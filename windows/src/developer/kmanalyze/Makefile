@@ -22,7 +22,7 @@ wrap-symbols:
 test-manifest:
     @rem
 
-#install:
-#    $(COPY) $(PROGRAM)\developer\kmanalyze.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmanalyze.exe"
+install:
+    $(COPY) $(PROGRAM)\developer\kmanalyze.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmanalyze.exe"
 
 !include ..\..\Target.mak

@@ -1,8 +1,15 @@
-keyman (15.0.90) UNRELEASED; urgency=medium
+keyman (15.0.90-1) UNRELEASED; urgency=medium
 
   * Consolidate source packages
 
  -- Eberhard Beilharz <eb1@sil.org>  Mon, 02 Aug 2021 18:13:58 +0200
+
+keyman-config (14.0.280-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 23 Aug 2021 17:38:22 +0200
 
 keyman-config (14.0.276-2) experimental; urgency=medium
 

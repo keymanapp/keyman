@@ -7,7 +7,7 @@ namespace com.keyman.osk.layouts {
     titleBar: layouts.TitleBar;
     resizeBar: layouts.ResizeBar;
 
-    private oskView: OSKManager;
+    private oskView: FloatingOSKView;
 
     // Encapsulations of the drag behaviors for OSK movement & resizing
     private _moveHandler: MouseDragOperation;
@@ -44,12 +44,9 @@ namespace com.keyman.osk.layouts {
       return this.resizeDragHandler.isActive;
     }
 
-    attachToView(view: OSKManager) {
-      if(this.oskView) {
-        throw new Error("This layout is already attached to an OSK.");
-      }
-
+    attachToView(view: FloatingOSKView) {
       this.oskView = view;
+      this.titleBar.attachHandlers(view);
       this.titleDragHandler.enabled = !view.noDrag;
       this.resizeDragHandler.enabled = true; // by default.
     }
@@ -148,8 +145,8 @@ namespace com.keyman.osk.layouts {
             return;
           }
 
-          this.startWidth = layout.oskView.vkbd.kbdDiv.offsetWidth;
-          this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
+          this.startWidth = layout.oskView.computedWidth;
+          this.startHeight = layout.oskView.computedHeight;
 
           let keymanweb = com.keyman.singleton;
 
@@ -200,8 +197,8 @@ namespace com.keyman.osk.layouts {
           }
 
           if(layout.oskView.vkbd) {
-            this.startWidth  = layout.oskView.vkbd.kbdDiv.offsetWidth;
-            this.startHeight = layout.oskView.vkbd.kbdDiv.offsetHeight;
+            this.startWidth  = layout.oskView.computedWidth;
+            this.startHeight = layout.oskView.computedHeight;
           }
           layout.oskView.refreshLayout(); // Finalize the resize.
           layout.oskView.doResizeMove();

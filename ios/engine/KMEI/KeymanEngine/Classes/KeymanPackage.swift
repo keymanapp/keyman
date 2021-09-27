@@ -16,6 +16,8 @@ public enum KMPError : String, Error {
   case invalidPackage = "kmp-error-invalid"
   case fileSystem = "kmp-error-file-system"
   case copyFiles = "kmp-error-file-copying"
+  case unsupportedPackage = "kmp-error-unsupported"
+  case doesNotExist = "kmp-error-missing"
   // TODO:  Consider changing the parent type so that these may take arguments that may be used
   //        to provide better clarity.
   case wrongPackageType = "kmp-error-wrong-type"
@@ -380,35 +382,37 @@ public class KeymanPackage {
    * Typecast the return value to either KeyboardKeymanPackage or LexicalModelKeymanPackage for richly-typed
    * information about the package's contents.
    */
-  static public func parse(_ folder: URL) -> KeymanPackage? {
-    do {
-      var path = folder
-      path.appendPathComponent(kmpFile)
-      if FileManager.default.fileExists(atPath: path.path) {
-        let data = try Data(contentsOf: path, options: .mappedIfSafe)
-        let decoder = JSONDecoder()
+  static public func parse(_ folder: URL) throws -> KeymanPackage? {
+    var path = folder
+    path.appendPathComponent(kmpFile)
+    if FileManager.default.fileExists(atPath: path.path) {
+      let data = try Data(contentsOf: path, options: .mappedIfSafe)
+      let decoder = JSONDecoder()
 
-        var metadata: KMPMetadata
+      var metadata: KMPMetadata
 
-        do {
-          metadata = try decoder.decode(KMPMetadata.self, from: data)
-        } catch {
-          throw KMPError.noMetadata
-        }
-
-        switch metadata.packageType {
-          case .Keyboard:
-            return KeyboardKeymanPackage(metadata: metadata, folder: folder)
-          case .LexicalModel:
-            return LexicalModelKeymanPackage(metadata: metadata, folder: folder)
-          default:
-            throw KMPError.invalidPackage
-        }
+      do {
+        metadata = try decoder.decode(KMPMetadata.self, from: data)
+      } catch {
+        throw KMPError.noMetadata
       }
-    } catch {
-      // It's not an app or engine error when the package itself is invalid.
-      // Definitely worth noting, though.
-      SentryManager.breadcrumbAndLog("error parsing keyman package: \(error)", sentryLevel: .error)
+
+      var package: KeymanPackage
+
+      switch metadata.packageType {
+        case .Keyboard:
+          package = KeyboardKeymanPackage(metadata: metadata, folder: folder)
+        case .LexicalModel:
+          package = LexicalModelKeymanPackage(metadata: metadata, folder: folder)
+        default:
+          throw KMPError.invalidPackage
+      }
+
+      if package.resources.count == 0 {
+        throw KMPError.unsupportedPackage
+      } else {
+        return package
+      }
     }
     
     return nil
@@ -417,13 +421,19 @@ public class KeymanPackage {
   @available(*, deprecated, message: "Use of the completion block is unnecessary; this method now returns synchronously.")
   static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void) throws {
     try unzipFile(fileUrl: fileUrl, destination: destination) {
-      complete(KeymanPackage.parse(destination))
+      do {
+        let package = try KeymanPackage.parse(destination)
+        complete(package)
+      } catch {
+        SentryManager.captureAndLog(error, sentryLevel: .info)
+        complete(nil)
+      }
     }
   }
 
   static public func extract(fileUrl: URL, destination: URL) throws -> KeymanPackage? {
     try unzipFile(fileUrl: fileUrl, destination: destination)
-    return KeymanPackage.parse(destination)
+    return try KeymanPackage.parse(destination)
   }
 
   static public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void = {}) throws {

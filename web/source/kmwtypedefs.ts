@@ -3,7 +3,7 @@ namespace com.keyman {
     /**
      * Provides the core interface between the DOM and the actual keyboard.
      */
-    interface:      text.OutputTarget;
+    interface:      dom.targets.OutputTarget;
 
     /**
      * Tracks the control's independent keyboard selection, when applicable.
@@ -23,7 +23,7 @@ namespace com.keyman {
      */
     touchEnabled:   boolean;
 
-    constructor(eleInterface: text.OutputTarget, kbd: string, touch?: boolean) {
+    constructor(eleInterface: dom.targets.OutputTarget, kbd: string, touch?: boolean) {
       this.interface = eleInterface;
       this.keyboard = kbd;
       this.touchEnabled = touch || false;

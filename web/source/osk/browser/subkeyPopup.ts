@@ -65,7 +65,8 @@ namespace com.keyman.osk.browser {
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
       let rowElement = (e.key as OSKBaseKey).row.element;
-      ss.bottom = (vkbd.height - rowElement.offsetTop) + 'px';
+      const _Box = vkbd.element.offsetParent as HTMLDivElement;
+      ss.bottom = (_Box.offsetHeight - rowElement.offsetTop) + 'px';
 
       // Set key font according to layout, or defaulting to OSK font
       // (copied, not inherited, since OSK is not a parent of popup keys)
@@ -106,16 +107,16 @@ namespace com.keyman.osk.browser {
       this.shim.id = 'kmw-popup-shim';
 
       // Highlight the duplicated base key or ideal subkey (if a phone)
-      if(vkbd.device.formFactor == 'phone') {
+      if(vkbd.device.formFactor == utils.FormFactor.Phone) {
         this.selectDefaultSubkey(vkbd, e, subKeys /* == this.element */);
       }
     }
 
-    finalize(touch: Touch) {
+    finalize(input: InputEventCoordinate) {
       if(this.resolver) {
         let keyEvent: text.KeyEvent = null;
         if(this.currentSelection) {
-          keyEvent = this.vkbd.initKeyEvent(this.currentSelection, touch);
+          keyEvent = this.vkbd.initKeyEvent(this.currentSelection, input);
           this.currentSelection.key.highlight(false);
         }
         this.resolver(keyEvent);
@@ -132,7 +133,7 @@ namespace com.keyman.osk.browser {
       // And correct its position with respect to that element
       let ss=subKeys.style;
       var x = dom.Utils.getAbsoluteX(e)+0.5*(e.offsetWidth-subKeys.offsetWidth);
-      var xMax = keyman.osk.getWidth() - subKeys.offsetWidth;
+      var xMax = keyman.osk.computedWidth - subKeys.offsetWidth;
 
       if(x > xMax) {
         x=xMax;
@@ -149,7 +150,7 @@ namespace com.keyman.osk.browser {
       let constrainPopup = keyman.isEmbedded;
 
       let cs = getComputedStyle(subKeys);
-      let oskHeight = keyman.osk.getHeight();
+      let oskHeight = keyman.osk.computedHeight;
       let bottomY = parseInt(cs.bottom, 10);
       let popupHeight = parseInt(cs.height, 10);
 
@@ -160,7 +161,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Add the callout
-      if(vkbd.device.formFactor != 'phone' || vkbd.device.OS != 'iOS') {
+      if(vkbd.device.formFactor != utils.FormFactor.Phone || vkbd.device.OS != utils.OperatingSystem.iOS) {
         this.callout = this.addCallout(e, delta);
       }
     }
@@ -256,7 +257,7 @@ namespace com.keyman.osk.browser {
       }
     }
 
-    updateTouch(touch: Touch) {
+    updateTouch(input: InputEventCoordinate) {
       this.currentSelection = null;
       this.baseKey.key.highlight(false);
 
@@ -264,7 +265,7 @@ namespace com.keyman.osk.browser {
         try {
           let sk = this.element.childNodes[i].firstChild as KeyElement;
 
-          let onKey = sk.key.isUnderTouch(touch);
+          let onKey = sk.key.isUnderTouch(input);
           if(onKey) {
             this.currentSelection = sk;
           }
@@ -279,7 +280,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Use the popup duplicate of the base key if a phone with a visible popup array
-      if(!this.currentSelection && this.baseKey.key.isUnderTouch(touch)) {
+      if(!this.currentSelection && this.baseKey.key.isUnderTouch(input)) {
         this.baseKey.key.highlight(true);
         this.currentSelection = this.baseKey;
       }

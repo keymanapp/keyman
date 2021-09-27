@@ -131,14 +131,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.onStartInput(attribute, restarting);
     KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    // Select numeric layer if applicable
+    // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
     int inputType = attribute.inputType;
-    if (((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER) ||
-        ((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_PHONE)) {
-      KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
-    }
-
-    // Temporarily disable predictions if entering a hidden password field
     KMManager.setMayPredictOverride(inputType);
     if (KMManager.getMayPredictOverride()) {
       KMManager.setBannerOptions(false);
@@ -165,6 +159,11 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         if (!didUpdateText || !didUpdateSelection)
           exText = icText;
       }
+    }
+
+    // Select numeric layer if applicable
+    if (KMManager.isNumericField(inputType)) {
+      KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
   }
 

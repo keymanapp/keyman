@@ -49,7 +49,7 @@ namespace com.keyman.keyboards {
      * Matches the key code as set within Keyman Developer for the layout.
      * For example, K_R or U_0020.  Denotes either physical keys or virtual keys with custom output,
      * with no additional metadata like layer or active modifiers.
-     * 
+     *
      * Is used to determine the keycode for input events, rule-matching, and keystroke processing.
      */
     public get baseKeyID(): string {
@@ -62,20 +62,20 @@ namespace com.keyman.keyboards {
 
     /**
      * A unique identifier based on both the key ID & the 'desktop layer' to be used for the key.
-     * 
+     *
      * Allows diambiguation of scenarios where the same key ID is used twice within a layer, but
      * with different innate modifiers.  (Refer to https://github.com/keymanapp/keyman/issues/4617)
      * The 'desktop layer' may be omitted if it matches the key's display layer.
-     * 
+     *
      * Examples, given a 'default' display layer, matching keys to Keyman keyboard language:
-     * 
+     *
      * ```
-     * "K_Q" 
+     * "K_Q"
      * + [K_Q]
      * "K_Q+shift"
      * + [K_Q SHIFT]
      * ```
-     * 
+     *
      * Useful when the active layer of an input-event is already known.
      */
     public get coreID(): string {
@@ -84,7 +84,7 @@ namespace com.keyman.keyboards {
       }
 
       let baseID = this.id || '';
-      
+
       if(this.displayLayer != this.layer) {
         baseID = baseID + '+' + this.layer;
       }
@@ -95,19 +95,19 @@ namespace com.keyman.keyboards {
     /**
      * A keyboard-unique identifier to be used for any display elements representing this key
      * in user interfaces and/or on-screen keyboards.
-     * 
+     *
      * Distinguishes between otherwise-identical keys on different layers of an OSK.
      * Includes identifying information about the key's display layer.
-     * 
+     *
      * Examples, given a 'default' display layer, matching keys to Keyman keyboard language:
-     * 
+     *
      * ```
-     * "default-K_Q" 
+     * "default-K_Q"
      * + [K_Q]
      * "default-K_Q+shift"
      * + [K_Q SHIFT]
      * ```
-     * 
+     *
      * Useful when only the active keyboard is known about an input event.
      */
     public get elementID(): string {
@@ -544,7 +544,7 @@ namespace com.keyman.keyboards {
                 return;
               default:
                 // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
-                // layer shifting keys.  To be safe, we currently let K_TABBACK and 
+                // layer shifting keys.  To be safe, we currently let K_TABBACK and
                 // K_TABFWD through, though we might be able to drop them too.
                 let code = com.keyman.text.Codes[key.baseKeyID];
                 if(code > 50000 && code < 50011) {
@@ -639,11 +639,11 @@ namespace com.keyman.keyboards {
      * Refer to https://github.com/keymanapp/keyman/issues/254, which mentions
      * KD-11 from a prior issue-tracking system from the closed-source days that
      * resulted in an unintended extra empty row.
-     * 
+     *
      * It'll be pretty rare to see a keyboard affected by the bug, but we don't
      * 100% control all keyboards out there, so it's best we make sure the edge
      * case is covered.
-     * 
+     *
      * @param layers The layer group to be loaded for the form factor.  Will be
      *               mutated by this operation.
      */
@@ -652,14 +652,10 @@ namespace com.keyman.keyboards {
         let layer=layers[n];
         let rows=layer['row'];
         let i: number;
-        for(i=rows.length; i>0; i--) {
-          if(rows[i-1]['key'].length > 0) {
-            break;
+        for(i=rows.length-1; i>=0; i--) {
+          if(!Array.isArray(rows[i]['key']) || rows[i]['key'].length == 0) {
+            rows.splice(i, 1)
           }
-        }
-
-        if(i < rows.length) {
-          rows.splice(i-rows.length,rows.length-i);
         }
       }
     }
@@ -675,28 +671,11 @@ namespace com.keyman.keyboards {
       }
 
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-      var n: number, i: number;
-      var layers: LayoutLayer[], layer: LayoutLayer;
+      var n: number;
       let layerMap: {[layerId: string]: ActiveLayer} = {};
-      var rows: LayoutRow[];
 
-      ActiveLayout.correctLayerEmptyRowBug(layout['layer']);
-      layers=layout['layer'];
-
-      // ***Delete any empty rows at the end added by compiler bug...
-      for(n=0; n<layers.length; n++) {
-        layer=layers[n]; rows=layer['row'];
-        for(i=rows.length; i>0; i--) {
-          if(rows[i-1]['key'].length > 0) {
-            break;
-          }
-        }
-
-        if(i < rows.length) {
-          rows.splice(i-rows.length,rows.length-i);
-        }
-      }
-      // ...remove to here when compiler bug fixed ***
+      let layers=layout['layer'];
+      ActiveLayout.correctLayerEmptyRowBug(layers);
 
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveLayout();

@@ -541,7 +541,7 @@ var
 begin
   if GetPackageFromParams(params, pkg) then
   begin
-    DoShowPackageWelcome(pkg, True);
+    DoShowPackageWelcome(Self, pkg, True);
   end
   else
     ShowMessage(MsgFromIdFormat(SKPackageDoesNotIncludeWelcome, ['']));

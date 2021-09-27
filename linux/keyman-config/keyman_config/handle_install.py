@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlparse
 from keyman_config import KeymanComUrl, __tier__
 from keyman_config.install_window import InstallKmpWindow
 from keyman_config.get_kmp import get_download_folder, download_kmp_file
+from zipfile import is_zipfile
 
 
 def download_and_install_package(url):
@@ -40,6 +41,10 @@ def download_and_install_package(url):
         severity = logging.ERROR
     else:
         logging.critical("Invalid URL: " + url)
+        return
+
+    if not is_zipfile(packageFile):
+        logging.critical("Not a valid KMP package: " + url)
         return
 
     if packageFile and not _install_package(packageFile, bcp47):

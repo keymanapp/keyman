@@ -3076,9 +3076,9 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Action = modActionsKeyboardEditor.actDebugSelectSystemKeyboard
       end
     end
-    object ools1: TMenuItem
+    object mnuTools: TMenuItem
       Caption = '&Tools'
-      OnClick = ools1Click
+      OnClick = mnuToolsClick
       object VirtualKeyIdentifier1: TMenuItem
         Action = modActionsMain.actToolsVirtualKeyIdentifier
       end
@@ -3093,6 +3093,13 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       end
       object mnuToolsDebugTests: TMenuItem
         Caption = 'Debug Tests'
+        object mnuToolsDebugTestsShowDebuggerEventsPanel: TMenuItem
+          Caption = 'Show Debugger Events panel'
+          OnClick = mnuToolsDebugTestsShowDebuggerEventsPanelClick
+        end
+        object N3: TMenuItem
+          Caption = '-'
+        end
         object mnuToolsDebugTestsExceptionTest: TMenuItem
           Caption = '&Exception Test'
           OnClick = mnuToolsDebugTestsExceptionTestClick

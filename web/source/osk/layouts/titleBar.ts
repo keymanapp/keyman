@@ -1,7 +1,8 @@
 /// <reference path="mouseDragOperation.ts" />
+/// <reference path="../oskViewComponent.ts" />
 
 namespace com.keyman.osk.layouts {
-  export class TitleBar {
+  export class TitleBar implements OSKViewComponent {
     private _element: HTMLDivElement;
     private _unpinButton: HTMLDivElement;
     private _closeButton: HTMLDivElement;
@@ -9,13 +10,18 @@ namespace com.keyman.osk.layouts {
     private _configButton: HTMLDivElement;
     private _caption: HTMLSpanElement;
 
+    private static readonly DISPLAY_HEIGHT = ParsedLengthStyle.inPixels(20); // As set in kmwosk.css
+
     public constructor(dragHandler?: MouseDragOperation) {
       this._element = this.buildTitleBar();
-      this.attachHandlers();
 
       if(dragHandler) {
         this.element.onmousedown = dragHandler.mouseDownHandler;
       }
+    }
+
+    public get layoutHeight(): ParsedLengthStyle {
+      return TitleBar.DISPLAY_HEIGHT;
     }
 
     private mouseCancellingHandler: (ev: MouseEvent) => boolean = function(ev: MouseEvent) {
@@ -45,8 +51,7 @@ namespace com.keyman.osk.layouts {
       this._caption.innerHTML = title;
     }
 
-    public attachHandlers() {
-      let osk = com.keyman.singleton.osk;
+    public attachHandlers(osk: OSKView) {
       let util = com.keyman.singleton.util;
 
       this._helpButton.onclick = function() {
@@ -68,13 +73,16 @@ namespace com.keyman.osk.layouts {
       }
 
       this._closeButton.onclick = function () {
-        osk._Hide(true);
+        osk.startHide(true);
         return false;
       };
 
-      this._unpinButton.onclick = function () {
-        osk.restorePosition(true);
-        return false;
+      if(osk instanceof FloatingOSKView) {
+        const _osk = osk as FloatingOSKView;
+        this._unpinButton.onclick = function () {
+          _osk.restorePosition(true);
+          return false;
+        }
       }
     }
 
@@ -162,6 +170,10 @@ namespace com.keyman.osk.layouts {
       Limg.onmousedown = this.mouseCancellingHandler;
 
       return Limg;
+    }
+
+    public refreshLayout() {
+      // The title bar is adaptable as it is and needs no adjustments.
     }
   }
 }

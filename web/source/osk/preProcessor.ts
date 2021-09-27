@@ -9,9 +9,9 @@ namespace com.keyman.osk {
      * 
      * @param       {Object}      e      element touched (or clicked)
      */
-    static clickKey(e: osk.KeyElement, touch?: Touch) {
+    static clickKey(e: osk.KeyElement, input?: InputEventCoordinate) {
       let keyman = com.keyman.singleton;
-      let Lkc = keyman['osk'].vkbd.initKeyEvent(e, touch);
+      let Lkc = keyman['osk'].vkbd.initKeyEvent(e, input);
       if(!Lkc) {
         return true;
       }
@@ -21,7 +21,7 @@ namespace com.keyman.osk {
 
     static raiseKeyEvent(keyEvent: text.KeyEvent) {
       let keyman = com.keyman.singleton;
-      var Lelem = keyman.domManager.getLastActiveElement();
+      var Lelem = keyman.domManager.lastActiveElement;
 
       if(Lelem != null) {
         // Handle any DOM state management related to click inputs.
@@ -63,7 +63,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      let retVal = (keyman.core.processKeyEvent(Lkc, outputTarget) != null);
+      let retVal = !!keyman.core.processKeyEvent(Lkc, outputTarget);
 
       return retVal;
     }

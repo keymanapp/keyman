@@ -30,9 +30,9 @@ function downloadSource() {
     packageDir=$1
 
     if [ "${proj}" == "keyman" ]; then
-       cd ${BASEDIR}/..
+       cd ${BASEDIR}
     else
-       cd ${proj}
+       cd legacy/${proj}
     fi
 
     if [ "${proj}" == "keyman" ]; then

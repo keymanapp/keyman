@@ -19,7 +19,7 @@ KMX_BOOL km::kbp::kmx::g_silent = FALSE;
 * KMX_ProcessEvent
 */
 
-KMX_ProcessEvent::KMX_ProcessEvent() : m_actions(&m_context), m_options(&m_keyboard) {
+KMX_ProcessEvent::KMX_ProcessEvent() : m_actions(&m_context), m_options(&m_keyboard, m_actions) {
   m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];
   m_miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
   m_miniContextIfLen = 0;
@@ -29,7 +29,7 @@ KMX_ProcessEvent::KMX_ProcessEvent() : m_actions(&m_context), m_options(&m_keybo
 KMX_ProcessEvent::~KMX_ProcessEvent() {
   delete[] m_indexStack;
   delete[] m_miniContext;
-  if(m_debug_items) delete m_debug_items;
+  DeleteInternalDebugItems();
 }
 
 char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
@@ -86,14 +86,11 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
   m_kbp_state = state;
 
   // If debugging is enabled, then ...
-  if(m_debug_items) {
-    delete m_debug_items;
-    m_debug_items = NULL;
-  }
+  DeleteInternalDebugItems();
 
   state->debug_items().clear();
   if(state->debug_items().is_enabled()) {
-    m_debug_items = new KMX_DebugItems(&state->debug_items());
+    CreateInternalDebugItems();
   } else {
     // We want to have a clean debug state even if it is not in use
     state->debug_items().push_end(m_actions.Length(), 0);
@@ -119,7 +116,10 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
     break;
   case KM_KBP_VKEY_SHIFT:
     KeyShiftPress(modifiers, isKeyDown);
-    break;
+    return TRUE;
+  case KM_KBP_VKEY_CONTROL:
+  case KM_KBP_VKEY_ALT:
+    return TRUE;
   }
 
   if (!isKeyDown) {
@@ -145,8 +145,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
     m_debug_items->push_end(m_actions.Length(), fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
     // m_debug_items is just a helper class that pushes to state->debug_items(),
     // so we can throw it away after we are done with it
-    delete m_debug_items;
-    m_debug_items = nullptr;
+    DeleteInternalDebugItems();
   }
 
   m_kbp_state = nullptr;
@@ -293,7 +292,6 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
           m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
           pdeletecontext = m_context.Buf(1);
         }
-
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
@@ -313,7 +311,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
       PostString(gp->dpNoMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
       if(m_debug_items) {
         m_debug_items->push_nomatch_exit(m_actions.Length(), gp);
-    }
+      }
     }
     else if (m_state.charCode != 0 && m_state.charCode != 0xFFFF && gp->fUsingKeys)
     {
@@ -784,4 +782,19 @@ PKMX_WCHAR KMX_ProcessEvent::GetSystemStore(LPKEYBOARD kb, KMX_DWORD SystemID)
     if (kb->dpStoreArray[i].dwSystemID == SystemID) return kb->dpStoreArray[i].dpString;
 
   return NULL;
+}
+
+void KMX_ProcessEvent::CreateInternalDebugItems() {
+  assert(m_debug_items == nullptr);
+  assert(m_kbp_state != nullptr);
+  m_debug_items = new KMX_DebugItems(&m_kbp_state->debug_items());
+  m_options.SetInternalDebugItems(m_debug_items);
+}
+
+void KMX_ProcessEvent::DeleteInternalDebugItems() {
+  if(m_debug_items) {
+    delete m_debug_items;
+    m_debug_items = nullptr;
+  }
+  m_options.SetInternalDebugItems(m_debug_items);
 }

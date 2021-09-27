@@ -19,7 +19,9 @@
 // Defines the ui management code that tracks UI activation and such.
 /// <reference path="kmwuimanager.ts" />
 // Defines OSK management code.
-/// <reference path="osk/oskManager.ts" />
+/// <reference path="osk/anchoredOskView.ts" />
+/// <reference path="osk/floatingOskView.ts" />
+/// <reference path="osk/inlinedOskView.ts" />
 // Defines the model manager.
 /// <reference path="text/prediction/modelManager.ts" />
 
@@ -84,7 +86,7 @@ namespace com.keyman {
 
     // Internal objects
     ['util']: Util;
-    ['osk']: com.keyman.osk.OSKManager;
+    ['osk']: com.keyman.osk.OSKView;
     ['ui']: any;
     keyboardManager: keyboards.KeyboardManager;
     domManager: dom.DOMManager;
@@ -256,7 +258,7 @@ namespace com.keyman {
       if (!e) {
         e = window.event as E;
         if(!e) {
-          var elem: HTMLElement = this.domManager.getLastActiveElement();
+          var elem: HTMLElement = this.domManager.lastActiveElement;
           if(elem) {
             let doc = elem.ownerDocument;
             var win: Window;
@@ -527,7 +529,7 @@ namespace com.keyman {
     ['resetContext'](e?: HTMLElement) {
       let elem = e;
       if(!elem) {
-        elem = dom.DOMEventHandlers.states.activeElement;
+        elem = this.domManager.activeElement;
       }
       let outputTarget = dom.Utils.getOutputTarget(elem);
       if(outputTarget) {
@@ -614,7 +616,7 @@ namespace com.keyman {
      * @return      {Object}
      */
     ['getLastActiveElement']() {
-      return this.domManager.getLastActiveElement();
+      return this.domManager.lastActiveElement;
     }
 
     /**
@@ -718,7 +720,7 @@ namespace com.keyman {
 
       PKbd = PKbd || this.core.activeKeyboard;
 
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.getKeyboardHeight());
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.computedHeight);
     }
   }
 }

@@ -52,6 +52,13 @@ end;
 
 pkm_kbp_state_debug_key_info = ^km_kbp_state_debug_key_info;
 
+km_kbp_state_debug_kmx_option_info = record
+  store: Pointer;       // LPSTORE
+  value: array[0..DEBUG_MAX_CONTEXT-1] of km_kbp_cp;  // value to be saved into the store
+end;
+
+pkm_kbp_state_debug_kmx_option_info = ^km_kbp_state_debug_kmx_option_info;
+
 ///
 /// KMX processor data for each event. kmx_base.h defines the types that are
 /// passed in here, read only. Warning: context may contain sentinel values
@@ -73,6 +80,7 @@ km_kbp_state_debug_kmx_info = record
   /// the debugger; the debugger uses this to determine when to
   /// execute the actions when single-stepping.
   first_action: uint16_t;
+  option: km_kbp_state_debug_kmx_option_info;
 end;
 
 pkm_kbp_state_debug_kmx_info = ^km_kbp_state_debug_kmx_info;
@@ -110,6 +118,7 @@ const
   KM_KBP_DEBUG_NOMATCH_ENTER = 8;
   KM_KBP_DEBUG_NOMATCH_EXIT = 9;
   KM_KBP_DEBUG_END = 10;
+  KM_KBP_DEBUG_SET_OPTION = 11;
 
 // Flags for KM_KBP_DEBUG_GROUP_EXIT
 const KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW = $0001;
@@ -176,8 +185,9 @@ initialization
   Assert(sizeof(km_kbp_attr) = 16);
 
   //keyboardprocessor_debug.h:
-  Assert(sizeof(km_kbp_state_debug_item) = 268);
+  Assert(sizeof(km_kbp_state_debug_item) = 432);
   Assert(sizeof(km_kbp_state_debug_key_info) = 6);
-  Assert(sizeof(km_kbp_state_debug_kmx_info) = 252);
+  Assert(sizeof(km_kbp_state_debug_kmx_info) = 416);
+  Assert(sizeof(km_kbp_state_debug_kmx_option_info) = 164);
   Assert(sizeof(km_kbp_debug_type) = 4);
 end.

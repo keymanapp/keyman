@@ -608,6 +608,15 @@ const
   KM_KBP_VKEY__FE   = $FE;
   KM_KBP_VKEY__FF   = $FF;
 
+// keyboardprocessor_consts.h
+const
+  // Defined environment options for KMX processor
+  KM_KBP_KMX_ENV_PLATFORM                       = 'platform';
+  KM_KBP_KMX_ENV_BASELAYOUT                     = 'baseLayout';
+  KM_KBP_KMX_ENV_BASELAYOUTALT                  = 'baseLayoutAlt';
+  KM_KBP_KMX_ENV_SIMULATEALTGR                  = 'simulateAltgr';
+  KM_KBP_KMX_ENV_CAPSLOCK                       = 'capsLock';
+  KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT = 'baseLayoutGivesCtrlRAltForRAlt';
 
 procedure _km_kbp_set_library_path(const path: string);
 

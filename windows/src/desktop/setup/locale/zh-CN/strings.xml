@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">中文 (简体)</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION 设置</string>
+  <string name="ssTitle">安装 $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION 已成功安装。</string>
+  <string name="ssCancelQuery">您确定要取消安装 $APPNAME 吗？</string>
+  <string name="ssBootstrapExtractingBundle">正在提取捆绑包...</string>
+  <string name="ssBootstrapCheckingPackages">正在检查软件包...</string>
+  <string name="ssBootstrapCheckingForUpdates">在线检查更新...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">正在检查已安装版本...</string>
+  <string name="ssBootstrapReady">正在完成操作...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">没有任何东西可以安装。</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s 下载)</string>
+  <string name="ssActionInstall">安装程序将会安装：</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION 是免费，公开的资源</string>
+  <string name="ssLicenseLink">阅读许可证 (&amp;R)</string>
+  <string name="ssInstallOptionsLink">安装 选项 (&amp;O)</string>
+  <string name="ssMessageBoxTitle">$APPNAME 设置</string>
+  <string name="ssOkButton">確定</string>
+  <string name="ssInstallButton">安装 (&amp;I)</string>
+  <string name="ssCancelButton">取消</string>
+  <string name="ssExitButton">退出 (&amp;X)</string>
+  <string name="ssStatusInstalling">正在安装 $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">删除旧版本</string>
+  <string name="ssStatusComplete">安装完成</string>
+  <string name="ssQueryRestart">您必须在安装程序完成前重新启动Windows。当您重新启动Windows时，安装程序将会继续。
+
+现在重新启动吗？</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows无法自动重启。您应该在尝试和启动 $APPNAME 之前重启Windows。</string>
+  <string name="ssMustRestart">您必须重启 Windows 来完成安装。当您重新启动 Windows后，安装程序将会完成。</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION 需要安装 Windows 7 或更高版本。然而，已检测到 Keyman 桌面 7、8 或9。 您想要将此安装程序中包含的键盘安装到已安装的 Keyman 桌面版本吗？</string>
+  <string name="ssOldOsVersionDownload">此版本的 $APPNAME 需要在安装 Windows 7 或以后版本后安装。您想要下载 Keyman桌面8吗？</string>
+  <string name="ssOptionsTitle">安装选项</string>
+  <string name="ssOptionsTitleInstallOptions">安装选项</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">默认 $APPNAME 设置</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">安装或升级模块</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">关联的键盘语言</string>
+  <string name="ssOptionsTitleLocation">要安装的版本</string>
+  <string name="ssOptionsStartWithWindows">在Windows启动时启动$APPNAME</string>
+  <string name="ssOptionsStartAfterInstall">安装完成后启动 $APPNAME</string>
+  <string name="ssOptionsCheckForUpdates">定期在线检查更新</string>
+  <string name="ssOptionsUpgradeKeyboards">将用旧版本安装的键盘升级到$VERSION版本</string>
+  <string name="ssOptionsAutomaticallyReportUsage">用 keyman.com 分享匿名使用统计</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">设置版本: %0:s</string>
+  <string name="ssOptionsInstallKeyman">安装 $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">升级 $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s 已经安装。</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">下载版本 %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">版本 %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">安装 %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">下载版本 %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">版本 %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">选择您想要与 %0:s 键盘关联的语言</string>
+  <string name="ssOptionsDefaultLanguage">默认语言</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">正在下载 %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">正在下载 %0:s</string>
+  <string name="ssOffline">$APPNAME 安装程序无法连接到 keyman.com 下载额外资源。
+
+请检查您是否在线，并在防火墙设置中授予 $APPNAME 访问互联网的权限。
+
+点击中止退出设置，点击重试以重新下载资源，或者点击忽略以离线继续。</string>
+</resources>

@@ -41,15 +41,13 @@ type
     Flags: DWord;
     Rule: TKeymanKeyEx;
     Group: TKeymanGroupEx;
+    OptionStoreName: string;
+    OptionValue: string;
     Key: TAIDebugKeyInfo;
     Context: WideString;
     StoreOffsets: array[0..20] of Word; //TKeymanStoreEx;
     nStores: Integer;
     procedure FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
-  end;
-
-  TDebugEventCursor = record
-    X, Y: Integer;
   end;
 
   TDebugEventType = (etAction, etRuleMatch);
@@ -59,14 +57,12 @@ type
     FEventType: TDebugEventType;
     FAction: TDebugEventActionData;
     FRule: TDebugEventRuleData;
-    FCursor: TDebugEventCursor;
     procedure SetEventType(const Value: TDebugEventType);
   public
     constructor Create;
     destructor Destroy; override;
     property Action: TDebugEventActionData read FAction;
     property Rule: TDebugEventRuleData read FRule;
-    property Cursor: TDebugEventCursor read FCursor;
     property EventType: TDebugEventType read FEventType write SetEventType;
   end;
 
@@ -262,6 +258,7 @@ var
   ev: TDebugEvent;
   rule: PKeymanKey;
   group: PKeymanGroup;
+  store: PKeymanStore;
 begin
   if not Assigned(debugkeyboard) then Exit;
 
@@ -302,6 +299,13 @@ begin
   begin
     ev.Rule.Key.VirtualKey := vk;
     ev.Rule.Key.Modifiers := modifier_state;
+  end;
+
+  if ev.Rule.ItemType = KM_KBP_DEBUG_SET_OPTION then
+  begin
+    store := PKeymanStore(debug.kmx_info.option.store);
+    ev.Rule.OptionStoreName := store.dpName;
+    ev.Rule.OptionValue := debug.kmx_info.option.value;
   end;
 end;
 

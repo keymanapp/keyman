@@ -101,18 +101,37 @@ namespace com.keyman.text {
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
   KeyboardInterface.prototype['hideHelp'] = function(): void {
     let keyman = com.keyman.singleton;
-    keyman.osk._Hide(true);
+    keyman.osk.startHide(true);
   }
 
   KeyboardInterface.prototype['showHelp'] = function(Px: number, Py: number): void {
     let keyman = com.keyman.singleton;
-    keyman.osk._Show(Px,Py);
+    if(keyman.osk instanceof osk.FloatingOSKView) {
+      keyman.osk.presentAtPosition(Px,Py);
+    } else {
+      keyman.osk.present();
+    }
   }
 
   KeyboardInterface.prototype['showPinnedHelp'] = function(): void {
     let keyman = com.keyman.singleton;
-    keyman.osk.userPositioned=true;
-    keyman.osk._Show(-1,-1);
+    if(keyman.osk instanceof osk.FloatingOSKView) {
+      // An old KMW bug previously auto-unset the affected field when this function was
+      // used by CJK keyboards during rule processing.  As a result, we need to condition
+      // on whether or not:
+      // 1.  The active keyboard is CJK
+      // 2.  A keyboard rule is actively processing.
+      //
+      // If BOTH are true, we do NOT mutate keyman.osk.userPositioned.
+      // Otherwise, not all conditions are met, so we still allow OSK pinning.
+      if(!keyman.core.activeKeyboard.isCJK || !this.ruleBehavior) {
+        keyman.osk.userPositioned=true;
+      }
+    }
+    // Automatically reuses previously-set positioning.
+    // Other OSK API functions must have previously been used to set the 
+    // pinned position.
+    keyman.osk.present();
   }
 
   // Also needed for some legacy CJK keyboards.

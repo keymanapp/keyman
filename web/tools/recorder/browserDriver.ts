@@ -77,6 +77,10 @@ namespace KMWRecorder {
           upEvent = new Event(BrowserDriver.oskUpMouseType);
           downEvent['relatedTarget'] = target;
           upEvent['relatedTarget'] = target;
+          // Mouse-click driven OSK use involves use of at least one mouse button.
+          downEvent['button'] = upEvent['button'] = 0;
+          downEvent['buttons'] = 1;
+          upEvent['buttons'] = 0;
         }
       } else { // Yeah, so IE can't use the above at all, and requires its own trick.
         downEvent = document.createEvent(BrowserDriver.oskEventClass);

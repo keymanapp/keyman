@@ -383,7 +383,7 @@ namespace com.keyman.osk {
         case '*ZWNJ*':
           // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
           // possible / available though, and there's a different standard symbol on Android.
-          oldText = vkbd.device.coreSpec.OS == com.keyman.utils.OperatingSystem.Android ?
+          oldText = vkbd.device.OS == com.keyman.utils.OperatingSystem.Android ?
             '*ZWNJAndroid*' :
             '*ZWNJiOS*';
           break;
@@ -478,18 +478,35 @@ namespace com.keyman.osk {
       ts.fontSize = this.getIdealFontSize(vkbd, styleSpec);
 
       // Finalize the key's text.
-      t.innerHTML = keyText;
+      t.innerText = keyText;
 
       return t;
     }
 
-    public isUnderTouch(touch: Touch): boolean {
-      let x = touch.clientX;
-      let y = touch.clientY;
+    public isUnderTouch(input: InputEventCoordinate): boolean {
+      let x = input.x;
+      let y = input.y;
 
       let btn = this.btn;
+      // These functions do not account for 'fixed' positioning.
       let x0 = dom.Utils.getAbsoluteX(btn); 
-      let y0 = dom.Utils.getAbsoluteY(btn);//-document.body.scrollTop;
+      let y0 = dom.Utils.getAbsoluteY(btn);
+
+      let isFixed = false;
+      let node: HTMLElement = btn;
+      while(node) {
+        if(getComputedStyle(node).position == 'fixed') {
+          isFixed = true;
+          break;
+        } else {
+          node = node.offsetParent as HTMLElement;
+        }
+      }
+      
+      if(isFixed) {
+        x0 += window.pageXOffset;
+        y0 += window.pageYOffset;
+      }
       
       let x1 = x0 + btn.offsetWidth;
       let y1 = y0 + btn.offsetHeight;

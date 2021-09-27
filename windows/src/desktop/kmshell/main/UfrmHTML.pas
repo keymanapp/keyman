@@ -42,14 +42,12 @@ type
     cmdPrint: TButton;
     cmdBack: TButton;
     cmdForward: TButton;
-    ApplicationEvents1: TApplicationEvents;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure cmdPrintClick(Sender: TObject);
     procedure cmdBackClick(Sender: TObject);
     procedure cmdForwardClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
   private
     cef: TframeCEFHost;
     FFileName: string;
@@ -61,7 +59,7 @@ type
     property URL: string write SetURL;
   end;
 
-procedure DoShowPackageWelcome(pkg: IKeymanPackage; ShowMessageIfNoWelcome: Boolean);
+procedure DoShowPackageWelcome(AOwner: TComponent; pkg: IKeymanPackage; ShowMessageIfNoWelcome: Boolean);
 //procedure DoShowWelcome(const Title, FileName: WideString);
 
 implementation
@@ -100,18 +98,6 @@ begin
   end;
 
   ShowFile(FFileName);
-end;
-
-procedure TfrmHTML.ApplicationEvents1Message(var Msg: tagMSG;
-  var Handled: Boolean);
-begin
-  if (Msg.message = WM_SYSCOMMAND) and (Msg.wParam = SC_RESTORE) then
-  begin
-    // Handle the case where Win+M pressed, window never restores
-    SendMessage(Application.Handle, WM_SHOWWINDOW, 1, 0);
-    SendMessage(Handle, WM_SHOWWINDOW, 1, SW_PARENTOPENING);
-    OpenIcon(Handle);
-  end;
 end;
 
 procedure TfrmHTML.cmdBackClick(Sender: TObject);
@@ -170,9 +156,9 @@ begin
   if Assigned(cef) then cef.Navigate(Value);
 end;
 
-procedure DoShowWelcome(const Title, FileName: WideString);
+procedure DoShowWelcome(AOwner: TComponent; const Title, FileName: WideString);
 begin
-  with TfrmHTML.Create(Screen.ActiveForm) do
+  with TfrmHTML.Create(AOwner) do
   try
     Width := Screen.Width * 6 div 10;
     Height := Screen.Height * 6 div 10;
@@ -186,13 +172,13 @@ begin
   end;
 end;
 
-procedure DoShowPackageWelcome(pkg: IKeymanPackage; ShowMessageIfNoWelcome: Boolean);
+procedure DoShowPackageWelcome(AOwner: TComponent; pkg: IKeymanPackage; ShowMessageIfNoWelcome: Boolean);
 var
   FWelcomeFile: IKeymanPackageContentFile;
 begin
   FWelcomeFile := pkg.WelcomeFile;
   if Assigned(FWelcomeFile) then
-    DoShowWelcome(pkg.Name, FWelcomeFile.FullFilename)
+    DoShowWelcome(AOwner, pkg.Name, FWelcomeFile.FullFilename)
   else if ShowMessageIfNoWelcome then
     ShowMessage(MsgFromIdFormat(SKPackageDoesNotIncludeWelcome, [pkg.Name]));
 end;

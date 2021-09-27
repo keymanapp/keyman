@@ -85,6 +85,7 @@ for proj in ${extra_projects}; do
             -e "s/_RELEASEVERSION_/${VERSION_RELEASE}/g" \
             -e "s/_TIER_/${TIER}/g" \
             -e "s/_ENVIRONMENT_/${VERSION_ENVIRONMENT}/g" \
+            -e "s/_UPLOADSENTRY_/${UPLOAD_SENTRY}/g" \
             version.py.in > version.py
         cd ../buildtools && python3 ./build-langtags.py
     fi

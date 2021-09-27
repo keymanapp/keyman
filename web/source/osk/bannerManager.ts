@@ -1,4 +1,5 @@
 /// <reference path="banner.ts" />
+/// <reference path="oskViewComponent.ts" />
 
 namespace com.keyman.osk {
   /**
@@ -49,13 +50,15 @@ namespace com.keyman.osk {
    *       needs to reserve this space (i.e: Keyman for iOS),
    *       rather than as its standalone app.
    */
-  export class BannerManager {
+  export class BannerManager implements OSKViewComponent {
     private _activeType: BannerType;
     private _options: BannerOptions = {};
     private bannerContainer: HTMLDivElement;
     private activeBanner: Banner;
     private alwaysShow: boolean;
     private imagePath?: string = "";
+
+    private readonly hostDevice: utils.DeviceSpec;
 
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
       alwaysShow: false,
@@ -64,9 +67,10 @@ namespace com.keyman.osk {
       imagePath: ""
     }
 
-    constructor() {
+    constructor(hostDevice: utils.DeviceSpec) {
       // Step 1 - establish the container element.  Must come before this.setOptions.
       this.constructContainer();
+      this.hostDevice = hostDevice;
 
       // Initialize with the default options - 
       // any 'manually set' options come post-construction.
@@ -190,7 +194,7 @@ namespace com.keyman.osk {
           banner = new ImageBanner(this.imagePath, Banner.DEFAULT_HEIGHT);
           break;
         case 'suggestion':
-          banner = new SuggestionBanner(height);
+          banner = new SuggestionBanner(this.hostDevice, height);
           break;
         default:
           throw new Error("Invalid type specified for the banner!");
@@ -210,7 +214,7 @@ namespace com.keyman.osk {
      * @param state 
      */
     selectBanner(state: text.prediction.StateChangeEnum) {
-      // Only display a SuggestionBanner when LanguageProcessor states it is active.s
+      // Only display a SuggestionBanner when LanguageProcessor states it is active.
       if(state == 'active') {
         this.setBanner('suggestion');
       } else if(state == 'inactive') {
@@ -222,7 +226,7 @@ namespace com.keyman.osk {
       } else if(state == 'configured') {
         let suggestionBanner = this.activeBanner as SuggestionBanner;
         if(suggestionBanner.postConfigure) {
-          // Triggers the initially-displayed suggestions.s
+          // Triggers the initially-displayed suggestions.
           suggestionBanner.postConfigure();
         }
       }
@@ -251,7 +255,7 @@ namespace com.keyman.osk {
       // Null guard b/c this function can be trigggered during OSK initialization.
       let keyman = com.keyman.singleton;
       if(keyman['osk']) {
-        keyman['osk']._Show();
+        keyman['osk'].refreshLayout();
       }
     }
 
@@ -278,5 +282,11 @@ namespace com.keyman.osk {
         this.activeBanner.height = h;
       }
     }
+
+    public get layoutHeight(): ParsedLengthStyle {
+      return ParsedLengthStyle.inPixels(this.height);
+    }
+
+    public refreshLayout() {};
   }
 }
