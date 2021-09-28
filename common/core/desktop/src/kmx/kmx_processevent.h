@@ -138,15 +138,6 @@ const char *Debug_VirtualKey(KMX_WORD vk);
 const char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
 const char *Debug_UnicodeString(std::u16string s, int x = 0);
 const char *Debug_ModifierName(KMX_UINT modifiers);
-const int CODE_PTR[2][14] = {
-      {CODE_ANY, CODE_NOTANY, CODE_INDEX, CODE_USE, CODE_DEADKEY, CODE_CLEARCONTEXT, CODE_CALL, CODE_CONTEXTEX, CODE_IFOPT,
-       CODE_IFSYSTEMSTORE, CODE_SETOPT, CODE_SETSYSTEMSTORE, CODE_RESETOPT, CODE_SAVEOPT},
-      {3, 3, 4, 3, 3, 3, 3, 3, 5, 5, 4, 4, 3, 3}};
-
-const int CODE_PTR[2][14] = {
-      {CODE_ANY, CODE_NOTANY, CODE_INDEX, CODE_USE, CODE_DEADKEY, CODE_CLEARCONTEXT, CODE_CALL, CODE_CONTEXTEX, CODE_IFOPT,
-       CODE_IFSYSTEMSTORE, CODE_SETOPT, CODE_SETSYSTEMSTORE, CODE_RESETOPT, CODE_SAVEOPT},
-      {3, 3, 4, 3, 3, 3, 3, 3, 5, 5, 4, 4, 3, 3}};
 inline KMX_BOOL ShouldDebug() {
   return g_debug_KeymanLog;
 }
