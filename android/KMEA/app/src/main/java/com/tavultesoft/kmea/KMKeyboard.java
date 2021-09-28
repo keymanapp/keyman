@@ -127,8 +127,8 @@ final class KMKeyboard extends WebView {
 
     // Normally, this would be true to prevent the WebView from accessing the network.
     // But this needs to false for sending embedded KMW crash reports to Sentry (keymanapp/keyman#3825)
-    // Throws SecurityException if INTERNET permission not granted
     if (KMManager.hasInternetPermission(context)) {
+      // Throws SecurityException if INTERNET permission not granted
       getSettings().setBlockNetworkLoads(!KMManager.getMaySendCrashReport());
     }
 
