@@ -9,6 +9,7 @@
 #include <locale>
 #include "kmx_processevent.h"
 #include "utfcodec.hpp"
+//#include <assert.h>
 
 using namespace std;
 using namespace km::kbp;
@@ -118,6 +119,7 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 */
 PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
 
+PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
   if (*p == 0)
     return p;
   if (*p != UC_SENTINEL) {
@@ -130,29 +132,22 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
     p += 2;
     while (*p && *p != UC_SENTINEL_EXTENDEDEND)
       p++;
-    if (*p == 0)
-      return p;
     return p + 1;
   }
 
-  // CODE_PTR defined in kmx_processevent.h
-  for (int i = 0; i < size(CODE_PTR[0]); i++) {
-    if (*(p + 1) == CODE_PTR[0][i]) {
-      deltaptr = CODE_PTR[1][i];
-      break;
-    }
-  }
+  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
+    return p + 1;
 
   // check for \0 between FFFF and next printable character
   for (int i = 0; i < deltaptr; i++) {
     if (*p == 0) {
       return p;
-    }
+  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
     p++;
   }
   return p;
- }
-
+}
+ 
 
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
 {

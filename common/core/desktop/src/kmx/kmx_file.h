@@ -219,6 +219,8 @@ namespace kmx {
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
+
+
 struct COMP_STORE {
   KMX_DWORD dwSystemID;
   KMX_DWORD dpName;
@@ -272,6 +274,8 @@ typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
 typedef COMP_STORE *PCOMP_STORE;
 typedef COMP_KEY *PCOMP_KEY;
 typedef COMP_GROUP *PCOMP_GROUP;
+
+extern const int CODE__SIZE[];
 
 #define KEYBOARDFILEHEADER_SIZE 64
 #define KEYBOARDFILESTORE_SIZE  12

@@ -54,16 +54,6 @@ void test_incxstr() {
   // ---- UC_SENTINEL WITHOUT \0 ----------------------------------------------------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-  // --- Test for FFFF + CODE_ANY ----------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000001\U00000001";
-  q = incxstr(p);
-  assert(q == p + 3);
-  // 
-  // --- Test for FFFF +CODE_NOTANY ----------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000012\U00000001";
-  q = incxstr(p);
-  assert(q == p + 3);
-
   // --- Test for FFFF +CODE_INDEX --------------------------------------------------------------------------------------------------------------------
   p = (PKMX_WCHAR)u"\U0000FFFF\U00000002\U00000002\U00000001";
   q = incxstr(p);
@@ -142,12 +132,12 @@ void test_incxstr() {
   p = (PKMX_WCHAR)u"\U0000FFFF\0\U00000008\U00000001";
   q = incxstr(p);
   assert(q == p+1);
-
+    
   // --- Test for FFFF +control (earlier p+1) with \0 after second position --------- unit test failed with old version of incxstr() -----
   p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\0\U00000001";
   q = incxstr(p);
   assert(q == p+2);
-
+    
   // --- Test for FFFF +control (earlier p+1) with \0 after third position ----- unit test failed with old version of incxstr() -----
   p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\U00000001\0";
   q = incxstr(p);
@@ -211,7 +201,6 @@ void test_incxstr() {
   p = (PKMX_WCHAR)u"\U0000FFFF\U00000004\U00000062";
   q = incxstr(p);
   assert(q == p + 2);
-
 }
 
 constexpr const auto help_str = "\
