@@ -2,7 +2,6 @@
   xmlns:tools="http://schemas.android.com/tools"
   package="com.tavultesoft.kmea" >
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Ensure these permissions aren't added by dependencies unless calling app intentionally adds them -->

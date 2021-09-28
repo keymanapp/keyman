@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.firstvoices.keyboards" >
 
-    <!-- Keyman Engine removes INTERNET permission, so replace that -->
+    <!-- Keyman Engine removes INTERNET permission, so add it back for crash reporting -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="replace" />
 
     <application

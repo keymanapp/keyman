@@ -724,23 +724,40 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Query the AndroidManifest file to see if a permission is granted.
+   * @param permission - The manifest permission to query
+   * @return boolean - true if the manifest permission is granted
+    */
+  protected static boolean hasPermission(Context context, String permission) {
+    // API to check permission depends on Android SDK level
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      return (context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
+    }
+
+    return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+  }
+
+  /**
+   * Check if KMManager has an active network connection.
+   * Requires Manifest.permission.ACCESS_NETWORK_STATE to be granted
+   * @param context - The context
+   * @return boolean - true if manifest permission ACCESS_NETWORK_STATE is granted and the device
+   * has an active network connection
+   */
+  @SuppressLint("MissingPermission")
   public static boolean hasConnection(Context context) {
-    ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-    if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
-      return true;
+    if (hasPermission(context, Manifest.permission.ACCESS_NETWORK_STATE)) {
+      ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+      return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 
     return false;
   }
 
   public static boolean hasInternetPermission(Context context) {
-    // Check if the Internet permission has been granted
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      return (context.checkSelfPermission(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED);
-    }
-
-    return ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED;
+    return hasPermission(context, Manifest.permission.INTERNET);
   }
 
   private static void copyAssets(Context context) {
