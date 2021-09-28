@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.120 alpha 2021-09-28
+
+* fix: help.keyman.com script file cleanup (#5751)
+* chore(common): Enhance cherry-pick labeling (#5759)
+
 ## 15.0.119 alpha 2021-09-24
 
 * chore(common): support forked repos when triggering test builds (#5738)
