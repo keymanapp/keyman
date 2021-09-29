@@ -208,6 +208,7 @@ type
     procedure tmrCheckInputPaneTimer(Sender: TObject);
     procedure tmrRefreshTimer(Sender: TObject);
   private
+    FCoreTrayIcon: TKeymanTrayIcon;
     InMenuLoop: Integer;  // I1082 - Avoid menu nasty flicker with rapid click
     FClosingApp: Boolean;
     FRunningProduct: TRunningProduct;
@@ -301,6 +302,7 @@ type
     procedure HotkeyWndProc(var Message: TMessage);
 
     procedure DoLanguageHotkey(Index: Integer);
+    procedure CreateCoreTrayIcon;
   protected
     procedure DoInterfaceHotkey(Target: Integer);
 
@@ -500,6 +502,40 @@ begin
       olestrm.Free;
     end;
   end;
+end;
+
+procedure TfrmKeyman7Main.CreateCoreTrayIcon;
+var
+  cust: IKeymanCustomisation;
+  istrm: IStream;
+  olestrm: TOleStream;
+const
+  REGSZ_CoreIntegation = 'use common core';
+begin
+  if not Reg_GetDebugFlag(REGSZ_CoreIntegation, True) then
+    Exit;
+
+  FCoreTrayIcon := TKeymanTrayIcon.Create(Self);
+
+  cust := kmint.KeymanCustomisation;
+  istrm := cust.CustFile['core.ico'];
+  if istrm <> nil then
+  begin
+    olestrm := TOLEStream.Create(istrm);
+    try
+      // In some situations, launching the app multiple times rapidly can
+      // cause the icon to be loaded multiple times. Make sure we reset the
+      // stream position before we try and read.
+      olestrm.Position := 0;
+      FCoreTrayIcon.Icon.LoadFromStream(olestrm);
+      FCoreTrayIcon.Hint := 'Keyman Engine is using Keyman Core library ("engine.compatibility.use_keyman_core" system setting)';
+      FCoreTrayIcon.Visible := True;
+    finally
+      olestrm.Free;
+      istrm := nil;
+    end;
+  end;
+
 end;
 
 procedure TfrmKeyman7Main.FormCreate(Sender: TObject);
@@ -1283,6 +1319,7 @@ begin
     end;
   end;
 
+  CreateCoreTrayIcon;
   //Windows.MessageBox(Handle, PChar(IntToStr(kmcom._AddRef)), 'RefCount+1', MB_OK);
 
   try

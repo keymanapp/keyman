@@ -126,6 +126,10 @@
               </Component>
 
               <Component>
+                <File Id="core.ico" Name="core.ico" Source="..\..\desktop\branding\core.ico" KeyPath="yes" />
+              </Component>
+
+              <Component>
                 <File Id="appicon.ico" Name="appicon.ico" Source="..\..\global\res\90\desktop\appicon.ico" KeyPath="yes" />
               </Component>
 
