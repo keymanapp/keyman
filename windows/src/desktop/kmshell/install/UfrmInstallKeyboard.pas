@@ -118,6 +118,7 @@ uses
   System.Win.ComObj,
   Winapi.ShellApi,
 
+  KLog,
   custinterfaces,
   GetOSVersion,
   MessageIdentifierConsts,
@@ -270,7 +271,6 @@ end;
 
 procedure TfrmInstallKeyboard.FireCommand(const command: WideString; params: TStringList);
 var
-  t: TTempFile;
   BCP47Tag: string;
 begin
   BCP47Tag := '';
@@ -297,28 +297,38 @@ begin
       BCP47Tag := params.ValueFromIndex[0];
     TfrmProgress.Execute(Self,
       function(Manager: IProgressManager): Boolean
+      var
+        t: TTempFile;
+        ExecParams: string;
       begin
-        Manager.Title := 'Installing Keyboard';
-        Manager.CanCancel := False;
-        Manager.UpdateProgress('Installing Keyboard', 0, 0);
-        t := TTempFileManager.Get('.log');
+        KL.MethodEnter(Self, '"keyboard_install"', [params.Text]);
         try
-          if WaitForElevatedConfiguration(GetForegroundWindow, '-log "'+t.Name+'" -s -i "'+FInstallFile+'='+BCP47Tag+'"'+
-            ' -nowelcome '+TTIPMaintenance.GetUserDefaultLangParameterString) = 0 then
-          begin
-            // install the keyboard tip
-            if not InstallTipForKeyboard(BCP47Tag) then
-              Exit(False);
+          Manager.Title := 'Installing Keyboard';
+          Manager.CanCancel := False;
+          Manager.UpdateProgress('Installing Keyboard', 0, 0);
+          t := TTempFileManager.Get('.log');
+          try
+            ExecParams := '-log "'+t.Name+'" -s -i "'+FInstallFile+'='+BCP47Tag+'"'+
+              ' -nowelcome '+TTIPMaintenance.GetUserDefaultLangParameterString;
+            KL.Log('Calling elevated kmshell %s', [ExecParams]);
+            if WaitForElevatedConfiguration(GetForegroundWindow, ExecParams) = 0 then
+            begin
+              // install the keyboard tip
+              if not InstallTipForKeyboard(BCP47Tag) then
+                Exit(False);
 
-            CheckForMitigationWarningFor_Win10_1803(False, '');
-            ModalResult := mrOk;
-          end
-          else
-            ModalResult := mrCancel;
+              CheckForMitigationWarningFor_Win10_1803(False, '');
+              ModalResult := mrOk;
+            end
+            else
+              ModalResult := mrCancel;
 
-          CheckLogFileForWarnings(t.Name, False);
+            CheckLogFileForWarnings(t.Name, False);
+          finally
+            t.Free;
+          end;
         finally
-          t.Free;
+          KL.MethodExit(Self, '"keyboard_install"');
         end;
         Result := True;
       end
