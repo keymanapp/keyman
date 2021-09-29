@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.121 alpha 2021-09-29
+
+* fix(developer): remove empty touch rows on save (#5720)
+* chore(common): Check in crowdin strings for Shuwa Latin (#5734)
+* chore(windows): fix broken links in help (#5765)
+
 ## 15.0.120 alpha 2021-09-28
 
 * fix: help.keyman.com script file cleanup (#5751)
