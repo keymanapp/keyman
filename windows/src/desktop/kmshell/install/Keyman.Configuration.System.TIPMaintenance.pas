@@ -52,6 +52,7 @@ uses
 
   Keyman.System.LanguageCodeUtils,
 
+  KLog,
   BCP47Tag,
   glossary,
   kmint,
@@ -67,9 +68,14 @@ var
   i: Integer;
 begin
   Result := True;
-  for i := 0 to Packages.Count - 1 do
-    // We'll attempt every package but return failure if any of them have issues
-    Result := InstallTipForPackage(Packages.Names[i], Packages.ValueFromIndex[i]) and Result;
+  KL.MethodEnter(nil, 'TTIPMaintenance.InstallTipsForPackages', [Packages.Text]);
+  try
+    for i := 0 to Packages.Count - 1 do
+      // We'll attempt every package but return failure if any of them have issues
+      Result := InstallTipForPackage(Packages.Names[i], Packages.ValueFromIndex[i]) and Result;
+  finally
+    KL.MethodExit(nil, 'TTIPMaintenance.InstallTipsForPackages', [Result]);
+  end;
 end;
 
 class function TTIPMaintenance.InstallTipForPackage(const PackageFilename, BCP47Tag: string): Boolean;
@@ -78,23 +84,29 @@ var
   n: Integer;
   pack: IKeymanPackageInstalled;
 begin
-  // This function has a known limitation: if a package contains more than one keyboard,
-  // then the BCP47 association will be made only for the first keyboard. This is
-  // considered an acceptable limitation at this time
+  Result := False;
+  KL.MethodEnter(nil, 'TTIPMaintenance.InstallTipForPackage', [PackageFilename, BCP47Tag]);
+  try
+    // This function has a known limitation: if a package contains more than one keyboard,
+    // then the BCP47 association will be made only for the first keyboard. This is
+    // considered an acceptable limitation at this time
 
-  PackageID := ChangeFileExt(ExtractFileName(PackageFilename), '');
-  n := kmcom.Packages.IndexOf(PackageID);
-  if n < 0 then
-    Exit(False);
+    PackageID := ChangeFileExt(ExtractFileName(PackageFilename), '');
+    n := kmcom.Packages.IndexOf(PackageID);
+    if n < 0 then
+      Exit(False);
 
-  pack := kmcom.Packages[n];
+    pack := kmcom.Packages[n];
 
-  if pack.Keyboards.Count = 0 then
-    Exit(False);
+    if pack.Keyboards.Count = 0 then
+      Exit(False);
 
-  if BCP47Tag = ''
-    then Result := DoInstall(pack.Keyboards[0].ID, GetFirstLanguage(pack.Keyboards[0] as IKeymanKeyboardInstalled))
-    else Result := DoInstall(pack.Keyboards[0].ID, BCP47Tag);
+    if BCP47Tag = ''
+      then Result := DoInstall(pack.Keyboards[0].ID, GetFirstLanguage(pack.Keyboards[0] as IKeymanKeyboardInstalled))
+      else Result := DoInstall(pack.Keyboards[0].ID, BCP47Tag);
+  finally
+    KL.MethodExit(nil, 'TTIPMaintenance.InstallTipForPackage', [Result]);
+  end;
 end;
 
 class function TTIPMaintenance.InstallTip(LangID: Integer; const KeyboardID, BCP47Tag,
@@ -102,13 +114,19 @@ class function TTIPMaintenance.InstallTip(LangID: Integer; const KeyboardID, BCP
 var
   lang: IKeymanKeyboardLanguageInstalled;
 begin
-  lang := GetKeyboardLanguage(KeyboardID, BCP47Tag);
-  if lang = nil then
-    Exit(False);
+  Result := False;
+  KL.MethodEnter(nil, 'TTIPMaintenance.InstallTip', [LangID, KeyboardID, BCP47Tag, KeyboardToRemove]);
+  try
+    lang := GetKeyboardLanguage(KeyboardID, BCP47Tag);
+    if lang = nil then
+      Exit(False);
 
-  // TODO: can this fail?
-  (lang as IKeymanKeyboardLanguageInstalled2).InstallTip(LangID, KeyboardToRemove);
-  Result := True;
+    // TODO: can this fail?
+    (lang as IKeymanKeyboardLanguageInstalled2).InstallTip(LangID, KeyboardToRemove);
+    Result := True;
+  finally
+    KL.MethodExit(nil, 'TTIPMaintenance.InstallTip', [Result]);
+  end;
 end;
 
 class function TTIPMaintenance.RegisterTip(LangID: Integer; const KeyboardID,
@@ -116,13 +134,19 @@ class function TTIPMaintenance.RegisterTip(LangID: Integer; const KeyboardID,
 var
   lang: IKeymanKeyboardLanguageInstalled;
 begin
-  lang := GetKeyboardLanguage(KeyboardID, BCP47Tag);
-  if lang = nil then
-    Exit(False);
+  Result := False;
+  KL.MethodEnter(nil, 'TTIPMaintenance.RegisterTip', [KeyboardID, BCP47Tag]);
+  try
+    lang := GetKeyboardLanguage(KeyboardID, BCP47Tag);
+    if lang = nil then
+      Exit(False);
 
-  // TODO: can this fail?
-  (lang as IKeymanKeyboardLanguageInstalled2).RegisterTip(LangID);
-  Result := True;
+    // TODO: can this fail?
+    (lang as IKeymanKeyboardLanguageInstalled2).RegisterTip(LangID);
+    Result := True;
+  finally
+    KL.MethodExit(nil, 'TTIPMaintenance.RegisterTip', [Result]);
+  end;
 end;
 
 class function TTIPMaintenance.DoInstall(const KeyboardID,
@@ -133,44 +157,59 @@ var
   TemporaryKeyboardID: WideString;
   LangID: Integer;
   childExitCode: Cardinal;
+  CanonicalTag, Command: string;
 begin
-  lang := GetKeyboardLanguage(KeyboardID, (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Tag));
-  if lang = nil then
-    // The keyboard was not found
-    Exit(False);
-
-  if lang.IsInstalled then
-    // After canonicalization, we may find the language is already installed
-    Exit(True);
-
-  TemporaryKeyboardID := '';
-  LangID := 0;
-  RegistrationRequired := False;
-
-  if not (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
-  begin
-    // We were not able to find a TIP, perhaps all transient TIPs have been used
-    Exit(False);
-  end;
-
-  if RegistrationRequired then
-  begin
-    // This calls back into TTIPMaintenance.RegisterTip
-    if WaitForElevatedConfiguration(0, '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" '+GetUserDefaultLangParameterString) <> 0 then
+  Result := False;
+  KL.MethodEnter(nil, 'TTIPMaintenance.DoInstall', [KeyboardID, BCP47Tag]);
+  try
+    CanonicalTag := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Tag);
+    lang := GetKeyboardLanguage(KeyboardID, CanonicalTag);
+    KL.Log('BCP47Tag = %s, CanonicalTag = %s, lang.BCP47Code = %s', [BCP47Tag, CanonicalTag, lang.BCP47Code]);
+    if lang = nil then
+      // The keyboard was not found
       Exit(False);
-  end;
 
-  // This calls back into TTIPMaintenance.InstallTip
-  if not TUtilExecute.WaitForProcess('"'+ParamStr(0)+'" -install-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" "'+TemporaryKeyboardID+'"',
-      GetCurrentDir, childExitCode) or
-    (childExitCode <> 0) then
-  begin
+    if lang.IsInstalled then
+      // After canonicalization, we may find the language is already installed
+      Exit(True);
+
+    TemporaryKeyboardID := '';
+    LangID := 0;
+    RegistrationRequired := False;
+
+    if not (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
+    begin
+      KL.Log('Failed to find installation langid');
+      // We were not able to find a TIP, perhaps all transient TIPs have been used
+      Exit(False);
+    end;
+
+    KL.Log('LangID=%x, TemporaryKeyboardID=%s, RegistrationRequired=%s', [LangID, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True)]);
+
+    if RegistrationRequired then
+    begin
+      Command := '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" '+GetUserDefaultLangParameterString;
+      KL.Log('Calling elevated kmshell %s', [Command]);
+      // This calls back into TTIPMaintenance.RegisterTip
+      if WaitForElevatedConfiguration(0, Command) <> 0 then
+        Exit(False);
+    end;
+
+    Command := '-install-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" "'+TemporaryKeyboardID+'"';
+    KL.Log('Calling user kmshell %s', [Command]);
+    // This calls back into TTIPMaintenance.InstallTip
+    if not TUtilExecute.WaitForProcess('"'+ParamStr(0)+'" '+Command, GetCurrentDir, childExitCode) or
+      (childExitCode <> 0) then
+    begin
+      kmcom.Refresh;
+      Exit(False);
+    end;
+
     kmcom.Refresh;
-    Exit(False);
+    Result := True;
+  finally
+    KL.MethodExit(nil, 'TTIPMaintenance.DoInstall', [Result]);
   end;
-
-  kmcom.Refresh;
-  Result := True;
 end;
 
 function GetDefaultHKL: HKL;
@@ -187,25 +226,31 @@ var
   TemporaryKeyboardID: WideString;
   RegistrationRequired: WordBool;
 begin
-  lang := GetKeyboardLanguage(KeyboardID, (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Tag));
-  if lang = nil then
-    // The keyboard was not found
-    Exit(False);
+  Result := False;
+  KL.MethodEnter(nil, 'TTIPMaintenance.DoRegister', [KeyboardID, BCP47Tag]);
+  try
+    lang := GetKeyboardLanguage(KeyboardID, (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Tag));
+    if lang = nil then
+      // The keyboard was not found
+      Exit(False);
 
-  if lang.IsInstalled or (lang as IKeymanKeyboardLanguageInstalled2).IsRegistered then
-    // After canonicalization, we may find the language is already installed
-    Exit(True);
+    if lang.IsInstalled or (lang as IKeymanKeyboardLanguageInstalled2).IsRegistered then
+      // After canonicalization, we may find the language is already installed
+      Exit(True);
 
-  TemporaryKeyboardID := '';
-  LangID := 0;
-  RegistrationRequired := False;
+    TemporaryKeyboardID := '';
+    LangID := 0;
+    RegistrationRequired := False;
 
-  if (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, 0) then
-  begin
-    Result := not RegistrationRequired or RegisterTip(LangID, KeyboardID, lang.BCP47Code);
-  end
-  else
-    Result := False;
+    if (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, 0) then
+    begin
+      Result := not RegistrationRequired or RegisterTip(LangID, KeyboardID, lang.BCP47Code);
+    end
+    else
+      Result := False;
+  finally
+    KL.MethodExit(nil, 'TTIPMaintenance.DoRegister', [Result]);
+  end;
 end;
 
 class function TTIPMaintenance.GetUserDefaultLangParameterString: string;
@@ -213,15 +258,25 @@ var
   LangID: Integer;
   BCP47: string;
 begin
-  GetUserDefaultLanguage(BCP47, LangID);
-  Result := '-default-lang '+BCP47+' '+IntToHex(LangID,4);
+  KL.MethodEnter(nil, 'TTIPMaintenance.GetUserDefaultLangParameterString', []);
+  try
+    GetUserDefaultLanguage(BCP47, LangID);
+    Result := '-default-lang '+BCP47+' '+IntToHex(LangID,4);
+  finally
+    KL.MethodExit(nil, 'TTIPMaintenance.GetUserDefaultLangParameterString', [Result]);
+  end;
 end;
 
 class function TTIPMaintenance.GetUserDefaultLanguage: string;
 var
   LangID: Integer;
 begin
-  GetUserDefaultLanguage(Result, LangID);
+  KL.MethodEnter(nil, 'TTIPMaintenance.GetUserDefaultLanguage', []);
+  try
+    GetUserDefaultLanguage(Result, LangID);
+  finally
+    KL.MethodExit(nil, 'TTIPMaintenance.GetUserDefaultLanguage', [Result]);
+  end;
 end;
 
 class procedure TTIPMaintenance.GetUserDefaultLanguage(var BCP47: string; var LangID: Integer);
@@ -260,54 +315,60 @@ var
   end;
 
 begin
-  // Fallback result
-  LangID := HKLToLanguageID(GetDefaultHKL);
-  BCP47 := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(LangID);
-
-  // For Win10, look in CPL/International/UserProfile
-  r := TRegistry.Create;
+  KL.MethodEnter(nil, 'TTIPMaintenance.GetUserDefaultLanguage', []);
   try
-    if not r.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) then
-      Exit;
-    if r.ValueExists(SRegValue_CPIUP_InputMethodOverride) then
-    begin
-      // Lookup the override input method BCP 47 tag
-      v := r.ReadString(SRegValue_CPIUP_InputMethodOverride);
-      keys := TStringList.Create;
-      try
-        r.GetKeyNames(keys);
-        for key in keys do
-        begin
-          if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + key) and
-            r.ValueExists(v) then
+    // Fallback result
+    LangID := HKLToLanguageID(GetDefaultHKL);
+    BCP47 := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(LangID);
+
+    // For Win10, look in CPL/International/UserProfile
+    r := TRegistry.Create;
+    try
+      if not r.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) then
+        Exit;
+      if r.ValueExists(SRegValue_CPIUP_InputMethodOverride) then
+      begin
+        // Lookup the override input method BCP 47 tag
+        v := r.ReadString(SRegValue_CPIUP_InputMethodOverride);
+        keys := TStringList.Create;
+        try
+          r.GetKeyNames(keys);
+          for key in keys do
           begin
-            BCP47 := key;
-            LangID := GetLangIDFromValueName;
-            Break;
+            if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + key) and
+              r.ValueExists(v) then
+            begin
+              BCP47 := key;
+              LangID := GetLangIDFromValueName;
+              Break;
+            end;
           end;
+        finally
+          keys.Free;
         end;
-      finally
-        keys.Free;
-      end;
-    end
-    else if r.ValueExists(SRegValue_CPIUP_Languages) then
-    begin
-      // The first tag is the default language tag
-      tags := TStringList.Create;
-      try
-        r.ReadMultiString(SRegValue_CPIUP_Languages, tags);
-        if tags.Count > 0 then
-        begin
-          BCP47 := tags[0].Trim;
-          if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47) then
-            LangID := GetLangIDFromValueName;
+      end
+      else if r.ValueExists(SRegValue_CPIUP_Languages) then
+      begin
+        // The first tag is the default language tag
+        tags := TStringList.Create;
+        try
+          r.ReadMultiString(SRegValue_CPIUP_Languages, tags);
+          if tags.Count > 0 then
+          begin
+            BCP47 := tags[0].Trim;
+            if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47) then
+              LangID := GetLangIDFromValueName;
+          end;
+        finally
+          tags.Free;
         end;
-      finally
-        tags.Free;
       end;
+    finally
+      r.Free;
     end;
   finally
-    r.Free;
+    KL.Log('TTIPMaintenance.GetUserDefaultLanguage = BCP47:%s LangID:%d', [BCP47, LangID]);
+    KL.MethodExit(nil, 'TTIPMaintenance.GetUserDefaultLanguage');
   end;
 end;
 
