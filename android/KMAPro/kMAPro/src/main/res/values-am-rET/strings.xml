@@ -45,7 +45,7 @@
   <!-- Context: Get Started menu -->
   <string name="more_info" comment="Open the Keyman for Android help page">ተጨማሪ መረጃ</string>
   <!-- Context: Get Started menu -->
-  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">በሚነሳበት ሰአት ይታይ\"%1$s\"</string>
+  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">በሚነሳበት ሰአት ይታይ \"%1$s\"</string>
   <!-- Context: Android Storage Permission -->
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">የፊደል ገበታውን ሰሌዳ ጥቅሎችን ለመጫን ለኪይማኑ ውጫዊ ማከማቻ ለማንበብ ፈቃድ ይስጡት።</string>
   <!-- Context: Android Storage Permission -->
@@ -54,7 +54,7 @@
   <string name="keyman_settings" comment="Settings menu title">አደረጃጀት</string>
   <!-- Context: Keyman Settings menu -->
   <plurals name="installed_languages">
-    <item quantity="one">የተጫኑ ቋንዎች (%1$d)</item>
+    <item quantity="one">የተጫኑ ቋንቋዎች (%1$d)</item>
     <item quantity="other">የተጫኑ ቋንዎች (%1$d)</item>
   </plurals>
   <!-- Context: Keyman Settings menu -->
