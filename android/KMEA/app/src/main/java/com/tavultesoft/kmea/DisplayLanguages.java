@@ -49,6 +49,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("km-KH", "Khmer"),
       new DisplayLanguageType("ann", "Obolo"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
+      new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
       new DisplayLanguageType("zh-CN", "中文(简体) (Simplified Chinese)")
     };
     return languages;

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u kakkad hana kalimat dakhal</string>
+        <key>two</key>
+        <string>%u kakkad hana kalimat dakhal</string>
+        <key>few</key>
+        <string>%u kakkad hana kalimat dakhal</string>
+        <key>other</key>
+        <string>%u kakkad hana kalimat dakhal</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Dassasan judad ma kan</string>
+        <key>two</key>
+        <string>%u Dassasan judad ma kan</string>
+        <key>few</key>
+        <string>%u Dassasan judad ma kan</string>
+        <key>other</key>
+        <string>%u Dassasan judad ma kan</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u Dassasan judad kan</string>
+        <key>two</key>
+        <string>%u Dassasan judad kan</string>
+        <key>few</key>
+        <string>%u Dassasan judad kan</string>
+        <key>other</key>
+        <string>%u Dassasan judad kan</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u keyboard dakhal</string>
+        <key>two</key>
+        <string>%u keyboard dakhal</string>
+        <key>few</key>
+        <string>%u keyboard dakhal</string>
+        <key>other</key>
+        <string>%u keyboards dakhal</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u lugga dakhal</string>
+        <key>two</key>
+        <string>%u lugga dakhal</string>
+        <key>few</key>
+        <string>%u lugga dakhal</string>
+        <key>other</key>
+        <string>%u luggat dakhalo</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Ligo %u keyboard fyl package:</string>
+        <key>two</key>
+        <string>Ligo %u keyboard fyl package:</string>
+        <key>few</key>
+        <string>Ligo %u keyboard fyl package:</string>
+        <key>other</key>
+        <string>Ligo %u keyboards fyl package:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Ligo %u kakkad hana kalimat fyl package:</string>
+        <key>two</key>
+        <string>Ligo %u kakkad hana kalimat fyl package:</string>
+        <key>few</key>
+        <string>Ligo %u kakkad hana kalimat fyl package:</string>
+        <key>other</key>
+        <string>Ligo %u kakkad hana kalimat fyl package:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>

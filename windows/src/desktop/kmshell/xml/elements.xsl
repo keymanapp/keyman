@@ -164,6 +164,15 @@
 
   <!-- Replaces a string, e.g. ' with \' https://stackoverflow.com/a/7712434/1836776 -->
 
+  <xsl:template name="escape-apos">
+    <xsl:param name="text"/>
+    <xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="$text" />
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template>
+  </xsl:template>
+
   <xsl:template name="replace-string">
     <xsl:param name="text"/>
     <xsl:param name="replace"/>
