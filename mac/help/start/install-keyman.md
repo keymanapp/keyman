@@ -2,13 +2,17 @@
 title: Install Keyman for macOS
 ---
 
-*Keyman for macOS* is available for [download](https://keyman.com/mac/download) as a standard
-Apple Disk Image (.dmg) file. You can also get the installer through Homebrew with the command:
+*Keyman for macOS* is available as a standard
+Apple Disk Image (.dmg) file. You can install through Homebrew with the command:
 ```
 brew install --cask keyman
 ```
 
-It should be installed according to the following instructions.
+Then configure the macOS [security permissions](../troubleshooting/configure-security) for Keyman to run.
+
+----
+
+Alternatively, Keyman can also be [downloaded](https://keyman.com/mac/download) and installed according to the following instructions.
 
 [![Play](../mac_images/video.png) Watch Video](https://youtu.be/7Ax71QeUNfo)
 
