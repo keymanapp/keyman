@@ -8,16 +8,10 @@ Launches Keyman Configuration for installing and showing information about Keyma
 ## Syntax
 
 ```bash
-km-config [-h] [--version] [-v] [-vv] [-i INSTALL] [INSTALL]
+km-config [-h] [--version] [-v] [-vv] [-i [INSTALL]]
 ```
 
 ### Parameters
-
-`INSTALL` <br>
-download and/or install .kmp package. INSTALL can
-either be a downloaded .kmp file, a file:// URL
-pointing to a .kmp file, or a keyman:// URL, possibly
-with a bcp47=`language` specified.
 
 `-h`, `--help` <br>
 __optional__ <br>
@@ -35,7 +29,7 @@ verbose logging
 __optional__ <br>
 very verbose logging
 
-`-i INSTALL`, `--install INSTALL` <br>
+`-i [INSTALL]`, `--install [INSTALL]` <br>
 __optional__ <br>
 download and/or install .kmp package. INSTALL can
 either be a downloaded .kmp file, a file:// URL
