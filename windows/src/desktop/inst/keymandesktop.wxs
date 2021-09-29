@@ -246,6 +246,7 @@
       <ComponentRef Id="menu.txt" />
       <ComponentRef Id="messages.txt" />
       <ComponentRef Id="trayicon.ico" />
+      <ComponentRef Id="core.ico" />
       <ComponentRef Id="KeymanDesktop.chm" />
       <ComponentRef Id="appicon.ico" />
       <ComponentRef Id="cfgicon.ico" />

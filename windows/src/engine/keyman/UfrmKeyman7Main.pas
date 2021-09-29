@@ -509,10 +509,8 @@ var
   cust: IKeymanCustomisation;
   istrm: IStream;
   olestrm: TOleStream;
-const
-  REGSZ_CoreIntegation = 'use common core';
 begin
-  if not Reg_GetDebugFlag(REGSZ_CoreIntegation, True) then
+  if not Reg_GetDebugFlag(SRegValue_Flag_UseKeymanCore, True) then
     Exit;
 
   FCoreTrayIcon := TKeymanTrayIcon.Create(Self);
