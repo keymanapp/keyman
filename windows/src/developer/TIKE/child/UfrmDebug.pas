@@ -825,6 +825,26 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     end;
   end;
 
+  procedure DoHandleShortcut(vk: UINT);
+  begin
+    // Because we disable shortcuts in the debug memo, there are a small set of
+    // editor Ctrl+Key shortcuts we need to rehandle here. Note that Ctrl+Ins,
+    // Shift+Ins, Shift+Del appear to be handled natively by the debug memo
+    // control (Windows code?), as are all cursor movement / selection keys,
+    // apart from Ctrl+A
+
+    if GetKeyState(VK_CONTROL) >= 0 then
+      Exit;
+
+    case vk of
+      Ord('A'): memo.SelectAll;
+      Ord('C'): memo.CopyToClipboard;
+      Ord('V'): memo.PasteFromClipboard;
+      Ord('X'): memo.CutToClipboard;
+      Ord('Y'): ; // redo not supported in edit
+      Ord('Z'): memo.Undo;
+    end;
+  end;
 
   procedure DoEmitKeystroke(dwData: DWord);
   var
@@ -850,6 +870,8 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         then msg.Msg := WM_SYSKEYUP
         else msg.Msg := WM_KEYUP;
       memo.Dispatch(msg);
+
+      DoHandleShortcut(LOBYTE(dwData));
 
       RealignMemoSelectionState(state);
     end;
@@ -1116,6 +1138,7 @@ begin
         begin
           StatusText := 'Simple Test';
           memo.ReadOnly := False;
+          memo.IsDebugging := True;
         end;
       duiDebugging:
         begin
@@ -1124,6 +1147,7 @@ begin
           StartBatch;
           StatusText := 'Debugging';
           memo.ReadOnly := True;
+          memo.IsDebugging := False;
         end;
       duiFocusedForInput:
         begin
@@ -1131,6 +1155,7 @@ begin
           FinishBatch;
           StatusText := 'Focused for input';
           memo.ReadOnly := False;
+          memo.IsDebugging := True;
           //SelectSystemLayout(True);
         end;
       duiReadyForInput:
@@ -1143,6 +1168,7 @@ begin
             FinishBatch;
             StatusText := 'Ready for input';
             memo.ReadOnly := True;
+            memo.IsDebugging := False;
           end;
         end;
       duiPaused:
@@ -1152,6 +1178,7 @@ begin
           FUIDisabled := False;   // I4033
           StatusText := 'Paused';
           memo.ReadOnly := True;
+          memo.IsDebugging := False;
         end;
     end;
     UpdateDebugStatusForm;   // I4809
