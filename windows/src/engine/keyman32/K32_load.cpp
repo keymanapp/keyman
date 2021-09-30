@@ -75,12 +75,63 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
   return n;
 }
 
+BOOL LoadlpKeyboardCore(int i)
+{
+  SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: Enter ---");
+  
+
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) return FALSE;
+  if (_td->lpKeyboards[i].lpCoreKeyboard) return TRUE;
+  if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
+
+  if (_td->lpKeyboards[i].lpCoreKeyboardState) {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: a keyboard km_kbp_state exits without matching keyboard - disposing of state");
+    km_kbp_state_dispose(_td->lpKeyboards[i].lpCoreKeyboardState);
+    _td->lpKeyboards[i].lpCoreKeyboardState = NULL;
+  }
+
+  char buf[256];
+  if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
+  PWCHAR keyboardPath = strtowstr(buf);
+  km_kbp_status err_status = km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].lpCoreKeyboard);
+  if (err_status != KM_KBP_STATUS_OK) {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
+    delete keyboardPath;
+    return FALSE;
+  }
+  delete keyboardPath;
+
+  // TODO: 5650 handle dlls
+  //LoadDLLs(&_td->lpKeyboards[i]);
+  const km_kbp_option_item test_env_opts[] =
+  {
+    KM_KBP_OPTIONS_END
+  };
+
+  err_status = km_kbp_state_create(_td->lpKeyboards[i].lpCoreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpCoreKeyboardState);
+  if (err_status != KM_KBP_STATUS_OK) {
+    SendDebugMessageFormat(
+        0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_state_create failed with error status [%d]", err_status);
+    // Dispose of the keyboard to leave us in a consistent state
+    ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
+    return FALSE;
+  }
+
+  LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpCoreKeyboardState);
+
+  return TRUE;
+}
+
 BOOL LoadlpKeyboard(int i)
 {
+  if (Globals::get_CoreIntegration())
+  {
+    return LoadlpKeyboardCore(i);
+  }
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
   if(_td->lpKeyboards[i].Keyboard) return TRUE;
-
   if(_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
   char buf[256];

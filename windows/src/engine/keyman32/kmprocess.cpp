@@ -109,8 +109,8 @@ BOOL ProcessHook()
 
 	LPGROUP gp = _td->state.startgroup;
 
-	fOutputKeystroke = FALSE;
-
+  fOutputKeystroke = FALSE;  // TODO: 5442 no longer needs to be global once we use core processor
+  BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
   //
   // If we are running in the debugger, don't do a second run through
   //
@@ -140,8 +140,32 @@ BOOL ProcessHook()
 		else
 			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
+  
+  if (isUsingCoreProcessor) {
 
-	ProcessGroup(gp);
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: ");
+    PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
+    km_kbp_context_item *citems = nullptr;
+    ContextItemsFromAppContext(contextBuf, &citems);
+    if (KM_KBP_STATUS_OK !=
+      (km_kbp_status_codes)km_kbp_context_set(
+        km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
+      km_kbp_context_items_dispose(citems);
+      return FALSE;
+    }
+    km_kbp_context_items_dispose(citems);
+    //_td->state.vkey == VK_DOWN
+    if (KM_KBP_STATUS_OK !=
+      (km_kbp_status_codes)km_kbp_process_event(
+            _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey, static_cast<uint16_t>(Globals::get_ShiftState()), 1)) {
+      return FALSE;
+    }
+
+    ProcessActions(&fOutputKeystroke);
+  }
+  else {
+    ProcessGroup(gp); // TODO: 5442 remove
+  }
 
   if (fOutputKeystroke && !_td->app->IsQueueEmpty()) {
     //
@@ -195,6 +219,9 @@ BOOL ProcessHook()
 		_td->app->SetCurrentShiftState(Globals::get_ShiftState());
 		_td->app->SendActions();   // I4196
 	}
+  // output context for debugging
+  // PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
+  // SendDebugMessageFormat(0, sdmAIDefault, 0, "Kmprocess::ProcessHook After cxt=%s", Debug_UnicodeString(contextBuf, 1));
 
 	_td->app->QueueDebugInformation(QID_END, NULL, NULL, NULL, NULL, 0);
 
@@ -217,7 +244,10 @@ BOOL ProcessHook()
 
 BOOL ProcessGroup(LPGROUP gp)
 {
-	DWORD i;
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "KMPROCESS:ProcessGroup: Error called in core integration mode")) {
+    return FALSE;
+  }
+  DWORD i;
 	LPKEY kkp = NULL;
 	PWSTR p;
 	int sdmfI;
@@ -515,7 +545,10 @@ BOOL ProcessGroup(LPGROUP gp)
 
 int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
 {
-	PWSTR p, q, temp;
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "KKMPROCESS:PostString: Error called in core integration mode")) {
+    return FALSE;
+  }
+  PWSTR p, q, temp;
   LPSTORE s;
   int n1, n2;
 	int i, n, shift;
@@ -680,6 +713,9 @@ BOOL IsMatchingPlatform(LPSTORE s)  // I3432
 
 BOOL ContextMatch(LPKEY kkp)
 {
+  if (!DebugAssert(!Globals::get_CoreIntegration(), "KMPROCESS:ContextMatch: Error called in core integration mode")) {
+    return FALSE;
+  }
 	WORD /*i,*/ n;
 	PWSTR p, q, qbuf, temp;
 	LPWORD indexp;

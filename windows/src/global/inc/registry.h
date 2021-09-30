@@ -140,7 +140,9 @@
 #define REGSZ_AutomaticallyReportErrors "automatically report errors"              // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
 #define REGSZ_AutomaticallyReportUsage  "automatically report usage"               // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
 
-/* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry 
+#define REGSZ_CoreIntegration "use common core" // Turns on the common core - instead of windows core
+
+/* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry
    correctly -- readonly wherever possible. */
 
 class RegistryReadOnly
@@ -173,7 +175,7 @@ public:
 
 class RegistryFullAccess: public RegistryReadOnly
 {
-protected:	
+protected:
 	HKEY GetKey(LPCSTR AKey);
 	BOOL IntRecursiveDeleteKey(HKEY hkey);
 
