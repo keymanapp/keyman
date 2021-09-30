@@ -145,8 +145,8 @@ export default class KmpCompiler {
     zip.file(kmpJsonFileName, JSON.stringify(kmpJsonData, null, 2));
 
     // Generate kmp file
-    var data = zip.generate({base64:false,compression:'DEFLATE'});
-    fs.writeFileSync(kmpFileName, data, 'binary');
-
+    zip.generateAsync({type: 'binarystring', compression:'DEFLATE'}).then(function (data) {
+      fs.writeFileSync(kmpFileName, data, 'binary');
+    });
   }
 }
