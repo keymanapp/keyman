@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.122 alpha 2021-09-30
+
+* fix(developer): move ampersand to shift+7 on touch (#5746)
+* feat(windows): Keyman Core integration (#5443)
+* chore(windows): Keyman Core UI and Settings (#5769)
+* fix(linux): Fix debian package script (#5771)
+* docs(mac): Add note about installing with homebrew (#5767)
+
 ## 15.0.121 alpha 2021-09-29
 
 * fix(developer): remove empty touch rows on save (#5720)
