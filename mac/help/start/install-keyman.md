@@ -2,17 +2,8 @@
 title: Install Keyman for macOS
 ---
 
-*Keyman for macOS* is available as a standard
-Apple Disk Image (.dmg) file. You can install through Homebrew with the command:
-```
-brew install --cask keyman
-```
-
-Then configure the macOS [security permissions](../troubleshooting/configure-security) for Keyman to run.
-
-----
-
-Alternatively, Keyman can also be [downloaded](https://keyman.com/mac/download) and installed according to the following instructions.
+*Keyman for macOS* is available for [downloaded](https://keyman.com/mac/download) as a standard
+Apple Disk Image (.dmg) file. It should be installed according to the following instructions.
 
 [![Play](../mac_images/video.png) Watch Video](https://youtu.be/7Ax71QeUNfo)
 
@@ -41,6 +32,18 @@ Alternatively, Keyman can also be [downloaded](https://keyman.com/mac/download) 
 5. Now you can start typing with the selected keyboard in any text editor or
    application that uses standard macOS input methods.
 
+---
+
+If you're using Homebrew, you can also install Keyman with the command:
+
+1.
+```
+brew install --cask keyman
+```
+
+2. Configure the macOS [security permissions](../troubleshooting/configure-security) for Keyman to run.
+
+----
 ## How To - Updating Keyman for macOS
 
 When a new version of Keyman is released, you can update by following the instructions
