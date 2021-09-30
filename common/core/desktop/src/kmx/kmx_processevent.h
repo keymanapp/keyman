@@ -138,6 +138,7 @@ const char *Debug_VirtualKey(KMX_WORD vk);
 const char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
 const char *Debug_UnicodeString(std::u16string s, int x = 0);
 const char *Debug_ModifierName(KMX_UINT modifiers);
+
 inline KMX_BOOL ShouldDebug() {
   return g_debug_KeymanLog;
 }

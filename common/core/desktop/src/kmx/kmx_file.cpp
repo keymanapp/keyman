@@ -19,7 +19,6 @@ KMX_BOOL KMX_ProcessEvent::Load(km_kbp_path_name KeyboardName)
   return TRUE;
 }
 
-
 const int km::kbp::kmx::CODE__SIZE[] = {
     -1,  // undefined                0x00
     1,   // CODE_ANY                 0x01
@@ -50,7 +49,6 @@ const int km::kbp::kmx::CODE__SIZE[] = {
 
 // Ensure that all CODE_### sizes are defined
 static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1), "Size of array CODE_SIZE not correct");
-
 
 const unsigned long CRCTable[256] = {
   0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,

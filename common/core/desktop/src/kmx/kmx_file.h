@@ -219,8 +219,6 @@ namespace kmx {
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
-
-
 struct COMP_STORE {
   KMX_DWORD dwSystemID;
   KMX_DWORD dpName;

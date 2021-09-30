@@ -5,7 +5,7 @@
 #
 
 defns=['-DKMN_KBP_STATIC']
-tests = [ 
+tests = [
   ['context-api', 'context_api.cpp'],
   ['keyboard-api', 'keyboard_api.cpp'],
 #  ['options-api', 'options_api.cpp'],
@@ -13,7 +13,7 @@ tests = [
   ['debug-api', 'debug_api.cpp'],
   ['kmx_xstring', 'test_kmx_xstring.cpp'],
 ]
-  
+
 foreach t : tests
   bin = executable(t[0], t[1],
     cpp_args: defns,
