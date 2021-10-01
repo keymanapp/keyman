@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.123 alpha 2021-10-01
+
+* fix(common): Fix cherry-pick labeling (#5782)
+* chore(ios,android,windows): Update crowdin strings for Amharic (#5722)
+
 ## 15.0.122 alpha 2021-09-30
 
 * fix(developer): move ampersand to shift+7 on touch (#5746)
