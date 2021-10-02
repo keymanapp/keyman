@@ -1,0 +1,18 @@
+﻿store(&VERSION) '10.0'
+store(&NAME) 'testvariable'
+store(&COPYRIGHT) '©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&LAYOUTFILE) 'testvariable.keyman-touch-layout'
+
+store (myVar) "1"
+store(&VISUALKEYBOARD) 'testvariable.kvks'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [K_S] > "(+)" set(myVar="1")    c  S will Set the variable, and output (+)
++ [K_C] > "(-)" set(myVar="0")    c  C will Clear the variable, and output (-)
+if (myVar = "1") + [K_R] > "+"    c  R will Reveal the variable's state with + or - 
+if (myVar!= "1") + [K_R] > "-"
