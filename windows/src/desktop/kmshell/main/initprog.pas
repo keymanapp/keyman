@@ -195,7 +195,8 @@ begin
 end;
 
 function Init(var FMode: TKMShellMode; KeyboardFileNames: TStrings; var FSilent, FForce, FNoWelcome: Boolean;
-  var FLogFile, FQuery: string; var FDisablePackages, FDefaultUILanguage: string; var FStartWithConfiguration: Boolean; var FParentWindow: THandle): Boolean;
+  var FLogFile, FQuery: string; var FDisablePackages, FDefaultUILanguage: string; var FStartWithConfiguration: Boolean;
+  var FParentWindow: THandle; var FDefaultBCP47: string; var FDefaultLangID: Integer): Boolean;
 var
   s: string;
   i: Integer;
@@ -269,7 +270,13 @@ begin
         FQuery := Trim(FQuery);
       end
       else if Copy(s, 1, 3) = '-ur' then UnRegCRC := StrToIntDef('$'+Copy(s, 4, 8), 0)
-
+      else if s = '-default-lang' then
+      begin
+        Inc(i);
+        FDefaultBCP47 := ParamStr(i);
+        Inc(i);
+        FDefaultLangID := StrToIntDef('$'+ParamStr(i), 0);
+      end
       // Controls from Keyman Engine
       else if s = '-showhint' then FMode := fmShowHint
       else if s = '-parentwindow' then
@@ -301,7 +308,8 @@ begin
 end;
 
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
-  FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean; FParentWindow: THandle); forward;
+  FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean; FParentWindow: THandle;
+  const FDefaultBCP47: string; FDefaultLangID: Integer); forward;
 
 procedure Run;
 var
@@ -312,7 +320,8 @@ var
   FForce: Boolean;
   FParentWindow: THandle;
   FLogFile: string;
-  FDisablePackages, FDefaultUILanguage: string;
+  FDefaultLangID: Integer;
+  FDefaultBCP47, FDisablePackages, FDefaultUILanguage: string;
   FStartWithConfiguration: Boolean;
 begin
   RegisterControlClasses;
@@ -320,7 +329,7 @@ begin
   KeyboardFileNames := TStringList.Create;
   try
     FParentWindow := 0;
-    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow) then
+    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow, FDefaultBCP47, FDefaultLangID) then
     begin
   //TODO:   TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
       Exit;
@@ -328,7 +337,7 @@ begin
 
     if not LoadKMCOM then Exit;
     try
-      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow);
+      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow, FDefaultBCP47, FDefaultLangID);
     finally
       kmcom := nil;
     end;
@@ -366,8 +375,10 @@ begin
 end;
 
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
-  FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean; FParentWindow: THandle);
+  FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean;
+  FParentWindow: THandle; const FDefaultBCP47: string; FDefaultLangID: Integer);
 var
+  kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
     function FirstKeyboardFileName: WideString;
@@ -439,6 +450,12 @@ begin
   FIcon := GetDebugPath(FIcon, ExtractFilePath(ParamStr(0)) + FIcon, False);
   if FileExists(FIcon) then
     Application.Icon.LoadFromFile(FIcon);
+
+  if (FDefaultBCP47 <> '') or (FDefaultLangID <> 0) then
+  begin
+    if Supports(kmcom, IKeymanDefaultLanguage, kdl) then
+      kdl.SetDefaultLanguage(FDefaultBCP47, FDefaultLangID);
+  end;
 
   case FMode of
     fmKeyboardWelcome:  // I2569

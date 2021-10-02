@@ -48,7 +48,7 @@ uses
   keymansysteminfo;
 
 type
-  TKeyman = class(TAutoObject, IKeyman, IIntKeyman, IKeymanBCP47Canonicalization)
+  TKeyman = class(TAutoObject, IKeyman, IIntKeyman, IKeymanBCP47Canonicalization, IKeymanDefaultLanguage)
   private
     FInitialized: Boolean;
     FContext: TKeymanContext;
@@ -84,6 +84,8 @@ type
     // Reimplement as a special case for this interface
     function SerializeXML(Flags: TOleEnum; const ImagePath: WideString; out References: OleVariant): WideString; safecall;
 
+    { IKeymanDefaultLanguage }
+    procedure SetDefaultLanguage(const BCP47: WideString; LangID: Integer); safecall;
   public
     procedure Initialize; override;
     destructor Destroy; override;
@@ -288,6 +290,12 @@ begin
   finally
     FControl.AutoApply := AutoApply;
   end;
+end;
+
+procedure TKeyman.SetDefaultLanguage(const BCP47: WideString; LangID: Integer);
+begin
+  FContext.DefaultBCP47 := BCP47;
+  FContext.DefaultLangID := LangID;
 end;
 
 procedure TKeyman.Set_AutoApply(Value: WordBool);
