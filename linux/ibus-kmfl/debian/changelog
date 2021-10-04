@@ -1,3 +1,10 @@
+ibus-kmfl (14.0.282-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 29 Sep 2021 12:47:21 +0200
+
 ibus-kmfl (14.0.280-1) unstable; urgency=medium
 
   * New upstream release
