@@ -211,7 +211,7 @@ NODE_SOURCE="source"
 
 SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
 
-export SENTRY_URL="https://sentry.keyman.com"
+export SENTRY_URL="https://sentry.io"
 export SENTRY_ORG=keyman
 export SENTRY_PROJECT=keyman-web
 export SENTRY_LOG_LEVEL=info
