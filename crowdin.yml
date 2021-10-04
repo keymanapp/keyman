@@ -37,6 +37,7 @@ files:
         es-419: b+es+419
         pap: pap
         ar: ar
+	shu-latn-n: b+shu+latn
 
   - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
     dest: /android/app/strings.xml
@@ -47,6 +48,7 @@ files:
         es-419: b+es+419
         pap: pap
         ar: ar
+	shu-latn-n: b+shu+latn
 
   # Windows files
   # Note: we use type: android for the Windows project files

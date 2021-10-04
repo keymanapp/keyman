@@ -339,8 +339,7 @@ begin
       (GetKeyState(VK_SHIFT) < 0) and
       (UIStatus = duiPaused) then
     UIStatus := duiFocusedForInput
-  else if (Message.Msg = WM_KEYDOWN) and
-    (UIStatus in [duiTest, duiFocusedForInput]) then
+  else if UIStatus in [duiTest, duiFocusedForInput] then
   begin
     Exit(ProcessKeyEvent(Message));
   end
@@ -361,7 +360,8 @@ begin
   end;
 
   case Message.Msg of
-    WM_KEYDOWN:
+    WM_KEYDOWN,
+    WM_SYSKEYDOWN:
       Handled := HandleMemoKeydown(Message);
     WM_SYSCHAR:
       Handled := FUIDisabled;
@@ -454,10 +454,10 @@ var
 begin
   Assert(Assigned(FDebugCore));
   modifier := 0;
-  if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_LCTRL or KM_KBP_MODIFIER_CTRL;
-  if GetKeyState(VK_RCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_RCTRL or KM_KBP_MODIFIER_CTRL;
-  if GetKeyState(VK_LMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_LALT or KM_KBP_MODIFIER_ALT;
-  if GetKeyState(VK_RMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_RALT or KM_KBP_MODIFIER_ALT;
+  if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_LCTRL;
+  if GetKeyState(VK_RCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_RCTRL;
+  if GetKeyState(VK_LMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_LALT;
+  if GetKeyState(VK_RMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_RALT;
   if GetKeyState(VK_SHIFT) < 0 then modifier := modifier or KM_KBP_MODIFIER_SHIFT;
   if (GetKeyState(VK_CAPITAL) and 1) = 1 then modifier := modifier or KM_KBP_MODIFIER_CAPS;
 
@@ -508,8 +508,18 @@ begin
 end;
 
 procedure TfrmDebug.StepForward;
+var
+  StepTwice: Boolean;
 begin
   if UIStatus = duiTest then Exit;
+
+  // We don't need to step through each individual set() call manually, so
+  // we'll just step forward again until we reach the end of the set() calls
+  // for the current rule
+  StepTwice :=
+    (_FCurrentEvent < FEvents.Count) and
+    (FEvents[_FCurrentEvent].EventType = etRuleMatch) and
+    (FEvents[_FCurrentEvent].Rule.ItemType = KM_KBP_DEBUG_SET_OPTION);
 
   if _FCurrentEvent < FEvents.Count then
   begin
@@ -536,6 +546,9 @@ begin
   end;
 
   UpdateCharacterGrid;
+
+  if StepTwice then
+    StepForward;
 end;
 
 procedure TfrmDebug.Run;
@@ -603,6 +616,11 @@ procedure TfrmDebug.ExecuteEventRule(n: Integer);
     frmDebugStatus.Key.ShowKey(@ev.Rule.Key);
     frmDebugStatus.RegTest.RegTestLogKey(@ev.Rule.Key);
   end;
+
+  procedure ExecuteSetOption(ev: TDebugEvent);
+  begin
+    frmDebugStatus.Options.SetOptionValue(ev.Rule.OptionStoreName, ev.Rule.OptionValue);
+  end;
 begin
   with FEvents[n].Rule do
   begin
@@ -643,6 +661,8 @@ begin
         frmDebugStatus.CallStack.CallStackPop;
       KM_KBP_DEBUG_END:
         begin frmDebugStatus.CallStack.CallStackClear; ExecutionPointLine := -1; end;
+      KM_KBP_DEBUG_SET_OPTION:
+        ExecuteSetOption(FEvents[n]);
     else
       Assert(False);
     end;

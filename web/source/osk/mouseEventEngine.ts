@@ -7,26 +7,58 @@ namespace com.keyman.osk {
     private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
 
     private hasActiveClick: boolean = false;
+    private ignoreSequence: boolean = false;
 
-    public constructor(vkbd: VisualKeyboard) {
-      super(vkbd);
+    public constructor(config: InputEventEngineConfig) {
+      super(config);
 
       this._mouseStart = this.onMouseStart.bind(this);
       this._mouseMove  = this.onMouseMove.bind(this);
       this._mouseEnd   = this.onMouseEnd.bind(this);
     }
 
+    public static forVisualKeyboard(vkbd: VisualKeyboard) {
+      const config: InputEventEngineConfig = {
+        targetRoot: vkbd.element,
+        // document.body is the event root b/c we need to track the mouse if it leaves
+        // the VisualKeyboard's hierarchy.
+        eventRoot: document.body,
+        inputStartHandler: vkbd.touch.bind(vkbd),
+        inputMoveHandler: vkbd.moveOver.bind(vkbd),
+        inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
+        inputEndHandler: vkbd.release.bind(vkbd),
+        coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
+      };
+
+      return new MouseEventEngine(config);
+    }
+
+    public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
+      const config: InputEventEngineConfig = {
+        targetRoot: banner.getDiv(),
+        // document.body is the event root b/c we need to track the mouse if it leaves
+        // the VisualKeyboard's hierarchy.
+        eventRoot: document.body,
+        inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
+        inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
+        inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
+        coordConstrainedWithinInteractiveBounds: function() { return true; }
+      };
+
+      return new MouseEventEngine(config);
+    }
+
     registerEventHandlers() {
-      this.eventRoot.addEventListener('mousedown', this._mouseStart, true);
-      this.eventRoot.addEventListener('mousemove',  this._mouseMove, false);
+      this.config.eventRoot.addEventListener('mousedown', this._mouseStart, true);
+      this.config.eventRoot.addEventListener('mousemove',  this._mouseMove, false);
       // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
-      this.eventRoot.addEventListener('mouseup',   this._mouseEnd, true);
+      this.config.eventRoot.addEventListener('mouseup',   this._mouseEnd, true);
     }
 
     unregisterEventHandlers() {
-      this.eventRoot.removeEventListener('mousedown', this._mouseStart, true);
-      this.eventRoot.removeEventListener('mousemove',  this._mouseMove, false);
-      this.eventRoot.removeEventListener('mouseup',   this._mouseEnd, true);
+      this.config.eventRoot.removeEventListener('mousedown', this._mouseStart, true);
+      this.config.eventRoot.removeEventListener('mousemove',  this._mouseMove, false);
+      this.config.eventRoot.removeEventListener('mouseup',   this._mouseEnd, true);
     }
 
     private preventPropagation(e: MouseEvent) {
@@ -43,12 +75,21 @@ namespace com.keyman.osk {
     }
 
     onMouseStart(event: MouseEvent) {
+      if(!this.config.targetRoot.contains(event.target as Node)) {
+        this.ignoreSequence = true;
+        return;
+      }
+
       this.preventPropagation(event);
       this.onInputStart(InputEventCoordinate.fromEvent(event));
       this.hasActiveClick = true;
     }
 
     onMouseMove(event: MouseEvent) {
+      if(this.ignoreSequence) {
+        return;
+      }
+
       const coord = InputEventCoordinate.fromEvent(event);
 
       if(!event.buttons) {
@@ -64,7 +105,7 @@ namespace com.keyman.osk {
 
       this.preventPropagation(event);
 
-      if(this.vkbd.detectWithinInteractiveBounds(coord)) {
+      if(this.config.coordConstrainedWithinInteractiveBounds(coord)) {
         this.onInputMove(coord);
       } else {
         this.onInputMoveCancel(coord);
@@ -72,6 +113,11 @@ namespace com.keyman.osk {
     }
 
     onMouseEnd(event: MouseEvent) {
+      if(this.ignoreSequence) {
+        this.ignoreSequence = false;
+        return;
+      }
+
       if(!event.buttons) {
         this.hasActiveClick = false;
       }

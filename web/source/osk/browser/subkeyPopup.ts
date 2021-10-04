@@ -65,7 +65,8 @@ namespace com.keyman.osk.browser {
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
       let rowElement = (e.key as OSKBaseKey).row.element;
-      ss.bottom = (vkbd.height - rowElement.offsetTop) + 'px';
+      const _Box = vkbd.element.offsetParent as HTMLDivElement;
+      ss.bottom = (_Box.offsetHeight - rowElement.offsetTop) + 'px';
 
       // Set key font according to layout, or defaulting to OSK font
       // (copied, not inherited, since OSK is not a parent of popup keys)
@@ -106,7 +107,7 @@ namespace com.keyman.osk.browser {
       this.shim.id = 'kmw-popup-shim';
 
       // Highlight the duplicated base key or ideal subkey (if a phone)
-      if(vkbd.device.formFactor == 'phone') {
+      if(vkbd.device.formFactor == utils.FormFactor.Phone) {
         this.selectDefaultSubkey(vkbd, e, subKeys /* == this.element */);
       }
     }
@@ -160,7 +161,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Add the callout
-      if(vkbd.device.formFactor != 'phone' || vkbd.device.OS != 'iOS') {
+      if(vkbd.device.formFactor != utils.FormFactor.Phone || vkbd.device.OS != utils.OperatingSystem.iOS) {
         this.callout = this.addCallout(e, delta);
       }
     }

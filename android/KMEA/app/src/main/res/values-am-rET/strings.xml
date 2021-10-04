@@ -24,6 +24,10 @@
     <!-- Context: Button label -->
     <string name="label_close_keyman" comment="Close the Keyman application">ኪይማኑን ዝጋ</string>
     <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">ወደፊት</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">የሚቀጥለውን የመቀበያ ዘዴ</string>
+    <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item">ወርዷል</string>
     <!-- Context: Button label -->
     <string name="label_install" comment="Confirmation to install a package">ጫን</string>
@@ -69,6 +73,8 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">የእገዛ ፋይልን ለማየት ፋይል ፕሮቫይደሩ ቤተ መጽሐፍት ያስፈልገዋል %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">የገበታ ሰሌዳ ፋታል ችግር ዝርዝር %1$s:%2$s ለ %3$s ቋንቋ፤ መደበኛ ቋንቋ ጭኗል።</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">የፊደል ገበታ ሰሌዳው ችግር %1$s:%2$s ለ %3$s ቋንቋ።</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">ተያያዥነት ያለውን መዝገበ ቃላት ለመጫን እየፈተሸ ነው።</string>
     <!-- Context: Model Updates -->

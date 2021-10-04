@@ -233,7 +233,7 @@ namespace com.keyman.renderer {
     }
 
     setActiveDummy() {
-      com.keyman['dom']['DOMEventHandlers'].states.activeElement = BatchRenderer.dummy;
+      com.keyman['dom']['DOMEventHandlers'].states._activeElement = BatchRenderer.dummy;
     }
 
     async run(allLayers, filter) {

@@ -142,15 +142,21 @@ void KMX_Options::Set(int nStoreToSet, std::u16string const & rValueToSet)
   assert(nStoreToSet >= 0);
   assert(nStoreToSet < (int) _kp->Keyboard->cxStoreArray);
 
+  LPSTORE optionStore = &_kp->Keyboard->dpStoreArray[nStoreToSet];
+
   auto & rStoreToSetValue = _kp->KeyboardOptions[nStoreToSet].Value;
   if(rStoreToSetValue)
   {
     delete rStoreToSetValue;
   }
 
+  if(m_debug_items) {
+    m_debug_items->push_set_option(m_actions.Length(), optionStore, rValueToSet.c_str());
+  }
+
   rStoreToSetValue = new std::u16string::value_type[rValueToSet.size()+1];
   u16cpy(rStoreToSetValue, /*u16len(sp->dpString)+1,*/ rValueToSet.c_str());
-  _kp->Keyboard->dpStoreArray[nStoreToSet].dpString = rStoreToSetValue;
+  optionStore->dpString = rStoreToSetValue;
 }
 
 

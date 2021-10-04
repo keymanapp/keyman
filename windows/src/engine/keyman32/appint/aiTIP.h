@@ -1,18 +1,18 @@
 /*
   Name:             aiTIP
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+ Documentation:
+  Description:
   Create Date:      11 Dec 2009
 
   Modified Date:    23 Feb 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
                     24 Jun 2010 - mcdurdin - I2436 - Add space to context for AIWin2000Unicode when not matched
                     24 Apr 2014 - mcdurdin - I4196 - V9.0 - wm_kmmoreposting must be refactored for TIP work as it is not sequential
@@ -71,14 +71,29 @@ public:
 
   BOOL DebugControlled();
 
+  // TODO: 5442 This would be better to called SaveContextWithStores or SaveContextWithKbdOptions
+  //       Will be removed with 5442 when removing window core
   void SaveContext(AppContextWithStores *savedContext);   // I4370   // I4978
   void RestoreContext(AppContextWithStores *savedContext);   // I4370   // I4978
 
+  /**
+   * Copy the member context
+   *
+   * @param[out]  savedContext  the copied context
+   */
+  void CopyContext(AppContext *savedContext);
+
+   /**
+   * Restore the passed context to the member context
+   *
+   * @param  savedContext  the context to restore
+   */
+  void RestoreContextOnly(AppContext *savedContext);
 
 	virtual BOOL QueueAction(int ItemType, DWORD dwData);
 
 	/* Information functions */
-	
+
 	virtual BOOL CanHandleWindow(HWND ahwnd);
 	virtual BOOL IsWindowHandled(HWND ahwnd);
 	virtual BOOL HandleWindow(HWND ahwnd);
@@ -89,7 +104,7 @@ public:
 	virtual void ReadContext();
 
 	/* Queue and sending functions */
-	
+
 	virtual BOOL SendActions();   // I4196
 	virtual BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags);
 

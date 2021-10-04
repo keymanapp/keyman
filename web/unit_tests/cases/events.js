@@ -42,8 +42,8 @@ describe('Event Management', function() {
     }
 
     // A bit of a force-hack to ensure the element is seen as active for the tests.
-    com.keyman.dom['DOMEventHandlers'].states.lastActiveElement = ele;
-    com.keyman.dom['DOMEventHandlers'].states.activeElement = ele;
+    com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
+    com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
@@ -79,8 +79,8 @@ describe('Event Management', function() {
     }
 
     // A bit of a force-hack to ensure the element is seen as active for the tests.
-    com.keyman.dom['DOMEventHandlers'].states.lastActiveElement = ele;
-    com.keyman.dom['DOMEventHandlers'].states.activeElement = ele;
+    com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
+    com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);

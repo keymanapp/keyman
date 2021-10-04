@@ -18,6 +18,15 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
 #endif
 
+// For keyboardprocessor_bits.h
+#ifndef KMN_KBP_STATIC
+#define KMN_KBP_STATIC
+#endif
+// For keyboardprocessor_bits.h
+#ifndef _WIN32
+#define _WIN32 1
+#endif
+
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0600
 #endif
@@ -30,6 +39,7 @@
 #include <assert.h>
 #include <msctf.h>
 #include "compiler.h"
+#include <keyman/keyboardprocessor.h>
 
 /***************************************************************************/
 
@@ -77,6 +87,9 @@ typedef struct tagINTKEYBOARDINFO
   LPINTKEYBOARDOPTIONS KeyboardOptions;
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
+  km_kbp_keyboard* lpCoreKeyboard;
+  km_kbp_option_item* lpCoreKeyboardOptions;
+  km_kbp_state* lpCoreKeyboardState;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
 
 typedef struct tagINI
@@ -89,14 +102,17 @@ typedef struct tagINI
 typedef struct tagKMSTATE
 {
   BOOL NoMatches;
+  MSG msg;
+  // TODO: 5442 will remove these once windows core is deprecated
   BOOL StopOutput;
   int LoopTimes;
-  MSG msg;
-  WORD vkey; // I934
-  WCHAR charCode;   // I4582
-  BOOL windowunicode;   // I4287
+  // TODO: 5442
+  WORD vkey;           // I934
+  WCHAR charCode;      // I4582
+  BOOL windowunicode;  // I4287
   LPKEYBOARD lpkb;
-  LPGROUP startgroup;
+  km_kbp_keyboard* lpCoreKb;  //  future use with IMDLL
+  LPGROUP startgroup;         // TODO: 5442 will remove this once windows core is deprecated
 } KMSTATE;
 
 // I3616
@@ -111,6 +127,8 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
 );
 
 BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
+BOOL ReleaseStateMemoryCore(km_kbp_state** state);
+BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard** kbd);
 
 void PostGETNEXT(HWND hwnd);
 BOOL CompareMsg(LPMSG MsgA, LPMSG MsgB);
@@ -151,6 +169,8 @@ void PostDummyKeyEvent();  // I3301 - Handle I3250 regression with inadvertent m
 
 /* Debugging functions */
 
+BOOL IsDebugAssertEnabled();
+
 #ifndef SendDebugMessage
    // I4379
 typedef enum ATSDMState { sdmInternat, sdmAIDefault, sdmMessage, sdmKeyboard, sdmGlobal, sdmMenu, sdmDebug, sdmLoad, sdmOther } TSDMState;
@@ -165,6 +185,9 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char* file, i
 #define ShouldDebug(state) ShouldDebug_1()
 #define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __FILE__,__LINE__,__FUNCTION__))
 #define DebugLastError0(error, context) (DebugLastError_1((error), (context), __FILE__,__LINE__,__FUNCTION__))
+// On failed condition log "message", return FALSE
+// and assert if a debugger is attached for a debug build.
+#define DebugAssert(condition, message) (DebugAssert_1((condition),(message), __FILE__, __LINE__))
 int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char* file, int line, char* msg);
 int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char* file, int line, char* fmt, ...);
 void DebugLastError_1(DWORD err, char* context, char* file, int line, char* func);
@@ -173,7 +196,7 @@ void DebugShift(char* function, char* point);
 BOOL DebugSignalPause(BOOL fIsUp);
 char* Debug_VirtualKey(WORD vk);
 char* Debug_UnicodeString(PWSTR s, int x = 0);
-
+BOOL DebugAssert_1(BOOL condition, char* msg, char* file, int line);
 BOOL ShouldDebug_1(); // TSDMState state);
 
 #endif
@@ -232,6 +255,7 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "addins.h"
 #include "keymancontrol.h"
 #include "keyboardoptions.h"
+#include "kmprocessactions.h"
 
 #include "syskbd.h"
 #include "vkscancodes.h"

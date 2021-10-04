@@ -7,34 +7,26 @@
 #
 
 ver = lib_version.split('.')
-
-# TODO: consider if 0.0.0 is an appropriate or useful library version
+project_ver = meson.project_version().split('.')
 
 cfg = configuration_data()
 cfg.set('lib_curr', ver[0])
 cfg.set('lib_age', ver[1])
 cfg.set('lib_rev', ver[2])
+cfg.set('majorver', project_ver[0])
+cfg.set('minorver', project_ver[1])
+cfg.set('patchver', project_ver[2])
 
 configure_file(
   configuration: cfg,
-  input: 'keyboardprocessor.h.in',
-  output: 'keyboardprocessor.h',
-)
-
-project_ver = meson.project_version().split('.')
-
-vercfg = configuration_data()
-vercfg.set('majorver', project_ver[0])
-vercfg.set('minorver', project_ver[1])
-vercfg.set('patchver', project_ver[2])
-
-configure_file(
-  configuration: vercfg,
   input: 'keyboardprocessor_version.h.in',
   output: 'keyboardprocessor_version.h',
 )
 
-install_headers(join_paths(meson.current_build_dir(), 'keyboardprocessor.h'),
-                'keyboardprocessor_vkeys.h',
+install_headers('keyboardprocessor.h',
                 'keyboardprocessor_bits.h',
+                'keyboardprocessor_consts.h',
+                'keyboardprocessor_debug.h',
+                'keyboardprocessor_vkeys.h',
+                join_paths(meson.current_build_dir(), 'keyboardprocessor_version.h'),
                 subdir: 'keyman')

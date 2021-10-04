@@ -46,6 +46,7 @@ type
   public
     procedure StartBatch; override;
     procedure FinishBatch; override;
+    procedure SetOptionValue(const name, value: string);
   end;
 
 implementation
@@ -128,7 +129,6 @@ end;
 procedure TfrmDebugStatus_Options.DebugEventChanged;
 begin
   inherited;
-  UpdateOptions;
   EnableControls;
 end;
 
@@ -155,6 +155,7 @@ end;
 procedure TfrmDebugStatus_Options.FinishBatch;
 begin
   inherited;
+  UpdateOptions;
   EnableControls;
 end;
 
@@ -211,6 +212,17 @@ begin
     opt.cb.Tag := Integer(Pointer(opt));
     opt.cb.OnChange := cbChange;
     Inc(y, opt.cb.Height + 2);
+  end;
+end;
+
+procedure TfrmDebugStatus_Options.SetOptionValue(const name, value: string);
+var
+  opt: TDebugKeyboardOption;
+begin
+  if FOptions.TryGetValue(name, opt) then
+  begin
+    opt.CurrentValue := value;
+    opt.cb.Text := value;
   end;
 end;
 

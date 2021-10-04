@@ -1811,6 +1811,11 @@ $(function () {
       layer.row.push(row);
     });
 
+    builder.saveJSON(json, force);
+  };
+
+  this.saveJSON = function(force) {
+    builder.removeEmptyRows();
     var newJson = JSON.stringify(KVKL, null, '  ');
     if(force || newJson != json) {
       // When adding or deleting layers and platforms, we need to force because
@@ -2261,6 +2266,23 @@ $(function () {
         }
       }
     );
+  };
+
+  builder.removeEmptyRows = function() {
+    var json = JSON.stringify(KVKL, null, '  ');
+    for (var platform in KVKL) {
+      for (let layer of KVKL[platform].layer) {
+        let newRow = [], n = 1;
+        for(let row of layer.row) {
+          if(row.key.length > 0) {
+            row.id = n;
+            n++;
+            newRow.push(row);
+          }
+        }
+        layer.row = newRow;
+      }
+    }
   };
 
   builder.preparePlatforms();

@@ -208,6 +208,16 @@ public:
 	virtual BOOL SendActions() = 0;   // I4196
 };
 
+/**
+ * Convert AppContext array into an array of core context items.
+ * Caller is responsible for freeing the memory.
+ *
+ * @param   buf     appcontext character array
+ * @param   outPtr  The ouput array of context items. caller to free memory
+ * @return  BOOL    True if array created succesfully
+ */
+BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr);
+
 extern const LPSTR ItemTypes[];
 
 #endif

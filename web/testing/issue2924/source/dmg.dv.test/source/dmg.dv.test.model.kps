@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>13.0.108.0</KeymanDeveloperVersion>
+    <FileVersion>12.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Name URL="">test</Name>
+    <Copyright URL="">© 2020 dmg</Copyright>
+    <Author URL="">dmg</Author>
+    <Version URL="">1.0</Version>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\dmg.dv.test.model.js</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>welcome.htm</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+  </Files>
+  <Keyboards/>
+  <LexicalModels>
+    <LexicalModel>
+      <Name>test</Name>
+      <ID>dmg.dv.test</ID>
+      <Languages>
+        <Language ID="dv">Dhivehi</Language>
+      </Languages>
+    </LexicalModel>
+  </LexicalModels>
+  <Strings/>
+</Package>

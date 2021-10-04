@@ -21,7 +21,7 @@ namespace com.keyman.osk {
 
     static raiseKeyEvent(keyEvent: text.KeyEvent) {
       let keyman = com.keyman.singleton;
-      var Lelem = keyman.domManager.getLastActiveElement();
+      var Lelem = keyman.domManager.lastActiveElement;
 
       if(Lelem != null) {
         // Handle any DOM state management related to click inputs.

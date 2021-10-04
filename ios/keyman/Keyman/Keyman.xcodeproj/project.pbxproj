@@ -336,6 +336,7 @@
 		CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = ../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<absolute>"; };
 		CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = ../../Carthage/Build/Zip.xcframework; sourceTree = "<absolute>"; };
 		CEBD3458265511B700EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEEC468226F2F7BA009A5B7D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		CEEF81B92673019600EE6A07 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageBanner.xib; sourceTree = "<group>"; };
 		CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBannerViewController.swift; sourceTree = "<group>"; };
@@ -781,7 +782,8 @@
 				az,
 				am,
 				"es-419",
-				ar,
+				"zh-Hans",
+				ar
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -1080,7 +1082,8 @@
 				CE72B3D62643ABB7006821CE /* az */,
 				CEBD3458265511B700EB2EA8 /* am */,
 				CEEF81B92673019600EE6A07 /* es-419 */,
-				29E94B5226FC49D00061DD09 /* ar */,
+				CEEC468226F2F7BA009A5B7D /* zh-Hans */,
+				29E94B5226FC49D00061DD09 /* ar */
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

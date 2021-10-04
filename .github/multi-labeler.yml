@@ -64,4 +64,4 @@ labels:
 
   - label: 'cherry-pick'
     matcher:
-      title: '🍒'
+      title: '(🍒|:cherries:)'

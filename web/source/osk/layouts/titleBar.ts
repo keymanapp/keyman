@@ -14,7 +14,6 @@ namespace com.keyman.osk.layouts {
 
     public constructor(dragHandler?: MouseDragOperation) {
       this._element = this.buildTitleBar();
-      this.attachHandlers();
 
       if(dragHandler) {
         this.element.onmousedown = dragHandler.mouseDownHandler;
@@ -52,8 +51,7 @@ namespace com.keyman.osk.layouts {
       this._caption.innerHTML = title;
     }
 
-    public attachHandlers() {
-      let osk = com.keyman.singleton.osk;
+    public attachHandlers(osk: OSKView) {
       let util = com.keyman.singleton.util;
 
       this._helpButton.onclick = function() {
@@ -75,13 +73,16 @@ namespace com.keyman.osk.layouts {
       }
 
       this._closeButton.onclick = function () {
-        osk._Hide(true);
+        osk.startHide(true);
         return false;
       };
 
-      this._unpinButton.onclick = function () {
-        osk.restorePosition(true);
-        return false;
+      if(osk instanceof FloatingOSKView) {
+        const _osk = osk as FloatingOSKView;
+        this._unpinButton.onclick = function () {
+          _osk.restorePosition(true);
+          return false;
+        }
       }
     }
 

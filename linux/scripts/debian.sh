@@ -31,7 +31,7 @@ for proj in ${projects}; do
     downloadSource debianpackage
 
     cd ${proj}-${version}
-    if [ -n $DIST ]; then
+    if [ -n "$DIST" ]; then
         EXTRA_ARGS="--distribution $DIST --force-distribution"
     fi
     dch --newversion ${version}-1 ${EXTRA_ARGS} "Re-release to Debian"

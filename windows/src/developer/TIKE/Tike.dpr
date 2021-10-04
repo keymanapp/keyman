@@ -15,7 +15,6 @@ uses
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   compile in '..\..\global\delphi\general\compile.pas',
   KeymanDeveloperOptions in 'main\KeymanDeveloperOptions.pas',
-  int_kmdebug in '..\..\global\delphi\general\int_kmdebug.pas',
   UfrmKeyTest in 'debug\UfrmKeyTest.pas' {frmKeyTest},
   CompilePackage in '..\..\global\delphi\general\CompilePackage.pas',
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',
@@ -292,7 +291,8 @@ uses
   Keyman.System.VisualKeyboardImportKMX in 'main\Keyman.System.VisualKeyboardImportKMX.pas',
   Keyman.UI.Debug.CharacterGridRenderer in 'debug\Keyman.UI.Debug.CharacterGridRenderer.pas',
   UfrmDebugStatus_Platform in 'debug\UfrmDebugStatus_Platform.pas' {frmDebugStatus_Platform},
-  UfrmDebugStatus_Options in 'debug\UfrmDebugStatus_Options.pas' {frmDebugStatus_Options};
+  UfrmDebugStatus_Options in 'debug\UfrmDebugStatus_Options.pas' {frmDebugStatus_Options},
+  Keyman.Developer.System.KeymanDeveloperPaths in 'main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

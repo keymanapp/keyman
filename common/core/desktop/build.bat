@@ -70,14 +70,7 @@ cd %KEYMAN_ROOT%\common\core\desktop
 
 set BUILDTYPE=%2
 
-if "%3" == "--static" (
-  set STATIC_LIBRARY=--default-library static
-  shift
-) else (
-  set STATIC_LIBRARY=
-)
-
-echo "Is static build = !STATIC_LIBRARY! (%3)"
+set STATIC_LIBRARY=--default-library both
 
 if "%3" == "build" (
   echo === Calling meson build for Windows !ARCH! !BUILDTYPE! ===

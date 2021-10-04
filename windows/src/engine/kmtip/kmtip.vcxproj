@@ -104,6 +104,7 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">kmtip64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">kmtip64</TargetName>
   </PropertyGroup>
+
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
