@@ -1,18 +1,18 @@
 /*
   Name:             registry
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    28 Mar 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add KeymanHotkeys reg
                     05 Nov 2007 - mcdurdin - I1087 - Add hotkeys to switch languages
@@ -44,7 +44,7 @@
 
 #else
 // this below is same in NT 4 and Win95; others will be different
-#define REGSZ_Keyman			"software\\keyman\\keyman engine" 
+#define REGSZ_Keyman			"software\\keyman\\keyman engine"
 #define REGSZ_KeymanDeveloper	"software\\keyman\\keyman developer"
 #define REGSZ_KeymanCU  REGSZ_Keyman
 #define REGSZ_KeymanLM  REGSZ_Keyman
@@ -83,7 +83,7 @@
 
 //#define REGSZ_SystemNLSLocale "system\\currentcontrolset\\control\\Nls\\Locale"
    // I4220
-   
+
 #define REGSZ_KeymanFile		"keyman file"
 #define REGSZ_KeymanFile_MnemonicOverride "keyman file mnemonic override"   // I4169
 #define REGSZ_KeymanFile_MnemonicOverride_Deadkey "keyman file mnemonic override deadkey"   // I4552
@@ -110,7 +110,7 @@
 #define REGSZ_KeyboardHotkeysAreToggle "hotkeys are toggles"
 #define REGSZ_DeadkeyConversionMode    "deadkey conversion mode"                // CU   // I4552
 #define REGSZ_ZapVirtualKeyCode        "zap virtual key code"   // LM, defaults to 0x0E (_VK_PREFIX_DEFAULT)
-/* 
+/*
   Debug flags
   These are all stored in HKCU\Software\Keyman\Debug
 */
@@ -129,6 +129,9 @@
 
 #define REGSZ_Flag_UseCachedHotkeyModifierState "Flag_UseCachedHotkeyModifierState"
 
+/* REGSZ_Flag_UseKeymanCore DWORD: Turns on the common core - instead of windows core */
+#define REGSZ_Flag_UseKeymanCore "Flag_UseKeymanCore"
+
 /* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 
 #define REGSZ_DeepTSFIntegration  "deep tsf integration"
@@ -140,7 +143,8 @@
 #define REGSZ_AutomaticallyReportErrors "automatically report errors"              // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
 #define REGSZ_AutomaticallyReportUsage  "automatically report usage"               // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
 
-/* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry 
+
+/* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry
    correctly -- readonly wherever possible. */
 
 class RegistryReadOnly
@@ -173,7 +177,7 @@ public:
 
 class RegistryFullAccess: public RegistryReadOnly
 {
-protected:	
+protected:
 	HKEY GetKey(LPCSTR AKey);
 	BOOL IntRecursiveDeleteKey(HKEY hkey);
 

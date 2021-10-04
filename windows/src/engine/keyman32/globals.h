@@ -149,6 +149,7 @@ public:
 
   static BOOL get_debug_KeymanLog();
   static BOOL get_debug_ToConsole();
+  static BOOL get_CoreIntegration();
   static void LoadDebugSettings();
 };
 
@@ -191,6 +192,7 @@ typedef struct tagKEYMAN64THREADDATA
 {
   LPINTKEYBOARDINFO lpKeyboards;			// keyboard definitions
   LPINTKEYBOARDINFO lpActiveKeyboard;
+
    // I3616
   LPMSG msgbuf;						// Message buffer (alloc at runtime)
 

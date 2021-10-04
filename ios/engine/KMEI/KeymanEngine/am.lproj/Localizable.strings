@@ -49,6 +49,12 @@
 /* Confirmation text to display before uninstalling a lexical model */
 "command-uninstall-lexical-model-confirm" = "ይህንን መዝገበ ቃላት ልታጠፋው ትፈልጋለህ?";
 
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "የተጠየቀው የፊደል ገበታ ሰሌዳውን ሊጫን አልተቻለም";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "የተጠየቀው ዲክሽናሪ ሊጫን አልተቻለም";
+
 /* Text for error when an installed file is unexpectedly missing */
 "error-missing-file" = "የእርዳታ ሰነዱን ማግኘት አልተቻለም።";
 
@@ -180,6 +186,36 @@
 
 /* Title for the main Settings menu */
 "menu-settings-title" = "የኪይማን ቅንብሮች";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "የስፔስባሩ መግለጫ ጽሁፍ አታሳይ";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "የፊደል ገበታ ሰሌዳውን ስም በስፔስ ባሩ ላይ አሳይ";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "የቋንቋውን ስም በስፔስ ባሩ ላይ አሳይ";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "ቋንቋና የፊደል ገበታውን በስፔስ ባሩ ላይ";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "የስፔስባሩ መግለጫ ጽሁፍ";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "የስፔስባሩ መግለጫ ጽሁፍ";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "ባዶ";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "የፊደል ገበታ ሰሌዳ";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "ቋንቋ";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "ቋንቋና የፊደል ገበታ";
 
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "የፊደል ገበታ ሰሌዳ መውረድ አልቻለም";

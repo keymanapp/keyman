@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 1/02/2021 8:52:41 AM from Type Library described below.
+// File generated on 16/09/2021 6:54:44 PM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -93,6 +93,7 @@ const
   IID_IKeymanKeyboardLanguageInstalled2: TGUID = '{414C26E6-BFAC-4A70-9EA1-E525BA9BBA7E}';
   IID_IKeymanKeyboardLanguagesInstalled2: TGUID = '{628FF2E6-B490-462E-8FC7-7AE53B9D392C}';
   CLASS_Keyman: TGUID = '{CF46549D-4D2D-4679-A2E1-23A815F172F8}';
+  IID_IKeymanDefaultLanguage: TGUID = '{77BAB934-B7DF-4304-AFA6-B8F6BEC16516}';
 
 // *********************************************************************//
 // Declaration of Enumerations defined in Type Library
@@ -257,6 +258,8 @@ type
   IKeymanKeyboardLanguageInstalled2Disp = dispinterface;
   IKeymanKeyboardLanguagesInstalled2 = interface;
   IKeymanKeyboardLanguagesInstalled2Disp = dispinterface;
+  IKeymanDefaultLanguage = interface;
+  IKeymanDefaultLanguageDisp = dispinterface;
 
 // *********************************************************************//
 // Declaration of CoClasses defined in Type Library
@@ -1763,6 +1766,26 @@ type
     procedure Refresh; dispid 2;
     function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
                           out References: OleVariant): WideString; dispid 401;
+  end;
+
+// *********************************************************************//
+// Interface: IKeymanDefaultLanguage
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {77BAB934-B7DF-4304-AFA6-B8F6BEC16516}
+// *********************************************************************//
+  IKeymanDefaultLanguage = interface(IDispatch)
+    ['{77BAB934-B7DF-4304-AFA6-B8F6BEC16516}']
+    procedure SetDefaultLanguage(const DefaultBCP47: WideString; DefaultLangID: Integer); safecall;
+  end;
+
+// *********************************************************************//
+// DispIntf:  IKeymanDefaultLanguageDisp
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {77BAB934-B7DF-4304-AFA6-B8F6BEC16516}
+// *********************************************************************//
+  IKeymanDefaultLanguageDisp = dispinterface
+    ['{77BAB934-B7DF-4304-AFA6-B8F6BEC16516}']
+    procedure SetDefaultLanguage(const DefaultBCP47: WideString; DefaultLangID: Integer); dispid 201;
   end;
 
 // *********************************************************************//

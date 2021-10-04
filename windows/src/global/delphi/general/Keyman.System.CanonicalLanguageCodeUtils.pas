@@ -14,6 +14,7 @@ implementation
 
 uses
   BCP47Tag,
+  GetOsVersion,
   Keyman.System.LanguageCodeUtils,
   Keyman.System.Standards.LangTagsRegistry,
   System.SysUtils;
@@ -34,6 +35,12 @@ var
   t: TBCP47Tag;
   LangTag: TLangTag;
 begin
+  // We do not try and canonicalize language tags on Windows 7, because it does
+  // not follow the same patterns as for later versions of Windows. For example,
+  // zh-CN is not canonicalized to zh-Hans-CN
+  if GetOs = osWin7 then
+    Exit(Tag);
+
   if Tag = '' then
     Exit('');
 
