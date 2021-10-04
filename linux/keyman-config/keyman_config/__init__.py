@@ -57,7 +57,7 @@ else:
             level=logging.INFO,           # Capture info and above as breadcrumbs
             event_level=logging.CRITICAL  # Send critical errors as events
         )
-        SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357@sentry.keyman.com/12"
+        SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357@o1005580.ingest.sentry.io/5983525"
         sentry_sdk.init(
             dsn=SentryUrl,
             environment=__environment__,
@@ -78,7 +78,7 @@ else:
             from raven import Client
             HaveSentryNewSdk = False
 
-            SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357:e6d5a81ee6944fc79bd9f0cbb1f2c2a4@sentry.keyman.com/12"
+            SentryUrl = "https://1d0edbf2d0dc411b87119b6e92e2c357@o1005580.ingest.sentry.io/5983525"
             client = Client(SentryUrl, environment=__environment__, release=__version__)
             client.user_context({'id': hash(getpass.getuser())})
             client.tags_context({

@@ -36,7 +36,7 @@ public class SentryManager {
       let release = "release-\(versionWithTag)"
 
       let options: [String: Any] = [
-        "dsn": "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8",
+        "dsn": "https://d14d2efb594e4345b8367dbb61ebceaf@o1005580.ingest.sentry.io/5983521",
         "enabled": allowEnabled && sendingEnabled,
         "environment": environment,
         "release": release
