@@ -116,7 +116,7 @@ NSString* _keymanDataPath = nil;
 
 - (KeymanVersionInfo)versionInfo {
     KeymanVersionInfo result;
-    // Get version information from Info.plist, which is filled in 
+    // Get version information from Info.plist, which is filled in
     // by build.sh.
     NSDictionary *keymanInfo =[[[NSBundle mainBundle] infoDictionary] objectForKey:@"Keyman"];
     result.sentryEnvironment = [keymanInfo objectForKey:@"SentryEnvironment"];
@@ -127,7 +127,7 @@ NSString* _keymanDataPath = nil;
         result.keymanCom = @"keyman.com";
         result.helpKeymanCom = @"help.keyman.com";
         result.apiKeymanCom = @"api.keyman.com";
-    } 
+    }
     else {
         result.keymanCom = @"keyman-staging.com";
         result.helpKeymanCom = @"help.keyman-staging.com";
@@ -141,14 +141,14 @@ NSString* _keymanDataPath = nil;
 
     KeymanVersionInfo keymanVersionInfo = [self versionInfo];
     NSString *releaseName = [NSString stringWithFormat:@"release-%@", keymanVersionInfo.versionWithTag];
-    
+
     [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
-        options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@sentry.keyman.com/9";
+        options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522";
         options.releaseName = releaseName;
         options.environment = keymanVersionInfo.sentryEnvironment;
-        // options.debug = @YES; 
+        // options.debug = @YES;
     }];
-    
+
     // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
 }
 
@@ -483,7 +483,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 /**
  * Returns the list of user-default legacy apps
  */
-- (NSArray *)legacyAppsUserDefaults { 
+- (NSArray *)legacyAppsUserDefaults {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     return [userData arrayForKey:kKMLegacyApps];
 }
@@ -857,7 +857,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             [self.activeKeyboards removeObjectAtIndex:n];
             found = TRUE;
         } else {
-            i++;            
+            i++;
         }
     }
 
@@ -1113,12 +1113,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return _downloadKBWindow;
 }
 
-/* 
+/*
  * Release windows after closing -- no need to keep them hanging about
  */
 
 - (void)observeCloseFor:(NSWindow *)window {
-    [[NSNotificationCenter defaultCenter] addObserver:self 
+    [[NSNotificationCenter defaultCenter] addObserver:self
                                           selector:@selector(windowWillClose:)
                                           name:NSWindowWillCloseNotification
                                           object:window];

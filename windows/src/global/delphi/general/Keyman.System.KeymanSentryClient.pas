@@ -76,8 +76,8 @@ uses
   utilexecute;
 
 const
-  SENTRY_DSN_DESKTOP = 'https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5';
-  SENTRY_DSN_DEVELOPER = 'https://39b25a09410349a58fe12aaf721565af@sentry.keyman.com/6';
+  SENTRY_DSN_DESKTOP = 'https://92eb58e6005d47daa33c9c9e39458eb7@o1005580.ingest.sentry.io/5983518';
+  SENTRY_DSN_DEVELOPER = 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519';
 
   SENTRY_PROJECT_NAME_DESKTOP = 'keyman-windows';
   SENTRY_PROJECT_NAME_DEVELOPER = 'keyman-developer';

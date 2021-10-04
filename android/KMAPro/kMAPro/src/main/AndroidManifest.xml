@@ -24,7 +24,7 @@
 
     <!--    see the events from this app in sentry.keyman.com dashboard -->
     <meta-data
-      android:name="io.sentry.dsn" android:value="https://2f067e5571a74974b9e210ca76ca9607@sentry.keyman.com/7" />
+      android:name="io.sentry.dsn" android:value="https://2f067e5571a74974b9e210ca76ca9607@o1005580.ingest.sentry.io/5983520" />
     <!--    how to enable Sentry's debug mode-->
     <meta-data
       android:name="io.sentry.debug" android:value="true" />
