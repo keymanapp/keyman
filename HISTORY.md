@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.124 alpha 2021-10-04
+
+* fix(web): support variable stores with predictive text (#5749)
+* fix(windows): handle edge cases using default language (#5709)
+* fix(linux): Don't crash with non-keyboard package file (#5755)
+* fix(linux): Don't crash displaying keyboard details (#5758)
+
 ## 15.0.123 alpha 2021-10-01
 
 * fix(common): Fix cherry-pick labeling (#5782)
