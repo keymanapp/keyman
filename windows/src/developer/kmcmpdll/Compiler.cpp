@@ -95,10 +95,10 @@ int UTF32ToUTF16(int n, int *n1, int *n2);
 int GetDeadKey(PFILE_KEYBOARD fk, PWSTR p);
 
 BOOL IsValidCallStore(PFILE_STORE fs);
-BOOL IsSameToken(PWSTR *p, PWSTR token);
+BOOL IsSameToken(PWSTR *p, WCHAR const * token);
 DWORD GetRHS(PFILE_KEYBOARD fk, PWSTR p, PWSTR buf, int bufsize, int offset, int IsUnicode);
-PWSTR GetDelimitedString(PWSTR *p, PWSTR Delimiters, WORD Flags);
-DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int max, int offset, PWSTR *newp, int isVKey,
+PWSTR GetDelimitedString(PWSTR *p, WCHAR const * Delimiters, WORD Flags);
+DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, WCHAR const * token, PWSTR output, int max, int offset, PWSTR *newp, int isVKey,
   int isUnicode);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PWSTR p);
@@ -109,7 +109,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str);
 DWORD ProcessGroupFinish(PFILE_KEYBOARD fk);
 DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p);
 DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p);
-DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str);
+DWORD AddDebugStore(PFILE_KEYBOARD fk, WCHAR const * str);
 DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode);
 DWORD ProcessEthnologueStore(PWSTR p); // I2646
 DWORD ProcessHotKey(PWSTR p, DWORD *hk);
@@ -124,7 +124,7 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk);
 
 int GetVKCode(PFILE_KEYBOARD fk, PWSTR p);  // I3438  // TODO: Consolidate GetDeadKey and GetVKCode?
 DWORD BuildVKDictionary(PFILE_KEYBOARD fk);  // I3438
-DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID = NULL);
+DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, WCHAR const * str, DWORD *dwStoreID = NULL);
 DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp);
 void RecordDeadkeyNames(PFILE_KEYBOARD fk);
 DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk);
@@ -143,7 +143,7 @@ BOOL IsValidKeyboardVersion(WCHAR *dpString);   // I4140
 
 HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble);
 
-const PWCHAR LineTokens[] = {
+WCHAR const * LineTokens[] = {
   L"SVNBHBGMNSCCLLCMLB", L"store", L"VERSION ", L"NAME ",
   L"BITMAP ", L"HOTKEY ", L"begin", L"group", L"match", L"nomatch",
   L"SHIFT FREES CAPS", L"CAPS ON ONLY", L"CAPS ALWAYS OFF",
@@ -152,7 +152,7 @@ const PWCHAR LineTokens[] = {
 
 #define SSN__PREFIX		L"&"
 
-const PWCHAR StoreTokens[TSS__MAX + 2] = {
+WCHAR const * StoreTokens[TSS__MAX + 2] = {
   L"",
   SSN__PREFIX L"BITMAP",
   SSN__PREFIX L"COPYRIGHT",
@@ -995,7 +995,7 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
   return CERR_None;
 }
 
-DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID)
+DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, WCHAR const * str, DWORD *dwStoreID)
 {
   PFILE_STORE sp;
 
@@ -1018,7 +1018,7 @@ DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID)
   sp->fIsDebug = FALSE;
   sp->fIsCall = FALSE;
 
-  safe_wcsncpy(sp->szName, StoreTokens[SystemID], SZMAX_STORENAME);
+  safe_wcsncpy(sp->szName, (PWSTR) StoreTokens[SystemID], SZMAX_STORENAME);
 
   sp->dpString = new WCHAR[wcslen(str) + 1];
   wcscpy_s(sp->dpString, wcslen(str) + 1, str);  // I3481
@@ -1032,7 +1032,7 @@ DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID)
   return ProcessSystemStore(fk, SystemID, sp);
 }
 
-DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str)
+DWORD AddDebugStore(PFILE_KEYBOARD fk, WCHAR const * str)
 {
   PFILE_STORE sp;
   WCHAR tstr[16];
@@ -1051,7 +1051,7 @@ DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str)
   fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
-  safe_wcsncpy(sp->szName, str, SZMAX_STORENAME);
+  safe_wcsncpy(sp->szName, (PWSTR) str, SZMAX_STORENAME);
 
   sp->dpString = new WCHAR[wcslen(tstr) + 1];
   wcscpy_s(sp->dpString, wcslen(tstr) + 1, tstr);  // I3481
@@ -1710,7 +1710,7 @@ DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, DWORD storeIndex)
 }
 
 
-PWSTR GetDelimitedString(PWSTR *p, PWSTR Delimiters, WORD Flags)
+PWSTR GetDelimitedString(PWSTR *p, WCHAR const * Delimiters, WORD Flags)
 {
   PWSTR q, r;
   WCHAR dOpen, dClose;
@@ -1829,17 +1829,17 @@ int LineTokenType(PWSTR *str)
   return T_UNKNOWN;
 }
 
-const PWSTR DeadKeyChars =
+WCHAR const * DeadKeyChars =
 L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
 
-BOOL strvalidchrs(PWSTR q, PWSTR chrs)
+BOOL strvalidchrs(PWSTR q, WCHAR const * chrs)
 {
   for (; *q; q++)
     if (!wcschr(chrs, *q)) return FALSE;
   return TRUE;
 }
 
-DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int max, int offset, PWSTR *newp, int isVKey, int isUnicode)
+DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, WCHAR const * token, PWSTR output, int max, int offset, PWSTR *newp, int isVKey, int isUnicode)
 {
   DWORD err;
   PWSTR p = str, q, r;
@@ -2526,7 +2526,7 @@ DWORD process_if_synonym(DWORD dwSystemID, PFILE_KEYBOARD fk, LPWSTR q, LPWSTR t
 DWORD process_if(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)  // I3431
 {
   /* if(<store> <'='|'!='> <XString+outs>) */
-  DWORD i, code, not = FALSE;
+  DWORD i, code; DWORD nnot = FALSE;
   LPWSTR r = q, s = q;
   while (*s && *s != L' ' && *s != L'!' && *s != L'=') s++;
   r = s;
@@ -2534,7 +2534,7 @@ DWORD process_if(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)  // I3431
   if (*s == L'!')
   {
     s++;
-    not = TRUE;
+    nnot = TRUE;
   }
 
   if (*s != '=') return CERR_InvalidIf;
@@ -2586,7 +2586,7 @@ DWORD process_if(PFILE_KEYBOARD fk, LPWSTR q, LPWSTR tstr, int *mx)  // I3431
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (WCHAR)code;
   tstr[(*mx)++] = (WCHAR)(i + 1);
-  tstr[(*mx)++] = not ? 1 : 2;
+  tstr[(*mx)++] = nnot ? 1 : 2;
   tstr[(*mx)++] = (WCHAR)(dwStoreID + 1);
   tstr[(*mx)] = 0;
 
@@ -3308,7 +3308,7 @@ void safe_wcsncpy(PWSTR out, PWSTR in, int cbMax)
   out[cbMax - 1] = 0;
 }
 
-BOOL IsSameToken(PWSTR *p, PWSTR token)
+BOOL IsSameToken(PWSTR *p, WCHAR const * token)
 {
   PWSTR q;
   q = *p;

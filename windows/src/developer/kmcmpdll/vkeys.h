@@ -1,24 +1,24 @@
 /*
   Name:             vkeys
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      22 Mar 2010
 
   Modified Date:    22 Mar 2010
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          22 Mar 2010 - mcdurdin - Compiler fixup - tidy up
 */
 
 #define lpuch(x) L ## x
 
-static PWSTR VKeyNames[256] = {
+static WCHAR const * VKeyNames[] = {
 // Key Codes
 	lpuch("K_?00"),				// &H0
 	lpuch("K_LBUTTON"),			// &H1
@@ -289,8 +289,8 @@ static PWSTR VKeyNames[256] = {
 	lpuch("K_?FE"),				// &HFE
 	lpuch("K_?FF")				// &HFF
 	};
-	
-  static PWSTR VKeyISO9995Names[256] = {
+
+  static WCHAR const * VKeyISO9995Names[256] = {
     // Key Codes
     lpuch(""), // lpuch("K_?00"),				// &H0
     lpuch(""), // lpuch("K_LBUTTON"),			// &H1
