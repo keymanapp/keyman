@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.125 alpha 2021-10-05
+
+* fix(android/engine): Remove unnecessary permissions from Manifest (#5752)
+* feat(developer): touch layout testing (#5723)
+* fix(web): popup positioning (#5742)
+* chore(linux): Update changelog files for 14.0.282 :cherries: (#5794)
+
 ## 15.0.124 alpha 2021-10-04
 
 * fix(web): support variable stores with predictive text (#5749)
