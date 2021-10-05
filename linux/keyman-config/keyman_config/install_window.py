@@ -62,6 +62,15 @@ class InstallKmpWindow(Gtk.Dialog):
         with tempfile.TemporaryDirectory() as tmpdirname:
             extract_kmp(kmpfile, tmpdirname)
             info, system, options, keyboards, files = get_metadata(tmpdirname)
+            if not keyboards:
+                # Likely not a keyboard .kmp file
+                logging.info("%s is not a Keyman keyboard package" % kmpfile)
+                dialog = Gtk.MessageDialog(viewkmp, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
+                    _("The file '{kmpfile}' is not a Keyman keyboard package!").format(kmpfile=kmpfile))
+                dialog.run()
+                dialog.destroy()
+                self.checkcontinue = False
+                return
             if len(keyboards) > 0 and 'name' in keyboards[0]:
                 self.kbname = keyboards[0]['name']
             else:
