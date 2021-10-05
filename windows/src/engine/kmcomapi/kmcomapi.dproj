@@ -124,7 +124,7 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
         <DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
-        <Debugger_HostApplication>..\..\desktop\kmshell\kmshell.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>..\..\desktop\kmshell\bin\win32\debug\kmshell.exe</Debugger_HostApplication>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <Debugger_RunParams>-c</Debugger_RunParams>
         <DCC_UseMSBuildExternally>false</DCC_UseMSBuildExternally>

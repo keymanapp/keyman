@@ -326,6 +326,7 @@ var
   kpil: TKPInstallKeyboardLanguage;
   ml: TMitigateWin10_1803.TMitigatedLanguage;
   KeyboardName: string;
+  FDefaultBCP47: string;
 
 type
   TWSLCallback = reference to procedure(r: TRegistryErrorControlled);
@@ -366,7 +367,11 @@ begin
       ErrorFmt(KMN_E_Install_InvalidFile, VarArrayOf([ExtractFileName(FileName), E.Message]));
   end;
 
-  FDefaultHKL := GetDefaultHKL;
+  FDefaultHKL := Context.DefaultLangID;
+  if FDefaultHKL = 0 then
+    FDefaultHKL := GetDefaultHKL;
+
+  FDefaultBCP47 := Context.DefaultBCP47;
 
   KeyboardID := GetShortKeyboardName(FileName);
 
@@ -456,12 +461,6 @@ begin
     begin
       FLanguages := GetLanguageCodesFromKeyboard(ki);
 
-      //
-      // Final fallback is to install against default language for system   // I4607
-      //
-      if Length(FLanguages) = 0 then
-        AddLanguage(HKLToLanguageID(FDefaultHKL));
-
       for i := 0 to High(Flanguages) do
         if TMitigateWin10_1803.IsMitigationRequired(FLanguages[i], ml) then
         begin
@@ -483,6 +482,19 @@ begin
           i: Integer;
           BCP47Tag: string;
         begin
+          if Length(FLanguages) = 0 then
+          begin
+            //
+            // Final fallback is to install against default language for system
+            //
+            kpil := TKPInstallKeyboardLanguage.Create(Context);
+            try
+              kpil.RegisterTip(KeyboardID, FDefaultBCP47, KeyboardName, FDefaultHKL, FIconFileName, '');      //TODO: language name
+            finally
+              kpil.Free;
+            end;
+            r.WriteString(FDefaultBCP47, ''); // TODO: language name
+          end;
           for i := 0 to High(FLanguages) do
           begin
             BCP47Tag := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(FLanguages[i]);
