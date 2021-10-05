@@ -1856,6 +1856,7 @@ var
   HasRules: Boolean;
   sModifierBitmask: string;
   fDisplayUnderlying: Boolean;
+  FOptionStores: string;
 begin
   Result := '';//UTF16SignatureW;  // + '// compiled by Keyman Developer'+nl;  // I3474
 	{ Locate the name of the keyboard }
@@ -2067,6 +2068,7 @@ begin
     Result := Result + Format('%sthis.KCSS="%s";%s', [FTabStop, RequotedString(sEmbedCSS), nl]);
 
 	{ Write the stores out }
+  FOptionStores := '';
   fsp := fk.dpStoreArray;
 	for i := 0 to fk.cxStoreArray - 1 do
   begin
@@ -2081,17 +2083,25 @@ begin
       //else if fsp.dwSystemID = TSS_VKDICTIONARY then // I3438, required for vkdictionary
       //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
       else if fsp.fIsOption and not fsp.fIsReserved then
+      begin
         Result := Result + Format('%sthis.s%s=KeymanWeb.KLOAD(this.KI,"%s",%s);%s',
           [FTabstop,
           JavaScript_Name(i,fsp.szName),
           JavaScript_Name(i,fsp.szName,True),
           JavaScript_Store(fsp.line, fsp.dpString),
-          nl])  // I3429
-      else if fsp.dwSystemID = TSS_NONE then
+          nl]);  // I3429
+
+        if FOptionStores <> '' then
+          FOptionStores := FOptionStores + ',';
+        FOptionStores := FOptionStores + Format('''s%s''', [JavaScript_Name(i,fsp.szName)]);
+      end
+      else if fsp.dwSystemID = TSS_NONE {aka not fsp.fIsReserved} then
         Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl]);   // I3681
     end;
     Inc(fsp);
   end;
+
+  Result := Result + Format('%sthis.KVS=[%s];%s', [FTabStop, FOptionStores, nl]);
 
 	{ Write the groups out }
 

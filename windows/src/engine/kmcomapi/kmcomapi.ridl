@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 1/02/2021 8:52:42 AM (- $Rev: 12980 $, 9519671).
+// File generated on 16/09/2021 6:54:45 PM (- $Rev: 12980 $, 32940875).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -66,6 +66,7 @@ library keymanapi
   interface IKeymanKeyboardLanguageInstalled2;
   interface IKeymanKeyboardLanguagesInstalled2;
   interface IKeymanBCP47Canonicalization;
+  interface IKeymanDefaultLanguage;
 
 
   [
@@ -1017,6 +1018,17 @@ library keymanapi
     HRESULT _stdcall GetCanonicalTag([in] BSTR Tag, [out, retval] BSTR* Result);
     [id(0x0000012E)]
     HRESULT _stdcall GetFullTagList([in] BSTR Tag, [out, retval] VARIANT* Result);
+  };
+
+  [
+    uuid(77BAB934-B7DF-4304-AFA6-B8F6BEC16516),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanDefaultLanguage: IDispatch
+  {
+    [id(0x000000C9)]
+    HRESULT _stdcall SetDefaultLanguage([in] BSTR DefaultBCP47, [in] long DefaultLangID);
   };
 
   [

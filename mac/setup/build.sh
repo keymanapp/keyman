@@ -29,6 +29,13 @@ fi
 osacompile -o "$SOURCEAPP" -x source/install.applescript
 cp source/applet.icns "$SOURCEAPP/Contents/Resources/applet.icns"
 
+# Add arm64 to plist so that the script is not marked as requiring Rosetta
+# ... LSArchitecturePriority
+# https://developer.apple.com/documentation/apple-silicon/building-a-universal-macos-binary#Specify-the-Launch-Behavior-of-Your-App
+/usr/libexec/PlistBuddy -c "Add :LSArchitecturePriority array" "$SOURCEAPP/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :LSArchitecturePriority:0 string 'arm64'" "$SOURCEAPP/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :LSArchitecturePriority:1 string 'x86_64'" "$SOURCEAPP/Contents/Info.plist"
+
 #
 # Build textinputsource
 #

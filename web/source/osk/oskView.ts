@@ -94,7 +94,7 @@ namespace com.keyman.osk {
       this._Box.style.userSelect = 'none';
 
       // Initializes the two constant OSKComponentView fields.
-      this.bannerView   = new BannerManager();
+      this.bannerView   = new BannerManager(this.hostDevice);
       this.keyboardView = null;
 
       let keymanweb = com.keyman.singleton;
@@ -514,12 +514,20 @@ namespace com.keyman.osk {
         }
 
         const bs = this._Box.style;
+        // OSK size settings can only be reliably applied to standard VisualKeyboard
+        // visualizations, not to help text or empty views.
         bs.width  = bs.maxWidth  = this.computedWidth + 'px';
         bs.height = bs.maxHeight = this.computedHeight + 'px';
 
-        let keyman = com.keyman.singleton;
-        keyman.alignInputs();
+      } else {
+        const bs = this._Box.style;
+        bs.width  = 'auto';
+        bs.height = 'auto';
+        bs.maxWidth = bs.maxHeight = '';
       }
+
+      let keyman = com.keyman.singleton;
+      keyman.alignInputs();
     }
 
     public refreshLayoutIfNeeded(pending?: boolean) {

@@ -12,7 +12,7 @@ namespace com.keyman.utils {
   export class StyleConstants {
     constructor(device: com.keyman.utils.DeviceSpec) {
       // popupCanvasBackgroundColor
-      if(device.OS == 'android') {
+      if(device.OS == utils.OperatingSystem.Android) {
         this.popupCanvasBackgroundColor = '#999';
       } else {
         this.popupCanvasBackgroundColor = StyleConstants.prefersDarkMode() ? '#0f1319' : '#ffffff';

@@ -169,12 +169,12 @@ begin
         if Length(FilenameBCP47) > 1
           then RegisterKeyboardPackageLanguage(FPackage, FilenameBCP47[1])
           else RegisterKeyboardPackageLanguage(FPackage, '');
-          // The keyboard will be installed for current user as a separate step
+        // The keyboard will be installed for current user as a separate step
       end
       else
       begin
         FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True);
-        if Length(FilenameBCP47) > 1
+        if (Length(FilenameBCP47) > 1) and (Trim(FilenameBCP47[1]) <> '')
           then BCP47Tag := FilenameBCP47[1]
           else BCP47Tag := TTIPMaintenance.GetFirstLanguage(FKeyboard);
         TTIPMaintenance.DoRegister(FKeyboard.ID, BCP47Tag);

@@ -134,7 +134,6 @@
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\compile.pas"/>
         <DCCReference Include="main\KeymanDeveloperOptions.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\int_kmdebug.pas"/>
         <DCCReference Include="debug\UfrmKeyTest.pas">
             <Form>frmKeyTest</Form>
         </DCCReference>
@@ -402,10 +401,7 @@
         <DCCReference Include="oskbuilder\UframeTouchLayoutBuilder.pas">
             <Form>frameTouchLayoutBuilder</Form>
         </DCCReference>
-        <DCCReference Include="oskbuilder\TouchLayoutUtils.pas">
-            <Form>,
-  UfrmSelectTouchLayoutTemplate in &apos;oskbuilder\UfrmSelectTouchLayoutTemplate.pas&apos; {frmSelectTouchLayoutTemplate</Form>
-        </DCCReference>
+        <DCCReference Include="oskbuilder\TouchLayoutUtils.pas"/>
         <DCCReference Include="oskbuilder\UfrmSelectTouchLayoutTemplate.pas">
             <Form>frmSelectTouchLayoutTemplate</Form>
         </DCCReference>
@@ -553,6 +549,17 @@
         <DCCReference Include="debug\Keyman.System.Debug.DebugCore.pas"/>
         <DCCReference Include="main\Keyman.System.VisualKeyboardImportKMX.pas"/>
         <DCCReference Include="debug\Keyman.UI.Debug.CharacterGridRenderer.pas"/>
+        <DCCReference Include="debug\UfrmDebugStatus_Platform.pas">
+            <Form>frmDebugStatus_Platform</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="debug\UfrmDebugStatus_Options.pas">
+            <Form>frmDebugStatus_Options</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas">
+            <Form>$R *.RES</Form>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

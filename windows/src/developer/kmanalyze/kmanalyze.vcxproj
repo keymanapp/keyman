@@ -179,8 +179,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Projects\keyman\open\windows\src\global\inc\keyman64.h" />
     <ClInclude Include="..\..\ext\sentry\sentry.h" />
+    <ClInclude Include="..\..\global\inc\keyman64.h" />
     <ClInclude Include="..\..\global\inc\keymansentry.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

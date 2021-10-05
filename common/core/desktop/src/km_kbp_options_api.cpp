@@ -25,7 +25,9 @@ km_kbp_options_list_size(km_kbp_option_item const *opts)
   if (!opts)  return 0;
 
   auto n = 0;
-  while (opts->key) ++n;
+  for (; opts->key; ++opts) {
+    ++n;
+  }
 
   return n;
 }

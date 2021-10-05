@@ -1,0 +1,57 @@
+{
+  "tablet": {
+    "displayUnderlying": false,
+    "layer": [
+      {
+        "id": "default",
+        "row": [
+          {
+            "id": 1,
+            "key": [
+              {
+                "id": "K_S",
+                "text": "Set"
+              },
+              {
+                "id": "K_C",
+                "text": "Clear"
+              },
+              {
+                "id": "K_R",
+                "text": "Reveal"
+              },
+              {
+                "id": "K_BKSP",
+                "text": "*BkSp*",
+                "width": "100",
+                "sp": "1"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "key": [
+              {
+                "id": "K_LOPT",
+                "text": "*Menu*",
+                "width": "140",
+                "sp": "1"
+              },
+              {
+                "id": "K_SPACE",
+                "text": "",
+                "width": ""
+              },
+              {
+                "id": "K_ENTER",
+                "text": "*Enter*",
+                "width": "145",
+                "sp": "1"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

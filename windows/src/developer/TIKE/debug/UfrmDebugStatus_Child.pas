@@ -60,9 +60,13 @@ type
 
     function memoDebug: TKeymanDeveloperDebuggerMemo;
 
+    procedure DebugEventChanged; virtual;
     procedure DebugKeyboardChanged; virtual;
     procedure DisplayFontChanged; virtual;
   public
+    procedure StartBatch; virtual;
+    procedure FinishBatch; virtual;
+
     procedure SetDisplayFont(Value: TFont);
     procedure SetDebugKeyboard(const Value: TDebugKeyboard);
     procedure SetEditorMemo(Value: TframeTextEditor);
@@ -76,6 +80,11 @@ implementation
 {$R *.dfm}
 
 { TfrmDebugStatus_Child }
+
+procedure TfrmDebugStatus_Child.DebugEventChanged;
+begin
+
+end;
 
 procedure TfrmDebugStatus_Child.DebugKeyboardChanged;
 begin
@@ -107,6 +116,7 @@ end;
 procedure TfrmDebugStatus_Child.SetCurrentEvent(const Value: TDebugEvent);
 begin
   FCurrentEvent := Value;
+  DebugEventChanged;
 end;
 
 procedure TfrmDebugStatus_Child.SetDebugCore(const Value: TDebugCore);
@@ -134,6 +144,16 @@ end;
 procedure TfrmDebugStatus_Child.SetEditorMemo(Value: TframeTextEditor);
 begin
   FEditorMemo := Value;
+end;
+
+procedure TfrmDebugStatus_Child.StartBatch;
+begin
+
+end;
+
+procedure TfrmDebugStatus_Child.FinishBatch;
+begin
+
 end;
 
 end.

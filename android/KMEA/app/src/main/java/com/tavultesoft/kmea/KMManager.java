@@ -16,12 +16,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -52,6 +54,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import androidx.core.content.ContextCompat;
 
 import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
@@ -720,25 +724,40 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Query the AndroidManifest file to see if a permission is granted.
+   * @param permission - The manifest permission to query
+   * @return boolean - true if the manifest permission is granted
+    */
+  protected static boolean hasPermission(Context context, String permission) {
+    // API to check permission depends on Android SDK level
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      return (context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
+    }
+
+    return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+  }
+
+  /**
+   * Check if KMManager has an active network connection.
+   * Requires Manifest.permission.ACCESS_NETWORK_STATE to be granted
+   * @param context - The context
+   * @return boolean - true if manifest permission ACCESS_NETWORK_STATE is granted and the device
+   * has an active network connection
+   */
+  @SuppressLint("MissingPermission")
   public static boolean hasConnection(Context context) {
-    ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-    NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-    if (wifiNetwork != null && wifiNetwork.isConnected()) {
-      return true;
-    }
-
-    NetworkInfo mobileNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-    if (mobileNetwork != null && mobileNetwork.isConnected()) {
-      return true;
-    }
-
-    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    if (activeNetwork != null && activeNetwork.isConnected()) {
-      return true;
+    if (hasPermission(context, Manifest.permission.ACCESS_NETWORK_STATE)) {
+      ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+      return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 
     return false;
+  }
+
+  public static boolean hasInternetPermission(Context context) {
+    return hasPermission(context, Manifest.permission.INTERNET);
   }
 
   private static void copyAssets(Context context) {

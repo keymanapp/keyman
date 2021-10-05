@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Shuwa Latin</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Miwasa</string>
+  <string name="ssTitle">Dyss $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION dakhal zayn.</string>
+  <string name="ssCancelQuery">Tabbat tador tahal dassasan hana $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Sallalanal mulamma...</string>
+  <string name="ssBootstrapCheckingPackages">Shafiyanal packages...</string>
+  <string name="ssBootstrapCheckingForUpdates">Shafiyan online ley shu\'ul judad...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Shafiyan nafar aldakhal...</string>
+  <string name="ssBootstrapReady">Tammaman...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Mafi shu\'ul albidukhul.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s dyssasan)</string>
+  <string name="ssActionInstall">Almiwasa bidys:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION da sul wa mi misadda</string>
+  <string name="ssLicenseLink">&amp;Agural izin</string>
+  <string name="ssInstallOptionsLink">Dyssal &amp;durub</string>
+  <string name="ssMessageBoxTitle">$APPNAME Miwasa</string>
+  <string name="ssOkButton">Zayn</string>
+  <string name="ssInstallButton">&amp;Dyssa</string>
+  <string name="ssCancelButton">Halla</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Dassasan $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Sallalan nafar hana gabul</string>
+  <string name="ssStatusComplete">Dakhal kamil</string>
+  <string name="ssQueryRestart">Eilla kan saddayt wa fakayt komfita hanak hadar bitamum. Kan sawwayta da, bibga kamil dakhal.
+
+Tasawwa dugut wah?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Al komfita ma gudur sawwa. Wasa hadar tahawula wa tabda nafiyan beya $APPNAME.</string>
+  <string name="ssMustRestart">Wajib taktul wa tafuk komfita hanak. Kan sawwayta dugo budukhul kamil.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION bidor Windows 7 walla hana giddama bidukhul. Lakin, Keyman Desktop 7, 8, walla 9 alshaf. Tador tadissal keyboards jami layl Keyman Desktop da wah?</string>
+  <string name="ssOldOsVersionDownload">Nafar hanal $APPNAME da bidor Windows 7 walla hana giddama ley eikhadum. Tador tadis Keyman Desktop 8 wah?</string>
+  <string name="ssOptionsTitle">Durub hana dassasana</string>
+  <string name="ssOptionsTitleInstallOptions">Durub hana Dassasana</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">$APPNAME Miwasa hana gabul</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modules ley dassasan walla wasiyana jadid</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Lugga hana Keyboard almulamma</string>
+  <string name="ssOptionsTitleLocation">Nafar hana dassasan</string>
+  <string name="ssOptionsStartWithWindows">Abda $APPNAME kan Windows anfakka bas</string>
+  <string name="ssOptionsStartAfterInstall">Eibda $APPNAME kan tammam dakhalan</string>
+  <string name="ssOptionsCheckForUpdates">Shyf ley shu\'ul judad fi waqat waqat</string>
+  <string name="ssOptionsUpgradeKeyboards">Saw al keyboards eibga jadid maala hanal gadim $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Eiyathil akhbar fyl syr ley keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Nafar shaba bidussu: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Dassasan $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Jadidiye $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s mafi dakhal.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Nafar al dakhal %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Nafar %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Dassasan %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Nafar al dakhal %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Nafar %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Azzulal lugga al tador tadissal %0:s keyboard beya</string>
+  <string name="ssOptionsDefaultLanguage">Lugga hana gabul</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Bidukhul %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Bidukhul %0:s</string>
+  <string name="ssOffline">$APPNAME Aldassasan ma gudur kan ley dassasan ziyada hana shu\'ul finshan ma gudur wassal keyman.com
+
+Albarak shyf kan internet hanak bikhadum, wa ath $APPNAME izin hana dassasan min internet hanak ley firewall hana browser hanak.
+
+Assur hallayt ley dabbaran dassasana, hawul ley dassasana addarey shiyakay, walla halla ley takhadum bala internet.</string>
+</resources>

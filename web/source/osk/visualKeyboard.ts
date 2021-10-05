@@ -193,9 +193,9 @@ namespace com.keyman.osk {
       // Needs to occur AFTER this.kbdDiv is initialized.
       if (!this.isStatic) {
         if (this.hostDevice.touchable) {
-          this.inputEngine = new TouchEventEngine(this);
+          this.inputEngine = TouchEventEngine.forVisualKeyboard(this);
         } else {
-          this.inputEngine = new MouseEventEngine(this);
+          this.inputEngine = MouseEventEngine.forVisualKeyboard(this);
         }
         this.inputEngine.registerEventHandlers();
       }
@@ -1211,7 +1211,7 @@ namespace com.keyman.osk {
 
       var fs = 1.0;
       // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
-      if (device.OS == 'ios' && !keyman.isEmbedded) {
+      if (device.OS == utils.OperatingSystem.iOS && !keyman.isEmbedded) {
         fs = fs / keyman.util.getViewportScale();
       }
 
