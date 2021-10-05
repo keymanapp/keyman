@@ -23,9 +23,11 @@ import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -125,7 +127,10 @@ final class KMKeyboard extends WebView {
 
     // Normally, this would be true to prevent the WebView from accessing the network.
     // But this needs to false for sending embedded KMW crash reports to Sentry (keymanapp/keyman#3825)
-    getSettings().setBlockNetworkLoads(!KMManager.getMaySendCrashReport());
+    if (KMManager.hasInternetPermission(context)) {
+      // Throws SecurityException if INTERNET permission not granted
+      getSettings().setBlockNetworkLoads(!KMManager.getMaySendCrashReport());
+    }
 
     getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     getSettings().setSupportZoom(false);
