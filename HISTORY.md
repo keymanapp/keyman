@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.126 alpha 2021-10-05
+
+* chore: sentry.io dsn  ‍ ️ (#5787)
+
 ## 15.0.125 alpha 2021-10-05
 
 * fix(android/engine): Remove unnecessary permissions from Manifest (#5752)
