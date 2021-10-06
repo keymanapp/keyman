@@ -134,13 +134,13 @@ BOOL ProcessHook()
 		keyinfo.VirtualKey = _td->state.vkey;
 		keyinfo.Character = _td->state.charCode;
 		keyinfo.DeadKeyCharacter = 0;   // I4582
-		keyinfo.IsUp = _td->state.msg.message == wm_keymankeyup;
+		keyinfo.IsUp = !_td->state.isDown;
 		if(_td->app->IsUnicode())
 			_td->app->QueueDebugInformation(QID_BEGIN_UNICODE, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 		else
 			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
-  
+
   if (isUsingCoreProcessor) {
 
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: ");
@@ -154,10 +154,10 @@ BOOL ProcessHook()
       return FALSE;
     }
     km_kbp_context_items_dispose(citems);
-    //_td->state.vkey == VK_DOWN
     if (KM_KBP_STATUS_OK !=
-      (km_kbp_status_codes)km_kbp_process_event(
-            _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey, static_cast<uint16_t>(Globals::get_ShiftState()), 1)) {
+      (km_kbp_status_codes)km_kbp_process_event(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
+                                                  static_cast<uint16_t>(Globals::get_ShiftState()),
+                                                  (uint8_t)_td->state.isDown)) {
       return FALSE;
     }
 
