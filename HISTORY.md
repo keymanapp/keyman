@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.127 alpha 2021-10-06
+
+* chore(web): disable registerstub test (#5800)
+
 ## 15.0.126 alpha 2021-10-05
 
 * chore: sentry.io dsn  ‍ ️ (#5787)
