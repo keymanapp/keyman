@@ -29,26 +29,26 @@ const int km::kbp::kmx::CODE__SIZE[] = {
     0,   // CODE_RETURN              0x06
     0,   // CODE_BEEP                0x07
     1,   // CODE_DEADKEY             0x08
-    0,   // CODE_BACKSPACE           0x09
+    -1,  // unused                   0x09
     2,   // CODE_EXTENDED            0x0A
-    0,   // CODE_EXTENDEDEND         0x0B
-    0,   // CODE_SWITCH              0x0C
-    0,   // CODE_KEY                 0x0D
-    1,   // CODE_CLEARCONTEXT        0x0E
+    -1,  // CODE_EXTENDEDEND         0x0B (unused)
+    1,   // CODE_SWITCH              0x0C
+    -1,  // CODE_KEY                 0x0D (never used)
+    0,   // CODE_CLEARCONTEXT        0x0E
     1,   // CODE_CALL                0x0F
-    0,   // UC_SENTINEL_EXTENDEDEND  0x10
+    -1,  // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
     1,   // CODE_CONTEXTEX           0x11
     1,   // CODE_NOTANY              0x12
-    2,   // CODE_KEYMAN70_LASTCODE   0x13
+    2,   // CODE_SETOPT              0x13
     3,   // CODE_IFOPT               0x14
     1,   // CODE_SAVEOPT             0x15
     1,   // CODE_RESETOPT            0x16
     3,   // CODE_IFSYSTEMSTORE       0x17
-    2    // CODE_LASTCODE            0x18
+    2    // CODE_SETSYSTEMSTORE      0x18
 };
 
 // Ensure that all CODE_### sizes are defined
-static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1), "Size of array CODE_SIZE not correct");
+static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_SETSYSTEMSTORE + 1), "Size of array CODE__SIZE not correct");
 
 const unsigned long CRCTable[256] = {
   0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,

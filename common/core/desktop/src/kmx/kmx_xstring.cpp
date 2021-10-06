@@ -3,7 +3,6 @@
   Authors:          mcdurdin
 */
 #include <vector>
-#include <array>
 #include <iterator>
 #include <codecvt>
 #include <locale>
@@ -142,7 +141,8 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
 
   // check for \0 between FFFF and next printable character
   for (int i = 0; i < deltaptr; i++) {
-    if (*p == 0)       return p;
+    if (*p == 0)
+      return p;
     p++;
   }
   return p;
