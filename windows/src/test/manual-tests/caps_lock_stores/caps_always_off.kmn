@@ -1,0 +1,20 @@
+﻿c Caps Lock cannot be turned on while the keyboard is active, and it turns Caps Lock off when the keyboard is switched on.
+c caps_always_off generated from template at 2021-07-20 17:34:24
+c with name "Caps Always Off"
+store(&NAME) 'Caps Always Off'
+store(&COPYRIGHT) '© SIL International'
+store(&VERSION) '10.0'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'macosx iphone androidtablet mobile desktop tablet'
+store(&VISUALKEYBOARD) 'caps_always_off.kvks'
+store(&LAYOUTFILE) 'caps_always_off.keyman-touch-layout'
+store(&MESSAGE) 'Caps Lock cannot be turned on while the keyboard is active, and it turns Caps Lock off when the keyboard is switched on.'
+store(&capsAlwaysOff) "1"
+
+begin Unicode > use(main)
+
+group(main) using keys
++ [NCAPS K_A] > 'ncaps_little_a '
++ [NCAPS SHIFT K_A] > 'ncaps_shift_A '
++ [CAPS K_A] > 'CAPS_A '
++ [CAPS SHIFT K_A] > 'CAPS_shift_a '
