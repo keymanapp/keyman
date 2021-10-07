@@ -89,7 +89,7 @@ processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable
   if (actionItem->capsLock) {
     // This case would occur for the keyboard rule CAPSONLY
     if (isUp && !IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "processCapsLock: TURN CAPS ON: FIsUp=%d CapsState=%d", FIsUp, IsCapsLockOn());
+      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS ON: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
 
@@ -98,8 +98,7 @@ processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable
     // A trick is being played here of synthesising a release the CAPSLOCK key event
     // then a depress CAPSLOCK key event
     else if (!isUp && IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", FIsUp,
-       IsCapsLockOn());
+      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
 
@@ -108,8 +107,7 @@ processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable
   else {
     // This case would occur for the keyboard rule SHIFTFREESCAPS
     if (!isUp && IsCapsLockOn()) {
-      SendDebugMessageFormat(
-        0, sdmAIDefault, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
