@@ -31,7 +31,7 @@ void test_incxstr() {
   assert(q == p);
 
   // --- Test for character ---------------------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR) u"\U00001234";   
+  p = (PKMX_WCHAR) u"\u1234";
   q = incxstr(p);
   assert(q == p+1);
 
@@ -41,12 +41,12 @@ void test_incxstr() {
   assert(q == p+2);
 
   // --- Test for one <control> -----------------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U00000012";
+  p = (PKMX_WCHAR)u"\u0012";
   q = incxstr(p);
   assert(q == p + 1);
 
   // --- Test for FFFF only -------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF";
+  p = (PKMX_WCHAR)u"\uFFFF";
   q = incxstr(p);
   assert(q == p + 1);
 
@@ -55,102 +55,102 @@ void test_incxstr() {
   // --------------------------------------------------------------------------------------------------------------------------------------------------
 
   // --- Test for FFFF +CODE_INDEX --------------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000002\U00000002\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0002\u0002\u0001";
   q = incxstr(p);
   assert(q == p + 4);
 
   // --- Test for FFFF +CODE_USE ----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000005\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0005\u0001";
   q = incxstr(p);
   assert(q == p + 3);
 
   // --- Test for FFFF +CODE_DEADKEY ------------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\u0001";
   q = incxstr(p);
   assert(q == p + 3);
 
   // --- Test for FFFF  CODE_EXTENDED -------------------------------------------------------------------------------------------------------- 
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000010";
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0010";
   q = incxstr(p);
   assert(q == p + 9);
 
   // --- Test for FFFF +CODE_CLEARCONTEXT ------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000E\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u000E\u0001";
   q = incxstr(p);
   assert(q == p + 2);
 
   // --- Test for FFFF +CODE_CALL ----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000F\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u000F\u0001";
   q = incxstr(p);
   assert(q == p + 3);
 
   // --- Test for FFFF +CODE_CONTEXTEX ---------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000011\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0011\u0001";
   q = incxstr(p);
   assert(q == p + 3);
 
   // --- Test for FFFF +CODE_IFOPT -------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000014\U00000002\U00000002\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0014\u0002\u0002\u0001";
   q = incxstr(p);
   assert(q == p + 5);
 
   // --- Test for FFFF +CODE_IFSYSTEMSTORE ------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000017\U00000002\U00000002\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0017\u0002\u0002\u0001";
   q = incxstr(p);
   assert(q == p + 5);
 
   // --- Test for FFFF +CODE_SETOPT ----------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000013\U00000002\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0013\u0002\u0001";
   q = incxstr(p);
   assert(q == p + 4);
 
   // --- Test for FFFF +CODE_SETSYSTEMRESTORE ---------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000018\U00000002\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0018\u0002\u0001";
   q = incxstr(p);
   assert(q == p + 4);
 
   // --- Test for FFFF +CODE_RESETOPT -----------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000016\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0016\u0001";
   q = incxstr(p);
   assert(q == p + 3);
 
   // --- Test for FFFF +CODE_SAVEOPT -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000015\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0015\u0001";
   q = incxstr(p);
   assert(q == p + 3 );
 
   // --- Test for FFFF +default ----------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000004";
+  p = (PKMX_WCHAR)u"\uFFFF\u0004";
   q = incxstr(p);
   assert(q == p + 2);
 
   // --- Test for FFFF + CODE_ANY -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000001\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0001\u0001";
   q = incxstr(p);
   assert(q == p + 3 );
 
   // --- Test for FFFF + CODE_CONTEXT -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000003\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0003\u0001";
   q = incxstr(p);
   assert(q == p + 2 );
 
   // --- Test for FFFF + CODE_RETURN -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000006\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0006\u0001";
   q = incxstr(p);
   assert(q == p + 2 );
 
   // --- Test for FFFF + CODE_BEEP -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000007\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0007\u0001";
   q = incxstr(p);
   assert(q == p + 2 );
 
   // --- Test for FFFF + CODE_SWITCH -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000C\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u000C\u0001";
   q = incxstr(p);
   assert(q == p + 3 );
 
   // --- Test for FFFF + NOTANY -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000012\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0012\u0001";
   q = incxstr(p);
   assert(q == p + 3 );
 
@@ -159,52 +159,52 @@ void test_incxstr() {
   // --------------------------------------------------------------------------------------------------------------------------------------------------
                         
   // --- Test for FFFF + control (earlier p+1) with \0 after first position --------------- unit test failed with old version of incxstr() -----
-  p = (PKMX_WCHAR)u"\U0000FFFF\0\U00000008\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\0\u0008\u0001";
   q = incxstr(p);
   assert(q == p+1);
 
   // --- Test for FFFF +control (earlier p+1) with \0 after second position --------- unit test failed with old version of incxstr() -----
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\0\U00000001";
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\0\u0001";
   q = incxstr(p);
   assert(q == p+2);
 
   // --- Test for FFFF +control (earlier p+1) with \0 after third position ----- unit test failed with old version of incxstr() -----
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\U00000001\0";
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\u0001\0";
   q = incxstr(p);
   assert(q == p+3)
 
   // --- Test for FFFF +control (earlier p+2) with \0 after fourth position ----- unit test failed with old version of incxstr() ----
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000002\U00000001\U00000001\0";
+  p = (PKMX_WCHAR)u"\uFFFF\u0002\u0001\u0001\0";
   q = incxstr(p);
   assert(q == p+4);
  
   // --- Test for FFFF +control (earlier p+3) with \0 after fifth  position ----- unit test failed with old version of incxstr() ---------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000014\U00000001\U00000001\U00000001\0";
+  p = (PKMX_WCHAR)u"\uFFFF\u0014\u0001\u0001\u0001\0";
   q = incxstr(p);
   assert(q == p+5);
   
   // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 6.  position  ----- unit test failed with old version of incxstr() ----- 
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\0\U00000005\U00000006\U00000007\U00000010";
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\0\u0005\u0006\u0007\u0010";
   q = incxstr(p);
   assert(q == p + 6);
 
   // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 7.  position  ----- unit test failed with old version of incxstr() 
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\0\U00000006\U00000007\U00000010";
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\0\u0006\u0007\u0010";
   q = incxstr(p);
   assert(q == p + 7);
 
   // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 8.  position  ----- unit test failed with old version of incxstr() ----------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\0\U00000007\U00000010";
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\0\u0007\u0010";
   q = incxstr(p);
   assert(q == p + 8);
 
   // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 9.  position  ----- unit test failed with old version of incxstr() ---
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000007\0\U00000010";
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0007\0\u0010";
   q = incxstr(p);
   assert(q == p + 9);
 
   // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 10.  position  ----- unit test failed with old version of incxstr() -----------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000007\U00000010\0";
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0010\0";
   q = incxstr(p);
   assert(q == p + 10);
 
@@ -213,22 +213,22 @@ void test_incxstr() {
   // --------------------------------------------------------------------------------------------------------------------------------------------------
 
   // --- Test for FFFF + \0 --------------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\0";
+  p = (PKMX_WCHAR)u"\uFFFF\0";
   q = incxstr(p);
   assert(q == p + 1);
 
   // --- Test for FFFF +one character ------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000062";
+  p = (PKMX_WCHAR)u"\uFFFF\u0062";
   q = incxstr(p);
   assert(q == p + 1);
 
   // --- Test for FFFF +one <control> -----------------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000004";
+  p = (PKMX_WCHAR)u"\uFFFF\u0004";
   q = incxstr(p);
   assert(q == p + 2);
 
   // --- Test for FFFF + one <control> + character -------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR)u"\U0000FFFF\U00000004\U00000062";
+  p = (PKMX_WCHAR)u"\uFFFF\u0004\u0062";
   q = incxstr(p);
   assert(q == p + 2);
 
@@ -236,512 +236,503 @@ void test_incxstr() {
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //
-                // --------------------------------------------------------------------------------------------------------------------------------------------------
-                // ---- NULL, SURROGATE PAIRS, NON_UC_SENTINEL, ONE CHARACTER  WITH \U00001234\U00002468 At END
-                // ---------------------------------------------------------------------------------------
-                // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // ---- NULL, SURROGATE PAIRS, NON_UC_SENTINEL, ONE CHARACTER  WITH \u1234\u2468 At END
+  // ---------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-                // --- Test for empty string
-                ------------------------------------------------------------------------------------------------------------------------
+  // --- Test for empty string
+  //---------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR) u"\0\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p);
 
-                p = (PKMX_WCHAR) u"\0\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p);
+  // --- Test for character
+  // ---------------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\u1234\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 1);;
 
-                // --- Test for character
-                // ---------------------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U00001234\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 1);;
+  // --- Test for surrogate pair
+  // ----------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\U0001F609\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-                // --- Test for surrogate pair
-                // ----------------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0001F609\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2);
+  // --- Test for one <control>
+  // -----------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\u0012\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-                // --- Test for one <control>
-                // -----------------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U00000012\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 1);
+  // --- Test for FFFF only
+  // -------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-                // --- Test for FFFF only
-                // -------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 1);
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // ---- UC_SENTINEL WITHOUT \0
+  // ----------------------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-                // --------------------------------------------------------------------------------------------------------------------------------------------------
-                // ---- UC_SENTINEL WITHOUT \0
-                // ----------------------------------------------------------------------------------------------------------------------
-                // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // --- Test for FFFF +CODE_INDEX
+  // --------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0002\u0002\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 4);
 
-                // --- Test for FFFF +CODE_INDEX
-                // --------------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000002\U00000002\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 4);
+  // --- Test for FFFF +CODE_USE
+  // ----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0005\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-                // --- Test for FFFF +CODE_USE
-                // ----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000005\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3);
+  // --- Test for FFFF +CODE_DEADKEY
+  // ------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-                // --- Test for FFFF +CODE_DEADKEY
-                // ------------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3);
+  // --- Test for FFFF  CODE_EXTENDED
+  // --------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0010\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 9);
 
-                // --- Test for FFFF  CODE_EXTENDED
-                // --------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000010\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 9);
+  // --- Test for FFFF +CODE_CLEARCONTEXT
+  // ------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u000E\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-                // --- Test for FFFF +CODE_CLEARCONTEXT
-                // ------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000E\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2);
+  // --- Test for FFFF +CODE_CALL
+  // ----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u000F\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-                // --- Test for FFFF +CODE_CALL
-                // ----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000F\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3);
+  // --- Test for FFFF +CODE_CONTEXTEX
+  // ---------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0011\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-                // --- Test for FFFF +CODE_CONTEXTEX
-                // ---------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000011\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3);
+  // --- Test for FFFF +CODE_IFOPT
+  // -------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0014\u0002\u0002\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 5);
 
-                // --- Test for FFFF +CODE_IFOPT
-                // -------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000014\U00000002\U00000002\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 5);
+  // --- Test for FFFF +CODE_IFSYSTEMSTORE
+  // ------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0017\u0002\u0002\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 5);
 
-                // --- Test for FFFF +CODE_IFSYSTEMSTORE
-                // ------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000017\U00000002\U00000002\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 5);
+  // --- Test for FFFF +CODE_SETOPT
+  // ----------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0013\u0002\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 4);
 
-                // --- Test for FFFF +CODE_SETOPT
-                // ----------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000013\U00000002\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 4);
+  // --- Test for FFFF +CODE_SETSYSTEMRESTORE
+  // ---------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0018\u0002\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 4);
 
-                // --- Test for FFFF +CODE_SETSYSTEMRESTORE
-                // ---------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000018\U00000002\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 4);
+  // --- Test for FFFF +CODE_RESETOPT
+  // -----------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0016\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-                // --- Test for FFFF +CODE_RESETOPT
-                // -----------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000016\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3);
+  // --- Test for FFFF +CODE_SAVEOPT
+  // -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0015\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-                // --- Test for FFFF +CODE_SAVEOPT
-                // -----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000015\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3);
+  // --- Test for FFFF +default
+  // ----------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0004\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-                // --- Test for FFFF +default
-                // ----------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000004\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2);
+  // --- Test for FFFF + CODE_ANY -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0001\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3 );
 
-                // --- Test for FFFF + CODE_ANY -----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000001\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3 );
+  // --- Test for FFFF + CODE_CONTEXT -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0003\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2 );
 
-                // --- Test for FFFF + CODE_CONTEXT -----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000003\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2 );
+  // --- Test for FFFF + CODE_RETURN -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0006\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2 );
 
-                // --- Test for FFFF + CODE_RETURN -----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000006\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2 );
+  // --- Test for FFFF + CODE_BEEP -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0007\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2 );
 
-                // --- Test for FFFF + CODE_BEEP -----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000007\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2 );
+  // --- Test for FFFF + CODE_SWITCH -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u000C\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3 );
 
-                // --- Test for FFFF + CODE_SWITCH -----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000C\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3 );
+  // --- Test for FFFF + NOTANY -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0012\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3 );
 
-                // --- Test for FFFF + NOTANY -----------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000012\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3 );
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // ---- UC_SENTINEL WITH \0 AT DIFFERENT POSITIONS
+  // --------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-                // --------------------------------------------------------------------------------------------------------------------------------------------------
-                // ---- UC_SENTINEL WITH \0 AT DIFFERENT POSITIONS
-                // --------------------------------------------------------------------------------------------------
-                // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // --- Test for FFFF + control (earlier p+1) with \0 after first position --------------- unit test failed with old version of
+  // incxstr() -----
+  p = (PKMX_WCHAR)u"\uFFFF\0\u0008\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-                // --- Test for FFFF + control (earlier p+1) with \0 after first position --------------- unit test failed with old version of
-                // incxstr() -----
-                p = (PKMX_WCHAR)u"\U0000FFFF\0\U00000008\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 1);
+  // --- Test for FFFF +control (earlier p+1) with \0 after second position --------- unit test failed with old version of
+  // incxstr() -----
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\0\u0001\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-                // --- Test for FFFF +control (earlier p+1) with \0 after second position --------- unit test failed with old version of
-                // incxstr() -----
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\0\U00000001\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2);
+  // --- Test for FFFF +control (earlier p+1) with \0 after third position ----- unit test failed with old version of incxstr()
+  // -----
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\u0001\0\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 3)
 
-                // --- Test for FFFF +control (earlier p+1) with \0 after third position ----- unit test failed with old version of incxstr()
-                // -----
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\U00000001\0\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 3)
+  // --- Test for FFFF +control (earlier p+2) with \0 after fourth position ----- unit test failed with old version of
+  // incxstr() ----
+  p = (PKMX_WCHAR)u"\uFFFF\u0002\u0001\u0001\0\u1234\u2468";
+  q     = incxstr(p);
+  assert(q == p + 4);
 
-                // --- Test for FFFF +control (earlier p+2) with \0 after fourth position ----- unit test failed with old version of
-                // incxstr() ----
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000002\U00000001\U00000001\0\U00001234\U00002468";
-                q     = incxstr(p);
-                assert(q == p + 4);
+  // --- Test for FFFF +control (earlier p+3) with \0 after fifth  position ----- unit test failed with old version of incxstr()
+  // ---------
+  p = (PKMX_WCHAR)u"\uFFFF\u0014\u0001\u0001\u0001\0\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 5);
 
-                // --- Test for FFFF +control (earlier p+3) with \0 after fifth  position ----- unit test failed with old version of incxstr()
-                // ---------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000014\U00000001\U00000001\U00000001\0\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 5);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 6.  position  ----- unit test failed with old
+  // version of incxstr() -----
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\0\u0005\u0006\u0007\u0010\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 6);
 
-                // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 6.  position  ----- unit test failed with old
-                // version of incxstr() -----
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\0\U00000005\U00000006\U00000007\U00000010\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 6);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 7.  position  ----- unit test failed with old
+  // version of incxstr()
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\0\u0006\u0007\u0010\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 7);
 
-                // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 7.  position  ----- unit test failed with old
-                // version of incxstr()
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\0\U00000006\U00000007\U00000010\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 7);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 8.  position  ----- unit test failed with old
+  // version of incxstr() ----------
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\0\u0007\u0010\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 8);
 
-                // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 8.  position  ----- unit test failed with old
-                // version of incxstr() ----------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\0\U00000007\U00000010\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 8);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 9.  position  ----- unit test failed with old
+  // version of incxstr() ---
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0007\0\u0010\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 9);
 
-                // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 9.  position  ----- unit test failed with old
-                // version of incxstr() ---
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000007\0\U00000010\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 9);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 10.  position  ----- unit test failed with old
+  // version of incxstr() -----------
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0010\0\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 10);
 
-                // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 10.  position  ----- unit test failed with old
-                // version of incxstr() -----------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000007\U00000010\0\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 10);
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // ---- UC_SENTINEL, INCOMPLETE & UNUSUAL SEQUENCES--------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-                // --------------------------------------------------------------------------------------------------------------------------------------------------
-                // ---- UC_SENTINEL, INCOMPLETE & UNUSUAL
-                // SEQUENCES--------------------------------------------------------------------------------------------------
-                // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // --- Test for FFFF + \0
+  // --------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\0\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-                // --- Test for FFFF + \0
-                // --------------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\0\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 1);
+  // --- Test for FFFF +one character
+  // ------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0062\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-                // --- Test for FFFF +one character
-                // ------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000062\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 1);
+  // --- Test for FFFF +one <control>
+  // -----------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0004\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-                // --- Test for FFFF +one <control>
-                // -----------------------------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000004\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2);
-
-                // --- Test for FFFF + one <control> + character
-                // -------------------------------------------------------------------------------------------
-                p = (PKMX_WCHAR)u"\U0000FFFF\U00000004\U00000062\U00001234\U00002468";
-                q = incxstr(p);
-                assert(q == p + 2);
+  // --- Test for FFFF + one <control> + character
+  // -------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0004\u0062\u1234\u2468";
+  q = incxstr(p);
+  assert(q == p + 2);
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 
-          // --------------------------------------------------------------------------------------------------------------------------------------------------
-          // ---- NULL, SURROGATE PAIRS, NON_UC_SENTINEL, ONE CHARACTER  WITH SURROGATE PAIR \U0001F609 At END
-          // ---------------------------------------------------------------------------------------
-          // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // ---- NULL, SURROGATE PAIRS, NON_UC_SENTINEL, ONE CHARACTER  WITH SURROGATE PAIR \U0001F609 At END
+  // ---------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-          // --- Test for empty string
-          ------------------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\0\U0001F609";
-          q = incxstr(p);
-          assert(q == p);
+  // --- Test for empty string
+  //------------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\0\U0001F609";
+  q = incxstr(p);
+  assert(q == p);
 
-          // --- Test for character
-          // ---------------------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U00001234\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 1);
+  // --- Test for character
+  // ---------------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\u1234\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-          // --- Test for surrogate pair
-          // ----------------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0001F609\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2);
+  // --- Test for surrogate pair
+  // ----------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\U0001F609\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-          // --- Test for one <control>
-          // -----------------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U00000012\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 1);
+  // --- Test for one <control>
+  // -----------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\u0012\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-          // --- Test for FFFF only
-          // -------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 1);
+  // --- Test for FFFF only
+  // -------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-          // --------------------------------------------------------------------------------------------------------------------------------------------------
-          // ---- UC_SENTINEL WITHOUT \0
-          // ----------------------------------------------------------------------------------------------------------------------
-          // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // ---- UC_SENTINEL WITHOUT \0
+  // ----------------------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-          // --- Test for FFFF +CODE_INDEX
-          // --------------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000002\U00000002\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 4);
+  // --- Test for FFFF +CODE_INDEX
+  // --------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0002\u0002\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 4);
 
-          // --- Test for FFFF +CODE_USE
-          // ----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000005\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3);
+  // --- Test for FFFF +CODE_USE
+  // ----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0005\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-          // --- Test for FFFF +CODE_DEADKEY
-          // ------------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3);
+  // --- Test for FFFF +CODE_DEADKEY
+  // ------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-          // --- Test for FFFF  CODE_EXTENDED
-          // --------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000010\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 9);
+  // --- Test for FFFF  CODE_EXTENDED
+  // --------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0010\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 9);
 
-          // --- Test for FFFF +CODE_CLEARCONTEXT
-          // ------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000E\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2);
+  // --- Test for FFFF +CODE_CLEARCONTEXT
+  // ------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u000E\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-          // --- Test for FFFF +CODE_CALL
-          // ----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000F\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3);
+  // --- Test for FFFF +CODE_CALL
+  // ----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u000F\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-          // --- Test for FFFF +CODE_CONTEXTEX
-          // ---------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000011\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3);
+  // --- Test for FFFF +CODE_CONTEXTEX
+  // ---------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0011\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-          // --- Test for FFFF +CODE_IFOPT
-          // -------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000014\U00000002\U00000002\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 5);
+  // --- Test for FFFF +CODE_IFOPT
+  // -------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0014\u0002\u0002\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 5);
 
+  // --- Test for FFFF +CODE_IFSYSTEMSTORE
+  // ------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0017\u0002\u0002\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 5);
 
-          // --- Test for FFFF +CODE_IFSYSTEMSTORE
-          // ------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000017\U00000002\U00000002\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 5);
+  // --- Test for FFFF +CODE_SETOPT
+  // ----------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0013\u0002\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 4);
 
-          // --- Test for FFFF +CODE_SETOPT
-          // ----------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000013\U00000002\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 4);
+  // --- Test for FFFF +CODE_SETSYSTEMRESTORE
+  // ---------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0018\u0002\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 4);
 
-          // --- Test for FFFF +CODE_SETSYSTEMRESTORE
-          // ---------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000018\U00000002\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 4);
+  // --- Test for FFFF +CODE_RESETOPT
+  // -----------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0016\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-          // --- Test for FFFF +CODE_RESETOPT
-          // -----------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000016\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3);
+  // --- Test for FFFF +CODE_SAVEOPT
+  // -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0015\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3);
 
-          // --- Test for FFFF +CODE_SAVEOPT
-          // -----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000015\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3);
+  // --- Test for FFFF +default
+  // ----------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0004\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-          // --- Test for FFFF +default
-          // ----------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000004\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2);
+  // --- Test for FFFF + CODE_ANY -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0001\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3 );
 
-          // --- Test for FFFF + CODE_ANY -----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000001\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3 );
+  // --- Test for FFFF + CODE_CONTEXT -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0003\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2 );
 
-          // --- Test for FFFF + CODE_CONTEXT -----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000003\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2 );
+  // --- Test for FFFF + CODE_RETURN -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0006\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2 );
 
-          // --- Test for FFFF + CODE_RETURN -----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000006\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2 );
+  // --- Test for FFFF + CODE_BEEP -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0007\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2 );
 
-          // --- Test for FFFF + CODE_BEEP -----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000007\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2 );
+  // --- Test for FFFF + CODE_SWITCH -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u000C\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3 );
 
-          // --- Test for FFFF + CODE_SWITCH -----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000C\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3 );
+  // --- Test for FFFF + NOTANY -----------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0012\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3 );
 
-          // --- Test for FFFF + NOTANY -----------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000012\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3 );
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // ---- UC_SENTINEL WITH \0 AT DIFFERENT POSITIONS
+  // --------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-          // --------------------------------------------------------------------------------------------------------------------------------------------------
-          // ---- UC_SENTINEL WITH \0 AT DIFFERENT POSITIONS
-          // --------------------------------------------------------------------------------------------------
-          // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // --- Test for FFFF + control (earlier p+1) with \0 after first position --------------- unit test failed
+  // with old version of incxstr() -----
+  p = (PKMX_WCHAR)u"\uFFFF\0\u0008\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-          // --- Test for FFFF + control (earlier p+1) with \0 after first position --------------- unit test failed
-          // with old version of incxstr() -----
-          p = (PKMX_WCHAR)u"\U0000FFFF\0\U00000008\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 1);
+  // --- Test for FFFF +control (earlier p+1) with \0 after second position --------- unit test failed with
+  // old version of incxstr() -----
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\0\u0001\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-          // --- Test for FFFF +control (earlier p+1) with \0 after second position --------- unit test failed with
-          // old version of incxstr() -----
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\0\U00000001\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2);
+  // --- Test for FFFF +control (earlier p+1) with \0 after third position ----- unit test failed with old
+  // version of incxstr() -----
+  p = (PKMX_WCHAR)u"\uFFFF\u0008\u0001\0\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 3)
 
-          // --- Test for FFFF +control (earlier p+1) with \0 after third position ----- unit test failed with old
-          // version of incxstr()
-          // -----
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000008\U00000001\0\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 3)
+  // --- Test for FFFF +control (earlier p+2) with \0 after fourth position ----- unit test failed with
+  // old version of incxstr() ----
+  p = (PKMX_WCHAR)u"\uFFFF\u0002\u0001\u0001\0\U0001F609";
+  q     = incxstr(p);
+  assert(q == p + 4);
 
+  // --- Test for FFFF +control (earlier p+3) with \0 after fifth  position ----- unit test failed with old
+  // version of incxstr() ---------
+  p = (PKMX_WCHAR)u"\uFFFF\u0014\u0001\u0001\u0001\0\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 5);
 
-          // --- Test for FFFF +control (earlier p+2) with \0 after fourth position ----- unit test failed with
-          // old version of incxstr() ----
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000002\U00000001\U00000001\0\U0001F609";
-          q     = incxstr(p);
-          assert(q == p + 4);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 6.  position  ----- unit test
+  // failed with old version of incxstr() -----
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\0\u0005\u0006\u0007\u0010\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 6);
 
-          // --- Test for FFFF +control (earlier p+3) with \0 after fifth  position ----- unit test failed with old
-          // version of incxstr()
-          // ---------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000014\U00000001\U00000001\U00000001\0\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 5);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 7.  position  ----- unit test
+  // failed with old version of incxstr()
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\0\u0006\u0007\u0010\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 7);
 
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 8.  position  ----- unit test
+  // failed with old version of incxstr() ----------
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\0\u0007\u0010\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 8);
 
-          // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 6.  position  ----- unit test
-          // failed with old version of incxstr() -----
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\0\U00000005\U00000006\U00000007\U00000010\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 6);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 9.  position  ----- unit test
+  // failed with old version of incxstr() ---
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0007\0\u0010\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 9);
 
-          // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 7.  position  ----- unit test
-          // failed with old version of incxstr()
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\0\U00000006\U00000007\U00000010\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 7);
+  // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 10.  position  ----- unit test
+  // failed with old version of incxstr() -----------
+  p = (PKMX_WCHAR)u"\uFFFF\u000A\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0010\0\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 10);
 
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
+  // ---- UC_SENTINEL, INCOMPLETE & UNUSUAL SEQUENCES--------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------
 
-          // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 8.  position  ----- unit test
-          // failed with old version of incxstr() ----------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\0\U00000007\U00000010\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 8);
+  // --- Test for FFFF + \0
+  // --------------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\0\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-          // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 9.  position  ----- unit test
-          // failed with old version of incxstr() ---
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000007\0\U00000010\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 9);
+  // --- Test for FFFF +one character
+  // ------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0062\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 1);
 
-          // --- Test for FFFF +control CODE_EXTENDED ----- (earlier p+n) with \0 after 10.  position  ----- unit test
-          // failed with old version of incxstr() -----------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U0000000A\U00000001\U00000002\U00000003\U00000004\U00000005\U00000006\U00000007\U00000010\0\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 10);
+  // --- Test for FFFF +one <control>
+  // -----------------------------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0004\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2);
 
-          // --------------------------------------------------------------------------------------------------------------------------------------------------
-          // ---- UC_SENTINEL, INCOMPLETE & UNUSUAL
-          // SEQUENCES--------------------------------------------------------------------------------------------------
-          // --------------------------------------------------------------------------------------------------------------------------------------------------
-
-          // --- Test for FFFF + \0
-          // --------------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\0\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 1);
-
-          // --- Test for FFFF +one character
-          // ------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000062\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 1);
-
-          // --- Test for FFFF +one <control>
-          // -----------------------------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000004\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2);
-
-          // --- Test for FFFF + one <control> + character
-          // -------------------------------------------------------------------------------------------
-          p = (PKMX_WCHAR)u"\U0000FFFF\U00000004\U00000062\U0001F609";
-          q = incxstr(p);
-          assert(q == p + 2);
+  // --- Test for FFFF + one <control> + character
+  // -------------------------------------------------------------------------------------------
+  p = (PKMX_WCHAR)u"\uFFFF\u0004\u0062\U0001F609";
+  q = incxstr(p);
+  assert(q == p + 2);
 }
 
 constexpr const auto help_str = "\
