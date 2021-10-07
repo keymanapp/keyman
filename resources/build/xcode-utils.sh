@@ -129,8 +129,6 @@ function phaseSentryDsymUpload() {
 
   # The remaining update logic seen here was auto-generated at https://sentry.keyman.com/keyman/keyman-ios/getting-started/cocoa-swift/
   if which sentry-cli >/dev/null; then
-    export SENTRY_URL="https://sentry.keyman.com"
-    export SENTRY_ORG=keyman
     export SENTRY_PROJECT="$SENTRY_PROJECT_TARGET"
     export SENTRY_LOG_LEVEL=info
     ERROR=$(sentry-cli upload-dif "$DWARF_DSYM_FOLDER_PATH" 2>&1 >/dev/null)
