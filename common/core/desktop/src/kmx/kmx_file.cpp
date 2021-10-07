@@ -48,7 +48,7 @@ const int km::kbp::kmx::CODE__SIZE[] = {
 };
 
 // Ensure that all CODE_### sizes are defined
-static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_SETSYSTEMSTORE + 1), "Size of array CODE__SIZE not correct");
+static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1), "Size of array CODE__SIZE not correct");
 
 const unsigned long CRCTable[256] = {
   0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
