@@ -25,7 +25,7 @@ var
   o: TSentryClientOptions;
 begin
   o.Debug := False;
-  o.DSN := 'https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5';
+  o.DSN := 'https://92eb58e6005d47daa33c9c9e39458eb7@o1005580.ingest.sentry.io/5983518';
   //o.DSN := 'https://7b1ff1dae2c8495b84f90dadcf512b84@sentry.io/4853461';
   o.Release := 'keyman-14.0.22-alpha-local';
   o.HandlerPath := 'c:\Projects\keyman\app\windows\src\ext\sentry\test\Win32\Release\crashpad_handler.exe';
