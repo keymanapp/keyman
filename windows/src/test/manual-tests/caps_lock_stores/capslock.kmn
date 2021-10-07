@@ -1,5 +1,6 @@
 ﻿c capslock generated from template at 2021-07-27 17:32:04
 c with name "Caps Lock"
+c For Manual Tests to go with this keyboard see TestReadme.md
 store(&VERSION) '10.0'
 store(&NAME) 'Caps Lock'
 store(&COPYRIGHT) 'Copyright (C)'

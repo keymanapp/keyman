@@ -1,5 +1,6 @@
 ﻿c capscontrol generated from template at 2021-07-28 10:48:25
 c with name "CapsOnOnly and ShiftFreesCaps features"
+c For Manual Tests to go with this keyboard see TestReadme.md
 store(&VERSION) '10.0'
 store(&NAME) 'CapsOnOnly and ShiftFreesCaps features'
 store(&COPYRIGHT) 'Copyright (C)'
