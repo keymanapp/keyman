@@ -159,7 +159,10 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   }
 
   DWORD LocalShiftState = Globals::get_ShiftState();
-
+  // Only the modifer flag 'f_ShiftState' is changed before sending the key stroke to the
+  // core processor. The core processor has the keyboard Caps Lock stores and will
+  // queue an action 'KM_KBP_IT_CAPSLOCK'. In processing the action the Windows engine will synthesise keystrokes
+  // to ensure caps lock is in the correct state.
   if (isUsingCoreProcessor) {
     if (!Preserved) {
       switch (wParam) {
@@ -186,7 +189,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
           0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
       *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;  // I3588
     }
-  } else {  // TODO: #5442 Remove this else block
+  } else {  // using windows processor TODO: #5442 Remove this else block
     if (!Preserved) {
       switch (wParam) {
       case VK_CAPITAL:
@@ -225,7 +228,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
           0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
       *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;  // I3588
     }
-  }
+  } // TODO: #5442 Remove this else block ^^
 
 	_td->TIPFUpdateable = Updateable;
   _td->TIPFPreserved = Preserved;   // I4290

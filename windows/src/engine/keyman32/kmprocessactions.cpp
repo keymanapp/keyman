@@ -117,6 +117,7 @@ processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable
 
   return TRUE;
 }
+
 BOOL ProcessActions(BOOL* emitKeyStroke)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
