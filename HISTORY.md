@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.128 alpha 2021-10-07
+
+* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5805)
+
 ## 15.0.127 alpha 2021-10-06
 
 * chore(web): disable registerstub test (#5800)
