@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.129 alpha 2021-10-08
+
+* chore: Create CODE_OF_CONDUCT.md (#5819)
+* chore: Add CONTRIBUTING documentation (#5821)
+* chore: Add link to SIL (#5823)
+
 ## 15.0.128 alpha 2021-10-07
 
 * fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5805)
