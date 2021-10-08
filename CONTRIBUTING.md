@@ -216,7 +216,7 @@ The labels are loosely grouped by their purpose, but it's not required that ever
 | `feat` | [search][search-feat] | Feature requests. |
 | `bug` | [search][search-bug] | Confirmed bugs or reports that are very likely to be bugs. |
 | `chore` | [search][search-chore] | Minor updates to Keyman. |
-| `question` | [search][search-question] | Questions more than bug reports or feature requests (e.g. how do I do X). [**Usually better on the Keyman Community**][https://community.software.sil.org/c/keyman] |
+| `question` | [search][search-question] | Questions more than bug reports or feature requests (e.g. how do I do X). [**Usually better on the Keyman Community**](https://community.software.sil.org/c/keyman) |
 | `spec` | [search][search-spec] | Issues which are specifications for a large scale feature. |
 | `docs` | [search][search-docs] | Related to any type of documentation. |
 
