@@ -10,8 +10,8 @@
   <Files>
     <File>
       <ID>id_33ce2429c1a33e2c9041e57fc40fa4b7</ID>
-      <Filename>capscontrol.kmn</Filename>
-      <Filepath>source\capscontrol.kmn</Filepath>
+      <Filename>shift_frees_caps.kmn</Filename>
+      <Filepath>source\shift_frees_caps.kmn</Filepath>
       <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
       <Details>
@@ -21,8 +21,8 @@
     </File>
     <File>
       <ID>id_ad3e4a94f3d77a420667e85598072f2f</ID>
-      <Filename>capscontrol.kps</Filename>
-      <Filepath>source\capscontrol.kps</Filepath>
+      <Filename>shift_frees_caps.kps</Filename>
+      <Filepath>source\shift_frees_caps.kps</Filepath>
       <FileVersion></FileVersion>
       <FileType>.kps</FileType>
       <Details>
@@ -53,31 +53,31 @@
     </File>
     <File>
       <ID>id_5e7df09f2deea5c5789153c0e7bca89f</ID>
-      <Filename>capscontrol.keyboard_info</Filename>
-      <Filepath>capscontrol.keyboard_info</Filepath>
+      <Filename>shift_frees_caps.keyboard_info</Filename>
+      <Filepath>shift_frees_caps.keyboard_info</Filepath>
       <FileVersion></FileVersion>
       <FileType>.keyboard_info</FileType>
     </File>
     <File>
-      <ID>id_dc14460a5ac2043c5e599d0f4c08d42d</ID>
-      <Filename>capscontrol.kmx</Filename>
-      <Filepath>source\..\build\capscontrol.kmx</Filepath>
+      <ID>id_f5c18d42ae1a4a0cad4fa87bc4e65767</ID>
+      <Filename>shift_frees_caps.kmx</Filename>
+      <Filepath>source\..\build\shift_frees_caps.kmx</Filepath>
       <FileVersion></FileVersion>
       <FileType>.kmx</FileType>
       <ParentFileID>id_ad3e4a94f3d77a420667e85598072f2f</ParentFileID>
     </File>
     <File>
-      <ID>id_5e326b1f647cc23e377749a58e9bd657</ID>
-      <Filename>capscontrol.js</Filename>
-      <Filepath>source\..\build\capscontrol.js</Filepath>
+      <ID>id_7f51f4ffe3b9f598c8822ed82d2ac69e</ID>
+      <Filename>shift_frees_caps.js</Filename>
+      <Filepath>source\..\build\shift_frees_caps.js</Filepath>
       <FileVersion></FileVersion>
       <FileType>.js</FileType>
       <ParentFileID>id_ad3e4a94f3d77a420667e85598072f2f</ParentFileID>
     </File>
     <File>
-      <ID>id_6de04240e03ff8aa07c3584b9de75bea</ID>
-      <Filename>capscontrol.kvk</Filename>
-      <Filepath>source\..\build\capscontrol.kvk</Filepath>
+      <ID>id_e3f64466ae5ab63876dd07318020d681</ID>
+      <Filename>shift_frees_caps.kvk</Filename>
+      <Filepath>source\..\build\shift_frees_caps.kvk</Filepath>
       <FileVersion></FileVersion>
       <FileType>.kvk</FileType>
       <ParentFileID>id_ad3e4a94f3d77a420667e85598072f2f</ParentFileID>

@@ -108,20 +108,20 @@ Any keyboard with that store set will work; if you don't have one at hand you ca
 
 ## CapsOnOnly/ShiftFreesCaps
 
-For these tests, use a keyboard with the `CapsOnOnly` and `ShiftFreesCaps` stores set. We call this keyboard _capscontrol_ below.
+For these tests, use a keyboard with the `CapsOnOnly` and `ShiftFreesCaps` stores set. We call this keyboard _shift_frees_caps_ below.
 
-Any keyboard with these stores set will work; if you don't have one at hand you can use the capscontrol.kmp
+Any keyboard with these stores set will work; if you don't have one at hand you can use the shift_frees_caps.kmp
 
-The _capscontrol.kmp_ keyboard will enable caps lock by pressing the `CapsLock` key, and will turn capslock off by pressing the `Shift` key. The keyboard outputs _pass_ or _fail_ if following the test cases.
+The _shift_frees_caps.kmp_ keyboard will enable caps lock by pressing the `CapsLock` key, and will turn capslock off by pressing the `Shift` key. The keyboard outputs _pass_ or _fail_ if following the test cases.
 
 **Note:** When testing in a virtual machine, use an on-screen keyboard (in VirtualBox: Input/Keyboard/Soft Keyboard) and observe the caps lock indicator of the on-screen keyboard. Using the hardware keyboard might show side effects with caps lock.
 
 ### Prerequisites before each test
 
 - Install a keyboard that has the `CapsOnOnly` and `ShiftFreesCaps` stores set, e.g.
-  `capscontrol.kmp`.
+  `shift_frees_caps.kmp`.
 - CapsLock is currently off
-- Currently active keyboard is _capscontrol_ keyboard
+- Currently active keyboard is _shift_frees_caps_ keyboard
 
 ### Test cases
 

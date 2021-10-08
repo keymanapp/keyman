@@ -1,12 +1,12 @@
-﻿c capscontrol generated from template at 2021-07-28 10:48:25
+﻿c shift_frees_caps generated from template at 2021-07-28 10:48:25
 c with name "CapsOnOnly and ShiftFreesCaps features"
 store(&VERSION) '10.0'
 store(&NAME) 'CapsOnOnly and ShiftFreesCaps features'
 store(&COPYRIGHT) 'Copyright (C)'
 store(&KEYBOARDVERSION) '1.0'
 store(&TARGETS) 'macosx iphone androidtablet mobile desktop tablet'
-store(&VISUALKEYBOARD) 'capscontrol.kvks'
-store(&LAYOUTFILE) 'capscontrol.keyman-touch-layout'
+store(&VISUALKEYBOARD) 'shift_frees_caps.kvks'
+store(&LAYOUTFILE) 'shift_frees_caps.keyman-touch-layout'
 
 c Description: Tests Caps Lock env set
 c keys: [K_1][K_CAPS][K_2][SHIFT K_3][K_4][K_CAPS][K_5][K_CAPS][K_6]

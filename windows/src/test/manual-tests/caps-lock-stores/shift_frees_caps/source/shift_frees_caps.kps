@@ -23,19 +23,19 @@
   </Info>
   <Files>
     <File>
-      <Name>..\build\capscontrol.kmx</Name>
+      <Name>..\build\shift_frees_caps.kmx</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
     <File>
-      <Name>..\build\capscontrol.js</Name>
+      <Name>..\build\shift_frees_caps.js</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
     </File>
     <File>
-      <Name>..\build\capscontrol.kvk</Name>
+      <Name>..\build\shift_frees_caps.kvk</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kvk</FileType>
@@ -56,7 +56,7 @@
   <Keyboards>
     <Keyboard>
       <Name>CapsOnOnly and ShiftFreesCaps features</Name>
-      <ID>capscontrol</ID>
+      <ID>shift_frees_caps</ID>
       <Version>1.0</Version>
       <Languages>
         <Language ID="en">English</Language>
