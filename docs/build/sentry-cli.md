@@ -6,7 +6,7 @@ After setting up your personal [Auth token](http://sentry.keyman.com/settings/ac
 
 ```bash
 export SENTRY_AUTH_TOKEN={your Sentry auth token}
-export SENTRY_URL=https://sentry.keyman.com
+export SENTRY_URL=https://sentry.io
 export SENTRY_ORG=keyman
 # select the appropriate project here:
 export SENTRY_PROJECT=keyman-android
