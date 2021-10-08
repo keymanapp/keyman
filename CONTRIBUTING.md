@@ -20,6 +20,8 @@ The following is a set of guidelines for contributing to Keyman, Keyman keyboard
   * [Suggesting Enhancements](#suggesting-enhancements)
   * [Your First Code Contribution](#your-first-code-contribution)
   * [Building Keyman](#building-keyman)
+  * [Localize Keyman](#localize-keyman)
+  * [Other Ways of Getting Involved](#other-ways-of-getting-involved)
 
 [Style Guides](#style-guides)
   * [Principles of Keyman Code Changes](#principles-of-keyman-code-changes)
@@ -143,7 +145,19 @@ Unsure where to begin contributing to Keyman? You can start by looking through t
 
 ### Building Keyman
 
-Keyman can be built locally. For instructions on how to do this, see the [build documentation](https://github.com/keymanapp/keyman/blob/master/docs/build/index.md).
+Keyman can be built locally. For instructions on how to do this, see the [build documentation](./docs/build/index.md).
+
+### Localize Keyman
+
+We use CrowdIn to develop translations for the Keyman user interface.
+
+* [Localize Keyman](https://translate.keyman.com/project/keyman) [![Crowdin](https://badges.crowdin.net/keyman/localized.svg)](https://translate.keyman.com/project/keyman)
+
+### Other Ways of Getting Involved
+
+Even if you are not a coder, there are many other ways you can help with the Keyman project:
+
+* [Other Ways of Getting Involved](https://keyman.com/about/get-involved)
 
 ## Style Guides
 
