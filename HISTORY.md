@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.130 alpha 2021-10-11
+
+* fix(common/core): incxstr checks all character while incrementing (#5712)
+
 ## 15.0.129 alpha 2021-10-08
 
 * chore: Create CODE_OF_CONDUCT.md (#5819)
