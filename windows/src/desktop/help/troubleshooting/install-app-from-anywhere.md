@@ -15,7 +15,7 @@ If "**Change my app recommendation settings**" is shown, select that and go to s
 3. Click on the **Apps** in the **Windows Settings** menu
 ![](../desktop_images/km_install_anywhere_2.png)
 
-4. In the **Apps & Features** Section go to **choose where to get apps**, click on the dropdown menu below and select one of the options that allows you to install from *Anywhere*.
+4. In the **Apps & Features** Section go to **choose where to get apps**, click on the dropdown menu below and select "Anywhere, but warn me before installing an app that's not from the Microsoft Store" or one of the other options that allows you to install from *Anywhere*.
 ![](../desktop_images/km_install_anywhere_3.png)
 
 5. Now continue installing by double-clicking on the Keyman file identified in Step 1 of [How To - Download and Install a Keyman](../start/download-and-install-keyman).
