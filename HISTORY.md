@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.131 alpha 2021-10-13
+
+* chore(windows): Add obj cod and pdb to gitignore (#5826)
+
 ## 15.0.130 alpha 2021-10-11
 
 * fix(common/core): incxstr checks all character while incrementing (#5712)
