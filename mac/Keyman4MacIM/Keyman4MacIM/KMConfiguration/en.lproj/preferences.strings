@@ -1,0 +1,51 @@
+
+/* Class = "NSButtonCell"; title = "Always show on-screen keyboard"; ObjectID = "4UX-80-0Vo"; */
+"4UX-80-0Vo.title" = "Always show on-screen keyboard";
+
+/* Class = "NSButtonCell"; title = "Use verbose Console logging"; ObjectID = "7J6-zy-R20"; */
+"7J6-zy-R20.title" = "Use verbose Console logging";
+
+/* Class = "NSTabViewItem"; label = "Support"; ObjectID = "93O-x6-RLF"; */
+"93O-x6-RLF.label" = "Support";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "C6L-PK-bpq"; */
+"C6L-PK-bpq.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "Download keyboard..."; ObjectID = "CTw-kf-WNS"; */
+"CTw-kf-WNS.title" = "Download keyboard...";
+
+/* Class = "NSWindow"; title = "Keyman Configuration"; ObjectID = "F0z-JX-Cv5"; */
+"F0z-JX-Cv5.title" = "Keyman Configuration";
+
+/* Class = "NSTextFieldCell"; title = "Table View Cell"; ObjectID = "J2x-OZ-TSX"; */
+"J2x-OZ-TSX.title" = "Table View Cell";
+
+/* Class = "NSButtonCell"; title = "< Back"; ObjectID = "JOK-JV-n8w"; */
+"JOK-JV-n8w.title" = "< Back";
+
+/* Class = "NSTabViewItem"; label = "Keyboard Layouts"; ObjectID = "MPN-9N-wWc"; */
+"MPN-9N-wWc.label" = "Keyboard Layouts";
+
+/* Class = "NSTextFieldCell"; title = "When the verbose logging option is on, Keyman will log actions that might help Keyman Support diagnose a problem. The Console program can be used to see a log of messages from Keyman. In Console, filter to show all messages from the \"Keyman\" process. This log can be exported and sent to Keyman support if needed."; ObjectID = "MrI-GM-7d6"; */
+"MrI-GM-7d6.title" = "When the verbose logging option is on, Keyman will log actions that might help Keyman Support diagnose a problem. The Console program can be used to see a log of messages from Keyman. In Console, filter to show all messages from the \"Keyman\" process. This log can be exported and sent to Keyman support if needed.";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "dU5-ev-A3u"; */
+"dU5-ev-A3u.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "Forward >"; ObjectID = "eXr-8V-h1g"; */
+"eXr-8V-h1g.title" = "Forward >";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eoD-O5-Qsf"; */
+"eoD-O5-Qsf.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "Home"; ObjectID = "fXS-aC-CMH"; */
+"fXS-aC-CMH.title" = "Home";
+
+/* Class = "NSTabViewItem"; label = "Options"; ObjectID = "frd-No-seV"; */
+"frd-No-seV.label" = "Options";
+
+/* Class = "NSTableColumn"; headerCell.title = "Installed Keyboard"; ObjectID = "jex-Nd-Qzg"; */
+"jex-Nd-Qzg.headerCell.title" = "Installed Keyboard";
+
+/* Class = "NSButton"; ibShadowedToolTip = "Turn this on if you are having problems with a specific keyboard or with Keyman in general."; ObjectID = "uWx-3J-U0D"; */
+"uWx-3J-U0D.ibShadowedToolTip" = "Turn this on if you are having problems with a specific keyboard or with Keyman in general.";

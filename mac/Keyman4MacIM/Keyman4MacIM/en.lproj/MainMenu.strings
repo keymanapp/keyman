@@ -1,0 +1,15 @@
+
+/* Class = "NSMenuItem"; title = "Configuration..."; ObjectID = "P1b-lE-yFw"; */
+"P1b-lE-yFw.title" = "Configuration...";
+
+/* Class = "NSMenuItem"; title = "Keyboards"; ObjectID = "bQa-j9-nHe"; */
+"bQa-j9-nHe.title" = "Keyboards";
+
+/* Class = "NSMenu"; title = "Keyboards"; ObjectID = "goP-aK-3WB"; */
+"goP-aK-3WB.title" = "Keyboards";
+
+/* Class = "NSMenuItem"; title = "About"; ObjectID = "kb2-ww-RS3"; */
+"kb2-ww-RS3.title" = "About";
+
+/* Class = "NSMenuItem"; title = "On-Screen Keyboard"; ObjectID = "s96-JI-YDh"; */
+"s96-JI-YDh.title" = "On-Screen Keyboard";
