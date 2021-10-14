@@ -453,12 +453,11 @@
     
     if (!didUnzip) {
         NSAlert *failure = [[NSAlert alloc] init];
-        [failure addButtonWithTitle:NSLocalizedString(@"OK", @"Alert button")];
-        [failure setMessageText:NSLocalizedString(@"message-keyboard-file-unreadable", nil)];
-        /*
+        [failure addButtonWithTitle:NSLocalizedString(@"button-keyboard-file-unreadable", @"Alert button")];
+        
         NSString *errorString = NSLocalizedString(@"message-keyboard-file-unreadable", nil);
-        [failure setMessageText:[NSString localizedStringWithFormat:errorString, kmpFile]];
-         */
+        [failure setMessageText:[NSString localizedStringWithFormat:errorString, kmpFile.lastPathComponent]];
+
         [failure setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
         [failure setAlertStyle:NSWarningAlertStyle];
         [failure beginSheetModalForWindow:self.window

@@ -7,7 +7,7 @@
 */
 
 /* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
-"message-confirm-delete-keyboard" = "Are you sure you want to permanently delete the keyboard '%@'?";
+"message-confirm-delete-keyboard" = "Are you sure you want to delete the keyboard '%@'?";
 
 /* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
 "info-cannot-undo-delete-keyboard" = "You cannot undo this action.";
@@ -22,7 +22,7 @@
 "message-confirm-install-keyboard" = "Install Keyman keyboard?";
 
 /* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
-"info-install-keyboard-filename" = "Do you want Keyman to install the keyboard from the file'%@'?";
+"info-install-keyboard-filename" = "Do you want Keyman to install the keyboard from the file '%@'?";
 
 /* Button text to cancel installation of the double-clicked Keyman file  */
 "button-cancel-install-keyboard" = "Cancel";
@@ -31,7 +31,25 @@
 "button-install-keyboard" = "Install";
 
 /* Message displayed to inform user that .kmp file could not be read/unzipped  */
-"message-keyboard-file-unreadable" = "Could not read the Keyman file.";
+"message-keyboard-file-unreadable" = "Could not read the Keyman file '%@'.";
 
 /* Button text to acknowledge that .kmp file could not be read  */
-"button-install-keyboard" = "Install";
+"button-keyboard-file-unreadable" = "OK";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Version  %@";
+
+/* text to identify the window that displays keyboard information */
+"window-title-keyboard-info" = "Keyboard Information";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Downloading...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Download complete.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Cancel";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Done";

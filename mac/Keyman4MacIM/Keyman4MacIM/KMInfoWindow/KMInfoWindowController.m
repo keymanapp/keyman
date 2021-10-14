@@ -27,7 +27,8 @@
 
 - (void)windowDidLoad {
     [super windowDidLoad];
-    [self.window setTitle:@"Keyboard/Package Info"];
+    [self.window setTitle:NSLocalizedString(@"window-title-keyboard-info", nil)];
+
     [self.tabView setDelegate:self];
     [self.detailsView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
     [self.detailsView setPolicyDelegate:(id<WebPolicyDelegate>)self];

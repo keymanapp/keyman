@@ -32,8 +32,11 @@
     [self.window setBackgroundColor:[NSColor whiteColor]];
 
     KeymanVersionInfo versionInfo = [[self AppDelegate] versionInfo];
+    NSString *versionString = NSLocalizedString(@"version-label-text", nil);
+    [self.versionLabel setStringValue:[NSString localizedStringWithFormat:versionString, versionInfo.versionWithTag]];
+/*
     [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@", versionInfo.versionWithTag]];
-         
+*/
     NSMutableString *copyrightInfo = [[NSMutableString alloc] initWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"]];
     [self.copyrightLabel setStringValue:copyrightInfo];
 
