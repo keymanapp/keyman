@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		293EA3E427140C6500545EED /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3E327140C6500545EED /* Localizable.strings */; };
 		293EA3E627140D8100545EED /* KMAboutWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3E827140D8100545EED /* KMAboutWindowController.xib */; };
 		293EA3EB27140DEC00545EED /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3ED27140DEC00545EED /* preferences.xib */; };
+		293EA3F427181FDA00545EED /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3F627181FDA00545EED /* Localizable.strings */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -126,13 +126,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		293EA3E327140C6500545EED /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		293EA3E527140D3A00545EED /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		293EA3E727140D8100545EED /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/KMAboutWindowController.xib; sourceTree = "<group>"; };
 		293EA3EA27140D8E00545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		293EA3EC27140DEC00545EED /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/preferences.xib; sourceTree = "<group>"; };
 		293EA3EF27140DFA00545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/preferences.strings; sourceTree = "<group>"; };
 		293EA3F02714158600545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		293EA3F527181FDA00545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		370E44542564E1EE00642929 /* Sentry.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Sentry.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37589AD422E52DA20097D39D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keyman.entitlements; sourceTree = "<group>"; };
 		37A00ED4239AA25700D2C837 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -438,7 +438,7 @@
 				E240F598202DED740000067D /* KMPackage.m */,
 				9A3D6C5B221531B0008785A3 /* KMOSVersion.h */,
 				9A3D6C5C221531B0008785A3 /* KMOSVersion.m */,
-				293EA3E327140C6500545EED /* Localizable.strings */,
+				293EA3F627181FDA00545EED /* Localizable.strings */,
 			);
 			path = Keyman4MacIM;
 			sourceTree = "<group>";
@@ -666,7 +666,7 @@
 				984B8F451AF1C3D900E096A8 /* OSKWindowController.xib in Resources */,
 				98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */,
 				E213601E2142D7C000A043B7 /* keyman-88.png in Resources */,
-				293EA3E427140C6500545EED /* Localizable.strings in Resources */,
+				293EA3F427181FDA00545EED /* Localizable.strings in Resources */,
 				98BF92471BF01D890002126A /* image.jpg in Resources */,
 				293EA3E627140D8100545EED /* KMAboutWindowController.xib in Resources */,
 				37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */,
@@ -876,6 +876,14 @@
 			);
 			name = preferences.xib;
 			path = Keyman4MacIM/KMConfiguration;
+			sourceTree = "<group>";
+		};
+		293EA3F627181FDA00545EED /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				293EA3F527181FDA00545EED /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		37A00EDC239AA25D00D2C837 /* Main.storyboard */ = {
