@@ -98,7 +98,7 @@ public:
   KMX_Options const *GetOptions() const;
   KMX_Environment *GetEnvironment();
   KMX_Environment const *GetEnvironment() const;
-  LPINTKEYBOARDINFO GetKeyboard();
+  INTKEYBOARDINFO const *GetKeyboard() const;
 };
 
 inline KMX_BOOL KMX_ProcessEvent::IsCapsLockOn(KMX_DWORD modifiers) {

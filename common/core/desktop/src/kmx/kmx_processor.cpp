@@ -194,3 +194,42 @@ constexpr km_kbp_attr const engine_attrs = {
 km_kbp_attr const & kmx_processor::attributes() const {
   return engine_attrs;
 }
+
+km_kbp_keyboard_key_rules const * kmx_processor::get_key_rules() const  {
+  // iterate through the groups and get the rules with virtual keys.
+
+  const uint32_t group_cnt = _kmx.GetKeyboard()->Keyboard->cxGroupArray;
+  const LPGROUP group_array = _kmx.GetKeyboard()->Keyboard->dpGroupArray;
+  uint16_t vk_count = 0;
+  GROUP *p_group;
+
+  for(auto i = 0; i < group_cnt; i++)
+  {
+    if(group_array[i].fUsingKeys)
+    {
+      vk_count += group_array[i].cxKeyArray;
+    }
+  }
+
+  km_kbp_keyboard_key_rules *rules = new km_kbp_keyboard_key_rules[vk_count];
+  int n = 0;
+  for(auto i = 0; i < group_cnt; i++)
+  {
+    p_group = &group_array[i];
+    if(p_group->fUsingKeys)
+    {
+      for(auto j = 0; j < p_group->cxKeyArray; j++)
+      {
+        // If we have a key rule for the key add it to the list
+        rules[n].key = p_group->dpKeyArray[j].Key;
+        rules[n].modifier_flag = p_group->dpKeyArray[j].ShiftFlags;
+        n++;
+      }
+    }
+  }
+  return rules;
+  //return nullptr;
+
+}
+
+ uint16_t kmx_processor::dummy_method() const {return 0;}

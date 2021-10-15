@@ -50,6 +50,10 @@ namespace kbp
       std::u16string const & key,
       std::u16string const & value
     ) override;
+
+    km_kbp_keyboard_key_rules const * get_key_rules() const override;
+
+    uint16_t dummy_method() const override;
   };
 
   class null_processor : public mock_processor {

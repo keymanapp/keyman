@@ -81,3 +81,15 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
   *out = &keyboard->keyboard();
   return KM_KBP_STATUS_OK;
 }
+
+km_kbp_status
+km_kbp_keyboard_get_key_rules(km_kbp_keyboard const *keyboard,
+                          km_kbp_keyboard_key_rules const **out)
+{
+  assert(keyboard); assert(out);
+  if (!keyboard || !out)
+    return KM_KBP_STATUS_INVALID_ARGUMENT;
+
+  *out = keyboard->get_key_rules();
+  return KM_KBP_STATUS_OK;
+}

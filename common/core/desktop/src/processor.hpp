@@ -60,6 +60,12 @@ namespace kbp
       std::u16string const & value
     ) = 0;
 
+    virtual km_kbp_keyboard_key_rules const *
+    get_key_rules() const = 0;
+
+    virtual uint16_t
+    dummy_method() const = 0;
+
     friend json & operator << (json &j, abstract_processor const &opts);
   };
 
