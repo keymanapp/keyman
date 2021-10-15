@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.132 alpha 2021-10-15
+
+* feat(windows): manual keyboard caps tests (#5808)
+
 ## 15.0.131 alpha 2021-10-13
 
 * chore(windows): Add obj cod and pdb to gitignore (#5826)
