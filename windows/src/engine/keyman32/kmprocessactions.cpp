@@ -77,6 +77,44 @@ static BOOL processInvalidateContext(
   return TRUE;
 }
 
+static BOOL
+processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable) {
+
+  // We only want to process the Caps Lock key event once --
+  // in the first pass (!Updateable).
+  if (Updateable){
+    return TRUE;
+  }
+
+  if (actionItem->capsLock) {
+    // This case would occur for the keyboard system store setting `store(&CapsOnOnly) '1'`
+    if (isUp && !IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
+      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS ON: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+    }
+    
+    // This case would occur for the keyboard system store setting `store(&CapsAlwaysOff) '1'`
+    // A trick is being played here of synthesising a release the CAPSLOCK key event
+    // then a depress CAPSLOCK key event
+    else if (!isUp && IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
+      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+    }
+  }
+  else {
+    // This case would occur for the keyboard system store setting `store(&ShiftFreesCaps) '1'`
+    if (!isUp && IsCapsLockOn()) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+      keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+    }
+  }
+
+  return TRUE;
+}
+
 BOOL ProcessActions(BOOL* emitKeyStroke)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
@@ -109,6 +147,9 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
       break;
     case KM_KBP_IT_INVALIDATE_CONTEXT:
       continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
+      break;
+    case KM_KBP_IT_CAPSLOCK:
+      continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable);
       break;
     case KM_KBP_IT_END:
       // fallthrough
