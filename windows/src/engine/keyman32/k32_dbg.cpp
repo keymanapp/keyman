@@ -306,6 +306,18 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   return bufout[x];
 }
 
+BOOL DebugAssert_1(BOOL condition, char *message, char *file, int line)
+{
+  if (!(condition)) {
+    SendDebugMessage_1(0, sdmGlobal, 0, file, line, message);
+    if (IsDebugAssertEnabled()) {
+      assert(condition);
+    }
+    return FALSE;
+  }
+  return TRUE;
+}
+
 #ifdef _DEBUG
 void _OutputThreadDebugString(char *s) {
   char buf[256];
@@ -313,6 +325,15 @@ void _OutputThreadDebugString(char *s) {
   OutputDebugString(buf);
 }
 #endif
+
+BOOL IsDebugAssertEnabled()
+{
+#ifdef _DEBUG
+  return IsDebuggerPresent();
+#else
+  return FALSE;
+#endif
+}
 
 void WINAPI Keyman_Diagnostic(int mode) {
   if (mode == 0) {

@@ -3,6 +3,7 @@
   Authors:          mcdurdin
 */
 #include "kmx_processevent.h"
+#include <assert.h>
 
 using namespace km::kbp;
 using namespace kmx;
@@ -17,6 +18,37 @@ KMX_BOOL KMX_ProcessEvent::Load(km_kbp_path_name KeyboardName)
 
   return TRUE;
 }
+
+const int km::kbp::kmx::CODE__SIZE[] = {
+    -1,  // undefined                0x00
+    1,   // CODE_ANY                 0x01
+    2,   // CODE_INDEX               0x02
+    0,   // CODE_CONTEXT             0x03
+    0,   // CODE_NUL                 0x04
+    1,   // CODE_USE                 0x05
+    0,   // CODE_RETURN              0x06
+    0,   // CODE_BEEP                0x07
+    1,   // CODE_DEADKEY             0x08
+    -1,  // unused                   0x09
+    2,   // CODE_EXTENDED            0x0A
+    -1,  // CODE_EXTENDEDEND         0x0B (unused)
+    1,   // CODE_SWITCH              0x0C
+    -1,  // CODE_KEY                 0x0D (never used)
+    0,   // CODE_CLEARCONTEXT        0x0E
+    1,   // CODE_CALL                0x0F
+    -1,  // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
+    1,   // CODE_CONTEXTEX           0x11
+    1,   // CODE_NOTANY              0x12
+    2,   // CODE_SETOPT              0x13
+    3,   // CODE_IFOPT               0x14
+    1,   // CODE_SAVEOPT             0x15
+    1,   // CODE_RESETOPT            0x16
+    3,   // CODE_IFSYSTEMSTORE       0x17
+    2    // CODE_SETSYSTEMSTORE      0x18
+};
+
+// Ensure that all CODE_### sizes are defined
+static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1), "Size of array CODE__SIZE not correct");
 
 const unsigned long CRCTable[256] = {
   0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
@@ -51,15 +83,14 @@ const unsigned long CRCTable[256] = {
   0xaed16a4a, 0xd9d65adc, 0x40df0b66, 0x37d83bf0, 0xa9bcae53, 0xdebb9ec5, 0x47b2cf7f, 0x30b5ffe9,
   0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6, 0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf,
   0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
-};
-
+}; 
 /*
  * This routine calculates the CRC for a block of data using the
  * table lookup method. It accepts an original value for the crc,
  * and returns the updated value.
  */
 
-unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
+static unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
 {
   unsigned long temp1;
   unsigned long temp2;

@@ -1,5 +1,68 @@
 # Keyman Version History
 
+## 15.0.132 alpha 2021-10-15
+
+* feat(windows): manual keyboard caps tests (#5808)
+
+## 15.0.131 alpha 2021-10-13
+
+* chore(windows): Add obj cod and pdb to gitignore (#5826)
+
+## 15.0.130 alpha 2021-10-11
+
+* fix(common/core): incxstr checks all character while incrementing (#5712)
+
+## 15.0.129 alpha 2021-10-08
+
+* chore: Create CODE_OF_CONDUCT.md (#5819)
+* chore: Add CONTRIBUTING documentation (#5821)
+* chore: Add link to SIL (#5823)
+
+## 15.0.128 alpha 2021-10-07
+
+* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5805)
+
+## 15.0.127 alpha 2021-10-06
+
+* chore(web): disable registerstub test (#5800)
+
+## 15.0.126 alpha 2021-10-05
+
+* chore: sentry.io dsn  ‍ ️ (#5787)
+
+## 15.0.125 alpha 2021-10-05
+
+* fix(android/engine): Remove unnecessary permissions from Manifest (#5752)
+* feat(developer): touch layout testing (#5723)
+* fix(web): popup positioning (#5742)
+* chore(linux): Update changelog files for 14.0.282 :cherries: (#5794)
+
+## 15.0.124 alpha 2021-10-04
+
+* fix(web): support variable stores with predictive text (#5749)
+* fix(windows): handle edge cases using default language (#5709)
+* fix(linux): Don't crash with non-keyboard package file (#5755)
+* fix(linux): Don't crash displaying keyboard details (#5758)
+
+## 15.0.123 alpha 2021-10-01
+
+* fix(common): Fix cherry-pick labeling (#5782)
+* chore(ios,android,windows): Update crowdin strings for Amharic (#5722)
+
+## 15.0.122 alpha 2021-09-30
+
+* fix(developer): move ampersand to shift+7 on touch (#5746)
+* feat(windows): Keyman Core integration (#5443)
+* chore(windows): Keyman Core UI and Settings (#5769)
+* fix(linux): Fix debian package script (#5771)
+* docs(mac): Add note about installing with homebrew (#5767)
+
+## 15.0.121 alpha 2021-09-29
+
+* fix(developer): remove empty touch rows on save (#5720)
+* chore(common): Check in crowdin strings for Shuwa Latin (#5734)
+* chore(windows): fix broken links in help (#5765)
+
 ## 15.0.120 alpha 2021-09-28
 
 * fix: help.keyman.com script file cleanup (#5751)

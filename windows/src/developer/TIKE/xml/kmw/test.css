@@ -29,10 +29,29 @@ h2 {
 
 .header div {
   display: inline-block;
+  vertical-align: middle;
+}
+
+.header div#KeymanWebControl {
+  display: inline-block;
+  vertical-align: middle;
+  float: none;
 }
 
 .header div h2 {
   margin: 4px;
+}
+
+.header label {
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  margin-left: 6px;
+}
+
+.header select {
+  height: 29px;
+  border-radius: 4px;
+  background: #CCCCCC;
 }
 
 .header div.float-right {
@@ -51,31 +70,154 @@ h2 {
 }
 
 #content {
-  margin: 8px 16px;
+  margin: 0px 16px 8px;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Lexical model menu */
-
-.model-list-visible#model-list {
-  display: block;
+.test {
+  font-size: 1.5em;
+  background-color: #ffffee;
+  height:100px;
+  width:92%;
+  min-height:30px;
 }
 
-#model-list {
+.desktop-device .test {
+  box-sizing: border-box;
+  padding: 4px;
+  margin: 0;
+  width:100%;
+}
+
+.install-link {
+  background: none repeat scroll 0 0 #CCCCCC;
+  border: 1px solid #444444;
+  border-radius: 4px;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
+  color: #444444;
   display: none;
-  position: absolute;
-  z-index: 3;
-  margin-top: 4px;
-  padding: 5px 5px 5px 5px;
-  background: #424248;
-  border-left: solid 1px #442244;
-  border-right: solid 1px #442244;
-  border-bottom: solid 1px #442244;
-  border-radius: 0 0 4px 4px;
-  box-shadow: 4px 4px 4px rgba(64,64,64,0.5);
+  font-family: Sans-serif;
+  font-size: 10pt;
+  margin: 0;
+  padding: 6px;
+  margin: 2px;
+  text-decoration: none;
 }
 
-#model-list a {
-  display: block;
-  color: white;
-  padding: 6px;
+/** Mobile, Tablet **/
+
+.install-link .ios,
+.install-link .android {
+  display: none;
+}
+
+.install-link-packages,
+#install-link-packages,
+#model-link,
+.touch-device #install-link,
+.touch-device-ios #install-link-ios,
+.touch-device-android #install-link-android {
+  display: inline-block;
+}
+
+.touch-device-android .install-link .android,
+.touch-device-ios .install-link .ios {
+  display: inline;
+}
+
+.touch-device #character-grid {
+  white-space: nowrap;
+  overflow-x: scroll;
+}
+
+#character-grid {
+  min-height: 49px;
+  margin: 0 0 8px 0;
+  border: solid 1px #cccccc;
+}
+
+#character-grid > div {
+  display: inline-block;
+}
+
+.char-char,
+.char-code {
+  border-right: solid 1px #eeeeee;
+  margin-right: 2px;
+}
+
+.char-char {
+  border-bottom: solid 1px #eeeeee;
+}
+
+.cursor > .char-char,
+.cursor > .char-code {
+  border-right: solid 3px blue;
+  margin-right: 0;
+}
+
+.cursor#character-grid {
+  border-left: solid 3px blue;
+}
+
+.cursor-selected {
+  background: #e0e0ff;
+}
+
+.char-char {
+  font-size: 14pt;
+  text-align: center;
+}
+
+.char-code {
+  font: 8pt Consolas,Courier;
+  padding: 4px;
+}
+
+
+/* iPhone positioning */
+
+#osk-host-frame {
+  margin: 16px 0;
+}
+
+#osk-host-frame.iPadMini {
+  margin: 0;
+  background-image: url(tablet-ipad-landscape.png);
+  background-repeat: no-repeat;
+  padding-left: 97px;
+  background-position-y: -358px;
+  height: 360px;
+  width: 927px;
+  padding-top: 62px;
+}
+
+#osk-host-frame.iPadMini .kmw-osk-frame,
+#osk-host-frame.iPadMini .kmw-key-layer-group {
+  border-radius: 0 0 5px 5px;
+}
+
+#osk-host-frame.iPhone {
+  margin: 0;
+  background-image: url(phone-iphone5-portrait.png);
+  background-position-x: 0px;
+  background-position-y: -794px;
+  height: 374px;
+  width: 600px;
+  background-repeat: no-repeat;
+  padding-left: 91px;
+  padding-right: 50px;
+  padding-top: 64px;
+}
+
+#osk-host-frame.iPhone .kmw-osk-frame,
+#osk-host-frame.iPhone .kmw-key-layer-group {
+  border-radius: 0 0 3px 3px;
+}
+
+#input-area, #character-grid {
+  width: 100%;
 }

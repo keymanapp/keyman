@@ -95,7 +95,7 @@ const
       ValueType: kstInteger
   );
 
-  BaseKeymanSettings: array[0..33] of TKeymanSettingBase = (
+  BaseKeymanSettings: array[0..34] of TKeymanSettingBase = (
 
     // TIKE:UTikeDebugMode.TikeDebugMode
     (
@@ -385,6 +385,18 @@ const
       RootKey: HKCU;
       Key: SRegKey_KeymanEngineDebug_CU;
       Description: 'Set to 1 for old RegisterHotkey pathway';
+      ValueType: kstInteger
+    ),
+
+    (
+      ID: 'engine.compatibility.use_keyman_core';
+      Name: SRegValue_Flag_UseKeymanCore;
+      RootKey: HKCU;
+      Key: SRegKey_KeymanEngineDebug_CU;
+      Description: 'When set to 1, uses the new Keyman Core common library; '+
+                   'if compatibility issues are encountered, set to 0 '+
+                   'to use the legacy Keyman for Windows core.';
+      DefaultInt: 1;
       ValueType: kstInteger
     ),
 

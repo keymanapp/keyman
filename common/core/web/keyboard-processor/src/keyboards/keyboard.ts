@@ -20,9 +20,14 @@ namespace com.keyman.keyboards {
     CALIBRATED = 2
   }
 
+  export interface VariableStoreDictionary {
+    [name: string]: string;
+  };
+
+
   /**
    * Acts as a wrapper class for Keyman keyboards compiled to JS, providing type information
-   * and keyboard-centered functionality in an object-oriented way without modifying the 
+   * and keyboard-centered functionality in an object-oriented way without modifying the
    * wrapped keyboard itself.
    */
   export class Keyboard {
@@ -37,7 +42,7 @@ namespace com.keyman.keyboards {
     /**
      * This is the object provided to KeyboardInterface.registerKeyboard - that is, the keyboard
      * being wrapped.
-     * 
+     *
      * TODO:  Make this private instead.  But there are a LOT of references that must be rooted out first.
      */
     public readonly scriptObject: any;
@@ -71,6 +76,51 @@ namespace com.keyman.keyboards {
       return this.scriptObject['KN'];
     }
 
+    /**
+     * Cache variable store values
+     *
+     * Primarily used for predictive text to prevent variable store
+     * values from being changed in 'fat finger' processing.
+     *
+     * KVS is available in keyboards compiled with Keyman Developer 15
+     * and later versions. See #2924.
+     *
+     * @returns an object with each property referencing a variable store
+     */
+    get variableStores(): VariableStoreDictionary {
+      const storeNames = this.scriptObject['KVS'];
+      let values = {};
+      if(Array.isArray(storeNames)) {
+        for(let store of storeNames) {
+          values[store] = this.scriptObject[store];
+        }
+      }
+      return values;
+    }
+
+    /**
+     * Restore variable store values from cache
+     *
+     * KVS is available in keyboards compiled with Keyman Developer 15
+     * and later versions. See #2924.
+     *
+     * @param values  name-value pairs for each store value
+     */
+    set variableStores(values: VariableStoreDictionary) {
+      const storeNames = this.scriptObject['KVS'];
+      if(Array.isArray(storeNames)) {
+        for(let store of storeNames) {
+          // If the value is not present in the cache, don't overwrite it;
+          // while this is not used in initial implementation, we could use
+          // it in future to update a single variable store value rather than
+          // the whole cache.
+          if(typeof values[store] == 'string') {
+            this.scriptObject[store] = values[store];
+          }
+        }
+      }
+    }
+
     // TODO:  Better typing.
     private get _legacyLayoutSpec(): any {
       return this.scriptObject['KV'];  // used with buildDefaultLayout; layout must be constructed at runtime.
@@ -99,7 +149,7 @@ namespace com.keyman.keyboards {
 
     /**
      * HTML help text, as specified by either the &kmw_helptext or &kmw_helpfile system stores.
-     * 
+     *
      * Reference: https://help.keyman.com/developer/language/reference/kmw_helptext,
      *            https://help.keyman.com/developer/language/reference/kmw_helpfile
      */
@@ -121,7 +171,7 @@ namespace com.keyman.keyboards {
      * Embeds a custom script for use by the OSK, which may be interactive (like with sil_euro_latin).
      * Note:  this must be called AFTER any contents of `helpText` have been inserted into the DOM.
      * (See sil_euro_latin's source -> sil_euro_latin_js.txt)
-     * 
+     *
      * Reference: https://help.keyman.com/developer/language/reference/kmw_embedjs
      */
     embedScript(e: any) {
@@ -136,10 +186,10 @@ namespace com.keyman.keyboards {
 
     /**
      * true if this keyboard uses a (legacy) pick list (Chinese, Japanese, Korean, etc.)
-     * 
+     *
      * TODO:  Make a property on keyboards (say, `isPickList` / `KPL`) to signal this when we
      *        get around to better, generalized picker-list support.
-     */    
+     */
     get isCJK(): boolean { // I3363 (Build 301)
       var lg: string;
       if(typeof(this.scriptObject['KLC']) != 'undefined') {
@@ -147,7 +197,7 @@ namespace com.keyman.keyboards {
       } else if(typeof(this.scriptObject['LanguageCode']) != 'undefined') {
         lg = this.scriptObject['LanguageCode'];
       }
-      
+
       // While some of these aren't proper BCP-47 language codes, the CJK keyboards predate our use of BCP-47.
       // So, we preserve the old ISO 639-3 codes, as that's what the keyboards are matching against.
       return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
@@ -186,7 +236,7 @@ namespace com.keyman.keyboards {
         this.scriptObject['_kmw'] = tag;
       }
 
-      return tag; 
+      return tag;
     }
 
     get explodedStores(): {[storeName: string]: text.ComplexKeyboardStore} {
@@ -209,7 +259,7 @@ namespace com.keyman.keyboards {
       if(this._legacyLayoutSpec == null) {
         return false;
       }
-      
+
       // Only exists in KMW 10.0+, but before that Web had no chirality support, so... return false.
       let layers = this._legacyLayoutSpec['KLS'];
       if(!layers) {
@@ -219,18 +269,18 @@ namespace com.keyman.keyboards {
       var emulationMask = modifierCodes['LCTRL'] | modifierCodes['LALT'];
       var unshiftedEmulationLayer = layers[Layouts.getLayerId(emulationMask)];
       var shiftedEmulationLayer = layers[Layouts.getLayerId(modifierCodes['SHIFT'] | emulationMask)];
-      
+
       // buildDefaultLayout ensures that these are aliased to the original modifier set being emulated.
       // As a result, we can directly test for reference equality.
       //
       // This allows us to still return `true` after creating the layers for emulation; during keyboard
       // construction, the two layers should be null for AltGr emulation to succeed.
-      if(unshiftedEmulationLayer != null && 
+      if(unshiftedEmulationLayer != null &&
           unshiftedEmulationLayer != layers[Layouts.getLayerId(modifierCodes['RALT'])]) {
         return false;
       }
 
-      if(shiftedEmulationLayer != null && 
+      if(shiftedEmulationLayer != null &&
           shiftedEmulationLayer != layers[Layouts.getLayerId(modifierCodes['RALT'] | modifierCodes['SHIFT'])]) {
         return false;
       }
@@ -273,9 +323,9 @@ namespace com.keyman.keyboards {
     /**
      * @param       {number}    _PCommand     event code (16,17,18) or 0
      * @param       {Object}    _PTarget      target element
-     * @param       {number}    _PData        1 or 0    
+     * @param       {number}    _PData        1 or 0
      * Notifies keyboard of keystroke or other event
-     */    
+     */
     notify(_PCommand: number, _PTarget: text.OutputTarget, _PData: number) { // I2187
       // Good example use case - the Japanese CJK-picker keyboard
       if(typeof(this.scriptObject['KNS']) == 'function') {
@@ -318,7 +368,7 @@ namespace com.keyman.keyboards {
         rawSpecifications = {'F':'Tahoma', 'BK': Layouts.dfltText};
       }
 
-      // Regardless of success, we'll want to initialize the field that backs the property; 
+      // Regardless of success, we'll want to initialize the field that backs the property;
       // may as well cache the default layout we just built, or a 'null' if it shouldn't exist..
       if(!this._layouts) {
         this._layouts = {};
@@ -339,7 +389,7 @@ namespace com.keyman.keyboards {
 
     /**
      * Returns an ActiveLayout object representing the keyboard's layout for this form factor.  May return null if a custom desktop "help" OSK is defined, as with sil_euro_latin.
-     * 
+     *
      * In such cases, please use either `helpText` or `insertHelpHTML` instead.
      * @param formFactor {string} The desired form factor for the layout.
      */

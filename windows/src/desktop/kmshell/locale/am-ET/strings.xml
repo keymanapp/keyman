@@ -215,7 +215,7 @@
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">የፊደል ገበታ ሰሌዳን ጫን...</string>
+  <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">የፊደል ገበታ ሰሌዳ ጫን...</string>
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -276,7 +276,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
-  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">የሃርድዌር ዴድኪዎችን እንደ ተራ ቁልፍ አድርገው ይይዟቸው</string>
+  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">የሃርድዌር ዴድኪዎችን እንደ ተራ ቁልፍ አድርገው ይያዟቸው</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
@@ -312,7 +312,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
-  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">የስክሪን ላይ ኪቦርዱን ፊደሉን ከተጫኑ በኋላ Shift/Ctrl/Alt ይልቀቁ</string>
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">የስክሪን ኪቦርድ ላይ ያለውን ፊደል ከተጫኑ በኋላ Shift/Ctrl/Alt ይልቀቁ</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->
@@ -365,11 +365,11 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_TurnKeymanOff" comment="Hotkey - Turn Product Off">ኪይማኑን ያጥፉ</string>
+  <string name="S_Hotkey_TurnKeymanOff" comment="Hotkey - Turn Product Off">ኪይማኑን አጥፋ</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">የፊደል ገበታውን ዝርዝር ይክፈቱ</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">የፊደል ገበታውን ዝርዝር ክፈት</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -629,7 +629,7 @@
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.278.0 -->
-  <string name="S_DisplayIn" comment="'Display In' text label for UI language menu">በውስጥ አሳይ</string>
+  <string name="S_DisplayIn" comment="'Display In' text label for UI language menu">ቋንቋ በ</string>
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.278.0 -->
@@ -733,7 +733,7 @@
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">ኪይማኑን ያጥፉ</string>
+  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">ኪይማኑን አጥፋ (&amp;O)</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

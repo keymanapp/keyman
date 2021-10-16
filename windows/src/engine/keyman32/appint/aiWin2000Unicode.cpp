@@ -116,6 +116,11 @@ WCHAR *AIWin2000Unicode::ContextBufMax(int n)
 {
 	return context->BufMax(n);
 }
+
+void AIWin2000Unicode::SetContext(const WCHAR* buf)
+{
+  return context->Set(buf);
+}
 	
 BYTE SavedKbdState[256];
 

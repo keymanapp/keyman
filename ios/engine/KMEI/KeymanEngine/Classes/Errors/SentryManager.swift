@@ -38,7 +38,7 @@ public class SentryManager {
     let release = "release-\(versionWithTag)"
 
     let options = Sentry.Options()
-    options.dsn = "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8"
+    options.dsn = "https://d14d2efb594e4345b8367dbb61ebceaf@o1005580.ingest.sentry.io/5983521"
     options.enabled = allowEnabled && sendingEnabled
     options.environment = environment
     options.releaseName = release

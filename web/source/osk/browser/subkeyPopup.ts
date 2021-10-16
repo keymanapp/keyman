@@ -4,7 +4,7 @@
 namespace com.keyman.osk.browser {
   /**
    * Represents a 'realized' longpress gesture's default implementation
-   * within KeymanWeb.  Once a touch sequence has been confirmed to 
+   * within KeymanWeb.  Once a touch sequence has been confirmed to
    * correspond to a longpress gesture, implementations of this class
    * provide the following:
    * * The UI needed to present a subkey menu
@@ -12,7 +12,7 @@ namespace com.keyman.osk.browser {
    * currently-selected subkey to the user
    * * A `Promise` that will resolve to the user's selected subkey
    * once the longpress operation is complete.
-   * 
+   *
    * As selection of the subkey occurs after the subkey popup is
    * displayed, selection of the subkey is inherently asynchronous.
    * The `Promise` may also resolve to `null` if the user indicates
@@ -40,10 +40,10 @@ namespace com.keyman.osk.browser {
       this.promise = new Promise<text.KeyEvent>(function(resolve) {
         _this.resolver = resolve;
       })
-      
+
       this.vkbd = vkbd;
       this.baseKey = e;
-      
+
       // If the user doesn't move their finger and releases, we'll output the base key
       // by default.
       this.currentSelection = e;
@@ -64,9 +64,6 @@ namespace com.keyman.osk.browser {
 
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
-      let rowElement = (e.key as OSKBaseKey).row.element;
-      const _Box = vkbd.element.offsetParent as HTMLDivElement;
-      ss.bottom = (_Box.offsetHeight - rowElement.offsetTop) + 'px';
 
       // Set key font according to layout, or defaulting to OSK font
       // (copied, not inherited, since OSK is not a parent of popup keys)
@@ -79,9 +76,7 @@ namespace com.keyman.osk.browser {
       var nKeys=subKeySpec.length,nRows,nCols;
       nRows=Math.min(Math.ceil(nKeys/9),2);
       nCols=Math.ceil(nKeys/nRows);
-      if(nRows > 1) {
-        ss.width=(nCols*e.offsetWidth+nCols*5)+'px';
-      }
+      ss.width=(nCols*e.offsetWidth+nCols*5)+'px';
 
       // Add nested button elements for each sub-key
       for(i=0; i<nKeys; i++) {
@@ -131,8 +126,10 @@ namespace com.keyman.osk.browser {
       let e = this.baseKey;
 
       // And correct its position with respect to that element
+      const _Box = vkbd.element.offsetParent as HTMLDivElement;
+      let rowElement = (e.key as OSKBaseKey).row.element;
       let ss=subKeys.style;
-      var x = dom.Utils.getAbsoluteX(e)+0.5*(e.offsetWidth-subKeys.offsetWidth);
+      var x = e.offsetLeft + (<HTMLElement>e.offsetParent).offsetLeft + 0.5*(e.offsetWidth-subKeys.offsetWidth);
       var xMax = keyman.osk.computedWidth - subKeys.offsetWidth;
 
       if(x > xMax) {
@@ -142,6 +139,7 @@ namespace com.keyman.osk.browser {
         x=0;
       }
       ss.left=x+'px';
+      ss.bottom = (_Box.offsetHeight - rowElement.offsetTop + subKeys.offsetHeight) + 'px';
 
       // Make the popup keys visible
       ss.visibility='visible';
@@ -161,7 +159,7 @@ namespace com.keyman.osk.browser {
       }
 
       // Add the callout
-      if(vkbd.device.formFactor != utils.FormFactor.Phone || vkbd.device.OS != utils.OperatingSystem.iOS) {
+      if(vkbd.device.formFactor == utils.FormFactor.Phone && vkbd.device.OS == utils.OperatingSystem.iOS) {
         this.callout = this.addCallout(e, delta);
       }
     }
@@ -185,13 +183,13 @@ namespace com.keyman.osk.browser {
         keyman.osk._Box.appendChild(cc);
 
         // Create the callout
-        var xLeft = key.offsetLeft,
-            xTop = key.offsetTop + delta,
-            xWidth = key.offsetWidth,
+        var xLeft = key.offsetLeft + (<HTMLElement>key.offsetParent).offsetLeft,
+            xTop = key.offsetTop + (key.key as OSKBaseKey).row.element.offsetTop + delta,
+            xWidth = key.offsetWidth + 2,
             xHeight = calloutHeight;
 
         // Set position and style
-        ccs.top = (xTop-6)+'px'; ccs.left = xLeft+'px';
+        ccs.top = (xTop-6)+'px'; ccs.left = (xLeft-1)+'px';
         ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
 
         // Return callout element, to allow removal later
@@ -210,7 +208,7 @@ namespace com.keyman.osk.browser {
 
         // Preference order:
         // #1:  if a default subkey has been specified, select it.  (pending, for 15.0+)
-        // #2:  if no default subkey is specified, default to a subkey with the same 
+        // #2:  if no default subkey is specified, default to a subkey with the same
         //      key ID and layer / modifier spec.
         //if(skSpec.isDefault) { TODO for 15.0
         //  bk = skElement;

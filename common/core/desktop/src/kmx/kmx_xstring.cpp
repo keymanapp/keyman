@@ -9,8 +9,6 @@
 #include "kmx_processevent.h"
 #include "utfcodec.hpp"
 
-
-
 using namespace km::kbp;
 using namespace kmx;
 
@@ -116,36 +114,38 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 *
 * xstrlen calculates the length of a string, ignoring some special chars.
 */
+PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
 
-PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
-{
-  if(*p == 0) return p;
-  if(*p != UC_SENTINEL)
-  {
-    if(*p >= 0xD800 && *p <= 0xDBFF && *(p+1) >= 0xDC00 && *(p+1) <= 0xDFFF) return p+2;
-    return p+1;
+  if (*p == 0)
+    return p;
+  if (*p != UC_SENTINEL) {
+    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)
+      return p + 2;
+    return p + 1;
+  }
+  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
+  if (*(p + 1) == CODE_EXTENDED) {
+    p += 2;
+    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
+      p++;
+
+    if (*p == 0)        return p;
+    return p + 1;
   }
 
-  p+=2;
-  switch(*(p-1))
-  {
-    case CODE_ANY:      return p+1;
-    case CODE_NOTANY:   return p+1;
-    case CODE_INDEX:    return p+2;
-    case CODE_USE:      return p+1;
-    case CODE_DEADKEY:    return p+1;
-    case CODE_EXTENDED:   p += 2; while(*p && *p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
-    case CODE_CLEARCONTEXT: return p+1;
-    case CODE_CALL:     return p+1;
-    case CODE_CONTEXTEX:  return p+1;
-    case CODE_IFOPT:    return p+3;
-    case CODE_IFSYSTEMSTORE: return p+3;
-    case CODE_SETOPT:   return p+2;
-    case CODE_SETSYSTEMSTORE: return p+2;
-    case CODE_RESETOPT: return p+1;
-    case CODE_SAVEOPT:  return p+1;
-    default:        return p;
+  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
+    return p + 1;
   }
+
+  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
+
+  // check for \0 between UC_SENTINEL(FFFF) and next printable character
+  for (int i = 0; i < deltaptr; i++) {
+    if (*p == 0)
+      return p;
+    p++;
+  }
+  return p;
 }
 
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
@@ -250,7 +250,7 @@ int km::kbp::kmx::xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return u16ncmp(ch1, ch2, (intptr_t)(nch1-ch1));
 }
-
+ 
 PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
 {
   PKMX_WCHAR result;
@@ -261,7 +261,6 @@ PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
   result[s.length()] = 0;
   return result;
 }
-
 
 PKMX_CHAR km::kbp::kmx::wstrtostr(PKMX_WCHAR in)
 {
