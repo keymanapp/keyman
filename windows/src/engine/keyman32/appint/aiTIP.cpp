@@ -95,9 +95,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateEx(BOOL FActivate) {  //
 }
 
 
-/*
-  Update the Keyman toggle state based on the key event
-*/
 void ProcessToggleChange(UINT key) {   // I4793
   UINT flag = 0;
 
@@ -129,6 +126,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   BOOL isUp = keyFlags & KF_UP ? TRUE : FALSE;
   BOOL extended = keyFlags & KF_EXTENDED ? TRUE : FALSE;
   BYTE scan = keyFlags & 0xFF;
+  BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
 
   SendDebugMessageFormat(0, sdmAIDefault, 0, "TIPProcessKey: Enter VirtualKey=%s lParam=%x   IsUp=%d Extended=%d Updateable=%d Preserved=%d", Debug_VirtualKey((WORD) wParam), lParam, isUp, extended, Updateable, Preserved);
 
@@ -161,44 +159,77 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   }
 
   DWORD LocalShiftState = Globals::get_ShiftState();
-
-  if(!Preserved) {
-    switch(wParam) {
-    case VK_CAPITAL:
-      if(!isUp) ProcessToggleChange((UINT) wParam);   // I4793
-      if (!Updateable) {
-        // We only want to process the Caps Lock key event once --
-        // in the first pass (!Updateable).
-        KeyCapsLockPress(isUp);   // I4548
+  // Only the modifer flag 'f_ShiftState' is changed before sending the key stroke to the
+  // core processor. The core processor has the keyboard Caps Lock stores and will
+  // queue an action 'KM_KBP_IT_CAPSLOCK'. In processing the action the Windows engine will synthesise keystrokes
+  // to ensure caps lock is in the correct state.
+  if (isUsingCoreProcessor) {
+    if (!Preserved) {
+      switch (wParam) {
+      case VK_MENU:
+      case VK_CONTROL:
+        ProcessModifierChange((UINT)wParam, isUp, extended);
+        return FALSE;
+      case VK_NUMLOCK:
+        if (!isUp)
+          ProcessToggleChange((UINT)wParam);  // I4793
+        return FALSE;
+      case VK_CAPITAL:
+         if (!isUp)
+          ProcessToggleChange((UINT)wParam);  // I4793
+         break;
+      case VK_SHIFT:
+        ProcessModifierChange((UINT)wParam, isUp, extended);
+        break;
       }
-      return FALSE;
-    case VK_SHIFT:
-      if (!Updateable) {
-        // We only want to process the Shift key event once --
-        // in the first pass (!Updateable).
-        KeyShiftPress(isUp);   // I4548
+    } else {
+      // Mask out Ctrl, Shift and Alt and include new modifiers   // I4548
+      DWORD NewShiftState = TSFShiftToShift(lParam);  // I3588
+      SendDebugMessageFormat(
+          0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
+      *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;  // I3588
+    }
+  } else {  // using windows processor TODO: #5442 Remove this else block
+    if (!Preserved) {
+      switch (wParam) {
+      case VK_CAPITAL:
+        if (!isUp)
+          ProcessToggleChange((UINT)wParam);  // I4793
+        if (!Updateable) {
+          // We only want to process the Caps Lock key event once --
+          // in the first pass (!Updateable).
+          KeyCapsLockPress(isUp);  // I4548
+        }
+        return FALSE;
+      case VK_SHIFT:
+        if (!Updateable) {
+          // We only want to process the Shift key event once --
+          // in the first pass (!Updateable).
+          KeyShiftPress(isUp);  // I4548
+        }
+        // Fall through
+      case VK_MENU:
+      case VK_CONTROL:
+        ProcessModifierChange((UINT)wParam, isUp, extended);
+        return FALSE;
+      case VK_NUMLOCK:
+        if (!isUp)
+          ProcessToggleChange((UINT)wParam);  // I4793
+        return FALSE;
       }
-      // Fall through
-    case VK_MENU:
-    case VK_CONTROL:
-      ProcessModifierChange((UINT) wParam, isUp, extended);
-      return FALSE;
-
-    case VK_NUMLOCK:
-      if(!isUp) ProcessToggleChange((UINT) wParam);   // I4793
-      return FALSE;
+      // This would only get here if none of the above cases matched why not use default in the switch?
+      if (isUp) {
+        return FALSE;  // return value ignored in this case; we only needed it for testing anyway
+      }
+    } else {
+      // Mask out Ctrl, Shift and Alt and include new modifiers   // I4548
+      DWORD NewShiftState = TSFShiftToShift(lParam);  // I3588
+      SendDebugMessageFormat(
+          0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
+      *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;  // I3588
     }
-    if(isUp) {
-      return FALSE; // return value ignored in this case; we only needed it for testing anyway
-    }
-  } else {
-    // Mask out Ctrl, Shift and Alt and include new modifiers   // I4548
-    DWORD NewShiftState = TSFShiftToShift(lParam);   // I3588
-    SendDebugMessageFormat(0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
-    *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;   // I3588
-  }
+  } // TODO: #5442 Remove this else block ^^
 
-  BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
 	_td->TIPFUpdateable = Updateable;
   _td->TIPFPreserved = Preserved;   // I4290
 
@@ -206,6 +237,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->state.msg.lParam = 0;
 	_td->state.msg.message = wm_keymankeydown;
 	_td->state.vkey = (WORD) wParam;
+  _td->state.isDown = !isUp;
 
   if (isUsingCoreProcessor) {
     _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;

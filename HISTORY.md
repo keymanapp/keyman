@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 15.0.132 alpha 2021-10-15
+
+* feat(windows): manual keyboard caps tests (#5808)
+
+## 15.0.131 alpha 2021-10-13
+
+* chore(windows): Add obj cod and pdb to gitignore (#5826)
+
+## 15.0.130 alpha 2021-10-11
+
+* fix(common/core): incxstr checks all character while incrementing (#5712)
+
+## 15.0.129 alpha 2021-10-08
+
+* chore: Create CODE_OF_CONDUCT.md (#5819)
+* chore: Add CONTRIBUTING documentation (#5821)
+* chore: Add link to SIL (#5823)
+
+## 15.0.128 alpha 2021-10-07
+
+* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5805)
+
 ## 15.0.127 alpha 2021-10-06
 
 * chore(web): disable registerstub test (#5800)
