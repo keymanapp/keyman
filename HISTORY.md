@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.133 alpha 2021-10-16
+
+* chore(common): Check in crowdin strings for Hausa (#5768)
+
 ## 15.0.132 alpha 2021-10-15
 
 * feat(windows): manual keyboard caps tests (#5808)
