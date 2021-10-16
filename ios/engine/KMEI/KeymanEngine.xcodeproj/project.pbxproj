@@ -302,6 +302,9 @@
 		1645D5942036C6FF0076C51B /* KeymanPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanPackage.swift; sourceTree = "<group>"; };
 		1645D5962036C9F80076C51B /* KMPKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPKeyboard.swift; sourceTree = "<group>"; };
 		165EB3A02098993900040A69 /* KeyboardError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardError.swift; sourceTree = "<group>"; };
+		293EA3DB2705955300545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		293EA3DC2705964200545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/Localizable.strings; sourceTree = "<group>"; };
+		293EA3DD270596B700545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ha; path = ha.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		377D10DD26846B8900467431 /* SpacebarTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacebarTextViewController.swift; sourceTree = "<group>"; };
 		6C0A140E151EA930007FA4AD /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		6C0A140F151EA930007FA4AD /* Keyman.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; lineEnding = 0; path = Keyman.xcconfig; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcconfig; };
@@ -1171,6 +1174,7 @@
 				am,
 				"es-419",
 				"zh-Hans",
+				ha,
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1556,6 +1560,7 @@
 				CEBD34552655117800EB2EA8 /* am */,
 				CEEF81B82673016E00EE6A07 /* es-419 */,
 				CEEC467E26F2F777009A5B7D /* zh-Hans */,
+				293EA3DD270596B700545EED /* ha */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1572,6 +1577,7 @@
 				CEBD34542655117400EB2EA8 /* am */,
 				CEEF81B72673016900EE6A07 /* es-419 */,
 				CEEC467D26F2F76E009A5B7D /* zh-Hans */,
+				293EA3DC2705964200545EED /* ha */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1589,6 +1595,7 @@
 				CEBD34532655115800EB2EA8 /* am */,
 				CEEF81AD2672FBE900EE6A07 /* es-419 */,
 				CEEC467526F2F5EE009A5B7D /* zh-Hans */,
+				293EA3DB2705955300545EED /* ha */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";
