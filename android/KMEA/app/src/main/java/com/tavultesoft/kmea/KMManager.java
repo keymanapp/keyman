@@ -2109,9 +2109,6 @@ public final class KMManager {
     } else {
       // clear globeKeyState
       globeKeyState = GlobeKeyState.GLOBE_KEY_STATE_UP;
-
-      // TODO: This should not be allowed because !shouldAllowSetKeyboard (#5570)
-      switchToNextKeyboard(context);
     }
   }
 
