@@ -148,8 +148,9 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
   return p;
 }
 
-PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
-{
+PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart) {
+  
+
   if(p <= pStart) {
     return NULL;
   }
@@ -173,43 +174,81 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   {
     return p-1;
   }
+
   else if(*(p-1) == UC_SENTINEL) return p-1;
-  else if(p > pStart+1 && *(p-2) == UC_SENTINEL)
+  else
   {
-    switch(*(p-1))
+    for (int i = 1; i < 5; i++)
     {
-      case CODE_ANY:
-      case CODE_NOTANY:
-      case CODE_USE:
-      case CODE_DEADKEY:
-      case CODE_CLEARCONTEXT:
-      case CODE_CALL:
-      case CODE_CONTEXTEX:
-      case CODE_RESETOPT:
-      case CODE_SAVEOPT:
-        return p-2;
+      //   *(p - i) == UC_SENTINEL  &&  next CODE_ right to UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
+      if ((*(p - i) == UC_SENTINEL) && (CODE__SIZE[*(p - i + 1)] + 1 == i)) {
+        int jump = CODE__SIZE[*(p - i + 1)] + 1;
+        return (p - jump);
+      }
     }
   }
-  else if(p > pStart+2 && *(p-3) == UC_SENTINEL)
-  {
-    switch(*(p-2))
-    {
-      case CODE_INDEX:
-      case CODE_SETOPT:
-      case CODE_SETSYSTEMSTORE:
-        return p-3;
-    }
+
+  return p;
+ /**/
+  //--------------------------------------------------------
+     /*
+  if (p <= pStart) {
+    return NULL;
   }
-  else if(p > pStart+3 && *(p-4) == UC_SENTINEL)
-  {
-    switch(*(p-3))
-    {
-      case CODE_IFOPT:
-      case CODE_IFSYSTEMSTORE:  // I3432
-        return p-4;
+
+  p--;
+  if (*p == UC_SENTINEL_EXTENDEDEND) {
+    int n = 0;
+    while (*p != UC_SENTINEL && n < 10) {
+      p--;
+      n++;
+    }
+
+    if (p < pStart) {
+      // May be a malformed virtual key
+      return pStart;
+    }
+    return p;
+  }
+
+
+  if (p == pStart)
+    return p;  // Don't allow test before pStart
+
+  if (*p >= 0xDC00 && *p <= 0xDFFF && *(p - 1) >= 0xD800 && *(p - 1) <= 0xDBFF) {
+    return p - 1;
+  } else if (*(p - 1) == UC_SENTINEL)
+    return p - 1;
+
+  else if (p > pStart + 1 && *(p - 2) == UC_SENTINEL) {
+    switch (*(p - 1)) {
+    case CODE_ANY:
+    case CODE_NOTANY:
+    case CODE_USE:
+    case CODE_DEADKEY:
+    case CODE_CLEARCONTEXT:
+    case CODE_CALL:
+    case CODE_CONTEXTEX:
+    case CODE_RESETOPT:
+    case CODE_SAVEOPT:
+      return p - 2;
+    }
+  } else if (p > pStart + 2 && *(p - 3) == UC_SENTINEL) {
+    switch (*(p - 2)) {
+    case CODE_INDEX:
+    case CODE_SETOPT:
+    case CODE_SETSYSTEMSTORE:
+      return p - 3;
+    }
+  } else if (p > pStart + 3 && *(p - 4) == UC_SENTINEL) {
+    switch (*(p - 3)) {
+    case CODE_IFOPT:
+    case CODE_IFSYSTEMSTORE:  // I3432
+      return p - 4;
     }
   }
   return p;
+*/
 }
 
 int km::kbp::kmx::xstrlen_ignoreifopt(PKMX_WCHAR p)
