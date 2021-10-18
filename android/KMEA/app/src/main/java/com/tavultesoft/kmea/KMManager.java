@@ -159,7 +159,7 @@ public final class KMManager {
 
   private static InputMethodService IMService;
   private static boolean debugMode = false;
-  private static boolean shouldAllowSetKeyboard = true;
+  private static boolean shouldAllowSetKeyboard = false; // TEST CODE to remove after user testing: Do not merge to production
   private static boolean didCopyAssets = false;
 
   private static boolean didLogHardwareKeystrokeException = false;
