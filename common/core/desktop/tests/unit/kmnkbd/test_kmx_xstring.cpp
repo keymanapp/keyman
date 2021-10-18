@@ -33,69 +33,66 @@ void test_decxstr() {
 		PKMX_WCHAR p;       // pointer end of input  
     PKMX_WCHAR q;       // pointer output
            
-    // ---------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------
     // ---- differences in deltas for new decxstr
-    // ---------------------------------------------------------------------------------------
-  
-    // ----- NEW version of decxstr ---------------------------------------------------------------------------
-    
-    //runs OK with NEW version of decxstr ( with CODE_EXTENDED  pointer moves 3 ( 4 altogether) 
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000A\u0001\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 4) );
-
-     //runs OK with NEW version of decxstr ( with CODE_SWITCH  pointer moves 2 ( 3 altogether) 
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000C\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) ); 
-
-     // runs OK with NEW version of decxstr ( with CODE_CLEARCONTEXT  pointer moves 0 ( 1 altogether) 
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000E\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-
-
-
-    // ----- OLD version of decxstr ---------------------------------------------------------------------------
-/*    
-     // runs OK with OLD version of decxstr (  with CODE_EXTENDED  pointer moves 0 ( 1 altogether) )
+    // --------------------------------------------------------------------------------------------- 
+/*
+     // ----- OLD version of decxstr: 0x0A and 0x0C not used; 0x0E originally set to 1 -------------    
+     // runs OK with OLD version of decxstr (with CODE_EXTENDED pointer moves 0 (1 altogether) )
      p_start = (PKMX_WCHAR)u"abc\uFFFF\u000A\u0001\u0001d";     
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);       
      assert(q == (p - 1) );
      
-     // runs OK with OLD version of decxstr ( ith CODE_SWITCH  pointer moves 0 ( 1 altogether) )
+     // runs OK with OLD version of decxstr (with CODE_SWITCH pointer moves 0 (1 altogether) )
      p_start = (PKMX_WCHAR)u"abc\uFFFF\u000C\u0001d";     
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);       
      assert(q == (p - 1) ); 
 
-     // runs OK with OLD version of decxstr ( with CODE_CLEARCONTEXT  pointer moves 2 ( 3 altogether) )
+     // runs OK with OLD version of decxstr (with CODE_CLEARCONTEXT pointer moves 2 (3 altogether) )
      p_start = (PKMX_WCHAR)u"abc\uFFFF\u000E\u0001d";     
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);       
      assert(q == (p - 3) );
 */
 
+     // ----- NEW version of decxstr: 0x0A , 0x0C and 0x0E are set in CODE__SIZE[] (Value  2, 1, 0) --   
+     // runs OK with NEW version of decxstr (with CODE_EXTENDED pointer moves 3 ( 4 altogether) 
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000A\u0001\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 4) );
+
+     //runs OK with NEW version of decxstr (with CODE_SWITCH pointer moves 2 ( 3 altogether) 
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000C\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) ); 
+
+     // runs OK with NEW version of decxstr (with CODE_CLEARCONTEXT pointer moves 0 ( 1 altogether) 
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000E\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 1) );
      
      // runs OK with OLD version and NEW version of decxstr
      p_start = (PKMX_WCHAR)u"abc\uFFFF\u000E\u0001";     
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);       
      assert(q == (p - 2) );
-      
-    // ---------------------------------------------------------------------------------------
-    // ---- 
-    // ---------------------------------------------------------------------------------------
-    
-      
      
+     // ---------------------------------------------------------------------------------------
+     // ---- character
+     // --------------------------------------------------------------------------------------- 
+   
+     p_start = (PKMX_WCHAR)u"abcd";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);
+       
+     assert(q == (p - 1) );
 
-    // 
-    // ---------------------------------------------------------------------------------------
+         // ---------------------------------------------------------------------------------------
     // ---- p <= pstart
     // ---------------------------------------------------------------------------------------
    
@@ -112,7 +109,7 @@ void test_decxstr() {
     // ---------------------------------------------------------------------------------------
     // ----  p= UC_SENTINEL_EXTENDED
     // ---------------------------------------------------------------------------------------
-      /* */  
+     
      p_start = (PKMX_WCHAR)u"abc\uFFFF\u000A\u0001\u0002\u0003\u0004\u0010";         
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);     
@@ -147,95 +144,6 @@ void test_decxstr() {
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);       
      assert(q == (p - 2) );
-     
-    // ---------------------------------------------------------------------------------------
-    // ---- CODE_ followed by letter
-    // ---------------------------------------------------------------------------------------
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0001\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0002\u0001\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 4) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0003\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0004\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0005\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0006\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0007\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0008\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) ); 
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000F\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) ); 
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0011\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0012\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0013\u0001\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 4) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0014\u0001\u0001\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 5) ); 
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0015\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0016\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0017\u0001\u0001\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 5) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0018\u0001\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 4) );
      
     // ---------------------------------------------------------------------------------------
     // ---- CODE_ 
@@ -345,12 +253,98 @@ void test_decxstr() {
      q       = decxstr(p, p_start);
      assert(q == (p - 1) ); 
 
+    // ---------------------------------------------------------------------------------------
+    // ---- CODE_ followed by letter
+    // ---------------------------------------------------------------------------------------
 
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0001\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0002\u0001\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 4) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0003\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 1) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0004\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 1) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0005\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0006\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 1) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0007\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 1) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0008\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) ); 
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000F\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) ); 
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0011\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0012\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0013\u0001\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 4) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0014\u0001\u0001\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 5) ); 
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0015\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0016\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 3) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0017\u0001\u0001\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 5) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0018\u0001\u0001d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 4) );   
      
     // ---------------------------------------------------------------------------------------
     // ---- malformed CODE_  too short & too long
     // ---------------------------------------------------------------------------------------
-    
 
      p_start = (PKMX_WCHAR)u"abc\uFFFF\u0001";     
      p       = find_ptr_to_last_character(p_start);
@@ -418,63 +412,14 @@ void test_decxstr() {
      assert(q == (p - 5) );
 
     // ---------------------------------------------------------------------------------------
-    // ---- other 
-    // ---------------------------------------------------------------------------------------
-    
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0002def\u0001";
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);
-     assert(q == (p - 1) );
-
-     p_start = (PKMX_WCHAR)u"abc\uFFFF";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-
-     p_start = (PKMX_WCHAR)u"\uFFFF\U0001F609";        
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);
-     assert(q == (p - 2) );
-
-     p_start = (PKMX_WCHAR)u"\u0014d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-
-     p_start = (PKMX_WCHAR)u"\uFFFF";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);
-     assert(q == NULL );
-
-     p_start = (PKMX_WCHAR)u"\uFFFFd";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-
-     p_start = (PKMX_WCHAR)u"\uFFFF\uFFFF";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);
-     assert(q == p - 1 );
-
-     // ---------------------------------------------------------------------------------------
-     // ---- letter
-     // --------------------------------------------------------------------------------------- 
-   
-     p_start = (PKMX_WCHAR)u"abcd";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);
-       
-     assert(q == (p - 1) );
-
-    // ---------------------------------------------------------------------------------------
-    // ---- with \0 
+    // ---- \0 in sequence
     // ---------------------------------------------------------------------------------------
     
      p_start = (PKMX_WCHAR)u"abc\0";     
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);       
      assert(q == (p - 1) );
- /**/
+ 
      p_start = (PKMX_WCHAR)u"abc\0d";     
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);       
@@ -534,6 +479,46 @@ void test_decxstr() {
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);
      assert(q == (p - 1) );
+     
+    // ---------------------------------------------------------------------------------------
+    // ---- other 
+    // ---------------------------------------------------------------------------------------
+    
+     p_start = (PKMX_WCHAR)u"abc\uFFFF\u0002def\u0001";
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);
+     assert(q == (p - 1) );
+
+     p_start = (PKMX_WCHAR)u"abc\uFFFF";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 1) );
+
+     p_start = (PKMX_WCHAR)u"\uFFFF\U0001F609";        
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);
+     assert(q == (p - 2) );
+
+     p_start = (PKMX_WCHAR)u"\u0014d";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 1) );
+
+     p_start = (PKMX_WCHAR)u"\uFFFF";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);
+     assert(q == NULL );
+
+     p_start = (PKMX_WCHAR)u"\uFFFFd";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);       
+     assert(q == (p - 1) );
+
+     p_start = (PKMX_WCHAR)u"\uFFFF\uFFFF";     
+     p       = find_ptr_to_last_character(p_start);
+     q       = decxstr(p, p_start);
+     assert(q == p - 1 );
+
 }
 
 
@@ -1282,7 +1267,7 @@ int main(int argc, char *argv []) {
   auto arg_color = argc > 1 && std::string(argv[1]) == "--color";
   console_color::enabled = console_color::isaterminal() || arg_color;
 
-  //test_incxstr();
+  test_incxstr();
   test_decxstr();
 
   return 0;
