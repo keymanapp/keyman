@@ -182,7 +182,7 @@ namespace km {
       return engine_attrs;
     }
 
-    km_kbp_keyboard_key_rules const * mock_processor::get_key_rules() const {
+    km_kbp_keyboard_key_rules  * mock_processor::get_key_rules() const {
       return nullptr;
     }
 

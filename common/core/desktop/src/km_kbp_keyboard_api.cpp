@@ -84,12 +84,24 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
 
 km_kbp_status
 km_kbp_keyboard_get_key_rules(km_kbp_keyboard const *keyboard,
-                          km_kbp_keyboard_key_rules const **out)
+                          km_kbp_keyboard_key_rules **out)
 {
   assert(keyboard); assert(out);
   if (!keyboard || !out)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
+
   *out = keyboard->get_key_rules();
+  //km_kbp_keyboard_key_rules *test = new km_kbp_keyboard_key_rules[3];
+  // test[0].key = 66;
+  // test[1].key = 67;
+  // test[2].key = 0;
+  // *out = test;
+  // auto n = 0;
+  // for (; (*out)->key; ++(*out)) {
+  //   ++n;
+  // }
+  //DebugLog("api key_rules count: %d",  n);
   return KM_KBP_STATUS_OK;
 }
+

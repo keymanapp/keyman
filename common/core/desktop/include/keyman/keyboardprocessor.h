@@ -664,6 +664,7 @@ typedef struct {
   uint32_t modifier_flag;   // modifier flag for the rule
 } km_kbp_keyboard_key_rules;
 
+#define KM_KBP_KEYBOARD_KEY_RULES_END { 0, 0 }
 /*
 ```
 ### `km_kbp_keyboard_load`
@@ -753,7 +754,7 @@ for the lifetime of the opaque keyboard object. Do not modify the returned data.
 KMN_API
 km_kbp_status
 km_kbp_keyboard_get_key_rules(km_kbp_keyboard const *keyboard,
-                          km_kbp_keyboard_key_rules const **out);
+                          km_kbp_keyboard_key_rules **out);
 
 
 /*

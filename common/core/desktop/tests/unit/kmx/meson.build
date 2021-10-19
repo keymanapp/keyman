@@ -201,3 +201,14 @@ else
     test(kbd, kmx, args: [kbd_src, kbd_obj])
   endforeach
 endif
+
+# test for preserved keys
+
+key_e = executable('key_rules', 'kmx_key_rules.cpp',
+                cpp_args: defns,include_directories: [inc, libsrc],
+                link_args: links,
+                dependencies: [rust_mock_processor],
+                objects: lib.extract_all_objects())
+test('key_rules', key_e, args: [test_path] )
+
+

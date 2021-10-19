@@ -60,7 +60,7 @@ namespace kbp
       std::u16string const & value
     ) = 0;
 
-    virtual km_kbp_keyboard_key_rules const *
+    virtual km_kbp_keyboard_key_rules *
     get_key_rules() const = 0;
 
     virtual uint16_t

@@ -49,7 +49,7 @@ namespace kbp
       std::u16string const & value
     ) override;
 
-    km_kbp_keyboard_key_rules const * get_key_rules() const override;
+    km_kbp_keyboard_key_rules * get_key_rules() const override;
     uint16_t dummy_method()const override;
 
 
