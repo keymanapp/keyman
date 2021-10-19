@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.134 alpha 2021-10-19
+
+* docs(windows): add install apps from anywhere instructions (#5829)
+
 ## 15.0.133 alpha 2021-10-16
 
 * chore(common): Check in crowdin strings for Hausa (#5768)
