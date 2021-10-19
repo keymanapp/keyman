@@ -106,6 +106,8 @@ Any keyboard with that store set will work; if you don't have one at hand you ca
   - caps lock indicator turned off
   - output: `ncaps_little_a`
 
+**Note:** For `Test caps off 5` using a soft keyboard provided in virtual box will fail to turn the cap lock indicator off. This because the soft keyboard does pre processing of the shift key combined with any key pressed and the shift key stroke does not get sent to the keyman engine.
+
 ## CapsOnOnly/ShiftFreesCaps
 
 For these tests, use a keyboard with the `CapsOnOnly` and `ShiftFreesCaps` stores set. We call this keyboard _shift_frees_caps_ below.
