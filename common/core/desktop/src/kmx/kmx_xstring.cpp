@@ -148,8 +148,7 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
   return p;
 }
 
-PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart) {
-  
+PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart) {  
 
   if(p <= pStart) {
     return NULL;

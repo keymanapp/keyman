@@ -17,12 +17,10 @@ using namespace km::kbp::kmx;
 using namespace std;
 
 PKMX_WCHAR find_ptr_to_last_character(PKMX_WCHAR p_first) {
-  int length = wcslen((const wchar_t *)p_first);
- 
+  int length = wcslen((const wchar_t *)p_first); 
  if (length > 0)
     return p_first + length - 1;
   else
-  /**/
     return p_first;
 }
 
@@ -33,31 +31,12 @@ void test_decxstr() {
 		PKMX_WCHAR p;       // pointer end of input  
     PKMX_WCHAR q;       // pointer output
            
-    // ---------------------------------------------------------------------------------------------
-    // ---- differences in deltas for new decxstr
-    // --------------------------------------------------------------------------------------------- 
-/*
-     // ----- OLD version of decxstr: 0x0A and 0x0C not used; 0x0E originally set to 1 -------------    
-     // runs OK with OLD version of decxstr (with CODE_EXTENDED pointer moves 0 (1 altogether) )
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000A\u0001\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) );
-     
-     // runs OK with OLD version of decxstr (with CODE_SWITCH pointer moves 0 (1 altogether) )
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000C\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 1) ); 
+    // -------------------------------------------------------------------------------------------------------------------------------------------------------
+    // -- differences in pointer movement for new decxstr ----------------------------------------------------------------------------------------------------
+    // ----- OLD version of decxstr: 0x0A not used  => return ( p - 1) , 0x0C not used => return ( p - 1) , 0x0E = 1  => return ( p - 3) 
+    // ----- NEW version of decxstr: Values set in in CODE__SIZE[]: 0x0A = 2 => return ( p - 4) , 0x0C =1 => return ( p - 3) , 0x0E = 0  => return ( p - 1)     
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------- 
 
-     // runs OK with OLD version of decxstr (with CODE_CLEARCONTEXT pointer moves 2 (3 altogether) )
-     p_start = (PKMX_WCHAR)u"abc\uFFFF\u000E\u0001d";     
-     p       = find_ptr_to_last_character(p_start);
-     q       = decxstr(p, p_start);       
-     assert(q == (p - 3) );
-*/
-
-     // ----- NEW version of decxstr: 0x0A , 0x0C and 0x0E are set in CODE__SIZE[] (Value  2, 1, 0) --   
      // runs OK with NEW version of decxstr (with CODE_EXTENDED pointer moves 3 ( 4 altogether) 
      p_start = (PKMX_WCHAR)u"abc\uFFFF\u000A\u0001\u0001d";     
      p       = find_ptr_to_last_character(p_start);
@@ -518,7 +497,6 @@ void test_decxstr() {
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);
      assert(q == p - 1 );
-
 }
 
 
