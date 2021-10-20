@@ -148,8 +148,8 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
   return p;
 }
 
-PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart) {  
-
+PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
+{
   if(p <= pStart) {
     return NULL;
   }
@@ -181,8 +181,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart) {
     {
       //   *(p - i) == UC_SENTINEL  &&  next CODE_ right to UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
       if ((*(p - i) == UC_SENTINEL) && (CODE__SIZE[*(p - i + 1)] + 1 == i)) {
-        int jump = CODE__SIZE[*(p - i + 1)] + 1;
-        return (p - jump);
+        return (p - (CODE__SIZE[*(p - i + 1)] + 1));
       }
     }
   }
