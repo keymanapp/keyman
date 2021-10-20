@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.135 alpha 2021-10-20
+
+* docs(windows): add note to caps-lock-stores test (#5837)
+
 ## 15.0.134 alpha 2021-10-19
 
 * docs(windows): add install apps from anywhere instructions (#5829)
