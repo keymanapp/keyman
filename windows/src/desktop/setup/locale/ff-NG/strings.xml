@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Ɗemngal Fulfulde</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Wa`uggo</string>
+  <string name="ssTitle">Wa`unu $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION wa`aama no haandi.</string>
+  <string name="ssCancelQuery">A` tabbiti a` ɗo yiɗi wurtugo wa`innol man na $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Ɗo wurtina bondul...</string>
+  <string name="ssBootstrapCheckingPackages">Ɗo larta pakej</string>
+  <string name="ssBootstrapCheckingForUpdates">Ɗo larta dow lenguru ngam kesitiggo...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Ɗo larta vashon ko wa`inni...</string>
+  <string name="ssBootstrapReady">Ɗo timmina dow...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s jee %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Walaa ko wa`ina.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s jippunu)</string>
+  <string name="ssActionInstall">Wo`innol man wa`an:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION ɗum caahu on nden koomoy waaway naftira</string>
+  <string name="ssLicenseLink">&amp;Janngu lasisi man</string>
+  <string name="ssInstallOptionsLink">Cuɓol &amp;wa`innol</string>
+  <string name="ssMessageBoxTitle">$APPNAME Wo`innol</string>
+  <string name="ssOkButton">TOH</string>
+  <string name="ssInstallButton">&amp;Wa`innu</string>
+  <string name="ssCancelButton">Wurtu</string>
+  <string name="ssExitButton">W&amp;urtu</string>
+  <string name="ssStatusInstalling">Ɗo wa`inna $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Ɗo itta jee ɓoyma</string>
+  <string name="ssStatusComplete">Tmmini wa`ingo</string>
+  <string name="ssQueryRestart">Sayto a` kesiti lenguru windo bako wa`innol man timma. To a` kesiti lenguru windo, wa`innol man jokkitay.
+
+A` waɗan kesitol man jotta?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Lenguru windo man sali lorugo kesita bee hoore mum. Sayto a` kesiti lenguru windo bako a` foonda waɗita $APPNAME.</string>
+  <string name="ssMustRestart">Doole sayto a` kesiti windo bako wa`innol timma. To a` kesiti lenguru windo wa`innol man timman.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION ɗo mari haaje windo 7 ko ko ɓuri bako wa`a. Haa fahin, Keyman dow komputa 7, 8 ko 9 keptaama. A` ɗo yiɗi wa`inna kibod man na ko kawti nder wa`a ɗo dow Keyman jee dow komputa ko wa`ini ma?</string>
+  <string name="ssOldOsVersionDownload">Nonde $APPNAME ɗo mari haaje lenguru windo 7 ko ko ɓuri ɗum bako wa`a. A` ɗo yiɗi jippina Keyman jee dow Komputa 8?</string>
+  <string name="ssOptionsTitle">Cuɓol wa`innol</string>
+  <string name="ssOptionsTitleInstallOptions">Cuɓol wa`innol</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Setinji ko woni dow komputa $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Yebre man ngam wa`inna ko kesita</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Ɗemngal kibod ko wari bee man</string>
+  <string name="ssOptionsTitleLocation">Nonde ko wa`inta</string>
+  <string name="ssOptionsStartWithWindows">Fuɗɗu $APPNAME to lenguru windo man fuɗɗi</string>
+  <string name="ssOptionsStartAfterInstall">Fuɗɗu $APPNAME to wa`ingo man timmini</string>
+  <string name="ssOptionsCheckForUpdates">A` tefa kesitiggo dow online wakkati ɓaawo wakkati</string>
+  <string name="ssOptionsUpgradeKeyboards">A` kesita kibod ko wa`ini jee ɓoyma yaha nonde $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">A` senda wi`ɗitol naftirol dow sirru bee keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Nonde wa`innol: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Wa`unu $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Kesitu $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s arti wa`i.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Jippunu nonde %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Nonde %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Wa`unu %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Jippunu nonde %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Nonde %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">A` suɓa ɗemngal ngal a` yiɗi kawrugo bee %0:s kibod</string>
+  <string name="ssOptionsDefaultLanguage">Ɗemngal ko naftirta</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Jippingo %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Jippingo %0:s</string>
+  <string name="ssOffline">$APPNAME Nangataa keyman.com ngam jippina ɓeddaari kare kuuɗe.
+
+Usseni laaru dow a` ɗo online, nden a` hokka $APPNAME laawol wa`innol ngam keɓa nasta nder intanet dow settinji ma.
+
+A` ɓiɗɗa Abort ngam a` wurta wa`innol, a` foondita ngam a` fonnda jippingo kare kuuɗe fahin, ko bo a` wurta haala man ngam a` jokkita ha yaasi intanet.</string>
+</resources>
