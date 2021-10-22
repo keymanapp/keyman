@@ -65,6 +65,11 @@ public class PackageActivity extends AppCompatActivity implements
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
       kmpFile = new File(bundle.getString("kmpFile"));
+      if (!kmpFile.exists()) {
+        KMLog.LogError(TAG, kmpFile.getAbsolutePath() + " not found. Unable to extract");
+        showErrorToast(context, getString(R.string.failed_to_extract));
+        return;
+      }
       installMode = (KmpInstallMode) bundle.getSerializable("installMode");
       if(installMode == null) installMode = KmpInstallMode.Full;
       lastInstallMode = installMode;
@@ -230,6 +235,7 @@ public class PackageActivity extends AppCompatActivity implements
     setResult(1);
     cleanup();
     finish();
+    MainActivity.cleanupPackageInstall();
   }
 
   /**
