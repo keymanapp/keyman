@@ -1,32 +1,18 @@
 /*
   Copyright:    © 2018 SIL International.
-  Description:  Tests for kmx integration key rules
+  Description:  Tests for key rules list generation in the kmx processor
   Create Date:  30 Oct 2018
-  Authors:      Marc Durdin (MD), Tim Eves (TSE)
+  Authors:      Ross Cruickshank (RC) Marc Durdin (MD), Tim Eves (TSE)
 
-  Note: Exit codes will be 100*LINE + ERROR CODE, e.g. 25005 is code 5 on line 250
 */
-#include <algorithm>
-#include <cctype>
-#include <fstream>
-#include <iostream>
-#include <iomanip>
-#include <iterator>
-#include <list>
-#include <sstream>
-#include <string>
-#include <type_traits>
 
 #include <kmx/kmx_processevent.h>
-#include <kmx/kmx_xstring.h>
 
 #include "path.hpp"
 #include "state.hpp"
-#include "utfcodec.hpp"
 
 #include "../test_assert.h"
 #include "../test_color.h"
-
 
 using namespace km::kbp::kmx;
 
@@ -56,20 +42,17 @@ void test_key_rules(const km::kbp::path &source_path){
 
   try_status(km_kbp_keyboard_get_key_rules(test_kb,&kb_key_rules));
 
-  // Now see how many rules are there
-  //#define KM_KBP_KEYBOARD_KEY_RULES_END { 0, 0 }
-  //assert(kb_key_rules);
- DebugLog("key value: %d",  kb_key_rules[0].key);
+  km_kbp_keyboard_key_rules *key_rule_it = kb_key_rules;
   auto n = 0;
-  for (; kb_key_rules->key; ++kb_key_rules) {
+  for (; key_rule_it->key; ++key_rule_it) {
     ++n;
   }
-   DebugLog("key_rules test count: %d",  n);
   assert(n==2);
 
-  // Destroy them
+  km_kbp_keyboard_key_rules_dispose(kb_key_rules);
   km_kbp_state_dispose(test_state);
   km_kbp_keyboard_dispose(test_kb);
+
 }
 
 int main(int argc, char *argv []) {

@@ -53,7 +53,6 @@ namespace kbp
 
     km_kbp_keyboard_key_rules  * get_key_rules() const override;
 
-    uint16_t dummy_method() const override;
   };
 
   class null_processor : public mock_processor {

@@ -196,8 +196,8 @@ km_kbp_attr const & kmx_processor::attributes() const {
 }
 
 km_kbp_keyboard_key_rules * kmx_processor::get_key_rules() const  {
-  // iterate through the groups and get the rules with virtual keys.
-
+  // Iterate through the groups and get the rules with virtual keys
+  // and store the key along with the modifer.
   const uint32_t group_cnt = _kmx.GetKeyboard()->Keyboard->cxGroupArray;
   const LPGROUP group_array = _kmx.GetKeyboard()->Keyboard->dpGroupArray;
   uint16_t vk_count = 0;
@@ -210,30 +210,24 @@ km_kbp_keyboard_key_rules * kmx_processor::get_key_rules() const  {
       vk_count += group_array[i].cxKeyArray;
     }
   }
-  DebugLog("vk_count: %d",  vk_count);
+
   km_kbp_keyboard_key_rules *rules = new km_kbp_keyboard_key_rules[vk_count + 1];
   int n = 0;
   for(auto i = 0; i < group_cnt; i++)
   {
     p_group = &group_array[i];
-    DebugLog("Group array bp cnt %d",  i);
     if(p_group->fUsingKeys)
     {
       for(auto j = 0; j < p_group->cxKeyArray; j++)
       {
         // If we have a key rule for the key add it to the list
-        DebugLog("Key array key: %d modifier flag: %d",   p_group->dpKeyArray[j].Key, p_group->dpKeyArray[j].ShiftFlags);
         rules[n].key = p_group->dpKeyArray[j].Key;
         rules[n].modifier_flag = p_group->dpKeyArray[j].ShiftFlags;
         n++;
       }
     }
   }
-  // Insert terminating rule
+  // Insert list termination
   rules[n] =  KM_KBP_KEYBOARD_KEY_RULES_END;
   return rules;
-  //return nullptr;
-
 }
-
- uint16_t kmx_processor::dummy_method() const {return 0;}

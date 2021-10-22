@@ -77,9 +77,6 @@ namespace km {
     km_kbp_keyboard_key_rules  * rust_mock_processor::get_key_rules() const  {
       return nullptr;
     }
-
-    uint16_t rust_mock_processor::dummy_method() const {return 0;}
-
     km_kbp_status rust_mock_processor::validate() const { return KM_KBP_STATUS_OK; }
 
     km_kbp_status rust_null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }

@@ -202,7 +202,7 @@ else
   endforeach
 endif
 
-# test for preserved keys
+# test for key rule keys
 
 key_e = executable('key_rules', 'kmx_key_rules.cpp',
                 cpp_args: defns,include_directories: [inc, libsrc],

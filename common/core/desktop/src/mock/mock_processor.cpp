@@ -186,8 +186,6 @@ namespace km {
       return nullptr;
     }
 
-    uint16_t mock_processor::dummy_method() const {return 0;}
-
     km_kbp_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
 
     km_kbp_status null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }

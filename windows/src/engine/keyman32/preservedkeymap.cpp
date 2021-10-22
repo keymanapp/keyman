@@ -38,6 +38,18 @@ class PreservedKeyMap
 {
 public:
   BOOL MapKeyboard(KEYBOARD *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
+  /**
+   * Updates a map of preserved keys (with GUID) that are used in keyboard rules.
+   * Passing in NULL for pPreservedKeys will cause cPreservedKeys to be set to the number
+   * PreserveKeys needed for the supplied pKeyboard, this should be used in creating pPreservedKeys
+   * List to sufficent size. When pPreseredKeys list is passed the cPreservedKeys will be the actual
+   * count of the number of unique pPreseredKeys
+   *
+   * @param   pKeyboard  the keyboard for which the rules will be extracted from
+   * @param   pPreservedKeys  list of or PreservedKeys
+   * @param   cPreservedKeys  number of preserved keys in pPreservedKeys - or the size pPreservedKeys needs to be
+   * @return  BOOL  return TRUE if pPreveredKeys was updated
+   */
   BOOL MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
 
 private:
@@ -360,9 +372,8 @@ BOOL PreservedKeyMap::MapKeyboard(KEYBOARD *pKeyboard, PreservedKey **pPreserved
 
 BOOL
 PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys) {
-  size_t cKeys = 0, cRules, n;
-  DWORD i, j;
-  GROUP *pGroup;
+  size_t cKeys = 0, cRules = 0, n = 0;
+  DWORD i;
 
   m_BaseKeyboardUsesAltGr = KeyboardGivesCtrlRAltForRAlt();  // I4592
 
@@ -379,16 +390,18 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
   // This is where we will call down to the api to get all key rules
   km_kbp_keyboard_key_rules *kb_key_rules;
 
-  if (KM_KBP_STATUS_OK !=
-    (km_kbp_status_codes)km_kbp_keyboard_get_key_rules(pKeyboard, &kb_key_rules)) {
+  km_kbp_status err_status = km_kbp_keyboard_get_key_rules(pKeyboard, &kb_key_rules);
+  if ((err_status != KM_KBP_STATUS_OK) || (kb_key_rules ==nullptr)) {
     return FALSE;
   }
-    
-  for (; kb_key_rules->key; ++kb_key_rules) {
+
+  km_kbp_keyboard_key_rules *key_rule_it = kb_key_rules;
+  for (; key_rule_it->key; ++key_rule_it) {
     ++cRules;
-  } 
+  }
   cKeys = cRules;
   if (cKeys == 0) {
+    km_kbp_keyboard_key_rules_dispose(kb_key_rules);
     return FALSE;
   }
 
@@ -399,10 +412,12 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
 
   if (pPreservedKeys == NULL) {
     *cPreservedKeys = cKeys;
+    km_kbp_keyboard_key_rules_dispose(kb_key_rules);
     return TRUE;
   }
 
   if (*cPreservedKeys < cKeys) {
+    km_kbp_keyboard_key_rules_dispose(kb_key_rules);
     return FALSE;
   }
 
@@ -411,7 +426,7 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
 
   for (i = 0; i < cRules; i++) {
     // If we have a key rule for the key, we should preserve it
-    if (MapKeyRuleCore(&kb_key_rules[i], &pKeys[i].key)) {
+    if (MapKeyRuleCore(&kb_key_rules[i], &pKeys[n].key)) {
       // Don't attempt to add the same preserved key twice. Bad things happen
       if (!IsMatchingKey(&pKeys[n], pKeys, n)) {
         CoCreateGuid(&pKeys[n].guid);
@@ -428,8 +443,8 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
       }
     }
   }
-    
-  
+
+  km_kbp_keyboard_key_rules_dispose(kb_key_rules);
 
   *cPreservedKeys = n;  // return actual count of allocated keys, usually smaller than allocated count
   return TRUE;
@@ -451,12 +466,12 @@ extern "C" __declspec(dllexport) BOOL WINAPI GetKeyboardPreservedKeys(PreservedK
   }
   // It could be an active core keyboard
   if (Globals::get_CoreIntegration()) {
-    
+
     if (!_td->lpActiveKeyboard->lpCoreKeyboard) {
       return FALSE;
     }
     // use api to get key rules
-
+    return pkm.MapKeyboardCore(_td->lpActiveKeyboard->lpCoreKeyboard, pPreservedKeys, cPreservedKeys);
 
   } else {
     if (!_td->lpActiveKeyboard->Keyboard) {
@@ -464,5 +479,5 @@ extern "C" __declspec(dllexport) BOOL WINAPI GetKeyboardPreservedKeys(PreservedK
     }
     return pkm.MapKeyboard(_td->lpActiveKeyboard->Keyboard, pPreservedKeys, cPreservedKeys);
   }
-  
+
 }

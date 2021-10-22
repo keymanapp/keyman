@@ -660,7 +660,7 @@ typedef struct {
 } km_kbp_keyboard_attrs;
 
 typedef struct {
-  km_kbp_virtual_key key;   // The key rule
+  km_kbp_virtual_key key;   // The key the belongs
   uint32_t modifier_flag;   // modifier flag for the rule
 } km_kbp_keyboard_key_rules;
 
@@ -733,28 +733,30 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
 
 /*
 ```
-### `km_kbp_keyboard_get_attrs`
+### `km_kbp_keyboard_get_key_rules`
 ##### Description:
-Returns the const internal attributes of the keyboard. This structure is valid
-for the lifetime of the opaque keyboard object. Do not modify the returned data.
+Returns the list of keys that belong to keyboard rules. The matching dispose
+call needs to be called to free the memory.
 ##### Return status:
 - `KM_KBP_STATUS_OK`: On success.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque keyboard object to be queried.
 - __out__: A pointer to the result:
-    A pointer to a `km_kbp_keyboard_attrs` structure.
+    A pointer to a `km_kbp_keyboard_get_key_rules` structure.
 
 ```c
 */
-
-
 
 /* Get keyboard rules */
 KMN_API
 km_kbp_status
 km_kbp_keyboard_get_key_rules(km_kbp_keyboard const *keyboard,
                           km_kbp_keyboard_key_rules **out);
+
+
+
+void km_kbp_keyboard_key_rules_dispose(km_kbp_keyboard_key_rules *key_rules);
 
 
 /*

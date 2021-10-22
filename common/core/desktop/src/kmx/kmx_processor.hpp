@@ -49,9 +49,12 @@ namespace kbp
       std::u16string const & value
     ) override;
 
+    /**
+     * Get the list of keys belonging to the keyboard rules.
+     *
+     * @return  km_kbp_keyboard_key_rules*
+     */
     km_kbp_keyboard_key_rules * get_key_rules() const override;
-    uint16_t dummy_method()const override;
-
 
   };
 
