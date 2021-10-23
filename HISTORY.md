@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.136 alpha 2021-10-23
+
+* chore(android/engine): Address globe key TODO (#5836)
+
 ## 15.0.135 alpha 2021-10-20
 
 * docs(windows): add note to caps-lock-stores test (#5837)
