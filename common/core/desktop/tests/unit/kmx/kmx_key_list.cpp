@@ -26,11 +26,11 @@ int error_args() {
     return 1;
 }
 
-void test_key_rules(const km::kbp::path &source_path){
+void test_key_list(const km::kbp::path &source_path){
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
-  km_kbp_keyboard_key_rules * kb_key_rules;
+  km_kbp_keyboard_key * kb_key_list;
 
   km::kbp::path const source_keybard = "039 - generic ctrlalt.kmx";
   km::kbp::path full_path = km::kbp::path::join(source_path, source_keybard);
@@ -40,16 +40,16 @@ void test_key_rules(const km::kbp::path &source_path){
   // Setup state, environment
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
 
-  try_status(km_kbp_keyboard_get_key_rules(test_kb,&kb_key_rules));
+  try_status(km_kbp_keyboard_get_key_list(test_kb,&kb_key_list));
 
-  km_kbp_keyboard_key_rules *key_rule_it = kb_key_rules;
+  km_kbp_keyboard_key *key_rule_it = kb_key_list;
   auto n = 0;
   for (; key_rule_it->key; ++key_rule_it) {
     ++n;
   }
   assert(n==2);
 
-  km_kbp_keyboard_key_rules_dispose(kb_key_rules);
+  km_kbp_keyboard_key_list_dispose(kb_key_list);
   km_kbp_state_dispose(test_state);
   km_kbp_keyboard_dispose(test_kb);
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv []) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
-  test_key_rules(argv[first_arg]);
+  test_key_list(argv[first_arg]);
 
   return 0;
 }

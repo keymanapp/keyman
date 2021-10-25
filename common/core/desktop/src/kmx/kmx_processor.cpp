@@ -195,7 +195,7 @@ km_kbp_attr const & kmx_processor::attributes() const {
   return engine_attrs;
 }
 
-km_kbp_keyboard_key_rules * kmx_processor::get_key_rules() const  {
+km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
   // Iterate through the groups and get the rules with virtual keys
   // and store the key along with the modifer.
   const uint32_t group_cnt = _kmx.GetKeyboard()->Keyboard->cxGroupArray;
@@ -211,7 +211,7 @@ km_kbp_keyboard_key_rules * kmx_processor::get_key_rules() const  {
     }
   }
 
-  km_kbp_keyboard_key_rules *rules = new km_kbp_keyboard_key_rules[vk_count + 1];
+  km_kbp_keyboard_key *rules = new km_kbp_keyboard_key[vk_count + 1];
   int n = 0;
   for(auto i = 0; i < group_cnt; i++)
   {
@@ -228,6 +228,6 @@ km_kbp_keyboard_key_rules * kmx_processor::get_key_rules() const  {
     }
   }
   // Insert list termination
-  rules[n] =  KM_KBP_KEYBOARD_KEY_RULES_END;
+  rules[n] =  KM_KBP_KEYBOARD_KEY_LIST_END;
   return rules;
 }

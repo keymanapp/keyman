@@ -204,11 +204,11 @@ endif
 
 # test for key rule keys
 
-key_e = executable('key_rules', 'kmx_key_rules.cpp',
+key_e = executable('key_list', 'kmx_key_list.cpp',
                 cpp_args: defns,include_directories: [inc, libsrc],
                 link_args: links,
                 dependencies: [rust_mock_processor],
                 objects: lib.extract_all_objects())
-test('key_rules', key_e, args: [test_path] )
+test('key_list', key_e, args: [test_path] )
 
 

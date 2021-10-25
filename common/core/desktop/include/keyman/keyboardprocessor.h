@@ -662,9 +662,9 @@ typedef struct {
 typedef struct {
   km_kbp_virtual_key key;   // The key the belongs
   uint32_t modifier_flag;   // modifier flag for the rule
-} km_kbp_keyboard_key_rules;
+} km_kbp_keyboard_key;
 
-#define KM_KBP_KEYBOARD_KEY_RULES_END { 0, 0 }
+#define KM_KBP_KEYBOARD_KEY_LIST_END { 0, 0 }
 /*
 ```
 ### `km_kbp_keyboard_load`
@@ -733,9 +733,9 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
 
 /*
 ```
-### `km_kbp_keyboard_get_key_rules`
+### `km_kbp_keyboard_get_key_list`
 ##### Description:
-Returns the list of keys that belong to keyboard rules. The matching dispose
+Returns the list of keys that belong to the keyboard rules. The matching dispose
 call needs to be called to free the memory.
 ##### Return status:
 - `KM_KBP_STATUS_OK`: On success.
@@ -743,7 +743,7 @@ call needs to be called to free the memory.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque keyboard object to be queried.
 - __out__: A pointer to the result:
-    A pointer to a `km_kbp_keyboard_get_key_rules` structure.
+    A pointer to a `km_kbp_keyboard_get_key_list` structure.
 
 ```c
 */
@@ -751,12 +751,12 @@ call needs to be called to free the memory.
 /* Get keyboard rules */
 KMN_API
 km_kbp_status
-km_kbp_keyboard_get_key_rules(km_kbp_keyboard const *keyboard,
-                          km_kbp_keyboard_key_rules **out);
+km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
+                          km_kbp_keyboard_key **out);
 
 
 
-void km_kbp_keyboard_key_rules_dispose(km_kbp_keyboard_key_rules *key_rules);
+void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
 
 
 /*

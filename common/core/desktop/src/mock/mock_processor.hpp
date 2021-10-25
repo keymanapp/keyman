@@ -51,7 +51,7 @@ namespace kbp
       std::u16string const & value
     ) override;
 
-    km_kbp_keyboard_key_rules  * get_key_rules() const override;
+    km_kbp_keyboard_key  * get_key_list() const override;
 
   };
 

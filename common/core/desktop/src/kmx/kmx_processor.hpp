@@ -52,9 +52,9 @@ namespace kbp
     /**
      * Get the list of keys belonging to the keyboard rules.
      *
-     * @return  km_kbp_keyboard_key_rules*
+     * @return  km_kbp_keyboard_key*
      */
-    km_kbp_keyboard_key_rules * get_key_rules() const override;
+    km_kbp_keyboard_key * get_key_list() const override;
 
   };
 

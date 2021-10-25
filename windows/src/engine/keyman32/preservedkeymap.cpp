@@ -57,7 +57,7 @@ private:
   UINT ShiftToTSFShift(UINT ShiftFlags);
   BOOL MapUSCharToVK(UINT *puKey, UINT *puShiftFlags);
   BOOL MapKeyRule(KEY *pKey, TF_PRESERVEDKEY *pPreservedKey);
-  BOOL MapKeyRuleCore(km_kbp_keyboard_key_rules *pKeyRule, TF_PRESERVEDKEY *pPreservedKey);
+  BOOL MapKeyRuleCore(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey);
   BOOL IsMatchingKey(PreservedKey *pKey, PreservedKey *pKeys, size_t cKeys);
 };
 
@@ -237,7 +237,7 @@ BOOL PreservedKeyMap::MapKeyRule(KEY *pKey, TF_PRESERVEDKEY *pPreservedKey)
 }
 
 BOOL
-PreservedKeyMap::MapKeyRuleCore(km_kbp_keyboard_key_rules *pKeyRule, TF_PRESERVEDKEY *pPreservedKey) {
+PreservedKeyMap::MapKeyRuleCore(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey) {
   UINT ShiftFlags;
   UINT Key;
 
@@ -387,21 +387,21 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
   // So we exclude all our other favourite modifier keys.
   const UINT RALT_MATCHING_MASK = TF_MOD_CONTROL | TF_MOD_ALT | TF_MOD_LCONTROL | TF_MOD_RCONTROL | TF_MOD_LALT | TF_MOD_RALT;
 
-  // This is where we will call down to the api to get all key rules
-  km_kbp_keyboard_key_rules *kb_key_rules;
+  // This is where we will call down to the api to get list of keys used in the keyboard rules
+  km_kbp_keyboard_key *kb_key_list;
 
-  km_kbp_status err_status = km_kbp_keyboard_get_key_rules(pKeyboard, &kb_key_rules);
-  if ((err_status != KM_KBP_STATUS_OK) || (kb_key_rules ==nullptr)) {
+  km_kbp_status err_status = km_kbp_keyboard_get_key_list(pKeyboard, &kb_key_list);
+  if ((err_status != KM_KBP_STATUS_OK) || (kb_key_list ==nullptr)) {
     return FALSE;
   }
 
-  km_kbp_keyboard_key_rules *key_rule_it = kb_key_rules;
+  km_kbp_keyboard_key *key_rule_it = kb_key_list;
   for (; key_rule_it->key; ++key_rule_it) {
     ++cRules;
   }
   cKeys = cRules;
   if (cKeys == 0) {
-    km_kbp_keyboard_key_rules_dispose(kb_key_rules);
+    km_kbp_keyboard_key_list_dispose(kb_key_list);
     return FALSE;
   }
 
@@ -412,12 +412,12 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
 
   if (pPreservedKeys == NULL) {
     *cPreservedKeys = cKeys;
-    km_kbp_keyboard_key_rules_dispose(kb_key_rules);
+    km_kbp_keyboard_key_list_dispose(kb_key_list);
     return TRUE;
   }
 
   if (*cPreservedKeys < cKeys) {
-    km_kbp_keyboard_key_rules_dispose(kb_key_rules);
+    km_kbp_keyboard_key_list_dispose(kb_key_list);
     return FALSE;
   }
 
@@ -426,7 +426,7 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
 
   for (i = 0; i < cRules; i++) {
     // If we have a key rule for the key, we should preserve it
-    if (MapKeyRuleCore(&kb_key_rules[i], &pKeys[n].key)) {
+    if (MapKeyRuleCore(&kb_key_list[i], &pKeys[n].key)) {
       // Don't attempt to add the same preserved key twice. Bad things happen
       if (!IsMatchingKey(&pKeys[n], pKeys, n)) {
         CoCreateGuid(&pKeys[n].guid);
@@ -444,7 +444,7 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
     }
   }
 
-  km_kbp_keyboard_key_rules_dispose(kb_key_rules);
+  km_kbp_keyboard_key_list_dispose(kb_key_list);
 
   *cPreservedKeys = n;  // return actual count of allocated keys, usually smaller than allocated count
   return TRUE;
