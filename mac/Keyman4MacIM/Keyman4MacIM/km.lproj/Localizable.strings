@@ -1,0 +1,55 @@
+/*
+  Localizable.strings
+  Keyman4MacIM
+
+  Created by Shawn Schantz on 10/11/21.
+  Copyright © 2021 SIL International. All rights reserved.
+*/
+
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "តើអ្នកពិតជាចង់លុបក្ដារចុច '%@' នេះឬ?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "អ្នកមិនអាចត្រឡប់សកម្មភាពវិញបានទេ។";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "កុំលុប";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "លុប";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "ដំឡើងក្ដារចុច Keyman?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "តើអ្នកចង់ឱ្យ Keyman ដំឡើងក្ដារចុចពីឯកសារ '%@' នេះឬ?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "បោះបង់";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "ដំឡើង";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "មិនអាចអានឯកសារ Keyman '%@' នេះបានទេ។";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "យល់ព្រម";
+
+/* label text to identify Keyman version */
+"version-label-text" = "ជំនាន់  %@";
+
+/* text to identify the window that displays keyboard information */
+"window-title-keyboard-info" = "ព័ត៌មានក្ដារចុច";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "កំពុងទាញយក...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "បានទាញយករួចរាល់។";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "បោះបង់";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "រួចរាល់";

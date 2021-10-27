@@ -10,6 +10,8 @@
 		293EA3E627140D8100545EED /* KMAboutWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3E827140D8100545EED /* KMAboutWindowController.xib */; };
 		293EA3EB27140DEC00545EED /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3ED27140DEC00545EED /* preferences.xib */; };
 		293EA3F427181FDA00545EED /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3F627181FDA00545EED /* Localizable.strings */; };
+		29B42A572728339900EDD5D3 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A592728339900EDD5D3 /* KMInfoWindowController.xib */; };
+		29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -46,11 +48,9 @@
 		98E6729F1B532F5E00DBDE2F /* KMDownloadKBWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98E6729D1B532F5D00DBDE2F /* KMDownloadKBWindowController.m */; };
 		98E672A01B532F5E00DBDE2F /* KMDownloadKBWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98E6729E1B532F5E00DBDE2F /* KMDownloadKBWindowController.xib */; };
 		98E672A41B532F9900DBDE2F /* KMKeyboardHelpWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98E672A21B532F9900DBDE2F /* KMKeyboardHelpWindowController.m */; };
-		98E672A51B532F9900DBDE2F /* KMKeyboardHelpWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98E672A31B532F9900DBDE2F /* KMKeyboardHelpWindowController.xib */; };
 		98F3C8931A8D739500F675E3 /* KMConfigurationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F3C8911A8D739500F675E3 /* KMConfigurationWindowController.m */; };
 		98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE105D1B4DE8F400525F54 /* NSWindow+SuppMethods.m */; };
 		98FE10631B4DEE5600525F54 /* KMInfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */; };
-		98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */; };
 		9A3D6C5D221531B0008785A3 /* KMOSVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3D6C5C221531B0008785A3 /* KMOSVersion.m */; };
 		B90818AF7ED302187DE0E026 /* Pods_Keyman.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B644E63217FFE54B91C71C94 /* Pods_Keyman.framework */; };
 		E211769D20E182DD00F8065D /* NoContextTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E211769C20E182DD00F8065D /* NoContextTestClient.m */; };
@@ -133,6 +133,16 @@
 		293EA3EF27140DFA00545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/preferences.strings; sourceTree = "<group>"; };
 		293EA3F02714158600545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		293EA3F527181FDA00545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29B348AA2726F1C1009B1C82 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
+		29B348AB2726F1C2009B1C82 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/preferences.strings; sourceTree = "<group>"; };
+		29B348AC2726F1C2009B1C82 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		29B348AE2726F1C7009B1C82 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29B42A582728339900EDD5D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/KMInfoWindowController.xib; sourceTree = "<group>"; };
+		29B42A5B2728339E00EDD5D3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
+		29B42A5F272833A600EDD5D3 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
+		29B42A612728343B00EDD5D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/KMKeyboardHelpWindowController.xib; sourceTree = "<group>"; };
+		29B42A642728343F00EDD5D3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
+		29B42A682728344600EDD5D3 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
 		370E44542564E1EE00642929 /* Sentry.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Sentry.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37589AD422E52DA20097D39D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keyman.entitlements; sourceTree = "<group>"; };
 		37A00ED4239AA25700D2C837 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -140,7 +150,6 @@
 		37A00ED7239AA25700D2C837 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		37A00ED8239AA25700D2C837 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		37A00EDA239AA25D00D2C837 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		37A00EDD239AA25D00D2C837 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		37A00EDF239AA25D00D2C837 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37A00EE0239AA25D00D2C837 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		37A00EE2239AA25D00D2C837 /* ConfigurationHost.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ConfigurationHost.entitlements; sourceTree = "<group>"; };
@@ -204,14 +213,12 @@
 		98E6729E1B532F5E00DBDE2F /* KMDownloadKBWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = KMDownloadKBWindowController.xib; path = Keyman4MacIM/KMDownloadKeyboard/KMDownloadKBWindowController.xib; sourceTree = "<group>"; };
 		98E672A11B532F9900DBDE2F /* KMKeyboardHelpWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMKeyboardHelpWindowController.h; path = Keyman4MacIM/KMKeyboardHelpWindow/KMKeyboardHelpWindowController.h; sourceTree = "<group>"; };
 		98E672A21B532F9900DBDE2F /* KMKeyboardHelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMKeyboardHelpWindowController.m; path = Keyman4MacIM/KMKeyboardHelpWindow/KMKeyboardHelpWindowController.m; sourceTree = "<group>"; };
-		98E672A31B532F9900DBDE2F /* KMKeyboardHelpWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = KMKeyboardHelpWindowController.xib; path = Keyman4MacIM/KMKeyboardHelpWindow/KMKeyboardHelpWindowController.xib; sourceTree = "<group>"; };
 		98F3C8901A8D739500F675E3 /* KMConfigurationWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMConfigurationWindowController.h; path = Keyman4MacIM/KMConfiguration/KMConfigurationWindowController.h; sourceTree = "<group>"; };
 		98F3C8911A8D739500F675E3 /* KMConfigurationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMConfigurationWindowController.m; path = Keyman4MacIM/KMConfiguration/KMConfigurationWindowController.m; sourceTree = "<group>"; };
 		98FE105C1B4DE8F400525F54 /* NSWindow+SuppMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSWindow+SuppMethods.h"; path = "Categories/NSWindow+SuppMethods.h"; sourceTree = "<group>"; };
 		98FE105D1B4DE8F400525F54 /* NSWindow+SuppMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+SuppMethods.m"; path = "Categories/NSWindow+SuppMethods.m"; sourceTree = "<group>"; };
 		98FE10601B4DEE5600525F54 /* KMInfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMInfoWindowController.h; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.h; sourceTree = "<group>"; };
 		98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMInfoWindowController.m; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.m; sourceTree = "<group>"; };
-		98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = KMInfoWindowController.xib; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.xib; sourceTree = "<group>"; };
 		9A3D6C5B221531B0008785A3 /* KMOSVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMOSVersion.h; sourceTree = "<group>"; };
 		9A3D6C5C221531B0008785A3 /* KMOSVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMOSVersion.m; sourceTree = "<group>"; };
 		A71FD8BA8404531DFBD861B6 /* Pods_KeymanTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KeymanTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -296,7 +303,6 @@
 				37A00ED7239AA25700D2C837 /* ViewController.h */,
 				37A00ED8239AA25700D2C837 /* ViewController.m */,
 				37A00EDA239AA25D00D2C837 /* Assets.xcassets */,
-				37A00EDC239AA25D00D2C837 /* Main.storyboard */,
 				37A00EDF239AA25D00D2C837 /* Info.plist */,
 				37A00EE0239AA25D00D2C837 /* main.m */,
 				37A00EE2239AA25D00D2C837 /* ConfigurationHost.entitlements */,
@@ -491,7 +497,7 @@
 			children = (
 				98E672A11B532F9900DBDE2F /* KMKeyboardHelpWindowController.h */,
 				98E672A21B532F9900DBDE2F /* KMKeyboardHelpWindowController.m */,
-				98E672A31B532F9900DBDE2F /* KMKeyboardHelpWindowController.xib */,
+				29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */,
 			);
 			name = KMKeyboardHelpWindow;
 			path = ..;
@@ -513,7 +519,7 @@
 			children = (
 				98FE10601B4DEE5600525F54 /* KMInfoWindowController.h */,
 				98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */,
-				98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */,
+				29B42A592728339900EDD5D3 /* KMInfoWindowController.xib */,
 			);
 			name = KMInfoWindow;
 			path = ..;
@@ -630,12 +636,12 @@
 			};
 			buildConfigurationList = 989C9C031A7876DE00A20425 /* Build configuration list for PBXProject "Keyman4MacIM" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
+				km,
 			);
 			mainGroup = 989C9BFF1A7876DE00A20425;
 			productRefGroup = 989C9C091A7876DE00A20425 /* Products */;
@@ -664,7 +670,7 @@
 				37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */,
 				37C2B0CB25FF2C350092E16A /* Help in Resources */,
 				984B8F451AF1C3D900E096A8 /* OSKWindowController.xib in Resources */,
-				98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */,
+				29B42A572728339900EDD5D3 /* KMInfoWindowController.xib in Resources */,
 				E213601E2142D7C000A043B7 /* keyman-88.png in Resources */,
 				293EA3F427181FDA00545EED /* Localizable.strings in Resources */,
 				98BF92471BF01D890002126A /* image.jpg in Resources */,
@@ -673,7 +679,7 @@
 				293EA3EB27140DEC00545EED /* preferences.xib in Resources */,
 				9800EC5A1C02940300BF0FB5 /* keyman-for-mac-os-license.html in Resources */,
 				989C9C161A7876DE00A20425 /* MainMenu.xib in Resources */,
-				98E672A51B532F9900DBDE2F /* KMKeyboardHelpWindowController.xib in Resources */,
+				29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */,
 				98BF92541BF040A50002126A /* title.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -864,6 +870,7 @@
 			children = (
 				293EA3E727140D8100545EED /* Base */,
 				293EA3EA27140D8E00545EED /* en */,
+				29B348AA2726F1C1009B1C82 /* km */,
 			);
 			name = KMAboutWindowController.xib;
 			sourceTree = "<group>";
@@ -873,6 +880,7 @@
 			children = (
 				293EA3EC27140DEC00545EED /* Base */,
 				293EA3EF27140DFA00545EED /* en */,
+				29B348AB2726F1C2009B1C82 /* km */,
 			);
 			name = preferences.xib;
 			path = Keyman4MacIM/KMConfiguration;
@@ -882,16 +890,31 @@
 			isa = PBXVariantGroup;
 			children = (
 				293EA3F527181FDA00545EED /* en */,
+				29B348AE2726F1C7009B1C82 /* km */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
-		37A00EDC239AA25D00D2C837 /* Main.storyboard */ = {
+		29B42A592728339900EDD5D3 /* KMInfoWindowController.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				37A00EDD239AA25D00D2C837 /* Base */,
+				29B42A582728339900EDD5D3 /* Base */,
+				29B42A5B2728339E00EDD5D3 /* en */,
+				29B42A5F272833A600EDD5D3 /* km */,
 			);
-			name = Main.storyboard;
+			name = KMInfoWindowController.xib;
+			path = Keyman4MacIM/KMInfoWindow;
+			sourceTree = "<group>";
+		};
+		29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				29B42A612728343B00EDD5D3 /* Base */,
+				29B42A642728343F00EDD5D3 /* en */,
+				29B42A682728344600EDD5D3 /* km */,
+			);
+			name = KMKeyboardHelpWindowController.xib;
+			path = Keyman4MacIM/KMKeyboardHelpWindow;
 			sourceTree = "<group>";
 		};
 		989C9C141A7876DE00A20425 /* MainMenu.xib */ = {
@@ -899,6 +922,7 @@
 			children = (
 				293EA3E527140D3A00545EED /* Base */,
 				293EA3F02714158600545EED /* en */,
+				29B348AC2726F1C2009B1C82 /* km */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
