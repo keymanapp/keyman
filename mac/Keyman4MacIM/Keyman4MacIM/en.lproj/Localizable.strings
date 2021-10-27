@@ -37,10 +37,7 @@
 "button-keyboard-file-unreadable" = "OK";
 
 /* label text to identify Keyman version */
-"version-label-text" = "Version  %@";
-
-/* text to identify the window that displays keyboard information */
-"window-title-keyboard-info" = "Keyboard Information";
+"version-label-text" = "Version %@";
 
 /* Status text for keyboard downloading  */
 "message-keyboard-downloading" = "Downloading...";

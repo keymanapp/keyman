@@ -37,10 +37,7 @@
 "button-keyboard-file-unreadable" = "យល់ព្រម";
 
 /* label text to identify Keyman version */
-"version-label-text" = "ជំនាន់  %@";
-
-/* text to identify the window that displays keyboard information */
-"window-title-keyboard-info" = "ព័ត៌មានក្ដារចុច";
+"version-label-text" = "ជំនាន់ %@";
 
 /* Status text for keyboard downloading  */
 "message-keyboard-downloading" = "កំពុងទាញយក...";
