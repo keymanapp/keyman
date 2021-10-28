@@ -220,9 +220,7 @@
       var ta = document.getElementById('ta');
       var kmw = window['keyman'];
       var resetContext = (ta.selectionStart != start || ta.selectionEnd != end);
-      // Intentionally not passing ta._KeymanWebSelectionStart because the selected text is going to be replaced with the inserted text
-      // Issue #5853
-      ta.selectionStart = ta._KeymanWebSelectionEnd = end;
+      ta.selectionStart = ta._KeymanWebSelectionStart = start;
       ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
       kmw['setActiveElement'](ta);
       if(resetContext) {
