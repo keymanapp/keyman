@@ -78,6 +78,7 @@ tests = [
 if build_machine.system() == 'windows'
   kmcomp = find_program('kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
+  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
 else
   kmcomp = find_program('kmcomp', required: false)
   kmcomp_cmd = [kmcomp]
@@ -89,6 +90,7 @@ else
       kmcomp = disabler()
     endif
   endif
+  copy_cmd = [find_program('cp', required: true)]
 endif
 
 if compiler.get_id() == 'emscripten'
@@ -115,13 +117,13 @@ foreach kbd : tests
     ]
   }'''
   configure_file(
-    copy: true,
+    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
     input: kbd + '.kmn',
     output: kbd + '.kmn'
   )
   if not kmcomp.found()
     configure_file(
-      copy: true,
+      command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
       input: kbd + '.kmx',
       output: kbd + '.kmx'
     )
