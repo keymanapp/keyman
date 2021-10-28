@@ -277,9 +277,8 @@ ibus_keyman_engine_constructor(
 ) {
     IBusKeymanEngine *keyman;
     IBusEngine *engine;
-    IBusText *text;
     const gchar *engine_name;
-    gchar *surrounding_text, *p, *abs_kmx_path;
+    gchar *p, *abs_kmx_path;
     guint cursor_pos, anchor_pos;
     km_kbp_context_item *context_items;
 
