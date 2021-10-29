@@ -203,7 +203,7 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
   uint16_t vk_count = 0;
   GROUP *p_group;
 
-  for(auto i = 0; i < group_cnt; i++)
+  for(auto i = decltype(group_cnt){0}; i < group_cnt; i++)
   {
     if(group_array[i].fUsingKeys)
     {
@@ -213,12 +213,12 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
 
   km_kbp_keyboard_key *rules = new km_kbp_keyboard_key[vk_count + 1];
   int n = 0;
-  for(auto i = 0; i < group_cnt; i++)
+  for(auto i = decltype(group_cnt){0}; i < group_cnt; i++)
   {
     p_group = &group_array[i];
     if(p_group->fUsingKeys)
     {
-      for(auto j = 0; j < p_group->cxKeyArray; j++)
+      for(auto j = decltype(p_group->cxKeyArray){0}; j < p_group->cxKeyArray; j++)
       {
         // If we have a key rule for the key add it to the list
         rules[n].key = p_group->dpKeyArray[j].Key;
