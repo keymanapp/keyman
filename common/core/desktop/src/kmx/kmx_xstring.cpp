@@ -179,10 +179,9 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   {
     for (int i = 1; i < 5; i++)
     {
-      //   *(p - i) == UC_SENTINEL  &&  next CODE_ right to UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
-      if ((*(p - i) == UC_SENTINEL) && (CODE__SIZE[*(p - i + 1)] + 1 == i)) {
+      //   p right of pstart &&  *(p - i) == UC_SENTINEL  &&  next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
+      if ((p >= pStart + i)  && (*(p - i) == UC_SENTINEL) && (CODE__SIZE[*(p - i + 1)] + 1 == i))
         return (p - (CODE__SIZE[*(p - i + 1)] + 1));
-      }
     }
   }
   return p; 
