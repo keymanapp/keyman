@@ -81,6 +81,12 @@ constexpr km_kbp_option_item const expected_persist_opt = {
   KM_KBP_OPT_KEYBOARD
 };
 
+static uint8_t test_imx_callback(km_kbp_state *state, uint32_t store_no){
+
+  // does nothing;
+  return 1;
+}
+
 } // namespace
 
 int main(int argc, char * argv[])
@@ -92,6 +98,10 @@ int main(int argc, char * argv[])
   km_kbp_state * test_state = nullptr,
                * test_clone = nullptr;
   try_status(km_kbp_keyboard_load(km::kbp::path("dummy.mock").c_str(), &test_kb));
+
+  // Check registering platform engine callback
+  km_kbp_state_imx_register_callback(test_state, test_imx_callback);
+  //km_kbp_state_imx_deregister_callback(test_state);
 
   // Simple sanity tests.
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));

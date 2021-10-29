@@ -240,3 +240,55 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
   rules[n] =  KM_KBP_KEYBOARD_KEY_LIST_END;
   return rules;
 }
+
+km_kbp_keyboard_imx * kmx_processor::get_imx_list() const  {
+
+  const uint32_t store_cnt = _kmx.GetKeyboard()->Keyboard->cxStoreArray;
+  const LPSTORE store_array = _kmx.GetKeyboard()->Keyboard->dpStoreArray;
+  uint16_t fn_count = 0;
+  uint16_t fn_idx = 0;
+  GROUP *p_group;
+
+
+  for(auto i = 0; i < store_cnt; i++)
+  {
+    LPSTORE p_store = &store_array[i];
+    if(p_store->dwSystemID == TSS_CALLDEFINITION)
+		{
+      fn_count++;
+    }
+  }
+
+  km_kbp_keyboard_imx *imx_list = new km_kbp_keyboard_imx[fn_count + 1];
+
+  for(auto i = 0; i < store_cnt; i++)
+  {
+    LPSTORE p_store = &store_array[i];
+    if(p_store->dwSystemID == TSS_CALLDEFINITION)
+		{
+			/* Break the store string into components */
+
+			PKMX_CHAR full_fn_name = wstrtostr(p_store->dpString), lib_name, fn_name, context;
+
+			lib_name = strtok_s(full_fn_name, ":", &context);
+			fn_name = strtok_s(NULL, ":", &context);
+
+			if(!lib_name || !fn_name)
+			{
+				//s->dwSystemID = TSS_CALLDEFINITION_LOADFAILED;
+				delete[] full_fn_name;
+				continue;
+			}
+
+      imx_list[fn_idx].library_name = strtowstr(lib_name);
+      imx_list[fn_idx].function_name = strtowstr(fn_name);
+      imx_list[fn_idx].store_no = i;
+		  delete[] full_fn_name;
+      fn_idx++;
+		}
+  }
+  // Insert list termination
+  imx_list[fn_idx] =  KM_KBP_KEYBOARD_IMX_END;
+  return imx_list;
+}
+

@@ -489,6 +489,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
       case CODE_CALL:
         p++;
         DebugLog("CallDLL not supported [store=%d].\n", *p-1);
+        //m_kbp_state->imx_callback(*p-1);
         FoundUse = TRUE;
         break;
       case CODE_USE:          // use another group

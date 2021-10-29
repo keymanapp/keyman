@@ -47,3 +47,16 @@ state::state(km::kbp::abstract_processor & ap, km_kbp_option_item const *env)
                      env->value);
   }
 }
+
+void state::imx_register_callback(km_kbp_keyboard_imx_platform imx_callback){
+  _imx_callback = imx_callback;
+  //km_kbp_keyboard_imx_platform test_fn_ptr = imx_callback;
+}
+
+void state::imx_deregister_callback(){
+  _imx_callback = nullptr;
+}
+
+void state::imx_callback(uint32_t store_no){
+  _imx_callback(static_cast<km_kbp_state *>(this), store_no);
+}

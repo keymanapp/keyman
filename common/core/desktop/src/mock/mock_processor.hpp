@@ -53,6 +53,8 @@ namespace kbp
 
     km_kbp_keyboard_key  * get_key_list() const override;
 
+    km_kbp_keyboard_imx  * get_imx_list() const override;
+
   };
 
   class null_processor : public mock_processor {

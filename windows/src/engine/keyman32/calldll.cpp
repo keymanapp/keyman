@@ -30,8 +30,8 @@
 
 typedef BOOL (WINAPI *InitDllFunction)(PSTR name);
 
-/* Add a dll to the list of dlls associated with the keyboard */
-
+/* Add a dll to the list of dlls associated with the keyboard */ 
+// core processor implmentation also uses the 
 static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilename)
 {
 	DWORD j;
@@ -186,6 +186,7 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 	SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Exit");
 	return TRUE;
 }
+
 
 BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi)
 {
@@ -375,4 +376,40 @@ BOOL IsIMWindow(HWND hwnd)
 	if(hwnd == *Globals::hwndIM()) return TRUE;
 	if(!*Globals::hwndIM()) return FALSE;
 	return IsChild(*Globals::hwndIM(), hwnd);
+}
+
+// All the functions bellow are used for interaction with the core processor.
+
+
+/* Load the dlls associated with a keyboard */
+
+BOOL
+LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
+  char fullname[_MAX_PATH];
+
+  // SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Enter");
+
+  if (lpkbi->nIMDLLs > 0)
+    if (!UnloadDLLs(lpkbi))
+      return FALSE;
+
+  if (!GetKeyboardFileName(lpkbi->Name, fullname, _MAX_PATH))
+    return FALSE;
+  if (!lpkbi->lpCoreKeyboard)
+    return FALSE;
+
+  km_kbp_keyboard_imx *imx_list = lpkbi->lpIMXList;
+
+  for (; imx_list; ++imx_list) {
+    LPIMDLL imd = AddIMDLL(lpkbi, fullname, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->library_name)));
+    if (imd && AddIMDLLHook(imd, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->function_name)), imx_list->store_no, &s->dpString))
+      s->dwSystemID = TSS_CALLDEFINITION;
+    else
+      s->dwSystemID = TSS_CALLDEFINITION_LOADFAILED;
+
+    delete[] p;
+  }
+
+  // SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Exit");
+  return TRUE;
 }
