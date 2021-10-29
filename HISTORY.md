@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.138 alpha 2021-10-29
+
+* chore(linux): Set correct version number on ibus component (#5859)
+* chore(common/core): generate kmp.json (#5860)
+
 ## 15.0.137 alpha 2021-10-28
 
 * chore(common): Don't check for conventional commit for fixups (#5858)
