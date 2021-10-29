@@ -131,6 +131,10 @@ typedef struct km_kbp_options     km_kbp_options;
 //
 typedef struct km_kbp_option_item  km_kbp_option_item;
 
+// Callback functions
+//
+typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t);
+
 /*```
 ### Error Handling
 Error handling and success failure notification are communicated through a
@@ -665,6 +669,16 @@ typedef struct {
 } km_kbp_keyboard_key;
 
 #define KM_KBP_KEYBOARD_KEY_LIST_END { 0, 0 }
+
+typedef struct {
+  km_kbp_cp const * library_name;
+  km_kbp_cp const * function_name;
+  uint32_t store_no;
+} km_kbp_keyboard_imx;
+
+
+#define KM_KBP_KEYBOARD_IMX_END { 0, 0 }
+
 /*
 ```
 ### `km_kbp_keyboard_load`
@@ -753,6 +767,7 @@ km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
                             km_kbp_keyboard_key **out);
 
 
+
 /*
 ```
 ### `km_kbp_keyboard_key_list_dispose`
@@ -765,7 +780,27 @@ returned by `km_kbp_keyboard_get_key_list`.
 
 ```c
 */
+KMN_API
 void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
+
+
+/**
+ * km_kbp_keyboard_get_imx_libs
+ *
+ */
+KMN_API
+km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx** imx_list);
+
+KMN_API
+void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list);
+
+// TODO: typdef this something like typedef BOOL (*km_kbp_keyboard_imx_platform)(uint32_t)
+//typedef BOOL (*km_kbp_keyboard_imx_platform)(uint32_t)
+KMN_API
+void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback);
+
+KMN_API
+void km_kbp_state_imx_deregister_callback(km_kbp_state *state);
 
 
 /*

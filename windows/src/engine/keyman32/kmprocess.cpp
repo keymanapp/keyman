@@ -902,7 +902,7 @@ PWSTR strtowstr(PSTR in)
 }
 
 
-PSTR wstrtostr(PWSTR in)
+PSTR wstrtostr(PCWSTR in)
 {
     PSTR result;
     size_t len;

@@ -200,3 +200,13 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
   return KM_KBP_STATUS_OK;
 
 }
+
+void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback)
+{
+  state->imx_register_callback(imx_callback);
+}
+
+void km_kbp_state_imx_deregister_callback(km_kbp_state *state)
+{
+  state->imx_deregister_callback();
+}

@@ -23,6 +23,10 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL ActivateDLLs(LPINTKEYBOARDINFO lpkbi);
+// Core processor integration of dlls
+
+BOOL LoadDLLsCore(LPINTKEYBOARDINFO lpkbi);
+
 
 BOOL IsIMWindow(HWND hwnd);
 

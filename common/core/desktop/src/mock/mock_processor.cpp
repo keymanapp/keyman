@@ -186,6 +186,11 @@ namespace km {
       km_kbp_keyboard_key* key_list = new km_kbp_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
       return key_list;
     }
+
+    km_kbp_keyboard_imx  * mock_processor::get_imx_list() const  {
+      return nullptr;
+    }
+
     km_kbp_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
 
     km_kbp_status null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }

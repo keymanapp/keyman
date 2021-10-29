@@ -102,8 +102,6 @@ BOOL LoadlpKeyboardCore(int i)
   }
   delete keyboardPath;
 
-  // TODO: 5650 handle dlls
-  //LoadDLLs(&_td->lpKeyboards[i]);
   const km_kbp_option_item test_env_opts[] =
   {
     KM_KBP_OPTIONS_END
@@ -114,10 +112,18 @@ BOOL LoadlpKeyboardCore(int i)
     SendDebugMessageFormat(
         0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_state_create failed with error status [%d]", err_status);
     // Dispose of the keyboard to leave us in a consistent state
-    ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
+    ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
     return FALSE;
   }
+  // TODO: 5650 handle dlls
+  // LoadDLLs(&_td->lpKeyboards[i]);
+  // Get the list of dlls to load set the call back
+  // Note we need to also deregister the callback
+  // use my core state to get my keyboard then get the list.
+  err_status = km_kbp_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
 
+  LoadDLLsCore(&_td->lpKeyboards[i]);
+  
   LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpCoreKeyboardState);
 
   return TRUE;
