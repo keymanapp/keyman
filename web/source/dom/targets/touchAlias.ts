@@ -32,10 +32,17 @@ namespace com.keyman.dom.targets {
 
     hasSelection(): boolean {
       let Lsel = this.root.ownerDocument.getSelection();
-      if (Lsel) {
-        return Lsel.toString().length > 0;
+      let outerSel = document.getSelection();
+
+      if (Lsel && outerSel) {
+        // If the outer doc's selection matches, we're active.
+        // Both start and end elements need to be the same
+        if(outerSel.anchorNode == Lsel.anchorNode && outerSel.focusNode == Lsel.focusNode &&
+            Lsel.anchorNode == Lsel.focusNode) {
+          return true;
+        }
       }
-      return false;
+      return false; // designIFrame returns true?
     }
 
     getDeadkeyCaret(): number {
