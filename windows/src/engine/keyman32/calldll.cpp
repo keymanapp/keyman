@@ -177,7 +177,7 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 	return TRUE;
 }
 
-
+// Both Core and Window keyboard processor can use this function
 BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi)
 {
 	if(!lpkbi)
@@ -243,6 +243,42 @@ void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
 
 	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Exit");
 }
+
+// The callback function from core
+//typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state *, uint32_t);
+// TODO need to update this to have LPINTKEYBOARDINFO lpkbi in the callback. So the callback will store the object.
+// will not need km_state anymore
+uint8_t
+IM_CallBackCore(void* callbackObject, km_kbp_state *km_state, uint32_t UniqueStoreNo) {
+  // SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");
+  if (callbackObject == NULL) {
+    return;
+  }
+  LPINTKEYBOARDINFO lpkbi = (LPINTKEYBOARDINFO)(callbackObject);
+  if (!lpkbi->lpCoreKeyboard)
+    return;
+  // Iterate through hooks to find the call back
+  DWORD n = 0;
+  for (DWORD i = 0; i < lpkbi->nIMDLLHooks; i++) {
+    if (lpkbi->lpIMDLLHooks[i]->storeno == UniqueStoreNo) {
+      break;
+    }
+    n++;
+  }
+  LPIMDLLHOOK imdh = lpkbi->lpIMDLLHooks[n];
+
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td)
+    return;
+
+  if (_td->TIPFUpdateable) {  // I4452
+    (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
+  }
+
+  // SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
+
+}
+
 
 
 
@@ -363,8 +399,32 @@ BOOL IsIMWindow(HWND hwnd)
 	return IsChild(*Globals::hwndIM(), hwnd);
 }
 
-// All the functions bellow are used for interaction with the core processor.
+//------- All the functions bellow are used for interaction with the core processor.
 
+/* Add a dll hook function to the list of hook functions associated with a single dll */
+
+static BOOL
+AddIMDLLHookCore(LPIMDLL imd, LPSTR funcname, DWORD storeno) {
+  /* Get the procedure address for the function */
+
+  IMDLLHOOKProc dhp = (IMDLLHOOKProc)GetProcAddress(imd->hModule, funcname);
+  if (!dhp)
+    return FALSE;
+
+  /* Add the function to the list of functions in the DLL */
+
+  LPIMDLLHOOK hooks = new IMDLLHOOK[imd->nHooks + 1];
+  if (imd->nHooks > 0) {
+    memcpy(hooks, imd->Hooks, sizeof(IMDLLHOOK) * imd->nHooks);
+    delete imd->Hooks;
+  }
+  imd->Hooks = hooks;
+  strncpy(imd->Hooks[imd->nHooks].name, funcname, 31);
+  imd->Hooks[imd->nHooks].name[31] = 0;
+  imd->Hooks[imd->nHooks].storeno  = storeno;
+  imd->Hooks[imd->nHooks].function = dhp;
+  return TRUE;
+}
 
 /* Load the dlls associated with a keyboard */
 
@@ -387,14 +447,14 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
 
   for (; imx_list; ++imx_list) {
     LPIMDLL imd = AddIMDLL(lpkbi, fullname, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->library_name)));
-    if (imd && AddIMDLLHook(imd, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->function_name)), imx_list->store_no, &s->dpString))
-      s->dwSystemID = TSS_CALLDEFINITION;
-    else
-      s->dwSystemID = TSS_CALLDEFINITION_LOADFAILED;
-
-    delete[] p;
+    if (imd && AddIMDLLHookCore(imd, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->function_name)), imx_list->store_no)) {
+    }
+      // log ok
+    //else
+    //  log error
   }
 
   // SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Exit");
   return TRUE;
 }
+
