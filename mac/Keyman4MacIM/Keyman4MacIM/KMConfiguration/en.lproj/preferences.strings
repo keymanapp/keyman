@@ -12,7 +12,7 @@
 "C6L-PK-bpq.title" = "Text Cell";
 
 /* Class = "NSButtonCell"; title = "Download keyboard..."; ObjectID = "CTw-kf-WNS"; */
-"CTw-kf-WNS.title" = "Download keyboard...";
+"CTw-kf-WNS.title" = "Download Keyboard...";
 
 /* Class = "NSWindow"; title = "Keyman Configuration"; ObjectID = "F0z-JX-Cv5"; */
 "F0z-JX-Cv5.title" = "Keyman Configuration";
@@ -21,7 +21,7 @@
 "J2x-OZ-TSX.title" = "Table View Cell";
 
 /* Class = "NSButtonCell"; title = "< Back"; ObjectID = "JOK-JV-n8w"; */
-"JOK-JV-n8w.title" = "< Back";
+"JOK-JV-n8w.title" = "Back";
 
 /* Class = "NSTabViewItem"; label = "Keyboard Layouts"; ObjectID = "MPN-9N-wWc"; */
 "MPN-9N-wWc.label" = "Keyboard Layouts";
@@ -33,7 +33,7 @@
 "dU5-ev-A3u.title" = "Text Cell";
 
 /* Class = "NSButtonCell"; title = "Forward >"; ObjectID = "eXr-8V-h1g"; */
-"eXr-8V-h1g.title" = "Forward >";
+"eXr-8V-h1g.title" = "Forward";
 
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eoD-O5-Qsf"; */
 "eoD-O5-Qsf.title" = "Text Cell";

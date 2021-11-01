@@ -21,7 +21,7 @@
 "J2x-OZ-TSX.title" = "ក្រឡាទិដ្ឋភាពតារាង";
 
 /* Class = "NSButtonCell"; title = "< Back"; ObjectID = "JOK-JV-n8w"; */
-"JOK-JV-n8w.title" = "< ថយក្រោយ";
+"JOK-JV-n8w.title" = "ថយក្រោយ";
 
 /* Class = "NSTabViewItem"; label = "Keyboard Layouts"; ObjectID = "MPN-9N-wWc"; */
 "MPN-9N-wWc.label" = "ប្លង់ក្ដារចុច";
@@ -33,7 +33,7 @@
 "dU5-ev-A3u.title" = "ក្រឡាអត្ថបទ";
 
 /* Class = "NSButtonCell"; title = "Forward >"; ObjectID = "eXr-8V-h1g"; */
-"eXr-8V-h1g.title" = "ទៅមុខ >";
+"eXr-8V-h1g.title" = "ទៅមុខ";
 
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eoD-O5-Qsf"; */
 "eoD-O5-Qsf.title" = "ក្រឡាអត្ថបទ";
