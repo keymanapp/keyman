@@ -602,7 +602,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return packageFolder;
 }
 
-- (NSString *)packageNameFromFolder:(NSString *)packageFolder {
+- (NSString *)packageNameFromInfFile:(NSString *)packageFolder {
     NSString *packageName = nil;
     NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
     NSString *fileContents = [NSString stringWithContentsOfFile:[path stringByAppendingPathComponent:@"kmp.inf"] encoding:NSWindowsCP1252StringEncoding error:NULL];

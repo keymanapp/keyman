@@ -170,7 +170,7 @@
 }
 
 - (NSString *)packageNameFromFolder:(NSString *)packageFolder {
-    return [self.AppDelegate packageNameFromFolder:packageFolder];
+    return [self.AppDelegate packageNameFromInfFile:packageFolder];
 }
 
 - (NSString *)keyboardsPath {
