@@ -50,6 +50,10 @@ namespace com.keyman.dom.targets {
     }
 
     getTextBeforeCaret(): string {
+      if (this.hasSelection()) {
+        // If there's selected text, use nul for context
+        return '';
+      }
       return this.root.getTextBeforeCaret();
     }
 
