@@ -7,10 +7,12 @@
 
 if compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
+  source_path = '/'
   test_path = '/'
 else
   tests_flags = []
-  test_path = meson.current_source_dir()
+  source_path = meson.current_source_dir()
+  test_path = meson.current_build_dir()
 endif
 
 kmx = executable('kmx', 'kmx.cpp',
@@ -76,6 +78,7 @@ tests = [
 if build_machine.system() == 'windows'
   kmcomp = find_program('kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
+  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
 else
   kmcomp = find_program('kmcomp', required: false)
   kmcomp_cmd = [kmcomp]
@@ -87,6 +90,7 @@ else
       kmcomp = disabler()
     endif
   endif
+  copy_cmd = [find_program('cp', required: true)]
 endif
 
 if compiler.get_id() == 'emscripten'
@@ -95,10 +99,49 @@ if compiler.get_id() == 'emscripten'
   kmcomp = disabler()
 endif
 
+test_keyboards = ''
+foreach kbd : tests
+  if test_keyboards.startswith('{')
+    test_keyboards += ''',
+  '''
+  endif
+  test_keyboards +=  '''{
+    "name": "''' + kbd + '''",
+    "id": "''' + kbd + '''",
+    "version": "0.0",
+    "languages": [
+      {
+        "name": "Undetermined",
+        "id": "und"
+      }
+    ]
+  }'''
+  configure_file(
+    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
+    input: kbd + '.kmn',
+    output: kbd + '.kmn'
+  )
+  if not kmcomp.found()
+    configure_file(
+      command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
+      input: kbd + '.kmx',
+      output: kbd + '.kmx'
+    )
+  endif
+endforeach
+
+cfg = configuration_data()
+cfg.set('keyboards', test_keyboards)
+configure_file(
+  configuration: cfg,
+  input: 'kmp.json.in',
+  output: 'kmp.json'
+)
+
 if kmcomp.found()
   foreach kbd : tests
-    kbd_src = files(kbd + '.kmn')
-    kbd_obj = join_paths(meson.current_source_dir(), kbd) + '.kmx'
+    kbd_src = files(join_paths(source_path, kbd) + '.kmn')
+    kbd_obj = join_paths(test_path, kbd) + '.kmx'
     kbd_log = custom_target(kbd + '.kmx'.underscorify(),
       output: kbd + '.log',
       input: kbd_src,
@@ -109,7 +152,7 @@ if kmcomp.found()
   endforeach
 else
   foreach kbd : tests
-    kbd_src = join_paths(test_path, kbd) + '.kmn'
+    kbd_src = join_paths(source_path, kbd) + '.kmn'
     kbd_obj = join_paths(test_path, kbd) + '.kmx'
 
     test(kbd, kmx, args: [kbd_src, kbd_obj])

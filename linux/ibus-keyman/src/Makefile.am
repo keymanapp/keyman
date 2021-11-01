@@ -70,6 +70,7 @@ ibus_engine_keyman_SOURCES = \
 	engine.h \
 	keyman-service.c \
 	keyman-service.h \
+	keyman-version.h \
 	$(NULL)
 
 ibus_engine_keyman_CFLAGS = \
