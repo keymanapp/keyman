@@ -15,7 +15,9 @@ else
   test_path = meson.current_build_dir()
 endif
 
-kmx = executable('kmx', 'kmx.cpp',
+kmx = executable('kmx',
+    'kmx.cpp',
+    'kmx_test_source.cpp',
     cpp_args: defns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
