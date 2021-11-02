@@ -34,7 +34,7 @@ namespace com.keyman.dom.targets {
       let Lsel = this.root.ownerDocument.getSelection();
       let outerSel = document.getSelection();
 
-      if (Lsel && outerSel) {
+      if (Lsel && outerSel && Lsel.toString().length > 0) {
         // If the outer doc's selection matches, we're active.
         // Both start and end elements need to be the same
         if(outerSel.anchorNode == Lsel.anchorNode && outerSel.focusNode == Lsel.focusNode &&
