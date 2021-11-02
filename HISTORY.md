@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.139 alpha 2021-11-02
+
+* chore(common/core): refactor kmx unit tests (#5862)
+* chore(linux): Extract keycode_to_vk[] to separate header file (#5863)
+
 ## 15.0.138 alpha 2021-10-29
 
 * chore(linux): Set correct version number on ibus component (#5859)
