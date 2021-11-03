@@ -81,6 +81,7 @@ if build_machine.system() == 'windows'
   kmcomp = find_program('kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
   copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
+  cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']
 else
   kmcomp = find_program('kmcomp', required: false)
   kmcomp_cmd = [kmcomp]
@@ -93,6 +94,7 @@ else
     endif
   endif
   copy_cmd = [find_program('cp', required: true)]
+  cat_cmd = [find_program('cat', required: true)]
 endif
 
 if compiler.get_id() == 'emscripten'
@@ -146,7 +148,7 @@ if kmcomp.found()
     kbd_basename = 'k_' + kbd.underscorify().to_lower()
 
     content = run_command(
-      'cat', files(kbd + '.kmn'),
+      cat_cmd, files(kbd + '.kmn'),
     ).stdout().strip()
 
     cfg = configuration_data()
