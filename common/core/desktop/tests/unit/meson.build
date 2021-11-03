@@ -1,0 +1,5 @@
+subdir('json')
+subdir('utftest')
+subdir('kmnkbd')
+subdir('kmx')
+subdir('rust_mock')
