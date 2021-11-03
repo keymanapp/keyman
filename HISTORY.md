@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.140 alpha 2021-11-03
+
+* feat(android): Allow uninstall of sil_euro_latin keyboard (#5838)
+* chore(common/core): Compile test keyboards to .kmp (#5864)
+
 ## 15.0.139 alpha 2021-11-02
 
 * chore(common/core): refactor kmx unit tests (#5862)
