@@ -64,7 +64,9 @@
                     23 Feb 2016 - mcdurdin - I4982 - Defined character constants cannot be referenced correctly in other stores
                     25 Oct 2016 - mcdurdin - I5135 - Remove product and licensing references from Developer projects
 */
+#include "../../../../common/core/desktop/src/kmx/kmx_kmcomp_inc.h"
 #include "pch.h"
+
 
 #include <compfile.h>
 #include <compiler.h>
@@ -96,7 +98,7 @@ int GetDeadKey(PFILE_KEYBOARD fk, PWSTR p);
 
 BOOL IsValidCallStore(PFILE_STORE fs);
 BOOL IsSameToken(PWSTR *p, WCHAR const * token);
-DWORD GetRHS(PFILE_KEYBOARD fk, PWSTR p, PWSTR buf, int bufsize, int offset, int IsUnicode);
+KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PWSTR p, PWSTR buf, int bufsize, int offset, int IsUnicode);
 PWSTR GetDelimitedString(PWSTR *p, WCHAR const * Delimiters, WORD Flags);
 DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, WCHAR const * token, PWSTR output, int max, int offset, PWSTR *newp, int isVKey,
   int isUnicode);
@@ -104,10 +106,10 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, WCHAR const * token, PWSTR output
 int GetGroupNum(PFILE_KEYBOARD fk, PWSTR p);
 int LineTokenType(PWSTR *str);
 
-DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str);
+KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str);
 
-DWORD ProcessGroupFinish(PFILE_KEYBOARD fk);
-DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p);
+KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk);
+KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p);
 DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p);
 DWORD AddDebugStore(PFILE_KEYBOARD fk, WCHAR const * str);
 DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode);
@@ -613,11 +615,11 @@ DWORD ValidateMatchNomatchOutput(PWSTR p) {
   return CERR_None;
 }
 
-DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
+KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 {
   PWSTR p, q, pp;
   PFILE_GROUP gp;
-  DWORD msg;
+  KMX_DWORD msg;
   int IsUnicode = TRUE; // For NOW!
 
   p = str;
@@ -830,7 +832,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 
 //**********************************************************************************************************************
 
-DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
+KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
 {
   PFILE_GROUP gp;
   PWSTR q;
@@ -896,7 +898,7 @@ int cmpkeys(const void *key, const void *elem)
   return(char_key - char_elem); // akey->Key - aelem->Key);
 }
 
-DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
+KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 {
   PFILE_GROUP gp;
   DWORD msg;
@@ -3289,7 +3291,7 @@ DWORD ReadLine(HANDLE hInfile, PWSTR wstr, BOOL PreProcess)
   return CERR_None;
 }
 
-DWORD GetRHS(PFILE_KEYBOARD fk, PWSTR p, PWSTR buf, int bufsize, int offset, int IsUnicode)
+KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PWSTR p, PWSTR buf, int bufsize, int offset, int IsUnicode)
 {
   PWSTR q;
 
