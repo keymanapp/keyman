@@ -1,18 +1,18 @@
 /*
   Name:             calldll
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      11 Mar 2009
 
   Modified Date:    13 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          11 Mar 2009 - mcdurdin - I1894 - Fix threading bugs introduced in I1888
                     11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
                     12 Mar 2010 - mcdurdin - I934 - x64 - Complete
@@ -30,8 +30,8 @@
 
 typedef BOOL (WINAPI *InitDllFunction)(PSTR name);
 
-/* Add a dll to the list of dlls associated with the keyboard */ 
-// core processor implmentation also uses the 
+/* Add a dll to the list of dlls associated with the keyboard */
+// core processor implmentation also uses the
 static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilename)
 {
 	DWORD j;
@@ -63,7 +63,7 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 	HINSTANCE hModule = LoadLibrary(fullname); // Try keyboard dir first
 	if(!hModule) hModule = LoadLibrary(newdllname); // Try anywhere on the path -- LIBRARY_NAME dir first  // I3094
 	if(!hModule) return NULL;
-	
+
 	/* Initialise the DLL */
 
 	InitDllFunction idf = (InitDllFunction) GetProcAddress(hModule, "KeymanIMInit");
@@ -72,7 +72,7 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 		FreeLibrary(hModule);
 		return NULL;
 	}
-	
+
 	/* Add the DLL to the list of DLLs */
 
 	LPIMDLL imd = new IMDLL[lpkbi->nIMDLLs + 1];
@@ -116,6 +116,81 @@ static BOOL AddIMDLLHook(LPIMDLL imd, LPSTR funcname, DWORD storeno, PWCHAR *dpS
 	imd->Hooks[imd->nHooks].function = dhp;
 	*dpString = (PWCHAR) &imd->Hooks[imd->nHooks++];
 	return TRUE;
+}
+
+static km_kbp_action_item*
+kmnToCoreActionItems(int ItemType, DWORD dwData) {
+  km_kbp_action_item *actionItem = new km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}};
+  switch (ItemType) {
+  case QIT_CHAR:
+    actionItem = new km_kbp_action_item {
+        KM_KBP_CT_CHAR,
+        {
+            0,
+        },
+        {dwData}};
+    break;
+  case QIT_DEADKEY:
+    actionItem = new km_kbp_action_item {
+        KM_KBP_IT_MARKER,
+        {
+            0,
+        },
+        {dwData}};
+    break;
+  case QIT_BELL:
+    actionItem = new km_kbp_action_item {
+        KM_KBP_IT_ALERT,
+        {
+            0,
+        },
+        {0}};
+    break;
+  case QIT_BACK:
+    //switch (dwData) {
+    //case BK_DEFAULT:
+      // This only happens if we know we have context to delete. Last item must be a character
+      //  assert(!state->context().empty());
+      //  assert(state->context().back().type != KM_KBP_IT_MARKER);
+      //  if (!state->context().empty()) {
+      //    auto item = state->context().back();
+      //    state->context().pop_back();
+      //    state->actions().push_backspace(KM_KBP_BT_CHAR, item.character);
+      //  } else {
+      //    // Note: only runs on non-debug build, fail safe
+      //    state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
+      //  }
+      //  break;
+      // case BK_DEADKEY:
+      //  // This only happens if we know we have context to delete. Last item must be a deadkey
+      //  assert(!state->context().empty());
+      //  assert(state->context().back().type == KM_KBP_IT_MARKER);
+      //  if (!state->context().empty()) {
+      //    auto item = state->context().back();
+      //    state->context().pop_back();
+      //    state->actions().push_backspace(KM_KBP_BT_MARKER, item.marker);
+      //  } else {
+      //    // Note: only runs on non-debug build, fail safe
+      //    state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
+      //  }
+      break;
+      // case QIT_CAPSLOCK:
+      // km_kbp_action_item ai = {KM_KBP_IT_CAPSLOCK,{0,},{0}};
+      // ai.capsLock = dwData;
+      ///   break;
+    case QIT_VKEYDOWN:
+    case QIT_VKEYUP:
+    case QIT_VSHIFTDOWN:
+    case QIT_VSHIFTUP:
+      // Not hanled TODO Log a message?
+      break;
+  // case QIT_INVALIDATECONTEXT:
+  //  km_kbp_action_item actionItems = km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}};
+  //  break;
+    //default:
+    // TODO: Warning message;
+  }
+  return actionItem;
 }
 
 /* Call a DLL callback for all DLLs loaded with a given keyboard */
@@ -252,11 +327,14 @@ uint8_t
 IM_CallBackCore(void* callbackObject, km_kbp_state *km_state, uint32_t UniqueStoreNo) {
   // SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");
   if (callbackObject == NULL) {
-    return;
+    return 0;
+  }
+  if (km_state == NULL) {
+    return 0;
   }
   LPINTKEYBOARDINFO lpkbi = (LPINTKEYBOARDINFO)(callbackObject);
   if (!lpkbi->lpCoreKeyboard)
-    return;
+    return 0; // False
   // Iterate through hooks to find the call back
   DWORD n = 0;
   for (DWORD i = 0; i < lpkbi->nIMDLLHooks; i++) {
@@ -265,18 +343,21 @@ IM_CallBackCore(void* callbackObject, km_kbp_state *km_state, uint32_t UniqueSto
     }
     n++;
   }
-  LPIMDLLHOOK imdh = lpkbi->lpIMDLLHooks[n];
+  if (n==0)
+    return 0;
 
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if (!_td)
-    return;
+  //LPIMDLLHOOK imdh = lpkbi->lpIMDLLHooks[n];
 
-  if (_td->TIPFUpdateable) {  // I4452
-    (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
-  }
+  //PKEYMAN64THREADDATA _td =   ();
+  //if (!_td)
+  //  return;
+
+  //if (_td->TIPFUpdateable) {  // I4452
+  //  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
+  //}
 
   // SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
-
+  return 1;
 }
 
 
@@ -293,12 +374,27 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
 	return TRUE;
 }
 
-extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dwData)
-{
+extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dwData) {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-	if(!_td->app) return FALSE;
-	return _td->app->QueueAction(ItemType, dwData);
+  if (!_td)
+    return FALSE;
+  if (!_td->app)
+    return FALSE;
+
+  if (!Globals::get_CoreIntegration()) {
+    return _td->app->QueueAction(ItemType, dwData);  // TODO: 5442 Remove
+  } else {
+    if (!_td->lpActiveKeyboard->lpCoreKeyboard) {
+      return FALSE;
+    }
+    km_kbp_action_item *actionItem = kmnToCoreActionItems(ItemType, dwData);
+    if (KM_KBP_STATUS_OK !=
+        (km_kbp_status_codes)km_kbp_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItem)) {
+      delete actionItem;
+      return FALSE;
+    }
+    return TRUE;
+  }
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
@@ -306,12 +402,35 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 	if(!_td->app) return FALSE;
-	
-	PWSTR q = _td->app->ContextBufMax(len);
-	if(!q) return FALSE;	// context buf does not exist
+  // TODO: 5442  KMGetContext is already public call (even though it is pointer) Rather then making a new KMGetContextCore
+  // This has been modified to check for core processor once we move to core processor the old Windows Platmform calling of
+  // ContextBuff can be removed
+  //
+  if(!Globals::get_CoreIntegration()){
+    PWSTR q = _td->app->ContextBufMax(len);
+    if (!q)
+      return FALSE;  // context buf does not exist
 
-	wcscpy_s(buf, len+1, q);  // I3091
-	return TRUE;
+    wcscpy_s(buf, len + 1, q);  // I3091
+    return TRUE;
+  } else {
+    if (!_td->lpActiveKeyboard->lpCoreKeyboard) {
+      return FALSE;
+    }
+    km_kbp_context_item *citems = nullptr;
+      if (KM_KBP_STATUS_OK !=
+        (km_kbp_status_codes)km_kbp_context_get(km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), &citems)){
+          km_kbp_context_items_dispose(citems);
+          return FALSE;
+    }
+
+    if (!ContextItemToAppContext(citems, buf)) {
+      km_kbp_context_items_dispose(citems);
+      return FALSE;
+    }
+    km_kbp_context_items_dispose(citems);
+    return TRUE;
+  }
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlways)
@@ -332,14 +451,14 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlw
 
 	POINT pt;
 	RECT r;
-	
+
 	GetCaretPos(&pt);
-	
+
 	int n;
-	//if(pt.x == 0 && pt.y == 0) 
-		n = SWP_NOMOVE; 
+	//if(pt.x == 0 && pt.y == 0)
+		n = SWP_NOMOVE;
 	//else n = 0;
-	
+
 	ClientToScreen(hwndFocus, &pt);
 	GetWindowRect(hwnd, &r);
 	if(pt.x + r.right - r.left >= GetSystemMetrics(SM_CXSCREEN))
@@ -349,7 +468,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlw
 	else pt.y += 32; // guessing...
 
 	SetWindowPos(hwnd, HWND_TOPMOST, pt.x,pt.y,0,0, n|SWP_NOSIZE|SWP_SHOWWINDOW|SWP_NOACTIVATE);
-	
+
 	return TRUE;
 }
 

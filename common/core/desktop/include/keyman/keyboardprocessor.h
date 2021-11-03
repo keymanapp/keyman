@@ -930,6 +930,28 @@ km_kbp_state_action_items(km_kbp_state const *state,
 
 /*
 ```
+### `km_kbp_state_queue_action_items`
+##### Description:
+Queue and the action in the current keyboard processor.
+`km_kbp_process_event`.
+##### Return:
+- `KM_KBP_STATUS_OK`: On success.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+In the event the `state` or `in action` pointer are null.
+##### Parameters:
+- __state__: A pointer to the opaque `km_kbp_state` object to be queried.
+- __action_items__:
+A pointer to a action item: The action item to be added to the keyboardprocessor queue.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_state_queue_action_items(km_kbp_state *state,
+                         km_kbp_action_item const *action_items);
+
+/*
+```
 ### `km_kpb_state_to_json`
 ##### Description:
 Export the internal state of a `km_kbp_state` object to a JSON format document

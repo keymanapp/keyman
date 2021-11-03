@@ -78,7 +78,7 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
 BOOL LoadlpKeyboardCore(int i)
 {
   SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: Enter ---");
-  
+
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
@@ -123,7 +123,7 @@ BOOL LoadlpKeyboardCore(int i)
   err_status = km_kbp_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
 
   LoadDLLsCore(&_td->lpKeyboards[i]);
-  
+
   LoadKeyboardOptionsREGCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpCoreKeyboardState);
 
   return TRUE;

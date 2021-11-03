@@ -75,6 +75,45 @@ kmx_processor::update_option(
   return option(scope, key, value);
 }
 
+
+
+bool
+kmx_processor::queue_action(km_kbp_action_item const * action_item
+) {
+
+  switch (action_item->type) {
+  case KM_KBP_IT_END:
+    // error should not queue empty item
+    return false;
+    break;
+  case KM_KBP_IT_CHAR:
+   _kmx.GetActions()->QueueAction(QIT_CHAR, action_item->character);
+    break;
+  case KM_KBP_IT_MARKER:
+   _kmx.GetActions()->QueueAction(QIT_DEADKEY, action_item->marker);
+    break;
+  case KM_KBP_IT_ALERT:
+    _kmx.GetActions()->QueueAction(QIT_BELL, 0);
+    break;
+  case KM_KBP_IT_BACK:
+    if (action_item->backspace.expected_type == KM_KBP_BT_MARKER) {
+      _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEADKEY);
+    } else /* KM_KBP_BT_CHAR, KM_KBP_BT_UNKNOWN */ {
+      _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEFAULT);
+    }
+  case KM_KBP_IT_PERSIST_OPT:
+  case KM_KBP_IT_EMIT_KEYSTROKE:
+  case KM_KBP_IT_CAPSLOCK:
+    // Not implemented TODO log message?
+    return false;
+    break;
+  case KM_KBP_IT_INVALIDATE_CONTEXT:
+    _kmx.GetActions()->QueueAction(QIT_INVALIDATECONTEXT, 0);
+    break;
+  }
+  return true;
+}
+
 km_kbp_status
 kmx_processor::process_event(
   km_kbp_state *state,
