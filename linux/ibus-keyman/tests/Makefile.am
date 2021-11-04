@@ -39,6 +39,11 @@ AM_LDFLAGS = \
 
 libexec_PROGRAMS = ibus-keyman-tests
 
+# Note: don't use $(top_srcdir) here for the first `..` - automake <= 1.15 (Ubuntu 18.04)
+# has a bug where it doesn't resolve the variable and so stores some files in the wrong
+# location and can't find them later. https://debbugs.gnu.org/cgi/bugreport.cgi?bug=13928
+# Once we drop support for Ubuntu 18.04 Bionic we change this.
+
 ibus_keyman_tests_SOURCES = \
   ibusimcontext.c \
   ibusimcontext.h \
@@ -75,6 +80,7 @@ ibus_keyman_tests_SOURCES = \
   ../../../common/core/desktop/src/utfcodec.cpp \
   ../../../common/core/desktop/tests/unit/kmx/kmx_test_source.cpp \
   ../../../common/core/desktop/tests/unit/kmx/kmx_test_source.hpp \
+  ../src/keycodes.h \
   $(NULL)
 
 ibus_keyman_tests_CFLAGS = \
@@ -84,10 +90,10 @@ ibus_keyman_tests_CFLAGS = \
   @JSON_GLIB_CFLAGS@ \
   @KEYMAN_PROC_CFLAGS@ \
   -DPKGDATADIR=\"$(pkgdatadir)\" \
-  -I../../../common/core/desktop/src \
-  -I../../../common/core/desktop/src/kmx \
-  -I../../../common/core/desktop/tests/unit/kmx \
-  -I../src \
+  -I$(top_srcdir)/../../common/core/desktop/src \
+  -I$(top_srcdir)/../../common/core/desktop/src/kmx \
+  -I$(top_srcdir)/../../common/core/desktop/tests/unit/kmx \
+  -I$(top_srcdir)/src \
   $(NULL)
 
 ibus_keyman_tests_CPPFLAGS = \
@@ -97,10 +103,10 @@ ibus_keyman_tests_CPPFLAGS = \
   @JSON_GLIB_CFLAGS@ \
   @KEYMAN_PROC_CFLAGS@ \
   -DPKGDATADIR=\"$(pkgdatadir)\" \
-  -I../../../common/core/desktop/src \
-  -I../../../common/core/desktop/src/kmx \
-  -I../../../common/core/desktop/tests/unit/kmx \
-  -I../src \
+  -I$(top_srcdir)/../../common/core/desktop/src \
+  -I$(top_srcdir)/../../common/core/desktop/src/kmx \
+  -I$(top_srcdir)/../../common/core/desktop/tests/unit/kmx \
+  -I$(top_srcdir)/src \
   $(NULL)
 
 ibus_keyman_tests_LDFLAGS = \

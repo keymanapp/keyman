@@ -1347,7 +1347,6 @@ _create_input_context(IBusIMContext *ibusimcontext) {
   if (context == NULL) {
     g_warning("Create input context failed.");
   } else {
-    ibus_input_context_set_client_commit_preedit(context, TRUE);
     ibusimcontext->ibuscontext = context;
 
     g_signal_connect(ibusimcontext->ibuscontext, "commit-text", G_CALLBACK(_ibus_context_commit_text_cb), ibusimcontext);
