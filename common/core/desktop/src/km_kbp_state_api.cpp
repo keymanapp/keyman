@@ -89,13 +89,14 @@ KMN_API
 km_kbp_status
 km_kbp_state_queue_action_items(km_kbp_state *state,
                          km_kbp_action_item const *action_items){
-assert(state); assert(action_items);
+  assert(state);
+  assert(action_items);
   if (!state|| !action_items)  return KM_KBP_STATUS_INVALID_ARGUMENT;
 
   auto & processor = state->processor();
 
 
-  for (;action_items->type; ++action_items)
+  for (; action_items->type != KM_KBP_CT_END; ++action_items)
   {
     if (action_items->type >= KM_KBP_IT_MAX_TYPE_ID)
       return KM_KBP_STATUS_INVALID_ARGUMENT;
