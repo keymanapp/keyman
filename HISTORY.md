@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.141 alpha 2021-11-05
+
+* chore(linux): Add integration tests for ibus-keyman (#5881)
+
 ## 15.0.140 alpha 2021-11-03
 
 * feat(android): Allow uninstall of sil_euro_latin keyboard (#5838)
