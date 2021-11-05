@@ -1,18 +1,18 @@
 /*
   Name:             calldll
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      11 Dec 2009
 
   Modified Date:    11 Dec 2009
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
 */
 
@@ -23,8 +23,13 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi);
 BOOL ActivateDLLs(LPINTKEYBOARDINFO lpkbi);
-// Core processor integration of dlls
 
+/**
+ * Load the all the dlls use by the current keyboard
+ * // TODO: 5444 This will become the only LoadDLLs function
+ * @param   lpkbi  The keyboard for which to load the dlls
+ * @return  BOOL  True on success
+ */
 BOOL LoadDLLsCore(LPINTKEYBOARDINFO lpkbi);
 
 
