@@ -12,6 +12,7 @@
 #include <string>
 #include "ibusimcontext.h"
 #include "keycodes.h"
+#include "keymanutil.h"
 #include "kmx_test_source.hpp"
 #include "testmodule.h"
 
@@ -20,6 +21,11 @@ typedef struct {
   GtkIMContext *context;
   IBusIMContext *ibuscontext;
 } IBusKeymanTestsFixture;
+
+typedef struct {
+  char *test_name;
+  char *test_path;
+} TestData;
 
 static gboolean loaded        = FALSE;
 static GdkWindow *window      = NULL;
@@ -272,8 +278,9 @@ press_keys(IBusKeymanTestsFixture *fixture, km::tests::KmxTestSource & test_sour
 }
 
 static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data) {
-  auto sourcefile = string_format("%s.kmn", (char *)user_data);
-  auto kmxfile = string_format("und:%s.kmx", (char*)user_data);
+  auto data       = (TestData*)user_data;
+  auto sourcefile = string_format("%s.kmn", data->test_path);
+  auto kmxfile    = string_format("und:%s.kmx", data->test_path);
 
   km::tests::KmxTestSource test_source;
   std::string keys        = "";
@@ -281,6 +288,14 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
   km::tests::kmx_options options;
   bool expected_beep = false;
   g_assert_cmpint(test_source.load_source(sourcefile.c_str(), keys, expected, context, options, expected_beep), ==, 0);
+
+  for (auto & option : options) {
+    if (option.type == km::tests::KOT_INPUT) {
+      auto key = g_utf16_to_utf8((gunichar2 *)option.key.c_str(), option.key.length(), NULL, NULL, NULL);
+      auto value = g_utf16_to_utf8((gunichar2 *)option.value.c_str(), option.value.length(), NULL, NULL, NULL);
+      keyman_put_options_todconf(data->test_name, data->test_name, key, value);
+    }
+  }
 
   switch_keyboard(fixture, kmxfile.c_str());
 
@@ -336,8 +351,11 @@ main(int argc, char *argv[]) {
     auto testname = g_string_new(NULL);
     g_string_append_printf(testname, "/%s", testfilebase);
     auto testfile = g_file_new_build_filename(directory, testfilebase, NULL);
+    TestData testdata;
+    testdata.test_name = filename;
+    testdata.test_path = g_file_get_parse_name(testfile);
     g_test_add(
-        testname->str, IBusKeymanTestsFixture, g_file_get_parse_name(testfile), ibus_keyman_tests_fixture_set_up, test_source,
+        testname->str, IBusKeymanTestsFixture, &testdata, ibus_keyman_tests_fixture_set_up, test_source,
         ibus_keyman_tests_fixture_tear_down);
     g_object_unref(file);
     g_object_unref(testfile);
