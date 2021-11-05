@@ -1014,6 +1014,11 @@ static gboolean
 _delete_surrounding(IBusIMContext *ibusimcontext, gint offset_from_cursor, guint nchars) {
   // g_signal_emit(ibusimcontext, _signal_delete_surrounding_id, 0);
   if (offset_from_cursor < 0) {
+    for (guint val = nchars;
+         val <= ibusimcontext->text->len && (guint)ibusimcontext->text->str[ibusimcontext->text->len - val] >= 0x80;
+         val++) {
+      nchars = val;
+    }
     g_string_erase(ibusimcontext->text, ibusimcontext->text->len - nchars, nchars);
   } else {
     g_string_erase(ibusimcontext->text, offset_from_cursor, nchars);
