@@ -70,7 +70,7 @@ void             ibus_keyman_init           (void);
 GList           *ibus_keyman_list_engines   (void);
 IBusComponent   *ibus_keyman_get_component  (void);
 
-// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// Obtain Keyboard Options list from DConf
 // DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
 //
 // Parameters:
@@ -83,7 +83,6 @@ gchar**  keyman_get_options_fromdconf
                                              gchar *keyboard_id);
 
 // Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
-// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
 //
 // Parameters:
 // package_id  (gchar *): Package ID
@@ -104,7 +103,7 @@ GQueue*  keyman_get_options_queue_fromdconf
 // option_key   (gchar *): Key for the new option
 // option_value (gchar *): Value of the new option
 void keyman_put_options_todconf
-                                            (gchar *package_id, 
+                                            (gchar *package_id,
                                              gchar *keyboard_id,
                                              gchar *option_key,
                                              gchar *option_value);

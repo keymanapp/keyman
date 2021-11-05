@@ -302,7 +302,7 @@ ibus_keyman_get_component (void)
 }
 
 
-// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// Obtain Keyboard Options list from DConf
 // DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
 //
 // Parameters:
@@ -332,7 +332,6 @@ keyman_get_options_fromdconf(gchar *package_id,
 }
 
 // Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
-// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
 //
 // Parameters:
 // package_id  (gchar *): Package ID
@@ -369,6 +368,7 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
             }
             index++;
         }
+        g_strfreev(options);
     }
 
     return queue_options;
