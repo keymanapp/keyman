@@ -18,6 +18,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+include $(top_srcdir)/glib-tap.mk
+
 AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CFLAGS = \
@@ -38,6 +40,8 @@ AM_LDFLAGS = \
   $(NULL)
 
 libexec_PROGRAMS = ibus-keyman-tests
+
+uninstalled_test_scripts = run-tests.sh
 
 # Note: don't use $(top_srcdir) here for the first `..` - automake <= 1.15 (Ubuntu 18.04)
 # has a bug where it doesn't resolve the variable and so stores some files in the wrong

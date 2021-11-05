@@ -18,6 +18,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+include $(top_srcdir)/glib-tap.mk
+
 AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CFLAGS = \
@@ -37,8 +39,10 @@ AM_LDFLAGS = \
   @KEYMAN_PROC_LIBS@ \
   $(NULL)
 
-check_PROGRAMS = \
-  keymanutil_tests \
+uninstalled_test_scripts = run-tests.sh
+
+libexec_PROGRAMS = \
+  keymanutil-tests \
   $(NULL)
 
 keymanutil_tests_SOURCES = \
@@ -57,6 +61,7 @@ keymanutil_tests_CFLAGS = \
   @KEYMAN_PROC_CFLAGS@ \
   -DPKGDATADIR=\"$(pkgdatadir)\" \
   -I$(top_srcdir)/src \
+  -I$(top_builddir)/src \
   $(NULL)
 
 keymanutil_tests_CPPFLAGS = \
@@ -67,6 +72,7 @@ keymanutil_tests_CPPFLAGS = \
   @KEYMAN_PROC_CFLAGS@ \
   -DPKGDATADIR=\"$(pkgdatadir)\" \
   -I$(top_srcdir)/src \
+  -I$(top_builddir)/src \
   $(NULL)
 
 keymanutil_tests_LDFLAGS = \
