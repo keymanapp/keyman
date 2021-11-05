@@ -673,7 +673,7 @@ typedef struct {
 typedef struct {
   km_kbp_cp const * library_name;
   km_kbp_cp const * function_name;
-  uint32_t store_no;
+  uint32_t store_no; // unique identifier used to call this function
 } km_kbp_keyboard_imx;
 
 
@@ -785,20 +785,30 @@ void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
 
 
 /**
- * km_kbp_keyboard_get_imx_libs
+ * Returns the list of libraries and function calls names that will be called by
+ * the library. The matching dispose call needs to be called to free the memory.
  *
  */
 KMN_API
 km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx** imx_list);
 
+/**
+ * Disposes of the IMX list
+ */
 KMN_API
 void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list);
 
 // TODO: typdef this something like typedef BOOL (*km_kbp_keyboard_imx_platform)(uint32_t)
 //typedef BOOL (*km_kbp_keyboard_imx_platform)(uint32_t)
+/**
+ * Register callback from the platform engine.
+ */
 KMN_API
 void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback);
 
+/**
+ * De-register call callback for platform engine
+ */
 KMN_API
 void km_kbp_state_imx_deregister_callback(km_kbp_state *state);
 
@@ -941,7 +951,8 @@ In the event the `state` or `in action` pointer are null.
 ##### Parameters:
 - __state__: A pointer to the opaque `km_kbp_state` object to be queried.
 - __action_items__:
-A pointer to a action item: The action item to be added to the keyboardprocessor queue.
+A pointer to a action item list: The action items to be added to
+the keyboardprocessor queue.
 
 ```c
 */
