@@ -41,14 +41,14 @@ public:
   /**
    * Updates a map of preserved keys (with GUID) that are used in keyboard rules.
    * Passing in NULL for pPreservedKeys will cause cPreservedKeys to be set to the number
-   * PreserveKeys needed for the supplied pKeyboard, this should be used in creating pPreservedKeys
-   * List to sufficent size. When pPreseredKeys list is passed the cPreservedKeys will be the actual
-   * count of the number of unique pPreseredKeys
+   * of preserved keys needed for the supplied pKeyboard; this should be used in creating 
+   * pPreservedKeys list to sufficient size. When pPreservedKeys list is passed the 
+   * cPreservedKeys will be the actual count of the number of unique pPreservedKeys
    *
    * @param   pKeyboard  the keyboard for which the rules will be extracted from
-   * @param   pPreservedKeys  list of or PreservedKeys
+   * @param   pPreservedKeys  preallocated array for preserved keys to be filled in, or nullptr to retrieve required size
    * @param   cPreservedKeys  number of preserved keys in pPreservedKeys - or the size pPreservedKeys needs to be
-   * @return  BOOL  return TRUE if pPreveredKeys was updated
+   * @return  BOOL  return TRUE on success
    */
   BOOL MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
 

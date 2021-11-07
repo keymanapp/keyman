@@ -84,7 +84,7 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
 
 km_kbp_status
 km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
-                          km_kbp_keyboard_key **out)
+                             km_kbp_keyboard_key **out)
 {
   assert(keyboard); assert(out);
   if (!keyboard || !out)
