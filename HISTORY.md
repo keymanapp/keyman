@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.142 alpha 2021-11-08
+
+* chore(linux): Cleanup (#5886)
+* chore(linux): cleanup defunct tests (#5885)
+* chore(linux): fix failing ibus-keyman tests (#5884)
+
 ## 15.0.141 alpha 2021-11-05
 
 * chore(linux): Add integration tests for ibus-keyman (#5881)
