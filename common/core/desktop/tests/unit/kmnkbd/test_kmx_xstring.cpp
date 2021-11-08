@@ -18,7 +18,7 @@ using namespace std;
 
 PKMX_WCHAR find_ptr_to_last_character(PKMX_WCHAR p_first) {
   int length = wcslen((const wchar_t *)p_first); 
- if (length > 0)
+  if (length > 0)
     return p_first + length - 1;
   else
     return p_first;
@@ -31,6 +31,54 @@ void test_decxstr() {
     PKMX_WCHAR p;       // pointer end of input
     PKMX_WCHAR q;       // pointer output
 
+    // -------------------------------------------------------------------------------------------------------------------------------------------------------
+    // even more tests: check for use with non-CODE__SIZE
+    // -------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p-1));
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000d";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p - 2));
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0001";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p - 2));
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0002";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p - 2));
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0001\u0001";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p - 1));
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0002\u0001";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p - 1));
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0001\u0001d";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p - 1));
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0002\u0001\u0001";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p - 1));
+
+    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0002\u0001\u0001d";
+    p       = find_ptr_to_last_character(p_start);
+    q       = decxstr(p, p_start);
+    assert(q == (p - 1));
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------
     // more tests: check if we might end up left of pstart
@@ -166,7 +214,7 @@ void test_decxstr() {
        
      assert(q == (p - 1) );
 
-         // ---------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------
     // ---- p <= pstart
     // ---------------------------------------------------------------------------------------
    
@@ -1313,7 +1361,7 @@ void test_decxstr() {
   p = (PKMX_WCHAR)u"\uFFFF\u0004\u0062\U0001F609";
   q = incxstr(p);
   assert(q == p + 2);
-  }
+}
 
 constexpr const auto help_str = "\
 test_kmx_xstring [--color]\n\

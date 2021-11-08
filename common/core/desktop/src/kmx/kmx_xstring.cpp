@@ -150,6 +150,8 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
 
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
 {
+  PKMX_WCHAR q;
+
   if(p <= pStart) {
     return NULL;
   }
@@ -177,11 +179,12 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   else if(*(p-1) == UC_SENTINEL) return p-1;
   else
   {
-    for (int i = 1; i < 5; i++)
+    q  = p - 2;
+    for (int i = 2; i < CODE__SIZE_MAX && q >= pStart; i++, q--)
     {
-      //   p right of pstart &&  *(p - i) == UC_SENTINEL  &&  next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
-      if ((p >= pStart + i)  && (*(p - i) == UC_SENTINEL) && (CODE__SIZE[*(p - i + 1)] + 1 == i))
-        return (p - (CODE__SIZE[*(p - i + 1)] + 1));
+      //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
+      if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
+        return (p - i);
     }
   }
   return p; 
