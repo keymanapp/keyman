@@ -17,16 +17,19 @@ After you download Keyman, to install the program:
 
 2.  Double-click the file to begin installation.
 
-3.  You will be asked to allow the installer to access your system.
+3. You may be warned to use a "Microsoft-verfied" App from the Microsoft Store. This is because Keyman is not available in the Microsoft Store. If "**Install Anyway**" is an option, select that. Otherwise follow the instructions found here [How To - Allow Windows 10 to Install Apps From Anywhere](../troubleshooting/install-app-from-anywhere)
+![](../desktop_images/km_non_app_store_2.png)
+
+4.  You will be asked to allow the installer to access your system.
     Click Yes to continue.
 
     ![](../desktop_images/setup-click1.png)
 
-4.  The installer may need to download additional components from keyman.com
+5.  The installer may need to download additional components from keyman.com
     in order to complete the installation. If prompted by your firewall
     software, ensure you Allow the installer to access the web.
 
-5.  Click Install Keyman to finish installing. Keyman may download additional
+6.  Click Install Keyman to finish installing. Keyman may download additional
     files during the installation process.
 
     ![](../desktop_images/setup-click2.png)
@@ -37,7 +40,7 @@ After you download Keyman, to install the program:
     **Note:** You can select advanced installation options from the Install
     Options link on the bottom left.
 
-6.  At the end of the installation, click Start Keyman to begin using
+7.  At the end of the installation, click Start Keyman to begin using
     Keyman or click Configuration to change Keyman settings first.
 
     ![](../desktop_images/setup-click3.png)

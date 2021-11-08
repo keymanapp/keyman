@@ -7,13 +7,17 @@
 
 if compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
+  source_path = '/'
   test_path = '/'
 else
   tests_flags = []
-  test_path = meson.current_source_dir()
+  source_path = meson.current_source_dir()
+  test_path = meson.current_build_dir()
 endif
 
-kmx = executable('kmx', 'kmx.cpp',
+kmx = executable('kmx',
+    'kmx.cpp',
+    'kmx_test_source.cpp',
     cpp_args: defns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
@@ -76,6 +80,8 @@ tests = [
 if build_machine.system() == 'windows'
   kmcomp = find_program('kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
+  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
+  cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']
 else
   kmcomp = find_program('kmcomp', required: false)
   kmcomp_cmd = [kmcomp]
@@ -87,6 +93,8 @@ else
       kmcomp = disabler()
     endif
   endif
+  copy_cmd = [find_program('cp', required: true)]
+  cat_cmd = [find_program('cat', required: true)]
 endif
 
 if compiler.get_id() == 'emscripten'
@@ -95,22 +103,100 @@ if compiler.get_id() == 'emscripten'
   kmcomp = disabler()
 endif
 
+test_keyboards = ''
+foreach kbd : tests
+  if test_keyboards.startswith('{')
+    test_keyboards += ''',
+  '''
+  endif
+  kbd_basename = 'k_' + kbd.underscorify().to_lower()
+  test_keyboards +=  '''{
+    "name": "''' + kbd_basename + '''",
+    "id": "''' + kbd_basename + '''",
+    "version": "0.0",
+    "languages": [
+      {
+        "name": "Undetermined",
+        "id": "und"
+      }
+    ]
+  }'''
+  if not kmcomp.found()
+    configure_file(
+      command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
+      input: kbd + '.kmn',
+      output: kbd_basename + '.kmn'
+    )
+    configure_file(
+      command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
+      input: kbd + '.kmx',
+      output: kbd_basename + '.kmx'
+    )
+  endif
+endforeach
+
+cfg = configuration_data()
+cfg.set('keyboards', test_keyboards)
+configure_file(
+  configuration: cfg,
+  input: 'kmp.json.in',
+  output: 'kmp.json'
+)
+
 if kmcomp.found()
   foreach kbd : tests
-    kbd_src = files(kbd + '.kmn')
-    kbd_obj = join_paths(meson.current_source_dir(), kbd) + '.kmx'
-    kbd_log = custom_target(kbd + '.kmx'.underscorify(),
-      output: kbd + '.log',
-      input: kbd_src,
-      command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
-    )
+    kbd_basename = 'k_' + kbd.underscorify().to_lower()
 
-    test(kbd, kmx, depends: kbd_log, args: [kbd_src, kbd_obj])
+    content = run_command(
+      cat_cmd, files(kbd + '.kmn'),
+    ).stdout().strip()
+
+    cfg = configuration_data()
+    cfg.set('keyboard', kbd)
+    cfg.set('keyboard_underscore', kbd_basename)
+    cfg.set('id1', 'id_' + kbd_basename + '_1')
+    cfg.set('id2', 'id_' + kbd_basename + '_2')
+    cfg.set('id3', 'id_' + kbd_basename + '_3')
+    cfg.set('build_dir', meson.current_build_dir())
+    cfg.set('NAME', kbd)
+    cfg.set('CONTENT', content)
+
+    kbd_kmn = configure_file(
+      configuration: cfg,
+      input: join_paths('template', 'keyboard.kmn.in'),
+      output: kbd_basename + '.kmn'
+    )
+    kbd_kpj = configure_file(
+      configuration: cfg,
+      input: join_paths('template', 'keyboard.kpj.in'),
+      output: kbd_basename + '.kpj'
+    )
+    kbd_kps = configure_file(
+      configuration: cfg,
+      input: join_paths('template', 'keyboard.kps.in'),
+      output: kbd_basename + '.kps'
+    )
+    kbd_kmp = custom_target(kbd_basename + '.kmp',
+      input: kbd_kpj,
+      output: [kbd_basename + '.kmp', kbd_basename + '.kmx'],
+      depend_files: [kbd_kps, kbd_kmn],
+      depfile: kbd_basename + '.dep',
+      command: kmcomp_cmd + ['-s', '-d', '@INPUT@'])
+
+    kbd_src = files(join_paths(test_path, kbd_basename) + '.kmn')
+    kbd_obj = join_paths(test_path, kbd_basename) + '.kmx'
+    # kbd_log = custom_target(kbd.underscorify() + '.kmx',
+    #   output: kbd + '.log',
+    #   input: kbd_src,
+    #   command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
+    # )
+
+    test(kbd, kmx, depends: [kbd_kmp], args: [kbd_src, kbd_obj])
   endforeach
 else
   foreach kbd : tests
-    kbd_src = join_paths(test_path, kbd) + '.kmn'
-    kbd_obj = join_paths(test_path, kbd) + '.kmx'
+    kbd_src = join_paths(test_path, kbd_basename) + '.kmn'
+    kbd_obj = join_paths(test_path, kbd_basename) + '.kmx'
 
     test(kbd, kmx, args: [kbd_src, kbd_obj])
   endforeach

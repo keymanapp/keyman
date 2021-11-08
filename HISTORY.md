@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 15.0.141 alpha 2021-11-05
+
+* chore(linux): Add integration tests for ibus-keyman (#5881)
+
+## 15.0.140 alpha 2021-11-03
+
+* feat(android): Allow uninstall of sil_euro_latin keyboard (#5838)
+* chore(common/core): Compile test keyboards to .kmp (#5864)
+
+## 15.0.139 alpha 2021-11-02
+
+* chore(common/core): refactor kmx unit tests (#5862)
+* chore(linux): Extract keycode_to_vk[] to separate header file (#5863)
+
+## 15.0.138 alpha 2021-10-29
+
+* chore(linux): Set correct version number on ibus component (#5859)
+* chore(common/core): generate kmp.json (#5860)
+
+## 15.0.137 alpha 2021-10-28
+
+* chore(common): Don't check for conventional commit for fixups (#5858)
+
+## 15.0.136 alpha 2021-10-23
+
+* chore(android/engine): Address globe key TODO (#5836)
+
+## 15.0.135 alpha 2021-10-20
+
+* docs(windows): add note to caps-lock-stores test (#5837)
+
+## 15.0.134 alpha 2021-10-19
+
+* docs(windows): add install apps from anywhere instructions (#5829)
+
 ## 15.0.133 alpha 2021-10-16
 
 * chore(common): Check in crowdin strings for Hausa (#5768)
