@@ -66,6 +66,8 @@
 #define KEYMAN_DCONF_PATH "/desktop/ibus/keyman/options/"
 #define KEYMAN_DCONF_OPTIONS_KEY "options"
 
+G_BEGIN_DECLS
+
 void             ibus_keyman_init           (void);
 GList           *ibus_keyman_list_engines   (void);
 IBusComponent   *ibus_keyman_get_component  (void);
@@ -108,5 +110,7 @@ void keyman_put_options_todconf
                                              gchar *keyboard_id,
                                              gchar *option_key,
                                              gchar *option_value);
+
+G_END_DECLS
 
 #endif

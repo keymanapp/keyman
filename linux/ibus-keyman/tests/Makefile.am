@@ -81,6 +81,10 @@ ibus_keyman_tests_SOURCES = \
   ../../../common/core/desktop/tests/unit/kmx/kmx_test_source.cpp \
   ../../../common/core/desktop/tests/unit/kmx/kmx_test_source.hpp \
   ../src/keycodes.h \
+  ../src/keymanutil.c \
+  ../src/keymanutil.h \
+  ../src/kmpdetails.c \
+  ../src/kmpdetails.h \
   $(NULL)
 
 ibus_keyman_tests_CFLAGS = \
@@ -94,6 +98,7 @@ ibus_keyman_tests_CFLAGS = \
   -I$(top_srcdir)/../../common/core/desktop/src/kmx \
   -I$(top_srcdir)/../../common/core/desktop/tests/unit/kmx \
   -I$(top_srcdir)/src \
+  -I$(top_builddir)/src \
   $(NULL)
 
 ibus_keyman_tests_CPPFLAGS = \
@@ -107,6 +112,7 @@ ibus_keyman_tests_CPPFLAGS = \
   -I$(top_srcdir)/../../common/core/desktop/src/kmx \
   -I$(top_srcdir)/../../common/core/desktop/tests/unit/kmx \
   -I$(top_srcdir)/src \
+  -I$(top_builddir)/src \
   $(NULL)
 
 ibus_keyman_tests_LDFLAGS = \
