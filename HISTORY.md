@@ -1,5 +1,88 @@
 # Keyman Version History
 
+## 15.0.141 alpha 2021-11-05
+
+* chore(linux): Add integration tests for ibus-keyman (#5881)
+
+## 15.0.140 alpha 2021-11-03
+
+* feat(android): Allow uninstall of sil_euro_latin keyboard (#5838)
+* chore(common/core): Compile test keyboards to .kmp (#5864)
+
+## 15.0.139 alpha 2021-11-02
+
+* chore(common/core): refactor kmx unit tests (#5862)
+* chore(linux): Extract keycode_to_vk[] to separate header file (#5863)
+
+## 15.0.138 alpha 2021-10-29
+
+* chore(linux): Set correct version number on ibus component (#5859)
+* chore(common/core): generate kmp.json (#5860)
+
+## 15.0.137 alpha 2021-10-28
+
+* chore(common): Don't check for conventional commit for fixups (#5858)
+
+## 15.0.136 alpha 2021-10-23
+
+* chore(android/engine): Address globe key TODO (#5836)
+
+## 15.0.135 alpha 2021-10-20
+
+* docs(windows): add note to caps-lock-stores test (#5837)
+
+## 15.0.134 alpha 2021-10-19
+
+* docs(windows): add install apps from anywhere instructions (#5829)
+
+## 15.0.133 alpha 2021-10-16
+
+* chore(common): Check in crowdin strings for Hausa (#5768)
+
+## 15.0.132 alpha 2021-10-15
+
+* feat(windows): manual keyboard caps tests (#5808)
+
+## 15.0.131 alpha 2021-10-13
+
+* chore(windows): Add obj cod and pdb to gitignore (#5826)
+
+## 15.0.130 alpha 2021-10-11
+
+* fix(common/core): incxstr checks all character while incrementing (#5712)
+
+## 15.0.129 alpha 2021-10-08
+
+* chore: Create CODE_OF_CONDUCT.md (#5819)
+* chore: Add CONTRIBUTING documentation (#5821)
+* chore: Add link to SIL (#5823)
+
+## 15.0.128 alpha 2021-10-07
+
+* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5805)
+
+## 15.0.127 alpha 2021-10-06
+
+* chore(web): disable registerstub test (#5800)
+
+## 15.0.126 alpha 2021-10-05
+
+* chore: sentry.io dsn  ‍ ️ (#5787)
+
+## 15.0.125 alpha 2021-10-05
+
+* fix(android/engine): Remove unnecessary permissions from Manifest (#5752)
+* feat(developer): touch layout testing (#5723)
+* fix(web): popup positioning (#5742)
+* chore(linux): Update changelog files for 14.0.282 :cherries: (#5794)
+
+## 15.0.124 alpha 2021-10-04
+
+* fix(web): support variable stores with predictive text (#5749)
+* fix(windows): handle edge cases using default language (#5709)
+* fix(linux): Don't crash with non-keyboard package file (#5755)
+* fix(linux): Don't crash displaying keyboard details (#5758)
+
 ## 15.0.123 alpha 2021-10-01
 
 * fix(common): Fix cherry-pick labeling (#5782)

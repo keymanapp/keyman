@@ -32,6 +32,7 @@ import com.tavultesoft.kmea.KMHelpFileActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.KMLog;
@@ -113,9 +114,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);
 
-    // If not default keyboard, display uninstall keyboard
-    if (!(kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID) &&
-        languageID.equalsIgnoreCase(KMManager.KMDefault_LanguageID))) {
+    // As long as more than 1 keyboard installed, display uninstall keyboard
+    if (KeyboardController.getInstance().get().size() > 1 && KMManager.canRemoveKeyboard()) {
       hashMap = new HashMap<>();
       hashMap.put(titleKey, getString(R.string.uninstall_keyboard));
       hashMap.put(subtitleKey, "");

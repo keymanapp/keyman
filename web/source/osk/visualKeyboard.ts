@@ -50,13 +50,13 @@ namespace com.keyman.osk {
 
     /**
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
-     * to allow automatic width scaling. 
+     * to allow automatic width scaling.
      */
     private _width: number;
 
     /**
      * The configured height for this VisualKeyboard.  May be `undefined` or `null`
-     * to allow automatic height scaling. 
+     * to allow automatic height scaling.
      */
     private _height: number;
 
@@ -211,7 +211,7 @@ namespace com.keyman.osk {
 
     /**
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
-     * to allow automatic width scaling. 
+     * to allow automatic width scaling.
      */
     get width(): number {
       return this._width;
@@ -219,7 +219,7 @@ namespace com.keyman.osk {
 
     /**
      * The configured height for this VisualKeyboard.  May be `undefined` or `null`
-     * to allow automatic height scaling. 
+     * to allow automatic height scaling.
      */
     get height(): number {
       return this._height;
@@ -485,17 +485,17 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Adjusts a potential "interactive boundary" definition by enforcing an 
-     * "event cancellation zone" near screen boundaries that are not directly adjacent 
+     * Adjusts a potential "interactive boundary" definition by enforcing an
+     * "event cancellation zone" near screen boundaries that are not directly adjacent
      * to the ongoing input event's initial coordinate.
-     * 
+     *
      * This facilitates modeling of conventional cancellation gestures where a user would
      * drag the mouse or touch point off the OSK, as mouse and touch event handlers receive
      * no input beyond screen boundaries.
-     * 
+     *
      * @param baseBounds The baseline interactive bounding area to be adjusted
      * @param startCoord The initial coordinate of a currently-ongoing input event
-     * @returns 
+     * @returns
      */
     private applyScreenMarginBoundsThresholding(baseBounds: BoundingRect,
       startCoord: InputEventCoordinate): BoundingRect {
@@ -1191,7 +1191,7 @@ namespace com.keyman.osk {
           layerElement.style.display = 'block';
           //b[n].style.visibility='visible';
 
-          // Most functions that call this one often indicate a change in modifier 
+          // Most functions that call this one often indicate a change in modifier
           // or state key state.  Keep it updated!
           this._UpdateVKShiftStyle();
         } else {
@@ -1409,7 +1409,7 @@ namespace com.keyman.osk {
      *  @param  {Object}            PKbd            the keyboard object to be displayed
      *  @param  {string=}           argFormFactor   layout form factor, defaulting to 'desktop'
      *  @param  {(string|number)=}  argLayerId      name or index of layer to show, defaulting to 'default'
-     *  @param  {number}            height          Target height for the rendered keyboard 
+     *  @param  {number}            height          Target height for the rendered keyboard
      *                                              (currently required for legacy reasons)
      *  @return {Object}                            DIV object with filled keyboard layer content
      */
@@ -1450,7 +1450,7 @@ namespace com.keyman.osk {
         kbdObj.layerId = layerId;
         kbdObj.updateState();
         // This still feels fairly hacky... but something IS needed to constrain the height.
-        // There are plans to address related concerns through some of the later aspects of 
+        // There are plans to address related concerns through some of the later aspects of
         // the Web OSK-Core design.
         kbdObj.setSize(800, height); // Probably need something for width, too, rather than
         // assuming 100%.
@@ -1492,7 +1492,7 @@ namespace com.keyman.osk {
      * Starts an implementation-specific longpress gesture.  Separately implemented for
      * in-browser and embedded modes.
      * @param key The base key of the longpress.
-     * @returns 
+     * @returns
      */
     startLongpress(key: KeyElement): PendingGesture {
       let _this = this;
@@ -1520,7 +1520,7 @@ namespace com.keyman.osk {
      * Initializes all supported gestures given a base key and the triggering touch coordinates.
      * @param key     The gesture's base key
      * @param touch   The starting touch coordinates for the gesture
-     * @returns 
+     * @returns
      */
     initGestures(key: KeyElement, input: InputEventCoordinate) {
       if (key['subKeys']) {
@@ -1557,7 +1557,7 @@ namespace com.keyman.osk {
 
     /**
      * Updates all currently-pending and activated gestures.
-     * 
+     *
      * @param currentKey    The key currently underneath the most recent touch coordinate
      * @param previousKey   The previously-selected key
      * @param input         The current mouse or touch coordinate for the gesture

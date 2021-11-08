@@ -45,6 +45,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
       new DisplayLanguageType("fr-FR", "French"),
+      new DisplayLanguageType("ha-HG", "Hausa"),
       new DisplayLanguageType("in-ID", "Indonesian"),
       new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("km-KH", "Khmer"),

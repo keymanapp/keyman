@@ -367,6 +367,9 @@ public class CloudRepository {
 
     if(cacheValid && shouldUseMemCache(context)) {
       return; // isn't null - checked by `shouldUseCache`.
+    } else if (!KMManager.hasInternetPermission(context) || !KMManager.hasConnection(context)) {
+      // noop if no internet permission or network connection
+      return;
     }
 
     // check if cache file is valid

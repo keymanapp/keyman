@@ -113,4 +113,12 @@ public:
   BOOL IsLegacy() { return useLegacy; }
 };
 
+/**
+ * ProcessToggleChange
+ * Toggles the state of FLAGS in the Globals::ShiftState bit mask
+ * Supports VK_CAPITAL and VK_NUMLOCK
+ * It DOES NOT generate a system event change for these flags
+ * @param  key
+ */
+void ProcessToggleChange(UINT key);
 #endif
