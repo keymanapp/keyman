@@ -20,6 +20,7 @@
 
 SUBDIRS = \
 	src \
+	tests \
 	icons \
 	m4 \
 	po \

@@ -136,8 +136,8 @@ public final class KeyboardPickerActivity extends BaseActivity {
     listView.setOnItemLongClickListener(new OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-        // Prevent the default keyboard from being removed
-        if (position > 0 && canRemoveKeyboard) {
+        // As long as more than 1 keyboard installed, display uninstall keyboard
+        if (KeyboardController.getInstance().get().size() > 1 && canRemoveKeyboard) {
           PopupMenu popup = new PopupMenu(context, view);
           popup.getMenuInflater().inflate(R.menu.popup, popup.getMenu());
           popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -370,11 +370,8 @@ public final class KeyboardPickerActivity extends BaseActivity {
   protected static boolean removeKeyboard(Context context, int position) {
     boolean result = false;
 
-    // Prevent the first keyboard (index 0) from being removed
-    if (position > 0) {
-      KeyboardController.getInstance().remove(position);
-      result = KeyboardController.getInstance().save(context);
-    }
+    KeyboardController.getInstance().remove(position);
+    result = KeyboardController.getInstance().save(context);
 
     notifyKeyboardsUpdate(context);
 

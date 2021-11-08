@@ -1,0 +1,32 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "10.0.1099.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "kmx.cpp"
+  },
+  "info": {
+    "name": {
+      "description": "Test Keyboards"
+    },
+    "version": {
+      "description": "0.0"
+    },
+    "copyright": {
+      "description": "\u00A9 2018 SIL International"
+    },
+    "author": {
+      "description": ""
+    }
+  },
+  "files": [
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    @keyboards@
+  ]
+}

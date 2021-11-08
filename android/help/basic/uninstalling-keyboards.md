@@ -28,7 +28,7 @@ Step 5)
 The bottom of the keyboard settings menu displays an option to uninstall the keyboard.
 Select 'Uninstall keyboard' to get a prompt to delete the keyboard.
 
-**Note:** The default 'SIL EuroLatin' keyboard for English cannot be removed.
+**Note:** Two or more keyboards need to be installed in order to display this option of uninstalling a keyboard.
 
 ![](../android_images/settings-khmer-info-ap.png)
 

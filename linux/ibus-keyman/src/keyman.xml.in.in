@@ -7,7 +7,7 @@
 	<version>@VERSION@</version>
 	<author>Keyman Team &lt;support@keyman.com&gt;</author>
 	<license>GPL</license>
-	<homepage>http://www.keyman.com</homepage>
+	<homepage>https://keyman.com</homepage>
 	<textdomain>ibus-keyman</textdomain>
 	<observed-paths>
 		<path>/usr/share/keyman/</path>
