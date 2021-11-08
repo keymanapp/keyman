@@ -400,7 +400,7 @@ keyman_put_options_todconf(gchar *package_id,
     gchar *needle = g_strdup_printf("%s=", option_key);
     gchar *kvp = g_strdup_printf("%s=%s", option_key, option_value);
 
-    if (*options != NULL)
+    if (options != NULL)
     {
         int index = 0;
         gboolean option_updated = FALSE;
@@ -409,6 +409,7 @@ keyman_put_options_todconf(gchar *package_id,
             // If option_key already exists, update value with option_value
             if (g_strrstr(options[index], needle) != NULL)
             {
+                g_free(options[index]);
                 options[index] = kvp;
                 option_updated = TRUE;
                 break;
@@ -443,9 +444,9 @@ keyman_put_options_todconf(gchar *package_id,
 
     g_object_unref(G_OBJECT(child_settings));
     g_free(path);
-    g_free(kvp);
     g_free(needle);
-    g_free(options);
+    g_strfreev(options);
+    // kvp got assigned to options[x] and so got freed by g_strfreev()
 }
 
 
