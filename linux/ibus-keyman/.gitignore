@@ -1,6 +1,7 @@
 po/POTFILES
 src/keyman.xml
 src/keyman.xml.in
+src/keyman-version.h
 src/ibus-engine-keyman
 src/print_kmp
 src/print_kmpdetails
