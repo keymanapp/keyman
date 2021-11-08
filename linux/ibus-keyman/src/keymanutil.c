@@ -349,7 +349,7 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
     gchar **options = keyman_get_options_fromdconf(package_id, keyboard_id);
 
     // Parse options into queue_options
-    if (*options != NULL)
+    if (options != NULL)
     {
         int index = 0;
         while (options[index] != NULL)
