@@ -201,7 +201,6 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
   // and store the key along with the modifer.
   const uint32_t group_cnt = _kmx.GetKeyboard()->Keyboard->cxGroupArray;
   const LPGROUP group_array = _kmx.GetKeyboard()->Keyboard->dpGroupArray;
-  uint16_t vk_count = 0;
   GROUP *p_group;
 
   std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t> map_rules;
