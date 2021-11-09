@@ -26,13 +26,21 @@ int error_args() {
     return 1;
 }
 
+km_kbp_keyboard_key kb_key_expected_list[] = {{49,16384},{50,16384},{66,16416},{67,16384},{67,16448},{97,0},{98,0}};
+
+/**
+ * The purpose of this test is to verify that `km_kbp_keyboard_get_key_list`
+ * returns list of all the keys used for a keyboard that core as loaded.
+ *
+ * @param source_path  Path to kmx keyboard file
+ */
 void test_key_list(const km::kbp::path &source_path){
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
   km_kbp_keyboard_key * kb_key_list;
 
-  km::kbp::path const source_keybard = "039 - generic ctrlalt.kmx";
+  km::kbp::path const source_keybard = "049 - groups ctrlalt.kmx";
   km::kbp::path full_path = km::kbp::path::join(source_path, source_keybard);
 
   try_status(km_kbp_keyboard_load(full_path.native().c_str(), &test_kb));
@@ -45,9 +53,11 @@ void test_key_list(const km::kbp::path &source_path){
   km_kbp_keyboard_key *key_rule_it = kb_key_list;
   auto n = 0;
   for (; key_rule_it->key; ++key_rule_it) {
+    assert(kb_key_expected_list[n].key == key_rule_it->key);
+    assert(kb_key_expected_list[n].modifier_flag == key_rule_it->modifier_flag);
     ++n;
   }
-  assert(n==2);
+  assert(n==7);
 
   km_kbp_keyboard_key_list_dispose(kb_key_list);
   km_kbp_state_dispose(test_state);

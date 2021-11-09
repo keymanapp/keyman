@@ -1,6 +1,7 @@
 #include <keyman/keyboardprocessor.h>
 #include "state.hpp"
 #include "kmx/kmx_processor.hpp"
+#include <map>
 
 using namespace km::kbp;
 using namespace kmx;
@@ -203,16 +204,10 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
   uint16_t vk_count = 0;
   GROUP *p_group;
 
-  for(auto i = decltype(group_cnt){0}; i < group_cnt; i++)
-  {
-    if(group_array[i].fUsingKeys)
-    {
-      vk_count += group_array[i].cxKeyArray;
-    }
-  }
-
-  km_kbp_keyboard_key *rules = new km_kbp_keyboard_key[vk_count + 1];
-  int n = 0;
+  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t> map_rules;
+  km_kbp_virtual_key v_key;
+  uint32_t modifier_flag;
+// Use hash map to get the unique list
   for(auto i = decltype(group_cnt){0}; i < group_cnt; i++)
   {
     p_group = &group_array[i];
@@ -220,12 +215,22 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
     {
       for(auto j = decltype(p_group->cxKeyArray){0}; j < p_group->cxKeyArray; j++)
       {
-        // If we have a key rule for the key add it to the list
-        rules[n].key = p_group->dpKeyArray[j].Key;
-        rules[n].modifier_flag = p_group->dpKeyArray[j].ShiftFlags;
-        n++;
+        v_key = p_group->dpKeyArray[j].Key;
+        modifier_flag = p_group->dpKeyArray[j].ShiftFlags;
+        map_rules.insert_or_assign(std::make_pair(v_key,modifier_flag),modifier_flag);
       }
     }
+  }
+  // Now convert to the keyboard key array
+  km_kbp_keyboard_key *rules = new km_kbp_keyboard_key[map_rules.size() + 1];
+  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t>::iterator it = map_rules.begin();
+  int n = 0;
+  while (it != map_rules.end()){
+    auto pair = it->first;
+    rules[n].key = pair.first;
+    rules[n].modifier_flag = it->second;
+    it++;
+    n++;
   }
   // Insert list termination
   rules[n] =  KM_KBP_KEYBOARD_KEY_LIST_END;
