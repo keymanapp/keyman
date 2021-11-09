@@ -217,7 +217,7 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
       {
         v_key = p_group->dpKeyArray[j].Key;
         modifier_flag = p_group->dpKeyArray[j].ShiftFlags;
-        map_rules.insert_or_assign(std::make_pair(v_key,modifier_flag),modifier_flag);
+        map_rules[std::make_pair(v_key,modifier_flag)] = modifier_flag;
       }
     }
   }

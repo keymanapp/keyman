@@ -753,7 +753,18 @@ km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
                             km_kbp_keyboard_key **out);
 
 
+/*
+```
+### `km_kbp_keyboard_key_list_dispose`
+##### Description:
+Free the allocated memory belonging to a keyboard key list previously
+returned by `km_kbp_keyboard_get_key_list`.
+##### Parameters:
+- __keyboard__: A pointer to the keyboard key list to be
+    disposed of.
 
+```c
+*/
 void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
 
 

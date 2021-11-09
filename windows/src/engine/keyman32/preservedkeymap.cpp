@@ -285,6 +285,7 @@ BOOL PreservedKeyMap::IsMatchingKey(PreservedKey *pKey, PreservedKey *pKeys, siz
   return FALSE;
 }
 
+// TODO: 5442 - Remove once core processor verfied
 BOOL PreservedKeyMap::MapKeyboard(KEYBOARD *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys)
 {
   size_t cKeys = 0, n;
@@ -473,7 +474,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI GetKeyboardPreservedKeys(PreservedK
     // use api to get key rules
     return pkm.MapKeyboardCore(_td->lpActiveKeyboard->lpCoreKeyboard, pPreservedKeys, cPreservedKeys);
 
-  } else {
+  } else { // TODO: 5442 Remove else
     if (!_td->lpActiveKeyboard->Keyboard) {
       return FALSE;
     }
