@@ -157,10 +157,10 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   }
 
   p--;
-  if(*p == UC_SENTINEL_EXTENDEDEND)
-  {
+  if(*p == UC_SENTINEL_EXTENDEDEND) {
     int n = 0;
-    while(*p != UC_SENTINEL && n < 10) { p--; n++; }
+    while(*p != UC_SENTINEL && n < 10) {
+      p--; n++; }
 
     if(p < pStart) {
       // May be a malformed virtual key
@@ -169,24 +169,27 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
     return p;
   }
 
-  if(p == pStart) return p; // Don't allow test before pStart
+  if (p == pStart) {
+    // Don't allow test before pStart
+    return p;
+  }
 
-  if(*p >= 0xDC00 && *p <= 0xDFFF && *(p-1) >= 0xD800 && *(p-1) <= 0xDBFF)
-  {
+  if(*p >= 0xDC00 && *p <= 0xDFFF && *(p-1) >= 0xD800 && *(p-1) <= 0xDBFF) {
     return p-1;
   }
 
-  else if(*(p-1) == UC_SENTINEL) return p-1;
-  else
-  {
-    q  = p - 2;
-    for (int i = 2; i < CODE__SIZE_MAX && q >= pStart; i++, q--)
-    {
-      //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
-      if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
-        return (p - i);
-    }
+  if (*(p - 1) == UC_SENTINEL) {
+    // TODO: validate that *p <= CODE_LASTCODE? What do we do if it isn't?
+    return p - 1;
   }
+  
+  q  = p - 2;
+  for (int i = 2; i < CODE__SIZE_MAX && q >= pStart; i++, q--) {
+    //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
+    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
+      return (p - i);
+  }
+  
   return p; 
 }
 
