@@ -94,12 +94,12 @@ Building:
 
 ### Keyman for Android
 
-Dependencies:
+**Dependencies**:
 * [Base](#base-dependencies)
 * [Web](#web-dependencies)
 * [Environment Variables](#environment-variables)
 
-Additional requirements:
+**Additional requirements**:
 * Android SDK
 * Android Studio
 * Ant
@@ -107,6 +107,7 @@ Additional requirements:
 * Maven
 
 ```ps1
+# Elevated PowerShell
 choco install android-sdk android-studio ant gradle maven
 # optionally install sdk images
 sdkmanager "system-images;android-30;google_apis;armeabi-v7a"
@@ -130,10 +131,10 @@ PowerShell.
 
 ### Base Dependencies
 
-For:
+**Projects**:
 * all projects
 
-Requirements:
+**Requirements**:
 * git for Windows
 * jq
 * Python 3
@@ -143,6 +144,7 @@ Requirements:
 * Pandoc
 
 ```ps1
+# Elevated PowerShell
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 choco install git jq python ninja pandoc
@@ -156,20 +158,39 @@ refreshenv
 rustup target add i686-pc-windows-msvc
 ```
 
+**Environment variables**:
+* [`KEYMAN_ROOT`](#keyman_root)
+
+```bat
+SET KEYMAN_ROOT=c:\Projects\keyman\keyman
+```
+
+To check whether environment variables are set, run `SET <variable>` in command
+prompt.
+
+You can use Windows Settings to add these environment variables permanently:
+
+1. In Windows Search, type "environment" and select "Edit System Environment
+   Variables"
+2. Click `Environment Variables...`
+3. You can add or edit variables in either User or System settings, as you
+   prefer.
+
 ### Web Dependencies
 
-For:
+**Projects**:
 * Keyman Developer
 * Keyman for Android
 * KeymanWeb
 
-Requirements:
+**Requirements**:
 * node.js 14+
 * emscripten 2.0.23+
 * wasm-pack 0.9.1+
 * openjdk 8+
 
 ```ps1
+# Elevated PowerShell
 rustup target add i686-pc-windows-msvc
 rustup target add wasm32-unknown-unknown
 choco install nodejs emscripten
@@ -181,13 +202,17 @@ Invoke-WebRequest -Uri https://github.com/rustwasm/wasm-pack/releases/download/v
 & "$env:TEMP\wasm-pack-init.exe"
 ```
 
+**Environment variables**:
+* `PATH`:
+  * Add emscripten to path, most likely %LocalAppData%\emsdk\upstream\emscripten
+
 ### Windows Platform Dependencies
 
-For:
+**Projects**:
 * Keyman Developer
 * Keyman for Windows
 
-Requirements:
+**Requirements**:
 * Delphi 10.3 Community or Professional:
   https://www.embarcadero.com/products/delphi/starter/free-download (Delphi
   Windows Community, DUnit Unit Testing Frameworks required)
@@ -214,63 +239,38 @@ Requirements:
   3. Change 'Tab size' to 2 and 'Indent size' to 2.
   4. Select 'Insert spaces'.
 
-Additional requirements for release builds:
-* [7-Zip](http://www.7-zip.org/), used for archiving build files
-* [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138)
-* [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm)
-* [CEF4Delphi_Binary](https://github.com/keymanapp/CEF4Delphi_Binary) repository
-
-```ps1
-choco install 7zip html-help-workshop
-choco install wixtoolset --version=3.11.1
-git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
-```
-
-## Environment Variables
-
-For:
-* All projects
-
-To check whether these variables are set, run `SET <variable>` in command
-prompt. You can use Windows Settings to add these environment variables permanently:
-
-1. In Windows Search, type "environment" and select "Edit System Environment Variables"
-2. Click `Environment Variables...`
-3. Click `New...` or `Edit...` (in User variables or System variables, as you prefer) for
-   each of the variables below.
-
-Required variables:
-* `KEYMAN_ROOT`
-
-```bat
-SET KEYMAN_ROOT=c:\Projects\keyman\keyman
-```
-
-### Windows Platform Variables
-
-For:
-* Keyman for Windows
-* Keyman Developer
-
-Required variables:
+**Required environment variables**:
 * `PATH`
   * Add the C:\Projects\keyman\keyman\windows\lib folder in the Keyman
     repository to your `PATH` environment variable. This is required for
     Keyman's design-time packages to load in Delphi.
-  * For web platform, add emscripten to path (most likely
-    %LocalAppData%\emsdk\upstream\emscripten).
-* `KEYMAN_CEF4DELPHI_ROOT`
+* [`KEYMAN_CEF4DELPHI_ROOT`](#keyman_cef4delphi_root)
 
-Optional variables:
-* `GIT_BASH_FOR_KEYMAN`
-* `USERDEFINES`
+**Optional environment variables**:
+* [`GIT_BASH_FOR_KEYMAN`](#git_bash_for_keyman)
+* [`USERDEFINES`](#userdefines)
 
 ```bat
 SET KEYMAN_CEF4DELPHI_ROOT=c:\Projects\keyman\CEF4Delphi_Binary
 SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l
 ```
 
-### KEYMAN_ROOT - Locating the source
+**Additional requirements for release builds**:
+* [7-Zip](http://www.7-zip.org/), used for archiving build files
+* [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138)
+* [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm)
+* [CEF4Delphi_Binary](https://github.com/keymanapp/CEF4Delphi_Binary) repository
+
+```ps1
+# Elevated PowerShell
+choco install 7zip html-help-workshop
+choco install wixtoolset --version=3.11.1
+git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
+```
+
+## Notes on Environment Variables
+
+### KEYMAN_ROOT
 
 If you pull the entire `keyman.git` repo to `c:\keyman`, then the paths by
 default will work without changes. Otherwise, you will need to set an
@@ -281,7 +281,7 @@ example:
 SET KEYMAN_ROOT=c:\projects\keyman\keyman
 ```
 
-### KEYMAN_CEF4DELPHI_ROOT - Chromium Embedded Framework
+### KEYMAN_CEF4DELPHI_ROOT
 
 Keyman and Keyman Developer use Chromium Embedded Framework. The source repo is
 at https://github.com/keymanapp/CEF4Delphi. In order to build the installers, we
@@ -309,7 +309,7 @@ SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Prog
 
 You should verify the install location of Git on your computer as it may vary.
 
-### USERDEFINES - User Defines
+### USERDEFINES
 
 You can specify defines that will not be added to the git repository and will be
 used in the build in the UserDefines.mak file in the root folder. This is used
@@ -325,6 +325,8 @@ the same result.
 * sentry-cli (optional)
   - Uploading symbols for Sentry-based error reporting
 
+  bash:
   ```bash
+  # bash
   curl -sL https://sentry.io/get-cli/ | bash
   ```
