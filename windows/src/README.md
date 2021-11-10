@@ -49,7 +49,7 @@ will need to uninstall and reinstall.
 
 #### Certificates
 
-In order to create a release builds, you will need a code signing certiicate.
+In order to create a release build, you will need a code signing certiicate.
 You can use your own certificate, or you can use test certificates which are not
 globally trusted.
 

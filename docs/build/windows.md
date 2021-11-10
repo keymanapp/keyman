@@ -62,7 +62,6 @@ finished with them.
 Dependencies:
 * [Base](#base-dependencies)
 * [Windows Platform](#windows-platform-dependencies)
-* [Environment Variables](#environment-variables)
 
 **Note**: Keyman for Windows is currently built together with Keyman Developer.
 We are working on splitting these projects. For now, you will need the Keyman
@@ -77,7 +76,6 @@ Dependencies:
 * [Base](#base-dependencies)
 * [Web](#web-dependencies)
 * [Windows Platform](#windows-platform-dependencies)
-* [Environment Variables](#environment-variables)
 
 Building:
 * [Building Keyman Developer](../../windows/src/README.md)
@@ -87,7 +85,6 @@ Building:
 Dependencies:
 * [Base](#base-dependencies)
 * [Web](#web-dependencies)
-* [Environment Variables](#environment-variables)
 
 Building:
 * [Building KeymanWeb](../../web/README.md)
@@ -97,7 +94,6 @@ Building:
 **Dependencies**:
 * [Base](#base-dependencies)
 * [Web](#web-dependencies)
-* [Environment Variables](#environment-variables)
 
 **Additional requirements**:
 * Android SDK
