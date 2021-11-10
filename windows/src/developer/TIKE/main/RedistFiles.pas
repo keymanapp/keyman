@@ -124,8 +124,15 @@ begin
 end;
 
 function GetRedistProjectTemplatePath: string;
+var
+  root: string;
+const
+  DevProjectTemplatePath = 'windows\src\developer\kmconvert\data\';
 begin
-  Result := GetDebugPath('Debug_RedistTemplatePath', ExtractFilePath(ParamStr(0))+'projects\templates\');
+  if TKeymanPaths.RunningFromSource(root)
+    then Result := root + DevProjectTemplatePath
+    else Result := ExtractFilePath(ParamStr(0))+'projects\templates\';
+  Result := GetDebugPath('Debug_RedistTemplatePath', Result);
 end;
 
 function GetDebugKMCmpDllPath: string;
