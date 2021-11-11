@@ -1629,12 +1629,24 @@ var
         ((ch >= $00A0) and (ch <= $10FFFF));
     end;
 
+    function AreValidUnicodeValues(const value: string): Boolean;
+    var
+      v: string;
+      values: TArray<string>;
+    begin
+      values := value.Split(['_']);
+      for v in values do
+        if not IsValidUnicodeValue(StrToIntDef('$'+v, 0)) then
+          Exit(False);
+      Result := True;
+    end;
+
     function KeyIdType(const FId: string): TKeyIdType;   // I4142
     begin
       Result := Key_Invalid;
       case UpCase(FId[1]) of
         'T': Result := Key_Touch;
-        'U': if (Copy(FId, 1, 2) = 'U_') and IsValidUnicodeValue(StrToIntDef('$'+Copy(FId,3,MaxInt), 0)) then Result := Key_Unicode;   // I4198
+        'U': if (Copy(FId, 1, 2) = 'U_') and AreValidUnicodeValues(FId.Substring(2)) then Result := Key_Unicode;   // I4198
         else if FindVKeyName(FId) <> $FFFF then Result := Key_Constant;
       end;
     end;
