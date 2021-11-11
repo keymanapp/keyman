@@ -251,6 +251,7 @@ type
     function JavaScript_SetupDebug: string;
     function JavaScript_SetupEpilog: string;
     function JavaScript_SetupProlog: string;
+    function IsKeyboardVersion15OrLater: Boolean;
   public
     function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallbackW): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
@@ -1635,6 +1636,8 @@ var
       values: TArray<string>;
     begin
       values := value.Split(['_']);
+      if (Length(values) > 1) and not IsKeyboardVersion15OrLater then
+        Exit(False);
       for v in values do
         if not IsValidUnicodeValue(StrToIntDef('$'+v, 0)) then
           Exit(False);
@@ -2338,6 +2341,11 @@ end;
 function TCompileKeymanWeb.IsKeyboardVersion14OrLater: Boolean;
 begin
   Result := fk.version >= VERSION_140;
+end;
+
+function TCompileKeymanWeb.IsKeyboardVersion15OrLater: Boolean;
+begin
+  Result := fk.version >= VERSION_150;
 end;
 
 procedure TCompileKeymanWeb.CheckStoreForInvalidFunctions(key: PFILE_KEY; store: PFILE_STORE);  // I1520
