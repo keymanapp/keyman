@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.143 alpha 2021-11-11
+
+* fix(developer): handle shortcut keys in debugger (#5776)
+
 ## 15.0.142 alpha 2021-11-08
 
 * chore(linux): Cleanup (#5886)
