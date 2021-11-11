@@ -33,13 +33,14 @@ uses
   kpsfile;
 
 function DoKCCompilePackage(FileName: string; AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean;
-  const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
+  const AInstallerMSI: string; AUpdateInstaller: Boolean; const ASchemaPath: string): Boolean;   // I4706
 
 implementation
 
 uses
   Keyman.Developer.System.Project.ProjectLog,
-  Keyman.Developer.System.Project.ProjectLogConsole;
+  Keyman.Developer.System.Project.ProjectLogConsole,
+  Keyman.Developer.System.ValidateKpsFile;
 
 type
   TKCCompilePackage = class
@@ -52,7 +53,8 @@ begin
   TProjectLogConsole.Instance.Log(State, pack.Filename, Msg, 0, 0);
 end;
 
-function DoKCCompilePackage(FileName: string; AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean; const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
+function DoKCCompilePackage(FileName: string; AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean;
+  const AInstallerMSI: string; AUpdateInstaller: Boolean; const ASchemaPath: string): Boolean;   // I4706
 var
   tcp: TKCCompilePackage;
   pack: TKPSFile;
@@ -68,6 +70,17 @@ begin
       TProjectLogConsole.Instance.Log(plsFatal, FileName, 'Package file does not exist', 0, 0);
       Exit;
     end;
+
+    if (ASchemaPath <> '') and (FileExists(ASchemaPath + 'kps.xsd')) then
+    begin
+      if not TValidateKpsFile.Execute(FileName, ASchemaPath + 'kps.xsd',
+        TProjectLogConsole.Instance.Log) then
+      begin
+        TProjectLogConsole.Instance.Log(plsFailure, FileName, 'Package '+FileName+' had validation errors.', 0, 0);
+        Exit;
+      end;
+    end;
+
     pack.FileName := FileName;
     pack.LoadXML;
 
