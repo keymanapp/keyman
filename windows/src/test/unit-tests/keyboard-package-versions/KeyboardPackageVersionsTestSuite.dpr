@@ -99,7 +99,8 @@ uses
   Keyman.System.PackageInfoRefreshLexicalModels in '..\..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.Developer.System.Project.UrlRenderer in '..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
-  KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas';
+  KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas',
+  Keyman.Developer.System.ValidateKpsFile in '..\..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas';
 
 var
   runner : ITestRunner;
