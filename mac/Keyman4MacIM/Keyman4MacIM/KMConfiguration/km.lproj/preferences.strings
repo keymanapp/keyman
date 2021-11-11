@@ -8,17 +8,11 @@
 /* Class = "NSTabViewItem"; label = "Support"; ObjectID = "93O-x6-RLF"; */
 "93O-x6-RLF.label" = "គាំទ្រ";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "C6L-PK-bpq"; */
-"C6L-PK-bpq.title" = "ក្រឡាអត្ថបទ";
-
 /* Class = "NSButtonCell"; title = "Download keyboard..."; ObjectID = "CTw-kf-WNS"; */
 "CTw-kf-WNS.title" = "ទាញយកក្ដារចុច...";
 
 /* Class = "NSWindow"; title = "Keyman Configuration"; ObjectID = "F0z-JX-Cv5"; */
 "F0z-JX-Cv5.title" = "ការកំណត់រចនាសម្ព័ន្ធ Keyman";
-
-/* Class = "NSTextFieldCell"; title = "Table View Cell"; ObjectID = "J2x-OZ-TSX"; */
-"J2x-OZ-TSX.title" = "ក្រឡាទិដ្ឋភាពតារាង";
 
 /* Class = "NSButtonCell"; title = "< Back"; ObjectID = "JOK-JV-n8w"; */
 "JOK-JV-n8w.title" = "ថយក្រោយ";
@@ -29,14 +23,8 @@
 /* Class = "NSTextFieldCell"; title = "When the verbose logging option is on, Keyman will log actions that might help Keyman Support diagnose a problem. The Console program can be used to see a log of messages from Keyman. In Console, filter to show all messages from the \"Keyman\" process. This log can be exported and sent to Keyman support if needed."; ObjectID = "MrI-GM-7d6"; */
 "MrI-GM-7d6.title" = "នៅពេលបើកជម្រើសកំណត់ហេតុលម្អិត Keyman នឹងរក្សារទុកកំណត់ហេតុសកម្មភាពដែលអាចជួយក្រុមការងារ​ Keyman វិភាគបញ្ហា។ កម្មវិធីកុងសូលអាចប្រើបើកមើលសារកំណត់ហេតុពី Keyman។ ក្នុងកុងសូល ត្រងដើម្បីបង្ហាញសារទាំងអស់ពីដំណើរការរបស់ \"Keyman\"។ បើចាំបាច់ អ្នកអាចនាំចេញ ឬផ្ញើកំណត់ហេតុនេទៅក្រុមការងារ Keyman។";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "dU5-ev-A3u"; */
-"dU5-ev-A3u.title" = "ក្រឡាអត្ថបទ";
-
 /* Class = "NSButtonCell"; title = "Forward >"; ObjectID = "eXr-8V-h1g"; */
 "eXr-8V-h1g.title" = "ទៅមុខ";
-
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eoD-O5-Qsf"; */
-"eoD-O5-Qsf.title" = "ក្រឡាអត្ថបទ";
 
 /* Class = "NSButtonCell"; title = "Home"; ObjectID = "fXS-aC-CMH"; */
 "fXS-aC-CMH.title" = "ដើម";
