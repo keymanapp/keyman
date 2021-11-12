@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.144 alpha 2021-11-12
+
+* fix(android/engine): Truncate language name in list (#5878)
+* fix(android/app): Check KMP file exists before attempting to extract (#5849)
+* fix(web): Check parent element is defined before assigning (#5874)
+* fix(android/app): Revert test code (#5899)
+
 ## 15.0.143 alpha 2021-11-11
 
 * fix(developer): handle shortcut keys in debugger (#5776)
