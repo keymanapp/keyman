@@ -121,7 +121,8 @@ uses
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
   Keyman.Developer.System.ValidateRepoChanges in 'Keyman.Developer.System.ValidateRepoChanges.pas',
-  Keyman.Developer.System.KeymanDeveloperPaths in '..\TIKE\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
+  Keyman.Developer.System.KeymanDeveloperPaths in '..\TIKE\main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
+  Keyman.Developer.System.ValidateKpsFile in '..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas';
 
 {$R icons.RES}
 {$R version.res}
