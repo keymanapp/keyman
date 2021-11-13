@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.145 alpha 2021-11-13
+
+* fix(developer): crash exporting OSK on European keyboard (#5893)
+* feat(developer): validate .kps files during compile (#5895)
+
 ## 15.0.144 alpha 2021-11-12
 
 * fix(android/engine): Truncate language name in list (#5878)
