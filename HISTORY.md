@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.146 alpha 2021-11-14
+
+* feat(developer): support for U_xxxx_yyyy (#5894)
+
 ## 15.0.145 alpha 2021-11-13
 
 * fix(developer): crash exporting OSK on European keyboard (#5893)
