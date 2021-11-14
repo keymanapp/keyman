@@ -22,7 +22,7 @@ namespace com.keyman.osk {
     manual      = "manual",
     automatic = "automatic"
   }
-  
+
   export abstract class OSKView {
     _Box: HTMLDivElement;
 
@@ -34,23 +34,23 @@ namespace com.keyman.osk {
     protected device: com.keyman.utils.DeviceSpec;
     protected readonly hostDevice: com.keyman.utils.DeviceSpec;
 
-    private _boxBaseMouseDown:        (e: MouseEvent) => boolean; 
+    private _boxBaseMouseDown:        (e: MouseEvent) => boolean;
     private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
     private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
     private keyboard: keyboards.Keyboard;
 
     private _target:  text.OutputTarget;
-    
+
     /**
      * The configured width for this OSKManager.  May be `undefined` or `null`
-     * to allow automatic width scaling. 
+     * to allow automatic width scaling.
      */
     private _width: ParsedLengthStyle;
 
     /**
      * The configured height for this OSKManager.  May be `undefined` or `null`
-     * to allow automatic height scaling. 
+     * to allow automatic height scaling.
      */
     private _height: ParsedLengthStyle;
 
@@ -111,7 +111,7 @@ namespace com.keyman.osk {
       // Register a listener for model change events so that we can hot-swap the banner as needed.
       // Handled here b/c banner changes may trigger a need to re-layout the OSK.
       const _this = this;
-      keymanweb.core.languageProcessor.on('statechange', 
+      keymanweb.core.languageProcessor.on('statechange',
                                           function(state: text.prediction.StateChangeEnum) {
         let currentType = _this.bannerView.activeType;
         _this.bannerView.selectBanner(state);
@@ -182,7 +182,7 @@ namespace com.keyman.osk {
     /**
      * Gets and sets the IME-like interface (`OutputTarget`) to be affected by events from
      * the OSK.
-     * 
+     *
      * If `activationMode` is `'conditional'`, this property's state controls the visibility
      * of the OSKView.
      */
@@ -259,11 +259,11 @@ namespace com.keyman.osk {
 
     /**
      * A property denoting whether or not the OSK should be presented if it meets its
-     * activation conditions. 
-     * 
+     * activation conditions.
+     *
      * When `activationMode == 'manual'`, `displayIfActive == true` is the lone
      * activation condition.
-     * 
+     *
      * Note: cannot be set to `false` if `activationMode == 'static'`.
      */
     get displayIfActive(): boolean {
@@ -318,7 +318,7 @@ namespace com.keyman.osk {
 
     /**
      * The configured width for this VisualKeyboard.  May be `undefined` or `null`
-     * to allow automatic width scaling. 
+     * to allow automatic width scaling.
      */
     get width(): ParsedLengthStyle {
       return this._width;
@@ -326,7 +326,7 @@ namespace com.keyman.osk {
 
     /**
      * The configured height for this VisualKeyboard.  May be `undefined` or `null`
-     * to allow automatic height scaling. 
+     * to allow automatic height scaling.
      */
     get height(): ParsedLengthStyle {
       return this._height;
@@ -357,7 +357,7 @@ namespace com.keyman.osk {
     }
 
     /**
-     * The top-level style string for the font size used by the predictive banner 
+     * The top-level style string for the font size used by the predictive banner
      * and the primary keyboard visualization elements.
      */
     get baseFontSize(): string {
@@ -397,7 +397,7 @@ namespace com.keyman.osk {
         return ParsedLengthStyle.special(fontScale, 'em');
       } else {
         return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
-      } 
+      }
     }
 
     public get activeKeyboard(): keyboards.Keyboard {
@@ -488,13 +488,11 @@ namespace com.keyman.osk {
       this.needsLayout = false;
 
       // Step 3:  perform layout operations.
-      if(!this._baseFontSize && this.parsedBaseFontSize) {
-        // Make sure to initialize the default font size if it hasn't already been set!
-        this.banner.element.style.fontSize = this.baseFontSize;
-        if(this.vkbd) {
-          this.vkbd.fontSize = this.parsedBaseFontSize;
-        }
+      this.banner.element.style.fontSize = this.baseFontSize;
+      if(this.vkbd) {
+        this.vkbd.fontSize = this.parsedBaseFontSize;
       }
+
       if(!pending) {
         this.headerView?.refreshLayout();
         this.bannerView.refreshLayout();
@@ -509,9 +507,6 @@ namespace com.keyman.osk {
           availableHeight -= this.bannerView.height + 5;
         }
         this.vkbd.setSize(this.computedWidth, availableHeight, pending);
-        if(!pending) {
-          this.vkbd.refreshLayout();
-        }
 
         const bs = this._Box.style;
         // OSK size settings can only be reliably applied to standard VisualKeyboard
@@ -614,7 +609,7 @@ namespace com.keyman.osk {
     private layerChangeHandler: text.SystemStoreMutationHandler = function(this: OSKView,
       source: text.MutableSystemStore,
       newValue: string) {
-      // This handler is also triggered on state-key state changes (K_CAPS) that 
+      // This handler is also triggered on state-key state changes (K_CAPS) that
       // may not actually change the layer.
       if(this.vkbd) {
         this.vkbd._UpdateVKShiftStyle();
@@ -631,7 +626,9 @@ namespace com.keyman.osk {
 
         // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
         this.keyboardView.updateState();
-        this.refreshLayoutIfNeeded();
+        // We need to recalc the font size here because the layer did not have
+        // calculated dimensions available before it was visible
+        this.refreshLayout();
       }
     }.bind(this);
 
@@ -691,7 +688,7 @@ namespace com.keyman.osk {
 
     /**
      * The main function for presenting the OSKView.
-     * 
+     *
      * This includes:
      * - refreshing its layout
      * - displaying it
@@ -719,7 +716,7 @@ namespace com.keyman.osk {
 
       /* In case it's still '0' from a hide() operation.
        *
-       * (Opacity is only modified when device.touchable = true, 
+       * (Opacity is only modified when device.touchable = true,
        * though a couple of extra conditions may apply.)
        */
       this._Box.style.opacity = '1';
@@ -808,7 +805,7 @@ namespace com.keyman.osk {
     }
 
     /**
-     * 
+     *
      * @returns `false` if the OSK is in an invalid state for being presented to the user.
      */
     protected mayShow(): boolean {
@@ -829,8 +826,8 @@ namespace com.keyman.osk {
     }
 
     /**
-     * 
-     * @param hiddenByUser 
+     *
+     * @param hiddenByUser
      * @returns `false` if the OSK is in an invalid state for being hidden from the user.
      */
     protected mayHide(hiddenByUser: boolean): boolean {
@@ -851,12 +848,12 @@ namespace com.keyman.osk {
     /**
      * Applies CSS styling and handling needed to perform a fade animation when
      * hiding the OSK.
-     * 
+     *
      * Note:  currently reflects an effectively-dead code path, though this is
      * likely not intentional.  Other parts of the KMW engine seem to call hideNow()
      * synchronously after each and every part of the engine that calls this function,
      * cancelling the Promise.
-     * 
+     *
      * @returns A Promise denoting either cancellation of the hide (`false`) or
      * completion of the hide & its animation (`true`)
      */
@@ -993,10 +990,10 @@ namespace com.keyman.osk {
 
     /**
      * Display build number
-     * 
+     *
      * In the future, this should raise an event that the consuming KeymanWeb
      * engine may listen for & respond to, rather than having it integrated
-     * as part of the OSK itself. 
+     * as part of the OSK itself.
      */
     showBuild() {
       let keymanweb = com.keyman.singleton;
@@ -1006,11 +1003,11 @@ namespace com.keyman.osk {
 
     /**
      * Display list of installed keyboards in pop-up menu
-     * 
+     *
      * In the future, this language menu should be defined as a UI module like the standard
      * desktop UI modules.  The globe key should then trigger an event to _request_ that the
      * consuming engine display the active UI module's menu.
-     * 
+     *
      **/
     showLanguageMenu() {
       if(this.hostDevice.touchable) {

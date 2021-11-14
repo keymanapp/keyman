@@ -54,7 +54,7 @@ namespace com.keyman.osk {
       let q = document.createElement('div');
       q.className='kmw-key-label';
       if(x > 0) {
-        q.innerHTML=String.fromCharCode(x);
+        q.innerText=String.fromCharCode(x);
       } else {
         // Keyman-only virtual keys have no corresponding physical key.
         // So, no text for the key-cap.
@@ -128,7 +128,7 @@ namespace com.keyman.osk {
       this.square.style.width = vkbd.layoutWidth.scaledBy(key.proportionalWidth).styleString;
       this.square.style.marginLeft = vkbd.layoutWidth.scaledBy(key.proportionalPad).styleString;
       this.btn.style.width = vkbd.usesFixedWidthScaling ? this.square.style.width : '100%';
-      
+
       if(vkbd.usesFixedHeightScaling) {
         // Matches its row's height.
         this.square.style.height = vkbd.layoutHeight.scaledBy(this.row.heightFraction).styleString;
