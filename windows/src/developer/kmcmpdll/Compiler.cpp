@@ -1220,6 +1220,7 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     else if (wcsncmp(p, L"9.0", 3) == 0)  fk->version = VERSION_90;
     else if (wcsncmp(p, L"10.0", 4) == 0)  fk->version = VERSION_100;
     else if (wcsncmp(p, L"14.0", 4) == 0)  fk->version = VERSION_140; // Adds support for #917 -- context() with notany() for KeymanWeb
+    else if (wcsncmp(p, L"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
     else return CERR_InvalidVersion;
 
     if (fk->version < VERSION_60) FOldCharPosMatching = TRUE;

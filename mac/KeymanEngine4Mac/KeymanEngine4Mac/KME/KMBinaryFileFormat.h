@@ -42,12 +42,10 @@ struct COMP_KEYBOARD {
 #define VERSION_80  0x00000800
 #define VERSION_90  0x00000900
 #define VERSION_100 0x00000A00
-#define VERSION_110 0x00000B00
-#define VERSION_120 0x00000C00
-#define VERSION_130 0x00000D00
 #define VERSION_140 0x00000E00
+#define VERSION_150 0x00000F00
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_140
+#define VERSION_MAX VERSION_150
 
 struct COMP_GROUP {
     DWORD dpName;           // string (only debug)
@@ -122,7 +120,7 @@ struct COMP_STORE {
 #define K_CTRLFLAG      0x0020      // Either ctrl flag
 #define K_ALTFLAG       0x0040      // Either alt flag
 //#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
-                                // Used internally (currently, only by KMW) to ensure Meta-key 
+                                // Used internally (currently, only by KMW) to ensure Meta-key
                                 // shortcuts safely bypass rules
                                 // Meta key = Command key on macOS, Windows key on Windows
 #define CAPITALFLAG     0x0100      // Caps lock on
