@@ -676,8 +676,9 @@ final class KMKeyboard extends WebView {
     }
   }
 
-  // Extract Unicode numbers (\\uxxxx) from a layer to character string.
+  // Extract Unicode numbers (\\u_xxxx_yyyy) from a layer to character string.
   // Ignores empty strings and layer names
+  // Refer to web/source/osk/oskKey.ts
   // Returns: String
   protected String convertKeyText(String ktext) {
     String title = "";
@@ -685,9 +686,17 @@ final class KMKeyboard extends WebView {
     int length = values.length;
     for (int j = 0; j < length; j++) {
       if (!values[j].isEmpty() && !values[j].contains("-")) {
-        int c = Integer.parseInt(values[j], 16);
-        // TODO: \\uxxxxxx will need to be handled with title.codePointAt(c)
-        title += String.valueOf((char) c);
+        // Split U_xxxx_yyyy
+        String[] codePoints = values[j].split("_");
+        for (String codePoint : codePoints) {
+          int codePointValue = Integer.parseInt(codePoint, 16);
+          if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F))) {
+            continue;
+          } else {
+            // TODO: \\uxxxxxx will need to be handled with title.codePointAt(c)
+            title += new String(Character.toChars(codePointValue));
+          }
+        }
       }
     }
     return title;
