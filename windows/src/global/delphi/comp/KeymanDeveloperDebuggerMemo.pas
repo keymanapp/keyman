@@ -23,6 +23,7 @@ uses
   System.Classes,
   Winapi.Messages,
   Winapi.Windows,
+  Vcl.Controls,
   Vcl.StdCtrls;
 
 type
@@ -37,9 +38,11 @@ type
   private
     FOnMessage: TKeymanDeveloperDebuggerMessageEvent;
     FAllowUnicodeInput: Boolean;
+    FIsDebugging: Boolean;
     procedure SetAllowUnicode(const Value: Boolean);
     function GetSelection: TMemoSelection;
     procedure SetSelection(const Value: TMemoSelection);
+    procedure CNKeyDown(var Message: TWMKeyDown); message CN_KEYDOWN;
   protected
     procedure CreateHandle; override;
     procedure WndProc(var Message: TMessage); override;
@@ -49,6 +52,7 @@ type
     property AllowUnicode: Boolean read FAllowUnicodeInput write SetAllowUnicode default True;
     property OnMessage: TKeymanDeveloperDebuggerMessageEvent read FOnMessage write FOnMessage;
     property Selection: TMemoSelection read GetSelection write SetSelection;
+    property IsDebugging: Boolean read FIsDebugging write FIsDebugging;
   end;
 
 procedure Register;
@@ -56,6 +60,18 @@ procedure Register;
 implementation
 
 { TKeymanDeveloperDebuggerMemo }
+
+procedure TKeymanDeveloperDebuggerMemo.CNKeyDown(var Message: TWMKeyDown);
+begin
+  // Shortcuts for actions are handled with CN_KEYDOWN before we get WM_KEYDOWN,
+  // so if we are debugging we want to filter those out so that the debugger
+  // gets access to them instead of us. Note that this means that editor
+  // shortcuts such as Ctrl+A (select all) will not be processed in the normal
+  // way, so the host of this control needs to look after that.
+  if IsDebugging
+    then Exit
+    else inherited;
+end;
 
 constructor TKeymanDeveloperDebuggerMemo.Create(AOwner: TComponent);
 begin

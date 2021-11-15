@@ -1,5 +1,31 @@
 # Keyman Version History
 
+## 15.0.146 alpha 2021-11-14
+
+* feat(developer): support for U_xxxx_yyyy (#5894)
+
+## 15.0.145 alpha 2021-11-13
+
+* fix(developer): crash exporting OSK on European keyboard (#5893)
+* feat(developer): validate .kps files during compile (#5895)
+
+## 15.0.144 alpha 2021-11-12
+
+* fix(android/engine): Truncate language name in list (#5878)
+* fix(android/app): Check KMP file exists before attempting to extract (#5849)
+* fix(web): Check parent element is defined before assigning (#5874)
+* fix(android/app): Revert test code (#5899)
+
+## 15.0.143 alpha 2021-11-11
+
+* fix(developer): handle shortcut keys in debugger (#5776)
+
+## 15.0.142 alpha 2021-11-08
+
+* chore(linux): Cleanup (#5886)
+* chore(linux): cleanup defunct tests (#5885)
+* chore(linux): fix failing ibus-keyman tests (#5884)
+
 ## 15.0.141 alpha 2021-11-05
 
 * chore(linux): Add integration tests for ibus-keyman (#5881)

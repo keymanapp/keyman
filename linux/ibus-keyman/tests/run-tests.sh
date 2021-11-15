@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASEDIR=$(dirname $0)
+BASEDIR=$(realpath $(dirname $0))
 TESTDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman/test_kmx
 
 if [ "$DISPLAY" == ":0" ]; then
@@ -9,7 +9,14 @@ if [ "$DISPLAY" == ":0" ]; then
 fi
 
 if [ ! -d $TESTDIR ]; then
-  ln -sf $BASEDIR/../../../common/core/desktop/build/arch/debug/tests/unit/kmx $TESTDIR
+  if [ -d $BASEDIR/../../../common/core/desktop/build/arch/debug ]; then
+    ln -sf $(realpath $BASEDIR/../../../common/core/desktop/build/arch/debug/tests/unit/kmx) $TESTDIR
+  elif [ -d $BASEDIR/../../../common/core/desktop/build/arch/release ]; then
+    ln -sf $(realpath $BASEDIR/../../../common/core/desktop/build/arch/release/tests/unit/kmx) $TESTDIR
+  else
+    echo "Can't find kmx files in common/core/desktop/build/arch/*/tests/unit/kmx"
+    exit 2
+  fi
 fi
 
 if [ $# -gt 0 ]; then

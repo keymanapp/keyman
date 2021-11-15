@@ -70,15 +70,15 @@ namespace com.keyman.text {
     }
 
     /**
-     * Used when a RuleBehavior represents a non-text "command" within the Engine.  This will generally 
+     * Used when a RuleBehavior represents a non-text "command" within the Engine.  This will generally
      * trigger events that require context reset - often by moving the caret or by moving what OutputTarget
      * the caret is in.  However, we let those events perform the actual context reset.
-     * 
+     *
      * Note:  is extended by DOM-aware KeymanWeb code.
      */
     public static applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
       // Notes for potential default-handling extensions:
-      // 
+      //
       // switch(code) {
         // // Problem:  clusters, and doing them right.
         // // The commented-out code below should be a decent starting point, but clusters make it complex.
@@ -142,27 +142,33 @@ namespace com.keyman.text {
     // Test for fall back to U_xxxxxx key id
     // For this first test, we ignore the keyCode and use the keyName
     public static forUnicodeKeynames(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
-      let keyName = Lkc.kName;
+      const keyName = Lkc.kName;
 
       // Test for fall back to U_xxxxxx key id
       // For this first test, we ignore the keyCode and use the keyName
       if(!keyName || keyName.substr(0,2) != 'U_') {
         return null;
       }
-    
-      var codePoint = parseInt(keyName.substr(2,6), 16);
-      if (((0x0 <= codePoint) && (codePoint <= 0x1F)) || ((0x80 <= codePoint) && (codePoint <= 0x9F))) {
-        // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
-        // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
-        if(ruleBehavior) {
-          ruleBehavior.errorLog = ("Suppressing Unicode control code: U_00" + codePoint.toString(16));
+
+      let result = '';
+      const codePoints = keyName.substr(2).split('_');
+      for(let codePoint of codePoints) {
+        const codePointValue = parseInt(codePoint, 16);
+        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F))) {
+          // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
+          // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
+          if(ruleBehavior) {
+            ruleBehavior.errorLog = ("Suppressing Unicode control code in " + keyName);
+          }
+          // We'll attempt to add valid chars
+          continue;
+        } else {
+          // String.fromCharCode() is inadequate to handle the entire range of Unicode
+          // Someday after upgrading to ES2015, can use String.fromCodePoint()
+          result += String.kmwFromCharCode(codePointValue);
         }
-        return null;
-      } else {
-        // String.fromCharCode() is inadequate to handle the entire range of Unicode
-        // Someday after upgrading to ES2015, can use String.fromCodePoint()
-        return String.kmwFromCharCode(codePoint);
       }
+      return result ? result : null;
     }
 
     // Test for otherwise unimplemented keys on the the base default & shift layers.
