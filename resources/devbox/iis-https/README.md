@@ -8,9 +8,13 @@ The script must be run as Administrator and can safely be run multiple times.
 
 Once configured, the certificates will work for the following sites (configured in v3.ext):
 - `localhost`
+- `keyman-local.com`
+- `*.keyman-local.com`
 - `keyman.com.local`
 - `*.keyman.com.local`
 - `keymanweb.com.local`
 - `keymankeyboards.com.local`
 - `keyman.dev.local`
 - `*.keymanweb.com.local`
+- `keyman.blog.local`
+- `*.keyman.blog.local`
