@@ -5,5 +5,7 @@ src/keyman-version.h
 src/ibus-engine-keyman
 src/print_kmp
 src/print_kmpdetails
+src/test/keymanutil_tests
 *.log
 *.trs
+.dirstamp

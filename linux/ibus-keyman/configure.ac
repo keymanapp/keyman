@@ -100,6 +100,7 @@ Makefile
 src/Makefile
 src/keyman.xml.in
 src/keyman-version.h
+src/test/Makefile
 tests/Makefile
 icons/Makefile
 m4/Makefile

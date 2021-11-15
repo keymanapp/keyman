@@ -376,7 +376,8 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
 
 // Write new keyboard option to DConf.
 // DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
-// If the option key already exists, the value is updated. Otherwise a new string 'option_key=option_value' is appended.
+// If the option key already exists, the value is updated. Otherwise a new string
+// 'option_key=option_value' is appended.
 //
 // Parameters:
 // package_id   (gchar *): Package ID
@@ -420,17 +421,20 @@ keyman_put_options_todconf(gchar *package_id,
         if (!option_updated)
         {
             // Resize to add new option and null-terminate
-            options = g_realloc(options, strlen(kvp) + 1);
+            int size = index + 2; // old size: index + 1, plus 1 new
+            options = g_renew(gchar*, options, size);
             options[index] = kvp;
             options[index+1] = NULL;
         }
     }
     else
     {
-        // If options don't exist, allocate space for new option and null-terminate
-        options = g_malloc(strlen(kvp) + 1);
-        options[0] = kvp;
-        options[1] = NULL;
+      // we never should come here - keyman_get_options_fromdconf will create empty
+      // options if they don't yet exist.
+      // Allocate space for new option and null-terminate
+      options    = g_new(gchar *, 2);
+      options[0] = kvp;
+      options[1] = NULL;
     }
 
     // Write to DConf
