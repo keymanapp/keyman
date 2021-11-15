@@ -1177,7 +1177,7 @@
 				am,
 				"es-419",
 				"zh-Hans",
-                                ar,
+				ar,
 				ha,
 			);
 			mainGroup = F243887314BBD43000A3E055;
