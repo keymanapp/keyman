@@ -272,7 +272,7 @@ begin
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
       Ferror := not DoKCCompileProject(FParamInfile, FDebug, FClean, FWarnAsError, FCheckFilenameConventions, FParamTarget)   // I4706   // I4707
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kps' then
-      FError := not DoKCCompilePackage(FParamInfile, FWarnAsError, FInstaller, FCheckFilenameConventions, FInstallerMSI, FUpdateInstaller)   // I4706
+      FError := not DoKCCompilePackage(FParamInfile, FWarnAsError, FInstaller, FCheckFilenameConventions, FInstallerMSI, FUpdateInstaller, FJsonSchemaPath)   // I4706
     else
       FError := not CompileKeyboard(FParamInfile, FParamOutfile, FDebug, FWarnAsError);   // I4706
 

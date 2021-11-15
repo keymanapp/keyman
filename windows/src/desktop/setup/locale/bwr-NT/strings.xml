@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Bura-Pabir</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
+  <string name="ssTitle">Instal $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION kǝ wutǝ ka hara instal ɓɗakǝlaka.</string>
+  <string name="ssCancelQuery">Gǝ tamata abbǝr ga aɗa hira kara lǝkǝma ka hara instal ar $APPNAME ni wa ya?</string>
+  <string name="ssBootstrapExtractingBundle">Akwa ɗǝmɓǝla bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Akwa pakǝ packageyeri...</string>
+  <string name="ssBootstrapCheckingForUpdates">Akwa pakǝ suayeri na bǝlin akwa onlayin...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Akwa pakǝ jiliyeri natǝ mdǝ hara instal...</string>
+  <string name="ssBootstrapReady">Akwa kuriyari...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s ar %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Suma aɗiwa natǝ mda ata hara instal ni.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s dawunlodi)</string>
+  <string name="ssActionInstall">Setup an ata hara instal ni:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION tsa ni gapani kula ntǝ kwaba</string>
+  <string name="ssLicenseLink">&amp;Karatǝ lasisi ni</string>
+  <string name="ssInstallOptionsLink">Instal &amp;suayeri natǝ mda ata cara</string>
+  <string name="ssMessageBoxTitle">$APPNAME Setup</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Instal</string>
+  <string name="ssCancelButton">Awo</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Akwa hara instal $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Akwa kǝlǝɓǝla jili na waci ni</string>
+  <string name="ssStatusComplete">Ku kurtǝ ka ka kuri hara instal ni</string>
+  <string name="ssQueryRestart">Doli sai magǝ jaktǝ kǝlar Windows kwapu Setup ni ku kuri. Sakatǝ gǝ jaktǝ kǝlar Windows ni, Setup ata lǝkǝma.
+
+Jaktǝ kǝlari kulini?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows aɗa wutǝdzi ka jaktǝ kǝlardzi ka kǝrni wa. Kagǝ jaktǝ kǝlar Windows kwapu gǝ ngkǝrtǝ kǝlar $APPNAME.</string>
+  <string name="ssMustRestart">Doli sai magǝ jaktǝ kǝlar Windows kwapu Setup ni Kuri. Sakatǝ gǝ jaktǝ kǝlar Windows, Setup ata kuri.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION ata bara Windows 7 wala nakǝmari kwapu tsa hara instal. Amma, tsaku ngaɓǝla aɗi Keyman Desctop 7, 8 wala 9. Ga ata bara kara hara instal ar keyboardyeri natǝ mdǝ pakta akwa installa ngǝni akwa jili natǝ mdǝ hara instal ar Keyman Desktop ni ya?</string>
+  <string name="ssOldOsVersionDownload">Jili $APPNAME ngǝni ata bara Windows 7 wala na kǝmari kwapu tsa hara instal. Ga ata bara kara hara dawunlodi ar Keyman Desktop 8 ya?</string>
+  <string name="ssOptionsTitle">Suayeri natǝ mda ata cara na ar isntal</string>
+  <string name="ssOptionsTitleInstallOptions">Suayeri natǝ mda ata cara na ar hara isntal</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Default $APPNAME setiyeri</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modulyeri natǝ mda ata hara instal wala jakǝ ala duna</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Hulfur mnya ar keyboard na kǝɓa kari</string>
+  <string name="ssOptionsTitleLocation">Jili natǝ mda ata hara instal</string>
+  <string name="ssOptionsStartWithWindows">Baɗita $APPNAME sakatǝ Windows kǝkǝlardzi</string>
+  <string name="ssOptionsStartAfterInstall">Baɗita $APPNAME sakatǝ instal ni kǝ kuri</string>
+  <string name="ssOptionsCheckForUpdates">Pakǝɓǝla suayeri na bǝlin akwa onlayin saka ka saka</string>
+  <string name="ssOptionsUpgradeKeyboards">Jaktǝ dunar jili keyboardyeri na waci natǝ mdǝ hara instal ɗa ka jili na $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Ngkǝrɓǝla labar na ar hangkur kǝthlǝr tǝ ga ana hara kula ngkǝr thlǝma ga aka keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup ar jili: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Instal $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Jaktǝ dunar $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s kǝ kurtǝ ka hara instal.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Dawunlodi jili %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Jili %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Instal %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Dawunlodi jili %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Jili %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Car hulfur mnya natǝ gǝ hira kara pakta ka %0:s keyboard ni</string>
+  <string name="ssOptionsDefaultLanguage">Hulfur mnya na default</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Akwa hara dawunlodi %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Akwa hara dawunlodi %0:s</string>
+  <string name="ssOffline">Setup ar $APPNAME aɗa tsoktǝ ka kǝɓa ka kwyman.com kamnyar katsa hara dawunlodi ar kariyeri na damwa.
+
+Usa kara wulha abbǝr ka akwa onlayin, antǝ kara hamta $APPNAME dunar Setup kamnyar wutǝ intanet akwa setiyeri ar firewall.
+
+Ntsari Abort kamnyar lǝɓǝla akwa Setup, Jaktǝ ngkǝrta kamnyar ngkǝrtǝ hara dawunlodi ar kariyeri ni ka damwa, wala fwari kari kamnyar lǝkǝma kari akwa offlayin.</string>
+</resources>

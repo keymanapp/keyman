@@ -560,6 +560,7 @@
         <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas">
             <Form>$R *.RES</Form>
         </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
