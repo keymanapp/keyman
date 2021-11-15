@@ -32,16 +32,15 @@ km_kbp_keyboard_key kb_key_expected_list[] = {{49,16384},{50,16384},{66,16416},{
  * The purpose of this test is to verify that `km_kbp_keyboard_get_key_list`
  * returns list of all the keys used for a keyboard that core as loaded.
  *
- * @param source_path  Path to kmx keyboard file
+ * @param source_file  Path to kmx keyboard file
  */
-void test_key_list(const km::kbp::path &source_path){
+void test_key_list(const km::kbp::path &source_file){
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
   km_kbp_keyboard_key * kb_key_list;
 
-  km::kbp::path const source_keybard = "049 - groups ctrlalt.kmx";
-  km::kbp::path full_path = km::kbp::path::join(source_path, source_keybard);
+  km::kbp::path full_path = source_file;
 
   try_status(km_kbp_keyboard_load(full_path.native().c_str(), &test_kb));
 
