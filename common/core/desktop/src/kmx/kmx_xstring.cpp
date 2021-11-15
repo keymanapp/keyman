@@ -159,7 +159,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   p--;
   if(*p == UC_SENTINEL_EXTENDEDEND) {
     int n = 0;
-    while(*p != UC_SENTINEL && n < 10) {
+    while (p >= pStart && *p != UC_SENTINEL && n < 10) {
       p--; n++; }
 
     if(p < pStart) {
@@ -187,7 +187,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   for (int i = 2; i < CODE__SIZE_MAX && q >= pStart; i++, q--) {
     //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
     if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
-      return (p - i);
+      return q;
   }
   
   return p; 

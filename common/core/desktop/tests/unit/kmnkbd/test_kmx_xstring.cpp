@@ -32,55 +32,6 @@ void test_decxstr() {
     PKMX_WCHAR q;       // pointer output
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------
-    // even more tests: check for use with non-CODE__SIZE
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p-1));
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000d";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p - 2));
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0001";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p - 2));
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0002";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p - 2));
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0001\u0001";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p - 1));
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0002\u0001";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p - 1));
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0001\u0001d";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p - 1));
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0002\u0001\u0001";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p - 1));
-
-    p_start = (PKMX_WCHAR)u"abc\uFFFF\uF000\u0002\u0001\u0001d";
-    p       = find_ptr_to_last_character(p_start);
-    q       = decxstr(p, p_start);
-    assert(q == (p - 1));
-
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------
     // more tests: check if we might end up left of pstart
     // -------------------------------------------------------------------------------------------------------------------------------------------------------
 
