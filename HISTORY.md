@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.147 alpha 2021-11-15
+
+* chore(android,linux,windows): Check in crowdin strings for Bura-Pabir (#5839)
+* chore: add keyman-local.com to iis https setup (#5892)
+* fix(web): avoid error if timerid not valid (#5908)
+
 ## 15.0.146 alpha 2021-11-14
 
 * feat(developer): support for U_xxxx_yyyy (#5894)
