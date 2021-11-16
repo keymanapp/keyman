@@ -26,7 +26,19 @@ int error_args() {
     return 1;
 }
 
-km_kbp_keyboard_key kb_key_expected_list[] = {{49,16384},{50,16384},{66,16416},{67,16384},{67,16448},{97,0},{98,0}};
+#define NO_MODIFIER_FLAGS 0
+#define CHAR_CODE_LOWER_A 97
+#define CHAR_CODE_LOWER_B 98
+
+km_kbp_keyboard_key kb_key_expected_list[] = {{KM_KBP_VKEY_1, KM_KBP_MODIFIER_VIRTUALKEY},
+                                              {KM_KBP_VKEY_2, KM_KBP_MODIFIER_VIRTUALKEY},
+                                              {KM_KBP_VKEY_B, (KM_KBP_MODIFIER_VIRTUALKEY | KM_KBP_MODIFIER_CTRL )},
+                                              {KM_KBP_VKEY_C, KM_KBP_MODIFIER_VIRTUALKEY},
+                                              {KM_KBP_VKEY_C, (KM_KBP_MODIFIER_VIRTUALKEY | KM_KBP_MODIFIER_ALT )},
+                                              {CHAR_CODE_LOWER_A, NO_MODIFIER_FLAGS},
+                                              {CHAR_CODE_LOWER_B, NO_MODIFIER_FLAGS}};
+
+
 
 /**
  * The purpose of this test is to verify that `km_kbp_keyboard_get_key_list`
