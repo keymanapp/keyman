@@ -2578,9 +2578,9 @@ namespace com.keyman.osk {
       }
 
       let r = key.getClientRects()[0];
-      let xLeft = r.left,
-          xWidth = r.width,
-          xHeight = r.height,
+      let xLeft = r ? r.left : dom.Utils.getAbsoluteX(key),
+          xWidth = r ? r.width : key.offsetWidth,
+          xHeight = r ? r.height : key.offsetHeight,
           previewFontScale = 1.8;
 
       // Canvas dimensions must be set explicitly to prevent clipping
