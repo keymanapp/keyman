@@ -1,7 +1,7 @@
 /*
-  Copyright:    © 2018 SIL International.
+  Copyright:    © 2021 SIL International.
   Description:  Tests for key rules list generation in the kmx processor
-  Create Date:  30 Oct 2018
+  Create Date:  15 Nov 2021
   Authors:      Ross Cruickshank (RC) Marc Durdin (MD), Tim Eves (TSE)
 
 */
