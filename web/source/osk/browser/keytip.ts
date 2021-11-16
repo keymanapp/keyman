@@ -99,7 +99,7 @@ namespace com.keyman.osk.browser {
           this.cap.style.left = (canvasWidth - xWidth) + 'px';
           xLeft -= xOverflow;
         } else {
-          this.cap.style.left = ((canvasWidth - xWidth) / 2) + 'px';
+          this.cap.style.left = xOverflow + 'px';
         }
 
         kts.left=(xLeft - xOverflow) + 'px';
