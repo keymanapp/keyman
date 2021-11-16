@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.148 alpha 2021-11-16
+
+* chore(common): Check in crowdin strings for Mandara (Wandala) (#5857)
+* chore(linux): Update method comments (#5883)
+
 ## 15.0.147 alpha 2021-11-15
 
 * chore(android,linux,windows): Check in crowdin strings for Bura-Pabir (#5839)
