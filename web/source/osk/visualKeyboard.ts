@@ -647,7 +647,7 @@ namespace com.keyman.osk {
     subkeyDelayTimer: number;
     popupDelay: number = 500;
     menuEvent: KeyElement; // Used by embedded-mode.
-    keytip: {key: KeyElement, state: boolean, element?: HTMLDivElement};
+    keytip: {key: KeyElement, state: boolean, element?, tip?, cap?: HTMLDivElement, label?: HTMLSpanElement};
     popupCallout: HTMLDivElement;
 
     //#region OSK constructor and helpers
@@ -1003,7 +1003,7 @@ namespace com.keyman.osk {
     layerChangeHandler: text.SystemStoreMutationHandler = function(this: VisualKeyboard,
                                                                    source: text.MutableSystemStore,
                                                                    newValue: string) {
-      // This handler is also triggered on state-key state changes (K_CAPS) that 
+      // This handler is also triggered on state-key state changes (K_CAPS) that
       // may not actually change the layer.
       if(this) {
         this._UpdateVKShiftStyle();
@@ -2566,20 +2566,8 @@ namespace com.keyman.osk {
 
     // Create and display the preview
     if(on && !popup) {
-      var y0 = dom.Utils.getAbsoluteY(oskManager._Box),
-          h0 = oskManager._Box.offsetHeight,
-          xLeft = dom.Utils.getAbsoluteX(key),
-          xTop = dom.Utils.getAbsoluteY(key),
-          xWidth = key.offsetWidth,
-          xHeight = key.offsetHeight,
-          kc = <HTMLElement> key.firstChild,
-          kcs = kc.style,
-          kts = tip.element.style,
-          ktLabel = <HTMLElement> tip.element.childNodes[1],
-          ktls = ktLabel.style,
-          edge = 0,
-          canvas = <HTMLCanvasElement> tip.element.firstChild,
-          previewFontScale = 1.8;
+      var kc = <HTMLElement> key.firstChild,
+          kts = tip.element.style;
 
       // Find key text element
       for(var i=0; i<key.childNodes.length; i++) {
@@ -2589,17 +2577,24 @@ namespace com.keyman.osk {
         }
       }
 
+      let r = key.getClientRects()[0];
+      let xLeft = r.left,
+          xWidth = r.width,
+          xHeight = r.height,
+          previewFontScale = 1.8;
+
       // Canvas dimensions must be set explicitly to prevent clipping
-      canvas.width = 1.6 * xWidth;
-      canvas.height = 2.3 * xHeight;
+      let canvasWidth = 1.6 * xWidth;
+      let canvasHeight = 2.3 * xHeight;
 
       kts.top = 'auto';
       // Matches how the subkey positioning is set.
-      kts.bottom = (parseInt(key.style.bottom, 10))+'px';
-      kts.textAlign = 'center';   kts.overflow = 'visible';
+      kts.bottom = (parseFloat(key.style.bottom))+'px';
+      kts.textAlign = 'center';
+      kts.overflow = 'visible';
       kts.fontFamily = util.getStyleValue(kc,'font-family');
-      kts.width = canvas.width+'px';
-      kts.height = canvas.height+'px';
+      kts.width = canvasWidth+'px';
+      kts.height = canvasHeight+'px';
 
       var px=util.getStyleInt(kc, 'font-size');
       if(px != 0) {
@@ -2613,23 +2608,21 @@ namespace com.keyman.osk {
         kts.fontSize = key.key.getIdealFontSize(this, scaleStyle);
       }
 
-      ktLabel.textContent = kc.textContent;
-      ktls.display = 'block';
-      ktls.position = 'absolute';
-      ktls.textAlign = 'center';
-      ktls.width='100%';
-      ktls.top = '2%';
-      ktls.bottom = 'auto';
+      this.keytip.label.textContent = kc.textContent;
 
       // Adjust canvas shape if at edges
-      var xOverflow = (canvas.width - xWidth) / 2;
+      var xOverflow = (canvasWidth - xWidth) / 2;
       if(xLeft < xOverflow) {
-        edge = -1;
         xLeft += xOverflow;
+        this.keytip.cap.style.left = '0px';
       } else if(xLeft > window.innerWidth - xWidth - xOverflow) {
-        edge = 1;
+        this.keytip.cap.style.left = (canvasWidth - xWidth) + 'px';
         xLeft -= xOverflow;
+      } else {
+        this.keytip.cap.style.left = ((canvasWidth - xWidth) / 2) + 'px';
       }
+
+      kts.left=(xLeft - xOverflow) + 'px';
 
       // For now, should only be true (in production) when keyman.isEmbedded == true.
       let constrainPopup = keyman.isEmbedded;
@@ -2639,16 +2632,18 @@ namespace com.keyman.osk {
       let bottomY = parseInt(cs.bottom, 10);
       let tipHeight = parseInt(cs.height, 10);
 
-      let delta = 0;
-      if(tipHeight + bottomY > oskHeight && constrainPopup) {
-        delta = tipHeight + bottomY - oskHeight;
-        canvas.height = canvas.height - delta;
-        kts.height = canvas.height + 'px';
+      this.keytip.cap.style.width = xWidth + 'px';
+      this.keytip.tip.style.height = (canvasHeight / 2) + 'px';
+      this.keytip.cap.style.top = (canvasHeight / 2) + 'px';
+      this.keytip.cap.style.height = (canvasHeight / 2 - 1) + 'px';
+
+      if(constrainPopup && tipHeight + bottomY > oskHeight) {
+        const delta = tipHeight + bottomY - oskHeight;
+        kts.height = (canvasHeight-delta) + 'px';
+        const hx = Math.max(0, (canvasHeight-delta)-(canvasHeight/2));
+        this.keytip.cap.style.height = hx + 'px';
       }
 
-      this.drawPreview(canvas, xWidth, xHeight, edge, delta);
-
-      kts.left=(xLeft - xOverflow) + 'px';
       kts.display = 'block';
     } else { // Hide the key preview
       tip.element.style.display = 'none';
@@ -2657,82 +2652,6 @@ namespace com.keyman.osk {
     // Save the key preview state
     tip.key = key;
     tip.state = on;
-  };
-
-  /**
-   * Draw key preview in element using CANVAS
-   *  @param  {Object}  canvas CANVAS element
-   *  @param  {number}  w width of touched key, px
-   *  @param  {number}  h height of touched key, px
-   *  @param  {number}  edge  -1 left edge, 1 right edge, else 0
-   */
-  drawPreview(canvas: HTMLCanvasElement, w: number, h: number, edge: number, delta?: number) {
-    let util = com.keyman.singleton.util;
-    let device = util.device;
-
-    delta = delta || 0;
-
-    var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height + delta,
-        w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx,
-        h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8;
-
-    let hBoundedMax = canvas.height;
-
-    h2 = h2 > hBoundedMax ? hBoundedMax : h2;
-    h3 = hMax > hBoundedMax ? hBoundedMax : h3;
-
-    if(device.OS == 'Android') {
-      r = 3;
-    }
-
-    // Adjust the preview shape at the edge of the keyboard
-    switch(edge) {
-      case -1:
-        w1 -= dx;
-        w2 -= dx;
-        break;
-      case 1:
-        w1 += dx;
-        w2 += dx;
-        break;
-    }
-
-    // Clear the canvas
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    // Define appearance of preview (cannot be done directly in CSS)
-    if(device.OS == 'Android') {
-      var wx=(w1+w2)/2;
-      w1 = w2 = wx;
-    }
-    ctx.fillStyle = device.styles.popupCanvasBackgroundColor;
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = '#cccccc';
-
-    // Draw outline
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(w0+r,0);
-    ctx.arcTo(w3,0,w3,r,r);
-    if(device.OS == 'Android') {
-      ctx.arcTo(w3,h1,w2,h2,r);
-      ctx.arcTo(w2,h2,w1,h2,r);
-    } else {
-      let lowerR = 0;
-      if(h3 > h2) {
-        lowerR = h3-h2 > r ? r : h3-h2;
-      }
-      ctx.arcTo(w3,h1,w2,h2,r);
-      ctx.arcTo(w2,h2,w2-lowerR,h3,lowerR);
-      ctx.arcTo(w2,h3,w1,h3,lowerR);
-      ctx.arcTo(w1,h3,w1,h2-lowerR,lowerR);
-    }
-    ctx.arcTo(w1,h2,w0,h1-r,r);
-    ctx.arcTo(w0,h1,w0,r,r);
-    ctx.arcTo(w0,0,w0+r,0,r);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
   };
 
     /**
@@ -2754,10 +2673,15 @@ namespace com.keyman.osk {
 
           // The following style is critical, so do not rely on external CSS
           tipElement.style.pointerEvents='none';
+          tipElement.style.display='none';
 
-          // Add CANVAS element for outline and SPAN for key label
-          tipElement.appendChild(util._CreateElement('canvas'));
-          tipElement.appendChild(util._CreateElement('span'));
+          tipElement.appendChild(this.keytip.tip = document.createElement('div'));
+          tipElement.appendChild(this.keytip.cap = document.createElement('div'));
+          this.keytip.tip.appendChild(this.keytip.label = document.createElement('span'));
+
+          this.keytip.tip.className = 'kmw-keytip-tip';
+          this.keytip.cap.className = 'kmw-keytip-cap';
+          this.keytip.label.className = 'kmw-keytip-label';
         }
 
         // Always append to _Box (since cleared during OSK Load)
