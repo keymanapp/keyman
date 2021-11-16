@@ -1,9 +1,9 @@
 
-/* Class = "NSWindow"; title = "Window"; ObjectID = "F0z-JX-Cv5"; */
+/* Keyboard Information window title */
 "F0z-JX-Cv5.title" = "Keyboard Information";
 
-/* Class = "NSTabViewItem"; label = "Details"; ObjectID = "Fvy-XJ-s38"; */
+/* button text to show Details */
 "Fvy-XJ-s38.label" = "Details";
 
-/* Class = "NSTabViewItem"; label = "Read Me"; ObjectID = "waA-IW-Qyn"; */
+/* button text to show Read Me */
 "waA-IW-Qyn.label" = "Read Me";

@@ -1,9 +1,9 @@
 
-/* Class = "NSWindow"; title = "Window"; ObjectID = "F0z-JX-Cv5"; */
+/* Keyboard Help window title */
 "F0z-JX-Cv5.title" = "Keyboard Help";
 
-/* Class = "NSButtonCell"; title = "OK"; ObjectID = "Zla-QF-m0K"; */
+/* OK button text */
 "Zla-QF-m0K.title" = "OK";
 
-/* Class = "NSButtonCell"; title = "Print..."; ObjectID = "fYY-Uj-y4S"; */
+/* Print button text */
 "fYY-Uj-y4S.title" = "Print...";

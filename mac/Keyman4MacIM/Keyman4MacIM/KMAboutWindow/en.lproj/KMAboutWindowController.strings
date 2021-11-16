@@ -1,9 +1,9 @@
 
-/* Class = "NSButtonCell"; title = "Close"; ObjectID = "Kab-Up-fYH"; */
+/* button text to close the About window */
 "Kab-Up-fYH.title" = "Close";
 
-/* Class = "NSButtonCell"; title = "License Agreement"; ObjectID = "hYC-Bx-aoP"; */
+/* text of link to the license agreement */
 "hYC-Bx-aoP.title" = "License Agreement";
 
-/* Class = "NSButtonCell"; title = "Configuration"; ObjectID = "vkh-b5-vO7"; */
-"vkh-b5-vO7.title" = "Configuration";
+/* button text to open Configuration window  */
+"vkh-b5-vO7.title" = "Configuration...";
