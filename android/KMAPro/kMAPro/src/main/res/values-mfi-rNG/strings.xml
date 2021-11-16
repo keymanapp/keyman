@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Context: Menu Action -->
+  <string name="action_share" comment="Menu action to send text content to another app">Digahe</string>
+  <!-- Context: Menu Action -->
+  <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
+  <!-- Context: Menu Action -->
+  <string name="action_text_size" comment="Menu action to adjust text size">Ƴaikire Text</string>
+  <!-- Context: Menu Action -->
+  <string name="action_overflow" comment="Show additional menu items">Farfe adaliya</string>
+  <!-- Context: Menu Action -->
+  <string name="action_clear_text" comment="Menu action to erase text">Gaggahe Text</string>
+  <!-- Context: Menu Action -->
+  <string name="action_info" comment="Menu action to display Keyman help page">Labare</string>
+  <!-- Context: Menu Action -->
+  <string name="action_settings" comment="Menu action to open Settings menu">Saitine</string>
+  <!-- Context: Menu Action -->
+  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Femhe Updates</string>
+  <!-- Context: Title -->
+  <string name="title_version" comment="Title of Keyman for Android version">Version: %1$s</string>
+  <!-- Context: Text label when old Chrome version installed -->
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">    Keyman requires Chrome version 57 mtu daula ne.</string>
+  <!-- Context: Button label -->
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">Maga Update Chrome</string>
+  <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
+  <string name="textview_hint" comment="Prompt to start typing">Fantuhe vinda ahuna&#8230;</string>
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <!-- Context: Text Size dialog -->
+  <string name="text_size" comment="Current text size (number)">Ƴaikire Text: %1$d</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_up" comment="Make text bigger">Ƴaikire Text at irane</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_down" comment="Make text smaller">Ƴaikire Text am ɗyilane</string>
+  <!-- Context: Clear Text dialog -->
+  <string name="all_text_will_be_cleared" comment="Erase all the text">\nBaɗumma text a de gagga nde\n</string>
+  <!-- Context: Get Started menu -->
+  <string name="get_started" comment="Menu for getting started">Fantuhe</string>
+  <!-- Context: Get Started menu -->
+  <string name="add_a_keyboard" comment="Menu item to add a keyboard">Farfe keyboard gé naza nare ŋa</string>
+  <!-- Context: Get Started menu -->
+  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Magave Keyman gé system-wide keyboard</string>
+  <!-- Context: Get Started menu -->
+  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Magahe saitin Keyman gé default keyboard</string>
+  <!-- Context: Get Started menu -->
+  <string name="more_info" comment="Open the Keyman for Android help page">Farfe labare adaliya</string>
+  <!-- Context: Get Started menu -->
+  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">Mara \"%1$s\" at fantuhe ne</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">Gé femhe keyboard pakeji, ɗyanɗya Keyman permission gé magahe karatu external storage.</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Storage permission magavka. Matake a de magavka femhe keyboard pakeji ŋanna</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="keyman_settings" comment="Settings menu title">Saitine</string>
+  <!-- Context: Keyman Settings menu -->
+  <plurals name="installed_languages">
+    <item quantity="one">Naraha na an fa na (%1$d)</item>
+    <item quantity="other">Naraha na an fa na (%1$d)</item>
+  </plurals>
+  <!-- Context: Keyman Settings menu -->
+  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Femhe Keyboard mtu Dictionary</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="change_display_language" comment="Menu action to change interface language">Mara-nare</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Mbeɗanahe tsa keyboard</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Spacebar caption</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Keyboard</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">Nare</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">Nare + Keyboard</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">Blank</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">Mara zhera keyboard at spacebar</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">Mara zhera nare at spacebar</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Nare antara keyboard at spacebar</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Ɓáaka mara caption at spacebar</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner" comment="text suggestions banner">Ba kullume mam-mara banner</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner_on" comment="Description when toggle is on">Gé fantu maga slera anikwa</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner_off" comment="Description when toggle is off">Ma seke an já, a mara ba predictive text ŋane a magave</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report" comment="permission for sending crash reports">Ɓilana-ɓila basha jare badza aɗaba network</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">Ma seke an kunna, anuga vela basha jare badza ŋanna</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">Ma seke an já, ɓáaka vela basha jare badza ŋanna</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">A femhe a sawam keyman.com</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_local_file" comment="Install package file from local device">A femhe a sawam local file</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_other_device" comment="Scan QR Code">A femhe a sawam umbulé gé nawura</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_languages_to_installed_keyboard" comment="Install additional languages from a keyboard package">Farfe naraha gé femhe keyboard</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_language_subtext" comment="Additional information for adding another language">(a sawam keyboard pakeji)</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">Ksa Keyboard Pakeji</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_languages_for_package" comment="Select language names from the keyboard package">Ksa naraha gé %1$s</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">Nare na farfe nde ŋanna %1$s to %2$s</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Baɗumma naraha na an fa amikwa ŋanna</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Piya keyboard gé fare tsa ne adaliya</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Mbeɗanahe nja nawura ŋanna gé portrait antara landscape</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="reset_to_defaults" comment="Button to reset to default heights">Reset to Defaults</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_text" comment="Prompt to type in the browser search bar">Ɗatsa mtu vinda URL</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="title_bookmarks" comment="Title for bookmarks">Bookmarks</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="no_bookmarks" comment="Text when bookmark list is empty">Ɓáaka Bookmarks</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="add_bookmark" comment="Confirmation to add bookmark">Farfe Bookmark</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_title" comment="Page title for saved bookmark">Irane gé duksá</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_url" comment="Page URL for saved bookmark">Url</string>
+  <!-- Context: KMP Package strings -->
+  <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">Pakeji %1$s kwalla-kwale magave gé femhe</string>
+  <!-- Context: KMP Package strings -->
+  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">Tsukwanahe keyboard pakeji\n%1$s&#8230;</string>
+  <!-- Context: KMP Package strings -->
+  <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Magavka tiɗase ashigashe</string>
+  <!-- Context: KMP Package strings -->
+  <string name="install_keyboard_package" comment="Title to install keyboard package">Femhe Keyboard</string>
+  <!-- Context: KMP Package strings -->
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">Femhe Dictionary</string>
+  <!-- Context: KMP Package strings -->
+  <string name="not_valid_package_file" comment="Notification when invalid package file cannot be installed">%1$s ŋanenka kalkale Keyman pakeji file.\n%2$s\"</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Keyboard pakeji ɓáaka elva geja keyboards gé femhe</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">Ɓáaka daula predictive text gé femhe</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">Ɓáaka keyboards mtu predictive text gé femhe</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Keyboard pakeji ɓáaka naraha harzhe gé femhe</string>
+  <!-- Context: KMP Package strings -->
+  <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Kalkalenka/Missing metadata am pakeji</string>
+</resources>

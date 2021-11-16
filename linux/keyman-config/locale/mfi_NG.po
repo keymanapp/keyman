@@ -1,0 +1,332 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: keyman\n"
+"Report-Msgid-Bugs-To: <support@keyman.com>\n"
+"POT-Creation-Date: 2020-08-19 19:17+0200\n"
+"PO-Revision-Date: 2021-10-26 08:15\n"
+"Last-Translator: \n"
+"Language-Team: Mandara (Wandala)\n"
+"Language: mfi_NG\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Crowdin-Project: keyman\n"
+"X-Crowdin-Project-ID: 386703\n"
+"X-Crowdin-Language: mfi\n"
+"X-Crowdin-File: /master/linux/keyman-config.pot\n"
+"X-Crowdin-File-ID: 504\n"
+
+#: keyman_config/__init__.py:68
+msgid "Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting."
+msgstr "Ɓáaka zlage sentry-sdk mtu raven am táte ŋanna. Ɓáaka a ɓilanahe Sentry basha kuskure."
+
+#: keyman_config/downloadkeyboard.py:23
+msgid "Download Keyman keyboards"
+msgstr "Tsukwana-tsukwa Keyman keyboards"
+
+#: keyman_config/downloadkeyboard.py:37 keyman_config/keyboard_details.py:49
+#: keyman_config/keyboard_details.py:340 keyman_config/view_installed.py:205
+msgid "_Close"
+msgstr "_Hiɗante"
+
+#: keyman_config/install_kmp.py:99
+msgid "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman"
+msgstr "Ɓáaka izini gé femhe keyboard files gé diga maga slera /usr/local/share/keyman"
+
+#: keyman_config/install_kmp.py:103
+msgid "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman"
+msgstr "Ɓáaka izini gé femhe bayani kaɗkaɗe gé mátá diga bayani ŋanna /usr/local/share/doc/keyman"
+
+#: keyman_config/install_kmp.py:107
+msgid "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts"
+msgstr "Ɓáaka izini gé femhe gé font files am mátá diga font /usr/local/share/fonts"
+
+#: keyman_config/install_kmp.py:179
+#, python-brace-format
+msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {package}"
+msgstr "femfe_kmp.py: error: No kmp.json or kmp.inf found in {package}"
+
+#: keyman_config/install_kmp.py:246
+#, python-brace-format
+msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}"
+msgstr "femfe_kmp.py: error: No kmp.json or kmp.inf am {packageFile}"
+
+#: keyman_config/install_window.py:54
+#, python-brace-format
+msgid "Installing keyboard/package {keyboardid}"
+msgstr "Femhe keyboard/pakeji {keyboardid}"
+
+#: keyman_config/install_window.py:72 keyman_config/install_window.py:93
+msgid "Keyboard is installed already"
+msgstr "Keyboard aŋkwa femfande"
+
+#: keyman_config/install_window.py:74
+#, python-brace-format
+msgid "The {name} keyboard is already installed at version {version}. Do you want to uninstall then reinstall it?"
+msgstr "Ŋane {name} keyboard aŋkwa an fa am version {version}. Ká kátáhe tiɗase antara femhe adaliya?"
+
+#: keyman_config/install_window.py:95
+#, python-brace-format
+msgid "The {name} keyboard is already installed with a newer version {installedversion}. Do you want to uninstall it and install the older version {version}?"
+msgstr "Ŋane {name} keyboard aŋkwa an fa am daula version {installedversion}. Ká kátáhe tiɗase antara femhe emgyigwa version {version}?"
+
+#: keyman_config/install_window.py:128
+msgid "Keyboard layouts:   "
+msgstr "Ndraha Keyboard:   "
+
+#: keyman_config/install_window.py:147
+msgid "Fonts:   "
+msgstr "Fonts:   "
+
+#: keyman_config/install_window.py:167 keyman_config/keyboard_details.py:96
+msgid "Package version:   "
+msgstr "Pakeji version:   "
+
+#: keyman_config/install_window.py:179
+msgid "Author:   "
+msgstr "Dadda vinda:   "
+
+#: keyman_config/install_window.py:197
+msgid "Website:   "
+msgstr "Website:   "
+
+#: keyman_config/install_window.py:211
+msgid "Copyright:   "
+msgstr "Hakkin malaka:   "
+
+#: keyman_config/install_window.py:245
+msgid "Details"
+msgstr "Baɗumma bayani"
+
+#: keyman_config/install_window.py:248
+msgid "README"
+msgstr "Karanta-karata ya"
+
+#: keyman_config/install_window.py:256 keyman_config/view_installed.py:200
+msgid "_Install"
+msgstr "Femhe"
+
+#: keyman_config/install_window.py:260
+msgid "_Cancel"
+msgstr "Tsanahe"
+
+#: keyman_config/install_window.py:305
+#, python-brace-format
+msgid "Keyboard {name} installed"
+msgstr "Keyboard {name} an fa"
+
+#: keyman_config/install_window.py:310 keyman_config/install_window.py:315
+#, python-brace-format
+msgid "Keyboard {name} could not be installed."
+msgstr "Keyboard {name} a magavka femhe."
+
+#: keyman_config/install_window.py:311
+msgid "Error Message:"
+msgstr "Elva kuskure:"
+
+#: keyman_config/install_window.py:316
+msgid "Warning Message:"
+msgstr "Elva sawari gé fa taɗa:"
+
+#: keyman_config/keyboard_details.py:37
+#, python-brace-format
+msgid "{name} keyboard"
+msgstr "{name} keyboard"
+
+#: keyman_config/keyboard_details.py:53
+msgid "ERROR: Keyboard metadata is damaged.\n"
+"Please \"Uninstall\" and then \"Install\" the keyboard."
+msgstr "KUSKURE: Keyboard metadata badza-badze.\n"
+"Tazlaŋa \"tiɗase-tiɗe\" antara ká \"Femhe\" keyboard ŋanna."
+
+#: keyman_config/keyboard_details.py:74
+msgid "Package name:   "
+msgstr "Zhera pakeji:   "
+
+#: keyman_config/keyboard_details.py:85
+msgid "Package id:   "
+msgstr "Id pakeji:   "
+
+#: keyman_config/keyboard_details.py:108
+msgid "Package description:   "
+msgstr "Bayani a pakeji:   "
+
+#: keyman_config/keyboard_details.py:121
+msgid "Package author:   "
+msgstr "Dadda vinda pakeji:   "
+
+#: keyman_config/keyboard_details.py:133
+msgid "Package copyright:   "
+msgstr "Hakkin malaka pakeji:   "
+
+#: keyman_config/keyboard_details.py:174
+msgid "Keyboard filename:   "
+msgstr "Keyboard zherafile:   "
+
+#: keyman_config/keyboard_details.py:187
+msgid "Keyboard name:   "
+msgstr "Keyboard zherafile:   "
+
+#: keyman_config/keyboard_details.py:198
+msgid "Keyboard id:   "
+msgstr "Keyboard id:   "
+
+#: keyman_config/keyboard_details.py:209
+msgid "Keyboard version:   "
+msgstr "Keyboard version:   "
+
+#: keyman_config/keyboard_details.py:221
+msgid "Keyboard author:   "
+msgstr "Dadda vinda Keyboard:   "
+
+#: keyman_config/keyboard_details.py:232
+msgid "Keyboard license:   "
+msgstr "Keyboard lasisi:   "
+
+#: keyman_config/keyboard_details.py:243
+msgid "Keyboard description:   "
+msgstr "Bayani Keyboard:   "
+
+#: keyman_config/keyboard_details.py:334
+#, python-brace-format
+msgid "Scan this code to load this keyboard\n"
+"on another device or <a href='{uri}'>share online</a>"
+msgstr "Ksa fatawa code gé femhe una gé keyboard\n"
+"am nazu umbulé gé nawura mtu <a href='{uri}'>share online</a>"
+
+#: keyman_config/options.py:24
+#, python-brace-format
+msgid "{packageId} Settings"
+msgstr "{packageId} Saitin"
+
+#: keyman_config/view_installed.py:30
+msgid "Keyman Configuration"
+msgstr "Keyman Configuration"
+
+#: keyman_config/view_installed.py:60
+msgid "Choose a kmp file..."
+msgstr "Ksa kmp file..."
+
+#. i18n: file type in file selection dialog
+#: keyman_config/view_installed.py:65
+msgid "KMP files"
+msgstr "KMP files"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:141
+msgid "Icon"
+msgstr "Ikon"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:145
+msgid "Name"
+msgstr "Zhere"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:148
+msgid "Version"
+msgstr "Version"
+
+#: keyman_config/view_installed.py:161
+msgid "_Uninstall"
+msgstr "Tiɗase ashigashe"
+
+#: keyman_config/view_installed.py:162 keyman_config/view_installed.py:304
+msgid "Uninstall keyboard"
+msgstr "Tiɗase ashigashe keyboard"
+
+#: keyman_config/view_installed.py:167
+msgid "_About"
+msgstr "_Aɗaba"
+
+#: keyman_config/view_installed.py:168 keyman_config/view_installed.py:306
+msgid "About keyboard"
+msgstr "Aɗaba keyboard"
+
+#: keyman_config/view_installed.py:173
+msgid "_Help"
+msgstr "_Mla"
+
+#: keyman_config/view_installed.py:174 keyman_config/view_installed.py:305
+msgid "Help for keyboard"
+msgstr "Mla gé keyboard"
+
+#: keyman_config/view_installed.py:179
+msgid "_Options"
+msgstr "Naza ksa gergre"
+
+#: keyman_config/view_installed.py:180 keyman_config/view_installed.py:307
+msgid "Settings for keyboard"
+msgstr "Saitin aza keyboard"
+
+#: keyman_config/view_installed.py:190
+msgid "_Refresh"
+msgstr "_Refresh"
+
+#: keyman_config/view_installed.py:191
+msgid "Refresh keyboard list"
+msgstr "Refresh keyboard list"
+
+#: keyman_config/view_installed.py:195
+msgid "_Download"
+msgstr "_Tsukwanahe"
+
+#: keyman_config/view_installed.py:196
+msgid "Download and install a keyboard from the Keyman website"
+msgstr "Tsukwanahe antara femhe keyboard a sawam Keyman website"
+
+#: keyman_config/view_installed.py:201
+msgid "Install a keyboard from a file"
+msgstr "Femhe keyboard a sawam file"
+
+#: keyman_config/view_installed.py:206
+msgid "Close window"
+msgstr "Hiɗante window"
+
+#: keyman_config/view_installed.py:278
+#, python-brace-format
+msgid "Uninstall keyboard {package}"
+msgstr "Tiɗase keyboard {package}"
+
+#: keyman_config/view_installed.py:280
+#, python-brace-format
+msgid "Help for keyboard {package}"
+msgstr "Mla aza keyboard {package}"
+
+#: keyman_config/view_installed.py:282
+#, python-brace-format
+msgid "About keyboard {package}"
+msgstr "Aɗaba keyboard {package}"
+
+#: keyman_config/view_installed.py:284
+#, python-brace-format
+msgid "Settings for keyboard {package}"
+msgstr "Saitin gé keyboard {package}"
+
+#: keyman_config/view_installed.py:349
+msgid "Uninstall keyboard package?"
+msgstr "Tiɗase keyboard pakeji?"
+
+#: keyman_config/view_installed.py:351
+#, python-brace-format
+msgid "Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?"
+msgstr "Ba jirahe ká kátá tiɗase {keyboard} keyboard antara fonts ne ŋanna?"
+
+#: keyman_config/welcome.py:22
+#, python-brace-format
+msgid "{name} installed"
+msgstr "{name} an fa"
+
+#: keyman_config/welcome.py:40
+msgid "Open in _Web browser"
+msgstr "Wurante-wura _Web browser"
+
+#: keyman_config/welcome.py:42
+msgid "Open in the default web browser to do things like printing"
+msgstr "Wurante-wura am default web browser gé shafte magahe bárá seke fatawe"
+
+#: keyman_config/welcome.py:45
+msgid "_OK"
+msgstr "_Bastuwa"
+

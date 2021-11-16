@@ -50,6 +50,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("in-ID", "Indonesian"),
       new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("km-KH", "Khmer"),
+      new DisplayLanguageType("mfi-NG", "Mandara (Wandala)"),
       new DisplayLanguageType("ann", "Obolo"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
       new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
