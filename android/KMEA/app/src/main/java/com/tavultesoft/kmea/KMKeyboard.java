@@ -676,10 +676,13 @@ final class KMKeyboard extends WebView {
     }
   }
 
-  // Extract Unicode numbers (\\u_xxxx_yyyy) from a layer to character string.
-  // Ignores empty strings and layer names
-  // Refer to web/source/osk/oskKey.ts
-  // Returns: String
+  /**
+   * Extract Unicode numbers (\\u_xxxx_yyyy) from a layer to character string.
+   * Ignores empty strings and layer names
+   * Refer to web/source/osk/oskKey.ts
+   * @param ktext Unicode string in the format \\uxxxx_yyyy
+   * @return String to display on subkey
+   */
   protected String convertKeyText(String ktext) {
     String title = "";
     String[] values = ktext.split("\\\\u");
