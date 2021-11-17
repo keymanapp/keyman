@@ -109,6 +109,10 @@ h2 {
 
 /** Mobile, Tablet **/
 
+.touch-device #control-devices {
+  display: none;
+}
+
 .install-link .ios,
 .install-link .android {
   display: none;
