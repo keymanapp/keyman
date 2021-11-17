@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 14.0.283 stable 2021-11-17
+
+* chore(windows): fix broken links in help (#5766)
+* chore(linux): copy Keyman for Linux 15 reference to 14 (#5764)
+* fix(linux): Fix debian package script (#5772)
+* chore(common): Enhance cherry-pick labeling (#5773)
+* fix(common): Fix cherry-pick labeling (:cherries:) (#5783)
+* fix(linux): Don't crash displaying keyboard details (#5757)
+* chore(linux): Update changelog files for 14.0.282 (#5793)
+* fix(linux): Don't crash with non-keyboard package file (#5754)
+* chore: sentry.io dsn  ‍ ️ (#5788)
+* fix(windows): handle edge cases using default language (#5775)
+* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5806)
+* fix(web): remove canvas use for iOS compatibility (#5916)
+
 ## 14.0.282 stable 2021-09-27
 
 * fix(mac): add support for M1 processor (#5737)
