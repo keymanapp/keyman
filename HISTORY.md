@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.150 alpha 2021-11-17
+
+* fix(web): remove canvas use for iOS compatibility (#5915)
+
 ## 15.0.149 alpha 2021-11-17
 
 * chore(developer): Update jszip version (#5770)
