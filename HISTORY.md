@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.149 alpha 2021-11-17
+
+* chore(developer): Update jszip version (#5770)
+* chore(common): Check in crowdin strings for Fulfulde Nigeria (#5841)
+
 ## 15.0.148 alpha 2021-11-16
 
 * chore(common): Check in crowdin strings for Mandara (Wandala) (#5857)
