@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.151 alpha 2021-11-18
+
+* fix(developer): use correct tike icon (#5925)
+* fix(android/engine): Support for U_xxxx_yyyy subkeys (#5913)
+* fix(mac): use xcframework to support m1 (#5933)
+* fix(developer): move web osk beneath text area (#5937)
+
 ## 15.0.150 alpha 2021-11-17
 
 * fix(web): remove canvas use for iOS compatibility (#5915)
