@@ -150,15 +150,17 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
 
 PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
 {
+  PKMX_WCHAR q;
+
   if(p <= pStart) {
     return NULL;
   }
 
   p--;
-  if(*p == UC_SENTINEL_EXTENDEDEND)
-  {
+  if(*p == UC_SENTINEL_EXTENDEDEND) {
     int n = 0;
-    while(*p != UC_SENTINEL && n < 10) { p--; n++; }
+    while (p >= pStart && *p != UC_SENTINEL && n < 10) {
+      p--; n++; }
 
     if(p < pStart) {
       // May be a malformed virtual key
@@ -167,49 +169,26 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
     return p;
   }
 
-  if(p == pStart) return p; // Don't allow test before pStart
+  if (p == pStart) {
+    // Don't allow test before pStart
+    return p;
+  }
 
-  if(*p >= 0xDC00 && *p <= 0xDFFF && *(p-1) >= 0xD800 && *(p-1) <= 0xDBFF)
-  {
+  if(*p >= 0xDC00 && *p <= 0xDFFF && *(p-1) >= 0xD800 && *(p-1) <= 0xDBFF) {
     return p-1;
   }
-  else if(*(p-1) == UC_SENTINEL) return p-1;
-  else if(p > pStart+1 && *(p-2) == UC_SENTINEL)
-  {
-    switch(*(p-1))
-    {
-      case CODE_ANY:
-      case CODE_NOTANY:
-      case CODE_USE:
-      case CODE_DEADKEY:
-      case CODE_CLEARCONTEXT:
-      case CODE_CALL:
-      case CODE_CONTEXTEX:
-      case CODE_RESETOPT:
-      case CODE_SAVEOPT:
-        return p-2;
-    }
+
+  // Look for a UC_SENTINEL to jump to
+  // note: If we are pointing to the middle of a UC_SENTINEL CODE_x, then we won't treat it as valid,
+  //       and will just go back a single wchar
+  q = p;
+  for (int i = 0; i < CODE__SIZE_MAX && q >= pStart; i++, q--) {
+    //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
+    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
+      return q;
   }
-  else if(p > pStart+2 && *(p-3) == UC_SENTINEL)
-  {
-    switch(*(p-2))
-    {
-      case CODE_INDEX:
-      case CODE_SETOPT:
-      case CODE_SETSYSTEMSTORE:
-        return p-3;
-    }
-  }
-  else if(p > pStart+3 && *(p-4) == UC_SENTINEL)
-  {
-    switch(*(p-3))
-    {
-      case CODE_IFOPT:
-      case CODE_IFSYSTEMSTORE:  // I3432
-        return p-4;
-    }
-  }
-  return p;
+  
+  return p; 
 }
 
 int km::kbp::kmx::xstrlen_ignoreifopt(PKMX_WCHAR p)
