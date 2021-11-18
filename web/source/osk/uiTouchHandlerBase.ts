@@ -16,15 +16,15 @@ namespace com.keyman.osk {
     // before interpreting the currently-ongoing touch command as having scrolled.
     static readonly HAS_SCROLLED_FUDGE_FACTOR = 10;
 
-    constructor(touch: Touch) {
-      this.x = touch.pageX;
+    constructor(coord: InputEventCoordinate) {
+      this.x = coord.x;
 
       this.totalLength = 0;
     }
 
-    updateTo(touch: Touch): {deltaX: number} {
+    updateTo(coord: InputEventCoordinate): {deltaX: number} {
       let x = this.x;
-      this.x = touch.pageX;
+      this.x = coord.x;
 
       let deltas = {deltaX: this.x - x};
       this.totalLength += Math.abs(deltas.deltaX);
@@ -126,22 +126,14 @@ namespace com.keyman.osk {
      * Identify the key nearest to (but NOT under) the touch point if at the end of a key row,
      * but return null more than about 0.6 key width from the nearest key.
      *
-     *  @param  {Event}   e   touch event
+     *  @param  {Object}  coord   A pre-analyzed input coordinate
      *  @param  {Object}  t   HTML object at touch point
      *  @param  {boolean} omitCurrent  Omits any target directly under the touch point.
      *  @return {Object}      nearest key to touch point
      *
      **/
-    private findTargetFromTouch(e: TouchEvent, t: HTMLElement, forMove: boolean): Target {
-      let touchList = forMove ? e.touches : e.changedTouches;
-
-      if((!e) || (typeof touchList == 'undefined')
-        || (touchList.length == 0)) {
-        return null;
-      }
-
-      // Get touch point on screen
-      var x = touchList[0].pageX;
+    private findTargetFromTouch(coord: InputEventCoordinate, t: HTMLElement, forMove: boolean): Target {
+      var x = coord.x;
 
       // Get the UI row beneath touch point (SuggestionBanner div, 'kmw-key-row' if OSK, ...)
       while(t && t.className !== undefined && t.className.indexOf(this.rowClassMatch) < 0) {
@@ -201,13 +193,15 @@ namespace com.keyman.osk {
       return null;
     }
 
-    findBestTarget(e: TouchEvent, forMove?: boolean) {
+    findBestTarget(coord: InputEventCoordinate, forMove?: boolean) {
       var eventTarget: HTMLElement;
 
       if(forMove) {
-        eventTarget = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) as HTMLElement;
+        const clientX = coord.x + document.body.scrollLeft;
+        const clientY = coord.y + document.body.scrollTop;
+        eventTarget = document.elementFromPoint(clientX, clientY) as HTMLElement;
       } else {
-        eventTarget = e.changedTouches[0].target as HTMLElement;
+        eventTarget = coord.target as HTMLElement;
       }
 
       let target = this.findTargetFrom(eventTarget);
@@ -216,7 +210,7 @@ namespace com.keyman.osk {
       if(!target) {
         // We didn't find a direct target, so we should look for the closest possible one.
         // Filters out invalid targets.
-        target = this.findTargetFromTouch(e, eventTarget, forMove);
+        target = this.findTargetFromTouch(coord, eventTarget, forMove);
       }
 
       return target;
@@ -231,16 +225,15 @@ namespace com.keyman.osk {
       return false;
     }
 
-    touchStart(e: TouchEvent) {
+    touchStart(coord: InputEventCoordinate) {
       // Determine the selected Target, manage state.
-      //this.currentTarget = this.findTargetFrom(e.changedTouches[0].target as HTMLElement);
-      this.currentTarget = this.findBestTarget(e);
-      this.touchX = e.changedTouches[0].pageX;
-      this.touchY = e.changedTouches[0].pageY;
+      this.currentTarget = this.findBestTarget(coord);
+      this.touchX = coord.x;
+      this.touchY = coord.y;
 
       // If popup stuff, immediately return. 
       
-      this.touchCount = e.touches.length;
+      this.touchCount = coord.activeInputCount;
 
       if(!this.currentTarget) {
         return;
@@ -248,7 +241,7 @@ namespace com.keyman.osk {
 
       // Establish scroll tracking.
       let shouldScroll = (this.currentTarget.clientWidth < this.currentTarget.scrollWidth);
-      this.scrollTouchState = shouldScroll ? new ScrollState(e.changedTouches[0]) : null;
+      this.scrollTouchState = shouldScroll ? new ScrollState(coord) : null;
 
       // Alright, Target acquired!  Now to use it:
 
@@ -271,13 +264,13 @@ namespace com.keyman.osk {
       this.pendingTarget = this.currentTarget;
     }
 
-    touchEnd(e: TouchEvent): void {
+    touchEnd(coord: InputEventCoordinate): void {
       // Prevent incorrect multi-touch behaviour if native or device popup visible
       let t = this.currentTarget;
 
       if(this.isSubmenuActive() || this.hasModalPopup()) {
         // Ignore release if a multiple touch
-        if(e.touches.length > 0) {
+        if(coord.activeInputCount > 0) {
           return;
         }
 
@@ -291,7 +284,7 @@ namespace com.keyman.osk {
 
       // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
       // This is not completely effective and needs some tweaking, especially on Android
-      var x = e.changedTouches[0].pageX;
+      var x = coord.x;
       var beyondEdge = ((x < 2 && this.touchX > 5) || (x > window.innerWidth - 2 && this.touchX < window.innerWidth - 5));
 
       if(this.scrollTouchState) {
@@ -316,7 +309,7 @@ namespace com.keyman.osk {
         this.pendingTarget = null;
         // Always clear highlighting of current target on release (multi-touch)
       } else {
-        t = this.findBestTarget(e);
+        t = this.findBestTarget(coord);
 
         if(t) {
           this.highlight(t,false);
@@ -327,40 +320,31 @@ namespace com.keyman.osk {
     /**
      * OSK touch move event handler
      *
-     *  @param  {Event} e   touch move event object
+     *  @param  {Object}  coord   A pre-analyzed input coordinate
      *
      **/
-    touchMove(e: TouchEvent): void {
+    touchMove(coord: InputEventCoordinate) : void {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
 
-      e.preventDefault();
-      e.cancelBubble=true;
-
-      if(typeof e.stopImmediatePropagation == 'function') {
-        e.stopImmediatePropagation();
-      } else if(typeof e.stopPropagation == 'function') {
-        e.stopPropagation();
-      }
-
       // Do not attempt to support reselection of target key for overlapped keystrokes
-      if(e.touches.length > 1 || this.touchCount == 0) {
+      if(coord.activeInputCount > 1 || this.touchCount == 0) {
         return;
       }
 
       if(this.currentTarget && this.scrollTouchState != null) {
-        let deltaX = this.scrollTouchState.updateTo(e.changedTouches[0]).deltaX;
+        let deltaX = this.scrollTouchState.updateTo(coord).deltaX;
         this.currentTarget.scrollLeft -= window.devicePixelRatio * deltaX;
 
         return;
       }
 
       // Get touch position
-      var y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
+      var y = coord.y;
 
       // Move target key and highlighting
       var key0 = this.pendingTarget,
-          key1 = this.findBestTarget(e, true);  // For the OSK, this ALSO gets subkeys.
+          key1 = this.findBestTarget(coord, true);  // For the OSK, this ALSO gets subkeys.
 
       // If option should not be selectable, how do we re-target?
 
@@ -425,15 +409,11 @@ namespace com.keyman.osk {
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
         let base = this.baseElement;
-        let parent = base.parentElement; // parentElement is _Box
-        let top = base.offsetTop;
-        if(parent) {
-          top += parent.offsetTop;
-        }
+        let top = dom.Utils.getAbsoluteY(base);
         let height = base.offsetHeight;
         let yMin = Math.max(5, top - 0.25 * height);
         let yMax = (top + height) + 0.25 * height;
-        if(key0 && (e.touches[0].pageY < yMin || e.touches[0].pageY > yMax)) {
+        if(key0 && (coord.y < yMin || coord.y > yMax)) {
           this.highlight(key0,false);
           this.clearHolds();
           this.pendingTarget = null;

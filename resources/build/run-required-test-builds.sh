@@ -89,10 +89,18 @@ echo ". Get information about pull request #$PRNUM from GitHub"
 prinfo=`curl -s -H "User-Agent: @keymanapp" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`
 prbase=`echo ${prinfo} | "$JQ" -r '.base.ref'`
 prhead=`echo ${prinfo} | "$JQ" -r '.head.ref'`
+prbaserepo=`echo ${prinfo} | "$JQ" -r '.base.repo.html_url'`
+prheadrepo=`echo ${prinfo} | "$JQ" -r '.head.repo.html_url'`
 
 debug_echo "PRNUM: $PRNUM"
-debug_echo "BASE: $prbase"
-debug_echo "HEAD: $prhead"
+debug_echo "BASE: $prbase ($prbaserepo)"
+debug_echo "HEAD: $prhead ($prheadrepo)"
+
+prremote=origin
+if [ "$prbaserepo" != "https://github.com/keymanapp/keyman" ]; then
+  echo "Unknown base repository $prbaserepo."
+  exit 1
+fi
 
 #
 # By default, TeamCity does not fetch any remote branch information
@@ -105,16 +113,35 @@ pushd "$KEYMAN_ROOT" > /dev/null
 git fetch origin > /dev/null
 
 #
+# If the repo is a fork, we need to fetch the remote as well; note that
+# this only happens on a manual build as automatic trigger does not run
+# on untrusted forks.
+#
+
+if [ "$prheadrepo" != "https://github.com/keymanapp/keyman" ]; then
+  prremote=external-rrtb
+  git remote add "$prremote" "$prheadrepo"
+  git fetch "$prremote" > /dev/null
+fi
+
+#
 # Then get a list of changed files between BASE of the branch and the branch itself
 # We work from origin so we don't need the branches in our local copy
 #
 
 echo ". Get list of changed files in the pull request"
-prfiles=`git diff --name-only "origin/$prbase"..."origin/$prhead" || ( if [ $? == 128 ]; then echo abort; else exit $?; fi )`
+prfiles=`git diff --name-only "origin/$prbase"..."$prremote/$prhead" || ( if [ $? == 128 ]; then echo abort; else exit $?; fi )`
 if [ "$prfiles" == "abort" ]; then
   # Don't trigger any builds, exit with success
+  if [ "$prremote" != "origin" ]; then
+    git remote remove "$prremote"
+  fi
   echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
   exit 0
+fi
+
+if [ "$prremote" != "origin" ]; then
+  git remote remove "$prremote"
 fi
 
 debug_echo "Files found: ${prfiles[*]}"

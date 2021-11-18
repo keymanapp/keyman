@@ -5,6 +5,7 @@
 #
 
 defns = ['-DKMN_KBP_EXPORTING']
+version_res = []
 
 if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
   warns = [
@@ -46,6 +47,10 @@ if compiler.get_id() == 'msvc'
     '-DUNICODE'
   ]
   links = []
+
+  # /n = append null
+  # /c65001 = utf-8 file format
+  version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
 if compiler.get_id() == 'emscripten'
@@ -82,6 +87,7 @@ lib = library('kmnkbp0',
   'kmx/kmx_processor.cpp',
   'kmx/kmx_xstring.cpp',
   'utfcodec.cpp',
+  version_res,
   cpp_args: defns + warns + flags,
   link_args: links,
   dependencies: [rust_mock_processor],

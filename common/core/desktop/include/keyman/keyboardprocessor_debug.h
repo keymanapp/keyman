@@ -59,6 +59,16 @@ typedef struct {
 } km_kbp_state_debug_key_info;
 
 /**
+ * Option event data.
+ *
+ * Used only in event type KM_KBP_DEBUG_SET_OPTION.
+ */
+typedef struct {
+  void *store;      // LPSTORE
+  km_kbp_cp value[DEBUG_MAX_CONTEXT];  // value to be saved into the store
+} km_kbp_state_debug_kmx_option_info;
+
+/**
  * KMX processor data for each event. kmx_base.h defines the types that are
  * passed in here, read only. Warning: context may contain sentinel values
  * for markers, with the kmx UC_SENTINEL, CODE_CONTEXT, DEADKEY pattern.
@@ -79,6 +89,7 @@ typedef struct {
   /// the debugger; the debugger uses this to determine when to
   /// execute the actions when single-stepping.
   uint16_t first_action;
+  km_kbp_state_debug_kmx_option_info option;
 } km_kbp_state_debug_kmx_info;
 
 /**
@@ -106,6 +117,7 @@ enum km_kbp_debug_type {
   KM_KBP_DEBUG_NOMATCH_ENTER = 8,
   KM_KBP_DEBUG_NOMATCH_EXIT = 9,
   KM_KBP_DEBUG_END = 10,
+  KM_KBP_DEBUG_SET_OPTION = 11,
 };
 
 // Flags for KM_KBP_DEBUG_GROUP_EXIT

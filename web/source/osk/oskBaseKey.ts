@@ -140,7 +140,9 @@ namespace com.keyman.osk {
 
       let util = com.keyman.singleton.util;
       const device = vkbd.device;
-      const resizeLabels = (device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
+      const resizeLabels = (device.OS == utils.OperatingSystem.iOS &&
+                            device.formFactor == utils.FormFactor.Phone
+                            && util.landscapeView());
 
       // Rescale keycap labels on iPhone (iOS 7)
       if(resizeLabels && this.capLabel) {

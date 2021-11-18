@@ -65,7 +65,15 @@ class PackageBrowserViewController: UIDocumentPickerViewController, UIDocumentPi
       return
     }
 
-    if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: self) {
+    // The package browser view has usually self-dismissed at this point and cannot
+    // present error message alerts.  We need to find something in the view
+    // hierarchy that can present the error.
+    var alertVC: UIViewController = self
+    if self.view.superview == nil && self.navVC != nil {
+      alertVC = self.navVC!
+    }
+
+    if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: alertVC) {
       // These type checks are necessary due to generic constraints.
       if let kbdPackage = package as? KeyboardKeymanPackage {
         doPrompt(for: kbdPackage, withAssociators: [.lexicalModels])

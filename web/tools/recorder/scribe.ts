@@ -238,7 +238,7 @@ namespace KMWRecorder {
 
         // What's the active stub immediately after our _SetActiveKeyboard call?
         var internalStub = keyman.keyboardManager.activeStub;
-        if(internalStub && (com.keyman.dom.DOMEventHandlers.states.activeElement == in_output.getElement())) {
+        if(internalStub && (com.keyman.dom.DOMEventHandlers.states._activeElement == in_output.getElement())) {
           var kbdRecord = KMWRecorder.Scribe.recordKeyboardStub(internalStub, 'resources/keyboards');
 
           recorderScribe.emit('stub-changed', JSON.stringify(kbdRecord));

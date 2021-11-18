@@ -4,7 +4,8 @@ interface
 
 uses
   Keyman.Developer.System.Project.ProjectFile,
-  Keyman.Developer.System.Project.ProjectLog;
+  Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.KeymanDeveloperPaths;
 
 function CompileModelFile(ProjectFile: TProjectFile; infile, outfile: string; debug: Boolean): Boolean;
 
@@ -25,7 +26,8 @@ var
 begin
   ec := 0;
   logtext := '';
-  cmdline := Format('"%skmlmc.cmd" "%s" -o "%s"', [ExtractFilePath(ParamStr(0)), infile, outfile]);
+
+  cmdline := Format('"%s" "%s" -o "%s"', [TKeymanDeveloperPaths.LexicalModelCompilerPath, infile, outfile]);
   Result := TUtilExecute.Console(cmdline, ExtractFileDir(infile), logtext, ec);
 
   logtext := UTF8ToString(AnsiString(logtext));

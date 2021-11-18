@@ -71,6 +71,8 @@ private:
 
   /* Utility functions */
 
+  void DeleteInternalDebugItems();
+  void CreateInternalDebugItems();
   PKMX_WCHAR  GetSystemStore(LPKEYBOARD kb, KMX_DWORD SystemID);
 
   /* Caps Lock and modifier management */

@@ -1,5 +1,45 @@
 # Keyman Version History
 
+## 15.0.119 alpha 2021-09-24
+
+* chore(common): support forked repos when triggering test builds (#5738)
+
+## 15.0.118 alpha 2021-09-23
+
+* chore(deps): bump ansi-regex from 5.0.0 to 5.0.1 in /resources/build/version (#5741)
+* refactor(web): active element management in relation to OSK display control  ️ (#5644)
+* refactor(web): osk activation and visibility modeling  ️ (#5661)
+* chore(android/app): Remove runConfigruations.xml file (#5743)
+* feat(web): new OSK type - the inlined OSK (#5665)
+* chore(web): inline osk test page (#5728)
+* feat(web): enables mouse interactivity for the predictive banner (#5739)
+* fix(mac): add support for M1 processor (#5701)
+
+## 15.0.117 alpha 2021-09-22
+
+* fix(developer): run kmlmc from Keyman source path (#5727)
+
+## 15.0.116 alpha 2021-09-21
+
+* fix(common/core): insure list pntr is incremented (#5669)
+* chore(common): Check in crowdin strings for Simplified Chinese (#5681)
+* fix(web): Null check for calculating globe key position (#5724)
+
+## 15.0.115 alpha 2021-09-20
+
+* chore(common/core): cleanup version headers (#5719)
+* refactor(web): OSK modularization - specialized OSKView classes  ️ (#5633)
+* feat(developer): track changes to option values better in debugger (#5696)
+* fix(developer): support chiral modifiers in debugger (#5697)
+
+## 15.0.114 alpha 2021-09-17
+
+* feat(developer): Debugger platform option (#5640)
+* feat(developer): Debugger keyboard options (#5647)
+* fix(developer): add version info to Core (#5711)
+* fix(common/core/web): layer reset on physical keystroke after OSK interaction (#5641)
+* fix(ios): prevents installation of packages without JS (#5698)
+
 ## 15.0.113 alpha 2021-09-16
 
 * fix(ios): version-tagging for errors logged from the system keyboard (#5693)

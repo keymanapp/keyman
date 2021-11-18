@@ -6,25 +6,54 @@ namespace com.keyman.osk {
     private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
     private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
-    public constructor(vkbd: VisualKeyboard) {
-      super(vkbd);
+    public constructor(config: InputEventEngineConfig) {
+      super(config);
 
       this._touchStart = this.onTouchStart.bind(this);
       this._touchMove  = this.onTouchMove.bind(this);
       this._touchEnd   = this.onTouchEnd.bind(this);
     }
 
+    public static forVisualKeyboard(vkbd: VisualKeyboard) {
+      let config: InputEventEngineConfig = {
+        targetRoot: vkbd.element,
+        eventRoot: vkbd.element,
+        inputStartHandler: vkbd.touch.bind(vkbd),
+        inputMoveHandler: vkbd.moveOver.bind(vkbd),
+        inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
+        inputEndHandler: vkbd.release.bind(vkbd),
+        coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
+      };
+
+      return new TouchEventEngine(config);
+    }
+
+    public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
+      const config: InputEventEngineConfig = {
+        targetRoot: banner.getDiv(),
+        // document.body is the event root b/c we need to track the mouse if it leaves
+        // the VisualKeyboard's hierarchy.
+        eventRoot: banner.getDiv(),
+        inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
+        inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
+        inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
+        coordConstrainedWithinInteractiveBounds: function() { return true; }
+      };
+
+      return new TouchEventEngine(config);
+    }
+
     registerEventHandlers() {
-      this.eventRoot.addEventListener('touchstart', this._touchStart, true);
-      this.eventRoot.addEventListener('touchmove',  this._touchMove, false);
+      this.config.eventRoot.addEventListener('touchstart', this._touchStart, true);
+      this.config.eventRoot.addEventListener('touchmove',  this._touchMove, false);
       // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
-      this.eventRoot.addEventListener('touchend',   this._touchEnd, true);
+      this.config.eventRoot.addEventListener('touchend',   this._touchEnd, true);
     }
 
     unregisterEventHandlers() {
-      this.eventRoot.removeEventListener('touchstart', this._touchStart, true);
-      this.eventRoot.removeEventListener('touchmove',  this._touchMove, false);
-      this.eventRoot.removeEventListener('touchend',   this._touchEnd, true);
+      this.config.eventRoot.removeEventListener('touchstart', this._touchStart, true);
+      this.config.eventRoot.removeEventListener('touchmove',  this._touchMove, false);
+      this.config.eventRoot.removeEventListener('touchend',   this._touchEnd, true);
     }
 
     private preventPropagation(e: TouchEvent) {
@@ -47,7 +76,7 @@ namespace com.keyman.osk {
       this.preventPropagation(event);
       const coord = InputEventCoordinate.fromEvent(event);
 
-      if(this.vkbd.detectWithinInteractiveBounds(coord)) {
+      if(this.config.coordConstrainedWithinInteractiveBounds(coord)) {
         this.onInputMove(coord);
       } else {
         this.onInputMoveCancel(coord);
