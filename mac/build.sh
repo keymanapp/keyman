@@ -291,7 +291,7 @@ if $CLEAN ; then
 fi
 
 if [ "$TEST_ACTION" == "test" ]; then
-    carthage bootstrap
+    carthage bootstrap --use-xcframeworks
 fi
 
 execBuildCommand() {
