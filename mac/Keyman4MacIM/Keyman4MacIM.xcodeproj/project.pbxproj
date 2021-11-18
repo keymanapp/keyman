@@ -10,7 +10,7 @@
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
-		37CA0FCF2745DCFE00266259 /* OCMock.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37CA0FCE2745DCFE00266259 /* OCMock.xcframework */; };
+		37CA0FD12746010300266259 /* OCMock.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37CA0FCE2745DCFE00266259 /* OCMock.xcframework */; };
 		9800EC5A1C02940300BF0FB5 /* keyman-for-mac-os-license.html in Resources */ = {isa = PBXBuildFile; fileRef = 9800EC591C02940300BF0FB5 /* keyman-for-mac-os-license.html */; };
 		9803C9D81B0EFB3B0082A6F9 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9803C9D71B0EFB3B0082A6F9 /* WebKit.framework */; };
 		983247281A9EA28F0010B90C /* KeymanEngine4Mac.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -66,7 +66,6 @@
 		E2585A7D20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E2585A7C20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m */; };
 		E2585A7F20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */; };
 		E2585A8120DD7CF100CBB994 /* TestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E2585A8020DD7CF100CBB994 /* TestAppDelegate.m */; };
-		E27BA9CE2020322000D273E7 /* OCMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27BA9CD2020322000D273E7 /* OCMock.framework */; };
 		E27BA9D32020D8BF00D273E7 /* SimpleTest.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E27BA9D22020D8BF00D273E7 /* SimpleTest.kmx */; };
 		E28914D32024D1B80048E71E /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C2B211A79DF1B0023F89D /* KeymanEngine4Mac.framework */; };
 		E28914D52024E3DF0048E71E /* KMInputMethodBrowserClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */; };
@@ -252,7 +251,6 @@
 				984C2B221A79DF1B0023F89D /* KeymanEngine4Mac.framework in Frameworks */,
 				9803C9D81B0EFB3B0082A6F9 /* WebKit.framework in Frameworks */,
 				B90818AF7ED302187DE0E026 /* Pods_Keyman.framework in Frameworks */,
-				37CA0FCF2745DCFE00266259 /* OCMock.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,8 +259,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E28914D32024D1B80048E71E /* KeymanEngine4Mac.framework in Frameworks */,
-				E27BA9CE2020322000D273E7 /* OCMock.framework in Frameworks */,
 				F9B9814A51575496B5DA2948 /* Pods_KeymanTests.framework in Frameworks */,
+				37CA0FD12746010300266259 /* OCMock.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
