@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         webView.addJavascriptInterface(new JSHandler(context), "jsInterface");
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setAllowFileAccess(true);
         webView.getSettings().setSupportZoom(false);
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
