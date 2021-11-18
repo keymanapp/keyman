@@ -123,8 +123,8 @@ static BOOL AddIMDLLHook(LPIMDLL imd, LPSTR funcname, DWORD storeno, PWCHAR *dpS
 }
 
 static km_kbp_action_item*
-kmnToCoreActionItems(int ItemType, DWORD dwData) {
-  km_kbp_action_item *actionItem = new km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}};
+kmnToCoreActionItem(int ItemType, DWORD dwData) {
+  km_kbp_action_item *actionItem = nullptr;
   switch (ItemType) {
   case QIT_CHAR:
     actionItem = new km_kbp_action_item {
@@ -151,49 +151,47 @@ kmnToCoreActionItems(int ItemType, DWORD dwData) {
         {0}};
     break;
   case QIT_BACK:
-    //switch (dwData) {
-    //case BK_DEFAULT:
-      // This only happens if we know we have context to delete. Last item must be a character
-      //  assert(!state->context().empty());
-      //  assert(state->context().back().type != KM_KBP_IT_MARKER);
-      //  if (!state->context().empty()) {
-      //    auto item = state->context().back();
-      //    state->context().pop_back();
-      //    state->actions().push_backspace(KM_KBP_BT_CHAR, item.character);
-      //  } else {
-      //    // Note: only runs on non-debug build, fail safe
-      //    state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
-      //  }
-      //  break;
-      // case BK_DEADKEY:
-      //  // This only happens if we know we have context to delete. Last item must be a deadkey
-      //  assert(!state->context().empty());
-      //  assert(state->context().back().type == KM_KBP_IT_MARKER);
-      //  if (!state->context().empty()) {
-      //    auto item = state->context().back();
-      //    state->context().pop_back();
-      //    state->actions().push_backspace(KM_KBP_BT_MARKER, item.marker);
-      //  } else {
-      //    // Note: only runs on non-debug build, fail safe
-      //    state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
-      //  }
+    switch (dwData) {
+    case BK_DEFAULT:
+      actionItem = new km_kbp_action_item{
+          KM_KBP_IT_BACK,
+          {
+              0,
+          },
+          {0}};
+      actionItem->backspace.expected_type = KM_KBP_BT_CHAR;
       break;
-      // case QIT_CAPSLOCK:
-      // km_kbp_action_item ai = {KM_KBP_IT_CAPSLOCK,{0,},{0}};
-      // ai.capsLock = dwData;
-      ///   break;
+    case BK_DEADKEY:
+      actionItem = new km_kbp_action_item{
+          KM_KBP_IT_BACK,
+          {
+              0,
+          },
+          {0}};
+      actionItem->backspace.expected_type = KM_KBP_BT_MARKER;
+      break;
+    }
+    break;
+    case QIT_CAPSLOCK:
     case QIT_VKEYDOWN:
     case QIT_VKEYUP:
     case QIT_VSHIFTDOWN:
     case QIT_VSHIFTUP:
-      // Not hanled TODO Log a message?
+      // Not handled TODO Log a message?
+      actionItem = new km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}};
       break;
-  // case QIT_INVALIDATECONTEXT:
-  //  km_kbp_action_item actionItems = km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}};
-  //  break;
-    //default:
-    // TODO: Warning message;
+   case QIT_INVALIDATECONTEXT:
+    actionItem = new km_kbp_action_item {KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0}};
+    break;
   }
+
+  if (!actionItem) {
+    actionItem = new km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}};
+    return actionItem;
+  } //else
+  km_kbp_action_item *actionItems[2];
+  actionItems[0] = actionItem;
+  actionItems[1] = new km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}};
   return actionItem;
 }
 
@@ -334,7 +332,7 @@ void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
 // TODO need to update this to have LPINTKEYBOARDINFO lpkbi in the callback. So the callback will store the object.
 // will not need km_state anymore
 uint8_t
-IM_CallBackCore(void* callbackObject, km_kbp_state *km_state, uint32_t UniqueStoreNo) {
+IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject) {
   // SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");
   if (callbackObject == NULL) {
     return 0;
@@ -437,10 +435,10 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dw
     if (!_td->lpActiveKeyboard->lpCoreKeyboard) {
       return FALSE;
     }
-    km_kbp_action_item *actionItem = kmnToCoreActionItems(ItemType, dwData);
+    km_kbp_action_item *actionItem = kmnToCoreActionItem(ItemType, dwData);
     if (KM_KBP_STATUS_OK !=
         (km_kbp_status_codes)km_kbp_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItem)) {
-      delete actionItem;
+      delete[] actionItem;
       return FALSE;
     }
     return TRUE;

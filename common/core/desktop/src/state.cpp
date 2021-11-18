@@ -48,15 +48,25 @@ state::state(km::kbp::abstract_processor & ap, km_kbp_option_item const *env)
   }
 }
 
-void state::imx_register_callback(km_kbp_keyboard_imx_platform imx_callback){
-  //_imx_callback = imx_callback;
-  km_kbp_keyboard_imx_platform test_fn_ptr = imx_callback;
+void state::imx_register_callback(km_kbp_keyboard_imx_platform imx_callback, void *callback_object){
+  assert(imx_callback);
+  if(!imx_callback){
+    return;
+  }
+  _imx_callback = imx_callback;
+  _imx_object = callback_object;
+  //km_kbp_keyboard_imx_platform test_fn_ptr = imx_callback;
 }
 
 void state::imx_deregister_callback(){
   _imx_callback = nullptr;
+  _imx_object = nullptr;
 }
 
 void state::imx_callback(uint32_t store_no){
-  _imx_callback(static_cast<km_kbp_state *>(this), store_no);
+  if (_imx_callback==nullptr){
+    return;
+  }
+  _imx_callback(static_cast<km_kbp_state *>(this), store_no, _imx_object);
+  // _imx_callback(nullptr, store_no);
 }

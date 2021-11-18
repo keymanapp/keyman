@@ -223,12 +223,18 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
 
 }
 
-void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback)
+void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback, void *callback_object)
 {
-  state->imx_register_callback(imx_callback);
+  assert(state);
+  if (!state)
+    return;
+  state->imx_register_callback(imx_callback, callback_object);
 }
 
 void km_kbp_state_imx_deregister_callback(km_kbp_state *state)
 {
+  assert(state);
+  if (!state)
+    return;
   state->imx_deregister_callback();
 }

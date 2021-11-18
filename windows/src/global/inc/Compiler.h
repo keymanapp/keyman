@@ -113,6 +113,7 @@
 //
 
 // Delete a deadkey from context, do not pass on to app
+#define BK_DEFAULT    0
 #define BK_DEADKEY		1
 
 // User pressed backspace so clear deadkeys either side of next deleted character

@@ -133,7 +133,7 @@ typedef struct km_kbp_option_item  km_kbp_option_item;
 
 // Callback functions
 //
-typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t);
+typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t, void*);
 
 /*```
 ### Error Handling
@@ -677,7 +677,7 @@ typedef struct {
 } km_kbp_keyboard_imx;
 
 
-#define KM_KBP_KEYBOARD_IMX_END { 0, 0 }
+#define KM_KBP_KEYBOARD_IMX_END { 0, 0, 0 }
 
 /*
 ```
@@ -804,7 +804,7 @@ void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list);
  * Register callback from the platform engine.
  */
 KMN_API
-void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback);
+void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback, void *callback_object);
 
 /**
  * De-register call callback for platform engine

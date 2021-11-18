@@ -25,7 +25,7 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
     DebugLog("App::QueueAction: queue size exceeded");
     return FALSE;
   }
-
+  DebugLog("App::QueueAction: ItemType: [%d] dwData[%lu]",ItemType, dwData);
   Queue[QueueSize].ItemType = ItemType;
   Queue[QueueSize].dwData = dwData;
 
