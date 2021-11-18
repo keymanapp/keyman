@@ -693,10 +693,10 @@ final class KMKeyboard extends WebView {
         String[] codePoints = values[j].split("_");
         for (String codePoint : codePoints) {
           int codePointValue = Integer.parseInt(codePoint, 16);
-          if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F))) {
+          if ((0x0 <= codePointValue && codePointValue <= 0x1F) || (0x80 <= codePointValue && codePointValue <= 0x9F)
+              || (codePointValue > 0x10FFFF)) {
             continue;
           } else {
-            // TODO: \\uxxxxxx will need to be handled with title.codePointAt(c)
             title += new String(Character.toChars(codePointValue));
           }
         }
