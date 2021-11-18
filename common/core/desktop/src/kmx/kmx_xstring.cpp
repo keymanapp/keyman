@@ -139,7 +139,7 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
 
   int deltaptr = 2 + CODE__SIZE[*(p + 1)];
 
-  // check for \0 between FFFF and next printable character
+  // check for \0 between UC_SENTINEL(FFFF) and next printable character
   for (int i = 0; i < deltaptr; i++) {
     if (*p == 0)
       return p;

@@ -21,8 +21,4 @@ if get_option('default_library') != 'static'
   endif
 endif
 
-subdir('unit/json')
-subdir('unit/utftest')
-subdir('unit/kmnkbd')
-subdir('unit/kmx')
-subdir('unit/rust_mock')
+subdir('unit')

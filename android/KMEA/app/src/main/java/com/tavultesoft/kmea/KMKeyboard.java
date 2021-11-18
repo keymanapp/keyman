@@ -23,9 +23,11 @@ import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -125,7 +127,10 @@ final class KMKeyboard extends WebView {
 
     // Normally, this would be true to prevent the WebView from accessing the network.
     // But this needs to false for sending embedded KMW crash reports to Sentry (keymanapp/keyman#3825)
-    getSettings().setBlockNetworkLoads(!KMManager.getMaySendCrashReport());
+    if (KMManager.hasInternetPermission(context)) {
+      // Throws SecurityException if INTERNET permission not granted
+      getSettings().setBlockNetworkLoads(!KMManager.getMaySendCrashReport());
+    }
 
     getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     getSettings().setSupportZoom(false);
@@ -671,18 +676,30 @@ final class KMKeyboard extends WebView {
     }
   }
 
-  // Extract Unicode numbers (\\uxxxx) from a layer to character string.
-  // Ignores empty strings and layer names
-  // Returns: String
+  /**
+   * Extract Unicode numbers (\\u_xxxx_yyyy) from a layer to character string.
+   * Ignores empty strings and layer names
+   * Refer to web/source/osk/oskKey.ts
+   * @param ktext Unicode string in the format \\uxxxx_yyyy
+   * @return String to display on subkey
+   */
   protected String convertKeyText(String ktext) {
     String title = "";
     String[] values = ktext.split("\\\\u");
     int length = values.length;
     for (int j = 0; j < length; j++) {
       if (!values[j].isEmpty() && !values[j].contains("-")) {
-        int c = Integer.parseInt(values[j], 16);
-        // TODO: \\uxxxxxx will need to be handled with title.codePointAt(c)
-        title += String.valueOf((char) c);
+        // Split U_xxxx_yyyy
+        String[] codePoints = values[j].split("_");
+        for (String codePoint : codePoints) {
+          int codePointValue = Integer.parseInt(codePoint, 16);
+          if ((0x0 <= codePointValue && codePointValue <= 0x1F) || (0x80 <= codePointValue && codePointValue <= 0x9F)
+              || (codePointValue > 0x10FFFF)) {
+            continue;
+          } else {
+            title += new String(Character.toChars(codePointValue));
+          }
+        }
       }
     }
     return title;

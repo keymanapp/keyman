@@ -73,7 +73,7 @@ namespace com.keyman.keyboards {
 
     /**
      * Utility to convert stubs to KeyboardStub[]
-     * @param arg 
+     * @param arg
      * @returns (KeyboardStub|ErrorStub)[]
      */
     public static toStubs(arg: any): (KeyboardStub|ErrorStub)[] {
@@ -962,8 +962,8 @@ namespace com.keyman.keyboards {
 
     /**
      * Returns a Promise of the merged keyboard stubs and error stubs.
-     * 
-     * If the keyboard stub array is empty, will return a rejected Promise, 
+     *
+     * If the keyboard stub array is empty, will return a rejected Promise,
      * otherwise returns a resolved Promise.
      *
      * @param keyboardStubs  array of keyboard stubs to merge.
@@ -1220,14 +1220,16 @@ namespace com.keyman.keyboards {
         const promiseFuncs = this.registrationResolvers[promiseid];
         window.clearTimeout(promiseid);
 
-        try {
-          if(result instanceof Error) {
-            promiseFuncs.reject(result as Error);
-          } else {
-            promiseFuncs.resolve(result as KeyboardStub[]);
+        if(promiseFuncs) {
+          try {
+            if(result instanceof Error) {
+              promiseFuncs.reject(result as Error);
+            } else {
+              promiseFuncs.resolve(result as KeyboardStub[]);
+            }
+          } finally {
+            delete this.registrationResolvers[promiseid];
           }
-        } finally {
-          delete this.registrationResolvers[promiseid];
         }
       }
     }
@@ -1325,7 +1327,7 @@ namespace com.keyman.keyboards {
         }).catch(function(error) {
           return Promise.reject(error);
         });
-      
+
       } else { // Identify and register each keyboard by language name
         cmd = '';
         for(i=0; i<languages.length; i++) {
@@ -1362,7 +1364,7 @@ namespace com.keyman.keyboards {
         if(cmd == '') {
           // No command so return errors
           return Promise.reject(errorStubs);
-        } 
+        }
 
         try {
           // Merge this with errorStub
@@ -1424,7 +1426,7 @@ namespace com.keyman.keyboards {
 
         Lscript.onload = function(event: Event) {
           window.clearTimeout(timeoutID);
-        // This case should only happen if a returned, otherwise-valid keyboard 
+        // This case should only happen if a returned, otherwise-valid keyboard
           // script does not ever call `register`.  Also provides default handling
           // should `register` fail to report results/failure correctly.
           if(kbdManager.registrationResolvers[timeoutID]) {
@@ -1436,13 +1438,13 @@ namespace com.keyman.keyboards {
           }
         };
 
-      // Note:  at this time (24 May 2021), this is also happens for "successful" 
+      // Note:  at this time (24 May 2021), this is also happens for "successful"
         //        API calls where there is no matching keyboard ID.
-      //        
+      //
         //        The returned 'error' JSON object is sent with an HTML error code (404)
         //        and does not call `keyman.register`.  Even if it did the latter, the
         //        404 code would likely prevent the returned script's call.
-      Lscript.onerror = function(event: string | Event, source?: string, 
+      Lscript.onerror = function(event: string | Event, source?: string,
                                   lineno?: number, colno?: number, error?: Error) {
           window.clearTimeout(timeoutID);
           try {

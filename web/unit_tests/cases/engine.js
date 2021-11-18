@@ -41,7 +41,9 @@ describe('Engine - Browser Interactions', function() {
   });
 
   describe('RegisterStub', function() {
-    it('RegisterStub on same keyboard twice', function(done) {
+    it.skip('RegisterStub on same keyboard twice', function(done) {
+      // mcdurdin: skipping this test for now as it is sporadically failing and have not been able to trace source of issue
+      // see https://github.com/keymanapp/keyman/issues/5799
       this.timeout(kmwconfig.timeouts.scriptLoad);
 
       var test_callback = function() {
@@ -218,12 +220,12 @@ describe('Unmatched Final Groups', function() {
 
   beforeEach(function(done) {
     fixture.load("singleTextArea.html");
-    
+
     window.setTimeout(function() {
       done()
     }, kmwconfig.timeouts.eventDelay);
   });
-  
+
   after(function() {
     teardownKMW();
   });

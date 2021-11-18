@@ -90,7 +90,7 @@ const unsigned long CRCTable[256] = {
  * and returns the updated value.
  */
 
-unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
+static unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
 {
   unsigned long temp1;
   unsigned long temp2;

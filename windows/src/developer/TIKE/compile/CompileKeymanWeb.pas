@@ -251,6 +251,7 @@ type
     function JavaScript_SetupDebug: string;
     function JavaScript_SetupEpilog: string;
     function JavaScript_SetupProlog: string;
+    function IsKeyboardVersion15OrLater: Boolean;
   public
     function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallbackW): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
@@ -1629,12 +1630,26 @@ var
         ((ch >= $00A0) and (ch <= $10FFFF));
     end;
 
+    function AreValidUnicodeValues(const value: string): Boolean;
+    var
+      v: string;
+      values: TArray<string>;
+    begin
+      values := value.Split(['_']);
+      if (Length(values) > 1) and not IsKeyboardVersion15OrLater then
+        Exit(False);
+      for v in values do
+        if not IsValidUnicodeValue(StrToIntDef('$'+v, 0)) then
+          Exit(False);
+      Result := True;
+    end;
+
     function KeyIdType(const FId: string): TKeyIdType;   // I4142
     begin
       Result := Key_Invalid;
       case UpCase(FId[1]) of
         'T': Result := Key_Touch;
-        'U': if (Copy(FId, 1, 2) = 'U_') and IsValidUnicodeValue(StrToIntDef('$'+Copy(FId,3,MaxInt), 0)) then Result := Key_Unicode;   // I4198
+        'U': if (Copy(FId, 1, 2) = 'U_') and AreValidUnicodeValues(FId.Substring(2)) then Result := Key_Unicode;   // I4198
         else if FindVKeyName(FId) <> $FFFF then Result := Key_Constant;
       end;
     end;
@@ -1856,6 +1871,7 @@ var
   HasRules: Boolean;
   sModifierBitmask: string;
   fDisplayUnderlying: Boolean;
+  FOptionStores: string;
 begin
   Result := '';//UTF16SignatureW;  // + '// compiled by Keyman Developer'+nl;  // I3474
 	{ Locate the name of the keyboard }
@@ -2067,6 +2083,7 @@ begin
     Result := Result + Format('%sthis.KCSS="%s";%s', [FTabStop, RequotedString(sEmbedCSS), nl]);
 
 	{ Write the stores out }
+  FOptionStores := '';
   fsp := fk.dpStoreArray;
 	for i := 0 to fk.cxStoreArray - 1 do
   begin
@@ -2081,17 +2098,25 @@ begin
       //else if fsp.dwSystemID = TSS_VKDICTIONARY then // I3438, required for vkdictionary
       //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
       else if fsp.fIsOption and not fsp.fIsReserved then
+      begin
         Result := Result + Format('%sthis.s%s=KeymanWeb.KLOAD(this.KI,"%s",%s);%s',
           [FTabstop,
           JavaScript_Name(i,fsp.szName),
           JavaScript_Name(i,fsp.szName,True),
           JavaScript_Store(fsp.line, fsp.dpString),
-          nl])  // I3429
-      else if fsp.dwSystemID = TSS_NONE then
+          nl]);  // I3429
+
+        if FOptionStores <> '' then
+          FOptionStores := FOptionStores + ',';
+        FOptionStores := FOptionStores + Format('''s%s''', [JavaScript_Name(i,fsp.szName)]);
+      end
+      else if fsp.dwSystemID = TSS_NONE {aka not fsp.fIsReserved} then
         Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl]);   // I3681
     end;
     Inc(fsp);
   end;
+
+  Result := Result + Format('%sthis.KVS=[%s];%s', [FTabStop, FOptionStores, nl]);
 
 	{ Write the groups out }
 
@@ -2316,6 +2341,11 @@ end;
 function TCompileKeymanWeb.IsKeyboardVersion14OrLater: Boolean;
 begin
   Result := fk.version >= VERSION_140;
+end;
+
+function TCompileKeymanWeb.IsKeyboardVersion15OrLater: Boolean;
+begin
+  Result := fk.version >= VERSION_150;
 end;
 
 procedure TCompileKeymanWeb.CheckStoreForInvalidFunctions(key: PFILE_KEY; store: PFILE_STORE);  // I1520

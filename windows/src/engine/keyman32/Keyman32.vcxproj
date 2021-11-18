@@ -55,11 +55,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\common\core\desktop\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\include;$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\common\core\desktop\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -95,7 +95,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kmnkbp0.lib;keyman_keyboard_processor_native.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libkmnkbp0.a;keyman_keyboard_processor_native.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -151,7 +151,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kmnkbp0.lib;keyman_keyboard_processor_native.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libkmnkbp0.a;keyman_keyboard_processor_native.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -295,6 +295,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="kmprocessactions.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -371,6 +372,7 @@
     <ClInclude Include="capsstate.h" />
     <ClInclude Include="..\..\global\inc\Compiler.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="kmprocessactions.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="hotkeys.h" />
     <ClInclude Include="k32_tsf.h" />

@@ -55,11 +55,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\common\core\desktop\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\common\core\desktop\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -96,7 +96,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>keyman_keyboard_processor_native.lib;kmnkbp0.lib;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libkmnkbp0.a;keyman_keyboard_processor_native.lib;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -152,11 +152,12 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>keyman_keyboard_processor_native.lib;kmnkbp0.lib;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libkmnkbp0.a;keyman_keyboard_processor_native.lib;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -243,6 +244,7 @@
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
     <ClCompile Include="..\..\global\vc\registry.cpp" />
+    <ClCompile Include="..\keyman32\kmprocessactions.cpp" />
     <ClCompile Include="..\keyman32\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -307,6 +309,7 @@
     <ClInclude Include="..\keyman32\keyeventsenderthread.h" />
     <ClInclude Include="..\keyman32\keystate.h" />
     <ClInclude Include="..\..\global\inc\Kmnreg.h" />
+    <ClInclude Include="..\keyman32\kmprocessactions.h" />
     <ClInclude Include="..\keyman32\kmprot.h" />
     <ClInclude Include="..\..\global\inc\kmprot_hwkey.h" />
     <ClInclude Include="..\..\global\inc\kmprot_licencenumber.h" />

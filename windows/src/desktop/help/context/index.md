@@ -8,9 +8,9 @@ title: Contextual Help
 * [Startup Screen](splash)
 
 ## Keyman Toolbox
-* [Keyman Toolbox - On Screen Keyboard](onscreenkeyboard)
-* [Keyman Toolbox - Font Helper](fonthelper)
-* [Keyman Toolbox - Character Map](charactermap)
+* [Keyman Toolbox - On Screen Keyboard](toolbox-onscreenkeyboard)
+* [Keyman Toolbox - Font Helper](toolbox-fonthelper)
+* [Keyman Toolbox - Character Map](toolbox-charactermap)
 
 ## [Keyman Configuration](keyman)
 * [Keyman Configuration - Keyboard Layouts Tab](configuration-keyboards)

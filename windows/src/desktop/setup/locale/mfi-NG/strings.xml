@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Mandara</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
+  <string name="ssTitle">Femhe$APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION zlawzla nde a fa ne ba shagera.</string>
+  <string name="ssCancelQuery">Ba jirahe ká kátá tsanahe femhe $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Tiɗa bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Zhara pakej...</string>
+  <string name="ssBootstrapCheckingForUpdates">Zhara daula ne am online...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Zhara jiba versions na an fa na...</string>
+  <string name="ssBootstrapReady">Zlanahe...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Ɓáaka nazu a femhe nde adaliya.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s tsukwanahe)</string>
+  <string name="ssActionInstall">Saitin ŋanna a fantufe femhe:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION ŋane a ban dey antara paɗare shante</string>
+  <string name="ssLicenseLink">&amp;Maga karatu lasisi</string>
+  <string name="ssInstallOptionsLink">Femhe &amp;naza ksa gergre</string>
+  <string name="ssMessageBoxTitle">$APPNAME Setup</string>
+  <string name="ssOkButton">Bastuwa</string>
+  <string name="ssInstallButton">&amp;Femhe</string>
+  <string name="ssCancelButton">Tsanahe</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Fa ne gé fantu slera $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Tiɗa emgyigwa Versions</string>
+  <string name="ssStatusComplete">Zlawzle fa ne gé slera</string>
+  <string name="ssQueryRestart">Sey ma fantufe Windows kabu a fantu maga slera kalkale. Ma seke fantufe Windows ŋanna, Saitin ŋanna anuga a za katafke.
+
+Fantufahe akina?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Fantuka Windows ŋanna ga slera anirane. Shagera a fantuhe gé Windows ŋanna kabu ga gwada antara fantu $APPNAME.</string>
+  <string name="ssMustRestart">Dole sey ká fantu Windows kabu ká zla saiti ŋanna. Ma seke fakantufe Windows, anuga a zla saitin ŋanna.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION Jiba Windows 7 ŋanna a kátáva mtu a de fa nde am katafke. An kya ŋalape umbulé, Keyman Desktop 7, 8 mtu 9 aŋkwa nde a diyase. Ká kátáhe femhe keyboards ŋanna tirba una a fava am nazu an fa gé Keyman Desktop?</string>
+  <string name="ssOldOsVersionDownload">Una gé version $APPNAME a kátá Windows 7 mtu gé femhe an katafke. Ká kátáhe tsukwanahe Keyman Desktop 8?</string>
+  <string name="ssOptionsTitle">Ksa naza femhe gergre</string>
+  <string name="ssOptionsTitleInstallOptions">Femhe naza ksa gergre</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Default $APPNAME saitin</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Femhe Modules mtu daula ne ŋanna</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Nalaka Keyboard Nare</string>
+  <string name="ssOptionsTitleLocation">Version ŋanna a de fava na</string>
+  <string name="ssOptionsStartWithWindows">Fantuhe $APPNAME ma seke Windows fantufe</string>
+  <string name="ssOptionsStartAfterInstall">Fantuhe $APPNAME ma seke zlawzle fa ne ŋanna</string>
+  <string name="ssOptionsCheckForUpdates">Zhara daula duksá online a sawam lokte gé lokte</string>
+  <string name="ssOptionsUpgradeKeyboards">Farfe ndzeɗa keyboards an fa gé slera antara emgyigwa versions gé version $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Diga kwakyira maga slera an Keyman.com ba kwal-zhere</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Saitin version: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Femhe $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Farfe ndzeɗa $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s zlawzle femfande gé maga slera.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Tsukwanahe version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Femhe %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Tsukwanahe version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Version %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Ksa nare ŋanna ká kátá naka maga slera anikwa %0:s keyboard</string>
+  <string name="ssOptionsDefaultLanguage">Naru an ksa gé maga slera anikwa</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Tsukwa ne %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Tsukwa ne %0:s</string>
+  <string name="ssOffline">$APPNAME Saitin ŋanna jemka an keyman.com gé tsukwanahe daula duksáhá.
+
+Tazlaŋa zharana-zhara ká ba online, antara ká vante $APPNAME dama saiti gé sha Internet am saiti firewall a ŋa.
+
+Piyana-piya Abort gé tsanahe saiti ŋanna, ká maganahe adaliya antara tsukwanahe duksáhá umbulé adaliya, mtu ká ɗyante gé maga ne offline.</string>
+</resources>

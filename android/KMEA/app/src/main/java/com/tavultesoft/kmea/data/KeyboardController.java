@@ -321,7 +321,7 @@ public class KeyboardController {
    * @param index
    */
   public void remove(int index) {
-    // Check initialized, and disallow removing default keyboard
+    // Check initialized
     if (!isInitialized) {
       return;
     }

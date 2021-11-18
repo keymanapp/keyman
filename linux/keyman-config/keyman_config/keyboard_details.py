@@ -107,7 +107,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         label.set_selectable(True)
         grid.attach_next_to(label, lbl_pkg_vrs, Gtk.PositionType.RIGHT, 1, 1)
 
-        if kbdata:
+        if kbdata and kbdata.get('description'):
             lbl_pkg_desc = Gtk.Label()
             lbl_pkg_desc.set_text(_("Package description:   "))
             lbl_pkg_desc.set_halign(Gtk.Align.END)

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>testvariable</kbdname>
+    <flags/>
+  </header>
+  <encoding name="unicode" fontname="Arial" fontsize="-12">
+    <layer shift="">
+      <key vkey="K_C">Clear</key>
+      <key vkey="K_R">Reveal</key>
+      <key vkey="K_S">Set</key>
+    </layer>
+  </encoding>
+</visualkeyboard>

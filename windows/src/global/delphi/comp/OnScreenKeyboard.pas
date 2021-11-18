@@ -391,20 +391,27 @@ var
   minsz: Integer;
   i: Integer;
   n: Integer;
+  Canvas: TCanvas;
+  b: TBitmap;
 begin
-  minsz := MAXINT;
-  for i := 0 to FKeys.Count - 1 do
-    if FKeys[i].KeyType <> kktNormal then
-    begin
-      n := FKeys[i].CalcFontSize(Canvas);
-      if (n > 0) and (n < minsz) then
-        minsz := n;
-    end;
+  b := TBitmap.Create;
+  try
+    minsz := MAXINT;
+    for i := 0 to FKeys.Count - 1 do
+      if FKeys[i].KeyType <> kktNormal then
+      begin
+        n := FKeys[i].CalcFontSize(b.Canvas);
+        if (n > 0) and (n < minsz) then
+          minsz := n;
+      end;
 
-  if minsz = MAXINT then minsz := 0;
-  for i := 0 to FKeys.Count - 1 do
-    if FKeys[i].KeyType <> kktNormal then
-      FKeys[i].FontSize := minsz;
+    if minsz = MAXINT then minsz := 0;
+    for i := 0 to FKeys.Count - 1 do
+      if FKeys[i].KeyType <> kktNormal then
+        FKeys[i].FontSize := minsz;
+  finally
+    b.Free;
+  end;
 end;
 
 procedure TOnScreenKeyboard.CreateParams(var params: TCreateParams);
@@ -852,13 +859,16 @@ begin
 
   ResizeKeys;
 
-  if FDisplay102Key or FEuroLayout then
+  if HandleAllocated then
   begin
-    r := Rect(k.FX, k.FY, F102Key.FX+F102Key.FW, F102Key.FY+F102Key.FH);
-    FillBkRect(Canvas.Handle, r);
+    if FDisplay102Key or FEuroLayout then
+    begin
+      r := Rect(k.FX, k.FY, F102Key.FX+F102Key.FW, F102Key.FY+F102Key.FH);
+      FillBkRect(Canvas.Handle, r);
+    end;
+    DoDrawKey(Canvas, k);
+    DoDrawKey(Canvas, F102Key);
   end;
-  DoDrawKey(Canvas, k);
-  DoDrawKey(Canvas, F102Key);
 end;
 
 procedure TOnScreenKeyboard.SetDisplayUnderlyingChar(const Value: Boolean);
@@ -1028,7 +1038,8 @@ begin
 
   CalcKeyFontSizes;
 
-  InvalidateRect(Handle, nil, True);
+  if HandleAllocated then
+    InvalidateRect(Handle, nil, True);
 end;
 
 { TOnScreenKeyboardKeys }

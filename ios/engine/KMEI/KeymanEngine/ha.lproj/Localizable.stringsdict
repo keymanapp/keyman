@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>An shigar da ƙamus %u</string>
+        <key>other</key>
+        <string>An shigar da duk ƙamus %u</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>an kasa sabunta %u</string>
+        <key>other</key>
+        <string>an kasa sabuntawar %u</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>An yi nasarar sabunta %u</string>
+        <key>other</key>
+        <string>An sami nasarar sabunta %u</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>An shigar da madannin %u</string>
+        <key>other</key>
+        <string>An shigar da madannan %u</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>An shigar da yaren %u</string>
+        <key>other</key>
+        <string>An shigar da yarukan %u</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>An samo madanni %u a ƙunshin:</string>
+        <key>other</key>
+        <string>An samo madannai %u a ƙunshin:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>An samo ƙamus %u a ƙunshin:</string>
+        <key>other</key>
+        <string>An sami ƙamus %u a ƙunshin:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>

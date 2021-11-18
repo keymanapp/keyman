@@ -214,6 +214,10 @@
       <!-- Data Files -->
 
       <Component>
+        <File Name="kps.xsd" KeyPath="yes" />
+      </Component>
+
+      <Component>
         <File Name="unicodedata.mdb" Source="..\..\global\inst\data\" KeyPath="yes" />
       </Component>
 

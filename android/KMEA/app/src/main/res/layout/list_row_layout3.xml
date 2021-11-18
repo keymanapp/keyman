@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_toStartOf="@id/imageButton1"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:orientation="vertical" >
@@ -22,6 +23,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:textSize="16sp"
             android:textStyle="bold" />
 
