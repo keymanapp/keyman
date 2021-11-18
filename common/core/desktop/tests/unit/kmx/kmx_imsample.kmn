@@ -1,0 +1,19 @@
+
+store(&version) '6.0'
+
+store(DLLFunction) "imsample.dll:DF"
+store(DLLFunction2) "imsample.dll:func2"
+store(DLLFunction3) "another.dll:func3"
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [K_BKSP] > call(DLLFunction)
++ [K_ESC] > call(DLLFunction2)
++ [K_1] > call(DLLFunction3)
+
++ 'A' > U+0E01
++ 'B' > U+0E02
++ 'C' > U+0E03
+c nomatch > call(DLLFunction)

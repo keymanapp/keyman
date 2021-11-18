@@ -40,6 +40,8 @@ typedef struct
 #define QIT_DEADKEY		5
 #define QIT_BELL		6
 #define QIT_BACK		7
+#define QIT_CAPSLOCK 8
+#define QIT_INVALIDATECONTEXT 9
 
 // QueueDebugInformation ItemTypes
 #define QID_BEGIN_UNICODE		0
