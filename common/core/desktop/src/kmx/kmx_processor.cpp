@@ -80,7 +80,7 @@ kmx_processor::update_option(
 bool
 kmx_processor::queue_action(km_kbp_action_item const * action_item
 ) {
-
+   DebugLog("Action type is [%d].\n", action_item->type);
   switch (action_item->type) {
   case KM_KBP_IT_END:
     // error should not queue empty item
@@ -101,6 +101,7 @@ kmx_processor::queue_action(km_kbp_action_item const * action_item
     } else /* KM_KBP_BT_CHAR, KM_KBP_BT_UNKNOWN */ {
       _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEFAULT);
     }
+    break;
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_EMIT_KEYSTROKE:
   case KM_KBP_IT_CAPSLOCK:
