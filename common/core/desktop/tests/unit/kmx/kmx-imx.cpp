@@ -1,5 +1,5 @@
 /*
-  Copyright:    © 2018 SIL International.
+  Copyright:    © 2021 SIL International.
   Description:  Tests for key rules list generation in the kmx processor
   Create Date:  30 Oct 2018
   Authors:      Ross Cruickshank (RC) Marc Durdin (MD), Tim Eves (TSE)
@@ -18,6 +18,9 @@
 #include<iostream>
 #include<sstream>
 
+/** This test will test the infrastructure around IMX third party librays
+ */
+
 using namespace km::kbp::kmx;
 
 km_kbp_option_item test_env_opts[] =
@@ -28,6 +31,7 @@ km_kbp_option_item test_env_opts[] =
 std::map<uint16_t,std::string> expected_imx_map { {4, "imsample.dll:DF"},
                                       {5, "imsample.dll:func2"},
                                       {6, "another.dll:func3"},
+                                      {7, "another.dll:func4"},
                                        };
 
 std::map<uint16_t,std::string> g_extract_imx_map;
@@ -39,8 +43,26 @@ int error_args() {
     return 1;
 }
 
+
+
 extern "C"
 {
+  /**
+   * This callback will be used in place of calling out to the third party
+   * library. It will then test adding to the action queue all the implemented action types.
+   * KM_KBP_IT_END
+   * KM_KBP_IT_CHAR
+   * KM_KBP_IT_MARKER
+   * KM_KBP_IT_ALERT
+   * KM_KBP_IT_BACK
+   * KM_KBP_IT_INVALIDATE_CONTEXT
+   *
+   *
+   * @param state
+   * @param store_no
+   * @param callback_object
+   * @return uint8_t
+   */
   uint8_t test_imx_callback(km_kbp_state *state, uint32_t store_no, void *callback_object){
 
   std::cout << "test_imx_callback store_no: " << store_no << std::endl;
@@ -57,25 +79,26 @@ extern "C"
     return FALSE;
   }
   std::cout << "test_imx_callback function name: " << it->second << std::endl;
-  km_kbp_action_item *a_items = new km_kbp_action_item[3];
+  km_kbp_action_item *a_items = new km_kbp_action_item[10];
   switch (store_no)
   {
   case 4:
 
     a_items[0].type      = KM_KBP_IT_CHAR;
     a_items[0].character = km_kbp_usv('X');
-  //  a_items[1].type      = KM_KBP_IT_CHAR;
-  //  a_items[1].character = km_kbp_usv('A');
-    a_items[1].type   = KM_KBP_IT_END;
+    a_items[1].type      = KM_KBP_IT_ALERT;
+    a_items[2].type   = KM_KBP_IT_END;
     km_kbp_state_queue_action_items(state, a_items);
     break;
     case 5:
 
     a_items[0].type      = KM_KBP_IT_CHAR;
     a_items[0].character = km_kbp_usv('Y');
-    a_items[1].type      = KM_KBP_IT_CHAR;
-    a_items[1].character = km_kbp_usv('A');
-    a_items[2].type   = KM_KBP_IT_END;
+    a_items[1].type      = KM_KBP_IT_MARKER;
+    a_items[1].marker = 1;
+    a_items[2].type      = KM_KBP_IT_CHAR;
+    a_items[2].character = km_kbp_usv('A');
+    a_items[3].type   = KM_KBP_IT_END;
     km_kbp_state_queue_action_items(state, a_items);
     break;
     case 6:
@@ -91,7 +114,13 @@ extern "C"
     delete[] a1_items;
     }
     break;
-
+    case 7:
+    {
+      a_items[0].type   = KM_KBP_IT_INVALIDATE_CONTEXT;
+      a_items[1].type   = KM_KBP_IT_END;
+      km_kbp_state_queue_action_items(state, a_items);
+    }
+    break;
   default:
     break;
   }
@@ -108,7 +137,7 @@ void test_imx_list(const km::kbp::path &source_path){
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
   km_kbp_keyboard_imx * kb_imx_list;
-  // err_status = km_kbp_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
+
   km::kbp::path const source_keybard = "kmx_imsample.kmx";
   km::kbp::path full_path = km::kbp::path::join(source_path, source_keybard);
 
@@ -119,8 +148,7 @@ void test_imx_list(const km::kbp::path &source_path){
   try_status(km_kbp_keyboard_get_imx_list(test_kb, &kb_imx_list));
 
 
-  // This keyboard has 6 function names in the stores but only calls 5 and also it calls the same function for
-  // different rule
+  // This keyboard has 4 function names from 2 different libraries in the stores
   km_kbp_keyboard_imx *imx_rule_it = kb_imx_list;
   std::stringstream extracted_library_function;
   auto x = 0;
@@ -133,8 +161,8 @@ void test_imx_list(const km::kbp::path &source_path){
   }
 
   std::cout << " X Value is " << x << std::endl;
-  //assert(x==5);
-  assert(x==3);
+
+  assert(x==4);
   km_kbp_keyboard_imx_list_dispose(kb_imx_list);
 
   km_kbp_state_dispose(test_state);
@@ -159,29 +187,28 @@ void test_queue_actions (const km::kbp::path &source_path) {
   try_status(km_kbp_keyboard_get_imx_list(test_kb, &kb_imx_list));
   km_kbp_state_imx_register_callback(test_state, test_imx_callback, (void*)&g_extract_imx_map);
 
-  // try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | caps_lock_state(), key_down));
+  // Key Press that doesn't trigger a call back
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,KM_KBP_MODIFIER_SHIFT, 1));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}, {KM_KBP_IT_END}}));
-
-  std::cout << "about to trigger imx_callback" << std::endl;
+  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('P')}}, {KM_KBP_IT_END}}));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('X')}}, {KM_KBP_IT_END}}));
+  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('X')}}, {KM_KBP_IT_ALERT, {0,}, {0}}, {KM_KBP_IT_END}}));
+
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_ESC, 0, 1));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('Y')}},
-                                   {KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('A')}},
+  assert(action_items(test_state, { {KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('Y')}},
+                                    {KM_KBP_IT_MARKER, {0,}, {1}},
+                                    {KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('A')}},
                                     {KM_KBP_IT_END}}));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_1, 0, 1));
-
-  //  km_kbp_action_item bksp_y = {KM_KBP_IT_BACK};
-  // bksp_y.backspace.expected_type = KM_KBP_BT_CHAR;
-  // bksp_y.backspace.expected_value = 'Y';
 
   km_kbp_action_item bksp_a = {KM_KBP_IT_BACK};
   bksp_a.backspace.expected_type = KM_KBP_BT_CHAR;
   bksp_a.backspace.expected_value = 'A';
   assert(action_items(test_state, {bksp_a,{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('Z')}}, {KM_KBP_IT_END}}));
+
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1));
+  assert(action_items(test_state, {{KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0}}, {KM_KBP_IT_END}}));
 
   km_kbp_state_imx_deregister_callback(test_state);
   km_kbp_keyboard_imx_list_dispose(kb_imx_list);
