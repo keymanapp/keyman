@@ -1218,14 +1218,16 @@ namespace com.keyman.keyboards {
         const promiseFuncs = this.registrationResolvers[promiseid];
         window.clearTimeout(promiseid);
 
-        try {
-          if(result instanceof Error) {
-            promiseFuncs.reject(result as Error);
-          } else {
-            promiseFuncs.resolve(result as KeyboardStub[]);
+        if(promiseFuncs) {
+          try {
+            if(result instanceof Error) {
+              promiseFuncs.reject(result as Error);
+            } else {
+              promiseFuncs.resolve(result as KeyboardStub[]);
+            }
+          } finally {
+            delete this.registrationResolvers[promiseid];
           }
-        } finally {
-          delete this.registrationResolvers[promiseid];
         }
       }
     }
@@ -1314,7 +1316,6 @@ namespace com.keyman.keyboards {
           }
           return result;
         });
-
       }
 
       // Identify and register each keyboard by language name

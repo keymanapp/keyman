@@ -1,5 +1,48 @@
 # Keyman Version History
 
+## 15.0.151 alpha 2021-11-18
+
+* fix(developer): use correct tike icon (#5925)
+* fix(android/engine): Support for U_xxxx_yyyy subkeys (#5913)
+* fix(mac): use xcframework to support m1 (#5933)
+* fix(developer): move web osk beneath text area (#5937)
+
+## 15.0.150 alpha 2021-11-17
+
+* fix(web): remove canvas use for iOS compatibility (#5915)
+
+## 15.0.149 alpha 2021-11-17
+
+* chore(developer): Update jszip version (#5770)
+* chore(common): Check in crowdin strings for Fulfulde Nigeria (#5841)
+
+## 15.0.148 alpha 2021-11-16
+
+* chore(common): Check in crowdin strings for Mandara (Wandala) (#5857)
+* chore(linux): Update method comments (#5883)
+
+## 15.0.147 alpha 2021-11-15
+
+* chore(android,linux,windows): Check in crowdin strings for Bura-Pabir (#5839)
+* chore: add keyman-local.com to iis https setup (#5892)
+* fix(web): avoid error if timerid not valid (#5908)
+
+## 15.0.146 alpha 2021-11-14
+
+* feat(developer): support for U_xxxx_yyyy (#5894)
+
+## 15.0.145 alpha 2021-11-13
+
+* fix(developer): crash exporting OSK on European keyboard (#5893)
+* feat(developer): validate .kps files during compile (#5895)
+
+## 15.0.144 alpha 2021-11-12
+
+* fix(android/engine): Truncate language name in list (#5878)
+* fix(android/app): Check KMP file exists before attempting to extract (#5849)
+* fix(web): Check parent element is defined before assigning (#5874)
+* fix(android/app): Revert test code (#5899)
+
 ## 15.0.143 alpha 2021-11-11
 
 * fix(developer): handle shortcut keys in debugger (#5776)

@@ -86,6 +86,7 @@
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <Icon_MainIcon>KeymanDeveloper90.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <Icon_MainIcon>Tike_Icon.ico</Icon_MainIcon>
@@ -103,6 +104,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <DCC_DebugInformation>2</DCC_DebugInformation>
+        <Icon_MainIcon>KeymanDeveloper90.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -560,6 +562,7 @@
         <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas">
             <Form>$R *.RES</Form>
         </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

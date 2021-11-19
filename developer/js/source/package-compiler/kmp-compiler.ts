@@ -124,7 +124,12 @@ export default class KmpCompiler {
     return kmp;
   }
 
-  public buildKmpFile(kmpJsonData: KmpJsonFile, kmpFileName: string) {
+  /**
+   * Returns a Promise to the serialized data which can then be written to a .kmp file.
+   *
+   * @param kmpJsonData - The kmp.json Object
+   */
+  public buildKmpFile(kmpJsonData: KmpJsonFile): Promise<any> {
     const kmpJsonFileName = 'kmp.json';
 
     if(!kmpJsonData.files) {
@@ -145,8 +150,6 @@ export default class KmpCompiler {
     zip.file(kmpJsonFileName, JSON.stringify(kmpJsonData, null, 2));
 
     // Generate kmp file
-    var data = zip.generate({base64:false,compression:'DEFLATE'});
-    fs.writeFileSync(kmpFileName, data, 'binary');
-
+    return zip.generateAsync({type: 'binarystring', compression:'DEFLATE'});
   }
 }

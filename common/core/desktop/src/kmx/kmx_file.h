@@ -42,9 +42,11 @@ namespace kmx {
 #define VERSION_80  0x00000800
 #define VERSION_90  0x00000900
 #define VERSION_100 0x00000A00
+#define VERSION_140 0x00000E00
+#define VERSION_150 0x00000F00
 
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_100
+#define VERSION_MAX VERSION_150
 
 //
 // Backspace types
@@ -274,6 +276,7 @@ typedef COMP_KEY *PCOMP_KEY;
 typedef COMP_GROUP *PCOMP_GROUP;
 
 extern const int CODE__SIZE[];
+#define CODE__SIZE_MAX 5
 
 #define KEYBOARDFILEHEADER_SIZE 64
 #define KEYBOARDFILESTORE_SIZE  12
