@@ -320,23 +320,17 @@ namespace com.keyman {
      * Exposed function to load keyboards by name. One or more arguments may be used
      *
      * @param {any[]} args keyboard name string or keyboard metadata JSON object
-     * @returns {Promise<(KeyboardStub|ErrorStub)[]} Promise of added keyboard/error stubs
+     * @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard/error stubs
      *
      */
-    async ['addKeyboards'](...args: any[]) : 
+    ['addKeyboards'](...args: any[]) :
         Promise<(com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[]> {
       if (!args || !args[0] || args[0].length == 0) {
         // Get the cloud keyboard catalog
-        let stubs: (com.keyman.keyboards.KeyboardStub|com.keyman.keyboards.ErrorStub)[] = [];
-        try {
-          await this.keyboardManager.keymanCloudRequest('',false);
-          return Promise.resolve(stubs);
-        } catch(error) {
+        return this.keyboardManager.keymanCloudRequest('',false).catch(error => {
           console.error(error);
-          let stub: com.keyman.keyboards.ErrorStub = {error: error};
-          stubs.push(stub);
-          return Promise.reject(stubs);
-        };
+          return Promise.reject([{error: error}]);
+        });
       } else {
         let x: (string|com.keyman.keyboards.KeyboardStub)[] = [];
         if (Array.isArray(args[0])) {

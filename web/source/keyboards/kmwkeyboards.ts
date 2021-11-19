@@ -187,8 +187,6 @@ namespace com.keyman.keyboards {
     activeStub: KeyboardStub = null;
     keyboardStubs: KeyboardStub[] = [];
 
-    firstCall: boolean = true; // First time to call keymanCloudRequest()
-
     // For deferment of adding keyboards until keymanweb initializes
     deferment: Promise<void> = null;
     endDeferment:() => void;
@@ -1285,106 +1283,87 @@ namespace com.keyman.keyboards {
      *  @param  {string[]}   languages    Array of language names
      *  @returns {Promise<(KeyboardStub|ErrorStub)[]>} Promise of added keyboard stubs
      **/
-    async addLanguageKeyboards(languages: string[]): Promise<(KeyboardStub|ErrorStub)[]> {
-      var i, j, lgName, cmd, addAll, retPromise;
-
+    addLanguageKeyboards(languages: string[]): Promise<(KeyboardStub|ErrorStub)[]> {
       let errorStubs: ErrorStub[] = [];
 
       // Defer registering keyboards by language until the language list has been loaded
       if (this.languageList == null) {
-        if (this.firstCall) {
-          this.firstCall = false;
-          let promise = this.keymanCloudRequest('',true);
-          // If promise is not error, then... (needs an error guard)
-          promise.catch(function(error) {
-            let msg = "Unable to retrieve the master language list.";
-            console.error(msg, error)
-            let stub: ErrorStub = {error: new Error(msg)};
-            errorStubs.push(stub);
-            return Promise.reject(errorStubs);
+        if (this.languageListPromise == null) {
+          this.languageListPromise = this.keymanCloudRequest('',true).catch((error) => {
+            // If promise is not error, then... (needs an error guard)
+            console.error(error);
+            errorStubs.push({error: error});
+            return errorStubs;
           });
-          this.languageListPromise = promise;
         }
 
         let _this = this;
-        retPromise = new Promise(function(resolve, reject) {
+        return new Promise<(KeyboardStub|ErrorStub)[]>(function(resolve, reject) {
           if (_this.languageListPromise) {
             // 1: wait for the language list to be loaded properly
-            _this.languageListPromise.then(function() {
+            return _this.languageListPromise.then(function() {
               // 2: perform the actual query, now that we can find the language code
               resolve(_this.addLanguageKeyboards(languages));
             }).catch(function(error) {
-              return Promise.reject(error);
+              reject(error);
             });
           } else {
-            return _this.addLanguageKeyboards(languages);
+            resolve(_this.addLanguageKeyboards(languages));
           }
         }).then(function(result) {
           if (result instanceof Error) {
-            return Promise.reject(result);
+            throw result;
           }
-          return Promise.resolve(result);
-        }).catch(function(error) {
-          return Promise.reject(error);
+          return result;
         });
+      }
 
-      } else { // Identify and register each keyboard by language name
-        cmd = '';
-        for(i=0; i<languages.length; i++) {
-          lgName = languages[i].toLowerCase();
-          addAll = (lgName.substr(-1,1) == '$');
-          if(addAll) {
-            lgName = lgName.substr(0,lgName.length-1);
-          }
+      // Identify and register each keyboard by language name
+      let cmd = '';
+      for(let i=0; i<languages.length; i++) {
+        let lgName = languages[i].toLowerCase();
+        let addAll = (lgName.substr(-1,1) == '$');
+        if(addAll) {
+          lgName = lgName.substr(0,lgName.length-1);
+        }
 
-          let languageFound: boolean = false;
-          for(j=0; j<this.languageList.length; j++) {
-            if(lgName == this.languageList[j]['name'].toLowerCase()) {
-              if(cmd != '') {
-                cmd = cmd + ',';
-              }
-
-              cmd = cmd+'@'+this.languageList[j]['id'];
-              if(addAll) {
-                cmd = cmd + '$';
-              }
-
-              languageFound = true;
-              break;
+        let languageFound: boolean = false;
+        for(let j=0; j<this.languageList.length; j++) {
+          if(lgName == this.languageList[j]['name'].toLowerCase()) {
+            if(cmd != '') {
+              cmd = cmd + ',';
             }
-          }
-          if (!languageFound) {
-            // Construct response array of errors (failed-query keyboards)
-            // that will be merged with stubs (successfully-queried keyboards)
-            let stub: ErrorStub = {language: {name: lgName}, error: new Error(this.alertLanguageUnavailable(lgName))};
-            errorStubs.push(stub);
+
+            cmd = cmd+'@'+this.languageList[j]['id'];
+            if(addAll) {
+              cmd = cmd + '$';
+            }
+
+            languageFound = true;
+            break;
           }
         }
-
-        if(cmd == '') {
-          // No command so return errors
-          return Promise.reject(errorStubs);
-        }
-
-        try {
-          // Merge this with errorStub
-          let result:(KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest('&keyboardid='+cmd, false);
-          return this.mergeAndResolveStubPromises(result, errorStubs);
-        } catch(err) {
-            // We don't have language info for this ErrorStub
-            console.error(err);
-            let stub: ErrorStub = {error: err};
-            errorStubs.push(stub);
-            return Promise.reject(errorStubs);
+        if (!languageFound) {
+          // Construct response array of errors (failed-query keyboards)
+          // that will be merged with stubs (successfully-queried keyboards)
+          let stub: ErrorStub = {language: {name: lgName}, error: new Error(this.alertLanguageUnavailable(lgName))};
+          errorStubs.push(stub);
         }
       }
 
-      if (retPromise) {
-        return retPromise;
-      } else {
-        // No keyboards added so return empty stub
-        return Promise.resolve(errorStubs);
+      if(cmd == '') {
+        // No command so return errors
+        return Promise.reject(errorStubs);
       }
+
+      return this.keymanCloudRequest('&keyboardid='+cmd, false).then((result) => {
+        return this.mergeAndResolveStubPromises(result, errorStubs);
+      }, (err) => {
+        console.error(err);
+        let stub: ErrorStub = {error: err};
+        errorStubs.push(stub);
+        return Promise.reject(errorStubs);
+      });
     }
 
     /**
