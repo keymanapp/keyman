@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.152 alpha 2021-11-19
+
+* fix(common/core):  Update decxstr to check all characters while decrementing (#5842)
+
 ## 15.0.151 alpha 2021-11-18
 
 * fix(developer): use correct tike icon (#5925)
