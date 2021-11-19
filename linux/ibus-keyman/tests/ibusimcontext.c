@@ -71,6 +71,8 @@ struct _IBusIMContext {
   GString *text;
 };
 
+static gboolean surrounding_text_supported = TRUE;
+
 struct _IBusIMContextClass {
   GtkIMContextClass parent;
   /* class members */
@@ -379,24 +381,6 @@ ibus_im_context_class_fini(IBusIMContextClass *class) {
   g_bus_unwatch_name(_daemon_name_watch_id);
 }
 
-/* Copied from gtk+2.0-2.20.1/modules/input/imcedilla.c to fix crosbug.com/11421.
- * Overwrite the original Gtk+'s compose table in gtk+-2.x.y/gtk/gtkimcontextsimple.c. */
-
-/* The difference between this and the default input method is the handling
- * of C+acute - this method produces C WITH CEDILLA rather than C WITH ACUTE.
- * For languages that use CCedilla and not acute, this is the preferred mapping,
- * and is particularly important for pt_BR, where the us-intl keyboard is
- * used extensively.
- */
-static guint16 cedilla_compose_seqs[] = {
-  GDK_KEY_dead_acute,	GDK_KEY_C,	0,	0,	0,	0x00C7,	/* LATIN_CAPITAL_LETTER_C_WITH_CEDILLA */
-  GDK_KEY_dead_acute,	GDK_KEY_c,	0,	0,	0,	0x00E7,	/* LATIN_SMALL_LETTER_C_WITH_CEDILLA */
-  GDK_KEY_Multi_key,	GDK_KEY_apostrophe,	GDK_KEY_C,  0,      0,      0x00C7, /* LATIN_CAPITAL_LETTER_C_WITH_CEDILLA */
-  GDK_KEY_Multi_key,	GDK_KEY_apostrophe,	GDK_KEY_c,  0,      0,      0x00E7, /* LATIN_SMALL_LETTER_C_WITH_CEDILLA */
-  GDK_KEY_Multi_key,	GDK_KEY_C,  GDK_KEY_apostrophe,	0,      0,      0x00C7, /* LATIN_CAPITAL_LETTER_C_WITH_CEDILLA */
-  GDK_KEY_Multi_key,	GDK_KEY_c,  GDK_KEY_apostrophe,	0,      0,      0x00E7, /* LATIN_SMALL_LETTER_C_WITH_CEDILLA */
-};
-
 static void
 ibus_im_context_init(GObject *obj) {
   IDEBUG("%s", __FUNCTION__);
@@ -414,7 +398,10 @@ ibus_im_context_init(GObject *obj) {
   ibusimcontext->ibuscontext = NULL;
   ibusimcontext->has_focus   = FALSE;
   ibusimcontext->time        = GDK_CURRENT_TIME;
-  ibusimcontext->caps        = IBUS_CAP_FOCUS | IBUS_CAP_SURROUNDING_TEXT | IBUS_CAP_AUXILIARY_TEXT | IBUS_CAP_PROPERTY;
+  ibusimcontext->caps        = IBUS_CAP_FOCUS | IBUS_CAP_AUXILIARY_TEXT | IBUS_CAP_PROPERTY;
+  if (surrounding_text_supported) {
+    ibusimcontext->caps |= IBUS_CAP_SURROUNDING_TEXT;
+  }
 
   ibusimcontext->events_queue = g_queue_new();
 
@@ -967,6 +954,28 @@ _ibus_context_forward_key_event_cb(
   }
   GdkEventKey *event = _create_gdk_event(ibusimcontext, keyval, keycode, state);
   gdk_event_put((GdkEvent *)event);
+
+  if (!surrounding_text_supported && keyval == IBUS_KEY_BackSpace && ibusimcontext->text->len > 0) {
+    int index = ibusimcontext->text->len - 1;
+    int len   = 1;
+    do {
+      guchar c = (guchar)ibusimcontext->text->str[index];
+      // delete a single UTF-8 codepoint, code unit (byte) by code unit
+      if (c <= 0x7F) { // ASCII character
+        break;
+      } else if (c >= 0x80 && c <= 0xBF) { // Trailing byte of multi-byte character
+        index--;
+        len++;
+      } else if (c >= 0xC2 && c <= 0xF4) { // First byte of 2-/3-/4-byte character
+        break;
+      } else {
+        g_error("Illegal code unit value 0x%2x in %s", c, ibusimcontext->text->str);
+        g_test_fail();
+      }
+    } while (index >= 0);
+    g_string_erase(ibusimcontext->text, index, len);
+  }
+
   gdk_event_free((GdkEvent *)event);
 }
 
@@ -1087,4 +1096,8 @@ ibus_im_test_clear_text(IBusIMContext *context) {
     g_string_free(context->text, TRUE);
     context->text = NULL;
   }
+}
+
+void ibus_im_test_set_surrounding_text_supported(gboolean supported) {
+  surrounding_text_supported = supported;
 }
