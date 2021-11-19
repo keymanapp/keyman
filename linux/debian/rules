@@ -22,20 +22,18 @@ override_dh_auto_configure:
 			--localstatedir=/var --libdir=lib/$(DEB_TARGET_MULTIARCH) \
 			--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
 	# ibus-keyman
-	cd linux/ibus-keyman && \
-		cp -f ../../VERSION.md VERSION && \
-		export KEYMAN_PROC_CFLAGS="-I$(CURDIR)/common/core/desktop/build/arch/release/include -I$(CURDIR)/common/core/desktop/include" && \
-		export KEYMAN_PROC_LIBS="-L$(CURDIR)/common/core/desktop/build/arch/release/src -lkmnkbp0" && \
-		export PKG_CONFIG_PATH=$(CURDIR)/common/core/desktop/build/arch/release/meson-private && \
-		./autogen.sh && \
-		./configure --prefix=/usr
+	cp -f VERSION.md linux/ibus-keyman/VERSION && \
+	export KEYMAN_PROC_CFLAGS="-I$(CURDIR)/common/core/desktop/build/arch/release/include -I$(CURDIR)/common/core/desktop/include" && \
+	export KEYMAN_PROC_LIBS="-L$(CURDIR)/common/core/desktop/build/arch/release/src -lkmnkbp0" && \
+	export PKG_CONFIG_PATH=$(CURDIR)/common/core/desktop/build/arch/release/meson-private && \
+	dh_auto_configure --sourcedir=linux/ibus-keyman -- --prefix=/usr --libexecdir=/usr/libexec
 	# keyman-config
 
 override_dh_auto_build:
 	# keymankeyboardprocessor
 	cd common/core/desktop && ./build.sh build
 	# ibus-keyman
-	cd linux/ibus-keyman && make
+	dh_auto_build --sourcedir=linux/ibus-keyman
 	# keyman-config
 	cd linux/keyman-config && \
 		make man && \
@@ -47,7 +45,7 @@ override_dh_auto_test:
 	# keymankeyboardprocessor
 	cd common/core/desktop && ./build.sh tests
 	# ibus-keyman
-	cd linux/ibus-keyman && make check VERBOSE=1
+	dh_auto_test --sourcedir=linux/ibus-keyman
 	# keyman-config
 	dh_auto_test --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 
@@ -56,7 +54,7 @@ override_dh_auto_install:
 	install -d $(CURDIR)/debian/tmp
 	cd common/core/desktop && DESTDIR=$(CURDIR)/debian/tmp ./build.sh install
 	# ibus-keyman
-	cd linux/ibus-keyman && make install DESTDIR=$(CURDIR)/debian/tmp
+	dh_auto_install --sourcedir=linux/ibus-keyman
 	# keyman-config
 	install -d $(CURDIR)/debian/keyman/usr/share/
 	cp -r linux/keyman-config/locale/ $(CURDIR)/debian/keyman/usr/share/
