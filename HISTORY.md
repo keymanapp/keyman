@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.153 alpha 2021-11-20
+
+* fix(web): resolve unhandled exception in promise (#5902)
+
 ## 15.0.152 alpha 2021-11-19
 
 * fix(common/core):  Update decxstr to check all characters while decrementing (#5842)
