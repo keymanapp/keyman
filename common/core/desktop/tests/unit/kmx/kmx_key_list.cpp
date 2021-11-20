@@ -10,6 +10,7 @@
 
 #include "path.hpp"
 #include "state.hpp"
+#include <map>
 
 #include "../test_assert.h"
 #include "../test_color.h"
@@ -30,15 +31,15 @@ int error_args() {
 #define CHAR_CODE_LOWER_A 97
 #define CHAR_CODE_LOWER_B 98
 
-km_kbp_keyboard_key kb_key_expected_list[] = {{KM_KBP_VKEY_1, KM_KBP_MODIFIER_VIRTUALKEY},
-                                              {KM_KBP_VKEY_2, KM_KBP_MODIFIER_VIRTUALKEY},
-                                              {KM_KBP_VKEY_B, (KM_KBP_MODIFIER_VIRTUALKEY | KM_KBP_MODIFIER_CTRL )},
-                                              {KM_KBP_VKEY_C, KM_KBP_MODIFIER_VIRTUALKEY},
-                                              {KM_KBP_VKEY_C, (KM_KBP_MODIFIER_VIRTUALKEY | KM_KBP_MODIFIER_ALT )},
-                                              {CHAR_CODE_LOWER_A, NO_MODIFIER_FLAGS},
-                                              {CHAR_CODE_LOWER_B, NO_MODIFIER_FLAGS}};
 
-
+std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t> kb_key_expected_key_list {{{KM_KBP_VKEY_1, 0},0},
+                                              {{KM_KBP_VKEY_2, 0},0},
+                                              {{KM_KBP_VKEY_A, 0},0},
+                                              {{KM_KBP_VKEY_B, 0},0},
+                                              {{KM_KBP_VKEY_B, KM_KBP_MODIFIER_CTRL},KM_KBP_MODIFIER_CTRL},
+                                              {{KM_KBP_VKEY_C, 0},0},
+                                              {{KM_KBP_VKEY_C, KM_KBP_MODIFIER_ALT},KM_KBP_MODIFIER_ALT},
+                                              };
 
 /**
  * The purpose of this test is to verify that `km_kbp_keyboard_get_key_list`
@@ -62,13 +63,27 @@ void test_key_list(const km::kbp::path &source_file){
   try_status(km_kbp_keyboard_get_key_list(test_kb,&kb_key_list));
 
   km_kbp_keyboard_key *key_rule_it = kb_key_list;
+  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t> map_key_list;
+
   auto n = 0;
+  // Internally the list is created using map so we should not rely on order elemnts
+  // in the expected list  array.
+
   for (; key_rule_it->key; ++key_rule_it) {
-    assert(kb_key_expected_list[n].key == key_rule_it->key);
-    assert(kb_key_expected_list[n].modifier_flag == key_rule_it->modifier_flag);
+    std::cout << "key:" << key_rule_it->key << " modifer: " << key_rule_it->modifier_flag << std::endl;
+    map_key_list[std::make_pair(key_rule_it->key, key_rule_it->modifier_flag)] = key_rule_it->modifier_flag;
     ++n;
   }
   assert(n==7);
+
+  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t>::iterator it_expected;
+  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t>::iterator it_key_list = map_key_list.begin();
+  while (it_key_list != map_key_list.end()){
+
+    it_expected = kb_key_expected_key_list.find(it_key_list->first);
+    assert (it_expected != kb_key_expected_key_list.end());
+    it_key_list++;
+  }
 
   km_kbp_keyboard_key_list_dispose(kb_key_list);
   km_kbp_state_dispose(test_state);

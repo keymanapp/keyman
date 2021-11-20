@@ -216,7 +216,11 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
       {
         v_key = p_group->dpKeyArray[j].Key;
         modifier_flag = p_group->dpKeyArray[j].ShiftFlags;
-        map_rules[std::make_pair(v_key,modifier_flag)] = modifier_flag;
+        if(modifier_flag == 0) {
+          if(!MapUSCharToVK(v_key, &v_key, &modifier_flag)) continue;
+        }
+        map_rules[std::make_pair(v_key,modifier_flag)] = (modifier_flag & K_MODIFIERFLAG); // Clear kmx special flags
+
       }
     }
   }
