@@ -53,13 +53,6 @@ struct _IBusIMContext {
 
   IBusInputContext *ibuscontext;
 
-  /* preedit status */
-  gchar *preedit_string;
-  PangoAttrList *preedit_attrs;
-  gint preedit_cursor_pos;
-  gboolean preedit_visible;
-  guint preedit_mode;
-
   GdkRectangle cursor_area;
   gboolean has_focus;
 
@@ -103,10 +96,8 @@ static void ibus_im_context_reset(GtkIMContext *context);
 static gboolean ibus_im_context_filter_keypress(GtkIMContext *context, GdkEventKey *key);
 static void ibus_im_context_focus_in(GtkIMContext *context);
 static void ibus_im_context_focus_out(GtkIMContext *context);
-static void ibus_im_context_get_preedit_string(GtkIMContext *context, gchar **str, PangoAttrList **attrs, gint *cursor_pos);
 static void ibus_im_context_set_client_window(GtkIMContext *context, GdkWindow *client);
 static void ibus_im_context_set_cursor_location(GtkIMContext *context, GdkRectangle *area);
-static void ibus_im_context_set_use_preedit(GtkIMContext *context, gboolean use_preedit);
 static void ibus_im_context_set_surrounding(GtkIMContext *context, const gchar *text, int len, int cursor_index);
 static void ibus_im_context_set_surrounding_with_selection(
     GtkIMContext *context,
@@ -116,13 +107,6 @@ static void ibus_im_context_set_surrounding_with_selection(
     int anchor_index);
 
 /* static methods*/
-static void _ibus_context_update_preedit_text_cb(
-    IBusInputContext *ibuscontext,
-    IBusText *text,
-    gint cursor_pos,
-    gboolean visible,
-    guint mode,
-    IBusIMContext *ibusimcontext);
 static void _create_input_context(IBusIMContext *context);
 static gboolean _set_cursor_location_internal(IBusIMContext *context);
 
@@ -130,9 +114,6 @@ static void _bus_connected_cb(IBusBus *bus, IBusIMContext *context);
 static void _request_surrounding_text(IBusIMContext *context);
 static gboolean _set_content_type(IBusIMContext *context);
 static void _commit_text(IBusIMContext *context, const gchar *text);
-static void _preedit_start(IBusIMContext *context);
-static void _preedit_end(IBusIMContext *context);
-static void _preedit_changed(IBusIMContext *context);
 static gboolean _retrieve_surrounding(IBusIMContext *context);
 static gboolean _delete_surrounding(IBusIMContext *context, gint offset_from_cursor, guint nchars);
 static gboolean _timeout_callback(gpointer *user_data);
@@ -375,10 +356,8 @@ ibus_im_context_class_init(IBusIMContextClass *class) {
   im_context_class->focus_in            = ibus_im_context_focus_in;
   im_context_class->focus_out           = ibus_im_context_focus_out;
   im_context_class->filter_keypress     = ibus_im_context_filter_keypress;
-  im_context_class->get_preedit_string  = ibus_im_context_get_preedit_string;
   im_context_class->set_client_window   = ibus_im_context_set_client_window;
   im_context_class->set_cursor_location = ibus_im_context_set_cursor_location;
-  im_context_class->set_use_preedit     = ibus_im_context_set_use_preedit;
   im_context_class->set_surrounding     = ibus_im_context_set_surrounding;
   gobject_class->notify                 = ibus_im_context_notify;
   gobject_class->finalize               = ibus_im_context_finalize;
@@ -425,13 +404,6 @@ ibus_im_context_init(GObject *obj) {
   IBusIMContext *ibusimcontext = IBUS_IM_CONTEXT(obj);
 
   ibusimcontext->client_window = NULL;
-
-  // Init preedit status
-  ibusimcontext->preedit_string     = NULL;
-  ibusimcontext->preedit_attrs      = NULL;
-  ibusimcontext->preedit_cursor_pos = 0;
-  ibusimcontext->preedit_visible    = FALSE;
-  ibusimcontext->preedit_mode       = IBUS_ENGINE_PREEDIT_CLEAR;
 
   // Init cursor area
   ibusimcontext->cursor_area.x      = -1;
@@ -485,42 +457,9 @@ ibus_im_context_finalize(GObject *obj) {
 
   ibus_im_context_set_client_window((GtkIMContext *)ibusimcontext, NULL);
 
-  // release preedit
-  if (ibusimcontext->preedit_string) {
-    g_free(ibusimcontext->preedit_string);
-  }
-  if (ibusimcontext->preedit_attrs) {
-    pango_attr_list_unref(ibusimcontext->preedit_attrs);
-  }
-
   g_queue_free_full(ibusimcontext->events_queue, (GDestroyNotify)gdk_event_free);
 
   G_OBJECT_CLASS(parent_class)->finalize(obj);
-}
-
-static void
-ibus_im_context_clear_preedit_text(IBusIMContext *ibusimcontext) {
-  gchar *preedit_string = NULL;
-  g_assert(ibusimcontext->ibuscontext);
-  if (ibusimcontext->preedit_visible && ibusimcontext->preedit_mode == IBUS_ENGINE_PREEDIT_COMMIT) {
-    preedit_string = g_strdup(ibusimcontext->preedit_string);
-  }
-
-  /* Clear the preedit_string but keep the preedit_cursor_pos and
-   * preedit_visible because a time lag could happen, firefox commit
-   * the preedit text before the preedit text is cleared and it cause
-   * a double commits of the Hangul preedit in firefox if the preedit
-   * would be located on the URL bar and click on anywhere of firefox
-   * out of the URL bar.
-   */
-  _ibus_context_update_preedit_text_cb(
-      ibusimcontext->ibuscontext, ibus_text_new_from_string(""), ibusimcontext->preedit_cursor_pos,
-      ibusimcontext->preedit_visible, IBUS_ENGINE_PREEDIT_CLEAR, ibusimcontext);
-  if (preedit_string) {
-    _commit_text(ibusimcontext, preedit_string);
-    g_free(preedit_string);
-    _request_surrounding_text(ibusimcontext);
-  }
 }
 
 static gboolean
@@ -642,7 +581,6 @@ ibus_im_context_focus_out(GtkIMContext *context) {
 
   ibusimcontext->has_focus = FALSE;
   if (ibusimcontext->ibuscontext) {
-    ibus_im_context_clear_preedit_text(ibusimcontext);
     ibus_input_context_focus_out(ibusimcontext->ibuscontext);
   }
 
@@ -663,38 +601,6 @@ ibus_im_context_reset(GtkIMContext *context) {
   }
 }
 
-static void
-ibus_im_context_get_preedit_string(GtkIMContext *context, gchar **str, PangoAttrList **attrs, gint *cursor_pos) {
-  IDEBUG("%s", __FUNCTION__);
-
-  IBusIMContext *ibusimcontext = IBUS_IM_CONTEXT(context);
-
-  if (ibusimcontext->preedit_visible) {
-    if (str) {
-      *str = g_strdup(ibusimcontext->preedit_string ? ibusimcontext->preedit_string : "");
-    }
-
-    if (attrs) {
-      *attrs = ibusimcontext->preedit_attrs ? pango_attr_list_ref(ibusimcontext->preedit_attrs) : pango_attr_list_new();
-    }
-
-    if (cursor_pos) {
-      *cursor_pos = ibusimcontext->preedit_cursor_pos;
-    }
-  } else {
-    if (str) {
-      *str = g_strdup("");
-    }
-    if (attrs) {
-      *attrs = pango_attr_list_new();
-    }
-    if (cursor_pos) {
-      *cursor_pos = 0;
-    }
-  }
-  IDEBUG("str=%s", *str);
-}
-
 /* Use the button-press-event signal until GtkIMContext always emits the reset
  * signal.
  * https://gitlab.gnome.org/GNOME/gtk/merge_requests/460
@@ -706,7 +612,6 @@ ibus_im_context_button_press_event_cb(GtkWidget *widget, GdkEventButton *event, 
     return FALSE;
 
   if (ibusimcontext->ibuscontext) {
-    ibus_im_context_clear_preedit_text(ibusimcontext);
     ibus_input_context_reset(ibusimcontext->ibuscontext);
   }
   return FALSE;
@@ -820,22 +725,6 @@ ibus_im_context_set_cursor_location(GtkIMContext *context, GdkRectangle *area) {
   _set_cursor_location_internal(ibusimcontext);
 }
 
-static void
-ibus_im_context_set_use_preedit(GtkIMContext *context, gboolean use_preedit) {
-  IDEBUG("%s", __FUNCTION__);
-
-  IBusIMContext *ibusimcontext = IBUS_IM_CONTEXT(context);
-
-  if (use_preedit) {
-    ibusimcontext->caps |= IBUS_CAP_PREEDIT_TEXT;
-  } else {
-    ibusimcontext->caps &= ~IBUS_CAP_PREEDIT_TEXT;
-  }
-  if (ibusimcontext->ibuscontext) {
-    ibus_input_context_set_capabilities(ibusimcontext->ibuscontext, ibusimcontext->caps);
-  }
-}
-
 static guint
 get_selection_anchor_point(IBusIMContext *ibusimcontext, guint cursor_pos, guint surrounding_text_len) {
   if (cursor_pos <= 0) {
@@ -902,24 +791,6 @@ static void
 _commit_text(IBusIMContext *ibusimcontext, const gchar *text) {
   // g_signal_emit(ibusimcontext, _signal_commit_id, 0, text->text);
   ibus_im_test_set_text(ibusimcontext, text);
-}
-
-static void
-_preedit_start(IBusIMContext *ibusimcontext) {
-  // g_signal_emit(ibusimcontext, _signal_preedit_start_id, 0);
-  g_warning("%s not implemented", __FUNCTION__);
-}
-
-static void
-_preedit_end(IBusIMContext *ibusimcontext) {
-  // g_signal_emit(ibusimcontext, _signal_preedit_end_id, 0);
-  // g_warning("%s not implemented", __FUNCTION__);
-}
-
-static void
-_preedit_changed(IBusIMContext *ibusimcontext) {
-  // g_signal_emit(ibusimcontext, _signal_preedit_changed_id, 0);
-  // g_warning("%s not implemented", __FUNCTION__);
 }
 
 static gboolean
@@ -1110,131 +981,12 @@ _ibus_context_delete_surrounding_text_cb(
 }
 
 static void
-_ibus_context_update_preedit_text_cb(
-    IBusInputContext *ibuscontext,
-    IBusText *text,
-    gint cursor_pos,
-    gboolean visible,
-    guint mode,
-    IBusIMContext *ibusimcontext) {
-  IDEBUG("%s: text=%p", __FUNCTION__, text);
-
-  const gchar *str;
-  gboolean flag;
-
-  if (ibusimcontext->preedit_string) {
-    g_free(ibusimcontext->preedit_string);
-  }
-  if (ibusimcontext->preedit_attrs) {
-    pango_attr_list_unref(ibusimcontext->preedit_attrs);
-    ibusimcontext->preedit_attrs = NULL;
-  }
-
-  if (!ibusimcontext->use_button_press_event && mode == IBUS_ENGINE_PREEDIT_COMMIT) {
-    if (ibusimcontext->client_window) {
-      _connect_button_press_event(ibusimcontext, TRUE);
-    }
-  }
-
-  str                           = text->text;
-  ibusimcontext->preedit_string = g_strdup(str);
-  if (text->attrs) {
-    guint i;
-    ibusimcontext->preedit_attrs = pango_attr_list_new();
-    for (i = 0;; i++) {
-      IBusAttribute *attr = ibus_attr_list_get(text->attrs, i);
-      if (attr == NULL) {
-        break;
-      }
-
-      PangoAttribute *pango_attr;
-      switch (attr->type) {
-      case IBUS_ATTR_TYPE_UNDERLINE:
-        pango_attr = pango_attr_underline_new(attr->value);
-        break;
-      case IBUS_ATTR_TYPE_FOREGROUND:
-        pango_attr = pango_attr_foreground_new(
-            ((attr->value & 0xff0000) >> 8) | 0xff, ((attr->value & 0x00ff00)) | 0xff, ((attr->value & 0x0000ff) << 8) | 0xff);
-        break;
-      case IBUS_ATTR_TYPE_BACKGROUND:
-        pango_attr = pango_attr_background_new(
-            ((attr->value & 0xff0000) >> 8) | 0xff, ((attr->value & 0x00ff00)) | 0xff, ((attr->value & 0x0000ff) << 8) | 0xff);
-        break;
-      default:
-        continue;
-      }
-      pango_attr->start_index = g_utf8_offset_to_pointer(str, attr->start_index) - str;
-      pango_attr->end_index   = g_utf8_offset_to_pointer(str, attr->end_index) - str;
-      pango_attr_list_insert(ibusimcontext->preedit_attrs, pango_attr);
-    }
-  }
-
-  ibusimcontext->preedit_cursor_pos = cursor_pos;
-
-  flag                           = ibusimcontext->preedit_visible != visible;
-  ibusimcontext->preedit_visible = visible;
-  ibusimcontext->preedit_mode    = mode;
-
-  if (ibusimcontext->preedit_visible) {
-    if (flag) {
-      /* invisible => visible */
-      _preedit_start(ibusimcontext);
-    }
-    _preedit_changed(ibusimcontext);
-  } else {
-    if (flag) {
-      /* visible => invisible */
-      _preedit_changed(ibusimcontext);
-      _preedit_end(ibusimcontext);
-    } else {
-      /* still invisible */
-      /* do nothing */
-    }
-  }
-}
-
-static void
-_ibus_context_show_preedit_text_cb(IBusInputContext *ibuscontext, IBusIMContext *ibusimcontext) {
-  IDEBUG("%s", __FUNCTION__);
-
-  if (ibusimcontext->preedit_visible == TRUE)
-    return;
-
-  ibusimcontext->preedit_visible = TRUE;
-  _preedit_start(ibusimcontext);
-  _preedit_changed(ibusimcontext);
-
-  _request_surrounding_text(ibusimcontext);
-}
-
-static void
-_ibus_context_hide_preedit_text_cb(IBusInputContext *ibuscontext, IBusIMContext *ibusimcontext) {
-  IDEBUG("%s", __FUNCTION__);
-
-  if (ibusimcontext->preedit_visible == FALSE)
-    return;
-
-  ibusimcontext->preedit_visible = FALSE;
-  _preedit_changed(ibusimcontext);
-  _preedit_end(ibusimcontext);
-}
-
-static void
 _ibus_context_destroy_cb(IBusInputContext *ibuscontext, IBusIMContext *ibusimcontext) {
   IDEBUG("%s", __FUNCTION__);
   g_assert(ibusimcontext->ibuscontext == ibuscontext);
 
   g_object_unref(ibusimcontext->ibuscontext);
   ibusimcontext->ibuscontext = NULL;
-
-  /* clear preedit */
-  ibusimcontext->preedit_visible    = FALSE;
-  ibusimcontext->preedit_cursor_pos = 0;
-  g_free(ibusimcontext->preedit_string);
-  ibusimcontext->preedit_string = NULL;
-
-  _preedit_changed(ibusimcontext);
-  _preedit_end(ibusimcontext);
 }
 
 static gboolean
@@ -1275,13 +1027,6 @@ _create_input_context(IBusIMContext *ibusimcontext) {
     g_signal_connect(
         ibusimcontext->ibuscontext, "delete-surrounding-text", G_CALLBACK(_ibus_context_delete_surrounding_text_cb),
         ibusimcontext);
-    g_signal_connect(
-        ibusimcontext->ibuscontext, "update-preedit-text-with-mode", G_CALLBACK(_ibus_context_update_preedit_text_cb),
-        ibusimcontext);
-    g_signal_connect(
-        ibusimcontext->ibuscontext, "show-preedit-text", G_CALLBACK(_ibus_context_show_preedit_text_cb), ibusimcontext);
-    g_signal_connect(
-        ibusimcontext->ibuscontext, "hide-preedit-text", G_CALLBACK(_ibus_context_hide_preedit_text_cb), ibusimcontext);
     g_signal_connect(ibusimcontext->ibuscontext, "destroy", G_CALLBACK(_ibus_context_destroy_cb), ibusimcontext);
 
     ibus_input_context_set_capabilities(ibusimcontext->ibuscontext, ibusimcontext->caps);
