@@ -32,9 +32,10 @@
     [self.window setBackgroundColor:[NSColor whiteColor]];
 
     KeymanVersionInfo versionInfo = [[self AppDelegate] versionInfo];
-    [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@", versionInfo.versionWithTag]];
-         
-    NSMutableString *copyrightInfo = [[NSMutableString alloc] initWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"]];
+    NSString *versionString = NSLocalizedString(@"version-label-text", nil);
+    [self.versionLabel setStringValue:[NSString localizedStringWithFormat:versionString, versionInfo.versionWithTag]];
+
+  NSMutableString *copyrightInfo = [[NSMutableString alloc] initWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"]];
     [self.copyrightLabel setStringValue:copyrightInfo];
 
     NSTrackingArea *trackingArea = [[NSTrackingArea alloc] initWithRect:[self.licenseButton bounds]
