@@ -59,6 +59,25 @@ override_dh_auto_install:
 	install -d $(CURDIR)/debian/keyman/usr/share/
 	cp -r linux/keyman-config/locale/ $(CURDIR)/debian/keyman/usr/share/
 	rm $(CURDIR)/debian/keyman/usr/share/locale/*.po*
+	ls -al $(CURDIR)/debian/tmp || true
+	ls -al $(CURDIR)/debian/tmp/usr || true
+	ls -al $(CURDIR)/debian/tmp/usr/lib || true
+	ls -al $(CURDIR)/debian/tmp/usr/lib/x86_64-linux-gnu/ || true
+	ls -al $(CURDIR)/debian/tmp/usr/libexec || true
+	ls -al $(CURDIR)/debian/tmp/usr/share || true
+	ls -al $(CURDIR)/debian/tmp/usr/share/ibus || true
+	ls -al $(CURDIR)/debian/tmp/usr/share/ibus/component || true
+	ls -al $(CURDIR)/debian/tmp/usr/share/keyman || true
+	ls -al $(CURDIR)/debian/tmp/usr/share/keyman/icons || true
+	ls -al $(CURDIR)/debian/tmp/keyman || true
+	ls -al $(CURDIR)/debian/tmp/keyman/usr || true
+	ls -al $(CURDIR)/debian/keyman || true
+	ls -al $(CURDIR)/debian/keyman/usr || true
+	ls -al $(CURDIR)/debian/keyman/usr/lib || true
+	ls -al $(CURDIR)/debian/keyman/usr/lib/x86_64-linux-gnu || true
+	ls -al $(CURDIR)/debian/keyman/usr/libexec || true
+	ls -al $(CURDIR)/debian/keyman/usr/local || true
+	ls -al $(CURDIR)/debian/keyman/usr/local/libexec || true
 	dh_auto_install --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 	# Unfortunately bash-completion 2.10 (focal) doesn't yet provide dh-sequence-bash-completion,
 	# which we could add as build-dependency, so we'll have to explicitly call
