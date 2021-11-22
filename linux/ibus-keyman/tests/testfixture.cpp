@@ -16,6 +16,11 @@
 #include "kmx_test_source.hpp"
 #include "testmodule.h"
 
+#ifdef GDK_WINDOWING_X11
+#include <X11/XKBlib.h>
+#include <gdk/gdkx.h>
+#endif
+
 typedef struct {
   IBusBus *bus;
   GtkIMContext *context;
@@ -25,12 +30,14 @@ typedef struct {
 typedef struct {
   char *test_name;
   char *test_path;
+  char *skip_reason;
 } TestData;
 
 static gboolean loaded        = FALSE;
 static GdkWindow *window      = NULL;
 static GMainLoop *thread_loop = NULL;
 static GTypeModule *module    = NULL;
+static Display *display       = NULL;
 
 static void
 module_register(GTypeModule *module) {
@@ -50,6 +57,14 @@ ibus_keyman_tests_fixture_set_up(IBusKeymanTestsFixture *fixture, gconstpointer 
     GtkWidget *widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(widget, "destroy", G_CALLBACK(destroy), NULL);
     window = gtk_widget_get_window(widget);
+  }
+
+  if (!display) {
+#ifdef GDK_WINDOWING_X11
+    if (GDK_IS_X11_DISPLAY(gdk_display_get_default())) {
+      display = GDK_DISPLAY_XDISPLAY(gdk_display_get_default());
+    }
+#endif
   }
 
   if (!loaded) {
@@ -77,6 +92,29 @@ ibus_keyman_tests_fixture_tear_down(IBusKeymanTestsFixture *fixture, gconstpoint
 
   g_clear_object(&fixture->bus);
   g_clear_object(&fixture->context);
+}
+
+static void
+set_caps_lock_state(IBusKeymanTestsFixture *fixture, bool caps_lock_on) {
+#ifdef GDK_WINDOWING_X11
+  if (display) {
+    XkbLockModifiers(display, XkbUseCoreKbd, LockMask, caps_lock_on ? LockMask : 0);
+    XSync(display, False);
+  }
+#endif
+}
+
+static bool
+get_caps_lock_state(IBusKeymanTestsFixture *fixture) {
+#ifdef GDK_WINDOWING_X11
+  if (display) {
+    XKeyboardState state;
+    XGetKeyboardControl(display, &state);
+    return state.led_mask & 1;
+  }
+#endif
+
+  return false;
 }
 
 static void
@@ -130,40 +168,6 @@ static unsigned short vk_to_keycode(unsigned short vk) {
 #define KEYMAN_RCTRL 97  // 0x61
 #define KEYMAN_RALT 100  // 0x64
 
-static guint
-km_modifiers_to_ibus(km::tests::KmxTestSource& test_source, km::tests::key_event event) {
-  guint result = 0;
-  auto state   = event.modifier_state | test_source.caps_lock_state();
-  if (state & KM_KBP_MODIFIER_SHIFT) {
-    result |= IBUS_SHIFT_MASK;
-  }
-  if (state & KM_KBP_MODIFIER_ALT) {
-    result |= IBUS_MOD1_MASK;
-  }
-  if (state & KM_KBP_MODIFIER_RALT) {
-    if (event.vk == KEYMAN_RALT)
-      result |= IBUS_MOD1_MASK;
-    else
-      result |= IBUS_MOD5_MASK;
-  }
-  if (state & KM_KBP_MODIFIER_LALT) {
-    result |= IBUS_MOD1_MASK;
-  }
-  if (state & KM_KBP_MODIFIER_CTRL) {
-    result |= IBUS_CONTROL_MASK;
-  }
-  if (state & KM_KBP_MODIFIER_RCTRL) {
-    result |= IBUS_CONTROL_MASK;
-  }
-  if (state & KM_KBP_MODIFIER_LCTRL) {
-    result |= IBUS_CONTROL_MASK;
-  }
-  if (state & KM_KBP_MODIFIER_CAPS) {
-    result |= IBUS_LOCK_MASK;
-  }
-  return result;
-}
-
 typedef struct {
   guint modifiers_keydown;
   guint modifiers_keyup;
@@ -185,9 +189,9 @@ get_key_event_for_modifier(guint modifier, guint & prev_modifiers, guint keyval,
 }
 
 static std::list<gdk_key_event>
-get_involved_keys(km::tests::KmxTestSource &test_source, km::tests::key_event test_event) {
+get_involved_keys(IBusKeymanTestsFixture *fixture, km::tests::key_event test_event) {
   guint modifiers = 0;
-  if (test_source.caps_lock_state()) {
+  if (get_caps_lock_state(fixture)) {
     modifiers = IBUS_LOCK_MASK;
   }
 
@@ -245,11 +249,15 @@ get_context_keys(std::u16string context) {
 
 static void
 press_keys(IBusKeymanTestsFixture *fixture, km::tests::KmxTestSource & test_source,km::tests::key_event key_event) {
-  auto involved_keys = get_involved_keys(test_source, key_event);
+  auto involved_keys = get_involved_keys(fixture, key_event);
 
   // press and hold the individual modifier keys, finally the actual key
   std::stack<GdkEventKey> keys_to_release;
   for (auto key = involved_keys.begin(); key != involved_keys.end(); key++) {
+    bool old_caps_lock = get_caps_lock_state(fixture);
+    if (key->keycode == KEY_CAPSLOCK && !old_caps_lock) {
+      set_caps_lock_state(fixture, true);
+    }
     GdkEventKey keyEvent = {
         .type             = GDK_KEY_PRESS,
         .window           = window,
@@ -267,6 +275,10 @@ press_keys(IBusKeymanTestsFixture *fixture, km::tests::KmxTestSource & test_sour
     keyEvent.type  = GDK_KEY_RELEASE;
     keyEvent.state = key->modifiers_keyup;
     keys_to_release.push(keyEvent);
+
+    if (key->keycode == KEY_CAPSLOCK && old_caps_lock) {
+      set_caps_lock_state(fixture, false);
+    }
   }
 
   // then release the keys in reverse order
@@ -298,6 +310,9 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
   }
 
   switch_keyboard(fixture, kmxfile.c_str());
+  if (test_source.caps_lock_state() != get_caps_lock_state(fixture)) {
+    set_caps_lock_state(fixture, test_source.caps_lock_state());
+  }
 
   auto contextKeys = get_context_keys(context);
   for (auto k = contextKeys.begin(); k != contextKeys.end(); k++) {
@@ -310,8 +325,23 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
     press_keys(fixture, test_source, p);
   }
 
-  auto expectedText = g_utf16_to_utf8((gunichar2*)expected.c_str(), expected.length(), NULL, NULL, NULL);
-  g_assert_cmpstr(ibus_im_test_get_text(fixture->ibuscontext), ==, expectedText);
+  if (expected.length() == 0) {
+    g_assert_null(ibus_im_test_get_text(fixture->ibuscontext));
+  } else {
+    auto expectedText = g_utf16_to_utf8((gunichar2*)expected.c_str(), expected.length(), NULL, NULL, NULL);
+    g_assert_cmpstr(ibus_im_test_get_text(fixture->ibuscontext), ==, expectedText);
+  }
+
+  // Cleanup
+  g_free(data->test_name);
+  g_free(data->test_path);
+  delete data;
+}
+
+static void
+test_skip(IBusKeymanTestsFixture *fixture, gconstpointer user_data) {
+  auto data = (TestData *)user_data;
+  g_test_skip(data->skip_reason);
 }
 
 void
@@ -342,28 +372,52 @@ main(int argc, char *argv[]) {
   // Add tests
   for (int i = 0; i < nTests; i++)
   {
-    auto filename = tests[i];
-    if (strstr(filename, ".kmx") || strstr(filename, ".kmn")) {
-      filename[strlen(filename) - 4] = '\0';
+    auto filename = g_string_new(tests[i]);
+    if (strstr(filename->str, ".kmx") || strstr(filename->str, ".kmn")) {
+      g_string_truncate(filename, filename->len - 4);
     }
-    auto file     = g_file_new_for_commandline_arg(filename);
+
+    auto testdata     = new TestData();
+    auto file         = g_file_new_for_commandline_arg(filename->str);
     auto testfilebase = g_file_get_basename(file);
-    auto testname = g_string_new(NULL);
+    auto testname     = g_string_new(NULL);
     g_string_append_printf(testname, "/%s", testfilebase);
-    auto testfile = g_file_new_build_filename(directory, testfilebase, NULL);
-    TestData testdata;
-    testdata.test_name = filename;
-    testdata.test_path = g_file_get_parse_name(testfile);
+    auto testfile       = g_file_new_build_filename(directory, testfilebase, NULL);
+    testdata->test_name = strdup(filename->str);
+    testdata->test_path = g_file_get_parse_name(testfile);
+
+    // Check for tests to skip - #3345
+    gboolean skip = FALSE;
+    char *skipReason = NULL;
+    if (strcmp(filename->str, "k_026___system_stores") == 0 || strcmp(filename->str, "k_027___system_stores_2") == 0) {
+      skip = TRUE;
+      testdata->skip_reason = "mnemonic keyboards are not yet supported on Linux (#3345)";
+    } else if (
+        strcmp(filename->str, "k_041___long_context_and_deadkeys") == 0 ||
+        strcmp(filename->str, "k_042___long_context_and_split_deadkeys") == 0) {
+      skip = TRUE;
+      testdata->skip_reason = "can't test context with deadkey";
+    }
+
     g_test_add(
-        testname->str, IBusKeymanTestsFixture, &testdata, ibus_keyman_tests_fixture_set_up, test_source,
-        ibus_keyman_tests_fixture_tear_down);
+        testname->str, IBusKeymanTestsFixture, testdata, ibus_keyman_tests_fixture_set_up,
+        skip ? test_skip : test_source, ibus_keyman_tests_fixture_tear_down);
     g_object_unref(file);
     g_object_unref(testfile);
     g_string_free(testname, TRUE);
+    g_string_free(filename, TRUE);
   }
 
   // Run tests
   int retVal = g_test_run();
+
+  // Cleanup
+#ifdef GDK_WINDOWING_X11
+  if (display) {
+    XCloseDisplay(display);
+    display = NULL;
+  }
+#endif
 
   test_module_unuse(module);
   return retVal;
