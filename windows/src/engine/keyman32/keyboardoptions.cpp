@@ -237,7 +237,7 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
 
   RegistryReadOnly r(HKEY_CURRENT_USER);
 
-  if (!(r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key))) {
+  BOOL hasData = r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key);
     return FALSE;
   }
 
@@ -258,7 +258,7 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
     keyboardOpts[n].key   = kpc->key;
     LPCWSTR coreKey = reinterpret_cast<LPCWSTR>(kpc->key);
     WCHAR val[256];
-    if (r.ReadString(coreKey, val, sizeof(val) / sizeof(val[0])) && val[0]) {
+    if (hasData && r.ReadString(coreKey, val, sizeof(val) / sizeof(val[0])) && val[0]) {
       km_kbp_cp* cp = new km_kbp_cp[wcslen(val) + 1];
       wcscpy_s(reinterpret_cast<LPWSTR>(cp), wcslen(val) + 1, val);
       keyboardOpts[n].value = cp;
