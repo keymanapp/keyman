@@ -1,0 +1,32 @@
+﻿c start_of_sentence_3621 generated from template at 2021-11-22 15:39:24
+c with name "start_of_sentence_3621"
+store(&VERSION) '10.0'
+store(&NAME) 'start_of_sentence_3621'
+store(&COPYRIGHT) '©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'start_of_sentence_3621.kvks'
+store(&LAYOUTFILE) 'start_of_sentence_3621.keyman-touch-layout'
+
+begin Unicode > use(main)
+begin NewContext > use(NewContext)
+c begin PostKeystroke > use(PostKeystroke)
+
+group(NewContext)
+
+    nomatch > use(nextLayer)
+
+c group(PostKeystroke)
+c   if(&layerChanged = "0") > use(nextLayer)
+c   nomatch > use(nextLayer)
+
+group(nextLayer)
+
+    store(sentencePunctuation) '.?!'
+    nul > layer('shift')
+    any(sentencePunctuation) ' ' > context layer('shift') 
+    any(sentencePunctuation) '  ' > context layer('shift') 
+    nomatch > layer('default')
+
+group(main) using keys
+
