@@ -193,6 +193,8 @@ const PWCHAR StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX L"KMW_EMBEDCSS",
   SSN__PREFIX L"TARGETS",   // I4504
   SSN__PREFIX L"CASEDKEYS", // #2241
+  SSN__PREFIX L"", // TSS_BEGIN_NEWCONTEXT
+  SSN__PREFIX L"", // TSS_BEGIN_POSTKEYSTROKE
   NULL
 };
 
@@ -578,22 +580,33 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
   while (iswspace(*p)) p++;
   if (_wcsnicmp(p, L"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;
   else if (_wcsnicmp(p, L"ansi", 4) == 0) BeginMode = BEGIN_ANSI;
+  else if (_wcsnicmp(p, L"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;
+  else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
   else if (*p != '>') return CERR_InvalidToken;
   else BeginMode = BEGIN_ANSI;
 
   if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
 
-  if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) return CERR_InvalidBegin;
+  if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) {
+    return CERR_InvalidBegin;
+  }
+  if (tstr[3] != 0) {
+    return CERR_InvalidToken;
+  }
 
-  fk->StartGroup[BeginMode] = tstr[2] - 1;
-  //mcd-03-01-2000: removed the secondary group idea; this was undocumented and
-  //is not supported under Keyman 5.0: ugly!!
-  //if(tstr[3] == UC_SENTINEL && tstr[4] == CODE_USE) fk->StartGroup[1] = tstr[5] - 1;
-  if (tstr[3] != 0) return CERR_InvalidToken;
+  if (BeginMode == BEGIN_ANSI || BeginMode == BEGIN_UNICODE) {
+    fk->StartGroup[BeginMode] = tstr[2] - 1;
+    // mcd-03-01-2000: removed the secondary group idea; this was undocumented and
+    // is not supported under Keyman 5.0: ugly!!
+    // if(tstr[3] == UC_SENTINEL && tstr[4] == CODE_USE) fk->StartGroup[1] = tstr[5] - 1;
 
-  if (FSaveDebug)
-    /* Record a system store for the line number of the begin statement */
-    AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN L"Unicode" : DEBUGSTORE_BEGIN L"ANSI");
+    if (FSaveDebug) {
+      /* Record a system store for the line number of the begin statement */
+      AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN L"Unicode" : DEBUGSTORE_BEGIN L"ANSI");
+    }
+  } else {
+    return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
+  }
 
   return CERR_None;
 }
@@ -1323,6 +1336,10 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     if ((msg = VerifyCasedKeys(sp)) != CERR_None) {
       return msg;
     }
+    break;
+
+  case TSS_BEGIN_NEWCONTEXT:
+  case TSS_BEGIN_POSTKEYSTROKE:
     break;
 
   default:

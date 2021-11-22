@@ -252,6 +252,8 @@ type
     function JavaScript_SetupEpilog: string;
     function JavaScript_SetupProlog: string;
     function IsKeyboardVersion15OrLater: Boolean;
+    function WriteBeginStatement(const name: string;
+      groupIndex: Integer): string;
   public
     function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallbackW): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
@@ -1845,6 +1847,20 @@ begin
   Result := True;
 end;
 
+function TCompileKeymanWeb.WriteBeginStatement(const name: string; groupIndex: Integer): string;
+var
+  fgp: PFILE_GROUP;
+begin
+	fgp := fk.dpGroupArray; Inc(fgp, groupIndex);
+  Result := Format(
+    '%sthis.%s=function(t,e) {%s'+
+    '%sreturn this.g%s(t,e);%s'+
+    '%s};%s',
+    [FTabStop, name, nl,
+     FTabStop+FTabStop, JavaScript_Name(groupIndex, fgp.szName), nl,
+     FTabStop, nl]);   // I3681
+end;
+
 //{$WARNINGS OFF} // bug in Delphi compiler returning W1035 return value undefined?!?
 function TCompileKeymanWeb.WriteCompiledKeyboard: string; {UTF8}
     function Requote(const S: string): string;
@@ -1866,12 +1882,14 @@ var
   vMnemonic: Integer;
   s, sRTL, sHelp, sHelpFile, sName, sEmbedJS, sEmbedCSS: string;
   sVisualKeyboard, sFullName: WideString;
+  sBegin_NewContext, sBegin_PostKeystroke: string;
   sLayoutFile, sVKDictionary: string;
   linecomment: string;  // I3438
   HasRules: Boolean;
   sModifierBitmask: string;
   fDisplayUnderlying: Boolean;
   FOptionStores: string;
+  rec: TSentinelRecord;
 begin
   Result := '';//UTF16SignatureW;  // + '// compiled by Keyman Developer'+nl;  // I3474
 	{ Locate the name of the keyboard }
@@ -1909,7 +1927,11 @@ begin
     else if fsp.dwSystemID = TSS_VKDICTIONARY then  // I3438
       sVKDictionary := fsp.dpString
     else if fsp.dwSystemID = TSS_LAYOUTFILE then  // I3483
-      sLayoutFile := fsp.dpString;
+      sLayoutFile := fsp.dpString
+    else if fsp.dwSystemID = TSS_BEGIN_NEWCONTEXT then
+      sBegin_NewContext := fsp.dpString
+    else if fsp.dwSystemID = TSS_BEGIN_POSTKEYSTROKE then
+      sBegin_PostKeystroke := fsp.dpString;
     Inc(fsp);
   end;
 
@@ -2127,6 +2149,13 @@ begin
     Exit;
   end;}
 
+  Result := Result + WriteBeginStatement('gs', fk.StartGroup[BEGIN_UNICODE]);
+  rec := ExpandSentinel(PChar(sBegin_NewContext));
+  if rec.Code = CODE_USE then
+    Result := Result + WriteBeginStatement('gn', rec.Use.GroupIndex);
+  rec := ExpandSentinel(PChar(sBegin_PostKeystroke));
+  if rec.Code = CODE_USE then
+    Result := Result + WriteBeginStatement('gpk', rec.Use.GroupIndex);
 
 	fgp := fk.dpGroupArray; Inc(fgp, fk.StartGroup[BEGIN_UNICODE]);
   Result := Result + Format(
