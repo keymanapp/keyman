@@ -62,7 +62,7 @@ test_keyman_put_options_todconf__other_keys() {
   // Initialize
   gchar* testname = "test_keyman_put_options_todconf__other_keys";
   delete_key(testname);
-  gchar* existingKeys[] = {"key1=val1", "key2=val2"};
+  gchar* existingKeys[] = {"key1=val1", "key2=val2", NULL};
   set_key(testname, existingKeys);
   gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
@@ -90,7 +90,7 @@ test_keyman_put_options_todconf__existing_key() {
   // Initialize
   gchar* testname = "test_keyman_put_options_todconf__existing_key";
   delete_key(testname);
-  gchar* existingKeys[] = {"key1=val1", "new_key=val2"};
+  gchar* existingKeys[] = {"key1=val1", "new_key=val2", NULL};
   set_key(testname, existingKeys);
   gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
