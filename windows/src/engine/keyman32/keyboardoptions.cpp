@@ -31,6 +31,12 @@ static km_kbp_cp* CloneKMKBPCP(const km_kbp_cp* cp) {
   return clone;
 }
 
+static km_kbp_cp* CloneKMKBPCPFromWSTR(LPWSTR buf) {
+  km_kbp_cp* clone = new km_kbp_cp[wcslen(buf) + 1];
+  wcscpy_s(reinterpret_cast<LPWSTR>(clone), wcslen(buf) + 1, buf);
+  return clone;
+}
+
 void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
 {   // I3594
   IntLoadKeyboardOptions(REGSZ_KeyboardOptions, kp);
@@ -235,12 +241,6 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
   assert(key != NULL);
   assert(kp != NULL);
 
-  RegistryReadOnly r(HKEY_CURRENT_USER);
-
-  BOOL hasData = r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key);
-    return FALSE;
-  }
-
   // Get the list of default options to determine size of list
   const km_kbp_keyboard_attrs* keyboardAttrs;
   km_kbp_status err_status = km_kbp_keyboard_get_attrs(kp->lpCoreKeyboard, &keyboardAttrs);
@@ -249,8 +249,15 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
         0, sdmKeyboard, 0, "LoadKeyboardOptionsREGCore: km_kbp_keyboard_get_attrs failed with error status [%d]", err_status);
     return FALSE;
   }
+
   size_t listSize = km_kbp_options_list_size(keyboardAttrs->default_options);
+  if (listSize == 0){
+    return TRUE;
+  }
   km_kbp_option_item* keyboardOpts = new km_kbp_option_item[listSize + 1];
+
+  RegistryReadOnly r(HKEY_CURRENT_USER);
+  BOOL hasData = r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key);
 
   int n = 0;
   for (auto kpc = keyboardAttrs->default_options; kpc->key; kpc++) {
@@ -259,15 +266,12 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
     LPCWSTR coreKey = reinterpret_cast<LPCWSTR>(kpc->key);
     WCHAR val[256];
     if (hasData && r.ReadString(coreKey, val, sizeof(val) / sizeof(val[0])) && val[0]) {
-      km_kbp_cp* cp = new km_kbp_cp[wcslen(val) + 1];
-      wcscpy_s(reinterpret_cast<LPWSTR>(cp), wcslen(val) + 1, val);
-      keyboardOpts[n].value = cp;
+      keyboardOpts[n].value = CloneKMKBPCPFromWSTR(val);
     } else {
       keyboardOpts[n].value = CloneKMKBPCP(kpc->value);
     }
     n++;
   }
-
   keyboardOpts[n] = KM_KBP_OPTIONS_END;
 
   // once we have the option list we can then update the options using the public api call
