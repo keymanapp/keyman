@@ -253,7 +253,7 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
   km_kbp_option_item* keyboardOpts = new km_kbp_option_item[listSize + 1];
 
   int n = 0;
-  for (auto kpc = keyboardAttrs->default_options; *kpc->key; kpc++) {
+  for (auto kpc = keyboardAttrs->default_options; kpc->key; kpc++) {
     keyboardOpts[n].scope = KM_KBP_OPT_KEYBOARD;
     keyboardOpts[n].key   = kpc->key;
     LPCWSTR coreKey = reinterpret_cast<LPCWSTR>(kpc->key);
@@ -264,11 +264,6 @@ BOOL IntLoadKeyboardOptionsCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_kbp_state* 
       keyboardOpts[n].value = cp;
     } else {
       keyboardOpts[n].value = CloneKMKBPCP(kpc->value);
-
-      // Write default value from the keyboard to the registry
-      LPWSTR value = new WCHAR[sizeof(kpc->value) + 1];
-      wcscpy_s(value, sizeof(kpc->value) + 1, reinterpret_cast<LPCWSTR>(kpc->value));
-      IntSaveKeyboardOptionREGCore(REGSZ_KeyboardOptions, kp, coreKey, value);
     }
     n++;
   }
