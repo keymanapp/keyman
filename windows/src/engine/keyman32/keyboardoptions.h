@@ -57,7 +57,11 @@ BOOL RestoreKeyboardOptionsCore(km_kbp_state* const lpCoreKeyboardState, km_kbp_
 /* Common core integration functions */
 
 /**
- *  Loads the keyboard options from the windows registry
+ * Loads the keyboard options from the windows registry.
+ *
+ * If the registry does not have an entry for keyboard option belonging
+ * to the keyboard, it (the registry) will be modified adding the key and
+ * default value.
  *
  * @param  kp     keyboard info object with options to be updated
  * @param  state  core keyboard state used to update keyboard options
