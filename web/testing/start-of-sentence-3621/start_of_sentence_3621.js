@@ -1338,51 +1338,74 @@ function Keyboard_start_of_sentence_3621()
   }
 }
 ;
-  this.s_sentencePunctuation_11=".?!";
-  this.s15="shift";
-  this.s16="shift";
-  this.s17="shift";
-  this.s18="default";
+  this.s_sentencePunctuation_13=".?!";
+  this.s20="shift";
+  this.s21="shift";
+  this.s22="shift";
+  this.s23="default";
   this.KVER="15.0.114.0";
   this.KVS=[];
   this.gs=function(t,e) {
-    return this.g_main_1(t,e);
+    return this.g_main_3(t,e);
   };
   this.gn=function(t,e) {
     return this.g_NewContext_0(t,e);
   };
+  this.gpk=function(t,e) {
+    return this.g_PostKeystroke_1(t,e);
+  };
   this.gs=function(t,e) {
-    return this.g_main_1(t,e);
+    return this.g_main_3(t,e);
   };
   this.g_NewContext_0=function(t,e) {
     var k=KeymanWeb,r=1,m=0;
-      if(k.KFCM(3,t,[{t:'a',a:this.s_sentencePunctuation_11},' ',' '])){
-        m=1;   // Line 19
+    if(!m) {
+    
+      k.KDC(-1,t);
+      r=this.g_nextLayer_2(t,e);
+      m=2;
+    }
+    return r;
+  };
+  this.g_PostKeystroke_1=function(t,e) {
+    var k=KeymanWeb,r=1,m=0;
+    if(!m) {
+    
+      k.KDC(-1,t);
+      r=this.g_nextLayer_2(t,e);
+      m=2;
+    }
+    return r;
+  };
+  this.g_nextLayer_2=function(t,e) {
+    var k=KeymanWeb,r=1,m=0;
+      if(k.KFCM(3,t,[{t:'a',a:this.s_sentencePunctuation_13},' ',' '])){
+        m=1;   // Line 27
         k.KDC(3,t);
-        k.KIO(-1,this.s_sentencePunctuation_11,1,t);
+        k.KIO(-1,this.s_sentencePunctuation_13,1,t);
         k.KO(-1,t,"  ");
-        k.KSETS(33,this.s17,t);
+        k.KSETS(33,this.s22,t);
       }
-      else if(k.KFCM(2,t,[{t:'a',a:this.s_sentencePunctuation_11},' '])){
-        m=1;   // Line 18
+      else if(k.KFCM(2,t,[{t:'a',a:this.s_sentencePunctuation_13},' '])){
+        m=1;   // Line 26
         k.KDC(2,t);
-        k.KIO(-1,this.s_sentencePunctuation_11,1,t);
+        k.KIO(-1,this.s_sentencePunctuation_13,1,t);
         k.KO(-1,t," ");
-        k.KSETS(33,this.s16,t);
+        k.KSETS(33,this.s21,t);
       }
       else if(k.KFCM(1,t,[{t:'n'}])){
-        m=1;   // Line 17
+        m=1;   // Line 25
         k.KDC(0,t);
-        k.KSETS(33,this.s15,t);
+        k.KSETS(33,this.s20,t);
       }
     if(!m) {
     
       k.KDC(-1,t);
-      k.KSETS(33,this.s18,t);
+      k.KSETS(33,this.s23,t);
     }
     return r;
   };
-  this.g_main_1=function(t,e) {
+  this.g_main_3=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
     return r;
   };

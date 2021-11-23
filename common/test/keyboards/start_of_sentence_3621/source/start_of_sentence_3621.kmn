@@ -10,15 +10,14 @@ store(&LAYOUTFILE) 'start_of_sentence_3621.keyman-touch-layout'
 
 begin Unicode > use(main)
 begin NewContext > use(NewContext)
-c begin PostKeystroke > use(PostKeystroke)
+begin PostKeystroke > use(PostKeystroke)
 
 group(NewContext)
-
     nomatch > use(nextLayer)
 
-c group(PostKeystroke)
-c   if(&layerChanged = "0") > use(nextLayer)
-c   nomatch > use(nextLayer)
+group(PostKeystroke)
+c    if(&layerChanged = "0") > use(nextLayer)
+    nomatch > use(nextLayer)
 
 group(nextLayer)
 

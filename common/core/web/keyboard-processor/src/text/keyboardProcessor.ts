@@ -208,7 +208,6 @@ namespace com.keyman.text {
     }
 
     processNewContextEvent(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
-      // Pass this key code and state to the keyboard program
       if(!this.activeKeyboard) {
         return null;
       }
@@ -218,6 +217,18 @@ namespace com.keyman.text {
       keyEvent.device = device;
       this.setSyntheticEventDefaults(keyEvent);
       return this.keyboardInterface.processNewContextEvent(outputTarget, keyEvent);
+    }
+
+    processPostKeystroke(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+      if(!this.activeKeyboard) {
+        return null;
+      }
+      let keyEvent = new KeyEvent();
+      keyEvent.Lcode = 0;
+      keyEvent.kName = '';
+      keyEvent.device = device;
+      this.setSyntheticEventDefaults(keyEvent);
+      return this.keyboardInterface.processPostKeystroke(outputTarget, keyEvent);
     }
 
     processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {

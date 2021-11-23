@@ -256,6 +256,15 @@ namespace com.keyman.text {
           // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
           outputTarget.doInputEvent();
         }
+
+        // The keyboard may want to take an action after all other keystroke processing is
+        // finished, for example to switch layers. This action may not have any output
+        // but may change system store or variable store values. Given this, we don't need to
+        // save anything about the post behavior, after finalizing it
+        let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(keyEvent.device, outputTarget);
+        if(postRuleBehavior) {
+          postRuleBehavior.finalize(this.keyboardProcessor, outputTarget);
+        }
       }
 
       return ruleBehavior;

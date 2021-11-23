@@ -58,14 +58,24 @@ namespace com.keyman.keyboards {
     }
 
     /**
-     * Calls the keyboard's `gs` function, which represents the keyboard source's group(main).
+     * Calls the keyboard's `gs` function, which represents the keyboard source's begin Unicode group.
      */
     process(outputTarget: text.OutputTarget, keystroke: text.KeyEvent): boolean {
       return this.scriptObject['gs'](outputTarget, keystroke);
     }
 
+    /**
+     * Calls the keyboard's `gn` function, which represents the keyboard source's begin newContext group.
+     */
     processNewContextEvent(outputTarget: text.OutputTarget, keystroke: text.KeyEvent): boolean {
       return this.scriptObject['gn'] ? this.scriptObject['gn'](outputTarget, keystroke) : false;
+    }
+
+    /**
+     * Calls the keyboard's `gpk` function, which represents the keyboard source's begin postKeystroke group.
+     */
+    processPostKeystroke(outputTarget: text.OutputTarget, keystroke: text.KeyEvent): boolean {
+      return this.scriptObject['gpk'] ? this.scriptObject['gpk'](outputTarget, keystroke) : false;
     }
 
     get isHollow(): boolean {

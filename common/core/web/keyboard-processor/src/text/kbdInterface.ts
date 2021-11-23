@@ -948,74 +948,59 @@ namespace com.keyman.text {
       this.output(1, outputTarget, "");
     }
 
+    /**
+     * Function     processNewContextEvent
+     * Scope        Private
+     * @param       {Object}        outputTarget   The target receiving input
+     * @param       {Object}        keystroke      The input keystroke (with its properties) to be mapped by the keyboard.
+     * Description  Calls the keyboard's `begin newContext` group
+     * @returns     {number}        0 if no match is made, otherwise 1.
+     */
     processNewContextEvent(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
-      // Clear internal state tracking data from prior keystrokes.
-      if(!outputTarget) {
-        throw "No target specified for keyboard output!";
-      } else if(!this.activeKeyboard) {
+      if(!this.activeKeyboard) {
         throw "No active keyboard for keystroke processing!";
       }
+      return this.process(this.activeKeyboard.processNewContextEvent.bind(this.activeKeyboard), outputTarget, keystroke);
+    }
 
-      outputTarget.invalidateSelection();
-
-      outputTarget.deadkeys().resetMatched();       // I3318
-      this.resetContextCache();
-
-      // Capture the initial state of the OutputTarget before any rules are matched.
-      let preInput = Mock.from(outputTarget);
-
-      // Capture the initial state of any variable stores
-      const cachedVariableStores = this.activeKeyboard.variableStores;
-
-      // Establishes the results object, allowing corresponding commands to set values here as appropriate.
-      this.ruleBehavior = new RuleBehavior();
-
-      // Ensure the settings are in place so that KIFS/ifState activates and deactivates
-      // the appropriate rule(s) for the modeled device.
-      this.activeDevice = keystroke.device;
-
-      // Calls the start-group of the active keyboard.
-      this.activeTargetOutput = outputTarget;
-      var matched = this.activeKeyboard.processNewContextEvent(outputTarget, keystroke);
-      this.activeTargetOutput = null;
-
-      // Finalize the rule's results.
-      this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke);
-
-      // We always backup the changes to variable stores to the RuleBehavior, to
-      // be applied during finalization, then restore them to the cached initial
-      // values to avoid side-effects with predictive text mocks.
-      this.ruleBehavior.variableStores = this.activeKeyboard.variableStores;
-      this.activeKeyboard.variableStores = cachedVariableStores;
-
-      // `matched` refers to whether or not the FINAL rule (from any group) matched, rather than
-      // whether or not ANY rule matched.  If the final rule doesn't match, we trigger the key's
-      // default behavior (if appropriate).
-      //
-      // See https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852
-      this.ruleBehavior.triggerKeyDefault = !matched;
-
-      // Clear our result-tracking variable to prevent any possible pollution for future processing.
-      let behavior = this.ruleBehavior;
-      this.ruleBehavior = null;
-
-      return behavior;
+    /**
+     * Function     processPostKeystroke
+     * Scope        Private
+     * @param       {Object}        outputTarget   The target receiving input
+     * @param       {Object}        keystroke      The input keystroke with relevant properties to be mapped by the keyboard.
+     * Description  Calls the keyboard's `begin postKeystroke` group
+     * @returns     {number}        0 if no match is made, otherwise 1.
+     */
+    processPostKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+      if(!this.activeKeyboard) {
+        throw "No active keyboard for keystroke processing!";
+      }
+      return this.process(this.activeKeyboard.processPostKeystroke.bind(this.activeKeyboard), outputTarget, keystroke);
     }
 
     /**
      * Function     processKeystroke
      * Scope        Private
-     * @param       {Object}        element     The page element receiving input
+     * @param       {Object}        outputTarget   The target receiving input
      * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
     processKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+      if(!this.activeKeyboard) {
+        throw "No active keyboard for keystroke processing!";
+      }
+      return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), outputTarget, keystroke);
+    }
+
+    private process(callee, outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";
       } else if(!this.activeKeyboard) {
         throw "No active keyboard for keystroke processing!";
+      } else if(!callee) {
+        throw "No callee for keystroke processing!";
       }
 
       outputTarget.invalidateSelection();
@@ -1038,7 +1023,7 @@ namespace com.keyman.text {
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
-      var matched = this.activeKeyboard.process(outputTarget, keystroke);
+      var matched = callee(outputTarget, keystroke);
       this.activeTargetOutput = null;
 
       // Finalize the rule's results.
