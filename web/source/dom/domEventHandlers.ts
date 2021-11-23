@@ -355,11 +355,10 @@ namespace com.keyman.dom {
       DOMEventHandlers.states._SelectionControl = target;
 
       if(target && outputTarget) {
-        //
         // Call the current keyboard's newContext handler;
         // timeout is required in order to get the current
-        // selection, swhich is not ready at time of focus event
-        //
+        // selection, which is not ready at time of focus event,
+        // at least on Chrome
         window.setTimeout(() => {
           //console.log('processNewContextEvent called from focus');
           com.keyman.singleton.core.processNewContextEvent(outputTarget);

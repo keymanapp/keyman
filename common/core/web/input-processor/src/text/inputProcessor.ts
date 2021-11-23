@@ -53,16 +53,16 @@ namespace com.keyman.text {
     }
 
     /**
+     * Tell the currently active keyboard that a new context has been selected,
+     * e.g. by focus change, selection change, keyboard change, etc.
      *
-     * @param outputTarget
-     * @returns
+     * @param    {Object}   outputTarget  The OutputTarget that has focus
+     * @returns  {Object}                 A RuleBehavior object describing the cumulative effects of
+     *                                    all matched keyboard rules
      */
      processNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
-      // We presently need the true keystroke to run on the FULL context.  That index is still
-      // needed for some indexing operations when comparing two different output targets.
       const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.device, outputTarget);
 
-      // Should we swallow any further processing of keystroke events for this?
       if(ruleBehavior != null) {
         ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
       }
