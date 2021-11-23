@@ -32,7 +32,7 @@ namespace com.keyman.dom {
 
       this.focusTimer = window.setTimeout(function() {
         this.focusing=false;
-      }.bind(this), 1000)
+      }.bind(this), 50)
     }
   }
 
