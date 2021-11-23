@@ -32,7 +32,7 @@ extern char CompileDir[];
 
 int IsHangulSyllable(const wchar_t *codename, int *code);
 
-BOOL FileExists(const char *filename)
+KMX_BOOL FileExists(const char *filename)
 {
   _finddata_t fi;
   intptr_t n;
@@ -60,7 +60,7 @@ NamedCodeConstants::~NamedCodeConstants()
   if(entries_file) delete entries_file;
 }
 
-void NamedCodeConstants::AddCode(int n, const wchar_t *p, DWORD storeIndex)
+void NamedCodeConstants::AddCode(int n, const wchar_t *p, KMX_DWORD storeIndex)
 {
   if((nEntries_file % ALLOC_SIZE) == 0)
   {
@@ -114,13 +114,13 @@ int __cdecl sort_entries(const void *elem1, const void *elem2)
     ((NCCENTRY *)elem2)->name);
 }
 
-BOOL NamedCodeConstants::IntLoadFile(const char *filename)
+KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 {
   FILE *fp = NULL;
   if(fopen_s(&fp, filename, "rt") != 0) return FALSE;  // I3481
 
-  char str[256], *p, *q, *context = NULL;
-  BOOL neol, first = TRUE;
+  KMX_CHAR str[256], *p, *q, *context = NULL;
+  KMX_BOOL neol, first = TRUE;
 
   while(fgets(str, 256, fp))
   {
@@ -129,7 +129,7 @@ BOOL NamedCodeConstants::IntLoadFile(const char *filename)
     q = strtok_s(NULL, ";\n", &context);
     if(p && q)
     {
-      if(first && *p == (char)0xEF && *(p+1) == (char)0xBB && *(p+2) == (char)0xBF) p += 3;  // I3056 UTF-8   // I3512
+      if(first && *p == (KMX_CHAR)0xEF && *(p+1) == (KMX_CHAR)0xBB && *(p+2) == (KMX_CHAR)0xBF) p += 3;  // I3056 UTF-8   // I3512
       first = FALSE;
       _strupr_s(q, strlen(q)+1);  // I3481   // I3641
       int n = strtol(p, NULL, 16);
@@ -150,7 +150,7 @@ BOOL NamedCodeConstants::IntLoadFile(const char *filename)
   return TRUE;
 }
 
-BOOL NamedCodeConstants::LoadFile(const char *filename)
+KMX_BOOL NamedCodeConstants::LoadFile(const char *filename)
 {
   char buf[260];
   // Look in current directory first
@@ -196,7 +196,7 @@ void NamedCodeConstants::reindex()
   }
 }
 
-int NamedCodeConstants::GetCode(const wchar_t *codename, DWORD *storeIndex)
+int NamedCodeConstants::GetCode(const wchar_t *codename, KMX_DWORD *storeIndex)
 {
   *storeIndex = 0xFFFFFFFFL;    // I2993
   int code = GetCode_IncludedCodes(codename);

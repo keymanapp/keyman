@@ -91,7 +91,7 @@ void keyman_sentry_shutdown() {
 // the trace. Apart from skipping frames and the inclusion of TopAddr, this is
 // very similar to sentry_event_value_add_stacktrace.
 //
-sentry_value_t CaptureStackTrace(PVOID TopAddr, DWORD FramesToSkip) {
+sentry_value_t CaptureStackTrace(PVOID TopAddr, KMX_DWORD FramesToSkip) {
   PVOID walked_backtrace[256];
 
   WORD frameCount = RtlCaptureStackBackTrace(FramesToSkip, 256, walked_backtrace, NULL);
@@ -129,7 +129,7 @@ sentry_value_t CaptureStackTrace(PVOID TopAddr, DWORD FramesToSkip) {
   return threads;
 }
 
-void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress) {
+void keyman_sentry_report_exception(KMX_DWORD ExceptionCode, PVOID ExceptionAddress) {
   sentry_value_t event;
   const int FRAMES_TO_SKIP = 0;
 

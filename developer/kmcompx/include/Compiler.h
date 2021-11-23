@@ -25,7 +25,7 @@
 
 */
 
-#include "../../../../developer/kmcompx/include/kmcompx.h"
+#include "kmcompx.h"		// added S
 #ifndef	_COMPILER_H
 #define _COMPILER_H
 

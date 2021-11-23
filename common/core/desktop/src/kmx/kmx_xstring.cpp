@@ -273,3 +273,5 @@ PKMX_CHAR km::kbp::kmx::wstrtostr(PKMX_WCHAR in)
   result[s.length()] = 0;
   return result;
 }
+
+//***********************************************

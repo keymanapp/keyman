@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "virtualcharkeys.h"
 
-BOOL VKeyMayBeVCKey[256] = {
+KMX_BOOL VKeyMayBeVCKey[256] = {
 	FALSE,    // L"K_?00",				// &H0
 	FALSE,    // L"K_LBUTTON",			// &H1
 	FALSE,    // L"K_RBUTTON",			// &H2
