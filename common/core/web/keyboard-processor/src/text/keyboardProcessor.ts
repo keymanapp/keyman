@@ -91,6 +91,10 @@ namespace com.keyman.text {
       return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYER] as MutableSystemStore;
     }
 
+    public get layerChangedStore(): MutableSystemStore {
+      return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYERCHANGED] as MutableSystemStore;
+    }
+
     public get layerId(): string {
       return this.layerStore.value;
     }

@@ -124,6 +124,8 @@ namespace com.keyman.text {
       // Current, long-existing assumption - it's DOM-backed.
       let preInputMock = Mock.from(outputTarget);
 
+      const startingLayerId = this.keyboardProcessor.layerId;
+
       // We presently need the true keystroke to run on the FULL context.  That index is still
       // needed for some indexing operations when comparing two different output targets.
       let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget);
@@ -261,6 +263,11 @@ namespace com.keyman.text {
         // finished, for example to switch layers. This action may not have any output
         // but may change system store or variable store values. Given this, we don't need to
         // save anything about the post behavior, after finalizing it
+
+        // We need to tell the keyboard if the layer has been changed, either by a keyboard rule itself,
+        // or by the touch layout 'nextlayer' control.
+        this.keyboardProcessor.layerChangedStore.set(startingLayerId == this.keyboardProcessor.layerId ? '0' : '1');
+
         let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(keyEvent.device, outputTarget);
         if(postRuleBehavior) {
           postRuleBehavior.finalize(this.keyboardProcessor, outputTarget);

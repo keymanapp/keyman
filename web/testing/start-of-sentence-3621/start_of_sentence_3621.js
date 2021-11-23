@@ -1338,11 +1338,17 @@ function Keyboard_start_of_sentence_3621()
   }
 }
 ;
-  this.s_sentencePunctuation_13=".?!";
-  this.s20="shift";
-  this.s21="shift";
-  this.s22="shift";
-  this.s23="default";
+  this.s_caps_12="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  this.s_digit_13="0123456789";
+  this.s_sentencePunctuation_15=".?!";
+  this.s21="0";
+  this.s22="0";
+  this.s23="numeric";
+  this.s24="0";
+  this.s25="shift";
+  this.s26="shift";
+  this.s27="shift";
+  this.s28="default";
   this.KVER="15.0.114.0";
   this.KVS=[];
   this.gs=function(t,e) {
@@ -1369,39 +1375,50 @@ function Keyboard_start_of_sentence_3621()
   };
   this.g_PostKeystroke_1=function(t,e) {
     var k=KeymanWeb,r=1,m=0;
-    if(!m) {
-    
-      k.KDC(-1,t);
-      r=this.g_nextLayer_2(t,e);
-      m=2;
-    }
+      if(k.KFCM(2,t,[{t:'a',a:this.s_caps_12},{t:'a',a:this.s_caps_12}])&&k.KIFS(42,this.s21,t)){
+        m=1;   // Line 24
+        k.KDC(2,t);
+        k.KIO(-1,this.s_caps_12,1,t);
+        k.KIO(-1,this.s_caps_12,2,t);
+      }
+      else if(k.KFCM(1,t,[{t:'a',a:this.s_digit_13}])&&k.KIFS(42,this.s22,t)&&k.KIFS(33,this.s23,t)){
+        m=1;   // Line 27
+        k.KDC(1,t);
+        k.KIO(-1,this.s_digit_13,1,t);
+      }
+      else if(k.KIFS(42,this.s24,t)){
+        m=1;   // Line 30
+        k.KDC(0,t);
+        r=this.g_nextLayer_2(t,e);
+        m=2;
+      }
     return r;
   };
   this.g_nextLayer_2=function(t,e) {
     var k=KeymanWeb,r=1,m=0;
-      if(k.KFCM(3,t,[{t:'a',a:this.s_sentencePunctuation_13},' ',' '])){
-        m=1;   // Line 27
+      if(k.KFCM(3,t,[{t:'a',a:this.s_sentencePunctuation_15},' ',' '])){
+        m=1;   // Line 37
         k.KDC(3,t);
-        k.KIO(-1,this.s_sentencePunctuation_13,1,t);
+        k.KIO(-1,this.s_sentencePunctuation_15,1,t);
         k.KO(-1,t,"  ");
-        k.KSETS(33,this.s22,t);
+        k.KSETS(33,this.s27,t);
       }
-      else if(k.KFCM(2,t,[{t:'a',a:this.s_sentencePunctuation_13},' '])){
-        m=1;   // Line 26
+      else if(k.KFCM(2,t,[{t:'a',a:this.s_sentencePunctuation_15},' '])){
+        m=1;   // Line 36
         k.KDC(2,t);
-        k.KIO(-1,this.s_sentencePunctuation_13,1,t);
+        k.KIO(-1,this.s_sentencePunctuation_15,1,t);
         k.KO(-1,t," ");
-        k.KSETS(33,this.s21,t);
+        k.KSETS(33,this.s26,t);
       }
       else if(k.KFCM(1,t,[{t:'n'}])){
-        m=1;   // Line 25
+        m=1;   // Line 35
         k.KDC(0,t);
-        k.KSETS(33,this.s20,t);
+        k.KSETS(33,this.s25,t);
       }
     if(!m) {
     
       k.KDC(-1,t);
-      k.KSETS(33,this.s23,t);
+      k.KSETS(33,this.s28,t);
     }
     return r;
   };

@@ -185,6 +185,7 @@ namespace com.keyman.text {
 
     static readonly TSS_LAYER:    number = 33;
     static readonly TSS_PLATFORM: number = 31;
+    static readonly TSS_LAYERCHANGED: number = 42;
 
     systemStores: {[storeID: number]: SystemStore};
 
@@ -201,6 +202,7 @@ namespace com.keyman.text {
 
       this.systemStores[KeyboardInterface.TSS_PLATFORM] = new PlatformSystemStore(this);
       this.systemStores[KeyboardInterface.TSS_LAYER] = new MutableSystemStore(KeyboardInterface.TSS_LAYER, 'default');
+      this.systemStores[KeyboardInterface.TSS_LAYERCHANGED] = new MutableSystemStore(KeyboardInterface.TSS_LAYERCHANGED, '0');
 
       this.variableStoreSerializer = variableStoreSerializer;
     }

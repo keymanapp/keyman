@@ -117,9 +117,10 @@ struct COMP_STORE {
 /* Keyman 15.0 system stores */
 #define TSS_BEGIN_NEWCONTEXT            40
 #define TSS_BEGIN_POSTKEYSTROKE         41
-#define TSS__KEYMAN_150_MAX             41
+#define TSS_LAYERCHANGED                42
+#define TSS__KEYMAN_150_MAX             42
 
-#define TSS__MAX                        41
+#define TSS__MAX                        42
 
 // ShiftFlags
 #define LCTRLFLAG       0x0001      // Left Control flag

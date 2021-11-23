@@ -985,6 +985,11 @@ var
               ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement notany in context() match requires version 14.0+ of KeymanWeb', [GetCodeName(recContext.Code)]));  // I1971   // I4061
             Result := Result + nlt + Format('k.KCXO(%d,t,%d,%d);', [len, AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext)), AdjustIndex(fkp.dpContext, ContextIndex)]);
           end;
+        CODE_IFOPT,
+        CODE_IFSYSTEMSTORE,
+        CODE_NUL:
+          // These have no output for a context emit
+          ;
         else
         begin
           ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement %s is not currently supported in context() match', [GetCodeName(recContext.Code)]));  // I1971   // I4061

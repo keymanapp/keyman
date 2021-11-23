@@ -152,7 +152,7 @@ const PWCHAR LineTokens[] = {
 
 #define SSN__PREFIX		L"&"
 
-const PWCHAR StoreTokens[TSS__MAX + 2] = {
+const PWCHAR StoreTokens[] = {
   L"",
   SSN__PREFIX L"BITMAP",
   SSN__PREFIX L"COPYRIGHT",
@@ -195,8 +195,11 @@ const PWCHAR StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX L"CASEDKEYS", // #2241
   SSN__PREFIX L"", // TSS_BEGIN_NEWCONTEXT
   SSN__PREFIX L"", // TSS_BEGIN_POSTKEYSTROKE
+  SSN__PREFIX L"LAYERCHANGED",
   NULL
 };
+
+static_assert(_countof(StoreTokens) == TSS__MAX + 2, "StoreTokens should have exactly TSS__MAX+2 elements");
 
 HINSTANCE g_hInstance;
 CompilerMessageProc msgproc = NULL;
@@ -1340,6 +1343,9 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 
   case TSS_BEGIN_NEWCONTEXT:
   case TSS_BEGIN_POSTKEYSTROKE:
+    break;
+
+  case TSS_LAYERCHANGED:
     break;
 
   default:
