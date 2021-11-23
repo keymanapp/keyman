@@ -779,6 +779,11 @@ namespace com.keyman.dom {
       }
     }
 
+    dragEnd: (e: TouchEvent|MouseEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent|MouseEvent) {
+      e.stopPropagation();
+      this.firstTouch = null;
+    }.bind(this);
+
     /**
      * Handle the touch move event for an input element
      */

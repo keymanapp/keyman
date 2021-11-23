@@ -95,6 +95,31 @@ files:
     type: gettext
     update_option: update_as_unapproved
 
+  # macOS files
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMAboutWindow/en.lproj/KMAboutWindowController.strings
+    dest: /mac/app/KMAboutWindowController.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/KMAboutWindow/%osx_code%/%original_file_name%
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/en.lproj/preferences.strings
+    dest: /mac/app/preferences.strings
+    translation:  /mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/%osx_code%/%original_file_name%
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/en.lproj/KMInfoWindowController.strings
+    dest: /mac/app/KMInfoWindowController.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/%osx_code%/%original_file_name%
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings  
+    dest: /mac/app/KMKeyboardHelpWindowController.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/%osx_code%/%original_file_name%
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/en.lproj/Localizable.strings
+    dest: /mac/app/Localizable.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/%osx_code%/%original_file_name%
+
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/en.lproj/MainMenu.strings
+    dest: /mac/app/MainMenu.strings
+    translation: /mac/Keyman4MacIM/Keyman4MacIM/%osx_code%/%original_file_name%
 
   # crowdin parameters descriptions:
 

@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 15.0.154 alpha 2021-11-22
+
+* fix(web): simplify hide transition (#5910)
+* fix(web): inline osk keytip position (#5938)
+* feat(mac): i18n, support localization of Keyman for Mac (#5869)
+* chore(linux): Remove unused test methods (#5954)
+* chore(linux): Run ibus-keyman tests as part of the build (#5889)
+
+## 15.0.153 alpha 2021-11-20
+
+* fix(web): resolve unhandled exception in promise (#5902)
+
+## 15.0.152 alpha 2021-11-19
+
+* fix(common/core):  Update decxstr to check all characters while decrementing (#5842)
+
 ## 15.0.151 alpha 2021-11-18
 
 * fix(developer): use correct tike icon (#5925)

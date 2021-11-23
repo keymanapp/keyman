@@ -62,16 +62,6 @@ void     ibus_im_context_disable  (IBusIMContext  *context);
 void     ibus_im_context_commit_string
                                   (IBusIMContext  *context,
                                    const gchar    *string);
-void     ibus_im_context_update_preedit
-                                  (IBusIMContext  *context,
-                                   const gchar    *string,
-                                   PangoAttrList  *attrs,
-                                   gint            cursor_pos,
-                                   gboolean        visible);
-void     ibus_im_context_show_preedit
-                                  (IBusIMContext *context);
-void     ibus_im_context_hide_preedit
-                                  (IBusIMContext *context);
 
 void ibus_im_test_set_thread_loop(IBusIMContext *context, GMainLoop *loop);
 
