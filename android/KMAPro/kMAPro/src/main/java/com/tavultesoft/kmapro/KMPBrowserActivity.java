@@ -73,6 +73,7 @@ public class KMPBrowserActivity extends BaseActivity {
     webView = (WebView) findViewById(R.id.kmpBrowserWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
     webView.getSettings().setJavaScriptEnabled(true);
+    webView.getSettings().setAllowFileAccess(true);
     webView.getSettings().setUseWideViewPort(true);
     webView.getSettings().setLoadWithOverviewMode(true);
     webView.getSettings().setBuiltInZoomControls(true);

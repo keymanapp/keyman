@@ -250,6 +250,8 @@ public class WebBrowserActivity extends BaseActivity {
 
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
     webView.getSettings().setJavaScriptEnabled(true);
+    // Intentionally disallow file:// access
+    webView.getSettings().setAllowFileAccess(false);
     webView.getSettings().setUseWideViewPort(true);
     webView.getSettings().setLoadWithOverviewMode(true);
     webView.getSettings().setBuiltInZoomControls(true);
