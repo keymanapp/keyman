@@ -262,11 +262,6 @@ PreservedKeyMap::MapKeyRuleCore(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *
     return FALSE;
   }
 
-  if (ShiftFlags == 0) {
-    if (!MapUSCharToVK(&Key, &ShiftFlags))
-      return FALSE;
-  }
-
   pPreservedKey->uVKey      = (UINT)USVKToScanCodeToLayoutVK((WORD)Key);  // I3762
   pPreservedKey->uModifiers = ShiftToTSFShift(ShiftFlags);
 

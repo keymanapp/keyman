@@ -6,10 +6,8 @@
 using namespace km::kbp;
 using namespace kmx;
 
-
-
 /* This array is lifted from preservedkeymap.cpp */
-// TODO: share this
+
 const struct
 {
   KMX_DWORD key;

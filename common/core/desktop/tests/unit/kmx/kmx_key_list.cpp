@@ -66,9 +66,9 @@ void test_key_list(const km::kbp::path &source_file){
   std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t> map_key_list;
 
   auto n = 0;
-  // Internally the list is created using map so we should not rely on order elemnts
-  // in the expected list  array.
-
+  // Internally the list is created using a map so we should not rely on order elemnts
+  // in the returned array. Therefore we will put the array items back into a map to verify
+  // against our expected map.
   for (; key_rule_it->key; ++key_rule_it) {
     std::cout << "key:" << key_rule_it->key << " modifer: " << key_rule_it->modifier_flag << std::endl;
     map_key_list[std::make_pair(key_rule_it->key, key_rule_it->modifier_flag)] = key_rule_it->modifier_flag;
