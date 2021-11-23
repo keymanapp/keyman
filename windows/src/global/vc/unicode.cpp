@@ -19,7 +19,7 @@
 
 #include "pch.h"
 
-PWSTR wcschrsupp(PWSTR buf, DWORD x)
+PWSTR wcschrsupp(PWSTR buf, KMX_DWORD x)
 {
 	if(x < 0x10000) return wcschr(buf,(WCHAR) x);
 	int chigh = Uni_UTF32ToSurrogate1(x);
@@ -40,7 +40,7 @@ int wcssuppos(PWSTR p1, PWSTR p)
 }
 
 
-int GetSuppChar(WCHAR *p)
+int GetSuppChar(KMX_WCHAR *p)
 {
 	if(Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p+1)))
 		return Uni_SurrogateToUTF32(*p, *(p+1));
@@ -55,7 +55,7 @@ int wcspos(PWSTR s, int pos)
 	return pos;
 }
 
-WCHAR ByteToWChar(char b)
+WCHAR ByteToWChar(KMX_CHAR b)
 {
 	if(b == 0) return 0;
 	WCHAR buf[2];

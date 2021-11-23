@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../developer/kmcompx/include/kmcompx.h"
+#include "kmcompx.h"		 // added S
 #include <windows.h>
 
 #define VK_COLON	0xBA

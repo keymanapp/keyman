@@ -273,3 +273,15 @@ PKMX_CHAR km::kbp::kmx::wstrtostr(PKMX_WCHAR in)
   result[s.length()] = 0;
   return result;
 }
+
+//***********************************************
+
+const PKMX_WCHAR  km::kbp::kmx::KMX2_u16cpy( PKMX_WCHAR dst, PKMX_WCHAR src){  
+PKMX_WCHAR o =
+ dst;
+while (*src) {
+    *dst++ = *src++;
+  }
+  *dst = 0;
+return o;
+}

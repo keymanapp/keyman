@@ -36,23 +36,23 @@ RegistryReadOnly::~RegistryReadOnly()
 	if(FhKey != NULL) CloseKey();
 }
 
-BOOL RegistryReadOnly::CloseKey(void)
+KMX_BOOL RegistryReadOnly::CloseKey(void)
 {
-	BOOL Result = FALSE;
+	KMX_BOOL Result = FALSE;
 	if(FhKey != NULL) Result = WrapError(RegCloseKey(FhKey));
 	FhKey = NULL;
 	return TRUE;
 }
 
 
-BOOL RegistryFullAccess::CreateKey(LPCSTR AKey)
+KMX_BOOL RegistryFullAccess::CreateKey(LPCSTR AKey)
 {
 	DWORD dwDisposition;
 	return WrapError(RegCreateKeyEx(FhKey ? FhKey : FhRootKey, AKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, 
 		&FhKey, &dwDisposition));
 }
 
-BOOL RegistryFullAccess::RecursiveDeleteKey(LPCSTR AKey)
+KMX_BOOL RegistryFullAccess::RecursiveDeleteKey(LPCSTR AKey)
 {
 	HKEY hkey;
 
@@ -69,9 +69,9 @@ BOOL RegistryFullAccess::RecursiveDeleteKey(LPCSTR AKey)
 	return WrapError(RegDeleteKey(hkey, AKey));
 }
 
-BOOL RegistryFullAccess::IntRecursiveDeleteKey(HKEY hkey)
+KMX_BOOL RegistryFullAccess::IntRecursiveDeleteKey(HKEY hkey)
 {
-	char buf[260];
+	KMX_CHAR buf[260];
 	DWORD dwlen = 260;
 	FILETIME ftime;
 	HKEY hsubkey;
@@ -88,12 +88,12 @@ BOOL RegistryFullAccess::IntRecursiveDeleteKey(HKEY hkey)
 	return TRUE;
 }
 
-BOOL RegistryFullAccess::DeleteKey(LPCSTR AKey)
+KMX_BOOL RegistryFullAccess::DeleteKey(LPCSTR AKey)
 {
 	return WrapError(RegDeleteKey(FhKey, AKey));
 }
 
-BOOL RegistryFullAccess::DeleteValue(LPCSTR AName)
+KMX_BOOL RegistryFullAccess::DeleteValue(LPCSTR AName)
 {
 	return WrapError(RegDeleteValue(FhKey, AName));
 }
@@ -115,33 +115,33 @@ HKEY RegistryReadOnly::GetKeyReadOnly(LPCSTR AKey)
 }
 
 
-BOOL RegistryReadOnly::GetKeyNames(LPSTR AKey, int len, int n)
+KMX_BOOL RegistryReadOnly::GetKeyNames(LPSTR AKey, int len, int n)
 {
 	DWORD dwlen = len;
 	FILETIME ftime;
 	return WrapError(RegEnumKeyEx(FhKey, n, AKey, &dwlen, NULL, NULL, NULL, &ftime));
 }
 
-BOOL RegistryReadOnly::GetValueNames(LPSTR AName, int len, int n)
+KMX_BOOL RegistryReadOnly::GetValueNames(LPSTR AName, int len, int n)
 {
 	DWORD dwlen = len;
 	return WrapError(RegEnumValue(FhKey, n, AName, &dwlen, NULL, NULL, NULL, NULL));
 }
 
-BOOL RegistryReadOnly::GetValueNames(LPWSTR AName, int len, int n)
+KMX_BOOL RegistryReadOnly::GetValueNames(LPWSTR AName, int len, int n)
 {
 	DWORD dwlen = len;
 	return WrapError(RegEnumValueW(FhKey, n, AName, &dwlen, NULL, NULL, NULL, NULL));
 }
 
-BOOL RegistryReadOnly::KeyExists(LPCSTR AKey)
+KMX_BOOL RegistryReadOnly::KeyExists(LPCSTR AKey)
 {
 	HKEY hkey = GetKeyReadOnly(AKey);
 	if(hkey != 0) RegCloseKey(hkey);
 	return hkey != 0;
 }
 
-BOOL RegistryFullAccess::OpenKey(LPCSTR AKey, BOOL ACreate)
+KMX_BOOL RegistryFullAccess::OpenKey(LPCSTR AKey, KMX_BOOL ACreate)
 {
 	if(ACreate)
 		if(!KeyExists(AKey))
@@ -159,7 +159,7 @@ BOOL RegistryFullAccess::OpenKey(LPCSTR AKey, BOOL ACreate)
 }
 
 
-BOOL RegistryReadOnly::OpenKeyReadOnly(LPCSTR AKey)
+KMX_BOOL RegistryReadOnly::OpenKeyReadOnly(LPCSTR AKey)
 {
 	HKEY hkey = GetKeyReadOnly(AKey);
 	if(!hkey) return FALSE;
@@ -178,31 +178,31 @@ int RegistryReadOnly::ReadInteger(LPCSTR AName)
 	//return WrapError();
 }
 
-BOOL RegistryReadOnly::ReadString(LPCSTR AName, LPSTR AValue, int len)
+KMX_BOOL RegistryReadOnly::ReadString(LPCSTR AName, LPSTR AValue, int len)
 {
 	DWORD dwlen = len;
 	return WrapError(RegQueryValueEx(FhKey, AName, NULL, NULL, (LPBYTE) AValue, &dwlen));
 }
 
-BOOL RegistryReadOnly::ReadString(LPCWSTR AName, LPWSTR AValue, int len)
+KMX_BOOL RegistryReadOnly::ReadString(LPCWSTR AName, LPWSTR AValue, int len)
 {
 	DWORD dwlen = len * 2; // byte size
 	return WrapError(RegQueryValueExW(FhKey, AName, NULL, NULL, (LPBYTE) AValue, &dwlen));
 }
 
-BOOL RegistryReadOnly::ValueExists(LPCSTR AName)
+KMX_BOOL RegistryReadOnly::ValueExists(LPCSTR AName)
 {
 	DWORD dwType;
 	return WrapError(RegQueryValueEx(FhKey,  AName, NULL, &dwType, NULL, NULL));
 }
 
-BOOL RegistryReadOnly::ValueExists(LPCWSTR AName)
+KMX_BOOL RegistryReadOnly::ValueExists(LPCWSTR AName)
 {
 	DWORD dwType;
 	return WrapError(RegQueryValueExW(FhKey,  AName, NULL, &dwType, NULL, NULL));
 }
 
-BOOL RegistryReadOnly::WrapError(DWORD res)
+KMX_BOOL RegistryReadOnly::WrapError(KMX_DWORD res)
 {
 	/*if(res != ERROR_SUCCESS)
 	{
@@ -211,19 +211,19 @@ BOOL RegistryReadOnly::WrapError(DWORD res)
 	return res == ERROR_SUCCESS;
 }
 
-BOOL RegistryFullAccess::WriteInteger(LPCSTR AName, int AValue)
+KMX_BOOL RegistryFullAccess::WriteInteger(LPCSTR AName, int AValue)
 {
 	return WrapError(RegSetValueEx(FhKey, AName, 0, REG_DWORD, (LPBYTE) &AValue, sizeof(int)));
 }
 
-BOOL RegistryFullAccess::WriteString(LPCSTR AName, LPSTR AValue)
+KMX_BOOL RegistryFullAccess::WriteString(LPCSTR AName, LPSTR AValue)
 {
-	return WrapError(RegSetValueEx(FhKey, AName, 0, REG_SZ, (LPBYTE) AValue, (DWORD) strlen(AValue)+1));
+	return WrapError(RegSetValueEx(FhKey, AName, 0, REG_SZ, (LPBYTE) AValue, (KMX_DWORD) strlen(AValue)+1));
 }
 
-BOOL RegistryFullAccess::WriteString(LPCWSTR AName, LPWSTR AValue)
+KMX_BOOL RegistryFullAccess::WriteString(LPCWSTR AName, LPWSTR AValue)
 {
-	return WrapError(RegSetValueExW(FhKey, AName, 0, REG_SZ, (LPBYTE) AValue, (DWORD) wcslen(AValue)*2+2));
+	return WrapError(RegSetValueExW(FhKey, AName, 0, REG_SZ, (LPBYTE) AValue, (KMX_DWORD) wcslen(AValue)*2+2));
 }
 
 RegistryReadOnly *Reg_GetKeymanInstalledKeyboard(LPSTR kbname)

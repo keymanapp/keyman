@@ -177,3 +177,43 @@ int xchrcmp(PWSTR ch1, PWSTR ch2)
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return wcsncmp(ch1, ch2, (intptr_t)(nch1-ch1));
 }
+
+//*******Sab: overloaded incxstr for use of tests for kmcompx. May be deleted leater **********************
+PKMX_WCHAR incxstr(PKMX_WCHAR p)
+{
+	if(*p == 0) return p;
+	if(*p != UC_SENTINEL)
+	{
+		if(*p >= 0xD800 && *p <= 0xDBFF && *(p+1) >= 0xDC00 && *(p+1) <= 0xDFFF) return p+2;
+		return p+1;
+	}
+
+	p+=2;
+	switch(*(p-1))
+	{
+		case CODE_ANY:			return p+1;
+		case CODE_NOTANY:   return p+1;
+		case CODE_INDEX:		return p+2;
+		case CODE_USE:			return p+1;
+		case CODE_DEADKEY:		return p+1;
+		case CODE_EXTENDED:		p += 2; while(*p && *p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
+		case CODE_CLEARCONTEXT: return p+1;
+		case CODE_CALL:			return p+1;
+		case CODE_CONTEXTEX:	return p+1;
+    case CODE_IFOPT:    return p+3;
+    case CODE_IFSYSTEMSTORE: return p+3;
+    case CODE_SETOPT:   return p+2;
+    case CODE_SETSYSTEMSTORE: return p+2;
+    case CODE_RESETOPT: return p+1;
+    case CODE_SAVEOPT:  return p+1;
+		default:				return p;
+	}
+}
+
+
+int KMX_xstrlen(PKMX_WSTR p)
+{
+	int i;
+	for(i = 0; *p; i++, p=incxstr(p));
+	return i;
+}

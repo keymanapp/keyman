@@ -1,14 +1,14 @@
 
 #include <json-schema.hpp>
 #include <fstream>
-
+#include "../../../../developer/kmcompx/include/kmcompx.h"
 #include <windows.h>
 
 using nlohmann::json;
 using nlohmann::json_uri;
 using nlohmann::json_schema_draft4::json_validator;
 
-typedef BOOL (CALLBACK *ValidateJsonMessageProc)(INT64 offset, const char* szText);
+typedef KMX_BOOL (CALLBACK *ValidateJsonMessageProc)(INT64 offset, const KMX_CHAR* szText);
 
 static void loader(const json_uri &uri, json &schema)
 {
@@ -24,7 +24,7 @@ static void loader(const json_uri &uri, json &schema)
   }
 }
 
-extern "C" BOOL __declspec(dllexport) ValidateJsonFile(PWSTR pwszSchemaFile, PWSTR pwszJsonFile, ValidateJsonMessageProc MessageProc) {
+extern "C" KMX_BOOL __declspec(dllexport) ValidateJsonFile(PWSTR pwszSchemaFile, PWSTR pwszJsonFile, ValidateJsonMessageProc MessageProc) {
   std::fstream f(pwszSchemaFile);
   if (!f.good()) {
     MessageProc(-1, "Schema file could not be loaded.");
