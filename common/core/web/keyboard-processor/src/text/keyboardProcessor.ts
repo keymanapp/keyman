@@ -207,6 +207,19 @@ namespace com.keyman.text {
       }
     }
 
+    processNewContextEvent(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+      // Pass this key code and state to the keyboard program
+      if(!this.activeKeyboard) {
+        return null;
+      }
+      let keyEvent = new KeyEvent();
+      keyEvent.Lcode = 0;
+      keyEvent.kName = '';
+      keyEvent.device = device;
+      this.setSyntheticEventDefaults(keyEvent);
+      return this.keyboardInterface.processNewContextEvent(outputTarget, keyEvent);
+    }
+
     processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       var matchBehavior: RuleBehavior;
 

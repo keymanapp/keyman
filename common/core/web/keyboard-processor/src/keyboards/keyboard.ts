@@ -64,6 +64,10 @@ namespace com.keyman.keyboards {
       return this.scriptObject['gs'](outputTarget, keystroke);
     }
 
+    processNewContextEvent(outputTarget: text.OutputTarget, keystroke: text.KeyEvent): boolean {
+      return this.scriptObject['gn'] ? this.scriptObject['gn'](outputTarget, keystroke) : false;
+    }
+
     get isHollow(): boolean {
       return this.scriptObject == Keyboard.DEFAULT_SCRIPT_OBJECT;
     }

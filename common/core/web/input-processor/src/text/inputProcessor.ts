@@ -10,14 +10,16 @@ namespace com.keyman.text {
       baseLayout: 'us'
     }
 
+    private device: utils.DeviceSpec;
     private kbdProcessor: KeyboardProcessor;
     private lngProcessor: prediction.LanguageProcessor;
 
-    constructor(options?: ProcessorInitOptions) {
+    constructor(device: utils.DeviceSpec, options?: ProcessorInitOptions) {
       if(!options) {
         options = InputProcessor.DEFAULT_OPTIONS;
       }
 
+      this.device = device;
       this.kbdProcessor = new KeyboardProcessor(options);
       this.lngProcessor = new prediction.LanguageProcessor();
     }
@@ -50,11 +52,28 @@ namespace com.keyman.text {
       return this.languageProcessor.activeModel;
     }
 
-        /**
+    /**
+     *
+     * @param outputTarget
+     * @returns
+     */
+     processNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
+      // We presently need the true keystroke to run on the FULL context.  That index is still
+      // needed for some indexing operations when comparing two different output targets.
+      const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.device, outputTarget);
+
+      // Should we swallow any further processing of keystroke events for this?
+      if(ruleBehavior != null) {
+        ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
+      }
+      return ruleBehavior;
+    }
+
+    /**
      * Simulate a keystroke according to the touched keyboard button element
      *
      * Handles default output and keyboard processing for both OSK and physical keystrokes.
-     * 
+     *
      * @param       {Object}      keyEvent      The abstracted KeyEvent to use for keystroke processing
      * @param       {Object}      outputTarget  The OutputTarget receiving the KeyEvent
      * @returns     {Object}                    A RuleBehavior object describing the cumulative effects of
@@ -113,7 +132,7 @@ namespace com.keyman.text {
       if(keyEvent.kNextLayer) {
         this.keyboardProcessor.selectLayer(keyEvent);
       }
-      
+
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(ruleBehavior != null) {
         let alternates: Alternate[];
@@ -123,7 +142,7 @@ namespace com.keyman.text {
         if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
           let keyDistribution = keyEvent.keyDistribution;
 
-          // We don't need to track absolute indexing during alternate-generation; 
+          // We don't need to track absolute indexing during alternate-generation;
           // only position-relative, so it's better to use a sliding window for context
           // when making alternates.  (Slightly worse for short text, matters greatly
           // for long text.)
@@ -141,7 +160,7 @@ namespace com.keyman.text {
             let _globalThis = com.keyman.utils.getGlobalObject();
             let timer: () => number;
 
-            // Available by default on `window` in browsers, but _not_ on `global` in Node, 
+            // Available by default on `window` in browsers, but _not_ on `global` in Node,
             // surprisingly.  Since we can't use code dependent on `require` statements
             // at present, we have to condition upon it actually existing.
             if(_globalThis['performance'] && _globalThis['performance']['now']) {
@@ -152,15 +171,15 @@ namespace com.keyman.text {
               TIMEOUT_THRESHOLD = timer() + 16; // + 16ms.
             } // else {
               // We _could_ just use Date.now() as a backup... but that (probably) only matters
-              // when unit testing.  So... we actually don't _need_ time thresholding when in 
+              // when unit testing.  So... we actually don't _need_ time thresholding when in
               // a Node environment.
             // }
 
             // Tracks a minimum probability for keystroke probability.  Anything less will not be
-            // included in alternate calculations. 
+            // included in alternate calculations.
             //
             // Seek to match SearchSpace.EDIT_DISTANCE_COST_SCALE from the predictive-text engine.
-            // Reasoning for the selected value may be seen there.  Short version - keystrokes 
+            // Reasoning for the selected value may be seen there.  Short version - keystrokes
             // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
             let KEYSTROKE_EPSILON = Math.exp(-5);
 
@@ -169,7 +188,7 @@ namespace com.keyman.text {
 
             let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
-    
+
             let totalMass = 0; // Tracks sum of non-error probabilities.
             for(let pair of keyDistribution) {
               if(pair.p < KEYSTROKE_EPSILON) {
@@ -184,7 +203,7 @@ namespace com.keyman.text {
               }
 
               let mock = Mock.from(windowedMock);
-              
+
               let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
               if(!altKey) {
                 console.warn("Potential fat-finger key could not be found in layer!");
@@ -193,14 +212,14 @@ namespace com.keyman.text {
 
               let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, keyEvent.device);
               let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
-              
+
               // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
               // so we expect users to never intend their use.
               //
               // Also possible that this set of conditions fail for all evaluated alternates.
               if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
                 let transform: Transform = alternateBehavior.transcription.transform;
-                
+
                 // Ensure that the alternate's token id matches that of the current keystroke, as we only
                 // record the matched rule's context (since they match)
                 transform.id = ruleBehavior.transcription.token;
@@ -224,7 +243,7 @@ namespace com.keyman.text {
         ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
 
         // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
-        
+
         // Notify the ModelManager of new input - it's predictive text time!
         if(alternates && alternates.length > 0) {
           ruleBehavior.transcription.alternates = alternates;
@@ -245,6 +264,12 @@ namespace com.keyman.text {
     public resetContext(outputTarget?: OutputTarget) {
       this.keyboardProcessor.resetContext();
       this.languageProcessor.invalidateContext(outputTarget);
+
+      // Let the keyboard do its initial group processing
+      //console.log('processNewContextEvent called from resetContext');
+      if(outputTarget) {
+        this.processNewContextEvent(outputTarget);
+      }
     }
   }
 }
