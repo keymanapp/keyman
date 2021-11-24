@@ -14,6 +14,12 @@
     </plurals>
 
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+      <item quantity="one">Other Input Method</item>
+      <item quantity="other">Other Input Methods</item>
+    </plurals>
+
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Add New Keyboard</string>
 
     <!-- Context: Title for list -->
