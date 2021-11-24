@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.155 alpha 2021-11-24
+
+* fix(web): reset scroll anchor on touchend (#5919)
+* fix(web): shorten setFocusTimer() (#5946)
+* fix(web): clear longpress timeout if user does a flick up (#5952)
+
 ## 15.0.154 alpha 2021-11-22
 
 * fix(web): simplify hide transition (#5910)
