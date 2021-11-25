@@ -118,9 +118,10 @@ typedef struct {
 - (NSString *)packagePathAtIndex:(NSUInteger)index;
 - (NSInteger)indexForPackageFolder:(NSString *)packageFolder;
 - (NSString *)packageFolderFromPath:(NSString *)path;
+- (NSDictionary *)loadPackageInfo:(NSString *)path;
 - (NSString *)packageNameFromInfFile:(NSString *)packageFolder;
+- (NSString *)packageNameFromJsonFile:(NSString *)packageFolder;
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder;
-- (NSDictionary *)infoDictionaryFromFile:(NSString *)infoFile;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;
 - (NSString *)oskWindowTitle;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;

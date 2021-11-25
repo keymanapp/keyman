@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		290BC680274B9DB1005CD1C3 /* KMPackageInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 290BC67F274B9DB1005CD1C3 /* KMPackageInfo.m */; };
+		290BC75E274F3FD7005CD1C3 /* KMKeyboardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 290BC75D274F3FD7005CD1C3 /* KMKeyboardInfo.m */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -125,6 +127,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		290BC67E274B9DB1005CD1C3 /* KMPackageInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMPackageInfo.h; sourceTree = "<group>"; };
+		290BC67F274B9DB1005CD1C3 /* KMPackageInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMPackageInfo.m; sourceTree = "<group>"; };
+		290BC75C274F3FD7005CD1C3 /* KMKeyboardInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMKeyboardInfo.h; sourceTree = "<group>"; };
+		290BC75D274F3FD7005CD1C3 /* KMKeyboardInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMKeyboardInfo.m; sourceTree = "<group>"; };
 		370E44542564E1EE00642929 /* Sentry.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Sentry.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37589AD422E52DA20097D39D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keyman.entitlements; sourceTree = "<group>"; };
 		37A00ED4239AA25700D2C837 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -433,6 +439,10 @@
 				E240F598202DED740000067D /* KMPackage.m */,
 				9A3D6C5B221531B0008785A3 /* KMOSVersion.h */,
 				9A3D6C5C221531B0008785A3 /* KMOSVersion.m */,
+				290BC67E274B9DB1005CD1C3 /* KMPackageInfo.h */,
+				290BC75C274F3FD7005CD1C3 /* KMKeyboardInfo.h */,
+				290BC75D274F3FD7005CD1C3 /* KMKeyboardInfo.m */,
+				290BC67F274B9DB1005CD1C3 /* KMPackageInfo.m */,
 			);
 			path = Keyman4MacIM;
 			sourceTree = "<group>";
@@ -801,6 +811,7 @@
 				98F3C8931A8D739500F675E3 /* KMConfigurationWindowController.m in Sources */,
 				9A3D6C5D221531B0008785A3 /* KMOSVersion.m in Sources */,
 				989C9C111A7876DE00A20425 /* main.m in Sources */,
+				290BC680274B9DB1005CD1C3 /* KMPackageInfo.m in Sources */,
 				98BF924F1BF02DC20002126A /* KMBarView.m in Sources */,
 				E240F599202DED740000067D /* KMPackage.m in Sources */,
 				984B8F441AF1C3D900E096A8 /* OSKWindowController.m in Sources */,
@@ -820,6 +831,7 @@
 				98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */,
 				9836B3741AE5F11D00780482 /* ZipArchive.mm in Sources */,
 				983247B21A9EB9690010B90C /* KMConfigColumn3CellView.m in Sources */,
+				290BC75E274F3FD7005CD1C3 /* KMKeyboardInfo.m in Sources */,
 				98BF92521BF03D4D0002126A /* KMAboutBGView.m in Sources */,
 				98BF92571BF0431F0002126A /* KMAboutWindow.m in Sources */,
 				98BCD1F61B4E5998004E1AFD /* NSString+SuppMethods.m in Sources */,

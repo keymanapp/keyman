@@ -8,6 +8,7 @@
 
 #import "KMInfoWindowController.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMPackageInfo.h"
 #import <WebKit/WebKit.h>
 
 @interface KMInfoWindowController ()
@@ -15,7 +16,7 @@
 @property (nonatomic, weak) IBOutlet NSTabView *tabView;
 @property (nonatomic, weak) IBOutlet WebView *detailsView;
 @property (nonatomic, weak) IBOutlet WebView *readmeView;
-@property (nonatomic, strong) NSDictionary *infoDict;
+@property (nonatomic, strong) NSDictionary *keyboardInfo;
 @property (nonatomic, strong) NSTabViewItem *readMeTab;
 @end
 
@@ -37,10 +38,10 @@
 
 - (void)setPackagePath:(NSString *)packagePath {
     _packagePath = packagePath;
-    _infoDict = nil;
+    _keyboardInfo = nil;
     [self.tabView selectTabViewItemAtIndex:0];
     if (packagePath != nil && packagePath.length) {
-        NSString *imgName = [self.infoDict objectForKey:kGraphicFile];
+        NSString *imgName = [self.keyboardInfo objectForKey:kGraphicFile];
         if (imgName != nil) {
             NSString *imgFile = [packagePath stringByAppendingPathComponent:imgName];
             NSImage *img = [[NSImage alloc] initWithContentsOfFile:imgFile];
@@ -56,7 +57,7 @@
         else
             [self.detailsView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
         
-        NSString *readMeFile = [self.infoDict objectForKey:kReadMeFile];
+        NSString *readMeFile = [self.keyboardInfo objectForKey:kReadMeFile];
         if (readMeFile != nil) {
             [self.readmeView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[packagePath stringByAppendingPathComponent:readMeFile]]]];
             if (_readMeTab != nil && ![self.tabView.tabViewItems containsObject:_readMeTab]) {
@@ -131,7 +132,7 @@
         else {
             // This was the old logic (prior to fixing issue #994). Keeping as fallback, though
             // it's unlikely to be useful/needed.
-            kbs = [self.infoDict objectForKey:kKeyboard];
+            kbs = [self.keyboardInfo objectForKey:kKeyboard];
         
             if (kbs != nil && kbs.count) {
                 for (NSArray *kb in kbs) {
@@ -143,7 +144,7 @@
             }
         }
         
-        NSArray *fonts = [self.infoDict objectForKey:kFont];
+        NSArray *fonts = [self.keyboardInfo objectForKey:kFont];
         NSMutableString *fontsStr = [NSMutableString stringWithString:@""];
         if (fonts != nil && fonts.count) {
             for (NSArray *font in fonts) {
@@ -159,16 +160,16 @@
 
         KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
         NSString *shareUrl = [NSString stringWithFormat:@"https://%@/go/keyboard/%@/share", keymanVersionInfo.keymanCom, packageId];
-        NSString *name = [[self.infoDict objectForKey:kName] objectAtIndex:0];
+        NSString *name = [[self.keyboardInfo objectForKey:kName] objectAtIndex:0];
         if (name == nil)
             name = @"Unknown Keyboard Package";
         
-        NSString *version = [[self.infoDict objectForKey:kVersion] objectAtIndex:0];
+        NSString *version = [[self.keyboardInfo objectForKey:kVersion] objectAtIndex:0];
         if (version == nil)
             version = @"";
         
-        NSString *authorV1 = [[self.infoDict objectForKey:kAuthor] objectAtIndex:0];
-        NSString *authorV2 = [[self.infoDict objectForKey:kAuthor] objectAtIndex:1];
+        NSString *authorV1 = [[self.keyboardInfo objectForKey:kAuthor] objectAtIndex:0];
+        NSString *authorV2 = [[self.keyboardInfo objectForKey:kAuthor] objectAtIndex:1];
         NSString *author = @"";
         if (authorV1.length && authorV2.length)
             author = [NSString stringWithFormat:linkFormat, authorV2, authorV1];
@@ -177,8 +178,8 @@
         else if (authorV2.length)
             author = [NSString stringWithFormat:linkFormat, authorV2, authorV2];
         
-        NSString *websiteV1 = [[self.infoDict objectForKey:kWebSite] objectAtIndex:0];
-        NSString *websiteV2 = [[self.infoDict objectForKey:kWebSite] objectAtIndex:1];
+        NSString *websiteV1 = [[self.keyboardInfo objectForKey:kWebSite] objectAtIndex:0];
+        NSString *websiteV2 = [[self.keyboardInfo objectForKey:kWebSite] objectAtIndex:1];
         NSString *website = @"";
         if (websiteV1.length && websiteV2.length)
             website = [NSString stringWithFormat:linkFormat, websiteV2, websiteV1];
@@ -187,8 +188,8 @@
         else if (websiteV2.length)
             website = [NSString stringWithFormat:linkFormat, websiteV2, websiteV2];
         
-        NSString *copyrightV1 = [[self.infoDict objectForKey:kCopyright] objectAtIndex:0];
-        NSString *copyrightV2 = [[self.infoDict objectForKey:kCopyright] objectAtIndex:1];
+        NSString *copyrightV1 = [[self.keyboardInfo objectForKey:kCopyright] objectAtIndex:0];
+        NSString *copyrightV2 = [[self.keyboardInfo objectForKey:kCopyright] objectAtIndex:1];
         NSString *copyright = @"";
         if (copyrightV1.length && copyrightV2.length)
             copyright = [NSString stringWithFormat:linkFormat, copyrightV2, copyrightV1];
@@ -208,13 +209,44 @@
     }
 }
 
-- (NSDictionary *)infoDict {
-    if (_infoDict == nil) {
-        NSString *infoFile = [self.packagePath stringByAppendingPathComponent:@"kmp.inf"];
-        _infoDict = [self.AppDelegate infoDictionaryFromFile:infoFile];
+- (NSDictionary *)keyboardInfo {
+    if(_keyboardInfo == nil) {
+        KMPackageInfo *packageInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
+        NSLog(@"SGS2021 packageInfo.packageName = %@", packageInfo.packageName);
+        NSLog(@"SGS2021 packageInfo.packageVersion = %@", packageInfo.packageVersion);
+        NSLog(@"SGS2021 packageInfo.authorName = %@", packageInfo.authorName);
+        NSLog(@"SGS2021 packageInfo.authorUrl = %@", packageInfo.authorUrl);
+        NSLog(@"SGS2021 packageInfo.copyright = %@", packageInfo.copyright);
+        NSLog(@"SGS2021 packageInfo.readMe = %@", packageInfo.readMe);
+
+        NSMutableDictionary *infoDict = [NSMutableDictionary dictionaryWithCapacity:0];
+        [infoDict setObject:@[packageInfo.packageName, @""] forKey:@"Name"];
+        [infoDict setObject:packageInfo.readMe forKey:@"ReadMeFile"];
+
+        _keyboardInfo = infoDict;
+//        _keyboardInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
+
     }
-    
-    return _infoDict;
+    /*
+    if (_keyboardInfo == nil) {
+        NSString *jsonFilename = [self.packagePath stringByAppendingPathComponent:@"kmp.json"];
+        NSLog(@"SGS2021 KMInfoWindowController loading keyboard info from json file: %@", jsonFilename);
+        _keyboardInfo = [self.AppDelegate loadPackageInfoFromJsonFile:jsonFilename];
+ 
+        if (_keyboardInfo != nil) {
+            NSDictionary *info = _keyboardInfo[@"info"];
+            NSDictionary *nameMap = info[@"name"];
+            NSLog(@"SGS2021 keyboardInfo initialized, package name = %@", nameMap[@"description"]);
+        } else
+        {
+            NSString *infoFile = [self.packagePath stringByAppendingPathComponent:@"kmp.inf"];
+            NSLog(@"SGS2021 KMInfoWindowController loading keyboard info from %@", infoFile);
+            _keyboardInfo = [self.AppDelegate keyboardInfoFromInfFile:infoFile];
+        }
+    }
+    */
+        
+    return _keyboardInfo;
 }
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {

@@ -136,14 +136,14 @@
                 NSString *packageName = [self packageNameFromFolder:packageFolder];
                 [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"HeaderTitle", nil]];
                 for (NSString *path in pArray) {
-                    NSDictionary *info = [KMXFile infoDictionaryFromFilePath:path];
+                    NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
                     if (info)
                         [_tableContents addObject:info];
                 }
             }
             else {
                 NSString *path = (NSString *)obj;
-                NSDictionary *info = [KMXFile infoDictionaryFromFilePath:path];
+                NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
                 if (info)
                     [_tableContents addObject:info];
             }
@@ -171,6 +171,8 @@
 
 - (NSString *)packageNameFromFolder:(NSString *)packageFolder {
     return [self.AppDelegate packageNameFromInfFile:packageFolder];
+    // TODO: call below but handle non-existent JSON file case
+    //return [self.AppDelegate packageNameFromJsonFile:packageFolder];
 }
 
 - (NSString *)keyboardsPath {

@@ -283,7 +283,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
         
         NSString *packagePath = [kmxPath stringByDeletingLastPathComponent];
-        NSDictionary *infoDict = [KMXFile infoDictionaryFromFilePath:kmxPath];
+        NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:kmxPath];
         NSString *kvkFilename = [infoDict objectForKey:kKMVisualKeyboardKey];
         if (kvkFilename && [kvkFilename length]) {
             NSString *kvkPath = [packagePath stringByAppendingPathComponent:kvkFilename];
@@ -328,7 +328,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     self.kmxList = [NSMutableArray arrayWithArray:[self KMXFiles]];
     NSMutableArray *kmxDesc = [[NSMutableArray alloc] initWithCapacity:0];
     for (NSString *path in self.kmxList) {
-        NSDictionary *infoDict = [KMXFile infoDictionaryFromFilePath:path];
+        NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:path];
         if (!infoDict)
             continue;
         

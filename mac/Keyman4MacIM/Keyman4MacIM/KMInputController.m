@@ -224,7 +224,7 @@ NSMutableArray *servers;
         KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
         [self.AppDelegate setKmx:kmx];
         KVKFile *kvk = nil;
-        NSDictionary *kmxInfo = [KMXFile infoDictionaryFromFilePath:path];
+        NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
         NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
         if (kvkFilename != nil) {
             NSString *kvkFilePath = [self.AppDelegate kvkFilePathFromFilename:kvkFilename];

@@ -19,6 +19,8 @@
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
+#import "KMPackageInfo.h"
+#import "KMKeyboardInfo.h"
 @import Sentry;
 
 /** NSUserDefaults keys */
@@ -464,6 +466,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return [userData boolForKey:kKMUseVerboseLogging];
 }
 
+#pragma mark - Keyman Data
+
 /**
  * Locate and create the Keyman data path; currently in ~/Documents/Keyman-Keyboards
  */
@@ -602,7 +606,61 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return packageFolder;
 }
 
+/*
+ attempt to load Keyman Package Information from kmp.json
+ if kmp.json file is not found or not readable, load from legacy kmp.inf file
+*/
+
+- (KMPackageInfo *)loadPackageInfo:(NSString *)path {
+    KMPackageInfo *packageInfo = nil;
+    NSString *jsonFilename = [path stringByAppendingPathComponent:@"kmp.json"];
+    NSLog(@"SGS2021 KXMInputMethodAppDelegate loading keyboard info from json file: %@", jsonFilename);
+    
+    packageInfo = [self loadPackageInfoFromJsonFile:jsonFilename];
+    
+    // TODO: remove test
+    packageInfo = nil;
+    
+    if (packageInfo != nil) {
+        /*
+        NSDictionary *info = packageInfo[@"info"];
+        NSDictionary *nameMap = info[@"name"];
+         */
+        NSLog(@"SGS2021 keyboardInfo initialized, package name = %@", packageInfo.packageName);
+    } else
+    {
+        NSString *infoFile = [path stringByAppendingPathComponent:@"kmp.inf"];
+        NSLog(@"SGS2021 KXMInputMethodAppDelegate loading keyboard info from inf file %@", infoFile);
+        
+        packageInfo = [self loadPackageInfoFromInfFile:infoFile];
+        //packageInfo = [self keyboardInfoFromInfFile:infoFile];
+    }
+    
+    return packageInfo;
+}
+
+
+// TODO: SGS, create JSON version
+- (NSString *)packageNameFromJsonFile:(NSString *)packageFolder {
+    NSLog(@"SGS2021 load packageNameFromJsonFile");
+    NSString *packageName = nil;
+    NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
+    NSString *jsonFilename = [path stringByAppendingPathComponent:@"kmp.json"];
+    NSDictionary *kbInfo = [self loadPackageInfoFromJsonFile:jsonFilename];
+
+    NSDictionary *info = kbInfo[@"info"];
+    NSDictionary *nameMap = info[@"name"];
+    packageName = nameMap[@"description"];
+    
+    NSLog(@"SGS2021 package name = %@", packageName);
+
+    if (packageName == nil)
+        packageName = packageFolder;
+
+    return packageName;
+}
 - (NSString *)packageNameFromInfFile:(NSString *)packageFolder {
+    NSLog(@"SGS2021 load packageNameFromInfFile");
     NSString *packageName = nil;
     NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
     NSString *fileContents = [NSString stringWithContentsOfFile:[path stringByAppendingPathComponent:@"kmp.inf"] encoding:NSWindowsCP1252StringEncoding error:NULL];
@@ -621,6 +679,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
     }
 
+    NSLog(@"SGS2021 package name = %@", packageName);
     if (packageName == nil)
         packageName = packageFolder;
 
@@ -630,7 +689,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder {
     NSMutableArray *kbNames = [[NSMutableArray alloc] initWithCapacity:0];;
     for (NSString *kmxFile in [self KMXFilesAtPath:packageFolder]) {
-        NSDictionary * infoDict = [KMXFile infoDictionaryFromFilePath:kmxFile];
+        NSDictionary * infoDict = [KMXFile keyboardInfoFromKmxFile:kmxFile];
         if (infoDict != nil) {
             NSString *name = [infoDict objectForKey:kKMKeyboardNameKey];
             if (name != nil && [name length]) {
@@ -643,7 +702,245 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return kbNames;
 }
 
-- (NSDictionary *)infoDictionaryFromFile:(NSString *)infoFile {
+// returns nil if the file does not exist or it cannot be parsed as JSON
+- (KMPackageInfo *) loadPackageInfoFromJsonFile:(NSString *)path {
+    KMPackageInfo * packageInfo = nil;
+    
+    if (self.debugMode)
+        NSLog(@"SGS2021 loading JSON package info from path: %@", path);
+    NSError *readError = nil;
+    NSData *data = [NSData dataWithContentsOfFile:path options:kNilOptions error:&readError];
+    NSDictionary *parsedData = nil;
+
+    if (data == nil) {
+      NSLog(@"SGS2021 Error reading JSON file at path : %@, error: %@ ", path, readError);
+    } else {
+        NSError *parseError = nil;
+        parsedData = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&parseError];
+
+        if (parsedData == nil) {
+            NSLog(@"SGS2021 Error parsing JSON file at path : %@, error: %@ ", path, parseError);
+        } else {
+            packageInfo = [self createPackageInfoFromJsonData:parsedData];
+        }
+    }
+
+    return packageInfo;
+}
+
+- (KMPackageInfo *) createPackageInfoFromJsonData:(NSDictionary *) jsonData {
+    KMPackageInfo *packageInfo = [[KMPackageInfo alloc] initWithName:jsonData[@"info"][@"name"][@"description"]
+                                                      packageVersion:jsonData[@"info"][@"version"][@"description"]
+                                                              readMe:jsonData[@"options"][@"readmeFile"]
+                                                         fileVersion:jsonData[@"system"][@"fileVersion"]
+                                              keymanDeveloperVersion:jsonData[@"system"][@"keymanDeveloperVersion"]
+                                                           copyright:jsonData[@"info"][@"copyright"][@"description"]
+                                                          authorName:jsonData[@"info"][@"author"][@"description"]
+                                                           authorUrl:jsonData[@"info"][@"author"][@"url"]
+                                                             website:jsonData[@"info"][@"website"][@"url"]
+                                                           keyboards:nil
+                                                           files:nil];
+    return packageInfo;
+}
+
+
+// returns nil if the file does not exist or it cannot be parsed
+// adapted from method keyboardInfoFromInfFile that loaded data from inf file to NSDictionary
+- (KMPackageInfo *) loadPackageInfoFromInfFile:(NSString *)path {
+    KMPackageInfo * packageInfo = nil;
+    
+    if (self.debugMode)
+        NSLog(@"SGS2021 loading inf package info from path: %@", path);
+    
+    NSString* packageName;
+    NSString* packageVersion;
+    NSString* readMe;
+    NSString* graphicFile;
+    NSString* fileVersion;
+    NSString* keymanDeveloperVersion;
+    NSString* copyright;
+    NSString* authorName;
+    NSString* authorUrl;
+    NSString* website;
+    
+    NSMutableArray *files = [NSMutableArray arrayWithCapacity:0];
+    //NSMutableArray *fonts = [NSMutableArray arrayWithCapacity:0];
+    NSMutableArray *keyboards = [NSMutableArray arrayWithCapacity:0];
+
+    @try {
+        NSString *fileContents = [[NSString stringWithContentsOfFile:path encoding:NSWindowsCP1252StringEncoding error:NULL] stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+        NSArray *lines = [fileContents componentsSeparatedByString:@"\n"];
+        ContentType contentType = ctUnknown;
+        for (NSString *line in lines) {
+            if (!line.length)
+                continue;
+
+            if ([line startsWith:kPackage]) {
+                contentType = ctPackage;
+                continue;
+            }
+            else if ([line startsWith:kButtons]) {
+                contentType = ctButtons;
+                continue;
+            }
+            else if ([line startsWith:kStartMenu]) {
+                contentType = ctStartMenu;
+                continue;
+            }
+            else if ([line startsWith:kStartMenuEntries]) {
+                contentType = ctStartMenuEntries;
+                continue;
+            }
+            else if ([line startsWith:kInfo]) {
+                contentType = ctInfo;
+                continue;
+            }
+            else if ([line startsWith:kFiles]) {
+                contentType = ctFiles;
+                continue;
+            }
+
+            switch (contentType) {
+                case ctPackage: {
+                    if ([line startsWith:kReadMeFile])
+                        readMe = [line substringFromIndex:kReadMeFile.length+1];
+                    else if ([line startsWith:kGraphicFile])
+                        graphicFile = [line substringFromIndex:kGraphicFile.length+1];
+                    
+                    break;
+                }
+                case ctButtons:
+                    break;
+                case ctStartMenu:
+                    break;
+                case ctStartMenuEntries: {
+                    if ([line startsWith:kWelcome]) {
+                        NSLog(@"SGS2021 line of inf file: %@", line);
+                        NSString *s = [line substringFromIndex:kWelcome.length+1];
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                    }
+
+                    break;
+                }
+                case ctInfo: {
+                    if ([line startsWith:kName]) {
+                        NSLog(@"SGS2021 line of inf file: %@", line);
+                        NSString *s = [line substringFromIndex:kName.length+1];
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        packageName = v1;
+                        NSLog(@"SGS2021 package name from inf file = %@", v1);
+                    }
+                    else if ([line startsWith:kVersion]) {
+                        NSLog(@"SGS2021 line of inf file: %@", line);
+                       NSString *s = [line substringFromIndex:kVersion.length+1];
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        packageVersion = v1;
+                    }
+                    else if ([line startsWith:kAuthor]) {
+                        NSLog(@"SGS2021 line of inf file: %@", line);
+                        NSString *s = [line substringFromIndex:kAuthor.length+1];
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        authorName = v1;
+                    }
+                    else if ([line startsWith:kCopyright]) {
+                        NSLog(@"SGS2021 line of inf file: %@", line);
+                        NSString *s = [line substringFromIndex:kCopyright.length+1];
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        authorUrl = v1;
+                    }
+                    else if ([line startsWith:kWebSite]) {
+                        NSLog(@"SGS2021 line of inf file: %@", line);
+                        NSString *s = [line substringFromIndex:kWebSite.length+1];
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        website = v1;
+                    }
+
+                    break;
+                }
+                case ctFiles: {
+                    NSUInteger x = [line rangeOfString:@"="].location;
+                    if (x == NSNotFound)
+                        continue;
+
+                    NSString *s = [line substringFromIndex:x+2];
+                    if ([s startsWith:kFile]) {
+                        NSLog(@"SGS2021 file line of inf file: %@", line);
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kFile.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *fileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        [files addObject:fileName];
+                    }
+                    else if ([s startsWith:kFont]) {
+                        NSLog(@"SGS2021 font line of inf file: %@", line);
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kFont.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *fontFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        [files addObject:fontFileName];
+                    }
+                    else if ([s startsWith:kKeyboard]) {
+                        NSLog(@"SGS2021 keyboard line of inf file: %@", line);
+                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+                        NSString *keyboardName = [[[vs objectAtIndex:0] substringFromIndex:kKeyboard.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        NSString *keyboardFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                        KMKeyboardInfo * keyboardInfo = [[KMKeyboardInfo alloc] initWithName:keyboardName
+                            identifier:nil
+                            oskFont:nil
+                        displayFont:nil
+                        languages:nil];
+                        [keyboards addObject:keyboardInfo];
+                    }
+
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+    @catch (NSException *e) {
+        NSLog(@"Error = %@", e.description);
+        return nil;
+    }
+/*
+    if (files.count)
+        [infoDict setValue:files forKey:kFile];
+    if (fonts.count)
+        [infoDict setValue:fonts forKey:kFont];
+    if (kbs.count)
+        [infoDict setValue:kbs forKey:kKeyboard];
+    return infoDict.count?[NSDictionary dictionaryWithDictionary:infoDict]:nil;
+ */
+
+    packageInfo = [[KMPackageInfo alloc] initWithName:packageName
+                                                      packageVersion:packageVersion
+                                                              readMe:readMe
+                                                         fileVersion:fileVersion
+                                              keymanDeveloperVersion:keymanDeveloperVersion
+                                                           copyright:copyright
+                                                          authorName:authorName
+                                                           authorUrl:authorUrl
+                                                             website:website
+                                                           keyboards:keyboards
+                                                           files:files];
+    return packageInfo;
+}
+
+
+- (NSDictionary *)keyboardInfoFromInfFile:(NSString *)infoFile {
+    NSLog(@"SGS2021 load keyboardInfoFromInfFile");
+
     NSMutableDictionary *infoDict = [NSMutableDictionary dictionaryWithCapacity:0];
     NSMutableArray *files = [NSMutableArray arrayWithCapacity:0];
     NSMutableArray *fonts = [NSMutableArray arrayWithCapacity:0];
@@ -713,6 +1010,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         [infoDict setObject:@[v1, v2] forKey:kName];
+                        NSLog(@"SGS2021 keyboard name from inf file = %@ or %@", v1, v2);
                     }
                     else if ([line startsWith:kVersion]) {
                         NSString *s = [line substringFromIndex:kVersion.length+1];
@@ -764,7 +1062,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         [fonts addObject:@[v1, v2]];
                     }
                     else if ([s startsWith:kKeyboard]) {
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
+						NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kKeyboard.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         [kbs addObject:@[v1, v2]];
@@ -907,7 +1205,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         NSInteger itag = 1000;
         [keyboards.submenu removeAllItems];
         for (NSString *path in self.activeKeyboards) {
-            NSDictionary *infoDict = [KMXFile infoDictionaryFromFilePath:path];
+            NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:path];
             if (!infoDict)
                 continue;
             //NSString *str = [NSString stringWithFormat:@"%@ (%@)", [infoDict objectForKey:kKMKeyboardNameKey], [infoDict objectForKey:kKMKeyboardVersionKey]];
@@ -918,7 +1216,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 [item setState:NSOnState];
                 KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
                 [self setKmx:kmx];
-                NSDictionary *kmxInfo = [KMXFile infoDictionaryFromFilePath:path];
+                NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
                 NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
                 if (kvkFilename != nil) {
                     NSString *kvkFilePath = [self kvkFilePathFromFilename:kvkFilename];
@@ -953,7 +1251,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             NSString *path = [self.activeKeyboards objectAtIndex:0];
             KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
             [self setKmx:kmx];
-            NSDictionary *kmxInfo = [KMXFile infoDictionaryFromFilePath:path];
+            NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
             NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
             if (kvkFilename != nil) {
                 NSString *kvkFilePath = [self kvkFilePathFromFilename:kvkFilename];
