@@ -236,10 +236,13 @@ BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr)
 
 
 BOOL
-ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf) {
+ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD len) {
   assert(contextItems);
   assert(outBuf);
 
+ /* if (!DebugAssert(!(len > MAXCONTEXT), "AppInt:ContextItemToAppContext: Len requested longer than MAXCONTEXT")) {
+    return FALSE;
+  }*/
   km_kbp_context_item *km_kbp_context_it = contextItems;
   uint8_t contextLen               = 0;
   for (; km_kbp_context_it->type != KM_KBP_CT_END; ++contextItems) {
@@ -268,14 +271,22 @@ ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf) {
   }
 
   buf[idx] = 0;  // Null terminate character array
-  if (wcslen(buf) < sizeof(outBuf)) {
+
+  if (wcslen(buf) < len) {
     wcscpy_s(outBuf, wcslen(buf) + 1, buf);
     delete[] buf;
     return TRUE;
-  } else { // TODO: copy the buffer so that the context closest to the caret is preservd truncation the start of the "context"
-           // taking care not to truncate  deadkeys and surrogate pairs Hint see BufMax()
+  } else if (wcslen(buf) < MAXCONTEXT)
+  { // Truncate to length 'len' using AppContext so that the context closest to the caret is preserved
+    // and the truncation will not split deadkeys or surrogate pairs
+    AppContext context;
+    context.Set(buf);
+    context.Get(outBuf, len);
     delete[] buf;
-    return FALSE;
+    return TRUE;
+  } else {
+    // TODO sort out how to fail asking for a len longer then MAXCONTEXT and the context from the api is longer.
+    return FALSE; 
   }
 
 }

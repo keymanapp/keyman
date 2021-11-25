@@ -231,7 +231,7 @@ BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr);
  *
  * @return  BOOL    True if array created successfully
  */
-BOOL ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf);
+BOOL ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD len);
 
 extern const LPSTR ItemTypes[];
 
