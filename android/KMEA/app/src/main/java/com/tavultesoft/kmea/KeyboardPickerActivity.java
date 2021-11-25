@@ -25,6 +25,7 @@ import com.tavultesoft.kmea.util.MapCompat;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -530,6 +531,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
     InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
     List<InputMethodInfo> imeList = imManager.getEnabledInputMethodList();
+    PackageManager packageManager = context.getPackageManager();
     for (InputMethodInfo imeInfo : imeList) {
       String id = imeInfo.getId();
       if (!id.startsWith(selfPackageName)) {
@@ -539,9 +541,9 @@ public final class KeyboardPickerActivity extends BaseActivity {
         if (componentName != null) {
           String packageName = componentName.getPackageName();
           try {
-            PackageManager packageManager = context.getPackageManager();
-            ApplicationInfo info = packageManager.getApplicationInfo(packageName, 0);
-            String imeName = info.loadLabel(packageManager).toString();
+            //PackageInfo info = packageManager.getPackageInfo(packageName, 0);
+            ApplicationInfo info = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+            String imeName = (String)packageManager.getApplicationLabel(info);
             HashMap<String, String> hashMap = new HashMap<String, String>();
             hashMap.put(titleKey, imeName);
             hashMap.put(subtitleKey, id);
