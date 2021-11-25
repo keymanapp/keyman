@@ -469,10 +469,6 @@ main(int argc, char *argv[]) {
     if (strcmp(filename->str, "k_026___system_stores") == 0 ||
         strcmp(filename->str, "k_027___system_stores_2") == 0) {
       skipReason = "mnemonic keyboards are not yet supported on Linux (#3345)";
-    } else if (
-        strcmp(filename->str, "k_041___long_context_and_deadkeys") == 0 ||
-        strcmp(filename->str, "k_042___long_context_and_split_deadkeys") == 0) {
-      skipReason = "can't test context with deadkey";
     }
 
     if (runSurroundingTextTests) {
