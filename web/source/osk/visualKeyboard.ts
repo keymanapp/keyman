@@ -1218,7 +1218,7 @@ namespace com.keyman.osk {
         }
 
         // Cancel (but do not execute) pending key if neither a popup key or the base key
-        if((t == null) || ((t.id.indexOf('popup') < 0) && (t.id != this.popupBaseKey.id))) {
+        if(t == null || (t.id.indexOf('popup') < 0 && (t?.id != this.popupBaseKey?.id))) {
           this.highlightKey(this.keyPending,false);
           this.clearPopup();
           this.keyPending = null;
