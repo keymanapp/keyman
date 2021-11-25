@@ -41,7 +41,7 @@
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">Close</string>
 
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">Close Keyman</string>
 
     <!-- Context: Button label -->
