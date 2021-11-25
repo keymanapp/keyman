@@ -49,8 +49,8 @@ PWCHAR wcscat2(PWCHAR c1, size_t sz, const PWCHAR c2)
 	return wcschr(c1, 0);
 }
 
-#define MAX_SYSTEM_STORE 41   // I4652
-const PWCHAR StoreTokens[MAX_SYSTEM_STORE] = {   // I4652
+// TODO: consolidate with list in compiler.cpp
+const PWCHAR StoreTokens[] = {   // I4652
 	L"", 
 	SSN__PREFIX L"BITMAP", 
 	SSN__PREFIX L"COPYRIGHT",
@@ -91,8 +91,13 @@ const PWCHAR StoreTokens[MAX_SYSTEM_STORE] = {   // I4652
 	SSN__PREFIX L"KMW_EMBEDCSS",
   SSN__PREFIX L"TARGETS",   // I4504
   SSN__PREFIX L"CASEDKEYS",
+  L"", // TSS_BEGIN_NEWCONTEXT
+  L"", // TSS_BEGIN_POSTKEYSTROKE
+  SSN__PREFIX L"LAYERCHANGED",
 	NULL
 };
+
+static_assert(_countof(StoreTokens) == TSS__MAX + 2);
 
 PWCHAR storename(int num)
 {
@@ -199,13 +204,14 @@ PWCHAR ExtString(PWCHAR str)
 
 	bufpointer = !bufpointer;
 	p = buf[bufpointer]; *p = 0;
+  PWCHAR q = p;
 
 	for(; *str; str++)
 	{
 		if(*str == UC_SENTINEL)
 		{
 			str++;
-			if(inquotes) p = wcscat2(p, BUFSIZE, L"\" ");
+			if(inquotes) p = wcscat2(q, BUFSIZE, L"\" ");
 			inquotes = 0;
 			switch(*str)
 			{
@@ -221,10 +227,10 @@ PWCHAR ExtString(PWCHAR str)
 				p = wcschr(p, 0);
 				break;
 			case CODE_CONTEXT:
-				p = wcscat2(p, BUFSIZE, L"context ");
+				p = wcscat2(q, BUFSIZE, L"context ");
 				break;
 			case CODE_NUL:
-				p = wcscat2(p, BUFSIZE, L"nul ");
+				p = wcscat2(q, BUFSIZE, L"nul ");
 				break;
 			case CODE_USE:
 				str++;
@@ -232,10 +238,10 @@ PWCHAR ExtString(PWCHAR str)
 				p = wcschr(p, 0);
 				break;
 			case CODE_RETURN:
-				p = wcscat2(p, BUFSIZE, L"return ");
+				p = wcscat2(q, BUFSIZE, L"return ");
 				break;
 			case CODE_BEEP:
-				p = wcscat2(p, BUFSIZE, L"beep ");
+				p = wcscat2(q, BUFSIZE, L"beep ");
 				break;
 			case CODE_DEADKEY:
 				str++;
@@ -259,13 +265,13 @@ PWCHAR ExtString(PWCHAR str)
 				p = wcschr(p, 0);
 				break;
 			case CODE_SWITCH:
-				p = wcscat2(p, BUFSIZE, L"switch<deprecated> ");
+				p = wcscat2(q, BUFSIZE, L"switch<deprecated> ");
 				break;
 			case CODE_KEY:
-				p = wcscat2(p, BUFSIZE, L"key<deprecated> ");
+				p = wcscat2(q, BUFSIZE, L"key<deprecated> ");
 				break;
 			case CODE_CLEARCONTEXT:
-				p = wcscat2(p, BUFSIZE, L"clearcontext ");
+				p = wcscat2(q, BUFSIZE, L"clearcontext ");
 				break;
 			case CODE_CALL:
 				str++;
@@ -323,7 +329,7 @@ PWCHAR ExtString(PWCHAR str)
         break;
 
 			default:
-				p = wcscat2(p, BUFSIZE, L"unknown() ");
+				p = wcscat2(q, BUFSIZE, L"unknown() ");
 				break;
 			}
 		}
@@ -331,13 +337,13 @@ PWCHAR ExtString(PWCHAR str)
 		{
 			if(*str == L'"')
 			{
-				if(inquotes) p = wcscat2(p, BUFSIZE, L"\" ");
+				if(inquotes) p = wcscat2(q, BUFSIZE, L"\" ");
 				inquotes = 0;
-				p = wcscat2(p, BUFSIZE, L"'\"' ");
+				p = wcscat2(q, BUFSIZE, L"'\"' ");
 			}
 			else if(*str < 32)
 			{
-				if(inquotes) p = wcscat2(p, BUFSIZE, L"\" ");
+				if(inquotes) p = wcscat2(q, BUFSIZE, L"\" ");
 				inquotes = 0;
 				wsprintfW(p, L"x%x ", *str);
 				p = wcschr(p, 0);
@@ -347,7 +353,7 @@ PWCHAR ExtString(PWCHAR str)
 				if(!inquotes)
 				{
 					inquotes = 1;
-					p = wcscat2(p, BUFSIZE, L"\"");
+					p = wcscat2(q, BUFSIZE, L"\"");
 				}
 				*p++ = *str;
 				*p = 0;
@@ -355,7 +361,7 @@ PWCHAR ExtString(PWCHAR str)
 		}
 	}
 
-	if(inquotes) p = wcscat2(p, BUFSIZE, L"\" ");
+	if(inquotes) p = wcscat2(q, BUFSIZE, L"\" ");
 	return buf[bufpointer];
 }
 
@@ -393,7 +399,7 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
 
 	for(i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++)
 	{
-		if(sp->dwSystemID > 0 && (sp->dwSystemID >= MAX_SYSTEM_STORE || !StoreTokens[sp->dwSystemID][0]))   // I4652
+		if(sp->dwSystemID > 0 && (sp->dwSystemID > TSS__MAX || !StoreTokens[sp->dwSystemID][0]))   // I4652
 			wsprintfW(buf, L"c store(&%d) %s\n", sp->dwSystemID, ExtString(sp->dpString));
 		else
 			wsprintfW(buf, L"store(%s) %s\n", storename(i+1), ExtString(sp->dpString));
