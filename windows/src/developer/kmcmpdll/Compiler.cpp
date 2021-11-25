@@ -608,6 +608,12 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
       AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN L"Unicode" : DEBUGSTORE_BEGIN L"ANSI");
     }
   } else {
+    PFILE_GROUP gp = &fk->dpGroupArray[tstr[2] - 1];
+    if (!gp->fReadOnly) {
+      return BeginMode == BEGIN_NEWCONTEXT ?
+        CERR_NewContextGroupMustBeReadonly :
+        CERR_PostKeystrokeGroupMustBeReadonly;
+    }
     return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
   }
 
@@ -873,7 +879,11 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
   if (!q) return CERR_InvalidGroupLine;
 
   gp->fUsingKeys = FALSE;
-  if (IsSameToken(&p, L"using") && IsSameToken(&p, L"keys")) gp->fUsingKeys = TRUE;
+  gp->fReadOnly  = IsSameToken(&p, L"readonly");
+  if (!gp->fReadOnly) {
+    if (IsSameToken(&p, L"using") && IsSameToken(&p, L"keys"))
+      gp->fUsingKeys = TRUE;
+  }
 
   safe_wcsncpy(gp->szName, q, SZMAX_GROUPNAME);
 
@@ -1504,21 +1514,90 @@ BOOL CheckContextStatementPositions(PWSTR context) {
 /**
  * Checks if a use() statement is followed by other content in the output of a rule
  */
-DWORD CheckUseStatementsInOutput(PWSTR output) {   // I4867
-  BOOL HasUse = FALSE;
+DWORD
+CheckUseStatementsInOutput(const PFILE_GROUP gp, const PWSTR output) {  // I4867
+  BOOL hasUse = FALSE;
   PWSTR p;
   for (p = output; *p; p = incxstr(p)) {
     if (*p == UC_SENTINEL && *(p + 1) == CODE_USE) {
-      HasUse = TRUE;
-    } else if (HasUse) {
+      hasUse = TRUE;
+    } else if (hasUse) {
       AddWarning(CWARN_UseNotLastStatementInRule);
-      return FALSE;
+      break;
     }
   }
-  return TRUE;
+  return CERR_None;
 }
 
-DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
+/**
+ * Adds implicit `context` to start of output of rules for readonly groups
+ */
+DWORD
+InjectContextToReadonlyOutput(PWSTR pklOut) {
+  if (pklOut[0] != UC_SENTINEL || pklOut[1] != CODE_CONTEXT) {
+    if (wcslen(pklOut) > GLOBAL_BUFSIZE - 3) {
+      return CERR_MEMORY;
+    }
+    memmove(pklOut + 2, pklOut, (wcslen(pklOut) + 1) * 2);
+    pklOut[0] = UC_SENTINEL;
+    pklOut[1] = CODE_CONTEXT;
+  }
+  return CERR_None;
+}
+
+/**
+ * Verifies that a keyboard does not attempt to emit characters or
+ * other changes to text store when processing a readonly group
+ */
+DWORD
+CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PWSTR output) {  // I4867
+  PWSTR p;
+  for (p = output; *p; p = incxstr(p)) {
+    if (*p != UC_SENTINEL) {
+      return CERR_OutputInReadonlyGroup;
+    }
+    switch (*(p + 1)) {
+    case CODE_CALL:
+      // We cannot be sure that the callee is going to be readonly
+      // but we have to operate on a trust basis for call() in any
+      // case, so we'll allow it.
+      continue;
+    case CODE_USE:
+      // We only allow use() of other readonly groups
+      {
+        PFILE_GROUP targetGroup = &fk->dpGroupArray[*(p + 2) - 1];
+        if (!targetGroup->fReadOnly) {
+          return CERR_CannotUseReadWriteGroupFromReadonlyGroup;
+        }
+      }
+      continue;
+    case CODE_SETOPT:
+    case CODE_RESETOPT:
+    case CODE_SAVEOPT:
+      // it is okay to set, reset or save keyboard options
+      // although it's hard to see good use cases for this
+      continue;
+    case CODE_SETSYSTEMSTORE:
+      // it is okay to set system stores; Engine or Core will
+      // ignore set(&) that are not permissible in the given context
+      continue;
+    case CODE_CONTEXT:
+      // We allow `context` but only as the very first statement in output
+      if (p == output) {
+        continue;
+      }
+      return CERR_OutputInReadonlyGroup;
+    default:
+      // Note: conceptually, CODE_NUL could be transformed to CODE_CONTEXT
+      // if the context was also empty, but it is probably safest to avoid this,
+      // given CODE_CONTEXT does what we need anyway
+      return CERR_StatementNotPermittedInReadonlyGroup;
+    }
+  }
+  return CERR_None;
+}
+
+  DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
 {
   PWSTR p, pp;
   DWORD msg;
@@ -1562,7 +1641,23 @@ DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
     if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
 
     // Test that use() statements are not followed by other content
-    CheckUseStatementsInOutput(pklOut);   // I4867
+    if ((msg = CheckUseStatementsInOutput(gp, pklOut)) != CERR_None) {
+      return msg;   // I4867
+    }
+
+    if (gp->fReadOnly) {
+      // Ensure no output is made from the rule, and that
+      // use() statements meet required readonly semantics
+      if ((msg = CheckOutputIsReadonly(fk, pklOut)) != CERR_None) {
+        return msg;
+      }
+
+      // Inject `context` to start of output if group is readonly
+      // to keep the output internally consistent
+      if ((msg = InjectContextToReadonlyOutput(pklOut)) != CERR_None) {
+        return msg;
+      }
+    }
 
     kp = new FILE_KEY[gp->cxKeyArray + 1];
     if (!kp) return CERR_CannotAllocateMemory;

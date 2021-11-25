@@ -1,0 +1,7 @@
+﻿c Should fail to compile, missing group
+
+begin Unicode > use(main)
+begin NewContext > use(NewContext)
+
+group(main) using keys
+
