@@ -335,10 +335,10 @@ uint8_t
 IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject) {
   // SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");
   if (callbackObject == NULL) {
-    return 0;
+    return FALSE;
   }
   if (km_state == NULL) {
-    return 0;
+    return FALSE;
   }
   LPINTKEYBOARDINFO lpkbi = (LPINTKEYBOARDINFO)(callbackObject);
   if (!lpkbi->lpCoreKeyboard)
@@ -352,20 +352,20 @@ IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackOb
     n++;
   }
   if (n==0)
-    return 0;
+    return FALSE;
 
-  //LPIMDLLHOOK imdh = lpkbi->lpIMDLLHooks[n];
+  LPIMDLLHOOK imdh = lpkbi->lpIMDLLHooks[n];
 
-  //PKEYMAN64THREADDATA _td =   ();
-  //if (!_td)
-  //  return;
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td)
+    return FALSE;
 
-  //if (_td->TIPFUpdateable) {  // I4452
-  //  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
-  //}
+  if (_td->TIPFUpdateable) {  // I4452
+    (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
+  }
 
-  // SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
-  return 1;
+   SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
+  return TRUE;
 }
 
 
@@ -377,10 +377,8 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     return FALSE;
   if (!_td->app)
     return FALSE;
-  // Does not set the BK_BACKSPACE flag which checks for deadkey. The caller of KMSetOutput would seem the
-  // backlen takes into account deadkeys
-
-  if (!Globals::get_CoreIntegration()) {  // TODO: 5442 Remove
+ 
+  if (!Globals::get_CoreIntegration()) {  // TODO: 5442 Remove If and fix indent
     while (backlen-- > 0)
       _td->app->QueueAction(QIT_BACK, 0);
     while (*buf)
@@ -390,16 +388,41 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     if (!_td->lpActiveKeyboard->lpCoreKeyboard) {
       return FALSE;
     }
-    DWORD numActions = backlen + wcslen(buf);
+    DWORD numActions = backlen + (DWORD)wcslen(buf);
     DWORD idx = 0;
     km_kbp_action_item *actionItems = new km_kbp_action_item[numActions + 1];
 
+    // The actions sent to the core processor need to set the expected_type
+    // correctly. To do this need to check the context as we process the
+    // backspaces.
+    AppContext context;
+    _td->app->CopyContext(&context);
+
     while (backlen-- > 0) {
       actionItems[idx].type = KM_KBP_IT_BACK;
-      actionItems[idx].backspace.expected_type = 0;  // TODO this will be ignored down the chain
-      actionItems[idx].backspace.expected_value = 0;
+      WCHAR *CodeUnitPtr;
+      const int DeadKeyLength = 3;
+      const int SurrogateLength = 2;
+      const int SingleCharLength = 1;
+      if (context.CharIsDeadkey()) {
+        CodeUnitPtr = context.BufMax(DeadKeyLength);
+        CodeUnitPtr += 2;
+        actionItems[idx].backspace.expected_type  = KM_KBP_BT_MARKER;
+        actionItems[idx].backspace.expected_value = (uintptr_t)*CodeUnitPtr;
+      } else if (context.CharIsSurrogatePair()) {
+        CodeUnitPtr = context.BufMax(SurrogateLength);
+        actionItems[idx].backspace.expected_type  = KM_KBP_BT_CHAR;
+        actionItems[idx].backspace.expected_value = (DWORD)Uni_SurrogateToUTF32(*CodeUnitPtr, *(CodeUnitPtr + 1));
+      } else {
+        CodeUnitPtr = context.BufMax(SingleCharLength);
+        actionItems[idx].backspace.expected_type  = KM_KBP_BT_CHAR;
+        actionItems[idx].backspace.expected_value = (DWORD)*CodeUnitPtr;
+      }
+      context.Delete();
       idx++;
     }
+    // Need to set the app with the updated context
+    _td->app->RestoreContextOnly(&context);
     while (*buf) {
       actionItems[idx].type      = KM_KBP_IT_CHAR;
       if (Uni_IsSurrogate1(*buf) && Uni_IsSurrogate2(*(buf + 1))) {
@@ -417,7 +440,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
       delete[] actionItems;
       return FALSE;
     }
-
+    delete[] actionItems;
     return TRUE;
   }
 }
@@ -473,7 +496,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
           return FALSE;
     }
 
-    if (!ContextItemToAppContext(citems, buf)) {
+    if (!ContextItemToAppContext(citems, buf, len)) {
       km_kbp_context_items_dispose(citems);
       return FALSE;
     }

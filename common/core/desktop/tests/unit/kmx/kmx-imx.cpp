@@ -48,7 +48,7 @@ int error_args() {
 extern "C"
 {
   /**
-   * This callback will be used in place of calling out to the third party
+   * This callback will be used in place of a callback to the third party
    * library. It will then test adding to the action queue all the implemented action types.
    * KM_KBP_IT_END
    * KM_KBP_IT_CHAR
@@ -102,17 +102,13 @@ extern "C"
     km_kbp_state_queue_action_items(state, a_items);
     break;
     case 6:
-    {
-    km_kbp_action_item *a1_items = new km_kbp_action_item[3];
-    a1_items[0].type      = KM_KBP_IT_BACK;
-    a1_items[0].backspace.expected_type = KM_KBP_BT_CHAR;
-    a1_items[0].backspace.expected_value = km_kbp_usv('A');
-    a1_items[1].type      = KM_KBP_IT_CHAR;
-    a1_items[1].character = km_kbp_usv('Z');
-    a1_items[2].type   = KM_KBP_IT_END;
-    km_kbp_state_queue_action_items(state, a1_items);
-    delete[] a1_items;
-    }
+    a_items[0].type      = KM_KBP_IT_BACK;
+    a_items[0].backspace.expected_type = KM_KBP_BT_CHAR;
+    a_items[0].backspace.expected_value = km_kbp_usv('A');
+    a_items[1].type      = KM_KBP_IT_CHAR;
+    a_items[1].character = km_kbp_usv('Z');
+    a_items[2].type   = KM_KBP_IT_END;
+    km_kbp_state_queue_action_items(state, a_items);
     break;
     case 7:
     {
@@ -170,6 +166,15 @@ void test_imx_list(const km::kbp::path &source_path){
 
 }
 
+// This tests both the registering callbacks and queuing actions.
+// The sequence for this test will be to load a keyboard and register
+// a callback - `test_imx_callback`.
+// Then it will call `km_kbp_process_event` with a `key` that will cause
+// the callback to be called. The callback will then use
+// `km_kbp_state_queue_action_items` to queue action times so that
+// the kmx processor will add this items to its action queue.
+// Finally when the `process_event` call returns we verify the action
+// queue is as expected.
 void test_queue_actions (const km::kbp::path &source_path) {
 
   km_kbp_keyboard * test_kb = nullptr;
@@ -189,7 +194,7 @@ void test_queue_actions (const km::kbp::path &source_path) {
 
   // Key Press that doesn't trigger a call back
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,KM_KBP_MODIFIER_SHIFT, 1));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('P')}}, {KM_KBP_IT_END}}));
+  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('S')}}, {KM_KBP_IT_END}}));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('X')}}, {KM_KBP_IT_ALERT, {0,}, {0}}, {KM_KBP_IT_END}}));
