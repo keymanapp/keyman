@@ -26,7 +26,8 @@
 @implementation KMKeyboardInfo
 
 - (instancetype)initWithName:(NSString*)name
-              identifier:(NSString*)identifier
+                  identifier:(NSString*)identifier
+                  version:(NSString*)version
                       oskFont:(NSString*)oskFont
                  displayFont:(NSString*)displayFont
                    languages:(NSArray*)languages
@@ -35,6 +36,7 @@
     if (self) {
         _name = [name copy];
         _identifier = [identifier copy];
+        _version = [version copy];
         _oskFont = [oskFont copy];
         _displayFont = [displayFont copy];
         _languages = [languages copy];

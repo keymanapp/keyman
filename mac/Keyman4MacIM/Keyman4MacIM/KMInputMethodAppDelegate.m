@@ -619,7 +619,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     packageInfo = [self loadPackageInfoFromJsonFile:jsonFilename];
     
     // TODO: remove test
-    packageInfo = nil;
+    //packageInfo = nil;
     
     if (packageInfo != nil) {
         /*
@@ -640,7 +640,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 
-// TODO: SGS, create JSON version
 - (NSString *)packageNameFromJsonFile:(NSString *)packageFolder {
     NSLog(@"SGS2021 load packageNameFromJsonFile");
     NSString *packageName = nil;
@@ -659,6 +658,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
     return packageName;
 }
+
 - (NSString *)packageNameFromInfFile:(NSString *)packageFolder {
     NSLog(@"SGS2021 load packageNameFromInfFile");
     NSString *packageName = nil;
@@ -702,7 +702,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return kbNames;
 }
 
-// returns nil if the file does not exist or it cannot be parsed as JSON
+/*
+ read JSON file and load it into KMPackageInfo object
+ returns nil if the file does not exist or it cannot be parsed as JSON
+ */
 - (KMPackageInfo *) loadPackageInfoFromJsonFile:(NSString *)path {
     KMPackageInfo * packageInfo = nil;
     
@@ -729,23 +732,67 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (KMPackageInfo *) createPackageInfoFromJsonData:(NSDictionary *) jsonData {
+    
+    NSMutableArray *keyboardInfoArray = [NSMutableArray arrayWithCapacity:0];
+    NSMutableArray *fontArray = [NSMutableArray arrayWithCapacity:0];
+    NSArray *keyboards = jsonData[@"keyboards"];
+
+    // loop through keyboards array and add keyboards, and loop through each keyboard's languages array to add languages
+    for (NSDictionary *keyboard in keyboards) {
+        NSArray *languages = keyboard[@"languages"];
+        NSMutableArray *languageInfoArray = [NSMutableArray arrayWithCapacity:0];
+
+        for (NSDictionary *language in languages) {
+            KMLanguageInfo *languageInfo = [[KMLanguageInfo alloc] initWithName:language[@"name"]
+                              identifier:language[@"id"]];
+
+            [languageInfoArray addObject:languageInfo];
+        }
+
+        NSString * oskFont = keyboard[@"oskFont"];
+        if (oskFont && [oskFont length]) {
+            [fontArray addObject:oskFont];
+        }
+        NSString * displayFont = keyboard[@"displayFont"];
+        if (displayFont && [displayFont length] && ![displayFont isEqualToString:oskFont]) {
+            [fontArray addObject:displayFont];
+        }
+
+        KMKeyboardInfo *keyboardInfo = [[KMKeyboardInfo alloc] initWithName:keyboard[@"name"]
+                                                                 identifier:keyboard[@"id"]
+                                                                 version:keyboard[@"version"]
+                                                                oskFont:keyboard[@"oskFont"]
+                                                                displayFont:keyboard[@"displayFont"]
+                                                                  languages:[languageInfoArray copy]];
+
+        [keyboardInfoArray addObject:keyboardInfo];
+        
+    }
+
     KMPackageInfo *packageInfo = [[KMPackageInfo alloc] initWithName:jsonData[@"info"][@"name"][@"description"]
                                                       packageVersion:jsonData[@"info"][@"version"][@"description"]
-                                                              readMe:jsonData[@"options"][@"readmeFile"]
+                                                          readmeFilename:jsonData[@"options"][@"readmeFile"]
+                                                          graphicFilename:jsonData[@"options"][@"graphicFile"]
                                                          fileVersion:jsonData[@"system"][@"fileVersion"]
                                               keymanDeveloperVersion:jsonData[@"system"][@"keymanDeveloperVersion"]
                                                            copyright:jsonData[@"info"][@"copyright"][@"description"]
                                                           authorName:jsonData[@"info"][@"author"][@"description"]
                                                            authorUrl:jsonData[@"info"][@"author"][@"url"]
                                                              website:jsonData[@"info"][@"website"][@"url"]
-                                                           keyboards:nil
+                                                           keyboards:[keyboardInfoArray copy]
+                                                           fonts:[fontArray copy]
                                                            files:nil];
+    NSLog(@"SGS2021 packageInfo created from JSON:");
+    packageInfo.debugReport;
     return packageInfo;
 }
 
 
-// returns nil if the file does not exist or it cannot be parsed
-// adapted from method keyboardInfoFromInfFile that loaded data from inf file to NSDictionary
+/*
+ read inf file and load it into KMPackageInfo object
+ returns nil if the file does not exist or it cannot be parsed
+ adapted from legacy method keyboardInfoFromInfFile that loaded data from inf file to NSDictionary
+ */
 - (KMPackageInfo *) loadPackageInfoFromInfFile:(NSString *)path {
     KMPackageInfo * packageInfo = nil;
     
@@ -754,7 +801,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     
     NSString* packageName;
     NSString* packageVersion;
-    NSString* readMe;
+    NSString* readmeFilename;
     NSString* graphicFile;
     NSString* fileVersion;
     NSString* keymanDeveloperVersion;
@@ -764,7 +811,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSString* website;
     
     NSMutableArray *files = [NSMutableArray arrayWithCapacity:0];
-    //NSMutableArray *fonts = [NSMutableArray arrayWithCapacity:0];
     NSMutableArray *keyboards = [NSMutableArray arrayWithCapacity:0];
 
     @try {
@@ -803,7 +849,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             switch (contentType) {
                 case ctPackage: {
                     if ([line startsWith:kReadMeFile])
-                        readMe = [line substringFromIndex:kReadMeFile.length+1];
+                        readmeFilename = [line substringFromIndex:kReadMeFile.length+1];
                     else if ([line startsWith:kGraphicFile])
                         graphicFile = [line substringFromIndex:kGraphicFile.length+1];
                     
@@ -849,6 +895,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         authorName = v1;
+                        authorUrl = v2;
                     }
                     else if ([line startsWith:kCopyright]) {
                         NSLog(@"SGS2021 line of inf file: %@", line);
@@ -856,7 +903,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        authorUrl = v1;
+                        copyright = v1;
                     }
                     else if ([line startsWith:kWebSite]) {
                         NSLog(@"SGS2021 line of inf file: %@", line);
@@ -895,7 +942,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         NSString *keyboardName = [[[vs objectAtIndex:0] substringFromIndex:kKeyboard.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *keyboardFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         KMKeyboardInfo * keyboardInfo = [[KMKeyboardInfo alloc] initWithName:keyboardName
-                            identifier:nil
+                                                                                  identifier:nil
+                                                                                  version:nil
                             oskFont:nil
                         displayFont:nil
                         languages:nil];
@@ -913,26 +961,19 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         NSLog(@"Error = %@", e.description);
         return nil;
     }
-/*
-    if (files.count)
-        [infoDict setValue:files forKey:kFile];
-    if (fonts.count)
-        [infoDict setValue:fonts forKey:kFont];
-    if (kbs.count)
-        [infoDict setValue:kbs forKey:kKeyboard];
-    return infoDict.count?[NSDictionary dictionaryWithDictionary:infoDict]:nil;
- */
 
     packageInfo = [[KMPackageInfo alloc] initWithName:packageName
                                                       packageVersion:packageVersion
-                                                              readMe:readMe
-                                                         fileVersion:fileVersion
+                                                    readmeFilename:readmeFilename
+                                                    graphicFilename:graphicFile
+                                                    fileVersion:fileVersion
                                               keymanDeveloperVersion:keymanDeveloperVersion
                                                            copyright:copyright
                                                           authorName:authorName
                                                            authorUrl:authorUrl
                                                              website:website
-                                                           keyboards:keyboards
+                                                        keyboards:keyboards
+                                                            fonts:nil
                                                            files:files];
     return packageInfo;
 }

@@ -13,7 +13,7 @@
 
 @interface KMKeyboardHelpWindowController ()
 @property (nonatomic, weak) IBOutlet WebView *welcomeView;
-@property (nonatomic, strong) NSDictionary *keyboardInfo;
+@property (nonatomic, strong) KMPackageInfo *packageInfo;
 @end
 
 @implementation KMKeyboardHelpWindowController
@@ -31,10 +31,10 @@
 
 - (void)setPackagePath:(NSString *)packagePath {
     _packagePath = packagePath;
-    _keyboardInfo = nil;
+    _packageInfo = nil;
     if (packagePath != nil && packagePath.length) {
         @try {
-            NSString *title = [[self.keyboardInfo objectForKey:kName] objectAtIndex:0];
+            NSString *title = self.packageInfo.packageName;
             if (title.length)
                 [self.window setTitle:title];
         }
@@ -50,19 +50,31 @@
     }
 }
 
-- (NSDictionary *)keyboardInfo {
+- (KMPackageInfo*)packageInfo {
+    if(_packageInfo == nil) {
+        _packageInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
+        
+        NSLog(@"SGS2021 packageInfo.packageName = %@", _packageInfo.packageName);
+        NSLog(@"SGS2021 packageInfo.packageVersion = %@", _packageInfo.packageVersion);
+        NSLog(@"SGS2021 packageInfo.authorName = %@", _packageInfo.authorName);
+        NSLog(@"SGS2021 packageInfo.authorUrl = %@", _packageInfo.authorUrl);
+        NSLog(@"SGS2021 packageInfo.copyright = %@", _packageInfo.copyright);
+        NSLog(@"SGS2021 packageInfo.readmeFilename = %@", _packageInfo.readmeFilename);
+
+    }
+
+    /*
     if(_keyboardInfo == nil) {
         KMPackageInfo *packageInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
     
         NSMutableDictionary *infoDict = [NSMutableDictionary dictionaryWithCapacity:0];
         [infoDict setObject:@[packageInfo.packageName, @""] forKey:@"Name"];
-        [infoDict setObject:packageInfo.readMe forKey:@"ReadMeFile"];
+        [infoDict setObject:packageInfo.readmeFilename forKey:@"ReadMeFile"];
 
         _keyboardInfo = infoDict;
-//        _keyboardInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
+        _keyboardInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
     }
 
-    /*
     if (_keyboardInfo == nil) {
         NSString *jsonFilename = [self.packagePath stringByAppendingPathComponent:@"kmp.json"];
         NSLog(@"SGS2021 KMKeyboardHelpWindowController loading keyboard info from json file: %@", jsonFilename);
@@ -80,7 +92,7 @@
     }
     */
     
-    return _keyboardInfo;
+    return _packageInfo;
 }
 
 - (IBAction)okAction:(id)sender {

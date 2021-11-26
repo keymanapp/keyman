@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface KMPackageInfo : NSObject
 @property (nonatomic,readonly) NSString* packageName;
 @property (nonatomic,readonly) NSString* packageVersion;
-@property (nonatomic,readonly) NSString* readMe;
+@property (nonatomic,readonly) NSString* readmeFilename;
+@property (nonatomic,readonly) NSString* graphicFilename;
 @property (nonatomic,readonly) NSString* fileVersion;
 @property (nonatomic,readonly) NSString* keymanDeveloperVersion;
 @property (nonatomic,readonly) NSString* copyright;
@@ -22,10 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,readonly) NSString* website;
 @property (nonatomic,readonly) NSDictionary* keyboards;
 @property (nonatomic,readonly) NSArray* files;
+@property (nonatomic,readonly) NSArray* fonts;
 
 - (instancetype)initWithName:(NSString*)packageName
               packageVersion:(NSString*)packageVersion
-                      readMe:(NSString*)readMe
+              readmeFilename:(NSString*)readmeFilename
+             graphicFilename:(NSString*)graphicFilename
                      fileVersion:(NSString*)fileVersion
       keymanDeveloperVersion:(NSString*)keymanDeveloperVersion
                    copyright:(NSString*)copyright
@@ -33,7 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
                   authorUrl:(NSString*)authorUrl
                      website:(NSString*)website
                    keyboards:(NSDictionary*)keyboards
-                   files:(NSArray*)files;
+                       fonts:(NSArray*)fonts
+                       files:(NSArray*)files;
+- (void)debugReport;
 @end
 
 NS_ASSUME_NONNULL_END

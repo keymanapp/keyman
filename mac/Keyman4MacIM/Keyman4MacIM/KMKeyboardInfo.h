@@ -21,12 +21,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface KMKeyboardInfo : NSObject
 @property (nonatomic,readonly) NSString* name;
 @property (nonatomic,readonly) NSString* identifier;
+@property (nonatomic,readonly) NSString* version;
 @property (nonatomic,readonly) NSString* oskFont;
 @property (nonatomic,readonly) NSString* displayFont;
 @property (nonatomic,readonly) NSArray* languages;
 
 - (instancetype)initWithName:(NSString*)name
-              identifier:(NSString*)identifier
+                  identifier:(NSString*)identifier
+                     version:(NSString*)version
                       oskFont:(NSString*)oskFont
                  displayFont:(NSString*)displayFont
                    languages:(NSArray*)languages;
