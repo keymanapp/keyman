@@ -52,3 +52,10 @@ releasedeb: reconf origdist cow debnocow # it will prompt for sudo if required f
 nightlydist: reconf sources
 	echo "Built nightly source release in dist/"
 
+check:
+	cd keyman-config && ./run-tests.sh
+
+tmpcheck:
+	cd keyman-config && ./run-tests.sh
+
+tests: check
