@@ -57,6 +57,14 @@ namespace kbp
     bool
     kmx_processor::queue_action(km_kbp_action_item const* action_item) override;
 
+     /**
+     *
+     * @param  action_items  action item list to be added to the keyboard processors queue
+     * @return bool - true if action list has been successfully processed
+     */
+    bool
+    kmx_processor::get_intermediate_context() const  override;
+
     km_kbp_keyboard_key * get_key_list() const override;
 
     km_kbp_keyboard_imx * get_imx_list() const override;

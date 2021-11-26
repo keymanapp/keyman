@@ -913,6 +913,26 @@ KMN_API
 km_kbp_context *
 km_kbp_state_context(km_kbp_state *state);
 
+
+/*
+```
+### `kbp_state_get_intermediate_context`
+##### Description:
+Get access to the state object's intermediate context.
+That is the context as it is with the keyboardprocessor
+part way through processing a key stroke.
+##### Return:
+A pointer to an context object. This pointer is valid for the lifetime
+of the state object. If null is passed in, then null is returned.
+##### Parameters:
+- __state__: A pointer to the opaque state object to be queried.
+
+```c
+*/
+KMN_API
+km_kbp_status
+kbp_state_get_intermediate_context(km_kbp_state *state, km_kbp_context_item **context_items);
+
 /*
 ```
 ### `km_kbp_state_action_items`
