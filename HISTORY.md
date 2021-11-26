@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.156 alpha 2021-11-26
+
+* fix(windows): fix loadkeyboardoptions core memory error (#5959)
+
 ## 15.0.155 alpha 2021-11-24
 
 * fix(web): reset scroll anchor on touchend (#5919)
