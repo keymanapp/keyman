@@ -211,28 +211,25 @@ namespace com.keyman.text {
       }
     }
 
-    processNewContextEvent(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
-      if(!this.activeKeyboard) {
-        return null;
-      }
-      let keyEvent = new KeyEvent();
+    constructNullKeyEvent(device: utils.DeviceSpec): KeyEvent {
+      const keyEvent = new KeyEvent();
       keyEvent.Lcode = 0;
       keyEvent.kName = '';
       keyEvent.device = device;
       this.setSyntheticEventDefaults(keyEvent);
-      return this.keyboardInterface.processNewContextEvent(outputTarget, keyEvent);
+      return keyEvent;
+    }
+
+    processNewContextEvent(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+      return this.activeKeyboard ?
+        this.keyboardInterface.processNewContextEvent(outputTarget, this.constructNullKeyEvent(device)) :
+        null;
     }
 
     processPostKeystroke(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
-      if(!this.activeKeyboard) {
-        return null;
-      }
-      let keyEvent = new KeyEvent();
-      keyEvent.Lcode = 0;
-      keyEvent.kName = '';
-      keyEvent.device = device;
-      this.setSyntheticEventDefaults(keyEvent);
-      return this.keyboardInterface.processPostKeystroke(outputTarget, keyEvent);
+      return this.activeKeyboard ?
+        this.keyboardInterface.processPostKeystroke(outputTarget, this.constructNullKeyEvent(device)) :
+        null;
     }
 
     processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
