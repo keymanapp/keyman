@@ -1,5 +1,5 @@
-﻿c start_of_sentence_3621 generated from template at 2021-11-22 15:39:24
-c with name "start_of_sentence_3621"
+﻿c This keyboard provides a reasonably complete example of
+c start-of-sentence detection, for use in testing #3621.
 store(&VERSION) '10.0'
 store(&NAME) 'start_of_sentence_3621'
 store(&COPYRIGHT) '©'
@@ -12,29 +12,38 @@ begin Unicode > use(main)
 begin NewContext > use(NewContext)
 begin PostKeystroke > use(PostKeystroke)
 
-group(NewContext)
+group(NewContext) readonly
+    c Any time we get a new context, by mouse click, tap,
+    c cursor movement, new document, etc, we'll try and
+    c determine the best layer to use
     nomatch > use(nextLayer)
 
-group(PostKeystroke)
+group(PostKeystroke) readonly
 
 store(caps) 'A'..'Z'
 store(digit) '0'..'9'
 
-    c until we get a 'CAPS' layer, stay on CAPS if 2+ chrs in caps
+    c this is a heuristic that we can use until we support a CAPS layer (#3620):
+    c if we find two+ characters in capitals, leave us in shift layer,
+    c assuming the user hasn't just switched layer themselves. Once we have a
+    c proper CAPS layer, we'll get rid of this.
     if(&layerChanged = "0") any(caps) any(caps) > context
 
     c stay on the numeric layer if we are there already
     if(&layerChanged = "0") if(&layer = 'numeric') any(digit) > context
 
-    c no other changes, so detect sentence or layer change
+    c no other changes, so detect sentence or layer change, as long
+    c as the user hasn't attempted to change layer themselves
     if(&layerChanged = "0") > use(nextLayer)
 
-group(nextLayer)
+group(nextLayer) readonly
 
     store(sentencePunctuation) '.?!'
     nul > layer('shift')
-    any(sentencePunctuation) ' ' > context layer('shift')
-    any(sentencePunctuation) '  ' > context layer('shift')
+    c note that 'readonly' layers do not need to use 'context' unless there is
+    c no other content on output of rule (empty output is illegal)
+    any(sentencePunctuation) ' ' > layer('shift')
+    any(sentencePunctuation) '  ' > layer('shift')
     nomatch > layer('default')
 
 group(main) using keys
