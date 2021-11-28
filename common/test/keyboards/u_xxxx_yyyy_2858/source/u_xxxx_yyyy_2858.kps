@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package>
   <System>
-    <KeymanDeveloperVersion>15.0.114.0</KeymanDeveloperVersion>
+    <KeymanDeveloperVersion>15.0.146.0</KeymanDeveloperVersion>
     <FileVersion>7.0</FileVersion>
   </System>
   <Options>
@@ -52,13 +52,29 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.htm</FileType>
     </File>
+    <File>
+      <Name>NotoSansOldItalic-Regular.ttf</Name>
+      <Description>Font Noto Sans Old Italic Regular</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ttf</FileType>
+    </File>
+    <File>
+      <Name>OFL.txt</Name>
+      <Description>File OFL.txt</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.txt</FileType>
+    </File>
   </Files>
   <Keyboards>
     <Keyboard>
       <Name>U_xxxx_yyyy_2858</Name>
       <ID>u_xxxx_yyyy_2858</ID>
       <Version>1.0</Version>
-      <Languages/>
+      <OSKFont>NotoSansOldItalic-Regular.ttf</OSKFont>
+      <DisplayFont>NotoSansOldItalic-Regular.ttf</DisplayFont>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
     </Keyboard>
   </Keyboards>
   <Strings/>

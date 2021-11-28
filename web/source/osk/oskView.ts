@@ -79,7 +79,6 @@ namespace com.keyman.osk {
     private _displayIfActive: boolean = true;
 
     private _animatedHideTimeout: number;
-    private _animatedHideResolver: () => void;
 
     constructor(deviceSpec: com.keyman.utils.DeviceSpec, hostDevice?: com.keyman.utils.DeviceSpec) {
       this.device = deviceSpec;
@@ -841,13 +840,47 @@ namespace com.keyman.osk {
      * @returns A Promise denoting either cancellation of the hide (`false`) or
      * completion of the hide & its animation (`true`)
      */
+
     protected useHideAnimation(): Promise<boolean> {
       const os = this._Box.style;
       const _this = this;
-      const promise = new Promise<void>(function(resolve) {
-        os.transition='opacity 0.5s linear 0';
 
-        _this._animatedHideResolver = resolve;
+      return new Promise<boolean>(function(resolve) {
+        const cleanup = function() {
+          // TODO(lowpri): attach event listeners on create and leave them there
+          _this._Box.removeEventListener('transitionend', cleanup, false);
+          _this._Box.removeEventListener('webkitTransitionEnd', cleanup, false);
+          _this._Box.removeEventListener('transitioncancel', cleanup, false);
+          _this._Box.removeEventListener('webkitTransitionCancel', cleanup, false);
+          if(_this._animatedHideTimeout != 0) {
+            window.clearTimeout(_this._animatedHideTimeout);
+          }
+          _this._animatedHideTimeout = 0;
+
+          if(_this._Visible && _this.activationConditionsMet) {
+            // Leave opacity alone and clear transition if another element activated
+            os.transition='';
+            os.opacity='1';
+            resolve(false);
+            return false;
+          } else {
+            resolve(true);
+            return true;
+          }
+        }, startup = function() {
+          _this._Box.removeEventListener('transitionrun', startup, false);
+          _this._Box.removeEventListener('webkitTransitionRun', startup, false);
+          _this._Box.addEventListener('transitionend', cleanup, false);
+          _this._Box.addEventListener('webkitTransitionEnd', cleanup, false);
+          _this._Box.addEventListener('transitioncancel', cleanup, false);
+          _this._Box.addEventListener('webkitTransitionCancel', cleanup, false);
+        };
+
+        _this._Box.addEventListener('transitionrun', startup, false);
+        _this._Box.addEventListener('webkitTransitionRun', startup, false);
+
+        os.transition='opacity 0.5s linear 0';
+        os.opacity='0';
 
         // Cannot hide the OSK smoothly using a transitioned drop, since for
         // position:fixed elements transitioning is incompatible with translate3d(),
@@ -855,45 +888,8 @@ namespace com.keyman.osk {
         // Opacity can be transitioned and is probably the simplest alternative.
         // We must condition on osk._Visible in case focus has since been moved to another
         // input (in which case osk._Visible will be non-zero)
-        _this._animatedHideTimeout = window.setTimeout(function(this: AnchoredOSKView) {
-          if(_this._animatedHideResolver) {
-            _this._animatedHideResolver();
-          }
-
-          _this._animatedHideTimeout = 0;
-          _this._animatedHideResolver = null;
-        }.bind(_this), 200); // Wait a bit before starting, to allow for moving to another element
-      });
-
-      return promise.then(function() {
-        // Repro for passing this condition:
-        // 1.  Touch an input element of the page
-        // 2.  Within a second (before the focusing timer expires), touch the base page.
-        //     See domEventHandlers.ts, `focusTimer` / `setFocusTimer`.
-        // 3.  After the timer expires, touch the base page again.
-        if(_this._Visible && _this.activationConditionsMet) {
-          // Leave opacity alone and clear transition if another element activated
-          os.transition='';
-          return false;
-        } else {
-          // Set opacity to zero, should decrease smoothly.  Starts the actual animation.
-          os.opacity='0';
-
-          // Listen for the animation's end.
-          return new Promise<void>(function(resolve) {
-            _this._animatedHideResolver = resolve;
-            // Actually hide the OSK at the end of the transition
-            _this._Box.addEventListener('transitionend', _this._animatedHideResolver, false);
-            _this._Box.addEventListener('webkitTransitionEnd', _this._animatedHideResolver, false);
-          }).then(function() {
-            // Remove the promise's resolver method from future handling.
-            _this._Box.removeEventListener('transitionend', _this._animatedHideResolver, false);
-            _this._Box.removeEventListener('webkitTransitionEnd', _this._animatedHideResolver, false);
-
-            // The hide animation is considered complete now.
-            return true;
-          });
-        }
+        _this._animatedHideTimeout = window.setTimeout(cleanup,
+          200); // Wait a bit before starting, to allow for moving to another element
       });
     }
 
@@ -914,21 +910,14 @@ namespace com.keyman.osk {
       // Was an animated hide waiting to start?  Just cancel it.
       if(this._animatedHideTimeout) {
         window.clearTimeout(this._animatedHideTimeout);
-        this._animatedHideResolver = null;
         this._animatedHideTimeout = 0;
       }
 
       // Was an animated hide already in progress?  If so, just trigger it early.
-      if(this._animatedHideResolver) {
-        this._animatedHideResolver();  // also triggers finalizeHide().
-        this._animatedHideResolver = null;
-      } else {
-        const os = this._Box.style;
-        os.transition='';
-        os.opacity='0';
-
-        this.finalizeHide();
-      }
+      const os = this._Box.style;
+      os.transition='';
+      os.opacity='0';
+      this.finalizeHide();
     }
 
     ['shutdown']() {

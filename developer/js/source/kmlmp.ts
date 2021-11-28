@@ -40,7 +40,13 @@ let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString);
 // Build the .kmp package file
 //
 
-kmpCompiler.buildKmpFile(kmpJsonData, outputFilename);
+let promise = kmpCompiler.buildKmpFile(kmpJsonData);
+promise.then(data => {
+  fs.writeFileSync(outputFilename, data, 'binary');
+}).catch(error => {
+  // Consumer decides how to handle errors
+  console.error('Failed to write kmp file');
+});
 
 function exitDueToUsageError(message: string): never  {
   console.error(`${program._name}: ${message}`);

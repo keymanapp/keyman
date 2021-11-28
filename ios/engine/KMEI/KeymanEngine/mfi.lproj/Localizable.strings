@@ -1,0 +1,254 @@
+/* A descriptive message used for errors when the app is already busy downloading */
+"alert-download-error-busy" = "Aŋkwa ŋane a tsukwane.";
+
+/* A descriptive message used when a download fails */
+"alert-download-error-detail" = "Aŋkwa kuskure a magave am sarta tsukwane mtu femhe.";
+
+/* Title for a "download failed" alert */
+"alert-download-error-title" = "Kuskure tsukwanahe";
+
+/* Title for a general alert about errors */
+"alert-error-title" = "Kuskure";
+
+/* A descriptive message used when no internet connection is detected */
+"alert-no-connection-detail" = "Magavka shanahe Keyman server.  Tazlaŋa ká naba gwada adaliya.";
+
+/* Title for a "no connection" alert */
+"alert-no-connection-title" = "Kuskure Connection";
+
+/* Short text for a 'back' navigational command.  Used to return to the previous screen */
+"command-back" = "Fitsanahe aliye";
+
+/* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
+"command-cancel" = "Tsanahe";
+
+/* Short text for a 'done' command.  Used to back out of settings menus after changes have been made */
+"command-done" = "Zlawzle";
+
+/* Short text for an 'install' command.  Used to confirm installation of a package. */
+"command-install" = "Femfe";
+
+/* Short text for a 'next' navigational command.  Used to advance to the next screen */
+"command-next" = "Dem katafke";
+
+/* Short text for an 'OK' command.  Used for some error alerts */
+"command-ok" = "Bastuwa";
+
+/* Short text for confirmining 'uninstall' commands. */
+"command-uninstall" = "Tiɗase";
+
+/* Text for the command to uninstall a keyboard */
+"command-uninstall-keyboard" = "Tiɗase keyboard";
+
+/* Confirmation text to display before uninstalling a keyboard */
+"command-uninstall-keyboard-confirm" = "Ká kátáhe tiɗase una gé keyboard?";
+
+/* Text for the command to uninstall a lexical model */
+"command-uninstall-lexical-model" = "Tiɗase-tiɗe dictionary";
+
+/* Confirmation text to display before uninstalling a lexical model */
+"command-uninstall-lexical-model-confirm" = "Ká kátáhe tiɗase una gé dictionary?";
+
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Ɓáaka a magave load keyboard ŋanna a ɗatsava na";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Ɓáaka a magave load dictionary ŋanna a ɗatsava na";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file" = "File na a kátáva ŋanna shavantika.";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file-critical" = "Mandala file ŋanna a kátáva na shavantika.  Tazlaŋa gwadana-gwada femhe app ŋanna adaliya.";
+
+/* Text for errors in data received from search queries */
+"error-query-decoding" = "Server ŋanna ɓáaka a ga slera kalkale aɗaba damuwa technical";
+
+/* A descriptive message used when a download fails */
+"error-query-general" = "Kuskure ɗamalahe kalkale an server";
+
+/* Text for error when a search query is unexpectedly empty */
+"error-query-no-data" = "Kwalla-kwale server ŋanna maga slera";
+
+/* Text for general errors where not much information is known */
+"error-unknown" = "Aŋkwa jare kuskure ba kwal dzama jarane";
+
+/* Text for error when updating a resource:  cannot download because no source is available */
+"error-update-no-link" = "Ɓáaka duksá aɗaba updates gé naza una gé pakeji";
+
+/* Text for error when updating a resource:  Keyman does not know how to update the resource */
+"error-update-not-managed" = "A tá magavka update nazahu ɓáaka am kazlaŋaha nijiniya Keyman";
+
+/* Text for the command to open the help page of a keyboard, as shown on resource information views */
+"info-command-help-keyboard" = "Mla Keyboard";
+
+/* Text for the command to open the help page of a lexical model, as shown on resource information views */
+"info-command-help-lexical-model" = "Mla Dictionary";
+
+/* Text label for displaying a keyboard's version, as shown on resource information views */
+"info-label-version-keyboard" = "Keyboard version";
+
+/* Text label for displaying a lexical model's version, as shown on resource information views */
+"info-label-version-lexical-model" = "Version Dictionary";
+
+/* Label used for the "package info" / readme tab with the package installation prompt on phones. */
+"installer-label-package-info" = "Labare pakeji";
+
+/* Label used for the language-selection tab with the package installation prompt on phones. */
+"installer-label-select-languages" = "Ksa Nare (ha)";
+
+/* Label used with a package's version, as seen within the package installation prompt.  Example:  "Version: 14.0.0" */
+"installer-label-version" = "Version: %@";
+
+/* Section header for languages supported by a package, as seen within the package installation prompt */
+"installer-section-available-languages" = "Naraha na aŋkwa na";
+
+/* Text for the help popup for changing keyboards with the globe key */
+"keyboard-help-change" = "Piyana-piya mátána gé mbeɗa keyboard";
+
+/* Text for the command to exit the Keyman keyboard in favor of other keyboards installed on the system */
+"keyboard-menu-exit" = "Hiɗante %@";
+
+/* Error installing a Keyman package - could not allocate a location to install it */
+"kmp-error-file-system" = "Kuskure femhe pakeji- kuskure file-system";
+
+/* Error installing a Keyman package - could not copy package files */
+"kmp-error-file-copying" = "Kuskure femhe pakeji - a magavka burha files na a kátáva ŋanna";
+
+/* Error opening a Keyman package - package is not valid */
+"kmp-error-invalid" = "File pakeji ŋanna shanasha virus.";
+
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "Pakej ŋanna a kátáva na ɓáaka.";
+
+/* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
+"kmp-error-missing-resource" = "Una gé pakeji ɓáaka jiba keyboard ŋanna a kátáva ŋanna mtu dictionary.";
+
+/* Error opening a Keyman package - cannot parse contents */
+"kmp-error-no-metadata" = "Una gé pakeji ndza kaɓa shagera- diyakande duksáhá ŋanna amikwa.";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "Una gé pakej a tá magaka slera kalkale at nawuraŋa ŋanna.";
+
+/* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
+"kmp-error-wrong-type" = "Una gé pakeji ɓáaka jiba duksáhá ŋanna a kátáva amikwa.";
+
+/* Title for the Installed Languages menu */
+"menu-installed-languages-title" = "Naraha na an fa amikwa";
+
+/* Section header for lexical models within a language-specific settings menu */
+"menu-langsettings-label-lexical-models" = "Dictionaries";
+
+/* Section header for keyboards within a language-specific settings menu */
+"menu-langsettings-section-keyboards" = "Keyboards";
+
+/* Section header for the settings toggles within a language-specific settings menu */
+"menu-langsettings-section-settings" = "Saitine Nare";
+
+/* Title for the language-specific settings menus */
+"menu-langsettings-title" = "%@ Saitin";
+
+/* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-correct" = "Magave kaɓa kuskure";
+
+/* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-predict" = "Magave predictions";
+
+/* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-message" = "Ká kátáhe femhe una gé dictionary?";
+
+/* Title for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-title" = "%1$@: %2$@";
+
+/* Text for an info alert indicating that no lexical models are available */
+"menu-lexical-model-none-message" = "Ɓáaka dictionaries amikwa";
+
+/* Title for the lexical model menu, a submenu of the language-specific settings menus */
+"menu-lexical-model-title" = "%@ Dictionaries";
+
+/* Title for the keyboard picker */
+"menu-picker-title" = "Keyboards";
+
+/* Primary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report" = "Ɓilana-ɓila basha kuskure";
+
+/* Secondary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report-description" = "Anaba kátá \"shante magaviré\"";
+
+/* Primary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file" = "Femhe a sawam File";
+
+/* Secondary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file-description" = "Browse gé .kmp files";
+
+/* Primary text for the Settings menu option that displays the iOS system menu options for the app's keyboard */
+"menu-settings-system-keyboard-menu" = "System Keyboard Saitin";
+
+/* Label for the "Show Banner" toggle on the main settings screen */
+"menu-settings-show-banner" = "Mara Banner";
+
+/* Label for the "Get Started" automatic display toggle seen in the Settings menu */
+"menu-settings-startup-get-started" = "Mara 'Mátá Fantu' am tátá fantuhe";
+
+/* Title for the main Settings menu */
+"menu-settings-title" = "Saitine Keyman";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Ɓáaka mara caption at spacebar";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Mara zhera keyboard at spacebar";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Mara zhera nare at spacebar";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Mara nare antara zhera keyboard at spacebar";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Spacebar Caption";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Spacebar Caption";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Blank";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Keyboard";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Nare";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Nare antara Keyboard";
+
+/* Short text for notification:  download failure for keyboard */
+"notification-download-failure-keyboard" = "Kwalla-kwale Keyboard tsukwa";
+
+/* Short text for notification:  download failure for lexical model */
+"notification-download-failure-lexical-model" = "Kwalla-kwale Dictionary tsukwa";
+
+/* Short text for notification:  download success for keyboard */
+"notification-download-success-keyboard" = "Tsukwafana-tsukwa Keyboard ŋanna ba kalkale";
+
+/* Short text for notification:  download success for lexical model */
+"notification-download-success-lexical-model" = "Tsukwafana-tsukwa Lexical model ŋanna ba kalkale";
+
+/* Short text for notification:  downloading a keyboard */
+"notification-downloading-keyboard" = "Tsukwanahe keyboard\U2026";
+
+/* Short text for notification:  downloading a lexical model */
+"notification-downloading-lexical-model" = "Tsukwanahe dictionary\U2026";
+
+/* Short text for notification:  an update is available */
+"notification-update-available" = "Update na aŋkwa ŋanna";
+
+/* Short text for notification:  currently updating */
+"notification-update-processing" = "Updating\U2026";
+
+/* Text indicating success at installing new keyboards or dictionaries */
+"success-install" = "An fa ba kalkale.";
+
+/* A title to use in alerts indicating 'success' at whatever task the user requested */
+"success-title" = "Magavmage";

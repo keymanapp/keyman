@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u dictionari natǝ mdǝku hara instal ni</string>
+        <key>other</key>
+        <string>%u dictionariyeri natǝ mdǝku hara instal ɗa</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u update ni aɗi hara wa</string>
+        <key>other</key>
+        <string>%u updatyeri ni aɗi hara wa</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u update ku hara ɓɗaku</string>
+        <key>other</key>
+        <string>%u updatyeri ku hara ɓɗaku</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u keyboard ku hara instal</string>
+        <key>other</key>
+        <string>%u keyboardyeri ku hara instal</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u hulfur mnya ku hara instal</string>
+        <key>other</key>
+        <string>%u hulfur mnyayeri ku hara instal</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Ku wutǝ %u keyboard akwa package:</string>
+        <key>other</key>
+        <string>Ku wutǝ %u keyboardyeri akwa package:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>Ku wutǝ %u dictionary akwa package:</string>
+        <key>other</key>
+        <string>Ku wutǝ %u dictionariyeri akwa package:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>

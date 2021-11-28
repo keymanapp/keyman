@@ -819,7 +819,7 @@ namespace com.keyman.osk {
       }
 
       if (this.keyPending) {
-        if (key0 != key1 || key1.className.indexOf('kmw-key-touched') < 0) {
+        if (key0 != key1 || key1.className.indexOf(OSKKey.HIGHLIGHT_CLASS) < 0) {
           this.highlightKey(key1, true);
         }
       }

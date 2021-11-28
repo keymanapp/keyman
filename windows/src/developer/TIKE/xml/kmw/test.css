@@ -109,6 +109,10 @@ h2 {
 
 /** Mobile, Tablet **/
 
+.touch-device #control-devices {
+  display: none;
+}
+
 .install-link .ios,
 .install-link .android {
   display: none;
@@ -190,7 +194,7 @@ h2 {
   background-repeat: no-repeat;
   padding-left: 97px;
   background-position-y: -358px;
-  height: 360px;
+  height: 384px;
   width: 927px;
   padding-top: 62px;
 }
@@ -205,7 +209,7 @@ h2 {
   background-image: url(phone-iphone5-portrait.png);
   background-position-x: 0px;
   background-position-y: -794px;
-  height: 374px;
+  height: 444px;
   width: 600px;
   background-repeat: no-repeat;
   padding-left: 91px;
@@ -216,6 +220,10 @@ h2 {
 #osk-host-frame.iPhone .kmw-osk-frame,
 #osk-host-frame.iPhone .kmw-key-layer-group {
   border-radius: 0 0 3px 3px;
+}
+
+#input-area {
+  line-height: 0;
 }
 
 #input-area, #character-grid {
