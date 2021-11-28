@@ -508,9 +508,6 @@ namespace com.keyman.osk {
           availableHeight -= this.bannerView.height + 5;
         }
         this.vkbd.setSize(this.computedWidth, availableHeight, pending);
-        if(!pending) {
-          this.vkbd.refreshLayout();
-        }
 
         const bs = this._Box.style;
         // OSK size settings can only be reliably applied to standard VisualKeyboard
