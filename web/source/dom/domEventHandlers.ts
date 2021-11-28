@@ -32,7 +32,7 @@ namespace com.keyman.dom {
 
       this.focusTimer = window.setTimeout(function() {
         this.focusing=false;
-      }.bind(this), 1000)
+      }.bind(this), 50)
     }
   }
 
@@ -195,6 +195,15 @@ namespace com.keyman.dom {
         if(!Ltarg) {
           return true;
         }
+      }
+
+      if(DOMEventHandlers.states._IgnoreNextSelChange) {
+        // If a keyboard calls saveFocus() (KSF), then ignore the
+        // next selection change
+        DOMEventHandlers.states._IgnoreNextSelChange--;
+        e.cancelBubble = true;
+        e.stopPropagation();
+        return true;
       }
 
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
@@ -370,19 +379,6 @@ namespace com.keyman.dom {
       }
       return false;
     }
-
-    /**
-     * Function   _SelectionChange
-     * Scope      Private
-     * Description Respond to selection change event
-     */
-    _SelectionChange: () => boolean = function(this: DOMEventHandlers): boolean {
-      if(DOMEventHandlers.states._IgnoreNextSelChange) {
-        DOMEventHandlers.states._IgnoreNextSelChange--;
-      }
-      return true;
-    }.bind(this);
-
 
     /**
      * Function     _KeyDown
@@ -803,6 +799,14 @@ namespace com.keyman.dom {
         sbs.visibility='hidden';
       }
     }
+
+    /**
+     * Handle the touch end event for an input element
+     */
+    dragEnd: (e: TouchEvent|MouseEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent|MouseEvent) {
+      e.stopPropagation();
+      this.firstTouch = null;
+    }.bind(this);
 
     /**
      * Handle the touch move event for an input element

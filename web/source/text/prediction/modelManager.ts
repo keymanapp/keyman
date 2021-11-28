@@ -8,10 +8,10 @@ namespace com.keyman.text.prediction {
 
     // Allows for easy model lookup by language code; useful when switching keyboards.
     languageModelMap: {[language:string]: ModelSpec} = {};
-    
+
     init() {
       let keyman = com.keyman.singleton;
-      
+
       // Registers this module for keyboard (language) and model change events.
       keyman['addEventListener']('keyboardchange', this.onKeyboardChange.bind(this));
     }
@@ -46,6 +46,11 @@ namespace com.keyman.text.prediction {
       let keyman = com.keyman.singleton;
       let activeLanguage = keyman.keyboardManager.getActiveLanguage();
 
+      if(JSON.stringify(model) == JSON.stringify(this.registeredModels[model.id])) {
+        // We are already registered, let's not go through and re-register
+        // because we'll already have the correct model active
+        return;
+      }
       this.registeredModels[model.id] = model;
 
       // Register the model for each targeted language code variant.

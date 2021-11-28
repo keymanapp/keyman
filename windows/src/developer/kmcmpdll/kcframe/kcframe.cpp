@@ -1,30 +1,29 @@
 /*
   Name:             kcframe
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      24 Aug 2015
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
-                    
+
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
 */
 
 #include <windows.h>
 #include <stdio.h>
 
 #include <compiler.h>
-
-//extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, CompilerMessageProc pMsgProc)
+#include <compfile.h>
 
 int WINAPI msgproc(int line, DWORD dwMsgCode, LPSTR szText)
 {
@@ -34,11 +33,19 @@ int WINAPI msgproc(int line, DWORD dwMsgCode, LPSTR szText)
 
 int main(int argc, char *argv[])
 {
+  if (argc == 2 && strcmp(argv[1], "--sizeof") == 0) {
+    printf("FILE_KEYBOARD_SIZE = %d\n", sizeof(FILE_KEYBOARD));
+    printf("FILE_GROUP_SIZE = %d\n", sizeof(FILE_GROUP));
+    printf("FILE_STORE_SIZE = %d\n", sizeof(FILE_STORE));
+    printf("FILE_KEY_SIZE = %d\n", sizeof(FILE_KEY));
+    printf("FILE_DEADKEY_SIZE = %d\n", sizeof(FILE_DEADKEY));
+    return 0;
+  }
 	if(argc < 3)
 	{
 		puts("Usage: kcframe infile.kmn outfile.kmx");
 		return 1;
 	}
 
-	return CompileKeyboardFile(argv[1], argv[2], TRUE, FALSE, TRUE, msgproc) ? 0 : 1;   // I4865   // I4866
+	return CompileKeyboardFile(argv[1], argv[2], TRUE, FALSE, TRUE, msgproc) ? 0 : 1;
 }

@@ -282,9 +282,7 @@ namespace com.keyman.dom {
         return touchHandlers.setFocus(e);
       };
 
-      x.addEventListener('touchend', function(e) {
-        e.stopPropagation();
-      });
+      x.addEventListener('touchend', touchHandlers.dragEnd, false);
 
       x.onmspointerup=function(e) {
         e.stopPropagation();
