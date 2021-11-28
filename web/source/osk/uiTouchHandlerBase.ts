@@ -2,8 +2,8 @@ namespace com.keyman.osk {
   /**
    * This class was added to facilitate scroll handling for overflow-x elements, though it could
    * be extended in the future to accept overflow-y if needed.
-   * 
-   * This is necessary because of the OSK's need to use `.preventDefault()` for stability; that 
+   *
+   * This is necessary because of the OSK's need to use `.preventDefault()` for stability; that
    * same method blocks native handling of overflow scrolling for touch browsers.
    */
   class ScrollState {
@@ -51,7 +51,6 @@ namespace com.keyman.osk {
 
     private scrollTouchState: ScrollState;
     private pendingTarget: Target;
-    private popupBaseTarget: Target;
 
     constructor(baseElement: HTMLElement, rowClassMatch: string, selectedTargetMatch: string) {
       this.baseElement = baseElement;
@@ -87,7 +86,7 @@ namespace com.keyman.osk {
     protected abstract hasSubmenu(t: Target): boolean;
 
     /**
-     * Indicates that the user is maintaining a `Touch` on the specified `Target`. 
+     * Indicates that the user is maintaining a `Touch` on the specified `Target`.
      * Popups and-or longpress menus may be appropriate.
      * @param t The `Target` being held.
      */
@@ -151,7 +150,7 @@ namespace com.keyman.osk {
         if(this.isInvalidTarget(this.findTargetFrom(childNode))) {
           continue;
         }
-        
+
         x1 = childNode.offsetLeft;
         x2 = x1 + childNode.offsetWidth;
 
@@ -231,8 +230,8 @@ namespace com.keyman.osk {
       this.touchX = coord.x;
       this.touchY = coord.y;
 
-      // If popup stuff, immediately return. 
-      
+      // If popup stuff, immediately return.
+
       this.touchCount = coord.activeInputCount;
 
       if(!this.currentTarget) {
@@ -275,7 +274,7 @@ namespace com.keyman.osk {
         }
 
         // Cancel (but do not execute) pending key if neither a popup key or the base key
-        if((t == null) || ((t.id.indexOf('popup') < 0) && (t.id != this.popupBaseTarget.id))) {
+        if(t == null || t.id.indexOf('popup') < 0) {
           this.highlight(this.pendingTarget,false);
           this.clearHolds();
           this.pendingTarget = null;
@@ -351,24 +350,10 @@ namespace com.keyman.osk {
 
       // Do not move over keys if device popup visible
       if(this.hasModalPopup()) {
-        if(key1 == null) {
-          if(key0) {
-            this.highlight(key0,false);
-          }
-          this.pendingTarget=null;
-        } else {
-          if(key1 == this.popupBaseTarget) {
-            if(!util.hasClass(key1, this.selectedTargetMatch)) {
-              this.highlight(key1,true);
-            }
-            this.pendingTarget = key1;
-          } else {
-            if(key0) {
-              this.highlight(key0,false);
-            }
-            this.pendingTarget = null;
-          }
+        if(key0) {
+          this.highlight(key0,false);
         }
+        this.pendingTarget=null;
         return;
       }
 
@@ -398,12 +383,12 @@ namespace com.keyman.osk {
 
         // Once a subkey array is displayed, do not allow changing the base key.
         // Keep that array visible and accept no other options until the touch ends.
-        if(key1 && key1.id.indexOf('popup') < 0 && key1 != this.popupBaseTarget) { // TODO:  reliant on 'popup' in .id
+        if(key1 && key1.id.indexOf('popup') < 0) { // TODO:  reliant on 'popup' in .id
           return;
         }
 
         // Highlight the base key on devices that do not append it to the subkey array.
-        if(key1 && key1 == this.popupBaseTarget && key1.className.indexOf(this.selectedTargetMatch) < 0) {
+        if(key1 && key1.className.indexOf(this.selectedTargetMatch) < 0) {
           this.highlight(key1,true);
         }
         // Cancel touch if moved up and off keyboard, unless popup keys visible
