@@ -1,0 +1,39 @@
+
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Always show on-screen keyboard";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Use verbose Console logging";
+
+/* Support buton text  */
+"93O-x6-RLF.label" = "Support";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Download Keyboard...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Keyman Configuration";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Back";
+
+/* Class = "NSTabViewItem"; label = "Keyboard Layouts"; ObjectID = "MPN-9N-wWc"; */
+"MPN-9N-wWc.label" = "Keyboard Layouts";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "When the verbose logging option is on, Keyman will log actions that might help Keyman Support diagnose a problem. The Console program can be used to see a log of messages from Keyman. In Console, filter to show all messages from the \"Keyman\" process. This log can be exported and sent to Keyman support if needed.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Forward";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Home";
+
+/* Options button text */
+"frd-No-seV.label" = "Options";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Installed Keyboard";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Turn this on if you are having problems with a specific keyboard or with Keyman in general.";

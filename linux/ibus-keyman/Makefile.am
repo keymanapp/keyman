@@ -19,24 +19,26 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 SUBDIRS = \
-	src \
-	tests \
-	icons \
-	m4 \
-	po \
-	$(NULL)
+  src \
+  tests \
+  icons \
+  m4 \
+  po \
+  $(NULL)
 
 ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = \
-	autogen.sh \
-	VERSION \
-	$(NULL)
+  autogen.sh \
+  VERSION \
+  tap-driver.sh \
+  tap-test \
+  $(NULL)
 
 noinst_DIST = \
-	$(NULL)
+  $(NULL)
 
 
 DISTCLEANFILES = \
-	po/stamp-it \
-	$(NULL)
+  po/stamp-it \
+  $(NULL)
