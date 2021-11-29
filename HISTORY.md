@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 15.0.157 alpha 2021-11-29
+
+* fix(web): remove obsolete popupBaseTarget (#5949)
+* fix(web): improve keyboard switch performance (#5958)
+* fix(web): support saving focus for custom OSK interactions (#5947)
+* fix(developer): render OSK nicely on touch devices (#5923)
+* chore(developer): move kcframe into its own folder (#5971)
+* fix(web): restore `dragEnd` function (#5977)
+* feat(common/core/desktop): Allow preserved key support (#5850)
+* chore(windows): Consolidate documentation for Windows devboxes (#5481)
+* chore(developer): tweak language metadata message (#5978)
+* fix(linux): Fix ibus-keyman integration tests (#5966)
+
 ## 15.0.156 alpha 2021-11-26
 
 * fix(windows): fix loadkeyboardoptions core memory error (#5959)
