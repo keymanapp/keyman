@@ -253,7 +253,7 @@ SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Prog
 
 **Additional requirements for release builds**:
 * [7-Zip](http://www.7-zip.org/), used for archiving build files
-* [HTML Help Workshop](https://www.microsoft.com/en-us/download/details.aspx?id=21138)
+* [HTML Help Workshop](http://web.archive.org/web/20160201063255/http://download.microsoft.com/download/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe) note: Microsoft no longer offer this download...
 * [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm)
 * [CEF4Delphi_Binary](https://github.com/keymanapp/CEF4Delphi_Binary) repository
 
