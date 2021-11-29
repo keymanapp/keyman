@@ -659,6 +659,12 @@ typedef struct {
   km_kbp_option_item const * default_options;
 } km_kbp_keyboard_attrs;
 
+typedef struct {
+  km_kbp_virtual_key key;
+  uint32_t modifier_flag;
+} km_kbp_keyboard_key;
+
+#define KM_KBP_KEYBOARD_KEY_LIST_END { 0, 0 }
 /*
 ```
 ### `km_kbp_keyboard_load`
@@ -724,6 +730,43 @@ KMN_API
 km_kbp_status
 km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
                           km_kbp_keyboard_attrs const **out);
+
+/*
+```
+### `km_kbp_keyboard_get_key_list`
+##### Description:
+Returns the unordered full set of modifier+virtual keys that are handled by the
+keyboard. The matching dispose call needs to be called to free the memory.
+##### Return status:
+- `KM_KBP_STATUS_OK`: On success.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+##### Parameters:
+- __keyboard__: A pointer to the opaque keyboard object to be queried.
+- __out__: A pointer to an array of `km_kbp_keyboard_key` structures,
+           terminated by `KM_KBP_KEYBOARD_KEY_LIST_END`.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
+                            km_kbp_keyboard_key **out);
+
+
+/*
+```
+### `km_kbp_keyboard_key_list_dispose`
+##### Description:
+Free the allocated memory belonging to a keyboard key list previously
+returned by `km_kbp_keyboard_get_key_list`.
+##### Parameters:
+- __keyboard__: A pointer to the keyboard key list to be
+    disposed of.
+
+```c
+*/
+void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
+
 
 /*
 ```
