@@ -1,4 +1,5 @@
-c Description: Tests that we don't split a dk in context:set. Note that we start with a context with length MAXCONTEXT.
+c Description: Tests that we don't split a dk in context:set. Note that we start with a context
+c with length MAXCONTEXT-1 (abc...fgh is 60 characters/bytes long + 3 bytes for dk(1)).
 c keys: [K_Z][K_1][K_2][K_3][K_4]
 c context:
 c expected: PASS
