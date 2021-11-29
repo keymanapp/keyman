@@ -50,7 +50,7 @@ This project and everyone participating in it is governed by the [Keyman Code of
 Keyman is a complex project that spans six different platforms, with many a variety of components on each platform. We have chosen to host the Keyman project in the [keymanapp/keyman](https://github.com/keymanapp/keyman) monorepo, but [keyboard layouts](https://github.com/keymanapp/keyboards) and [lexical models](https://github.com/keymanapp/lexical-models) are stored in their own repositories.
 
 * Issues relating to the Keyman apps and their interactions with operating systems or other apps should be opened in the Keyman repo
-* For keyboard-specific or model-specific issues, open issues in the corresponding respository.
+* For keyboard-specific or model-specific issues, open issues in the corresponding repository.
 * The Keyman websites are also hosted in their own repositories. Contributions, including issues and pull requests can be opened against these repositories also.
 * Product documentation for the Keyman app is hosted in the Keyman app repository, and replicated to the help.keyman.com repository.
 
@@ -216,7 +216,7 @@ The labels are loosely grouped by their purpose, but it's not required that ever
 | `feat` | [search][search-feat] | Feature requests. |
 | `bug` | [search][search-bug] | Confirmed bugs or reports that are very likely to be bugs. |
 | `chore` | [search][search-chore] | Minor updates to Keyman. |
-| `question` | [search][search-question] | Questions more than bug reports or feature requests (e.g. how do I do X). [**Usually better on the Keyman Community**][https://community.software.sil.org/c/keyman] |
+| `question` | [search][search-question] | Questions more than bug reports or feature requests (e.g. how do I do X). [**Usually better on the Keyman Community**](https://community.software.sil.org/c/keyman) |
 | `spec` | [search][search-spec] | Issues which are specifications for a large scale feature. |
 | `docs` | [search][search-docs] | Related to any type of documentation. |
 

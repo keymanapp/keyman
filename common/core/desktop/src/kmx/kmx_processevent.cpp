@@ -764,7 +764,7 @@ KMX_Environment const *KMX_ProcessEvent::GetEnvironment() const {
   return &m_environment;
 }
 
-LPINTKEYBOARDINFO KMX_ProcessEvent::GetKeyboard() {
+INTKEYBOARDINFO const *KMX_ProcessEvent::GetKeyboard() const {
   return &m_keyboard;
 }
 

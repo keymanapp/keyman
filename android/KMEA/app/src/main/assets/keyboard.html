@@ -118,8 +118,7 @@
       //window.console.log('onStateChange change: ' + change);
 
       // Refresh KMW OSK
-      var kmw=window['keyman'];
-      kmw['correctOSKTextSize']();
+      keyman.correctOSKTextSize();
 
       fragmentToggle = (fragmentToggle + 1) % 100;
       if(change != 'configured') { // doesn't change the display; only initiates suggestions.

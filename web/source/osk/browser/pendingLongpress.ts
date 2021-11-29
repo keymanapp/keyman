@@ -7,12 +7,12 @@ namespace com.keyman.osk.browser {
    * whether or not a series of touch events corresponds to a longpress
    * touch input.  The `resolve` method may be used to trigger the
    * subkey menu early, as with the upward quick-display shortcut.
-   * 
+   *
    * This is the default implementation of longpress behavior for KMW.
    * Alterate implementations are modeled through the `embedded`
    * namespace's equivalent, which is designed to facilitate custom
    * modeling for such gestures.
-   * 
+   *
    * Once the conditions to recognize a longpress gesture have been
    * fulfilled, this class's `promise` will resolve with a `SubkeyPopup`
    * matching the gesture's 'base' key, which itself provides a
@@ -50,16 +50,24 @@ namespace com.keyman.osk.browser {
         this.timerId = null;
       }
 
-      if(this.resolver) {        
+      if(this.resolver) {
         this.resolver(null);
         this.resolver = null;
       }
     }
 
     public resolve() {
+      // User has flicked up to get to the longpress, before
+      // the timeout has expired. We need to cancel the timeout.
+      // See #5950
+      if(this.timerId) {
+        window.clearTimeout(this.timerId);
+        this.timerId = null;
+      }
+
       if(this.resolver) {
         this.resolver(new SubkeyPopup(this.vkbd, this.baseKey));
       }
-    } 
+    }
   }
 }

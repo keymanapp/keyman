@@ -59,6 +59,7 @@
 
 #include "keymanutil.h"
 #include "kmpdetails.h"
+#include "keyman-version.h"
 
 #define N_(text) text
 
@@ -150,7 +151,7 @@ ibus_keyman_engine_desc_new (gchar * file_name,
     return engine_desc;
 }
 
-GList * 
+GList *
 ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
 {
     GList *p, *k, *l, *e;
@@ -283,10 +284,10 @@ ibus_keyman_get_component (void)
 
     component = ibus_component_new ("org.freedesktop.IBus.Keyman",
                                     N_("Keyman"),
-                                    "10.99.0",
+                                    KEYMAN_VERSION,
                                     "GPL",
-                                    "Daniel Glassey <wdg@debian.org>",
-                                    "http://www.keyman.com",
+                                    "Keyman team <support@keyman.com>",
+                                    "https://keyman.com",
                                     "",
                                     "ibus-keyman");
 
@@ -301,7 +302,7 @@ ibus_keyman_get_component (void)
 }
 
 
-// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// Obtain Keyboard Options list from DConf
 // DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
 //
 // Parameters:
@@ -331,7 +332,6 @@ keyman_get_options_fromdconf(gchar *package_id,
 }
 
 // Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
-// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
 //
 // Parameters:
 // package_id  (gchar *): Package ID
@@ -349,7 +349,7 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
     gchar **options = keyman_get_options_fromdconf(package_id, keyboard_id);
 
     // Parse options into queue_options
-    if (*options != NULL)
+    if (options != NULL)
     {
         int index = 0;
         while (options[index] != NULL)
@@ -368,6 +368,7 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
             }
             index++;
         }
+        g_strfreev(options);
     }
 
     return queue_options;
@@ -375,7 +376,8 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
 
 // Write new keyboard option to DConf.
 // DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
-// If the option key already exists, the value is updated. Otherwise a new string 'option_key=option_value' is appended.
+// If the option key already exists, the value is updated. Otherwise a new string
+// 'option_key=option_value' is appended.
 //
 // Parameters:
 // package_id   (gchar *): Package ID
@@ -399,7 +401,7 @@ keyman_put_options_todconf(gchar *package_id,
     gchar *needle = g_strdup_printf("%s=", option_key);
     gchar *kvp = g_strdup_printf("%s=%s", option_key, option_value);
 
-    if (*options != NULL)
+    if (options != NULL)
     {
         int index = 0;
         gboolean option_updated = FALSE;
@@ -408,6 +410,7 @@ keyman_put_options_todconf(gchar *package_id,
             // If option_key already exists, update value with option_value
             if (g_strrstr(options[index], needle) != NULL)
             {
+                g_free(options[index]);
                 options[index] = kvp;
                 option_updated = TRUE;
                 break;
@@ -418,17 +421,20 @@ keyman_put_options_todconf(gchar *package_id,
         if (!option_updated)
         {
             // Resize to add new option and null-terminate
-            options = g_realloc(options, strlen(kvp) + 1);
+            int size = index + 2; // old size: index + 1, plus 1 new
+            options = g_renew(gchar*, options, size);
             options[index] = kvp;
             options[index+1] = NULL;
         }
     }
     else
     {
-        // If options don't exist, allocate space for new option and null-terminate
-        options = g_malloc(strlen(kvp) + 1);
-        options[0] = kvp;
-        options[1] = NULL;
+      // we never should come here - keyman_get_options_fromdconf will create empty
+      // options if they don't yet exist.
+      // Allocate space for new option and null-terminate
+      options    = g_new(gchar *, 2);
+      options[0] = kvp;
+      options[1] = NULL;
     }
 
     // Write to DConf
@@ -442,9 +448,9 @@ keyman_put_options_todconf(gchar *package_id,
 
     g_object_unref(G_OBJECT(child_settings));
     g_free(path);
-    g_free(kvp);
     g_free(needle);
-    g_free(options);
+    g_strfreev(options);
+    // kvp got assigned to options[x] and so got freed by g_strfreev()
 }
 
 

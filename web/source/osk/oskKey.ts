@@ -175,7 +175,7 @@ namespace com.keyman.osk {
      * may be used to toggle which state the key's button class is in.
      * -  shift  <=>  shift-on
      * - special <=> special-on
-     * @param {boolean=} flag The new toggle state 
+     * @param {boolean=} flag The new toggle state
      */
     public setToggleState(flag?: boolean) {
       let btnClassId: number;
@@ -186,7 +186,7 @@ namespace com.keyman.osk {
       } else {
         btnClassId = this.spec['sp'];
       }
-      
+
       // 1 + 2:   shift  +  shift-on
       // 3 + 4:  special + special-on
       switch(OSKKey.BUTTON_CLASSES[btnClassId]) {
@@ -291,7 +291,7 @@ namespace com.keyman.osk {
       }
 
       // re-use canvas object for better performance
-      var canvas: HTMLCanvasElement = OSKKey.getTextMetrics['canvas'] || 
+      var canvas: HTMLCanvasElement = OSKKey.getTextMetrics['canvas'] ||
                                      (OSKKey.getTextMetrics['canvas'] = document.createElement("canvas"));
       var context = canvas.getContext("2d");
       context.font = fontSize + " " + fontFamily;
@@ -304,7 +304,7 @@ namespace com.keyman.osk {
       let buttonStyle = getComputedStyle(this.btn);
       let keyWidth = parseFloat(buttonStyle.width);
       let emScale = 1;
-    
+
       const originalSize = getFontSizeStyle(style.fontSize || '1em');
 
       // Not yet available; it'll be handled in a later layout pass.
@@ -404,6 +404,29 @@ namespace com.keyman.osk {
         oldText;
     }
 
+
+    private unicodeKeyIdToString(id: string): string {
+      // This is similar to defaultOutput.ts:forUnicodeKeynames and could potentially
+      // be refactored in the future.
+      if(!id || id.substr(0,2) != 'U_') {
+        return null;
+      }
+
+      let result = '';
+      const codePoints = id.substr(2).split('_');
+      for(let codePoint of codePoints) {
+        const codePointValue = parseInt(codePoint, 16);
+        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F))) {
+          continue;
+        } else {
+          // String.fromCharCode() is inadequate to handle the entire range of Unicode
+          // Someday after upgrading to ES2015, can use String.fromCodePoint()
+          result += String.kmwFromCharCode(codePointValue);
+        }
+      }
+      return result ? result : null;
+    }
+
     // Produces a HTMLSpanElement with the key's actual text.
     protected generateKeyText(vkbd: VisualKeyboard): HTMLSpanElement {
       let spec = this.spec;
@@ -415,9 +438,7 @@ namespace com.keyman.osk {
         keyText='\xa0';  // default:  nbsp.
         if(typeof spec['id'] == 'string') {
           // If the ID's Unicode-based, just use that code.
-          if(/^U_[0-9A-F]{4}$/i.test(spec['id'])) {
-            keyText=String.fromCharCode(parseInt(spec['id'].substr(2),16));
-          }
+          keyText = this.unicodeKeyIdToString(spec['id']) || keyText;
         }
       } else {
         keyText=spec['text'];
@@ -489,7 +510,7 @@ namespace com.keyman.osk {
 
       let btn = this.btn;
       // These functions do not account for 'fixed' positioning.
-      let x0 = dom.Utils.getAbsoluteX(btn); 
+      let x0 = dom.Utils.getAbsoluteX(btn);
       let y0 = dom.Utils.getAbsoluteY(btn);
 
       let isFixed = false;
@@ -502,12 +523,12 @@ namespace com.keyman.osk {
           node = node.offsetParent as HTMLElement;
         }
       }
-      
+
       if(isFixed) {
         x0 += window.pageXOffset;
         y0 += window.pageYOffset;
       }
-      
+
       let x1 = x0 + btn.offsetWidth;
       let y1 = y0 + btn.offsetHeight;
 

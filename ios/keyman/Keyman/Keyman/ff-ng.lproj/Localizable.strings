@@ -1,0 +1,81 @@
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-add-title" = "A` waata Bukmak";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-none" = "Walaa bukmak";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-title" = "Bukmaks";
+
+/* Used to confirm a user's desire to install a package */
+"confirm-install" = "Wa`unu";
+
+/* The label for the toggle to stop automatically showing the "Get Started" tutorial popup. */
+"disable-get-started" = "Taa holla fahin";
+
+/* Indicates an error opening a web page requested by a user */
+"error-opening-page" = "Maɓɓititta pej man";
+
+/* Long-form used when installing a font in order to display a language properly. */
+"font-install-description" = "Meemu Instal ngam a` waɗa %@ holla haa app ma";
+
+/* The name of the iOS Settings menu option for keyboards */
+"ios-settings-keyboards" = "Kibod";
+
+/* The name of the iOS Settings menu option for giving the keyboard full access.  (The menu entry
+underneath the app's name within the app-specific keyboard menu.) */
+"ios-settings-allow-full-access" = "Accu laawol nastugo fuu";
+
+/* Short-form used when installing a font in order to display a language properly. */
+"language-for-font" = "%@ Maunugo bindi";
+
+/* Used for 'add' options within menus */
+"menu-add" = "Ɓeddu";
+
+/* Used to indicate a sequence of menu options that a user needs to copy.  May be chained.  Example:  "Keyboards (1) > Enable Keyman (2)" */
+"menu-breadcrumbing" = "%1$@ > %2$@";
+
+/* Used to exit a menu without choosing an option */
+"menu-cancel" = "Wurtu";
+
+/* Menu option that erases all previously-typed text. */
+"menu-clear-text" = "A` wogga ɓaleeri";
+
+/* Menu option that displays a list designed to help users start using the app */
+"menu-get-started" = "A` fuɗɗa kesum";
+
+/* Menu option that displays help for the app */
+"menu-help" = "Bayanu";
+
+/* Menu option that displays the main screen's drop-down menu */
+"menu-more" = "Ɓeddaari";
+
+/* Menu option used to edit keyboard and dictionary settings */
+"menu-settings" = "Settinji";
+
+/* Menu option that displays the iOS Share menu */
+"menu-share" = "Sendu";
+
+/* Menu option that displays an embedded web browser. */
+"menu-show-browser" = "Lenguru";
+
+/* Menu option used to control in-app font size. */
+"menu-text-size" = "Mawnugo ɓaleeri";
+
+/* Used to describe the current font size */
+"text-size-label" = "Mawnugo ɓaleeri: %i";
+
+/* Text to indicate that a user should set a toggle within iOS Settings to 'active'. */
+"toggle-to-enable" = "Accu %@";
+
+/* First option on the Get Started tutorial - Add a keyboard for your language */
+"tutorial-add-keyboard" = "A` waata kibod jee ɗemngal ma";
+
+/* Third option on the Get Started tutorial - Displays app help. */
+"tutorial-show-help" = "Ɓeddaari bayanu";
+
+/* Second option on the Get Started tutorial - Set up Keyman as system-wide keyboard */
+"tutorial-system-keyboard" = "A` waɗa Keyman laata kibod na`ura";
+
+/* Used to display app version (as in \"Version: 1.0.2\" */
+"version-label" = "Nonde: %@";

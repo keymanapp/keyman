@@ -90,7 +90,11 @@ function build_regex() {
   remessage=".{$min_length,$max_length}[^.]"
   refixes="(\. Fixes #[[:digit:]]+)?"
 
-  regexp="^${retypes}${rescope}: ${remessage}${refixes}[[:space:]]*$"
+  # Regex for the commit message title. It's ok if the commit message starts with "fixup!".
+  # (This allows to run `git commit --fixup=<sha>` without complaining about the commit
+  # message not being in conventional commit format. This helps in squashing with a previous
+  # commit.)
+  regexp="^(fixup\! )?${retypes}${rescope}: ${remessage}${refixes}[[:space:]]*$"
 }
 
 # Print out a standard error message which explains

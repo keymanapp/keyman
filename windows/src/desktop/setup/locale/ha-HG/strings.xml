@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Hausa</string>
+  <string name="ssApplicationTitle">Saita $APPNAME $VERSION</string>
+  <string name="ssTitle">Shigar da $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">An sami nasarar shigar da $APPNAME $VERSION.</string>
+  <string name="ssCancelQuery">An tabbatar ana son soke shigar da $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Ana ciro tarin...</string>
+  <string name="ssBootstrapCheckingPackages">Ana duba ƙunshin...</string>
+  <string name="ssBootstrapCheckingForUpdates">Dubawa kan yanar gizo domin a sabunta...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Ana duba nau\'ín da aka shigar...</string>
+  <string name="ssBootstrapReady">Ana kammalawa...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Babu abinda za a shigar.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(sauke %0:s)</string>
+  <string name="ssActionInstall">Saitin zai shigar:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION kyauta ne a buɗe</string>
+  <string name="ssLicenseLink">&amp;Karanta lasisin</string>
+  <string name="ssInstallOptionsLink">Shigarwa &amp;zaɓi</string>
+  <string name="ssMessageBoxTitle">Saitin $APPNAME</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Shigarwa</string>
+  <string name="ssCancelButton">Soke</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Shigar da $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Cire tsohon nau\'in</string>
+  <string name="ssStatusComplete">An kammala shigarwa</string>
+  <string name="ssQueryRestart">Dole ne ku sake kunna Windows kafin Saitin ya kammala. Lokacin da kuka sake kunna Windows, Saitin zai ci gaba.
+
+Sake kunnawa yanzu?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows ɗin bai sami damar sake kunnuwa kai tsaye ba. Ya kamata ku sake kunna Windows ɗin kafin gwadawa da fara $APPNAME.</string>
+  <string name="ssMustRestart">Dole ne a sake kunna Windows ɗin domin kammala saitin, Lokacin da aka kuma kunna Windows, Saitin zai kammala.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION na buƙatar Windows 7 ko daga baya don shigarwa. Haka kuma, an gano Keyman Desktop 7, 8 ko 9. Shin ana son shigar da madannan da aka haɗa a cikin wannan mashiga cikin sigar Keyman Desktop ɗin da aka shigar?</string>
+  <string name="ssOldOsVersionDownload">Wannan nau\'in $APPNAME na buƙatar Windows 7 ko daga baya domin shigarwa. Kuna son saukar da Keyman Desktop 8?</string>
+  <string name="ssOptionsTitle">Zaɓukan shigarwa</string>
+  <string name="ssOptionsTitleInstallOptions">Zaɓukan shigarwa</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Saitin default $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Abubuwa masu alaƙa da za a shigar ko haɓakawa</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Madannai masu Alaƙa da Yare</string>
+  <string name="ssOptionsTitleLocation">Shigar da Nau\'i</string>
+  <string name="ssOptionsStartWithWindows">Kunna $APPNAME yayinda aka kunna Window</string>
+  <string name="ssOptionsStartAfterInstall">Kunna $APPNAME yayinda aka kammala shigarwa</string>
+  <string name="ssOptionsCheckForUpdates">Duba sabuntawa a yanar gizo lokaci zuwa lokaci</string>
+  <string name="ssOptionsUpgradeKeyboards">Haɓaka madannan da aka shigar daga tsohon nau\'i zuwa nau\'in $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Tura abubuwan da ba a fahimta ba ga keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Saita nau\'in; %0:s</string>
+  <string name="ssOptionsInstallKeyman">Shigar da $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Haɓaka $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">An riga da an shigar da $APPNAME %0:s.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Sauke nau\'in %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Nau\'in %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Shigar da %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Sauke nau\'in %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Nau\'in %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">A zaɓi yaren da ake son haɗawa da madannin %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Default yare</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Ana sauke %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Ana sauke %0:s</string>
+  <string name="ssOffline">Saitin $APPNAME bai sami haɗewa zuwa keyman.com domin saukar da ƙarin abubuwa ba.
+
+Da fatan za a duba cewa kuna kan yanar gizo, kuma a bawa Saitin $APPNAME izinin shiga Intanet a cikin saitunan firewall.
+
+Danna Abort domin fita daga Saitin, Sake gwadawa da sake saukar da abubuwa, ko Barinsa domin ci gaba offline.</string>
+</resources>

@@ -33,6 +33,10 @@ Build-Depends:
  libibus-1.0-dev (>= 1.2),
  libjson-glib-dev (>= 1.4.0),
  pkg-config,
+ xserver-xephyr,
+ xvfb,
+ metacity,
+ gawk,
 Standards-Version: 4.5.1
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman
