@@ -1,4 +1,4 @@
-c Description: Tests that we don't split a dk in context
+c Description: Tests that we don't split a dk in context. Note that we start with a context with length MAXCONTEXT.
 c keys: [K_SPACE]
 c context: \u00ffff\u000008\u00000001abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh
 c expected: \u00ffff\u000008\u00000001abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh\u0020
