@@ -5,6 +5,7 @@
 /// <reference path="keytip.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/pendingLongpress.ts" />
+/// <reference path="browser/pendingMultiTap.ts" />
 /// <reference path="keyboardView.interface.ts" />
 /// <reference path="touchEventEngine.ts" />
 /// <reference path="mouseEventEngine.ts" />
@@ -97,6 +98,8 @@ namespace com.keyman.osk {
     keytip: KeyTip;
     pendingSubkey: PendingGesture;
     subkeyGesture: RealizedGesture;
+
+    pendingMultiTap: PendingMultiTap;
 
     get layerId(): string {
       return this._layerId;
@@ -640,7 +643,6 @@ namespace com.keyman.osk {
           // sending the keystroke again when the key is actually released
           this.touchCount--;
         } else {
-          // If this key has subkey, start timer to display subkeys after delay, set up release
           this.initGestures(key, input);
         }
         this.keyPending = key;
@@ -661,6 +663,23 @@ namespace com.keyman.osk {
       // Clear repeated backspace if active, preventing 'sticky' behavior.
       this.cancelDelete();
 
+      // Multi-Tap
+      if (this.pendingMultiTap && this.pendingMultiTap.realized) {
+        // Ignore pending key if we've just handled a multitap
+        this.pendingMultiTap = null;
+
+        this.highlightKey(this.keyPending, false);
+        this.keyPending = null;
+        this.touchPending = null;
+
+        return;
+      }
+
+      if (this.pendingMultiTap && this.pendingMultiTap.cancelled) {
+        this.pendingMultiTap = null;
+      }
+
+      // Longpress
       if ((this.subkeyGesture && this.subkeyGesture.isVisible())) {
         // Ignore release if a multiple touch
         if (input.activeInputCount > 0) {
@@ -1523,6 +1542,31 @@ namespace com.keyman.osk {
      * @returns
      */
     initGestures(key: KeyElement, input: InputEventCoordinate) {
+
+      if (this.pendingMultiTap) {
+        switch (this.pendingMultiTap.incrementTouch(key)) {
+          case PendingMultiTapState.Cancelled:
+            this.pendingMultiTap = null;
+            break;
+          case PendingMultiTapState.Realized:
+            // Don't initialize any other gestures if the
+            // multi tap is realized; we cleanup on touch
+            // release because we need to cancel the base
+            // key action
+            return;
+        }
+      }
+
+      if (!this.pendingMultiTap && PendingMultiTap.isValidTarget(this, key)) {
+        // We are only going to support double-tap on Shift
+        // in Keyman 15, so we pass in the constant count = 2
+        this.pendingMultiTap = new PendingMultiTap(this, key, 2);
+        this.pendingMultiTap.timeout.then(() => {
+          this.pendingMultiTap = null;
+        });
+      }
+
+
       if (key['subKeys']) {
         let _this = this;
 
@@ -1566,6 +1610,11 @@ namespace com.keyman.osk {
     updateGestures(currentKey: KeyElement, previousKey: KeyElement, input: InputEventCoordinate): boolean {
       let key0 = previousKey;
       let key1 = currentKey;
+
+      if(!currentKey && this.pendingMultiTap) {
+        this.pendingMultiTap.cancel();
+        this.pendingMultiTap = null;
+      }
 
       // Clear previous key highlighting, allow subkey controller to highlight as appropriate.
       if (this.subkeyGesture) {

@@ -212,10 +212,7 @@ namespace com.keyman.text {
     }
 
     constructNullKeyEvent(device: utils.DeviceSpec): KeyEvent {
-      const keyEvent = new KeyEvent();
-      keyEvent.Lcode = 0;
-      keyEvent.kName = '';
-      keyEvent.device = device;
+      const keyEvent = KeyEvent.constructNullKeyEvent(device);
       this.setSyntheticEventDefaults(keyEvent);
       return keyEvent;
     }
@@ -362,6 +359,22 @@ namespace com.keyman.text {
       }
       if(layerId.indexOf('alt')  >= 0 && !altMatched) {
         modifier |= Codes.modifierCodes['ALT'];
+      }
+
+      return modifier;
+    }
+
+    /**
+     * Get state key state from layer id
+     *
+     * @param       {string}      layerId       layer id (e.g. caps)
+     * @return      {number}                    modifier key state (desktop keyboards)
+     */
+     static getStateFromLayer(layerId: string): number {
+      var modifier=0;
+
+      if(layerId.indexOf('caps') >= 0) {
+        modifier |= Codes.modifierCodes['CAPS'];
       }
 
       return modifier;
