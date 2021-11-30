@@ -99,6 +99,7 @@ namespace com.keyman.osk {
     pendingSubkey: PendingGesture;
     subkeyGesture: RealizedGesture;
 
+    // Multi-tap gesture management
     pendingMultiTap: PendingMultiTap;
 
     get layerId(): string {

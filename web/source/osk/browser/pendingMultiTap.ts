@@ -46,7 +46,6 @@ namespace com.keyman.osk {
         // then we will abandon the gesture
         _this.timerId = window.setTimeout(() => {
           _this.cancel();
-          _this.timerId = null;
           resolve();
         }, _this.cancelDelayFactor * _this.count);
       });
