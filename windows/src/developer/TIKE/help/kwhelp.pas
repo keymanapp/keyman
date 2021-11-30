@@ -41,7 +41,7 @@ type
   end;
 
 const
-  HelpArray: array[0..74] of THelpArray = (   // I4840
+  HelpArray: array[0..78] of THelpArray = (   // I4840
     (Word: 'BITMAP' ),
     (Word: 'begin' ),
     (Word: 'COPYRIGHT' ),
@@ -87,6 +87,8 @@ const
     (Word: 'begin' ),
     (Word: 'ansi'; Topic: 'begin' ),
     (Word: 'unicode'; Topic: 'begin' ),
+    (Word: 'postkeystroke'; Topic: 'begin' ),
+    (Word: 'newcontext'; Topic: 'begin' ),
 
     (Word: 'context' ),
     (Word: 'deadkey' ),
@@ -95,6 +97,7 @@ const
     (Word: 'group' ),
     (Word: 'using'; Topic: 'group' ),
     (Word: 'keys'; Topic: 'group' ),
+    (Word: 'readonly'; Topic: 'group' ),
 
     (Word: 'if' ),   // I4840
     (Word: 'index' ),
@@ -125,7 +128,9 @@ const
     (Word: '*character'; Topic: 'strings'; Guide: True ),
     (Word: '*string'; Topic: 'strings'; Guide: True ),
     (Word: '*constant'; Topic: 'constants'; Guide: True ),
-    (Word: '*compile-target'; Topic: 'compile-targets'; Guide: True )
+    (Word: '*compile-target'; Topic: 'compile-targets'; Guide: True ),
+
+    (Word: '&layerchanged'; Topic: 'layerchanged')
   );
 
 function IsValidHelpToken(var token: WideString; HelpOnSyntacticElements: Boolean): Boolean;
