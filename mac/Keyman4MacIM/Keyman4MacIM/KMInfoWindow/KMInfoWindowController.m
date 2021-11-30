@@ -151,9 +151,10 @@
 */
         NSArray *fonts = self.packageInfo.fonts;
         NSMutableString *fontsStr = [NSMutableString stringWithString:@""];
+        
         if (fonts != nil && fonts.count) {
-            for (NSArray *font in fonts) {
-                [fontsStr appendString:[NSString stringWithFormat:pBodyFormat, [font objectAtIndex:0]]];
+           for (NSString *font in fonts) {
+                [fontsStr appendString:[NSString stringWithFormat:pBodyFormat, font]];
             }
         }
         else {
@@ -230,32 +231,7 @@
 - (KMPackageInfo *)packageInfo {
     if(_packageInfo == nil) {
         _packageInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
-        NSLog(@"SGS2021 packageInfo.packageName = %@", _packageInfo.packageName);
-        NSLog(@"SGS2021 packageInfo.packageVersion = %@", _packageInfo.packageVersion);
-        NSLog(@"SGS2021 packageInfo.authorName = %@", _packageInfo.authorName);
-        NSLog(@"SGS2021 packageInfo.authorUrl = %@", _packageInfo.authorUrl);
-        NSLog(@"SGS2021 packageInfo.copyright = %@", _packageInfo.copyright);
-        NSLog(@"SGS2021 packageInfo.readmeFilename = %@", _packageInfo.readmeFilename);
-
     }
-    /*
-    if (_keyboardInfo == nil) {
-        NSString *jsonFilename = [self.packagePath stringByAppendingPathComponent:@"kmp.json"];
-        NSLog(@"SGS2021 KMInfoWindowController loading keyboard info from json file: %@", jsonFilename);
-        _keyboardInfo = [self.AppDelegate loadPackageInfoFromJsonFile:jsonFilename];
- 
-        if (_keyboardInfo != nil) {
-            NSDictionary *info = _keyboardInfo[@"info"];
-            NSDictionary *nameMap = info[@"name"];
-            NSLog(@"SGS2021 keyboardInfo initialized, package name = %@", nameMap[@"description"]);
-        } else
-        {
-            NSString *infoFile = [self.packagePath stringByAppendingPathComponent:@"kmp.inf"];
-            NSLog(@"SGS2021 KMInfoWindowController loading keyboard info from %@", infoFile);
-            _keyboardInfo = [self.AppDelegate keyboardInfoFromInfFile:infoFile];
-        }
-    }
-    */
         
     return _packageInfo;
 }

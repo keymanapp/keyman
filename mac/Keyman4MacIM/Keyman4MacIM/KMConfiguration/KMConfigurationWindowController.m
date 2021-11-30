@@ -133,7 +133,7 @@
             if ([obj isKindOfClass:[NSArray class]]) {
                 NSArray *pArray = (NSArray *)obj;
                 NSString *packageFolder = [self packageFolderFromPath:[pArray objectAtIndex:0]];
-                NSString *packageName = [self packageNameFromFolder:packageFolder];
+                NSString *packageName = [self.AppDelegate packageNameFromPackageInfo:packageFolder];
                 [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"HeaderTitle", nil]];
                 for (NSString *path in pArray) {
                     NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
@@ -167,12 +167,6 @@
 
 - (NSString *)packageFolderFromPath:(NSString *)path {
     return [self.AppDelegate packageFolderFromPath:path];
-}
-
-- (NSString *)packageNameFromFolder:(NSString *)packageFolder {
-    return [self.AppDelegate packageNameFromInfFile:packageFolder];
-    // TODO: call below but handle non-existent JSON file case
-    //return [self.AppDelegate packageNameFromJsonFile:packageFolder];
 }
 
 - (NSString *)keyboardsPath {

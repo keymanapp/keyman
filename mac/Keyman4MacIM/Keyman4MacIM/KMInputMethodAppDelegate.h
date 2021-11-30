@@ -119,8 +119,7 @@ typedef struct {
 - (NSInteger)indexForPackageFolder:(NSString *)packageFolder;
 - (NSString *)packageFolderFromPath:(NSString *)path;
 - (NSDictionary *)loadPackageInfo:(NSString *)path;
-- (NSString *)packageNameFromInfFile:(NSString *)packageFolder;
-- (NSString *)packageNameFromJsonFile:(NSString *)packageFolder;
+- (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder;
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;
 - (NSString *)oskWindowTitle;

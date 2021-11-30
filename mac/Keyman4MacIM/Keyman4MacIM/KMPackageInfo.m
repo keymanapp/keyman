@@ -45,13 +45,24 @@
 
 - (void)debugReport
 {
-    NSLog(@"SGS2021 packageInfo.packageName = %@", _packageName);
+    if (_packageName)
+        NSLog(@"SGS2021 packageInfo.packageName = %@", _packageName);
+    if (_packageVersion)
     NSLog(@"SGS2021 packageInfo.packageVersion = %@", _packageVersion);
+    if (_authorName)
     NSLog(@"SGS2021 packageInfo.authorName = %@", _authorName);
+    if (_authorUrl)
     NSLog(@"SGS2021 packageInfo.authorUrl = %@", _authorUrl);
+    if (_copyright)
     NSLog(@"SGS2021 packageInfo.copyright = %@", _copyright);
+    if (_readmeFilename)
     NSLog(@"SGS2021 packageInfo.readMe = %@", _readmeFilename);
-    NSLog(@"SGS2021 packageInfo.fonts.count = %@", [_fonts count]);
+    if (_fonts) {
+        NSLog(@"SGS2021 packageInfo.fonts.count = %lu", [_fonts count]);
+        if ([_fonts count] > 0) {
+            NSLog(@"SGS2021 packageInfo.fonts[0] = %@", _fonts[0]);
+        }
+    }
 }
 
 

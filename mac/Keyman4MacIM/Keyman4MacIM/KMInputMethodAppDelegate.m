@@ -614,53 +614,30 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (KMPackageInfo *)loadPackageInfo:(NSString *)path {
     KMPackageInfo *packageInfo = nil;
     NSString *jsonFilename = [path stringByAppendingPathComponent:@"kmp.json"];
-    NSLog(@"SGS2021 KXMInputMethodAppDelegate loading keyboard info from json file: %@", jsonFilename);
     
     packageInfo = [self loadPackageInfoFromJsonFile:jsonFilename];
     
-    // TODO: remove test
-    //packageInfo = nil;
-    
-    if (packageInfo != nil) {
-        /*
-        NSDictionary *info = packageInfo[@"info"];
-        NSDictionary *nameMap = info[@"name"];
-         */
-        NSLog(@"SGS2021 keyboardInfo initialized, package name = %@", packageInfo.packageName);
-    } else
-    {
+    if (packageInfo == nil) {
         NSString *infoFile = [path stringByAppendingPathComponent:@"kmp.inf"];
-        NSLog(@"SGS2021 KXMInputMethodAppDelegate loading keyboard info from inf file %@", infoFile);
         
         packageInfo = [self loadPackageInfoFromInfFile:infoFile];
-        //packageInfo = [self keyboardInfoFromInfFile:infoFile];
     }
     
     return packageInfo;
 }
 
 
-- (NSString *)packageNameFromJsonFile:(NSString *)packageFolder {
-    NSLog(@"SGS2021 load packageNameFromJsonFile");
+- (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder {
     NSString *packageName = nil;
+
     NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
-    NSString *jsonFilename = [path stringByAppendingPathComponent:@"kmp.json"];
-    NSDictionary *kbInfo = [self loadPackageInfoFromJsonFile:jsonFilename];
-
-    NSDictionary *info = kbInfo[@"info"];
-    NSDictionary *nameMap = info[@"name"];
-    packageName = nameMap[@"description"];
-    
-    NSLog(@"SGS2021 package name = %@", packageName);
-
-    if (packageName == nil)
-        packageName = packageFolder;
+    KMPackageInfo *packageInfo = [self loadPackageInfo:path];
+    packageName = packageInfo.packageName;
 
     return packageName;
 }
 
 - (NSString *)packageNameFromInfFile:(NSString *)packageFolder {
-    NSLog(@"SGS2021 load packageNameFromInfFile");
     NSString *packageName = nil;
     NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
     NSString *fileContents = [NSString stringWithContentsOfFile:[path stringByAppendingPathComponent:@"kmp.inf"] encoding:NSWindowsCP1252StringEncoding error:NULL];
@@ -679,7 +656,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
     }
 
-    NSLog(@"SGS2021 package name = %@", packageName);
     if (packageName == nil)
         packageName = packageFolder;
 
@@ -782,7 +758,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                                                            keyboards:[keyboardInfoArray copy]
                                                            fonts:[fontArray copy]
                                                            files:nil];
-    NSLog(@"SGS2021 packageInfo created from JSON:");
     packageInfo.debugReport;
     return packageInfo;
 }
@@ -861,7 +836,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                     break;
                 case ctStartMenuEntries: {
                     if ([line startsWith:kWelcome]) {
-                        NSLog(@"SGS2021 line of inf file: %@", line);
                         NSString *s = [line substringFromIndex:kWelcome.length+1];
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
@@ -872,16 +846,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 }
                 case ctInfo: {
                     if ([line startsWith:kName]) {
-                        NSLog(@"SGS2021 line of inf file: %@", line);
                         NSString *s = [line substringFromIndex:kName.length+1];
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         packageName = v1;
-                        NSLog(@"SGS2021 package name from inf file = %@", v1);
                     }
                     else if ([line startsWith:kVersion]) {
-                        NSLog(@"SGS2021 line of inf file: %@", line);
                        NSString *s = [line substringFromIndex:kVersion.length+1];
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
@@ -889,7 +860,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         packageVersion = v1;
                     }
                     else if ([line startsWith:kAuthor]) {
-                        NSLog(@"SGS2021 line of inf file: %@", line);
                         NSString *s = [line substringFromIndex:kAuthor.length+1];
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
@@ -898,7 +868,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         authorUrl = v2;
                     }
                     else if ([line startsWith:kCopyright]) {
-                        NSLog(@"SGS2021 line of inf file: %@", line);
                         NSString *s = [line substringFromIndex:kCopyright.length+1];
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
@@ -906,7 +875,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         copyright = v1;
                     }
                     else if ([line startsWith:kWebSite]) {
-                        NSLog(@"SGS2021 line of inf file: %@", line);
                         NSString *s = [line substringFromIndex:kWebSite.length+1];
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
@@ -923,21 +891,18 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
                     NSString *s = [line substringFromIndex:x+2];
                     if ([s startsWith:kFile]) {
-                        NSLog(@"SGS2021 file line of inf file: %@", line);
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kFile.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *fileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         [files addObject:fileName];
                     }
                     else if ([s startsWith:kFont]) {
-                        NSLog(@"SGS2021 font line of inf file: %@", line);
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kFont.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *fontFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         [files addObject:fontFileName];
                     }
                     else if ([s startsWith:kKeyboard]) {
-                        NSLog(@"SGS2021 keyboard line of inf file: %@", line);
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
                         NSString *keyboardName = [[[vs objectAtIndex:0] substringFromIndex:kKeyboard.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         NSString *keyboardFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
@@ -978,7 +943,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return packageInfo;
 }
 
-
+/* obsolete now that we're loading into KMPackageInfo
 - (NSDictionary *)keyboardInfoFromInfFile:(NSString *)infoFile {
     NSLog(@"SGS2021 load keyboardInfoFromInfFile");
 
@@ -1130,6 +1095,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
     return infoDict.count?[NSDictionary dictionaryWithDictionary:infoDict]:nil;
 }
+ */
 
 - (NSString *)selectedKeyboard {
     if (_selectedKeyboard == nil) {

@@ -53,44 +53,7 @@
 - (KMPackageInfo*)packageInfo {
     if(_packageInfo == nil) {
         _packageInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
-        
-        NSLog(@"SGS2021 packageInfo.packageName = %@", _packageInfo.packageName);
-        NSLog(@"SGS2021 packageInfo.packageVersion = %@", _packageInfo.packageVersion);
-        NSLog(@"SGS2021 packageInfo.authorName = %@", _packageInfo.authorName);
-        NSLog(@"SGS2021 packageInfo.authorUrl = %@", _packageInfo.authorUrl);
-        NSLog(@"SGS2021 packageInfo.copyright = %@", _packageInfo.copyright);
-        NSLog(@"SGS2021 packageInfo.readmeFilename = %@", _packageInfo.readmeFilename);
-
     }
-
-    /*
-    if(_keyboardInfo == nil) {
-        KMPackageInfo *packageInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
-    
-        NSMutableDictionary *infoDict = [NSMutableDictionary dictionaryWithCapacity:0];
-        [infoDict setObject:@[packageInfo.packageName, @""] forKey:@"Name"];
-        [infoDict setObject:packageInfo.readmeFilename forKey:@"ReadMeFile"];
-
-        _keyboardInfo = infoDict;
-        _keyboardInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
-    }
-
-    if (_keyboardInfo == nil) {
-        NSString *jsonFilename = [self.packagePath stringByAppendingPathComponent:@"kmp.json"];
-        NSLog(@"SGS2021 KMKeyboardHelpWindowController loading keyboard info from json file: %@", jsonFilename);
-        _keyboardInfo = [self.AppDelegate loadKeyboardInfoFromJsonFile:jsonFilename];
-
-        NSDictionary *info = _keyboardInfo[@"info"];
-        NSDictionary *nameMap = info[@"name"];
-        NSLog(@"SGS2021 package name = %@", nameMap[@"description"]);
-    }
-    
-    if (_keyboardInfo == nil) {
-        NSString *infoFile = [self.packagePath stringByAppendingPathComponent:@"kmp.inf"];
-        NSLog(@"SGS2021 KMKeyboardHelpWindowController loading keyboard info from %@", infoFile);
-        _keyboardInfo = [self.AppDelegate keyboardInfoFromInfFile:infoFile];
-    }
-    */
     
     return _packageInfo;
 }
