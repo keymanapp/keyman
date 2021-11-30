@@ -59,11 +59,10 @@ namespace kbp
 
      /**
      *
-     * @param  action_items  action item list to be added to the keyboard processors queue
-     * @return bool - true if action list has been successfully processed
+     *
+     * @return km_kbp_context_item* - the intermediate context
      */
-    bool
-    kmx_processor::get_intermediate_context() const  override;
+    km_kbp_context_item * get_intermediate_context() override;
 
     km_kbp_keyboard_key * get_key_list() const override;
 

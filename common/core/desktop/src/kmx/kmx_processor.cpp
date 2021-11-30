@@ -6,6 +6,38 @@
 using namespace km::kbp;
 using namespace kmx;
 
+// TODO consolodate with appint.cpp and put in public library.
+static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR const* buf, km_kbp_context_item** outPtr)
+{
+  assert(buf);
+  assert(outPtr);
+  km_kbp_context_item* context_items  = new km_kbp_context_item[u16len(buf) + 1];
+  KMX_WCHAR const *p = buf;
+  uint8_t contextIndex = 0;
+  while (*p) {
+    if (*p == UC_SENTINEL) {
+      assert(*(p + 1) == CODE_DEADKEY);
+      // we know the only uc_sentinel code in the context is code_deadkey, which has only 1 parameter: uc_sentinel code_deadkey <deadkey_id>
+      // setup dead key context item
+      p += 2;
+      context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {*p} };
+    } else if (Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p + 1))) {
+      // handle surrogate
+      context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
+      p++;
+    } else {
+      context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
+    }
+    p++;
+  }
+  // terminate the context_items array.
+  context_items[contextIndex] = km_kbp_context_item KM_KBP_CONTEXT_ITEM_END;
+
+  *outPtr = context_items;
+  return true;
+}
+
+
 km_kbp_status kmx_processor::validate() const {
   return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
 }
@@ -234,6 +266,15 @@ constexpr km_kbp_attr const engine_attrs = {
 
 km_kbp_attr const & kmx_processor::attributes() const {
   return engine_attrs;
+}
+
+km_kbp_context_item * kmx_processor::get_intermediate_context() {
+  KMX_WCHAR *buf = _kmx.GetContext()->BufMax(MAXCONTEXT);
+  km_kbp_context_item *citems = nullptr;
+  if (!ContextItemsFromAppContext(buf, &citems)){
+      citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
+  }
+  return citems;
 }
 
 km_kbp_keyboard_key * kmx_processor::get_key_list() const  {

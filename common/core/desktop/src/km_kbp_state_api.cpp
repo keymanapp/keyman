@@ -69,6 +69,18 @@ km_kbp_context *km_kbp_state_context(km_kbp_state *state)
   return static_cast<km_kbp_context *>(&state->context());
 }
 
+km_kbp_status
+kbp_state_get_intermediate_context(km_kbp_state *state, km_kbp_context_item ** context_items){
+  assert(state);
+  assert(context_items);
+  if (!state|| !context_items){
+    return KM_KBP_STATUS_INVALID_ARGUMENT;
+  }
+  auto & processor = state->processor();
+  *context_items = processor.get_intermediate_context();
+
+  return KM_KBP_STATUS_OK;
+}
 
 km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
                                                      size_t *num_items)
@@ -85,7 +97,6 @@ km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
   return state->actions().data();
 }
 
-KMN_API
 km_kbp_status
 km_kbp_state_queue_action_items(km_kbp_state *state,
                          km_kbp_action_item const *action_items){

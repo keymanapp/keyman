@@ -191,8 +191,14 @@ namespace km {
       return key_list;
     }
 
-    km_kbp_keyboard_imx  * mock_processor::get_imx_list() const  {
-      return nullptr;
+    km_kbp_keyboard_imx  * mock_processor::get_imx_list() const {
+      km_kbp_keyboard_imx* imx_list = new km_kbp_keyboard_imx(KM_KBP_KEYBOARD_IMX_END);
+      return imx_list;
+    }
+
+    km_kbp_context_item * mock_processor::get_intermediate_context() {
+      km_kbp_context_item *citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
+      return citems;
     }
 
     km_kbp_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
