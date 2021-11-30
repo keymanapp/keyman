@@ -70,6 +70,15 @@ namespace kbp
     queue_action(km_kbp_action_item const* action_item
     ) = 0;
 
+/**
+ * Returns the keyboardprocessor context as an array of
+ * km_kbp_context_items. Caller is responsible for freeing
+ * the memory
+ * @return km_kbp_context_item*
+ */
+    virtual km_kbp_context_item *
+    get_intermediate_context() = 0;
+
   /**
    * Returns the list of keys that belong to the keyboard rules. The matching dispose
    * call needs to be called to free the memory.
