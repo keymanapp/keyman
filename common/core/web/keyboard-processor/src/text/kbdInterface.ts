@@ -956,7 +956,7 @@ namespace com.keyman.text {
      * @param       {Object}        outputTarget   The target receiving input
      * @param       {Object}        keystroke      The input keystroke (with its properties) to be mapped by the keyboard.
      * Description  Calls the keyboard's `begin newContext` group
-     * @returns     {number}        0 if no match is made, otherwise 1.
+     * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin NewContext`
      */
     processNewContextEvent(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
       if(!this.activeKeyboard) {
@@ -971,7 +971,7 @@ namespace com.keyman.text {
      * @param       {Object}        outputTarget   The target receiving input
      * @param       {Object}        keystroke      The input keystroke with relevant properties to be mapped by the keyboard.
      * Description  Calls the keyboard's `begin postKeystroke` group
-     * @returns     {number}        0 if no match is made, otherwise 1.
+     * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin PostKeystroke`
      */
     processPostKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
       if(!this.activeKeyboard) {
@@ -986,7 +986,7 @@ namespace com.keyman.text {
      * @param       {Object}        outputTarget   The target receiving input
      * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
      * Description  Encapsulates calls to keyboard input processing.
-     * @returns     {number}        0 if no match is made, otherwise 1.
+     * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin Unicode`
      */
     processKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
       if(!this.activeKeyboard) {
