@@ -10,6 +10,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface KMKeyboardInfoBuilder : NSObject
+@property (nonatomic,copy) NSString* name;
+@property (nonatomic,copy) NSString* identifier;
+@property (nonatomic,copy) NSString* version;
+@property (nonatomic,copy) NSString* oskFont;
+@property (nonatomic,copy) NSString* displayFont;
+@property (nonatomic,copy) NSArray* languages;
+
+- (instancetype)init;
+
+@end
+
 @interface KMLanguageInfo : NSObject
 @property (nonatomic,readonly) NSString* name;
 @property (nonatomic,readonly) NSString* identifier;
@@ -25,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,readonly) NSString* oskFont;
 @property (nonatomic,readonly) NSString* displayFont;
 @property (nonatomic,readonly) NSArray* languages;
+
+- (instancetype)initWithBuilder:(KMKeyboardInfoBuilder*)builder;
 
 - (instancetype)initWithName:(NSString*)name
                   identifier:(NSString*)identifier

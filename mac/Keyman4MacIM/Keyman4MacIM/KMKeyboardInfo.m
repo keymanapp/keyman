@@ -8,6 +8,22 @@
 
 #import "KMKeyboardInfo.h"
 
+@implementation KMKeyboardInfoBuilder
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _name = nil;
+        _identifier = nil;
+        _version = nil;
+        _oskFont = nil;
+        _displayFont = nil;
+        _languages = nil;
+    }
+    return self;
+}
+@end
+
+
 @implementation KMLanguageInfo
 
 - (instancetype)initWithName:(NSString*)name
@@ -24,6 +40,19 @@
 @end
 
 @implementation KMKeyboardInfo
+
+- (instancetype)initWithBuilder:(KMKeyboardInfoBuilder *)builder {
+    self = [super init];
+    if (self) {
+        _name = builder.name;
+        _identifier = builder.identifier;
+        _version = builder.version;
+        _oskFont = builder.oskFont;
+        _displayFont = builder.displayFont;
+        _languages = builder.languages;
+    }
+    return self;
+}
 
 - (instancetype)initWithName:(NSString*)name
                   identifier:(NSString*)identifier

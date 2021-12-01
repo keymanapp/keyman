@@ -8,7 +8,49 @@
 
 #import "KMPackageInfo.h"
 
+@implementation KMPackageInfoBuilder
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _packageName = nil;
+        _packageVersion = nil;
+        _readmeFilename = nil;
+        _graphicFilename = nil;
+        _fileVersion = nil;
+        _keymanDeveloperVersion = nil;
+        _copyright = nil;
+        _authorName = nil;
+        _authorUrl = nil;
+        _website = nil;
+        _keyboards = nil;
+        _fonts = nil;
+        _files = nil;
+    }
+    return self;
+}
+@end
+
 @implementation KMPackageInfo
+
+- (instancetype)initWithBuilder:(KMPackageInfoBuilder *)builder {
+    self = [super init];
+    if (self) {
+        _packageName = builder.packageName;
+        _packageVersion = builder.packageVersion;
+        _readmeFilename = builder.readmeFilename;
+        _graphicFilename = builder.graphicFilename;
+        _fileVersion = builder.fileVersion;
+        _keymanDeveloperVersion = builder.keymanDeveloperVersion;
+        _copyright = builder.copyright;
+        _authorName = builder.authorName;
+        _authorUrl = builder.authorUrl;
+        _website = builder.website;
+        _keyboards = builder.keyboards;
+        _fonts = builder.fonts;
+        _files = builder.files;
+    }
+    return self;
+}
 
 - (instancetype)initWithName:(NSString*)packageName
               packageVersion:(NSString*)packageVersion
