@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.158 alpha 2021-12-01
+
+* feat(android/engine): Add other IME's to the Keyboard Picker menu (#5973)
+* chore(android): Specify build tools version on other projects (#5979)
+
 ## 15.0.157 alpha 2021-11-29
 
 * fix(web): remove obsolete popupBaseTarget (#5949)
