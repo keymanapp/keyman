@@ -12,9 +12,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -24,23 +22,27 @@ import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
-//import android.inputmethodservice.Keyboard;
+import android.inputmethodservice.InputMethodService;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,8 +53,14 @@ public final class KeyboardPickerActivity extends BaseActivity {
   //TODO: view instances should not be static
   private static Toolbar toolbar = null;
   private static ListView listView = null;
-  private static Button closeButton = null;
+  private static ListView imeListView = null;
+  private static final String titleKey = "title";
+  private static final String subtitleKey = "subtitle";
+  private static final String iconKey = "icon";
+
+  private static ArrayList<HashMap<String, String>> imeList = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
+  private static ListAdapter imeListAdapter = null;
 
   public static final String  KMKEY_INTERNAL_NEW_KEYBOARD = "_internal_new_keyboard_";
 
@@ -83,27 +91,12 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
+    int actionBarHeight = toolbar.getLayoutParams().height;
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     TextView textView = (TextView) findViewById(R.id.bar_title);
     textView.setText(getResources().getQuantityString(R.plurals.title_keyboards, 2));
-
-    closeButton = (Button) findViewById(R.id.close_keyman_button);
-    Bundle bundle = getIntent().getExtras();
-    if (bundle != null) {
-      if (!bundle.getBoolean(KMManager.KMKey_DisplayKeyboardSwitcher)) {
-        closeButton.setVisibility(View.GONE);
-      }
-    }
-    closeButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        KMManager.advanceToNextInputMode();
-        if (dismissOnSelect) {
-          finish();
-        }
-      }
-    });
 
     listView = (ListView) findViewById(R.id.listView);
 
@@ -124,6 +117,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     listAdapter.listFont = listFont;
     listView.setAdapter(listAdapter);
     listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -200,6 +194,49 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
       }
     });
+
+    Bundle bundle = getIntent().getExtras();
+    if (bundle != null) {
+      if (bundle.getBoolean(KMManager.KMKey_DisplayKeyboardSwitcher)) {
+        // Create list of other Enabled IME's (excluding self)
+        View view = getLayoutInflater().inflate(R.layout.ime_list_layout, null);
+        LinearLayout imeLinearLayout = (LinearLayout) view.findViewById(R.id.ime_linear_layout);
+        imeListView = (ListView) imeLinearLayout.findViewById(R.id.listView);
+        imeList = getIMEList(context);
+        if (imeListView != null && imeList != null && imeList.size() > 0) {
+          // "Other Input Methods" titlebar
+          TextView imeTextView = (TextView) view.findViewById(R.id.other_ime_title);
+          imeTextView.setText(getResources().getQuantityString(R.plurals.title_other_input_methods, imeList.size()));
+
+          String[] from = new String[]{titleKey, subtitleKey, iconKey};
+          int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
+          // Using list_row_layout5 to hide displaying subtitle (IME ID)
+          imeListAdapter = new SimpleAdapter(this, imeList, R.layout.list_row_layout5, from, to);
+          imeListView.setAdapter(imeListAdapter);
+          // Rescale IME listview so entire list is visible (wrap_content not working)
+          imeListView.getLayoutParams().height = actionBarHeight * imeListAdapter.getCount();
+          imeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+              HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
+              if (hashMap == null) {
+                return;
+              }
+
+              String imeID = MapCompat.getOrDefault(hashMap, subtitleKey, "");
+              InputMethodService ims = KMManager.getInputMethodService();
+              if (!imeID.equals("") && ims != null) {
+                ims.switchInputMethod(imeID);
+              }
+              finish();
+            }
+          });
+
+          // Append the IME list to the overall listView
+          listView.addFooterView(imeLinearLayout);
+        }
+      }
+    }
   }
 
   @Override
@@ -212,6 +249,13 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
     int curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
     setSelection(curKbPos);
+
+    imeList = getIMEList(this);
+    BaseAdapter imeAdapter = (BaseAdapter)imeListAdapter;
+    if (imeListAdapter != null) {
+      imeAdapter.notifyDataSetChanged();
+    }
+
     if (!shouldCheckKeyboardUpdates)
       return;
   }
@@ -478,6 +522,39 @@ public final class KeyboardPickerActivity extends BaseActivity {
       }
     }
 
+    return list;
+  }
+
+  // Get the list of IME's excluding self
+  private static ArrayList<HashMap<String, String>> getIMEList(Context context) {
+    String selfPackageName = context.getApplicationContext().getPackageName();
+    ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+    InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+    List<InputMethodInfo> imeList = imManager.getEnabledInputMethodList();
+    PackageManager packageManager = context.getPackageManager();
+    for (InputMethodInfo imeInfo : imeList) {
+      String id = imeInfo.getId();
+      if (!id.startsWith(selfPackageName)) {
+        // Attempt to get a readable name
+        // Reference: https://stackoverflow.com/questions/62512501/get-human-readable-name-of-default-keyboard-not-package-name
+        ComponentName componentName = ComponentName.unflattenFromString(id);
+        if (componentName != null) {
+          String packageName = componentName.getPackageName();
+          try {
+            //PackageInfo info = packageManager.getPackageInfo(packageName, 0);
+            ApplicationInfo info = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+            String imeName = (String)packageManager.getApplicationLabel(info);
+            HashMap<String, String> hashMap = new HashMap<String, String>();
+            hashMap.put(titleKey, imeName);
+            hashMap.put(subtitleKey, id);
+            list.add(hashMap);
+
+          } catch (PackageManager.NameNotFoundException e) {
+            KMLog.LogException(TAG, "Name not found", e);
+          }
+        }
+      }
+    }
     return list;
   }
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/ime_linear_layout"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical">
+
+  <!-- "Other Input Methods" title -->
+  <TextView
+    android:id="@+id/other_ime_title"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/other_ime_title_height"
+    android:layout_gravity="center_horizontal"
+    android:background="@android:color/darker_gray"
+    android:gravity="center"
+    android:ellipsize="end"
+    android:singleLine="true"
+    android:textSize="@dimen/titlebar_label_textsize"
+    android:textStyle="bold"
+    android:layout_marginTop="@dimen/fab_margin"/>
+
+  <!-- ListView of other enabled keyboards -->
+  <include layout="@layout/list_layout"
+    android:id="@+id/ime_list_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+
+</LinearLayout>
