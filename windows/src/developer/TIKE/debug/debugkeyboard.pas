@@ -190,7 +190,7 @@ begin
       Inc(pch, kfh.dpGroupArray);
       kfg := PKeyboardFileGroup(pch);
 
-      for i := 0 to kfh.cxGroupArray - 1 do
+      for i := 0 to Integer(kfh.cxGroupArray) - 1 do
       begin
         group := TDebugGroup.Create;
         group.Base := kfg;
@@ -201,7 +201,7 @@ begin
         pch := PByte(Memory);
         Inc(pch, kfg.dpKeyArray);
         kfk := PKeyboardFileKey(pch);
-        for j := 0 to kfg.cxKeyArray - 1 do
+        for j := 0 to Integer(kfg.cxKeyArray) - 1 do
         begin
           key := TDebugKey.Create;
           key.Key := kfk.Key;
@@ -218,7 +218,7 @@ begin
       Inc(pch, kfh.dpStoreArray);
       kfs := PKeyboardFileStore(pch);
 
-      for i := 0 to kfh.cxStoreArray - 1 do
+      for i := 0 to Integer(kfh.cxStoreArray) - 1 do
       begin
         store := TDebugStore.Create;
         store.Base := kfs;
