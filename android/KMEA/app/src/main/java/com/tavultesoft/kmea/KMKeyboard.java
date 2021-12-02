@@ -372,9 +372,7 @@ final class KMKeyboard extends WebView {
    * @return String
    */
   public static String textFontFilename() {
-    String fontPath = (txtFont.contains(KMManager.KMDefault_KeyboardFont)) ?
-      KMManager.getResourceRoot() : keyboardRoot;
-    return txtFont.isEmpty() ? "" : fontPath + txtFont;
+    return txtFont;
   }
 
   /**
@@ -382,9 +380,7 @@ final class KMKeyboard extends WebView {
    * @return String
    */
   public static String oskFontFilename() {
-    String fontPath = (oskFont.contains(KMManager.KMDefault_KeyboardFont)) ?
-      KMManager.getResourceRoot() : keyboardRoot;
-    return fontPath + oskFont;
+    return oskFont;
   }
 
   /**
