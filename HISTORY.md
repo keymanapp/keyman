@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.159 alpha 2021-12-02
+
+* fix(developer): debugger crash with empty group (#5995)
+* chore(android): Document switching to other system keyboard (#5991)
+* fix(android/engine): Fix font paths (#5987)
+
 ## 15.0.158 alpha 2021-12-01
 
 * feat(android/engine): Add other IME's to the Keyboard Picker menu (#5973)
