@@ -5,10 +5,11 @@
 
 # must be run from linux dir
 
-# parameters: [PROJECT=<project>] [DIST=<dist>] ./scripts/debian.sh
+# parameters: [PROJECT=<project>] [DIST=<dist>] [DEBREVISION=<no>] ./scripts/debian.sh
 # PROJECT=<project>   only process this project
 # DIST=<dist>         distribution to create packages for (unstable, experimental, etc). If not
 #                     specified UNRELEASED will be used.
+# DEBREVISION=<no>    the debian revision number. Defaults to 1.
 
 set -e
 
@@ -34,7 +35,7 @@ for proj in ${projects}; do
     if [ -n "$DIST" ]; then
         EXTRA_ARGS="--distribution $DIST --force-distribution"
     fi
-    dch --newversion ${version}-1 ${EXTRA_ARGS} "Re-release to Debian"
+    dch --newversion ${version}-${DEBREVISION-1} ${EXTRA_ARGS} "Re-release to Debian"
     debuild -d -S -sa -Zxz
     cd ${BASEDIR}
 done
