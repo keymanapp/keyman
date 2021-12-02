@@ -31,7 +31,7 @@ type
   end;
 
 function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;   // I3310
-
+function CompilerMessageW( line: Integer; msgcode: LongWord; const text: string): Integer;
 implementation
 
 uses
@@ -169,11 +169,9 @@ begin
   end;
 end;
 
-function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;   // I3310
+function CompilerMessageW( line: Integer; msgcode: LongWord; const text: string): Integer;
 var
   state: TProjectLogState;
-const
-	nlstr: array[0..2] of ansichar = (#$D, #$A, #$0);   // I3310
 begin
   if (msgcode = CWARN_Info) then state := plsInfo
   else if (msgcode and CERR_ERROR) <> 0   then state := plsError
@@ -181,9 +179,14 @@ begin
   else if (msgcode and CERR_FATAL) <> 0   then state := plsFatal
   else state := plsFatal;
 
-  TProjectLogConsole.Instance.Log(state, string(AnsiString(text)), msgcode, line);
+  TProjectLogConsole.Instance.Log(state, text, msgcode, line);
 
   Result := 1;
+end;
+
+function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;   // I3310
+begin
+  Result := CompilerMessageW(line, msgcode, string(AnsiString(text)));
 end;
 
 end.

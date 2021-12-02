@@ -293,7 +293,7 @@ begin
   begin
     with TCompileKeymanWeb.Create do
     try
-      Result := Compile(nil, FInFile, FOutFile, FDebug, @CompilerMessage);   // I3681   // I4865   // I4866
+      Result := Compile(nil, FInFile, FOutFile, FDebug, @CompilerMessageW);   // I3681   // I4865   // I4866
     finally
       Free;
     end;
