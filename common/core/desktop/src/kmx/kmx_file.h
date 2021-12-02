@@ -147,6 +147,8 @@ namespace kmx {
 #define UC_SENTINEL       0xFFFF
 #define UC_SENTINEL_EXTENDEDEND 0x10 // was ((CODE_LASTCODE)+1)... what was I thinking?
 
+#define U_UC_SENTINEL u"\uFFFF"
+
 /*
  * VK__MAX defines the highest virtual key code defined in the system = 0xFF.  Custom VK codes start at 256
  */
@@ -187,6 +189,49 @@ namespace kmx {
 #define CODE_SETSYSTEMSTORE 0x18
 
 #define CODE_LASTCODE   0x18
+
+#define U_CODE_ANY u"\u0001"
+#define U_CODE_INDEX u"\u0002"
+#define U_CODE_CONTEXT u"\u0003"
+#define U_CODE_NUL u"\u0004"
+#define U_CODE_USE u"\u0005"
+#define U_CODE_RETURN u"\u0006"
+#define U_CODE_BEEP u"\u0007"
+#define U_CODE_DEADKEY u"\u0008"
+#define U_CODE_EXTENDED u"\u000A"
+#define U_CODE_SWITCH u"\u000C"
+#define U_CODE_CLEARCONTEXT u"\u000E"
+#define U_CODE_CALL u"\u000F"
+#define U_CODE_EXTENDEDEND u"\u0010"
+#define U_CODE_CONTEXTEX u"\u0011"
+#define U_CODE_NOTANY u"\u0012"
+#define U_CODE_SETOPT u"\u0013"
+#define U_CODE_IFOPT u"\u0014"
+#define U_CODE_SAVEOPT u"\u0015"
+#define U_CODE_RESETOPT u"\u0016"
+#define U_CODE_IFSYSTEMSTORE u"\u0017"
+#define U_CODE_SETSYSTEMSTORE u"\u0018"
+
+#define C_CODE_ANY(store) U_UC_SENTINEL U_CODE_ANY store
+#define C_CODE_INDEX(val1, val2) U_UC_SENTINEL U_CODE_INDEX val1 val2
+#define C_CODE_CONTEXT() U_UC_SENTINEL U_CODE_CONTEXT
+#define C_CODE_NUL() U_UC_SENTINEL U_CODE_NUL
+#define C_CODE_USE(val) U_UC_SENTINEL U_CODE_USE val
+#define C_CODE_RETURN() U_UC_SENTINEL U_CODE_RETURN
+#define C_CODE_BEEP() U_UC_SENTINEL U_CODE_BEEP
+#define C_CODE_DEADKEY(deadkey) U_UC_SENTINEL U_CODE_DEADKEY deadkey
+#define C_CODE_EXTENDED(varargs) U_UC_SENTINEL U_CODE_EXTENDED varargs
+#define C_CODE_SWITCH(val) U_UC_SENTINEL U_CODE_SWITCH val
+#define C_CODE_CLEARCONTEXT() U_UC_SENTINEL U_CODE_CLEARCONTEXT
+#define C_CODE_CALL(val) U_UC_SENTINEL U_CODE_CALL val
+#define C_CODE_CONTEXTEX(val) U_UC_SENTINEL U_CODE_CONTEXTEX val
+#define C_CODE_NOTANY(val) U_UC_SENTINEL U_CODE_NOTANY val
+#define C_CODE_SETOPT(val1, val2) U_UC_SENTINEL U_CODE_SETOPT val1 val2
+#define C_CODE_IFOPT(opt, val1, val2) U_UC_SENTINEL U_CODE_IFOPT opt val1 val2
+#define C_CODE_SAVEOPT(opt) U_UC_SENTINEL U_CODE_SAVEOPT opt
+#define C_CODE_RESETOPT(opt) U_UC_SENTINEL U_CODE_RESETOPT opt
+#define C_CODE_IFSYSTEMSTORE(store, val1, val2) U_UC_SENTINEL U_CODE_IFSYSTEMSTORE store val1 val2
+#define C_CODE_SETSYSTEMSTORE(store, val) U_UC_SENTINEL U_CODE_SETSYSTEMSTORE store val
 
 #define KF_SHIFTFREESCAPS 0x0001
 #define KF_CAPSONONLY   0x0002
