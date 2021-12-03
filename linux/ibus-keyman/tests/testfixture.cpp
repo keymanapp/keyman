@@ -30,7 +30,8 @@ typedef struct {
 typedef struct {
   char *test_name;
   char *test_path;
-  char *skip_reason;
+  const char *skip_reason;
+  gboolean use_surrounding_text;
 } TestData;
 
 static gboolean loaded        = FALSE;
@@ -92,6 +93,10 @@ ibus_keyman_tests_fixture_tear_down(IBusKeymanTestsFixture *fixture, gconstpoint
 
   g_clear_object(&fixture->bus);
   g_clear_object(&fixture->context);
+  auto data = (TestData *)user_data;
+  g_free(data->test_name);
+  g_free(data->test_path);
+  delete data;
 }
 
 static void
@@ -188,6 +193,21 @@ get_key_event_for_modifier(guint modifier, guint & prev_modifiers, guint keyval,
   return event;
 }
 
+static bool
+is_modifier(guint16 keycode) {
+  switch (keycode) {
+    case KEY_LEFTSHIFT:
+    case KEY_RIGHTSHIFT:
+    case KEY_LEFTALT:
+    case KEY_RIGHTALT:
+    case KEY_LEFTCTRL:
+    case KEY_RIGHTCTRL:
+    case KEY_CAPSLOCK:
+      return true;
+    }
+    return false;
+}
+
 static std::list<gdk_key_event>
 get_involved_keys(IBusKeymanTestsFixture *fixture, km::tests::key_event test_event) {
   guint modifiers = 0;
@@ -220,12 +240,18 @@ get_involved_keys(IBusKeymanTestsFixture *fixture, km::tests::key_event test_eve
   // process key
   guint keyval = (test_event.modifier_state & KM_KBP_MODIFIER_SHIFT) ? gdk_keyval_to_upper(test_event.vk)
                                                                      : gdk_keyval_to_lower(test_event.vk);
+
+  // REVIEW: the keyval we use here are not correct for < 0x20 and >= 0x7f
+  // See /usr/include/X11/keysymdef.h and /usr/include/ibus-1.0/ibuskeysyms.h
+  // Currently this is not a problem because we don't use keyval, but if that ever changes we
+  // should be aware that our test behaves different than the real client.
+
   gdk_key_event event;
   event.modifiers_keydown = modifiers;
   event.modifiers_keyup   = modifiers | IBUS_RELEASE_MASK;
   event.keyval            = keyval;
   event.keycode           = vk_to_keycode(test_event.vk);
-  event.is_modifier       = 0;
+  event.is_modifier       = is_modifier(event.keycode);
   result.push_back(event);
 
   return result;
@@ -255,8 +281,18 @@ press_keys(IBusKeymanTestsFixture *fixture, km::tests::KmxTestSource & test_sour
   std::stack<GdkEventKey> keys_to_release;
   for (auto key = involved_keys.begin(); key != involved_keys.end(); key++) {
     bool old_caps_lock = get_caps_lock_state(fixture);
+    guint lock_modifier = 0;
+
+    // KEY_CAPSLOCK behaves a bit strange:
+    // If capslock is off:
+    // - on keypress we turn on capslock, but the modifier is still not set.
+    // - The LOCK_MASK modifier gets set on release.
+    // When capslock is already on:
+    // - the LOCK_MASK modifier is set on both keypress and release
+    // - capslock gets turned off on release
     if (key->keycode == KEY_CAPSLOCK && !old_caps_lock) {
       set_caps_lock_state(fixture, true);
+      lock_modifier = IBUS_LOCK_MASK;
     }
     GdkEventKey keyEvent = {
         .type             = GDK_KEY_PRESS,
@@ -273,7 +309,7 @@ press_keys(IBusKeymanTestsFixture *fixture, km::tests::KmxTestSource & test_sour
     gtk_im_context_filter_keypress(fixture->context, &keyEvent);
 
     keyEvent.type  = GDK_KEY_RELEASE;
-    keyEvent.state = key->modifiers_keyup;
+    keyEvent.state = key->modifiers_keyup | lock_modifier;
     keys_to_release.push(keyEvent);
 
     if (key->keycode == KEY_CAPSLOCK && old_caps_lock) {
@@ -293,12 +329,15 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
   auto data       = (TestData*)user_data;
   auto sourcefile = string_format("%s.kmn", data->test_path);
   auto kmxfile    = string_format("und:%s.kmx", data->test_path);
+  ibus_im_test_set_surrounding_text_supported(data->use_surrounding_text);
 
   km::tests::KmxTestSource test_source;
   std::string keys        = "";
   std::u16string expected = u"", context = u"";
   km::tests::kmx_options options;
   bool expected_beep = false;
+  // NOTE: we don't verify expected beeps since engine.c directly calls a gdk method so we
+  // don't know when it gets called.
   g_assert_cmpint(test_source.load_source(sourcefile.c_str(), keys, expected, context, options, expected_beep), ==, 0);
 
   for (auto & option : options) {
@@ -333,9 +372,7 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
   }
 
   // Cleanup
-  g_free(data->test_name);
-  g_free(data->test_path);
-  delete data;
+  g_settings_sync();
 }
 
 static void
@@ -346,7 +383,32 @@ test_skip(IBusKeymanTestsFixture *fixture, gconstpointer user_data) {
 
 void
 print_usage() {
-  printf("Usage: %s --directory <keyboarddir> test1 [test2 ...]", g_get_prgname());
+  printf("Usage: %s --directory <keyboarddir> [--surrounding-text] [--no-surrounding-text] test1 [test2 ...]\n\n", g_get_prgname());
+  printf("Arguments:\n");
+  printf("\t--surrounding-text\tRun tests with surrounding text support\n");
+  printf("\t--no-surrounding-text\tRun tests without surrounding text support\n");
+  printf("\nIf neither --surrounding-text nor --no-surrounding-text are specified then the tests run with both settings.\n");
+}
+
+void
+add_test(const char* directory, const char* filename, gboolean use_surrounding_text, const char* skip_reason) {
+  auto file         = g_file_new_for_commandline_arg(filename);
+  auto testfilebase = g_file_get_basename(file);
+  auto testname     = g_string_new(NULL);
+  g_string_append_printf(
+      testname, "/integration-tests/%s/%s", use_surrounding_text ? "surrounding-text" : "no-surrounding-text", testfilebase);
+  auto testfile = g_file_new_build_filename(directory, testfilebase, NULL);
+  auto testdata                  = new TestData();
+  testdata->test_name            = strdup(filename);
+  testdata->test_path            = g_file_get_parse_name(testfile);
+  testdata->use_surrounding_text = use_surrounding_text;
+  testdata->skip_reason          = skip_reason;
+  g_test_add(
+      testname->str, IBusKeymanTestsFixture, testdata, ibus_keyman_tests_fixture_set_up, skip_reason ? test_skip : test_source,
+      ibus_keyman_tests_fixture_tear_down);
+  g_object_unref(file);
+  g_object_unref(testfile);
+  g_string_free(testname, TRUE);
 }
 
 int
@@ -360,51 +422,62 @@ main(int argc, char *argv[]) {
     return 1;
   }
 
-  if (strcmp(argv[1], "--directory") != 0) {
-    print_usage();
-    return 2;
+  int iArg;
+  char *directory = NULL;
+  bool seenDirectory = false;
+  bool seenSurroundingTextOption = false;
+  bool runSurroundingTextTests = true;
+  bool runNoSurroundingTextTests = true;
+
+  for (iArg = 1; iArg < argc; iArg++) {
+    if (strcmp(argv[iArg], "--directory") == 0 && iArg + 1 < argc) {
+      iArg++;
+      directory = argv[iArg];
+      seenDirectory = true;
+    } else if (strcmp(argv[iArg], "--surrounding-text") == 0) {
+      if (!seenSurroundingTextOption) {
+        runNoSurroundingTextTests = false;
+      }
+      runSurroundingTextTests = true;
+      seenSurroundingTextOption = true;
+    } else if (strcmp(argv[iArg], "--no-surrounding-text") == 0) {
+      if (!seenSurroundingTextOption) {
+        runSurroundingTextTests = false;
+      }
+      runNoSurroundingTextTests = true;
+      seenSurroundingTextOption = true;
+    } else if (!seenDirectory) {
+      print_usage();
+      return 2;
+    } else {
+      break;
+    }
   }
 
-  char *directory = argv[2];
-  int nTests      = argc - 3;
-  char **tests    = &argv[3];
+  int nTests      = argc - iArg;
+  char **tests    = &argv[iArg];
 
   // Add tests
-  for (int i = 0; i < nTests; i++)
-  {
+  for (int i = 0; i < nTests; i++) {
     auto filename = g_string_new(tests[i]);
     if (strstr(filename->str, ".kmx") || strstr(filename->str, ".kmn")) {
       g_string_truncate(filename, filename->len - 4);
     }
 
-    auto testdata     = new TestData();
-    auto file         = g_file_new_for_commandline_arg(filename->str);
-    auto testfilebase = g_file_get_basename(file);
-    auto testname     = g_string_new(NULL);
-    g_string_append_printf(testname, "/%s", testfilebase);
-    auto testfile       = g_file_new_build_filename(directory, testfilebase, NULL);
-    testdata->test_name = strdup(filename->str);
-    testdata->test_path = g_file_get_parse_name(testfile);
-
     // Check for tests to skip - #3345
-    gboolean skip = FALSE;
-    char *skipReason = NULL;
-    if (strcmp(filename->str, "k_026___system_stores") == 0 || strcmp(filename->str, "k_027___system_stores_2") == 0) {
-      skip = TRUE;
-      testdata->skip_reason = "mnemonic keyboards are not yet supported on Linux (#3345)";
-    } else if (
-        strcmp(filename->str, "k_041___long_context_and_deadkeys") == 0 ||
-        strcmp(filename->str, "k_042___long_context_and_split_deadkeys") == 0) {
-      skip = TRUE;
-      testdata->skip_reason = "can't test context with deadkey";
+    const char *skipReason = NULL;
+    if (strcmp(filename->str, "k_026___system_stores") == 0 ||
+        strcmp(filename->str, "k_027___system_stores_2") == 0) {
+      skipReason = "mnemonic keyboards are not yet supported on Linux (#3345)";
     }
 
-    g_test_add(
-        testname->str, IBusKeymanTestsFixture, testdata, ibus_keyman_tests_fixture_set_up,
-        skip ? test_skip : test_source, ibus_keyman_tests_fixture_tear_down);
-    g_object_unref(file);
-    g_object_unref(testfile);
-    g_string_free(testname, TRUE);
+    if (runSurroundingTextTests) {
+      add_test(directory, filename->str, TRUE, skipReason);
+    }
+    if (runNoSurroundingTextTests) {
+      add_test(directory, filename->str, FALSE, skipReason);
+    }
+
     g_string_free(filename, TRUE);
   }
 

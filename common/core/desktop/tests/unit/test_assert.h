@@ -43,3 +43,33 @@
     _assert_failed(0, u ## #expr); \
   } \
 }
+
+#ifdef assert_equal
+#undef assert_equal
+#endif
+#define assert_equal(actual, expected) { \
+  if ((actual) != (expected)) { \
+    std::wcerr << console_color::fg(console_color::BRIGHT_RED) \
+             << "Test failed at " << __FILE__ << ":" << __LINE__ << ":" \
+             << console_color::reset() \
+             << std::endl \
+             << "expected: " << (expected) << std::endl \
+             << "actual:   " << (actual) << std::endl; \
+    std::exit(100*__LINE__); \
+  } \
+}
+
+#ifdef assert_string_equal
+#undef assert_string_equal
+#endif
+#define assert_string_equal(actual, expected) { \
+  if (u16cmp((actual), (expected)) != 0) { \
+    std::wcerr << console_color::fg(console_color::BRIGHT_RED) \
+             << "Test failed at " << __FILE__ << ":" << __LINE__ << ":" \
+             << console_color::reset() \
+             << std::endl \
+             << "expected: " << Debug_UnicodeString((PKMX_WCHAR)(expected)) << std::endl \
+             << "actual:   " << Debug_UnicodeString((PKMX_WCHAR)(actual)) << std::endl; \
+    std::exit(100*__LINE__); \
+  } \
+}

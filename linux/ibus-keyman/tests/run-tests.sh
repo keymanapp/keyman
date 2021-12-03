@@ -30,11 +30,63 @@ function cleanup() {
   fi
 }
 
+function help() {
+  echo "Usage:"
+  echo "  $0 [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [[--] TEST...]"
+  echo
+  echo "Arguments:"
+  echo "  --help, -h, -?          Display this help"
+  echo "  -k                      passed to GLib testing framework"
+  echo "  --tap                   output in TAP format. Passed to GLib testing framework"
+  echo "  --surrounding-text      run tests with surrounding texts enabled"
+  echo "  --no-surrounding-text   run tests without support for surrounding text"
+  echo
+  echo "If no TESTs are specified then all tests are run."
+  echo "If neither --surrounding-text nor --no-surrounding-text are specified then the tests run with both settings."
+  exit 0
+}
+
+while (( $# )); do
+  case $1 in
+    --help|-h|-\?) help ;;
+    -k) ARG_K=$1 ;;
+    --tap) ARG_TAP=$1 ;;
+    --surrounding-text) ARG_SURROUNDING_TEXT=$1 ;;
+    --no-surrounding-text) ARG_NO_SURROUNDING_TEXT=$1 ;;
+    --) shift && break ;;
+    *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
+  esac
+  shift || (echo "Error: The last argument is missing a value. Exiting."; false) || exit 5
+done
+
 echo > $PID_FILE
 trap cleanup EXIT SIGINT
 
 TEMP_DATA_DIR=$(mktemp --directory)
 echo "rm -rf ${TEMP_DATA_DIR}" >> $PID_FILE
+
+COMMON_ARCH_DIR=
+[ -d ${TOP_SRCDIR}/../../common/core/desktop/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../common/core/desktop/build/arch
+[ -d ${TOP_SRCDIR}/../keyboardprocessor/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../keyboardprocessor/arch
+
+if [ -d ${COMMON_ARCH_DIR}/release ]; then
+  COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/release
+elif [ -d ${COMMON_ARCH_DIR}/debug ]; then
+  COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/debug
+else
+  echo "Can't find neither ${COMMON_ARCH_DIR}/release nor ${COMMON_ARCH_DIR}/debug"
+  exit 2
+fi
+
+if [ ! -d $TESTDIR ] || ! [[ $(ls -x ${TESTDIR}/*.kmx 2>/dev/null | wc -l) > 0 ]]; then
+  if [[ $(ls -x ${COMMON_ARCH_DIR}/tests/unit/kmx/*.kmx 2>/dev/null | wc -l) > 0 ]]; then
+    mkdir -p $(realpath --canonicalize-missing $TESTDIR/..)
+    ln -sf $(realpath ${COMMON_ARCH_DIR}/tests/unit/kmx) $TESTDIR
+  else
+    echo "Can't find kmx files in ${COMMON_ARCH_DIR}/tests/unit/kmx"
+    exit 3
+  fi
+fi
 
 echo "Starting Xvfb..."
 Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
@@ -58,34 +110,7 @@ mkdir -p $SCHEMA_DIR
 cp ${TOP_SRCDIR}/../keyman-config/com.keyman.gschema.xml $SCHEMA_DIR/
 glib-compile-schemas $SCHEMA_DIR
 
-COMMON_ARCH_DIR=
-[ -d ${TOP_SRCDIR}/../../common/core/desktop/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../common/core/desktop/build/arch
-[ -d ${TOP_SRCDIR}/../keyboardprocessor/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../keyboardprocessor/arch
-
-if [ -d ${COMMON_ARCH_DIR}/release ]; then
-  COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/release
-elif [ -d ${COMMON_ARCH_DIR}/debug ]; then
-  COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/debug
-else
-  echo "Can't find neither ${COMMON_ARCH_DIR}/release nor ${COMMON_ARCH_DIR}/debug"
-  exit 2
-fi
-
-if [ ! -d $TESTDIR ]; then
-  if [[ $(ls -l ${COMMON_ARCH_DIR}/tests/unit/kmx/*.kmx 2>/dev/null | wc -l) > 0 ]]; then
-    mkdir -p $(realpath --canonicalize-missing $TESTDIR/..)
-    ln -sf $(realpath ${COMMON_ARCH_DIR}/tests/unit/kmx) $TESTDIR
-  else
-    echo "Can't find kmx files in ${COMMON_ARCH_DIR}/tests/unit/kmx"
-    exit 3
-  fi
-fi
-
-[ "$1" == "-k" ] && ARG_K="-k" && shift
-[ "$1" == "--tap" ] && ARG_TAP="--tap" && shift
-
 if [ $# -gt 0 ]; then
-  [ "$1" == "--" ] && shift
   TESTFILES=($@)
 else
   pushd $TESTDIR > /dev/null
@@ -93,11 +118,15 @@ else
   popd > /dev/null
 fi
 
-export GSETTINGS_BACKEND=keyfile
 export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:$LD_LIBRARY_PATH
 
-# Ubuntu 18.04 Bionic doesn't have ibus-memconf
-[ -f /usr/libexec/ibus-memconf ] && IBUS_CONFIG=--config=/usr/libexec/ibus-memconf
+# Ubuntu 18.04 Bionic doesn't have ibus-memconf, and glib is not compiled with the keyfile
+# backend enabled, so we just use the default backend. Otherwise we use the keyfile
+# store which interferes less when running on a dev machine.
+if [ -f /usr/libexec/ibus-memconf ]; then
+  export GSETTINGS_BACKEND=keyfile
+  IBUS_CONFIG=--config=/usr/libexec/ibus-memconf
+fi
 
 ibus-daemon --panel=disable ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log &
 echo "kill -9 $!" >> $PID_FILE
@@ -106,5 +135,6 @@ echo "kill -9 $!" >> $PID_FILE
 sleep 1s
 
 echo "Starting tests..."
-./ibus-keyman-tests ${ARG_K-} ${ARG_TAP-} --directory $TESTDIR "${TESTFILES[@]}"
+# Note: -k and --tap are consumed by the GLib testing framework
+./ibus-keyman-tests ${ARG_K-} ${ARG_TAP-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} --directory $TESTDIR "${TESTFILES[@]}"
 echo "Finished tests."

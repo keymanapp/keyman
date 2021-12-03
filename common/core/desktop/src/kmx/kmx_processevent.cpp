@@ -292,6 +292,12 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
           m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
           pdeletecontext = m_context.Buf(1);
         }
+      } else if (m_state.vkey == KM_KBP_VKEY_CAPS) {
+        if (m_debug_items) {
+          m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+        }
+        *pOutputKeystroke = TRUE;
+        return FALSE;
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);

@@ -17,6 +17,19 @@
 using namespace km::kbp::kmx;
 using namespace std;
 
+#define U_UC_SENTINEL u"\uFFFF"
+#define U_1F609_WINKING_FACE u"\U0001F609"
+
+#define U_CODE_ANY u"\u0001"
+#define U_CODE_DEADKEY u"\u0008"
+#define U_CODE_IFOPT u"\u0014"
+#define U_CODE_IFSYSTEMSTORE u"\u0017"
+
+#define C_CODE_ANY(store) U_UC_SENTINEL U_CODE_ANY store
+#define C_CODE_IFOPT(opt, val1, val2) U_UC_SENTINEL U_CODE_IFOPT opt val1 val2
+#define C_CODE_IFSYSTEMSTORE(store, val1, val2) U_UC_SENTINEL U_CODE_IFSYSTEMSTORE store val1 val2
+#define C_CODE_DEADKEY(deadkey) U_UC_SENTINEL U_CODE_DEADKEY deadkey
+
 PKMX_WCHAR find_ptr_to_last_character(PKMX_WCHAR p_first) {
   int length = std::u16string(p_first).length();
   if (length > 0)
@@ -1208,6 +1221,27 @@ void test_decxstr() {
   assert(q == p + 2);
 }
 
+void test_xstrlen() {
+  assert_equal(xstrlen((PKMX_WCHAR)u""), 0);
+  assert_equal(xstrlen((PKMX_WCHAR)u"1"), 1);
+  assert_equal(xstrlen((PKMX_WCHAR)u"1234567890"), 10);
+  assert_equal(xstrlen((PKMX_WCHAR) C_CODE_DEADKEY("\u0001") u"a"), 2);
+  assert_equal(xstrlen((PKMX_WCHAR) C_CODE_IFOPT("\u0001", "\u0002", "\u0003") u"a"), 2);
+  assert_equal(xstrlen((PKMX_WCHAR) C_CODE_IFSYSTEMSTORE("\u0001", "\u0002", "\u0003") u"a"), 2);
+  assert_equal(xstrlen((PKMX_WCHAR) U_1F609_WINKING_FACE "a"), 2);
+}
+
+void
+test_xstrlen_ignoreifopt() {
+  assert_equal(xstrlen_ignoreifopt((PKMX_WCHAR)u""), 0);
+  assert_equal(xstrlen_ignoreifopt((PKMX_WCHAR)u"1"), 1);
+  assert_equal(xstrlen_ignoreifopt((PKMX_WCHAR)u"1234567890"), 10);
+  assert_equal(xstrlen_ignoreifopt((PKMX_WCHAR) C_CODE_DEADKEY("\u0001") u"a"), 2);
+  assert_equal(xstrlen_ignoreifopt((PKMX_WCHAR) C_CODE_IFOPT("\u0001", "\u0002", "\u0003") u"a"), 1);
+  assert_equal(xstrlen_ignoreifopt((PKMX_WCHAR) C_CODE_IFSYSTEMSTORE("\u0001", "\u0002", "\u0003") u"a"), 1);
+  assert_equal(xstrlen_ignoreifopt((PKMX_WCHAR) U_1F609_WINKING_FACE "a"), 2);
+}
+
 constexpr const auto help_str = "\
 test_kmx_xstring [--color]\n\
 \n\
@@ -1226,6 +1260,8 @@ int main(int argc, char *argv []) {
 
   test_incxstr();
   test_decxstr();
+  test_xstrlen();
+  test_xstrlen_ignoreifopt();
 
   return 0;
 }
