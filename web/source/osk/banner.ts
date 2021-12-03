@@ -404,10 +404,6 @@ namespace com.keyman.osk {
       // Tell the keyboard that the current layer has not changed
       keyman.core.keyboardProcessor.layerChangedStore.set('0');
       // Call the keyboard's entry point.
-      /*const postRuleBehavior = keyman.core.keyboardProcessor.processPostKeystroke(this.hostDevice, outputTarget);
-      if(postRuleBehavior) {
-        postRuleBehavior.finalize(keyman.core.keyboardProcessor, outputTarget);
-      }*/
       keyman.core.keyboardProcessor.processPostKeystroke(this.hostDevice, outputTarget)
         // If we have a RuleBehavior as a result, run it on the target. This should
         // only change system store and variable store values.
