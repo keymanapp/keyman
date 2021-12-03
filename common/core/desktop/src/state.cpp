@@ -46,6 +46,8 @@ state::state(km::kbp::abstract_processor & ap, km_kbp_option_item const *env)
                      env->key,
                      env->value);
   }
+  _imx_callback = nullptr;
+  _imx_object = nullptr;
 }
 
 void state::imx_register_callback(km_kbp_keyboard_imx_platform imx_callback, void *callback_object){

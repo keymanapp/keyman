@@ -245,18 +245,18 @@ ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD l
   }*/
   km_kbp_context_item *km_kbp_context_it = contextItems;
   uint8_t contextLen               = 0;
-  for (; km_kbp_context_it->type != KM_KBP_CT_END; ++contextItems) {
+  for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
     ++contextLen;
   }
    
   WCHAR *buf = new WCHAR[(contextLen*3)+ 1 ]; // *3 if every context item was a deadkey 
   uint8_t idx               = 0;
-  for (; km_kbp_context_it->type != KM_KBP_CT_END; ++contextItems) {
+  for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
     switch (km_kbp_context_it->type) {
     case KM_KBP_CT_CHAR:
       if (Uni_IsSMP(km_kbp_context_it->character)) {
         buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate1(km_kbp_context_it->character);
-        buf[idx++] = Uni_UTF32ToSurrogate2(km_kbp_context_it->character);
+        buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate2(km_kbp_context_it->character);
       } else {
         buf[idx++] = (km_kbp_cp)km_kbp_context_it->character;
       }
