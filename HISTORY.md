@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.160 alpha 2021-12-03
+
+* fix(developer): building kmw keyboard had wrong message callback signature (#5972)
+* chore(common): add more description to Buf method (#6003)
+* chore(linux): add non-surrounding-text feature to tests (#5968)
+
 ## 15.0.159 alpha 2021-12-02
 
 * fix(developer): debugger crash with empty group (#5995)
