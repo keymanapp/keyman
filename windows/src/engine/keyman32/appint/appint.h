@@ -147,7 +147,7 @@ public:
    * will have n valid xstring units remaining until the the null terminating character.
    * OR
    * Returns NULL if there are less than n valid xstring units in the current context.
-   * Background this was historically for performance during rule evaluation, if I there
+   * Background this was historically for performance during rule evaluation, if there
    * are not enough characters to compare, don't event attempt the comparison.
    * Note:  Unlike BufMax there is no checking for truncation of code points.
    *        e.g. the pointer may point to a code unit that is half of a surrogate pair.
