@@ -23,85 +23,90 @@ public:
   KMX_Context();
 
   /**
-   * @brief Copy "source" AppContext to this AppContext
+   * Copy "source" AppContext to this AppContext
    *
-   * @param source KMX_Context to copy
+   * @param  source  KMX_Context to copy
    */
   void CopyFrom(KMX_Context *source);
 
   /**
-   * @brief  Add a single code unit to the Current Context. Not necessarily a complete code point
+   * Add a single code unit to the Current Context. Not necessarily a complete code point
    *
-   * @param Code unit to add
+   * @param  ch  Code unit to add
    */
   void Add(KMX_WCHAR ch);
 
   /**
-   * @brief  Removes a single code point from the end of the CurContext closest to the caret;
-   *         i.e. it will be both code units if a surrogate pair. If it is a deadkey it will
-   *         remove three code points: UC_SENTINEL, CODE_DEADKEY and deadkey value.
-   */
+  * Removes a single code point from the end of the CurContext closest to the caret;
+  * i.e. it will be both code units if a surrogate pair. If it is a deadkey it will
+  * remove three code points: UC_SENTINEL, CODE_DEADKEY and deadkey value.
+  */
   void Delete();
 
    /**
-   * @brief Clears the CurContext and resets the position - pos - index
+   * Clears the CurContext and resets the position - pos - index
    */
   void Reset();
 
    /**
-   * @brief  Copies the characters in CurContext to supplied buffer.
-   *         If bufsize is reached before the entire context was copied, the buf
-   *         will be truncated to number of valid characters possible with null character
-   *         termination. e.g. it will be one code unit less than bufsize if that would
-   *         have meant splitting a surrogate pair
-   * @param buf      The data buffer to copy current context
-   * @param bufsize  The number of code units ie size of the KMX_WCHAR buffer - not the code points
+   * Copies the characters in CurContext to supplied buffer.
+   * If bufsize is reached before the entire context was copied, the buf
+   * will be truncated to number of valid characters possible with null character
+   * termination. e.g. it will be one code unit less than bufsize if that would
+   * have meant splitting a surrogate pair
+   * @param  buf      The data buffer to copy current context
+   * @param  bufsize  The number of code units ie size of the KMX_WCHAR buffer - not the code points
    */
   void Get(KMX_WCHAR *buf, int bufsize);
 
    /**
-   * @brief Sets the CurContext to the supplied buf character array and updates the pos index.
+   *  Sets the CurContext to the supplied buf character array and updates the pos index.
    *
    * @param buf
    */
   void Set(const KMX_WCHAR *buf);
 
   /**
-   * @brief  Returns a pointer to the character in the current context buffer which
-   *         will have at most n valid xstring units remaining until the null terminating
-   *         character. It will be one code unit less than bufsize if that would
-   *         have meant splitting a surrogate pair or deadkey.
+   * Returns a pointer to the character in the current context buffer which
+   * will have at most n valid xstring units remaining until the null terminating
+   * character. It will be one code unit less than bufsize if that would
+   * have meant splitting a surrogate pair or deadkey.
    *
-   * @param n        The maximum number of valid xstring units (not code points or code units)
-   * @return KMX_WCHAR*  Pointer to the start postion for a buffer of maximum n xstring units
-   */
-  KMX_WCHAR *Buf(int n);
-
-  /**
-   * @brief  Returns a pointer to the character in the current context buffer which
-   *         will have at most n code units remaining until the the null terminating character.
-   *         Note: Unlike BufMax there is no checking for truncation of code points.
-   *         e.g. the pointer may point to a code unit that is half of a surrogate pair.
-   *
-   * @param n
-   * @return KMX_WCHAR* Pointer to the start postion for a buffer of maximum n characters
+   * @param  n            The maximum number of valid xstring units (not code points or code units)
+   * @return  KMX_WCHAR*  Pointer to the start postion for a buffer of maximum n xstring units
    */
   KMX_WCHAR *BufMax(int n);
 
   /**
-   * @brief Return a pointer to the CurContext buffer
+   * Returns a pointer to the character in the current context buffer which
+   * will have n valid xstring units remaining until the the null terminating character.
+   * OR
+   * Returns NULL if there are less than n valid xstring units in the current context.
+   * Background this was historically for performance during rule evaluation, if I there
+   * are not enough characters to compare, don't event attempt the comparison.
+   * Note: Unlike BufMax there is no checking for truncation of code points.
+   *        e.g. the pointer may point to a code unit that is half of a surrogate pair.
+   *
+   * @param n  The number of valid xstring units (not code points or code units)
+   * @return KMX_WCHAR* Pointer to the start postion for a buffer of maximum n characters
+   */
+  KMX_WCHAR *Buf(int n);
+
+  /**
+   * Return a pointer to the CurContext buffer
    *
    * @return KMX_WCHAR*
    */
   const KMX_WCHAR *GetFullContext() { return CurContext; }
+
   /**
-   * @brief Returns TRUE if the last xstring unit in the context is a deadkey
+   * Returns TRUE if the last xstring unit in the context is a deadkey
    *
    * @return BOOL
    */
   KMX_BOOL CharIsDeadkey();
   /**
-  * @brief Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
+  * Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
   * @return BOOL
   */
   KMX_BOOL CharIsSurrogatePair();
