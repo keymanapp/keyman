@@ -1,3 +1,10 @@
+keyman-config (14.0.283-2) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 02 Dec 2021 12:02:35 +0100
+
 keyman-config (14.0.282-1) unstable; urgency=medium
 
   * New upstream release
