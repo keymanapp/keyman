@@ -27,7 +27,7 @@ namespace com.keyman.osk {
      * Function     height
      * Scope        Public
      * @param       {number} height   the height in pixels
-     * Description  Sets the height of the banner in pixels. If a negative 
+     * Description  Sets the height of the banner in pixels. If a negative
      *              height is given, set height to 0 pixels.
      *              Also updates the banner styling.
      */
@@ -54,7 +54,7 @@ namespace com.keyman.osk {
         ds.display = 'none';
       }
 
-      return (!(currentHeightStyle === ds.height) || 
+      return (!(currentHeightStyle === ds.height) ||
         !(currentDisplayStyle === ds.display));
     }
 
@@ -197,7 +197,7 @@ namespace com.keyman.osk {
       div.id = BannerSuggestion.BASE_ID + this.index;
 
       let kbdDetails = keyman.keyboardManager.activeStub;
-      if(kbdDetails) {  
+      if(kbdDetails) {
         if (kbdDetails['KLC']) {
           div.lang = kbdDetails['KLC'];
         }
@@ -250,10 +250,10 @@ namespace com.keyman.osk {
       if(this.isEmpty()) {
         return null;
       }
-      
+
       if(!target) {
-        /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate 
-          * everything if/when the active `OutputTarget` changes, though we haven't gotten that 
+        /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate
+          * everything if/when the active `OutputTarget` changes, though we haven't gotten that
           * far in implementation yet.
           */
         target = dom.Utils.getOutputTarget();
@@ -390,7 +390,31 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.addListener('suggestionsready', manager.updateSuggestions);
       keyman.core.languageProcessor.addListener('tryaccept', manager.tryAccept);
       keyman.core.languageProcessor.addListener('tryrevert', manager.tryRevert);
+      keyman.core.languageProcessor.addListener('suggestionapplied', this.suggestionApplied);
     }
+
+    /**
+     * Handler for post-porcessing once a suggestion has been applied: calls
+     * into the active keyboard's `begin postKeystroke` entry point.
+     * @param    outputTarget
+     * @returns  true
+     */
+    suggestionApplied(outputTarget: text.OutputTarget): boolean {
+      const keyman = com.keyman.singleton;
+      // Tell the keyboard that the current layer has not changed
+      keyman.core.keyboardProcessor.layerChangedStore.set('0');
+      // Call the keyboard's entry point.
+      /*const postRuleBehavior = keyman.core.keyboardProcessor.processPostKeystroke(this.hostDevice, outputTarget);
+      if(postRuleBehavior) {
+        postRuleBehavior.finalize(keyman.core.keyboardProcessor, outputTarget);
+      }*/
+      keyman.core.keyboardProcessor.processPostKeystroke(this.hostDevice, outputTarget)
+        // If we have a RuleBehavior as a result, run it on the target. This should
+        // only change system store and variable store values.
+        ?.finalize(keyman.core.keyboardProcessor, outputTarget);
+
+      return true;
+    };
 
     postConfigure() {
       let keyman = com.keyman.singleton;
@@ -480,7 +504,7 @@ namespace com.keyman.osk {
 
       // only really used in native-KMW
     }
-    
+
     protected hasModalPopup(): boolean {
       // Utilized by the mobile apps; allows them to 'take over' touch handling,
       // blocking it within KMW when the apps are already managing an ongoing touch-hold.
@@ -558,7 +582,7 @@ namespace com.keyman.osk {
           _this.revertSuggestion = suggestion;
         }
       });
-      
+
       this.selected = null;
       this.recentAccept = true;
       this.doRevert = false;
@@ -587,7 +611,7 @@ namespace com.keyman.osk {
         returnObj.shouldSwallow = true;
       } else if(this.recentAccept && source == 'space') {
         this.recentAccept = false;
-        // If the model doesn't insert wordbreaks, don't swallow the space.  If it does, 
+        // If the model doesn't insert wordbreaks, don't swallow the space.  If it does,
         // we consider that insertion to be the results of the first post-accept space.
         returnObj.shouldSwallow = !!keyman.core.languageProcessor.wordbreaksAfterSuggestions;
       } else {
@@ -622,9 +646,9 @@ namespace com.keyman.osk {
      * Scope        Public
      * Description  Clears the suggestions in the suggestion banner
      */
-    public invalidateSuggestions: (this: SuggestionManager, source: text.prediction.InvalidateSourceEnum) => boolean = 
+    public invalidateSuggestions: (this: SuggestionManager, source: text.prediction.InvalidateSourceEnum) => boolean =
         function(this: SuggestionManager, source: string) {
-      
+
       // By default, we assume that the context is the same until we notice otherwise.
       this.initNewContext = false;
 
@@ -678,7 +702,7 @@ namespace com.keyman.osk {
      */
     public updateSuggestions: (this: SuggestionManager, prediction: text.prediction.ReadySuggestions) => boolean =
         function(this: SuggestionManager, prediction: text.prediction.ReadySuggestions) {
-      
+
       let suggestions = prediction.suggestions;
 
       this.currentSuggestions = suggestions;
