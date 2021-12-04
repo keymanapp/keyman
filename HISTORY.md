@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.161 alpha 2021-12-04
+
+* chore(linux): Allow to specify debian revision :package:  :cherries: (#5999)
+* chore(linux): Remove lintian warning :package:  :cherries: (#6000)
+
 ## 15.0.160 alpha 2021-12-03
 
 * fix(developer): building kmw keyboard had wrong message callback signature (#5972)
