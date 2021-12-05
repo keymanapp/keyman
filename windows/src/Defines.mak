@@ -205,8 +205,6 @@ WIXHEAT=$(WIXPATH)\heat.exe
 
 LINKPATH=link.exe
 
-TORTOISEPROC=C:\Progra~1\TortoiseSVN\bin\TortoiseProc.exe
-
 #
 # Certificates and code signing
 #
@@ -265,8 +263,6 @@ MKVER_VERSION_MD=$(KEYMAN_ROOT)\VERSION.md
 
 MKVER_COMMON_PARAMS=-tier "$(MKVER_TIER_MD)" -version "$(MKVER_VERSION_MD)"
 
-# Update a version.rc file
-MKVER_V=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -v $(MKVER_VERSION_TXT) version.in version.rc
 # Update a manifest.xml file
 MKVER_M=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -m manifest.in manifest.xml
 # Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out>
