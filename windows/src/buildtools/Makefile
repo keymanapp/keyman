@@ -4,7 +4,7 @@
 
 NOTARGET_SIGNCODE=yes
 
-TARGETS=devtools sentrytool tds2dbg mkver \
+TARGETS=devtools sentrytool tds2dbg \
   buildunidata build_standards_data buildpkg test-klog delphiprojectmanager
 CLEANS=clean-buildtools
 
@@ -30,10 +30,6 @@ delphiprojectmanager: .virtual
 
 devtools: .virtual
     cd $(ROOT)\src\buildtools\devtools
-    $(MAKE) $(TARGET)
-
-mkver: .virtual
-    cd $(ROOT)\src\buildtools\mkver
     $(MAKE) $(TARGET)
 
 buildpkg: .virtual

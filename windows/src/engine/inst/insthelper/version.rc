@@ -13,12 +13,12 @@
     BEGIN
       BLOCK "0C0904E4"
       BEGIN
-        VALUE "CompanyName", "SIL International\0"
+        VALUE "CompanyName", KV_COMPANY_NAME
         VALUE "FileDescription", "Keyman Engine Installation Assistant\0"
         VALUE "FileVersion", KV_VERSION_STRING
         VALUE "InternalName", "INSTHELPER\0"
-        VALUE "LegalCopyright", "\xA9 SIL International\0"
-        VALUE "LegalTrademarks", "\0"
+        VALUE "LegalCopyright", KV_LEGAL_COPYRIGHT
+        VALUE "LegalTrademarks", KV_LEGAL_TRADEMARKS
         VALUE "OriginalFilename", "INSTHELPER.DLL\0"
         VALUE "ProductName", "Keyman Engine\0"
         VALUE "ProductVersion", KV_VERSION_STRING

@@ -251,23 +251,14 @@ PLATFORM=Win32
 # in the same way as /resources/build/build-utils.sh.
 #
 
-MKVER_APP=$(PROGRAM)\buildtools\mkver
+!ifdef GIT_BASH_FOR_KEYMAN
+MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\mkver.sh
+!else
+MKVER_SH=start /wait .\build.sh $(ROOT)\src\buildtools\mkver.sh
+!endif
 
-!IFDEF VERSION_TXT_PATH
-MKVER_VERSION_TXT=$(VERSION_TXT_PATH)\version.in
-!ELSE
-MKVER_VERSION_TXT=..\version.in
-!ENDIF
-
-MKVER_TIER_MD=$(KEYMAN_ROOT)\TIER.md
-MKVER_VERSION_MD=$(KEYMAN_ROOT)\VERSION.md
-
-MKVER_COMMON_PARAMS=-tier "$(MKVER_TIER_MD)" -version "$(MKVER_VERSION_MD)"
-
-# Update a manifest.xml file
-MKVER_M=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -m manifest.in manifest.xml
-# Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out>
-MKVER_U=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -u
+MKVER_M=$(MKVER_SH) manifest.in manifest.xml
+MKVER_U=$(MKVER_SH)
 
 #
 # Symstore

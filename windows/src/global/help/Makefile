@@ -3,7 +3,7 @@
 #
 !include ..\..\defines.mak
 
-build: mkver-app
+build:
   cd $(ROOT)\src\global\help
   $(MKVER_U) version.php.in version.out
 
