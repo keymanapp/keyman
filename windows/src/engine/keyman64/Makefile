@@ -5,13 +5,13 @@
 !include ..\..\Defines.mak
 
 build: version.res dirs
-    $(MSBUILD) keyman64.sln $(MSBUILD_BUILD) /p:Platform=x64
+    $(MSBUILD) keyman64.sln $(MSBUILD_BUILD) "/p:Platform=x64"
     $(COPY) $(X64_TARGET_PATH)\keyman64.dll $(PROGRAM)\engine
     $(COPY) $(X64_TARGET_PATH)\keyman64.pdb $(DEBUGPATH)\engine
-    # $(COPY) keyman64.lib $(OUTLIB) - already done
+# $(COPY) keyman64.lib $(OUTLIB) - already done
 
 clean: def-clean
-    $(MSBUILD) keyman64.sln $(MSBUILD_CLEAN)  /p:Platform=x64
+    $(MSBUILD) keyman64.sln $(MSBUILD_CLEAN) "/p:Platform=x64"
 
 signcode:
     $(SIGNCODE) /d "Keyman Engine x64" $(PROGRAM)\engine\keyman64.dll

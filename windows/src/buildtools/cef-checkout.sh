@@ -32,7 +32,10 @@ CEF_VERSION=`cat $CEF_VERSION_MD | tr -d "[:space:]"`
 # repo!
 git reset --hard
 git clean -fd
-git fetch origin "v$CEF_VERSION"
+
+if [ "${1-}" != "--offline" ]; then
+  git fetch origin "v$CEF_VERSION"
+fi
 git switch "v$CEF_VERSION"
 
 if [ ! -f ./libcef.dll ]; then

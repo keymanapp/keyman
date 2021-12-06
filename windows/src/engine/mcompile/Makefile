@@ -26,7 +26,7 @@ install:
     $(COPY) $(PROGRAM)\engine\mcompile.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-manifest:
-    # test that linked manifest exists and correct
+# test that linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\engine\mcompile.exe -validate_manifest
 
 !include ..\..\Target.mak

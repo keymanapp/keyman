@@ -11,7 +11,7 @@ TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler kmcomp-x
         ui-language-manager standards-data compile-supplementary-support
 
 test:
-    $(MAKE) -DTARGET=test $(TARGETS)
+    $(MAKE) "TARGET=test" $(TARGETS)
 
 !include ..\..\Header.mak
 

@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons
-    $(DELPHI_MSBUILD) setup.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) setup.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\setup.exe -dpr setup.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\setup.exe
     $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\developer

@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons xml
-    $(DELPHI_MSBUILD) kmshell.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) kmshell.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmshell.exe -dpr kmshell.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\kmshell.exe
     $(COPY) $(WIN32_TARGET_PATH)\kmshell.exe $(PROGRAM)\desktop
@@ -17,7 +17,7 @@ icons:
 xml: sentry-init.js
     cd $(ROOT)\src\desktop\kmshell\xml
     -del /q $(ROOT)\bin\desktop\xml\*
-    copy * $(ROOT)\bin\desktop\xml\   #
+    copy * $(ROOT)\bin\desktop\xml
     cd $(ROOT)\src\desktop\kmshell
     -rmdir /S /Q $(ROOT)\bin\desktop\locale
     mkdir $(ROOT)\bin\desktop\locale

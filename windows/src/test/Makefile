@@ -8,7 +8,7 @@ TARGETS=test_i3633
 CLEAN=test_i3633
 
 test: test-manifest-exec
-    $(MAKE) -DTARGET=test $(TARGETS)
+    $(MAKE) "TARGET=test" $(TARGETS)
 
 # We want `test` to be the default target
 !include ..\Header.mak

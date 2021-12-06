@@ -5,13 +5,13 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons locale
-    $(DELPHI_MSBUILD) setup.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) setup.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\setup.exe -dpr setup.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\setup.exe
     $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\desktop
 
-    # This version of setup.exe is for redistribution as a
-    # bundled installer and is not signed
+# This version of setup.exe is for redistribution as a
+# bundled installer and is not signed
     $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\desktop\setup-redist.exe
 
 locale:
@@ -34,11 +34,11 @@ wrap-symbols:
     $(SYMSTORE) $(DEBUGPATH)\desktop\setup.dbg /t keyman-windows
 
 test-manifest:
-    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+# test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\setup.exe -validate_manifest
 
 debug-manifest:
-    # make a non-elevated manifest for testing purposes
+# make a non-elevated manifest for testing purposes
     -del manifest.res
     copy manifest.in std-manifest.tmp
     copy debug-manifest.in manifest.in

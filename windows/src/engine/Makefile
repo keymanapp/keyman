@@ -16,19 +16,19 @@ keyman: redist
     cd $(ROOT)\src\engine\keyman
     $(MAKE) $(TARGET)
 
-kmcomapi:
+kmcomapi: .virtual
     cd $(ROOT)\src\engine\kmcomapi
     $(MAKE) $(TARGET)
 
-keymanmc:
+keymanmc: .virtual
     cd $(ROOT)\src\engine\keymanmc
     $(MAKE) $(TARGET)
 
-keyman32:
+keyman32: .virtual
     cd $(ROOT)\src\engine\keyman32
     $(MAKE) $(TARGET)
 
-tsysinfox64:
+tsysinfox64: .virtual
     cd $(ROOT)\src\engine\tsysinfox64
     $(MAKE) $(TARGET)
 
@@ -36,23 +36,23 @@ tsysinfo: tsysinfox64
     cd $(ROOT)\src\engine\tsysinfo
     $(MAKE) $(TARGET)
 
-keymanx64:
+keymanx64: .virtual
     cd $(ROOT)\src\engine\keymanx64
     $(MAKE) $(TARGET)
 
-keyman64:
+keyman64: .virtual
     cd $(ROOT)\src\engine\keyman64
     $(MAKE) $(TARGET)
 
-kmrefresh:
+kmrefresh: .virtual
     cd $(ROOT)\src\engine\kmrefresh
     $(MAKE) $(TARGET)
 
-mcompile:
+mcompile: .virtual
     cd $(ROOT)\src\engine\mcompile
     $(MAKE) $(TARGET)
 
-kmtip:
+kmtip: .virtual
     cd $(ROOT)\src\engine\kmtip
     $(MAKE) $(TARGET)
 

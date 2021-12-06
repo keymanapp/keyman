@@ -14,34 +14,34 @@ CLEANS=
 
 # ----------------------------------------------------------------------
 
-cef4delphi:
+cef4delphi: .virtual
     cd $(ROOT)\src\ext\cef4delphi
     $(MAKE) $(TARGET)
-    
-dcpcrypt:
+
+dcpcrypt: .virtual
     cd $(ROOT)\src\ext\dcpcrypt
     $(MAKE) $(TARGET)
 
-jedi:
+jedi: .virtual
     cd $(ROOT)\src\ext\jedi
     $(MAKE) $(TARGET)
 
-mbcolor:
+mbcolor: .virtual
     cd $(ROOT)\src\ext\mbcolor
     $(MAKE) $(TARGET)
 
-regexpr:
+regexpr: .virtual
     cd $(ROOT)\src\ext\regexpr
     $(MAKE) $(TARGET)
 
-vclzip:
+vclzip: .virtual
     cd $(ROOT)\src\ext\vclzip
     $(MAKE) $(TARGET)
 
-scfontcombobox:
+scfontcombobox: .virtual
     cd $(ROOT)\src\ext\scfontcombobox
     $(MAKE) $(TARGET)
-    
+
 #
 #
 #

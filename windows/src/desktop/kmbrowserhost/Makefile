@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res dirs
-    $(DELPHI_MSBUILD) kmbrowserhost.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) kmbrowserhost.dproj "/p:Platform=Win32"
 
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmbrowserhost.exe -dpr kmbrowserhost.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\kmbrowserhost.exe

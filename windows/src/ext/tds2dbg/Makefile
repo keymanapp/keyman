@@ -2,8 +2,8 @@
 !include ..\..\Defines.mak
 
 build: dirs
-    # tds2dbg.exe test.exe
-    @-mkdir $(WIN32_TARGET_PATH)
+# tds2dbg.exe test.exe
+    -mkdir $(WIN32_TARGET_PATH)
     $(COPY) tds2dbg.bin $(WIN32_TARGET_PATH)\tds2dbg.exe
     $(MAKE) install
 
@@ -18,20 +18,20 @@ install:
 BCC55DIR=c:\borland\bcc55
 
 tds2dbg.exe: main.cpp tds2dbg.cpp fileutils.cpp log.cpp
-	# $(CL) /Fe$< /EHsc $**
+# $(CL) /Fe$< /EHsc $**
   path $(BCC55DIR)\bin;$(PATH)
   $(BCC55DIR)\bin\bcc32 -y -v -L$(BCC55DIR)\Lib -I$(BCC55DIR)\Include -e$< $**
 
 test.exe: testa.cpp
-	# $(CL) /Fe$< /EHsc $**
+# $(CL) /Fe$< /EHsc $**
   $(BCC55DIR)\bin\bcc32 -y -v -M -L$(BCC55DIR)\Lib -I$(BCC55DIR)\Include -e$< $**
 
 clean:
-	-@del /Q tds2dbg.obj fileutils.obj log.obj main.obj tds2dbg.tds
-	-@del /Q testa.obj test.exe test.tds test.dbg
-	-@rmdir /S /Q html
+  -del /Q tds2dbg.obj fileutils.obj log.obj main.obj tds2dbg.tds
+  -del /Q testa.obj test.exe test.tds test.dbg
+  -rmdir /S /Q html
 
 doc:
-	doxygen tds2dbg.dcf
+  doxygen tds2dbg.dcf
 
 !include ..\..\Target.mak

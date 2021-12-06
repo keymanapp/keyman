@@ -15,12 +15,12 @@ test: build
 	cppstructsize\$(X64_TARGET_PATH)\cppstructsize.exe > 64-cppstructsize.txt
 	echo Comparing 64-bit sizes
 	fc 64-passtructsize.txt 64-cppstructsize.txt
-	
-build: 
-    $(DELPHI_MSBUILD) passtructsize\passtructsize.dproj /p:Platform=Win32
-    $(DELPHI_MSBUILD) passtructsize\passtructsize.dproj /p:Platform=Win64
-    $(MSBUILD) $(MSBUILD_BUILD) cppstructsize\cppstructsize.sln /p:Platform=Win32
-    $(MSBUILD) $(MSBUILD_BUILD) cppstructsize\cppstructsize.sln /p:Platform=x64
+
+build:
+    $(DELPHI_MSBUILD) passtructsize\passtructsize.dproj "/p:Platform=Win32"
+    $(DELPHI_MSBUILD) passtructsize\passtructsize.dproj "/p:Platform=Win64"
+    $(MSBUILD) $(MSBUILD_BUILD) cppstructsize\cppstructsize.sln" /p:Platform=Win32"
+    $(MSBUILD) $(MSBUILD_BUILD) cppstructsize\cppstructsize.sln" /p:Platform=x64"
 
 clean: def-clean
     -rd /s/q Win32

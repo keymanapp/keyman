@@ -20,7 +20,7 @@ test-install: prereq
 
 
 prereq:
-  $(DELPHI_MSBUILD) verify.dproj /p:Platform=Win32
+  $(DELPHI_MSBUILD) verify.dproj "/p:Platform=Win32"
   copy sigcheck.bin $(WIN32_TARGET_PATH)\sigcheck.exe
 
 
