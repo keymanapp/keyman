@@ -16,6 +16,9 @@ CGFloat r = 7.0;
 const NSTimeInterval delayBeforeRepeating = 0.5f;
 const NSTimeInterval repeatInterval = 0.05f;
 
+static CGFloat const kRelativeCharacterLabelHeight = 0.45f;
+static CGFloat const kRelativeModifierLabelHeight = 0.30f;
+
 @interface KeyView ()
 @property (nonatomic, assign) NSUInteger keyCode;
 @property (nonatomic, assign) BOOL hasKeyCaption;
@@ -50,7 +53,7 @@ const NSTimeInterval repeatInterval = 0.05f;
             [_label setLineBreakMode:NSLineBreakByClipping];
         } // There might be some problem not calling this, but it seems to be okay as far as I can tell
         
-        CGFloat fontSize = labelFrame.size.height*0.3;
+        CGFloat fontSize = labelFrame.size.height*kRelativeModifierLabelHeight;
         [_label setFont:[NSFont systemFontOfSize:fontSize]];
         [_label setTextColor:[NSColor blackColor]];
         [_label setStringValue:@""];
@@ -145,23 +148,28 @@ const NSTimeInterval repeatInterval = 0.05f;
     else
         _isSpecialKey = NO;
     
-    if (!_isSpecialKey && !_isModifierKey)
+    if (!_isSpecialKey && !_isModifierKey) {
         _isCharacterKey = YES;
-    else
+    } else {
         _isCharacterKey = NO;
-    
-    // having changed the keycode, adjust the font size of the key label to optimize for available space
-    [self adjustLabelFontSize];
+    }
+  
+  // having changed the keycode, adjust the font size of the key label to optimize for available space
+  [self adjustLabelFontSize];
 }
 
-// set the size of the font relative to the key height, depending on what type of key it is
-// this allows larger more readable character key text
+
+/**
+ * Set the size of the font relative to the key height, depending on what type of key it is.
+ * This allows larger more readable character key text.
+ */
 - (void)adjustLabelFontSize {
-    CGFloat relativeFontSize = 0.45;
+    CGFloat relativeFontSize = kRelativeCharacterLabelHeight;
     
-    if (!self.isCharacterKey)
-        relativeFontSize = 0.3;
-        
+    if (!self.isCharacterKey) {
+        relativeFontSize = kRelativeModifierLabelHeight;
+    }
+
     CGFloat fontSize = self.label.bounds.size.height*relativeFontSize;
     [self.label setFont:[NSFont systemFontOfSize:fontSize]];
 }
