@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.163 alpha 2021-12-06
+
+* chore(common): buf now uses decxstr so remove comment (#6012)
+
 ## 15.0.162 alpha 2021-12-05
 
 * chore(linux): Update changelogs for 14.0.283 :package:  :cherries: (#6008)
