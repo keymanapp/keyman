@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.164 alpha 2021-12-07
+
+* refactor(common/core): Use defines in all xstring tests (#6002)
+
 ## 15.0.163 alpha 2021-12-06
 
 * chore(common): buf now uses decxstr so remove comment (#6012)
