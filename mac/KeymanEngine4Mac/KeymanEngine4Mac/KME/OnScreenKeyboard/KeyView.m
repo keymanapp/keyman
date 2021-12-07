@@ -121,7 +121,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 }
 
 - (void)setKey:(OSKKey *)key {
-   _key = key;
+    _key = key;
     [self setKeyCode:key.keyCode];
     [self setTag:key.keyCode|0x1000];
     if ([self isSpecialKey])
