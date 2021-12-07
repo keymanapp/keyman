@@ -165,7 +165,6 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
 
 + (NSDictionary *)keyboardInfoFromKmxFile:(NSString *)path {
     NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
-    NSLog(@"SGS2021 load keyboardInfoFromKmxFile");
     
     if (file == nil) {
         //NSLog(@"Failed to open file");
@@ -209,8 +208,6 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
             visualKeyboard = [KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file];
     }
 
-    NSLog(@"SGS2021 keyboard name from kmx file: %@", nameStr);
-
     [file seekToFileOffset:cmp_kb.dpBitmapOffset];
     NSData *bitmapData = [file readDataOfLength:cmp_kb.dwBitmapSize];
     NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:bitmapData];
@@ -220,7 +217,6 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     
     if (!nameStr || !nameStr.length) {
         nameStr = [path.lastPathComponent stringByReplacingOccurrencesOfString:@".kmx" withString:@""];
-        NSLog(@"SGS2021 keyboard name from kmx filename: %@", nameStr);
     }
     if (!verStr)
         verStr = @"";

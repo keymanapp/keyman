@@ -167,8 +167,6 @@
         KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
         NSString *shareUrl = [NSString stringWithFormat:@"https://%@/go/keyboard/%@/share", keymanVersionInfo.keymanCom, packageId];
         
-        self.packageInfo.debugReport;
-        
         NSString *name = self.packageInfo.packageName;
         if (name == nil)
             name = @"Unknown Keyboard Package";

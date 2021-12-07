@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
+#import "KMPackageReader.h"
 #import "KMInputController.h"
 #import "KMAboutWindowController.h"
 #import "KMInfoWindowController.h"
@@ -25,24 +26,6 @@ typedef void(^PostEventCallback)(CGEventRef eventToPost);
 extern NSString *const kKMSelectedKeyboardKey;
 extern NSString *const kKMActiveKeyboardsKey;
 extern NSString *const kKeymanKeyboardDownloadCompletedNotification;
-
-extern NSString *const kPackage;
-extern NSString *const kButtons;
-extern NSString *const kStartMenu;
-extern NSString *const kStartMenuEntries;
-extern NSString *const kInfo;
-extern NSString *const kFiles;
-
-extern NSString *const kAuthor;
-extern NSString *const kCopyright;
-extern NSString *const kFile;
-extern NSString *const kFont;
-extern NSString *const kGraphicFile;
-extern NSString *const kKeyboard;
-extern NSString *const kName;
-extern NSString *const kReadMeFile;
-extern NSString *const kVersion;
-extern NSString *const kWebSite;
 
 typedef struct {
     NSString *sentryEnvironment;
@@ -118,7 +101,7 @@ typedef struct {
 - (NSString *)packagePathAtIndex:(NSUInteger)index;
 - (NSInteger)indexForPackageFolder:(NSString *)packageFolder;
 - (NSString *)packageFolderFromPath:(NSString *)path;
-- (NSDictionary *)loadPackageInfo:(NSString *)path;
+- (KMPackageInfo *)loadPackageInfo:(NSString *)path;
 - (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder;
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;

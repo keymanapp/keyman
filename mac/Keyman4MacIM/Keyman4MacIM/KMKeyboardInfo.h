@@ -1,10 +1,13 @@
-//
-//  KMKeyboardInfo.h
-//  Keyman
-//
-//  Created by Shawn Schantz on 11/25/21.
-//  Copyright © 2021 SIL International. All rights reserved.
-//
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * KMKeyboardInfo.h
+ * Keyman
+ *
+ * Created by Shawn Schantz on 11/25/21.
+ *
+ * Value object describing a keyboard element of a Keyman package.
+ */
 
 #import <Foundation/Foundation.h>
 

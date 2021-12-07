@@ -1,10 +1,13 @@
-//
-//  KMPackageInfo.h
-//  Keyman
-//
-//  Created by Shawn Schantz on 11/22/21.
-//  Copyright © 2021 SIL International. All rights reserved.
-//
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * KMPackageInfo.h
+ * Keyman
+ *
+ * Created by Shawn Schantz on 11/22/21.
+ *
+ * Value object describing a Keyman package.
+ */
 
 #import <Foundation/Foundation.h>
 
@@ -60,7 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
                    keyboards:(NSDictionary*)keyboards
                        fonts:(NSArray*)fonts
                        files:(NSArray*)files;
-- (void)debugReport;
 
 @end
 
