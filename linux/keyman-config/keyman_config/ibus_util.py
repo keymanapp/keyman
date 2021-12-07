@@ -10,6 +10,45 @@ gi.require_version('IBus', '1.0')
 from gi.repository import IBus, Gio
 
 
+class IbusUtil():
+    def __init__(self) -> None:
+        if os.environ.get('SUDO_USER'):
+            self.ibus_settings = None
+            self.is_sudo = True
+            logging.debug('Running with sudo. Real user: %s', os.environ.get('SUDO_USER'))
+        else:
+            self.ibus_settings = Gio.Settings.new("org.freedesktop.ibus.general")
+            self.is_sudo = False
+            logging.debug('Running as regular user')
+
+    def read_preload_engines(self):
+        if os.environ.get('SUDO_USER'):
+            process = subprocess.run(
+                ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
+                 'gsettings', 'get', 'org.freedesktop.ibus.general', 'preload-engines'],
+                capture_output=True)
+            if process.returncode == 0:
+                preload_engines = eval(process.stdout)
+            else:
+                preload_engines = None
+                logging.warning('Could not convert to preload_engines')
+        else:
+            preload_engines = self.ibus_settings.get_strv("preload-engines")
+        return preload_engines
+
+    def write_preload_engines(self, bus, preload_engines):
+        if os.environ.get('SUDO_USER'):
+            sourcesVal = str(preload_engines)
+            subprocess.run(
+                ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
+                 'gsettings', 'set', 'org.freedesktop.ibus.general', 'preload-engines', sourcesVal])
+        else:
+            self.ibus_settings.set_strv("preload-engines", preload_engines)
+            bus.preload_engines(preload_engines)
+
+
 def get_ibus_bus():
     try:
         for i in range(5):
@@ -27,19 +66,15 @@ def get_ibus_bus():
 
 def install_to_ibus(bus, keyboard_id):
     try:
-        # keyboard_id = "%s:%s" % (lang, kmx_file)
-        # logging.debug("getting bus")
-        # bus = IBus.Bus()
         logging.debug("installing to ibus")
-        ibus_settings = Gio.Settings.new("org.freedesktop.ibus.general")
-        preload_engines = ibus_settings.get_strv("preload-engines")
-        logging.debug(preload_engines)
+        ibusUtil = IbusUtil()
+        preload_engines = ibusUtil.read_preload_engines()
+        logging.debug('preload_engines before: %s', preload_engines)
         if keyboard_id not in preload_engines:
             # TODO: in the event preload_engines contains upper-case keyboards, we'll need to uninstall_from_ibus #1601
             preload_engines.append(keyboard_id)
-        logging.debug(preload_engines)
-        ibus_settings.set_strv("preload-engines", preload_engines)
-        bus.preload_engines(preload_engines)
+        logging.debug('Setting preload_engines to: %s', preload_engines)
+        ibusUtil.write_preload_engines(bus, preload_engines)
     except Exception as e:
         logging.warning("Failed to set up install %s to IBus", keyboard_id)
         logging.warning(e)
@@ -48,16 +83,14 @@ def install_to_ibus(bus, keyboard_id):
 def uninstall_from_ibus(bus, keyboard_id):
     # need to uninstall for all installed langs
     try:
-        # logging.debug("getting bus")
-        # bus = IBus.Bus()
-        ibus_settings = Gio.Settings.new("org.freedesktop.ibus.general")
-        preload_engines = ibus_settings.get_strv("preload-engines")
-        logging.debug(preload_engines)
+        logging.debug('Uninstalling from ibus')
+        ibusUtil = IbusUtil()
+        preload_engines = ibusUtil.read_preload_engines()
+        logging.debug('preload_engines before: %s', preload_engines)
         if keyboard_id in preload_engines:
             preload_engines.remove(keyboard_id)
-        logging.debug(preload_engines)
-        ibus_settings.set_strv("preload-engines", preload_engines)
-        bus.preload_engines(preload_engines)
+        logging.debug('Setting preload_engines to: %s', preload_engines)
+        ibusUtil.write_preload_engines(bus, preload_engines)
     except Exception as e:
         logging.warning("Failed to uninstall keyboard %s", keyboard_id)
         logging.warning(e)

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import logging
 import os
+import subprocess
 from gi.repository import Gio
 
 from gi.overrides.GLib import Variant
@@ -8,16 +9,44 @@ from gi.overrides.GLib import Variant
 
 class GnomeKeyboardsUtil():
     def __init__(self):
-        self.input_sources = Gio.Settings.new("org.gnome.desktop.input-sources")
+        if os.environ.get('SUDO_USER'):
+            self.input_sources = None
+            self.is_sudo = True
+            logging.debug('Running with sudo. Real user: %s', os.environ.get('SUDO_USER'))
+        else:
+            self.input_sources = Gio.Settings.new("org.gnome.desktop.input-sources")
+            self.is_sudo = False
+            logging.debug('Running as regular user')
 
     def read_input_sources(self):
-        sourcesVal = self.input_sources.get_value("sources")
-        sources = self._convert_variant_to_array(sourcesVal)
+        if self.is_sudo:
+            process = subprocess.run(
+                ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
+                 'gsettings', 'get', 'org.gnome.desktop.input-sources', 'sources'],
+                capture_output=True)
+            if process.returncode == 0:
+                sources = eval(process.stdout)
+                logging.debug('sources before change: %s', sources)
+            else:
+                sources = None
+                logging.warning('Could not convert to sources')
+        else:
+            sourcesVal = self.input_sources.get_value("sources")
+            sources = self._convert_variant_to_array(sourcesVal)
         return sources
 
     def write_input_sources(self, sources):
-        sourcesVal = self._convert_array_to_variant(sources)
-        self.input_sources.set_value("sources", sourcesVal)
+        if self.is_sudo:
+            logging.debug('Setting sources to: %s', sources)
+            sourcesVal = str(sources)
+            subprocess.run(
+                ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
+                 'gsettings', 'set', 'org.gnome.desktop.input-sources', 'sources', sourcesVal])
+        else:
+            sourcesVal = self._convert_array_to_variant(sources)
+            self.input_sources.set_value("sources", sourcesVal)
 
     def _convert_variant_to_array(self, variant):
         if variant is None:
