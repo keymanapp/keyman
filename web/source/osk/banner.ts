@@ -394,7 +394,7 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Handler for post-porcessing once a suggestion has been applied: calls
+     * Handler for post-processing once a suggestion has been applied: calls
      * into the active keyboard's `begin postKeystroke` entry point.
      * @param    outputTarget
      * @returns  true
