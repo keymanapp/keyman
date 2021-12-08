@@ -14,7 +14,7 @@ build: version.res manifest.res icons locale
 # bundled installer and is not signed
     $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\desktop\setup-redist.exe
 
-locale:
+locale: .virtual
     $(ROOT)\bin\buildtools\devtools.exe -buildsetupstrings locale\ .\
 
 setup_dialog.res:
