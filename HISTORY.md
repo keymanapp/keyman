@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.165 alpha 2021-12-08
+
+* fix(web): font size was not consistently set (#5906)
+
 ## 15.0.164 alpha 2021-12-07
 
 * refactor(common/core): Use defines in all xstring tests (#6002)
