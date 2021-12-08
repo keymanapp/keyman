@@ -462,7 +462,7 @@ namespace com.keyman.dom {
       return;
     };
 
-        /**
+    /**
      * Function     isKMWDisabled
      * Scope        Private
      * @param       {Element}   x   An element from the page.
@@ -663,7 +663,7 @@ namespace com.keyman.dom {
       }
     }
 
-        /**
+    /**
      * Function     _DetachFromIframe
      * Scope        Private
      * @param       {Element}      Pelem       IFrame to which KMW will be attached
@@ -1300,7 +1300,7 @@ namespace com.keyman.dom {
      *
      *  @param  {Object|string} e         element id or element
      *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
-     **/
+     */
     setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
       if(typeof e == "string") { // Can't instanceof string, and String is a different type.
         e = document.getElementById(e);
@@ -1423,7 +1423,7 @@ namespace com.keyman.dom {
      *
      *  @param  {string|Object}   e   element or element id
      *
-     **/
+     */
     moveToElement(e:string|HTMLElement) {
       var i;
 
@@ -1473,7 +1473,7 @@ namespace com.keyman.dom {
      * before applying any keymanweb styles or classes
      *
      *  @return   {string}
-     **/
+     */
     getBaseFont() {
       var util = this.keyman.util;
       var ipInput = document.getElementsByTagName<'input'>('input'),
@@ -1614,20 +1614,10 @@ namespace com.keyman.dom {
       keyman.modelManager.init();
       this.keyman._MasterDocument = window.document;
 
-      /**
+      /*
        * Initialization of touch devices and browser interfaces must be done
        * after all resources are loaded, during final stage of initialization
-       *
        */
-
-      // Treat Android devices as phones if either (reported) screen dimension is less than 4"
-      if(device.OS == 'Android')
-      {
-        // Determine actual device characteristics  I3363 (Build 301)
-        // TODO: device.dpi may no longer be needed - if so, get rid of it.
-        var dpi = device.getDPI(); //TODO: this will not work when called from HEAD!!
-        device.formFactor=((screen.height < 4.0 * dpi) || (screen.width < 4.0 * dpi)) ? 'phone' : 'tablet';
-      }
 
       // Set exposed initialization flag member for UI (and other) code to use
       this.keyman.setInitialized(1);
@@ -1785,7 +1775,7 @@ namespace com.keyman.dom {
           this.attachmentObserver.observe(observationTarget, observationConfig);
         }
 
-        /**
+        /*
          * Setup of handlers for dynamic detection of the kmw-disabled class tag that controls enablement.
          */
         observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
@@ -1812,7 +1802,7 @@ namespace com.keyman.dom {
 
     /**
      * Initialize the desktop user interface as soon as it is ready
-    **/
+     */
     initializeUI() {
       if(this.keyman.ui && this.keyman.ui['initialize'] instanceof Function) {
         this.keyman.ui['initialize']();

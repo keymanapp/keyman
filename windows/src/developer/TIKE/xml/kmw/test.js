@@ -226,10 +226,6 @@ window.onload = function() {
       newOSK.setSize(targetDevice.dimensions[0]+'px', targetDevice.dimensions[1]+'px');
     }
     document.getElementById('osk-host').appendChild(newOSK.element);
-
-    keyman.osk = newOSK;
-    newOSK.activeKeyboard = keyman.core.activeKeyboard;
-    keyman.alignInputs();
   }
 
   setOSK();

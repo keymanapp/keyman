@@ -33,28 +33,28 @@ namespace com.keyman {
     /**
      * Get device horizontal DPI for touch devices, to set actual size of active regions
      * Note that the actual physical DPI may be somewhat different.
-     * 
-     * @return      {number}               
-     */       
+     *
+     * @return      {number}
+     */
     getDPI(): number {
       var t=document.createElement('DIV') ,s=t.style,dpi=96;
       if(document.readyState !== 'complete') {
         return dpi;
       }
-      
+
       t.id='calculateDPI';
       s.position='absolute'; s.display='block';s.visibility='hidden';
       s.left='10px'; s.top='10px'; s.width='1in'; s.height='10px';
       document.body.appendChild(t);
       dpi=(typeof window.devicePixelRatio == 'undefined') ? t.offsetWidth : t.offsetWidth * window.devicePixelRatio;
       document.body.removeChild(t);
-      return dpi;    
+      return dpi;
     }
 
     detect() : void {
       var IEVersion = Device._GetIEVersion();
       var possMacSpoof = false;
-      
+
       if(navigator && navigator.userAgent) {
         var agent=navigator.userAgent;
 
@@ -62,7 +62,7 @@ namespace com.keyman {
           this.OS='iOS';
           this.formFactor='tablet';
           this.dyPortrait=this.dyLandscape=0;
-        } else if(agent.indexOf('iPhone') >= 0) { 
+        } else if(agent.indexOf('iPhone') >= 0) {
           this.OS='iOS';
           this.formFactor='phone';
           this.dyPortrait=this.dyLandscape=25;
@@ -78,7 +78,7 @@ namespace com.keyman {
         } else if(agent.indexOf('Linux') >= 0) {
           this.OS='Linux';
         } else if(agent.indexOf('Macintosh') >= 0) {
-          // Starting with 13.1, "Macintosh" can reflect iPads (by default) or iPhones 
+          // Starting with 13.1, "Macintosh" can reflect iPads (by default) or iPhones
           // (by user setting); a new "Request Desktop Website" setting for Safari will
           // change the user agent string to match a desktop Mac.
           //
@@ -86,7 +86,7 @@ namespace com.keyman {
           // '_' instead.  So, we have to check for both.  Yay.
           let regex = /Intel Mac OS X (\d+(?:[_\.]\d+)+)/i;
           let results = regex.exec(agent);
-          
+
           // Match result:  a version string with components separated by underscores.
           if(!results) {
             console.warn("KMW could not properly parse the user agent string."
@@ -105,7 +105,7 @@ namespace com.keyman {
           if(agent.indexOf('Touch') >= 0) {
             this.formFactor='phone';   // will be redefined as tablet if resolution high enough
           }
-          
+
           // Windows Phone and Tablet PC
           if(typeof navigator.msMaxTouchPoints == 'number' && navigator.msMaxTouchPoints > 0) {
             this.touchable=true;
@@ -113,14 +113,21 @@ namespace com.keyman {
         }
       }
 
-      // var sxx=device.formFactor;
-      // Check and possibly revise form factor according to actual screen size (adjusted for Galaxy S, maybe OK generally?)
-      if(this.formFactor == 'tablet' && Math.min(screen.width,screen.height) < 400) {
-        this.formFactor='phone';
-      }
+      // We look at the screen resolution for Android, because we can't tell from
+      // the user agent string whether or not this is supposed to be a tablet.
+      // It seems that there are a handful of older phones out there that report a
+      // higher resolution than 700px*___px, but it is proving hard to test these,
+      // and the majority have an aspect ratio <= 0.5625 anyway.
+      // But we trust what iOS tells us for phone vs tablet.
 
-      // Trust what iOS tells us for phone vs tablet.
-      if(this.formFactor == 'phone'  && Math.max(screen.width,screen.height) > 720 && this.OS != 'iOS') {
+      const dimMin = Math.min(screen.width,screen.height), dimMax = Math.max(screen.width,screen.height);
+      const aspect = dimMin / dimMax;
+
+      if(this.OS != 'iOS' &&
+          this.formFactor == 'phone' &&
+          ((dimMin >= 600 && aspect > 0.5625) || // 0.5625 -> 1920x1080 is common phone res
+          (aspect >= 0.625)) // all reported devices with aspect >= 0.625 are tablets per https://screensiz.es/
+        ) {
         this.formFactor='tablet';
       }
 
@@ -132,7 +139,7 @@ namespace com.keyman {
       if(this.OS == 'iOS' && !('ongesturestart' in window) && !possibleChromeEmulation) {
         this.OS='Android';
       }
-    
+
       // Determine application or browser
       this.browser='web';
       if(IEVersion < 999) {
@@ -160,7 +167,7 @@ namespace com.keyman {
           } else if(navigator.userAgent.indexOf('Safari') >= 0) {
             this.browser='safari';
           }
-        } 
+        }
       }
 
       if(possMacSpoof && this.browser == 'safari') {
@@ -193,13 +200,13 @@ namespace com.keyman {
 
     static _GetIEVersion() {
       var n, agent='';
-      
+
       if('userAgent' in navigator) {
         agent=navigator.userAgent;
       }
-      
+
       // Test first for old versions
-      if('selection' in document) {         // only defined for IE and not for IE 11!!!       
+      if('selection' in document) {         // only defined for IE and not for IE 11!!!
         var appVer=navigator.appVersion;
         n=appVer.indexOf('MSIE ');
         if(n >= 0) {
@@ -207,27 +214,27 @@ namespace com.keyman {
           if((document as Document).compatMode == 'BackCompat') {
             return 6;
           }
-          
+
           appVer=appVer.substr(n+5);
           n=appVer.indexOf('.');
           if(n > 0) {
             return parseInt(appVer.substr(0,n),10);
           }
-        }              
+        }
       }
-        
+
       // Finally test for IE 11 (and later?)
       n=agent.indexOf('Trident/');
       if(n < 0) {
         return 999;
       }
-      
+
       agent=agent.substr(n+8);
       n=agent.indexOf('.');
       if(n > 0){
         return parseInt(agent.substr(0,n),10)+4;
       }
-    
+
       return 999;
     }
 
