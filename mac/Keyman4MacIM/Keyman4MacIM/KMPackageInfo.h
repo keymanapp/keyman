@@ -4,7 +4,7 @@
  * KMPackageInfo.h
  * Keyman
  *
- * Created by Shawn Schantz on 11/22/21.
+ * Created by Shawn Schantz on 2021/11/22.
  *
  * Value object describing a Keyman package.
  */
@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,copy) NSString* authorName;
 @property (nonatomic,copy) NSString* authorUrl;
 @property (nonatomic,copy) NSString* website;
-@property (nonatomic,copy) NSDictionary* keyboards;
+@property (nonatomic,copy) NSArray* keyboards;
 @property (nonatomic,copy) NSArray* files;
 @property (nonatomic,copy) NSArray* fonts;
 
@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,readonly) NSString* authorName;
 @property (nonatomic,readonly) NSString* authorUrl;
 @property (nonatomic,readonly) NSString* website;
-@property (nonatomic,readonly) NSDictionary* keyboards;
+@property (nonatomic,readonly) NSArray* keyboards;
 @property (nonatomic,readonly) NSArray* files;
 @property (nonatomic,readonly) NSArray* fonts;
 
@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
                   authorName:(NSString*)authorName
                   authorUrl:(NSString*)authorUrl
                      website:(NSString*)website
-                   keyboards:(NSDictionary*)keyboards
+                   keyboards:(NSArray*)keyboards
                        fonts:(NSArray*)fonts
                        files:(NSArray*)files;
 

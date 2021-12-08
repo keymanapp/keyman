@@ -601,7 +601,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (KMPackageInfo *)loadPackageInfo:(NSString *)path {
-  return [self.packageReader loadPackageInfo:path];
+    return [self.packageReader loadPackageInfo:path];
 }
 
 - (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder {
@@ -610,9 +610,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSString *path = [[self keymanDataPath] stringByAppendingPathComponent:packageFolder];
     KMPackageInfo *packageInfo = [self.packageReader loadPackageInfo:path];
   
-  if (packageInfo) {
-    packageName = packageInfo.packageName;
-  }
+    if (packageInfo) {
+        packageName = packageInfo.packageName;
+    }
+  
     return packageName;
 }
 

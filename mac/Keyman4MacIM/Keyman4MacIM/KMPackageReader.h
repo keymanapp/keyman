@@ -4,7 +4,7 @@
  * KMPackageReader.m
  * Keyman
  *
- * Created by Shawn Schantz on 12/6/21.
+ * Created by Shawn Schantz on 2021/12/06.
  *
  * Read package information from kmp.json, if it exists. If not, read from kmp.inf.
  * Then create and return KMPackageInfo object.

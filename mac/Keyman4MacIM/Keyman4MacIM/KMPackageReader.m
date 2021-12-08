@@ -4,7 +4,7 @@
  * KMPackageReader.m
  * Keyman
  *
- * Created by Shawn Schantz on 12/6/21.
+ * Created by Shawn Schantz on 2021/12/06.
  *
  * Read package information from kmp.json, if it exists. If not, read from kmp.inf.
  * Then create and return KMPackageInfo object.
@@ -106,7 +106,12 @@ typedef enum {
   return packageInfo;
 }
 
-- (KMPackageInfo *) createKeyboardInfoFromJsonKeyboard:(NSDictionary *) keyboard {
+/**
+ * Creates a KeyboardInfo object using data loaded from kmp.json.
+ * @param keyboard  an NSDictionary containing all the key-value pairs of a keyboard object from the kmp.json keyboards array
+ * @return the corresponding KeyboardInfo value object
+ */
+- (KMKeyboardInfo *) createKeyboardInfoFromJsonKeyboard:(NSDictionary *) keyboard {
 
   KMKeyboardInfoBuilder *builder = [[KMKeyboardInfoBuilder alloc] init];
 
@@ -178,13 +183,14 @@ typedef enum {
    return packageInfo;
 }
 
+// TODO: refactor, break up and eliminate duplicate code
 /**
- * read .inf file and load it into KMPackageInfo object
- * returns nil if the file does not exist or it cannot be parsed
+ * Creates a KMPackageInfo object from the specified kmp.inf file.
+ * This code is adapted from legacy method keyboardInfoFromInfFile that loaded data from inf file to NSDictionary.
  *
- * adapted from legacy method keyboardInfoFromInfFile that loaded data from inf file to NSDictionary
- */
-
+ * @param path    the full path to the kmp.inf file
+ * @return      the corresponding PackageInfo value object or nil if the file cannot be found or parsed
+*/
 - (KMPackageInfo *) loadPackageInfoFromInfFile:(NSString *)path {
   if (self.debugMode)
     NSLog(@"Loading inf package info from path: %@", path);
@@ -238,16 +244,8 @@ typedef enum {
           break;
         case ctStartMenu:
           break;
-        case ctStartMenuEntries: {
-          if ([[line lowercaseString] hasPrefix:[kWelcome lowercaseString]]) {
-            NSString *s = [line substringFromIndex:kWelcome.length+1];
-            NSArray *vs = [s componentsSeparatedByString:@"\","];
-            NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-          }
-
+        case ctStartMenuEntries:
           break;
-        }
         case ctInfo: {
           if ([[line lowercaseString] hasPrefix:[kName lowercaseString]]) {
             NSString *s = [line substringFromIndex:kName.length+1];

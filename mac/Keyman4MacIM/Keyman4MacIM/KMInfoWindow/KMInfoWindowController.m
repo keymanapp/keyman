@@ -9,6 +9,7 @@
 #import "KMInfoWindowController.h"
 #import "KMInputMethodAppDelegate.h"
 #import "KMPackageInfo.h"
+#import "KMKeyboardInfo.h"
 #import <WebKit/WebKit.h>
 
 @interface KMInfoWindowController ()
@@ -124,31 +125,24 @@
         "</html>";
         
         NSString *pBodyFormat = @"<p class='body'>%@</p><br>";
-        NSMutableString *kbsStr = [NSMutableString stringWithString:@""];
+        NSMutableString *keyboardString = [NSMutableString stringWithString:@""];
         
-        // TODO: getting keyboards from folder/kmx rather than inf
-        NSArray *kbs = [[self AppDelegate] keyboardNamesFromFolder:self.packagePath];
-        if (kbs != nil && kbs.count) {
-            for (NSArray *kbName in kbs) {
-                [kbsStr appendString:[NSString stringWithFormat:pBodyFormat, kbName]];
+        if (self.packageInfo.keyboards.count) {
+            for (KMKeyboardInfo *keyboard in self.packageInfo.keyboards) {
+                [keyboardString appendString:[NSString stringWithFormat:pBodyFormat, keyboard.name]];
             }
-        }
-        // TODO: need to provide above as fallback in case no json???
-/*        else {
-            // This was the old logic (prior to fixing issue #994). Keeping as fallback, though
-            // it's unlikely to be useful/needed.
-            kbs = [self.keyboardInfo objectForKey:kKeyboard];
-        
-            if (kbs != nil && kbs.count) {
-                for (NSArray *kb in kbs) {
-                    [kbsStr appendString:[NSString stringWithFormat:pBodyFormat, [kb objectAtIndex:0]]];
+        } else {
+            // get keyboards from folder because not available in package info (.json or .inf)
+            NSArray *keyboards = [[self AppDelegate] keyboardNamesFromFolder:self.packagePath];
+            if (keyboards != nil && keyboards.count) {
+                for (NSArray *keyboardName in keyboards) {
+                    [keyboardString appendString:[NSString stringWithFormat:pBodyFormat, keyboardName]];
                 }
-            }
-            else {
-                kbsStr = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
+            } else {
+              keyboardString = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
             }
         }
-*/
+
         NSArray *fonts = self.packageInfo.fonts;
         NSMutableString *fontsStr = [NSMutableString stringWithString:@""];
         
@@ -184,39 +178,17 @@
             author = authorV1;
         else if (authorV2.length)
             author = [NSString stringWithFormat:linkFormat, authorV2, authorV2];
-        /*
-        NSString *websiteV1 = [[self.keyboardInfo objectForKey:kWebSite] objectAtIndex:0];
-        NSString *websiteV2 = [[self.keyboardInfo objectForKey:kWebSite] objectAtIndex:1];
-        NSString *website = @"";
-        if (websiteV1.length && websiteV2.length)
-            website = [NSString stringWithFormat:linkFormat, websiteV2, websiteV1];
-        else if (websiteV1.length)
-            website = websiteV1;
-        else if (websiteV2.length)
-            website = [NSString stringWithFormat:linkFormat, websiteV2, websiteV2];
-        */
+
         NSString *website = @"";
         if (self.packageInfo.website.length)
             website = [NSString stringWithFormat:linkFormat, self.packageInfo.website, self.packageInfo.website];
-
-        /*
-        NSString *copyrightV1 = [[self.keyboardInfo objectForKey:kCopyright] objectAtIndex:0];
-        NSString *copyrightV2 = [[self.keyboardInfo objectForKey:kCopyright] objectAtIndex:1];
-        NSString *copyright = @"";
-        if (copyrightV1.length && copyrightV2.length)
-            copyright = [NSString stringWithFormat:linkFormat, copyrightV2, copyrightV1];
-        else if (copyrightV1.length)
-            copyright = copyrightV1;
-        else if (copyrightV2.length)
-            copyright = [NSString stringWithFormat:linkFormat, copyrightV2, copyrightV2];
-        */
         
         NSString *copyright = @"";
         if (self.packageInfo.copyright.length)
             copyright = self.packageInfo.copyright;
         
         NSString *htmlStr = [NSString stringWithFormat:htmlFormat, name, shareUrl, shareUrl,
-                             kbsStr, fontsStr, version, author, website, copyright];
+                             keyboardString, fontsStr, version, author, website, copyright];
         
         return htmlStr;
     }

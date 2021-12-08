@@ -4,7 +4,7 @@
  * KMPackageInfo.m
  * Keyman
  *
- * Created by Shawn Schantz on 11/22/21.
+ * Created by Shawn Schantz on 2021/11/22.
  *
  * Value object describing a Keyman package.
  */
@@ -65,7 +65,7 @@
                   authorName:(NSString*)authorName
                   authorUrl:(NSString*)authorUrl
                      website:(NSString*)website
-                   keyboards:(NSDictionary*)keyboards
+                   keyboards:(NSArray*)keyboards
                        fonts:(NSArray*)fonts
                        files:(NSArray*)files
 {
