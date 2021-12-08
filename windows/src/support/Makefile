@@ -9,11 +9,11 @@ CLEANS=clean-support
 
 # ----------------------------------------------------------------------
 
-oskbulkrenderer:
+oskbulkrenderer: .virtual
     cd $(ROOT)\src\support\oskbulkrenderer
     $(MAKE) $(TARGET)
 
-etl2log:
+etl2log: .virtual
     cd $(ROOT)\src\support\etl2log
     $(MAKE) $(TARGET)
 
