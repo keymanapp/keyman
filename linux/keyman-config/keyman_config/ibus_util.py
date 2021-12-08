@@ -6,46 +6,22 @@ import gi
 import logging
 import subprocess
 
+from keyman_config.gsettings import GSettings
+
 gi.require_version('IBus', '1.0')
-from gi.repository import IBus, Gio
+from gi.repository import IBus
 
 
 class IbusUtil():
     def __init__(self) -> None:
-        if os.environ.get('SUDO_USER'):
-            self.ibus_settings = None
-            self.is_sudo = True
-            logging.debug('Running with sudo. Real user: %s', os.environ.get('SUDO_USER'))
-        else:
-            self.ibus_settings = Gio.Settings.new("org.freedesktop.ibus.general")
-            self.is_sudo = False
-            logging.debug('Running as regular user')
+        self.ibus_settings = GSettings('org.freedesktop.ibus.general')
 
     def read_preload_engines(self):
-        if os.environ.get('SUDO_USER'):
-            process = subprocess.run(
-                ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-                 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
-                 'gsettings', 'get', 'org.freedesktop.ibus.general', 'preload-engines'],
-                capture_output=True)
-            if process.returncode == 0:
-                preload_engines = eval(process.stdout)
-            else:
-                preload_engines = None
-                logging.warning('Could not convert to preload_engines')
-        else:
-            preload_engines = self.ibus_settings.get_strv("preload-engines")
-        return preload_engines
+        return self.ibus_settings.get('preload-engines')
 
     def write_preload_engines(self, bus, preload_engines):
-        if os.environ.get('SUDO_USER'):
-            sourcesVal = str(preload_engines)
-            subprocess.run(
-                ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-                 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
-                 'gsettings', 'set', 'org.freedesktop.ibus.general', 'preload-engines', sourcesVal])
-        else:
-            self.ibus_settings.set_strv("preload-engines", preload_engines)
+        self.ibus_settings.set('preload-engines', preload_engines)
+        if bus:
             bus.preload_engines(preload_engines)
 
 
