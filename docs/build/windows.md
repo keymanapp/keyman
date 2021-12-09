@@ -148,24 +148,25 @@ refreshenv
 # choco meson (0.55) is too old, 0.56 required:
 python -m pip install meson
 
-*** ADD TO PATH 
->>> e.g. C:\Users\mcdurdin\AppData\Roaming\Python\Python310\Scripts
-
 # choco rustup is not currently working:
 Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile $env:TEMP\rustup-init.exe
 & "$env:TEMP\rustup-init.exe"
 refreshenv
+```
 
-*** restart powershell, because refreshenv doesn't cut it...
-
+Restart PowerShell (because `refreshenv` doesn't seem to pick up the rust environment), then
+```ps1
+# Elevated Powershell
 rustup target add i686-pc-windows-msvc
 ```
 
 **Environment variables**:
 * [`KEYMAN_ROOT`](#keyman_root)
+* `PATH`: add your Python scripts folder to your path: it will normally be `%appdata%\Python\Python310\Scripts`.
 
 ```bat
 SET KEYMAN_ROOT=c:\Projects\keyman\keyman
+SET PATH=%path%;%appdata%\Python\Python310\Scripts
 ```
 
 To check whether environment variables are set, run `SET <variable>` in command

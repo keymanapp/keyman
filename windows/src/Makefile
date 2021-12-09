@@ -286,14 +286,17 @@ build-tools: global-versions
 !ifdef NODELPHI
     echo Skipping build-tools
 !else
-    $(MAKE) devtools-app
+# we need to build devtools directly because otherwise we have a
+# chicken-and-egg issue with PathDefines.mak
+    cd $(ROOT)\src\buildtools\devtools
+    $(MAKE)
 # We'll build a default PathDefines.mak if it is missing here so we can
 # go on and do the rest of the build
     $(PROGRAM)\buildtools\devtools -ti
 !endif
 
 message-constants: build-tools
-!ifdef NODELPHI 
+!ifdef NODELPHI
     echo Skipping message-constants
 !else
     $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
