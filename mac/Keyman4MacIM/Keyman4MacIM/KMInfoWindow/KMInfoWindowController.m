@@ -132,15 +132,7 @@
                 [keyboardString appendString:[NSString stringWithFormat:pBodyFormat, keyboard.name]];
             }
         } else {
-            // get keyboards from folder because not available in package info (.json or .inf)
-            NSArray *keyboards = [[self AppDelegate] keyboardNamesFromFolder:self.packagePath];
-            if (keyboards != nil && keyboards.count) {
-                for (NSArray *keyboardName in keyboards) {
-                    [keyboardString appendString:[NSString stringWithFormat:pBodyFormat, keyboardName]];
-                }
-            } else {
-              keyboardString = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
-            }
+            keyboardString = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
         }
 
         NSArray *fonts = self.packageInfo.fonts;

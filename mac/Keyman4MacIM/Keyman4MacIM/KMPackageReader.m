@@ -196,7 +196,8 @@ typedef enum {
     NSLog(@"Loading inf package info from path: %@", path);
         
   NSMutableArray *files = [NSMutableArray arrayWithCapacity:0];
-  NSMutableArray *keyboards = [NSMutableArray arrayWithCapacity:0];
+  NSMutableArray *keyboardInfoArray = [NSMutableArray arrayWithCapacity:0];
+  NSMutableArray *fontArray = [NSMutableArray arrayWithCapacity:0];
   KMPackageInfoBuilder *builder = [[KMPackageInfoBuilder alloc] init];
 
   @try {
@@ -300,20 +301,19 @@ typedef enum {
           }
           else if ([[s lowercaseString] hasPrefix:[kFont lowercaseString]]) {
             NSArray *vs = [s componentsSeparatedByString:@"\","];
-            NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kFont.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+            NSString *fontName = [[[vs objectAtIndex:0] substringFromIndex:kFont.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             NSString *fontFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            [files addObject:fontFileName];
+            [fontArray addObject:fontName];
           }
           else if ([[s lowercaseString] hasPrefix:[kKeyboard lowercaseString]]) {
             NSArray *vs = [s componentsSeparatedByString:@"\","];
             NSString *keyboardName = [[[vs objectAtIndex:0] substringFromIndex:kKeyboard.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             NSString *keyboardFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             
-            
             KMKeyboardInfoBuilder *builder = [[KMKeyboardInfoBuilder alloc] init];
             builder.name = keyboardName;
             KMKeyboardInfo *keyboardInfo = [[KMKeyboardInfo alloc] initWithBuilder:builder];
-            [keyboards addObject:keyboardInfo];
+            [keyboardInfoArray addObject:keyboardInfo];
           }
 
           break;
@@ -328,8 +328,10 @@ typedef enum {
       return nil;
   }
 
-    KMPackageInfo *packageInfo = [[KMPackageInfo alloc] initWithBuilder:builder];
-    return packageInfo;
+  builder.keyboards = keyboardInfoArray;
+  builder.fonts = fontArray;
+  KMPackageInfo *packageInfo = [[KMPackageInfo alloc] initWithBuilder:builder];
+  return packageInfo;
 }
 
 @end
