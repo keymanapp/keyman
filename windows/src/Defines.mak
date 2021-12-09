@@ -15,7 +15,9 @@ EXT=$(ROOT)\src\ext
 INCLUDE=$(ROOT)\src\global\inc;$(INCLUDE)
 
 !ifndef EXCLUDEPATHDEFINES
+!ifndef NODELPHI
 !include $(ROOT)\src\PathDefines.mak
+!endif
 !endif
 
 PROGRAM=$(ROOT)\bin
@@ -143,6 +145,13 @@ DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 
 DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
 
+!IFDEF NODELPHI
+DCC32=echo skipping 
+DCC32DPK=echo skipping 
+DCC64=echo skipping 
+DELPHI_MSBUILD=echo skipping
+!ENDIF
+
 # Visual C++ x86, x64
 WIN32_TARGET_PATH=bin\Win32\$(TARGET_PATH)
 X64_TARGET_PATH=bin\x64\$(TARGET_PATH)
@@ -254,7 +263,7 @@ PLATFORM=Win32
 !ifdef GIT_BASH_FOR_KEYMAN
 MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\mkver.sh
 !else
-MKVER_SH=start /wait .\build.sh $(ROOT)\src\buildtools\mkver.sh
+MKVER_SH=start /wait $(ROOT)\src\buildtools\mkver.sh
 !endif
 
 MKVER_M=$(MKVER_SH) manifest.in manifest.xml

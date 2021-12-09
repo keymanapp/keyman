@@ -4,8 +4,13 @@
 
 NOTARGET_SIGNCODE=yes
 
+!ifdef NODELPHI
+TARGETS=.virtual
+!else
 TARGETS=devtools sentrytool tds2dbg \
   buildunidata build_standards_data buildpkg test-klog delphiprojectmanager
+!endif
+
 CLEANS=clean-buildtools
 
 !include ..\Header.mak
@@ -29,8 +34,12 @@ delphiprojectmanager: .virtual
     $(MAKE) $(TARGET)
 
 devtools: .virtual
+!ifdef NODELPHI
+    echo Skipping devtools
+!else
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE) $(TARGET)
+!endif
 
 buildpkg: .virtual
     cd $(ROOT)\src\buildtools\buildpkg

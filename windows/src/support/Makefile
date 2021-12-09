@@ -2,7 +2,11 @@
 # Support Makefile
 #
 
+!ifdef NODELPHI
+TARGETS=etl2log
+!else
 TARGETS=oskbulkrenderer etl2log
+!endif
 CLEANS=clean-support
 
 !include ..\Header.mak

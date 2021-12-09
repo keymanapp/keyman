@@ -2,6 +2,9 @@
 !include ..\Defines.mak
 
 build:
+!ifdef NODELPHI
+  echo Skipping global
+!else
   cd $(ROOT)\src\global\delphi
   $(MAKE) $(TARGET)
 
@@ -13,6 +16,7 @@ build:
 
   cd $(ROOT)\src\global\wix
   $(MAKE) $(TARGET)
+!endif
 
 build-release:
   @rem
