@@ -1019,9 +1019,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSAlert *)downloadInfoView {
     if (_downloadInfoView == nil) {
         _downloadInfoView = [[NSAlert alloc] init];
-        [_downloadInfoView setMessageText:@"Downloading..."];
+        [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
         [_downloadInfoView setInformativeText:@""];
-        [_downloadInfoView addButtonWithTitle:@"Cancel"];
+        [_downloadInfoView addButtonWithTitle:NSLocalizedString(@"button-cancel-downloading", nil)];
         [_downloadInfoView setAlertStyle:NSInformationalAlertStyle];
         [_downloadInfoView setAccessoryView:self.progressIndicator];
     }
@@ -1080,9 +1080,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
 
         if (_connection == nil) {
-            [_downloadInfoView setMessageText:@"Downloading..."];
+            [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
             NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
-            [button setTitle:@"Cancel"];
+            [button setTitle:NSLocalizedString(@"button-cancel-downloading", nil)];
             [button setTag:-1];
             [self.progressIndicator setDoubleValue:0];
             NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
@@ -1126,9 +1126,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self.receivedData writeToFile:filePath atomically:YES];
     [self unzipFile:filePath];
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-    [_downloadInfoView setMessageText:@"Download Complete"];
+    
+    [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-download-complete", nil)];
     NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
-    [button setTitle:@"Done"];
+    [button setTitle:NSLocalizedString(@"button-download-complete", nil)];
     [button setTag:1];
     [[NSNotificationCenter defaultCenter] postNotificationName:kKeymanKeyboardDownloadCompletedNotification
                                                         object:self

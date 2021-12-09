@@ -18,6 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+SUBDIRS = \
+  test \
+  $(NULL)
+
 AM_CFLAGS = \
 	@IBUS_CFLAGS@ \
 	@GTK_CFLAGS@ \
@@ -68,6 +72,7 @@ ibus_engine_keyman_SOURCES = \
 	main.c \
 	engine.c \
 	engine.h \
+	keycodes.h \
 	keyman-service.c \
 	keyman-service.h \
 	keyman-version.h \

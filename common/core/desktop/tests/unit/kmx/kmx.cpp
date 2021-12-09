@@ -27,159 +27,73 @@
 #include "../test_assert.h"
 #include "../test_color.h"
 
-namespace
-{
+#include "kmx_test_source.hpp"
+
+namespace {
+
 bool g_beep_found = false;
-bool g_caps_lock_on = false;
-
-struct key_event {
-  km_kbp_virtual_key vk;
-  uint16_t modifier_state;
-};
-
-typedef enum {
-  KOT_INPUT,
-  KOT_OUTPUT,
-  KOT_SAVED
-} kmx_option_type;
-
-struct kmx_option {
-  kmx_option_type type;
-  std::u16string key, value, saved_value;
-};
-
-using kmx_options = std::vector<kmx_option>;
-
-int load_source(const km::kbp::path &, std::string &, std::u16string &,
-                std::u16string &, kmx_options &, bool &);
-std::string string_to_hex(const std::u16string& input);
 
 km_kbp_option_item test_env_opts[] =
 {
   KM_KBP_OPTIONS_END
 };
 
-// String trim functions from https://stackoverflow.com/a/217605/1836776
-// trim from start (in place)
-static inline void ltrim(std::string &s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-    return !std::isspace(ch);
-  }));
-}
+std::string
+string_to_hex(const std::u16string &input) {
+  std::ostringstream result;
+  result << std::setfill('0') << std::hex << std::uppercase;
 
-// trim from end (in place)
-static inline void rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-    return !std::isspace(ch);
-  }).base(), s.end());
-}
-
-// trim from both ends (in place)
-static inline void trim(std::string &s) {
-  ltrim(s);
-  rtrim(s);
-}
-
-key_event char_to_event(char ch) {
-  assert(ch >= 32 && ch <= 127);
-  return {
-    km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
-    (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ?  KM_KBP_MODIFIER_SHIFT : 0)
-  };
-}
-
-uint16_t get_modifier(std::string const m) {
-  for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
-    if (m == km::kbp::kmx::s_modifier_names[i].name) {
-      return km::kbp::kmx::s_modifier_names[i].modifier;
+  for (size_t i = 0; i < input.length(); i++) {
+    unsigned int ch = input[i];
+    if (i < input.length() - 1 && Uni_IsSurrogate1(input[i]) && Uni_IsSurrogate2(input[i + 1])) {
+      ch = Uni_SurrogateToUTF32(input[i], input[i + 1]);
+      i++;
     }
+
+    result << "U+" << std::setw(4) << ch << " ";
   }
-  return 0;
+  return result.str();
 }
 
-km_kbp_virtual_key get_vk(std::string const & vk) {
-  for (int i = 1; i < 256; i++) {
-    if (vk == km::kbp::kmx::s_key_names[i]) {
-      return i;
-    }
-  }
-  return 0;
-}
-
-key_event vkey_to_event(std::string const & vk_event) {
-  // vkey format is MODIFIER MODIFIER K_NAME
-  //std::cout << "VK=" << vk_event << std::endl;
-
-  std::stringstream f(vk_event);
-  std::string s;
-  uint16_t modifier_state = 0;
-  km_kbp_virtual_key vk = 0;
-  while(std::getline(f, s, ' ')) {
-    uint16_t modifier = get_modifier(s);
-    if (modifier != 0) {
-      modifier_state |= modifier;
-    }
-    else {
-      vk = get_vk(s);
-      break;
-    }
-  }
-
-  // The string should be empty at this point
-  assert(!std::getline(f, s, ' '));
-  assert(vk != 0);
-
-  return {
-    vk,
-    modifier_state
-  };
-}
-
-key_event next_key(std::string &keys) {
-  // Parse the next element of the string, chop it off, and return it
-  if (keys.length() == 0) return { 0, 0 };
-  char ch = keys[0];
-  if (ch == '[') {
-    if (keys.length() > 1 && keys[1] == '[') {
-      keys.erase(0, 2);
-      return char_to_event(ch);
-    }
-    auto n = keys.find(']');
-    assert(n != std::string::npos);
-    auto vkey = keys.substr(1, n - 1);
-    keys.erase(0, n+1);
-    return vkey_to_event(vkey);
-  }
-  else {
-    keys.erase(0, 1);
-    return char_to_event(ch);
-  }
-}
-
-void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16string & text_store, std::vector<km_kbp_context_item> & context, kmx_options &options) {
-  switch (act.type)
-  {
+void
+apply_action(
+    km_kbp_state const *,
+    km_kbp_action_item const &act,
+    std::u16string &text_store,
+    std::vector<km_kbp_context_item> &context,
+    km::tests::kmx_options &options,
+    km::tests::KmxTestSource &test_source) {
+  switch (act.type) {
   case KM_KBP_IT_END:
     assert(false);
     break;
   case KM_KBP_IT_ALERT:
     g_beep_found = true;
-    //std::cout << "beep" << std::endl;
+    // std::cout << "beep" << std::endl;
     break;
   case KM_KBP_IT_CHAR:
-    context.push_back(km_kbp_context_item{KM_KBP_CT_CHAR, {0,}, {act.character}});
+    context.push_back(km_kbp_context_item{
+        KM_KBP_CT_CHAR,
+        {
+            0,
+        },
+        {act.character}});
     if (Uni_IsSMP(act.character)) {
       text_store.push_back(Uni_UTF32ToSurrogate1(act.character));
       text_store.push_back(Uni_UTF32ToSurrogate2(act.character));
-    }
-    else {
+    } else {
       text_store.push_back(act.character);
     }
-    //std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
+    // std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
   case KM_KBP_IT_MARKER:
-    //std::cout << "deadkey(" << act.marker << ")" << std::endl;
-    context.push_back(km_kbp_context_item{KM_KBP_CT_MARKER, {0,}, {(uint32_t)act.marker}});
+    // std::cout << "deadkey(" << act.marker << ")" << std::endl;
+    context.push_back(km_kbp_context_item{
+        KM_KBP_CT_MARKER,
+        {
+            0,
+        },
+        {(uint32_t)act.marker}});
     break;
   case KM_KBP_IT_BACK:
     // It is valid for a backspace to be received with an empty text store
@@ -188,18 +102,17 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
     // processing at start of a text store, e.g. delete from a previous cell
     // in a table. Or, if Keyman has a cached context, then there may be
     // additional text in the text store that Keyman can't see.
-    if(act.backspace.expected_type == KM_KBP_BT_MARKER) {
+    if (act.backspace.expected_type == KM_KBP_BT_MARKER) {
       assert(!context.empty());
       assert(context.back().type == KM_KBP_CT_MARKER);
       context.pop_back();
-    }
-    else if (text_store.length() > 0) {
+    } else if (text_store.length() > 0) {
       assert(!context.empty() && !text_store.empty());
       km_kbp_usv ch = text_store.back();
       text_store.pop_back();
-      if(text_store.length() > 0 && Uni_IsSurrogate2(ch)) {
+      if (text_store.length() > 0 && Uni_IsSurrogate2(ch)) {
         auto ch1 = text_store.back();
-        if(Uni_IsSurrogate1(ch1)) {
+        if (Uni_IsSurrogate1(ch1)) {
           // We'll only pop the next character off it is actually a
           // surrogate pair
           ch = Uni_SurrogateToUTF32(ch1, ch);
@@ -213,30 +126,24 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
       context.pop_back();
     }
     break;
-  case KM_KBP_IT_PERSIST_OPT:
-    {
-      bool found = false;
-      for (auto it = options.begin(); it != options.end(); it++) {
-        if (it->type == KOT_SAVED) {
-          if (it->key.compare(act.option->key) == 0) {
-            found = true;
-            it->saved_value = act.option->value;
-            break;
-          }
+  case KM_KBP_IT_PERSIST_OPT: {
+    bool found = false;
+    for (auto it = options.begin(); it != options.end(); it++) {
+      if (it->type == km::tests::KOT_SAVED) {
+        if (it->key.compare(act.option->key) == 0) {
+          found           = true;
+          it->saved_value = act.option->value;
+          break;
         }
       }
-      std::cout << "action: option "
-                << (act.option->scope == KM_KBP_OPT_ENVIRONMENT ? "environment " : "keyboard ")
-                              << act.option->key
-                              << "=" << act.option->value
-                << " persistence requested" << std::endl;
-      if (!found) {
-        std::cout << "option "
-                  << act.option->key
-                  << " saved but no expected output found. Suggestion: update test to include saved option value." << std::endl;
-      }
     }
-    break;
+    std::cout << "action: option " << (act.option->scope == KM_KBP_OPT_ENVIRONMENT ? "environment " : "keyboard ")
+              << act.option->key << "=" << act.option->value << " persistence requested" << std::endl;
+    if (!found) {
+      std::cout << "option " << act.option->key
+                << " saved but no expected output found. Suggestion: update test to include saved option value." << std::endl;
+    }
+  } break;
   case KM_KBP_IT_INVALIDATE_CONTEXT:
     std::cout << "action: context invalidated (markers cleared)" << std::endl;
     break;
@@ -245,67 +152,23 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
     break;
   case KM_KBP_IT_CAPSLOCK:
     std::cout << "action: capsLock " << act.capsLock << std::endl;
-    g_caps_lock_on = act.capsLock;
+    test_source.set_caps_lock_on(act.capsLock);
     break;
   default:
-    assert(false); // NOT SUPPORTED
+    assert(false);  // NOT SUPPORTED
     break;
   }
 }
 
-int caps_lock_state() {
-  return g_caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
-}
-
-void toggle_caps_lock_state() {
-  g_caps_lock_on = !g_caps_lock_on;
-}
-
-km_kbp_option_item *get_keyboard_options(kmx_options options) {
-  km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
-
-  int i = 0;
-  for (auto it = options.begin(); it != options.end(); it++) {
-    if (it->type != KOT_INPUT) continue;
-
-    std::cout << "input option-key: " << it->key << std::endl;
-
-    std::u16string key = it->key;
-    if (key[0] == u'&') {
-      // environment value (aka system store)
-      key.erase(0, 1);
-      keyboard_opts[i].scope = KM_KBP_OPT_ENVIRONMENT;
-    }
-    else {
-      keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
-    }
-
-    km_kbp_cp *cp = new km_kbp_cp[key.length() + 1];
-    key.copy(cp, key.length());
-    cp[key.length()] = 0;
-
-    keyboard_opts[i].key = cp;
-
-    cp = new km_kbp_cp[it->value.length() + 1];
-    it->value.copy(cp, it->value.length());
-    cp[it->value.length()] = 0;
-
-    keyboard_opts[i].value = cp;
-
-    i++;
-  }
-
-  keyboard_opts[i] = KM_KBP_OPTIONS_END;
-  return keyboard_opts;
-}
-
-int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
+int
+run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
-  kmx_options options;
+  km::tests::kmx_options options;
   bool expected_beep = false;
+  km::tests::KmxTestSource test_source;
 
-  int result = load_source(source, keys, expected, context, options, expected_beep);
+  int result = test_source.load_source(source, keys, expected, context, options, expected_beep);
   if (result != 0) return result;
 
   std::cout << "source file   = " << source << std::endl
@@ -321,7 +184,7 @@ int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   // Setup keyboard options
   if (options.size() > 0) {
-    km_kbp_option_item *keyboard_opts = get_keyboard_options(options);
+    km_kbp_option_item *keyboard_opts = test_source.get_keyboard_options(options);
 
     try_status(km_kbp_state_options_update(test_state, keyboard_opts));
 
@@ -345,20 +208,20 @@ int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   std::u16string text_store = context;
 
   // Run through key events, applying output for each event
-  for (auto p = next_key(keys); p.vk != 0; p = next_key(keys)) {
+  for (auto p = test_source.next_key(keys); p.vk != 0; p = test_source.next_key(keys)) {
     // Because a normal system tracks caps lock state itself,
     // we mimic that in the tests. We assume caps lock state is
     // updated on key_down before the processor receives the
     // event.
     if (p.vk == KM_KBP_VKEY_CAPS) {
-      toggle_caps_lock_state();
+      test_source.toggle_caps_lock_state();
     }
 
     for (auto key_down = 1; key_down >= 0; key_down--) {
-      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | caps_lock_state(), key_down));
+      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down));
 
       for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
-        apply_action(test_state, *act, text_store, test_context, options);
+        apply_action(test_state, *act, text_store, test_context, options, test_source);
       }
     }
 
@@ -387,7 +250,8 @@ int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   }
 
   // Test if the beep action was as expected
-  if (g_beep_found != expected_beep) return __LINE__;
+  if (g_beep_found != expected_beep)
+    return __LINE__;
 
   // Compare final output - retrieve internal context
   size_t n = 0;
@@ -418,14 +282,13 @@ int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   // Test resultant options
   for (auto it = options.begin(); it != options.end(); it++) {
-    if (it->type == KOT_OUTPUT) {
+    if (it->type == km::tests::KOT_OUTPUT) {
       std::cout << "output option-key: " << it->key << " expected: " << it->value;
       km_kbp_cp const *value;
       try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
       std::cout << " actual: " << value << std::endl;
       if (it->value.compare(value) != 0) return __LINE__;
-    }
-    else if (it->type == KOT_SAVED) {
+    } else if (it->type == km::tests::KOT_SAVED) {
       std::cout << "persisted option-key: " << it->key << " expected: " << it->value << " actual: " << it->saved_value << std::endl;
       if (it->value.compare(it->saved_value) != 0) return __LINE__;
     }
@@ -438,145 +301,14 @@ int run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   return 0;
 }
 
-std::string string_to_hex(const std::u16string& input) {
-    std::ostringstream result;
-    result << std::setfill('0') << std::hex << std::uppercase;
-
-    for (size_t i = 0; i < input.length(); i++) {
-      unsigned int ch = input[i];
-      if(i < input.length() - 1 && Uni_IsSurrogate1(input[i]) && Uni_IsSurrogate2(input[i+1])) {
-        ch = Uni_SurrogateToUTF32(input[i], input[i+1]);
-        i++;
-      }
-
-      result << "U+" << std::setw(4) << ch << " ";
-    }
-    return result.str();
-}
-
-std::u16string parse_source_string(std::string const & s) {
-  std::u16string t;
-  for (auto p = s.begin(); p != s.end(); p++) {
-    if (*p == '\\') {
-      p++;
-      km_kbp_usv v;
-      assert(p != s.end());
-      if (*p == 'u' || *p == 'U') {
-        // Unicode value
-        p++;
-        size_t n;
-        std::string s1 = s.substr(p - s.begin(), 8);
-        v = std::stoul(s1, &n, 16);
-        // Allow deadkey_number (U+0001) characters and onward
-        assert(v >= 0x0001 && v <= 0x10FFFF);
-        p += n-1;
-        if (v < 0x10000) {
-          t += km_kbp_cp(v);
-        }
-        else {
-          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
-        }
-      }
-      else if (*p == 'd') {
-        // Deadkey
-        // TODO, not yet supported
-        assert(false);
-      }
-    }
-    else {
-      t += *p;
-    }
-  }
-  return t;
-}
-
-bool parse_option_string(std::string line, kmx_options &options, kmx_option_type type) {
-  auto x = line.find('=');
-  if (x == std::string::npos) return false;
-
-  kmx_option o;
-
-  o.type = type;
-  o.key = parse_source_string(line.substr(0, x));
-  o.value = parse_source_string(line.substr(x + 1));
-
-  options.emplace_back(o);
-  return true;
-}
-
-bool is_token(const std::string token, std::string &line) {
-  if (line.compare(0, token.length(), token) == 0) {
-    line = line.substr(token.length());
-    trim(line);
-    return true;
-  }
-  return false;
-}
-
-int load_source(const km::kbp::path & path, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
-  const std::string s_keys = "c keys: ",
-    s_expected = "c expected: ",
-    s_context = "c context: ",
-    s_option = "c option: ",
-    s_option_expected = "c expected option: ",
-    s_option_saved = "c saved option: ",
-    s_capsLock = "c capsLock: ";
-
-  // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
-  std::ifstream kmn(path.native());
-  if (!kmn.good()) {
-    std::cerr << "could not open file: " << path << std::endl;
-    return __LINE__;
-  }
-  std::string line;
-  while (std::getline(kmn, line)) {
-    trim(line);
-
-    if (!line.length()) continue;
-    if (line.compare(0, s_keys.length(), s_keys) == 0) {
-      keys = line.substr(s_keys.length());
-      trim(keys);
-    }
-    else if(is_token(s_expected, line)) {
-      if (line == "\\b") {
-        expected_beep = true;
-      }
-      else {
-        expected = parse_source_string(line);
-      }
-    }
-    else if (is_token(s_context, line)) {
-      context = parse_source_string(line);
-    }
-    else if (is_token(s_option, line)) {
-      if (!parse_option_string(line, options, KOT_INPUT)) return __LINE__;
-    }
-    else if (is_token(s_option_expected, line)) {
-      if (!parse_option_string(line, options, KOT_OUTPUT)) return __LINE__;
-    }
-    else if (is_token(s_option_saved, line)) {
-      if (!parse_option_string(line, options, KOT_SAVED)) return __LINE__;
-    }
-    else if (is_token(s_capsLock, line)) {
-      g_caps_lock_on = parse_source_string(line).compare(u"1") == 0;
-    }
-  }
-
-  if (keys == "") {
-    // We must at least have a key sequence to run the test
-    return __LINE__;
-  }
-
-  return 0;
-}
-
-constexpr const auto help_str = "\
+constexpr const auto help_str =
+    "\
 kmx [--color] <KMN_FILE> <KMX_FILE>\n\
 help:\n\
 \tKMN_FILE:\tThe source file for the keyboard under test.\n\
 \tKMX_FILE:\tThe corresponding compiled kmx file produced from KMN_FILE.\n";
-} // namespace
+
+}  // namespace
 
 int error_args() {
     std::cerr << "kmx: Not enough arguments." << std::endl;
@@ -601,5 +333,5 @@ int main(int argc, char *argv[]) {
   console_color::enabled = console_color::isaterminal() || arg_color;
 
   km::kbp::kmx::g_debug_ToConsole = TRUE;
-  return run_test(argv[first_arg], argv[first_arg+1]);
+  return run_test(argv[first_arg], argv[first_arg + 1]);
 }

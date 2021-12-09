@@ -4,7 +4,7 @@
 
 !include ..\..\Defines.mak
 
-build: version.res manifest.res icons dirs xml pull-core
+build: version.res manifest.res icons dirs xml xsd pull-core
     cd $(ROOT)\src\developer\tike
     $(DELPHI_MSBUILD) tike.dproj /p:Platform=Win32
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\tike.exe -dpr tike.dpr
@@ -13,6 +13,9 @@ build: version.res manifest.res icons dirs xml pull-core
     $(COPY) kmlmc.cmd $(PROGRAM)\developer
     $(COPY) $(ROOT)\..\common\core\desktop\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEBUGPATH)\developer
+
+xsd:
+    $(COPY) $(KEYMAN_ROOT)\common\schemas\kps\kps.xsd $(PROGRAM)\developer
 
 xml: pull-keymanweb pull-npm sentry-init.js
     cd $(ROOT)\src\developer\tike\xml

@@ -182,16 +182,23 @@ window.onload = function() {
   );
 
   let newOSK = null;
-  let deviceSelect = document.getElementById('device-select');
-  if(deviceSelect.value == '') deviceSelect.value = 'desktop';
+  let deviceSelect = null;
 
-  deviceSelect.addEventListener('change', function() {
-    setOSK();
-    ta1.focus();
-  });
+  if(!keyman.util.isTouchDevice()) {
+    deviceSelect = document.getElementById('device-select');
+    if(deviceSelect.value == '') deviceSelect.value = 'desktop';
 
+    deviceSelect.addEventListener('change', function() {
+      setOSK();
+      ta1.focus();
+    });
+  }
 
   function setOSK() {
+    if(keyman.util.isTouchDevice()) {
+      return;
+    }
+
     const devices = {
       Windows:         { browser: 'chrome', formFactor: 'desktop', OS: 'windows', touchable: false, dimensions: [640, 300] },
       macOS:           { browser: 'chrome', formFactor: 'desktop', OS: 'macosx',  touchable: false, dimensions: [640, 300] },
@@ -219,17 +226,15 @@ window.onload = function() {
       newOSK.setSize(targetDevice.dimensions[0]+'px', targetDevice.dimensions[1]+'px');
     }
     document.getElementById('osk-host').appendChild(newOSK.element);
-
-    keyman.osk = newOSK;
-    newOSK.activeKeyboard = keyman.core.activeKeyboard;
-    keyman.alignInputs();
   }
 
   setOSK();
 
   keyman.addEventListener('keyboardchange', function(keyboardProperties) {
-    keyman.osk = newOSK;
-    newOSK.activeKeyboard = keyman.core.activeKeyboard;
+    if(newOSK) {
+      keyman.osk = newOSK;
+      newOSK.activeKeyboard = keyman.core.activeKeyboard;
+    }
     keyboardSelect.value = keyboardProperties.internalName;
     keyman.alignInputs();
     //console.log('keyboardchange:'+JSON.stringify(keyboardProperties)+' [active='+keyman.getActiveKeyboard()+';'+keyman.core.activeKeyboard+']');

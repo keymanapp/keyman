@@ -1,0 +1,28 @@
+c Description: Tests multiple groups. This keyboard is used to test km_kbp_keyboard_get_key_list API call
+c keys: [K_1][K_2]
+c expected: abc
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [K_1] > 'a'
+'b' + [K_2] > context use(b)
+'a' + [CTRL K_B] > 'b'
+'a' + [ALT K_C] > 'c'
+
+match > use(a)
+
+group(a) using keys
+
++ 'a' > 'c'
++ [CTRL K_B] > 'b'
++ [K_C] > 'c'
+group(b) using keys
+
++ 'b' > 'abc'
++ [ALT K_C] > 'e'
+

@@ -14,6 +14,12 @@
     </plurals>
 
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+      <item quantity="one">Other Input Method</item>
+      <item quantity="other">Other Input Methods</item>
+    </plurals>
+
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Add New Keyboard</string>
 
     <!-- Context: Title for list -->
@@ -35,7 +41,7 @@
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">Close</string>
 
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">Close Keyman</string>
 
     <!-- Context: Button label -->

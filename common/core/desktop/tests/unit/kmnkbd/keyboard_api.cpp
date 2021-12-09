@@ -23,13 +23,17 @@ int main(int, char *[])
 {
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_keyboard_attrs const * kb_attrs = nullptr;
+  km_kbp_keyboard_key * kb_key_list = nullptr;
 
   try_status(km_kbp_keyboard_load(test_kb_path.c_str(), &test_kb));
   try_status(km_kbp_keyboard_get_attrs(test_kb, &kb_attrs));
+  try_status(km_kbp_keyboard_get_key_list(test_kb,&kb_key_list));
+
   if (kb_attrs->folder_path != test_kb_path.parent())
     return __LINE__;
 
   km_kbp_keyboard_dispose(test_kb);
+  km_kbp_keyboard_key_list_dispose(kb_key_list);
 
   return 0;
 }

@@ -386,13 +386,13 @@
 - (void)removeAction:(id)sender {
     NSButton *removeButton = (NSButton *)sender;
     NSDictionary *info = [self.tableContents objectAtIndex:removeButton.tag];
-    NSString *msg;
-    if ([info objectForKey:@"HeaderTitle"] != nil)
-        msg = [NSString stringWithFormat:@"This action will permanently delete '%@'.", [info objectForKey:@"HeaderTitle"]];
-    else
-        msg = [NSString stringWithFormat:@"This action will permanently delete '%@'.", [info objectForKey:kKMKeyboardNameKey]];
+    NSString *deleteKeyboardMessage = NSLocalizedString(@"message-confirm-delete-keyboard", nil);
     
-    [self.deleteAlertView setMessageText:msg];
+    if ([info objectForKey:@"HeaderTitle"] != nil)
+        [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, [info objectForKey:@"HeaderTitle"]]];
+    else
+        [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, [info objectForKey:kKMKeyboardNameKey]]];
+
     [self.deleteAlertView beginSheetModalForWindow:self.window
                                       modalDelegate:self
                                      didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
@@ -424,9 +424,9 @@
 }
 
 - (void)handleRequestToInstallPackage:(KMPackage *) package {
-    NSString *infoFmt = NSLocalizedString(@"Do you want the Keyman Input Method to install this Package?\rFile: %@", @"Alert informative text when user double-clicks a KMP file. Parameter is the name of the KMP file.");
-    [self.confirmKmpInstallAlertView setInformativeText:[NSString localizedStringWithFormat:infoFmt, package.getOrigKmpFilename]];
-    
+    NSString *keyboardInfoString = NSLocalizedString(@"info-install-keyboard-filename", nil);
+    [self.confirmKmpInstallAlertView setInformativeText:[NSString localizedStringWithFormat:keyboardInfoString, package.getOrigKmpFilename]];
+
     if ([self.AppDelegate debugMode]) {
         NSLog(@"Asking user to confirm installation of %@...", package.getOrigKmpFilename);
         NSLog(@"KMP - temp file name: %@", package.getTempKmpFilename);
@@ -449,8 +449,11 @@
     
     if (!didUnzip) {
         NSAlert *failure = [[NSAlert alloc] init];
-        [failure addButtonWithTitle:NSLocalizedString(@"OK", @"Alert button")];
-        [failure setMessageText:NSLocalizedString(@"Failed to unzip Keyman Package!", @"Alert message when user double-clicks a KMP file that cannot be unzipped.")];
+        [failure addButtonWithTitle:NSLocalizedString(@"button-keyboard-file-unreadable", @"Alert button")];
+        
+        NSString *errorString = NSLocalizedString(@"message-keyboard-file-unreadable", nil);
+        [failure setMessageText:[NSString localizedStringWithFormat:errorString, kmpFile.lastPathComponent]];
+
         [failure setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
         [failure setAlertStyle:NSWarningAlertStyle];
         [failure beginSheetModalForWindow:self.window
@@ -512,10 +515,9 @@
 - (NSAlert *)deleteAlertView {
     if (_deleteAlertView == nil) {
         _deleteAlertView = [[NSAlert alloc] init];
-        [_deleteAlertView setMessageText:@"This action will permanently delete this keyboard."];
-        [_deleteAlertView setInformativeText:@"Press OK to continue."];
-        [_deleteAlertView addButtonWithTitle:@"OK"];
-        [_deleteAlertView addButtonWithTitle:@"Cancel"];
+        [_deleteAlertView setInformativeText:NSLocalizedString(@"info-cannot-undo-delete-keyboard", nil)];
+        [_deleteAlertView addButtonWithTitle:NSLocalizedString(@"button-delete-keyboard", nil)];
+        [_deleteAlertView addButtonWithTitle:NSLocalizedString(@"button-cancel-delete-keyboard", nil)];
         [_deleteAlertView setAlertStyle:NSWarningAlertStyle];
         [_deleteAlertView setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     }
@@ -526,9 +528,9 @@
 - (NSAlert *)confirmKmpInstallAlertView {
     if (_confirmKmpInstallAlertView == nil) {
         _confirmKmpInstallAlertView = [[NSAlert alloc] init];
-        [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"Yes", @"Alert button")];
-        [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"No", @"Alert button")];
-        [_confirmKmpInstallAlertView setMessageText:NSLocalizedString(@"Install Keyman Package?", @"Alert message text when user double-clicks a KMP file.")];
+        [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"button-install-keyboard", nil)];
+        [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"button-cancel-install-keyboard", nil)];
+        [_confirmKmpInstallAlertView setMessageText:NSLocalizedString(@"message-confirm-install-keyboard", nil)];
         [_confirmKmpInstallAlertView setAlertStyle:NSInformationalAlertStyle];
         [_confirmKmpInstallAlertView setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     }
@@ -541,7 +543,7 @@
         NSLog(@"User responded to NSAlert");
     }
     if (alert == _deleteAlertView) {
-        if (returnCode == NSAlertFirstButtonReturn) { // OK
+        if (returnCode == NSAlertFirstButtonReturn) { // Delete
             [self deleteFileAtIndex:(__bridge NSNumber *)contextInfo];
         }
         
@@ -552,7 +554,7 @@
         if ([self.AppDelegate debugMode]) {
             NSLog(@"KMP - Temp file: %@", package.getTempKmpFilename);
         }
-        if (returnCode == NSAlertFirstButtonReturn) { // Yes
+        if (returnCode == NSAlertFirstButtonReturn) { // Install
             [self installPackageFile: package.getTempKmpFilename];
         }
         

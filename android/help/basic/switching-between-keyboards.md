@@ -24,7 +24,7 @@ You should then see the same listing of languages/keyboards. Tap on any availabl
 
 ### Alternate Step for System Keyboard
 
-The Keyman system keyboard has an additional **NEXT INPUT METHOD** button at the bottom left of
-the keyboard picker menu. Pushing this button will close Keyman and switch to the next non-Keyman system keyboard.
+The Keyman system keyboard lists **Other Input Methods** that are enabled at the bottom of
+the keyboard picker menu. Selecting any of those keyboards close Keyman and switch to the selected system keyboard.
 
-![](../android_images/close-keyman-a.png)
+![](../android_images/other-input-methods.png)

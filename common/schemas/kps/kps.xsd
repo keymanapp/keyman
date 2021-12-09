@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  .kps file schema, version 7.0
+
+  Copyright (C) SIL International
+
+  Supports KPS files for Keyman Developer 7+
+
+  Expects FileVersion 7.0
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="Package">
+  <xs:complexType>
+    <xs:all>
+
+
+      <xs:element minOccurs="1" maxOccurs="1" name="System">
+        <xs:complexType>
+          <xs:all>
+            <xs:element minOccurs="1" maxOccurs="1" name="KeymanDeveloperVersion" type="km-version" />
+            <xs:element minOccurs="1" maxOccurs="1" name="FileVersion" type="km-version" />
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+
+
+      <xs:element minOccurs="0" maxOccurs="1" name="Options">
+        <xs:complexType>
+          <xs:all>
+            <xs:element minOccurs="0" maxOccurs="1" name="ExecuteProgram" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="ReadMeFile" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="GraphicFile" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="MSIFileName" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="MSIOptions" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="FollowKeyboardVersion" type="km-empty" />
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+
+
+      <xs:element minOccurs="0" maxOccurs="1" name="StartMenu">
+        <xs:complexType>
+          <xs:all>
+            <xs:element minOccurs="0" maxOccurs="1" name="Folder" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="AddUninstallEntry" type="km-empty" />
+            <xs:element minOccurs="0" maxOccurs="1" name="Items">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="Item">
+                    <xs:complexType>
+                      <xs:all>
+                        <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+                        <xs:element minOccurs="0" maxOccurs="1" name="FileName" type="xs:string" />
+                        <xs:element minOccurs="0" maxOccurs="1" name="Arguments" type="xs:string" />
+                        <xs:element minOccurs="0" maxOccurs="1" name="Icon" type="xs:string" />
+                        <xs:element minOccurs="0" maxOccurs="1" name="Location" type="km-start-menu-location" />
+                      </xs:all>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+
+
+      <xs:element minOccurs="0" maxOccurs="1" name="Info">
+        <xs:complexType>
+          <xs:all>
+            <xs:element minOccurs="0" maxOccurs="1" name="Name" type="km-info" />
+            <xs:element minOccurs="0" maxOccurs="1" name="Version" type="km-info" />
+            <xs:element minOccurs="0" maxOccurs="1" name="Copyright" type="km-info" />
+            <xs:element minOccurs="0" maxOccurs="1" name="Author" type="km-info" />
+            <xs:element minOccurs="0" maxOccurs="1" name="WebSite" type="km-info" />
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+
+
+      <xs:element minOccurs="0" maxOccurs="1" name="Files">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="File">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="CopyLocation" type="km-file-copy-location" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="FileType" type="xs:string" />
+                </xs:all>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+
+      <xs:element minOccurs="0" maxOccurs="1" name="Keyboards">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="Keyboard">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="ID" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Version" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="RTL" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="OSKFont" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="DisplayFont" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
+                </xs:all>
+              </xs:complexType>
+              </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+
+      <xs:element minOccurs="0" maxOccurs="1" name="LexicalModels">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="LexicalModel">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="ID" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Version" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="RTL" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
+                </xs:all>
+              </xs:complexType>
+              </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+
+      <xs:element minOccurs="0" maxOccurs="1" name="Strings">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="String">
+              <xs:complexType>
+                <xs:attribute name="Name" type="xs:string" />
+                <xs:attribute name="Value" type="xs:string" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <!-- Deprecated elements: we won't validate as processors ignore them -->
+
+      <xs:element minOccurs="0" maxOccurs="1" name="Buttons" type="km-any" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Registry" type="km-any" />
+
+    </xs:all>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="km-empty">
+  <xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="km-any">
+  <xs:sequence>
+    <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="km-version">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="(\d+\.)+(\d+)"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="km-info">
+  <xs:simpleContent>
+    <xs:extension base="xs:string">
+      <xs:attribute name="URL" type="xs:anyURI" />
+    </xs:extension>
+  </xs:simpleContent>
+</xs:complexType>
+
+<xs:simpleType name="km-file-copy-location">
+  <xs:restriction base="xs:integer">
+    <xs:minInclusive value="0" />
+    <xs:maxInclusive value="3"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="km-start-menu-location">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="psmelStartMenu|psmelDesktop"></xs:pattern>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="km-keyboard-languages">
+  <xs:sequence>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="Language">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="ID" type="xs:string" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+</xs:schema>

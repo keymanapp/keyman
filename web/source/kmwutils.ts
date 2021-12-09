@@ -442,6 +442,11 @@ namespace com.keyman {
       // This can sometimes fail with some browsers if called before document defined,
       // so catch the exception
       try {
+        // For emulation of iOS on a desktop device, use a default value
+        if(this.device.formFactor == 'desktop') {
+          return 1;
+        }
+
         // Get viewport width
         var viewportWidth = document.documentElement.clientWidth;
 

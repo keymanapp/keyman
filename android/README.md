@@ -111,6 +111,7 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
 ```gradle
 android {
     compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {

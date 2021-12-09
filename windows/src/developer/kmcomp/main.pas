@@ -272,7 +272,7 @@ begin
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
       Ferror := not DoKCCompileProject(FParamInfile, FDebug, FClean, FWarnAsError, FCheckFilenameConventions, FParamTarget)   // I4706   // I4707
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kps' then
-      FError := not DoKCCompilePackage(FParamInfile, FWarnAsError, FInstaller, FCheckFilenameConventions, FInstallerMSI, FUpdateInstaller)   // I4706
+      FError := not DoKCCompilePackage(FParamInfile, FWarnAsError, FInstaller, FCheckFilenameConventions, FInstallerMSI, FUpdateInstaller, FJsonSchemaPath)   // I4706
     else
       FError := not CompileKeyboard(FParamInfile, FParamOutfile, FDebug, FWarnAsError);   // I4706
 
@@ -293,7 +293,7 @@ begin
   begin
     with TCompileKeymanWeb.Create do
     try
-      Result := Compile(nil, FInFile, FOutFile, FDebug, @CompilerMessage);   // I3681   // I4865   // I4866
+      Result := Compile(nil, FInFile, FOutFile, FDebug, @CompilerMessageW);   // I3681   // I4865   // I4866
     finally
       Free;
     end;

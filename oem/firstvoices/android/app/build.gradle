@@ -9,6 +9,7 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

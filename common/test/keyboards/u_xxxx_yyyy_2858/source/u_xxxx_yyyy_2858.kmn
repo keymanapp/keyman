@@ -1,0 +1,13 @@
+﻿c u_xxxx_yyyy_2858 generated from template at 2021-11-11 12:27:04
+c with name "U_xxxx_yyyy_2858"
+store(&VERSION) '15.0'
+store(&NAME) 'U_xxxx_yyyy_2858'
+store(&COPYRIGHT) '©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'u_xxxx_yyyy_2858.kvks'
+store(&LAYOUTFILE) 'u_xxxx_yyyy_2858.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys

@@ -24,19 +24,19 @@
 
       <div class='control' id='keymanweb-control-host'>
         <!--<div id='KeymanWebControl'></div>-->
-        <div>
+        <div id='control-keyboards'>
           <label for='keyboard-select'>Keyboard:</label>
           <select id='keyboard-select'>
             <option value=''>(system keyboard)</option>
           </select>
         </div>
-        <div>
+        <div id='control-models'>
           <label for='model-list'>Model:</label>
           <select id='model-list'>
             <option value=''>(no model)</option>
           </select>
         </div>
-        <div>
+        <div id='control-devices'>
           <label for='device-select'>Device:</label>
           <select id='device-select'>
             <option value='Windows'>Windows desktop</option>
@@ -58,16 +58,16 @@
     <div class='clear'></div>
 
     <div id='content'>
-      <div id='osk-host-frame'>
-        <div id='osk-host'>
-          <!-- Contains the inline OSK -->
-        </div>
-      </div>
       <div id='character-grid'>
         <!-- contains the breakdown of characters from the input-area -->
       </div>
       <div id='input-area'>
         <textarea id='ta1' class='test'></textarea><br/>
+      </div>
+      <div id='osk-host-frame'>
+        <div id='osk-host'>
+          <!-- Contains the inline OSK -->
+        </div>
       </div>
     </div>
 

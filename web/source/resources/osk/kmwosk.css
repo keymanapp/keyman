@@ -323,8 +323,58 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 }
 
 /* Key preview styles */
+
 div.ios div.kmw-keytip {
-  position:absolute; left:0; top:0; width:3em; height:3em; background-color:rgb(0,0,0,0);overflow:visible;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3em;
+  height: 3em;
+  background-color: rgb(0, 0, 0, 0);
+  overflow: visible;
+}
+
+div.ios div.kmw-keytip-tip {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  border-radius: 6px 6px 4px 4px;
+  border: solid 1px #cccccc;
+  border-bottom: solid 1px #8a8d90;
+}
+
+div.ios div.kmw-keytip-cap {
+  position: absolute;
+  border-radius: 0 0 5px 5px;
+  border-top: solid 1px white;
+  border-bottom: solid 1px #8a8d90;
+}
+
+span.kmw-keytip-label {
+  display: block;
+  transform: translateY(-50%);
+  top: 50%;
+  position: relative;
+}
+
+div.ios div.kmw-keytip-cap,
+div.ios div.kmw-keytip-tip {
+  background:white;
+}
+
+div.android div.kmw-keytip {
+  position:absolute;
+  left: 0;
+  top: 0;
+  width: 3em;
+  height: 3em;
+  color: white;
+  overflow: visible;
+}
+
+div.android div.kmw-keytip-tip {
+  border-radius: 6px;
+  background: #999;
 }
 
 /* Dark mode - ensure text is colored appropriately for key tips. */
@@ -333,20 +383,20 @@ div.ios div.kmw-keytip {
     color:#fff;
   }
 
+  div.ios div.kmw-keytip-cap,
+  div.ios div.kmw-keytip-tip {
+    background: #0f1319;
+  }
+
+  div.ios div.kmw-keytip-cap {
+    border-top: solid 1px #0f1319;
+  }
+
   /* Style for callout used on phones */
   #kmw-popup-callout {
     background-color: #0f1319;
   }
 }
-
-div.android div.kmw-keytip {
-  position:absolute; left:0; top:0; width:3em; height:3em;
-  color:#fff;
-  background-color: rgb(0,0,0,0);
-  overflow:visible;
-}
-
-div.android #keytip {background-color:#f00;}
 
 /* Box styles for keyboard-specific OSK (e.g. EuroLatin) and if no keyboard active (desktop only) */
 .kmw-osk-static, .kmw-osk-none{text-align:left;font:12px sans-serif;border:solid 1px #ad4a28;color:blue;background-color:white;}

@@ -29,12 +29,14 @@ uses
   compile,
   CompilePackage,
   CompilePackageInstaller,
+  Keyman.Developer.System.ValidateKpsFile,
   PackageInfo,
   utilexecute;
 
 function TkpsProjectFileAction.CompilePackage(APack: TKPSFile; FSilent: Boolean): Boolean;
 var
   pack: TKPSFile;
+  ASchemaPath: string;
 begin
   HasCompileWarning := False;   // I4706
   if APack = nil then
@@ -45,6 +47,16 @@ begin
   end
   else
     pack := APack;
+
+  ASchemaPath := ExtractFilePath(ParamStr(0));
+  if (ASchemaPath <> '') and (FileExists(ASchemaPath + 'kps.xsd')) then
+  begin
+    if not TValidateKpsFile.Execute(FileName, ASchemaPath + 'kps.xsd', OwnerProject.Log) then
+    begin
+      Log(plsFailure, 'Package '+FileName+' had validation errors.', 0, 0);
+      Exit(False);
+    end;
+  end;
 
   try
     try

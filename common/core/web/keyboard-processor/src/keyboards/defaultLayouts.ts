@@ -140,6 +140,15 @@ namespace com.keyman.keyboards {
       var i, j, k, m, row, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
       var chiral: boolean = (kbdBitmask & Codes.modifierBitmasks.IS_CHIRAL) != 0;
 
+      if(PVK['F']) {
+        // The KeymanWeb compiler generates a string of the format `[italic ][bold ] 1em "<font>"`
+        // We will ignore the bold, italic and font size spec
+        let legacyFontSpec = /^(?:(?:italic|bold) )* *[0-9.eE-]+(?:[a-z]+) "(.+)"$/.exec(PVK['F']);
+        if(legacyFontSpec) {
+          layout.font = legacyFontSpec[1];
+        }
+      }
+
       var kmw10Plus = !(typeof keyLabels == 'undefined' || !keyLabels);
       if(!kmw10Plus) {
         // Save the processed key label information to the keyboard's general data.

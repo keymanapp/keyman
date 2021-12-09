@@ -8,8 +8,10 @@
 #include "kmx_base.h"
 #include "kmx_file.h"
 #include "kmx_context.h"
+#include "kmx_conversion.h"
 #include "kmx_actions.h"
 #include "kmx_xstring.h"
+#include "kmx_actions.h"
 #include "kmx_options.h"
 #include "kmx_environment.h"
 #include "kmx_debugger.h"
@@ -98,7 +100,7 @@ public:
   KMX_Options const *GetOptions() const;
   KMX_Environment *GetEnvironment();
   KMX_Environment const *GetEnvironment() const;
-  LPINTKEYBOARDINFO GetKeyboard();
+  INTKEYBOARDINFO const *GetKeyboard() const;
 };
 
 inline KMX_BOOL KMX_ProcessEvent::IsCapsLockOn(KMX_DWORD modifiers) {

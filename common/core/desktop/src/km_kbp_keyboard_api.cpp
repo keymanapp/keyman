@@ -81,3 +81,20 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
   *out = &keyboard->keyboard();
   return KM_KBP_STATUS_OK;
 }
+
+km_kbp_status
+km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
+                             km_kbp_keyboard_key **out)
+{
+  assert(keyboard); assert(out);
+  if (!keyboard || !out)
+    return KM_KBP_STATUS_INVALID_ARGUMENT;
+
+  *out = keyboard->get_key_list();
+  return KM_KBP_STATUS_OK;
+}
+
+void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list)
+{
+  delete[] key_list;
+}

@@ -819,7 +819,7 @@ namespace com.keyman.osk {
       }
 
       if (this.keyPending) {
-        if (key0 != key1 || key1.className.indexOf('kmw-key-touched') < 0) {
+        if (key0 != key1 || key1.className.indexOf(OSKKey.HIGHLIGHT_CLASS) < 0) {
           this.highlightKey(key1, true);
         }
       }
@@ -1232,12 +1232,6 @@ namespace com.keyman.osk {
       gs.fontSize = this.fontSize.styleString;
       bs.fontSize = ParsedLengthStyle.forScalar(fs).styleString;
 
-      // Needs the refreshed layout info to work correctly.
-      for (const layerId in this.layerGroup.layers) {
-        const layer = this.layerGroup.layers[layerId];
-        layer.refreshLayout(this, paddedHeight, this.height);
-      }
-
       // NEW CODE ------
 
       // Step 1:  have the necessary conditions been met?
@@ -1268,9 +1262,8 @@ namespace com.keyman.osk {
       // END NEW CODE -----------
 
       // Needs the refreshed layout info to work correctly.
-      for (const layerId in this.layerGroup.layers) {
-        const layer = this.layerGroup.layers[layerId];
-        layer.refreshLayout(this, paddedHeight, this._computedHeight);
+      if(this.currentLayer) {
+        this.currentLayer.refreshLayout(this, paddedHeight, this._computedHeight);
       }
     }
 

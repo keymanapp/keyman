@@ -449,6 +449,7 @@ public final class KMManager {
   public static void setInputMethodService(InputMethodService service) {
     IMService = service;
   }
+  public static InputMethodService getInputMethodService() { return IMService; }
 
   public static boolean executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
     if (SystemKeyboard != null) {

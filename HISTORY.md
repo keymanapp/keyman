@@ -1,5 +1,149 @@
 # Keyman Version History
 
+## 15.0.165 alpha 2021-12-08
+
+* fix(web): font size was not consistently set (#5906)
+
+## 15.0.164 alpha 2021-12-07
+
+* refactor(common/core): Use defines in all xstring tests (#6002)
+
+## 15.0.163 alpha 2021-12-06
+
+* chore(common): buf now uses decxstr so remove comment (#6012)
+
+## 15.0.162 alpha 2021-12-05
+
+* chore(linux): Update changelogs for 14.0.283 :package:  :cherries: (#6008)
+
+## 15.0.161 alpha 2021-12-04
+
+* chore(linux): Allow to specify debian revision :package:  :cherries: (#5999)
+* chore(linux): Remove lintian warning :package:  :cherries: (#6000)
+
+## 15.0.160 alpha 2021-12-03
+
+* fix(developer): building kmw keyboard had wrong message callback signature (#5972)
+* chore(common): add more description to Buf method (#6003)
+* chore(linux): add non-surrounding-text feature to tests (#5968)
+
+## 15.0.159 alpha 2021-12-02
+
+* fix(developer): debugger crash with empty group (#5995)
+* chore(android): Document switching to other system keyboard (#5991)
+* fix(android/engine): Fix font paths (#5987)
+
+## 15.0.158 alpha 2021-12-01
+
+* feat(android/engine): Add other IME's to the Keyboard Picker menu (#5973)
+* chore(android): Specify build tools version on other projects (#5979)
+
+## 15.0.157 alpha 2021-11-29
+
+* fix(web): remove obsolete popupBaseTarget (#5949)
+* fix(web): improve keyboard switch performance (#5958)
+* fix(web): support saving focus for custom OSK interactions (#5947)
+* fix(developer): render OSK nicely on touch devices (#5923)
+* chore(developer): move kcframe into its own folder (#5971)
+* fix(web): restore `dragEnd` function (#5977)
+* feat(common/core/desktop): Allow preserved key support (#5850)
+* chore(windows): Consolidate documentation for Windows devboxes (#5481)
+* chore(developer): tweak language metadata message (#5978)
+* fix(linux): Fix ibus-keyman integration tests (#5966)
+
+## 15.0.156 alpha 2021-11-26
+
+* fix(windows): fix loadkeyboardoptions core memory error (#5959)
+
+## 15.0.155 alpha 2021-11-24
+
+* fix(web): reset scroll anchor on touchend (#5919)
+* fix(web): shorten setFocusTimer() (#5946)
+* fix(web): clear longpress timeout if user does a flick up (#5952)
+
+## 15.0.154 alpha 2021-11-22
+
+* fix(web): simplify hide transition (#5910)
+* fix(web): inline osk keytip position (#5938)
+* feat(mac): i18n, support localization of Keyman for Mac (#5869)
+* chore(linux): Remove unused test methods (#5954)
+* chore(linux): Run ibus-keyman tests as part of the build (#5889)
+
+## 15.0.153 alpha 2021-11-20
+
+* fix(web): resolve unhandled exception in promise (#5902)
+
+## 15.0.152 alpha 2021-11-19
+
+* fix(common/core):  Update decxstr to check all characters while decrementing (#5842)
+
+## 15.0.151 alpha 2021-11-18
+
+* fix(developer): use correct tike icon (#5925)
+* fix(android/engine): Support for U_xxxx_yyyy subkeys (#5913)
+* fix(mac): use xcframework to support m1 (#5933)
+* fix(developer): move web osk beneath text area (#5937)
+
+## 15.0.150 alpha 2021-11-17
+
+* fix(web): remove canvas use for iOS compatibility (#5915)
+
+## 15.0.149 alpha 2021-11-17
+
+* chore(developer): Update jszip version (#5770)
+* chore(common): Check in crowdin strings for Fulfulde Nigeria (#5841)
+
+## 15.0.148 alpha 2021-11-16
+
+* chore(common): Check in crowdin strings for Mandara (Wandala) (#5857)
+* chore(linux): Update method comments (#5883)
+
+## 15.0.147 alpha 2021-11-15
+
+* chore(android,linux,windows): Check in crowdin strings for Bura-Pabir (#5839)
+* chore: add keyman-local.com to iis https setup (#5892)
+* fix(web): avoid error if timerid not valid (#5908)
+
+## 15.0.146 alpha 2021-11-14
+
+* feat(developer): support for U_xxxx_yyyy (#5894)
+
+## 15.0.145 alpha 2021-11-13
+
+* fix(developer): crash exporting OSK on European keyboard (#5893)
+* feat(developer): validate .kps files during compile (#5895)
+
+## 15.0.144 alpha 2021-11-12
+
+* fix(android/engine): Truncate language name in list (#5878)
+* fix(android/app): Check KMP file exists before attempting to extract (#5849)
+* fix(web): Check parent element is defined before assigning (#5874)
+* fix(android/app): Revert test code (#5899)
+
+## 15.0.143 alpha 2021-11-11
+
+* fix(developer): handle shortcut keys in debugger (#5776)
+
+## 15.0.142 alpha 2021-11-08
+
+* chore(linux): Cleanup (#5886)
+* chore(linux): cleanup defunct tests (#5885)
+* chore(linux): fix failing ibus-keyman tests (#5884)
+
+## 15.0.141 alpha 2021-11-05
+
+* chore(linux): Add integration tests for ibus-keyman (#5881)
+
+## 15.0.140 alpha 2021-11-03
+
+* feat(android): Allow uninstall of sil_euro_latin keyboard (#5838)
+* chore(common/core): Compile test keyboards to .kmp (#5864)
+
+## 15.0.139 alpha 2021-11-02
+
+* chore(common/core): refactor kmx unit tests (#5862)
+* chore(linux): Extract keycode_to_vk[] to separate header file (#5863)
+
 ## 15.0.138 alpha 2021-10-29
 
 * chore(linux): Set correct version number on ibus component (#5859)

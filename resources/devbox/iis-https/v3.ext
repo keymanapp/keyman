@@ -11,3 +11,7 @@ DNS.4 = keymanweb.com.local
 DNS.5 = keymankeyboards.com.local
 DNS.6 = keyman.dev.local
 DNS.7 = *.keymanweb.com.local
+DNS.8 = *.keyman-local.com
+DNS.9 = keyman.blog.local
+DNS.10 = *.keyman.blog.local
+DNS.11 = keyman-local.com
