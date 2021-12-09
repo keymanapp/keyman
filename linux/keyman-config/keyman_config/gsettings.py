@@ -9,6 +9,9 @@ from gi.overrides.GLib import Variant
 
 class GSettings():
     def __init__(self, schema_id):
+        """
+        Wrapper around Gio Settings that deals with running under sudo
+        """
         self.schema_id = schema_id
         if os.environ.get('SUDO_USER'):
             self.is_sudo = True
