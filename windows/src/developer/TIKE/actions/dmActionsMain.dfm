@@ -477,6 +477,11 @@ object modActionsMain: TmodActionsMain
       OnExecute = actProjectCloseExecute
       OnUpdate = actProjectCloseUpdate
     end
+    object actToolsClearCachedDebugObjects: TAction
+      Category = 'Tools'
+      Caption = 'Clear Cached Debug Objects'
+      OnExecute = actToolsClearCachedDebugObjectsExecute
+    end
   end
   object ActionManager1: TActionManager
     ActionBars = <

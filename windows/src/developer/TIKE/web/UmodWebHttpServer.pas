@@ -260,8 +260,7 @@ begin
       Exit;
     end;
 
-    if Assigned(FDebugger) then
-      FDebugger.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
+    Self.GetDebugger.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
   finally
     CoUninitialize;
   end;

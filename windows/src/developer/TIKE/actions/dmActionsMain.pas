@@ -134,6 +134,7 @@ type
     actViewCode: TAction;   // I4678
     actViewCharacterIdentifier: TAction;   // I4807
     actProjectClose: TAction;
+    actToolsClearCachedDebugObjects: TAction;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -229,6 +230,7 @@ type
     procedure actProjectSettingsUpdate(Sender: TObject);
     procedure actFileNewUpdate(Sender: TObject);
     procedure actFileOpenUpdate(Sender: TObject);
+    procedure actToolsClearCachedDebugObjectsExecute(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
@@ -280,6 +282,7 @@ uses
   UfrmOptions,
   UfrmOSKEditor,
   UfrmPackageEditor,
+  UmodWebHttpServer,
   Keyman.Developer.UI.Project.UfrmProject,
   Keyman.Developer.UI.Project.UfrmProjectSettings,
   Upload_Settings,
@@ -668,6 +671,12 @@ begin
   begin
     actSearchFind.Enabled := True;
   end;
+end;
+
+procedure TmodActionsMain.actToolsClearCachedDebugObjectsExecute(
+  Sender: TObject);
+begin
+  modWebHttpServer.Debugger.ClearCache;
 end;
 
 procedure TmodActionsMain.actToolsFileFormatExecute(Sender: TObject);

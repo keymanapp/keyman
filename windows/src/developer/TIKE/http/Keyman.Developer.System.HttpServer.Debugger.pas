@@ -5,7 +5,9 @@ interface
 uses
   System.Classes,
   System.Generics.Collections,
+  System.JSON,
   System.SyncObjs,
+  System.SysUtils,
   Winapi.Windows,
 
   IdContext,
@@ -16,8 +18,24 @@ uses
 
   KeyboardFonts;
 
+
 type
-  TWebDebugKeyboardInfo = class   // I4063
+  EWebDebugCache = class(Exception)
+    constructor Create;
+  end;
+
+  TWebDebugInfo = class
+  private
+    FLastAccess: TDateTime;
+  public
+    constructor Create;
+    procedure LoadFromCache(o: TJSONObject); virtual;
+    procedure SaveToCache(o: TJSONObject); virtual;
+    function CompareLastAccess(R: TWebDebugInfo): Integer;
+    property LastAccess: TDateTime read FLastAccess write FLastAccess;
+  end;
+
+  TWebDebugKeyboardInfo = class(TWebDebugInfo)   // I4063
   strict private
     FID: string;
     FPath: string;
@@ -31,8 +49,12 @@ type
     function GetFontName(Index: TKeyboardFont): string;
     function GetWebFilename: string;
     function GetName: string;
+  private
+    FFilename: string;
   public
     constructor Create(const AFilename, AVersion: string; AFonts: TKeyboardFontArray);   // I4409
+    constructor CreateFromCache(o: TJSONObject);
+    procedure SaveToCache(o: TJSONObject); override;
     destructor Destroy; override;
     property ID: string read FID;
     property Name: string read GetName;
@@ -44,21 +66,25 @@ type
     property FontData[Index: TKeyboardFont]: TStream read GetFontData;   // I4409
   end;
 
-  TWebDebugPackageInfo = class
+  TWebDebugPackageInfo = class(TWebDebugInfo)
   strict private
     FFilename: string;
     FName: string;
   public
     constructor Create(const AFilename, AName: string);
+    constructor CreateFromCache(o: TJSONObject);
+    procedure SaveToCache(o: TJSONObject); override;
     property Filename: string read FFilename;
     property Name: string read FName;
   end;
 
-  TWebDebugModelInfo = class
+  TWebDebugModelInfo = class(TWebDebugInfo)
   strict private
     FFilename: string;
   public
     constructor Create(const AFilename: string);
+    constructor CreateFromCache(o: TJSONObject);
+    procedure SaveToCache(o: TJSONObject); override;
     property Filename: string read FFilename;
   end;
 
@@ -68,12 +94,17 @@ type
     FModels: TObjectDictionary<string,TWebDebugModelInfo>;
     FKeyboards: TObjectDictionary<string,TWebDebugKeyboardInfo>;   // I4063
     FPackages: TObjectDictionary<string,TWebDebugPackageInfo>;
-    function GetKeyboardStoredFileName(const WebFilename: string): string;
-    function GetPackageStoredFileName(const WebFilename: string): string;
-    function GetModelStoredFileName(const WebFilename: string): string;
+    function AccessKeyboardFileNameFromStore(const WebFilename: string): string;
+    function AccessPackageFileNameFromStore(const WebFilename: string): string;
+    function AccessModelFileNameFromStore(const WebFilename: string): string;
+
+    function GetCacheFileName: string;
+    procedure LoadFromCache;
+    procedure SaveToCache;
   public
     constructor Create;
     destructor Destroy; override;
+    procedure ClearCache;
     procedure RegisterKeyboard(const Filename, Version: string; FontInfo: TKeyboardFontArray);   // I4063   // I4409
     procedure UnregisterKeyboard(const Filename: string);
     procedure RegisterPackage(const Filename, Name: string);
@@ -89,13 +120,13 @@ implementation
 
 uses
   System.DateUtils,
+  System.Generics.Defaults,
   System.Hash,
-  System.JSON,
   System.StrUtils,
-  System.SysUtils,
   System.TimeSpan,
   System.TypInfo,
   Vcl.Graphics,
+  Winapi.ShlObj,
 
   RegExpr,
   IdGlobalProtocols,
@@ -103,7 +134,12 @@ uses
   JsonUtil,
   KeymanDeveloperOptions,
   RedistFiles,
-  Upload_Settings;
+  RegistryKeys,
+  Upload_Settings,
+  utilsystem;
+
+const
+  C_MaxCachedObjects = 10;
 
 const
   TestFontName: array[TKeyboardFont] of string = (   // I4409
@@ -121,6 +157,30 @@ end;
 
 { TDebuggerHttpServer }
 
+procedure TDebuggerHttpResponder.ClearCache;
+begin
+  FKeyboardsCS.Enter;
+  try
+    FKeyboards.Clear;
+  finally
+    FKeyboardsCS.Leave;
+  end;
+
+  FModelsCS.Enter;
+  try
+    FModels.Clear;
+  finally
+    FModelsCS.Leave;
+  end;
+
+  FPackagesCS.Enter;
+  try
+    FPackages.Clear;
+  finally
+    FPackagesCS.Leave;
+  end;
+end;
+
 constructor TDebuggerHttpResponder.Create;
 begin
   FKeyboardsCS := TCriticalSection.Create;   // I4036
@@ -131,10 +191,14 @@ begin
 
   FModelsCS := TCriticalSection.Create;
   FModels := TObjectDictionary<string,TWebDebugModelInfo>.Create;   // I4063
+
+  LoadFromCache;
 end;
 
 destructor TDebuggerHttpResponder.Destroy;
 begin
+  SaveToCache;
+
   FreeAndNil(FKeyboards);
   FreeAndNil(FKeyboardsCS);   // I4036
 
@@ -147,39 +211,86 @@ begin
   inherited Destroy;
 end;
 
-function TDebuggerHttpResponder.GetKeyboardStoredFileName(
+function TDebuggerHttpResponder.GetCacheFileName: string;
+begin
+  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\WebDebugCache.json';
+end;
+
+function TDebuggerHttpResponder.AccessKeyboardFileNameFromStore(
   const WebFilename: string): string;
 begin
   FKeyboardsCS.Enter;   // I4036
   try
-    if FKeyboards.ContainsKey(WebFilename) then Result := FKeyboards[WebFilename].StoredFilename
-    else Result := '';
+    if FKeyboards.ContainsKey(WebFilename) then
+    begin
+      FKeyboards[WebFilename].LastAccess := Now;
+      Result := FKeyboards[WebFilename].StoredFilename
+    end
+    else
+      Result := '';
   finally
     FKeyboardsCS.Leave;
   end;
 end;
 
-function TDebuggerHttpResponder.GetModelStoredFileName(
+function TDebuggerHttpResponder.AccessModelFileNameFromStore(
   const WebFilename: string): string;
 begin
   FModelsCS.Enter;   // I4036
   try
-    if FModels.ContainsKey(WebFilename) then Result := FModels[WebFilename].Filename
+    if FModels.ContainsKey(WebFilename) then
+    begin
+      FModels[WebFilename].LastAccess := Now;
+      Result := FModels[WebFilename].Filename
+    end
     else Result := '';
   finally
     FModelsCS.Leave;
   end;
 end;
 
-function TDebuggerHttpResponder.GetPackageStoredFileName(
+function TDebuggerHttpResponder.AccessPackageFileNameFromStore(
   const WebFilename: string): string;
 begin
   FPackagesCS.Enter;   // I4036
   try
-    if FPackages.ContainsKey(WebFilename) then Result := FPackages[WebFilename].Filename
+    if FPackages.ContainsKey(WebFilename) then
+    begin
+      FPackages[WebFilename].LastAccess := Now;
+      Result := FPackages[WebFilename].Filename
+    end
     else Result := '';
   finally
     FPackagesCS.Leave;
+  end;
+end;
+
+//
+// Modified from System.DateUtils.DateToISO8601
+// This does ISO8601 Date+Time+TZ without msec, which
+// is what Swift 4.0 demands...
+//
+function FormatFinnickyISO8601Date(const ADate: TDateTime; AInputIsUTC: Boolean = true): string;
+const
+  SDateFormat: string = 'yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''Z'''; { Do not localize }
+  SOffsetFormat: string = '%s%s%.02d:%.02d'; { Do not localize }
+  Neg: array[Boolean] of string = ('+', '-'); { Do not localize }
+var
+  Bias: Integer;
+  TimeZone: TTimeZone;
+begin
+  Result := FormatDateTime(SDateFormat, ADate);
+  if not AInputIsUTC then
+  begin
+    TimeZone := TTimeZone.Local;
+    Bias := Trunc(TimeZone.GetUTCOffset(ADate).Negate.TotalMinutes);
+    if Bias <> 0 then
+    begin
+      // Remove the Z, in order to add the UTC_Offset to the string.
+      SetLength(Result, Result.Length - 1);
+      Result := Format(SOffsetFormat, [Result, Neg[Bias > 0], Abs(Bias) div MinsPerHour,
+        Abs(Bias) mod MinsPerHour]);
+    end
   end;
 end;
 
@@ -429,35 +540,6 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
     end;
   end;
 
-  //
-  // Modified from System.DateUtils.DateToISO8601
-  // This does ISO8601 Date+Time+TZ without msec, which
-  // is what Swift 4.0 demands...
-  //
-  function FormatFinnickyISO8601Date(const ADate: TDateTime; AInputIsUTC: Boolean = true): string;
-  const
-    SDateFormat: string = 'yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''Z'''; { Do not localize }
-    SOffsetFormat: string = '%s%s%.02d:%.02d'; { Do not localize }
-    Neg: array[Boolean] of string = ('+', '-'); { Do not localize }
-  var
-    Bias: Integer;
-    TimeZone: TTimeZone;
-  begin
-    Result := FormatDateTime(SDateFormat, ADate);
-    if not AInputIsUTC then
-    begin
-      TimeZone := TTimeZone.Local;
-      Bias := Trunc(TimeZone.GetUTCOffset(ADate).Negate.TotalMinutes);
-      if Bias <> 0 then
-      begin
-        // Remove the Z, in order to add the UTC_Offset to the string.
-        SetLength(Result, Result.Length - 1);
-        Result := Format(SOffsetFormat, [Result, Neg[Bias > 0], Abs(Bias) div MinsPerHour,
-          Abs(Bias) mod MinsPerHour]);
-      end
-    end;
-  end;
-
   procedure RespondKeyboardJson(filename: string);   // I4260
   var
     JSON: TJSONObject;
@@ -639,7 +721,7 @@ begin
         Respond404;
         Exit;
       end;
-      doc := GetPackageStoredFileName(doc);
+      doc := AccessPackageFileNameFromStore(doc);
       if doc = '' then
       begin
         Respond404;
@@ -659,7 +741,7 @@ begin
         Respond404;
         Exit;
       end;
-      doc := GetKeyboardStoredFileName(doc);
+      doc := AccessKeyboardFileNameFromStore(doc);
       if doc = '' then
       begin
         Respond404;
@@ -680,7 +762,7 @@ begin
         Respond404;
         Exit;
       end;
-      doc := GetModelStoredFileName(doc);
+      doc := AccessModelFileNameFromStore(doc);
       if doc = '' then
       begin
         Respond404;
@@ -792,6 +874,207 @@ begin
   end;
 end;
 
+//
+// Caching of keyboards, models and packages under test
+//
+
+
+procedure TDebuggerHttpResponder.LoadFromCache;
+  procedure LoadPackagesFromCache(a: TJSONArray);
+  var
+    i: Integer;
+    package: TWebDebugPackageInfo;
+  begin
+    for i := 0 to a.Count - 1 do
+    begin
+      if a.Items[i] is TJSONObject then
+      begin
+        try
+          package := TWebDebugPackageInfo.CreateFromCache(a.Items[i] as TJSONObject);
+        except
+          on E:EWebDebugCache do Continue;
+        end;
+        if not FileExists(package.Filename) then
+        begin
+          package.Free;
+          Continue;
+        end;
+        Self.FPackages.AddOrSetValue(ExtractFileName(package.Filename), package);
+      end;
+    end;
+  end;
+
+  procedure LoadModelsFromCache(a: TJSONArray);
+  var
+    i: Integer;
+    model: TWebDebugModelInfo;
+  begin
+    for i := 0 to a.Count - 1 do
+    begin
+      if a.Items[i] is TJSONObject then
+      begin
+        try
+          model := TWebDebugModelInfo.CreateFromCache(a.Items[i] as TJSONObject);
+        except
+          on E:EWebDebugCache do Continue;
+        end;
+        if not FileExists(model.Filename) then
+        begin
+          model.Free;
+          Continue;
+        end;
+        Self.FModels.AddOrSetValue(ExtractFileName(model.Filename), model);
+      end;
+    end;
+  end;
+
+  procedure LoadKeyboardsFromCache(a: TJSONArray);
+  var
+    i: Integer;
+    keyboard: TWebDebugKeyboardInfo;
+  begin
+    for i := 0 to a.Count - 1 do
+    begin
+      if a.Items[i] is TJSONObject then
+      begin
+        try
+          keyboard := TWebDebugKeyboardInfo.CreateFromCache(a.Items[i] as TJSONObject);
+        except
+          on E:EWebDebugCache do Continue;
+        end;
+        if not FileExists(keyboard.FFilename) then
+        begin
+          keyboard.Free;
+          Continue;
+        end;
+        Self.FKeyboards.AddOrSetValue(ExtractFileName(keyboard.FFilename), keyboard);
+      end;
+    end;
+  end;
+
+var
+  v: TJSONValue;
+  json: TJSONObject;
+  ss: TStringStream;
+  a: TJSONArray;
+  offset: Integer;
+begin
+  if not FileExists(GetCacheFileName) then
+    Exit;
+
+  ss := TStringStream.Create('', TEncoding.UTF8);
+  try
+    ss.LoadFromFile(Self.GetCacheFileName);
+    offset := 0;
+    v := ParseJSONValue(ss.DataString, offset);
+    if not (v is TJSONObject) then
+      Exit;
+  finally
+    ss.Free;
+  end;
+
+  json := v as TJSONObject;
+
+  if json.TryGetValue<TJSONArray>('packages', a) then
+  begin
+    LoadPackagesFromCache(a);
+  end;
+
+  if json.TryGetValue<TJSONArray>('models', a) then
+  begin
+    LoadModelsFromCache(a);
+  end;
+
+  if json.TryGetValue<TJSONArray>('keyboards', a) then
+  begin
+    LoadKeyboardsFromCache(a);
+  end;
+end;
+
+type
+  TListReducer<T:TWebDebugInfo> = class
+    class procedure Save(json: TJSONObject;
+      const name: string;
+      const Collection: TObjectDictionary<string,T>);
+  end;
+
+///
+/// Reduce a list of cache objects to a maximum of 10 items
+/// so that we don't overwhelm the user over time; use the
+/// ten most recently loaded items based on LastAccess property
+///
+class procedure TListReducer<T>.Save(
+  json: TJSONObject;
+  const name: string;
+  const Collection: TObjectDictionary<string,T>);
+var
+  item: T;
+  list: TObjectList<T>;
+  o: TJSONObject;
+  a: TJSONArray;
+begin
+  list := TObjectList<T>.Create(False);
+  try
+    list.AddRange(Collection.Values);
+    list.Sort(TComparer<T>.Construct(
+      function (const L, R: T): integer
+      begin
+       Result := L.CompareLastAccess(R);
+      end
+    ));
+
+    while list.Count > C_MaxCachedObjects do
+      list.Delete(0);
+
+    a := TJSONArray.Create;
+    json.AddPair(name, a);
+
+    // Use the original collection to
+    // maintain the used order
+    for item in Collection.Values do
+    begin
+      if list.Contains(item) then
+      begin
+        o := TJSONObject.Create;
+        a.Add(o);
+        item.SaveToCache(o);
+      end;
+    end;
+  finally
+    list.Free;
+  end;
+end;
+
+procedure TDebuggerHttpResponder.SaveToCache;
+var
+  json: TJSONObject;
+  ss: TStringStream;
+  strings: TStringList;
+begin
+  json := TJSONObject.Create;
+  try
+    TListReducer<TWebDebugPackageInfo>.Save(json, 'packages', FPackages);
+    TListReducer<TWebDebugKeyboardInfo>.Save(json, 'keyboards', FKeyboards);
+    TListReducer<TWebDebugModelInfo>.Save(json, 'models', FModels);
+
+    strings := TStringList.Create;
+    try
+      PrettyPrintJSON(json, strings, 2);
+      ss := TStringStream.Create(strings.Text, TEncoding.UTF8);
+      try
+        ss.SaveToFile(Self.GetCacheFileName);
+      finally
+        ss.Free;
+      end;
+    finally
+      strings.Free;
+    end;
+  finally
+    json.Free;
+  end;
+end;
+
+
 { TWebDebugKeyboardInfo }
 
 constructor TWebDebugKeyboardInfo.Create(const AFilename, AVersion: string; AFonts: TKeyboardFontArray);   // I4409
@@ -799,6 +1082,7 @@ var
   I: TKeyboardFont;
 begin
   inherited Create;
+  FFilename := AFilename;
   FID := ChangeFileExt(ExtractFileName(AFilename), '');
   FVersion := AVersion;
   FPath := ExtractFilePath(AFilename);
@@ -813,6 +1097,39 @@ begin
     else
       FFontData[i] := nil;
   end;
+end;
+
+constructor TWebDebugKeyboardInfo.CreateFromCache(o: TJSONObject);
+var
+  fonts: TKeyboardFontArray;
+  kf: TKeyboardFont;
+  filename, version: string;
+begin
+  for kf := Low(TKeyboardFont) to High(TKeyboardFont) do
+  begin
+    if not o.TryGetValue<string>('font' + KeyboardFontId[kf], fonts[kf]) then
+      fonts[kf] := '';
+  end;
+
+  if not o.TryGetValue<string>('filename', filename) or
+      not o.TryGetValue<string>('version', version) then
+    raise EWebDebugCache.Create;
+
+  Create(filename, version, fonts);
+  inherited LoadFromCache(o);
+end;
+
+procedure TWebDebugKeyboardInfo.SaveToCache(o: TJSONObject);
+var
+  kf: TKeyboardFont;
+begin
+  o.AddPair('filename', Self.FFilename);
+  o.AddPair('version', Self.FVersion);
+  for kf := Low(TKeyboardFont) to High(TKeyboardFont) do
+  begin
+    o.AddPair('font' + KeyboardFontId[kf], Self.FFontName[kf]);
+  end;
+  inherited SaveToCache(o);
 end;
 
 destructor TWebDebugKeyboardInfo.Destroy;   // I4063
@@ -903,8 +1220,28 @@ end;
 
 constructor TWebDebugPackageInfo.Create(const AFilename, AName: string);
 begin
+  inherited Create;
   FFilename := AFilename;
   FName := AName;
+end;
+
+constructor TWebDebugPackageInfo.CreateFromCache(o: TJSONObject);
+var
+  filename, name: string;
+begin
+  if not o.TryGetValue<string>('filename', filename) or
+      not o.TryGetValue<string>('name', name) then
+    raise EWebDebugCache.Create;
+
+  Create(filename, name);
+  inherited LoadFromCache(o);
+end;
+
+procedure TWebDebugPackageInfo.SaveToCache(o: TJSONObject);
+begin
+  o.AddPair('filename', FFilename);
+  o.AddPair('name', FName);
+  inherited SaveToCache(o);
 end;
 
 { TWebDebugModelInfo }
@@ -913,6 +1250,61 @@ constructor TWebDebugModelInfo.Create(const AFilename: string);
 begin
   inherited Create;
   FFilename := AFilename;
+end;
+
+constructor TWebDebugModelInfo.CreateFromCache(o: TJSONObject);
+var
+  filename: string;
+begin
+  if not o.TryGetValue<string>('filename', filename) then
+    raise EWebDebugCache.Create;
+
+  Create(filename);
+  inherited LoadFromCache(o);
+end;
+
+procedure TWebDebugModelInfo.SaveToCache(o: TJSONObject);
+begin
+  o.AddPair('filename', FFilename);
+  inherited SaveToCache(o);
+end;
+
+{ EWebDebugCache }
+
+constructor EWebDebugCache.Create;
+begin
+  inherited Create('Invalid cache data');
+end;
+
+{ TWebDebugInfo }
+
+function TWebDebugInfo.CompareLastAccess(R: TWebDebugInfo): Integer;
+begin
+  if Self.LastAccess = R.LastAccess then
+    Result := 0
+  else if Self.LastAccess < R.LastAccess then
+    Result := -1
+  else
+    Result := 1;
+end;
+
+constructor TWebDebugInfo.Create;
+begin
+  inherited Create;
+  FLastAccess := Now;
+end;
+
+procedure TWebDebugInfo.LoadFromCache(o: TJSONObject);
+var
+  s: string;
+begin
+  if o.TryGetValue<string>('lastAccess', s) then
+    Self.FLastAccess := ISO8601ToDate(s);
+end;
+
+procedure TWebDebugInfo.SaveToCache(o: TJSONObject);
+begin
+  o.AddPair('lastAccess', FormatFinnickyISO8601Date(FLastAccess));
 end;
 
 end.

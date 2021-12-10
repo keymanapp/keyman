@@ -292,7 +292,7 @@ uses
   Keyman.UI.Debug.CharacterGridRenderer in 'debug\Keyman.UI.Debug.CharacterGridRenderer.pas',
   UfrmDebugStatus_Platform in 'debug\UfrmDebugStatus_Platform.pas' {frmDebugStatus_Platform},
   UfrmDebugStatus_Options in 'debug\UfrmDebugStatus_Options.pas' {frmDebugStatus_Options},
-  Keyman.Developer.System.KeymanDeveloperPaths in 'main\Keyman.Developer.System.KeymanDeveloperPaths.pas' {$R *.RES},
+  Keyman.Developer.System.KeymanDeveloperPaths in 'main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
   Keyman.Developer.System.ValidateKpsFile in '..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas';
 
 {$R *.RES}
@@ -325,8 +325,12 @@ begin
           //TBX.TBXSetTheme('OfficeXP2');
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  Application.Run;
+          try
+            Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+            Application.Run;
+          finally
+            FreeAndNil(modWebHttpServer);
+          end;
         end;
       finally
         FInitializeCEF.Free;
