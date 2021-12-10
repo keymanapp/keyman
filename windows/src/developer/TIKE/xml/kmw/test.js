@@ -176,7 +176,6 @@ document.getElementById('ta1').addEventListener('input', logContent, false);
 window.onload = function() {
   window.setTimeout(
     function () {
-      //document.getElementById('ta1').focus();
       keyman.moveToElement('ta1');
     }, 10
   );
@@ -186,11 +185,12 @@ window.onload = function() {
 
   if(!keyman.util.isTouchDevice()) {
     deviceSelect = document.getElementById('device-select');
-    if(deviceSelect.value == '') deviceSelect.value = 'desktop';
-
+    const currentDevice = window.sessionStorage.getItem('current-device');
+    deviceSelect.value = currentDevice ? currentDevice : 'Windows';
     deviceSelect.addEventListener('change', function() {
       setOSK();
       ta1.focus();
+      window.sessionStorage.setItem('current-device', deviceSelect.value);
     });
   }
 
@@ -239,24 +239,8 @@ window.onload = function() {
     keyman.alignInputs();
     //console.log('keyboardchange:'+JSON.stringify(keyboardProperties)+' [active='+keyman.getActiveKeyboard()+';'+keyman.core.activeKeyboard+']');
   });
-}
 
-/* Lexical models */
-
-var firstModel = true;
-var modelList = document.getElementById('model-list');
-
-/**
- * Register a model for debugging. Called by keyboards.js. The
- * first model registered will be activated automatically.
- */
-function registerModel(model, src) {
-  var modelList = document.getElementById('model-list');
-  var opt = document.createElement('option');
-  opt.innerText = model;
-  opt.value = model;
-  opt['data-src'] = src;
-  modelList.appendChild(opt);
+  selectRecentModel();
 }
 
 keyboardSelect.addEventListener('change', function() {
@@ -264,21 +248,60 @@ keyboardSelect.addEventListener('change', function() {
   ta1.focus();
 });
 
+/* Lexical models */
+
+var firstModel = true;
+var modelList = document.getElementById('model-list');
+let registeredModels = {};
+
+/**
+ * Register a model for debugging. Called by keyboards.js. The
+ * first model registered will be activated automatically.
+ */
+function registerModel(model, src) {
+  registeredModels[model] = {id: model, src: src};
+
+  const modelList = document.getElementById('model-list');
+  const opt = document.createElement('option');
+  opt.innerText = model;
+  opt.value = model;
+  modelList.appendChild(opt);
+}
+
 modelList.addEventListener('change', function() {
-  let model = modelList.value;
-  if(modelList.selectedOptions.length == 0) return;
-  let opt = modelList.selectedOptions[0];
+  let modelId = modelList.value;
+  selectModel(modelId);
+});
 
+/**
+ * Select a model by id
+ * @param {string} modelId
+ * @returns void
+ */
+function selectModel(modelId) {
+  const model = registeredModels[modelId];
+  const lastModel = keyman.core.activeModel;
 
-  let lastModel = keyman.core.activeModel;
   if(lastModel) {
     keyman.modelManager.deregister(lastModel.id);
   }
-  if(model != '') {
+
+  if(model) {
     keyman.modelManager.register({
-      id: model,
+      id: model.id,
       languages: ['en'],
-      path: 'http://'+location.host+'/model/'+opt['data-src']
+      path: 'http://'+location.host+'/model/'+model.src
     });
   }
-});
+  window.sessionStorage.setItem('current-model', model.id);
+}
+
+/**
+ * Select the most recently used model, per the current session
+ * storage
+ */
+function selectRecentModel() {
+  const model = window.sessionStorage.getItem('current-model');
+  document.getElementById('model-list').value = model;
+  selectModel(model ? model : '');
+}
