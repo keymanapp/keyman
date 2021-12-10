@@ -252,7 +252,6 @@ km_kbp_context_item_list_size(km_kbp_context_item const *context_items)
   return n;
 }
 
-
 json & operator << (json & j, km::kbp::context const & ctxt) {
   j << json::array;
   for (auto & i: ctxt)  j << i;

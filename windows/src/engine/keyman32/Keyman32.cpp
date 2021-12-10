@@ -590,11 +590,11 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
     // TODO: 5650 LoadDLLs
     // TODO: 5652 verify - ResetCapsLock();
     ResetCapsLock();
-    err_status = km_kbp_keyboard_get_imx_list(_td->lpActiveKeyboard.lpCoreKeyboard, &_td->lpActiveKeyboard.lpIMXList);
+    err_status = km_kbp_keyboard_get_imx_list(_td->lpActiveKeyboard->lpCoreKeyboard, &_td->lpActiveKeyboard->lpIMXList);
     if (err_status != KM_KBP_STATUS_OK) {
       SendDebugMessageFormat(0, sdmLoad, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_get_imx_list failed with error status [%d]", err_status);
       // Dispose of the keyboard to leave us in a consistent state
-      ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
+      ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
       return FALSE;
     }
 
