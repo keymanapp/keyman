@@ -293,7 +293,7 @@ function selectModel(modelId) {
       path: 'http://'+location.host+'/model/'+model.src
     });
   }
-  window.sessionStorage.setItem('current-model', model.id);
+  window.sessionStorage.setItem('current-model', model ? model.id : '');
 }
 
 /**
