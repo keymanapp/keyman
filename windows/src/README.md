@@ -7,26 +7,36 @@
 ## Building Keyman for Windows and Keyman Developer
 
 1. Start 'Developer Command Prompt for VS 2019'.
-2. Run `make build` from the **windows/src** folder.
+2. Run `nmake build` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/bin** folder.
 
-*Note*: running `make build` will currently reset the packages and path settings
+*Note*: running `nmake build` will currently reset the packages and path settings
 in your Delphi environment. If you use Delphi for other projects, you should
 consider building Keyman under a login user dedicated to it, or in a VM.
 
-Type `make` to see build targets. Common build targets are:
+Type `nmake` to see build targets. Common build targets are:
 
-* `make build`
+* `nmake build`
 : builds Keyman for Windows and Keyman Developer
 
-* `make clean`
+* `nmake clean`
 : remove temporary files and build artifacts
 
-* `make release`
+* `nmake release`
 : makes a release of all Keyman Windows projects
 
-* `make install`
+* `nmake install`
 : install some or all components to Program Files (requires elevated command prompt).
+
+### Building without Delphi
+
+It is possible to build all components that do _not_ require Delphi by adding
+the environment variable `NODELPHI=1` before starting the build. Currently many
+components are Delphi-based, but if you are working just in Keyman Core, the
+compiler, or Keyman Engine's C++ components, you may be able to get away without
+building them. In this situation, we recommend copying the relevant Delphi-built
+components into bin folders from a compatible installed version of Keyman for
+testing and debugging purposes.
 
 ### Release builds
 
@@ -36,7 +46,7 @@ Certificates, below. Official release builds for Keyman are built in the Keyman
 project's CI environment.
 
 1. Start 'Developer Command Prompt for VS 2019'.
-2. Run `make release` from the **windows/src** folder.
+2. Run `nmake release` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/release**
    folder.
 4. **buildtools/help-keyman-com.sh** will push updated documentation to

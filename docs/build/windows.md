@@ -231,6 +231,14 @@ Invoke-WebRequest -Uri https://github.com/rustwasm/wasm-pack/releases/download/v
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
 
+  * Note: It is possible to build all components that do _not_ require Delphi by
+    adding the environment variable `NODELPHI=1` before starting the build.
+    Currently many components are Delphi-based, but if you are working just in
+    Keyman Core, the compiler, or Keyman Engine's C++ components, you may be
+    able to get away without building them. In this situation, we recommend
+    copying the relevant Delphi-built components into bin folders from a
+    compatible installed version of Keyman for testing and debugging purposes.
+
 * Visual C++ 2019 Community or Professional
 
   ```ps1
