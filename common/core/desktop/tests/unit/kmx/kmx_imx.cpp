@@ -86,41 +86,7 @@ extern "C"
   std::cout << "imx entry context   : "  << " [" << buf << "]" << std::endl;
   km_kbp_context_items_dispose(entry_context);
   delete[] buf;
-// km_kbp_context_item *km_kbp_context_it = entry_context;
-//   uint8_t context_len               = 0;
-//   for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
-//     ++context_len;
-//   }
 
-//   KMX_WCHAR *buf = new KMX_WCHAR[(context_len*3)+ 1 ]; // *3 if every context item was a deadkey
-
-//   std::cout << "test_imx_callback entry context: ";
-//   uint16_t idx = 0;
-//   for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
-//     switch (km_kbp_context_it->type) {
-//     case KM_KBP_CT_CHAR:
-//       if (Uni_IsSMP(km_kbp_context_it->character)) {
-//         buf[idx++] = Uni_UTF32ToSurrogate1(km_kbp_context_it->character);
-//         buf[idx++] = Uni_UTF32ToSurrogate2(km_kbp_context_it->character);
-//         //std::cout << stringtoUni_UTF32ToSurrogate1(km_kbp_context_it->character);
-//         //std::cout << Uni_UTF32ToSurrogate2(km_kbp_context_it->character);
-//       } else {
-//         //std::cout << (km_kbp_cp)km_kbp_context_it->character;
-//         //buf[idx++] = (km_kbp_cp)km_kbp_context_it->character;
-//         buf[idx++] = "a";
-//       }
-//       break;
-//     case KM_KBP_CT_MARKER:
-//       assert(km_kbp_context_it->marker > 0);
-//       buf[idx++] = UC_SENTINEL;
-//       buf[idx++] = CODE_DEADKEY;
-//       buf[idx++] = (km_kbp_context_it->marker);
-//       //std::cout << "marker: " << (km_kbp_context_it->marker);
-//       break;
-//     }
-//   }
-//    buf[idx] = 0;  // Null terminate character array
-//    std::cout << "imx entry context: " << buf << std::endl;
   // Test km_kbp_state_queue_action_items but also test identifying the unique
   // number assigned to each 3rd party library function name.
   std::map<uint16_t,std::string> *imx_map = static_cast<std::map<uint16_t,std::string>*>(callback_object);

@@ -463,6 +463,10 @@ km_kbp_context_shrink(km_kbp_context *context,
                       size_t num,
                       km_kbp_context_item const *prefix);
 
+// TODO Do we want this public function it is useful
+KMN_API
+size_t
+km_kbp_context_item_list_size(km_kbp_context_item const *context_items);
 /*
 ```
 ### Action Items

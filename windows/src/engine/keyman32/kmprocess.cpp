@@ -143,10 +143,10 @@ BOOL ProcessHook()
 
   if (isUsingCoreProcessor) {
 
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: ");
     PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
     km_kbp_context_item *citems = nullptr;
     ContextItemsFromAppContext(contextBuf, &citems);
+    SendDebugMessageFormat(0, sdmGlobal, 0, "context set:[%s] ", Debug_UnicodeString(contextBuf));
     if (KM_KBP_STATUS_OK !=
       (km_kbp_status_codes)km_kbp_context_set(
         km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
@@ -154,6 +154,7 @@ BOOL ProcessHook()
       return FALSE;
     }
     km_kbp_context_items_dispose(citems);
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent: ");
     if (KM_KBP_STATUS_OK !=
       (km_kbp_status_codes)km_kbp_process_event(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
                                                   static_cast<uint16_t>(Globals::get_ShiftState()),

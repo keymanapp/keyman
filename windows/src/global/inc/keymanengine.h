@@ -91,8 +91,8 @@ typedef struct tagINTKEYBOARDINFO
   km_kbp_option_item* lpCoreKeyboardOptions;
   km_kbp_state* lpCoreKeyboardState;
   km_kbp_keyboard_imx* lpIMXList;
-  DWORD nIMDLLHooks;
-  LPIMDLLHOOK* lpIMDLLHooks;
+  DWORD nIMDLLHooks;  // TODO Remove as not needed
+  LPIMDLLHOOK* lpIMDLLHooks;  // TODO Remove as not needed
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
 
 typedef struct tagINI

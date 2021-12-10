@@ -557,7 +557,6 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
 		DeactivateDLLs(_td->lpActiveKeyboard);
 	}
 
-
 	_td->lpActiveKeyboard = new INTKEYBOARDINFO;
   memset(_td->lpActiveKeyboard, 0, sizeof(INTKEYBOARDINFO));    // I2437 - Crash unloading keyboard due to keyboard options not init
 	/*_td->lpActiveKeyboard->KeymanID = 0;
@@ -576,7 +575,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
     }
     delete keyboardPath;
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core
-    // TODO: #5650 Equivalent for common core                                                            
+    // TODO: #5650 Equivalent for common core
     // LoadDLLs(&_td->lpKeyboards[i]);
     const km_kbp_option_item test_env_opts[] = {KM_KBP_OPTIONS_END};
     err_status =
@@ -589,8 +588,18 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
       return FALSE;
     }
     // TODO: 5650 LoadDLLs
-    // TODO: 5652 verify - ResetCapsLock(); 
+    // TODO: 5652 verify - ResetCapsLock();
     ResetCapsLock();
+    err_status = km_kbp_keyboard_get_imx_list(_td->lpActiveKeyboard.lpCoreKeyboard, &_td->lpActiveKeyboard.lpIMXList);
+    if (err_status != KM_KBP_STATUS_OK) {
+      SendDebugMessageFormat(0, sdmLoad, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_get_imx_list failed with error status [%d]", err_status);
+      // Dispose of the keyboard to leave us in a consistent state
+      ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
+      return FALSE;
+    }
+
+    LoadDLLsCore(_td->lpActiveKeyboard);
+    ActivateDLLs(_td->lpActiveKeyboard);
     LoadKeyboardOptionsREGCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);
     RefreshPreservedKeys(TRUE);
     return TRUE;
@@ -1029,7 +1038,7 @@ void ReleaseKeyboards(BOOL Lock)
 		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
     ReleaseStateMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboardState);
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
-    
+
     if(_td->lpKeyboards[i].Profiles) delete _td->lpKeyboards[i].Profiles;   // I3581
 	}
 

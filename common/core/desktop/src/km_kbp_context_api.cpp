@@ -238,6 +238,20 @@ km_kbp_status km_kbp_context_shrink(km_kbp_context *ctxt, size_t num,
   return KM_KBP_STATUS_OK;
 }
 
+size_t
+km_kbp_context_item_list_size(km_kbp_context_item const *context_items)
+{
+  assert(context_items);
+  if (!context_items)  return 0;
+
+  auto n = 0;
+  for (; context_items->type; ++context_items) {
+    ++n;
+  }
+
+  return n;
+}
+
 
 json & operator << (json & j, km::kbp::context const & ctxt) {
   j << json::array;
