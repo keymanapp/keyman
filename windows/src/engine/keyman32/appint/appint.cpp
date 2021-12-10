@@ -129,7 +129,7 @@ void AppContext::Get(WCHAR *buf, int bufsize)
 
 void AppContext::CopyFrom(AppContext *source)   // I3575
 {
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 0));
   wcscpy_s(CurContext, _countof(CurContext), source->CurContext);
 	pos = source->pos;
 }
@@ -270,6 +270,7 @@ ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD l
    
   WCHAR *buf = new WCHAR[(contextLen*3)+ 1 ]; // *3 if every context item was a deadkey 
   uint8_t idx               = 0;
+  km_kbp_context_it = contextItems;
   for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
     switch (km_kbp_context_it->type) {
     case KM_KBP_CT_CHAR:

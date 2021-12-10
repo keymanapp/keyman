@@ -107,7 +107,7 @@ km_kbp_state_queue_action_items(km_kbp_state *state,
   auto & processor = state->processor();
 
 
-  for (; action_items->type != KM_KBP_CT_END; ++action_items)
+  for (; action_items->type != KM_KBP_IT_END; ++action_items)
   {
     if (action_items->type >= KM_KBP_IT_MAX_TYPE_ID)
       return KM_KBP_STATUS_INVALID_ARGUMENT;
