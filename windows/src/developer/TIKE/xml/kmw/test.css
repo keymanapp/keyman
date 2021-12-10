@@ -229,3 +229,21 @@ h2 {
 #input-area, #character-grid {
   width: 100%;
 }
+
+/* Package install */
+
+#package-install {
+  text-align: left;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#package-install td,
+#package-install th {
+  border: solid 1px #c0c0c0;
+  padding: 8px;
+}
+
+#package-install th {
+  background: #cccccc;
+}

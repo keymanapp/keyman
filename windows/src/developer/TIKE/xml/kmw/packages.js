@@ -31,22 +31,35 @@ function updatePackages(data) {
       return false;
     }
 
-    var ul = document.getElementById('packages');
-    ul.innerHTML = '';
+    var tbody = document.getElementById('packages');
+    tbody.innerHTML = '';
     if(data.packages.length == 0) {
-      var li = document.createElement('li');
-      li.innerText = 'No packages available.';
-      ul.appendChild(li);
+      var tr = document.createElement('tr');
+      var td = document.createElement('td');
+      td.colSpan = 2;
+      td.innerText = 'No packages available.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
       return true;
     }
 
     for(var i = 0; i < data.packages.length; i++) {
-      var li = document.createElement('li');
+      var tr = document.createElement('tr');
+      var tdname = document.createElement('td');
+      var tdid = document.createElement('td');
       var a = document.createElement('a');
       a.href = '/package/'+data.packages[i].id;
+      a.title = data.packages[i].filename;
       a.innerText = data.packages[i].name;
-      li.appendChild(a);
-      ul.appendChild(li);
+      tdname.appendChild(a);
+      var a = document.createElement('a');
+      a.href = '/package/'+data.packages[i].id;
+      a.title = data.packages[i].filename;
+      a.innerText = data.packages[i].id;
+      tdid.appendChild(a);
+      tr.appendChild(tdname);
+      tr.appendChild(tdid);
+      tbody.appendChild(tr);
     }
   }
 }
