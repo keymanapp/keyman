@@ -89,6 +89,7 @@ implementation
 
 uses
   System.DateUtils,
+  System.Hash,
   System.JSON,
   System.StrUtils,
   System.SysUtils,
@@ -249,11 +250,11 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
     n: Integer;
     srcVersion: string;
     model: string;
+    sha: string;
   begin
     // Get dynamic keyboard registration
 
     response :=
-      'var debugKeyboards = [];'#13#10+
       '(function() {'#13#10+
       '  var kmw=KeymanWeb;'#13#10;
 
@@ -275,6 +276,11 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
         end;
 
         value := FKeyboards[key];
+        try
+          sha := THashSHA2.GetHashStringFromFile(value.StoredFilename);
+        except
+          on E:Exception do sha := E.Message;
+        end;
         response := response + '  kmw.KRS({'+#13#10+
           '    KN:"'+name+'",'#13#10+
           '    KI:"Keyboard_'+name+'",'#13#10+
@@ -285,7 +291,7 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
           '    KFont:{family:"'+value.FontName[kfontChar]+'"},'#13#10+   // I4063   // I4409
           '    KOskFont:{family:"'+value.FontName[kfontOSK]+'"},'#13#10+   // I4063   // I4409
           '    KF:"'+src+'.js"'#13#10+   // I4140
-          '  });'#13#10+
+          '  }); /*sha256='+sha+'*/'#13#10+
           '  debugKeyboards["'+name+'"] = {'+#13#10+   // I4260
           '    id:"'+name+'",'#13#10+
           '    version:"'+srcVersion+'"'#13#10+
@@ -300,7 +306,12 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
       for model in FModels.Keys do
       begin
         id := ChangeFileExt(model, '');
-        response := response + Format('registerModel("%s", "%s");', [id, model]);
+        try
+          sha := THashSHA2.GetHashStringFromFile(FModels[model].Filename);
+        except
+          on E:Exception do sha := E.Message;
+        end;
+        response := response + Format('registerModel("%s", "%s"); /*sha256=%s*/'#13#10, [id, model, sha]);
       end;
     finally
       FModelsCS.Leave;
