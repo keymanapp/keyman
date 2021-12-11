@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.166 alpha 2021-12-11
+
+* chore(windows): version.rc use macros instead of mkver (#6019)
+* chore(windows): move from Borland make to nmake (#6020)
+* chore(windows): use findstr instead of Borland grep (#6021)
+* chore(windows): replace mkver with mkver.sh (#6022)
+* chore(windows): build without delphi (#6030)
+
 ## 15.0.165 alpha 2021-12-08
 
 * fix(web): font size was not consistently set (#5906)
