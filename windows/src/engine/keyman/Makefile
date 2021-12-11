@@ -43,13 +43,13 @@ install:
     $(COPY) $(PROGRAM)\engine\keyman.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
-    $(GREP) -c "uiAccess=\"true\"" manifest.in
+    findstr "uiAccess=\"true\"" manifest.in >nul
 
 test-manifest:
 # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\engine\keyman.exe -validate_manifest
     $(MT) -nologo -inputresource:$(PROGRAM)\engine\keyman.exe -out:temp.manifest
-    $(GREP) -c "uiAccess=\"true\"" temp.manifest
+    findstr "uiAccess=\"true\"" temp.manifest >nul
     -del temp.manifest
 
 !include ..\..\Target.mak

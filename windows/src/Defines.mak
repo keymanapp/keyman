@@ -306,7 +306,4 @@ SYMSTORE="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe" add
     /c "Version: $(__VERSION_WITH_TAG)" \
     /compress /f
 
-# nmake is crashing with straight grep?
-GREP=cmd /c grep
-
 CLEAN=-del /S /Q
