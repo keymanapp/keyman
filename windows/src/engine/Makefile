@@ -4,7 +4,11 @@
 
 # ----------------------------------------------------------------------
 
+!ifdef NODELPHI
+TARGETS=keymanmc keyman32 keyman64 keymanx64 mcompile kmtip kmrefresh
+!else
 TARGETS=keymanmc keyman32 kmcomapi keyman tsysinfox64 tsysinfo keyman64 keymanx64 mcompile inst kmtip kmrefresh
+!endif
 MANIFESTS=keyman tsysinfo tsysinfox64 keymanx64 mcompile
 CLEANS=clean-engine
 

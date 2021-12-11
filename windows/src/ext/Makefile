@@ -4,7 +4,11 @@
 
 NOTARGET_SIGNCODE=yes
 
+!ifdef NODELPHI
+TARGETS=.virtual
+!else
 TARGETS=dcpcrypt jedi mbcolor regexpr scfontcombobox cef4delphi
+!endif
 
 # jedi, regexpr have no packages
 

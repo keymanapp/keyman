@@ -283,15 +283,24 @@ global-versions:
     $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc
 
 build-tools: global-versions
+!ifdef NODELPHI
+    echo Skipping build-tools
+!else
+# we need to build devtools directly because otherwise we have a
+# chicken-and-egg issue with PathDefines.mak
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE)
-
 # We'll build a default PathDefines.mak if it is missing here so we can
 # go on and do the rest of the build
     $(PROGRAM)\buildtools\devtools -ti
+!endif
 
 message-constants: build-tools
+!ifdef NODELPHI
+    echo Skipping message-constants
+!else
     $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
+!endif
 
 #
 # Remove all files from output folders to ensure no legacy files left in a release

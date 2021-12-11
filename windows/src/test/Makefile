@@ -4,7 +4,11 @@
 
 # ----------------------------------------------------------------------
 
+!ifdef NODELPHI
+TARGETS=.virtual
+!else
 TARGETS=test_i3633
+!endif
 CLEAN=test_i3633
 
 test: test-manifest-exec

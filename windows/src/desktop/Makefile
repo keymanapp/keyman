@@ -2,7 +2,12 @@
 # Keyman for Windows Makefile
 #
 
+!ifdef NODELPHI
+TARGETS=.virtual
+!else
 TARGETS=kmshell kmconfig kmbrowserhost setup insthelp
+!endif
+
 RELEASE_TARGETS=help
 CLEANS=inst clean-desktop
 MANIFESTS=kmshell setup insthelp

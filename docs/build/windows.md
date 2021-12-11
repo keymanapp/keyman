@@ -147,18 +147,26 @@ choco install git jq python ninja pandoc
 refreshenv
 # choco meson (0.55) is too old, 0.56 required:
 python -m pip install meson
+
 # choco rustup is not currently working:
 Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile $env:TEMP\rustup-init.exe
 & "$env:TEMP\rustup-init.exe"
 refreshenv
+```
+
+Restart PowerShell (because `refreshenv` doesn't seem to pick up the rust environment), then
+```ps1
+# Elevated Powershell
 rustup target add i686-pc-windows-msvc
 ```
 
 **Environment variables**:
 * [`KEYMAN_ROOT`](#keyman_root)
+* `PATH`: add your Python scripts folder to your path: it will normally be `%appdata%\Python\Python310\Scripts`.
 
 ```bat
 SET KEYMAN_ROOT=c:\Projects\keyman\keyman
+SET PATH=%path%;%appdata%\Python\Python310\Scripts
 ```
 
 To check whether environment variables are set, run `SET <variable>` in command
@@ -222,6 +230,14 @@ Invoke-WebRequest -Uri https://github.com/rustwasm/wasm-pack/releases/download/v
 
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
+
+  * Note: It is possible to build all components that do _not_ require Delphi by
+    adding the environment variable `NODELPHI=1` before starting the build.
+    Currently many components are Delphi-based, but if you are working just in
+    Keyman Core, the compiler, or Keyman Engine's C++ components, you may be
+    able to get away without building them. In this situation, we recommend
+    copying the relevant Delphi-built components into windows/bin folders from a
+    compatible installed version of Keyman for testing and debugging purposes.
 
 * Visual C++ 2019 Community or Professional
 

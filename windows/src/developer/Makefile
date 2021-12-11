@@ -2,8 +2,12 @@
 # Keyman dev Makefile
 #
 
-
+!ifdef NODELPHI
+TARGETS=kmcmpdll kmanalyze kmdecomp
+!else
 TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp
+!endif
+
 MANIFESTS=kmcomp tike setup
 CLEANS=clean-developer
 
