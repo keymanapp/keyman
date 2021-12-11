@@ -236,7 +236,7 @@ Invoke-WebRequest -Uri https://github.com/rustwasm/wasm-pack/releases/download/v
     Currently many components are Delphi-based, but if you are working just in
     Keyman Core, the compiler, or Keyman Engine's C++ components, you may be
     able to get away without building them. In this situation, we recommend
-    copying the relevant Delphi-built components into bin folders from a
+    copying the relevant Delphi-built components into windows/bin folders from a
     compatible installed version of Keyman for testing and debugging purposes.
 
 * Visual C++ 2019 Community or Professional
