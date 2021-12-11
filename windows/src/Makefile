@@ -158,7 +158,7 @@ test-7zip:
 # Test that klog is disabled
 #
 
-test-klog: mkver-app
+test-klog:
     cd $(ROOT)\src\buildtools\test-klog
     $(MAKE) verify
     cd $(ROOT)\src
@@ -167,7 +167,7 @@ test-klog: mkver-app
 # Test that we haven't already built this release
 #
 
-test-releaseexists: mkver-app
+test-releaseexists:
     cd $(ROOT)\src\developer\inst
     $(MAKE) test-releaseexists
     cd $(ROOT)\src
@@ -275,7 +275,7 @@ build-release-wrapper-oem:
 # Tools needed to complete a build
 #
 
-global-versions: mkver-app
+global-versions:
 # Build our root version.txt
     cd $(ROOT)\src
 

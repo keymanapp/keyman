@@ -15,11 +15,6 @@ versionhistory-app2:
     cd $(ROOT)\src\buildtools
     $(MAKE) versionhistory
 
-mkver-app: dirs
-    cd $(ROOT)\src\buildtools\mkver
-    $(MAKE)
-    cd $(ROOT)\src
-
 devtools-app: dirs
     cd $(ROOT)\src\buildtools
     $(MAKE) devtools
@@ -28,7 +23,7 @@ devtools-app: dirs
 version.res: version.rc
     rc $?
 
-manifest.res: version.res
+manifest.res: manifest.in version.res
     $(MKVER_M)
     rc manifest.rc
 

@@ -20,4 +20,8 @@
 #define KEYMANVERSION90W	L"9.0"
 #define KEYMANVERSION80W	L"8.0"
 
+#define KV_COMPANY_NAME  "SIL International\0"
+#define KV_LEGAL_COPYRIGHT "\xA9 SIL International\0"
+#define KV_LEGAL_TRADEMARKS "Keyman is a registered trademark in Australia\0"
+
 #endif
