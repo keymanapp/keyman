@@ -12,7 +12,7 @@ test: build
     -$(WIN32_TARGET_PATH)\keyboardjsinfotestsuite.exe -b -exit:continue
 
 build:
-    $(DELPHI_MSBUILD) /p:CI=CI keyboardjsinfotestsuite.dproj
+    $(DELPHI_MSBUILD) "/p:CI=CI" keyboardjsinfotestsuite.dproj
 
 clean: def-clean
 

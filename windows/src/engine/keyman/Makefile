@@ -6,7 +6,7 @@
 
 build: version.res manifest.res keymanmenuitem.res icons.res osktoolbar.res dirs
     rc langswitch\langswitchmanager.rc
-    $(DELPHI_MSBUILD) keyman.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) keyman.dproj "/p:Platform=Win32"
 #    $(DCC32) keyman.dpr
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\keyman.exe -dpr keyman.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\keyman.exe
@@ -43,13 +43,13 @@ install:
     $(COPY) $(PROGRAM)\engine\keyman.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
-    grep -c "uiAccess=\"true\"" manifest.in
+    $(GREP) -c "uiAccess=\"true\"" manifest.in
 
 test-manifest:
-    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+# test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\engine\keyman.exe -validate_manifest
     $(MT) -nologo -inputresource:$(PROGRAM)\engine\keyman.exe -out:temp.manifest
-    grep -c "uiAccess=\"true\"" temp.manifest
+    $(GREP) -c "uiAccess=\"true\"" temp.manifest
     -del temp.manifest
 
 !include ..\..\Target.mak

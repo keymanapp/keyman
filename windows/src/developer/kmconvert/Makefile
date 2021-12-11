@@ -5,14 +5,14 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res dirs icons
-    $(DELPHI_MSBUILD) kmconvert.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) kmconvert.dproj "/p:Platform=Win32"
 
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmconvert.exe -dpr kmconvert.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\kmconvert.exe
     $(COPY) $(WIN32_TARGET_PATH)\kmconvert.exe $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\kmconvert.dbg $(COPY) $(WIN32_TARGET_PATH)\kmconvert.dbg $(DEBUGPATH)\developer
 
-    # Copy template files to project
+# Copy template files to project
     -rd /s/q $(ROOT)\bin\developer\projects\templates
     -mkdir $(ROOT)\bin\developer\projects\templates
     xcopy /s /y data\* $(ROOT)\bin\developer\projects\templates
@@ -31,7 +31,7 @@ wrap-symbols:
     $(SYMSTORE) $(DEBUGPATH)\developer\kmconvert.dbg /t keyman-developer
 
 test-manifest:
-    # test that (a) linked manifest exists and correct
+# test that (a) linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\kmconvert.exe -validate_manifest
 
 install:

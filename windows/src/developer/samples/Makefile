@@ -5,9 +5,11 @@
 TARGETS=imsample
 !include ..\..\Header.mak
 
-imsample:
+imsample: .virtual
     cd $(ROOT)\src\developer\samples\imsample
     $(MAKE) $(TARGET)
+
+!include ..\..\Target.mak
 
 # ----------------------------------------------------------------------
 # EOF

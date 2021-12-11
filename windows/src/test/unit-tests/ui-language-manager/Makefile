@@ -12,7 +12,7 @@ test: build
     -$(WIN32_TARGET_PATH)\UILanguageManagerTest.exe -b -exit:continue
 
 build:
-    $(DELPHI_MSBUILD) /p:CI=CI UILanguageManagerTest.dproj
+    $(DELPHI_MSBUILD) "/p:CI=CI" UILanguageManagerTest.dproj
 
 clean: def-clean
 

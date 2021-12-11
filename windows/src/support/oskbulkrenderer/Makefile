@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 build: version.res dirs
-    $(DELPHI_MSBUILD) oskbulkrenderer.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) oskbulkrenderer.dproj "/p:Platform=Win32"
 
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\oskbulkrenderer.exe -dpr oskbulkrenderer.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\oskbulkrenderer.exe

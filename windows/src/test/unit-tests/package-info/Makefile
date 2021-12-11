@@ -8,7 +8,7 @@ test: build
     -$(WIN32_TARGET_PATH)\packageinfotestsuite.exe -b -exit:continue
 
 build:
-    $(DELPHI_MSBUILD) /p:CI=CI packageinfotestsuite.dproj
+    $(DELPHI_MSBUILD) "/p:CI=CI" packageinfotestsuite.dproj
 
 clean: def-clean
     -del test\*.out.*

@@ -38,12 +38,12 @@ candle-desktop:
 #
 
 heat-cef:
-  # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+# We copy the files to a temp folder in order to exclude .git and README.md from harvesting
   -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
   mkdir $(KEYMAN_WIX_TEMP_CEF)
   xcopy $(KEYMAN_CEF4DELPHI_ROOT)\* $(KEYMAN_WIX_TEMP_CEF)\ /s
   $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_CEF) -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
-  # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+# When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
   -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
 
 candle-cef: heat-cef
@@ -54,6 +54,6 @@ candle-cef: heat-cef
 #
 
 candle-locale:
-  # locale files are in desktop/locale/*
+# locale files are in desktop/locale/*
   $(WIXHEAT) dir ..\kmshell\locale -o locale.wxs -ag -cg Locale -dr INSTALLDIR -var var.LOCALESOURCE -wx -nologo
   $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dLOCALESOURCE=..\kmshell\locale locale.wxs

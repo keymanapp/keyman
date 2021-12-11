@@ -4,15 +4,12 @@
 
 !include ..\..\Defines.mak
 
-build: version.res manifest.res #icons
-    $(DELPHI_MSBUILD) kmconfig.dproj /p:Platform=Win32
+build: version.res manifest.res
+    $(DELPHI_MSBUILD) kmconfig.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmconfig.exe -dpr kmconfig.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\kmconfig.exe
     $(COPY) $(WIN32_TARGET_PATH)\kmconfig.exe $(PROGRAM)\desktop
     if exist $(WIN32_TARGET_PATH)\kmconfig.dbg $(COPY) $(WIN32_TARGET_PATH)\kmconfig.dbg $(DEBUGPATH)\desktop
-
-#icons:
-    #rc icons.rc
 
 clean: def-clean
 

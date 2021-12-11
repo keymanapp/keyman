@@ -7,8 +7,8 @@
 PLATFORM=x64
 
 build: version.res dirs
-    $(MSBUILD) kmrefresh.vcxproj /p:Platform=Win32 $(MSBUILD_BUILD)
-    $(MSBUILD) kmrefresh.vcxproj /p:Platform=x64 $(MSBUILD_BUILD)
+    $(MSBUILD) kmrefresh.vcxproj "/p:Platform=Win32" $(MSBUILD_BUILD)
+    $(MSBUILD) kmrefresh.vcxproj "/p:Platform=x64" $(MSBUILD_BUILD)
     $(COPY) $(WIN32_TARGET_PATH)\kmrefresh.x86.exe $(PROGRAM)\engine
     $(COPY) $(WIN32_TARGET_PATH)\kmrefresh.x86.pdb $(DEBUGPATH)\engine
     $(COPY) $(X64_TARGET_PATH)\kmrefresh.x64.exe $(PROGRAM)\engine

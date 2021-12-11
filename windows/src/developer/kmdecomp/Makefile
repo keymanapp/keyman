@@ -6,7 +6,7 @@
 
 
 build: version.res dirs
-    $(MSBUILD) kmdecomp.sln $(MSBUILD_BUILD) /p:Platform=Win32
+    $(MSBUILD) kmdecomp.sln $(MSBUILD_BUILD) "/p:Platform=Win32"
     $(COPY) $(WIN32_TARGET_PATH)\kmdecomp.exe $(PROGRAM)\developer
     $(COPY) $(WIN32_TARGET_PATH)\kmdecomp.pdb $(DEBUGPATH)\developer
 

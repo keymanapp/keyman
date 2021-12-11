@@ -11,31 +11,31 @@ MANIFESTS=kmshell setup insthelp
 
 # ----------------------------------------------------------------------
 
-kmshell:
+kmshell: .virtual
     cd $(ROOT)\src\desktop\kmshell
     $(MAKE) $(TARGET)
 
-kmconfig:
+kmconfig: .virtual
     cd $(ROOT)\src\desktop\kmconfig
     $(MAKE) $(TARGET)
 
-kmbrowserhost:
+kmbrowserhost: .virtual
     cd $(ROOT)\src\desktop\kmbrowserhost
     $(MAKE) $(TARGET)
 
-setup:
+setup: .virtual
     cd $(ROOT)\src\desktop\setup
     $(MAKE) $(TARGET)
 
-help:
+help: .virtual
     cd $(ROOT)\src\desktop\help
     $(MAKE) $(TARGET)
 
-insthelp:
+insthelp: .virtual
   cd $(ROOT)\src\desktop\insthelp
   $(MAKE) $(TARGET)
 
-inst:
+inst: .virtual
   cd $(ROOT)\src\desktop\inst
   $(MAKE) $(TARGET)
 
