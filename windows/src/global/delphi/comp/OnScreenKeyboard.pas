@@ -391,7 +391,6 @@ var
   minsz: Integer;
   i: Integer;
   n: Integer;
-  Canvas: TCanvas;
   b: TBitmap;
 begin
   b := TBitmap.Create;
