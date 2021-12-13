@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.167 alpha 2021-12-13
+
+* fix(windows): remove unused variable (#6039)
+
 ## 15.0.166 alpha 2021-12-11
 
 * chore(windows): version.rc use macros instead of mkver (#6019)
