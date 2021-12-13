@@ -8,6 +8,11 @@
         <item quantity="other">የፊደል ገበታዎች</item>
     </plurals>
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">የሚቀጥለውን የመቀበያ ዘዴ</item>
+        <item quantity="other">የሚቀጥለውን የመቀበያ ዘዴዎች</item>
+    </plurals>
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">አዲስ ኪቦርድ ጨምር</string>
     <!-- Context: Title for list -->
     <string name="title_languages_settings" comment="List of installed languages">የተጫኑ ቋንዎች</string>
@@ -21,7 +26,7 @@
     <string name="label_cancel" comment="Button to cancel an action">ይቅር</string>
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">ዝጋ</string>
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">ኪይማኑን ዝጋ</string>
     <!-- Context: Button label -->
     <string name="label_forward" comment="Button to go forward">ወደፊት</string>
