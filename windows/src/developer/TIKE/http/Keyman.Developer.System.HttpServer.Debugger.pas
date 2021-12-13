@@ -947,7 +947,7 @@ procedure TDebuggerHttpResponder.LoadFromCache;
           keyboard.Free;
           Continue;
         end;
-        Self.FKeyboards.AddOrSetValue(ExtractFileName(keyboard.FFilename), keyboard);
+        Self.FKeyboards.AddOrSetValue(keyboard.WebFilename, keyboard);
       end;
     end;
   end;
