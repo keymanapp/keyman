@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.168 alpha 2021-12-14
+
+* feat(linux): Add support for Ubuntu 22.04 Jammy (#6037)
+
 ## 15.0.167 alpha 2021-12-13
 
 * fix(windows): remove unused variable (#6039)
