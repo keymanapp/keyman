@@ -774,8 +774,13 @@ ibus_keyman_engine_process_key_event(
 
   g_message("-----------------------------------------------------------------------------------------------------------------");
   g_message(
-      "DAR: ibus_keyman_engine_process_key_event - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d", keyval, keycode,
-      state, isKeyDown);
+      "DAR: ibus_keyman_engine_process_key_event - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, prefilter=%d", keyval, keycode,
+      state, isKeyDown, (state & IBUS_PREFILTER_MASK) > 0);
+
+  if (!(state & IBUS_PREFILTER_MASK)) {
+    ibus_engine_forward_key_event(engine, keyval, keycode, state | IBUS_PREFILTER_MASK);
+    return TRUE;
+  }
 
   // REVIEW: why don't we handle these keys?
   switch (keycode) {

@@ -46,6 +46,10 @@
 
 #define MAX_QUEUED_EVENTS 20
 
+#ifndef IBUS_PREFILTER_MASK
+#define IBUS_PREFILTER_MASK (1 << 23)
+#endif
+
 struct _IBusIMContext {
   GtkIMContext parent;
 
@@ -462,7 +466,7 @@ ibus_im_context_filter_keypress(GtkIMContext *context, GdkEventKey *event) {
   /* Do not call gtk_im_context_filter_keypress() because
    * gtk_im_context_simple_filter_keypress() binds Ctrl-Shift-u
    */
-  if (event->state & IBUS_IGNORED_MASK)
+  if (event->state & IBUS_IGNORED_MASK && !(event->state & IBUS_PREFILTER_MASK))
     return ibus_im_context_commit_event(ibusimcontext, event);
 
   /* XXX it is a workaround for some applications do not set client
@@ -943,6 +947,7 @@ _ibus_context_forward_key_event_cb(
     guint state,
     IBusIMContext *ibusimcontext) {
   IDEBUG("%s", __FUNCTION__);
+  g_debug("_ibus_context_forward_key_event_cb");
   if (keycode == 0 && ibusimcontext->client_window) {
     GdkDisplay *display = gdk_window_get_display(ibusimcontext->client_window);
     GdkKeymap *keymap   = gdk_keymap_get_for_display(display);
@@ -954,7 +959,7 @@ _ibus_context_forward_key_event_cb(
       g_warning("Failed to parse keycode from keyval %x", keyval);
   }
   GdkEventKey *event = _create_gdk_event(ibusimcontext, keyval, keycode, state);
-  gdk_event_put((GdkEvent *)event);
+  ibus_im_context_filter_keypress(ibusimcontext, event);
 
   if (!surrounding_text_supported && keyval == IBUS_KEY_BackSpace && ibusimcontext->text->len > 0) {
     int index = ibusimcontext->text->len - 1;
