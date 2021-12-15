@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.169 alpha 2021-12-15
+
+* fix(mac): display Unicode package name correctly instead of '????' (#6016)
+* fix(linux): Improve ibus-keyman tests (#6044)
+
 ## 15.0.168 alpha 2021-12-14
 
 * feat(linux): Add support for Ubuntu 22.04 Jammy (#6037)
