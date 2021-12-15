@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Nasara</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
+  <string name="ssTitle">Install $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION has been installed successfully.</string>
+  <string name="ssCancelQuery">Sawo dǝ tawatkǝma wa cinnǝmiya raamma ro $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Extracting bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Checking packages...</string>
+  <string name="ssBootstrapCheckingForUpdates">Checking online for updates...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Checking installed versions...</string>
+  <string name="ssBootstrapReady">Ayima sawobe ba</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Ayima ikkowo be ba</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s download)</string>
+  <string name="ssActionInstall">Setup will install:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION is free and open source</string>
+  <string name="ssLicenseLink">&amp;Read the license</string>
+  <string name="ssInstallOptionsLink">Install &amp;options</string>
+  <string name="ssMessageBoxTitle">$APPNAME Setup</string>
+  <string name="ssOkButton">Yo</string>
+  <string name="ssInstallButton">&amp;Install</string>
+  <string name="ssCancelButton">Cinne</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Installing $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Shi version din dǝ tǝluwo</string>
+  <string name="ssStatusComplete">Chatto ikko</string>
+  <string name="ssQueryRestart">Mbu waltǝm Windows nǝm dǝ sangǝmiya do kawu Setup nǝm dǝ tamotin dǝro. Sa waltǝm Windows nǝm dǝ sangǝmiya, Setup dǝ gotǝ kotin.
+
+Waltǝne Wasǝne kwami dǝ?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows dǝ kǝlanzǝn citǝro kattero.  Windows dǝ waltǝne wasǝne kawu waltǝm jarabnǝmin dǝro $APPNAME.</string>
+  <string name="ssMustRestart">Windows dǝ mbu diya waltǝm sangǝm do setup dǝ tamozluyin.  Sa Windows dǝ sangǝma dǝn, Setup dǝ tamotǝyin.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION requires Windows 7 or later to install. However, Keyman Desktop 7, 8 or 9 has been detected. Do you want to install the keyboards included in this installer into the installed Keyman Desktop version?</string>
+  <string name="ssOldOsVersionDownload">This version of $APPNAME requires Windows 7 or later to install. Do you want to download Keyman Desktop 8?</string>
+  <string name="ssOptionsTitle">Install Options</string>
+  <string name="ssOptionsTitleInstallOptions">Installation options</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Default $APPNAME settings</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modules dǝ ikko au waltǝm bǝlintǝ</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Tǝlamma Keyboard wa kǝllata</string>
+  <string name="ssOptionsTitleLocation">Version to install</string>
+  <string name="ssOptionsStartWithWindows"> $APPNAME dǝ dandine sa Windows dǝ cizǝna dǝn</string>
+  <string name="ssOptionsStartAfterInstall"> $APPNAME dǝ sange sa installation dǝ dazǝna dǝn</string>
+  <string name="ssOptionsCheckForUpdates">Online lan update mbeji wa ro kǝlakǝlan kulasne</string>
+  <string name="ssOptionsUpgradeKeyboards">Keyboards tǝkǝna dǝ din dǝwa falle $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Share anonymous usage statistics with keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup version: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Install $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Upgrade $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s is already installed.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Download version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Install %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Download version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Version %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Tǝlamdo sha %0:s keyboard dǝn faidatǝ raammama dǝ karne</string>
+  <string name="ssOptionsDefaultLanguage">Default language</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Downloading %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Downloading %0:s</string>
+  <string name="ssOffline">$APPNAME Setup dǝ keyman.com dǝ ro kǝlatǝyin ba kare gade downlod dinno.
+
+Martǝne nyi online ninna ro wune, kuru ye $APPNAME Amari Setup internet fando be ro firewell settings nǝm dǝn.
+Abort ranne Setup dǝn luworo, Waltǝne jarabne download resources dǝ, au sha njesǝne offline lan diye.</string>
+</resources>
