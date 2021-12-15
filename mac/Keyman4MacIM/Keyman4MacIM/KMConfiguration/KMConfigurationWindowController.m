@@ -133,17 +133,17 @@
             if ([obj isKindOfClass:[NSArray class]]) {
                 NSArray *pArray = (NSArray *)obj;
                 NSString *packageFolder = [self packageFolderFromPath:[pArray objectAtIndex:0]];
-                NSString *packageName = [self packageNameFromFolder:packageFolder];
+                NSString *packageName = [self.AppDelegate packageNameFromPackageInfo:packageFolder];
                 [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"HeaderTitle", nil]];
                 for (NSString *path in pArray) {
-                    NSDictionary *info = [KMXFile infoDictionaryFromFilePath:path];
+                    NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
                     if (info)
                         [_tableContents addObject:info];
                 }
             }
             else {
                 NSString *path = (NSString *)obj;
-                NSDictionary *info = [KMXFile infoDictionaryFromFilePath:path];
+                NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
                 if (info)
                     [_tableContents addObject:info];
             }
@@ -167,10 +167,6 @@
 
 - (NSString *)packageFolderFromPath:(NSString *)path {
     return [self.AppDelegate packageFolderFromPath:path];
-}
-
-- (NSString *)packageNameFromFolder:(NSString *)packageFolder {
-    return [self.AppDelegate packageNameFromFolder:packageFolder];
 }
 
 - (NSString *)keyboardsPath {

@@ -8,11 +8,12 @@
 
 #import "KMKeyboardHelpWindowController.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMPackageInfo.h"
 #import <WebKit/WebKit.h>
 
 @interface KMKeyboardHelpWindowController ()
 @property (nonatomic, weak) IBOutlet WebView *welcomeView;
-@property (nonatomic, strong) NSDictionary *infoDict;
+@property (nonatomic, strong) KMPackageInfo *packageInfo;
 @end
 
 @implementation KMKeyboardHelpWindowController
@@ -30,10 +31,10 @@
 
 - (void)setPackagePath:(NSString *)packagePath {
     _packagePath = packagePath;
-    _infoDict = nil;
+    _packageInfo = nil;
     if (packagePath != nil && packagePath.length) {
         @try {
-            NSString *title = [[self.infoDict objectForKey:kName] objectAtIndex:0];
+            NSString *title = self.packageInfo.packageName;
             if (title.length)
                 [self.window setTitle:title];
         }
@@ -49,13 +50,12 @@
     }
 }
 
-- (NSDictionary *)infoDict {
-    if (_infoDict == nil) {
-        NSString *infoFile = [self.packagePath stringByAppendingPathComponent:@"kmp.inf"];
-        _infoDict = [self.AppDelegate infoDictionaryFromFile:infoFile];
+- (KMPackageInfo*)packageInfo {
+    if(_packageInfo == nil) {
+        _packageInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
     }
     
-    return _infoDict;
+    return _packageInfo;
 }
 
 - (IBAction)okAction:(id)sender {
