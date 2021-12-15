@@ -19,6 +19,9 @@
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
+#import "KMPackageReader.h"
+#import "KMPackageInfo.h"
+#import "KMKeyboardInfo.h"
 @import Sentry;
 
 /** NSUserDefaults keys */
@@ -31,28 +34,9 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
-NSString *const kPackage = @"[Package]";
-NSString *const kButtons = @"[Buttons]";
-NSString *const kStartMenu = @"[StartMenu]";
-NSString *const kStartMenuEntries = @"[StartMenuEntries]";
-NSString *const kInfo = @"[Info]";
-NSString *const kFiles = @"[Files]";
-
-NSString *const kAuthor = @"Author";
-NSString *const kCopyright = @"Copyright";
-NSString *const kFile = @"File";
-NSString *const kFont = @"Font";
-NSString *const kGraphicFile = @"GraphicFile";
-NSString *const kKeyboard = @"Keyboard";
-NSString *const kName = @"Name";
-NSString *const kReadMeFile = @"ReadMeFile";
-NSString *const kVersion = @"Version";
-NSString *const kWebSite = @"WebSite";
-NSString *const kWelcome = @"Welcome";
-
-typedef enum {
-    ctPackage, ctButtons, ctStartMenu, ctStartMenuEntries, ctInfo, ctFiles, ctUnknown
-} ContentType;
+@interface KMInputMethodAppDelegate ()
+@property (nonatomic, strong) KMPackageReader *packageReader;
+@end
 
 @implementation KMInputMethodAppDelegate
 @synthesize kme = _kme;
@@ -365,6 +349,15 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return _kme;
 }
 
+- (KMPackageReader *)packageReader {
+    if (_packageReader == nil) {
+      _packageReader = [[KMPackageReader alloc] init];
+      [_packageReader setDebugMode:self.debugMode];
+    }
+
+    return _packageReader;
+}
+
 - (void)setKmx:(KMXFile *)kmx {
     _kmx = kmx;
     [self.kme setKmx:_kmx];
@@ -448,6 +441,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _debugMode = useVerboseLogging;
     if (_kme != nil)
         [_kme setUseVerboseLogging:useVerboseLogging];
+    if (_packageReader != nil) {
+        [_packageReader setDebugMode:useVerboseLogging];
+    }
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     [userData setBool:useVerboseLogging forKey:kKMUseVerboseLogging];
     [userData synchronize];
@@ -463,6 +459,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     return [userData boolForKey:kKMUseVerboseLogging];
 }
+
+#pragma mark - Keyman Data
 
 /**
  * Locate and create the Keyman data path; currently in ~/Documents/Keyman-Keyboards
@@ -602,35 +600,27 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return packageFolder;
 }
 
-- (NSString *)packageNameFromFolder:(NSString *)packageFolder {
+- (KMPackageInfo *)loadPackageInfo:(NSString *)path {
+    return [self.packageReader loadPackageInfo:path];
+}
+
+- (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder {
     NSString *packageName = nil;
-    NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
-    NSString *fileContents = [NSString stringWithContentsOfFile:[path stringByAppendingPathComponent:@"kmp.inf"] encoding:NSWindowsCP1252StringEncoding error:NULL];
-    NSArray *lines = [fileContents componentsSeparatedByString:@"\n"];
-    BOOL hasInfo = NO;
-    for (NSString *line in lines) {
-        if ([line startsWith:@"[Info]"]) {
-            hasInfo = YES;
-            continue;
-        }
 
-        if (hasInfo && [line startsWith:@"Name="]) {
-            NSString *value = [[[line substringFromIndex:5] componentsSeparatedByString:@","] objectAtIndex:0];
-            packageName = [NSString stringWithString:[value stringByReplacingOccurrencesOfString:@"\"" withString:@""]];
-            break;
-        }
+    NSString *path = [[self keymanDataPath] stringByAppendingPathComponent:packageFolder];
+    KMPackageInfo *packageInfo = [self.packageReader loadPackageInfo:path];
+  
+    if (packageInfo) {
+        packageName = packageInfo.packageName;
     }
-
-    if (packageName == nil)
-        packageName = packageFolder;
-
+  
     return packageName;
 }
 
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder {
     NSMutableArray *kbNames = [[NSMutableArray alloc] initWithCapacity:0];;
     for (NSString *kmxFile in [self KMXFilesAtPath:packageFolder]) {
-        NSDictionary * infoDict = [KMXFile infoDictionaryFromFilePath:kmxFile];
+        NSDictionary * infoDict = [KMXFile keyboardInfoFromKmxFile:kmxFile];
         if (infoDict != nil) {
             NSString *name = [infoDict objectForKey:kKMKeyboardNameKey];
             if (name != nil && [name length]) {
@@ -641,155 +631,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
     }
     return kbNames;
-}
-
-- (NSDictionary *)infoDictionaryFromFile:(NSString *)infoFile {
-    NSMutableDictionary *infoDict = [NSMutableDictionary dictionaryWithCapacity:0];
-    NSMutableArray *files = [NSMutableArray arrayWithCapacity:0];
-    NSMutableArray *fonts = [NSMutableArray arrayWithCapacity:0];
-    NSMutableArray *kbs = [NSMutableArray arrayWithCapacity:0];
-
-    @try {
-        NSString *fileContents = [[NSString stringWithContentsOfFile:infoFile encoding:NSWindowsCP1252StringEncoding error:NULL] stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-        NSArray *lines = [fileContents componentsSeparatedByString:@"\n"];
-        ContentType contentType = ctUnknown;
-        for (NSString *line in lines) {
-            if (!line.length)
-                continue;
-
-            if ([line startsWith:kPackage]) {
-                contentType = ctPackage;
-                continue;
-            }
-            else if ([line startsWith:kButtons]) {
-                contentType = ctButtons;
-                continue;
-            }
-            else if ([line startsWith:kStartMenu]) {
-                contentType = ctStartMenu;
-                continue;
-            }
-            else if ([line startsWith:kStartMenuEntries]) {
-                contentType = ctStartMenuEntries;
-                continue;
-            }
-            else if ([line startsWith:kInfo]) {
-                contentType = ctInfo;
-                continue;
-            }
-            else if ([line startsWith:kFiles]) {
-                contentType = ctFiles;
-                continue;
-            }
-
-            switch (contentType) {
-                case ctPackage: {
-                    if ([line startsWith:kReadMeFile])
-                        [infoDict setObject:[line substringFromIndex:kReadMeFile.length+1] forKey:kReadMeFile];
-                    else if ([line startsWith:kGraphicFile])
-                        [infoDict setObject:[line substringFromIndex:kGraphicFile.length+1] forKey:kGraphicFile];
-
-                    break;
-                }
-                case ctButtons:
-                    break;
-                case ctStartMenu:
-                    break;
-                case ctStartMenuEntries: {
-                    if ([line startsWith:kWelcome]) {
-                        NSString *s = [line substringFromIndex:kWelcome.length+1];
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [infoDict setObject:@[v1, v2] forKey:kWelcome];
-                    }
-
-                    break;
-                }
-                case ctInfo: {
-                    if ([line startsWith:kName]) {
-                        NSString *s = [line substringFromIndex:kName.length+1];
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [infoDict setObject:@[v1, v2] forKey:kName];
-                    }
-                    else if ([line startsWith:kVersion]) {
-                        NSString *s = [line substringFromIndex:kVersion.length+1];
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [infoDict setObject:@[v1, v2] forKey:kVersion];
-                    }
-                    else if ([line startsWith:kAuthor]) {
-                        NSString *s = [line substringFromIndex:kAuthor.length+1];
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [infoDict setObject:@[v1, v2] forKey:kAuthor];
-                    }
-                    else if ([line startsWith:kCopyright]) {
-                        NSString *s = [line substringFromIndex:kCopyright.length+1];
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [infoDict setObject:@[v1, v2] forKey:kCopyright];
-                    }
-                    else if ([line startsWith:kWebSite]) {
-                        NSString *s = [line substringFromIndex:kWebSite.length+1];
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [infoDict setObject:@[v1, v2] forKey:kWebSite];
-                    }
-
-                    break;
-                }
-                case ctFiles: {
-                    NSUInteger x = [line rangeOfString:@"="].location;
-                    if (x == NSNotFound)
-                        continue;
-
-                    NSString *s = [line substringFromIndex:x+2];
-                    if ([s startsWith:kFile]) {
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kFile.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [files addObject:@[v1, v2]];
-                    }
-                    else if ([s startsWith:kFont]) {
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kFont.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [fonts addObject:@[v1, v2]];
-                    }
-                    else if ([s startsWith:kKeyboard]) {
-                        NSArray *vs = [s componentsSeparatedByString:@"\","];
-                        NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kKeyboard.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        [kbs addObject:@[v1, v2]];
-                    }
-
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-    }
-    @catch (NSException *e) {
-        NSLog(@"Error = %@", e.description);
-        return nil;
-    }
-
-    if (files.count)
-        [infoDict setValue:files forKey:kFile];
-    if (fonts.count)
-        [infoDict setValue:fonts forKey:kFont];
-    if (kbs.count)
-        [infoDict setValue:kbs forKey:kKeyboard];
-
-    return infoDict.count?[NSDictionary dictionaryWithDictionary:infoDict]:nil;
 }
 
 - (NSString *)selectedKeyboard {
@@ -907,7 +748,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         NSInteger itag = 1000;
         [keyboards.submenu removeAllItems];
         for (NSString *path in self.activeKeyboards) {
-            NSDictionary *infoDict = [KMXFile infoDictionaryFromFilePath:path];
+            NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:path];
             if (!infoDict)
                 continue;
             //NSString *str = [NSString stringWithFormat:@"%@ (%@)", [infoDict objectForKey:kKMKeyboardNameKey], [infoDict objectForKey:kKMKeyboardVersionKey]];
@@ -918,7 +759,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 [item setState:NSOnState];
                 KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
                 [self setKmx:kmx];
-                NSDictionary *kmxInfo = [KMXFile infoDictionaryFromFilePath:path];
+                NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
                 NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
                 if (kvkFilename != nil) {
                     NSString *kvkFilePath = [self kvkFilePathFromFilename:kvkFilename];
@@ -953,7 +794,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             NSString *path = [self.activeKeyboards objectAtIndex:0];
             KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
             [self setKmx:kmx];
-            NSDictionary *kmxInfo = [KMXFile infoDictionaryFromFilePath:path];
+            NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
             NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
             if (kvkFilename != nil) {
                 NSString *kvkFilePath = [self kvkFilePathFromFilename:kvkFilename];
