@@ -482,6 +482,23 @@ object modActionsMain: TmodActionsMain
       Caption = 'Clear Cached Debug Objects'
       OnExecute = actToolsClearCachedDebugObjectsExecute
     end
+    object actToolsWebCopyPublicUrl: TAction
+      Category = 'Tools'
+      Caption = '&Copy to Clipboard'
+      OnExecute = actToolsWebCopyPublicUrlExecute
+      OnUpdate = actToolsWebCopyPublicUrlUpdate
+    end
+    object actToolsWebOpenPublicUrl: TAction
+      Category = 'Tools'
+      Caption = '&Open in browser'
+      OnExecute = actToolsWebOpenPublicUrlExecute
+      OnUpdate = actToolsWebOpenPublicUrlUpdate
+    end
+    object actToolsWebConfigure: TAction
+      Category = 'Tools'
+      Caption = 'Co&nfigure...'
+      OnExecute = actToolsWebConfigureExecute
+    end
   end
   object ActionManager1: TActionManager
     ActionBars = <

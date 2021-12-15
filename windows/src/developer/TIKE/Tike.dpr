@@ -293,7 +293,8 @@ uses
   UfrmDebugStatus_Platform in 'debug\UfrmDebugStatus_Platform.pas' {frmDebugStatus_Platform},
   UfrmDebugStatus_Options in 'debug\UfrmDebugStatus_Options.pas' {frmDebugStatus_Options},
   Keyman.Developer.System.KeymanDeveloperPaths in 'main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
-  Keyman.Developer.System.ValidateKpsFile in '..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas';
+  Keyman.Developer.System.ValidateKpsFile in '..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas',
+  Keyman.Developer.System.HttpServer.NGrokIntegration in 'web\Keyman.Developer.System.HttpServer.NGrokIntegration.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

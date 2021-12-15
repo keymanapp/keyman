@@ -45,7 +45,8 @@ uses
 
   Keyman.Developer.System.HttpServer.App,
   Keyman.Developer.System.HttpServer.AppSource,
-  Keyman.Developer.System.HttpServer.Debugger;
+  Keyman.Developer.System.HttpServer.Debugger,
+  Keyman.Developer.System.HttpServer.NGrokIntegration;
 
 type
 
@@ -59,6 +60,7 @@ type
     FApp: TAppHttpResponder;
     FAppSource: TAppSourceHttpResponder;
     FDebugger: TDebuggerHttpResponder;
+    FNGrokIntegration: TNGrokIntegration;
     function GetApp: TAppHttpResponder;
     function GetDebugger: TDebuggerHttpResponder;
     function GetAppSource: TAppSourceHttpResponder;
@@ -67,10 +69,12 @@ type
     function GetLocalhostURL: string;
     function GetAppURL(s: string): string;
     procedure GetURLs(v: TStrings);
+    procedure RefreshOptions;
 
     property Debugger: TDebuggerHttpResponder read GetDebugger;
     property App: TAppHttpResponder read GetApp;
     property AppSource: TAppSourceHttpResponder read GetAppSource;
+    property NGrokIntegration: TNGrokIntegration read FNGrokIntegration;
   end;
 
 var
@@ -129,10 +133,16 @@ begin
         'enable the debugger again.');
     end;
   end;
+
+  if FKeymanDeveloperOptions.WebHostUseNGrok then
+    FNGrokIntegration := TNGrokIntegration.Create(FKeymanDeveloperOptions.WebHostDefaultPort,
+      FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible);
 end;
 
 procedure TmodWebHttpServer.DataModuleDestroy(Sender: TObject);
 begin
+  FreeAndNil(FNGrokIntegration);
+
   http.Active := False;   // I4036
 
   FreeAndNil(FApp);
@@ -208,34 +218,42 @@ var
   i: Integer;
   FIPv4Addresses: TIdStackLocalAddressList;
 begin
-  port := ':'+IntToStr(http.DefaultPort);
-  sFull := GetHostName(ComputerNameDnsFullyQualified);
-  sHost := GetHostName(ComputerNameDnsHostname);
-  sNetbios := GetHostName(ComputerNameNetBIOS);
-  if SameText(sHost, sFull) then sHost := '';
-  if SameText(sNetbios, sHost) or SameText(sNetbios, sFull) then sNetbios := '';
+  if Assigned(FNGrokIntegration) then
+  begin
+    if FNGrokIntegration.Connected then
+      v.Add(FNGrokIntegration.Url);
+  end;
+  if FKeymanDeveloperOptions.WebHostUseLocalAddresses then
+  begin
+    port := ':'+IntToStr(http.DefaultPort);
+    sFull := GetHostName(ComputerNameDnsFullyQualified);
+    sHost := GetHostName(ComputerNameDnsHostname);
+    sNetbios := GetHostName(ComputerNameNetBIOS);
+    if SameText(sHost, sFull) then sHost := '';
+    if SameText(sNetbios, sHost) or SameText(sNetbios, sFull) then sNetbios := '';
 
-  if sFull <> '' then v.Add('http://'+sFull+port);
-  if sHost <> '' then v.Add('http://'+sHost+port);
-  if sNetbios <> '' then v.Add('http://'+sNetbios+port);
+    if sFull <> '' then v.Add('http://'+sFull+port);
+    if sHost <> '' then v.Add('http://'+sHost+port);
+    if sNetbios <> '' then v.Add('http://'+sNetbios+port);
 
-  FIPv4Addresses := TIdStackLocalAddressList.Create;
-  try
-    TIdStack.IncUsage;
+    FIPv4Addresses := TIdStackLocalAddressList.Create;
     try
-      GStack.GetLocalAddressList(FIPv4Addresses);
+      TIdStack.IncUsage;
+      try
+        GStack.GetLocalAddressList(FIPv4Addresses);
+      finally
+        TIdStack.DecUsage;
+      end;
+
+      for i := 0 to FIPv4Addresses.Count - 1 do
+        v.Add('http://'+FIPv4Addresses[i].IPAddress+port);
     finally
-      TIdStack.DecUsage;
+      FIPv4Addresses.Free;
     end;
 
-    for i := 0 to FIPv4Addresses.Count - 1 do
-      v.Add('http://'+FIPv4Addresses[i].IPAddress+port);
-  finally
-    FIPv4Addresses.Free;
+    v.Add('http://localhost'+port);
+    v.Add('http://'+IPv4Loopback+port);
   end;
-
-  v.Add('http://localhost'+port);
-  v.Add('http://'+IPv4Loopback+port);
 end;
 
 procedure TmodWebHttpServer.httpCommandGet(AContext: TIdContext;
@@ -264,6 +282,21 @@ begin
   finally
     CoUninitialize;
   end;
+end;
+
+procedure TmodWebHttpServer.RefreshOptions;
+begin
+  if Assigned(FNGrokIntegration) and FKeymanDeveloperOptions.WebHostUseNGrok and
+    (FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible <> FNGrokIntegration.ShowNGrok) then
+  begin
+    FreeAndNil(FNGrokIntegration);
+  end;
+
+  if Assigned(FNGrokIntegration) and not FKeymanDeveloperOptions.WebHostUseNGrok then
+    FreeAndNil(FNGrokIntegration)
+  else if not Assigned(FNGrokIntegration) and FKeymanDeveloperOptions.WebHostUseNGrok then
+    FNGrokIntegration := TNGrokIntegration.Create(FKeymanDeveloperOptions.WebHostDefaultPort,
+      FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible);
 end;
 
 end.

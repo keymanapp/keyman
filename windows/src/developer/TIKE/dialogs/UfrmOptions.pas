@@ -104,6 +104,10 @@ type
     gbPrivacy: TGroupBox;
     chkReportUsage: TCheckBox;
     chkReportErrors: TCheckBox;
+    chkUseNGrok: TCheckBox;
+    chkListLocalURLs: TCheckBox;
+    chkKeepNGrokControlWindowVisible: TCheckBox;
+    cmdConfigureNGrok: TButton;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -116,13 +120,15 @@ type
     procedure cmdResetToolWindowsClick(Sender: TObject);
     procedure cbEditorThemeClick(Sender: TObject);
     procedure cmdBrowseDefaultProjectPathClick(Sender: TObject);
+    procedure chkUseNGrokClick(Sender: TObject);
   private
     FDefaultFont, FQuotedFont: TFont;
-    { Private declarations }
+    procedure EnableControls;
   protected
     function GetHelpTopic: string; override;
   public
     { Public declarations }
+    procedure FocusDebuggerTab;
   end;
 
 implementation
@@ -152,6 +158,11 @@ uses
 
 { General functions }
 
+
+procedure TfrmOptions.FocusDebuggerTab;
+begin
+  pages.ActivePage := tabDebugger;
+end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
 var
@@ -201,6 +212,9 @@ begin
     editIndentSize.Text := IntToStr(IndentSize);
 
     editWebHostDefaultPort.Text := IntToStr(WebHostDefaultPort);   // I4021
+    chkUseNGrok.Checked := WebHostUseNGrok;
+    chkListLocalURLs.Checked := WebHostUseLocalAddresses;
+    chkKeepNGrokControlWindowVisible.Checked := WebHostKeepNGrokControlWindowVisible;
 
     chkReportUsage.Checked := ReportUsage;
     chkReportErrors.Checked := ReportErrors;
@@ -240,6 +254,8 @@ begin
 
   chkCharMapDisableDatabaseLookups.Checked := True;
   chkCharMapDisableDatabaseLookups.Enabled := False;
+
+  EnableControls;
 end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
@@ -290,6 +306,9 @@ begin
     OSKAutoSaveBeforeImporting       := chkOSKAutoSaveBeforeImporting.Checked;
 
     WebHostDefaultPort := StrToIntDef(editWebHostDefaultPort.Text, 8008);   // I4021
+    WebHostUseNGrok := chkUseNGrok.Checked;
+    WebHostUseLocalAddresses := chkListLocalURLs.Checked;
+    WebHostKeepNGrokControlWindowVisible := chkKeepNGrokControlWindowVisible.Checked;
 
     CharMapAutoLookup := chkCharMapAutoLookup.Checked;
     CharMapDisableDatabaseLookups := chkCharMapDisableDatabaseLookups.Checked;
@@ -384,6 +403,12 @@ begin
   end;
 end;
 
+procedure TfrmOptions.EnableControls;
+begin
+  chkKeepNGrokControlWindowVisible.Enabled := chkUseNGrok.Checked;
+  cmdConfigureNGrok.Enabled := chkUseNGrok.Checked;
+end;
+
 procedure TfrmOptions.cbEditorThemeClick(Sender: TObject);
 var
   j: TJSONObject;
@@ -421,6 +446,11 @@ begin
   end
   else
     lblEditorCustomTheme.Caption := '';
+end;
+
+procedure TfrmOptions.chkUseNGrokClick(Sender: TObject);
+begin
+  EnableControls;
 end;
 
 procedure TfrmOptions.cmdBrowseDefaultProjectPathClick(Sender: TObject);

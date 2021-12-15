@@ -698,7 +698,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Top = 22
             Width = 390
             Height = 13
-            Caption = 
+            Caption =
               'Language metadata is managed in the package that contains this k' +
               'eyboard.'
           end
@@ -968,7 +968,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
                 Top = 8
                 Width = 183
                 Height = 39
-                Caption = 
+                Caption =
                   'Warning: mixing left/right and non-specific modifiers means some' +
                   ' rules are not visible here'
                 WordWrap = True
@@ -1093,7 +1093,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           Top = 13
           Width = 333
           Height = 13
-          Caption = 
+          Caption =
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
@@ -1199,10 +1199,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           object cmdOpenDebugHost: TButton
             Left = 12
             Top = 198
-            Width = 189
+            Width = 109
             Height = 25
-            Caption = 'Open &debugger in local browser'
-            TabOrder = 1
+            Caption = 'Open in &browser'
+            TabOrder = 3
             OnClick = cmdOpenDebugHostClick
           end
           object lbDebugHosts: TListBox
@@ -1211,17 +1211,34 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Width = 289
             Height = 97
             ItemHeight = 13
-            TabOrder = 3
+            TabOrder = 2
             OnClick = lbDebugHostsClick
           end
           object cmdSendURLsToEmail: TButton
-            Left = 12
-            Top = 229
-            Width = 189
+            Left = 127
+            Top = 198
+            Width = 109
             Height = 25
-            Caption = 'Send addresses to &email...'
-            TabOrder = 2
+            Caption = 'Send to &email...'
+            TabOrder = 4
             OnClick = cmdSendURLsToEmailClick
+          end
+          object cmdCopyDebuggerLink: TButton
+            Left = 242
+            Top = 198
+            Width = 109
+            Height = 25
+            Caption = 'Copy &link'
+            TabOrder = 5
+            OnClick = cmdCopyDebuggerLinkClick
+          end
+          object cmdConfigureWebDebugger: TButton
+            Left = 168
+            Top = 33
+            Width = 153
+            Height = 25
+            Action = modActionsMain.actToolsWebConfigure
+            TabOrder = 1
           end
         end
         object panOpenInExplorer: TPanel
@@ -1361,7 +1378,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgBrowseBitmap: TOpenPictureDialog
     DefaultExt = 'ico'
-    Filter = 
+    Filter =
       'All supported files (*.ico, *.bmp)|*.ico;*.bmp|Icon files (*.ico' +
       ')|*.ico|Bitmap files (*.bmp)|*.bmp|All files (*.*)|*.*'
     Options = [ofHideReadOnly, ofCreatePrompt, ofEnableSizing]
@@ -1371,7 +1388,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
   end
   object dlgSaveExport: TSaveDialog
     DefaultExt = 'kmn'
-    Filter = 
+    Filter =
       'Keyman 5.0 Keyboard Wizard (*.kmn)|*.kmn|Windows NT/2000/XP keyb' +
       'oard (*.dll)|*.dll|Windows 95/98/Me keyboard (*.kbd)|*.kbd'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]

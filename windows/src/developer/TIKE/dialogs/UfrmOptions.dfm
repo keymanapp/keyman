@@ -336,7 +336,7 @@ inherited frmOptions: TfrmOptions
         Left = 8
         Top = 159
         Width = 313
-        Height = 89
+        Height = 170
         Caption = 'Web Host'
         TabOrder = 1
         object lblWebHostDefaultPort: TLabel
@@ -354,6 +354,39 @@ inherited frmOptions: TfrmOptions
           TabOrder = 0
           Text = 'editWebHostDefaultPort'
           OnKeyPress = editWebHostDefaultPortKeyPress
+        end
+        object chkUseNGrok: TCheckBox
+          Left = 8
+          Top = 78
+          Width = 257
+          Height = 17
+          Caption = 'Use &NGrok to provide public url for web debugger'
+          TabOrder = 2
+          OnClick = chkUseNGrokClick
+        end
+        object chkListLocalURLs: TCheckBox
+          Left = 8
+          Top = 55
+          Width = 257
+          Height = 17
+          Caption = 'List local &URLs in web debugger'
+          TabOrder = 1
+        end
+        object chkKeepNGrokControlWindowVisible: TCheckBox
+          Left = 23
+          Top = 101
+          Width = 257
+          Height = 17
+          Caption = '&Keep NGrok control window visible'
+          TabOrder = 3
+        end
+        object cmdConfigureNGrok: TButton
+          Left = 23
+          Top = 124
+          Width = 121
+          Height = 25
+          Caption = '&Configure NGrok...'
+          TabOrder = 4
         end
       end
     end

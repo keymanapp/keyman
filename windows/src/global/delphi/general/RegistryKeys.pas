@@ -394,6 +394,9 @@ const
   SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
 
   SRegValue_IDEOptWebHostPort = 'web host port';   // I4021
+  SRegValue_IDEOptWebHostUseLocalAddresses = 'web host use local addresses';
+  SRegValue_IDEOptWebHostUseNGrok = 'web host use ngrok';
+  SRegValue_IDEOptWebHostKeepNGrokControlWindowVisible = 'web host keep ngrok control window visible';
 
   SRegValue_IDEOptCharMapDisableDatabaseLookups = 'char map disable database lookups';  // CU
   SRegValue_IDEOptCharMapAutoLookup             = 'char map auto lookup';               // CU

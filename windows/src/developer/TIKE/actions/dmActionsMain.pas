@@ -135,6 +135,9 @@ type
     actViewCharacterIdentifier: TAction;   // I4807
     actProjectClose: TAction;
     actToolsClearCachedDebugObjects: TAction;
+    actToolsWebCopyPublicUrl: TAction;
+    actToolsWebOpenPublicUrl: TAction;
+    actToolsWebConfigure: TAction;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -231,6 +234,11 @@ type
     procedure actFileNewUpdate(Sender: TObject);
     procedure actFileOpenUpdate(Sender: TObject);
     procedure actToolsClearCachedDebugObjectsExecute(Sender: TObject);
+    procedure actToolsWebCopyPublicUrlExecute(Sender: TObject);
+    procedure actToolsWebOpenPublicUrlExecute(Sender: TObject);
+    procedure actToolsWebConfigureExecute(Sender: TObject);
+    procedure actToolsWebCopyPublicUrlUpdate(Sender: TObject);
+    procedure actToolsWebOpenPublicUrlUpdate(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
@@ -255,6 +263,7 @@ uses
   OnlineConstants,
   Keyman.Developer.UI.TikeOnlineUpdateCheck,
   Printers,
+  Vcl.Clipbrd,
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
@@ -286,6 +295,7 @@ uses
   Keyman.Developer.UI.Project.UfrmProject,
   Keyman.Developer.UI.Project.UfrmProjectSettings,
   Upload_Settings,
+  utilexecute,
   UfrmMDIChild;
 
 procedure TmodActionsMain.actFileNewExecute(Sender: TObject);
@@ -746,6 +756,46 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure TmodActionsMain.actToolsWebConfigureExecute(Sender: TObject);
+begin
+  with TfrmOptions.Create(frmKeymanDeveloper) do
+  try
+    FocusDebuggerTab;
+    if ShowModal = mrOk then
+    begin
+      frmKeymanDeveloper.RefreshOptions;
+    end;
+  finally
+    Free;
+  end;
+end;
+
+procedure TmodActionsMain.actToolsWebCopyPublicUrlExecute(Sender: TObject);
+begin
+  if Assigned(modWebHttpServer.NGrokIntegration) and
+      modWebHttpServer.NGrokIntegration.Connected then
+    Clipboard.AsText := modWebHttpServer.NGrokIntegration.Url;
+end;
+
+procedure TmodActionsMain.actToolsWebCopyPublicUrlUpdate(Sender: TObject);
+begin
+  actToolsWebCopyPublicUrl.Enabled := Assigned(modWebHttpServer.NGrokIntegration) and
+    modWebHttpServer.NGrokIntegration.Connected;
+end;
+
+procedure TmodActionsMain.actToolsWebOpenPublicUrlExecute(Sender: TObject);
+begin
+  if Assigned(modWebHttpServer.NGrokIntegration) and
+      modWebHttpServer.NGrokIntegration.Running then
+    TUtilExecute.URL(modWebHttpServer.NGrokIntegration.Url);
+end;
+
+procedure TmodActionsMain.actToolsWebOpenPublicUrlUpdate(Sender: TObject);
+begin
+  actToolsWebOpenPublicUrl.Enabled := Assigned(modWebHttpServer.NGrokIntegration) and
+    modWebHttpServer.NGrokIntegration.Connected;
 end;
 
 procedure TmodActionsMain.actViewCharacterIdentifierExecute(Sender: TObject);   // I4807

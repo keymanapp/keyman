@@ -3085,6 +3085,24 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object N39: TMenuItem
         Caption = '-'
       end
+      object mnuToolsWebDebugger: TMenuItem
+        Caption = '&Web Debugger'
+        object mnuToolsWebDebuggerOpenInBrowser: TMenuItem
+          Action = modActionsMain.actToolsWebOpenPublicUrl
+        end
+        object mnuToolsWebDebuggerCopyToClipboard: TMenuItem
+          Action = modActionsMain.actToolsWebCopyPublicUrl
+        end
+        object N7: TMenuItem
+          Caption = '-'
+        end
+        object mnuToolsWebDebuggerConfigure: TMenuItem
+          Action = modActionsMain.actToolsWebConfigure
+        end
+      end
+      object N4: TMenuItem
+        Caption = '-'
+      end
       object Customise1: TMenuItem
         Action = modActionsMain.actToolsCustomise
       end

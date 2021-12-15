@@ -277,6 +277,12 @@ type
     mnuToolsDebugTestsCompilerExceptionTest: TMenuItem;
     mnuToolsDebugTestsShowDebuggerEventsPanel: TMenuItem;
     N3: TMenuItem;
+    N4: TMenuItem;
+    mnuToolsWebDebugger: TMenuItem;
+    mnuToolsWebDebuggerOpenInBrowser: TMenuItem;
+    mnuToolsWebDebuggerCopyToClipboard: TMenuItem;
+    N7: TMenuItem;
+    mnuToolsWebDebuggerConfigure: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -460,7 +466,8 @@ uses
   UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor,
   UfrmDebug, KeymanDeveloperOptions, utilfiletypes,
   UfrmHelp, dmActionsTextEditor, UfrmDebugStatus,
-  UfrmCharacterIdentifier, UfrmCharacterMapNew;
+  UfrmCharacterIdentifier, UfrmCharacterMapNew,
+  UmodWebHttpServer;
 
 {$R *.DFM}
 
@@ -1373,6 +1380,15 @@ procedure TfrmKeymanDeveloper.mnuToolsClick(Sender: TObject);
 begin
   mnuToolsDebugTests.Visible := (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0);
   mnuToolsDebugTestsShowDebuggerEventsPanel.Checked := TfrmDebugStatus.ShowDebuggerEventsPanel;
+  if Assigned(modWebHttpServer.NGrokIntegration) then
+  begin
+    mnuToolsWebDebugger.Visible := True;
+    if modWebHttpServer.NGrokIntegration.Connected
+      then modActionsMain.actToolsWebOpenPublicUrl.Caption := modWebHttpServer.NGrokIntegration.Url
+      else modActionsMain.actToolsWebOpenPublicUrl.Caption := '&Open in browser';
+  end
+  else
+    mnuToolsWebDebugger.Visible := False;
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectClick(Sender: TObject);
@@ -1524,6 +1540,7 @@ begin
     if ProjectForm <> nil then ProjectForm.RefreshOptions;
     if Assigned(frmMessages) then frmMessages.RefreshOptions;
     if Assigned(frmCharacterMapDock) then frmCharacterMapDock.RefreshOptions; // Recalculates grid after unicode data refresh
+    if Assigned(modWebHttpServer) then modWebHttpServer.RefreshOptions;
   finally
     Screen.Cursor := crDefault;
   end;

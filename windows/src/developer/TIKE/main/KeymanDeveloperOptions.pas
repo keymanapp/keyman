@@ -64,6 +64,9 @@ type
     FOSKAutoSaveBeforeImporting: Boolean;
     FReportErrors: Boolean;
     FReportUsage: Boolean;
+    FWebHostUseLocalAddresses: Boolean;
+    FWebHostUseNGrok: Boolean;
+    FWebHostKeepNGrokControlWindowVisible: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -101,6 +104,10 @@ type
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
 
     property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
+
+    property WebHostUseNGrok: Boolean read FWebHostUseNGrok write FWebHostUseNGrok;
+    property WebHostUseLocalAddresses: Boolean read FWebHostUseLocalAddresses write FWebHostUseLocalAddresses;
+    property WebHostKeepNGrokControlWindowVisible: Boolean read FWebHostKeepNGrokControlWindowVisible write FWebHostKeepNGrokControlWindowVisible;
 
     property AllowMultipleInstances: Boolean read FAllowMultipleInstances write FAllowMultipleInstances;
 
@@ -199,6 +206,9 @@ begin
     FOSKAutoSaveBeforeImporting := regReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
 
     FWebHostDefaultPort := regReadInt(SRegValue_IDEOptWebHostPort, 8008);
+    FWebHostUseLocalAddresses := regReadBool(SRegValue_IDEOptWebHostUseLocalAddresses, True);
+    FWebHostUseNGrok := regReadBool(SRegValue_IDEOptWebHostUseNGrok, False);
+    FWebHostKeepNGrokControlWindowVisible := regReadBool(SRegValue_IDEOptWebHostKeepNGrokControlWindowVisible, False);
 
     FCharMapDisableDatabaseLookups := regReadBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, False);
     FCharMapAutoLookup             := regReadBool(SRegValue_IDEOptCharMapAutoLookup,             True);
@@ -254,6 +264,9 @@ begin
 
 
     regWriteInt(SRegValue_IDEOptWebHostPort, FWebHostDefaultPort);
+    regWriteBool(SRegValue_IDEOptWebHostUseLocalAddresses, FWebHostUseLocalAddresses);
+    regWriteBool(SRegValue_IDEOptWebHostUseNGrok, FWebHostUseNGrok);
+    regWriteBool(SRegValue_IDEOptWebHostKeepNGrokControlWindowVisible, FWebHostKeepNGrokControlWindowVisible);
 
 
     regWriteBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, FCharMapDisableDatabaseLookups);
