@@ -12,8 +12,7 @@
 ​  <description>
 ​    <p>
       This input method provides the Keyman IM engine for IBus. With this module, you can
-      use keyboard layouts designed for Keyman version 11 or earlier under the IBus
-      platform.
+      use keyboard layouts designed for Keyman under the IBus platform.
     </p>
     <p>
       Originally created in 1993 to type Lao on Windows, Keyman is now a free and

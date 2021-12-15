@@ -51,7 +51,7 @@ Depends:
 Recommends:
  onboard-keyman,
 Description: Type in your language with Keyman for Linux
- Keyman makes it possible for you to type in over 1,000 languages on Windows,
+ Keyman makes it possible for you to type in over 2,000 languages on Windows,
  macOS, Linux, iPhone, iPad, Android tablets and phones, and even instantly
  in your web browser. With the world’s most powerful keyboarding engine,
  intuitive and rapid text input is now possible in your language, and for
@@ -98,8 +98,8 @@ Description: Keyman for Linux configuration
  Keyboard layouts are distributed through an open catalog to all major desktop
  and mobile platforms.
  .
- Python module to install, uninstall and view information about Keyman
- keyboard packages.
+ This package contains the Python module to install, uninstall and view
+ information about Keyman keyboard packages.
 
 Package: libkmnkbp-dev
 Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
@@ -121,7 +121,7 @@ Description: Development files for Keyman keyboard processing library
  and mobile platforms.
  .
  The Keyman keyboardprocessor library processes input from input method engines
- and applies rules from compiled Keyman 11 or earlier kmx keyboard files.
+ and applies rules from compiled Keyman keyboard files.
  .
  This package contains development headers and libraries.
 
@@ -149,7 +149,7 @@ Description: Keyman keyboard processing library
  and mobile platforms.
  .
  The Keyman keyboardprocessor library processes input from input method engines
- and applies rules from compiled Keyman 11 or earlier kmx keyboard files.
+ and applies rules from compiled Keyman keyboard files.
 
 Package: ibus-keyman
 Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
@@ -173,9 +173,8 @@ Description: Keyman engine for IBus
  Keyboard layouts are distributed through an open catalog to all major desktop
  and mobile platforms.
  .
- IBus-keyman is a IM (input method) Engine for multiple languages, based on
+ ibus-keyman is a IM (input method) Engine for multiple languages, based on
  IBus.
  .
  This package provides the Keyman IM engine for IBus. With this module, you
- can use keyboard layouts designed for Keyman version 11 or earlier under the
- IBus platform.
+ can use keyboard layouts designed for Keyman under the IBus platform.
