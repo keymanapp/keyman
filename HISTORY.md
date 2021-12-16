@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.170 alpha 2021-12-16
+
+* docs(linux): Document how to disable error reporting (#6051)
+* fix(linux): fix release version number for Sentry reporting (#6052)
+* fix(linux): Fix package description (#6054)
+
 ## 15.0.169 alpha 2021-12-15
 
 * fix(mac): display Unicode package name correctly instead of '????' (#6016)
