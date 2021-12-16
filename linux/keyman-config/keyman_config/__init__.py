@@ -61,7 +61,7 @@ else:
         sentry_sdk.init(
             dsn=SentryUrl,
             environment=__environment__,
-            release=__version__,
+            release='release-' + __versionwithtag__,
             integrations=[sentry_logging],
         )
         set_user({'id': hash(getpass.getuser())})
