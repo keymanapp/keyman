@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=Keyman Keyboards
-Name[en_GB]=Keyman Keyboards
-Comment=Configure Keyman keyboards
-Comment[en_GB]=Configure Keyman keyboards
+Name=Keyman Configuration
+Name[en_GB]=Keyman Configuration
+Comment=Configure Keyman for Linux keyboards
+Comment[en_GB]=Configure Keyman for Linux keyboards
 Exec=km-config %u
 Icon=km-config
 Terminal=false
