@@ -304,7 +304,7 @@ void CalcScrollSize()
 	{
 		WCHAR buf[48];
 		if(!(*KMGetContext)(buf, 48)) buf[0] = 0;
-		int buflen=wcslen(buf);
+		int buflen = (int)wcslen(buf);
 
 		wz.cellcount = 0;
                 int i;
@@ -463,10 +463,10 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 					
 					SIZE sz2;
 
-					GetTextExtentPoint32W(hDC, currule->outputs[i], wcslen(currule->outputs[i]), &sz2);
+					GetTextExtentPoint32W(hDC, currule->outputs[i], (int)wcslen(currule->outputs[i]), &sz2);
 					
 					TextOutW(hDC, x * cx + (cx-sz2.cx)/2, -vpos + (y+1) * cy - sz2.cy - 2, 
-						currule->outputs[i], wcslen(currule->outputs[i]));
+						currule->outputs[i], (int)wcslen(currule->outputs[i]));
 
 					if(++x >= wz.visiblecolcount) { x = 0; y++; }
 				}
@@ -512,8 +512,8 @@ BOOL FindRule(group *g, rule **rp, WCHAR KeyChar)
 	WCHAR buf[48];
 	if(!(*KMGetContext)(buf, 48)) return FALSE;
 	rule *r = g->rules;
-	int buflen = wcslen(buf);
-        int i;
+	int buflen = (int)wcslen(buf);
+  int i;
 	for(i = 0; i < g->nrules; i++)
 	{
 		if(r[i].key == KeyChar && buflen >= r[i].contextlen && !wcscmp(buf+(buflen-r[i].contextlen), r[i].context))
@@ -738,9 +738,9 @@ PWSTR extstr(char *p)
 		if(!q) return newempty();
 		if(q == p) return newempty();
 		*q = 0;
-		int n = MultiByteToWideChar(CP_ACP, 0, p, strlen(p), NULL, 0);
+		int n = MultiByteToWideChar(CP_ACP, 0, p, (int)strlen(p), NULL, 0);
 		PWCHAR buf = new WCHAR[n+1];
-		MultiByteToWideChar(CP_ACP, 0, p, strlen(p), buf, n);
+		MultiByteToWideChar(CP_ACP, 0, p, (int)strlen(p), buf, n);
 		buf[n] = 0;
 		return buf;
 	}
@@ -791,7 +791,9 @@ PWSTR extstr(char *p)
 void UnloadRules(PSTR KeyboardName)
 {
 	int nkbi;
-
+  if (nkeyboards == 0) {
+    return;
+  }
 	for(nkbi = 0; nkbi < nkeyboards; nkbi++)
 		if(!_stricmp(KeyboardName, keyboards[nkbi].name)) break;
 
@@ -801,7 +803,12 @@ void UnloadRules(PSTR KeyboardName)
 
 	if(kbi->hFont) DeleteObject(kbi->hFont);
 	kbi->hFont = NULL;
-        int i;
+
+  if (kbi->groups == NULL) {
+          return;
+  }
+
+  int i;
 	for(i = 0; i < kbi->ngroups; i++)
 	{
 		for(int j = 0; j < kbi->groups[i].nrules; j++)
@@ -940,7 +947,7 @@ BOOL LoadRules(PSTR KeyboardName)
 			rule *r2 = &kbi->groups[i].rules[kbi->groups[i].nrules++];
 
 			r2->context = extstr(pcontext);
-			r2->contextlen = wcslen(r2->context);
+			r2->contextlen = (int)wcslen(r2->context);
 			PWSTR pp = extstr(pkey);
 			r2->key = pp[0];
 			delete pp;
@@ -949,7 +956,7 @@ BOOL LoadRules(PSTR KeyboardName)
 			while(poutput && i < 10)
 			{
 				r2->outputs[i++] = extstr(poutput);
-				r2->outputlen += wcslen(r2->outputs[i-1]) + 2;
+				r2->outputlen += (int)wcslen(r2->outputs[i-1]) + 2;
 				poutput = strtokquoted(NULL, ", ", "\"\'");
 			}
 			if(i > kbi->maxoutputs) kbi->maxoutputs = i;
@@ -1001,6 +1008,8 @@ void CreateKeyboard(PSTR keyboardname)
 		keyboards = kb2;
 		strncpy_s(keyboards[nkeyboards].name, _countof(keyboards[nkeyboards].name), keyboardname, 127);  // I3481
 		keyboards[nkeyboards].name[127] = 0;
+    keyboards[nkeyboards].groups    = NULL;
+    keyboards[nkeyboards].hFont     = NULL;
 		nkeyboards++;
 	}
 }

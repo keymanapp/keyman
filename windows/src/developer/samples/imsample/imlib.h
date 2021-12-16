@@ -19,7 +19,7 @@ typedef BOOL (WINAPI *KMGetActiveKeyboardProc)(PSTR kbdname, DWORD len);
 typedef BOOL (WINAPI *KMHideIMProc)();
 typedef BOOL (WINAPI *KMGetKeyboardPathProc)(PSTR kbdname, PSTR buf, DWORD len);
 
-extern HMODULE hModuleKeyman32;
+extern HMODULE hModuleKeyman;
 extern KMSetOutputProc KMSetOutput;
 extern KMGetContextProc KMGetContext;
 extern KMQueueActionProc KMQueueAction;
