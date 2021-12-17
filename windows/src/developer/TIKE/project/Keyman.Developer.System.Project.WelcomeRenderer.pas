@@ -23,8 +23,26 @@ uses
   utilsystem;
 
 class function TWelcomeRenderer.ProjectMRUFilename: string;
+var
+  path: string;
+const
+  SMRUFilename = 'project_mru.xml';
 begin
-  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + 'project_mru.xml';
+  // Keyman Developer 14 omitted the backslash in the file path
+  // so it was saving this file in the wrong location. This small patch
+  // moves the file into the right location.
+  path := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper;
+  if FileExists(path + SMRUFilename) then
+  begin
+    if not DirectoryExists(path) then
+      CreateDir(path);
+    if FileExists(path + '\' + SMRuFilename)
+      then DeleteFile(path + SMRUFilename)
+      else RenameFile(path + SMRUFilename, path + '\' + SMRUFilename);
+  end;
+  // end patch
+
+  Result := path + '\' + SMRUFilename;
 end;
 
 class function TWelcomeRenderer.Render: string;
