@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 15.0.171 alpha 2021-12-17
+
+* feat(developer): remember test page preferences on reload (#6033)
+* feat(developer): tidy up package list in web test view (#6034)
+* feat(developer): live reload of web debugger (#6035)
+* feat(developer): cache web debug objects across sessions (#6036)
+* fix(developer): project_mru.xml path (#6061)
+* chore(developer): add browse4folder to components (#6062)
+* docs(windows): Add note on split user/admin accounts (#6059)
+* fix(mac): increase OSK character size by 50% (#6006)
+
 ## 15.0.170 alpha 2021-12-16
 
 * docs(linux): Document how to disable error reporting (#6051)
