@@ -1380,15 +1380,7 @@ procedure TfrmKeymanDeveloper.mnuToolsClick(Sender: TObject);
 begin
   mnuToolsDebugTests.Visible := (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0);
   mnuToolsDebugTestsShowDebuggerEventsPanel.Checked := TfrmDebugStatus.ShowDebuggerEventsPanel;
-  if Assigned(modWebHttpServer.NGrokIntegration) then
-  begin
-    mnuToolsWebDebugger.Visible := True;
-    if modWebHttpServer.NGrokIntegration.Connected
-      then modActionsMain.actToolsWebOpenPublicUrl.Caption := modWebHttpServer.NGrokIntegration.Url
-      else modActionsMain.actToolsWebOpenPublicUrl.Caption := '&Open in browser';
-  end
-  else
-    mnuToolsWebDebugger.Visible := False;
+  mnuToolsWebDebugger.Visible := Assigned(modWebHttpServer.NGrokIntegration);
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectClick(Sender: TObject);

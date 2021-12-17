@@ -796,6 +796,10 @@ procedure TmodActionsMain.actToolsWebOpenPublicUrlUpdate(Sender: TObject);
 begin
   actToolsWebOpenPublicUrl.Enabled := Assigned(modWebHttpServer.NGrokIntegration) and
     modWebHttpServer.NGrokIntegration.Connected;
+
+  if actToolsWebOpenPublicUrl.Enabled
+    then actToolsWebOpenPublicUrl.Caption := 'Open '+modWebHttpServer.NGrokIntegration.Url+' in browser'
+    else actToolsWebOpenPublicUrl.Caption := 'Open in browser';
 end;
 
 procedure TmodActionsMain.actViewCharacterIdentifierExecute(Sender: TObject);   // I4807

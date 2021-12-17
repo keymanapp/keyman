@@ -135,7 +135,11 @@ begin
   end;
 
   if FKeymanDeveloperOptions.WebHostUseNGrok then
-    FNGrokIntegration := TNGrokIntegration.Create(FKeymanDeveloperOptions.WebHostDefaultPort,
+    FNGrokIntegration := TNGrokIntegration.Create(
+      FKeymanDeveloperOptions.WebHostDefaultPort,
+      FKeymanDeveloperOptions.WebHostNGrokControlPort,
+      FKeymanDeveloperOptions.WebHostNGrokToken,
+      FKeymanDeveloperOptions.WebHostNGrokRegion,
       FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible);
 end;
 
@@ -285,18 +289,47 @@ begin
 end;
 
 procedure TmodWebHttpServer.RefreshOptions;
+var
+  Reinstantiate: Boolean;
 begin
-  if Assigned(FNGrokIntegration) and FKeymanDeveloperOptions.WebHostUseNGrok and
-    (FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible <> FNGrokIntegration.ShowNGrok) then
+  Reinstantiate := False;
+  if http.DefaultPort <> FKeymanDeveloperOptions.WebHostDefaultPort then
   begin
-    FreeAndNil(FNGrokIntegration);
+    http.Active := False;
+    http.DefaultPort := FKeymanDeveloperOptions.WebHostDefaultPort;
+    http.Active := True;
+    Reinstantiate := True;
   end;
 
-  if Assigned(FNGrokIntegration) and not FKeymanDeveloperOptions.WebHostUseNGrok then
-    FreeAndNil(FNGrokIntegration)
-  else if not Assigned(FNGrokIntegration) and FKeymanDeveloperOptions.WebHostUseNGrok then
-    FNGrokIntegration := TNGrokIntegration.Create(FKeymanDeveloperOptions.WebHostDefaultPort,
+  if not FKeymanDeveloperOptions.WebHostUseNGrok then
+  begin
+    FreeAndNil(FNGrokIntegration);
+    Exit;
+  end;
+
+  if not Assigned(FNgrokIntegration) or not FNgrokIntegration.Connected then
+  begin
+    Reinstantiate := True;
+  end
+  else
+  begin
+    Reinstantiate := Reinstantiate or
+      (FNgrokIntegration.LocalPort <> FKeymanDeveloperOptions.WebHostDefaultPort) or
+      (FNgrokIntegration.ShowNgrok <> FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible) or
+      (FNGrokIntegration.Token <> FKeymanDeveloperOptions.WebHostNGrokToken) or
+      (FNGrokIntegration.Region <> FKeymanDeveloperOptions.WebHostNGrokRegion);
+  end;
+
+  if Reinstantiate then
+  begin
+    FreeAndNil(FNGrokIntegration);
+    FNGrokIntegration := TNGrokIntegration.Create(
+      FKeymanDeveloperOptions.WebHostDefaultPort,
+      FKeymanDeveloperOptions.WebHostNGrokControlPort,
+      FKeymanDeveloperOptions.WebHostNGrokToken,
+      FKeymanDeveloperOptions.WebHostNGrokRegion,
       FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible);
+  end;
 end;
 
 end.

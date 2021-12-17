@@ -67,6 +67,9 @@ type
     FWebHostUseLocalAddresses: Boolean;
     FWebHostUseNGrok: Boolean;
     FWebHostKeepNGrokControlWindowVisible: Boolean;
+    FWebHostNGrokControlPort: Integer;
+    FWebHostNGrokToken: string;
+    FWebHostNGrokRegion: string;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -104,9 +107,12 @@ type
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
 
     property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
-
-    property WebHostUseNGrok: Boolean read FWebHostUseNGrok write FWebHostUseNGrok;
     property WebHostUseLocalAddresses: Boolean read FWebHostUseLocalAddresses write FWebHostUseLocalAddresses;
+
+    property WebHostNGrokControlPort: Integer read FWebHostNGrokControlPort write FWebHostNGrokControlPort;
+    property WebHostNGrokToken: string read FWebHostNGrokToken write FWebHostNGrokToken;
+    property WebHostNGrokRegion: string read FWebHostNGrokRegion write FWebHostNGrokRegion;
+    property WebHostUseNGrok: Boolean read FWebHostUseNGrok write FWebHostUseNGrok;
     property WebHostKeepNGrokControlWindowVisible: Boolean read FWebHostKeepNGrokControlWindowVisible write FWebHostKeepNGrokControlWindowVisible;
 
     property AllowMultipleInstances: Boolean read FAllowMultipleInstances write FAllowMultipleInstances;
@@ -207,6 +213,10 @@ begin
 
     FWebHostDefaultPort := regReadInt(SRegValue_IDEOptWebHostPort, 8008);
     FWebHostUseLocalAddresses := regReadBool(SRegValue_IDEOptWebHostUseLocalAddresses, True);
+
+    FWebHostNGrokControlPort := regReadInt(SRegValue_IDEOptWebHostNGrokControlPort, 8009);
+    FWebHostNGrokToken := regReadString(SRegValue_IDEOptWebHostNGrokToken, '');
+    FWebHostNGrokRegion := regReadString(SRegValue_IDEOptWebHostNGrokRegion, 'us');
     FWebHostUseNGrok := regReadBool(SRegValue_IDEOptWebHostUseNGrok, False);
     FWebHostKeepNGrokControlWindowVisible := regReadBool(SRegValue_IDEOptWebHostKeepNGrokControlWindowVisible, False);
 
@@ -265,6 +275,10 @@ begin
 
     regWriteInt(SRegValue_IDEOptWebHostPort, FWebHostDefaultPort);
     regWriteBool(SRegValue_IDEOptWebHostUseLocalAddresses, FWebHostUseLocalAddresses);
+
+    regWriteInt(SRegValue_IDEOptWebHostNGrokControlPort, FWebHostNGrokControlPort);
+    regWriteString(SRegValue_IDEOptWebHostNGrokToken, FWebHostNGrokToken);
+    regWriteString(SRegValue_IDEOptWebHostNGrokRegion, FWebHostNGrokRegion);
     regWriteBool(SRegValue_IDEOptWebHostUseNGrok, FWebHostUseNGrok);
     regWriteBool(SRegValue_IDEOptWebHostKeepNGrokControlWindowVisible, FWebHostKeepNGrokControlWindowVisible);
 

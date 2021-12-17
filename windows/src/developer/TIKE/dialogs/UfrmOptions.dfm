@@ -328,7 +328,7 @@ inherited frmOptions: TfrmOptions
           Top = 122
           Width = 250
           Height = 17
-          Caption = '&Automatically reset debugger before recompiling'
+          Caption = 'Automatically &reset debugger before recompiling'
           TabOrder = 5
         end
       end
@@ -336,7 +336,7 @@ inherited frmOptions: TfrmOptions
         Left = 8
         Top = 159
         Width = 313
-        Height = 170
+        Height = 138
         Caption = 'Web Host'
         TabOrder = 1
         object lblWebHostDefaultPort: TLabel
@@ -344,25 +344,25 @@ inherited frmOptions: TfrmOptions
           Top = 31
           Width = 55
           Height = 13
-          Caption = 'Default port'
+          Caption = '&Default port'
         end
         object editWebHostDefaultPort: TEdit
           Left = 84
           Top = 28
           Width = 61
           Height = 21
+          NumbersOnly = True
           TabOrder = 0
-          Text = 'editWebHostDefaultPort'
           OnKeyPress = editWebHostDefaultPortKeyPress
         end
-        object chkUseNGrok: TCheckBox
+        object chkUseNgrok: TCheckBox
           Left = 8
           Top = 78
           Width = 257
           Height = 17
-          Caption = 'Use &NGrok to provide public url for web debugger'
+          Caption = 'Use &ngrok to provide public url for web debugger'
           TabOrder = 2
-          OnClick = chkUseNGrokClick
+          OnClick = chkUseNgrokClick
         end
         object chkListLocalURLs: TCheckBox
           Left = 8
@@ -372,21 +372,14 @@ inherited frmOptions: TfrmOptions
           Caption = 'List local &URLs in web debugger'
           TabOrder = 1
         end
-        object chkKeepNGrokControlWindowVisible: TCheckBox
-          Left = 23
+        object cmdConfigureNgrok: TButton
+          Left = 24
           Top = 101
-          Width = 257
-          Height = 17
-          Caption = '&Keep NGrok control window visible'
-          TabOrder = 3
-        end
-        object cmdConfigureNGrok: TButton
-          Left = 23
-          Top = 124
           Width = 121
           Height = 25
-          Caption = '&Configure NGrok...'
-          TabOrder = 4
+          Caption = '&Configure ngrok...'
+          TabOrder = 3
+          OnClick = cmdConfigureNgrokClick
         end
       end
     end

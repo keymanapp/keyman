@@ -394,6 +394,9 @@ const
   SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
 
   SRegValue_IDEOptWebHostPort = 'web host port';   // I4021
+  SRegValue_IDEOptWebHostNGrokControlPort = 'web host ngrok control port';
+  SRegValue_IDEOptWebHostNGrokToken = 'web host ngrok token';
+  SRegValue_IDEOptWebHostNGrokRegion = 'web host ngrok region';
   SRegValue_IDEOptWebHostUseLocalAddresses = 'web host use local addresses';
   SRegValue_IDEOptWebHostUseNGrok = 'web host use ngrok';
   SRegValue_IDEOptWebHostKeepNGrokControlWindowVisible = 'web host keep ngrok control window visible';
