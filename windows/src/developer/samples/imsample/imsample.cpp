@@ -317,8 +317,8 @@ void CalcScrollSize()
 		}
 	}
 
-	wz.visiblecolcount = rect.right / curkbd->gridx;
-	wz.visiblerowcount = rect.bottom / curkbd->gridy;
+	wz.visiblecolcount = (curkbd->gridx != 0 ? rect.right / curkbd->gridx : rect.right);
+  wz.visiblerowcount = (curkbd->gridy != 0 ? rect.bottom / curkbd->gridy : rect.bottom);
 
 	wz.xi = (wz.cellcount-1) % wz.visiblecolcount;
 	wz.yi = (wz.cellcount-1) / wz.visiblecolcount;
@@ -657,7 +657,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMConfigure(PSTR keyboardname
 void WriteRegSetting(PSTR text, int value)
 {
 	HKEY hkey;
-	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Tavultesoft\\Keyman\\5.0", 
+  if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\impsample", 
 		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
 	{
 		RegSetValueEx(hkey, text, 0, REG_DWORD, (PBYTE) &value, 4);
@@ -668,7 +668,7 @@ void WriteRegSetting(PSTR text, int value)
 int ReadRegSetting(PSTR text)
 {
 	HKEY hkey;
-	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Tavultesoft\\Keyman\\5.0", 
+	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\impsample", 
 		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
 	{
 		unsigned long value, sz = 4, tp = REG_DWORD;
