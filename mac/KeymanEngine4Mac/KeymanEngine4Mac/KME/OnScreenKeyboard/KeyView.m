@@ -16,11 +16,15 @@ CGFloat r = 7.0;
 const NSTimeInterval delayBeforeRepeating = 0.5f;
 const NSTimeInterval repeatInterval = 0.05f;
 
+static CGFloat const kRelativeCharacterLabelHeight = 0.45f;
+static CGFloat const kRelativeModifierLabelHeight = 0.30f;
+
 @interface KeyView ()
 @property (nonatomic, assign) NSUInteger keyCode;
 @property (nonatomic, assign) BOOL hasKeyCaption;
 @property (nonatomic, assign) BOOL isModifierKey;
 @property (nonatomic, assign) BOOL isSpecialKey;
+@property (nonatomic, assign) BOOL isCharacterKey;
 @property (nonatomic, strong) KeyLabel *label;
 @property (nonatomic, strong) NSTextField *caption;
 @property (nonatomic, strong) NSImageView *bitmapView;
@@ -40,7 +44,6 @@ const NSTimeInterval repeatInterval = 0.05f;
         CGSize size = frame.size;
         CGFloat x = size.width*0.05;
         NSRect labelFrame = NSMakeRect(x, 0, size.width -lw -2*x, size.height);
-        CGFloat fontSize = labelFrame.size.height*0.3;
         _label = [[KeyLabel alloc] initWithFrame:labelFrame];
         [_label setEditable:NO];
         [_label setBordered:NO];
@@ -49,9 +52,12 @@ const NSTimeInterval repeatInterval = 0.05f;
         if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
             [_label setLineBreakMode:NSLineBreakByClipping];
         } // There might be some problem not calling this, but it seems to be okay as far as I can tell
+        
+        CGFloat fontSize = labelFrame.size.height*kRelativeModifierLabelHeight;
         [_label setFont:[NSFont systemFontOfSize:fontSize]];
         [_label setTextColor:[NSColor blackColor]];
         [_label setStringValue:@""];
+        [_label setLineBreakMode:NSLineBreakByClipping];
         [self addSubview:_label];
 
         bgColor1 = [self getOpaqueColorWithRed:209 green:211 blue:212];
@@ -141,6 +147,31 @@ const NSTimeInterval repeatInterval = 0.05f;
         _isSpecialKey = YES;
     else
         _isSpecialKey = NO;
+    
+    if (!_isSpecialKey && !_isModifierKey) {
+        _isCharacterKey = YES;
+    } else {
+        _isCharacterKey = NO;
+    }
+  
+  // having changed the keycode, adjust the font size of the key label to optimize for available space
+  [self adjustLabelFontSize];
+}
+
+
+/**
+ * Set the size of the font relative to the key height, depending on what type of key it is.
+ * This allows larger more readable character key text.
+ */
+- (void)adjustLabelFontSize {
+    CGFloat relativeFontSize = kRelativeCharacterLabelHeight;
+    
+    if (!self.isCharacterKey) {
+        relativeFontSize = kRelativeModifierLabelHeight;
+    }
+
+    CGFloat fontSize = self.label.bounds.size.height*relativeFontSize;
+    [self.label setFont:[NSFont systemFontOfSize:fontSize]];
 }
 
 - (void)setLabelText:(NSString *)text {
