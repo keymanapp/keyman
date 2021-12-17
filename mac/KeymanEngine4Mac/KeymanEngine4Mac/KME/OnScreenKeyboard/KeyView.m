@@ -16,7 +16,7 @@ CGFloat r = 7.0;
 const NSTimeInterval delayBeforeRepeating = 0.5f;
 const NSTimeInterval repeatInterval = 0.05f;
 
-static CGFloat const kRelativeCharacterLabelHeight = 0.42f;
+static CGFloat const kRelativeCharacterLabelHeight = 0.45f;
 static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 
 @interface KeyView ()
