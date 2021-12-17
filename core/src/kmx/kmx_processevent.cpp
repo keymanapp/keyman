@@ -125,7 +125,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
 
   if (!isKeyDown) {
     m_kbp_state = nullptr;
-    return FALSE;
+    return TRUE;
   }
 
   LPGROUP gp = &kbd->dpGroupArray[kbd->StartGroup[BEGIN_UNICODE]];
@@ -439,9 +439,8 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
   // TODO: Refactor to use incxstr
   for(p = str; *p && (p < endstr || !endstr); p++)
   {
-    if(*p == UC_SENTINEL)
-     switch(*(++p))
-     {
+    if(*p == UC_SENTINEL) {
+      switch(*(++p)) {
       case CODE_EXTENDED:       // Start of a virtual key section w/shift codes
         p++;
 
@@ -533,7 +532,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
         p+=2;
         break;
       }
-    else {
+    } else {
       if(Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p+1))) {
         m_actions.QueueAction(QIT_CHAR, Uni_SurrogateToUTF32(*p, *(p+1)));
         p++;
