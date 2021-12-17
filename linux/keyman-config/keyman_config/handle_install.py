@@ -20,17 +20,17 @@ def download_and_install_package(url):
     """
     parsedUrl = urlparse(url)
     bcp47 = _extract_bcp47(parsedUrl.query)
-    severity = logging.CRITICAL
+    severity = logging.ERROR
 
     if parsedUrl.scheme == 'keyman':
         logging.info("downloading " + url)
         if not url.startswith('keyman://download/keyboard/'):
-            logging.critical("Don't know what to do with URL " + url)
+            logging.error("Don't know what to do with URL " + url)
             return
 
         packageId = parsedUrl.path[len('/keyboard/'):]
         if not packageId:
-            logging.critical("Missing package id")
+            logging.error("Missing package id")
             return
 
         downloadFile = os.path.join(get_download_folder(), packageId)
@@ -38,13 +38,12 @@ def download_and_install_package(url):
         packageFile = download_kmp_file(downloadUrl, downloadFile)
     elif parsedUrl.scheme == '' or parsedUrl.scheme == 'file':
         packageFile = parsedUrl.path
-        severity = logging.ERROR
     else:
-        logging.critical("Invalid URL: " + url)
+        logging.error("Invalid URL: " + url)
         return
 
     if not is_zipfile(packageFile):
-        logging.critical("Not a valid KMP package: " + url)
+        logging.error("Not a valid KMP package: " + url)
         return
 
     if packageFile and not _install_package(packageFile, bcp47):
