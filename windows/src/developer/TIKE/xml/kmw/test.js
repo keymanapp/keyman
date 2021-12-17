@@ -2,6 +2,13 @@ const keyboardSelect = document.getElementById('keyboard-select');
 const ta1 = document.getElementById('ta1');
 const charGrid = document.getElementById('character-grid');
 
+// this needs to be defined before we load inc/keyboards.js
+var debugKeyboards = [];
+
+var firstModel = true;
+var modelList = document.getElementById('model-list');
+let registeredModels = {};
+
 keyman.addEventListener('keyboardregistered', function(keyboardProperties) {
   console.log('keyboardregistered:'+JSON.stringify(keyboardProperties)+' [active='+keyman.getActiveKeyboard()+';'+keyman.core.activeKeyboard+']');
   buildKeyboardList();
@@ -248,11 +255,60 @@ keyboardSelect.addEventListener('change', function() {
   ta1.focus();
 });
 
-/* Lexical models */
+/* Poll for new keyboards */
 
-var firstModel = true;
-var modelList = document.getElementById('model-list');
-let registeredModels = {};
+let currentKeyboardModelScript = null;
+
+function unloadKeyboardsAndModels() {
+  let keyboards = keyman.getKeyboards().map(e => e.Name);
+  keyman.removeKeyboards(...keyboards);
+  for(let keyboard of keyboards) {
+    if(window['Keyboard_'+keyboard])
+      delete window['Keyboard_'+keyboard];
+  }
+
+  const lastModel = keyman.core.activeModel;
+  if(lastModel) {
+    keyman.modelManager.deregister(lastModel.id);
+  }
+
+  modelList.innerHTML = "<option value=''>(no model)</option>";
+
+  //let models = keyman.modelManager.registeredModels
+}
+
+function checkKeyboardsAndModels(shouldReload) {
+  var req=new XMLHttpRequest();
+  req.onreadystatechange = function() {
+    if (req.readyState==4) {
+      if (req.status==200) {
+        if(req.responseText !== currentKeyboardModelScript) {
+          currentKeyboardModelScript = req.responseText;
+          if(shouldReload) {
+            // we need to force a reload of the keyboards...
+            const currentKeyboard = keyman.getActiveKeyboard();
+            const lastModel = keyman.core.activeModel;
+            unloadKeyboardsAndModels();
+            eval(req.responseText);
+            keyman.setActiveKeyboard(currentKeyboard);
+            if(lastModel) {
+              selectModel(lastModel.id);
+              modelList.value = lastModel.id;
+            }
+          }
+        }
+      }
+    }
+  }
+  req.open("GET", "/inc/keyboards.js", true);
+  req.send(null);
+}
+
+checkKeyboardsAndModels(false);
+
+window.setInterval(function() { checkKeyboardsAndModels(true); }, 2000);
+
+/* Lexical models */
 
 /**
  * Register a model for debugging. Called by keyboards.js. The
@@ -302,6 +358,6 @@ function selectModel(modelId) {
  */
 function selectRecentModel() {
   const model = window.sessionStorage.getItem('current-model');
-  document.getElementById('model-list').value = model;
+  modelList.value = model;
   selectModel(model ? model : '');
 }

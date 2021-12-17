@@ -1,22 +1,6 @@
 // The following dynamic script will register each of the additional packages
 var packagesJSON = '';
 
-function ajaxRequest(){
-  var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE
-  if (window.ActiveXObject) { //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
-    for (var i=0; i<activexmodes.length; i++) {
-      try {
-        return new ActiveXObject(activexmodes[i]);
-      } catch(e) {
-        //suppress error
-      }
-    }
-  } else if (window.XMLHttpRequest) { // if Mozilla, Safari etc
-    return new XMLHttpRequest();
-  }
- return false;
-}
-
 function updatePackages(data) {
   var dataJSON = JSON.stringify(data);
   if(packagesJSON !== dataJSON) {
@@ -65,7 +49,7 @@ function updatePackages(data) {
 }
 
 function checkPackages() {
-  var req=new ajaxRequest();
+  var req=new XMLHttpRequest();
   req.onreadystatechange = function() {
     if (req.readyState==4) {
       if (req.status==200) {
