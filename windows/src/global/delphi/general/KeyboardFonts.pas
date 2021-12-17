@@ -32,6 +32,10 @@ type
     Enabled: Boolean;
   end;
 
+const
+  KeyboardFontId: array[TKeyboardFont] of string = (
+    'Code', 'Char', 'Osk', 'TouchLayoutPhone', 'TouchLayoutTablet', 'TouchLayoutDesktop'
+  );
 implementation
 
 end.
