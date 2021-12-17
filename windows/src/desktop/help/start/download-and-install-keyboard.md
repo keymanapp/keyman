@@ -71,6 +71,11 @@ Here's how to download and install a Keyman keyboard within Keyman:
 
     ![](../desktop_images/download-keyboard-step6.png)
 
+    **Note:** If you have a separate administrator account -- that is, you are
+    prompted to enter a username and password at this point -- you may need to
+    [add a language association](configure-computer) for your keyboard on your
+    user account after completing the keyboard installation.
+
 10. The keyboard will now be installed; you can close Keyman Configuration.
 
 ## Installing a Keyman Keyboard from a Folder on Your Computer
