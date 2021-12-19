@@ -13,17 +13,17 @@
 build: dirs
     $(MAKE) install-paths
     $(MAKE) build-jvcl-docking
-    #$(MAKE) build-jcldbg
+#$(MAKE) build-jcldbg
     $(MAKE) install-packages
 
 build-jcldbg:
   rem
-    # This needs to be called separately so we get the updated include path jedi-includes
-    # It also needs to be called after make install
+# This needs to be called separately so we get the updated include path jedi-includes
+# It also needs to be called after make install
 #    cd $(EXT)\jedi\jcl\jcl\examples\windows\debug\tools
 
-    # We use a direct build to ignore platform warnings
-    # as we don't control the source of this code
+# We use a direct build to ignore platform warnings
+# as we don't control the source of this code
 
 #    $(MAKEDIR)\dcc32.exe $(DELPHIDPRPARAMS) makejcldbg.dpr
 #    $(COPY) makejcldbg.exe $(PROGRAM)\buildtools

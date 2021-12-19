@@ -15,10 +15,10 @@ EXCLUDEPATHDEFINES=1
 !include ..\..\Defines.mak
 
 build: dirs
-    # build with DCC32PATH as $DCC32 command uses devtools.exe...
-    # $(DCC32) devtools.dpr
+# build with DCC32PATH as $DCC32 command uses devtools.exe...
+# $(DCC32) devtools.dpr
     $(DELPHI_MSBUILD) devtools.dproj
-    #"$(DCC32PATH)\dcc32.exe" -Q -B -E. -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win devtools.dpr
+#"$(DCC32PATH)\dcc32.exe" -Q -B -E. -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win devtools.dpr
     $(COPY) $(WIN32_TARGET_PATH)\devtools.exe $(PROGRAM)\buildtools
 
 test-releasebuildcheck: build

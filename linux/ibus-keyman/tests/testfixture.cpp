@@ -347,6 +347,7 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
       keyman_put_options_todconf(data->test_name, data->test_name, key, value);
     }
   }
+  g_settings_sync();
 
   switch_keyboard(fixture, kmxfile.c_str());
   if (test_source.caps_lock_state() != get_caps_lock_state(fixture)) {

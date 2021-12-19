@@ -64,3 +64,14 @@ sudo dpkg --purge ibus-kmfl libkmfl
 
 **A.** Most keyboards will work without change. A small subset of keyboards require features which
 are not yet available in Keyman for Linux. These features will be progressively implemented.
+
+## Q. How can I disable automatically reporting errors?
+
+**A.** If Keyman crashes, it will automatically send a report to the development team. This report
+is anonymous and contains only technical details relating to the crash. It does not include keystroke
+data or personally identifying data. If you don't want these automatic error reports to be sent you
+can set the environment variable `KEYMAN_NOSENTRY`:
+
+```bash
+export KEYMAN_NOSENTRY=1
+```

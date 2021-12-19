@@ -7,24 +7,24 @@
   <project_group>Keyman</project_group>
   <developer_name>SIL International</developer_name>
   <icon type="remote" width="96" height="96">https://keyman.com/cdn/dev/img/keyman-logo.png</icon>
-  <name>Keyman Keyboards</name>
-  <summary>Keyman makes it possible for you to type in over 1,000 languages</summary>
+  <name>Keyman for Linux</name>
+  <summary>Keyman makes it possible for you to type in over 2,000 languages</summary>
 
   <description>
     <p>
-Keyman makes it possible for you to type in over 1,000 languages on Windows, macOS, Linux,
+Keyman makes it possible for you to type in over 2,000 languages on Windows, macOS, Linux,
 iPhone, iPad, Android tablets and phones, and even instantly in your web browser. With the
 world’s most powerful keyboarding engine, intuitive and rapid text input is now possible in
 your language, and for over 99% of the global population’s mother tongues!
 </p>
     <p>
- Originally created in 1993 to type Lao on Windows, Keyman is now a free and
-open source keyboarding platform which allows anyone to write a keyboard layout
+Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+open source keyboarding platform which allows anyone to write and use a keyboard layout
 for their language. Keyman is available for many platforms, including Windows,
 macOS, iOS, Android, Linux and the web.
 </p>
     <p>
- Keyboard layouts are defined with a clear and easy to understand keyboard
+Keyboard layouts are defined with a clear and easy to understand keyboard
 grammar. Keyman's contextual input model means keyboard layouts can be
 intelligent and make it simple to type even the most complex languages.
 Keyboard layouts are distributed through an open catalog to all major desktop
@@ -39,7 +39,7 @@ and mobile platforms.
 
   <screenshots>
     <screenshot type="default">
-      <caption>The Keyman Keyboards main window with a keyboard welcome window.</caption>
+      <caption>The Keyman for Linux configuration window with a keyboard welcome window.</caption>
       <image type="source" width="920" height="518">https://keyman.com/go/linux/11.0/linux-configuration.png</image>
     </screenshot>
   </screenshots>

@@ -89,6 +89,8 @@ type
     property ShowTitle: Boolean read FShowTitle write FShowTitle default True;
   end;
 
+procedure Register;
+
 implementation
 
 uses
@@ -281,6 +283,11 @@ begin
   inherited Loaded;
   if FInitialDir = '' then
     FInitialDir := GetPath(FRoot);
+end;
+
+procedure Register;
+begin
+  RegisterComponents('Keyman', [TBrowse4Folder]);
 end;
 
 initialization

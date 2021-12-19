@@ -8,10 +8,12 @@
 
 all: keyman-components
 
+build: keyman-components
+
 # ----------------------------------------------------------------------
 
 keyman-components: dirs compile install
-    # $(COPY) keyman_components.bpl $(OUTLIB)
+# $(COPY) keyman_components.bpl $(OUTLIB)
 
 compile:
     @-mkdir obj\Win32\$(TARGET_PATH)

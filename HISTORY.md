@@ -1,5 +1,32 @@
 # Keyman Version History
 
+## 15.0.170 alpha 2021-12-16
+
+* docs(linux): Document how to disable error reporting (#6051)
+* fix(linux): fix release version number for Sentry reporting (#6052)
+* fix(linux): Fix package description (#6054)
+
+## 15.0.169 alpha 2021-12-15
+
+* fix(mac): display Unicode package name correctly instead of '????' (#6016)
+* fix(linux): Improve ibus-keyman tests (#6044)
+
+## 15.0.168 alpha 2021-12-14
+
+* feat(linux): Add support for Ubuntu 22.04 Jammy (#6037)
+
+## 15.0.167 alpha 2021-12-13
+
+* fix(windows): remove unused variable (#6039)
+
+## 15.0.166 alpha 2021-12-11
+
+* chore(windows): version.rc use macros instead of mkver (#6019)
+* chore(windows): move from Borland make to nmake (#6020)
+* chore(windows): use findstr instead of Borland grep (#6021)
+* chore(windows): replace mkver with mkver.sh (#6022)
+* chore(windows): build without delphi (#6030)
+
 ## 15.0.165 alpha 2021-12-08
 
 * fix(web): font size was not consistently set (#5906)

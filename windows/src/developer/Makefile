@@ -2,8 +2,12 @@
 # Keyman dev Makefile
 #
 
-
+!ifdef NODELPHI
+TARGETS=kmcmpdll kmanalyze kmdecomp
+!else
 TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp
+!endif
+
 MANIFESTS=kmcomp tike setup
 CLEANS=clean-developer
 
@@ -11,15 +15,15 @@ CLEANS=clean-developer
 
 # ----------------------------------------------------------------------
 
-imsample:
+imsample: .virtual
     cd $(ROOT)\src\developer\imsample
     $(MAKE) $(TARGET)
 
-kmcmpdll:
+kmcmpdll: .virtual
     cd $(ROOT)\src\developer\kmcmpdll
     $(MAKE) $(TARGET)
 
-kmdecomp:
+kmdecomp: .virtual
     cd $(ROOT)\src\developer\kmdecomp
     $(MAKE) $(TARGET)
 
@@ -27,11 +31,11 @@ kmcomp: kmcmpdll
     cd $(ROOT)\src\developer\kmcomp
     $(MAKE) $(TARGET)
 
-kmanalyze:
+kmanalyze: .virtual
     cd $(ROOT)\src\developer\kmanalyze
     $(MAKE) $(TARGET)
 
-kmconvert:
+kmconvert: .virtual
     cd $(ROOT)\src\developer\kmconvert
     $(MAKE) $(TARGET)
 
@@ -39,11 +43,11 @@ tike: kmcmpdll redist
     cd $(ROOT)\src\developer\tike
     $(MAKE) $(TARGET)
 
-samples:
+samples: .virtual
     cd $(ROOT)\src\developer\samples
     $(MAKE) $(TARGET)
 
-setup:
+setup: .virtual
     cd $(ROOT)\src\developer\setup
     $(MAKE) $(TARGET)
 

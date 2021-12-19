@@ -9,31 +9,29 @@
 DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj kmlmc.wixobj
 
 setup:
-
-    #
-    # Prepare file version information
-    #
-
+#
+# Prepare file version information
+#
     cd $(ROOT)\src\developer\inst
     $(MKVER_U) download.in download.mak
 
-    #
-    # Build the installation archive
-    #
+#
+# Build the installation archive
+#
 
     $(MAKE) -fdownload.mak candle
     $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf -out keymandeveloper.msi -ext WixUIExtension $(DEVELOPER_FILES)
     $(MAKE) -fdownload.mak clean-heat
 
-    #
-    # Sign the installation archive
-    #
+#
+# Sign the installation archive
+#
 
     $(SIGNCODE) /d "Keyman Developer" keymandeveloper.msi
 
-    #
-    # Copy the installation archive
-    #
+#
+# Copy the installation archive
+#
 
     cd $(ROOT)\src\developer\inst
     $(MAKE) -fdownload.mak

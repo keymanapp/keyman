@@ -21,19 +21,18 @@ manual-setup: check setup
 setup: desktop
 
 prereq:
-    #
-    # Prepare make file to copy versioned filenames to release folder
-    #
-
+#
+# Prepare make file to copy versioned filenames to release folder
+#
     cd $(FVROOT)\src\inst
     $(MKVER_U) download.in download.mak
 
     cd $(FVROOT)\src\xml
     $(MKVER_U) sentry.init.js.in sentry.init.js
 
-    #
-    # Build FirstVoices keyboards fv_all.kmp
-    #
+#
+# Build FirstVoices keyboards fv_all.kmp
+#
 
     cd $(KEYMAN_ROOT)\..\keyboards
 

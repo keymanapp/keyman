@@ -13,7 +13,7 @@ test: build
     -$(WIN32_TARGET_PATH)\kmxfilelanguagestestsuite.exe -b -exit:continue
 
 build:
-    $(DELPHI_MSBUILD) /p:CI=CI kmxfilelanguagestestsuite.dproj
+    $(DELPHI_MSBUILD) "/p:CI=CI" kmxfilelanguagestestsuite.dproj
 
 clean: def-clean
 

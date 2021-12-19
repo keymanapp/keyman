@@ -8,6 +8,8 @@
 
 #import "KMInfoWindowController.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMPackageInfo.h"
+#import "KMKeyboardInfo.h"
 #import <WebKit/WebKit.h>
 
 @interface KMInfoWindowController ()
@@ -15,7 +17,7 @@
 @property (nonatomic, weak) IBOutlet NSTabView *tabView;
 @property (nonatomic, weak) IBOutlet WebView *detailsView;
 @property (nonatomic, weak) IBOutlet WebView *readmeView;
-@property (nonatomic, strong) NSDictionary *infoDict;
+@property (nonatomic, strong) KMPackageInfo *packageInfo;
 @property (nonatomic, strong) NSTabViewItem *readMeTab;
 @end
 
@@ -27,6 +29,8 @@
 
 - (void)windowDidLoad {
     [super windowDidLoad];
+    // TODO: rename
+    [self.window setTitle:@"Keyboard/Package Info"];
     [self.tabView setDelegate:self];
     [self.detailsView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
     [self.detailsView setPolicyDelegate:(id<WebPolicyDelegate>)self];
@@ -34,12 +38,13 @@
     [self.readmeView setPolicyDelegate:(id<WebPolicyDelegate>)self];
 }
 
+// TODO: rename, refactor, reset PackageInfo directly rather than making getter do it?
 - (void)setPackagePath:(NSString *)packagePath {
     _packagePath = packagePath;
-    _infoDict = nil;
+    _packageInfo = nil;
     [self.tabView selectTabViewItemAtIndex:0];
     if (packagePath != nil && packagePath.length) {
-        NSString *imgName = [self.infoDict objectForKey:kGraphicFile];
+        NSString *imgName = self.packageInfo.graphicFilename;
         if (imgName != nil) {
             NSString *imgFile = [packagePath stringByAppendingPathComponent:imgName];
             NSImage *img = [[NSImage alloc] initWithContentsOfFile:imgFile];
@@ -55,9 +60,9 @@
         else
             [self.detailsView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
         
-        NSString *readMeFile = [self.infoDict objectForKey:kReadMeFile];
-        if (readMeFile != nil) {
-            [self.readmeView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[packagePath stringByAppendingPathComponent:readMeFile]]]];
+        NSString *readmeFilename = self.packageInfo.readmeFilename;
+        if (readmeFilename != nil) {
+            [self.readmeView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[packagePath stringByAppendingPathComponent:readmeFilename]]]];
             if (_readMeTab != nil && ![self.tabView.tabViewItems containsObject:_readMeTab]) {
                 [self.tabView addTabViewItem:_readMeTab];
                 _readMeTab = nil;
@@ -120,33 +125,22 @@
         "</html>";
         
         NSString *pBodyFormat = @"<p class='body'>%@</p><br>";
-        NSMutableString *kbsStr = [NSMutableString stringWithString:@""];
-        NSArray *kbs = [[self AppDelegate] keyboardNamesFromFolder:self.packagePath];
-        if (kbs != nil && kbs.count) {
-            for (NSArray *kbName in kbs) {
-                [kbsStr appendString:[NSString stringWithFormat:pBodyFormat, kbName]];
-            }
-        }
-        else {
-            // This was the old logic (prior to fixing issue #994). Keeping as fallback, though
-            // it's unlikely to be useful/needed.
-            kbs = [self.infoDict objectForKey:kKeyboard];
+        NSMutableString *keyboardString = [NSMutableString stringWithString:@""];
         
-            if (kbs != nil && kbs.count) {
-                for (NSArray *kb in kbs) {
-                    [kbsStr appendString:[NSString stringWithFormat:pBodyFormat, [kb objectAtIndex:0]]];
-                }
+        if (self.packageInfo.keyboards.count) {
+            for (KMKeyboardInfo *keyboard in self.packageInfo.keyboards) {
+                [keyboardString appendString:[NSString stringWithFormat:pBodyFormat, keyboard.name]];
             }
-            else {
-                kbsStr = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
-            }
+        } else {
+            keyboardString = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
         }
-        
-        NSArray *fonts = [self.infoDict objectForKey:kFont];
+
+        NSArray *fonts = self.packageInfo.fonts;
         NSMutableString *fontsStr = [NSMutableString stringWithString:@""];
+        
         if (fonts != nil && fonts.count) {
-            for (NSArray *font in fonts) {
-                [fontsStr appendString:[NSString stringWithFormat:pBodyFormat, [font objectAtIndex:0]]];
+           for (NSString *font in fonts) {
+                [fontsStr appendString:[NSString stringWithFormat:pBodyFormat, font]];
             }
         }
         else {
@@ -158,16 +152,17 @@
 
         KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
         NSString *shareUrl = [NSString stringWithFormat:@"https://%@/go/keyboard/%@/share", keymanVersionInfo.keymanCom, packageId];
-        NSString *name = [[self.infoDict objectForKey:kName] objectAtIndex:0];
+        
+        NSString *name = self.packageInfo.packageName;
         if (name == nil)
             name = @"Unknown Keyboard Package";
         
-        NSString *version = [[self.infoDict objectForKey:kVersion] objectAtIndex:0];
+        NSString *version = self.packageInfo.packageVersion;
         if (version == nil)
             version = @"";
         
-        NSString *authorV1 = [[self.infoDict objectForKey:kAuthor] objectAtIndex:0];
-        NSString *authorV2 = [[self.infoDict objectForKey:kAuthor] objectAtIndex:1];
+        NSString *authorV1 = self.packageInfo.authorName;
+        NSString *authorV2 = self.packageInfo.authorUrl;
         NSString *author = @"";
         if (authorV1.length && authorV2.length)
             author = [NSString stringWithFormat:linkFormat, authorV2, authorV1];
@@ -175,29 +170,17 @@
             author = authorV1;
         else if (authorV2.length)
             author = [NSString stringWithFormat:linkFormat, authorV2, authorV2];
-        
-        NSString *websiteV1 = [[self.infoDict objectForKey:kWebSite] objectAtIndex:0];
-        NSString *websiteV2 = [[self.infoDict objectForKey:kWebSite] objectAtIndex:1];
+
         NSString *website = @"";
-        if (websiteV1.length && websiteV2.length)
-            website = [NSString stringWithFormat:linkFormat, websiteV2, websiteV1];
-        else if (websiteV1.length)
-            website = websiteV1;
-        else if (websiteV2.length)
-            website = [NSString stringWithFormat:linkFormat, websiteV2, websiteV2];
+        if (self.packageInfo.website.length)
+            website = [NSString stringWithFormat:linkFormat, self.packageInfo.website, self.packageInfo.website];
         
-        NSString *copyrightV1 = [[self.infoDict objectForKey:kCopyright] objectAtIndex:0];
-        NSString *copyrightV2 = [[self.infoDict objectForKey:kCopyright] objectAtIndex:1];
         NSString *copyright = @"";
-        if (copyrightV1.length && copyrightV2.length)
-            copyright = [NSString stringWithFormat:linkFormat, copyrightV2, copyrightV1];
-        else if (copyrightV1.length)
-            copyright = copyrightV1;
-        else if (copyrightV2.length)
-            copyright = [NSString stringWithFormat:linkFormat, copyrightV2, copyrightV2];
+        if (self.packageInfo.copyright.length)
+            copyright = self.packageInfo.copyright;
         
         NSString *htmlStr = [NSString stringWithFormat:htmlFormat, name, shareUrl, shareUrl,
-                             kbsStr, fontsStr, version, author, website, copyright];
+                             keyboardString, fontsStr, version, author, website, copyright];
         
         return htmlStr;
     }
@@ -207,13 +190,12 @@
     }
 }
 
-- (NSDictionary *)infoDict {
-    if (_infoDict == nil) {
-        NSString *infoFile = [self.packagePath stringByAppendingPathComponent:@"kmp.inf"];
-        _infoDict = [self.AppDelegate infoDictionaryFromFile:infoFile];
+- (KMPackageInfo *)packageInfo {
+    if(_packageInfo == nil) {
+        _packageInfo = [self.AppDelegate loadPackageInfo:self.packagePath];
     }
-    
-    return _infoDict;
+        
+    return _packageInfo;
 }
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {

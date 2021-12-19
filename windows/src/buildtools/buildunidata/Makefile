@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 build: dirs version.res
-    $(DELPHI_MSBUILD) buildunidata.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) buildunidata.dproj "/p:Platform=Win32"
     $(COPY) $(WIN32_TARGET_PATH)\buildunidata.exe $(PROGRAM)\buildtools
 
 run:

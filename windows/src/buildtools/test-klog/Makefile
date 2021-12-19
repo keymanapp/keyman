@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 verify: clean
-    $(DELPHI_MSBUILD) test_klog.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) test_klog.dproj "/p:Platform=Win32"
     $(WIN32_TARGET_PATH)\test_klog
 
 build:

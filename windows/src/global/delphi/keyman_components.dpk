@@ -75,6 +75,7 @@ contains
   KeymanVersion in 'general\KeymanVersion.pas',
   CloseButtonPageControl in 'comp\CloseButtonPageControl.pas',
   KeymanDeveloperDebuggerMemo in 'comp\KeymanDeveloperDebuggerMemo.pas',
-  TextFileFormat in '..\..\developer\TIKE\main\TextFileFormat.pas';
+  TextFileFormat in '..\..\developer\TIKE\main\TextFileFormat.pas',
+  Browse4Folder in '..\..\ext\browse4folder\Browse4Folder.pas';
 
 end.

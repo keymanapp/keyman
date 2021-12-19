@@ -3,9 +3,9 @@
 #
 !include ..\..\defines.mak
 
-build: mkver-app
+build:
   cd $(ROOT)\src\global\help
-  $(MKVER_U) version.in version.out
+  $(MKVER_U) version.php.in version.out
 
 clean:
   -del version.out

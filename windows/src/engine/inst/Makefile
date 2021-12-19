@@ -23,34 +23,31 @@ wrap-symbols:
     $(MAKE) symbols
 
 msm:
-    #
-    # Copy files for installation
-    #
-
+#
+# Copy files for installation
+#
     $(MKVER_U) download.in download.mak
 
-    #
-    # Make the installation archive
-    #
+#
+# Make the installation archive
+#
 
     $(MAKE) -fdownload.mak prepareredist
     $(MAKE) -fdownload.mak candle
 
-    # warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
+# warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
     $(WIXLIGHT) -sw1072 -ext WixUtilExtension $(ENGINE_FILES) -o keymanengine.msm
 
 copy:
-    #
-    # Sign the installation archive
-    #
-
+#
+# Sign the installation archive
+#
     cd $(ROOT)\src\engine\inst
     $(SIGNCODE) /d "Keyman Engine" keymanengine.msm
 
-    #
-    # Copy the installation archive
-    #
-
+#
+# Copy the installation archive
+#
     cd $(ROOT)\src\engine\inst
     copy $(ROOT)\src\engine\inst\keymanengine.msm $(ROOT)\bin\developer\wix
     $(MAKE) -fdownload.mak copyredist
