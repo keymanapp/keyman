@@ -159,14 +159,14 @@ extern "C"
   }
 };
 
-void test_imx_list(const km::kbp::path &source_path){
+void test_imx_list(const km::kbp::path &source_file){
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
   km_kbp_keyboard_imx * kb_imx_list;
 
-  km::kbp::path const source_keybard = "kmx_imsample.kmx";
-  km::kbp::path full_path = km::kbp::path::join(source_path, source_keybard);
+
+  km::kbp::path full_path = source_file;
 
   try_status(km_kbp_keyboard_load(full_path.native().c_str(), &test_kb));
 
@@ -206,15 +206,13 @@ void test_imx_list(const km::kbp::path &source_path){
 // the kmx processor will add this items to its action queue.
 // Finally when the `process_event` call returns we verify the action
 // queue is as expected.
-void test_queue_actions (const km::kbp::path &source_path) {
+void test_queue_actions (const km::kbp::path &source_keybard) {
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
   km_kbp_keyboard_imx * kb_imx_list;
 
-  km::kbp::path const source_keybard = "kmx_imsample.kmx";
-
-  km::kbp::path full_path = km::kbp::path::join(source_path, source_keybard);
+  km::kbp::path full_path = source_keybard;
 
   try_status(km_kbp_keyboard_load(full_path.native().c_str(), &test_kb));
 

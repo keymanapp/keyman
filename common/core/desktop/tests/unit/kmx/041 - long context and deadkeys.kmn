@@ -10,6 +10,9 @@ begin Unicode > use(Main)
 
 group(Main) using keys
 
+c Setup
++ [K_Z] > dk(1) 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh'
+
 c Test 1
 dk(1) 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh' + '1' > context '1'
 
