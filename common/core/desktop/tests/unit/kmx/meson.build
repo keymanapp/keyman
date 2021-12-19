@@ -227,11 +227,26 @@ endif
 
 # test for imx list
 
-imx_e = executable('imx_list', 'kmx-imx.cpp',
+imx_e = executable('imx_list', 'kmx_imx.cpp',
                 cpp_args: defns,include_directories: [inc, libsrc],
                 link_args: links,
                 dependencies: [rust_mock_processor],
                 objects: lib.extract_all_objects())
-test('imx_list', imx_e, args: [test_path] )
+
+test_kbd = 'kmx_imsample'
+if kmcomp.found()
+  kbd_src = files(test_kbd + '.kmn')
+  kbd_obj = join_paths(meson.current_source_dir(), test_kbd) + '.kmx'
+  kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
+    output: test_kbd + '.log',
+    input: kbd_src,
+    command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
+  )
+    test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
+else
+  kbd_obj = join_paths(meson.current_source_dir(), test_kbd) + '.kmx'
+  test('imx_list', imx_e, args: [kbd_obj] )
+endif
+
 
 
