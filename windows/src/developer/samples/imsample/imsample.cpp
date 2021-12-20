@@ -657,7 +657,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMConfigure(PSTR keyboardname
 void WriteRegSetting(PSTR text, int value)
 {
 	HKEY hkey;
-  if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\impsample", 
+  if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample", 
 		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
 	{
 		RegSetValueEx(hkey, text, 0, REG_DWORD, (PBYTE) &value, 4);
@@ -668,7 +668,7 @@ void WriteRegSetting(PSTR text, int value)
 int ReadRegSetting(PSTR text)
 {
 	HKEY hkey;
-	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\impsample", 
+	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample", 
 		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
 	{
 		unsigned long value, sz = 4, tp = REG_DWORD;
@@ -791,9 +791,6 @@ PWSTR extstr(char *p)
 void UnloadRules(PSTR KeyboardName)
 {
 	int nkbi;
-  if (nkeyboards == 0) {
-    return;
-  }
 	for(nkbi = 0; nkbi < nkeyboards; nkbi++)
 		if(!_stricmp(KeyboardName, keyboards[nkbi].name)) break;
 
