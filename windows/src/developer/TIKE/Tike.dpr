@@ -239,7 +239,6 @@ uses
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
-  Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
   Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
   Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas',
   Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas',
@@ -295,7 +294,9 @@ uses
   Keyman.Developer.System.KeymanDeveloperPaths in 'main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
   Keyman.Developer.System.ValidateKpsFile in '..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas',
   Keyman.Developer.System.HttpServer.NGrokIntegration in 'web\Keyman.Developer.System.HttpServer.NGrokIntegration.pas',
-  Keyman.Developer.UI.UfrmNGrokOptions in 'dialogs\Keyman.Developer.UI.UfrmNGrokOptions.pas' {frmNgrokOptions};
+  Keyman.Developer.UI.UfrmNGrokOptions in 'dialogs\Keyman.Developer.UI.UfrmNGrokOptions.pas' {frmNgrokOptions},
+  Keyman.Developer.System.KMDevServerAPI in 'http\Keyman.Developer.System.KMDevServerAPI.pas',
+  Keyman.System.FontLoadUtil in 'main\Keyman.System.FontLoadUtil.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

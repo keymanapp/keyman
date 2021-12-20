@@ -11,13 +11,48 @@ type
   TKeymanDeveloperPaths = class sealed
   private
   public
+    class function NodePath: string; static;
+
     const S_LexicalModelCompiler = 'kmlmc.cmd';
     class function LexicalModelCompilerPath: string; static;
+
+    const S_ServerConfigJson = 'config.json';
+    class function KMDevServerDataPath: string; static;
+    class function KMDevServerPath: string; static;
   end;
 
 implementation
 
+uses
+  Winapi.ShlObj,
+
+  RegistryKeys,
+  utilsystem;
+
 { TKeymanDeveloperPaths }
+
+class function TKeymanDeveloperPaths.NodePath: string;
+var
+  KeymanRoot: string;
+begin
+  if TKeymanPaths.RunningFromSource(KeymanRoot)
+    then Result := KeymanRoot + 'developer\inst\dist\node.exe'
+    else Result := ExtractFilePath(ParamStr(0)) + 'node.js\node.exe';
+end;
+
+class function TKeymanDeveloperPaths.KMDevServerDataPath: string;
+begin
+  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\server\';
+end;
+
+class function TKeymanDeveloperPaths.KMDevServerPath: string;
+var
+  KeymanRoot: string;
+begin
+  if TKeymanPaths.RunningFromSource(KeymanRoot)
+    then Result := KeymanRoot + 'developer\kmdev-server\'
+    else Result := ExtractFilePath(ParamStr(0)) + 'server\';
+end;
 
 class function TKeymanDeveloperPaths.LexicalModelCompilerPath: string;
 var

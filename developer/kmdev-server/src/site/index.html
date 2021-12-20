@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+
+    <!-- Set the viewport width to match iOS device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <title>Keyman Developer Keyboard Test Site</title>
+
+    <script src="lib/sentry/bundle.min.js"></script>
+    <script src="lib/sentry/init.js"></script>
+    <script src="lib/websockhop/websockhop.min.js"></script>
+    <script src="resource/keymanweb.js"></script>
+
+    <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="lib/bootstrap/css/bootstrap-icons.css" rel="stylesheet" />
+    <link href='test.css' type="text/css" rel="stylesheet" />
+    <link href="inc/keyboards.css" type="text/css" rel="stylesheet" /> <!-- This script loads the dynamic keyboard fonts -->
+  </head>
+
+  <body class='osk-always-visible'>
+
+    <header class='navbar navbar-dark bg-dark text-white'>
+      <div class='container-fluid'>
+        <div class='row'>
+          <div class='col-md-auto'>
+            <div class="dropdown" id="dropdown-keyboard">
+              <button id="btn-keyboard" class="btn btn-sm bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Keyboard
+                <span class="bi-caret-down-fill"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="btn-keyboard">
+              </ul>
+            </div>
+          </div>
+
+          <div class='col-md-auto'>
+            <div class="dropdown" id="dropdown-model">
+              <button id="btn-model" class="btn btn-sm bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Model
+                <span class="bi-caret-down-fill"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="btn-model">
+                <li><button class="dropdown-item" type="button" data-model=''>(no model)</button></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class='col-md-auto'>
+            <div class="dropdown" id="dropdown-device">
+              <button id="btn-device" class="btn btn-sm bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Device
+                <span class="bi-caret-down-fill"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="btn-device">
+                <li><button class="dropdown-item" type="button" data-device='Windows'>Windows desktop</button></li>
+                <li><button class="dropdown-item" type="button" data-device='iPhone'>iPhone</button></li>
+                <li><button class="dropdown-item" type="button" data-device='iPadMini'>iPad Mini</button></li>
+                <li><button class="dropdown-item" type="button" data-device='SamsungGalaxyS5'>Samsung Galaxy S5</button></li>
+                <li><button class="dropdown-item" type="button" data-device='SamsungTablet'>Samsung Tablet</button></li>
+                <li><button class="dropdown-item" type="button" data-device='macOS'>macOS desktop</button></li>
+                <li><button class="dropdown-item" type="button" data-device='Linux'>Linux desktop</button></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class='col-md-auto'>
+            <form class="file-upload" id="drop-form">
+              <input type="file" id="drop-file" multiple accept="*" onchange="handleFiles(this.files)">
+              <input type="button" id="drop-button" class="btn btn-sm bg-light" value="Upload file">
+            </form>
+          </div>
+
+          <div class='col-md-auto'>
+
+            <div class="dropdown" id='dropdown-package'>
+              <button id="btn-package" class='btn btn-sm bg-warning' type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Install
+                <span class="bi-caret-down-fill"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="btn-package">
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class='container-fluid' id='drop-area'>
+      <div class='row'>
+        <div class='col'>
+          <h2>Keyman Developer Server - Keyboard Testing</h2>
+        </div>
+      </div>
+      <div class='row'>
+        <div class='col'>
+          <div id='content'>
+            <div id='character-grid'>
+              <!-- contains the breakdown of characters from the input-area -->
+            </div>
+            <div id='input-area'>
+              <textarea id='ta1' class='test'></textarea><br/>
+            </div>
+            <div id='osk-host-frame'>
+              <div id='osk-host'>
+                <!-- Contains the inline OSK -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='drop-image'></div>
+
+      <div class="position-absolute top-0 end-0 p-3 toast-container" id='toast-container' style="z-index: 11000">
+        <div id='toast-info-template' data-bs-dismiss="toast" class="toast text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+        <div id='toast-success-template' data-bs-dismiss="toast" class="toast text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+        <div id='toast-error-template' data-bs-dismiss="toast" class="toast text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src='test.js'></script>
+    <script src='packages.js'></script>
+    <script src='websocket.js'></script>
+    <script src='upload.js'></script>
+    <script src='chargrid.js'></script>
+    <!--<script src="inc/keyboards.js" type="text/javascript"></script> !-- This dynamic script registers each of the keyboards -->
+  </body>
+</html>

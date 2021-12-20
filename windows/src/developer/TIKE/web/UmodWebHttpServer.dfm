@@ -6,7 +6,7 @@ object modWebHttpServer: TmodWebHttpServer
   Width = 215
   object http: TIdHTTPServer
     Bindings = <>
-    DefaultPort = 8008
+    DefaultPort = 0
     KeepAlive = True
     OnCommandGet = httpCommandGet
     Left = 88

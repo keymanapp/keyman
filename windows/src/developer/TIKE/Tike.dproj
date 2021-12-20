@@ -480,7 +480,6 @@
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
-        <DCCReference Include="http\Keyman.Developer.System.HttpServer.Debugger.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.App.pas"/>
         <DCCReference Include="..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.AppSource.pas"/>
@@ -566,6 +565,8 @@
             <Form>frmNgrokOptions</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="http\Keyman.Developer.System.KMDevServerAPI.pas"/>
+        <DCCReference Include="main\Keyman.System.FontLoadUtil.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

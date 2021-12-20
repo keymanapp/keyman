@@ -1,0 +1,176 @@
+import express = require('express');
+import multer = require('multer');
+import ws = require('ws');
+import handleIncKeyboardsJs from './handlers/inc/keyboards-js';
+import { data, DebugFont, DebugKeyboard, DebugModel, DebugObject, DebugPackage } from './data';
+import apiGet from './handlers/api/debugobject/get';
+import apiRegister, { apiRegisterFile } from './handlers/api/debugobject/register';
+import apiKeyboardRegister from './handlers/api/keyboard/register';
+import apiUnregister from './handlers/api/debugobject/unregister';
+import handleIncPackagesJson from './handlers/inc/packages-json';
+import apiPackageRegister from './handlers/api/package/register';
+import handleIncKeyboardsCss from './handlers/inc/keyboards-css';
+import { Environment } from './environment';
+import { configuration } from './config';
+
+export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.Server, environment: Environment) {
+
+  /* Middleware - JSON and logging */
+
+  app.use(express.json()); // for parsing application/json
+
+  app.use(function (req, _res, next) {
+    // if(environment == Environment.Development) {
+      console.log(req.method + ' ' + req.path);
+    // }
+    next();
+  });
+
+  function localhostOnly(req: express.Request, res: express.Response, next: express.NextFunction) {
+    if(req.socket.remoteAddress != '127.0.0.1' && req.socket.remoteAddress != '::1') {
+      res.sendStatus(401);
+    } else {
+      next();
+    }
+  }
+
+  // Only allow connections from localhost to /api/
+  app.use('/api/', localhostOnly);
+
+  /* All routes */
+
+  app.use('/', express.static((environment == Environment.Development ? '' : '') + 'dist/site'));
+
+  app.post('/upload', localhostOnly, upload.single('file'), (req, res, next) => {
+    const name = req.file.originalname;
+    const rModel = /^([a-zA-Z0-9_\.-]+)\.model\.js$/.exec(name);
+    const rKeyboard = /^([a-zA-Z0-9_]+)\.js$/.exec(name);
+    const rPackage = /^([a-zA-Z0-9_]+)\.kmp$/.exec(name);
+    const rFont = /^(.+\.(ttf|otf))$/.exec(name);
+    if(rModel) {
+      apiRegisterFile(DebugModel, data.models, rModel[1], req.file.buffer);
+    } else if(rKeyboard) {
+      apiRegisterFile(DebugKeyboard, data.keyboards, rKeyboard[1], req.file.buffer);
+    } else if(rPackage) {
+      apiRegisterFile(DebugPackage, data.packages, rPackage[1], req.file.buffer);
+    } else if(rFont) {
+      apiRegisterFile(DebugFont, data.fonts, rFont[1], req.file.buffer);
+    } else {
+      res.status(400).json({message: 'unrecognised file type'});
+      return;
+    }
+
+    // fs.writeFileSync(o.filename, req.file.buffer);
+    // o.sha256 = crypto.createHash('sha256').update(req.file.buffer).digest('hex');
+
+    res.json({message: 'success'});
+    next();
+  },
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+
+  app.get('/inc/keyboards.js', handleIncKeyboardsJs);
+  app.get('/inc/keyboards.css', handleIncKeyboardsCss);
+  app.get('/inc/packages.json', handleIncPackagesJson);
+
+  app.post('/api/shutdown', (_req,res) => { setTimeout(() => process.exit(0), 100); res.send('ok'); });
+
+  appGetData(app, /\/data\/keyboard\/(.+)\.js$/, data.keyboards);
+  appGetData(app, /\/data\/model\/(.+)\.model\.js$/, data.models);
+  appGetData(app, /\/data\/package\/(.+)\.kmp$/, data.packages);
+  appGetData(app, /\/data\/font\/(.+)/, data.fonts);
+
+  app.get('/api/font', (req,res,next)=>apiGet(data.fonts,req,res,next));
+  app.post('/api/font/register',
+    upload.single('file'),
+    (req,res,next)=>apiRegister(DebugFont, data.fonts, req, res, next),
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+  app.post('/api/font/unregister',
+    (req,res,next)=>apiUnregister(data.fonts,req,res,next),
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+
+  app.get('/api/keyboard', (req,res,next)=>apiGet(data.keyboards,req,res,next));
+  app.post('/api/keyboard/register',
+    upload.single('file'),
+    (req,res,next)=>apiRegister(DebugKeyboard, data.keyboards, req, res, next),
+    apiKeyboardRegister,
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+  app.post('/api/keyboard/unregister',
+    (req,res,next)=>apiUnregister(data.keyboards,req,res,next),
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+
+  app.get('/api/model', (req,res,next)=>apiGet(data.models,req,res,next));
+  app.post('/api/model/register',
+    upload.single('file'),
+    (req,res,next)=>apiRegister(DebugModel, data.models, req, res, next),
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+  app.post('/api/model/unregister',
+    (req,res,next)=>apiUnregister(data.models,req,res,next),
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+
+  app.get('/api/package', (req,res,next)=>apiGet(data.packages,req,res,next));
+  app.post('/api/package/register',
+    upload.single('file'),
+    (req,res,next)=>apiRegister(DebugPackage, data.packages, req, res, next),
+    apiPackageRegister,
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+  app.post('/api/package/unregister',
+    (req,res,next)=>apiUnregister(data.packages,req,res,next),
+    saveState,
+    (req,res,next)=>notifyClients(wsServer,req,res,next)
+  );
+
+  /* ngrok data */
+
+  app.get('/api/status', (_req,res,next) => {
+    const response = { ngrokEnabled: configuration.useNgrok, ngrokEndpoint: configuration.ngrokEndpoint };
+    res.send(response);
+    next();
+  });
+}
+
+/* Utility functions */
+
+function notifyClients(wsServer: ws.Server, res: express.Request, req: express.Response, next: express.NextFunction) {
+  console.debug('notifyClients');
+  wsServer.clients.forEach(c => {
+    c.send('refresh', (err) => {
+      if(err) console.error('Websocket send error '+err.message);
+    });
+  });
+  next();
+}
+
+function saveState (res: express.Request, req: express.Response, next: express.NextFunction) {
+  data.saveState();
+  next();
+}
+
+function appGetData(app: express.Express, pathregex: RegExp,  root: { [id: string]: DebugObject }) {
+  app.get(pathregex, (req,res,next)=>{
+    const r = pathregex.exec(req.path);
+    // TODO: ensure path safety
+    const o = root[r ? r[1] : null];
+    if(!o) {
+      res.status(404).send('not found');
+    } else {
+      res.sendFile(o.filename, (err)=>{if(err) console.error(err)});
+    }
+  });
+}
+

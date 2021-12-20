@@ -66,22 +66,15 @@ pull-keymanweb:
 #
 # GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l
 #
-    cd $(ROOT)\..\web\source
+    cd $(ROOT)\..\developer\kmdev-server
 
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh -no_minify
+    $(GIT_BASH_FOR_KEYMAN) build.sh --production
 !else
-    start /wait ./build.sh -no_minify
+    start /wait ./build.sh --production
 !endif
 
-    -rd /s/q $(ROOT)\src\developer\tike\xml\kmw\resource
-    mkdir $(ROOT)\src\developer\tike\xml\kmw\resource
-    xcopy /i /y $(ROOT)\..\web\release\unminified\web\*.js $(ROOT)\src\developer\tike\xml\kmw\resource
-    xcopy /i /y $(ROOT)\..\web\release\unminified\web\*.js.map $(ROOT)\src\developer\tike\xml\kmw\resource
-    xcopy /i /y $(ROOT)\..\web\LICENSE $(ROOT)\src\developer\tike\xml\kmw\resource
-    xcopy /i /y $(ROOT)\..\web\README.md $(ROOT)\src\developer\tike\xml\kmw\resource
-    xcopy /i /s /y $(ROOT)\..\web\release\unminified\web\osk\* $(ROOT)\src\developer\tike\xml\kmw\resource\osk
-    xcopy /i /s /y $(ROOT)\..\web\release\unminified\web\ui\* $(ROOT)\src\developer\tike\xml\kmw\resource\ui
+# TODO: make sure files available for release build (move this to inst?)
 
 icons:
     rc icons.rc

@@ -267,6 +267,7 @@ uses
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.System.KMDevServerAPI,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProject,
@@ -686,7 +687,7 @@ end;
 procedure TmodActionsMain.actToolsClearCachedDebugObjectsExecute(
   Sender: TObject);
 begin
-  modWebHttpServer.Debugger.ClearCache;
+//  TKMDevServerDebugAPI.ClearCache; //TODO
 end;
 
 procedure TmodActionsMain.actToolsFileFormatExecute(Sender: TObject);
@@ -774,31 +775,27 @@ end;
 
 procedure TmodActionsMain.actToolsWebCopyPublicUrlExecute(Sender: TObject);
 begin
-  if Assigned(modWebHttpServer.NGrokIntegration) and
-      modWebHttpServer.NGrokIntegration.Connected then
-    Clipboard.AsText := modWebHttpServer.NGrokIntegration.Url;
+  Clipboard.AsText := TKMDevServerDebugAPI.ngrokEndpoint;
 end;
 
 procedure TmodActionsMain.actToolsWebCopyPublicUrlUpdate(Sender: TObject);
 begin
-  actToolsWebCopyPublicUrl.Enabled := Assigned(modWebHttpServer.NGrokIntegration) and
-    modWebHttpServer.NGrokIntegration.Connected;
+  TKMDevServerDebugAPI.UpdateStatus;
+  actToolsWebCopyPublicUrl.Enabled :=   TKMDevServerDebugAPI.ngrokEndpoint <> '';
 end;
 
 procedure TmodActionsMain.actToolsWebOpenPublicUrlExecute(Sender: TObject);
 begin
-  if Assigned(modWebHttpServer.NGrokIntegration) and
-      modWebHttpServer.NGrokIntegration.Running then
-    TUtilExecute.URL(modWebHttpServer.NGrokIntegration.Url);
+  TUtilExecute.URL(TKMDevServerDebugAPI.ngrokEndpoint);
 end;
 
 procedure TmodActionsMain.actToolsWebOpenPublicUrlUpdate(Sender: TObject);
 begin
-  actToolsWebOpenPublicUrl.Enabled := Assigned(modWebHttpServer.NGrokIntegration) and
-    modWebHttpServer.NGrokIntegration.Connected;
+  TKMDevServerDebugAPI.UpdateStatus;
+  actToolsWebOpenPublicUrl.Enabled := TKMDevServerDebugAPI.ngrokEndpoint <> '';
 
   if actToolsWebOpenPublicUrl.Enabled
-    then actToolsWebOpenPublicUrl.Caption := 'Open '+modWebHttpServer.NGrokIntegration.Url+' in browser'
+    then actToolsWebOpenPublicUrl.Caption := 'Open '+TKMDevServerDebugAPI.ngrokEndpoint+' in browser'
     else actToolsWebOpenPublicUrl.Caption := 'Open in browser';
 end;
 

@@ -1380,7 +1380,7 @@ procedure TfrmKeymanDeveloper.mnuToolsClick(Sender: TObject);
 begin
   mnuToolsDebugTests.Visible := (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0);
   mnuToolsDebugTestsShowDebuggerEventsPanel.Checked := TfrmDebugStatus.ShowDebuggerEventsPanel;
-  mnuToolsWebDebugger.Visible := Assigned(modWebHttpServer.NGrokIntegration);
+  mnuToolsWebDebugger.Visible := FKeymanDeveloperOptions.WebHostUseNGrok;
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectClick(Sender: TObject);
@@ -1532,7 +1532,7 @@ begin
     if ProjectForm <> nil then ProjectForm.RefreshOptions;
     if Assigned(frmMessages) then frmMessages.RefreshOptions;
     if Assigned(frmCharacterMapDock) then frmCharacterMapDock.RefreshOptions; // Recalculates grid after unicode data refresh
-    if Assigned(modWebHttpServer) then modWebHttpServer.RefreshOptions;
+//    if Assigned(modWebHttpServer) then modWebHttpServer.RestartServer;
   finally
     Screen.Cursor := crDefault;
   end;

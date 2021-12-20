@@ -19,7 +19,7 @@ inherited frmOptions: TfrmOptions
     Top = 8
     Width = 425
     Height = 392
-    ActivePage = tabGeneral
+    ActivePage = tabDebugger
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -339,47 +339,22 @@ inherited frmOptions: TfrmOptions
         Height = 138
         Caption = 'Web Host'
         TabOrder = 1
-        object lblWebHostDefaultPort: TLabel
-          Left = 8
-          Top = 31
-          Width = 55
-          Height = 13
-          Caption = '&Default port'
-        end
-        object editWebHostDefaultPort: TEdit
-          Left = 84
-          Top = 28
-          Width = 61
-          Height = 21
-          NumbersOnly = True
-          TabOrder = 0
-          OnKeyPress = editWebHostDefaultPortKeyPress
-        end
-        object chkUseNgrok: TCheckBox
-          Left = 8
-          Top = 78
-          Width = 257
-          Height = 17
-          Caption = 'Use &ngrok to provide public url for web debugger'
-          TabOrder = 2
-          OnClick = chkUseNgrokClick
-        end
         object chkListLocalURLs: TCheckBox
           Left = 8
           Top = 55
           Width = 257
           Height = 17
           Caption = 'List local &URLs in web debugger'
-          TabOrder = 1
+          TabOrder = 0
         end
-        object cmdConfigureNgrok: TButton
+        object cmdConfigureServer: TButton
           Left = 24
           Top = 101
           Width = 121
           Height = 25
-          Caption = '&Configure ngrok...'
-          TabOrder = 3
-          OnClick = cmdConfigureNgrokClick
+          Caption = '&Configure server...'
+          TabOrder = 1
+          OnClick = cmdConfigureServerClick
         end
       end
     end

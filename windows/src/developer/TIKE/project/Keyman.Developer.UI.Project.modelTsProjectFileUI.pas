@@ -59,6 +59,7 @@ uses
   UmodWebHttpServer,
   UfrmMain,
   UfrmMDIEditor,
+  Keyman.Developer.System.KMDevServerAPI,
   Keyman.Developer.UI.UfrmModelEditor,
   KeymanDeveloperUtils,
   KeymanDeveloperOptions,
@@ -119,8 +120,6 @@ var
   FCompiledName: string;
   editor: TfrmTikeEditor;
   wizard: TfrmModelEditor;
-  FontNames: TKeyboardFontArray;
-  i: TKeyboardFont;
 begin
   editor := frmKeymanDeveloper.FindEditorByFileName(ProjectFile.FileName);   // I4021
   if not Assigned(editor) or not (editor is TfrmModelEditor) then
@@ -131,12 +130,9 @@ begin
   if not TestModelState(FCompiledName, FSilent) then
     Exit(False);
 
-  for i := Low(TKeyboardFont) to High(TKeyboardFont) do
-    FontNames[i] := '';
-
   if FileExists(ProjectFile.TestKeyboard) then
-    modWebHttpServer.Debugger.RegisterKeyboard(ProjectFile.TestKeyboard, '1.0', FontNames);
-  modWebHttpServer.Debugger.RegisterModel(FCompiledName);
+    TKMDevServerDebugAPI.RegisterKeyboard(ProjectFile.TestKeyboard, '1.0', '', '');
+  TKMDevServerDebugAPI.RegisterModel(FCompiledName);
 
   wizard.NotifyStartedWebDebug;   // I4021
 

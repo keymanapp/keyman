@@ -3,8 +3,8 @@ object frmNgrokOptions: TfrmNgrokOptions
   Top = 0
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'ngrok Options'
-  ClientHeight = 350
+  Caption = 'Keyman Developer Server Options'
+  ClientHeight = 436
   ClientWidth = 433
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,7 +19,7 @@ object frmNgrokOptions: TfrmNgrokOptions
   TextHeight = 13
   object Label1: TLabel
     Left = 8
-    Top = 8
+    Top = 96
     Width = 403
     Height = 39
     Caption = 
@@ -29,40 +29,47 @@ object frmNgrokOptions: TfrmNgrokOptions
       'keyboards, models and packages.'
     WordWrap = True
   end
+  object lblWebHostDefaultPort: TLabel
+    Left = 8
+    Top = 19
+    Width = 58
+    Height = 13
+    Caption = '&Default port'
+  end
   object cmdOK: TButton
     Left = 272
-    Top = 315
+    Top = 403
     Width = 73
     Height = 25
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 0
+    TabOrder = 5
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
     Left = 352
-    Top = 315
+    Top = 403
     Width = 73
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 1
+    TabOrder = 6
   end
   object gbSetup: TGroupBox
     Left = 8
-    Top = 56
+    Top = 144
     Width = 417
     Height = 150
     Caption = 'Setup'
-    TabOrder = 2
+    TabOrder = 3
     object lblAuthToken: TLabel
       Left = 16
       Top = 93
       Width = 100
       Height = 13
-      Caption = 'Authentication token'
+      Caption = '&Authentication token'
       FocusControl = editAuthToken
     end
     object lblRegion: TLabel
@@ -70,7 +77,7 @@ object frmNgrokOptions: TfrmNgrokOptions
       Top = 120
       Width = 33
       Height = 13
-      Caption = 'Region'
+      Caption = '&Region'
       FocusControl = cbRegion
     end
     object lblVersion: TLabel
@@ -123,7 +130,7 @@ object frmNgrokOptions: TfrmNgrokOptions
       Top = 24
       Width = 161
       Height = 25
-      Caption = '&Download or update ngrok'
+      Caption = 'Download or &update ngrok'
       TabOrder = 0
       OnClick = cmdDownloadClick
     end
@@ -139,17 +146,17 @@ object frmNgrokOptions: TfrmNgrokOptions
   end
   object gbAdvanced: TGroupBox
     Left = 8
-    Top = 212
+    Top = 300
     Width = 417
     Height = 90
     Caption = 'Advanced Options'
-    TabOrder = 3
+    TabOrder = 4
     object lblControlPort: TLabel
       Left = 16
       Top = 57
       Width = 58
       Height = 13
-      Caption = 'Control port'
+      Caption = 'Control &port'
       FocusControl = editControlPort
     end
     object chkKeepNGrokControlWindowVisible: TCheckBox
@@ -168,5 +175,29 @@ object frmNgrokOptions: TfrmNgrokOptions
       NumbersOnly = True
       TabOrder = 1
     end
+  end
+  object editWebHostDefaultPort: TEdit
+    Left = 84
+    Top = 16
+    Width = 61
+    Height = 21
+    NumbersOnly = True
+    TabOrder = 0
+  end
+  object chkUseNgrok: TCheckBox
+    Left = 8
+    Top = 73
+    Width = 257
+    Height = 17
+    Caption = 'Use &ngrok to provide public url for web debugger'
+    TabOrder = 2
+  end
+  object chkLeaveServerRunning: TCheckBox
+    Left = 8
+    Top = 43
+    Width = 257
+    Height = 17
+    Caption = '&Leave server running after closing IDE'
+    TabOrder = 1
   end
 end

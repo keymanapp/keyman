@@ -70,6 +70,7 @@ type
     FWebHostNGrokControlPort: Integer;
     FWebHostNGrokToken: string;
     FWebHostNGrokRegion: string;
+    FWebHostKeepAlive: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -78,6 +79,7 @@ type
     procedure regWriteString(const nm, value: string);
     procedure regWriteBool(const nm: string; value: Boolean);
     procedure regWriteInt(const nm: string; value: Integer);
+    procedure WriteServerConfigurationJson;
   public
     procedure Read;
     procedure Write;
@@ -107,6 +109,7 @@ type
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
 
     property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
+    property WebHostKeepAlive: Boolean read FWebHostKeepAlive write FWebHostKeepAlive;
     property WebHostUseLocalAddresses: Boolean read FWebHostUseLocalAddresses write FWebHostUseLocalAddresses;
 
     property WebHostNGrokControlPort: Integer read FWebHostNGrokControlPort write FWebHostNGrokControlPort;
@@ -149,9 +152,13 @@ const
 implementation
 
 uses
+  System.Classes,
+  System.JSON,
   System.Math,
   Winapi.ShlObj,
 
+  JsonUtil,
+  Keyman.Developer.System.KeymanDeveloperPaths,
   utilsystem,
   OnlineConstants,
   GetOSVersion;
@@ -212,6 +219,7 @@ begin
     FOSKAutoSaveBeforeImporting := regReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
 
     FWebHostDefaultPort := regReadInt(SRegValue_IDEOptWebHostPort, 8008);
+    FWebHostKeepAlive := regReadBool(SRegValue_IDEOptWebHostKeepAlive, False);
     FWebHostUseLocalAddresses := regReadBool(SRegValue_IDEOptWebHostUseLocalAddresses, True);
 
     FWebHostNGrokControlPort := regReadInt(SRegValue_IDEOptWebHostNGrokControlPort, 8009);
@@ -274,6 +282,7 @@ begin
 
 
     regWriteInt(SRegValue_IDEOptWebHostPort, FWebHostDefaultPort);
+    regWriteBool(SRegValue_IDEOptWebHostKeepAlive, FWebHostKeepAlive);
     regWriteBool(SRegValue_IDEOptWebHostUseLocalAddresses, FWebHostUseLocalAddresses);
 
     regWriteInt(SRegValue_IDEOptWebHostNGrokControlPort, FWebHostNGrokControlPort);
@@ -307,6 +316,40 @@ begin
     reg.WriteInteger(SRegValue_AutomaticallyReportUsage, IfThen(FReportUsage, 1, 0));
   finally
     CloseRegistry;
+  end;
+
+  WriteServerConfigurationJson;
+end;
+
+procedure TKeymanDeveloperOptions.WriteServerConfigurationJson;
+var
+  o: TJSONObject;
+  s: TStringList;
+  ss: TStringStream;
+begin
+  o := TJSONObject.Create;
+  try
+    o.AddPair('port', TJSONNumber.Create(FWebHostDefaultPort));
+    o.AddPair('ngrokControlPort', TJSONNumber.Create(FWebHostNGrokControlPort));
+    o.AddPair('ngrokToken', FWebHostNGrokToken);
+    o.AddPair('ngrokRegion', FWebHostNGrokRegion);
+    o.AddPair('useNgrok', TJSONBool.Create(FWebHostUseNGrok));
+    o.AddPair('ngrokVisible', TJSONBool.Create(FWebHostKeepNGrokControlWindowVisible));
+    s := TStringList.Create;
+    try
+      PrettyPrintJSON(o, s, 2);
+      ss := TStringStream.Create(s.Text, TEncoding.UTF8);
+      try
+        ss.SaveToFile(TKeymanDeveloperPaths.KMDevServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson);
+      finally
+        ss.Free;
+      end;
+    finally
+      s.Free;
+    end;
+    o.ToJSON
+  finally
+    o.Free;
   end;
 end;
 

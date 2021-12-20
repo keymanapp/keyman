@@ -35,6 +35,10 @@ type
     lblVersion: TLabel;
     Label1: TLabel;
     lblGetToken: TLabel;
+    lblWebHostDefaultPort: TLabel;
+    editWebHostDefaultPort: TEdit;
+    chkUseNgrok: TCheckBox;
+    chkLeaveServerRunning: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDownloadClick(Sender: TObject);
@@ -58,6 +62,7 @@ uses
   System.Zip,
 
   KeymanDeveloperOptions,
+  Keyman.Developer.System.KMDevServerAPI,
   Keyman.Developer.System.HttpServer.NgrokIntegration,
   UmodWebHttpServer,
   utilexecute;
@@ -164,14 +169,9 @@ end;
 
 procedure TfrmNgrokOptions.cmdDownloadClick(Sender: TObject);
 var
-  Reinstantiate: Boolean;
   DownloadProgress: TfrmDownloadProgress;
 begin
-  Reinstantiate := Assigned(modWebHttpServer.NGrokIntegration) and modWebHttpServer.NGrokIntegration.Running;
-  if Reinstantiate then
-  begin
-    modWebHttpServer.NGrokIntegration.TeardownTunnel;
-  end;
+  TKMDevServerDebugAPI.StopServer;
 
   try
     DownloadProgress := TfrmDownloadProgress.Create(Self);
@@ -183,20 +183,46 @@ begin
     end;
   finally
     UpdateVersionLabel;
-    if Reinstantiate then
-    begin
-      modWebHttpServer.NGrokIntegration.InstantiateTunnel;
-    end;
+    TKMDevServerDebugAPI.StartServer;
   end;
 end;
 
 procedure TfrmNgrokOptions.cmdOKClick(Sender: TObject);
+var
+  DefaultPort, ngrokControlPort: Integer;
+  KeepAlive, UseNgrok, ngrokKeepVisible: Boolean;
+  ngrokToken, ngrokRegion: string;
+  Changed: Boolean;
 begin
-  FKeymanDeveloperOptions.WebHostNGrokControlPort := StrToIntDef(editControlPort.Text, 8009);
-  FKeymanDeveloperOptions.WebHostNGrokToken := editAuthToken.Text;
-  FKeymanDeveloperOptions.WebHostNGrokRegion := Copy(cbRegion.Text, 1, 2);
-  FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible := chkKeepNGrokControlWindowVisible.Checked;
-  modWebHttpServer.RefreshOptions;
+  DefaultPort := StrToIntDef(editWebHostDefaultPort.Text, 8008);   // I4021
+  KeepAlive := chkLeaveServerRunning.Checked;
+  UseNgrok := chkUseNgrok.Checked;
+  ngrokControlPort := StrToIntDef(editControlPort.Text, 8009);
+  ngrokToken := editAuthToken.Text;
+  ngrokRegion := Copy(cbRegion.Text, 1, 2);
+  ngrokKeepVisible := chkKeepNGrokControlWindowVisible.Checked;
+
+  Changed :=
+    (FKeymanDeveloperOptions.WebHostDefaultPort <> DefaultPort) or
+    (FKeymanDeveloperOptions.WebHostKeepAlive <> KeepAlive) or
+    (FKeymanDeveloperOptions.WebHostUseNgrok <> UseNgrok) or
+    (FKeymanDeveloperOptions.WebHostNGrokControlPort <> ngrokControlPort) or
+    (FKeymanDeveloperOptions.WebHostNGrokToken <> ngrokToken) or
+    (FKeymanDeveloperOptions.WebHostNGrokRegion <> ngrokRegion) or
+    (FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible <> ngrokKeepVisible);
+
+  if Changed then
+  begin
+    FKeymanDeveloperOptions.WebHostDefaultPort := DefaultPort;
+    FKeymanDeveloperOptions.WebHostKeepAlive := KeepAlive;
+    FKeymanDeveloperOptions.WebHostUseNgrok := UseNgrok;
+    FKeymanDeveloperOptions.WebHostNGrokControlPort := ngrokControlPort;
+    FKeymanDeveloperOptions.WebHostNGrokToken := ngrokToken;
+    FKeymanDeveloperOptions.WebHostNGrokRegion := ngrokRegion;
+    FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible := ngrokKeepVisible;
+    FKeymanDeveloperOptions.Write; // TODO: Cancel button in parent dialog is a problem
+    modWebHttpServer.RestartServer;
+  end;
   ModalResult := mrOk;
 end;
 
@@ -204,6 +230,10 @@ procedure TfrmNgrokOptions.FormCreate(Sender: TObject);
 var
   i: Integer;
 begin
+  editWebHostDefaultPort.Text := IntToStr(FKeymanDeveloperOptions.WebHostDefaultPort);   // I4021
+  chkUseNgrok.Checked := FKeymanDeveloperOptions.WebHostUseNgrok;
+  chkLeaveServerRunning.Checked := FKeymanDeveloperOptions.WebHostKeepAlive;
+
   lblVersion.Caption := '';
   editAuthToken.Text := FKeymanDeveloperOptions.WebHostNGrokToken;
 

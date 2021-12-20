@@ -32,7 +32,6 @@ interface
 
 uses
   System.Classes,
-//  System.SysUtils,
 
   Winapi.Windows,
 
@@ -44,9 +43,7 @@ uses
   IdHTTPServer,
 
   Keyman.Developer.System.HttpServer.App,
-  Keyman.Developer.System.HttpServer.AppSource,
-  Keyman.Developer.System.HttpServer.Debugger,
-  Keyman.Developer.System.HttpServer.NGrokIntegration;
+  Keyman.Developer.System.HttpServer.AppSource;
 
 type
 
@@ -59,22 +56,20 @@ type
   private
     FApp: TAppHttpResponder;
     FAppSource: TAppSourceHttpResponder;
-    FDebugger: TDebuggerHttpResponder;
-    FNGrokIntegration: TNGrokIntegration;
     function GetApp: TAppHttpResponder;
-    function GetDebugger: TDebuggerHttpResponder;
     function GetAppSource: TAppSourceHttpResponder;
+    function GetPort: Integer;
   public
     function GetURL: string;
     function GetLocalhostURL: string;
     function GetAppURL(s: string): string;
     procedure GetURLs(v: TStrings);
-    procedure RefreshOptions;
+    procedure RestartServer;
 
-    property Debugger: TDebuggerHttpResponder read GetDebugger;
     property App: TAppHttpResponder read GetApp;
     property AppSource: TAppSourceHttpResponder read GetAppSource;
-    property NGrokIntegration: TNGrokIntegration read FNGrokIntegration;
+
+    property Port: Integer read GetPort;
   end;
 
 var
@@ -90,32 +85,30 @@ uses
   IdGlobalProtocols,
   IdStack,
 
-//  System.DateUtils,
-//  System.JSON,
-//  System.TimeSpan,
-//  System.TypInfo,
-
   System.SysUtils,
 
   Vcl.Dialogs,
   Winapi.ActiveX,
   System.Win.ComObj,
-//  Vcl.Graphics,
+
+  Keyman.Developer.System.KMDevServerAPI,
 
   KeymanDeveloperOptions;
-//  RedistFiles;
 
 {$R *.dfm}
 
 procedure TmodWebHttpServer.DataModuleCreate(Sender: TObject);
 begin
-  http.DefaultPort := FKeymanDeveloperOptions.WebHostDefaultPort;
+  // TODO: split web host for project, editor, until we have moved
+  // these over to the KMDevServer as well
+//  http.DefaultPort := FKeymanDeveloperOptions.WebHostDefaultPort;
 
   try
     http.Active := True;
   except
     on E:EIdSocketError do   // I4304
     begin
+      // TODO fix message
       ShowMessage('The Keyman Developer debug web server was unable to start. '+
         'This is usually caused by a firewall blocking rule or another process '+
         'using the port '+IntToStr(http.DefaultPort)+' (change this in Tools/Options/Debugger). '+
@@ -125,6 +118,7 @@ begin
     end;
     on E:EIdCouldNotBindSocket do   // I4304
     begin
+      // TODO fix message
       ShowMessage('The Keyman Developer debug web server was unable to start. '+
         'This is usually caused by a firewall blocking rule or another process '+
         'using the port '+IntToStr(http.DefaultPort)+' (change this in Tools/Options/Debugger). '+
@@ -134,24 +128,18 @@ begin
     end;
   end;
 
-  if FKeymanDeveloperOptions.WebHostUseNGrok then
-    FNGrokIntegration := TNGrokIntegration.Create(
-      FKeymanDeveloperOptions.WebHostDefaultPort,
-      FKeymanDeveloperOptions.WebHostNGrokControlPort,
-      FKeymanDeveloperOptions.WebHostNGrokToken,
-      FKeymanDeveloperOptions.WebHostNGrokRegion,
-      FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible);
+  TKMDevServerDebugAPI.StartServer;
 end;
 
 procedure TmodWebHttpServer.DataModuleDestroy(Sender: TObject);
 begin
-  FreeAndNil(FNGrokIntegration);
+  if not FKeymanDeveloperOptions.WebHostKeepAlive then
+    TKMDevServerDebugAPI.StopServer;
 
   http.Active := False;   // I4036
 
   FreeAndNil(FApp);
   FreeAndNil(FAppSource);
-  FreeAndNil(FDebugger);
 end;
 
 function TmodWebHttpServer.GetApp: TAppHttpResponder;
@@ -173,16 +161,14 @@ begin
   Result := GetLocalhostURL + '/app/' + s;
 end;
 
-function TmodWebHttpServer.GetDebugger: TDebuggerHttpResponder;
-begin
-  if not Assigned(FDebugger) then
-    FDebugger := TDebuggerHttpResponder.Create;
-  Result := FDebugger;
-end;
-
 function TmodWebHttpServer.GetLocalhostURL: string;
 begin
-  Result := 'http://127.0.0.1:'+IntToStr(http.DefaultPort);
+  Result := 'http://127.0.0.1:'+IntToStr(Port);
+end;
+
+function TmodWebHttpServer.GetPort: Integer;
+begin
+  Result := http.Bindings[0].Port;
 end;
 
 function TmodWebHttpServer.GetURL: string;
@@ -200,6 +186,7 @@ begin
   end;
 end;
 
+// TODO: move out of here
 procedure TmodWebHttpServer.GetURLs(v: TStrings);
 const
   IPv4Loopback  = '127.0.0.1';          {do not localize}
@@ -222,14 +209,14 @@ var
   i: Integer;
   FIPv4Addresses: TIdStackLocalAddressList;
 begin
-  if Assigned(FNGrokIntegration) then
+  if TKMDevServerDebugAPI.UpdateStatus and
+    (TKMDevServerDebugAPI.ngrokEndpoint <> '') then
   begin
-    if FNGrokIntegration.Connected then
-      v.Add(FNGrokIntegration.Url);
+    v.Add(TKMDevServerDebugAPI.ngrokEndpoint);
   end;
   if FKeymanDeveloperOptions.WebHostUseLocalAddresses then
   begin
-    port := ':'+IntToStr(http.DefaultPort);
+    port := ':'+IntToStr(FKeymanDeveloperOptions.WebHostDefaultPort);
     sFull := GetHostName(ComputerNameDnsFullyQualified);
     sHost := GetHostName(ComputerNameDnsHostname);
     sNetbios := GetHostName(ComputerNameNetBIOS);
@@ -282,54 +269,16 @@ begin
       Exit;
     end;
 
-    Self.GetDebugger.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
   finally
     CoUninitialize;
   end;
 end;
 
-procedure TmodWebHttpServer.RefreshOptions;
-var
-  Reinstantiate: Boolean;
+procedure TmodWebHttpServer.RestartServer;
 begin
-  Reinstantiate := False;
-  if http.DefaultPort <> FKeymanDeveloperOptions.WebHostDefaultPort then
-  begin
-    http.Active := False;
-    http.DefaultPort := FKeymanDeveloperOptions.WebHostDefaultPort;
-    http.Active := True;
-    Reinstantiate := True;
-  end;
-
-  if not FKeymanDeveloperOptions.WebHostUseNGrok then
-  begin
-    FreeAndNil(FNGrokIntegration);
-    Exit;
-  end;
-
-  if not Assigned(FNgrokIntegration) or not FNgrokIntegration.Connected then
-  begin
-    Reinstantiate := True;
-  end
-  else
-  begin
-    Reinstantiate := Reinstantiate or
-      (FNgrokIntegration.LocalPort <> FKeymanDeveloperOptions.WebHostDefaultPort) or
-      (FNgrokIntegration.ShowNgrok <> FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible) or
-      (FNGrokIntegration.Token <> FKeymanDeveloperOptions.WebHostNGrokToken) or
-      (FNGrokIntegration.Region <> FKeymanDeveloperOptions.WebHostNGrokRegion);
-  end;
-
-  if Reinstantiate then
-  begin
-    FreeAndNil(FNGrokIntegration);
-    FNGrokIntegration := TNGrokIntegration.Create(
-      FKeymanDeveloperOptions.WebHostDefaultPort,
-      FKeymanDeveloperOptions.WebHostNGrokControlPort,
-      FKeymanDeveloperOptions.WebHostNGrokToken,
-      FKeymanDeveloperOptions.WebHostNGrokRegion,
-      FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible);
-  end;
+  TKMDevServerDebugAPI.StopServer;
+  Sleep(2000); // give server + ngrok time to shut down
+  TKMDevServerDebugAPI.StartServer;
 end;
 
 end.
