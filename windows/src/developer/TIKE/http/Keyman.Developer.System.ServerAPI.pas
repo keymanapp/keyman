@@ -1,4 +1,4 @@
-unit Keyman.Developer.System.ServerAPI;
+﻿unit Keyman.Developer.System.ServerAPI;
 
 interface
 
@@ -11,7 +11,7 @@ type
   TServerDebugAPI = class
   private
     class var
-      FStatusChecked: Boolean;
+      LastGetStatusTime: UInt64;
       FngrokEnabled: Boolean;
       FngrokEndpoint: string;
     class function IsDebugObjectRegistered(const objectType, id: string): Boolean; static;
@@ -47,7 +47,6 @@ type
 
     class property ngrokEnabled: Boolean read FngrokEnabled;
     class property ngrokEndpoint: string read FngrokEndpoint;
-    class property StatusChecked: Boolean read FStatusChecked;
   end;
 
 implementation
@@ -73,25 +72,22 @@ uses
 
 class procedure TServerDebugAPI.StartServer;
 var
-  pi: TProcessInformation;
   sw: Integer;
 begin
   if Running then
     Exit;
 
-//  if FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible
-//    then sw := SW_SHOWNORMAL
-//    else sw := SW_HIDE;
-
-  sw := SW_SHOWNORMAL;
+  if FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible
+    then sw := SW_SHOWNORMAL
+    else sw := SW_HIDE;
 
   if not TUtilExecute.Execute(Format('"%s" .', [TKeymanDeveloperPaths.NodePath]),
-    TKeymanDeveloperPaths.ServerPath, sw, pi) then
+    TKeymanDeveloperPaths.ServerPath, sw) then
   begin
-    RaiseLastOSError; //ShowMessage(SysErrorMessage(GetLastError));
+    RaiseLastOSError;
   end;
 
-  FStatusChecked := False;
+  LastGetStatusTime := 0;
 end;
 
 function QueryFullProcessImageName(
@@ -112,7 +108,7 @@ begin
     mfd.Free;
   end;
 
-  FStatusChecked := False;
+  LastGetStatusTime := 0;
 end;
 
 class function TServerDebugAPI.Running: Boolean;
@@ -260,7 +256,7 @@ begin
         if not o.TryGetValue<Boolean>('ngrokEnabled', FngrokEnabled) then FngrokEnabled := False;
         if not o.TryGetValue<string>('ngrokEndpoint', FngrokEndpoint) then FngrokEndpoint := '';
 
-        FStatusChecked := True;
+        LastGetStatusTime := GetTickCount64;
       end;
     except
       Result := False;
@@ -452,9 +448,9 @@ end;
 
 class function TServerDebugAPI.UpdateStatus: Boolean;
 begin
-  if FStatusChecked
-    then Result := True
-    else Result := GetStatus;
+  if GetTickCount64 - LastGetStatusTime > 1000
+    then Result := GetStatus
+    else Result := True;
 end;
 
 end.

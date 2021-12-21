@@ -1,3 +1,4 @@
+import chalk = require('chalk');
 import express = require('express');
 import { DebugObject } from "../../../data";
 
@@ -6,7 +7,7 @@ export default function apiGet (data: { [id: string]: DebugObject }, req: expres
   // TODO: verify that id matches filename pattern (no .., no /, no \)
   const o: DebugObject = data[id];
   if(!o) {
-    console.error('  not found');
+    console.error(chalk.red('  not found'));
     res.status(404).send(JSON.stringify({error: 'not found'}));
   } else {
     res.send(JSON.stringify(o));

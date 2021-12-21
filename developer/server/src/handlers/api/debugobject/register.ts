@@ -3,6 +3,7 @@ import { DebugObject } from "../../../data";
 import fs = require('fs');
 import crypto = require('crypto');
 import { configuration } from '../../../config';
+import chalk = require('chalk');
 
 export default function apiRegister<O extends DebugObject> (intf: new () => O, root:{ [id: string]: O }, req: express.Request, res: express.Response, next: express.NextFunction) {
   const id = req.body['id'];
@@ -16,7 +17,7 @@ export default function apiRegister<O extends DebugObject> (intf: new () => O, r
   fs.writeFileSync(o.filename, req.file.buffer);
   o.sha256 = crypto.createHash('sha256').update(req.file.buffer).digest('hex');
 
-  console.log('registering object '+o.id+' at '+o.filename+' sha '+o.sha256);
+  console.log(chalk.grey('registering object '+o.id+' at '+o.filename+' sha '+o.sha256));
 
   next();
 }
@@ -33,5 +34,5 @@ export function apiRegisterFile<O extends DebugObject> (intf: new () => O, root:
   fs.writeFileSync(o.filename, file);
   o.sha256 = crypto.createHash('sha256').update(file).digest('hex');
 
-  console.log('registering object '+o.id+' at '+o.filename+' sha '+o.sha256);
+  console.log(chalk.grey('registering object '+o.id+' at '+o.filename+' sha '+o.sha256));
 }

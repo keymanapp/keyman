@@ -12,6 +12,7 @@ import apiPackageRegister from './handlers/api/package/register';
 import handleIncKeyboardsCss from './handlers/inc/keyboards-css';
 import { Environment } from './environment';
 import { configuration } from './config';
+import chalk = require('chalk');
 
 export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.Server, environment: Environment) {
 
@@ -149,10 +150,9 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 /* Utility functions */
 
 function notifyClients(wsServer: ws.Server, res: express.Request, req: express.Response, next: express.NextFunction) {
-  console.debug('notifyClients');
   wsServer.clients.forEach(c => {
     c.send('refresh', (err) => {
-      if(err) console.error('Websocket send error '+err.message);
+      if(err) console.error(chalk.red('Websocket send error '+err.message));
     });
   });
   next();
@@ -171,7 +171,7 @@ function appGetData(app: express.Express, pathregex: RegExp,  root: { [id: strin
     if(!o) {
       res.status(404).send('not found');
     } else {
-      res.sendFile(o.filename, (err)=>{if(err) console.error(err)});
+      res.sendFile(o.filename, (err)=>{if(err) console.error(chalk.red(err))});
     }
   });
 }

@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "postbuild": "copyfiles -u 1 \"src/site/**\" \"dist/\" && copyfiles -u 1 \"src/trayicon/**\" \"dist/\"",
+    "postbuild": "copyfiles -u 1 \"src/site/**\" \"dist/\" && copyfiles -u 1 \"src/win32/**\" \"dist/\"",
     "prod": "node .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "npm run postbuild && tsc-watch --onSuccess \"node .\" --onFailure \"node .\""
@@ -13,6 +13,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.1.2",
     "express": "^4.17.2",
     "multer": "^1.4.4",
     "ngrok": "^4.2.2",

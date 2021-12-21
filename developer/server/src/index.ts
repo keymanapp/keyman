@@ -7,6 +7,11 @@ import setupRoutes from './routes';
 import { environment } from './environment';
 import { configuration } from './config';
 import Tray from './tray';
+import chalk = require('chalk');
+
+const options = {
+  ngrokLog: false,   // Set this to true if you need to see ngrok logs in the console
+};
 
 /* Lock file - report on PID and prevent multiple instances cleanly */
 
@@ -26,7 +31,6 @@ if(fs.existsSync(configuration.lockFilename)) {
 let lockFileDescriptor = fs.openSync(configuration.lockFilename, 'w');
 fs.writeFileSync(configuration.pidFilename, process.pid.toString());
 fs.writeFileSync(lockFileDescriptor, process.pid.toString());
-//console.log('lfd = '+JSON.stringify(lockFileDescriptor));
 
 process.on('exit', () => {
   if(fs.existsSync(configuration.pidFilename)) {
@@ -79,11 +83,31 @@ if(configuration.useNgrok && os.platform() == 'win32' && fs.existsSync(configura
   (async function() {
     configuration.ngrokEndpoint = await ngrok.connect({
       proto: 'http',
+      bind_tls: true,
       addr: configuration.port,
       authtoken: configuration.ngrokToken,
       region: configuration.ngrokRegion,
-      binPath: () => configuration.ngrokBinPath
+      binPath: () => configuration.ngrokBinPath,
+      onLogEvent: (msg: string) => {
+        if(options.ngrokLog) {
+          console.log(chalk.cyan(('\n'+msg).split('\n').join('\n[ngrok] ').trim()));
+        }
+      },
+      onStatusChange: (state: string) => {
+        if(state == 'connected') {
+          setTimeout(async () => {
+            const api = ngrok.getApi();
+            const tunnels = await api.listTunnels();
+            configuration.ngrokEndpoint = tunnels.tunnels[0]?.public_url ?? '';
+            console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
+          }, 1000);
+        } else if(state == 'closed') {
+          configuration.ngrokEndpoint = '';
+          console.log(chalk.blueBright('ngrok tunnel closed'));
+        }
+      }
     });
+    console.log(chalk.blueBright('ngrok tunnel initially established at %s'), configuration.ngrokEndpoint);
   })();
 }
 
