@@ -1,5 +1,6 @@
 # Ignore files required only in development.
 build.sh
+bundle.sh
 source/*
 tests/*
 tsconfig.json
