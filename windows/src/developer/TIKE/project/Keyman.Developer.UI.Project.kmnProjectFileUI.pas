@@ -69,7 +69,7 @@ uses
   UfrmKeyboardFonts,
   UfrmMDIEditor,
   UmodWebHttpServer,
-  Keyman.Developer.System.KMDevServerAPI,
+  Keyman.Developer.System.ServerAPI,
   KeyboardFonts,
   KeymanDeveloperUtils,
   KeymanDeveloperOptions,
@@ -237,7 +237,7 @@ var
       strm := TMemoryStream.Create;
       try
         if TFontLoadUtil.LoadFontData(fontname, strm) then
-          TKMDevServerDebugAPI.RegisterFont(strm, fontname);
+          TServerDebugAPI.RegisterFont(strm, fontname);
       finally
         strm.Free;
       end;
@@ -268,7 +268,7 @@ begin
       RegisterFont(Wizard.FontInfo[i].Name);
   end;
 
-  TKMDevServerDebugAPI.RegisterKeyboard(
+  TServerDebugAPI.RegisterKeyboard(
     FCompiledName,
     ProjectFile.FileVersion,
     // We only need to specify the char + osk fonts here

@@ -1,18 +1,18 @@
 (*
   Name:             UfrmOptions
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Tweak character map calls
                     04 Dec 2006 - mcdurdin - Add Allow Multiple Instances
@@ -140,13 +140,13 @@ uses
   JvDockControlForm,
   OnlineConstants,
   RedistFiles,
-  ErrorControlledRegistry, 
+  ErrorControlledRegistry,
   RegistryKeys,
   KeymanDeveloperOptions,
   KeymanDeveloperUtils,
   UfrmCharacterMapNew,
   UfrmMain,
-  Keyman.Developer.UI.UfrmNgrokOptions,
+  Keyman.Developer.UI.UfrmServerOptions,
   Keyman.Developer.UI.UfrmTikeOnlineUpdateSetup,
   UfrmSMTPSetup,
   UnicodeData,
@@ -451,24 +451,24 @@ begin
       ShowMessage('The files unicodedata.txt and blocks.txt could not be found at the path '+FUnicodeSourcePath+'.  These files can be downloaded from http://www.unicode.org/');
       Exit;
     end;
-    
+
     FUnicodeData.BuildDatabase(FUnicodeSourcePath);
     if Assigned(frmCharacterMapNew) then
       frmCharacterMapNew.Reload;
-      
+
     editDatabasePath.Text := FUnicodeData.DBPath; // I2299
   end;
 end;
 
 procedure TfrmOptions.cmdConfigureServerClick(Sender: TObject);
 var
-  ngrokOptions: TfrmNGrokOptions;
+  serverOptionsForm: TfrmServerOptions;
 begin
-  ngrokOptions := TfrmNGrokOptions.Create(Self);
+  serverOptionsForm := TfrmServerOptions.Create(Self);
   try
-    ngrokOptions.ShowModal;
+    serverOptionsForm.ShowModal;
   finally
-    ngrokOptions.Free;
+    serverOptionsForm.Free;
   end;
 end;
 

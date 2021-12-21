@@ -55,7 +55,7 @@ uses
   dmActionsMain,
   Controls,
   Keyman.Developer.System.Project.Project,
-  Keyman.Developer.System.KMDevServerAPI,
+  Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectUIFileType,
   UfrmMain,
   UfrmMessages,
@@ -138,7 +138,7 @@ begin
   if not FileExists(FCompiledName) then
     Exit(False);
 
-  TKMDevServerDebugAPI.RegisterPackage(FCompiledName, ProjectFile.Header_Name);
+  TServerDebugAPI.RegisterPackage(FCompiledName, ProjectFile.Header_Name);
 
   packageEditor.NotifyStartedWebDebug;   // I4021
 

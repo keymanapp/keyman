@@ -59,7 +59,7 @@ uses
   UmodWebHttpServer,
   UfrmMain,
   UfrmMDIEditor,
-  Keyman.Developer.System.KMDevServerAPI,
+  Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.UfrmModelEditor,
   KeymanDeveloperUtils,
   KeymanDeveloperOptions,
@@ -131,8 +131,8 @@ begin
     Exit(False);
 
   if FileExists(ProjectFile.TestKeyboard) then
-    TKMDevServerDebugAPI.RegisterKeyboard(ProjectFile.TestKeyboard, '1.0', '', '');
-  TKMDevServerDebugAPI.RegisterModel(FCompiledName);
+    TServerDebugAPI.RegisterKeyboard(ProjectFile.TestKeyboard, '1.0', '', '');
+  TServerDebugAPI.RegisterModel(FCompiledName);
 
   wizard.NotifyStartedWebDebug;   // I4021
 

@@ -250,18 +250,14 @@ set_version ( ) {
 
 # Uses npm to set the current package version (package.json).
 #
-# NOTE: this must be invoked exclusively on the CI system!
+# This sets the version according to the current VERSION_WITH_TAG.
 #
 # Usage:
 #
-#   set_npm_version VERSION_WITH_TIER
+#   set_npm_version
 #
 set_npm_version () {
-  if [ $# == 0 ]; then
-    fail "set_npm_version requires a specified version."
-  fi
-
-  local version=$1
+  local version="$VERSION_WITH_TAG"
   # We use --no-git-tag-version because our CI system controls version numbering and
   # already tags releases. We also want to have the version of this match the
   # release of Keyman Developer -- these two versions should be in sync. Because this

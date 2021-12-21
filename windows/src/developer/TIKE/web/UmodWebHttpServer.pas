@@ -1,18 +1,18 @@
 (*
   Name:             UmodWebHttpServer
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      7 Feb 2014
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          07 Feb 2014 - mcdurdin - I4036 - V9.0 - Keyboard Debug HTTP Host should be thread safe
                     07 Feb 2014 - mcdurdin - I4037 - V9.0 - Keyboard HTTP debugger sometimes caches old keyboards
                     21 Feb 2014 - mcdurdin - I4063 - V9.0 - Web Debugger needs to embed fonts for OSK and text area
@@ -91,7 +91,7 @@ uses
   Winapi.ActiveX,
   System.Win.ComObj,
 
-  Keyman.Developer.System.KMDevServerAPI,
+  Keyman.Developer.System.ServerAPI,
 
   KeymanDeveloperOptions;
 
@@ -100,7 +100,7 @@ uses
 procedure TmodWebHttpServer.DataModuleCreate(Sender: TObject);
 begin
   // TODO: split web host for project, editor, until we have moved
-  // these over to the KMDevServer as well
+  // these over to the Server as well
 //  http.DefaultPort := FKeymanDeveloperOptions.WebHostDefaultPort;
 
   try
@@ -128,13 +128,13 @@ begin
     end;
   end;
 
-  TKMDevServerDebugAPI.StartServer;
+  TServerDebugAPI.StartServer;
 end;
 
 procedure TmodWebHttpServer.DataModuleDestroy(Sender: TObject);
 begin
   if not FKeymanDeveloperOptions.WebHostKeepAlive then
-    TKMDevServerDebugAPI.StopServer;
+    TServerDebugAPI.StopServer;
 
   http.Active := False;   // I4036
 
@@ -209,10 +209,10 @@ var
   i: Integer;
   FIPv4Addresses: TIdStackLocalAddressList;
 begin
-  if TKMDevServerDebugAPI.UpdateStatus and
-    (TKMDevServerDebugAPI.ngrokEndpoint <> '') then
+  if TServerDebugAPI.UpdateStatus and
+    (TServerDebugAPI.ngrokEndpoint <> '') then
   begin
-    v.Add(TKMDevServerDebugAPI.ngrokEndpoint);
+    v.Add(TServerDebugAPI.ngrokEndpoint);
   end;
   if FKeymanDeveloperOptions.WebHostUseLocalAddresses then
   begin
@@ -276,9 +276,9 @@ end;
 
 procedure TmodWebHttpServer.RestartServer;
 begin
-  TKMDevServerDebugAPI.StopServer;
+  TServerDebugAPI.StopServer;
   Sleep(2000); // give server + ngrok time to shut down
-  TKMDevServerDebugAPI.StartServer;
+  TServerDebugAPI.StartServer;
 end;
 
 end.

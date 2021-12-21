@@ -1,4 +1,4 @@
-unit Keyman.Developer.System.KMDevServerAPI;
+unit Keyman.Developer.System.ServerAPI;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   System.Net.Mime;
 
 type
-  TKMDevServerDebugAPI = class
+  TServerDebugAPI = class
   private
     class var
       FStatusChecked: Boolean;
@@ -64,9 +64,9 @@ uses
   Winapi.ShlObj,
   Winapi.Windows;
 
-{ TKMDevServerDebugAPI }
+{ TServerDebugAPI }
 
-class procedure TKMDevServerDebugAPI.StartServer;
+class procedure TServerDebugAPI.StartServer;
 var
   pi: TProcessInformation;
   sw: Integer;
@@ -74,14 +74,14 @@ begin
   if Running then
     Exit;
 
-//  if FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible
+//  if FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible
 //    then sw := SW_SHOWNORMAL
 //    else sw := SW_HIDE;
 
   sw := SW_SHOWNORMAL;
 
   if not TUtilExecute.Execute(Format('"%s" .', [TKeymanDeveloperPaths.NodePath]),
-    TKeymanDeveloperPaths.KMDevServerPath, sw, pi) then
+    TKeymanDeveloperPaths.ServerPath, sw, pi) then
   begin
     RaiseLastOSError; //ShowMessage(SysErrorMessage(GetLastError));
   end;
@@ -96,7 +96,7 @@ function QueryFullProcessImageName(
   var lpdwSize: DWORD): BOOL; stdcall; external kernel32
   name 'QueryFullProcessImageNameW';
 
-class procedure TKMDevServerDebugAPI.StopServer;
+class procedure TServerDebugAPI.StopServer;
 var
   mfd: TMultipartFormData;
 begin
@@ -110,7 +110,7 @@ begin
   FStatusChecked := False;
 end;
 
-class function TKMDevServerDebugAPI.Running: Boolean;
+class function TServerDebugAPI.Running: Boolean;
 var
   s: TStringStream;
   pid: Integer;
@@ -123,20 +123,20 @@ begin
 
   // TODO: check a ping endpoint instead?
 
-  if not FileExists(TKeymanDeveloperPaths.KMDevServerDataPath + 'lock.json') or
-    not FileExists(TKeymanDeveloperPaths.KMDevServerDataPath + 'pid.json') then
+  if not FileExists(TKeymanDeveloperPaths.ServerDataPath + 'lock.json') or
+    not FileExists(TKeymanDeveloperPaths.ServerDataPath + 'pid.json') then
   begin
     Exit;
   end;
 
-  {if System.SysUtils.DeleteFile(TKeymanDeveloperPaths.KMDevServerDataPath + 'lock.json') then
+  {if System.SysUtils.DeleteFile(TKeymanDeveloperPaths.ServerDataPath + 'lock.json') then
   begin
     // Suggests improper shutdown of node as lock.json should not be deleteable
     // if the server is running
     Exit;
   end;}
 
-  fs := TFileStream.Create(TKeymanDeveloperPaths.KMDevServerDataPath + 'pid.json', fmOpenRead);
+  fs := TFileStream.Create(TKeymanDeveloperPaths.ServerDataPath + 'pid.json', fmOpenRead);
   try
     s := TStringStream.Create('', TEncoding.UTF8);
     try
@@ -170,7 +170,7 @@ begin
 end;
 
 
-class function TKMDevServerDebugAPI.GetStatus: Boolean;
+class function TServerDebugAPI.GetStatus: Boolean;
 var
   http: THttpClient;
   res: IHTTPResponse;
@@ -204,12 +204,12 @@ begin
   end;
 end;
 
-class function TKMDevServerDebugAPI.HostName: string;
+class function TServerDebugAPI.HostName: string;
 begin
   Result := 'http://localhost:'+FKeymanDeveloperOptions.WebHostDefaultPort.ToString+'/';
 end;
 
-class function TKMDevServerDebugAPI.IsDebugObjectRegistered(const objectType, id: string): Boolean;
+class function TServerDebugAPI.IsDebugObjectRegistered(const objectType, id: string): Boolean;
 var
   http: THttpClient;
   uri: TURI;
@@ -230,7 +230,7 @@ begin
   end;
 end;
 
-class procedure TKMDevServerDebugAPI.Post(const api: string; mfd: TMultipartFormData);
+class procedure TServerDebugAPI.Post(const api: string; mfd: TMultipartFormData);
 var
   http: THttpClient;
 begin
@@ -251,13 +251,13 @@ end;
 // Font API wrappers
 //------------------------------------------------------------------------------
 
-class function TKMDevServerDebugAPI.IsFontRegistered(
+class function TServerDebugAPI.IsFontRegistered(
   const Filename: string): Boolean;
 begin
   Result := IsDebugObjectRegistered('font', ExtractFileName(Filename));
 end;
 
-class procedure TKMDevServerDebugAPI.RegisterFont(const Filename,
+class procedure TServerDebugAPI.RegisterFont(const Filename,
   Facename: string);
 var
   mfd: TMultipartFormData;
@@ -272,7 +272,7 @@ begin
   end;
 end;
 
-class procedure TKMDevServerDebugAPI.RegisterFont(Filedata: TStream;
+class procedure TServerDebugAPI.RegisterFont(Filedata: TStream;
   const Facename: string);
 var
   mfd: TMultipartFormData;
@@ -287,7 +287,7 @@ begin
   end;
 end;
 
-class procedure TKMDevServerDebugAPI.UnregisterFont(const Facename: string);
+class procedure TServerDebugAPI.UnregisterFont(const Facename: string);
 begin
 
 end;
@@ -296,13 +296,13 @@ end;
 // Keyboard API wrappers
 //------------------------------------------------------------------------------
 
-class function TKMDevServerDebugAPI.IsKeyboardRegistered(
+class function TServerDebugAPI.IsKeyboardRegistered(
   const Filename: string): Boolean;
 begin
   Result := IsDebugObjectRegistered('keyboard', TKeyboardUtils.KeyboardFileNameToID(Filename));
 end;
 
-class procedure TKMDevServerDebugAPI.RegisterKeyboard(const Filename, Version,
+class procedure TServerDebugAPI.RegisterKeyboard(const Filename, Version,
   FontFace, OskFontFace: string);
 var
   mfd: TMultipartFormData;
@@ -319,7 +319,7 @@ begin
   end;
 end;
 
-class procedure TKMDevServerDebugAPI.UnregisterKeyboard(const Filename: string);
+class procedure TServerDebugAPI.UnregisterKeyboard(const Filename: string);
 begin
 
 end;
@@ -328,13 +328,13 @@ end;
 // Model API wrappers
 //------------------------------------------------------------------------------
 
-class function TKMDevServerDebugAPI.IsModelRegistered(
+class function TServerDebugAPI.IsModelRegistered(
   const Filename: string): Boolean;
 begin
   Result := IsDebugObjectRegistered('model', TLexicalModelUtils.LexicalModelFileNameToID(Filename));
 end;
 
-class procedure TKMDevServerDebugAPI.RegisterModel(const Filename: string);
+class procedure TServerDebugAPI.RegisterModel(const Filename: string);
 var
   mfd: TMultipartFormData;
 begin
@@ -348,7 +348,7 @@ begin
   end;
 end;
 
-class procedure TKMDevServerDebugAPI.UnregisterModel(const Filename: string);
+class procedure TServerDebugAPI.UnregisterModel(const Filename: string);
 begin
 
 end;
@@ -357,13 +357,13 @@ end;
 // Package API wrappers
 //------------------------------------------------------------------------------
 
-class function TKMDevServerDebugAPI.IsPackageRegistered(
+class function TServerDebugAPI.IsPackageRegistered(
   const Filename: string): Boolean;
 begin
   Result := IsDebugObjectRegistered('package', TKeyboardUtils.KeyboardFileNameToID(Filename));
 end;
 
-class procedure TKMDevServerDebugAPI.RegisterPackage(const Filename,
+class procedure TServerDebugAPI.RegisterPackage(const Filename,
   Name: string);
 var
   mfd: TMultipartFormData;
@@ -379,12 +379,12 @@ begin
   end;
 end;
 
-class procedure TKMDevServerDebugAPI.UnregisterPackage(const Filename: string);
+class procedure TServerDebugAPI.UnregisterPackage(const Filename: string);
 begin
 
 end;
 
-class function TKMDevServerDebugAPI.UpdateStatus: Boolean;
+class function TServerDebugAPI.UpdateStatus: Boolean;
 begin
   if FStatusChecked
     then Result := True

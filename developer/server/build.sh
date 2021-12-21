@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Compiles kmdev-server for deployment
+# Compiles Keyman Developer Server for deployment
 #
 
 # Exit on command failure and when using unset variables:
@@ -85,15 +85,13 @@ type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
-  npm install --production=false
+  verify_npm_setup
+  # npm install --production=false
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   rm -f node_modules/ngrok/bin/ngrok.exe
 fi
 
-# TODO
-##if [ -n "$publish_version" ]; then
-#  set_npm_version "$publish_version" || fail "Setting version failed."
-#fi
+set_npm_version || fail "Setting version failed."
 
 # TODO: build kmw (unless skipped)
 

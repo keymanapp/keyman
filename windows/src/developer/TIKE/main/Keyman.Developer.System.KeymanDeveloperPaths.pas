@@ -17,8 +17,8 @@ type
     class function LexicalModelCompilerPath: string; static;
 
     const S_ServerConfigJson = 'config.json';
-    class function KMDevServerDataPath: string; static;
-    class function KMDevServerPath: string; static;
+    class function ServerDataPath: string; static;
+    class function ServerPath: string; static;
   end;
 
 implementation
@@ -40,17 +40,17 @@ begin
     else Result := ExtractFilePath(ParamStr(0)) + 'node.js\node.exe';
 end;
 
-class function TKeymanDeveloperPaths.KMDevServerDataPath: string;
+class function TKeymanDeveloperPaths.ServerDataPath: string;
 begin
   Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\server\';
 end;
 
-class function TKeymanDeveloperPaths.KMDevServerPath: string;
+class function TKeymanDeveloperPaths.ServerPath: string;
 var
   KeymanRoot: string;
 begin
   if TKeymanPaths.RunningFromSource(KeymanRoot)
-    then Result := KeymanRoot + 'developer\kmdev-server\'
+    then Result := KeymanRoot + 'developer\server\'
     else Result := ExtractFilePath(ParamStr(0)) + 'server\';
 end;
 

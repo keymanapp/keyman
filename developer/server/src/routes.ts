@@ -27,7 +27,9 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
   });
 
   function localhostOnly(req: express.Request, res: express.Response, next: express.NextFunction) {
-    if(req.socket.remoteAddress != '127.0.0.1' && req.socket.remoteAddress != '::1') {
+    if(req.socket.remoteAddress != '127.0.0.1' &&
+       req.socket.remoteAddress != '::1' &&
+       req.socket.remoteAddress != '::ffff:127.0.0.1') {  // ipv4 localhost over ipv6
       res.sendStatus(401);
     } else {
       next();

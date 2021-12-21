@@ -1,6 +1,7 @@
 import os = require('os');
 import path = require("path");
-const WindowsTrayicon = require("./trayicon/index");
+
+const WindowsTrayicon = os.platform() == 'win32' ? require("./trayicon/index") : null;
 
 // TODO: this is a Windows-only tray icon. There are a number of
 // cross-platform solutions but none of them are wonderful. We

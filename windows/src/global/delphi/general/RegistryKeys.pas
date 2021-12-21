@@ -395,12 +395,12 @@ const
 
   SRegValue_IDEOptWebHostPort = 'web host port';   // I4021
   SRegValue_IDEOptWebHostKeepAlive = 'web host keep alive';
-  SRegValue_IDEOptWebHostNGrokControlPort = 'web host ngrok control port';
-  SRegValue_IDEOptWebHostNGrokToken = 'web host ngrok token';
-  SRegValue_IDEOptWebHostNGrokRegion = 'web host ngrok region';
+  SRegValue_IDEOptWebHostNgrokControlPort = 'web host ngrok control port';
+  SRegValue_IDEOptWebHostNgrokToken = 'web host ngrok token';
+  SRegValue_IDEOptWebHostNgrokRegion = 'web host ngrok region';
   SRegValue_IDEOptWebHostUseLocalAddresses = 'web host use local addresses';
-  SRegValue_IDEOptWebHostUseNGrok = 'web host use ngrok';
-  SRegValue_IDEOptWebHostKeepNGrokControlWindowVisible = 'web host keep ngrok control window visible';
+  SRegValue_IDEOptWebHostUseNgrok = 'web host use ngrok';
+  SRegValue_IDEOptWebHostKeepNgrokControlWindowVisible = 'web host keep ngrok control window visible';
 
   SRegValue_IDEOptCharMapDisableDatabaseLookups = 'char map disable database lookups';  // CU
   SRegValue_IDEOptCharMapAutoLookup             = 'char map auto lookup';               // CU

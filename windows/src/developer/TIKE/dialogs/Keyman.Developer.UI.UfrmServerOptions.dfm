@@ -1,4 +1,4 @@
-object frmNgrokOptions: TfrmNgrokOptions
+object frmServerOptions: TfrmServerOptions
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu]
@@ -22,7 +22,7 @@ object frmNgrokOptions: TfrmNgrokOptions
     Top = 96
     Width = 403
     Height = 39
-    Caption = 
+    Caption =
       'ngrok is a service that allows you to temporarily share your loc' +
       'al web debugger site with a public URL, so that you can access i' +
       't from any device or share it with other users for testing your ' +
@@ -159,7 +159,7 @@ object frmNgrokOptions: TfrmNgrokOptions
       Caption = 'Control &port'
       FocusControl = editControlPort
     end
-    object chkKeepNGrokControlWindowVisible: TCheckBox
+    object chkKeepNgrokControlWindowVisible: TCheckBox
       Left = 16
       Top = 27
       Width = 257

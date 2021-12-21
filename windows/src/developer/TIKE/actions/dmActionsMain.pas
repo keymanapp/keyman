@@ -1,18 +1,18 @@
 (*
   Name:             dmActionsMain
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2006
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Add CRM action
                     14 Sep 2006 - mcdurdin - Move font bold issue to UFixFontDialogBold unit
@@ -267,7 +267,7 @@ uses
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
-  Keyman.Developer.System.KMDevServerAPI,
+  Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProject,
@@ -687,7 +687,7 @@ end;
 procedure TmodActionsMain.actToolsClearCachedDebugObjectsExecute(
   Sender: TObject);
 begin
-//  TKMDevServerDebugAPI.ClearCache; //TODO
+//  TServerDebugAPI.ClearCache; //TODO
 end;
 
 procedure TmodActionsMain.actToolsFileFormatExecute(Sender: TObject);
@@ -775,27 +775,27 @@ end;
 
 procedure TmodActionsMain.actToolsWebCopyPublicUrlExecute(Sender: TObject);
 begin
-  Clipboard.AsText := TKMDevServerDebugAPI.ngrokEndpoint;
+  Clipboard.AsText := TServerDebugAPI.ngrokEndpoint;
 end;
 
 procedure TmodActionsMain.actToolsWebCopyPublicUrlUpdate(Sender: TObject);
 begin
-  TKMDevServerDebugAPI.UpdateStatus;
-  actToolsWebCopyPublicUrl.Enabled :=   TKMDevServerDebugAPI.ngrokEndpoint <> '';
+  TServerDebugAPI.UpdateStatus;
+  actToolsWebCopyPublicUrl.Enabled :=   TServerDebugAPI.ngrokEndpoint <> '';
 end;
 
 procedure TmodActionsMain.actToolsWebOpenPublicUrlExecute(Sender: TObject);
 begin
-  TUtilExecute.URL(TKMDevServerDebugAPI.ngrokEndpoint);
+  TUtilExecute.URL(TServerDebugAPI.ngrokEndpoint);
 end;
 
 procedure TmodActionsMain.actToolsWebOpenPublicUrlUpdate(Sender: TObject);
 begin
-  TKMDevServerDebugAPI.UpdateStatus;
-  actToolsWebOpenPublicUrl.Enabled := TKMDevServerDebugAPI.ngrokEndpoint <> '';
+  TServerDebugAPI.UpdateStatus;
+  actToolsWebOpenPublicUrl.Enabled := TServerDebugAPI.ngrokEndpoint <> '';
 
   if actToolsWebOpenPublicUrl.Enabled
-    then actToolsWebOpenPublicUrl.Caption := 'Open '+TKMDevServerDebugAPI.ngrokEndpoint+' in browser'
+    then actToolsWebOpenPublicUrl.Caption := 'Open '+TServerDebugAPI.ngrokEndpoint+' in browser'
     else actToolsWebOpenPublicUrl.Caption := 'Open in browser';
 end;
 

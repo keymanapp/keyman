@@ -88,42 +88,6 @@ else
   DRY_RUN=
 fi
 
-publish_version=`cat "$KEYMAN_ROOT/VERSION.md"`
-publish_tier=`cat "$KEYMAN_ROOT/TIER.md"`
-
-# Validate the publish_version
-if [ ! -z "$publish_version" ]; then
-  # Remove final component if more than 3 components passed
-  publish_version=` echo "$publish_version" | cut -d "." -f1,2,3 -`
-  [[ $publish_version =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]] || fail "-version must be dotted numeric string, e.g. 1.2.3."
-fi
-
-if [ -n "$publish_tier" ]; then
-  # Make sure we're either setting the version or publishing:
-  if [ -z "$publish_version" ] && (( !should_publish )) ; then
-    fail "-tier cannot be specified without -version or -publish-to-npm"
-  fi
-
-  case "$publish_tier" in
-    alpha)
-      publish_tier=-alpha
-      npm_dist_tag=alpha
-      ;;
-    beta)
-      publish_tier=-beta
-      npm_dist_tag=beta
-      ;;
-    stable)
-      # Stable releases intentionally have a blank publish tier:
-      publish_tier=
-      npm_dist_tag=latest
-      ;;
-    *)
-      fail "-tier must be one of alpha, beta or stable"
-  esac
-  publish_version=$publish_version$publish_tier
-fi
-
 # Check if Node.JS/npm is installed.
 type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
@@ -132,9 +96,7 @@ if (( install_dependencies )) ; then
   verify_npm_setup
 fi
 
-if [ -n "$publish_version" ]; then
-  set_npm_version "$publish_version" || fail "Setting version failed."
-fi
+set_npm_version || fail "Setting version failed."
 
 build || fail "Compilation failed."
 echo "Typescript compilation successful."

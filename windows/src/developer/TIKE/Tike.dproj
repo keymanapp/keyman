@@ -560,11 +560,11 @@
         </DCCReference>
         <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas"/>
-        <DCCReference Include="dialogs\Keyman.Developer.UI.UfrmNGrokOptions.pas">
-            <Form>frmNgrokOptions</Form>
+        <DCCReference Include="dialogs\Keyman.Developer.UI.UfrmServerOptions.pas">
+            <Form>frmServerOptions</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="http\Keyman.Developer.System.KMDevServerAPI.pas"/>
+        <DCCReference Include="http\Keyman.Developer.System.ServerAPI.pas"/>
         <DCCReference Include="main\Keyman.System.FontLoadUtil.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">

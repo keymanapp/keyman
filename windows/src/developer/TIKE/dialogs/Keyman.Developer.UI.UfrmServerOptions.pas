@@ -1,4 +1,4 @@
-unit Keyman.Developer.UI.UfrmNGrokOptions;
+unit Keyman.Developer.UI.UfrmServerOptions;
 
 interface
 
@@ -18,7 +18,7 @@ uses
   UfrmTike;
 
 type
-  TfrmNgrokOptions = class(TTikeForm)
+  TfrmServerOptions = class(TTikeForm)
     cmdOK: TButton;
     cmdCancel: TButton;
     gbSetup: TGroupBox;
@@ -28,7 +28,7 @@ type
     lblRegion: TLabel;
     cmdDownload: TButton;
     gbAdvanced: TGroupBox;
-    chkKeepNGrokControlWindowVisible: TCheckBox;
+    chkKeepNgrokControlWindowVisible: TCheckBox;
     editControlPort: TEdit;
     lblControlPort: TLabel;
     cmdCreateAccount: TButton;
@@ -64,7 +64,7 @@ uses
   Winapi.ShlObj,
 
   KeymanDeveloperOptions,
-  Keyman.Developer.System.KMDevServerAPI,
+  Keyman.Developer.System.ServerAPI,
   KeymanPaths,
   RegistryKeys,
   UmodWebHttpServer,
@@ -79,12 +79,12 @@ const
   SUrlNgrokSignup = 'https://dashboard.ngrok.com/signup';
   SUrlNgrokDownload = 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-386.zip';
 
-procedure TfrmNgrokOptions.cmdCreateAccountClick(Sender: TObject);
+procedure TfrmServerOptions.cmdCreateAccountClick(Sender: TObject);
 begin
   TUtilExecute.URL(SUrlNgrokSignup);
 end;
 
-procedure TfrmNgrokOptions.HttpReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
+procedure TfrmServerOptions.HttpReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
 begin
   Abort := False;
   if Assigned(FDownloadProgress) then
@@ -94,7 +94,7 @@ begin
   end;
 end;
 
-procedure TfrmNgrokOptions.DownloadNgrok(AOwner: TfrmDownloadProgress; var Result: Boolean);
+procedure TfrmServerOptions.DownloadNgrok(AOwner: TfrmDownloadProgress; var Result: Boolean);
 var
   http: THttpClient;
   res: IHTTPResponse;
@@ -170,11 +170,11 @@ begin
   end;
 end;
 
-procedure TfrmNgrokOptions.cmdDownloadClick(Sender: TObject);
+procedure TfrmServerOptions.cmdDownloadClick(Sender: TObject);
 var
   DownloadProgress: TfrmDownloadProgress;
 begin
-  TKMDevServerDebugAPI.StopServer;
+  TServerDebugAPI.StopServer;
 
   try
     DownloadProgress := TfrmDownloadProgress.Create(Self);
@@ -186,11 +186,11 @@ begin
     end;
   finally
     UpdateVersionLabel;
-    TKMDevServerDebugAPI.StartServer;
+    TServerDebugAPI.StartServer;
   end;
 end;
 
-procedure TfrmNgrokOptions.cmdOKClick(Sender: TObject);
+procedure TfrmServerOptions.cmdOKClick(Sender: TObject);
 var
   DefaultPort, ngrokControlPort: Integer;
   KeepAlive, UseNgrok, ngrokKeepVisible: Boolean;
@@ -203,33 +203,33 @@ begin
   ngrokControlPort := StrToIntDef(editControlPort.Text, 8009);
   ngrokToken := editAuthToken.Text;
   ngrokRegion := Copy(cbRegion.Text, 1, 2);
-  ngrokKeepVisible := chkKeepNGrokControlWindowVisible.Checked;
+  ngrokKeepVisible := chkKeepNgrokControlWindowVisible.Checked;
 
   Changed :=
     (FKeymanDeveloperOptions.WebHostDefaultPort <> DefaultPort) or
     (FKeymanDeveloperOptions.WebHostKeepAlive <> KeepAlive) or
     (FKeymanDeveloperOptions.WebHostUseNgrok <> UseNgrok) or
-    (FKeymanDeveloperOptions.WebHostNGrokControlPort <> ngrokControlPort) or
-    (FKeymanDeveloperOptions.WebHostNGrokToken <> ngrokToken) or
-    (FKeymanDeveloperOptions.WebHostNGrokRegion <> ngrokRegion) or
-    (FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible <> ngrokKeepVisible);
+    (FKeymanDeveloperOptions.WebHostNgrokControlPort <> ngrokControlPort) or
+    (FKeymanDeveloperOptions.WebHostNgrokToken <> ngrokToken) or
+    (FKeymanDeveloperOptions.WebHostNgrokRegion <> ngrokRegion) or
+    (FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible <> ngrokKeepVisible);
 
   if Changed then
   begin
     FKeymanDeveloperOptions.WebHostDefaultPort := DefaultPort;
     FKeymanDeveloperOptions.WebHostKeepAlive := KeepAlive;
     FKeymanDeveloperOptions.WebHostUseNgrok := UseNgrok;
-    FKeymanDeveloperOptions.WebHostNGrokControlPort := ngrokControlPort;
-    FKeymanDeveloperOptions.WebHostNGrokToken := ngrokToken;
-    FKeymanDeveloperOptions.WebHostNGrokRegion := ngrokRegion;
-    FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible := ngrokKeepVisible;
+    FKeymanDeveloperOptions.WebHostNgrokControlPort := ngrokControlPort;
+    FKeymanDeveloperOptions.WebHostNgrokToken := ngrokToken;
+    FKeymanDeveloperOptions.WebHostNgrokRegion := ngrokRegion;
+    FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible := ngrokKeepVisible;
     FKeymanDeveloperOptions.Write; // TODO: Cancel button in parent dialog is a problem
     modWebHttpServer.RestartServer;
   end;
   ModalResult := mrOk;
 end;
 
-procedure TfrmNgrokOptions.FormCreate(Sender: TObject);
+procedure TfrmServerOptions.FormCreate(Sender: TObject);
 var
   i: Integer;
 begin
@@ -238,33 +238,33 @@ begin
   chkLeaveServerRunning.Checked := FKeymanDeveloperOptions.WebHostKeepAlive;
 
   lblVersion.Caption := '';
-  editAuthToken.Text := FKeymanDeveloperOptions.WebHostNGrokToken;
+  editAuthToken.Text := FKeymanDeveloperOptions.WebHostNgrokToken;
 
   cbRegion.ItemIndex := 0;
   for i := 0 to cbRegion.Items.Count - 1 do
-    if cbRegion.Items[i].StartsWith(FKeymanDeveloperOptions.WebHostNGrokRegion) then
+    if cbRegion.Items[i].StartsWith(FKeymanDeveloperOptions.WebHostNgrokRegion) then
     begin
       cbRegion.ItemIndex := i;
       Break;
     end;
 
-  chkKeepNGrokControlWindowVisible.Checked := FKeymanDeveloperOptions.WebHostKeepNGrokControlWindowVisible;
-  editControlPort.Text := IntToStr(FKeymanDeveloperOptions.WebHostNGrokControlPort);
+  chkKeepNgrokControlWindowVisible.Checked := FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible;
+  editControlPort.Text := IntToStr(FKeymanDeveloperOptions.WebHostNgrokControlPort);
 
   UpdateVersionLabel;
 end;
 
-procedure TfrmNgrokOptions.lblGetTokenClick(Sender: TObject);
+procedure TfrmServerOptions.lblGetTokenClick(Sender: TObject);
 begin
   TUtilExecute.URL(SUrlNgrokAuthToken);
 end;
 
-function TfrmNgrokOptions.NgrokPath: string;
+function TfrmServerOptions.NgrokPath: string;
 begin
   Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\ngrok.exe';
 end;
 
-procedure TfrmNgrokOptions.UpdateVersionLabel;
+procedure TfrmServerOptions.UpdateVersionLabel;
 var
   logtext: string;
   ec: Integer;
