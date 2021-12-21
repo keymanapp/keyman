@@ -1,11 +1,14 @@
 import express = require('express');
-import {  DebugObject } from "../../../data";
+import { DebugObject, isValidId } from "../../../data";
 import fs = require('fs');
 import chalk = require('chalk');
 
 export default function apiUnregister<O extends DebugObject> (root:{ [id: string]: O }, req: express.Request, res: express.Response, next: express.NextFunction) {
   const id = req.body['id'];
-  // TODO: verify that id matches filename pattern (no .., no /, no \)
+  if(!isValidId(id)) {
+    res.sendStatus(400);
+    return;
+  }
   const o = root[id];
 
   if(!o) {

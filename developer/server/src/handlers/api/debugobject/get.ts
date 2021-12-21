@@ -1,10 +1,14 @@
 import chalk = require('chalk');
 import express = require('express');
-import { DebugObject } from "../../../data";
+import { DebugObject, isValidId } from "../../../data";
 
 export default function apiGet (data: { [id: string]: DebugObject }, req: express.Request, res: express.Response, next: express.NextFunction) {
   const id = req.query['id'] as string;
-  // TODO: verify that id matches filename pattern (no .., no /, no \)
+  if(!isValidId(id)) {
+    res.sendStatus(400);
+    return;
+  }
+
   const o: DebugObject = data[id];
   if(!o) {
     console.error(chalk.red('  not found'));

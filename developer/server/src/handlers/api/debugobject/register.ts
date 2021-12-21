@@ -1,14 +1,19 @@
 import express = require('express');
-import { DebugObject } from "../../../data";
+import { DebugObject, isValidId } from "../../../data";
 import fs = require('fs');
 import crypto = require('crypto');
 import { configuration } from '../../../config';
 import chalk = require('chalk');
 
 export default function apiRegister<O extends DebugObject> (intf: new () => O, root:{ [id: string]: O }, req: express.Request, res: express.Response, next: express.NextFunction) {
-  const id = req.body['id'];
-  // TODO: verify that id matches filename pattern (no .., no /, no \)
-  // TODO: unregister least recently used object
+  const id: string = req.body['id'];
+  if(!isValidId(id)) {
+    res.sendStatus(400);
+    return;
+  }
+
+  // TODO: unregister least recently used object if > 16?
+
   const o: O = root[id] ?? new intf();
   root[id] = o;
 
@@ -23,8 +28,10 @@ export default function apiRegister<O extends DebugObject> (intf: new () => O, r
 }
 
 export function apiRegisterFile<O extends DebugObject> (intf: new () => O, root: { [id: string]: O }, id: string, file: Buffer) {
-  // TODO: verify that id matches filename pattern (no .., no /, no \)
   // TODO: unregister least recently used object
+  if(!isValidId(id)) {
+    return;
+  }
 
   const o: O = root[id] ?? new intf();
   root[id] = o;

@@ -118,3 +118,7 @@ export class SiteData {
 };
 
 export let data: SiteData = new SiteData();
+
+export function isValidId(id: string) {
+  return !id.match(/\.\.|\/|\\/);
+}

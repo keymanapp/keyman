@@ -2,7 +2,7 @@ import express = require('express');
 import multer = require('multer');
 import ws = require('ws');
 import handleIncKeyboardsJs from './handlers/inc/keyboards-js';
-import { data, DebugFont, DebugKeyboard, DebugModel, DebugObject, DebugPackage } from './data';
+import { data, DebugFont, DebugKeyboard, DebugModel, DebugObject, DebugPackage, isValidId } from './data';
 import apiGet from './handlers/api/debugobject/get';
 import apiRegister, { apiRegisterFile } from './handlers/api/debugobject/register';
 import apiKeyboardRegister from './handlers/api/keyboard/register';
@@ -38,6 +38,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
   }
 
   // Only allow connections from localhost to /api/
+
   app.use('/api/', localhostOnly);
 
   /* All routes */
@@ -46,6 +47,10 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
   app.post('/upload', localhostOnly, upload.single('file'), (req, res, next) => {
     const name = req.file.originalname;
+    if(!isValidId(name)) {
+      res.sendStatus(400);
+      return;
+    }
     const rModel = /^([a-zA-Z0-9_\.-]+)\.model\.js$/.exec(name);
     const rKeyboard = /^([a-zA-Z0-9_]+)\.js$/.exec(name);
     const rPackage = /^([a-zA-Z0-9_]+)\.kmp$/.exec(name);
@@ -62,9 +67,6 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
       res.status(400).json({message: 'unrecognised file type'});
       return;
     }
-
-    // fs.writeFileSync(o.filename, req.file.buffer);
-    // o.sha256 = crypto.createHash('sha256').update(req.file.buffer).digest('hex');
 
     res.json({message: 'success'});
     next();
@@ -165,9 +167,17 @@ function saveState (res: express.Request, req: express.Response, next: express.N
 
 function appGetData(app: express.Express, pathregex: RegExp,  root: { [id: string]: DebugObject }) {
   app.get(pathregex, (req,res,next)=>{
+
     const r = pathregex.exec(req.path);
-    // TODO: ensure path safety
-    const o = root[r ? r[1] : null];
+    if(!r) {
+      res.status(404).send('invalid path');
+      return;
+    }
+    if(!isValidId(r[1])) {
+      res.sendStatus(400);
+      return;
+    }
+    const o = root[r[1]];
     if(!o) {
       res.status(404).send('not found');
     } else {
