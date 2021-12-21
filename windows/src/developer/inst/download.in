@@ -120,6 +120,14 @@ heat-model-compiler:
     cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     # package-lock.json wasn't bundled; this is needed to keep dependency versions consistent.
     copy $(KEYMAN_MODELCOMPILER_ROOT)\package-lock.json $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+# as of npm v8.x, even though we are only working with `dependencies`, `devDependencies` is
+# still checked, and as these two modules are present in devDependencies but are only
+# available when in the repo path, we need to remove them before attempting to continue.
+# Yuck! ref: https://github.com/npm/cli/issues/3975#issuecomment-985305678
+# ref: https://github.com/npm/cli/issues/2921
+# don't forget to uninstall both at the same time or it *still* fails...
+    npm uninstall @keymanapp/models-templates @keymanapp/models-wordbreakers
+
     npm install kmtypes.tgz --production --no-optional
     npm install --production --no-optional
 
