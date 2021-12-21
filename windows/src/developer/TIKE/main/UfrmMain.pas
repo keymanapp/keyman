@@ -1380,7 +1380,7 @@ procedure TfrmKeymanDeveloper.mnuToolsClick(Sender: TObject);
 begin
   mnuToolsDebugTests.Visible := (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0);
   mnuToolsDebugTestsShowDebuggerEventsPanel.Checked := TfrmDebugStatus.ShowDebuggerEventsPanel;
-  mnuToolsWebDebugger.Visible := FKeymanDeveloperOptions.WebHostUseNgrok;
+  mnuToolsWebDebugger.Visible := FKeymanDeveloperOptions.ServerUseNgrok;
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectClick(Sender: TObject);

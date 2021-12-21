@@ -22,19 +22,20 @@ object frmServerOptions: TfrmServerOptions
     Top = 96
     Width = 403
     Height = 39
-    Caption =
+    Caption = 
       'ngrok is a service that allows you to temporarily share your loc' +
       'al web debugger site with a public URL, so that you can access i' +
       't from any device or share it with other users for testing your ' +
       'keyboards, models and packages.'
     WordWrap = True
   end
-  object lblWebHostDefaultPort: TLabel
+  object lblDefaultPort: TLabel
     Left = 8
     Top = 19
     Width = 58
     Height = 13
     Caption = '&Default port'
+    FocusControl = editDefaultPort
   end
   object cmdOK: TButton
     Left = 272
@@ -151,32 +152,16 @@ object frmServerOptions: TfrmServerOptions
     Height = 90
     Caption = 'Advanced Options'
     TabOrder = 4
-    object lblControlPort: TLabel
-      Left = 16
-      Top = 57
-      Width = 58
-      Height = 13
-      Caption = 'Control &port'
-      FocusControl = editControlPort
-    end
-    object chkKeepNgrokControlWindowVisible: TCheckBox
+    object chkServerShowConsoleWindow: TCheckBox
       Left = 16
       Top = 27
       Width = 257
       Height = 17
-      Caption = '&Keep ngrok control window visible'
+      Caption = '&Show server console window on start'
       TabOrder = 0
     end
-    object editControlPort: TEdit
-      Left = 122
-      Top = 54
-      Width = 79
-      Height = 21
-      NumbersOnly = True
-      TabOrder = 1
-    end
   end
-  object editWebHostDefaultPort: TEdit
+  object editDefaultPort: TEdit
     Left = 84
     Top = 16
     Width = 61

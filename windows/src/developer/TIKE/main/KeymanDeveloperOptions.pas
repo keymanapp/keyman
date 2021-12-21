@@ -51,7 +51,7 @@ type
     FDebuggerAutoRecompileWithDebugInfo: Boolean;
     FAllowMultipleInstances: Boolean;
     FExternalEditorPath: WideString;
-    FWebHostDefaultPort: Integer;   // I4021
+    FServerDefaultPort: Integer;   // I4021
     FSMTPServer: string;   // I4506
     FTestEmailAddresses: string;   // I4506
     FOpenKeyboardFilesInSourceView: Boolean;   // I4751
@@ -64,13 +64,12 @@ type
     FOSKAutoSaveBeforeImporting: Boolean;
     FReportErrors: Boolean;
     FReportUsage: Boolean;
-    FWebHostUseLocalAddresses: Boolean;
-    FWebHostUseNgrok: Boolean;
-    FWebHostKeepNgrokControlWindowVisible: Boolean;
-    FWebHostNgrokControlPort: Integer;
-    FWebHostNgrokToken: string;
-    FWebHostNgrokRegion: string;
-    FWebHostKeepAlive: Boolean;
+    FServerUseLocalAddresses: Boolean;
+    FServerUseNgrok: Boolean;
+    FServerServerShowConsoleWindow: Boolean;
+    FServerNgrokToken: string;
+    FServerNgrokRegion: string;
+    FServerKeepAlive: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -108,15 +107,14 @@ type
     property ReportErrors: Boolean read FReportErrors write FReportErrors;
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
 
-    property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
-    property WebHostKeepAlive: Boolean read FWebHostKeepAlive write FWebHostKeepAlive;
-    property WebHostUseLocalAddresses: Boolean read FWebHostUseLocalAddresses write FWebHostUseLocalAddresses;
+    property ServerDefaultPort: Integer read FServerDefaultPort write FServerDefaultPort;   // I4021
+    property ServerKeepAlive: Boolean read FServerKeepAlive write FServerKeepAlive;
+    property ServerUseLocalAddresses: Boolean read FServerUseLocalAddresses write FServerUseLocalAddresses;
 
-    property WebHostNgrokControlPort: Integer read FWebHostNgrokControlPort write FWebHostNgrokControlPort;
-    property WebHostNgrokToken: string read FWebHostNgrokToken write FWebHostNgrokToken;
-    property WebHostNgrokRegion: string read FWebHostNgrokRegion write FWebHostNgrokRegion;
-    property WebHostUseNgrok: Boolean read FWebHostUseNgrok write FWebHostUseNgrok;
-    property WebHostKeepNgrokControlWindowVisible: Boolean read FWebHostKeepNgrokControlWindowVisible write FWebHostKeepNgrokControlWindowVisible;
+    property ServerNgrokToken: string read FServerNgrokToken write FServerNgrokToken;
+    property ServerNgrokRegion: string read FServerNgrokRegion write FServerNgrokRegion;
+    property ServerUseNgrok: Boolean read FServerUseNgrok write FServerUseNgrok;
+    property ServerServerShowConsoleWindow: Boolean read FServerServerShowConsoleWindow write FServerServerShowConsoleWindow;
 
     property AllowMultipleInstances: Boolean read FAllowMultipleInstances write FAllowMultipleInstances;
 
@@ -218,15 +216,14 @@ begin
     FAutoSaveBeforeCompiling := regReadBool(SRegValue_IDEOptAutoSaveBeforeCompiling, False);
     FOSKAutoSaveBeforeImporting := regReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
 
-    FWebHostDefaultPort := regReadInt(SRegValue_IDEOptWebHostPort, 8008);
-    FWebHostKeepAlive := regReadBool(SRegValue_IDEOptWebHostKeepAlive, False);
-    FWebHostUseLocalAddresses := regReadBool(SRegValue_IDEOptWebHostUseLocalAddresses, True);
+    FServerDefaultPort := regReadInt(SRegValue_IDEOptServerPort, 8008);
+    FServerKeepAlive := regReadBool(SRegValue_IDEOptServerKeepAlive, False);
+    FServerUseLocalAddresses := regReadBool(SRegValue_IDEOptServerUseLocalAddresses, True);
 
-    FWebHostNgrokControlPort := regReadInt(SRegValue_IDEOptWebHostNgrokControlPort, 8009);
-    FWebHostNgrokToken := regReadString(SRegValue_IDEOptWebHostNgrokToken, '');
-    FWebHostNgrokRegion := regReadString(SRegValue_IDEOptWebHostNgrokRegion, 'us');
-    FWebHostUseNgrok := regReadBool(SRegValue_IDEOptWebHostUseNgrok, False);
-    FWebHostKeepNgrokControlWindowVisible := regReadBool(SRegValue_IDEOptWebHostKeepNgrokControlWindowVisible, False);
+    FServerNgrokToken := regReadString(SRegValue_IDEOptServerNgrokToken, '');
+    FServerNgrokRegion := regReadString(SRegValue_IDEOptServerNgrokRegion, 'us');
+    FServerUseNgrok := regReadBool(SRegValue_IDEOptServerUseNgrok, False);
+    FServerServerShowConsoleWindow := regReadBool(SRegValue_IDEOptServerShowConsoleWindow, False);
 
     FCharMapDisableDatabaseLookups := regReadBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, False);
     FCharMapAutoLookup             := regReadBool(SRegValue_IDEOptCharMapAutoLookup,             True);
@@ -281,15 +278,14 @@ begin
     regWriteBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, FOSKAutoSaveBeforeImporting);
 
 
-    regWriteInt(SRegValue_IDEOptWebHostPort, FWebHostDefaultPort);
-    regWriteBool(SRegValue_IDEOptWebHostKeepAlive, FWebHostKeepAlive);
-    regWriteBool(SRegValue_IDEOptWebHostUseLocalAddresses, FWebHostUseLocalAddresses);
+    regWriteInt(SRegValue_IDEOptServerPort, FServerDefaultPort);
+    regWriteBool(SRegValue_IDEOptServerKeepAlive, FServerKeepAlive);
+    regWriteBool(SRegValue_IDEOptServerUseLocalAddresses, FServerUseLocalAddresses);
 
-    regWriteInt(SRegValue_IDEOptWebHostNgrokControlPort, FWebHostNgrokControlPort);
-    regWriteString(SRegValue_IDEOptWebHostNgrokToken, FWebHostNgrokToken);
-    regWriteString(SRegValue_IDEOptWebHostNgrokRegion, FWebHostNgrokRegion);
-    regWriteBool(SRegValue_IDEOptWebHostUseNgrok, FWebHostUseNgrok);
-    regWriteBool(SRegValue_IDEOptWebHostKeepNgrokControlWindowVisible, FWebHostKeepNgrokControlWindowVisible);
+    regWriteString(SRegValue_IDEOptServerNgrokToken, FServerNgrokToken);
+    regWriteString(SRegValue_IDEOptServerNgrokRegion, FServerNgrokRegion);
+    regWriteBool(SRegValue_IDEOptServerUseNgrok, FServerUseNgrok);
+    regWriteBool(SRegValue_IDEOptServerShowConsoleWindow, FServerServerShowConsoleWindow);
 
 
     regWriteBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, FCharMapDisableDatabaseLookups);
@@ -329,12 +325,11 @@ var
 begin
   o := TJSONObject.Create;
   try
-    o.AddPair('port', TJSONNumber.Create(FWebHostDefaultPort));
-    o.AddPair('ngrokControlPort', TJSONNumber.Create(FWebHostNgrokControlPort));
-    o.AddPair('ngrokToken', FWebHostNgrokToken);
-    o.AddPair('ngrokRegion', FWebHostNgrokRegion);
-    o.AddPair('useNgrok', TJSONBool.Create(FWebHostUseNgrok));
-    o.AddPair('ngrokVisible', TJSONBool.Create(FWebHostKeepNgrokControlWindowVisible));
+    o.AddPair('port', TJSONNumber.Create(FServerDefaultPort));
+    o.AddPair('ngrokToken', FServerNgrokToken);
+    o.AddPair('ngrokRegion', FServerNgrokRegion);
+    o.AddPair('useNgrok', TJSONBool.Create(FServerUseNgrok));
+    o.AddPair('ngrokVisible', TJSONBool.Create(FServerServerShowConsoleWindow));
     s := TStringList.Create;
     try
       PrettyPrintJSON(o, s, 2);

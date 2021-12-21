@@ -28,15 +28,13 @@ type
     lblRegion: TLabel;
     cmdDownload: TButton;
     gbAdvanced: TGroupBox;
-    chkKeepNgrokControlWindowVisible: TCheckBox;
-    editControlPort: TEdit;
-    lblControlPort: TLabel;
+    chkServerShowConsoleWindow: TCheckBox;
     cmdCreateAccount: TButton;
     lblVersion: TLabel;
     Label1: TLabel;
     lblGetToken: TLabel;
-    lblWebHostDefaultPort: TLabel;
-    editWebHostDefaultPort: TEdit;
+    lblDefaultPort: TLabel;
+    editDefaultPort: TEdit;
     chkUseNgrok: TCheckBox;
     chkLeaveServerRunning: TCheckBox;
     procedure FormCreate(Sender: TObject);
@@ -192,37 +190,34 @@ end;
 
 procedure TfrmServerOptions.cmdOKClick(Sender: TObject);
 var
-  DefaultPort, ngrokControlPort: Integer;
+  DefaultPort: Integer;
   KeepAlive, UseNgrok, ngrokKeepVisible: Boolean;
   ngrokToken, ngrokRegion: string;
   Changed: Boolean;
 begin
-  DefaultPort := StrToIntDef(editWebHostDefaultPort.Text, 8008);   // I4021
+  DefaultPort := StrToIntDef(editDefaultPort.Text, 8008);   // I4021
   KeepAlive := chkLeaveServerRunning.Checked;
   UseNgrok := chkUseNgrok.Checked;
-  ngrokControlPort := StrToIntDef(editControlPort.Text, 8009);
   ngrokToken := editAuthToken.Text;
   ngrokRegion := Copy(cbRegion.Text, 1, 2);
-  ngrokKeepVisible := chkKeepNgrokControlWindowVisible.Checked;
+  ngrokKeepVisible := chkServerShowConsoleWindow.Checked;
 
   Changed :=
-    (FKeymanDeveloperOptions.WebHostDefaultPort <> DefaultPort) or
-    (FKeymanDeveloperOptions.WebHostKeepAlive <> KeepAlive) or
-    (FKeymanDeveloperOptions.WebHostUseNgrok <> UseNgrok) or
-    (FKeymanDeveloperOptions.WebHostNgrokControlPort <> ngrokControlPort) or
-    (FKeymanDeveloperOptions.WebHostNgrokToken <> ngrokToken) or
-    (FKeymanDeveloperOptions.WebHostNgrokRegion <> ngrokRegion) or
-    (FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible <> ngrokKeepVisible);
+    (FKeymanDeveloperOptions.ServerDefaultPort <> DefaultPort) or
+    (FKeymanDeveloperOptions.ServerKeepAlive <> KeepAlive) or
+    (FKeymanDeveloperOptions.ServerUseNgrok <> UseNgrok) or
+    (FKeymanDeveloperOptions.ServerNgrokToken <> ngrokToken) or
+    (FKeymanDeveloperOptions.ServerNgrokRegion <> ngrokRegion) or
+    (FKeymanDeveloperOptions.ServerServerShowConsoleWindow <> ngrokKeepVisible);
 
   if Changed then
   begin
-    FKeymanDeveloperOptions.WebHostDefaultPort := DefaultPort;
-    FKeymanDeveloperOptions.WebHostKeepAlive := KeepAlive;
-    FKeymanDeveloperOptions.WebHostUseNgrok := UseNgrok;
-    FKeymanDeveloperOptions.WebHostNgrokControlPort := ngrokControlPort;
-    FKeymanDeveloperOptions.WebHostNgrokToken := ngrokToken;
-    FKeymanDeveloperOptions.WebHostNgrokRegion := ngrokRegion;
-    FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible := ngrokKeepVisible;
+    FKeymanDeveloperOptions.ServerDefaultPort := DefaultPort;
+    FKeymanDeveloperOptions.ServerKeepAlive := KeepAlive;
+    FKeymanDeveloperOptions.ServerUseNgrok := UseNgrok;
+    FKeymanDeveloperOptions.ServerNgrokToken := ngrokToken;
+    FKeymanDeveloperOptions.ServerNgrokRegion := ngrokRegion;
+    FKeymanDeveloperOptions.ServerServerShowConsoleWindow := ngrokKeepVisible;
     FKeymanDeveloperOptions.Write; // TODO: Cancel button in parent dialog is a problem
     modWebHttpServer.RestartServer;
   end;
@@ -233,23 +228,22 @@ procedure TfrmServerOptions.FormCreate(Sender: TObject);
 var
   i: Integer;
 begin
-  editWebHostDefaultPort.Text := IntToStr(FKeymanDeveloperOptions.WebHostDefaultPort);   // I4021
-  chkUseNgrok.Checked := FKeymanDeveloperOptions.WebHostUseNgrok;
-  chkLeaveServerRunning.Checked := FKeymanDeveloperOptions.WebHostKeepAlive;
+  editDefaultPort.Text := IntToStr(FKeymanDeveloperOptions.ServerDefaultPort);   // I4021
+  chkUseNgrok.Checked := FKeymanDeveloperOptions.ServerUseNgrok;
+  chkLeaveServerRunning.Checked := FKeymanDeveloperOptions.ServerKeepAlive;
 
   lblVersion.Caption := '';
-  editAuthToken.Text := FKeymanDeveloperOptions.WebHostNgrokToken;
+  editAuthToken.Text := FKeymanDeveloperOptions.ServerNgrokToken;
 
   cbRegion.ItemIndex := 0;
   for i := 0 to cbRegion.Items.Count - 1 do
-    if cbRegion.Items[i].StartsWith(FKeymanDeveloperOptions.WebHostNgrokRegion) then
+    if cbRegion.Items[i].StartsWith(FKeymanDeveloperOptions.ServerNgrokRegion) then
     begin
       cbRegion.ItemIndex := i;
       Break;
     end;
 
-  chkKeepNgrokControlWindowVisible.Checked := FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible;
-  editControlPort.Text := IntToStr(FKeymanDeveloperOptions.WebHostNgrokControlPort);
+  chkServerShowConsoleWindow.Checked := FKeymanDeveloperOptions.ServerServerShowConsoleWindow;
 
   UpdateVersionLabel;
 end;

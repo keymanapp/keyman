@@ -393,14 +393,16 @@ const
   SRegValue_IDEOptAutoSaveBeforeCompiling = 'auto save before compiling'; // CU
   SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
 
-  SRegValue_IDEOptWebHostPort = 'web host port';   // I4021
-  SRegValue_IDEOptWebHostKeepAlive = 'web host keep alive';
-  SRegValue_IDEOptWebHostNgrokControlPort = 'web host ngrok control port';
-  SRegValue_IDEOptWebHostNgrokToken = 'web host ngrok token';
-  SRegValue_IDEOptWebHostNgrokRegion = 'web host ngrok region';
-  SRegValue_IDEOptWebHostUseLocalAddresses = 'web host use local addresses';
-  SRegValue_IDEOptWebHostUseNgrok = 'web host use ngrok';
-  SRegValue_IDEOptWebHostKeepNgrokControlWindowVisible = 'web host keep ngrok control window visible';
+  // Note: keeping 'web host port' reg value name to ensure settings maintained
+  //       from version 14.0 and earlier of Keyman Developer. Other values are
+  //       new with Keyman Developer 15.0
+  SRegValue_IDEOptServerPort = 'web host port';   // I4021
+  SRegValue_IDEOptServerKeepAlive = 'server keep alive';
+  SRegValue_IDEOptServerNgrokToken = 'server ngrok token';
+  SRegValue_IDEOptServerNgrokRegion = 'server ngrok region';
+  SRegValue_IDEOptServerUseLocalAddresses = 'server use local addresses';
+  SRegValue_IDEOptServerUseNgrok = 'server use ngrok';
+  SRegValue_IDEOptServerShowConsoleWindow = 'server show console window';
 
   SRegValue_IDEOptCharMapDisableDatabaseLookups = 'char map disable database lookups';  // CU
   SRegValue_IDEOptCharMapAutoLookup             = 'char map auto lookup';               // CU

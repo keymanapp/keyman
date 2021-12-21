@@ -332,7 +332,7 @@ inherited frmOptions: TfrmOptions
           TabOrder = 5
         end
       end
-      object gbWebHost: TGroupBox
+      object gbServer: TGroupBox
         Left = 8
         Top = 159
         Width = 313

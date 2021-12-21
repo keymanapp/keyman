@@ -72,7 +72,7 @@ type
     TntLabel1: TLabel;
     editDatabasePath: TEdit;
     dlgBrowseUnicodeData: TOpenDialog;
-    gbWebHost: TGroupBox;
+    gbServer: TGroupBox;
     cmdSMTPSettings: TButton;
     chkOpenKeyboardFilesInSourceView: TCheckBox;
     cmdResetToolWindows: TButton;
@@ -111,7 +111,6 @@ type
     procedure cmdQuotedFontClick(Sender: TObject);
     procedure cmdCharMapRebuildDatabaseClick(Sender: TObject);
     procedure cmdProxySettingsClick(Sender: TObject);
-    procedure editWebHostDefaultPortKeyPress(Sender: TObject; var Key: Char);
     procedure cmdSMTPSettingsClick(Sender: TObject);
     procedure cmdResetToolWindowsClick(Sender: TObject);
     procedure cbEditorThemeClick(Sender: TObject);
@@ -207,7 +206,7 @@ begin
 
     editIndentSize.Text := IntToStr(IndentSize);
 
-    chkListLocalURLs.Checked := WebHostUseLocalAddresses;
+    chkListLocalURLs.Checked := ServerUseLocalAddresses;
 
     chkReportUsage.Checked := ReportUsage;
     chkReportErrors.Checked := ReportErrors;
@@ -296,7 +295,7 @@ begin
     AutoSaveBeforeCompiling          := chkAutoSaveBeforeCompiling.Checked;
     OSKAutoSaveBeforeImporting       := chkOSKAutoSaveBeforeImporting.Checked;
 
-    WebHostUseLocalAddresses := chkListLocalURLs.Checked;
+    ServerUseLocalAddresses := chkListLocalURLs.Checked;
 
     CharMapAutoLookup := chkCharMapAutoLookup.Checked;
     CharMapDisableDatabaseLookups := chkCharMapDisableDatabaseLookups.Checked;
@@ -379,15 +378,6 @@ begin
     ShowModal;
   finally
     Free;
-  end;
-end;
-
-procedure TfrmOptions.editWebHostDefaultPortKeyPress(Sender: TObject;
-  var Key: Char);   // I4021
-begin
-  if not CharInSet(Key, ['0' .. '9']) then
-  begin
-    Key := #0;
   end;
 end;
 

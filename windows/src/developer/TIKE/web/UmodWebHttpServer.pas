@@ -127,7 +127,7 @@ end;
 
 procedure TmodWebHttpServer.DataModuleDestroy(Sender: TObject);
 begin
-  if not FKeymanDeveloperOptions.WebHostKeepAlive then
+  if not FKeymanDeveloperOptions.ServerKeepAlive then
     TServerDebugAPI.StopServer;
 
   http.Active := False;   // I4036

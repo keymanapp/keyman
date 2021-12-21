@@ -77,7 +77,7 @@ begin
   if Running then
     Exit;
 
-  if FKeymanDeveloperOptions.WebHostKeepNgrokControlWindowVisible
+  if FKeymanDeveloperOptions.ServerServerShowConsoleWindow
     then sw := SW_SHOWNORMAL
     else sw := SW_HIDE;
 
@@ -197,9 +197,9 @@ begin
   begin
     v.Add(TServerDebugAPI.ngrokEndpoint);
   end;
-  if FKeymanDeveloperOptions.WebHostUseLocalAddresses then
+  if FKeymanDeveloperOptions.ServerUseLocalAddresses then
   begin
-    port := ':'+IntToStr(FKeymanDeveloperOptions.WebHostDefaultPort);
+    port := ':'+IntToStr(FKeymanDeveloperOptions.ServerDefaultPort);
     sFull := GetHostName(ComputerNameDnsFullyQualified);
     sHost := GetHostName(ComputerNameDnsHostname);
     sNetbios := GetHostName(ComputerNameNetBIOS);
@@ -268,7 +268,7 @@ end;
 
 class function TServerDebugAPI.HostName: string;
 begin
-  Result := 'http://localhost:'+FKeymanDeveloperOptions.WebHostDefaultPort.ToString+'/';
+  Result := 'http://localhost:'+FKeymanDeveloperOptions.ServerDefaultPort.ToString+'/';
 end;
 
 class function TServerDebugAPI.IsDebugObjectRegistered(const objectType, id: string): Boolean;
