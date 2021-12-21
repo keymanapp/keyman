@@ -74,10 +74,10 @@ heat-model-compiler:
 
 !ifdef GIT_BASH_FOR_KEYMAN
     $(GIT_BASH_FOR_KEYMAN) build.sh
-    $(GIT_BASH_FOR_KEYMAN) bundle.sh "$(KEYMAN_WIX_TEMP_BASE)"
+    $(GIT_BASH_FOR_KEYMAN) bundle.sh --build-path "$(KEYMAN_WIX_TEMP_BASE)"
 !else
     start /wait .\build.sh
-    start /wait .\bundle.sh "$(KEYMAN_WIX_TEMP_BASE)"
+    start /wait .\bundle.sh --build-path "$(KEYMAN_WIX_TEMP_BASE)"
 !endif
 
 # Build the .wxs file
