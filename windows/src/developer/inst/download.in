@@ -125,8 +125,8 @@ heat-model-compiler:
 # available when in the repo path, we need to remove them before attempting to continue.
 # Yuck! ref: https://github.com/npm/cli/issues/3975#issuecomment-985305678
 # ref: https://github.com/npm/cli/issues/2921
-# don't forget to uninstall both at the same time or it *still* fails...
-    npm uninstall @keymanapp/models-templates @keymanapp/models-wordbreakers
+# can't use npm uninstall because it depends on @keymanapp/models-types being present!
+    cat package.json | grep -v "@keymanapp/models-templates" | grep -v "@keymanapp/models-wordbreakers" > package.json
 
     npm install kmtypes.tgz --production --no-optional
     npm install --production --no-optional
