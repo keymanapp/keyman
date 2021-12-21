@@ -6,9 +6,9 @@
 
 # ----------------------------------------------------------------------
 
-DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj kmlmc.wixobj
+DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj kmlmc.wixobj kmdev-server.wixobj
 
-setup:
+setup: pull-kmdev-server
 #
 # Prepare file version information
 #
@@ -36,6 +36,25 @@ setup:
     cd $(ROOT)\src\developer\inst
     $(MAKE) -fdownload.mak
 
+pull-kmdev-server:
+#
+# Requires us to build kmdev-server (which in turn build kmw) in order to get
+# the output files If GIT_BASH_FOR_KEYMAN variable is not defined, then will
+# just throw up a new window to do the build. This means we lose logging and
+# potentially exit values as well. So GIT_BASH should be set for build agents,
+# etc, to something like
+#
+# GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file
+# "c:\Program Files\Git\etc\profile" -l
+#
+    cd $(ROOT)\..\developer\kmdev-server
+
+!ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) build.sh --production
+!else
+    start /wait ./build.sh --production
+!endif
+
 build:
     @rem
 
@@ -58,7 +77,7 @@ clean:
     -del /Q *.exe
     -del /Q *.wixpdb
     -del /Q xml.wxs
-		-del /Q cef.wxs
+    -del /Q cef.wxs
     -del /Q templates.wxs
     -del /Q kmlmc.wxs
 

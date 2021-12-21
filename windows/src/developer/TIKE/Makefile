@@ -17,7 +17,7 @@ build: version.res manifest.res icons dirs xml xsd pull-core
 xsd:
     $(COPY) $(KEYMAN_ROOT)\common\schemas\kps\kps.xsd $(PROGRAM)\developer
 
-xml: pull-keymanweb pull-npm sentry-init.js
+xml: pull-npm sentry-init.js
     cd $(ROOT)\src\developer\tike\xml
     -del /q $(ROOT)\bin\developer\xml\*
     xcopy /s /y * $(ROOT)\bin\developer\xml
@@ -55,26 +55,6 @@ pull-npm:
     -rd /s/q $(ROOT)\src\developer\tike\xml\app\lib\monaco
     xcopy /i /s /y $(ROOT)\src\developer\tike\xml\app\node_modules\monaco-editor\min $(ROOT)\src\developer\tike\xml\app\lib\monaco\min
     xcopy /i /s /y $(ROOT)\src\developer\tike\xml\app\node_modules\monaco-editor\min-maps $(ROOT)\src\developer\tike\xml\app\lib\monaco\min-maps
-
-pull-keymanweb:
-#
-# Requires us to build KMW in order to get the output files
-# If GIT_BASH_FOR_KEYMAN variable is not defined, then will just throw up
-# a new window to do the build. This means we lose logging and
-# potentially exit values as well. So GIT_BASH should be set for
-# build agents, etc, to something like
-#
-# GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l
-#
-    cd $(ROOT)\..\developer\kmdev-server
-
-!ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh --production
-!else
-    start /wait ./build.sh --production
-!endif
-
-# TODO: make sure files available for release build (move this to inst?)
 
 icons:
     rc icons.rc
