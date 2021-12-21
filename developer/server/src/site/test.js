@@ -154,6 +154,8 @@ window.onload = function() {
       ta1.focus();
       window.sessionStorage.setItem('current-device', currentDevice);
     };
+  } else {
+    document.body.classList.add('touch-device');
   }
 
   function setOSK() {

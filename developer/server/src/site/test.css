@@ -103,7 +103,7 @@ h2 {
 
 /** Mobile, Tablet **/
 
-.touch-device #control-devices {
+.touch-device #dropdown-device {
   display: none;
 }
 
@@ -114,25 +114,21 @@ h2 {
 
 .install-link-packages,
 #install-link-packages,
-#model-link,
-.touch-device #install-link,
-.touch-device-ios #install-link-ios,
-.touch-device-android #install-link-android {
+#model-link {
   display: inline-block;
 }
 
-.touch-device-android .install-link .android,
-.touch-device-ios .install-link .ios {
-  display: inline;
-}
-
 .touch-device #character-grid {
-  white-space: nowrap;
+  height: 49px;
   overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 
 #character-grid {
   min-height: 49px;
+  max-height: 200px;
+  overflow-y: auto;
   margin: 0 0 8px 0;
   border: solid 1px #cccccc;
 }

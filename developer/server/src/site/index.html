@@ -24,8 +24,8 @@
 
     <header class='navbar navbar-dark bg-dark text-white'>
       <div class='container-fluid'>
-        <div class='row'>
-          <div class='col-md-auto'>
+        <div class='xzrow'>
+          <div class='d-inline-flex my-1 mx-1'>
             <div class="dropdown" id="dropdown-keyboard">
               <button id="btn-keyboard" class="btn btn-sm bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Keyboard
@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <div class='col-md-auto'>
+          <div class='d-inline-flex my-1 mx-1'>
             <div class="dropdown" id="dropdown-model">
               <button id="btn-model" class="btn btn-sm bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Model
@@ -48,7 +48,7 @@
             </div>
           </div>
 
-          <div class='col-md-auto'>
+          <div class='d-inline-flex my-1 mx-1'>
             <div class="dropdown" id="dropdown-device">
               <button id="btn-device" class="btn btn-sm bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Device
@@ -66,15 +66,14 @@
             </div>
           </div>
 
-          <div class='col-md-auto'>
+          <div class='d-inline-flex my-1 mx-1'>
             <form class="file-upload" id="drop-form">
               <input type="file" id="drop-file" multiple accept="*" onchange="handleFiles(this.files)">
               <input type="button" id="drop-button" class="btn btn-sm bg-light" value="Upload file">
             </form>
           </div>
 
-          <div class='col-md-auto'>
-
+          <div class='d-inline-flex my-1 mx-1'>
             <div class="dropdown" id='dropdown-package'>
               <button id="btn-package" class='btn btn-sm bg-warning' type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Install
