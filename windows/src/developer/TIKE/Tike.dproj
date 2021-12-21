@@ -560,7 +560,6 @@
         </DCCReference>
         <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas"/>
-        <DCCReference Include="web\Keyman.Developer.System.HttpServer.NGrokIntegration.pas"/>
         <DCCReference Include="dialogs\Keyman.Developer.UI.UfrmNGrokOptions.pas">
             <Form>frmNgrokOptions</Form>
             <FormType>dfm</FormType>

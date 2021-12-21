@@ -47,6 +47,7 @@ type
   private
     FDownloadProgress: TfrmDownloadProgress;
     procedure UpdateVersionLabel;
+    function NgrokPath: string;
     procedure DownloadNgrok(AOwner: TfrmDownloadProgress; var Result: Boolean);
     procedure HttpReceiveData(const Sender: TObject; AContentLength,
       AReadCount: Int64; var Abort: Boolean);
@@ -60,10 +61,12 @@ implementation
 uses
   System.Net.HttpClient,
   System.Zip,
+  Winapi.ShlObj,
 
   KeymanDeveloperOptions,
   Keyman.Developer.System.KMDevServerAPI,
-  Keyman.Developer.System.HttpServer.NgrokIntegration,
+  KeymanPaths,
+  RegistryKeys,
   UmodWebHttpServer,
   utilexecute;
 
@@ -145,7 +148,7 @@ begin
         end;
       end;
       try
-        fs := TFileStream.Create(TNgrokIntegration.NgrokPath, fmCreate);
+        fs := TFileStream.Create(NgrokPath, fmCreate);
       except
         on E:Exception do
         begin
@@ -256,14 +259,19 @@ begin
   TUtilExecute.URL(SUrlNgrokAuthToken);
 end;
 
+function TfrmNgrokOptions.NgrokPath: string;
+begin
+  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\ngrok.exe';
+end;
+
 procedure TfrmNgrokOptions.UpdateVersionLabel;
 var
   logtext: string;
   ec: Integer;
 begin
-  if not FileExists(TNgrokIntegration.NgrokPath) then
+  if not FileExists(NgrokPath) then
     lblVersion.Caption := 'Ngrok not installed'
-  else if TUtilExecute.Console(Format('"%s" --version', [TNgrokIntegration.NgrokPath]), ExtractFilePath(ParamStr(0)),
+  else if TUtilExecute.Console(Format('"%s" --version', [NgrokPath]), ExtractFilePath(ParamStr(0)),
     logtext, ec) then
   begin
     if ec = 0

@@ -74,7 +74,8 @@ uses
   Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
   Keyman.System.PackageInfoRefreshLexicalModels in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
-  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas';
+  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
+  Keyman.Developer.System.KeymanDeveloperPaths in '..\..\developer\TIKE\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
 
 begin
   Run;
