@@ -1234,7 +1234,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           end
           object cmdConfigureWebDebugger: TButton
             Left = 168
-            Top = 33
+            Top = 34
             Width = 153
             Height = 25
             Action = modActionsMain.actToolsWebConfigure

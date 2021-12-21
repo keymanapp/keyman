@@ -590,6 +590,7 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.kmnProjectFileAction,
+  Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.UfrmMessageDlgWithSave,
   RegExpr,
@@ -603,7 +604,6 @@ uses
   UfrmEditor,
   UfrmMain,
   UfrmMessages,
-  UmodWebHttpServer,
   UfrmMustIncludeDebug,
   UfrmSelectKey,
   UfrmSelectSystemKeyboard,
@@ -2619,7 +2619,7 @@ end;
 procedure TfrmKeymanWizard.NotifyStartedWebDebug;
 begin
   lbDebugHosts.Clear;
-  modWebHttpServer.GetURLs(lbDebugHosts.Items);
+  TServerDebugAPI.GetServerURLs(lbDebugHosts.Items);
   if lbDebugHosts.Items.Count > 0 then
     lbDebugHosts.ItemIndex := 0;
   UpdateQRCode;

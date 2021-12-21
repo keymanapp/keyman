@@ -18,11 +18,13 @@ type
     class procedure Post(const api: string; mfd: TMultipartFormData); static;
     class function HostName: string; static;
   public
+    // Server Control functions
     class function Running: Boolean; static;
-
     class procedure StartServer; static;
     class procedure StopServer; static;
+    class procedure GetServerURLs(v: TStrings); static;
 
+    // API endpoints
     class function IsKeyboardRegistered(const Filename: string): Boolean; static;
     class procedure RegisterKeyboard(const Filename, Version, FontFace, OskFontFace: string); static;
     class procedure UnregisterKeyboard(const Filename: string); static;
@@ -51,6 +53,9 @@ type
 implementation
 
 uses
+  IdGlobal,
+  IdGlobalProtocols,
+  IdStack,
   System.JSON,
   System.NetEncoding,
   System.Net.URLClient,
@@ -168,6 +173,67 @@ begin
 
   Result := True;
 end;
+
+class procedure TServerDebugAPI.GetServerURLs(v: TStrings);
+const
+  IPv4Loopback  = '127.0.0.1';          {do not localize}
+
+  function GetHostName(tp: TComputerNameFormat): string;
+  var
+    buf: array[0..260] of char;
+    sz: Cardinal;
+  begin
+    if GetComputerNameEx(tp, buf, sz) then
+      Result := buf
+    else
+      Result := '';
+  end;
+var
+  port: string;
+  sNetbios: string;
+  sHost: string;
+  sFull: string;
+  i: Integer;
+  FIPv4Addresses: TIdStackLocalAddressList;
+begin
+  if TServerDebugAPI.UpdateStatus and
+    (TServerDebugAPI.ngrokEndpoint <> '') then
+  begin
+    v.Add(TServerDebugAPI.ngrokEndpoint);
+  end;
+  if FKeymanDeveloperOptions.WebHostUseLocalAddresses then
+  begin
+    port := ':'+IntToStr(FKeymanDeveloperOptions.WebHostDefaultPort);
+    sFull := GetHostName(ComputerNameDnsFullyQualified);
+    sHost := GetHostName(ComputerNameDnsHostname);
+    sNetbios := GetHostName(ComputerNameNetBIOS);
+    if SameText(sHost, sFull) then sHost := '';
+    if SameText(sNetbios, sHost) or SameText(sNetbios, sFull) then sNetbios := '';
+
+    if sFull <> '' then v.Add('http://'+sFull+port);
+    if sHost <> '' then v.Add('http://'+sHost+port);
+    if sNetbios <> '' then v.Add('http://'+sNetbios+port);
+
+    FIPv4Addresses := TIdStackLocalAddressList.Create;
+    try
+      TIdStack.IncUsage;
+      try
+        GStack.GetLocalAddressList(FIPv4Addresses);
+      finally
+        TIdStack.DecUsage;
+      end;
+
+      for i := 0 to FIPv4Addresses.Count - 1 do
+        v.Add('http://'+FIPv4Addresses[i].IPAddress+port);
+    finally
+      FIPv4Addresses.Free;
+    end;
+
+    v.Add('http://localhost'+port);
+    v.Add('http://'+IPv4Loopback+port);
+  end;
+end;
+
 
 
 class function TServerDebugAPI.GetStatus: Boolean;

@@ -60,10 +60,8 @@ type
     function GetAppSource: TAppSourceHttpResponder;
     function GetPort: Integer;
   public
-    function GetURL: string;
     function GetLocalhostURL: string;
     function GetAppURL(s: string): string;
-    procedure GetURLs(v: TStrings);
     procedure RestartServer;
 
     property App: TAppHttpResponder read GetApp;
@@ -81,8 +79,6 @@ implementation
 
 uses
   IdException,
-  IdGlobal,
-  IdGlobalProtocols,
   IdStack,
 
   System.SysUtils,
@@ -101,34 +97,32 @@ procedure TmodWebHttpServer.DataModuleCreate(Sender: TObject);
 begin
   // TODO: split web host for project, editor, until we have moved
   // these over to the Server as well
-//  http.DefaultPort := FKeymanDeveloperOptions.WebHostDefaultPort;
 
   try
     http.Active := True;
   except
     on E:EIdSocketError do   // I4304
     begin
-      // TODO fix message
-      ShowMessage('The Keyman Developer debug web server was unable to start. '+
-        'This is usually caused by a firewall blocking rule or another process '+
-        'using the port '+IntToStr(http.DefaultPort)+' (change this in Tools/Options/Debugger). '+
-        #13#10#13#10'You will not be able to debug web or touch keyboards until this issue '+
-        'is resolved.'#13#10#13#10'Please note: restart Keyman Developer after resolving the issue to '+
-        'enable the debugger again.');
+      ShowMessage('The Keyman Developer internal web server was unable to start. '+
+        'Editors and Project view will not work correctly.');
     end;
     on E:EIdCouldNotBindSocket do   // I4304
     begin
-      // TODO fix message
-      ShowMessage('The Keyman Developer debug web server was unable to start. '+
-        'This is usually caused by a firewall blocking rule or another process '+
-        'using the port '+IntToStr(http.DefaultPort)+' (change this in Tools/Options/Debugger). '+
-        #13#10#13#10'You will not be able to debug web or touch keyboards until this issue '+
-        'is resolved.'#13#10#13#10'Please note: restart Keyman Developer after resolving the issue to '+
-        'enable the debugger again.');
+      ShowMessage('The Keyman Developer internal web server was unable to start. '+
+        'Editors and Project view will not work correctly.');
     end;
   end;
 
-  TServerDebugAPI.StartServer;
+  try
+    TServerDebugAPI.StartServer;
+  except
+    on E:Exception do
+    begin
+      ShowMessage('Unable to start Keyman Developer Server: '#13#10#13#10+
+        E.Message+
+        #13#10#13#10'The web debugger will not be available.');
+    end;
+  end;
 end;
 
 procedure TmodWebHttpServer.DataModuleDestroy(Sender: TObject);
@@ -169,82 +163,6 @@ end;
 function TmodWebHttpServer.GetPort: Integer;
 begin
   Result := http.Bindings[0].Port;
-end;
-
-function TmodWebHttpServer.GetURL: string;
-var
-  str: TStringList;
-begin
-  str := TStringList.Create;
-  try
-    GetURLs(str);
-    if str.Count > 0
-      then Result := str[0]
-      else Result := '';
-  finally
-    str.Free;
-  end;
-end;
-
-// TODO: move out of here
-procedure TmodWebHttpServer.GetURLs(v: TStrings);
-const
-  IPv4Loopback  = '127.0.0.1';          {do not localize}
-
-  function GetHostName(tp: TComputerNameFormat): string;
-  var
-    buf: array[0..260] of char;
-    sz: Cardinal;
-  begin
-    if GetComputerNameEx(tp, buf, sz) then
-      Result := buf
-    else
-      Result := '';
-  end;
-var
-  port: string;
-  sNetbios: string;
-  sHost: string;
-  sFull: string;
-  i: Integer;
-  FIPv4Addresses: TIdStackLocalAddressList;
-begin
-  if TServerDebugAPI.UpdateStatus and
-    (TServerDebugAPI.ngrokEndpoint <> '') then
-  begin
-    v.Add(TServerDebugAPI.ngrokEndpoint);
-  end;
-  if FKeymanDeveloperOptions.WebHostUseLocalAddresses then
-  begin
-    port := ':'+IntToStr(FKeymanDeveloperOptions.WebHostDefaultPort);
-    sFull := GetHostName(ComputerNameDnsFullyQualified);
-    sHost := GetHostName(ComputerNameDnsHostname);
-    sNetbios := GetHostName(ComputerNameNetBIOS);
-    if SameText(sHost, sFull) then sHost := '';
-    if SameText(sNetbios, sHost) or SameText(sNetbios, sFull) then sNetbios := '';
-
-    if sFull <> '' then v.Add('http://'+sFull+port);
-    if sHost <> '' then v.Add('http://'+sHost+port);
-    if sNetbios <> '' then v.Add('http://'+sNetbios+port);
-
-    FIPv4Addresses := TIdStackLocalAddressList.Create;
-    try
-      TIdStack.IncUsage;
-      try
-        GStack.GetLocalAddressList(FIPv4Addresses);
-      finally
-        TIdStack.DecUsage;
-      end;
-
-      for i := 0 to FIPv4Addresses.Count - 1 do
-        v.Add('http://'+FIPv4Addresses[i].IPAddress+port);
-    finally
-      FIPv4Addresses.Free;
-    end;
-
-    v.Add('http://localhost'+port);
-    v.Add('http://'+IPv4Loopback+port);
-  end;
 end;
 
 procedure TmodWebHttpServer.httpCommandGet(AContext: TIdContext;
