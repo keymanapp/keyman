@@ -3,8 +3,6 @@
 set -eu
 set -x
 
-# $1 = keyman_wix_build temp root
-
 display_usage() {
   echo "Usage: $0 --build-path path"
   echo "       $0 --help"
@@ -103,4 +101,4 @@ npm install --production --no-optional
 rm kmtypes.tgz
 
 # We don't need the unit tests
-rm -rf /s/q "$KEYMAN_WIX_TEMP_MODELCOMPILER/tests"
+rm -rf "$KEYMAN_WIX_TEMP_MODELCOMPILER/tests"
