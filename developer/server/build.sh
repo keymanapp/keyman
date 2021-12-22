@@ -86,7 +86,7 @@ type npm >/dev/null ||\
 
 if (( install_dependencies )) ; then
   verify_npm_setup
-  # npm install --production=false
+  npm install --production=false
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   rm -f node_modules/ngrok/bin/ngrok.exe
 fi
