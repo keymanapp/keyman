@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -eu
+set -x
 
 # $1 = keyman_wix_build temp root
 
