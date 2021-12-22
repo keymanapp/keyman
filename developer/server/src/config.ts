@@ -28,7 +28,7 @@ export class Configuration {
     this.appDataPath = (process.env.APPDATA ||
       (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) +
       '/Keyman/Keyman Developer/Server/';
-    this.cachePath = this.appDataPath + '/cache/';
+    this.cachePath = this.appDataPath + 'cache/';
     this.cacheStateFilename = this.appDataPath + 'cache.json';
     this.lockFilename = this.appDataPath + 'lock.json';
     this.pidFilename = this.appDataPath + 'pid.json';

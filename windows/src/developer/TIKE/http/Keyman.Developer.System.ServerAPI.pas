@@ -27,20 +27,20 @@ type
     // API endpoints
     class function IsKeyboardRegistered(const Filename: string): Boolean; static;
     class procedure RegisterKeyboard(const Filename, Version, FontFace, OskFontFace: string); static;
-    class procedure UnregisterKeyboard(const Filename: string); static;
+    // Not currently used: class procedure UnregisterKeyboard(const Filename: string); static;
 
     class function IsPackageRegistered(const Filename: string): Boolean; static;
     class procedure RegisterPackage(const Filename, Name: string); static;
-    class procedure UnregisterPackage(const Filename: string); static;
+    // Not currently used: class procedure UnregisterPackage(const Filename: string); static;
 
     class function IsModelRegistered(const Filename: string): Boolean; static;
     class procedure RegisterModel(const Filename: string); static;
-    class procedure UnregisterModel(const Filename: string); static;
+    // Not currently used: class procedure UnregisterModel(const Filename: string); static;
 
     class function IsFontRegistered(const Filename: string): Boolean; static;
     class procedure RegisterFont(const Filename, Facename: string); overload; static;
     class procedure RegisterFont(Filedata: TStream; const Facename: string); overload; static;
-    class procedure UnregisterFont(const Facename: string); static;
+    // Not currently used: class procedure UnregisterFont(const Facename: string); static;
 
     class function GetStatus: Boolean; static;
     class function UpdateStatus: Boolean; static;
@@ -230,7 +230,12 @@ begin
   end;
 end;
 
-
+class function TServerDebugAPI.UpdateStatus: Boolean;
+begin
+  if GetTickCount64 - LastGetStatusTime > 1000
+    then Result := GetStatus
+    else Result := True;
+end;
 
 class function TServerDebugAPI.GetStatus: Boolean;
 var
@@ -349,11 +354,6 @@ begin
   end;
 end;
 
-class procedure TServerDebugAPI.UnregisterFont(const Facename: string);
-begin
-
-end;
-
 //------------------------------------------------------------------------------
 // Keyboard API wrappers
 //------------------------------------------------------------------------------
@@ -381,11 +381,6 @@ begin
   end;
 end;
 
-class procedure TServerDebugAPI.UnregisterKeyboard(const Filename: string);
-begin
-
-end;
-
 //------------------------------------------------------------------------------
 // Model API wrappers
 //------------------------------------------------------------------------------
@@ -408,11 +403,6 @@ begin
   finally
     mfd.Free;
   end;
-end;
-
-class procedure TServerDebugAPI.UnregisterModel(const Filename: string);
-begin
-
 end;
 
 //------------------------------------------------------------------------------
@@ -439,18 +429,6 @@ begin
   finally
     mfd.Free;
   end;
-end;
-
-class procedure TServerDebugAPI.UnregisterPackage(const Filename: string);
-begin
-
-end;
-
-class function TServerDebugAPI.UpdateStatus: Boolean;
-begin
-  if GetTickCount64 - LastGetStatusTime > 1000
-    then Result := GetStatus
-    else Result := True;
 end;
 
 end.

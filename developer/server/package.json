@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "postbuild": "gosh postbuild.sh",
+    "postbuild": "npx gosh postbuild.sh",
     "prod": "node .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "npm run postbuild && tsc-watch --onSuccess \"node .\" --onFailure \"node .\""

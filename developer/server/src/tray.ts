@@ -15,7 +15,7 @@ export default class Tray {
     if(os.platform() == 'win32') {
       this.myTrayApp = new WindowsTrayicon({
         title: "Keyman Developer Server",
-        icon: path.resolve(__dirname, "icon.ico"),
+        icon: path.resolve(__dirname, "site", "favicon.ico"),
         menu: [
           {
             id: "item-id-show-console",

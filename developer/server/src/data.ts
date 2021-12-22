@@ -5,6 +5,7 @@ export interface DebugObject {
   id: string;
   filename: string;
   sha256: string;
+  lastUse: Date;
   filenameFromId(id: string): string;
 };
 
@@ -12,6 +13,7 @@ export class DebugKeyboard implements DebugObject {
   id: string;
   filename: string;
   sha256: string;
+  lastUse: Date;
   path: string;
   version: string;
   oskFontFace?: string;
@@ -54,6 +56,7 @@ export class DebugModel implements DebugObject {
   id: string;
   filename: string;
   sha256: string;
+  lastUse: Date;
 
   filenameFromId(id: string): string {
     return id + '.model.js';
@@ -69,6 +72,7 @@ export class DebugPackage implements DebugObject {
   id: string;
   filename: string;
   sha256: string;
+  lastUse: Date;
   name: string;
 
   filenameFromId(id: string): string {
@@ -80,6 +84,7 @@ export class DebugFont implements DebugObject {
   id: string;
   filename: string;
   sha256: string;
+  lastUse: Date;
   facename: string;
 
   filenameFromId(id: string): string {

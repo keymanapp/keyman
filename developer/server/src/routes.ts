@@ -162,7 +162,7 @@ function notifyClients(wsServer: ws.Server, res: express.Request, req: express.R
 
 function saveState (res: express.Request, req: express.Response, next: express.NextFunction) {
   data.saveState();
-  next();
+  if(next) next();
 }
 
 function appGetData(app: express.Express, pathregex: RegExp,  root: { [id: string]: DebugObject }) {
@@ -181,6 +181,8 @@ function appGetData(app: express.Express, pathregex: RegExp,  root: { [id: strin
     if(!o) {
       res.status(404).send('not found');
     } else {
+      o.lastUse = new Date();
+      saveState(null, null, null);
       res.sendFile(o.filename, (err)=>{if(err) console.error(chalk.red(err))});
     }
   });
