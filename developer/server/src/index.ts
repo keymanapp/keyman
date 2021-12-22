@@ -1,10 +1,18 @@
+import { environment } from './environment';
+
+const Sentry = require("@sentry/node");
+Sentry.init({
+  dsn: 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519',  // Keyman Developer
+  environment: environment.environment,
+  release: environment.versionWithTag
+});
+
 import express = require('express');
 import ws = require('ws');
 import os = require('os');
 import multer = require('multer');
 import fs = require('fs');
 import setupRoutes from './routes';
-import { environment } from './environment';
 import { configuration } from './config';
 import Tray from './tray';
 import chalk = require('chalk');
@@ -15,7 +23,7 @@ const options = {
 
 /* Lock file - report on PID and prevent multiple instances cleanly */
 
-console.log(`Starting Keyman Developer Server, listening on port ${configuration.port}.`);
+console.log(`Starting Keyman Developer Server ${environment.versionWithTag}, listening on port ${configuration.port}.`);
 
 // This triggers the exit event for Ctrl+C which allows us to cleanup
 // consistently

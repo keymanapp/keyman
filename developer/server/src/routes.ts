@@ -14,14 +14,14 @@ import { Environment } from './environment';
 import { configuration } from './config';
 import chalk = require('chalk');
 
-export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.Server, environment: Environment) {
+export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.Server, environment: Environment ) {
 
   /* Middleware - JSON and logging */
 
   app.use(express.json()); // for parsing application/json
 
   app.use(function (req, _res, next) {
-    // if(environment == Environment.Development) {
+    // if(environment.environment == 'local') {
       console.log(req.method + ' ' + req.path);
     // }
     next();
@@ -43,7 +43,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
   /* All routes */
 
-  app.use('/', express.static((environment == Environment.Development ? '' : '') + 'dist/site'));
+  app.use('/', express.static('dist/site'));
 
   app.post('/upload', localhostOnly, upload.single('file'), (req, res, next) => {
     const name = req.file.originalname;

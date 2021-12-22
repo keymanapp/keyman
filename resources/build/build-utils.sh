@@ -213,3 +213,48 @@ function exportEnvironmentDefinitionScript() {
 if [[ -z "${XCODE_VERSION_ACTUAL:-}" ]] && [[ -z "${XCODE_PRODUCT_BUILD_VERSION:-}" ]]; then
     exportEnvironmentDefinitionScript
 fi
+
+
+replaceVersionStrings() {
+  local infile=$1
+  local outfile=$2
+
+  sed "
+    s/\$VERSION_WIN/$VERSION_WIN/g;
+    s/\$VERSION_RELEASE/$VERSION_RELEASE/g;
+    s/\$VERSION_MAJOR/$VERSION_MAJOR/g;
+    s/\$VERSION_MINOR/$VERSION_MINOR/g;
+    s/\$VERSION_PATCH/$VERSION_PATCH/g;
+    s/\$TIER/$TIER/g;
+    s/\$VERSION_TAG/$VERSION_TAG/g;
+    s/\$VERSION_WITH_TAG/$VERSION_WITH_TAG/g;
+    s/\$VERSION_ENVIRONMENT/$VERSION_ENVIRONMENT/g;
+    s/\$VERSION/$VERSION/g;
+    " "$infile" > "$outfile"
+}
+
+replaceVersionStrings_Mkver() {
+  # This is similar to replaceVersionStrings but supports all
+  # the old mkver strings as used by windows/src
+  local infile=$1
+  local outfile=$2
+
+  sed "
+    s/\$VersionWin/$VERSION_WIN/g;
+    s/\$VersionRelease/$VERSION_RELEASE/g;
+    s/\$VersionMajor/$VERSION_MAJOR/g;
+    s/\$VersionMinor/$VERSION_MINOR/g;
+    s/\$VersionPatch/$VERSION_PATCH/g;
+    s/\$Tier/$TIER/g;
+    s/\$Tag/$VERSION_TAG/g;
+    s/\$VersionWithTag/$VERSION_WITH_TAG/g;
+    s/\$VersionRc/$VERSION_MAJOR,$VERSION_MINOR,$VERSION_PATCH,0/g;
+    s/\$Environment/$VERSION_ENVIRONMENT/g;
+    s/\$Version/$VERSION/g;
+    s/\$VERSIONNUM/$VERSION_MAJOR,$VERSION_MINOR,$VERSION_PATCH,0/g;
+    s/\$VERSION/$VERSION_WIN/g;
+    s/\$RELEASE_MAJOR/$VERSION_MAJOR/g;
+    s/\$RELEASE_MINOR/$VERSION_MINOR/g;
+    s/\$RELEASE/$VERSION_RELEASE/g;
+    " "$infile" > "$outfile"
+}

@@ -1,13 +1,28 @@
+const pjson = require('../package.json');
 
-export enum Environment {
-  Development = 'development',
-  Release = 'release'
+function extractVersionData(version: string) {
+  const versionData = /(\d+\.\d+\.\d+)(?:-(alpha|beta))?(?:-(test|local))?(?:-(\d+))?/.exec(version);
+  if(!versionData) return null;
+  return {
+    version: versionData[1],
+    tier: versionData[2] || 'stable',
+    environment: versionData[3] || versionData[2] || 'stable',
+    pr: versionData[4] || ''
+  };
 };
 
-export const environment: Environment = Environment.Development; // TODO: lookup env var KEYMAN_ROOT and only use Development if in that path
-/*
-process.execPath
-  process.env['NODE_ENV'] == 'production' ? Environment.Production :
-  process.env['NODE_ENV'] == 'staging' ? Environment.Staging :
-  Environment.Development;
-*/
+let versionData = extractVersionData(pjson.version);
+
+export interface Environment {
+  environment: string;
+  version: string;
+  tier: string;
+  versionWithTag: string;
+}
+
+export const environment: Environment = {
+  environment: versionData.environment,
+  version: versionData.version,
+  tier: versionData.tier,
+  versionWithTag: pjson.version
+}

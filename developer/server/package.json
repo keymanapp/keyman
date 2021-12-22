@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "postbuild": "copyfiles -u 1 \"src/site/**\" \"dist/\" && copyfiles -u 1 \"src/win32/**\" \"dist/\"",
+    "postbuild": "gosh postbuild.sh",
     "prod": "node .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "npm run postbuild && tsc-watch --onSuccess \"node .\" --onFailure \"node .\""
@@ -13,6 +13,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^6.16.1",
     "chalk": "^4.1.2",
     "express": "^4.17.2",
     "multer": "^1.4.4",
@@ -20,6 +21,7 @@
     "ws": "^8.3.0"
   },
   "devDependencies": {
+    "@keymanapp/resources-gosh": "file:../../resources/gosh",
     "@types/express": "^4.17.13",
     "@types/multer": "^1.4.7",
     "@types/node": "^17.0.0",
