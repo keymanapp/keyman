@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.172 alpha 2021-12-23
+
+* fix(developer): work around devDependencies bug in npm (#6074)
+* chore(windows): nmake makefile cleanup (#6065)
+
 ## 15.0.171 alpha 2021-12-17
 
 * feat(developer): remember test page preferences on reload (#6033)
