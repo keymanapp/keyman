@@ -93,7 +93,7 @@ processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
-    
+
     // This case would occur for the keyboard system store setting `store(&CapsAlwaysOff) '1'`
     // A trick is being played here of synthesising a release the CAPSLOCK key event
     // then a depress CAPSLOCK key event
@@ -125,6 +125,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 
   for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
     BOOL continueProcessingActions = TRUE;
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: Action Type=[%d]", act->type);
     switch (act->type) {
     case KM_KBP_IT_CHAR:
       continueProcessingActions = processUnicodeChar(_td->app, act);

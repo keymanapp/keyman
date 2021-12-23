@@ -1,18 +1,18 @@
 /*
   Name:             K32_DBG
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    9 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Rework internal debugging to use mailslot passing to Keyman
                     05 Dec 2006 - mcdurdin - Disable temporary file-based logging
                     15 Jan 2007 - mcdurdin - Use _FILELOG define
@@ -98,8 +98,8 @@ void InitDebugging() {
 			GetFileVersionInfo(fname, 0, sz, buf);
 			VerQueryValue(buf, "\\", (void **) &ffi, &ffilen);
 
-			SendDebugMessageFormat(0, sdmKeyboard, 0, "Keyman version: %d.%d.%d.%d", 
-				HIWORD(ffi->dwProductVersionMS), LOWORD(ffi->dwProductVersionMS), 
+			SendDebugMessageFormat(0, sdmKeyboard, 0, "Keyman version: %d.%d.%d.%d",
+				HIWORD(ffi->dwProductVersionMS), LOWORD(ffi->dwProductVersionMS),
 				HIWORD(ffi->dwProductVersionLS), LOWORD(ffi->dwProductVersionLS));
   		delete buf; // I2157
 		}
@@ -210,7 +210,7 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
     wsprintf(ds, "DebugMessage(%x, wm_keyman_keyevent: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
       Debug_VirtualKey((WORD)msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
   else if(msg->message == WM_KEYDOWN || msg->message == WM_KEYUP || msg->message == WM_SYSKEYDOWN || msg->message == WM_SYSKEYUP)
-    wsprintf(ds, "DebugMessage(%x, %s, wParam: %s, lParam: %X) [message flags: %x time: %d extra: %x]", 
+    wsprintf(ds, "DebugMessage(%x, %s, wParam: %s, lParam: %X) [message flags: %x time: %d extra: %x]",
       PtrToInt(msg->hwnd),
       msgnames[msg->message-WM_KEYDOWN],
       Debug_VirtualKey((WORD) msg->wParam),
@@ -219,11 +219,11 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
       (int) msg->time,
       (unsigned int) GetMessageExtraInfo());
 	else if(msg->message >= WM_KEYDOWN && msg->message <= WM_UNICHAR)
-    wsprintf(ds, "DebugMessage(%x, %s, wParam: '%c' (U+%04X), lParam: %X) [message flags: %x time: %d extra: %x]", 
+    wsprintf(ds, "DebugMessage(%x, %s, wParam: '%c' (U+%04X), lParam: %X) [message flags: %x time: %d extra: %x]",
       PtrToInt(msg->hwnd),
       msgnames[msg->message-WM_KEYDOWN],
       msg->wParam,
-      msg->wParam, 
+      msg->wParam,
       (unsigned int) msg->lParam,
       wParam,
       (int) msg->time,
@@ -298,6 +298,7 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   __declspec(thread) static char bufout[2][128 * 7];
   WCHAR *p;
   char *q;
+  memset(bufout, 0, sizeof bufout);
   for (p = s, q = bufout[x]; *p && (p - s < 128); p++)
   {
     wsprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);

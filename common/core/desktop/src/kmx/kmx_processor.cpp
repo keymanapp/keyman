@@ -128,12 +128,30 @@ kmx_processor::queue_action(km_kbp_action_item const * action_item
     _kmx.GetActions()->QueueAction(QIT_BELL, 0);
     break;
   case KM_KBP_IT_BACK:
-    if (action_item->backspace.expected_type == KM_KBP_BT_MARKER) {
+  {
+    // If the context is already empty, we want to emit the backspace for application to use
+    PKMX_WCHAR p_last_item_context = _kmx.GetContext()->Buf(1);
+
+    if(!p_last_item_context || *p_last_item_context == 0)   {
+      _kmx.GetActions()->QueueAction(QIT_INVALIDATECONTEXT, 0);
+      // this method(queue_action) could be called outside the processing of a key
+      // stroke, so it cannot set emit keystroke. Synthasize instead;
+      // Currently    QIT_VKEYDOWN QIT_VKEYUP QIT_VSHIFTDOWN UP are not implmente
+      //in the core KM_KBP actions therefore we can not synthasize.
+      // For this Backspace case the Core is going to have to relax the
+      // no QIT_BACK on a empty context. for now.
+      //_kmx.GetActions()->QueueAction(QIT_VKEYDOWN, KM_KBP_VKEY_BKSP);
+      //_kmx.GetActions()->QueueAction(QIT_VKEYUP, KM_KBP_VKEY_BKSP);
+
+      // if we can synthasize backspace remove the queaction back
+      _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEFAULT);
+    } else if (action_item->backspace.expected_type == KM_KBP_BT_MARKER) {
       _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEADKEY);
     } else /* KM_KBP_BT_CHAR, KM_KBP_BT_UNKNOWN */ {
       _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEFAULT);
     }
     break;
+  }
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_EMIT_KEYSTROKE:
   case KM_KBP_IT_CAPSLOCK:
@@ -154,36 +172,44 @@ kmx_processor::process_event(
   uint16_t modifier_state,
   uint8_t is_key_down
 ) {
-  // Construct a context buffer from the items
+  // If the Virtual Key is VK_SPACE and the internal kmx processor has actions
+  // then we simply process that and return. These actions must have been added externally
+  // via queue_action method.
+  bool has_internal_actions =  ((vk == VK_SPACE) && (!_kmx.GetActions()->IsQueueEmpty()));
 
-  std::u16string ctxt;
-  auto cp = state->context();
-  for (auto c = cp.begin(); c != cp.end(); c++) {
-    switch (c->type) {
-    case KM_KBP_CT_CHAR:
-      if (Uni_IsSMP(c->character)) {
-        ctxt += Uni_UTF32ToSurrogate1(c->character);
-        ctxt += Uni_UTF32ToSurrogate2(c->character);
-      } else {
-        ctxt += (km_kbp_cp)c->character;
+  if (!has_internal_actions){
+    // Construct a context buffer from the items
+    std::u16string ctxt;
+    auto cp = state->context();
+    for (auto c = cp.begin(); c != cp.end(); c++) {
+      switch (c->type) {
+      case KM_KBP_CT_CHAR:
+        if (Uni_IsSMP(c->character)) {
+          ctxt += Uni_UTF32ToSurrogate1(c->character);
+          ctxt += Uni_UTF32ToSurrogate2(c->character);
+        } else {
+          ctxt += (km_kbp_cp)c->character;
+        }
+        break;
+      case KM_KBP_CT_MARKER:
+        assert(c->marker > 0);
+        ctxt += UC_SENTINEL;
+        ctxt += CODE_DEADKEY;
+        ctxt += c->marker;
+        break;
       }
-      break;
-    case KM_KBP_CT_MARKER:
-      assert(c->marker > 0);
-      ctxt += UC_SENTINEL;
-      ctxt += CODE_DEADKEY;
-      ctxt += c->marker;
-      break;
     }
-  }
 
-  _kmx.GetContext()->Set(ctxt.c_str());
-  _kmx.GetActions()->ResetQueue();
-  state->actions().clear();
+    _kmx.GetContext()->Set(ctxt.c_str());
+    _kmx.GetActions()->ResetQueue();
+    state->actions().clear();
 
-  if (!_kmx.ProcessEvent(state, vk, modifier_state, is_key_down)) {
-    // We need to output the default keystroke
-    state->actions().push_emit_keystroke();
+    if (!_kmx.ProcessEvent(state, vk, modifier_state, is_key_down)) {
+      // We need to output the default keystroke
+      state->actions().push_emit_keystroke();
+    }
+  } else{
+    state->actions().clear();
   }
 
   for (auto i = 0; i < _kmx.GetActions()->Length(); i++) {
@@ -213,7 +239,10 @@ kmx_processor::process_event(
       switch (a.dwData) {
       case BK_DEFAULT:
         // This only happens if we know we have context to delete. Last item must be a character
-        assert(!state->context().empty());
+
+        // TODO: #5060 If we added a new action to core actions then we
+        // can assert on backspace for a empty context.
+        //assert(!state->context().empty());
         assert(state->context().back().type != KM_KBP_IT_MARKER);
         if(!state->context().empty()) {
           auto item = state->context().back();
@@ -251,7 +280,8 @@ kmx_processor::process_event(
   }
 
   state->actions().commit();
-
+  // Queue should be cleared allows testing for external actions added the queue(IMX)
+  _kmx.GetActions()->ResetQueue();
   return KM_KBP_STATUS_OK;
 }
 
