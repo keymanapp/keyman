@@ -640,7 +640,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
       return FALSE;  // context buf does not exist
 
     wcscpy_s(buf, len + 1, q);  // I3091
-    SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetContextEngine: intermediate_context [%s]", Debug_UnicodeString(buf));
+    SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetContextEngine: [%s]", Debug_UnicodeString(buf));
     return TRUE;
   } else {
     if (!_td->lpActiveKeyboard->lpCoreKeyboardState) {

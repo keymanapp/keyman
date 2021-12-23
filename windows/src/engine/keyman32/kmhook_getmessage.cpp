@@ -289,8 +289,21 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 			{
 				if(_td->app)
 				{
-					_td->app->SetCurrentShiftState(Globals::get_ShiftState());
-					_td->app->SendActions();   // I4196
+          BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
+
+          if (isUsingCoreProcessor) {
+            // send a VK_SPACE to the core keyboard processor to get the queued actions
+            if (KM_KBP_STATUS_OK != (km_kbp_status_codes)km_kbp_process_event(
+                                        _td->lpActiveKeyboard->lpCoreKeyboardState, VK_SPACE,
+                                        static_cast<uint16_t>(Globals::get_ShiftState()), (uint8_t)TRUE)) {
+              SendDebugMessageFormat(0, sdmGlobal, 0, "_kmnGetMessageProc wm_keymanim_close process event fail");
+              return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+            }
+            BOOL emitKeyStroke;
+            ProcessActions(&emitKeyStroke);
+          }
+          _td->app->SetCurrentShiftState(Globals::get_ShiftState());
+          _td->app->SendActions();
 				}
 			}
 			return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);

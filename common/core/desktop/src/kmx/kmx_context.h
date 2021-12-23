@@ -103,11 +103,18 @@ public:
    * @return BOOL
    */
   KMX_BOOL CharIsDeadkey();
+
   /**
   * Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
   * @return BOOL
   */
   KMX_BOOL CharIsSurrogatePair();
+
+  /**
+   * Returns TRUE if the context is empty
+   * @return  BOOL  TRUE
+   */
+  KMX_BOOL Empty();
 };
 
 } // namespace kmx
