@@ -26,6 +26,7 @@ files:
 
 
   # Android files
+  # Reference: https://developer.android.com/guide/topics/resources/multilingual-support
 
   - source: /android/KMEA/app/src/main/res/values/strings.xml
     dest: /android/engine/strings.xml
@@ -33,6 +34,7 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
       android_code:
+        es-419: b+es+419
         pap: pap
 
   - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
@@ -41,6 +43,7 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP
       android_code:
+        es-419: b+es+419
         pap: pap
 
   # Windows files
