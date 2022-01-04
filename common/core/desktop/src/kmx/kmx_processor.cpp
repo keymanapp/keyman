@@ -37,7 +37,6 @@ static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR const* buf, km_kbp_context_
   return true;
 }
 
-
 km_kbp_status kmx_processor::validate() const {
   return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
 }
@@ -107,8 +106,6 @@ kmx_processor::update_option(
   return option(scope, key, value);
 }
 
-
-
 bool
 kmx_processor::queue_action(km_kbp_action_item const * action_item
 ) {
@@ -136,14 +133,14 @@ kmx_processor::queue_action(km_kbp_action_item const * action_item
       _kmx.GetActions()->QueueAction(QIT_INVALIDATECONTEXT, 0);
       // this method(queue_action) could be called outside the processing of a key
       // stroke, so it cannot set emit keystroke. Synthasize instead;
-      // Currently    QIT_VKEYDOWN QIT_VKEYUP QIT_VSHIFTDOWN UP are not implmente
+      // Currently    QIT_VKEYDOWN QIT_VKEYUP QIT_VSHIFTDOWN UP are not implmented
       //in the core KM_KBP actions therefore we can not synthasize.
       // For this Backspace case the Core is going to have to relax the
       // no QIT_BACK on a empty context. for now.
       //_kmx.GetActions()->QueueAction(QIT_VKEYDOWN, KM_KBP_VKEY_BKSP);
       //_kmx.GetActions()->QueueAction(QIT_VKEYUP, KM_KBP_VKEY_BKSP);
 
-      // if we can synthasize backspace remove the queaction back
+      // if we can synthasize backspace remove this QueAction back
       _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEFAULT);
     } else if (action_item->backspace.expected_type == KM_KBP_BT_MARKER) {
       _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEADKEY);
@@ -173,9 +170,9 @@ kmx_processor::process_event(
   uint8_t is_key_down
 ) {
   // If the Virtual Key is VK_SPACE and the internal kmx processor has actions
-  // then we simply process that and return. These actions must have been added externally
-  // via queue_action method.
-  bool has_internal_actions =  ((vk == VK_SPACE) && (!_kmx.GetActions()->IsQueueEmpty()));
+  // then process that and return. These actions must have been added externally
+  // via the queue_action method.
+  bool has_internal_actions = ((vk == VK_SPACE) && (!_kmx.GetActions()->IsQueueEmpty()));
 
   if (!has_internal_actions){
     // Construct a context buffer from the items
@@ -280,7 +277,8 @@ kmx_processor::process_event(
   }
 
   state->actions().commit();
-  // Queue should be cleared allows testing for external actions added the queue(IMX)
+  // Queue should be cleared to allow testing if external actions have
+  // been added to the keyboard action queue (currently IMX interaction)
   _kmx.GetActions()->ResetQueue();
   return KM_KBP_STATUS_OK;
 }

@@ -131,7 +131,8 @@ typedef struct km_kbp_options     km_kbp_options;
 //
 typedef struct km_kbp_option_item  km_kbp_option_item;
 
-// Callback functions
+// Callback function used to to access 3rd pary library functions
+// via the Keyman Platform
 //
 typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t, void*);
 
@@ -463,10 +464,23 @@ km_kbp_context_shrink(km_kbp_context *context,
                       size_t num,
                       km_kbp_context_item const *prefix);
 
-// TODO Do we want this public function it is useful
+/*
+```
+### `km_kbp_context_item_list_size`
+##### Description:
+Return the length of a terminated `km_kbp_context_item` array.
+##### Return:
+The number of items in the list or 0 if `context_items` is null.
+##### Parameters:
+- __context_items__: A pointer to a `KM_KBP_CT_END` terminated array of
+    `km_kbp_context_item` values.
+
+```c
+*/
 KMN_API
 size_t
 km_kbp_context_item_list_size(km_kbp_context_item const *context_items);
+
 /*
 ```
 ### Action Items
@@ -680,7 +694,6 @@ typedef struct {
   uint32_t store_no; // unique identifier used to call this function
 } km_kbp_keyboard_imx;
 
-
 #define KM_KBP_KEYBOARD_IMX_END { 0, 0, 0 }
 
 /*
@@ -771,7 +784,6 @@ km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
                             km_kbp_keyboard_key **out);
 
 
-
 /*
 ```
 ### `km_kbp_keyboard_key_list_dispose`
@@ -791,7 +803,6 @@ void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
 /**
  * Returns the list of libraries and function calls names that will be called by
  * the library. The matching dispose call needs to be called to free the memory.
- *
  */
 KMN_API
 km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx** imx_list);
@@ -802,8 +813,6 @@ km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_k
 KMN_API
 void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list);
 
-// TODO: typdef this something like typedef BOOL (*km_kbp_keyboard_imx_platform)(uint32_t)
-//typedef BOOL (*km_kbp_keyboard_imx_platform)(uint32_t)
 /**
  * Register callback from the platform engine.
  */
@@ -815,7 +824,6 @@ void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx
  */
 KMN_API
 void km_kbp_state_imx_deregister_callback(km_kbp_state *state);
-
 
 /*
 ```

@@ -146,7 +146,6 @@ BOOL ProcessHook()
     PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
     km_kbp_context_item *citems = nullptr;
     ContextItemsFromAppContext(contextBuf, &citems);
-    SendDebugMessageFormat(0, sdmGlobal, 0, "Set Core context to:[%s] len:[%d] ", Debug_UnicodeString(contextBuf) ,wcslen(contextBuf));
     if (KM_KBP_STATUS_OK !=
       (km_kbp_status_codes)km_kbp_context_set(
         km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
@@ -162,12 +161,9 @@ BOOL ProcessHook()
       SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ",FALSE);
       return FALSE;
     }
-
     ProcessActions(&fOutputKeystroke);
   }
   else {
-    PWSTR contextBuf            = _td->app->ContextBufMax(MAXCONTEXT);
-    SendDebugMessageFormat(0, sdmGlobal, 0, "Windows Engine context is:[%s] ", Debug_UnicodeString(contextBuf));
     ProcessGroup(gp); // TODO: 5442 remove
   }
 
@@ -228,8 +224,6 @@ BOOL ProcessHook()
   // SendDebugMessageFormat(0, sdmAIDefault, 0, "Kmprocess::ProcessHook After cxt=%s", Debug_UnicodeString(contextBuf, 1));
 
 	_td->app->QueueDebugInformation(QID_END, NULL, NULL, NULL, NULL, 0);
-        SendDebugMessageFormat(
-            0, sdmGlobal, 0, "ProcessHook: fOuputKeyStroke:[%d]",fOutputKeystroke);
 	return !fOutputKeystroke;
 }
 

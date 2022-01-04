@@ -575,8 +575,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
     }
     delete keyboardPath;
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core
-    // TODO: #5650 Equivalent for common core
-    // LoadDLLs(&_td->lpKeyboards[i]);
+
     const km_kbp_option_item test_env_opts[] = {KM_KBP_OPTIONS_END};
     err_status =
         km_kbp_state_create(_td->lpActiveKeyboard->lpCoreKeyboard, test_env_opts, &_td->lpActiveKeyboard->lpCoreKeyboardState);
@@ -587,8 +586,7 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
       ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
       return FALSE;
     }
-    // TODO: 5650 LoadDLLs
-    // TODO: 5652 verify - ResetCapsLock();
+
     ResetCapsLock();
     err_status = km_kbp_keyboard_get_imx_list(_td->lpActiveKeyboard->lpCoreKeyboard, &_td->lpActiveKeyboard->lpIMXList);
     if (err_status != KM_KBP_STATUS_OK) {
@@ -1038,7 +1036,6 @@ void ReleaseKeyboards(BOOL Lock)
 		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
     ReleaseStateMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboardState);
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
-
     if(_td->lpKeyboards[i].Profiles) delete _td->lpKeyboards[i].Profiles;   // I3581
 	}
 

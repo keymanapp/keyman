@@ -79,7 +79,6 @@ BOOL LoadlpKeyboardCore(int i)
 {
   SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: Enter ---");
 
-
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
   if (_td->lpKeyboards[i].lpCoreKeyboard) return TRUE;
@@ -115,11 +114,7 @@ BOOL LoadlpKeyboardCore(int i)
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
     return FALSE;
   }
-  // TODO: 5650 handle dlls
-  // LoadDLLs(&_td->lpKeyboards[i]);
-  // Get the list of dlls to load set the call back
-  // Note we need to also deregister the callback
-  // use my core state to get my keyboard then get the list.
+  // Register callback?
   err_status = km_kbp_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_keyboard_get_imx_list failed with error status [%d]", err_status);
