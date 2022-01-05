@@ -116,7 +116,7 @@ void AppContext::Get(WCHAR *buf, int bufsize)
   for (WCHAR *p = this->BufMax(bufsize); *p && bufsize > 0; p++, bufsize--)
   {
     *buf = *p;
-    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) { 
+    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) {
       buf++; p++;
       *buf = *p;
       bufsize--;
@@ -163,20 +163,6 @@ void AppContext::Set(const WCHAR *buf)
   *q = 0;
   pos = (int)(intptr_t)(q - CurContext);
   CurContext[MAXCONTEXT - 1] = 0;
-
-  //////
-  //const WCHAR *p;
-  //WCHAR *q;
-  //for (p = buf, q = CurContext; *p && (INT_PTR)(q - CurContext) < MAXCONTEXT - 1; p++, q++) {
-  //  *q = *p;
-  //  if (*p >= 0xD800 && *p <= 0xDBFF) {
-  //    *(++q) = *(++p);
-  //  }
-  //}
-  //*q                         = 0;
-  //pos                        = (int)(INT_PTR)(q - CurContext);  // I1129 - Irregular behaviour with context rules
-  //CurContext[MAXCONTEXT - 1] = 0;
-
 
 }
 
