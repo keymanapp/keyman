@@ -289,21 +289,19 @@ ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD l
 
   buf[idx] = 0;  // Null terminate character array
 
-  if (wcslen(buf) < len) {
-    wcscpy_s(outBuf, wcslen(buf) + 1, buf);
-    delete[] buf;
-    return TRUE;
-  } else if (wcslen(buf) < MAXCONTEXT)
-  { // Truncate to length 'len' using AppContext so that the context closest to the caret is preserved
+  if (wcslen(buf) > len) {
+    // Truncate to length 'len' using AppContext so that the context closest to the caret is preserved
     // and the truncation will not split deadkeys or surrogate pairs
+    // Note by using the app context class we will truncate the context to the MAXCONTEXT length if 'len'
+    // is greater than MAXCONTEXT
     AppContext context;
     context.Set(buf);
     context.Get(outBuf, len);
     delete[] buf;
     return TRUE;
   } else {
-    // TODO sort out how to fail asking for a len longer then MAXCONTEXT and the context from the api is longer.
-    return FALSE;
+    wcscpy_s(outBuf, wcslen(buf) + 1, buf);
+    delete[] buf;
+    return TRUE;
   }
-
 }
