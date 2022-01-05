@@ -41,7 +41,7 @@ AppContext::AppContext()
 
 void AppContext::Add(WCHAR ch)
 {
-	if(pos == MAXCONTEXT - 1){
+	if(pos == MAXCONTEXT - 1) {
 //    SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: MAXCONTEXT[%d]: %ws", pos, CurContext);
     auto p = incxstr(CurContext);
     auto n = p - CurContext;
