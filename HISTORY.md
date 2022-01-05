@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.173 alpha 2022-01-05
+
+* chore(common): Update crowdin strings for Amharic (#6040)
+* fix(linux): fix release version number for Sentry reporting (#6068)
+
 ## 15.0.172 alpha 2021-12-23
 
 * fix(developer): work around devDependencies bug in npm (#6074)
