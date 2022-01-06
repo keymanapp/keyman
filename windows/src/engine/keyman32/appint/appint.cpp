@@ -46,7 +46,7 @@ void AppContext::Add(WCHAR ch)
     auto p = incxstr(CurContext);
     auto n = p - CurContext;
     memmove(CurContext, p, (MAXCONTEXT - n) * 2);
-    pos -= n;
+    pos -= (int)n;
 	}
 
 	CurContext[pos++] = ch;
