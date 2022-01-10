@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.174 alpha 2022-01-10
+
+* chore(android/samples): Add -no-daemon flag to KMSample2 build script (#6082)
+* fix(linux): Fix installation of shared packages (#6015)
+
 ## 15.0.173 alpha 2022-01-05
 
 * chore(common): Update crowdin strings for Amharic (#6040)
