@@ -5,7 +5,7 @@
 /* Checkbox text to enable verbose Console logging */
 "7J6-zy-R20.title" = "Use verbose Console logging";
 
-/* Support buton text  */
+/* Support button text  */
 "93O-x6-RLF.label" = "Support";
 
 /* Download Keyboard button text */
@@ -17,7 +17,7 @@
 /* button text to go back to previous page */
 "JOK-JV-n8w.title" = "Back";
 
-/* Class = "NSTabViewItem"; label = "Keyboards"; ObjectID = "MPN-9N-wWc"; */
+/* Keyboards button text */
 "MPN-9N-wWc.label" = "Keyboards";
 
 /* text to explain verbose Console logging option */
