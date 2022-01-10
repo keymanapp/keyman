@@ -38,58 +38,66 @@ class IbusUtilTests(unittest.TestCase):
         self.assertTrue(MockIbusBusClass.called, "IBus.Bus called")
         self.assertFalse(mock_ibusBusInstance.destroy.called)
 
-    @patch('keyman_config.ibus_util.Gio.Settings.new')
-    def test_installToIbus_AlreadyInstalled(self, MockSettingsClass, MockIbusBusClass):
+    @patch('keyman_config.gsettings.GSettings.get')
+    @patch('keyman_config.gsettings.GSettings.set')
+    def test_installToIbus_AlreadyInstalled(self, MockSettingsSet, MockSettingsGet, MockIbusBusClass):
         # Setup
-        mock_settingsInstance = MockSettingsClass.return_value
-        mock_settingsInstance.get_strv.return_value = ['k1', 'k2', 'k3']
+        mock_settingsGet = MockSettingsGet
+        mock_settingsSet = MockSettingsSet
+        mock_settingsGet.return_value = ['k1', 'k2', 'k3']
         mock_ibusBusInstance = MockIbusBusClass.return_value
         # Execute
         install_to_ibus(mock_ibusBusInstance, 'k3')
         # Verify
-        mock_settingsInstance.set_strv.assert_called_once_with(
+        mock_settingsSet.assert_called_once_with(
             "preload-engines", ['k1', 'k2', 'k3'])
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k2', 'k3'])
 
-    @patch('keyman_config.ibus_util.Gio.Settings.new')
-    def test_installToIbus_InstallsNewKb(self, MockSettingsClass, MockIbusBusClass):
+    @patch('keyman_config.gsettings.GSettings.get')
+    @patch('keyman_config.gsettings.GSettings.set')
+    def test_installToIbus_InstallsNewKb(self, MockSettingsSet, MockSettingsGet, MockIbusBusClass):
         # Setup
-        mock_settingsInstance = MockSettingsClass.return_value
-        mock_settingsInstance.get_strv.return_value = ['k1', 'k2', 'k3']
+        mock_settingsGet = MockSettingsGet
+        mock_settingsSet = MockSettingsSet
+        mock_settingsGet.return_value = ['k1', 'k2', 'k3']
         mock_ibusBusInstance = MockIbusBusClass.return_value
         # Execute
         install_to_ibus(mock_ibusBusInstance, 'k4')
         # Verify
-        mock_settingsInstance.set_strv.assert_called_once_with(
+        mock_settingsSet.assert_called_once_with(
             "preload-engines", ['k1', 'k2', 'k3', 'k4'])
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k2', 'k3', 'k4'])
 
-    @patch('keyman_config.ibus_util.Gio.Settings.new')
-    def test_uninstallFromIbus_KbInstalled(self, MockSettingsClass, MockIbusBusClass):
+    @patch('keyman_config.gsettings.GSettings.get')
+    @patch('keyman_config.gsettings.GSettings.set')
+    def test_uninstallFromIbus_KbInstalled(self, MockSettingsSet, MockSettingsGet, MockIbusBusClass):
         # Setup
-        mock_settingsInstance = MockSettingsClass.return_value
-        mock_settingsInstance.get_strv.return_value = ['k1', 'k2', 'k3']
+        mock_settingsGet = MockSettingsGet
+        mock_settingsSet = MockSettingsSet
+        mock_settingsGet.return_value = ['k1', 'k2', 'k3']
         mock_ibusBusInstance = MockIbusBusClass.return_value
         # Execute
         uninstall_from_ibus(mock_ibusBusInstance, 'k2')
         # Verify
-        mock_settingsInstance.set_strv.assert_called_once_with(
+        mock_settingsSet.assert_called_once_with(
             "preload-engines", ['k1', 'k3'])
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k3'])
 
-    @patch('keyman_config.ibus_util.Gio.Settings.new')
-    def test_uninstallFromIbus_KbNotInstalled(self, MockSettingsClass, MockIbusBusClass):
+    @patch('keyman_config.gsettings.GSettings.get')
+    @patch('keyman_config.gsettings.GSettings.set')
+    def test_uninstallFromIbus_KbNotInstalled(self, MockSettingsSet, MockSettingsGet, MockIbusBusClass):
         # Setup
-        mock_settingsInstance = MockSettingsClass.return_value
-        mock_settingsInstance.get_strv.return_value = ['k1', 'k2', 'k3']
+        mock_settingsGet = MockSettingsGet
+        mock_settingsSet = MockSettingsSet
+        mock_settingsGet.return_value = ['k1', 'k2', 'k3']
         mock_ibusBusInstance = MockIbusBusClass.return_value
         # Execute
         uninstall_from_ibus(mock_ibusBusInstance, 'k4')
         # Verify
-        mock_settingsInstance.set_strv.assert_called_once_with(
+        mock_settingsSet.assert_called_once_with(
             "preload-engines", ['k1', 'k2', 'k3'])
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k2', 'k3'])

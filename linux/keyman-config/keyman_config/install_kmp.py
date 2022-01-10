@@ -211,13 +211,14 @@ class InstallKmp():
 
     def _install_keyboards_to_ibus(self, keyboards, packageDir, language=None):
         bus = get_ibus_bus()
-        if bus:
+        if bus or os.environ.get('SUDO_USER'):
             # install all kmx for first lang not just packageID
             for kb in keyboards:
                 ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir, language)
                 install_to_ibus(bus, ibus_keyboard_id)
             restart_ibus(bus)
-            bus.destroy()
+            if bus:
+                bus.destroy()
         else:
             logging.debug("could not install keyboards to IBus")
         return ''

@@ -78,7 +78,7 @@ def uninstall_kmp_shared(packageID):
 
 def uninstall_keyboards_from_ibus(keyboards, packageDir):
     bus = get_ibus_bus()
-    if bus:
+    if bus or os.environ.get('SUDO_USER'):
         # install all kmx for first lang not just packageID
         for kb in keyboards:
             ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
