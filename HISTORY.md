@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 14.0.284 stable 2022-01-11
+
+* chore(android,oem/fv/android): Update targetSDKVersion to 30 (#5934)
+* fix(web): popupBaseKey null check (#5948)
+* fix(linux): Add test targets to Makefile (#5975)
+* fix(android/engine): Fix font paths (#5990)
+* chore(linux): Remove lintian warning (#5993)
+* chore(linux): Allow to specify debian revision (#5998)
+* chore(linux): Update changelogs for 14.0.283 :package: (#6007)
+* fix(linux): fix release version number for Sentry reporting :cherries: (#6053)
+* chore(common): Check in crowdin strings for Spanish (Latin America) (#6060)
+* fix(linux): fix release version number for Sentry reporting :cherries: (#6069)
+* chore(android/samples): Add -no-daemon flag to KMSample2 build script (#6083)
+* fix(linux): Fix attribute error :cherries: (#6087)
+
 ## 14.0.283 stable 2021-11-17
 
 * chore(windows): fix broken links in help (#5766)
