@@ -33,7 +33,7 @@
 #define _REGISTRY_H
 
 #include "../../../../developer/kmcompx/include/kmcompx.h"
-#include <windows.h>
+#include <windows.h>       // Can be removed here :-) 
 
 #ifdef _WIN64
 

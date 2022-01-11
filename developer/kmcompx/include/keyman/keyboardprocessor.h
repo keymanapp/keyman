@@ -102,7 +102,7 @@ nothing in that event.
 #include <stdlib.h>
 #include "keyboardprocessor_bits.h"
 #include "keyboardprocessor_vkeys.h"
-//#include "keyboardprocessor_version.h"
+#include "keyboardprocessor_version.h"
 
 #if defined(__cplusplus)
 extern "C"

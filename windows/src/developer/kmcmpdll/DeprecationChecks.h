@@ -7,4 +7,4 @@ KMX_BOOL WarnDeprecatedHeader();
 KMX_BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk);
 //......................................................
 
-KMX_BOOL KMXCheckForDeprecatedFeatures(PFILE_KEYBOARD fk);
+KMX_BOOL KMX_CheckForDeprecatedFeatures(PKMX_FILE_KEYBOARD fk);

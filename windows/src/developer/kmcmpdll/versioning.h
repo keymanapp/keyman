@@ -22,4 +22,5 @@ KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver);
     return (err); \
 }
 
+KMX_BOOL KMX_CheckKeyboardFinalVersion(PKMX_FILE_KEYBOARD fk);
 KMX_BOOL KMX_VerifyKeyboardVersion(PKMX_FILE_KEYBOARD fk, KMX_DWORD ver);

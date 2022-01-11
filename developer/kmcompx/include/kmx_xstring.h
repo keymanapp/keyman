@@ -33,6 +33,16 @@ const PKMX_WCHAR  KMX_u16cpy( PKMX_WCHAR dst, PKMX_WCHAR src){
 	  }
 	  *dst = 0;
 	return o;}
+
+
+const PKMX_WCHART  KMX_u16cpy( PKMX_WCHART dst, PKMX_WCHART src){  
+	PKMX_WCHART o = dst;
+	while (*src) {
+		*dst++ = *src++;
+	  }
+	  *dst = 0;
+	return o;}
+
 const km_kbp_cp *u16ncpy(km_kbp_cp *dst, const km_kbp_cp *src, size_t max);
 size_t u16len(const km_kbp_cp *p);
 int u16cmp(const km_kbp_cp *p, const km_kbp_cp *q);

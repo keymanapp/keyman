@@ -126,8 +126,8 @@ struct KMX_FILE_KEY {
 KMX_WCHAR   Key;            // WCHAR for consistency; only a byte used however
 KMX_DWORD   Line;
 KMX_DWORD   ShiftFlags;
-PKMX_WSTR  dpOutput;		// from start of key structure
-PKMX_WSTR  dpContext;		// from start of key structure
+PKMX_WCHART  dpOutput;		// from start of key structure
+PKMX_WCHART  dpContext;		// from start of key structure
 };
 
 typedef KMX_FILE_KEY *PKMX_FILE_KEY;
@@ -168,7 +168,7 @@ typedef KMX_FILE_GROUP *PKMX_FILE_GROUP;
 
 struct KMX_FILE_DEADKEY
 {
-	KMX_WCHAR szName[SZMAX_DEADKEYNAME];
+	KMX_WCHART szName[SZMAX_DEADKEYNAME];
 };
 typedef KMX_FILE_DEADKEY *PKMX_FILE_DEADKEY;
 
@@ -181,7 +181,7 @@ typedef KMX_FILE_DEADKEY *PKMX_FILE_DEADKEY;
 
 struct KMX_FILE_VKDICTIONARY
 {
-	KMX_WCHAR szName[SZMAX_VKDICTIONARYNAME];
+	KMX_WCHART szName[SZMAX_VKDICTIONARYNAME];
 };
 typedef KMX_FILE_VKDICTIONARY *PKMX_FILE_VKDICTIONARY;
 

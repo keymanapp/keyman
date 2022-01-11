@@ -6,4 +6,4 @@
 #include <stdio.h>
 
 #include <string.h>
-#include <windows.h>
+#include <windows.h>       // Can be removed here :-) 

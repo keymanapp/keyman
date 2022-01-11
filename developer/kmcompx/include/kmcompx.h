@@ -7,6 +7,7 @@
 
 //#include <keyman/keyboardprocessor.h>		// removed S
 #include "keyman/keyboardprocessor.h"	
+#include "keyman/keyboardprocessor_bits.h"	
 
 
 
@@ -131,8 +132,6 @@ typedef struct KMX_tagKMSTATE
 } KMX_KMSTATE;
 // I3616
 enum KMX_ProcessStringReturn { KMX_psrPostMessages, KMX_psrCheckMatches };
-
-/**/
 
 } // namespace kmx
 } // namespace kbp

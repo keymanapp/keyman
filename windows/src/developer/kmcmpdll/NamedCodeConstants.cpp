@@ -25,7 +25,8 @@
 #include <io.h>
 #include <limits.h>
 #include "NamedCodeConstants.h"
-#include "kmcmpdll.h"
+//#include "kmcmpdll.h"
+#include "../../../../developer/kmcompx/include/kmcmpdll.h"
 
 extern char CompileDir[];
 
@@ -134,7 +135,7 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
       _strupr_s(q, strlen(q)+1);  // I3481   // I3641
       int n = strtol(p, NULL, 16);
       if (*q != '<') {
-        PWSTR q0 = strtowstr(q);
+        PKMX_WCHART q0 =  KMX_strtowstr(q);
         AddCode_IncludedCodes(n, q0);
         delete[] q0;
       }

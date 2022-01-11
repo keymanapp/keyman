@@ -24,6 +24,7 @@
 //#include "CharToKeyConversion.h"                                          // removed S
 // for u16cpy
 #include "../../../../developer/kmcompx/include/kmx_xstring.h"      // added S
+//#include "../../../../common/core/desktop/src/kmx/kmx_xstring.h"
 #include <string>
 
 
@@ -83,7 +84,7 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
 
   return CERR_None;
 }
-
+/*
 KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   assert(fk != NULL);
   assert(gp != NULL);
@@ -113,7 +114,7 @@ KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   }
   return CERR_None;
 }
-
+*/
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   KMX_UINT key = kpp->Key;
   KMX_UINT shift = kpp->ShiftFlags;
@@ -304,8 +305,11 @@ KMX_DWORD KMX_ExpandCapsRule(PKMX_FILE_GROUP gp, PKMX_FILE_KEY kpp, PKMX_FILE_ST
   gp->cxKeyArray++;
 
   k = &k[gp->cxKeyArray - 1];
-  k->dpContext = new KMX_WCHAR[std::u16string(kpp->dpContext).length() + 1];
-  k->dpOutput  = new KMX_WCHAR[std::u16string(kpp->dpOutput).length() + 1];
+  //k->dpContext = new KMX_WCHAR[std::u16string(kpp->dpContext).length() + 1];
+  //k->dpOutput  = new KMX_WCHAR[std::u16string(kpp->dpOutput).length() + 1];
+  
+  k->dpContext = new KMX_WCHART[wcslen(kpp->dpContext) + 1];
+  k->dpOutput  = new KMX_WCHART[wcslen(kpp->dpOutput) + 1];
   
   // copy the output.
   km::kbp::kmx::KMX_u16cpy(k->dpContext, kpp->dpContext );

@@ -78,7 +78,7 @@ int km::kbp::kmx::DebugLog_1(const char *file, int line, const char *function, c
     syslog(LOG_DEBUG, "%s", windowinfo);
 #endif
   }
-
+/**/
   return 0;
 }
 
