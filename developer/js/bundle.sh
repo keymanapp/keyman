@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -eu
-set -x
 
 display_usage() {
   echo "Usage: $0 --build-path path"
@@ -92,7 +91,7 @@ cp "$KEYMAN_MODELCOMPILER_ROOT/package-lock.json" "$KEYMAN_WIX_TEMP_MODELCOMPILE
 # Yuck! ref: https://github.com/npm/cli/issues/3975#issuecomment-985305678
 # ref: https://github.com/npm/cli/issues/2921
 # can't use npm uninstall because it depends on @keymanapp/models-types being present!
-cat package.json | grep -v "@keymanapp/models-templates" | grep -v "@keymanapp/models-wordbreakers" > package.json
+cat package.json | grep -v "@keymanapp/models-templates" | grep -v "@keymanapp/models-wordbreakers" > package.json || true
 
 npm install kmtypes.tgz --production --no-optional
 npm install --production --no-optional
