@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.175 alpha 2022-01-11
+
+* feat(linux): Don't create Sentry events for errors (#6070)
+* fix(linux): Fix attribute error (#6086)
+* fix(developer): bundle.sh must succeed (#6091)
+
 ## 15.0.174 alpha 2022-01-10
 
 * chore(android/samples): Add -no-daemon flag to KMSample2 build script (#6082)
