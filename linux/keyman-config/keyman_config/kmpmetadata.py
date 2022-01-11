@@ -459,7 +459,7 @@ def parsemetadata(jsonfile, verbose=False):
             try:
                 data = json.load(read_file)
             except JSONDecodeError as e:
-                logging.critical("parsemetadata: %s invalid: %s (line %d, col %d)",
+                logging.error("parsemetadata: %s invalid: %s (line %d, col %d)",
                                  jsonfile, e.msg, e.lineno, e.colno)
                 # Use empty details
                 data = {"nonexistent": "none"}

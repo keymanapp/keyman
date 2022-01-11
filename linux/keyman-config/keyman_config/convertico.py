@@ -51,7 +51,7 @@ def checkandsaveico(icofile):
         # Using .bmp.png file extension so it won't conflict if the package already contains .png
         im4.save(bmpfile + '.png', 'png')
     except (IOError, OSError):
-        logging.critical("Cannot convert %s to png", icofile)
+        logging.error("Cannot convert %s to png", icofile)
         pass
     finally:
         # Clean up intermediary .bmp file if it was generated
