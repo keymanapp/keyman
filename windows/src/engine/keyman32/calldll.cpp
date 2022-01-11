@@ -35,7 +35,7 @@ typedef BOOL (WINAPI *InitDllFunction)(PSTR name);
 static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilename)
 {
 	DWORD j;
-
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: Enter");
 	for(j = 0; j < lpkbi->nIMDLLs; j++)
 		if(!_stricmp(lpkbi->IMDLLs[j].Filename, dllfilename)) break;
 
@@ -62,8 +62,10 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 
 	HINSTANCE hModule = LoadLibrary(fullname); // Try keyboard dir first
 	if(!hModule) hModule = LoadLibrary(newdllname); // Try anywhere on the path -- LIBRARY_NAME dir first  // I3094
-	if(!hModule) return NULL;
-	
+        if (!hModule) {
+          SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: hModule not loadded fullname[%s] newdllname[%s]", fullname, newdllname);
+          return NULL;
+        }
 	/* Initialise the DLL */
 
 	InitDllFunction idf = (InitDllFunction) GetProcAddress(hModule, "KeymanIMInit");
@@ -88,7 +90,7 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 	imd->Hooks = NULL;
 	imd->hModule = hModule;
 	lpkbi->nIMDLLs++;
-
+        SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: Exit");
 	return imd;
 }
 
@@ -96,7 +98,8 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 
 static BOOL AddIMDLLHook(LPIMDLL imd, LPSTR funcname, DWORD storeno, PWCHAR *dpString)
 {
-	/* Get the procedure address for the function */
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHook: Enter");
+  /* Get the procedure address for the function */
 
 	IMDLLHOOKProc dhp = (IMDLLHOOKProc) GetProcAddress(imd->hModule, funcname);
 	if(!dhp) return FALSE;
@@ -115,6 +118,7 @@ static BOOL AddIMDLLHook(LPIMDLL imd, LPSTR funcname, DWORD storeno, PWCHAR *dpS
 	imd->Hooks[imd->nHooks].storeno = storeno;
 	imd->Hooks[imd->nHooks].function = dhp;
 	*dpString = (PWCHAR) &imd->Hooks[imd->nHooks++];
+        SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHook: Exit");
 	return TRUE;
 }
 
@@ -139,13 +143,19 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 {
 	char fullname[_MAX_PATH];
 
-	//SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Enter");
+	SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Enter");
 
 	if(lpkbi->nIMDLLs > 0) if(!UnloadDLLs(lpkbi)) return FALSE;
 
-  if(!GetKeyboardFileName(lpkbi->Name, fullname, _MAX_PATH)) return FALSE;
-  if (!lpkbi->Keyboard) return FALSE;
+  if (!GetKeyboardFileName(lpkbi->Name, fullname, _MAX_PATH)) {
+          SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Filename not found[%s]", lpkbi->Name);
 
+      return FALSE;
+  }
+  if (!lpkbi->Keyboard) {
+    SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Keyboard is null");
+    return FALSE;
+  }
 	for(DWORD i = 0; i < lpkbi->Keyboard->cxStoreArray; i++)
 	{
 		LPSTORE s = &lpkbi->Keyboard->dpStoreArray[i];
@@ -173,7 +183,7 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 		}
 	}
 
-	//SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Exit");
+	SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Exit");
 	return TRUE;
 }
 
@@ -224,7 +234,7 @@ BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi)
 
 void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
 {
-	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Enter");
+	SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Enter");
   if (!lpkbi->Keyboard) return;
   if(storenum >= lpkbi->Keyboard->cxStoreArray) return;
 
@@ -240,32 +250,36 @@ void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
 	  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
   }
 
-	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Exit");
+	SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Exit");
 }
 
 
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen)
 {
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutput: Enter");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
   if(!_td->app) return FALSE;
 	while(backlen-- > 0) _td->app->QueueAction(QIT_BACK, 0);
 	while(*buf) _td->app->QueueAction(QIT_CHAR, *buf++);
-
+        SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutput: Exit");
 	return TRUE;
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dwData)
 {
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMQueueAction: Enter");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 	if(!_td->app) return FALSE;
+        SendDebugMessageFormat(0, sdmKeyboard, 0, "KMQueueAction: Exit");
 	return _td->app->QueueAction(ItemType, dwData);
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
 {
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetContext: Enter");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 	if(!_td->app) return FALSE;
@@ -274,6 +288,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
 	if(!q) return FALSE;	// context buf does not exist
 
 	wcscpy_s(buf, len+1, q);  // I3091
+        SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetContext: Exit");
 	return TRUE;
 }
 
