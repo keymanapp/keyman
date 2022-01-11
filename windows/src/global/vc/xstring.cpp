@@ -210,8 +210,17 @@ PKMX_WCHAR incxstr(PKMX_WCHAR p)
 	}
 }
 
+//..........................................
 
+// just for intermediate use - can be removed later
 int KMX_xstrlen(PKMX_WSTR p)
+{
+	int i;
+	for(i = 0; *p; i++, p=incxstr(p));
+	return i;
+}
+
+int KMX_xstrlen(PKMX_WCHART p)
 {
 	int i;
 	for(i = 0; *p; i++, p=incxstr(p));

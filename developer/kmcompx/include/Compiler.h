@@ -329,7 +329,7 @@ struct COMP_STORE {
 static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
 
 struct COMP_KEY {
-	KMX_WORD Key;
+	WORD Key;
 	DWORD Line;
 	DWORD ShiftFlags;
 	DWORD dpOutput;
@@ -370,7 +370,7 @@ struct COMP_KEYBOARD {
 
 	DWORD dwFlags;			  // 0030 Flags for the keyboard file
 
-	DWORD dwHotKey;			  // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+	DWORD dwHotKey;			  // 0034 standard windows hotkey (hiword=shift/ctrl/alt stufkf, loword=vkey)
 
 	//DWORD dpName;			// offset of name
 	//DWORD dpLanguageName;	// offset of language name;
@@ -391,6 +391,61 @@ typedef COMP_GROUP *PCOMP_GROUP;
 typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
 
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+
+
+//---------------------------//s
+
+//typedef int (__stdcall *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
+//extern "C" bool __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, bool FSaveDebug, bool ACompilerWarningsAsErrors, bool AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+
+
+struct KMX_COMP_KEYBOARD {
+	KMX_DWORD dwIdentifier;		// 0000 Keyman compiled keyboard id
+
+	KMX_DWORD dwFileVersion;	// 0004 Version of the file - Keyman 4.0 is 0x0400
+
+	KMX_DWORD dwCheckSum;		  // 0008 As stored in keyboard
+	KMX_DWORD KeyboardID;    	// 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+	KMX_DWORD IsRegistered;		// 0010
+	KMX_DWORD version;			  // 0014 keyboard version
+
+	KMX_DWORD cxStoreArray;		// 0018 in array entries
+	KMX_DWORD cxGroupArray;		// 001C in array entries
+
+	KMX_DWORD dpStoreArray;		// 0020 [LPSTORE] address of first item in store array
+	KMX_DWORD dpGroupArray;		// 0024 [LPGROUP] address of first item in group array
+
+	KMX_DWORD StartGroup[2];	// 0028 index of starting groups [2 of them]
+	//DWORD StartGroupIndex;	// StartGroup current index
+
+	KMX_DWORD dwFlags;			  // 0030 Flags for the keyboard file
+
+	KMX_DWORD dwHotKey;			  // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+
+	//DWORD dpName;			// offset of name
+	//DWORD dpLanguageName;	// offset of language name;
+	//DWORD dpCopyright;		// offset of copyright
+	//DWORD dpMessage;		// offset of message in Keyboard About box
+
+	KMX_DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
+	KMX_DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps
+	};
+
+static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
+
+
+struct KMX_COMP_KEY {
+	KMX_WORD Key;
+	KMX_DWORD Line;
+	KMX_DWORD ShiftFlags;
+	KMX_DWORD dpOutput;
+	KMX_DWORD dpContext;
+	};
+
+static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
+
+typedef KMX_COMP_KEYBOARD *PKMX_COMP_KEYBOARD;
+//---------------------------
 
 #endif		// _COMPILER_H
 

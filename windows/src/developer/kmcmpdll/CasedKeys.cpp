@@ -304,8 +304,11 @@ KMX_DWORD KMX_ExpandCapsRule(PKMX_FILE_GROUP gp, PKMX_FILE_KEY kpp, PKMX_FILE_ST
   gp->cxKeyArray++;
 
   k = &k[gp->cxKeyArray - 1];
-  k->dpContext = new KMX_WCHAR[std::u16string(kpp->dpContext).length() + 1];
-  k->dpOutput  = new KMX_WCHAR[std::u16string(kpp->dpOutput).length() + 1];
+  //k->dpContext = new KMX_WCHAR[std::u16string(kpp->dpContext).length() + 1];
+  //k->dpOutput  = new KMX_WCHAR[std::u16string(kpp->dpOutput).length() + 1];
+  
+  k->dpContext = new KMX_WCHART[wcslen(kpp->dpContext) + 1];
+  k->dpOutput  = new KMX_WCHART[wcslen(kpp->dpOutput) + 1];
   
   // copy the output.
   km::kbp::kmx::KMX_u16cpy(k->dpContext, kpp->dpContext );
