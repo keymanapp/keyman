@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.176 alpha 2022-01-12
+
+* fix(windows): add x64 build fix invalid memory access (#6057)
+* feat(windows): method set context correctly truncates input buffer (#6080)
+* chore(common): Check in crowdin strings for Kanuri (#6047)
+* fix(linux): Update minimum sentry-sdk version (#6093)
+* docs: Enhance Linux build setup doc (#6094)
+
 ## 15.0.175 alpha 2022-01-11
 
 * feat(linux): Don't create Sentry events for errors (#6070)
