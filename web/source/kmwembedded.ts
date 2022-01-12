@@ -365,27 +365,24 @@ namespace com.keyman.text {
       // Changes for Build 353 to resolve KMEI popup key issues
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
 
-      // Determine display layer (and ignore functional layer if it exists).
-      // Can't just split on '-' because some layers like ctrl-shift contain it.
-      let originalKeyName = keyName;
       let displayLayer = keymanweb.core.keyboardProcessor.layerId;
-      let functionalLayerSeparatorIndex = keyName.indexOf('+');
-      let separatorIndex = (functionalLayerSeparatorIndex > 0) ?
-        keyName.substring(0, functionalLayerSeparatorIndex).lastIndexOf('-') :
-        keyName.lastIndexOf('-');
-      if (separatorIndex > 0) {
-        displayLayer = keyName.substring(0, separatorIndex);
-        keyName = keyName.substring(separatorIndex+1);
-      }
-      if(displayLayer == 'undefined') {
-        displayLayer=keymanweb.core.keyboardProcessor.layerId;
+      let functionalLayer = '';
+
+      // Regex for 'display layer'-'virtual key name'+'optional functional layer'
+      // Can't just split on '-' because some layers like ctrl-shift contain it.
+      // Virtual key can be T_, U_, K_, or ISO 9995
+      let rx = new RegExp("(.*)-([TKU]_[^+]*|[A-E]\\d\\d)\\+?(.*)?");
+      let matches = keyName.match(rx);
+      displayLayer = matches[1];
+      keyName = matches[2];
+      if (matches[3]) {
+        // Optional function layer
+        functionalLayer = matches[3]
+        keyName += '+' + functionalLayer;
       }
 
-      // Determine the "functional" layer from the coreID
-      let layer = displayLayer;
-      separatorIndex = originalKeyName.lastIndexOf('+');
-      if (separatorIndex > 0) {
-        layer = originalKeyName.substring(separatorIndex+1);
+      if(displayLayer == 'undefined') {
+        displayLayer=keymanweb.core.keyboardProcessor.layerId;
       }
 
       // Note:  this assumes Lelem is properly attached and has an element interface.
@@ -400,11 +397,6 @@ namespace com.keyman.text {
         osk.vkbd.subkeyGesture = null;
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
-      }
-
-      // Now that we've checked if key is found, split "functional" layer from keyName
-      if (separatorIndex > 0) {
-        keyName = keyName.substring(0, separatorIndex);
       }
   };
 
