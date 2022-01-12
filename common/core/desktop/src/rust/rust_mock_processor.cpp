@@ -59,7 +59,11 @@ namespace km {
       return option(scope, key, i->second);
     }
 
-    bool rust_mock_processor::queue_action(km_kbp_action_item const* action_item) {
+    bool rust_mock_processor::queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    )
+    {
       return false;
     }
 

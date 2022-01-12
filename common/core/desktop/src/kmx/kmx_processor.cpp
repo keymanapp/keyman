@@ -107,7 +107,9 @@ kmx_processor::update_option(
 }
 
 bool
-kmx_processor::queue_action(km_kbp_action_item const * action_item
+kmx_processor::queue_action(
+  km_kbp_state * state,
+  km_kbp_action_item const * action_item
 ) {
    DebugLog("Action type is [%d].\n", action_item->type);
   switch (action_item->type) {
@@ -150,10 +152,16 @@ kmx_processor::queue_action(km_kbp_action_item const * action_item
     break;
   }
   case KM_KBP_IT_PERSIST_OPT:
-  case KM_KBP_IT_EMIT_KEYSTROKE:
   case KM_KBP_IT_CAPSLOCK:
     // Not implemented TODO log message?
     return false;
+    break;
+  case KM_KBP_IT_EMIT_KEYSTROKE:
+    // By pass the kmx processor and put this action into the core queue immediately
+    // This has to be done as the kmx processor QueAction does not have an
+    // emit key stroke type.
+    //state->actions().clear(); // This seems to be needed for some strange reason.
+    state->actions().push_emit_keystroke();
     break;
   case KM_KBP_IT_INVALIDATE_CONTEXT:
     _kmx.GetActions()->QueueAction(QIT_INVALIDATECONTEXT, 0);

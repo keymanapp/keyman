@@ -48,7 +48,10 @@ namespace kbp
       std::u16string const & value
     ) override;
 
-    bool queue_action(km_kbp_action_item const* action_item) override;
+    bool queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    ) override;
 
     km_kbp_context_item * get_intermediate_context() override;
 

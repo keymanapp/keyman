@@ -112,7 +112,7 @@ km_kbp_state_queue_action_items(km_kbp_state *state,
     if (action_items->type >= KM_KBP_IT_MAX_TYPE_ID)
       return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-    if (!processor.queue_action(action_items))
+    if (!processor.queue_action(state, action_items))
       return KM_KBP_STATUS_KEY_ERROR;
   }
 

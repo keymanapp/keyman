@@ -125,6 +125,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 
   for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
     BOOL continueProcessingActions = TRUE;
+    SendDebugMessageFormat(0, sdmGlobal, 0, "processActions: act->type=%d", act->type);
     switch (act->type) {
     case KM_KBP_IT_CHAR:
       continueProcessingActions = processUnicodeChar(_td->app, act);
@@ -143,6 +144,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
       break;
     case KM_KBP_IT_EMIT_KEYSTROKE:
       *emitKeyStroke = TRUE;
+      SendDebugMessageFormat(0, sdmGlobal, 0, "processEMIT_KEYSTROKE: act->type=%d", act->type);
       continueProcessingActions = TRUE;
       break;
     case KM_KBP_IT_INVALIDATE_CONTEXT:

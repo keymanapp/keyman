@@ -67,7 +67,9 @@ namespace kbp
      * @param  bool  return true if action item list is successfully processed
      */
     virtual bool
-    queue_action(km_kbp_action_item const* action_item
+    queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
     ) = 0;
 
 /**

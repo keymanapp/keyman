@@ -19,6 +19,7 @@ namespace kmx {
 #define VK_RBRKT	0xDD
 #define VK_QUOTE	0xDE
 #define VK_xDF		0xDF
+#define VK_RETURN 0x0D
 
 /**
  * This maps an ASCII character corresponding to a US EN key cap to a

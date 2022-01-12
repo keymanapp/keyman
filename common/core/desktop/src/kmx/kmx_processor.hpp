@@ -50,7 +50,10 @@ namespace kbp
     ) override;
 
     bool
-    kmx_processor::queue_action(km_kbp_action_item const* action_item) override;
+    kmx_processor::queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    ) override;
 
     km_kbp_context_item * get_intermediate_context() override;
 
