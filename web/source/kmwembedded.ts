@@ -366,23 +366,21 @@ namespace com.keyman.text {
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
 
       let displayLayer = keymanweb.core.keyboardProcessor.layerId;
-      let functionalLayer = '';
 
       // Regex for 'display layer'-'virtual key name'+'optional functional layer'
       // Can't just split on '-' because some layers like ctrl-shift contain it.
       // Virtual key can be T_, U_, K_, or ISO 9995
       let rx = new RegExp("(.*)-([TKU]_[^+]*|[A-E]\\d\\d)\\+?(.*)?");
       let matches = keyName.match(rx);
+      if (matches == null) {
+        return false;
+      }
       displayLayer = matches[1];
       keyName = matches[2];
+      let functionalLayer = '';
       if (matches[3]) {
-        // Optional function layer
-        functionalLayer = matches[3]
+        functionalLayer = matches[3];
         keyName += '+' + functionalLayer;
-      }
-
-      if(displayLayer == 'undefined') {
-        displayLayer=keymanweb.core.keyboardProcessor.layerId;
       }
 
       // Note:  this assumes Lelem is properly attached and has an element interface.
