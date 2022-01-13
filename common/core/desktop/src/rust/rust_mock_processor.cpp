@@ -60,6 +60,8 @@ namespace km {
     }
 
     bool rust_mock_processor::queue_action(km_kbp_action_item const* action_item) {
+      assert(action_item);
+      // TODO Implement
       return false;
     }
 

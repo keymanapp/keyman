@@ -119,7 +119,7 @@ kmx_processor::queue_action(km_kbp_action_item const * action_item
    _kmx.GetActions()->QueueAction(QIT_CHAR, action_item->character);
     break;
   case KM_KBP_IT_MARKER:
-   _kmx.GetActions()->QueueAction(QIT_DEADKEY, action_item->marker);
+   _kmx.GetActions()->QueueAction(QIT_DEADKEY, (KMX_DWORD)action_item->marker);
     break;
   case KM_KBP_IT_ALERT:
     _kmx.GetActions()->QueueAction(QIT_BELL, 0);
@@ -359,7 +359,7 @@ km_kbp_keyboard_imx * kmx_processor::get_imx_list() const  {
   GROUP *p_group;
 
 
-  for(auto i = 0; i < store_cnt; i++)
+  for(uint32_t i = 0; i < store_cnt; i++)
   {
     LPSTORE p_store = &store_array[i];
     if(p_store->dwSystemID == TSS_CALLDEFINITION)
@@ -370,17 +370,17 @@ km_kbp_keyboard_imx * kmx_processor::get_imx_list() const  {
 
   km_kbp_keyboard_imx *imx_list = new km_kbp_keyboard_imx[fn_count + 1];
 
-  for(auto i = 0; i < store_cnt; i++)
+  for(uint32_t i = 0; i < store_cnt; i++)
   {
     LPSTORE p_store = &store_array[i];
     if(p_store->dwSystemID == TSS_CALLDEFINITION)
 		{
 			/* Break the store string into components */
 
-			PKMX_CHAR full_fn_name = wstrtostr(p_store->dpString), lib_name, fn_name, context;
+			PKMX_CHAR full_fn_name = wstrtostr(p_store->dpString), lib_name, fn_name;
 
-			lib_name = strtok_s(full_fn_name, ":", &context);
-			fn_name = strtok_s(NULL, ":", &context);
+			lib_name = strtok(full_fn_name, ":");
+			fn_name = strtok(NULL, ":");
 
 			if(!lib_name || !fn_name)
 			{
