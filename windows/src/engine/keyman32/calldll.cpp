@@ -62,10 +62,10 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 
 	HINSTANCE hModule = LoadLibrary(fullname); // Try keyboard dir first
 	if(!hModule) hModule = LoadLibrary(newdllname); // Try anywhere on the path -- LIBRARY_NAME dir first  // I3094
-        if (!hModule) {
-          SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: hModule not loadded fullname[%s] newdllname[%s]", fullname, newdllname);
-          return NULL;
-        }
+    if (!hModule) {
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: hModule not loadded fullname[%s] newdllname[%s]", fullname, newdllname);
+      return NULL;
+    }
 	/* Initialise the DLL */
 
 	InitDllFunction idf = (InitDllFunction) GetProcAddress(hModule, "KeymanIMInit");
@@ -118,7 +118,7 @@ static BOOL AddIMDLLHook(LPIMDLL imd, LPSTR funcname, DWORD storeno, PWCHAR *dpS
 	imd->Hooks[imd->nHooks].storeno = storeno;
 	imd->Hooks[imd->nHooks].function = dhp;
 	*dpString = (PWCHAR) &imd->Hooks[imd->nHooks++];
-        SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHook: Exit");
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHook: Exit");
 	return TRUE;
 }
 
@@ -238,10 +238,10 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 	if(lpkbi->nIMDLLs > 0) if(!UnloadDLLs(lpkbi)) return FALSE;
 
   if (!GetKeyboardFileName(lpkbi->Name, fullname, _MAX_PATH)) {
-          SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Filename not found[%s]", lpkbi->Name);
-
-      return FALSE;
+    SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Filename not found[%s]", lpkbi->Name);
+    return FALSE;
   }
+
   if (!lpkbi->Keyboard) {
     SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Keyboard is null");
     return FALSE;
