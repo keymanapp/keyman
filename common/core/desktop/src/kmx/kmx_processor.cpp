@@ -356,7 +356,6 @@ km_kbp_keyboard_imx * kmx_processor::get_imx_list() const  {
   const LPSTORE store_array = _kmx.GetKeyboard()->Keyboard->dpStoreArray;
   uint16_t fn_count = 0;
   uint16_t fn_idx = 0;
-  GROUP *p_group;
 
 
   for(uint32_t i = 0; i < store_cnt; i++)
