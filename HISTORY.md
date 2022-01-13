@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.177 alpha 2022-01-13
+
+* chore(common): Check in crowdin strings for Marghi (#6049)
+
 ## 15.0.176 alpha 2022-01-12
 
 * fix(windows): add x64 build fix invalid memory access (#6057)
