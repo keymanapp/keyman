@@ -52,6 +52,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("kr-NG", "Kanuri"),
       new DisplayLanguageType("km-KH", "Khmer"),
       new DisplayLanguageType("mfi-NG", "Mandara (Wandala)"),
+      new DisplayLanguageType("mrt-NG", "Marghi"),
       new DisplayLanguageType("ann", "Obolo"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
       new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
