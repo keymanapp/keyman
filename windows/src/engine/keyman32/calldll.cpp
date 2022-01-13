@@ -34,8 +34,9 @@ typedef BOOL (WINAPI *InitDllFunction)(PSTR name);
 // core processor implmentation also uses the
 static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilename)
 {
-	DWORD j;
   SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: Enter");
+  DWORD j;
+
 	for(j = 0; j < lpkbi->nIMDLLs; j++)
 		if(!_stricmp(lpkbi->IMDLLs[j].Filename, dllfilename)) break;
 
@@ -76,6 +77,8 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 	}
 
 	/* Add the DLL to the list of DLLs */
+        SendDebugMessageFormat(
+            0, sdmKeyboard, 0, "AddIMDLL: add new function");
 
 	LPIMDLL imd = new IMDLL[lpkbi->nIMDLLs + 1];
 	if(lpkbi->nIMDLLs > 0)
@@ -90,7 +93,7 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 	imd->Hooks = NULL;
 	imd->hModule = hModule;
 	lpkbi->nIMDLLs++;
-        SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: Exit");
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: Exit");
 	return imd;
 }
 
@@ -331,9 +334,9 @@ void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
 //typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state *, uint32_t);
 // TODO need to update this to have LPINTKEYBOARDINFO lpkbi in the callback. So the callback will store the object.
 // will not need km_state anymore
-uint8_t
-IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject) {
-  // SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");
+
+extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject) {
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");
   if (callbackObject == NULL) {
     return FALSE;
   }
@@ -345,6 +348,7 @@ IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackOb
     return 0; // False
   // Iterate through hooks to find the call back
   DWORD n = 0;
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: nIMDLL count [%d] hook count", lpkbi->nIMDLLs, lpkbi->nIMDLLHooks);
   for (DWORD i = 0; i < lpkbi->nIMDLLHooks; i++) {
     if (lpkbi->lpIMDLLHooks[i]->storeno == UniqueStoreNo) {
       break;
@@ -377,7 +381,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     return FALSE;
   if (!_td->app)
     return FALSE;
- 
+
   if (!Globals::get_CoreIntegration()) {  // TODO: 5442 Remove If and fix indent
     while (backlen-- > 0)
       _td->app->QueueAction(QIT_BACK, 0);
@@ -491,7 +495,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
     }
     km_kbp_context_item *citems = nullptr;
       if (KM_KBP_STATUS_OK !=
-        (km_kbp_status_codes)km_kbp_context_get(km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), &citems)){
+        (km_kbp_status_codes)kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)){
           km_kbp_context_items_dispose(citems);
           return FALSE;
     }
@@ -598,6 +602,7 @@ static BOOL
 AddIMDLLHookCore(LPIMDLL imd, LPSTR funcname, DWORD storeno) {
   /* Get the procedure address for the function */
 
+   SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHookCore: Enter");
   IMDLLHOOKProc dhp = (IMDLLHOOKProc)GetProcAddress(imd->hModule, funcname);
   if (!dhp)
     return FALSE;
@@ -614,6 +619,9 @@ AddIMDLLHookCore(LPIMDLL imd, LPSTR funcname, DWORD storeno) {
   imd->Hooks[imd->nHooks].name[31] = 0;
   imd->Hooks[imd->nHooks].storeno  = storeno;
   imd->Hooks[imd->nHooks].function = dhp;
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHookCore: nHooks count [%d] unique [%d]", imd->nHooks, storeno);
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHookCore: Exit");
+  imd->nHooks++;
   return TRUE;
 }
 
@@ -623,7 +631,7 @@ BOOL
 LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
   char fullname[_MAX_PATH];
 
-  // SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Enter");
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Enter");
 
   if (lpkbi->nIMDLLs > 0)
     if (!UnloadDLLs(lpkbi))
@@ -631,20 +639,34 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
 
   if (!GetKeyboardFileName(lpkbi->Name, fullname, _MAX_PATH))
     return FALSE;
-  if (!lpkbi->lpCoreKeyboard)
+  if ((!lpkbi->lpCoreKeyboard) || (!lpkbi->lpCoreKeyboard)){
     return FALSE;
+  }
 
   km_kbp_keyboard_imx *imx_list = lpkbi->lpIMXList;
+  BOOL result = false;
+  for (; imx_list->library_name; ++imx_list) {
 
-  for (; imx_list; ++imx_list) {
-    LPIMDLL imd = AddIMDLL(lpkbi, fullname, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->library_name)));
-    if (imd && AddIMDLLHookCore(imd, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->function_name)), imx_list->store_no)) {
-    }
-      // log ok
+    // maybe need to check if copy string
+    SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Library name %s", wstrtostr(reinterpret_cast<PCWSTR>(imx_list->library_name)));
+    SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Function name %s", wstrtostr(reinterpret_cast<PCWSTR>(imx_list->function_name)));
+    // dummy line
+
+      LPIMDLL imd = AddIMDLL(lpkbi, fullname, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->library_name)));
+      if (imd && AddIMDLLHookCore(imd, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->function_name)), imx_list->store_no)) {
+        result = TRUE;
+      }
+
+
+    // log ok
     //else
     //  log error
   }
+  // If result is true register a callback with the core
+  if (result) {
 
+    km_kbp_state_imx_register_callback(lpkbi->lpCoreKeyboardState, IM_CallBackCore, (void *)&lpkbi);
+  }
   // SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Exit");
   return TRUE;
 }

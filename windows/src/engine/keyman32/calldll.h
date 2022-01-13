@@ -36,7 +36,7 @@ BOOL LoadDLLsCore(LPINTKEYBOARDINFO lpkbi);
 BOOL IsIMWindow(HWND hwnd);
 
 void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum);
-uint8_t IM_CallBackCore(void* callbackObject, km_kbp_state* km_state, uint32_t UniqueStoreNo);
+extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject);
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlways);
 extern "C" BOOL _declspec(dllexport) WINAPI KMHideIM();

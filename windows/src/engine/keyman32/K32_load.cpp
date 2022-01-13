@@ -121,6 +121,12 @@ BOOL LoadlpKeyboardCore(int i)
   // Note we need to also deregister the callback
   // use my core state to get my keyboard then get the list.
   err_status = km_kbp_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
+  if (err_status != KM_KBP_STATUS_OK) {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_keyboard_get_imx_list failed with error status [%d]", err_status);
+    // Dispose of the keyboard to leave us in a consistent state
+    ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
+    return FALSE;
+  }
 
   LoadDLLsCore(&_td->lpKeyboards[i]);
 
