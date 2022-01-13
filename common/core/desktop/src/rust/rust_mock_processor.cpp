@@ -59,6 +59,10 @@ namespace km {
       return option(scope, key, i->second);
     }
 
+    bool rust_mock_processor::queue_action(km_kbp_action_item const* action_item) {
+      return false;
+    }
+
     extern "C" uint32_t rust_mock_process_event(uint16_t vk, uint16_t modifier, uint8_t is_key_down);
 
     km_kbp_status rust_mock_processor::process_event(km_kbp_state *state,

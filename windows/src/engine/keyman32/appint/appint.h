@@ -220,6 +220,17 @@ public:
  */
 BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr);
 
+/**
+ * Convert km_kbp_context_item array into an array of kmx char buffer.
+ * Caller is responsible for freeing the memory.
+ *
+ * @param  contextItems  the input core context array. (km_kbp_context_item)
+ * @param  [out] outBuf  the kmx charater array output. caller to free memory.
+ *
+ * @return  BOOL    True if array created successfully
+ */
+BOOL ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf);
+
 extern const LPSTR ItemTypes[];
 
 #endif

@@ -51,6 +51,8 @@ namespace kbp
       std::u16string const & value
     ) override;
 
+    bool queue_action(km_kbp_action_item const* action_item) override;
+
     km_kbp_keyboard_key  * get_key_list() const override;
 
     km_kbp_keyboard_imx  * get_imx_list() const override;

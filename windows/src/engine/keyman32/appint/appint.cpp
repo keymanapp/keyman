@@ -252,3 +252,49 @@ BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr)
   *outPtr = context_items;
   return true;
 }
+
+
+BOOL
+ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf) {
+  assert(contextItems);
+  assert(outBuf);
+
+  km_kbp_context_item *km_kbp_context_it = contextItems;
+  uint8_t contextLen               = 0;
+  for (; km_kbp_context_it->type != KM_KBP_CT_END; ++contextItems) {
+    ++contextLen;
+  }
+   
+  WCHAR *buf = new WCHAR[(contextLen*3)+ 1 ]; // *3 if every context item was a deadkey 
+  uint8_t idx               = 0;
+  for (; km_kbp_context_it->type != KM_KBP_CT_END; ++contextItems) {
+    switch (km_kbp_context_it->type) {
+    case KM_KBP_CT_CHAR:
+      if (Uni_IsSMP(km_kbp_context_it->character)) {
+        buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate1(km_kbp_context_it->character);
+        buf[idx++] = Uni_UTF32ToSurrogate2(km_kbp_context_it->character);
+      } else {
+        buf[idx++] = (km_kbp_cp)km_kbp_context_it->character;
+      }
+      break;
+    case KM_KBP_CT_MARKER:
+      assert(km_kbp_context_it->marker > 0);
+      buf[idx++] = UC_SENTINEL;
+      buf[idx++] = CODE_DEADKEY;
+      buf[idx++] = static_cast<WCHAR>(km_kbp_context_it->marker);
+      break;
+    }
+  }
+
+  buf[idx] = 0;  // Null terminate character array
+  if (wcslen(buf) < sizeof(outBuf)) {
+    wcscpy_s(outBuf, wcslen(buf) + 1, buf);
+    delete[] buf;
+    return TRUE;
+  } else { // TODO: copy the buffer so that the context closest to the caret is preservd truncation the start of the "context"
+           // taking care not to truncate  deadkeys and surrogate pairs Hint see BufMax()
+    delete[] buf;
+    return FALSE;
+  }
+
+}

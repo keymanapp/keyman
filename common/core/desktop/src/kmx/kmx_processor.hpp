@@ -49,6 +49,10 @@ namespace kbp
       std::u16string const & value
     ) override;
 
+    bool
+    kmx_processor::queue_action(km_kbp_action_item const* action_item) override;
+
+
     /**
      * Get the list of keys belonging to the keyboard rules.
      *

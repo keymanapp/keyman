@@ -103,6 +103,10 @@ namespace km {
       return option(scope, key, i->second);
     }
 
+    bool mock_processor::queue_action(km_kbp_action_item const* action_item) {
+      return false;
+    }
+
     km_kbp_status
     mock_processor::process_event(
       km_kbp_state *state,
