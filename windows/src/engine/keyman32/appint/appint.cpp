@@ -259,16 +259,13 @@ ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD l
   assert(contextItems);
   assert(outBuf);
 
- /* if (!DebugAssert(!(len > MAXCONTEXT), "AppInt:ContextItemToAppContext: Len requested longer than MAXCONTEXT")) {
-    return FALSE;
-  }*/
   km_kbp_context_item *km_kbp_context_it = contextItems;
   uint8_t contextLen               = 0;
   for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
     ++contextLen;
   }
-   
-  WCHAR *buf = new WCHAR[(contextLen*3)+ 1 ]; // *3 if every context item was a deadkey 
+
+  WCHAR *buf = new WCHAR[(contextLen*3)+ 1 ]; // *3 if every context item was a deadkey
   uint8_t idx               = 0;
   km_kbp_context_it = contextItems;
   for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
@@ -306,7 +303,7 @@ ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD l
     return TRUE;
   } else {
     // TODO sort out how to fail asking for a len longer then MAXCONTEXT and the context from the api is longer.
-    return FALSE; 
+    return FALSE;
   }
 
 }

@@ -125,7 +125,6 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 
   for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
     BOOL continueProcessingActions = TRUE;
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: Action Type=[%d]", act->type);
     switch (act->type) {
     case KM_KBP_IT_CHAR:
       continueProcessingActions = processUnicodeChar(_td->app, act);

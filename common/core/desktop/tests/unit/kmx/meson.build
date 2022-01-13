@@ -198,7 +198,7 @@ else
     kbd_src = join_paths(test_path, kbd_basename) + '.kmn'
     kbd_obj = join_paths(test_path, kbd_basename) + '.kmx'
 
-    #test(kbd, kmx, args: [kbd_src, kbd_obj])
+    test(kbd, kmx, args: [kbd_src, kbd_obj])
   endforeach
 endif
 

@@ -487,7 +487,6 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
 
       case CODE_CALL:
         p++;
-        DebugLog("CallDLL with [store=%d].\n", *p-1);
         m_kbp_state->imx_callback(*p-1);
         FoundUse = TRUE;
         break;

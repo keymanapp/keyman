@@ -41,7 +41,7 @@ TEST(AppContext, Get_split_surrogate) {
 }
 
 
-// Test Calling
+// Test Calling BufMax
 TEST(AppContext, BufMax_LastChar) {
   WCHAR callbuff[MAXCONTEXT];
   const uint32_t ExpectedMarker = 0x0002;
@@ -50,8 +50,6 @@ TEST(AppContext, BufMax_LastChar) {
   WCHAR expectedString[] = {UC_SENTINEL, CODE_DEADKEY, 0x0002, 0x0000};
 
   testContext.Set(testString);
-  // split the surrogate should return on 16-bit code unit less than requested
-  //testContext.Get(callbuff, 3);
   WCHAR *contextBuf = testContext.BufMax(3);
   EXPECT_STREQ((expectedString), contextBuf);
   contextBuf += 2;

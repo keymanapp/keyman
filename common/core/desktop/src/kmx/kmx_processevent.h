@@ -87,9 +87,6 @@ private:
 
   KMX_BOOL IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift);
 
-// TODO need to have the callback registered as memeber
-
-
 public:
   KMX_ProcessEvent();
   ~KMX_ProcessEvent();
