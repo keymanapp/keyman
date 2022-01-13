@@ -373,16 +373,55 @@ IM_CallBackCore(void* callbackObject, km_kbp_state *km_state, uint32_t UniqueSto
 
 
 
-extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen)
-{
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutput: Enter");
+extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen) {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-  if(!_td->app) return FALSE;
-	while(backlen-- > 0) _td->app->QueueAction(QIT_BACK, 0);
-	while(*buf) _td->app->QueueAction(QIT_CHAR, *buf++);
-        SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutput: Exit");
-	return TRUE;
+  if (!_td)
+    return FALSE;
+  if (!_td->app)
+    return FALSE;
+  // Does not set the BK_BACKSPACE flag which checks for deadkey. The caller of KMSetOutput would seem the
+  // backlen takes into account deadkeys
+
+  if (!Globals::get_CoreIntegration()) {  // TODO: 5442 Remove
+    while (backlen-- > 0)
+      _td->app->QueueAction(QIT_BACK, 0);
+    while (*buf)
+      _td->app->QueueAction(QIT_CHAR, *buf++);
+    return TRUE;
+  } else {
+    if (!_td->lpActiveKeyboard->lpCoreKeyboard) {
+      return FALSE;
+    }
+    DWORD numActions = backlen + wcslen(buf);
+    DWORD idx = 0;
+    km_kbp_action_item *actionItems = new km_kbp_action_item[numActions + 1];
+
+    while (backlen-- > 0) {
+      actionItems[idx].type = KM_KBP_IT_BACK;
+      actionItems[idx].backspace.expected_type = 0;  // TODO this will be ignored down the chain
+      actionItems[idx].backspace.expected_value = 0;
+      idx++;
+    }
+    while (*buf) {
+      actionItems[idx].type      = KM_KBP_IT_CHAR;
+      if (Uni_IsSurrogate1(*buf) && Uni_IsSurrogate2(*(buf + 1))) {
+        actionItems[idx].character = Uni_SurrogateToUTF32(*buf, *(buf + 1));
+        buf++;
+      } else {
+        actionItems[idx].character = (DWORD)(*buf);
+      }
+      buf++;
+      idx++;
+    }
+    actionItems[idx].type   = KM_KBP_IT_END;
+    if (KM_KBP_STATUS_OK !=
+        (km_kbp_status_codes)km_kbp_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItems)) {
+      delete[] actionItems;
+      return FALSE;
+    }
+
+    return TRUE;
+  }
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dwData) {
