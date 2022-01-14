@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Ko ngawa an marat-screen keyboard";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Maga thlina nda verbose Console logging";
+
+/* Support buton text  */
+"93O-x6-RLF.label" = "Fanast jivo";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Anga klagat Keyboard...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Keyman mrata";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Uhili";
+
+/* Class = "NSTabViewItem"; label = "Keyboard Layouts"; ObjectID = "MPN-9N-wWc"; */
+"MPN-9N-wWc.label" = "Keyboard Layouts";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Vita verbose logging option na tadiya, Keyman da fant tinahunda da tamaka Keyman fanast jiv ina ɓilafta. Console program na da mogt thlina fant habarha javal avla Keyman. In Console, filter da marant habarha sma avla \"Keyman\" process. Nana fantanana da tsighapta jeb anga Keyman fanast jiv vita ɗowlo.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Langabta t kima";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Higa";
+
+/* Options button text */
+"frd-No-seV.label" = "Inahunda ɗowal k mogo";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Fant Keyboard";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "A gunatana vita hahaɗka nda ina damaɗata nda musaman keyboard ko nda Keyman sma sma.";
