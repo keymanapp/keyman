@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -eu
-set -x
 
 display_usage() {
   echo "Usage: $0 --build-path path"
