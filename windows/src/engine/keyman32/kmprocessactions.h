@@ -9,5 +9,6 @@
 #define _KMPROCESSACTIONS_h
 
 BOOL ProcessActions(BOOL* emitKeyStroke);
+BOOL ProcessActionsTestParse(BOOL* emitKeyStroke);
 
 #endif

@@ -141,27 +141,29 @@ BOOL ProcessHook()
 			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
 
-  if (isUsingCoreProcessor) {
-
-    PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
-    km_kbp_context_item *citems = nullptr;
-    ContextItemsFromAppContext(contextBuf, &citems);
-    if (KM_KBP_STATUS_OK !=
-      (km_kbp_status_codes)km_kbp_context_set(
-        km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
+  if (isUsingCoreProcessor) {  // TODO: 5442 Note: Nested if will be reduced once using core only
+    if (!_td->TIPFUpdateable) {
+      PWSTR contextBuf            = _td->app->ContextBufMax(MAXCONTEXT);
+      km_kbp_context_item *citems = nullptr;
+      ContextItemsFromAppContext(contextBuf, &citems);
+      if (KM_KBP_STATUS_OK != (km_kbp_status_codes)km_kbp_context_set(
+                                  km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
+        km_kbp_context_items_dispose(citems);
+        return FALSE;
+      }
       km_kbp_context_items_dispose(citems);
-      return FALSE;
+      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent: ");
+      if (KM_KBP_STATUS_OK != (km_kbp_status_codes)km_kbp_process_event(
+                                  _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
+                                  static_cast<uint16_t>(Globals::get_ShiftState()), (uint8_t)_td->state.isDown)) {
+        SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ", FALSE);
+        return FALSE;
+      }
+      ProcessActionsTestParse(&fOutputKeystroke);
+    } else {
+      ProcessActions(&fOutputKeystroke);
     }
-    km_kbp_context_items_dispose(citems);
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent: ");
-    if (KM_KBP_STATUS_OK !=
-      (km_kbp_status_codes)km_kbp_process_event(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
-                                                  static_cast<uint16_t>(Globals::get_ShiftState()),
-                                                  (uint8_t)_td->state.isDown)) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ",FALSE);
-      return FALSE;
-    }
-    ProcessActions(&fOutputKeystroke);
+
   }
   else {
     ProcessGroup(gp); // TODO: 5442 remove
