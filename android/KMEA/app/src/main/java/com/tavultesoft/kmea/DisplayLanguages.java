@@ -51,6 +51,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("kr-NG", "Kanuri"),
       new DisplayLanguageType("km-KH", "Khmer"),
+      new DisplayLanguageType("ckl-NG", "Kibaku"),
       new DisplayLanguageType("mfi-NG", "Mandara (Wandala)"),
       new DisplayLanguageType("mrt-NG", "Marghi"),
       new DisplayLanguageType("ann", "Obolo"),
