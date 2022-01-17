@@ -672,14 +672,16 @@ $(function () {
     this.modifierCodes.ALT,
     this.modifierCodes.CTRL | this.modifierCodes.ALT,
     this.modifierCodes.SHIFT | this.modifierCodes.ALT,
-    this.modifierCodes.SHIFT | this.modifierCodes.CTRL | this.modifierCodes.ALT
+    this.modifierCodes.SHIFT | this.modifierCodes.CTRL | this.modifierCodes.ALT,
+    this.modifierCodes.CAPS
   ];
 
   this.minimalModifierCombinations = [
     0,
     this.modifierCodes.RALT,
     this.modifierCodes.SHIFT,
-    this.modifierCodes.RALT | this.modifierCodes.SHIFT
+    this.modifierCodes.RALT | this.modifierCodes.SHIFT,
+    this.modifierCodes.CAPS
   ];
 
   this.showAllModifierCombinations = false;
