@@ -98,6 +98,7 @@ struct COMP_STORE {
 #define TSS__KEYMAN_70_MAX              29
 /* Keyman 8.0 system stores */
 #define TSS_COMPARISON                  30
+#define TSS__KEYMAN_80_MAX              30
 /* Keyman 9.0 system stores */
 #define TSS_PLATFORM                    31
 #define TSS_BASELAYOUT                  32
@@ -109,7 +110,17 @@ struct COMP_STORE {
 #define TSS_KEYBOARDVERSION             36      // &keyboardversion system store   // I4140
 #define TSS_KMW_EMBEDCSS                37
 #define TSS_TARGETS                     38
-#define TSS__MAX                        38
+#define TSS__KEYMAN_90_MAX              38
+/* Keyman 14.0 system stores */
+#define TSS_CASEDKEYS                   39
+#define TSS__KEYMAN_140_MAX             39
+/* Keyman 15.0 system stores */
+#define TSS_BEGIN_NEWCONTEXT            40
+#define TSS_BEGIN_POSTKEYSTROKE         41
+#define TSS_LAYERCHANGED                42
+#define TSS__KEYMAN_150_MAX             42
+
+#define TSS__MAX                        42
 
 // ShiftFlags
 #define LCTRLFLAG       0x0001      // Left Control flag

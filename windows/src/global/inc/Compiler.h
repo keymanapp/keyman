@@ -132,6 +132,8 @@
 // Different begin types
 #define BEGIN_ANSI		0
 #define BEGIN_UNICODE	1
+#define BEGIN_NEWCONTEXT 2
+#define BEGIN_POSTKEYSTROKE 3
 
 //#define lpuch		(LPBYTE)
 
@@ -204,7 +206,14 @@
 
 #define TSS_CASEDKEYS        39
 
-#define TSS__MAX				     39
+#define TSS__KEYMAN_140_MAX  39
+
+#define TSS_BEGIN_NEWCONTEXT    40
+#define TSS_BEGIN_POSTKEYSTROKE 41
+
+#define TSS_LAYERCHANGED        42
+
+#define TSS__MAX                42
 
 /* wm_keyman_control_internal message control codes */
 

@@ -152,7 +152,7 @@ const PWCHAR LineTokens[] = {
 
 #define SSN__PREFIX		L"&"
 
-const PWCHAR StoreTokens[TSS__MAX + 2] = {
+const PWCHAR StoreTokens[] = {
   L"",
   SSN__PREFIX L"BITMAP",
   SSN__PREFIX L"COPYRIGHT",
@@ -193,8 +193,13 @@ const PWCHAR StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX L"KMW_EMBEDCSS",
   SSN__PREFIX L"TARGETS",   // I4504
   SSN__PREFIX L"CASEDKEYS", // #2241
+  SSN__PREFIX L"", // TSS_BEGIN_NEWCONTEXT
+  SSN__PREFIX L"", // TSS_BEGIN_POSTKEYSTROKE
+  SSN__PREFIX L"LAYERCHANGED",
   NULL
 };
+
+static_assert(_countof(StoreTokens) == TSS__MAX + 2, "StoreTokens should have exactly TSS__MAX+2 elements");
 
 HINSTANCE g_hInstance;
 CompilerMessageProc msgproc = NULL;
@@ -578,22 +583,39 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
   while (iswspace(*p)) p++;
   if (_wcsnicmp(p, L"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;
   else if (_wcsnicmp(p, L"ansi", 4) == 0) BeginMode = BEGIN_ANSI;
+  else if (_wcsnicmp(p, L"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;
+  else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
   else if (*p != '>') return CERR_InvalidToken;
   else BeginMode = BEGIN_ANSI;
 
   if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
 
-  if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) return CERR_InvalidBegin;
+  if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) {
+    return CERR_InvalidBegin;
+  }
+  if (tstr[3] != 0) {
+    return CERR_InvalidToken;
+  }
 
-  fk->StartGroup[BeginMode] = tstr[2] - 1;
-  //mcd-03-01-2000: removed the secondary group idea; this was undocumented and
-  //is not supported under Keyman 5.0: ugly!!
-  //if(tstr[3] == UC_SENTINEL && tstr[4] == CODE_USE) fk->StartGroup[1] = tstr[5] - 1;
-  if (tstr[3] != 0) return CERR_InvalidToken;
+  if (BeginMode == BEGIN_ANSI || BeginMode == BEGIN_UNICODE) {
+    fk->StartGroup[BeginMode] = tstr[2] - 1;
+    // mcd-03-01-2000: removed the secondary group idea; this was undocumented and
+    // is not supported under Keyman 5.0: ugly!!
+    // if(tstr[3] == UC_SENTINEL && tstr[4] == CODE_USE) fk->StartGroup[1] = tstr[5] - 1;
 
-  if (FSaveDebug)
-    /* Record a system store for the line number of the begin statement */
-    AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN L"Unicode" : DEBUGSTORE_BEGIN L"ANSI");
+    if (FSaveDebug) {
+      /* Record a system store for the line number of the begin statement */
+      AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN L"Unicode" : DEBUGSTORE_BEGIN L"ANSI");
+    }
+  } else {
+    PFILE_GROUP gp = &fk->dpGroupArray[tstr[2] - 1];
+    if (!gp->fReadOnly) {
+      return BeginMode == BEGIN_NEWCONTEXT ?
+        CERR_NewContextGroupMustBeReadonly :
+        CERR_PostKeystrokeGroupMustBeReadonly;
+    }
+    return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
+  }
 
   return CERR_None;
 }
@@ -857,7 +879,11 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
   if (!q) return CERR_InvalidGroupLine;
 
   gp->fUsingKeys = FALSE;
-  if (IsSameToken(&p, L"using") && IsSameToken(&p, L"keys")) gp->fUsingKeys = TRUE;
+  gp->fReadOnly  = IsSameToken(&p, L"readonly");
+  if (!gp->fReadOnly) {
+    if (IsSameToken(&p, L"using") && IsSameToken(&p, L"keys"))
+      gp->fUsingKeys = TRUE;
+  }
 
   safe_wcsncpy(gp->szName, q, SZMAX_GROUPNAME);
 
@@ -1325,6 +1351,13 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
     }
     break;
 
+  case TSS_BEGIN_NEWCONTEXT:
+  case TSS_BEGIN_POSTKEYSTROKE:
+    break;
+
+  case TSS_LAYERCHANGED:
+    break;
+
   default:
     return CERR_InvalidSystemStore;
   }
@@ -1481,21 +1514,90 @@ BOOL CheckContextStatementPositions(PWSTR context) {
 /**
  * Checks if a use() statement is followed by other content in the output of a rule
  */
-DWORD CheckUseStatementsInOutput(PWSTR output) {   // I4867
-  BOOL HasUse = FALSE;
+DWORD
+CheckUseStatementsInOutput(const PFILE_GROUP gp, const PWSTR output) {  // I4867
+  BOOL hasUse = FALSE;
   PWSTR p;
   for (p = output; *p; p = incxstr(p)) {
     if (*p == UC_SENTINEL && *(p + 1) == CODE_USE) {
-      HasUse = TRUE;
-    } else if (HasUse) {
+      hasUse = TRUE;
+    } else if (hasUse) {
       AddWarning(CWARN_UseNotLastStatementInRule);
-      return FALSE;
+      break;
     }
   }
-  return TRUE;
+  return CERR_None;
 }
 
-DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
+/**
+ * Adds implicit `context` to start of output of rules for readonly groups
+ */
+DWORD
+InjectContextToReadonlyOutput(PWSTR pklOut) {
+  if (pklOut[0] != UC_SENTINEL || pklOut[1] != CODE_CONTEXT) {
+    if (wcslen(pklOut) > GLOBAL_BUFSIZE - 3) {
+      return CERR_MEMORY;
+    }
+    memmove(pklOut + 2, pklOut, (wcslen(pklOut) + 1) * 2);
+    pklOut[0] = UC_SENTINEL;
+    pklOut[1] = CODE_CONTEXT;
+  }
+  return CERR_None;
+}
+
+/**
+ * Verifies that a keyboard does not attempt to emit characters or
+ * other changes to text store when processing a readonly group
+ */
+DWORD
+CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PWSTR output) {  // I4867
+  PWSTR p;
+  for (p = output; *p; p = incxstr(p)) {
+    if (*p != UC_SENTINEL) {
+      return CERR_OutputInReadonlyGroup;
+    }
+    switch (*(p + 1)) {
+    case CODE_CALL:
+      // We cannot be sure that the callee is going to be readonly
+      // but we have to operate on a trust basis for call() in any
+      // case, so we'll allow it.
+      continue;
+    case CODE_USE:
+      // We only allow use() of other readonly groups
+      {
+        PFILE_GROUP targetGroup = &fk->dpGroupArray[*(p + 2) - 1];
+        if (!targetGroup->fReadOnly) {
+          return CERR_CannotUseReadWriteGroupFromReadonlyGroup;
+        }
+      }
+      continue;
+    case CODE_SETOPT:
+    case CODE_RESETOPT:
+    case CODE_SAVEOPT:
+      // it is okay to set, reset or save keyboard options
+      // although it's hard to see good use cases for this
+      continue;
+    case CODE_SETSYSTEMSTORE:
+      // it is okay to set system stores; Engine or Core will
+      // ignore set(&) that are not permissible in the given context
+      continue;
+    case CODE_CONTEXT:
+      // We allow `context` but only as the very first statement in output
+      if (p == output) {
+        continue;
+      }
+      return CERR_OutputInReadonlyGroup;
+    default:
+      // Note: conceptually, CODE_NUL could be transformed to CODE_CONTEXT
+      // if the context was also empty, but it is probably safest to avoid this,
+      // given CODE_CONTEXT does what we need anyway
+      return CERR_StatementNotPermittedInReadonlyGroup;
+    }
+  }
+  return CERR_None;
+}
+
+  DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
 {
   PWSTR p, pp;
   DWORD msg;
@@ -1539,7 +1641,23 @@ DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PWSTR str, BOOL IsUnicode)
     if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
 
     // Test that use() statements are not followed by other content
-    CheckUseStatementsInOutput(pklOut);   // I4867
+    if ((msg = CheckUseStatementsInOutput(gp, pklOut)) != CERR_None) {
+      return msg;   // I4867
+    }
+
+    if (gp->fReadOnly) {
+      // Ensure no output is made from the rule, and that
+      // use() statements meet required readonly semantics
+      if ((msg = CheckOutputIsReadonly(fk, pklOut)) != CERR_None) {
+        return msg;
+      }
+
+      // Inject `context` to start of output if group is readonly
+      // to keep the output internally consistent
+      if ((msg = InjectContextToReadonlyOutput(pklOut)) != CERR_None) {
+        return msg;
+      }
+    }
 
     kp = new FILE_KEY[gp->cxKeyArray + 1];
     if (!kp) return CERR_CannotAllocateMemory;

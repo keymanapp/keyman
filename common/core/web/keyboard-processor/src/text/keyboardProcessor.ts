@@ -91,6 +91,10 @@ namespace com.keyman.text {
       return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYER] as MutableSystemStore;
     }
 
+    public get layerChangedStore(): MutableSystemStore {
+      return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYERCHANGED] as MutableSystemStore;
+    }
+
     public get layerId(): string {
       return this.layerStore.value;
     }
@@ -205,6 +209,27 @@ namespace com.keyman.text {
         Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
         Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
       }
+    }
+
+    constructNullKeyEvent(device: utils.DeviceSpec): KeyEvent {
+      const keyEvent = new KeyEvent();
+      keyEvent.Lcode = 0;
+      keyEvent.kName = '';
+      keyEvent.device = device;
+      this.setSyntheticEventDefaults(keyEvent);
+      return keyEvent;
+    }
+
+    processNewContextEvent(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+      return this.activeKeyboard ?
+        this.keyboardInterface.processNewContextEvent(outputTarget, this.constructNullKeyEvent(device)) :
+        null;
+    }
+
+    processPostKeystroke(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+      return this.activeKeyboard ?
+        this.keyboardInterface.processPostKeystroke(outputTarget, this.constructNullKeyEvent(device)) :
+        null;
     }
 
     processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {

@@ -151,7 +151,7 @@ namespace com.keyman {
       }
       this._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1
 
-      this.core = new text.InputProcessor({
+      this.core = new text.InputProcessor(this.util.device.coreSpec, {
         baseLayout: baseLayout,
         variableStoreSerializer: new dom.VariableStoreCookieSerializer()
       });

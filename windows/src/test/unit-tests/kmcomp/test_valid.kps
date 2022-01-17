@@ -31,7 +31,9 @@
       <ID>test_valid</ID>
       <Version>1.0</Version>
       <RTL>True</RTL>
-      <Languages/>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
     </Keyboard>
   </Keyboards>
   <Strings/>
