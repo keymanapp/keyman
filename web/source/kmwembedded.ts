@@ -365,24 +365,18 @@ namespace com.keyman.text {
       // Changes for Build 353 to resolve KMEI popup key issues
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
 
-      let displayLayer = keymanweb.core.keyboardProcessor.layerId;
-
       // Regex for 'display layer'-'virtual key name'+'optional functional layer'
       // Can't just split on '-' because some layers like ctrl-shift contain it.
-      // Virtual key can be T_, U_, K_, or ISO 9995
-      let rx = new RegExp("(.*)-([TKU]_[^+]*|[A-E]\\d\\d)\\+?(.*)?");
-      let matches = keyName.match(rx);
+      // Virtual key name starts with T_, K_, or U_
+      // matches[1]: displayLayer (not used)
+      // matches[2]: keyId
+      // matches[3]: optional functionalLayer
+      let matches = keyName.match(/^(.+)-([TKU]_[^+]+)\+?(.+)?$/);
       if (matches == null) {
         return false;
       }
-      displayLayer = matches[1];
-      keyName = matches[2];
-      let functionalLayer = '';
-      if (matches[3]) {
-        functionalLayer = matches[3];
-        keyName += '+' + functionalLayer;
-      }
-
+      keyName = matches[2] + (matches[3] ? '+' + matches[3] : '');
+ 
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
       var Lelem=keymanweb.domManager.lastActiveElement;
