@@ -106,10 +106,10 @@ kmx_processor::update_option(
   return option(scope, key, value);
 }
 
-bool
-kmx_processor::queue_action(km_kbp_action_item const * action_item
+bool kmx_processor::queue_action(
+  km_kbp_action_item const * action_item
 ) {
-   DebugLog("Action type is [%d].\n", action_item->type);
+  DebugLog("Action type is [%d].\n", action_item->type);
   switch (action_item->type) {
   case KM_KBP_IT_END:
     // error should not queue empty item
@@ -174,7 +174,7 @@ kmx_processor::process_event(
   // via the queue_action method.
   bool has_internal_actions = ((vk == VK_SPACE) && (!_kmx.GetActions()->IsQueueEmpty()));
 
-  if (!has_internal_actions){
+  if (!has_internal_actions) {
     // Construct a context buffer from the items
     std::u16string ctxt;
     auto cp = state->context();
@@ -205,7 +205,7 @@ kmx_processor::process_event(
       // We need to output the default keystroke
       state->actions().push_emit_keystroke();
     }
-  } else{
+  } else {
     state->actions().clear();
   }
 
@@ -299,8 +299,8 @@ km_kbp_attr const & kmx_processor::attributes() const {
 km_kbp_context_item * kmx_processor::get_intermediate_context() {
   KMX_WCHAR *buf = _kmx.GetContext()->BufMax(MAXCONTEXT);
   km_kbp_context_item *citems = nullptr;
-  if (!ContextItemsFromAppContext(buf, &citems)){
-      citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
+  if (!ContextItemsFromAppContext(buf, &citems)) {
+    citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
   }
   return citems;
 }

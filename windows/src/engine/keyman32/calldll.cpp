@@ -357,8 +357,9 @@ extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreN
     return FALSE;
   }
   LPINTKEYBOARDINFO lpkbi = (LPINTKEYBOARDINFO)(callbackObject);
-  if (!lpkbi->lpCoreKeyboard)
-    return 0; // False
+  if (!lpkbi->lpCoreKeyboard) {
+    return FALSE;
+  }
   // Iterate through hooks to find the third party library function to call
   BOOL found = FALSE;
   DWORD n = 0;
@@ -403,7 +404,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
 
   if (!Globals::get_CoreIntegration()) {  // TODO: 5442 Remove If and fix indent
     while (backlen-- > 0)
-      _td->app->QueueAction(QIT_BACK, 0);
+      _td->app->QueueAction(QIT_BACK, BK_DEFAULT);
     while (*buf)
       _td->app->QueueAction(QIT_CHAR, *buf++);
     SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutput: Exit");

@@ -131,8 +131,8 @@ typedef struct km_kbp_options     km_kbp_options;
 //
 typedef struct km_kbp_option_item  km_kbp_option_item;
 
-// Callback function used to to access 3rd pary library functions
-// via the Keyman Platform
+// Callback function used to to access Input Method eXtension library functions
+// from Keyman Core
 //
 typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t, void*);
 
@@ -801,8 +801,8 @@ void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
 
 
 /**
- * Returns the list of libraries and function calls names that will be called by
- * the library. The matching dispose call needs to be called to free the memory.
+ * Returns the list of IMX libraries and function names that are referenced by
+ * the keyboard. The matching dispose call needs to be called to free the memory.
  */
 KMN_API
 km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx** imx_list);
@@ -814,13 +814,13 @@ KMN_API
 void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list);
 
 /**
- * Register callback from the platform engine.
+ * Register the IMX callback endpoint for the client.
  */
 KMN_API
 void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback, void *callback_object);
 
 /**
- * De-register call callback for platform engine
+ * De-register IMX callback endpoint for the client.
  */
 KMN_API
 void km_kbp_state_imx_deregister_callback(km_kbp_state *state);
@@ -930,8 +930,8 @@ km_kbp_state_context(km_kbp_state *state);
 ```
 ### `kbp_state_get_intermediate_context`
 ##### Description:
-Get access to the state object's keyboard processor's intermediate context.
-That is the context "now" in the keyboardprocessor part way through processing a key stroke.
+Get access to the state object's keyboard processor's intermediate context. This context
+is used during an IMX callback, part way through processing a keystroke.
 ##### Return:
 A pointer to an context item array. Must be disposed of by a call
 to `km_kbp_context_items_dispose`.
@@ -973,17 +973,16 @@ km_kbp_state_action_items(km_kbp_state const *state,
 ```
 ### `km_kbp_state_queue_action_items`
 ##### Description:
-Queue and the action in the current keyboard processor.
-`km_kbp_process_event`.
+Queue actions for the current keyboard processor state; normally
+used in IMX callbacks called during `km_kbp_process_event`.
 ##### Return:
 - `KM_KBP_STATUS_OK`: On success.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`:
-In the event the `state` or `in action` pointer are null.
+In the event the `state` or `action_items` pointer are null.
 ##### Parameters:
-- __state__: A pointer to the opaque `km_kbp_state` object to be queried.
-- __action_items__:
-A pointer to a action item list: The action items to be added to
-the keyboardprocessor queue.
+- __state__:        A pointer to the opaque `km_kbp_state` object to be queried.
+- __action_items__: The action items to be added to the keyboardprocessor 
+                    queue. Must be terminated with a `KM_KBP_IT_END` entry. 
 
 ```c
 */

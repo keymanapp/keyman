@@ -297,11 +297,9 @@ ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD l
     AppContext context;
     context.Set(buf);
     context.Get(outBuf, len);
-    delete[] buf;
-    return TRUE;
   } else {
     wcscpy_s(outBuf, wcslen(buf) + 1, buf);
-    delete[] buf;
-    return TRUE;
   }
+  delete[] buf;
+  return TRUE;
 }

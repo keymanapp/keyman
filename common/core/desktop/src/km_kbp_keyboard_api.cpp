@@ -99,16 +99,18 @@ void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list)
   delete[] key_list;
 }
 
- km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx** imx_list)
- {
-   assert(keyboard); assert(imx_list);
-  if (!keyboard || !imx_list)
+km_kbp_status km_kbp_keyboard_get_imx_list(
+  km_kbp_keyboard const *keyboard,
+  km_kbp_keyboard_imx** imx_list
+) {
+  assert(keyboard); assert(imx_list);
+  if (!keyboard || !imx_list) {
     return KM_KBP_STATUS_INVALID_ARGUMENT;
-
+  }
+  
   *imx_list = keyboard->get_imx_list();
   return KM_KBP_STATUS_OK;
-
- }
+}
 
 void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list)
 {
