@@ -1,15 +1,15 @@
 
-/* Class = "NSMenuItem"; title = "Configuration..."; ObjectID = "P1b-lE-yFw"; */
+/* Configuration window menu text */
 "P1b-lE-yFw.title" = "ការកំណត់រចនាសម្ព័ន្ធ...";
 
-/* Class = "NSMenuItem"; title = "Keyboards"; ObjectID = "bQa-j9-nHe"; */
+/* Keyboards menu text */
 "bQa-j9-nHe.title" = "ក្ដារចុច";
 
-/* Class = "NSMenu"; title = "Keyboards"; ObjectID = "goP-aK-3WB"; */
+/* Keyboards menu text */
 "goP-aK-3WB.title" = "ក្ដារចុច";
 
-/* Class = "NSMenuItem"; title = "About"; ObjectID = "kb2-ww-RS3"; */
+/* About menu text */
 "kb2-ww-RS3.title" = "អំពី";
 
-/* Class = "NSMenuItem"; title = "On-Screen Keyboard"; ObjectID = "s96-JI-YDh"; */
+/* On-Screen Keyboard menu text */
 "s96-JI-YDh.title" = "ក្ដារចុចលើអេក្រង់";

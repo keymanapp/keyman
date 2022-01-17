@@ -43,3 +43,21 @@
 
 /* Button text keyboard download complete  */
 "button-download-complete" = "រួចរាល់";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "ក្ដារចុច៖";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "ពុម្ពអក្សរ៖";
+
+/* package version label in the Package Information window */
+"package-version-label" = "ជំនាន់កញ្ចប់៖";
+
+/* author label in the Package Information window */
+"author-label" = "អ្នកបង្កើត៖";
+
+/* website label in the Package Information window */
+"website-label" = "គេហទំព័រ៖";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "រក្សាសិទ្ធិ៖";

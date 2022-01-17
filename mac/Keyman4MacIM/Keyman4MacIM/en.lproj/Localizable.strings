@@ -43,3 +43,23 @@
 
 /* Button text keyboard download complete  */
 "button-download-complete" = "Done";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Keyboards:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Fonts:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Package Version:";
+
+/* author label in the Package Information window */
+"author-label" = "Author:";
+
+/* website label in the Package Information window */
+"website-label" = "Website:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Copyright:";
+
+
