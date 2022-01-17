@@ -55,6 +55,12 @@ These dependencies are also listed below if you'd prefer to install manually.
   brew install bash jq python3 meson ninja rustup-init coreutils pandoc rustup-init
   ```
 
+  On M1 only (as greadlink is not on the path otherwise in XCode):
+
+  ```shell
+  sudo ln -s /opt/homebrew/bin/greadlink /usr/local/bin/greadlink
+  ```
+
 * Web: node.js, emscripten, wasm-pack, openjdk 8
 
   ```shell
