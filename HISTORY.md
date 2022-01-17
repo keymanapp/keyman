@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 15.0.179 alpha 2022-01-17
+
+* feat(web): Start of Sentence support - part 1 (#5963)
+* feat(developer): support for Caps Lock layer (#5988)
+* fix(web): call postKeystroke on banner touch (#6004)
+* chore(ios): project scripts should use /usr/bin/env bash (#6114)
+* chore: update docs (#6115)
+* chore(common): Check in crowdin strings for Kibaku (#6048)
+* fix(mac): externalize strings for package info window localization (#6088)
+* fix(developer): repatch #6074 (#6111)
+* fix(linux): Fix lintian errors (#6106)
+
 ## 15.0.178 alpha 2022-01-14
 
 * chore(common): Check in crowdin strings for Waha (#6050)
