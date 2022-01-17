@@ -63,6 +63,7 @@ ibus_keyman_tests_SOURCES = \
   ../../../common/core/desktop/src/kmx/kmx_consts.cpp \
   ../../../common/core/desktop/src/kmx/kmx_context.cpp \
   ../../../common/core/desktop/src/kmx/kmx_context.h \
+  ../../../common/core/desktop/src/kmx/kmx_conversion.cpp \
   ../../../common/core/desktop/src/kmx/kmx_debug.cpp \
   ../../../common/core/desktop/src/kmx/kmx_debugger.cpp \
   ../../../common/core/desktop/src/kmx/kmx_debugger.h \

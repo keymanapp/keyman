@@ -1,5 +1,131 @@
 # Keyman Version History
 
+## 15.0.178 alpha 2022-01-14
+
+* chore(common): Check in crowdin strings for Waha (#6050)
+
+## 15.0.177 alpha 2022-01-13
+
+* chore(common): Check in crowdin strings for Marghi (#6049)
+
+## 15.0.176 alpha 2022-01-12
+
+* fix(windows): add x64 build fix invalid memory access (#6057)
+* feat(windows): method set context correctly truncates input buffer (#6080)
+* chore(common): Check in crowdin strings for Kanuri (#6047)
+* fix(linux): Update minimum sentry-sdk version (#6093)
+* docs: Enhance Linux build setup doc (#6094)
+
+## 15.0.175 alpha 2022-01-11
+
+* feat(linux): Don't create Sentry events for errors (#6070)
+* fix(linux): Fix attribute error (#6086)
+* fix(developer): bundle.sh must succeed (#6091)
+
+## 15.0.174 alpha 2022-01-10
+
+* chore(android/samples): Add -no-daemon flag to KMSample2 build script (#6082)
+* fix(linux): Fix installation of shared packages (#6015)
+
+## 15.0.173 alpha 2022-01-05
+
+* chore(common): Update crowdin strings for Amharic (#6040)
+* fix(linux): fix release version number for Sentry reporting (#6068)
+
+## 15.0.172 alpha 2021-12-23
+
+* fix(developer): work around devDependencies bug in npm (#6074)
+* chore(windows): nmake makefile cleanup (#6065)
+
+## 15.0.171 alpha 2021-12-17
+
+* feat(developer): remember test page preferences on reload (#6033)
+* feat(developer): tidy up package list in web test view (#6034)
+* feat(developer): live reload of web debugger (#6035)
+* feat(developer): cache web debug objects across sessions (#6036)
+* fix(developer): project_mru.xml path (#6061)
+* chore(developer): add browse4folder to components (#6062)
+* docs(windows): Add note on split user/admin accounts (#6059)
+* fix(mac): increase OSK character size by 50% (#6006)
+
+## 15.0.170 alpha 2021-12-16
+
+* docs(linux): Document how to disable error reporting (#6051)
+* fix(linux): fix release version number for Sentry reporting (#6052)
+* fix(linux): Fix package description (#6054)
+
+## 15.0.169 alpha 2021-12-15
+
+* fix(mac): display Unicode package name correctly instead of '????' (#6016)
+* fix(linux): Improve ibus-keyman tests (#6044)
+
+## 15.0.168 alpha 2021-12-14
+
+* feat(linux): Add support for Ubuntu 22.04 Jammy (#6037)
+
+## 15.0.167 alpha 2021-12-13
+
+* fix(windows): remove unused variable (#6039)
+
+## 15.0.166 alpha 2021-12-11
+
+* chore(windows): version.rc use macros instead of mkver (#6019)
+* chore(windows): move from Borland make to nmake (#6020)
+* chore(windows): use findstr instead of Borland grep (#6021)
+* chore(windows): replace mkver with mkver.sh (#6022)
+* chore(windows): build without delphi (#6030)
+
+## 15.0.165 alpha 2021-12-08
+
+* fix(web): font size was not consistently set (#5906)
+
+## 15.0.164 alpha 2021-12-07
+
+* refactor(common/core): Use defines in all xstring tests (#6002)
+
+## 15.0.163 alpha 2021-12-06
+
+* chore(common): buf now uses decxstr so remove comment (#6012)
+
+## 15.0.162 alpha 2021-12-05
+
+* chore(linux): Update changelogs for 14.0.283 :package:  :cherries: (#6008)
+
+## 15.0.161 alpha 2021-12-04
+
+* chore(linux): Allow to specify debian revision :package:  :cherries: (#5999)
+* chore(linux): Remove lintian warning :package:  :cherries: (#6000)
+
+## 15.0.160 alpha 2021-12-03
+
+* fix(developer): building kmw keyboard had wrong message callback signature (#5972)
+* chore(common): add more description to Buf method (#6003)
+* chore(linux): add non-surrounding-text feature to tests (#5968)
+
+## 15.0.159 alpha 2021-12-02
+
+* fix(developer): debugger crash with empty group (#5995)
+* chore(android): Document switching to other system keyboard (#5991)
+* fix(android/engine): Fix font paths (#5987)
+
+## 15.0.158 alpha 2021-12-01
+
+* feat(android/engine): Add other IME's to the Keyboard Picker menu (#5973)
+* chore(android): Specify build tools version on other projects (#5979)
+
+## 15.0.157 alpha 2021-11-29
+
+* fix(web): remove obsolete popupBaseTarget (#5949)
+* fix(web): improve keyboard switch performance (#5958)
+* fix(web): support saving focus for custom OSK interactions (#5947)
+* fix(developer): render OSK nicely on touch devices (#5923)
+* chore(developer): move kcframe into its own folder (#5971)
+* fix(web): restore `dragEnd` function (#5977)
+* feat(common/core/desktop): Allow preserved key support (#5850)
+* chore(windows): Consolidate documentation for Windows devboxes (#5481)
+* chore(developer): tweak language metadata message (#5978)
+* fix(linux): Fix ibus-keyman integration tests (#5966)
+
 ## 15.0.156 alpha 2021-11-26
 
 * fix(windows): fix loadkeyboardoptions core memory error (#5959)

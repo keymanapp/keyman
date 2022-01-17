@@ -5,7 +5,7 @@
 @Library('lsdev-pipeline-library') _
 
 keymanPackaging {
-  distributionsToPackage = 'bionic focal hirsute'
+  distributionsToPackage = 'bionic focal hirsute jammy'
   arches = 'amd64 i386'
   packagesToBuild = ['keyman', 'kmflcomp', 'libkmfl', 'ibus-kmfl']
 }

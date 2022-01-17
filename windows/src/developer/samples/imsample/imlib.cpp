@@ -3,7 +3,7 @@
 #include <windows.h>
 #include "imlib.h"
 
-HMODULE hModuleKeyman32 = 0;
+HMODULE hModuleKeyman = 0;
 KMSetOutputProc KMSetOutput = NULL;
 KMGetContextProc KMGetContext = NULL;
 KMQueueActionProc KMQueueAction = NULL;
@@ -20,34 +20,39 @@ BOOL WINAPI IntKMGetKeyboardPath(PSTR kbdname, PSTR buf, DWORD len)
 
 BOOL PrepIM(void)
 {
-	if(hModuleKeyman32 != 0) return TRUE;
+	if(hModuleKeyman != 0) return TRUE;
 
-	hModuleKeyman32 = GetModuleHandle("keyman32.dll");
-	if(hModuleKeyman32 == 0)
+#ifdef _WIN64
+  hModuleKeyman = GetModuleHandle("keyman64.dll");
+#else
+  hModuleKeyman = GetModuleHandle("keyman32.dll");
+#endif
+
+	if(hModuleKeyman == 0)
 	{
 		KMGetKeyboardPath = IntKMGetKeyboardPath;
 		return TRUE;
 	}
-	
-	KMSetOutput = (KMSetOutputProc) GetProcAddress(hModuleKeyman32, "KMSetOutput");
+
+	KMSetOutput = (KMSetOutputProc) GetProcAddress(hModuleKeyman, "KMSetOutput");
 	if(!KMSetOutput) return FALSE;
 
-	KMGetContext = (KMGetContextProc) GetProcAddress(hModuleKeyman32, "KMGetContext");
+	KMGetContext = (KMGetContextProc) GetProcAddress(hModuleKeyman, "KMGetContext");
 	if(!KMGetContext) return FALSE;
 
-	KMQueueAction = (KMQueueActionProc) GetProcAddress(hModuleKeyman32, "KMQueueAction");
+	KMQueueAction = (KMQueueActionProc) GetProcAddress(hModuleKeyman, "KMQueueAction");
 	if(!KMQueueAction) return FALSE;
 
-	KMDisplayIM = (KMDisplayIMProc) GetProcAddress(hModuleKeyman32, "KMDisplayIM");
+	KMDisplayIM = (KMDisplayIMProc) GetProcAddress(hModuleKeyman, "KMDisplayIM");
 	if(!KMDisplayIM) return FALSE;
 
-	KMHideIM = (KMHideIMProc) GetProcAddress(hModuleKeyman32, "KMHideIM");
+	KMHideIM = (KMHideIMProc) GetProcAddress(hModuleKeyman, "KMHideIM");
 	if(!KMHideIM) return FALSE;
 
-	KMGetActiveKeyboard = (KMGetActiveKeyboardProc) GetProcAddress(hModuleKeyman32, "KMGetActiveKeyboard");
+	KMGetActiveKeyboard = (KMGetActiveKeyboardProc) GetProcAddress(hModuleKeyman, "KMGetActiveKeyboard");
 	if(!KMGetActiveKeyboard) return FALSE;
 
-	KMGetKeyboardPath = (KMGetKeyboardPathProc) GetProcAddress(hModuleKeyman32, "KMGetKeyboardPath");
+	KMGetKeyboardPath = (KMGetKeyboardPathProc) GetProcAddress(hModuleKeyman, "KMGetKeyboardPath");
 	if(!KMGetKeyboardPath) return FALSE;
 
 	return TRUE;
@@ -72,7 +77,7 @@ HCURSOR GetHitTestCursor(HWND hwnd, LRESULT ht, LPRECT sizerect)
 		case HTBOTTOMRIGHT: cr = IDC_SIZENWSE; sizerect->bottom = sizerect->right = 1; break;
 		case HTLEFT:		cr = IDC_SIZEWE;   sizerect->left = 1; break;
 		case HTRIGHT:		cr = IDC_SIZEWE;   sizerect->right = 1; break;
-		default: return (HCURSOR) GetClassLong(hwnd, GCL_HCURSOR);
+		default: return (HCURSOR) GetClassLongPtr(hwnd, GCLP_HCURSOR);
 	}
 
 	return LoadCursor(NULL, cr);
@@ -105,7 +110,7 @@ BOOL IMDefWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT 
 		*lResult = HTCLIENT;
 
 		if(FMoveWindow || FSizeWindow) return TRUE;
-		
+
 		ht = DefWindowProc(hwnd, msg, wParam, lParam);
 		SetCursor(FHitTestCursor = GetHitTestCursor(hwnd, ht, &sizerect));
 		return TRUE;
@@ -131,20 +136,20 @@ BOOL IMDefWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT 
 			SetCursor(FHitTestCursor);
 			return TRUE;
 
-		case HTTOP:			
-		case HTTOPLEFT:		
-		case HTTOPRIGHT:	
-		case HTBOTTOM:		
-		case HTBOTTOMLEFT:  
-		case HTBOTTOMRIGHT: 
-		case HTLEFT:		
-		case HTRIGHT:		
+		case HTTOP:
+		case HTTOPLEFT:
+		case HTTOPRIGHT:
+		case HTBOTTOM:
+		case HTBOTTOMLEFT:
+		case HTBOTTOMRIGHT:
+		case HTLEFT:
+		case HTRIGHT:
 			FSizeWindow = TRUE;
 			SetCapture(hwnd);
 			FLastPoint = pt2;
 			SetCursor(FHitTestCursor);
 			return TRUE;
-				
+
 		default:
 			return ht != HTCLIENT;
 		}
@@ -156,36 +161,36 @@ BOOL IMDefWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT 
 
 		if(FMoveWindow)
 		{
-			MoveWindow(hwnd, 
-				rect.left+pt2.x - FLastPoint.x, 
-				rect.top+pt2.y - FLastPoint.y, 
-				rect.right-rect.left, 
-				rect.bottom-rect.top, 
+			MoveWindow(hwnd,
+				rect.left+pt2.x - FLastPoint.x,
+				rect.top+pt2.y - FLastPoint.y,
+				rect.right-rect.left,
+				rect.bottom-rect.top,
 				TRUE);
 			FLastPoint = pt2;
 			SetCursor(FHitTestCursor);
 			return TRUE;
 		}
 		else if(FSizeWindow)
-		{ 
+		{
 			POINT pt3 = pt2; pt3.x -= FLastPoint.x; pt3.y -= FLastPoint.y;
 			RECT r2;
 			r2.left = rect.left + pt3.x*sizerect.left;
 			r2.top = rect.top + pt3.y*sizerect.top;
 			r2.right = rect.right + pt3.x*sizerect.right;
 			r2.bottom = rect.bottom + pt3.y*sizerect.bottom;
-			if(r2.right - r2.left < 16) 
+			if(r2.right - r2.left < 16)
 			{
 				r2.right = rect.right; r2.left = rect.left;
 			}
 			else FLastPoint.x = pt2.x;
-			if(r2.bottom - r2.top < 10) 
+			if(r2.bottom - r2.top < 10)
 			{
 				r2.bottom = rect.bottom; r2.top = rect.top;
 			}
 			else FLastPoint.y = pt2.y;
 
-			MoveWindow(hwnd, 
+			MoveWindow(hwnd,
 				r2.left,
 				r2.top,
 				r2.right-r2.left,
@@ -195,9 +200,9 @@ BOOL IMDefWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT 
 			SetCursor(FHitTestCursor);
 			return TRUE;
 		}
-	
+
 		return DefWindowProc(hwnd, WM_NCHITTEST, 0, MAKELONG(pt2.x, pt2.y)) != HTCLIENT;
-	
+
 	case WM_LBUTTONUP:
 		if(FMoveWindow || FSizeWindow)
 		{
@@ -208,7 +213,7 @@ BOOL IMDefWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT 
 
 		pt = MAKEPOINTS(lParam); pt2.x = pt.x; pt2.y = pt.y;
 		ClientToScreen(hwnd, &pt2);
-		
+
 		return DefWindowProc(hwnd, WM_NCHITTEST, 0, MAKELONG(pt2.x, pt2.y)) != HTCLIENT;
 	}
 

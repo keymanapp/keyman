@@ -7,7 +7,7 @@
 PLATFORM=x64
 
 build: manifest.res version.res dirs
-    $(MSBUILD) keymanx64.vcxproj $(MSBUILD_BUILD) /p:Platform=x64
+    $(MSBUILD) keymanx64.vcxproj $(MSBUILD_BUILD) "/p:Platform=x64"
     $(COPY) $(X64_TARGET_PATH)\keymanx64.exe $(PROGRAM)\engine
     $(COPY) $(X64_TARGET_PATH)\keymanx64.pdb $(DEBUGPATH)\engine
 
@@ -30,13 +30,13 @@ install:
     $(COPY) $(PROGRAM)\engine\keymanx64.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
-    grep -c "uiAccess=\"true\"" manifest.in
+    findstr "uiAccess=\"true\"" manifest.in >nul
 
 test-manifest:
-    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+# test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\engine\keymanx64.exe -validate_manifest
     $(MT) -nologo -inputresource:$(PROGRAM)\engine\keymanx64.exe -out:temp.manifest
-    grep -c "uiAccess=\"true\"" temp.manifest
+    findstr "uiAccess=\"true\"" temp.manifest >nul
     -del temp.manifest
 
 !include ..\..\Target.mak

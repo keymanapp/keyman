@@ -43,7 +43,7 @@ def get_package_download_data(packageID, weekCache=False):
     response = requests.get(api_url)
     logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
     os.chdir(current_dir)
-    requests_cache.core.uninstall_cache()
+    requests_cache.uninstall_cache()
     if response.status_code == 200:
         return response.json()
     else:
@@ -75,7 +75,7 @@ def get_keyboard_data(keyboardID, weekCache=False):
     response = requests.get(api_url)
     logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
     os.chdir(current_dir)
-    requests_cache.core.uninstall_cache()
+    requests_cache.uninstall_cache()
     if response.status_code == 200:
         return response.json()
     else:
@@ -203,7 +203,7 @@ def download_kmp_file(url, kmpfile, cache=False):
     if cache:
         logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
         os.chdir(current_dir)
-        requests_cache.core.uninstall_cache()
+        requests_cache.uninstall_cache()
 
     if response.status_code == 200:
         with open(kmpfile, 'wb') as f:

@@ -15,7 +15,9 @@ EXT=$(ROOT)\src\ext
 INCLUDE=$(ROOT)\src\global\inc;$(INCLUDE)
 
 !ifndef EXCLUDEPATHDEFINES
+!ifndef NODELPHI
 !include $(ROOT)\src\PathDefines.mak
+!endif
 !endif
 
 PROGRAM=$(ROOT)\bin
@@ -28,26 +30,26 @@ INSTALLPATH_KEYMANDEVELOPER=%ProgramFiles(X86)%\Keyman\Keyman Developer
 INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
 
 !IFDEF DEBUG
-  MAKEFLAG_DEBUG=-DDEBUG
-  DELPHI_MSBUILD_FLAG_DEBUG=/p:Config=Debug
+MAKEFLAG_DEBUG="DEBUG=$(DEBUG)"
+DELPHI_MSBUILD_FLAG_DEBUG="/p:Config=Debug"
 !ELSE
-  DELPHI_MSBUILD_FLAG_DEBUG=/p:Config=Release
+DELPHI_MSBUILD_FLAG_DEBUG="/p:Config=Release"
 !ENDIF
 
 !IFDEF USERDEFINES
-  MAKEFLAG_USERDEFINES=-DUSERDEFINES
+MAKEFLAG_USERDEFINES="USERDEFINES=$(USERDEFINES)"
 !ENDIF
 
 !IFDEF SC_TIMESTAMP
-  MAKEFLAG_SC_TIMESTAMP=-DSC_TIMESTAMP
+MAKEFLAG_SC_TIMESTAMP="SC_TIMESTAMP=$(SC_TIMESTAMP)"
 !ENDIF
 
 !IFDEF BUILDHELP
-  MAKEFLAG_BUILDHELP=-DBUILDHELP
+MAKEFLAG_BUILDHELP="BUILDHELP=$(BUILDHELP)"
 !ENDIF
 
 !IFDEF BUILDRTF
-  MAKEFLAG_BUILDRTF=-DBUILDRTF
+MAKEFLAG_BUILDRTF="BUILDRTF=$(BUILDRTF)"
 !ENDIF
 
 !IFDEF REL_SUFFIX
@@ -55,23 +57,23 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
 !ENDIF
 
 !IFDEF LINT
-  MAKEFLAG_LINT=-DLINT
+MAKEFLAG_LINT="LINT=$(LINT)"
 !ENDIF
 
 !IFDEF NOUI
-  MAKEFLAG_QUIET=-DNOUI
+MAKEFLAG_QUIET="NOUI=$(NOUI)"
 !ELSE
 !IFDEF QUIET
-  MAKEFLAG_QUIET=-DQUIET
+MAKEFLAG_QUIET="QUIET=$(QUIET)"
 !ENDIF
 !ENDIF
 
 !IFDEF RELEASE_OEM
-  MAKEFLAG_RELEASE_OEM=-DRELEASE_OEM
+MAKEFLAG_RELEASE_OEM="RELEASE_OEM=$(RELEASE_OEM)"
 !ENDIF
 
 !IFDEF QUICK_BUILD_KEYMAN
-  MAKEFLAG_QUICK_BUILD_KEYMAN=-DQUICK_BUILD_KEYMAN
+MAKEFLAG_QUICK_BUILD_KEYMAN="QUICK_BUILD_KEYMAN=$(QUICK_BUILD_KEYMAN)"
 !ENDIF
 
 #
@@ -97,7 +99,7 @@ DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\$(DELPHI_VERSION)\bin
 # Pass local configuration through to sub-instances of MAKE
 #
 
-MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_QUICK_BUILD_KEYMAN) $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
+MAKE="nmake" /C $(MAKEFLAG_QUICK_BUILD_KEYMAN) $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
 
 #
 # Delphi build commands
@@ -118,13 +120,13 @@ DELPHIWARNINGS=-W+MESSAGE_DIRECTIVE -W+IMPLICIT_STRING_CAST -W+IMPLICIT_STRING_C
 DELPHIWARNINGS=-W-MESSAGE_DIRECTIVE -W-IMPLICIT_STRING_CAST -W-IMPLICIT_STRING_CAST_LOSS -W-EXPLICIT_STRING_CAST -W-EXPLICIT_STRING_CAST_LOSS -W-CVT_WCHAR_TO_ACHAR -W-CVT_NARROWING_STRING_LOST -W-CVT_ACHAR_TO_WCHAR -W-CVT_WIDENING_STRING_LOST -W-UNICODE_TO_LOCALE -W-LOCALE_TO_UNICODE -W-IMPLICIT_VARIANTS -W-IMPLICIT_INTEGER_CAST_LOSS -W-IMPLICIT_CONVERSION_LOSS -W-COMBINING_SIGNED_UNSIGNED64 -W-COMBINING_SIGNED_UNSIGNED64
 !ENDIF
 
-DELPHIDPRPARAMS=-Q -B -GD -H -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win32\$(TARGET_PATH) -E.\bin\Win32\$(TARGET_PATH)
-DELPHIDPRPARAMS64=-Q -B -GD -H -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win64\$(TARGET_PATH) -E.\bin\Win64\$(TARGET_PATH)
-DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$J+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData -NUobj\Win32\$(TARGET_PATH)
+DELPHIDPRPARAMS=-Q -B -GD -H -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win32\$(TARGET_PATH) -E.\bin\Win32\$(TARGET_PATH)
+DELPHIDPRPARAMS64=-Q -B -GD -H -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win64\$(TARGET_PATH) -E.\bin\Win64\$(TARGET_PATH)
+DELPHIDPKPARAMS=-Q -B -GD -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData -NUobj\Win32\$(TARGET_PATH)
 
 !IFDEF NOUI
-DCC32="$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
-DCC32DPK="$(DCC32PATH)\dcc32.exe" $(DELPHIDPKPARAMS)
+DCC32=cmd /c "$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
+DCC32DPK=cmd /c "$(DCC32PATH)\dcc32.exe" $(DELPHIDPKPARAMS)
 !ELSE
 !IFDEF QUIET
 DCC32=@$(DEVTOOLS) -dccq  $(DELPHIDPRPARAMS)
@@ -141,8 +143,14 @@ DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 # Delphi MSBuild related commands and macros
 #
 
-# Warning: whitespace is horribly significant in the following macro -- particularly lack of space before &&
-DELPHI_MSBUILD=set DCC32PATH=$(DCC32PATH)&& $(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_DEBUG)
+DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
+
+!IFDEF NODELPHI
+DCC32=echo skipping 
+DCC32DPK=echo skipping 
+DCC64=echo skipping 
+DELPHI_MSBUILD=echo skipping
+!ENDIF
 
 # Visual C++ x86, x64
 WIN32_TARGET_PATH=bin\Win32\$(TARGET_PATH)
@@ -170,11 +178,11 @@ MT=mt.exe
 VCBUILD=error
 
 !IFDEF DEBUG
-  MSBUILD_BUILD=/t:Build /p:Configuration=Debug
-  MSBUILD_CLEAN=/t:Clean /p:Configuration=Debug
+MSBUILD_BUILD=/t:Build /p:Configuration=Debug
+MSBUILD_CLEAN=/t:Clean /p:Configuration=Debug
 !ELSE
-  MSBUILD_BUILD=/t:Rebuild /p:Configuration=Release
-  MSBUILD_CLEAN=/t:Clean /p:Configuration=Release
+MSBUILD_BUILD=/t:Rebuild /p:Configuration=Release
+MSBUILD_CLEAN=/t:Clean /p:Configuration=Release
 !ENDIF
 
 COPY=copy
@@ -186,7 +194,9 @@ WZUNZIP=$(WZZIPPATH) e
 # TDSPACK=error! $(ROOT)\src\buildtools\tdspack\tdspack -e
 # TDSPACKCOMPRESS=error! $(ROOT)\src\buildtools\tdspack\tdspack -o
 
-TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
+# we are using cmd /c because tds2dbg is failing on direct execution
+# from nmake
+TDS2DBG=cmd /c $(ROOT)\bin\buildtools\tds2dbg
 SENTRYTOOL=$(ROOT)\bin\buildtools\sentrytool
 SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep -r $(KEYMAN_ROOT) -i $(DELPHIINCLUDES)
 
@@ -205,14 +215,12 @@ WIXHEAT=$(WIXPATH)\heat.exe
 
 LINKPATH=link.exe
 
-TORTOISEPROC=C:\Progra~1\TortoiseSVN\bin\TortoiseProc.exe
-
 #
 # Certificates and code signing
 #
 
 !ifdef SIGNCODE_BUILD
-MAKE=$(MAKE) -DSIGNCODE_BUILD
+MAKE=$(MAKE) "SIGNCODE_BUILD=$(SIGNCODE_BUILD)"
 !else
 MAKE=$(MAKE)
 !endif
@@ -252,25 +260,14 @@ PLATFORM=Win32
 # in the same way as /resources/build/build-utils.sh.
 #
 
-MKVER_APP=$(PROGRAM)\buildtools\mkver
+!ifdef GIT_BASH_FOR_KEYMAN
+MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\mkver.sh
+!else
+MKVER_SH=start /wait $(ROOT)\src\buildtools\mkver.sh
+!endif
 
-!IFDEF VERSION_TXT_PATH
-MKVER_VERSION_TXT=$(VERSION_TXT_PATH)\version.in
-!ELSE
-MKVER_VERSION_TXT=..\version.in
-!ENDIF
-
-MKVER_TIER_MD=$(KEYMAN_ROOT)\TIER.md
-MKVER_VERSION_MD=$(KEYMAN_ROOT)\VERSION.md
-
-MKVER_COMMON_PARAMS=-tier "$(MKVER_TIER_MD)" -version "$(MKVER_VERSION_MD)"
-
-# Update a version.rc file
-MKVER_V=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -v $(MKVER_VERSION_TXT) version.in version.rc
-# Update a manifest.xml file
-MKVER_M=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -m manifest.in manifest.xml
-# Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out>
-MKVER_U=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -u
+MKVER_M=$(MKVER_SH) manifest.in manifest.xml
+MKVER_U=$(MKVER_SH)
 
 #
 # Symstore
@@ -294,10 +291,10 @@ KEYMAN_SYMSTOREPATH=$(KEYMAN_ROOT)\..\symbols
 # symbols in the symstore index which we can purge later on.
 __VERSION_WITH_TAG=$(VERSION_WIN)-$(VERSION_TIER)
 !IFNDEF TEAMCITY_VERSION
-  __VERSION_WITH_TAG=$(__VERSION_WITH_TAG)-local
+__VERSION_WITH_TAG=$(__VERSION_WITH_TAG)-local
 !ELSE
 !IFDEF TEAMCITY_PR_NUMBER
-  __VERSION_WITH_TAG=$(__VERSION_WITH_TAG)-test-$(TEAMCITY_PR_NUMBER)
+__VERSION_WITH_TAG=$(__VERSION_WITH_TAG)-test-$(TEAMCITY_PR_NUMBER)
 !ENDIF
 !ENDIF
 
@@ -308,3 +305,5 @@ SYMSTORE="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe" add
     /v "$(VERSION_WIN)" \
     /c "Version: $(__VERSION_WITH_TAG)" \
     /compress /f
+
+CLEAN=-del /S /Q

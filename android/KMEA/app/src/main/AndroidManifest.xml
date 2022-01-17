@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
   package="com.tavultesoft.kmea" >
+    <!-- Query other IME's for keyboard picker menu -->
+    <queries>
+      <intent>
+        <action android:name="android.view.InputMethod" />
+      </intent>
+    </queries>
 
     <uses-permission android:name="android.permission.VIBRATE" />
 

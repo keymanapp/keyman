@@ -163,8 +163,9 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     return YES;
 }
 
-+ (NSDictionary *)infoDictionaryFromFilePath:(NSString *)path {
++ (NSDictionary *)keyboardInfoFromKmxFile:(NSString *)path {
     NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
+    
     if (file == nil) {
         //NSLog(@"Failed to open file");
         return nil;
@@ -206,7 +207,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
         if (cmp_str[i].dwSystemID == TSS_VISUALKEYBOARD)
             visualKeyboard = [KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file];
     }
-    
+
     [file seekToFileOffset:cmp_kb.dpBitmapOffset];
     NSData *bitmapData = [file readDataOfLength:cmp_kb.dwBitmapSize];
     NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:bitmapData];
@@ -214,8 +215,9 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     
     [file closeFile];
     
-    if (!nameStr || !nameStr.length)
+    if (!nameStr || !nameStr.length) {
         nameStr = [path.lastPathComponent stringByReplacingOccurrencesOfString:@".kmx" withString:@""];
+    }
     if (!verStr)
         verStr = @"";
     if (!copyrightStr)

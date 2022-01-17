@@ -81,3 +81,6 @@ $(MOFILES): %/LC_MESSAGES/keyman-config.mo: %.po
 	msgfmt -v --check --output-file=$@ $^
 
 compile-po: $(MOFILES)
+
+check:
+	./run-tests.sh

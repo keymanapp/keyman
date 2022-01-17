@@ -42,18 +42,21 @@ public class DisplayLanguages {
       new DisplayLanguageType("am-ET", "አማርኛ (Amharic)"),
       new DisplayLanguageType("az-AZ", "Azərbaycanca (Azəricə)"),
       new DisplayLanguageType("bwr-NT", "Bura-Pabir"),
-      new DisplayLanguageType("ff-NG", "Ɗemngal Fulfulde"),	  
+      new DisplayLanguageType("ff-NG", "Ɗemngal Fulfulde"),
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
       new DisplayLanguageType("fr-FR", "French"),
       new DisplayLanguageType("ha-HG", "Hausa"),
       new DisplayLanguageType("in-ID", "Indonesian"),
       new DisplayLanguageType("de-DE", "German"),
+      new DisplayLanguageType("kr-NG", "Kanuri"),
       new DisplayLanguageType("km-KH", "Khmer"),
       new DisplayLanguageType("mfi-NG", "Mandara (Wandala)"),
+      new DisplayLanguageType("mrt-NG", "Marghi"),
       new DisplayLanguageType("ann", "Obolo"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
       new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
+      new DisplayLanguageType("hia-NG", "Waha"),
       new DisplayLanguageType("zh-CN", "中文(简体) (Simplified Chinese)")
     };
     return languages;

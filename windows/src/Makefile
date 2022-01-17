@@ -6,7 +6,7 @@
 
 default:
     @echo The following make targets are available:
-    @echo .   build                 builds everything except help files (-DBUILDHELP to build help)
+    @echo .   build                 builds everything except help files (BUILDHELP=1 to build help)
     @echo .   install               installs packages into Delphi IDE (run after a build)
     @echo .   clean                 removes all temp files
     @echo .   release               make a release
@@ -18,7 +18,7 @@ default:
     @echo .         DEBUG           Include debug information
     @echo .         SC_TIMESTAMP    Don't timestamp certificates (for internal releases only, offline)
     @echo .         BUILDHELP       Build the helpfiles (implicit when 'make release')
-    @echo .         LINT            Turns on $MESSAGE hints and warnings and all extra string warnings
+    @echo .         LINT            Turns on ^$MESSAGE hints and warnings and all extra string warnings
     @echo .         QUIET           Ignore hints and warnings
     @echo .         RELEASE_OEM     Build executables for third party products in oem folder (e.g. FirstVoices)
     @echo.
@@ -105,11 +105,11 @@ release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uia
     cd $(ROOT)\src
     $(MAKE) global-versions
     $(MAKE) build-release-wrapper
-    # $(MAKE) clean  <-- this makes it harder to do OEM builds
+#   $(MAKE) clean  <-- this makes it harder to do OEM builds
     cd $(ROOT)\src
 
 clean-pathdefines: test-releasebuildcheck
-    # test-releasebuildcheck builds devtools for us
+# test-releasebuildcheck builds devtools for us
     $(PROGRAM)\buildtools\devtools -ri
 
 #
@@ -117,10 +117,12 @@ clean-pathdefines: test-releasebuildcheck
 # and checkout the appropriate version of CEF as determined by CEF_VERSION.md
 #
 test-release-cef-path:
+!ifndef SC_TIMESTAMP
 !ifdef GIT_BASH_FOR_KEYMAN
     $(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\cef-checkout.sh
 !else
     start /wait $(ROOT)\src\buildtools\cef-checkout.sh
+!endif
 !endif
 
 #
@@ -156,7 +158,7 @@ test-7zip:
 # Test that klog is disabled
 #
 
-test-klog: mkver-app
+test-klog:
     cd $(ROOT)\src\buildtools\test-klog
     $(MAKE) verify
     cd $(ROOT)\src
@@ -165,7 +167,7 @@ test-klog: mkver-app
 # Test that we haven't already built this release
 #
 
-test-releaseexists: mkver-app
+test-releaseexists:
     cd $(ROOT)\src\developer\inst
     $(MAKE) test-releaseexists
     cd $(ROOT)\src
@@ -210,7 +212,7 @@ test-coverity:
     tar cvzf keyman-windows-coverity.tgz cov-int
     rd /s/q cov-int
     echo Manual upload keyman-windows-coverity.tgz to coverity
-    # TODO: automated upload as part of build
+# TODO: automated upload as part of build
 
 test-coverity-internal:
     cd $(ROOT)\src\developer\kmanalyze
@@ -236,14 +238,14 @@ build-release-wrapper: clean-output global-versions
     $(MAKE) dirs
     $(MAKE) build-tools
 !ifdef QUICK_BUILD_KEYMAN
-    $(MAKE) -DSIGNCODE_BUILD build
-    $(MAKE) -DSIGNCODE_BUILD build-release
+    $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build
+    $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build-release
     $(MAKE) signcode
 !else
-    $(MAKE) -DSIGNCODE_BUILD build unit-tests
-    $(MAKE) -DSIGNCODE_BUILD build-release
+    $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build unit-tests
+    $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build-release
     $(MAKE) signcode
-    $(MAKE) -DTARGET=test test
+    $(MAKE) "TARGET=test" test
 !endif
 
     cd $(ROOT)\src\engine\inst
@@ -273,23 +275,32 @@ build-release-wrapper-oem:
 # Tools needed to complete a build
 #
 
-global-versions: mkver-app
-    # Build our root version.txt
+global-versions:
+# Build our root version.txt
     cd $(ROOT)\src
 
     $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h
     $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc
 
 build-tools: global-versions
+!ifdef NODELPHI
+    echo Skipping build-tools
+!else
+# we need to build devtools directly because otherwise we have a
+# chicken-and-egg issue with PathDefines.mak
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE)
-
-    # We'll build a default PathDefines.mak if it is missing here so we can
-    # go on and do the rest of the build
+# We'll build a default PathDefines.mak if it is missing here so we can
+# go on and do the rest of the build
     $(PROGRAM)\buildtools\devtools -ti
+!endif
 
 message-constants: build-tools
+!ifdef NODELPHI
+    echo Skipping message-constants
+!else
     $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
+!endif
 
 #
 # Remove all files from output folders to ensure no legacy files left in a release

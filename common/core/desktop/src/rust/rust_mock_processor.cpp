@@ -74,6 +74,10 @@ namespace km {
       return engine_attrs;
     }
 
+    km_kbp_keyboard_key  * rust_mock_processor::get_key_list() const  {
+      km_kbp_keyboard_key* key_list = new km_kbp_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
+      return key_list;
+    }
     km_kbp_status rust_mock_processor::validate() const { return KM_KBP_STATUS_OK; }
 
     km_kbp_status rust_null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }

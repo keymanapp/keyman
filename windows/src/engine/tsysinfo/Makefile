@@ -8,7 +8,8 @@ build: version.res manifest.res dirs
     cd ..\tsysinfox64
 
 !ifdef SIGNCODE_BUILD
-    $(MAKE) signcode   # have to sign x64 version here as otherwise signcode is done after build.
+    $(MAKE) signcode
+# have to sign x64 version here as otherwise signcode is done after build.
 !endif
 
     cd ..\tsysinfo
@@ -16,7 +17,7 @@ build: version.res manifest.res dirs
     rc tsysinfo_x64.rc
     del tsysinfox64.bin
 
-    $(DELPHI_MSBUILD) tsysinfo.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) tsysinfo.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\tsysinfo.exe -dpr tsysinfo.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tsysinfo.exe
     $(COPY) $(WIN32_TARGET_PATH)\tsysinfo.exe $(PROGRAM)\engine
@@ -38,7 +39,7 @@ install:
     $(COPY) $(ROOT)\src\engine\tsysinfo\*.xsl "$(INSTALLPATH_KEYMANENGINE)"
 
 test-manifest:
-    # test that linked manifest exists and correct
+# test that linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\engine\tsysinfo.exe -validate_manifest
 
 !include ..\..\Target.mak

@@ -24,14 +24,14 @@ ROOT=c:\keyman\windows
 #
 
 build: $(BUILDPREREQ)
-    $(MAKE) -DTARGET=build $(TARGETS)
+    $(MAKE) "TARGET=build" $(TARGETS)
 
 !IFNDEF NOTARGET_SIGNCODE
 signcode:
-    $(MAKE) -DTARGET=signcode $(TARGETS)
+    $(MAKE) "TARGET=signcode" $(TARGETS)
 
 symbols:
-    $(MAKE) -DTARGET=symbols $(TARGETS)
+    $(MAKE) "TARGET=symbols" $(TARGETS)
 !ELSE
 signcode:
     rem no signcode required
@@ -42,20 +42,20 @@ symbols:
 
 build-release:
 !IFDEF RELEASE_TARGETS
-    $(MAKE) -DTARGET=build-release $(RELEASE_TARGETS)
+    $(MAKE) "TARGET=build-release" $(RELEASE_TARGETS)
 !ELSE
     @rem
 !ENDIF
 
 clean:
-    $(MAKE) -DTARGET=clean $(TARGETS) $(CLEANS)
+    $(MAKE) "TARGET=clean" $(TARGETS) $(CLEANS)
 
 install:
-    $(MAKE) -DTARGET=install $(TARGETS)
+    $(MAKE) "TARGET=install" $(TARGETS)
 
 test-manifest:
 !IFDEF MANIFESTS
-    $(MAKE) -DTARGET=test-manifest $(MANIFESTS)
+    $(MAKE) "TARGET=test-manifest" $(MANIFESTS)
 !ELSE
-    $(MAKE) -DTARGET=test-manifest $(TARGETS)
+    $(MAKE) "TARGET=test-manifest" $(TARGETS)
 !ENDIF

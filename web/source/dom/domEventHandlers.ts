@@ -517,8 +517,8 @@ namespace com.keyman.dom {
     }
 
     private static selectTouch(e: TouchEvent): Touch {
-      /**
-       * During multi-touch event's, it's possible for one or more touches of said multi-touch
+      /*
+       * During multi-touch events, it's possible for one or more touches of said multi-touch
        * to be against irrelevant parts of the page.  We only want to consider touches against
        * valid OutputTargets - against elements of the page that KMW can attach to.
        * With touch active... that's a TouchAliasElement.
@@ -546,7 +546,6 @@ namespace com.keyman.dom {
 
     /**
      * Handle receiving focus by simulated input field
-     *
      */
     setFocus: (e?: TouchEvent|MSPointerEvent) => void = function(this: DOMTouchHandlers, e?: TouchEvent|MSPointerEvent): void {
       DOMEventHandlers.states.setFocusTimer();
@@ -707,7 +706,7 @@ namespace com.keyman.dom {
         }
       }
 
-      /**
+      /*
        * This event will trigger before keymanweb.setBlur is triggered.  Now that we're allowing independent keyboard settings
        * for controls, we have to act here to preserve the outgoing control's keyboard settings.
        *
@@ -721,7 +720,7 @@ namespace com.keyman.dom {
       this.keyman.domManager.lastActiveElement = target;
       target.showCaret();
 
-      /**
+      /*
        * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
        * If not, we need to activate the control's preferred keyboard.
        */

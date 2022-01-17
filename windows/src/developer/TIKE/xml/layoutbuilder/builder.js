@@ -673,7 +673,6 @@ $(function () {
     this.modifierCodes.CTRL | this.modifierCodes.ALT,
     this.modifierCodes.SHIFT | this.modifierCodes.ALT,
     this.modifierCodes.SHIFT | this.modifierCodes.CTRL | this.modifierCodes.ALT,
-
     this.modifierCodes.CAPS
   ];
 

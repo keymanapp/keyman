@@ -63,7 +63,7 @@ namespace com.keyman.text {
      processNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
       const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.device, outputTarget);
 
-      if(ruleBehavior != null) {
+      if(ruleBehavior) {
         ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
       }
       return ruleBehavior;

@@ -12,6 +12,7 @@ tests = [
   ['state-api', 'state_api.cpp'],
   ['debug-api', 'debug_api.cpp'],
   ['kmx_xstring', 'test_kmx_xstring.cpp'],
+  ['kmx_context', 'test_kmx_context.cpp'],
 ]
 
 foreach t : tests

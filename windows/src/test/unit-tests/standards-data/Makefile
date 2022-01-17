@@ -8,7 +8,7 @@ test: build
     -$(WIN32_TARGET_PATH)\standardsdata.exe -b -exit:continue
 
 build:
-    $(DELPHI_MSBUILD) /p:CI=CI standardsdata.dproj
+    $(DELPHI_MSBUILD) "/p:CI=CI" standardsdata.dproj
 
 clean: def-clean
 

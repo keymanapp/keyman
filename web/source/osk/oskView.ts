@@ -374,25 +374,9 @@ namespace com.keyman.osk {
 
     public defaultFontSize(device: utils.DeviceSpec, isEmbedded: boolean): ParsedLengthStyle {
       if(device.touchable) {
-        var fontScale: number = 1;
-        if(device.formFactor == 'phone') {
-          fontScale = 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2;  // Combines original scaling factor with one previously applied to the layer group.
-        } else {
-          // The following is a *temporary* fix for small format tablets, e.g. PendoPad
-          var pixelRatio = 1;
-          if(device.OS == 'android' && 'devicePixelRatio' in window) {
-            pixelRatio = window.devicePixelRatio;
-          }
-
-          let defaultHeight = this.bannerView.height + this.getDefaultKeyboardHeight();
-          if(device.OS == 'android' && device.formFactor == 'tablet' && defaultHeight < 300 * pixelRatio) {
-            fontScale *= 1.2;
-          } else {
-            fontScale *= 2; //'2.5em';
-          }
-        }
-
-        // Finalize the font size parameter.
+        const fontScale = device.formFactor == 'phone'
+          ? 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2  // Combines original scaling factor with one previously applied to the layer group.
+          : 2; // iPad or Android tablet
         return ParsedLengthStyle.special(fontScale, 'em');
       } else {
         return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
@@ -487,13 +471,11 @@ namespace com.keyman.osk {
       this.needsLayout = false;
 
       // Step 3:  perform layout operations.
-      if(!this._baseFontSize && this.parsedBaseFontSize) {
-        // Make sure to initialize the default font size if it hasn't already been set!
-        this.banner.element.style.fontSize = this.baseFontSize;
-        if(this.vkbd) {
-          this.vkbd.fontSize = this.parsedBaseFontSize;
-        }
+      this.banner.element.style.fontSize = this.baseFontSize;
+      if(this.vkbd) {
+        this.vkbd.fontSize = this.parsedBaseFontSize;
       }
+
       if(!pending) {
         this.headerView?.refreshLayout();
         this.bannerView.refreshLayout();
@@ -627,7 +609,9 @@ namespace com.keyman.osk {
 
         // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
         this.keyboardView.updateState();
-        this.refreshLayoutIfNeeded();
+        // We need to recalc the font size here because the layer did not have
+        // calculated dimensions available before it was visible
+        this.refreshLayout();
       }
     }.bind(this);
 

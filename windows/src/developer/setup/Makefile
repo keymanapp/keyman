@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons
-    $(DELPHI_MSBUILD) setup.dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) setup.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\setup.exe -dpr setup.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\setup.exe
     $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\developer
@@ -26,14 +26,14 @@ signcode:
     rem SIGNCODE /d "Keyman Developer Setup" $(PROGRAM)\developer\setup.exe
 
 wrap-symbols:
-    # This is slightly non-standard due to renamed devsetup.dbg above
-    # we should be able to clean this up in the future when we remove the
-    # zipped debug symbols
+# This is slightly non-standard due to renamed devsetup.dbg above
+# we should be able to clean this up in the future when we remove the
+# zipped debug symbols
     $(SYMSTORE) $(PROGRAM)\developer\setup.exe /t keyman-developer
     $(SYMSTORE) $(ROOT)\src\developer\setup\setup.dbg /t keyman-developer
 
 test-manifest:
-    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+# test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\setup.exe -validate_manifest
 
 install:

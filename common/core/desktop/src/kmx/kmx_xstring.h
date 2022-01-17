@@ -35,6 +35,8 @@ int u16icmp(const km_kbp_cp *p, const km_kbp_cp *q);
 int u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count);
 km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx);
 
+//KMX_BOOL MapUSCharToVK(KMX_WORD ch, PKMX_WORD puKey, PKMX_DWORD puShiftFlags);
+
 } // namespace kmx
 } // namespace kbp
 } // namespace km

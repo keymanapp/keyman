@@ -6,7 +6,7 @@ TEST(AppContext, Get_Max_buff) {
   WCHAR callbuf[MAXCONTEXT];
   AppContext testContext;
   WCHAR *testString = L"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz0123456789";
-  WCHAR *expectedString = L"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz0"; // MAXCONTEXT taking into account null character termination
+  WCHAR *expectedString = L"JKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz0123456789"; // MAXCONTEXT taking into account null character termination
   testContext.Set(testString);
   testContext.Get(callbuf, MAXCONTEXT);
   EXPECT_STREQ((expectedString), callbuf);

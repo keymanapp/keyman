@@ -34,3 +34,20 @@
 
 #define KEYMAN_Environment        "$Environment"
 #define KEYMAN_Environment_W      L"$Environment"
+
+//
+// Version macros for .rc files
+///
+
+#define kv_version_stringify(x) kv_version_to_string(x)
+#define kv_version_to_string(x) #x
+
+// Product versioning
+
+#define KV_VERSION_MAJOR $VersionMajor
+#define KV_VERSION_MINOR $VersionMinor
+#define KV_VERSION_PATCH $VersionPatch
+#define KV_VERSION_STRING kv_version_stringify($VersionMajor ## . ## $VersionMinor ## . ## $VersionPatch ## .0) "\0"
+
+#define KV_FILEVERSION KV_VERSION_MAJOR, KV_VERSION_MINOR, KV_VERSION_PATCH, 0
+#define KV_PRODUCTVERSION KV_VERSION_MAJOR, KV_VERSION_MINOR, KV_VERSION_PATCH, 0

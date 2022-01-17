@@ -11,12 +11,12 @@
     BEGIN
       BLOCK "0C0904E4"
       BEGIN
-        VALUE "CompanyName", "SIL International\0"
+        VALUE "CompanyName", KV_COMPANY_NAME
         VALUE "FileDescription", "CHARIDENT\0"
         VALUE "FileVersion", "8.0.329.0\0"
         VALUE "InternalName", "CHARIDENT\0"
-        VALUE "LegalCopyright", "© SIL International\0"
-        VALUE "LegalTrademarks", "\0"
+        VALUE "LegalCopyright", KV_LEGAL_COPYRIGHT
+        VALUE "LegalTrademarks", KV_LEGAL_TRADEMARKS
         VALUE "OriginalFilename", "CHARIDENT.EXE\0"
         VALUE "ProductName", "SIL International Keyman Support Tools\0"
         VALUE "ProductVersion", "8.0.329.0\0"

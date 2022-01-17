@@ -1,4 +1,4 @@
-# Linux KMP installer
+# Linux km-config
 
 ## Preparing to run
 
@@ -181,3 +181,20 @@ This will create `.mo` files, e.g. `locale/de/LC_MESSAGES/keyman-config.mo`.
 ```bash
 LANGUAGE=de ./km-config
 ```
+
+## Debugging unit tests
+
+* Add the following lines to your workspace settings file (`.vscode/settings`),
+  or copy `docs/settings/linux/settings` to `.vscode/settings`)
+
+  ```settings
+  "python.envFile": "${workspaceFolder}/linux/keyman-config/tests/python.env",
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s", "linux/keyman-config/tests",
+    "-p", "test_*.py"
+  ],
+  "python.testing.unittestEnabled": true,
+  ```
+
+* The tests will show up in the _Test Explorer_ in VSCode and can be debugged there

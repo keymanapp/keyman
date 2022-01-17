@@ -68,6 +68,7 @@ void ibus_im_test_set_thread_loop(IBusIMContext *context, GMainLoop *loop);
 void ibus_im_test_set_text(IBusIMContext *context, const gchar *text);
 const gchar *ibus_im_test_get_text(IBusIMContext *context);
 void ibus_im_test_clear_text(IBusIMContext *context);
+void ibus_im_test_set_surrounding_text_supported(gboolean supported);
 G_END_DECLS
 #endif // __IBUSIMCONTEXT_H__
 

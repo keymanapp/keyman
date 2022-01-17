@@ -12,7 +12,7 @@ test: build
     -$(WIN32_TARGET_PATH)\jsonutiltests.exe -b -exit:continue
 
 build:
-    $(DELPHI_MSBUILD) /p:CI=CI jsonutiltests.dproj
+    $(DELPHI_MSBUILD) "/p:CI=CI" jsonutiltests.dproj
 
 clean: def-clean
 
