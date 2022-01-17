@@ -384,7 +384,7 @@ extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreN
     return FALSE;
   SendDebugMessageFormat(
       0, sdmKeyboard, 0, "IM_CallBackCore: td loadeded");
-  if (_td->TIPFUpdateable) {  // I4452
+  if (!_td->TIPFUpdateable) {  // Only execute the 3rd party function on first parse - not updateable. 
     SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td TIPFUpdatable about to call function [%s]", imdh->name);
     LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_CORE);
     LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_INT);

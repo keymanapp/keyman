@@ -144,7 +144,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
       break;
     case KM_KBP_IT_EMIT_KEYSTROKE:
       *emitKeyStroke = TRUE;
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsTestParse EMIT_KEYSTROKE: act->type=%d", act->type);
+      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions EMIT_KEYSTROKE: act->type=%d", act->type);
       continueProcessingActions = TRUE;
       break;
     case KM_KBP_IT_INVALIDATE_CONTEXT:
@@ -173,11 +173,9 @@ ProcessActionsTestParse(BOOL* emitKeyStroke) {
     return FALSE;
   }
 
-  if (!_td->TIPFUpdateable) {  // ensure precondition
+  if (_td->TIPFUpdateable) {  // ensure only run when not updateable
     return FALSE;
   }
-  // This is the test "not updateable" pass we only want to process emit keystroke and capslock both these are required
-  // to be processed in this phase.
 
   BOOL continueProcessingActions = TRUE;
   for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
