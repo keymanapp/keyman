@@ -349,7 +349,8 @@ namespace com.keyman.text {
  /**
    *  Accept an external key ID (from KeymanTouch) and pass to the keyboard mapping
    *  
-   *  @param  {string}  keyName   key identifier
+   *  @param  {string}  keyName   key identifier which could contain a display layer and a "functional" layer
+   *                              e.g: 'shift-K_E+rightalt-shift'
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
       let osk = keymanweb.osk;
@@ -361,16 +362,21 @@ namespace com.keyman.text {
       /* Clear any pending (non-popup) key */
       osk.vkbd.keyPending = null;
 
-      // Changes for Build 353 to resolve KMEI popup key issues      
+      // Changes for Build 353 to resolve KMEI popup key issues
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
 
+      // Regex for 'display layer'-'virtual key name'+'optional functional layer'
       // Can't just split on '-' because some layers like ctrl-shift contain it.
-      let separatorIndex = keyName.lastIndexOf('-');
-
-      if (separatorIndex > 0) {
-        keyName = keyName.substring(separatorIndex+1);
+      // Virtual key name starts with T_, K_, or U_
+      // matches[1]: displayLayer (not used)
+      // matches[2]: keyId
+      // matches[3]: optional functionalLayer
+      let matches = keyName.match(/^(.+)-([TKU]_[^+]+)\+?(.+)?$/);
+      if (matches == null) {
+        return false;
       }
-
+      keyName = matches[2] + (matches[3] ? '+' + matches[3] : '');
+ 
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
       var Lelem=keymanweb.domManager.lastActiveElement;
