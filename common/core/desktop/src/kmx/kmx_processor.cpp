@@ -11,29 +11,26 @@ static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR const* buf, km_kbp_context_
 {
   assert(buf);
   assert(outPtr);
-  km_kbp_context_item* context_items  = new km_kbp_context_item[u16len(buf) + 1];
+  km_kbp_context_item* context_items  = new km_kbp_context_item[xstrlen(buf) + 1];
   KMX_WCHAR const *p = buf;
-  uint8_t contextIndex = 0;
+  *outPtr = context_items;
   while (*p) {
     if (*p == UC_SENTINEL) {
       assert(*(p + 1) == CODE_DEADKEY);
       // we know the only uc_sentinel code in the context is code_deadkey, which has only 1 parameter: uc_sentinel code_deadkey <deadkey_id>
       // setup dead key context item
-      p += 2;
-      context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {*p} };
+      *context_items = km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {*(p+2)} };
     } else if (Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p + 1))) {
       // handle surrogate
-      context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
-      p++;
+      *context_items = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
     } else {
-      context_items[contextIndex++] = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
+      *context_items = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
     }
-    p++;
+    p = incxstr(p);
+    context_items++;
   }
   // terminate the context_items array.
-  context_items[contextIndex] = km_kbp_context_item KM_KBP_CONTEXT_ITEM_END;
-
-  *outPtr = context_items;
+  *context_items = km_kbp_context_item KM_KBP_CONTEXT_ITEM_END;
   return true;
 }
 
