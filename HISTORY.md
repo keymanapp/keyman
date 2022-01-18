@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.180 alpha 2022-01-18
+
+* feat(web): Caps Layer and double-tap gesture (#5989)
+* fix(web): Use regex to determine display layer and functional layers (#6100)
+
 ## 15.0.179 alpha 2022-01-17
 
 * feat(web): Start of Sentence support - part 1 (#5963)
