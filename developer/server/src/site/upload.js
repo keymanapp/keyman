@@ -1,5 +1,20 @@
 /* File upload via browser */
 
+const HIGHLIGHT_DELAY = 5000;
+
+function temporarilyHighlight(id) {
+  let btn = document.getElementById(id);
+  if(!btn) {
+    return false;
+  }
+  btn.classList.add('btn-primary');
+  btn.classList.remove('bg-light');
+  window.setTimeout(() => {
+    btn.classList.add('bg-light');
+    btn.classList.remove('btn-primary');
+  }, HIGHLIGHT_DELAY);
+}
+
 function handleFiles(files) {
   ([...files]).forEach(uploadFile);
 }
@@ -19,6 +34,21 @@ function uploadFile(file) {
       showToast('Unrecognised file name format "'+file.name+'".', 'error');
     } else {
       showToast('Uploaded "'+file.name+'" successfully.', 'success');
+      res.json().then(data => {
+        switch(data.type) {
+          case 'keyboard':
+            temporarilyHighlight('btn-keyboard');
+            break;
+          case 'package':
+            temporarilyHighlight('btn-menu');
+            break;
+          case 'model':
+            temporarilyHighlight('btn-model');
+            break;
+          case 'font':
+            // No action
+        }
+      });
     }
   })
   .catch((e) => {
@@ -41,7 +71,7 @@ function showToast(message, type) {
     toastContainer.removeChild(tt);
   });
   toastContainer.appendChild(tt);
-  let toast = new bootstrap.Toast(tt);
+  let toast = new bootstrap.Toast(tt, {delay: HIGHLIGHT_DELAY});
   toast.show();
 }
 

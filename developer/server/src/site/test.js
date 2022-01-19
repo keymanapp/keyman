@@ -1,13 +1,13 @@
 const ta1 = document.getElementById('ta1');
 
 const devices = {
-  Windows:         { browser: 'chrome', formFactor: 'desktop', OS: 'windows', touchable: false, dimensions: [640, 300] },
-  macOS:           { browser: 'chrome', formFactor: 'desktop', OS: 'macosx',  touchable: false, dimensions: [640, 300] },
-  Linux:           { browser: 'chrome', formFactor: 'desktop', OS: 'linux',   touchable: false, dimensions: [640, 300] },
-  iPhone:          { browser: 'chrome', formFactor: 'phone',   OS: 'ios',     touchable: true,  dimensions: [527, 280] },
-  iPadMini:        { browser: 'chrome', formFactor: 'tablet',  OS: 'ios',     touchable: true,  dimensions: [829, 300] },
-  SamsungGalaxyS5: { browser: 'chrome', formFactor: 'phone',   OS: 'android', touchable: true,  dimensions: [520, 270] },
-  SamsungTablet:   { browser: 'chrome', formFactor: 'tablet',  OS: 'android', touchable: true,  dimensions: [640, 300] },
+  Windows:         { name: 'Windows',           browser: 'chrome', formFactor: 'desktop', OS: 'windows', touchable: false, dimensions: [640, 300] },
+  macOS:           { name: 'macOS',             browser: 'chrome', formFactor: 'desktop', OS: 'macosx',  touchable: false, dimensions: [640, 300] },
+  Linux:           { name: 'Linux',             browser: 'chrome', formFactor: 'desktop', OS: 'linux',   touchable: false, dimensions: [640, 300] },
+  iPhone:          { name: 'iPhone',            browser: 'chrome', formFactor: 'phone',   OS: 'ios',     touchable: true,  dimensions: [527, 280] },
+  iPadMini:        { name: 'iPad Mini',         browser: 'chrome', formFactor: 'tablet',  OS: 'ios',     touchable: true,  dimensions: [829, 300] },
+  Pixel5:          { name: 'Google Pixel 5',    browser: 'chrome', formFactor: 'phone',   OS: 'android', touchable: true,  dimensions: [551, 290] },
+  Nexus9:          { name: 'Google Nexus 9',    browser: 'chrome', formFactor: 'tablet',  OS: 'android', touchable: true,  dimensions: [763, 300] },
 };
 
 // these need to be defined before we load inc/keyboards.js
@@ -110,6 +110,7 @@ keyboardDropdown.onclick = (value) => {
   console.log('setting keyboard to '+value);
   keyman.setActiveKeyboard(value, 'en');
   ta1.focus();
+  refreshStatusKeyboard(value);
 };
 
 function buildKeyboardList() {
@@ -153,7 +154,9 @@ window.onload = function() {
       setOSK();
       ta1.focus();
       window.sessionStorage.setItem('current-device', currentDevice);
+      refreshStatusDevice(currentDevice);
     };
+    refreshStatusDevice(currentDevice);
   } else {
     document.body.classList.add('touch-device');
   }
@@ -192,8 +195,28 @@ window.onload = function() {
     keyboardDropdown.set(keyboardProperties.internalName);
     window.sessionStorage.setItem('current-keyboard', keyboardProperties.internalName);
     keyman.alignInputs();
-    //console.log('keyboardchange:'+JSON.stringify(keyboardProperties)+' [active='+keyman.getActiveKeyboard()+';'+keyman.core.activeKeyboard+']');
   });
+}
+
+function refreshStatusKeyboard(keyboard, model) {
+  let statusKeyboard = document.getElementById('status-keyboard');
+  let activeKeyboard = keyman.core.activeKeyboard ? keyman.core.activeKeyboard.id : '';
+  let keyboards = keyman.getKeyboards();
+  for(let k of keyboards) {
+    if(k.InternalName == keyboard) activeKeyboard = k.Name;
+  }
+  statusKeyboard.innerText = activeKeyboard;
+}
+
+function refreshStatusModel(model) {
+  let statusModel = document.getElementById('status-model');
+  const activeModel = keyman.core.activeModel ? keyman.core.activeModel.id : '';
+  model = model ? model : activeModel;
+  statusModel.innerText = activeModel;
+}
+
+function refreshStatusDevice(device) {
+  document.getElementById('status-device').innerText = device;
 }
 
 /* Refresh keyboard and model dropdowns */
@@ -203,10 +226,12 @@ let currentKeyboardModelScript = null;
 function unloadKeyboardsAndModels() {
   let keyboards = keyman.getKeyboards().map(e => e.Name);
   console.log('Unregistering keyboards: '+JSON.stringify(keyboards));
-  keyman.removeKeyboards(...keyboards);
   for(let keyboard of keyboards) {
-    if(window['Keyboard_'+keyboard])
-      delete window['Keyboard_'+keyboard];
+    keyman.removeKeyboards(keyboard);
+    if(window['Keyboard_'+keyboard]) {
+      // can't `delete` as it is defined as a function rather than as a property
+      window['Keyboard_'+keyboard] = undefined;
+    }
   }
 
   const lastModel = keyman.core.activeModel;
@@ -238,6 +263,8 @@ function checkKeyboardsAndModels(shouldReload) {
             console.log('setting active model to '+lastModel);
             keyman.setActiveKeyboard(currentKeyboard, 'en')
             selectModel(lastModel);
+            refreshStatusKeyboard(currentKeyboard);
+            refreshStatusModel(lastModel);
           }, 10);
         }
       }
@@ -281,10 +308,12 @@ function selectModel(modelId) {
     keyman.modelManager.register({
       id: model.id,
       languages: ['en'],
-      path: 'http://'+location.host+'/data/model/'+model.src
+      path: location.protocol + '//' + location.host + '/data/model/' + model.src
     });
   }
   window.sessionStorage.setItem('current-model', model ? model.id : '');
   modelDropdown.set(model ? model.id : '');
+  refreshStatusModel(modelId);
+  ta1.focus();
 }
 

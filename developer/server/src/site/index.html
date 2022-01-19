@@ -27,12 +27,24 @@
       <div class='container-fluid'>
         <div class='xzrow'>
           <div class='d-inline-flex my-1 mx-1'>
+            <div class="dropdown" id="dropdown-menu">
+              <button id="btn-menu" class="btn btn-sm bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <svg focusable="false" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="btn-menu">
+                <!-- filled by packages.js -->
+              </ul>
+            </div>
+          </div>
+
+          <div class='d-inline-flex my-1 mx-1'>
             <div class="dropdown" id="dropdown-keyboard">
               <button id="btn-keyboard" class="btn btn-sm bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Keyboard
                 <span class="bi-caret-down-fill"></span>
               </button>
               <ul class="dropdown-menu" aria-labelledby="btn-keyboard">
+                <!-- filled by test.js -->
               </ul>
             </div>
           </div>
@@ -45,6 +57,7 @@
               </button>
               <ul class="dropdown-menu" aria-labelledby="btn-model">
                 <li><button class="dropdown-item" type="button" data-model=''>(no model)</button></li>
+                <!-- filled by test.js -->
               </ul>
             </div>
           </div>
@@ -56,13 +69,18 @@
                 <span class="bi-caret-down-fill"></span>
               </button>
               <ul class="dropdown-menu" aria-labelledby="btn-device">
-                <li><button class="dropdown-item" type="button" data-device='Windows'>Windows desktop</button></li>
-                <li><button class="dropdown-item" type="button" data-device='iPhone'>iPhone</button></li>
+                <li><h4 class="dropdown-header">Desktop Browsers</h4></li>
+                <li><button class="dropdown-item" type="button" data-device='Windows'>Windows</button></li>
+                <li><button class="dropdown-item" type="button" data-device='macOS'>macOS</button></li>
+                <li><button class="dropdown-item" type="button" data-device='Linux'>Linux</button></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><h4 class="dropdown-header">Phone Devices</h4></li>
+                <li><button class="dropdown-item" type="button" data-device='iPhone'>iPhone 5S</button></li>
+                <li><button class="dropdown-item" type="button" data-device='Pixel5'>Pixel 5</button></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><h4 class="dropdown-header">Tablet Devices</h4></li>
                 <li><button class="dropdown-item" type="button" data-device='iPadMini'>iPad Mini</button></li>
-                <li><button class="dropdown-item" type="button" data-device='SamsungGalaxyS5'>Samsung Galaxy S5</button></li>
-                <li><button class="dropdown-item" type="button" data-device='SamsungTablet'>Samsung Tablet</button></li>
-                <li><button class="dropdown-item" type="button" data-device='macOS'>macOS desktop</button></li>
-                <li><button class="dropdown-item" type="button" data-device='Linux'>Linux desktop</button></li>
+                <li><button class="dropdown-item" type="button" data-device='Nexus9'>Nexus 9</button></li>
               </ul>
             </div>
           </div>
@@ -73,36 +91,40 @@
               <input type="button" id="drop-button" class="btn btn-sm bg-light" value="Upload file">
             </form>
           </div>
+        </div>
 
-          <div class='d-inline-flex my-1 mx-1'>
-            <div class="dropdown" id='dropdown-package'>
-              <button id="btn-package" class='btn btn-sm bg-warning' type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Install
-                <span class="bi-caret-down-fill"></span>
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="btn-package">
-              </ul>
-            </div>
-          </div>
+        <div class='d-inline-flex my-1 mx-1 float-end'>
+          <img src='keyman-developer.svg' id='keyman-developer-logo' alt='Keyman Developer Server'>
         </div>
       </div>
     </header>
 
     <div class='container-fluid' id='drop-area'>
-      <div class='row'>
+      <div class='row mb-2 mt-2'>
         <div class='col'>
-          <h2>Keyman Developer Server - Keyboard Testing</h2>
+          <div id='status' class='card rounded-3 container'>
+            <div class='row'>
+              <div title='Active Keyboard' class='col-md-4 col-12'>
+                <span>⌨</span> <span id='status-keyboard'></span>
+              </div>
+              <div title='Active Lexical Model' class='col-md-4 col-12'>
+                <span>📖</span> <span id='status-model'></span>
+              </div>
+              <div title='Active Device' id='status-device-box' class='col-md-4 col-12 d-none d-md-block'>
+                <span>📱</span> <span id='status-device'>iPhone</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
       <div class='row'>
         <div class='col'>
           <div id='content'>
-            <div id='character-grid'>
+            <div id='character-grid' class='rounded-3'>
               <!-- contains the breakdown of characters from the input-area -->
             </div>
-            <div id='input-area'>
-              <textarea id='ta1' class='test'></textarea><br/>
-            </div>
+            <div id='input-area'><textarea id='ta1' class='test'></textarea></div>
             <div id='osk-host-frame'>
               <div id='osk-host'>
                 <!-- Contains the inline OSK -->
@@ -113,7 +135,7 @@
       </div>
       <div id='drop-image'></div>
 
-      <div class="position-absolute top-0 end-0 p-3 toast-container" id='toast-container' style="z-index: 11000">
+      <div class="position-absolute top-0 end-0 p-3 toast-container" id='toast-container'>
         <div id='toast-info-template' data-bs-dismiss="toast" class="toast text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
           <div class="d-flex">
             <div class="toast-body"></div>
@@ -136,12 +158,30 @@
 
     </div>
 
+    <div class='modal' id='about-modal' tabindex='-1'>
+      <div class='modal-dialog'>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">About Keyman Developer Server</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Version <span id='about-version'></span></p>
+            <p>&copy; 2022 SIL International</p>
+            <p><a id='about-help-link' target='_blank'>Help</a></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src='test.js'></script>
     <script src='packages.js'></script>
     <script src='websocket.js'></script>
     <script src='upload.js'></script>
     <script src='chargrid.js'></script>
-    <!--<script src="inc/keyboards.js" type="text/javascript"></script> !-- This dynamic script registers each of the keyboards -->
   </body>
 </html>

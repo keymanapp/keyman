@@ -1,6 +1,24 @@
 html, body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-image: url(keyman-developer.svg);
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-color: rgba(255,255,255,0.9);
+  background-blend-mode: lighten;
+  background-size: auto 50%;
+}
+
+@media(max-width:576px) {
+  body {
+    background-size: 75%;
+  }
 }
 
 h2 {
@@ -172,11 +190,24 @@ h2 {
 }
 
 
-/* iPhone positioning */
+/*
+ * ---------------------
+ * Device frame position
+ * ---------------------
+ */
 
 #osk-host-frame {
   margin: 16px 0;
 }
+
+#osk-host .kmw-key-row > .kmw-key-square {
+  /* We don't want the OSK to ever float over anything else when it is
+     hosted in our frame. This should probably be fixed in KeymanWeb,
+     as an embedded OSK should not have z-indexing... */
+  z-index: auto !important;
+}
+
+/* --- iPadMini Device --- */
 
 #osk-host-frame.iPadMini {
   margin: 0;
@@ -184,7 +215,7 @@ h2 {
   background-repeat: no-repeat;
   padding-left: 97px;
   background-position-y: -358px;
-  height: 384px;
+  height: 1000px;
   width: 1045px;
   padding-top: 62px;
 }
@@ -194,12 +225,14 @@ h2 {
   border-radius: 0 0 5px 5px;
 }
 
+/* --- iPhone Device --- */
+
 #osk-host-frame.iPhone {
   margin: 0;
   background-image: url(phone-iphone5-portrait.png);
   background-position-x: 0px;
   background-position-y: -794px;
-  height: 444px;
+  height: 1800px;
   width: 660px;
   background-repeat: no-repeat;
   padding-left: 91px;
@@ -210,6 +243,48 @@ h2 {
 #osk-host-frame.iPhone .kmw-osk-frame,
 #osk-host-frame.iPhone .kmw-key-layer-group {
   border-radius: 0 0 3px 3px;
+}
+
+/* --- Pixel 5 Phone --- */
+
+#osk-host-frame.Pixel5 {
+  margin: 0;
+  background-image: url(phone-pixel5-portrait.png);
+  background-position-x: 0px;
+  background-position-y: -810px;
+  height: 1800px;
+  width: 660px;
+  background-repeat: no-repeat;
+  padding-left: 73px;
+  padding-right: 50px;
+  padding-top: 70px;
+}
+
+/* --- Nexus 9 Tablet --- */
+
+#osk-host-frame.Nexus9 {
+  margin: 0;
+  background-image: url(tablet-nexus9-landscape.png);
+  background-repeat: no-repeat;
+  padding-left: 132px;
+  background-position-y: -250px;
+  height: 1000px;
+  width: 1024px;
+  padding-top: 72px;
+}
+
+/*
+ * ---------------------
+ * Input area layout
+ * ---------------------
+ */
+
+#input-area {
+  line-height: 0;
+}
+
+#input-area * {
+  line-height: normal;
 }
 
 #input-area, #character-grid {
@@ -246,7 +321,8 @@ h2 {
   border: 2px dashed #ccc;
 }
 
-#drop-file {
+#drop-file,
+#drop-button {
   display: none;
 }
 
@@ -270,4 +346,25 @@ h2 {
 
 #drop-area.highlight #drop-image {
   display: block;
+}
+
+#keyman-developer-logo {
+  width: 30px;
+}
+
+#btn-menu {
+  padding: 2px;
+}
+
+#btn-menu svg {
+  width: 24px;
+}
+
+__disabled__ #toast-container {
+  /* Pop toasts above OSK and menus */
+  z-index: 11000;
+}
+
+.navbar button {
+  transition: background 0.5s ease-in-out;
 }

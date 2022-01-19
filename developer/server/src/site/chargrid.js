@@ -103,7 +103,12 @@
         if(x >= 0 && x < charGrid.childNodes.length) {
           charGrid.childNodes[x].className = 'cursor';
         }
-        charGrid.childNodes[x].scrollIntoView();
+        if(keyman.util.isTouchDevice() || charGrid.scrollHeight > charGrid.clientHeight) {
+          charGrid.childNodes[x].scrollIntoView();
+          // This scrollIntoView call can cause the document to scroll as well, even though
+          // we've said overflow:hidden. So this restores the scroll position in the document.
+          document.body.scrollTop = 0;
+        }
       }
 
       for(i = selStart; i < selStart+selLength; i++) {

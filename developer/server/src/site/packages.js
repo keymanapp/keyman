@@ -1,14 +1,20 @@
-/*
- TODO: predicate the download link on platform
-
-*/
-
-const packageDropdown = new DropdownMenu('package');
+const menuDropdown = new DropdownMenu('menu');
 let packages = null;
 let packagesJSON = null;
+let helpUrl = '';
 
-packageDropdown.onclick = (value) => {
-  packageDropdown.set(''); // we never show an 'active' package
+fetch('/api-public/version').
+  then(response => response.json()).
+  then(value => {
+    const versionMajor = /^(\d+\.\d+)/.exec(value.version);
+    helpUrl = 'https://help.keyman.com/developer/'+versionMajor[1]+'/context/server';
+    document.getElementById('about-version').innerText = value.version;
+    document.getElementById('about-help-link').href = helpUrl;
+    document.getElementById('keyman-developer-logo').title = 'Keyman Developer Server '+value.version;
+  });
+
+menuDropdown.onclick = (value) => {
+  menuDropdown.set(''); // we never show an 'active' package
   if(value == '#install-keyman') {
     let href = '';
     switch(keyman.util.device.OS) {
@@ -20,6 +26,13 @@ packageDropdown.onclick = (value) => {
       default:        href = 'https://keyman.com/downloads'; break;
     }
     location.href = href;
+  } else if(value == '#upload') {
+    document.getElementById('drop-file').click();
+  } else if(value == '#help') {
+    window.open(helpUrl);
+  } else if(value == '#about') {
+    let aboutModal = new bootstrap.Modal(document.getElementById('about-modal'));
+    aboutModal.show();
   } else {
     location.href = '/data/package/'+value+'.kmp';
   }
@@ -36,15 +49,18 @@ function updatePackages(data) {
     return false;
   }
 
-  packageDropdown.removeAll();
-
-  packageDropdown.add('#install-keyman', 'Download and install Keyman');
-  packageDropdown.addDivider();
-
+  menuDropdown.removeAll();
+  menuDropdown.add('#install-keyman', 'Download and install Keyman');
+  menuDropdown.addDivider();
   for(var i = 0; i < data.packages.length; i++) {
-    let name = 'Install ' + data.packages[i].name ? data.packages[i].name + ' (' + data.packages[i].filename + ')' : data.packages[i].filename;
-    packageDropdown.add(data.packages[i].id, name);
+    let name = 'Install ' + (data.packages[i].name ? data.packages[i].name + ' (' + data.packages[i].filename + ')' : data.packages[i].filename);
+    menuDropdown.add(data.packages[i].id, name);
   }
+  menuDropdown.addDivider();
+  menuDropdown.add('#upload', 'Upload file...');
+  menuDropdown.addDivider();
+  menuDropdown.add('#help', 'Help...');
+  menuDropdown.add('#about', 'About Keyman Developer Server');
 }
 
 function checkPackages() {
@@ -61,5 +77,3 @@ function checkPackages() {
 }
 
 checkPackages();
-
-// TODO: link to websocket

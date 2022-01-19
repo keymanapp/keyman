@@ -51,24 +51,29 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
       res.sendStatus(400);
       return;
     }
+    let fileType = '';
     const rModel = /^([a-zA-Z0-9_\.-]+)\.model\.js$/.exec(name);
     const rKeyboard = /^([a-zA-Z0-9_]+)\.js$/.exec(name);
     const rPackage = /^([a-zA-Z0-9_]+)\.kmp$/.exec(name);
     const rFont = /^(.+\.(ttf|otf))$/.exec(name);
     if(rModel) {
       apiRegisterFile(DebugModel, data.models, rModel[1], req.file.buffer);
+      fileType = 'model';
     } else if(rKeyboard) {
       apiRegisterFile(DebugKeyboard, data.keyboards, rKeyboard[1], req.file.buffer);
+      fileType = 'keyboard';
     } else if(rPackage) {
       apiRegisterFile(DebugPackage, data.packages, rPackage[1], req.file.buffer);
+      fileType = 'package';
     } else if(rFont) {
       apiRegisterFile(DebugFont, data.fonts, rFont[1], req.file.buffer);
+      fileType = 'font';
     } else {
       res.status(400).json({message: 'unrecognised file type'});
       return;
     }
 
-    res.json({message: 'success'});
+    res.json({message: 'success', type: fileType});
     next();
   },
     saveState,
@@ -78,6 +83,14 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
   app.get('/inc/keyboards.js', handleIncKeyboardsJs);
   app.get('/inc/keyboards.css', handleIncKeyboardsCss);
   app.get('/inc/packages.json', handleIncPackagesJson);
+
+  app.get('/api-public/version', (req,res,next)=>{
+    let pjson = require('../package.json');
+    res.json({version: pjson.version});
+    next();
+  });
+
+  /* Localhost only routes -- todo /api/internal/ vs /api/... */
 
   app.post('/api/shutdown', (_req,res) => { setTimeout(() => process.exit(0), 100); res.send('ok'); });
 
