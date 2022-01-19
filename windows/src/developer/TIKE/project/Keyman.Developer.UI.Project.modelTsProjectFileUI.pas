@@ -98,6 +98,10 @@ begin
     frmMessages.DoShowForm;
 
   Result := ProjectFile.CompileModel;
+
+
+  if Result and TServerDebugAPI.IsModelRegistered(ProjectFile.TargetFileName) then
+    TestKeymanWeb(True);
 end;
 
 function TmodelTsProjectFileUI.GetDebug: Boolean;

@@ -75,6 +75,9 @@ begin
     if not modActionsMain.actFileSave.Execute then Exit;
 
   Result := ProjectFile.CompilePackage(GetPack, FSilent);
+
+  if Result and TServerDebugAPI.IsPackageRegistered(ProjectFile.TargetFileName) then
+    TestPackageOnline;
 end;
 
 function TkpsProjectFileUI.CompilePackageInstaller(FSilent: Boolean): Boolean;

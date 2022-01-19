@@ -131,6 +131,9 @@ begin
     frmMessages.DoShowForm;
 
   Result := ProjectFile.CompileKeyboard;
+
+  if Result and TServerDebugAPI.IsKeyboardRegistered(ProjectFile.TargetFileName) then
+    TestKeymanWeb(True);
 end;
 
 function TkmnProjectFileUI.FontDialog(FSilent: Boolean): Boolean;   // I4057
