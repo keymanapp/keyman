@@ -1,61 +1,16 @@
 import os = require('os');
-import path = require("path");
 
-const WindowsTrayicon = os.platform() == 'win32' ? require("./win32/trayicon") : null;
-const WindowsConsole = os.platform() == 'win32' ? require("./win32/console") : null;
-// TODO: this is a Windows-only tray icon. There are a number of
-// cross-platform solutions but none of them are wonderful. We
-// should replace this when we find a decent one.
+class TrayStub {
+  public start(localPort: number, ngrokAddress: string) {}
+  public restart(localPort: number, ngrokAddress: string) {}
+  public shutdown() {};
+};
 
-export default class Tray {
-  private readonly signals = ['exit']; //, 'SIGINT', 'uncaughtException'];
-  private myTrayApp: any;
+let tray = new TrayStub();
 
-  public start() {
-    if(os.platform() == 'win32') {
-      this.myTrayApp = new WindowsTrayicon({
-        title: "Keyman Developer Server",
-        icon: path.resolve(__dirname, "site", "favicon.ico"),
-        menu: [
-          {
-            id: "item-id-show-console",
-            caption: "Show console"
-          },
-          {
-            id: "item-id-hide-console",
-            caption: "Hide console"
-          },
-          {
-            id: "item-id-exit",
-            caption: "Exit Keyman Developer Server"
-          }
-        ]
-      });
-
-      this.myTrayApp.item((id: string) => {
-        //console.log(`Menu id selected=${id}`);
-        switch (id) {
-          case 'item-id-show-console':
-            WindowsConsole.showConsole();
-            break;
-          case 'item-id-hide-console':
-            WindowsConsole.hideConsole();
-            break;
-          case 'item-id-exit':
-            process.exit(0);
-        }
-      });
-
-      //console.log('starting tray icon');
-      this.signals.forEach(signal => process.on(signal, this.shutdown.bind(this)));
-    }
-  }
-
-  public shutdown() {
-    if(this.myTrayApp) {
-      //console.debug('Closing down tray icon');
-      this.myTrayApp.exit();
-      this.myTrayApp = null;
-    }
-  }
+if(os.platform() == 'win32') {
+  const Win32Tray = require('./win32-tray');
+  tray = new Win32Tray();
 }
+
+export default tray;

@@ -14,7 +14,7 @@ import multer = require('multer');
 import fs = require('fs');
 import setupRoutes from './routes';
 import { configuration } from './config';
-import Tray from './tray';
+import tray from './tray';
 import chalk = require('chalk');
 
 const options = {
@@ -107,19 +107,22 @@ if(configuration.useNgrok && os.platform() == 'win32' && fs.existsSync(configura
             const api = ngrok.getApi();
             const tunnels = await api.listTunnels();
             configuration.ngrokEndpoint = tunnels.tunnels[0]?.public_url ?? '';
+            //tray.restart(configuration.port, configuration.ngrokEndpoint);
             console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
           }, 1000);
         } else if(state == 'closed') {
           configuration.ngrokEndpoint = '';
+          //tray.restart(configuration.port, configuration.ngrokEndpoint);
           console.log(chalk.blueBright('ngrok tunnel closed'));
         }
       }
     });
     console.log(chalk.blueBright('ngrok tunnel initially established at %s'), configuration.ngrokEndpoint);
+    tray.start(configuration.port, configuration.ngrokEndpoint);
   })();
 }
+else {
+  /* Load the tray icon */
+  tray.start(configuration.port, configuration.ngrokEndpoint);
+}
 
-/* Load the tray icon */
-
-const tray = new Tray();
-tray.start();
