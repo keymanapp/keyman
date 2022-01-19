@@ -55,7 +55,7 @@ while [[ $# -gt 0 ]] ; do
     --production|-p)
       production=1
       ;;
-    -skip-package-install|-S)
+    --skip-package-install|-S)
       install_dependencies=0
       ;;
     --no-build-kmw)
