@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.181 alpha 2022-01-19
+
+* fix(linux): Add workaround for Python bug (#6124)
+* docs(linux): Add missing dependency (#6118)
+
 ## 15.0.180 alpha 2022-01-18
 
 * feat(web): Caps Layer and double-tap gesture (#5989)
