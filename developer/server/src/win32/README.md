@@ -6,7 +6,7 @@ differing versions of node on build machines.
 
 The target versions of node are:
 
-* ia32:  node 12 (matches version in developer/inst/dist)
+* ia32:  node 16 (matches version in developer/inst/dist)
 * x64:   node 17 (matches current team environment)
 
 If we update the node.exe version in developer/inst/dist, we will need to
