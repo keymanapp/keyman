@@ -151,7 +151,7 @@ public:
 
     void imx_deregister_callback();
 
-    void imx_callback(uint32_t store_no);
+    void imx_callback(uint32_t imx_id);
 };
 
 } // namespace kbp

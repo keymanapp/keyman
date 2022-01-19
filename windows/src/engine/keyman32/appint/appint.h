@@ -144,7 +144,7 @@ public:
    */
 	WCHAR *BufMax(int n);
 
-    /**
+  /**
    * Returns a pointer to the character in the current context buffer which
    * will have n valid xstring units remaining until the the null terminating character.
    * OR
@@ -165,10 +165,17 @@ public:
 	BOOL CharIsDeadkey();
 
   /**
-  * Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
-  * @return BOOL
-  */
+   * Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
+   * @return BOOL
+   */
   BOOL CharIsSurrogatePair();
+
+  /**
+   * Returns TRUE if the context is empty
+   * @return  BOOL
+   */
+  BOOL AppContext::IsEmpty();
+
 };
 
 class AppContextWithStores : public AppContext   // I4978

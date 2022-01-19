@@ -114,7 +114,7 @@ public:
    * Returns TRUE if the context is empty
    * @return  BOOL
    */
-  KMX_BOOL Empty();
+  KMX_BOOL IsEmpty();
 };
 
 } // namespace kmx

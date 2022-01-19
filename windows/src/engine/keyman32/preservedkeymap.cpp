@@ -392,7 +392,6 @@ PreservedKeyMap::MapKeyboardCore(km_kbp_keyboard *pKeyboard, PreservedKey **pPre
   }
 
   km_kbp_keyboard_key *key_rule_it = kb_key_list;
-
   for (; key_rule_it->key; ++key_rule_it) {
     ++cRules;
   }

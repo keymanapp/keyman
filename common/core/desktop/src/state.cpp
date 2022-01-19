@@ -51,7 +51,7 @@ state::state(km::kbp::abstract_processor & ap, km_kbp_option_item const *env)
 }
 
 void state::imx_register_callback(
-  km_kbp_keyboard_imx_platform imx_callback_fp, 
+  km_kbp_keyboard_imx_platform imx_callback_fp,
   void *callback_object
 ) {
   assert(imx_callback_fp);
@@ -67,9 +67,9 @@ void state::imx_deregister_callback() {
   _imx_object = nullptr;
 }
 
-void state::imx_callback(uint32_t store_no) {
+void state::imx_callback(uint32_t imx_id) {
   if (_imx_callback==nullptr) {
     return;
   }
-  _imx_callback(static_cast<km_kbp_state *>(this), store_no, _imx_object);
+  _imx_callback(static_cast<km_kbp_state *>(this), imx_id, _imx_object);
 }

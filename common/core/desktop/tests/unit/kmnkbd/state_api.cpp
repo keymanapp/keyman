@@ -83,7 +83,7 @@ constexpr km_kbp_option_item const expected_persist_opt = {
 
 extern "C"
 {
-  uint8_t test_imx_callback(km_kbp_state *state, uint32_t store_no, void *callback_object){
+  uint8_t test_imx_callback(km_kbp_state *state, uint32_t imx_id, void *callback_object){
 
   // does nothing;
   return 1;

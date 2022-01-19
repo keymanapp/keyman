@@ -158,7 +158,6 @@ kmnToCoreActionItem(int ItemType, DWORD dwData) {
     case QIT_VSHIFTDOWN:
     case QIT_VSHIFTUP:
       // Not handled TODO Log a message?
-      actionItems[0].type = KM_KBP_IT_END;
       break;
    case QIT_INVALIDATECONTEXT:
      actionItems[0].type = KM_KBP_IT_INVALIDATE_CONTEXT;
@@ -361,13 +360,11 @@ extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreN
     return FALSE;
   }
   // Iterate through hooks to find the third party library function to call
-  BOOL found = FALSE;
   DWORD n = 0;
   LPIMDLLHOOK imdh = nullptr;
   for (DWORD i = 0; i < lpkbi->nIMDLLs; i++) {
     for (DWORD j = 0; j < lpkbi->IMDLLs[i].nHooks; j++) {
       if (lpkbi->IMDLLs[i].Hooks[j].storeno == UniqueStoreNo) {
-        found = TRUE;
         imdh  = &lpkbi->IMDLLs[i].Hooks[j];
         break;
       }
@@ -375,7 +372,7 @@ extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreN
     }
   }
 
-  if (!found) {
+  if (!imdh) {
     return FALSE;
   }
 
@@ -424,13 +421,16 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     km_kbp_context_item *citems = nullptr;
     if (KM_KBP_STATUS_OK !=
         (km_kbp_status_codes)kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
-      km_kbp_context_items_dispose(citems);
+      delete[] actionItems;
       return FALSE;
     }
-    WCHAR *contextString           = new WCHAR[MAXCONTEXT];  // *3 if every context item was a deadkey
-    if (!ContextItemToAppContext(citems, contextString, MAXCONTEXT)) {
+
+    DWORD context_length = (DWORD)km_kbp_context_item_list_size(citems);
+    WCHAR *contextString = new WCHAR[(context_length * 3) + 1];  // *3 if every context item was a deadkey
+    if (!ContextItemToAppContext(citems, contextString, context_length)) {
       km_kbp_context_items_dispose(citems);
       delete[] contextString;
+      delete[] actionItems;
       return FALSE;
     }
     km_kbp_context_items_dispose(citems);
@@ -453,10 +453,13 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
         CodeUnitPtr = context.BufMax(SurrogateLength);
         actionItems[idx].backspace.expected_type  = KM_KBP_BT_CHAR;
         actionItems[idx].backspace.expected_value = (DWORD)Uni_SurrogateToUTF32(*CodeUnitPtr, *(CodeUnitPtr + 1));
-      } else {
+      } else if (!context.IsEmpty()) {
         CodeUnitPtr = context.BufMax(SingleCharLength);
         actionItems[idx].backspace.expected_type  = KM_KBP_BT_CHAR;
         actionItems[idx].backspace.expected_value = (DWORD)*CodeUnitPtr;
+      } else {
+        actionItems[idx].backspace.expected_type  = KM_KBP_BT_UNKNOWN;
+        actionItems[idx].backspace.expected_value = 0;
       }
       context.Delete();
       idx++;
@@ -536,10 +539,9 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
       return FALSE;
     }
     km_kbp_context_item *citems = nullptr;
-      if (KM_KBP_STATUS_OK !=
-        (km_kbp_status_codes)kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)){
-          km_kbp_context_items_dispose(citems);
-          return FALSE;
+    if (KM_KBP_STATUS_OK !=
+      (km_kbp_status_codes)kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
+        return FALSE;
     }
 
     if (!ContextItemToAppContext(citems, buf, len)) {
@@ -695,7 +697,7 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
   BOOL result = false;
   for (; imx_list->library_name; ++imx_list) {
     LPIMDLL imd = AddIMDLL(lpkbi, fullname, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->library_name)));
-    if (imd && AddIMDLLHookCore(imd, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->function_name)), imx_list->store_no)) {
+    if (imd && AddIMDLLHookCore(imd, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->function_name)), imx_list->imx_id)) {
       result = TRUE;
     }
     else {

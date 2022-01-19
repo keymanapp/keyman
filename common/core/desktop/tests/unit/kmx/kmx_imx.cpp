@@ -62,15 +62,14 @@ extern "C"
    *
    *
    * @param state
-   * @param store_no
+   * @param imx_id
    * @param callback_object
    * @return uint8_t
    */
-  uint8_t test_imx_callback(km_kbp_state *state, uint32_t store_no, void *callback_object){
+  uint8_t test_imx_callback(km_kbp_state *state, uint32_t imx_id, void *callback_object){
 
-  std::cout << "test_imx_callback store_no: " << store_no << std::endl;
-  if (callback_object==nullptr)
-  {
+  std::cout << "test_imx_callback imx_id: " << imx_id << std::endl;
+  if (callback_object==nullptr) {
     return FALSE;
   }
 
@@ -91,16 +90,15 @@ extern "C"
   // number assigned to each 3rd party library function name.
   std::map<uint16_t,std::string> *imx_map = static_cast<std::map<uint16_t,std::string>*>(callback_object);
   std::map<uint16_t,std::string>::iterator it;
-  it = (*imx_map).find(store_no);
-  if (it == (*imx_map).end())
-  {
+  it = (*imx_map).find(imx_id);
+  if (it == (*imx_map).end()) {
     std::cerr  << "Unique store number is not in the engines imx list" << std::endl;
     return FALSE;
   }
+
   std::cout << "test_imx_callback function name: " << it->second << std::endl;
   km_kbp_action_item *a_items = new km_kbp_action_item[10];
-  switch (store_no)
-  {
+  switch (imx_id) {
   case 4:
 
     a_items[0].type      = KM_KBP_IT_CHAR;
@@ -129,8 +127,7 @@ extern "C"
     a_items[2].type   = KM_KBP_IT_END;
     km_kbp_state_queue_action_items(state, a_items);
     break;
-    case 7:
-    {
+    case 7: {
       a_items[0].type   = KM_KBP_IT_INVALIDATE_CONTEXT;
       a_items[1].type   = KM_KBP_IT_END;
       km_kbp_state_queue_action_items(state, a_items);
@@ -139,8 +136,7 @@ extern "C"
   default:
     break;
   }
-  if (a_items)
-  {
+  if (a_items) {
     delete[] a_items;
   }
   // Test Exit Context
@@ -165,7 +161,6 @@ void test_imx_list(const km::kbp::path &source_file){
   km_kbp_state * test_state = nullptr;
   km_kbp_keyboard_imx * kb_imx_list;
 
-
   km::kbp::path full_path = source_file;
 
   try_status(km_kbp_keyboard_load(full_path.native().c_str(), &test_kb));
@@ -174,15 +169,14 @@ void test_imx_list(const km::kbp::path &source_file){
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
   try_status(km_kbp_keyboard_get_imx_list(test_kb, &kb_imx_list));
 
-
   // This keyboard has 4 function names from 2 different libraries in the stores
   km_kbp_keyboard_imx *imx_rule_it = kb_imx_list;
   std::stringstream extracted_library_function;
   auto x = 0;
   for (; imx_rule_it->library_name; ++imx_rule_it) {
     extracted_library_function << imx_rule_it->library_name << ":" << imx_rule_it->function_name;
-    assert(extracted_library_function.str() == expected_imx_map[imx_rule_it->store_no] );
-    g_extract_imx_map[imx_rule_it->store_no] = extracted_library_function.str();
+    assert(extracted_library_function.str() == expected_imx_map[imx_rule_it->imx_id] );
+    g_extract_imx_map[imx_rule_it->imx_id] = extracted_library_function.str();
     extracted_library_function.str("");
     ++x;
   }

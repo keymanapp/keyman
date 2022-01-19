@@ -183,6 +183,10 @@ BOOL AppContext::CharIsSurrogatePair()
     Uni_IsSurrogate2(CurContext[pos - 1]);
 }
 
+BOOL AppContext::IsEmpty() {
+  return (BOOL)(pos == 0);
+}
+
 /* AppActionQueue */
 
 AppActionQueue::AppActionQueue()

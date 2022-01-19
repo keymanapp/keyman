@@ -691,7 +691,7 @@ typedef struct {
 typedef struct {
   km_kbp_cp const * library_name;
   km_kbp_cp const * function_name;
-  uint32_t store_no; // unique identifier used to call this function
+  uint32_t imx_id; // unique identifier used to call this function
 } km_kbp_keyboard_imx;
 
 #define KM_KBP_KEYBOARD_IMX_END { 0, 0, 0 }
@@ -981,8 +981,8 @@ used in IMX callbacks called during `km_kbp_process_event`.
 In the event the `state` or `action_items` pointer are null.
 ##### Parameters:
 - __state__:        A pointer to the opaque `km_kbp_state` object to be queried.
-- __action_items__: The action items to be added to the keyboardprocessor 
-                    queue. Must be terminated with a `KM_KBP_IT_END` entry. 
+- __action_items__: The action items to be added to the keyboardprocessor
+                    queue. Must be terminated with a `KM_KBP_IT_END` entry.
 
 ```c
 */

@@ -7,12 +7,12 @@ using namespace km::kbp;
 using namespace kmx;
 
 // TODO consolodate with appint.cpp and put in public library.
-static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR const* buf, km_kbp_context_item** outPtr)
+static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR *buf, km_kbp_context_item** outPtr)
 {
   assert(buf);
   assert(outPtr);
   km_kbp_context_item* context_items  = new km_kbp_context_item[xstrlen(buf) + 1];
-  KMX_WCHAR const *p = buf;
+  PKMX_WCHAR p = buf;
   *outPtr = context_items;
   while (*p) {
     if (*p == UC_SENTINEL) {
@@ -126,18 +126,9 @@ bool kmx_processor::queue_action(
     // If the context is already empty, we want to emit the backspace for application to use
     PKMX_WCHAR p_last_item_context = _kmx.GetContext()->Buf(1);
 
-    if(!p_last_item_context || *p_last_item_context == 0)   {
+    if ((!p_last_item_context || *p_last_item_context == 0) ||
+      (action_item->backspace.expected_type == KM_KBP_BT_UNKNOWN)) {
       _kmx.GetActions()->QueueAction(QIT_INVALIDATECONTEXT, 0);
-      // this method(queue_action) could be called outside the processing of a key
-      // stroke, so it cannot set emit keystroke. Synthasize instead;
-      // Currently    QIT_VKEYDOWN QIT_VKEYUP QIT_VSHIFTDOWN UP are not implmented
-      //in the core KM_KBP actions therefore we can not synthasize.
-      // For this Backspace case the Core is going to have to relax the
-      // no QIT_BACK on a empty context. for now.
-      //_kmx.GetActions()->QueueAction(QIT_VKEYDOWN, KM_KBP_VKEY_BKSP);
-      //_kmx.GetActions()->QueueAction(QIT_VKEYUP, KM_KBP_VKEY_BKSP);
-
-      // if we can synthasize backspace remove this QueAction back
       _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEFAULT);
     } else if (action_item->backspace.expected_type == KM_KBP_BT_MARKER) {
       _kmx.GetActions()->QueueAction(QIT_BACK, BK_DEADKEY);
@@ -167,8 +158,9 @@ kmx_processor::process_event(
   uint8_t is_key_down
 ) {
   // If the Virtual Key is VK_SPACE and the internal kmx processor has actions
-  // then process that and return. These actions must have been added externally
-  // via the queue_action method.
+  // then process that and return. Why - because these actions must have been added externally
+  // via the queue_action method. The IMX extension requests processing of action queue
+  // in this scenario by sending VK_SPACE key to be processed
   bool has_internal_actions = ((vk == VK_SPACE) && (!_kmx.GetActions()->IsQueueEmpty()));
 
   if (!has_internal_actions) {
@@ -232,18 +224,13 @@ kmx_processor::process_event(
     case QIT_BACK:
       switch (a.dwData) {
       case BK_DEFAULT:
-        // This only happens if we know we have context to delete. Last item must be a character
-
-        // TODO: #5060 If we added a new action to core actions then we
-        // can assert on backspace for a empty context.
-        //assert(!state->context().empty());
         assert(state->context().back().type != KM_KBP_IT_MARKER);
         if(!state->context().empty()) {
           auto item = state->context().back();
           state->context().pop_back();
           state->actions().push_backspace(KM_KBP_BT_CHAR, item.character);
         } else {
-          // Note: only runs on non-debug build, fail safe
+          // Note: runs on non-debug build or if IMX callback has requested it in both cases uses fail safe
           state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
         }
         break;
@@ -313,13 +300,10 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
   km_kbp_virtual_key v_key;
   uint32_t modifier_flag;
 // Use hash map to get the unique list
-  for(auto i = decltype(group_cnt){0}; i < group_cnt; i++)
-  {
+  for(auto i = decltype(group_cnt){0}; i < group_cnt; i++) {
     p_group = &group_array[i];
-    if(p_group->fUsingKeys)
-    {
-      for(auto j = decltype(p_group->cxKeyArray){0}; j < p_group->cxKeyArray; j++)
-      {
+    if(p_group->fUsingKeys) {
+      for(auto j = decltype(p_group->cxKeyArray){0}; j < p_group->cxKeyArray; j++) {
         v_key = p_group->dpKeyArray[j].Key;
         modifier_flag = p_group->dpKeyArray[j].ShiftFlags;
         if(modifier_flag == 0) {
@@ -327,7 +311,6 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
           if(!MapUSCharToVK(v_key, &v_key, &modifier_flag)) continue;
         }
         map_rules[std::make_pair(v_key,modifier_flag)] = (modifier_flag & K_MODIFIERFLAG); // Clear kmx special flags
-
       }
     }
   }
@@ -354,41 +337,32 @@ km_kbp_keyboard_imx * kmx_processor::get_imx_list() const  {
   uint16_t fn_count = 0;
   uint16_t fn_idx = 0;
 
-
-  for(uint32_t i = 0; i < store_cnt; i++)
-  {
+  for(uint32_t i = 0; i < store_cnt; i++) {
     LPSTORE p_store = &store_array[i];
-    if(p_store->dwSystemID == TSS_CALLDEFINITION)
-		{
+    if(p_store->dwSystemID == TSS_CALLDEFINITION) {
       fn_count++;
     }
   }
 
   km_kbp_keyboard_imx *imx_list = new km_kbp_keyboard_imx[fn_count + 1];
 
-  for(uint32_t i = 0; i < store_cnt; i++)
-  {
+  for(uint32_t i = 0; i < store_cnt; i++) {
     LPSTORE p_store = &store_array[i];
-    if(p_store->dwSystemID == TSS_CALLDEFINITION)
-		{
+    if(p_store->dwSystemID == TSS_CALLDEFINITION) {
 			/* Break the store string into components */
 
-			PKMX_CHAR full_fn_name = wstrtostr(p_store->dpString), lib_name, fn_name;
+			PKMX_WCHAR full_fn_name = p_store->dpString;
+      PKMX_WCHAR pt = NULL;
+      PKMX_WCHAR lib_name = u16tok(full_fn_name, u':', &pt);
+			PKMX_WCHAR fn_name = u16tok(NULL, u':', &pt);
 
-			lib_name = strtok(full_fn_name, ":");
-			fn_name = strtok(NULL, ":");
-
-			if(!lib_name || !fn_name)
-			{
-				//s->dwSystemID = TSS_CALLDEFINITION_LOADFAILED;
-				delete[] full_fn_name;
+			if(!lib_name || !fn_name){
 				continue;
 			}
 
-      imx_list[fn_idx].library_name = strtowstr(lib_name);
-      imx_list[fn_idx].function_name = strtowstr(fn_name);
-      imx_list[fn_idx].store_no = i;
-		  delete[] full_fn_name;
+      imx_list[fn_idx].library_name = lib_name;
+      imx_list[fn_idx].function_name = fn_name;
+      imx_list[fn_idx].imx_id = i;
       fn_idx++;
 		}
   }
