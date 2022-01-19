@@ -47,7 +47,7 @@ namespace com.keyman.osk.layouts {
     }
 
     public setTitleFromKeyboard(keyboard: keyboards.Keyboard) {
-      let title = "<span style='font-weight:bold'>" + keyboard.name + '</span>';  // I1972  // I2186
+      let title = "<span style='font-weight:bold'>" + keyboard?.name + '</span>';  // I1972  // I2186
       this._caption.innerHTML = title;
     }
 
@@ -163,7 +163,7 @@ namespace com.keyman.osk.layouts {
       let Limg = document.createElement('div');  //I2186
       this.markUnselectable(Limg);
 
-      Limg.id = 'kmw-pin-image'; 
+      Limg.id = 'kmw-pin-image';
       Limg.className = 'kmw-title-bar-image';
       Limg.title='Pin the On Screen Keyboard to its default location on the active text box';
 
