@@ -18,6 +18,7 @@
     "express": "^4.17.2",
     "multer": "^1.4.4",
     "ngrok": "^4.2.2",
+    "open": "^8.4.0",
     "ws": "^8.3.0"
   },
   "devDependencies": {
