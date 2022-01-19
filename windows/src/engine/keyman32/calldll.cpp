@@ -90,7 +90,6 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 	imd->Hooks = NULL;
 	imd->hModule = hModule;
 	lpkbi->nIMDLLs++;
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLL: Exit");
 	return imd;
 }
 
@@ -98,7 +97,7 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 
 static BOOL AddIMDLLHook(LPIMDLL imd, LPSTR funcname, DWORD storeno, PWCHAR *dpString)
 {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHook: Enter");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHook: Enter");
   /* Get the procedure address for the function */
 
 	IMDLLHOOKProc dhp = (IMDLLHOOKProc) GetProcAddress(imd->hModule, funcname);
@@ -118,7 +117,7 @@ static BOOL AddIMDLLHook(LPIMDLL imd, LPSTR funcname, DWORD storeno, PWCHAR *dpS
 	imd->Hooks[imd->nHooks].storeno = storeno;
 	imd->Hooks[imd->nHooks].function = dhp;
 	*dpString = (PWCHAR) &imd->Hooks[imd->nHooks++];
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHook: Exit");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHook: Exit");
 	return TRUE;
 }
 
@@ -231,8 +230,7 @@ BOOL CallbackDLLs(LPINTKEYBOARDINFO lpkbi, PSTR cmd)
 BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 {
 	char fullname[_MAX_PATH];
-
-	SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Enter");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Enter");
 
 	if(lpkbi->nIMDLLs > 0) if(!UnloadDLLs(lpkbi)) return FALSE;
 
@@ -272,7 +270,7 @@ BOOL LoadDLLs(LPINTKEYBOARDINFO lpkbi)
 		}
 	}
 
-	SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Exit");
+	//SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLs: Exit");
 	return TRUE;
 }
 
@@ -327,7 +325,7 @@ BOOL DeactivateDLLs(LPINTKEYBOARDINFO lpkbi)
 
 void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
 {
-	SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Enter");
+	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Enter");
   if (!lpkbi->Keyboard) return;
   if(storenum >= lpkbi->Keyboard->cxStoreArray) return;
 
@@ -342,13 +340,12 @@ void CallDLL(LPINTKEYBOARDINFO lpkbi, DWORD storenum)
   if(_td->TIPFUpdateable) {   // I4452
 	  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
   }
-
-	SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Exit");
+	//SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDll: Exit");
 }
 
 // The callback function called by the Core Keyboardprocessor
 extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreNo, void *callbackObject) {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Enter");
   if (callbackObject == NULL) {
     return FALSE;
   }
@@ -379,15 +376,14 @@ extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreN
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td)
     return FALSE;
-  SendDebugMessageFormat(
-      0, sdmKeyboard, 0, "IM_CallBackCore: td loadeded");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td loadeded");
   if (_td->TIPFUpdateable) {  // I4452
     SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td TIPFUpdatable about to call function [%s]", imdh->name);
     LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_CORE);
     LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_INT);
     (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
   }
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
   return TRUE;
 }
 
@@ -404,7 +400,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
       _td->app->QueueAction(QIT_BACK, BK_DEFAULT);
     while (*buf)
       _td->app->QueueAction(QIT_CHAR, *buf++);
-    SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutput: Exit");
     return TRUE;
   } else {
     if (!_td->lpActiveKeyboard->lpCoreKeyboardState) {
@@ -437,7 +432,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     AppContext context;
     context.Set(contextString);
     delete[] contextString;
-    SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutputCore: backlen[%lu],buflen[%lu]", backlen, (DWORD)wcslen(buf));
+  
     while (backlen-- > 0) {
       actionItems[idx].type = KM_KBP_IT_BACK;
       WCHAR *CodeUnitPtr;
@@ -464,7 +459,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
       context.Delete();
       idx++;
     }
-    SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutputCore: buf is [%s]", Debug_UnicodeString(buf));
+    
     while (*buf) {
       actionItems[idx].type      = KM_KBP_IT_CHAR;
       if (Uni_IsSurrogate1(*buf) && Uni_IsSurrogate2(*(buf + 1))) {
@@ -507,7 +502,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dw
         (km_kbp_status_codes)km_kbp_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItem);
     if (error_status != KM_KBP_STATUS_OK) {
       delete[] actionItem;
-      SendDebugMessageFormat(0, sdmKeyboard, 0, "KMQueueAction: Exit - core queue Return [%lu]",error_status);
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "KMQueueAction: Error core queue_action_items error status:[%lu]",error_status);
       return FALSE;
     }
     delete[] actionItem;
@@ -532,7 +527,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
       return FALSE;  // context buf does not exist
 
     wcscpy_s(buf, len + 1, q);  // I3091
-    SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetContextEngine: [%s]", Debug_UnicodeString(buf));
     return TRUE;
   } else {
     if (!_td->lpActiveKeyboard->lpCoreKeyboardState) {
@@ -549,7 +543,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
       return FALSE;
     }
     km_kbp_context_items_dispose(citems);
-    SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetContextCore: intermediate_context [%s]", Debug_UnicodeString(buf));
     //SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetContext: Exit");
     return TRUE;
   }
@@ -597,7 +590,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlw
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMHideIM()
 {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMHideIM: Enter");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "KMHideIM: Enter");
   if(*Globals::hwndIM() != 0)
 	{
 		ShowWindow(*Globals::hwndIM(), SW_HIDE);
@@ -605,31 +598,30 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMHideIM()
 		*Globals::hwndIM() = 0;
 		*Globals::hwndIMAlways() = FALSE;
 	}
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMHideIM: Exit");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "KMHideIM: Exit");
 	return TRUE;
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMGetActiveKeyboard(PSTR buf, int nbuf)
 {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetActiveKeyboard: Enter");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetActiveKeyboard: Enter");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
   if(!_td->lpActiveKeyboard) return FALSE;
 	strncpy_s(buf, nbuf, _td->lpActiveKeyboard->Name, nbuf-1);
 	buf[nbuf-1] = 0;
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetActiveKeyboard: Exit");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetActiveKeyboard: Exit");
 	return TRUE;
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI KMGetKeyboardPath(PSTR keyboardname, PSTR buf, int nbuf)
 {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMGetKeyboardPath: Enter&Exit");
   return GetKeyboardFileName(keyboardname, buf, nbuf);
 }
 
 void KMUpdateIM()
 {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMUpdateIM: Enter");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "KMUpdateIM: Enter");
   if(*Globals::hwndIM() != 0)
 	{
 		ShowWindow(*Globals::hwndIM(), SW_HIDE);
@@ -637,7 +629,7 @@ void KMUpdateIM()
 		*Globals::hwndIM() = 0;
 		*Globals::hwndIMAlways() = FALSE;
 	}
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "KMUpdateIM: Exit");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "KMUpdateIM: Exit");
 }
 
 
@@ -654,7 +646,7 @@ BOOL IsIMWindow(HWND hwnd)
 
 static BOOL
 AddIMDLLHookCore(LPIMDLL imd, LPSTR funcname, DWORD storeno) {
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHookCore: Enter");
+ //SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHookCore: Enter");
   /* Get the procedure address for the function */
   IMDLLHOOKProc dhp = (IMDLLHOOKProc)GetProcAddress(imd->hModule, funcname);
   if (!dhp)
@@ -673,7 +665,7 @@ AddIMDLLHookCore(LPIMDLL imd, LPSTR funcname, DWORD storeno) {
   imd->Hooks[imd->nHooks].storeno  = storeno;
   imd->Hooks[imd->nHooks].function = dhp;
   imd->nHooks++;
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHookCore: Exit");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "AddIMDLLHookCore: Exit");
   return TRUE;
 }
 
@@ -681,7 +673,7 @@ AddIMDLLHookCore(LPIMDLL imd, LPSTR funcname, DWORD storeno) {
 BOOL
 LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
   char fullname[_MAX_PATH];
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Enter");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Enter");
 
   if (lpkbi->nIMDLLs > 0)
     if (!UnloadDLLs(lpkbi))
@@ -710,7 +702,7 @@ LoadDLLsCore(LPINTKEYBOARDINFO lpkbi) {
   if (result) {
     km_kbp_state_imx_register_callback(lpkbi->lpCoreKeyboardState, IM_CallBackCore, (void *)lpkbi);
   }
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Exit");
+  //SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: Exit");
   return TRUE;
 }
 
