@@ -470,7 +470,8 @@ km_kbp_context_shrink(km_kbp_context *context,
 ##### Description:
 Return the length of a terminated `km_kbp_context_item` array.
 ##### Return:
-The number of items in the list or 0 if `context_items` is null.
+The number of items in the list, not including terminating item,
+or 0 if `context_items` is null.
 ##### Parameters:
 - __context_items__: A pointer to a `KM_KBP_CT_END` terminated array of
     `km_kbp_context_item` values.

@@ -66,7 +66,7 @@ extern "C"
    * @param callback_object
    * @return uint8_t
    */
-  uint8_t test_imx_callback(km_kbp_state *state, uint32_t imx_id, void *callback_object){
+uint8_t test_imx_callback(km_kbp_state *state, uint32_t imx_id, void *callback_object) {
 
   std::cout << "test_imx_callback imx_id: " << imx_id << std::endl;
   if (callback_object==nullptr) {
@@ -107,7 +107,7 @@ extern "C"
     a_items[2].type   = KM_KBP_IT_END;
     km_kbp_state_queue_action_items(state, a_items);
     break;
-    case 5:
+  case 5:
 
     a_items[0].type      = KM_KBP_IT_CHAR;
     a_items[0].character = km_kbp_usv('Y');
@@ -118,7 +118,7 @@ extern "C"
     a_items[3].type   = KM_KBP_IT_END;
     km_kbp_state_queue_action_items(state, a_items);
     break;
-    case 6:
+  case 6:
     a_items[0].type      = KM_KBP_IT_BACK;
     a_items[0].backspace.expected_type = KM_KBP_BT_CHAR;
     a_items[0].backspace.expected_value = km_kbp_usv('A');
@@ -127,7 +127,7 @@ extern "C"
     a_items[2].type   = KM_KBP_IT_END;
     km_kbp_state_queue_action_items(state, a_items);
     break;
-    case 7: {
+  case 7: {
       a_items[0].type   = KM_KBP_IT_INVALIDATE_CONTEXT;
       a_items[1].type   = KM_KBP_IT_END;
       km_kbp_state_queue_action_items(state, a_items);
@@ -152,8 +152,8 @@ extern "C"
   km_kbp_context_items_dispose(exit_context);
   delete[] tmp_buf;
   return 1;
-  }
-};
+}
+}; // extern "C"
 
 void test_imx_list(const km::kbp::path &source_file){
 
@@ -200,7 +200,7 @@ void test_imx_list(const km::kbp::path &source_file){
 // the kmx processor will add this items to its action queue.
 // Finally when the `process_event` call returns we verify the action
 // queue is as expected.
-void test_queue_actions (const km::kbp::path &source_keybard) {
+void test_queue_actions (const km::kbp::path &source_keyboard) {
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;

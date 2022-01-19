@@ -159,7 +159,7 @@ kmx_processor::process_event(
 ) {
   // If the Virtual Key is VK_SPACE and the internal kmx processor has actions
   // then process that and return. Why - because these actions must have been added externally
-  // via the queue_action method. The IMX extension requests processing of action queue
+  // via the queue_action method. The client can request processing of action queue
   // in this scenario by sending VK_SPACE key to be processed
   bool has_internal_actions = ((vk == VK_SPACE) && (!_kmx.GetActions()->IsQueueEmpty()));
 
