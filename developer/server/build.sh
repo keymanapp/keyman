@@ -31,6 +31,7 @@ display_usage ( ) {
   echo "  --test, -t                  runs unit tests after building"
   #echo "  --watch, -w                 builds dev server in watch mode"
   echo "  --tdd                       runs unit tests WITHOUT building"
+  echo "  --no-build-addins           don't build/copy Win32 addins"
   echo "  --no-build-kmw              don't build KeymanWeb"
   echo "  --no-copy-kmw               don't copy KeymanWeb"
 }
@@ -43,6 +44,7 @@ build=1
 install_dependencies=1
 build_keymanweb=1
 copy_keymanweb=1
+build_addins=1
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
@@ -60,6 +62,9 @@ while [[ $# -gt 0 ]] ; do
       ;;
     --no-build-kmw)
       build_keymanweb=0
+      ;;
+    --no-build-addins)
+      build_addins=0
       ;;
     --no-copy-kmw)
       copy_keymanweb=0
@@ -80,6 +85,10 @@ while [[ $# -gt 0 ]] ; do
   shift # past the processed argument
 done
 
+# ----------------------------------------
+# Install dependencies
+# ----------------------------------------
+
 # Check if Node.JS/npm is installed.
 type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
@@ -93,7 +102,25 @@ fi
 
 set_npm_version || fail "Setting version failed."
 
-# TODO: build kmw (unless skipped)
+# ----------------------------------------
+# Build and bundle addins
+# ----------------------------------------
+
+if (( build_addins )); then
+  . ./build-addins.inc.sh
+
+  # If we have an x64 version of node installed
+  if [[ $(isNodeX64) ]]; then
+    build_addins
+  fi
+
+  # Build with the Keyman Developer x86 version of node
+  PATH="$KEYMAN_ROOT/developer/inst/dist:$PATH" build_addins
+fi
+
+# ----------------------------------------
+# Build and bundle KeymanWeb
+# ----------------------------------------
 
 if (( build_keymanweb )); then
   pushd "$KEYMAN_ROOT/web/source"
@@ -115,12 +142,24 @@ if (( copy_keymanweb )); then
   cp "$KEYMAN_ROOT/web/README.md" "$DST/"
 fi
 
+# ----------------------------------------
+# Build the project
+# ----------------------------------------
+
 npm run build || fail "Compilation failed."
 echo "Typescript compilation successful."
+
+# ----------------------------------------
+# Unit tests
+# ----------------------------------------
 
 if (( run_tests )); then
   npm test || fail "Tests failed"
 fi
+
+# ----------------------------------------
+# Deploy to dist/
+# ----------------------------------------
 
 if (( production )) ; then
   # We'll build in the build/ folder
