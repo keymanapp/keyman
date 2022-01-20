@@ -114,11 +114,14 @@ km_kbp_status km_kbp_keyboard_get_imx_list(
 
 void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list)
 {
-  km_kbp_keyboard_imx *imx_rule_it = imx_list;
-  //for (; imx_rule_it->library_name; ++imx_rule_it) {
-    //delete [] imx_rule_it->library_name; // from u16dup
-    //delete [] imx_rule_it->function_name; // from u16dup
+  if(!imx_list) {
+    return;
+  }
 
-  //}
+  km_kbp_keyboard_imx *imx_rule_it = imx_list;
+  for (; imx_rule_it->library_name; ++imx_rule_it) {
+    delete [] imx_rule_it->library_name; // from u16dup
+    delete [] imx_rule_it->function_name; // from u16dup
+  }
   delete[] imx_list;
 }

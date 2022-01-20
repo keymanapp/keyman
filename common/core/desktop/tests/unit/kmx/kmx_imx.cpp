@@ -39,8 +39,6 @@ std::map<uint16_t,std::string> expected_imx_map { {4, "imsample.dll:DF"},
 
 std::map<uint16_t,std::string> g_extract_imx_map;
 
-km_kbp_keyboard_imx * global_imx_list;
-
 int error_args() {
     std::cerr << "kmx: Not enough arguments." << std::endl;
     return 1;
@@ -264,6 +262,5 @@ int main(int argc, char *argv []) {
   km::kbp::kmx::g_debug_ToConsole = TRUE;
   test_imx_list(argv[first_arg]);
   test_queue_actions(argv[first_arg]);
-  km_kbp_keyboard_imx_list_dispose(global_imx_list);
   return 0;
 }
