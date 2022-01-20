@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.285 stable 2022-01-20
+
+* fix(linux): Fix lintian errors :cherries: (#6107)
+* fix(linux): Add workaround for Python bug :cherries: (#6125)
+* fix(web): Use regex to determine display layer and functional layers (#6123)
+
 ## 14.0.284 stable 2022-01-11
 
 * chore(android,oem/fv/android): Update targetSDKVersion to 30 (#5934)
