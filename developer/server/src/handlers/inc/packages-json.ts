@@ -1,5 +1,6 @@
 import express = require('express');
 import { data } from "../../data";
+import { environment } from '../../environment';
 
 export default function handleIncPackagesJson (req: express.Request, res: express.Response) {
   const packages = Object.keys(data.packages).map(id => { return { id: id, filename: id+'.kmp', name: data.packages[id].name} });
@@ -12,9 +13,8 @@ export default function handleIncPackagesJson (req: express.Request, res: expres
   });
 }
 
-const SKeymanVersion = '15.0'; //TODO
-const URLPath_KeymanDeveloper_KeymanForAndroidDownload = '/go/developer/'+SKeymanVersion+'/android-app'
-const URLPath_KeymanDeveloper_KeymanForIosDownload = '/go/developer/'+SKeymanVersion+'/ios-app'
+const URLPath_KeymanDeveloper_KeymanForAndroidDownload = '/go/developer/'+environment.versionRelease+'/android-app'
+const URLPath_KeymanDeveloper_KeymanForIosDownload = '/go/developer/'+environment.versionRelease+'/ios-app'
 
 function makeKeymanURL(base: string) {
   return 'https://keyman.com' + base;

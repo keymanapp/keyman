@@ -10,7 +10,7 @@ import apiUnregister from './handlers/api/debugobject/unregister';
 import handleIncPackagesJson from './handlers/inc/packages-json';
 import apiPackageRegister from './handlers/api/package/register';
 import handleIncKeyboardsCss from './handlers/inc/keyboards-css';
-import { Environment } from './environment';
+import { Environment } from './version-data';
 import { configuration } from './config';
 import chalk = require('chalk');
 
@@ -85,8 +85,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
   app.get('/inc/packages.json', handleIncPackagesJson);
 
   app.get('/api-public/version', (req,res,next)=>{
-    let pjson = require('../package.json');
-    res.json({version: pjson.version});
+    res.json({version: environment.versionWithTag});
     next();
   });
 

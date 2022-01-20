@@ -3,7 +3,7 @@ import { environment } from './environment';
 const Sentry = require("@sentry/node");
 Sentry.init({
   dsn: 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519',  // Keyman Developer
-  environment: environment.environment,
+  environment: environment.versionEnvironment,
   release: environment.versionWithTag
 });
 
