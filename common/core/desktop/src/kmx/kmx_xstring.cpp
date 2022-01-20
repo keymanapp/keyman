@@ -105,7 +105,7 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 
 km_kbp_cp *km::kbp::kmx::u16dup(km_kbp_cp *src) {
   km_kbp_cp *dup = new km_kbp_cp[u16len(src) + 1];
-  memcpy(dup, src, (u16len(src) + 1) * 2);
+  memcpy(dup, src, (u16len(src) + 1) * sizeof(km_kbp_cp));
   return dup;
 }
 
