@@ -357,7 +357,8 @@ namespace com.keyman.text {
  /**
    *  Accept an external key ID (from KeymanTouch) and pass to the keyboard mapping
    *
-   *  @param  {string}  keyName   key identifier
+   *  @param  {string}  keyName   key identifier which could contain a display layer and a "functional" layer
+   *                              e.g: 'shift-K_E+rightalt-shift'
    **/
   keymanweb['executePopupKey'] = function(keyName: string) {
       let core = (<KeymanBase> keymanweb).core;
@@ -373,27 +374,25 @@ namespace com.keyman.text {
       // Changes for Build 353 to resolve KMEI popup key issues
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)
 
+      // Regex for 'display layer'-'virtual key name'+'optional functional layer'
       // Can't just split on '-' because some layers like ctrl-shift contain it.
-      let separatorIndex = keyName.lastIndexOf('-');
-      var displayLayer = core.keyboardProcessor.layerId;
-      if (separatorIndex > 0) {
-        displayLayer = keyName.substring(0, separatorIndex);
-        keyName = keyName.substring(separatorIndex+1);
+      // Virtual key starts with T_, K_, or U_
+      // matches[1]: displayLayer
+      // matches[2]: keyId
+      // matches[3]" optional functionLayer
+      let matches = keyName.match(/^(.+)-([TKU]_[^+]+)\+?(.+)?$/);
+      if (matches == null) {
+        return false
       }
-      if(displayLayer == 'undefined') {
-        displayLayer=core.keyboardProcessor.layerId;
-      }
+      let displayLayer = matches[1];
+      keyName = matches[2] + (matches[3] ? '+' + matches[3] : '');
 
-      // Determine the "functional" layer
-      let layer = displayLayer;
-      separatorIndex = keyName.lastIndexOf('+');
-      if (separatorIndex > 0) {
-        layer = keyName.substring(separatorIndex+1);
-      }
+      // Determine the functional layer
+      let functionalLayer = (matches[3]) ? matches[3] : displayLayer;
 
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(functionalLayer);
 
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -428,10 +427,7 @@ namespace com.keyman.text {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }
 
-      // Now that we've checked if key is found, split "functional layer" from keyName
-      if (separatorIndex > 0) {
-        keyName = keyName.substring(0, separatorIndex);
-      }
+      keyName = matches[2];
 
       let Codes = com.keyman.text.Codes;
 
@@ -443,7 +439,7 @@ namespace com.keyman.text {
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
         kName: keyName,
-        kLayer: layer,
+        kLayer: functionalLayer,
         kbdLayer: displayLayer,
         kNextLayer: nextLayer,
         vkCode: null, // was originally undefined
