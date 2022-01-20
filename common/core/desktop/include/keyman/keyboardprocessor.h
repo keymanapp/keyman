@@ -575,7 +575,8 @@ struct km_kbp_option_item {
 Return the length of a terminated `km_kbp_option_item` array (options
 list).
 ##### Return:
-The number of items in the list or 0 if `opts` is null.
+The number of items in the list, not including terminating item,
+or 0 if `opts` is null.
 ##### Parameters:
 - __opts__: A pointer to a `KM_KBP_OPTIONS_END` terminated array of
     `km_kbp_option_item` values.
@@ -1097,6 +1098,37 @@ km_kbp_process_event(km_kbp_state *state,
                      km_kbp_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down);
+
+/*
+```
+### `km_kbp_process_queued_actions`
+##### Description:
+Process the keyboard processors queued actions for the opaque state object.
+Updates the state object as appropriate and fills out its action list.
+The client can add actions externally via the `km_kbp_state_queue_action_items` and
+then request the processing of the actions with this method.
+
+The state action list will be cleared at the start of this call; options and context in
+the state may also be modified.
+##### Return status:
+- `KM_KBP_STATUS_OK`: On success.
+- `KM_KBP_STATUS_NO_MEM`:
+In the event memory is unavailable to allocate internal buffers.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+In the event the `state` pointer is null
+
+##### Parameters:
+- __state__: A pointer to the opaque state object.
+- __vk__: A virtual key to be processed.
+- __modifier_state__:
+The combinations of modifier keys set at the time key `vk` was pressed, bitmask
+from the `km_kbp_modifier_state` enum.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_process_queued_actions(km_kbp_state *state);
 
 #if defined(__cplusplus)
 } // extern "C"

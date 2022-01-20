@@ -206,7 +206,7 @@ void test_queue_actions (const km::kbp::path &source_keyboard) {
   km_kbp_state * test_state = nullptr;
   km_kbp_keyboard_imx * kb_imx_list;
 
-  km::kbp::path full_path = source_keybard;
+  km::kbp::path full_path = source_keyboard;
 
   try_status(km_kbp_keyboard_load(full_path.native().c_str(), &test_kb));
 

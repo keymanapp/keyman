@@ -22,6 +22,12 @@ namespace kbp
   private:
     bool               _valid;
     kmx::KMX_ProcessEvent _kmx;
+
+    km_kbp_status
+    internal_process_queued_actions(
+      km_kbp_state *state
+      );
+
   public:
     kmx_processor(path);
 
@@ -48,6 +54,11 @@ namespace kbp
       std::u16string const & key,
       std::u16string const & value
     ) override;
+
+    km_kbp_status
+    process_queued_actions(
+      km_kbp_state *state
+      ) override;
 
     bool queue_action(km_kbp_action_item const* action_item) override;
 

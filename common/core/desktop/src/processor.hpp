@@ -61,6 +61,18 @@ namespace kbp
     ) = 0;
 
     /**
+     * Requests this keyboard processor to process its queued actions
+     * updateing the state as required.
+     *
+     * @param   state  An opaque pointer to a state object
+     * @return  km_kbp_status  `KM_KBP_STATUS_OK`: On success. Else KB_KBP_ error code
+     */
+    virtual km_kbp_status
+    process_queued_actions(
+      km_kbp_state * state
+    ) = 0;
+
+    /**
      * Add the action items to this keyboard processor queue
      *
      * @param  action_item

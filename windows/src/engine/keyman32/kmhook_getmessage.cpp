@@ -292,10 +292,11 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
           BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
 
           if (isUsingCoreProcessor) {
-            // send a VK_SPACE to the core keyboard processor to get the queued actions
-            if (KM_KBP_STATUS_OK != (km_kbp_status_codes)km_kbp_process_event(
-                                        _td->lpActiveKeyboard->lpCoreKeyboardState, VK_SPACE,
-                                        static_cast<uint16_t>(Globals::get_ShiftState()), (uint8_t)TRUE)) {
+            // Call the core keyboard processor to process the queued actions
+            if (!_td->lpActiveKeyboard) {
+              return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+            }
+            if (KM_KBP_STATUS_OK != (km_kbp_status_codes)km_kbp_process_queued_actions(_td->lpActiveKeyboard->lpCoreKeyboardState)) {
               SendDebugMessageFormat(0, sdmGlobal, 0, "_kmnGetMessageProc wm_keymanim_close process event fail");
               return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
             }

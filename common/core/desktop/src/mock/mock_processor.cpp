@@ -103,6 +103,17 @@ namespace km {
       return option(scope, key, i->second);
     }
 
+    km_kbp_status
+    mock_processor::process_queued_actions(
+      km_kbp_state *state
+    ) {
+      assert(state);
+      if (!state)
+        return KM_KBP_STATUS_INVALID_ARGUMENT;
+      // TODO Implement
+      return KM_KBP_STATUS_OK;
+    }
+
     bool mock_processor::queue_action(km_kbp_action_item const* action_item) {
       assert(action_item);
       // TODO Implement

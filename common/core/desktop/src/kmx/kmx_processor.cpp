@@ -106,12 +106,10 @@ kmx_processor::update_option(
 bool kmx_processor::queue_action(
   km_kbp_action_item const * action_item
 ) {
-  DebugLog("Action type is [%d].\n", action_item->type);
   switch (action_item->type) {
   case KM_KBP_IT_END:
-    // error should not queue empty item
+    DebugLog("kmx_processor::queue_action: Error attempt to queue KM_KBP_IT_END action type\n");
     return false;
-    break;
   case KM_KBP_IT_CHAR:
    _kmx.GetActions()->QueueAction(QIT_CHAR, action_item->character);
     break;
@@ -140,7 +138,7 @@ bool kmx_processor::queue_action(
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_EMIT_KEYSTROKE:
   case KM_KBP_IT_CAPSLOCK:
-    // Not implemented TODO log message?
+    DebugLog("kmx_processor::queue_action: Warning handling of action type [%d] not implented \n", action_item->type);
     return false;
     break;
   case KM_KBP_IT_INVALIDATE_CONTEXT:
@@ -151,52 +149,7 @@ bool kmx_processor::queue_action(
 }
 
 km_kbp_status
-kmx_processor::process_event(
-  km_kbp_state *state,
-  km_kbp_virtual_key vk,
-  uint16_t modifier_state,
-  uint8_t is_key_down
-) {
-  // If the Virtual Key is VK_SPACE and the internal kmx processor has actions
-  // then process that and return. Why - because these actions must have been added externally
-  // via the queue_action method. The client can request processing of action queue
-  // in this scenario by sending VK_SPACE key to be processed
-  bool has_internal_actions = ((vk == VK_SPACE) && (!_kmx.GetActions()->IsQueueEmpty()));
-
-  if (!has_internal_actions) {
-    // Construct a context buffer from the items
-    std::u16string ctxt;
-    auto cp = state->context();
-    for (auto c = cp.begin(); c != cp.end(); c++) {
-      switch (c->type) {
-      case KM_KBP_CT_CHAR:
-        if (Uni_IsSMP(c->character)) {
-          ctxt += Uni_UTF32ToSurrogate1(c->character);
-          ctxt += Uni_UTF32ToSurrogate2(c->character);
-        } else {
-          ctxt += (km_kbp_cp)c->character;
-        }
-        break;
-      case KM_KBP_CT_MARKER:
-        assert(c->marker > 0);
-        ctxt += UC_SENTINEL;
-        ctxt += CODE_DEADKEY;
-        ctxt += c->marker;
-        break;
-      }
-    }
-
-    _kmx.GetContext()->Set(ctxt.c_str());
-    _kmx.GetActions()->ResetQueue();
-    state->actions().clear();
-
-    if (!_kmx.ProcessEvent(state, vk, modifier_state, is_key_down)) {
-      // We need to output the default keystroke
-      state->actions().push_emit_keystroke();
-    }
-  } else {
-    state->actions().clear();
-  }
+kmx_processor::internal_process_queued_actions(km_kbp_state *state) {
 
   for (auto i = 0; i < _kmx.GetActions()->Length(); i++) {
     auto a = _kmx.GetActions()->Get(i);
@@ -265,6 +218,53 @@ kmx_processor::process_event(
   // been added to the keyboard action queue (currently IMX interaction)
   _kmx.GetActions()->ResetQueue();
   return KM_KBP_STATUS_OK;
+}
+
+km_kbp_status
+kmx_processor::process_event(
+  km_kbp_state *state,
+  km_kbp_virtual_key vk,
+  uint16_t modifier_state,
+  uint8_t is_key_down
+) {
+  // Construct a context buffer from the items
+  std::u16string ctxt;
+  auto cp = state->context();
+  for (auto c = cp.begin(); c != cp.end(); c++) {
+    switch (c->type) {
+    case KM_KBP_CT_CHAR:
+      if (Uni_IsSMP(c->character)) {
+        ctxt += Uni_UTF32ToSurrogate1(c->character);
+        ctxt += Uni_UTF32ToSurrogate2(c->character);
+      } else {
+        ctxt += (km_kbp_cp)c->character;
+      }
+      break;
+    case KM_KBP_CT_MARKER:
+      assert(c->marker > 0);
+      ctxt += UC_SENTINEL;
+      ctxt += CODE_DEADKEY;
+      ctxt += c->marker;
+      break;
+    }
+  }
+
+  _kmx.GetContext()->Set(ctxt.c_str());
+  _kmx.GetActions()->ResetQueue();
+  state->actions().clear();
+
+  if (!_kmx.ProcessEvent(state, vk, modifier_state, is_key_down)) {
+    // We need to output the default keystroke
+    state->actions().push_emit_keystroke();
+  }
+
+  return internal_process_queued_actions(state);
+}
+
+km_kbp_status
+kmx_processor::process_queued_actions (km_kbp_state *state) {
+  state->actions().clear();
+  return internal_process_queued_actions(state);
 }
 
 constexpr km_kbp_attr const engine_attrs = {
@@ -349,22 +349,22 @@ km_kbp_keyboard_imx * kmx_processor::get_imx_list() const  {
   for(uint32_t i = 0; i < store_cnt; i++) {
     LPSTORE p_store = &store_array[i];
     if(p_store->dwSystemID == TSS_CALLDEFINITION) {
-			/* Break the store string into components */
+      /* Break the store string into components */
 
-			PKMX_WCHAR full_fn_name = p_store->dpString;
+      PKMX_WCHAR full_fn_name = u16dup(p_store->dpString);
       PKMX_WCHAR pt = NULL;
       PKMX_WCHAR lib_name = u16tok(full_fn_name, u':', &pt);
-			PKMX_WCHAR fn_name = u16tok(NULL, u':', &pt);
+      PKMX_WCHAR fn_name = u16tok(NULL, u':', &pt);
 
-			if(!lib_name || !fn_name){
-				continue;
-			}
+      if(!lib_name || !fn_name){
+        continue;
+      }
 
       imx_list[fn_idx].library_name = lib_name;
-      imx_list[fn_idx].function_name = fn_name;
+      imx_list[fn_idx].function_name = u16dup(fn_name);
       imx_list[fn_idx].imx_id = i;
       fn_idx++;
-		}
+    }
   }
   // Insert list termination
   imx_list[fn_idx] =  KM_KBP_KEYBOARD_IMX_END;

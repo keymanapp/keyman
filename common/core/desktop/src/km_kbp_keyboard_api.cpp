@@ -107,12 +107,18 @@ km_kbp_status km_kbp_keyboard_get_imx_list(
   if (!keyboard || !imx_list) {
     return KM_KBP_STATUS_INVALID_ARGUMENT;
   }
-  
+
   *imx_list = keyboard->get_imx_list();
   return KM_KBP_STATUS_OK;
 }
 
 void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list)
 {
+  km_kbp_keyboard_imx *imx_rule_it = imx_list;
+  //for (; imx_rule_it->library_name; ++imx_rule_it) {
+    //delete [] imx_rule_it->library_name; // from u16dup
+    //delete [] imx_rule_it->function_name; // from u16dup
+
+  //}
   delete[] imx_list;
 }
