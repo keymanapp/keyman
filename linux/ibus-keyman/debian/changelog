@@ -1,3 +1,10 @@
+ibus-keyman (14.0.284-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 14 Jan 2022 18:00:31 +0100
+
 ibus-keyman (14.0.283-2) unstable; urgency=medium
 
   * New upstream release
