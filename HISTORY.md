@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.183 alpha 2022-01-21
+
+* chore(linux): Update changelogs for 14.0.284 :cherries: (#6132)
+* chore(linux): Revert workaround for Python bug (#6133)
+
 ## 15.0.182 alpha 2022-01-21
 
 * chore(linux): Add metadata file for packaging (#6127)
