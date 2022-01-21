@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "postbuild": "npx gosh postbuild.sh",
+    "postbuild": "npx gosh ./postbuild.sh",
     "prod": "node .",
     "test": "mocha",
     "watch": "npm run postbuild && tsc-watch --onSuccess \"node .\" --onFailure \"node .\""
@@ -31,7 +31,9 @@
     "@types/ws": "^8.2.2",
     "chai": "^4.3.4",
     "copyfiles": "^2.4.1",
+    "hetrodo-node-hide-console-window-napi": "keymanapp/hetrodo-node-hide-console-window-napi#keyman-15.0",
     "mocha": "^9.1.4",
+    "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-15.0",
     "ts-node": "^10.4.0",
     "tsc-watch": "^4.5.0",
     "typescript": "^4.5.4"

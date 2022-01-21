@@ -36,10 +36,9 @@ build_addins() {
   # Build node-windows-trayicon
   #
 
-  pushd "$KEYMAN_ROOT/developer/server/win32/node-windows-trayicon"
-  rm -rf node_modules
+  pushd "./node_modules/node-windows-trayicon"
   rm -rf build
-  npm install --arch=$ARCH --silent
+  npx node-gyp clean configure build --arch=$ARCH --silent
   cp build/Release/addon.node "$TRAYICON_TARGET"
   popd
 
@@ -47,10 +46,9 @@ build_addins() {
   # Build hetrodo-node-hide-console-window-napi
   #
 
-  pushd "$KEYMAN_ROOT/developer/server/win32/hetrodo-node-hide-console-window-napi"
-  rm -rf node_modules
+  pushd "./node_modules/hetrodo-node-hide-console-window-napi"
   rm -rf build
-  npm install --arch=$ARCH --silent
+  npx node-gyp clean configure build --arch=$ARCH --silent
   cp build/Release/node-hide-console-window.node "$HIDECONSOLE_TARGET"
   popd
 
