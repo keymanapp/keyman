@@ -100,10 +100,15 @@ function run_tests() {
     echo "Running on Wayland..."
     TMPFILE=$(mktemp)
     # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
-    mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> $TMPFILE &
+    # ibus doesn't yet fully support Wayland - it only works with XWayland. If that ever
+    # changes we can pass `--no-x11` to mutter.
+    mutter --wayland --headless --virtual-monitor 1024x768 &> $TMPFILE &
     echo "kill -9 $!" >> $PID_FILE
     sleep 1s
+    # mutter-Message: 18:40:45.081: Using Wayland display name 'wayland-1'
     export WAYLAND_DISPLAY=$(cat $TMPFILE | grep "Using Wayland display" | cut -d"'" -f2)
+    # mutter-Message: 18:40:45.080: Using public X11 display :2, (using :3 for managed services)
+    export DISPLAY=:$(cat $TMPFILE | grep "Using public X11 display" | cut -d":" -f6 | cut -d"," -f1)
     rm $TMPFILE
   else
     echo "Starting Xvfb..."

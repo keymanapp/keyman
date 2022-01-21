@@ -281,8 +281,20 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
 #endif
 #ifdef GDK_WINDOWING_WAYLAND
   if (GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
+    // The Wayland support of ibus is currently non-working. It only works with
+    // XWayland. Also there are still some APIs in Wayland missing that would allow
+    // us to toggle capslock etc, so we use XWayland if available. If XWayland is
+    // not available I guess things won't completely work, but there's currently not
+    // much we can do about that with ibus.
     g_debug("Using Wayland");
     keyman->wldisplay = GDK_WAYLAND_DISPLAY(gdkDisplay);
+
+#ifdef GDK_WINDOWING_X11
+    if (getenv("DISPLAY")) {
+      g_debug("Also using XWayland");
+      keyman->xdisplay = XOpenDisplay(NULL);
+    }
+#endif
   } else
 #endif
   {
@@ -683,12 +695,12 @@ process_capslock_action(
     XSync(keyman->xdisplay, False);
   }
 #endif
-#ifdef GDK_WINDOWING_WAYLAND
-  // TODO
-  if (keyman->wldisplay) {
+// #ifdef GDK_WINDOWING_WAYLAND
+//   // TODO
+//   if (keyman->wldisplay) {
 
-  }
-#endif
+//   }
+// #endif
   return TRUE;
 }
 

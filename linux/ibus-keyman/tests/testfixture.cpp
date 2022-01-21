@@ -78,6 +78,11 @@ ibus_keyman_tests_fixture_set_up(IBusKeymanTestsFixture *fixture, gconstpointer 
 #ifdef GDK_WINDOWING_WAYLAND
   if (use_wayland && !wldisplay && GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
     wldisplay = GDK_WAYLAND_DISPLAY(gdkDisplay);
+#ifdef GDK_WINDOWING_X11
+    if (getenv("DISPLAY")) {
+      display = XOpenDisplay(NULL);
+    }
+#endif
   }
 #endif
 
@@ -115,7 +120,7 @@ ibus_keyman_tests_fixture_tear_down(IBusKeymanTestsFixture *fixture, gconstpoint
 static void
 set_caps_lock_state(IBusKeymanTestsFixture *fixture, bool caps_lock_on) {
 #ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
+  if (display) {
     XkbLockModifiers(display, XkbUseCoreKbd, LockMask, caps_lock_on ? LockMask : 0);
     XSync(display, False);
   }
@@ -130,7 +135,7 @@ set_caps_lock_state(IBusKeymanTestsFixture *fixture, bool caps_lock_on) {
 static bool
 get_caps_lock_state(IBusKeymanTestsFixture *fixture) {
 #ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
+  if (display) {
     XKeyboardState state;
     XGetKeyboardControl(display, &state);
     return state.led_mask & 1;
@@ -543,7 +548,7 @@ main(int argc, char *argv[]) {
 
   // Cleanup
 #ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
+  if (display) {
     XCloseDisplay(display);
     display = NULL;
   }
