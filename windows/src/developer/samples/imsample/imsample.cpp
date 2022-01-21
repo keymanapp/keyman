@@ -1,18 +1,18 @@
 /*
   Name:             imsample
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      24 Oct 2012
 
   Modified Date:    24 Oct 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          24 Oct 2012 - mcdurdin - I3481 - V9.0 - Eliminate unsafe calls in C++
 */
 
@@ -51,7 +51,7 @@ struct group
 struct keyboard
 {
 	char name[128];
-	
+
 	LOGFONT font;
 	HFONT hFont;
 
@@ -79,7 +79,7 @@ void CreateKeyboard(PSTR keyboardname);
 
 
 /************************************************************************************************************
- * DLL entry functions          
+ * DLL entry functions
  ************************************************************************************************************/
 
 BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
@@ -121,7 +121,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMInit(PSTR keyboardname)
 		wc.lpszMenuName = NULL;
 		wc.lpszClassName = "KM_IMSample";
 		if(!RegisterClass(&wc)) return FALSE;
-		
+
 		wc.lpfnWndProc = (WNDPROC) IMSampleChildWndProc;
 		wc.lpszClassName = "KM_IMSampleChild";
 		if(!RegisterClass(&wc)) return FALSE;
@@ -131,7 +131,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMInit(PSTR keyboardname)
 	pt.x = ReadRegSetting("imsample x");
 	pt.y = ReadRegSetting("imsample y");
 
-	hwnd = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, "KM_IMSample", "Keyman Sample IM", 
+	hwnd = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, "KM_IMSample", "Keyman Sample IM",
 		WS_POPUP | WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME,
 		pt.x, pt.y, 200, 120, 0, NULL, hinst, NULL);
 
@@ -160,7 +160,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMReloadConfig(PSTR keyboardn
 }
 
 /************************************************************************************************************
- * IM Events                     
+ * IM Events
  ************************************************************************************************************/
 
 extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMActivate(PSTR keyboardname)
@@ -295,7 +295,10 @@ void CalcScrollSize()
 	RECT rect;
 
 	if(!curkbd) { wz.cellcount = 0; return; }
-
+  if (!curkbd->groups) {
+    wz.cellcount = 0;
+    return;
+  }
 	GetClientRect(hwndChild, &rect);
 
 	if(FIMWindowActive && currule)
@@ -308,6 +311,7 @@ void CalcScrollSize()
 
 		wz.cellcount = 0;
                 int i;
+
 		for(i = 0; i < curkbd->groups[0].nrules; i++)
 		{
 			rule *r = &curkbd->groups[0].rules[i];
@@ -320,8 +324,8 @@ void CalcScrollSize()
 	wz.visiblecolcount = (curkbd->gridx != 0 ? rect.right / curkbd->gridx : rect.right);
   wz.visiblerowcount = (curkbd->gridy != 0 ? rect.bottom / curkbd->gridy : rect.bottom);
 
-	wz.xi = (wz.cellcount-1) % wz.visiblecolcount;
-	wz.yi = (wz.cellcount-1) / wz.visiblecolcount;
+	wz.xi = (wz.visiblecolcount !=0 ) ? (wz.cellcount-1) % wz.visiblecolcount : 2;
+	wz.yi = (wz.visiblecolcount !=0 ) ? (wz.cellcount-1) / wz.visiblecolcount : 2;
 
 	SCROLLINFO si;
 	si.cbSize = sizeof(SCROLLINFO);
@@ -359,17 +363,19 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 	case WM_USER+200:
 		CalcScrollSize();
 		InvalidateRect(hwndChild, NULL, TRUE);
-	
+
 		return 0;
 
 	case WM_LBUTTONUP:
 		if(!PrepIM()) return DefWindowProc(hwndChild, msg, wParam, lParam);
 		if(!curkbd) return 0;
-
+    if (!curkbd->groups) {
+      return 0;
+    }
 		GetClientRect(hwndChild, &rect);
 
 		pt = MAKEPOINTS(lParam);
-		
+
 		pt.x /= cx;
 		pt.y /= cy;
 
@@ -378,8 +384,8 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 		if(!FIMWindowActive || !currule)
 		{       int i, j;
 			for(i = 0, j = 0; i < curkbd->groups[0].nrules; i++)
-				if(curkbd->groups[0].rules[i].drawvalid) 
-				{	
+				if(curkbd->groups[0].rules[i].drawvalid)
+				{
 					if(j == n) break;
 					j++;
 				}
@@ -403,7 +409,7 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 
 	case WM_VSCROLL:
 		nPos = HIWORD(wParam);
-		if(nPos == 0 && LOWORD(wParam) != SB_THUMBTRACK && LOWORD(wParam) != SB_THUMBPOSITION) 
+		if(nPos == 0 && LOWORD(wParam) != SB_THUMBTRACK && LOWORD(wParam) != SB_THUMBPOSITION)
 			nPos = GetScrollPos(hwndChild, SB_VERT);
 		switch(LOWORD(wParam))
 		{
@@ -426,10 +432,19 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 
 		return 0;
 	case WM_PAINT:
+    if (!curkbd) {
+       return 0;
+    }
+    if (!curkbd->hFont) {
+       return 0;
+    }
+    if (!curkbd->groups) {
+      return 0;
+    }
 		if(!PrepIM()) return DefWindowProc(hwndChild, msg, wParam, lParam);
-		
+
 		int vpos = GetScrollPos(hwndChild, SB_VERT) * curkbd->gridy;
-		
+
 		hDC = BeginPaint(hwndChild, &ps);
 		GetClientRect(hwndChild, &rect);
 		if(curkbd)
@@ -460,12 +475,12 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 					SelectObject(hDC, GetStockObject(SYSTEM_FONT));
 					TextOut(hDC, x * cx + 1, -vpos + y * cy+1, buf, 1);
 					SelectObject(hDC, curkbd->hFont);
-					
+
 					SIZE sz2;
 
 					GetTextExtentPoint32W(hDC, currule->outputs[i], (int)wcslen(currule->outputs[i]), &sz2);
-					
-					TextOutW(hDC, x * cx + (cx-sz2.cx)/2, -vpos + (y+1) * cy - sz2.cy - 2, 
+
+					TextOutW(hDC, x * cx + (cx-sz2.cx)/2, -vpos + (y+1) * cy - sz2.cy - 2,
 						currule->outputs[i], (int)wcslen(currule->outputs[i]));
 
 					if(++x >= wz.visiblecolcount) { x = 0; y++; }
@@ -509,7 +524,10 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 
 BOOL FindRule(group *g, rule **rp, WCHAR KeyChar)
 {
-	WCHAR buf[48];
+	if(!g){
+    return FALSE;
+  }
+  WCHAR buf[48];
 	if(!(*KMGetContext)(buf, 48)) return FALSE;
 	rule *r = g->rules;
 	int buflen = (int)wcslen(buf);
@@ -526,7 +544,7 @@ BOOL FindRule(group *g, rule **rp, WCHAR KeyChar)
 }
 
 BOOL PostKey(WCHAR KeyChar, WORD KeyStroke)
-{ 
+{
 	if(KeyChar != 0)
 	{
 		WCHAR buf[2];
@@ -547,7 +565,10 @@ BOOL PostKey(WCHAR KeyChar, WORD KeyStroke)
 extern "C" BOOL __declspec(dllexport) WINAPI DFWindow(HWND hwndFocus, WORD KeyStroke, WCHAR KeyChar, DWORD shiftFlags)
 {
 	if(!curkbd) return FALSE;
-	
+  if (!curkbd->groups) {
+    return FALSE;
+  }
+
 	if(!FindRule(&curkbd->groups[0], &currule, KeyChar))
 	{
 		if(FIMWindowAlwaysVisible)
@@ -566,6 +587,9 @@ extern "C" BOOL __declspec(dllexport) WINAPI DFText(HWND hwndFocus, WORD KeyStro
 {
 	WCHAR buf[32];
 	if(!curkbd) return FALSE;
+  if (!curkbd->groups) {
+    return FALSE;
+  }
 	if(!currule)
 	{
 		if(!FindRule(&curkbd->groups[0], &currule, KeyChar))
@@ -589,7 +613,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI DFText(HWND hwndFocus, WORD KeyStro
 	else if(KeyChar >= '1' && KeyChar <= '9')
 	{
 		KeyChar -= '1';
-		if(currule->outputs[KeyChar]) 
+		if(currule->outputs[KeyChar])
 		{
 			(*KMSetOutput)(currule->outputs[KeyChar], currule->outputlen);
 			currule = NULL;
@@ -615,7 +639,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI DF(HWND hwndFocus, WORD KeyStroke, 
 
 
 /************************************************************************************************************
- * IM Configuration            
+ * IM Configuration
  ************************************************************************************************************/
 
 extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMConfigure(PSTR keyboardname, HWND hwndParent)
@@ -634,7 +658,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMConfigure(PSTR keyboardname
 		case IDYES:
 			WriteRegSetting("ShowIMWindowAlways", 1);
 			break;
-	
+
 		case IDNO:
 			WriteRegSetting("ShowIMWindowAlways", 0);
 			break;
@@ -657,7 +681,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMConfigure(PSTR keyboardname
 void WriteRegSetting(PSTR text, int value)
 {
 	HKEY hkey;
-  if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample", 
+  if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample",
 		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
 	{
 		RegSetValueEx(hkey, text, 0, REG_DWORD, (PBYTE) &value, 4);
@@ -668,7 +692,7 @@ void WriteRegSetting(PSTR text, int value)
 int ReadRegSetting(PSTR text)
 {
 	HKEY hkey;
-	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample", 
+	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample",
 		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
 	{
 		unsigned long value, sz = 4, tp = REG_DWORD;
@@ -684,10 +708,10 @@ int ReadRegSetting(PSTR text)
 char *strtokquoted(char *str, char *token, char *quotes)
 { //slow-n-ugly but quick to write ;-)
 	static char *buf = NULL;
-	if(!str) 
+	if(!str)
 		if(!buf) return NULL;
 		else str = buf;
-	
+
 	char *q = str;
 	if(!*q) return q;
 
@@ -699,7 +723,7 @@ char *strtokquoted(char *str, char *token, char *quotes)
 		if(!r) return NULL; // unterminated quotes
 		r++;
 		if(!strchr(token, *r)) return NULL; // close of quoted string does not culminate in token
-		if(*r != 0) 
+		if(*r != 0)
 		{
 			*r++ = 0;
 			while(*r != 0 && strchr(token, *r)) r++;
@@ -825,7 +849,7 @@ BOOL LoadRules(PSTR KeyboardName)
 	BOOL FGroups = FALSE, FRules = FALSE, FConfig = FALSE;
 	char str[512];
 	int nkbi, lfpixelsy;
-			
+
 	UnloadRules(KeyboardName); // Free existing rule base
 
 	for(nkbi = 0; nkbi < nkeyboards; nkbi++)
@@ -845,7 +869,7 @@ BOOL LoadRules(PSTR KeyboardName)
 
 	kbi->font.lfHeight         = -MulDiv(10, lfpixelsy, 72);
 	kbi->font.lfWidth          = 0;
-	kbi->font.lfEscapement     = 0; 
+	kbi->font.lfEscapement     = 0;
 	kbi->font.lfOrientation    = 0;
 	kbi->font.lfWeight         = FW_NORMAL;
 	kbi->font.lfItalic         = FALSE;
@@ -859,7 +883,7 @@ BOOL LoadRules(PSTR KeyboardName)
   strcpy_s(kbi->font.lfFaceName, _countof(kbi->font.lfFaceName), "Arial");  // I3481
 
 	char drive[_MAX_DRIVE], dir[_MAX_DIR], buf[260];
-	
+
 	if(!(*KMGetKeyboardPath)(KeyboardName, buf, 260)) return FALSE;
 	_splitpath_s(buf, drive, _MAX_DRIVE, dir, _MAX_DIR, NULL, 0, NULL, 0);  // I3481
 	_makepath_s(buf, _countof(buf), drive, dir, "imsample", ".txt");  // I3481
@@ -873,7 +897,7 @@ BOOL LoadRules(PSTR KeyboardName)
 		if(strchr(str, '\n')) *strchr(str, '\n') = 0;
 
 		if(str[0] == '#' || str[0] == 0) continue;
-				
+
 		if(str[0] == '[')
 		{
 			FConfig = FALSE; FGroups = FALSE; FRules = FALSE;
@@ -886,10 +910,10 @@ BOOL LoadRules(PSTR KeyboardName)
       char *tokcontext = NULL;
 			char *p = strtok_s(str, "= ", &tokcontext); if(!p) continue;  // I3481
 			char *q = strtok_s(NULL, "\n", &tokcontext); if(!q) continue;  // I3481
-			if(!_stricmp(p, "font")) 
-			{ 
-				strncpy_s(kbi->font.lfFaceName, _countof(kbi->font.lfFaceName), q, LF_FACESIZE-1); 
-				kbi->font.lfFaceName[LF_FACESIZE-1] = 0; 
+			if(!_stricmp(p, "font"))
+			{
+				strncpy_s(kbi->font.lfFaceName, _countof(kbi->font.lfFaceName), q, LF_FACESIZE-1);
+				kbi->font.lfFaceName[LF_FACESIZE-1] = 0;
 			}
 			else if(!_stricmp(p, "size"))
 			{
@@ -911,7 +935,7 @@ BOOL LoadRules(PSTR KeyboardName)
 				delete kbi->groups;
 			}
 			kbi->groups = g2;
-			
+
 			kbi->groups[kbi->ngroups].rules = NULL;
 			kbi->groups[kbi->ngroups].nrules = 0;
 			strncpy_s(kbi->groups[kbi->ngroups].name, _countof(kbi->groups[kbi->ngroups].name), str, 31);  // I3481
@@ -940,7 +964,7 @@ BOOL LoadRules(PSTR KeyboardName)
 				}
 				kbi->groups[i].rules = r2;
 			}
-			
+
 			rule *r2 = &kbi->groups[i].rules[kbi->groups[i].nrules++];
 
 			r2->context = extstr(pcontext);
@@ -963,7 +987,7 @@ BOOL LoadRules(PSTR KeyboardName)
 	}
 
 	fclose(fp);
-	kbi->hFont = CreateFontIndirect(&kbi->font);	
+	kbi->hFont = CreateFontIndirect(&kbi->font);
 
 	return TRUE;
 }
