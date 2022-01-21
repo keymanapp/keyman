@@ -70,8 +70,14 @@ namespace km {
       return KM_KBP_STATUS_OK;
     }
 
-    bool rust_mock_processor::queue_action(km_kbp_action_item const* action_item) {
-      assert(action_item);
+    bool rust_mock_processor::queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    )
+    {
+      assert(state);
+      if (!state)
+        return false;
       // TODO Implement
       return false;
     }
