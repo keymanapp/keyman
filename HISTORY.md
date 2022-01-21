@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.182 alpha 2022-01-21
+
+* chore(linux): Add metadata file for packaging (#6127)
+* fix(web): crash in setTitleFromKeyboard when no keyboard active (#6129)
+
 ## 15.0.181 alpha 2022-01-19
 
 * fix(linux): Add workaround for Python bug (#6124)
