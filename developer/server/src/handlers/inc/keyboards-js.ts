@@ -3,13 +3,7 @@ import { SiteData, data } from "../../data";
 
 export default function handleIncKeyboardsJs (req: express.Request, res: express.Response) {
   let headers = {"Content-Type": "application/javascript"};
-  /*if(environment == Environment.Development) {
-    // Allow requests from ng-served host in development
-    headers["Access-Control-Allow-Origin"] = '*';
-  }*/
   res.writeHead(200, headers);
-  //*/
-  //response.
   res.write(emitJavascript(data));
   res.end();
 }

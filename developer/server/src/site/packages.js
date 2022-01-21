@@ -2,12 +2,14 @@ const menuDropdown = new DropdownMenu('menu');
 let packages = null;
 let packagesJSON = null;
 let helpUrl = '';
+let versionMajor = '15.0'; // will be updated from the server below
 
 fetch('/api-public/version').
   then(response => response.json()).
   then(value => {
-    const versionMajor = /^(\d+\.\d+)/.exec(value.version);
-    helpUrl = 'https://help.keyman.com/developer/'+versionMajor[1]+'/context/server';
+    const versionMajorRx = /^(\d+\.\d+)/.exec(value.version);
+    versionMajor = versionMajorRx[1];
+    helpUrl = 'https://help.keyman.com/developer/'+versionMajor+'/context/server';
     document.getElementById('about-version').innerText = value.version;
     document.getElementById('about-help-link').href = helpUrl;
     document.getElementById('keyman-developer-logo').title = 'Keyman Developer Server '+value.version;
@@ -18,8 +20,8 @@ menuDropdown.onclick = (value) => {
   if(value == '#install-keyman') {
     let href = '';
     switch(keyman.util.device.OS) {
-      case 'iOS':     href = 'https://keyman.com/go/developer/15.0/ios-app'; break;
-      case 'Android': href = 'https://keyman.com/go/developer/15.0/android-app'; break;
+      case 'iOS':     href = 'https://keyman.com/go/developer/'+versionMajor+'/ios-app'; break;
+      case 'Android': href = 'https://keyman.com/go/developer/'+versionMajor+'/android-app'; break;
       case 'Linux':   href = 'https://keyman.com/linux/download'; break;
       case 'Windows': href = 'https://keyman.com/go/download/keyman-windows'; break;
       case 'MacOSX':  href = 'https://keyman.com/go/download/keyman-mac'; break;

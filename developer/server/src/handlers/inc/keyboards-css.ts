@@ -4,8 +4,6 @@ import { data, SiteData } from "../../data";
 export default function handleIncKeyboardsCss (req: express.Request, res: express.Response) {
   let headers = {"Content-Type": "text/css"};
   res.writeHead(200, headers);
-  //*/
-  //response.
   res.write(emitCSS(data));
   res.end();
 
