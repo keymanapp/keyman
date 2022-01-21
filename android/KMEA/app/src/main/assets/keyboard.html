@@ -248,7 +248,8 @@
         var keyPos = x.toString() + ',' + y.toString();
         for(i=0; i<obj.length; i++)
         {
-          s=s+obj[i].layer+'-'+obj[i].coreID;
+          // elementID contains the layer and coreID
+          s=s+obj[i].elementID;
           if(obj[i].sp == 1 || obj[i].sp == 2) shift = true;
           if(typeof(obj[i].text) != 'undefined' && obj[i].text != null && obj[i].text != '') s=s+':'+toHex(obj[i].text);
           if(i < (obj.length -1)) s=s+';'

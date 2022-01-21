@@ -41,10 +41,12 @@ AppContext::AppContext()
 
 void AppContext::Add(WCHAR ch)
 {
-	if(pos == MAXCONTEXT - 1)
-	{
+	if(pos == MAXCONTEXT - 1) {
 //    SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: MAXCONTEXT[%d]: %ws", pos, CurContext);
-		memmove(CurContext, &CurContext[1], MAXCONTEXT*2 - 2); pos--;
+    auto p = incxstr(CurContext);
+    auto n = p - CurContext;
+    memmove(CurContext, p, (MAXCONTEXT - n) * 2);
+    pos -= (int)n;
 	}
 
 	CurContext[pos++] = ch;
@@ -114,7 +116,7 @@ void AppContext::Get(WCHAR *buf, int bufsize)
   for (WCHAR *p = this->BufMax(bufsize); *p && bufsize > 0; p++, bufsize--)
   {
     *buf = *p;
-    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) { 
+    if(Uni_IsSurrogate1(*p) && bufsize - 2 > 0) {
       buf++; p++;
       *buf = *p;
       bufsize--;
@@ -135,16 +137,33 @@ void AppContext::CopyFrom(AppContext *source)   // I3575
 
 void AppContext::Set(const WCHAR *buf)
 {
-	const WCHAR *p;
-	WCHAR *q;
-	for(p = buf, q = CurContext; *p && (INT_PTR)(q-CurContext) < MAXCONTEXT - 1; p++, q++)
-	{
-		*q = *p;
-		if(*p >= 0xD800 && *p <= 0xDBFF) { *(++q) = *(++p); }
-	}
-	*q = 0;
-  pos = (int)(INT_PTR)(q-CurContext);  // I1129 - Irregular behaviour with context rules
-	CurContext[MAXCONTEXT-1] = 0;
+  const WCHAR *p;
+  WCHAR *q;
+
+  // We may be past a buffer longer than our internal
+  // buffer. So we shift to make sure we capture the end
+  // of the string, not the start
+  p = wcschr(buf, 0);
+  q = (WCHAR *)p;
+  while (p != NULL && p > buf && (intptr_t)(q - p) < MAXCONTEXT - 1) {
+    p = decxstr((WCHAR *)p, (WCHAR *)buf);
+  }
+
+  // If the first character in the buffer is a surrogate pair,
+  // or a deadkey, our buffer may be too long, so move to the
+  // next character in the buffer
+  if ((intptr_t)(q - p) > MAXCONTEXT - 1) {
+    p = incxstr((WCHAR *)p);
+  }
+
+  for (q = CurContext; *p; p++, q++) {
+    *q = *p;
+  }
+
+  *q = 0;
+  pos = (int)(intptr_t)(q - CurContext);
+  CurContext[MAXCONTEXT - 1] = 0;
+
 }
 
 BOOL AppContext::CharIsDeadkey()

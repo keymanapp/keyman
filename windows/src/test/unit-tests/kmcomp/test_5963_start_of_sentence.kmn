@@ -1,0 +1,35 @@
+﻿c should compile, uses all features of start-of-sentence #3621 (PR #5963)
+
+store(&targets) 'any'
+
+begin Unicode > use(main)
+begin NewContext > use(NewContext)
+begin PostKeystroke > use(PostKeystroke)
+
+group(NewContext) readonly
+    nomatch > use(nextLayer)
+
+group(PostKeystroke) readonly
+
+store(caps) 'A'..'Z'
+store(digit) '0'..'9'
+
+    c until we get a 'CAPS' layer, stay on CAPS if 2+ chrs in caps
+    if(&layerChanged = "0") any(caps) any(caps) > context
+
+    c stay on the numeric layer if we are there already
+    if(&layerChanged = "0") if(&layer = 'numeric') any(digit) > context
+
+    c no other changes, so detect sentence or layer change
+    if(&layerChanged = "0") > use(nextLayer)
+
+group(nextLayer) readonly
+
+    store(sentencePunctuation) '.?!'
+    nul > layer('shift')
+    any(sentencePunctuation) ' ' > layer('shift')
+    any(sentencePunctuation) '  ' > layer('shift')
+    nomatch > layer('default')
+
+group(main) using keys
+

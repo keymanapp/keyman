@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Context: Title for list -->
+    <plurals name="title_keyboards">
+        <item quantity="zero">Keyboardina ta faftal jiv tadiye k vinda an kompitaina ta faftal jiv tadiye k vinda an kompita</item>
+        <item quantity="one">Keyboardina ta faftal jiv tadiye k vinda an kompitaina ta faftal jiv tadiye k vinda an kompita</item>
+        <item quantity="other">Keyboardina ta faftal jiv tadiye k vinda an kompitaina ta faftal jiv tadiye k vinda an kompita</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="zero">Other Input Methods</item>
+        <item quantity="one">Other Input Method</item>
+        <item quantity="other">Other Input Methods</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <string name="title_add_keyboard" comment="Add a new keyboard">A mbakat wuliwa Keyboard</string>
+    <!-- Context: Title for list -->
+    <string name="title_languages_settings" comment="List of installed languages">Gwaɗaha luwahunda fanlo</string>
+    <!-- Context: Title for list -->
+    <string name="title_language_settings" comment="Keyman Settings for a language">%1$s Settings</string>
+    <!-- Context: Button label -->
+    <string name="label_add" comment="Button to add an item">Mbakata</string>
+    <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">Uhili</string>
+    <!-- Context: Button label -->
+    <string name="label_cancel" comment="Button to cancel an action">Jata</string>
+    <!-- Context: Button label -->
+    <string name="label_close" comment="Close a dialog">Funta</string>
+    <!-- Context: Button label. Removed in Keyman 15 -->
+    <string name="label_close_keyman" comment="Close the Keyman application">Funt Keyman</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">Mbakata jeb t kima</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Next Input Method</string>
+    <!-- Context: Button label -->
+    <string name="label_download" comment="Button to confirm downloading an item">Sangata</string>
+    <!-- Context: Button label -->
+    <string name="label_install" comment="Confirmation to install a package">Fanta</string>
+    <!-- Context: Button label -->
+    <string name="label_later" comment="Do an action at a later time">Peɗe</string>
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">Unda siɗi</string>
+    <!-- Context: Button label -->
+    <string name="label_ok" comment="Button to acknowledge a dialog">Muvaya</string>
+    <!-- Context: Button label -->
+    <string name="label_update" comment="Dialog button to update a resource">Haf tinunda sa magalo</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="cannot_connect" comment="Error message when network connection fails">Ha da gwaghva nda Keyman server wo!</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">Ɗow ka k masunt tana keyboard na re?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">Ɗow ka k sangat tina wuliwa tana keyboard na re?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_update" comment="Confirmation to update several resources">Ɗow ka k haf tinunda sa magalo sakoro t keyboards na nda dictionaries na kana re?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_channel">Resource Updates</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">Resource Updates hahaɗe</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (Update hahaɗe)</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Updates hahaɗe anga keyboard %1$s: %2$s </string>
+    <!-- Context: Keyboard Updates -->
+    <string name="dictionary_update_message">Updates hahaɗe anga dictionary %1$s: %2$s </string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version" comment="Label for keyboard version">Keyboard version</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="help_link" comment="Label for help link">Help link</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">Fan bol t keyboard wo</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_qr_code" comment="QR Code description">      Afkla fota nana code na anga klaf tana \nkeyboard tundaha sakwiɗi</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Uss nda sukagha da vila %1$s</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      FileProvider library needed to view help file: %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Fatal keyboard nda kuskure %1$s:%2$s anga %3$s gwaɗaha luwa. Kalt girgira keyboard.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">   Kuskure an keyboard %1$s:%2$s for %3$s gwaɗa luwa.</string>
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">Naghata anga gwaft dictionary da sangata</string>
+    <!-- Context: Model Updates -->
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Ɗow ka k sangat wuliwa nana dictionary na re?</string>
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">Ha dictionary k sangatawo</string>
+    <!-- Context: Model Updates -->
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">The resource catalog is unavailable</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">Catalog update started in background</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">      Ana catalog nana hma t sangata; Gamsa an tika pighata hiɗeka!</string>
+    <!-- Context: Background download messages-->
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">Nagha tinaha</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">Sangat keyboard fuɗata an Background</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">Key board unda klafal na fuɗa fuɗa sangata; Gamsa an tika pighata hiɗeka!</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">Keyboard kakiɗa sangata!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Sangat dictionary fuɗa fuɗa an Background</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">Dictionary unda klafal na fuɗa fuɗa sangata; gamsa an tika pighata hiɗeka!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Dictionary kakiɗa sangata.</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">Sanga buwo</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Kalavukala k thlighaft file unda sangalo</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Javabt wativa kusat server wo!</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_current" comment="Notification that all resources are up to date">"Sma inaha nganana ɗughwana!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">Tala ko kada inaha kol ɗughwana!</string>
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">Inaha ngana maga magal saʻa ɗughwanukini!</string>
+    <!-- Context: Model Info -->
+    <string name="model_version" comment="Title for a dictionary version">Dictionary version</string>
+    <!-- Context: Model Info -->
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">Fan bol t dictionary wo</string>
+    <!-- Context: Model Info -->
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Ɗow ka k masun tana dictionary na re?</string>
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s keyboard fan falo</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Magaghva virata magata</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Enable predictions</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_label">Dictionary</string>
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">A nighat dictionary unda hahaɗe</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_info_header" comment="Dictionary name">Dictionary: %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_picker_header" comment="Dictionaries for a specified language">%1$s dictionaries</string>
+    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">Dictionary fan falo</string>
+    <!-- Context: Language Settings menu strings -->
+    <plurals name="keyboard_count">
+        <item quantity="zero">(%1$d keyboards)</item>
+        <item quantity="one">(%1$d keyboard)</item>
+        <item quantity="other">(%1$d keyboards)</item>
+    </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">Default Locale</string>
+    <!-- Context: Content descriptions -->
+    <!-- Context: Content descriptions -->
+    <!-- Context: Popup menu labels -->
+    <string name="label_delete" comment="Confirmation to delete an item">Masata</string>
+    <!-- Context: Shared preferences name -->
+    <!-- Context: Other strings -->
+    <string name="help_bubble_text">Aff fa jiv ahdina ka mbiɗat keyboard</string>
+</resources>

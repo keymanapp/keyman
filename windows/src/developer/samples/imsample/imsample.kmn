@@ -1,9 +1,8 @@
-
-VERSION 5.0
-NAME "IMTest"
+﻿store(&VERSION) '6.0'
+store(&NAME) 'IMTest'
 
 store(DLLFunction) "imsample.dll:DF"
-               
+
 begin Unicode > use(main)
 
 group(main) using keys

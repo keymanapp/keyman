@@ -1,5 +1,75 @@
 # Keyman Version History
 
+## 15.0.181 alpha 2022-01-19
+
+* fix(linux): Add workaround for Python bug (#6124)
+* docs(linux): Add missing dependency (#6118)
+
+## 15.0.180 alpha 2022-01-18
+
+* feat(web): Caps Layer and double-tap gesture (#5989)
+* fix(web): Use regex to determine display layer and functional layers (#6100)
+
+## 15.0.179 alpha 2022-01-17
+
+* feat(web): Start of Sentence support - part 1 (#5963)
+* feat(developer): support for Caps Lock layer (#5988)
+* fix(web): call postKeystroke on banner touch (#6004)
+* chore(ios): project scripts should use /usr/bin/env bash (#6114)
+* chore: update docs (#6115)
+* chore(common): Check in crowdin strings for Kibaku (#6048)
+* fix(mac): externalize strings for package info window localization (#6088)
+* fix(developer): repatch #6074 (#6111)
+* fix(linux): Fix lintian errors (#6106)
+
+## 15.0.178 alpha 2022-01-14
+
+* chore(common): Check in crowdin strings for Waha (#6050)
+
+## 15.0.177 alpha 2022-01-13
+
+* chore(common): Check in crowdin strings for Marghi (#6049)
+
+## 15.0.176 alpha 2022-01-12
+
+* fix(windows): add x64 build fix invalid memory access (#6057)
+* feat(windows): method set context correctly truncates input buffer (#6080)
+* chore(common): Check in crowdin strings for Kanuri (#6047)
+* fix(linux): Update minimum sentry-sdk version (#6093)
+* docs: Enhance Linux build setup doc (#6094)
+
+## 15.0.175 alpha 2022-01-11
+
+* feat(linux): Don't create Sentry events for errors (#6070)
+* fix(linux): Fix attribute error (#6086)
+* fix(developer): bundle.sh must succeed (#6091)
+
+## 15.0.174 alpha 2022-01-10
+
+* chore(android/samples): Add -no-daemon flag to KMSample2 build script (#6082)
+* fix(linux): Fix installation of shared packages (#6015)
+
+## 15.0.173 alpha 2022-01-05
+
+* chore(common): Update crowdin strings for Amharic (#6040)
+* fix(linux): fix release version number for Sentry reporting (#6068)
+
+## 15.0.172 alpha 2021-12-23
+
+* fix(developer): work around devDependencies bug in npm (#6074)
+* chore(windows): nmake makefile cleanup (#6065)
+
+## 15.0.171 alpha 2021-12-17
+
+* feat(developer): remember test page preferences on reload (#6033)
+* feat(developer): tidy up package list in web test view (#6034)
+* feat(developer): live reload of web debugger (#6035)
+* feat(developer): cache web debug objects across sessions (#6036)
+* fix(developer): project_mru.xml path (#6061)
+* chore(developer): add browse4folder to components (#6062)
+* docs(windows): Add note on split user/admin accounts (#6059)
+* fix(mac): increase OSK character size by 50% (#6006)
+
 ## 15.0.170 alpha 2021-12-16
 
 * docs(linux): Document how to disable error reporting (#6051)

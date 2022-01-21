@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Waha</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
+  <string name="ssTitle">An fa t $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION fan falo jama.</string>
+  <string name="ssCancelQuery">Tabata tabatakana ɗow k masat tana ina fangal naka $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Extracting bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Checking packages...</string>
+  <string name="ssBootstrapCheckingForUpdates">Checking online for updates...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Checking installed versions...</string>
+  <string name="ssBootstrapReady">Kiɗata jefe...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Ha ina da fantal wo.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s sangata)</string>
+  <string name="ssActionInstall">Kaɓavatana da funta:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION na kewtaya nda ta guna</string>
+  <string name="ssLicenseLink">&amp;A jang t license</string>
+  <string name="ssInstallOptionsLink">Anfa &amp;options</string>
+  <string name="ssMessageBoxTitle">$APPNAME Setup</string>
+  <string name="ssOkButton">Toh</string>
+  <string name="ssInstallButton">&amp;Fanta</string>
+  <string name="ssCancelButton">Jata</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Fanta $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Kulunt nguzaka versions</string>
+  <string name="ssStatusComplete">Fanta sasima</string>
+  <string name="ssQueryRestart">Dole da virataka fuɗat Windows kajuma mak da kaɓavata k kiɗata.  Vita vaviraka fuɗat Windows, da kabavata k kiɗavasta.
+
+Restart now?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows ngana sakorna ha da virata fuɗatawo. Sai vaviraka fuɗat Windows kajuwa mak ka tikanta nda fuɗat $APPNAME.</string>
+  <string name="ssMustRestart">Doliyagha se fuɗa fuɗaka Windows k kiɗat Setup.  Vita vaviraka fuɗat Windows, Setup da kuɗuta.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION ɗowt Windows 7 ko tikima da fanta. Ko keghe, Keyman Desktop 7, 8 ko 9 javajalo. Ɗow ka fant keyboards kare har da mana mina fantana da minunda sa falo Keyman Desktop version?</string>
+  <string name="ssOldOsVersionDownload">Nana version na $APPNAME ɗowt Windows 7 ko tikima ka fanta. Ɗow ka k sangat Keyman Desktop 8 re?</string>
+  <string name="ssOptionsTitle">An fat Options</string>
+  <string name="ssOptionsTitleInstallOptions">Fant options</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Default $APPNAME settings</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modules ka fant ko mbakana ɗughwanuku</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Associated Keyboard Language</string>
+  <string name="ssOptionsTitleLocation">Version ka fanta</string>
+  <string name="ssOptionsStartWithWindows">A fuɗa $APPNAME vita fuɗa fuɗa Windows</string>
+  <string name="ssOptionsStartAfterInstall">A fuɗa $APPNAME vita kakiɗal fanta</string>
+  <string name="ssOptionsCheckForUpdates">Ka naghataka tinahagha ta wativa waya ko kompita sart sarti</string>
+  <string name="ssOptionsUpgradeKeyboards">Ana mbakat ɗughwanuk t keyboards fanglo nda nguzaka versions to version $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Share anonymous usage statistics with keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup version: %0:s</string>
+  <string name="ssOptionsInstallKeyman">An fat $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Ana mbaka ɗughwanuk t $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s na puta putal fanta.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Anga sat version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">An fat %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Anga sat version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Version %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Abkla t gwaɗa luwunda ɗowka da gwafta nda %0:s keyboard</string>
+  <string name="ssOptionsDefaultLanguage">Gwaɗa luwunda klafal k mog thlina ndeɗe an kompita</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Sangata %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Sangata %0:s</string>
+  <string name="ssOffline">$APPNAME Setup ha da gwaghva nda keyman.com k sangat mbata tinaha.
+
+Gamsa anigha na t lai ka, nda anvila $APPNAME Setupwativa javat Internet an minagha firewall settings.
+
+Aff fa jiv t Abort ka sapta an Setup, avira tikanta k tikanta nda sangat inaha guleng, ko avathla k kiɗata ɗobo t offline.</string>
+</resources>

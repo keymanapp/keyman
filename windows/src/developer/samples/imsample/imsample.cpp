@@ -304,7 +304,7 @@ void CalcScrollSize()
 	{
 		WCHAR buf[48];
 		if(!(*KMGetContext)(buf, 48)) buf[0] = 0;
-		int buflen=wcslen(buf);
+		int buflen = (int)wcslen(buf);
 
 		wz.cellcount = 0;
                 int i;
@@ -317,8 +317,8 @@ void CalcScrollSize()
 		}
 	}
 
-	wz.visiblecolcount = rect.right / curkbd->gridx;
-	wz.visiblerowcount = rect.bottom / curkbd->gridy;
+	wz.visiblecolcount = (curkbd->gridx != 0 ? rect.right / curkbd->gridx : rect.right);
+  wz.visiblerowcount = (curkbd->gridy != 0 ? rect.bottom / curkbd->gridy : rect.bottom);
 
 	wz.xi = (wz.cellcount-1) % wz.visiblecolcount;
 	wz.yi = (wz.cellcount-1) / wz.visiblecolcount;
@@ -463,10 +463,10 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 					
 					SIZE sz2;
 
-					GetTextExtentPoint32W(hDC, currule->outputs[i], wcslen(currule->outputs[i]), &sz2);
+					GetTextExtentPoint32W(hDC, currule->outputs[i], (int)wcslen(currule->outputs[i]), &sz2);
 					
 					TextOutW(hDC, x * cx + (cx-sz2.cx)/2, -vpos + (y+1) * cy - sz2.cy - 2, 
-						currule->outputs[i], wcslen(currule->outputs[i]));
+						currule->outputs[i], (int)wcslen(currule->outputs[i]));
 
 					if(++x >= wz.visiblecolcount) { x = 0; y++; }
 				}
@@ -512,8 +512,8 @@ BOOL FindRule(group *g, rule **rp, WCHAR KeyChar)
 	WCHAR buf[48];
 	if(!(*KMGetContext)(buf, 48)) return FALSE;
 	rule *r = g->rules;
-	int buflen = wcslen(buf);
-        int i;
+	int buflen = (int)wcslen(buf);
+  int i;
 	for(i = 0; i < g->nrules; i++)
 	{
 		if(r[i].key == KeyChar && buflen >= r[i].contextlen && !wcscmp(buf+(buflen-r[i].contextlen), r[i].context))
@@ -657,7 +657,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMConfigure(PSTR keyboardname
 void WriteRegSetting(PSTR text, int value)
 {
 	HKEY hkey;
-	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Tavultesoft\\Keyman\\5.0", 
+  if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample", 
 		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
 	{
 		RegSetValueEx(hkey, text, 0, REG_DWORD, (PBYTE) &value, 4);
@@ -668,7 +668,7 @@ void WriteRegSetting(PSTR text, int value)
 int ReadRegSetting(PSTR text)
 {
 	HKEY hkey;
-	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Tavultesoft\\Keyman\\5.0", 
+	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample", 
 		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
 	{
 		unsigned long value, sz = 4, tp = REG_DWORD;
@@ -738,9 +738,9 @@ PWSTR extstr(char *p)
 		if(!q) return newempty();
 		if(q == p) return newempty();
 		*q = 0;
-		int n = MultiByteToWideChar(CP_ACP, 0, p, strlen(p), NULL, 0);
+		int n = MultiByteToWideChar(CP_ACP, 0, p, (int)strlen(p), NULL, 0);
 		PWCHAR buf = new WCHAR[n+1];
-		MultiByteToWideChar(CP_ACP, 0, p, strlen(p), buf, n);
+		MultiByteToWideChar(CP_ACP, 0, p, (int)strlen(p), buf, n);
 		buf[n] = 0;
 		return buf;
 	}
@@ -791,7 +791,6 @@ PWSTR extstr(char *p)
 void UnloadRules(PSTR KeyboardName)
 {
 	int nkbi;
-
 	for(nkbi = 0; nkbi < nkeyboards; nkbi++)
 		if(!_stricmp(KeyboardName, keyboards[nkbi].name)) break;
 
@@ -801,7 +800,12 @@ void UnloadRules(PSTR KeyboardName)
 
 	if(kbi->hFont) DeleteObject(kbi->hFont);
 	kbi->hFont = NULL;
-        int i;
+
+  if (kbi->groups == NULL) {
+          return;
+  }
+
+  int i;
 	for(i = 0; i < kbi->ngroups; i++)
 	{
 		for(int j = 0; j < kbi->groups[i].nrules; j++)
@@ -940,7 +944,7 @@ BOOL LoadRules(PSTR KeyboardName)
 			rule *r2 = &kbi->groups[i].rules[kbi->groups[i].nrules++];
 
 			r2->context = extstr(pcontext);
-			r2->contextlen = wcslen(r2->context);
+			r2->contextlen = (int)wcslen(r2->context);
 			PWSTR pp = extstr(pkey);
 			r2->key = pp[0];
 			delete pp;
@@ -949,7 +953,7 @@ BOOL LoadRules(PSTR KeyboardName)
 			while(poutput && i < 10)
 			{
 				r2->outputs[i++] = extstr(poutput);
-				r2->outputlen += wcslen(r2->outputs[i-1]) + 2;
+				r2->outputlen += (int)wcslen(r2->outputs[i-1]) + 2;
 				poutput = strtokquoted(NULL, ", ", "\"\'");
 			}
 			if(i > kbi->maxoutputs) kbi->maxoutputs = i;
@@ -1001,6 +1005,8 @@ void CreateKeyboard(PSTR keyboardname)
 		keyboards = kb2;
 		strncpy_s(keyboards[nkeyboards].name, _countof(keyboards[nkeyboards].name), keyboardname, 127);  // I3481
 		keyboards[nkeyboards].name[127] = 0;
+    keyboards[nkeyboards].groups    = NULL;
+    keyboards[nkeyboards].hFont     = NULL;
 		nkeyboards++;
 	}
 }

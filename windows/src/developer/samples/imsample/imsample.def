@@ -1,4 +1,4 @@
-LIBRARY   IMSAMPLE
+LIBRARY
 
 EXPORTS
 	DF
@@ -7,3 +7,4 @@ EXPORTS
 	KeymanIMActivate
 	KeymanIMDeactivate
 	KeymanIMConfigure
+  KeymanIMReloadConfig

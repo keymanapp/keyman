@@ -243,4 +243,9 @@ BEGIN
     CERR_CasedKeysMustContainOnlyVirtualKeys           "The &CasedKeys system store must contain only virtual keys or characters found on a US English keyboard"
     CERR_CasedKeysMustNotIncludeShiftStates            "The &CasedKeys system store must not include shift states"
     CERR_CasedKeysNotSupportedWithMnemonicLayout       "The &CasedKeys system store is not supported with mnemonic layouts"
+    CERR_CannotUseReadWriteGroupFromReadonlyGroup      "Group used from a readonly group must also be readonly"
+    CERR_StatementNotPermittedInReadonlyGroup          "Statement is not permitted in output of readonly group"
+    CERR_OutputInReadonlyGroup                         "Output is not permitted in a readonly group"
+    CERR_NewContextGroupMustBeReadonly                 "Group used in begin newContext must be readonly"
+    CERR_PostKeystrokeGroupMustBeReadonly              "Group used in begin postKeystroke must be readonly"
 END

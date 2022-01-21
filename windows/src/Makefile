@@ -105,7 +105,7 @@ release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uia
     cd $(ROOT)\src
     $(MAKE) global-versions
     $(MAKE) build-release-wrapper
-# $(MAKE) clean  <-- this makes it harder to do OEM builds
+#   $(MAKE) clean  <-- this makes it harder to do OEM builds
     cd $(ROOT)\src
 
 clean-pathdefines: test-releasebuildcheck

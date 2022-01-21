@@ -709,9 +709,9 @@
 				981AFADC19EF44DE006706BF /* Embed App Extensions */,
 				37BC8FF91DE83B40006AEBFF /* Headers */,
 				C01AB5981F8343F7009B37D3 /* Embed Frameworks */,
-				CE7E13D8240E285800252C00 /* ShellScript */,
-				989E4DB91B1EB5C200A345FB /* Run Script */,
-				CE002CB32408B372002026CE /* ShellScript */,
+				CE7E13D8240E285800252C00 /* Run Script - set versions */,
+				989E4DB91B1EB5C200A345FB /* Run Script - update plists and lint */,
+				CE002CB32408B372002026CE /* Run Script - upload dsyms to sentry */,
 			);
 			buildRules = (
 			);
@@ -931,22 +931,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		989E4DB91B1EB5C200A345FB /* Run Script */ = {
+		989E4DB91B1EB5C200A345FB /* Run Script - update plists and lint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Run Script";
+			name = "Run Script - update plists and lint";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
+			shellPath = "/usr/bin/env bash";
 			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		CE002CB32408B372002026CE /* ShellScript */ = {
+		CE002CB32408B372002026CE /* Run Script - upload dsyms to sentry */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -956,12 +956,13 @@
 			inputPaths = (
 				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
 			);
+			name = "Run Script - upload dsyms to sentry";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
+			shellPath = "/usr/bin/env bash";
 			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  phaseSentryDsymUpload \"keyman-ios\"\nfi\n";
 		};
 		CE06AA671F161422006D91C3 /* Run Script */ = {
@@ -978,7 +979,7 @@
 			shellPath = /bin/sh;
 			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
-		CE7E13D8240E285800252C00 /* ShellScript */ = {
+		CE7E13D8240E285800252C00 /* Run Script - set versions */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -987,12 +988,13 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script - set versions";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
+			shellPath = "/usr/bin/env bash";
 			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\n# true:  applies VERSION_WITH_TAG to custom KeymanVersionWithTag plist member used for in-app display\nphaseSetBundleVersions true\n\n# Also updates the version string for Settings\nsetSettingsBundleVersion\n";
 			showEnvVarsInLog = 0;
 		};

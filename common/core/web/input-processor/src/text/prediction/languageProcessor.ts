@@ -24,7 +24,7 @@ namespace com.keyman.text.prediction {
     path: string;
 
     /**
-     * The raw JS script defining the model.  Only used if `path` is not specified.  
+     * The raw JS script defining the model.  Only used if `path` is not specified.
      */
     code: string;
   }
@@ -123,10 +123,10 @@ namespace com.keyman.text.prediction {
         lp.emit('statechange', 'active');
       }
 
-      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) { 
+      return this.lmEngine.loadModel(source, specType).then(function(config: Configuration) {
         lp.configuration = config;
         lp.emit('statechange', 'configured');
-      }).catch(function(error) { 
+      }).catch(function(error) {
         // Does this provide enough logging information?
         let message: string;
         if(error instanceof Error) {
@@ -185,7 +185,7 @@ namespace com.keyman.text.prediction {
       if(!this.currentModel || !this.configuration) {
         return null;
       }
-            
+
       // We've already invalidated any suggestions resulting from any previously-existing Promise -
       // may as well officially invalidate them via event.
       this.emit("invalidatesuggestions", 'new');
@@ -197,7 +197,7 @@ namespace com.keyman.text.prediction {
       if(!outputTarget) {
         throw "Accepting suggestions requires a destination OutputTarget instance."
       }
-      
+
       // Find the state of the context at the time the suggestion was generated.
       // This may refer to the context before an input keystroke or before application
       // of a predictive suggestion.
@@ -217,6 +217,10 @@ namespace com.keyman.text.prediction {
         // values as needed for use with their IME interfaces.
         let transform = final.buildTransformFrom(outputTarget);
         outputTarget.apply(transform);
+
+        // Tell the banner that a suggestion was applied, so it can call the
+        // keyboard's PostKeystroke entry point as needed
+        this.emit('suggestionapplied', outputTarget);
 
         // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
         // replacing the suggestion transform with the original input text.
@@ -259,7 +263,7 @@ namespace com.keyman.text.prediction {
       if(!outputTarget) {
         throw "Accepting suggestions requires a destination OutputTarget instance."
       }
-      
+
       // Find the state of the context at the time the suggestion was generated.
       // This may refer to the context before an input keystroke or before application
       // of a predictive suggestion.
@@ -271,7 +275,7 @@ namespace com.keyman.text.prediction {
         console.warn("Could not apply the Suggestion!");
         return;
       }
-      
+
       // Apply the Reversion!
 
       // Step 1:  determine the final output text
@@ -355,7 +359,7 @@ namespace com.keyman.text.prediction {
     }
 
     /**
-     * Retrieves the context and output state of KMW immediately before the prediction with 
+     * Retrieves the context and output state of KMW immediately before the prediction with
      * token `id` was generated.  Must correspond to a 'recent' one, as only so many are stored
      * in `ModelManager`'s history buffer.
      * @param id A unique identifier corresponding to a recent `Transcription`.

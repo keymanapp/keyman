@@ -1,18 +1,18 @@
 (*
   Name:             kmxfileconsts
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Mar 2008
 
   Modified Date:    27 Aug 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Mar 2008 - mcdurdin - Initial version (Refactored)
                     25 May 2009 - mcdurdin - Use names for functions rather than codes in KMW compiler error messages
                     17 Aug 2012 - mcdurdin - I3429 - V9.0 - Add support for if, set, reset, save to KeymanWeb compiler
@@ -200,6 +200,18 @@ const
   TSS_KMW_EMBEDCSS = 37;   // I4368
   TSS_TARGETS = 38;   // I4504
 
+  { V14.0 }
+
+  TSS_CASEDKEYS = 39;
+
+  { V15.0 }
+
+  TSS_BEGIN_NEWCONTEXT = 40;
+  TSS_BEGIN_POSTKEYSTROKE = 41;
+  TSS_LAYERCHANGED = 42;
+
+  TSS__MAX = 42;
+
 type
   TSystemStore = (ssNone = 0, ssBitmap = 1, ssCopyright = 2, ssHotkey = 3, ssLanguage = 4, ssLayout = 5, ssMessage = 6,
     ssName = 7, ssVersion = 8, ssCapsOnOnly = 9, ssCapsAlwaysOff = 10, ssShiftFreesCaps = 11, ssLanguageName = 12,
@@ -210,7 +222,9 @@ type
     ssWindowsLanguages = 29,
     ssComparison = 30,
     ssPlatform = 31, ssBaseLayout = 32, ssLayer = 33, ssVKDictionary = 34, ssLayoutFile = 35,  // I3438 // I3483
-    ssKeyboardVersion = 36, ssKMW_EmbedCSS = 37, ssTargets = 38);   // I4140   // I4368   // I4504
+    ssKeyboardVersion = 36, ssKMW_EmbedCSS = 37, ssTargets = 38,
+    ssCasedKeys = 39,
+    ssBegin_NewContext = 40, ssBegin_PostKeystroke = 41, ssLayerChanged = 42);   // I4140   // I4368   // I4504
 
 const
   SystemStoreNames: array[TSystemStore] of WideString = (
@@ -223,7 +237,9 @@ const
     'WINDOWSLANGUAGES',
     '', //8.0
     '', '', '', '', 'LAYOUTFILE', 'KEYBOARDVERSION', 'KMW_EMBEDCSS',
-    'TARGETS'); //9.0  // I3483   // I4140   // I4368   // I4504
+    'TARGETS', //9.0  // I3483   // I4140   // I4368   // I4504
+    'CASEDKEYS', //14.0,
+    '', '', 'LAYERCHANGED'); //15.0
 
 implementation
 

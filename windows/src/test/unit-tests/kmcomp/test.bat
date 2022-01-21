@@ -52,25 +52,33 @@ call :should-pass "#2241: &CasedKeys (chars)" test_casedkeys_chars.kmn || goto :
 
 call :should-fail "#2241: &CasedKeys (mnemonic 1)" test_casedkeys_mnemonic_1.kmn || goto :eof
 call :should-fail "#2241: &CasedKeys (mnemonic 2)" test_casedkeys_mnemonic_2.kmn || goto :eof
-call :should-pass "#2241: &CasedKeys (mnemonic 3)" test_casedkeys_mnemonic_3.kmn || goto :eof
+call :should-fail "#2241: &CasedKeys (mnemonic 3)" test_casedkeys_mnemonic_3.kmn || goto :eof
 call :should-fail "#2241: &CasedKeys (invalid chars 1)" test_casedkeys_invalid_1.kmn || goto :eof
 call :should-fail "#2241: &CasedKeys (invalid chars 2)" test_casedkeys_invalid_2.kmn || goto :eof
 
+call :should-pass "#5963 start-of-sentence" test_5963_start_of_sentence.kmn || goto :eof
+call :should-fail "#5963 begin newcontext (missing group)" test_5963_newcontext_1.kmn || goto :eof
+call :should-fail "#5963 begin newcontext (not readonly)" test_5963_newcontext_2.kmn || goto :eof
+call :should-fail "#5963 begin postkeystroke (missing group)" test_5963_postkeystroke_1.kmn || goto :eof
+call :should-fail "#5963 begin postkeystroke (not readonly) " test_5963_postkeystroke_2.kmn || goto :eof
+call :should-fail "#5963 context not first token in readonly group output" test_5963_readonlygroup_misplacedcontext.kmn || goto :eof
+call :should-fail "#5963 emitting chars in readonly group" test_5963_readonlygroup_output.kmn || goto :eof
+call :should-fail "#5963 using non-readonly group in readonly group" test_5963_readonlygroup_usenonreadonly.kmn || goto :eof
 goto :eof
 
 :should-pass
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -s -w tests.kpj -t "%2"
+"%compiler%" -no-color -s -w tests.kpj -t "%2"
 if %ERRORLEVEL% EQU 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0
 )
 echo %RED%FAILED: expected %2 to be valid.%WHITE% 1>&2
-goto :eof
+exit /b 1
 
 :should-fail
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -s -w tests.kpj -t "%2"
+"%compiler%" -no-color -s -w tests.kpj -t "%2"
 if %ERRORLEVEL% GTR 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0

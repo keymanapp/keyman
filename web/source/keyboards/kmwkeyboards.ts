@@ -765,6 +765,10 @@ namespace com.keyman.keyboards {
             if(osk) {
               osk._Load();
             }
+
+            if(manager.keymanweb.domManager.lastActiveElement != null) {
+              core.processNewContextEvent(dom.Utils.getOutputTarget(manager.keymanweb.domManager.lastActiveElement));
+            }
           }
 
           // Remove the wait message, if defined

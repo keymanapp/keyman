@@ -79,6 +79,7 @@ type
     dpNoMatch: PWideChar;              // from start of group structure
     cxKeyArray: DWORD;             // in array items
     fUsingKeys: BOOL;              // group(xx) [using keys] <-- specified or not
+    fReadOnly: BOOL;
 	end;
 
   PFILE_GROUP = ^FILE_GROUP;
@@ -145,6 +146,15 @@ const
   CERR_WARNING = $00002000;
   CERR_MEMORY  = $00001000;
   CWARN_Info =   $0000208A;
+
+const
+  // kcframe --sizeof returns these values
+  FILE_KEYBOARD_SIZE = 2952;
+  FILE_GROUP_SIZE = 184;
+  FILE_STORE_SIZE = 192;
+  FILE_KEY_SIZE = 20;
+  FILE_DEADKEY_SIZE = 160;
+
 
 function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer; cdecl;   // I4865   // I4866
 function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;   // I4865   // I4866
@@ -285,6 +295,11 @@ initialization
   // We want to early load the compiler because we need it loaded for
   // sentry symbolication: https://github.com/getsentry/sentry-native/issues/213
   LoadCompiler;
+  Assert(sizeof(FILE_KEYBOARD) = FILE_KEYBOARD_SIZE);
+  Assert(sizeof(FILE_GROUP) = FILE_GROUP_SIZE);
+  Assert(sizeof(FILE_STORE) = FILE_STORE_SIZE);
+  Assert(sizeof(FILE_KEY) = FILE_KEY_SIZE);
+  Assert(sizeof(FILE_DEADKEY) = FILE_DEADKEY_SIZE);
 
 finalization
   if HKMCmpDll > 0 then

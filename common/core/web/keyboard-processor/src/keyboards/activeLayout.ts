@@ -158,13 +158,12 @@ namespace com.keyman.keyboards {
 
       // Start:  mirrors _GetKeyEventProperties
 
-      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      let keyShiftState = text.KeyboardProcessor.getModifierState(layer);
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: text.KeyEvent = {
-        Lmodifiers: keyShiftState,
-        Lstates: 0,
+        // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
+        Lmodifiers: text.KeyboardProcessor.getModifierState(layer),
+        Lstates: text.KeyboardProcessor.getStateFromLayer(layer),
         Lcode: keyName ? text.Codes.keyCodes[keyName] : 0,
         LisVirtualKey: true,
         vkCode: 0,

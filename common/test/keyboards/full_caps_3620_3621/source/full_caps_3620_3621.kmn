@@ -1,0 +1,56 @@
+﻿c full_caps_3620_3621 generated from template at 2021-12-01 08:45:15
+c with name "full_caps_3620_3621"
+store(&VERSION) '10.0'
+store(&NAME) 'full_caps_3620_3621'
+store(&COPYRIGHT) '©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'full_caps_3620_3621.kvks'
+store(&LAYOUTFILE) 'full_caps_3620_3621.keyman-touch-layout'
+
+begin Unicode > use(main)
+begin NewContext > use(NewContext)
+begin PostKeystroke > use(PostKeystroke)
+
+store(key) [K_A] .. [K_Z] [SHIFT K_A] .. [SHIFT K_Z]
+store(out) 'a' .. 'z'     'A' .. 'Z'
+store(&CasedKeys) [K_A] .. [K_Z]
+store(caps) 'A'..'Z'
+store(digit) '0'..'9'
+
+group(NewContext) readonly
+    c Any time we get a new context, by mouse click, tap,
+    c cursor movement, new document, etc, we'll try and
+    c determine the best layer to use
+    nomatch > use(nextLayer)
+
+group(PostKeystroke) readonly
+    c this is a heuristic: if we find two+ characters in capitals, leave
+    c us in shift layer, assuming the user hasn't just switched layer
+    c themselves. Not sure if this is a good idea!
+    c if(&layerChanged = "0") if(&layer = 'shift') any(caps) any(caps) > layer('caps') c ??? is this a good idea?
+
+    c stay on the numeric layer if we are there already
+    if(&layerChanged = "0") if(&layer = 'numeric') any(digit) > context
+
+    c don't cancel caps lock layer
+    if(&layer = 'caps') > context
+
+    c no other changes, so detect sentence or layer change, as long
+    c as the user hasn't attempted to change layer themselves
+    if(&layerChanged = "0") > use(nextLayer)
+
+group(nextLayer) readonly
+    store(sentencePunctuation) '.?!'
+    nul > layer('shift')
+    c note that 'readonly' layers do not need to use 'context' unless there is
+    c no other content on output of rule (empty output is illegal)
+    any(sentencePunctuation) ' ' > layer('shift')
+    any(sentencePunctuation) '  ' > layer('shift')
+    nomatch > layer('default')
+
+group(main) using keys
+
+    + any(key) > index(out, 1)
+
+
