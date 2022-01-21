@@ -185,7 +185,7 @@ if (( production )) ; then
   mkdir build/
   cp -R dist/ package.json package-lock.json build/
   cd build/
-  npm install --production
+  npm install --omit=dev --omit=optional
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   rm -f node_modules/ngrok/bin/ngrok.exe
   cd ..
