@@ -50,9 +50,9 @@ pull-server:
     cd $(ROOT)\..\developer\server
 
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh --production
+    $(GIT_BASH_FOR_KEYMAN) build.sh --production --test
 !else
-    start /wait ./build.sh --production
+    start /wait ./build.sh --production --test
 !endif
 
 build:
