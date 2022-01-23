@@ -1,18 +1,18 @@
 (*
   Name:             kmxfile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    4 Nov 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Fix packing of TKeyboardFileKey
                     23 Aug 2006 - mcdurdin - Add TSS_VISUALKEYBOARD, TSS_KMW_RTL, TSS_KMWHELPFILE, TSS_KMW_HELPTEXT, TSS_KMWEMBEDJS
                     23 Aug 2006 - mcdurdin - Add TSS_MNEMONIC, TSS_INCLUDECODES, TSS_OLDCHARPOSMATCHING, TSS_KEYMANCOPYRIGHT
@@ -82,6 +82,7 @@ type
     ISO6393Languages: WideString;
     KeyboardVersion: WideString;   // I4136
     Targets: WideString;
+    function FileVersionAsString: string;
   end;
 
   PKeyboardInfo = ^TKeyboardInfo;
@@ -297,7 +298,7 @@ begin
 
       if (ki.KeyboardID <> 0) and (Pos('x'+IntToHex(ki.KeyboardID, 4), string(ki.WindowsLanguages)) = 0) then
         ki.WindowsLanguages := Trim('x'+IntToHex(ki.KeyboardID, 4) + ' ' + ki.WindowsLanguages);
-      
+
       ki.Icon := nil;
       ki.Bitmap := nil;
       if FReturnBitmap then
@@ -467,6 +468,13 @@ begin
       AddLanguage(FLanguageID);
     end;
   end;
+end;
+
+{ TKeyboardInfo }
+
+function TKeyboardInfo.FileVersionAsString: string;
+begin
+  Result := Format('%d.%d', [(FileVersion and VERSION_MASK_MAJOR) shr 8, FileVersion and VERSION_MASK_MINOR]);
 end;
 
 end.

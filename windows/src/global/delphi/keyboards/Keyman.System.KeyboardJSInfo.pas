@@ -13,6 +13,7 @@ type
     FName: string;
     FMnemonic: Boolean;
     FRTL: Boolean;
+    FMinKeymanVersion: string;
 
     procedure Parse(data: string);
   public
@@ -22,6 +23,7 @@ type
     property Name: string read FName;
     property Version: string read FVersion;
     property RTL: Boolean read FRTL;
+    property MinKeymanVersion: string read FMinKeymanVersion;
     property Mnemonic: Boolean read FMnemonic;
   end;
 
@@ -29,7 +31,8 @@ implementation
 
 uses
   System.RegularExpressions,
-  Keyman.System.RegExGroupHelperRSP19902;
+  Keyman.System.RegExGroupHelperRSP19902,
+  KeymanVersion;
 
 { TKeyboardJSInfo }
 
@@ -88,6 +91,12 @@ begin
   if m.Success
     then FVersion := TGroupHelperRSP19902.Create(m.Groups[2], data).FixedValue
     else FVersion := '';
+
+  // Extract keyboard version - see also MergeKeyboardInfo.pas
+  m := TRegEx.Match(data, 'this.KMINVER\s*=\s*([''"])(.*?)\1');
+  if m.Success
+    then FMinKeymanVersion := TGroupHelperRSP19902.Create(m.Groups[2], data).FixedValue
+    else FMinKeymanVersion := SKeymanVersion70;
 
   // Extract RTL status
   m := TRegEx.Match(data, 'this.KRTL\s*=\s*(.*?)\s*;');

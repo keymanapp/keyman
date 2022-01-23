@@ -28,7 +28,7 @@ type
     function IsModelFileByName(f: TPackageContentFile): Boolean;
   public
     type TPackageKeyboardInfo = record
-      Name, ID, Version: string;
+      Name, ID, Version, MinKeymanVersion: string;
       RTL: Boolean;
     end;
 
@@ -123,6 +123,7 @@ begin
         k.Name := pki.Name;
         k.ID := pki.ID;
         k.Version := pki.Version;
+        k.MinKeymanVersion := pki.MinKeymanVersion;
         if IsKeyboardFileByName(pack.Files[i]) = ftJavascript then
           // RTL flag is currently only relevant for KMW so although the
           // information can be read from .kmx we only copy it over for
@@ -333,6 +334,7 @@ begin
       GetKeyboardInfo(f.FileName, False, ki, False);
       pki.Name := ki.KeyboardName;
       pki.Version := ki.KeyboardVersion;
+      pki.MinKeymanVersion := ki.FileVersionAsString;
       pki.RTL := ki.KMW_RTL;
     except
       on E:EKMXError do Result := False;
@@ -347,6 +349,7 @@ begin
         pki.Name := Name;
         pki.Version := Version;
         pki.RTL := RTL;
+        pki.MinKeymanVersion := MinKeymanVersion;
       finally
         Free;
       end;

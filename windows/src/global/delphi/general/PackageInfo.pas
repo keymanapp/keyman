@@ -1,18 +1,18 @@
 (*
   Name:             PackageInfo
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Rework to load/save to/from XML
                     02 Aug 2006 - mcdurdin - Don't load from XML if file is 0 bytes or does not exist
                     23 Aug 2006 - mcdurdin - Add SaveXMLToText and LoadXMLFromText functions
@@ -292,6 +292,7 @@ type
     FDisplayFont: TPackageContentFile;
     FLanguages: TPackageKeyboardLanguageList;
     FVersion: string;
+    FMinKeymanVersion: string;
     procedure SetDisplayFont(const Value: TPackageContentFile);
     procedure SetOSKFont(const Value: TPackageContentFile);
     procedure DisplayFontRemoved(Sender: TObject;
@@ -305,6 +306,7 @@ type
     property Name: string read FName write FName;
     property ID: string read FID write FID;
     property RTL: Boolean read FRTL write FRTL;
+    property MinKeymanVersion: string read FMinKeymanVersion write FMinKeymanVersion;
     property Version: string read FVersion write FVersion;
     property Languages: TPackageKeyboardLanguageList read FLanguages;
     property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
@@ -368,6 +370,7 @@ type
     FFileName: WideString;
     FWasIni: Boolean;
     FLoadLegacy: Boolean;
+    procedure FixupFileVersion;
   protected
     procedure Import(AIni: TIniFile); virtual; abstract;
     function XMLRootNode: WideString; virtual;
@@ -439,6 +442,7 @@ const
   SXML_PackageKeyboard = 'Keyboard';
   SXML_PackageKeyboard_Name = 'Name';
   SXML_PackageKeyboard_ID = 'ID';
+  SXML_PackageKeyboard_MinKeymanVersion = 'MinKeymanVersion';
   SXML_PackageKeyboard_Version = 'Version';
   SXML_PackageKeyboard_RTL = 'RTL';
   SXML_PackageKeyboard_OSKFont = 'OSKFont';
@@ -506,6 +510,7 @@ const
   SJSON_Keyboard_Name = 'name';
   SJSON_Keyboard_ID = 'id';
   SJSON_Keyboard_RTL = 'rtl';
+  SJSON_Keyboard_MinKeymanVersion = 'MinKeymanVersion';
   SJSON_Keyboard_Version = 'version';
   SJSON_Keyboard_OSKFont = 'oskFont';
   SJSON_Keyboard_DisplayFont = 'displayFont';
@@ -1597,8 +1602,8 @@ var
   FVersion: WideString;
 begin
   FVersion := XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
-  if (FVersion <> SKeymanVersion70) and (FVersion <> SKeymanVersion120) then
-    PackageLoadError('Package file version '+FVersion+' is not recognised.');
+  if CompareVersions(SKeymanVersion, FVersion) > 0 then
+    PackageLoadError('Package file version '+FVersion+' can only be loaded by a newer version of this software.');
 
   StartMenu.LoadXML(ARoot);
   Info.LoadXML(ARoot);
@@ -1611,6 +1616,7 @@ end;
 
 procedure TPackage.DoSaveIni(ini: TIniFile);
 begin
+  FixupFileVersion;
   Options.SaveIni(ini);
   StartMenu.SaveIni(ini);
   Info.SaveIni(ini);
@@ -1619,34 +1625,37 @@ begin
   // Lexical models not supported in ini
 end;
 
+procedure TPackage.FixupFileVersion;
+begin
+  // Note: see also CompilePackage, MergeKeyboardInfo
+  if LexicalModels.Count > 0 then
+    Options.FileVersion := SKeymanVersion120
+  else if Options.FileVersion = '' then
+    Options.FileVersion := SKeymanVersion70;
+end;
+
 procedure TPackage.DoSaveJSON(ARoot: TJSONObject);
 begin
-  if LexicalModels.Count > 0
-    then Options.FileVersion := SKeymanVersion120
-    else Options.FileVersion := SKeymanVersion70;
-
+  FixupFileVersion;
   Options.SaveJSON(ARoot);
   StartMenu.SaveJSON(ARoot);
   Info.SaveJSON(ARoot);
   Files.SaveJSON(ARoot);
   Keyboards.SaveJSON(ARoot);
-  if Options.FileVersion = SKeymanVersion120 then
+  if LexicalModels.Count > 0 then
     LexicalModels.SaveJSON(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
 begin
-  if LexicalModels.Count > 0
-    then Options.FileVersion := SKeymanVersion120
-    else Options.FileVersion := SKeymanVersion70;
-
+  FixupFileVersion;
   ARoot.ChildNodes['System'].ChildNodes['KeymanDeveloperVersion'].NodeValue := GetVersionString;
   Options.SaveXML(ARoot);
   StartMenu.SaveXML(ARoot);
   Info.SaveXML(ARoot);
   Files.SaveXML(ARoot);
   Keyboards.SaveXML(ARoot);
-  if Options.FileVersion = SKeymanVersion120 then
+  if LexicalModels.Count > 0 then
     LexicalModels.SaveXML(ARoot);
 end;
 
@@ -1814,6 +1823,7 @@ begin
   FName := Source.Name;
   FID := Source.ID;
   FVersion := Source.Version;
+  FMinKeymanVersion := Source.FMinKeymanVersion;
   FRTL := Source.RTL;
   if Assigned(Source.OSKFont)
     then FOSKFont := Package.Files.FromFileNameEx(Source.OSKFont.FileName)
@@ -1929,6 +1939,7 @@ begin
       keyboard := TPackageKeyboard.Create(Package);
       keyboard.Name := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Name, '');
       keyboard.ID := AIni.ReadString(FSectionName, SXML_PackageKeyboard_ID, '');
+      keyboard.MinKeymanVersion := AIni.ReadString(FSectionName, SXML_PackageKeyboard_MinKeymanVersion, SKeymanVersion70);
       keyboard.Version := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Version, '1.0');
       keyboard.RTL := AIni.ReadBool(FSectionName, SXML_PackageKeyboard_RTL, False);
       keyboard.OSKFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SXML_PackageKeyboard_OSKFont, ''));
@@ -1972,6 +1983,7 @@ begin
     keyboard := TPackageKeyboard.Create(Package);
     keyboard.Name := GetJsonValueString(AKeyboard, SJSON_Keyboard_Name);
     keyboard.ID := GetJsonValueString(AKeyboard,SJSON_Keyboard_ID);
+    keyboard.MinKeymanVersion := GetJsonValueString(AKeyboard,SJSON_Keyboard_MinKeymanVersion);
     keyboard.Version := GetJsonValueString(AKeyboard, SJSON_Keyboard_Version);
     keyboard.RTL := GetJsonValueBool(AKeyboard, SJSON_Keyboard_RTL);
     keyboard.OSKFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_OSKFont));
@@ -1997,6 +2009,7 @@ begin
     keyboard := TPackageKeyboard.Create(Package);
     keyboard.Name := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Name]);
     keyboard.ID := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_ID]);
+    keyboard.MinKeymanVersion := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_MinKeymanVersion]);
     keyboard.Version := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Version]);
     keyboard.RTL := ANode.ChildNodes.IndexOf(SXML_PackageKeyboard_RTL) >= 0;
     keyboard.OSKFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont]));
@@ -2017,6 +2030,7 @@ begin
     FSectionName := 'Keyboard'+IntToStr(i);
     AIni.WriteString(FSectionName, SXML_PackageKeyboard_Name, Items[i].Name);
     AIni.WriteString(FSectionName, SXML_PackageKeyboard_ID, Items[i].ID);
+    AIni.WriteString(FSectionName, SXML_PackageKeyboard_MinKeymanVersion, Items[i].MinKeymanVersion);
     AIni.WriteString(FSectionName, SXML_PackageKeyboard_Version, Items[i].Version);
     if Items[i].RTL then AIni.WriteBool(FSectionName, SXML_PackageKeyboard_RTL, True);
     if Assigned(Items[i].OSKFont) then
@@ -2050,6 +2064,7 @@ begin
 
     AKeyboard.AddPair(SJSON_Keyboard_Name, Items[i].Name);
     AKeyboard.AddPair(SJSON_Keyboard_ID, Items[i].ID);
+    AKeyboard.AddPair(SJSON_Keyboard_MinKeymanVersion, Items[i].MinKeymanVersion);
     AKeyboard.AddPair(SJSON_Keyboard_Version, Items[i].Version);
     if Items[i].RTL then AKeyboard.AddPair(SJSON_Keyboard_RTL, TJSONTrue.Create);
     if Assigned(Items[i].OSKFont) then
@@ -2073,6 +2088,7 @@ begin
 
     AKeyboard.ChildNodes[SXML_PackageKeyboard_Name].NodeValue := Items[i].Name;
     AKeyboard.ChildNodes[SXML_PackageKeyboard_ID].NodeValue := Items[i].ID;
+    AKeyboard.ChildNodes[SXML_PackageKeyboard_MinKeymanVersion].NodeValue := Items[i].MinKeymanVersion;
     AKeyboard.ChildNodes[SXML_PackageKeyboard_Version].NodeValue := Items[i].Version;
     if Items[i].RTL then
       AKeyboard.ChildNodes[SXML_PackageKeyboard_RTL].NodeValue := True;
