@@ -51,9 +51,6 @@
     <Condition Message="Keyman Developer requires Windows 7 or later"><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
 
     <Directory Id='TARGETDIR' Name='SourceDir' DiskId='1'>
-
-      <Merge Id="keymanengine" Language='1033' SourceFile='..\..\engine\inst\keymanengine.msm' DiskId='1' />
-
       <Directory Id="ProgramFilesFolder" Name="PFiles">
         <Directory Id="KeymanRoot" Name="Keyman">
           <Directory Id="KEYMANDEV" Name="Keyman Developer">
