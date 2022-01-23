@@ -373,8 +373,6 @@
       <ComponentGroupRef Id="ModelCompiler" />
       <ComponentGroupRef Id="Node" />
       <ComponentGroupRef Id="KeymanDevSentryComponents" />
-
-      <MergeRef Id='keymanengine' />
     </Feature>
 
     <Feature Id="featSamples" Title="Sample Files" Description="Example keyboards, packages and products"
