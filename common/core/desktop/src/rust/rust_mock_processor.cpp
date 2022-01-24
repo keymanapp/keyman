@@ -76,7 +76,8 @@ namespace km {
     )
     {
       assert(state);
-      if (!state)
+            assert(action_item);
+      if ((!state) || (!action_item))
         return false;
       // TODO Implement
       return false;
