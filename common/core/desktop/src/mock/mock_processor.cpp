@@ -114,9 +114,15 @@ namespace km {
       return KM_KBP_STATUS_OK;
     }
 
-    bool mock_processor::queue_action(km_kbp_action_item const* action_item) {
+    bool mock_processor::queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    )
+    {
+      assert(state);
       assert(action_item);
-      // TODO Implement
+      if ((!state) || (!action_item))
+        return false;
       return false;
     }
 

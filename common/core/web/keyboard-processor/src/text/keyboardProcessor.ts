@@ -91,6 +91,10 @@ namespace com.keyman.text {
       return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYER] as MutableSystemStore;
     }
 
+    public get layerChangedStore(): MutableSystemStore {
+      return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYERCHANGED] as MutableSystemStore;
+    }
+
     public get layerId(): string {
       return this.layerStore.value;
     }
@@ -205,6 +209,24 @@ namespace com.keyman.text {
         Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
         Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
       }
+    }
+
+    constructNullKeyEvent(device: utils.DeviceSpec): KeyEvent {
+      const keyEvent = KeyEvent.constructNullKeyEvent(device);
+      this.setSyntheticEventDefaults(keyEvent);
+      return keyEvent;
+    }
+
+    processNewContextEvent(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+      return this.activeKeyboard ?
+        this.keyboardInterface.processNewContextEvent(outputTarget, this.constructNullKeyEvent(device)) :
+        null;
+    }
+
+    processPostKeystroke(device: utils.DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+      return this.activeKeyboard ?
+        this.keyboardInterface.processPostKeystroke(outputTarget, this.constructNullKeyEvent(device)) :
+        null;
     }
 
     processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
@@ -337,6 +359,22 @@ namespace com.keyman.text {
       }
       if(layerId.indexOf('alt')  >= 0 && !altMatched) {
         modifier |= Codes.modifierCodes['ALT'];
+      }
+
+      return modifier;
+    }
+
+    /**
+     * Get state key state from layer id
+     *
+     * @param       {string}      layerId       layer id (e.g. caps)
+     * @return      {number}                    modifier key state (desktop keyboards)
+     */
+     static getStateFromLayer(layerId: string): number {
+      var modifier=0;
+
+      if(layerId.indexOf('caps') >= 0) {
+        modifier |= Codes.modifierCodes['CAPS'];
       }
 
       return modifier;

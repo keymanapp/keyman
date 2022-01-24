@@ -392,6 +392,7 @@ namespace com.keyman.dom {
 
           this.keyman.util.attachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
           this.keyman.util.attachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
+          this.keyman.util.attachDOMEvent(baseElement,'click', this.getHandlers(Pelem)._Click);
 
           // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
           Pelem.onkeypress = this.getHandlers(Pelem)._KeyPress;
@@ -434,6 +435,7 @@ namespace com.keyman.dom {
         if(!isAlias) { // See note about the alias below.
           this.keyman.util.detachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
           this.keyman.util.detachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
+          this.keyman.util.detachDOMEvent(baseElement,'click', this.getHandlers(Pelem)._Click);
         }
         // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
         Pelem.onkeypress = null;
@@ -1352,6 +1354,10 @@ namespace com.keyman.dom {
           this.focusLastActiveElement();
         }
       }
+
+      // Let the keyboard do its initial group processing
+      //console.log('processNewContextEvent [not] called from setActiveElement');
+      com.keyman.singleton.core.processNewContextEvent(dom.Utils.getOutputTarget(e));
     }
 
     /** Sets the active input element only if it is presently null.

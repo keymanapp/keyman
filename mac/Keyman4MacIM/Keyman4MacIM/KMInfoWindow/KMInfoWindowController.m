@@ -29,8 +29,7 @@
 
 - (void)windowDidLoad {
     [super windowDidLoad];
-    // TODO: rename
-    [self.window setTitle:@"Keyboard/Package Info"];
+  
     [self.tabView setDelegate:self];
     [self.detailsView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
     [self.detailsView setPolicyDelegate:(id<WebPolicyDelegate>)self];
@@ -82,7 +81,11 @@
     return YES;
 }
 
+// TODO: refactor: any reason for this to be HTML? hard to read stringWithFormat applied to template with 16 arguments
 - (NSString *)detailsHtml {
+  
+  NSString *errorString = NSLocalizedString(@"message-keyboard-file-unreadable", nil);
+
     @try {
         NSString *htmlFormat =
         @"<html>"
@@ -110,16 +113,16 @@
           "<div id='qrcode-caption'>Scan this code to load this keyboard on another device or "
           "<a href='%@'>share online</a></div>"
         "</div>"
-        "<p class='title'>Keyboard Layouts:</p><br>"
+        "<p class='title'>%@</p><br>"
         "%@"
         "<br>"
-        "<p class='title'>Fonts:</p><br>"
+        "<p class='title'>%@</p><br>"
         "%@"
         "<br>"
-        "<p class='title'>Package version: </p><p class='body'>%@</p><br>"
-        "<p class='title'>Author: </p><p class='body'>%@</p><br>"
-        "<p class='title'>Website: </p><p class='body'>%@</p><br>"
-        "<p class='title'>Copyright: </p><p class='body'>%@</p>"
+        "<p class='title'>%@ </p><p class='body'>%@</p><br>"
+        "<p class='title'>%@ </p><p class='body'>%@</p><br>"
+        "<p class='title'>%@ </p><p class='body'>%@</p><br>"
+        "<p class='title'>%@ </p><p class='body'>%@</p>"
         "</div>"
         "</body>"
         "</html>";
@@ -179,8 +182,19 @@
         if (self.packageInfo.copyright.length)
             copyright = self.packageInfo.copyright;
         
+        // get localized label strings
+        NSString *keyboardsLabel = NSLocalizedString(@"keyboards-label", nil);
+        NSString *fontsLabel = NSLocalizedString(@"fonts-label", nil);
+        NSString *packageVersionLabel = NSLocalizedString(@"package-version-label", nil);
+        NSString *authorLabel = NSLocalizedString(@"author-label", nil);
+        NSString *websiteLabel = NSLocalizedString(@"website-label", nil);
+        NSString *copyrightLabel = NSLocalizedString(@"copyright-label", nil);
+
+      
         NSString *htmlStr = [NSString stringWithFormat:htmlFormat, name, shareUrl, shareUrl,
-                             keyboardString, fontsStr, version, author, website, copyright];
+                             keyboardsLabel, keyboardString, fontsLabel, fontsStr,
+                             packageVersionLabel, version, authorLabel, author,
+                             websiteLabel, website, copyrightLabel, copyright];
         
         return htmlStr;
     }

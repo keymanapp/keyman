@@ -97,7 +97,7 @@ Nightly and release builds upload the most recent new master build to <https://d
 
 ## Building packages
 
-See [Linux packaging doc](https://github.com/keymanapp/keyman/blob/master/docs/linux-packaging.md)
+See [Linux packaging doc](../docs/linux-packaging.md)
 for details on building Linux packages for Keyman.
 
 ## Testing

@@ -70,7 +70,7 @@ km_kbp_context *km_kbp_state_context(km_kbp_state *state)
 }
 
 km_kbp_status kbp_state_get_intermediate_context(
-  km_kbp_state *state, 
+  km_kbp_state *state,
   km_kbp_context_item ** context_items
 ) {
   assert(state);
@@ -116,7 +116,7 @@ km_kbp_status km_kbp_state_queue_action_items(
       return KM_KBP_STATUS_INVALID_ARGUMENT;
     }
 
-    if (!processor.queue_action(action_items)) {
+    if (!processor.queue_action(state, action_items)) {
       return KM_KBP_STATUS_KEY_ERROR;
     }
   }

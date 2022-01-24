@@ -122,7 +122,7 @@ static BOOL AddIMDLLHook(LPIMDLL imd, LPSTR funcname, DWORD storeno, PWCHAR *dpS
 }
 
 static km_kbp_action_item*
-kmnToCoreActionItem(int ItemType, DWORD dwData) {
+kmnToCoreActionItem(int ItemType, DWORD dwData, WORD wVkey) {
 
   km_kbp_action_item *actionItems = new km_kbp_action_item[2];
   actionItems[0].type             = KM_KBP_IT_END;
@@ -151,13 +151,20 @@ kmnToCoreActionItem(int ItemType, DWORD dwData) {
       break;
     }
     break;
-    case QIT_CAPSLOCK:
-    case QIT_VKEYDOWN:
-    case QIT_VKEYUP:
-    case QIT_VSHIFTDOWN:
-    case QIT_VSHIFTUP:
-      // Not handled TODO Log a message?
-      break;
+  case QIT_VKEYDOWN:
+  case QIT_VKEYUP:
+    if (dwData == wVkey) {
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "kmnToCoreActionItem: Emit Action:[%s] Key:[%x] ", ItemTypes[ItemType], dwData);
+      actionItems[0].type      = KM_KBP_IT_EMIT_KEYSTROKE;
+      actionItems[0].character = dwData;
+    } else{
+      SendDebugMessageFormat(
+          0, sdmKeyboard, 0, "kmnToCoreActionItem: Attempt to emit key that is NOT current key pressed [%s] [%x] ", ItemTypes[ItemType], dwData);
+    }
+    break;
+  case QIT_CAPSLOCK:
+    SendDebugMessageFormat(0, sdmKeyboard, 0, "kmnToCoreActionItem: Unhandled Action: [%s] [%x] ", ItemTypes[ItemType], dwData);
+    break;      ;
    case QIT_INVALIDATECONTEXT:
      actionItems[0].type = KM_KBP_IT_INVALIDATE_CONTEXT;
     break;
@@ -377,7 +384,7 @@ extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreN
   if (!_td)
     return FALSE;
   //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td loadeded");
-  if (_td->TIPFUpdateable) {  // I4452
+  if (!_td->TIPFUpdateable) {  // Only execute the 3rd party function on the not updateable parse.
     SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td TIPFUpdatable about to call function [%s]", imdh->name);
     LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_CORE);
     LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_INT);
@@ -432,7 +439,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     AppContext context;
     context.Set(contextString);
     delete[] contextString;
-  
+
     while (backlen-- > 0) {
       actionItems[idx].type = KM_KBP_IT_BACK;
       WCHAR *CodeUnitPtr;
@@ -459,7 +466,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
       context.Delete();
       idx++;
     }
-    
+
     while (*buf) {
       actionItems[idx].type      = KM_KBP_IT_CHAR;
       if (Uni_IsSurrogate1(*buf) && Uni_IsSurrogate2(*(buf + 1))) {
@@ -497,7 +504,8 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dw
     if (!_td->lpActiveKeyboard->lpCoreKeyboardState) {
       return FALSE;
     }
-    km_kbp_action_item *actionItem = kmnToCoreActionItem(ItemType, dwData);
+
+    km_kbp_action_item *actionItem = kmnToCoreActionItem(ItemType, dwData, _td->state.vkey);
     km_kbp_status_codes error_status =
         (km_kbp_status_codes)km_kbp_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItem);
     if (error_status != KM_KBP_STATUS_OK) {

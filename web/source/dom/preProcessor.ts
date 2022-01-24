@@ -21,13 +21,13 @@ namespace com.keyman.dom {
      * Scope        Private
      * @param       {Event}       e         Event object
      * @param       {boolean=}    keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
-     * @return      {Object.<string,*>}     KMW keyboard event object: 
-     * Description  Get object with target element, key code, shift state, virtual key state 
+     * @return      {Object.<string,*>}     KMW keyboard event object:
+     * Description  Get object with target element, key code, shift state, virtual key state
      *                Lcode=keyCode
      *                Lmodifiers=shiftState
      *                LisVirtualKeyCode e.g. ctrl/alt key
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
-     */    
+     */
     static _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean): text.KeyEvent {
       let keyman = com.keyman.singleton;
       let core = keyman.core;
@@ -46,7 +46,7 @@ namespace com.keyman.dom {
       // Stage 1 - track the true state of the keyboard's modifiers.
       var prevModState = core.keyboardProcessor.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
-      
+
       let keyCodes = text.Codes.keyCodes;
       switch(s.Lcode) {
         case keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
@@ -68,16 +68,16 @@ namespace com.keyman.dom {
 
       /**
        * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
-       * 
-       * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.  
+       *
+       * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.
        *     Problem: its layer isn't presently activated within the OSK.
-       * 
+       *
        * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
        *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
        *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
-       * 
+       *
        * In either case, `e.getModifierState("Control")` is set to true, but as a result does nothing to tell us which case is active.
-       * 
+       *
        * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
        */
 
@@ -85,19 +85,19 @@ namespace com.keyman.dom {
 
       let modifierCodes = text.Codes.modifierCodes;
       if(e.getModifierState("Control")) {
-        curModState |= ((e.location != 0 && ctrlEvent) ? 
+        curModState |= ((e.location != 0 && ctrlEvent) ?
           (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
           prevModState & 0x0003);                                                       // Condition 2
       }
       if(e.getModifierState("Alt")) {
-        curModState |= ((e.location != 0 && altEvent) ? 
+        curModState |= ((e.location != 0 && altEvent) ?
           (e.location == 1 ? modifierCodes['LALT'] : modifierCodes['RALT']) :   // Condition 1
           prevModState & 0x000C);                                                       // Condition 2
       }
 
       // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
       s.Lstates = 0;
-      
+
       s.Lstates |= e.getModifierState('CapsLock') ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
       s.Lstates |= e.getModifierState('NumLock') ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
       s.Lstates |= (e.getModifierState('ScrollLock') || e.getModifierState("Scroll")) // "Scroll" for IE9.
@@ -134,14 +134,14 @@ namespace com.keyman.dom {
         }
       } else {
         // No need to sim AltGr here; we don't need chiral ALTs.
-        s.Lmodifiers = 
+        s.Lmodifiers =
           (curModState & 0x10) | // SHIFT
-          ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) | 
-          ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0); 
+          ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) |
+          ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0);
       }
 
 
-      /* Tweak the modifiers if an OS meta key is detected; this will allow meta-key-based 
+      /* Tweak the modifiers if an OS meta key is detected; this will allow meta-key-based
        * hotkeys to bypass Keyman processing.  We do this AFTER the chiral modifier filtering
        * because some keyboards specify their own modifierBitmask, which won't include it.
        * We don't currently use that reference in this method, but that may change in the future.
@@ -151,7 +151,7 @@ namespace com.keyman.dom {
       // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
       s.device = keyman.util.physicalDevice.coreSpec;
 
-      // Perform any browser-specific key remapping before other remaps and mnemonic transforms. 
+      // Perform any browser-specific key remapping before other remaps and mnemonic transforms.
       // (See https://github.com/keymanapp/keyman/issues/1125.)
       if(!keyman.isEmbedded && s.device.browser == utils.Browser.Firefox) {
       // Browser key identifiers are not completely consistent; Firefox has a few (for US punctuation)
@@ -185,7 +185,7 @@ namespace com.keyman.dom {
           s.Lcode=Lbase['k'+s.Lcode];
         }
         /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
-        
+
         if(!activeKeyboard.definesPositionalOrMnemonic && !(s.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           s = {
@@ -200,11 +200,11 @@ namespace com.keyman.dom {
           };
         }
       }
-      
+
       return s;
     }
 
-    public static getEventOutputTarget(e: KeyboardEvent): text.OutputTarget {
+    public static getEventOutputTarget(e: Event): text.OutputTarget {
       let keyman = com.keyman.singleton;
       let target = keyman.util.eventTarget(e) as HTMLElement;
       if (target == null) {
@@ -219,17 +219,17 @@ namespace com.keyman.dom {
     /**
      * Function     keyDown
      * Scope        Public
-     * Description  Processes keydown event and passes data to keyboard. 
-     * 
+     * Description  Processes keydown event and passes data to keyboard.
+     *
      * Note that the test-case oriented 'recorder' stubs this method to facilitate keystroke
      * recording for use in test cases.  If changing this function, please ensure the recorder is
      * not affected.
-     */ 
+     */
     static keyDown(e: KeyboardEvent): boolean {
       let core = com.keyman.singleton.core;
       DOMEventHandlers.states.swallowKeypress = false;
 
-      // Get event properties  
+      // Get event properties
       var Levent = this._GetKeyEventProperties(e, true);
       if(Levent == null) {
         return true;
@@ -298,7 +298,7 @@ namespace com.keyman.dom {
         return false;
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
-      
+
       // Only reached if it's a mnemonic keyboard.
       let outputTarget = PreProcessor.getEventOutputTarget(e);
       if(DOMEventHandlers.states.swallowKeypress || core.keyboardInterface.processKeystroke(outputTarget, Levent)) {

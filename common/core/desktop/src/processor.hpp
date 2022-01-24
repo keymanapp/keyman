@@ -75,11 +75,15 @@ namespace kbp
     /**
      * Add the action items to this keyboard processor queue
      *
+     * @param  state  An opaque pointer to a state object
      * @param  action_item
      * @param  bool  return true if action item list is successfully processed
      */
     virtual bool
-    queue_action(km_kbp_action_item const* action_item) = 0;
+    queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    ) = 0;
 
   /**
    * Returns the keyboardprocessor context as an array of

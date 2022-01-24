@@ -343,14 +343,16 @@ namespace com.keyman.dom {
       }
       DOMEventHandlers.states._DisableInput = false;
 
+      const outputTarget = dom.Utils.getOutputTarget(target);
+
       let activeKeyboard = keyman.core.activeKeyboard;
       if(!uiManager.justActivated) {
-        if(target && Utils.getOutputTarget(target)) {
-          Utils.getOutputTarget(target).deadkeys().clear();
+        if(target && outputTarget) {
+          outputTarget.deadkeys().clear();
         }
 
         if(activeKeyboard) {
-          activeKeyboard.notify(0, Utils.getOutputTarget(target), 1);  // I2187
+          activeKeyboard.notify(0, outputTarget, 1);  // I2187
         }
       }
 
@@ -361,8 +363,19 @@ namespace com.keyman.dom {
 
       DOMEventHandlers.states._SelectionControl = target;
 
+      if(target && outputTarget) {
+        // Call the current keyboard's newContext handler;
+        // timeout is required in order to get the current
+        // selection, which is not ready at time of focus event,
+        // at least on Chrome
+        window.setTimeout(() => {
+          //console.log('processNewContextEvent called from focus');
+          com.keyman.singleton.core.processNewContextEvent(outputTarget);
+        });
+      }
+
       if(keyman.core.languageProcessor.isActive) {
-        keyman.core.languageProcessor.predictFromTarget(Utils.getOutputTarget(target));
+        keyman.core.languageProcessor.predictFromTarget(outputTarget);
       }
       return false;
     }
@@ -416,6 +429,18 @@ namespace com.keyman.dom {
 
       DOMEventHandlers.states.changed = false;
     }
+
+    _Click: (e: MouseEvent) => boolean = function(this: DOMEventHandlers, e: MouseEvent): boolean {
+      let target = e.target as HTMLElement;
+      if(target && target['base']) {
+        target = target['base'];
+      }
+
+      //console.log('processNewContextEvent called from click');
+      com.keyman.singleton.core.processNewContextEvent(dom.Utils.getOutputTarget(target));
+
+      return true;
+    }.bind(this);
 
     /**
      * Function     _KeyPress

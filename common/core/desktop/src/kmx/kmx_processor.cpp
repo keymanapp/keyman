@@ -103,7 +103,9 @@ kmx_processor::update_option(
   return option(scope, key, value);
 }
 
-bool kmx_processor::queue_action(
+bool
+kmx_processor::queue_action(
+  km_kbp_state * state,
   km_kbp_action_item const * action_item
 ) {
   switch (action_item->type) {
@@ -136,10 +138,16 @@ bool kmx_processor::queue_action(
     break;
   }
   case KM_KBP_IT_PERSIST_OPT:
-  case KM_KBP_IT_EMIT_KEYSTROKE:
   case KM_KBP_IT_CAPSLOCK:
     DebugLog("kmx_processor::queue_action: Warning handling of action type [%d] not implented \n", action_item->type);
     return false;
+    break;
+  case KM_KBP_IT_EMIT_KEYSTROKE:
+    // By pass the kmx processor and put this action into the core queue immediately
+    // This has to be done as the kmx processor QueAction does not have an
+    // emit key stroke type.
+    // currently only supporting emitting the current key stroke
+    state->actions().push_emit_keystroke();
     break;
   case KM_KBP_IT_INVALIDATE_CONTEXT:
     _kmx.GetActions()->QueueAction(QIT_INVALIDATECONTEXT, 0);
