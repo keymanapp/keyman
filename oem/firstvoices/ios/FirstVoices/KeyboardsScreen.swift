@@ -13,6 +13,8 @@
 
 import UIKit
 
+let keymanHelpSite: String = "https://help.keyman.com/keyboard/"
+
 class KeyboardsScreen: UIViewController {
  
   @IBOutlet weak var tableView: UITableView!
@@ -55,6 +57,14 @@ class KeyboardsScreen: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.navigationController!.isNavigationBarHidden = false
+  }
+  
+  // TODO: stop using deprecated openURL method when we upgrade to iOS 10 or later
+  func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+    let keyboards: FVKeyboardList = (self.keyboardList[indexPath.section]).keyboards
+    let keyboard: FVKeyboard = keyboards[indexPath.row]
+    let helpUrl: URL = URL.init(string: "\(keymanHelpSite)\(keyboard.id)")!
+    UIApplication.shared.openURL(helpUrl)
   }
 }
 

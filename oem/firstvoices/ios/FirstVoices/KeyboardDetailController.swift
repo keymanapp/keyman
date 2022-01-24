@@ -45,9 +45,9 @@ class KeyboardDetailController: UITableViewController {
     case 1:
       header = "Language Settings"
     case 2:
-      header = "Dictionaries"
+      header = "Downloadable Dictionaries"
     case 3:
-      header = "Package Information"
+      header = "Keyboard Information"
     default:
       header = "Undefined"
     }
