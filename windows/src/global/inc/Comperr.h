@@ -153,6 +153,12 @@
 #define CERR_CasedKeysMustNotIncludeShiftStates            0x0000406A
 #define CERR_CasedKeysNotSupportedWithMnemonicLayout       0x0000406B
 
+#define CERR_CannotUseReadWriteGroupFromReadonlyGroup      0x0000406C
+#define CERR_StatementNotPermittedInReadonlyGroup          0x0000406D
+#define CERR_OutputInReadonlyGroup                         0x0000406E
+#define CERR_NewContextGroupMustBeReadonly                 0x0000406F
+#define CERR_PostKeystrokeGroupMustBeReadonly              0x00004070
+
 #define CWARN_TooManyWarnings                              0x00002080
 #define CWARN_OldVersion                                   0x00002081
 #define CWARN_BitmapNotUsed                                0x00002082

@@ -17,7 +17,7 @@ define("language.keyman", ["require", "exports"], function (require, exports) {
       ],
 
       predefined: [
-        'begin', 'unicode', 'ansi', 'group', 'using', 'keys', 'match', 'nomatch'
+        'begin', 'unicode', 'ansi', 'newcontext', 'postkeystroke', 'group', 'using', 'keys', 'readonly', 'match', 'nomatch'
       ],
 
       operators: [

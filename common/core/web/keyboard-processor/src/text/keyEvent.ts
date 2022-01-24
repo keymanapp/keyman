@@ -20,12 +20,12 @@ namespace com.keyman.text {
     kLayer?: string;   // The key's layer property
     kbdLayer?: string; // The virtual keyboard's active layer
     kNextLayer?: string;
-    
+
     // Holds relevant event properties leading to construction of this KeyEvent.
     source?: any; // Technically, KeyEvent|MouseEvent|Touch - but those are DOM types that must be kept out of headless mode.
     // Holds a generated fat-finger distribution (when appropriate)
     keyDistribution?: KeyDistribution;
-    
+
     /**
      * The device model for web-core to follow when processing the keystroke.
      */
@@ -35,5 +35,13 @@ namespace com.keyman.text {
      * `true` if this event was produced by sources other than a DOM-based KeyboardEvent.
      */
     isSynthetic: boolean = true;
+
+    public static constructNullKeyEvent(device: utils.DeviceSpec): KeyEvent {
+      const keyEvent = new KeyEvent();
+      keyEvent.Lcode = 0;
+      keyEvent.kName = '';
+      keyEvent.device = device;
+      return keyEvent;
+    }
   };
 }

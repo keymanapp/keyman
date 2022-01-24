@@ -29,7 +29,7 @@ describe('Attachment API', function() {
   beforeEach(function() {
     fixture.load("robustAttachment.html");
   });
-  
+
   afterEach(function(done) {
     fixture.cleanup();
     window.setTimeout(function(){
@@ -79,7 +79,7 @@ describe('Attachment API', function() {
         DynamicElements.assertAttached(ele);
         let eventDriver = new KMWRecorder.BrowserDriver(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
         eventDriver.simulateEvent(DynamicElements.keyCommand);
-        val = retrieveAndReset(ele);  
+        val = retrieveAndReset(ele);
         assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
 
         keyman.enableControl(ele);
@@ -147,25 +147,29 @@ describe('Attachment API', function() {
     keyman.attachToControl(input);
     keyman.attachToControl(textarea);
 
-    keyman.setActiveElement(input);
     // We assume from the other tests that running on the Lao keyboard will give proper output.
     // It'd be a redundant check.
 
-    // Set control with independent keyboard.
+    // We are testing that setting a specific keyboard for an inactive control does not affect
+    // the currently active control. The textarea control will be manually set to Khmer,
+    // and the input control will get the document default of Lao.
+
+    keyman.setActiveElement(input);
+    // Set textarea control with independent keyboard khmer_angkor.
     keyman.setKeyboardForControl(textarea, "khmer_angkor", "km");
     var eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW set independent keyboard for the incorrect control!");
 
-    // Swap to a global-linked control...
+    // Swap to the textarea control with its overridden khmer_angkor keyboard...
     keyman.setActiveElement(textarea);
     eventDriver = new KMWRecorder.BrowserDriver(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(textarea);
     assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW did not properly store keyboard for the previously-inactive control!");
 
-    // Swap back and check that the settings persist.
+    // Swap back to the input control and check that the settings persist.
     keyman.setActiveElement(input);
     keyman.setKeyboardForControl(textarea, null, null);
 
@@ -175,9 +179,10 @@ describe('Attachment API', function() {
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW made a strange error when clearing an inactive control's keyboard setting!");
 
     keyman.setActiveElement(textarea);
-    // Finally, clear the independent setting.
+    // Finally, after clearing the independent setting, check that we are back to Lao output as expected for the textarea
+    eventDriver = new KMWRecorder.BrowserDriver(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
-    val = retrieveAndReset(input);
+    val = retrieveAndReset(textarea);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not properly clear control's independent keyboard settings!");
   });
 });
@@ -194,22 +199,22 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('fixtures');
         setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
       });
-      
+
       beforeEach(function() {
         fixture.load("robustAttachment.html");
       });
-      
+
       after(function() {
         teardownKMW();
       });
-      
+
       afterEach(function(done) {
         fixture.cleanup();
         window.setTimeout(function(){
           done();
         }, kmwconfig.timeouts.eventDelay);
       });
-      
+
       describe('Element Type', function() {
         it('<input>', function(done) {
           var ID = DynamicElements.addInput();
@@ -227,7 +232,7 @@ Modernizr.on('touchevents', function(result) {
 
         it.skip('<iframe>', function(done) {
           this.timeout(kmwconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
-          
+
           var ID = DynamicElements.addIFrame(function() {
             var ele = document.getElementById(ID);
             var innerEle = ele.contentDocument.getElementById('iframe_input');
@@ -262,22 +267,22 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('fixtures');
         setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
       });
-      
+
       beforeEach(function() {
         fixture.load("robustAttachment.html");
       });
-      
+
       after(function() {
         teardownKMW();
       });
-      
+
       afterEach(function(done) {
         fixture.cleanup();
         window.setTimeout(function(){
           done();
         }, kmwconfig.timeouts.eventDelay);
       })
-      
+
       describe('Element Type', function() {
         it('<input>', function(done) {
           var ID = DynamicElements.addInput();

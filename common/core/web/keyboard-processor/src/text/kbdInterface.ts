@@ -185,6 +185,7 @@ namespace com.keyman.text {
 
     static readonly TSS_LAYER:    number = 33;
     static readonly TSS_PLATFORM: number = 31;
+    static readonly TSS_LAYERCHANGED: number = 42;
 
     systemStores: {[storeID: number]: SystemStore};
 
@@ -201,6 +202,7 @@ namespace com.keyman.text {
 
       this.systemStores[KeyboardInterface.TSS_PLATFORM] = new PlatformSystemStore(this);
       this.systemStores[KeyboardInterface.TSS_LAYER] = new MutableSystemStore(KeyboardInterface.TSS_LAYER, 'default');
+      this.systemStores[KeyboardInterface.TSS_LAYERCHANGED] = new MutableSystemStore(KeyboardInterface.TSS_LAYERCHANGED, '0');
 
       this.variableStoreSerializer = variableStoreSerializer;
     }
@@ -949,19 +951,58 @@ namespace com.keyman.text {
     }
 
     /**
+     * Function     processNewContextEvent
+     * Scope        Private
+     * @param       {Object}        outputTarget   The target receiving input
+     * @param       {Object}        keystroke      The input keystroke (with its properties) to be mapped by the keyboard.
+     * Description  Calls the keyboard's `begin newContext` group
+     * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin NewContext`
+     */
+    processNewContextEvent(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+      if(!this.activeKeyboard) {
+        throw "No active keyboard for keystroke processing!";
+      }
+      return this.process(this.activeKeyboard.processNewContextEvent.bind(this.activeKeyboard), outputTarget, keystroke);
+    }
+
+    /**
+     * Function     processPostKeystroke
+     * Scope        Private
+     * @param       {Object}        outputTarget   The target receiving input
+     * @param       {Object}        keystroke      The input keystroke with relevant properties to be mapped by the keyboard.
+     * Description  Calls the keyboard's `begin postKeystroke` group
+     * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin PostKeystroke`
+     */
+    processPostKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+      if(!this.activeKeyboard) {
+        throw "No active keyboard for keystroke processing!";
+      }
+      return this.process(this.activeKeyboard.processPostKeystroke.bind(this.activeKeyboard), outputTarget, keystroke);
+    }
+
+    /**
      * Function     processKeystroke
      * Scope        Private
-     * @param       {Object}        element     The page element receiving input
+     * @param       {Object}        outputTarget   The target receiving input
      * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
      * Description  Encapsulates calls to keyboard input processing.
-     * @returns     {number}        0 if no match is made, otherwise 1.
+     * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin Unicode`
      */
     processKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+      if(!this.activeKeyboard) {
+        throw "No active keyboard for keystroke processing!";
+      }
+      return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), outputTarget, keystroke);
+    }
+
+    private process(callee, outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";
       } else if(!this.activeKeyboard) {
         throw "No active keyboard for keystroke processing!";
+      } else if(!callee) {
+        throw "No callee for keystroke processing!";
       }
 
       outputTarget.invalidateSelection();
@@ -984,7 +1025,7 @@ namespace com.keyman.text {
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
-      var matched = this.activeKeyboard.process(outputTarget, keystroke);
+      var matched = callee(outputTarget, keystroke);
       this.activeTargetOutput = null;
 
       // Finalize the rule's results.

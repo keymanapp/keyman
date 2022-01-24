@@ -595,10 +595,10 @@ namespace com.keyman.osk {
       // This handler is also triggered on state-key state changes (K_CAPS) that
       // may not actually change the layer.
       if(this.vkbd) {
-        this.vkbd._UpdateVKShiftStyle();
+        this.vkbd._UpdateVKShiftStyle(newValue);
       }
 
-      if(source.value != newValue) {
+      if((this.vkbd && this.vkbd.layerId != newValue) || source.value != newValue) {
         // Prevents console errors when a keyboard only displays help.
         // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.
         if(this.vkbd) {

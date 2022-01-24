@@ -101,6 +101,7 @@ struct FILE_GROUP {
 	PWSTR      dpNoMatch;           // from start of group structure
 	DWORD cxKeyArray;               // in array items
 	BOOL  fUsingKeys;               // group(xx) [using keys] <-- specified or not
+  BOOL  fReadOnly;                // group(xx) [readonly] <-- specified or not
 	};
 
 typedef FILE_GROUP *PFILE_GROUP;

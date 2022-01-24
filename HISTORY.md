@@ -1,5 +1,45 @@
 # Keyman Version History
 
+## 15.0.183 alpha 2022-01-21
+
+* chore(linux): Update changelogs for 14.0.284 :cherries: (#6132)
+* chore(linux): Revert workaround for Python bug (#6133)
+
+## 15.0.182 alpha 2022-01-21
+
+* chore(linux): Add metadata file for packaging (#6127)
+* fix(web): crash in setTitleFromKeyboard when no keyboard active (#6129)
+
+## 15.0.181 alpha 2022-01-19
+
+* fix(linux): Add workaround for Python bug (#6124)
+* docs(linux): Add missing dependency (#6118)
+
+## 15.0.180 alpha 2022-01-18
+
+* feat(web): Caps Layer and double-tap gesture (#5989)
+* fix(web): Use regex to determine display layer and functional layers (#6100)
+
+## 15.0.179 alpha 2022-01-17
+
+* feat(web): Start of Sentence support - part 1 (#5963)
+* feat(developer): support for Caps Lock layer (#5988)
+* fix(web): call postKeystroke on banner touch (#6004)
+* chore(ios): project scripts should use /usr/bin/env bash (#6114)
+* chore: update docs (#6115)
+* chore(common): Check in crowdin strings for Kibaku (#6048)
+* fix(mac): externalize strings for package info window localization (#6088)
+* fix(developer): repatch #6074 (#6111)
+* fix(linux): Fix lintian errors (#6106)
+
+## 15.0.178 alpha 2022-01-14
+
+* chore(common): Check in crowdin strings for Waha (#6050)
+
+## 15.0.177 alpha 2022-01-13
+
+* chore(common): Check in crowdin strings for Marghi (#6049)
+
 ## 15.0.176 alpha 2022-01-12
 
 * fix(windows): add x64 build fix invalid memory access (#6057)

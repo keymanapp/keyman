@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Nya Nasara</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
+  <string name="ssTitle">Vu $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION ndǝ kurta vu tǝni kuraka bwanai.</string>
+  <string name="ssCancelQuery">Gǝ tǝmacini gada bara kansǝl vu $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Ata kǝra sǝgǝl aka bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Ata kǝra chakǝba packagyere...</string>
+  <string name="ssBootstrapCheckingForUpdates">Ata kǝra chakǝba updateyere online...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Ata kǝra chakǝba versionyere namtǝ ndǝ vuyere...</string>
+  <string name="ssBootstrapReady">Ata kǝra kurai ʻya suyere...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Mima adiwɛ namtǝ ndɛ ata vu.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s download)</string>
+  <string name="ssActionInstall">Setup will install:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION is free and open source</string>
+  <string name="ssLicenseLink">&amp;Karatɛ lasǝsari</string>
+  <string name="ssInstallOptionsLink">Install &amp;options</string>
+  <string name="ssMessageBoxTitle">$APPNAME Setup</string>
+  <string name="ssOkButton">Kal kal</string>
+  <string name="ssInstallButton">&amp;Install</string>
+  <string name="ssCancelButton">Kansǝl</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Ata kǝra vudzi $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Ata kǝra kǝlba ka ɗalba varshionyere nam hal hali</string>
+  <string name="ssStatusComplete">Sǝgǝl ka pu suyere ku kuri</string>
+  <string name="ssQueryRestart">You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.
+
+Restart now?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows adika mǝzi ka badicini ka dawm automatic wɛ.  Ɓǝla hyanti Windows kǝmata ga nkǝrti hyanti ko badicini $APPNAME.</string>
+  <string name="ssMustRestart">Akuyaka kurai setup dole akuya ka gǝ ɓǝla hyanti ko badicini Windows. Ma gǝ hyanti Windows, Setup ata kuri.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION requires Windows 7 or later to install. However, Keyman Desktop 7, 8 or 9 has been detected. Do you want to install the keyboards included in this installer into the installed Keyman Desktop version?</string>
+  <string name="ssOldOsVersionDownload">Version ǝni nǝr $APPNAME ada bara Windows 7 ko version nam bǝlin ta dza ka ndǝ vu akwa. Gada bara ka gǝ download Keyman Desktop 8 ya?</string>
+  <string name="ssOptionsTitle">Install Options</string>
+  <string name="ssOptionsTitleInstallOptions">Installation options</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Default $APPNAME settings</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modules to install or upgrade</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Associated Keyboard Language</string>
+  <string name="ssOptionsTitleLocation">Version namtǝ ndata vu</string>
+  <string name="ssOptionsStartWithWindows">Mburnta $APPNAME saka namtǝ Windows badicini</string>
+  <string name="ssOptionsStartAfterInstall">Mburnta $APPNAME saka namtǝ sǝgǝl ba vu su kuri</string>
+  <string name="ssOptionsCheckForUpdates">Chakuba updateyere online ata saka ata saka</string>
+  <string name="ssOptionsUpgradeKeyboards">Upgrade keyboards installed with older versions to version $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Share anonymous usage statistics with keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup version: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Vu $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Upgrade $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s is already installed.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Download version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Sǝgǝl ka vu %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Download version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Version %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Tsarba nya namtǝ gada bara ka dzǝ ʻya aka %0:s kibodari</string>
+  <string name="ssOptionsDefaultLanguage">Default language</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Downloading %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Downloading %0:s</string>
+  <string name="ssOffline">$APPNAME Setup could not connect to keyman.com to download additional resources.
+
+Please check that you are online, and give $APPNAME Setup permission to access the Internet in your firewall settings.
+
+Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.</string>
+</resources>

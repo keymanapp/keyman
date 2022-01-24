@@ -110,6 +110,8 @@ namespace kmx {
 
 #define TSS_COMPARISON 30
 
+#define TSS__KEYMAN_80_MAX  30
+
 /* Keyman 9.0 system stores */
 
 #define TSS_PLATFORM    31
@@ -126,7 +128,23 @@ namespace kmx {
 
 #define TSS_TARGETS         38
 
-#define TSS__MAX        38
+#define TSS__KEYMAN_90_MAX  38
+
+/* Keyman 14.0 system stores */
+
+#define TSS_CASEDKEYS       39
+
+#define TSS__KEYMAN_140_MAX  39
+
+/* Keyman 15.0 system stores */
+
+#define TSS_BEGIN_NEWCONTEXT    40
+#define TSS_BEGIN_POSTKEYSTROKE 41
+#define TSS_LAYERCHANGED     42
+
+#define TSS__KEYMAN_150_MAX  42
+
+#define TSS__MAX        42
 
 /* wm_keyman_control_internal message control codes */
 

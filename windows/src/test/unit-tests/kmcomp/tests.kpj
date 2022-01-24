@@ -227,6 +227,16 @@
       </Details>
     </File>
     <File>
+      <ID>id_c8f8bfc9e4fd77bdd6db910b6a18eb0b</ID>
+      <Filename>test_casedkeys_mnemonic_3.kmn</Filename>
+      <Filepath>test_casedkeys_mnemonic_3.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Test mnemonic layout but no cased keys</Name>
+      </Details>
+    </File>
+    <File>
       <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
       <Filename>test_valid.kmx</Filename>
       <Filepath>test_valid.kmx</Filepath>
@@ -251,14 +261,68 @@
       <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
     </File>
     <File>
-      <ID>id_c8f8bfc9e4fd77bdd6db910b6a18eb0b</ID>
-      <Filename>test_casedkeys_mnemonic_3.kmn</Filename>
-      <Filepath>test_casedkeys_mnemonic_3.kmn</Filepath>
+      <ID>id_4de56227a5ee2e083ad7dfe971272f41</ID>
+      <Filename>test_5963_start_of_sentence.kmn</Filename>
+      <Filepath>test_5963_start_of_sentence.kmn</Filepath>
       <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
-      <Details>
-        <Name>Test mnemonic layout but no cased keys</Name>
-      </Details>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_617d47ee42934d7c9adcca257f8fc537</ID>
+      <Filename>test_5963_readonlygroup_usenonreadonly.kmn</Filename>
+      <Filepath>test_5963_readonlygroup_usenonreadonly.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_7e12ebddcbd1fc497ef1d125c55e8ff2</ID>
+      <Filename>test_5963_readonlygroup_output.kmn</Filename>
+      <Filepath>test_5963_readonlygroup_output.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_02e09e1457b2b2164e9ae62a897b0003</ID>
+      <Filename>test_5963_postkeystroke_1.kmn</Filename>
+      <Filepath>test_5963_postkeystroke_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_7c92e58b16db283f505d0102c4833e02</ID>
+      <Filename>test_5963_newcontext_1.kmn</Filename>
+      <Filepath>test_5963_newcontext_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_41c3aed69b2166aeae2fb77a4f9fb945</ID>
+      <Filename>test_5963_postkeystroke_2.kmn</Filename>
+      <Filepath>test_5963_postkeystroke_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_43ae15b55415d3294219e26d13ebbb9e</ID>
+      <Filename>test_5963_readonlygroup_misplacedcontext.kmn</Filename>
+      <Filepath>test_5963_readonlygroup_misplacedcontext.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_d9f5051cafe945eb9f91aaaf9cfa94a3</ID>
+      <Filename>test_5963_newcontext_2.kmn</Filename>
+      <Filepath>test_5963_newcontext_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
     </File>
   </Files>
 </KeymanDeveloperProject>
