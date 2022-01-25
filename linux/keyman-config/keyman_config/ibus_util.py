@@ -20,7 +20,7 @@ class IbusUtil():
         return self.ibus_settings.get('preload-engines')
 
     def write_preload_engines(self, bus, preload_engines):
-        self.ibus_settings.set('preload-engines', preload_engines)
+        self.ibus_settings.set('preload-engines', preload_engines, 'as')
         if bus:
             bus.preload_engines(preload_engines)
 

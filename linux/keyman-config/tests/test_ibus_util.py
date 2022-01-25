@@ -50,7 +50,7 @@ class IbusUtilTests(unittest.TestCase):
         install_to_ibus(mock_ibusBusInstance, 'k3')
         # Verify
         mock_settingsSet.assert_called_once_with(
-            "preload-engines", ['k1', 'k2', 'k3'])
+            "preload-engines", ['k1', 'k2', 'k3'], 'as')
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k2', 'k3'])
 
@@ -66,7 +66,7 @@ class IbusUtilTests(unittest.TestCase):
         install_to_ibus(mock_ibusBusInstance, 'k4')
         # Verify
         mock_settingsSet.assert_called_once_with(
-            "preload-engines", ['k1', 'k2', 'k3', 'k4'])
+            "preload-engines", ['k1', 'k2', 'k3', 'k4'], 'as')
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k2', 'k3', 'k4'])
 
@@ -82,7 +82,7 @@ class IbusUtilTests(unittest.TestCase):
         uninstall_from_ibus(mock_ibusBusInstance, 'k2')
         # Verify
         mock_settingsSet.assert_called_once_with(
-            "preload-engines", ['k1', 'k3'])
+            "preload-engines", ['k1', 'k3'], 'as')
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k3'])
 
@@ -98,7 +98,7 @@ class IbusUtilTests(unittest.TestCase):
         uninstall_from_ibus(mock_ibusBusInstance, 'k4')
         # Verify
         mock_settingsSet.assert_called_once_with(
-            "preload-engines", ['k1', 'k2', 'k3'])
+            "preload-engines", ['k1', 'k2', 'k3'], 'as')
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k2', 'k3'])
 
