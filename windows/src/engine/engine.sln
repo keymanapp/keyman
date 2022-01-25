@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine-tests", "keym
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine", "keyman32\keyman-engine.vcxproj", "{A7069186-5AE7-4504-8926-861B7A34BA9E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testhost", "testhost\testhost.vcxproj", "{12818DA3-0472-49A5-96FC-A4808A1A77FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -81,6 +83,14 @@ Global
 		{A7069186-5AE7-4504-8926-861B7A34BA9E}.Release|Win32.ActiveCfg = Release|Win32
 		{A7069186-5AE7-4504-8926-861B7A34BA9E}.Release|Win32.Build.0 = Release|Win32
 		{A7069186-5AE7-4504-8926-861B7A34BA9E}.Release|x64.ActiveCfg = Release|Win32
+		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Debug|Win32.Build.0 = Debug|Win32
+		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Debug|x64.ActiveCfg = Debug|x64
+		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Debug|x64.Build.0 = Debug|x64
+		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Release|Win32.ActiveCfg = Release|Win32
+		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Release|Win32.Build.0 = Release|Win32
+		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Release|x64.ActiveCfg = Release|x64
+		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
