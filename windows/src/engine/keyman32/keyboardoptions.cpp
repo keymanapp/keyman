@@ -58,9 +58,6 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
-  if (!DebugAssert(!Globals::get_CoreIntegration(), "FreeKeyboardOptions: Error called in core integration mode")) {
-    return;
-  }
   // This is a cleanup routine; we don't want to precondition all calls to it
   // so we do not assert
   if (kp == NULL || kp->Keyboard == NULL || kp->KeyboardOptions == NULL)

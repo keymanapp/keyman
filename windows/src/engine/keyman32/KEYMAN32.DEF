@@ -44,3 +44,5 @@ EXPORTS
       Keyman_UnregisterMasterController
 			Keyman_RegisterControllerThread
 			Keyman_UnregisterControllerThread
+
+      SetCustomPostKeyCallback
