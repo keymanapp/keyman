@@ -711,3 +711,9 @@ void Globals::LoadDebugSettings() {
     f_debug_ToConsole = FALSE;   // I3951
   }
 }
+
+void WINAPI SetCustomPostKeyCallback(CUSTOMPOSTKEYCALLBACKPROC proc) {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) return;
+  _td->CustomPostKeyCallback = proc;
+}
