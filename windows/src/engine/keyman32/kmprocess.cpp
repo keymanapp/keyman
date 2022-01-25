@@ -153,10 +153,12 @@ BOOL ProcessHook()
         return FALSE;
       }
       km_kbp_context_items_dispose(citems);
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent: ");
+      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
+                                                    static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG),
+                                                    (uint8_t)_td->state.isDown);
       if (KM_KBP_STATUS_OK !=
         (km_kbp_status_codes)km_kbp_process_event(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
-                                                    static_cast<uint16_t>(Globals::get_ShiftState()),
+                                  static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG),
                                                     (uint8_t)_td->state.isDown)) {
         SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ",FALSE);
         return FALSE;
