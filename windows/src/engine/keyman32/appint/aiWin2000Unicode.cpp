@@ -191,9 +191,14 @@ BOOL AIWin2000Unicode::PostKeys()
 		return TRUE;
 	}
 
+  if (_td->CustomPostKeyCallback != nullptr) {
+    BOOL res = _td->CustomPostKeyCallback(Queue, QueueSize);
+    QueueSize = 0;
+    return res;
+  }
+
   int n = 0;
 	/* 6.0.153.0: Fix repeat state for virtual keys */
-
 
   LPINPUT pInputs = new INPUT[QueueSize*100]; // TODO: Tidy this up. Horrid doing a junky alloc like this each event
   int i = 0;

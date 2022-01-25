@@ -180,6 +180,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+    case WM_SETFOCUS:
+        SetFocus(hWndEdit);
+        break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -208,13 +211,86 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 HMODULE hlibKeyman32 = nullptr;
 
+/* From appint.h */
+
+typedef struct
+{
+  int ItemType;
+  DWORD dwData;
+} APPACTIONQUEUEITEM;
+
+// QueueAction ItemTypes
+#define QIT_VKEYDOWN	0
+#define QIT_VKEYUP		1
+#define QIT_VSHIFTDOWN	2
+#define QIT_VSHIFTUP	3
+#define QIT_CHAR		4
+#define QIT_DEADKEY		5
+#define QIT_BELL		6
+#define QIT_BACK		7
+
+#define QVK_EXTENDED 0x00010000 // Flag for QIT_VKEYDOWN to indicate an extended key
+#define QVK_KEYMASK  0x0000FFFF
+#define QVK_FLAGMASK 0xFFFF0000
+
+
+
+typedef BOOL(WINAPI* CUSTOMPOSTKEYCALLBACKPROC)(APPACTIONQUEUEITEM* Queue, int QueueSize);
+
 typedef BOOL(WINAPI* KEYMAN_INITIALISE)(HWND hwnd, BOOL singleApp);
 typedef BOOL(WINAPI* KEYMAN_EXIT)();
 typedef BOOL(WINAPI* KEYMAN_REGISTERMASTERCONTROLLER)(HWND hwnd);
+typedef void(WINAPI* SETCUSTOMPOSTKEYCALLBACK)(CUSTOMPOSTKEYCALLBACKPROC proc);
 
 KEYMAN_INITIALISE Keyman_Initialise = nullptr;
 KEYMAN_EXIT Keyman_Exit             = nullptr;
 KEYMAN_REGISTERMASTERCONTROLLER Keyman_RegisterMasterController = nullptr;
+SETCUSTOMPOSTKEYCALLBACK SetCustomPostKeyCallback = nullptr;
+
+BOOL WINAPI PostKeyCallback(APPACTIONQUEUEITEM* Queue, int QueueSize) {
+  // Note: copied from aiWin2000Unicode and dumbed down for test purposes
+  for (int n = 0; n < QueueSize; n++) {
+    switch (Queue[n].ItemType) {
+    case QIT_VKEYDOWN:
+      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
+      if ((Queue[n].dwData & QVK_KEYMASK) <= 255) {
+        PostMessage(hWndEdit, WM_KEYDOWN, Queue[n].dwData & 0xFF, 0); // TODO: lparam
+        //pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
+        //pInputs[i].ki.dwFlags = ((Queue[n].dwData & QVK_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0);
+      }
+      break;
+    case QIT_VKEYUP:
+      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
+      if ((Queue[n].dwData & QVK_KEYMASK) <= 255) {
+        PostMessage(hWndEdit, WM_KEYUP, Queue[n].dwData & 0xFF, 0); // TODO: lparam
+        //pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
+        //pInputs[i].ki.dwFlags = KEYEVENTF_KEYUP | ((Queue[n].dwData & QVK_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0);  // I3438
+      }
+      break;
+    case QIT_VSHIFTDOWN:
+      break;
+    case QIT_VSHIFTUP:
+      break;
+    case QIT_CHAR:
+      // TODO: surrogate pairs
+      PostMessage(hWndEdit, WM_CHAR, (WORD)Queue[n].dwData, 0);
+      break;
+    case QIT_DEADKEY:
+      break;
+    case QIT_BELL:
+      MessageBeep(MB_ICONASTERISK);
+      break;
+    case QIT_BACK:
+#define BK_DEADKEY		1
+      if (Queue[n].dwData & BK_DEADKEY) break;
+      PostMessage(hWndEdit, WM_CHAR, 8, 0);
+      break;
+    }
+  }
+
+  return TRUE;
+}
+
 
 void
 Fail(PCWSTR message) {
@@ -261,7 +337,7 @@ StartKeyman() {
       keyman32 = fs::path(keyman_root.data()) / "windows" / "src" / "engine" / KEYMAN32_DEBUG;
       if (!fs::exists(keyman32)) {
         keyman32 = fs::path(keyman_root.data()) / "windows" / "src" / "engine" / KEYMAN32_RELEASE;
-                  
+
         if (!fs::exists(keyman32))
           keyman32 = "";
       }
@@ -286,7 +362,8 @@ StartKeyman() {
   Keyman_Exit       = (KEYMAN_EXIT)GetProcAddress(hlibKeyman32, "Keyman_Exit");
   Keyman_RegisterMasterController =
       (KEYMAN_REGISTERMASTERCONTROLLER)GetProcAddress(hlibKeyman32, "Keyman_RegisterMasterController");
-  if (!Keyman_Initialise || !Keyman_Exit || !Keyman_RegisterMasterController) {
+  SetCustomPostKeyCallback = (SETCUSTOMPOSTKEYCALLBACK)GetProcAddress(hlibKeyman32, "SetCustomPostKeyCallback");
+  if (!Keyman_Initialise || !Keyman_Exit || !Keyman_RegisterMasterController || !SetCustomPostKeyCallback) {
     Keyman_Exit = nullptr;
     StopKeyman();
     Fail(L"Failed to get proc addresses");
@@ -298,6 +375,7 @@ StartKeyman() {
     Fail(L"Failed to initialise Keyman Engine");
     return;
   }
+  SetCustomPostKeyCallback(PostKeyCallback);
 }
 
 void
@@ -313,5 +391,6 @@ StopKeyman() {
   Keyman_Initialise               = nullptr;
   Keyman_Exit                     = nullptr;
   Keyman_RegisterMasterController = nullptr;
+  SetCustomPostKeyCallback        = nullptr;
   hlibKeyman32 = nullptr;
 }
