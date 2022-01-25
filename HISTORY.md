@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.184 alpha 2022-01-24
+
+* fix: only auto-merge if `auto:` prefix in title (#6146)
+
 ## 15.0.183 alpha 2022-01-21
 
 * chore(linux): Update changelogs for 14.0.284 :cherries: (#6132)
