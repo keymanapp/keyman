@@ -77,7 +77,8 @@ class KeyboardDetailController: UITableViewController {
     if indexPath.section == 3 {
       let versionCell = tableView.dequeueReusableCell(withIdentifier: "attributeCell")
       versionCell!.textLabel!.text = "Version"
-      versionCell!.detailTextLabel!.text = "1.0.0"
+      let versionText = FVKeyboardPackage.availableKeyboards[keyboard!.id]?.keyboardVersion
+      versionCell!.detailTextLabel!.text = versionText
       return versionCell!
     }
     else {

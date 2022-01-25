@@ -21,6 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
     FVRegionStorage.upgrade()
+    
+    FVKeyboardPackage.loadAvailableKeyboards();
 
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug

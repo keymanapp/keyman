@@ -36,7 +36,7 @@ class KeyboardsScreen: UIViewController {
 
   override func viewDidLoad() {
     _loadedKeyboards = FVRegionStorage.loadKeyboardListFromUserDefaults()
-   
+
     super.viewDidLoad()
 
     tableView.delegate = self

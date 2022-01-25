@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		294D40E9279FE62600DB37F6 /* FVKeyboardPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294D40E8279FE62600DB37F6 /* FVKeyboardPackage.swift */; };
 		2990208E278FF402004F18CF /* KeyboardsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2990208D278FF402004F18CF /* KeyboardsScreen.swift */; };
 		2990209127901DD7004F18CF /* KeyboardDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2990209027901DD7004F18CF /* KeyboardDetailCell.swift */; };
 		2993F6E62791621D009E1352 /* KeyboardDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2993F6E52791621D009E1352 /* KeyboardDetailController.swift */; };
@@ -98,6 +99,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		294D40E8279FE62600DB37F6 /* FVKeyboardPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVKeyboardPackage.swift; sourceTree = "<group>"; };
 		2990208D278FF402004F18CF /* KeyboardsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardsScreen.swift; sourceTree = "<group>"; };
 		2990209027901DD7004F18CF /* KeyboardDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDetailCell.swift; sourceTree = "<group>"; };
 		2993F6E52791621D009E1352 /* KeyboardDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDetailController.swift; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 				37EA1F25228B5D6E003E710C /* AppDelegate.swift */,
 				37EA1F2E228B7458003E710C /* CheckBox.swift */,
 				37C183B822932AD2009F9EFD /* FVKeyboardList.swift */,
+				294D40E8279FE62600DB37F6 /* FVKeyboardPackage.swift */,
 				37EA1F4522921BAD003E710C /* KeyboardInfo.swift */,
 				37EA1F29228B69AF003E710C /* KeyboardsViewController.swift */,
 				2990208D278FF402004F18CF /* KeyboardsScreen.swift */,
@@ -494,6 +497,7 @@
 				2990209127901DD7004F18CF /* KeyboardDetailCell.swift in Sources */,
 				37EA1F4622921BAD003E710C /* KeyboardInfo.swift in Sources */,
 				37EA1F2F228B7458003E710C /* CheckBox.swift in Sources */,
+				294D40E9279FE62600DB37F6 /* FVKeyboardPackage.swift in Sources */,
 				2990208E278FF402004F18CF /* KeyboardsScreen.swift in Sources */,
 				37EA1F31228B7661003E710C /* FVShared.swift in Sources */,
 				37EA1F28228B5E2B003E710C /* ViewController.swift in Sources */,
