@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.185 alpha 2022-01-25
+
+* feat(windows): testhost project for debugging keyman32 (#6154)
+* feat(windows): handle key output in testhost (#6157)
+* chore(deps): bump node-fetch from 2.6.1 to 2.6.7 in /resources/build/version (#6156)
+* fix(developer): prevent crash on build dblclicked file (#6151)
+* chore(linux): Add comment for clarification of code behaviour (#6152)
+
 ## 15.0.184 alpha 2022-01-24
 
 * fix: only auto-merge if `auto:` prefix in title (#6146)
