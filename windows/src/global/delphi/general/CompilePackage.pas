@@ -295,7 +295,15 @@ begin
       for i := 0 to kmpinf.Keyboards.Count - 1 do
       begin
         if CompareVersions(kmpinf.Options.FileVersion, kmpinf.Keyboards[i].MinKeymanVersion) > 0 then
-          kmpinf.Options.FileVersion := kmpinf.Keyboards[i].MinKeymanVersion;
+        begin
+          // Keyman for Windows 14 and earlier only accepted version 7.0 for keyboard
+          // packages, so we must not write any other version in order to allow
+          // earlier versions of Keyman to load the package.
+          if CompareVersions(kmpinf.Keyboards[i].MinKeymanVersion, SKeymanVersion150) <= 0 then
+          begin
+            kmpinf.Options.FileVersion := kmpinf.Keyboards[i].MinKeymanVersion;
+          end;
+        end;
       end;
 
       psf := TPackageContentFile.Create(kmpinf);

@@ -306,11 +306,12 @@ type
     property Name: string read FName write FName;
     property ID: string read FID write FID;
     property RTL: Boolean read FRTL write FRTL;
-    property MinKeymanVersion: string read FMinKeymanVersion write FMinKeymanVersion;
     property Version: string read FVersion write FVersion;
     property Languages: TPackageKeyboardLanguageList read FLanguages;
     property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
     property DisplayFont: TPackageContentFile read FDisplayFont write SetDisplayFont;
+    // The following properties are used only in memory and never streamed in or out
+    property MinKeymanVersion: string read FMinKeymanVersion write FMinKeymanVersion;
   end;
 
   TPackageKeyboardList = class(TPackageObjectList<TPackageKeyboard>)
@@ -442,7 +443,6 @@ const
   SXML_PackageKeyboard = 'Keyboard';
   SXML_PackageKeyboard_Name = 'Name';
   SXML_PackageKeyboard_ID = 'ID';
-  SXML_PackageKeyboard_MinKeymanVersion = 'MinKeymanVersion';
   SXML_PackageKeyboard_Version = 'Version';
   SXML_PackageKeyboard_RTL = 'RTL';
   SXML_PackageKeyboard_OSKFont = 'OSKFont';
@@ -510,7 +510,6 @@ const
   SJSON_Keyboard_Name = 'name';
   SJSON_Keyboard_ID = 'id';
   SJSON_Keyboard_RTL = 'rtl';
-  SJSON_Keyboard_MinKeymanVersion = 'MinKeymanVersion';
   SJSON_Keyboard_Version = 'version';
   SJSON_Keyboard_OSKFont = 'oskFont';
   SJSON_Keyboard_DisplayFont = 'displayFont';
@@ -1601,6 +1600,9 @@ procedure TPackage.DoLoadXML(ARoot: IXMLNode);
 var
   FVersion: WideString;
 begin
+  // Keyman for Windows 14 and earlier only accepted version 7.0 and 12.0.
+  // But Keyman for Windows 15 and onward accept any version number up to and
+  // including their version.
   FVersion := XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
   if CompareVersions(SKeymanVersion, FVersion) > 0 then
     PackageLoadError('Package file version '+FVersion+' can only be loaded by a newer version of this software.');
@@ -1939,7 +1941,6 @@ begin
       keyboard := TPackageKeyboard.Create(Package);
       keyboard.Name := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Name, '');
       keyboard.ID := AIni.ReadString(FSectionName, SXML_PackageKeyboard_ID, '');
-      keyboard.MinKeymanVersion := AIni.ReadString(FSectionName, SXML_PackageKeyboard_MinKeymanVersion, SKeymanVersion70);
       keyboard.Version := AIni.ReadString(FSectionName, SXML_PackageKeyboard_Version, '1.0');
       keyboard.RTL := AIni.ReadBool(FSectionName, SXML_PackageKeyboard_RTL, False);
       keyboard.OSKFont := Package.Files.FromFileNameEx(AIni.ReadString(FSectionName, SXML_PackageKeyboard_OSKFont, ''));
@@ -1983,7 +1984,6 @@ begin
     keyboard := TPackageKeyboard.Create(Package);
     keyboard.Name := GetJsonValueString(AKeyboard, SJSON_Keyboard_Name);
     keyboard.ID := GetJsonValueString(AKeyboard,SJSON_Keyboard_ID);
-    keyboard.MinKeymanVersion := GetJsonValueString(AKeyboard,SJSON_Keyboard_MinKeymanVersion);
     keyboard.Version := GetJsonValueString(AKeyboard, SJSON_Keyboard_Version);
     keyboard.RTL := GetJsonValueBool(AKeyboard, SJSON_Keyboard_RTL);
     keyboard.OSKFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_OSKFont));
@@ -2009,7 +2009,6 @@ begin
     keyboard := TPackageKeyboard.Create(Package);
     keyboard.Name := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Name]);
     keyboard.ID := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_ID]);
-    keyboard.MinKeymanVersion := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_MinKeymanVersion]);
     keyboard.Version := XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_Version]);
     keyboard.RTL := ANode.ChildNodes.IndexOf(SXML_PackageKeyboard_RTL) >= 0;
     keyboard.OSKFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont]));
@@ -2030,7 +2029,6 @@ begin
     FSectionName := 'Keyboard'+IntToStr(i);
     AIni.WriteString(FSectionName, SXML_PackageKeyboard_Name, Items[i].Name);
     AIni.WriteString(FSectionName, SXML_PackageKeyboard_ID, Items[i].ID);
-    AIni.WriteString(FSectionName, SXML_PackageKeyboard_MinKeymanVersion, Items[i].MinKeymanVersion);
     AIni.WriteString(FSectionName, SXML_PackageKeyboard_Version, Items[i].Version);
     if Items[i].RTL then AIni.WriteBool(FSectionName, SXML_PackageKeyboard_RTL, True);
     if Assigned(Items[i].OSKFont) then
@@ -2064,7 +2062,6 @@ begin
 
     AKeyboard.AddPair(SJSON_Keyboard_Name, Items[i].Name);
     AKeyboard.AddPair(SJSON_Keyboard_ID, Items[i].ID);
-    AKeyboard.AddPair(SJSON_Keyboard_MinKeymanVersion, Items[i].MinKeymanVersion);
     AKeyboard.AddPair(SJSON_Keyboard_Version, Items[i].Version);
     if Items[i].RTL then AKeyboard.AddPair(SJSON_Keyboard_RTL, TJSONTrue.Create);
     if Assigned(Items[i].OSKFont) then
@@ -2088,7 +2085,6 @@ begin
 
     AKeyboard.ChildNodes[SXML_PackageKeyboard_Name].NodeValue := Items[i].Name;
     AKeyboard.ChildNodes[SXML_PackageKeyboard_ID].NodeValue := Items[i].ID;
-    AKeyboard.ChildNodes[SXML_PackageKeyboard_MinKeymanVersion].NodeValue := Items[i].MinKeymanVersion;
     AKeyboard.ChildNodes[SXML_PackageKeyboard_Version].NodeValue := Items[i].Version;
     if Items[i].RTL then
       AKeyboard.ChildNodes[SXML_PackageKeyboard_RTL].NodeValue := True;
