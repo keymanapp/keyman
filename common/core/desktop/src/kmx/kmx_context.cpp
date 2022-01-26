@@ -156,4 +156,8 @@ KMX_BOOL KMX_Context::CharIsSurrogatePair()
     Uni_IsSurrogate2(CurContext[pos - 1]);
 }
 
+KMX_BOOL KMX_Context::IsEmpty()
+{
+  return (KMX_BOOL)(pos == 0);
+}
 

@@ -93,7 +93,7 @@ processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
-    
+
     // This case would occur for the keyboard system store setting `store(&CapsAlwaysOff) '1'`
     // A trick is being played here of synthesising a release the CAPSLOCK key event
     // then a depress CAPSLOCK key event
@@ -157,8 +157,39 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
       assert(false); // NOT SUPPORTED
       break;
     }
-    if (!continueProcessingActions)
+    if (!continueProcessingActions) {
       return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+BOOL
+ProcessActionsTestParse(BOOL* emitKeyStroke) {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return FALSE;
+  }
+
+  if (_td->TIPFUpdateable) {  // ensure only run when not updateable
+    return FALSE;
+  }
+
+  BOOL continueProcessingActions = TRUE;
+  for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
+    switch (act->type) {
+    case KM_KBP_IT_EMIT_KEYSTROKE:
+      *emitKeyStroke = TRUE;
+      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsTestParse EMIT_KEYSTROKE: act->type=%d", act->type);
+      continueProcessingActions = TRUE;
+      break;
+    case KM_KBP_IT_CAPSLOCK:
+      continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable);
+      break;
+    }
+    if (!continueProcessingActions) {
+      return FALSE;
+    }
   }
   return TRUE;
 }

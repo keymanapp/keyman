@@ -20,6 +20,13 @@ km_kbp_process_event(km_kbp_state *state,
   return state->processor().process_event(state, vk, modifier_state, is_key_down);
 }
 
+km_kbp_status
+km_kbp_process_queued_actions(
+      km_kbp_state *state
+      ) {
+  return state->processor().process_queued_actions(state);
+}
+
 km_kbp_attr const *
 km_kbp_get_engine_attrs(km_kbp_state const *state)
 {

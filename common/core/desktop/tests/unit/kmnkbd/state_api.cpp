@@ -81,6 +81,15 @@ constexpr km_kbp_option_item const expected_persist_opt = {
   KM_KBP_OPT_KEYBOARD
 };
 
+extern "C"
+{
+  uint8_t test_imx_callback(km_kbp_state *state, uint32_t imx_id, void *callback_object){
+
+  // does nothing;
+  return 1;
+  }
+};
+
 } // namespace
 
 int main(int argc, char * argv[])
@@ -103,6 +112,9 @@ int main(int argc, char * argv[])
   if (km_kbp_state_action_items(test_state, &n_actions) == nullptr
       && n_actions != 0)
     return __LINE__;
+  // Check registering platform engine callback
+  km_kbp_state_imx_register_callback(test_state, test_imx_callback, nullptr);
+  km_kbp_state_imx_deregister_callback(test_state);
 
   // Lets add data and do some basic checks of options and km_kbp_context
   km_kbp_context_item *citems = nullptr;

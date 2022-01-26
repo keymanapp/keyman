@@ -59,6 +59,30 @@ namespace km {
       return option(scope, key, i->second);
     }
 
+    km_kbp_status
+    rust_mock_processor::process_queued_actions(
+      km_kbp_state *state
+    ) {
+      assert(state);
+      if (!state)
+        return KM_KBP_STATUS_INVALID_ARGUMENT;
+      // TODO Implement
+      return KM_KBP_STATUS_OK;
+    }
+
+    bool rust_mock_processor::queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    )
+    {
+      assert(state);
+            assert(action_item);
+      if ((!state) || (!action_item))
+        return false;
+      // TODO Implement
+      return false;
+    }
+
     extern "C" uint32_t rust_mock_process_event(uint16_t vk, uint16_t modifier, uint8_t is_key_down);
 
     km_kbp_status rust_mock_processor::process_event(km_kbp_state *state,
@@ -78,6 +102,17 @@ namespace km {
       km_kbp_keyboard_key* key_list = new km_kbp_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
       return key_list;
     }
+
+    km_kbp_keyboard_imx  * rust_mock_processor::get_imx_list() const  {
+       km_kbp_keyboard_imx* imx_list = new km_kbp_keyboard_imx(KM_KBP_KEYBOARD_IMX_END);
+      return imx_list;
+    }
+
+    km_kbp_context_item * rust_mock_processor::get_intermediate_context() {
+      km_kbp_context_item *citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
+      return citems;
+    }
+
     km_kbp_status rust_mock_processor::validate() const { return KM_KBP_STATUS_OK; }
 
     km_kbp_status rust_null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }

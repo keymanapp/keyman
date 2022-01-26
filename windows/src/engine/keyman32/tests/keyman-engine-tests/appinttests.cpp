@@ -39,3 +39,45 @@ TEST(AppContext, Get_split_surrogate) {
   testContext.Get(callbuff, 2);
   EXPECT_STREQ((expectedString), callbuff);
 }
+
+
+// Test Calling BufMax
+TEST(AppContext, BufMax_LastChar) {
+  WCHAR callbuff[MAXCONTEXT];
+  const uint32_t ExpectedMarker = 0x0002;
+  AppContext testContext;
+  WCHAR testString[]            = {0x0042, 0xD800, 0xDC00, UC_SENTINEL, CODE_DEADKEY, ExpectedMarker, 0x0000};
+  WCHAR expectedString[] = {UC_SENTINEL, CODE_DEADKEY, 0x0002, 0x0000};
+
+  testContext.Set(testString);
+  WCHAR *contextBuf = testContext.BufMax(3);
+  EXPECT_STREQ((expectedString), contextBuf);
+  contextBuf += 2;
+  uint32_t TestMarker = (uint32_t)*contextBuf;
+  EXPECT_EQ(ExpectedMarker, TestMarker);
+
+}
+
+// Test AppContext::Delete()
+TEST(AppContext, AppContext_Delete) {
+  WCHAR callbuff[MAXCONTEXT];
+  const uint32_t ExpectedMarker = 0x0002;
+  AppContext testContext;
+  WCHAR testString[]     = {0x0042, 0xD800, 0xDC00, UC_SENTINEL, CODE_DEADKEY, ExpectedMarker, 0x0000};
+  WCHAR expectedString1[] = {0x0042, 0xD800, 0xDC00, 0x0000};
+  WCHAR expectedString2[] = {0x0042, 0x0000};
+  WCHAR expectedString3[] = {0x0000};
+  testContext.Set(testString);
+
+  testContext.Delete();
+  WCHAR *contextBuf = testContext.BufMax(MAXCONTEXT);
+  EXPECT_STREQ((expectedString1), contextBuf);
+  testContext.Delete();
+  contextBuf = testContext.BufMax(MAXCONTEXT);
+  EXPECT_STREQ((expectedString2), contextBuf);
+  testContext.Delete();
+  contextBuf = testContext.BufMax(MAXCONTEXT);
+  EXPECT_STREQ((expectedString3), contextBuf);
+  testContext.Delete();
+
+}

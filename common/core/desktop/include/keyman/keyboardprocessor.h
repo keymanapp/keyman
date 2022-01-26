@@ -131,6 +131,11 @@ typedef struct km_kbp_options     km_kbp_options;
 //
 typedef struct km_kbp_option_item  km_kbp_option_item;
 
+// Callback function used to to access Input Method eXtension library functions
+// from Keyman Core
+//
+typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t, void*);
+
 /*```
 ### Error Handling
 Error handling and success failure notification are communicated through a
@@ -461,6 +466,24 @@ km_kbp_context_shrink(km_kbp_context *context,
 
 /*
 ```
+### `km_kbp_context_item_list_size`
+##### Description:
+Return the length of a terminated `km_kbp_context_item` array.
+##### Return:
+The number of items in the list, not including terminating item,
+or 0 if `context_items` is null.
+##### Parameters:
+- __context_items__: A pointer to a `KM_KBP_CT_END` terminated array of
+    `km_kbp_context_item` values.
+
+```c
+*/
+KMN_API
+size_t
+km_kbp_context_item_list_size(km_kbp_context_item const *context_items);
+
+/*
+```
 ### Action Items
 These provide the results of processing a key event to the Platform layer and
 should be processed by the Platform layer to issue commands to the os text
@@ -552,7 +575,8 @@ struct km_kbp_option_item {
 Return the length of a terminated `km_kbp_option_item` array (options
 list).
 ##### Return:
-The number of items in the list or 0 if `opts` is null.
+The number of items in the list, not including terminating item,
+or 0 if `opts` is null.
 ##### Parameters:
 - __opts__: A pointer to a `KM_KBP_OPTIONS_END` terminated array of
     `km_kbp_option_item` values.
@@ -665,6 +689,15 @@ typedef struct {
 } km_kbp_keyboard_key;
 
 #define KM_KBP_KEYBOARD_KEY_LIST_END { 0, 0 }
+
+typedef struct {
+  km_kbp_cp const * library_name;
+  km_kbp_cp const * function_name;
+  uint32_t imx_id; // unique identifier used to call this function
+} km_kbp_keyboard_imx;
+
+#define KM_KBP_KEYBOARD_IMX_END { 0, 0, 0 }
+
 /*
 ```
 ### `km_kbp_keyboard_load`
@@ -765,8 +798,34 @@ returned by `km_kbp_keyboard_get_key_list`.
 
 ```c
 */
+KMN_API
 void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
 
+
+/**
+ * Returns the list of IMX libraries and function names that are referenced by
+ * the keyboard. The matching dispose call needs to be called to free the memory.
+ */
+KMN_API
+km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx** imx_list);
+
+/**
+ * Disposes of the IMX list
+ */
+KMN_API
+void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list);
+
+/**
+ * Register the IMX callback endpoint for the client.
+ */
+KMN_API
+void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback, void *callback_object);
+
+/**
+ * De-register IMX callback endpoint for the client.
+ */
+KMN_API
+void km_kbp_state_imx_deregister_callback(km_kbp_state *state);
 
 /*
 ```
@@ -868,6 +927,25 @@ KMN_API
 km_kbp_context *
 km_kbp_state_context(km_kbp_state *state);
 
+
+/*
+```
+### `kbp_state_get_intermediate_context`
+##### Description:
+Get access to the state object's keyboard processor's intermediate context. This context
+is used during an IMX callback, part way through processing a keystroke.
+##### Return:
+A pointer to an context item array. Must be disposed of by a call
+to `km_kbp_context_items_dispose`.
+##### Parameters:
+- __state__: A pointer to the opaque state object to be queried.
+
+```c
+*/
+KMN_API
+km_kbp_status
+kbp_state_get_intermediate_context(km_kbp_state *state, km_kbp_context_item ** context_items);
+
 /*
 ```
 ### `km_kbp_state_action_items`
@@ -892,6 +970,28 @@ KMN_API
 km_kbp_action_item const *
 km_kbp_state_action_items(km_kbp_state const *state,
                           size_t *num_items);
+
+/*
+```
+### `km_kbp_state_queue_action_items`
+##### Description:
+Queue actions for the current keyboard processor state; normally
+used in IMX callbacks called during `km_kbp_process_event`.
+##### Return:
+- `KM_KBP_STATUS_OK`: On success.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+In the event the `state` or `action_items` pointer are null.
+##### Parameters:
+- __state__:        A pointer to the opaque `km_kbp_state` object to be queried.
+- __action_items__: The action items to be added to the keyboardprocessor
+                    queue. Must be terminated with a `KM_KBP_IT_END` entry.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_state_queue_action_items(km_kbp_state *state,
+                         km_kbp_action_item const *action_items);
 
 /*
 ```
@@ -998,6 +1098,37 @@ km_kbp_process_event(km_kbp_state *state,
                      km_kbp_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down);
+
+/*
+```
+### `km_kbp_process_queued_actions`
+##### Description:
+Process the keyboard processors queued actions for the opaque state object.
+Updates the state object as appropriate and fills out its action list.
+The client can add actions externally via the `km_kbp_state_queue_action_items` and
+then request the processing of the actions with this method.
+
+The state action list will be cleared at the start of this call; options and context in
+the state may also be modified.
+##### Return status:
+- `KM_KBP_STATUS_OK`: On success.
+- `KM_KBP_STATUS_NO_MEM`:
+In the event memory is unavailable to allocate internal buffers.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+In the event the `state` pointer is null
+
+##### Parameters:
+- __state__: A pointer to the opaque state object.
+- __vk__: A virtual key to be processed.
+- __modifier_state__:
+The combinations of modifier keys set at the time key `vk` was pressed, bitmask
+from the `km_kbp_modifier_state` enum.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_process_queued_actions(km_kbp_state *state);
 
 #if defined(__cplusplus)
 } // extern "C"
