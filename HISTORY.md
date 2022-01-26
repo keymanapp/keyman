@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.186 alpha 2022-01-26
+
+* feat(linux): Replace hirsute with impish (#6161)
+
 ## 15.0.185 alpha 2022-01-25
 
 * feat(windows): testhost project for debugging keyman32 (#6154)
