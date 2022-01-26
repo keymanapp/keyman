@@ -214,7 +214,6 @@ uses
   utilcheckfontchars in '..\..\global\delphi\charmap\utilcheckfontchars.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  keymanapi_TLB in '..\..\engine\kmcomapi\keymanapi_TLB.pas',
   VisualKeyboardLoaderXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardExportXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas',
   VisualKeyboardLoaderBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',

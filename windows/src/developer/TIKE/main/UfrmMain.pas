@@ -423,7 +423,6 @@ uses
   System.Win.ComObj,
   Vcl.Themes,
 
-  keymanapi_tlb,
   Keyman.System.CEFManager,
 
   CharMapDropTool,
@@ -528,18 +527,6 @@ begin
     end;
   finally
     Free;
-  end;
-
-  // TODO: move this out of here and alongside keyboard install helpers
-  try
-    kmcom := CoKeyman.Create;
-  except
-    on E:Exception do
-    begin
-      ShowMessage('Unable to instanatiate Keyman COM object.  Keyman Developer tools will run, but will have limited functionality.  '+
-        'To resolve this problem, reinstall Keyman.'#13#10#13#10'The error returned was: '+E.Message);
-      kmcom := nil;
-    end;
   end;
 
   RemoveOldestTikeEditFonts(False);
@@ -695,8 +682,6 @@ begin
   FreeUnicodeData;
 
   FreeAndNil(AppStorage);
-
-  kmcom := nil;
 end;
 
 procedure TfrmKeymanDeveloper.FormShow(Sender: TObject);

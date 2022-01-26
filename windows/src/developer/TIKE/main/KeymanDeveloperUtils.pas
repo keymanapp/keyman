@@ -54,7 +54,6 @@ uses
   Winapi.Windows,
 
   KeymanPaths,
-  keymanapi_TLB,
   Sentry.Client,
   UserMessages;
 
@@ -81,13 +80,9 @@ function GetBitmapNameFromLine(FFileName: string; s: string): string;
 procedure RemoveOldestTikeEditFonts(FMaxLessOne: Boolean);
 procedure RemoveOldestTikeTestFonts(FMaxLessOne: Boolean);
 function GetCurrentDateTime: string;
-function GetKMShellPath(var ps: string): Boolean;   // I3655
 function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean): Cardinal;   // I3655
 
 procedure TestSentry;
-
-var
-  kmcom: IKeyman = nil;
 
 implementation
 
@@ -97,6 +92,8 @@ uses
   ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
      utilsystem, Forms, kmxfile, OnlineConstants, Dialogs, utilexecute,
      KeymanVersion, CRC32, VisualKeyboard, Controls;
+
+function GetKMShellPath(var ps: string): Boolean; forward;  // I3655
 
 var
   hMutex: THandle;
@@ -304,20 +301,12 @@ end;
 procedure InstallKeyboard(const nm: string; FCanInstallUnreg: Boolean);   // I4682
 var
   kmshell: string;
-  errmsg: WideString;
 begin
-  if not Assigned(kmcom) then Exit;
-
   if not GetKMShellPath(kmshell) then   // I3655
-  begin
-    ShowMessage('Keyman is not installed.  You must install Keyman to install this keyboard.');
     Exit;
-  end;
 
   if not TUtilExecute.WaitForProcess(kmshell+' -i "'+nm+'"', ExtractFilePath(nm)) then  // I3475
-    ShowMessage('Failed to install keyboard: '+errmsg);
-
-  kmcom.Refresh;
+    ShowMessage('Failed to install keyboard');
 end;
 
 function IsKeymanDesktopInstalled: Boolean;
@@ -332,81 +321,35 @@ end;
 
 procedure InstallPackage(const nm: string; FCanInstallUnreg: Boolean);
 var
-  kmshell: WideString;
-  errmsg: WideString;
+  kmshell: string;
 begin
-  if not Assigned(kmcom) then Exit;
-
-  if not IsKeymanDesktopInstalled then
-  begin
-    ShowMessage('Keyman is not installed.  You must install Keyman to install this keyboard.');
+  if not GetKmshellPath(kmshell) then
     Exit;
-  end;
-
-  try
-    kmshell := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
-  except
-    on E:EKeymanPath do
-    begin
-      ShowMessage('Keyman is not installed.  You must install Keyman to install this keyboard.');
-      Exit;
-    end;
-  end;
 
   if TUtilExecute.WaitForProcess('"'+kmshell+'" -i "'+nm+'"', ExtractFilePath(nm)) = False then  // I3475
-    ShowMessage('Failed to install package: '+errmsg);
-
-  kmcom.Refresh;
-{  if not Assigned(kmcom) then Exit;
-  try
-    UninstallPackage(nm);
-    kmcom.Packages.Install(nm, False, True, '');
-  except
-    on E:EOleException do  // I654
-    begin
-      ShowMessage(E.Message);
-    end;
-  end;}
+    ShowMessage('Failed to install package');
 end;
 
 procedure UninstallKeyboard(const nm: string);
 var
-  n: Integer;
+  kmshell: string;
 begin
-  if not Assigned(kmcom) then Exit;
-  try
-    kmcom.Keyboards.Refresh;
-    n := kmcom.Keyboards.IndexOf(nm);
-    if n > 0 then
-    begin
-      if kmcom.Keyboards[n].OwnerPackage <> nil then
-        kmcom.Keyboards[n].OwnerPackage.Uninstall(True)
-      else
-        kmcom.Keyboards[n].Uninstall;
-    end;
-  except
-    on E:EOleException do // I654
-    begin
-      ShowMessage(E.Message);
-    end;
-  end;
+  if not GetKmshellPath(kmshell) then
+    Exit;
+
+  if TUtilExecute.WaitForProcess('"'+kmshell+'" -uk "'+nm+'"', ExtractFilePath(nm)) = False then  // I3475
+    ShowMessage('Failed to uninstall package');
 end;
 
 procedure UninstallPackage(const nm: string);
 var
-  n: Integer;
+  kmshell: string;
 begin
-  if not Assigned(kmcom) then Exit;
-  try
-    kmcom.Packages.Refresh;
-    n := kmcom.Packages.IndexOf(nm);
-    if n > 0 then kmcom.Packages[n].Uninstall(True);
-  except
-    on E:EOleException do // I654
-    begin
-      ShowMessage(E.Message);
-    end;
-  end;
+  if not GetKmshellPath(kmshell) then
+    Exit;
+
+  if TUtilExecute.WaitForProcess('"'+kmshell+'" -up "'+nm+'"', ExtractFilePath(nm)) = False then  // I3475
+    ShowMessage('Failed to uninstall package');
 end;
 
 
@@ -571,11 +514,20 @@ end;
 
 function GetKMShellPath(var ps: string): Boolean;   // I3655
 begin
+  if not IsKeymanDesktopInstalled then
+  begin
+    ShowMessage('Keyman for Windows is not installed.  You must install Keyman to complete this action.');
+    Exit(False);
+  end;
+
   try
     ps := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
   except
     on E:EKeymanPath do
+    begin
+      ShowMessage('Keyman for Windows is not installed.  You must install Keyman to complete this action.');
       Exit(False);
+    end;
   end;
   Result := FileExists(ps);
 end;
@@ -588,10 +540,7 @@ begin
   Result := $FFFFFFFF;
 
   if not GetKMShellPath(kmshell) then
-  begin
-    ShowMessage('Keyman is not installed.  You must install Keyman to continue.');
     Exit;
-  end;
 
   FillChar(execinfo, sizeof(execinfo), 0);
   execinfo.cbSize := SizeOf(execinfo);
