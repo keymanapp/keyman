@@ -62,16 +62,16 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             [_tmpCtxBuf replaceOccurrencesOfString:@"\0" withString:@"" options:0 range:NSMakeRange(0, 1)];
         [self setVKMapping];
     }
-    
+
     return self;
 }
 
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
     self.debugMode = useVerboseLogging;
-    
+
     if (useVerboseLogging) {
         NSLog(@"KME - Turning verbose logging on");
-        // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME", 
+        // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME",
         // it will force a simulated crash to test reporting to sentry.keyman.com.
         NSString * kmxName = [[_kmx filePath] lastPathComponent];
         NSLog(@"Sentry - KME: _kmx name = %@", kmxName);
@@ -101,7 +101,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     if (_tmpCtxBuf == nil) {
         _tmpCtxBuf = [[NSMutableString alloc] initWithString:@""];
     }
-    
+
     return _tmpCtxBuf;
 }
 
@@ -114,23 +114,23 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 - (NSArray *)processEvent:(NSEvent *)event {
     NSArray *actions = nil;
-    
+
     if (!self.kmx)
         return nil;
-    
+
     NSInteger startIndex = [[self.kmx.startGroup objectAtIndex:1] integerValue];
     if (startIndex < 0 || startIndex >= [self.kmx.group count])
         startIndex = [[self.kmx.startGroup objectAtIndex:0] integerValue];
     if (startIndex < 0 || startIndex >= [self.kmx.group count])
         return nil;
-    
+
     KMCompGroup *gp = [self.kmx.group objectAtIndex:startIndex];
     actions = [self processGroup:gp event:event];
-    
+
     if (actions.count == 0 && _easterEggForSentry != nil) {
         [self processPossibleEasterEggCharacterFrom:[event characters]];
     }
-    
+
     return [[actions mutableCopy] optimise];
 }
 
@@ -146,24 +146,24 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             // Both of the following approaches do throw an exception that causes control to exit this method,
             // but at least in my debug builds locally, neither one seems to get picked up by Sentry in a
             // way that results in a new report on sentry.keyman.com
-            
+
 #ifndef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
             //#1
             @throw ([NSException exceptionWithName:@"SentryForce" reason:@"Easter egg hit" userInfo:nil]);
-            
+
             //#2
             //    NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
             //    NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
             //    // Divide by 0 to throw an exception
             //    NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
-            
+
 #else
             //#3 The following DOES work, but it's really lame because the crash actually gets forced in the IM
             // via this bogus call to a protocol method implemented in the IM's App Delegate just for the
             // purpose of enabling the engine to force a crash.
             [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
 #endif
-            
+
             NSLog(@"Sentry - KME: You should not be seeing this line!");
         }
     }
@@ -176,13 +176,13 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (NSArray *)processGroup:(KMCompGroup *)gp event:(NSEvent *)event {
     if (!gp)
         return nil;
-    
+
     if (event.type != NSKeyDown || ![event respondsToSelector:@selector(keyCode)])
         return nil;
 
     if (([event modifierFlags] & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
         return nil; // Engine should NEVER attempt to process characters when the Command key is pressed.
-    
+
     // REVIEW: Might need to use charactersIgnoringModifiers instead of characters to avoid
     // getting Mac predefined subsitutions for Option + ??? keystrokes. But at least for the normal
     // case of shifted characters, what we have is what we want.
@@ -193,9 +193,9 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         NSLog(@"%lu characters = %@", [[event characters] length], characters);
         NSLog(@"%lu characters ignoring modifiers = %@", [[event charactersIgnoringModifiers] length], [event charactersIgnoringModifiers]);
     }
-    
+
     NSArray *actions = nil;
-    
+
     if (gp.fUsingKeys) {
         // Begin group using keys
         unsigned short keyCode = [event keyCode];
@@ -206,7 +206,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             DWORD flags = kmKey.shiftFlags;
             if (![self.kmx isMnemonic] && ((flags & VIRTUALCHARKEY) == VIRTUALCHARKEY))
                 continue;
-            
+
             if ((flags & (ISVIRTUALKEY | VIRTUALCHARKEY)) == (ISVIRTUALKEY | VIRTUALCHARKEY)) {
                 NSString *chars = [self getCharsFromKeyCode:[event keyCode]];
                 if (chars.length && ((kmKey.key == [chars characterAtIndex:0]) || (kmKey.key == [[chars uppercaseString] characterAtIndex:0])))
@@ -221,7 +221,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 [mKeys addObject:kmKey];
             }
         }
-        
+
         if (self.debugMode) {
             NSLog(@"Matching keys = %@", mKeys);
             NSLog(@"[event modifierFlags] = %lX", [event modifierFlags]);
@@ -232,13 +232,13 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 NSLog(@"Adding SHIFT flag to mask.");
             mask |= K_SHIFTFLAG;
         }
-        
+
         if (([event modifierFlags] & NSEventModifierFlagCapsLock) == NSEventModifierFlagCapsLock) {
             if (self.debugMode)
                 NSLog(@"Adding CAPITAL flag to mask.");
             mask |= CAPITALFLAG;
         }
-        
+
         if (([event modifierFlags] & MK_LEFT_ALT_MASK) == MK_LEFT_ALT_MASK) {
             if (self.debugMode)
                 NSLog(@"Adding LEFT ALT flag to mask.");
@@ -271,7 +271,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         }
         if (self.debugMode)
             NSLog(@"Mask = %X", mask);
-        
+
         KMCompKey *mKey = nil;
         for (KMCompKey *key in mKeys) {
             if (key.shiftFlags & ISVIRTUALKEY) {
@@ -297,7 +297,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     kMask |= K_ALTFLAG;
                     kMask ^= RALTFLAG;
                 }
-                
+
                 DWORD mFlag = key.shiftFlags & K_MODIFIERFLAG;
                 DWORD mMask = kMask & K_MODIFIERFLAG;
                 if (self.debugMode) {
@@ -331,7 +331,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 }
             }
         }
-        
+
         /*
          // Fall back if no match
          if (!mKey && mKeys.count == 1) {
@@ -350,14 +350,14 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
          }
          }
          }*/
-        
+
         if (self.debugMode)
             NSLog(@"mKey = %@", mKey);
         if (mKey == nil)
             actions = [self processNoMatch:gp.noMatch event:event usingKeys:YES];
         else {
             actions = [self processKey:mKey event:event];
-            
+
             NSArray *mActions = [self processMatch:gp.match event:event];
             if (mActions) {
                 NSMutableArray *nActions = [NSMutableArray arrayWithArray:actions];
@@ -376,14 +376,14 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 break;
             }
         }
-        
+
         if (self.debugMode)
             NSLog(@"mKey! = %@", mKey);
         if (mKey == nil)
             actions = [self processNoMatch:gp.noMatch event:event usingKeys:NO];
         else {
             actions = [self processKey:mKey event:event];
-            
+
             NSArray *mActions = [self processMatch:gp.match event:event];
             if (mActions) {
                 NSMutableArray *nActions = [NSMutableArray arrayWithArray:actions];
@@ -393,14 +393,14 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             }
         }
     }
-    
+
     return actions;
 }
 
 - (NSArray *)processKey:(KMCompKey *)key event:(NSEvent *)event {
     if (!key)
         return nil;
-    
+
     NSMutableArray *actions = nil;
     NSUInteger cx = [self contextMatch:key]%1000;
     NSString *ctx = @"";
@@ -412,11 +412,11 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         NSDictionary *action = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:cx], Q_BACK, nil];
         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
     }
-    
+
     NSString *outKey = key.output;
     if (!outKey || !outKey.length)
         return nil;
-    
+
     BOOL handledWithoutActions = NO;
 
     for (int i = 0; i < outKey.length;) {
@@ -441,7 +441,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
                     else
                         [actions addAction:action];
-                    
+
                     i+=4;
                     break;
                 }
@@ -454,7 +454,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
                     else
                         [actions addAction:action];
-                    
+
                     i+=2;
                     break;
                 }
@@ -470,7 +470,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
                     else
                         [actions addAction:action];
-                    
+
                     i+=3;
                     break;
                 }
@@ -504,7 +504,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         for (NSDictionary *action in nActions)
                             [actions addAction:action];
                     }
-                    
+
                     i+=3;
                     break;
                 }
@@ -514,7 +514,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
                     else
                         [actions addAction:action];
-                    
+
                     i+=2;
                     break;
                 }
@@ -524,7 +524,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
                     else
                         [actions addAction:action];
-                    
+
                     i+=2;
                     break;
                 }
@@ -539,6 +539,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     i+=4;
                     break;
                 }
+
                 case CODE_RESETOPT: {
                     DWORD x1 = [outKey characterAtIndex:i+2]-1;
                     KMCompStore *store = [self.kmx.store objectAtIndex:x1];
@@ -560,10 +561,13 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
                     else
                         [actions addAction:action];
-                    
+
                     i+=3;
                     break;
                 }
+                case CODE_SETSYSTEMSTORE:
+                    i+=4;
+                    break;
                 default:
                     i+=2;
                     break;
@@ -577,14 +581,14 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 actions = [[NSMutableArray alloc] initWithObjects:action, nil];
             else
                 [actions addAction:action];
-            
+
             i++;
         }
-        
+
         if (self.debugMode)
             NSLog(@"tmpCtxBuf = \"%@\"", [self.tmpCtxBuf codeString]);
     }
-    
+
     if (!actions && handledWithoutActions) {
         NSDictionary *action = [[NSDictionary alloc] initWithObjectsAndKeys:@"", Q_NUL, nil];
         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
@@ -596,12 +600,12 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (NSArray *)processMatch:(NSString *)match event:(NSEvent *)event {
     if (!match || !match.length)
         return nil;
-    
+
     if (self.debugMode)
         NSLog(@"Processing match rule = %@", [match codeString]);
-    
+
     NSMutableArray *actions = nil;
-    
+
     for (int i = 0; i < match.length;) {
         unichar c = [match characterAtIndex:i];
         if (c == UC_SENTINEL) {
@@ -617,7 +621,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         for (NSDictionary *action in nActions)
                             [actions addAction:action];
                     }
-                    
+
                     i+=3;
                     break;
                 }
@@ -652,14 +656,14 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 actions = [[NSMutableArray alloc] initWithObjects:action, nil];
             else
                 [actions addAction:action];
-            
+
             i++;
         }
-        
+
         if (self.debugMode)
             NSLog(@"tmpCtxBuf = \"%@\"", [self.tmpCtxBuf codeString]);
     }
-    
+
     return actions;
 }
 
@@ -667,12 +671,12 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     // * return nil if the current keystroke does not produce a character in normal use
     if (!noMatch || !noMatch.length || (VKMap[[event keyCode]] < 32))
         return nil;
-    
+
     if (self.debugMode)
         NSLog(@"Processing NoMatch rule = %@", [noMatch codeString]);
-    
+
     NSMutableArray *actions = nil;
-    
+
     for (int i = 0; i < noMatch.length;) {
         unichar c = [noMatch characterAtIndex:i];
         if (c == UC_SENTINEL) {
@@ -688,7 +692,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         for (NSDictionary *action in nActions)
                             [actions addAction:action];
                     }
-                    
+
                     i+=3;
                     break;
                 }
@@ -723,14 +727,14 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 actions = [[NSMutableArray alloc] initWithObjects:action, nil];
             else
                 [actions addAction:action];
-            
+
             i++;
         }
-        
+
         if (self.debugMode)
             NSLog(@"tmpCtxBuf = \"%@\"", [self.tmpCtxBuf codeString]);
     }
-    
+
     return actions;
 }
 
@@ -738,13 +742,13 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     NSString *keyCtx = cpKey.context;
     //if (/*!self.tmpCtxBuf.length ||*/ !keyCtx.length)
     //    return 0;
-    
+
     // Context match length
     NSUInteger cx = keyCtx.xLength;
     NSUInteger cxIf = keyCtx.xLengthIncludingIf;
     if (self.tmpCtxBuf.xLength < cx)
         return 0;
-    
+
     //NSString *ctx = [ctxBuf substringFromIndex:ctxBuf.length - cx];
     NSString *ctx = [self.tmpCtxBuf lastNChars:cx];
     //if (self.debugMode)
@@ -752,7 +756,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     self.indexStack = [[NSMutableArray alloc] initWithCapacity:cxIf];
     for (int i = 0; i < cxIf; i++)
         [self.indexStack addObject:[NSNumber numberWithUnsignedInteger:0]];
-    
+
     BOOL checkNul = NO;
     BOOL checkPlatform = NO;
     int sx = 0; // index stack counter
@@ -773,7 +777,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                         return 0;
                     else
                         [self.indexStack setObject:[NSNumber numberWithUnsignedInteger:loc] atIndexedSubscript:sx];
-                    
+
                     px++;
                     sx++;
                     i+=3;
@@ -789,7 +793,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     //NSUInteger loc = [store.string rangeOfString:strKey].location;
                     if (loc != NSNotFound)
                         return 0;
-                    
+
                     px++;
                     sx++;
                     i+=3;
@@ -802,7 +806,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     NSUInteger n = [[self.indexStack objectAtIndex:x2 - 1] unsignedIntegerValue];
                     if ([ctx characterAtIndex:px] != [store.string characterAtIndex:n])
                         return 0;
-                    
+
                     px++;
                     sx++;
                     i+=4;
@@ -813,7 +817,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     c = [ctx characterAtIndex:index - 1];
                     if ([ctx characterAtIndex:px] != c)
                         return 0;
-                    
+
                     px++;
                     sx++;
                     i+=3;
@@ -830,7 +834,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     }
                     else
                         return 0;
-                    
+
                     px++;
                     sx++;
                     i+=3;
@@ -881,7 +885,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 case CODE_NUL:
                     if (i == 0)
                         checkNul = YES;
-                    
+
                     i+=2;
                     break;
                 default:
@@ -891,22 +895,22 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         else {
             if ([ctx characterAtIndex:px++] != c)
                 return 0;
-            
+
             sx++;
             i++;
         }
     }
-    
+
     if (checkNul) {
         if (![self.tmpCtxBuf isEqualToString:ctx])
             return 0;
         else
             cx+=1000;
     }
-    
+
     if (checkPlatform)
         cx+=1000;
-    
+
     return cx;
 }
 
@@ -914,20 +918,20 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     TISInputSourceRef currentKeyboard = TISCopyCurrentKeyboardLayoutInputSource();
     CFDataRef uchr = (CFDataRef)TISGetInputSourceProperty(currentKeyboard, kTISPropertyUnicodeKeyLayoutData);
     const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout*)CFDataGetBytePtr(uchr);
-    
+
     if (keyboardLayout) {
         UInt32 deadKeyState = 0;
         UniCharCount maxStringLength = 255;
         UniCharCount actualStringLength = 0;
         UniChar unicodeString[maxStringLength];
-        
+
         OSStatus status = UCKeyTranslate(keyboardLayout,
                                          keyCode, kUCKeyActionDown, 0,
                                          LMGetKbdType(), 0,
                                          &deadKeyState,
                                          maxStringLength,
                                          &actualStringLength, unicodeString);
-        
+
         if (actualStringLength == 0 && deadKeyState) {
             status = UCKeyTranslate(keyboardLayout,
                                     kVK_Space, kUCKeyActionDown, 0,
@@ -936,11 +940,11 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                                     maxStringLength,
                                     &actualStringLength, unicodeString);
         }
-        
+
         if (actualStringLength > 0 && status == noErr)
             return [NSString stringWithCharacters:unicodeString length:(NSUInteger)actualStringLength];
     }
-    
+
     return nil;
 }
 
@@ -1005,7 +1009,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     VKMap[MVK_GRAVE] = VK_GRAVE;                    // `
     VKMap[MVK_BACKSPACE] = VK_BACKSPACE;            // <Backspace>
     VKMap[MVK_OEM102] = VK_OEM_102;                 // 102nd key (ISO keyboards)
-    
+
     // Num Pad
     VKMap[0x41] = VK_NUMPAD_DECIMAL;                // Decimal .
     VKMap[0x43] = VK_NUMPAD_MULTIPLY;               // Multiply *
@@ -1037,7 +1041,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
            && [c characterAtIndex:x+1] >= 0xDC00 && [c characterAtIndex:x+1] <= 0xDFFF) return x+2;
         return x+1;
     }
-    
+
     x+=2;
     switch([c characterAtIndex:x-1])
     {
