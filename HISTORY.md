@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.286 stable 2022-01-27
+
+* chore(linux): Update changelogs for 14.0.284 (#6131)
+* chore(linux): Revert workaround for Python bug (#6134)
+* fix: only auto-merge if `auto:` prefix in title (#6148)
+* fix(developer): work around devDependencies bug in npm (#6142)
+* chore(ios): certificate update (#6166)
+* fix(mac): Check for CODE_SETSYSTEMSTORE (#6170)
+
 ## 14.0.285 stable 2022-01-20
 
 * fix(linux): Fix lintian errors :cherries: (#6107)
