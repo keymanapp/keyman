@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.187 alpha 2022-01-27
+
+* fix(developer): handle Core failure to load (#6141)
+* feat(windows): Keyman Core Integration - Support for IMX DLLs (#5936)
+* chore(windows): testhost readme (#6164)
+* chore(ios): certificate update (#6165)
+* feat(linux): add support for Wayland (#6135)
+
 ## 15.0.186 alpha 2022-01-26
 
 * feat(linux): Replace hirsute with impish (#6161)
