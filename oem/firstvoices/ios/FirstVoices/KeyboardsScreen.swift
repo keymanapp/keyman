@@ -15,14 +15,24 @@ import UIKit
 
 let keymanHelpSite: String = "https://help.keyman.com/keyboard/"
 
-class KeyboardsScreen: UIViewController {
+/*
+ * define protocol so that KeyboardDetailController can send message to update state of checkmark in keyboard list
+ */
+protocol RefreshKeyboardCheckmark {
+  func refreshCheckmark()
+}
+
+class KeyboardsScreen: UIViewController, RefreshKeyboardCheckmark {
+  func refreshCheckmark() {
+    self.tableView.reloadRows(at: [selectedKeyboardIndex], with: UITableView.RowAnimation.top)
+    //self.tableView.setNeedsDisplay()
+  }
  
   @IBOutlet weak var tableView: UITableView!
 
   var selectedKeyboardIndex: IndexPath = IndexPath(row: 0, section: 0)
     
   private var _keyboardList: FVRegionList!
-  
   private var keyboardList: FVRegionList {
     get {
       if _keyboardList == nil {
@@ -32,25 +42,30 @@ class KeyboardsScreen: UIViewController {
     }
   }
 
-  private var _loadedKeyboards: [String] = []
-
   override func viewDidLoad() {
-    _loadedKeyboards = FVRegionStorage.loadKeyboardListFromUserDefaults()
-
     super.viewDidLoad()
 
     tableView.delegate = self
     tableView.dataSource = self
   }
   
-  // In a storyboard-based application, you will often want to do a little preparation before navigation
+  /*
+   * Segue to keyboard details screen.
+   * Before the segue, call the details view controller and pass the state of the keyboard and
+   * a reference to self to be called back to update the row if the state changes.
+   */
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     if segue.identifier == "keyboardDetails" {
       let detailsController = segue.destination as! KeyboardDetailController
       let indexPath = self.tableView.indexPathForSelectedRow
       let keyboards = (self.keyboardList[indexPath!.section]).keyboards
       let keyboard = keyboards[indexPath!.row]
-      detailsController.keyboard = keyboard
+      
+      if let keyboardState: FVKeyboardState = FVKeyboardState.loadKeyboardState(keyboardId: keyboard.id) {
+        detailsController.configure(delegate: self, keyboard: keyboardState)
+      } else {
+        print("Could not find keyboard \(keyboard.id) in available keyboards list.")
+      }
     }
   }
 
@@ -84,21 +99,9 @@ extension KeyboardsScreen: UITableViewDataSource, UITableViewDelegate {
     return self.keyboardList[section].name
   }
 
-  /*
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    super
     self.selectedKeyboardIndex = indexPath
-    //tableView.deselectRow(at: <#T##IndexPath#>, animated: <#T##Bool#>)
-    //tableView.deselectRow(at: indexPath, animated: true)
-    //let keyboards = (self.keyboardList[indexPath.section]).keyboards
-    
-    /*
-    guard let cell = tableView.cellForRow(at: indexPath) else { return }
-    cell.accessoryType = .checkmark
-     */
-    self.performSegue(withIdentifier: "keyboardDetails", sender: indexPath)
- }
- */
+  }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return self.keyboardList[section].keyboards.count
@@ -108,18 +111,14 @@ extension KeyboardsScreen: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let keyboards = (self.keyboardList[indexPath.section]).keyboards
     let keyboard = keyboards[indexPath.row]
+    let keyboardState = FVKeyboardState.loadKeyboardState(keyboardId: keyboard.id)
+    
     //let cell = tableView.dequeueReusableCell(withIdentifier: "KeyboardCell") as! KeyboardCell
     let cell = tableView.dequeueReusableCell(withIdentifier: "KeyboardCell")
-      cell!.textLabel!.text = keyboard.name
+    cell!.textLabel!.text = keyboardState?.name
 
-    if(_loadedKeyboards.contains(keyboard.id)) {
-      cell!.imageView?.isHidden = false
-      print("loaded keyboard = \(keyboard.name), id = \(keyboard.id), legacyId = \(keyboard.legacyId)")
-    } else {
-    cell!.imageView?.isHidden = true
-    }
+    cell!.imageView?.isHidden = !keyboardState!.isEnabled
         
     return cell!
   }
-  
 }

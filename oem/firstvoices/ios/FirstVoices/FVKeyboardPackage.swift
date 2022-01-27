@@ -8,16 +8,36 @@
  *
  * Created by Shawn Schantz on 2022-01-25.
  * 
- * Description...
+ * Class that loads data related to the definition of the Keyboard and Package.
+ * Includes methods to read from the First Voices kmp file and load available keyboards.
+ * When loading keyboards from the kmp file, information is saved in an FVKeyboardDefinition
+ * object to associate it with its corresponding language and language tag.
+ *
  */
 
 import Foundation
 import KeymanEngine
 
+class FVKeyboardDefinition {
+  let name: String
+  let keyboardId: String
+  let keyboardVersion: String
+  let languageTag: String
+  let languageName: String
+  
+  init(name: String, keyboardId: String, keyboardVersion: String, languageTag: String, languageName: String) {
+    self.name = name
+    self.keyboardId = keyboardId
+    self.keyboardVersion = keyboardVersion
+    self.languageTag = languageTag
+    self.languageName = languageName
+  }
+}
+
 class FVKeyboardPackage {
 
-  static private var _availableKeyboards: [String:FVKeyboardDescriptor] = [:]
-  static public var availableKeyboards: [String:FVKeyboardDescriptor] {
+  static private var _availableKeyboards: [String:FVKeyboardDefinition] = [:]
+  static public var availableKeyboards: [String:FVKeyboardDefinition] {
     get {
       return FVKeyboardPackage._availableKeyboards
     }
@@ -55,27 +75,11 @@ class FVKeyboardPackage {
       // assume one keyboard per package per language as that's currently all we have in practice
       let keyboard = keyboardArray[0]
       let keyboardId = keyboard.id
-      let keyboardDescriptor = FVKeyboardDescriptor(name: keyboard.name, keyboardId: keyboardId,
+      let keyboardDefinition = FVKeyboardDefinition(name: keyboard.name, keyboardId: keyboardId,
                                                     keyboardVersion: keyboard.version, languageTag:
                                                   keyboard.lgCode, languageName: keyboard.languageName)
       
-      _availableKeyboards[keyboardId] = keyboardDescriptor
+      _availableKeyboards[keyboardId] = keyboardDefinition
     }
-  }
-}
-
-class FVKeyboardDescriptor {
-  let name: String
-  let keyboardId: String
-  let keyboardVersion: String
-  let languageTag: String
-  let languageName: String
-  
-  init(name: String, keyboardId: String, keyboardVersion: String, languageTag: String, languageName: String) {
-    self.name = name
-    self.keyboardId = keyboardId
-    self.keyboardVersion = keyboardVersion
-    self.languageTag = languageTag
-    self.languageName = languageName
   }
 }

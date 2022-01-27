@@ -71,6 +71,9 @@
                                         </label>
                                         <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XVc-S7-Ce9">
                                             <rect key="frame" x="255" y="11" width="51" height="31.5"/>
+                                            <connections>
+                                                <action selector="didToggle:" destination="EEw-P3-Ezy" eventType="valueChanged" id="UBL-bH-leY"/>
+                                            </connections>
                                         </switch>
                                     </subviews>
                                     <constraints>
@@ -89,7 +92,7 @@
                                     <outlet property="switchLabel" destination="VGm-es-KNg" id="QhH-fq-zgE"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="attributeCell" textLabel="hmb-Gy-LXm" detailTextLabel="4gY-nL-15E" style="IBUITableViewCellStyleValue1" id="XYb-N4-6xI" customClass="KeyboardDetailCell" customModule="FirstVoices" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="attributeCell" textLabel="hmb-Gy-LXm" detailTextLabel="4gY-nL-15E" style="IBUITableViewCellStyleValue1" id="XYb-N4-6xI">
                                 <rect key="frame" x="0.0" y="109" width="320" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="XYb-N4-6xI" id="jbc-l5-Yyr">
@@ -105,6 +108,23 @@
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="4gY-nL-15E">
                                             <rect key="frame" x="260" y="12" width="44" height="20.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="labelCell" textLabel="Z7V-cv-wnS" style="IBUITableViewCellStyleDefault" id="U3s-AW-OmZ">
+                                <rect key="frame" x="0.0" y="152.5" width="320" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="U3s-AW-OmZ" id="nUv-LH-pRe">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Text" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="Z7V-cv-wnS">
+                                            <rect key="frame" x="16" y="0.0" width="288" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>

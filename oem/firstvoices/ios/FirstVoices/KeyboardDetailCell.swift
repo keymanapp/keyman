@@ -13,12 +13,24 @@
 
 import UIKit
 
+typealias Callback = (Bool) -> Bool
+
 class KeyboardDetailCell: UITableViewCell {
+  var callback: Callback? = nil
+  
   @IBOutlet weak var switchLabel: UILabel!
   @IBOutlet weak var detailSwitch: UISwitch!
   
-  func configure(label: String, enabled: Bool) {
+  private var title: String = ""
+  
+  @IBAction func didToggle(_ sender: Any) {
+    let result = callback!(detailSwitch.isOn)
+  }
+  
+  func configure(label: String, enabled: Bool, callback: @escaping Callback) {
     switchLabel.text = label
+    self.title = label
+    self.callback = callback
     detailSwitch.setOn(enabled, animated: false)
   }
 }
