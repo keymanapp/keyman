@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.188 alpha 2022-01-28
+
+* fix(mac): Check for CODE_SETSYSTEMSTORE (#6169)
+* feat(developer): Keyman Developer Server (#6073)
+
 ## 15.0.187 alpha 2022-01-27
 
 * fix(developer): handle Core failure to load (#6141)
