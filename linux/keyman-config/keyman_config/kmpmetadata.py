@@ -316,6 +316,7 @@ def parseinfdata(inffile, verbose=False):
                     options = {}
                 for item in config.items('Package'):
                     if item[0] == 'Version':
+                        # intentionally storing in system because that's where fileVersion lives in kmp.json
                         system['fileVersion'] = item[1]
                     elif item[0] == 'ReadMeFile':
                         options['readmeFile'] = item[1]

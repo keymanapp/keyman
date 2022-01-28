@@ -22,6 +22,12 @@ namespace kbp
   private:
     bool               _valid;
     kmx::KMX_ProcessEvent _kmx;
+
+    km_kbp_status
+    internal_process_queued_actions(
+      km_kbp_state *state
+      );
+
   public:
     kmx_processor(path);
 
@@ -49,12 +55,22 @@ namespace kbp
       std::u16string const & value
     ) override;
 
-    /**
-     * Get the list of keys belonging to the keyboard rules.
-     *
-     * @return  km_kbp_keyboard_key*
-     */
+    km_kbp_status
+    process_queued_actions(
+      km_kbp_state *state
+      ) override;
+
+    bool
+    queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    ) override;
+
+    km_kbp_context_item * get_intermediate_context() override;
+
     km_kbp_keyboard_key * get_key_list() const override;
+
+    km_kbp_keyboard_imx * get_imx_list() const override;
 
   };
 

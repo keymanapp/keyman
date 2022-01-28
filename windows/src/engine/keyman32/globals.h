@@ -188,6 +188,8 @@ typedef struct tagKEYMANHKLPAIR
 
 #define MAXCACHEDKEYBOARDLAYOUTS 128
 
+typedef BOOL (WINAPI *CUSTOMPOSTKEYCALLBACKPROC)(APPACTIONQUEUEITEM* Queue, int QueueSize);
+
 typedef struct tagKEYMAN64THREADDATA
 {
   LPINTKEYBOARDINFO lpKeyboards;			// keyboard definitions
@@ -252,6 +254,10 @@ typedef struct tagKEYMAN64THREADDATA
   ISerialKeyEventClient *pSerialKeyEventClient;
   ISharedBufferManager *pSharedBufferManager;
 
+  /* Test host integration */
+
+  CUSTOMPOSTKEYCALLBACKPROC CustomPostKeyCallback;
+
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
 extern UINT
@@ -292,5 +298,9 @@ BOOL Globals_ProcessInitialised();
 /* Debug flags */
 
 BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault);
+
+/* Test Host integration */
+
+void WINAPI SetCustomPostKeyCallback(CUSTOMPOSTKEYCALLBACKPROC proc);
 
 #endif

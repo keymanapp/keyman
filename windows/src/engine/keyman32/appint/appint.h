@@ -40,6 +40,8 @@ typedef struct
 #define QIT_DEADKEY		5
 #define QIT_BELL		6
 #define QIT_BACK		7
+#define QIT_CAPSLOCK 8
+#define QIT_INVALIDATECONTEXT 9
 
 // QueueDebugInformation ItemTypes
 #define QID_BEGIN_UNICODE		0
@@ -142,7 +144,7 @@ public:
    */
 	WCHAR *BufMax(int n);
 
-    /**
+  /**
    * Returns a pointer to the character in the current context buffer which
    * will have n valid xstring units remaining until the the null terminating character.
    * OR
@@ -163,10 +165,17 @@ public:
 	BOOL CharIsDeadkey();
 
   /**
-  * Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
-  * @return BOOL
-  */
+   * Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
+   * @return BOOL
+   */
   BOOL CharIsSurrogatePair();
+
+  /**
+   * Returns TRUE if the context is empty
+   * @return  BOOL
+   */
+  BOOL AppContext::IsEmpty();
+
 };
 
 class AppContextWithStores : public AppContext   // I4978
@@ -216,9 +225,23 @@ public:
  *
  * @param   buf     appcontext character array
  * @param   outPtr  The ouput array of context items. caller to free memory
- * @return  BOOL    True if array created succesfully
+ * @return  BOOL    True if array created successfully
  */
 BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr);
+
+/**
+ * Convert km_kbp_context_item array into an kmx char buffer.
+ * Caller is responsible for freeing the memory.
+ * The length is restricted to a maximum of MAXCONTEXT length. If the number
+ * of input km_kbp_context_items exceeds this length the characters furthest
+ * from the caret will be truncated.
+ *
+ * @param  contextItems  the input core context array. (km_kbp_context_item)
+ * @param  [out] outBuf  the kmx character array output. caller to free memory.
+ *
+ * @return  BOOL    True if array created successfully
+ */
+BOOL ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD len);
 
 extern const LPSTR ItemTypes[];
 

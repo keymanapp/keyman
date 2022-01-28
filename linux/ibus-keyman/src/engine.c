@@ -33,6 +33,10 @@
 #include <X11/XKBlib.h>
 #endif
 
+#ifdef GDK_WINDOWING_WAYLAND
+#include <gdk/gdkwayland.h>
+#endif
+
 #include <keyman/keyboardprocessor.h>
 
 #include "keymanutil.h"
@@ -71,6 +75,9 @@ struct _IBusKeymanEngine {
     IBusPropList    *prop_list;
 #ifdef GDK_WINDOWING_X11
     Display         *xdisplay;
+#endif
+#ifdef GDK_WINDOWING_WAYLAND
+    GdkWaylandDisplay *wldisplay;
 #endif
 };
 
@@ -260,8 +267,20 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   keyman->state = NULL;
 #ifdef GDK_WINDOWING_X11
   keyman->xdisplay = NULL;
-  if (GDK_IS_X11_DISPLAY(gdk_display_get_default())) {
-    keyman->xdisplay = GDK_DISPLAY_XDISPLAY(gdk_display_get_default());
+#endif
+#ifdef GDK_WINDOWING_WAYLAND
+  keyman->wldisplay = NULL;
+#endif
+
+  GdkDisplay *gdkDisplay = gdk_display_get_default();
+#ifdef GDK_WINDOWING_X11
+  if (GDK_IS_X11_DISPLAY(gdkDisplay)) {
+    keyman->xdisplay = GDK_DISPLAY_XDISPLAY(gdkDisplay);
+  } else
+#endif
+#ifdef GDK_WINDOWING_WAYLAND
+  if (GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
+    keyman->wldisplay = GDK_WAYLAND_DISPLAY(gdkDisplay);
   } else
 #endif
   {
@@ -660,6 +679,12 @@ process_capslock_action(
     XkbLockModifiers(keyman->xdisplay, XkbUseCoreKbd, LockMask, action_item->capsLock ? LockMask : 0);
 
     XSync(keyman->xdisplay, False);
+  }
+#endif
+#ifdef GDK_WINDOWING_WAYLAND
+  // TODO
+  if (keyman->wldisplay) {
+
   }
 #endif
   return TRUE;

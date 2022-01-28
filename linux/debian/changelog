@@ -4,6 +4,22 @@ keyman (15.0.90-1) UNRELEASED; urgency=medium
 
  -- Eberhard Beilharz <eb1@sil.org>  Mon, 02 Aug 2021 18:13:58 +0200
 
+keyman-config (14.0.284-3) unstable; urgency=medium
+
+  * Team upload
+  * No-change rebuild against python-requests-cache 0.9.1-1
+    - The build of keyman-config 14.0.284-1 failed. Hopefully we'll be
+      more lucky this time.
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Wed, 19 Jan 2022 12:50:32 +0100
+
+keyman-config (14.0.284-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 14 Jan 2022 18:00:21 +0100
+
 keyman-config (14.0.283-2) unstable; urgency=medium
 
   * New upstream release

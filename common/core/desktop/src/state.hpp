@@ -126,6 +126,8 @@ protected:
     kbp::abstract_processor & _processor;
     kbp::actions              _actions;
     kbp::debug_items          _debug_items;
+    km_kbp_keyboard_imx_platform _imx_callback;
+    void *_imx_object;
 
 public:
     state(kbp::abstract_processor & kb, km_kbp_option_item const *env);
@@ -144,6 +146,12 @@ public:
 
     kbp::debug_items        & debug_items() noexcept        { return _debug_items; }
     kbp::debug_items const  & debug_items() const noexcept  { return _debug_items; }
+
+    void imx_register_callback(km_kbp_keyboard_imx_platform imx_callback, void *callback_object);
+
+    void imx_deregister_callback();
+
+    void imx_callback(uint32_t imx_id);
 };
 
 } // namespace kbp

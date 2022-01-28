@@ -103,6 +103,12 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
   return p;
 }
 
+km_kbp_cp *km::kbp::kmx::u16dup(km_kbp_cp *src) {
+  km_kbp_cp *dup = new km_kbp_cp[u16len(src) + 1];
+  memcpy(dup, src, (u16len(src) + 1) * sizeof(km_kbp_cp));
+  return dup;
+}
+
 /*
 * int xstrlen( PKMX_BYTE p );
 *
@@ -187,8 +193,8 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
     if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
       return q;
   }
-  
-  return p; 
+
+  return p;
 }
 
 int km::kbp::kmx::xstrlen_ignoreifopt(PKMX_WCHAR p)

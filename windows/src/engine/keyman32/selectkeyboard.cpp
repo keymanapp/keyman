@@ -78,7 +78,7 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
     }
 
     KMHideIM();
-    // TODO: 5650 Equivalent for core keyboard  IDML dlls 
+ 
     if (_td->lpActiveKeyboard) DeactivateDLLs(_td->lpActiveKeyboard);
     _td->lpActiveKeyboard = NULL;
     _td->ActiveKeymanID = KEYMANID_NONKEYMAN;
@@ -106,8 +106,8 @@ BOOL SelectKeyboardCore(DWORD KeymanID)
         SelectApplicationIntegration();   // I4287
         if (_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
         _td->state.windowunicode = !_td->app || _td->app->IsUnicode();
-        // TODO: 5650 Equivalent for corekeyboard
-        //ActivateDLLs(_td->lpActiveKeyboard);
+ 
+        ActivateDLLs(_td->lpActiveKeyboard);
 
         return TRUE;
       }

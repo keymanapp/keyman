@@ -137,7 +137,7 @@ type
     procedure UpdateDeadkeys;
     procedure SetSingleStepMode(const Value: Boolean);
     procedure ResetDebug;
-    procedure SetupDebug;
+    function SetupDebug: Boolean;
     procedure UpdateCharacterGrid;
 
     function ProcessKeyEvent(var Message: TMessage): Boolean;
@@ -956,7 +956,8 @@ begin
   FDebugVisible := True;
 
   //UpdateFont(nil);
-  SetupDebug;
+  if not SetupDebug then
+    Exit;
 
   memo.SetFocus;
 end;
@@ -976,7 +977,7 @@ begin
   memo.Text := '';
 end;
 
-procedure TfrmDebug.SetupDebug;
+function TfrmDebug.SetupDebug: Boolean;
 var
   buf: array[0..KL_NAMELENGTH] of Char;
 begin
@@ -993,8 +994,8 @@ begin
       CleanupCoreState;
       Winapi.Windows.SetFocus(0);
       HideDebugForm;
-      ShowMessage(E.Message);
-      Exit;
+      ShowMessage('Unable to start the debugger: '+E.Message);
+      Exit(False);
     end;
   end;
 
@@ -1002,6 +1003,8 @@ begin
   frmDebugStatus.RegTest.RegTestSetup(buf, FFileName, False);   // I3655
   frmDebugStatus.SetDebugKeyboard(debugkeyboard);
   frmDebugStatus.Elements.ClearStores;
+
+  Result := True;
 end;
 
 {-------------------------------------------------------------------------------

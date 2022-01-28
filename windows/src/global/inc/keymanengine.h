@@ -90,6 +90,7 @@ typedef struct tagINTKEYBOARDINFO
   km_kbp_keyboard* lpCoreKeyboard;
   km_kbp_option_item* lpCoreKeyboardOptions;
   km_kbp_state* lpCoreKeyboardState;
+  km_kbp_keyboard_imx* lpIMXList;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
 
 typedef struct tagINI
@@ -159,7 +160,7 @@ BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf);
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
 BOOL LoadlpKeyboard(int i);
 
-PSTR wstrtostr(PWSTR in);
+PSTR wstrtostr(PCWSTR in);
 PWSTR strtowstr(PSTR in);
 
 WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags);
