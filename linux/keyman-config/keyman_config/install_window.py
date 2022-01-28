@@ -16,7 +16,7 @@ gi.require_version('WebKit2', '4.0')
 
 from gi.repository import Gtk, WebKit2
 from distutils.version import StrictVersion
-from keyman_config import _
+from keyman_config import _, secure_lookup
 from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
 from keyman_config.list_installed_kmp import get_kmp_version
@@ -80,8 +80,8 @@ class InstallKmpWindow(Gtk.Dialog):
                 self.kbname = keyboardid
             self.checkcontinue = True
 
-            if installed_kmp_ver and info and 'version' in info and 'description' in info['version']:
-                if info['version']['description'] == installed_kmp_ver:
+            if installed_kmp_ver and secure_lookup('version', 'description'):
+                if secure_lookup(info, 'version', 'description') == installed_kmp_ver:
                     dialog = Gtk.MessageDialog(
                         viewkmp, 0, Gtk.MessageType.QUESTION,
                         Gtk.ButtonsType.YES_NO, _("Keyboard is installed already"))
@@ -100,9 +100,9 @@ class InstallKmpWindow(Gtk.Dialog):
                         return
                 else:
                     try:
-                        logging.info("package version %s", info['version']['description'])
+                        logging.info("package version %s", secure_lookup(info, 'version', 'description'))
                         logging.info("installed kmp version %s", installed_kmp_ver)
-                        if StrictVersion(info['version']['description']) <= StrictVersion(installed_kmp_ver):
+                        if StrictVersion(secure_lookup(info, 'version', 'description')) <= StrictVersion(installed_kmp_ver):
                             dialog = Gtk.MessageDialog(
                                 viewkmp, 0, Gtk.MessageType.QUESTION,
                                 Gtk.ButtonsType.YES_NO, _("Keyboard is installed already"))
@@ -110,7 +110,7 @@ class InstallKmpWindow(Gtk.Dialog):
                                 _("The {name} keyboard is already installed with a newer version {installedversion}. "
                                   "Do you want to uninstall it and install the older version {version}?")
                                 .format(name=self.kbname, installedversion=installed_kmp_ver,
-                                        version=info['version']['description']))
+                                        version=secure_lookup(info, 'version', 'description')))
                             response = dialog.run()
                             dialog.destroy()
                             if response == Gtk.ResponseType.YES:
@@ -125,7 +125,7 @@ class InstallKmpWindow(Gtk.Dialog):
                         pass
 
             image = Gtk.Image()
-            if options and "graphicFile" in options:
+            if secure_lookup(options, 'graphicFile'):
                 image.set_from_file(os.path.join(tmpdirname, options['graphicFile']))
             else:
                 img_default = find_keyman_image("defaultpackage.gif")
@@ -186,13 +186,13 @@ class InstallKmpWindow(Gtk.Dialog):
             grid.attach_next_to(label3, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = label3
             label = Gtk.Label()
-            if info and 'version' in info and 'description' in info['version']:
-                label.set_text(info['version']['description'])
+            if secure_lookup(info, 'version', 'description'):
+                label.set_text(secure_lookup(info, 'version', 'description'))
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, label3, Gtk.PositionType.RIGHT, 1, 1)
 
-            if info and 'author' in info:
+            if secure_lookup(info, 'author'):
                 author = info['author']
                 label4 = Gtk.Label()
                 label4.set_text(_("Author:   "))
@@ -200,17 +200,17 @@ class InstallKmpWindow(Gtk.Dialog):
                 grid.attach_next_to(label4, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label4
                 label = Gtk.Label()
-                if 'url' in author and 'description' in author:
+                if secure_lookup(author, 'url') and secure_lookup(author, 'description'):
                     label.set_markup(
                         "<a href=\"" + author['url'] + "\" title=\"" +
                         author['url'] + "\">" + author['description'] + "</a>")
-                elif 'description' in author:
+                elif secure_lookup(author, 'description'):
                     label.set_text(author['description'])
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, label4, Gtk.PositionType.RIGHT, 1, 1)
 
-            if info and 'website' in info:
+            if secure_lookup(info, 'website'):
                 label5 = Gtk.Label()
                 # Website is optional and may be a mailto for the author
                 label5.set_text(_("Website:   "))
@@ -218,22 +218,22 @@ class InstallKmpWindow(Gtk.Dialog):
                 grid.attach_next_to(label5, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label5
                 label = Gtk.Label()
-                if 'description' in info['website']:
+                if secure_lookup(info, 'website', 'description'):
                     label.set_markup(
-                        "<a href=\"" + info['website']['description'] + "\">" +
-                        info['website']['description'] + "</a>")
+                        "<a href=\"" + secure_lookup(info, 'website', 'description') + "\">" +
+                        secure_lookup(info, 'website', 'description') + "</a>")
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, label5, Gtk.PositionType.RIGHT, 1, 1)
 
-            if info and 'copyright' in info:
+            if secure_lookup(info, 'copyright'):
                 label6 = Gtk.Label()
                 label6.set_text(_("Copyright:   "))
                 label6.set_halign(Gtk.Align.END)
                 grid.attach_next_to(label6, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 label = Gtk.Label()
-                if 'description' in info['copyright']:
-                    label.set_text(info['copyright']['description'])
+                if secure_lookup(info, 'copyright', 'description'):
+                    label.set_text(secure_lookup(info, 'copyright', 'description'))
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
@@ -242,7 +242,7 @@ class InstallKmpWindow(Gtk.Dialog):
             webview = WebKit2.WebView()
             webview.connect("decide-policy", self.doc_policy)
 
-            if options and "readmeFile" in options:
+            if secure_lookup(options, 'readmeFile'):
                 self.readme = options['readmeFile']
             else:
                 self.readme = "noreadme"

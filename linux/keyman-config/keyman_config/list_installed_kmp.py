@@ -3,6 +3,7 @@
 import logging
 import os
 import json
+from keyman_config import secure_lookup
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
 from keyman_config.get_kmp import get_keyman_dir, InstallLocation
 from keyman_config.deprecated_decorator import deprecated
@@ -83,8 +84,8 @@ def get_installed_kmp_paths(check_paths):
                         except Exception as e:
                             logging.warning('Exception %s loading %s %s', type(e), kbjson, e.args)
                     if info:
-                        md_version = info['version']['description']
-                        md_name = info['name']['description']
+                        md_version = secure_lookup(info, 'version', 'description')
+                        md_name = secure_lookup(info, 'name', 'description')
                     if keyboards:
                         keyboardID = keyboards[0]['id']
                     else:

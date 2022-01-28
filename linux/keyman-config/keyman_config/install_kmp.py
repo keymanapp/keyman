@@ -7,7 +7,7 @@ import zipfile
 from shutil import rmtree
 from enum import Enum
 
-from keyman_config import _
+from keyman_config import _, secure_lookup
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
 from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
 from keyman_config.get_kmp import get_keyboard_data, get_keyboard_dir, get_keyman_doc_dir
@@ -119,7 +119,7 @@ class InstallKmp():
         info, _, _, keyboards, files = get_metadata(self.packageDir)
 
         if keyboards:
-            logging.info("Installing %s", info['name']['description'])
+            logging.info("Installing %s", secure_lookup(info, 'name', 'description'))
             if online:
                 process_keyboard_data(self.packageID, self.packageDir)
                 for kb in keyboards:
@@ -199,7 +199,7 @@ class InstallKmp():
 
     def install_keyboards(self, keyboards, packageDir, language=None):
         firstKeyboard = keyboards[0]
-        if firstKeyboard and 'languages' in firstKeyboard and len(firstKeyboard['languages']) > 0:
+        if secure_lookup(firstKeyboard, 'languages') and len(firstKeyboard['languages']) > 0:
             language = self._normalize_language(firstKeyboard['languages'], language)
 
         if is_fcitx_running():

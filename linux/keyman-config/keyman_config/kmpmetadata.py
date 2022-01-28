@@ -9,6 +9,8 @@ import magic
 from enum import Enum
 from json.decoder import JSONDecodeError
 
+from keyman_config import secure_lookup
+
 
 class KMFileTypes(Enum):
     KM_ICON = 1
@@ -32,18 +34,18 @@ def print_info(info):
         print("---- Info ----")
         if not info:
             return
-        print("Name: ", info['name']['description'])
-        print("Copyright: ", info['copyright']['description'])
+        print("Name: ", secure_lookup(info, 'name', 'description'))
+        print("Copyright: ", secure_lookup(info, 'copyright', 'description'))
         if 'version' in info:
-            print("Version: ", info['version']['description'])
+            print("Version: ", secure_lookup(info, 'version', 'description'))
         if 'author' in info:
-            print("Author: ", info['author']['description'])
-            if 'url' in info['author']:
-                print("Author URL: ", info['author']['url'])
+            print("Author: ", secure_lookup(info, 'author', 'description'))
+            if secure_lookup(info, 'author', 'url'):
+                print("Author URL: ", secure_lookup(info, 'author', 'url'))
         if 'website' in info:
-            print("Website description: ", info['website']['description'])
-            if 'url' in info['website']:
-                print("Website URL: ", info['website']['url'])
+            print("Website description: ", secure_lookup(info, 'website', 'description'))
+            if secure_lookup(info, 'website', 'url'):
+                print("Website URL: ", secure_lookup(info, 'website', 'url'))
     except Exception as e:
         print(type(e))    # the exception instance
         print(e.args)     # arguments stored in .args
@@ -390,7 +392,7 @@ def parseinfdata(inffile, verbose=False):
                     keyboards = [{
                         'name': id,
                         'id': id,
-                        'version': info['version']['description']
+                        'version': secure_lookup(info, 'version', 'description')
                     }]
 
         kblist = []
