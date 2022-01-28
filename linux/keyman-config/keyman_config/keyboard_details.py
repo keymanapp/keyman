@@ -61,8 +61,11 @@ class KeyboardDetailsView(Gtk.Dialog):
         kbdata = None
         jsonfile = path.join(packageDir, kmp['packageID'] + ".json")
         if path.isfile(jsonfile):
-            with open(jsonfile, "r") as read_file:
-                kbdata = json.load(read_file)
+            try:
+                with open(jsonfile, "r") as read_file:
+                    kbdata = json.load(read_file)
+            except Exception as e:
+                logging.warning('Exception %s reading %s %s', type(e), jsonfile, e.args)
 
         grid = Gtk.Grid()
         # grid.set_column_homogeneous(True)
@@ -165,8 +168,11 @@ class KeyboardDetailsView(Gtk.Dialog):
                 kbdata = None
                 jsonfile = path.join(packageDir, kbd['id'] + ".json")
                 if path.isfile(jsonfile):
-                    with open(jsonfile, "r") as read_file:
-                        kbdata = json.load(read_file)
+                    try:
+                        with open(jsonfile, "r") as read_file:
+                            kbdata = json.load(read_file)
+                    except Exception as e:
+                        logging.warning('Exception %s reading %s %s', type(e), jsonfile, e.args)
 
                 # start with padding
                 lbl_pad = Gtk.Label()

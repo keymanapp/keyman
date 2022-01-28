@@ -57,11 +57,14 @@ def get_keyboard_list():
 
 
 def write_kmpdirlist(kmpdirfile):
-    with open(kmpdirfile, 'wt') as kmpdirlist:
-        keyboards = get_keyboard_list()
-        if keyboards:
-            for kb in get_keyboard_list():
-                print(kb, file=kmpdirlist)
+    try:
+        with open(kmpdirfile, 'wt') as kmpdirlist:
+            keyboards = get_keyboard_list()
+            if keyboards:
+                for kb in get_keyboard_list():
+                    print(kb, file=kmpdirlist)
+    except Exception as e:
+        logging.warning('Exception %s writing %s %s', type(e), kmpdirfile, e.args)
 
 
 def list_keyboards():

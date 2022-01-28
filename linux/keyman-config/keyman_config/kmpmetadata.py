@@ -535,8 +535,11 @@ def get_and_convert_infdata(tmpdirname):
         info, system, options, keyboards, files = parseinfdata(kmpinf, False)
         j = infmetadata_to_json(info, system, options, keyboards, files)
         kmpjson = os.path.join(tmpdirname, "kmp.json")
-        with open(kmpjson, "w") as write_file:
-            print(j, file=write_file)
+        try:
+            with open(kmpjson, "w") as write_file:
+                print(j, file=write_file)
+        except Exception as e:
+            logging.warning('Exception %s writing metadata %s %s', type(e), kmpjson, e.args)
         return info, system, options, keyboards, files
     else:
         return None, None, None, None, None

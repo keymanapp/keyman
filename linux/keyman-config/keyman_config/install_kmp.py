@@ -249,12 +249,19 @@ def extract_kmp(kmpfile, directory):
 def process_keyboard_data(keyboardID, packageDir):
     kbdata = get_keyboard_data(keyboardID)
     if kbdata:
-        if not os.path.isdir(packageDir):
-            os.makedirs(packageDir)
+        if not os.path.isdir(packageDir) and os.access(os.path.join(packageDir, os.pardir), os.X_OK | os.W_OK):
+            try:
+                os.makedirs(packageDir)
+            except Exception as e:
+                logging.warning('Exception %s creating %s %s', type(e), packageDir, e.args)
 
-        with open(os.path.join(packageDir, keyboardID + '.json'), 'w') as outfile:
-            json.dump(kbdata, outfile)
-            logging.info("Installing api data file %s.json as keyman file", keyboardID)
+        if os.access(packageDir, os.X_OK | os.W_OK):
+            try:
+                with open(os.path.join(packageDir, keyboardID + '.json'), 'w') as outfile:
+                    json.dump(kbdata, outfile)
+                    logging.info("Installing api data file %s.json as keyman file", keyboardID)
+            except Exception as e:
+                logging.warning('Exception %s writing %s/%s.json %s', type(e), packageDir, keyboardID, e.args)
     # else:
     # 	message = "install_kmp.py: error: cannot download keyboard data so not installing."
     # 	rmtree(kbdir)
