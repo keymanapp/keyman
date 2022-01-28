@@ -55,6 +55,7 @@ implementation
 
 uses
   Winapi.Windows,
+  System.StrUtils,
   System.SysUtils,
   Vcl.Dialogs,
   Vcl.Graphics,
@@ -68,9 +69,11 @@ uses
   UfrmKeyboardFonts,
   UfrmMDIEditor,
   UmodWebHttpServer,
+  Keyman.Developer.System.ServerAPI,
   KeyboardFonts,
   KeymanDeveloperUtils,
   KeymanDeveloperOptions,
+  Keyman.System.FontLoadUtil,
   System.Classes,
   UfrmPackageEditor,
   System.Variants,
@@ -128,6 +131,9 @@ begin
     frmMessages.DoShowForm;
 
   Result := ProjectFile.CompileKeyboard;
+
+  if Result and TServerDebugAPI.IsKeyboardRegistered(ProjectFile.TargetFileName) then
+    TestKeymanWeb(True);
 end;
 
 function TkmnProjectFileUI.FontDialog(FSilent: Boolean): Boolean;   // I4057
@@ -212,8 +218,34 @@ var
   FCompiledName: string;
   editor: TfrmTikeEditor;
   wizard: TfrmKeymanWizard;
-  FontNames: TKeyboardFontArray;
   i: TKeyboardFont;
+  j: TKeyboardFont;
+  Found: Boolean;
+
+  function IsStandardFont(const FontName: string): Boolean;   // I4448
+  const
+    StandardFontNames: array[0..9] of string = (
+      'Arial', 'Calibri', 'Consolas', 'Courier New', 'Lucida Console', 'Lucida Sans Unicode', 'Segoe UI', 'Tahoma', 'Times New Roman', 'Verdana'
+      );
+  begin
+    Result := AnsiIndexText(FontName, StandardFontNames) >= 0;
+  end;
+
+  procedure RegisterFont(const fontname: string);
+  var
+    strm: TMemoryStream;
+  begin
+    if (fontname <> '') and not IsStandardFont(fontname) then
+    begin
+      strm := TMemoryStream.Create;
+      try
+        if TFontLoadUtil.LoadFontData(fontname, strm) then
+          TServerDebugAPI.RegisterFont(strm, fontname);
+      finally
+        strm.Free;
+      end;
+    end;
+  end;
 begin
   editor := frmKeymanDeveloper.FindEditorByFileName(ProjectFile.FileName);   // I4021
   if not Assigned(editor) or not (editor is TfrmKeymanWizard) then
@@ -224,9 +256,29 @@ begin
   if not TestKeyboardState(FCompiledName, FSilent) then
     Exit(False);
 
-  for i := Low(TKeyboardFont) to High(TKeyboardFont) do
-    FontNames[i] := Wizard.FontInfo[i].Name;
-  modWebHttpServer.Debugger.RegisterKeyboard(FCompiledName, ProjectFile.FileVersion, FontNames);
+  // We register all fonts that are used by the layout,
+  // but just once for each reference!
+  for i := kfontChar to kfontTouchLayoutDesktop do
+  begin
+    Found := False;
+    for j := kfontChar to TKeyboardFont(Ord(i)-1) do
+      if Wizard.FontInfo[j].Name = Wizard.FontInfo[i].Name then
+      begin
+        Found := True;
+        Break;
+      end;
+    if not Found then
+      RegisterFont(Wizard.FontInfo[i].Name);
+  end;
+
+  TServerDebugAPI.RegisterKeyboard(
+    FCompiledName,
+    ProjectFile.FileVersion,
+    // We only need to specify the char + osk fonts here
+    // as the others are referenced in the touch layout definition directly
+    Wizard.FontInfo[kfontChar].Name,
+    Wizard.FontInfo[kfontOSK].Name
+  );
 
   wizard.NotifyStartedWebDebug;   // I4021
 

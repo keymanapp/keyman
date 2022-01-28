@@ -17,7 +17,9 @@ KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build\xml
 KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build\cef
 KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build\templates
 KEYMAN_WIX_TEMP_MODELCOMPILER=$(TEMP)\keyman_wix_build\ModelCompiler
+KEYMAN_WIX_TEMP_SERVER=$(TEMP)\keyman_wix_build\Server
 
+KEYMAN_WIX_KMDEV_SERVER=$(KEYMAN_ROOT)\developer\server\build
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
 KEYMAN_MODELCOMPILER_ROOT=$(KEYMAN_ROOT)\developer\js
 
@@ -29,12 +31,13 @@ copykmdev: makeinstaller
 test-releaseexists:
     if exist $(ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update VERSION.md and try again & exit 1
 
-candle: heat-cef heat-xml heat-templates heat-model-compiler
+candle: heat-cef heat-xml heat-templates heat-model-compiler heat-server
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease kmdev.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dServerSourceDir=$(KEYMAN_WIX_KMDEV_SERVER) server.wxs
 
 clean-heat: clean-heat-model-compiler
 
@@ -67,6 +70,15 @@ heat-cef:
     $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_CEF) -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
 # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
     -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
+
+heat-server:
+# We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_SERVER)
+    mkdir $(KEYMAN_WIX_TEMP_SERVER)
+    xcopy $(KEYMAN_WIX_KMDEV_SERVER)\* $(KEYMAN_WIX_TEMP_SERVER)\ /s
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_SERVER) -o server.wxs -ag -cg Server -dr INSTALLDIR -var var.ServerSourceDir -wx -nologo
+# When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_SERVER)
 
 heat-model-compiler:
 # Build kmlmc

@@ -19,7 +19,7 @@ inherited frmOptions: TfrmOptions
     Top = 8
     Width = 425
     Height = 392
-    ActivePage = tabGeneral
+    ActivePage = tabDebugger
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -328,32 +328,33 @@ inherited frmOptions: TfrmOptions
           Top = 122
           Width = 250
           Height = 17
-          Caption = '&Automatically reset debugger before recompiling'
+          Caption = 'Automatically &reset debugger before recompiling'
           TabOrder = 5
         end
       end
-      object gbWebHost: TGroupBox
+      object gbServer: TGroupBox
         Left = 8
         Top = 159
         Width = 313
-        Height = 89
+        Height = 138
         Caption = 'Web Host'
         TabOrder = 1
-        object lblWebHostDefaultPort: TLabel
+        object chkListLocalURLs: TCheckBox
           Left = 8
-          Top = 31
-          Width = 55
-          Height = 13
-          Caption = 'Default port'
-        end
-        object editWebHostDefaultPort: TEdit
-          Left = 84
-          Top = 28
-          Width = 61
-          Height = 21
+          Top = 55
+          Width = 257
+          Height = 17
+          Caption = 'List local &URLs in web debugger'
           TabOrder = 0
-          Text = 'editWebHostDefaultPort'
-          OnKeyPress = editWebHostDefaultPortKeyPress
+        end
+        object cmdConfigureServer: TButton
+          Left = 24
+          Top = 101
+          Width = 121
+          Height = 25
+          Caption = '&Configure server...'
+          TabOrder = 1
+          OnClick = cmdConfigureServerClick
         end
       end
     end

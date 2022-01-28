@@ -345,6 +345,7 @@ uses
   CompilePackageInstaller,
   Keyman.Developer.System.Project.kpsProjectFile,
   Keyman.Developer.System.Project.kpsProjectFileAction,
+  Keyman.Developer.System.ServerAPI,
   OnlineConstants,
   KeymanVersion,
   Keyman.System.PackageInfoRefreshKeyboards,
@@ -361,7 +362,6 @@ uses
   utilsystem,
   UfrmMain,
   UfrmMessages,
-  UmodWebHttpServer,
   utilexecute,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
   xmldoc;
@@ -1053,7 +1053,7 @@ end;
 
 procedure TfrmPackageEditor.cmdOpenDebugHostClick(Sender: TObject);
 begin
-  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex] + '/packages.html');
+  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex]);
 end;
 
 procedure TfrmPackageEditor.cmdOpenFileClick(Sender: TObject);   // I4687
@@ -1362,7 +1362,7 @@ end;
 procedure TfrmPackageEditor.NotifyStartedWebDebug;
 begin
   lbDebugHosts.Clear;
-  modWebHttpServer.GetURLs(lbDebugHosts.Items);
+  TServerDebugAPI.GetServerURLs(lbDebugHosts.Items);
   if lbDebugHosts.Items.Count > 0 then
     lbDebugHosts.ItemIndex := 0;
   UpdateQRCode;

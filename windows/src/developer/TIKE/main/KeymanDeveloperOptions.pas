@@ -51,7 +51,7 @@ type
     FDebuggerAutoRecompileWithDebugInfo: Boolean;
     FAllowMultipleInstances: Boolean;
     FExternalEditorPath: WideString;
-    FWebHostDefaultPort: Integer;   // I4021
+    FServerDefaultPort: Integer;   // I4021
     FSMTPServer: string;   // I4506
     FTestEmailAddresses: string;   // I4506
     FOpenKeyboardFilesInSourceView: Boolean;   // I4751
@@ -64,6 +64,12 @@ type
     FOSKAutoSaveBeforeImporting: Boolean;
     FReportErrors: Boolean;
     FReportUsage: Boolean;
+    FServerUseLocalAddresses: Boolean;
+    FServerUseNgrok: Boolean;
+    FServerServerShowConsoleWindow: Boolean;
+    FServerNgrokToken: string;
+    FServerNgrokRegion: string;
+    FServerKeepAlive: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -72,6 +78,7 @@ type
     procedure regWriteString(const nm, value: string);
     procedure regWriteBool(const nm: string; value: Boolean);
     procedure regWriteInt(const nm: string; value: Integer);
+    procedure WriteServerConfigurationJson;
   public
     procedure Read;
     procedure Write;
@@ -100,7 +107,14 @@ type
     property ReportErrors: Boolean read FReportErrors write FReportErrors;
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
 
-    property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
+    property ServerDefaultPort: Integer read FServerDefaultPort write FServerDefaultPort;   // I4021
+    property ServerKeepAlive: Boolean read FServerKeepAlive write FServerKeepAlive;
+    property ServerUseLocalAddresses: Boolean read FServerUseLocalAddresses write FServerUseLocalAddresses;
+
+    property ServerNgrokToken: string read FServerNgrokToken write FServerNgrokToken;
+    property ServerNgrokRegion: string read FServerNgrokRegion write FServerNgrokRegion;
+    property ServerUseNgrok: Boolean read FServerUseNgrok write FServerUseNgrok;
+    property ServerServerShowConsoleWindow: Boolean read FServerServerShowConsoleWindow write FServerServerShowConsoleWindow;
 
     property AllowMultipleInstances: Boolean read FAllowMultipleInstances write FAllowMultipleInstances;
 
@@ -136,9 +150,13 @@ const
 implementation
 
 uses
+  System.Classes,
+  System.JSON,
   System.Math,
   Winapi.ShlObj,
 
+  JsonUtil,
+  Keyman.Developer.System.KeymanDeveloperPaths,
   utilsystem,
   OnlineConstants,
   GetOSVersion;
@@ -198,7 +216,14 @@ begin
     FAutoSaveBeforeCompiling := regReadBool(SRegValue_IDEOptAutoSaveBeforeCompiling, False);
     FOSKAutoSaveBeforeImporting := regReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
 
-    FWebHostDefaultPort := regReadInt(SRegValue_IDEOptWebHostPort, 8008);
+    FServerDefaultPort := regReadInt(SRegValue_IDEOptServerPort, 8008);
+    FServerKeepAlive := regReadBool(SRegValue_IDEOptServerKeepAlive, False);
+    FServerUseLocalAddresses := regReadBool(SRegValue_IDEOptServerUseLocalAddresses, True);
+
+    FServerNgrokToken := regReadString(SRegValue_IDEOptServerNgrokToken, '');
+    FServerNgrokRegion := regReadString(SRegValue_IDEOptServerNgrokRegion, 'us');
+    FServerUseNgrok := regReadBool(SRegValue_IDEOptServerUseNgrok, False);
+    FServerServerShowConsoleWindow := regReadBool(SRegValue_IDEOptServerShowConsoleWindow, False);
 
     FCharMapDisableDatabaseLookups := regReadBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, False);
     FCharMapAutoLookup             := regReadBool(SRegValue_IDEOptCharMapAutoLookup,             True);
@@ -253,7 +278,14 @@ begin
     regWriteBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, FOSKAutoSaveBeforeImporting);
 
 
-    regWriteInt(SRegValue_IDEOptWebHostPort, FWebHostDefaultPort);
+    regWriteInt(SRegValue_IDEOptServerPort, FServerDefaultPort);
+    regWriteBool(SRegValue_IDEOptServerKeepAlive, FServerKeepAlive);
+    regWriteBool(SRegValue_IDEOptServerUseLocalAddresses, FServerUseLocalAddresses);
+
+    regWriteString(SRegValue_IDEOptServerNgrokToken, FServerNgrokToken);
+    regWriteString(SRegValue_IDEOptServerNgrokRegion, FServerNgrokRegion);
+    regWriteBool(SRegValue_IDEOptServerUseNgrok, FServerUseNgrok);
+    regWriteBool(SRegValue_IDEOptServerShowConsoleWindow, FServerServerShowConsoleWindow);
 
 
     regWriteBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, FCharMapDisableDatabaseLookups);
@@ -280,6 +312,39 @@ begin
     reg.WriteInteger(SRegValue_AutomaticallyReportUsage, IfThen(FReportUsage, 1, 0));
   finally
     CloseRegistry;
+  end;
+
+  WriteServerConfigurationJson;
+end;
+
+procedure TKeymanDeveloperOptions.WriteServerConfigurationJson;
+var
+  o: TJSONObject;
+  s: TStringList;
+  ss: TStringStream;
+begin
+  o := TJSONObject.Create;
+  try
+    o.AddPair('port', TJSONNumber.Create(FServerDefaultPort));
+    o.AddPair('ngrokToken', FServerNgrokToken);
+    o.AddPair('ngrokRegion', FServerNgrokRegion);
+    o.AddPair('useNgrok', TJSONBool.Create(FServerUseNgrok));
+    o.AddPair('ngrokVisible', TJSONBool.Create(FServerServerShowConsoleWindow));
+    s := TStringList.Create;
+    try
+      PrettyPrintJSON(o, s, 2);
+      ss := TStringStream.Create(s.Text, TEncoding.UTF8);
+      try
+        ss.SaveToFile(TKeymanDeveloperPaths.ServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson);
+      finally
+        ss.Free;
+      end;
+    finally
+      s.Free;
+    end;
+    o.ToJSON
+  finally
+    o.Free;
   end;
 end;
 

@@ -376,6 +376,7 @@
       <ComponentGroupRef Id="ModelCompiler" />
       <ComponentGroupRef Id="Node" />
       <ComponentGroupRef Id="KeymanDevSentryComponents" />
+      <ComponentGroupRef Id="Server" />
 
       <MergeRef Id='keymanengine' />
     </Feature>

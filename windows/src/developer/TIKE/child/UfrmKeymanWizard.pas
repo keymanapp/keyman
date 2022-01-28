@@ -276,6 +276,8 @@ type
     panWarnMixedShiftStates: TPanel;
     cmdFixupShiftStates: TButton;
     lblWarnMixedShiftStates: TLabel;
+    cmdCopyDebuggerLink: TButton;
+    cmdConfigureWebDebugger: TButton;
     procedure FormCreate(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
@@ -344,6 +346,7 @@ type
     procedure cmdOpenBuildFolderClick(Sender: TObject);
     procedure cmdOpenProjectFolderClick(Sender: TObject);
     procedure cmdFixupShiftStatesClick(Sender: TObject);
+    procedure cmdCopyDebuggerLinkClick(Sender: TObject);
   private
     frameSource: TframeTextEditor;
 
@@ -587,6 +590,7 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.kmnProjectFileAction,
+  Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.UfrmMessageDlgWithSave,
   RegExpr,
@@ -600,7 +604,6 @@ uses
   UfrmEditor,
   UfrmMain,
   UfrmMessages,
-  UmodWebHttpServer,
   UfrmMustIncludeDebug,
   UfrmSelectKey,
   UfrmSelectSystemKeyboard,
@@ -747,6 +750,7 @@ begin
 
   cmdOpenDebugHost.Enabled := lbDebugHosts.ItemIndex >= 0;
   cmdSendURLsToEmail.Enabled := lbDebugHosts.Items.Count > 0;   // I4506
+  cmdCopyDebuggerLink.Enabled := lbDebugHosts.ItemIndex >= 0;
 
   gridFeatures.Enabled := gridFeatures.RowCount > 1;   // I4587   // I4427
   cmdEditFeature.Enabled := gridFeatures.RowCount > 1;   // I4587   // I4427
@@ -829,6 +833,17 @@ begin
     Free;
   end;
 end;
+
+procedure TfrmKeymanWizard.cmdCopyDebuggerLinkClick(Sender: TObject);
+begin
+  try
+    Clipboard.AsText := lbDebugHosts.Items[lbDebugHosts.ItemIndex];
+  except
+    on E:Exception do
+      ShowMessage(E.Message);
+  end;
+end;
+
 
 procedure TfrmKeymanWizard.CodeFontChanged;
 begin
@@ -2607,7 +2622,7 @@ end;
 procedure TfrmKeymanWizard.NotifyStartedWebDebug;
 begin
   lbDebugHosts.Clear;
-  modWebHttpServer.GetURLs(lbDebugHosts.Items);
+  TServerDebugAPI.GetServerURLs(lbDebugHosts.Items);
   if lbDebugHosts.Items.Count > 0 then
     lbDebugHosts.ItemIndex := 0;
   UpdateQRCode;

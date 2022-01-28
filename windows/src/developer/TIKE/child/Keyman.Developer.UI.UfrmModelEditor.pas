@@ -173,9 +173,9 @@ uses
 
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.modeltsProjectFileAction,
+  Keyman.Developer.System.ServerAPI,
   Keyman.System.QRCode,
   TextFileFormat,
-  UmodWebHttpServer,
   UfrmSendURLsToEmail,
   utilexecute,
   utilsystem;
@@ -414,7 +414,7 @@ end;
 procedure TfrmModelEditor.NotifyStartedWebDebug;
 begin
   lbDebugHosts.Clear;
-  modWebHttpServer.GetURLs(lbDebugHosts.Items);
+  TServerDebugAPI.GetServerURLs(lbDebugHosts.Items);
   if lbDebugHosts.Items.Count > 0 then
     lbDebugHosts.ItemIndex := 0;
   UpdateQRCode;
