@@ -134,7 +134,6 @@ type
     actViewCode: TAction;   // I4678
     actViewCharacterIdentifier: TAction;   // I4807
     actProjectClose: TAction;
-    actToolsClearCachedDebugObjects: TAction;
     actToolsWebCopyPublicUrl: TAction;
     actToolsWebOpenPublicUrl: TAction;
     actToolsWebConfigure: TAction;
@@ -233,7 +232,6 @@ type
     procedure actProjectSettingsUpdate(Sender: TObject);
     procedure actFileNewUpdate(Sender: TObject);
     procedure actFileOpenUpdate(Sender: TObject);
-    procedure actToolsClearCachedDebugObjectsExecute(Sender: TObject);
     procedure actToolsWebCopyPublicUrlExecute(Sender: TObject);
     procedure actToolsWebOpenPublicUrlExecute(Sender: TObject);
     procedure actToolsWebConfigureExecute(Sender: TObject);
@@ -682,12 +680,6 @@ begin
   begin
     actSearchFind.Enabled := True;
   end;
-end;
-
-procedure TmodActionsMain.actToolsClearCachedDebugObjectsExecute(
-  Sender: TObject);
-begin
-//  TServerDebugAPI.ClearCache; //TODO
 end;
 
 procedure TmodActionsMain.actToolsFileFormatExecute(Sender: TObject);

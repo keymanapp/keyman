@@ -107,12 +107,10 @@ if(configuration.useNgrok && os.platform() == 'win32' && fs.existsSync(configura
             const api = ngrok.getApi();
             const tunnels = await api.listTunnels();
             configuration.ngrokEndpoint = tunnels.tunnels[0]?.public_url ?? '';
-            //tray.restart(configuration.port, configuration.ngrokEndpoint);
             console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
           }, 1000);
         } else if(state == 'closed') {
           configuration.ngrokEndpoint = '';
-          //tray.restart(configuration.port, configuration.ngrokEndpoint);
           console.log(chalk.blueBright('ngrok tunnel closed'));
         }
       }

@@ -38,18 +38,6 @@ export class DebugKeyboard implements DebugObject {
 
     return JSON.stringify(o, null, 2) + '/*'+this.sha256+'*/';
   };
-
-/*
-    '    KN:"'+name+'",'#13#10+
-    '    KI:"Keyboard_'+name+'",'#13#10+
-    '    KL:"'+name+'",'#13#10+
-    '    KLC:"en",'#13#10+
-    '    KR:"Europe",'#13#10+
-    '    KRC:"eu",'#13#10+
-    '    KFont:{family:"'+value.FontName[kfontChar]+'"},'#13#10+   // I4063   // I4409
-    '    KOskFont:{family:"'+value.FontName[kfontOSK]+'"},'#13#10+   // I4063   // I4409
-    '    KF:"'+src+'.js"'#13#10+   // I4140
-*/
 };
 
 export class DebugModel implements DebugObject {
@@ -64,7 +52,6 @@ export class DebugModel implements DebugObject {
 
   toRegistrationBlob() {
     return JSON.stringify(this.id) + ', ' + JSON.stringify(this.id + '.model.js') + '/*'+this.sha256+'*/';
-    //response := response + Format('registerModel("%s", "%s"); /*sha256=%s*/'#13#10, [id, model, sha]);
   }
 };
 

@@ -477,11 +477,6 @@ object modActionsMain: TmodActionsMain
       OnExecute = actProjectCloseExecute
       OnUpdate = actProjectCloseUpdate
     end
-    object actToolsClearCachedDebugObjects: TAction
-      Category = 'Tools'
-      Caption = 'Clear Cached Debug Objects'
-      OnExecute = actToolsClearCachedDebugObjectsExecute
-    end
     object actToolsWebCopyPublicUrl: TAction
       Category = 'Tools'
       Caption = '&Copy to clipboard'
