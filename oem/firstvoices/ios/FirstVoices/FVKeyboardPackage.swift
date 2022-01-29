@@ -50,7 +50,6 @@ class FVKeyboardPackage {
  *
  */
   class func loadAvailableKeyboards() {
-
     // Load the primary keyboards package so that we can install keyboards from it.
     let keyboardPackagePath: String = Bundle.main.path(forResource: FVConstants.keyboardsPackage,
                                                        ofType: FVConstants.keyboardsPackageExt,

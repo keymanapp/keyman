@@ -13,7 +13,7 @@
  */
 
 import UIKit
-//import KeymanEngine
+import KeymanEngine
 
 class FVLexicalModels {
   static let keymanLexicalModelApiUrl = "https://api.keyman.com/model?q=bcp47:"
@@ -50,17 +50,21 @@ class FVLexicalModels {
     
     return modelArray
   }
+  
+  class func downloadModel(keyboard: FVKeyboardState) {
+    Manager.shared.downloadLexicalModel(withID: keyboard.keyboardId, languageID: keyboard.languageTag, isUpdate: false, fetchRepositoryIfNeeded: true)
+  }
 }
 
 class FVLexicalModel {
   let name: String
-  let packageUrl: String
+  let packageUrl: URL
   let languageTag: String
   let version: String
   
   internal init(name: String, packageUrl: String, languageTag: String, version: String) {
     self.name = name
-    self.packageUrl = packageUrl
+    self.packageUrl = URL(string: packageUrl)!
     self.languageTag = languageTag
     self.version = version
   }

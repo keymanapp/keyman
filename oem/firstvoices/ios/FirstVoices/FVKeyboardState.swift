@@ -37,6 +37,10 @@ class FVKeyboardState {
       get {
         return definition.name      }
   }
+  var keyboardId: String {
+      get {
+        return definition.keyboardId      }
+  }
   var languageTag: String {
       get {
         return definition.languageTag      }

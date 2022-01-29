@@ -8,7 +8,10 @@
  *
  * Created by Shawn Schantz on 2022-01-13.
  * 
- * Description...
+ * The main screen of the app containing the list (UITableView) of FirstVoices keyboards.
+ * From here, users can tap on a keyboard which will cause it to transition to a detail page for that keyboard, or
+ * they can tap on the info icon for a keyboard which will load the help web page for the keyboard in the browser.
+ *
  */
 
 import UIKit
@@ -24,8 +27,7 @@ protocol RefreshKeyboardCheckmark {
 
 class KeyboardsScreen: UIViewController, RefreshKeyboardCheckmark {
   func refreshCheckmark() {
-    self.tableView.reloadRows(at: [selectedKeyboardIndex], with: UITableView.RowAnimation.top)
-    //self.tableView.setNeedsDisplay()
+    self.tableView.reloadRows(at: [selectedKeyboardIndex], with: UITableView.RowAnimation.none)
   }
  
   @IBOutlet weak var tableView: UITableView!

@@ -8,12 +8,14 @@
  *
  * Created by Shawn Schantz on 2022-01-13.
  *
- * Description...
+ * Subclass of UITableViewCell that contains a label and switch control.
+ * Executes callback closure when switch is toggled.
+ *
  */
 
 import UIKit
 
-typealias Callback = (Bool) -> Bool
+typealias Callback = (Bool) -> Void
 
 class KeyboardDetailCell: UITableViewCell {
   var callback: Callback? = nil
@@ -24,7 +26,7 @@ class KeyboardDetailCell: UITableViewCell {
   private var title: String = ""
   
   @IBAction func didToggle(_ sender: Any) {
-    let result = callback!(detailSwitch.isOn)
+    callback!(detailSwitch.isOn)
   }
   
   func configure(label: String, enabled: Bool, callback: @escaping Callback) {
