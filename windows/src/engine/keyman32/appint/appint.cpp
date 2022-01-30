@@ -129,7 +129,7 @@ void AppContext::Get(WCHAR *buf, int bufsize)
 
 void AppContext::CopyFrom(AppContext *source)   // I3575
 {
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 0));
   wcscpy_s(CurContext, _countof(CurContext), source->CurContext);
 	pos = source->pos;
 }
@@ -181,6 +181,10 @@ BOOL AppContext::CharIsSurrogatePair()
 
   return Uni_IsSurrogate1(CurContext[pos - 2]) &&
     Uni_IsSurrogate2(CurContext[pos - 1]);
+}
+
+BOOL AppContext::IsEmpty() {
+  return (BOOL)(pos == 0);
 }
 
 /* AppActionQueue */
@@ -251,4 +255,55 @@ BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr)
 
   *outPtr = context_items;
   return true;
+}
+
+
+BOOL
+ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD len) {
+  assert(contextItems);
+  assert(outBuf);
+
+  km_kbp_context_item *km_kbp_context_it = contextItems;
+  uint8_t contextLen               = 0;
+  for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
+    ++contextLen;
+  }
+
+  WCHAR *buf = new WCHAR[(contextLen*3)+ 1 ]; // *3 if every context item was a deadkey
+  uint8_t idx               = 0;
+  km_kbp_context_it = contextItems;
+  for (; km_kbp_context_it->type != KM_KBP_CT_END; ++km_kbp_context_it) {
+    switch (km_kbp_context_it->type) {
+    case KM_KBP_CT_CHAR:
+      if (Uni_IsSMP(km_kbp_context_it->character)) {
+        buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate1(km_kbp_context_it->character);
+        buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate2(km_kbp_context_it->character);
+      } else {
+        buf[idx++] = (km_kbp_cp)km_kbp_context_it->character;
+      }
+      break;
+    case KM_KBP_CT_MARKER:
+      assert(km_kbp_context_it->marker > 0);
+      buf[idx++] = UC_SENTINEL;
+      buf[idx++] = CODE_DEADKEY;
+      buf[idx++] = static_cast<WCHAR>(km_kbp_context_it->marker);
+      break;
+    }
+  }
+
+  buf[idx] = 0;  // Null terminate character array
+
+  if (wcslen(buf) > len) {
+    // Truncate to length 'len' using AppContext so that the context closest to the caret is preserved
+    // and the truncation will not split deadkeys or surrogate pairs
+    // Note by using the app context class we will truncate the context to the MAXCONTEXT length if 'len'
+    // is greater than MAXCONTEXT
+    AppContext context;
+    context.Set(buf);
+    context.Get(outBuf, len);
+  } else {
+    wcscpy_s(outBuf, wcslen(buf) + 1, buf);
+  }
+  delete[] buf;
+  return TRUE;
 }

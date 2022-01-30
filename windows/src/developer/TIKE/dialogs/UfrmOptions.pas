@@ -1,18 +1,18 @@
 (*
   Name:             UfrmOptions
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Tweak character map calls
                     04 Dec 2006 - mcdurdin - Add Allow Multiple Instances
@@ -72,9 +72,7 @@ type
     TntLabel1: TLabel;
     editDatabasePath: TEdit;
     dlgBrowseUnicodeData: TOpenDialog;
-    gbWebHost: TGroupBox;
-    editWebHostDefaultPort: TEdit;
-    lblWebHostDefaultPort: TLabel;
+    gbServer: TGroupBox;
     cmdSMTPSettings: TButton;
     chkOpenKeyboardFilesInSourceView: TCheckBox;
     cmdResetToolWindows: TButton;
@@ -104,6 +102,8 @@ type
     gbPrivacy: TGroupBox;
     chkReportUsage: TCheckBox;
     chkReportErrors: TCheckBox;
+    chkListLocalURLs: TCheckBox;
+    cmdConfigureServer: TButton;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -111,18 +111,18 @@ type
     procedure cmdQuotedFontClick(Sender: TObject);
     procedure cmdCharMapRebuildDatabaseClick(Sender: TObject);
     procedure cmdProxySettingsClick(Sender: TObject);
-    procedure editWebHostDefaultPortKeyPress(Sender: TObject; var Key: Char);
     procedure cmdSMTPSettingsClick(Sender: TObject);
     procedure cmdResetToolWindowsClick(Sender: TObject);
     procedure cbEditorThemeClick(Sender: TObject);
     procedure cmdBrowseDefaultProjectPathClick(Sender: TObject);
+    procedure cmdConfigureServerClick(Sender: TObject);
   private
     FDefaultFont, FQuotedFont: TFont;
-    { Private declarations }
   protected
     function GetHelpTopic: string; override;
   public
     { Public declarations }
+    procedure FocusDebuggerTab;
   end;
 
 implementation
@@ -139,12 +139,13 @@ uses
   JvDockControlForm,
   OnlineConstants,
   RedistFiles,
-  ErrorControlledRegistry, 
+  ErrorControlledRegistry,
   RegistryKeys,
   KeymanDeveloperOptions,
   KeymanDeveloperUtils,
   UfrmCharacterMapNew,
   UfrmMain,
+  Keyman.Developer.UI.UfrmServerOptions,
   Keyman.Developer.UI.UfrmTikeOnlineUpdateSetup,
   UfrmSMTPSetup,
   UnicodeData,
@@ -152,6 +153,11 @@ uses
 
 { General functions }
 
+
+procedure TfrmOptions.FocusDebuggerTab;
+begin
+  pages.ActivePage := tabDebugger;
+end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
 var
@@ -200,7 +206,7 @@ begin
 
     editIndentSize.Text := IntToStr(IndentSize);
 
-    editWebHostDefaultPort.Text := IntToStr(WebHostDefaultPort);   // I4021
+    chkListLocalURLs.Checked := ServerUseLocalAddresses;
 
     chkReportUsage.Checked := ReportUsage;
     chkReportErrors.Checked := ReportErrors;
@@ -289,7 +295,7 @@ begin
     AutoSaveBeforeCompiling          := chkAutoSaveBeforeCompiling.Checked;
     OSKAutoSaveBeforeImporting       := chkOSKAutoSaveBeforeImporting.Checked;
 
-    WebHostDefaultPort := StrToIntDef(editWebHostDefaultPort.Text, 8008);   // I4021
+    ServerUseLocalAddresses := chkListLocalURLs.Checked;
 
     CharMapAutoLookup := chkCharMapAutoLookup.Checked;
     CharMapDisableDatabaseLookups := chkCharMapDisableDatabaseLookups.Checked;
@@ -375,15 +381,6 @@ begin
   end;
 end;
 
-procedure TfrmOptions.editWebHostDefaultPortKeyPress(Sender: TObject;
-  var Key: Char);   // I4021
-begin
-  if not CharInSet(Key, ['0' .. '9']) then
-  begin
-    Key := #0;
-  end;
-end;
-
 procedure TfrmOptions.cbEditorThemeClick(Sender: TObject);
 var
   j: TJSONObject;
@@ -444,12 +441,24 @@ begin
       ShowMessage('The files unicodedata.txt and blocks.txt could not be found at the path '+FUnicodeSourcePath+'.  These files can be downloaded from http://www.unicode.org/');
       Exit;
     end;
-    
+
     FUnicodeData.BuildDatabase(FUnicodeSourcePath);
     if Assigned(frmCharacterMapNew) then
       frmCharacterMapNew.Reload;
-      
+
     editDatabasePath.Text := FUnicodeData.DBPath; // I2299
+  end;
+end;
+
+procedure TfrmOptions.cmdConfigureServerClick(Sender: TObject);
+var
+  serverOptionsForm: TfrmServerOptions;
+begin
+  serverOptionsForm := TfrmServerOptions.Create(Self);
+  try
+    serverOptionsForm.ShowModal;
+  finally
+    serverOptionsForm.Free;
   end;
 end;
 

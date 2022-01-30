@@ -40,6 +40,7 @@ inherited frmDebug: TfrmDebug
     OnExit = memoLostFocus
     OnKeyUp = memoKeyUp
     OnMessage = memoMessage
+    IsDebugging = False
   end
   object sgChars: TStringGrid
     Left = 0

@@ -182,6 +182,7 @@
         <DCCReference Include="..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas"/>
+        <DCCReference Include="..\..\..\developer\TIKE\main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

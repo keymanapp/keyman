@@ -1,18 +1,18 @@
 (*
   Name:             dmActionsMain
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2006
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Add CRM action
                     14 Sep 2006 - mcdurdin - Move font bold issue to UFixFontDialogBold unit
@@ -134,7 +134,9 @@ type
     actViewCode: TAction;   // I4678
     actViewCharacterIdentifier: TAction;   // I4807
     actProjectClose: TAction;
-    actToolsClearCachedDebugObjects: TAction;
+    actToolsWebCopyPublicUrl: TAction;
+    actToolsWebOpenPublicUrl: TAction;
+    actToolsWebConfigure: TAction;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -230,7 +232,11 @@ type
     procedure actProjectSettingsUpdate(Sender: TObject);
     procedure actFileNewUpdate(Sender: TObject);
     procedure actFileOpenUpdate(Sender: TObject);
-    procedure actToolsClearCachedDebugObjectsExecute(Sender: TObject);
+    procedure actToolsWebCopyPublicUrlExecute(Sender: TObject);
+    procedure actToolsWebOpenPublicUrlExecute(Sender: TObject);
+    procedure actToolsWebConfigureExecute(Sender: TObject);
+    procedure actToolsWebCopyPublicUrlUpdate(Sender: TObject);
+    procedure actToolsWebOpenPublicUrlUpdate(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
@@ -255,9 +261,11 @@ uses
   OnlineConstants,
   Keyman.Developer.UI.TikeOnlineUpdateCheck,
   Printers,
+  Vcl.Clipbrd,
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProject,
@@ -286,6 +294,7 @@ uses
   Keyman.Developer.UI.Project.UfrmProject,
   Keyman.Developer.UI.Project.UfrmProjectSettings,
   Upload_Settings,
+  utilexecute,
   UfrmMDIChild;
 
 procedure TmodActionsMain.actFileNewExecute(Sender: TObject);
@@ -673,12 +682,6 @@ begin
   end;
 end;
 
-procedure TmodActionsMain.actToolsClearCachedDebugObjectsExecute(
-  Sender: TObject);
-begin
-  modWebHttpServer.Debugger.ClearCache;
-end;
-
 procedure TmodActionsMain.actToolsFileFormatExecute(Sender: TObject);
 begin
   frmKeymanDeveloper.ActiveChild.TextFileFormatClick;
@@ -746,6 +749,46 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure TmodActionsMain.actToolsWebConfigureExecute(Sender: TObject);
+begin
+  with TfrmOptions.Create(frmKeymanDeveloper) do
+  try
+    FocusDebuggerTab;
+    if ShowModal = mrOk then
+    begin
+      frmKeymanDeveloper.RefreshOptions;
+    end;
+  finally
+    Free;
+  end;
+end;
+
+procedure TmodActionsMain.actToolsWebCopyPublicUrlExecute(Sender: TObject);
+begin
+  Clipboard.AsText := TServerDebugAPI.ngrokEndpoint;
+end;
+
+procedure TmodActionsMain.actToolsWebCopyPublicUrlUpdate(Sender: TObject);
+begin
+  TServerDebugAPI.UpdateStatus;
+  actToolsWebCopyPublicUrl.Enabled :=   TServerDebugAPI.ngrokEndpoint <> '';
+end;
+
+procedure TmodActionsMain.actToolsWebOpenPublicUrlExecute(Sender: TObject);
+begin
+  TUtilExecute.URL(TServerDebugAPI.ngrokEndpoint);
+end;
+
+procedure TmodActionsMain.actToolsWebOpenPublicUrlUpdate(Sender: TObject);
+begin
+  TServerDebugAPI.UpdateStatus;
+  actToolsWebOpenPublicUrl.Enabled := TServerDebugAPI.ngrokEndpoint <> '';
+
+  if actToolsWebOpenPublicUrl.Enabled
+    then actToolsWebOpenPublicUrl.Caption := 'Open '+TServerDebugAPI.ngrokEndpoint+' in browser'
+    else actToolsWebOpenPublicUrl.Caption := 'Open in browser';
 end;
 
 procedure TmodActionsMain.actViewCharacterIdentifierExecute(Sender: TObject);   // I4807

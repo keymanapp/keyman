@@ -60,8 +60,57 @@ namespace kbp
       std::u16string const & value
     ) = 0;
 
+    /**
+     * Requests this keyboard processor to process its queued actions
+     * updateing the state as required.
+     *
+     * @param   state  An opaque pointer to a state object
+     * @return  km_kbp_status  `KM_KBP_STATUS_OK`: On success. Else KB_KBP_ error code
+     */
+    virtual km_kbp_status
+    process_queued_actions(
+      km_kbp_state * state
+    ) = 0;
+
+    /**
+     * Add the action items to this keyboard processor queue
+     *
+     * @param  state  An opaque pointer to a state object
+     * @param  action_item
+     * @param  bool  return true if action item list is successfully processed
+     */
+    virtual bool
+    queue_action(
+      km_kbp_state * state,
+      km_kbp_action_item const* action_item
+    ) = 0;
+
+  /**
+   * Returns the keyboardprocessor context as an array of
+   * km_kbp_context_items. Caller is responsible for freeing
+   * the memory
+   * @return km_kbp_context_item*
+   */
+    virtual km_kbp_context_item *
+    get_intermediate_context() = 0;
+
+   /**
+    * Returns the list of keys that belong to the keyboard rules. The matching dispose
+    * call needs to be called to free the memory.
+    *
+    * @return km_kbp_keyboard_key*
+    */
     virtual km_kbp_keyboard_key *
     get_key_list() const = 0;
+
+
+    /** Get the imx list of external libraries and functions
+     * this keyboard calls.
+     *
+     * @return km_kbp_keyboard_imx*
+     */
+    virtual km_kbp_keyboard_imx *
+    get_imx_list() const = 0;
 
     friend json & operator << (json &j, abstract_processor const &opts);
   };

@@ -171,9 +171,12 @@ begin
 
         if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 
-      if Result
-        then Log(plsSuccess, Format('''%s'' was compiled successfully for %s to ''%s''.', [FileName, TargetNames, FOutFileName]), 0, 0)   // I4504
-        else Log(plsFailure, Format('''%s'' was not compiled successfully for %s.', [FileName, TargetNames]), 0, 0);   // I4504
+        if Result
+          then Log(plsSuccess, Format('''%s'' was compiled successfully for %s to ''%s''.', [FileName, TargetNames, FOutFileName]), 0, 0)   // I4504
+          else Log(plsFailure, Format('''%s'' was not compiled successfully for %s.', [FileName, TargetNames]), 0, 0);   // I4504
+
+        if Result and Assigned(OnCompileSuccess) then
+          OnCompileSuccess(Self, FileName, FOutFileName);
       finally
         ckw.Free;
       end;

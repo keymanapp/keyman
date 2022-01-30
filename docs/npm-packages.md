@@ -72,11 +72,10 @@ the particular version of Keyman Developer.
 ### `set_npm_version`
 
 This helper function sets the version in the `package.json` for the
-given package. It must be given a three-part version number, with an
-optional tier, "alpha" or "beta". No tier indicates "stable".
+given package, according to the VERSION_WITH_TAG variable.
 
 ```bash
 . $KEYMAN_REPOSITORY_ROOT/resources/shellHelperFunctions.sh
 
-set_npm_version MAJOR.MINOR.PATCH[-alpha|-beta]
+set_npm_version
 ```

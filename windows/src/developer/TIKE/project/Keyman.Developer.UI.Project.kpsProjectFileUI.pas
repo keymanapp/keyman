@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.UI.Project.kpsProjectFileUI
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 May 2015
 
   Modified Date:    4 May 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 May 2015 - mcdurdin - I4694 - V9.0 - Split UI actions from non-UI actions in projects
 *)
 unit Keyman.Developer.UI.Project.kpsProjectFileUI;
@@ -55,6 +55,7 @@ uses
   dmActionsMain,
   Controls,
   Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectUIFileType,
   UfrmMain,
   UfrmMessages,
@@ -74,6 +75,9 @@ begin
     if not modActionsMain.actFileSave.Execute then Exit;
 
   Result := ProjectFile.CompilePackage(GetPack, FSilent);
+
+  if Result and TServerDebugAPI.IsPackageRegistered(ProjectFile.TargetFileName) then
+    TestPackageOnline;
 end;
 
 function TkpsProjectFileUI.CompilePackageInstaller(FSilent: Boolean): Boolean;
@@ -137,7 +141,7 @@ begin
   if not FileExists(FCompiledName) then
     Exit(False);
 
-  modWebHttpServer.Debugger.RegisterPackage(FCompiledName, ProjectFile.Header_Name); // TODO: Show package 'name' in future
+  TServerDebugAPI.RegisterPackage(FCompiledName, ProjectFile.Header_Name);
 
   packageEditor.NotifyStartedWebDebug;   // I4021
 

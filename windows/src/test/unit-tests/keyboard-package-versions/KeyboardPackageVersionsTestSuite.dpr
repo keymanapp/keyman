@@ -100,7 +100,8 @@ uses
   Keyman.System.Standards.LangTagsRegistry in '..\..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.Developer.System.Project.UrlRenderer in '..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
   KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas',
-  Keyman.Developer.System.ValidateKpsFile in '..\..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas';
+  Keyman.Developer.System.ValidateKpsFile in '..\..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas',
+  Keyman.Developer.System.KeymanDeveloperPaths in '..\..\..\developer\TIKE\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
 
 var
   runner : ITestRunner;

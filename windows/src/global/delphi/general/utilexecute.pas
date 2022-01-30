@@ -41,7 +41,8 @@ type
     class function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean): Boolean; overload;
     class function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean; var AExitCode: Cardinal): Boolean; overload;
 
-    class function Execute(const cmdline, curdir: string; ShowWindow: Integer): Boolean; static;
+    class function Execute(const cmdline, curdir: string; ShowWindow: Integer): Boolean; overload; static;
+    class function Execute(const cmdline, curdir: string; ShowWindow: Integer; var pi: TProcessInformation): Boolean; overload; static;
   end;
 
 implementation
@@ -260,8 +261,19 @@ end;
 
 class function TUtilExecute.Execute(const cmdline, curdir: string; ShowWindow: Integer): Boolean;
 var
-  si: TStartupInfoW;
   pi: TProcessInformation;
+begin
+  Result := Execute(cmdline, curdir, ShowWindow, pi);
+  if Result then
+  begin
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+  end;
+end;
+
+class function TUtilExecute.Execute(const cmdline, curdir: string; ShowWindow: Integer; var pi: TProcessInformation): Boolean;
+var
+  si: TStartupInfoW;
   buf: PChar;
 begin
   Result := False;
@@ -282,8 +294,6 @@ begin
       nil, nil, True, NORMAL_PRIORITY_CLASS, nil, PWideChar(curdir),
       si, pi) then
     begin
-      CloseHandle(pi.hProcess);
-      CloseHandle(pi.hThread);
       Result := True;
     end;
   finally

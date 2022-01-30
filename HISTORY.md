@@ -1,5 +1,34 @@
 # Keyman Version History
 
+## 15.0.188 alpha 2022-01-28
+
+* fix(mac): Check for CODE_SETSYSTEMSTORE (#6169)
+* feat(developer): Keyman Developer Server (#6073)
+
+## 15.0.187 alpha 2022-01-27
+
+* fix(developer): handle Core failure to load (#6141)
+* feat(windows): Keyman Core Integration - Support for IMX DLLs (#5936)
+* chore(windows): testhost readme (#6164)
+* chore(ios): certificate update (#6165)
+* feat(linux): add support for Wayland (#6135)
+
+## 15.0.186 alpha 2022-01-26
+
+* feat(linux): Replace hirsute with impish (#6161)
+
+## 15.0.185 alpha 2022-01-25
+
+* feat(windows): testhost project for debugging keyman32 (#6154)
+* feat(windows): handle key output in testhost (#6157)
+* chore(deps): bump node-fetch from 2.6.1 to 2.6.7 in /resources/build/version (#6156)
+* fix(developer): prevent crash on build dblclicked file (#6151)
+* chore(linux): Add comment for clarification of code behaviour (#6152)
+
+## 15.0.184 alpha 2022-01-24
+
+* fix: only auto-merge if `auto:` prefix in title (#6146)
+
 ## 15.0.183 alpha 2022-01-21
 
 * chore(linux): Update changelogs for 14.0.284 :cherries: (#6132)
