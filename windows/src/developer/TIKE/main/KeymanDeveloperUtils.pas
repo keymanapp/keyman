@@ -69,8 +69,8 @@ function FontAsString(f: TFont): string;
 
 procedure InstallKeyboard(const nm: string; FCanInstallUnreg: Boolean);
 procedure InstallPackage(const nm: string; FCanInstallUnreg: Boolean);
-procedure UninstallKeyboard(const nm: string);
-procedure UninstallPackage(const nm: string);
+function UninstallKeyboard(const nm: string): Boolean;
+function UninstallPackage(const nm: string): Boolean;
 
 function GetKeymanInstallPath: string;
 
@@ -330,26 +330,24 @@ begin
     ShowMessage('Failed to install package');
 end;
 
-procedure UninstallKeyboard(const nm: string);
+function UninstallKeyboard(const nm: string): Boolean;
 var
   kmshell: string;
 begin
   if not GetKmshellPath(kmshell) then
-    Exit;
+    Exit(False);
 
-  if TUtilExecute.WaitForProcess('"'+kmshell+'" -uk "'+nm+'"', ExtractFilePath(nm)) = False then  // I3475
-    ShowMessage('Failed to uninstall package');
+  Result := TUtilExecute.WaitForProcess('"'+kmshell+'" -uk "'+nm+'"', ExtractFilePath(kmshell));  // I3475
 end;
 
-procedure UninstallPackage(const nm: string);
+function UninstallPackage(const nm: string): Boolean;
 var
   kmshell: string;
 begin
   if not GetKmshellPath(kmshell) then
-    Exit;
+    Exit(False);
 
-  if TUtilExecute.WaitForProcess('"'+kmshell+'" -up "'+nm+'"', ExtractFilePath(nm)) = False then  // I3475
-    ShowMessage('Failed to uninstall package');
+  Result := TUtilExecute.WaitForProcess('"'+kmshell+'" -up "'+nm+'"', ExtractFilePath(kmshell));  // I3475
 end;
 
 

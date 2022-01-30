@@ -540,8 +540,9 @@ end;
 procedure TmodActionsKeyboardEditor.actKeyboardUninstallExecute(Sender: TObject);
 begin
   try
-    (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaUninstall, False);   // I4687
-    ShowMessage('Keyboard uninstalled successfully.');
+    if (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaUninstall, False)
+      then ShowMessage('Keyboard uninstalled successfully.')
+      else ShowMessage('Failed to uninstall keyboard.');
   except
     on E:EOleException do // I654
     begin

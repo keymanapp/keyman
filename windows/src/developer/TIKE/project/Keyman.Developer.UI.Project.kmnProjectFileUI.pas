@@ -246,8 +246,7 @@ end;
 
 function TkmnProjectFileUI.UninstallKeyboard: Boolean;
 begin
-  KeymanDeveloperUtils.UninstallKeyboard(ChangeFileExt(ExtractFileName(ProjectFile.FileName), ''));
-  Result := True;
+  Result := KeymanDeveloperUtils.UninstallKeyboard(ChangeFileExt(ExtractFileName(ProjectFile.FileName), ''));
 end;
 
 function TkmnProjectFileUI.DebugKeyboard(FSilent: Boolean): Boolean;
