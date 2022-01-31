@@ -22,8 +22,9 @@ An older version of Keyman for Linux packages is also available in any current D
 
 ## Q. What's the relationship between Keyman for Linux and KMFL?
 
-**A.** Keyman for Linux and KMFL are released together in the Keyman
-[PPA](https://en.wikipedia.org/wiki/Ubuntu#Package_Archives), but are separate. The installation
+**A.** KMFL is no longer actively developed, although it can still be installed.
+Both Keyman for Linux and KMFL are available in the Keyman
+[PPA](https://en.wikipedia.org/wiki/Ubuntu#Package_Archives). The installation
 instructions above will install Keyman, not KMFL. KMFL was developed as a black-box clone of Keyman
 for Windows years ago; after Keyman was released as open source it became possible to share the
 code base between Windows and Linux. Keyman for Linux is the long-term supported solution.

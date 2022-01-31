@@ -2,7 +2,8 @@
 
 # autoreconf autotool projects
 
-# parameters: [JENKINS="yes"] ./reconf.sh [proj]
+# parameters: [BUILD_LEGACY=1] [JENKINS="yes"] ./reconf.sh [proj]
+# BUILD_LEGACY=1 to also build legacy KMFL projects
 # JENKINS="yes" to set version for jenkins builds
 # proj = only reconf this project
 
@@ -16,7 +17,10 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 BASEDIR="$KEYMAN_ROOT/linux"
 echo "basedir is $BASEDIR"
-legacy_projects="kmflcomp libkmfl ibus-kmfl"
+legacy_projects=""
+if [ -n "$BUILD_LEGACY" ]; then
+    legacy_projects="kmflcomp libkmfl ibus-kmfl"
+fi
 autotool_projects="ibus-keyman"
 extra_projects="keyboardprocessor keyman-config"
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Install keyboardprocessor, kmflcomp, libkmfl, ibus-kmfl, ibus-keyman and keyman-config
+# Install keyboardprocessor, ibus-keyman and keyman-config
+# If BUILD_LEGACY is set this also install kmflcomp, libkmfl, and ibus-kmfl.
 
 # It must be run from the keyman/linux directory
 
@@ -15,6 +16,11 @@ BASEDIR=`pwd`
 SUDOINSTALL=${SUDOINSTALL:-"no"}
 
 INSTALLDIR=${INSTALLDIR:-"/usr/local"}
+
+legacy_projects=""
+if [ -n "$BUILD_LEGACY" ]; then
+    legacy_projects="kmflcomp libkmfl ibus-kmfl"
+fi
 
 if [[ "${SUDOINSTALL}" != "no" ]]; then
 	if [ "$EUID" -ne 0 ]
@@ -51,7 +57,7 @@ cd keyboardprocessor/arch/release
 ninja install
 cd $BASEDIR
 
-for proj in kmflcomp libkmfl ibus-kmfl ibus-keyman; do
+for proj in ${legacy_projects} ibus-keyman; do
 	cd build-$proj
 	if [[ "${SUDOINSTALL}" == "uninstall" ]]; then
 		if [ ! -f Makefile ]; then

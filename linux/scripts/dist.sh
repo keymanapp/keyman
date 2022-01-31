@@ -3,9 +3,10 @@
 # Build dist tarballs or Debian orig tarballs
 # and put them in dist/
 
-# parameters: ./dist.sh [origdist] [proj]
+# parameters: [BUILD_LEGACY=1] ./dist.sh [origdist] [proj]
 # origdist = create Debian orig.tar.gz
 # proj = only make tarball for this project
+# BUILD_LEGACY = additionaly build legacy KMFL tarballs
 
 set -e
 
@@ -16,8 +17,12 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 BASEDIR=$(pwd)
-legacy_projects="kmflcomp libkmfl ibus-kmfl"
+legacy_projects=""
 extra_projects="keyman"
+
+if [ -n "$BUILD_LEGACY" ]; then
+    legacy_projects="kmflcomp libkmfl ibus-kmfl"
+fi
 
 if [ "$1" == "origdist" ]; then
     create_origdist=1

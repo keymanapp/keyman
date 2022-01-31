@@ -20,8 +20,10 @@ function checkPrerequisites() {
 
     if [ "${PROJECT}" != "" ]; then
         projects="${PROJECT}"
-    else
+    elif [ -n "${BUILD_LEGACY}" ]; then
         projects="keyman kmflcomp libkmfl ibus-kmfl"
+    else
+        projects="keyman"
     fi
 }
 

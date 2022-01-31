@@ -7,7 +7,10 @@ PROGRAM_NAME="$(basename "$0")"
 . $HOME/ci-builder-scripts/bash/common.sh
 init --no-package
 
-keyman_projects="keyman kmflcomp libkmfl ibus-kmfl"
+keyman_projects="keyman"
+if [ -n "$BUILD_LEGACY" ]; then
+    keyman_projects="keyman kmflcomp libkmfl ibus-kmfl"
+fi
 
 tier="stable"
 

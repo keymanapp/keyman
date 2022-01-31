@@ -8,6 +8,4 @@ Thank you for installing Keyman for Linux. Whether you're a new or returning use
 
 Keyman for Linux makes it possible to type in over 1,000 languages in any Linux application.
 
-Keyman for Linux also supports KMFL keyboards, so your existing KMFL keyboards will continue to work.
-
 [Click here](../start/) to get started.

@@ -5,16 +5,20 @@
 
 # It must be run from the keyman/linux directory
 
-# parameters: ./deb.sh [sourcepackage] [proj] [dist]
+# parameters: [BUILD_LEGACY=1] ./deb.sh [sourcepackage] [proj] [dist]
 # sourcepackage = only create Debian source package
 # proj = only build for this project
 # dist = only build for this distribution
+# BUILD_LEGACY = also build legacy KMFL packages
 
 set -e
 
 all_distributions="focal"
 distributions=""
-all_projects="keyman kmflcomp libkmfl ibus-kmfl"
+all_projects="keyman"
+if [ -n "$BUILD_LEGACY" ]; then
+    all_projects="keyman kmflcomp libkmfl ibus-kmfl"
+fi
 projects=""
 echo "all_distributions: ${all_distributions}"
 echo "all_projects: ${all_projects}"
