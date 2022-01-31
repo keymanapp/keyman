@@ -80,7 +80,7 @@ class InstallKmpWindow(Gtk.Dialog):
                 self.kbname = keyboardid
             self.checkcontinue = True
 
-            if installed_kmp_ver and secure_lookup('version', 'description'):
+            if installed_kmp_ver and secure_lookup(info, 'version', 'description'):
                 if secure_lookup(info, 'version', 'description') == installed_kmp_ver:
                     dialog = Gtk.MessageDialog(
                         viewkmp, 0, Gtk.MessageType.QUESTION,
