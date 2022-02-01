@@ -13,6 +13,7 @@
  */
 
 import Foundation
+import KeymanEngine
 
 class FVKeyboardState {
   static private var cache:[String:FVKeyboardState] = [:]

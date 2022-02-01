@@ -33,9 +33,10 @@ class FVLexicalModels {
             if !jsonArray.isEmpty {
               let jsonModelMap = jsonArray.first
               let name = jsonModelMap!["description"] as! String
+              let modelId = jsonModelMap!["id"] as! String
               let packageUrl = jsonModelMap!["packageFilename"] as! String
               let version = jsonModelMap!["version"] as! String
-              let model = FVLexicalModel(name: name, packageUrl: packageUrl, languageTag: languageTag, version: version)
+              let model = FVLexicalModel(name: name, id: modelId, packageUrl: packageUrl, languageTag: languageTag, version: version)
               modelArray.append(model)
             }
           }
@@ -51,19 +52,21 @@ class FVLexicalModels {
     return modelArray
   }
   
-  class func downloadModel(keyboard: FVKeyboardState) {
-    Manager.shared.downloadLexicalModel(withID: keyboard.keyboardId, languageID: keyboard.languageTag, isUpdate: false, fetchRepositoryIfNeeded: true)
+  class func downloadModel(keyboard: FVKeyboardState, modelId: String) {
+    Manager.shared.downloadLexicalModel(withID: modelId, languageID: keyboard.languageTag, isUpdate: true, fetchRepositoryIfNeeded: true)
   }
 }
 
 class FVLexicalModel {
   let name: String
+  let id: String
   let packageUrl: URL
   let languageTag: String
   let version: String
   
-  internal init(name: String, packageUrl: String, languageTag: String, version: String) {
+  internal init(name: String, id: String, packageUrl: String, languageTag: String, version: String) {
     self.name = name
+    self.id = id
     self.packageUrl = URL(string: packageUrl)!
     self.languageTag = languageTag
     self.version = version

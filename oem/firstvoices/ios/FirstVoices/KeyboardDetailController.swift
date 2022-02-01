@@ -148,6 +148,13 @@ class KeyboardDetailController: UITableViewController {
     let switchCell = tableView.dequeueReusableCell(withIdentifier: switchCellIdentifier) as! KeyboardDetailCell
     let actionCallBack: Callback = { (enable) in
       self.keyboardState?.isEnabled = enable
+      
+      // call Keyman Engine to install or remove the keyboard
+      if enable {
+        FVKeyboardPackage.installKeyboard(keyboard: self.keyboardState!.definition)
+      } else {
+        FVKeyboardPackage.removeKeyboard(keyboard: self.keyboardState!.definition)
+      }
       // update the enabled/disabled state of dependent switches
       self.updateSwitchDetailAvailability(available: enable)
       self.delegate?.refreshCheckmark()
@@ -194,13 +201,8 @@ class KeyboardDetailController: UITableViewController {
     let actionCallBack: Callback = { (enable) in
       if enable {
         self.keyboardState?.selectedDictionary = availableModelName;
-        do {
-          let url = try URL(string: String(contentsOf: self.lexicalModels.first!.packageUrl))
-          FVLexicalModels.downloadModel(keyboard: self.keyboardState!)
-        }
-        catch {
-          print("FVLexicalModels.downloadModel error")
-        }
+          let id = self.lexicalModels.first!.id
+          FVLexicalModels.downloadModel(keyboard: self.keyboardState!, modelId: id)
       }
     }
 
