@@ -23,6 +23,20 @@ def _(txt):
     return translation
 
 
+def secure_lookup(data, key1, key2 = None):
+    """
+    Return data[key1][key2] while dealing with data being None or key1 or key2 not existing
+    """
+    if not data:
+        return None
+    if key1 in data:
+        if not key2:
+            return data[key1]
+        if key2 in data[key1]:
+            return data[key1][key2]
+    return None
+
+
 gettext.bindtextdomain('keyman-config', '/usr/share/locale')
 gettext.textdomain('keyman-config')
 

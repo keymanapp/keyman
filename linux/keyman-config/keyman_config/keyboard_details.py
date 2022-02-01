@@ -2,6 +2,7 @@
 
 # Keyboard details window
 
+import logging
 import json
 from os import path
 import qrcode
@@ -10,7 +11,7 @@ import tempfile
 import gi
 from gi.repository import Gtk
 
-from keyman_config import KeymanComUrl, _
+from keyman_config import KeymanComUrl, _, secure_lookup
 from keyman_config.accelerators import init_accel
 from keyman_config.kmpmetadata import parsemetadata
 
@@ -61,8 +62,11 @@ class KeyboardDetailsView(Gtk.Dialog):
         kbdata = None
         jsonfile = path.join(packageDir, kmp['packageID'] + ".json")
         if path.isfile(jsonfile):
-            with open(jsonfile, "r") as read_file:
-                kbdata = json.load(read_file)
+            try:
+                with open(jsonfile, "r") as read_file:
+                    kbdata = json.load(read_file)
+            except Exception as e:
+                logging.warning('Exception %s reading %s %s', type(e), jsonfile, e.args)
 
         grid = Gtk.Grid()
         # grid.set_column_homogeneous(True)
@@ -77,8 +81,8 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.add(lbl_pkg_name)
         prevlabel = lbl_pkg_name
         label = Gtk.Label()
-        if info['name']['description']:
-            label.set_text(info['name']['description'])
+        if secure_lookup(info, 'name', 'description'):
+            label.set_text(secure_lookup(info, 'name', 'description'))
         label.set_halign(Gtk.Align.START)
         label.set_selectable(True)
         grid.attach_next_to(label, lbl_pkg_name, Gtk.PositionType.RIGHT, 1, 1)
@@ -89,7 +93,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.attach_next_to(lbl_pkg_id, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         prevlabel = lbl_pkg_id
         label = Gtk.Label()
-        if kmp['packageID']:
+        if secure_lookup(kmp, 'packageID'):
             label.set_text(kmp['packageID'])
         label.set_halign(Gtk.Align.START)
         label.set_selectable(True)
@@ -101,48 +105,47 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.attach_next_to(lbl_pkg_vrs, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         prevlabel = lbl_pkg_vrs
         label = Gtk.Label()
-        if info['version']['description']:
-            label.set_text(info['version']['description'])
+        if secure_lookup(info, 'version', 'description'):
+            label.set_text(secure_lookup(info, 'version', 'description'))
         label.set_halign(Gtk.Align.START)
         label.set_selectable(True)
         grid.attach_next_to(label, lbl_pkg_vrs, Gtk.PositionType.RIGHT, 1, 1)
 
-        if kbdata and kbdata.get('description'):
+        if secure_lookup(kbdata, 'description'):
             lbl_pkg_desc = Gtk.Label()
             lbl_pkg_desc.set_text(_("Package description:   "))
             lbl_pkg_desc.set_halign(Gtk.Align.END)
             grid.attach_next_to(lbl_pkg_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_desc
             label = Gtk.Label()
-            if kbdata.get('description'):
-                label.set_text(kbdata.get('description'))
+            label.set_text(kbdata['description'])
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             label.set_line_wrap(80)
             grid.attach_next_to(label, lbl_pkg_desc, Gtk.PositionType.RIGHT, 1, 1)
 
-        if "author" in info:
+        if secure_lookup(info, "author"):
             lbl_pkg_auth = Gtk.Label()
             lbl_pkg_auth.set_text(_("Package author:   "))
             lbl_pkg_auth.set_halign(Gtk.Align.END)
             grid.attach_next_to(lbl_pkg_auth, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_auth
             label = Gtk.Label()
-            if info['author']['description']:
-                label.set_text(info['author']['description'])
+            if secure_lookup(info, 'author', 'description'):
+                label.set_text(secure_lookup(info, 'author', 'description'))
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, lbl_pkg_auth, Gtk.PositionType.RIGHT, 1, 1)
 
-        if "copyright" in info:
+        if secure_lookup(info, "copyright"):
             lbl_pkg_cpy = Gtk.Label()
             lbl_pkg_cpy.set_text(_("Package copyright:   "))
             lbl_pkg_cpy.set_halign(Gtk.Align.END)
             grid.attach_next_to(lbl_pkg_cpy, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_cpy
             label = Gtk.Label()
-            if info['copyright']['description']:
-                label.set_text(info['copyright']['description'])
+            if secure_lookup(info, 'copyright', 'description'):
+                label.set_text(secure_lookup(info, 'copyright', 'description'))
             label.set_halign(Gtk.Align.START)
             label.set_selectable(True)
             grid.attach_next_to(label, lbl_pkg_cpy, Gtk.PositionType.RIGHT, 1, 1)
@@ -165,8 +168,11 @@ class KeyboardDetailsView(Gtk.Dialog):
                 kbdata = None
                 jsonfile = path.join(packageDir, kbd['id'] + ".json")
                 if path.isfile(jsonfile):
-                    with open(jsonfile, "r") as read_file:
-                        kbdata = json.load(read_file)
+                    try:
+                        with open(jsonfile, "r") as read_file:
+                            kbdata = json.load(read_file)
+                    except Exception as e:
+                        logging.warning('Exception %s reading %s %s', type(e), jsonfile, e.args)
 
                 # start with padding
                 lbl_pad = Gtk.Label()
@@ -188,133 +194,132 @@ class KeyboardDetailsView(Gtk.Dialog):
                 label.set_selectable(True)
                 grid.attach_next_to(label, lbl_kbd_file, Gtk.PositionType.RIGHT, 1, 1)
 
-                if kbdata:
-                    if kbdata['id'] != kmp['packageID']:
-                        lbl_kbd_name = Gtk.Label()
-                        lbl_kbd_name.set_text(_("Keyboard name:   "))
-                        lbl_kbd_name.set_halign(Gtk.Align.END)
-                        grid.attach_next_to(lbl_kbd_name, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                        prevlabel = lbl_kbd_name
+                if kbdata and secure_lookup(kbdata, 'id') != secure_lookup(kmp, 'packageID'):
+                    lbl_kbd_name = Gtk.Label()
+                    lbl_kbd_name.set_text(_("Keyboard name:   "))
+                    lbl_kbd_name.set_halign(Gtk.Align.END)
+                    grid.attach_next_to(lbl_kbd_name, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                    prevlabel = lbl_kbd_name
+                    label = Gtk.Label()
+                    if secure_lookup(kbdata, 'name'):
+                        label.set_text(kbdata['name'])
+                    label.set_halign(Gtk.Align.START)
+                    label.set_selectable(True)
+                    grid.attach_next_to(label, lbl_kbd_name, Gtk.PositionType.RIGHT, 1, 1)
+
+                    lbl_kbd_id = Gtk.Label()
+                    lbl_kbd_id.set_text(_("Keyboard id:   "))
+                    lbl_kbd_id.set_halign(Gtk.Align.END)
+                    grid.attach_next_to(lbl_kbd_id, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                    prevlabel = lbl_kbd_id
+                    label = Gtk.Label()
+                    if secure_lookup(kbdata, 'id'):
+                        label.set_text(kbdata['id'])
+                    label.set_halign(Gtk.Align.START)
+                    label.set_selectable(True)
+                    grid.attach_next_to(label, lbl_kbd_id, Gtk.PositionType.RIGHT, 1, 1)
+
+                    lbl_kbd_vrs = Gtk.Label()
+                    lbl_kbd_vrs.set_text(_("Keyboard version:   "))
+                    lbl_kbd_vrs.set_halign(Gtk.Align.END)
+                    grid.attach_next_to(lbl_kbd_vrs, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                    prevlabel = lbl_kbd_vrs
+                    label = Gtk.Label()
+                    if secure_lookup(kbdata, 'version'):
+                        label.set_text(kbdata['version'])
+                    label.set_halign(Gtk.Align.START)
+                    label.set_selectable(True)
+                    grid.attach_next_to(label, lbl_kbd_vrs, Gtk.PositionType.RIGHT, 1, 1)
+
+                    if secure_lookup(info, "author"):
+                        lbl_kbd_auth = Gtk.Label()
+                        lbl_kbd_auth.set_text(_("Keyboard author:   "))
+                        lbl_kbd_auth.set_halign(Gtk.Align.END)
+                        grid.attach_next_to(lbl_kbd_auth, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                        prevlabel = lbl_kbd_auth
                         label = Gtk.Label()
-                        if kbdata['name']:
-                            label.set_text(kbdata['name'])
+                        if secure_lookup(kbdata, 'authorName'):
+                            label.set_text(kbdata['authorName'])
                         label.set_halign(Gtk.Align.START)
                         label.set_selectable(True)
-                        grid.attach_next_to(label, lbl_kbd_name, Gtk.PositionType.RIGHT, 1, 1)
+                        grid.attach_next_to(label, lbl_kbd_auth, Gtk.PositionType.RIGHT, 1, 1)
 
-                        lbl_kbd_id = Gtk.Label()
-                        lbl_kbd_id.set_text(_("Keyboard id:   "))
-                        lbl_kbd_id.set_halign(Gtk.Align.END)
-                        grid.attach_next_to(lbl_kbd_id, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                        prevlabel = lbl_kbd_id
-                        label = Gtk.Label()
-                        if kbdata['id']:
-                            label.set_text(kbdata['id'])
-                        label.set_halign(Gtk.Align.START)
-                        label.set_selectable(True)
-                        grid.attach_next_to(label, lbl_kbd_id, Gtk.PositionType.RIGHT, 1, 1)
+                    lbl_kbd_lic = Gtk.Label()
+                    lbl_kbd_lic.set_text(_("Keyboard license:   "))
+                    lbl_kbd_lic.set_halign(Gtk.Align.END)
+                    grid.attach_next_to(lbl_kbd_lic, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                    prevlabel = lbl_kbd_lic
+                    label = Gtk.Label()
+                    if secure_lookup(kbdata, 'license'):
+                        label.set_text(kbdata['license'])
+                    label.set_halign(Gtk.Align.START)
+                    label.set_selectable(True)
+                    grid.attach_next_to(label, lbl_kbd_lic, Gtk.PositionType.RIGHT, 1, 1)
 
-                        lbl_kbd_vrs = Gtk.Label()
-                        lbl_kbd_vrs.set_text(_("Keyboard version:   "))
-                        lbl_kbd_vrs.set_halign(Gtk.Align.END)
-                        grid.attach_next_to(lbl_kbd_vrs, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                        prevlabel = lbl_kbd_vrs
-                        label = Gtk.Label()
-                        if kbdata['version']:
-                            label.set_text(kbdata['version'])
-                        label.set_halign(Gtk.Align.START)
-                        label.set_selectable(True)
-                        grid.attach_next_to(label, lbl_kbd_vrs, Gtk.PositionType.RIGHT, 1, 1)
+                    lbl_kbd_desc = Gtk.Label()
+                    lbl_kbd_desc.set_text(_("Keyboard description:   "))
+                    lbl_kbd_desc.set_halign(Gtk.Align.END)
+                    grid.attach_next_to(lbl_kbd_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                    prevlabel = lbl_kbd_desc
+                    label = Gtk.Label()
+                    if secure_lookup(kbdata, 'description'):
+                        label.set_text(kbdata['description'])
+                    label.set_halign(Gtk.Align.START)
+                    label.set_selectable(True)
+                    label.set_line_wrap(80)
+                    grid.attach_next_to(label, lbl_kbd_desc, Gtk.PositionType.RIGHT, 1, 1)
 
-                        if "author" in info:
-                            lbl_kbd_auth = Gtk.Label()
-                            lbl_kbd_auth.set_text(_("Keyboard author:   "))
-                            lbl_kbd_auth.set_halign(Gtk.Align.END)
-                            grid.attach_next_to(lbl_kbd_auth, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                            prevlabel = lbl_kbd_auth
-                            label = Gtk.Label()
-                            if kbdata['authorName']:
-                                label.set_text(kbdata['authorName'])
-                            label.set_halign(Gtk.Align.START)
-                            label.set_selectable(True)
-                            grid.attach_next_to(label, lbl_kbd_auth, Gtk.PositionType.RIGHT, 1, 1)
+                    # Padding and full width horizontal divider
+                    lbl_pad = Gtk.Label()
+                    lbl_pad.set_text("")
+                    lbl_pad.set_halign(Gtk.Align.END)
+                    grid.attach_next_to(lbl_pad, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
+                    prevlabel = lbl_pad
 
-                        lbl_kbd_lic = Gtk.Label()
-                        lbl_kbd_lic.set_text(_("Keyboard license:   "))
-                        lbl_kbd_lic.set_halign(Gtk.Align.END)
-                        grid.attach_next_to(lbl_kbd_lic, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                        prevlabel = lbl_kbd_lic
-                        label = Gtk.Label()
-                        if kbdata['license']:
-                            label.set_text(kbdata['license'])
-                        label.set_halign(Gtk.Align.START)
-                        label.set_selectable(True)
-                        grid.attach_next_to(label, lbl_kbd_lic, Gtk.PositionType.RIGHT, 1, 1)
+                    divider_pkg = Gtk.HSeparator()
+                    grid.attach_next_to(divider_pkg, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
 
-                        lbl_kbd_desc = Gtk.Label()
-                        lbl_kbd_desc.set_text(_("Keyboard description:   "))
-                        lbl_kbd_desc.set_halign(Gtk.Align.END)
-                        grid.attach_next_to(lbl_kbd_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                        prevlabel = lbl_kbd_desc
-                        label = Gtk.Label()
-                        if kbdata['description']:
-                            label.set_text(kbdata['description'])
-                        label.set_halign(Gtk.Align.START)
-                        label.set_selectable(True)
-                        label.set_line_wrap(80)
-                        grid.attach_next_to(label, lbl_kbd_desc, Gtk.PositionType.RIGHT, 1, 1)
+                    # label7 = Gtk.Label()
+                    # label7.set_text(_("On Screen Keyboard:   "))
+                    # label7.set_halign(Gtk.Align.END)
+                    # grid.attach_next_to(label7, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                    # prevlabel = label7
+                    # # label = Gtk.Label()
+                    # # label.set_text(secure_lookup(info, 'version', 'description'))
+                    # # label.set_halign(Gtk.Align.START)
+                    # # label.set_selectable(True)
+                    # # grid.attach_next_to(label, label7, Gtk.PositionType.RIGHT, 1, 1)
 
-                        # Padding and full width horizontal divider
-                        lbl_pad = Gtk.Label()
-                        lbl_pad.set_text("")
-                        lbl_pad.set_halign(Gtk.Align.END)
-                        grid.attach_next_to(lbl_pad, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
-                        prevlabel = lbl_pad
+                    # label8 = Gtk.Label()
+                    # label8.set_text(_("Documentation:   "))
+                    # label8.set_halign(Gtk.Align.END)
+                    # grid.attach_next_to(label8, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                    # prevlabel = label8
+                    # #TODO need to know which area keyboard is installed in to show this
+                    # # label = Gtk.Label()
+                    # # welcome_file = path.join("/usr/local/share/doc/keyman", kmp["id"], "welcome.htm")
+                    # # if path.isfile(welcome_file):
+                    # #     label.set_text(_("Installed"))
+                    # # else:
+                    # #     label.set_text(_("Not installed"))
+                    # # label.set_halign(Gtk.Align.START)
+                    # # label.set_selectable(True)
+                    # # grid.attach_next_to(label, label8, Gtk.PositionType.RIGHT, 1, 1)
 
-                        divider_pkg = Gtk.HSeparator()
-                        grid.attach_next_to(divider_pkg, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
-
-                        # label7 = Gtk.Label()
-                        # label7.set_text(_("On Screen Keyboard:   "))
-                        # label7.set_halign(Gtk.Align.END)
-                        # grid.attach_next_to(label7, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                        # prevlabel = label7
-                        # # label = Gtk.Label()
-                        # # label.set_text(info['version']['description'])
-                        # # label.set_halign(Gtk.Align.START)
-                        # # label.set_selectable(True)
-                        # # grid.attach_next_to(label, label7, Gtk.PositionType.RIGHT, 1, 1)
-
-                        # label8 = Gtk.Label()
-                        # label8.set_text(_("Documentation:   "))
-                        # label8.set_halign(Gtk.Align.END)
-                        # grid.attach_next_to(label8, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                        # prevlabel = label8
-                        # #TODO need to know which area keyboard is installed in to show this
-                        # # label = Gtk.Label()
-                        # # welcome_file = path.join("/usr/local/share/doc/keyman", kmp["id"], "welcome.htm")
-                        # # if path.isfile(welcome_file):
-                        # #     label.set_text(_("Installed"))
-                        # # else:
-                        # #     label.set_text(_("Not installed"))
-                        # # label.set_halign(Gtk.Align.START)
-                        # # label.set_selectable(True)
-                        # # grid.attach_next_to(label, label8, Gtk.PositionType.RIGHT, 1, 1)
-
-                        # label9 = Gtk.Label()
-                        # # stored in kmx
-                        # label9.set_text(_("Message:   "))
-                        # label9.set_halign(Gtk.Align.END)
-                        # grid.attach_next_to(label9, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-                        # prevlabel = label9
-                        # label = Gtk.Label()
-                        # label.set_line_wrap(True)
-                        # label.set_text(
-                        #     "This keyboard is distributed under the MIT license (MIT) as described somewhere")
-                        # #label.set_text(kmp["description"])
-                        # label.set_halign(Gtk.Align.START)
-                        # label.set_selectable(True)
-                        # grid.attach_next_to(label, label9, Gtk.PositionType.RIGHT, 1, 1)
+                    # label9 = Gtk.Label()
+                    # # stored in kmx
+                    # label9.set_text(_("Message:   "))
+                    # label9.set_halign(Gtk.Align.END)
+                    # grid.attach_next_to(label9, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+                    # prevlabel = label9
+                    # label = Gtk.Label()
+                    # label.set_line_wrap(True)
+                    # label.set_text(
+                    #     "This keyboard is distributed under the MIT license (MIT) as described somewhere")
+                    # #label.set_text(kmp["description"])
+                    # label.set_halign(Gtk.Align.START)
+                    # label.set_selectable(True)
+                    # grid.attach_next_to(label, label9, Gtk.PositionType.RIGHT, 1, 1)
 
         # Add an entire row of padding
         lbl_pad = Gtk.Label()

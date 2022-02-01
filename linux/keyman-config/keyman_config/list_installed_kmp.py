@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
+import logging
 import os
 import json
+from keyman_config import secure_lookup
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
 from keyman_config.get_kmp import get_keyman_dir, InstallLocation
 from keyman_config.deprecated_decorator import deprecated
@@ -70,17 +72,20 @@ def get_installed_kmp_paths(check_paths):
                     has_kbjson = False
                     kbjson = os.path.join(keymanpath, o, o + ".json")
                     if os.path.isfile(kbjson):
-                        with open(kbjson, "r") as read_file:
-                            kbdata = json.load(read_file)
-                    if kbdata:
-                        if 'description' in kbdata:
-                            description = kbdata['description']
-                        version = kbdata['version']
-                        name = kbdata['name']
-                        has_kbjson = True
+                        try:
+                            with open(kbjson, "r") as read_file:
+                                kbdata = json.load(read_file)
+                            if kbdata:
+                                if 'description' in kbdata:
+                                    description = kbdata['description']
+                                version = kbdata['version']
+                                name = kbdata['name']
+                                has_kbjson = True
+                        except Exception as e:
+                            logging.warning('Exception %s loading %s %s', type(e), kbjson, e.args)
                     if info:
-                        md_version = info['version']['description']
-                        md_name = info['name']['description']
+                        md_version = secure_lookup(info, 'version', 'description')
+                        md_name = secure_lookup(info, 'name', 'description')
                     if keyboards:
                         keyboardID = keyboards[0]['id']
                     else:

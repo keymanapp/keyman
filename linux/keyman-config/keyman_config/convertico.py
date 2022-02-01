@@ -69,34 +69,42 @@ def extractico(kmxfile):
     """
     name, ext = os.path.splitext(kmxfile)
     imagefilename = name
-    with open(kmxfile, mode='rb') as file:  # b is important -> binary
-        fileContent = file.read()
+    bitmap = None
+    try:
+        with open(kmxfile, mode='rb') as file:  # b is important -> binary
+            fileContent = file.read()
 
-        kmxstart = struct.unpack_from("<16I", fileContent, 0)
-        if kmxstart[0] != 0x5354584B:
-            logging.debug("bad kmx identifier")
-            return False
-        bitmapOffset = kmxstart[14]
-        bitmapSize = kmxstart[15]
-        logging.debug("bitmap offset is %d", bitmapOffset)
-        logging.debug("bitmap size is %d", bitmapSize)
-        file.seek(bitmapOffset, 0)
-        bitmap = file.read(bitmapSize)
-        if not bitmap or file.tell() != bitmapOffset + bitmapSize:
-            logging.debug("unreadable bitmap in kmx")
-            return False
+            kmxstart = struct.unpack_from("<16I", fileContent, 0)
+            if kmxstart[0] != 0x5354584B:
+                logging.debug("bad kmx identifier")
+                return False
+            bitmapOffset = kmxstart[14]
+            bitmapSize = kmxstart[15]
+            logging.debug("bitmap offset is %d", bitmapOffset)
+            logging.debug("bitmap size is %d", bitmapSize)
+            file.seek(bitmapOffset, 0)
+            bitmap = file.read(bitmapSize)
+            if not bitmap or file.tell() != bitmapOffset + bitmapSize:
+                logging.debug("unreadable bitmap in kmx")
+                return False
+    except Exception as e:
+        logging.warning('Exception %s extracting icon %s %s', type(e), kmxfile, e.args)
+        return False
 
-        # Read first two bytes to determine if icon is .bmp or .ico
-        if bitmap.startswith(b'BM'):
-            imagefilename = imagefilename + ".bmp"
-        else:
-            imagefilename = imagefilename + ".ico"
+    # Read first two bytes to determine if icon is .bmp or .ico
+    if bitmap.startswith(b'BM'):
+        imagefilename = imagefilename + ".bmp"
+    else:
+        imagefilename = imagefilename + ".ico"
 
+    try:
         with open(imagefilename, mode='wb') as imagefile:
             imagefile.write(bitmap)
         checkandsaveico(imagefilename)
-
-        return True
+    except Exception as e:
+        logging.warning('Exception %s writing imagefile %s %s', type(e), imagefilename, e.args)
+        return False
+    return True
 
 
 def main(argv):

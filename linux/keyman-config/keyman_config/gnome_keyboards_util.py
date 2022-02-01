@@ -39,6 +39,8 @@ def _reset_gnome_shell():
 
 
 def get_ibus_keyboard_id(keyboard, packageDir, language=None, ignore_language=False):
+    if not keyboard:
+        return None
     kmx_file = os.path.join(packageDir, keyboard['id'] + ".kmx")
     if ignore_language:
         return kmx_file

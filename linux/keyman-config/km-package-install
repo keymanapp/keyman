@@ -4,7 +4,7 @@ import argparse
 import logging
 import sys
 import os
-from keyman_config import __version__, KeymanApiUrl
+from keyman_config import __version__, KeymanApiUrl, secure_lookup
 from keyman_config.uninstall_kmp import uninstall_kmp
 
 import datetime
@@ -57,11 +57,14 @@ def get_keyboard_list():
 
 
 def write_kmpdirlist(kmpdirfile):
-    with open(kmpdirfile, 'wt') as kmpdirlist:
-        keyboards = get_keyboard_list()
-        if keyboards:
-            for kb in get_keyboard_list():
-                print(kb, file=kmpdirlist)
+    try:
+        with open(kmpdirfile, 'wt') as kmpdirlist:
+            keyboards = get_keyboard_list()
+            if keyboards:
+                for kb in get_keyboard_list():
+                    print(kb, file=kmpdirlist)
+    except Exception as e:
+        logging.warning('Exception %s writing %s %s', type(e), kmpdirfile, e.args)
 
 
 def list_keyboards():
@@ -137,17 +140,18 @@ def main():
         if not kbdata:
             logging.error("km-package-install: error: Could not download keyboard data for %s", args.package)
             sys.exit(3)
-        if installed_kmp_ver:
-            if kbdata['version'] == installed_kmp_ver:
+        kbdata_version = secure_lookup(kbdata, 'version')
+        if installed_kmp_ver and kbdata_version:
+            if kbdata_version == installed_kmp_ver:
                 logging.error(
                     "km-package-install: The %s version of the %s keyboard package is already installed.",
                     installed_kmp_ver, args.package)
                 sys.exit(1)
-            elif float(kbdata['version']) > float(installed_kmp_ver):
+            elif float(kbdata_version) > float(installed_kmp_ver):
                 logging.error(
                     "km-package-install: A newer version of %s keyboard package is available. " +
                     "Uninstalling old version %s then downloading and installing new version %s.",
-                    args.package, installed_kmp_ver, kbdata['version'])
+                    args.package, installed_kmp_ver, kbdata_version)
                 uninstall_kmp(args.package, args.shared)
 
         kmpfile = get_kmp(args.package)

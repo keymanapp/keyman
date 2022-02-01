@@ -206,9 +206,13 @@ def download_kmp_file(url, kmpfile, cache=False):
         requests_cache.uninstall_cache()
 
     if response.status_code == 200:
-        with open(kmpfile, 'wb') as f:
-            f.write(response.content)
-            downloadfile = kmpfile
+        try:
+            with open(kmpfile, 'wb') as f:
+                f.write(response.content)
+                downloadfile = kmpfile
+        except Exception as e:
+            logging.warning('Exception %s writing downloaded file %s %s', type(e), kmpfile, e.args)
+            return None
     return downloadfile
 
 

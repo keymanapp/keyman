@@ -7,7 +7,7 @@ import zipfile
 from shutil import rmtree
 from enum import Enum
 
-from keyman_config import _
+from keyman_config import _, secure_lookup
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
 from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
 from keyman_config.get_kmp import get_keyboard_data, get_keyboard_dir, get_keyman_doc_dir
@@ -119,7 +119,7 @@ class InstallKmp():
         info, _, _, keyboards, files = get_metadata(self.packageDir)
 
         if keyboards:
-            logging.info("Installing %s", info['name']['description'])
+            logging.info("Installing %s", secure_lookup(info, 'name', 'description'))
             if online:
                 process_keyboard_data(self.packageID, self.packageDir)
                 for kb in keyboards:
@@ -199,7 +199,7 @@ class InstallKmp():
 
     def install_keyboards(self, keyboards, packageDir, language=None):
         firstKeyboard = keyboards[0]
-        if firstKeyboard and 'languages' in firstKeyboard and len(firstKeyboard['languages']) > 0:
+        if secure_lookup(firstKeyboard, 'languages') and len(firstKeyboard['languages']) > 0:
             language = self._normalize_language(firstKeyboard['languages'], language)
 
         if is_fcitx_running():
@@ -249,12 +249,19 @@ def extract_kmp(kmpfile, directory):
 def process_keyboard_data(keyboardID, packageDir):
     kbdata = get_keyboard_data(keyboardID)
     if kbdata:
-        if not os.path.isdir(packageDir):
-            os.makedirs(packageDir)
+        if not os.path.isdir(packageDir) and os.access(os.path.join(packageDir, os.pardir), os.X_OK | os.W_OK):
+            try:
+                os.makedirs(packageDir)
+            except Exception as e:
+                logging.warning('Exception %s creating %s %s', type(e), packageDir, e.args)
 
-        with open(os.path.join(packageDir, keyboardID + '.json'), 'w') as outfile:
-            json.dump(kbdata, outfile)
-            logging.info("Installing api data file %s.json as keyman file", keyboardID)
+        if os.access(packageDir, os.X_OK | os.W_OK):
+            try:
+                with open(os.path.join(packageDir, keyboardID + '.json'), 'w') as outfile:
+                    json.dump(kbdata, outfile)
+                    logging.info("Installing api data file %s.json as keyman file", keyboardID)
+            except Exception as e:
+                logging.warning('Exception %s writing %s/%s.json %s', type(e), packageDir, keyboardID, e.args)
     # else:
     # 	message = "install_kmp.py: error: cannot download keyboard data so not installing."
     # 	rmtree(kbdir)
