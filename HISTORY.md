@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.189 alpha 2022-02-01
+
+* fix(linux): Don't crash if we lack permissions (#6179)
+* chore(linux): stop releasing KMFL together with Keyman (#6184)
+
 ## 15.0.188 alpha 2022-01-28
 
 * fix(mac): Check for CODE_SETSYSTEMSTORE (#6169)
