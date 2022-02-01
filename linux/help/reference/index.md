@@ -4,7 +4,7 @@ title: Keyman 15.0 for Linux Reference
 
 ## Keyman 15.0 for Linux Overview
 
-Keyman for Linux makes it possible for you to type in over 1,000 languages on Linux.
+Keyman for Linux makes it possible for you to type in over 2,000 languages on Linux.
 
 [km-config](km-config) <br>
 Keyman keyboards installation and information

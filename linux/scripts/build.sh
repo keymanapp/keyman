@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Build KMFL in the required order: keyboardprocessor kmflcomp libkmfl ibus-kmfl ibus-keyman
+# Build Keyman for Linux: keyboardprocessor ibus-keyman
+# If BUILD_LEGACY is set instead, additionally build KMFL in the required order:
+#   kmflcomp libkmfl ibus-kmfl
 
 # It must be run from the keyman/linux directory
 
@@ -13,7 +15,10 @@ INSTALLDIR=${INSTALLDIR:-"/usr/local"}
 CONFIGUREONLY=${CONFIGUREONLY:="no"}
 BUILDONLY=${BUILDONLY:="no"}
 
-legacy_projects="kmflcomp libkmfl ibus-kmfl"
+legacy_projects=""
+if [ -n "$BUILD_LEGACY" ]; then
+    legacy_projects="kmflcomp libkmfl ibus-kmfl"
+fi
 projects="ibus-keyman"
 
 if [[ "${CONFIGUREONLY}" != "no" && "${BUILDONLY}" != "no" ]]; then
@@ -84,11 +89,11 @@ function buildproject() {
 }
 
 for proj in $legacy_projects; do
-	buildproject $proj legacy/
+    buildproject $proj legacy/
 done
 
 for proj in $projects; do
-	buildproject $proj
+    buildproject $proj
 done
 
 if [[ "${CONFIGUREONLY}" == "no" ]]; then

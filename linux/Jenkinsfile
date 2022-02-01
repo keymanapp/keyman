@@ -7,5 +7,5 @@
 keymanPackaging {
   distributionsToPackage = 'bionic focal impish jammy'
   arches = 'amd64 i386'
-  packagesToBuild = ['keyman', 'kmflcomp', 'libkmfl', 'ibus-kmfl']
+  packagesToBuild = ['keyman']
 }
