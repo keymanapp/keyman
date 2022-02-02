@@ -432,16 +432,9 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 
 		return 0;
 	case WM_PAINT:
-    if (!curkbd) {
-       return 0;
+    if (!curkbd || !curkbd->hFont || !curkbd->groups || !PrepIM()) {
+      return DefWindowProc(hwndChild, msg, wParam, lParam);
     }
-    if (!curkbd->hFont) {
-       return 0;
-    }
-    if (!curkbd->groups) {
-      return 0;
-    }
-		if(!PrepIM()) return DefWindowProc(hwndChild, msg, wParam, lParam);
 
 		int vpos = GetScrollPos(hwndChild, SB_VERT) * curkbd->gridy;
 
@@ -524,7 +517,7 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwndChild, UINT msg, WPARAM wParam, L
 
 BOOL FindRule(group *g, rule **rp, WCHAR KeyChar)
 {
-	if(!g){
+	if (!g || !rp) {
     return FALSE;
   }
   WCHAR buf[48];
@@ -586,8 +579,7 @@ extern "C" BOOL __declspec(dllexport) WINAPI DFWindow(HWND hwndFocus, WORD KeySt
 extern "C" BOOL __declspec(dllexport) WINAPI DFText(HWND hwndFocus, WORD KeyStroke, WCHAR KeyChar, DWORD shiftFlags)
 {
 	WCHAR buf[32];
-	if(!curkbd) return FALSE;
-  if (!curkbd->groups) {
+	if (!curkbd || !curkbd->groups) {
     return FALSE;
   }
 	if(!currule)
