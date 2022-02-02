@@ -150,8 +150,7 @@ end;
 
 function TkpsProjectFileUI.UninstallPackage: Boolean;
 begin
-  KeymanDeveloperUtils.UninstallPackage(ChangeFileExt(ExtractFileName(ProjectFile.FileName), ''));
-  Result := True;
+  Result := KeymanDeveloperUtils.UninstallPackage(ChangeFileExt(ExtractFileName(ProjectFile.FileName), ''));
 end;
 
 function TkpsProjectFileUI.TestPackageState(FCompiledName: string; FSilent: Boolean): Boolean;

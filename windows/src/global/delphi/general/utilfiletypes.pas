@@ -79,7 +79,6 @@ const ExtFileTypes: array[0..13] of TKMFileTypeInfo = (
   (Ext: ''; FileType: ftOther));
 
 function GetFileTypeFromFileName(const FileName: string): TKMFileType;
-//function UtilFileTypeToTLBFileType(ft: TKMFileType): keymanapi_TLB.KeymanFileType;
 function GetFileTypeFilter(ft: TKMFileType; var DefaultExt: string): string;
 
 function IsKeyboardFile(const FileName: string): Boolean;
@@ -118,11 +117,6 @@ begin
 
   Result := ftOther;
 end;
-
-//function UtilFileTypeToTLBFileType(ft: TKMFileType): keymanapi_TLB.KeymanFileType;
-//begin
-//  Result := KeymanFileType(ft);
-//end;
 
 function GetFileTypeFilter(ft: TKMFileType; var DefaultExt: string): string;
 var

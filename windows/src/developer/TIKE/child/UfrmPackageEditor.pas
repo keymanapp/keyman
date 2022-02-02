@@ -961,7 +961,9 @@ end;
 
 procedure TfrmPackageEditor.cmdUninstallClick(Sender: TObject);
 begin
-  DoAction(pfaUninstall);
+  if DoAction(pfaUninstall)
+    then ShowMessage('Package uninstalled successfully.')
+    else ShowMessage('Failed to uninstall package.');
 end;
 
 procedure TfrmPackageEditor.lbStartMenuEntriesClick(Sender: TObject);

@@ -451,7 +451,6 @@
         <DCCReference Include="..\..\global\delphi\charmap\utilcheckfontchars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
-        <DCCReference Include="..\..\engine\kmcomapi\keymanapi_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
@@ -544,7 +543,6 @@
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanCoreDebug.pas"/>
         <DCCReference Include="debug\UfrmDebugStatus_CallStack.pas">
             <Form>frmDebugStatus_CallStack</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="debug\Keyman.System.Debug.DebugEvent.pas"/>
         <DCCReference Include="debug\Keyman.System.Debug.DebugCore.pas"/>
@@ -552,7 +550,6 @@
         <DCCReference Include="debug\Keyman.UI.Debug.CharacterGridRenderer.pas"/>
         <DCCReference Include="debug\UfrmDebugStatus_Platform.pas">
             <Form>frmDebugStatus_Platform</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="debug\UfrmDebugStatus_Options.pas">
             <Form>frmDebugStatus_Options</Form>
