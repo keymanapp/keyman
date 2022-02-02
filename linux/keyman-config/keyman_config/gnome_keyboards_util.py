@@ -16,7 +16,7 @@ class GnomeKeyboardsUtil():
 
     def write_input_sources(self, sources):
         logging.debug('Setting sources to: %s', sources)
-        self.input_sources.set('sources', sources)
+        self.input_sources.set('sources', sources, 'a(ss)')
 
 
 __is_gnome_shell = None

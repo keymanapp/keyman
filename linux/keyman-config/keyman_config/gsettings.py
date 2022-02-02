@@ -25,6 +25,11 @@ class GSettings():
         if variant is None:
             return []
 
+        if variant.get_type_string() == 'as':
+            return variant.get_strv()
+
+        assert(variant.get_type_string() == 'a(ss)')
+
         values = []
         # Process variant of type "a(ss)" (array of tuples with two strings)
         nChildren = variant.n_children()
@@ -38,9 +43,14 @@ class GSettings():
             values.append((type, id))
         return values
 
-    def _convert_array_to_variant(self, array):
+    def _convert_array_to_variant(self, array, type):
         if len(array) == 0:
-            return Variant('a(ss)', None)
+            return Variant(type, None)
+
+        if type == 'as':
+            return Variant('as', array)
+
+        assert(type == 'a(ss)')
 
         children = []
         for (type, id) in array:
@@ -67,7 +77,7 @@ class GSettings():
             value = self._convert_variant_to_array(variant)
         return value
 
-    def set(self, key, value):
+    def set(self, key, value, type):
         if self.is_sudo:
             variant = str(value)
             subprocess.run(
@@ -75,5 +85,5 @@ class GSettings():
                  'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
                  'gsettings', 'set', self.schema_id, key, variant])
         else:
-            variant = self._convert_array_to_variant(value)
+            variant = self._convert_array_to_variant(value, type)
             self.schema.set_value(key, variant)
