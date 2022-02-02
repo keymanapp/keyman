@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.190 alpha 2022-02-02
+
+* fix(linux): Don't crash when installing keyboards in Wasta (#6159)
+
 ## 15.0.189 alpha 2022-02-01
 
 * fix(linux): Don't crash if we lack permissions (#6179)
