@@ -27,7 +27,7 @@ typedef wchar_t             KMX_WCHART;    // wc,   16-bit UNICODE character-> w
 typedef KMX_CHAR *   PKMX_CHAR;
 typedef KMX_WCHAR *  PKMX_WCHAR;
 typedef KMX_WCHAR *  PKMX_WSTR;      // n win: typedef WCHAR *PWSTR;
-typedef KMX_WCHAR *  KMX_PWSTR;      // n win: typedef WCHAR *PWSTR; // s ??
+//typedef KMX_WCHAR *  KMX_PWSTR;      // n win: typedef WCHAR *PWSTR; // s ??
 typedef KMX_WCHART * PKMX_WCHART;      // n win: typedef WCHAR *PWSTR; // s ??
 
 typedef KMX_BYTE *   PKMX_BYTE;        // never used?
@@ -41,9 +41,9 @@ typedef char *       PKMX_STR;
 
 
 //typedef KMX_DWORD *KMX_LPDWORD;
-typedef KMX_PWSTR *  PKMX_PWSTR;      // s ??
-typedef KMX_PWSTR * LPKMX_STR;       // s ??
-typedef KMX_PWSTR * PPKMX_WSTR;      // s ??
+typedef PKMX_WSTR *  PKMX_PWSTR;      // s ??
+typedef PKMX_WSTR * LPKMX_STR;       // s ??
+typedef PKMX_WSTR * PPKMX_WSTR;      // s ??
 typedef KMX_WCHART* LPKMX_WCHART;      // s ??
 //typedef KMX_PWSTR * LPKMX_STR;      
 

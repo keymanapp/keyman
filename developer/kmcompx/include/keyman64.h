@@ -26,8 +26,7 @@
 #ifndef STRICT
 #define STRICT
 #endif
-
-#include <windows.h>
+#include <windows.h>       // Can be removed here :-)
 #include <assert.h>
 
 #include "compiler.h"
