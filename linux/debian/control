@@ -46,7 +46,8 @@ Package: keyman
 Architecture: all
 Depends:
  libglib2.0-bin,
- python3-keyman-config,
+ python3-keyman-config (= ${binary:Version}),
+ ibus-keyman (= ${binary:Version}),
  ${misc:Depends},
 Recommends:
  onboard-keyman,
