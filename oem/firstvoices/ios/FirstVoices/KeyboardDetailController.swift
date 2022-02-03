@@ -62,8 +62,8 @@ class KeyboardDetailController: UITableViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
-    // before the view appears, update the initial enabled/disabled state of dependent switches
-    updateSwitchDetailAvailability(available: self.keyboardState!.isEnabled)
+    // before the view appears, update the initial enabled/disabled state of dictionary switches
+    updateDictionaryAvailability(keyboardEnabled: self.keyboardState!.isEnabled)
   }
   
 
@@ -162,7 +162,7 @@ class KeyboardDetailController: UITableViewController {
       self.settingsRepo.saveKeyboardState(keyboardId: self.keyboardState!.keyboardId, enabled: enable)
 
       // update the enabled/disabled state of dependent switches
-      self.updateSwitchDetailAvailability(available: enable)
+      self.updateDictionaryAvailability(keyboardEnabled: enable)
       self.delegate?.refreshCheckmark()
     }
     switchCell.configure(label: (self.keyboardState?.name)!, enabled: self.keyboardState!.isEnabled,
@@ -249,15 +249,21 @@ class KeyboardDetailController: UITableViewController {
     }
   }
 
-  func updateSwitchDetailAvailability(available: Bool) {
-    let predictionIndex = IndexPath(row: predictionsRow, section: languageSettingsSection)
-    self.updateSwitchCell(index: predictionIndex, available: available)
-    let correctionIndex = IndexPath(row: correctionsRow, section: languageSettingsSection)
-    self.updateSwitchCell(index: correctionIndex, available: available)
-    
+  func updateDictionaryAvailability(keyboardEnabled: Bool) {
     for rowNumber in 0...max(0, lexicalModels.count-1) {
       let dictionaryIndex = IndexPath(row: rowNumber, section: dictionarySection)
-      self.updateSwitchCell(index: dictionaryIndex, available: available)
+      self.updateSwitchCell(index: dictionaryIndex, available: keyboardEnabled)
     }
+    
+      // dictionary settings are only available when keyboard is enabled and there are available dictionaries
+    let enableDictionarySettings =  keyboardEnabled && self.lexicalModels.count > 0
+    self.updateDictionarySettingsAvailability(enable: enableDictionarySettings)
+  }
+  
+  func updateDictionarySettingsAvailability(enable: Bool) {
+    let predictionIndex = IndexPath(row: predictionsRow, section: languageSettingsSection)
+    self.updateSwitchCell(index: predictionIndex, available: enable)
+    let correctionIndex = IndexPath(row: correctionsRow, section: languageSettingsSection)
+    self.updateSwitchCell(index: correctionIndex, available: enable)
   }
 }
