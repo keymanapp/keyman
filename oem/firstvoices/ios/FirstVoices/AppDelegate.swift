@@ -22,8 +22,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     FVRegionStorage.upgrade()
     
-    FVKeyboardPackage.loadAvailableKeyboards();
-
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       KeymanEngine.log.logAppDetails()

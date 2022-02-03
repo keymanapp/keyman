@@ -1,5 +1,5 @@
 /*
- * KeyboardsScreen.swift
+ * KeyboardTableController.swift
  * FirstVoices app
  * 
  * License: MIT
@@ -25,7 +25,9 @@ protocol RefreshKeyboardCheckmark {
   func refreshCheckmark()
 }
 
-class KeyboardsScreen: UIViewController, RefreshKeyboardCheckmark {
+class KeyboardTableController: UIViewController, RefreshKeyboardCheckmark {
+  var settingsRepo = KeyboardSettingsRepository.shared
+
   func refreshCheckmark() {
     self.tableView.reloadRows(at: [selectedKeyboardIndex], with: UITableView.RowAnimation.none)
   }
@@ -63,7 +65,7 @@ class KeyboardsScreen: UIViewController, RefreshKeyboardCheckmark {
       let keyboards = (self.keyboardList[indexPath!.section]).keyboards
       let keyboard = keyboards[indexPath!.row]
       
-      if let keyboardState: FVKeyboardState = FVKeyboardState.loadKeyboardState(keyboardId: keyboard.id) {
+      if let keyboardState: KeyboardState = settingsRepo.loadKeyboardState(keyboardId: keyboard.id) {
         detailsController.configure(delegate: self, keyboard: keyboardState)
       } else {
         print("Could not find keyboard \(keyboard.id) in available keyboards list.")
@@ -83,15 +85,23 @@ class KeyboardsScreen: UIViewController, RefreshKeyboardCheckmark {
     let helpUrl: URL = URL.init(string: "\(keymanHelpSite)\(keyboard.id)")!
     UIApplication.shared.openURL(helpUrl)
   }
+  
+  func reportFatalError(message: String) {
+    let alertController = UIAlertController(title: title, message: message,
+      preferredStyle: UIAlertController.Style.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertAction.Style.cancel,
+                                            handler: nil))
+
+    self.present(alertController, animated: true, completion: nil)
+    print(message)
+    // TODO: send the error message + call stack through to us
+    // some reporting mechanism
+  }
 }
 
-extension KeyboardsScreen: UITableViewDataSource, UITableViewDelegate {
+extension KeyboardTableController: UITableViewDataSource, UITableViewDelegate {
 
-/*  func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-    let headerView: UITableViewHeaderFooterView  = view as! UITableViewHeaderFooterView
-    headerView.textLabel?.textColor = UIColor.darkGray
-  }
-*/
   func numberOfSections(in tableView: UITableView) -> Int {
     return self.keyboardList.count
   }
@@ -113,7 +123,7 @@ extension KeyboardsScreen: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let keyboards = (self.keyboardList[indexPath.section]).keyboards
     let keyboard = keyboards[indexPath.row]
-    let keyboardState = FVKeyboardState.loadKeyboardState(keyboardId: keyboard.id)
+    let keyboardState = settingsRepo.loadKeyboardState(keyboardId: keyboard.id)
     
     //let cell = tableView.dequeueReusableCell(withIdentifier: "KeyboardCell") as! KeyboardCell
     let cell = tableView.dequeueReusableCell(withIdentifier: "KeyboardCell")

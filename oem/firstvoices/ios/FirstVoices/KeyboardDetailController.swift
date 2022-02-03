@@ -42,8 +42,11 @@ let switchCellIdentifier = "switchCell"
 let labelCellIdentifier = "labelCell"
 
 class KeyboardDetailController: UITableViewController {
+  var keyboardRepo = KeyboardRepository.shared
+  var settingsRepo = KeyboardSettingsRepository.shared
+  var lexicalModelRepo = LexicalModelRepository.shared
 
-  var keyboardState: FVKeyboardState? = nil
+  var keyboardState: KeyboardState? = nil
   var delegate: RefreshKeyboardCheckmark? = nil
   var lexicalModels: [FVLexicalModel] = []
     
@@ -52,7 +55,7 @@ class KeyboardDetailController: UITableViewController {
 
     // get lexical models to display in dictionary section
     if let languageTag = self.keyboardState?.languageTag {
-      lexicalModels = FVLexicalModels.getAvailableLexicalModels(languageTag: languageTag)
+      lexicalModels = lexicalModelRepo.getAvailableLexicalModels(languageTag: languageTag)
     }
   }
 
@@ -67,7 +70,7 @@ class KeyboardDetailController: UITableViewController {
   /*
    * Used to display the values for the keyboard that was tapped and caused the segue to the detail view.
    */
-  func configure(delegate: RefreshKeyboardCheckmark, keyboard: FVKeyboardState) {
+  func configure(delegate: RefreshKeyboardCheckmark, keyboard: KeyboardState) {
     self.delegate = delegate
     self.keyboardState = keyboard
   }
@@ -151,10 +154,13 @@ class KeyboardDetailController: UITableViewController {
       
       // call Keyman Engine to install or remove the keyboard
       if enable {
-        FVKeyboardPackage.installKeyboard(keyboard: self.keyboardState!.definition)
+        self.keyboardRepo.installKeyboard(keyboard: self.keyboardState!.definition)
       } else {
-        FVKeyboardPackage.removeKeyboard(keyboard: self.keyboardState!.definition)
+        self.keyboardRepo.removeKeyboard(keyboard: self.keyboardState!.definition)
       }
+      // update local settings storage
+      self.settingsRepo.saveKeyboardState(keyboardId: self.keyboardState!.keyboardId, enabled: enable)
+
       // update the enabled/disabled state of dependent switches
       self.updateSwitchDetailAvailability(available: enable)
       self.delegate?.refreshCheckmark()
@@ -200,9 +206,20 @@ class KeyboardDetailController: UITableViewController {
 
     let actionCallBack: Callback = { (enable) in
       if enable {
-        self.keyboardState?.selectedDictionary = availableModelName;
+        let dictionaryName = self.lexicalModels.first!.name
+        let message = "As you type in your language, the FirstVoices dictionary will provide suggestions.\n\nWould you like to install this dictionary?"
+        let alert = UIAlertController(title: "\(dictionaryName)", message: message, preferredStyle: .alert)
+        let installAction = UIAlertAction(title: NSLocalizedString("Install", comment: "Default action"), style: .default, handler: { _ in
+          self.keyboardState?.selectedDictionary = availableModelName;
           let id = self.lexicalModels.first!.id
-          FVLexicalModels.downloadModel(keyboard: self.keyboardState!, modelId: id)
+          self.lexicalModelRepo.downloadModel(keyboard: self.keyboardState!, modelId: id)
+        })
+        alert.addAction(installAction)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
+          switchCell.detailSwitch.isOn = false
+        }
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
       }
     }
 

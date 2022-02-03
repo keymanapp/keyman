@@ -1,5 +1,5 @@
 /*
- * FVLexicalModels.swift
+ * LexicalModelRepository.swift
  * FirstVoices app
  *
  * License: MIT
@@ -15,12 +15,20 @@
 import UIKit
 import KeymanEngine
 
-class FVLexicalModels {
-  static let keymanLexicalModelApiUrl = "https://api.keyman.com/model?q=bcp47:"
+class LexicalModelRepository {
 
-  class func getAvailableLexicalModels(languageTag: String) -> [FVLexicalModel] {
+  private static let keymanLexicalModelApiUrl = "https://api.keyman.com/model?q=bcp47:"
+
+  static let shared: LexicalModelRepository  = {
+    let instance = LexicalModelRepository()
+    return instance
+  }()
+    
+  private init() {}
+
+  func getAvailableLexicalModels(languageTag: String) -> [FVLexicalModel] {
     var modelArray: [FVLexicalModel] = []
-    let keymanApiUrl: URL = URL.init(string: "\(keymanLexicalModelApiUrl)\(languageTag)")!
+    let keymanApiUrl: URL = URL.init(string: "\(LexicalModelRepository.keymanLexicalModelApiUrl)\(languageTag)")!
     // UIApplication.shared.openURL(keymanApiUrl)
     
     do {
@@ -52,7 +60,7 @@ class FVLexicalModels {
     return modelArray
   }
   
-  class func downloadModel(keyboard: FVKeyboardState, modelId: String) {
+  func downloadModel(keyboard: KeyboardState, modelId: String) {
     Manager.shared.downloadLexicalModel(withID: modelId, languageID: keyboard.languageTag, isUpdate: true, fetchRepositoryIfNeeded: true)
   }
 }

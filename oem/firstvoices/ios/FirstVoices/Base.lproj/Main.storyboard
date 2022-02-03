@@ -9,44 +9,6 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Keyboards-->
-        <scene sceneID="tne-QT-ifu">
-            <objects>
-                <viewController id="BYZ-38-t0r" customClass="KeyboardsViewController" customModule="FirstVoices" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
-                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="UVJ-Ew-lHf">
-                                <rect key="frame" x="-4" y="0.0" width="328" height="480"/>
-                                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <connections>
-                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="cMH-s4-fuO"/>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="da5-WN-wt5"/>
-                                </connections>
-                            </tableView>
-                        </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstAttribute="trailingMargin" secondItem="UVJ-Ew-lHf" secondAttribute="trailing" constant="-20" id="8Sd-4z-QVa"/>
-                            <constraint firstItem="UVJ-Ew-lHf" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="Gyx-PE-FxL"/>
-                            <constraint firstItem="UVJ-Ew-lHf" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottomMargin" id="L8v-o5-LQ0"/>
-                            <constraint firstItem="UVJ-Ew-lHf" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="Yic-97-fIg"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" title="Keyboards" id="eXD-Jp-GTP"/>
-                    <connections>
-                        <outlet property="tableView" destination="UVJ-Ew-lHf" id="LPZ-WI-WjF"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1198" y="1068"/>
-        </scene>
         <!--Keyboard Detail Controller-->
         <scene sceneID="GrU-Rz-ZC7">
             <objects>
@@ -195,7 +157,7 @@
         <!--Keyboards-->
         <scene sceneID="lOI-BU-RcK">
             <objects>
-                <viewController id="1C4-C6-YJD" customClass="KeyboardsScreen" customModule="FirstVoices" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="1C4-C6-YJD" customClass="KeyboardTableController" customModule="FirstVoices" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="jzl-4G-LXr"/>
                         <viewControllerLayoutGuide type="bottom" id="53X-jo-06i"/>
@@ -259,7 +221,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="2cD-28-paa" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="5hZ-ha-bhO">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="102"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
