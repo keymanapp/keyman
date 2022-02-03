@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.191 alpha 2022-02-03
+
+* fix(developer): remove keymanengine.msm (#6143)
+
 ## 15.0.190 alpha 2022-02-02
 
 * fix(linux): Don't crash when installing keyboards in Wasta (#6159)
