@@ -109,9 +109,10 @@ public final class KMManager {
   // Globe key actions
   public enum GlobeKeyAction {
     GLOBE_KEY_ACTION_SHOW_MENU,
-    // GLOBE_KEY_ACTION_SWITCH_TO_PREVIOUS_KEYBOARD,     // Switch to previous Keyman keyboard (reserved for flick)
-    GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
-    GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
+    // GLOBE_KEY_ACTION_SWITCH_TO_PREVIOUS_KEYBOARD,      // Switch to previous Keyman keyboard (reserved for flick)
+    GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,             // Switch to next Keyman keyboard
+    GLOBE_KEY_ACTION_ADVANCE_TO_PREVIOUS_SYSTEM_KEYBOARD, // Advance to previous system keyboard
+    GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD,     // Advance to next system keyboard
     GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS,
     GLOBE_KEY_ACTION_DO_NOTHING,
   }
@@ -546,8 +547,14 @@ public final class KMManager {
 
     if (action == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD &&
       KeyboardController.getInstance().get().size() == 1) {
-      // Override when keyboard switch and only 1 keyboard installed ==>show menu
-      action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+      // Override when keyboard switch and only 1 keyboard installed
+      if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+        // In-app keyboard shows keyboard menu
+        action = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+      } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+        // System keyboard switches back to previous system keyboard (Issue #6175)
+        action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_PREVIOUS_SYSTEM_KEYBOARD;
+      }
     }
 
     switch (action) {
@@ -556,6 +563,12 @@ public final class KMManager {
         break;
       case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
         switchToNextKeyboard(context);
+        break;
+      case GLOBE_KEY_ACTION_ADVANCE_TO_PREVIOUS_SYSTEM_KEYBOARD:
+        // Only do this for system keyboard
+        if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+          advanceToPreviousInputMethod();
+        }
         break;
       case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
         // Only do this for system keyboard
@@ -1567,6 +1580,19 @@ public final class KMManager {
       return null;
     }
     return window.getAttributes().token;
+  }
+
+  public static void advanceToPreviousInputMethod() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      if (IMService != null) {
+        IMService.switchToPreviousInputMethod();
+      }
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      // This method is added in API level 16 and deprecated in API level 28
+      // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager#switchToLastInputMethod(android.os.IBinder)
+      InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.switchToLastInputMethod(getToken());
+    }
   }
 
   public static void advanceToNextInputMode() {
