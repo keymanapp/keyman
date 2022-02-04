@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.192 alpha 2022-02-04
+
+* chore(oem/firstvoices): Add fv_haisla keyboard (#6181)
+* chore(linux): Improve dependencies in Linux package (#6198)
+* chore(linux): Remove obsolete Ubuntu 21.04 Hirsute (#6199)
+
 ## 15.0.191 alpha 2022-02-03
 
 * fix(developer): remove keymanengine.msm (#6143)
