@@ -1889,9 +1889,12 @@ public final class KMManager {
 
   public static boolean updateSelectionRange(KeyboardType kbType, int selStart, int selEnd) {
     boolean result = false;
+    // Currently, KMW doesn't support selection on touch alias elements
+    // so pass null context to KMW. See issue #5853
+    int selectionEnd = Math.max(selStart, selEnd);
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreSelectionChange) {
-        InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        InAppKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selectionEnd, selectionEnd));
         result = true;
       }
 
@@ -1906,7 +1909,7 @@ public final class KMManager {
           }
         }
 
-        SystemKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        SystemKeyboard.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selectionEnd, selectionEnd));
         result = true;
       }
 
