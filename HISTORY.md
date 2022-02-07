@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.193 alpha 2022-02-07
+
+* chore(ios): certificate update again (#6208)
+
 ## 15.0.192 alpha 2022-02-04
 
 * chore(oem/firstvoices): Add fv_haisla keyboard (#6181)
