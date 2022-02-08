@@ -172,7 +172,6 @@ BOOL ProcessHook()
 			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
 	}
 
-
   if (isUsingCoreProcessor) {  // TODO: 5442 Note: Nested if will be reduced once using core only
     // For applications not using the TSF kmtip calls this function twice for each keystroke,
     // first to determine if we are doing processing work (TIPFUpdateable == FALSE),
