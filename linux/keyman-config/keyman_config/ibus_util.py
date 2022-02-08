@@ -4,7 +4,9 @@ import os
 import time
 import gi
 import logging
+import re
 import subprocess
+from keyman_config.gnome_keyboards_util import is_gnome_shell
 
 from keyman_config.gsettings import GSettings
 
@@ -77,6 +79,40 @@ def restart_ibus_subp():
     subprocess.run(["ibus", "restart"])
 
 
+def _verify_ibus_daemon():
+    realuser = os.environ.get('SUDO_USER')
+    user = os.environ.get('USER')
+    if realuser:
+        user = realuser
+    elif not user:
+        user = os.environ.get('LOGNAME')
+
+    try:
+        ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
+        if not re.search('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE):
+            _start_ibus_daemon(realuser)
+    except subprocess.CalledProcessError:
+        _start_ibus_daemon(realuser)
+
+
+def _start_ibus_daemon(realuser):
+    try:
+        args = ['ibus-daemon', '-d', '-r', '--xim']
+        if is_gnome_shell():
+            # on Ubuntu 21.10 with Gnome the keyboards don't show in dropdown list if we don't disable the panel
+            args.extend(['--panel', 'disable'])
+
+        if realuser:
+            # we have been called with `sudo`. Start ibus-daemon for the real user.
+            logging.info('starting ibus-daemon for user %s', realuser)
+            subprocess.run(['sudo', '-u', realuser].extend(args))
+        else:
+            logging.info('ibus-daemon not running. Starting it...')
+            subprocess.run(args)
+    except Exception:
+        logging.warning('Failed to start ibus-daemon')
+
+
 def restart_ibus(bus=None):
     realuser = os.environ.get('SUDO_USER')
     if realuser:
@@ -87,12 +123,14 @@ def restart_ibus(bus=None):
         try:
             if not bus:
                 bus = get_ibus_bus()
-            logging.info("restarting IBus")
-            bus.exit(True)
-            bus.destroy()
+            if bus:
+                logging.info("restarting IBus")
+                bus.exit(True)
+                bus.destroy()
         except Exception as e:
             logging.warning("Failed to restart IBus")
             logging.warning(e)
+    _verify_ibus_daemon()
 
 
 def bus_has_engine(bus, name):

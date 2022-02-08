@@ -27,6 +27,9 @@ case "$1" in
           done
         fi
       fi
+
+      # No need to verify that ibus is running - we're uninstalling keyman
+      # and so we don't care if it's not running
     fi
   ;;
 
