@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.194 alpha 2022-02-08
+
+* chore(android): Update Play publishing plugin to 3.5.0 (#6217)
+* feat(android/engine): Single tap globe switch to previous system IME (#6206)
+* feat(linux): Try to start ibus if not running (#6109)
+
 ## 15.0.193 alpha 2022-02-07
 
 * chore(ios): certificate update again (#6208)
