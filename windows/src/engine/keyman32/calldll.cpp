@@ -384,12 +384,12 @@ extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreN
   if (!_td)
     return FALSE;
   //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td loadeded");
-  if (!_td->TIPFUpdateable) {  // Only execute the 3rd party function on the not updateable parse.
-    SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td TIPFUpdatable about to call function [%s]", imdh->name);
-    LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_CORE);
-    LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_INT);
-    (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
-  }
+
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td TIPFUpdatable about to call function [%s]", imdh->name);
+  LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_CORE);
+  LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_INT);
+  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
+
   //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
   return TRUE;
 }
