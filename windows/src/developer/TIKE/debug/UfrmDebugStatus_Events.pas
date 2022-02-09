@@ -124,6 +124,7 @@ begin
     KM_KBP_IT_BACK:        AddItem('back', action);
     KM_KBP_IT_PERSIST_OPT: AddItem('persist_opt', action);
     KM_KBP_IT_INVALIDATE_CONTEXT:  AddItem('invalidate_context', action);
+    KM_KBP_IT_CAPSLOCK:    AddItem('capslock', action);
     else             AddItem('Unknown action ???', action);
   end;
 end;

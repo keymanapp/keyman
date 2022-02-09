@@ -905,6 +905,7 @@ begin
       KM_KBP_IT_ALERT:          DoBell;
       KM_KBP_IT_BACK:           DoBackspace(km_kbp_backspace_type(dwData));
       KM_KBP_IT_PERSIST_OPT: ; //TODO
+      KM_KBP_IT_CAPSLOCK:    ; //TODO
       KM_KBP_IT_INVALIDATE_CONTEXT: ; // no-op
     end;
 //    AddDEBUG(Format('%d: %d [%s]', [ActionType, dwData, Text]));
