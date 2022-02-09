@@ -934,6 +934,25 @@ begin
   end;
 end;
 
+//
+// See #6221.
+//
+// If Keyman is being installed under the SYSTEM profile, e.g. when using tools
+// such as SCCM or Intune, then the installer runs with a redirected folder for
+// %LocalAppData%, under C:\Windows\SysWow64\config, but is given the name
+// C:\Windows\System32\config....
+//
+// Keyman Setup then creates %LocalAppData%\Keyman\Diag, which it thinks is in
+// C:\Windows\System32\config... But in reality it is in SysWow64... Keyman
+// Setup passes a file under this folder to Windows Installer, running as 64
+// bit, which immediately falls over because the path does not exist to it, in
+// the real System32\config folder.
+//
+// This patch disables redirection temporarily just to create the folder under
+// both 32 and 64 bit versions of the profile. It has no effect on normal user
+// accounts (apart from verifying that the folder is present twice rather than
+// once).
+//
 procedure TRunTools.ApplyWow64SystemProfilePatch;
 type
   TWow64DisableWow64FsRedirection = function(out cookie: PVOID): BOOL; stdcall;
