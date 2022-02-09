@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.195 alpha 2022-02-09
+
+* chore(android): Upgrade gradle-wrapper version to 6.8 (#6223)
+
 ## 15.0.194 alpha 2022-02-08
 
 * chore(android): Update Play publishing plugin to 3.5.0 (#6217)
