@@ -281,8 +281,6 @@ namespace kmx {
 #define ISVIRTUALKEY  0x4000    // It is a Virtual Key Sequence
 #define VIRTUALCHARKEY  0x8000    // Keyman 6.0: Virtual Key Cap Sequence NOT YET
 
-#define NUM_SCROLL_LOCK_MASK 0x3C00 // Numlock and Scroll lock on & NOT on FLAGS
-
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 

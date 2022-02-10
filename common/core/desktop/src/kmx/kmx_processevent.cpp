@@ -35,8 +35,8 @@ KMX_ProcessEvent::~KMX_ProcessEvent() {
 char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
   // We only map keys that are unmodified, shifted, or caps locked
 
-  // Test for modifier flags excluding Shift, Caps, Num and Scroll Lock
-  if ((modifiers & ~(K_SHIFTFLAG | CAPITALFLAG | NUM_SCROLL_LOCK_MASK)) != 0) {
+  // Test for modifier flags excluding Shift, Caps
+  if ((modifiers & ~(K_SHIFTFLAG | CAPITALFLAG)) != 0) {
     return 0;
   }
 
