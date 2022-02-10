@@ -98,11 +98,10 @@ char *getcontext_debug() {
 
 static BOOL
 Process_Event_Core(PKEYMAN64THREADDATA _td) {
-  PWSTR contextBuf            = _td->app->ContextBufMax(MAXCONTEXT);
+  PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
   km_kbp_context_item *citems = nullptr;
   ContextItemsFromAppContext(contextBuf, &citems);
-  if (KM_KBP_STATUS_OK !=
-      (km_kbp_status_codes)km_kbp_context_set(km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
+  if (KM_KBP_STATUS_OK != km_kbp_context_set(km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
     km_kbp_context_items_dispose(citems);
     return FALSE;
   }
@@ -110,9 +109,9 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
   SendDebugMessageFormat(
       0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
       static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG), (uint8_t)_td->state.isDown);
-  if (KM_KBP_STATUS_OK != (km_kbp_status_codes)km_kbp_process_event(
-                              _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
-                              static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG), (uint8_t)_td->state.isDown)) {
+  if (KM_KBP_STATUS_OK != km_kbp_process_event(
+    _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
+    static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG), (uint8_t)_td->state.isDown)) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ", FALSE);
     return FALSE;
   }
@@ -178,8 +177,11 @@ BOOL ProcessHook()
     // if we say yes it will call a second time to actually do the work.
     // We call the core process event only once and use the core's queued actions
     // on the second pass.
-    // For the TSF in most cases kmtip (except OnPreservedKey) will not call the non-updateable test pass.
+    // For the TSF in most cases kmtip (except OnPreservedKey) will not call the non-updateable test parse.
     // Therfore the core process event will need to be called before processing the actions.
+
+    // CoreProcessEventRun would be a sufficient test however testing TIPFUpdateable defines
+    // the status of the keystroke processing more precisely.
     if (!_td->TIPFUpdateable || !_td->CoreProcessEventRun) {
       if (!Process_Event_Core(_td)) {
         return FALSE;
