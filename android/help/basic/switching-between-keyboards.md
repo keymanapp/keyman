@@ -10,7 +10,12 @@ With the keyboard visible, press and release the globe key:
 
 ![](../android_images/globe-ap.png)
 
-If only one Keyman keyboard is installed, a short press on the globe key will bring up a list of all currently installed languages. Otherwise a short press on the globe key will switch to the next language/keyboard. 
+| Keyboard Type | # Keyman Keyboards | Short press and release to |
+|---------------|:------------------:|----------------------------|
+| In-app        | 1                  | Display keyboard picker menu |
+| In-app        | 2+                 | Quickly switch to next Keyman keyboard |
+| System        | 1                  | Quickly switch to previous system keyboard |
+| System        | 2+                 | Quickly switch to next Keyman keyboard |
 
 A long press on the globe key will bring up a list of all currently installed languages (the default is **English EuroLatin (SIL)**). 
 
