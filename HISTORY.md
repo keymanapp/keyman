@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.196 alpha 2022-02-11
+
+* fix(windows): add flag to track core process event (#6219)
+
 ## 15.0.195 alpha 2022-02-09
 
 * chore(android): Upgrade gradle-wrapper version to 6.8 (#6223)
