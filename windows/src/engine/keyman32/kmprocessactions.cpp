@@ -120,11 +120,13 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
 
+  _td->CoreProcessEventRun = FALSE;
   // Process the action items from the core. This actions will modify the windows context (AppContext).
   // Therefore it is not required to copy the context from the core to the windows context.
 
   for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
     BOOL continueProcessingActions = TRUE;
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions : act->type=%d", act->type);
     switch (act->type) {
     case KM_KBP_IT_CHAR:
       continueProcessingActions = processUnicodeChar(_td->app, act);
@@ -175,6 +177,8 @@ ProcessActionsTestParse(BOOL* emitKeyStroke) {
     return FALSE;
   }
 
+  _td->CoreProcessEventRun = TRUE;
+
   BOOL continueProcessingActions = TRUE;
   for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
     switch (act->type) {
@@ -182,6 +186,7 @@ ProcessActionsTestParse(BOOL* emitKeyStroke) {
       *emitKeyStroke = TRUE;
       SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsTestParse EMIT_KEYSTROKE: act->type=%d", act->type);
       continueProcessingActions = TRUE;
+      _td->CoreProcessEventRun = FALSE; // If we emit the key stroke on this parse we don't need the second parse
       break;
     case KM_KBP_IT_CAPSLOCK:
       continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable);

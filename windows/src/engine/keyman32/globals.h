@@ -225,6 +225,8 @@ typedef struct tagKEYMAN64THREADDATA
 
   BOOL TIPFUpdateable, TIPFPreserved;   // I4290
 
+  BOOL CoreProcessEventRun;  // True if core process event has been run
+
   BOOL FInRefreshKeyboards;
   BOOL RefreshRequired;
   LONG RefreshTag_Thread; // TODO: we may be able to eliminate this with our delayed refresh pattern?

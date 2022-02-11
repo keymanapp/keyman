@@ -384,12 +384,12 @@ extern "C" uint8_t IM_CallBackCore(km_kbp_state *km_state, uint32_t UniqueStoreN
   if (!_td)
     return FALSE;
   //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td loadeded");
-  if (!_td->TIPFUpdateable) {  // Only execute the 3rd party function on the not updateable parse.
-    SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td TIPFUpdatable about to call function [%s]", imdh->name);
-    LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_CORE);
-    LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_INT);
-    (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
-  }
+
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td TIPFUpdatable about to call function [%s]", imdh->name);
+  LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_CORE);
+  LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_INT);
+  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
+
   //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
   return TRUE;
 }
@@ -421,8 +421,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     // correctly. To do this need to check the context as we process the
     // backspaces.
     km_kbp_context_item *citems = nullptr;
-    if (KM_KBP_STATUS_OK !=
-        (km_kbp_status_codes)kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
+    if (KM_KBP_STATUS_OK != kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
       delete[] actionItems;
       return FALSE;
     }
@@ -479,8 +478,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
       idx++;
     }
     actionItems[idx].type   = KM_KBP_IT_END;
-    if (KM_KBP_STATUS_OK !=
-        (km_kbp_status_codes)km_kbp_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItems)) {
+    if (KM_KBP_STATUS_OK != km_kbp_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItems)) {
       delete[] actionItems;
       return FALSE;
     }
@@ -541,8 +539,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
       return FALSE;
     }
     km_kbp_context_item *citems = nullptr;
-    if (KM_KBP_STATUS_OK !=
-      (km_kbp_status_codes)kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
+    if (KM_KBP_STATUS_OK != kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
         return FALSE;
     }
 

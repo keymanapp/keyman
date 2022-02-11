@@ -89,6 +89,36 @@ char *getcontext_debug() {
 	return Debug_UnicodeString(_td->app->ContextBufMax(128));
 }
 
+/**
+ *  Process the key stroke using the core processor
+ *
+ * @param   _td   Pointer to KEYMAN64THREADDATA
+ * @return  BOOL  Return TRUE if keystroke event is passed successfully
+ */
+
+static BOOL
+Process_Event_Core(PKEYMAN64THREADDATA _td) {
+  PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
+  km_kbp_context_item *citems = nullptr;
+  ContextItemsFromAppContext(contextBuf, &citems);
+  if (KM_KBP_STATUS_OK != km_kbp_context_set(km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
+    km_kbp_context_items_dispose(citems);
+    return FALSE;
+  }
+  km_kbp_context_items_dispose(citems);
+  SendDebugMessageFormat(
+      0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
+      static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG), (uint8_t)_td->state.isDown);
+  if (KM_KBP_STATUS_OK != km_kbp_process_event(
+    _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
+    static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG), (uint8_t)_td->state.isDown)) {
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ", FALSE);
+    return FALSE;
+  }
+  return TRUE;
+}
+
+
 /*
 *	BOOL ProcessHook();
 *
@@ -121,7 +151,7 @@ BOOL ProcessHook()
   }
 
 	//app->NoSetShift = FALSE;
-	_td->app->ReadContext();
+  _td->app->ReadContext();
 
 	if(_td->state.msg.message == wm_keymankeydown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
@@ -142,27 +172,23 @@ BOOL ProcessHook()
 	}
 
   if (isUsingCoreProcessor) {  // TODO: 5442 Note: Nested if will be reduced once using core only
+    // For applications not using the TSF kmtip calls this function twice for each keystroke,
+    // first to determine if we are doing processing work (TIPFUpdateable == FALSE),
+    // if we say yes it will call a second time to actually do the work.
+    // We call the core process event only once and use the core's queued actions
+    // on the second pass.
+    // For the TSF in most cases kmtip (except OnPreservedKey) will not call the non-updateable test parse.
+    // Therfore the core process event will need to be called before processing the actions.
+
+    // CoreProcessEventRun would be a sufficient test however testing TIPFUpdateable defines
+    // the status of the keystroke processing more precisely.
+    if (!_td->TIPFUpdateable || !_td->CoreProcessEventRun) {
+      if (!Process_Event_Core(_td)) {
+        return FALSE;
+      }
+    }
+
     if (!_td->TIPFUpdateable) {
-      PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
-      km_kbp_context_item *citems = nullptr;
-      ContextItemsFromAppContext(contextBuf, &citems);
-      if (KM_KBP_STATUS_OK !=
-        (km_kbp_status_codes)km_kbp_context_set(
-          km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
-        km_kbp_context_items_dispose(citems);
-        return FALSE;
-      }
-      km_kbp_context_items_dispose(citems);
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
-                                                    static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG),
-                                                    (uint8_t)_td->state.isDown);
-      if (KM_KBP_STATUS_OK !=
-        (km_kbp_status_codes)km_kbp_process_event(_td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
-                                  static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG),
-                                                    (uint8_t)_td->state.isDown)) {
-        SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ",FALSE);
-        return FALSE;
-      }
       ProcessActionsTestParse(&fOutputKeystroke);
     } else {
       ProcessActions(&fOutputKeystroke);
