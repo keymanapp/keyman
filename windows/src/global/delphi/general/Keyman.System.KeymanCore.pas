@@ -168,6 +168,7 @@ type
             // for applications where context is cached, this clears the context;
             // for applications where context is read from the focused text store,
             // the context is just re-read and markers flushed.
+    KM_KBP_IT_CAPSLOCK    = 8,  // Enable or disable capsLock
     KM_KBP_IT_MAX_TYPE_ID
   );
 
@@ -194,7 +195,8 @@ type
     0: (marker: uintptr_t);
     1: (option: pkm_kbp_option_item);
     2: (character: km_kbp_usv);
-    3: (backspace: km_kbp_backspace_item)
+    3: (backspace: km_kbp_backspace_item);
+    4: (capsLock: uint8_t);  // CAPSLOCK type, 1 to turn on, 0 to turn off
   end;
 
   pkm_kbp_action_item = ^km_kbp_action_item;

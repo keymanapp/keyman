@@ -143,6 +143,7 @@ begin
     KM_KBP_IT_BACK:           Action_DeleteBack(action.backspace.expected_type, action.backspace.expected_value);
     KM_KBP_IT_PERSIST_OPT:    ; // TODO: The indicated option needs to be stored.
     KM_KBP_IT_EMIT_KEYSTROKE: Action_EmitKeystroke(key);
+    KM_KBP_IT_CAPSLOCK:       ; // TODO: Caps lock state needs to be updated
     else Assert(False, 'Action type '+IntToStr(Ord(action._type))+' is unexpected.');
   end;
 end;
