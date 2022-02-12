@@ -1,18 +1,18 @@
 (*
   Name:             PackageInfo
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Rework to load/save to/from XML
                     02 Aug 2006 - mcdurdin - Don't load from XML if file is 0 bytes or does not exist
                     23 Aug 2006 - mcdurdin - Add SaveXMLToText and LoadXMLFromText functions
@@ -292,6 +292,7 @@ type
     FDisplayFont: TPackageContentFile;
     FLanguages: TPackageKeyboardLanguageList;
     FVersion: string;
+    FMinKeymanVersion: string;
     procedure SetDisplayFont(const Value: TPackageContentFile);
     procedure SetOSKFont(const Value: TPackageContentFile);
     procedure DisplayFontRemoved(Sender: TObject;
@@ -309,6 +310,8 @@ type
     property Languages: TPackageKeyboardLanguageList read FLanguages;
     property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
     property DisplayFont: TPackageContentFile read FDisplayFont write SetDisplayFont;
+    // The following properties are used only in memory and never streamed in or out
+    property MinKeymanVersion: string read FMinKeymanVersion write FMinKeymanVersion;
   end;
 
   TPackageKeyboardList = class(TPackageObjectList<TPackageKeyboard>)
@@ -368,6 +371,7 @@ type
     FFileName: WideString;
     FWasIni: Boolean;
     FLoadLegacy: Boolean;
+    procedure FixupFileVersion;
   protected
     procedure Import(AIni: TIniFile); virtual; abstract;
     function XMLRootNode: WideString; virtual;
@@ -1596,9 +1600,12 @@ procedure TPackage.DoLoadXML(ARoot: IXMLNode);
 var
   FVersion: WideString;
 begin
+  // Keyman for Windows 14 and earlier only accepted version 7.0 and 12.0.
+  // But Keyman for Windows 15 and onward accept any version number up to and
+  // including their version.
   FVersion := XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
-  if (FVersion <> SKeymanVersion70) and (FVersion <> SKeymanVersion120) then
-    PackageLoadError('Package file version '+FVersion+' is not recognised.');
+  if CompareVersions(SKeymanVersion, FVersion) > 0 then
+    PackageLoadError('Package file version '+FVersion+' can only be loaded by a newer version of this software.');
 
   StartMenu.LoadXML(ARoot);
   Info.LoadXML(ARoot);
@@ -1611,6 +1618,7 @@ end;
 
 procedure TPackage.DoSaveIni(ini: TIniFile);
 begin
+  FixupFileVersion;
   Options.SaveIni(ini);
   StartMenu.SaveIni(ini);
   Info.SaveIni(ini);
@@ -1619,34 +1627,37 @@ begin
   // Lexical models not supported in ini
 end;
 
+procedure TPackage.FixupFileVersion;
+begin
+  // Note: see also CompilePackage, MergeKeyboardInfo
+  if LexicalModels.Count > 0 then
+    Options.FileVersion := SKeymanVersion120
+  else if Options.FileVersion = '' then
+    Options.FileVersion := SKeymanVersion70;
+end;
+
 procedure TPackage.DoSaveJSON(ARoot: TJSONObject);
 begin
-  if LexicalModels.Count > 0
-    then Options.FileVersion := SKeymanVersion120
-    else Options.FileVersion := SKeymanVersion70;
-
+  FixupFileVersion;
   Options.SaveJSON(ARoot);
   StartMenu.SaveJSON(ARoot);
   Info.SaveJSON(ARoot);
   Files.SaveJSON(ARoot);
   Keyboards.SaveJSON(ARoot);
-  if Options.FileVersion = SKeymanVersion120 then
+  if LexicalModels.Count > 0 then
     LexicalModels.SaveJSON(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
 begin
-  if LexicalModels.Count > 0
-    then Options.FileVersion := SKeymanVersion120
-    else Options.FileVersion := SKeymanVersion70;
-
+  FixupFileVersion;
   ARoot.ChildNodes['System'].ChildNodes['KeymanDeveloperVersion'].NodeValue := GetVersionString;
   Options.SaveXML(ARoot);
   StartMenu.SaveXML(ARoot);
   Info.SaveXML(ARoot);
   Files.SaveXML(ARoot);
   Keyboards.SaveXML(ARoot);
-  if Options.FileVersion = SKeymanVersion120 then
+  if LexicalModels.Count > 0 then
     LexicalModels.SaveXML(ARoot);
 end;
 
@@ -1814,6 +1825,7 @@ begin
   FName := Source.Name;
   FID := Source.ID;
   FVersion := Source.Version;
+  FMinKeymanVersion := Source.FMinKeymanVersion;
   FRTL := Source.RTL;
   if Assigned(Source.OSKFont)
     then FOSKFont := Package.Files.FromFileNameEx(Source.OSKFont.FileName)

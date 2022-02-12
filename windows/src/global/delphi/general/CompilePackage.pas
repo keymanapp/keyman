@@ -57,7 +57,8 @@ uses
   Keyman.System.PackageInfoRefreshLexicalModels,
 
   RedistFiles,
-  TempFileManager;
+  TempFileManager,
+  VersionINfo;
 
 type
   TCompilePackage = class
@@ -282,19 +283,46 @@ begin
 
     kmpinf.RemoveFilePaths;
 
-    if kmpinf.LexicalModels.Count = 0
-      then kmpinf.Options.FileVersion := SKeymanVersion70
-      else kmpinf.Options.FileVersion := SKeymanVersion120;
+    //
+    // Find the minimum package version based on keyboard version
+    // See also MergeKeyboardInfo.pas
+    //
 
-    if kmpinf.Options.FileVersion = SKeymanVersion70 then
+    if kmpinf.LexicalModels.Count = 0 then
     begin
+      kmpinf.Options.FileVersion := SKeymanVersion70;
+
+      for i := 0 to kmpinf.Keyboards.Count - 1 do
+      begin
+        if CompareVersions(kmpinf.Options.FileVersion, kmpinf.Keyboards[i].MinKeymanVersion) > 0 then
+        begin
+          // Keyman for Windows 14 and earlier only accepted version 7.0 for keyboard
+          // packages, so we must not write any other version in order to allow
+          // earlier versions of Keyman to load the package.
+          if CompareVersions(kmpinf.Keyboards[i].MinKeymanVersion, SKeymanVersion150) <= 0 then
+          begin
+            kmpinf.Options.FileVersion := kmpinf.Keyboards[i].MinKeymanVersion;
+          end;
+        end;
+      end;
+
       psf := TPackageContentFile.Create(kmpinf);
       psf.FileName := 'kmp.inf';
       psf.Description := 'Package information';
       psf.CopyLocation := pfclPackage;
 
       kmpinf.Files.Add(psf);
+    end
+    else
+    begin
+      // TODO: min model version is always 12.0 currently
+      // but we may need to support this in future
+      kmpinf.Options.FileVersion := SKeymanVersion120;
     end;
+
+    //
+    // Prepare and save
+    //
 
     psf := TPackageContentFile.Create(kmpinf);
     psf.FileName := 'kmp.json';

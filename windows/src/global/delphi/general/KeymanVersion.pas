@@ -30,6 +30,7 @@ const
   TIER_STABLE = 'stable';
 
 const
+  SKeymanVersion150 = '15.0';
   SKeymanVersion140 = '14.0';
   SKeymanVersion130 = '13.0';
   SKeymanVersion120 = '12.0';
@@ -60,6 +61,9 @@ const
   // via filename or parameter), then this option will only be applied if
   // the installed Keyman version is this version or later.
   SKeymanVersion_Min_SpecifyLanguage = '14.0.104';
+
+  // U_1234_5678 identifiers require 15.0+ on iOS and Android #5894
+  SKeymanVersion_Min_MulticharUIdentifiers = SKeymanVersion150;
 
 const
   SKeymanDeveloperName = 'Keyman Developer';

@@ -479,7 +479,7 @@ var
   v: TJSONValue;
   alangs: TJSONArray;
   olangs, o: TJSONObject;
-  pair: TJSONPair; 
+  pair: TJSONPair;
   i: Integer;
   id: string;
 begin
@@ -858,7 +858,8 @@ begin
       MinVersion := FPackageKMXFileInfos[i].Info.FileVersion;
 
   FJSMinVersionString := '';
-  with TRegEx.Match(FJSFileInfo.Data, 'this\.KMINVER=([''"])([^''"]+)(\1)') do
+  // See also Keyman.System.KeyboardJSInfo.pas, CompilePackage.pas
+  with TRegEx.Match(FJSFileInfo.Data, 'this.KMINVER\s*=\s*([''"])(.*?)\1') do
   begin
     if Success then
     begin
