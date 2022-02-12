@@ -407,7 +407,7 @@ namespace com.keyman.osk {
       keyman.core.keyboardProcessor.processPostKeystroke(this.hostDevice, outputTarget)
         // If we have a RuleBehavior as a result, run it on the target. This should
         // only change system store and variable store values.
-        ?.finalize(keyman.core.keyboardProcessor, outputTarget);
+        ?.finalize(keyman.core.keyboardProcessor, outputTarget, true);
 
       return true;
     };
