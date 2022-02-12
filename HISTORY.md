@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.197 alpha 2022-02-12
+
+* chore(deps): bump follow-redirects from 1.7.0 to 1.14.8 in /web/testing/regression-tests (#6247)
+* chore(deps-dev): bump karma from 6.3.4 to 6.3.14 in /web/testing/regression-tests (#6236)
+* fix(windows): create Keyman/Diag folder in redirected profile (#6225)
+* fix(developer): support KM_KBP_IT_CAPSLOCK (#6230)
+
 ## 15.0.196 alpha 2022-02-11
 
 * fix(windows): add flag to track core process event (#6219)
