@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.198 alpha 2022-02-13
+
+* fix(developer): compile package fileVersion from keyboard FileVersion (#6145)
+* chore(android/app): Clarify help on switching keyboards (#6234)
+
 ## 15.0.197 alpha 2022-02-12
 
 * chore(deps): bump follow-redirects from 1.7.0 to 1.14.8 in /web/testing/regression-tests (#6247)
