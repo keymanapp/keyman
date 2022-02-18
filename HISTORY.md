@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.199 alpha 2022-02-18
+
+* fix(web): Non-integer OSK sizes (#6248)
+
 ## 15.0.198 alpha 2022-02-13
 
 * fix(developer): compile package fileVersion from keyboard FileVersion (#6145)
