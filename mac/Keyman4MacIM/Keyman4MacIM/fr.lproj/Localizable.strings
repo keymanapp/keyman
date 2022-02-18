@@ -1,0 +1,62 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "Êtes-vous sûr de vouloir supprimer le clavier '%@ ' ?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "Vous ne pouvez pas annuler cette action.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "Installer plus tard";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "Supprimer";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "Installer le clavier Keyman ?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "Voulez-vous que Keyman installe le clavier à partir du fichier '%@ ' ?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "Installer plus tard";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "Installer";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "Impossible de lire le fichier Keyman '%@'.";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "OK";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Version %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Téléchargement...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Téléchargement terminé.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Installer plus tard";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Terminé";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Claviers :";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Polices :";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Version du package :";
+
+/* author label in the Package Information window */
+"author-label" = "Auteur :";
+
+/* website label in the Package Information window */
+"website-label" = "Site Web :";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Droit d'auteur :";
