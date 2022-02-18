@@ -13,4 +13,4 @@ extern BOOL FWarnDeprecatedCode;
 extern int currentLine;
 
 PWSTR strtowstr(PSTR in);
-PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, DWORD dwSystemID);
+PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID);

@@ -52,6 +52,7 @@ KMX_BOOL RegistryFullAccess::CreateKey(LPCSTR AKey)
 		&FhKey, &dwDisposition));
 }
 
+/* // _S2 not in use ?
 KMX_BOOL RegistryFullAccess::RecursiveDeleteKey(LPCSTR AKey)
 {
 	HKEY hkey;
@@ -68,6 +69,7 @@ KMX_BOOL RegistryFullAccess::RecursiveDeleteKey(LPCSTR AKey)
 	if(RegCloseKey(hkey) != ERROR_SUCCESS) return FALSE;
 	return WrapError(RegDeleteKey(hkey, AKey));
 }
+*/
 
 KMX_BOOL RegistryFullAccess::IntRecursiveDeleteKey(HKEY hkey)
 {
@@ -88,15 +90,19 @@ KMX_BOOL RegistryFullAccess::IntRecursiveDeleteKey(HKEY hkey)
 	return TRUE;
 }
 
+/* // _S2 not in use ?
 KMX_BOOL RegistryFullAccess::DeleteKey(LPCSTR AKey)
 {
 	return WrapError(RegDeleteKey(FhKey, AKey));
 }
+*/
 
+/* // _S2 not in use ?
 KMX_BOOL RegistryFullAccess::DeleteValue(LPCSTR AName)
 {
 	return WrapError(RegDeleteValue(FhKey, AName));
 }
+*/
 
 HKEY RegistryFullAccess::GetKey(LPCSTR AKey)
 {
@@ -211,11 +217,13 @@ KMX_BOOL RegistryReadOnly::WrapError(KMX_DWORD res)
 	return res == ERROR_SUCCESS;
 }
 
+
+/* // _S2 not in use ?
 KMX_BOOL RegistryFullAccess::WriteInteger(LPCSTR AName, int AValue)
 {
 	return WrapError(RegSetValueEx(FhKey, AName, 0, REG_DWORD, (LPBYTE) &AValue, sizeof(int)));
 }
-
+*/
 KMX_BOOL RegistryFullAccess::WriteString(LPCSTR AName, LPSTR AValue)
 {
 	return WrapError(RegSetValueEx(FhKey, AName, 0, REG_SZ, (LPBYTE) AValue, (KMX_DWORD) strlen(AValue)+1));
@@ -241,6 +249,7 @@ RegistryReadOnly *Reg_GetKeymanInstalledKeyboard(LPSTR kbname)
 	}
 	return reg;
 }
+/* // _S2 not in use ?
 
 RegistryReadOnly *Reg_GetKeymanActiveKeyboard(LPSTR kbname)
 {
@@ -251,4 +260,4 @@ RegistryReadOnly *Reg_GetKeymanActiveKeyboard(LPSTR kbname)
 		return NULL;
 	}
 	return reg;
-}
+}*/

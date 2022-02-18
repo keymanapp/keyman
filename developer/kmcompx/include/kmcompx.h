@@ -1,18 +1,16 @@
 
 
 // taken from C:\Projects\keyman\keyman\common\core\desktop\src\kmx\kmx_base.h
-//  we are here: C:\Projects\keyman\keyman\developer\kmcompx\include
 #pragma once
 #include <stdint.h>
 
-//#include <keyman/keyboardprocessor.h>		// removed S
-#include "keyman/keyboardprocessor.h"	
-#include "keyman/keyboardprocessor_bits.h"	
+#include <keyman/keyboardprocessor.h>		
+#include <keyman/keyboardprocessor_bits.h>	
 
 
 
 
-// old ->new
+// typedef:old ->new
 typedef uint32_t            KMX_DWORD;
 typedef uint32_t            KMX_UINT;
 typedef uint16_t            KMX_WORD;
@@ -38,13 +36,12 @@ typedef KMX_DWORD *  PKMX_DWORD;       // KMX_DWORD * never used?  (KMX_DWORD is
 typedef KMX_DWORD * LPKMX_DWORD;       // KMX_DWORD * never used?  (KMX_DWORD is used)
 typedef char *       PKMX_STR;
 
-
-
 //typedef KMX_DWORD *KMX_LPDWORD;
 typedef PKMX_WSTR *  PKMX_PWSTR;      // s ??
 typedef PKMX_WSTR * LPKMX_STR;       // s ??
 typedef PKMX_WSTR * PPKMX_WSTR;      // s ??
 typedef KMX_WCHART* LPKMX_WCHART;      // s ??
+typedef KMX_WCHAR* LPKMX_WCHAR;      // s ??
 //typedef KMX_PWSTR * LPKMX_STR;      
 
 //DWORD x;
@@ -87,10 +84,10 @@ typedef struct KMX_tagKEYBOARD
 
   KMX_DWORD dwFileVersion;  // Version of the file - Keyman 4.0 is 0x0400
 
-  KMX_DWORD dwCheckSum;   // As stored in keyboard
-  KMX_DWORD xxkbdlayout;      // as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  KMX_DWORD dwCheckSum;     // As stored in keyboard
+  KMX_DWORD xxkbdlayout;    // as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   KMX_DWORD IsRegistered;   // layout id, from same key
-  KMX_DWORD version;      // keyboard version
+  KMX_DWORD version;        // keyboard version
 
   KMX_DWORD cxStoreArray;   // in array entries
   KMX_DWORD cxGroupArray;   // in array entries
@@ -99,11 +96,11 @@ typedef struct KMX_tagKEYBOARD
   LPKMX_GROUP dpGroupArray; // [LPGROUP] address of first item in group array, from start of file
 
   KMX_DWORD StartGroup[2];  // index of starting groups [2 of them]
-              // Ansi=0, Unicode=1
+                            // Ansi=0, Unicode=1
 
-  KMX_DWORD dwFlags;      // Flags for the keyboard file
+  KMX_DWORD dwFlags;        // Flags for the keyboard file
 
-  KMX_DWORD dwHotKey;     // standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+  KMX_DWORD dwHotKey;       // standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 } KMX_KEYBOARD, *LPKMX_KEYBOARD;
 
 typedef struct KMX_tagINTKEYBOARDOPTIONS
@@ -116,8 +113,7 @@ typedef struct KMX_tagINTKEYBOARDOPTIONS
 typedef struct KMX_tagINTKEYBOARDINFO
 {
   KMX_DWORD      KeymanID;
-  KMX_CHAR       Name[256];    
-  //char       Name[256];     //s :this was original 
+  KMX_CHAR       Name[256];   // _S2 :this was original:  char       Name[256];     
   LPKMX_KEYBOARD Keyboard;
   LPKMX_INTKEYBOARDOPTIONS KeyboardOptions;
 } KMX_INTKEYBOARDINFO, *LPKMX_INTKEYBOARDINFO;

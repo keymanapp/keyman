@@ -14,6 +14,15 @@
 using namespace km::kbp;
 using namespace kmx;
 
+const km_kbp_cp * u16ncat(km_kbp_cp *dst, const km_kbp_cp *src, size_t max) {
+  km_kbp_cp* o = dst;
+  dst = dst + max;
+  while (*src) {
+    *dst++ = *src++;
+  }
+  *dst = 0;
+  return o;
+}
 const km_kbp_cp *km::kbp::kmx::u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   while (*p) {
     if (*p == ch) return p;
@@ -83,6 +92,8 @@ int km::kbp::kmx::u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count) 
   return 0;
 }
 
+//This was here but is not used _S2
+/*
 km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
   if (!p) {
     p = *ctx;
@@ -104,7 +115,7 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
   }
   return p;
 }
-
+*/
 /*
 * int xstrlen( PKMX_BYTE p );
 *
@@ -250,7 +261,7 @@ int km::kbp::kmx::xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return u16ncmp(ch1, ch2, (intptr_t)(nch1-ch1));
 }
-
+/*
 PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
 {
   PKMX_WCHAR result;
@@ -262,7 +273,7 @@ PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
   return result;
 }
 
-
+*/
 PKMX_CHAR km::kbp::kmx::wstrtostr(PKMX_WCHAR in)
 {
   PKMX_CHAR result;

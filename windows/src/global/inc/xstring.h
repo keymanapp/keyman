@@ -5,7 +5,3 @@ int xstrlen_ignoreifopt(PWSTR p);
 int xstrpos(PWSTR p1, PWSTR p);
 PWSTR xstrchr(PWSTR buf, PWSTR chr);
 int xchrcmp(PWSTR ch1, PWSTR ch2);
-
-//*********************
-
-PKMX_WSTR incxstr(PKMX_WSTR p);

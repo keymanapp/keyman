@@ -1,6 +1,6 @@
 
-#include "../../../../developer/kmcompx/include/pch.h"            // added S
-//#include "pch.h"    //removed S
+#include "../../../../developer/kmcompx/include/pch.h"            // added _S2
+//#include "pch.h"    //removed _S2
 #include <CharToKeyConversion.h>
 
 /* Following code lifted from syskbd.cpp and tweaked for compiler use. Todo: consolidate */

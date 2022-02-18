@@ -19,7 +19,7 @@
                     
 */
 
-#include <windows.h>
+//#include <windows.h>    // _S2
 #include <stdio.h>
 
 #include <compiler.h>

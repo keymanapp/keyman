@@ -4,7 +4,8 @@
 #include <compfile.h>
 #include <compiler.h>
 #include <comperr.h>
-#include <kmcmpdll.h>
+//#include <kmcmpdll.h>
+#include "../../../../developer/kmcompx/include/kmcmpdll.h" 
 
 KMX_BOOL WarnDeprecatedHeader() {   // I4866
   if (FWarnDeprecatedCode) {
@@ -53,23 +54,23 @@ KMX_BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
 }
 
 
-//......................................................
-/* Flag presence of deprecated features */
-KMX_BOOL KMX_CheckForDeprecatedFeatures(PKMX_FILE_KEYBOARD fk) {
-  /* 
-    For Keyman 10, we deprecated:
-      // < Keyman 7
-      #define TSS_LANGUAGE			4
-      #define TSS_LAYOUT				5
-      #define TSS_LANGUAGENAME		12
-      #define TSS_ETHNOLOGUECODE		15
+//....old ..................................................
+// Flag presence of deprecated features //
+/*KMX_BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
+  // 
+    //For Keyman 10, we deprecated://
+    //  // < Keyman 7//
+    //  #define TSS_LANGUAGE			4//
+    //  #define TSS_LAYOUT				5//
+    //  #define TSS_LANGUAGENAME		12 //
+    //  #define TSS_ETHNOLOGUECODE		15//
 
-      // Keyman 7
-      #define TSS_WINDOWSLANGUAGES 29 
-  */
+      // Keyman 7//
+     // #define TSS_WINDOWSLANGUAGES 29 //
+  //
   int currentLineBackup = currentLine;
   KMX_DWORD i;
-  PKMX_FILE_STORE sp;
+  PFILE_STORE sp;
 
   if (!FWarnDeprecatedCode) {
     return TRUE;
@@ -92,3 +93,5 @@ KMX_BOOL KMX_CheckForDeprecatedFeatures(PKMX_FILE_KEYBOARD fk) {
 
   return TRUE;
 }
+*/
+

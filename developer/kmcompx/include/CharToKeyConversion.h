@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <windows.h>       // Can be removed here :-)
+//#include <windows.h>       // Can be removed here :-)
 
 #define VK_COLON	0xBA
 #define VK_EQUAL	0xBB
