@@ -5,16 +5,16 @@
 #include "../../../../developer/kmcompx/include/pch.h"            // added S
 //#include "pch.h"                                                // removed S
 
-#include "../../../../developer/kmcompx/include/compfile.h"       // added S
+//#include "../../../../developer/kmcompx/include/compfile.h"       // added S
 //#include <compfile.h>                                           // removed S
 
-#include "../../../../developer/kmcompx/include/compiler.h"       // added S
+//#include "../../../../developer/kmcompx/include/compiler.h"       // added S
 //#include <compiler.h>                                           // removed S
 
 #include "../../../../developer/kmcompx/include/comperr.h"        // added S
 //#include <comperr.h>                                            // removed S
-
-#include "../../../../developer/kmcompx/include/vkeys.h"          // added S
+//
+//#include "../../../../developer/kmcompx/include/vkeys.h"          // added S
 //#include <vkeys.h>                                              // removed S
 
 #include "../../../../developer/kmcompx/include/kmcmpdll.h"       // added S
@@ -25,15 +25,15 @@
 // for u16cpy
 #include "../../../../developer/kmcompx/include/kmx_xstring.h"      // added S
 //#include "../../../../common/core/desktop/src/kmx/kmx_xstring.h"
-#include <string>
+//#include <string>
 
 
 //using namespace km::kbp;
 //using namespace kmx;
 extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
 
-KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);
-
+//KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);
+/*
 KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   assert(sp != NULL);
 
@@ -83,8 +83,9 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   sp->dpString = buf;
 
   return CERR_None;
-}
+}*/
 /*
+
 KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   assert(fk != NULL);
   assert(gp != NULL);
@@ -115,6 +116,7 @@ KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   return CERR_None;
 }
 */
+/*
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   KMX_UINT key = kpp->Key;
   KMX_UINT shift = kpp->ShiftFlags;
@@ -171,6 +173,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   return CERR_None;
 }
 
+*/
 //*****************************************************************************************************
 //*****************************************************************************************************
 //*****************************************************************************************************
@@ -323,60 +326,4 @@ KMX_DWORD KMX_ExpandCapsRule(PKMX_FILE_GROUP gp, PKMX_FILE_KEY kpp, PKMX_FILE_ST
   kpp->ShiftFlags = shift | NOTCAPITALFLAG;
 
   return CERR_None;
-}
-
-//*****************************************************************************
-
-void TestSab(){
-//incxstr:  ************************************************************
-// A) can use PKMX_WCHAR incxstr(PKMX_WCHAR p) of C:\Projects\keyman\keyman\windows\src\global\vc
-// A) can use PKMX_WCHAR incxstr(PKMX_WCHAR p) of C:\Projects\keyman\keyman\windows\src\test\manual-tests\mnemonic-to-positional\m-to-p\m-to-p
-// B) can use PWSTR      incxstr(PWSTR p)      of C:\Projects\keyman\keyman\windows\src\test\manual-tests\mnemonic-to-positional\m-to-p\m-to-p
-
-// new should work without win -> kmx
-// A)
-// there is PKMX_WCHAR KMX_incxstr	(	PKMX_WCHAR 	p	)	
-// PKMX_WCHAR == PKMX_WSTR
-     //PKMX_FILE_STORE sp;
-     //PKMX_WSTR p = sp->dpString;
-     //PKMX_WCHAR q = sp->dpString;
-     //q = incxstr(q);     // takes win/src/global/vc-> created overloaded fun there
-     //q = incxstr(p);     // takes win/src/global/vc-> created overloaded fun there
-
-// B)
-// old with win ( for already created tests)
-     //PWSTR pp ;
-     //pp = incxstr(pp);
-
-
-// use u16cpy ************************************************************
-// Z1   can use  km_kbp_cp     const km_kbp_cp *km::kbp::kmx::   u16cpy(km_kbp_cp *dst, const km_kbp_cp *src)   
-      //   of C:\Projects\keyman\keyman\common\core\desktop\src\kmx\kmx_xstring.h
-// Z1 can use  km_kbp_cp       const km_kbp_cp *km::kbp::kmx::   u16cpy(km_kbp_cp *dst, const km_kbp_cp *src)   
-      //    of C:\Projects\keyman\keyman\developer\kmcompx\include\X\kmx_xstring.h
-// Z2 can use KMX_WCHAR     const KMX_WCHAR *km::kbp::kmx::KMX_u16cpy(KMX_WCHAR *dst, const KMX_WCHAR *src) 
-      //     of C:\Projects\keyman\keyman\developer\kmcompx\include\X\kmx_xstring.h
-// Z3 can use KMX_WCHAR     const KMX_WCHAR *km::kbp::kmx::     u16cpy(KMX_WCHAR *dst, const KMX_WCHAR *src) 
-      //     of C:\Projects\keyman\keyman\developer\kmcompx\include\X\kmx_xstring.h
-// Z3   can use  km_kbp_cp     const km_kbp_cp *km::kbp::kmx::   u16cpy(km_kbp_cp *dst, const km_kbp_cp *src)   
-      //   of C:\Projects\keyman\keyman\common\core\desktop\src\kmx\kmx_xstring.h
-// Z4 can use KMX_WCHAR     const KMX_WCHAR *km::kbp::kmx::KMX_u16cpy(KMX_WCHAR *dst, const KMX_WCHAR *src) 
-      //     of C:\Projects\keyman\keyman\developer\kmcompx\include\X\kmx_xstring.h
-
-  // use like that:
-      // km::kbp::kmx::KMX_u16cpy(k->dpContext, kpp->dpContext );
-  /*
-  PKMX_FILE_KEY kpp;
-  PKMX_FILE_GROUP gp;
-  PKMX_FILE_KEY k = new KMX_FILE_KEY[gp->cxKeyArray + 1];
-  delete gp->dpKeyArray;
-  gp->dpKeyArray = k;
-  gp->cxKeyArray++;
-
-  k = &k[gp->cxKeyArray - 1];
-  k->dpContext = new KMX_WCHAR[std::u16string(kpp->dpContext).length() + 1];
-  k->dpOutput  = new KMX_WCHAR[std::u16string(kpp->dpOutput).length() + 1];
-    
-  km::kbp::kmx::KMX_u16cpy(k->dpContext, kpp->dpContext );
-*/
 }
