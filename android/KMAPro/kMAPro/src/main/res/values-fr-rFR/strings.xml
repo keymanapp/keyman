@@ -18,6 +18,10 @@
   <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Installer les mises à jour</string>
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">Version : %1$s</string>
+  <!-- Context: Text label when old Chrome version installed -->
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">    Keyman nécessite Chrome version 57 ou plus récente.</string>
+  <!-- Context: Button label -->
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">Mettre à jour Chrome</string>
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">Commencez à taper ici&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
@@ -56,7 +60,27 @@
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Installer un clavier ou un dictionnaire</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="change_display_language" comment="Menu action to change interface language">Changer la langue de l\'interface</string>
+  <string name="change_display_language" comment="Menu action to change interface language">Langue d\'affichage</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Modifier la hauteur du clavier</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Légende de la barre d\'espace</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Clavier</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">Langue</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">Langue + Clavier</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">Vide</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">Afficher le nom du clavier sur la barre d\'espace</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">Afficher le nom de la langue dans la barre d\'espace</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Langue et clavier sur la barre d\'espace</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Ne pas afficher la légende sur la barre d\'espace</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Toujours afficher la bannière</string>
   <!-- Context: Keyman Settings menu -->
@@ -87,6 +111,12 @@
   <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">Langue %1$s ajoutée à %2$s</string>
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Toutes les langues de cet ensemble sont déjà installées</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Faites glisser le clavier pour redimensionner la hauteur</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Faire pivoter l\'appareil pour ajuster le portrait et le paysage</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="reset_to_defaults" comment="Button to reset to default heights">Réinitialiser aux valeurs par défaut</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Recherchez ou tapez l\'URL</string>
   <!-- Context: Keyman Web Browser -->

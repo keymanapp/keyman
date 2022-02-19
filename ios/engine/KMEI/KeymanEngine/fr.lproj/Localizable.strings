@@ -49,6 +49,12 @@
 /* Confirmation text to display before uninstalling a lexical model */
 "command-uninstall-lexical-model-confirm" = "Voulez-vous désinstaller ce dictionnaire ?";
 
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Impossible de charger le clavier demandé";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Impossible de charger le dictionnaire demandé";
+
 /* Text for error when an installed file is unexpectedly missing */
 "error-missing-file" = "Un fichier requis est introuvable.";
 
@@ -112,11 +118,17 @@
 /* Error opening a Keyman package - package is not valid */
 "kmp-error-invalid" = "Le fichier du package est corrompu.";
 
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "Le paquet spécifié n'existe pas.";
+
 /* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
 "kmp-error-missing-resource" = "Ce paquet ne contient pas le clavier ou le dictionnaire demandé.";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Ce package n'a pas été correctement construit - contenu inconnu.";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "Ce paquet ne prend pas en charge votre appareil.";
 
 /* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
 "kmp-error-wrong-type" = "Ce paquet ne contient pas le type de ressource attendu.";
@@ -180,6 +192,36 @@
 
 /* Title for the main Settings menu */
 "menu-settings-title" = "Paramètres Keyman";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Ne pas afficher la légende sur la barre d'espace";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Afficher le nom du clavier sur la barre d'espace";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Afficher le nom de la langue dans la barre d'espace";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Afficher la langue et le nom du clavier sur la barre d'espacement";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Légende de la barre d'espace";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Légende de la barre d'espace";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Vide";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Clavier";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Langue";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Langue et clavier";
 
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Le téléchargement du clavier a échoué";
