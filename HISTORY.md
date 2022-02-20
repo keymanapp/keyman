@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.200 alpha 2022-02-20
+
+* chore(common): Update French strings (#6263)
+
 ## 15.0.199 alpha 2022-02-18
 
 * fix(web): Non-integer OSK sizes (#6248)
