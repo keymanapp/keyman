@@ -106,9 +106,16 @@ if (( run_tests )); then
 fi
 
 if (( should_publish )); then
+  if [[ $TIER == stable ]]; then
+    npm_dist_tag=latest
+  else
+    npm_dist_tag=$TIER
+  fi
+
   # Note: In either case, npm publish MUST be given --access public to publish
   # a package in the @keymanapp scope on the public npm package index.
   #
   # See `npm help publish` for more details.
-  npm publish $DRY_RUN --access public --tag "${npm_dist_tag:=latest}" || fail "Could not publish ${npm_dist_tag} release."
+  echo "Publishing $DRY_RUN npm package with tag $npm_dist_tag"
+  npm publish $DRY_RUN --access public --tag $npm_dist_tag || fail "Could not publish $npm_dist_tag release."
 fi
