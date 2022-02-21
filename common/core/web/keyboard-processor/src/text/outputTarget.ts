@@ -260,9 +260,16 @@ namespace com.keyman.text {
 
     /**
      * Indicates whether or not the underlying element has its own selection (input, textarea)
-     * or is part of (or possesses) the DOM's active selection.
+     * or is part of (or possesses) the DOM's active selection. Don't confuse with isSelectionEmpty().
+     *
+     * TODO: rename to supportsOwnSelection
      */
     abstract hasSelection(): boolean;
+
+    /**
+     * Returns true if there is no current selection -- that is, the selection range is empty
+     */
+    abstract isSelectionEmpty(): boolean;
 
     /**
      * Returns an index corresponding to the caret's position for use with deadkeys.
@@ -387,6 +394,11 @@ namespace com.keyman.text {
 
     invalidateSelection(): void {
       return;
+    }
+
+    isSelectionEmpty(): boolean {
+      // TODO: consider if we need to maintain selection information in Mocks
+      return true;
     }
 
     hasSelection(): boolean {

@@ -39,9 +39,17 @@ namespace com.keyman.dom.targets {
       return this.root;
     }
 
+    isSelectionEmpty(): boolean {
+      if(!this.hasSelection()) {
+        return true;
+      }
+
+      return this.root.ownerDocument.getSelection().isCollapsed;
+    }
+
     hasSelection(): boolean {
       let Lsel = this.root.ownerDocument.getSelection();
-      
+
       // We can't completely rely on this.root.contains because of a weird IE 11 bug.
       // Apparently, the text node contains the HTMLElement?
       var ie11ParentChild = function(parent, child) {
@@ -87,7 +95,7 @@ namespace com.keyman.dom.targets {
 
       if(Lsel.isCollapsed) {
         let caret = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
-        return new SelectionRange(caret, caret); 
+        return new SelectionRange(caret, caret);
       } else {
         let anchor = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
         let focus = new SelectionCaret(Lsel.focusNode, Lsel.focusOffset);
@@ -224,7 +232,7 @@ namespace com.keyman.dom.targets {
       // As it turns out, we never had an implementation for handling newline inputs from the OSK for this element type.
       // At least this way, it's more explicit.
       //
-      // Note:  consult "// Create a new text node - empty control" case in insertTextBeforeCaret - 
+      // Note:  consult "// Create a new text node - empty control" case in insertTextBeforeCaret -
       // this helps to handle the browser-default implementation of newline handling.  In particular,
       // entry of the first character after a newline.
       //

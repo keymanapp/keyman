@@ -61,6 +61,14 @@ namespace com.keyman.dom.targets {
       this.doc.defaultView.focus(); // I3363 (Build 301)
     }
 
+    isSelectionEmpty(): boolean {
+      if(!this.hasSelection()) {
+        return true;
+      }
+
+      return this.doc.getSelection().isCollapsed;
+    }
+
     hasSelection(): boolean {
       let Lsel = this.doc.getSelection();
       let outerSel = document.getSelection();
@@ -97,7 +105,7 @@ namespace com.keyman.dom.targets {
 
       if(Lsel.isCollapsed) {
         let caret = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
-        return new SelectionRange(caret, caret); 
+        return new SelectionRange(caret, caret);
       } else {
         let anchor = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
         let focus = new SelectionCaret(Lsel.focusNode, Lsel.focusOffset);
@@ -234,7 +242,7 @@ namespace com.keyman.dom.targets {
       // As it turns out, we never had an implementation for handling newline inputs from the OSK for this element type.
       // At least this way, it's more explicit.
       //
-      // Note:  consult "// Create a new text node - empty control" case in insertTextBeforeCaret - 
+      // Note:  consult "// Create a new text node - empty control" case in insertTextBeforeCaret -
       // this helps to handle the browser-default implementation of newline handling.  In particular,
       // entry of the first character after a newline.
       //
@@ -280,8 +288,8 @@ namespace com.keyman.dom.targets {
     saveProperties() {
       // Formerly _CacheCommands.
       var _CacheableCommands=[
-        new StyleCommand('backcolor',1), new StyleCommand('fontname',1), new StyleCommand('fontsize',1), 
-        new StyleCommand('forecolor',1), new StyleCommand('bold',0), new StyleCommand('italic',0), 
+        new StyleCommand('backcolor',1), new StyleCommand('fontname',1), new StyleCommand('fontsize',1),
+        new StyleCommand('forecolor',1), new StyleCommand('bold',0), new StyleCommand('italic',0),
         new StyleCommand('strikethrough',0), new StyleCommand('subscript',0),
         new StyleCommand('superscript',0), new StyleCommand('underline',0)
       ];
@@ -289,7 +297,7 @@ namespace com.keyman.dom.targets {
       if(this.doc.defaultView) {
         _CacheableCommands.push(new StyleCommand('hilitecolor',1));
       }
-        
+
       for(var n=0; n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
         let cmd = _CacheableCommands[n];
         //KeymanWeb._Debug('Command:'+_CacheableCommands[n][0]);

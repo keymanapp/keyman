@@ -24,6 +24,11 @@ namespace com.keyman.dom.targets {
       return;
     }
 
+    isSelectionEmpty(): boolean {
+      // Touch-alias elements do not currently support selections.
+      return true;
+    }
+
     hasSelection(): boolean {
       // Always has an internal caret position.
       return true;
@@ -55,7 +60,7 @@ namespace com.keyman.dom.targets {
         this.root.setTextBeforeCaret(curText.kmwSubstring(0, this.root.getTextCaret() - dn));
       }
     }
-    
+
     insertTextBeforeCaret(s: string): void {
       this.adjustDeadkeys(s._kmwLength());
       this.root.setTextBeforeCaret(this.root.getTextBeforeCaret() + s);

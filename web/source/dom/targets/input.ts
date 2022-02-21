@@ -37,10 +37,14 @@ namespace com.keyman.dom.targets {
 
     clearSelection(): void {
       // Processes our codepoint-based variants of selectionStart and selectionEnd.
-      let caret = this.getCaret();
-      this.root.value = this.root.value._kmwSubstring(0, caret) + this.root.value._kmwSubstring(this.processedSelectionEnd); //I3319
+      this.getCaret(); // updates processedSelectionStart if required
+      this.root.value = this.root.value._kmwSubstring(0, this.processedSelectionStart) + this.root.value._kmwSubstring(this.processedSelectionEnd); //I3319
 
-      this.setCaret(caret);
+      this.setCaret(this.processedSelectionStart);
+    }
+
+    isSelectionEmpty(): boolean {
+      return this.root.selectionStart == this.root.selectionEnd;
     }
 
     hasSelection(): boolean {
@@ -55,13 +59,13 @@ namespace com.keyman.dom.targets {
 
     getCaret(): number {
       if(this.root.selectionStart == this._cachedSelectionStart) {
-        return this.processedSelectionStart;
+        return this.processedSelectionEnd;
       } else {
         this._cachedSelectionStart = this.root.selectionStart; // KMW-1
         this.processedSelectionStart = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionStart); // I3319
         this.processedSelectionEnd = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionEnd);     // I3319
 
-        return this.processedSelectionStart;
+        return this.processedSelectionEnd;
       }
     }
 
@@ -81,7 +85,7 @@ namespace com.keyman.dom.targets {
       this.processedSelectionStart = start;
       this.processedSelectionEnd = end;
 
-      keyman.dom.Utils.forceScroll(this.root);
+      Utils.forceScroll(this.root);
     }
 
     getTextBeforeCaret(): string {
@@ -153,7 +157,7 @@ namespace com.keyman.dom.targets {
       } else {
         // Allows compiling this separately from the main body of KMW.
         // TODO:  rework class to accept a class-static 'callback' from the DOM module that this can call.
-        //        Would eliminate the need for this 'static' reference. 
+        //        Would eliminate the need for this 'static' reference.
         //        Only strongly matters once we better modularize KMW, with web-dom vs web-dom-targets vs web-core, etc.
         if(com.keyman["singleton"]) {
           com.keyman["singleton"].domManager.moveToNext(false);
