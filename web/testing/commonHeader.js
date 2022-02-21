@@ -90,6 +90,9 @@
     doAddKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
       filename:(prefix + 'us-1.0.js')});
 
+    doAddKeyboards({id:'web_context_tests',name:'Web Context Tests',languages:{id:'en',name:'English'},
+      filename:(prefix + 'web_context_tests.js')});
+
     // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the BCP-47 language code.
     // We use a different loading pattern here than in the samples version to provide a slightly different set of test cases.
