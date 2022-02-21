@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.201 alpha 2022-02-21
+
+* fix(developer): npm publish with correct tier (#6259)
+* fix(linux): Fix stray `[-vv]` in man pages (#6241)
+
 ## 15.0.200 alpha 2022-02-20
 
 * chore(common): Update French strings (#6263)
