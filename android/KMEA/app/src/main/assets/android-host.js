@@ -1,3 +1,10 @@
+let _debug = 0;
+
+// Android harness attachment
+if(window.parent && window.parent.jsInterface && !window.jsInterface) {
+  window.jsInterface = window.parent.jsInterface;
+}
+
 var device = window.jsInterface.getDeviceType();
 var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.devicePixelRatio);
 var oskWidth = 0;
@@ -19,7 +26,7 @@ function init() {
   //window.console.log('Device type = '+device);
   //window.console.log('Keyboard height = '+oskHeight);
   var kmw=com.keyman.singleton;
-  kmw.init({'app':device,'fonts':'packages/'});
+  kmw.init({'app':device,'fonts':'packages/',root:'./'});
   kmw['util']['setOption']('attachType','manual');
   kmw['oninserttext'] = insertText;
   kmw['showKeyboardList'] = showMenu;
@@ -48,6 +55,7 @@ function init() {
 }
 
 function notifyHost(event, params) {
+  console_debug('notifyHost(event='+event+',params='+params+')');
   // TODO: Update all other host notifications to use notifyHost instead of directly setting window.location.hash
   window.setTimeout(function() {
     // We use a timeout so that the navigation doesn't cause the calling function to abort after the call
@@ -142,6 +150,7 @@ function setSpacebarText(mode) {
  * @param dr  Number of post-caret code points to delete.  (optional)
  */
 function insertText(dn, s, dr) {
+  console_debug('insertText(dn='+dn+',s='+s+',dr='+dr+')');
   dr = dr || 0; // Sets a default value of zero when dr is undefined
   //window.console.log('insertText('+ dn +', ' + s +', ' + dr + ');');
   window.jsInterface.insertText(dn, s, dr);
@@ -189,29 +198,43 @@ function setNumericLayer() {
 }
 
 function updateKMText(text) {
+  var ta = document.getElementById('ta');
+  console_debug('updateKMText(text='+text+') ta.value='+ta.value);
+
   if(text == undefined) {
       text = '';
   }
-  var ta = document.getElementById('ta');
-  var kmw = window['keyman'];
-  var resetContext = ta.value != text;
-  ta.value = text;
-  kmw['setActiveElement'](ta);
 
-  if(resetContext) {
-    kmw.resetContext();
+  if(ta.value != text) {
+    ta.value = text;
+    window.resetContext();
+  }
+}
+
+function console_debug(s) {
+  if(_debug) {
+    console.debug(s);
   }
 }
 
 function updateKMSelectionRange(start, end) {
   var ta = document.getElementById('ta');
-  var kmw = window['keyman'];
-  var resetContext = (ta.selectionStart != start || ta.selectionEnd != end);
-  ta.selectionStart = ta._KeymanWebSelectionStart = start;
-  ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
-  kmw['setActiveElement'](ta);
-  if(resetContext) {
-    kmw.resetContext();
+  console_debug('updateKMSelectionRange('+start+','+end+'): ta.selectionStart='+ta.selectionStart+' '+
+    '['+ta._KeymanWebSelectionStart+'] ta.selectionEnd='+ta.selectionEnd+' '+ta._KeymanWebSelectionEnd);
+
+  var selDirection = 'forward';
+  if(start > end) {
+    let e0 = end;
+    end = start;
+    start = e0;
+    selDirection = 'backward';
+  }
+
+  if(ta.selectionStart != start || ta.selectionEnd != end || ta.selectionDirection != selDirection) {
+    ta.selectionStart = ta._KeymanWebSelectionStart = start;
+    ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
+    ta.selectionDirection = selDirection;
+    keyman.resetContext();
   }
 }
 
@@ -301,6 +324,7 @@ function executePopupKey(keyID, keyText) {
 }
 
 function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
+  console_debug('executeHardwareKeystroke(code='+code+',shift='+shift+',lstates='+lstates+',eventModifiers='+eventModifiers+')');
   var kmw=window['keyman'];
   //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
   try {
@@ -342,7 +366,7 @@ function toHex(theString) {
  * Reference: Issue #5376
  */
 function checkTextArea() {
-  var uaRe = /Chrome\/([0-9]*)./g;
+  var uaRe = /Chrome\/([0-9]*)\./g;
   var chromeMajorVersion = uaRe.exec(navigator.userAgent);
   if (chromeMajorVersion && parseInt(chromeMajorVersion[1]) <= 37) {
     var ta = document.getElementById('ta');

@@ -2683,17 +2683,24 @@ public final class KMManager {
             start = temp;
           }
 
-          if (dn <= 0) {
+          int deleteLeft = dn;
+
+          if(start != end && dn == 1 && s.length() == 0) {
+            /* Handle backspace with a selection: just delete selection */
+            deleteLeft = 0;
+          }
+
+          if (deleteLeft <= 0) {
             if (start == end) {
               if (s.length() > 0 && s.charAt(0) == '\n') {
                 textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
-              } else {
-                // *** TO DO: Try to find a solution to the bug on API < 17, insert overwrites on next line
-                if (s.length() > 0) {
+              } else if (s.length() > 0) {
+                  // *** TO DO: Try to find a solution to the bug on API < 17, insert overwrites on next line
                   InAppKeyboardShouldIgnoreTextChange = true;
                   InAppKeyboardShouldIgnoreSelectionChange = true;
                   textView.getText().insert(start, s);
-                }
+              } else {
+                textView.getText().delete(start, end);
               }
             } else {
               if (s.length() > 0 && s.charAt(0) == '\n') {
@@ -2712,21 +2719,25 @@ public final class KMManager {
               }
             }
           } else {
-            for (int i = 0; i < dn; i++) {
-              CharSequence chars = textView.getText().subSequence(0, start);
-              if (chars != null && chars.length() > 0) {
-                char c = chars.charAt(start - 1);
-                InAppKeyboardShouldIgnoreTextChange = true;
-                InAppKeyboardShouldIgnoreSelectionChange = true;
-                if (Character.isLowSurrogate(c)) {
-                  textView.getText().delete(start - 2, end);
-                } else {
-                  textView.getText().delete(start - 1, end);
-                }
+            if(start == end) {
+              for (int i = 0; i < deleteLeft; i++) {
+                CharSequence chars = textView.getText().subSequence(0, start);
+                if (chars != null && chars.length() > 0) {
+                  char c = chars.charAt(start - 1);
+                  InAppKeyboardShouldIgnoreTextChange = true;
+                  InAppKeyboardShouldIgnoreSelectionChange = true;
+                  if (Character.isLowSurrogate(c)) {
+                    textView.getText().delete(start - 2, end);
+                  } else {
+                    textView.getText().delete(start - 1, end);
+                  }
 
-                start = textView.getSelectionStart();
-                end = textView.getSelectionEnd();
+                  start = textView.getSelectionStart();
+                  end = textView.getSelectionEnd();
+                }
               }
+            } else {
+              Log.w(TAG, "Unexpected request to selection");
             }
 
             if (s.length() > 0) {
@@ -2736,6 +2747,8 @@ public final class KMManager {
             }
           }
 
+          // Collapse the selection
+          textView.setSelection(start + s.length());
           textView.endBatchEdit();
         }
       });
