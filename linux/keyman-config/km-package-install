@@ -99,6 +99,7 @@ def main():
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
     if args.package and args.file:
+        parser.print_usage()
         logging.error(
             "km-package-install: error: too many arguments: either install a local kmp file or " +
             "specify a keyboard id to download and install.")
@@ -161,6 +162,7 @@ def main():
             logging.error("km-package-install: error: Could not download keyboard package %s", args.package)
             sys.exit(2)
     else:
+        parser.print_usage()
         logging.error(
             "km-package-install: error: no arguments: either install a local kmp file " +
             "or specify a keyboard package id to download and install.")
