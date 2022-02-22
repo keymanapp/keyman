@@ -221,6 +221,10 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
+                     resourceName: "ios-host.js",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
                      resourceName: "keymanios.js",
                      dstDir: baseDir,
                      excludeFromBackup: true)
