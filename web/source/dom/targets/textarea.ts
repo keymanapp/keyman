@@ -67,15 +67,12 @@ namespace com.keyman.dom.targets {
     }
 
     getCaret(): number {
-      if(this.root.selectionStart == this._cachedSelectionStart) {
-        return this.processedSelectionEnd;
-      } else {
+      if(this.root.selectionStart != this._cachedSelectionStart) {
         this._cachedSelectionStart = this.root.selectionStart; // KMW-1
         this.processedSelectionStart = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionStart); // I3319
         this.processedSelectionEnd = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionEnd);     // I3319
-
-        return this.processedSelectionEnd;
       }
+      return this.root.selectionDirection == 'forward' ? this.processedSelectionEnd : this.processedSelectionStart;
     }
 
     getDeadkeyCaret(): number {
@@ -83,13 +80,13 @@ namespace com.keyman.dom.targets {
     }
 
     setCaret(caret: number) {
-      this.setSelection(caret, caret);
+      this.setSelection(caret, caret, "none");
     }
 
-    setSelection(start: number, end: number) {
+    setSelection(start: number, end: number, direction: "forward" | "backward" | "none") {
       let domStart = this.root.value._kmwCodePointToCodeUnit(start);
       let domEnd = this.root.value._kmwCodePointToCodeUnit(end);
-      this.root.setSelectionRange(domStart, domEnd);
+      this.root.setSelectionRange(domStart, domEnd, direction);
 
       this.processedSelectionStart = start;
       this.processedSelectionEnd = end;
@@ -97,23 +94,31 @@ namespace com.keyman.dom.targets {
       Utils.forceScroll(this.root);
     }
 
+    getSelectionDirection(): "forward" | "backward" | "none" {
+      return this.root.selectionDirection;
+    }
+
     getTextBeforeCaret(): string {
-      return this.getText()._kmwSubstring(0, this.getCaret());
+      this.getCaret();
+      return this.getText()._kmwSubstring(0, this.processedSelectionStart);
     }
 
     setTextBeforeCaret(text: string) {
       this.getCaret();
+      let selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
+      let direction = this.getSelectionDirection();
       let newCaret = text._kmwLength();
       this.root.value = text + this.getText()._kmwSubstring(this.processedSelectionStart);
 
-      this.setCaret(newCaret);
+      this.setSelection(newCaret, newCaret + selectionLength, direction);
     }
 
     protected setTextAfterCaret(s: string) {
       let c = this.getCaret();
+      let direction = this.getSelectionDirection();
 
       this.root.value = this.getTextBeforeCaret() + s;
-      this.setCaret(c);
+      this.setSelection(this.processedSelectionStart, this.processedSelectionEnd, direction);
     }
 
     getTextAfterCaret(): string {
@@ -128,14 +133,14 @@ namespace com.keyman.dom.targets {
     deleteCharsBeforeCaret(dn: number) {
       if(dn > 0) {
         let curText = this.getTextBeforeCaret();
-        let caret = this.getCaret();
+        let caret = this.processedSelectionStart;
 
         if(dn > caret) {
           dn = caret;
         }
 
         this.adjustDeadkeys(-dn);
-        this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));
+        this.setTextBeforeCaret(curText.kmwSubstring(0, caret - dn));
         this.setCaret(caret - dn);
       }
     }
