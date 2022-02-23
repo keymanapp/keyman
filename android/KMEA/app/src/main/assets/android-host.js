@@ -1,4 +1,4 @@
-let _debug = 0;
+var _debug = 1;
 
 // Android harness attachment
 if(window.parent && window.parent.jsInterface && !window.jsInterface) {
@@ -224,7 +224,7 @@ function updateKMSelectionRange(start, end) {
 
   var selDirection = 'forward';
   if(start > end) {
-    let e0 = end;
+    var e0 = end;
     end = start;
     start = e0;
     selDirection = 'backward';

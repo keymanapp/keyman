@@ -2719,25 +2719,29 @@ public final class KMManager {
               }
             }
           } else {
-            if(start == end) {
-              for (int i = 0; i < deleteLeft; i++) {
-                CharSequence chars = textView.getText().subSequence(0, start);
-                if (chars != null && chars.length() > 0) {
-                  char c = chars.charAt(start - 1);
-                  InAppKeyboardShouldIgnoreTextChange = true;
-                  InAppKeyboardShouldIgnoreSelectionChange = true;
-                  if (Character.isLowSurrogate(c)) {
-                    textView.getText().delete(start - 2, end);
-                  } else {
-                    textView.getText().delete(start - 1, end);
-                  }
-
-                  start = textView.getSelectionStart();
-                  end = textView.getSelectionEnd();
+            if(start != end) {
+              // Delete the selection
+              InAppKeyboardShouldIgnoreTextChange = true;
+              InAppKeyboardShouldIgnoreSelectionChange = true;
+              textView.getText().delete(start, end);
+              textView.setSelection(start);
+              end = start;
+            }
+            for (int i = 0; i < deleteLeft; i++) {
+              CharSequence chars = textView.getText().subSequence(0, start);
+              if (chars != null && chars.length() > 0) {
+                char c = chars.charAt(start - 1);
+                InAppKeyboardShouldIgnoreTextChange = true;
+                InAppKeyboardShouldIgnoreSelectionChange = true;
+                if (Character.isLowSurrogate(c)) {
+                  textView.getText().delete(start - 2, end);
+                } else {
+                  textView.getText().delete(start - 1, end);
                 }
+
+                start = textView.getSelectionStart();
+                end = textView.getSelectionEnd();
               }
-            } else {
-              Log.w(TAG, "Unexpected request to selection");
             }
 
             if (s.length() > 0) {
@@ -2802,6 +2806,7 @@ public final class KMManager {
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void insertText(final int dn, final String s, final int dr) {
+      // TODO: Unify in-app and system insertText
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -2826,11 +2831,19 @@ public final class KMManager {
 
           ic.beginBatchEdit();
 
+          int deleteLeft = dn;
+
           // Delete any existing selected text.
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
           if (icText != null) { // This can be null if the input connection becomes invalid.
             int start = icText.startOffset + icText.selectionStart;
             int end = icText.startOffset + icText.selectionEnd;
+            if (end < start) {
+              // Swap start/end for backward selection
+              int temp = start;
+              start = end;
+              end = temp;
+            }
             if (end > start) {
               if (s.length() == 0) {
                 ic.setSelection(start, start);
@@ -2842,6 +2855,10 @@ public final class KMManager {
                 ic.setSelection(start, start);
                 ic.deleteSurroundingText(0, end - start);
               }
+
+              // KeymanWeb tells us how to delete the selection, but we don't
+              // want to do that twice
+              deleteLeft = 0;
             }
           }
 
@@ -2852,8 +2869,8 @@ public final class KMManager {
           }
 
           // Perform left-deletions
-          if (dn > 0) {
-            performLeftDeletions(ic, dn);
+          if (deleteLeft > 0) {
+            performLeftDeletions(ic, deleteLeft);
           }
 
           // Perform right-deletions
@@ -2888,8 +2905,8 @@ public final class KMManager {
     }
 
     /*
-    // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
-    // instead of one code-point. See Chromium issue #1024738
+    // Chromium up until version M81 had a bug where deleteSurroundingText deletes an entire
+    // grapheme cluster instead of one code-point. See Chromium issue #1024738
     // https://bugs.chromium.org/p/chromium/issues/detail?id=1024738
     //
     // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
