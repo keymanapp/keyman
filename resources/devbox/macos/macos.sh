@@ -150,6 +150,9 @@ BREW_IOS="swiftlint carthage"
 BREW_MACOS="carthage cocoapods"
 BREW_ANDROID="openjdk@8 android-sdk android-studio ant gradle maven"
 
+# Turn on verbosity
+set -x
+
 brew install $BREW_ALL
 $REQUIRE_ANDROID && brew install $BREW_ANDROID
 $REQUIRE_IOS && brew install $BREW_IOS
@@ -197,7 +200,10 @@ $REQUIRE_ANDROID && (
 # Add keyman.macos.env.sh to ~/.bashrc
 
 echo "Adding environment variables to ~/.bashrc..."
-if [ ! -f ~/.bashrc ] || `grep "keyman.macos.env.sh" ~/.bashrc 2>/dev/null`; then
+if [ -f ~/.bashrc ] && fgrep -q -s "keyman.macos.env.sh" ~/.bashrc; then
+    echo ~/.bashrc unchanged
+else
+    echo "# added by keyman/macos.sh" >> ~/.bashrc
     echo "source $THIS_DIR/keyman.macos.env.sh" >> ~/.bashrc
 fi
 
