@@ -147,15 +147,13 @@ def main():
             kbdata_version = StrictVersion(kbdata_v)
             installed_kmp_ver = StrictVersion(installed_kmp_v)
             if kbdata_version == installed_kmp_ver:
-                logging.error(
-                    "km-package-install: The %s version of the %s keyboard package is already installed.",
-                    installed_kmp_ver, args.package)
+                print("km-package-install: Version %s of the %s keyboard package is already installed."
+                      % (installed_kmp_ver, args.package))
                 sys.exit(1)
             elif kbdata_version > installed_kmp_ver:
-                logging.error(
-                    "km-package-install: A newer version of %s keyboard package is available. " +
-                    "Uninstalling old version %s then downloading and installing new version %s.",
-                    args.package, installed_kmp_ver, kbdata_version)
+                print("km-package-install: A newer version of %s keyboard package is available. Uninstalling old "
+                      "version %s then downloading and installing new version %s."
+                      % (args.package, installed_kmp_ver, kbdata_version))
                 uninstall_kmp(args.package, args.shared)
 
         kmpfile = get_kmp(args.package)
