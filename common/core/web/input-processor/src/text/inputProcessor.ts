@@ -122,7 +122,7 @@ namespace com.keyman.text {
 
       // Create a "mock" backup of the current outputTarget in its pre-input state.
       // Current, long-existing assumption - it's DOM-backed.
-      let preInputMock = Mock.from(outputTarget, false);
+      let preInputMock = Mock.from(outputTarget, true);
 
       const startingLayerId = this.keyboardProcessor.layerId;
 

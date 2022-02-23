@@ -1011,7 +1011,7 @@ namespace com.keyman.text {
       this.resetContextCache();
 
       // Capture the initial state of the OutputTarget before any rules are matched.
-      let preInput = Mock.from(outputTarget, readonly);
+      let preInput = Mock.from(outputTarget, true);
 
       // Capture the initial state of any variable stores
       const cachedVariableStores = this.activeKeyboard.variableStores;
