@@ -1,0 +1,10 @@
+{
+  "id": "web_context_tests",
+  "name":"KeymanWeb Context Basic Test",
+  "languages":{
+    "id":"en",
+    "name": "English",
+    "region": "World"
+  },
+  "filename":"resources/keyboards/web_context_tests.js"
+}
