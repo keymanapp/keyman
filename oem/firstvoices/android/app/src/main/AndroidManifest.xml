@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.firstvoices.keyboards" >
 
-    <!-- Keyman Engine removes INTERNET permission, so add it back for crash reporting -->
+    <!-- Keyman Engine removes INTERNET permission, so add it back for crash reporting and get dictionaries -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="replace" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -41,7 +42,8 @@
 
         <activity
             android:name="com.firstvoices.keyboards.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,10 +61,26 @@
             android:theme="@style/AppTheme.Light.Dialog" >
         </activity>
         <activity
+            android:name="com.firstvoices.keyboards.FVKeyboardSettingsActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.Light.Dialog" >
+        </activity>
+        <activity
             android:name="com.firstvoices.keyboards.SetupActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.Light.Dialog" >
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 </manifest>
