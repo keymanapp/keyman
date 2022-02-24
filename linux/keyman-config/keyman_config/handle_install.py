@@ -36,6 +36,8 @@ def download_and_install_package(url):
         downloadFile = os.path.join(get_download_folder(), packageId)
         downloadUrl = KeymanComUrl + '/go/package/download/' + packageId + '?platform=linux&tier=' + __tier__
         packageFile = download_kmp_file(downloadUrl, downloadFile)
+        if packageFile is None:
+            return
     elif parsedUrl.scheme == '' or parsedUrl.scheme == 'file':
         packageFile = parsedUrl.path
     else:
