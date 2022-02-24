@@ -13,3 +13,19 @@ begin Unicode > use(main)
 group(main) using keys
 
 'abc' + 'd' > '!'
+
+c SMP tests
+
++ 'f' > '𐌀'
++ 'g' > '𐌁'
++ 'h' > '𐌂'
+'𐌀𐌁𐌂' + 'i' > '𐌙'
++ 'j' > '𐌈'
+
+c Mixed SMP + BMP tests
+
++ 'k' > '𐌰'
++ 'l' > 'B'
++ 'm' > '𐌲'
+'𐌰B𐌲' + 'n' > '𐌽'
++ 'o' > '𐍈'
