@@ -46,9 +46,20 @@ describe('Text Selection', function() {
     return new KMWRecorder.BrowserDriver(setupElement(ele));
   }
 
-  /* Don't run tests on browsers that don't support Input event */
 
-  if(!supportsInputEvent()) return;
+  if(!supportsInputEvent()) {
+    console.log('Don\'t run Text Selection tests on browsers that don\'t support Input event');
+    return;
+  }
+
+  var device = new com.keyman.Device();
+  device.detect();
+
+  if(device.formFactor != 'desktop') {
+    console.log('Don\'t run Text Selection tests on mobile, because we don\'t '+
+      'yet support selection on mobile browsers');
+    return;
+  }
 
   /* Define key event specs */
 
