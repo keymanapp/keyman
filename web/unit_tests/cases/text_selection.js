@@ -224,7 +224,7 @@ describe('Text Selection', function() {
          * Using the attached web_context_tests keyboard, type abcx. Select the x character, and type d.
          * The output after the final key should be 'abcd'.
          */
-        it('Should ignore context when a selection is made', async () => {
+        it('Should ignore context when a selection, in '+direction+' direction, is made', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
 
@@ -254,7 +254,7 @@ describe('Text Selection', function() {
           assert.deepEqual([ele.selectionStart, ele.selectionEnd], [4, 4], "Expected caret to be after 'd'");
         });
 
-        it('Should ignore context when a selection is made - SMP', async () => {
+        it('Should ignore context when a selection, in '+direction+' direction, is made - SMP', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
 
@@ -290,7 +290,7 @@ describe('Text Selection', function() {
          * Using the attached web_context_tests keyboard, type abcx. Select the x character, and
          * delete it with Backspace. Type d. The output after the final key should be !.
          */
-        it('Should correctly delete selection with backspace and not lose sync', async () => {
+        it('Should correctly delete selection, in '+direction+' direction, with backspace and not lose sync', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
 
@@ -330,7 +330,7 @@ describe('Text Selection', function() {
           assert.deepEqual([ele.selectionStart, ele.selectionEnd], [1, 1], "Expected caret to be after '!'");
         });
 
-        it('Should correctly delete selection with backspace and not lose sync - SMP', async () => {
+        it('Should correctly delete selection, in '+direction+' direction, with backspace and not lose sync - SMP', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
 
@@ -376,7 +376,7 @@ describe('Text Selection', function() {
          * Using the attached web_context_tests keyboard, type abcx. Select the x character, and type y.
          * Press Backspace, and type d. The output after the final key should be !.
          */
-        it('Should correctly replace selection and not lose sync', async () => {
+        it('Should correctly replace selection, in '+direction+' direction, and not lose sync', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
 
@@ -424,7 +424,7 @@ describe('Text Selection', function() {
           assert.deepEqual([ele.selectionStart, ele.selectionEnd], [1, 1], "Expected caret to be after '!'");
         });
 
-        it('Should correctly replace selection and not lose sync - SMP', async () => {
+        it('Should correctly replace selection, in '+direction+' direction, and not lose sync - SMP', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
 
@@ -478,7 +478,7 @@ describe('Text Selection', function() {
          * Using the attached web_context_tests keyboard, type xabcx.
          * Select the abc characters, and type d. The output after the final key should be xdx.
          */
-        it('Should not treat the selection as context', async () => {
+        it('Should not treat the selection, in '+direction+' direction, as context', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
 
@@ -509,7 +509,7 @@ describe('Text Selection', function() {
           assert.deepEqual([ele.selectionStart, ele.selectionEnd], [2, 2], "Expected caret to be after 'd'");
         });
 
-        it('Should not treat the selection as context - SMP', async () => {
+        it('Should not treat the selection, in '+direction+' direction, as context - SMP', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
 
