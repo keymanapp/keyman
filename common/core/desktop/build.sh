@@ -39,20 +39,14 @@ display_usage() {
   echo "  clean             Clean target path"
   echo "  configure         Configure libraries (linux,macos only)"
   echo "  build             Build all libraries"
-  echo "    build-rust        Build rust libraries"
   echo "    build-cpp         Build c++ libraries"
   echo "  tests             Run all tests"
-  echo "    tests-rust        Run rust tests"
-  echo "    tests-cpp         Run c++ and c++/rust integration tests"
+  echo "    tests-cpp         Run c++ tests"
   echo "  install           Install all libraries"
-  echo "    install-rust      Install rust libraries"
   echo "    install-cpp       Install c++ libraries"
   echo "  uninstall         Uninstall all libraries"
-  echo "    uninstall-rust    Uninstall rust libraries"
   echo "    uninstall-cpp     Uninstall c++ libraries"
   echo
-  echo "Rust libraries will be in:      TARGETPATH/rust/<arch>/<buildtype>"
-  echo "Rust web libraries will be in:  TARGETPATH/rust/web/<buildtype>"
   echo "C++ libraries will be in:       TARGETPATH/<arch>/<buildtype>/src"
   echo "WASM libraries will be in:      TARGETPATH/wasm/<buildtype>/src"
   echo "On Windows, <arch> will be 'x86' or 'x64'; elsewhere it is 'arch'"
@@ -61,18 +55,13 @@ display_usage() {
 
 get_builder_OS
 
-CARGO_TARGET=--release
 MESON_TARGET=release
 HAS_TARGET=false
 CLEAN=false
 CONFIGURE=false
-BUILD_RUST=false
 BUILD_CPP=false
-TESTS_RUST=false
 TESTS_CPP=false
-INSTALL_RUST=false
 INSTALL_CPP=false
-UNINSTALL_RUST=false
 UNINSTALL_CPP=false
 QUIET=false
 TARGET_PATH="$THIS_DIR/build"
@@ -86,7 +75,6 @@ while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
     --debug|-d)
-      CARGO_TARGET=
       MESON_TARGET=debug
       ;;
     --help|-\?)
@@ -103,9 +91,6 @@ while [[ $# -gt 0 ]] ; do
     configure)
       HAS_TARGET=true
       CONFIGURE=true
-      # meson depends on the rust build in order
-      # to do its configure step, for now anyway
-      BUILD_RUST=true
       ;;
     clean)
       HAS_TARGET=true
@@ -113,12 +98,10 @@ while [[ $# -gt 0 ]] ; do
       ;;
     build)
       HAS_TARGET=true
-      BUILD_RUST=true
       BUILD_CPP=true
       ;;
-    build-rust)
-      HAS_TARGET=true
-      BUILD_RUST=true
+    *-rust)
+      echo "$key: Rust was removed in <https://github.com/keymanapp/keyman/issues/6290>"
       ;;
     build-cpp)
       HAS_TARGET=true
@@ -126,12 +109,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
     tests)
       HAS_TARGET=true
-      TESTS_RUST=true
       TESTS_CPP=true
-      ;;
-    tests-rust)
-      HAS_TARGET=true
-      TESTS_RUST=true
       ;;
     tests-cpp)
       HAS_TARGET=true
@@ -139,12 +117,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
     install)
       HAS_TARGET=true
-      INSTALL_RUST=true
       INSTALL_CPP=true
-      ;;
-    install-rust)
-      HAS_TARGET=true
-      INSTALL_RUST=true
       ;;
     install-cpp)
       HAS_TARGET=true
@@ -152,16 +125,11 @@ while [[ $# -gt 0 ]] ; do
       ;;
     uninstall)
       HAS_TARGET=true
-      UNINSTALL_RUST=true
       # ninja records the files it installs, so unless we install first we don't know
       # what to uninstall. Installing will overwrite the existing files, if we then
       # then uninstall the files get removed - unless previously we had additional files.
       INSTALL_CPP=true
       UNINSTALL_CPP=true
-      ;;
-    uninstall-rust)
-      HAS_TARGET=true
-      UNINSTALL_RUST=true
       ;;
     uninstall-cpp)
       HAS_TARGET=true
@@ -183,9 +151,7 @@ if ! $HAS_TARGET; then
   if [ ! -f "$TARGET_PATH" ]; then
     CONFIGURE=true
   fi
-  BUILD_RUST=true
   BUILD_CPP=true
-  TESTS_RUST=true
   TESTS_CPP=true
 fi
 
@@ -201,15 +167,10 @@ displayInfo "" \
     "PLATFORM: $PLATFORM" \
     "CONFIGURE: $CONFIGURE" \
     "CLEAN: $CLEAN" \
-    "BUILD_RUST: $BUILD_RUST" \
     "BUILD_CPP: $BUILD_CPP" \
-    "TESTS_RUST: $TESTS_RUST" \
     "TESTS_CPP: $TESTS_CPP" \
-    "INSTALL_RUST: $INSTALL_RUST" \
     "INSTALL_CPP: $INSTALL_CPP" \
-    "UNINSTALL_RUST: $UNINSTALL_RUST" \
     "UNINSTALL_CPP: $UNINSTALL_CPP" \
-    "CARGO_TARGET: $CARGO_TARGET" \
     "MESON_TARGET: $MESON_TARGET" \
     "TARGET_PATH: $TARGET_PATH" \
     ""
@@ -225,80 +186,8 @@ path_remove() {
   PATH=${PATH/%":$1"/} # delete any instance in the at the end
 }
 
-run_cargo() {
-  if [ $os_id == "win" ]; then
-    # Remove /usr/bin/link from path because it confuses cargo
-    local PATH_BACKUP="$PATH"
-    path_remove /usr/bin
-    path_remove /bin
-  fi
-  cargo "$@"
-  if [ $os_id == "win" ]; then
-    PATH="$PATH_BACKUP"
-  fi
-}
-
-build_test_rust() {
-  local TARGETBASE="$1"
-  if [ -z ${2+x} ]; then local TARGET=""; else local TARGET="$2"; fi
-
-  if [ ! -z $TARGET ]; then
-    local TARGET_FLAG=--target=$TARGET
-  else
-    local TARGET_FLAG=
-  fi
-
-  # Cargo struggles with paths if Windows SDK environment does not
-  # match; this overrides the library paths for this build
-  if [ $os_id == "win" ]; then
-    if [ ! -z ${LIB+x} ]; then
-      LIB=${LIB//\\x86/\\$TARGETBASE}
-      LIB=${LIB//\\x64/\\$TARGETBASE}
-    fi
-    if [ ! -z ${LIBPATH+x} ]; then
-      LIBPATH=${LIBPATH//\\x86/\\$TARGETBASE}
-      LIBPATH=${LIBPATH//\\x64/\\$TARGETBASE}
-    fi
-  fi
-
-  pushd "$THIS_DIR/src/rust/$PLATFORM" >/dev/null
-  if $BUILD_RUST; then
-    echo_heading "======= Building rust library for $TARGETBASE, $TARGET ======="
-
-    # Built library path for multi-arch (Windows) vs single (*nix)
-
-    run_cargo build --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
-
-    # On Windows, final output path is ./build/rust/<arch>/<arch_rust>/debug|release/<libraryname>
-    # WASM is similar: ./build/rust/wasm/wasm_unknown_unknown/debug|release/<libraryname>
-    # On Linux, macOS, the final file is already in the right place (TARGET=="")
-    if [ ! -z $TARGET ]; then
-      local LIB_MAP="keyman_keyboard_processor_$PLATFORM"
-
-      # Library name on Windows vs *nix / WASM pref
-      [[ $os_id == "win" && $TARGETBASE != "wasm" ]] && \
-        local LIBNAME=$LIB_MAP.lib || \
-        local LIBNAME=lib$LIB_MAP.a
-
-      local BUILT_PATH="$TARGET_PATH/rust/$TARGETBASE/$TARGET/$MESON_TARGET"
-      local RUST_TARGET_PATH="$TARGET_PATH/rust/$TARGETBASE/$MESON_TARGET"
-      cp "$BUILT_PATH/$LIBNAME" "$RUST_TARGET_PATH/$LIBNAME"
-    fi
-  fi
-
-  if $TESTS_RUST; then
-    echo_heading "======= Testing rust library for $TARGETBASE $TARGET ======="
-    run_cargo test --target-dir="$TARGET_PATH/rust/$TARGETBASE" $TARGET_FLAG $CARGO_TARGET
-  fi
-  popd >/dev/null
-}
-
 build_windows() {
   # Build targets for Windows
-
-  # Build the rust targets, both x86 and x64
-  build_test_rust x86 i686-pc-windows-msvc
-  build_test_rust x64 x86_64-pc-windows-msvc
 
   # Build the meson targets, both x86 and x64 also
   # We need to use a batch file here so we can get
@@ -324,15 +213,13 @@ build_standard() {
   local BUILD_PLATFORM="$1"
   local ARCH="$2"
   local RUSTARCH=${3:-}
+  # RUSTARCH is not currently used.
   if [ $# -gt 3 ]; then
     shift 3
     local STANDARD_MESON_ARGS="$*"
   else
     local STANDARD_MESON_ARGS=
   fi
-
-  # Build rust targets
-  build_test_rust "$ARCH" "$RUSTARCH"
 
   # Build meson targets
   if $CONFIGURE; then
@@ -356,21 +243,11 @@ build_standard() {
     popd > /dev/null
   fi
 
-  if $INSTALL_RUST; then
-    echo_heading "======= Installing Rust libraries for $BUILD_PLATFORM ======="
-    # TODO
-  fi
-
   if $INSTALL_CPP; then
     echo_heading "======= Installing C++ libraries for $BUILD_PLATFORM ======="
     pushd "$MESON_PATH" > /dev/null
     ninja install
     popd > /dev/null
-  fi
-
-  if $UNINSTALL_RUST; then
-    echo_heading "======= Uninstalling Rust libraries for $BUILD_PLATFORM ======="
-    # TODO
   fi
 
   if $UNINSTALL_CPP; then

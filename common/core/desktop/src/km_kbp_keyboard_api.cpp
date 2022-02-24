@@ -15,7 +15,6 @@
 #include "processor.hpp"
 #include "kmx/kmx_processor.hpp"
 #include "mock/mock_processor.hpp"
-#include "rust/rust_mock_processor.hpp"
 
 using namespace km::kbp;
 
@@ -29,9 +28,6 @@ namespace
     }
     else if (kb_path.suffix() == ".mock") {
       return new mock_processor(kb_path);
-    }
-    else if (kb_path.suffix() == ".rust_mock") {
-      return new rust_mock_processor(kb_path);
     }
     else {
       return new null_processor();

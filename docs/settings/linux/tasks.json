@@ -42,35 +42,10 @@
               "message": 4
             }
           ]
-        },
-        {
-          "base": "$rustc",
-          "source": "rust compiler",
-          "fileLocation": "absolute"
         }
       ],
       "group": "build",
       "detail": "build common/core/desktop"
-    },
-    {
-      "type": "shell",
-      "label": "core: build Rust",
-      "command": "${workspaceFolder}/common/core/desktop/build.sh",
-      "args": [
-        "--debug",
-        "build-rust"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}/common/core/desktop"
-      },
-      "problemMatcher": [
-        {
-          "base": "$rustc",
-          "fileLocation": "absolute"
-        }
-      ],
-      "group": "build",
-      "detail": "Rust build of common/core/desktop"
     },
     {
       "type": "shell",

@@ -4,7 +4,6 @@
   "recommendations": [
     "asabil.meson",
     "EditorConfig.editorconfig",
-    "ms-python.python",
-    "rust-lang.rust",
+    "ms-python.python"
   ]
 }
