@@ -6,15 +6,10 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.util.Log;
-
-import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
-
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
