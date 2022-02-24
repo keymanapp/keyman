@@ -91,7 +91,9 @@ def _verify_ibus_daemon():
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
         if not re.search('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE):
             _start_ibus_daemon(realuser)
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        # Log criticial error in order to track down #6237
+        logging.critical('getting ibus-daemon failed (%s: %s)', type(e), e.args)
         _start_ibus_daemon(realuser)
 
 
@@ -130,6 +132,7 @@ def restart_ibus(bus=None):
         except Exception as e:
             logging.warning("Failed to restart IBus")
             logging.warning(e)
+    time.sleep(1)  # 1s
     _verify_ibus_daemon()
 
 
