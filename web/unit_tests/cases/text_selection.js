@@ -1,6 +1,6 @@
 var assert = chai.assert;
 
-describe.only('Text Selection', function() {
+describe('Text Selection', function() {
   this.timeout(kmwconfig.timeouts.standard);
 
   /* Utility functions */
