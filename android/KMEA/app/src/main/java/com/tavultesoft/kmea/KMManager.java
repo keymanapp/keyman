@@ -1579,6 +1579,17 @@ public final class KMManager {
     registerAssociatedLexicalModel(kbInfo.getLanguageID());
   }
 
+  public static void clearKeyboardCache() {
+    if (InAppKeyboard != null && InAppKeyboardLoaded) {
+      InAppKeyboard.clearCache(true);
+      InAppKeyboard.loadKeyboard();
+    }
+    if (SystemKeyboard != null && SystemKeyboardLoaded) {
+      SystemKeyboard.clearCache(true);
+      SystemKeyboard.loadKeyboard();
+    }
+  }
+
   protected static IBinder getToken() {
     if (IMService == null) {
       return null;
