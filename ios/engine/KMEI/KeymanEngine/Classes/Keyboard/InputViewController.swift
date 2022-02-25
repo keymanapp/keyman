@@ -298,8 +298,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     let selection = textDocumentProxy.selectedText ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
     let context = "\(contextBeforeInput)\(selection)\(contextAfterInput)"
-    let bLength = contextBeforeInput.unicodeScalars.count
-    let sLength = selection.unicodeScalars.count
+    let bLength = contextBeforeInput.utf16.count
+    let sLength = selection.utf16.count
     setContextState(text: context, range: NSMakeRange(bLength, sLength))
     // Within the app, this is triggered after every keyboard input.
     // We should NOT call .resetContext() here for this reason.
