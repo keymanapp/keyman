@@ -2726,6 +2726,7 @@ public final class KMManager {
               textView.getText().delete(start, end);
               textView.setSelection(start);
               end = start;
+              deleteLeft = 0;
             }
             for (int i = 0; i < deleteLeft; i++) {
               CharSequence chars = textView.getText().subSequence(0, start);
