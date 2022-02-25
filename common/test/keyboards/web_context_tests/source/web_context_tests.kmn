@@ -14,6 +14,8 @@ group(main) using keys
 
 'abc' + 'd' > '!'
 
+c 'e' is not transformed
+
 c SMP tests
 
 + 'f' > '𐌀'
@@ -29,3 +31,19 @@ c Mixed SMP + BMP tests
 + 'm' > '𐌲'
 '𐌰B𐌲' + 'n' > '𐌽'
 + 'o' > '𐍈'
+
+c 'p' always generates single char
+
++ 'p' > 'q'
+
+c 'q' is always untouched
+
+c other combos, mixing bmp and smp
+
++ 'r' > 'tuv'
++ 's' > '𐍈x'
++ 't' > '𐍈x𐌈'
++ 'u' > '𐍈𐌈𐌰'
++ 'v' > '𐍈𐌈x𐌰'
+
+c 'x' is always untouched

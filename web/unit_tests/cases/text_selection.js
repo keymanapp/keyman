@@ -188,6 +188,36 @@ describe('Text Selection', function() {
           assert.deepEqual([ele.selectionStart, ele.selectionEnd], [2, 2], "Expected caret to be after 'q'");
         });
 
+        it('Should do a basic selection replacement, with a matching rule, in '+direction+' direction', async () => {
+          var ele = document.getElementById("singleton");
+          var eventDriver = instantiateBrowserDriver(ele);
+
+          // Step 1: 'abcx'
+
+          await assertInputSteps(ele, 4, () => {
+            eventDriver.simulateEvent(keys.A);
+            eventDriver.simulateEvent(keys.B);
+            eventDriver.simulateEvent(keys.C);
+            eventDriver.simulateEvent(keys.X);
+          });
+
+          assert.strictEqual(ele.value, 'abcx', "Sanity check: expected text to be 'abcx'");
+
+          // Step 2, select 'bc', replace with [p] => 'q'
+
+          ele.selectionStart = 1;
+          ele.selectionEnd = 3;
+          ele.selectionDirection = direction;
+          assert.deepEqual([ele.selectionStart, ele.selectionEnd], [1, 3], "Sanity check: expected selection to be 'bc'");
+
+          await assertInputSteps(ele, 1, () => {
+            eventDriver.simulateEvent(keys.P);
+          });
+
+          assert.strictEqual(ele.value, 'aqx', "Expected selection to have been replaced with 'q'");
+          assert.deepEqual([ele.selectionStart, ele.selectionEnd], [2, 2], "Expected caret to be after 'q'");
+        });
+
         it('Should do a basic selection replacement, in '+direction+' direction - SMP', async () => {
           var ele = document.getElementById("singleton");
           var eventDriver = instantiateBrowserDriver(ele);
