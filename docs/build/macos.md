@@ -48,11 +48,11 @@ These dependencies are also listed below if you'd prefer to install manually.
 
 ## Shared Dependencies
 
-* Shared: HomeBrew, Bash 5.0+, jq, Python 3, Meson, Ninja, Rust, coreutils, Pandoc
+* Shared: HomeBrew, Bash 5.0+, jq, Python 3, Meson, Ninja, coreutils, Pandoc
 
   ```shell
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  brew install bash jq python3 meson ninja rustup-init coreutils pandoc rustup-init
+  brew install bash jq python3 meson ninja coreutils pandoc
   ```
 
   On M1 only (as greadlink is not on the path otherwise in XCode):
@@ -61,11 +61,10 @@ These dependencies are also listed below if you'd prefer to install manually.
   sudo ln -s /opt/homebrew/bin/greadlink /usr/local/bin/greadlink
   ```
 
-* Web: node.js, emscripten, wasm-pack, openjdk 8
+* Web: node.js, emscripten, openjdk 8
 
   ```shell
-  brew install node emscripten wasm-pack openjdk@8
-  rustup target add wasm32-unknown-unknown
+  brew install node emscripten openjdk@8
   ```
 
 * iOS: swiftlint, carthage

@@ -136,7 +136,6 @@ PowerShell.
 * Python 3
 * Meson 0.56+
 * Ninja
-* Rust
 * Pandoc
 
 ```ps1
@@ -147,18 +146,6 @@ choco install git jq python ninja pandoc
 refreshenv
 # choco meson (0.55) is too old, 0.56 required:
 python -m pip install meson
-
-# choco rustup is not currently working:
-Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile $env:TEMP\rustup-init.exe
-& "$env:TEMP\rustup-init.exe"
-refreshenv
-```
-
-Restart PowerShell (because `refreshenv` doesn't seem to pick up the rust environment), then
-```ps1
-# Elevated Powershell
-rustup target add i686-pc-windows-msvc
-```
 
 **Environment variables**:
 * [`KEYMAN_ROOT`](#keyman_root)
@@ -190,21 +177,15 @@ You can use Windows Settings to add these environment variables permanently:
 **Requirements**:
 * node.js 14+
 * emscripten 2.0.23+
-* wasm-pack 0.9.1+
 * openjdk 8+
 
 ```ps1
 # Elevated PowerShell
-rustup target add i686-pc-windows-msvc
-rustup target add wasm32-unknown-unknown
 choco install nodejs emscripten
 choco install openjdk
 
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -Uri https://github.com/rustwasm/wasm-pack/releases/download/v0.9.1/wasm-pack-init.exe -OutFile $env:TEMP\wasm-pack-init.exe
-& "$env:TEMP\wasm-pack-init.exe"
-```
 
 **Environment variables**:
 * `PATH`:

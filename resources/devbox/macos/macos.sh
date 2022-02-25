@@ -144,8 +144,8 @@ which brew || (
 
 ## Install devchain components
 
-BREW_ALL="bash jq python3 meson ninja rustup-init coreutils"
-BREW_WEB="node emscripten wasm-pack openjdk@8"
+BREW_ALL="bash jq python3 meson ninja coreutils"
+BREW_WEB="node emscripten openjdk@8"
 BREW_IOS="swiftlint carthage"
 BREW_MACOS="carthage cocoapods"
 BREW_ANDROID="openjdk@8 android-sdk android-studio ant gradle maven"
@@ -166,10 +166,6 @@ $REQUIRE_SENTRYCLI && brew install getsentry/tools/sentry-cli
 $REQUIRE_KMCOMP && (
   brew tap homebrew/cask-versions
   brew install --cask --no-quarantine wine-stable
-)
-
-$REQUIRE_WEB && (
-    rustup-init -y -t wasm32-unknown-unknown
 )
 
 source "$THIS_DIR/keyman.macos.env.sh"

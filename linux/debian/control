@@ -28,7 +28,6 @@ Build-Depends:
  python3-setuptools,
  meson (>= 0.45),
  ninja-build,
- cargo,
  libgtk-3-dev,
  libibus-1.0-dev (>= 1.2),
  libjson-glib-dev (>= 1.4.0),
