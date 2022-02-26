@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.203 alpha 2022-02-26
+
+* chore(common): remove rust (for now!) (#6291)
+
 ## 15.0.202 alpha 2022-02-24
 
 * feat(common): echo in macos.sh setup script (#6246)
