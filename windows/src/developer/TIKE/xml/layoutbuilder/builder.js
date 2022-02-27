@@ -1430,8 +1430,7 @@ $(function () {
 
   $('#inpKeyPadding')
     .change(inpKeyPaddingChange)
-    .on('paste', inpKeyPaddingChange)
-    .keyup(inpKeyPaddingChange);
+    .on('input', inpKeyPaddingChange);
 
   const inpKeyWidthChange = builder.wrapChange(function () {
     builder.selectedKey().data('width', $(this).val())
@@ -1440,8 +1439,7 @@ $(function () {
 
   $('#inpKeyWidth')
     .change(inpKeyWidthChange)
-    .on('paste', inpKeyWidthChange)
-    .keyup(inpKeyWidthChange);
+    .on('input', inpKeyWidthChange);
 
   const inpKeyNameChange = builder.wrapChange(function () {
     builder.selectedKey().data('id', $(this).val());
@@ -1454,25 +1452,10 @@ $(function () {
       source: builder.lookupKeyNames,
       change: inpKeyNameChange
     })
-    .on('paste', inpKeyNameChange)
-    .keyup(inpKeyNameChange)
+    .on('input', inpKeyNameChange)
     .blur(function () {
       builder.hasSavedKeyUndo = false;
     });
-
-  this.updateSelectedKeyText = function (val) {
-    var k = builder.selectedKey();
-    $('.text', k).text(builder.renameSpecialKey(val));
-    k.data('text', val);
-
-    if(this.specialCharacters[val]) {
-      k.addClass('key-special-text');
-    } else {
-      k.removeClass('key-special-text');
-    }
-
-    builder.updateCharacterMap(val, false);
-  }
 
   this.updateCharacterMap = function (val, fromSubKey) {
     // Update character map
@@ -1491,18 +1474,28 @@ $(function () {
     }
   }
 
-  const inpKeyCapChange = builder.wrapChange(function () {
-    builder.updateSelectedKeyText($(this).val());
+  const inpKeyCapChange = builder.wrapChange(function (e) {
+    const val = $(this).val();
+    var k = builder.selectedKey();
+    $('.text', k).text(builder.renameSpecialKey(val));
+    k.data('text', val);
+
+    if(builder.specialCharacters[val]) {
+      k.addClass('key-special-text');
+    } else {
+      k.removeClass('key-special-text');
+    }
+
+    builder.updateCharacterMap(val, false);
   }, {saveOnce: true});
 
   $('#inpKeyCap')
+    .on('input', inpKeyCapChange)
     .change(inpKeyCapChange)
     .autocomplete({
       source: builder.specialKeyNames,
       change: inpKeyCapChange
     })
-    .on('paste', inpKeyCapChange)
-    .keyup(inpKeyCapChange)
     .mouseup(function () {
       builder.updateCharacterMap($(this).val(), false);
     }).focus(function () {
@@ -1725,8 +1718,7 @@ $(function () {
 
   $('#inpSubKeyName')
     .change(subKeyNameChange)
-    .on('paste', subKeyNameChange)
-    .keyup(subKeyNameChange)
+    .on('input', subKeyNameChange)
     .autocomplete({
       source: builder.lookupKeyNames,
       change: subKeyNameChange
@@ -1754,8 +1746,7 @@ $(function () {
       source: builder.specialKeyNames,
       change: inpSubKeyCapChange
     })
-    .on('paste', inpSubKeyCapChange)
-    .keyup(inpSubKeyCapChange)
+    .on('input', inpSubKeyCapChange)
     .mouseup(function () {
       builder.updateCharacterMap($(this).val(), false);
     }).focus(function () {
