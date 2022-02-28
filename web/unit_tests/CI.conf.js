@@ -92,12 +92,6 @@ module.exports = function(config) {
       os_version: '10',
       browser: 'chrome',
       browser_version: '70.0'
-    },
-    bs_edge_win: {
-      os: 'Windows',
-      os_version: '10',
-      browser: 'edge',
-      version: '18.0'
     }
   }
 

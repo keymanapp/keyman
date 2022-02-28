@@ -286,7 +286,8 @@ namespace com.keyman.text {
     private KC_(n: number, ln: number, outputTarget: OutputTarget): string {
       var tempContext = '';
 
-      tempContext = outputTarget.getTextBeforeCaret();
+      // If we have a selection, we have an empty context
+      tempContext = outputTarget.isSelectionEmpty() ? outputTarget.getTextBeforeCaret() : "";
 
       if(tempContext._kmwLength() < n) {
         tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
@@ -947,7 +948,13 @@ namespace com.keyman.text {
     }
 
     defaultBackspace(outputTarget: OutputTarget) {
-      this.output(1, outputTarget, "");
+      if(outputTarget.isSelectionEmpty()) {
+        // Delete the character left of the caret
+        this.output(1, outputTarget, "");
+      } else {
+        // Delete just the selection
+        this.output(0, outputTarget, "");
+      }
     }
 
     /**
