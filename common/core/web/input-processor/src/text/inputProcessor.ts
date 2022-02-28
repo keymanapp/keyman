@@ -64,7 +64,7 @@ namespace com.keyman.text {
       const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.device, outputTarget);
 
       if(ruleBehavior) {
-        ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
+        ruleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
       }
       return ruleBehavior;
     }
@@ -122,7 +122,7 @@ namespace com.keyman.text {
 
       // Create a "mock" backup of the current outputTarget in its pre-input state.
       // Current, long-existing assumption - it's DOM-backed.
-      let preInputMock = Mock.from(outputTarget);
+      let preInputMock = Mock.from(outputTarget, true);
 
       const startingLayerId = this.keyboardProcessor.layerId;
 
@@ -204,7 +204,7 @@ namespace com.keyman.text {
                 break;
               }
 
-              let mock = Mock.from(windowedMock);
+              let mock = Mock.from(windowedMock, false);
 
               let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
               if(!altKey) {
@@ -242,7 +242,7 @@ namespace com.keyman.text {
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
-        ruleBehavior.finalize(this.keyboardProcessor, outputTarget);
+        ruleBehavior.finalize(this.keyboardProcessor, outputTarget, false);
 
         // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
 
@@ -270,7 +270,7 @@ namespace com.keyman.text {
 
         let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(keyEvent.device, outputTarget);
         if(postRuleBehavior) {
-          postRuleBehavior.finalize(this.keyboardProcessor, outputTarget);
+          postRuleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
         }
       }
 

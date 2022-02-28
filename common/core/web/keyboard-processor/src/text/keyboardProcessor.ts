@@ -112,8 +112,8 @@ namespace com.keyman.text {
      * @param   {boolean} outputTarget  The OutputTarget receiving the KeyEvent
      * @return  {string}
      */
-    defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
-      let preInput = Mock.from(outputTarget);
+    defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTarget, readonly: boolean): RuleBehavior {
+      let preInput = Mock.from(outputTarget, readonly);
       let ruleBehavior = new RuleBehavior();
 
       let matched = false;
@@ -176,7 +176,7 @@ namespace com.keyman.text {
         return ruleBehavior;
       }
 
-      let transcription = outputTarget.buildTranscriptionFrom(preInput, Lkc);
+      let transcription = outputTarget.buildTranscriptionFrom(preInput, Lkc, readonly);
       ruleBehavior.transcription = transcription;
 
       return ruleBehavior;
@@ -257,7 +257,7 @@ namespace com.keyman.text {
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
-        let defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget);
+        let defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
         if(defaultBehavior) {
           if(!matchBehavior) {
             matchBehavior = defaultBehavior;

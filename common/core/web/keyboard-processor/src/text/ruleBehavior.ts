@@ -59,7 +59,7 @@ namespace com.keyman.text {
      */
     triggerKeyDefault?: boolean;
 
-    finalize(processor: KeyboardProcessor, outputTarget: OutputTarget) {
+    finalize(processor: KeyboardProcessor, outputTarget: OutputTarget, readonly: boolean) {
       if(!this.transcription) {
         throw "Cannot finalize a RuleBehavior with no transcription.";
       }
@@ -123,11 +123,11 @@ namespace com.keyman.text {
 
       this.triggersDefaultCommand = this.triggersDefaultCommand || other.triggersDefaultCommand;
 
-      let mergingMock = Mock.from(this.transcription.preInput);
+      let mergingMock = Mock.from(this.transcription.preInput, false);
       mergingMock.apply(this.transcription.transform);
       mergingMock.apply(other.transcription.transform);
 
-      this.transcription = mergingMock.buildTranscriptionFrom(this.transcription.preInput, keystroke, this.transcription.alternates);
+      this.transcription = mergingMock.buildTranscriptionFrom(this.transcription.preInput, keystroke, false, this.transcription.alternates);
     }
   }
 }

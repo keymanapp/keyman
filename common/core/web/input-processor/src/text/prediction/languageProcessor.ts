@@ -158,7 +158,7 @@ namespace com.keyman.text.prediction {
       if(!this.isActive) {
         return;
       } else if(outputTarget) {
-        let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
+        let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
         this.predict_internal(transcription, true);
       } else {
         // Shouldn't be possible, and we'll want to know if and when it is.
@@ -171,7 +171,7 @@ namespace com.keyman.text.prediction {
         return null;
       }
 
-      let context = new ContextWindow(Mock.from(target), this.configuration);
+      let context = new ContextWindow(Mock.from(target, false), this.configuration);
       return this.lmEngine.wordbreak(context);
     }
 
@@ -209,7 +209,7 @@ namespace com.keyman.text.prediction {
         // Apply the Suggestion!
 
         // Step 1:  determine the final output text
-        let final = text.Mock.from(original.preInput);
+        let final = text.Mock.from(original.preInput, false);
         final.apply(suggestion.transform);
 
         // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
@@ -224,7 +224,7 @@ namespace com.keyman.text.prediction {
 
         // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
         // replacing the suggestion transform with the original input text.
-        let preApply = text.Mock.from(original.preInput);
+        let preApply = text.Mock.from(original.preInput, false);
         preApply.apply(original.transform);
 
         // Builds the reversion option according to the loaded lexical model's known
@@ -279,7 +279,7 @@ namespace com.keyman.text.prediction {
       // Apply the Reversion!
 
       // Step 1:  determine the final output text
-      let final = text.Mock.from(original.preInput);
+      let final = text.Mock.from(original.preInput, false);
       final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
 
       // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
@@ -306,7 +306,7 @@ namespace com.keyman.text.prediction {
         return null;
       }
 
-      let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
+      let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
       return this.predict(transcription);
     }
 
