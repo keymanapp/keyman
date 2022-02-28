@@ -1,4 +1,4 @@
-var _debug = 1;
+var _debug = 0;
 
 // Android harness attachment
 if(window.parent && window.parent.jsInterface && !window.jsInterface) {
