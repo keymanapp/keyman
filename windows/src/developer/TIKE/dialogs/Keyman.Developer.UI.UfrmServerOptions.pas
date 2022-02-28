@@ -76,6 +76,7 @@ const
   SUrlNgrokAuthToken = 'https://dashboard.ngrok.com/get-started/your-authtoken';
   SUrlNgrokSignup = 'https://dashboard.ngrok.com/signup';
   SUrlNgrokDownload = 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-386.zip';
+  SNGrokExe = 'ngrok.exe';
 
 procedure TfrmServerOptions.cmdCreateAccountClick(Sender: TObject);
 begin
@@ -113,15 +114,15 @@ begin
     except
       on E:ENetHTTPClientException do
       begin
-        ShowMessage(Format('Unable to download ngrok.exe: %s', [E.Message]));
+        ShowMessage(Format('Unable to download %s: %s', [SNGrokExe, E.Message]));
         Exit;
       end;
     end;
 
     if res.StatusCode <> 200 then
     begin
-      ShowMessage(Format('Unable to download ngrok.exe: %d %s',
-        [res.StatusCode, res.StatusText]));
+      ShowMessage(Format('Unable to download %s: %d %s',
+        [SNGrokExe, res.StatusCode, res.StatusText]));
       Exit;
     end;
 
@@ -132,7 +133,7 @@ begin
       try
         try
           zip.Open(res.ContentStream, zmRead);
-          zip.Read('ngrok.exe', ms, zh);
+          zip.Read(SNGrokExe, ms, zh);
           ms.Position := 0;
         finally
           zip.Free;
@@ -140,8 +141,8 @@ begin
       except
         on E:Exception do
         begin
-          ShowMessage(Format('Unable to extract ngrok.exe from downloaded archive: %s',
-            [E.Message]));
+          ShowMessage(Format('Unable to extract %s from downloaded archive: %s',
+            [SNGrokExe, E.Message]));
           Exit;
         end;
       end;
@@ -150,7 +151,7 @@ begin
       except
         on E:Exception do
         begin
-          ShowMessage(Format('Unable to save ngrok.exe: %s', [E.Message]));
+          ShowMessage(Format('Unable to save %s: %s', [SNGrokExe, E.Message]));
           Exit;
         end;
       end;
@@ -255,7 +256,9 @@ end;
 
 function TfrmServerOptions.NgrokPath: string;
 begin
-  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\ngrok.exe';
+  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Server\bin\';
+  ForceDirectories(Result);
+  Result := Result + SNgrokExe;
 end;
 
 procedure TfrmServerOptions.UpdateVersionLabel;
