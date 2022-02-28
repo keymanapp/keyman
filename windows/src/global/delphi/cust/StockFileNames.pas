@@ -1,18 +1,18 @@
 (*
   Name:             StockFileNames
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    4 Dec 2006
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Remove StockFileName_Macros
                     14 Sep 2006 - mcdurdin - Add StockFileName_Fixed_Welcome
@@ -28,14 +28,11 @@ const StockFileName_Menu     = 'menu.txt';     // do not localise
 const StockFileName_AppIcon = 'appicon.ico';    // do not localise
 const StockFileName_ConfigIcon = 'cfgicon.ico'; // do not localise
 
-const StockFileName_CoreIcon = 'core.ico'; // do not localise
-
-const SStockFileNames: array[0..4] of string = (
+const SStockFileNames: array[0..3] of string = (
   StockFileName_TrayIcon,
   StockFileName_Menu,
   StockFileName_AppIcon,
-  StockFileName_ConfigIcon,
-  StockFileName_CoreIcon);
+  StockFileName_ConfigIcon);
 
 // Following file names are standard names within a .kmp file
 

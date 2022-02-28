@@ -126,10 +126,6 @@
               </Component>
 
               <Component>
-                <File Id="core.ico" Name="core.ico" Source="..\..\desktop\branding\core.ico" KeyPath="yes" />
-              </Component>
-
-              <Component>
                 <File Id="appicon.ico" Name="appicon.ico" Source="..\..\global\res\90\desktop\appicon.ico" KeyPath="yes" />
               </Component>
 
@@ -246,7 +242,6 @@
       <ComponentRef Id="menu.txt" />
       <ComponentRef Id="messages.txt" />
       <ComponentRef Id="trayicon.ico" />
-      <ComponentRef Id="core.ico" />
       <ComponentRef Id="KeymanDesktop.chm" />
       <ComponentRef Id="appicon.ico" />
       <ComponentRef Id="cfgicon.ico" />
