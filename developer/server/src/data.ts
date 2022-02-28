@@ -75,7 +75,7 @@ export class DebugFont implements DebugObject {
   facename: string;
 
   filenameFromId(id: string): string {
-    return id.replace(/[^a-z0-9A-Z-]/g, '_') + '.ttf';
+    return simplifyId(id) + '.ttf';
   }
 };
 
@@ -114,3 +114,8 @@ export let data: SiteData = new SiteData();
 export function isValidId(id: string) {
   return !id.match(/\.\.|\/|\\/);
 }
+
+export function simplifyId(id: string) {
+  return id.replace(/[^_a-zA-Z0-9-]/g, '_');
+}
+
