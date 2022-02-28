@@ -1,0 +1,33 @@
+#
+# Code owners - this lists first the primary dev, then second, the platform advocate for each area
+#
+# @darcywong00 @mcdurdin @ermshiperete @rc-swag @SabineSIL @sgschantz
+
+/android/                     @darcywong00  @rc_swag
+
+/common/core/desktop/         @mcdurdin     @jahorton
+/common/core/web/             @jahorton     @ermshiperete
+/common/lexical-model-types/  @jahorton     @mcdurdin
+/common/models/               @jahorton     @mcdurdin
+/common/predictive-text/      @jahorton     @mcdurdin
+/common/schemas/              @mcdurdin     @jahorton
+/common/test/                 @mcdurdin     @ermshiperete
+
+/developer/                   @mcdurdin     @darcywong00
+/docs/                        @mcdurdin     @jahorton
+/ios/                         @sgschantz    @mcdurdin
+/linux/                       @ermshiperete @darcywong00
+/mac/                         @sgschantz    @SabineSIL
+
+/oem/firstvoices/android/     @darcywong00  @rc_swag
+/oem/firstvoices/common/      @mcdurdin     @jahorton
+/oem/firstvoices/ios/         @sgschantz    @mcdurdin
+/oem/firstvoices/windows/     @rc_swag      @sgschantz
+/resources/                   @mcdurdin     @jahorton
+
+# Web is currently shared between Marc and Joshua:
+/web/                         @jahorton     @ermshiperete   @mcdurdin
+
+/windows/src/                 @rc_swag      @sgschantz
+# Override for windows/src:
+/windows/src/developer/       @mcdurdin     @darcywong00

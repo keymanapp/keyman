@@ -21,7 +21,6 @@ kmx = executable('kmx',
     cpp_args: defns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
-    dependencies: [rust_mock_processor],
     objects: lib.extract_all_objects())
 
 tests = [
@@ -208,7 +207,6 @@ endif
 key_e = executable('key_list', 'kmx_key_list.cpp',
                 cpp_args: defns,include_directories: [inc, libsrc],
                 link_args: links,
-                dependencies: [rust_mock_processor],
                 objects: lib.extract_all_objects())
 test_kbd = 'kmx_key_list'
 if kmcomp.found()
@@ -230,7 +228,6 @@ endif
 imx_e = executable('imx_list', 'kmx_imx.cpp',
                 cpp_args: defns,include_directories: [inc, libsrc],
                 link_args: links,
-                dependencies: [rust_mock_processor],
                 objects: lib.extract_all_objects())
 
 test_kbd = 'kmx_imsample'

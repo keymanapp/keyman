@@ -93,6 +93,5 @@
     "ibus.h": "c",
     "*.in": "cpp"
   },
-  "C_Cpp.clang_format_fallbackStyle": "Google",
-  "rust.target_dir": "../../../build/rust/rls",
+  "C_Cpp.clang_format_fallbackStyle": "Google"
 }

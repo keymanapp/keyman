@@ -9,12 +9,10 @@ WARNING: these are old configuration notes. See [index.md](../index.md) for curr
 - C++14 or later compiler (VC++ 2019 or later for Windows).
 - lib std::fs
 - kmcomp (for tests) -- must be added to path
-- Rust 1.50+ from <https://www.rust-lang.org/tools/install> (or `cargo` package on Linux)
 
 For WASM builds:
 - Meson build system 0.56+
 - emscripten 2.0.23+ <https://emscripten.org/docs/getting_started/downloads.html>
-- WasmPack 0.9.1+ <https://github.com/rustwasm/wasm-pack>
 - ninja 1.10+ for WASM
 
 ### Windows
@@ -43,21 +41,6 @@ For WASM builds:
   ```bash
   choco install ninja
   ```
-
-* Install Rust:
-
-  After downloading and running the executable from:
-  <https://www.rust-lang.org/tools/install>
-
-  Run the command:
-
-  ```bash
-  rustup target add i686-pc-windows-msvc
-  rustup target add wasm32-unknown-unknown
-  ```
-
-* Install wasm-pack:
-  <https://github.com/rustwasm/wasm-pack/releases/download/v0.9.1/wasm-pack-init.exe>
 
 * Install Emscripten:
   <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
@@ -102,19 +85,6 @@ the kmcomp archive.
   sudo apt install meson
   ```
 
-* Install Rust:
-
-  ```bash
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-  rustup target add wasm32-unknown-unknown
-  ```
-
-* Install wasm-pack (WASM builds):
-
-  ```bash
-  curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-  ```
-
 * Install Enscripten (including adding to path with `emsdk_env.sh`)  (WASM builds):
   <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
 
@@ -132,18 +102,6 @@ You may also need the `kmcomp` wrapper - see below.
 
   ```bash
   python3 -m pip install meson
-  ```
-
-* Install Rust from <https://www.rust-lang.org/tools/install>, then:
-
-  ```bash
-  rustup target add wasm32-unknown-unknown
-  ```
-
-* Install wasm-pack (WASM builds):
-
-  ```bash
-  curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
   ```
 
 * Install Enscripten (WASM builds):
@@ -178,19 +136,6 @@ Place this in the same folder as you extracted kmcomp.exe, and
 
   ```bash
   brew install meson    # if you haven't already installed via pip
-  ```
-
-* Install Rust:
-
-  ```bash
-  curl https://sh.rustup.rs -sSf | sh
-  rustup target add wasm32-unknown-unknown
-  ```
-
-* Install wasm-pack:
-
-  ```bash
-  curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
   ```
 
 * Install Enscripten (including environment update):

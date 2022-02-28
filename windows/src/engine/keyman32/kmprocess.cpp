@@ -108,10 +108,11 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
   km_kbp_context_items_dispose(citems);
   SendDebugMessageFormat(
       0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
-      static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG), (uint8_t)_td->state.isDown);
+      static_cast<uint16_t>(Globals::get_ShiftState() & (KM_KBP_MODIFIER_MASK_ALL | KM_KBP_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown);
+  //  Mask the bits supported according to `km_kbp_modifier_state` enum, update the mask if this enum is expanded.
   if (KM_KBP_STATUS_OK != km_kbp_process_event(
     _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
-    static_cast<uint16_t>(Globals::get_ShiftState() & K_MODIFIERFLAG), (uint8_t)_td->state.isDown)) {
+    static_cast<uint16_t>(Globals::get_ShiftState() & (KM_KBP_MODIFIER_MASK_ALL | KM_KBP_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown)) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ", FALSE);
     return FALSE;
   }

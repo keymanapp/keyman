@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 15.0.203 alpha 2022-02-26
+
+* chore(common): remove rust (for now!) (#6291)
+
+## 15.0.202 alpha 2022-02-24
+
+* feat(common): echo in macos.sh setup script (#6246)
+* chore(common): Add CODEOWNERS file (#6262)
+* chore(oem/fv): Add keyboard version and languages (#6226)
+* fix(common/core/desktop): Add num and scroll lock mask to VKeyToChar (#6211)
+* fix(linux): Properly compare versions in km-package-install (#6278)
+
 ## 15.0.201 alpha 2022-02-21
 
 * fix(developer): npm publish with correct tier (#6259)

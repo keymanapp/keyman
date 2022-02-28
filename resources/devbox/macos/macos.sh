@@ -144,11 +144,14 @@ which brew || (
 
 ## Install devchain components
 
-BREW_ALL="bash jq python3 meson ninja rustup-init coreutils"
-BREW_WEB="node emscripten wasm-pack openjdk@8"
+BREW_ALL="bash jq python3 meson ninja coreutils"
+BREW_WEB="node emscripten openjdk@8"
 BREW_IOS="swiftlint carthage"
 BREW_MACOS="carthage cocoapods"
 BREW_ANDROID="openjdk@8 android-sdk android-studio ant gradle maven"
+
+# Turn on verbosity
+set -x
 
 brew install $BREW_ALL
 $REQUIRE_ANDROID && brew install $BREW_ANDROID
@@ -163,10 +166,6 @@ $REQUIRE_SENTRYCLI && brew install getsentry/tools/sentry-cli
 $REQUIRE_KMCOMP && (
   brew tap homebrew/cask-versions
   brew install --cask --no-quarantine wine-stable
-)
-
-$REQUIRE_WEB && (
-    rustup-init -y -t wasm32-unknown-unknown
 )
 
 source "$THIS_DIR/keyman.macos.env.sh"
@@ -197,7 +196,10 @@ $REQUIRE_ANDROID && (
 # Add keyman.macos.env.sh to ~/.bashrc
 
 echo "Adding environment variables to ~/.bashrc..."
-if [ ! -f ~/.bashrc ] || `grep "keyman.macos.env.sh" ~/.bashrc 2>/dev/null`; then
+if [ -f ~/.bashrc ] && fgrep -q -s "keyman.macos.env.sh" ~/.bashrc; then
+    echo ~/.bashrc unchanged
+else
+    echo "# added by keyman/macos.sh" >> ~/.bashrc
     echo "source $THIS_DIR/keyman.macos.env.sh" >> ~/.bashrc
 fi
 
