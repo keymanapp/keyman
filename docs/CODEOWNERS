@@ -28,6 +28,6 @@
 # Web is currently shared between Marc and Joshua:
 /web/                         @jahorton     @ermshiperete   @mcdurdin
 
-/windows/src/                 @rc_swag      @sgschantz
+/windows/                     @rc_swag      @sgschantz
 # Override for windows/src:
 /windows/src/developer/       @mcdurdin     @darcywong00
