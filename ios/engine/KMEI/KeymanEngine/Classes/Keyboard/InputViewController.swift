@@ -295,17 +295,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
     
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
+    let selection = textDocumentProxy.selectedText ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
-    let context = "\(contextBeforeInput)\(contextAfterInput)"
-
-    let newRange: Range<String.Index>
-    if let range = context.range(of: contextBeforeInput) {
-      newRange = range.upperBound..<range.upperBound
-    } else {
-      newRange = context.startIndex..<context.startIndex
-    }
-
-    setContextState(text: context, range: NSRange(newRange, in: context))
+    let context = "\(contextBeforeInput)\(selection)\(contextAfterInput)"
+    let bLength = contextBeforeInput.utf16.count
+    let sLength = selection.utf16.count
+    setContextState(text: context, range: NSMakeRange(bLength, sLength))
     // Within the app, this is triggered after every keyboard input.
     // We should NOT call .resetContext() here for this reason.
   }
@@ -322,17 +317,19 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       isInputClickSoundEnabled = false
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
+    
+    var hasDeletedSelection = false
+    
+    if let selected = textDocumentProxy.selectedText {
+      if selected.count > 0 {
+        textDocumentProxy.deleteBackward()
+        hasDeletedSelection = true
+      }
+    }
 
-    if numCharsToDelete <= 0 {
+    if numCharsToDelete <= 0 || hasDeletedSelection {
       textDocumentProxy.insertText(newText)
 
-      // A full-context deletion will report numCharsToDelete == 0 and won't
-      // otherwise delete selected text.
-      if let selected = textDocumentProxy.selectedText {
-        if selected.count > 0 {
-          textDocumentProxy.deleteBackward()
-        }
-      }
       return
     }
 

@@ -1,0 +1,49 @@
+﻿c web_context_tests generated from template at 2022-02-10 13:12:25
+c with name "web_context_tests"
+store(&VERSION) '10.0'
+store(&NAME) 'web_context_tests'
+store(&COPYRIGHT) '© SIL International'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'web_context_tests.kvks'
+store(&LAYOUTFILE) 'web_context_tests.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+'abc' + 'd' > '!'
+
+c 'e' is not transformed
+
+c SMP tests
+
++ 'f' > '𐌀'
++ 'g' > '𐌁'
++ 'h' > '𐌂'
+'𐌀𐌁𐌂' + 'i' > '𐌙'
++ 'j' > '𐌈'
+
+c Mixed SMP + BMP tests
+
++ 'k' > '𐌰'
++ 'l' > 'B'
++ 'm' > '𐌲'
+'𐌰B𐌲' + 'n' > '𐌽'
++ 'o' > '𐍈'
+
+c 'p' always generates single char
+
++ 'p' > 'q'
+
+c 'q' is always untouched
+
+c other combos, mixing bmp and smp
+
++ 'r' > 'tuv'
++ 's' > '𐍈x'
++ 't' > '𐍈x𐌈'
++ 'u' > '𐍈𐌈𐌰'
++ 'v' > '𐍈𐌈x𐌰'
+
+c 'x' is always untouched

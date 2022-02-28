@@ -290,6 +290,7 @@ public final class KMManager {
   protected static final String KMFilename_JSEngine = "keymanandroid.js";
   protected static final String KMFilename_JSEngine_Sourcemap = "keyman.js.map";
   protected static final String KMFilename_JSSentry = "keyman-sentry.js";
+  protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
 
@@ -781,6 +782,7 @@ public final class KMManager {
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
+      copyAsset(context, KMFilename_AndroidHost, "", true);
       if(KMManager.isDebugMode()) {
         copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
       }
@@ -2681,17 +2683,24 @@ public final class KMManager {
             start = temp;
           }
 
-          if (dn <= 0) {
+          int deleteLeft = dn;
+
+          if(start != end && dn == 1 && s.length() == 0) {
+            /* Handle backspace with a selection: just delete selection */
+            deleteLeft = 0;
+          }
+
+          if (deleteLeft <= 0) {
             if (start == end) {
               if (s.length() > 0 && s.charAt(0) == '\n') {
                 textView.keyDownUp(KeyEvent.KEYCODE_ENTER);
-              } else {
-                // *** TO DO: Try to find a solution to the bug on API < 17, insert overwrites on next line
-                if (s.length() > 0) {
+              } else if (s.length() > 0) {
+                  // *** TO DO: Try to find a solution to the bug on API < 17, insert overwrites on next line
                   InAppKeyboardShouldIgnoreTextChange = true;
                   InAppKeyboardShouldIgnoreSelectionChange = true;
                   textView.getText().insert(start, s);
-                }
+              } else {
+                textView.getText().delete(start, end);
               }
             } else {
               if (s.length() > 0 && s.charAt(0) == '\n') {
@@ -2710,7 +2719,16 @@ public final class KMManager {
               }
             }
           } else {
-            for (int i = 0; i < dn; i++) {
+            if(start != end) {
+              // Delete the selection
+              InAppKeyboardShouldIgnoreTextChange = true;
+              InAppKeyboardShouldIgnoreSelectionChange = true;
+              textView.getText().delete(start, end);
+              textView.setSelection(start);
+              end = start;
+              deleteLeft = 0;
+            }
+            for (int i = 0; i < deleteLeft; i++) {
               CharSequence chars = textView.getText().subSequence(0, start);
               if (chars != null && chars.length() > 0) {
                 char c = chars.charAt(start - 1);
@@ -2734,6 +2752,8 @@ public final class KMManager {
             }
           }
 
+          // Collapse the selection
+          textView.setSelection(start + s.length());
           textView.endBatchEdit();
         }
       });
@@ -2787,6 +2807,7 @@ public final class KMManager {
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void insertText(final int dn, final String s, final int dr) {
+      // TODO: Unify in-app and system insertText
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -2811,11 +2832,19 @@ public final class KMManager {
 
           ic.beginBatchEdit();
 
+          int deleteLeft = dn;
+
           // Delete any existing selected text.
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
           if (icText != null) { // This can be null if the input connection becomes invalid.
             int start = icText.startOffset + icText.selectionStart;
             int end = icText.startOffset + icText.selectionEnd;
+            if (end < start) {
+              // Swap start/end for backward selection
+              int temp = start;
+              start = end;
+              end = temp;
+            }
             if (end > start) {
               if (s.length() == 0) {
                 ic.setSelection(start, start);
@@ -2827,6 +2856,10 @@ public final class KMManager {
                 ic.setSelection(start, start);
                 ic.deleteSurroundingText(0, end - start);
               }
+
+              // KeymanWeb tells us how to delete the selection, but we don't
+              // want to do that twice
+              deleteLeft = 0;
             }
           }
 
@@ -2837,8 +2870,8 @@ public final class KMManager {
           }
 
           // Perform left-deletions
-          if (dn > 0) {
-            performLeftDeletions(ic, dn);
+          if (deleteLeft > 0) {
+            performLeftDeletions(ic, deleteLeft);
           }
 
           // Perform right-deletions
@@ -2873,8 +2906,8 @@ public final class KMManager {
     }
 
     /*
-    // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
-    // instead of one code-point. See Chromium issue #1024738
+    // Chromium up until version M81 had a bug where deleteSurroundingText deletes an entire
+    // grapheme cluster instead of one code-point. See Chromium issue #1024738
     // https://bugs.chromium.org/p/chromium/issues/detail?id=1024738
     //
     // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
@@ -2892,7 +2925,17 @@ public final class KMManager {
         return;
       }
 
-      int numPairs = CharSequenceUtil.countSurrogatePairs(charsBackup, dn);
+      // Count the number of characters which are surrogate pairs
+      int index = lastIndex, dnx = dn, numPairs = 0;
+      while(index > 0 && dnx > 0) {
+        if(Character.isLowSurrogate(charsBackup.charAt(index)) &&
+            Character.isHighSurrogate(charsBackup.charAt(index-1))) {
+          numPairs++;
+          index--;
+        }
+        index--;
+        dnx--;
+      }
 
       // Chop dn+numPairs code points from the end of charsBackup
       // subSequence indices are start(inclusive) to end(exclusive)

@@ -17,10 +17,15 @@ namespace com.keyman.dom {
   }
 
   let headlessRuleBehaviorFinalize = text.RuleBehavior.prototype.finalize;
-  text.RuleBehavior.prototype.finalize = function(this: text.RuleBehavior, processor: text.KeyboardProcessor, outputTarget: text.OutputTarget) {
+  text.RuleBehavior.prototype.finalize = function(this: text.RuleBehavior, processor: text.KeyboardProcessor, outputTarget: text.OutputTarget, readonly: boolean) {
     let keyman = com.keyman.singleton;
     // Execute the standard baseline stuff first.
     headlessRuleBehaviorFinalize.call(this, processor);
+
+    // newContext and postKeystroke events cannot emit content
+    if(readonly) {
+      return;
+    }
 
     // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
     let ruleTransform = this.transcription.transform;

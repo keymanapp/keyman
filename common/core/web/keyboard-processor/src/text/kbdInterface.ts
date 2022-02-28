@@ -286,7 +286,8 @@ namespace com.keyman.text {
     private KC_(n: number, ln: number, outputTarget: OutputTarget): string {
       var tempContext = '';
 
-      tempContext = outputTarget.getTextBeforeCaret();
+      // If we have a selection, we have an empty context
+      tempContext = outputTarget.isSelectionEmpty() ? outputTarget.getTextBeforeCaret() : "";
 
       if(tempContext._kmwLength() < n) {
         tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
@@ -947,7 +948,13 @@ namespace com.keyman.text {
     }
 
     defaultBackspace(outputTarget: OutputTarget) {
-      this.output(1, outputTarget, "");
+      if(outputTarget.isSelectionEmpty()) {
+        // Delete the character left of the caret
+        this.output(1, outputTarget, "");
+      } else {
+        // Delete just the selection
+        this.output(0, outputTarget, "");
+      }
     }
 
     /**
@@ -962,7 +969,7 @@ namespace com.keyman.text {
       if(!this.activeKeyboard) {
         throw "No active keyboard for keystroke processing!";
       }
-      return this.process(this.activeKeyboard.processNewContextEvent.bind(this.activeKeyboard), outputTarget, keystroke);
+      return this.process(this.activeKeyboard.processNewContextEvent.bind(this.activeKeyboard), outputTarget, keystroke, true);
     }
 
     /**
@@ -977,7 +984,7 @@ namespace com.keyman.text {
       if(!this.activeKeyboard) {
         throw "No active keyboard for keystroke processing!";
       }
-      return this.process(this.activeKeyboard.processPostKeystroke.bind(this.activeKeyboard), outputTarget, keystroke);
+      return this.process(this.activeKeyboard.processPostKeystroke.bind(this.activeKeyboard), outputTarget, keystroke, true);
     }
 
     /**
@@ -992,10 +999,10 @@ namespace com.keyman.text {
       if(!this.activeKeyboard) {
         throw "No active keyboard for keystroke processing!";
       }
-      return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), outputTarget, keystroke);
+      return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), outputTarget, keystroke, false);
     }
 
-    private process(callee, outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+    private process(callee, outputTarget: OutputTarget, keystroke: KeyEvent, readonly: boolean): RuleBehavior {
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";
@@ -1011,7 +1018,7 @@ namespace com.keyman.text {
       this.resetContextCache();
 
       // Capture the initial state of the OutputTarget before any rules are matched.
-      let preInput = Mock.from(outputTarget);
+      let preInput = Mock.from(outputTarget, true);
 
       // Capture the initial state of any variable stores
       const cachedVariableStores = this.activeKeyboard.variableStores;
@@ -1029,7 +1036,7 @@ namespace com.keyman.text {
       this.activeTargetOutput = null;
 
       // Finalize the rule's results.
-      this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke);
+      this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke, readonly);
 
       // We always backup the changes to variable stores to the RuleBehavior, to
       // be applied during finalization, then restore them to the cached initial
