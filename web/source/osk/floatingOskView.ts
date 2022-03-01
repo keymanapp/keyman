@@ -77,7 +77,9 @@ namespace com.keyman.osk {
       // Add header element to OSK only for desktop browsers
       const layout = this.desktopLayout;
       layout.attachToView(this);
-      this.desktopLayout.titleBar.setTitleFromKeyboard(this.activeKeyboard);
+      if(this.activeKeyboard) {
+        this.desktopLayout.titleBar.setTitleFromKeyboard(this.activeKeyboard);
+      }
 
       if(this.vkbd) {
         this.footerView = layout.resizeBar;
@@ -517,7 +519,7 @@ namespace com.keyman.osk {
       }
 
       this.specifiedPosition = Px >= 0 || Py >= 0; //probably never happens, legacy support only
-      if(this.specifiedPosition) { 
+      if(this.specifiedPosition) {
         this.x = Px;
         this.y = Py;
       }
