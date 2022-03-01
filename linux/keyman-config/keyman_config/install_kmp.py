@@ -101,8 +101,8 @@ class InstallKmp():
         self.kmpdocdir = get_keyman_doc_dir(area, self.packageID)
         self.kmpfontdir = get_keyman_font_dir(area, self.packageID)
 
-        if not os.path.isdir(self.packageDir):
-            os.makedirs(self.packageDir)
+        if not self._safeMakeDirs(self.packageDir):
+            return
 
         if not os.path.isfile(inputfile):
             message = _("File {kmpfile} doesn't exist").format(kmpfile=inputfile)
@@ -133,19 +133,15 @@ class InstallKmp():
                 if ftype == KMFileTypes.KM_DOC or ftype == KMFileTypes.KM_IMAGE:
                     # Special handling of doc and images to hard link them into doc dir
                     logging.info("Installing %s as documentation", f['name'])
-                    if not os.path.isdir(self.kmpdocdir):
-                        os.makedirs(self.kmpdocdir)
-                    kmpdocpath = os.path.join(self.kmpdocdir, f['name'])
-                    if not os.path.isfile(kmpdocpath):
-                        os.link(fpath, kmpdocpath)
+                    if self._safeMakeDirs(self.kmpdocdir):
+                        kmpdocpath = os.path.join(self.kmpdocdir, f['name'])
+                        self._safeLinkFile(fpath, kmpdocpath)
                 elif ftype == KMFileTypes.KM_FONT:
                     # Special handling of font to hard link it into font dir
                     logging.info("Installing %s as font", f['name'])
-                    if not os.path.isdir(self.kmpfontdir):
-                        os.makedirs(self.kmpfontdir)
-                    fontpath = os.path.join(self.kmpfontdir, f['name'])
-                    if not os.path.isfile(fontpath):
-                        os.link(fpath, fontpath)
+                    if self._safeMakeDirs(self.kmpfontdir):
+                        fontpath = os.path.join(self.kmpfontdir, f['name'])
+                        self._safeLinkFile(fpath, fontpath)
                 elif ftype == KMFileTypes.KM_OSK:
                     # Special handling to convert kvk into LDML
                     logging.info("Converting %s to LDML and installing both as as keyman file",
@@ -182,6 +178,23 @@ class InstallKmp():
             message = _("No kmp.json or kmp.inf found in {packageFile}").format(
                 packageFile=inputfile)
             raise InstallError(InstallStatus.Abort, message)
+
+    def _safeMakeDirs(self, dir):
+        if not os.path.isdir(dir):
+            try:
+                os.makedirs(dir)
+            except NotADirectoryError:
+                logging.error("Can't create directory %s", dir)
+                return None
+        return dir
+
+    def _safeLinkFile(self, source, target):
+        if os.path.isfile(target):
+            return
+        if os.path.exists(target):
+            logging.error("Can't link file %s to %s - something exists at the target", source, target)
+            return
+        os.link(source, target)
 
     def _normalize_language(self, supportedLanguages, language):
         if len(supportedLanguages) <= 0:
