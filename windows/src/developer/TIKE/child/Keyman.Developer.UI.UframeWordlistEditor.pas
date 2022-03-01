@@ -210,6 +210,8 @@ procedure TframeWordlistEditor.gridWordlistSetEditText(Sender: TObject; ACol,
   ARow: Integer; const Value: string);
 var
   w: TWordlistWord;
+  TrimmedValue: string;
+  Frequency: Integer;
 begin
   if FSetup > 0 then Exit;
 
@@ -229,11 +231,13 @@ begin
     end
     else
     begin
+      TrimmedValue := Value.Trim;
+      Frequency := StrToIntDef(TrimmedValue.Replace(',', '', [rfReplaceAll]), 0);
       w := FWordlist.Word[ARow-1];
       case ACol of
-        0: if w.Word = Value then Exit else w.Word := Value;
-        1: if w.Frequency = StrToIntDef(Value, 0) then Exit else w.Frequency := StrToIntDef(Value, 0);
-        2: if w.Comment = Value then Exit else w.Comment := Value;
+        0: if w.Word = TrimmedValue then Exit else w.Word := TrimmedValue;
+        1: if w.Frequency = Frequency then Exit else w.Frequency := Frequency;
+        2: if w.Comment = TrimmedValue then Exit else w.Comment := TrimmedValue;
       end;
       FWordlist.Word[ARow-1] := w;
     end;
