@@ -21,12 +21,6 @@ object modActionsKeyboardEditor: TmodActionsKeyboardEditor
       OnExecute = actKeyboardIncludeDebugInformationExecute
       OnUpdate = actKeyboardIncludeDebugInformationUpdate
     end
-    object actKeyboardCreatePackage: TAction
-      Category = 'Keyboard'
-      Caption = 'Package for Distribution...'
-      ImageIndex = 40
-      OnExecute = actKeyboardCreatePackageExecute
-    end
     object actKeyboardInstall: TAction
       Category = 'Keyboard'
       Caption = '&Install...'

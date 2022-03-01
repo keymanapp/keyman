@@ -220,10 +220,8 @@ type
     CompileKeyboard1: TMenuItem;
     N28: TMenuItem;
     N29: TMenuItem;
-    N30: TMenuItem;
     IncludeDebugInformation1: TMenuItem;
     estKeyboard1: TMenuItem;
-    PackageforDistribution1: TMenuItem;
     Install1: TMenuItem;
     Uninstall1: TMenuItem;
     N31: TMenuItem;

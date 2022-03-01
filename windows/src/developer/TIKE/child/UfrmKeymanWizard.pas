@@ -241,7 +241,6 @@ type
     lblCompileTargetHeader: TLabel;
     cmdInstall: TButton;
     cmdUninstall: TButton;
-    cmdPackageForDistribution: TButton;
     panBuildKMW: TPanel;
     lblDebugHostCaption: TLabel;
     lblCrossPlatform: TLabel;

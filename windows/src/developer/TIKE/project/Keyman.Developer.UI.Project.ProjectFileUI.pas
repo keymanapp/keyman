@@ -33,7 +33,7 @@ uses
   TempFileManager;
 
 type
-  TProjectFileAction = (pfaCompile, pfaInstall, pfaUninstall, pfaDebug, pfaPackage, pfaEncrypt,
+  TProjectFileAction = (pfaCompile, pfaInstall, pfaUninstall, pfaDebug,
     pfaTestKeymanWeb, pfaCompileInstaller, pfaFontHelper, pfaFontDialog, pfaClean);   // I4057
 
   TProjectUI = class(TProject)

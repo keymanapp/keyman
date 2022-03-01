@@ -1116,9 +1116,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           object lblCompileTargetHeader: TLabel
             Left = 9
             Top = 6
-            Width = 219
+            Width = 247
             Height = 17
-            Caption = 'Windows and Mac OS X Targets'
+            Caption = 'Windows, macOS and Linux Targets'
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -14
@@ -1140,14 +1140,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Width = 152
             Height = 25
             Action = modActionsKeyboardEditor.actKeyboardUninstall
-            TabOrder = 2
-          end
-          object cmdPackageForDistribution: TButton
-            Left = 9
-            Top = 126
-            Width = 152
-            Height = 25
-            Action = modActionsKeyboardEditor.actKeyboardCreatePackage
             TabOrder = 1
           end
         end
