@@ -46,7 +46,7 @@ export class Configuration {
 
     // ngrok configuration
     this.useNgrok = cfg?.useNgrok ?? false;
-    this.ngrokBinPath = this.appDataPath + '../';
+    this.ngrokBinPath = this.appDataPath + 'bin/';
     this.ngrokControlPort = cfg?.ngrokControlPort ?? 8009;
     this.ngrokToken = cfg?.ngrokToken ?? '';
     this.ngrokRegion = cfg?.ngrokRegion ?? '';
