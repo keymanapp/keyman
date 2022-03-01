@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
 
         setContentView(R.layout.activity_main);
 
-        new FVShared(this);
+        FVShared.getInstance().initialize(this);
 
         FVShared.getInstance().upgradeTo12();
         FVShared.getInstance().upgradeTo14();

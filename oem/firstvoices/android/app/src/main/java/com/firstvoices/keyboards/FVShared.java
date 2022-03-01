@@ -27,6 +27,7 @@ import java.util.List;
 
 final class FVShared {
     private static FVShared instance = null;
+    private boolean isInitialized = false;
 
     private static final String FVLoadedKeyboardList = "loaded_keyboards.dat";
 
@@ -37,9 +38,14 @@ final class FVShared {
     private static final String FVUpgrade_KeyboardFilenameKey = "FVKeyboardFilename";
     private static final String FVUpgrade_KeyboardCheckStateKey = "FVKeyboardCheckState";
 
+    private Context context;
+    private FVRegionList regionList;
+    private FVLoadedKeyboardList loadedKeyboards;
+
     private static final String FVKeyboardHelpLink = "http://help.keyman.com/keyboard/";
 
     public static final String FVDefault_PackageID = "fv_all";
+    public static final String TAG = "FVShared";
 
     /// Describes a keyboard used in FirstVoices Keyboards
     static class FVKeyboard {
@@ -93,28 +99,30 @@ final class FVShared {
         }
     }
 
-    FVShared(Context context) {
-        // We only want a single instance
-        assert(instance == null);
-        instance = this;
+    public synchronized void initialize(Context context) {
+        if (isInitialized) {
+          Log.w(TAG, "initialize called multiple times");
+          return;
+        }
 
         this.context = context.getApplicationContext();
         this.regionList = loadRegionList();
         this.loadedKeyboards = loadLoadedKeyboardList();
+
+        isInitialized = true;
     }
 
-    private final Context context;
-    private final FVRegionList regionList;
-    private final FVLoadedKeyboardList loadedKeyboards;
-
-    static FVShared getInstance() {
-        // This 'singleton' requires initialization, so
-        // we cannot lazily instantiate.
-        assert(instance != null);
-        return instance;
+  /**
+   * @return get or create shared singleton instance.
+   */
+  public static FVShared getInstance() {
+    if (instance == null) {
+      instance = new FVShared();
     }
+    return instance;
+  }
 
-    private FVRegionList loadRegionList() {
+  private FVRegionList loadRegionList() {
         FVRegionList list = new FVRegionList();
         try {
             // At this point in initialization, fv_all.kmp hasn't been extracted, so
