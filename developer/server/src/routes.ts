@@ -6,6 +6,7 @@ import { data, DebugFont, DebugKeyboard, DebugModel, DebugObject, DebugPackage, 
 import apiGet from './handlers/api/debugobject/get';
 import apiRegister, { apiRegisterFile } from './handlers/api/debugobject/register';
 import apiKeyboardRegister from './handlers/api/keyboard/register';
+import apiFontRegister from './handlers/api/font/register';
 import apiUnregister from './handlers/api/debugobject/unregister';
 import handleIncPackagesJson from './handlers/inc/packages-json';
 import apiPackageRegister from './handlers/api/package/register';
@@ -96,12 +97,13 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
   appGetData(app, /\/data\/keyboard\/(.+)\.js$/, data.keyboards);
   appGetData(app, /\/data\/model\/(.+)\.model\.js$/, data.models);
   appGetData(app, /\/data\/package\/(.+)\.kmp$/, data.packages);
-  appGetData(app, /\/data\/font\/(.+)/, data.fonts);
+  appGetData(app, /\/data\/font\/(.+)\.ttf$/, data.fonts);
 
   app.get('/api/font', (req,res,next)=>apiGet(data.fonts,req,res,next));
   app.post('/api/font/register',
     upload.single('file'),
     (req,res,next)=>apiRegister(DebugFont, data.fonts, req, res, next),
+    apiFontRegister,
     saveState,
     (req,res,next)=>notifyClients(wsServer,req,res,next)
   );

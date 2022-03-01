@@ -1,5 +1,5 @@
 import express = require('express');
-import { DebugObject, isValidId } from "../../../data";
+import { DebugObject, isValidId, simplifyId } from "../../../data";
 import fs = require('fs');
 import crypto = require('crypto');
 import { configuration } from '../../../config';
@@ -20,6 +20,8 @@ export function apiRegisterFile<O extends DebugObject> (intf: new () => O, root:
   if(!isValidId(id)) {
     return false;
   }
+
+  id = simplifyId(id);
 
   let keys = Object.keys(root);
   if(keys.length > MAX_OBJECTS) {
