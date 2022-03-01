@@ -378,6 +378,7 @@ begin
       CloseBtnRect.Top := Rect.Top + 4;
       CloseBtnRect.Right := Rect.Right - 5;
       TabCaption.X := Rect.Left + 6;
+      Canvas.Brush.Color := $DAC379; // Keyman Light Blue
     end
     else
     begin

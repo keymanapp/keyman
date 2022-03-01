@@ -1,18 +1,18 @@
 (*
   Name:             LeftTabbedPageControl
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 May 2015
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 May 2015 - mcdurdin - I4693 - V9.0 - Fix crash when creating left tabbed page control without images
                     24 Jul 2015 - mcdurdin - I4796 - Refresh Keyman Developer look and feel for release
 *)
@@ -126,10 +126,11 @@ procedure TLeftTabbedPageControl.DrawTab(TabIndex: Integer; const Rect: TRect;
 begin
   TabIndex := GetPageIndexFromTabIndex(TabIndex);
 
-//  ARect := Rect;
-//  InflateRect(ARect, 4, 4);
-//  Canvas.Brush.Color := $c0c000;
-//  Canvas.FillRect(ARect);
+  if Active then
+  begin
+    Canvas.Brush.Color := $DAC379; // Keyman Light Blue
+    Canvas.FillRect(Rect);
+  end;
 
   if Images <> nil then   // I4693
     Images.Draw(Canvas,
