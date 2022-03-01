@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.204 alpha 2022-03-01
+
+* feat(android): Android web-based test harness (#6250)
+* fix(developer): server font support (#6298)
+* chore(windows): Remove core icon from system tray (#6302)
+
 ## 15.0.203 alpha 2022-02-26
 
 * chore(common): remove rust (for now!) (#6291)
