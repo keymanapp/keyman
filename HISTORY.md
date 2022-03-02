@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.1 alpha 2022-03-02
+
+* chore: move to 16.0 (#6318)
+
 ## 15.0.205 alpha 2022-03-02
 
 * fix(developer): move ngrok to Server/bin/ (#6304)
