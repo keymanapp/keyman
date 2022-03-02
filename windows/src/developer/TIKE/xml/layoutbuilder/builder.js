@@ -1423,45 +1423,39 @@ $(function () {
     }
   };
 
-  $('#inpKeyPadding').change(builder.wrapChange(function () {
+  const inpKeyPaddingChange = builder.wrapChange(function () {
     builder.selectedKey().data('pad', $(this).val())
                          .css('margin-left', $(this).val() + 'px');
-  }, {rescale: true}));
+  }, {rescale: true});
 
-  $('#inpKeyWidth').change(builder.wrapChange(function () {
+  $('#inpKeyPadding')
+    .change(inpKeyPaddingChange)
+    .on('input', inpKeyPaddingChange);
+
+  const inpKeyWidthChange = builder.wrapChange(function () {
     builder.selectedKey().data('width', $(this).val())
                          .css('width', parseInt($(this).val(), 10) * this.xscale + 'px');
-  }, {rescale: true}));
+  }, {rescale: true});
 
-  $('#inpKeyName').change(builder.wrapChange(function () {
+  $('#inpKeyWidth')
+    .change(inpKeyWidthChange)
+    .on('input', inpKeyWidthChange);
+
+  const inpKeyNameChange = builder.wrapChange(function () {
     builder.selectedKey().data('id', $(this).val());
     builder.updateKeyId(builder.selectedKey());
-  }, {saveOnce: true})).autocomplete({
-    source: builder.lookupKeyNames,
-    change: builder.wrapChange(function () {
-      builder.selectedKey().data('id', $(this).val());
-      builder.updateKeyId(builder.selectedKey());
-    }, {saveOnce: true})
-  }).keyup(builder.wrapChange(function () {
-    builder.selectedKey().data('id', $(this).val());
-    builder.updateKeyId(builder.selectedKey());
-  }, {saveOnce: true})).blur(function () {
-    builder.hasSavedKeyUndo = false;
-  });
+  }, {saveOnce: true});
 
-  this.updateSelectedKeyText = function (val) {
-    var k = builder.selectedKey();
-    $('.text', k).text(builder.renameSpecialKey(val));
-    k.data('text', val);
-
-    if(this.specialCharacters[val]) {
-      k.addClass('key-special-text');
-    } else {
-      k.removeClass('key-special-text');
-    }
-
-    builder.updateCharacterMap(val, false);
-  }
+  $('#inpKeyName')
+    .change(inpKeyNameChange)
+    .autocomplete({
+      source: builder.lookupKeyNames,
+      change: inpKeyNameChange
+    })
+    .on('input', inpKeyNameChange)
+    .blur(function () {
+      builder.hasSavedKeyUndo = false;
+    });
 
   this.updateCharacterMap = function (val, fromSubKey) {
     // Update character map
@@ -1480,25 +1474,37 @@ $(function () {
     }
   }
 
-  $('#inpKeyCap').change(builder.wrapChange(function () {
-    builder.updateSelectedKeyText($(this).val());
-  }, {saveOnce: true})).autocomplete({
-    source: builder.specialKeyNames,
-    change: builder.wrapChange(function () {
-      builder.updateSelectedKeyText($(this).val());
-    }, {saveOnce: true})
-  }).keyup(builder.wrapChange(function () {
-    builder.updateSelectedKeyText($(this).val());
-  }, {saveOnce: true})).mouseup(function () {
-    builder.updateCharacterMap($(this).val(), false);
-  }).focus(function () {
-    builder.updateCharacterMap($(this).val(), false);
-  }).blur(function () {
-    builder.hasSavedKeyUndo = false;
-  });
+  const inpKeyCapChange = builder.wrapChange(function (e) {
+    const val = $(this).val();
+    var k = builder.selectedKey();
+    $('.text', k).text(builder.renameSpecialKey(val));
+    k.data('text', val);
 
+    if(builder.specialCharacters[val]) {
+      k.addClass('key-special-text');
+    } else {
+      k.removeClass('key-special-text');
+    }
 
-  $('#selKeyType').change(builder.wrapChange(function () {
+    builder.updateCharacterMap(val, false);
+  }, {saveOnce: true});
+
+  $('#inpKeyCap')
+    .on('input', inpKeyCapChange)
+    .change(inpKeyCapChange)
+    .autocomplete({
+      source: builder.specialKeyNames,
+      change: inpKeyCapChange
+    })
+    .mouseup(function () {
+      builder.updateCharacterMap($(this).val(), false);
+    }).focus(function () {
+      builder.updateCharacterMap($(this).val(), false);
+    }).blur(function () {
+      builder.hasSavedKeyUndo = false;
+    });
+
+  const selKeyTypeChange = builder.wrapChange(function () {
     var sp = $(this).val();
     if (sp == 0) {
       builder.selectedKey().removeData('sp');
@@ -1506,20 +1512,26 @@ $(function () {
       builder.selectedKey().data('sp', $(this).val());
     }
     builder.formatKey(builder.selectedKey(), $(this).val());
-  }));
+  });
 
-  $('#selKeyNextLayer').change(builder.wrapChange(function () {
+  $('#selKeyType').change(selKeyTypeChange);
+
+  const selKeyNextLayerChange = builder.wrapChange(function () {
     $(this).val() === '' ?
       builder.selectedKey().removeData('nextlayer') :
       builder.selectedKey().data('nextlayer', $(this).val());
-  }));
+  });
 
-  $('#selKeyLayerOverride').change(builder.wrapChange(function () {
+  $('#selKeyNextLayer').change(selKeyNextLayerChange);
+
+  const selKeyLayerOverrideChange = builder.wrapChange(function () {
     $(this).val() === '' ?
       builder.selectedKey().removeData('layer') :
       builder.selectedKey().data('layer', $(this).val());
     builder.updateKeyId(builder.selectedKey());
-  }));
+  });
+
+  $('#selKeyLayerOverride').change(selKeyLayerOverrideChange);
 
   this.prepareKey = function () {
     builder.enableKeyControls();
@@ -1706,7 +1718,7 @@ $(function () {
 
   $('#inpSubKeyName')
     .change(subKeyNameChange)
-    .keyup(subKeyNameChange)
+    .on('input', subKeyNameChange)
     .autocomplete({
       source: builder.lookupKeyNames,
       change: subKeyNameChange
@@ -1724,37 +1736,43 @@ $(function () {
     builder.generateSubKeys();
   };
 
-  $('#inpSubKeyCap').change(builder.wrapChange(function () {
+  const inpSubKeyCapChange = builder.wrapChange(function () {
     builder.updateSubKeyCap($(this).val());
-  }, {saveOnce: true})).autocomplete({
-    source: builder.specialKeyNames,
-    change: builder.wrapChange(function () {
-      builder.updateSubKeyCap($(this).val());
-    }, {saveOnce: true})
-  }).keyup(builder.wrapChange(function () {
-    builder.updateSubKeyCap($(this).val());
-  },{saveOnce: true})).mouseup(function () {
-    builder.updateCharacterMap($(this).val(), false);
-  }).focus(function () {
-    builder.updateCharacterMap($(this).val(), false);
-  }).blur(function () {
-    builder.hasSavedSubKeyUndo = false;
-  });
+  }, {saveOnce: true});
 
-  $('#selSubKeyNextLayer').change(builder.wrapChange(function () {
+  $('#inpSubKeyCap')
+    .change(inpSubKeyCapChange)
+    .autocomplete({
+      source: builder.specialKeyNames,
+      change: inpSubKeyCapChange
+    })
+    .on('input', inpSubKeyCapChange)
+    .mouseup(function () {
+      builder.updateCharacterMap($(this).val(), false);
+    }).focus(function () {
+      builder.updateCharacterMap($(this).val(), false);
+    }).blur(function () {
+      builder.hasSavedSubKeyUndo = false;
+    });
+
+  const selSubKeyNextLayerChange = builder.wrapChange(function () {
     $(this).val() === '' ?
       builder.selectedSubKey().removeData('nextlayer') :
       builder.selectedSubKey().data('nextlayer', $(this).val());
     builder.generateSubKeys();
-  }));
+  });
 
-  $('#selSubKeyLayerOverride').change(builder.wrapChange(function () {
+  $('#selSubKeyNextLayer').change(selSubKeyNextLayerChange);
+
+  const selSubKeyLayerOverrideChange = builder.wrapChange(function () {
     $(this).val() === '' ?
       builder.selectedSubKey().removeData('layer') :
       builder.selectedSubKey().data('layer', $(this).val());
     builder.updateKeyId(builder.selectedSubKey());
     builder.generateSubKeys();
-  }));
+  });
+
+  $('#selSubKeyLayerOverride').change(selSubKeyLayerOverrideChange);
 
   $('#wedgeAddSubKeyLeft').click(builder.wrapChange(function () {
     builder.selectSubKey(builder.addKey('before-subkey', true));
@@ -1771,7 +1789,7 @@ $(function () {
     builder.generateSubKeys();
   }));
 
-  $('#selSubKeyType').change(builder.wrapChange(function () {
+  const selSubKeyTypeChange = builder.wrapChange(function () {
     var sp = $(this).val(), key = builder.selectedSubKey();
     if (key.length == 0) return;
     if (sp == 0) {
@@ -1781,7 +1799,9 @@ $(function () {
     }
     builder.formatKey(key, $(this).val());
     builder.generateSubKeys();
-  }));
+  });
+
+  $('#selSubKeyType').change(selSubKeyTypeChange);
 
   this.generate = function (display, force) {
     var json = JSON.stringify(KVKL, null, '  ');
