@@ -1,3 +1,8 @@
+/* Global Variables */
+
+let helpUrl = ''; // Will be updated when we retrieve the server API version
+let versionMajor = '15.0'; // will be updated from the server when we retrieve the server API version
+
 const ta1 = document.getElementById('ta1');
 
 const devices = {
@@ -32,6 +37,28 @@ keyman.init({
   attachType:'auto',
   setActiveOnRegister:false
 });
+
+/* Initialization */
+
+fetch('/api-public/version').
+  then(response => response.json()).
+  then(value => {
+    const versionMajorRx = /^(\d+\.\d+)/.exec(value.version);
+    versionMajor = versionMajorRx[1];
+    helpUrl = 'https://help.keyman.com/developer/'+versionMajor+'/context/server';
+    document.getElementById('about-version').innerText = value.version;
+    document.getElementById('about-help-link').href = helpUrl;
+    document.getElementById('keyman-developer-logo').title = 'Keyman Developer Server '+value.version;
+    if(!value.isApiAvailable) {
+      document.body.classList.add('disable-upload');
+    } else {
+      initDropArea();
+    }
+  });
+
+function isApiAvailable() {
+  return !document.body.classList.contains('disable-upload');
+}
 
 /* Dropdown menus */
 

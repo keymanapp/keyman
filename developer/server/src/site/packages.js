@@ -1,19 +1,11 @@
 const menuDropdown = new DropdownMenu('menu');
 let packages = null;
 let packagesJSON = null;
-let helpUrl = '';
-let versionMajor = '15.0'; // will be updated from the server below
 
-fetch('/api-public/version').
-  then(response => response.json()).
-  then(value => {
-    const versionMajorRx = /^(\d+\.\d+)/.exec(value.version);
-    versionMajor = versionMajorRx[1];
-    helpUrl = 'https://help.keyman.com/developer/'+versionMajor+'/context/server';
-    document.getElementById('about-version').innerText = value.version;
-    document.getElementById('about-help-link').href = helpUrl;
-    document.getElementById('keyman-developer-logo').title = 'Keyman Developer Server '+value.version;
-  });
+let menuDropdownElement = document.getElementById('dropdown-menu');
+menuDropdownElement.addEventListener('show.bs.dropdown', function () {
+  fillDropdownMenu(packages);
+});
 
 menuDropdown.onclick = (value) => {
   menuDropdown.set(''); // we never show an 'active' package
@@ -28,7 +20,7 @@ menuDropdown.onclick = (value) => {
       default:        href = 'https://keyman.com/downloads'; break;
     }
     location.href = href;
-  } else if(value == '#upload') {
+  } else if(value == '#upload' && isApiAvailable()) {
     document.getElementById('drop-file').click();
   } else if(value == '#help') {
     window.open(helpUrl);
@@ -47,10 +39,13 @@ function updatePackages(data) {
   packagesJSON = dataJSON;
   packages = data;
 
+  fillDropdownMenu(packages);
+}
+
+function fillDropdownMenu(data) {
   if(!data.packages) {
     return false;
   }
-
   menuDropdown.removeAll();
   menuDropdown.add('#install-keyman', 'Download and install Keyman');
   menuDropdown.addDivider();
@@ -58,8 +53,11 @@ function updatePackages(data) {
     let name = 'Install ' + (data.packages[i].name ? data.packages[i].name + ' (' + data.packages[i].filename + ')' : data.packages[i].filename);
     menuDropdown.add(data.packages[i].id, name);
   }
-  menuDropdown.addDivider();
-  menuDropdown.add('#upload', 'Upload file...');
+
+  if(isApiAvailable()) {
+    menuDropdown.addDivider();
+    menuDropdown.add('#upload', 'Upload file...');
+  }
   menuDropdown.addDivider();
   menuDropdown.add('#help', 'Help...');
   menuDropdown.add('#about', 'About Keyman Developer Server');

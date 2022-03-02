@@ -75,7 +75,7 @@ function showToast(message, type) {
   toast.show();
 }
 
-(function() {
+function initDropArea() {
   let dropArea = document.getElementById('drop-area');
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropArea.addEventListener(eventName, preventDefaults, false)
@@ -120,5 +120,4 @@ function showToast(message, type) {
     unhighlight(e);
     handleFiles(files);
   }
-
-})();
+}

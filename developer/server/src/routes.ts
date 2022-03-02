@@ -28,10 +28,15 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
     next();
   });
 
+  function isLocalhost(req: express.Request) {
+    return (
+      req.socket.remoteAddress == '127.0.0.1' ||
+      req.socket.remoteAddress == '::1' ||
+      req.socket.remoteAddress == '::ffff:127.0.0.1' // ipv4 localhost over ipv6
+    );
+  }
   function localhostOnly(req: express.Request, res: express.Response, next: express.NextFunction) {
-    if(req.socket.remoteAddress != '127.0.0.1' &&
-       req.socket.remoteAddress != '::1' &&
-       req.socket.remoteAddress != '::ffff:127.0.0.1') {  // ipv4 localhost over ipv6
+    if(!isLocalhost(req)) {
       res.sendStatus(401);
     } else {
       next();
@@ -86,7 +91,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
   app.get('/inc/packages.json', handleIncPackagesJson);
 
   app.get('/api-public/version', (req,res,next)=>{
-    res.json({version: environment.versionWithTag});
+    res.json({version: environment.versionWithTag, isApiAvailable: isLocalhost(req)});
     next();
   });
 
