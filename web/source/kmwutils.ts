@@ -613,6 +613,16 @@ namespace com.keyman {
      * @param   {string}  s   path to stylesheet file
      */
     linkStyleSheet(s: string): void {
+      try {
+        if(document.querySelector("link[href="+JSON.stringify(s)+"]") != null) {
+          // We've already linked this stylesheet, don't do it again
+          return;
+        }
+      } catch(e) {
+        // We've built an invalid href, somehow?
+        return;
+      }
+
       var headElements=document.getElementsByTagName('head');
       if(headElements.length > 0) {
         var linkElement=document.createElement('link');
