@@ -2,6 +2,24 @@
 
 ## 15.0.206 beta 2022-03-02
 
+* change(web): tightens call signature for banner selection (#4966)
+* fix(windows): cleanup edge cases in k32_load (#5197)
+* feat(ios): refinement of spacebar-captioning PR (#5368)
+* fix(developer): move ngrok to Server/bin/ (#6304)
+* fix(linux): Gracefully handle keyboard download failure (#6285)
+* fix(linux): Gracefully handle makedirs failures (#6287)
+* chore(common): tweak CODEOWNERS (#6305)
+* fix(developer): rename Code to ID in Touch Layout Editor (#6309)
+* feat(developer): kmcomp -h and -help (#6312)
+* chore(developer): remove Package for Distribution action (#6313)
+* fix(web): error in floating osk view when no keyboard active (#6316)
+* chore(developer): disable upload for server except localhost (#6300)
+* fix(ios): tweak simulator builds to support M1 (#6317)
+* fix(developer): handle paste event in touch layout editor (#6295)
+* fix(developer): Improve active tab visibility (#6314)
+* fix(developer): font for Package and Model Editors (#6311)
+* fix(web): stop repeated CSS injection (#6310)
+* feat(developer): support commas in frequency in wordlists (#6315)
 * chore: release to beta
 
 ## 15.0.204 alpha 2022-03-01
