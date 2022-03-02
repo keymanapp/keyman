@@ -2979,12 +2979,6 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object N29: TMenuItem
         Caption = '-'
       end
-      object PackageforDistribution1: TMenuItem
-        Action = modActionsKeyboardEditor.actKeyboardCreatePackage
-      end
-      object N30: TMenuItem
-        Caption = '-'
-      end
       object Install1: TMenuItem
         Action = modActionsKeyboardEditor.actKeyboardInstall
       end

@@ -325,8 +325,6 @@ type
   public
     function GetPack: TKPSFile;
 
-    procedure CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
-
     procedure NotifyStartedWebDebug;
 
     procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
@@ -597,7 +595,7 @@ procedure TfrmPackageEditor.cmdInsertCopyrightClick(Sender: TObject);
 begin
   Modified := True;
   editInfoCopyright.SelLength := 0;
-  editInfoCopyright.SelText := '©';
+  editInfoCopyright.SelText := 'ï¿½';
 end;
 
 procedure TfrmPackageEditor.editInfoAuthorChange(Sender: TObject);
@@ -1369,12 +1367,6 @@ begin
     lbDebugHosts.ItemIndex := 0;
   UpdateQRCode;
   EnableCompileTabControls;
-end;
-
-procedure TfrmPackageEditor.CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
-begin
-  if (FKMXFilename <> '') and FileExists(FKMXFilename) then AddFile(FKMXFilename);
-  if (FJSFilename <> '') and FileExists(FJSFilename) then AddFile(FJSFilename);
 end;
 
 {-------------------------------------------------------------------------------

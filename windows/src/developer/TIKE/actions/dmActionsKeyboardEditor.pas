@@ -48,7 +48,6 @@ type
     actionsKeyboardEditor: TActionList;
     actKeyboardCompile: TAction;
     actKeyboardIncludeDebugInformation: TAction;
-    actKeyboardCreatePackage: TAction;
     actKeyboardInstall: TAction;
     actKeyboardUninstall: TAction;
     actionsDebug: TActionList;
@@ -80,7 +79,6 @@ type
     procedure actionsKeyboardEditorUpdate(Action: TBasicAction;
       var Handled: Boolean);
     procedure actKeyboardIncludeDebugInformationExecute(Sender: TObject);
-    procedure actKeyboardCreatePackageExecute(Sender: TObject);
     procedure actDebugViewElementsExecute(Sender: TObject);
     procedure actDebugSetClearBreakpointExecute(Sender: TObject);
     procedure actDebugSetClearBreakpointUpdate(Sender: TObject);
@@ -480,11 +478,6 @@ begin
 
   frmKeymanDeveloper.mnuKeyboard.Visible := actKeyboardCompile.Enabled;
   frmKeymanDeveloper.mnuDebug.Visible := ActiveEditor <> nil;
-end;
-
-procedure TmodActionsKeyboardEditor.actKeyboardCreatePackageExecute(Sender: TObject);
-begin
-  (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaPackage, False);   // I4687
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardFontHelperExecute(
