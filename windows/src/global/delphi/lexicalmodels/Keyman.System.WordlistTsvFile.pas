@@ -148,7 +148,7 @@ begin
   else
   begin
     Word := StrToken(s, #9);
-    Frequency := StrToIntDef(StrToken(s, #9), 0);
+    Frequency := StrToIntDef(StrToken(s, #9).Replace(',','', [rfReplaceAll]), 0);
     Comment := s;
   end;
 end;

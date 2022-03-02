@@ -78,7 +78,8 @@ export function parseWordListFromContents(wordlist: WordList, contents: string):
  *  - column 1 (REQUIRED): the wordform: can have any character except tab, CR,
  *    LF. Surrounding whitespace characters are trimmed.
  *  - column 2 (optional): the count: a non-negative integer specifying how many
- *    times this entry has appeared in the corpus. Blank means 'indeterminate'.
+ *    times this entry has appeared in the corpus. Blank means 'indeterminate';
+ *    commas are permissible in the digits.
  *  - column 3 (optional): comment: an informative comment, ignored by the tool.
  *
  * @param wordlist word list to merge entries into (may have existing entries)
@@ -117,11 +118,11 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
 
     wordform = wordform.trim()
 
-    countText = (countText || '').trim();
+    countText = (countText || '').trim().replace(/,/g, '');
     let count = parseInt(countText, 10);
 
     // When parsing a decimal integer fails (e.g., blank or something else):
-    if (!isFinite(count)) {
+    if (!isFinite(count) || count < 0) {
       // TODO: is this the right thing to do?
       // Treat it like a hapax legonmenom -- it exist, but only once.
       count = 1;
