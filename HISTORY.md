@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.206 beta 2022-03-02
+
+* chore: release to beta
+
 ## 15.0.204 alpha 2022-03-01
 
 * feat(android): Android web-based test harness (#6250)
