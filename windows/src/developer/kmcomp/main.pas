@@ -182,6 +182,12 @@ begin
       FColorMode := cmForceColor
     else if s = '-no-color' then
       FColorMode := cmForceNoColor
+    else if (s = '-help') or (s = '-h') then
+    begin
+      // Force help
+      FParamInfile := '';
+      Break;
+    end
     else if FParamInfile = '' then FParamInfile := ParamStr(i)
     else if FParamOutfile = '' then FParamOutfile := ParamStr(i)
     else if FParamDebugfile = '' then FParamDebugfile := ParamStr(i)
@@ -192,7 +198,8 @@ begin
   if FUpdateInstaller and (FInstallerMSI = '') then
   begin
     writeln('Invalid arguments: -u cannot be specified if installer.msi is not.');
-    Halt(3);
+    ExitCode := 3;
+    Exit;
   end;
 
   if (not FSilent and not FNologo) or FError then   // I4706
@@ -220,6 +227,7 @@ begin
     writeln('          outfile.js    write a KeymanWeb file');
     writeln('          error.log     write to an error log; outfile must be specified');   // I4825
     writeln;
+    writeln('          -h, -help      print this help information');
     writeln('          -s             silent; don''t print information-level messages');
     writeln('          -ss            fully silent; don''t print anything (except fatal errors)');
     writeln('          -nologo        don''t print the compiler description');
@@ -244,7 +252,10 @@ begin
     writeln('          -schema-path    specify path to the keyboard_info json schema definitions');
     writeln('                          if not specified, then defaults to same folder as kmcomp.exe');
 
-    Halt(2);
+    if FError
+      then ExitCode := 2
+      else ExitCode := 0;
+    Exit;
   end;
 
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
