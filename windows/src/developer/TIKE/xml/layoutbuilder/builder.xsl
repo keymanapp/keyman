@@ -62,7 +62,7 @@
                   <option value='10'>Spacer</option>
                 </select>
                 <label for='selKeyLayerOverride'>Modifier:</label> <select id='selKeyLayerOverride'></select>
-                <label for='inpKeyName'>Code:</label> <input id='inpKeyName' type='text' size='16' maxlength='64' />
+                <label for='inpKeyName'>ID:</label> <input id='inpKeyName' type='text' size='16' maxlength='64' />
                 <input id='inpKeyCap' type='text' size='8' maxlength='16' />
                 <label for='inpKeyPadding'>Padding Left:</label>
                 <input id='inpKeyPadding' size='5' maxlength='5' />
@@ -89,7 +89,7 @@
                         <option value='10'>Spacer</option>
                     </select>
                     <label for='selSubKeyLayerOverride'>Modifier:</label> <select id='selSubKeyLayerOverride'></select>
-                    <label for='inpSubKeyName'>Code:</label> <input id='inpSubKeyName' type='text' size='16' maxlength='64' />
+                    <label for='inpSubKeyName'>ID:</label> <input id='inpSubKeyName' type='text' size='16' maxlength='64' />
                     <input id='inpSubKeyCap' type='text' size='8' maxlength='16' />
                     <label for='selSubKeyNextLayer'>Next Layer:</label> <select id='selSubKeyNextLayer'></select>
                     <br class='clear' />
