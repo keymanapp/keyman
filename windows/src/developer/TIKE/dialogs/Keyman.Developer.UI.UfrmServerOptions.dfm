@@ -4,7 +4,7 @@ object frmServerOptions: TfrmServerOptions
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Keyman Developer Server Options'
-  ClientHeight = 436
+  ClientHeight = 402
   ClientWidth = 433
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,11 +22,12 @@ object frmServerOptions: TfrmServerOptions
     Top = 96
     Width = 403
     Height = 39
+    AutoSize = False
     Caption = 
-      'ngrok is a service that allows you to temporarily share your loc' +
-      'al web debugger site with a public URL, so that you can access i' +
-      't from any device or share it with other users for testing your ' +
-      'keyboards, models and packages.'
+      'ngrok is a service that allows you to temporarily make your loca' +
+      'l Server instance public accessible, so that you can view it fro' +
+      'm any device or share it with other users for testing your keybo' +
+      'ards, models and packages.'
     WordWrap = True
   end
   object lblDefaultPort: TLabel
@@ -39,7 +40,7 @@ object frmServerOptions: TfrmServerOptions
   end
   object cmdOK: TButton
     Left = 272
-    Top = 403
+    Top = 367
     Width = 73
     Height = 25
     Caption = 'OK'
@@ -50,7 +51,7 @@ object frmServerOptions: TfrmServerOptions
   end
   object cmdCancel: TButton
     Left = 352
-    Top = 403
+    Top = 367
     Width = 73
     Height = 25
     Cancel = True
@@ -149,7 +150,7 @@ object frmServerOptions: TfrmServerOptions
     Left = 8
     Top = 300
     Width = 417
-    Height = 90
+    Height = 61
     Caption = 'Advanced Options'
     TabOrder = 4
     object chkServerShowConsoleWindow: TCheckBox
@@ -157,7 +158,7 @@ object frmServerOptions: TfrmServerOptions
       Top = 27
       Width = 257
       Height = 17
-      Caption = '&Show server console window on start'
+      Caption = '&Show Server console window on start'
       TabOrder = 0
     end
   end
@@ -172,9 +173,9 @@ object frmServerOptions: TfrmServerOptions
   object chkUseNgrok: TCheckBox
     Left = 8
     Top = 73
-    Width = 257
+    Width = 313
     Height = 17
-    Caption = 'Use &ngrok to provide public url for web debugger'
+    Caption = 'Use &ngrok to provide public url for Server'
     TabOrder = 2
   end
   object chkLeaveServerRunning: TCheckBox
@@ -182,7 +183,7 @@ object frmServerOptions: TfrmServerOptions
     Top = 43
     Width = 257
     Height = 17
-    Caption = '&Leave server running after closing IDE'
+    Caption = '&Leave Server running after closing IDE'
     TabOrder = 1
   end
 end

@@ -1,4 +1,4 @@
-(*
+﻿(*
   Name:             UfrmPackageEditor
   Copyright:        Copyright (C) SIL International.
   Documentation:
@@ -204,6 +204,9 @@ type
     cmdAddToProject: TButton;
     cmdBuildPackage: TButton;
     Label5: TLabel;
+    cmdConfigureWebDebugger: TButton;
+    cmdSendURLsToEmail: TButton;
+    cmdCopyDebuggerLink: TButton;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -264,6 +267,8 @@ type
     procedure cmdOpenSourceFolderClick(Sender: TObject);
     procedure cmdOpenBuildFolderClick(Sender: TObject);
     procedure cmdOpenProjectFolderClick(Sender: TObject);
+    procedure cmdSendURLsToEmailClick(Sender: TObject);
+    procedure cmdCopyDebuggerLinkClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -339,6 +344,8 @@ type
 implementation
 
 uses
+  Vcl.Clipbrd,
+
   Keyman.Developer.System.HelpTopics,
 
   CharMapDropTool,
@@ -363,6 +370,7 @@ uses
   utilsystem,
   UfrmMain,
   UfrmMessages,
+  UfrmSendURLsToEmail,
   utilexecute,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
   xmldoc;
@@ -439,6 +447,16 @@ begin
   begin
     frmMessages.Clear;
     DoAction(pfaCompileInstaller);
+  end;
+end;
+
+procedure TfrmPackageEditor.cmdCopyDebuggerLinkClick(Sender: TObject);
+begin
+  try
+    Clipboard.AsText := lbDebugHosts.Items[lbDebugHosts.ItemIndex];
+  except
+    on E:Exception do
+      ShowMessage(E.Message);
   end;
 end;
 
@@ -759,6 +777,18 @@ begin
     RefreshKeyboardList;
     RefreshLexicalModelList;
     Modified := True;
+  end;
+end;
+
+procedure TfrmPackageEditor.cmdSendURLsToEmailClick(Sender: TObject);
+begin
+  with TfrmSendURLsToEmail.Create(Application.MainForm) do
+  try
+    //TODO: KeyboardName := Self.FKeyboardParser.GetSystemStoreValue(ssName);
+    Hosts.Assign(lbDebugHosts.Items);
+    ShowModal;
+  finally
+    Free;
   end;
 end;
 

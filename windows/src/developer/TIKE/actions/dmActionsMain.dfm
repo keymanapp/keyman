@@ -479,7 +479,7 @@ object modActionsMain: TmodActionsMain
     end
     object actToolsWebCopyPublicUrl: TAction
       Category = 'Tools'
-      Caption = '&Copy to clipboard'
+      Caption = '&Copy URL to clipboard'
       OnExecute = actToolsWebCopyPublicUrlExecute
       OnUpdate = actToolsWebCopyPublicUrlUpdate
     end
