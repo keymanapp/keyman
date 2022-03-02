@@ -153,6 +153,9 @@ type
     function GetFileNameFilter: string; override;
     function GetDefaultExt: string; override;
 
+    procedure CodeFontChanged; override;
+    procedure CharFontChanged; override;
+
     function GetProjectFile: TProjectFile; override;
 
   public
@@ -855,6 +858,32 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure TfrmModelEditor.CodeFontChanged;
+var
+  i: Integer;
+begin
+  inherited;
+  // We always use the CodeFont for the source frame at present because it is
+  // a .ts file
+  frameSource.CharFont := CodeFont;
+  frameSource.CodeFont := CodeFont;
+  for i := 0 to wordlists.Count - 1 do
+    wordlists[i].Frame.CodeFont := CodeFont;
+end;
+
+procedure TfrmModelEditor.CharFontChanged;
+var
+  i: Integer;
+begin
+  inherited;
+  // We always use the CodeFont for the source frame at present because it is
+  // a .ts file
+  frameSource.CharFont := CodeFont;
+  frameSource.CodeFont := CodeFont;
+  for i := 0 to wordlists.Count - 1 do
+    wordlists[i].Frame.CharFont := CharFont;
 end;
 
 { TfrmModelEditor.TWordlist }

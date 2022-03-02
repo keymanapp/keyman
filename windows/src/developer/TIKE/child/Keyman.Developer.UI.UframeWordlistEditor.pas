@@ -48,6 +48,8 @@ type
     FModified: Boolean;
     FOnChanged: TNotifyEvent;
     FFilename: string;
+    FCodeFont: TFont;
+    FCharFont: TFont;
     procedure UpdateData;
     function MoveCodeToWordlist: Boolean;
     procedure FillCode;
@@ -57,6 +59,11 @@ type
     procedure FillGridNewRow;
     procedure EnableControls;
     procedure SetModified(const Value: Boolean);
+    procedure SetCharFont(const Value: TFont);
+    procedure SetCodeFont(const Value: TFont);
+    procedure CharCodeFontChanged(Sender: TObject);
+    procedure CharFontChanged;
+    procedure CodeFontChanged;
   protected
     function GetHelpTopic: string; override;
     function DoOpenFile: Boolean;
@@ -68,6 +75,9 @@ type
     property Filename: string read FFilename;
     property Modified: Boolean read FModified write SetModified;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
+
+    property CodeFont: TFont read FCodeFont write SetCodeFont;
+    property CharFont: TFont read FCharFont write SetCharFont;
   end;
 
 implementation
@@ -92,6 +102,11 @@ begin
   inherited;
   Inc(FSetup);
   try
+    FCharFont := TFont.Create;
+    FCharFont.OnChange := CharCodeFontChanged;
+    FCodeFont := TFont.Create;
+    FCodeFont.OnChange := CharCodeFontChanged;
+
     FWordlist := TWordlistTsvFile.Create;
     frameSource := TframeTextEditor.Create(Self);
     frameSource.Parent := pageCode;
@@ -118,12 +133,31 @@ procedure TframeWordlistEditor.FormDestroy(Sender: TObject);
 begin
   inherited;
   FWordlist.Free;
+  FreeAndNil(FCharFont);
+  FreeAndNil(FCodeFont);
 end;
 
 procedure TframeWordlistEditor.FormResize(Sender: TObject);
 begin
   inherited;
   gridWordlist.ColWidths[2] := gridWordlist.ClientWidth - ColWidth_Word - ColWidth_Frequency - 2;
+end;
+
+procedure TframeWordlistEditor.CharCodeFontChanged(Sender: TObject);
+begin
+  if Sender = FCharFont
+    then CharFontChanged
+    else CodeFontChanged;
+end;
+
+procedure TframeWordlistEditor.CharFontChanged;
+begin
+  // We always use the CharFont for the wordlist tsv
+  frameSource.CodeFont := CharFont;
+  frameSource.CharFont := CharFont;
+  gridWordlist.Font := CharFont;
+  gridWordlist.Canvas.Font := CharFont;
+  gridWordlist.DefaultRowHeight := gridWordlist.Canvas.TextHeight('A') + 2;
 end;
 
 procedure TframeWordlistEditor.cmdDeleteRowClick(Sender: TObject);
@@ -139,6 +173,13 @@ begin
   FWordlist.SortByFrequency;
   FillGrid;
   Modified := True;
+end;
+
+procedure TframeWordlistEditor.CodeFontChanged;
+begin
+  // We always use the CharFont for the wordlist tsv
+  frameSource.CodeFont := CharFont;
+  frameSource.CharFont := CharFont;
 end;
 
 function TframeWordlistEditor.DoOpenFile: Boolean;
@@ -188,6 +229,7 @@ var
   LText: string;
 begin
   inherited;
+  gridWordlist.Canvas.Font := CharFont;
   if ARow = gridWordlist.RowCount - 1 then
   begin
     // Drawing last row
@@ -290,6 +332,16 @@ function TframeWordlistEditor.SaveToFile(const Filename: string): Boolean;
 begin
   FFilename := Filename;
   Result := DoSaveFile;
+end;
+
+procedure TframeWordlistEditor.SetCharFont(const Value: TFont);
+begin
+  FCharFont.Assign(Value);
+end;
+
+procedure TframeWordlistEditor.SetCodeFont(const Value: TFont);
+begin
+  FCodeFont.Assign(Value);
 end;
 
 procedure TframeWordlistEditor.SetModified(const Value: Boolean);

@@ -1,18 +1,18 @@
 (*
   Name:             UfrmPackageEditor
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Support tab child format
                     23 Aug 2006 - mcdurdin - Rework UI with new Unicode controls
@@ -321,6 +321,9 @@ type
 
     procedure FocusTab;
     function GetProjectFile: TProjectFile; override;   // I4702
+
+    procedure CodeFontChanged; override;
+    procedure CharFontChanged; override;
 
   public
     function GetPack: TKPSFile;
@@ -1357,6 +1360,18 @@ begin
       Result := False;
     end;
   end;
+end;
+
+procedure TfrmPackageEditor.CodeFontChanged;
+begin
+  inherited;
+  frameSource.CodeFont := CodeFont;
+end;
+
+procedure TfrmPackageEditor.CharFontChanged;
+begin
+  inherited;
+  frameSource.CharFont := CharFont;
 end;
 
 procedure TfrmPackageEditor.NotifyStartedWebDebug;
