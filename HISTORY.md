@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.2 alpha 2022-03-03
+
+* chore(deps-dev): bump karma from 6.3.14 to 6.3.16 in /web/testing/regression-tests (#6322)
+
 ## 16.0.1 alpha 2022-03-02
 
 * chore: move to 16.0 (#6318)

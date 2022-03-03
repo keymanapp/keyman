@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/input-processor",
-  "version": "16.0.2",
+  "version": "16.0.3",
   "description": "The core text and prediction processing engine for KeymanWeb",
   "repository": {
     "type": "git",
@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@keymanapp/lexical-model-compiler": "^16.0.2",
-    "@keymanapp/resources-gosh": "^16.0.2",
+    "@keymanapp/lexical-model-compiler": "^16.0.3",
+    "@keymanapp/resources-gosh": "^16.0.3",
     "@types/node": "^11.9.4",
     "chai": "^4.3.4",
     "mocha": "^8.4.0",
@@ -34,11 +34,11 @@
     "mocha": "mocha"
   },
   "dependencies": {
-    "@keymanapp/keyboard-processor": "^16.0.2",
-    "@keymanapp/lexical-model-layer": "^16.0.2",
-    "@keymanapp/models-types": "^16.0.2",
-    "@keymanapp/web-environment": "^16.0.2",
-    "@keymanapp/web-utils": "^16.0.2",
+    "@keymanapp/keyboard-processor": "^16.0.3",
+    "@keymanapp/lexical-model-layer": "^16.0.3",
+    "@keymanapp/models-types": "^16.0.3",
+    "@keymanapp/web-environment": "^16.0.3",
+    "@keymanapp/web-utils": "^16.0.3",
     "eventemitter3": "^4.0.0"
   }
 }
