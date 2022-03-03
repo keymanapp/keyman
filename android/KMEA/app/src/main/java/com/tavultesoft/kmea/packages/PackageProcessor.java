@@ -182,15 +182,15 @@ public class PackageProcessor {
    */
   public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, ArrayList<String> languageList) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray(PP_LANGUAGES_KEY);
-    int preferredLanguageCount = (languageList != null & !languageList.isEmpty()) ? languageList.size() : 1;
+    int preferredLanguageCount = (languageList != null && !languageList.isEmpty()) ? languageList.size() : 1;
     String defaultLanguageID = languages.getJSONObject(0).getString("id");
     if (languageList == null || languageList.isEmpty()) {
       languageList = new ArrayList<String>();
       languageList.add(defaultLanguageID);
     }
 
-
     String keyboardId = jsonEntry.getString(PP_KEYBOARD_ID_KEY);
+    // Check that package has touch keyboards.
     if (touchKeyboardExists(packageId, keyboardId)) {
       HashMap<String, String>[] keyboards = new HashMap[preferredLanguageCount];
       boolean firstLanguageAdded = false;
@@ -561,7 +561,7 @@ public class PackageProcessor {
       File kmpFile = new File(packageId + ".kmp");
       File packageDir = constructPath(kmpFile, false);
       File[] files = packageDir.listFiles(touchKeyboardFilter);
-      if (files.length > 0) {
+      if (files != null && files.length > 0) {
         return true;
       }
     }

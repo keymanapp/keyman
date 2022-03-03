@@ -5,4 +5,4 @@ root = true
 indent_style = space
 
 [*.{java, sh, css, html, xml}]
-indent_size = 4
+indent_size = 2
