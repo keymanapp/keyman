@@ -72,7 +72,6 @@ type
     TntLabel1: TLabel;
     editDatabasePath: TEdit;
     dlgBrowseUnicodeData: TOpenDialog;
-    gbServer: TGroupBox;
     cmdSMTPSettings: TButton;
     chkOpenKeyboardFilesInSourceView: TCheckBox;
     cmdResetToolWindows: TButton;
@@ -102,6 +101,8 @@ type
     gbPrivacy: TGroupBox;
     chkReportUsage: TCheckBox;
     chkReportErrors: TCheckBox;
+    tabServer: TTabSheet;
+    gbServer: TGroupBox;
     chkListLocalURLs: TCheckBox;
     cmdConfigureServer: TButton;
     procedure FormCreate(Sender: TObject);
@@ -122,7 +123,7 @@ type
     function GetHelpTopic: string; override;
   public
     { Public declarations }
-    procedure FocusDebuggerTab;
+    procedure FocusServerTab;
   end;
 
 implementation
@@ -154,9 +155,9 @@ uses
 { General functions }
 
 
-procedure TfrmOptions.FocusDebuggerTab;
+procedure TfrmOptions.FocusServerTab;
 begin
-  pages.ActivePage := tabDebugger;
+  pages.ActivePage := tabServer;
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
