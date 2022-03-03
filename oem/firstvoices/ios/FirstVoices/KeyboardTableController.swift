@@ -28,8 +28,9 @@ protocol RefreshKeyboardCheckmark {
 class KeyboardTableController: UIViewController, RefreshKeyboardCheckmark {
   var settingsRepo = KeyboardSettingsRepository.shared
 
+  // TODO: cannot reload when outside view hierarchy
   func refreshCheckmark() {
-    self.tableView.reloadRows(at: [selectedKeyboardIndex], with: UITableView.RowAnimation.none)
+    self.rowToReload = self.selectedKeyboardIndex
   }
  
   @IBOutlet weak var tableView: UITableView!
@@ -45,6 +46,7 @@ class KeyboardTableController: UIViewController, RefreshKeyboardCheckmark {
       return _keyboardList!
     }
   }
+  private var rowToReload: IndexPath? = nil
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -53,6 +55,24 @@ class KeyboardTableController: UIViewController, RefreshKeyboardCheckmark {
     tableView.dataSource = self
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    self.navigationController!.isNavigationBarHidden = false
+  }
+
+  /*
+   * Needed to override to add the checkmark to the keyboard that has just been made active. Cannot call reloadRows before the view appears because it causes layout.
+   */
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    if(rowToReload != nil) {
+      let rows: [IndexPath] = [rowToReload!]
+      self.tableView.reloadRows(at: rows, with: UITableView.RowAnimation.none)
+      self.rowToReload = nil;
+    }
+
+  }
   /*
    * Segue to keyboard details screen.
    * Before the segue, call the details view controller and pass the state of the keyboard and
@@ -73,11 +93,6 @@ class KeyboardTableController: UIViewController, RefreshKeyboardCheckmark {
     }
   }
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    self.navigationController!.isNavigationBarHidden = false
-  }
-  
   // TODO: stop using deprecated openURL method when we upgrade to iOS 10 or later
   func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
     let keyboards: FVKeyboardList = (self.keyboardList[indexPath.section]).keyboards
@@ -125,11 +140,10 @@ extension KeyboardTableController: UITableViewDataSource, UITableViewDelegate {
     let keyboard = keyboards[indexPath.row]
     let keyboardState = settingsRepo.loadKeyboardState(keyboardId: keyboard.id)
     
-    //let cell = tableView.dequeueReusableCell(withIdentifier: "KeyboardCell") as! KeyboardCell
     let cell = tableView.dequeueReusableCell(withIdentifier: "KeyboardCell")
     cell!.textLabel!.text = keyboardState?.name
 
-    cell!.imageView?.isHidden = !keyboardState!.isEnabled
+    cell!.imageView?.isHidden = !keyboardState!.isActive
         
     return cell!
   }

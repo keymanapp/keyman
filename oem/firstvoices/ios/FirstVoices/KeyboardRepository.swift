@@ -83,26 +83,34 @@ class KeyboardRepository {
     return KeyboardRepository.shared.availableKeyboards[keyboardId]
   }
     
-  func installKeyboard(keyboard: FVKeyboardDefinition) {
+  func installKeyboard(keyboard: FVKeyboardDefinition) -> Bool {
+    var success = false
     if let keyboardsPackage = loadKeyboardPackage() {
       let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
       do {
         try ResourceFileManager.shared.install(resourceWithID: fullKeyboardId, from: keyboardsPackage)
         print("Installed keyboard \(keyboard.keyboardId)")
+        success = true
       } catch {
         print("Failed to load preload " + keyboard.keyboardId + ": " + error.localizedDescription)
-      }
+        success = true
+     }
     }
+    return success
   }
 
-  func removeKeyboard(keyboard: FVKeyboardDefinition) {
-      let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
+  func removeKeyboard(keyboard: FVKeyboardDefinition) -> Bool {
+    var success = false
+     let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
       let removed = Manager.shared.removeKeyboard(withFullID: fullKeyboardId)
     if (removed) {
         print("Removed keyboard \(keyboard.keyboardId)")
+        success = true
     } else {
       print("Could not remove keyboard \(keyboard.keyboardId)")
-    }
+      success = true
+   }
+    return success
   }
 
   // TODO: implement for debugging or delete

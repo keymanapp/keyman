@@ -386,7 +386,19 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return false
   }
-  
+
+  /*
+   * Called from FirstVoices app as a workaround to cause dictionary options to be applied.
+   */
+  public func registerLexicalModel(lexicalModelId: String, languageId: String) -> Bool {
+    let fullId = FullLexicalModelID(lexicalModelID: lexicalModelId, languageID: languageId)
+
+    if let lexicalModel = Storage.active.userDefaults.userLexicalModel(withFullID: fullId) {
+      return registerLexicalModel(lexicalModel)
+    }
+    return false
+  }
+
   /// Registers a lexical model with KMW.
   public func registerLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
     SentryManager.breadcrumbAndLog("Setting lexical model: \(lm.fullID)")

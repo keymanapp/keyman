@@ -51,35 +51,32 @@ class KeyboardSettingsRepository {
     if let state = savedKeyboards[keyboardId] {
       return state
     } else {
-        state = createDefaultKeyboardState(for: keyboardId, enabled: false)
+      state = createDefaultKeyboardState(for: keyboardId, isActive: false)
       }
       return state
   }
 
-  func createDefaultKeyboardState(for keyboardId: String, enabled: Bool) -> KeyboardState? {
+  func createDefaultKeyboardState(for keyboardId: String, isActive: Bool) -> KeyboardState? {
     if let keyboardDefinition = KeyboardRepository.shared.findKeyboardDefinition(for: keyboardId) {
       return KeyboardState(definition: keyboardDefinition,
-                                isEnabled: enabled,
-                                offerCorrections: false,
-                                offerPredictions: false,
-                                selectedDictionary: "")
+                           isActive: isActive)
     } else {
       return nil
     }
   }
 
-  func isKeyboardEnabled(keyboardId: String) -> Bool {
+  func isKeyboardActive(keyboardId: String) -> Bool {
     if let state = self.savedKeyboards[keyboardId] {
-      return state.isEnabled
+      return state.isActive
     } else {
         return false
     }
   }
   
-  func saveKeyboardState(keyboardId: String, enabled: Bool) {
+  func saveKeyboardState(keyboardId: String, active: Bool) {
     if let keyboardState = self.loadKeyboardState(keyboardId: keyboardId) {
-      if enabled {
-        keyboardState.isEnabled = enabled
+      if active {
+        keyboardState.isActive = active
         self.savedKeyboards[keyboardId] = keyboardState
     } else {
       // invalid keyboardId
@@ -95,7 +92,7 @@ class KeyboardSettingsRepository {
     
     if let keyboardIds = sharedData.array(forKey: FVConstants.kFVLoadedKeyboardList) as? [String] {
       for keyboardId in keyboardIds {
-        let keyboardState = createDefaultKeyboardState(for: keyboardId, enabled: true)
+        let keyboardState = createDefaultKeyboardState(for: keyboardId, isActive: true)
         keyboardsMap[keyboardId] = keyboardState
       }
     }
@@ -111,10 +108,11 @@ class KeyboardSettingsRepository {
 
 class KeyboardState {
   let definition: FVKeyboardDefinition
-  var isEnabled: Bool
+  var isActive: Bool
   var suggestCorrections: Bool
   var suggestPredictions: Bool
-  var selectedDictionary: String?
+  var lexicalModelName: String?
+  var lexicalModelId: String?
   var name: String {
       get {
         return definition.name
@@ -136,11 +134,53 @@ class KeyboardState {
       }
   }
 
-  internal init(definition: FVKeyboardDefinition, isEnabled: Bool, offerCorrections: Bool, offerPredictions: Bool, selectedDictionary: String?) {
+  internal init(definition: FVKeyboardDefinition, isActive: Bool) {
     self.definition = definition
-    self.isEnabled = isEnabled
-    self.suggestCorrections = offerCorrections
-    self.suggestPredictions = offerPredictions
-    self.selectedDictionary = selectedDictionary
+    self.isActive = isActive
+    self.suggestCorrections = false
+    self.suggestPredictions = false
+    self.lexicalModelName = ""
+    self.lexicalModelId = ""
+  }
+  
+  func selectDictionary(lexicalModel: FVLexicalModel) {
+    self.lexicalModelName = lexicalModel.name
+    self.lexicalModelId = lexicalModel.id
+    self.suggestPredictions = true
+    self.suggestCorrections = true
+  }
+  
+  func clearDictionary() {
+    self.lexicalModelName = ""
+    self.lexicalModelId = ""
+    self.suggestPredictions = false
+    self.suggestCorrections = false
+  }
+  
+  func updatePredictions(on: Bool) {
+    self.suggestPredictions = on
+    
+    // we cannot do corrections when predictions are off
+    if (!on) {
+      self.suggestCorrections = false
+    }
+  }
+  
+  func canSelectDictionary() -> Bool {
+    return self.isActive
+  }
+  
+  func isDictionarySelected() -> Bool {
+    return !(self.lexicalModelName ?? "").isEmpty
+  }
+  
+  // if a dictionary is selected the suggestPredictions option is available
+  func canSuggestPredictions() -> Bool {
+    return isDictionarySelected()
+  }
+  
+  // if the suggestPredictions option is active, then suggestCorrections is available
+  func canSuggestCorrections() -> Bool {
+    return self.canSuggestPredictions() && self.suggestPredictions
   }
 }

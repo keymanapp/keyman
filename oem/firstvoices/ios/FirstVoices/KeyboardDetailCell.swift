@@ -29,10 +29,25 @@ class KeyboardDetailCell: UITableViewCell {
     callback!(detailSwitch.isOn)
   }
   
-  func configure(label: String, enabled: Bool, callback: @escaping Callback) {
+  func configure(label: String, on: Bool, available: Bool, callback: @escaping Callback) {
     switchLabel.text = label
     self.title = label
     self.callback = callback
-    detailSwitch.setOn(enabled, animated: false)
+    detailSwitch.setOn(on, animated: false)
+    self.updateSwitchAvailability(available: available)
+  }
+  
+  func updateSwitchAvailability(available: Bool) {
+    if (available) {
+      detailSwitch.alpha = 1.0;
+    } else {
+      detailSwitch.alpha = 0.5;
+    }
+    detailSwitch.isEnabled = available
+  }
+
+  func updateSwitchState(on: Bool, animated: Bool, available: Bool) {
+    self.updateSwitchAvailability(available: available)
+    detailSwitch.setOn(on, animated: animated)
   }
 }
