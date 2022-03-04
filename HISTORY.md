@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.287 stable 2022-03-04
+
+* chore(ios): certificate update (#6210)
+* fix(windows): create Keyman/Diag folder in redirected profile (#6222)
+* fix(web): stop masking error (#6332)
+
 ## 14.0.286 stable 2022-01-27
 
 * chore(linux): Update changelogs for 14.0.284 (#6131)
