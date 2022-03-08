@@ -63,7 +63,6 @@ class ViewController: UIViewController, UIWebViewDelegate {
     let fragment: String? = request.url!.fragment
     if fragment?.range(of: "showKeyboards") != nil {
       self.performSegue(withIdentifier: "keyboardList", sender: nil)
- //     self.performSegue(withIdentifier: "Keyboards", sender: nil)
       return false
     }
     if navigationType == .linkClicked {

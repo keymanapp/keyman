@@ -14,7 +14,12 @@ import Foundation
 
 struct FVConstants {
   static let groupID: String = "group.FVKeyboards"
+  
+  // earlier format was an array of strings, if a keyboard was in the array it was active
   static let kFVLoadedKeyboardList: String = "FVLoadedKeyboardList"
+  
+  // updated format (2022) is Dictionary of KeyboardSettings structs  
+  static let kFVKeyboardSettingsMap: String = "FVKeyboardSettingsMap"
 
   // Legacy keys
   static let legacy_kFVKeyboardList = "FVKeyboardList"

@@ -28,8 +28,12 @@ protocol RefreshKeyboardCheckmark {
 class KeyboardTableController: UIViewController, RefreshKeyboardCheckmark {
   var settingsRepo = KeyboardSettingsRepository.shared
 
-  // TODO: cannot reload when outside view hierarchy
-  func refreshCheckmark() {
+/*
+ * mark the row to be reloaded after return segue -- it can be reloaded immediately
+ * when the state changes because it is outside the view hierachy until the user
+ * navigates back
+ */
+ func refreshCheckmark() {
     self.rowToReload = self.selectedKeyboardIndex
   }
  
@@ -134,7 +138,6 @@ extension KeyboardTableController: UITableViewDataSource, UITableViewDelegate {
     return self.keyboardList[section].keyboards.count
   }
   
-  // TODO: return empty cell if it cannot be dequeued
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let keyboards = (self.keyboardList[indexPath.section]).keyboards
     let keyboard = keyboards[indexPath.row]

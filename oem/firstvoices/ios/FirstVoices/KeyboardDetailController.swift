@@ -15,8 +15,8 @@
 import UIKit
 
 let keyboardsSection = 0
-let languageSettingsSection = 1
-let dictionarySection = 2
+let languageSettingsSection = 2
+let dictionarySection = 1
 let keyboardInfoSection = 3
 
 let keyboardsHeader = "Available Keyboards"
@@ -62,40 +62,14 @@ class KeyboardDetailController: UITableViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
-    // TODO: remove test code
-    examineUserDefaults()
   }
+  
   /*
-   * To help with debugging, check UserDefaults state upon entering view.
-   */
-  func examineUserDefaults() {
-    // get the dictionary
-    let sharedData: UserDefaults = FVShared.userDefaults()
-    var userDefaultsKey = "UserPredictionEnablementSettings";
-    if let settings = sharedData.dictionary(forKey: userDefaultsKey) as? [String : Bool] {
-      for (languageId, value) in settings {
-        print("current settings for \(userDefaultsKey), \(languageId) = \(value)")
-      }
-    }
-    userDefaultsKey = "UserCorrectionEnablementSettings";
-    if let settings = sharedData.dictionary(forKey: userDefaultsKey) as? [String : Bool] {
-      for (languageId, value) in settings {
-        print("current settings for \(userDefaultsKey), \(languageId) = \(value)")
-      }
-    }
-  }
-
-  /*
-   * Used to display the values for the keyboard that was tapped and caused the segue to the detail view.
+   * Used to display the values for the keyboard that was tapped, causing the segue to the detail view.
    */
   func configure(delegate: RefreshKeyboardCheckmark, keyboard: KeyboardState) {
     self.delegate = delegate
     self.keyboardState = keyboard
-  }
-  
-  func saveKeyboard() {
-    
   }
   
   override func numberOfSections(in tableView: UITableView) -> Int {
@@ -150,7 +124,6 @@ class KeyboardDetailController: UITableViewController {
           tableCell = configureCorrectionsSwitchCell()
        }
       case dictionarySection:
-        // TODO: number of dictionaries varies from zero to n
         if self.lexicalModels.isEmpty {
           tableCell = configureNoDictionaryCell()
         } else {
@@ -168,7 +141,7 @@ class KeyboardDetailController: UITableViewController {
   
   func configureKeyboardCell() -> UITableViewCell {
     let switchCell = tableView.dequeueReusableCell(withIdentifier: switchCellIdentifier) as! KeyboardDetailCell
-    let actionCallBack: Callback = { (on) in
+    let keyboardAction: Callback = { (on) in
       var updatedKeyboardState = false
       
       // call Keyman Engine to install or remove the keyboard
@@ -179,42 +152,44 @@ class KeyboardDetailController: UITableViewController {
       }
       
       if (updatedKeyboardState) {
-        // update local settings storage
-        self.settingsRepo.saveKeyboardState(keyboardId: self.keyboardState!.keyboardId, active: on)
+        // update state and write to local settings storage
+        self.keyboardState!.isActive = on
+        self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
 
         // update the on/off state of dependent switches
-        self.updateDictionarySettingsAvailability()
+        self.updateDictionarySettingsState(animated: true)
         self.delegate?.refreshCheckmark()
       }
     }
     switchCell.configure(label: (self.keyboardState?.name)!, on: self.keyboardState!.isActive, available: true,
-                         callback: actionCallBack)
+                         callback: keyboardAction)
     return switchCell
   }
 
   func configurePredictionsSwitchCell() -> UITableViewCell {
     let switchCell = tableView.dequeueReusableCell(withIdentifier: switchCellIdentifier) as! KeyboardDetailCell
-    let actionCallBack: Callback = { (on) in
+    let predictionAction: Callback = { (on) in
       if self.lexicalModelRepo.applyPredictionSettings(languageId: self.keyboardState!.languageTag, modelId: self.keyboardState!.lexicalModelId!, on: on) {
-        
         self.keyboardState!.updatePredictions(on: on)
-        self.updateDictionarySettingsState()
+        self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
+        self.updateDictionarySettingsState(animated: true)
       }
     }
     switchCell.configure(label: predictionLabel, on: self.keyboardState!.suggestPredictions, available: self.keyboardState!.canSuggestPredictions(),
-                         callback: actionCallBack)
+                         callback: predictionAction)
     return switchCell
   }
 
   func configureCorrectionsSwitchCell() -> UITableViewCell {
     let switchCell = tableView.dequeueReusableCell(withIdentifier: switchCellIdentifier) as! KeyboardDetailCell
-    let actionCallBack: Callback = { (on) in
+    let correctionAction: Callback = { (on) in
       if (self.lexicalModelRepo.applyCorrectionSettings(languageId: self.keyboardState!.languageTag, modelId: self.keyboardState!.lexicalModelId!, on: on)) {
         self.keyboardState?.suggestCorrections = on
+        self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
       }
     }
     switchCell.configure(label: correctionLabel, on: self.keyboardState!.suggestCorrections, available: self.keyboardState!.canSuggestCorrections(),
-                         callback: actionCallBack)
+                         callback: correctionAction)
     return switchCell
   }
 
@@ -226,17 +201,20 @@ class KeyboardDetailController: UITableViewController {
   
   func configureDictionaryCell(index: Int) -> UITableViewCell {
     let switchCell = tableView.dequeueReusableCell(withIdentifier: switchCellIdentifier) as! KeyboardDetailCell
-    // TODO: handle multiple dictionaries instead of getting first in array
-    // TODO: handle empty array
-    let lexicalModel = self.lexicalModels.first!
+
+    if (self.lexicalModels.isEmpty) {
+      print("error, invalid cell: there are no lexical models available for this langauge")
+      return configureNoDictionaryCell()
+    }
+    let thisDictionary = self.lexicalModels[index]
     
     let savedModel = (self.keyboardState?.lexicalModelName)!
-    let modelEnabled = lexicalModel.name.elementsEqual(savedModel)
+    let modelEnabled = thisDictionary.name == savedModel
 
-    let actionCallBack: Callback = { (on) in
+    let dictionaryAction: Callback = { (on) in
       if on {
-        let lexicalModelName = lexicalModel.name
-        let lexicalModelId = lexicalModel.id
+        let lexicalModelName = thisDictionary.name
+        let lexicalModelId = thisDictionary.id
         let message = "As you type in your language, the FirstVoices dictionary will provide suggestions.\n\nWould you like to install this dictionary?"
         let alert = UIAlertController(title: "\(lexicalModelName)", message: message, preferredStyle: .alert)
         
@@ -245,11 +223,12 @@ class KeyboardDetailController: UITableViewController {
           // install = download dictionary and set default settings
           let installed = self.lexicalModelRepo.installLexicalModel(keyboardState: self.keyboardState!, modelId: lexicalModelId)
           if (installed) {
-            self.keyboardState?.selectDictionary(lexicalModel: lexicalModel)
+            self.keyboardState?.selectDictionary(lexicalModel: thisDictionary)
+            self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
           }
 
           // update the state of dependent switches
-          self.updateDictionarySettingsState()
+          self.updateDictionarySettingsState(animated: true)
         })
         alert.addAction(installAction)
         
@@ -260,14 +239,15 @@ class KeyboardDetailController: UITableViewController {
         self.present(alert, animated: true, completion: nil)
       } else {
         self.keyboardState?.clearDictionary()
-        
+        self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
+
         // update the state of dependent switches
-        self.updateDictionarySettingsState()
+        self.updateDictionarySettingsState(animated: true)
       }
     }
 
-    switchCell.configure(label: self.lexicalModels.first!.name, on: modelEnabled,  available: self.keyboardState!.canSelectDictionary(),
-                         callback: actionCallBack)
+    switchCell.configure(label: thisDictionary.name, on: modelEnabled,  available: self.keyboardState!.canSelectDictionary(),
+                         callback: dictionaryAction)
     return switchCell
   }
 
@@ -291,36 +271,30 @@ class KeyboardDetailController: UITableViewController {
     }
   }
 
-  func updateDictionarySettingsState() {
+  func updateDictionarySettingsState(animated: Bool) {
+    let keyboardsIndex = IndexPath(row: keyboardsRow, section: keyboardsSection)
+    self.updateCellSwitchState(index: keyboardsIndex,
+                               on: self.keyboardState!.isActive,
+                               animated: animated,
+                               available: true)
+
     for rowNumber in 0...max(0, lexicalModels.count-1) {
       let dictionaryIndex = IndexPath(row: rowNumber, section: dictionarySection)
       self.updateCellSwitchState(index: dictionaryIndex,
                                  on: self.keyboardState!.isDictionarySelected(),
-                             animated: true,
+                             animated: animated,
                              available: self.keyboardState!.canSelectDictionary())
     }
     
     let predictionIndex = IndexPath(row: predictionsRow, section: languageSettingsSection)
     self.updateCellSwitchState(index: predictionIndex,
                                on: self.keyboardState!.suggestPredictions,
-                               animated: true,
+                               animated: animated,
                                available: self.keyboardState!.canSuggestPredictions())
     let correctionIndex = IndexPath(row: correctionsRow, section: languageSettingsSection)
     self.updateCellSwitchState(index: correctionIndex,
                                on: self.keyboardState!.suggestCorrections,
-                               animated: true,
+                               animated: animated,
                                available: self.keyboardState!.canSuggestCorrections())
-  }
-
-  func updateDictionarySettingsAvailability() {
-    for rowNumber in 0...max(0, lexicalModels.count-1) {
-      let dictionaryIndex = IndexPath(row: rowNumber, section: dictionarySection)
-      self.updateCellSwitchAvailability(index: dictionaryIndex, available: self.keyboardState!.canSelectDictionary())
-    }
-    
-    let predictionIndex = IndexPath(row: predictionsRow, section: languageSettingsSection)
-    self.updateCellSwitchAvailability(index: predictionIndex, available: self.keyboardState!.canSuggestPredictions())
-    let correctionIndex = IndexPath(row: correctionsRow, section: languageSettingsSection)
-    self.updateCellSwitchAvailability(index: correctionIndex, available: self.keyboardState!.canSuggestCorrections())
   }
 }

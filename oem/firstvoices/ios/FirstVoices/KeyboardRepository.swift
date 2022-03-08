@@ -112,11 +112,6 @@ class KeyboardRepository {
    }
     return success
   }
-
-  // TODO: implement for debugging or delete
-  func getPackageInfo () {
-    //ResourceFileManager.getInstalledPackage(<#T##self: ResourceFileManager##ResourceFileManager#>)
-  }
 }
 
 class FVKeyboardDefinition {

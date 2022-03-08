@@ -30,7 +30,8 @@ class KeyboardSettingsRepository {
   private var savedKeyboards: [String:KeyboardState] {
     get {
       if _savedKeyboards == nil {
-        _savedKeyboards = self.loadInstalledKeyboardsFromUserDefaults()
+        //_savedKeyboards = self.loadInstalledKeyboardsFromUserDefaults()
+        _savedKeyboards = self.loadKeyboardStateFromUserDefaults()
       }
       return _savedKeyboards!
     }
@@ -39,11 +40,10 @@ class KeyboardSettingsRepository {
     }
   }
 
-  // TODO: improve error handling
   /*
    * Attempts to load an existing keyboard state from storage.
-   * If it is not in storage, create a new default keyboard state object.
-   * If the keyboardId is not found, return nil.
+   * If it is not in storage, create a new default keyboard state or return nil if
+   * keyboard is not defined.
    */
   func loadKeyboardState(keyboardId: String) -> KeyboardState? {
     var state:KeyboardState? = nil;
@@ -56,6 +56,9 @@ class KeyboardSettingsRepository {
       return state
   }
 
+  /*
+   * Create a new default keyboard state object or nil if specified keyboard is not defined.
+   */
   func createDefaultKeyboardState(for keyboardId: String, isActive: Bool) -> KeyboardState? {
     if let keyboardDefinition = KeyboardRepository.shared.findKeyboardDefinition(for: keyboardId) {
       return KeyboardState(definition: keyboardDefinition,
@@ -64,46 +67,145 @@ class KeyboardSettingsRepository {
       return nil
     }
   }
+  
+  func saveKeyboardState(state: KeyboardState) {
+    // replace element of keyboard state map with updated one
+    self.savedKeyboards[state.keyboardId] = state
 
-  func isKeyboardActive(keyboardId: String) -> Bool {
-    if let state = self.savedKeyboards[keyboardId] {
-      return state.isActive
-    } else {
-        return false
-    }
+    // persist the entire map
+    self.saveKeyboardStateMapToSettingsMap()
   }
-  
-  func saveKeyboardState(keyboardId: String, active: Bool) {
-    if let keyboardState = self.loadKeyboardState(keyboardId: keyboardId) {
-      if active {
-        keyboardState.isActive = active
-        self.savedKeyboards[keyboardId] = keyboardState
-    } else {
-      // invalid keyboardId
-        self.savedKeyboards.removeValue(forKey: keyboardId)
-      }
-    }
-    self.saveKeyboardIdArrayToUserDefaults()
-  }
-  
-  func loadInstalledKeyboardsFromUserDefaults() -> [String:KeyboardState] {
+
+  /*
+   * Load persisted keyboard settings from UserDefaults.
+   * If new and old format of the settings exist, delete the old format.
+   */
+  func loadKeyboardStateFromUserDefaults() -> [String:KeyboardState] {
     var keyboardsMap: [String:KeyboardState] = [:]
     let sharedData: UserDefaults = FVShared.userDefaults()
     
-    if let keyboardIds = sharedData.array(forKey: FVConstants.kFVLoadedKeyboardList) as? [String] {
-      for keyboardId in keyboardIds {
-        let keyboardState = createDefaultKeyboardState(for: keyboardId, isActive: true)
-        keyboardsMap[keyboardId] = keyboardState
+    if let data = sharedData.data(forKey: FVConstants.kFVKeyboardSettingsMap) {
+      do {
+        let settingsMap = try JSONDecoder().decode([String:KeyboardSettings].self, from: data)
+         // if there is a keyboard settings map, then create a KeyboardState map from it
+         keyboardsMap = self.createKeyboardMapFromKeyboardSettings(settingsMap: settingsMap)
+      } catch  {
+         print(error)
+      }
+
+      // data is already in the latest format, so it is safe to remove old format, if it exists
+      if (sharedData.object(forKey: FVConstants.kFVLoadedKeyboardList) != nil) {
+        sharedData.removeObject(forKey: FVConstants.kFVLoadedKeyboardList)
       }
     }
+    else
+      if let keyboardIds = sharedData.array(forKey: FVConstants.kFVLoadedKeyboardList) as? [String] {
+      // else if the legacy String array is found, then build default settings objects for it
+      keyboardsMap = self.createKeyboardMapFromKeyboardNameArray(keyboardIds: keyboardIds)
+    }
+    else {
+      // else if no data is found in UserDefaults, then return an empty map
+      keyboardsMap = [:]
+    }
+
+    return keyboardsMap
+  }
+  
+  /*
+   * Convert the hashmap of KeyboardState objects into a hashmap of KeyboardSettings structs
+   * which can then be persisted to the UserDefaults.
+   */
+  func createSettingsMapFromKeyboardStateMap(keyboards: [String:KeyboardState]) -> [String:KeyboardSettings] {
+    var settingsMap: [String:KeyboardSettings] = [:]
+    
+    for (name, keyboard) in keyboards {
+      let settings  = KeyboardSettings(keyboardName: keyboard.name,
+                                       keyboardId: keyboard.keyboardId,
+                                       isActive: keyboard.isActive,
+                                       suggestCorrections: keyboard.suggestCorrections, suggestPredictions: keyboard.suggestPredictions, lexicalModelName: keyboard.lexicalModelName!, lexicalModelId: keyboard.lexicalModelId!)
+      settingsMap[name] = settings
+      }
+
+    return settingsMap
+  }
+ 
+  func createKeyboardState(for keyboardId: String, isActive: Bool) -> KeyboardState? {
+    if let keyboardDefinition = KeyboardRepository.shared.findKeyboardDefinition(for: keyboardId) {
+      
+      return KeyboardState(definition: keyboardDefinition,
+                           isActive: isActive)
+    } else {
+      return nil
+    }
+  }
+
+  /*
+   * used to convert map of KeyboardSettings to map of KeyboardState object
+   */
+  func createKeyboardMapFromKeyboardSettings(settingsMap: [String:KeyboardSettings]) -> [String:KeyboardState] {
+    var keyboardsMap: [String:KeyboardState] = [:]
+    
+    for (name, settings) in settingsMap {
+      if let keyboardState = createKeyboardState(for: name, isActive: settings.isActive) {
+        keyboardState.suggestCorrections = settings.suggestCorrections
+        keyboardState.suggestPredictions = settings.suggestPredictions
+        keyboardState.lexicalModelName = settings.lexicalModelName
+        keyboardState.lexicalModelId = settings.lexicalModelId
+        keyboardsMap[name] = keyboardState
+      }
+    }
+
     return keyboardsMap
   }
 
+  /*
+   * used to convert legacy format keyboard name array to keyboard map
+   */
+  func createKeyboardMapFromKeyboardNameArray(keyboardIds: [String]) -> [String:KeyboardState] {
+    var keyboardsMap: [String:KeyboardState] = [:]
+    
+    // the keyboard array contains only active keyboards
+    for keyboardId in keyboardIds {
+      let keyboardState = createDefaultKeyboardState(for: keyboardId, isActive: true)
+      keyboardsMap[keyboardId] = keyboardState
+    }
+    
+    return keyboardsMap
+  }
+
+  func saveKeyboardStateMapToSettingsMap() {
+    let settings:[String:KeyboardSettings] = createSettingsMapFromKeyboardStateMap(keyboards: self.savedKeyboards)
+    let sharedData: UserDefaults = FVShared.userDefaults()
+    guard let data = try? JSONEncoder().encode(settings) else { return }
+    sharedData.set(data, forKey: FVConstants.kFVKeyboardSettingsMap)
+  }
+  
+  // deprecated but retained in case of need to test with data saved in old format
   func saveKeyboardIdArrayToUserDefaults() {
     let sharedData: UserDefaults = FVShared.userDefaults()
     let keyboardIds: [String] = Array(savedKeyboards.keys)
     sharedData.set(keyboardIds, forKey: FVConstants.kFVLoadedKeyboardList)
   }
+}
+
+struct KeyboardSettings: Codable {
+  internal init(keyboardName: String, keyboardId: String, isActive: Bool, suggestCorrections: Bool, suggestPredictions: Bool, lexicalModelName: String, lexicalModelId: String) {
+    self.keyboardName = keyboardName
+    self.keyboardId = keyboardId
+    self.isActive = isActive
+    self.suggestCorrections = suggestCorrections
+    self.suggestPredictions = suggestPredictions
+    self.lexicalModelName = lexicalModelName
+    self.lexicalModelId = lexicalModelId
+  }
+  
+  let keyboardName: String
+  let keyboardId: String
+  let isActive: Bool
+  let suggestCorrections: Bool
+  let suggestPredictions: Bool
+  let lexicalModelName: String
+  let lexicalModelId: String
 }
 
 class KeyboardState {

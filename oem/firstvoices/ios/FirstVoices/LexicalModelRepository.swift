@@ -34,7 +34,6 @@ class LexicalModelRepository {
   func getAvailableLexicalModels(languageTag: String) -> [FVLexicalModel] {
     var modelArray: [FVLexicalModel] = []
     let keymanApiUrl: URL = URL.init(string: "\(LexicalModelRepository.keymanLexicalModelApiUrl)\(languageTag)")!
-    // UIApplication.shared.openURL(keymanApiUrl)
     
     do {
       let lexicalModelData = try Data(contentsOf: keymanApiUrl, options: NSData.ReadingOptions())
@@ -58,10 +57,28 @@ class LexicalModelRepository {
       }
       print(lexicalModelData)
     } catch {
-      // TODO: handle errors
         print(error)
     }
     
+    // TODO: delete commented-out test code when a keyboard with multiple dictionaries is available
+    /*
+    // test code for multi dictionary support since no real data exists for this
+    // add two fake dictionaries for single language
+    if (languageTag == "ikt-latn") {
+      var name = "northern dialect"
+      var modelId = "nrc.str.sencoten"
+      var packageUrl = "https://keyman.com/go/package/download/model/nrc.str.sencoten?version=1.0.5&update=1"
+      var version = "1.01"
+      var model = FVLexicalModel(name: name, id: modelId, packageUrl: packageUrl, languageTag: languageTag, version: version)
+      modelArray.append(model)
+      name = "southern dialect"
+      modelId = "nrc.str.sencoten"
+      packageUrl = "https://keyman.com/go/package/download/model/nrc.str.sencoten?version=1.0.5&update=1"
+      version = "1.03"
+      model = FVLexicalModel(name: name, id: modelId, packageUrl: packageUrl, languageTag: languageTag, version: version)
+      modelArray.append(model)
+    }
+     */
     return modelArray
   }
   
