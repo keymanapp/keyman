@@ -103,7 +103,7 @@ function triggerJenkinsBuild() {
   for line in "${jobs[@]}"; do
     if [[ $line == \"$JENKINS_JOB/$JENKINS_BRANCH* ]]; then
       echo "$line"
-      ((count++))
+      count=$((++count))
     fi
   done
   if [[ $count < 1 ]]; then
