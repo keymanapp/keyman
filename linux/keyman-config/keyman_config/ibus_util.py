@@ -80,6 +80,7 @@ def restart_ibus_subp():
 
 
 def _verify_ibus_daemon():
+    logging.info('**** Verify ibus running')
     realuser = os.environ.get('SUDO_USER')
     user = os.environ.get('USER')
     if realuser:
@@ -89,8 +90,11 @@ def _verify_ibus_daemon():
 
     try:
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
+        logging.info('**** running processes: %s', ps.decode('utf-8'))
         if not re.search('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE):
             _start_ibus_daemon(realuser)
+        else:
+            logging.info('ibus already running')
     except subprocess.CalledProcessError as e:
         # Log criticial error in order to track down #6237
         logging.critical('getting ibus-daemon failed (%s: %s)', type(e), e.args)
@@ -122,6 +126,7 @@ def restart_ibus(bus=None):
         logging.info('restarting IBus by subprocess for user %s', realuser)
         subprocess.run(['sudo', '-u', realuser, 'ibus', 'restart'])
     else:
+        logging.info('restarting IBus through API')
         try:
             if not bus:
                 bus = get_ibus_bus()
@@ -132,6 +137,7 @@ def restart_ibus(bus=None):
         except Exception as e:
             logging.warning("Failed to restart IBus")
             logging.warning(e)
+    # give ibus a chance to shutdown (#6237)
     time.sleep(1)  # 1s
     _verify_ibus_daemon()
 
