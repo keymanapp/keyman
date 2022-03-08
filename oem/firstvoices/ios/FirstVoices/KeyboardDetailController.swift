@@ -53,6 +53,7 @@ class KeyboardDetailController: UITableViewController {
     
   override func viewDidLoad() {
     super.viewDidLoad()
+    self.title = keyboardState?.name
 
     // get lexical models to display in dictionary section
     if let languageTag = self.keyboardState?.languageTag {

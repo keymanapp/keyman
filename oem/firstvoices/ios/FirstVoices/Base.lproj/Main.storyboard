@@ -19,7 +19,7 @@
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="switchCell" id="EEw-P3-Ezy" customClass="KeyboardDetailCell" customModule="FirstVoices" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="32" width="320" height="53.5"/>
+                                <rect key="frame" x="0.0" y="49.5" width="320" height="53.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="EEw-P3-Ezy" id="LiT-Kp-6MK">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="53.5"/>
@@ -55,7 +55,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="attributeCell" textLabel="hmb-Gy-LXm" detailTextLabel="4gY-nL-15E" style="IBUITableViewCellStyleValue1" id="XYb-N4-6xI">
-                                <rect key="frame" x="0.0" y="85.5" width="320" height="43.5"/>
+                                <rect key="frame" x="0.0" y="103" width="320" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="XYb-N4-6xI" id="jbc-l5-Yyr">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
@@ -79,7 +79,7 @@
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="labelCell" textLabel="Z7V-cv-wnS" style="IBUITableViewCellStyleDefault" id="U3s-AW-OmZ">
-                                <rect key="frame" x="0.0" y="129" width="320" height="43.5"/>
+                                <rect key="frame" x="0.0" y="146.5" width="320" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="U3s-AW-OmZ" id="nUv-LH-pRe">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
@@ -102,7 +102,7 @@
                             <outlet property="delegate" destination="5fY-SS-uGU" id="ppG-aC-Bm9"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="Ebu-fN-Orh"/>
+                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="Ebu-fN-Orh"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="auh-pZ-eI3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -221,7 +221,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="2cD-28-paa" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="5hZ-ha-bhO">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="96"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="102"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
