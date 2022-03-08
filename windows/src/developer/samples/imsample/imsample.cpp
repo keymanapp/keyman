@@ -71,12 +71,13 @@ LRESULT CALLBACK IMSampleChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 LRESULT CALLBACK IMSampleWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMReloadConfig(PSTR keyboardname);
 void WriteRegSetting(PSTR text, int value);
-int ReadRegSetting(PSTR text);
+int  ReadRegSetting(PSTR text);
+bool RegKeyExits(PSTR text);
 void UnloadRules(PSTR KeyboardName);
 BOOL LoadRules(PSTR KeyboardName);
 void DeleteKeyboard(PSTR keyboardname);
 void CreateKeyboard(PSTR keyboardname);
-
+void CreateRegistryKeys();
 
 /************************************************************************************************************
  * DLL entry functions
@@ -146,12 +147,13 @@ extern "C" BOOL __declspec(dllexport) WINAPI KeymanIMReloadConfig(PSTR keyboardn
 	curkbd = NULL;
 	FIMWindowActive = FALSE;
 
+  CreateRegistryKeys();
 	FIMWindowUse = ReadRegSetting("ShowIMWindow");
 	FIMWindowAlwaysVisible = ReadRegSetting("ShowIMWindowAlways");
 
 	if(!PrepIM()) return FALSE;
 
-	CreateKeyboard(keyboardname);
+  CreateKeyboard(keyboardname);
 	LoadRules(keyboardname);
 
 	if(!FIMWindowUse || !FIMWindowAlwaysVisible) (*KMHideIM)();
@@ -695,7 +697,25 @@ int ReadRegSetting(PSTR text)
 	return 0;
 }
 
+bool RegKeyExits(PSTR text)
+{
+	HKEY hkey;
+	bool result = false;
 
+  if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Keyman\\Keyman Engine\\Active Keyboards\\imsample",
+		0, KEY_ALL_ACCESS, &hkey) == ERROR_SUCCESS)
+	{
+		unsigned long value, sz = 4, tp = REG_DWORD;
+
+    if (RegQueryValueEx(hkey, text, 0, &tp, (PBYTE) &value, &sz) == ERROR_SUCCESS)
+    {
+      result = true;
+    }
+
+    RegCloseKey(hkey);
+	}
+	return result;
+}
 
 char *strtokquoted(char *str, char *token, char *quotes)
 { //slow-n-ugly but quick to write ;-)
@@ -1027,3 +1047,23 @@ void CreateKeyboard(PSTR keyboardname)
 	}
 }
 
+// Write default values if keys are not found
+void CreateRegistryKeys()
+{
+      if(!RegKeyExits("imsample x"))
+      {
+        WriteRegSetting("imsample x", 50);
+      }
+      if(!RegKeyExits("imsample y"))
+      {
+        WriteRegSetting("imsample y", 50);
+      }
+      if(!RegKeyExits("ShowIMWindow"))
+      {
+        WriteRegSetting("ShowIMWindow", 1);
+      }
+      if(!RegKeyExits("ShowIMWindowAlways"))
+      {
+        WriteRegSetting("ShowIMWindowAlways", 1);
+      }
+}
