@@ -9,12 +9,11 @@
   "devDependencies": {
     "@types/node": "^13.7.0",
     "@types/semver": "^7.1.0",
-    "@zeit/ncc": "^0.21.0",
     "semver": "^7.1.2",
     "ts-node": "^8.6.2"
   },
   "engines": {
-    "node": "12"
+    "node": "v16"
   },
   "files": [
     "dist",
@@ -27,11 +26,9 @@
   "repository": "https://github.com/keymanapp/auto-history-action",
   "scripts": {
     "build": "npm run clean:dist; npm run build:dist",
-    "build:dist": "ncc build src/index.ts --minify --source-map --v8-cache",
     "build:ts": "tsc --project tsconfig.production.json",
     "build:ts:watch": "tsc --project tsconfig.production.json --watch",
     "clean": "run-p clean:*",
-    "clean:dist": "rm -rf dist",
     "clean:lib": "rm -rf lib",
     "types": "tsc --noEmit"
   },
