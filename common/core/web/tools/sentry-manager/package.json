@@ -20,7 +20,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@keymanapp/web-environment": "file:../../../../../resources/web-environment",
+    "@keymanapp/web-environment": "^15.0.207",
     "@sentry/browser": "^5.27.4"
   }
 }

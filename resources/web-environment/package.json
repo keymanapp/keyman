@@ -17,6 +17,6 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "@keymanapp/resources-gosh": "file:../gosh"
+    "@keymanapp/resources-gosh": "^15.0.207"
   }
 }
