@@ -96,12 +96,20 @@ function triggerJenkinsBuild() {
   # Strip {"jobs":{ from the beginning of OUTPUT
   OUTPUT=${OUTPUT#\{\"jobs\":\{}
   # Split json string to lines with one job each
-  local jobs
+  local jobs count
+  count=0
   IFS='|' jobs=(${OUTPUT//\},\"pipeline/\},|\"pipeline})
   # Find job that actually got triggered (or that we should have triggered)
   for line in "${jobs[@]}"; do
     if [[ $line == \"$JENKINS_JOB/$JENKINS_BRANCH* ]]; then
       echo "$line"
+      ((count++))
     fi
   done
+  if [[ $count < 1 ]]; then
+    # DEBUG
+    echo -n $OUTPUT
+
+    echo
+  fi
 }
