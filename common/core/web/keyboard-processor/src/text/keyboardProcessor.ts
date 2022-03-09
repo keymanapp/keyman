@@ -184,9 +184,9 @@ namespace com.keyman.text {
 
     setSyntheticEventDefaults(Lkc: text.KeyEvent) {
       // Set the flags for the state keys.
-      Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
+      Lkc.Lstates |= Lkc.Lstates & Codes.modifierCodes['CAPS'] ? 0 : Codes.modifierCodes['NO_CAPS'];
+      Lkc.Lstates |= Lkc.Lstates & Codes.modifierCodes['NUM_LOCK'] ? 0 : Codes.modifierCodes['NO_NUM_LOCK'];
+      Lkc.Lstates |= Lkc.Lstates & Codes.modifierCodes['SCROLL_LOCK'] ? 0 : Codes.modifierCodes['NO_SCROLL_LOCK'];
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
       if(Lkc.kName && Lkc.kName.substr(0,2) == 'U_') {
@@ -731,11 +731,11 @@ namespace com.keyman.text {
       } else if(KeyboardProcessor.isModifier(Levent)) {
         // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
         this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
-        if(!Levent.device.touchable) {
+       if(!Levent.device.touchable) {
           return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
-        } else {
+       } else {
           return true;
-        }
+       }
       }
 
       if(Levent.LmodifierChange) {
