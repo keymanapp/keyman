@@ -54,7 +54,7 @@ if [ $FETCH_DEPS = true ]; then
 fi
 
 # Ensures that the lexical model compiler has been built locally.
-echo "${TERM_HEADING}Preparing Lexical Model Compiler for test use${NORMAL}"
+echo_heading "Preparing Lexical Model Compiler for test use"
 pushd $WORKING_DIRECTORY/node_modules/@keymanapp/lexical-model-compiler
 npm run build
 popd
