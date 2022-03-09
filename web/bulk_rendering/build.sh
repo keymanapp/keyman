@@ -1,5 +1,5 @@
 #! /bin/bash
-# 
+#
 # Compile the KeymanWeb bulk-renderer module for use with developing/running engine tests.
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -8,23 +8,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-# Fails the build if a specified file does not exist.
-assert ( ) {
-    if ! [ -f $1 ]; then
-        fail "Build failed."
-        exit 1
-    fi
-}
-
-fail() {
-    FAILURE_MSG="$1"
-    if [[ "$FAILURE_MSG" == "" ]]; then
-        FAILURE_MSG="Unknown failure"
-    fi
-    echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
-    exit 1
-}
 
 # Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
 verify_npm_setup

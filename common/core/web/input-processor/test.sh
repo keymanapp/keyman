@@ -75,5 +75,5 @@ if [ $FETCH_DEPS = true ]; then
 fi
 
 # Now we run our local tests.
-echo "${TERM_HEADING}Running Input Processor test suite${NORMAL}"
+echo_heading "Running Input Processor test suite"
 test-headless || fail "Input Processor tests failed!"
