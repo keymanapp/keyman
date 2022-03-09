@@ -213,9 +213,10 @@ class KeyboardDetailController: UITableViewController {
     let modelEnabled = thisDictionary.name == savedModel
 
     let dictionaryAction: Callback = { (on) in
+      let lexicalModelName = thisDictionary.name
+      let lexicalModelId = thisDictionary.id
+
       if on {
-        let lexicalModelName = thisDictionary.name
-        let lexicalModelId = thisDictionary.id
         let message = "As you type in your language, the FirstVoices dictionary will provide suggestions.\n\nWould you like to install this dictionary?"
         let alert = UIAlertController(title: "\(lexicalModelName)", message: message, preferredStyle: .alert)
         
@@ -239,11 +240,13 @@ class KeyboardDetailController: UITableViewController {
         alert.addAction(cancelAction)
         self.present(alert, animated: true, completion: nil)
       } else {
-        self.keyboardState?.clearDictionary()
-        self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
+        if self.lexicalModelRepo.disableLexicalModel(keyboardState: self.keyboardState!, modelId: lexicalModelId) {
+          self.keyboardState?.clearDictionary()
+          self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
 
-        // update the state of dependent switches
-        self.updateDictionarySettingsState(animated: true)
+          // update the state of dependent switches
+          self.updateDictionarySettingsState(animated: true)
+        }
       }
     }
 

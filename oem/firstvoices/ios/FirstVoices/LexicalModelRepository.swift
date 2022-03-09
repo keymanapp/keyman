@@ -94,6 +94,15 @@ class LexicalModelRepository {
     return self.applyLexicalModelSettings(languageId: keyboardState.languageTag, modelId: modelId)
   }
   
+  func disableLexicalModel(keyboardState: KeyboardState, modelId: String) -> Bool {
+    self.downloadModel(keyboardState: keyboardState, modelId: modelId)
+    
+    // call Keyman once after disabling both prediction and correction flags in UserDefaults
+    self.writePredictionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: false)
+    self.writeCorrectionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: false)
+    return self.applyLexicalModelSettings(languageId: keyboardState.languageTag, modelId: modelId)
+  }
+  
   func downloadModel(keyboardState: KeyboardState, modelId: String) {
     Manager.shared.downloadLexicalModel(withID: modelId, languageID: keyboardState.languageTag,
                         isUpdate: true, fetchRepositoryIfNeeded: true)
