@@ -182,8 +182,8 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     // The following two layouts/toggles will need to link with these objects.
     Context appContext = this.getApplicationContext();
     prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(lgCode), true);
-    boolean mayCorrect = prefs.getBoolean(KMManager.getLanguageCorrectionPreferenceKey(lgCode), true);
+    boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(lgCode), false);
+    boolean mayCorrect = prefs.getBoolean(KMManager.getLanguageCorrectionPreferenceKey(lgCode), false);
 
     layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
 

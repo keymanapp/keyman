@@ -2,6 +2,7 @@ package com.firstvoices.keyboards;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -254,13 +255,21 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         KMManager.KMDefault_LanguageID;
       boolean matchingModel = false;
 
+      SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      SharedPreferences.Editor editor = prefs.edit();
+
       for(int i=0; i<lexicalModelsInstalled.size(); i++) {
         HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
         if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
           matchingModel = true;
         }
         KMManager.addLexicalModel(this, lexicalModelInfo);
+
+        // Enable predictions and corrections toggles
+        editor.putBoolean(KMManager.getLanguagePredictionPreferenceKey(lexicalModelInfo.get(KMManager.KMKey_LanguageID)), true);
+        editor.putBoolean(KMManager.getLanguageCorrectionPreferenceKey(lexicalModelInfo.get(KMManager.KMKey_LanguageID)), true);
       }
+      editor.commit();
 
       // We're on the main thread, so if the active keyboard's language code matches,
       // let's register the associated lexical model.
