@@ -38,6 +38,8 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
+    logging.info('Keyman version %s %s', __versionwithtag__, __pkgversion__)
+
     if args.install:
         download_and_install_package(args.install)
     elif args.url:

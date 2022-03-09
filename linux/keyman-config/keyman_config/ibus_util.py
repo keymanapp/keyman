@@ -91,12 +91,16 @@ def _verify_ibus_daemon():
     try:
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
         logging.info('**** running processes: %s', ps.decode('utf-8'))
-        if not re.search('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE):
+        ibus_daemons = re.findall('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE)
+        if len(ibus_daemons) <= 0:
             _start_ibus_daemon(realuser)
+        elif len(ibus_daemons) > 1:
+            logging.error('More than one ibus-daemon instance running! Keyman keyboards might not work as expected. '
+                          'Please reboot your machine.')
         else:
             logging.info('ibus already running')
     except subprocess.CalledProcessError as e:
-        # Log criticial error in order to track down #6237
+        # Log critical error in order to track down #6237
         logging.critical('getting ibus-daemon failed (%s: %s)', type(e), e.args)
         _start_ibus_daemon(realuser)
 
