@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/list_toolbar" />
+  <include layout="@layout/list_toolbar" />
 
     <include
         android:id="@+id/keyboard_toggle"
@@ -24,43 +22,45 @@
         android:layout_marginBottom="0dp"
         android:orientation="vertical">
 
-        <View
-            android:id="@+id/separator"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="?attr/colorAccent" />
-
+        <!-- Enable predictions toggle -->
         <include
             android:id="@+id/predictions_toggle"
             layout="@layout/list_row_layout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <!-- Enable corrections toggle -->
         <include
             android:id="@+id/corrections_toggle"
             layout="@layout/list_row_layout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <TextView
+            android:id="@+id/model_label"
+            android:textColor="@color/firstvoices_red"
+            android:background="@android:color/transparent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/dictionaries"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Model picker -->
+        <include layout="@layout/list_layout"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"/>
+
+        <!-- Check for dictionaries online -->
         <include
-            android:id="@+id/model_picker"
-            layout="@layout/list_row_layout2"
+            android:id="@+id/check_model"
+            layout="@layout/list_row_layout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
     </LinearLayout>
-
-    <!-- Enable corrections toggle -->
-
-    <!-- Enable predictions toggle -->
-
-    <!-- Model picker -->
-
-    <!-- Model dictionary -->
-    <!-- Currently a placeholder
-    <include layout="@layout/list_row_layout1"
-        android:id="@+id/manage_dictionary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/model_picker"/> -->
 
 </RelativeLayout>

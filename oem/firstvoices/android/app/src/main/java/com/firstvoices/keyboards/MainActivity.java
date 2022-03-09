@@ -89,10 +89,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        /*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            webView.setWebContentsDebuggingEnabled(true);
-        }*/
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -204,30 +200,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
       // ensure onKeyboardDownloadFinished() gets called
     }
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-    */
-
     private static final class JSHandler {
         final private Context context;
 
@@ -281,13 +253,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         KMManager.getCurrentKeyboardInfo(this).getLanguageID() :
         KMManager.KMDefault_LanguageID;
       boolean matchingModel = false;
-      String lexicalModelName = "";
 
       for(int i=0; i<lexicalModelsInstalled.size(); i++) {
         HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
         if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
           matchingModel = true;
-          lexicalModelName = lexicalModelInfo.get(KMManager.KMKey_LexicalModelName);
         }
         KMManager.addLexicalModel(this, lexicalModelInfo);
       }
@@ -298,8 +268,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         KMManager.registerAssociatedLexicalModel(langId);
 
         // Update associated dictionary string if applicable
-        FVKeyboardSettingsActivity.setActiveLexicalModelLabel(lexicalModelName);
-
+        FVKeyboardSettingsActivity.notifyDataSetChanged();
+        //FVKeyboardSettingsActivity.updateDictionariesSection(context);
       }
 
     }
