@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
-    public static Context context;
+    public Context context;
 
     FVDownloadResultReceiver resultReceiver;
 
@@ -275,12 +275,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
       // let's register the associated lexical model.
       if(matchingModel) {
         KMManager.registerAssociatedLexicalModel(langId);
-
-        // Update associated dictionary string if applicable
-        FVKeyboardSettingsActivity.notifyDataSetChanged();
-        //FVKeyboardSettingsActivity.updateDictionariesSection(context);
       }
 
+      // Launch/refresh FV Keyboard Settings menu
+      FVKeyboardSettingsActivity.restartActivity();
     }
 
 }

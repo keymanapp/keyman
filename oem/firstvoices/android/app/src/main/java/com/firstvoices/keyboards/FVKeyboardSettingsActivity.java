@@ -3,6 +3,7 @@ package com.firstvoices.keyboards;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -46,7 +46,7 @@ import java.util.HashMap;
  * Displays an FV Keyboard enable and some lexical model switches.
  */
 public final class FVKeyboardSettingsActivity extends AppCompatActivity {
-  private Context context;
+  private static Context context = null;
   private static Toolbar toolbar = null;
   private static TextView fvKeyboardTextView = null;
   private static TextView fvVersionTextView = null;
@@ -57,6 +57,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
   private String associatedLexicalModel = "";
   private String lgCode;
   private static RelativeLayout checkModelLayout = null;
+  private static Bundle bundle = null;
   private static ListView listView = null;
   private String lgName;
   private String kbId;
@@ -119,7 +120,9 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     context = this;
     setContentView(R.layout.fv_keyboard_settings_list_layout);
 
-    Bundle bundle = getIntent().getExtras();
+    if (getIntent() != null && getIntent().getExtras() != null) {
+      bundle = getIntent().getExtras();
+    }
     if (bundle == null) {
       // Should never actually happen.
       KMLog.LogError(TAG, "Language data not specified for FVKeyboardSettingsActivity!");
@@ -152,7 +155,6 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
 
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
-    int actionBarHeight = toolbar.getLayoutParams().height;
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -376,8 +378,12 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     if (listAdapter != null) {
       listAdapter.notifyDataSetChanged();
     }
+  }
 
-    //updateDictionariesSection();
+  public static void restartActivity() {
+    if (context != null) {
+      ((Activity)context).recreate();
+    }
   }
 
   @Override
