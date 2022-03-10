@@ -457,9 +457,8 @@ namespace com.keyman.osk {
      */
     private getInteractiveBoundingRect(): BoundingRect {
       // Determine the important geometric values involved
-      const _Box = this.element.offsetParent as HTMLElement;
-      let oskX = this.element.offsetLeft + (_Box?.offsetLeft || 0);
-      let oskY = this.element.offsetTop + (_Box?.offsetTop || 0);
+      let oskX = dom.Utils.getAbsoluteX(this.element);
+      let oskY = dom.Utils.getAbsoluteY(this.element);
 
       // Determine the out-of-bounds threshold at which touch-cancellation should automatically occur.
       // Assuming square key-squares, we'll use 1/3 the height of a row for bounds detection
@@ -475,15 +474,6 @@ namespace com.keyman.osk {
         top: oskY - buffer,
         bottom: oskY + this.height + buffer
       };
-
-      // If the OSK is using fixed positioning (thus, viewport-relative), we need to
-      // convert the 'clientX'-like values into 'pageX'-like values.
-      if (this.usesFixedPositioning) {
-        boundingRect.left += window.pageXOffset;
-        boundingRect.right += window.pageXOffset;
-        boundingRect.top += window.pageYOffset;
-        boundingRect.bottom += window.pageYOffset;
-      }
 
       return boundingRect;
     }
