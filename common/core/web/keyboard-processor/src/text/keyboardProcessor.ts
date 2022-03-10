@@ -184,9 +184,9 @@ namespace com.keyman.text {
 
     setSyntheticEventDefaults(Lkc: text.KeyEvent) {
       // Set the flags for the state keys.
-      Lkc.Lstates |= Lkc.Lstates & Codes.modifierCodes['CAPS'] ? 0 : Codes.modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= Lkc.Lstates & Codes.modifierCodes['NUM_LOCK'] ? 0 : Codes.modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= Lkc.Lstates & Codes.modifierCodes['SCROLL_LOCK'] ? 0 : Codes.modifierCodes['NO_SCROLL_LOCK'];
+      Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
+      Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
+      Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
       if(Lkc.kName && Lkc.kName.substr(0,2) == 'U_') {
@@ -421,16 +421,14 @@ namespace com.keyman.text {
      * Function     _UpdateVKShift
      * Scope        Private
      * @param       {Object}            e     OSK event
-     * @param       {number}            v     keyboard shift state
-     * @param       {(boolean|number)}  d     set (1) or clear(0) shift state bits
      * @return      {boolean}                 Always true
      * Description  Updates the current shift state within KMW, updating the OSK's visualization thereof.
      */
-    _UpdateVKShift(e: KeyEvent, v: number, d: boolean|number): boolean {
-      var keyShiftState=0, lockStates=0, i;
+    _UpdateVKShift(e: KeyEvent): boolean {
+      let keyShiftState=0;
 
-      var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
-      var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+      const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
+      const lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
 
       if(!this.activeKeyboard) {
         return true;
@@ -439,7 +437,6 @@ namespace com.keyman.text {
       if(e) {
         // read shift states from Pevent
         keyShiftState = e.Lmodifiers;
-        lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
         if(this.activeKeyboard.isChiral && (this.activeKeyboard.emulatesAltGr) &&
@@ -448,25 +445,10 @@ namespace com.keyman.text {
           keyShiftState &= ~Codes.modifierCodes['RALT'];
         }
 
-        for(i=0; i < lockNames.length; i++) {
-          if(lockStates & Codes.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = !!(lockStates & Codes.modifierCodes[lockNames[i]]);
-          }
-        }
-      } else if(d) {
-        keyShiftState |= v;
-
-        for(i=0; i < lockNames.length; i++) {
-          if(v & Codes.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = true;
-          }
-        }
-      } else {
-        keyShiftState &= ~v;
-
-        for(i=0; i < lockNames.length; i++) {
-          if(v & Codes.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = false;
+        // Set stateKeys where corresponding value is passed in e.Lstates
+        for(let i=0; i < lockNames.length; i++) {
+          if(e.Lstates & Codes.stateBitmasks[lockNames[i]]) {
+            this.stateKeys[lockKeys[i]] = !!(e.Lstates & Codes.modifierCodes[lockNames[i]]);
           }
         }
       }
@@ -700,6 +682,13 @@ namespace com.keyman.text {
         this.layerId = 'default';
       }
 
+      if(keyEvent.device.formFactor != utils.FormFactor.Desktop) {
+        // The caps layer works slightly differently on touch than on desktop.
+        // It's a single layer with no ability to mix with other modifiers
+        // We need to make sure that the state is kept in sync with the layer.
+        this.stateKeys['K_CAPS'] = this.layerId == 'caps';
+      }
+
       let baseModifierState = text.KeyboardProcessor.getModifierState(this.layerId);
       this.modStateFlags = baseModifierState | keyEvent.Lstates;
     }
@@ -732,7 +721,7 @@ namespace com.keyman.text {
         // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
         this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
        if(!Levent.device.touchable) {
-          return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
+          return this._UpdateVKShift(Levent); // I2187
        } else {
           return true;
        }
@@ -740,7 +729,7 @@ namespace com.keyman.text {
 
       if(Levent.LmodifierChange) {
         this.activeKeyboard.notify(0, outputTarget, 1);
-        this._UpdateVKShift(Levent, 0, 1);
+        this._UpdateVKShift(Levent);
       }
 
       // No modifier keypresses detected.
@@ -751,7 +740,7 @@ namespace com.keyman.text {
       this.layerId = 'default';
 
       this.keyboardInterface.resetContextCache();
-      this._UpdateVKShift(null, 15, 0);
+      this._UpdateVKShift(null);
     };
 
     setNumericLayer(device: utils.DeviceSpec) {
