@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.211 beta 2022-03-10
+
+* fix(oem/fv/android): Check keyboard exists before registering a model (#6346)
+* chore(common): cleanup sh global color variables (#6353)
+
 ## 15.0.210 beta 2022-03-10
 
 * feat(common): build test keyboards via script (#6352)
