@@ -718,13 +718,13 @@ namespace com.keyman.text {
         // I3318 (always clear deadkeys after backspace)
         outputTarget.deadkeys().clear();
       } else if(KeyboardProcessor.isModifier(Levent)) {
-        // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
         this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
-       if(!Levent.device.touchable) {
+        // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
+        if(!Levent.device.touchable) {
           return this._UpdateVKShift(Levent); // I2187
-       } else {
+        } else {
           return true;
-       }
+        }
       }
 
       if(Levent.LmodifierChange) {
