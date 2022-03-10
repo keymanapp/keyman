@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.210 beta 2022-03-10
+
+* feat(common): build test keyboards via script (#6352)
+
 ## 15.0.209 beta 2022-03-08
 
 * fix(windows): add null pointer checks imsample keyboard (#6187)
