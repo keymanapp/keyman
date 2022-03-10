@@ -2103,7 +2103,7 @@ public final class KMManager {
    * Return if the lock screen is locked (prevents keyboard picker menu from being displayed)
    * @return boolean
    */
-  public static boolean isLocked() {
+  private static boolean isLocked() {
     KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
     // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
     return keyguardManager.isKeyguardLocked();
@@ -2114,7 +2114,7 @@ public final class KMManager {
    * @param globeKeyDown boolean if the globe key state is GLOBE_KEY_STATE_DOWN
    * @param keyboardType KeyboardType KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
    */
-  private static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
+  public static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
     // Update globeKeyState
     if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
       globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;

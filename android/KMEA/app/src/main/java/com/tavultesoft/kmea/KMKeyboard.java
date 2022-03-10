@@ -189,11 +189,8 @@ final class KMKeyboard extends WebView {
           showSubKeys(context);
           return;
         } else if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
-          // Shortcut to keyboard picker menu (Ignore if system keyboard on lock screen)
-          // Do we need to make KMManager.doGlobeKeyLongpressAction() public?
-          if ((keyboardType != KeyboardType.KEYBOARD_TYPE_SYSTEM) || !KMManager.isLocked()) {
-            KMManager.showKeyboardPicker(context, keyboardType);
-          }
+          KMManager.setGlobeKeyState(KMManager.GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS);
+          KMManager.handleGlobeKeyAction(context, true, keyboardType);
           return;
         /* For future implementation
         else if(suggestionJSON != null) {
