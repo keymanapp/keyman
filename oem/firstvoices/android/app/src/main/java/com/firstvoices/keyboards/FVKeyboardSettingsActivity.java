@@ -22,6 +22,7 @@ import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.KMLog;
@@ -88,8 +89,8 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
       }
 
       // If the active keyboard is for this language, immediately enact the new pref setting.
-      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
-      if (BCP47.languageEquals(kbdLgCode, lgCode)) {
+      Keyboard currentKeyboard = KMManager.getCurrentKeyboardInfo(context);
+      if (currentKeyboard != null && BCP47.languageEquals(currentKeyboard.getLanguageID(), lgCode)) {
         // Not only registers the model but also applies our modeling preferences.
         KMManager.registerAssociatedLexicalModel(lgCode);
       }
