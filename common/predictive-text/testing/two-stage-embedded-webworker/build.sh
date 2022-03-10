@@ -1,31 +1,20 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
 # Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications.
 # Designed for optimal compatibility with the Keyman Suite.
 #
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 display_usage ( ) {
   echo "build.sh [-clean]"
   echo
   echo "  -clean              to erase pre-existing build products before a re-build"
-}
-
-# Fails the build if a specified file does not exist.
-assert ( ) {
-  if ! [ -f $1 ]; then
-    fail "Build failed."
-    exit 1
-  fi
-}
-
-# Prints a nice, common error message.
-fail ( ) {
-  FAILURE_MSG="$1"
-  if [[ "$FAILURE_MSG" == "" ]]; then
-    FAILURE_MSG="Unknown failure."
-  fi
-  echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
-  exit 1
 }
 
 SOURCE="testing/two-stage-embedded-webworker"
