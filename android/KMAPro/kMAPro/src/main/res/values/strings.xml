@@ -243,5 +243,5 @@
 
   <!-- Context: KMP Package strings -->
   <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">
-    Keyboard package has functionality not supported with this version of Keyman</string>
+    Keyboard requires a newer version of Keyman</string>
 </resources>
