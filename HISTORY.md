@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.212 beta 2022-03-11
+
+* chore(linux): Fix lintian warnings (#6360)
+* fix(common): allow custom keyboard builds (#6358)
+
 ## 15.0.211 beta 2022-03-10
 
 * fix(oem/fv/android): Check keyboard exists before registering a model (#6346)
