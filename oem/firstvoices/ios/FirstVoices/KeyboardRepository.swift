@@ -93,7 +93,7 @@ class KeyboardRepository {
         success = true
       } catch {
         print("Failed to load preload " + keyboard.keyboardId + ": " + error.localizedDescription)
-        success = true
+        success = false
      }
     }
     return success
