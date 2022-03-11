@@ -79,7 +79,7 @@ def restart_ibus_subp():
     subprocess.run(["ibus", "restart"])
 
 
-def _verify_ibus_daemon():
+def verify_ibus_daemon(start):
     logging.info('**** Verify ibus running')
     realuser = os.environ.get('SUDO_USER')
     user = os.environ.get('USER')
@@ -90,10 +90,12 @@ def _verify_ibus_daemon():
 
     try:
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
-        logging.info('**** running processes: %s', ps.decode('utf-8'))
+        debugps = subprocess.run(('bash', '-c', 'ps -ef | grep ibus-daemon'), stdout=subprocess.PIPE).stdout
+        logging.info('**** running processes: %s', debugps.decode('utf-8'))
         ibus_daemons = re.findall('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE)
         if len(ibus_daemons) <= 0:
-            _start_ibus_daemon(realuser)
+            if start:
+                _start_ibus_daemon(realuser)
         elif len(ibus_daemons) > 1:
             logging.error('More than one ibus-daemon instance running! Keyman keyboards might not work as expected. '
                           'Please reboot your machine.')
@@ -102,7 +104,8 @@ def _verify_ibus_daemon():
     except subprocess.CalledProcessError as e:
         # Log critical error in order to track down #6237
         logging.critical('getting ibus-daemon failed (%s: %s)', type(e), e.args)
-        _start_ibus_daemon(realuser)
+        if start:
+            _start_ibus_daemon(realuser)
 
 
 def _start_ibus_daemon(realuser):
@@ -124,6 +127,7 @@ def _start_ibus_daemon(realuser):
 
 
 def restart_ibus(bus=None):
+    verify_ibus_daemon(False)
     realuser = os.environ.get('SUDO_USER')
     if realuser:
         # we have been called with `sudo`. Restart ibus for the real user.
@@ -136,14 +140,17 @@ def restart_ibus(bus=None):
                 bus = get_ibus_bus()
             if bus:
                 logging.info("restarting IBus")
-                bus.exit(True)
+                # we no longer try to restart since we sometimes ended up with more than one
+                # ibus-daemon process (#6237). Instead we only exit ibus here, and start
+                # ibus again below.
+                bus.exit(False)
                 bus.destroy()
         except Exception as e:
             logging.warning("Failed to restart IBus")
             logging.warning(e)
     # give ibus a chance to shutdown (#6237)
     time.sleep(1)  # 1s
-    _verify_ibus_daemon()
+    verify_ibus_daemon(True)
 
 
 def bus_has_engine(bus, name):
