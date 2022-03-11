@@ -37,6 +37,7 @@ QUIET=false
 DEBUG=false
 CLEAN=false
 KEYBOARDS_ONLY=false
+CUSTOM_KMCOMP=
 KMCOMP="$KEYMAN_ROOT/windows/bin/developer/kmcomp.exe"
 TARGETS=()
 
@@ -64,6 +65,7 @@ while [[ $# -gt 0 ]] ; do
     --kmcomp)
       shift
       KMCOMP="$1"
+      CUSTOM_KMCOMP=true
       ;;
     *)
       TARGETS+=("$key")
@@ -75,35 +77,35 @@ done
 # don't currently have a binary version of kmcomp available
 # during Linux and macOS builds, so that will need to be
 # manually sourced.
+KMCOMP_LAUNCHER=
 
-case "${OSTYPE}" in
-  "cygwin")
-    KMCOMP_LAUNCHER=
-    ;;
-  "msys")
-    KMCOMP_LAUNCHER=
-    ;;
-  "darwin"*)
-    # For Catalina (10.15) onwards, must use wine64
-    base_macos_ver=10.15
-    macos_ver=$(sw_vers -productVersion)
-    if verlt "$macos_ver" "$base_macos_ver"; then
+if ! $CUSTOM_KMCOMP; then
+  case "${OSTYPE}" in
+    "cygwin")
+      ;;
+    "msys")
+      ;;
+    "darwin"*)
+      # For Catalina (10.15) onwards, must use wine64
+      base_macos_ver=10.15
+      macos_ver=$(sw_vers -productVersion)
+      if verlt "$macos_ver" "$base_macos_ver"; then
+        KMCOMP_LAUNCHER=wine
+      else
+        # On Catalina, and later versions:
+        # wine-4.12.1 works; wine-5.0, wine-5.7 do not.
+        # retrieve these from:
+        # `brew tap gcenx/wine && brew install --cask --no-quarantine wine-crossover`
+        # may also need to `sudo spctl --master-disable`
+        KMCOMP_LAUNCHER=wine64
+        KMCOMP="$(dirname $KMCOMP)/kmcomp.x64.exe"
+      fi
+      ;;
+    *)
       KMCOMP_LAUNCHER=wine
-    else
-      # On Catalina, and later versions:
-      # wine-4.12.1 works; wine-5.0, wine-5.7 do not.
-      # retrieve these from:
-      # `brew tap gcenx/wine && brew install --cask --no-quarantine wine-crossover`
-      # may also need to `sudo spctl --master-disable`
-      KMCOMP_LAUNCHER=wine64
-      KMCOMP="$(dirname $KMCOMP)/kmcomp.x64.exe"
-    fi
-    ;;
-  *)
-    KMCOMP_LAUNCHER=wine
-    ;;
-esac
-
+      ;;
+  esac
+fi
 
 # Build list of available targets from subfolders, if none specified
 if [ ${#TARGETS[@]} == 0 ]; then
@@ -124,18 +126,24 @@ if ! $QUIET; then
 fi
 
 clean() {
-  local kpj="$1.kpj" ss=
+  local kpj="$1.kpj" ss= s=
   if $QUIET; then
     ss=-ss
+    s=-s
   fi
   pushd "$1" > /dev/null
-  $KMCOMP_LAUNCHER "$KMCOMP" -c $ss "$kpj"
+  if [ -f build.sh ]; then
+    ./build.sh -c $s
+  else
+    $KMCOMP_LAUNCHER "$KMCOMP" -c $ss "$kpj"
+  fi
   popd > /dev/null
 }
 
 build() {
-  local kpj="$1.kpj" d= t= ss= target=
+  local kpj="$1.kpj" d= t= ss= target= s= k=
   if $KEYBOARDS_ONLY; then
+    k=-k
     t=-t
     target="$1.kmn"
   fi
@@ -143,12 +151,17 @@ build() {
     d=-d
   fi
   if $QUIET; then
+    s=-s
     ss=-ss
   fi
   # -w - treat warnings as errors, we'll force this
   # -cfc - check filename conventions
   pushd "$1" > /dev/null
-  $KMCOMP_LAUNCHER "$KMCOMP" $d $ss -w -cfc "$kpj" $t "$target"
+  if [ -f build.sh ]; then
+    ./build.sh $d $k $s
+  else
+    $KMCOMP_LAUNCHER "$KMCOMP" $d $ss -w -cfc "$kpj" $t "$target"
+  fi
   popd > /dev/null
 }
 
@@ -156,14 +169,18 @@ build() {
 
 for TARGET in "${TARGETS[@]}"; do
   if $CLEAN; then
-    echo
-    echo_heading "Cleaning target $TARGET"
-    echo
+    if ! $QUIET; then
+      echo
+      echo_heading "Cleaning target $TARGET"
+      echo
+    fi
     clean "$TARGET"
   else
-    echo
-    echo_heading "Building target $TARGET"
-    echo
+    if ! $QUIET; then
+      echo
+      echo_heading "Building target $TARGET"
+      echo
+    fi
     build "$TARGET"
   fi
 done
