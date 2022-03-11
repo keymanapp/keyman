@@ -20,7 +20,7 @@ let dictionarySection = 1
 let keyboardInfoSection = 3
 
 let keyboardsHeader = "Available Keyboards"
-let languageSettingsHeader = "Language Settings"
+let languageSettingsHeader = "Dictionary Settings"
 let dictionaryHeader = "Downloadable Dictionaries"
 let keyboardInfoHeader = "Keyboard Information"
 
@@ -160,11 +160,40 @@ class KeyboardDetailController: UITableViewController {
         // update the on/off state of dependent switches
         self.updateDictionarySettingsState(animated: true)
         self.delegate?.refreshCheckmark()
+      } else {
+        // install or remove failed, set switch back to previous state
+        let keyboardsIndex = IndexPath(row: keyboardsRow, section: keyboardsSection)
+        
+        var message = ""
+        if (on) {
+          message = "Keyboard activation failed"
+        } else {
+          message = "Keyboard deactivation failed"
+        }
+        self.reportError(message: message)
+        
+        self.updateCellSwitchState(index: keyboardsIndex,
+                                   on: self.keyboardState!.isActive,
+                                   animated: true,
+                                   available: true)
       }
     }
     switchCell.configure(label: (self.keyboardState?.name)!, on: self.keyboardState!.isActive, available: true,
                          callback: keyboardAction)
     return switchCell
+  }
+
+  func reportError(message: String) {
+    let alertController = UIAlertController(title: title, message: message,
+      preferredStyle: UIAlertController.Style.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertAction.Style.cancel,
+                                            handler: nil))
+
+    self.present(alertController, animated: true, completion: nil)
+    print(message)
+    // TODO: send the error message + call stack through to us
+    // some reporting mechanism
   }
 
   func configurePredictionsSwitchCell() -> UITableViewCell {

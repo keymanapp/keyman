@@ -44,7 +44,7 @@ class LexicalModelRepository {
               // try to read array
             if !jsonArray.isEmpty {
               let jsonModelMap = jsonArray.first
-              let name = jsonModelMap!["description"] as! String
+              let name = jsonModelMap!["name"] as! String
               let modelId = jsonModelMap!["id"] as! String
               let packageUrl = jsonModelMap!["packageFilename"] as! String
               let version = jsonModelMap!["version"] as! String
