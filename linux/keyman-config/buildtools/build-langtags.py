@@ -42,7 +42,7 @@ class LangTagsMap():
                         if len(lang['tag']) < 3:
                             map3To2.append("'%s': '%s'" % (lang['iso639_3'], lang['tag']))
                 langTags.append(
-                    "'%s': { 'full': '%s', 'region': '%s', 'script': '%s', 'suppress': %s }" % (lang['tag'], lang['full'], region, script, suppress))
+                    "'%s': {'full': '%s', 'region': '%s', 'script': '%s', 'suppress': %s}" % (lang['tag'], lang['full'], region, script, suppress))
                 allTags.append("'%s': '%s'" % (lang['tag'], lang['tag']))
                 if lang['tag'] != lang['full']:
                     allTags.append("'%s': '%s'" % (lang['full'], lang['tag']))
@@ -52,8 +52,8 @@ class LangTagsMap():
                             allTags.append("'%s': '%s'" % (tag, lang['tag']))
 
         langTagsString = ',\n        '.join(map(str, langTags))
-        allTagsString = ', '.join(allTags)
-        map3To2String = ', '.join(map3To2)
+        allTagsString = ',\n        '.join(allTags)
+        map3To2String = ',\n        '.join(map3To2)
         outputFile.write("    __langTags = {\n        %s }\n\n" % langTagsString)
         outputFile.write("    __allTags = { %s }\n\n" % allTagsString)
         outputFile.write("    __map3To2 = { %s }\n" % map3To2String)
