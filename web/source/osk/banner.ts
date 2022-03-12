@@ -402,8 +402,8 @@ namespace com.keyman.osk {
     suggestionApplied(outputTarget: text.OutputTarget): boolean {
       const keyman = com.keyman.singleton;
       // Tell the keyboard that the current layer has not changed
-      keyman.core.keyboardProcessor.newLayerStore.set('0');
-      keyman.core.keyboardProcessor.oldLayerStore.set('0');
+      keyman.core.keyboardProcessor.newLayerStore.set('');
+      keyman.core.keyboardProcessor.oldLayerStore.set('');
       // Call the keyboard's entry point.
       keyman.core.keyboardProcessor.processPostKeystroke(this.hostDevice, outputTarget)
         // If we have a RuleBehavior as a result, run it on the target. This should
