@@ -208,9 +208,10 @@ const
 
   TSS_BEGIN_NEWCONTEXT = 40;
   TSS_BEGIN_POSTKEYSTROKE = 41;
-  TSS_LAYERCHANGED = 42;
+  TSS_NEWLAYER = 42;
+  TSS_OLDLAYER = 43;
 
-  TSS__MAX = 42;
+  TSS__MAX = 43;
 
 type
   TSystemStore = (ssNone = 0, ssBitmap = 1, ssCopyright = 2, ssHotkey = 3, ssLanguage = 4, ssLayout = 5, ssMessage = 6,
@@ -224,7 +225,7 @@ type
     ssPlatform = 31, ssBaseLayout = 32, ssLayer = 33, ssVKDictionary = 34, ssLayoutFile = 35,  // I3438 // I3483
     ssKeyboardVersion = 36, ssKMW_EmbedCSS = 37, ssTargets = 38,
     ssCasedKeys = 39,
-    ssBegin_NewContext = 40, ssBegin_PostKeystroke = 41, ssLayerChanged = 42);   // I4140   // I4368   // I4504
+    ssBegin_NewContext = 40, ssBegin_PostKeystroke = 41, ssNewLayer = 42, ssOldLayer = 43);   // I4140   // I4368   // I4504
 
 const
   SystemStoreNames: array[TSystemStore] of WideString = (
@@ -239,7 +240,7 @@ const
     '', '', '', '', 'LAYOUTFILE', 'KEYBOARDVERSION', 'KMW_EMBEDCSS',
     'TARGETS', //9.0  // I3483   // I4140   // I4368   // I4504
     'CASEDKEYS', //14.0,
-    '', '', 'LAYERCHANGED'); //15.0
+    '', '', 'NEWLAYER', 'OLDLAYER'); //15.0
 
 implementation
 

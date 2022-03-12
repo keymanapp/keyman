@@ -266,7 +266,9 @@ namespace com.keyman.text {
 
         // We need to tell the keyboard if the layer has been changed, either by a keyboard rule itself,
         // or by the touch layout 'nextlayer' control.
-        this.keyboardProcessor.layerChangedStore.set(startingLayerId == this.keyboardProcessor.layerId ? '0' : '1');
+        const hasLayerChanged = ruleBehavior.setStore[KeyboardInterface.TSS_LAYER] || keyEvent.kNextLayer;
+        this.keyboardProcessor.newLayerStore.set(hasLayerChanged ? this.keyboardProcessor.layerId : '');
+        this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
 
         let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(keyEvent.device, outputTarget);
         if(postRuleBehavior) {

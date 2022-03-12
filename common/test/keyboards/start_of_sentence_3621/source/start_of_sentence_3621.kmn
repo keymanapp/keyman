@@ -27,14 +27,14 @@ store(digit) '0'..'9'
     c if we find two+ characters in capitals, leave us in shift layer,
     c assuming the user hasn't just switched layer themselves. Once we have a
     c proper CAPS layer, we'll get rid of this.
-    if(&layerChanged = "0") any(caps) any(caps) > context
+    if(&newLayer = "") any(caps) any(caps) > context
 
     c stay on the numeric layer if we are there already
-    if(&layerChanged = "0") if(&layer = 'numeric') any(digit) > context
+    if(&newLayer = "") if(&layer = 'numeric') any(digit) > context
 
     c no other changes, so detect sentence or layer change, as long
     c as the user hasn't attempted to change layer themselves
-    if(&layerChanged = "0") > use(nextLayer)
+    if(&newLayer = "") > use(nextLayer)
 
 group(nextLayer) readonly
 

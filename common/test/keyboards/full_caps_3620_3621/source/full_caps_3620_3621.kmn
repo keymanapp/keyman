@@ -28,17 +28,17 @@ group(PostKeystroke) readonly
     c this is a heuristic: if we find two+ characters in capitals, leave
     c us in shift layer, assuming the user hasn't just switched layer
     c themselves. Not sure if this is a good idea!
-    c if(&layerChanged = "0") if(&layer = 'shift') any(caps) any(caps) > layer('caps') c ??? is this a good idea?
+    c if(&newLayer = "") if(&layer = 'shift') any(caps) any(caps) > layer('caps') c ??? is this a good idea?
 
     c stay on the numeric layer if we are there already
-    if(&layerChanged = "0") if(&layer = 'numeric') any(digit) > context
+    if(&newLayer = "") if(&layer = 'numeric') any(digit) > context
 
     c don't cancel caps lock layer
     if(&layer = 'caps') > context
 
     c no other changes, so detect sentence or layer change, as long
     c as the user hasn't attempted to change layer themselves
-    if(&layerChanged = "0") > use(nextLayer)
+    if(&newLayer = "") > use(nextLayer)
 
 group(nextLayer) readonly
     store(sentencePunctuation) '.?!'

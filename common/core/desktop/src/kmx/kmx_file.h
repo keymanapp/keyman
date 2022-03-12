@@ -140,11 +140,12 @@ namespace kmx {
 
 #define TSS_BEGIN_NEWCONTEXT    40
 #define TSS_BEGIN_POSTKEYSTROKE 41
-#define TSS_LAYERCHANGED     42
+#define TSS_NEWLAYER     42
+#define TSS_OLDLAYER     43
 
-#define TSS__KEYMAN_150_MAX  42
+#define TSS__KEYMAN_150_MAX  43
 
-#define TSS__MAX        42
+#define TSS__MAX        43
 
 /* wm_keyman_control_internal message control codes */
 
