@@ -287,7 +287,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       return
     }
 
-    // What the actual heck, Apple.  Apparently, in system-keyboard mode, this is also self-triggered if we erase back to a newline.
+    // Apparently, in system-keyboard mode, this is also self-triggered if we erase back to a newline.
     // Refer to https://github.com/keymanapp/keyman/pull/2770 for context.
     if self.swallowBackspaceTextChange && Manager.shared.isSystemKeyboard && textDocumentProxy.documentContextBeforeInput == "\n" {
       self.swallowBackspaceTextChange = false
@@ -333,6 +333,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       return
     }
 
+    if numCharsToDelete > 0 && textDocumentProxy.documentContextBeforeInput == nil {
+      textDocumentProxy.deleteBackward()
+      return
+    }
+    
     for _ in 0..<numCharsToDelete {
       let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
       textDocumentProxy.deleteBackward()
