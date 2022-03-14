@@ -76,6 +76,9 @@
     <ClInclude Include="CasedKeys.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="CheckNCapsConsistency.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
@@ -97,6 +100,7 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="CasedKeys.cpp" />
     <ClCompile Include="CharToKeyConversion.cpp" />
+    <ClCompile Include="CheckNCapsConsistency.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Compiler.rc" />

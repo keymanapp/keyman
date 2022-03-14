@@ -218,6 +218,8 @@
 #define CWARN_NulNotFirstStatementInContext                0x000020AB
 #define CWARN_IfShouldBeAtStartOfContext                   0x000020AC
 
+#define CWARN_KeyShouldIncludeNCaps                        0x000020AD
+
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1
 
