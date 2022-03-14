@@ -111,6 +111,8 @@ namespace com.keyman.osk {
       //       description.
       let e = text.KeyEvent.constructNullKeyEvent(this.vkbd.device);
       e.kNextLayer = 'caps';
+      e.Lstates = text.Codes.stateBitmasks.CAPS;
+      e.LmodifierChange = true;
       PreProcessor.raiseKeyEvent(e);
     }
   }
