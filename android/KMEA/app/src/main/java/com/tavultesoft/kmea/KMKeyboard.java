@@ -190,6 +190,7 @@ final class KMKeyboard extends WebView {
           return;
         } else if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           KMManager.setGlobeKeyState(KMManager.GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS);
+          KMManager.handleGlobeKeyAction(context, true, keyboardType);
           return;
         /* For future implementation
         else if(suggestionJSON != null) {
