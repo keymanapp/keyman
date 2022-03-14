@@ -57,6 +57,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
   private String associatedLexicalModel = "";
   private String lgCode;
   private static RelativeLayout checkModelLayout = null;
+  private static Intent intent = null;
   private static Bundle bundle = null;
   private static ListView listView = null;
   private String lgName;
@@ -121,7 +122,8 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     setContentView(R.layout.fv_keyboard_settings_list_layout);
 
     if (getIntent() != null && getIntent().getExtras() != null) {
-      bundle = getIntent().getExtras();
+      intent = getIntent();
+      bundle = intent.getExtras();
     }
     if (bundle == null) {
       // Should never actually happen.
@@ -182,8 +184,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     });
 
     // The following two layouts/toggles will need to link with these objects.
-    Context appContext = this.getApplicationContext();
-    prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(lgCode), false);
     boolean mayCorrect = prefs.getBoolean(KMManager.getLanguageCorrectionPreferenceKey(lgCode), false);
 
@@ -382,7 +383,9 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
 
   public static void restartActivity() {
     if (context != null) {
-      ((Activity)context).recreate();
+      // Not using Activity.recreate() because we need to recalculate the items
+      ((Activity)context).finish();
+      ((Activity)context).startActivity(intent);
     }
   }
 

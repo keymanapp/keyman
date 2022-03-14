@@ -19,6 +19,7 @@ import io.sentry.android.core.SentryAndroid;
 
 import com.tavultesoft.kmea.*;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
 
     @Override
     public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
-      String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
+      String keyboardLangId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
         KMManager.getCurrentKeyboardInfo(this).getLanguageID() :
         KMManager.KMDefault_LanguageID;
       boolean matchingModel = false;
@@ -260,21 +261,22 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
 
       for(int i=0; i<lexicalModelsInstalled.size(); i++) {
         HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
-        if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
+        String lexicalModelLangId = lexicalModelInfo.get(KMManager.KMKey_LanguageID);
+        if(BCP47.languageEquals(keyboardLangId, lexicalModelLangId)) {
           matchingModel = true;
         }
         KMManager.addLexicalModel(this, lexicalModelInfo);
 
         // Enable predictions and corrections toggles
-        editor.putBoolean(KMManager.getLanguagePredictionPreferenceKey(lexicalModelInfo.get(KMManager.KMKey_LanguageID)), true);
-        editor.putBoolean(KMManager.getLanguageCorrectionPreferenceKey(lexicalModelInfo.get(KMManager.KMKey_LanguageID)), true);
+        editor.putBoolean(KMManager.getLanguagePredictionPreferenceKey(lexicalModelLangId), true);
+        editor.putBoolean(KMManager.getLanguageCorrectionPreferenceKey(lexicalModelLangId), true);
       }
       editor.commit();
 
       // We're on the main thread, so if the active keyboard's language code matches,
       // let's register the associated lexical model.
       if(matchingModel) {
-        KMManager.registerAssociatedLexicalModel(langId);
+        KMManager.registerAssociatedLexicalModel(keyboardLangId);
       }
 
       // Launch/refresh FV Keyboard Settings menu
