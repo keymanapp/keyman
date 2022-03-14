@@ -4,6 +4,7 @@
  * Copyright (C) 2008-2013 Peng Huang <shawn.p.huang@gmail.com>
  * Copyright (C) 2015-2021 Takao Fujiwara <takao.fujiwara1@gmail.com>
  * Copyright (C) 2008-2021 Red Hat, Inc.
+ * Copyright (C) 2021-2022 SIL International
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
