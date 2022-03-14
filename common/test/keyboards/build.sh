@@ -21,6 +21,9 @@ display_usage() {
   echo "  --keyboard, -k    Build only keyboards (not packages)"
   echo "  --kmcomp path     Specify path to kmcomp.exe, defaults"
   echo "                    to windows/bin/developer/kmcomp.exe"
+  echo "  --zip-source      Create zip file for source of each"
+  echo "                    keyboard for artifact tests"
+  echo "  --index           Build index.html for artifact tests"
   echo
   echo "Targets (all unless specified):"
 
@@ -38,6 +41,8 @@ DEBUG=false
 CLEAN=false
 KEYBOARDS_ONLY=false
 CUSTOM_KMCOMP=
+INDEX=false
+ZIPSOURCE=false
 KMCOMP="$KEYMAN_ROOT/windows/bin/developer/kmcomp.exe"
 TARGETS=()
 
@@ -61,6 +66,12 @@ while [[ $# -gt 0 ]] ; do
       ;;
     --keyboard|-k)
       KEYBOARDS_ONLY=true
+      ;;
+    --zip-source)
+      ZIPSOURCE=true
+      ;;
+    --index)
+      INDEX=true
       ;;
     --kmcomp)
       shift
@@ -122,6 +133,8 @@ if ! $QUIET; then
       "QUIET: $QUIET" \
       "KEYBOARDS_ONLY: $KEYBOARDS_ONLY" \
       "TARGETS: ${TARGETS[@]}" \
+      "ZIPSOURCE: $ZIPSOURCE" \
+      "INDEX: $INDEX" \
       ""
 fi
 
@@ -165,6 +178,13 @@ build() {
   popd > /dev/null
 }
 
+zipsource() {
+  local target="$1"
+  pushd "$1" > /dev/null
+  7z a -r -x!build -x"!$target.kpj.user" "${target}_source.zip" .
+  popd > /dev/null
+}
+
 ###
 
 for TARGET in "${TARGETS[@]}"; do
@@ -182,7 +202,44 @@ for TARGET in "${TARGETS[@]}"; do
       echo
     fi
     build "$TARGET"
+
+    if $ZIPSOURCE; then
+      zipsource "$TARGET"
+    fi
   fi
 done
 
+###
+
+if $INDEX; then
+  if $CLEAN; then
+    rm -f "$THIS_DIR/index.html"
+  else
+    cat << EOF > "$THIS_DIR/index.html"
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Test Keyboards - $VERSION_WITH_TAG</title>
+  </head>
+  <body>
+    <h1>Test Keyboards - $VERSION_WITH_TAG</h1>
+    <ul>
+EOF
+
+    for TARGET in "${TARGETS[@]}"; do
+      if $ZIPSOURCE; then
+        echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a> (<a href='$TARGET/${TARGET}_source.zip'>source</a>)</li>" >> "$THIS_DIR/index.html"
+      else
+        echo "      <li><a href='$TARGET/build/$TARGET.kmp'>$TARGET.kmp</a></li>" >> "$THIS_DIR/index.html"
+      fi
+    done
+
+    cat << 'EOF' >> "$THIS_DIR/index.html"
+    </ul>
+  </body>
+</html>
+EOF
+  fi
+fi
 exit 0
