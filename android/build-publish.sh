@@ -75,6 +75,9 @@ echo "BUILD_FLAGS $BUILD_FLAGS"
 # Publish Keyman for Android
 if [ "$DO_KMAPRO" = true ]; then
   cd "$KEYMAN_ROOT/android/KMAPro/"
+  # Copy Release Notes
+  ./build-play-store-notes.sh
+
   ./gradlew $DAEMON_FLAG $BUILD_FLAGS
 fi
 
