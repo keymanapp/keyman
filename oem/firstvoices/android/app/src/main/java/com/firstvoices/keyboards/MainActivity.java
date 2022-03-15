@@ -2,6 +2,7 @@ package com.firstvoices.keyboards;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import io.sentry.android.core.SentryAndroid;
 
 import com.tavultesoft.kmea.*;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.DownloadFileUtils;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 
@@ -27,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
-    public static Context context;
+    public Context context;
 
     FVDownloadResultReceiver resultReceiver;
 
@@ -89,10 +91,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        /*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            webView.setWebContentsDebuggingEnabled(true);
-        }*/
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -204,30 +202,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
       // ensure onKeyboardDownloadFinished() gets called
     }
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-    */
-
     private static final class JSHandler {
         final private Context context;
 
@@ -277,31 +251,36 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
 
     @Override
     public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
-      String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
+      String keyboardLangId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
         KMManager.getCurrentKeyboardInfo(this).getLanguageID() :
         KMManager.KMDefault_LanguageID;
       boolean matchingModel = false;
-      String lexicalModelName = "";
+
+      SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      SharedPreferences.Editor editor = prefs.edit();
 
       for(int i=0; i<lexicalModelsInstalled.size(); i++) {
         HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
-        if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
+        String lexicalModelLangId = lexicalModelInfo.get(KMManager.KMKey_LanguageID);
+        if(BCP47.languageEquals(keyboardLangId, lexicalModelLangId)) {
           matchingModel = true;
-          lexicalModelName = lexicalModelInfo.get(KMManager.KMKey_LexicalModelName);
         }
         KMManager.addLexicalModel(this, lexicalModelInfo);
+
+        // Enable predictions and corrections toggles
+        editor.putBoolean(KMManager.getLanguagePredictionPreferenceKey(lexicalModelLangId), true);
+        editor.putBoolean(KMManager.getLanguageCorrectionPreferenceKey(lexicalModelLangId), true);
       }
+      editor.commit();
 
       // We're on the main thread, so if the active keyboard's language code matches,
       // let's register the associated lexical model.
       if(matchingModel) {
-        KMManager.registerAssociatedLexicalModel(langId);
-
-        // Update associated dictionary string if applicable
-        FVKeyboardSettingsActivity.setActiveLexicalModelLabel(lexicalModelName);
-
+        KMManager.registerAssociatedLexicalModel(keyboardLangId);
       }
 
+      // Launch/refresh FV Keyboard Settings menu
+      FVKeyboardSettingsActivity.restartActivity();
     }
 
 }

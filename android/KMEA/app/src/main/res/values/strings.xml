@@ -97,7 +97,6 @@
     <!-- Context: Keyboard Updates -->
     <string name="dictionary_update_message">Updates available for dictionary %1$s: %2$s </string>
 
-
     <!-- Context: Keyboard Info and Keyboard Settings -->
     <string name="keyboard_version" comment="Label for keyboard version">Keyboard version</string>
 
@@ -132,6 +131,9 @@
 
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
+
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">
+      Cannot connect to Keyman server to check for associated dictionary to download</string>
 
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Would you like to download the latest version of this dictionary?</string>
@@ -210,10 +212,14 @@
 
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dictionary</string>
+    <plurals name="model_count">
+      <item quantity="one">Dictionary</item>
+      <item quantity="other">Dictionaries</item>
+    </plurals>
 
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Check for available dictionary</string>
-
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
 
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Dictionary: %1$s</string>

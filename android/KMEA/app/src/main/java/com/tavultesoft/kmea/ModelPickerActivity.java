@@ -275,7 +275,7 @@ public final class ModelPickerActivity extends BaseActivity {
 
   // Uses the repo dataset's master lexical model list to create a filtered adapter for use here.
   // As this one is specific to this class, we can implement Activity-specific functionality within it.
-  static private class FilteredLexicalModelAdapter extends NestedAdapter<LexicalModel, Dataset.LexicalModels, String> {
+  static public class FilteredLexicalModelAdapter extends NestedAdapter<LexicalModel, Dataset.LexicalModels, String> {
     static final int RESOURCE = R.layout.models_list_row_layout;
     private final Context context;
 
