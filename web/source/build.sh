@@ -355,11 +355,11 @@ if [ $BUILD_CORE = true ]; then
     CORE_FLAGS="-skip-package-install"
 
     # Build the sentry-manager module - it's used in embedded contexts and on one testing page.
-    echo "${TERM_HEADING}Compiling KeymanWeb's sentry-manager module...${NORMAL}"
+    echo_heading "Compiling KeymanWeb's sentry-manager module..."
     pushd ../../common/core/web/tools/sentry-manager/src
     ./build.sh $CORE_FLAGS || fail "Failed to compile the sentry-manager module"
     popd
-    echo "${TERM_HEADING}sentry-manager module compiled successfully.${NORMAL}"
+    echo_heading "sentry-manager module compiled successfully."
 
     if [ $BUILD_LMLAYER = false ]; then
         CORE_FLAGS="$CORE_FLAGS -test"
@@ -368,10 +368,10 @@ if [ $BUILD_CORE = true ]; then
     # Ensure that the Input Processor module compiles properly.
     cd ../../common/core/web/input-processor/src
     echo ""
-    echo "${TERM_HEADING}Compiling local KeymanWeb dependencies...${NORMAL}"
+    echo_heading "Compiling local KeymanWeb dependencies..."
     ./build.sh $CORE_FLAGS || fail "Failed to compile KeymanWeb dependencies"
     cd $WORKING_DIRECTORY
-    echo "${TERM_HEADING}Local KeymanWeb dependency compilations completed successfully.${NORMAL}"
+    echo_heading "Local KeymanWeb dependency compilations completed successfully."
     echo ""
 fi
 

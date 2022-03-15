@@ -3080,7 +3080,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Caption = '-'
       end
       object mnuToolsWebDebugger: TMenuItem
-        Caption = '&Web Debugger'
+        Caption = '&Server'
         object mnuToolsWebDebuggerOpenInBrowser: TMenuItem
           Action = modActionsMain.actToolsWebOpenPublicUrl
         end

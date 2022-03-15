@@ -4,12 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-//import android.support.v8.app.ActionBarActivity;
+import android.os.Handler;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,24 +18,35 @@ import io.sentry.android.core.SentryAndroid;
 
 import com.tavultesoft.kmea.*;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.util.DownloadFileUtils;
+import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 
-import java.util.ArrayList;
+import java.io.File;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
+    public static Context context;
+
+    FVDownloadResultReceiver resultReceiver;
+
     @SuppressWarnings("SetJavascriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
 
-        SentryAndroid.init(this, options -> {
+        SentryAndroid.init(context, options -> {
             options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
             options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
         });
 
+        resultReceiver = new FVDownloadResultReceiver(new Handler(), context);
+
         setContentView(R.layout.activity_main);
 
-        new FVShared(this);
+        FVShared.getInstance().initialize(this);
 
         FVShared.getInstance().upgradeTo12();
         FVShared.getInstance().upgradeTo14();
@@ -44,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
             KMManager.setDebugMode(true);
         }
         KMManager.initialize(getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
-
-        final Context context = this;
 
         /**
          * We need to set the default (fallback) keyboard to sil_euro_latin inside the fv_all package
@@ -69,22 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 KMManager.KMDefault_KeyboardFont,
                 KMManager.KMDefault_KeyboardFont)
         );
-
-        ArrayList<HashMap<String, String>> modelsList = KMManager.getLexicalModelsList(context);
-        if (modelsList == null || modelsList.size() == 0) {
-          String lexicalModelVersion = KMManager.getLexicalModelPackageVersion(
-            context, FVShared.FVDefault_DictionaryPackageID);
-
-          // Add default dictionaries
-          HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
-          lexicalModelInfo.put(KMManager.KMKey_PackageID, FVShared.FVDefault_DictionaryPackageID);
-          lexicalModelInfo.put(KMManager.KMKey_LanguageID, FVShared.FVDefault_DictionaryLanguageID);
-          lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, FVShared.FVDefault_DictionaryModelID);
-          lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, FVShared.FVDefault_DictionaryModelName);
-          lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, lexicalModelVersion);
-          KMManager.addLexicalModel(context, lexicalModelInfo);
-          KMManager.registerAssociatedLexicalModel(FVShared.FVDefault_DictionaryLanguageID);
-        }
 
       final String htmlPath = "file:///android_asset/setup/main.html";
         WebView webView = findViewById(R.id.webView);
@@ -136,9 +130,56 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl(htmlPath);
     }
 
+    public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
+      DownloadFileUtils.Info info = DownloadFileUtils.cacheDownloadFile(context, data);
+      boolean isKMP = info.isKMP();
+      String filename = info.getFilename();
+      File cacheKMPFile = info.getFile();
+
+      if (filename == null || filename.isEmpty() || cacheKMPFile == null || !cacheKMPFile.exists()) {
+        // failed to retrieve downloaded file
+        String message = context.getString(R.string.failed_to_retrieve_file);
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        return;
+      } else if (!isKMP) {
+        String noKeyboardsInstalledMessage = String.format(
+          context.getString(R.string.not_valid_package_file), filename, context.getString(R.string.no_targets_to_install));
+        Toast.makeText(context, noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
+        return;
+      }
+
+      if (cacheKMPFile != null) {
+        Bundle bundle = new Bundle();
+        bundle.putString("kmpFile", cacheKMPFile.getAbsolutePath());
+        bundle.putBoolean("silentInstall", silentInstall);
+
+        Intent packageIntent = new Intent(context, PackageActivity.class);
+        packageIntent.putExtras(bundle);
+        context.startActivity(packageIntent);
+      }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+
+        KMManager.onResume();
+        KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
+        PackageActivity.addKeyboardDownloadEventListener(this);
+
+        Intent intent = getIntent();
+        Uri loadingIntentUri = intent.getData();
+
+        if (loadingIntentUri != null) {
+          String scheme = loadingIntentUri.getScheme().toLowerCase();
+          switch (scheme) {
+            // content:// Android DownloadManager
+            case "content":
+              // TODO: checkStoragePermission(loadingIntentUri);
+              useLocalKMP(context, loadingIntentUri, true);
+              break;
+          }
+        }
 
         WebView webView = findViewById(R.id.webView);
         if (webView != null) {
@@ -152,6 +193,15 @@ public class MainActivity extends AppCompatActivity {
             else
                 webView.loadUrl("javascript:setCheckBoxOff('checkbox2');");
         }
+    }
+
+    @Override
+    protected void onPause() {
+      super.onPause();
+      KMManager.onPause();
+
+      // Intentionally not removing KeyboardDownloadEventListener to
+      // ensure onKeyboardDownloadFinished() gets called
     }
 
     /*
@@ -209,4 +259,49 @@ public class MainActivity extends AppCompatActivity {
 
         return SetupActivity.isDefaultKB(this);
     }
+
+    @Override
+    public void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo) {
+      // Do nothing
+    }
+
+    @Override
+    public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
+      // Do nothing
+    }
+
+    @Override
+    public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+      // Do nothing
+    }
+
+    @Override
+    public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+      String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
+        KMManager.getCurrentKeyboardInfo(this).getLanguageID() :
+        KMManager.KMDefault_LanguageID;
+      boolean matchingModel = false;
+      String lexicalModelName = "";
+
+      for(int i=0; i<lexicalModelsInstalled.size(); i++) {
+        HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
+        if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
+          matchingModel = true;
+          lexicalModelName = lexicalModelInfo.get(KMManager.KMKey_LexicalModelName);
+        }
+        KMManager.addLexicalModel(this, lexicalModelInfo);
+      }
+
+      // We're on the main thread, so if the active keyboard's language code matches,
+      // let's register the associated lexical model.
+      if(matchingModel) {
+        KMManager.registerAssociatedLexicalModel(langId);
+
+        // Update associated dictionary string if applicable
+        FVKeyboardSettingsActivity.setActiveLexicalModelLabel(lexicalModelName);
+
+      }
+
+    }
+
 }

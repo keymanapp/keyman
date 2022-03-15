@@ -190,11 +190,15 @@ async function loadSettings() {
   };
 
   context.updateExecutionPoint = function (row) {
-    executionPoint = editor.deltaDecorations(
-      executionPoint,
-      row >= 0 ? [{ range: new monaco.Range(row + 1, 1, row + 1, 1), options: { isWholeLine: true, linesDecorationsClassName: 'km_executionPoint' } }] : []
-    );
-    context.moveCursor({ row: row, column: 0 });
+    if(row >= 0) {
+      executionPoint = editor.deltaDecorations(
+        executionPoint,
+        [{ range: new monaco.Range(row + 1, 1, row + 1, 1), options: { isWholeLine: true, linesDecorationsClassName: 'km_executionPoint' } }]
+      );
+      context.moveCursor({ row: row, column: 0 });
+    } else {
+      executionPoint = editor.deltaDecorations(executionPoint, []);
+    }
   };
 
   //

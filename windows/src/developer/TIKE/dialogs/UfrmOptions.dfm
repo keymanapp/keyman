@@ -19,7 +19,7 @@ inherited frmOptions: TfrmOptions
     Top = 8
     Width = 425
     Height = 392
-    ActivePage = tabDebugger
+    ActivePage = tabGeneral
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
@@ -332,31 +332,6 @@ inherited frmOptions: TfrmOptions
           TabOrder = 5
         end
       end
-      object gbServer: TGroupBox
-        Left = 8
-        Top = 159
-        Width = 313
-        Height = 138
-        Caption = 'Web Host'
-        TabOrder = 1
-        object chkListLocalURLs: TCheckBox
-          Left = 8
-          Top = 55
-          Width = 257
-          Height = 17
-          Caption = 'List local &URLs in web debugger'
-          TabOrder = 0
-        end
-        object cmdConfigureServer: TButton
-          Left = 24
-          Top = 101
-          Width = 121
-          Height = 25
-          Caption = '&Configure server...'
-          TabOrder = 1
-          OnClick = cmdConfigureServerClick
-        end
-      end
     end
     object tabCharMap: TTabSheet
       Caption = 'Character Map'
@@ -416,6 +391,35 @@ inherited frmOptions: TfrmOptions
           ParentColor = True
           ReadOnly = True
           TabOrder = 1
+        end
+      end
+    end
+    object tabServer: TTabSheet
+      Caption = 'Server'
+      ImageIndex = 4
+      object gbServer: TGroupBox
+        Left = 8
+        Top = 8
+        Width = 313
+        Height = 97
+        Caption = 'Keyman Developer Server'
+        TabOrder = 0
+        object chkListLocalURLs: TCheckBox
+          Left = 9
+          Top = 60
+          Width = 257
+          Height = 17
+          Caption = 'List local &URLs for Server'
+          TabOrder = 1
+        end
+        object cmdConfigureServer: TButton
+          Left = 9
+          Top = 21
+          Width = 121
+          Height = 25
+          Caption = '&Configure Server...'
+          TabOrder = 0
+          OnClick = cmdConfigureServerClick
         end
       end
     end

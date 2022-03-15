@@ -409,7 +409,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
       _td->app->QueueAction(QIT_CHAR, *buf++);
     return TRUE;
   } else {
-    if (!_td->lpActiveKeyboard->lpCoreKeyboardState) {
+    if (!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
       SendDebugMessageFormat(0, sdmKeyboard, 0, "KMSetOutputCore: no active state");
       return FALSE;
     }
@@ -499,7 +499,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dw
   if (!Globals::get_CoreIntegration()) {
     return _td->app->QueueAction(ItemType, dwData);  // TODO: 5442 Remove
   } else {
-    if (!_td->lpActiveKeyboard->lpCoreKeyboardState) {
+    if (!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
       return FALSE;
     }
 
@@ -535,7 +535,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
     wcscpy_s(buf, len + 1, q);  // I3091
     return TRUE;
   } else {
-    if (!_td->lpActiveKeyboard->lpCoreKeyboardState) {
+    if (!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
       return FALSE;
     }
     km_kbp_context_item *citems = nullptr;

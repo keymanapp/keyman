@@ -8,13 +8,13 @@
    Copyright 2019 SIL International
 ***/
 
-// If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
+// If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
-if(!window['keyman']['initialized']) { 
+if(!window['keyman']['initialized']) {
 
   // Continued KeymanWeb initialization.
-  (function() 
+  (function()
   {
 
     // Declare KeymanWeb, OnScreen Keyboard and Util object variables
@@ -25,8 +25,8 @@ if(!window['keyman']['initialized']) {
      * Scope        Private
      * @param       {(string|Object)}     s   string (or object) to print
      * Description  Simple debug display (upper right of screen)
-     *              Extended to support multiple arguments May 2015   
-     */       
+     *              Extended to support multiple arguments May 2015
+     */
     keymanweb['debug']=keymanweb.debug=function(s){
       var p;
       if(keymanweb.debugElement == null)
@@ -36,10 +36,10 @@ if(!window['keyman']['initialized']) {
         ds.minHeight='50px'; ds.border='1px solid blue'; ds.whiteSpace='pre-line';ds.overflowY='scroll';
         p=document.createElement('P'); p.id='debug_output';p.style.margin='2px';
         d.appendChild(p);
-        document.body.appendChild(d);   
-        keymanweb.debugElement=p;  
-      } 
-      if((p=document.getElementById('debug_output')) == null) return; 
+        document.body.appendChild(d);
+        keymanweb.debugElement=p;
+      }
+      if((p=document.getElementById('debug_output')) == null) return;
 
       if(arguments.length == 0)
         if(typeof p.textContent != 'undefined') p.textContent=''; else p.innerHTML='';
@@ -59,10 +59,10 @@ if(!window['keyman']['initialized']) {
             else
             {
               t1 = '';
-              for(m in sx) 
+              for(m in sx)
               {
                 if(t1.length > 0) t1 = t1 + ', ';
-                t1 = t1 + m + ':';              
+                t1 = t1 + m + ':';
                 switch(typeof sx[m])
                 {
                   case 'string':
@@ -72,7 +72,7 @@ if(!window['keyman']['initialized']) {
                   default:
                     t1 = t1 + typeof sx[m]; break;
                 }
-                if(t1.length > 1024) 
+                if(t1.length > 1024)
                 {
                   t1 = t1.substr(0,1000)+'...'; break;
                 }
@@ -84,15 +84,15 @@ if(!window['keyman']['initialized']) {
           {
             t = t + sx;
           }
-        } 
+        }
         // Truncate if necessary to avoid memory problems
-        if(t.length > 1500) t = t.substr(0,1500) + ' (more)';  
-        
+        if(t.length > 1500) t = t.substr(0,1500) + ' (more)';
+
         if(typeof p.textContent != 'undefined')
           p.textContent=t+'\n'+p.textContent;
         else
           p.innerHTML=t+'<br />'+p.innerHTML;
-        
+
       }
     }
 
@@ -102,28 +102,28 @@ if(!window['keyman']['initialized']) {
      */
     keymanweb.debugElement=null;
     var dbg=keymanweb.debug;
-        
+
     keymanweb.delayedInit();
 
   //TODO: find all references to next three routines and disambiguate!!
-    
+
     // Complete page initialization only after the page is fully loaded, including any embedded fonts
     // This avoids the need to use a timer to test for the fonts
-    
+
     util.attachDOMEvent(window, 'load', keymanweb.domManager._WindowLoad,false);
-    util.attachDOMEvent(window, 'unload', keymanweb.domManager._WindowUnload,false);  // added fourth argument (default value)       
-    
+    util.attachDOMEvent(window, 'unload', keymanweb.domManager._WindowUnload,false);  // added fourth argument (default value)
+
     // *** I3319 Supplementary Plane modifications - end new code
 
     util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);
 
     /**
      * Reset OSK shift states when entering or exiting the active element
-     **/    
+     **/
     function resetVKShift() {
       let keyman = com.keyman.singleton;
       if(!keyman.uiManager.isActivating && keyman.osk.vkbd) {
-        keyman.core.keyboardProcessor._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
+        keyman.core.keyboardProcessor._UpdateVKShift(null);  //this should be enabled !!!!! TODO
       }
     }
 
@@ -131,9 +131,9 @@ if(!window['keyman']['initialized']) {
     keymanweb['pageFocusHandler'] = resetVKShift;
     util.attachDOMEvent(window, 'focus', keymanweb['pageFocusHandler'], false);  // I775
     util.attachDOMEvent(window, 'blur', keymanweb['pageFocusHandler'], false);   // I775
-    
+
     // Initialize supplementary plane string extensions
-    String.kmwEnableSupplementaryPlane(true);    
+    String.kmwEnableSupplementaryPlane(true);
 
   })();
 }

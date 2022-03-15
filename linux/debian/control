@@ -40,13 +40,15 @@ Standards-Version: 4.5.1
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman
 Homepage: https://www.keyman.com
+Rules-Requires-Root: binary-targets
 
 Package: keyman
 Architecture: all
 Depends:
  libglib2.0-bin,
  python3-keyman-config (= ${binary:Version}),
- ibus-keyman (= ${binary:Version}),
+ ibus-keyman (>= ${binary:Version}),
+ ibus-keyman (<< ${binary:Version}.1~),
  ${misc:Depends},
 Recommends:
  onboard-keyman,

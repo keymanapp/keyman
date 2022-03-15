@@ -9,8 +9,7 @@
         android:background="@android:color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_alignParentLeft="true"
+        android:layout_marginStart="20dp"
         android:layout_centerVertical="true"
         android:orientation="vertical" >
  
@@ -41,7 +40,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
-        android:src="@drawable/ic_action_next"
+        android:src="@drawable/ic_arrow_forward"
         app:tint="@android:color/black"
         android:contentDescription="@string/image_view" />
     
