@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.288 stable 2022-03-15
+
+* chore(linux): Update changelogs for 14.0.287 (#6373)
+
 ## 14.0.287 stable 2022-03-04
 
 * chore(ios): certificate update (#6210)
