@@ -83,8 +83,10 @@ class KeyboardRepository {
     return KeyboardRepository.shared.availableKeyboards[keyboardId]
   }
     
-  func installKeyboard(keyboard: FVKeyboardDefinition) -> Bool {
+  func installKeyboard(keyboard: FVKeyboardDefinition) -> (Bool, String) {
     var success = false
+    var message = "success"
+    
     if let keyboardsPackage = loadKeyboardPackage() {
       let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
       do {
@@ -92,11 +94,15 @@ class KeyboardRepository {
         print("Installed keyboard \(keyboard.keyboardId)")
         success = true
       } catch {
-        print("Failed to load preload " + keyboard.keyboardId + ": " + error.localizedDescription)
+        let installError = error
+        
+        print("Failed to load preload \(keyboard.keyboardId) installError: \(installError.localizedDescription)")
         success = false
+        message = installError.localizedDescription
      }
     }
-    return success
+    
+    return (success, message)
   }
 
   func removeKeyboard(keyboard: FVKeyboardDefinition) -> Bool {
