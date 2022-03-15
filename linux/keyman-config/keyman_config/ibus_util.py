@@ -80,7 +80,6 @@ def restart_ibus_subp():
 
 
 def verify_ibus_daemon(start):
-    logging.info('**** Verify ibus running')
     realuser = os.environ.get('SUDO_USER')
     user = os.environ.get('USER')
     if realuser:
@@ -90,8 +89,6 @@ def verify_ibus_daemon(start):
 
     try:
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
-        debugps = subprocess.run(('bash', '-c', 'ps -ef | grep ibus-daemon'), stdout=subprocess.PIPE).stdout
-        logging.info('**** running processes: %s', debugps.decode('utf-8'))
         ibus_daemons = re.findall('^[^ZT] ibus-daemon .*--xim.*', ps.decode('utf-8'), re.MULTILINE)
         if len(ibus_daemons) <= 0:
             if start:
@@ -100,7 +97,7 @@ def verify_ibus_daemon(start):
             logging.error('More than one ibus-daemon instance running! Keyman keyboards might not work as expected. '
                           'Please reboot your machine.')
         else:
-            logging.info('ibus already running')
+            logging.debug('ibus already running')
     except subprocess.CalledProcessError as e:
         # Log critical error in order to track down #6237
         logging.critical('getting ibus-daemon failed (%s: %s)', type(e), e.args)
