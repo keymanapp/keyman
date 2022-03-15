@@ -1,15 +1,15 @@
-/*    
+/*
     file
         main.c
-
+    
     function
-        to manipulate text input source, i.e., 
+        to manipulate text input source, i.e.,
             - print currently selected source,
             - select specified source (enable it as needed)
-            - enable specified source, 
+            - enable specified source,
             - disable specified source,
             - toggle enabled/disabled state of specified source.
-
+    
     compile
         gcc -framework Carbon -o textinputsource main.c
 
@@ -23,14 +23,15 @@
             -d : disable source name
             -t : toggle enabled/disabled on source name
 
+ 
+ Originally found at https://discussions.apple.com/thread/5610262
 
-    Originally found at https://discussions.apple.com/thread/5610262
-*/
+ */
 
 #include <Carbon/Carbon.h>
 #include <libgen.h>    // basename
 
-TISInputSourceRef getInputSourceByName(char *);
+TISInputSourceRef createInputSourceByName(char *);
 
 int
 main (int argc, char * argv[])
@@ -40,13 +41,13 @@ main (int argc, char * argv[])
     TISInputSourceRef tis;
     CFStringRef name;
     OSStatus err = 0;
-
+    
     while ((c = getopt(argc, argv, "s:e:d:t:h")) != -1)
     {
         switch (c)
         {
             case 's':
-                tis = getInputSourceByName(optarg);
+                tis = createInputSourceByName(optarg);
                 if (tis)
                 {
                     CFBooleanRef enabled = TISGetInputSourceProperty(tis, kTISPropertyInputSourceIsEnabled);
@@ -58,7 +59,7 @@ main (int argc, char * argv[])
                 ret = tis ? (int) err : 1;
                 break;
             case 'e':
-                tis = getInputSourceByName(optarg);
+                tis = createInputSourceByName(optarg);
                 if (tis)
                 {
                     err = TISEnableInputSource(tis);
@@ -67,7 +68,7 @@ main (int argc, char * argv[])
                 ret = tis ? (int) err : 1;
                 break;
             case 'd':
-                tis = getInputSourceByName(optarg);
+                tis = createInputSourceByName(optarg);
                 if (tis)
                 {
                     err = TISDisableInputSource(tis);
@@ -76,7 +77,7 @@ main (int argc, char * argv[])
                 ret = tis ? (int) err : 1;
                 break;
             case 't':
-                tis = getInputSourceByName(optarg);
+                tis = createInputSourceByName(optarg);
                 if (tis)
                 {
                     CFBooleanRef enabled = TISGetInputSourceProperty(tis, kTISPropertyInputSourceIsEnabled);
@@ -91,7 +92,7 @@ main (int argc, char * argv[])
             case 'h':
             case '?':
             default:
-                fprintf(stderr, "Usage: %s %s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n",
+                fprintf(stderr, "Usage: %s %s\n\t\%s\n\t%s\n\t%s\n\t%s\n\t%s\n",
                     basename(argv[0]),
                     "[-s|e|d|t name]",
                     "-s : select source name (enable it as needed)",
@@ -108,6 +109,7 @@ main (int argc, char * argv[])
     {
         tis = TISCopyCurrentKeyboardInputSource();
         name = TISGetInputSourceProperty(tis, kTISPropertyLocalizedName);
+        CFRelease(tis);
         int len = CFStringGetLength(name) * 4 + 1;
         char cname[len];
         bool b = CFStringGetCString(name, cname, len, kCFStringEncodingUTF8);
@@ -120,11 +122,11 @@ main (int argc, char * argv[])
 }
 
 TISInputSourceRef
-getInputSourceByName(char *cname)
+createInputSourceByName(char *cname)
 {
     //     char *cname : input source name in UTF-8 terminated by null character
     //     return TISInputSourceRef or NULL : text input source reference (retained)
-
+    
     CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, cname, kCFStringEncodingUTF8);
     CFStringRef keys[] = { kTISPropertyLocalizedName };
     CFStringRef values[] = { name };
@@ -134,7 +136,7 @@ getInputSourceByName(char *cname)
     CFRelease(name);
     if (!array)
     {
-        fprintf(stderr, "No such text input source: %s\n", optarg);
+        fprintf(stderr, "No such text input source: %s\n", cname);
         return NULL;
     }
     TISInputSourceRef tis = (TISInputSourceRef) CFArrayGetValueAtIndex(array, 0);
