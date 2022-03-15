@@ -1,3 +1,10 @@
+keyman-keyboardprocessor (14.0.287-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 11 Mar 2022 12:31:45 +0100
+
 keyman-keyboardprocessor (14.0.284-1) unstable; urgency=medium
 
   * New upstream release
