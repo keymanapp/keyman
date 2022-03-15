@@ -123,7 +123,10 @@ This installer will copy Keyman into your Input Methods folder, and configure Ke
 	#
 	# Enable Keyman as an input method
 	#
-	
+	dlog("### about to begin 3 second delay before adding Keyman to Input Methods ###")
+	delay 3
+	dlog("### completed 3 second delay before adding Keyman to Input Methods ###")
+
 	dlog("### Helping user add Keyman to Input Methods ###")
 	set cmd to scriptContainer & "Contents/MacOS/textinputsource -e Keyman"
 	set scriptResult to do shell script cmd
