@@ -9,8 +9,7 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.md]
-# Lintian in Debian complains about lines > 512
-max_line_length = 512
+max_line_length = 160
 
 [{Makefile,rules}]
 indent_style = tab
