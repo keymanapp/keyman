@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/recorder-core",
-  "version": "16.0.3",
+  "version": "16.0.4",
   "description": "Core classes used to develop KeymanWeb test cases based on keystrokes",
   "main": "index.js",
   "scripts": {
@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "dependencies": {
-    "@keymanapp/keyboard-processor": "^16.0.3",
-    "@keymanapp/models-types": "^16.0.3",
-    "@keymanapp/web-environment": "^16.0.3",
-    "@keymanapp/web-utils": "^16.0.3",
+    "@keymanapp/keyboard-processor": "^16.0.4",
+    "@keymanapp/models-types": "^16.0.4",
+    "@keymanapp/web-environment": "^16.0.4",
+    "@keymanapp/web-utils": "^16.0.4",
     "@types/node": "^11.9.4"
   },
   "devDependencies": {
