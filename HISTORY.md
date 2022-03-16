@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.214 beta 2022-03-16
+
+* feat(web): `&newLayer` and `&oldLayer` (#6366)
+
 ## 15.0.213 beta 2022-03-15
 
 * feat(common): zip and index keyboard artifacts (#6367)
