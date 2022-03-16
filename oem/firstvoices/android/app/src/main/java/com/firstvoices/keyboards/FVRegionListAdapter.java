@@ -37,10 +37,6 @@ final class FVRegionListAdapter extends ArrayAdapter<FVShared.FVRegion> {
 			holder.text1 = convertView.findViewById(R.id.text1);
 			holder.text2 = convertView.findViewById(R.id.text2);
 
-			if (listFont != null) {
-				holder.text1.setTypeface(listFont, Typeface.BOLD);
-				holder.text2.setTypeface(listFont, Typeface.NORMAL);
-			}
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();

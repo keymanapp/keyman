@@ -4,6 +4,7 @@
     <string name="setup">Setup</string>
     <string name="regions">Regions</string>
     <string name="keyboards">Keyboards</string>
+    <string name="dictionaries">Dictionaries</string>
     <string name="keyboard_settings">%1$s Settings</string>
     <string name="enable_keyboard">Enable keyboard</string>
     <string name="keyboard_version">Version %1$s</string>

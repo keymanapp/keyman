@@ -44,12 +44,14 @@ override_dh_auto_build:
 	dh_auto_build --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 
 override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# keymankeyboardprocessor
 	cd common/core/desktop && ./build.sh tests
 	# ibus-keyman
 	cd linux/ibus-keyman && make check VERBOSE=1
 	# keyman-config
 	dh_auto_test --sourcedir=linux/keyman-config --buildsystem=pybuild $@
+endif
 
 override_dh_auto_install:
 	# keymankeyboardprocessor

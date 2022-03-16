@@ -1,6 +1,6 @@
 ﻿c full_caps_3620_3621 generated from template at 2021-12-01 08:45:15
 c with name "full_caps_3620_3621"
-store(&VERSION) '10.0'
+store(&VERSION) '15.0'
 store(&NAME) 'full_caps_3620_3621'
 store(&COPYRIGHT) '©'
 store(&KEYBOARDVERSION) '1.0'
