@@ -1,6 +1,7 @@
 package com.firstvoices.keyboards;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -19,15 +20,17 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 
-import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KeyboardEventHandler;
+import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
+import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.data.Keyboard;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
 
-public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
+public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
     private View inputView = null;
     private static ExtractedText exText = null;
@@ -123,11 +126,17 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
         KMManager.setMayPredictOverride(inputType);
         if (KMManager.getMayPredictOverride()) {
             KMManager.setBannerOptions(false);
-        } else {
-            final boolean mayPredict = true;
+        } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
+          // Check if predictions needs to be re-enabled per Settings preference
+          Context appContext = getApplicationContext();
+          Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
+          if (kbInfo != null) {
+            String langId = kbInfo.getLanguageID();
+            SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+            boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(langId), true);
             KMManager.setBannerOptions(mayPredict);
+          }
         }
-
         // User switched to a new input field so we should extract the text from input field
         // and pass it to Keyman Engine together with selection range
         InputConnection ic = getCurrentInputConnection();

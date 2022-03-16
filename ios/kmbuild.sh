@@ -207,7 +207,7 @@ update_bundle ( ) {
       downloadKeyboardPackage "$DEFAULT_KBD_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_KBD_ID.kmp"
       downloadModelPackage "$DEFAULT_LM_ID" "$base_dir/$BUNDLE_PATH/$DEFAULT_LM_ID.model.kmp"
 
-      echo "${SUCCESS_GREEN}Packages successfully updated${NORMAL}"
+      echo "${COLOR_GREEN}Packages successfully updated${COLOR_RESET}"
 
       # If we aren't downloading resources, make sure copies of them already exist!
     fi
@@ -317,7 +317,7 @@ if [ $DO_KEYMANAPP = true ]; then
                 VERSION=$VERSION \
                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
-                UPLOAD_SENTRY=$UPLOAD_SENTRY 
+                UPLOAD_SENTRY=$UPLOAD_SENTRY
   fi
 
   echo ""

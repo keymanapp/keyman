@@ -755,7 +755,7 @@ procedure TmodActionsMain.actToolsWebConfigureExecute(Sender: TObject);
 begin
   with TfrmOptions.Create(frmKeymanDeveloper) do
   try
-    FocusDebuggerTab;
+    FocusServerTab;
     if ShowModal = mrOk then
     begin
       frmKeymanDeveloper.RefreshOptions;

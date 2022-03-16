@@ -135,7 +135,7 @@ pushd $WORKING_DIRECTORY/node_modules/@keymanapp/input-processor
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd
 
-echo "${TERM_HEADING}Running KeymanWeb integration test suite${NORMAL}"
+echo_heading "Running KeymanWeb integration test suite"
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
 npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
 

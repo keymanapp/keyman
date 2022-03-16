@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/list_item" >
-    
+
     <LinearLayout
         android:background="@android:color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_alignParentLeft="true"
+        android:layout_toStartOf="@+id/linearLayout2"
+        android:layout_marginStart="5dp"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:id="@+id/linearLayout">
- 
+
+        <ImageView
+            android:id="@+id/image1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:tint="@android:color/holo_blue_light"
+            android:src="@drawable/ic_check"
+            android:visibility="invisible"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/image_view" />
+
         <TextView
             android:id="@+id/text1"
             android:background="@android:color/transparent"
@@ -21,20 +34,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp"
-            android:textSize="14sp"
-            android:textStyle="bold" />
- 
+            android:textSize="14sp" />
+
     </LinearLayout>
 
     <LinearLayout
         android:background="@android:color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
-        android:layout_alignParentRight="true"
+        android:layout_marginEnd="10dp"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:orientation="horizontal"
-        android:id="@+id/linearLayout2">
+        android:id="@id/linearLayout2">
 
         <ImageButton
             android:id="@+id/buttonHelp"
@@ -42,13 +54,19 @@
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackground"
             android:src="@drawable/ic_action_help"
+            android:layout_gravity="center_vertical"
+            app:tint="@android:color/black"
             android:contentDescription="@string/image_button" />
 
-        <CheckBox
-            android:id="@+id/checkBox1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
+      <ImageButton
+        android:id="@+id/imageNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/image_view"
+        android:src="@drawable/ic_arrow_forward"
+        app:tint="@android:color/black" />
     </LinearLayout>
 
 </RelativeLayout>

@@ -182,15 +182,15 @@ public class PackageProcessor {
    */
   public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, ArrayList<String> languageList) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray(PP_LANGUAGES_KEY);
-    int preferredLanguageCount = (languageList != null & !languageList.isEmpty()) ? languageList.size() : 1;
+    int preferredLanguageCount = (languageList != null && !languageList.isEmpty()) ? languageList.size() : 1;
     String defaultLanguageID = languages.getJSONObject(0).getString("id");
     if (languageList == null || languageList.isEmpty()) {
       languageList = new ArrayList<String>();
       languageList.add(defaultLanguageID);
     }
 
-
     String keyboardId = jsonEntry.getString(PP_KEYBOARD_ID_KEY);
+    // Check that package has touch keyboards.
     if (touchKeyboardExists(packageId, keyboardId)) {
       HashMap<String, String>[] keyboards = new HashMap[preferredLanguageCount];
       boolean firstLanguageAdded = false;
@@ -395,6 +395,22 @@ public class PackageProcessor {
   }
 
   /**
+   * Parse a kmp.json JSON object and return the package's minimum keyboard version (system.fileVersion).
+   * This is to avoid issues with app crashing if keyboard functionality is not supported.
+   * If undefined, return default version "7.0".
+   * @param json kmp.json as a JSON object.
+   * @return String of the package's minimum keyboard version
+   */
+  public static String getPackageMinimumKeyboardVersion(JSONObject json) {
+    try {
+      return json.getJSONObject("system").getString("fileVersion");
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
+      return "7.0";
+    }
+  }
+
+  /**
    * Parse a kmp.json JSON object and return the package's target (keyboards vs lexical models).
    * Only one can be valid. Otherwise, return "invalid"
    * @param json kmp.json as a JSON object.
@@ -561,7 +577,7 @@ public class PackageProcessor {
       File kmpFile = new File(packageId + ".kmp");
       File packageDir = constructPath(kmpFile, false);
       File[] files = packageDir.listFiles(touchKeyboardFilter);
-      if (files.length > 0) {
+      if (files != null && files.length > 0) {
         return true;
       }
     }

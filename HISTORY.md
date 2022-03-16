@@ -1,7 +1,61 @@
 # Keyman Version History
 
+## 15.0.213 beta 2022-03-15
+
+* feat(common): zip and index keyboard artifacts (#6367)
+* fix(android/engine): Activate menu on globe longpress before release (#6356)
+* fix(web): subkey touch position after scroll (#6340)
+* fix(developer): warn on ncaps usage inconsistency (#6347)
+* fix(web): caps state tracking for touch (#6351)
+* chore(windows): Update license date (#6374)
+* chore(android): Separate CI step to generate Play Store notes (#6375)
+* chore(linux): Update changelog and copyright (#6372)
+* fix(oem/fv/android): Consolidate dictionary and keyboard settings (#6369)
+* fix(linux): Don't start ibus-daemon multiple times (#6283)
+
+## 15.0.212 beta 2022-03-11
+
+* chore(linux): Fix lintian warnings (#6360)
+* fix(common): allow custom keyboard builds (#6358)
+
+## 15.0.211 beta 2022-03-10
+
+* fix(oem/fv/android): Check keyboard exists before registering a model (#6346)
+* chore(common): cleanup sh global color variables (#6353)
+
+## 15.0.210 beta 2022-03-10
+
+* feat(common): build test keyboards via script (#6352)
+
+## 15.0.209 beta 2022-03-08
+
+* fix(windows): add null pointer checks imsample keyboard (#6187)
+* chore(linux): Debug why Beta build didn't get triggered (#6337)
+* fix(developer): project should not steal focus on load (#6325)
+* chore(android/engine): Remove bold styling in lists (#6341)
+* fix(linux): Fix trigger script (#6342)
+* chore: increment to 15.0.209 (#6343)
+
 ## 15.0.206 beta 2022-03-02
 
+* change(web): tightens call signature for banner selection (#4966)
+* fix(windows): cleanup edge cases in k32_load (#5197)
+* feat(ios): refinement of spacebar-captioning PR (#5368)
+* fix(developer): move ngrok to Server/bin/ (#6304)
+* fix(linux): Gracefully handle keyboard download failure (#6285)
+* fix(linux): Gracefully handle makedirs failures (#6287)
+* chore(common): tweak CODEOWNERS (#6305)
+* fix(developer): rename Code to ID in Touch Layout Editor (#6309)
+* feat(developer): kmcomp -h and -help (#6312)
+* chore(developer): remove Package for Distribution action (#6313)
+* fix(web): error in floating osk view when no keyboard active (#6316)
+* chore(developer): disable upload for server except localhost (#6300)
+* fix(ios): tweak simulator builds to support M1 (#6317)
+* fix(developer): handle paste event in touch layout editor (#6295)
+* fix(developer): Improve active tab visibility (#6314)
+* fix(developer): font for Package and Model Editors (#6311)
+* fix(web): stop repeated CSS injection (#6310)
+* feat(developer): support commas in frequency in wordlists (#6315)
 * chore: release to beta
 
 ## 15.0.204 alpha 2022-03-01

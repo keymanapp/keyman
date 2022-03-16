@@ -105,6 +105,13 @@ public class PackageActivity extends AppCompatActivity implements
       return;
     }
 
+    // Check minimum keyboard version to ensure current version of Keyman supports the features
+    String pkgMinimumKeyboardVersion = kmpProcessor.getPackageMinimumKeyboardVersion(pkgInfo);
+    if (FileUtils.compareVersions(pkgMinimumKeyboardVersion, KMManager.getMajorVersion()) == FileUtils.VERSION_GREATER) {
+      showErrorToast(context, getString(R.string.minimum_keyboard_version_not_supported));
+      return;
+    }
+
     pkgName = kmpProcessor.getPackageName(pkgInfo);
     final int keyboardCount = kmpProcessor.getKeyboardCount(pkgInfo);
 

@@ -15,6 +15,6 @@ Here are some of the new features we have added to Keyman 15.0 for Android:
     | System        | 1                  | Quickly switch to previous system keyboard |
     | System        | 2+                 | Quickly switch to next Keyman keyboard |
 
-    * Long press and release the globe key to bring up the keyboard picker menu. On a Keyman system keyboard, the bottom of this menu will also display other enabled system keyboards that can be selected.
+    * Long press the globe key to bring up the keyboard picker menu. On a Keyman system keyboard, the bottom of this menu will also display other enabled system keyboards that can be selected.
 
     Note: On the lock screen, the keyboard picker menu is not displayed.

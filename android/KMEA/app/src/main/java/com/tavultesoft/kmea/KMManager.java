@@ -1325,7 +1325,17 @@ public final class KMManager {
     return true;
   }
 
-  public static boolean setBannerOptions(boolean mayPredict) {
+  /**
+   * deleteLexicalModel - Remove lexical model from the installed list
+   * and deregister the model with KMW
+   * @param context
+   * @param position - int position in the models list
+   */
+  public static void deleteLexicalModel(Context context, int position, boolean silenceNotification) {
+    KeyboardPickerActivity.deleteLexicalModel(context, position, silenceNotification);
+  }
+
+    public static boolean setBannerOptions(boolean mayPredict) {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
@@ -2100,20 +2110,29 @@ public final class KMManager {
   }
 
   /**
+   * Return if the lock screen is locked (prevents keyboard picker menu from being displayed)
+   * @return boolean
+   */
+  private static boolean isLocked() {
+    KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+    // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
+    return keyguardManager.isKeyguardLocked();
+  }
+
+  /**
    * Handle the globe key action
    * @param globeKeyDown boolean if the globe key state is GLOBE_KEY_STATE_DOWN
    * @param keyboardType KeyboardType KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
    */
-  private static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
+  public static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
     // Update globeKeyState
     if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
       globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
     }
 
     if (KMManager.shouldAllowSetKeyboard()) {
-      KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
       // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
-      if (keyguardManager.isKeyguardLocked()) {
+      if (isLocked()) {
         if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
           doGlobeKeyLockscreenAction(context);
         }

@@ -1155,9 +1155,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           object lblDebugHostCaption: TLabel
             Left = 12
             Top = 70
-            Width = 252
+            Width = 222
             Height = 13
-            Caption = 'Debug host is active at following web addresses:'
+            Caption = 'Server is active at following web addresses:'
           end
           object lblCrossPlatform: TLabel
             Left = 12

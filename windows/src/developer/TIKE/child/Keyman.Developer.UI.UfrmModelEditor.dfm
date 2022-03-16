@@ -334,9 +334,9 @@ inherited frmModelEditor: TfrmModelEditor
           object lblDebugHostCaption: TLabel
             Left = 12
             Top = 158
-            Width = 252
+            Width = 222
             Height = 13
-            Caption = 'Debug host is active at following web addresses:'
+            Caption = 'Server is active at following web addresses:'
           end
           object lblCrossPlatform: TLabel
             Left = 12
@@ -388,10 +388,10 @@ inherited frmModelEditor: TfrmModelEditor
           object cmdOpenDebugHost: TButton
             Left = 12
             Top = 286
-            Width = 189
+            Width = 109
             Height = 25
-            Caption = 'Open &debugger in local browser'
-            TabOrder = 3
+            Caption = 'Open in browser'
+            TabOrder = 5
             OnClick = cmdOpenDebugHostClick
           end
           object lbDebugHosts: TListBox
@@ -404,12 +404,12 @@ inherited frmModelEditor: TfrmModelEditor
             OnClick = lbDebugHostsClick
           end
           object cmdSendURLsToEmail: TButton
-            Left = 12
-            Top = 317
-            Width = 189
+            Left = 127
+            Top = 286
+            Width = 109
             Height = 25
-            Caption = 'Send addresses to &email...'
-            TabOrder = 5
+            Caption = 'Send to &email...'
+            TabOrder = 6
             OnClick = cmdSendURLsToEmailClick
           end
           object editTestKeyboard: TEdit
@@ -428,6 +428,23 @@ inherited frmModelEditor: TfrmModelEditor
             Caption = '&Browse...'
             TabOrder = 1
             OnClick = cmdBrowseTestKeyboardClick
+          end
+          object cmdCopyDebuggerLink: TButton
+            Left = 242
+            Top = 286
+            Width = 109
+            Height = 25
+            Caption = 'Copy &link'
+            TabOrder = 7
+            OnClick = cmdCopyDebuggerLinkClick
+          end
+          object cmdConfigureWebDebugger: TButton
+            Left = 168
+            Top = 122
+            Width = 153
+            Height = 25
+            Action = modActionsMain.actToolsWebConfigure
+            TabOrder = 3
           end
         end
         object panOpenInExplorer: TPanel
@@ -542,15 +559,15 @@ inherited frmModelEditor: TfrmModelEditor
   object dlgAddWordlist: TOpenDialog
     Options = [ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Create or Add Wordlist'
-    Left = 344
-    Top = 344
+    Left = 32
+    Top = 216
   end
   object dlgBrowseTestKeyboard: TOpenDialog
     DefaultExt = 'js'
     Filter = 'Compiled keyboard files (*.js)|*.js|All files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select compiled keyboard to test with'
-    Left = 488
-    Top = 120
+    Left = 32
+    Top = 280
   end
 end

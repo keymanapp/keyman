@@ -1167,9 +1167,9 @@ inherited frmPackageEditor: TfrmPackageEditor
           object lblDebugHostCaption: TLabel
             Left = 12
             Top = 70
-            Width = 252
+            Width = 222
             Height = 13
-            Caption = 'Debug host is active at following web addresses:'
+            Caption = 'Server is active at following web addresses:'
           end
           object lblCrossPlatform: TLabel
             Left = 12
@@ -1197,17 +1197,17 @@ inherited frmPackageEditor: TfrmPackageEditor
             Top = 34
             Width = 150
             Height = 25
-            Caption = 'Test &Package Online'
+            Caption = 'Test &package on web'
             TabOrder = 0
             OnClick = cmdStartTestOnlineClick
           end
           object cmdOpenDebugHost: TButton
             Left = 12
             Top = 240
-            Width = 221
+            Width = 109
             Height = 25
-            Caption = 'Open packages page in local &browser'
-            TabOrder = 2
+            Caption = 'Open in &browser'
+            TabOrder = 3
             OnClick = cmdOpenDebugHostClick
           end
           object lbDebugHosts: TListBox
@@ -1216,8 +1216,34 @@ inherited frmPackageEditor: TfrmPackageEditor
             Width = 289
             Height = 142
             ItemHeight = 13
-            TabOrder = 1
+            TabOrder = 2
             OnClick = lbDebugHostsClick
+          end
+          object cmdConfigureWebDebugger: TButton
+            Left = 168
+            Top = 34
+            Width = 153
+            Height = 25
+            Action = modActionsMain.actToolsWebConfigure
+            TabOrder = 1
+          end
+          object cmdSendURLsToEmail: TButton
+            Left = 127
+            Top = 240
+            Width = 109
+            Height = 25
+            Caption = 'Send to &email...'
+            TabOrder = 4
+            OnClick = cmdSendURLsToEmailClick
+          end
+          object cmdCopyDebuggerLink: TButton
+            Left = 242
+            Top = 240
+            Width = 109
+            Height = 25
+            Caption = 'Copy &link'
+            TabOrder = 5
+            OnClick = cmdCopyDebuggerLinkClick
           end
         end
         object panBuildDesktop: TPanel

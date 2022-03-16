@@ -19,7 +19,7 @@ verify_on_mac
 
 
 #xcodebuild -exportLocalizations -project "engine/KMEI/KeymanEngine.xcodeproj"
-#xcodebuild -exportLocalizations -project "keyman/Keyman/Keyman.xcodeproj" 
+#xcodebuild -exportLocalizations -project "keyman/Keyman/Keyman.xcodeproj"
 
 BASE_EXPORT_FOLDER="build/crowdin"
 START_DIRECTORY=`pwd`
@@ -52,8 +52,8 @@ echo ""
 echo "---------------------------------------------"
 echo "iOS base i18n files have been exported."
 echo "Examine the contents of the folder at"
-echo "${SUCCESS_GREEN}$KEYMAN_ROOT/ios/$BASE_EXPORT_FOLDER${NORMAL}"
+echo "${COLOR_GREEN}$KEYMAN_ROOT/ios/$BASE_EXPORT_FOLDER${COLOR_RESET}"
 echo "and compare against the iOS entries within"
-echo "${SUCCESS_GREEN}$KEYMAN_ROOT/crowdin.yml${NORMAL}"
+echo "${COLOR_GREEN}$KEYMAN_ROOT/crowdin.yml${COLOR_RESET}"
 echo "---------------------------------------------"
 

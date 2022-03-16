@@ -601,7 +601,8 @@ begin
   if csDestroying in ComponentState then
     Exit;
 
-  if (frmKeymanDeveloper.ActiveChild = Self) and (Screen.ActiveForm = frmKeymanDeveloper) then
+  if (frmKeymanDeveloper.ActiveChild = Self) and (Screen.ActiveForm = frmKeymanDeveloper) and
+    (GetWindowThreadProcessId(GetForegroundWindow, nil) = GetCurrentThreadId) then
   begin
     cef.SetFocus;
   end;

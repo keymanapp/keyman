@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- path is relative to /data/data/com.firstvoices.keyboards/files/ -->
+    <files-path name="cloud" path="../app_data/cloud/" />
+    <files-path name="models" path="../app_data/models/" />
+    <files-path name="packages" path="../app_data/packages/" />
+    <files-path name="root" path="../app_data/" />
+</paths>

@@ -88,6 +88,8 @@ type
     cmdCompile: TButton;
     Label5: TLabel;
     editOutPath: TEdit;
+    cmdCopyDebuggerLink: TButton;
+    cmdConfigureWebDebugger: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
@@ -115,6 +117,7 @@ type
     procedure cmdOpenSourceFolderClick(Sender: TObject);
     procedure cmdOpenBuildFolderClick(Sender: TObject);
     procedure cmdOpenProjectFolderClick(Sender: TObject);
+    procedure cmdCopyDebuggerLinkClick(Sender: TObject);
   private
     type
       TWordlist = class
@@ -173,6 +176,7 @@ implementation
 
 uses
   System.UITypes,
+  Vcl.Clipbrd,
 
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.modeltsProjectFileAction,
@@ -798,6 +802,16 @@ procedure TfrmModelEditor.cmdBrowseTestKeyboardClick(Sender: TObject);
 begin
   if dlgBrowseTestKeyboard.Execute then
     editTestKeyboard.Text := dlgBrowseTestKeyboard.FileName;
+end;
+
+procedure TfrmModelEditor.cmdCopyDebuggerLinkClick(Sender: TObject);
+begin
+  try
+    Clipboard.AsText := lbDebugHosts.Items[lbDebugHosts.ItemIndex];
+  except
+    on E:Exception do
+      ShowMessage(E.Message);
+  end;
 end;
 
 procedure TfrmModelEditor.cmdOpenDebugHostClick(Sender: TObject);
