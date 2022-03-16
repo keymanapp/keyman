@@ -150,12 +150,11 @@ namespace com.keyman.osk.browser {
       let cs = getComputedStyle(subKeys);
       let oskHeight = keyman.osk.computedHeight;
       let bottomY = parseInt(cs.bottom, 10);
-      let popupHeight = parseInt(cs.height, 10);
 
       let delta = 0;
-      if(popupHeight + bottomY > oskHeight && constrainPopup) {
-        delta = popupHeight + bottomY - oskHeight;
-        ss.bottom = (bottomY - delta) + 'px';
+      if(bottomY > oskHeight && constrainPopup) {
+        delta = bottomY - oskHeight;
+        ss.bottom = oskHeight + 'px';
       }
 
       // Add the callout
@@ -190,7 +189,7 @@ namespace com.keyman.osk.browser {
 
         // Set position and style
         ccs.top = (xTop-6)+'px'; ccs.left = (xLeft-1)+'px';
-        ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
+        ccs.width = xWidth+'px'; ccs.height = (xHeight+5)+'px';
 
         // Return callout element, to allow removal later
         return cc;

@@ -112,8 +112,8 @@ namespace com.keyman.osk.browser {
 
         this.cap.style.width = xWidth + 'px';
         this.tip.style.height = (canvasHeight / 2) + 'px';
-        this.cap.style.top = (canvasHeight / 2) + 'px';
-        this.cap.style.height = (canvasHeight / 2 - 1) + 'px';
+        this.cap.style.top = (canvasHeight / 2 - 1) + 'px';
+        this.cap.style.height = (canvasHeight / 2 + 2) + 'px';
 
         if(this.constrain && tipHeight + bottomY > oskHeight) {
           const delta = tipHeight + bottomY - oskHeight;
