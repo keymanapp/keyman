@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.3 alpha 2022-03-16
+
+* chore: merge beta changes to alpha B15S4 (#6376)
+* chore(common/core/desktop): Improve meson build file  ️ (#6183)
+
 ## 16.0.2 alpha 2022-03-03
 
 * chore(deps-dev): bump karma from 6.3.14 to 6.3.16 in /web/testing/regression-tests (#6322)
