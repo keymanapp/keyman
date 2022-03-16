@@ -19,8 +19,17 @@
 /* Common key-layout properties (all form factor + OS combinations) */
 
 .kmw-key-row {position: relative; width: 100%; height: 20%; margin: 0px; padding: 0px; border: 0px; overflow: hidden}
-.kmw-key-square {display: inline-block; position: relative; z-index: 10000; margin: 0px; border: 0px;
-  padding: 0px; box-sizing: border-box; -moz-box-sizing: border-box;}
+.kmw-key-square {
+  display: inline-block;
+  position: relative;
+  z-index: 10000;
+  margin: 0px;
+  border: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  vertical-align: top;
+}
 .kmw-key {display: block; position: relative; margin: 0px; text-align: center; box-sizing: border-box;
   -moz-box-sizing: border-box;}
 
