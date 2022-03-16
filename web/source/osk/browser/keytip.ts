@@ -86,7 +86,7 @@ namespace com.keyman.osk.browser {
             height: 1.6 * xHeight + 'px' // as opposed to the canvas height of 2.3 * xHeight.
           };
 
-          kts.fontSize = key.key.getIdealFontSize(vkbd, scaleStyle);
+          kts.fontSize = key.key.getIdealFontSize(vkbd, scaleStyle, true);
         }
 
         this.label.textContent = kc.textContent;
