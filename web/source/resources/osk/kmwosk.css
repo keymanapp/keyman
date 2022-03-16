@@ -333,9 +333,10 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   position: absolute;
   display: block;
   background-color: #fdfdfe;
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 5px 5px;
   z-index: 10002;
   pointer-events:none;
+  border-bottom: solid 1px #8a8d90;
 }
 
 #kmw-keytip {
@@ -459,7 +460,7 @@ div.android div.kmw-keytip-tip {
 
 /* Popup key styles */
 #kmw-popup-keys {
-  position: relative;
+  position: absolute;
   display: block;
   width: auto;
   height: auto;

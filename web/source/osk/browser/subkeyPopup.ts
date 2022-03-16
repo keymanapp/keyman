@@ -139,7 +139,10 @@ namespace com.keyman.osk.browser {
         x=0;
       }
       ss.left=x+'px';
-      ss.bottom = (_Box.offsetHeight - rowElement.offsetTop + subKeys.offsetHeight) + 'px';
+
+      let _BoxRect = _Box.getBoundingClientRect();
+      let rowElementRect = rowElement.getBoundingClientRect();
+      ss.top = (rowElementRect.top - _BoxRect.top - subKeys.offsetHeight - 3) + 'px';
 
       // Make the popup keys visible
       ss.visibility='visible';
@@ -149,12 +152,12 @@ namespace com.keyman.osk.browser {
 
       let cs = getComputedStyle(subKeys);
       let oskHeight = keyman.osk.computedHeight;
-      let bottomY = parseInt(cs.bottom, 10);
+      let topY = parseFloat(cs.top);
 
       let delta = 0;
-      if(bottomY > oskHeight && constrainPopup) {
-        delta = bottomY - oskHeight;
-        ss.bottom = oskHeight + 'px';
+      if(topY < 0 && constrainPopup) {
+        delta = -topY - 3;
+        ss.top = '0px';
       }
 
       // Add the callout
@@ -182,14 +185,19 @@ namespace com.keyman.osk.browser {
         keyman.osk._Box.appendChild(cc);
 
         // Create the callout
+        let keyRect = key.getBoundingClientRect();
+        let _BoxRect = keyman.osk._Box.getBoundingClientRect();
+
         var xLeft = key.offsetLeft + (<HTMLElement>key.offsetParent).offsetLeft,
             xTop = key.offsetTop + (key.key as OSKBaseKey).row.element.offsetTop + delta,
             xWidth = key.offsetWidth + 2,
             xHeight = calloutHeight;
 
         // Set position and style
-        ccs.top = (xTop-6)+'px'; ccs.left = (xLeft-1)+'px';
-        ccs.width = xWidth+'px'; ccs.height = (xHeight+5)+'px';
+        ccs.top = (keyRect.top - _BoxRect.top - 8 + delta) + 'px';
+        ccs.left = (keyRect.left - _BoxRect.left) + 'px';
+        ccs.width = keyRect.width + 'px';
+        ccs.height = (keyRect.height + 6) + 'px';
 
         // Return callout element, to allow removal later
         return cc;
