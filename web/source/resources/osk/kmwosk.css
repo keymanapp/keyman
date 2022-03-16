@@ -18,6 +18,13 @@
 
 /* Common key-layout properties (all form factor + OS combinations) */
 
+.kmw-osk-frame,
+.kmw-osk-frame * {
+  /* border-box may make more sense here in the future, but for compat reasons we need to
+     ensure we are always consistent, regardless of context of placement of the osk */
+  box-sizing: content-box;
+}
+
 .kmw-key-row {position: relative; width: 100%; height: 20%; margin: 0px; padding: 0px; border: 0px; overflow: hidden}
 .kmw-key-square {
   display: inline-block;

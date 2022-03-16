@@ -18,8 +18,11 @@ namespace com.keyman.osk.browser {
 
     private readonly constrain: boolean;
 
-    // constrain:  keep the keytip within the bounds of the overall OSK.
-    // Will probably be handled via function in a later pass.
+    /**
+     *
+     * @param constrain keep the keytip within the bounds of the overall OSK.
+     *                  Will probably be handled via function in a later pass.
+     */
     constructor(constrain: boolean) {
       let tipElement = this.element=document.createElement('div');
       tipElement.className='kmw-keytip';
@@ -70,7 +73,10 @@ namespace com.keyman.osk.browser {
 
         // Matches how the subkey positioning is set.
         const _Box = vkbd.element.parentNode as HTMLDivElement;
-        kts.bottom = (_Box.offsetHeight - rowElement.offsetHeight - rowElement.offsetTop + key.offsetTop) + 'px';
+        const _BoxRect = _Box.getBoundingClientRect();
+        const keyRect = key.getBoundingClientRect();
+
+        kts.bottom = (_BoxRect.bottom - keyRect.bottom + 3) + 'px';
         kts.textAlign = 'center';
         kts.overflow = 'visible';
         kts.fontFamily = util.getStyleValue(kc,'font-family');
@@ -107,8 +113,8 @@ namespace com.keyman.osk.browser {
 
         let cs = getComputedStyle(this.element);
         let oskHeight = keyman.osk.computedHeight;
-        let bottomY = parseInt(cs.bottom, 10);
-        let tipHeight = parseInt(cs.height, 10);
+        let bottomY = parseFloat(cs.bottom);
+        let tipHeight = parseFloat(cs.height);
 
         this.cap.style.width = xWidth + 'px';
         this.tip.style.height = (canvasHeight / 2) + 'px';
@@ -118,7 +124,7 @@ namespace com.keyman.osk.browser {
         if(this.constrain && tipHeight + bottomY > oskHeight) {
           const delta = tipHeight + bottomY - oskHeight;
           kts.height = (canvasHeight-delta) + 'px';
-          const hx = Math.max(0, (canvasHeight-delta)-(canvasHeight/2));
+          const hx = Math.max(0, (canvasHeight-delta)-(canvasHeight/2) + 2);
           this.cap.style.height = hx + 'px';
         }
 
