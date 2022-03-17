@@ -52,6 +52,8 @@ This installer will copy Keyman into your Input Methods folder, and configure Ke
 	#
 	
 	dlog("### Removing old version of Keyman ###")
+	dlog("### Removing old version of Keyman ###")
+	
 	set scriptResult to do shell script "rm -vrf ~/Library/Input\\ Methods/Keyman.app || true"
 	dlog(scriptResult)
 	
@@ -64,6 +66,9 @@ This installer will copy Keyman into your Input Methods folder, and configure Ke
 	set cmd to "cp -vR " & scriptContainer & "Contents/MacOS/Keyman.app ~/Library/Input\\ Methods/"
 	set scriptResult to do shell script cmd
 	dlog(scriptResult)
+	
+	set containerMessage to "scriptContainer: " & scriptContainer
+	display dialog containerMessage
 	
 	#
 	# remove quarantine extended attribute
@@ -129,6 +134,10 @@ This installer will copy Keyman into your Input Methods folder, and configure Ke
 
 	dlog("### Helping user add Keyman to Input Methods ###")
 	set cmd to scriptContainer & "Contents/MacOS/textinputsource -e Keyman"
+	
+	set enableMessage to "about to enable Keyman command: " & cmd
+	display dialog enableMessage
+	
 	set scriptResult to do shell script cmd
 	dlog(scriptResult)
 	
