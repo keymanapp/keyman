@@ -11,7 +11,7 @@ import  UIKit
 
 class KMUnderscoreView: KMView {
     override func draw(_ rect: CGRect) {
-        //percentage based widths for the color bar portion of the logo
+        // percentage based widths for the color bar portion of the logo
         let widths: [CGFloat] = [0.6, 0.25, 0.15]
         let colors: [UIColor] = [ UIColor.keymanOrange,
                                   UIColor.keymanRed,
