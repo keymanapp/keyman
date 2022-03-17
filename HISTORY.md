@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.215 beta 2022-03-17
+
+* fix(web): crash on focus before init (#6393)
+
 ## 15.0.214 beta 2022-03-16
 
 * feat(web): `&newLayer` and `&oldLayer` (#6366)
