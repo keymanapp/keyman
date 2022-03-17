@@ -426,6 +426,9 @@ ProcessWMKeymanControl(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
   switch (wParam) {
   case KMC_PROFILECHANGED:
+    if (!Globals::IsControllerThread(GetCurrentThreadId())) {
+      break;
+    }
     WORD wAtom = HIWORD(lParam);
     char atomStr[128];
     if (GetAtomName(wAtom, atomStr, 128))
@@ -437,7 +440,10 @@ ProcessWMKeymanControl(HWND hwnd, WPARAM wParam, LPARAM lParam) {
       if (wcsstr(atomWstr, clsidstr)) {
         // TODO: #5996 set a bool to say keyman keyboard is active
         // needs to be accessabel on the `k32_lowlevelkeyboardhook.cpp`
-
+        keymanKeyboardActive = TRUE;
+      }
+      else {
+        keymanKeyboardActive = FALSE;
       }
     }
     break;
