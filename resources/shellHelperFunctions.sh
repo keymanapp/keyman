@@ -85,21 +85,21 @@ get_platform_folder() {
 # The following allows coloring of warning and error lines, but only works if there's a
 # terminal attached, so not on the build machine.
 if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
-    ERROR_RED=$(tput setaf 1)
-    SUCCESS_GREEN=$(tput setaf 2)
-    WARNING_YELLOW=$(tput setaf 3)
-    NORMAL=$(tput sgr0)
-    TERM_HEADING=$(tput setaf 4)
+    COLOR_RED=$(tput setaf 1)
+    COLOR_GREEN=$(tput setaf 2)
+    COLOR_BLUE=$(tput setaf 4)
+    COLOR_YELLOW=$(tput setaf 3)
+    COLOR_RESET=$(tput sgr0)
 else
-    ERROR_RED=
-    SUCCESS_GREEN=
-    WARNING_YELLOW=
-    NORMAL=
-    TERM_HEADING=
+    COLOR_RED=
+    COLOR_GREEN=
+    COLOR_BLUE=
+    COLOR_YELLOW=
+    COLOR_RESET=
 fi
 
 echo_heading() {
-  echo "${TERM_HEADING}$*${NORMAL}"
+  echo "${COLOR_BLUE}$*${COLOR_RESET}"
 }
 
 fail() {
@@ -107,11 +107,11 @@ fail() {
     if [[ "$FAILURE_MSG" == "" ]]; then
         FAILURE_MSG="Unknown failure"
     fi
-    echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
+    echo "${COLOR_RED}$FAILURE_MSG${COLOR_RESET}"
     exit 1
 }
 
-warn() { echo "${WARNING_YELLOW}$*${NORMAL}"; }
+warn() { echo "${COLOR_YELLOW}$*${COLOR_RESET}"; }
 
 displayInfo() {
     if [ "$QUIET" != true ]; then

@@ -87,6 +87,7 @@
 #include "onlineconstants.h"
 #include "CharToKeyConversion.h"
 #include "CasedKeys.h"
+#include "CheckNCapsConsistency.h"
 
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
@@ -560,6 +561,11 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 
   if (!CheckKeyboardFinalVersion(fk)) {
     return FALSE;
+  }
+
+  /* Warn on inconsistent use of NCAPS */
+  if (!FMnemonicLayout) {
+    CheckNCapsConsistency(fk);
   }
 
   /* Flag presence of deprecated features */

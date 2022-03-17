@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 15.0.215 beta 2022-03-17
+
+* fix(web): crash on focus before init (#6393)
+
+## 15.0.214 beta 2022-03-16
+
+* feat(web): `&newLayer` and `&oldLayer` (#6366)
+
+## 15.0.213 beta 2022-03-15
+
+* feat(common): zip and index keyboard artifacts (#6367)
+* fix(android/engine): Activate menu on globe longpress before release (#6356)
+* fix(web): subkey touch position after scroll (#6340)
+* fix(developer): warn on ncaps usage inconsistency (#6347)
+* fix(web): caps state tracking for touch (#6351)
+* chore(windows): Update license date (#6374)
+* chore(android): Separate CI step to generate Play Store notes (#6375)
+* chore(linux): Update changelog and copyright (#6372)
+* fix(oem/fv/android): Consolidate dictionary and keyboard settings (#6369)
+* fix(linux): Don't start ibus-daemon multiple times (#6283)
+
+## 15.0.212 beta 2022-03-11
+
+* chore(linux): Fix lintian warnings (#6360)
+* fix(common): allow custom keyboard builds (#6358)
+
+## 15.0.211 beta 2022-03-10
+
+* fix(oem/fv/android): Check keyboard exists before registering a model (#6346)
+* chore(common): cleanup sh global color variables (#6353)
+
 ## 15.0.210 beta 2022-03-10
 
 * feat(common): build test keyboards via script (#6352)

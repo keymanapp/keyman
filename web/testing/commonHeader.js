@@ -93,7 +93,13 @@
     doAddKeyboards({id:'web_context_tests',name:'Web Context Tests',languages:{id:'en',name:'English'},
       filename:(prefix + 'web_context_tests.js')});
 
-    // Add more keyboards to the language menu, by keyboard name,
+    doAddKeyboards({id:'test_chirality',name:'test_chirality',languages:{id:'en',name:'English'},
+      filename:(prefix + 'test_chirality.js')});
+
+    doAddKeyboards({id:'obolo_chwerty',name:'obolo_chwerty',languages:{id:'en',name:'English'},
+      filename:(prefix + 'obolo_chwerty.js')});
+
+      // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the BCP-47 language code.
     // We use a different loading pattern here than in the samples version to provide a slightly different set of test cases.
     doAddKeyboards('french','@he');

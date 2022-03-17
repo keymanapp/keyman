@@ -1,6 +1,8 @@
 [Config]
 Font=Arial Unicode MS
-Size=20
+Size=15
+gridx=30
+gridy=30
 
 [Groups]
 IPA
