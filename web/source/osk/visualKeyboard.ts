@@ -1636,7 +1636,7 @@ namespace com.keyman.osk {
 
       // If there is an active popup menu (which can occur from the previous block),
       // a subkey popup exists; do not allow base key output.
-      if (this.subkeyGesture) {
+      if (this.subkeyGesture || this.pendingSubkey) {
         return true;
       }
 
