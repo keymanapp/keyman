@@ -65,6 +65,7 @@
 #include "pch.h"
 
 void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam);
+void ProcessWMKeymanControl(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void GetCapsAndNumlockState();
 
@@ -232,6 +233,13 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		ProcessWMKeymanControlInternal(mp->hwnd, mp->wParam, mp->lParam);
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
+
+  if (mp->message == wm_keyman_control)
+  {
+      SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_control hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);
+      ProcessWMKeymanControl(mp->hwnd, mp->wParam, mp->lParam);
+      return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  }
 
 	if(mp->message == wm_keyman)   // I3933
 	{
@@ -410,6 +418,30 @@ void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
     SetForegroundWindow(hwnd);
     break;
 	}
+}
+
+void
+ProcessWMKeymanControl(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+  UNREFERENCED_PARAMETER(hwnd);
+
+  switch (wParam) {
+  case KMC_PROFILECHANGED:
+    WORD wAtom = HIWORD(lParam);
+    char atomStr[128];
+    if (GetAtomName(wAtom, atomStr, 128))
+    {
+      // Is this a keyman keyboard check c_clsidKMTipTextService
+      WCHAR clsidstr[40];
+      StringFromGUID2(c_clsidKMTipTextService, clsidstr, _countof(clsidstr));
+      PWSTR atomWstr = strtowstr(atomStr);
+      if (wcsstr(atomWstr, clsidstr)) {
+        // TODO: #5996 set a bool to say keyman keyboard is active
+        // needs to be accessabel on the `k32_lowlevelkeyboardhook.cpp`
+
+      }
+    }
+    break;
+  }
 }
 
 /*
