@@ -87,9 +87,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window!.rootViewController = navigationController
     window!.makeKeyAndVisible()
 
-    //TODO: look in documents directory for .zip / .kmp files
-    //TODO: OR browse documents Dir from new keyboard window
-    //self.installAdhocKeyboard(filePath: "")
+    // TODO: look in documents directory for .zip / .kmp files
+    // TODO: OR browse documents Dir from new keyboard window
+    // self.installAdhocKeyboard(filePath: "")
 
     return true
   }

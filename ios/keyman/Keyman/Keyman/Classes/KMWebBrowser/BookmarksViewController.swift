@@ -57,7 +57,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
                                             message: "",
                                             preferredStyle: UIAlertController.Style.alert)
     alertController.addTextField(configurationHandler: { (textField) in
-      //listen for changes
+      // listen for changes
       NotificationCenter.default.addObserver(self,
         selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
         name: UITextField.textDidChangeNotification, object: textField)
@@ -70,7 +70,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
       self.inputTitleField = textField
     })
     alertController.addTextField(configurationHandler: { (textField) in
-      //listen for changes
+      // listen for changes
       NotificationCenter.default.addObserver(self,
           selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
           name: UITextField.textDidChangeNotification, object: textField)
@@ -207,7 +207,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     tableView.reloadData()
   }
 
-  //handler
+  // handler
   @objc func handleTextFieldTextChangedNotification(notification: NSNotification) {
     updateAddButtonEnableState()
   }
