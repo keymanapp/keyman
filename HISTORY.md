@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.216 beta 2022-03-18
+
+* feat(linux): Allow to run ibus tests on Wayland  ️ (#6202)
+
 ## 15.0.215 beta 2022-03-17
 
 * fix(web): crash on focus before init (#6393)
