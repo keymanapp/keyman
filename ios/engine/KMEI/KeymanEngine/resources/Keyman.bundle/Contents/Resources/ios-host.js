@@ -257,8 +257,8 @@ function setCursorRange(pos, length) {
     var resetContext = (ta.selectionStart != pos || ta.selectionEnd != pos + length);
     ta.selectionStart = ta._KeymanWebSelectionStart = pos;
     ta.selectionEnd = ta._KeymanWebSelectionEnd = pos + length;
-    kmw['setActiveElement'](ta);
     if(resetContext) {
+        kmw['setActiveElement'](ta);
         kmw.resetContext();
     }
     return ta.selectionEnd;
@@ -271,8 +271,8 @@ function setKeymanVal(text) {
 
     var resetContext = ta.value != text;
     ta.value = text;
-    kmw['setActiveElement'](ta);
     if(resetContext) {
+        kmw['setActiveElement'](ta);
         kmw.resetContext();
     }
     return ta.value;
