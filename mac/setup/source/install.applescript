@@ -70,10 +70,6 @@ This installer will copy Keyman into your Input Methods folder, and configure Ke
 	#set containerMessage to "scriptContainer: " & scriptContainer
 	#display dialog containerMessage
 	
-	# does this dialog provide time for input method to be recognized by the system?
-	set enableMessage to "Keyman has been added to your Mac. You will now be asked to enable Keyman as an input method."
-	display dialog enableMessage
-	
 	#
 	# remove quarantine extended attribute
 	#
@@ -133,21 +129,12 @@ This installer will copy Keyman into your Input Methods folder, and configure Ke
 	# Enable Keyman as an input method
 	#
 	
-	# for debugging, delete
-	#dlog("### about to begin 3 second delay before adding Keyman to Input Methods ###")
-	#delay 3
-	#dlog("### completed 3 second delay before adding Keyman to Input Methods ###")
-	
 	dlog("### Helping user add Keyman to Input Methods ###")
 	set cmd to scriptContainer & "Contents/MacOS/textinputsource -e Keyman"
 	
 	# for debugging, delete
-	#set enableMessage to "about to enable Keyman command: " & cmd
-	#display dialog enableMessage
-	
-	# does this dialog provide time for input method to be recognized by the system? NO -> does not help!!!
-	#set enableMessage to "Keyman has been added to your Mac. You will now be asked to enable Keyman as an input method."
-	#display dialog enableMessage
+	set enableMessage to "about to enable Keyman command: " & cmd
+	display dialog enableMessage
 	
 	set scriptResult to do shell script cmd
 	dlog(scriptResult)
