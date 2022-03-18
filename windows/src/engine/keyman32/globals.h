@@ -305,9 +305,9 @@ BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault);
 
 void WINAPI SetCustomPostKeyCallback(CUSTOMPOSTKEYCALLBACKPROC proc);
 
+extern BOOL isKeymanKeyboardActive; // is the active keyboard a Keyman keyboard
 
-extern BOOL keymanKeyboardActive;
-/* FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7 Keyman keyboard id */
+/* FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7 Keyman keyboard guid */
 extern const CLSID c_clsidKMTipTextService;
 
 #endif

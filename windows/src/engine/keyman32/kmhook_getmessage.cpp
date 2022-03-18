@@ -431,19 +431,16 @@ ProcessWMKeymanControl(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     }
     WORD wAtom = HIWORD(lParam);
     char atomStr[128];
-    if (GetAtomName(wAtom, atomStr, 128))
-    {
+    if (GetAtomName(wAtom, atomStr, 128)) {
       // Is this a keyman keyboard check c_clsidKMTipTextService
       WCHAR clsidstr[40];
       StringFromGUID2(c_clsidKMTipTextService, clsidstr, _countof(clsidstr));
       PWSTR atomWstr = strtowstr(atomStr);
       if (wcsstr(atomWstr, clsidstr)) {
-        // TODO: #5996 set a bool to say keyman keyboard is active
-        // needs to be accessabel on the `k32_lowlevelkeyboardhook.cpp`
-        keymanKeyboardActive = TRUE;
+        isKeymanKeyboardActive = TRUE;
       }
       else {
-        keymanKeyboardActive = FALSE;
+        isKeymanKeyboardActive = FALSE;
       }
     }
     break;
