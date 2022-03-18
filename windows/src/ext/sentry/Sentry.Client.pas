@@ -276,11 +276,13 @@ begin
   {$WARN SYMBOL_PLATFORM OFF} // W1002 Symbol 'CmdLine' is specific to a platform
   if CmdLine <> nil then
   begin
-    sentry_set_tag('keyman.commandline', PAnsiChar(AnsiString(string(CmdLine))));
+    sentry_set_extra('keyman.commandline', sentry_value_new_string(PAnsiChar(AnsiString(string(CmdLine)))));
   end;
   {$WARN SYMBOL_PLATFORM DEFAULT}
 
-  sentry_set_tag('keyman.executable', PAnsiChar(AnsiString(ParamStr(0))));
+  sentry_set_extra('keyman.executable.fullpath', sentry_value_new_string(PAnsiChar(AnsiString(ParamStr(0)))));
+  sentry_set_tag('keyman.executable', PAnsiChar(AnsiString(ExtractFileName(ParamStr(0)))));
+  // TODO: callback to capture list of keyboard filenames, TSF settings, additional diag?
 
   if scfCaptureExceptions in AFlags then
   begin
