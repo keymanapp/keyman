@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.217 beta 2022-03-19
+
+* fix(web): bounding rect offset was incorrect (#6357)
+
 ## 15.0.216 beta 2022-03-18
 
 * feat(linux): Allow to run ibus tests on Wayland  ️ (#6202)
