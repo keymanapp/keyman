@@ -122,7 +122,7 @@ if(!window['keyman']['initialized']) {
      **/
     function resetVKShift() {
       let keyman = com.keyman.singleton;
-      if(!keyman.uiManager.isActivating && keyman.osk.vkbd) {
+      if(!keyman.uiManager.isActivating && keyman.osk?.vkbd) {
         keyman.core.keyboardProcessor._UpdateVKShift(null);  //this should be enabled !!!!! TODO
       }
     }

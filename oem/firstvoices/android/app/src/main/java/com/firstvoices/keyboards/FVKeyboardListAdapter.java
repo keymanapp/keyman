@@ -54,10 +54,6 @@ class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
             holder.nextButton = convertView.findViewById(R.id.imageNext);
             holder.nextButton.setOnClickListener(new FVKeyboardListAdapter.FVOnClickNextListener());
             convertView.setTag(holder);
-
-            if (listFont != null) {
-                holder.text1.setTypeface(listFont, Typeface.BOLD);
-            }
         } else {
             holder = (ViewHolder) convertView.getTag();
         }

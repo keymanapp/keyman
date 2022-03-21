@@ -1325,7 +1325,17 @@ public final class KMManager {
     return true;
   }
 
-  public static boolean setBannerOptions(boolean mayPredict) {
+  /**
+   * deleteLexicalModel - Remove lexical model from the installed list
+   * and deregister the model with KMW
+   * @param context
+   * @param position - int position in the models list
+   */
+  public static void deleteLexicalModel(Context context, int position, boolean silenceNotification) {
+    KeyboardPickerActivity.deleteLexicalModel(context, position, silenceNotification);
+  }
+
+    public static boolean setBannerOptions(boolean mayPredict) {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);

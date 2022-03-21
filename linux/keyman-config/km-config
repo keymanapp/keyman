@@ -5,6 +5,7 @@ import logging
 
 from keyman_config import __versionwithtag__, __pkgversion__
 from keyman_config.handle_install import download_and_install_package
+from keyman_config.ibus_util import verify_ibus_daemon
 
 
 if __name__ == '__main__':
@@ -37,6 +38,10 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
     else:
         logging.basicConfig(format='%(levelname)s:%(message)s')
+
+    logging.info('Keyman version %s %s', __versionwithtag__, __pkgversion__)
+
+    verify_ibus_daemon(False)
 
     if args.install:
         download_and_install_package(args.install)
