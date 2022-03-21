@@ -82,7 +82,7 @@ apply_action(
       text_store.push_back(Uni_UTF32ToSurrogate1(act.character));
       text_store.push_back(Uni_UTF32ToSurrogate2(act.character));
     } else {
-      text_store.push_back(act.character);
+      text_store.push_back((char16_t)act.character);
     }
     // std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
