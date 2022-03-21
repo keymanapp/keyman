@@ -151,12 +151,11 @@ namespace com.keyman.osk.browser {
       let constrainPopup = keyman.isEmbedded;
 
       let cs = getComputedStyle(subKeys);
-      let oskHeight = keyman.osk.computedHeight;
       let topY = parseFloat(cs.top);
 
       let delta = 0;
       if(topY < 0 && constrainPopup) {
-        delta = -topY - 3;
+        delta = -topY;
         ss.top = '0px';
       }
 
@@ -177,7 +176,7 @@ namespace com.keyman.osk.browser {
 
       delta = delta || 0;
 
-      let calloutHeight = key.offsetHeight - delta;
+      let calloutHeight = key.offsetHeight - delta + 6;
 
       if(calloutHeight > 0) {
         var cc = document.createElement('div'), ccs = cc.style;
@@ -188,16 +187,11 @@ namespace com.keyman.osk.browser {
         let keyRect = key.getBoundingClientRect();
         let _BoxRect = keyman.osk._Box.getBoundingClientRect();
 
-        var xLeft = key.offsetLeft + (<HTMLElement>key.offsetParent).offsetLeft,
-            xTop = key.offsetTop + (key.key as OSKBaseKey).row.element.offsetTop + delta,
-            xWidth = key.offsetWidth + 2,
-            xHeight = calloutHeight;
-
         // Set position and style
         ccs.top = (keyRect.top - _BoxRect.top - 8 + delta) + 'px';
         ccs.left = (keyRect.left - _BoxRect.left) + 'px';
         ccs.width = keyRect.width + 'px';
-        ccs.height = (keyRect.height + 6) + 'px';
+        ccs.height = calloutHeight + 'px';
 
         // Return callout element, to allow removal later
         return cc;
