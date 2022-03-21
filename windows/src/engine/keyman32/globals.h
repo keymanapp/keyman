@@ -61,6 +61,8 @@
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
 
+#include "keymankeyboard_id.h"
+
 class Globals
 {
 public:
@@ -307,7 +309,5 @@ void WINAPI SetCustomPostKeyCallback(CUSTOMPOSTKEYCALLBACKPROC proc);
 
 extern BOOL isKeymanKeyboardActive; // is the active keyboard a Keyman keyboard
 
-/* FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7 Keyman keyboard guid */
-extern const CLSID c_clsidKMTipTextService;
 
 #endif

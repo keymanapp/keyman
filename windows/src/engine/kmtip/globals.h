@@ -29,6 +29,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include "keymankeyboard_id.h"
 #define assert(x)
 
 //
@@ -106,7 +107,7 @@ extern CRITICAL_SECTION g_cs;
 
 extern DWORD g_dwDeepIntegration;   // I4375
 
-extern const CLSID c_clsidKMTipTextService;
+//extern const CLSID c_clsidKMTipTextService;
 
 extern const GUID c_guidKeymanDeadkeysProp;
 

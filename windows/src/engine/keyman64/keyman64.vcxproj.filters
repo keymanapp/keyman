@@ -38,6 +38,7 @@
     <ClCompile Include="..\keyman32\VKScanCodes.cpp" />
     <ClCompile Include="..\keyman32\DebugEventTrace.cpp" />
     <ClCompile Include="..\keyman32\kmprocessactions.cpp" />
+    <ClCompile Include="..\..\global\vc\keymankeyboard_id.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\keyman32\addins.h" />
@@ -86,6 +87,7 @@
     <ClInclude Include="..\keyman32\vkscancodes.h" />
     <ClInclude Include="..\..\global\inc\keymanengine.h" />
     <ClInclude Include="..\keyman32\kmprocessactions.h" />
+    <ClInclude Include="..\..\global\inc\keymankeyboard_id.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\keyman32\keyman-debug-etw.man" />

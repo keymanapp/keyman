@@ -69,6 +69,9 @@
     <ClCompile Include="keyman32interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\global\vc\keymankeyboard_id.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="kmtip.def">
@@ -106,6 +109,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\global\inc\keymankeyboard_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -96,8 +96,6 @@ BOOL
 
 BOOL isKeymanKeyboardActive = FALSE;
 
-const CLSID c_clsidKMTipTextService = {0xFE0420F1, 0x38D1, 0x4B4C, {0x96, 0xBF, 0xE7, 0xE2, 0x0A, 0x74, 0xCF, 0xB7}};
-
 static DWORD dwTlsIndex = TLS_OUT_OF_INDEXES;
 static CRITICAL_SECTION csGlobals;
 

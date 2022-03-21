@@ -138,6 +138,9 @@
     <ClCompile Include="kmprocessactions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\global\vc\keymankeyboard_id.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -247,6 +250,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kmprocessactions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\global\inc\keymankeyboard_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

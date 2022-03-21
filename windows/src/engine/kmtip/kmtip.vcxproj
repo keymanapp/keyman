@@ -104,7 +104,6 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">kmtip64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">kmtip64</TargetName>
   </PropertyGroup>
-
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -276,6 +275,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\global\vc\keymankeyboard_id.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="keyman32interface.cpp" />
     <ClCompile Include="keys.cpp">
@@ -417,6 +417,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\global\inc\certificate_check.h" />
     <ClInclude Include="..\..\global\inc\Compiler.h" />
+    <ClInclude Include="..\..\global\inc\keymankeyboard_id.h" />
     <ClInclude Include="editsess.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="..\..\global\inc\KEYNAMES.H" />
