@@ -309,5 +309,4 @@ void WINAPI SetCustomPostKeyCallback(CUSTOMPOSTKEYCALLBACKPROC proc);
 
 extern BOOL isKeymanKeyboardActive; // is the active keyboard a Keyman keyboard
 
-
 #endif

@@ -107,7 +107,6 @@ extern CRITICAL_SECTION g_cs;
 
 extern DWORD g_dwDeepIntegration;   // I4375
 
-//extern const CLSID c_clsidKMTipTextService;
 
 extern const GUID c_guidKeymanDeadkeysProp;
 
