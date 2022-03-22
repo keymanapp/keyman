@@ -251,29 +251,33 @@ function langMenuPos() {
     return pos;
 }
 
+function doResetContext() {
+    keyman.resetContext();
+}
+
 function setCursorRange(pos, length) {
+    //console.log('setCursorRange('+pos+', '+length+')');
     var ta = document.getElementById('ta');
-    var kmw = window['keyman'];
     var resetContext = (ta.selectionStart != pos || ta.selectionEnd != pos + length);
     ta.selectionStart = ta._KeymanWebSelectionStart = pos;
     ta.selectionEnd = ta._KeymanWebSelectionEnd = pos + length;
     if(resetContext) {
-        kmw['setActiveElement'](ta);
-        kmw.resetContext();
+        //console.log('  setCursorRange: resetting context');
+        doResetContext();
     }
     return ta.selectionEnd;
 }
 
 function setKeymanVal(text) {
+    //console.log('setKeymanVal('+JSON.stringify(text)+')');
     if(undefined == text) text = '';
     var ta = document.getElementById('ta');
-    var kmw = window['keyman'];
 
-    var resetContext = ta.value != text || text == '';
+    var resetContext = ta.value != text;
     ta.value = text;
     if(resetContext) {
-        kmw['setActiveElement'](ta);
-        kmw.resetContext();
+        //console.log('  setKeymanVal: resetting context');
+        doResetContext();
     }
     return ta.value;
 }

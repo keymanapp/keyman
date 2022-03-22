@@ -247,7 +247,7 @@ extension KeymanWebViewController {
   }
   
   func resetContext() {
-    webView!.evaluateJavaScript("keyman.core.resetContext();", completionHandler: nil)
+    webView!.evaluateJavaScript("doResetContext();", completionHandler: nil)
   }
 
   func setDeviceType(_ idiom: UIUserInterfaceIdiom) {
