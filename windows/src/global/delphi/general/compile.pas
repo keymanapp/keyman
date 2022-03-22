@@ -149,12 +149,19 @@ const
 
 const
   // kcframe --sizeof returns these values
+{$IFDEF WIN64}
+  FILE_KEYBOARD_SIZE = 2984;
+  FILE_GROUP_SIZE = 200;
+  FILE_STORE_SIZE = 200;
+  FILE_KEY_SIZE = 32;
+  FILE_DEADKEY_SIZE = 160;
+{$ELSE}
   FILE_KEYBOARD_SIZE = 2952;
   FILE_GROUP_SIZE = 184;
   FILE_STORE_SIZE = 192;
   FILE_KEY_SIZE = 20;
   FILE_DEADKEY_SIZE = 160;
-
+{$ENDIF}
 
 function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer; cdecl;   // I4865   // I4866
 function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;   // I4865   // I4866
@@ -295,12 +302,21 @@ initialization
   // We want to early load the compiler because we need it loaded for
   // sentry symbolication: https://github.com/getsentry/sentry-native/issues/213
   LoadCompiler;
-  Assert(sizeof(FILE_KEYBOARD) = FILE_KEYBOARD_SIZE);
-  Assert(sizeof(FILE_GROUP) = FILE_GROUP_SIZE);
-  Assert(sizeof(FILE_STORE) = FILE_STORE_SIZE);
-  Assert(sizeof(FILE_KEY) = FILE_KEY_SIZE);
-  Assert(sizeof(FILE_DEADKEY) = FILE_DEADKEY_SIZE);
-
+  try
+    Assert(sizeof(FILE_KEYBOARD) = FILE_KEYBOARD_SIZE, 'Assertion failure: sizeof(FILE_KEYBOARD) = FILE_KEYBOARD_SIZE');
+    Assert(sizeof(FILE_GROUP) = FILE_GROUP_SIZE, 'Assertion failure: sizeof(FILE_GROUP) = FILE_GROUP_SIZE');
+    Assert(sizeof(FILE_STORE) = FILE_STORE_SIZE, 'Assertion failure: sizeof(FILE_STORE) = FILE_STORE_SIZE');
+    Assert(sizeof(FILE_KEY) = FILE_KEY_SIZE, 'Assertion failure: sizeof(FILE_KEY) = FILE_KEY_SIZE');
+    Assert(sizeof(FILE_DEADKEY) = FILE_DEADKEY_SIZE, 'Assertion failure: sizeof(FILE_DEADKEY) = FILE_DEADKEY_SIZE');
+  except
+    on E:Exception do
+    begin
+      // We emit to the console manually because this exception is otherwise
+      // completely silent, which is a pain for testing.
+      writeln(E.Message);
+      raise;
+    end;
+  end;
 finalization
   if HKMCmpDll > 0 then
     FreeLibrary(HKMCmpDll);

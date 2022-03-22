@@ -34,11 +34,11 @@ int WINAPI msgproc(int line, DWORD dwMsgCode, LPSTR szText)
 int main(int argc, char *argv[])
 {
   if (argc == 2 && strcmp(argv[1], "--sizeof") == 0) {
-    printf("FILE_KEYBOARD_SIZE = %d\n", sizeof(FILE_KEYBOARD));
-    printf("FILE_GROUP_SIZE = %d\n", sizeof(FILE_GROUP));
-    printf("FILE_STORE_SIZE = %d\n", sizeof(FILE_STORE));
-    printf("FILE_KEY_SIZE = %d\n", sizeof(FILE_KEY));
-    printf("FILE_DEADKEY_SIZE = %d\n", sizeof(FILE_DEADKEY));
+    printf("FILE_KEYBOARD_SIZE = %zu\n", sizeof(FILE_KEYBOARD));
+    printf("FILE_GROUP_SIZE = %zu\n", sizeof(FILE_GROUP));
+    printf("FILE_STORE_SIZE = %zu\n", sizeof(FILE_STORE));
+    printf("FILE_KEY_SIZE = %zu\n", sizeof(FILE_KEY));
+    printf("FILE_DEADKEY_SIZE = %zu\n", sizeof(FILE_DEADKEY));
     return 0;
   }
 	if(argc < 3)
