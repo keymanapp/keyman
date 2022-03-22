@@ -16,8 +16,7 @@
     android:ellipsize="end"
     android:singleLine="true"
     android:textSize="@dimen/titlebar_label_textsize"
-    android:textStyle="bold"
-    android:layout_marginTop="@dimen/fab_margin"/>
+    android:textStyle="bold" />
 
   <!-- ListView of other enabled keyboards -->
   <include layout="@layout/list_layout"

@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 15.0.218 beta 2022-03-21
+
+* chore(android/engine): Remove visual gaps in keyboard picker menu (#6370)
+
+## 15.0.217 beta 2022-03-19
+
+* fix(web): bounding rect offset was incorrect (#6357)
+
+## 15.0.216 beta 2022-03-18
+
+* feat(linux): Allow to run ibus tests on Wayland  ️ (#6202)
+
 ## 15.0.215 beta 2022-03-17
 
 * fix(web): crash on focus before init (#6393)

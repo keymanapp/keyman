@@ -17,3 +17,6 @@ export PATH=$ANDROID_HOME/build-tools/30.0.3:$PATH
 export PATH="/usr/local/opt/openjdk@8/bin:$PATH"
 
 export JAVA_HOME=/usr/local/opt/openjdk@8
+
+# Python 2.7
+eval "$(pyenv init --path)"
