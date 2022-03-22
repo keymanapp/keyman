@@ -265,7 +265,7 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 
 #include "testkeymanfunctioning.h"
 #include "keynames.h"
-#include "keymankeyboard_id.h"
+#include "kmtip_guids.h"
 
 #include "crc32.h"
 

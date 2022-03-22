@@ -29,7 +29,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "keymankeyboard_id.h"
+#include "kmtip_guids.h"
 #define assert(x)
 
 //

@@ -138,7 +138,7 @@
     <ClCompile Include="kmprocessactions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\keymankeyboard_id.cpp">
+    <ClCompile Include="..\..\global\vc\kmtip_guids.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -252,7 +252,7 @@
     <ClInclude Include="kmprocessactions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymankeyboard_id.h">
+    <ClInclude Include="..\..\global\inc\kmtip_guids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
