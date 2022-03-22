@@ -64,19 +64,21 @@ namespace com.keyman.osk.browser {
             kc = key.key.label,
             previewFontScale = 1.8;
 
-        // Canvas dimensions must be set explicitly to prevent clipping
-        let canvasWidth = 1.6 * xWidth;
-        let canvasHeight = 2.3 * xHeight;
-
         let kts = this.element.style;
-        kts.top = 'auto';
 
-        // Matches how the subkey positioning is set.
+        // Roughly matches how the subkey positioning is set.
         const _Box = vkbd.element.parentNode as HTMLDivElement;
         const _BoxRect = _Box.getBoundingClientRect();
         const keyRect = key.getBoundingClientRect();
+        let y = (keyRect.bottom - _BoxRect.top - 5);
+        let ySubPixelPadding = y - Math.floor(y);
 
-        kts.bottom = (_BoxRect.bottom - keyRect.bottom + 3) + 'px';
+        // Canvas dimensions must be set explicitly to prevent clipping
+        // This gives us exactly the same number of pixels on left and right
+        let canvasWidth = xWidth + Math.ceil(xWidth * 0.3) * 2;
+        let canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
+
+        kts.top = Math.floor(y - canvasHeight) + 'px';
         kts.textAlign = 'center';
         kts.overflow = 'visible';
         kts.fontFamily = util.getStyleValue(kc,'font-family');
@@ -115,11 +117,13 @@ namespace com.keyman.osk.browser {
         let oskHeight = keyman.osk.computedHeight;
         let bottomY = parseFloat(cs.bottom);
         let tipHeight = parseFloat(cs.height);
+        let halfHeight = Math.ceil(canvasHeight / 2);
 
         this.cap.style.width = xWidth + 'px';
-        this.tip.style.height = (canvasHeight / 2) + 'px';
-        this.cap.style.top = (canvasHeight / 2 - 1) + 'px';
-        this.cap.style.height = (canvasHeight / 2 + 2) + 'px';
+        this.tip.style.height = halfHeight + 'px';
+
+        this.cap.style.top = (halfHeight - 1) + 'px';
+        this.cap.style.height = (halfHeight + 2) + 'px';
 
         if(this.constrain && tipHeight + bottomY > oskHeight) {
           const delta = tipHeight + bottomY - oskHeight;

@@ -362,6 +362,7 @@ div.ios div.kmw-keytip-tip {
   border-radius: 6px 6px 4px 4px;
   border: solid 1px #cccccc;
   border-bottom: solid 1px #8a8d90;
+  box-sizing: border-box;
 }
 
 div.ios div.kmw-keytip-cap {
