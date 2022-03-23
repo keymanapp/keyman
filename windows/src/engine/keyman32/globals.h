@@ -307,6 +307,12 @@ BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault);
 
 void WINAPI SetCustomPostKeyCallback(CUSTOMPOSTKEYCALLBACKPROC proc);
 
-extern BOOL isKeymanKeyboardActive; // is the active keyboard a Keyman keyboard
+/**
+ * Is the active keyboard a Keyman keyboard? This value is
+ * only valid in the master controller thread, and is used
+ * by serialized input to ensure that we only trap input
+ * while a Keyman keyboard is active.
+ **/
+extern BOOL isKeymanKeyboardActive;
 
 #endif

@@ -234,11 +234,10 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
 
-  if (mp->message == wm_keyman_control)
-  {
-      SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_control hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);
-      ProcessWMKeymanControl(mp->wParam, mp->lParam);
-      return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  if (mp->message == wm_keyman_control) {
+    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_control hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);
+    ProcessWMKeymanControl(mp->wParam, mp->lParam);
+    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
 	if(mp->message == wm_keyman)   // I3933
