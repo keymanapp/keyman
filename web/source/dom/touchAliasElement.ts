@@ -183,7 +183,7 @@ namespace com.keyman.dom {
       divThis.appendChild(sb);
 
       let ds=d.style;
-      ds.position='absolute';
+      ds.position='relative';
 
       let preCaretStyle = this.__preCaret.style;
       let postCaretStyle = this.__postCaret.style;
@@ -200,12 +200,14 @@ namespace com.keyman.dom {
       styleCaret.visibility='hidden';
       styleCaret.marginLeft=styleCaret.marginRight='-1px';
 
+      ds.left='0px';
+      ds.top='0px';
+      ds.padding='0';
+      ds.border='none';
+
       // Set the outer element padding *after* appending the element,
       // otherwise Firefox misaligns the two elements
       xs.padding='8px';
-
-      // Set internal padding to match the TEXTAREA and INPUT elements
-      ds.padding='0px 2px'; // OK for iPad, possibly device-dependent
 
       // Set the tabindex to 0 to allow a DIV to accept focus and keyboard input
       // c.f. http://www.w3.org/WAI/GL/WCAG20/WD-WCAG20-TECHS/SCR29.html
@@ -285,8 +287,8 @@ namespace com.keyman.dom {
         // The rows value is used when setting the caret vertically
 
         if(base.rows == 2) { // 2 is default value
-          var h=parseInt(baseStyle.height,10)-parseInt(baseStyle.paddingTop,10)-parseInt(baseStyle.paddingBottom,10),
-            dh=parseInt(baseStyle.fontSize,10), calcRows=Math.round(h/dh);
+          var h=parseFloat(baseStyle.height)-parseFloat(baseStyle.paddingTop)-parseFloat(baseStyle.paddingBottom),
+            dh=parseFloat(baseStyle.fontSize), calcRows=Math.round(h/dh);
           if(calcRows > base.rows+1) {
             base.rows=calcRows;
           }
@@ -503,8 +505,8 @@ namespace com.keyman.dom {
 
         var xs=divThis.style, b=divThis.base,
             s=window.getComputedStyle(b,null),
-            mLeft=parseInt(s.marginLeft,10),
-            mTop=parseInt(s.marginTop,10),
+            mLeft=parseFloat(s.marginLeft),
+            mTop=parseFloat(s.marginTop),
             x1=Utils.getAbsoluteX(b), y1=Utils.getAbsoluteY(b);
 
         var p=divThis.offsetParent as HTMLElement;
@@ -523,17 +525,11 @@ namespace com.keyman.dom {
         xs.left=(x1-mLeft)+'px';
         xs.top=(y1-mTop)+'px';
 
-        // FireFox does not want the offset!
-        if(typeof(s.MozBoxSizing) != 'undefined') {
-          xs.left=x1+'px';
-          xs.top=y1+'px';
-        }
-
         var w=b.offsetWidth, h=b.offsetHeight,
-            pLeft=parseInt(s.paddingLeft,10), pRight=parseInt(s.paddingRight,10),
-            pTop=parseInt(s.paddingTop,10), pBottom=parseInt(s.paddingBottom,10),
-            bLeft=parseInt(s.borderLeft,10), bRight=parseInt(s.borderRight,10),
-            bTop=parseInt(s.borderTop,10), bBottom=parseInt(s.borderBottom,10);
+            pLeft=parseFloat(s.paddingLeft), pRight=parseFloat(s.paddingRight),
+            pTop=parseFloat(s.paddingTop), pBottom=parseFloat(s.paddingBottom),
+            bLeft=parseFloat(s.borderLeft), bRight=parseFloat(s.borderRight),
+            bTop=parseFloat(s.borderTop), bBottom=parseFloat(s.borderBottom);
 
         // If using content-box model, must subtract the padding and border,
         // but *not* for border-box (as for WordPress PlugIn)
@@ -557,23 +553,8 @@ namespace com.keyman.dom {
         }
 
         if(TouchAliasData.getOS() == 'Android') {
-          // FireFox - adjust padding to match input and text area defaults
-          if(typeof(s.MozBoxSizing) != 'undefined') {
-            xs.paddingTop=(pTop+1)+'px';
-            xs.paddingLeft=pLeft+'px';
-
-            if(this.isMultiline()) {
-              xs.marginTop='1px';
-            } else {
-              xs.marginLeft='1px';
-            }
-
-            w--;
-            h--;
-          } else { // Chrome, Opera, native browser (?)
-            w++;
-            h++;
-          }
+          w++;
+          h++;
         }
 
         xs.width=w+'px';
