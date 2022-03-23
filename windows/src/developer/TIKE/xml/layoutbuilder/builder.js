@@ -1446,11 +1446,18 @@ $(function () {
     builder.updateKeyId(builder.selectedKey());
   }, {saveOnce: true});
 
+  const wrapInstant = function(f) {
+    return function() {
+      window.setTimeout(f.bind(this), 0);
+    }
+  }
+
   $('#inpKeyName')
     .change(inpKeyNameChange)
     .autocomplete({
       source: builder.lookupKeyNames,
-      change: inpKeyNameChange
+      change: inpKeyNameChange,
+      select: wrapInstant(inpKeyNameChange)
     })
     .on('input', inpKeyNameChange)
     .blur(function () {
@@ -1494,7 +1501,8 @@ $(function () {
     .change(inpKeyCapChange)
     .autocomplete({
       source: builder.specialKeyNames,
-      change: inpKeyCapChange
+      change: inpKeyCapChange,
+      select: wrapInstant(inpKeyCapChange)
     })
     .mouseup(function () {
       builder.updateCharacterMap($(this).val(), false);
@@ -1721,7 +1729,8 @@ $(function () {
     .on('input', subKeyNameChange)
     .autocomplete({
       source: builder.lookupKeyNames,
-      change: subKeyNameChange
+      change: subKeyNameChange,
+      select: wrapInstant(subKeyNameChange)
     }).blur(function () {
       builder.hasSavedKeyUndo = false;
     });
@@ -1744,7 +1753,8 @@ $(function () {
     .change(inpSubKeyCapChange)
     .autocomplete({
       source: builder.specialKeyNames,
-      change: inpSubKeyCapChange
+      change: inpSubKeyCapChange,
+      select: wrapInstant(inpSubKeyCapChange)
     })
     .on('input', inpSubKeyCapChange)
     .mouseup(function () {

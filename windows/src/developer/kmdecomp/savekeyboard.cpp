@@ -1,18 +1,18 @@
 /*
   Name:             savekeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      18 Sep 2007
 
   Modified Date:    8 Apr 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          18 Sep 2007 - mcdurdin - Fix group and store offset bugs
                     18 Sep 2007 - mcdurdin - Fix bug with nomatch written as match
                     12 Oct 2007 - mcdurdin - Add Keyman 7.0 system store names
@@ -51,17 +51,17 @@ PWCHAR wcscat2(PWCHAR c1, size_t sz, const PWCHAR c2)
 
 // TODO: consolidate with list in compiler.cpp
 const PWCHAR StoreTokens[] = {   // I4652
-	L"", 
-	SSN__PREFIX L"BITMAP", 
+	L"",
+	SSN__PREFIX L"BITMAP",
 	SSN__PREFIX L"COPYRIGHT",
-	SSN__PREFIX L"HOTKEY", 
-	SSN__PREFIX L"LANGUAGE", 
+	SSN__PREFIX L"HOTKEY",
+	SSN__PREFIX L"LANGUAGE",
 	SSN__PREFIX L"LAYOUT",
-	SSN__PREFIX L"MESSAGE", 
-	SSN__PREFIX L"NAME", 
+	SSN__PREFIX L"MESSAGE",
+	SSN__PREFIX L"NAME",
 	SSN__PREFIX L"VERSION",
-	SSN__PREFIX L"CAPSONONLY", 
-	SSN__PREFIX L"CAPSALWAYSOFF", 
+	SSN__PREFIX L"CAPSONONLY",
+	SSN__PREFIX L"CAPSALWAYSOFF",
 	SSN__PREFIX L"SHIFTFREESCAPS",
 	SSN__PREFIX L"LANGUAGENAME",
 	L"",
@@ -93,7 +93,8 @@ const PWCHAR StoreTokens[] = {   // I4652
   SSN__PREFIX L"CASEDKEYS",
   L"", // TSS_BEGIN_NEWCONTEXT
   L"", // TSS_BEGIN_POSTKEYSTROKE
-  SSN__PREFIX L"LAYERCHANGED",
+  SSN__PREFIX L"NEWLAYER",
+  SSN__PREFIX L"OLDLAYER",
 	NULL
 };
 
@@ -127,7 +128,7 @@ PWCHAR groupname(int num)
 {
 	static WCHAR buf[256];
 	if((DWORD)num > g_kbd->cxGroupArray) return L"???";
-	
+
 	LPGROUP gp = &g_kbd->dpGroupArray[num-1];
 	if(gp->dpName != NULL)
 		wsprintfW(buf, L"%s", gp->dpName);
@@ -159,7 +160,7 @@ PWCHAR flagstr(int flag)
 PCWCHAR GetVKeyName(LPKEY key)  // I3438
 {
   static WCHAR buf[100];
-  if(key->Key <= VK__MAX) 
+  if(key->Key <= VK__MAX)
     return VKeyNames[key->Key];
 
   wsprintfW(buf, L"%d", key->Key - 256);  //TODO: Support getting the key name from the VK Dictionary
@@ -288,14 +289,14 @@ PWCHAR ExtString(PWCHAR str)
 				wsprintfW(p, L"notany(%s) ", storename(*str));
 				p = wcschr(p, 0);
 				break;
-      
+
       case CODE_SETOPT:
 				str++;
 				wsprintfW(p, L"set(%s = '%s') ", storename(*str), storevalue(*(str+1)));
 				p = wcschr(p, 0);
         str++;
 				break;
-      
+
       case CODE_IFOPT:
 				str++;
 				wsprintfW(p, L"if(%s%s '%s') ", storename(*str), ifvalue(*(str+1)), storevalue(*(str+2)));
@@ -414,11 +415,11 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
 
 	wsprintfW(buf, L"\n"); wr(fp, buf);
 
-	if(kbd->StartGroup[0] != -1) 
+	if(kbd->StartGroup[0] != -1)
 	{
 		wsprintfW(buf, L"begin ANSI    > use(%s)\n", groupname(kbd->StartGroup[0]+1)); wr(fp, buf);
 	}
-	if(kbd->StartGroup[1] != -1) 
+	if(kbd->StartGroup[1] != -1)
 	{
 		wsprintfW(buf, L"begin Unicode > use(%s)\n", groupname(kbd->StartGroup[1]+1)); wr(fp, buf);
 	}
@@ -434,7 +435,7 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
         gp->fUsingKeys ? KeyString(kp) : L" ", ExtString(kp->dpOutput), kp->Line);
 			wr(fp, buf);
 		}
-		
+
 		if(gp->dpMatch)
 		{
 			wsprintfW(buf, L"  match > %s\n", ExtString(gp->dpMatch));

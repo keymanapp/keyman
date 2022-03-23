@@ -14,4 +14,6 @@
     <dimen name="help_bubble_height">80dp</dimen>
     <dimen name="help_bubble_offset_x">0.5dp</dimen>
     <dimen name="help_bubble_offset_y">10dp</dimen>
+    <dimen name="other_ime_title_height">50dp</dimen>
+    <dimen name="other_ime_row_height">60dp</dimen>
 </resources>

@@ -214,7 +214,8 @@ public final class KeyboardPickerActivity extends BaseActivity {
           imeListAdapter = new SimpleAdapter(this, imeList, R.layout.list_row_layout5, from, to);
           imeListView.setAdapter(imeListAdapter);
           // Rescale IME listview so entire list is visible (wrap_content not working)
-          imeListView.getLayoutParams().height = actionBarHeight * imeListAdapter.getCount();
+          imeListView.getLayoutParams().height = ((int) context.getResources().getDimension(R.dimen.other_ime_row_height)) *
+            imeListAdapter.getCount();
           imeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
