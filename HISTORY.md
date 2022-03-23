@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.220 beta 2022-03-23
+
+* fix(web): adjust touch alias element positioning (#6406)
+* fix(android/engine): Display longpress keys during a Move gesture (#6138)
+
 ## 15.0.219 beta 2022-03-22
 
 * chore(common): Update Hausa strings (#6399)
