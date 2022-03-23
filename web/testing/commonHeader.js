@@ -96,8 +96,8 @@
     doAddKeyboards({id:'test_chirality',name:'test_chirality',languages:{id:'en',name:'English'},
       filename:(prefix + 'test_chirality.js')});
 
-    doAddKeyboards({id:'obolo_chwerty',name:'obolo_chwerty',languages:{id:'en',name:'English'},
-      filename:(prefix + 'obolo_chwerty.js')});
+    doAddKeyboards({id:'obolo_chwerty_6351',name:'obolo_chwerty_6351',languages:{id:'en',name:'English'},
+      filename:(prefix + 'obolo_chwerty_6351.js')});
 
       // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the BCP-47 language code.

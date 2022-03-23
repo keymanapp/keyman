@@ -2,16 +2,16 @@ if(typeof keyman === 'undefined') {
   console.log('Keyboard requires KeymanWeb 10.0 or later');
   if(typeof tavultesoft !== 'undefined') tavultesoft.keymanweb.util.alert("This keyboard requires KeymanWeb 10.0 or later");
 } else {
-KeymanWeb.KR(new Keyboard_obolo_chwerty());
+KeymanWeb.KR(new Keyboard_obolo_chwerty_6351());
 }
-function Keyboard_obolo_chwerty()
+function Keyboard_obolo_chwerty_6351()
 {
   var modCodes = keyman.osk.modifierCodes;
   var keyCodes = keyman.osk.keyCodes;
 
   this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;
-  this.KI="Keyboard_obolo_chwerty";
-  this.KN="Obolo Chwerty";
+  this.KI="Keyboard_obolo_chwerty_6351";
+  this.KN="Obolo Chwerty #6351";
   this.KMINVER="15.0";
   this.KV={F:' 1em "Tahoma"',K102:1};
   this.KV.KLS={
@@ -2062,7 +2062,7 @@ function Keyboard_obolo_chwerty()
   }
 }
 ;
-  this.KCSS="/* tone keys colour */\n .android .kmw-keyboard-obolo_chwerty #default-T_GRV {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty #default-T_CCM {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty #shift-T_GRV {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty #shift-T_CCM {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty #caps-T_GRV {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty #caps-T_CCM {color: #02ff02;}\n ";
+  this.KCSS="/* tone keys colour */\n .android .kmw-keyboard-obolo_chwerty_6351 #default-T_GRV {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty_6351 #default-T_CCM {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty_6351 #shift-T_GRV {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty_6351 #shift-T_CCM {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty_6351 #caps-T_GRV {color: #02ff02;}\n .android .kmw-keyboard-obolo_chwerty_6351 #caps-T_CCM {color: #02ff02;}\n ";
   this.s_digit_14="0123456789";
   this.s_sentencePunctuation_18=".?!‽";
   this.s_accentibles_19="aeiọoumnAEIỌOUMNn̄";
@@ -2082,15 +2082,15 @@ function Keyboard_obolo_chwerty()
   this.s_acutekeys_33=['','','',''];
   this.s_circumflexkeys_34=['','','',''];
   this.s_caronkeys_35=['','','',''];
-  this.s41="0";
+  this.s41="";
   this.s42="numeric";
   this.s43="caps";
-  this.s44="0";
+  this.s44="";
   this.s45="shift";
   this.s46="shift";
   this.s47="shift";
   this.s48="default";
-  this.KVER="15.0.204.0";
+  this.KVER="15.0.213.0";
   this.KVS=[];
   this.gs=function(t,e) {
     return this.g_main_3(t,e);

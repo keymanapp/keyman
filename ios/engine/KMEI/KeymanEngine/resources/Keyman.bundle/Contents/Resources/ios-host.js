@@ -41,7 +41,7 @@ function init() {
         kmw['getOskWidth'] = getOskWidth;
         kmw['beepKeyboard'] = beepKeyboard;
         kmw['setActiveElement']('ta');
-        
+
     //});
 }
 
@@ -72,12 +72,12 @@ function setBannerHeight(h) {
     // The banner itself may not be loaded yet.  This will preemptively help set
     // its eventual display height.
     com.keyman.osk.Banner.DEFAULT_HEIGHT = h;
-    
+
     if(osk.banner.activeType != 'blank') {
         osk.banner.height = h;
     }
     }
-    
+
     // Refresh KMW's OSK
     kmw.correctOSKTextSize();
 }
@@ -105,10 +105,10 @@ function setOskWidth(width) {
 function getOskWidth() {
     if (oskWidth == 0)
         oskWidth = Math.abs(window.orientation) == 90 ? screen.height : screen.width;
-    
+
     if (Math.abs(window.orientation) == 90) document.body.className="kmw-embedded keyman-app kmw-landscape";
     else document.body.className="kmw-embedded keyman-app kmw-portrait";
-    
+
     return oskWidth;
 }
 
@@ -202,7 +202,7 @@ oskCreatePopup = function(obj,x,y,w,h)
 function suggestionPopup(obj,custom,x,y,w,h) {
     if(obj != null) {
     fragmentToggle=(fragmentToggle+1) % 100;
-    
+
     var cmd = {
         'suggestion': obj,
         'isCustom': custom,
@@ -211,7 +211,7 @@ function suggestionPopup(obj,custom,x,y,w,h) {
         'width': w,
         'height': h
     };
-    
+
     var hash = 'suggestPopup-' + fragmentToggle + '+cmd=' + JSON.stringify(cmd);
 
     if (typeof(window.webkit) != 'undefined') {
@@ -251,29 +251,33 @@ function langMenuPos() {
     return pos;
 }
 
+function doResetContext() {
+    keyman.resetContext();
+}
+
 function setCursorRange(pos, length) {
+    //console.log('setCursorRange('+pos+', '+length+')');
     var ta = document.getElementById('ta');
-    var kmw = window['keyman'];
     var resetContext = (ta.selectionStart != pos || ta.selectionEnd != pos + length);
     ta.selectionStart = ta._KeymanWebSelectionStart = pos;
     ta.selectionEnd = ta._KeymanWebSelectionEnd = pos + length;
-    kmw['setActiveElement'](ta);
     if(resetContext) {
-        kmw.resetContext();
+        //console.log('  setCursorRange: resetting context');
+        doResetContext();
     }
     return ta.selectionEnd;
 }
 
 function setKeymanVal(text) {
+    //console.log('setKeymanVal('+JSON.stringify(text)+')');
     if(undefined == text) text = '';
     var ta = document.getElementById('ta');
-    var kmw = window['keyman'];
 
     var resetContext = ta.value != text;
     ta.value = text;
-    kmw['setActiveElement'](ta);
     if(resetContext) {
-        kmw.resetContext();
+        //console.log('  setKeymanVal: resetting context');
+        doResetContext();
     }
     return ta.value;
 }

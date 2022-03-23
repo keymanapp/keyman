@@ -1,24 +1,24 @@
 (*
   Name:             kwhelp
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    9 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          28 Sep 2006 - mcdurdin - Support additional context tags, for context help
                     04 Jan 2007 - mcdurdin - Add notany keyword
                     30 Apr 2015 - mcdurdin - I4677 - V9.0 - Move Developer help to online only
                     09 Aug 2015 - mcdurdin - I4840 - Context-sensitive help missing V8 and V9 keywords
                     09 Aug 2015 - mcdurdin - I4841 - Restructure version 9 developer help
-                    
+
 *)
 unit kwhelp;
 
@@ -41,7 +41,7 @@ type
   end;
 
 const
-  HelpArray: array[0..78] of THelpArray = (   // I4840
+  HelpArray: array[0..79] of THelpArray = (   // I4840
     (Word: 'BITMAP' ),
     (Word: 'begin' ),
     (Word: 'COPYRIGHT' ),
@@ -130,7 +130,8 @@ const
     (Word: '*constant'; Topic: 'constants'; Guide: True ),
     (Word: '*compile-target'; Topic: 'compile-targets'; Guide: True ),
 
-    (Word: '&layerchanged'; Topic: 'layerchanged')
+    (Word: '&newlayer'; Topic: 'newlayer'),
+    (Word: '&oldlayer'; Topic: 'oldlayer')
   );
 
 function IsValidHelpToken(var token: WideString; HelpOnSyntacticElements: Boolean): Boolean;
