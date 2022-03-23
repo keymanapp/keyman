@@ -421,25 +421,17 @@ void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 void
 ProcessWMKeymanControl(WPARAM wParam, LPARAM lParam) {
+  WORD wAtom = HIWORD(lParam);
+  char atomStr[128];
 
   switch (wParam) {
   case KMC_PROFILECHANGED:
     if (!Globals::IsControllerThread(GetCurrentThreadId())) {
       break;
     }
-    WORD wAtom = HIWORD(lParam);
-    char atomStr[128];
+
     if (GetAtomName(wAtom, atomStr, 128)) {
-      // Is this a keyman keyboard check c_clsidKMTipTextService
-      WCHAR clsidstr[40];
-      StringFromGUID2(c_clsidKMTipTextService, clsidstr, _countof(clsidstr));
-      PWSTR atomWstr = strtowstr(atomStr);
-      if (wcsstr(atomWstr, clsidstr)) {
-        isKeymanKeyboardActive = TRUE;
-      }
-      else {
-        isKeymanKeyboardActive = FALSE;
-      }
+      isKeymanKeyboardActive = strstr(atomStr, cs_clsidKMTipTextService) != nullptr;
     }
     break;
   }
