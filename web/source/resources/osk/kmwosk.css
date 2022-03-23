@@ -382,6 +382,8 @@ span.kmw-keytip-label {
 div.ios div.kmw-keytip-cap,
 div.ios div.kmw-keytip-tip {
   background:white;
+  /* background-clip: required to prevent antialiasing on top edge on hires devices e.g. iPhone 13 pro + iOS 15.4 */
+  background-clip: content-box;
 }
 
 div.android div.kmw-keytip {

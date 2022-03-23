@@ -188,7 +188,7 @@ namespace com.keyman.osk.browser {
         let _BoxRect = keyman.osk._Box.getBoundingClientRect();
 
         // Set position and style
-        let top = (keyRect.top - _BoxRect.top - 8 + delta);
+        let top = keyRect.top - _BoxRect.top - 9 + delta;
         // We're going to adjust the top of the box to ensure it stays
         // pixel aligned, otherwise we can get antialiasing artifacts
         // that look ugly
@@ -198,7 +198,7 @@ namespace com.keyman.osk.browser {
         ccs.top = top + 'px';
         ccs.left = (keyRect.left - _BoxRect.left) + 'px';
         ccs.width = keyRect.width + 'px';
-        ccs.height = (height - 2) + 'px';
+        ccs.height = (height - 1) + 'px';
 
         // Return callout element, to allow removal later
         return cc;

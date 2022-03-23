@@ -70,7 +70,7 @@ namespace com.keyman.osk.browser {
         const _Box = vkbd.element.parentNode as HTMLDivElement;
         const _BoxRect = _Box.getBoundingClientRect();
         const keyRect = key.getBoundingClientRect();
-        let y = (keyRect.bottom - _BoxRect.top - 5);
+        let y = (keyRect.bottom - _BoxRect.top + 1);
         let ySubPixelPadding = y - Math.floor(y);
 
         // Canvas dimensions must be set explicitly to prevent clipping
@@ -102,11 +102,11 @@ namespace com.keyman.osk.browser {
         // Adjust shape if at edges
         var xOverflow = (canvasWidth - xWidth) / 2;
         if(xLeft < xOverflow) {
-          this.cap.style.left = '0px';
-          xLeft += xOverflow;
+          this.cap.style.left = '1px';
+          xLeft += xOverflow - 1;
         } else if(xLeft > window.innerWidth - xWidth - xOverflow) {
-          this.cap.style.left = (canvasWidth - xWidth) + 'px';
-          xLeft -= xOverflow;
+          this.cap.style.left = (canvasWidth - xWidth - 1) + 'px';
+          xLeft -= xOverflow - 1;
         } else {
           this.cap.style.left = xOverflow + 'px';
         }
@@ -122,8 +122,8 @@ namespace com.keyman.osk.browser {
         this.cap.style.width = xWidth + 'px';
         this.tip.style.height = halfHeight + 'px';
 
-        this.cap.style.top = (halfHeight - 1) + 'px';
-        this.cap.style.height = (halfHeight + 2) + 'px';
+        this.cap.style.top = (halfHeight - 3) + 'px';
+        this.cap.style.height = (keyRect.bottom - _BoxRect.top - Math.floor(y - canvasHeight) - (halfHeight)) + 'px'; //(halfHeight + 3 + ySubPixelPadding) + 'px';
 
         if(this.constrain && tipHeight + bottomY > oskHeight) {
           const delta = tipHeight + bottomY - oskHeight;
