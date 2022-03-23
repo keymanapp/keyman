@@ -1,4 +1,4 @@
-import { warning as logWarning } from '@actions/core';
+import { warning as logWarning, info as logInfo } from '@actions/core';
 
 import { GitHub } from '@actions/github';
 
@@ -113,6 +113,8 @@ export const reportHistory = async (
     logWarning('No pull requests found since previous increment');
     return [];
   }
+
+  logInfo('Found commits for '+JSON.stringify(args)+': \n'+git_result);
 
   const new_commits = git_result.split(/\r?\n/g);
 
