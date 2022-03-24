@@ -195,4 +195,7 @@
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Invalid/Missing metadata in package</string>
 
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">
+    Keyboard requires a newer version of Keyman</string>
 </resources>

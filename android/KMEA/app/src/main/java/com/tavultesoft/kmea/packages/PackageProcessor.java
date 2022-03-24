@@ -395,6 +395,22 @@ public class PackageProcessor {
   }
 
   /**
+   * Parse a kmp.json JSON object and return the package's minimum keyboard version (system.fileVersion).
+   * This is to avoid issues with app crashing if keyboard functionality is not supported.
+   * If undefined, return default version "7.0".
+   * @param json kmp.json as a JSON object.
+   * @return String of the package's minimum keyboard version
+   */
+  public static String getPackageMinimumKeyboardVersion(JSONObject json) {
+    try {
+      return json.getJSONObject("system").getString("fileVersion");
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
+      return "7.0";
+    }
+  }
+
+  /**
    * Parse a kmp.json JSON object and return the package's target (keyboards vs lexical models).
    * Only one can be valid. Otherwise, return "invalid"
    * @param json kmp.json as a JSON object.
