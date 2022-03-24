@@ -153,10 +153,13 @@ namespace com.keyman.osk.browser {
       let cs = getComputedStyle(subKeys);
       let topY = parseFloat(cs.top);
 
+      // Adjust the vertical position of the popup to keep it within the
+      // bounds of the keyboard rectangle, when on iPhone (system keyboard)
+      const topOffset = 0; // Set this when testing constrainPopup, e.g. to -80px
       let delta = 0;
-      if(topY < 0 && constrainPopup) {
-        delta = -topY;
-        ss.top = '0px';
+      if(topY < topOffset && constrainPopup) {
+        delta = topOffset - topY;
+        ss.top = topOffset + 'px';
       }
 
       // Add the callout
@@ -188,17 +191,14 @@ namespace com.keyman.osk.browser {
         let _BoxRect = keyman.osk._Box.getBoundingClientRect();
 
         // Set position and style
-        let top = keyRect.top - _BoxRect.top - 9 + delta;
         // We're going to adjust the top of the box to ensure it stays
         // pixel aligned, otherwise we can get antialiasing artifacts
         // that look ugly
-        let height = calloutHeight + (Math.ceil(top) - top);
-        top = Math.ceil(top);
-
+        let top = Math.floor(keyRect.top - _BoxRect.top - 9 + delta);
         ccs.top = top + 'px';
         ccs.left = (keyRect.left - _BoxRect.left) + 'px';
         ccs.width = keyRect.width + 'px';
-        ccs.height = (height - 1) + 'px';
+        ccs.height = (keyRect.bottom - _BoxRect.top - top - 1) + 'px'; //(height - 1) + 'px';
 
         // Return callout element, to allow removal later
         return cc;

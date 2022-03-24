@@ -337,6 +337,7 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   z-index: 10002;
   pointer-events:none;
   border-bottom: solid 1px #8a8d90;
+  box-sizing: border-box;
 }
 
 #kmw-keytip {
