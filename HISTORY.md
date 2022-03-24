@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.221 beta 2022-03-24
+
+* fix(developer): structure sizes for kmcomp x64 (#6408)
+* fix(common): report more log detail in increment-version (#6418)
+
 ## 15.0.220 beta 2022-03-23
 
 * fix(web): adjust touch alias element positioning (#6406)
