@@ -42,7 +42,7 @@ test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\kmshell.exe -validate_manifest
 
-install:
+install: .virtual
     copy $(ROOT)\bin\desktop\kmshell.exe "$(INSTALLPATH_KEYMANDESKTOP)"
     copy $(ROOT)\bin\desktop\xml\* "$(INSTALLPATH_KEYMANDESKTOP)\xml\"
 
