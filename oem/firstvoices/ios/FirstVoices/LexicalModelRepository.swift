@@ -22,8 +22,7 @@ class LexicalModelRepository {
   // these strings match those in KeymanEngine so that we can share data across UserDefaults (hack!)
   private static let userPredictionSettings = "UserPredictionEnablementSettings"
   private static let userCorrectionSettings = "UserCorrectionEnablementSettings"
-
-
+  
   static let shared: LexicalModelRepository  = {
     let instance = LexicalModelRepository()
     return instance
@@ -85,22 +84,42 @@ class LexicalModelRepository {
   /*
    * install = 1) download lexical model and 2) turn on prediction and corrections by default
    */
-  func installLexicalModel(keyboardState: KeyboardState, modelId: String) -> Bool {
-    self.downloadModel(keyboardState: keyboardState, modelId: modelId)
+  func installLexicalModel(package: LexicalModelKeymanPackage, keyboardState: KeyboardState, modelId: String) -> Bool {
+    FVShared.reportState(location: "before install lexical model")
+
+    let added = Manager.shared.addLexicalModel(lexicalModelId: modelId, languageId: keyboardState.languageTag, from: package)
+
+    if (!added) {
+      return false
+    }
     
+    // Register the lexical model in defaults!
+    let defaults: UserDefaults = FVShared.userDefaults()
+    defaults.set(preferredLexicalModelID: modelId, forKey: keyboardState.languageTag)
+
     // call Keyman once after enabling both prediction and correction flags in UserDefaults
+        
     self.writePredictionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: true)
     self.writeCorrectionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: true)
-    return self.applyLexicalModelSettings(languageId: keyboardState.languageTag, modelId: modelId)
+
+    let applied = self.applyLexicalModelSettings(languageId: keyboardState.languageTag, modelId: modelId)
+    
+    FVShared.reportState(location: "from install lexical model")
+    
+    return applied
   }
   
   func disableLexicalModel(keyboardState: KeyboardState, modelId: String) -> Bool {
-    self.downloadModel(keyboardState: keyboardState, modelId: modelId)
-    
+    FVShared.reportState(location: "before disableLexicalModel")
+    let removed = Manager.shared.removeLexicalModel(lexicalModelId: modelId, languageId: keyboardState.languageTag)
+    FVShared.reportState(location: "after disableLexicalModel")
+    return removed
+    /*
     // call Keyman once after disabling both prediction and correction flags in UserDefaults
     self.writePredictionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: false)
     self.writeCorrectionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: false)
     return self.applyLexicalModelSettings(languageId: keyboardState.languageTag, modelId: modelId)
+     */
   }
   
   func downloadModel(keyboardState: KeyboardState, modelId: String) {

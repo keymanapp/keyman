@@ -129,7 +129,7 @@ class KeymanPackageTests: XCTestCase {
 
     // Intentionally scopes the `package` variable
     do {
-      let package = KeymanPackage.parse(installedDir)!
+      let package = try KeymanPackage.parse(installedDir)!
       XCTAssertTrue(FileManager.default.fileExists(atPath: installedURL.path))
       XCTAssertEqual(package.id, "khmer_angkor")
     }

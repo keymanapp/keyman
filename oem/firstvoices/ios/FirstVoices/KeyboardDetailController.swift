@@ -13,6 +13,7 @@
  */
 
 import UIKit
+import KeymanEngine
 
 let keyboardsSection = 0
 let languageSettingsSection = 2
@@ -43,14 +44,20 @@ let switchCellIdentifier = "switchCell"
 let labelCellIdentifier = "labelCell"
 
 class KeyboardDetailController: UITableViewController {
-  var keyboardRepo = KeyboardRepository.shared
-  var settingsRepo = KeyboardSettingsRepository.shared
-  var lexicalModelRepo = LexicalModelRepository.shared
+  private var keyboardRepo = KeyboardRepository.shared
+  private var settingsRepo = KeyboardSettingsRepository.shared
+  private var lexicalModelRepo = LexicalModelRepository.shared
 
-  var keyboardState: KeyboardState? = nil
-  var delegate: RefreshKeyboardCheckmark? = nil
-  var lexicalModels: [FVLexicalModel] = []
-    
+  private var keyboardState: KeyboardState? = nil
+  private var delegate: RefreshKeyboardCheckmark? = nil
+  private var lexicalModels: [FVLexicalModel] = []
+  
+  /*
+  private var lexicalModelDownloadStartedObserver: NotificationObserver?
+  private var lexicalModelDownloadCompletedObserver: NotificationObserver?
+  private var lexicalModelDownloadFailedObserver: NotificationObserver?
+*/
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     self.title = keyboardState?.name
@@ -59,6 +66,21 @@ class KeyboardDetailController: UITableViewController {
     if let languageTag = self.keyboardState?.languageTag {
       lexicalModels = lexicalModelRepo.getAvailableLexicalModels(languageTag: languageTag)
     }
+
+    /*
+    lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.packageDownloadStarted,
+      observer: self,
+      function: KeyboardDetailController.lexicalModelDownloadStarted)
+    lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.packageDownloadCompleted,
+      observer: self,
+      function: KeyboardDetailController.lexicalModelDownloadCompleted)
+    lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.packageDownloadFailed,
+      observer: self,
+      function: KeyboardDetailController.lexicalModelDownloadFailed)
+     */
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -248,16 +270,19 @@ class KeyboardDetailController: UITableViewController {
         let alert = UIAlertController(title: "\(lexicalModelName)", message: message, preferredStyle: .alert)
         
         let installAction = UIAlertAction(title: NSLocalizedString("Install", comment: "Default action"), style: .default, handler: { _ in
-          
-          // install = download dictionary and set default settings
-          let installed = self.lexicalModelRepo.installLexicalModel(keyboardState: self.keyboardState!, modelId: lexicalModelId)
-          if (installed) {
-            self.keyboardState?.selectDictionary(lexicalModel: thisDictionary)
-            self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
-          }
+          ResourceDownloadManager.shared.downloadLexicalModelsForLanguageIfExists(languageID: self.keyboardState!.languageTag) { package, error in
+            if error != nil {
+              print("lexical model download failed: \(error!)")
+            }
 
-          // update the state of dependent switches
-          self.updateDictionarySettingsState(animated: true)
+            print("download succeeded, installing lexical model...")
+            let installed = self.lexicalModelRepo.installLexicalModel(package: package!, keyboardState: self.keyboardState!, modelId: lexicalModelId)
+            if (installed) {
+              self.keyboardState?.selectDictionary(lexicalModel: thisDictionary)
+              self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
+              self.updateDictionarySettingsState(animated: true)
+            }
+          }
         })
         alert.addAction(installAction)
         
@@ -270,8 +295,6 @@ class KeyboardDetailController: UITableViewController {
         if self.lexicalModelRepo.disableLexicalModel(keyboardState: self.keyboardState!, modelId: lexicalModelId) {
           self.keyboardState?.clearDictionary()
           self.settingsRepo.saveKeyboardState(state: self.keyboardState!)
-
-          // update the state of dependent switches
           self.updateDictionarySettingsState(animated: true)
         }
       }
@@ -328,4 +351,33 @@ class KeyboardDetailController: UITableViewController {
                                animated: animated,
                                available: self.keyboardState!.canSuggestCorrections())
   }
+  
+  /*
+  private func lexicalModelDownloadStarted() {
+    log.info("lexicalModelDownloadStarted: KeyboardDetailViewController")
+    view.isUserInteractionEnabled = false
+    
+    navigationItem.setHidesBackButton(true, animated: true)
+    navigationController?.setToolbarHidden(false, animated: true)
+  }
+  
+  private func lexicalModelDownloadFailed() {
+    log.info("lexicalModelDownloadFailed: KeyboardDetailViewController")
+    view.isUserInteractionEnabled = true
+    navigationItem.setHidesBackButton(false, animated: true)
+  }
+  
+  private func lexicalModelDownloadCompleted() {
+    log.info("lexicalModelDownloadCompleted KeyboardDetailViewController")
+    
+    // Actually used now.
+    view.isUserInteractionEnabled = true
+    navigationItem.leftBarButtonItem?.isEnabled = true
+    if navigationItem.rightBarButtonItem != nil {
+      navigationItem.rightBarButtonItem?.isEnabled = true
+    }
+    
+    //navigationController?.popToRootViewController(animated: true)
+  }
+  */
 }
