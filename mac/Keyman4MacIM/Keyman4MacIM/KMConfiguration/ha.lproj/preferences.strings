@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Ko da yaushe a nuna madannai na allon kwamfuta";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Ayi amfani da shigar verbose Console";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Tallafi";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "A sauke Madannai...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Haɗa Keyman";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Baya";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Keyboards";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Idan zabin shigar verbose na kunne, Keyman zai shigar da ayyukan da zasu taimakawa hanyoyin nemo matsala na Keyman. Za'a iya amfani da shirin Keyman wajen ganin sakonni da yawa daga Keyman. A Console, a tace a nuna dukkan sakonni daga hanyar \"Keyman\". Za'a iya tura wadannan sakonni masu yawa zuwa Tallafin Keyman idan da bukata.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Gaba";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Babban Shafi";
+
+/* Options button text */
+"frd-No-seV.label" = "Zabuka";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Madannin da aka saka";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Ka kunna wannan idan kana da matsala da da wani madanni ko Keyman gabadaya.";

@@ -118,11 +118,17 @@
 /* Error opening a Keyman package - package is not valid */
 "kmp-error-invalid" = "Ƙunshin fayil ɗin ya lalace.";
 
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "Babu kunshin da aka bayyana.";
+
 /* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
 "kmp-error-missing-resource" = "Wannan ƙunshin bai ƙunshi madannai ko ƙamus ɗin da aka nema ba.";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Ba a samar da wannan ƙunshin yadda ya kamata ba - ba a san abubuwan ba.";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "Wannan kunshin bai hada da tallafawa na'urar da kake aiki da ita ba.";
 
 /* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
 "kmp-error-wrong-type" = "Wannan ƙunshin bai ƙunshi nau'in abubuwan da ake tsammani ba.";
