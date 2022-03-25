@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.222 beta 2022-03-25
+
+* fix(windows): put correct HK_ALT flag for modifier (#6425)
+
 ## 15.0.221 beta 2022-03-24
 
 * fix(developer): structure sizes for kmcomp x64 (#6408)
