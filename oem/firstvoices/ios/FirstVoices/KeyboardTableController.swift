@@ -62,6 +62,7 @@ class KeyboardTableController: UIViewController, RefreshKeyboardCheckmark {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.navigationController!.isNavigationBarHidden = false
+    navigationController?.setToolbarHidden(true, animated: false)
   }
 
   /*
@@ -85,6 +86,7 @@ class KeyboardTableController: UIViewController, RefreshKeyboardCheckmark {
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     if segue.identifier == "keyboardDetails" {
       let detailsController = segue.destination as! KeyboardDetailController
+
       let indexPath = self.tableView.indexPathForSelectedRow
       let keyboards = (self.keyboardList[indexPath!.section]).keyboards
       let keyboard = keyboards[indexPath!.row]

@@ -52,41 +52,18 @@ class KeyboardDetailController: UITableViewController {
   private var delegate: RefreshKeyboardCheckmark? = nil
   private var lexicalModels: [FVLexicalModel] = []
   
-  /*
-  private var lexicalModelDownloadStartedObserver: NotificationObserver?
-  private var lexicalModelDownloadCompletedObserver: NotificationObserver?
-  private var lexicalModelDownloadFailedObserver: NotificationObserver?
-*/
-  
   override func viewDidLoad() {
     super.viewDidLoad()
     self.title = keyboardState?.name
+
+    self.navigationController?.toolbar.isHidden = false
 
     // get lexical models to display in dictionary section
     if let languageTag = self.keyboardState?.languageTag {
       lexicalModels = lexicalModelRepo.getAvailableLexicalModels(languageTag: languageTag)
     }
-
-    /*
-    lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.packageDownloadStarted,
-      observer: self,
-      function: KeyboardDetailController.lexicalModelDownloadStarted)
-    lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.packageDownloadCompleted,
-      observer: self,
-      function: KeyboardDetailController.lexicalModelDownloadCompleted)
-    lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.packageDownloadFailed,
-      observer: self,
-      function: KeyboardDetailController.lexicalModelDownloadFailed)
-     */
   }
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-  }
-  
   /*
    * Used to display the values for the keyboard that was tapped, causing the segue to the detail view.
    */
@@ -270,12 +247,17 @@ class KeyboardDetailController: UITableViewController {
         let alert = UIAlertController(title: "\(lexicalModelName)", message: message, preferredStyle: .alert)
         
         let installAction = UIAlertAction(title: NSLocalizedString("Install", comment: "Default action"), style: .default, handler: { _ in
+          
+          let toolbar = self.navigationController?.toolbar as? DownloadStatusToolbar
+          toolbar?.displayStatus(true)
+
           ResourceDownloadManager.shared.downloadLexicalModelsForLanguageIfExists(languageID: self.keyboardState!.languageTag) { package, error in
             if error != nil {
               print("lexical model download failed: \(error!)")
             }
 
-            print("download succeeded, installing lexical model...")
+            toolbar?.hideStatus()
+            
             let installed = self.lexicalModelRepo.installLexicalModel(package: package!, keyboardState: self.keyboardState!, modelId: lexicalModelId)
             if (installed) {
               self.keyboardState?.selectDictionary(lexicalModel: thisDictionary)
@@ -351,33 +333,4 @@ class KeyboardDetailController: UITableViewController {
                                animated: animated,
                                available: self.keyboardState!.canSuggestCorrections())
   }
-  
-  /*
-  private func lexicalModelDownloadStarted() {
-    log.info("lexicalModelDownloadStarted: KeyboardDetailViewController")
-    view.isUserInteractionEnabled = false
-    
-    navigationItem.setHidesBackButton(true, animated: true)
-    navigationController?.setToolbarHidden(false, animated: true)
-  }
-  
-  private func lexicalModelDownloadFailed() {
-    log.info("lexicalModelDownloadFailed: KeyboardDetailViewController")
-    view.isUserInteractionEnabled = true
-    navigationItem.setHidesBackButton(false, animated: true)
-  }
-  
-  private func lexicalModelDownloadCompleted() {
-    log.info("lexicalModelDownloadCompleted KeyboardDetailViewController")
-    
-    // Actually used now.
-    view.isUserInteractionEnabled = true
-    navigationItem.leftBarButtonItem?.isEnabled = true
-    if navigationItem.rightBarButtonItem != nil {
-      navigationItem.rightBarButtonItem?.isEnabled = true
-    }
-    
-    //navigationController?.popToRootViewController(animated: true)
-  }
-  */
 }
