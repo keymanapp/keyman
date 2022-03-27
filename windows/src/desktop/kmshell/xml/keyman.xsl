@@ -78,6 +78,7 @@
   <xsl:template name="popupmenu_uilanguage">
     <div class="menu" id="menu_uilanguage">
       <xsl:for-each select="/Keyman/uilanguages/uilanguage">
+        <xsl:sort select="@name" />
         <xsl:call-template name="menuitem">
           <xsl:with-param name="id">menu_uilanguage_<xsl:value-of select="@code" /></xsl:with-param>
           <xsl:with-param name="caption"><xsl:value-of select="@name" /></xsl:with-param>
