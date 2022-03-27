@@ -137,15 +137,25 @@
                 [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"HeaderTitle", nil]];
                 for (NSString *path in pArray) {
                     NSDictionary *info = [KMXFile infoDictionaryFromFilePath:path];
-                    if (info)
-                        [_tableContents addObject:info];
+                    if (!info) {
+                        info = [[NSDictionary alloc] initWithObjectsAndKeys:@"(Error loading keyboard)", kKMKeyboardNameKey,
+                            @"unknown", kKMKeyboardVersionKey,
+                            @"unknown", kKMKeyboardCopyrightKey,
+                            @"unknown", kKMVisualKeyboardKey, nil];
+                    }
+                    [_tableContents addObject:info];
                 }
             }
             else {
                 NSString *path = (NSString *)obj;
                 NSDictionary *info = [KMXFile infoDictionaryFromFilePath:path];
-                if (info)
-                    [_tableContents addObject:info];
+                if (!info) {
+                  info = [[NSDictionary alloc] initWithObjectsAndKeys:@"(Error loading keyboard)", kKMKeyboardNameKey,
+                      @"unknown", kKMKeyboardVersionKey,
+                      @"unknown", kKMKeyboardCopyrightKey,
+                      @"unknown", kKMVisualKeyboardKey, nil];
+                }
+                [_tableContents addObject:info];
             }
         }
     }
