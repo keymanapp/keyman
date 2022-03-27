@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.223 beta 2022-03-27
+
+* fix(mac): invalid keyboard breaks configuration (#6421)
+* fix(windows): make long menus scroll in Configuration (#6424)
+* fix(web): ios popup positioning and style (#6383)
+
 ## 15.0.222 beta 2022-03-25
 
 * fix(windows): put correct HK_ALT flag for modifier (#6425)
