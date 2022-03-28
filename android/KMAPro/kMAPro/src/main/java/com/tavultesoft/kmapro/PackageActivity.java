@@ -282,6 +282,8 @@ public class PackageActivity extends AppCompatActivity implements
             notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
               installedPackageKeyboards, 1);
           }
+          KMManager.clearKeyboardCache();
+
           if(_cleanup)
             cleanup();
         } else {
