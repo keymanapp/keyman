@@ -143,11 +143,10 @@ class KeyboardDetailController: UITableViewController {
     let switchCell = tableView.dequeueReusableCell(withIdentifier: switchCellIdentifier) as! KeyboardDetailCell
     let keyboardAction: Callback = { (on) in
       var updatedKeyboardState = false
-      var errorMessage = ""
 
       // call Keyman Engine to install or remove the keyboard
       if on {
-        (updatedKeyboardState, errorMessage) = self.keyboardRepo.installKeyboard(keyboard: self.keyboardState!.definition)
+        updatedKeyboardState = self.keyboardRepo.installKeyboard(keyboard: self.keyboardState!.definition)
       } else {
         updatedKeyboardState = self.keyboardRepo.removeKeyboard(keyboard: self.keyboardState!.definition)
       }
@@ -163,12 +162,7 @@ class KeyboardDetailController: UITableViewController {
       } else {
         // install or remove failed, set switch back to previous state
         let keyboardsIndex = IndexPath(row: keyboardsRow, section: keyboardsSection)
-        
-        if (!on) {
-          errorMessage = "Keyboard deactivation failed"
-        }
-        self.reportError(message: errorMessage)
-        
+                
         self.updateCellSwitchState(index: keyboardsIndex,
                                    on: self.keyboardState!.isActive,
                                    animated: true,

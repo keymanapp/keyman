@@ -83,14 +83,15 @@ class KeyboardRepository {
     return KeyboardRepository.shared.availableKeyboards[keyboardId]
   }
     
-  func installKeyboard(keyboard: FVKeyboardDefinition) -> (Bool, String) {
+  func installKeyboard(keyboard: FVKeyboardDefinition) -> Bool {
     var success = false
-    var message = "success"
     
     if let keyboardsPackage = loadKeyboardPackage() {
       let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
       do {
+        FVShared.reportState(location: "before install keyboard")
         try ResourceFileManager.shared.install(resourceWithID: fullKeyboardId, from: keyboardsPackage)
+        FVShared.reportState(location: "after install keyboard")
         print("Installed keyboard \(keyboard.keyboardId)")
         success = true
       } catch {
@@ -98,17 +99,18 @@ class KeyboardRepository {
         
         print("Failed to load preload \(keyboard.keyboardId) installError: \(installError.localizedDescription)")
         success = false
-        message = installError.localizedDescription
      }
     }
     
-    return (success, message)
+    return success
   }
 
   func removeKeyboard(keyboard: FVKeyboardDefinition) -> Bool {
     var success = false
-     let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
-      let removed = Manager.shared.removeKeyboard(withFullID: fullKeyboardId)
+    let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
+    FVShared.reportState(location: "before remove keyboard")
+    let removed = Manager.shared.removeKeyboard(withFullID: fullKeyboardId)
+    FVShared.reportState(location: "after remove keyboard")
     if (removed) {
         print("Removed keyboard \(keyboard.keyboardId)")
         success = true
