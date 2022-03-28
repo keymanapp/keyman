@@ -8,15 +8,14 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
 
-        // VERSION_CODE and VERSION_NAME from version.gradle
-        versionCode VERSION_CODE as Integer
-        versionName VERSION_NAME
+        // VERSION_CODE and VERSION_NAME from version.gradle but Gradle removes them for libraries
+        buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+VERSION_NAME+"\""
         buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
     }
 
@@ -70,16 +69,13 @@ dependencies {
 
     // Robolectric
     testImplementation 'androidx.test:core:1.2.0'
-    testImplementation 'androidx.test.ext:junit:1.1.1'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
+    testImplementation 'androidx.test.ext:junit:1.1.2'
+    testImplementation 'org.robolectric:robolectric:4.5.1'
 
     // Generate QR Codes
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
         transitive = true
     }
-
-    // Assign the annotation processor for tests.
-    testAnnotationProcessor 'com.google.auto.service:auto-service:1.0-rc4'
 }
 //Show deprecation compiler warnings
 /*

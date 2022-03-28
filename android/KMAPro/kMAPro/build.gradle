@@ -11,7 +11,7 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "30.0.2"
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
@@ -93,20 +93,22 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
         serviceAccountCredentials = file(String.valueOf(env_keys_json_file))
 
         // Deactivate lower conflicting version APKs
-        resolutionStrategy = "ignore"
+        resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
         switch (System.env.TIER) {
             case 'beta':
-                track = 'beta'
+                track.set("beta")
+                println "TIER set to beta"
                 break
 
             case 'stable':
-                track = 'production'
+                track.set("production")
+                println "TIER set to production"
                 break
 
             default:
-                track = 'alpha'
+                track.set("alpha")
+                println "TIER set to alpha"
         }
-        println "TIER set to $track"
     }
 }
 
