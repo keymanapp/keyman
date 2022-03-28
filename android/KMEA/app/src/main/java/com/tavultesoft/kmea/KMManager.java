@@ -305,12 +305,12 @@ public final class KMManager {
   /**
    * Extract KMEA tier from versionName. Uses parameter so we can unit test.
    * @param versionName String - If not provided, determine tier from
-   *                    com.tavultesoft.kmea.BuildConfig.VERSION_NAME
+   *                    com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME
    * @return Tier (ALPHA, BETA, STABLE)
    */
   public static Tier getTier(String versionName) {
     if (versionName == null || versionName.isEmpty()) {
-      versionName = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+      versionName = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     }
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+)-(alpha|beta|stable).*");
     Matcher matcher = pattern.matcher(versionName);
@@ -326,12 +326,12 @@ public final class KMManager {
   }
 
   /**
-   * Extract KMEA major version #.# from VERSION_NAME
+   * Extract KMEA major version #.# from KEYMAN_ENGINE_VERSION_NAME
    * @return String
    */
   public static String getMajorVersion() {
     // Regex needs to match the entire string
-    String appVersion = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+    String appVersion = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+)\\.\\d+.*");
     Matcher matcher = pattern.matcher(appVersion);
     if (matcher.matches() && matcher.groupCount() >= 1) {
@@ -342,12 +342,12 @@ public final class KMManager {
   }
 
   /**
-   * Extract KMEA version #.#.# from VERSION_NAME
+   * Extract KMEA version #.#.# from KEYMAN_ENGINE_VERSION_NAME
    * @return String
    */
   public static String getVersion() {
     // Regex needs to match the entire string
-    String appVersion = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+    String appVersion = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+).*");
     Matcher matcher = pattern.matcher(appVersion);
     if (matcher.matches() && matcher.groupCount() >= 1) {

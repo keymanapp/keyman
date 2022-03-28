@@ -106,7 +106,7 @@ public final class KMPLink {
    * @return String of keyman.com host
    */
   public static String getHost() {
-    switch (KMManager.getTier(BuildConfig.VERSION_NAME)) {
+    switch (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME)) {
       case ALPHA:
       case BETA:
         return KMP_STAGING_HOST;
@@ -136,7 +136,7 @@ public final class KMPLink {
     if (matcher.matches() && matcher.group(3) != null) {
       String host = matcher.group(2);
       String packageID = matcher.group(3);
-      String tier = KMManager.getTier(BuildConfig.VERSION_NAME).toString().toLowerCase();
+      String tier = KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME).toString().toLowerCase();
       Uri installUri = Uri.parse(url);
       String languageID = installUri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
 
@@ -176,7 +176,7 @@ public final class KMPLink {
     // Validate deep link with package ID and optional bcp47 tag
     if (matcher.matches() && matcher.group(1) != null) {
       Uri installUri = Uri.parse(url);
-      String tier = KMManager.getTier(BuildConfig.VERSION_NAME).toString().toLowerCase();
+      String tier = KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME).toString().toLowerCase();
       String host = (tier.equals("alpha") || tier.equals("beta")) ? KMP_STAGING_HOST : KMP_PRODUCTION_HOST;
       String keyboardID = installUri.getQueryParameter("keyboard");
       String languageID = installUri.getQueryParameter("language");
