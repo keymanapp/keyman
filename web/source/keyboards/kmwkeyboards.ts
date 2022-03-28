@@ -386,13 +386,13 @@ namespace com.keyman.keyboards {
       // }
       this.doKeyboardChange(PInternalName, PLgCode);
 
-      p.catch(function() {
+      p.catch(function(error) {
         // Rejection indicates a failure of the keyboard to load.
         //
         // In case p's rejection is never caught, throwing this error will generate logs that shows up
         // in Sentry or in the console, with useful information for debugging either way.
-        throw new Error("Unable to load keyboard with internal name \"" + PInternalName + "\", language code \"" + PLgCode + "\".");
-      })
+        throw new Error("Unable to load keyboard with internal name \"" + PInternalName + "\", language code \"" + PLgCode + "\": "+JSON.stringify(error));
+      });
 
       return p;
     }

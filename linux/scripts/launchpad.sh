@@ -40,7 +40,7 @@ echo "ppa: ${ppa}"
 if [ "${DIST}" != "" ]; then
     distributions="${DIST}"
 else
-    distributions="bionic focal hirsute"
+    distributions="bionic focal"
 fi
 
 if [ "${PACKAGEVERSION}" != "" ]; then
