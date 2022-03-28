@@ -18,6 +18,7 @@
                 <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui.js</xsl:attribute></script>
                 <script>var KVKL = <xsl:value-of select='/TouchLayoutBuilder/LayoutJS' />;</script>
                 <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.js</xsl:attribute></script>
+                <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder-charmap.js</xsl:attribute></script>
             </head>
             <body>
               <div id="wedgeAddRowAbove" class="kcontrol wedge-horz"><span>+</span></div>
