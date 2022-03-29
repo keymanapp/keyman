@@ -11,10 +11,16 @@
 //
 
 import Foundation
+import KeymanEngine
 
 struct FVConstants {
   static let groupID: String = "group.FVKeyboards"
+  
+  // earlier format was an array of strings, if a keyboard was in the array it was active
   static let kFVLoadedKeyboardList: String = "FVLoadedKeyboardList"
+  
+  // updated format (2022) is Dictionary of KeyboardSettings structs  
+  static let kFVKeyboardSettingsMap: String = "FVKeyboardSettingsMap"
 
   // Legacy keys
   static let legacy_kFVKeyboardList = "FVKeyboardList"
@@ -51,5 +57,53 @@ class FVShared {
     return _userDefaults!
   }
 
+  // code for debugging state changes
+  class func reportState(location: String) {
+    print("at \(location), UserDefaults state:")
+    let defaults: UserDefaults = FVShared.userDefaults()
+    
+    if let userKeyboards = defaults.userKeyboards {
+      print(" userKeyboards count = \(userKeyboards.count)")
+      
+      if (userKeyboards.count > 0) {
+        let keyboard = userKeyboards[0]
+        if let preferredModelId = defaults.preferredLexicalModelID(forLanguage: keyboard.lgCode) {
+          print(" preferredModelId = \(preferredModelId)")
+        } else {
+          print(" could not find preferredModelId")
+        }
+      }
+    }
+    else {
+      print(" Could not find userKeyboards in FV UserDefaults")
+    }
+    
+    if let userLexicalModels = defaults.userLexicalModels {
+      print(" userLexicalModels count = \(userLexicalModels.count)")
+    }
+    else {
+      print(" Could not find userLexicalModels in FV UserDefaults")
+    }
+
+    if let currentKeyboard = defaults.currentKeyboardID {
+      print(" currentKeyboard ID = \(currentKeyboard.keyboardID)")
+      print(" currentKeyboard language ID = \(currentKeyboard.languageID)")
+      print(" currentKeyboard description = \(currentKeyboard.description)")
+      print(" currentKeyboard type = \(currentKeyboard.type)")
+    }
+    else {
+      print(" There is no currentKeyboardId in FV UserDefaults")
+    }
+
+    if let currentLexicalModel = defaults.currentLexicalModelID {
+      print(" currentLexicalModel ID = \(currentLexicalModel.lexicalModelID)")
+      print(" currentLexicalModel language ID = \(currentLexicalModel.languageID)")
+      print(" currentLexicalModel description = \(currentLexicalModel.description)")
+      print(" currentLexicalModel type = \(currentLexicalModel.type)")
+    }
+    else {
+      print(" There is no currentLexicalModel in FV UserDefaults")
+    }
+  }
 }
 

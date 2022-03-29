@@ -165,19 +165,6 @@ class FVRegionStorage {
     sharedData.removeObject(forKey: FVConstants.legacy_kKeyboardsFileLastModDateKey)
   }
 
-  /// Loads the list of keyboards that the user has selected; in theory we could
-  /// collect these from Keyman Engine but at present there is no API to iterate
-  /// over the installed keyboards.
-  class func loadKeyboardListFromUserDefaults() -> [String] {
-    let sharedData: UserDefaults = FVShared.userDefaults()
-    let keyboards = sharedData.array(forKey: FVConstants.kFVLoadedKeyboardList)
-    if keyboards != nil {
-      return keyboards as! [String]
-    } else {
-      return []
-    }
-  }
-
   /// Saves the list of keyboards to shared data
   class func saveKeyboardListToUserDefaults(loadedKeyboards: [String]) {
     let sharedData: UserDefaults = FVShared.userDefaults()
@@ -240,5 +227,4 @@ class FVRegionStorage {
       }
     }
   }
-
 }

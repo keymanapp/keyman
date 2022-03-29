@@ -21,6 +21,13 @@ class ViewController: UIViewController, UIWebViewDelegate {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    if let nc = self.navigationController {
+      let toolbar = nc.toolbar as! DownloadStatusToolbar
+      toolbar.navigationController = nc
+    }
+    
+    self.navigationController?.toolbar.isHidden = true
+    
     //
     // Show Instructions page
     //
@@ -34,7 +41,8 @@ class ViewController: UIViewController, UIWebViewDelegate {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    navigationController?.isNavigationBarHidden = true
+    navigationController!.isNavigationBarHidden = true
+    navigationController?.setToolbarHidden(true, animated: false)
     self.setStatusBarBackgroundWithOrientation(UIApplication.shared.statusBarOrientation)
   }
 
@@ -62,7 +70,7 @@ class ViewController: UIViewController, UIWebViewDelegate {
   func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
     let fragment: String? = request.url!.fragment
     if fragment?.range(of: "showKeyboards") != nil {
-      self.performSegue(withIdentifier: "Keyboards", sender: nil)
+      self.performSegue(withIdentifier: "keyboardList", sender: nil)
       return false
     }
     if navigationType == .linkClicked {
