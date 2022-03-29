@@ -51,31 +51,8 @@ builder.dragDrop = {};
     return { key: key, isIdField: isIdField };
   };
 
-  dragDrop.isHighSurrogate = function(character) {
-    let codeUnit = character.charCodeAt(0);
-    return codeUnit >= 0xD800 && codeUnit <= 0xDBFF;
-  };
-
-  dragDrop.isLowSurrogate = function(character) {
-    let codeUnit = character.charCodeAt(0);
-    return codeUnit >= 0xDC00 && codeUnit <= 0xDFFF;
-  };
-
-  dragDrop.surrogatePairToValue = function(character) {
-    let h = character.charCodeAt(0), l = character.charCodeAt(1);
-    return 0x10000 + (h - 0xD800) * 0x400 + (l - 0xDC00);
-  };
-
   dragDrop.charToUnicodeValue = function(s) {
-    let v;
-    if(s.length == 2 && dragDrop.isHighSurrogate(s) && dragDrop.isLowSurrogate(s.substring(1))) {
-      v = builder.surrogatePairToValue(s);
-    } else if(s.length == 1) {
-      v = s.charCodeAt(0);
-    } else {
-      return null;
-    }
-
+    let v = s.codePointAt(0);
     let ch = v.toString(16);
     while(ch.length < 4) ch = '0' + ch;
     return ch;
@@ -132,13 +109,6 @@ builder.dragDrop = {};
       // console.log('charmapDragDrop ctrlDown=false');
     }
 
-    if(o.shift && o.ctrl) {
-      // o.shift means append to current key cap
-      // o.ctrl means set id value
-      // together they have no good meaning
-      return false;
-    }
-
     // Convert X, Y to document coordinates
 
     if(o.x >= 0 && o.y >= 0) {
@@ -166,22 +136,25 @@ builder.dragDrop = {};
       return false;
     }
 
+    const target = $(dragDrop.isSubKey(key.key) ? '#inpSubKeyCap' : '#inpKeyCap');
+    const text = (o.shift ? target.val() : '') + o.text;
+
     // Focus the control and add the text
     if(key.isIdField || key.key.data('id').startsWith('T_new_') || o.ctrl) {
-      let target = $(dragDrop.isSubKey(key.key) ? '#inpSubKeyName' : '#inpKeyName');
-      target.val('U_'+dragDrop.charToUnicodeValue(o.text).toUpperCase());
+      const idTarget = $(dragDrop.isSubKey(key.key) ? '#inpSubKeyName' : '#inpKeyName');
+      const chars = [...text]; // Split o.text into array of codepoints, keeping surrogate pairs together
+      let id = chars.reduce((prev,curr) => prev+'_'+dragDrop.charToUnicodeValue(curr).toUpperCase(), 'U');
+      idTarget.val(id);
 
       if(key.isIdField) {
-        target.focus();
+        idTarget.focus();
       }
-
-      target.change();
+      idTarget.change();
     }
 
     if(!key.isIdField) {
-      let target = $(dragDrop.isSubKey(key.key) ? '#inpSubKeyCap' : '#inpKeyCap');
       target.focus();
-      target.val((o.shift ? target.val() : '') + o.text);
+      target.val(text);
       target.change();
     }
   };
