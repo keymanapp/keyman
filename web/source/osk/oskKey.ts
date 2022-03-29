@@ -82,7 +82,7 @@ namespace com.keyman.osk {
       '*123*':      19,
       '*Symbol*':   21,
       '*Currency*': 20,
-      '*Shifted*':  8, // set SHIFTED->9 for filled arrow icon
+      '*Shifted*':  9,
       '*AltGr*':    2,
       '*TabLeft*':  7,
       '*LAlt*':     0x56,
