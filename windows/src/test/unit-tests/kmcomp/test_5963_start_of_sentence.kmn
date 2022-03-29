@@ -21,7 +21,7 @@ store(digit) '0'..'9'
     if(&newLayer = "") if(&layer = 'numeric') any(digit) > context
 
     c no other changes, so detect sentence or layer change
-    if(&newLayer = 0") > use(nextLayer)
+    if(&newLayer = "") > use(nextLayer)
 
 group(nextLayer) readonly
 
