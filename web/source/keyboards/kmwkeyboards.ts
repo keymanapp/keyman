@@ -391,7 +391,7 @@ namespace com.keyman.keyboards {
         //
         // In case p's rejection is never caught, throwing this error will generate logs that shows up
         // in Sentry or in the console, with useful information for debugging either way.
-        throw new Error("Unable to load keyboard with internal name \"" + PInternalName + "\", language code \"" + PLgCode + "\": "+JSON.stringify(error));
+        throw new Error("Unable to load keyboard with internal name \"" + PInternalName + "\", language code \"" + PLgCode + "\": " + error);
       });
 
       return p;
@@ -603,7 +603,7 @@ namespace com.keyman.keyboards {
      *  @param  {Object}  kbdStub   keyboard stub to be loaded.
      *
      **/
-    installKeyboard(resolve: () => void, reject: () => void, kbdStub: KeyboardStub) {
+    installKeyboard(resolve: () => void, reject: (message?: string) => void, kbdStub: KeyboardStub) {
       var util = this.keymanweb.util;
       var osk = this.keymanweb.osk;
 
@@ -620,6 +620,8 @@ namespace com.keyman.keyboards {
       var kbdLang = kbdStub['KL'];
       var kbdName = kbdStub['KN'];
 
+      const scriptSrc = this.keymanweb.getKeyboardPath(kbdFile);
+
       var manager = this;
       let core = com.keyman.singleton.core;
 
@@ -632,15 +634,16 @@ namespace com.keyman.keyboards {
         }
 
         // We already know the load has failed... why wait?
-        kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'warn');
+        const msg = 'Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + ' at ' + scriptSrc + '.';
+        kbdStub.asyncLoader.callback(msg, 'warn');
         kbdStub.asyncLoader = null;
 
-        reject();
-      }, false);
+        reject(msg);
+      });
 
 
       // The load event will activate a newly-loaded keyboard if successful and report an error if it is not.
-      Lscript.addEventListener('load', function() {
+      Lscript.addEventListener('load', function(ev) {
         if(kbdStub.asyncLoader.timer !== null) {
           // Clear the timeout timer.
           window.clearTimeout(kbdStub.asyncLoader.timer);
@@ -677,27 +680,29 @@ namespace com.keyman.keyboards {
           resolve();
           // A handler portion for cases where the new <script> block loads, but fails to process.
         } else {  // Output error messages even when embedded - they're useful when debugging the apps and KMEA/KMEI engines.
-          kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'error');
+          const msg = 'Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '; keyboard script at ' + scriptSrc + ' may contain an error.';
+          kbdStub.asyncLoader.callback(msg, 'error');
           kbdStub.asyncLoader = null;
-          reject();
+          reject(msg);
         }
       }, false);
 
       // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.  This method is not relocated here (yet) b/c it varies based upon 'native' vs 'embedded'.
-      Lscript.src = this.keymanweb.getKeyboardPath(kbdFile);
+      Lscript.src = scriptSrc;
 
       try {
         document.body.appendChild(Lscript);
-        this.linkedScripts.push(Lscript);
       }
       catch(ex) {
         try {
           document.getElementsByTagName('head')[0].appendChild(Lscript);
         } catch(ex2) {
-          reject();
+          reject('Error registering script ' + scriptSrc + ': ' + ex2);
+          return;
         }
       }
+      this.linkedScripts.push(Lscript);
     }
 
     /* TODO: why not use util.loadCookie and saveCookie?? */
