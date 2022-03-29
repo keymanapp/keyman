@@ -504,12 +504,11 @@ namespace com.keyman.text {
      * The next layer will be determined from the key name unless otherwise specifed
      *
      *  @param  {string}                    keyName     key identifier
-     *  @param  {number|string|undefined}   nextLayerIn optional next layer identifier
      *  @return {boolean}                               return true if keyboard layer changed
      */
-    selectLayer(keyEvent: KeyEvent, fromNameOnly: boolean = false): boolean {
+    selectLayer(keyEvent: KeyEvent): boolean {
       let keyName = keyEvent.kName;
-      var nextLayer = fromNameOnly ? null : keyEvent.kNextLayer;
+      var nextLayer = keyEvent.kNextLayer;
       var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
 
       // Layer must be identified by name, not number (27/08/2015)
