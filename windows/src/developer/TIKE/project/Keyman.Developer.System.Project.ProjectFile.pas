@@ -1175,7 +1175,7 @@ const // from compile.pas
   CERR_FATAL   = $00008000;
   CERR_ERROR   = $00004000;
   CERR_WARNING = $00002000;
-  CERR_MEMORY  = $00001000;
+  CERR_INFO    = $00001000;
   CWARN_Info =   $0000208A;
 var
   FLogState: TProjectLogState;
@@ -1184,7 +1184,7 @@ begin
 
   if msgcode <> CWARN_Info then
     case msgcode and $F000 of
-      CERR_MEMORY:  FLogState := plsFatal;
+      CERR_INFO:    FLogState := plsInfo;
       CERR_WARNING: FLogState := plsWarning;
       CERR_ERROR:   FLogState := plsError;
       CERR_FATAL:   FLogState := plsFatal;

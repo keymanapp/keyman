@@ -79,6 +79,9 @@
     <ClInclude Include="CheckNCapsConsistency.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="UnreachableRules.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
@@ -101,6 +104,7 @@
     <ClCompile Include="CasedKeys.cpp" />
     <ClCompile Include="CharToKeyConversion.cpp" />
     <ClCompile Include="CheckNCapsConsistency.cpp" />
+    <ClCompile Include="UnreachableRules.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Compiler.rc" />
