@@ -691,6 +691,12 @@ begin
     j.AddPair('x', TJSONNumber.Create(X));
     j.AddPair('y', TJSONNumber.Create(Y));
     j.AddPair('text', cdo.Text[cmimCharacter]); // It never makes sense to drop anything other than char
+    if GetKeyState(VK_SHIFT) < 0 then
+      j.AddPair('shift', TJSONBool.Create(True));
+    if GetKeyState(VK_CONTROL) < 0 then
+      j.AddPair('ctrl', TJSONBool.Create(True));
+    if GetKeyState(VK_MENU) < 0 then
+      j.AddPair('alt', TJSONBool.Create(True));
     BuilderCommand('charmapDragDrop', j);
   finally
     j.Free;
