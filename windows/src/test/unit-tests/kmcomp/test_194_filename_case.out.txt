@@ -1,0 +1,11 @@
+
+test_194_filename_case.kmn: Compiling 'c:\Projects\keyman\app\windows\src\test\unit-tests\kmcomp\test_194_filename_case.kmn' for Windows...
+test_194_filename_case.kmn (5): 10AF Hint: Casing differences may fail on some platforms: reference 'test_194_Filename_case.bmp' does not match actual filename 'test_194_filename_case.bmp'
+test_194_filename_case.kmn (6): 10AF Hint: Casing differences may fail on some platforms: reference 'test_194_Filename_case.html' does not match actual filename 'test_194_filename_case.html'
+test_194_filename_case.kmn (7): 10AF Hint: Casing differences may fail on some platforms: reference 'test_194_Filename_case.embed.js' does not match actual filename 'test_194_filename_case.embed.js'
+test_194_filename_case.kmn (8): 10AF Hint: Casing differences may fail on some platforms: reference 'test_194_Filename_case.embed.css' does not match actual filename 'test_194_filename_case.embed.css'
+test_194_filename_case.kmn (9): 10AF Hint: Casing differences may fail on some platforms: reference 'test_194_Filename_case.keyman-touch-layout' does not match actual filename 'test_194_filename_case.keyman-touch-layout'
+test_194_filename_case.kmn (11): 10AF Hint: Casing differences may fail on some platforms: reference 'test_194_Filename_case.txt' does not match actual filename 'test_194_filename_case.txt'
+test_194_filename_case.kmn (29): 10AF Hint: Casing differences may fail on some platforms: reference 'test_194_Filename_case_call_0.call_js' does not match actual filename 'test_194_filename_case_call_0.call_js'
+test_194_filename_case.kmn (29): 10AF Hint: Casing differences may fail on some platforms: reference 'test_194_Filename_case_call_1.call_js' does not match actual filename 'test_194_filename_case_call_1.call_js'
+test_194_filename_case.kmn: Success: 'c:\Projects\keyman\app\windows\src\test\unit-tests\kmcomp\test_194_filename_case.kmn' was compiled successfully for Windows to 'c:\Projects\keyman\app\windows\src\test\unit-tests\kmcomp\test_194_filename_case.kmx'.

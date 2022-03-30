@@ -222,6 +222,8 @@
 #define CWARN_KeyShouldIncludeNCaps                        0x000020AD
 
 #define CINFO_UnreachableRule                              0x000010AE
+#define CINFO_FilenameHasDifferingCase                     0x000010AF
+#define CWARN_MissingFile                                  0x000020B0
 
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1

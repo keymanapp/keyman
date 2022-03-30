@@ -229,6 +229,8 @@ BEGIN
     CWARN_IfShouldBeAtStartOfContext          "if, platform and baselayout should be at start of context (after nul, if present])"
     CWARN_KeyShouldIncludeNCaps               "Other rules which reference this key include CAPS or NCAPS modifiers, so this rule must include NCAPS modifier to avoid inconsistent matches"
     CINFO_UnreachableRule                     "Hint: This rule will never be matched as another rule takes precedence"
+    CINFO_FilenameHasDifferingCase            "Hint: Casing differences may fail on some platforms:"
+    CWARN_MissingFile                         "The referenced file could not be found"
 END
 
 STRINGTABLE
