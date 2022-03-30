@@ -740,7 +740,7 @@ namespace com.keyman.keyboards {
 
 
       // The load event will activate a newly-loaded keyboard if successful and report an error if it is not.
-      Lscript.addEventListener('load', function(ev) {
+      Lscript.addEventListener('load', function() {
         if(kbdStub.asyncLoader.timer !== null) {
           // Clear the timeout timer.
           window.clearTimeout(kbdStub.asyncLoader.timer);
@@ -749,7 +749,7 @@ namespace com.keyman.keyboards {
 
         // To determine if the load was successful, we'll need to check the keyboard array for our desired keyboard.
         // Test if keyboard already loaded
-        var kbd = manager.getKeyboardByID(kbdStub['KI']), Li;
+        var kbd = manager.getKeyboardByID(kbdStub['KI']);
         if(kbd) {  // Is cleared upon a successful load.
 
           //Activate keyboard, if it's still the active stub.
