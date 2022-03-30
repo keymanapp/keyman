@@ -85,8 +85,6 @@ class LexicalModelRepository {
    * install = 1) download lexical model and 2) turn on prediction and corrections by default
    */
   func installLexicalModel(package: LexicalModelKeymanPackage, keyboardState: KeyboardState, modelId: String) -> Bool {
-    FVShared.reportState(location: "before install lexical model")
-
     let added = Manager.shared.addLexicalModel(lexicalModelId: modelId, languageId: keyboardState.languageTag, from: package)
 
     if (!added) {
@@ -104,22 +102,12 @@ class LexicalModelRepository {
 
     let applied = self.applyLexicalModelSettings(languageId: keyboardState.languageTag, modelId: modelId)
     
-    FVShared.reportState(location: "from install lexical model")
-    
     return applied
   }
   
   func disableLexicalModel(keyboardState: KeyboardState, modelId: String) -> Bool {
-    FVShared.reportState(location: "before disableLexicalModel")
     let removed = Manager.shared.removeLexicalModel(lexicalModelId: modelId, languageId: keyboardState.languageTag)
-    FVShared.reportState(location: "after disableLexicalModel")
     return removed
-    /*
-    // call Keyman once after disabling both prediction and correction flags in UserDefaults
-    self.writePredictionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: false)
-    self.writeCorrectionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: false)
-    return self.applyLexicalModelSettings(languageId: keyboardState.languageTag, modelId: modelId)
-     */
   }
   
   func downloadModel(keyboardState: KeyboardState, modelId: String) {

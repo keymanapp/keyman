@@ -84,41 +84,108 @@ class KeyboardRepository {
   }
     
   func installKeyboard(keyboard: FVKeyboardDefinition) -> Bool {
-    var success = false
+    // make a copy of all the active keyboards
+    var newKeyboardsMap = Dictionary(uniqueKeysWithValues:
+                                      KeyboardSettingsRepository.shared.activeKeyboards.map { key, value in (key, value.languageTag) })
+    // add new keyboard
+    newKeyboardsMap[keyboard.keyboardId] = keyboard.languageTag
+  
+    // Rebuilding the keyboard list will cause the pre-installed EuroLatin SIL keyboard to be deleted if it is installed.
+    // EuroLatin SIL is not tracked as an active keyboard in the KeyboardSettingsRepository.
+    // This is intentional as it should go away once FV keyboards are added.
+
+    rebuildKeyboardsListInKeymanEngine(keyboards: newKeyboardsMap)
     
-    if let keyboardsPackage = loadKeyboardPackage() {
-      let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
-      do {
-        FVShared.reportState(location: "before install keyboard")
-        try ResourceFileManager.shared.install(resourceWithID: fullKeyboardId, from: keyboardsPackage)
-        FVShared.reportState(location: "after install keyboard")
-        print("Installed keyboard \(keyboard.keyboardId)")
-        success = true
-      } catch {
-        let installError = error
-        
-        print("Failed to load preload \(keyboard.keyboardId) installError: \(installError.localizedDescription)")
-        success = false
-     }
-    }
+    return true
     
-    return success
   }
 
   func removeKeyboard(keyboard: FVKeyboardDefinition) -> Bool {
-    var success = false
-    let fullKeyboardId = FullKeyboardID(keyboardID: keyboard.keyboardId, languageID: keyboard.languageTag)
-    FVShared.reportState(location: "before remove keyboard")
-    let removed = Manager.shared.removeKeyboard(withFullID: fullKeyboardId)
-    FVShared.reportState(location: "after remove keyboard")
-    if (removed) {
-        print("Removed keyboard \(keyboard.keyboardId)")
-        success = true
-    } else {
-      print("Could not remove keyboard \(keyboard.keyboardId)")
-      success = true
-   }
-    return success
+    // make a copy of all the active keyboards
+    var newKeyboardsMap = Dictionary(uniqueKeysWithValues:
+                                      KeyboardSettingsRepository.shared.activeKeyboards.map { key, value in (key, value.languageTag) })
+    // remove keyboard to be deleted
+    newKeyboardsMap.removeValue(forKey: keyboard.keyboardId)
+    
+    rebuildKeyboardsListInKeymanEngine(keyboards: newKeyboardsMap)
+    
+    return true
+  }
+  
+  func rebuildKeyboardsListInKeymanEngine(keyboards: [String:String]) {
+
+    // call Keyman Engine to remove all keyboards
+    while Manager.shared.removeKeyboard(at: 0) {
+      print("removed existing keyboard")
+    }
+    
+    // re-install specified keyboards 
+    if let keyboardsPackage = loadKeyboardPackage() {
+      for (keyboardId, languageTag) in keyboards {
+        let fullKeyboardId = FullKeyboardID(keyboardID: keyboardId, languageID: languageTag)
+        do {
+          try ResourceFileManager.shared.install(resourceWithID: fullKeyboardId, from: keyboardsPackage)
+          print("Installed keyboard \(keyboardId)")
+        } catch {
+          let installError = error
+          print("Failed to load preload \(keyboardId) installError: \(installError.localizedDescription)")
+       }
+      }
+    }
+  }
+  
+  class func updateActiveKeyboardsList(keyboardList: FVRegionList, loadedKeyboards: [String]) {
+
+    // Remove all installed keyboards first -- we'll re-add them below
+
+    while Manager.shared.removeKeyboard(at: 0) {
+    }
+
+    // Load the primary keyboards package so that we can install keyboards from it.
+    let keyboardPackagePath: String = Bundle.main.path(forResource: FVConstants.keyboardsPackage,
+                                                       ofType: FVConstants.keyboardsPackageExt,
+                                                       inDirectory: FVConstants.keyboardsPath)!
+    let pathUrl = URL(fileURLWithPath: keyboardPackagePath)
+    let keyboardsPackage: KeyboardKeymanPackage
+    do {
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: pathUrl)
+      guard package as? KeyboardKeymanPackage != nil else {
+        print("Failed to load \(FVConstants.keyboardsPackage).\(FVConstants.keyboardsPackageExt)")
+        return
+      }
+
+      keyboardsPackage = (package as? KeyboardKeymanPackage)!
+    } catch {
+      print("Failed to load \(FVConstants.keyboardsPackage).\(FVConstants.keyboardsPackageExt)")
+      return
+    }
+
+    // Iterate through the available keyboards
+    for region in keyboardList {
+      let keyboards = region.keyboards
+      for kb in keyboards {
+        if loadedKeyboards.contains(kb.id) {
+          // Install the keyboard from its package.
+          do {
+            // Find the matching keyboard entry from the package.
+            // We currently rely on the package to track each keyboard's available language tags.
+            if let packageKbId = keyboardsPackage.installables.first(where: { entry in
+              // Each entry in the returned array corresponds to one supported language for the keyboard.
+              entry.contains { $0.id == kb.id }
+              // We only install the first available language.  Easy to change, though.
+            }).map({ $0[0] })?.fullID { // then
+              try ResourceFileManager.shared.install(resourceWithID: packageKbId, from: keyboardsPackage)
+            } else {
+              print("Keyboard "+kb.id+" not found in primary keyboards package")
+            continue
+            }
+          } catch {
+            print("Failed to load preload "+kb.id+": " + error.localizedDescription)
+            continue
+          }
+        }
+      }
+    }
   }
 }
 
