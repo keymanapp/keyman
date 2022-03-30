@@ -154,6 +154,8 @@ if "!outfile!" == "" (
 ) else (
   fc error.log !outfile! > nul
   if !ERRORLEVEL! GTR 0 (
+    type error.log
+    del error.log
     echo %RED%FAILED: expected output in error.log did not match !outfile!.%WHITE% 1>&2
     exit /b 1
   )
