@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.289 stable 2022-03-30
+
+* chore(linux): Remove versions that are no longer supported (#6388)
+* chore(windows): move crash metadata to extra (#6398)
+* fix(android/engine): Test fileVersion during package install (#6423)
+* fix(mac): invalid keyboard breaks configuration (#6420)
+* chore(android):   Update Play publishing plugin to 3.5.0 and other plugins (#6224)
+* fix(web): track load error detail (#6443)
+
 ## 14.0.288 stable 2022-03-15
 
 * chore(linux): Update changelogs for 14.0.287 (#6373)
