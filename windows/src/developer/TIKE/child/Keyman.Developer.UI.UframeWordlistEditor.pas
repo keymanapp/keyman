@@ -187,6 +187,7 @@ begin
   if FileExists(FileName) then
   begin
     FWordlist.LoadFromFile(FileName);
+    FModified := False;
   end;
   UpdateData;
   Result := True;
@@ -285,8 +286,6 @@ begin
     end;
 
     Modified := True;
-    if Assigned(FOnChanged) then
-      FOnChanged(Self);
   finally
     Dec(FSetup);
   end;
@@ -351,6 +350,8 @@ end;
 procedure TframeWordlistEditor.SetModified(const Value: Boolean);
 begin
   FModified := Value;
+  if Value and Assigned(FOnChanged) then
+    FOnChanged(Self);
 end;
 
 procedure TframeWordlistEditor.SourceChanged(Sender: TObject);
@@ -358,8 +359,6 @@ begin
   if FSetup = 0 then
   begin
     Modified := True;
-    if Assigned(FOnChanged) then
-      FOnChanged(Self);
   end;
 end;
 
