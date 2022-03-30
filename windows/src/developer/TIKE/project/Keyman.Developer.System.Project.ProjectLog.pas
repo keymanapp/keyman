@@ -23,6 +23,7 @@ interface
 type
   TProjectLogState = (
     plsInfo,     // informational only, process-oriented
+    plsHint,     // code-level hint
     plsWarning,  // code-level warning
     plsError,    // code-level error
     plsFatal,    // code-level or system-level fatal error, unexpected
@@ -38,6 +39,7 @@ type
 const
   ProjectLogStateTitle: array[TProjectLogState] of string = (
     '',
+    'Hint',
     'Warning',
     'Error',
     'Fatal Error',

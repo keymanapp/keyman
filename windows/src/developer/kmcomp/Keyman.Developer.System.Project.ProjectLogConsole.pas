@@ -177,6 +177,7 @@ begin
   else if (msgcode and CERR_ERROR) <> 0   then state := plsError
   else if (msgcode and CERR_WARNING) <> 0 then begin state := plsWarning; end   // I4706
   else if (msgcode and CERR_FATAL) <> 0   then state := plsFatal
+  else if (msgcode and CERR_HINT) <> 0    then state := plsHint
   else state := plsFatal;
 
   TProjectLogConsole.Instance.Log(state, text, msgcode, line);

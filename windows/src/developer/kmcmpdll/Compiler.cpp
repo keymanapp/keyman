@@ -3708,10 +3708,7 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
       ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
       if (cr == sourceIllegal) {
         // Not a valid UTF-8 file, so fall back to ANSI
-        //AddCompileMessage(CINFO_NonUnicodeFile);
-        // note, while this message is defined, for now we will not emit it
-        // because we don't support HINT/INFO messages yet and we don't want
-        // this to cause a blocking compile at this stage
+        AddCompileMessage(CHINT_NonUnicodeFile);
         poutbuf = strtowstr((PSTR)buf);
         WriteFile(hOutfile, poutbuf, (DWORD)wcslen(poutbuf) * 2, &len2, NULL);
         delete[] poutbuf;

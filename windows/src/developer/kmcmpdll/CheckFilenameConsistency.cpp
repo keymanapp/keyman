@@ -93,7 +93,7 @@ DWORD CheckFilenameConsistency(wchar_t const * Filename, BOOL ReportMissingFile)
   _wmakepath_s(Name, _MAX_PATH, nullptr, nullptr, FName, Ext);
   if (wcscmp(Name, fi.name) != 0) {
     wsprintf(ErrExtra, "reference '%ls' does not match actual filename '%ls'", Name, fi.name);
-    AddWarning(CINFO_FilenameHasDifferingCase);
+    AddWarning(CHINT_FilenameHasDifferingCase);
   }
   return CERR_None;
 }

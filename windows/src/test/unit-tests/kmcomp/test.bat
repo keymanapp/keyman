@@ -85,12 +85,12 @@ call :should-fail "#5963 using non-readonly group in readonly group" test_5963_r
 if not "!test!" == "" goto :eof
 
 :test-6440
-:: CINFO_UnreachableRule from compiler.rc
-set CINFO_UnreachableRule="Hint: This rule will never be matched as another rule takes precedence"
-call :should-have-message "#6440 hint on unreachable code #1" test_6440_unreachable_code_1.kmn %CINFO_UnreachableRule% || exit /b 34
-call :should-have-message "#6440 hint on unreachable code #2" test_6440_unreachable_code_2.kmn %CINFO_UnreachableRule% || exit /b 35
-call :should-have-message "#6440 hint on unreachable code #3" test_6440_unreachable_code_3.kmn %CINFO_UnreachableRule% || exit /b 36
-call :should-have-message "#6440 hint on unreachable code #4" test_6440_unreachable_code_4.kmn %CINFO_UnreachableRule% || exit /b 37
+:: CHINT_UnreachableRule from compiler.rc
+set CHINT_UnreachableRule="This rule will never be matched as another rule takes precedence"
+call :should-have-message "#6440 hint on unreachable code #1" test_6440_unreachable_code_1.kmn %CHINT_UnreachableRule% || exit /b 34
+call :should-have-message "#6440 hint on unreachable code #2" test_6440_unreachable_code_2.kmn %CHINT_UnreachableRule% || exit /b 35
+call :should-have-message "#6440 hint on unreachable code #3" test_6440_unreachable_code_3.kmn %CHINT_UnreachableRule% || exit /b 36
+call :should-have-message "#6440 hint on unreachable code #4" test_6440_unreachable_code_4.kmn %CHINT_UnreachableRule% || exit /b 37
 call :should-pass "#6440 hint on unreachable code #5" test_6440_unreachable_code_5.kmn || exit /b 38
 if not "!test!" == "" goto :eof
 
@@ -135,7 +135,7 @@ if %1 == -f (
 echo %BLUE%TEST: %1 %WHITE%
 
 if exist error.log del error.log
-"%compiler%" -no-color -nologo -w tests.kpj -t "%2" > error.log
+"%compiler%" -no-color -nologo -ss -w tests.kpj -t "%2" > error.log
 if !ERRORLEVEL! GTR 0 (
   type error.log
   del error.log
@@ -144,7 +144,7 @@ if !ERRORLEVEL! GTR 0 (
 )
 
 if "!outfile!" == "" (
-  findstr /L /C:%3 error.log
+  findstr /L /C:%3 error.log > nul
   if !ERRORLEVEL! GTR 0 (
     type error.log
     del error.log

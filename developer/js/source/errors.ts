@@ -11,7 +11,7 @@ export enum LogLevel {
   CERR_FATAL = 0x8000,
   CERR_ERROR = 0x4000,
   CERR_WARNING = 0x2000,
-  CERR_INFO = 0x1000
+  CERR_HINT = 0x1000
 };
 
 /**
@@ -35,7 +35,7 @@ export enum KeymanCompilerError {
   CWARN_MixedNormalizationForms = 0x2801, /* CERR_WARN_LM + 1 */
   CWARN_DuplicateWordInSameFile = 0x2802, /* CERR_WARN_LM + 2 */
 
-  CERR_INFO_LM = LogLevel.CERR_INFO | CERR_LEXICAL_MODEL_MIN,
+  CERR_HINT_LM = LogLevel.CERR_HINT | CERR_LEXICAL_MODEL_MIN,
     /* Place all LM compiler hints here! */
 
   /* Errors that are not specific to the lexical model compiler, from comperr.h: */
@@ -48,7 +48,7 @@ export enum KeymanCompilerError {
  * Taken from https://github.com/keymanapp/keyman/blob/d83cfffe511ce65b781f919e89e3693146844849/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L39-L46
  */
 const LOG_LEVEL_TITLE: {[level in LogLevel]: string} = {
-  [LogLevel.CERR_INFO]: '',
+  [LogLevel.CERR_HINT]: 'Hint',
   [LogLevel.CERR_WARNING]: 'Warning',
   [LogLevel.CERR_ERROR]: 'Error',
   [LogLevel.CERR_FATAL]: 'Fatal Error',
