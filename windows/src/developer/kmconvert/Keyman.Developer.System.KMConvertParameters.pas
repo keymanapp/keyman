@@ -9,25 +9,57 @@ type
   TKMConvertMode = (cmImportWindows, cmTemplate, cmLexicalModel);
 
   TKMConvertParameters = record
-    KLID: string;
-    Destination: string;
-    KeyboardID: string;
-    Name: string;
-    Copyright: string;
-    FullCopyright: string;
-    Version: string;
-    BCP47Tags: string;
-    Author: string;
-    Targets: TKeymanTargets;
-    Mode: TKMConvertMode;
-    NoLogo: Boolean;
-
-    ModelIdAuthor, ModelIdLanguage, ModelIdUniq: string;
   private
+    FKLID: string;
+    FDestination: string;
+    FKeyboardID: string;
+    FName: string;
+    FCopyright: string;
+    FFullCopyright: string;
+    FVersion: string;
+    FBCP47Tags: string;
+    FAuthor: string;
+    FTargets: TKeymanTargets;
+    FMode: TKMConvertMode;
+    FNoLogo: Boolean;
+    FModelIdAuthor: string;
+    FModelIdLanguage: string;
+    FModelIdUniq: string;
+
     function CheckParam(name, value: string): Boolean;
+    function SetKLID(const value: string): Boolean;
+    function SetAuthor(const value: string): Boolean;
+    function SetBCP47Tags(const value: string): Boolean;
+    function SetCopyright(const value: string): Boolean;
+    function SetDestination(const value: string): Boolean;
+    function SetFullCopyright(const value: string): Boolean;
+    function SetKeyboardID(const value: string): Boolean;
+    function SetModelIdAuthor(const value: string): Boolean;
+    function SetModelIdLanguage(const value: string): Boolean;
+    function SetModelIdUniq(const value: string): Boolean;
+    function SetName(const value: string): Boolean;
+    function SetTargets(const value: string): Boolean;
+    function SetVersion(const value: string): Boolean;
   public
     procedure WriteUsage;
     function CheckParams: Boolean;
+
+    property KLID: string read FKLID;
+    property Destination: string read FDestination;
+    property KeyboardID: string read FKeyboardID;
+    property Name: string read FName;
+    property Copyright: string read FCopyright;
+    property FullCopyright: string read FFullCopyright;
+    property Version: string read FVersion;
+    property BCP47Tags: string read FBCP47Tags;
+    property Author: string read FAuthor;
+    property Targets: TKeymanTargets read FTargets;
+    property Mode: TKMConvertMode read FMode;
+    property NoLogo: Boolean read FNoLogo;
+
+    property ModelIdAuthor: string read FModelIdAuthor;
+    property ModelIdLanguage: string read FModelIdLanguage;
+    property ModelIdUniq: string read FModelIdUniq;
   end;
 
 implementation
@@ -40,22 +72,22 @@ var
   ModeString: string;
   i: Integer;
 begin
-  Destination := '.';
-  Copyright := 'Copyright (C)';
-  FullCopyright := 'Copyright (C) '+FormatDateTime('yyyy', Now);
-  Version := '1.0';
-  Targets := [ktAny];
+  FDestination := '.';
+  FCopyright := 'Copyright (C)';
+  FFullCopyright := 'Copyright (C) '+FormatDateTime('yyyy', Now);
+  FVersion := '1.0';
+  FTargets := [ktAny];
 
   if ParamCount < 2 then
     Exit(False);
 
   ModeString := LowerCase(ParamStr(1));
   if ModeString = 'import-windows' then
-    Mode := cmImportWindows
+    FMode := cmImportWindows
   else if ModeString = 'template' then
-    Mode := cmTemplate
+    FMode := cmTemplate
   else if ModeString = 'lexical-model' then
-    Mode := cmLexicalModel
+    FMode := cmLexicalModel
   else
     Exit(False);
 
@@ -64,7 +96,7 @@ begin
   begin
     if ParamStr(i) = '-nologo' then
     begin
-      NoLogo := True;
+      FNoLogo := True;
       Inc(i);
       Continue;
     end;
@@ -118,21 +150,97 @@ end;
 
 function TKMConvertParameters.CheckParam(name, value: string): Boolean;
 begin
-  if name = '-klid' then KLID := value
-  else if name = '-o' then Destination := value
-  else if name = '-id' then KeyboardID := value
-  else if name = '-name' then Self.Name := value
-  else if name = '-copyright' then Copyright := value
-  else if name = '-full-copyright' then FullCopyright := value
-  else if name = '-version' then Version := value
-  else if name = '-languages' then BCP47Tags := value
-  else if name = '-author' then Author := value
-  else if name = '-targets' then Targets := StringToKeymanTargets(value)
-  else if name = '-id-author' then ModelIdAuthor := value
-  else if name = '-id-language' then ModelIdLanguage := value
-  else if name = '-id-uniq' then ModelIdUniq := value
+  if name = '-klid' then Result := SetKLID(value)
+  else if name = '-o' then Result := SetDestination(value)
+  else if name = '-id' then Result := SetKeyboardID(value)
+  else if name = '-name' then Result := SetName(value)
+  else if name = '-copyright' then Result := SetCopyright(value)
+  else if name = '-full-copyright' then Result := SetFullCopyright(value)
+  else if name = '-version' then Result := SetVersion(value)
+  else if name = '-languages' then Result := SetBCP47Tags(value)
+  else if name = '-author' then Result := SetAuthor(value)
+  else if name = '-targets' then Result := SetTargets(value)
+  else if name = '-id-author' then Result := SetModelIdAuthor(value)
+  else if name = '-id-language' then Result := SetModelIdLanguage(value)
+  else if name = '-id-uniq' then Result := SetModelIdUniq(value)
+  else Result := False;
+end;
 
-  else Exit(False);
+function TKMConvertParameters.SetKLID(const value: string): Boolean;
+begin
+  FKLID := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetDestination(const value: string): Boolean;
+begin
+  FDestination := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetKeyboardID(const value: string): Boolean;
+begin
+  FKeyboardID := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetName(const value: string): Boolean;
+begin
+  FName := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetCopyright(const value: string): Boolean;
+begin
+  FCopyright := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetFullCopyright(const value: string): Boolean;
+begin
+  FFullCopyright := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetVersion(const value: string): Boolean;
+begin
+  FVersion := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetBCP47Tags(const value: string): Boolean;
+begin
+  FBCP47Tags := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetAuthor(const value: string): Boolean;
+begin
+  FAuthor := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetTargets(const value: string): Boolean;
+begin
+  FTargets := StringToKeymanTargets(Value);
+  Result := True;
+end;
+
+function TKMConvertParameters.SetModelIdAuthor(const value: string): Boolean;
+begin
+  FModelIdAuthor := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetModelIdLanguage(const value: string): Boolean;
+begin
+  FModelIdLanguage := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetModelIdUniq(const value: string): Boolean;
+begin
+  FModelIdUniq := Value;
   Result := True;
 end;
 
