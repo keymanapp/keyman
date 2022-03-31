@@ -52,7 +52,6 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RelativeLayout;
@@ -1156,8 +1155,8 @@ final class KMKeyboard extends WebView {
         textView.setTypeface(Typeface.SANS_SERIF);
       }
 
-      int w = (int) (baseKeyFrame.width() * density);
-      int h = (int) (baseKeyFrame.height() * density);
+      int w = (int)getResources().getDimension(R.dimen.key_width);
+      int h = (int)getResources().getDimension(R.dimen.key_height);
       RectF frame = keyPreview.setKeySize(w, h);
       keyPreview.redraw();
 
@@ -1191,8 +1190,8 @@ final class KMKeyboard extends WebView {
       textView.setTypeface(Typeface.SANS_SERIF);
     }
 
-    int w = (int) (baseKeyFrame.width() * density);
-    int h = (int) (baseKeyFrame.height() * density);
+    int w = (int)getResources().getDimension(R.dimen.key_width);
+    int h = (int)getResources().getDimension(R.dimen.key_height);
     RectF frame = keyPreview.setKeySize(w, h);
     keyPreview.redraw();
     keyPreviewWindow = new PopupWindow(contentView, (int) frame.width(), (int) frame.height(), false);
@@ -1203,16 +1202,6 @@ final class KMKeyboard extends WebView {
         keyPreviewWindow = null;
       }
     });
-
-    int defaultHeight = (int) getResources().getDimension(R.dimen.keyboard_height);
-    if (KMManager.getKeyboardHeight(context) < defaultHeight) {
-      FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)(textView.getLayoutParams());
-      if (params != null) {
-        // If current OSK height is less than the default height, set key preview marginBottom to 0
-        params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, 0);
-        textView.setLayoutParams(params);
-      }
-    }
 
     float offset_y = getResources().getDimension(R.dimen.popup_offset_y);
     int posX, posY;
