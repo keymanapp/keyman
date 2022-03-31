@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.290 stable 2022-03-31
+
+* chore(oem/fv/android): Update dependencies (#6452)
+
 ## 14.0.289 stable 2022-03-30
 
 * chore(linux): Remove versions that are no longer supported (#6388)
