@@ -4,13 +4,11 @@
 namespace KMWRecorder {
   export class NodeProctor extends Proctor {
     private keyboard: com.keyman.keyboards.Keyboard;
-    private device: com.keyman.utils.DeviceSpec;
     public __debug = false;
 
     constructor(keyboard: com.keyman.keyboards.Keyboard, device: com.keyman.utils.DeviceSpec, assert: AssertCallback) {
       super(device, assert);
 
-      this.device = device;
       this.keyboard = keyboard;
     }
 
