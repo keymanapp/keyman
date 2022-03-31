@@ -4,11 +4,13 @@
 namespace KMWRecorder {
   export class NodeProctor extends Proctor {
     private keyboard: com.keyman.keyboards.Keyboard;
+    private device: com.keyman.utils.DeviceSpec;
     public __debug = false;
 
     constructor(keyboard: com.keyman.keyboards.Keyboard, device: com.keyman.utils.DeviceSpec, assert: AssertCallback) {
       super(device, assert);
 
+      this.device = device;
       this.keyboard = keyboard;
     }
 
@@ -45,7 +47,7 @@ namespace KMWRecorder {
       }
 
       // Establish a fresh processor, setting its keyboard appropriately for the test.
-      let processor = new com.keyman.text.KeyboardProcessor();
+      let processor = new com.keyman.text.KeyboardProcessor(this.device);
       processor.activeKeyboard = this.keyboard;
 
       if(sequence instanceof RecordedKeystrokeSequence) {
@@ -74,7 +76,7 @@ namespace KMWRecorder {
 
           // And now, execute the keystroke!
           // We don't care too much about particularities of per-keystroke behavior yet.
-          // ... we _could_ if we wanted to, though.  The framework is mostly in place; 
+          // ... we _could_ if we wanted to, though.  The framework is mostly in place;
           // it's a matter of actually adding the feature.
           let ruleBehavior = processor.processKeystroke(keyEvent, target);
 
