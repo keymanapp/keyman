@@ -8,7 +8,8 @@ TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler kmcomp-x
         androidstringtokeymanlocalestring \
         keyboard-info keyboard-js-info keyboard-package-versions \
         kmx-file-languages package-info jsonutil windows-setup \
-        ui-language-manager standards-data compile-supplementary-support
+        ui-language-manager standards-data compile-supplementary-support \
+        kmconvert
 
 test:
     $(MAKE) "TARGET=test" $(TARGETS)
@@ -27,6 +28,10 @@ group-helper-rsp19902:
 
 kmcomp:
     cd $(ROOT)\src\test\unit-tests\kmcomp
+    $(MAKE) $(TARGET)
+
+kmconvert: .virtual
+    cd $(ROOT)\src\test\unit-tests\kmconvert
     $(MAKE) $(TARGET)
 
 shared-data:
