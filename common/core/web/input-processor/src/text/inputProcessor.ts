@@ -20,7 +20,7 @@ namespace com.keyman.text {
       }
 
       this.device = device;
-      this.kbdProcessor = new KeyboardProcessor(options);
+      this.kbdProcessor = new KeyboardProcessor(device, options);
       this.lngProcessor = new prediction.LanguageProcessor();
     }
 
