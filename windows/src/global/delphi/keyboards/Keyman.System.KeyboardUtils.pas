@@ -36,6 +36,8 @@ type
     class function GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString; static;
     class function DoesFilenameFollowConventions(const Name: string): Boolean; static;
     class function DoesKeyboardFilenameFollowConventions(const Name: string): Boolean; static;
+
+    class function IsValidVersionString(const Version: string): Boolean; static;
   end;
 
 implementation
@@ -103,6 +105,29 @@ begin
   if EnforceCaseAndWhitespace
     then Result := CleanKeyboardID(Name) = Name
     else Result := CleanKeyboardID(Name.Trim) = LowerCase(Name.Trim);
+end;
+
+class function TKeyboardUtils.IsValidVersionString(
+  const Version: string): Boolean;
+var
+  p: PChar;
+begin
+  p := PChar(Version);
+  while p^ <> #0 do
+  begin
+    if not CharInSet(p^, ['0'..'9']) then
+      Exit(False);
+    while CharInSet(p^, ['0'..'9']) do Inc(p);
+
+    if p^ = '.' then
+    begin
+      Inc(p);
+      if not CharInSet(p^, ['0'..'9']) then   // I4263
+        Exit(False);
+    end;
+  end;
+
+  Result := True;
 end;
 
 class function TKeyboardUtils.GetKeymanWebCompiledFileName(const FileName: WideString): WideString;   // I4140

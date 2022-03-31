@@ -25,6 +25,7 @@ type
     FModelIdAuthor: string;
     FModelIdLanguage: string;
     FModelIdUniq: string;
+    FSilent: Boolean;
 
     function CheckParam(name, value: string): Boolean;
     function SetKLID(const value: string): Boolean;
@@ -40,9 +41,17 @@ type
     function SetName(const value: string): Boolean;
     function SetTargets(const value: string): Boolean;
     function SetVersion(const value: string): Boolean;
+    function IsValidModelComponent(const component, value: string): Boolean;
+    function ValidateBCP47Tag(const component, tag: string): Boolean;
+    procedure OutputText(const msg: string = '');
   public
+    type TOutputTextProc = reference to procedure(msg: string);
+    var OnOutputText: TOutputTextProc;
+
     procedure WriteUsage;
-    function CheckParams: Boolean;
+    function CheckParams(Params: TArray<string>): Boolean;
+
+    property Silent: Boolean read FSilent write FSilent;
 
     property KLID: string read FKLID;
     property Destination: string read FDestination;
@@ -65,9 +74,15 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils,
 
-function TKMConvertParameters.CheckParams: Boolean;
+  BCP47Tag,
+  Keyman.System.CanonicalLanguageCodeUtils,
+  Keyman.System.KeyboardUtils,
+  Keyman.System.LanguageCodeUtils,
+  Keyman.System.LexicalModelUtils;
+
+function TKMConvertParameters.CheckParams(Params: TArray<string>): Boolean;
 var
   ModeString: string;
   i: Integer;
@@ -78,10 +93,10 @@ begin
   FVersion := '1.0';
   FTargets := [ktAny];
 
-  if ParamCount < 2 then
+  if Length(Params) < 2 then
     Exit(False);
 
-  ModeString := LowerCase(ParamStr(1));
+  ModeString := Params[0].ToLower;
   if ModeString = 'import-windows' then
     FMode := cmImportWindows
   else if ModeString = 'template' then
@@ -91,22 +106,22 @@ begin
   else
     Exit(False);
 
-  i := 2;
-  while i <= ParamCount do
+  i := 1;
+  while i < Length(Params) do
   begin
-    if ParamStr(i) = '-nologo' then
+    if Params[i] = '-nologo' then
     begin
       FNoLogo := True;
       Inc(i);
       Continue;
     end;
-    if CheckParam(ParamStr(i), ParamStr(i+1)) then
+    if CheckParam(Params[i], Params[i+1]) then
     begin
       Inc(i, 2);
       Continue;
     end;
 
-    writeln('Invalid parameter: '+ParamStr(i));
+    OutputText('Invalid parameter: '+Params[i]);
     Exit(False);
   end;
 
@@ -115,35 +130,35 @@ end;
 
 procedure TKMConvertParameters.WriteUsage;
 begin
-  writeln('kmconvert import-windows -klid <source-klid> [additional-options]');
-  writeln('  Imports a Windows keyboard into a new Keyman keyboard project');
-  writeln;
-  writeln('kmconvert template -id <keyboard_id> [additional-options]');
-  writeln('  Creates a basic keyboard project in the repository template format');
-  writeln;
-  writeln('kmconvert lexical-model -id-author <id-author> -id-language <id-language> -id-uniq <id-uniq> [additional-options]');
-  writeln('  Creates a wordlist lexical model project in the repository template format');
-  writeln;
-  writeln('Parameters:');
-  writeln('  -nologo                Don''t show the program description and copyright banner');
-  writeln('  -klid <source-klid>    The KLID of the keyboard to import, per LoadKeyboardLayout');
-  writeln('  -id <keyboard_id>      The id of the keyboard to create');
-  writeln('                         (in `import-windows` mode, can be a format string)');
-  writeln('  -o <destination>       The target folder to write the project into, defaults to "."');
-  writeln('  -author <data>         Name of author of the keyboard/model, no default');
-  writeln('  -name <data>           Name of the keyboard/model, e.g. "My First Keyboard", "%s Basic" ');
-  writeln('                         (format strings are only valid in `import-windows` mode)');
-  writeln('  -copyright <data>      Copyright string for the keyboard/model, defaults to "Copyright (C)"');
-  writeln('  -full-copyright <data> Longer copyright string for the keyboard/model, defaults to "Copyright (C) yyyy"');
-  writeln('  -version <data>        Version number of the keyboard/model, defaults to "1.0"');
-  writeln('  -languages <data>      Space-separated list of BCP 47 tags, e.g. "en-US tpi-PG"');
-  writeln('  -targets <data>        Space-separate list of targets, e.g. "linux windows mobile"');
-  writeln;
+  OutputText('kmconvert import-windows -klid <source-klid> [additional-options]');
+  OutputText('  Imports a Windows keyboard into a new Keyman keyboard project');
+  OutputText;
+  OutputText('kmconvert template -id <keyboard_id> [additional-options]');
+  OutputText('  Creates a basic keyboard project in the repository template format');
+  OutputText;
+  OutputText('kmconvert lexical-model -id-author <id-author> -id-language <id-language> -id-uniq <id-uniq> [additional-options]');
+  OutputText('  Creates a wordlist lexical model project in the repository template format');
+  OutputText;
+  OutputText('Parameters:');
+  OutputText('  -nologo                Don''t show the program description and copyright banner');
+  OutputText('  -klid <source-klid>    The KLID of the keyboard to import, per LoadKeyboardLayout');
+  OutputText('  -id <keyboard_id>      The id of the keyboard to create');
+  OutputText('                         (in `import-windows` mode, can be a format string)');
+  OutputText('  -o <destination>       The target folder to write the project into, defaults to "."');
+  OutputText('  -author <data>         Name of author of the keyboard/model, no default');
+  OutputText('  -name <data>           Name of the keyboard/model, e.g. "My First Keyboard", "%s Basic" ');
+  OutputText('                         (format strings are only valid in `import-windows` mode)');
+  OutputText('  -copyright <data>      Copyright string for the keyboard/model, defaults to "Copyright (C)"');
+  OutputText('  -full-copyright <data> Longer copyright string for the keyboard/model, defaults to "Copyright (C) yyyy"');
+  OutputText('  -version <data>        Version number of the keyboard/model, defaults to "1.0"');
+  OutputText('  -languages <data>      Space-separated list of BCP 47 tags, e.g. "en-US tpi-PG"');
+  OutputText('  -targets <data>        Space-separate list of targets, e.g. "linux windows mobile"');
+  OutputText;
   // Model parameters
-  writeln('Note: model identifiers are constructed from params: <id-author>.<id-language>.<id-uniq>');
-  writeln('  -id-author <data>      Identifier for author of model');
-  writeln('  -id-language <data>    Single BCP 47 tag identifying primary language of model');
-  writeln('  -id-uniq <data>        Unique name for the model');
+  OutputText('Note: model identifiers are constructed from params: <id-author>.<id-language>.<id-uniq>');
+  OutputText('  -id-author <data>      Identifier for author of model');
+  OutputText('  -id-language <data>    Single BCP 47 tag identifying primary language of model');
+  OutputText('  -id-uniq <data>        Unique name for the model');
 end;
 
 { TKMConvertParameters }
@@ -167,7 +182,14 @@ begin
 end;
 
 function TKMConvertParameters.SetKLID(const value: string): Boolean;
+var
+  x: Integer;
 begin
+  if not TryStrToInt('$'+value, x) then
+  begin
+    OutputText('Invalid -klid value "'+value+'": must be a hexadecimal value');
+    Exit(False);
+  end;
   FKLID := Value;
   Result := True;
 end;
@@ -180,6 +202,12 @@ end;
 
 function TKMConvertParameters.SetKeyboardID(const value: string): Boolean;
 begin
+  if not TKeyboardUtils.IsValidKeyboardID(value, True) then
+  begin
+    OutputText('Invalid -id value "'+value+'": must be a clean keyboard id (a-z, 0-9, and _ characters only)');
+    OutputText('Suggested value: "'+TKeyboardUtils.CleanKeyboardID(value)+'"');
+    Exit(False);
+  end;
   FKeyboardID := Value;
   Result := True;
 end;
@@ -204,12 +232,59 @@ end;
 
 function TKMConvertParameters.SetVersion(const value: string): Boolean;
 begin
+  if not TKeyboardUtils.IsValidVersionString(value) then
+  begin
+    OutputText('Invalid -version value "'+value+'": must be a version string, e.g. "1.0.2"');
+    Exit(False);
+  end;
   FVersion := Value;
   Result := True;
 end;
 
-function TKMConvertParameters.SetBCP47Tags(const value: string): Boolean;
+function TKMConvertParameters.ValidateBCP47Tag(const component, tag: string): Boolean;
+var
+  b: TBCP47Tag;
+  msg: string;
 begin
+  b := TBCP47Tag.Create(tag);
+  try
+    if not b.IsValid(True) then
+    begin
+      OutputText('Invalid '+component+' value: "'+tag+'" is not a valid BCP-47 tag');
+      Exit(False);
+    end;
+  finally
+    b.Free;
+  end;
+
+  if not TCanonicalLanguageCodeUtils.IsCanonical(tag, msg, False, False) then
+  begin
+    // Just a warning, because it's not illegal, just generates a warning
+    // kmcomp-side
+    OutputText('Warning: '+component+': '+msg);
+  end;
+
+  Result := True;
+end;
+
+function TKMConvertParameters.SetBCP47Tags(const value: string): Boolean;
+var
+  tags: TArray<string>;
+  tag: string;
+begin
+  tags := value.Split([' ']);
+  if Length(Tags) = 0 then
+  begin
+    OutputText('Invalid -languages value "'+value+'": must be at least one tag');
+    Exit(False);
+  end;
+
+  for tag in tags do
+  begin
+    if not ValidateBCP47Tag('-languages', tag) then
+      Exit(False);
+  end;
+
   FBCP47Tags := Value;
   Result := True;
 end;
@@ -223,23 +298,55 @@ end;
 function TKMConvertParameters.SetTargets(const value: string): Boolean;
 begin
   FTargets := StringToKeymanTargets(Value);
+  if FTargets = [] then
+  begin
+    OutputText('Invalid -targets value "'+value+'": no valid targets found');
+    Exit(False);
+  end;
   Result := True;
+end;
+
+function TKMConvertParameters.IsValidModelComponent(const component, value: string): Boolean;
+begin
+  Result := TLexicalModelUtils.IsCleanLexicalModelIDComponent(value);
+  if not Result then
+  begin
+    OutputText('Invalid '+component+' value "'+value+'"');
+    OutputText('Suggested value: "'+TLexicalModelUtils.CleanLexicalModelIDComponent(value)+'"');
+  end;
+end;
+
+procedure TKMConvertParameters.OutputText(const msg: string);
+begin
+  if Assigned(OnOutputText) then
+    OnOutputText(msg)
+  else if not FSilent then
+    writeln(msg);
 end;
 
 function TKMConvertParameters.SetModelIdAuthor(const value: string): Boolean;
 begin
+  if not IsValidModelComponent('-id-author', value) then
+    Exit(False);
+
   FModelIdAuthor := Value;
   Result := True;
 end;
 
 function TKMConvertParameters.SetModelIdLanguage(const value: string): Boolean;
 begin
+  if not ValidateBCP47Tag('-id-language', value) then
+    Exit(False);
+
   FModelIdLanguage := Value;
   Result := True;
 end;
 
 function TKMConvertParameters.SetModelIdUniq(const value: string): Boolean;
 begin
+  if not IsValidModelComponent('-id-uniq', value) then
+    Exit(False);
+
   FModelIdUniq := Value;
   Result := True;
 end;
