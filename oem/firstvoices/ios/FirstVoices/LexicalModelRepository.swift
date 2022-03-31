@@ -91,12 +91,11 @@ class LexicalModelRepository {
       return false
     }
     
-    // Register the lexical model in defaults!
+    // set as preferred lexical model (same as done in Keyman switchLexicalModel())
     let defaults: UserDefaults = FVShared.userDefaults()
     defaults.set(preferredLexicalModelID: modelId, forKey: keyboardState.languageTag)
 
     // call Keyman once after enabling both prediction and correction flags in UserDefaults
-        
     self.writePredictionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: true)
     self.writeCorrectionSettings(languageId: keyboardState.languageTag, modelId: modelId, on: true)
 
