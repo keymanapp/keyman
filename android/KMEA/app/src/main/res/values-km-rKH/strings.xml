@@ -7,6 +7,10 @@
         <item quantity="other">ក្ដារចុច</item>
     </plurals>
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="other">វិធីសាស្ត្របញ្ចូលផ្សេងទៀត</item>
+    </plurals>
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">បន្ថែម​ក្ដារចុច​ថ្មី</string>
     <!-- Context: Title for list -->
     <string name="title_languages_settings" comment="List of installed languages">ភាសាដែលបានដំឡើង</string>
@@ -15,13 +19,17 @@
     <!-- Context: Button label -->
     <string name="label_add" comment="Button to add an item">បន្ថែម</string>
     <!-- Context: Button label -->
-    <string name="label_back" comment="Button to go back">ត្រឡប់ក្រោយ</string>
+    <string name="label_back" comment="Button to go back">ថយក្រោយ</string>
     <!-- Context: Button label -->
     <string name="label_cancel" comment="Button to cancel an action">បោះបង់</string>
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">បិទ</string>
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">បិទ​ Keyman</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">ទៅមុខ</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">វិធីសាស្ត្របញ្ចូលបន្ទាប់</string>
     <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item"> ទាញយក</string>
     <!-- Context: Button label -->
@@ -68,6 +76,8 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      ត្រូវការបណ្ណាល័យ FileProvider ដើម្បី​មើលឯកសារជំនួយ៖ %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      មាន​បញ្ហាធ្ងន់ធ្ងរចំពោះក្ដារចុច %1$s:%2$s សម្រាប់​ភាសា %3$s។ កំពុង​ផ្ទុក​ក្ដារចុច​លំនាំដើម។</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      បញ្ហាក្នុងក្ដារចុច %1$s:%2$s សម្រាប់ភាសា %3$s។</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">កំពុង​ពិនិត្យ​រក​បញ្ជី​ពាក្យ​ពាក់ព័ន្ធ​ដើម្បី​ទាញយក</string>
     <!-- Context: Model Updates -->
