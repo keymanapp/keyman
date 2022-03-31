@@ -66,10 +66,10 @@ android {
 // how to configure the sentry android gradle plugin
 sentry {
     // Disables or enables the automatic configuration of Native symbols
-    uploadNativeSymbols true
+    uploadNativeSymbols = true
 
     // Does or doesn't include the source code of native code for Sentry
-    includeNativeSources true
+    includeNativeSources = true
 }
 
 String env_keys_json_file = System.getenv("oem_firstvoices_keys_json_file")
@@ -80,20 +80,22 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
         serviceAccountCredentials = file(String.valueOf(env_keys_json_file))
 
         // Deactivate lower conflicting version APKs
-        resolutionStrategy = "ignore"
+        resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
         switch (System.env.TIER) {
             case 'beta':
-                track = 'beta'
+                track.set("beta")
+                println "TIER set to beta"
                 break
 
             case 'stable':
-                track = 'production'
+                track.set("production")
+                println "TIER set to production"
                 break
 
             default:
-                track = 'alpha'
+                track.set("alpha")
+                println "TIER set to alpha"
         }
-        println "TIER set to $track"
     }
 }
 
@@ -102,6 +104,7 @@ repositories {
         dirs 'libs'
     }
     google()
+    mavenCentral()
 }
 
 dependencies {
@@ -109,7 +112,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
     implementation 'com.google.android.material:material:1.2.1'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:3.1.0'
+    implementation 'io.sentry:sentry-android:4.3.0'
     implementation 'androidx.preference:preference:1.1.1'
 }
 
