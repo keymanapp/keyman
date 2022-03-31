@@ -25,7 +25,7 @@ type
     FModelIdAuthor: string;
     FModelIdLanguage: string;
     FModelIdUniq: string;
-    FSilent: Boolean;
+    FEmitUsage: Boolean;
 
     function CheckParam(name, value: string): Boolean;
     function SetKLID(const value: string): Boolean;
@@ -51,7 +51,7 @@ type
     procedure WriteUsage;
     function CheckParams(Params: TArray<string>): Boolean;
 
-    property Silent: Boolean read FSilent write FSilent;
+    property EmitUsage: Boolean read FEmitUsage;
 
     property KLID: string read FKLID;
     property Destination: string read FDestination;
@@ -87,14 +87,27 @@ var
   ModeString: string;
   i: Integer;
 begin
+  FEmitUsage := False;
+
   FDestination := '.';
   FCopyright := 'Copyright (C)';
   FFullCopyright := 'Copyright (C) '+FormatDateTime('yyyy', Now);
   FVersion := '1.0';
   FTargets := [ktAny];
 
-  if Length(Params) < 2 then
+  if Length(Params) < 1 then
+  begin
+    FEmitUsage := True;
     Exit(False);
+  end;
+
+  if SameText(Params[0], '-h') or
+      SameText(Params[0], '-help') or
+      SameText(Params[0], '-?') then
+  begin
+    FEmitUsage := True;
+    Exit(False);
+  end;
 
   ModeString := Params[0].ToLower;
   if ModeString = 'import-windows' then
@@ -104,7 +117,10 @@ begin
   else if ModeString = 'lexical-model' then
     FMode := cmLexicalModel
   else
+  begin
+    FEmitUsage := True;
     Exit(False);
+  end;
 
   i := 1;
   while i < Length(Params) do
@@ -121,7 +137,6 @@ begin
       Continue;
     end;
 
-    OutputText('Invalid parameter: '+Params[i]);
     Exit(False);
   end;
 
@@ -178,7 +193,11 @@ begin
   else if name = '-id-author' then Result := SetModelIdAuthor(value)
   else if name = '-id-language' then Result := SetModelIdLanguage(value)
   else if name = '-id-uniq' then Result := SetModelIdUniq(value)
-  else Result := False;
+  else
+  begin
+    OutputText('Invalid parameter: '+name);
+    Result := False;
+  end;
 end;
 
 function TKMConvertParameters.SetKLID(const value: string): Boolean;
@@ -320,7 +339,7 @@ procedure TKMConvertParameters.OutputText(const msg: string);
 begin
   if Assigned(OnOutputText) then
     OnOutputText(msg)
-  else if not FSilent then
+  else
     writeln(msg);
 end;
 
