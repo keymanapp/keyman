@@ -25,18 +25,17 @@ class KeyboardSettingsRepository {
   private init() {
   }
 
-  private var _savedKeyboards: [String:KeyboardState]!
+  private var _activeKeyboards: [String:KeyboardState]!
   
-  private var savedKeyboards: [String:KeyboardState] {
+  public var activeKeyboards: [String:KeyboardState] {
     get {
-      if _savedKeyboards == nil {
-        //_savedKeyboards = self.loadInstalledKeyboardsFromUserDefaults()
-        _savedKeyboards = self.loadKeyboardStateFromUserDefaults()
+      if _activeKeyboards == nil {
+        _activeKeyboards = self.loadKeyboardStateFromUserDefaults()
       }
-      return _savedKeyboards!
+      return _activeKeyboards!
     }
     set {
-      _savedKeyboards = newValue
+      _activeKeyboards = newValue
     }
   }
 
@@ -48,7 +47,7 @@ class KeyboardSettingsRepository {
   func loadKeyboardState(keyboardId: String) -> KeyboardState? {
     var state:KeyboardState? = nil;
     
-    if let state = savedKeyboards[keyboardId] {
+    if let state = activeKeyboards[keyboardId] {
       return state
     } else {
       state = createDefaultKeyboardState(for: keyboardId, isActive: false)
@@ -56,6 +55,10 @@ class KeyboardSettingsRepository {
       return state
   }
 
+  func hasActiveKeyboards() -> Bool {
+    return !activeKeyboards.isEmpty
+  }
+  
   /*
    * Create a new default keyboard state object or nil if specified keyboard is not defined.
    */
@@ -69,9 +72,13 @@ class KeyboardSettingsRepository {
   }
   
   func saveKeyboardState(state: KeyboardState) {
-    // replace element of keyboard state map with updated one
-    self.savedKeyboards[state.keyboardId] = state
-
+    if (state.isActive) {
+      // add to keyboard state map (or update if already exists)
+      self.activeKeyboards[state.keyboardId] = state
+    } else {
+      // is not active, so remove from keyboard state map if it is there
+      self.activeKeyboards.removeValue(forKey: state.keyboardId)
+    }
     // persist the entire map
     self.saveKeyboardStateMapToSettingsMap()
   }
@@ -174,7 +181,7 @@ class KeyboardSettingsRepository {
   }
 
   func saveKeyboardStateMapToSettingsMap() {
-    let settings:[String:KeyboardSettings] = createSettingsMapFromKeyboardStateMap(keyboards: self.savedKeyboards)
+    let settings:[String:KeyboardSettings] = createSettingsMapFromKeyboardStateMap(keyboards: self.activeKeyboards)
     let sharedData: UserDefaults = FVShared.userDefaults()
     guard let data = try? JSONEncoder().encode(settings) else { return }
     sharedData.set(data, forKey: FVConstants.kFVKeyboardSettingsMap)
@@ -183,7 +190,7 @@ class KeyboardSettingsRepository {
   // deprecated but retained in case of need to test with data saved in old format
   func saveKeyboardIdArrayToUserDefaults() {
     let sharedData: UserDefaults = FVShared.userDefaults()
-    let keyboardIds: [String] = Array(savedKeyboards.keys)
+    let keyboardIds: [String] = Array(activeKeyboards.keys)
     sharedData.set(keyboardIds, forKey: FVConstants.kFVLoadedKeyboardList)
   }
 }
