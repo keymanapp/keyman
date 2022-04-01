@@ -143,7 +143,7 @@ namespace com.keyman.text.prediction {
       });
     }
 
-    public invalidateContext(outputTarget?: OutputTarget, layerId: string) {
+    public invalidateContext(outputTarget: OutputTarget, layerId: string) {
       // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
       this.emit('invalidatesuggestions', 'context');
 
