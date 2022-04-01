@@ -143,7 +143,7 @@ namespace com.keyman.text.prediction {
       });
     }
 
-    public invalidateContext(outputTarget?: OutputTarget) {
+    public invalidateContext(outputTarget?: OutputTarget, layerId: string) {
       // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
       this.emit('invalidatesuggestions', 'context');
 
@@ -159,23 +159,23 @@ namespace com.keyman.text.prediction {
         return;
       } else if(outputTarget) {
         let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
-        this.predict_internal(transcription, true);
+        this.predict_internal(transcription, true, layerId);
       } else {
         // Shouldn't be possible, and we'll want to know if and when it is.
         console.warn("OutputTarget missing during an invalidateContext call");
       }
     }
 
-    public wordbreak(target: OutputTarget): Promise<string> {
+    public wordbreak(target: OutputTarget, layerId: string): Promise<string> {
       if(!this.isActive) {
         return null;
       }
 
-      let context = new ContextWindow(Mock.from(target, false), this.configuration);
+      let context = new ContextWindow(Mock.from(target, false), this.configuration, layerId);
       return this.lmEngine.wordbreak(context);
     }
 
-    public predict(transcription: Transcription): Promise<Suggestion[]> {
+    public predict(transcription: Transcription, layerId: string): Promise<Suggestion[]> {
       if(!this.isActive) {
         return null;
       }
@@ -190,10 +190,18 @@ namespace com.keyman.text.prediction {
       // may as well officially invalidate them via event.
       this.emit("invalidatesuggestions", 'new');
 
-      return this.predict_internal(transcription);
+      return this.predict_internal(transcription, false, layerId);
     }
 
-    public applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget): Promise<Reversion> {
+    /**
+     *
+     * @param suggestion
+     * @param outputTarget
+     * @param getLayerId      a function that returns the current layerId,
+     *                        required because layerid can be changed by PostKeystroke
+     * @returns
+     */
+    public applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget, getLayerId: ()=>string): Promise<Reversion> {
       if(!outputTarget) {
         throw "Accepting suggestions requires a destination OutputTarget instance."
       }
@@ -229,7 +237,7 @@ namespace com.keyman.text.prediction {
 
         // Builds the reversion option according to the loaded lexical model's known
         // syntactic properties.
-        let suggestionContext = new ContextWindow(original.preInput, this.configuration);
+        let suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
 
         // We must accept the Suggestion from its original context, which was before
         // `original.transform` was applied.
@@ -251,7 +259,7 @@ namespace com.keyman.text.prediction {
           // // If using the version from lm-layer:
           // let mappedReversion = reversion;
           // mappedReversion.transformId = reversionTranscription.token;
-          lp.predictFromTarget(outputTarget);
+          lp.predictFromTarget(outputTarget, getLayerId());
           return mappedReversion;
         });
 
@@ -289,7 +297,7 @@ namespace com.keyman.text.prediction {
       outputTarget.apply(transform);
 
       // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-      let promise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration))
+      let promise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
 
       let lp = this;
       return promise.then(function(suggestions: Suggestion[]) {
@@ -301,13 +309,13 @@ namespace com.keyman.text.prediction {
       });
     }
 
-    public predictFromTarget(outputTarget: OutputTarget): Promise<Suggestion[]> {
+    public predictFromTarget(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
       if(!outputTarget) {
         return null;
       }
 
       let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
-      return this.predict(transcription);
+      return this.predict(transcription, layerId);
     }
 
     /**
@@ -315,12 +323,12 @@ namespace com.keyman.text.prediction {
      * have been raised.
      * @param transcription The triggering transcription (if it exists)
      */
-    private predict_internal(transcription: Transcription, resetContext: boolean = false): Promise<Suggestion[]> {
+    private predict_internal(transcription: Transcription, resetContext: boolean, layerId: string): Promise<Suggestion[]> {
       if(!transcription) {
         return null;
       }
 
-      let context = new ContextWindow(transcription.preInput, this.configuration);
+      let context = new ContextWindow(transcription.preInput, this.configuration, layerId);
       this.recordTranscription(transcription);
 
       if(resetContext) {
