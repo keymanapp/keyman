@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.226 beta 2022-04-01
+
+* fix(web): track stateKeys changes with layer changes (#6453)
+
 ## 15.0.225 beta 2022-04-01
 
 * fix(ios): reset context when osk is resized (#6428)
