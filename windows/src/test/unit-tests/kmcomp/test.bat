@@ -73,6 +73,12 @@ call :should-have-message "#6440 hint on unreachable code #3" test_6440_unreacha
 call :should-have-message "#6440 hint on unreachable code #4" test_6440_unreachable_code_4.kmn %CINFO_UnreachableRule% || exit /b 37
 call :should-pass "#6440 hint on unreachable code #5" test_6440_unreachable_code_5.kmn || exit /b 38
 
+call :should-fail "#6462 duplicate group #1" test_6462_duplicate_group_1.kmn || exit /b 39
+call :should-fail "#6462 duplicate group #2" test_6462_duplicate_group_2.kmn || exit /b 40
+call :should-fail "#6462 duplicate store #1" test_6462_duplicate_store_1.kmn || exit /b 41
+call :should-fail "#6462 duplicate store #2" test_6462_duplicate_store_2.kmn || exit /b 42
+call :should-fail "#6462 duplicate store #3" test_6462_duplicate_store_3.kmn || exit /b 42
+
 goto :eof
 
 :should-pass

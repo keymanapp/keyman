@@ -89,6 +89,7 @@
 #include "CasedKeys.h"
 #include "CheckNCapsConsistency.h"
 #include "UnreachableRules.h"
+#include "CheckForDuplicates.h"
 
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
@@ -887,6 +888,8 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
 
   safe_wcsncpy(gp->szName, q, SZMAX_GROUPNAME);
 
+  gp->Line = currentLine;
+
   if (FSaveDebug)
   {
     WCHAR tstr[128];
@@ -895,7 +898,7 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
     AddDebugStore(fk, tstr);
   }
 
-  return CERR_None;
+  return CheckForDuplicateGroup(fk, gp);
 }
 
 int cmpkeys(const void *key, const void *elem)
@@ -1018,7 +1021,7 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
   if (i > 0)
     if ((msg = ProcessSystemStore(fk, i, sp)) != CERR_None) return msg;
 
-  return CERR_None;
+  return CheckForDuplicateStore(fk, sp);
 }
 
 DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID)
