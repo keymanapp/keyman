@@ -60,18 +60,18 @@ public class CharSequenceUtilTest {
 
     numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 1);
     Assert.assertEquals(0, numPairs);
+
+    sequence = SMILEY_LOW_SURROGATE_PAIR;
+    numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 1);
+    Assert.assertEquals(0, numPairs);
   }
 
   @Test
   public void test_countSurrogatePairs_one_pair() {
 
     // Test for scenarios that expect 1 surrogate pair
-    CharSequence sequence = SMILEY_LOW_SURROGATE_PAIR;
+    CharSequence sequence = "Have A " + SMILEY;
     int numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 1);
-    Assert.assertEquals(1, numPairs);
-
-    sequence = "Have A " + SMILEY;
-    numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 1);
     Assert.assertEquals(1, numPairs);
 
     numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 2);
@@ -84,8 +84,6 @@ public class CharSequenceUtilTest {
     numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 5);
     Assert.assertEquals(1, numPairs);
 
-    numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 6);
-    Assert.assertEquals(1, numPairs);
   }
 
   @Test
@@ -93,7 +91,10 @@ public class CharSequenceUtilTest {
 
     // Test for scenarios that expect 2 surrogate pairs
     CharSequence sequence = "Have A " + SMILEY + WINK + " Day";
-    int numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 7);
+    int numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 6);
+    Assert.assertEquals(2, numPairs);
+
+    numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 7);
     Assert.assertEquals(2, numPairs);
 
     numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 8);
@@ -151,54 +152,4 @@ public class CharSequenceUtilTest {
   }
 
   //endregion
-
-  // region adjustCursorPosition tests
-
-  @Test
-  public void test_adjustCursorPosition_invalid_input() {
-    CharSequence sequence = null;
-    String s = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
-    int move = CharSequenceUtil.adjustCursorPosition(sequence, s);
-    Assert.assertEquals(0, move);
-
-    sequence = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
-    s = null;
-    move = CharSequenceUtil.adjustCursorPosition(sequence, s);
-    Assert.assertEquals(0, move);
-  }
-
-  @Test
-  public void test_adjustCursorPosition_split_surrogate_pair() {
-    CharSequence sequence = SMILEY_LOW_SURROGATE_PAIR + P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY_HIGH_SURROGATE_PAIR;
-    String s = P_COMPOSING_CIRCUMFLEX_ACCENT;
-    int move = CharSequenceUtil.adjustCursorPosition(sequence, s);
-    Assert.assertEquals(1, move);
-  }
-
-  @Test
-  public void test_adjustCursorPosition_move() {
-    CharSequence charsBefore = P_COMPOSING_DOT_ABOVE + SMILEY;
-    String s = P_COMPOSING_DOT_ABOVE;
-    int move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
-    Assert.assertEquals(2, move);
-
-    charsBefore = P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY;
-    s = P_COMPOSING_CIRCUMFLEX_ACCENT;
-    move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
-    Assert.assertEquals(2, move);
-
-    charsBefore = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY + P_COMPOSING_DOT_ABOVE;
-    s = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
-    move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
-    Assert.assertEquals(4, move);
-
-    // Firefox behavior
-    charsBefore = "o" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY + "p";
-    s = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
-    move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
-    Assert.assertEquals(3, move);
-  }
-
-  //endregion
-
 }

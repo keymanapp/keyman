@@ -9,6 +9,7 @@ public final class CharSequenceUtil {
    * Count the number of surrogate pairs starting from the end of a character sequence
    * until we reach dn codepoints or searched the entire sequence.
    * Doing this the hard way because we can't foreach charSequence in reverse.
+   * Does not include split-surrogate pairs.
    * @param sequence - the character sequence to analyze
    * @param dn - the number of code points to count up to
    * @return int
@@ -18,20 +19,18 @@ public final class CharSequenceUtil {
       return 0;
     }
 
-    int numPairs = 0, counter = 0;
     int lastIndex = sequence.length()-1;
-    try {
-      do {
-        if (Character.isLowSurrogate(sequence.charAt(lastIndex - counter))) {
-          numPairs++;
-        }
-        counter++;
-      } while ((lastIndex - counter >= 0) && (counter < dn) && (numPairs < dn));
-      return numPairs;
-    } catch (Exception e) {
-      KMLog.LogException(TAG, "Error in countSurrogatePairs: ", e);
-      return numPairs;
+    int index = lastIndex, dnx = dn, numPairs = 0;
+    while(index > 0 && dnx > 0) {
+      if(Character.isLowSurrogate(sequence.charAt(index)) &&
+        Character.isHighSurrogate(sequence.charAt(index-1))) {
+        numPairs++;
+        index--;
+      }
+      index--;
+      dnx--;
     }
+    return numPairs;
   }
 
   /**
@@ -62,31 +61,4 @@ public final class CharSequenceUtil {
       return charsToRestore;
     }
   }
-
-  /**
-   * Adjust cursor position after insert the new text.
-   * @param charsBefore the character sequence of the inputconnection (2*s.length)
-   * @param s the inserted text
-   * @return int - number of characters to adjust the cursor
-   */
-  public static int adjustCursorPosition(CharSequence charsBefore, String s) {
-    if (charsBefore == null || s == null) {
-      return 0;
-    }
-
-    int numPairs = countSurrogatePairs(charsBefore, s.length());
-    int _expected_start_index = charsBefore.length() - s.length();
-    int _move = 0;
-    while (_move < _expected_start_index) {
-
-      CharSequence _check = charsBefore.subSequence(
-        _expected_start_index - _move,charsBefore.length()-_move);
-      if(_check.equals(s)) {
-        break;
-      }
-      _move++;
-    }
-    return _move;
-  }
-
 }
