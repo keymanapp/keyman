@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.226 beta 2022-04-01
+
+* fix(web): track stateKeys changes with layer changes (#6453)
+
+## 15.0.225 beta 2022-04-01
+
+* fix(ios): reset context when osk is resized (#6428)
+* feat(developer): keep Virtual Key Identifier dialog open on Insert (#6449)
+* fix(oem/fv/ios): maintain consistent keyboard state between Keyman Engine and FV app (#6446)
+
 ## 15.0.224 beta 2022-03-29
 
 * fix(android/engine): Clear WebView cache on package install (#6438)

@@ -12,7 +12,7 @@
         android:id="@+id/textView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="@dimen/preview_padding"
         android:layout_gravity="center"
         android:gravity="center"
         android:textSize="32sp"

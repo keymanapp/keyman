@@ -83,6 +83,7 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="CheckForDuplicates.h">
+    <ClInclude Include="CheckFilenameConsistency.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -109,6 +110,7 @@
     <ClCompile Include="CheckNCapsConsistency.cpp" />
     <ClCompile Include="UnreachableRules.cpp" />
     <ClCompile Include="CheckForDuplicates.cpp" />
+    <ClCompile Include="CheckFilenameConsistency.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Compiler.rc" />

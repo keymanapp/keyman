@@ -36,7 +36,7 @@ DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
         reportedLines.insert(kp->Line);
         currentLine = kp->Line;
         wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
-        AddWarning(CINFO_UnreachableRule);
+        AddWarning(CHINT_UnreachableRule);
       }
     }
     else {

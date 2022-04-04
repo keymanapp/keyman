@@ -18,6 +18,7 @@ type
     function Failed(message: string): Boolean;
     procedure Warning(message: string);
     procedure Info(message: string);
+    procedure Hint(message: string);
   public
     class function Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;
   end;
@@ -120,6 +121,11 @@ function TValidateKeyboardInfo.Failed(message: string): Boolean;
 begin
   GCallback(plsError, FJsonFile, Message, 0, 0);
   Result := False;
+end;
+
+procedure TValidateKeyboardInfo.Hint(message: string);
+begin
+  GCallback(plsHint, FJsonFile, Message, 0, 0);
 end;
 
 procedure TValidateKeyboardInfo.Info(message: string);

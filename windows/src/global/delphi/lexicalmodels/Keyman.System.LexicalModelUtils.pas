@@ -29,6 +29,7 @@ type
     class function DoesProjectFilenameFollowLexicalModelConventions(
       const Name: string): Boolean; static;
     class function CleanLexicalModelIDComponent(const Name: string): string; static;
+    class function IsCleanLexicalModelIDComponent(const Name: string): Boolean; static;
 
     class function ExtractFileExt(filename: string): string; static;
     class function RemoveFileExt(filename: string): string; static;
@@ -120,6 +121,11 @@ begin
       SameText(Result, Ext_ProjectSource)) and
      SameText(Second, Ext_Model_Component) then
     Result := Second + Result;
+end;
+
+class function TLexicalModelUtils.IsCleanLexicalModelIDComponent(const Name: string): Boolean;
+begin
+  Result := Name = CleanLexicalModelIDComponent(Name);
 end;
 
 class function TLexicalModelUtils.CleanLexicalModelIDComponent(const Name: string): string;

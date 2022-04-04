@@ -71,7 +71,10 @@
       <xsl:attribute name="id"><xsl:value-of select="../@Name"/>-<xsl:value-of select="@Name"/></xsl:attribute>
       <div class="title"><xsl:value-of select="@Title"/></div>
       <xsl:copy-of select="." />
-      <div class="morehelp"><a><xsl:attribute name='href'>help:<xsl:value-of select='../@Name'/></xsl:attribute>More help...</a></div>
+      <div class="morehelp"><a><xsl:attribute name='href'>help:<xsl:choose>
+          <xsl:when test="@TopicName"><xsl:value-of select="@TopicName"></xsl:value-of></xsl:when>
+          <xsl:otherwise><xsl:value-of select='../@Name'/></xsl:otherwise>
+        </xsl:choose></xsl:attribute>More help...</a></div>
     </div>
   </xsl:template>
 </xsl:stylesheet>

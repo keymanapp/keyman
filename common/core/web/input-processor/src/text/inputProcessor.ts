@@ -15,12 +15,16 @@ namespace com.keyman.text {
     private lngProcessor: prediction.LanguageProcessor;
 
     constructor(device: utils.DeviceSpec, options?: ProcessorInitOptions) {
+      if(!device) {
+        throw new Error('device must be defined');
+      }
+
       if(!options) {
         options = InputProcessor.DEFAULT_OPTIONS;
       }
 
       this.device = device;
-      this.kbdProcessor = new KeyboardProcessor(options);
+      this.kbdProcessor = new KeyboardProcessor(device, options);
       this.lngProcessor = new prediction.LanguageProcessor();
     }
 

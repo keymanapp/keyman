@@ -78,7 +78,7 @@ const
   SComment = '^\s*\/\*(.+?)\*\/';
   SFormat = 'format\s*:\s*([''"])(.+?)(\1)';
   SWordBreaker = 'wordBreaker\s*:\s*([''"])(.+?)(\1)';
-  SSources = 'sources\s*:\s*\[(.+?)\]';
+  SSources = 'sources\s*:\s*\[(.*?)\]';
   SSource = '\s*([''"])(.+?)(\1)\s*(,?)';
 
   SEndOfObject = '\s*};';

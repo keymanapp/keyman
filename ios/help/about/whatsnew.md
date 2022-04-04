@@ -2,7 +2,7 @@
 title: What's New
 ---
 
-Here are some of the new features we have added to Keyman for iPhone and iPad 14.0:
+Here are some of the new features we have added to Keyman for iPhone and iPad 15.0:
 
 * Simpler and smoother keyboard search
 * Localizable UI through [translate.keyman.com](https://translate.keyman.com)

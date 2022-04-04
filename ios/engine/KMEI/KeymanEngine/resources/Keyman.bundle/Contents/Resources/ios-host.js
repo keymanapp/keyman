@@ -80,6 +80,7 @@ function setBannerHeight(h) {
 
     // Refresh KMW's OSK
     kmw.correctOSKTextSize();
+    doResetContext();
 }
 
 function setDeviceType(deviceType) {
@@ -95,7 +96,8 @@ function setOskHeight(height) {
         kmw.core.activeKeyboard.refreshLayouts();
     }
     kmw.osk.show(true);
-    kmw['correctOSKTextSize']();
+    kmw.correctOSKTextSize();
+    doResetContext();
 }
 
 function setOskWidth(width) {
@@ -123,11 +125,13 @@ function getOskHeight() {
 var keyboardOffset = 0;
 function setKeymanLanguage(stub) {
     var kmw = window.keyman;
-
+    
     KeymanWeb.registerStub(stub);
-
-    kmw.setActiveKeyboard(stub.KP + '::' + stub.KI, stub.KLC);
-    kmw.osk.show(true);
+    
+    kmw.setActiveKeyboard(stub.KP + '::' + stub.KI, stub.KLC).then(function() {
+        kmw.osk.show(true);
+        doResetContext();
+    });
 }
 
 var fragmentToggle = 0;

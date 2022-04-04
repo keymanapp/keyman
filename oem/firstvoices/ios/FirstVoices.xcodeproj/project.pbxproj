@@ -19,7 +19,6 @@
 		37EA1F23228A1F57003E710C /* FVInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F22228A1F57003E710C /* FVInputViewController.swift */; };
 		37EA1F26228B5D6E003E710C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F25228B5D6E003E710C /* AppDelegate.swift */; };
 		37EA1F28228B5E2B003E710C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F27228B5E2B003E710C /* ViewController.swift */; };
-		37EA1F2F228B7458003E710C /* CheckBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F2E228B7458003E710C /* CheckBox.swift */; };
 		37EA1F31228B7661003E710C /* FVShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F30228B7661003E710C /* FVShared.swift */; };
 		37EA1F32228BCDA7003E710C /* FVShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F30228B7661003E710C /* FVShared.swift */; };
 		37EA1F4622921BAD003E710C /* KeyboardInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F4522921BAD003E710C /* KeyboardInfo.swift */; };
@@ -113,7 +112,6 @@
 		37EA1F22228A1F57003E710C /* FVInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVInputViewController.swift; sourceTree = "<group>"; };
 		37EA1F25228B5D6E003E710C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		37EA1F27228B5E2B003E710C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		37EA1F2E228B7458003E710C /* CheckBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CheckBox.swift; path = Checkbox/CheckBox.swift; sourceTree = "<group>"; };
 		37EA1F30228B7661003E710C /* FVShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FVShared.swift; path = FVShared/FVShared.swift; sourceTree = "<group>"; };
 		37EA1F4522921BAD003E710C /* KeyboardInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardInfo.swift; sourceTree = "<group>"; };
 		37EA1F472292238E003E710C /* Keyboards */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Keyboards; path = FirstVoices/Keyboards; sourceTree = "<group>"; };
@@ -227,7 +225,6 @@
 				98C9A9F91BFC10D2009E9A4F /* FirstVoices.entitlements */,
 				9889E8CA1BFA9CEC00019560 /* Info.plist */,
 				37EA1F25228B5D6E003E710C /* AppDelegate.swift */,
-				37EA1F2E228B7458003E710C /* CheckBox.swift */,
 				37C183B822932AD2009F9EFD /* FVKeyboardList.swift */,
 				294D40E8279FE62600DB37F6 /* KeyboardRepository.swift */,
 				29694DC127A27EC300EA6C18 /* LexicalModelRepository.swift */,
@@ -503,7 +500,6 @@
 				2993F6E62791621D009E1352 /* KeyboardDetailController.swift in Sources */,
 				2990209127901DD7004F18CF /* KeyboardDetailCell.swift in Sources */,
 				37EA1F4622921BAD003E710C /* KeyboardInfo.swift in Sources */,
-				37EA1F2F228B7458003E710C /* CheckBox.swift in Sources */,
 				296E22E527ED8FA4007BDA12 /* DownloadStatusToolbar.swift in Sources */,
 				294D40E9279FE62600DB37F6 /* KeyboardRepository.swift in Sources */,
 				2990208E278FF402004F18CF /* KeyboardTableController.swift in Sources */,

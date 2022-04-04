@@ -275,11 +275,13 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   GdkDisplay *gdkDisplay = gdk_display_get_default();
 #ifdef GDK_WINDOWING_X11
   if (GDK_IS_X11_DISPLAY(gdkDisplay)) {
+    g_debug("Using X11");
     keyman->xdisplay = GDK_DISPLAY_XDISPLAY(gdkDisplay);
   } else
 #endif
 #ifdef GDK_WINDOWING_WAYLAND
   if (GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
+    g_debug("Using Wayland");
     keyman->wldisplay = GDK_WAYLAND_DISPLAY(gdkDisplay);
   } else
 #endif

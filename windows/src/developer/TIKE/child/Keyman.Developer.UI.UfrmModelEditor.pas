@@ -335,6 +335,7 @@ begin
     FillDetails;
     UpdateWordlistTabs;
     MoveDesignToSource;
+    dlgAddWordlist.InitialDir := ExtractFilePath(Filename);
   finally
     Dec(FSetup);
   end;
@@ -783,13 +784,81 @@ begin
 end;
 
 procedure TfrmModelEditor.cmdAddWordlistClick(Sender: TObject);
+const
+  SMsg_CopyFile =
+    'The file "%0:s" is not in the same folder as the model file "%1:s".'#13#10#13#10+
+    'Do you want to copy this file into the model file folder (recommended)?';
+  SMsg_OverwriteFile =
+    'The file "%0:s" already exists.'#13#10#13#10+
+    'Do you want to overwrite it with "%1:s"?';
+  SMsg_UnableToCopyFile =
+    'The file "%1:s" could not be copied to "%0:s": %2:s';
+var
+  SourceFilename, TargetFilename: string;
+  i: Integer;
+
+  function DoCopyFile: Boolean;
+  begin
+    if FileExists(TargetFilename) and
+      (MessageDlg(Format(SMsg_OverwriteFile, [TargetFilename,
+      dlgAddWordlist.Filename]), mtWarning, mbOkCancel, 0) = mrCancel) then
+    begin
+      Exit(False);
+    end;
+
+    if not CopyFile(PChar(dlgAddWordlist.FileName), PChar(TargetFilename), False) then
+    begin
+      ShowMessage(Format(SMsg_UnableToCopyFile, [TargetFilename, dlgAddWordlist.FileName,
+        SysErrorMessage(GetLastError)]));
+      Exit(False);
+    end;
+
+    Result := True;
+  end;
+
+  function DoCheckFileLocation: Boolean;
+  begin
+    if ExtractFilePath(SourceFilename) <> '' then
+    begin
+      case MessageDlg(Format(SMsg_CopyFile, [dlgAddWordlist.FileName, Filename]), mtConfirmation, mbYesNoCancel, 0) of
+        mrCancel: Exit(False);
+        mrYes:
+          begin
+            Result := DoCopyFile;
+            SourceFilename := ExtractFileName(TargetFilename);
+          end;
+        mrNo: Result := True;
+        else Exit(False);
+      end;
+    end
+    else
+      Result := True;
+  end;
+
 begin
   if dlgAddWordlist.Execute then
   begin
-    parser.Wordlists.Add(ExtractRelativePath(Filename, dlgAddWordlist.FileName).Replace('\','/'));
+    SourceFilename := ExtractRelativePath(Filename, dlgAddWordlist.FileName);
+    TargetFilename := ExtractFilePath(Filename) + ExtractFileName(dlgAddWordlist.FileName);
+    if not DoCheckFileLocation then
+      Exit;
+
+    SourceFilename := SourceFilename.Replace('\','/');
+    if parser.Wordlists.IndexOf(SourceFilename) < 0 then
+      parser.Wordlists.Add(SourceFilename);
     Inc(FSetup);
     try
       FillDetails;
+
+      // Force a reload of the wordlist tab if it has been overwritten
+      for i := 0 to wordlists.Count - 1 do
+      begin
+        if SameText(wordlists[i].Filename, SourceFilename) then
+        begin
+          wordlists.Delete(i);
+          Break;
+        end;
+      end;
       UpdateWordlistTabs;
     finally
       Dec(FSetup);
