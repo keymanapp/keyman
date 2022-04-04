@@ -99,17 +99,17 @@
 
     <!-- Layout tab -->
     <!-- Icon tab -->
-    <Control Name="cmdbitmapChange" Title="Change">
+    <Control Name="cmdbitmapChange" Title="Change" TopicName="context/keyboard-editor#toc-icon-tab">
       <p>The Change option allows the editing of the icon filename.</p>
     </Control>
-    <Control Name="cmdExport" Title="Export">
+    <Control Name="cmdExport" Title="Export" TopicName="context/keyboard-editor#toc-icon-tab">
       <p>The Export option allows the exporting of the new image to a selected location.</p>
     </Control>
-    <Control Name="cmdImport" Title="Import">
+    <Control Name="cmdImport" Title="Import" TopicName="context/keyboard-editor#toc-icon-tab">
       <p>The import option allows for the loading of an existing icon from a selected location.</p>
     </Control>
-    <Control Name="panEdit" Title="Icon Editor">
-      <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the button and also a preview of the button is displayed.</p>
+    <Control Name="panEdit" Title="Icon Editor" TopicName="context/keyboard-editor#toc-icon-tab">
+      <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the canvas and also a preview of the icon is displayed.</p>
     </Control>
 
     <!-- On-Screen tab: see context/keyboard-editor#toc-on-screen-tab -->
