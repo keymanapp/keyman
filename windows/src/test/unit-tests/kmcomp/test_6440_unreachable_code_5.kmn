@@ -1,0 +1,18 @@
+c test_6440_unreachable_code_5
+c This won't fail in the 15.0 #6440 update,
+c because we don't analyse contents of stores,
+c apart from those that are exploded out in the
+c key part of the rule
+
+store(&VERSION) '10.0'
+store(&TARGETS) 'windows'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(foo) 'abc'
+store(bar) 'abc'
+
+any(foo) + [K_A] > 'ah'
+any(bar) + [K_A] > 'fail!'

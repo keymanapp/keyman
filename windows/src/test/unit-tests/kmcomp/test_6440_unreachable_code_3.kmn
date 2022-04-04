@@ -1,0 +1,14 @@
+c test_6440_unreachable_code_1
+
+store(&VERSION) '10.0'
+store(&TARGETS) 'windows'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(key) [K_A] [K_B]
+
++ any(key) > 'ah'
++ [K_A] > 'fail!'
++ [K_B] > 'fail!'

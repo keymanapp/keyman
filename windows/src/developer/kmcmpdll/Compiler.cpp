@@ -88,6 +88,7 @@
 #include "CharToKeyConversion.h"
 #include "CasedKeys.h"
 #include "CheckNCapsConsistency.h"
+#include "UnreachableRules.h"
 
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
@@ -264,14 +265,6 @@ BOOL AddCompileMessage(DWORD msg)
   char szText[SZMAX_ERRORTEXT + 1 + 280];
 
   SetLastError(0);
-  if (msg & CERR_MEMORY)
-  {
-    lstrcpy(szText, "Fatal Error: Out of Memory");
-    (*msgproc)(currentLine + 1, msg, szText);
-    nErrors++;
-    return TRUE;
-  }
-
   if (msg & CERR_FATAL)
   {
     LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);
@@ -283,9 +276,9 @@ BOOL AddCompileMessage(DWORD msg)
   if (msg & CERR_ERROR) nErrors++;
   LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);
   if (ErrChr > 0)
-    wsprintf(strchr(szText, 0), " chr:%d", ErrChr);
+    wsprintf(strchr(szText, 0), " character offset: %d", ErrChr);
   if (*ErrExtra)
-    wsprintf(strchr(szText, 0), " extra:%s", ErrExtra);
+    wsprintf(strchr(szText, 0), " %s", ErrExtra);
 
   ErrChr = 0; *ErrExtra = 0;
 
@@ -943,7 +936,7 @@ DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
   if ((msg = ExpandCapsRulesForGroup(fk, gp)) != CERR_None) return msg;
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), cmpkeys);
 
-  return CERR_None;
+  return VerifyUnreachableRules(gp);
 }
 
 /***************************************
@@ -1544,7 +1537,7 @@ DWORD
 InjectContextToReadonlyOutput(PWSTR pklOut) {
   if (pklOut[0] != UC_SENTINEL || pklOut[1] != CODE_CONTEXT) {
     if (wcslen(pklOut) > GLOBAL_BUFSIZE - 3) {
-      return CERR_MEMORY;
+      return CERR_CannotAllocateMemory;
     }
     memmove(pklOut + 2, pklOut, (wcslen(pklOut) + 1) * 2);
     pklOut[0] = UC_SENTINEL;
