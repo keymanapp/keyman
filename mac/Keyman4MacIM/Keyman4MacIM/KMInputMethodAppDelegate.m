@@ -34,6 +34,29 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
+@implementation NSString (VersionNumbers)
+/**
+ * Returns a minimal version number by removing all '.0' from end of string,
+ * e.g. '9.0.0' -> '9', '9.1.0' -> '9.1'.
+ * Use to prepare version numbers for comparison with a `NSNumericSearch`, for example:
+ * ```
+ *   NSString* version1 = [fileVersion minimalVersionNumberString];
+ *   NSString* version2 = [programVersion minimalVersionNumberString];
+ *   [version1 compare:version2 options:NSNumericSearch]
+ * ```
+ */
+- (NSString *)minimalVersionNumberString {
+    static NSString *const unnecessaryVersionSuffix = @".0";
+    NSString *minimalVersionNumber = self;
+
+    while ([minimalVersionNumber hasSuffix:unnecessaryVersionSuffix]) {
+        minimalVersionNumber = [minimalVersionNumber substringToIndex:minimalVersionNumber.length - unnecessaryVersionSuffix.length];
+    }
+
+    return minimalVersionNumber;
+}
+@end
+
 @interface KMInputMethodAppDelegate ()
 @property (nonatomic, strong) KMPackageReader *packageReader;
 @end
@@ -1165,42 +1188,114 @@ extern const CGKeyCode kProcessPendingBuffer;
     }
 }
 
+// Check the package info to ensure that we support this version
+// (e.g. Keyman 15 does not support a 16.0 version package)
+- (BOOL)verifyPackageVersionInTempFolder: (NSString *)tempDestFolder filePath:(NSString *)filePath {
+    KMPackageInfo *packageInfo = [self loadPackageInfo:tempDestFolder];
+    if(packageInfo == nil) {
+        NSLog(@"Could not find kmp.json in %@", filePath);
+    } else {
+        NSString* requiredVersion = [packageInfo.fileVersion minimalVersionNumberString];
+        KeymanVersionInfo keymanVersionInfo = [self versionInfo];
+        NSString *currentVersion = [keymanVersionInfo.versionRelease minimalVersionNumberString];
+
+        if ([requiredVersion compare:currentVersion options:NSNumericSearch] == NSOrderedDescending) {
+            // currentVersion is lower than the requiredVersion
+            NSLog(@"Package %@ requires a newer version of Keyman: %@", filePath, requiredVersion);
+        } else {
+            return YES;
+        }
+    }
+  return NO;
+}
+
+// TODO: This seriously needs to be refactored out of the app delegate and into
+//       a keyboard install module
 - (BOOL)unzipFile:(NSString *)filePath {
     BOOL didUnzip = NO;
+    NSError *error = nil;
     NSString *fileName = filePath.lastPathComponent;
     NSString *folderName = [fileName stringByDeletingPathExtension];
+
+    // First we unzip into a temp folder, and check kmp.json for the fileVersion
+    // before we continue installation. We don't want to overwrite existing
+    // package if it is there if the files are not compatible with the installed
+    // version of Keyman.
+
+    NSString *tempFolderName = [folderName stringByAppendingString:@".tmp.install"];
+    NSString *tempDestFolder = [self.keyboardsPath stringByAppendingPathComponent:tempFolderName];
+
     ZipArchive *za = [[ZipArchive alloc] init];
     if ([za UnzipOpenFile:filePath]) {
-        NSString *destFolder = [self.keyboardsPath stringByAppendingPathComponent:folderName];
         if (self.debugMode) {
-            NSLog(@"Unzipping %@ to %@", filePath, destFolder);
-            if ([[NSFileManager defaultManager] fileExistsAtPath:destFolder])
-                NSLog(@"The destiination folder already exists. Overwriting...");
+            NSLog(@"Unzipping %@ to %@", filePath, tempDestFolder);
+            if ([[NSFileManager defaultManager] fileExistsAtPath:tempDestFolder])
+                NSLog(@"The temp destination folder already exists. Overwriting...");
         }
-        didUnzip = [za UnzipFileTo:destFolder overWrite:YES];
+
+        didUnzip = [za UnzipFileTo:tempDestFolder overWrite:YES];
         [za UnzipCloseFile];
     }
 
-    if (didUnzip) {
-        if (self.debugMode)
-            NSLog(@"Unzipped file: %@", filePath);
-        NSString * keyboardFolderPath = [self.keyboardsPath stringByAppendingPathComponent:folderName];
-        [self installFontsAtPath:keyboardFolderPath];
-        for (NSString *kmxFile in [self KMXFilesAtPath:keyboardFolderPath]) {
-            if (self.debugMode)
-                NSLog(@"Adding keyboard to list of active keyboards: %@", kmxFile);
-            if (![self.activeKeyboards containsObject:kmxFile])
-                [self.activeKeyboards addObject:kmxFile];
-        }
-        [self saveActiveKeyboards];
+    if (!didUnzip) {
+        NSLog(@"Failed to unzip file: %@", filePath);
+        return NO;
     }
-    else {
-        if (self.debugMode) {
-            NSLog(@"Failed to unzip file: %@", filePath);
+
+    if (self.debugMode)
+        NSLog(@"Unzipped file: %@", filePath);
+
+    BOOL didInstall = [self verifyPackageVersionInTempFolder:tempDestFolder filePath:filePath];
+
+    NSString *destFolder = [self.keyboardsPath stringByAppendingPathComponent:folderName];
+
+    // Remove existing package if it exists
+    if (didInstall && [[NSFileManager defaultManager] fileExistsAtPath:destFolder]) {
+        if(self.debugMode) {
+            NSLog(@"The destination folder already exists. Overwriting...");
+        }
+        [[NSFileManager defaultManager] removeItemAtPath:destFolder error:&error];
+        if (error != nil) {
+            NSLog(@"Unable to remove destination folder %@", destFolder);
+            didInstall = NO;
         }
     }
 
-    return didUnzip;
+    //
+    // We believe this package is valid, let's go ahead and install it
+    //
+
+    // Rename the temp folder to the desired dest folder. removing existing folder first
+    if(didInstall) {
+        [[NSFileManager defaultManager] moveItemAtPath:tempDestFolder toPath:destFolder error:&error];
+        if (error != nil) {
+            NSLog(@"Unable to move temp folder %@ to dest folder %@", tempDestFolder, destFolder);
+            didInstall = NO;
+        }
+    }
+
+    if(!didInstall) {
+        [[NSFileManager defaultManager] removeItemAtPath:tempDestFolder error:&error];
+        if (error != nil) {
+            NSLog(@"Unable to remove temp folder %@", tempDestFolder);
+        }
+
+        return NO;
+    }
+
+    // Package has installed, now scan for keyboards and fonts
+    // TODO: we need to be reading the kmp.json data to determine keyboards to install
+    NSString * keyboardFolderPath = [self.keyboardsPath stringByAppendingPathComponent:folderName];
+    [self installFontsAtPath:keyboardFolderPath];
+    for (NSString *kmxFile in [self KMXFilesAtPath:keyboardFolderPath]) {
+        if (self.debugMode)
+            NSLog(@"Adding keyboard to list of active keyboards: %@", kmxFile);
+        if (![self.activeKeyboards containsObject:kmxFile])
+            [self.activeKeyboards addObject:kmxFile];
+    }
+    [self saveActiveKeyboards];
+
+    return YES;
 }
 
 - (NSString *)fontsPath {
