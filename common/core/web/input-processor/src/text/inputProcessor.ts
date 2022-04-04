@@ -139,9 +139,16 @@ namespace com.keyman.text {
         this.keyboardProcessor.selectLayer(keyEvent);
       }
 
+      // If a key (1) does not affect the context and (2) shifts the active layer,
+      // we assume it's a modifier key.  (Touch keyboards may define custom modifier keys.)
+      let isOnlyLayerShift = false;
+      if((ruleBehavior.transcription?.transform as TextTransform).isNoOp() && keyEvent.kNextLayer) {
+        isOnlyLayerShift = true;
+      }
+
       const keepRuleBehavior = ruleBehavior != null;
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
-      if(keepRuleBehavior) {
+      if(keepRuleBehavior && !isOnlyLayerShift) {
         let alternates = this.buildAlternates(ruleBehavior, keyEvent, preInputMock);
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
