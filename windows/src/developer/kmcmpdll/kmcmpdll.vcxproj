@@ -294,6 +294,7 @@
     <ClInclude Include="..\..\global\inc\Compiler.h" />
     <ClInclude Include="CasedKeys.h" />
     <ClInclude Include="CharToKeyConversion.h" />
+    <ClInclude Include="CheckFilenameConsistency.h" />
     <ClInclude Include="CheckNCapsConsistency.h" />
     <ClInclude Include="comprc.h" />
     <ClInclude Include="..\..\global\inc\ConvertUTF.h" />
@@ -334,6 +335,7 @@
     <ClCompile Include="..\..\global\vc\xstring.cpp" />
     <ClCompile Include="CasedKeys.cpp" />
     <ClCompile Include="CharToKeyConversion.cpp" />
+    <ClCompile Include="CheckFilenameConsistency.cpp" />
     <ClCompile Include="CheckNCapsConsistency.cpp" />
     <ClCompile Include="Compiler.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

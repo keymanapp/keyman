@@ -202,7 +202,7 @@ const
 
   CWARN_LanguageHeadersDeprecatedInKeyman10         = $20A5;
 
-  CINFO_NonUnicodeFile                              = $20A6;
+  CHINT_NonUnicodeFile                              = $10A6;
 
   CWARN_TooManyErrorsOrWarnings                     = $20A7;
 
@@ -214,6 +214,12 @@ const
 
   CWARN_NulNotFirstStatementInContext               = $20AB;
   CWARN_IfShouldBeAtStartOfContext                  = $20AC;
+
+  CWARN_KeyShouldIncludeNCaps                       = $20AD;
+
+  CHINT_UnreachableRule                             = $10AE;
+  CHINT_FilenameHasDifferingCase                    = $10AF;
+  CWARN_MissingFile                                 = $20B0;
 
 implementation
 

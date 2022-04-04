@@ -97,8 +97,15 @@ end;
 
 procedure TCompilePackageVersioningTest.PackageMessage(Sender: TObject; msg: string; State: TProjectLogState);
 const
-  Map: array[TProjectLogState] of TLogLevel = (TLogLevel.Information, TLogLevel.Warning, TLogLevel.Error, TLogLevel.Error,
-    TLogLevel.Information, TLogLevel.Error);
+  Map: array[TProjectLogState] of TLogLevel = (
+    {plsInfo}    TLogLevel.Information,
+    {plsHint}    TLogLevel.Information,
+    {plsWarning} TLogLevel.Warning,
+    {plsError}   TLogLevel.Error,
+    {plsFatal}   TLogLevel.Error,
+    {plsSuccess} TLogLevel.Information,
+    {plsFailure} TLogLevel.Error
+  );
 begin
   Log(Map[State], msg);
 end;

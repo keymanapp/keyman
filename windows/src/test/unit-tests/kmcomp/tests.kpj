@@ -341,6 +341,14 @@
       <Details/>
     </File>
     <File>
+      <ID>id_79b461cb3d02f0924c8f1364aac1e223</ID>
+      <Filename>test_194_filename_case.kmn</Filename>
+      <Filepath>test_194_filename_case.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
       <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
       <Filename>test_valid.kmx</Filename>
       <Filepath>test_valid.kmx</Filepath>
@@ -363,6 +371,14 @@
       <FileVersion></FileVersion>
       <FileType>.doc</FileType>
       <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+    <File>
+      <ID>id_8bf5064571a103aeb188d22b50886198</ID>
+      <Filename>test_194_Filename_case.bmp</Filename>
+      <Filepath>test_194_Filename_case.bmp</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.bmp</FileType>
+      <ParentFileID>id_79b461cb3d02f0924c8f1364aac1e223</ParentFileID>
     </File>
   </Files>
 </KeymanDeveloperProject>
