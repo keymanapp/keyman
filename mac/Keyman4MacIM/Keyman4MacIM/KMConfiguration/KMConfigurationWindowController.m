@@ -137,15 +137,29 @@
                 [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"HeaderTitle", nil]];
                 for (NSString *path in pArray) {
                     NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
-                    if (info)
-                        [_tableContents addObject:info];
+                    if (!info) {
+                        info = [[NSDictionary alloc] initWithObjectsAndKeys:
+                            NSLocalizedString(@"message-error-loading-keyboard", nil), kKMKeyboardNameKey,
+                            NSLocalizedString(@"message-error-unknown-metadata", nil), kKMKeyboardVersionKey,
+                            NSLocalizedString(@"message-error-unknown-metadata", nil), kKMKeyboardCopyrightKey,
+                            NSLocalizedString(@"message-error-unknown-metadata", nil), kKMVisualKeyboardKey,
+                            nil];
+                    }
+                    [_tableContents addObject:info];
                 }
             }
             else {
                 NSString *path = (NSString *)obj;
                 NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
-                if (info)
-                    [_tableContents addObject:info];
+                if (!info) {
+                    info = [[NSDictionary alloc] initWithObjectsAndKeys:
+                        NSLocalizedString(@"message-error-loading-keyboard", nil), kKMKeyboardNameKey,
+                        NSLocalizedString(@"message-error-unknown-metadata", nil), kKMKeyboardVersionKey,
+                        NSLocalizedString(@"message-error-unknown-metadata", nil), kKMKeyboardCopyrightKey,
+                        NSLocalizedString(@"message-error-unknown-metadata", nil), kKMVisualKeyboardKey,
+                        nil];
+                }
+                [_tableContents addObject:info];
             }
         }
     }

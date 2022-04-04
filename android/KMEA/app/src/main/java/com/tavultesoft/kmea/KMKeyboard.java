@@ -179,7 +179,9 @@ final class KMKeyboard extends WebView {
     gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
       @Override
       public boolean onDown(MotionEvent event) {
-        return false;
+         // https://developer.android.com/training/gestures/detector#detect-a-subset-of-supported-gestures
+         // If we return false, the system assumes we want to ignore the rest of the gesture
+         return true;
       }
 
       @Override
@@ -282,8 +284,14 @@ final class KMKeyboard extends WebView {
     } else {
       //handleTouchEvent(event);
       gestureDetector.onTouchEvent(event);
-      if (event.getAction() == MotionEvent.ACTION_UP)
+      if (event.getAction() == MotionEvent.ACTION_UP) {
         subKeysList = null;
+      } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+        if (subKeysList != null && subKeysWindow == null) {
+          // Display subkeys during move
+          showSubKeys(context);
+        }
+      }
     }
 
     return super.onTouchEvent(event);
@@ -1147,8 +1155,8 @@ final class KMKeyboard extends WebView {
         textView.setTypeface(Typeface.SANS_SERIF);
       }
 
-      int w = (int) (baseKeyFrame.width() * density);
-      int h = (int) (baseKeyFrame.height() * density);
+      int w = (int)getResources().getDimension(R.dimen.key_width);
+      int h = (int)getResources().getDimension(R.dimen.key_height);
       RectF frame = keyPreview.setKeySize(w, h);
       keyPreview.redraw();
 
@@ -1182,8 +1190,8 @@ final class KMKeyboard extends WebView {
       textView.setTypeface(Typeface.SANS_SERIF);
     }
 
-    int w = (int) (baseKeyFrame.width() * density);
-    int h = (int) (baseKeyFrame.height() * density);
+    int w = (int)getResources().getDimension(R.dimen.key_width);
+    int h = (int)getResources().getDimension(R.dimen.key_height);
     RectF frame = keyPreview.setKeySize(w, h);
     keyPreview.redraw();
     keyPreviewWindow = new PopupWindow(contentView, (int) frame.width(), (int) frame.height(), false);

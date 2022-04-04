@@ -15,13 +15,13 @@ store(caps) 'A'..'Z'
 store(digit) '0'..'9'
 
     c until we get a 'CAPS' layer, stay on CAPS if 2+ chrs in caps
-    if(&layerChanged = "0") any(caps) any(caps) > context
+    if(&newLayer = "") any(caps) any(caps) > context
 
     c stay on the numeric layer if we are there already
-    if(&layerChanged = "0") if(&layer = 'numeric') any(digit) > context
+    if(&newLayer = "") if(&layer = 'numeric') any(digit) > context
 
     c no other changes, so detect sentence or layer change
-    if(&layerChanged = "0") > use(nextLayer)
+    if(&newLayer = 0") > use(nextLayer)
 
 group(nextLayer) readonly
 

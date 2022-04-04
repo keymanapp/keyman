@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package>
   <System>
-    <KeymanDeveloperVersion>15.0.206.0</KeymanDeveloperVersion>
+    <KeymanDeveloperVersion>15.0.211.0</KeymanDeveloperVersion>
     <FileVersion>7.0</FileVersion>
   </System>
   <Options>
@@ -109,8 +109,8 @@
   </Files>
   <Keyboards>
     <Keyboard>
-      <Name>Obolo Chwerty</Name>
-      <ID>obolo_chwerty</ID>
+      <Name>Obolo Chwerty #6351</Name>
+      <ID>obolo_chwerty_6351</ID>
       <Version>1.2.1</Version>
       <Languages>
         <Language ID="ann-Latn">Obolo (Andoni)</Language>

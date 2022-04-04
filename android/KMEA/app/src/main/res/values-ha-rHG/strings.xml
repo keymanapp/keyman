@@ -8,6 +8,11 @@
         <item quantity="other">Madannai</item>
     </plurals>
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">Wata Hanyar Shigar</item>
+        <item quantity="other">Wasu Hanyoyin Sakawa</item>
+    </plurals>
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Ƙara sabon madanni</string>
     <!-- Context: Title for list -->
     <string name="title_languages_settings" comment="List of installed languages">Harsunan da aka shigar</string>
@@ -21,7 +26,7 @@
     <string name="label_cancel" comment="Button to cancel an action">Sokewa</string>
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">Rufewa</string>
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">Rufe Keyman</string>
     <!-- Context: Button label -->
     <string name="label_forward" comment="Button to go forward">Gaba</string>

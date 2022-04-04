@@ -82,7 +82,7 @@ namespace com.keyman.osk {
       '*123*':      19,
       '*Symbol*':   21,
       '*Currency*': 20,
-      '*Shifted*':  8, // set SHIFTED->9 for filled arrow icon
+      '*Shifted*':  9,
       '*AltGr*':    2,
       '*TabLeft*':  7,
       '*LAlt*':     0x56,
@@ -300,7 +300,14 @@ namespace com.keyman.osk {
       return metrics;
     }
 
-    getIdealFontSize(vkbd: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}): string {
+    /**
+     * Calculate the font size required for a key cap, scaling to fit longer text
+     * @param vkbd
+     * @param style     specification for the desired base font size
+     * @param override  if true, don't use the font spec from the button, just use the passed in spec
+     * @returns         font size as a style string
+     */
+    getIdealFontSize(vkbd: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
       let buttonStyle = getComputedStyle(this.btn);
       let keyWidth = parseFloat(buttonStyle.width);
       let emScale = 1;
@@ -316,7 +323,7 @@ namespace com.keyman.osk {
         // Recompute the new width for use in autoscaling calculations below, just in case.
         emScale = vkbd.getKeyEmFontSize();
         keyWidth = this.getKeyWidth(vkbd);
-      } else {
+      } else if(!override) {
         // When available, just use computedStyle instead.
         style = buttonStyle;
       }

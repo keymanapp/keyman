@@ -386,7 +386,39 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return false
   }
+
   
+  /*
+   * Called from FirstVoices app to add a lexical model.
+   */
+  public func addLexicalModel(lexicalModelId: String, languageId: String, from package: LexicalModelKeymanPackage) -> Bool {
+    let fullId = FullLexicalModelID(lexicalModelID: lexicalModelId, languageID: languageId)
+
+    do {
+      try ResourceFileManager.shared.install(resourceWithID: fullId, from: package)
+    }
+    catch {
+      log.error("Could not add lexical model for id '\(lexicalModelId)' and languageId '\(languageId)' due to error: \(error)")
+    }
+    
+    if let lexicalModel = Storage.active.userDefaults.userLexicalModel(withFullID: fullId) {
+      return registerLexicalModel(lexicalModel)
+    }
+    return false
+  }
+
+  /*
+   * Called from FirstVoices app as a workaround to cause dictionary options to be applied.
+   */
+  public func registerLexicalModel(lexicalModelId: String, languageId: String) -> Bool {
+    let fullId = FullLexicalModelID(lexicalModelID: lexicalModelId, languageID: languageId)
+
+    if let lexicalModel = Storage.active.userDefaults.userLexicalModel(withFullID: fullId) {
+      return registerLexicalModel(lexicalModel)
+    }
+    return false
+  }
+
   /// Registers a lexical model with KMW.
   public func registerLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
     SentryManager.breadcrumbAndLog("Setting lexical model: \(lm.fullID)")
@@ -503,7 +535,18 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return Storage.active.userDefaults.userKeyboard(withFullID: fullID)
   }
-    
+  
+  /*
+   * Called from FirstVoices app.
+   */
+  public func removeLexicalModel(lexicalModelId: String, languageId: String) -> Bool {
+    let fullId = FullLexicalModelID(lexicalModelID: lexicalModelId, languageID: languageId)
+
+    return removeLexicalModel(withFullID: fullId)
+  }
+
+
+  
   /// Removes a lexical model from the list in the lexical model picker if it exists.
   /// - Returns: The lexical model exists and was removed
   public func removeLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {

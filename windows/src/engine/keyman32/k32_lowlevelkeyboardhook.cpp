@@ -161,7 +161,7 @@ LRESULT _kmnLowLevelKeyboardProc(
     FHotkeyShiftState = 0;
     if (GetKeyState(VK_LCONTROL) < 0) FHotkeyShiftState |= HK_CTRL;
     if (GetKeyState(VK_RCONTROL) < 0) FHotkeyShiftState |= HK_RCTRL_INVALID;
-    if (GetKeyState(VK_LMENU) < 0) FHotkeyShiftState |= HK_CTRL;
+    if (GetKeyState(VK_LMENU) < 0) FHotkeyShiftState |= HK_ALT;
     if (GetKeyState(VK_RMENU) < 0) FHotkeyShiftState |= HK_RALT_INVALID;
     if (GetKeyState(VK_LSHIFT) < 0) FHotkeyShiftState |= HK_SHIFT;
     if (GetKeyState(VK_RSHIFT) < 0) FHotkeyShiftState |= HK_RSHIFT_INVALID;

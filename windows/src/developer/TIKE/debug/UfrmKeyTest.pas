@@ -1,18 +1,18 @@
 (*
   Name:             UfrmKeyTest
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    22 Jan 2007
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2006 - mcdurdin - Use TApplicationEvents instead of hooking all messages
                     23 Aug 2006 - mcdurdin - Insert with new CharMapDropTool
                     22 Jan 2007 - mcdurdin - Add K_NPENTER special case
@@ -33,7 +33,7 @@ const
   KT_LALT     = $0010000;
   KT_RCTRL    = $0020000;
   KT_RALT     = $0040000;
-  
+
 type
   TfrmKeyTest = class(TTIKEForm)
     lblTitle: TLabel;
@@ -105,7 +105,6 @@ end;
 
 procedure TfrmKeyTest.cmdInsertClick(Sender: TObject);
 begin
-  Close;
   if Assigned(FLastActiveControl) then
     GetCharMapDropTool.InsertToControl(FLastActiveControl, FormatKeyName(FLastShift, FLastKey), cmimCode);
 end;

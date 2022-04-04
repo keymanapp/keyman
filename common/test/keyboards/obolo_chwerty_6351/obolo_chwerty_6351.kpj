@@ -15,13 +15,13 @@
       <FileVersion>1.2.1</FileVersion>
       <FileType>.kmn</FileType>
       <Details>
-        <Name>Obolo Chwerty</Name>
+        <Name>Obolo Chwerty #6351</Name>
         <Copyright>© 2019-2022 Rogers Katelem Edeh</Copyright>
         <Message>A keyboard layout (chwerty) for the Obolo language of Nigeria. The keyboard covers the need of every dialect in that language.</Message>
       </Details>
     </File>
     <File>
-      <ID>id_4ed7acb803d5177bff445780f774fdb3</ID>
+      <ID>id_c2590fd2792d98557e2c2005ee77c7ad</ID>
       <Filename>obolo_chwerty_6351.kps</Filename>
       <Filepath>source\obolo_chwerty_6351.kps</Filepath>
       <FileVersion></FileVersion>
@@ -60,7 +60,7 @@
       <FileType>.keyboard_info</FileType>
     </File>
     <File>
-      <ID>id_ef2a383b75a0364689701ecbf2f6fefa</ID>
+      <ID>id_425d4d61d84287d1991f48eb0158c78c</ID>
       <Filename>obolo_chwerty_6351.ico</Filename>
       <Filepath>source\obolo_chwerty_6351.ico</Filepath>
       <FileVersion></FileVersion>
@@ -68,28 +68,28 @@
       <ParentFileID>id_e2041c991cdc20c570b342a5803447b0</ParentFileID>
     </File>
     <File>
-      <ID>id_fa2b1b4a5977c1283d061d23611709ef</ID>
+      <ID>id_22ef002cab6c6662df596ae9b904a55b</ID>
       <Filename>obolo_chwerty_6351.kvk</Filename>
       <Filepath>source\..\build\obolo_chwerty_6351.kvk</Filepath>
       <FileVersion></FileVersion>
       <FileType>.kvk</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
-      <ID>id_13adcc1b6b8e23edd35cfc6ab7c245b0</ID>
+      <ID>id_0579d0765b08c34563efd3d9ed90acd5</ID>
       <Filename>obolo_chwerty_6351.kmx</Filename>
       <Filepath>source\..\build\obolo_chwerty_6351.kmx</Filepath>
       <FileVersion></FileVersion>
       <FileType>.kmx</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
-      <ID>id_3ec4dad3d83c69fc4b33eb86d401d8cb</ID>
+      <ID>id_c87a8ab6b4f8526da91e8322bcc9fa38</ID>
       <Filename>obolo_chwerty_6351.js</Filename>
       <Filepath>source\..\build\obolo_chwerty_6351.js</Filepath>
       <FileVersion></FileVersion>
       <FileType>.js</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_f6212220adf6c5eb0ae25c33cb973c64</ID>
@@ -97,7 +97,7 @@
       <Filepath>source\welcome\chwerty_default.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_cd62e578000692c9966c069950904d06</ID>
@@ -105,7 +105,7 @@
       <Filepath>source\welcome\chwerty_keycombi.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_2d29737f21e65a75ca98a9c3ab1f4a6f</ID>
@@ -113,7 +113,7 @@
       <Filepath>source\welcome\chwerty_mobi_alt.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_2d856489cc6083c4b74a1b8c2b528785</ID>
@@ -121,7 +121,7 @@
       <Filepath>source\welcome\chwerty_mobi_default.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_ee5bdb44f34cd08e1c6012f91790c302</ID>
@@ -129,7 +129,7 @@
       <Filepath>source\welcome\chwerty_mobi_shift.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_743e9cd02f1d4004a5320b9faa355587</ID>
@@ -137,7 +137,7 @@
       <Filepath>source\welcome\chwerty_shift.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_a81a3f903e8ce052259e09e4a6fbabb0</ID>
@@ -145,7 +145,7 @@
       <Filepath>source\welcome\chwertyftkey1.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_cb8167846a4ac07edd78e5a39a7cc587</ID>
@@ -153,7 +153,7 @@
       <Filepath>source\welcome\chwertyftkey2.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_7325a11eaf4f66357aa7185056091802</ID>
@@ -161,7 +161,7 @@
       <Filepath>source\welcome\chwertyftkey3.png</Filepath>
       <FileVersion></FileVersion>
       <FileType>.png</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_724e5b4c63f10bc0abf7077f7c3172fc</ID>
@@ -169,7 +169,7 @@
       <Filepath>source\welcome\welcome.htm</Filepath>
       <FileVersion></FileVersion>
       <FileType>.htm</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
     <File>
       <ID>id_8da344c4cea6f467013357fe099006f5</ID>
@@ -177,7 +177,7 @@
       <Filepath>source\readme.htm</Filepath>
       <FileVersion></FileVersion>
       <FileType>.htm</FileType>
-      <ParentFileID>id_4ed7acb803d5177bff445780f774fdb3</ParentFileID>
+      <ParentFileID>id_c2590fd2792d98557e2c2005ee77c7ad</ParentFileID>
     </File>
   </Files>
 </KeymanDeveloperProject>

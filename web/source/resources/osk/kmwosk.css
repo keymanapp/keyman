@@ -18,9 +18,25 @@
 
 /* Common key-layout properties (all form factor + OS combinations) */
 
+.kmw-osk-frame,
+.kmw-osk-frame * {
+  /* border-box may make more sense here in the future, but for compat reasons we need to
+     ensure we are always consistent, regardless of context of placement of the osk */
+  box-sizing: content-box;
+}
+
 .kmw-key-row {position: relative; width: 100%; height: 20%; margin: 0px; padding: 0px; border: 0px; overflow: hidden}
-.kmw-key-square {display: inline-block; position: relative; z-index: 10000; margin: 0px; border: 0px;
-  padding: 0px; box-sizing: border-box; -moz-box-sizing: border-box;}
+.kmw-key-square {
+  display: inline-block;
+  position: relative;
+  z-index: 10000;
+  margin: 0px;
+  border: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  vertical-align: top;
+}
 .kmw-key {display: block; position: relative; margin: 0px; text-align: center; box-sizing: border-box;
   -moz-box-sizing: border-box;}
 
@@ -314,12 +330,18 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 
 /* Style for callout used on phones */
 #kmw-popup-callout {
-  position:absolute; display:block; background-color: #fdfdfe;
-  border-radius: 0 0 6px 6px; z-index:10001; pointer-events:none;
+  position: absolute;
+  display: block;
+  background-color: #fdfdfe;
+  border-radius: 0 0 5px 5px;
+  z-index: 10002;
+  pointer-events:none;
+  border-bottom: solid 1px #8a8d90;
+  box-sizing: border-box;
 }
 
 #kmw-keytip {
-  z-index: 10000
+  z-index: 10002;
 }
 
 /* Key preview styles */
@@ -341,6 +363,7 @@ div.ios div.kmw-keytip-tip {
   border-radius: 6px 6px 4px 4px;
   border: solid 1px #cccccc;
   border-bottom: solid 1px #8a8d90;
+  box-sizing: border-box;
 }
 
 div.ios div.kmw-keytip-cap {
@@ -360,6 +383,8 @@ span.kmw-keytip-label {
 div.ios div.kmw-keytip-cap,
 div.ios div.kmw-keytip-tip {
   background:white;
+  /* background-clip: required to prevent antialiasing on top edge on hires devices e.g. iPhone 13 pro + iOS 15.4 */
+  background-clip: content-box;
 }
 
 div.android div.kmw-keytip {
@@ -438,9 +463,20 @@ div.android div.kmw-keytip-tip {
 #kmw-language-menu .current {font-weight:bold;}
 
 /* Popup key styles */
-#kmw-popup-keys {position:relative;display:block;width:auto;height:auto;overflow-y:visible;
-        padding: 4px; border: 1px solid #ddd; border-radius:8px;
-        background-color:#fdfdfe; border:none; z-index:10000;}
+#kmw-popup-keys {
+  position: absolute;
+  display: block;
+  width: auto;
+  height: auto;
+  overflow-y: visible;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fdfdfe;
+  border: none;
+  z-index: 10002;
+  box-sizing: content-box;
+}
 
 .tablet.ios #kmw-popup-keys {padding: 4px 7px 0px 0px;}
 .phone.ios #kmw-popup-keys {padding: 4px 5px 0px 0px;}
@@ -459,9 +495,17 @@ div.android div.kmw-keytip-tip {
 
 /* Filter (shim) to darken screen and highlight popup keys */
 #kmw-popup-shim {
-    position: fixed; width: 100%; height: 100%; bottom: 0; left: 0;
-    display: block; ; opacity: 0.15; background-color: #000; pointer-events: none;
-    }
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+  left: 0;
+  display: block;
+  opacity: 0.15;
+  background-color: #000;
+  pointer-events: none;
+  z-index: 10001;
+}
 
 /* Styles for other KMW elements (keyboard loading wait notification, etc.) */
 .kmw-wait-background{display:none;position:absolute;left:0;top:0;width:100%;height:100%;

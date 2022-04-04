@@ -27,6 +27,8 @@ var menudiv = null, global_menu_elem_name = null;
 
     menudiv.innerHTML = menu.innerHTML;
     menudiv.style.width = menu.offsetWidth + 'px';
+    menudiv.style.overflowY = 'auto';
+    menudiv.style.overflowX = 'hidden';
 
     (function(m) {
       for(var i = 0; i < m.children.length; i++) {
@@ -40,18 +42,21 @@ var menudiv = null, global_menu_elem_name = null;
     menudiv.style.zIndex=100;
     menudiv.style.visibility='visible';
 
+    let top = 0;
+
     if( xpos && ypos ) {
       if(align=='right')
         menudiv.style.left = (xpos-menudiv.offsetWidth) + 'px';
       else
         menudiv.style.left = xpos + 'px';
-      menudiv.style.top = ypos + 'px';
+      top = ypos;
     } else {
       if(align=='right') menudiv.style.left = (pb.x+button.offsetWidth-menudiv.offsetWidth) + 'px';
-        else menudiv.style.left = pb.x + 'px';
-      menudiv.style.top = (pb.y+button.offsetHeight) + 'px';
+      else menudiv.style.left = pb.x + 'px';
+      top = pb.y+button.offsetHeight;
     }
-
+    menudiv.style.top = top + 'px';
+    menudiv.style.maxHeight = (document.body.clientHeight - top) + 'px';
 
     q = menudiv.children[0];
     q.focus();

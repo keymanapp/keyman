@@ -144,7 +144,7 @@ which brew || (
 
 ## Install devchain components
 
-BREW_ALL="bash jq python3 meson ninja coreutils"
+BREW_ALL="bash jq python3 meson ninja coreutils pyenv"
 BREW_WEB="node emscripten openjdk@8"
 BREW_IOS="swiftlint carthage"
 BREW_MACOS="carthage cocoapods"
@@ -161,6 +161,10 @@ $REQUIRE_MACOS && brew install $BREW_MACOS
 
 $REQUIRE_PANDOC && brew install pandoc
 $REQUIRE_SENTRYCLI && brew install getsentry/tools/sentry-cli
+
+# Add python 2.7.18 from pyenv
+pyenv install 2.7.18
+pyenv global 2.7.18
 
 # Install WINE
 $REQUIRE_KMCOMP && (

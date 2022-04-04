@@ -46,6 +46,7 @@ namespace com.keyman.text {
     modStateFlags: number = 0;
 
     keyboardInterface: KeyboardInterface;
+    device: utils.DeviceSpec;
 
     baseLayout: string;
 
@@ -54,10 +55,12 @@ namespace com.keyman.text {
     warningLogger?: LogMessageHandler;
     errorLogger?: LogMessageHandler;
 
-    constructor(options?: ProcessorInitOptions) {
+    constructor(device: utils.DeviceSpec, options?: ProcessorInitOptions) {
       if(!options) {
         options = KeyboardProcessor.DEFAULT_OPTIONS;
       }
+
+      this.device = device;
 
       this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
       this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
@@ -91,8 +94,12 @@ namespace com.keyman.text {
       return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYER] as MutableSystemStore;
     }
 
-    public get layerChangedStore(): MutableSystemStore {
-      return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYERCHANGED] as MutableSystemStore;
+    public get newLayerStore(): MutableSystemStore {
+      return this.keyboardInterface.systemStores[KeyboardInterface.TSS_NEWLAYER] as MutableSystemStore;
+    }
+
+    public get oldLayerStore(): MutableSystemStore {
+      return this.keyboardInterface.systemStores[KeyboardInterface.TSS_OLDLAYER] as MutableSystemStore;
     }
 
     public get layerId(): string {
@@ -500,12 +507,11 @@ namespace com.keyman.text {
      * The next layer will be determined from the key name unless otherwise specifed
      *
      *  @param  {string}                    keyName     key identifier
-     *  @param  {number|string|undefined}   nextLayerIn optional next layer identifier
      *  @return {boolean}                               return true if keyboard layer changed
      */
-    selectLayer(keyEvent: KeyEvent, fromNameOnly: boolean = false): boolean {
+    selectLayer(keyEvent: KeyEvent): boolean {
       let keyName = keyEvent.kName;
-      var nextLayer = fromNameOnly ? null : keyEvent.kNextLayer;
+      var nextLayer = keyEvent.kNextLayer;
       var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
 
       // Layer must be identified by name, not number (27/08/2015)
@@ -682,15 +688,19 @@ namespace com.keyman.text {
         this.layerId = 'default';
       }
 
-      if(keyEvent.device.formFactor != utils.FormFactor.Desktop) {
+      this.updateStateKeysFromLayer();
+
+      let baseModifierState = text.KeyboardProcessor.getModifierState(this.layerId);
+      this.modStateFlags = baseModifierState | keyEvent.Lstates;
+    }
+
+    public updateStateKeysFromLayer() {
+      if(this.device.formFactor != utils.FormFactor.Desktop) {
         // The caps layer works slightly differently on touch than on desktop.
         // It's a single layer with no ability to mix with other modifiers
         // We need to make sure that the state is kept in sync with the layer.
         this.stateKeys['K_CAPS'] = this.layerId == 'caps';
       }
-
-      let baseModifierState = text.KeyboardProcessor.getModifierState(this.layerId);
-      this.modStateFlags = baseModifierState | keyEvent.Lstates;
     }
 
     static isModifier(Levent: KeyEvent): boolean {
@@ -738,7 +748,7 @@ namespace com.keyman.text {
 
     resetContext() {
       this.layerId = 'default';
-
+      this.updateStateKeysFromLayer();
       this.keyboardInterface.resetContextCache();
       this._UpdateVKShift(null);
     };
@@ -748,6 +758,7 @@ namespace com.keyman.text {
         let layout = this.activeKeyboard.layout(device.formFactor);
         if(layout.getLayer('numeric')) {
           this.layerId = 'numeric';
+          this.updateStateKeysFromLayer();
         }
       }
     };

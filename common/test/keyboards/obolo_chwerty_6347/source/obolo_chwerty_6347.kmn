@@ -21,9 +21,9 @@ store(digit) '0'..'9'
 group(NewContext) readonly
     nomatch > use(detectStartOfSentence)
 group(PostKeystroke) readonly
-    if(&layerChanged = "0") if(&layer = 'numeric') any(digit) > context
+    if(&newLayer = "") if(&layer = 'numeric') any(digit) > context
     if(&layer = 'caps') > context
-    if(&layerChanged = "0") > use(detectStartOfSentence)
+    if(&newLayer = "") > use(detectStartOfSentence)
 group(detectStartOfSentence) readonly
     store(sentencePunctuation) '.?!‽'
     nul > layer('shift')

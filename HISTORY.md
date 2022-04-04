@@ -17,6 +17,49 @@
 
 * chore: move to 16.0 (#6318)
 
+## 15.0.226 beta 2022-04-01
+
+* fix(web): track stateKeys changes with layer changes (#6453)
+
+## 15.0.225 beta 2022-04-01
+
+* fix(ios): reset context when osk is resized (#6428)
+* feat(developer): keep Virtual Key Identifier dialog open on Insert (#6449)
+* fix(oem/fv/ios): maintain consistent keyboard state between Keyman Engine and FV app (#6446)
+
+## 15.0.224 beta 2022-03-29
+
+* fix(android/engine): Clear WebView cache on package install (#6438)
+* feat(oem/fv/ios): Dictionary Support (#6197)
+
+## 15.0.223 beta 2022-03-27
+
+* fix(mac): invalid keyboard breaks configuration (#6421)
+* fix(windows): make long menus scroll in Configuration (#6424)
+* fix(web): ios popup positioning and style (#6383)
+
+## 15.0.222 beta 2022-03-25
+
+* fix(windows): put correct HK_ALT flag for modifier (#6425)
+
+## 15.0.221 beta 2022-03-24
+
+* fix(developer): structure sizes for kmcomp x64 (#6408)
+* fix(common): report more log detail in increment-version (#6418)
+
+## 15.0.220 beta 2022-03-23
+
+* fix(web): adjust touch alias element positioning (#6406)
+* fix(android/engine): Display longpress keys during a Move gesture (#6138)
+
+## 15.0.219 beta 2022-03-22
+
+* chore(common): Update Hausa strings (#6399)
+
+## 15.0.218 beta 2022-03-21
+
+* chore(android/engine): Remove visual gaps in keyboard picker menu (#6370)
+
 ## 15.0.217 beta 2022-03-19
 
 * fix(web): bounding rect offset was incorrect (#6357)

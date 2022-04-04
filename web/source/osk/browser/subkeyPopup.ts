@@ -139,7 +139,10 @@ namespace com.keyman.osk.browser {
         x=0;
       }
       ss.left=x+'px';
-      ss.bottom = (_Box.offsetHeight - rowElement.offsetTop + subKeys.offsetHeight) + 'px';
+
+      let _BoxRect = _Box.getBoundingClientRect();
+      let rowElementRect = rowElement.getBoundingClientRect();
+      ss.top = (rowElementRect.top - _BoxRect.top - subKeys.offsetHeight - 3) + 'px';
 
       // Make the popup keys visible
       ss.visibility='visible';
@@ -148,14 +151,15 @@ namespace com.keyman.osk.browser {
       let constrainPopup = keyman.isEmbedded;
 
       let cs = getComputedStyle(subKeys);
-      let oskHeight = keyman.osk.computedHeight;
-      let bottomY = parseInt(cs.bottom, 10);
-      let popupHeight = parseInt(cs.height, 10);
+      let topY = parseFloat(cs.top);
 
+      // Adjust the vertical position of the popup to keep it within the
+      // bounds of the keyboard rectangle, when on iPhone (system keyboard)
+      const topOffset = 0; // Set this when testing constrainPopup, e.g. to -80px
       let delta = 0;
-      if(popupHeight + bottomY > oskHeight && constrainPopup) {
-        delta = popupHeight + bottomY - oskHeight;
-        ss.bottom = (bottomY - delta) + 'px';
+      if(topY < topOffset && constrainPopup) {
+        delta = topOffset - topY;
+        ss.top = topOffset + 'px';
       }
 
       // Add the callout
@@ -175,7 +179,7 @@ namespace com.keyman.osk.browser {
 
       delta = delta || 0;
 
-      let calloutHeight = key.offsetHeight - delta;
+      let calloutHeight = key.offsetHeight - delta + 6;
 
       if(calloutHeight > 0) {
         var cc = document.createElement('div'), ccs = cc.style;
@@ -183,14 +187,18 @@ namespace com.keyman.osk.browser {
         keyman.osk._Box.appendChild(cc);
 
         // Create the callout
-        var xLeft = key.offsetLeft + (<HTMLElement>key.offsetParent).offsetLeft,
-            xTop = key.offsetTop + (key.key as OSKBaseKey).row.element.offsetTop + delta,
-            xWidth = key.offsetWidth + 2,
-            xHeight = calloutHeight;
+        let keyRect = key.getBoundingClientRect();
+        let _BoxRect = keyman.osk._Box.getBoundingClientRect();
 
         // Set position and style
-        ccs.top = (xTop-6)+'px'; ccs.left = (xLeft-1)+'px';
-        ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
+        // We're going to adjust the top of the box to ensure it stays
+        // pixel aligned, otherwise we can get antialiasing artifacts
+        // that look ugly
+        let top = Math.floor(keyRect.top - _BoxRect.top - 9 + delta);
+        ccs.top = top + 'px';
+        ccs.left = (keyRect.left - _BoxRect.left) + 'px';
+        ccs.width = keyRect.width + 'px';
+        ccs.height = (keyRect.bottom - _BoxRect.top - top - 1) + 'px'; //(height - 1) + 'px';
 
         // Return callout element, to allow removal later
         return cc;

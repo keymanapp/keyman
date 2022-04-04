@@ -18,8 +18,11 @@ namespace com.keyman.osk.browser {
 
     private readonly constrain: boolean;
 
-    // constrain:  keep the keytip within the bounds of the overall OSK.
-    // Will probably be handled via function in a later pass.
+    /**
+     *
+     * @param constrain keep the keytip within the bounds of the overall OSK.
+     *                  Will probably be handled via function in a later pass.
+     */
     constructor(constrain: boolean) {
       let tipElement = this.element=document.createElement('div');
       tipElement.className='kmw-keytip';
@@ -61,16 +64,21 @@ namespace com.keyman.osk.browser {
             kc = key.key.label,
             previewFontScale = 1.8;
 
-        // Canvas dimensions must be set explicitly to prevent clipping
-        let canvasWidth = 1.6 * xWidth;
-        let canvasHeight = 2.3 * xHeight;
-
         let kts = this.element.style;
-        kts.top = 'auto';
 
-        // Matches how the subkey positioning is set.
+        // Roughly matches how the subkey positioning is set.
         const _Box = vkbd.element.parentNode as HTMLDivElement;
-        kts.bottom = (_Box.offsetHeight - rowElement.offsetHeight - rowElement.offsetTop + key.offsetTop) + 'px';
+        const _BoxRect = _Box.getBoundingClientRect();
+        const keyRect = key.getBoundingClientRect();
+        let y = (keyRect.bottom - _BoxRect.top + 1);
+        let ySubPixelPadding = y - Math.floor(y);
+
+        // Canvas dimensions must be set explicitly to prevent clipping
+        // This gives us exactly the same number of pixels on left and right
+        let canvasWidth = xWidth + Math.ceil(xWidth * 0.3) * 2;
+        let canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
+
+        kts.top = Math.floor(y - canvasHeight) + 'px';
         kts.textAlign = 'center';
         kts.overflow = 'visible';
         kts.fontFamily = util.getStyleValue(kc,'font-family');
@@ -86,7 +94,7 @@ namespace com.keyman.osk.browser {
             height: 1.6 * xHeight + 'px' // as opposed to the canvas height of 2.3 * xHeight.
           };
 
-          kts.fontSize = key.key.getIdealFontSize(vkbd, scaleStyle);
+          kts.fontSize = key.key.getIdealFontSize(vkbd, scaleStyle, true);
         }
 
         this.label.textContent = kc.textContent;
@@ -94,11 +102,11 @@ namespace com.keyman.osk.browser {
         // Adjust shape if at edges
         var xOverflow = (canvasWidth - xWidth) / 2;
         if(xLeft < xOverflow) {
-          this.cap.style.left = '0px';
-          xLeft += xOverflow;
+          this.cap.style.left = '1px';
+          xLeft += xOverflow - 1;
         } else if(xLeft > window.innerWidth - xWidth - xOverflow) {
-          this.cap.style.left = (canvasWidth - xWidth) + 'px';
-          xLeft -= xOverflow;
+          this.cap.style.left = (canvasWidth - xWidth - 1) + 'px';
+          xLeft -= xOverflow - 1;
         } else {
           this.cap.style.left = xOverflow + 'px';
         }
@@ -107,18 +115,20 @@ namespace com.keyman.osk.browser {
 
         let cs = getComputedStyle(this.element);
         let oskHeight = keyman.osk.computedHeight;
-        let bottomY = parseInt(cs.bottom, 10);
-        let tipHeight = parseInt(cs.height, 10);
+        let bottomY = parseFloat(cs.bottom);
+        let tipHeight = parseFloat(cs.height);
+        let halfHeight = Math.ceil(canvasHeight / 2);
 
         this.cap.style.width = xWidth + 'px';
-        this.tip.style.height = (canvasHeight / 2) + 'px';
-        this.cap.style.top = (canvasHeight / 2) + 'px';
-        this.cap.style.height = (canvasHeight / 2 - 1) + 'px';
+        this.tip.style.height = halfHeight + 'px';
+
+        this.cap.style.top = (halfHeight - 3) + 'px';
+        this.cap.style.height = (keyRect.bottom - _BoxRect.top - Math.floor(y - canvasHeight) - (halfHeight)) + 'px'; //(halfHeight + 3 + ySubPixelPadding) + 'px';
 
         if(this.constrain && tipHeight + bottomY > oskHeight) {
           const delta = tipHeight + bottomY - oskHeight;
           kts.height = (canvasHeight-delta) + 'px';
-          const hx = Math.max(0, (canvasHeight-delta)-(canvasHeight/2));
+          const hx = Math.max(0, (canvasHeight-delta)-(canvasHeight/2) + 2);
           this.cap.style.height = hx + 'px';
         }
 

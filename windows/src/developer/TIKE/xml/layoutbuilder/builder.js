@@ -1,6 +1,6 @@
-$(function () {
-  window.builder = this;
+window.builder = {};
 
+$(function() {
   (function(search) {
     var q = search.match(/Filename=(.+)(&|$)/);
     if(q) {
@@ -583,7 +583,7 @@ $(function () {
     '*123*':      19,
     '*Symbol*':   21,
     '*Currency*': 20,
-    '*Shifted*':  8, // set SHIFTED->9 for filled arrow icon
+    '*Shifted*':  9,
     '*AltGr*':    2,
     '*TabLeft*':  7,
     '*LAlt*':     0x56,
@@ -1446,11 +1446,18 @@ $(function () {
     builder.updateKeyId(builder.selectedKey());
   }, {saveOnce: true});
 
+  const wrapInstant = function(f) {
+    return function() {
+      window.setTimeout(f.bind(this), 0);
+    }
+  }
+
   $('#inpKeyName')
     .change(inpKeyNameChange)
     .autocomplete({
       source: builder.lookupKeyNames,
-      change: inpKeyNameChange
+      change: inpKeyNameChange,
+      select: wrapInstant(inpKeyNameChange)
     })
     .on('input', inpKeyNameChange)
     .blur(function () {
@@ -1494,7 +1501,8 @@ $(function () {
     .change(inpKeyCapChange)
     .autocomplete({
       source: builder.specialKeyNames,
-      change: inpKeyCapChange
+      change: inpKeyCapChange,
+      select: wrapInstant(inpKeyCapChange)
     })
     .mouseup(function () {
       builder.updateCharacterMap($(this).val(), false);
@@ -1605,8 +1613,6 @@ $(function () {
       $('.text', nkey).text(this.renameSpecialKey(text));
       builder.updateKeyId(nkey);
     }
-    //var div = document.createElement('div'); $(div).css('clear', 'both'); $('#sk').append(div);
-    builder.selectSubKey($('#sk > div')[0]);
     builder.prepareSubKey();
     builder.enableSubKeyControls();
   }
@@ -1631,15 +1637,15 @@ $(function () {
   this.enableSubKeyControls = function () {
     var key = builder.selectedSubKey();
     if (key.length == 0) {
-      $('#subKeyToolbar').css('visibility', 'hidden'); // attr('disabled', 'disabled');
+      $('#subKeyToolbar').css('visibility', 'hidden');
     } else {
-      $('#subKeyToolbar').css('visibility', ''); // removeAttr('disabled');
+      $('#subKeyToolbar').css('visibility', '');
     }
   }
 
   this.rescale = function () {
     builder.saveUndo();
-    var keyId = builder.selectedKey().data('id'); //$('#kbd .key')
+    var keyId = builder.selectedKey().data('id');
     builder.prepareLayer();
     if (keyId !== null)
       builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === keyId; }).first());
@@ -1721,7 +1727,8 @@ $(function () {
     .on('input', subKeyNameChange)
     .autocomplete({
       source: builder.lookupKeyNames,
-      change: subKeyNameChange
+      change: subKeyNameChange,
+      select: wrapInstant(subKeyNameChange)
     }).blur(function () {
       builder.hasSavedKeyUndo = false;
     });
@@ -1744,7 +1751,8 @@ $(function () {
     .change(inpSubKeyCapChange)
     .autocomplete({
       source: builder.specialKeyNames,
-      change: inpSubKeyCapChange
+      change: inpSubKeyCapChange,
+      select: wrapInstant(inpSubKeyCapChange)
     })
     .on('input', inpSubKeyCapChange)
     .mouseup(function () {
@@ -2162,7 +2170,11 @@ $(function () {
   }
 
   $(document).keydown(function (event) {
-    builder.ctrlDown = (event.which == 17);
+    if(!event.originalEvent.repeat) {
+      // We will get this event repeatedly while ctrl is held down,
+      // so if ctrlDown is cancelled, we don't want to set it again
+      builder.ctrlDown = (event.which == 17);
+    }
     if (builder.nextKeySelects) {
       $('#selectKeyDialog').dialog('close');
       event.preventDefault();
@@ -2181,56 +2193,6 @@ $(function () {
     }
     builder.ctrlDown = false;
   });
-
-  //
-  // Character map drag+drop and double-click insertion
-  //
-
-  builder.charmapDragOver = function(o) {
-
-    // Convert X, Y to document coordinates
-
-    let target = document.elementFromPoint(o.x, o.y);
-    if(target === null || (target.nodeName != 'INPUT' && target.className != 'text')) {
-      return false;
-    }
-
-    return true;
-  };
-
-  builder.charmapDragDrop = function(o) {
-
-    // Convert X, Y to document coordinates
-
-    if(o.x >= 0 && o.y >= 0) {
-      var target = document.elementFromPoint(o.x, o.y);
-      if(target === null) {
-        return false;
-      }
-      if(target.nodeName == 'INPUT') {
-        target = $(target);
-      } else if(target.className == 'text') {
-        if(target.parentElement.parentElement.id == 'sk') {
-          builder.selectSubKey(target.parentElement);
-          target = document.lastFocus;
-        } else {
-          builder.selectKey(target.parentElement);
-          target = document.lastFocus;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      // Double-click insertion, so use last focused control
-      var target = $(document.lastFocus);
-    }
-
-    // Focus the control and add the text
-
-    target.focus();
-    target.val(target.val() + o.text);
-    target.change();
-  };
 
   builder.loadingState = true;
 
@@ -2311,4 +2273,4 @@ $(function () {
   builder.enableUndoControls();
 
   builder.loadState();
-});
+}.bind(builder));

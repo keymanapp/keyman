@@ -48,11 +48,15 @@ These dependencies are also listed below if you'd prefer to install manually.
 
 ## Shared Dependencies
 
-* Shared: HomeBrew, Bash 5.0+, jq, Python 3, Meson, Ninja, coreutils, Pandoc
+* Shared: HomeBrew, Bash 5.0+, jq, Python 2.7, Python 3, Meson, Ninja, coreutils, Pandoc
 
   ```shell
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  brew install bash jq python3 meson ninja coreutils pandoc
+  brew install bash jq python3 meson ninja coreutils pandoc pyenv
+  # Python 2.7 required for DeviceKit (among others?) at present
+  pyenv install 2.7.18
+  pyenv global 2.7.18
+  echo 'eval "$(pyenv init --path)"' >> ~/.bash_profile
   ```
 
   On M1 only (as greadlink is not on the path otherwise in XCode):
