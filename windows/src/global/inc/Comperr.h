@@ -23,10 +23,11 @@
 #ifndef _COMPERR_H
 #define _COMPERR_H
 
+// Note: these are not be a bitmask
 #define CERR_FATAL                                         0x00008000
 #define CERR_ERROR                                         0x00004000
 #define CERR_WARNING                                       0x00002000
-#define CERR_MEMORY                                        0x00001000
+#define CERR_HINT                                          0x00001000
 
 // Any messages from the lexical model compiler occupy this range:
 #define CERR_LEXICAL_MODEL_MIN                             0x00000800
@@ -36,7 +37,7 @@
 #define CERR_EndOfFile                                     0x00000001
 
 #define CERR_BadCallParams                                 0x00008002
-#define CERR_CannotAllocateMemory                          0x00009004
+#define CERR_CannotAllocateMemory                          0x00008004
 #define CERR_InfileNotExist                                0x00008005
 #define CERR_CannotCreateOutfile                           0x00008006
 #define CERR_UnableToWriteFully                            0x00008007
@@ -205,7 +206,7 @@
 
 #define CWARN_LanguageHeadersDeprecatedInKeyman10          0x000020A5
 
-#define CINFO_NonUnicodeFile                               0x000020A6
+#define CHINT_NonUnicodeFile                               0x000010A6
 
 #define CWARN_TooManyErrorsOrWarnings                      0x000020A7
 
@@ -219,6 +220,10 @@
 #define CWARN_IfShouldBeAtStartOfContext                   0x000020AC
 
 #define CWARN_KeyShouldIncludeNCaps                        0x000020AD
+
+#define CHINT_UnreachableRule                              0x000010AE
+#define CHINT_FilenameHasDifferingCase                     0x000010AF
+#define CWARN_MissingFile                                  0x000020B0
 
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1

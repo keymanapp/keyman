@@ -1155,8 +1155,8 @@ final class KMKeyboard extends WebView {
         textView.setTypeface(Typeface.SANS_SERIF);
       }
 
-      int w = (int) (baseKeyFrame.width() * density);
-      int h = (int) (baseKeyFrame.height() * density);
+      int w = (int)getResources().getDimension(R.dimen.key_width);
+      int h = (int)getResources().getDimension(R.dimen.key_height);
       RectF frame = keyPreview.setKeySize(w, h);
       keyPreview.redraw();
 
@@ -1190,8 +1190,8 @@ final class KMKeyboard extends WebView {
       textView.setTypeface(Typeface.SANS_SERIF);
     }
 
-    int w = (int) (baseKeyFrame.width() * density);
-    int h = (int) (baseKeyFrame.height() * density);
+    int w = (int)getResources().getDimension(R.dimen.key_width);
+    int h = (int)getResources().getDimension(R.dimen.key_height);
     RectF frame = keyPreview.setKeySize(w, h);
     keyPreview.redraw();
     keyPreviewWindow = new PopupWindow(contentView, (int) frame.width(), (int) frame.height(), false);

@@ -46,6 +46,7 @@ namespace com.keyman.text {
     modStateFlags: number = 0;
 
     keyboardInterface: KeyboardInterface;
+    device: utils.DeviceSpec;
 
     baseLayout: string;
 
@@ -54,10 +55,12 @@ namespace com.keyman.text {
     warningLogger?: LogMessageHandler;
     errorLogger?: LogMessageHandler;
 
-    constructor(options?: ProcessorInitOptions) {
+    constructor(device: utils.DeviceSpec, options?: ProcessorInitOptions) {
       if(!options) {
         options = KeyboardProcessor.DEFAULT_OPTIONS;
       }
+
+      this.device = device;
 
       this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
       this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
@@ -269,7 +272,10 @@ namespace com.keyman.text {
             matchBehavior.mergeInDefaults(defaultBehavior);
           }
           matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
-        } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
+        } else {
+          // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
+          matchBehavior = null;
+        }
 
         this.keyboardInterface.activeTargetOutput = null;
       }
@@ -685,15 +691,19 @@ namespace com.keyman.text {
         this.layerId = 'default';
       }
 
-      if(keyEvent.device.formFactor != utils.FormFactor.Desktop) {
+      this.updateStateKeysFromLayer();
+
+      let baseModifierState = text.KeyboardProcessor.getModifierState(this.layerId);
+      this.modStateFlags = baseModifierState | keyEvent.Lstates;
+    }
+
+    public updateStateKeysFromLayer() {
+      if(this.device.formFactor != utils.FormFactor.Desktop) {
         // The caps layer works slightly differently on touch than on desktop.
         // It's a single layer with no ability to mix with other modifiers
         // We need to make sure that the state is kept in sync with the layer.
         this.stateKeys['K_CAPS'] = this.layerId == 'caps';
       }
-
-      let baseModifierState = text.KeyboardProcessor.getModifierState(this.layerId);
-      this.modStateFlags = baseModifierState | keyEvent.Lstates;
     }
 
     static isModifier(Levent: KeyEvent): boolean {
@@ -741,7 +751,7 @@ namespace com.keyman.text {
 
     resetContext() {
       this.layerId = 'default';
-
+      this.updateStateKeysFromLayer();
       this.keyboardInterface.resetContextCache();
       this._UpdateVKShift(null);
     };
@@ -751,6 +761,7 @@ namespace com.keyman.text {
         let layout = this.activeKeyboard.layout(device.formFactor);
         if(layout.getLayer('numeric')) {
           this.layerId = 'numeric';
+          this.updateStateKeysFromLayer();
         }
       }
     };
