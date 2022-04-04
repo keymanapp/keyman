@@ -139,9 +139,21 @@ namespace com.keyman.text {
         this.keyboardProcessor.selectLayer(keyEvent);
       }
 
+      // If it's a key that we 'optimize out' of our fat-finger correction algorithm,
+      // we MUST NOT trigger it for this keystroke.
+      let isOnlyLayerShift = text.Codes.isKnownOSKModifierKey(keyEvent.kName);
+
+      // Best-guess stopgap for possible custom modifier keys.
       // If a key (1) does not affect the context and (2) shifts the active layer,
       // we assume it's a modifier key.  (Touch keyboards may define custom modifier keys.)
-      let isOnlyLayerShift = false;
+      //
+      // Note:  this could cause an issue in the niche scenario where:
+      // 1.  Keypress does not alter the actual context
+      // 2.  It DOES emit a deadkey with an earlier processing rule.
+      // 3.  The FINAL processing rule does not match.
+      // 4.  The key ALSO signals a layer shift.
+      // If any of the four above conditions aren't met - no problem!
+      // So it's a pretty niche scenario.
       if((ruleBehavior.transcription?.transform as TextTransform).isNoOp() && keyEvent.kNextLayer) {
         isOnlyLayerShift = true;
       }
