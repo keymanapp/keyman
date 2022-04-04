@@ -217,7 +217,8 @@ public:
 
     _utf_iterator   & operator ++ ()    { cp += abs(sl); return *this; }
 
-    bool operator == (const _utf_iterator & rhs) const throw() { sz = std::min(ptrdiff_t(rhs.cp - cp),ptrdiff_t(127)); return 0 >= sz; }
+    bool operator == (const _utf_iterator & rhs) const throw() { sz = (int8_t)std::min(ptrdiff_t(rhs.cp - cp),ptrdiff_t(127)); return 0 >= sz;
+    }
     bool operator != (const _utf_iterator & rhs) const throw() { return !operator==(rhs); }
 
     reference   operator * () const throw() { return *this; }
