@@ -35,15 +35,25 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
 @implementation NSString (VersionNumbers)
-- (NSString *)shortenedVersionNumberString {
+/**
+ * Returns a minimal version number by removing all '.0' from end of string,
+ * e.g. '9.0.0' -> '9', '9.1.0' -> '9.1'.
+ * Use to prepare version numbers for comparison with a `NSNumericSearch`, for example:
+ * ```
+ *   NSString* version1 = [fileVersion minimalVersionNumberString];
+ *   NSString* version2 = [programVersion minimalVersionNumberString];
+ *   [version1 compare:version2 options:NSNumericSearch]
+ * ```
+ */
+- (NSString *)minimalVersionNumberString {
     static NSString *const unnecessaryVersionSuffix = @".0";
-    NSString *shortenedVersionNumber = self;
+    NSString *minimalVersionNumber = self;
 
-    while ([shortenedVersionNumber hasSuffix:unnecessaryVersionSuffix]) {
-        shortenedVersionNumber = [shortenedVersionNumber substringToIndex:shortenedVersionNumber.length - unnecessaryVersionSuffix.length];
+    while ([minimalVersionNumber hasSuffix:unnecessaryVersionSuffix]) {
+        minimalVersionNumber = [minimalVersionNumber substringToIndex:minimalVersionNumber.length - unnecessaryVersionSuffix.length];
     }
 
-    return shortenedVersionNumber;
+    return minimalVersionNumber;
 }
 @end
 
@@ -1178,6 +1188,26 @@ extern const CGKeyCode kProcessPendingBuffer;
     }
 }
 
+// Check the package info to ensure that we support this version
+// (e.g. Keyman 15 does not support a 16.0 version package)
+- (BOOL)verifyPackageVersionInTempFolder: (NSString *)tempDestFolder filePath:(NSString *)filePath {
+    KMPackageInfo *packageInfo = [self loadPackageInfo:tempDestFolder];
+    if(packageInfo == nil) {
+        NSLog(@"Could not find kmp.json in %@", filePath);
+    } else {
+        NSString* requiredVersion = [packageInfo.fileVersion minimalVersionNumberString];
+        KeymanVersionInfo keymanVersionInfo = [self versionInfo];
+        NSString *currentVersion = [keymanVersionInfo.versionRelease minimalVersionNumberString];
+
+        if ([requiredVersion compare:currentVersion options:NSNumericSearch] == NSOrderedDescending) {
+            // currentVersion is lower than the requiredVersion
+            NSLog(@"Package %@ requires a newer version of Keyman: %@", filePath, requiredVersion);
+        } else {
+            return YES;
+        }
+    }
+  return NO;
+}
 
 // TODO: This seriously needs to be refactored out of the app delegate and into
 //       a keyboard install module
@@ -1215,24 +1245,7 @@ extern const CGKeyCode kProcessPendingBuffer;
     if (self.debugMode)
         NSLog(@"Unzipped file: %@", filePath);
 
-    BOOL didInstall = NO;
-
-    // Check the package info to ensure that we support this version
-    KMPackageInfo *packageInfo = [self loadPackageInfo:tempDestFolder];
-    if(packageInfo == nil) {
-        NSLog(@"Could not find kmp.json in %@", filePath);
-    } else {
-        NSString* requiredVersion = [packageInfo.fileVersion shortenedVersionNumberString];
-        KeymanVersionInfo keymanVersionInfo = [self versionInfo];
-        NSString *currentVersion = [keymanVersionInfo.versionRelease shortenedVersionNumberString];
-
-        if ([requiredVersion compare:currentVersion options:NSNumericSearch] == NSOrderedDescending) {
-            // currentVersion is lower than the requiredVersion
-            NSLog(@"Package %@ requires a newer version of Keyman: %@", filePath, requiredVersion);
-        } else {
-            didInstall = YES;
-        }
-    }
+    BOOL didInstall = [self verifyPackageVersionInTempFolder:tempDestFolder filePath:filePath];
 
     NSString *destFolder = [self.keyboardsPath stringByAppendingPathComponent:folderName];
 
