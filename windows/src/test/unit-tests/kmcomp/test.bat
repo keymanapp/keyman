@@ -99,6 +99,12 @@ if not "!test!" == "" goto :eof
 call :should-have-message -f test_194_filename_case.out.txt "#194 filename case" test_194_filename_case.kmn || exit /b 34
 if not "!test!" == "" goto :eof
 
+call :should-fail "#6462 duplicate group #1" test_6462_duplicate_group_1.kmn || exit /b 39
+call :should-fail "#6462 duplicate group #2" test_6462_duplicate_group_2.kmn || exit /b 40
+call :should-fail "#6462 duplicate store #1" test_6462_duplicate_store_1.kmn || exit /b 41
+call :should-fail "#6462 duplicate store #2" test_6462_duplicate_store_2.kmn || exit /b 42
+call :should-fail "#6462 duplicate store #3" test_6462_duplicate_store_3.kmn || exit /b 42
+
 goto :eof
 :: --------------------------------------------------------------
 

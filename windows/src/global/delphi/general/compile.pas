@@ -47,6 +47,7 @@ const
 {$ENDIF}
 
 type
+  // These structures must match the structures in compfile.h
   FILE_STORE = record
   	dwSystemID: DWORD;
   	szName: array[0..SZMAX_STORENAME-1] of WCHAR;	// the name of the store
@@ -80,6 +81,7 @@ type
     cxKeyArray: DWORD;             // in array items
     fUsingKeys: BOOL;              // group(xx) [using keys] <-- specified or not
     fReadOnly: BOOL;
+    Line: DWORD;
 	end;
 
   PFILE_GROUP = ^FILE_GROUP;
@@ -157,7 +159,7 @@ const
   FILE_DEADKEY_SIZE = 160;
 {$ELSE}
   FILE_KEYBOARD_SIZE = 2952;
-  FILE_GROUP_SIZE = 184;
+  FILE_GROUP_SIZE = 188;
   FILE_STORE_SIZE = 192;
   FILE_KEY_SIZE = 20;
   FILE_DEADKEY_SIZE = 160;

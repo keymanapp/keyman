@@ -157,6 +157,15 @@ const
   CERR_CasedKeysMustNotIncludeShiftStates          = $406A;
   CERR_CasedKeysNotSupportedWithMnemonicLayout     = $406B;
 
+  CERR_CannotUseReadWriteGroupFromReadonlyGroup    = $406C;
+  CERR_StatementNotPermittedInReadonlyGroup        = $406D;
+  CERR_OutputInReadonlyGroup                       = $406E;
+  CERR_NewContextGroupMustBeReadonly               = $406F;
+  CERR_PostKeystrokeGroupMustBeReadonly            = $4070;
+
+  CERR_DuplicateGroup                              = $4071;
+  CERR_DuplicateStore                              = $4072;
+
   CWARN_TooManyWarnings                            = $2080;
   CWARN_OldVersion                                 = $2081;
   CWARN_BitmapNotUsed                              = $2082;

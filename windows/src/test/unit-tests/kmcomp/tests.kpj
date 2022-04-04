@@ -341,13 +341,45 @@
       <Details/>
     </File>
     <File>
+      <ID>id_aaef10bd8eb4cab82fbe8c06dc2fdda8</ID>
+      <Filename>test_6462_duplicate_group_1.kmn</Filename>
+      <Filepath>test_6462_duplicate_group_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_c1b4ccdd8bd17e108a7283ede40f8c5d</ID>
+      <Filename>test_6462_duplicate_group_2.kmn</Filename>
+      <Filepath>test_6462_duplicate_group_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_d4f50a05ee5d0c7eb883a7b0bf45db4b</ID>
+      <Filename>test_6462_duplicate_store_1.kmn</Filename>
+      <Filepath>test_6462_duplicate_store_1.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
+      <ID>id_a5faaab7434394aebd7c3dce83abc71d</ID>
+      <Filename>test_6462_duplicate_store_2.kmn</Filename>
+      <Filepath>test_6462_duplicate_store_2.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
+    </File>
+    <File>
       <ID>id_79b461cb3d02f0924c8f1364aac1e223</ID>
       <Filename>test_194_filename_case.kmn</Filename>
       <Filepath>test_194_filename_case.kmn</Filepath>
       <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
       <Details/>
-    </File>
+    </File>   
     <File>
       <ID>id_5f9e583f7392151b3c3a7d4577b31a4f</ID>
       <Filename>test_valid.kmx</Filename>
@@ -371,6 +403,14 @@
       <FileVersion></FileVersion>
       <FileType>.doc</FileType>
       <ParentFileID>id_98467bd680620f99f9adeb5347541b6a</ParentFileID>
+    </File>
+    <File>
+      <ID>id_da23dbc5087288ce8c52e07a797c76df</ID>
+      <Filename>test_6462_duplicate_store_3.kmn</Filename>
+      <Filepath>test_6462_duplicate_store_3.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details/>
     </File>
     <File>
       <ID>id_8bf5064571a103aeb188d22b50886198</ID>
