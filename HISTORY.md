@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 15.0.227 beta 2022-04-04
+
+* fix(developer): improves More Help link for icon tool (#6464)
+* chore(android): Document minimum required version of Chrome (#6468)
+* chore(common): Update in-app help versions to 15.0 (#6469)
+* fix(web): rely on caller for unmatched keys (#6457)
+* feat(developer): hint on unreachable code (#6440)
+* feat(developer): check filename case consistency when compiling keyboard (#6445)
+* feat(developer): add Clear All button to icon editor (#6465)
+* fix(developer): icon editor font color now follows fgcolor (#6466)
+* fix(developer): validate kmconvert parameters (#6451)
+* feat(developer): check for duplicate store/group names (#6463)
+* docs(linux): Update testing section in readme (#6460)
+
 ## 15.0.226 beta 2022-04-01
 
 * fix(web): track stateKeys changes with layer changes (#6453)
