@@ -77,7 +77,7 @@ inherited frmBitmapEditorText: TfrmBitmapEditorText
   object editFont: TEdit
     Left = 64
     Top = 20
-    Width = 233
+    Width = 204
     Height = 21
     TabStop = False
     ParentColor = True
@@ -92,6 +92,14 @@ inherited frmBitmapEditorText: TfrmBitmapEditorText
     Caption = '&Change...'
     TabOrder = 1
     OnClick = cmdFontClick
+  end
+  object cpTextColor: TmbColorPreview
+    Left = 274
+    Top = 20
+    Width = 24
+    Height = 21
+    Hint = 'Text Color'
+    Color = clNone
   end
   object dlgFont: TFontDialog
     Font.Charset = DEFAULT_CHARSET

@@ -168,6 +168,9 @@ type
     function CanClearSelection: Boolean;
 
   public
+    const
+      TransparentReplacementColour = $100000;  // I2634
+
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure LoadFromFile(FileName: WideString);
@@ -194,8 +197,6 @@ uses
   JPEG,
   UfrmBitmapEditorText;
 
-const
-  TransparentReplacementColour = $100000;  // I2634
 constructor TframeBitmapEditor.Create(AOwner: TComponent);
 var
   beb: TBitmapEditorBMType;
@@ -431,6 +432,8 @@ begin
 
   if GetDrawMode = dmText then
   begin
+    FLastInsertFont.Color := FEdit.Colour;
+
     r := panEdit.BoundsRect;
     r.TopLeft := ClientToScreen(r.TopLeft);
     r.BottomRight := ClientToScreen(r.BottomRight);
