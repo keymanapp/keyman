@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.5 alpha 2022-04-04
+
+* chore(common): beta to master B15S6 (#6467)
+
 ## 16.0.4 alpha 2022-03-22
 
 * chore: B15S4 beta->alpha (#6402)
