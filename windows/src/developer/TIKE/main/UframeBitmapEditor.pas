@@ -95,6 +95,7 @@ type
     memoReadOnlyIcons: TMemo;
     ppReadOnlyIcons: TPaintPanel;
     panReadOnlyIconsTop: TPanel;
+    cmdClearAll: TButton;
     procedure panEditMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure panEditMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -120,6 +121,7 @@ type
     procedure cmdExportClick(Sender: TObject);
     procedure cmdImportClick(Sender: TObject);
     procedure ppReadOnlyIconsPaint(Sender: TObject);
+    procedure cmdClearAllClick(Sender: TObject);
   private
     FReadOnlyIcons: array of TGraphic;
     FRSP21318IsPngIcon: Boolean;
@@ -540,6 +542,11 @@ begin
   finally
     bmp.Free;
   end;
+end;
+
+procedure TframeBitmapEditor.cmdClearAllClick(Sender: TObject);
+begin
+  ClearSelection;
 end;
 
 procedure TframeBitmapEditor.cmdClick(Sender: TObject);
@@ -1156,7 +1163,7 @@ begin
       except
         on E:Exception do   // I3147 - I don't want to use E:Exception but see http://marc.durdin.net/2012/01/how-not-to-do-exception-classes-in.html   // I3508
         begin
-          ShowMessage('The image file could not be imported because it is not a valid PNG file.');
+          ShowMessage('The image file could not be imported because it is not a valid PNG file: '+E.Message);
           Exit;
         end;
       end;
@@ -1238,21 +1245,27 @@ end;
 
 procedure TframeBitmapEditor.Clear;
 begin
-  Modified := False;
-  FBitmaps[bebEdit].Canvas.Brush.Color := BGColour;
-  FBitmaps[bebEdit].Canvas.FillRect(Rect(0,0,16,16));
+  ClearSelection;
   FEdit.IsTemp := False;
-  panEdit.RePaint;
-  panPreview.RePaint;
   SaveUndoBitmap;
 end;
 
 procedure TframeBitmapEditor.ClearSelection;
+var
+  hObject: THandle;
+  FColor: DWord;
 begin
   Modified := True;
   SaveUndoBitmap;
-  FBitmaps[bebEdit].Canvas.Brush.Color := BGColour;
-  FBitmaps[bebEdit].Canvas.FillRect(Rect(0,0,16,16));
+
+  if BGColour = clTransparent
+    then FColor := TransparentReplacementColour
+    else FColor := BGColour;
+
+  hObject := CreateSolidBrush(FColor);
+  Windows.FillRect(FBitmaps[bebEdit].Canvas.Handle, Rect(0,0,16,16), hObject);
+  DeleteObject(hObject);
+
   panEdit.RePaint;
   panPreview.RePaint;
 end;

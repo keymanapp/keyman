@@ -6,8 +6,8 @@ object frameBitmapEditor: TframeBitmapEditor
   TabOrder = 0
   TabStop = True
   object imgTransparent: TImage
-    Left = 280
-    Top = 252
+    Left = 494
+    Top = 251
     Width = 23
     Height = 23
     AutoSize = True
@@ -28,7 +28,7 @@ object frameBitmapEditor: TframeBitmapEditor
     Visible = False
   end
   object lblPixel: TLabel
-    Left = 232
+    Left = 302
     Top = 256
     Width = 3
     Height = 13
@@ -316,7 +316,7 @@ object frameBitmapEditor: TframeBitmapEditor
         '$00999999'
         '$00666666'
         '$00333333')
-      HintFormat = 
+      HintFormat =
         'RGB(%r, %g, %b) '#13'Hex: %hex Click for foreground Shift+Click for ' +
         'background'
       AutoHeight = True
@@ -848,7 +848,6 @@ object frameBitmapEditor: TframeBitmapEditor
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 7
-    ExplicitTop = 7
     object ppReadOnlyIcons: TPaintPanel
       Left = 0
       Top = 154
@@ -857,10 +856,8 @@ object frameBitmapEditor: TframeBitmapEditor
       OnPaint = ppReadOnlyIconsPaint
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = 10
-      ExplicitTop = 146
-      ExplicitWidth = 519
-      ExplicitHeight = 101
+      ExplicitLeft = -85
+      ExplicitTop = 249
     end
     object panReadOnlyIconsTop: TPanel
       Left = 0
@@ -879,7 +876,7 @@ object frameBitmapEditor: TframeBitmapEditor
         Width = 492
         Height = 41
         AutoSize = False
-        Caption = 
+        Caption =
           'This icon file is read only because it either contains multiple ' +
           'image resources, has a size other than 16x16 pixels, or a colour' +
           ' depth > 256 pixels'
@@ -894,6 +891,15 @@ object frameBitmapEditor: TframeBitmapEditor
         TabOrder = 0
       end
     end
+  end
+  object cmdClearAll: TButton
+    Left = 224
+    Top = 252
+    Width = 73
+    Height = 25
+    Caption = '&Clear all'
+    TabOrder = 8
+    OnClick = cmdClearAllClick
   end
   object ilCmds: TImageList
     Left = 84
