@@ -52,6 +52,11 @@ public class Version: NSObject, Comparable {
   public let plainString: String
   public let fullString: String
   public let tier: Tier?
+  public var major: Int {
+    get {
+      return components[0]
+    }
+  }
 
   public init?(_ string: String) {
     let tagComponents = string.components(separatedBy: "-")
