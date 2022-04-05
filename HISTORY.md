@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.228 beta 2022-04-05
+
+* feat(web): prediction casing follows current layer (#6459)
+* fix(mac): check package fileVersion during install (#6415)
+
 ## 15.0.227 beta 2022-04-04
 
 * fix(developer): improves More Help link for icon tool (#6464)
