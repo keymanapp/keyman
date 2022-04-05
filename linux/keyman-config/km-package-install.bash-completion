@@ -19,10 +19,13 @@ _km-package-install_completions()
         "-p"|"--package")
             words=""
             if [[ ! -s $cache ]] ; then
+                # NOTE: identical code in `km-package-get.bash-completion`.
+                # Unfortunately with bash completion scripts it's not possible to factor out
+                # common code.
                 if [[ -e ./km-package-install ]]; then
-                    python3 -c "from imp import load_source;load_source('km_package_install', './km-package-install');from km_package_install import list_keyboards;list_keyboards()"
+                    python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', './km-package-install');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
                 else
-                    python3 -c "from imp import load_source;load_source('km_package_install', '/usr/bin/km-package-install');from km_package_install import list_keyboards;list_keyboards()"
+                    python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', '/usr/bin/km-package-install');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
                 fi
             fi
 
