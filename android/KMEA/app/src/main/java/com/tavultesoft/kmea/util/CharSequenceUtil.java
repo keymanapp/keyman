@@ -19,8 +19,7 @@ public final class CharSequenceUtil {
       return 0;
     }
 
-    int lastIndex = sequence.length()-1;
-    int index = lastIndex, dnx = dn, numPairs = 0;
+    int index = sequence.length()-1, dnx = dn, numPairs = 0;
     while(index > 0 && dnx > 0) {
       if(Character.isLowSurrogate(sequence.charAt(index)) &&
         Character.isHighSurrogate(sequence.charAt(index-1))) {
