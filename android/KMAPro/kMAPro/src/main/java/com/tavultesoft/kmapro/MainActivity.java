@@ -620,52 +620,16 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void showShareDialog() {
-    List<Intent> shareIntents = new ArrayList<Intent>();
-    Intent intent = new Intent(Intent.ACTION_SEND);
-    intent.setType("text/plain");
-    intent.putExtra(Intent.EXTRA_TEXT, textView.getText().toString());
+    // Sharing text content via send intent
+    // Reference: https://developer.android.com/training/sharing/send#send-text-content
+    // Note: Sharing to Facebook removed in https://github.com/keymanapp/keyman/issues/156
+    // Users can copy text or use Keyman as system keyboard for typing into Facebook
+    Intent sendIntent = new Intent(Intent.ACTION_SEND);
+    sendIntent.setType("text/plain");
+    sendIntent.putExtra(Intent.EXTRA_TEXT, textView.getText().toString());
 
-    List<ResolveInfo> resInfo = getPackageManager().queryIntentActivities(intent, 0);
-    final String[] IGNORED_PACKAGE_NAMES = {
-      "com.facebook.katana",
-      "com.facebook.lite"
-    };
-
-    for (ResolveInfo resolveInfo : resInfo) {
-      String packageName = resolveInfo.activityInfo.packageName;
-
-      Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
-      shareIntent.setType("text/plain");
-      shareIntent.setPackage(packageName);
-
-      String text = textView.getText().toString();
-      String htmlMailFormat = "<html><head></head><body>%s%s</body></html>";
-      String extraMailText = "<br><br>Sent from&nbsp<a href=\"http://keyman.com/android\">Keyman for Android</a>";
-
-      // Sharing to Facebook removed in https://github.com/keymanapp/keyman/issues/156
-      // Users can copy text or use Keyman as system keyboard for typing into Facebook
-      if (!Arrays.asList(IGNORED_PACKAGE_NAMES).contains(packageName)) {
-        if (packageName.equals("com.google.android.gm")) {
-          // Html string for Gmail
-          shareIntent.setType("message/rfc822");
-          text = text.replace("<", "&lt;");
-          text = text.replace(">", "&gt;");
-          text = text.replace(" ", "&nbsp;");
-          text = text.replace('\n', ' ');
-          text = text.replace(" ", "<br>");
-          shareIntent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(KMString.format(htmlMailFormat, text, extraMailText)));
-        } else {
-          // Text for all others
-          shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-        }
-
-        shareIntents.add(shareIntent);
-      }
-    }
-
-    Intent chooserIntent = Intent.createChooser(shareIntents.remove(0), "Share via");
-    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, shareIntents.toArray(new Parcelable[]{}));
-    startActivity(chooserIntent);
+    Intent shareIntent = Intent.createChooser(sendIntent, null);
+    startActivity(shareIntent);
   }
 
   @SuppressLint("InflateParams")
