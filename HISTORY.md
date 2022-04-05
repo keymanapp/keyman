@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.6 alpha 2022-04-05
+
+* chore(deps): bump ansi-regex from 3.0.0 to 3.0.1 in /web/testing/regression-tests (#6470)
+* chore(deps-dev): bump minimist from 1.2.5 to 1.2.6 in /web/testing/regression-tests (#6471)
+* chore(deps): bump minimist from 1.2.5 to 1.2.6 in /developer/server (#6472)
+
 ## 16.0.5 alpha 2022-04-04
 
 * chore(common): beta to master B15S6 (#6467)
