@@ -1,0 +1,28 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Push Keyman to TestFlight for PRs"
+  lane :manual_testflight_prs do
+    build = latest_testflight_build_number(
+      api_key_path: "/Users/mcdurdin/fastlane/" + ENV["FASTLANE_API_KEY_ID"] + ".json",
+      app_identifier: "Tavultesoft.Keyman",
+      team_id: 687465,
+      version: ENV["VERSION"]
+    )
+    
+    vs = build.split('.')
+    
+    if vs.length < 5
+      build = ENV["VERSION"] + "." + ENV["TEAMCITY_PR_NUMBER"] + ".0"
+      vs = build.split('.')
+    end
+
+    # Increment the last component
+    vs[-1] = (vs[-1].to_i + 1).to_s
+
+    increment_build_number(
+      build_number: vs.join('.'),
+      xcodeproj: "./Keyman.xcodeproj"
+    )
+  end
+end
