@@ -423,9 +423,13 @@ public class KeymanPackage {
     return nil
   }
 
-  /*
+  /**
    * Checks whether the version of Keyman being used is greater than or equal to the minimum
    * Keyman version required by the package, and, if not, throws error.
+   *
+   * This function only verifies the major component of the version number, not the 
+   * minor or patch versions. This meets the Keyman design requirement that breaking
+   * file format changes can only occur in major version updates.
    */
   static private func validateVersionSupported(packageName: String, minSupportedVersion: String) throws {
     let currentVersion = Version.current
