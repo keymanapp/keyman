@@ -55,12 +55,13 @@ function phaseSetBundleVersions() {
   fi
 
   # Now, to set the build number (CFBundleVersion)
-  # 1.0 is the default for all released builds. For PRs, we use 0.PR#.0, and
-  # increment the final portion
-  BUILD_NUMBER=$VERSION
+  # 1.0 is the default for all released builds. For PRs, we use 0.PR#.n, and
+  # for n, use the TeamCity build.counter variable surfaced in the env var
+  # TEAMCITY_BUILD_COUNTER to give us a unique build id
+  BUILD_NUMBER=1.0
   if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
     if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
-      BUILD_NUMBER=$VERSION.$TEAMCITY_PR_NUMBER.$(date +%y%m%d).$(date +%H%M%S)
+      BUILD_NUMBER=0.$TEAMCITY_PR_NUMBER.$TEAMCITY_BUILD_COUNTER
     fi
   fi
 
