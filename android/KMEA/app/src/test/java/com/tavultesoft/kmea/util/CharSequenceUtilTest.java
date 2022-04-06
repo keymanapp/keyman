@@ -9,13 +9,13 @@ import com.tavultesoft.kmea.util.CharSequenceUtil;
 
 @RunWith(RobolectricTestRunner.class)
 public class CharSequenceUtilTest {
-  // Smiley emoji U+1F600 = D800 DC3D
-  private final String SMILEY_HIGH_SURROGATE_PAIR = "\uD800";
-  private final String SMILEY_LOW_SURROGATE_PAIR = "\uDC3D";
+  // Smiley emoji U+1F600 = D83D DE00
+  private final String SMILEY_HIGH_SURROGATE_PAIR = "\uD83D";
+  private final String SMILEY_LOW_SURROGATE_PAIR = "\uDE00";
   private final String SMILEY = SMILEY_HIGH_SURROGATE_PAIR + SMILEY_LOW_SURROGATE_PAIR;
 
-  // Winking emoji U+1F609 = D800 DC3C
-  private final String WINK = "\uD800\uDC3C";
+  // Winking emoji U+1F609 = D83D DE09
+  private final String WINK = "\uD83D\uDE09";
 
   private final String COMPOSING_DOT_ABOVE = "\u0307";
   private final String COMPOSING_CIRCUMFLEX_ACCENT = "\u0302";
@@ -130,7 +130,7 @@ public class CharSequenceUtilTest {
     CharSequence expectedChars = "o" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT + WINK + "p";
     CharSequence currentContext = P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY_HIGH_SURROGATE_PAIR;
     CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, currentContext);
-    Assert.assertEquals("\uDC3C" + "p", charsToRestore);
+    Assert.assertEquals("\uDE09" + "p", charsToRestore);
   }
 
   @Test
