@@ -57,7 +57,9 @@ function phaseSetBundleVersions() {
   # Now, to set the build number (CFBundleVersion)
   # 1.0 is the default for all released builds. For PRs, we use 0.PR#.n, and
   # for n, use the TeamCity build.counter variable surfaced in the env var
-  # TEAMCITY_BUILD_COUNTER to give us a unique build id
+  # TEAMCITY_BUILD_COUNTER to give us a unique build id. Note that
+  # CFBundleVersion cannot be longer than 18 characters.
+
   BUILD_NUMBER=1.0
   if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
     if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
@@ -69,17 +71,6 @@ function phaseSetBundleVersions() {
   echo "Setting $VERSION for $TARGET_BUILD_DIR/$INFOPLIST_PATH"
   /usr/libexec/Plistbuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_PLIST"
   /usr/libexec/Plistbuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_PLIST"
-
-  # If we are running a PR build, then ...
-#  if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
- #   if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
-  #    pushd "$KEYMAN_ROOT/ios/keyman/Keyman" > /dev/null
-   #   FASTLANE_ITC_TEAM_ID=687465
-
-      # fastlane manual_testflight_prs || exit 1
-    #  popd > /dev/null
-   # fi
-# fi
 
   # Only attempt to write this when directly specified (otherwise, generates minor warning)
   if [ $TAGGED == true ]; then
