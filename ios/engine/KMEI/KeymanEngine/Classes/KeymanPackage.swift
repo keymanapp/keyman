@@ -22,6 +22,7 @@ public enum KMPError : String, Error {
   //        to provide better clarity.
   case wrongPackageType = "kmp-error-wrong-type"
   case resourceNotInPackage = "kmp-error-missing-resource"
+  case unsupportedKeymanVersion = "kmp-error-unsupported-keyman-version"
 
   var localizedDescription: String {
     return engineBundle.localizedString(forKey: self.rawValue, value: nil, table: nil)
@@ -397,6 +398,10 @@ public class KeymanPackage {
         throw KMPError.noMetadata
       }
 
+      let packageName = metadata.info?.name?.description ?? ""
+      let minVersion = metadata.system.fileVersion
+      try validateVersionSupported(packageName: packageName, minSupportedVersion: minVersion)
+
       var package: KeymanPackage
 
       switch metadata.packageType {
@@ -418,6 +423,24 @@ public class KeymanPackage {
     return nil
   }
 
+  /**
+   * Checks whether the version of Keyman being used is greater than or equal to the minimum
+   * Keyman version required by the package, and, if not, throws error.
+   *
+   * This function only verifies the major component of the version number, not the 
+   * minor or patch versions. This meets the Keyman design requirement that breaking
+   * file format changes can only occur in major version updates.
+   */
+  static private func validateVersionSupported(packageName: String, minSupportedVersion: String) throws {
+    let currentVersion = Version.current
+    let minVersion = Version(minSupportedVersion)
+    
+    if (currentVersion.major < minVersion!.major) {
+      log.error("package '\(packageName)' could not be installed because it requires version \(minSupportedVersion) of Keyman")
+      throw KMPError.unsupportedKeymanVersion
+    }
+  }
+  
   @available(*, deprecated, message: "Use of the completion block is unnecessary; this method now returns synchronously.")
   static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void) throws {
     try unzipFile(fileUrl: fileUrl, destination: destination) {
