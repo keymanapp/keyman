@@ -60,7 +60,7 @@ function phaseSetBundleVersions() {
   BUILD_NUMBER=$VERSION
   if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
     if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
-      BUILD_NUMBER=$VERSION.$TEAMCITY_PR_NUMBER.0
+      BUILD_NUMBER=$VERSION.$TEAMCITY_PR_NUMBER.$(date +%y%m%d).$(date +%H%M%S)
     fi
   fi
 
@@ -70,15 +70,15 @@ function phaseSetBundleVersions() {
   /usr/libexec/Plistbuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_PLIST"
 
   # If we are running a PR build, then ...
-  if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
-    if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
-      pushd "$KEYMAN_ROOT/ios/keyman/Keyman" > /dev/null
-      FASTLANE_ITC_TEAM_ID=687465
+#  if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
+ #   if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
+  #    pushd "$KEYMAN_ROOT/ios/keyman/Keyman" > /dev/null
+   #   FASTLANE_ITC_TEAM_ID=687465
 
-      fastlane manual_testflight_prs || exit 1
-      popd > /dev/null
-    fi
-  fi
+      # fastlane manual_testflight_prs || exit 1
+    #  popd > /dev/null
+   # fi
+# fi
 
   # Only attempt to write this when directly specified (otherwise, generates minor warning)
   if [ $TAGGED == true ]; then
