@@ -75,7 +75,7 @@ function phaseSetBundleVersions() {
       pushd "$KEYMAN_ROOT/ios/keyman/Keyman" > /dev/null
       FASTLANE_ITC_TEAM_ID=687465
 
-      fastlane manual_testflight_prs
+      fastlane manual_testflight_prs || exit 1
       popd > /dev/null
     fi
   fi
