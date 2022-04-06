@@ -54,11 +54,31 @@ function phaseSetBundleVersions() {
     echo "Command-line build - using provided version parameters"
   fi
 
-  # Now, to set the version.
+  # Now, to set the build number (CFBundleVersion)
+  # 1.0 is the default for all released builds. For PRs, we use 0.PR#.0, and
+  # increment the final portion
+  BUILD_NUMBER=$VERSION
+  if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
+    if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
+      BUILD_NUMBER=$VERSION.$TEAMCITY_PR_NUMBER.0
+    fi
+  fi
+
   APP_PLIST="$TARGET_BUILD_DIR/$INFOPLIST_PATH"
   echo "Setting $VERSION for $TARGET_BUILD_DIR/$INFOPLIST_PATH"
-  /usr/libexec/Plistbuddy -c "Set :CFBundleVersion $VERSION" "$APP_PLIST"
+  /usr/libexec/Plistbuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_PLIST"
   /usr/libexec/Plistbuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_PLIST"
+
+  # If we are running a PR build, then ...
+  if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
+    if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
+      pushd "$KEYMAN_ROOT/ios/keyman/Keyman" > /dev/null
+      FASTLANE_ITC_TEAM_ID=687465
+
+      fastlane manual_testflight_prs
+      popd > /dev/null
+    fi
+  fi
 
   # Only attempt to write this when directly specified (otherwise, generates minor warning)
   if [ $TAGGED == true ]; then
@@ -71,7 +91,7 @@ function phaseSetBundleVersions() {
   if [ -f "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist" ]; then
     DSYM_PLIST="${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist"
     echo "Setting $VERSION for $DSYM_PLIST"
-    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$DSYM_PLIST"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$DSYM_PLIST"
     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$DSYM_PLIST"
   fi
 }
