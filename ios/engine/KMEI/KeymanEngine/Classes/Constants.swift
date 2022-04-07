@@ -124,7 +124,7 @@ public enum Util {
   public static let sdkVersion: String = {
     let url = Resources.bundle.url(forResource: "KeymanEngine-Info", withExtension: "plist")!
     let info = NSDictionary(contentsOf: url)!
-    return info["CFBundleVersion"] as! String
+    return info["CFBundleShortVersionString"] as! String
   }()
 }
 
