@@ -683,9 +683,7 @@ begin
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
     msiLocation := FInstallInfo.MsiInstallLocation;
-    if Assigned(msiLocation) and (
-        (FInstallInfo.InstalledVersion.Version = '') or (FInstallInfo.InstalledVersion.ProductCode <> msiLocation.ProductCode)
-      ) then
+    if Assigned(msiLocation) and (FInstallInfo.InstalledVersion.Version = '') then
     begin
       s := s + 'InstallDefaults,';  // I2651
       s := s + ' -defaultuilanguage='+TSetupUILanguageManager.ActiveLocale;
