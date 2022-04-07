@@ -1,4 +1,3 @@
-
 /* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
 "message-confirm-delete-keyboard" = "តើអ្នកពិតជាចង់លុបក្ដារចុច '%@' នេះឬ?";
 
@@ -51,7 +50,7 @@
 "fonts-label" = "ពុម្ពអក្សរ៖";
 
 /* package version label in the Package Information window */
-"package-version-label" = "ជំនាន់កញ្ចប់៖";
+"package-version-label" = "ជំនាន់​កញ្ចប់៖";
 
 /* author label in the Package Information window */
 "author-label" = "អ្នកបង្កើត៖";

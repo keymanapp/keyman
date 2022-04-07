@@ -1,5 +1,5 @@
 /* A descriptive message used for errors when the app is already busy downloading */
-"alert-download-error-busy" = "កំពុង​តែ​ទាញយក​";
+"alert-download-error-busy" = "កំពុង​តែ​ទាញយកស្រាប់ហើយ​។";
 
 /* A descriptive message used when a download fails */
 "alert-download-error-detail" = "បញ្ហា​បាន​កើត​ឡើង​ពេល​កំពុង​ទាញយក ឬ​ពេល​កំពុង​ដំឡើង។";
@@ -203,7 +203,7 @@
 "menu-settings-spacebar-hint-language" = "បង្ហាញឈ្មោះភាសាលើគ្រាប់ចុចដកឃ្លា";
 
 /* Secondary text showing current setting for spacebar caption - language + keyboard */
-"menu-settings-spacebar-hint-languageKeyboard" = "បង្ហាញឈ្មោះភាសា និង ក្ដារចុចលើគ្រាប់ចុចដកឃ្លា";
+"menu-settings-spacebar-hint-languageKeyboard" = "បង្ហាញឈ្មោះក្ដារចុច និងភាសានៅលើគ្រាប់ចុចដកឃ្លា";
 
 /* Label for the "Spacebar Caption" item on the main settings screen */
 "menu-settings-spacebar-text" = "ពាក្យលើគ្រាប់ចុចដកឃ្លា";

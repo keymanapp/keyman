@@ -150,4 +150,6 @@
   <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">កញ្ចប់ក្ដារចុច​នេះ​គ្មាន​​ភាសា​ពាក់ព័ន្ធ​សម្រាប់​ដំឡើង​ទេ</string>
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">គ្មានទិន្នន័យមេតា​ក្នុង​កញ្ចប់ ឬ​ទិន្នន័យមេតា​ហ្នឹង​មិន​ត្រឹមត្រូវ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    ក្ដារចុចត្រូវការ Keyman ជំនាន់ថ្មីជាងនេះ</string>
 </resources>
