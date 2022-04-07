@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.229 beta 2022-04-07
+
+* fix(iOS): check version during package install (#6479)
+* feat(ios): testflight builds for PRs (#6486)
+* chore(ios): Document minimum iOS version 12.1 (#6492)
+* fix(developer): handle exception on unpaired surrogate (#6487)
+* chore(mac): Update whatsnew for 15.0 (#6493)
+* fix(ios): use CFBundleShortVersionString for version (#6495)
+* fix(android/app): Simplify sharing intent (#6481)
+
 ## 15.0.228 beta 2022-04-05
 
 * feat(web): prediction casing follows current layer (#6459)
