@@ -1,5 +1,44 @@
 # Keyman Version History
 
+## 15.0.229 beta 2022-04-07
+
+* fix(iOS): check version during package install (#6479)
+* feat(ios): testflight builds for PRs (#6486)
+* chore(ios): Document minimum iOS version 12.1 (#6492)
+* fix(developer): handle exception on unpaired surrogate (#6487)
+* chore(mac): Update whatsnew for 15.0 (#6493)
+* fix(ios): use CFBundleShortVersionString for version (#6495)
+* fix(android/app): Simplify sharing intent (#6481)
+
+## 15.0.228 beta 2022-04-05
+
+* feat(web): prediction casing follows current layer (#6459)
+* fix(mac): check package fileVersion during install (#6415)
+
+## 15.0.227 beta 2022-04-04
+
+* fix(developer): improves More Help link for icon tool (#6464)
+* chore(android): Document minimum required version of Chrome (#6468)
+* chore(common): Update in-app help versions to 15.0 (#6469)
+* fix(web): rely on caller for unmatched keys (#6457)
+* feat(developer): hint on unreachable code (#6440)
+* feat(developer): check filename case consistency when compiling keyboard (#6445)
+* feat(developer): add Clear All button to icon editor (#6465)
+* fix(developer): icon editor font color now follows fgcolor (#6466)
+* fix(developer): validate kmconvert parameters (#6451)
+* feat(developer): check for duplicate store/group names (#6463)
+* docs(linux): Update testing section in readme (#6460)
+
+## 15.0.226 beta 2022-04-01
+
+* fix(web): track stateKeys changes with layer changes (#6453)
+
+## 15.0.225 beta 2022-04-01
+
+* fix(ios): reset context when osk is resized (#6428)
+* feat(developer): keep Virtual Key Identifier dialog open on Insert (#6449)
+* fix(oem/fv/ios): maintain consistent keyboard state between Keyman Engine and FV app (#6446)
+
 ## 15.0.224 beta 2022-03-29
 
 * fix(android/engine): Clear WebView cache on package install (#6438)

@@ -22,9 +22,9 @@
 */
 
 #include "pch.h"
-#include <io.h>
-#include <limits.h>
+#include <comperr.h>
 #include "NamedCodeConstants.h"
+#include "CheckFilenameConsistency.h"
 #include "kmcmpdll.h"
 
 extern char CompileDir[];
@@ -32,18 +32,6 @@ extern char CompileDir[];
 
 int IsHangulSyllable(const wchar_t *codename, int *code);
 
-BOOL FileExists(const char *filename)
-{
-  _finddata_t fi;
-  intptr_t n;
-
-  if((n = _findfirst(filename, &fi)) != -1)  // I3056   // I3512
-  {
-    _findclose(n);
-    return TRUE;
-  }
-  return FALSE;
-}
 
 NamedCodeConstants::NamedCodeConstants()
 {
@@ -117,6 +105,11 @@ int __cdecl sort_entries(const void *elem1, const void *elem2)
 BOOL NamedCodeConstants::IntLoadFile(const char *filename)
 {
   FILE *fp = NULL;
+
+  if (CheckFilenameConsistency(filename, FALSE) != CERR_None) {
+    return FALSE;
+  }
+
   if(fopen_s(&fp, filename, "rt") != 0) return FALSE;  // I3481
 
   char str[256], *p, *q, *context = NULL;

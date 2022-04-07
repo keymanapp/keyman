@@ -1,18 +1,18 @@
 (*
   Name:             compile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     06 Oct 2006 - mcdurdin - Fix record packing
                     27 Mar 2008 - mcdurdin - refactor constants into kmxfileconsts
@@ -24,7 +24,7 @@
                     22 Jun 2015 - mcdurdin - I4770 - If kmcmpdll.dll does not exist in debug path, try default paths
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
 *)
 unit compile;
 
@@ -47,6 +47,7 @@ const
 {$ENDIF}
 
 type
+  // These structures must match the structures in compfile.h
   FILE_STORE = record
   	dwSystemID: DWORD;
   	szName: array[0..SZMAX_STORENAME-1] of WCHAR;	// the name of the store
@@ -80,6 +81,7 @@ type
     cxKeyArray: DWORD;             // in array items
     fUsingKeys: BOOL;              // group(xx) [using keys] <-- specified or not
     fReadOnly: BOOL;
+    Line: DWORD;
 	end;
 
   PFILE_GROUP = ^FILE_GROUP;
@@ -144,7 +146,7 @@ const
   CERR_FATAL   = $00008000;
   CERR_ERROR   = $00004000;
   CERR_WARNING = $00002000;
-  CERR_MEMORY  = $00001000;
+  CERR_HINT    = $00001000;
   CWARN_Info =   $0000208A;
 
 const
@@ -157,7 +159,7 @@ const
   FILE_DEADKEY_SIZE = 160;
 {$ELSE}
   FILE_KEYBOARD_SIZE = 2952;
-  FILE_GROUP_SIZE = 184;
+  FILE_GROUP_SIZE = 188;
   FILE_STORE_SIZE = 192;
   FILE_KEY_SIZE = 20;
   FILE_DEADKEY_SIZE = 160;

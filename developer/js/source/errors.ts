@@ -1,20 +1,22 @@
 /**
  * Log levels.
- * 
+ *
  * Note: Currently, this acts like a bit set, where the upper 4 bits of an
  * unsigned 16 bit value are the log level flags.
+ *
+ * Warning: even though these look like bitmasks, these flags may not be
+ * combined.
  */
 export enum LogLevel {
   CERR_FATAL = 0x8000,
   CERR_ERROR = 0x4000,
   CERR_WARNING = 0x2000,
-  // Note: 0x01000 is a memory error, but that is never raised in TypeScript
-  CERR_INFO = 0x0000,  // N.B., not in widespread use
+  CERR_HINT = 0x1000
 };
 
 /**
  * Error codes. Use these when logging messages.
- * 
+ *
  * Extends https://github.com/keymanapp/keyman/blob/99db3c0d2448f448242e6397f9d72e9a7ccee4b9/windows/src/global/inc/Comperr.h
  */
 export enum KeymanCompilerError {
@@ -23,27 +25,30 @@ export enum KeymanCompilerError {
 
 
   CERR_FATAL_LM = LogLevel.CERR_FATAL | CERR_LEXICAL_MODEL_MIN,
-  /* Place all fatal LM compiler errors here! */
+    /* Place all fatal LM compiler errors here! */
 
   CERR_ERROR_LM = LogLevel.CERR_ERROR | CERR_LEXICAL_MODEL_MIN,
-  /* Place all recoverable LM compiler errors here! */
+    /* Place all recoverable LM compiler errors here! */
 
   CERR_WARN_LM = LogLevel.CERR_WARNING | CERR_LEXICAL_MODEL_MIN,
-  /* Place all LM compiler warnings here! */
-  CWARN_MixedNormalizationForms = 0x2801,
-  CWARN_DuplicateWordInSameFile = 0x2802,
+    /* Place all LM compiler warnings here! */
+  CWARN_MixedNormalizationForms = 0x2801, /* CERR_WARN_LM + 1 */
+  CWARN_DuplicateWordInSameFile = 0x2802, /* CERR_WARN_LM + 2 */
 
-  /* Errors that are not specific to the lexical model compiler: */
+  CERR_HINT_LM = LogLevel.CERR_HINT | CERR_LEXICAL_MODEL_MIN,
+    /* Place all LM compiler hints here! */
+
+  /* Errors that are not specific to the lexical model compiler, from comperr.h: */
   CWARN_TooManyErrorsOrWarnings = 0x20A7,
 }
 
 /**
  * Human-readable titles for the various log levels.
- * 
+ *
  * Taken from https://github.com/keymanapp/keyman/blob/d83cfffe511ce65b781f919e89e3693146844849/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L39-L46
  */
 const LOG_LEVEL_TITLE: {[level in LogLevel]: string} = {
-  [LogLevel.CERR_INFO]: '',
+  [LogLevel.CERR_HINT]: 'Hint',
   [LogLevel.CERR_WARNING]: 'Warning',
   [LogLevel.CERR_ERROR]: 'Error',
   [LogLevel.CERR_FATAL]: 'Fatal Error',
@@ -66,11 +71,11 @@ let _messagesSeen = 0;
 
 /**
  * Logs compiler messages (warnings, errors, logs).
- * 
+ *
  * @param code Error code
  * @param message A helpful message!
  * @param source [optional] the filename/line number in the source that induced this error
- * 
+ *
  * @see https://github.com/keymanapp/keyman/blob/99db3c0d2448f448242e6397f9d72e9a7ccee4b9/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L60-L77
  */
 export function log(code: KeymanCompilerError, message: string, source?: FilenameAndLineNo) {
@@ -95,7 +100,7 @@ export function log(code: KeymanCompilerError, message: string, source?: Filenam
 
 /**
  * Override where log messages go.
- * 
+ *
  * @param fn The desired log message handler.
  */
 export function redirectLogMessagesTo(fn: (log: LogMessage) => void) {
@@ -161,7 +166,7 @@ class OrdinaryLogMessage implements LogMessage {
     if (prefix)
       prefix = `${prefix}: `;
 
-    return `${prefix}${h(this.code)} ${this.message}`   
+    return `${prefix}${h(this.code)} ${this.message}`
   }
 }
 
@@ -193,5 +198,5 @@ function h(n: number) {
     formatted = '0'.repeat(4 - formatted.length);
   }
 
-  return formatted; 
+  return formatted;
 }

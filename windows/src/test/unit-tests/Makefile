@@ -8,7 +8,8 @@ TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler kmcomp-x
         androidstringtokeymanlocalestring \
         keyboard-info keyboard-js-info keyboard-package-versions \
         kmx-file-languages package-info jsonutil windows-setup \
-        ui-language-manager standards-data compile-supplementary-support
+        ui-language-manager standards-data compile-supplementary-support \
+        kmconvert
 
 test:
     $(MAKE) "TARGET=test" $(TARGETS)
@@ -17,23 +18,27 @@ test:
 
 # ----------------------------------------------------------------------
 
-androidstringtokeymanlocalestring:
+androidstringtokeymanlocalestring: .virtual
     cd $(ROOT)\src\test\unit-tests\androidstringtokeymanlocalestring
     $(MAKE) $(TARGET)
 
-group-helper-rsp19902:
+group-helper-rsp19902: .virtual
     cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902
     $(MAKE) $(TARGET)
 
-kmcomp:
+kmcomp: .virtual
     cd $(ROOT)\src\test\unit-tests\kmcomp
     $(MAKE) $(TARGET)
 
-shared-data:
+kmconvert: .virtual
+    cd $(ROOT)\src\test\unit-tests\kmconvert
+    $(MAKE) $(TARGET)
+
+shared-data: .virtual
     cd $(ROOT)\src\test\unit-tests\shared-data
     $(MAKE) $(TARGET)
 
-lexical-model-compiler:
+lexical-model-compiler: .virtual
     cd $(KEYMAN_ROOT)\developer\js
 
 !ifdef GIT_BASH_FOR_KEYMAN
@@ -42,47 +47,47 @@ lexical-model-compiler:
     start /wait ./build.sh -test
 !endif
 
-kmcomp-x64-structures:
+kmcomp-x64-structures: .virtual
 	cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902
 	$(MAKE) $(TARGET)
 
-keyboard-info:
+keyboard-info: .virtual
     cd $(ROOT)\src\test\unit-tests\keyboard-info
     $(MAKE) $(TARGET)
 
-keyboard-package-versions:
+keyboard-package-versions: .virtual
     cd $(ROOT)\src\test\unit-tests\keyboard-package-versions
     $(MAKE) $(TARGET)
 
-keyboard-js-info:
+keyboard-js-info: .virtual
     cd $(ROOT)\src\test\unit-tests\keyboard-js-info
     $(MAKE) $(TARGET)
 
-kmx-file-languages:
+kmx-file-languages: .virtual
     cd $(ROOT)\src\test\unit-tests\kmx-file-languages
     $(MAKE) $(TARGET)
 
-package-info:
+package-info: .virtual
     cd $(ROOT)\src\test\unit-tests\package-info
     $(MAKE) $(TARGET)
 
-jsonutil:
+jsonutil: .virtual
     cd $(ROOT)\src\test\unit-tests\jsonutil
     $(MAKE) $(TARGET)
 
-windows-setup:
+windows-setup: .virtual
     cd $(ROOT)\src\test\unit-tests\windows-setup
     $(MAKE) $(TARGET)
 
-ui-language-manager:
+ui-language-manager: .virtual
     cd $(ROOT)\src\test\unit-tests\ui-language-manager
     $(MAKE) $(TARGET)
 
-standards-data:
+standards-data: .virtual
     cd $(ROOT)\src\test\unit-tests\standards-data
     $(MAKE) $(TARGET)
 
-compile-supplementary-support:
+compile-supplementary-support: .virtual
     cd $(ROOT)\src\test\unit-tests\compile-supplementary-support
     $(MAKE) $(TARGET)
 

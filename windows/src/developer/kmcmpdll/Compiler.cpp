@@ -88,6 +88,9 @@
 #include "CharToKeyConversion.h"
 #include "CasedKeys.h"
 #include "CheckNCapsConsistency.h"
+#include "CheckFilenameConsistency.h"
+#include "UnreachableRules.h"
+#include "CheckForDuplicates.h"
 
 int xatoi(PWSTR *p);
 int atoiW(PWSTR p);
@@ -264,14 +267,6 @@ BOOL AddCompileMessage(DWORD msg)
   char szText[SZMAX_ERRORTEXT + 1 + 280];
 
   SetLastError(0);
-  if (msg & CERR_MEMORY)
-  {
-    lstrcpy(szText, "Fatal Error: Out of Memory");
-    (*msgproc)(currentLine + 1, msg, szText);
-    nErrors++;
-    return TRUE;
-  }
-
   if (msg & CERR_FATAL)
   {
     LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);
@@ -283,9 +278,9 @@ BOOL AddCompileMessage(DWORD msg)
   if (msg & CERR_ERROR) nErrors++;
   LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);
   if (ErrChr > 0)
-    wsprintf(strchr(szText, 0), " chr:%d", ErrChr);
+    wsprintf(strchr(szText, 0), " character offset: %d", ErrChr);
   if (*ErrExtra)
-    wsprintf(strchr(szText, 0), " extra:%s", ErrExtra);
+    wsprintf(strchr(szText, 0), " %s", ErrExtra);
 
   ErrChr = 0; *ErrExtra = 0;
 
@@ -557,6 +552,8 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   if ((msg = AddCompilerVersionStore(fk)) != CERR_None) SetError(msg);
 
   if ((msg = BuildVKDictionary(fk)) != CERR_None) SetError(msg);  // I3438
+
+  if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) SetError(msg);
 
   delete str;
 
@@ -894,6 +891,8 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
 
   safe_wcsncpy(gp->szName, q, SZMAX_GROUPNAME);
 
+  gp->Line = currentLine;
+
   if (FSaveDebug)
   {
     WCHAR tstr[128];
@@ -902,7 +901,7 @@ DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
     AddDebugStore(fk, tstr);
   }
 
-  return CERR_None;
+  return CheckForDuplicateGroup(fk, gp);
 }
 
 int cmpkeys(const void *key, const void *elem)
@@ -943,7 +942,7 @@ DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
   if ((msg = ExpandCapsRulesForGroup(fk, gp)) != CERR_None) return msg;
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), cmpkeys);
 
-  return CERR_None;
+  return VerifyUnreachableRules(gp);
 }
 
 /***************************************
@@ -1025,7 +1024,7 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
   if (i > 0)
     if ((msg = ProcessSystemStore(fk, i, sp)) != CERR_None) return msg;
 
-  return CERR_None;
+  return CheckForDuplicateStore(fk, sp);
 }
 
 DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID)
@@ -1284,17 +1283,30 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 
       delete[] sp->dpString;
       sp->dpString = q;
+
+      if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+        return msg;
+      }
     }
     break;
   case TSS_KMW_RTL:
-  case TSS_KMW_HELPFILE:
   case TSS_KMW_HELPTEXT:
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
+    break;
+
+  case TSS_KMW_HELPFILE:
   case TSS_KMW_EMBEDJS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
+    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+      return msg;
+    }
     break;
 
   case TSS_KMW_EMBEDCSS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
+    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+      return msg;
+    }
     break;
 
   case TSS_TARGETS:   // I4504
@@ -1341,6 +1353,9 @@ DWORD ProcessSystemStore(PFILE_KEYBOARD fk, DWORD SystemID, PFILE_STORE sp)
 
   case TSS_LAYOUTFILE:  // I3483
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
+    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+      return msg;
+    }
     // Used by KMW compiler
     break;
 
@@ -1544,7 +1559,7 @@ DWORD
 InjectContextToReadonlyOutput(PWSTR pklOut) {
   if (pklOut[0] != UC_SENTINEL || pklOut[1] != CODE_CONTEXT) {
     if (wcslen(pklOut) > GLOBAL_BUFSIZE - 3) {
-      return CERR_MEMORY;
+      return CERR_CannotAllocateMemory;
     }
     memmove(pklOut + 2, pklOut, (wcslen(pklOut) + 1) * 2);
     pklOut[0] = UC_SENTINEL;
@@ -3450,25 +3465,6 @@ BOOL IsSameToken(PWSTR *p, PWSTR token)
   return FALSE;
 }
 
-BOOL IsRelativePath(char *p)
-{
-  // Relative path (returns TRUE):
-  //  ..\...\BITMAP.BMP
-  //  PATH\BITMAP.BMP
-  //  BITMAP.BMP
-
-  // Semi-absolute path (returns FALSE):
-  //  \...\BITMAP.BMP
-
-  // Absolute path (returns FALSE):
-  //  C:\...\BITMAP.BMP
-  //  \\SERVER\SHARE\...\BITMAP.BMP
-
-  if (*p == '\\') return FALSE;
-  if (*p && *(p + 1) == ':') return FALSE;
-
-  return TRUE;
-}
 
 DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PWSTR szName, PDWORD FileSize, PBYTE *Buf)
 {
@@ -3491,6 +3487,12 @@ DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PWSTR szName, PDWORD FileSize, PBYTE *
     strcat_s(szNewName, _countof(szNewName), ".bmp");  // I3481
     hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if (hFile == INVALID_HANDLE_VALUE) return CERR_CannotReadBitmapFile;
+  }
+
+  DWORD msg;
+
+  if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
+    return msg;
   }
 
   delete[] p;
@@ -3709,10 +3711,7 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
       ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
       if (cr == sourceIllegal) {
         // Not a valid UTF-8 file, so fall back to ANSI
-        //AddCompileMessage(CINFO_NonUnicodeFile);
-        // note, while this message is defined, for now we will not emit it
-        // because we don't support HINT/INFO messages yet and we don't want
-        // this to cause a blocking compile at this stage
+        AddCompileMessage(CHINT_NonUnicodeFile);
         poutbuf = strtowstr((PSTR)buf);
         WriteFile(hOutfile, poutbuf, (DWORD)wcslen(poutbuf) * 2, &len2, NULL);
         delete[] poutbuf;

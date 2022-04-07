@@ -172,8 +172,11 @@ class FVRegionStorage {
     sharedData.synchronize()
   }
 
-  /// Updates Keyman Engine with the list of installed keyboards. Removes all
-  /// the keyboards and reinstalls them to maintain a clean configuration.
+  /*
+   * Mostly deprecated, used only for legacy data conversion
+   * Updates Keyman Engine with the list of installed keyboards.
+   * Removes all the keyboards and reinstalls them to maintain a clean configuration.
+   */
   class func updateActiveKeyboardsList(keyboardList: FVRegionList, loadedKeyboards: [String]) {
 
     // Remove all installed keyboards first -- we'll re-add them below

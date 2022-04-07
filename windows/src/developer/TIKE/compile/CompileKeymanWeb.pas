@@ -288,28 +288,6 @@ uses
 const
   SValidIdentifierCharSet = ['A'..'Z','a'..'z','0'..'9','_'];
 
-function IsValidKeyboardVersionString(value: string): Boolean;   // I4140
-var
-  p: PChar;
-begin
-  p := PChar(value);
-  while p^ <> #0 do
-  begin
-    if not CharInSet(p^, ['0'..'9']) then
-      Exit(False);
-    while CharInSet(p^, ['0'..'9']) do Inc(p);
-
-    if p^ = '.' then
-    begin
-      Inc(p);
-      if not CharInSet(p^, ['0'..'9']) then   // I4263
-        Exit(False);
-    end;
-  end;
-
-  Result := True;
-end;
-
 var
   GCallbackW: TCompilerCallbackW = nil;
 
@@ -1363,7 +1341,17 @@ begin
     end;
   end
   else
+  try
     Result := Char.ConvertFromUtf32(ch);  // I3310
+  except
+    on EArgumentOutOfRangeException do
+    begin
+      // #6480
+      // This happens when there is an unpaired surrogate. Not technically supported
+      // by KeymanWeb, warning is issued by kmx compiler, so we won't re-warn here.
+      Result := Char(ch);
+    end;
+  end;
 end;
 
 procedure TCompileKeymanWeb.ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971

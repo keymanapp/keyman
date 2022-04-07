@@ -157,6 +157,15 @@ const
   CERR_CasedKeysMustNotIncludeShiftStates          = $406A;
   CERR_CasedKeysNotSupportedWithMnemonicLayout     = $406B;
 
+  CERR_CannotUseReadWriteGroupFromReadonlyGroup    = $406C;
+  CERR_StatementNotPermittedInReadonlyGroup        = $406D;
+  CERR_OutputInReadonlyGroup                       = $406E;
+  CERR_NewContextGroupMustBeReadonly               = $406F;
+  CERR_PostKeystrokeGroupMustBeReadonly            = $4070;
+
+  CERR_DuplicateGroup                              = $4071;
+  CERR_DuplicateStore                              = $4072;
+
   CWARN_TooManyWarnings                            = $2080;
   CWARN_OldVersion                                 = $2081;
   CWARN_BitmapNotUsed                              = $2082;
@@ -202,7 +211,7 @@ const
 
   CWARN_LanguageHeadersDeprecatedInKeyman10         = $20A5;
 
-  CINFO_NonUnicodeFile                              = $20A6;
+  CHINT_NonUnicodeFile                              = $10A6;
 
   CWARN_TooManyErrorsOrWarnings                     = $20A7;
 
@@ -214,6 +223,12 @@ const
 
   CWARN_NulNotFirstStatementInContext               = $20AB;
   CWARN_IfShouldBeAtStartOfContext                  = $20AC;
+
+  CWARN_KeyShouldIncludeNCaps                       = $20AD;
+
+  CHINT_UnreachableRule                             = $10AE;
+  CHINT_FilenameHasDifferingCase                    = $10AF;
+  CWARN_MissingFile                                 = $20B0;
 
 implementation
 

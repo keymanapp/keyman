@@ -54,10 +54,22 @@ function phaseSetBundleVersions() {
     echo "Command-line build - using provided version parameters"
   fi
 
-  # Now, to set the version.
+  # Now, to set the build number (CFBundleVersion)
+  # 1.0 is the default for all released builds. For PRs, we use 0.PR#.n, and
+  # for n, use the TeamCity build.counter variable surfaced in the env var
+  # TEAMCITY_BUILD_COUNTER to give us a unique build id. Note that
+  # CFBundleVersion cannot be longer than 18 characters.
+
+  BUILD_NUMBER=1.0
+  if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
+    if [[ $TEAMCITY_PR_NUMBER =~ ^[0-9]+$ ]]; then
+      BUILD_NUMBER=0.$TEAMCITY_PR_NUMBER.$TEAMCITY_BUILD_COUNTER
+    fi
+  fi
+
   APP_PLIST="$TARGET_BUILD_DIR/$INFOPLIST_PATH"
   echo "Setting $VERSION for $TARGET_BUILD_DIR/$INFOPLIST_PATH"
-  /usr/libexec/Plistbuddy -c "Set :CFBundleVersion $VERSION" "$APP_PLIST"
+  /usr/libexec/Plistbuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_PLIST"
   /usr/libexec/Plistbuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_PLIST"
 
   # Only attempt to write this when directly specified (otherwise, generates minor warning)
@@ -71,7 +83,7 @@ function phaseSetBundleVersions() {
   if [ -f "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist" ]; then
     DSYM_PLIST="${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist"
     echo "Setting $VERSION for $DSYM_PLIST"
-    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$DSYM_PLIST"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$DSYM_PLIST"
     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$DSYM_PLIST"
   fi
 }

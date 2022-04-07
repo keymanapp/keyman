@@ -26,7 +26,7 @@ public class Version: NSObject, Comparable {
 
   public static var current: Version {
     let engineInfo = Bundle(for: Manager.self).infoDictionary
-    return Version(engineInfo!["CFBundleVersion"] as! String)!
+    return Version(engineInfo!["CFBundleShortVersionString"] as! String)!
   }
 
   public static var currentTagged: Version {
@@ -52,6 +52,11 @@ public class Version: NSObject, Comparable {
   public let plainString: String
   public let fullString: String
   public let tier: Tier?
+  public var major: Int {
+    get {
+      return components[0]
+    }
+  }
 
   public init?(_ string: String) {
     let tagComponents = string.components(separatedBy: "-")

@@ -45,7 +45,7 @@ namespace KMWRecorder {
       }
 
       // Establish a fresh processor, setting its keyboard appropriately for the test.
-      let processor = new com.keyman.text.KeyboardProcessor();
+      let processor = new com.keyman.text.KeyboardProcessor(this.device);
       processor.activeKeyboard = this.keyboard;
 
       if(sequence instanceof RecordedKeystrokeSequence) {
@@ -74,7 +74,7 @@ namespace KMWRecorder {
 
           // And now, execute the keystroke!
           // We don't care too much about particularities of per-keystroke behavior yet.
-          // ... we _could_ if we wanted to, though.  The framework is mostly in place; 
+          // ... we _could_ if we wanted to, though.  The framework is mostly in place;
           // it's a matter of actually adding the feature.
           let ruleBehavior = processor.processKeystroke(keyEvent, target);
 
