@@ -309,9 +309,8 @@ function hideKeyboard() {
 }
 
 function showKeyboard() {
-  var kmw=window['keyman'];
   // Refresh KMW OSK
-  kmw.correctOSKTextSize();
+  keyman.correctOSKTextSize();
 }
 
 function showHelpBubble() {
