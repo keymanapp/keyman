@@ -1,0 +1,14 @@
+c test_6462_duplicate_store_1
+
+store(&VERSION) '10.0'
+store(&TARGETS) 'windows'
+
+store(&name) 'test 1'
+
+NAME "Still test 1"
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'ah'

@@ -79,7 +79,7 @@ struct FILE_STORE {
   BOOL fIsOption;
   BOOL fIsDebug;
   BOOL fIsCall;
-  int line;
+  int line; // TODO: int vs dword, line vs Line (see FILE_KEY, FILE_GROUP)
 	};
 
 typedef FILE_STORE *PFILE_STORE;
@@ -102,7 +102,8 @@ struct FILE_GROUP {
 	DWORD cxKeyArray;               // in array items
 	BOOL  fUsingKeys;               // group(xx) [using keys] <-- specified or not
   BOOL  fReadOnly;                // group(xx) [readonly] <-- specified or not
-	};
+  DWORD Line;
+};
 
 typedef FILE_GROUP *PFILE_GROUP;
 

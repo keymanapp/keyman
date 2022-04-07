@@ -25,7 +25,7 @@ interface
 uses
   System.UITypes,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ClearTypeDrawCharacter, UfrmTike;
+  Dialogs, StdCtrls, ClearTypeDrawCharacter, UfrmTike, mbColorPreview;
 
 type
   TBitmapEditorTextDrawPreviewEvent = procedure(ADisplayQuality: TClearTypeDisplayQuality; AInsertFont: TFont; AInsertText: WideString) of object;
@@ -41,6 +41,7 @@ type
     editFont: TEdit;
     lblQuality: TLabel;
     cmdFont: TButton;
+    cpTextColor: TmbColorPreview;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure cbDisplayQualityClick(Sender: TObject);
@@ -186,6 +187,9 @@ begin
   FInsertFont.Assign(Value);
   editText.Font := FInsertFont;
   editFont.Text := FontDetailsToString(Value);
+  if FInsertFont.Color = TframeBitmapEditor.TransparentReplacementColour
+    then cpTextColor.Color := clNone
+    else cpTextColor.Color := FInsertFont.Color;
   DrawPreview;
 end;
 

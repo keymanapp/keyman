@@ -102,12 +102,30 @@ for details on building Linux packages for Keyman.
 
 ## Testing
 
-The unit tests can be running with the following command:
+### keyman-config
+
+The unit tests can be run with the following command:
 
 ```bash
 cd linux/keyman-config
 ./run-tests.sh
 ```
+
+### ibus-keyman
+
+If you want to run the ibus-keyman tests with Wayland, you'll have to
+have `mutter` installed (version >=40). Otherwise you'll only be able
+to run the tests with X11.
+
+The tests can be run with the following command:
+
+```bash
+cd linux/ibus-keyman/tests
+./run-tests
+```
+
+The `run-tests` script accepts different arguments which can be seen with
+`./run-tests --help`.
 
 ## Running Keyman for Linux
 

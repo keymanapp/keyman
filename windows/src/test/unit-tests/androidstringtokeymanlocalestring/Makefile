@@ -5,7 +5,7 @@
 !include ..\..\..\Defines.mak
 
 test: build
-    -$(WIN32_TARGET_PATH)\androidstringtokeymanlocalestring.exe -b -exit:continue
+    $(WIN32_TARGET_PATH)\androidstringtokeymanlocalestring.exe -b -exit:continue
 
 build:
     $(DELPHI_MSBUILD) androidstringtokeymanlocalestring.dproj

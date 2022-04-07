@@ -7,9 +7,9 @@
 !include ..\..\..\Defines.mak
 
 test: build
-    test.bat "$(PROGRAM)\developer\kmcomp.exe"
-  
-build: 
+    test.bat -c "$(PROGRAM)\developer\kmcomp.exe"
+
+build:
     rem Nothing to do
 
 clean: def-clean

@@ -152,6 +152,15 @@ begin
   writeln;
 end;
 
+function CmdLineToArray: TArray<string>;
+var
+  i: Integer;
+begin
+  SetLength(Result, ParamCount);
+  for i := 1 to ParamCount do
+    Result[i-1] := ParamStr(i);
+end;
+
 function DoRun: Boolean;
 var
   FParameters: TKMConvertParameters;
@@ -161,10 +170,13 @@ begin
   // convert transforms keyboards from one format to another
   // and also generates template projects, etc.
 
-  if not FParameters.CheckParams then
+  if not FParameters.CheckParams(CmdLineToArray) then
   begin
-    WriteBanner;
-    FParameters.WriteUsage;
+    if FParameters.EmitUsage then
+    begin
+      WriteBanner;
+      FParameters.WriteUsage;
+    end;
     Exit;
   end;
 

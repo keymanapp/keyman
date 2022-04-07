@@ -1,0 +1,14 @@
+c test_6462_duplicate_group_1
+
+store(&VERSION) '10.0'
+store(&TARGETS) 'windows'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'ah'
+
+group(main) using keys
+
++ [K_C] > 'duplicate!'
