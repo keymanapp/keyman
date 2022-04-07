@@ -1341,7 +1341,17 @@ begin
     end;
   end
   else
+  try
     Result := Char.ConvertFromUtf32(ch);  // I3310
+  except
+    on EArgumentOutOfRangeException do
+    begin
+      // #6480
+      // This happens when there is an unpaired surrogate. Not technically supported
+      // by KeymanWeb, warning is issued by kmx compiler, so we won't re-warn here.
+      Result := Char(ch);
+    end;
+  end;
 end;
 
 procedure TCompileKeymanWeb.ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971
