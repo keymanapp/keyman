@@ -26,7 +26,7 @@ public class Version: NSObject, Comparable {
 
   public static var current: Version {
     let engineInfo = Bundle(for: Manager.self).infoDictionary
-    return Version(engineInfo!["CFBundleVersion"] as! String)!
+    return Version(engineInfo!["CFBundleShortVersionString"] as! String)!
   }
 
   public static var currentTagged: Version {
