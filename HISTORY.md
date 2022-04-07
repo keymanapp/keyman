@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.7 alpha 2022-04-07
+
+* chore: beta to master B15S6 (#6490)
+* fix(ios): use CFBundleShortVersionString for version (#6496)
+
 ## 16.0.6 alpha 2022-04-05
 
 * chore(deps): bump ansi-regex from 3.0.0 to 3.0.1 in /web/testing/regression-tests (#6470)

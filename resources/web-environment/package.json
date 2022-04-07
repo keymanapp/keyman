@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/web-environment",
-  "version": "16.0.7",
+  "version": "16.0.8",
   "description": "A compilation utility for passing select environment variables into our TS builds",
   "author": "Joshua Horton <joshua_horton@sil.org> (https://github.com/jahorton)",
   "homepage": "https://github.com/keymanapp/keyman",
@@ -17,6 +17,6 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "@keymanapp/resources-gosh": "^16.0.7"
+    "@keymanapp/resources-gosh": "^16.0.8"
   }
 }
