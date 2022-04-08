@@ -187,10 +187,14 @@ begin
   try
     CanonicalTag := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Tag);
     lang := GetKeyboardLanguage(KeyboardID, CanonicalTag);
-    KL.Log('BCP47Tag = %s, CanonicalTag = %s, lang.BCP47Code = %s', [BCP47Tag, CanonicalTag, lang.BCP47Code]);
     if lang = nil then
+    begin
       // The keyboard was not found
+      KL.Log('lang not found: BCP47Tag = %s, CanonicalTag = %s', [BCP47Tag, CanonicalTag]);
       Exit(False);
+    end;
+
+    KL.Log('BCP47Tag = %s, CanonicalTag = %s, lang.BCP47Code = %s', [BCP47Tag, CanonicalTag, lang.BCP47Code]);
 
     if lang.IsInstalled then
       // After canonicalization, we may find the language is already installed
