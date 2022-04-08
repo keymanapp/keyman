@@ -20,7 +20,7 @@ class ModelCompositor {
   protected isWhitespace(transform: Transform): boolean {
     // Matches prefixed text + any instance of a character with Unicode general property Z* or the following: CR, LF, and Tab.
     let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u202f\u205f\u3000]/i;
-
+    
     // Filter out null-inserts; their high probability can cause issues.
     if(transform.insert == '') { // Can actually register as 'whitespace'.
       return false;
@@ -75,15 +75,15 @@ class ModelCompositor {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
     } else if(transformDistribution.length == 0) {
       /*
-         Robust stop-gap: if our other filters somehow fail, this fixes the
+         Robust stop-gap: if our other filters somehow fail, this fixes the 
          zero-length array by making it match the form of the array that
-         would result if it were instead called with the other legal
+         would result if it were instead called with the other legal 
          parameter type - a single Transform.
 
-         Unfortunately, the method will lack all data about even
-         the original keystroke that resulted in the call... but this way,
-         we can at least get some predictions rather than shortcutting
-         and producing none whatsoever.
+         Unfortunately, the method will lack all data about even 
+         the original keystroke that resulted in the call... but this way, 
+         we can at least get some predictions rather than shortcutting 
+         and producing none whatsoever.      
       */
       transformDistribution.push({
         sample: {
@@ -145,16 +145,16 @@ class ModelCompositor {
       // Running in bulk over all suggestions, duplicate entries may be possible.
       rawPredictions = this.predictFromCorrections(predictionRoots, context);
     } else {
-      contextState = this.contextTracker.analyzeState(this.lexicalModel,
+      contextState = this.contextTracker.analyzeState(this.lexicalModel, 
                                                       postContext,
-                                                      !this.isEmpty(inputTransform) ?
-                                                                    transformDistribution:
+                                                      !this.isEmpty(inputTransform) ? 
+                                                                    transformDistribution: 
                                                                     null
                                                       );
 
       // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
       //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
-
+      
       // Rather than go "full hog" and make a priority queue out of the eventual, future competing search spaces...
       // let's just note that right now, there will only ever be one.
       //
@@ -180,7 +180,7 @@ class ModelCompositor {
         // Corrections obtained:  now to predict from them!
         let predictionRoots = matches.map(function(match) {
           let correction = match.matchString;
-
+          
           // Worth considering:  extend Traversal to allow direct prediction lookups?
           // let traversal = match.finalTraversal;
 
@@ -209,7 +209,7 @@ class ModelCompositor {
           // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
-            deleteLeft: deleteLeft,
+            deleteLeft: deleteLeft, 
             id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
@@ -247,12 +247,12 @@ class ModelCompositor {
             });
 
             // If the best suggestion from the search's current tier fails to beat the worst
-            // pending suggestion from previous tiers, assume all further corrections will
+            // pending suggestion from previous tiers, assume all further corrections will 
             // similarly fail to win; terminate the search-loop.
             if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
               break;
             }
-          }
+          } 
         }
       }
     }
@@ -369,7 +369,7 @@ class ModelCompositor {
       suggestions = [ keepOption as Suggestion ].concat(suggestions);
     }
 
-    // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.
+    // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.  
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
 
     let compositor = this;
@@ -386,8 +386,8 @@ class ModelCompositor {
         if(tokenization && tokenization.caretSplitsToken) {
           // While we wait on the ability to provide a more 'ideal' solution, let's at least
           // go with a more stable, if slightly less ideal, solution for now.
-          //
-          // A predictive text default (on iOS, at least) - immediately wordbreak
+          // 
+          // A predictive text default (on iOS, at least) - immediately wordbreak 
           // on suggestions accepted mid-word.
           suggestion.transform.insert += punctuation.insertAfterWord;
         }
@@ -401,7 +401,7 @@ class ModelCompositor {
         // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
         // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
         let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
-
+        
         // Assignment via by-reference behavior, as suggestion is an object
         mutableSuggestion.transform = mergedTransform;
       }
@@ -439,16 +439,16 @@ class ModelCompositor {
     suggestion.displayAs = this.lexicalModel.applyCasing(casingForm, suggestion.displayAs);
   }
 
-  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>,
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
     annotationType: SuggestionTag,
     quoteBehavior?: models.QuoteBehavior): Outcome<Suggestion>;
   private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>,
     annotationType: 'keep',
     quoteBehavior?: models.QuoteBehavior): Outcome<Keep>;
-  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>,
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
     annotationType: 'revert',
     quoteBehavior?: models.QuoteBehavior): Outcome<Reversion>;
-  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>,
+  private toAnnotatedSuggestion(suggestion: Outcome<Suggestion>, 
                                 annotationType: SuggestionTag,
                                 quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default): Outcome<Suggestion> {
     // A method-internal 'import' of the enum.
@@ -457,7 +457,7 @@ class ModelCompositor {
     let defaultQuoteBehavior = QuoteBehavior.noQuotes;
     if(annotationType == 'keep' || annotationType == 'revert') {
       defaultQuoteBehavior = QuoteBehavior.useQuotes;
-    }
+    } 
 
     return {
       transform: suggestion.transform,
@@ -536,7 +536,7 @@ class ModelCompositor {
 
     let firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
-
+    
     // Build the actual Reversion, which is technically an annotated Suggestion.
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
@@ -545,7 +545,7 @@ class ModelCompositor {
       reversion.transformId = -suggestion.transformId;
     }
     if(suggestion.id != null) {
-      // Since a reversion inverts its source suggestion, we set its ID to be the
+      // Since a reversion inverts its source suggestion, we set its ID to be the 
       // additive inverse of the source suggestion's ID.  Makes easy mapping /
       // verification later.
       reversion.id = -suggestion.id;
@@ -553,14 +553,14 @@ class ModelCompositor {
       reversion.id = -this.SUGGESTION_ID_SEED;
       this.SUGGESTION_ID_SEED++;
     }
-
+    
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
     if(this.contextTracker) {
       let contextState = this.contextTracker.newest;
       if(!contextState) {
         contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
       }
-
+      
       contextState.tail.activeReplacementId = suggestion.id;
       let acceptedContext = models.applyTransform(suggestion.transform, context);
       this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
@@ -680,11 +680,6 @@ class ModelCompositor {
       throw "Invalid LMLayer state:  languageUsesCasing is set to true, but no applyCasing function exists";
     }
 
-    // If the user has selected Shift or Caps layer, that overrides our
-    // text analysis
-    if(context.casingForm == 'upper' || context.casingForm == 'initial') {
-      return context.casingForm;
-    }
     if(model.applyCasing('lower', text) == text) {
       return 'lower';
     } else if(model.applyCasing('upper', text) == text) {
@@ -694,9 +689,8 @@ class ModelCompositor {
       // We check 'initial' last, as upper-case input is indistinguishable.
       return 'initial';
     } else {
-      // If we do not have a casing form given to us by the keyboard, then
       // 'null' is returned when no casing pattern matches the input.
-      return context.casingForm ?? null;
+      return null;
     }
   }
 }

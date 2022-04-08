@@ -317,7 +317,7 @@ namespace com.keyman.dom {
        // Now that we've fully entered the new context, invalidate the context so we can generate initial predictions from it.
       if(this.keyman.modelManager) {
         let outputTarget = dom.Utils.getOutputTarget(lastElem);
-        this.keyman.core.languageProcessor.invalidateContext(outputTarget, this.keyman.core.keyboardProcessor?.layerId);
+        this.keyman.core.languageProcessor.invalidateContext(outputTarget);
       }
     }
 
@@ -375,7 +375,7 @@ namespace com.keyman.dom {
       }
 
       if(keyman.core.languageProcessor.isActive) {
-        keyman.core.languageProcessor.predictFromTarget(outputTarget, keyman.core.keyboardProcessor?.layerId);
+        keyman.core.languageProcessor.predictFromTarget(outputTarget);
       }
       return false;
     }
