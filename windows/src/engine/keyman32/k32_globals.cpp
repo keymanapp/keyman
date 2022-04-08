@@ -94,6 +94,8 @@ UINT
 BOOL
   flag_ShouldSerializeInput = TRUE;
 
+BOOL isKeymanKeyboardActive = FALSE;
+
 static DWORD dwTlsIndex = TLS_OUT_OF_INDEXES;
 static CRITICAL_SECTION csGlobals;
 
