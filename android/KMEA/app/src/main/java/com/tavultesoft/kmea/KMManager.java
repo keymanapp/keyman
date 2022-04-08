@@ -647,6 +647,12 @@ public final class KMManager {
     }
   }
 
+  public static void showSystemKeyboard() {
+    if (SystemKeyboard != null) {
+      SystemKeyboard.showKeyboard();
+    }
+  }
+
   public static boolean isKeyboardLoaded(KeyboardType type) {
     if (type == KeyboardType.KEYBOARD_TYPE_INAPP) {
       return InAppKeyboardLoaded;
