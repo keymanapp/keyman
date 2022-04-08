@@ -13,9 +13,7 @@ namespace com.keyman.text {
     startOfBuffer: boolean;
     endOfBuffer: boolean;
 
-    casingForm?: CasingForm;
-
-    constructor(mock: Mock, config: Configuration, layerId: string) {
+    constructor(mock: Mock, config: Configuration) {
       this.left = mock.getTextBeforeCaret();
       this.startOfBuffer = this.left._kmwLength() <= config.leftContextCodePoints;
       if(!this.startOfBuffer) {
@@ -28,11 +26,6 @@ namespace com.keyman.text {
       if(!this.endOfBuffer) {
         this.right = this.right._kmwSubstr(0, config.rightContextCodePoints);
       }
-
-      this.casingForm =
-        layerId == 'shift' ? 'initial' :
-        layerId == 'caps' ? 'upper' :
-        null;
     }
 
     public toMock(): Mock {

@@ -141,7 +141,108 @@ namespace com.keyman.text {
 
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(ruleBehavior != null) {
-        let alternates = this.buildAlternates(ruleBehavior, keyEvent, preInputMock);
+        let alternates: Alternate[];
+
+        // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
+        // Also, don't do fat-finger stuff if predictive text isn't enabled.
+        if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
+          let keyDistribution = keyEvent.keyDistribution;
+
+          // We don't need to track absolute indexing during alternate-generation;
+          // only position-relative, so it's better to use a sliding window for context
+          // when making alternates.  (Slightly worse for short text, matters greatly
+          // for long text.)
+          let contextWindow = new ContextWindow(preInputMock, ContextWindow.ENGINE_RULE_WINDOW);
+          let windowedMock = contextWindow.toMock();
+
+          // Note - we don't yet do fat-fingering with longpress keys.
+          if(keyDistribution && keyEvent.kbdLayer) {
+            // Tracks a 'deadline' for fat-finger ops, just in case both context is long enough
+            // and device is slow enough that the calculation takes too long.
+            //
+            // Consider use of https://developer.mozilla.org/en-US/docs/Web/API/Performance/now instead?
+            // Would allow finer-tuned control.
+            let TIMEOUT_THRESHOLD: number = Number.MAX_VALUE;
+            let _globalThis = com.keyman.utils.getGlobalObject();
+            let timer: () => number;
+
+            // Available by default on `window` in browsers, but _not_ on `global` in Node,
+            // surprisingly.  Since we can't use code dependent on `require` statements
+            // at present, we have to condition upon it actually existing.
+            if(_globalThis['performance'] && _globalThis['performance']['now']) {
+              timer = function() {
+                return _globalThis['performance']['now']();
+              };
+
+              TIMEOUT_THRESHOLD = timer() + 16; // + 16ms.
+            } // else {
+              // We _could_ just use Date.now() as a backup... but that (probably) only matters
+              // when unit testing.  So... we actually don't _need_ time thresholding when in
+              // a Node environment.
+            // }
+
+            // Tracks a minimum probability for keystroke probability.  Anything less will not be
+            // included in alternate calculations.
+            //
+            // Seek to match SearchSpace.EDIT_DISTANCE_COST_SCALE from the predictive-text engine.
+            // Reasoning for the selected value may be seen there.  Short version - keystrokes
+            // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
+            let KEYSTROKE_EPSILON = Math.exp(-5);
+
+            // Sort the distribution into probability-descending order.
+            keyDistribution.sort((a, b) => b.p - a.p);
+
+            let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
+            alternates = [];
+
+            let totalMass = 0; // Tracks sum of non-error probabilities.
+            for(let pair of keyDistribution) {
+              if(pair.p < KEYSTROKE_EPSILON) {
+                break;
+              } else if(timer && timer() >= TIMEOUT_THRESHOLD) {
+                // Note:  it's always possible that the thread _executing_ our JS
+                // got paused by the OS, even if JS itself is single-threaded.
+                //
+                // The case where `alternates` is initialized (line 167) but empty
+                // (because of net-zero loop iterations) MUST be handled.
+                break;
+              }
+
+              let mock = Mock.from(windowedMock, false);
+
+              let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
+              if(!altKey) {
+                console.warn("Potential fat-finger key could not be found in layer!");
+                continue;
+              }
+
+              let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, keyEvent.device);
+              let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
+
+              // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
+              // so we expect users to never intend their use.
+              //
+              // Also possible that this set of conditions fail for all evaluated alternates.
+              if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
+                let transform: Transform = alternateBehavior.transcription.transform;
+
+                // Ensure that the alternate's token id matches that of the current keystroke, as we only
+                // record the matched rule's context (since they match)
+                transform.id = ruleBehavior.transcription.token;
+                alternates.push({sample: transform, 'p': pair.p});
+                totalMass += pair.p;
+              }
+            }
+
+            // Renormalizes the distribution, as any error (beep) results
+            // will result in a distribution that doesn't sum to 1 otherwise.
+            // All `.p` values are strictly positive, so totalMass is
+            // guaranteed to be > 0 if the array has entries.
+            alternates.forEach(function(alt) {
+              alt.p /= totalMass;
+            });
+          }
+        }
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
@@ -153,150 +254,38 @@ namespace com.keyman.text {
         if(alternates && alternates.length > 0) {
           ruleBehavior.transcription.alternates = alternates;
         }
-      } else {
-        // We need a dummy RuleBehavior for keys which have no output (e.g. Shift)
-        ruleBehavior = new RuleBehavior();
-        ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
-        ruleBehavior.triggersDefaultCommand = true;
-      }
+        // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
+        ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription);
 
-      // The keyboard may want to take an action after all other keystroke processing is
-      // finished, for example to switch layers. This action may not have any output
-      // but may change system store or variable store values. Given this, we don't need to
-      // save anything about the post behavior, after finalizing it
+        // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
+        if(!ruleBehavior.triggersDefaultCommand) {
+          // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
+          outputTarget.doInputEvent();
+        }
 
-      // We need to tell the keyboard if the layer has been changed, either by a keyboard rule itself,
-      // or by the touch layout 'nextlayer' control.
-      const hasLayerChanged = ruleBehavior.setStore[KeyboardInterface.TSS_LAYER] || keyEvent.kNextLayer;
-      this.keyboardProcessor.newLayerStore.set(hasLayerChanged ? this.keyboardProcessor.layerId : '');
-      this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
+        // The keyboard may want to take an action after all other keystroke processing is
+        // finished, for example to switch layers. This action may not have any output
+        // but may change system store or variable store values. Given this, we don't need to
+        // save anything about the post behavior, after finalizing it
 
-      let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(keyEvent.device, outputTarget);
-      if(postRuleBehavior) {
-        postRuleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
-      }
+        // We need to tell the keyboard if the layer has been changed, either by a keyboard rule itself,
+        // or by the touch layout 'nextlayer' control.
+        const hasLayerChanged = ruleBehavior.setStore[KeyboardInterface.TSS_LAYER] || keyEvent.kNextLayer;
+        this.keyboardProcessor.newLayerStore.set(hasLayerChanged ? this.keyboardProcessor.layerId : '');
+        this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
 
-      // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
-      ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription, this.keyboardProcessor.layerId);
-
-      // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
-      if(!ruleBehavior.triggersDefaultCommand) {
-        // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
-        outputTarget.doInputEvent();
+        let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(keyEvent.device, outputTarget);
+        if(postRuleBehavior) {
+          postRuleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
+        }
       }
 
       return ruleBehavior;
     }
 
-    private buildAlternates(ruleBehavior: RuleBehavior, keyEvent: KeyEvent, preInputMock: Mock): Alternate[] {
-      let alternates: Alternate[];
-
-      // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
-      // Also, don't do fat-finger stuff if predictive text isn't enabled.
-      if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
-        let keyDistribution = keyEvent.keyDistribution;
-
-        // We don't need to track absolute indexing during alternate-generation;
-        // only position-relative, so it's better to use a sliding window for context
-        // when making alternates.  (Slightly worse for short text, matters greatly
-        // for long text.)
-        let contextWindow = new ContextWindow(preInputMock, ContextWindow.ENGINE_RULE_WINDOW, this.keyboardProcessor.layerId);
-        let windowedMock = contextWindow.toMock();
-
-        // Note - we don't yet do fat-fingering with longpress keys.
-        if(keyDistribution && keyEvent.kbdLayer) {
-          // Tracks a 'deadline' for fat-finger ops, just in case both context is long enough
-          // and device is slow enough that the calculation takes too long.
-          //
-          // Consider use of https://developer.mozilla.org/en-US/docs/Web/API/Performance/now instead?
-          // Would allow finer-tuned control.
-          let TIMEOUT_THRESHOLD: number = Number.MAX_VALUE;
-          let _globalThis = com.keyman.utils.getGlobalObject();
-          let timer: () => number;
-
-          // Available by default on `window` in browsers, but _not_ on `global` in Node,
-          // surprisingly.  Since we can't use code dependent on `require` statements
-          // at present, we have to condition upon it actually existing.
-          if(_globalThis['performance'] && _globalThis['performance']['now']) {
-            timer = function() {
-              return _globalThis['performance']['now']();
-            };
-
-            TIMEOUT_THRESHOLD = timer() + 16; // + 16ms.
-          } // else {
-            // We _could_ just use Date.now() as a backup... but that (probably) only matters
-            // when unit testing.  So... we actually don't _need_ time thresholding when in
-            // a Node environment.
-          // }
-
-          // Tracks a minimum probability for keystroke probability.  Anything less will not be
-          // included in alternate calculations.
-          //
-          // Seek to match SearchSpace.EDIT_DISTANCE_COST_SCALE from the predictive-text engine.
-          // Reasoning for the selected value may be seen there.  Short version - keystrokes
-          // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
-          let KEYSTROKE_EPSILON = Math.exp(-5);
-
-          // Sort the distribution into probability-descending order.
-          keyDistribution.sort((a, b) => b.p - a.p);
-
-          let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
-          alternates = [];
-
-          let totalMass = 0; // Tracks sum of non-error probabilities.
-          for(let pair of keyDistribution) {
-            if(pair.p < KEYSTROKE_EPSILON) {
-              break;
-            } else if(timer && timer() >= TIMEOUT_THRESHOLD) {
-              // Note:  it's always possible that the thread _executing_ our JS
-              // got paused by the OS, even if JS itself is single-threaded.
-              //
-              // The case where `alternates` is initialized (line 167) but empty
-              // (because of net-zero loop iterations) MUST be handled.
-              break;
-            }
-
-            let mock = Mock.from(windowedMock, false);
-
-            let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
-            if(!altKey) {
-              console.warn("Potential fat-finger key could not be found in layer!");
-              continue;
-            }
-
-            let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, keyEvent.device);
-            let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
-
-            // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
-            // so we expect users to never intend their use.
-            //
-            // Also possible that this set of conditions fail for all evaluated alternates.
-            if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
-              let transform: Transform = alternateBehavior.transcription.transform;
-
-              // Ensure that the alternate's token id matches that of the current keystroke, as we only
-              // record the matched rule's context (since they match)
-              transform.id = ruleBehavior.transcription.token;
-              alternates.push({sample: transform, 'p': pair.p});
-              totalMass += pair.p;
-            }
-          }
-
-          // Renormalizes the distribution, as any error (beep) results
-          // will result in a distribution that doesn't sum to 1 otherwise.
-          // All `.p` values are strictly positive, so totalMass is
-          // guaranteed to be > 0 if the array has entries.
-          alternates.forEach(function(alt) {
-            alt.p /= totalMass;
-          });
-        }
-      }
-      return alternates;
-    }
-
     public resetContext(outputTarget?: OutputTarget) {
       this.keyboardProcessor.resetContext();
-      this.languageProcessor.invalidateContext(outputTarget, this.keyboardProcessor.layerId);
+      this.languageProcessor.invalidateContext(outputTarget);
 
       // Let the keyboard do its initial group processing
       //console.log('processNewContextEvent called from resetContext');
