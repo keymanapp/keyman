@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.230 beta 2022-04-08
+
+* fix(android/engine): Show keyboard after rotating (#6498)
+* fix(windows): don't log before checking nil when installing keyboard (#6505)
+* chore: Revert "feat(web): prediction casing follows current layer" (#6510)
+* chore(linux): Update changelog file (#6500)
+* fix(windows): framework for switching of pipeline (#6392)
+
 ## 15.0.229 beta 2022-04-07
 
 * fix(iOS): check version during package install (#6479)
