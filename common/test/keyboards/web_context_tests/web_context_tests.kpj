@@ -12,7 +12,7 @@
       <ID>id_83bd7f5f7597798cfb2e5721191fb995</ID>
       <Filename>web_context_tests.kmn</Filename>
       <Filepath>source\web_context_tests.kmn</Filepath>
-      <FileVersion>1.0</FileVersion>
+      <FileVersion>1.1</FileVersion>
       <FileType>.kmn</FileType>
       <Details>
         <Name>web_context_tests</Name>
@@ -96,6 +96,22 @@
       <Filepath>source\readme.htm</Filepath>
       <FileVersion></FileVersion>
       <FileType>.htm</FileType>
+      <ParentFileID>id_da027d4a221ffc8f298eba6a0b8936fc</ParentFileID>
+    </File>
+    <File>
+      <ID>id_ef0d4e6917e0b21ca6b8e1cd5152e161</ID>
+      <Filename>NotoSansOldItalic-Regular.ttf</Filename>
+      <Filepath>source\..\assets\NotoSansOldItalic-Regular.ttf</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.ttf</FileType>
+      <ParentFileID>id_da027d4a221ffc8f298eba6a0b8936fc</ParentFileID>
+    </File>
+    <File>
+      <ID>id_687b874531c874a9737a529d404e579f</ID>
+      <Filename>OFL.txt</Filename>
+      <Filepath>source\..\assets\OFL.txt</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.txt</FileType>
       <ParentFileID>id_da027d4a221ffc8f298eba6a0b8936fc</ParentFileID>
     </File>
   </Files>

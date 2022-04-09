@@ -2962,16 +2962,7 @@ public final class KMManager {
       }
 
       // Count the number of characters which are surrogate pairs
-      int index = lastIndex, dnx = dn, numPairs = 0;
-      while(index > 0 && dnx > 0) {
-        if(Character.isLowSurrogate(charsBackup.charAt(index)) &&
-            Character.isHighSurrogate(charsBackup.charAt(index-1))) {
-          numPairs++;
-          index--;
-        }
-        index--;
-        dnx--;
-      }
+      int numPairs = CharSequenceUtil.countSurrogatePairs(charsBackup, dn);
 
       // Chop dn+numPairs code points from the end of charsBackup
       // subSequence indices are start(inclusive) to end(exclusive)
