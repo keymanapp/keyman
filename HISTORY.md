@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.231 beta 2022-04-09
+
+* test(common/resources): Add Noto font to web_context_tests keyboard (#6488)
+
 ## 15.0.230 beta 2022-04-08
 
 * fix(android/engine): Show keyboard after rotating (#6498)
