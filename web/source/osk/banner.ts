@@ -263,7 +263,7 @@ namespace com.keyman.osk {
         keyman.core.languageProcessor.applyReversion(this._suggestion as Reversion, target);
         return null;
       } else {
-        return keyman.core.languageProcessor.applySuggestion(this.suggestion, target);
+        return keyman.core.languageProcessor.applySuggestion(this.suggestion, target, () => keyman.core.keyboardProcessor.layerId);
       }
     }
 
@@ -416,7 +416,7 @@ namespace com.keyman.osk {
     postConfigure() {
       let keyman = com.keyman.singleton;
       // Trigger a null-based initial prediction to kick things off.
-      keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget());
+      keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget(), keyman.core.keyboardProcessor.layerId);
     }
 
     deactivate() {
