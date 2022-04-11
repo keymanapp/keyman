@@ -1,0 +1,92 @@
+﻿c vowel_hater generated from template at 2022-04-11 11:51:48
+c with name "Vowel Hater"
+c
+c This test-oriented keyboard "hates" words with more than two consecutive vowels.
+c In order to test within-word applications of non-final rule matching with final rule non-matching,
+c Vowels are NOT emitted by keyboard rule; only by 'default' behavior.
+
+store(&VERSION) '10.0'
+store(&NAME) 'Vowel Hater'
+store(&COPYRIGHT) '© SIL Int' U+0027 'l'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'vowel_hater.kvks'
+store(&LAYOUTFILE) 'vowel_hater.keyman-touch-layout'
+
+store(vowels) 'aeiouAEIOU' c Doesn't hate 'y' or 'Y'.
+
+begin Unicode > use(main)
+
+group(main) using keys
++ [SHIFT K_N] > 'N'
++ [SHIFT K_B] > 'B'
++ [SHIFT K_V] > 'V'
++ [SHIFT K_C] > 'C'
++ [SHIFT K_X] > 'X'
++ [SHIFT K_Z] > 'Z'
++ [SHIFT K_L] > 'L'
++ [SHIFT K_K] > 'K'
++ [SHIFT K_J] > 'J'
++ [SHIFT K_H] > 'H'
++ [SHIFT K_G] > 'G'
++ [SHIFT K_F] > 'F'
++ [SHIFT K_D] > 'D'
++ [SHIFT K_S] > 'S'
++ [SHIFT K_P] > 'P'
++ [SHIFT K_Y] > 'Y'
++ [SHIFT K_T] > 'T'
++ [SHIFT K_R] > 'R'
++ [SHIFT K_W] > 'W'
++ [SHIFT K_Q] > 'Q'
++ [SHIFT K_M] > 'M'
++ [K_M] > 'm'
++ [K_N] > 'n'
++ [K_B] > 'b'
++ [K_V] > 'v'
++ [K_C] > 'c'
++ [K_X] > 'x'
++ [K_Z] > 'z'
++ [K_L] > 'l'
++ [K_K] > 'k'
++ [K_J] > 'j'
++ [K_H] > 'h'
++ [K_G] > 'g'
++ [K_F] > 'f'
++ [K_D] > 'd'
++ [K_S] > 's'
++ [K_P] > 'p'
++ [K_Y] > 'y'
++ [K_T] > 't'
++ [K_R] > 'r'
++ [K_W] > 'w'
++ [K_Q] > 'q'
+
+c Vowel-hating pass 1
++ [K_A] > use(vowel_tolerance)
++ [K_E] > use(vowel_tolerance)
++ [K_I] > use(vowel_tolerance)
++ [K_O] > use(vowel_tolerance)
++ [K_U] > use(vowel_tolerance)
++ [SHIFT K_A] > use(vowel_tolerance)
++ [SHIFT K_E] > use(vowel_tolerance)
++ [SHIFT K_I] > use(vowel_tolerance)
++ [SHIFT K_O] > use(vowel_tolerance)
++ [SHIFT K_U] > use(vowel_tolerance)
+
+c Vowel-hating pass 2
+group(vowel_tolerance) using keys
+
+c By matching a contiguous vowel pair, further contiguous vowels will be blocked.
+c Note that 'tolerated' vowels are only emitted due to default behavior.
+
+any(vowels) any(vowels) + [K_A] > context(1) context(2)
+any(vowels) any(vowels) + [K_E] > context(1) context(2)
+any(vowels) any(vowels) + [K_I] > context(1) context(2)
+any(vowels) any(vowels) + [K_O] > context(1) context(2)
+any(vowels) any(vowels) + [K_U] > context(1) context(2)
+
+any(vowels) any(vowels) + [SHIFT K_A] > context(1) context(2)
+any(vowels) any(vowels) + [SHIFT K_E] > context(1) context(2)
+any(vowels) any(vowels) + [SHIFT K_I] > context(1) context(2)
+any(vowels) any(vowels) + [SHIFT K_O] > context(1) context(2)
+any(vowels) any(vowels) + [SHIFT K_U] > context(1) context(2)
