@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.232 beta 2022-04-11
+
+* fix(linux): Remove tab completion warning (#6482)
+
 ## 15.0.231 beta 2022-04-09
 
 * test(common/resources): Add Noto font to web_context_tests keyboard (#6488)
