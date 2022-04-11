@@ -1,8 +1,11 @@
 #!/usr/bin/python3
+import os
+import tempfile
 import unittest
 from unittest.mock import patch, ANY
-
-from keyman_config.install_kmp import InstallKmp
+from keyman_config import __version__
+from keyman_config.get_kmp import InstallLocation
+from keyman_config.install_kmp import InstallError, InstallKmp
 
 
 class InstallKmpTests(unittest.TestCase):
@@ -182,7 +185,7 @@ class InstallKmpTests(unittest.TestCase):
             {'id': 'dyo'}
         ]
 
-        for data in [
+        for testcase in [
             {'given': 'de', 'expected': 'de'},
             {'given': 'esi', 'expected': 'esi-Latn'},
             {'given': 'esi-Latn', 'expected': 'esi-Latn'},
@@ -193,12 +196,12 @@ class InstallKmpTests(unittest.TestCase):
             {'given': 'dyo-latn', 'expected': 'dyo-Latn'},
             {'given': 'dyo', 'expected': 'dyo-Latn'},
         ]:
-            with self.subTest(data = data):
+            with self.subTest(data=testcase):
                 # Execute
-                result = InstallKmp()._normalize_language(languages, data['given'])
+                result = InstallKmp()._normalize_language(languages, testcase['given'])
 
                 # Verify
-                self.assertEqual(result, data['expected'])
+                self.assertEqual(result, testcase['expected'])
 
     def test_normalizeLanguage_noLanguages(self):
         # Setup
@@ -209,6 +212,215 @@ class InstallKmpTests(unittest.TestCase):
 
         # Verify
         self.assertEqual(result, '')
+
+    def test_InstallKmp_FutureKeymanVersion(self):
+        # Setup
+        workdir = tempfile.TemporaryDirectory().name
+        os.makedirs(workdir)
+        packagedir = tempfile.TemporaryDirectory().name
+        os.makedirs(packagedir)
+        patcher1 = patch('keyman_config.install_kmp.get_keyboard_dir')
+        self.mockGetKeyboardDir = patcher1.start()
+        self.addCleanup(patcher1.stop)
+        self.mockGetKeyboardDir.return_value = packagedir
+        patcher2 = patch('keyman_config.install_kmp.extract_kmp')
+        self.mockExtractKmp = patcher2.start()
+        self.addCleanup(patcher2.stop)
+        patcher3 = patch('keyman_config.install_kmp.extractico')
+        self.mockExtractIco = patcher3.start()
+        self.addCleanup(patcher3.stop)
+        patcher4 = patch('keyman_config.install_kmp.is_gnome_shell')
+        self.mockIsGnomeShell = patcher4.start()
+        self.addCleanup(patcher4.stop)
+        self.mockIsGnomeShell.return_value = False
+        kmpfile = os.path.join(workdir, 'foo.kmp')
+        with open(kmpfile, 'w') as file:
+            file.write('')
+        with open(os.path.join(packagedir, 'kmp.json'), 'w') as file:
+            file.write('''{
+                "system": {
+                    "keymanDeveloperVersion": "15.0",
+                    "fileVersion": "99.0"
+                },
+                "files": [ {
+                    "name": "khmer_angkor.kmx",
+                    "description": "Keyboard Khmer Angkor"
+                    }, {
+                    "name": "kmp.json",
+                    "description": "Package information (JSON)"
+                    } ],
+                "keyboards": [ {
+                    "name": "Khmer Angkor",
+                    "id": "khmer_angkor",
+                    "version": "1.1",
+                    "languages": [ {
+                        "name": "Central Khmer (Khmer, Cambodia)",
+                        "id": "km"
+                        } ]}
+                ]}''')
+
+        # Execute
+        with self.assertRaises(InstallError) as context:
+            InstallKmp()._install_kmp(kmpfile, False, 'km', InstallLocation.User)
+
+        # Verify
+        self.assertTrue('foo.kmp requires Keyman 99.0 or higher' in context.exception.message)
+        self.mockInstallToIbus.assert_not_called()
+
+    def test_InstallKmp_PreviousKeymanVersion(self):
+        # Setup
+        workdir = tempfile.TemporaryDirectory().name
+        os.makedirs(workdir)
+        packagedir = tempfile.TemporaryDirectory().name
+        os.makedirs(packagedir)
+        patcher1 = patch('keyman_config.install_kmp.get_keyboard_dir')
+        self.mockGetKeyboardDir = patcher1.start()
+        self.addCleanup(patcher1.stop)
+        self.mockGetKeyboardDir.return_value = packagedir
+        patcher2 = patch('keyman_config.install_kmp.extract_kmp')
+        self.mockExtractKmp = patcher2.start()
+        self.addCleanup(patcher2.stop)
+        patcher3 = patch('keyman_config.install_kmp.extractico')
+        self.mockExtractIco = patcher3.start()
+        self.addCleanup(patcher3.stop)
+        patcher4 = patch('keyman_config.install_kmp.is_gnome_shell')
+        self.mockIsGnomeShell = patcher4.start()
+        self.addCleanup(patcher4.stop)
+        self.mockIsGnomeShell.return_value = False
+        kmpfile = os.path.join(workdir, 'foo.kmp')
+        with open(kmpfile, 'w') as file:
+            file.write('')
+        with open(os.path.join(packagedir, 'kmp.json'), 'w') as file:
+            file.write('''{
+                "system": {
+                    "keymanDeveloperVersion": "15.0",
+                    "fileVersion": "7.0"
+                },
+                "files": [ {
+                    "name": "khmer_angkor.kmx",
+                    "description": "Keyboard Khmer Angkor"
+                    }, {
+                    "name": "kmp.json",
+                    "description": "Package information (JSON)"
+                    } ],
+                "keyboards": [ {
+                    "name": "Khmer Angkor",
+                    "id": "khmer_angkor",
+                    "version": "1.1",
+                    "languages": [ {
+                        "name": "Central Khmer (Khmer, Cambodia)",
+                        "id": "km"
+                        } ]}
+                ]}''')
+
+        # Execute
+        InstallKmp()._install_kmp(kmpfile, False, 'km', InstallLocation.User)
+
+        # Verify
+        self.mockInstallToIbus.assert_called_once()
+
+    def test_InstallKmp_SameKeymanVersion(self):
+        # Setup
+        workdir = tempfile.TemporaryDirectory().name
+        os.makedirs(workdir)
+        packagedir = tempfile.TemporaryDirectory().name
+        os.makedirs(packagedir)
+        patcher1 = patch('keyman_config.install_kmp.get_keyboard_dir')
+        self.mockGetKeyboardDir = patcher1.start()
+        self.addCleanup(patcher1.stop)
+        self.mockGetKeyboardDir.return_value = packagedir
+        patcher2 = patch('keyman_config.install_kmp.extract_kmp')
+        self.mockExtractKmp = patcher2.start()
+        self.addCleanup(patcher2.stop)
+        patcher3 = patch('keyman_config.install_kmp.extractico')
+        self.mockExtractIco = patcher3.start()
+        self.addCleanup(patcher3.stop)
+        patcher4 = patch('keyman_config.install_kmp.is_gnome_shell')
+        self.mockIsGnomeShell = patcher4.start()
+        self.addCleanup(patcher4.stop)
+        self.mockIsGnomeShell.return_value = False
+        kmpfile = os.path.join(workdir, 'foo.kmp')
+        with open(kmpfile, 'w') as file:
+            file.write('')
+        with open(os.path.join(packagedir, 'kmp.json'), 'w') as file:
+            file.write('''{
+                "system": {
+                    "keymanDeveloperVersion": "15.0",
+                    "fileVersion": "''' + __version__ + '''"
+                },
+                "files": [ {
+                    "name": "khmer_angkor.kmx",
+                    "description": "Keyboard Khmer Angkor"
+                    }, {
+                    "name": "kmp.json",
+                    "description": "Package information (JSON)"
+                    } ],
+                "keyboards": [ {
+                    "name": "Khmer Angkor",
+                    "id": "khmer_angkor",
+                    "version": "1.1",
+                    "languages": [ {
+                        "name": "Central Khmer (Khmer, Cambodia)",
+                        "id": "km"
+                        } ]}
+                ]}''')
+
+        # Execute
+        InstallKmp()._install_kmp(kmpfile, False, 'km', InstallLocation.User)
+
+        # Verify
+        self.mockInstallToIbus.assert_called_once()
+
+    def test_InstallKmp_NoFileVersion(self):
+        # Setup
+        workdir = tempfile.TemporaryDirectory().name
+        os.makedirs(workdir)
+        packagedir = tempfile.TemporaryDirectory().name
+        os.makedirs(packagedir)
+        patcher1 = patch('keyman_config.install_kmp.get_keyboard_dir')
+        self.mockGetKeyboardDir = patcher1.start()
+        self.addCleanup(patcher1.stop)
+        self.mockGetKeyboardDir.return_value = packagedir
+        patcher2 = patch('keyman_config.install_kmp.extract_kmp')
+        self.mockExtractKmp = patcher2.start()
+        self.addCleanup(patcher2.stop)
+        patcher3 = patch('keyman_config.install_kmp.extractico')
+        self.mockExtractIco = patcher3.start()
+        self.addCleanup(patcher3.stop)
+        patcher4 = patch('keyman_config.install_kmp.is_gnome_shell')
+        self.mockIsGnomeShell = patcher4.start()
+        self.addCleanup(patcher4.stop)
+        self.mockIsGnomeShell.return_value = False
+        kmpfile = os.path.join(workdir, 'foo.kmp')
+        with open(kmpfile, 'w') as file:
+            file.write('')
+        with open(os.path.join(packagedir, 'kmp.json'), 'w') as file:
+            file.write('''{
+                "system": {
+                    "keymanDeveloperVersion": "15.0"
+                },
+                "files": [ {
+                    "name": "khmer_angkor.kmx",
+                    "description": "Keyboard Khmer Angkor"
+                    }, {
+                    "name": "kmp.json",
+                    "description": "Package information (JSON)"
+                    } ],
+                "keyboards": [ {
+                    "name": "Khmer Angkor",
+                    "id": "khmer_angkor",
+                    "version": "1.1",
+                    "languages": [ {
+                        "name": "Central Khmer (Khmer, Cambodia)",
+                        "id": "km"
+                        } ]}
+                ]}''')
+
+        # Execute
+        InstallKmp()._install_kmp(kmpfile, False, 'km', InstallLocation.User)
+
+        # Verify
+        self.mockInstallToIbus.assert_called_once()
 
 
 if __name__ == '__main__':
