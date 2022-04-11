@@ -1,5 +1,5 @@
 /* A descriptive message used for errors when the app is already busy downloading */
-"alert-download-error-busy" = "កំពុង​តែ​ទាញយក​";
+"alert-download-error-busy" = "កំពុង​តែ​ទាញយកស្រាប់ហើយ​។";
 
 /* A descriptive message used when a download fails */
 "alert-download-error-detail" = "បញ្ហា​បាន​កើត​ឡើង​ពេល​កំពុង​ទាញយក ឬ​ពេល​កំពុង​ដំឡើង។";
@@ -17,7 +17,7 @@
 "alert-no-connection-title" = "ការ​តភ្ជាប់​មាន​បញ្ហា";
 
 /* Short text for a 'back' navigational command.  Used to return to the previous screen */
-"command-back" = "ត្រឡប់ក្រោយ";
+"command-back" = "ថយក្រោយ";
 
 /* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
 "command-cancel" = "បោះ​បង់";
@@ -48,6 +48,12 @@
 
 /* Confirmation text to display before uninstalling a lexical model */
 "command-uninstall-lexical-model-confirm" = "តើ​អ្នក​ចង់​លុប​បញ្ជី​ពាក្យ​នេះ​ឬ?";
+
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "មិនអាចផ្ទុកក្ដារចុចដែលបានស្នើទេ";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "មិនអាចផ្ទុកបញ្ជីពាក្យដែលបានស្នើទេ";
 
 /* Text for error when an installed file is unexpectedly missing */
 "error-missing-file" = "មិន​អាច​រក​ឃើញ​ឯកសារ​ចាំបាច់មួយ។";
@@ -112,11 +118,17 @@
 /* Error opening a Keyman package - package is not valid */
 "kmp-error-invalid" = "ឯកសារ​ក្នុង​កញ្ចប់​នេះ​ខូច​ហើយ។";
 
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "គ្មានកញ្ចប់នេះទេ។";
+
 /* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
 "kmp-error-missing-resource" = "កញ្ចប់​នេះ​គ្មាន​ក្ដារចុច ឬ​បញ្ជី​ពាក្យ​ដែល​បាន​ស្នើ​សុំ​ទេ។";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "កញ្ចប់​នេះ​ត្រូវ​បាន​រៀបចំឡើងដោយ​មិន​សម​ស្រប - មិន​ស្គាល់​មាតិកា។";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "កញ្ចប់នេះគ្មានឯកសារសម្រាប់ដំឡើងលើឧបករណ៍របស់អ្នកទេ។";
 
 /* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
 "kmp-error-wrong-type" = "កញ្ចប់​នេះ​មិន​មាន​ប្រភេទ​ធនធានត្រឹមត្រូវ​ទេ។";
@@ -180,6 +192,36 @@
 
 /* Title for the main Settings menu */
 "menu-settings-title" = "ការកំណត់ Keyman";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "កុំបង្ហាញពាក្យលើគ្រាប់ចុចដកឃ្លា";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "បង្ហាញឈ្មោះក្ដារចុចលើគ្រាប់ចុចដកឃ្លា";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "បង្ហាញឈ្មោះភាសាលើគ្រាប់ចុចដកឃ្លា";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "បង្ហាញឈ្មោះក្ដារចុច និងភាសានៅលើគ្រាប់ចុចដកឃ្លា";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "ពាក្យលើគ្រាប់ចុចដកឃ្លា";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "ពាក្យលើគ្រាប់ចុចដកឃ្លា";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "ទទេ";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "ក្ដារចុច";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "ភាសា";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "ភាសា និងក្ដារចុច";
 
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "មិន​អាច​ទាញ​យក​ក្ដារចុច​បាន​ទេ";

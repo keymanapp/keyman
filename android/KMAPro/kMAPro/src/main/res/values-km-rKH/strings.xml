@@ -18,6 +18,10 @@
   <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">ដំឡើង​ជំនាន់</string>
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">ជំនាន់៖ %1$s</string>
+  <!-- Context: Text label when old Chrome version installed -->
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">    Keyman តម្រូវឱ្យមាន Chrome ជំនាន់ 57 ឬថ្មីជាងនេះ។</string>
+  <!-- Context: Button label -->
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">អាប់ដេត Chrome</string>
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">ចាប់ផ្ដើម​វាយអក្សរ​នៅ​ទីនេះ&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
@@ -55,7 +59,27 @@
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">ដំឡើង​ក្ដារ​ចុចឬ​បញ្ជី​ពាក្យ</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="change_display_language" comment="Menu action to change interface language">ប្ដូរ​ភាសានៃ​ការ​បង្ហាញ​</string>
+  <string name="change_display_language" comment="Menu action to change interface language">ភាសាបង្ហាញ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">កែកម្ពស់ក្ដារចុច</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">ពាក្យលើគ្រាប់ចុចដកឃ្លា</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">ក្តារចុច</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">ភាសា</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">ភាសា + ក្ដារចុច</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">ទទេ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">បង្ហាញឈ្មោះក្ដារចុចលើគ្រាប់ចុចដកឃ្លា</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">បង្ហាញឈ្មោះភាសាលើគ្រាប់ចុចដកឃ្លា</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">ភាសា និងក្ដារចុចលើគ្រាប់ចុចដកឃ្លា</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">កុំបង្ហាញពាក្យនៅលើគ្រាប់ចុចដកឃ្លា</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">បង្ហាញ​បដា​ជានិច្ច</string>
   <!-- Context: Keyman Settings menu -->
@@ -86,6 +110,12 @@
   <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">បាន​បន្ថែម​ភាសា %1$s ទៅ %2$s</string>
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">ភាសា​ទាំង​អស់​ដែល​បាន​ដំឡើង​ហើយ</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">ទាញក្ដារចុចដើម្បីកែកម្ពស់</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">បង្វិលឧបករណ៍ដើម្បីកែបញ្ឈ និងផ្ដេក</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="reset_to_defaults" comment="Button to reset to default heights">ប្ដូរ​កំណត់​ទៅលំនាំដើម</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">ស្វែងរក ឬវាយ​បញ្ចូល URL</string>
   <!-- Context: Keyman Web Browser -->
@@ -117,7 +147,9 @@
   <!-- Context: KMP Package strings -->
   <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">គ្មាន​ក្ដារចុច​ឬ​ការណែនាំ​ពាក្យ​ស្វ័យប្រវត្តិ​សម្រាប់​ដំឡើង​ទេ</string>
   <!-- Context: KMP Package strings -->
-  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">កញ្ចប់ក្ដារចុច​នេះ​គ្មាន​ភាសា​ភាសា​ពាក់ព័ន្ធ​សម្រាប់​ដំឡើង​ទេ</string>
+  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">កញ្ចប់ក្ដារចុច​នេះ​គ្មាន​​ភាសា​ពាក់ព័ន្ធ​សម្រាប់​ដំឡើង​ទេ</string>
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">គ្មានទិន្នន័យមេតា​ក្នុង​កញ្ចប់ ឬ​ទិន្នន័យមេតា​ហ្នឹង​មិន​ត្រឹមត្រូវ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    ក្ដារចុចត្រូវការ Keyman ជំនាន់ថ្មីជាងនេះ</string>
 </resources>
