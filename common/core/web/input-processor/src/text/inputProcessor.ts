@@ -173,7 +173,7 @@ namespace com.keyman.text {
         if(alternates && alternates.length > 0) {
           ruleBehavior.transcription.alternates = alternates;
         }
-      } else {
+      } else if(ruleBehavior == null) {
         // We need a dummy RuleBehavior for keys which have no output (e.g. Shift)
         ruleBehavior = new RuleBehavior();
         ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
