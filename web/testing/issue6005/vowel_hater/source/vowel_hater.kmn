@@ -4,6 +4,8 @@ c
 c This test-oriented keyboard "hates" words with more than two consecutive vowels.
 c In order to test within-word applications of non-final rule matching with final rule non-matching,
 c Vowels are NOT emitted by keyboard rule; only by 'default' behavior.
+c
+c For test coverage, also really likes duplicating 'y' and 'Y'.
 
 store(&VERSION) '10.0'
 store(&NAME) 'Vowel Hater'
@@ -33,7 +35,6 @@ group(main) using keys
 + [SHIFT K_D] > 'D'
 + [SHIFT K_S] > 'S'
 + [SHIFT K_P] > 'P'
-+ [SHIFT K_Y] > 'Y'
 + [SHIFT K_T] > 'T'
 + [SHIFT K_R] > 'R'
 + [SHIFT K_W] > 'W'
@@ -55,7 +56,6 @@ group(main) using keys
 + [K_D] > 'd'
 + [K_S] > 's'
 + [K_P] > 'p'
-+ [K_Y] > 'y'
 + [K_T] > 't'
 + [K_R] > 'r'
 + [K_W] > 'w'
@@ -72,6 +72,10 @@ c Vowel-hating pass 1
 + [SHIFT K_I] > use(vowel_tolerance)
 + [SHIFT K_O] > use(vowel_tolerance)
 + [SHIFT K_U] > use(vowel_tolerance)
+
+c Semi-vowel love (to test context manip early-match with no-match on later group)
++ [K_Y] > 'y' use(vowel_tolerance)
++ [SHIFT K_Y] > 'Y' use(vowel_tolerance)
 
 c Vowel-hating pass 2
 group(vowel_tolerance) using keys
