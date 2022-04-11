@@ -19,7 +19,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonYes" comment="Yes button in message boxes">&amp; Bəli</string>
+  <string name="SKButtonYes" comment="Yes button in message boxes">&amp;Bəli</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -47,7 +47,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
-  <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Klaviatura seçmək üçün bu işarəni vurun</string>
+  <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Klaviatura seçmək üçün bu nişana klikləyin</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
@@ -151,7 +151,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Caption_LayoutType" comment="Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic)">Düzüm növü:</string>
+  <string name="S_Caption_LayoutType" comment="Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic)">Düzülüş növü:</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -300,7 +300,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Salamlama ekranını göstərin</string>
+  <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Xoş gəldiniz ekranını göstərin</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -308,7 +308,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
-  <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Keyman başlayanda ziddiyyətli tətbiqetmələr üçün test etmək</string>
+  <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Keyman başlayanda ziddiyyətli tətbiqetmələr üçün test et</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
@@ -601,7 +601,7 @@
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="SKUpdate_IconMenuText" comment="Update icon - install menu item">Keyman yeniləmələrinə baxın &amp; və quraşdırın</string>
+  <string name="SKUpdate_IconMenuText" comment="Update icon - install menu item">Keyman yeniləmələrinə baxın &amp;və quraşdırın</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
@@ -733,7 +733,7 @@
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">Keyman &amp; söndərmək düyməsini dəyişdirin</string>
+  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">Keyman &amp;söndərmək düyməsini dəyişdirin</string>
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

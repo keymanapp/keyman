@@ -8,6 +8,11 @@
         <item quantity="other">Klaviatura</item>
     </plurals>
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">Digər daxil etmə üsul</item>
+        <item quantity="other">Digər daxil etmə usullar</item>
+    </plurals>
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Yeni klaviatura əlavə etmək</string>
     <!-- Context: Title for list -->
     <string name="title_languages_settings" comment="List of installed languages">Quraşdırılmış Dillər</string>
@@ -21,8 +26,12 @@
     <string name="label_cancel" comment="Button to cancel an action">Ləğv etmək</string>
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">Bağlamaq</string>
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">Keyman bağlamaq</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">İrəli</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Növbəti daxil etmə üsul</string>
     <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item">Yükləyin</string>
     <!-- Context: Button label -->
@@ -69,8 +78,11 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">FileProvider (Fayl Təminatçısı) kitabxanasına kömək sənədinə baxmaq lazımdır:%1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">%3$s dili üçün %1$s ilə ölümcül klaviatura xətası :%3$s dili üçün %2$s. Varsayılan klaviatura yüklənir.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">%3$s dil üçün %1$s:%2$s klaviaturasında xəta.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Yükləmək üçün əlaqəli lüğət yoxlanılır</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Bu lüğətin son versiyasını yükləmək istərdinizmi?</string>
     <!-- Context: No associated dictionary found -->
@@ -121,8 +133,13 @@
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Proqnozları aktivləşdirmək</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Lüğət</string>
+    <plurals name="model_count">
+        <item quantity="one">Dictionary</item>
+        <item quantity="other">Dictionaries</item>
+    </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Mövcud lüğəti üçün yoxlamaq</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Lüğət:%1$s</string>
     <!-- Context: Language Settings menu strings -->
