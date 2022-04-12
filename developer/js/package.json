@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/lexical-model-compiler",
-  "version": "15.0.230",
+  "version": "15.0.233",
   "description": "Keyman Developer lexical model compiler",
   "keywords": [
     "keyboard",

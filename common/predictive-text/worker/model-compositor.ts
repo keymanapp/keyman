@@ -679,6 +679,11 @@ class ModelCompositor {
       throw "Invalid LMLayer state:  languageUsesCasing is set to true, but no applyCasing function exists";
     }
 
+    // If the user has selected Shift or Caps layer, that overrides our
+    // text analysis
+    if(context.casingForm == 'upper' || context.casingForm == 'initial') {
+      return context.casingForm;
+    }
     if(model.applyCasing('lower', text) == text) {
       return 'lower';
     } else if(model.applyCasing('upper', text) == text) {
@@ -688,8 +693,9 @@ class ModelCompositor {
       // We check 'initial' last, as upper-case input is indistinguishable.
       return 'initial';
     } else {
+      // If we do not have a casing form given to us by the keyboard, then
       // 'null' is returned when no casing pattern matches the input.
-      return null;
+      return context.casingForm ?? null;
     }
   }
 }

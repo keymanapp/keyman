@@ -49,6 +49,12 @@
 /* Confirmation text to display before uninstalling a lexical model */
 "command-uninstall-lexical-model-confirm" = "Bu lüğəti silmək istəyirsiniz?";
 
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Sorğu edilmiş klaviaturanı yüklənə bilmir";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Sorğu edilmiş lüğəti yüklənə bilmir";
+
 /* Text for error when an installed file is unexpectedly missing */
 "error-missing-file" = "Tələb olunan fayl tapıla bilmədi.";
 
@@ -112,11 +118,17 @@
 /* Error opening a Keyman package - package is not valid */
 "kmp-error-invalid" = "Paketin faylı zədəlidir.";
 
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "Müəyyənləşdirilmiş paketi mövcud deyil.";
+
 /* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
 "kmp-error-missing-resource" = "Bu paket tələb olunan klaviatura və ya lüğəti ehtiva etmir.";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Bu paket düzgün qurulmamışdır - məzmunu bilinmir.";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "Bu paket sizin cihazınız üçün dəstəyini daxil etmir.";
 
 /* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
 "kmp-error-wrong-type" = "Bu paketdə gözlənilən resurs növü yoxdur.";
@@ -180,6 +192,36 @@
 
 /* Title for the main Settings menu */
 "menu-settings-title" = "Keyman Parametrləri";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Ara düyməsində mətni göstərilməsin";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Klaviatura adı ara düyməsində göstərilsin";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Dil adı ara düyməsində göstərilsin";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Dil və klaviatura adı ara düyməsində göstərilsin";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Ara düymənin mətni";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Ara düymənin mətni";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Boş";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Klaviatura";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Dil";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Dil və klaviatura";
 
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Klaviatura endirilmədi";

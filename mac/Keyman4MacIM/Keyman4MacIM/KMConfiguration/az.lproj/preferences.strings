@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Həmişə ekrandakı klaviaturasını göstər";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Uzun əmr sətri qeyd etməni istifadə et";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Dəstək";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Klaviaturanı endir...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Keyman konfiqurasiyası";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Geri";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Keyboards";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Uzun qeyd etmə seçimi aktivləşdiriləndə, Keyman destəkiçilərə problemi müəyyənləşdirmək üçün kömək edə bilən hərəkətləri qeyd edəcək. Əmr sətri proqramı Keymandan mesajlarının qeydləri baxmaq üçün istifadə edə bilər. Əmr sətridə süzgəc seçin ki, Keyman prosesindən bütün mesajları göstərilsin. Bu qeydlərinin sirası ixrac edilə bilər, və lazım olanda Keyman dəstəyə göndərilə bilər.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "İrəli";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Əsas səhifə";
+
+/* Options button text */
+"frd-No-seV.label" = "Seçimlər";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Quraşdırılmış klaviaturası";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Müəyyən bir klaviaturanı və ya ümumiyyətlə Keyman ilə problemlər yarınırsa, bu seçimi aktivləşdirin.";

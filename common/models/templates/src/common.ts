@@ -19,7 +19,8 @@ namespace models {
       left: leftContext,
       right: rightContext,
       startOfBuffer: context.startOfBuffer,
-      endOfBuffer: context.endOfBuffer
+      endOfBuffer: context.endOfBuffer,
+      casingForm: context.casingForm
     };
   }
 

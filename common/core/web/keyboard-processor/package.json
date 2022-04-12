@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/keyboard-processor",
-  "version": "15.0.230",
+  "version": "15.0.233",
   "description": "Core module for Keyman keyboard support in KeymanWeb.",
   "repository": {
     "type": "git",

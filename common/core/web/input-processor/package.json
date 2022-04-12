@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/input-processor",
-  "version": "15.0.230",
+  "version": "15.0.233",
   "description": "The core text and prediction processing engine for KeymanWeb",
   "repository": {
     "type": "git",
