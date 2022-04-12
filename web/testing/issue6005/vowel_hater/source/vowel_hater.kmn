@@ -22,10 +22,14 @@ store(cons)       'bcdfghjklmn' \
                   'pqrstvwxz' \
                   'BCDFGHJKLMN' \
                   'PQRSTVWXZ'
-store(consKeys)   [SHIFT K_B] [SHIFT K_C] [SHIFT K_D] [SHIFT K_F] [SHIFT K_G] [SHIFT K_H] \
+store(cons_keys)   [K_B] [K_C] [K_D] [K_F] [K_G] [K_H] \
+                    [K_J] [K_K] [K_L] [K_M] [K_N] \
+                  [K_P] [K_Q] [K_R] [K_S] [K_T] [K_V] \
+                    [K_W [K_X] [K_Z] \
+                  [SHIFT K_B] [SHIFT K_C] [SHIFT K_D] [SHIFT K_F] [SHIFT K_G] [SHIFT K_H] \
                     [SHIFT K_J] [SHIFT K_K] [SHIFT K_L] [SHIFT K_M] [SHIFT K_N] \
                   [SHIFT K_P] [SHIFT K_Q] [SHIFT K_R] [SHIFT K_S] [SHIFT K_T] [SHIFT K_V] \
-                    [SHIFT K_W] [SHIFT K_X] [SHIFT K_Z]
+                    [SHIFT K_W [SHIFT K_X] [SHIFT K_Z]
 
 begin Unicode > use(main)
 
