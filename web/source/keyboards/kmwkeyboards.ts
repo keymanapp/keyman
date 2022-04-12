@@ -1,6 +1,6 @@
 /// <reference path="../kmwbase.ts" />
 // Includes a promise polyfill (needed for IE)
-/// <reference path="../../node_modules/es6-shim/es6-shim.min.js" />
+/// <reference path="../../../common/web/es6-shim/build/index.d.ts" />
 
 namespace com.keyman.keyboards {
   class CloudRequestEntry {

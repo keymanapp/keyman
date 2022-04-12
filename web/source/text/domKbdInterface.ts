@@ -4,12 +4,12 @@
  */
 namespace com.keyman.text {
   /**
-   * Function     registerKeyboard  KR                    
+   * Function     registerKeyboard  KR
    * Scope        Public
    * @param       {Object}      Pk      Keyboard  object
    * Description  Register and load the keyboard.  This implementation overwrites web-core's intentionally,
    *              as web-core lacks access to the `KeyboardManager` object and class.
-   */    
+   */
   KeyboardInterface.prototype.registerKeyboard = function(Pk): void {
     let keyman = com.keyman.singleton;
     keyman.keyboardManager._registerKeyboard(Pk);
@@ -17,13 +17,13 @@ namespace com.keyman.text {
 
   /**
    * Add the basic keyboard parameters (keyboard stub) to the array of keyboard stubs
-   * If no language code is specified in a keyboard it cannot be registered, 
-   * and a keyboard stub must be registered before the keyboard is loaded 
+   * If no language code is specified in a keyboard it cannot be registered,
+   * and a keyboard stub must be registered before the keyboard is loaded
    * for the keyboard to be usable.
-   * 
+   *
    * @param       {Object}      Pstub     Keyboard stub object
    * @return      {?number}               1 if already registered, else null
-   */    
+   */
   KeyboardInterface.prototype.registerStub = function(Pstub): number {
     let keyboardManager = com.keyman.singleton.keyboardManager;
     if (keyboardManager.keymanweb.initialized) {
@@ -48,7 +48,7 @@ namespace com.keyman.text {
    * @return      {boolean}               true if inserted
    * Description  Insert text into active control.  Is utilized by keyboards with custom help HTML and requires
    *              special DOM handling.
-   */    
+   */
   KeyboardInterface.prototype.insertText = function(Ptext: string, PdeadKey:number): boolean {
     let keyman = com.keyman.singleton;
     this.resetContextCache();
@@ -81,11 +81,11 @@ namespace com.keyman.text {
    * Function     KSF
    * Scope        Public
    * Description  Save keyboard focus
-   */    
+   */
   KeyboardInterface.prototype.saveFocus = function(): void {
     dom.DOMEventHandlers.states._IgnoreNextSelChange = 1;
   }
-  
+
   /**
    * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
    */
@@ -129,7 +129,7 @@ namespace com.keyman.text {
       }
     }
     // Automatically reuses previously-set positioning.
-    // Other OSK API functions must have previously been used to set the 
+    // Other OSK API functions must have previously been used to set the
     // pinned position.
     keyman.osk.present();
   }

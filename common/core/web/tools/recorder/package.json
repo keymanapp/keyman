@@ -17,13 +17,13 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "dependencies": {
-    "@keymanapp/keyboard-processor": "^15.0.230",
-    "@keymanapp/models-types": "^15.0.230",
-    "@keymanapp/web-environment": "^15.0.230",
-    "@keymanapp/web-utils": "^15.0.230",
+    "@keymanapp/keyboard-processor": "*",
+    "@keymanapp/models-types": "*",
+    "@keymanapp/web-environment": "*",
+    "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4"
   },
   "devDependencies": {
-    "typescript": "^3.8.3"
+    "typescript": "^4.5.4"
   }
 }

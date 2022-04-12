@@ -1,16 +1,24 @@
 {
+  "extends": "../../../../../../tsconfig-base.json",
   "compilerOptions": {
-	"allowJs": true,
-	"module": "none",
-	"outDir": "../dist/",
-	"inlineSources": true,
-  "sourceMap": true,
-  "target": "es5",
-  "lib": ["es6", "dom"],
-  "outFile": "../dist/index.js"
+    "allowJs": true,
+    "module": "none",
+    "outDir": "../dist/",
+    "inlineSources": true,
+    "sourceMap": true,
+    "target": "es5",
+    "lib": ["es6", "dom"],
+    "outFile": "../dist/index.js"
   },
+  "references": [
+    { "path": "../../../../../../resources/web-environment" }
+  ],
+
+  "include": [
+    "../../../../../../node_modules/@sentry/browser/build/bundle.min.js",
+  ],
+
   "files": [
-    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
-		"index.ts"
+		"index.ts",
   ]
 }

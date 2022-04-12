@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig-base.json",
+
+  "compilerOptions": {
+    "outFile": "dist/index.js"
+  },
+
+  "files": [
+		"environment.inc.ts",
+  ]
+}

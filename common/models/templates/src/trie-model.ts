@@ -27,7 +27,7 @@
 /// <reference path="common.ts" />
 /// <reference path="priority-queue.ts" />
 /// <reference path="tokenization.ts" />
-
+/// <reference path="../../types/index.d.ts" />
 /**
  * @file trie-model.ts
  *
@@ -143,7 +143,7 @@
       let prefix = models.getLastPreCaretToken(this.breakWords, newContext);
 
       // Return suggestions from the trie.
-      return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => 
+      return makeDistribution(this._trie.lookup(prefix).map(({text, p}) =>
         models.transformToSuggestion({
           insert: text,
           // Delete whatever the prefix that the user wrote.

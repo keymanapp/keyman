@@ -3,15 +3,25 @@
   "private": true,
   "devDependencies": {
     "chai": "^4.3.4",
-    "lerna": "^4.0.0",
     "mocha": "^8.4.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "ts-node": "^9.1.1",
-    "typescript": "^3.8.3"
+    "typescript": "^4.5.4"
   },
-  "scripts": {
-    "bootstrap": "lerna bootstrap -- --no-optional",
-    "lerna": "lerna",
-    "version": "lerna version --amend --yes --force-publish --no-git-tag-version"
-  }
+  "scripts": {},
+  "workspaces": [
+    "resources/gosh",
+    "resources/web-environment",
+    "common/core/web/input-processor",
+    "common/core/web/keyboard-processor",
+    "common/core/web/tools/recorder",
+    "common/core/web/tools/sentry-manager",
+    "common/core/web/utils",
+    "developer/js",
+    "developer/server",
+    "common/models/*",
+    "common/web/*",
+    "common/predictive-text",
+    "web"
+  ]
 }

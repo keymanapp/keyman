@@ -3,11 +3,19 @@
   "compilerOptions": {
 		"outFile": "../intermediate/keyman.js"
   },
+  "references": [
+    { "path": "../../resources/web-environment" },
+    { "path": "../../common/core/web/utils" },
+    { "path": "../../common/core/web/keyboard-processor/src" },
+    { "path": "../../common/core/web/input-processor/src" },
+  ],
+  "include": [
+    "./*.ts",
+    "./**/*.ts"
+  ],
   "files": [
-    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
-    "../node_modules/@keymanapp/web-utils/src/index.ts",
-    "../node_modules/@keymanapp/lexical-model-layer/web-defaultWorker.ts",
-		"kmwbase.ts",
+		"../../common/predictive-text/web-defaultWorker.ts",
+    "kmwbase.ts",
 		"keymanweb.ts",
 		"kmwembedded.ts",
 		"kmwinit.ts",

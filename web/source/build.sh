@@ -3,6 +3,7 @@
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
 
+# set -x
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -53,7 +54,7 @@ EMBED_TARGET=( "keyman.js" )
 PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
 
-: ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler-java}
+: ${CLOSURECOMPILERPATH:=../../node_modules/google-closure-compiler-java}
 : ${JAVA:=java}
 
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
@@ -227,7 +228,8 @@ set_default_vars ( ) {
     BUILD_LMLAYER=true
     BUILD_CORE=true
     BUILD_UI=true
-    BUILD_EMBED=true
+    BUILD_EMBED=false
+    #true
     BUILD_FULLWEB=true
     BUILD_DEBUG_EMBED=false
     BUILD_COREWEB=true
@@ -351,29 +353,29 @@ if [ $DO_MINIFY = true ]; then
     fi
 fi
 
-if [ $BUILD_CORE = true ]; then
-    CORE_FLAGS="-skip-package-install"
+#if [ $BUILD_CORE = true ]; then
+    #CORE_FLAGS="-skip-package-install"
 
     # Build the sentry-manager module - it's used in embedded contexts and on one testing page.
-    echo_heading "Compiling KeymanWeb's sentry-manager module..."
-    pushd ../../common/core/web/tools/sentry-manager/src
-    ./build.sh $CORE_FLAGS || fail "Failed to compile the sentry-manager module"
-    popd
-    echo_heading "sentry-manager module compiled successfully."
+    #echo_heading "Compiling KeymanWeb's sentry-manager module..."
+    #pushd ../../common/core/web/tools/sentry-manager/src
+    #./build.sh $CORE_FLAGS || fail "Failed to compile the sentry-manager module"
+    #popd
+    #echo_heading "sentry-manager module compiled successfully."
 
-    if [ $BUILD_LMLAYER = false ]; then
-        CORE_FLAGS="$CORE_FLAGS -test"
-    fi
+    #if [ $BUILD_LMLAYER = false ]; then
+    #    CORE_FLAGS="$CORE_FLAGS -test"
+    #fi
 
     # Ensure that the Input Processor module compiles properly.
-    cd ../../common/core/web/input-processor/src
-    echo ""
-    echo_heading "Compiling local KeymanWeb dependencies..."
-    ./build.sh $CORE_FLAGS || fail "Failed to compile KeymanWeb dependencies"
-    cd $WORKING_DIRECTORY
-    echo_heading "Local KeymanWeb dependency compilations completed successfully."
-    echo ""
-fi
+    #cd ../../common/core/web/input-processor/src
+    #echo ""
+    #echo_heading "Compiling local KeymanWeb dependencies..."
+    #./build.sh $CORE_FLAGS || fail "Failed to compile KeymanWeb dependencies"
+    #cd $WORKING_DIRECTORY
+    #echo_heading "Local KeymanWeb dependency compilations completed successfully."
+    #echo ""
+#fi
 
 if [ $FULL_BUILD = true ]; then
     echo Compiling version $VERSION
@@ -385,7 +387,7 @@ fi
 if [ $BUILD_EMBED = true ]; then
     echo Compile KMEI/KMEA version $VERSION
 
-    $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
+    $compilecmd -b $NODE_SOURCE/tsconfig.embedded.json
     if [ $? -ne 0 ]; then
         fail "Typescript compilation failed."
     fi
@@ -450,11 +452,17 @@ fi
 if [ $BUILD_COREWEB = true ]; then
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb...
-    $compilecmd -p $NODE_SOURCE/tsconfig.web.json
+    $compilecmd -b $NODE_SOURCE/tsconfig.json -v
     if [ $? -ne 0 ]; then
         fail "Typescript compilation failed."
     fi
     assert $INTERMEDIATE/keymanweb.js
+
+    # TEMP STUB LMLayerWorkerCode
+    pwd
+    cat $INTERMEDIATE/keymanweb.js ../../common/predictive-text/build/intermediate/index.js > $INTERMEDIATE/km1.js
+    mv $INTERMEDIATE/km1.js $INTERMEDIATE/keymanweb.js
+
     echo Native TypeScript compiled as $INTERMEDIATE/keymanweb.js
 
     copy_resources "$INTERMEDIATE"
@@ -484,7 +492,7 @@ fi
 
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
-    $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
+    $compilecmd -b $NODE_SOURCE/tsconfig.ui.json
 
     if [ $? -ne 0 ]; then
         fail "Typescript compilation of the UI modules failed."
@@ -493,8 +501,8 @@ if [ $BUILD_UI = true ]; then
     CURRENT_PATH=`pwd`
     # Since the batch compiler for the UI modules outputs them within a subdirectory,
     # we need to copy them up to the base /intermediate/ folder.
-    cd "$INTERMEDIATE/source"
-    cp * ../
+    cd "$INTERMEDIATE/web/source"
+    cp * ../../
     cd $CURRENT_PATH
 
     assert $INTERMEDIATE/kmwuitoolbar.js

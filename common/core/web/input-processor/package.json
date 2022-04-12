@@ -18,27 +18,26 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@keymanapp/lexical-model-compiler": "^15.0.230",
-    "@keymanapp/resources-gosh": "^15.0.230",
+    "@keymanapp/lexical-model-compiler": "*",
+    "@keymanapp/resources-gosh": "*",
     "@types/node": "^11.9.4",
     "chai": "^4.3.4",
     "mocha": "^8.4.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "ts-node": "^9.1.1",
-    "typescript": "^3.8.3"
+    "typescript": "^4.5.4"
   },
   "scripts": {
-    "lerna": "cd ../ && npm run lerna --",
     "tsc": "tsc",
     "test": "gosh ./test.sh",
     "mocha": "mocha"
   },
   "dependencies": {
-    "@keymanapp/keyboard-processor": "^15.0.230",
-    "@keymanapp/lexical-model-layer": "^15.0.230",
-    "@keymanapp/models-types": "^15.0.230",
-    "@keymanapp/web-environment": "^15.0.230",
-    "@keymanapp/web-utils": "^15.0.230",
+    "@keymanapp/keyboard-processor": "*",
+    "@keymanapp/lexical-model-layer": "*",
+    "@keymanapp/models-types": "*",
+    "@keymanapp/web-environment": "*",
+    "@keymanapp/web-utils": "*",
     "eventemitter3": "^4.0.0"
   }
 }

@@ -214,7 +214,7 @@ namespace com.keyman.dom {
       divThis.tabIndex=0;
 
       // Disable (internal) pan and zoom on KMW input elements for IE10
-      divThis.style.msTouchAction='none';
+      (<any>divThis.style).msTouchAction='none';
 
       ds.minWidth=xs.width;
       ds.height=xs.height;
@@ -279,7 +279,7 @@ namespace com.keyman.dom {
 
       // Prevent highlighting of underlying element (Android)
       if('webkitTapHighlightColor' in style) {
-        style.webkitTapHighlightColor='rgba(0,0,0,0)';
+        (<any>style).webkitTapHighlightColor='rgba(0,0,0,0)';
       }
 
       if(base instanceof base.ownerDocument.defaultView.HTMLTextAreaElement) {

@@ -25,8 +25,8 @@ namespace models {
 
   /**
    * Merges two Transforms as if they were applied to a `Context` successively.
-   * @param first 
-   * @param second 
+   * @param first
+   * @param second
    */
   export function buildMergedTransform(first: Transform, second: Transform): Transform {
     // These exist to avoid parameter mutation.
@@ -56,13 +56,13 @@ namespace models {
 
   /**
    * Checks whether or not the specified UCS-2 character corresponds to a UTF-16 high surrogate.
-   * 
+   *
    * @param char A single JavaScript (UCS-2) char corresponding to a single code unit.
    */
   export function isHighSurrogate(char: string): boolean;
   /**
    * Checks whether or not the specified UCS-2 character corresponds to a UTF-16 high surrogate.
-   * 
+   *
    * @param codeUnit A code unit corresponding to a single UCS-2 char.
    */
   export function isHighSurrogate(codeUnit: number): boolean;
@@ -76,13 +76,13 @@ namespace models {
 
     /**
    * Checks whether or not the specified UCS-2 character corresponds to a UTF-16 low surrogate.
-   * 
+   *
    * @param char A single JavaScript (UCS-2) char corresponding to a single code unit.
    */
   export function isLowSurrogate(char: string): boolean;
   /**
    * Checks whether or not the specified UCS-2 character corresponds to a UTF-16 low surrogate.
-   * 
+   *
    * @param codeUnit A code unit corresponding to a single UCS-2 char.
    */
   export function isLowSurrogate(codeUnit: number): boolean;
@@ -100,13 +100,13 @@ namespace models {
 
   /**
    * Builds a Suggestion based on a Transform corresponding to a predictive-text op.
-   * 
+   *
    * Assumes that the Transform's `insert` property represents a completed word,
    * as models generally delete the whole prefix, replacing it with the full lexical entry.
-   * @param transform 
+   * @param transform
    */
   export function transformToSuggestion(transform: Transform): Suggestion;
-  export function transformToSuggestion(transform: Transform, p: number): WithOutcome<Suggestion>; 
+  export function transformToSuggestion(transform: Transform, p: number): WithOutcome<Suggestion>;
   export function transformToSuggestion(transform: Transform, p?: number): Outcome<Suggestion> {
     let suggestion: Outcome<Suggestion> = {
       transform: transform,
@@ -129,8 +129,8 @@ namespace models {
       case 'initial':
         // The length of the first code unit, as measured in code points.
         let headUnitLength = 1;
-  
-        // Is the first character a high surrogate, indicating possible use of UTF-16 
+
+        // Is the first character a high surrogate, indicating possible use of UTF-16
         // surrogate pairs?  Also, is the string long enough for there to BE a pair?
         if(text.length > 1 && isHighSurrogate(text.charAt(0))) {
           // It's possible, so now we check for low surrogates.
@@ -139,7 +139,7 @@ namespace models {
             headUnitLength = 2;
           }
         }
-  
+
         // Capitalizes the first code unit of the string, leaving the rest intact.
         return text.substring(0, headUnitLength).toUpperCase() .concat(text.substring(headUnitLength));
     }

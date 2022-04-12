@@ -1,5 +1,5 @@
 #! /bin/bash
-# 
+#
 # Compile KeymanWeb's 'keyboard-processor' module, one of the components of Web's 'core' module.
 #
 set -eu
@@ -19,7 +19,7 @@ display_usage ( ) {
     echo
     echo "  -test                  to compile for testing without re-fetching external dependencies"
     echo "                         or recompiling the lm-layer module."
-    echo "  -skip-package-install  (or -S) skips the `lerna bootstrap` dependency check."
+    echo "  -skip-package-install  (or -S) skips the `npm install` dependency check."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
     exit 1
@@ -84,6 +84,6 @@ fi
 
 # Compile web's `keyboard-processor` module.
 echo "Compiling Input Processor module..."
-npm run tsc -- -p src/tsconfig.json || fail "Failed to compile the core/web/input-processor module."
+npm run tsc -- -b src/tsconfig.json || fail "Failed to compile the core/web/input-processor module."
 echo "Input Processor module compilation successful."
 echo ""

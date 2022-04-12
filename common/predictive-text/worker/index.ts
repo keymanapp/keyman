@@ -22,7 +22,7 @@
 
 /**
  * @file index.ts
- * 
+ *
  * The main LMLayerWorker class, the top-level class within the Web Worker.
  * The LMLayerWorker handles the keyboard/worker communication
  * protocol, delegating prediction requests to the language
@@ -31,21 +31,20 @@
 
 /// <reference path="../message.d.ts" />
 /// <reference path="models/dummy-model.ts" />
-/// <reference path="../node_modules/@keymanapp/models-wordbreakers/src/index.ts" />
 /// <reference path="./model-compositor.ts" />
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
- * 
+ *
  * Implements the state pattern. There are three states:
- * 
+ *
  *  - `unconfigured`  (initial state before configuration)
  *  - `modelless`     (state without model loaded)
  *  - `ready`         (state with model loaded, accepts prediction requests)
- * 
+ *
  * Transitions are initiated by valid messages. Invalid
  * messages are errors, and do not lead to transitions.
- * 
+ *
  *          +-------------+    load    +---------+
  *   config |             |----------->|         |
  *  +------->  modelless  +            +  ready  +---+
@@ -53,7 +52,7 @@
  *          +-------------+   unload   +----^----+   | predict
  *                                          |        |
  *                                          +--------+
- * 
+ *
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
  */
@@ -74,7 +73,7 @@ class LMLayerWorker {
   /**
    * By default, it's self.importScripts(), but can be overridden
    * so that this can be tested **outside of a Worker**.
-   * 
+   *
    * To function properly, self.importScripts() must be bound to self
    * before being stored here, else it will fail.
    */
@@ -238,7 +237,7 @@ class LMLayerWorker {
 
   public unloadModel() {
     // Right now, this seems sufficient to clear out the old model.
-    // The only existing reference to a loaded model is held by 
+    // The only existing reference to a loaded model is held by
     // transitionToReadyState's `handleMessage` closure. (The `model` var)
     this.transitionToLoadingState();
   }
@@ -264,7 +263,7 @@ class LMLayerWorker {
       }
     }
   }
-  
+
   /**
    * Sets the model-loading state, i.e., `modelless`.
    * This state only handles `load` messages, and will
@@ -289,7 +288,7 @@ class LMLayerWorker {
           // `eval` runs by scope rules; our virtualized worker needs a special scope for this to work.
           //
           // Reference: https://stackoverflow.com/a/40108685
-          // Note that we don't need `this`, but we do need the namespaces seen below. 
+          // Note that we don't need `this`, but we do need the namespaces seen below.
           let code = payload.source.code;
           let evalInContext = function(LMLayerWorker, models, correction, wordBreakers) {
             eval(code);
@@ -384,7 +383,7 @@ class LMLayerWorker {
    *
    * @param scope A global scope to install upon.
    */
-  static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
+  static install(scope: any /* DedicatedWorkerGlobalScope */): LMLayerWorker {  // @ts-ignore
     let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
     worker.self = scope;
@@ -408,7 +407,7 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports['wordBreakers'] = wordBreakers;
   /// XXX: export the ModelCompositor for testing.
   module.exports['ModelCompositor'] = ModelCompositor;
-} else if (typeof self !== 'undefined' && 'postMessage' in self) {
+} else if (typeof self !== 'undefined' && 'postMessage' in self && 'importScripts' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as any); // really, 'as typeof globalThis', but we're currently getting TS errors from use of that.
 } else {

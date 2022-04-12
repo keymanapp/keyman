@@ -276,7 +276,7 @@ namespace com.keyman.dom {
       var touchHandlers = this.touchHandlers;
 
       x.addEventListener('touchstart', touchHandlers.setFocus);
-      x.onmspointerdown=function(e: MSPointerEvent) {
+      x.onmspointerdown=function(e: any) {
         e.preventDefault();
         e.stopPropagation();
         return touchHandlers.setFocus(e);

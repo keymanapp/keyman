@@ -1,4 +1,6 @@
 {
+  "extends": "../../tsconfig-base.json",
+
   "compilerOptions": {
     "allowJs": true,
     "module": "none",
@@ -10,6 +12,12 @@
   },
   "include" : [
     "./*.ts"
+  ],
+  "references": [
+    { "path": "../../common/web/es6-shim" },
+    { "path": "../models/types"},
+    { "path": "../models/wordbreakers"},
+    { "path": "../models/templates"}
   ],
   "exclude" : [
     "node-defaultWorker.ts",

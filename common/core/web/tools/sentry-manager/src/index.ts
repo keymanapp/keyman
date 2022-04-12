@@ -1,4 +1,5 @@
-///<reference path="../node_modules/@sentry/browser/build/bundle.min.js" />
+///<reference path="../../../../../../node_modules/@sentry/browser/build/bundle.min.js" />
+///<reference path="../../../../../../resources/web-environment/environment.inc.d.ts" />
 
 namespace com.keyman {
   /**

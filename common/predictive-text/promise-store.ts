@@ -1,5 +1,3 @@
-/// <reference path="node_modules/es6-shim/es6-shim.min.js" />
-
 /*
  * Copyright (c) 2018 National Research Council Canada (author: Eddie A. Santos)
  * Copyright (c) 2018 SIL International
@@ -38,7 +36,7 @@ namespace com.keyman.text.prediction {
    *
    * You can either .keep() a promise -- resolve() and forget it;
    * Or you may also .break() a promise -- reject() and forget it.
-   * 
+   *
    * <T> is the type of resolved value (value yielded successfully by promise).
    */
   export class PromiseStore<T> {

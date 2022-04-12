@@ -10,13 +10,10 @@
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
-  "scripts": {
-    "prepare": "gosh ./build.sh"
-  },
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "@keymanapp/resources-gosh": "^15.0.230"
+    "@keymanapp/resources-gosh": "*"
   }
 }

@@ -1,4 +1,6 @@
 {
+  "extends": "../../../tsconfig-base.json",
+
   "compilerOptions": {
     "allowJs": false,
     "declaration": true,
@@ -7,11 +9,16 @@
     "sourceMap": true,
     "lib": ["webworker", "es6"],
     "target": "es5",
-    "downlevelIteration": true
+    "downlevelIteration": true,
   },
+  "references": [
+    { "path": "../../../resources/web-environment", "prepend": true },
+    { "path": "../../core/web/utils", "prepend": true },
+    { "path": "../../models/types" },
+    { "path": "../../models/templates", "prepend": true },
+    { "path": "../../models/wordbreakers", "prepend": true },
+  ],
   "include": [
-    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
-    "../node_modules/@keymanapp/web-utils/src/index.ts",
-    "./**/*.ts",
+    "./**/*.ts"
   ]
 }

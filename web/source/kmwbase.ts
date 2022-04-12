@@ -1,11 +1,11 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
 // Includes a promise polyfill (needed for IE)
-/// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
+/*/// <reference path="../../common/web/es6-shim/build/index.d.ts" />*/
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
 // Defines the core text processor.
-/// <reference path="../node_modules/@keymanapp/input-processor/src/text/inputProcessor.ts" />
+/*/// <reference path="../../common/core/web/input-processor/src/text/inputProcessor.ts" />*/
 // Extends KeyboardInterface with DOM-oriented offerings.
 /// <reference path="text/domKbdInterface.ts" />
 // Defines the web-page interface object.

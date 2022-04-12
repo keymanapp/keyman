@@ -1,4 +1,6 @@
 {
+  "extends": "../../../tsconfig-base.json",
+
   "compilerOptions": {
     "module": "none",
     "lib": ["es6"],
@@ -8,11 +10,10 @@
     "outFile": "index.js",
     "strict": true,
     "allowJs": false,
-    "typeRoots": [
-      "node_modules/@types",
-      "node_modules/@keymanapp"
-    ]
   },
+  "references": [
+    { "path": "../types" }
+  ],
   "include": [
 	"src/**/*"
   ],

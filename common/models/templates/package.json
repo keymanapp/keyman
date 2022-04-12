@@ -34,7 +34,6 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
     "pretest": "npm run build",
     "test": "mocha -r test/helpers.js"
   },
@@ -42,8 +41,8 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "@keymanapp/models-types": "^15.0.230",
-    "@keymanapp/web-utils": "^15.0.230",
+    "@keymanapp/models-types": "*",
+    "@keymanapp/web-utils": "*",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "@types/node": "^14.0.4",
@@ -52,6 +51,6 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@keymanapp/models-wordbreakers": "^15.0.230"
+    "@keymanapp/models-wordbreakers": "*"
   }
 }

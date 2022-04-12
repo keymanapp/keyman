@@ -1,3 +1,4 @@
 index.js
 index.d.ts
 *.js.map
+build/

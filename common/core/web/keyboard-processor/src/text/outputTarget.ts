@@ -2,6 +2,7 @@
 ///<reference path="../text/deadkeys.ts" />
 // Defines the KeyEvent type.
 ///<reference path="keyEvent.ts" />
+///<reference path="../../../../../models/types/index.d.ts" />
 
 // Also relies on string-extensions provided by the web-utils package.
 

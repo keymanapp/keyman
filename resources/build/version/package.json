@@ -2,7 +2,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^2.1.0",
-    "typescript": "^3.7.5",
+    "typescript": "^4.5.4",
     "yargs": "^15.1.0"
   },
   "description": "Automatically updates HISTORY.md based on pull requests",

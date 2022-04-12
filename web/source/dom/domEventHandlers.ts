@@ -54,7 +54,7 @@ namespace com.keyman.dom {
     /**
      * Handle receiving focus by simulated input field
      */
-    setFocus: (e?: TouchEvent|MSPointerEvent) => void = function(e?: TouchEvent|MSPointerEvent): void {
+    setFocus: (e?: TouchEvent) => void = function(e?: TouchEvent): void {
       // Touch-only handler.
     }.bind(this);
 
@@ -547,7 +547,7 @@ namespace com.keyman.dom {
     /**
      * Handle receiving focus by simulated input field
      */
-    setFocus: (e?: TouchEvent|MSPointerEvent) => void = function(this: DOMTouchHandlers, e?: TouchEvent|MSPointerEvent): void {
+    setFocus: (e?: TouchEvent) => void = function(this: DOMTouchHandlers, e?: TouchEvent): void {
       DOMEventHandlers.states.setFocusTimer();
 
       var tEvent: {

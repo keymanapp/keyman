@@ -20,33 +20,34 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="node_modules/es6-shim/es6-shim.min.js" />
 /// <reference path="promise-store.ts" />
+/// <reference path="message.d.ts" />
+/// <reference path="worker-interface.d.ts" />
 
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
- * 
+ *
  * The Language Modelling layer provides a way for keyboards to offer prediction and
  * correction functionalities. The LMLayer proper runs within a Web Worker, however,
  * this class is intended to run in the main thread, and automatically spawn a Web
  * Worker, capable of offering predictions.
- * 
+ *
  * Since the Worker runs in a different thread, the public methods of this class are
  * asynchronous. Methods of note include:
- * 
+ *
  *  - #loadModel() -- loads a specified model file
  *  - #predict() -- ask the LMLayer to offer suggestions (predictions or corrections) for
  *                  the input event
  *  - #unloadModel() -- unloads the LMLayer's currently loaded model, preparing it to
  *                          receive (load) a new model
- * 
+ *
  * The top-level LMLayer will automatically starts up its own Web Worker.
  */
 
 namespace com.keyman.text.prediction {
   export class LMLayer {
     /**
-     * The underlying worker instance. By default, this is the LMLayerWorker. 
+     * The underlying worker instance. By default, this is the LMLayerWorker.
      */
     private _worker: Worker;
     /** Call this when the LMLayer has sent us the 'ready' message! */
@@ -60,7 +61,7 @@ namespace com.keyman.text.prediction {
 
     /**
      * Construct the top-level LMLayer interface. This also starts the underlying Worker.
-     * 
+     *
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
@@ -80,7 +81,7 @@ namespace com.keyman.text.prediction {
 
     /**
      * Initializes the LMLayer worker with the host platform's capability set.
-     * 
+     *
      * @param capabilities The host platform's capability spec - a model cannot assume access to more context
      *                     than specified by this parameter.
      */

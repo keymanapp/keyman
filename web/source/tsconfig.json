@@ -1,3 +1,38 @@
 {
-	"extends": "./tsconfig.web.json"
+  "extends": "./tsconfig.base.json",
+
+	"compilerOptions": {
+		"outFile": "../intermediate/keymanweb.js"
+  },
+
+	"include": [
+    "./*.ts",
+    "./**/*.ts"
+  ],
+
+  "files": [
+		"kmwbase.ts",
+		"keymanweb.ts",
+		"kmwnative.ts",
+		"kmwinit.ts",
+		"kmwapi.ts"
+  ],
+
+	"exclude": [
+		"./kmwembedded.ts",
+		"./kmwuibutton.ts",
+		"./kmwuifloat.ts",
+		"./kmwuitoggle.ts",
+		"./kmwuitoolbar.ts",
+	],
+
+  "references": [
+    { "path": "../../resources/web-environment", "prepend": true },
+    { "path": "../../common/core/web/utils", "prepend": true },
+    { "path": "../../common/predictive-text/browser.tsconfig.json", "prepend": true },
+    //{ "path": "../../common/predictive-text/worker", "prepend": true },
+    { "path": "../../common/core/web/input-processor/src", "prepend": true },
+    { "path": "../../common/core/web/keyboard-processor/src", "prepend": true },
+    { "path": "../../common/web/es6-shim", "prepend": true }
+	]
 }

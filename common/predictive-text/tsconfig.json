@@ -1,4 +1,6 @@
 {
+  "extends": "../../tsconfig-base.json",
+
   "compilerOptions": {
     "allowJs": true,
     "outFile": "build/headless.js",
@@ -8,6 +10,13 @@
     "target": "es5",
     "lib": ["es6"]
   },
+  "references": [
+    { "path": "../core/web/utils" },
+    { "path": "../web/es6-shim" },
+    { "path": "../models/types"},
+    { "path": "../models/wordbreakers"},
+    { "path": "../models/templates"}
+  ],
   "include" : [
     "./*.ts"
   ],

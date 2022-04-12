@@ -37,14 +37,14 @@
     "node": ">=12.0.0"
   },
   "dependencies": {
-    "@keymanapp/models-types": "^15.0.230",
+    "@keymanapp/models-types": "*",
     "commander": "^3.0.0",
-    "typescript": "^3.8.3",
+    "typescript": "^4.5.4",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "@keymanapp/models-templates": "^15.0.230",
-    "@keymanapp/models-wordbreakers": "^15.0.230",
+    "@keymanapp/models-templates": "*",
+    "@keymanapp/models-wordbreakers": "*",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.6",

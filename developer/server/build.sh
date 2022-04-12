@@ -126,24 +126,6 @@ if (( build_keymanweb )); then
   pushd "$KEYMAN_ROOT/web/source"
   ./build.sh -no_minify
   popd
-
-  # TODO: This is gross, but lerna is stripping out @keymanapp/resources-gosh
-  # from our local node-modules folder during the KeymanWeb build, and I don't
-  # want to try and figure out why just at this minute.
-  #
-  # This causes `npm run postbuild` (which also happens after `npm run build`)
-  # to fall over because `gosh` cannot be found. An alternative fix was to
-  # change the postbuild script from:
-  #
-  #   npx gosh ./postbuild.sh
-  #
-  # to:
-  #
-  #   npx -p file:../../resources/gosh -q gosh ./postbuild.sh
-  #
-  # Which is also gross and should not be required!
-  #
-  npm install --production=false
 fi
 
 if (( copy_keymanweb )); then

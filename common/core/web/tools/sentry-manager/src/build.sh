@@ -1,5 +1,5 @@
 #! /bin/bash
-# 
+#
 # Compiles development-related KeymanWeb resources for use with developing/running tests.
 #   - the Recorder module (for engine tests)
 #   - the DOM module (for touch-alias and element-interface tests)
@@ -16,7 +16,7 @@ SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
 display_usage ( ) {
     echo "build.sh [-skip-package-install]"
     echo
-    echo "  -skip-package-install  skips the `lerna bootstrap` dependency check."
+    echo "  -skip-package-install  skips the `npm install` dependency check."
     echo "                            (or -S) Intended for use when this script is called by another build script."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."

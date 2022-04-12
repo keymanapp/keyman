@@ -1,3 +1,4 @@
+///<reference path="../../types/index.d.ts" />
 namespace wordBreakers {
   /**
    * Splits ASCII words.

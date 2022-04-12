@@ -9,9 +9,9 @@
 
  Usage:
 
- Make sure gosh is installed with lerna, e.g.:
+ Make sure gosh is installed, e.g.:
 
-     npx lerna add @keymanapp/resources-gosh path/to/your/package
+     npm install '@keymanapp/resources-gosh@*'
 
  Then, in package.json, define scripts like this:
 
