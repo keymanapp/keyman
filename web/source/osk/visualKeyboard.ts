@@ -1660,9 +1660,6 @@ namespace com.keyman.osk {
     showKeyTip(key: KeyElement, on: boolean) {
       var tip = this.keytip;
 
-      //console.log('VisualKeyboard.showKeyTip', key ? key.id : 'null', on);
-
-      // Do not change the key preview unless key or state has changed
       if (tip == null) {
         return;
       }
