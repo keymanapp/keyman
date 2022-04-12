@@ -15,63 +15,25 @@ store(&TARGETS) 'any'
 store(&VISUALKEYBOARD) 'vowel_hater.kvks'
 store(&LAYOUTFILE) 'vowel_hater.keyman-touch-layout'
 
-store(vowels) 'aeiouAEIOU' c Doesn't hate 'y' or 'Y'.
+store(vowels)     'aeiouAEIOU' c Doesn't hate 'y' or 'Y'.
+store(vowel_keys) [K_A] [K_E] [K_I] [K_O] [K_U] \
+                  [SHIFT K_A] [SHIFT K_E] [SHIFT K_I] [SHIFT K_O] [SHIFT K_U] 
+store(cons)       'bcdfghjklmn' \
+                  'pqrstvwxz' \
+                  'BCDFGHJKLMN' \
+                  'PQRSTVWXZ'
+store(consKeys)   [SHIFT K_B] [SHIFT K_C] [SHIFT K_D] [SHIFT K_F] [SHIFT K_G] [SHIFT K_H] \
+                    [SHIFT K_J] [SHIFT K_K] [SHIFT K_L] [SHIFT K_M] [SHIFT K_N] \
+                  [SHIFT K_P] [SHIFT K_Q] [SHIFT K_R] [SHIFT K_S] [SHIFT K_T] [SHIFT K_V] \
+                    [SHIFT K_W] [SHIFT K_X] [SHIFT K_Z]
 
 begin Unicode > use(main)
 
 group(main) using keys
-+ [SHIFT K_N] > 'N'
-+ [SHIFT K_B] > 'B'
-+ [SHIFT K_V] > 'V'
-+ [SHIFT K_C] > 'C'
-+ [SHIFT K_X] > 'X'
-+ [SHIFT K_Z] > 'Z'
-+ [SHIFT K_L] > 'L'
-+ [SHIFT K_K] > 'K'
-+ [SHIFT K_J] > 'J'
-+ [SHIFT K_H] > 'H'
-+ [SHIFT K_G] > 'G'
-+ [SHIFT K_F] > 'F'
-+ [SHIFT K_D] > 'D'
-+ [SHIFT K_S] > 'S'
-+ [SHIFT K_P] > 'P'
-+ [SHIFT K_T] > 'T'
-+ [SHIFT K_R] > 'R'
-+ [SHIFT K_W] > 'W'
-+ [SHIFT K_Q] > 'Q'
-+ [SHIFT K_M] > 'M'
-+ [K_M] > 'm'
-+ [K_N] > 'n'
-+ [K_B] > 'b'
-+ [K_V] > 'v'
-+ [K_C] > 'c'
-+ [K_X] > 'x'
-+ [K_Z] > 'z'
-+ [K_L] > 'l'
-+ [K_K] > 'k'
-+ [K_J] > 'j'
-+ [K_H] > 'h'
-+ [K_G] > 'g'
-+ [K_F] > 'f'
-+ [K_D] > 'd'
-+ [K_S] > 's'
-+ [K_P] > 'p'
-+ [K_T] > 't'
-+ [K_R] > 'r'
-+ [K_W] > 'w'
-+ [K_Q] > 'q'
++ any(cons_keys) > index(cons, 1)
 
 c Vowel-hating pass 1
-+ [K_A] > use(vowel_tolerance)
-+ [K_E] > use(vowel_tolerance)
-+ [K_I] > use(vowel_tolerance)
-+ [K_O] > use(vowel_tolerance)
-+ [K_U] > use(vowel_tolerance)
-+ [SHIFT K_A] > use(vowel_tolerance)
-+ [SHIFT K_E] > use(vowel_tolerance)
-+ [SHIFT K_I] > use(vowel_tolerance)
-+ [SHIFT K_O] > use(vowel_tolerance)
-+ [SHIFT K_U] > use(vowel_tolerance)
++ any(vowel_keys) > use(vowel_tolerance)
 
 c Semi-vowel love (to test context manip early-match with no-match on later group)
 + [K_Y] > 'y' use(vowel_tolerance)
@@ -83,14 +45,4 @@ group(vowel_tolerance) using keys
 c By matching a contiguous vowel pair, further contiguous vowels will be blocked.
 c Note that 'tolerated' vowels are only emitted due to default behavior.
 
-any(vowels) any(vowels) + [K_A] > context(1) context(2)
-any(vowels) any(vowels) + [K_E] > context(1) context(2)
-any(vowels) any(vowels) + [K_I] > context(1) context(2)
-any(vowels) any(vowels) + [K_O] > context(1) context(2)
-any(vowels) any(vowels) + [K_U] > context(1) context(2)
-
-any(vowels) any(vowels) + [SHIFT K_A] > context(1) context(2)
-any(vowels) any(vowels) + [SHIFT K_E] > context(1) context(2)
-any(vowels) any(vowels) + [SHIFT K_I] > context(1) context(2)
-any(vowels) any(vowels) + [SHIFT K_O] > context(1) context(2)
-any(vowels) any(vowels) + [SHIFT K_U] > context(1) context(2)
+any(vowels) any(vowels) + any(vowel_keys) > context
