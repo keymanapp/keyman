@@ -1,4 +1,4 @@
-﻿c vowel_hater generated from template at 2022-04-11 11:51:48
+﻿c issue6005 generated from template at 2022-04-11 11:51:48
 c with name "Vowel Hater"
 c
 c This test-oriented keyboard "hates" words with more than two consecutive vowels.
@@ -8,12 +8,12 @@ c
 c For test coverage, also really likes duplicating 'y' and 'Y'.
 
 store(&VERSION) '10.0'
-store(&NAME) 'Vowel Hater'
+store(&NAME) 'Issue 6005 - "Vowel Hater"'
 store(&COPYRIGHT) '© SIL Int' U+0027 'l'
 store(&KEYBOARDVERSION) '1.0'
 store(&TARGETS) 'any'
-store(&VISUALKEYBOARD) 'vowel_hater.kvks'
-store(&LAYOUTFILE) 'vowel_hater.keyman-touch-layout'
+store(&VISUALKEYBOARD) 'issue6005.kvks'
+store(&LAYOUTFILE) 'issue6005.keyman-touch-layout'
 
 store(vowels)     'aeiouAEIOU' c Doesn't hate 'y' or 'Y'.
 store(vowel_keys) [K_A] [K_E] [K_I] [K_O] [K_U] \
@@ -25,7 +25,7 @@ store(cons)       'bcdfghjklmn' \
 store(cons_keys)   [K_B] [K_C] [K_D] [K_F] [K_G] [K_H] \
                     [K_J] [K_K] [K_L] [K_M] [K_N] \
                   [K_P] [K_Q] [K_R] [K_S] [K_T] [K_V] \
-                    [K_W [K_X] [K_Z] \
+                    [K_W] [K_X] [K_Z] \
                   [SHIFT K_B] [SHIFT K_C] [SHIFT K_D] [SHIFT K_F] [SHIFT K_G] [SHIFT K_H] \
                     [SHIFT K_J] [SHIFT K_K] [SHIFT K_L] [SHIFT K_M] [SHIFT K_N] \
                   [SHIFT K_P] [SHIFT K_Q] [SHIFT K_R] [SHIFT K_S] [SHIFT K_T] [SHIFT K_V] \

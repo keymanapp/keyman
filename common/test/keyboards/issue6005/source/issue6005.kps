@@ -16,26 +16,26 @@
     <Items/>
   </StartMenu>
   <Info>
-    <Name URL="">Vowel Hater</Name>
+    <Name URL="">Issue 6005 - "Vowel Hater"</Name>
     <Copyright URL="">© SIL Int'l</Copyright>
     <Author URL="">SIL Int'l</Author>
     <Version URL=""></Version>
   </Info>
   <Files>
     <File>
-      <Name>..\build\vowel_hater.kmx</Name>
+      <Name>..\build\issue6005.kmx</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
     <File>
-      <Name>..\build\vowel_hater.js</Name>
+      <Name>..\build\issue6005.js</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
     </File>
     <File>
-      <Name>..\build\vowel_hater.kvk</Name>
+      <Name>..\build\issue6005.kvk</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kvk</FileType>
@@ -55,8 +55,8 @@
   </Files>
   <Keyboards>
     <Keyboard>
-      <Name>Vowel Hater</Name>
-      <ID>vowel_hater</ID>
+      <Name>Issue 6005 - "Vowel Hater"</Name>
+      <ID>issue6005</ID>
       <Version>1.0</Version>
       <Languages>
         <Language ID="en">English</Language>
