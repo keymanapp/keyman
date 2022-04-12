@@ -53,15 +53,20 @@
             ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
             : window.location.href;
 
+          // Slice off any 'path' after the testing/ folder.
+          // This may vary depending on how the file is hosted / served;
+          // going relative may be tricky when served via our CI test-host setup.
+          pageRef = pageRef.substr(0, pageRef.lastIndexOf('testing/') + 'testing/'.length);
+
           // also register appropriate models.
           var modelStub1 = {'id': 'nrc.en.mtnt',
             languages: ['en'],
-            path: (pageRef + "../prediction-mtnt/nrc.en.mtnt.model.js")
+            path: (pageRef + "prediction-mtnt/nrc.en.mtnt.model.js")
           };
           kmw.modelManager.register(modelStub1);
           var modelStub2 = {'id': 'nrc.en.mtnt',
             languages: ['pny-latn'],  // yep.  Total cheat for the sake of testing.
-            path: (pageRef + "../prediction-mtnt/nrc.en.mtnt.model.js")
+            path: (pageRef + "prediction-mtnt/nrc.en.mtnt.model.js")
           };
           kmw.modelManager.register(modelStub2);
         }
