@@ -361,7 +361,7 @@ namespace com.keyman.osk {
       return offsetCoords;
     }
 
-    getTouchProbabilities(input: InputEventCoordinate): text.KeyDistribution {
+    getTouchProbabilities(input: InputEventCoordinate, subkey?: keyboards.ActiveKey): text.KeyDistribution {
       let keyman = com.keyman.singleton;
       if (!keyman.core.languageProcessor.mayCorrect) {
         return null;
@@ -400,10 +400,8 @@ namespace com.keyman.osk {
 
         // Note:  when embedded on Android (as of 14.0, at least), we don't get access to this.
         // Just the base key.
-        if (this.keyPending && this.keyPending.key) {
-          popupKeyMass = 3.0;
-          popupKeyID = this.keyPending.key.spec.coreID;
-        }
+        popupKeyMass = 3.0;
+        popupKeyID = subkey.coreID;
 
         // If the base key appears in the subkey array and was selected, merge the probability masses.
         if (popupKeyID == baseKeyID) {
@@ -997,7 +995,7 @@ namespace com.keyman.osk {
 
       if (core.languageProcessor.isActive && input) {
         Lkc.source = input;
-        Lkc.keyDistribution = this.getTouchProbabilities(input);
+        Lkc.keyDistribution = this.getTouchProbabilities(input, keySpec);
       }
 
       // Return the event object.
