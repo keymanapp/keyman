@@ -33,7 +33,7 @@ def get_languages():
         response = requests.get(api_url)
         logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
         os.chdir(current_dir)
-        requests_cache.core.uninstall_cache()
+        requests_cache.uninstall_cache()
         if response.status_code == 200:
             return response.json()
         else:
