@@ -94,6 +94,10 @@ files:
     translation: /linux/keyman-config/locale/%locale_with_underscore%.po
     type: gettext
     update_option: update_as_unapproved
+    languages_mapping:
+      locale_with_underscore:
+        shu-latn-n: shu@latin
+        ha: ha
 
   # macOS files
 
