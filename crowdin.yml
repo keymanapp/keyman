@@ -74,18 +74,30 @@ files:
   - source: /ios/engine/KMEI/KeymanEngine/Classes/en.lproj/ResourceInfoView.strings
     dest: /ios/engine/ResourceInfoView.strings
     translation: /ios/engine/KMEI/KeymanEngine/Classes/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
     dest: /ios/engine/Localizable.strings
     translation: /ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.stringsdict
     dest: /ios/engine/Localizable.stringsdict
     translation: /ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   - source: /ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings
     dest: /ios/app/Localizable.strings
     translation: /ios/keyman/Keyman/Keyman/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   # Linux files
 
@@ -100,26 +112,44 @@ files:
   - source: /mac/Keyman4MacIM/Keyman4MacIM/KMAboutWindow/en.lproj/KMAboutWindowController.strings
     dest: /mac/app/KMAboutWindowController.strings
     translation: /mac/Keyman4MacIM/Keyman4MacIM/KMAboutWindow/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/en.lproj/preferences.strings
     dest: /mac/app/preferences.strings
     translation:  /mac/Keyman4MacIM/Keyman4MacIM/KMConfiguration/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/en.lproj/KMInfoWindowController.strings
     dest: /mac/app/KMInfoWindowController.strings
     translation: /mac/Keyman4MacIM/Keyman4MacIM/KMInfoWindow/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings  
     dest: /mac/app/KMKeyboardHelpWindowController.strings
     translation: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/en.lproj/Localizable.strings
     dest: /mac/app/Localizable.strings
     translation: /mac/Keyman4MacIM/Keyman4MacIM/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   - source: /mac/Keyman4MacIM/Keyman4MacIM/en.lproj/MainMenu.strings
     dest: /mac/app/MainMenu.strings
     translation: /mac/Keyman4MacIM/Keyman4MacIM/%osx_code%/%original_file_name%
+    languages_mapping:
+      osx_code:
+        pt-PT: pt-PT.lproj
 
   # crowdin parameters descriptions:
 
