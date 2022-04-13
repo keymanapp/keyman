@@ -332,6 +332,19 @@ if [ $FETCH_DEPS = true ]; then
     # Ensure the dependencies are downloaded.
     verify_npm_setup
 
+    # Temporary patch for build -- ensure that predictive-text is
+    # built (because of its wrapper requirements), and that the
+    # web-environment file is generated (because it uses a script
+    # to do this at present).
+    echo "Temp: Building dependencies that have manual build requirements"
+    pushd "$KEYMAN_ROOT/common/predictive-text" > /dev/null
+    ./build.sh
+    popd > /dev/null
+
+    pushd "$KEYMAN_ROOT/resources/web-environment" > /dev/null
+    ./build.sh
+    popd > /dev/null
+
     echo "Copying testing resource ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
     cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
 fi

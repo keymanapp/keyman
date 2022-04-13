@@ -1,4 +1,4 @@
-///<reference path="../../types/index.d.ts" />
+///<reference types="@keymanapp/models-types" />
 namespace wordBreakers {
   /**
    * Splits ASCII words.

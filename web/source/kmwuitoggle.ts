@@ -1,5 +1,3 @@
-/// <reference path="../../common/core/web/utils/dist/index.d.ts" />
-
 /***
    KeymanWeb 11.0
    Copyright 2019 SIL International

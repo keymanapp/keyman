@@ -1,11 +1,11 @@
 if(!String.prototype.normalize) {
   (function() {
-    /* This table is of all characters in the range of U+0100 to U+2200 that 
-     * have a canonical decomposition in NFD form. For some characters, this 
-     * translates them into their canonical characters (e.g., K -> K). For 
-     * characters with combining diacritical marks, this leaves behind the base 
-     * character, removing its diacritics (e.g., É -> E). 
-     */ 
+    /* This table is of all characters in the range of U+0100 to U+2200 that
+     * have a canonical decomposition in NFD form. For some characters, this
+     * translates them into their canonical characters (e.g., K -> K). For
+     * characters with combining diacritical marks, this leaves behind the base
+     * character, removing its diacritics (e.g., É -> E).
+     */
     var PARTIAL_NFD_LOOKUP = {"À":"A","Á":"A","Â":"A","Ã":"A","Ä":"A","Å":"A","Ç":"C",
                               "È":"E","É":"E","Ê":"E","Ë":"E","Ì":"I","Í":"I","Î":"I","Ï":"I",
                               "Ñ":"N","Ò":"O","Ó":"O","Ô":"O","Õ":"O","Ö":"O",
@@ -121,7 +121,7 @@ if(!String.prototype.normalize) {
      * is for use in wordform-keying operations common within the LMLayer.
      */
     String.prototype.normalize = function() {
-      let chars = this.split('');
+      var chars = this.split('');
       return chars.map(function(c) {
         if (c in PARTIAL_NFD_LOOKUP) {
           return PARTIAL_NFD_LOOKUP[c];

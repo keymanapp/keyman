@@ -27,7 +27,8 @@
 /// <reference path="common.ts" />
 /// <reference path="priority-queue.ts" />
 /// <reference path="tokenization.ts" />
-/// <reference path="../../types/index.d.ts" />
+/// <reference types="@keymanapp/models-types" />
+
 /**
  * @file trie-model.ts
  *

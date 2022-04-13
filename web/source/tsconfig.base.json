@@ -6,7 +6,7 @@
     "outDir": "../intermediate/",
     "inlineSources": true,
     "sourceMap": true,
-    "sourceRoot": "/keyman/",
+    // "sourceRoot": "/keyman/",
     "target": "es5",
     "types": ["node"],
     "lib": ["es6", "dom"]

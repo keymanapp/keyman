@@ -2,7 +2,7 @@
 /// <reference path="../includes/events.ts" />
 /// <reference path="contextWindow.ts" />
 /// <reference path="prediction/languageProcessor.ts" />
-/// <reference path="../../../../../models/types/index.d.ts" />
+/// <reference types="@keymanapp/models-types" />
 
 namespace com.keyman.text {
   export class InputProcessor {
