@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.233 beta 2022-04-13
+
+* chore(android/app): Add description for referrer response error (#6524)
+* fix(linux): test fileVersion during package install (#6522)
+
 ## 15.0.232 beta 2022-04-11
 
 * fix(linux): Remove tab completion warning (#6482)
