@@ -1,11 +1,11 @@
-Vowel Hater keyboard
+Issue 6005 test keyboard - model interactions with unmatched final group
 ==============
 
 Version 1.0
 
 Description
 -----------
-Vowel Hater generated from template
+Generated from template
 
 Links
 -----

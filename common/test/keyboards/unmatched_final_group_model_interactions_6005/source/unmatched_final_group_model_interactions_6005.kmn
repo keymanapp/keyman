@@ -1,4 +1,4 @@
-﻿c issue6005 generated from template at 2022-04-11 11:51:48
+﻿c unmatched_final_group_model_interactions_6005 generated from template at 2022-04-11 11:51:48
 c with name "Vowel Hater"
 c
 c This test-oriented keyboard "hates" words with more than two consecutive vowels.
@@ -12,8 +12,8 @@ store(&NAME) 'Issue 6005 - "Vowel Hater"'
 store(&COPYRIGHT) '© SIL Int' U+0027 'l'
 store(&KEYBOARDVERSION) '1.0'
 store(&TARGETS) 'any'
-store(&VISUALKEYBOARD) 'issue6005.kvks'
-store(&LAYOUTFILE) 'issue6005.keyman-touch-layout'
+store(&VISUALKEYBOARD) 'unmatched_final_group_model_interactions_6005.kvks'
+store(&LAYOUTFILE) 'unmatched_final_group_model_interactions_6005.keyman-touch-layout'
 
 store(vowels)     'aeiouAEIOU' c Doesn't hate 'y' or 'Y'.
 store(vowel_keys) [K_A] [K_E] [K_I] [K_O] [K_U] \

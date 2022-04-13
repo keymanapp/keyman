@@ -23,19 +23,19 @@
   </Info>
   <Files>
     <File>
-      <Name>..\build\issue6005.kmx</Name>
+      <Name>..\build\unmatched_final_group_model_interactions_6005.kmx</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
     <File>
-      <Name>..\build\issue6005.js</Name>
+      <Name>..\build\unmatched_final_group_model_interactions_6005.js</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
     </File>
     <File>
-      <Name>..\build\issue6005.kvk</Name>
+      <Name>..\build\unmatched_final_group_model_interactions_6005.kvk</Name>
       <Description></Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kvk</FileType>
@@ -56,7 +56,7 @@
   <Keyboards>
     <Keyboard>
       <Name>Issue 6005 - "Vowel Hater"</Name>
-      <ID>issue6005</ID>
+      <ID>unmatched_final_group_model_interactions_6005</ID>
       <Version>1.0</Version>
       <Languages>
         <Language ID="en">English</Language>

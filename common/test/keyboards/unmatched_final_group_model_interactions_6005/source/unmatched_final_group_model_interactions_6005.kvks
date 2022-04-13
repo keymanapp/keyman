@@ -2,7 +2,7 @@
 <visualkeyboard>
   <header>
     <version>10.0</version>
-    <kbdname>issue6005</kbdname>
+    <kbdname>unmatched_final_group_model_interactions_6005</kbdname>
     <flags/>
   </header>
   <encoding name="unicode" fontname="Arial" fontsize="-12">
