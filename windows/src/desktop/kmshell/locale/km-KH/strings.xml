@@ -51,7 +51,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
-  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman កំពុង​ដំណើរការ​នៅឡើយ។ ចុច​អាយខុន​នេះ​ដើម្បី​ប្រើ​ក្ដារចុច​ភាសា​របស់​អ្នក​គ្រប់​ពេល</string>
+  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman កំពុង​ដំណើរការ​នៅឡើយ។ ចុច​អាយខុន​នេះ​ដើម្បី​ប្រើ​ក្ដារចុច​ភាសា​របស់​អ្នក​នៅពេលណាក៏បាន</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0.234 -->
@@ -99,7 +99,7 @@
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.493.0 -->
-  <string name="S_KeepInTouch" comment="Keep in touch tab name">ភ្ជាប់​ទំនាក់​ទំនង​ជាមូយ​យើង</string>
+  <string name="S_KeepInTouch" comment="Keep in touch tab name">បណ្ដាញសង្គម</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.492.0 -->
@@ -312,7 +312,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
-  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">ដក​ការចុច​ចេញ​ពីគ្រាប់​ចុច Shift/Ctrl/Alt នៅលើ​ \"ក្ដារចុច​លើ​អេក្រង់\" បន្ទាប់​ពី​បាន​ចុច​គ្រាប់​ចុច​ណា​មួយ</string>
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">លែងគ្រាប់​ចុច Shift/Ctrl/Alt នៅលើ​ \"ក្ដារចុច​លើ​អេក្រង់\" បន្ទាប់​ពី​បាន​ចុច​គ្រាប់​ចុច​ណា​មួយ</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.244.0 -->

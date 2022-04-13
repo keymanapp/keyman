@@ -61,6 +61,8 @@
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
 
+#include "kmtip_guids.h"
+
 class Globals
 {
 public:
@@ -304,5 +306,13 @@ BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault);
 /* Test Host integration */
 
 void WINAPI SetCustomPostKeyCallback(CUSTOMPOSTKEYCALLBACKPROC proc);
+
+/**
+ * Is the active keyboard a Keyman keyboard? This value is
+ * only valid in the master controller thread, and is used
+ * by serialized input to ensure that we only trap input
+ * while a Keyman keyboard is active.
+ **/
+extern BOOL isKeymanKeyboardActive;
 
 #endif

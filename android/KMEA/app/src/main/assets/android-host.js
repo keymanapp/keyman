@@ -320,6 +320,11 @@ function hideKeyboard() {
   window.location.hash = 'hideKeyboard' + fragmentToggle;
 }
 
+function showKeyboard() {
+  // Refresh KMW OSK
+  keyman.correctOSKTextSize();
+}
+
 function showHelpBubble() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   var kmw = window['keyman'];

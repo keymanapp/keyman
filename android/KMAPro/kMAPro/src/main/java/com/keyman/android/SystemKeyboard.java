@@ -225,7 +225,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardChanged(String newKeyboard) {
-    // Do nothing
+    KMManager.showSystemKeyboard();
   }
 
   @Override

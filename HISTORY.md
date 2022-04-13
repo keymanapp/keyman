@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 15.0.233 beta 2022-04-13
+
+* chore(android/app): Add description for referrer response error (#6524)
+* fix(linux): test fileVersion during package install (#6522)
+
+## 15.0.232 beta 2022-04-11
+
+* fix(linux): Remove tab completion warning (#6482)
+
+## 15.0.231 beta 2022-04-09
+
+* test(common/resources): Add Noto font to web_context_tests keyboard (#6488)
+
+## 15.0.230 beta 2022-04-08
+
+* fix(android/engine): Show keyboard after rotating (#6498)
+* fix(windows): don't log before checking nil when installing keyboard (#6505)
+* chore: Revert "feat(web): prediction casing follows current layer" (#6510)
+* chore(linux): Update changelog file (#6500)
+* fix(windows): framework for switching of pipeline (#6392)
+
+## 15.0.229 beta 2022-04-07
+
+* fix(iOS): check version during package install (#6479)
+* feat(ios): testflight builds for PRs (#6486)
+* chore(ios): Document minimum iOS version 12.1 (#6492)
+* fix(developer): handle exception on unpaired surrogate (#6487)
+* chore(mac): Update whatsnew for 15.0 (#6493)
+* fix(ios): use CFBundleShortVersionString for version (#6495)
+* fix(android/app): Simplify sharing intent (#6481)
+
 ## 15.0.228 beta 2022-04-05
 
 * feat(web): prediction casing follows current layer (#6459)

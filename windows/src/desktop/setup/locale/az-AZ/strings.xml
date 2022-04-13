@@ -21,8 +21,8 @@
   <string name="ssActionDownload">(%0:s endirmə)</string>
   <string name="ssActionInstall">Quraşdırma quraşdıracaq:</string>
   <string name="ssFreeCaption">$APPNAME $VERSION pulsuz və açıq mənbəlidir</string>
-  <string name="ssLicenseLink">&amp; Lisenziyanı oxuyun</string>
-  <string name="ssInstallOptionsLink">Quraşdırma &amp; seçimlər</string>
+  <string name="ssLicenseLink">&amp;Lisenziyanı oxuyun</string>
+  <string name="ssInstallOptionsLink">Quraşdırma &amp;seçimlər</string>
   <string name="ssMessageBoxTitle">$APPNAME Quraşdırma</string>
   <string name="ssOkButton">Oldu</string>
   <string name="ssInstallButton">&amp;Quraşdırmaql</string>

@@ -173,6 +173,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\global\vc\kmtip_guids.cpp" />
     <ClCompile Include="..\..\global\vc\xstring.cpp" />
     <ClCompile Include="addins.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -364,6 +365,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\global\inc\keymanengine.h" />
+    <ClInclude Include="..\..\global\inc\kmtip_guids.h" />
     <ClInclude Include="addins.h" />
     <ClInclude Include="appint\aiTIP.h" />
     <ClInclude Include="appint\aiWin2000Unicode.h" />
