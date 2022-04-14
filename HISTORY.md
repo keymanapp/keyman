@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.234 beta 2022-04-14
+
+* chore(common): Add Crowdin strings for Portuguese (pt-PT) (#6509)
+* chore(linux): Fix l10n language mappings (#6529)
+* chore(linux): Update Debian changelog (#6530)
+
 ## 15.0.233 beta 2022-04-13
 
 * chore(android/app): Add description for referrer response error (#6524)
