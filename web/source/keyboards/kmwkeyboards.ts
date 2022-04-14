@@ -477,7 +477,12 @@ namespace com.keyman.keyboards {
       // if(!PLgCode && (<KeymanBase>keymanweb).keyboardManager.activeStub) {
       //   PLgCode = (<KeymanBase>keymanweb).keyboardManager.activeStub['KLC'];
       // }
-      this.doKeyboardChange(PInternalName, PLgCode);
+      let _this = this;
+      p.then(function() {
+        // Only mark the keyboard as having changed once the setActiveKeyboard op
+        // is successful.
+        _this.doKeyboardChange(PInternalName, PLgCode);
+      })
 
       p.catch(error => {
         // Rejection indicates a failure of the keyboard to load.
