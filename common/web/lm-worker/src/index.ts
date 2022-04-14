@@ -29,8 +29,8 @@
  * model implementations.
  */
 
-/// <reference path="../message.d.ts" />
-/// <reference path="models/dummy-model.ts" />
+/// <reference types="@keymanapp/lm-message-types" />
+/// <reference path="./models/dummy-model.ts" />
 /// <reference path="./model-compositor.ts" />
 
 /**

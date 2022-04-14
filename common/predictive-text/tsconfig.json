@@ -15,11 +15,10 @@
     { "path": "../web/es6-shim" },
     { "path": "../models/types"},
     { "path": "../models/wordbreakers"},
-    { "path": "../models/templates"}
+    { "path": "../web/lm-message-types"},
+    { "path": "../models/templates"},
   ],
-  "include" : [
-    "./*.ts"
-  ],
+  "include" : [ "./*.ts" ],
   "exclude" : [
     "web-defaultWorker.ts",
     "node_modules",

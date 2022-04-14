@@ -26,7 +26,7 @@
  * Interfaces and types required internally in the worker code.
  */
 
-/// <reference path="../message.d.ts" />
+/// <reference types="@keymanapp/lm-message-types" />
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.

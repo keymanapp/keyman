@@ -6,7 +6,7 @@
  * safely due to DedicatedWorkerGlobalScope and a few other typing issues.
  */
 
-/// <reference path="message.d.ts" />
+/// <reference types="@keymanapp/lm-message-types" />
 /// <reference types="@keymanapp/models-types" />
 
 declare namespace com.keyman.text.prediction {

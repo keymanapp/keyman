@@ -30,9 +30,10 @@
     { "path": "../../resources/web-environment", "prepend": true },
     { "path": "../../common/core/web/utils", "prepend": true },
     { "path": "../../common/predictive-text/browser.tsconfig.json", "prepend": true },
-    //{ "path": "../../common/predictive-text/worker", "prepend": true },
+    //{ "path": "../../common/web/lm-worker", "prepend": true },
     { "path": "../../common/core/web/input-processor/src", "prepend": true },
     { "path": "../../common/core/web/keyboard-processor/src", "prepend": true },
-    { "path": "../../common/web/es6-shim", "prepend": true }
+    { "path": "../../common/web/es6-shim", "prepend": true },
+    { "path": "../../common/web/lm-message-types" }
 	]
 }
