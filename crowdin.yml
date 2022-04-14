@@ -34,7 +34,6 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
       android_code:
-        bwr-ng: bwr-rNG
         es-419: b+es+419
         pap: pap
         shu-latn-n: b+shu+latn
@@ -45,7 +44,6 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP
       android_code:
-        bwr-ng: bwr-rNG
         es-419: b+es+419
         pap: pap
         shu-latn-n: b+shu+latn
@@ -59,7 +57,6 @@ files:
     type: android
     languages_mapping:
       locale:
-        bwr-ng: bwr-NG
         de: de
         fr: fr
 
@@ -69,7 +66,6 @@ files:
     type: android
     languages_mapping:
       locale:
-        bwr-ng: bwr-NG
         de: de
         fr: fr
 
@@ -100,7 +96,6 @@ files:
     update_option: update_as_unapproved
     languages_mapping:
       locale_with_underscore:
-        bwr-ng: bwr_NG
         shu-latn-n: shu@latin
         ha: ha
 
