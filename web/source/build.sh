@@ -337,11 +337,11 @@ if [ $FETCH_DEPS = true ]; then
     # web-environment file is generated (because it uses a script
     # to do this at present).
     echo "Temp: Building dependencies that have manual build requirements"
-    pushd "$KEYMAN_ROOT/common/predictive-text" > /dev/null
+    pushd "$KEYMAN_ROOT/resources/web-environment" > /dev/null
     ./build.sh
     popd > /dev/null
 
-    pushd "$KEYMAN_ROOT/resources/web-environment" > /dev/null
+    pushd "$KEYMAN_ROOT/common/predictive-text" > /dev/null
     ./build.sh
     popd > /dev/null
 
