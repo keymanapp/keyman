@@ -21,8 +21,8 @@ void KMX_Context::Add(KMX_WCHAR ch)
   if(pos == MAXCONTEXT - 1)
   {
     auto p = incxstr(CurContext);
-    auto n = p - CurContext;
-    memmove(CurContext, p, (MAXCONTEXT - n) * 2);
+    auto n = (int)(p - CurContext);
+    memmove(CurContext, p, (MAXCONTEXT - n) * sizeof(KMX_WCHAR));
     pos -= n;
   }
 
