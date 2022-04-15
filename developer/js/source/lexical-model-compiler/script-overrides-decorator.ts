@@ -1,4 +1,4 @@
-/// <reference path="../../node_modules/@keymanapp/models-types/index.d.ts" />
+/// <reference types="@keymanapp/models-types" />
 
 export function decorateWithScriptOverrides(breaker: WordBreakingFunction, option: OverrideScriptDefaults) {
   if (option !== 'break-words-at-spaces') {
