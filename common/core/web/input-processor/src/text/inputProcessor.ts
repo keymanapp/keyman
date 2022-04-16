@@ -139,8 +139,9 @@ namespace com.keyman.text {
         this.keyboardProcessor.selectLayer(keyEvent);
       }
 
+      const keepRuleBehavior = ruleBehavior != null;
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
-      if(ruleBehavior != null) {
+      if(keepRuleBehavior) {
         let alternates = this.buildAlternates(ruleBehavior, keyEvent, preInputMock);
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
@@ -185,7 +186,7 @@ namespace com.keyman.text {
         outputTarget.doInputEvent();
       }
 
-      return ruleBehavior;
+      return keepRuleBehavior ? ruleBehavior : null;
     }
 
     private buildAlternates(ruleBehavior: RuleBehavior, keyEvent: KeyEvent, preInputMock: Mock): Alternate[] {

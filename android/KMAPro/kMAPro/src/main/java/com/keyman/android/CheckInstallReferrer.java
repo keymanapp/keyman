@@ -79,6 +79,9 @@ public class CheckInstallReferrer {
             // Connection couldn't be established; log to Sentry
             KMLog.LogError(TAG, "onInstallReferrerSetupFinished:SERVICE_UNAVAILABLE");
             break;
+          case InstallReferrerClient.InstallReferrerResponse.PERMISSION_ERROR:
+            KMLog.LogError(TAG, "onInstallReferrerSetupFinished.PERMISSION_ERROR");
+            break;
           default:
             // There are some other error codes; log to Sentry
             KMLog.LogError(TAG, "onInstallReferrerSetupFinished: Unexpected code: " +

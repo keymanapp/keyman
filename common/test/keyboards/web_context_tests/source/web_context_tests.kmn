@@ -3,7 +3,7 @@ c with name "web_context_tests"
 store(&VERSION) '10.0'
 store(&NAME) 'web_context_tests'
 store(&COPYRIGHT) '© SIL International'
-store(&KEYBOARDVERSION) '1.0'
+store(&KEYBOARDVERSION) '1.1'
 store(&TARGETS) 'any'
 store(&VISUALKEYBOARD) 'web_context_tests.kvks'
 store(&LAYOUTFILE) 'web_context_tests.keyman-touch-layout'
