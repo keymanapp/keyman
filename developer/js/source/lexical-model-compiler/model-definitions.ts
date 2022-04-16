@@ -49,7 +49,7 @@ export class ModelDefinitions {
     version: string;
     applyCasing?: CasingFunction;
   } = {
-    version: process.env.npm_package_version
+    version: KEYMAN_VERSION.VERSION_WITH_TAG
   };
 
   /**

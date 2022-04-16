@@ -96,8 +96,6 @@ if (( install_dependencies )) ; then
   verify_npm_setup
 fi
 
-set_npm_version || fail "Setting version failed."
-
 build || fail "Compilation failed."
 echo "Typescript compilation successful."
 
@@ -106,6 +104,8 @@ if (( run_tests )); then
 fi
 
 if (( should_publish )); then
+  set_npm_version || fail "Setting version failed."
+
   if [[ $TIER == stable ]]; then
     npm_dist_tag=latest
   else

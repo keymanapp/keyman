@@ -12,10 +12,12 @@ import { SysExits } from './util/sysexits';
 
 let inputFilename: string;
 
+/// <reference types="@keymanapp/keyman-version" />
+
 /* Arguments */
 program
   .description('Compiles Keyman lexical models')
-  .version(require('../package.json').version)
+  .version(KEYMAN_VERSION.VERSION_WITH_TAG)
   .arguments('<infile>')
   .action(infile => inputFilename = infile)
   .option('-o, --outFile <filename>', 'where to save the resultant file');

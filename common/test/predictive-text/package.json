@@ -1,6 +1,5 @@
 {
   "name": "lmlayer-cli",
-  "version": "0.2.0",
   "description": "Command line interface to the predictive text engine.",
   "main": "index.js",
   "bin": "./index.js",
