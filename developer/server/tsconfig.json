@@ -1,4 +1,6 @@
 {
+  "extends": "../../tsconfig-base.json",
+
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
@@ -16,5 +18,8 @@
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../common/web/keyman-version" }
   ]
 }
