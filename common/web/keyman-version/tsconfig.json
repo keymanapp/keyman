@@ -7,7 +7,7 @@
     "module": "none",
     "outFile": "build/index.js",
     "sourceMap": true,
-    "lib": ["webworker", "es6"],
+    "lib": ["es6"],
     "target": "es5",
     "downlevelIteration": true,
   },
