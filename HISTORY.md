@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.235 beta 2022-04-18
+
+* chore(android,windows): Update crowdin strings for bwr-NG (#6532)
+
 ## 15.0.234 beta 2022-04-14
 
 * chore(common): Add Crowdin strings for Portuguese (pt-PT) (#6509)
