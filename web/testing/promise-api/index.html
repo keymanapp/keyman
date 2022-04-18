@@ -19,6 +19,7 @@
       body {font-family: Tahoma,helvetica;}
       h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
       .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      .log  {font-size: 1em; width:80%; min-height:80px; max-height: 80px; border: 1px solid gray;}
       #KeymanWebControl {width:50%;min-width:600px;}
       .active {font-weight:bold}
     </style>
@@ -37,6 +38,7 @@
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
     <script src="promisehdr.js"></script>
+    <script src="eventLogging.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -44,6 +46,32 @@
       const alertType = (new URLSearchParams(window.location.search)).get("useAlerts") != "false";
 
       var kmw=window.keyman;
+
+      var loggingActive = false;
+
+      function eventLogChange() {
+        const logActiveRadio = document.getElementById('eventLog-on');
+        const offLabel = document.getElementById('event-label-off');
+        const onLabel = document.getElementById('event-label-on');
+
+        const loggingDiv = document.getElementById('logZone');
+        const hasLoggingText = !!document.getElementById('eventLogging').value;
+
+        const active = logActiveRadio.checked;
+        loggingActive = active;
+
+        offLabel.className = active ? '' : 'active';
+        onLabel.className  = active ? 'active' : '';
+
+        loggingDiv.style.display = active || hasLoggingText ? 'block' : 'none';
+      }
+
+      function flushLogs() {
+        const loggingElement = document.getElementById('eventLogging');
+        loggingElement.value = '';
+
+        eventLogChange();
+      }
 
       // Test adding keyboards before kmw.init get deferred
       addKeyboards('french','@he');
@@ -64,6 +92,8 @@
 
         var alertText = alertType ? 'enabled(default)' : 'disabled';
         alertLink.className += 'active';
+
+        attachLoggingEvents();
       }
     </script>
 
@@ -90,6 +120,22 @@
       A native browser alert and dev-console error log will occur regardless of this
       setting when stub fetch errors occur.
     </p>
+
+    <hr>
+    <p>Two keyboard-change related event-logging modes are available:
+      <div>
+        <input type='radio' id='eventLog-off' name='eventLog' value='off' onchange='eventLogChange()' checked>
+        <label id='event-label-off' for='eventLog-off' class='active'>No logging</label>
+
+        <input type='radio' id='eventLog-on' name='eventLog' value='on' onchange='eventLogChange()'>
+        <label id='event-label-on' for='eventLog-on'>Logging</label>
+      </div>
+    </p>
+    <div id='logZone' style='display:none'>
+      <textarea id='eventLogging' class='log' disabled></textarea>
+      <input type='button' id='logFlusher' style='display: block' onclick='flushLogs();' value='Clear event logs' />
+    </div>
+    <hr>
 
     <div>
     <!--
