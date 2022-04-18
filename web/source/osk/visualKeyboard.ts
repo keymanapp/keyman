@@ -1134,7 +1134,6 @@ namespace com.keyman.osk {
      *  @param    {boolean}   on    add or remove highlighting
      **/
     highlightKey(key: KeyElement, on: boolean) {
-      //console.log('VisualKeyboard.highlightKey', key ? key.id : 'null', on);
       // Do not change element class unless a key
       if (!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
 

@@ -20,8 +20,6 @@ namespace com.keyman.osk.embedded {
     show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
       let util = com.keyman.singleton.util;
 
-      //console.log('KeyTip.show', key ? key.id : null, on);
-
       if(on && this.showPreview) {
         var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(vkbd.kbdDiv) + key.offsetWidth/2,
             yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
