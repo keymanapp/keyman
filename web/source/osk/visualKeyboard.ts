@@ -1143,10 +1143,9 @@ namespace com.keyman.osk {
       if (usePreview) {
         this.showKeyTip(key, on);
       } else {
-        if (on) {
-          // May be called on already-unhighlighted keys, so we don't remove the tip here.
-          this.showKeyTip(null, false);
-        }
+        // No key tip should be shown. In some cases (e.g. multitap), we
+        // may still have a tip visible so let's always hide in that case
+        this.showKeyTip(null, false);
         key.key.highlight(on);
       }
     }
@@ -1660,8 +1659,7 @@ namespace com.keyman.osk {
     showKeyTip(key: KeyElement, on: boolean) {
       var tip = this.keytip;
 
-      // Do not change the key preview unless key or state has changed
-      if (tip == null || (key == tip.key && on == tip.state)) {
+      if (tip == null) {
         return;
       }
 
