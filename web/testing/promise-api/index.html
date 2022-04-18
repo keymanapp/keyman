@@ -20,6 +20,7 @@
       h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
       .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
       #KeymanWebControl {width:50%;min-width:600px;}
+      .active {font-weight:bold}
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
@@ -41,7 +42,6 @@
     <script>
       // Thank you to https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
       const alertType = (new URLSearchParams(window.location.search)).get("useAlerts") != "false";
-      var alertText = alertType ? 'enabled(default)' : 'disabled';
 
       var kmw=window.keyman;
 
@@ -53,12 +53,24 @@
       }).then(function() {
         loadKeyboards();
       });
+
+      function onLoad() {
+        let alertLink = null;
+        if(alertType) {
+          alertLink = document.getElementById('alert_default');
+        } else {
+          alertLink = document.getElementById('alert_disabled');
+        }
+
+        var alertText = alertType ? 'enabled(default)' : 'disabled';
+        alertLink.className += 'active';
+      }
     </script>
 
   </head>
 
 <!-- Sample page HTML -->
-  <body>
+  <body onload='onLoad();'>
     <h2>KeymanWeb Sample Page - Promise API</h2>
     <p>This page is for testing the Promises returned from adding keyboards.
       See <a href="https://github.com/keymanapp/keyman/issues/5044">Specification #5044.</a>
@@ -71,18 +83,13 @@
       for any of the three keyboard-adding options at the bottom of the page.
     </p>
 
-    <p id="modeSelect">You are currently testing under the internal alerts <em id="mode"> </em> mode.
-    Two alert modes are available:
+    <p id="modeSelect">Two internal-alert testing modes are available:
     <a id="alert_disabled" href="./index.html?useAlerts=false">Disabled</a> or
     <a id="alert_default" href="./index.html">Enabled (Default)</a></p>
     <p>This will only affect whether or not KeymanWeb's alert modal is displayed.
       A native browser alert and dev-console error log will occur regardless of this
       setting when stub fetch errors occur.
     </p>
-
-<script>
-      document.getElementById("mode").textContent = alertText;
-    </script>
 
     <div>
     <!--
