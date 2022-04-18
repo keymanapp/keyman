@@ -21,6 +21,7 @@ function beforeChange(props) {
     return;
   }
   appendLog('beforekeyboardchange: ' + JSON.stringify(props));
+  appendLog('- active keyboard: ' + keyman.getActiveKeyboard());
 }
 
 function change(props) {
@@ -28,6 +29,7 @@ function change(props) {
     return;
   }
   appendLog('keyboardchange: ' + JSON.stringify(props));
+  appendLog('- active keyboard: ' + keyman.getActiveKeyboard());
 }
 
 function loaded(props) {
@@ -35,6 +37,7 @@ function loaded(props) {
     return;
   }
   appendLog('keyboardloaded: ' + JSON.stringify(props));
+  appendLog('- active keyboard: ' + keyman.getActiveKeyboard());
 }
 
 function registered(props) {
@@ -42,4 +45,5 @@ function registered(props) {
     return;
   }
   appendLog('keyboardregistered: ' + JSON.stringify(props));
+  appendLog('- active keyboard: ' + keyman.getActiveKeyboard());
 }
