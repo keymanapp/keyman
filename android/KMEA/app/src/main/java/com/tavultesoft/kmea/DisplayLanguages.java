@@ -41,7 +41,7 @@ public class DisplayLanguages {
       new DisplayLanguageType(unspecifiedLocale, context.getString(R.string.default_locale)),
       new DisplayLanguageType("am-ET", "አማርኛ (Amharic)"),
       new DisplayLanguageType("az-AZ", "Azərbaycanca (Azəricə)"),
-      new DisplayLanguageType("bwr-NT", "Bura-Pabir"),
+      new DisplayLanguageType("bwr-NG", "Bura-Pabir"),
       new DisplayLanguageType("ff-NG", "Ɗemngal Fulfulde"),
       new DisplayLanguageType("en", "English"),
       new DisplayLanguageType("es-419", "Español (Spanish - Latin America)"),
