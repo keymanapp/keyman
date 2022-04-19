@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/developer-server",
-  "version": "15.0.236",
+  "version": "15.0.237",
   "description": "Keyman Developer backend server",
   "main": "dist/index.js",
   "scripts": {

@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.236 beta 2022-04-19
+
+* fix(android): key tip sticky with multitap (#6494)
+* fix(web): blocks modifier key fat-fingering (#6473)
+
 ## 15.0.235 beta 2022-04-18
 
 * chore(android,windows): Update crowdin strings for bwr-NG (#6532)
