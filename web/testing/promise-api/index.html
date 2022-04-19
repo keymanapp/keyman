@@ -47,32 +47,6 @@
 
       var kmw=window.keyman;
 
-      var loggingActive = false;
-
-      function eventLogChange() {
-        const logActiveRadio = document.getElementById('eventLog-on');
-        const offLabel = document.getElementById('event-label-off');
-        const onLabel = document.getElementById('event-label-on');
-
-        const loggingDiv = document.getElementById('logZone');
-        const hasLoggingText = !!document.getElementById('eventLogging').value;
-
-        const active = logActiveRadio.checked;
-        loggingActive = active;
-
-        offLabel.className = active ? '' : 'active';
-        onLabel.className  = active ? 'active' : '';
-
-        loggingDiv.style.display = active || hasLoggingText ? 'block' : 'none';
-      }
-
-      function flushLogs() {
-        const loggingElement = document.getElementById('eventLogging');
-        loggingElement.value = '';
-
-        eventLogChange();
-      }
-
       // Test adding keyboards before kmw.init get deferred
       addKeyboards('french','@he');
 
@@ -81,26 +55,12 @@
       }).then(function() {
         loadKeyboards();
       });
-
-      function onLoad() {
-        let alertLink = null;
-        if(alertType) {
-          alertLink = document.getElementById('alert_default');
-        } else {
-          alertLink = document.getElementById('alert_disabled');
-        }
-
-        var alertText = alertType ? 'enabled(default)' : 'disabled';
-        alertLink.className += 'active';
-
-        attachLoggingEvents();
-      }
     </script>
 
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='onLoad();'>
+  <body>
     <h2>KeymanWeb Sample Page - Promise API</h2>
     <p>This page is for testing the Promises returned from adding keyboards.
       See <a href="https://github.com/keymanapp/keyman/issues/5044">Specification #5044.</a>
