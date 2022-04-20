@@ -686,48 +686,58 @@ namespace com.keyman.dom {
       if(target.base instanceof target.base.ownerDocument.defaultView.HTMLTextAreaElement) {
         // Approximates the height of a row.
         const yRow=Math.round(target.base.offsetHeight/(target.base as HTMLTextAreaElement).rows);
+        const minY = touchY;
+        const maxY = touchY - yRow;
+
+        let oldCpMin = cpMin;
+        let oldCpMax = cpMax;
 
         // Performs a binary search for a valid caret based on the y-position.
         // cp:  the previously-set caret position.
         for(let iLoop=0; iLoop<16; iLoop++) {
           const y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
+
           // Break the binary search if our final search window is extremely small.
           if(cpMax - cpMin <= 1) {
             break;
           }
 
-          if(y > touchY && cp > cpMin /*&& cp != cpMax*/) {
+          if(y > maxY && cp > cpMin /*&& cp != cpMax*/) {
             // If caret's prior placement is below (after) the touch's y-pos...
+            oldCpMax = cpMax;
             cpMax=cp;  // new max position
             cp=Math.round((cp+cpMin)/2); // guess the halfway mark
-          } else if(y < touchY-yRow && cp < cpMax /*&& cp != cpMin*/) {
+          } else if(y < minY && cp < cpMax /*&& cp != cpMin*/) {
             // If caret's prior placement is above (before) the touch's y-pos - 1 row height...
+            oldCpMin = cpMin;
             cpMin=cp; // new min posiiton
             cp=Math.round((cp+cpMax)/2); // guess the halfway mark
           } else { // the y-position lines up.
             break;
           }
           // Actively set our caret to the determined matching y-position.
-          target.setTextCaret(cp); // Actively moves the VISUAL caret, the position of which is used
-                                   // in the `const y` calc above.
+          target.setTextCaret(cp);  // mutates `caret`'s position
         }
 
         // Because of situations with new-lines, we also need to ensure the caret's actually within the target row.
-        while(dom.Utils.getAbsoluteY(caret)-dy > touchY && cp > cpMin) {
-          target.setTextCaret(--cp);
+        while(dom.Utils.getAbsoluteY(caret)-dy > minY && cp > cpMin) {
+          target.setTextCaret(--cp); // mutates `caret`'s position
+          oldCpMin = cpMin = cp; // Old location was not on the same line.  It's free; may as well take it.
+          // If this block executed, cpMin will be 'tight' when complete.
         }
 
-        while(dom.Utils.getAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) {
-          target.setTextCaret(++cp);
+        while(dom.Utils.getAbsoluteY(caret)-dy < maxY && cp < cpMax) {
+          target.setTextCaret(++cp); // mutates `caret`'s position
+          oldCpMax = cpMax = cp; // Old location was not on the same line.  It's free; may as well take it.
+          // If this block executed, cpMax will be 'tight' when complete.
         }
 
-        // The caret itself should now lie within the target row.
+        // The caret itself should now lie within the target row.  cpMin and cpMax will be decent bounds,
+        // but not necessarily tight bounds for the target row.
         //
-        // At this point, cpMin and cpMax are decent bounds, but they're not tight bounds for
-        // the target row; their corresponding x-position is somewhat indeterminate.
-        // For smaller quantities of text, they may conceivably lie within the target row.
-        // For larger quantities, they should always lie outside of it, but again, 
-        // indeterminate x-position.
+        // FIXME: to properly reuse the InputHTMLElement-based x-coord search, we need the
+        // bounds to be TIGHT after this comment's containing block finishes.
+        // As in, [cpMin, cpMax] === [start of row, end of row].
       }
 
       // Caret repositioning for horizontal scrolling of RTL text
@@ -747,7 +757,8 @@ namespace com.keyman.dom {
 
       // Now to binary-search the x-coordinate.
       // Except... we... haven't modified cpMin & cpMax since their roles in the
-      // y-position search.  Why not?  That sounds dangerous!
+      // y-position search, which matters if the backing element is a TextArea.
+      // Why not?  That sounds dangerous!
       for(let iLoop=0; iLoop<16; iLoop++) {
         const x=dom.Utils.getAbsoluteX(caret);  //left of caret
         if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
