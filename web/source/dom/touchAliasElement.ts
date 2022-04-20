@@ -404,9 +404,10 @@ namespace com.keyman.dom {
 
     /**
      * Facilitates higher-performance execution of caret position updates by disabling
-     * preventing unnecessary DOM-manipulating operations during the search.
+     * unnecessary DOM-manipulating (& layout-triggering) operations during the search.
+     * Some are still needed for the search to work, though.
      * 
-     * Exists to encapsulate this 'disabling' behavior and ensure it's always re-enabled.
+     * Exists to encapsulate this behavior to ensure it's always, unfailingly re-enabled.
      * @param functor A function that will search for the best caret position.
      */
     executeCaretSearchFunctor(functor: () => void) {
