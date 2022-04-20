@@ -99,6 +99,7 @@ type
     FPromptForReboot: Boolean;  // I3355   // I3500
     FSilent: Boolean;
     FForceOffline: Boolean;
+    FInstallDefaults: Boolean;
     FTier, FPackages, FExtractOnly_Path: string;
 
     function CheckForOldVersionScenario: Boolean;
@@ -109,7 +110,7 @@ type
     procedure ProcessCommandLine(
       var FPromptForReboot, FSilent, FForceOffline, FExtractOnly: Boolean;
       var FContinueSetupFilename: string;
-      var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean;
+      var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FInstallDefaults: Boolean;
       var FPackages, FExtractPath, FTier: string);
     procedure SetExitVal(c: Integer);
     function IsKeymanDesktop7Installed: string;
@@ -165,7 +166,13 @@ BEGIN
           ProcessCommandLine(
             FPromptForReboot, FSilent, FForceOffline, FExtractOnly,
             FContinueSetupFilename, FStartAfterInstall,
-            FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
+            FDisableUpgradeFrom6Or7Or8, FInstallDefaults, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
+          // always honour the command line -d from ProcessCommandLine
+          if not(FInstallDefaults) and (FContinueSetupFilename = '') then
+          begin
+            if (Assigned(FInstallInfo.MsiInstallLocation) and (FInstallInfo.InstalledVersion.Version = '')) then
+              FInstallDefaults := True;
+          end;
 
           GetRunTools.Silent := FSilent;
 
@@ -542,7 +549,7 @@ end;
 procedure TSetupBootstrap.ProcessCommandLine(
   var FPromptForReboot, FSilent, FForceOffline, FExtractOnly: Boolean;
   var FContinueSetupFilename: string;
-  var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean;
+  var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FInstallDefaults: Boolean;
   var FPackages, FExtractPath, FTier: string
 );
 var
@@ -555,6 +562,7 @@ begin
   FContinueSetupFilename := '';
   FDisableUpgradeFrom6Or7Or8 := False; // I2847   // I4293
   FStartAfterInstall := True;  // I2738
+  FInstallDefaults := False;
   i := 1;
   while i <= ParamCount do
   begin
@@ -577,6 +585,8 @@ begin
       FStartAfterInstall := True;
       FDisableUpgradeFrom6Or7Or8 := True;  // I2847   // I4293
     end
+    else if WideSameText(ParamStr(i), '-d') then
+      FInstallDefaults := True
     else if WideSameText(ParamStr(i), '-o') then
       FForceOffline := True
     else if WideSameText(ParamStr(i), '-r') then
