@@ -678,57 +678,54 @@ namespace com.keyman.dom {
     private performCaretSearch(target: TouchAliasElement, scroller: HTMLElement, touchX: number, touchY: number) {
       const caret=scroller.childNodes[1] as HTMLSpanElement; //caret span
       const dy=document.body.scrollTop;
+      const contextLength = target.getText()._kmwLength();
       let cpMin=0;
-      let cpMax=target.getText()._kmwLength();
+      let cpMax=contextLength;
       let cp=target.getTextCaret();
 
       // Vertical scrolling
       if(target.base instanceof target.base.ownerDocument.defaultView.HTMLTextAreaElement) {
         // Approximates the height of a row.
         const yRow=Math.round(target.base.offsetHeight/(target.base as HTMLTextAreaElement).rows);
-        const minY = touchY;
-        const maxY = touchY - yRow;
-
-        let oldCpMin = cpMin;
-        let oldCpMax = cpMax;
+        const maxY = touchY;
+        const minY = touchY - yRow;
 
         // Performs a binary search for a valid caret based on the y-position.
         // cp:  the previously-set caret position.
         for(let iLoop=0; iLoop<16; iLoop++) {
-          const y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
-
           // Break the binary search if our final search window is extremely small.
           if(cpMax - cpMin <= 1) {
             break;
           }
+          const y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
 
           if(y > maxY && cp > cpMin /*&& cp != cpMax*/) {
             // If caret's prior placement is below (after) the touch's y-pos...
-            oldCpMax = cpMax;
             cpMax=cp;  // new max position
             cp=Math.round((cp+cpMin)/2); // guess the halfway mark
           } else if(y < minY && cp < cpMax /*&& cp != cpMin*/) {
             // If caret's prior placement is above (before) the touch's y-pos - 1 row height...
-            oldCpMin = cpMin;
             cpMin=cp; // new min posiiton
             cp=Math.round((cp+cpMax)/2); // guess the halfway mark
-          } else { // the y-position lines up.
+          } else { // the y-position lines up; cp is within the target row.
             break;
           }
           // Actively set our caret to the determined matching y-position.
           target.setTextCaret(cp);  // mutates `caret`'s position
         }
 
-        // Because of situations with new-lines, we also need to ensure the caret's actually within the target row.
-        while(dom.Utils.getAbsoluteY(caret)-dy > minY && cp > cpMin) {
+        // cpMin, cpMax are either absolute bounds or are outside of the target row at this point.
+
+        // Because of situations with new-lines, we still need to ensure the caret's actually within the target row.
+        while(dom.Utils.getAbsoluteY(caret)-dy > maxY && cp > cpMin) {
           target.setTextCaret(--cp); // mutates `caret`'s position
-          oldCpMin = cpMin = cp; // Old location was not on the same line.  It's free; may as well take it.
+          cpMin = cp; // Old location was not on the same line.  It's free; may as well take it.
           // If this block executed, cpMin will be 'tight' when complete.
         }
 
-        while(dom.Utils.getAbsoluteY(caret)-dy < maxY && cp < cpMax) {
+        while(dom.Utils.getAbsoluteY(caret)-dy < minY && cp < cpMax) {
           target.setTextCaret(++cp); // mutates `caret`'s position
-          oldCpMax = cpMax = cp; // Old location was not on the same line.  It's free; may as well take it.
+          cpMax = cp; // Old location was not on the same line.  It's free; may as well take it.
           // If this block executed, cpMax will be 'tight' when complete.
         }
 
@@ -738,6 +735,46 @@ namespace com.keyman.dom {
         // FIXME: to properly reuse the InputHTMLElement-based x-coord search, we need the
         // bounds to be TIGHT after this comment's containing block finishes.
         // As in, [cpMin, cpMax] === [start of row, end of row].
+        //
+        // Even though we reached these values via binary search, we still need to binary search again.
+        // If placing the caret nearby a previously-placed caret, one of the bounds can be VERY far away
+        // at this point!
+
+        // Determine minimum caret position on the target row.
+        let minMin = cpMin;
+        let minMax = cp;
+        while(minMax - minMin > 1) {
+          let minMid = Math.round((minMax+minMin)/2);
+          target.setTextCaret(minMid);
+
+          const y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
+          if(y < minY) {
+            minMin = minMid+1;
+          } else {
+            minMax = minMid;
+          }
+          cpMin = minMid;
+        }
+
+        // Determine maximum caret position on the target row.
+        let maxMin = cp;
+        let maxMax = cpMax;
+        while(maxMax - maxMin > 1) {
+          let maxMid = Math.round((maxMax+maxMin)/2);
+          target.setTextCaret(maxMid);
+
+          const y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
+          if(y > maxY) {
+            maxMax = maxMid-1;
+          } else {
+            maxMin = maxMid;
+          }
+          cpMax = maxMid;
+        }
+
+        // Set the potential caret in the middle of the range.
+        cp = Math.round((cpMin + cpMax)/2);
+        target.setTextCaret(cp);
       }
 
       // Caret repositioning for horizontal scrolling of RTL text
@@ -760,11 +797,17 @@ namespace com.keyman.dom {
       // y-position search, which matters if the backing element is a TextArea.
       // Why not?  That sounds dangerous!
       for(let iLoop=0; iLoop<16; iLoop++) {
+        // Break the binary search if our final search window is extremely small.
+        if(cpMax - cpMin <= 1) {
+          break;
+        }
+
         const x=dom.Utils.getAbsoluteX(caret);  //left of caret
-        if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
+
+        if(snapOrder(x, touchX) && cp > cpMin) {
           cpMax=cp;
           cp=Math.round((cp+cpMin)/2);
-        } else if(!snapOrder(x, touchX) && cp < cpMax && cp != cpMin) {
+        } else if(!snapOrder(x, touchX) && cp < cpMax) {
           cpMin=cp;
           cp=Math.round((cp+cpMax)/2);
         } else {
