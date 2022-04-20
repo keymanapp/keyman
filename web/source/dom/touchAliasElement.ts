@@ -96,6 +96,8 @@ namespace com.keyman.dom {
     __caretTimerId: number;
     __activeCaret: boolean = false;
 
+    __midCaretSearching: boolean = false;
+
     __resizeHandler: () => void;
 
     private static device: Device;
@@ -361,7 +363,9 @@ namespace com.keyman.dom {
       this.__preCaret.textContent=t1;
       this.__postCaret.textContent=t2;
 
-      this.updateBaseElement(); // KMW-3, KMW-29
+      if(!this.__midCaretSearching) {
+        this.updateBaseElement(); // KMW-3, KMW-29
+      }
     }
 
     getTextBeforeCaret() {
@@ -384,9 +388,9 @@ namespace com.keyman.dom {
       tLen=t.length;
       tLen=tLen+this.__postCaret.textContent.length;
 
-      // Update the base element then scroll into view if necessary
-      this.updateBaseElement(); //KMW-3, KMW-29
-      this.scrollInput();
+      if(!this.__midCaretSearching) {
+        this.finalizeCaret();
+      }
     }
 
     getTextCaret(): number {
@@ -396,6 +400,29 @@ namespace com.keyman.dom {
     setTextCaret(cp: number): void {
       this.setText(null,cp);
       this.showCaret();
+    }
+
+    /**
+     * Facilitates higher-performance execution of caret position updates by disabling
+     * preventing unnecessary DOM-manipulating operations during the search.
+     * 
+     * Exists to encapsulate this 'disabling' behavior and ensure it's always re-enabled.
+     * @param functor A function that will search for the best caret position.
+     */
+    executeCaretSearchFunctor(functor: () => void) {
+      this.__midCaretSearching = true;
+      try {
+        functor();
+      } finally {
+        this.__midCaretSearching = false;
+        this.finalizeCaret();
+      }
+    }
+
+    private finalizeCaret() {
+      // Update the base element then scroll into view if necessary
+      this.updateBaseElement(); //KMW-3, KMW-29
+      this.scrollInput();
     }
 
     /**
@@ -452,11 +479,13 @@ namespace com.keyman.dom {
       cs.visibility='hidden';   // best to wait for timer to display caret
       this.__activeCaret = true;
 
-      // Scroll into view if required
-      this.scrollBody();
+      if(!this.__midCaretSearching) {
+        // Scroll into view if required
+        this.scrollBody();
 
-      // Display and position the scrollbar if necessary
-      this.setScrollBar();
+        // Display and position the scrollbar if necessary
+        this.setScrollBar();
+      }
     }
 
     hideCaret() {

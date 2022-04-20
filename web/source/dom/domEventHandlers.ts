@@ -628,8 +628,8 @@ namespace com.keyman.dom {
       // If clicked on DIV on the main element, rather than any part of the text representation,
       // set caret to end of text
       if(tTarg && tTarg == target) {
-        var x,cp;
-        x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);
+        let cp: number;
+        let x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);
         if(target.dir == 'rtl') {
           x += (scroller.firstChild as HTMLElement).offsetWidth;
           cp=(touchX > x ? 0 : 100000);
@@ -641,69 +641,10 @@ namespace com.keyman.dom {
         target.scrollInput();
         // nextSibling - the scrollbar element.
       } else if(tTarg != scroller.nextSibling) { // Otherwise, if clicked on text in SPAN, set at touch position
-        var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
-        caret=scroller.childNodes[1]; //caret span
-        cpMin=0;
-        cpMax=target.getText()._kmwLength();
-        cp=target.getTextCaret();
-        dy=document.body.scrollTop;
-
-        // Vertical scrolling
-        if(target.base instanceof target.base.ownerDocument.defaultView.HTMLTextAreaElement) {
-          yRow=Math.round(target.base.offsetHeight/(target.base as HTMLTextAreaElement).rows);
-          for(iLoop=0; iLoop<16; iLoop++)
-          {
-            y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
-            if(y > touchY && cp > cpMin && cp != cpMax) {cpMax=cp; cp=Math.round((cp+cpMin)/2);}
-            else if(y < touchY-yRow && cp < cpMax && cp != cpMin) {cpMin=cp; cp=Math.round((cp+cpMax)/2);}
-            else break;
-            target.setTextCaret(cp);
-          }
-
-          while(dom.Utils.getAbsoluteY(caret)-dy > touchY && cp > cpMin) {
-            target.setTextCaret(--cp);
-          }
-
-          while(dom.Utils.getAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) {
-            target.setTextCaret(++cp);
-          }
-        }
-
-        // Caret repositioning for horizontal scrolling of RTL text
-
-        // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
-        // Think of it as performing a floor() function, but the floor depends on the origin's direction.
-        var snapOrder;
-        if(target.dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
-          snapOrder = function(a, b) {
-            return a < b;
-          };
-        } else {
-          snapOrder = function(a, b) {
-            return a > b;
-          };
-        }
-
-        for(iLoop=0; iLoop<16; iLoop++) {
-          x=dom.Utils.getAbsoluteX(caret);  //left of caret
-          if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
-            cpMax=cp;
-            cp=Math.round((cp+cpMin)/2);
-          } else if(!snapOrder(x, touchX) && cp < cpMax && cp != cpMin) {
-            cpMin=cp;
-            cp=Math.round((cp+cpMax)/2);
-          } else {
-            break;
-          }
-          target.setTextCaret(cp);
-        }
-
-        while(snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp > cpMin) {
-          target.setTextCaret(--cp);
-        }
-        while(!snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp < cpMax) {
-          target.setTextCaret(++cp);
-        }
+        let _this = this;
+        target.executeCaretSearchFunctor(function() {
+          _this.performCaretSearch(target, scroller, touchX, touchY);
+        });
       }
 
       /*
@@ -731,6 +672,101 @@ namespace com.keyman.dom {
       // despite its present redundancy.
       if(this._CommonFocusHelper(target)) {
         return;
+      }
+    }
+
+    private performCaretSearch(target: TouchAliasElement, scroller: HTMLElement, touchX: number, touchY: number) {
+      const caret=scroller.childNodes[1] as HTMLSpanElement; //caret span
+      const dy=document.body.scrollTop;
+      let cpMin=0;
+      let cpMax=target.getText()._kmwLength();
+      let cp=target.getTextCaret();
+
+      // Vertical scrolling
+      if(target.base instanceof target.base.ownerDocument.defaultView.HTMLTextAreaElement) {
+        // Approximates the height of a row.
+        const yRow=Math.round(target.base.offsetHeight/(target.base as HTMLTextAreaElement).rows);
+
+        // Performs a binary search for a valid caret based on the y-position.
+        // cp:  the previously-set caret position.
+        for(let iLoop=0; iLoop<16; iLoop++) {
+          const y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
+          // Break the binary search if our final search window is extremely small.
+          if(cpMax - cpMin <= 1) {
+            break;
+          }
+
+          if(y > touchY && cp > cpMin /*&& cp != cpMax*/) {
+            // If caret's prior placement is below (after) the touch's y-pos...
+            cpMax=cp;  // new max position
+            cp=Math.round((cp+cpMin)/2); // guess the halfway mark
+          } else if(y < touchY-yRow && cp < cpMax /*&& cp != cpMin*/) {
+            // If caret's prior placement is above (before) the touch's y-pos - 1 row height...
+            cpMin=cp; // new min posiiton
+            cp=Math.round((cp+cpMax)/2); // guess the halfway mark
+          } else { // the y-position lines up.
+            break;
+          }
+          // Actively set our caret to the determined matching y-position.
+          target.setTextCaret(cp); // Actively moves the VISUAL caret, the position of which is used
+                                   // in the `const y` calc above.
+        }
+
+        // Because of situations with new-lines, we also need to ensure the caret's actually within the target row.
+        while(dom.Utils.getAbsoluteY(caret)-dy > touchY && cp > cpMin) {
+          target.setTextCaret(--cp);
+        }
+
+        while(dom.Utils.getAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) {
+          target.setTextCaret(++cp);
+        }
+
+        // The caret itself should now lie within the target row.
+        //
+        // At this point, cpMin and cpMax are decent bounds, but they're not tight bounds for
+        // the target row; their corresponding x-position is somewhat indeterminate.
+        // For smaller quantities of text, they may conceivably lie within the target row.
+        // For larger quantities, they should always lie outside of it, but again, 
+        // indeterminate x-position.
+      }
+
+      // Caret repositioning for horizontal scrolling of RTL text
+
+      // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
+      // Think of it as performing a floor() function, but the floor depends on the origin's direction.
+      var snapOrder;
+      if(target.dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
+        snapOrder = function(a, b) {
+          return a < b;
+        };
+      } else {
+        snapOrder = function(a, b) {
+          return a > b;
+        };
+      }
+
+      // Now to binary-search the x-coordinate.
+      // Except... we... haven't modified cpMin & cpMax since their roles in the
+      // y-position search.  Why not?  That sounds dangerous!
+      for(let iLoop=0; iLoop<16; iLoop++) {
+        const x=dom.Utils.getAbsoluteX(caret);  //left of caret
+        if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
+          cpMax=cp;
+          cp=Math.round((cp+cpMin)/2);
+        } else if(!snapOrder(x, touchX) && cp < cpMax && cp != cpMin) {
+          cpMin=cp;
+          cp=Math.round((cp+cpMax)/2);
+        } else {
+          break;
+        }
+        target.setTextCaret(cp);
+      }
+
+      while(snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp > cpMin) {
+        target.setTextCaret(--cp);
+      }
+      while(!snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp < cpMax) {
+        target.setTextCaret(++cp);
       }
     }
 
