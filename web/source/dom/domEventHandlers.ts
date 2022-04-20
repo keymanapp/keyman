@@ -714,7 +714,8 @@ namespace com.keyman.dom {
           target.setTextCaret(cp);  // mutates `caret`'s position
         }
 
-        // cpMin, cpMax are either absolute bounds or are outside of the target row at this point.
+        // cpMin, cpMax are either absolute bounds (beginning/end of context)
+        // or are outside of the target row at this point.
 
         // Because of situations with new-lines, we still need to ensure the caret's actually within the target row.
         while(dom.Utils.getAbsoluteY(caret)-dy > maxY && cp > cpMin) {
@@ -729,47 +730,47 @@ namespace com.keyman.dom {
           // If this block executed, cpMax will be 'tight' when complete.
         }
 
-        // The caret itself should now lie within the target row.  cpMin and cpMax will be decent bounds,
-        // but not necessarily tight bounds for the target row.
+        // The caret itself should now lie within the target row.  The start of the row must be at or before
+        // the caret, while the end of the row must be at or after it.
         //
-        // FIXME: to properly reuse the InputHTMLElement-based x-coord search, we need the
-        // bounds to be TIGHT after this comment's containing block finishes.
-        // As in, [cpMin, cpMax] === [start of row, end of row].
+        // To properly reuse the InputHTMLElement-based x-coord search, we need the bounds to be TIGHT after
+        // this comment's containing block finishes. As in, we need [cpMin, cpMax] === [start of row, end of row].
         //
-        // Even though we reached these values via binary search, we still need to binary search again.
-        // If placing the caret nearby a previously-placed caret, one of the bounds can be VERY far away
-        // at this point!
+        // Note:  in certain scenarios, one of the bounds can be VERY far away at this point.
+        // Say, if a new touch event wants to move the caret nearby the previous location, as the
+        // bound on the opposite side may not have gotten overwritten even once so far in this call!
+        // Therefore... more binary search.
 
         // Determine minimum caret position on the target row.
-        let minMin = cpMin;
-        let minMax = cp;
-        while(minMax - minMin > 1) {
-          let minMid = Math.round((minMax+minMin)/2);
-          target.setTextCaret(minMid);
+        let minCpMin = cpMin; // Is before the row.
+        let maxCpMin = cp;
+        while(maxCpMin - minCpMin > 1) {
+          const searchPt = Math.round((maxCpMin+minCpMin)/2);
+          target.setTextCaret(searchPt);
 
           const y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
           if(y < minY) {
-            minMin = minMid+1;
+            minCpMin = searchPt+1; // We already know it's not on this row, so the minimum possible should be increased.
           } else {
-            minMax = minMid;
+            maxCpMin = searchPt; // Still in the same row, so the boundary can only be at or before this point.
           }
-          cpMin = minMid;
+          cpMin = searchPt;
         }
 
         // Determine maximum caret position on the target row.
-        let maxMin = cp;
-        let maxMax = cpMax;
-        while(maxMax - maxMin > 1) {
-          let maxMid = Math.round((maxMax+maxMin)/2);
-          target.setTextCaret(maxMid);
+        let minCpMax = cp;
+        let maxCpMax = cpMax; // Is after the row.
+        while(maxCpMax - minCpMax > 1) {
+          const searchPt = Math.round((maxCpMax+minCpMax)/2);
+          target.setTextCaret(searchPt);
 
           const y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
           if(y > maxY) {
-            maxMax = maxMid-1;
+            maxCpMax = searchPt-1; // We already know it's not on this row, so the maximum possible should be decreased.
           } else {
-            maxMin = maxMid;
+            minCpMax = searchPt; // Still in the same row, so the boundary can only be at or after this point.
           }
-          cpMax = maxMid;
+          cpMax = searchPt;
         }
 
         // Set the potential caret in the middle of the range.
