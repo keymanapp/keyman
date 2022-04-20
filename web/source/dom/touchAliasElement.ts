@@ -363,6 +363,7 @@ namespace com.keyman.dom {
       this.__preCaret.textContent=t1;
       this.__postCaret.textContent=t2;
 
+      // Disable if a caret search is operational; no need to alter page layout or scroll just yet.
       if(!this.__midCaretSearching) {
         this.updateBaseElement(); // KMW-3, KMW-29
       }
@@ -480,6 +481,7 @@ namespace com.keyman.dom {
       cs.visibility='hidden';   // best to wait for timer to display caret
       this.__activeCaret = true;
 
+      // Disable if a caret search is operational; no need to alter page layout or scroll just yet.
       if(!this.__midCaretSearching) {
         // Scroll into view if required
         this.scrollBody();
