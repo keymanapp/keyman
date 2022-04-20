@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.237 beta 2022-04-20
+
+* feat(linux): WIP - implement capslock handling with Wayland  ️ (#6213)
+
 ## 15.0.236 beta 2022-04-19
 
 * fix(android): key tip sticky with multitap (#6494)
