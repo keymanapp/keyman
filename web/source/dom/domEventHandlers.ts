@@ -551,8 +551,8 @@ namespace com.keyman.dom {
       DOMEventHandlers.states.setFocusTimer();
 
       var tEvent: {
-        clientX: number;
-        clientY: number;
+        pageX: number;
+        pageY: number;
         target?: EventTarget;
       };
 
@@ -564,7 +564,7 @@ namespace com.keyman.dom {
           return;
         }
       } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
-        tEvent={clientX:0, clientY:0}
+        tEvent={pageX:0, pageY:0}
 
         // Will usually be called from setActiveElement, which should define DOMEventHandlers.states.lastActiveElement
         if(this.keyman.domManager.lastActiveElement) {
@@ -584,8 +584,8 @@ namespace com.keyman.dom {
     }.bind(this);
 
     // Also handles initial touch responses.
-    setFocusWithTouch(tEvent: {clientX: number, clientY: number, target?: EventTarget}) {
-      var touchX=tEvent.clientX,touchY=tEvent.clientY;
+    setFocusWithTouch(tEvent: {pageX: number, pageY: number, target?: EventTarget}) {
+      var touchX=tEvent.pageX,touchY=tEvent.pageY;
 
       // Some specifics rely upon which child of the TouchAliasElement received the actual event.
       let tTarg=tEvent.target as HTMLElement;
