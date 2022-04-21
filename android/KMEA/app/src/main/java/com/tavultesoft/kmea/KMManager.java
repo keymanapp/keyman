@@ -235,6 +235,7 @@ public final class KMManager {
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
   public static final String KMKey_FontFamily = "family";
+  public static final String KMKey_KMPInstall_Mode = "kmpInstallMode";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
