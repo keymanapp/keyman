@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.238 beta 2022-04-21
+
+* chore(linux): Fix failure in Debian reproducibility testing (#6548)
+* chore(linux): Update Linux dependencies (#6549)
+
 ## 15.0.237 beta 2022-04-20
 
 * feat(linux): WIP - implement capslock handling with Wayland  ️ (#6213)
