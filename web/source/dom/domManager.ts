@@ -1441,27 +1441,14 @@ namespace com.keyman.dom {
     /* ----------------------- Editable IFrame methods ------------------- */
 
     /**
-     * Function     _IsIEEditableIframe
-     * Scope        Private
-     * @param       {Object}          Pelem         Iframe element
-     *              {boolean|number}  PtestOn       1 to test if frame content is editable (TODO: unclear exactly what this is doing!)
-     * @return      {boolean}
-     * Description  Test if element is an IE editable IFrame
-     */
-    _IsIEEditableIframe(Pelem: HTMLIFrameElement, PtestOn?: number) {
-      var Ldv, Lvalid = Pelem  &&  (Ldv=Pelem.tagName)  &&  Ldv.toLowerCase() == 'body'  &&  (Ldv=Pelem.ownerDocument)  &&  Ldv.parentWindow;
-      return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Pelem.isContentEditable));
-    }
-
-    /**
-     * Function     _IsMozillaEditableIframe
+     * Function     _IsEditableIframe
      * Scope        Private
      * @param       {Object}           Pelem    Iframe element
      * @param       {boolean|number}   PtestOn  1 to test if 'designMode' is 'ON'
      * @return      {boolean}
      * Description  Test if element is a Mozilla editable IFrame
      */
-    _IsMozillaEditableIframe(Pelem: HTMLIFrameElement, PtestOn?: number) {
+    _IsEditableIframe(Pelem: HTMLIFrameElement, PtestOn?: number) {
       var Ldv, Lvalid = Pelem  &&  (Ldv=(<any>Pelem).defaultView)  &&  Ldv.frameElement;  // Probable bug!
       return (!PtestOn  &&  Lvalid) || (PtestOn  &&  (!Lvalid || Ldv.document.designMode.toLowerCase()=='on'));
     }

@@ -332,11 +332,9 @@ namespace com.keyman.dom {
     _CommonFocusHelper(target: HTMLElement): boolean {
       let keyman = com.keyman.singleton;
       var uiManager = this.keyman.uiManager;
-      //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
-      //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
+
       if(target.ownerDocument && target instanceof target.ownerDocument.defaultView.HTMLIFrameElement) {
-        if(!this.keyman.domManager._IsIEEditableIframe(target, 1) ||
-            !this.keyman.domManager._IsMozillaEditableIframe(target, 1)) {
+        if(!this.keyman.domManager._IsEditableIframe(target, 1)) {
           DOMEventHandlers.states._DisableInput = true;
           return true;
         }
