@@ -13,8 +13,7 @@
     { "path": "../../utils", "prepend": true },
     { "path": "../../keyboard-processor/src", "prepend": true },
     // For headless tests, we need the headless version of the compile.
-    { "path": "../../../predictive-text/tsconfig.json", "prepend": true },
-    { "path": "../..//es6-shim", "prepend": true }
+    { "path": "../../../predictive-text/tsconfig.json", "prepend": true }
   ],
   "files": [
     "text/inputProcessor.ts",

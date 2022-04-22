@@ -41,9 +41,11 @@
 */
 
   function errToString(err) {
+    // Painful?  Kinda.  But needed on un-updated Android API 21!
     if(Array.isArray(err)) {
-      let result = '';
-      for(let e of err) {
+      var result = '';
+      for(var i = 0; i < err.length; i++) {
+        var e = err[i];
         if(e.error instanceof Error) {
           result += e.error.message + '\n';
         } else {
