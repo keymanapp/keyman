@@ -48,17 +48,11 @@ describe('Event Management', function() {
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
 
-    var focusEvent;
+    var focusEvent = new FocusEvent('blur', {relatedTarget: ele});
 
-    if(typeof FocusEvent == 'function') {
-      focusEvent = new FocusEvent('blur', {relatedTarget: ele});
-    } else {
-      focusEvent = document.createEvent("FocusEvent");
-      focusEvent.initFocusEvent("blur", true, false, ele.ownerDocument.defaultView, 0, ele);
-    }
-
-    if(focusEvent)
+    if(focusEvent) {
       ele.dispatchEvent(focusEvent);
+    }
   });
 
   it('OSK-based onChange event generation', function(done) {

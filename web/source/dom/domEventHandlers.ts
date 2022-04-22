@@ -412,14 +412,8 @@ namespace com.keyman.dom {
 
     doChangeEvent(_target: HTMLElement) {
       if(DOMEventHandlers.states.changed) {
-        var event: Event;
-        if(typeof Event == 'function') {
-          event = new Event('change', {"bubbles": true, "cancelable": false});
-        } else { // IE path
-          event = document.createEvent("HTMLEvents");
-          event.initEvent('change', true, false);
-        }
-
+        let event = new Event('change', {"bubbles": true, "cancelable": false});
+        
         // Ensure that touch-aliased elements fire as if from the aliased element.
         if(_target['base'] && _target['base']['kmw_ip']) {
           _target = _target['base'];
