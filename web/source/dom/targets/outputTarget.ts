@@ -17,7 +17,12 @@ namespace com.keyman.dom.targets {
      * @param elem 
      */
     protected dispatchInputEventOn(elem: HTMLElement) {
-      let event = new InputEvent('input', {"bubbles": true, "cancelable": false});
+      let event: InputEvent;
+
+      // `undefined` in pre-Chrome Edge and Chrome for Android before version 60.
+      if(window['InputEvent']) { // can't condition on the type directly; TS optimizes that out.
+        event = new InputEvent('input', {"bubbles": true, "cancelable": false});
+      }
 
       if(elem && event) {
         elem.dispatchEvent(event);
