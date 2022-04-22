@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.239 beta 2022-04-22
+
+* fix(web): optimizes, enhances caret placement within text on mobile devices (#6551)
+
 ## 15.0.238 beta 2022-04-21
 
 * chore(linux): Fix failure in Debian reproducibility testing (#6548)
