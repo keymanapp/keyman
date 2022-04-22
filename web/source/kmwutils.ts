@@ -304,17 +304,12 @@ namespace com.keyman {
 
     // Found a bit of magic formatting that allows dynamic return typing for a specified element tag!
     _CreateElement<E extends "p"|"style"|"script"|"div"|"canvas"|"span">(nodeName:E) {
-      var e = document.createElement<E>(nodeName);
+      const e = document.createElement<E>(nodeName);
 
-      // Make element unselectable (Internet Explorer)
-      if (typeof e.onselectstart != 'undefined') { //IE route
-        e.onselectstart=this.selectStartHandler; // Build 360
-      } else { // And for well-behaved browsers (may also work for IE9+, but not necessary)
-        e.style.MozUserSelect="none";
-        e.style.KhtmlUserSelect="none";
-        e.style.UserSelect="none";
-        e.style.WebkitUserSelect="none";
-      }
+      e.style.MozUserSelect="none";
+      e.style.KhtmlUserSelect="none";
+      e.style.UserSelect="none";
+      e.style.WebkitUserSelect="none";
       return e;
     }
 
@@ -883,8 +878,6 @@ namespace com.keyman {
         return e.target;
       } else if (e.srcElement) {
         return e.srcElement;
-      } else if(window.event) { //IE 8 (and earlier)
-        return window.event.srcElement;
       } else {
         return null;            // shouldn't happen!
       }
@@ -899,8 +892,6 @@ namespace com.keyman {
     eventType(e: Event): string {
       if(e && e.type) {         // most browsers
         return e.type;
-      } else if(window.event) { // IE 8 (and earlier)
-        return window.event.type;
       } else {
         return '';              // shouldn't happen!
       }

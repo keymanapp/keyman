@@ -219,9 +219,6 @@ namespace com.keyman.dom {
       // c.f. http://www.w3.org/WAI/GL/WCAG20/WD-WCAG20-TECHS/SCR29.html
       divThis.tabIndex=0;
 
-      // Disable (internal) pan and zoom on KMW input elements for IE10
-      (<any>divThis.style).msTouchAction='none';
-
       ds.minWidth=xs.width;
       ds.height=xs.height;
 
@@ -431,7 +428,7 @@ namespace com.keyman.dom {
      * the text form of the context given the page coordinate of a `TouchEvent`.  Takes great
      * care to remain O(log N); some layout-triggering operations are required, making O(N)
      * unacceptable.
-     * 
+     *
      * Even a few thousand characters is enough to become unacceptably laggy if O(N).
      * @param touchPageX  The target .pageX value for the caret
      * @param touchPageY  The target .pageY value for the caret

@@ -100,7 +100,7 @@ namespace com.keyman.dom {
 
       s.Lstates |= e.getModifierState('CapsLock') ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
       s.Lstates |= e.getModifierState('NumLock') ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
-      s.Lstates |= (e.getModifierState('ScrollLock') || e.getModifierState("Scroll")) // "Scroll" for IE9.
+      s.Lstates |= (e.getModifierState('ScrollLock'))
         ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
 
       // We need these states to be tracked as well for proper OSK updates.

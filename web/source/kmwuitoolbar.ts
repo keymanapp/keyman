@@ -946,7 +946,6 @@ if(!window['keyman']['ui']['name']) {
       // Must disable OSK button when not focused
       if(ui.oskButtonNode.style.display != 'none') ui.oskButtonNode.className='kmw_button_disabled';
 
-      if(!params.event) return true;   // I2404 - Manage IE events in IFRAMEs
       return true;
     }
     keymanweb['addEventListener']('controlblurred',ui.blurControlEvent);

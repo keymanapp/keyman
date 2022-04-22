@@ -119,7 +119,6 @@ if(!window['keyman']['initialized']) {
           processList = domManager.inputList;
         }
 
-        // Supported by IE 9 and all modern browsers.
         processList.forEach(function(element: HTMLElement) {
           if(dom.Utils.instanceof(element, "TouchAliasElement")) {
             (element as com.keyman.dom.TouchAliasElement).updateInput();
