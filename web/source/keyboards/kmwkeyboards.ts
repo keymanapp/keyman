@@ -803,7 +803,7 @@ namespace com.keyman.keyboards {
         }
       }, false);
 
-      // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
+      // Some browsers may instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.  This method is not relocated here (yet) b/c it varies based upon 'native' vs 'embedded'.
       Lscript.src = scriptSrc;
 
