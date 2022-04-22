@@ -76,9 +76,7 @@ namespace com.keyman.dom {
     _ControlFocus: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
       var Ltarg: HTMLElement;
       var device = this.keyman.util.device;
-      var osk = this.keyman.osk;
 
-      e = this.keyman._GetEventObject<FocusEvent>(e);     // I2404 - Manage IE events in IFRAMEs
       Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
       if (Ltarg == null) {
         return true;
@@ -175,10 +173,7 @@ namespace com.keyman.dom {
      * Respond to KMW losing focus on event
      */
     _ControlBlur: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
-      var Ltarg: HTMLElement;
-
-      e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs
-      Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
+      let Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
       if (Ltarg == null) {
         return true;
       }
@@ -249,7 +244,6 @@ namespace com.keyman.dom {
         activeKeyboard.notify(0, Utils.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
       }
 
-      //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
       this.doControlBlurred(Ltarg, e, isActivating);
 
       this.doChangeEvent(Ltarg);

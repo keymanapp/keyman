@@ -33,7 +33,6 @@ namespace com.keyman.dom {
       let core = keyman.core;
       var s = new text.KeyEvent();
 
-      e = keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(e.cancelBubble === true) {
         return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
       }
@@ -291,10 +290,6 @@ namespace com.keyman.dom {
           return true;
         }
 
-        e = keyman._GetEventObject<KeyboardEvent>(e);   // I2404 - Manage IE events in IFRAMEs
-        if(e) {
-          e.returnValue = false;
-        }
         return false;
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */

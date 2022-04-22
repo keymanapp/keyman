@@ -321,13 +321,11 @@ namespace com.keyman {
      * Description  Closes mouse click event
      */
     _CancelMouse=function(e: MouseEvent) {
-      e = com.keyman.singleton._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(e && e.preventDefault) {
         e.preventDefault();
       }
       if(e) {
         e.cancelBubble=true;
-        e.returnValue=false;
       } // I2409 - Avoid focus loss for visual keyboard events
 
       return false;
