@@ -336,16 +336,6 @@ namespace com.keyman {
     createElement = this._CreateElement;
 
     /**
-     * Function     getIEVersion
-     * Scope        Public
-     * @return      {number}
-     * Description  Return IE version number (or 999 if browser not IE)
-     */
-    getIEVersion() {
-      return 999;
-    }
-
-    /**
      * Get browser-independent computed style value for element
      *
      * @param       {Element}     e             HTML element
