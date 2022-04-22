@@ -278,13 +278,8 @@ namespace com.keyman.dom {
       x.addEventListener('touchstart', touchHandlers.setFocus);
       x.addEventListener('touchend', touchHandlers.dragEnd, false);
 
-      x.onmspointerup=function(e) {
-        e.stopPropagation();
-      };
-
       // Disable internal scroll when input element in focus
       x.addEventListener('touchmove', touchHandlers.dragInput, false);
-      x.onmspointermove=touchHandlers.dragInput;
 
       // Hide keyboard and caret when losing focus from simulated input field
       x.onblur=touchHandlers.setBlur;

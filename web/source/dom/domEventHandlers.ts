@@ -727,7 +727,7 @@ namespace com.keyman.dom {
     /**
      * Handle the touch end event for an input element
      */
-    dragEnd: (e: TouchEvent|MouseEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent|MouseEvent) {
+    dragEnd: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
       e.stopPropagation();
       this.firstTouch = null;
     }.bind(this);
@@ -735,7 +735,7 @@ namespace com.keyman.dom {
     /**
      * Handle the touch move event for an input element
      */
-    dragInput: (e: TouchEvent|MouseEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent|MouseEvent) {
+    dragInput: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
       // Prevent dragging window
       if(e.cancelable) {
         // If a touch-alias element is scrolling, this may be false.
@@ -770,16 +770,9 @@ namespace com.keyman.dom {
         return;
       }
 
-      var x, y;
-
-      if(dom.Utils.instanceof(e, "TouchEvent")) {
-        x = touch.screenX;
-        y = touch.screenY;
-      } else {
-        x = (e as MouseEvent).screenX;
-        y = (e as MouseEvent).screenY;
-      }
-
+      const x = touch.screenX;
+      const y = touch.screenY;
+      
       // Allow content of input elements to be dragged horizontally or vertically
       if(typeof this.firstTouch == 'undefined' || this.firstTouch == null) {
         this.firstTouch={x:x,y:y};
