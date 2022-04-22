@@ -20,8 +20,6 @@ if(!window['keyman']['initialized']) {
     {
       var dhost = document.createElement('DIV');
       dhost.style.display = 'block';
-      if(!keymanweb._IE)
-        dhost.style.position = 'fixed';
       dhost.style.right = 0;
       dhost.style.top = 0;
       if(util.device.formFactor == 'tablet') dhost.style.top='22px';  //allow for bar at top of iPad  I3363 (Build 301)
@@ -32,8 +30,6 @@ if(!window['keyman']['initialized']) {
       
       keymanweb._DivDebug = document.createElement('DIV');
       keymanweb._DivDebug.style.fontFamily = 'Lucida Console,Courier New,courier';
-      if(!keymanweb._IE)
-        keymanweb._DivDebug.style.position = 'absolute';
       keymanweb._DivDebug.style.top = '20px';
       keymanweb._DivDebug.style.width = '100%';
       keymanweb._DivDebug.style.height = '180px';
@@ -45,8 +41,6 @@ if(!window['keyman']['initialized']) {
       dhost.appendChild(keymanweb._DivDebug);
       
       var _dd = document.createElement('DIV');
-      if(!keymanweb._IE)
-        _dd.style.position = 'absolute';
       _dd.style.left = 0;
       _dd.style.right = 0;
       _dd.style.width = '100%';
@@ -158,9 +152,7 @@ if(!window['keyman']['initialized']) {
     _DebugDeadKeys = function(Pelem, Ps)
     {
       var Lt = "", Li, Lp = 0, Ls, Lj;
-      
-      // if(!keymanweb._IE) return true; //added test to avoid compiler warning 27/8 JMD // Commented-out after removal of document.selection 25/01/18 JAH
-      
+       
       // Mozilla debug (table formatting removed)
       if(Pelem.tagName == 'HTML') Ls = Pelem.innerHTML; else Ls = Pelem.value; Lt = ''; //span style="font-size: 12pt">';
       if(typeof(Ls) === 'undefined') return;

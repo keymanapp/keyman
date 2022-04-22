@@ -51,7 +51,6 @@ namespace com.keyman {
   }
 
   export class KeymanBase {
-    _IE = 0;                   // browser version identification
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
     warned = false;            // Warning flag (to prevent multiple warnings)

@@ -52,7 +52,6 @@ namespace com.keyman {
     }
 
     detect() : void {
-      var IEVersion = Device._GetIEVersion();
       var possMacSpoof = false;
 
       if(navigator && navigator.userAgent) {
@@ -142,31 +141,27 @@ namespace com.keyman {
 
       // Determine application or browser
       this.browser='web';
-      if(IEVersion < 999) {
-        this.browser='ie';
-      } else {
-        if(this.OS == 'iOS' || this.OS.toLowerCase() == 'macosx') {
-          this.browser='safari';
-        }
+      if(this.OS == 'iOS' || this.OS.toLowerCase() == 'macosx') {
+        this.browser='safari';
+      }
 
-        var bMatch=/Firefox|Chrome|OPR|Safari|Edge/;
-        if(bMatch.test(navigator.userAgent)) {
-          if((navigator.userAgent.indexOf('Firefox') >= 0) && ('onmozorientationchange' in screen)) {
-            this.browser='firefox';
-          } else if(navigator.userAgent.indexOf('OPR') >= 0) {
-            this.browser='opera';
-          } else if(navigator.userAgent.indexOf(' Edge/') >= 0) {
-            // Edge is too common a word, so test for Edge/ :)
-            // Must come before Chrome and Safari test because
-            // Edge pretends to be both
-            this.browser='edge';
-          } else if(navigator.userAgent.indexOf('Chrome') >= 0) {
-            // This test must come before Safari test because on macOS,
-            // Chrome also reports "Safari"
-            this.browser='chrome';
-          } else if(navigator.userAgent.indexOf('Safari') >= 0) {
-            this.browser='safari';
-          }
+      var bMatch=/Firefox|Chrome|OPR|Safari|Edge/;
+      if(bMatch.test(navigator.userAgent)) {
+        if((navigator.userAgent.indexOf('Firefox') >= 0) && ('onmozorientationchange' in screen)) {
+          this.browser='firefox';
+        } else if(navigator.userAgent.indexOf('OPR') >= 0) {
+          this.browser='opera';
+        } else if(navigator.userAgent.indexOf(' Edge/') >= 0) {
+          // Edge is too common a word, so test for Edge/ :)
+          // Must come before Chrome and Safari test because
+          // Edge pretends to be both
+          this.browser='edge';
+        } else if(navigator.userAgent.indexOf('Chrome') >= 0) {
+          // This test must come before Safari test because on macOS,
+          // Chrome also reports "Safari"
+          this.browser='chrome';
+        } else if(navigator.userAgent.indexOf('Safari') >= 0) {
+          this.browser='safari';
         }
       }
 
@@ -196,46 +191,6 @@ namespace com.keyman {
 
       this.colorScheme = utils.StyleConstants.prefersDarkMode() ? 'dark' : 'light';
       this.detected = true;
-    }
-
-    static _GetIEVersion() {
-      var n, agent='';
-
-      if('userAgent' in navigator) {
-        agent=navigator.userAgent;
-      }
-
-      // Test first for old versions
-      if('selection' in document) {         // only defined for IE and not for IE 11!!!
-        var appVer=navigator.appVersion;
-        n=appVer.indexOf('MSIE ');
-        if(n >= 0) {
-          // Check for quirks mode page, always return 6 if so
-          if((document as Document).compatMode == 'BackCompat') {
-            return 6;
-          }
-
-          appVer=appVer.substr(n+5);
-          n=appVer.indexOf('.');
-          if(n > 0) {
-            return parseInt(appVer.substr(0,n),10);
-          }
-        }
-      }
-
-      // Finally test for IE 11 (and later?)
-      n=agent.indexOf('Trident/');
-      if(n < 0) {
-        return 999;
-      }
-
-      agent=agent.substr(n+8);
-      n=agent.indexOf('.');
-      if(n > 0){
-        return parseInt(agent.substr(0,n),10)+4;
-      }
-
-      return 999;
     }
 
     /**

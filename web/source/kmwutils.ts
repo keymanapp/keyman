@@ -347,7 +347,7 @@ namespace com.keyman {
      * Description  Return IE version number (or 999 if browser not IE)
      */
     getIEVersion() {
-      return Device._GetIEVersion();
+      return 999;
     }
 
     /**
@@ -693,66 +693,55 @@ namespace com.keyman {
       var s='@font-face {\nfont-family:'
         +fd['family']+';\nfont-style:normal;\nfont-weight:normal;\n';
 
-      // Detect if Internet Explorer and version if so
-      var IE=Device._GetIEVersion();
-
       // Build the font source string according to the browser,
       // but return without adding the style sheet if the required font type is unavailable
 
       // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
-      if(IE >= 9) {
-        if(this.device.OS == 'iOS') {
-          if(ttf != '') {
-            // Modify the url if required to prevent caching
-            ttf = this.unCached(ttf);
-            s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
-          } else {
-            return;
-          }
-        } else {
-          var s0 = [];
-
-          if(this.device.OS == 'Android') {
-            // Android 4.2 and 4.3 have bugs in their rendering for some scripts
-            // with embedded ttf or woff.  svg mostly works so is a better initial
-            // choice on the Android browser.
-            if(svg != '') {
-              s0.push("url('"+svg+"') format('svg')");
-            }
-
-            if(woff != '') {
-              s0.push("url('"+woff+"') format('woff')");
-            }
-
-            if(ttf != '') {
-              s0.push("url('"+ttf+"') format('truetype')");
-            }
-          } else {
-            if(woff != '') {
-              s0.push("url('"+woff+"') format('woff')");
-            }
-
-            if(ttf != '') {
-              s0.push("url('"+ttf+"') format('truetype')");
-            }
-
-            if(svg != '') {
-              s0.push("url('"+svg+"') format('svg')");
-            }
-          }
-
-          if(s0.length == 0) {
-            return;
-          }
-
-          s += 'src:'+s0.join(',')+';';
-        }
-      } else { // IE 6-8
-        if(eot != '') {
-          s=s+'src:url(\''+eot+'\');';
+      if(this.device.OS == 'iOS') {
+        if(ttf != '') {
+          // Modify the url if required to prevent caching
+          ttf = this.unCached(ttf);
+          s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
         } else {
           return;
         }
+      } else {
+        var s0 = [];
+
+        if(this.device.OS == 'Android') {
+          // Android 4.2 and 4.3 have bugs in their rendering for some scripts
+          // with embedded ttf or woff.  svg mostly works so is a better initial
+          // choice on the Android browser.
+          if(svg != '') {
+            s0.push("url('"+svg+"') format('svg')");
+          }
+
+          if(woff != '') {
+            s0.push("url('"+woff+"') format('woff')");
+          }
+
+          if(ttf != '') {
+            s0.push("url('"+ttf+"') format('truetype')");
+          }
+        } else {
+          if(woff != '') {
+            s0.push("url('"+woff+"') format('woff')");
+          }
+
+          if(ttf != '') {
+            s0.push("url('"+ttf+"') format('truetype')");
+          }
+
+          if(svg != '') {
+            s0.push("url('"+svg+"') format('svg')");
+          }
+        }
+
+        if(s0.length == 0) {
+          return;
+        }
+
+        s += 'src:'+s0.join(',')+';';
       }
 
       s=s+'\n}\n';
