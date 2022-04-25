@@ -100,6 +100,10 @@ namespace com.keyman.dom {
 
     __resizeHandler: () => void;
 
+    // The number of pixels a touch may lie within the 'next' character before we
+    // bump the caret AFTER that next character.
+    static readonly X_SNAP_LENIENCY_PIXELS: number = 5;
+
     private static device: Device;
 
     private static getDevice(): Device {
@@ -538,15 +542,20 @@ namespace com.keyman.dom {
 
       // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
       // Think of it as performing a floor() function, but the floor depends on the origin's direction.
-      var snapOrder;
+      let snapOrder: (x: number, y: number) => boolean;
+      // Used to signify a few pixels of leniency in the 'rtl'-appropriate direction for final
+      // caret placement.
+      let snapLeniency: number;
       if((this as unknown as HTMLElement).dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
         snapOrder = function(a, b) {
           return a < b;
         };
+        snapLeniency = -TouchAliasData.X_SNAP_LENIENCY_PIXELS;
       } else {
         snapOrder = function(a, b) {
           return a > b;
         };
+        snapLeniency = TouchAliasData.X_SNAP_LENIENCY_PIXELS;
       }
 
       // Now to binary-search the x-coordinate.
@@ -568,10 +577,15 @@ namespace com.keyman.dom {
         this.setTextCaret(cp);
       }
 
+      // LTR:  if caret x-pos > touchPosition, push caret earlier.
       if(snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan), touchX) && cp > cpMin) {
         this.setTextCaret(--cp);
       }
-      if(!snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan), touchX) && cp < cpMax) {
+
+      // LTR:  if caret x-pos + leniency <= touchPosition, push caret later.
+      // Allows the touch to "bleed over" a couple pixels into the next char without
+      // bumping it later.
+      if(!snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan) + snapLeniency, touchX) && cp < cpMax) {
         this.setTextCaret(++cp);
       }
     }
