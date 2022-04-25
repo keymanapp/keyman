@@ -238,23 +238,29 @@ namespace com.keyman.keyboards {
      *   This was defined as an array, so is kept that way, but
      *   Javascript treats it as an object anyway
      *
-     * @param       {Object}    Lkbd       Keyboard object
+     * @param       {Object}    Lstub      Keyboard stub object
+     * @param       {Object}    Lkbd       Keyboard script object
      * @return      {Object}               Copy of keyboard identification strings
      *
      */
-    private _GetKeyboardDetail = function(Lkbd) { // I2078 - Full keyboard detail
+    private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: any /* KeyboardScriptObject */) { // I2078 - Full keyboard detail
       var Lr={};
-      Lr['Name'] = Lkbd['KN'];
-      Lr['InternalName'] =  Lkbd['KI'];
-      Lr['LanguageName'] = Lkbd['KL'];  // I1300 - Add support for language names
-      Lr['LanguageCode'] = Lkbd['KLC']; // I1702 - Add support for language codes, region names, region codes, country names and country codes
-      Lr['RegionName'] = Lkbd['KR'];
-      Lr['RegionCode'] = Lkbd['KRC'];
-      Lr['CountryName'] = Lkbd['KC'];
-      Lr['CountryCode'] = Lkbd['KCC'];
-      Lr['KeyboardID'] = Lkbd['KD'];
-      Lr['Font'] = Lkbd['KFont'];
-      Lr['OskFont'] = Lkbd['KOskFont'];
+      Lr['Name'] = Lstub['KN'];
+      Lr['InternalName'] =  Lstub['KI'];
+      Lr['LanguageName'] = Lstub['KL'];  // I1300 - Add support for language names
+      Lr['LanguageCode'] = Lstub['KLC']; // I1702 - Add support for language codes, region names, region codes, country names and country codes
+      Lr['RegionName'] = Lstub['KR'];
+      Lr['RegionCode'] = Lstub['KRC'];
+      Lr['CountryName'] = Lstub['KC'];
+      Lr['CountryCode'] = Lstub['KCC'];
+      Lr['KeyboardID'] = Lstub['KD'];
+      Lr['Font'] = Lstub['KFont'];
+      Lr['OskFont'] = Lstub['KOskFont'];
+      Lr['HasLoaded'] = !!Lkbd;
+
+      if(Lkbd) {
+        Lr['IsRTL'] = !!Lkbd['KRTL'];
+      }
       return Lr;
     }
 
@@ -267,10 +273,16 @@ namespace com.keyman.keyboards {
     getDetailedKeyboards() {
       var Lr = [], Ln, Lstub, Lrn;
 
-      for(Ln=0; Ln < this.keyboardStubs.length; Ln++)  // I1511 - array prototype extended
-      {
+      for(Ln=0; Ln < this.keyboardStubs.length; Ln++) { // I1511 - array prototype extended
         Lstub = this.keyboardStubs[Ln];
-        Lrn = this._GetKeyboardDetail(Lstub);  // I2078 - Full keyboard detail
+        let Lkbd;
+        for(let kbdIndex=0; kbdIndex < this.keyboards.length; kbdIndex++) {
+          if(this.keyboards[kbdIndex]['KI'] == Lstub['KI']) {
+            Lkbd = this.keyboards[kbdIndex];
+            break;
+          }
+        }
+        Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
         Lr=this.keymanweb._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
       }
       return Lr;
