@@ -106,7 +106,7 @@ public class ConfirmDialogFragment extends DialogFragment {
                 KMKeyboardDownloaderActivity.downloadKeyboard(
                   getActivity(), _langId, _kbId,_preparedCloudApiParams);
               } else {
-                Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getActivity().getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
               }
               break;
             case DIALOG_TYPE_DELETE_KEYBOARD :
@@ -121,7 +121,7 @@ public class ConfirmDialogFragment extends DialogFragment {
                 KMKeyboardDownloaderActivity.downloadLexicalModel(getActivity(),
                   _modelId, _preparedCloudApiParams);
               } else {
-                Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getActivity().getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
               }
               break;
             case DIALOG_TYPE_DELETE_MODEL :
