@@ -8,6 +8,11 @@
         <item quantity="other">Tappirɗe</item>
     </plurals>
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">Feere Naatnal Woɗnde</item>
+        <item quantity="other">Peeje Naatnal Goɗɗe</item>
+    </plurals>
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Ɓeydu Tappirde Hesere</string>
     <!-- Context: Title for list -->
     <string name="title_languages_settings" comment="List of installed languages">Ɗemɗe aafaaɗe</string>
@@ -21,8 +26,12 @@
     <string name="label_cancel" comment="Button to cancel an action">Haaytu</string>
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">Uddu</string>
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">Uddu Keyman</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">Yeeso</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Feere Naatnal Garowal</string>
     <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item">Aawto</string>
     <!-- Context: Button label -->
@@ -69,8 +78,11 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">Deftordu FileProvider ena soklaa ngam yiyde fiilde ballal: %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">Juumre tappirde halkoore e %1$s: %2$s mo ɗemngal %3$s. Nana loowa tappirde woowaande.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Juumre e tappirde %1$s:%2$s ɗemngal %3$s language.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Nana ƴeewtoo saggitorde yahdiinde ngam aawtaade</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">Waawaa seŋaade e sarworde Keyman ngam ƴeewtaade so saggitorde aawtoonde ena woodi</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Aɗa hatojini e aawtaade yamre sakkitiinde ndee saggitorde?</string>
     <!-- Context: No associated dictionary found -->
@@ -121,8 +133,13 @@
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Hurmin basiyol</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Saggitorde</string>
+    <plurals name="model_count">
+        <item quantity="one">Saggitorde</item>
+        <item quantity="other">Caggitorɗe</item>
+    </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Yiylo saggitorde woodnde</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Yiylo caggitorɗe e enternet</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Saggitotde: %1$s</string>
     <!-- Context: Language Settings menu strings -->
