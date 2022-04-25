@@ -258,9 +258,7 @@ namespace com.keyman.keyboards {
       Lr['OskFont'] = Lstub['KOskFont'];
       Lr['HasLoaded'] = !!Lkbd;
 
-      if(Lkbd) {
-        Lr['IsRTL'] = !!Lkbd['KRTL'];
-      }
+      Lr['IsRTL'] = Lkbd ? !!Lkbd['KRTL'] : null;
       return Lr;
     }
 
