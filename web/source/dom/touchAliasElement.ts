@@ -449,11 +449,10 @@ namespace com.keyman.dom {
 
         // Performs a binary search for a valid caret based on the y-position.
         // cp:  the previously-set caret position.
-        for(let iLoop=0; iLoop<16; iLoop++) {
-          if(cpMax - cpMin <= 1) {
-            // Break the binary search if our final search window is extremely small.
-            break;
-          }
+
+        // Break the binary search if our final search window is extremely small.
+        while(cpMax - cpMin > 1) {
+
           const y=dom.Utils.getAbsoluteY(this.__caretSpan)-dy;  //top of caret
 
           if(y > maxY && cp > cpMin) {
@@ -465,74 +464,69 @@ namespace com.keyman.dom {
             cpMin=cp; // new min posiiton
             cp=Math.round((cp+cpMax)/2); // guess the halfway mark
           } else {
-            // the y-position lines up; cp is within the target row.
+            // Great guess:  the y-position lines up, so cp is within the target row.
+            // At this point, the only thing that matters is that we've found ONE caret
+            // position that matches the target line.
             break;
           }
           // Actively set our caret to the determined matching y-position.
           this.setTextCaret(cp);  // mutates `caret`'s position
         }
 
-        // cpMin, cpMax are either absolute bounds (beginning/end of context)
-        // or are outside of the target row at this point.
-
-        // Because of situations with new-lines, we still need to ensure the caret's actually within the target row.
-        while(dom.Utils.getAbsoluteY(this.__caretSpan)-dy > maxY && cp > cpMin) {
+        // Tweak slightly if the caret position still falls out of bounds, but only enough to get in-bounds.
+        // Since our final window is small, we only need single-position shifts here (if needed at all).
+        if(dom.Utils.getAbsoluteY(this.__caretSpan)-dy > maxY && cp > cpMin) {
           this.setTextCaret(--cp); // mutates `caret`'s position
-          cpMin = cp; // Old location was not on the same line.  It's free; may as well take it.
-          // If this block executed, cpMin will be 'tight' when complete.
         }
 
-        while(dom.Utils.getAbsoluteY(this.__caretSpan)-dy < minY && cp < cpMax) {
+        if(dom.Utils.getAbsoluteY(this.__caretSpan)-dy < minY && cp < cpMax) {
           this.setTextCaret(++cp); // mutates `caret`'s position
-          cpMax = cp; // Old location was not on the same line.  It's free; may as well take it.
-          // If this block executed, cpMax will be 'tight' when complete.
         }
 
-        // The caret itself should now lie within the target row.  The start of the row must be at or before
-        // the caret, while the end of the row must be at or after it.
+        // Guarantees:  cp is 'close' to both bounds, as it lies within the target row.
+        // Therefore, it caps the search interval for the x-coordinate versions of both cpMin and cpMax.
         //
-        // To properly reuse the InputHTMLElement-based x-coord search, we need the bounds to be TIGHT after
-        // this comment's containing block finishes. As in, we need [cpMin, cpMax] === [start of row, end of row].
-        //
-        // Note:  in certain scenarios, one of the bounds can be VERY far away at this point.
-        // Say, if a new touch event wants to move the caret nearby the previous location, as the
-        // bound on the opposite side may not have gotten overwritten even once so far in this call!
-        // Therefore... more binary search.
+        // Now to meet the pre-condition for the x-coord search later in the function:
+        // we need those bounds to be [cpMin, cpMax] === [start of row, end of row], both within the same line.
 
-        // Determine minimum caret position on the target row.
-        let minCpMin = cpMin; // Is before the row.
+        // Determine minimum caret position on the target row; prep the x-coord cpMin.
+        // cpMin is guaranteed to lie strictly before the target row unless at the start of the first row.
+        // It is neither guaranteed to have changed since its initialization nor to be close to the target row.
+        let minCpMin = cpMin;
         let maxCpMin = cp;
-        while(maxCpMin - minCpMin > 1) {
-          const searchPt = Math.round((maxCpMin+minCpMin)/2);
+        while(maxCpMin != minCpMin) {
+          // Our logic will auto-increment if too low, so favor the lower index.
+          const searchPt = Math.floor((maxCpMin+minCpMin)/2);
           this.setTextCaret(searchPt);
 
           const y=dom.Utils.getAbsoluteY(this.__caretSpan)-dy;  //top of caret
           if(y < minY) {
-            // We already know it's not on this row, so the minimum possible should be increased.
-            minCpMin = searchPt+1;
+            // We already know it's not on this row, so the minimum possible index should be increased.
+            cpMin = minCpMin = searchPt+1;
           } else {
             // Still in the same row, so the boundary can only be at or before this point.
-            maxCpMin = searchPt;
+            cpMin = maxCpMin = searchPt;
           }
-          cpMin = searchPt;
         }
 
-        // Determine maximum caret position on the target row.
+        // Determine maximum caret position on the target row; prep the x-coord cpMax.
+        // cpMax is guaranteed to lie strictly after the target row unless at the end of the final row.
+        // It is neither guaranteed to have changed since its initialization nor to be close to the target row.
         let minCpMax = cp;
-        let maxCpMax = cpMax; // Is after the row.
-        while(maxCpMax - minCpMax > 1) {
+        let maxCpMax = cpMax;
+        while(maxCpMax != minCpMax) {
+          // Our logic will auto-decrement if too high, so favor the higher index.
           const searchPt = Math.round((maxCpMax+minCpMax)/2);
           this.setTextCaret(searchPt);
 
           const y=dom.Utils.getAbsoluteY(this.__caretSpan)-dy;  //top of caret
           if(y > maxY) {
-            // We already know it's not on this row, so the maximum possible should be decreased.
-            maxCpMax = searchPt-1;
+            // We already know it's not on this row, so the maximum possible index should be decreased.
+            cpMax = maxCpMax = searchPt-1;
           } else {
             // Still in the same row, so the boundary can only be at or after this point.
-            minCpMax = searchPt;
+            cpMax = minCpMax = searchPt;
           }
-          cpMax = searchPt;
         }
 
         // Set the potential caret in the middle of the range.
@@ -556,15 +550,10 @@ namespace com.keyman.dom {
       }
 
       // Now to binary-search the x-coordinate.
-      // Except... we... haven't modified cpMin & cpMax since their roles in the
-      // y-position search, which matters if the backing element is a TextArea.
-      // Why not?  That sounds dangerous!
-      for(let iLoop=0; iLoop<16; iLoop++) {
-        if(cpMax - cpMin <= 1) {
-          // Break the binary search if our final search window is extremely small.
-          break;
-        }
-
+      // Pre-condition:  [cpMin, cpMax] === [start of row, end of row], both within the same line.
+      // Automatically met for `<input`>-based instances.
+      // Break the binary search if our final search window is extremely small.
+      while(cpMax - cpMin > 1) {
         const x=dom.Utils.getAbsoluteX(this.__caretSpan);  //left of caret
 
         if(snapOrder(x, touchX) && cp > cpMin) {
@@ -579,10 +568,10 @@ namespace com.keyman.dom {
         this.setTextCaret(cp);
       }
 
-      while(snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan), touchX) && cp > cpMin) {
+      if(snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan), touchX) && cp > cpMin) {
         this.setTextCaret(--cp);
       }
-      while(!snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan), touchX) && cp < cpMax) {
+      if(!snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan), touchX) && cp < cpMax) {
         this.setTextCaret(++cp);
       }
     }
