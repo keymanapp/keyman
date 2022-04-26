@@ -33,6 +33,42 @@ namespace models {
     let leftSpans  = wordBreaker(context.left || '') || [];
     let rightSpans = wordBreaker(context.right || '') || [];
 
+    let leftTail: Span;
+    if(leftSpans.length > 0) {
+      leftTail = leftSpans[leftSpans.length - 1];
+    }
+
+    // Handle any directly-pre-caret 'detokenization' cases - where for this _specific_ context,
+    // we should not make a token division where one normally would exist otherwise.
+    // Refer to https://github.com/keymanapp/keyman/issues/6572.
+    if(leftSpans.length > 1 && rightSpans.length == 0) {
+      const leftTailBase = leftSpans[leftSpans.length - 2];
+
+      // if the two spans are adjacent...
+      // Nested if statements in case we need another 'detokenization' condition in the future;
+      // the outer condition should hold for all such cases.
+      if(leftTailBase.end == leftTail.start) {
+        // Ideal:  if(leftTailBase is standard-char-class && leftTail is single-quote-class)
+        // But we don't have character class access here; it's all wordbreaker-function internal.
+        // Upon inspection of the wordbreaker data definitions... the single-quote-class is ONLY "'".
+        // So... we'll just be lazy for now and append the `'`.
+        if(leftTail.text == "'") {
+          let mergedSpan: Span = {
+            text: leftTailBase.text + leftTail.text,
+            start: leftTailBase.start,
+            end: leftTail.end,
+            length: leftTailBase.length + leftTail.length
+          };
+
+          leftSpans.pop(); // leftTail
+          leftSpans.pop(); // leftTailBase
+          leftSpans.push(mergedSpan);
+          leftTail = mergedSpan; // don't forget to update the `leftTail` Span!
+        }
+      }
+    }
+
+    // With any 'detokenization' cases already handled, we may now begin to build the return object.
     let tokenization: Tokenization = {
       left: leftSpans.map(span => span.text),
       right: rightSpans.map(span => span.text),
@@ -43,7 +79,6 @@ namespace models {
 
     // Now the hard part - determining whether or not the caret caused a token split.
     if(leftSpans.length > 0 && rightSpans.length > 0) {
-      let leftTail = leftSpans[leftSpans.length - 1];
       let rightHead = rightSpans[0];
 
       // If tokenization includes all characters on each side of the caret,
