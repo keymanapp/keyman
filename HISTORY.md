@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.240 beta 2022-04-26
+
+* feat(web): adds .getKeyboard().IsRTL, .HasLoaded (#6567)
+* fix(android): Don't show welcome.htm on keyboard package update (#6555)
+* fix(android/engine): Localize some Toast notifications (#6561)
+
 ## 15.0.239 beta 2022-04-22
 
 * fix(web): optimizes, enhances caret placement within text on mobile devices (#6551)
