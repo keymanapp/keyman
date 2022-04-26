@@ -6,7 +6,9 @@ import android.widget.Toast;
 
 import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
+import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
+import com.tavultesoft.kmea.KmpInstallMode;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
@@ -88,6 +90,11 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
                 languageList.add(languageID);
               }
               installedKeyboards.addAll(kbdKMPProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_KEYBOARDS_KEY, languageList));
+
+              // Set "silent install" so cloud updates don't display welcome.htm
+              for(Map<String, String> kbdMap : installedKeyboards) {
+                kbdMap.put(KMManager.KMKey_KMPInstall_Mode, KmpInstallMode.Silent.toString());
+              }
             }
           }
         }
