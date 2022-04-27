@@ -2116,17 +2116,17 @@ public final class KMManager {
     globeKeyState = state;
   }
 
-  private static void toggleSuggestionBanner(String languageID, boolean result1, boolean result2) {
+  private static void toggleSuggestionBanner(String languageID, boolean inappKeyboardChanged, boolean systemKeyboardChanged) {
     //reset banner state if new language has no lexical model
     if (currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
       && getAssociatedLexicalModel(languageID)==null) {
       currentBanner = KMManager.KM_BANNER_STATE_BLANK;
     }
 
-    if(result1) {
+    if(inappKeyboardChanged) {
       InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
-    if(result2) {
+    if(systemKeyboardChanged) {
       SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
   }
