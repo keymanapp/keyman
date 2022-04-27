@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.241 beta 2022-04-27
+
+* change(web): touch alias optimization followup (#6566)
+* fix(common/core/web): Fix forEach loop in SentryManager (#6569)
+* fix(linux): Fix shared keyboard (un-)installation in Bionic (#6565)
+
 ## 15.0.240 beta 2022-04-26
 
 * feat(web): adds .getKeyboard().IsRTL, .HasLoaded (#6567)
