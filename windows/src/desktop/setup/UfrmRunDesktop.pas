@@ -524,7 +524,8 @@ begin
     SetupMSI; // I2644
 
     if GetRunTools.DoInstall(Handle, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
-      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FInstallDefaults, FAutomaticallyReportUsage) then
+      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FInstallDefaults,
+      FAutomaticallyReportUsage, FContinueSetup) then
     begin
       if not Silent and not FStartAfterInstall then   // I2610
         ShowMessage(FInstallInfo.Text(ssInstallSuccess));

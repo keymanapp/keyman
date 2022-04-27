@@ -147,6 +147,7 @@ procedure TSetupBootstrap.Run;
 var
   FTempPath: string;
   frmDownloadProgress: TfrmDownloadProgress;
+  msiLocation: TInstallInfoFileLocation;
   FResult: Boolean;
 BEGIN
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
@@ -168,11 +169,21 @@ BEGIN
             FContinueSetupFilename, FStartAfterInstall,
             FDisableUpgradeFrom6Or7Or8, FInstallDefaults, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
           // always honour the command line -d from ProcessCommandLine
-          if not(FInstallDefaults) and (FContinueSetupFilename = '') then
-          begin
-            if (Assigned(FInstallInfo.MsiInstallLocation) and (FInstallInfo.InstalledVersion.Version = '')) then
-              FInstallDefaults := True;
-          end;
+
+          msiLocation := FInstallInfo.MsiInstallLocation;
+          if Assigned(msiLocation) then
+            GetRunTools.LogInfo('msiLocation set in Run', False);
+
+          if(FInstallDefaults) then
+            GetRunTools.LogInfo('FInstallDefaults value PC True', True)
+          else
+            GetRunTools.LogInfo('FInstallDefaults value PC False', True);
+
+          GetRunTools.LogInfo('FContinueSetupFilename'+FContinueSetupFilename, True);
+          if (Assigned(FInstallInfo.MsiInstallLocation))
+          then GetRunTools.LogInfo('FInstallInfo.MsiInstallLocation not nil', True)
+          else GetRunTools.LogInfo('FInstallInfo.MsiInstallLocation is nil', True);
+          GetRunTools.LogInfo('FContinueSetupFilename'+FInstallInfo.InstalledVersion.Version, True);
 
           GetRunTools.Silent := FSilent;
 
@@ -233,6 +244,7 @@ BEGIN
             ContinueSetup := FContinueSetupFilename <> '';
             StartAfterInstall := FStartAfterInstall; // I2738
             DisableUpgradeFrom6Or7Or8 := FDisableUpgradeFrom6Or7Or8;  // I2847   // I4293
+            InstallDefaults := FInstallDefaults;
             if FSilent
               then DoInstall(True, FPromptForReboot)  // I3355   // I3500
               else ShowModal;

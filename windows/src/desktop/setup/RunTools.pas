@@ -80,7 +80,7 @@ type
     function CacheMSIFile(msiLocation: TInstallInfoFileLocation): WideString;
     procedure FinishCacheMSIFile(msiLocation: TInstallInfoFileLocation;
       InstallSuccess: Boolean);
-    function InstallMSI(msiLocation: TInstallInfoFileLocation; InstallDefaults: Boolean): Boolean;
+    function InstallMSI(msiLocation: TInstallInfoFileLocation; var InstallDefaults: Boolean; ContinueSetup: Boolean): Boolean;
     procedure ConfigFirstRun(StartKeyman,StartWithWindows,
       CheckForUpdates,StartDisabled,StartWithConfiguration,InstallDefaults,
       AutomaticallyReportUsage: Boolean);
@@ -102,7 +102,7 @@ type
     procedure CheckInternetConnectedState;
     function DoInstall(Handle: THandle;
       StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
-      StartWithConfiguration, InstallDefaults, AutomaticallyReportUsage: Boolean): Boolean;
+      StartWithConfiguration, InstallDefaults, AutomaticallyReportUsage, ContinueSetup: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
     procedure LogInfo(const msg: string; ShowDialogIfNotSilent: Boolean = False);
 
@@ -196,7 +196,7 @@ end;
 
 function TRunTools.DoInstall(Handle: THandle;
   StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
-  StartWithConfiguration, InstallDefaults, AutomaticallyReportUsage: Boolean): Boolean;
+  StartWithConfiguration, InstallDefaults, AutomaticallyReportUsage, ContinueSetup: Boolean): Boolean;
 var
   msiLocation: TInstallInfoFileLocation;
 begin
@@ -221,7 +221,7 @@ begin
 
     CloseKeymanApplications;  // I2740
 
-    if not InstallMSI(msiLocation, InstallDefaults) then
+    if not InstallMSI(msiLocation, InstallDefaults, ContinueSetup) then
       Exit(False);
   end;
 
@@ -500,7 +500,7 @@ begin
   end;
 end;
 
-function TRunTools.InstallMSI(msiLocation: TInstallInfoFileLocation;InstallDefaults: Boolean): Boolean;
+function TRunTools.InstallMSI(msiLocation: TInstallInfoFileLocation;var InstallDefaults: Boolean; ContinueSetup: Boolean): Boolean;
 var
   pcode: array[0..39] of Char;
   res: Cardinal;
@@ -534,6 +534,18 @@ begin
         // We'll ignore errors ...
       end;
     end;
+
+    //  Need to update the InstallDefaults flag based on current installed version information
+    if not(InstallDefaults) and not (ContinueSetup) then
+    begin
+      if Assigned(FInstallInfo.MsiInstallLocation) and (FInstallInfo.InstalledVersion.Version = '') then
+        InstallDefaults := True;
+    end;
+    if(InstallDefaults) then
+      GetRunTools.LogInfo('InstallDefaults value IMSI True', True)
+    else
+      GetRunTools.LogInfo('InstallDefaults value IMSI False', True);
+
 
     { Log the install to the diag folder }
 
@@ -681,6 +693,16 @@ begin
     if CheckForUpdates then s := s + 'CheckForUpdates,';
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
+    if(InstallDefaults) then
+      GetRunTools.LogInfo('FInstallDefaults value CFR True')
+    else
+      GetRunTools.LogInfo('FInstallDefaults value CFR False');
+
+    if (Assigned(FInstallInfo.MsiInstallLocation))
+          then GetRunTools.LogInfo('FInstallInfo.MsiInstallLocation not nil', True)
+          else GetRunTools.LogInfo('FInstallInfo.MsiInstallLocation is nil', True);
+    GetRunTools.LogInfo('InstalledVersion.Version'+FInstallInfo.InstalledVersion.Version, True);
+
     if InstallDefaults then
     begin
       s := s + 'InstallDefaults,';  // I2651
@@ -754,6 +776,7 @@ begin
       if InstallDefaults then
         s := s + ' -d';
       WriteString(SRegValue_WindowsRunOnce_Setup, s);
+      LogInfo('reboot command line '+s);
     end;
   finally
     Free;
