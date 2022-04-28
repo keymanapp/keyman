@@ -543,8 +543,6 @@ begin
         InstallDefaults := True;
     end;
 
-
-
     { Log the install to the diag folder }
 
     FLogFileName := TKeymanPaths.ErrorLogPath(ChangeFileExt(ExtractFileName(msiLocation.Path), ''));  // I1610 // I2755 // I2792
@@ -690,8 +688,6 @@ begin
     if StartWithWindows then s := s + 'StartWithWindows,';
     if CheckForUpdates then s := s + 'CheckForUpdates,';
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
-
-
 
     if InstallDefaults then
     begin
