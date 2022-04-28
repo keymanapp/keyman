@@ -535,16 +535,14 @@ begin
       end;
     end;
 
-    //  Need to update the InstallDefaults flag based on current installed version information
+    //  InstallDefaults may have already been set True from the command line if not then
+    //  update the InstallDefaults flag based on current installed version information.
     if not(InstallDefaults) and not (ContinueSetup) then
     begin
       if Assigned(FInstallInfo.MsiInstallLocation) and (FInstallInfo.InstalledVersion.Version = '') then
         InstallDefaults := True;
     end;
-    if(InstallDefaults) then
-      GetRunTools.LogInfo('InstallDefaults value IMSI True', True)
-    else
-      GetRunTools.LogInfo('InstallDefaults value IMSI False', True);
+
 
 
     { Log the install to the diag folder }
@@ -693,15 +691,7 @@ begin
     if CheckForUpdates then s := s + 'CheckForUpdates,';
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
-    if(InstallDefaults) then
-      GetRunTools.LogInfo('FInstallDefaults value CFR True')
-    else
-      GetRunTools.LogInfo('FInstallDefaults value CFR False');
 
-    if (Assigned(FInstallInfo.MsiInstallLocation))
-          then GetRunTools.LogInfo('FInstallInfo.MsiInstallLocation not nil', True)
-          else GetRunTools.LogInfo('FInstallInfo.MsiInstallLocation is nil', True);
-    GetRunTools.LogInfo('InstalledVersion.Version'+FInstallInfo.InstalledVersion.Version, True);
 
     if InstallDefaults then
     begin
@@ -776,7 +766,6 @@ begin
       if InstallDefaults then
         s := s + ' -d';
       WriteString(SRegValue_WindowsRunOnce_Setup, s);
-      LogInfo('reboot command line '+s);
     end;
   finally
     Free;

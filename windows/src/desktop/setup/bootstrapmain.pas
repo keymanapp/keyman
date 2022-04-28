@@ -168,22 +168,6 @@ BEGIN
             FPromptForReboot, FSilent, FForceOffline, FExtractOnly,
             FContinueSetupFilename, FStartAfterInstall,
             FDisableUpgradeFrom6Or7Or8, FInstallDefaults, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
-          // always honour the command line -d from ProcessCommandLine
-
-          msiLocation := FInstallInfo.MsiInstallLocation;
-          if Assigned(msiLocation) then
-            GetRunTools.LogInfo('msiLocation set in Run', False);
-
-          if(FInstallDefaults) then
-            GetRunTools.LogInfo('FInstallDefaults value PC True', True)
-          else
-            GetRunTools.LogInfo('FInstallDefaults value PC False', True);
-
-          GetRunTools.LogInfo('FContinueSetupFilename'+FContinueSetupFilename, True);
-          if (Assigned(FInstallInfo.MsiInstallLocation))
-          then GetRunTools.LogInfo('FInstallInfo.MsiInstallLocation not nil', True)
-          else GetRunTools.LogInfo('FInstallInfo.MsiInstallLocation is nil', True);
-          GetRunTools.LogInfo('FContinueSetupFilename'+FInstallInfo.InstalledVersion.Version, True);
 
           GetRunTools.Silent := FSilent;
 
