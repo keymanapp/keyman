@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.242 beta 2022-04-29
+
+* docs(windows): Update OS and whatsnew in help (#6560)
+* fix(android/engine): Check suggestion banner after setting keyboard (#6559)
+* chore(common): Update Crowdin strings for Fula (#6562)
+
 ## 15.0.241 beta 2022-04-27
 
 * change(web): touch alias optimization followup (#6566)
