@@ -38,15 +38,18 @@ namespace models {
       leftTail = leftSpans[leftSpans.length - 1];
     }
 
-    // Handle any directly-pre-caret 'detokenization' cases - where for this _specific_ context,
-    // we should not make a token division where one normally would exist otherwise.
-    // Refer to https://github.com/keymanapp/keyman/issues/6572.
-    if(leftSpans.length > 1 && rightSpans.length == 0) {
+    // Handle any desired special handling for directly-pre-caret scenarios - where for this 
+    // _specific_ context, we should not make a token division where one normally would exist otherwise.
+    //
+    // One notable example:  word-final apostrophe is tokenized separate from preceding text, but
+    // word-internal apostrophe is treated as part of the same word (i.e, English contractions).
+    // But, if the user is editing text and the caret is directly after a caret, there's a notable
+    // chance they may in the middle of typing a contraction. Refer to 
+    // https://github.com/keymanapp/keyman/issues/6572.
+    if(leftSpans.length > 1) {
       const leftTailBase = leftSpans[leftSpans.length - 2];
 
-      // if the two spans are adjacent...
-      // Nested if statements in case we need another 'detokenization' condition in the future;
-      // the outer condition should hold for all such cases.
+      // If the final two pre-caret spans are adjacent - without intervening whitespace...
       if(leftTailBase.end == leftTail.start) {
         // Ideal:  if(leftTailBase is standard-char-class && leftTail is single-quote-class)
         // But we don't have character class access here; it's all wordbreaker-function internal.
