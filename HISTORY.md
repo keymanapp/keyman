@@ -36,6 +36,41 @@
 
 * chore: move to 16.0 (#6318)
 
+
+## 15.0.241 beta 2022-04-27
+
+* change(web): touch alias optimization followup (#6566)
+* fix(common/core/web): Fix forEach loop in SentryManager (#6569)
+* fix(linux): Fix shared keyboard (un-)installation in Bionic (#6565)
+
+## 15.0.240 beta 2022-04-26
+
+* feat(web): adds .getKeyboard().IsRTL, .HasLoaded (#6567)
+* fix(android): Don't show welcome.htm on keyboard package update (#6555)
+* fix(android/engine): Localize some Toast notifications (#6561)
+
+## 15.0.239 beta 2022-04-22
+
+* fix(web): optimizes, enhances caret placement within text on mobile devices (#6551)
+
+## 15.0.238 beta 2022-04-21
+
+* chore(linux): Fix failure in Debian reproducibility testing (#6548)
+* chore(linux): Update Linux dependencies (#6549)
+
+## 15.0.237 beta 2022-04-20
+
+* feat(linux): WIP - implement capslock handling with Wayland  ️ (#6213)
+
+## 15.0.236 beta 2022-04-19
+
+* fix(android): key tip sticky with multitap (#6494)
+* fix(web): blocks modifier key fat-fingering (#6473)
+
+## 15.0.235 beta 2022-04-18
+
+* chore(android,windows): Update crowdin strings for bwr-NG (#6532)
+
 ## 15.0.234 beta 2022-04-14
 
 * chore(common): Add Crowdin strings for Portuguese (pt-PT) (#6509)

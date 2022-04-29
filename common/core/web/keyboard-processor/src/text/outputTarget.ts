@@ -18,6 +18,10 @@ namespace com.keyman.text {
     }
 
     public static readonly nil = new TextTransform('', 0, 0);
+
+    public isNoOp(): boolean {
+      return this.insert === '' && this.deleteLeft === 0 && this.deleteRight === 0;
+    }
   }
 
   export class Transcription {

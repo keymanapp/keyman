@@ -29,6 +29,7 @@ import com.android.installreferrer.api.InstallReferrerStateListener;
 import com.android.installreferrer.api.ReferrerDetails;
 import com.tavultesoft.kmapro.MainActivity;
 import com.tavultesoft.kmapro.R;
+import com.tavultesoft.kmea.KmpInstallMode;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 

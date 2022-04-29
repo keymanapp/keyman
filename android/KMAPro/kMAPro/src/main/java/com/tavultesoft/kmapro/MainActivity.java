@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.keyman.android.CheckInstallReferrer;
-import com.keyman.android.KmpInstallMode;
 import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.KMHelpFileActivity;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
+import com.tavultesoft.kmea.KmpInstallMode;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -495,6 +495,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
    * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
    * If URL is valid, download the kmp.
    * @param packageUri URI to download the package.
+   * @param installMode KMP installation mode (silent, welcome only, or full)
    * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
    *       URL parsing, not this function.
    */
@@ -540,7 +541,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             downloadIntent.putExtra("language", languageID);
             downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
             downloadIntent.putExtra("receiver", resultReceiver);
-            downloadIntent.putExtra("installMode", installMode);
+            downloadIntent.putExtra("installMode", installMode.toString());
 
             progressDialog = new ProgressDialog(MainActivity.this);
             progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
@@ -926,6 +927,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     String packageID = null;
     String customHelpLink = null;
+    KmpInstallMode installMode = KmpInstallMode.Full;
     for (int i = 0; i < keyboardsInstalled.size(); i++) {
       HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
       String languageID = hashMap.get(KMManager.KMKey_LanguageID);
@@ -942,6 +944,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         hashMap.get(KMManager.KMKey_Font),
         hashMap.get(KMManager.KMKey_OskFont));
 
+        if (hashMap.containsKey(KMManager.KMKey_KMPInstall_Mode)) {
+          installMode = KmpInstallMode.fromString(hashMap.get(KMManager.KMKey_KMPInstall_Mode));
+        }
       if (i == 0) {
         packageID = keyboardInfo.getPackageID();
         customHelpLink = keyboardInfo.getHelpLink();
@@ -983,7 +988,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
 
     // Display welcome.htm help file -- if we are not doing a silent install
-    if (PackageActivity.lastInstallMode != KmpInstallMode.Silent &&
+    if (installMode != KmpInstallMode.Silent &&
         customHelpLink != null && !customHelpLink.isEmpty() &&
         packageID != null && !packageID.isEmpty() && FileUtils.isWelcomeFile(customHelpLink)) {
       // Display local welcome.htm help file, including associated assets
@@ -993,10 +998,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
       startActivity(i);
     }
-
-    // We'll reset the global installMode flag now so that future package
-    // installs that don't go through PackageActivity are not affected.
-    PackageActivity.lastInstallMode  = KmpInstallMode.Full;
   }
 
   @Override

@@ -235,6 +235,7 @@ public final class KMManager {
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
   public static final String KMKey_FontFamily = "family";
+  public static final String KMKey_KMPInstall_Mode = "kmpInstallMode";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
@@ -1492,7 +1493,9 @@ public final class KMManager {
       result2 = SystemKeyboard.setKeyboard(keyboardInfo);
 
     if (keyboardInfo != null) {
-      registerAssociatedLexicalModel(keyboardInfo.getLanguageID());
+      String languageID = keyboardInfo.getLanguageID();
+      toggleSuggestionBanner(languageID, result1, result2);
+      registerAssociatedLexicalModel(languageID);
     }
 
     return (result1 || result2);
@@ -1521,19 +1524,7 @@ public final class KMManager {
       result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
     }
 
-    if(result1 || result2)
-    {
-      //reset banner state if new language has no lexical model
-      if(currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
-        && getAssociatedLexicalModel(languageID)==null)
-        currentBanner = KMManager.KM_BANNER_STATE_BLANK;
-
-      if(result1)
-        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
-      if(result2)
-        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
-    }
-
+    toggleSuggestionBanner(languageID, result1, result2);
     registerAssociatedLexicalModel(languageID);
 
     return (result1 || result2);
@@ -2124,6 +2115,21 @@ public final class KMManager {
 
   public static void setGlobeKeyState(GlobeKeyState state) {
     globeKeyState = state;
+  }
+
+  private static void toggleSuggestionBanner(String languageID, boolean inappKeyboardChanged, boolean systemKeyboardChanged) {
+    //reset banner state if new language has no lexical model
+    if (currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
+      && getAssociatedLexicalModel(languageID)==null) {
+      currentBanner = KMManager.KM_BANNER_STATE_BLANK;
+    }
+
+    if(inappKeyboardChanged) {
+      InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
+    if(systemKeyboardChanged) {
+      SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
   }
 
   /**
