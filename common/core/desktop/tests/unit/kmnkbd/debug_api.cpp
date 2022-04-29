@@ -61,7 +61,7 @@ void setup(const char *keyboard) {
 
   // Ensure the pre-run debug item state is not empty
   assert(debug_items(test_state, {
-    km_kbp_state_debug_item{KM_KBP_DEBUG_END}
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, {}, {}, {}}
   }));
 
   try_status(km_kbp_context_set(km_kbp_state_context(test_state), citems));

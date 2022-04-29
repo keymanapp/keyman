@@ -43,7 +43,7 @@ private:
 
   kmx::KMX_DebugItems *m_debug_items;
 
-  INTKEYBOARDINFO m_keyboard = { 0 };
+  INTKEYBOARDINFO m_keyboard = { 0, {}, {}, {} };
   KMX_DWORD m_modifiers = 0;
 
   /* File loading */

@@ -208,7 +208,7 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
 
 key_event
 KmxTestSource::char_to_event(char ch) {
-  assert(ch >= 32 && ch <= 127);
+  assert(ch >= 32);
   return {
       km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
       (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_KBP_MODIFIER_SHIFT : 0)};
