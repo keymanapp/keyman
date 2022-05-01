@@ -67,5 +67,5 @@ write_github_status_check_from_teamcity() {
   local MESSAGE=$3
   local TARGETURL=$4
   local SHA=$BUILD_VCS_NUMBER
-  report_github_status "$CONTEXT" "$RESULT_STATE" "$RESULT_MESSAGE" "" "$SHA"
+  write_github_status_check "$CONTEXT" "$RESULT_STATE" "$RESULT_MESSAGE" "" "$SHA"
 }
