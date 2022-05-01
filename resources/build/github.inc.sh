@@ -30,18 +30,19 @@ write_github_status_check() {
   JSON_TEMPFILE=`mktemp`
   echo "$JSON" > "$JSON_TEMPFILE"
 
-  curl \
-    -s -w "%{stderr}%{http_code}%{stdout}" \
+  curl_response=$(curl \
+    -s -w "%{http_code}" \
+    -o "$JSON_TEMPFILE.out" \
     -X POST \
     -H "Authorization: token $GITHUB_TOKEN" \
     -H "Content-Type: application/json; charset=utf-8" \
     -H "Accept: application/vnd.github.v3+json" \
     https://api.github.com/repos/keymanapp/keyman/statuses/$SHA \
-    --data-binary @"$JSON_TEMPFILE" > "$JSON_TEMPFILE.out" 2>"$JSON_TEMPFILE.err"
+    --data-binary @"$JSON_TEMPFILE")
 
   # Check that the HTTP result code is 2xx
 
-  if ! grep \^2 "$JSON_TEMPFILE.err" > /dev/null; then
+  if [[ ! $curl_response =~ 2[0-9][0-9] ]]; then
     echo "GitHub transaction failed."
     cat "$JSON_TEMPFILE.out"
     EXITCODE=1
@@ -51,7 +52,6 @@ write_github_status_check() {
 
   rm -f "$JSON_TEMPFILE"
   rm -f "$JSON_TEMPFILE.out"
-  rm -f "$JSON_TEMPFILE.err"
 
   return $EXITCODE
 }
