@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.243 beta 2022-05-03
+
+* chore(web): report on file size (#6584)
+* chore(android/engine): Ignore DownloadManager if ID not found (#6581)
+* fix(common/models): prevents preemptive tokenization of potential contractions (#6574)
+* fix(web): fixes fat-finger distrib when subkey selected (#6526)
+
 ## 15.0.242 beta 2022-04-29
 
 * docs(windows): Update OS and whatsnew in help (#6560)
