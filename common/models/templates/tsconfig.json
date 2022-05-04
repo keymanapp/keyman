@@ -3,7 +3,7 @@
   "compilerOptions": {
     "declaration": true,
     "module": "none",
-    "outFile": "build/index.js",
+    "outFile": "./build/index.js",
     "sourceMap": true,
     "lib": ["es6"],
     "target": "es5",

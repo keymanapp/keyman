@@ -7,7 +7,7 @@
     "target": "es5",
     "declaration": true,
     "sourceMap": true,
-    "outFile": "index.js",
+    "outFile": "./build/index.js",
     "strict": true,
     "allowJs": false,
   },

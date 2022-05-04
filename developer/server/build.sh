@@ -95,9 +95,6 @@ type npm >/dev/null ||\
 
 if (( install_dependencies )) ; then
   verify_npm_setup
-  pushd "$KEYMAN_ROOT" > /dev/null
-  npm ci --production=false
-  popd > /dev/null
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   # TODO: this is horrible; is there a way we can avoid this?
   rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok.exe

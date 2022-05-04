@@ -2,7 +2,7 @@
   "extends": "../../tsconfig-base.json",
 
   "compilerOptions": {
-    "outFile": "dist/index.js"
+    "outFile": "./build/index.js"
   },
 
   "files": [
