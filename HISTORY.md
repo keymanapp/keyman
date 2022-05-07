@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.291 stable 2022-05-07
+
+* fix(windows): don't log before checking nil when installing keyboard (#6506)
+* fix(windows): put correct HK_ALT flag for modifier (#6587)
+
 ## 14.0.290 stable 2022-03-31
 
 * chore(oem/fv/android): Update dependencies (#6452)
