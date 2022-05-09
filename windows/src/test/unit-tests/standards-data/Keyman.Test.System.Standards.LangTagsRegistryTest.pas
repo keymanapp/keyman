@@ -61,7 +61,7 @@ begin
   // All Tags
 
   Assert.AreEqual('arx', TLangTagsMap.AllTags['arx-BR']);
-  Assert.AreEqual('bfi-x-stokoe', TLangTagsMap.AllTags['sgn-bfi-GB-x-stokoe']);
+  Assert.AreEqual('bfi-Zzzz-x-stokoe', TLangTagsMap.AllTags['sgn-bfi-GB-x-stokoe']);
   Assert.AreEqual('bfy', TLangTagsMap.AllTags['ppa-Deva-IN']);
 
   // und

@@ -46,7 +46,7 @@ begin
   Assert.AreEqual('sqt-Latn-YE', TCanonicalLanguageCodeUtils.FindBestTag('sqt-Latn-YE', True, True));
 
   Assert.AreEqual('sa-Latn', TCanonicalLanguageCodeUtils.FindBestTag('sa-Latn', True, True));
-  Assert.AreEqual('hi-Latn', TCanonicalLanguageCodeUtils.FindBestTag('hi-Latn', True, True));
+  Assert.AreEqual('hi-Latn-IN', TCanonicalLanguageCodeUtils.FindBestTag('hi-Latn', True, True));
 
   // #1282
   Assert.AreEqual('raw-Latn-MM', TCanonicalLanguageCodeUtils.FindBestTag('raw', True, True));
