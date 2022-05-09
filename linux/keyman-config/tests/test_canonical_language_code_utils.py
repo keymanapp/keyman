@@ -21,8 +21,8 @@ class CanonicalLanguageCodeUtilsTests(unittest.TestCase):
             { 'expected': 'sqt-Arab-YE', 'tags': ['sqt', 'sqt-YE', 'sqt-Arab'] },
             { 'expected': 'sqt-Latn-YE', 'tags': ['sqt-Latn', 'sqt-Latn-YE'] },
 
-            { 'expected': 'sa-Latn', 'tags': ['sa-Latn'] },
-            { 'expected': 'hi-Latn', 'tags': ['hi-Latn'] },
+            { 'expected': 'sa-Latn', 'tags': ['sa-Latn'] }, # Should sa-Latn go away?
+            { 'expected': 'hi-Latn-IN', 'tags': ['hi-Latn'] },
 
             # #1282
             { 'expected': 'raw-Latn-MM', 'tags': ['raw', 'raw-MM', 'raw-Latn'] },
