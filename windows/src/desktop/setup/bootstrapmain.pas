@@ -99,6 +99,7 @@ type
     FPromptForReboot: Boolean;  // I3355   // I3500
     FSilent: Boolean;
     FForceOffline: Boolean;
+    FInstallDefaults: Boolean;
     FTier, FPackages, FExtractOnly_Path: string;
 
     function CheckForOldVersionScenario: Boolean;
@@ -109,7 +110,7 @@ type
     procedure ProcessCommandLine(
       var FPromptForReboot, FSilent, FForceOffline, FExtractOnly: Boolean;
       var FContinueSetupFilename: string;
-      var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean;
+      var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FInstallDefaults: Boolean;
       var FPackages, FExtractPath, FTier: string);
     procedure SetExitVal(c: Integer);
     function IsKeymanDesktop7Installed: string;
@@ -146,6 +147,7 @@ procedure TSetupBootstrap.Run;
 var
   FTempPath: string;
   frmDownloadProgress: TfrmDownloadProgress;
+  msiLocation: TInstallInfoFileLocation;
   FResult: Boolean;
 BEGIN
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
@@ -165,7 +167,7 @@ BEGIN
           ProcessCommandLine(
             FPromptForReboot, FSilent, FForceOffline, FExtractOnly,
             FContinueSetupFilename, FStartAfterInstall,
-            FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
+            FDisableUpgradeFrom6Or7Or8, FInstallDefaults, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
 
           GetRunTools.Silent := FSilent;
 
@@ -226,6 +228,7 @@ BEGIN
             ContinueSetup := FContinueSetupFilename <> '';
             StartAfterInstall := FStartAfterInstall; // I2738
             DisableUpgradeFrom6Or7Or8 := FDisableUpgradeFrom6Or7Or8;  // I2847   // I4293
+            InstallDefaults := FInstallDefaults;
             if FSilent
               then DoInstall(True, FPromptForReboot)  // I3355   // I3500
               else ShowModal;
@@ -542,7 +545,7 @@ end;
 procedure TSetupBootstrap.ProcessCommandLine(
   var FPromptForReboot, FSilent, FForceOffline, FExtractOnly: Boolean;
   var FContinueSetupFilename: string;
-  var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean;
+  var FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FInstallDefaults: Boolean;
   var FPackages, FExtractPath, FTier: string
 );
 var
@@ -555,6 +558,7 @@ begin
   FContinueSetupFilename := '';
   FDisableUpgradeFrom6Or7Or8 := False; // I2847   // I4293
   FStartAfterInstall := True;  // I2738
+  FInstallDefaults := False;
   i := 1;
   while i <= ParamCount do
   begin
@@ -577,6 +581,8 @@ begin
       FStartAfterInstall := True;
       FDisableUpgradeFrom6Or7Or8 := True;  // I2847   // I4293
     end
+    else if WideSameText(ParamStr(i), '-d') then
+      FInstallDefaults := True
     else if WideSameText(ParamStr(i), '-o') then
       FForceOffline := True
     else if WideSameText(ParamStr(i), '-r') then
