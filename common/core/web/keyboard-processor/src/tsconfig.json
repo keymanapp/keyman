@@ -10,7 +10,8 @@
     "target": "es5",
     "types": ["node"],
     "lib": ["es6"],
-    "outFile": "../build/index.js"
+    "outFile": "../build/index.js",
+    "experimentalDecorators": true,
   },
   "references": [
     { "path": "../../../../../common/models/types" },
