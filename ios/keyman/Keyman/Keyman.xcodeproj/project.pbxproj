@@ -205,6 +205,7 @@
 		16A9229D20325253003CC98E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Keyman/Info.plist; sourceTree = SOURCE_ROOT; };
 		293EA3E027059C6900545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/Localizable.strings; sourceTree = "<group>"; };
 		294914742738DF7700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		29BFA75D282931F8009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29C1E17028001EC200759EDE /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		37378F4222C9AA610043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPad.xib; sourceTree = "<group>"; };
 		37378F4322C9AA630043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPhone.xib; sourceTree = "<group>"; };
@@ -788,6 +789,7 @@
 				ha,
 				"ff-NG",
 				"pt-PT",
+				it,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -1092,6 +1094,7 @@
 				293EA3E027059C6900545EED /* ha */,
 				294914742738DF7700400732 /* ff-NG */,
 				29C1E17028001EC200759EDE /* pt-PT */,
+				29BFA75D282931F8009FCCC3 /* it */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
