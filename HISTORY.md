@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.245 beta 2022-05-10
+
+* chore(common): Add crowdin strings for Italian (#6592)
+
 ## 15.0.244 beta 2022-05-09
 
 * fix(windows): Don't reset defaults on Keyman upgrade (#6491)
