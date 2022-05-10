@@ -2,10 +2,7 @@ var assert = require('chai').assert;
 var fs = require("fs");
 var vm = require("vm");
 
-//let InputProcessor = require('../../build');
-
 // Required initialization setup.
-//global.com = InputProcessor.com; // exports all keyboard-processor namespacing.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 

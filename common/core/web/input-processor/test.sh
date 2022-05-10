@@ -72,6 +72,10 @@ test-headless ( ) {
   (cat ../input-processor/build/index.js; echo) >> $PREPEND
   (cat tests/cases/inputProcessor.js; echo) >> $PREPEND
 
+  # TODO: We will re-enable languageProcessor tests when we have sorted out
+  #       paths and modules for lmc
+  #(cat tests/cases/languageProcessor.js; echo) >> $PREPEND
+
   npm run mocha -- --recursive $FLAGS ./tests/cases/prepend.js
 
   rm $PREPEND

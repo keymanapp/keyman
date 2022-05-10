@@ -4,16 +4,18 @@
   "compilerOptions": {
     "allowJs": true,
     "module": "none",
-    "outDir": "../dist/",
+    "outDir": "../build/nodeProctor/",
+    "outFile": "../build/nodeProctor/index.js",
     "inlineSources": true,
     "inlineSourceMap": true,
     "target": "es5",
     "types": ["node"],
-    "lib": ["es6"],
-    "outFile": "../dist/nodeProctor.js"
+    "lib": ["es6"]
   },
 
   "files": [
+    "index.ts",
+    "proctor.ts",
     "nodeProctor.ts"
   ],
 
@@ -21,7 +23,6 @@
     { "path": "../../../../../../resources/web-environment" },
     { "path": "../../../../../../common/core/web/utils" },
     { "path": "../../../../../../common/core/web/keyboard-processor/src" },
-    { "path": "../../../../../../common/web/lm-message-types" },
-    { "path": "./tsconfig.json" }
+    { "path": "../../../../../../common/web/lm-message-types" }
   ]
 }

@@ -1,8 +1,9 @@
 var assert = require('chai').assert;
-let KeyboardProcessor = require('../../dist');
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+global.keyman = {};
+
+// Initialize supplementary plane string extensions
+String.kmwEnableSupplementaryPlane(false);
 
 describe('Version Logic', function() {
   it('Should provide a default, fallback value when nothing is specified', function() {
@@ -42,5 +43,5 @@ describe('Version Logic', function() {
     // Ensures the first "precede" check's return is flipped when the order's flipped.
     assert.equal(v9_1_0.compareTo(v9_0_1), 1);
   });
-    
+
 });

@@ -2,16 +2,11 @@ const assert = require('chai').assert;
 const fs = require('fs');
 const vm = require('vm');
 
-const KeyboardProcessor = require('../../../dist');
-const KMWRecorder = require('../../../../tools/recorder/dist/nodeProctor');
-
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
-global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
-                    // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
+let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
+global.keyman = {};
 
 // Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);    
+String.kmwEnableSupplementaryPlane(false);
 
 const device = {
   formFactor: 'desktop',
@@ -32,7 +27,7 @@ function runEngineRuleSet(ruleSet) {
 }
 
 /**
- * Wrapper to simplify running tests -- supports either virtual key codes as string (e.g. 'A' is VK_A) 
+ * Wrapper to simplify running tests -- supports either virtual key codes as string (e.g. 'A' is VK_A)
  * or an array of integers. Does not currently support modifiers (not needed here).
  * @param {String|Array} input   Virtual key codes of each character (as string or array)
  * @param {String}       output  Expected output
@@ -40,11 +35,11 @@ function runEngineRuleSet(ruleSet) {
 
 function runStringRuleSet(input, output) {
   const rule = {
-    "inputs": 
+    "inputs":
       typeof input == 'string'
-      ? input.split("").map(ch => 
+      ? input.split("").map(ch =>
         { return { "type": "key", "keyCode": ch.charCodeAt(0), "states": 10752, "modifiers": 0, "modifierChanged": false, "isVirtualKey": true } })
-      : input.map(ch => 
+      : input.map(ch =>
         { return { "type": "key", "keyCode": ch, "states": 10752, "modifiers": 0, "modifierChanged": false, "isVirtualKey": true } }),
     "output": output
   };
