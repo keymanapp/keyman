@@ -56,6 +56,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("mfi-NG", "Mandara (Wandala)"),
       new DisplayLanguageType("mrt-NG", "Marghi"),
       new DisplayLanguageType("ann", "Obolo"),
+      new DisplayLanguageType("pl-PL", "Polski (Polish)"),
       new DisplayLanguageType("pt-PT", "Português do Portugal"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
       new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
