@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.246 beta 2022-05-11
+
+* chore(ios): Set transparent background on "more" icons (#6598)
+* chore(common): Add crowdin strings for Polish (#6593)
+
 ## 15.0.245 beta 2022-05-10
 
 * chore(common): Add crowdin strings for Italian (#6592)
