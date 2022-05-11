@@ -48,6 +48,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("fr-FR", "French"),
       new DisplayLanguageType("ha-HG", "Hausa"),
       new DisplayLanguageType("in-ID", "Indonesian"),
+      new DisplayLanguageType("it-IT", "Italiana"),
       new DisplayLanguageType("de-DE", "German"),
       new DisplayLanguageType("kr-NG", "Kanuri"),
       new DisplayLanguageType("km-KH", "Khmer"),
