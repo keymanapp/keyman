@@ -8,10 +8,9 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-ENVIRONMENT_TS="environment.inc.ts"
+ENVIRONMENT_TS="$KEYMAN_ROOT/resources/web-environment/environment.inc.ts"
 
-if [ -f $ENVIRONMENT_TS ];
-then
+if [ -f $ENVIRONMENT_TS ]; then
     rm $ENVIRONMENT_TS
 fi
 
