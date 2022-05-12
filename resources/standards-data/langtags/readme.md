@@ -11,5 +11,5 @@ This file is intended to replace alltags, ethnologue, and iso639-3 data files in
 
 * Source repository: https://github.com/silnrsi/langtags/
 * Documentation: https://github.com/silnrsi/langtags/blob/master/doc/langtags.md
-* Offical schema: https://github.com/silnrsi/langtags/blob/master/source/langtags_schema.json
+* Official schema: https://github.com/silnrsi/langtags/blob/master/source/langtags_schema.json
 
