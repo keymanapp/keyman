@@ -122,9 +122,9 @@ if builder_has_action build; then
   # Wrap the worker code and create embedded index.js. Must be run after the
   # worker is built
   echo "Wrapping worker in function LMLayerWorkerCode ${WORKER_OUTPUT_FILENAME}"
-  wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT_FILENAME}" > "${WORKER_OUTPUT_FILENAME}.tmp" || die
-  # Replace the default output file
-  mv "${WORKER_OUTPUT_FILENAME}.tmp" "${WORKER_OUTPUT_FILENAME}" || die
+  # Note: We use intermediate.js for unit tests in predictive-text
+  cp "${WORKER_OUTPUT_FILENAME}" "${WORKER_OUTPUT}/intermediate.js"
+  wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT}/intermediate.js" > "${WORKER_OUTPUT_FILENAME}" || die
 
   builder_report build success
 fi
