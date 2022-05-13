@@ -95,6 +95,8 @@ verify_npm_setup $fetch_deps
 if $fetch_deps; then
   # We need to build web-environment with a script for now
   "$KEYMAN_ROOT/resources/web-environment/build.sh" || fail "Could not build web-environment"
+  # We need to build lm-worker with a script for now
+  "$KEYMAN_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
 fi
 
 build-browser || fail "Browser-oriented compilation failed."
