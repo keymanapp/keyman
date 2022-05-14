@@ -100,7 +100,7 @@ if (( install_dependencies )) ; then
   rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok.exe
 fi
 
-set_npm_version || fail "Setting version failed."
+# set_npm_version || fail "Setting version failed."
 
 # ----------------------------------------
 # Rebuild and bundle addins
