@@ -2,11 +2,12 @@
   "extends": "../../tsconfig-base.json",
 
   "compilerOptions": {
-    //"module": "commonjs",
+    "module": "commonjs",
     "target": "es2017",
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist/",
+    "rootDir": "source/",
     "declaration": true,
     "alwaysStrict": true,
     "noImplicitThis": true,

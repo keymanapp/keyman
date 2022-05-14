@@ -1,6 +1,6 @@
 var assert = require('chai').assert;
 
-const defaultWordBreaker = require('@keymanapp/models-wordbreakers').wordBreakers['default'];
+const defaultWordBreaker = require('../../../common/models/wordbreakers/build').wordBreakers['default'];
 import {decorateWithJoin} from '../dist/lexical-model-compiler/join-word-breaker-decorator';
 
 
