@@ -175,10 +175,9 @@ if (( production )) ; then
   cat package.json | "$JQ" \
     '. | del(.devDependencies."@keymanapp/resources-gosh") | del(.devDependencies."@keymanapp/keyman-version")' \
     > "$PRODBUILDTEMP/package.json"
-  cp package-lock.json "$PRODBUILDTEMP"
 
   pushd "$PRODBUILDTEMP"
-  npm ci --omit=dev --omit=optional
+  npm install --omit=dev --omit=optional
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   rm -f node_modules/ngrok/bin/ngrok.exe
   popd
