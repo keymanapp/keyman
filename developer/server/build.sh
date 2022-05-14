@@ -14,6 +14,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 EX_USAGE=64
 
+. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+
 pushd "$(dirname "$THIS_SCRIPT")"
 
 # Build the main script.
@@ -162,13 +164,29 @@ fi
 # ----------------------------------------
 
 if (( production )) ; then
+  # We need to build in a tmp folder so that npm doesn't get confused by our
+  # monorepo setup, and so we can copy the relevant node_modules in, because
+  # we'll need them in order to build the deployable version.
+
+  PRODBUILDTEMP=`mktemp -d`
+  echo "Preparing in $PRODBUILDTEMP"
+  # Remove @keymanapp devDependencies because they won't install outside the
+  # monorepo context
+  cat package.json | "$JQ" \
+    '. | del(.devDependencies."@keymanapp/resources-gosh") | del(.devDependencies."@keymanapp/keyman-version")' \
+    > "$PRODBUILDTEMP/package.json"
+  cp package-lock.json "$PRODBUILDTEMP"
+
+  pushd "$PRODBUILDTEMP"
+  npm ci --omit=dev --omit=optional
+  # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
+  rm -f node_modules/ngrok/bin/ngrok.exe
+  popd
+
   # We'll build in the build/ folder
   rm -rf build/
   mkdir build/
-  cp -R dist/ package.json package-lock.json build/
-  cd build/
-  npm install --omit=dev --omit=optional
-  # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
-  rm -f node_modules/ngrok/bin/ngrok.exe
-  cd ..
+  cp -R dist/* build/
+  cp -R "$PRODBUILDTEMP"/* build/
+  rm -rf "$PRODBUILDTEMP"
 fi
