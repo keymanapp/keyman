@@ -140,7 +140,7 @@ public class CloudDownloadMgr{
 
       CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(anInternalDownloadId);
       if(_parentSet==null) {
-        KMLog.LogError(TAG, "Download with ID " + anInternalDownloadId + " is not available");
+        // Download ID didn't match, so nothing to cleanup
         return;
       }
       _parentSet.setDone(anInternalDownloadId);

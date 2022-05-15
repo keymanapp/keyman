@@ -40,6 +40,31 @@
 
 * chore: move to 16.0 (#6318)
 
+## 15.0.246 beta 2022-05-11
+
+* chore(ios): Set transparent background on "more" icons (#6598)
+* chore(common): Add crowdin strings for Polish (#6593)
+
+## 15.0.245 beta 2022-05-10
+
+* chore(common): Add crowdin strings for Italian (#6592)
+
+## 15.0.244 beta 2022-05-09
+
+* fix(windows): Don't reset defaults on Keyman upgrade (#6491)
+
+## 15.0.243 beta 2022-05-03
+
+* chore(web): report on file size (#6584)
+* chore(android/engine): Ignore DownloadManager if ID not found (#6581)
+* fix(common/models): prevents preemptive tokenization of potential contractions (#6574)
+* fix(web): fixes fat-finger distrib when subkey selected (#6526)
+
+## 15.0.242 beta 2022-04-29
+
+* docs(windows): Update OS and whatsnew in help (#6560)
+* fix(android/engine): Check suggestion banner after setting keyboard (#6559)
+* chore(common): Update Crowdin strings for Fula (#6562)
 
 ## 15.0.241 beta 2022-04-27
 
