@@ -40,7 +40,7 @@ int run_tests(char const *prog_name, test<UTF> const (&tests)[N])
 
   for (auto const & test: tests)
   {
-    auto const test_num = &test - &tests[0] + 1;
+    auto const test_num = (int)(&test - &tests[0] + 1);
     size_t res = count_unicode_characters<UTF>(test.str, error);
     if (test.error >= 0)
     {
