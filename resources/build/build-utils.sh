@@ -28,8 +28,10 @@
 #
 
 # Setup variable for calling script's path
-THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
-readonly THIS_SCRIPT_PATH
+if [ ! -z ${THIS_SCRIPT+x} ]; then
+  THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
+  readonly THIS_SCRIPT_PATH
+fi
 
 function die () {
     # TODO: consolidate this with fail() from shellHelperFunctions.sh
