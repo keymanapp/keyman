@@ -2,6 +2,8 @@
 #
 # Compile the KeymanWeb bulk-renderer module for use with developing/running engine tests.
 
+set -eu
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -9,30 +11,30 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-verify_npm_setup
+set_keyman_standard_build_path
 
-# Definition of global compile constants
-COMPILED_FILE="bulk_render.js"
-OUTPUT="../release/renderer"
-NODE_SOURCE="bulk_rendering"
-#ENGINE_TEST_OUTPUT="../unit_tests/"
+display_usage ( ) {
+  echo "Usage: build.sh [flags...] [commands...]"
+  echo
+  echo "Commands:"
+  echo "  configure              runs 'npm ci' on root folder"
+  echo "  build                  (default) builds bulk_renderer to ../release/renderer"
+  echo
+  echo "Flags:"
+  echo "  -v, --verbose          Use verbose logging"
+  echo "  -h, --help             Print this help"
+}
 
-readonly OUTPUT
-readonly NODE_SOURCE
-#readonly ENGINE_TEST_OUTPUT
+################################ Main script ################################
 
-# Ensures that we rely first upon the local npm-based install of Typescript.
-# (Facilitates automated setup for build agents.)
-PATH="../../node_modules/.bin:$PATH"
+builder_init "configure build" "$@"
 
-compiler="npm run tsc --"
-compilecmd="$compiler"
-
-$compilecmd -p $NODE_SOURCE/tsconfig.json
-if [ $? -ne 0 ]; then
-    fail "Typescript compilation failed."
+if builder_has_action configure; then
+  verify_npm_setup
+  builder_report configure success
 fi
 
-#cp $OUTPUT/$COMPILED_FILE $ENGINE_TEST_OUTPUT
-#cp $OUTPUT/$COMPILED_FILE.map $ENGINE_TEST_OUTPUT
+if builder_has_action build; then
+  tsc --build "$THIS_SCRIPT_PATH/tsconfig.json" $builder_verbose
+  builder_report build success
+fi
