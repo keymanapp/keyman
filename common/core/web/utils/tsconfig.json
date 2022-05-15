@@ -12,7 +12,7 @@
     "outFile": "build/index.js"
   },
   "references": [
-    { "path": "../../../../resources/web-environment"}
+    { "path": "../../../web/web-environment"}
   ],
   "include": [
     "src/*.ts"

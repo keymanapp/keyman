@@ -11,7 +11,6 @@
   "scripts": {},
   "workspaces": [
     "resources/gosh",
-    "resources/web-environment",
     "common/core/web/input-processor",
     "common/core/web/keyboard-processor",
     "common/core/web/tools/recorder",

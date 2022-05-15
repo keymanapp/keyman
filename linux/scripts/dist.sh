@@ -77,7 +77,7 @@ for proj in ${extra_projects}; do
         --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
         --tar-ignore=linux/build* --tar-ignore=common/core/desktop/build \
         --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
-        --tar-ignore=resources/scopes --tar-ignore=resources/web-environment \
+        --tar-ignore=resources/scopes --tar-ignore=common/web \
         --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
         --tar-ignore=resources/build/vswhere* --tar-ignore=results \
         --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \

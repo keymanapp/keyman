@@ -60,7 +60,7 @@ test-headless ( ) {
   rm -f $PREPEND
   for n in tests/cases/*.js; do
     echo $n
-    (cat ../../../../resources/web-environment/build/index.js; echo) > $PREPEND
+    (cat ../../../web/web-environment/build/index.js; echo) > $PREPEND
     (cat ../utils/build/index.js; echo) >> $PREPEND
     (cat ../tools/recorder/build/nodeProctor/index.js; echo) >> $PREPEND
     (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
@@ -74,7 +74,7 @@ test-headless ( ) {
   rm -f $PREPEND
   for n in tests/cases/engine/*.js; do
     echo $n
-    (cat ../../../../resources/web-environment/build/index.js; echo) > $PREPEND
+    (cat ../../../web/web-environment/build/index.js; echo) > $PREPEND
     (cat ../utils/build/index.js; echo) >> $PREPEND
     (cat ../tools/recorder/build/nodeProctor/index.js; echo) >> $PREPEND
     (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND

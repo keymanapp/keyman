@@ -1,14 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# TODO: refactor away to use keyman-version instead
 
 echo "Starting in $(pwd)"
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-ENVIRONMENT_TS="$KEYMAN_ROOT/resources/web-environment/environment.inc.ts"
+ENVIRONMENT_TS="$THIS_SCRIPT_PATH/environment.inc.ts"
 
 if [ -f $ENVIRONMENT_TS ]; then
     rm $ENVIRONMENT_TS

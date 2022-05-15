@@ -95,7 +95,7 @@ type npm >/dev/null ||\
 if (( install_dependencies )) ; then
   verify_npm_setup
   # We need to build web-environment with a script for now
-  "$KEYMAN_ROOT/resources/web-environment/build.sh" || fail "Could not build web-environment"
+  "$KEYMAN_ROOT/common/web/web-environment/build.sh" || fail "Could not build web-environment"
 fi
 
 build || fail "Compilation failed."

@@ -16,7 +16,7 @@
   ],
 
   "references": [
-    { "path": "../../../resources/web-environment" },
+    { "path": "../../../common/web/web-environment" },
     { "path": "../../../common/core/web/utils" },
     { "path": "../../../common/core/web/keyboard-processor/src" },
     { "path": "../../../common/core/web/input-processor/src" },

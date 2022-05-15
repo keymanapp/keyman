@@ -20,9 +20,9 @@
   ],
 
   "references": [
-    { "path": "../../../../../../resources/web-environment" },
-    { "path": "../../../../../../common/core/web/utils" },
-    { "path": "../../../../../../common/core/web/keyboard-processor/src" },
-    { "path": "../../../../../../common/web/lm-message-types" }
+    { "path": "../../../../../web/web-environment" },
+    { "path": "../../../../../core/web/utils" },
+    { "path": "../../../../../core/web/keyboard-processor/src" },
+    { "path": "../../../../../web/lm-message-types" }
   ]
 }
