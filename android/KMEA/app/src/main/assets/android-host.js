@@ -141,6 +141,9 @@ function setKeymanLanguage(k) {
 function setSpacebarText(mode) {
   keyman.options['spacebarText'] = mode;
   keyman.osk.show(true);
+
+  // Refresh KMW OSK
+  keyman.correctOSKTextSize();
 }
 
 /**
