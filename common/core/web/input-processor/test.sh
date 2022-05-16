@@ -64,7 +64,8 @@ test-headless ( ) {
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  # Poor Man's Modules until we support ES6 throughout
+  # TODO: Poor Man's Modules until we support ES6 throughout
+
   PREPEND=./tests/cases/prepend.js
   (cat ../../../web/web-environment/build/index.js; echo) > $PREPEND
   (cat ../utils/build/index.js; echo) >> $PREPEND
@@ -72,9 +73,16 @@ test-headless ( ) {
   (cat ../input-processor/build/index.js; echo) >> $PREPEND
   (cat tests/cases/inputProcessor.js; echo) >> $PREPEND
 
-  # TODO: We will re-enable languageProcessor tests when we have sorted out
-  #       paths and modules for lmc
-  #(cat tests/cases/languageProcessor.js; echo) >> $PREPEND
+  npm run mocha -- --recursive $FLAGS ./tests/cases/prepend.js
+
+  PREPEND=./tests/cases/prepend.js
+  (cat ../../../web/web-environment/build/index.js; echo) > $PREPEND
+  (cat ../../../predictive-text/build/headless.js; echo) >> $PREPEND
+  (cat ../utils/build/index.js; echo) >> $PREPEND
+  (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
+  (cat ../input-processor/build/index.js; echo) >> $PREPEND
+  (cat ../../../web/lm-worker/build/index.js; echo) >> $PREPEND
+  (cat tests/cases/languageProcessor.js; echo) >> $PREPEND
 
   npm run mocha -- --recursive $FLAGS ./tests/cases/prepend.js
 
