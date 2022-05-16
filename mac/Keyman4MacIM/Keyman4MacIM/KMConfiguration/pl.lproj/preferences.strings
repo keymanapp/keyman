@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Zawsze pokazuj klawiaturę ekranową";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Użyj rejestrowania konsoli";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Wsparcie";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Pobierz klawiaturę...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Konfiguracja Keymana";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Powrót";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Keyboards";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Gdy włączona jest opcja rejestrowania szczegółowego, Keyman będzie rejestrować działania, które mogą pomóc w diagnozowaniu problemu przez obsługę Keyman. Program Konsoli może być używany do wyświetlania dziennika wiadomości od Keyman. W Konsoli filtr, aby wyświetlić wszystkie wiadomości z procesu \"Keyman\". Ten dziennik można wyeksportować i wysłać do obsługi Keyman w razie potrzeby.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Przekaż";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Strona główna";
+
+/* Options button text */
+"frd-No-seV.label" = "Opcje";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Zainstalowana Klawiatura";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Włącz tę opcję jeśli masz problemy z określoną klawiaturą lub ogólnie z Keymanem.";

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Italiana</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Configurazione</string>
+  <string name="ssTitle">Installa $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION è stato installato con successo.</string>
+  <string name="ssCancelQuery">Sei sicuro di voler annullare l\'installazione di $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Estrazione bundle...</string>
+  <string name="ssBootstrapCheckingPackages">Controllo pacchetti...</string>
+  <string name="ssBootstrapCheckingForUpdates">Controllo aggiornamenti online...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Controllo delle versioni installate...</string>
+  <string name="ssBootstrapReady">Terminazione...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s per %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Non c\'è nulla da installare.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s download)</string>
+  <string name="ssActionInstall">L\'installazione verrà installata:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION è libero e open source</string>
+  <string name="ssLicenseLink">&amp;Leggi la licenza</string>
+  <string name="ssInstallOptionsLink">Installa &amp;opzioni</string>
+  <string name="ssMessageBoxTitle">$APPNAME Setup</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Installa</string>
+  <string name="ssCancelButton">Annulla</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Installazione di $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Rimozione delle versioni precedenti</string>
+  <string name="ssStatusComplete">Installazione Completata</string>
+  <string name="ssQueryRestart">È necessario riavviare Windows prima che l\'installazione possa completare. Quando si riavvia Windows, l\'installazione continuerà.
+
+Riavvia ora?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows non è stato in grado di essere riavviato automaticamente. È necessario riavviare Windows prima di provare ad avviare $APPNAME.</string>
+  <string name="ssMustRestart">È necessario riavviare Windows per completare la configurazione. Quando si riavvia Windows, l\'installazione terminerà.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION richiede l\'installazione di Windows 7 o successivo. Tuttavia, è stato rilevato Keyman Desktop 7, 8 o 9. Vuoi installare le tastiere incluse in questo programma di installazione nella versione Keyman Desktop installata?</string>
+  <string name="ssOldOsVersionDownload">Questa versione di $APPNAME richiede l\'installazione di Windows 7 o successivo. Vuoi scaricare Keyman Desktop 8?</string>
+  <string name="ssOptionsTitle">Opzioni Di Installazione</string>
+  <string name="ssOptionsTitleInstallOptions">Opzioni di installazione</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Impostazioni predefinite $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Moduli da installare o aggiornare</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Lingua Della Tastiera Associata</string>
+  <string name="ssOptionsTitleLocation">Versione da installare</string>
+  <string name="ssOptionsStartWithWindows">Avvia $APPNAME all\'avvio di Windows</string>
+  <string name="ssOptionsStartAfterInstall">Avvia $APPNAME al completamento dell\'installazione</string>
+  <string name="ssOptionsCheckForUpdates">Controlla periodicamente gli aggiornamenti online</string>
+  <string name="ssOptionsUpgradeKeyboards">Aggiorna le tastiere installate con versioni precedenti alla versione $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Condividi statistiche anonime di utilizzo con keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Versione di configurazione: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Installa $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Aggiorna $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s è già installato.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Scarica la versione %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Versione %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Installa %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Scarica la versione %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Versione %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Seleziona la lingua che desideri associare alla tastiera %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Lingua predefinita</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Scaricamento di %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Scaricamento di %0:s</string>
+  <string name="ssOffline">$APPNAME L\'impostazione non può connettersi a keyman.com per scaricare risorse aggiuntive.
+
+Verificare di essere online e dare a $APPNAME il permesso di configurazione per accedere a Internet nelle impostazioni del firewall.
+
+Fare clic su Interrompi per uscire dalla configurazione, Riprova a provare e scaricare nuovamente le risorse, oppure Ignora per continuare offline.</string>
+</resources>

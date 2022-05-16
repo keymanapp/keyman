@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 15.0.246 beta 2022-05-11
+
+* chore(ios): Set transparent background on "more" icons (#6598)
+* chore(common): Add crowdin strings for Polish (#6593)
+
+## 15.0.245 beta 2022-05-10
+
+* chore(common): Add crowdin strings for Italian (#6592)
+
+## 15.0.244 beta 2022-05-09
+
+* fix(windows): Don't reset defaults on Keyman upgrade (#6491)
+
 ## 15.0.243 beta 2022-05-03
 
 * chore(web): report on file size (#6584)
