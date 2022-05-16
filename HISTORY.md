@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.247 beta 2022-05-16
+
+* chore(common/resources): Update langtags.json (#6594)
+* fix(android/engine): Refresh OSK when changing spacebar text (#6620)
+
 ## 15.0.246 beta 2022-05-11
 
 * chore(ios): Set transparent background on "more" icons (#6598)
