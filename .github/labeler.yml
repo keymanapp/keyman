@@ -38,7 +38,7 @@ developer/:
 
 developer/compilers/:
   - windows/src/developer/kmcomp/**
-  - developer/js/**
+  - developer/kmlmc/**
 
 developer/ide/:
   - windows/src/developer/TIKE/**

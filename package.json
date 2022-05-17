@@ -11,7 +11,7 @@
   "scripts": {},
   "workspaces": [
     "resources/gosh",
-    "developer/js",
+    "developer/kmlmc",
     "developer/server",
     "common/models/*",
     "common/web/*",

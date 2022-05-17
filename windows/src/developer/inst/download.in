@@ -21,7 +21,6 @@ KEYMAN_WIX_TEMP_SERVER=$(TEMP)\keyman_wix_build\Server
 
 KEYMAN_WIX_KMDEV_SERVER=$(KEYMAN_ROOT)\developer\server\build
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
-KEYMAN_MODELCOMPILER_ROOT=$(KEYMAN_ROOT)\developer\js
 
 copykmdev: makeinstaller
     -mkdir $(ROOT)\release\$Version

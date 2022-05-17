@@ -9,6 +9,7 @@ KEYMAN_ROOT=c:\keyman
 !ENDIF
 
 ROOT=$(KEYMAN_ROOT)\windows
+KEYMAN_MODELCOMPILER_ROOT=$(KEYMAN_ROOT)\developer\kmlmc
 
 EXT=$(ROOT)\src\ext
 
@@ -146,9 +147,9 @@ DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
 
 !IFDEF NODELPHI
-DCC32=echo skipping 
-DCC32DPK=echo skipping 
-DCC64=echo skipping 
+DCC32=echo skipping
+DCC32DPK=echo skipping
+DCC64=echo skipping
 DELPHI_MSBUILD=echo skipping
 !ENDIF
 

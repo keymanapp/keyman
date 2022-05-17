@@ -39,7 +39,7 @@ shared-data: .virtual
     $(MAKE) $(TARGET)
 
 lexical-model-compiler: .virtual
-    cd $(KEYMAN_ROOT)\developer\js
+    cd $(KEYMAN_MODELCOMPILER_ROOT)
 
 !ifdef GIT_BASH_FOR_KEYMAN
     $(GIT_BASH_FOR_KEYMAN) build.sh -test
