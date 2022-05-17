@@ -40,6 +40,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -2797,6 +2798,7 @@ public final class KMManager {
           // Collapse the selection
           textView.setSelection(start + s.length());
           textView.endBatchEdit();
+          textView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
         }
       });
     }
@@ -2938,6 +2940,10 @@ public final class KMManager {
           }
 
           ic.endBatchEdit();
+          ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();
+          if (parent != null) {
+            parent.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+          }
         }
       });
     }
