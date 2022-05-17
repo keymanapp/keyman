@@ -69,6 +69,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
+    boolean mayVibrateWhenTyping = prefs.getBoolean(KeymanSettingsActivity.vibrateWhenTypingKey, false);
+    KMManager.setMayVibrateWhenTyping(mayVibrateWhenTyping);
+
     KMManager.executeResourceUpdate(this);
   }
 

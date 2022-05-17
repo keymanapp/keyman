@@ -207,6 +207,9 @@ public final class KMManager {
   protected static String currentBanner = KM_BANNER_STATE_BLANK;
 
 
+  // Special override for haptic feedback when typing
+  private static boolean mayVibrateWhenTyping = false;
+
   // Special override for when keyboard is entering a password text field.
   // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
   // regardless what the Settings preference is.
@@ -1207,6 +1210,20 @@ public final class KMManager {
     return (((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER) ||
       ((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_PHONE));
   }
+
+  /**
+   * If the override is true, vibrate when user types on the Keyman keyboard
+   * @param override - boolean
+   */
+  public static void setMayVibrateWhenTyping(boolean override) {
+    mayVibrateWhenTyping = override;
+  }
+
+  /**
+   * Get the value of mayVibrateWhenTyping. Default is false
+   * @return boolean
+   */
+  public static boolean getMayVibrateWhenTyping() { return mayVibrateWhenTyping; };
 
   /**
    * If override is true, embedded KMW crash reports are allowed to be sent to sentry.keyman.com
@@ -2798,7 +2815,9 @@ public final class KMManager {
           // Collapse the selection
           textView.setSelection(start + s.length());
           textView.endBatchEdit();
-          textView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+          if (mayVibrateWhenTyping) {
+            textView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+          }
         }
       });
     }
@@ -2941,7 +2960,7 @@ public final class KMManager {
 
           ic.endBatchEdit();
           ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();
-          if (parent != null) {
+          if (parent != null && mayVibrateWhenTyping) {
             parent.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
           }
         }

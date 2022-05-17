@@ -149,6 +149,21 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
+    SwitchPreference hapticPreference = new SwitchPreference(context);
+    hapticPreference.setKey(KeymanSettingsActivity.vibrateWhenTypingKey);
+    hapticPreference.setTitle(getString(R.string.haptic_feedback));
+    hapticPreference.setDefaultValue(false);
+    hapticPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if (newValue == null) {
+          return false;
+        }
+        KMManager.setMayVibrateWhenTyping((boolean)newValue);
+        return true;
+      }
+    });
+
     /*
       Automatically does the following:
         SharedPreferences.Editor editor = prefs.edit();
@@ -184,6 +199,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     screen.addPreference(adjustKeyboardHeight);
     screen.addPreference(spacebarTextPreference);
 
+    screen.addPreference(hapticPreference);
     screen.addPreference(bannerPreference);
     screen.addPreference(getStartedPreference);
     screen.addPreference(sendCrashReportPreference);

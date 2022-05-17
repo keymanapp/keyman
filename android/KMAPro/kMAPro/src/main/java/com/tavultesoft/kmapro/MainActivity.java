@@ -184,6 +184,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
+    checkMayVibrateWhenTyping();
+
     setContentView(R.layout.activity_main);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
@@ -741,6 +743,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     boolean maySendCrashReport = prefs.getBoolean(KeymanSettingsActivity.sendCrashReport, true);
     KMManager.setMaySendCrashReport(maySendCrashReport);
+  }
+
+  private void checkMayVibrateWhenTyping() {
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean mayVibrateWhenTyping = prefs.getBoolean(KeymanSettingsActivity.vibrateWhenTypingKey, false);
+    KMManager.setMayVibrateWhenTyping(mayVibrateWhenTyping);
   }
 
   private void checkChromeVersion(WebView webView) {
