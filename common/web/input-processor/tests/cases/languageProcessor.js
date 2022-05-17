@@ -6,7 +6,7 @@ var vm = require("vm");
  * Unit tests for the Dummy prediction model.
  */
 
-var LexicalModelCompiler = require('../../../../../../developer/js/dist/lexical-model-compiler/lexical-model-compiler').default;
+var LexicalModelCompiler = require('../../../../../developer/js/dist/lexical-model-compiler/lexical-model-compiler').default;
 var path = require('path');
 
 // Required initialization setup.
@@ -30,7 +30,7 @@ describe('LanguageProcessor', function() {
       let languageProcessor = new LanguageProcessor();
 
       // These checks are lifted from the keyboard-processor init checks found in
-      // common/core/web/keyboard-processor/tests/cases/basic-init.js.
+      // common/web/keyboard-processor/tests/cases/basic-init.js.
       assert.isUndefined(languageProcessor.lmEngine);
       assert.isUndefined(languageProcessor.activeModel);
       assert.isFalse(languageProcessor.isActive);
@@ -46,7 +46,7 @@ describe('LanguageProcessor', function() {
   describe('.predict', function() {
     let compiler = new LexicalModelCompiler();
     const MODEL_ID = 'example.qaa.trivial';
-    const PATH = path.join(__dirname, '../../../../../../developer/js/tests/fixtures', MODEL_ID);
+    const PATH = path.join(__dirname, '../../../../../developer/js/tests/fixtures', MODEL_ID);
 
     describe('using angle brackets for quotes', function() {
       let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {

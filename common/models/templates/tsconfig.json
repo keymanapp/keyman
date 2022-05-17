@@ -9,7 +9,7 @@
     "target": "es5",
   },
   "references": [
-    { "path": "../../core/web/utils" },
+    { "path": "../../web/utils" },
     { "path": "../types" }
   ],
   "include": [

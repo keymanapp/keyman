@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../tsconfig-base.json",
+  "extends": "../../../tsconfig-base.json",
   "compilerOptions": {
     "allowJs": true,
     "module": "none",
@@ -12,7 +12,7 @@
     "outFile": "build/index.js"
   },
   "references": [
-    { "path": "../../../web/web-environment"}
+    { "path": "../web-environment"}
   ],
   "include": [
     "src/*.ts"

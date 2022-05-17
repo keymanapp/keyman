@@ -63,7 +63,7 @@ if [ $BUILD_LMLAYER = true ]; then
     echo ""
     echo "Compiling the Language Modeling layer module..."
     ./build.sh $FLAGS || fail "Failed to compile the language modeling layer module."
-    cd ../core/web/input-processor/src
+    cd ../web/input-processor/src
     # TODO:  Move this back to KMW's main build script.  Consider it part of the dependency update.
     echo "Language Modeling layer compilation successful."
     echo ""
@@ -84,6 +84,6 @@ fi
 
 # Compile web's `keyboard-processor` module.
 echo "Compiling Input Processor module..."
-npm run tsc -- -b src/tsconfig.json || fail "Failed to compile the core/web/input-processor module."
+npm run tsc -- -b src/tsconfig.json || fail "Failed to compile the web/input-processor module."
 echo "Input Processor module compilation successful."
 echo ""

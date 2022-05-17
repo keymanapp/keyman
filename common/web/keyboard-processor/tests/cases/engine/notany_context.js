@@ -54,7 +54,7 @@ describe('Engine - notany() and context()', function() {
 
     // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
     // automatically set the keyboard as active.
-    const script = new vm.Script(fs.readFileSync('../tests/resources/keyboards/test_917.js'));
+    const script = new vm.Script(fs.readFileSync('../../test/resources/keyboards/test_917.js'));
     script.runInThisContext();
 
     keyboard = kp.activeKeyboard;

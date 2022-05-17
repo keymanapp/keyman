@@ -1,17 +1,16 @@
 #! /bin/bash
 #
-# Compiles development-related KeymanWeb resources for use with developing/running tests.
-#   - the Recorder module (for engine tests)
-#   - the DOM module (for touch-alias and element-interface tests)
+# Compiles sentry manager
+
+set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 display_usage ( ) {
     echo "build.sh [-skip-package-install]"
@@ -46,18 +45,7 @@ if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
 fi
 
-# Definition of global compile constants
-OUTPUT_DIR="build"
-OUTPUT="index.js"
-
-# Ensures that we rely first upon the local npm-based install of Typescript.
-# (Facilitates automated setup for build agents.)
-PATH="../node_modules/.bin:$PATH"
-
-compiler="npm run tsc --"
-compilecmd="$compiler"
-
-$compilecmd -p "$SCRIPT_DIR/tsconfig.json"
+npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
 if [ $? -ne 0 ]; then
     fail "Compilation of package for Sentry integration with KeymanWeb failed."
 fi

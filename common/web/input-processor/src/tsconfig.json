@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../../tsconfig-base.json",
+  "extends": "../../../../tsconfig-base.json",
   "compilerOptions": {
     "allowJs": true,
     "module": "none",
@@ -13,15 +13,15 @@
     "outFile": "../build/index.js"
   },
   "references": [
-    { "path": "../../../../web/web-environment" },
+    { "path": "../../web-environment" },
     { "path": "../../utils" },
     { "path": "../../keyboard-processor/src" },
-    { "path": "../../../../predictive-text/browser.tsconfig.json" },
-    { "path": "../../../../web/es6-shim" }
+    { "path": "../../../predictive-text/browser.tsconfig.json" },
+    { "path": "../../es6-shim" }
   ],
   "include": ["./**/*.ts"],
   "files": [
     "text/inputProcessor.ts",
-    "../../../../../node_modules/eventemitter3/index.js"
+    "../../../../node_modules/eventemitter3/index.js"
   ]
 }

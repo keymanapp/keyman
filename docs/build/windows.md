@@ -12,7 +12,7 @@ On Windows, you can build the following projects:
 The following libraries can also be built:
 
 * Keyman Core (Windows, wasm targets) (aka common/core/desktop)
-* Common/Web (aka common/core/web)
+* Common/Web
 
 The following projects **cannot** be built on Windows:
 

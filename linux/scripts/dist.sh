@@ -68,7 +68,7 @@ for proj in ${extra_projects}; do
     dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
         --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
         --tar-ignore=.github --tar-ignore=.vscode --tar-ignore=android \
-        --tar-ignore=common/core/web --tar-ignore=common/lexical-model-types \
+        --tar-ignore=common/lexical-model-types \
         --tar-ignore=common/models --tar-ignore=common/predictive-text \
         --tar-ignore=common/test --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
         --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \

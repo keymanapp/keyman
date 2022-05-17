@@ -7,7 +7,7 @@ function loadKeyboards() {
     //
     // Both Firefox and Chrome don't like that it's not data: or http:/https:
     // and will consider the local files to be "remote resource[s]".
-    commonPrefix = "../../../common/core/web/tests/resources";
+    commonPrefix = "../../../common/test/resources";
   }
 
   var filePrefix = commonPrefix + "/json/keyboards/";
@@ -26,8 +26,8 @@ function loadKeyboards() {
   loadExistingStubs(preloadFiles);
 }
 
-// Script to allow a user to add any keyboard to the keyboard menu 
-function addKeyboard(n) { 
+// Script to allow a user to add any keyboard to the keyboard menu
+function addKeyboard(n) {
   var sKbd;
   switch(n) {
     case 1:
@@ -55,8 +55,8 @@ function addKeyboard(n) {
 }
 
 // Add keyboard on Enter (as well as pressing button)
-function clickOnEnter(e,id) {                                       
+function clickOnEnter(e,id) {
   e = e || window.event;
-  if(e.keyCode == 13) addKeyboard(id); 
+  if(e.keyCode == 13) addKeyboard(id);
 }
 

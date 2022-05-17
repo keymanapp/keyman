@@ -36,7 +36,7 @@ describe('InputProcessor', function() {
       assert.isUndefined(core.activeModel);    // Same for the model.
 
       // These checks are lifted from the keyboard-processor init checks found in
-      // common/core/web/keyboard-processor/tests/cases/basic-init.js.
+      // common/web/keyboard-processor/tests/cases/basic-init.js.
       assert.equal('us', core.keyboardProcessor.baseLayout, 'KeyboardProcessor has unexpected base layout')
       assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
       assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');
@@ -79,7 +79,7 @@ describe('InputProcessor', function() {
 
       // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
       // automatically set the keyboard as active.
-      let kbdScript = new vm.Script(fs.readFileSync('../tests/resources/keyboards/test_chirality.js'));
+      let kbdScript = new vm.Script(fs.readFileSync('../../test/resources/keyboards/test_chirality.js'));
       kbdScript.runInThisContext();
 
       keyboard = core.activeKeyboard;

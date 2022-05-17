@@ -14,7 +14,7 @@ On macOS, you can build the following projects:
 The following libraries can also be built:
 
 * Common/Core/Desktop (macOS, wasm targets)
-* Common/Core/Web
+* Common/Web
 
 The following projects **cannot** be built on macOS:
 

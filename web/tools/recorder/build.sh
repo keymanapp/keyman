@@ -28,7 +28,7 @@ readonly ENGINE_TEST_OUTPUT
 # (Facilitates automated setup for build agents.)
 PATH="../../node_modules/.bin:$PATH"
 
-pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
+pushd "$KEYMAN_ROOT/common/web/recorder/src"
 ./build.sh -skip-package-install || fail "recorder-core compilation failed."
 popd
 

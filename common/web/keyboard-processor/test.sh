@@ -1,15 +1,18 @@
 #!/bin/bash
 
-# We should work within the script's directory, not the one we were called in.
-cd $(dirname "$BASH_SOURCE")
+set -eu
 
 # Include useful testing resource functions
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
+# We should work within the script's directory, not the one we were called in.
+cd "$THIS_SCRIPT_PATH"
 
 # A simple utility script to facilitate unit-testing for the LM Layer.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
@@ -60,9 +63,9 @@ test-headless ( ) {
   rm -f $PREPEND
   for n in tests/cases/*.js; do
     echo $n
-    (cat ../../../web/web-environment/build/index.js; echo) > $PREPEND
+    (cat ../web-environment/build/index.js; echo) > $PREPEND
     (cat ../utils/build/index.js; echo) >> $PREPEND
-    (cat ../tools/recorder/build/nodeProctor/index.js; echo) >> $PREPEND
+    (cat ../recorder/build/nodeProctor/index.js; echo) >> $PREPEND
     (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
     (cat $n; echo) >> $PREPEND;
     npm run mocha -- --recursive $FLAGS $PREPEND || die
@@ -74,9 +77,9 @@ test-headless ( ) {
   rm -f $PREPEND
   for n in tests/cases/engine/*.js; do
     echo $n
-    (cat ../../../web/web-environment/build/index.js; echo) > $PREPEND
+    (cat ../web-environment/build/index.js; echo) > $PREPEND
     (cat ../utils/build/index.js; echo) >> $PREPEND
-    (cat ../tools/recorder/build/nodeProctor/index.js; echo) >> $PREPEND
+    (cat ../recorder/build/nodeProctor/index.js; echo) >> $PREPEND
     (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
     (cat $n; echo) >> $PREPEND;
     npm run mocha -- --recursive $FLAGS $PREPEND || die
@@ -88,7 +91,7 @@ test-headless ( ) {
 
 if [ $FETCH_DEPS = true ]; then
   # Build test dependency
-  pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
+  pushd "$KEYMAN_ROOT/common/web/recorder/src"
   ./build.sh -skip-package-install || fail "recorder-core compilation failed."
   popd
 fi

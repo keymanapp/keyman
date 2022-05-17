@@ -9,7 +9,7 @@ global.keyman = {};
 String.kmwEnableSupplementaryPlane(false);
 
 describe('Engine - Chirality', function() {
-  let testJSONtext = fs.readFileSync('../tests/resources/json/engine_tests/chirality.json');
+  let testJSONtext = fs.readFileSync('../../test/resources/json/engine_tests/chirality.json');
   // Common test suite setup.
   let testSuite = new KMWRecorder.KeyboardTest(JSON.parse(testJSONtext));
 
@@ -27,7 +27,7 @@ describe('Engine - Chirality', function() {
 
     // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
     // automatically set the keyboard as active.
-    var script = new vm.Script(fs.readFileSync('../tests/' + testSuite.keyboard.filename));
+    var script = new vm.Script(fs.readFileSync('../../test/' + testSuite.keyboard.filename));
     script.runInThisContext();
 
     keyboard = kp.activeKeyboard;

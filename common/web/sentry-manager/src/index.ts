@@ -1,4 +1,4 @@
-///<reference path="../../../../../../node_modules/@sentry/browser/build/bundle.min.js" />
+///<reference path="../../../../node_modules/@sentry/browser/build/bundle.min.js" />
 
 namespace com.keyman {
   /**

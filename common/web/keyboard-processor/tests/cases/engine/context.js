@@ -987,7 +987,7 @@ describe('Engine - Context Matching', function() {
 
     // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
     // automatically set the keyboard as active.
-    var script = new vm.Script(fs.readFileSync('../tests/resources/keyboards/test_simple_deadkeys.js'));
+    var script = new vm.Script(fs.readFileSync('../../test/resources/keyboards/test_simple_deadkeys.js'));
     script.runInThisContext();
 
     keyboard = kp.activeKeyboard;

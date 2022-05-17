@@ -32,7 +32,7 @@ describe('KeyboardProcessor', function() {
 
       // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
       // automatically set the keyboard as active.
-      var script = new vm.Script(fs.readFileSync('../tests/resources/keyboards/khmer_angkor.js'));
+      var script = new vm.Script(fs.readFileSync('../../test/resources/keyboards/khmer_angkor.js'));
       script.runInThisContext();
 
       assert.isDefined(kp.activeKeyboard, 'Keyboard failed to register on script load');

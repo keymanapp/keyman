@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../../../tsconfig-base.json",
+  "extends": "../../../../tsconfig-base.json",
 
   "compilerOptions": {
     "allowJs": true,
@@ -20,9 +20,9 @@
   ],
 
   "references": [
-    { "path": "../../../../../web/web-environment" },
-    { "path": "../../../../../core/web/utils" },
-    { "path": "../../../../../core/web/keyboard-processor/src" },
-    { "path": "../../../../../web/lm-message-types" }
+    { "path": "../../web-environment" },
+    { "path": "../../utils" },
+    { "path": "../../keyboard-processor/src" },
+    { "path": "../../lm-message-types" }
   ]
 }

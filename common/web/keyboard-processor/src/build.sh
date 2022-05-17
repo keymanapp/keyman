@@ -48,4 +48,4 @@ if [ $FETCH_DEPS = true ]; then
 fi
 
 # Compile web's `keyboard-processor` module.
-npm run tsc -- -b src/tsconfig.json || fail "Failed to compile the core/web/keyboard-processor module."
+npm run tsc -- -b src/tsconfig.json || fail "Failed to compile the web/keyboard-processor module."

@@ -17,7 +17,7 @@
     { "path": "../lm-message-types" },
     // modules
     { "path": "../web-environment", "prepend": true },
-    { "path": "../../core/web/utils", "prepend": true },
+    { "path": "../utils", "prepend": true },
     { "path": "../../models/templates", "prepend": true },
     { "path": "../../models/wordbreakers", "prepend": true },
   ],

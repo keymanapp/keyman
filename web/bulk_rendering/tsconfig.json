@@ -17,7 +17,7 @@
   ],
 
 	"references": [
-    { "path": "../../common/core/web/utils", "prepend": true },
+    { "path": "../../common/web/utils", "prepend": true },
     { "path": "../../common/web/web-environment", "prepend": true },
 		{ "path": "../../common/web/es6-shim", "prepend": true },
     { "path": "../../common/web/lm-message-types" },
