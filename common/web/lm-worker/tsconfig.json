@@ -16,7 +16,7 @@
     { "path": "../../models/types" },
     { "path": "../lm-message-types" },
     // modules
-    { "path": "../web-environment", "prepend": true },
+    { "path": "../keyman-version", "prepend": true },
     { "path": "../utils", "prepend": true },
     { "path": "../../models/templates", "prepend": true },
     { "path": "../../models/wordbreakers", "prepend": true },
