@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.248 beta 2022-05-17
+
+* fix(windows): use GlobalGetAtomName to access global list (#6580)
+
 ## 15.0.247 beta 2022-05-16
 
 * chore(common/resources): Update langtags.json (#6594)
