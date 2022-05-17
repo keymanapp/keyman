@@ -334,13 +334,7 @@ if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
 
     # Temporary patch for build -- ensure that predictive-text is
-    # built (because of its wrapper requirements), and that the
-    # web-environment file is generated (because it uses a script
-    # to do this at present).
-    echo "Temp: Building dependencies that have manual build requirements"
-    pushd "$KEYMAN_ROOT/common/web/web-environment" > /dev/null
-    ./build.sh
-    popd > /dev/null
+    # built (because of its wrapper requirements).
 
     pushd "$KEYMAN_ROOT/common/web/lm-worker" > /dev/null
     ./build.sh

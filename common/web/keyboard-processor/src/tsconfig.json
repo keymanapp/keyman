@@ -15,7 +15,7 @@
   },
   "references": [
     { "path": "../../../models/types" },
-    { "path": "../../web-environment/" },
+    { "path": "../../keyman-version/" },
     { "path": "../../utils/" }
   ],
   "include": ["./**/*.ts"],

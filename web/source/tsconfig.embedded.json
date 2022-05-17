@@ -27,7 +27,7 @@
 	],
 
   "references": [
-    { "path": "../../common/web/web-environment", "prepend": true },
+    { "path": "../../common/web/keyman-version", "prepend": true },
     { "path": "../../common/web/utils", "prepend": true },
     { "path": "../../common/predictive-text/browser.tsconfig.json", "prepend": true },
     { "path": "../../common/web/input-processor/src", "prepend": true },
