@@ -56,7 +56,7 @@ KEYMAN_MODELCOMPILER_TEMP=`mktemp -d`
 # We copy the built model compiler into a temporary folder in order to prepare
 # the node modules, as otherwise the workspace will interfere
 
-cp -R "$KEYMAN_ROOT/developer/js/"* "$KEYMAN_MODELCOMPILER_TEMP/"
+cp -R "$KEYMAN_ROOT/developer/kmlmc/"* "$KEYMAN_MODELCOMPILER_TEMP/"
 
 cd "$KEYMAN_MODELCOMPILER_TEMP"
 
