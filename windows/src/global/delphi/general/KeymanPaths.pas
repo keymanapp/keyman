@@ -435,7 +435,7 @@ begin
   // within that path then use that as source path
   if TKeymanPaths.RunningFromSource(keyman_root) then
   begin
-    Exit(keyman_root + 'common\core\desktop\build\x86\debug\src\' + Filename);
+    Exit(keyman_root + 'core\build\x86\debug\src\' + Filename);
   end;
 
   Result := GetDebugPath('KeymanCoreLibraryPath', '');

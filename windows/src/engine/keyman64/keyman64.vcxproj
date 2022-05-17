@@ -54,12 +54,12 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\common\core\desktop\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\core\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\common\core\desktop\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\core\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>

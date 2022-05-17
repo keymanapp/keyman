@@ -1,7 +1,7 @@
 namespace com.keyman.text {
   export var Codes = {
     // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
-    // Compare against /common/core/desktop/src/kmx/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
+    // Compare against /core/src/kmx/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
     modifierCodes: {
       "LCTRL":0x0001,           // LCTRLFLAG
       "RCTRL":0x0002,           // RCTRLFLAG
@@ -11,7 +11,7 @@ namespace com.keyman.text {
       "CTRL":0x0020,            // K_CTRLFLAG
       "ALT":0x0040,             // K_ALTFLAG
       // TENTATIVE:  Represents command keys, which some OSes use for shortcuts we don't
-      // want to block.  No rule will ever target a modifier set with this bit set to 1. 
+      // want to block.  No rule will ever target a modifier set with this bit set to 1.
       "META":0x0080,            // K_METAFLAG
       "CAPS":0x0100,            // CAPITALFLAG
       "NO_CAPS":0x0200,         // NOTCAPITALFLAG

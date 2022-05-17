@@ -5,7 +5,7 @@
 On Linux, you can build the following projects:
 
 * [Keyman for Linux](#keyman-for-linux)
-* [Keyman Core](#keyman-core) (Linux only) (aka common/core/desktop)
+* [Keyman Core](#keyman-core) (Linux only) (aka core)
 <!-- TODO: document how to build for Android, Web, Core-Wasm and Common/Web on Linux. See TC build agent for details. -->
 * Keyman for Android
 * Keyman Core (wasm targets)
@@ -63,4 +63,4 @@ All dependencies are already installed if you followed the instructions under [P
 
 Building:
 
-* [Building Keyman Core](../../common/core/desktop/doc/BUILDING.md)
+* [Building Keyman Core](../../core/doc/BUILDING.md)
