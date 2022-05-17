@@ -11,7 +11,7 @@
     "outFile": "../build/index.js"
   },
   "references": [
-    { "path": "../../web-environment" }
+    { "path": "../../keyman-version" }
   ],
 
   "include": [
