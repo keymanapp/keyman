@@ -10,7 +10,7 @@ global.keyman = {}; // So that keyboard-based checks against the global `keyman`
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 
 // Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);    
+String.kmwEnableSupplementaryPlane(false);
 
 // Test the KeyboardProcessor interface.
 describe('KeyboardProcessor', function() {
