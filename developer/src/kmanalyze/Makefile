@@ -2,7 +2,7 @@
 # KMAnalyze Makefile
 #
 
-!include ..\..\Defines.mak
+!include ..\Defines.mak
 
 build: version.res dirs
     $(MSBUILD) kmanalyze.vcxproj $(MSBUILD_BUILD)
@@ -25,4 +25,4 @@ test-manifest:
 install:
     $(COPY) $(DEVELOPER_PROGRAM)\developer\kmanalyze.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmanalyze.exe"
 
-!include ..\..\Target.mak
+!include ..\Target.mak

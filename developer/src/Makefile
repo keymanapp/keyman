@@ -11,7 +11,7 @@ TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp
 MANIFESTS=kmcomp tike setup
 CLEANS=clean-developer
 
-!include ..\Header.mak
+!include Header.mak
 
 # ----------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ clean-developer:
     cd $(DEVELOPER_ROOT)\src
     -del version.txt
 
-!include ..\Target.mak
+!include Target.mak
 
 # ----------------------------------------------------------------------
 # EOF

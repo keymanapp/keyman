@@ -1,5 +1,5 @@
 !IFNDEF KEYMAN_ROOT
-KEYMAN_ROOT=c:\keyman
+!error KEYMAN_ROOT must be defined
 !ENDIF
 
 DEVELOPER_ROOT=$(KEYMAN_ROOT)\developer
