@@ -9,13 +9,13 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 EX_USAGE=64
 
 # Where to find lexical model types.
-LEXICAL_MODELS_TYPES=../../common/models/types
+LEXICAL_MODELS_TYPES="$KEYMAN_ROOT/common/models/types"
 
 
 # Build the main script.

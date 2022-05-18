@@ -5,10 +5,11 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage() {
   echo "Usage: $0 --build-path path"
@@ -56,7 +57,7 @@ KEYMAN_MODELCOMPILER_TEMP=`mktemp -d`
 # We copy the built model compiler into a temporary folder in order to prepare
 # the node modules, as otherwise the workspace will interfere
 
-cp -R "$KEYMAN_ROOT/developer/kmlmc/"* "$KEYMAN_MODELCOMPILER_TEMP/"
+cp -R "$KEYMAN_ROOT/developer/src/kmlmc/"* "$KEYMAN_MODELCOMPILER_TEMP/"
 
 cd "$KEYMAN_MODELCOMPILER_TEMP"
 
