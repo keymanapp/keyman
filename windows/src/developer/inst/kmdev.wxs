@@ -270,22 +270,22 @@
 
     <ComponentGroup Id="Node">
       <Component Directory="dirNode">
-        <File Name='node.exe' KeyPath="yes" Source="..\..\..\..\developer\inst\dist\node.exe" />
-        <File Name='CHANGELOG.md' Source="..\..\..\..\developer\inst\dist\CHANGELOG.md" />
-        <File Name='LICENSE' Source="..\..\..\..\developer\inst\dist\LICENSE" />
-        <File Name='README.md' Source="..\..\..\..\developer\inst\dist\README.md" />
+        <File Name='node.exe' KeyPath="yes" Source="..\..\..\..\developer\src\inst\node\dist\node.exe" />
+        <File Name='CHANGELOG.md' Source="..\..\..\..\developer\src\inst\node\dist\CHANGELOG.md" />
+        <File Name='LICENSE' Source="..\..\..\..\developer\src\inst\node\dist\LICENSE" />
+        <File Name='README.md' Source="..\..\..\..\developer\src\inst\node\dist\README.md" />
       </Component>
 
       <Component Directory="INSTALLDIR">
-        <File Name='kmlmc.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmc.cmd" />
+        <File Name='kmlmc.cmd' KeyPath="yes" Source="..\..\..\..\developer\src\inst\node\kmlmc.cmd" />
       </Component>
 
       <Component Directory="INSTALLDIR">
-        <File Name='kmlmi.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmi.cmd" />
+        <File Name='kmlmi.cmd' KeyPath="yes" Source="..\..\..\..\developer\src\inst\node\kmlmi.cmd" />
       </Component>
 
       <Component Directory="INSTALLDIR">
-        <File Name='kmlmp.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmp.cmd" />
+        <File Name='kmlmp.cmd' KeyPath="yes" Source="..\..\..\..\developer\src\inst\node\kmlmp.cmd" />
       </Component>
     </ComponentGroup>
 

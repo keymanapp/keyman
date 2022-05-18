@@ -115,7 +115,7 @@ if (( build_addins )); then
   fi
 
   # Build with the Keyman Developer x86 version of node
-  PATH="$KEYMAN_ROOT/developer/inst/dist:$PATH" build_addins
+  PATH="$KEYMAN_ROOT/developer/src/inst/node/dist:$PATH" build_addins
 fi
 
 # ----------------------------------------

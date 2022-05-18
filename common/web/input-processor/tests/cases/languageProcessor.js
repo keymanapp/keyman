@@ -6,7 +6,7 @@ var vm = require("vm");
  * Unit tests for the Dummy prediction model.
  */
 
-var LexicalModelCompiler = require('../../../../../developer/kmlmc/dist/lexical-model-compiler/lexical-model-compiler').default;
+var LexicalModelCompiler = require('../../../../../developer/src/kmlmc/dist/lexical-model-compiler/lexical-model-compiler').default;
 var path = require('path');
 
 // Required initialization setup.
@@ -46,7 +46,7 @@ describe('LanguageProcessor', function() {
   describe('.predict', function() {
     let compiler = new LexicalModelCompiler();
     const MODEL_ID = 'example.qaa.trivial';
-    const PATH = path.join(__dirname, '../../../../../developer/kmlmc/tests/fixtures', MODEL_ID);
+    const PATH = path.join(__dirname, '../../../../../developer/src/kmlmc/tests/fixtures', MODEL_ID);
 
     describe('using angle brackets for quotes', function() {
       let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
