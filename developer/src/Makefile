@@ -16,58 +16,58 @@ CLEANS=clean-developer
 # ----------------------------------------------------------------------
 
 imsample: .virtual
-    cd $(ROOT)\src\developer\imsample
+    cd $(DEVELOPER_ROOT)\src\imsample
     $(MAKE) $(TARGET)
 
 kmcmpdll: .virtual
-    cd $(ROOT)\src\developer\kmcmpdll
+    cd $(DEVELOPER_ROOT)\src\kmcmpdll
     $(MAKE) $(TARGET)
 
 kmdecomp: .virtual
-    cd $(ROOT)\src\developer\kmdecomp
+    cd $(DEVELOPER_ROOT)\src\kmdecomp
     $(MAKE) $(TARGET)
 
 kmcomp: kmcmpdll
-    cd $(ROOT)\src\developer\kmcomp
+    cd $(DEVELOPER_ROOT)\src\kmcomp
     $(MAKE) $(TARGET)
 
 kmanalyze: .virtual
-    cd $(ROOT)\src\developer\kmanalyze
+    cd $(DEVELOPER_ROOT)\src\kmanalyze
     $(MAKE) $(TARGET)
 
 kmconvert: .virtual
-    cd $(ROOT)\src\developer\kmconvert
+    cd $(DEVELOPER_ROOT)\src\kmconvert
     $(MAKE) $(TARGET)
 
 tike: kmcmpdll redist
-    cd $(ROOT)\src\developer\tike
+    cd $(DEVELOPER_ROOT)\src\tike
     $(MAKE) $(TARGET)
 
 samples: .virtual
-    cd $(ROOT)\src\developer\samples
+    cd $(DEVELOPER_ROOT)\src\samples
     $(MAKE) $(TARGET)
 
 setup: .virtual
-    cd $(ROOT)\src\developer\setup
+    cd $(DEVELOPER_ROOT)\src\setup
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
 
 redist:
-    copy $(ROOT)\src\ext\sentry\sentry.dll $(ROOT)\bin\developer
-    copy $(ROOT)\src\ext\sentry\sentry.x64.dll $(ROOT)\bin\developer
-    copy $(ROOT)\src\ext\sentry\crashpad_handler.exe $(ROOT)\bin\developer
+    copy $(WINDOWS_ROOT)\src\ext\sentry\sentry.dll $(DEVELOPER_ROOT)\bin
+    copy $(WINDOWS_ROOT)\src\ext\sentry\sentry.x64.dll $(DEVELOPER_ROOT)\bin
+    copy $(WINDOWS_ROOT)\src\ext\sentry\crashpad_handler.exe $(DEVELOPER_ROOT)\bin
 
 # ----------------------------------------------------------------------
 
 inst: redist
-    cd $(ROOT)\src\developer\inst
+    cd $(DEVELOPER_ROOT)\src\inst
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
 
 clean-developer:
-    cd $(ROOT)\src\developer
+    cd $(DEVELOPER_ROOT)\src
     -del version.txt
 
 !include ..\Target.mak

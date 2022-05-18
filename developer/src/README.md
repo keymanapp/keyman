@@ -1,8 +1,25 @@
 # Keyman Developer for Windows
 
-This is the current home for Keyman Developer except for the Lexical Model Compiler.
+This is the current home for Keyman Developer.
 
-The Lexical Model Compiler is found at the root level /developer folder.
+# Transition steps
+
+1. Split .kps and model compilers into separate paths
+
+# Folders
+
+
+## inst
+
+Contains a minimal distribution of node.js intended just for compiling
+lexical models. If more  dependencies are required, then the
+developer will be expected to install node.js themselves; this gets
+users going without requiring a large installer or a full node.js
+install.
+
+## kmlmc
+
+Source files for node-based compilers kmlmc, kmlmi, and kmlmp
 
 ## inst - keymandeveloper.msi
 
@@ -46,3 +63,17 @@ Installation program for Keyman Developer.
 
 This is the designer side of the Developer. Used for designing, developing, testing and packing keyboards for distribution.
 
+# kmlmc - Lexical Model Compiler
+
+The Lexical Model Compiler, kmlmc, and the node-based
+Package Compiler run on nodeJS on all supported desktop platforms.
+
+## kmlmc/kmlmp - Package Compiler
+
+The package compiler is broadly compatible with the kmcomp .kps
+package compiler. However at this stage it is only tested with
+lexical models, and use with keyboards (either .js or .kmx) is not
+tested or supported. It is likely in the future that the kmcomp
+.kps compiler will be deprecated in favour of this one.
+
+## kmlmc/kmlmi - Model Info Compiler

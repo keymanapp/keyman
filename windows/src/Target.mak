@@ -32,16 +32,17 @@ manifest.res: manifest.in version.res
 dirs:
     -mkdir $(ROOT)\build\desktop 2>nul
     -mkdir $(ROOT)\build\engine 2>nul
-    -mkdir $(ROOT)\build\developer 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\build 2>nul
     -mkdir $(ROOT)\build\buildtools 2>nul
     -mkdir $(ROOT)\build\online 2>nul
     -mkdir $(ROOT)\build\support 2>nul
     -mkdir $(ROOT)\build\inst 2>nul
 
-    -mkdir $(ROOT)\bin\developer\samples 2>nul
-    -mkdir $(ROOT)\bin\developer\xml 2>nul
-    -mkdir $(ROOT)\bin\developer\projects 2>nul
-    -mkdir $(ROOT)\bin\developer\projects\templates 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin\samples 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin\xml 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin\projects 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin\projects\templates 2>nul
     -mkdir $(ROOT)\bin\buildtools 2>nul
     -mkdir $(ROOT)\bin\engine 2>nul
     -mkdir $(ROOT)\bin\desktop 2>nul
@@ -57,7 +58,7 @@ dirs:
     -mkdir $(ROOT)\lib 2>nul
     -mkdir $(ROOT)\release 2>nul
 
-    -mkdir $(ROOT)\debug\developer 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\debug 2>nul
     -mkdir $(ROOT)\debug\buildtools 2>nul
     -mkdir $(ROOT)\debug\engine 2>nul
     -mkdir $(ROOT)\debug\desktop 2>nul
