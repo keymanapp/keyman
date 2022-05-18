@@ -87,20 +87,20 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\ext\json;..\..\ext\json-schema-validator</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\windows\src\ext\json;$(KEYMAN_ROOT)\windows\src\ext\json-schema-validator</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\ext\json;..\..\ext\json-schema-validator</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\windows\src\ext\json;$(KEYMAN_ROOT)\windows\src\ext\json-schema-validator</IncludePath>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName).x64</TargetName>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\ext\json;..\..\ext\json-schema-validator</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\windows\src\ext\json;$(KEYMAN_ROOT)\windows\src\ext\json-schema-validator</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\ext\json;..\..\ext\json-schema-validator</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\windows\src\ext\json;$(KEYMAN_ROOT)\windows\src\ext\json-schema-validator</IncludePath>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName).x64</TargetName>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
@@ -118,7 +118,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.;..\..\global\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(KEYMAN_ROOT)\windows\src\global\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);JSON_SCHEMA_VALIDATOR_EXPORTS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -135,7 +135,7 @@
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0c09</Culture>
-      <AdditionalIncludeDirectories>..\..\global\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(KEYMAN_ROOT)\windows\src\global\inc</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -166,7 +166,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.;..\..\global\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(KEYMAN_ROOT)\windows\src\global\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);JSON_SCHEMA_VALIDATOR_EXPORTS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -183,7 +183,7 @@
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0c09</Culture>
-      <AdditionalIncludeDirectories>..\..\global\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(KEYMAN_ROOT)\windows\src\global\inc</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -210,7 +210,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;..\..\global\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(KEYMAN_ROOT)\windows\src\global\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);JSON_SCHEMA_VALIDATOR_EXPORTS</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -226,7 +226,7 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0c09</Culture>
-      <AdditionalIncludeDirectories>..\..\global\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(KEYMAN_ROOT)\windows\src\global\inc</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -254,7 +254,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;..\..\global\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(KEYMAN_ROOT)\windows\src\global\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);JSON_SCHEMA_VALIDATOR_EXPORTS</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -270,7 +270,7 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0c09</Culture>
-      <AdditionalIncludeDirectories>..\..\global\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(KEYMAN_ROOT)\windows\src\global\inc</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -286,21 +286,21 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ext\json-schema-validator\json-schema.hpp" />
-    <ClInclude Include="..\..\ext\json\json.hpp" />
-    <ClInclude Include="..\..\global\inc\certificate_check.h" />
-    <ClInclude Include="..\..\global\inc\Comperr.h" />
-    <ClInclude Include="..\..\global\inc\Compfile.h" />
-    <ClInclude Include="..\..\global\inc\Compiler.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\ext\json-schema-validator\json-schema.hpp" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\ext\json\json.hpp" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\certificate_check.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Comperr.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Compfile.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Compiler.h" />
     <ClInclude Include="CasedKeys.h" />
     <ClInclude Include="CharToKeyConversion.h" />
     <ClInclude Include="CheckForDuplicates.h" />
     <ClInclude Include="CheckFilenameConsistency.h" />
     <ClInclude Include="CheckNCapsConsistency.h" />
     <ClInclude Include="comprc.h" />
-    <ClInclude Include="..\..\global\inc\ConvertUTF.h" />
-    <ClInclude Include="..\..\global\inc\crc32.h" />
-    <ClInclude Include="..\..\global\inc\debugstore.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\ConvertUTF.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\crc32.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\debugstore.h" />
     <ClInclude Include="DeprecationChecks.h" />
     <ClInclude Include="Edition.h" />
     <ClInclude Include="keyman64.h" />
@@ -308,32 +308,32 @@
     <ClInclude Include="NamedCodeConstants.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="..\..\global\inc\unicode.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\unicode.h" />
     <ClInclude Include="UnreachableRules.h" />
     <ClInclude Include="versioning.h" />
     <ClInclude Include="virtualcharkeys.h" />
-    <ClInclude Include="..\..\global\inc\Vkeys.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Vkeys.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ext\json-schema-validator\json-schema-draft4.json.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\ext\json-schema-validator\json-schema-draft4.json.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\ext\json-schema-validator\json-uri.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\ext\json-schema-validator\json-uri.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\ext\json-schema-validator\json-validator.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\ext\json-schema-validator\json-validator.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\xstring.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\global\vc\xstring.cpp" />
     <ClCompile Include="CasedKeys.cpp" />
     <ClCompile Include="CharToKeyConversion.cpp" />
     <ClCompile Include="CheckForDuplicates.cpp" />
@@ -349,7 +349,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\ConvertUTF.c">
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\global\vc\ConvertUTF.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -363,7 +363,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\crc32.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\global\vc\crc32.cpp" />
     <ClCompile Include="DeprecationChecks.cpp" />
     <ClCompile Include="Edition.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -391,8 +391,8 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\rc4.cpp" />
-    <ClCompile Include="..\..\global\vc\registry.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\global\vc\rc4.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\global\vc\registry.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -402,7 +402,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\unicode.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\global\vc\unicode.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>

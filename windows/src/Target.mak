@@ -56,7 +56,9 @@ dirs:
     -mkdir $(ROOT)\bin\help\md 2>nul
     -mkdir $(ROOT)\bin\help\md\desktop 2>nul
     -mkdir $(ROOT)\lib 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\lib 2>nul
     -mkdir $(ROOT)\release 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\release 2>nul
 
     -mkdir $(KEYMAN_ROOT)\developer\debug 2>nul
     -mkdir $(ROOT)\debug\buildtools 2>nul
