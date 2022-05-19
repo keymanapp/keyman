@@ -2,33 +2,33 @@
 # TIKE Makefile
 #
 
-!include ..\..\Defines.mak
+!include ..\Defines.mak
 
 build: version.res manifest.res icons dirs xml xsd pull-core
-    cd $(ROOT)\src\developer\tike
+    cd $(DEVELOPER_ROOT)\src\tike
     $(DELPHI_MSBUILD) tike.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\tike.exe -dpr tike.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tike.exe
-    $(COPY) $(WIN32_TARGET_PATH)\tike.exe $(PROGRAM)\developer
-    $(COPY) kmlmc.cmd $(PROGRAM)\developer
-    $(COPY) $(ROOT)\..\core\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(PROGRAM)\developer
-    if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEBUGPATH)\developer
+    $(COPY) $(WIN32_TARGET_PATH)\tike.exe $(DEVELOPER_PROGRAM)
+    $(COPY) kmlmc.cmd $(DEVELOPER_PROGRAM)
+    $(COPY) $(ROOT)\..\core\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(DEVELOPER_PROGRAM)
+    if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEVELOPER_DEBUGPATH)
 
 xsd:
-    $(COPY) $(KEYMAN_ROOT)\common\schemas\kps\kps.xsd $(PROGRAM)\developer
+    $(COPY) $(KEYMAN_ROOT)\common\schemas\kps\kps.xsd $(DEVELOPER_PROGRAM)
 
 xml: pull-npm sentry-init.js
-    cd $(ROOT)\src\developer\tike\xml
-    -del /q $(ROOT)\bin\developer\xml\*
-    xcopy /s /y * $(ROOT)\bin\developer\xml
-    cd $(ROOT)\src\developer\tike
+    cd $(DEVELOPER_ROOT)\src\tike\xml
+    -del /q $(DEVELOPER_PROGRAM)\xml\*
+    xcopy /s /y * $(DEVELOPER_PROGRAM)\xml
+    cd $(DEVELOPER_ROOT)\src\tike
 
 sentry-init.js:
-    cd $(ROOT)\src\developer\tike\xml\app\lib\sentry
+    cd $(DEVELOPER_ROOT)\src\tike\xml\app\lib\sentry
     $(MKVER_U) init.js.in init.js
 
 pull-core:
-    cd $(ROOT)\..\core
+    cd $(KEYMAN_ROOT)\core
 !ifdef GIT_BASH_FOR_KEYMAN
 !ifdef DEBUG
     $(GIT_BASH_FOR_KEYMAN) build.sh --debug
@@ -50,11 +50,11 @@ pull-npm:
 # lib folder for sane paths. If we use more npm modules in the
 # future, we may consolidate the paths at that time.
 #
-    cd $(ROOT)\src\developer\tike\xml\app
+    cd $(DEVELOPER_ROOT)\src\tike\xml\app
     npm install
-    -rd /s/q $(ROOT)\src\developer\tike\xml\app\lib\monaco
-    xcopy /i /s /y $(ROOT)\src\developer\tike\xml\app\node_modules\monaco-editor\min $(ROOT)\src\developer\tike\xml\app\lib\monaco\min
-    xcopy /i /s /y $(ROOT)\src\developer\tike\xml\app\node_modules\monaco-editor\min-maps $(ROOT)\src\developer\tike\xml\app\lib\monaco\min-maps
+    -rd /s/q $(DEVELOPER_ROOT)\src\tike\xml\app\lib\monaco
+    xcopy /i /s /y $(DEVELOPER_ROOT)\src\tike\xml\app\node_modules\monaco-editor\min $(DEVELOPER_ROOT)\src\tike\xml\app\lib\monaco\min
+    xcopy /i /s /y $(DEVELOPER_ROOT)\src\tike\xml\app\node_modules\monaco-editor\min-maps $(DEVELOPER_ROOT)\src\tike\xml\app\lib\monaco\min-maps
 
 icons:
     rc icons.rc
@@ -63,20 +63,20 @@ clean: def-clean
     if exist icons.res del icons.res
 
 signcode:
-    $(SIGNCODE) /d "Keyman Developer" $(PROGRAM)\developer\tike.exe
-    $(SIGNCODE) /d "Keyman Core" $(PROGRAM)\developer\kmnkbp0-0.dll
+    $(SIGNCODE) /d "Keyman Developer" $(DEVELOPER_PROGRAM)\tike.exe
+    $(SIGNCODE) /d "Keyman Core" $(DEVELOPER_PROGRAM)\kmnkbp0-0.dll
 
 wrap-symbols:
-    $(SYMSTORE) $(PROGRAM)\developer\tike.exe /t keyman-developer
-    $(SYMSTORE) $(DEBUGPATH)\developer\tike.dbg /t keyman-developer
+    $(SYMSTORE) $(DEVELOPER_PROGRAM)\tike.exe /t keyman-developer
+    $(SYMSTORE) $(DEVELOPER_DEBUGPATH)\tike.dbg /t keyman-developer
 
 install:
-    $(COPY) $(PROGRAM)\developer\tike.exe "$(INSTALLPATH_KEYMANDEVELOPER)\tike.exe"
-    $(COPY) $(PROGRAM)\developer\kmnkbp0-0.dll "$(INSTALLPATH_KEYMANDEVELOPER)\kmnkbp0-0.dll"
+    $(COPY) $(DEVELOPER_PROGRAM)\tike.exe "$(INSTALLPATH_KEYMANDEVELOPER)\tike.exe"
+    $(COPY) $(DEVELOPER_PROGRAM)\kmnkbp0-0.dll "$(INSTALLPATH_KEYMANDEVELOPER)\kmnkbp0-0.dll"
 
 test-manifest:
 # test that linked manifest exists and correct
-    $(MT) -nologo -inputresource:$(PROGRAM)\developer\tike.exe -validate_manifest
+    $(MT) -nologo -inputresource:$(DEVELOPER_PROGRAM)\tike.exe -validate_manifest
 
 generate-app-wxs:
     @echo *******************************************************************************************
@@ -86,5 +86,5 @@ generate-app-wxs:
     @echo *******************************************************************************************
     $(WIXPATH)\heat.exe dir xml\app\lib\monaco\min\vs -gg -o ..\inst\monaco_gen.wxs -cg MonacoFiles -var var.MonacoSourceDir -dr MonacoTargetDir
 
-!include ..\..\Target.mak
+!include ..\Target.mak
 
