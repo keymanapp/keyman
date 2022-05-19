@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.249 beta 2022-05-19
+
+* chore(common): improve PR reporting of changes (#6624)
+
 ## 15.0.248 beta 2022-05-17
 
 * fix(windows): use GlobalGetAtomName to access global list (#6580)
