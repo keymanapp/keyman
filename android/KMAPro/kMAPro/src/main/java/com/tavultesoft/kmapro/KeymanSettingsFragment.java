@@ -149,17 +149,17 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
-    SwitchPreference hapticPreference = new SwitchPreference(context);
-    hapticPreference.setKey(KeymanSettingsActivity.vibrateWhenTypingKey);
-    hapticPreference.setTitle(getString(R.string.haptic_feedback));
-    hapticPreference.setDefaultValue(false);
-    hapticPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+    SwitchPreference hapticFeedbackPreference = new SwitchPreference(context);
+    hapticFeedbackPreference.setKey(KeymanSettingsActivity.hapticFeedbackKey);
+    hapticFeedbackPreference.setTitle(getString(R.string.haptic_feedback));
+    hapticFeedbackPreference.setDefaultValue(false);
+    hapticFeedbackPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
       @Override
       public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (newValue == null) {
           return false;
         }
-        KMManager.setMayVibrateWhenTyping((boolean)newValue);
+        KMManager.setHapticFeedback((boolean)newValue);
         return true;
       }
     });
@@ -199,7 +199,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     screen.addPreference(adjustKeyboardHeight);
     screen.addPreference(spacebarTextPreference);
 
-    screen.addPreference(hapticPreference);
+    screen.addPreference(hapticFeedbackPreference);
     screen.addPreference(bannerPreference);
     screen.addPreference(getStartedPreference);
     screen.addPreference(sendCrashReportPreference);

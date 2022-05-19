@@ -13,7 +13,7 @@ public class KeymanSettingsActivity extends BaseActivity {
   protected static final String showBannerKey = "ShowBanner";
   protected static final String sendCrashReport = "SendCrashReport";
   public static final String spacebarTextKey = "SpacebarText";
-  public static final String vibrateWhenTypingKey = "VibrateWhenTyping";
+  public static final String hapticFeedbackKey = "HapticFeedbackKey";
 
   protected KeymanSettingsFragment innerFragment;
 
