@@ -22,8 +22,9 @@ export const getAssociatedPR = `
         ... on Commit {
           parents(last: 1) {
             nodes {
-              associatedPullRequests(first: 1) {
+              associatedPullRequests(last: 10) {
                 nodes {
+                  state
                   title
                   number
                 }
