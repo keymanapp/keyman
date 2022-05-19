@@ -290,12 +290,16 @@ final class KMKeyboard extends WebView {
       //handleTouchEvent(event);
       gestureDetector.onTouchEvent(event);
       if (event.getAction() == MotionEvent.ACTION_UP) {
-        subKeysList = null;
+        dismissKeyPreview(0);
+        dismissSubKeysWindow();
+        //subKeysList = null;
       } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
         if (subKeysList != null && subKeysWindow == null) {
           // Display subkeys during move
           showSubKeys(context);
         }
+      } else if (event.getAction() != MotionEvent.ACTION_DOWN) {
+        Log.d(TAG, "action");
       }
     }
 
