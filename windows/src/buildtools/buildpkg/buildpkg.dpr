@@ -20,15 +20,15 @@ uses
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
-  KeymanDeveloperOptions in '..\..\developer\TIKE\main\KeymanDeveloperOptions.pas',
-  RedistFiles in '..\..\developer\TIKE\main\RedistFiles.pas',
+  KeymanDeveloperOptions in '..\..\..\..\developer\src\tike\main\KeymanDeveloperOptions.pas',
+  RedistFiles in '..\..\..\..\developer\src\tike\main\RedistFiles.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   httpuploader in '..\..\global\delphi\general\httpuploader.pas',
   Upload_Settings in '..\..\global\delphi\general\Upload_Settings.pas',
-  UfrmTike in '..\..\developer\TIKE\main\UfrmTike.pas' {TikeForm: TTntForm},
+  UfrmTike in '..\..\..\..\developer\src\tike\main\UfrmTike.pas' {TikeForm: TTntForm},
   utilhttp in '..\..\global\delphi\general\utilhttp.pas',
   kmxfile in '..\..\global\delphi\general\kmxfile.pas',
   utilkeyboard in '..\..\global\delphi\general\utilkeyboard.pas',
@@ -40,7 +40,7 @@ uses
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
-  Keyman.Developer.System.Project.ProjectLog in '..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas',
+  Keyman.Developer.System.Project.ProjectLog in '..\..\..\..\developer\src\tike\project\Keyman.Developer.System.Project.ProjectLog.pas',
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
@@ -75,7 +75,7 @@ uses
   Keyman.System.PackageInfoRefreshLexicalModels in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  Keyman.Developer.System.KeymanDeveloperPaths in '..\..\developer\TIKE\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
+  Keyman.Developer.System.KeymanDeveloperPaths in '..\..\..\..\developer\src\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
 
 begin
   Run;

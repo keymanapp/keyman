@@ -68,7 +68,7 @@ buildtools: global
     cd $(ROOT)\src
 
 developer: global
-    cd $(ROOT)\src\developer
+    cd $(KEYMAN_ROOT)\developer\src
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
@@ -168,7 +168,10 @@ test-klog:
 #
 
 test-releaseexists:
-    cd $(ROOT)\src\developer\inst
+    cd $(KEYMAN_ROOT)\developer\src\inst
+    $(MAKE) test-releaseexists
+
+    cd $(ROOT)\src\desktop\inst
     $(MAKE) test-releaseexists
     cd $(ROOT)\src
 
@@ -215,9 +218,9 @@ test-coverity:
 # TODO: automated upload as part of build
 
 test-coverity-internal:
-    cd $(ROOT)\src\developer\kmanalyze
+    cd $(KEYMAN_ROOT)\developer\src\kmanalyze
     $(MAKE) build
-    cd $(ROOT)\src\developer\kmcmpdll
+    cd $(KEYMAN_ROOT)\developer\src\kmcmpdll
     $(MAKE) build
     cd $(ROOT)\src\engine\keyman32
     $(MAKE) build
@@ -259,7 +262,7 @@ build-release-wrapper: clean-output global-versions
     cd $(ROOT)\src
     $(MAKE) build-release-wrapper-oem
 
-    cd $(ROOT)\src\developer\inst
+    cd $(KEYMAN_ROOT)\developer\src\inst
     $(MAKE)
 !endif
 
@@ -318,9 +321,6 @@ clean-output:
 
 web-install:
     cd $(ROOT)\src\desktop\help
-    $(MAKE) html install
-
-    cd $(ROOT)\src\developer\help
     $(MAKE) html install
 
 # ----------------------------------------------------------------------
