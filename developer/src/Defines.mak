@@ -9,5 +9,7 @@ DEVELOPER_PROGRAM=$(DEVELOPER_ROOT)\bin
 DEVELOPER_OUTLIB=$(DEVELOPER_ROOT)\lib
 DEVELOPER_DEBUGPATH=$(DEVELOPER_ROOT)\debug
 
+KEYMAN_MODELCOMPILER_ROOT=$(DEVELOPER_ROOT)\src\kmlmc
+
 # Temporary import of windows/src/Defines.mak
 !include $(WINDOWS_ROOT)\src\Defines.mak
