@@ -187,7 +187,7 @@ final class KMKeyboard extends WebView {
       @Override
       public void onLongPress(MotionEvent event) {
         // This is also called for banner longpresses!  Need a way to differentiate the sources.
-        if (subKeysList != null) {
+        if (subKeysList != null && subKeysWindow != null && !subKeysWindow.isShowing()) {
           showSubKeys(context);
           return;
         } else if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
@@ -276,6 +276,7 @@ final class KMKeyboard extends WebView {
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
+    int action = event.getAction();
     // JH:  I'm not sure if we even USE the suggestionMenuWindow construct anywhere, but either way,
     // this if block is designed explicitly for handling the subKeysWindow.
     //
@@ -289,24 +290,16 @@ final class KMKeyboard extends WebView {
     } else {
       //handleTouchEvent(event);
       gestureDetector.onTouchEvent(event);
-      switch(event.getAction()) {
-        case MotionEvent.ACTION_UP :
-          dismissKeyPreview(0);
-          dismissSubKeysWindow();
-          //subKeysList = null;
-          break;
-        case MotionEvent.ACTION_MOVE :
-          if (subKeysList != null && subKeysWindow == null) {
-            // Display subkeys during move
-            showSubKeys(context);
-          }
-          break;
-        default :
-          if (event.getAction() != MotionEvent.ACTION_DOWN) {
-            Log.d(TAG, "action");
-          }
-          return false;
+      if (action == MotionEvent.ACTION_MOVE && subKeysList != null && subKeysWindow == null) {
+        // Display subkeys during move
+        showSubKeys(context);
       }
+    }
+
+    if (action == MotionEvent.ACTION_UP) {
+      // Cleanup popups. #6636
+      dismissKeyPreview(0);
+      dismissSubKeysWindow();
     }
 
     return super.onTouchEvent(event);
