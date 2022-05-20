@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.250 beta 2022-05-20
+
+* feat(android/app): Provide haptic feedback when typing (#6626)
+* fix(ios): disables transparent nav bar for ios 15 (#6633)
+
 ## 15.0.249 beta 2022-05-19
 
 * chore(common): improve PR reporting of changes (#6624)
