@@ -9,7 +9,7 @@
   },
   "references": [
     // Prepended by lm-worker.
-    { "path": "../../web-environment", "prepend": true },
+    { "path": "../../keyman-version", "prepend": true },
     { "path": "../../utils", "prepend": true },
     { "path": "../../keyboard-processor/src", "prepend": true },
     // For headless tests, we need the headless version of the compile.
