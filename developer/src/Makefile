@@ -65,6 +65,130 @@ inst: redist
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# release
+# ----------------------------------------------------------------------
+
+release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-releaseexists test-cert test-7zip test-wix clean clean-output
+    cd $(DEVELOPER_ROOT)\src
+    echo Continuing Release
+    $(MAKE) do-build-release
+    echo After build-release
+    cd $(DEVELOPER_ROOT)\src
+
+# Build a release
+
+do-build-release:
+    echo Starting Release Build
+    cd $(DEVELOPER_ROOT)\src
+    $(MAKE) global-versions
+    $(MAKE) dirs
+    cd $(WINDOWS_ROOT)\src
+    $(MAKE) build-tools
+    cd $(DEVELOPER_ROOT)\src
+    $(MAKE) build-release-dependencies
+    $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build
+# unit-tests <-- to do
+    $(MAKE) signcode
+#   $(MAKE) "TARGET=test" test <-- to do
+
+    cd $(DEVELOPER_ROOT)\src\inst
+    $(MAKE)
+    cd $(DEVELOPER_ROOT)\src
+
+#
+# Dependencies on Windows are now only ext,global,buildtools and kmbrowserhost
+#
+build-release-dependencies:
+    cd $(WINDOWS_ROOT)\src\ext
+    $(MAKE) build
+
+    cd $(WINDOWS_ROOT)\src\global
+    $(MAKE) build
+
+    cd $(WINDOWS_ROOT)\src\buildtools
+    $(MAKE) build
+
+# TODO: kmbrowserhost should be in global
+    cd $(WINDOWS_ROOT)\src\desktop\kmbrowserhost
+    $(MAKE) build signcode
+
+    cd $(DEVELOPER_ROOT)\src
+
+
+clean-output:
+    rd /s/q $(DEVELOPER_ROOT)\bin
+    rd /s/q $(DEVELOPER_ROOT)\debug
+    rd /s/q $(DEVELOPER_ROOT)\build
+    rd /s/q $(DEVELOPER_ROOT)\lib
+
+clean-pathdefines: test-releasebuildcheck
+# test-releasebuildcheck builds devtools for us
+    $(WINDOWS_PROGRAM)\buildtools\devtools -ri
+
+#
+# Test that the CEF file path is accessible from env var KEYMAN_CEF4DELPHI_ROOT
+# and checkout the appropriate version of CEF as determined by CEF_VERSION.md
+#
+test-release-cef-path:
+!ifndef SC_TIMESTAMP
+!ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) $(WINDOWS_ROOT)\src\buildtools\cef-checkout.sh
+!else
+    start /wait $(WINDOWS_ROOT)\src\buildtools\cef-checkout.sh
+!endif
+!endif
+
+#
+# Test that certificate checking is enabled and that certificate is accessible
+#
+
+test-cert:
+    copy $(SC_PFX_SHA1) $(WINDOWS_ROOT)\src\pfx.tmp
+    del $(WINDOWS_ROOT)\src\pfx.tmp
+
+#
+# Test that WiX is installed
+#
+
+test-wix:
+    if not exist $(WIXPATH)\candle.exe exit 1
+
+#
+# Test that 7-zip is installed
+#
+
+test-7zip:
+    if not exist $(WZZIPPATH) exit 1
+
+#
+# Test that we haven't already built this release
+#
+
+test-releaseexists:
+    cd $(DEVELOPER_ROOT)\src\inst
+    $(MAKE) test-releaseexists
+    cd $(DEVELOPER_ROOT)\src
+
+#
+# Test various release prerequisites, e.g. Debug reg key not set
+#
+
+test-releasebuildcheck: global-versions
+    cd $(WINDOWS_ROOT)\src\buildtools\devtools
+    $(MAKE) test-releasebuildcheck
+    cd $(DEVELOPER_ROOT)\src
+
+global-versions:
+# Build our root version.txt
+    cd $(WINDOWS_ROOT)\src
+    $(MKVER_U) $(WINDOWS_ROOT)\src\global\inc\keymanversion_build.in $(WINDOWS_ROOT)\src\global\inc\keymanversion_build.h
+    $(MKVER_U) $(WINDOWS_ROOT)\src\global\delphi\general\keymanversion_build.in $(WINDOWS_ROOT)\src\global\delphi\general\keymanversion_build.inc
+    echo Continue Global-Versions
+    cd $(DEVELOPER_ROOT)\src
+    echo End Global-Versions
+
+# ----------------------------------------------------------------------
 
 clean-developer:
     cd $(DEVELOPER_ROOT)\src

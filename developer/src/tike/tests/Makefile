@@ -1,11 +1,11 @@
 
-!include ..\..\..\Defines.mak
+!include ..\..\Defines.mak
 
 all:
-  for %d in (*.kmn) do $(PROGRAM)\dev\kmcomp "%d"
+  for %d in (*.kmn) do $(DEVELOPER_PROGRAM)\kmcomp "%d"
 
 .kmn.kmx:
-  &$(PROGRAM)\dev\kmcomp $**
+  &$(DEVELOPER_PROGRAM)\kmcomp $**
 
 clean:
   -del *.kmx

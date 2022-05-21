@@ -30,7 +30,7 @@ wrap-symbols:
 # we should be able to clean this up in the future when we remove the
 # zipped debug symbols
     $(SYMSTORE) $(DEVELOPER_PROGRAM)\setup.exe /t keyman-developer
-    $(SYMSTORE) $(ROOT)\src\setup\setup.dbg /t keyman-developer
+    $(SYMSTORE) $(DEVELOPER_ROOT)\src\setup\setup.dbg /t keyman-developer
 
 test-manifest:
 # test that (a) linked manifest exists and correct, and (b) has uiAccess=true

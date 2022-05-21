@@ -2,8 +2,13 @@
 !error KEYMAN_ROOT must be defined
 !ENDIF
 
-DEVELOPER_ROOT=$(KEYMAN_ROOT)\developer
 WINDOWS_ROOT=$(KEYMAN_ROOT)\windows
+WINDOWS_PROGRAM=$(WINDOWS_ROOT)\bin
+
+DEVELOPER_ROOT=$(KEYMAN_ROOT)\developer
+DEVELOPER_PROGRAM=$(DEVELOPER_ROOT)\bin
+DEVELOPER_OUTLIB=$(DEVELOPER_ROOT)\lib
+DEVELOPER_DEBUGPATH=$(DEVELOPER_ROOT)\debug
 
 # Temporary import of windows/src/Header.mak
 !include $(WINDOWS_ROOT)\src\Header.mak

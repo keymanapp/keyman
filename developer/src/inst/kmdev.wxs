@@ -56,9 +56,6 @@
           <Directory Id="KEYMANDEV" Name="Keyman Developer">
             <Directory Id="INSTALLDIR" Name="." FileSource="..\bin\">
               <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
-              <Directory Id="dirRedist" Name="Redist">
-                <Directory Id="dirRedistSetup" Name="Setup" />
-              </Directory>
               <Directory Id="dirNode" Name="node.js" />
               <Directory Id="dirProjects" Name="Projects" />
             </Directory>
@@ -108,8 +105,6 @@
         <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer" />
 
         <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
-        <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\Installed Products" Name="developer_pro" Type="string" Value="developer_pro" />
-        <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\Installed Products\developer_pro" Name="product id" Type="integer" Value="4" />
 
         <Environment Id="environmentKeymanDeveloperPath" Action="set" Name="KeymanDeveloperPath" System="yes" Value="[INSTALLDIR]" />
 
@@ -258,12 +253,6 @@
 
       <Component Directory="FontsFolder">
         <File Name='keymanweb-osk.ttf' TrueType='yes' Source='..\tike\xml\layoutbuilder\keymanweb-osk.ttf' KeyPath="yes" />
-      </Component>
-
-      <!-- Redistributable files -->
-
-      <Component Directory="dirRedistSetup">
-        <File Name="setup.exe" Source="..\..\..\windows\bin\desktop\setup-redist.exe" KeyPath="yes" />
       </Component>
 
     </ComponentGroup>

@@ -49,7 +49,6 @@ copy:
 # Copy the installation archive
 #
     cd $(ROOT)\src\engine\inst
-    copy $(ROOT)\src\engine\inst\keymanengine.msm $(ROOT)\bin\developer\wix
     $(MAKE) -fdownload.mak copyredist
 
 clean:

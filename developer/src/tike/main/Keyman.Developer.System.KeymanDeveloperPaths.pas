@@ -59,7 +59,7 @@ var
   KeymanRoot: string;
 begin
   if TKeymanPaths.RunningFromSource(KeymanRoot)
-    then Result := KeymanRoot + 'windows\src\developer\tike\'
+    then Result := KeymanRoot + 'developer\src\tike\'
     else Result := ExtractFilePath(ParamStr(0));
 
   Result := Result + S_LexicalModelCompiler;

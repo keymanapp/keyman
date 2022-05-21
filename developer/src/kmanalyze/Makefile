@@ -13,16 +13,16 @@ clean: def-clean
     $(MSBUILD) kmanalyze.sln $(MSBUILD_CLEAN)
 
 signcode:
-    $(SIGNCODE) /d "Keyman Developer Keyboard Analyzer" $(DEVELOPER_PROGRAM)\developer\kmanalyze.exe
+    $(SIGNCODE) /d "Keyman Developer Keyboard Analyzer" $(DEVELOPER_PROGRAM)\kmanalyze.exe
 
 wrap-symbols:
-    $(SYMSTORE) $(DEVELOPER_PROGRAM)\developer\kmanalyze.exe /t keyman-developer
-    $(SYMSTORE) $(DEVELOPER_DEBUGPATH)\developer\kmanalyze.pdb /t keyman-developer
+    $(SYMSTORE) $(DEVELOPER_PROGRAM)\kmanalyze.exe /t keyman-developer
+    $(SYMSTORE) $(DEVELOPER_DEBUGPATH)\kmanalyze.pdb /t keyman-developer
 
 test-manifest:
     @rem
 
 install:
-    $(COPY) $(DEVELOPER_PROGRAM)\developer\kmanalyze.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmanalyze.exe"
+    $(COPY) $(DEVELOPER_PROGRAM)\kmanalyze.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmanalyze.exe"
 
 !include ..\Target.mak

@@ -32,8 +32,8 @@ default:
 TARGETS=ext global buildtools engine desktop
 MANIFESTS=engine desktop
 !else
-TARGETS=ext global buildtools developer engine desktop support
-MANIFESTS=engine desktop developer
+TARGETS=ext global buildtools engine desktop support
+MANIFESTS=engine desktop
 !endif
 
 RELEASE_TARGETS=desktop
@@ -64,11 +64,6 @@ ext: build-tools
 
 buildtools: global
     cd $(ROOT)\src\buildtools
-    $(MAKE) $(TARGET)
-    cd $(ROOT)\src
-
-developer: global
-    cd $(KEYMAN_ROOT)\developer\src
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
@@ -168,9 +163,6 @@ test-klog:
 #
 
 test-releaseexists:
-    cd $(KEYMAN_ROOT)\developer\src\inst
-    $(MAKE) test-releaseexists
-
     cd $(ROOT)\src\desktop\inst
     $(MAKE) test-releaseexists
     cd $(ROOT)\src
@@ -218,10 +210,6 @@ test-coverity:
 # TODO: automated upload as part of build
 
 test-coverity-internal:
-    cd $(KEYMAN_ROOT)\developer\src\kmanalyze
-    $(MAKE) build
-    cd $(KEYMAN_ROOT)\developer\src\kmcmpdll
-    $(MAKE) build
     cd $(ROOT)\src\engine\keyman32
     $(MAKE) build
     cd $(ROOT)\src\engine\keyman64
@@ -261,9 +249,6 @@ build-release-wrapper: clean-output global-versions
 !else
     cd $(ROOT)\src
     $(MAKE) build-release-wrapper-oem
-
-    cd $(KEYMAN_ROOT)\developer\src\inst
-    $(MAKE)
 !endif
 
 build-release-wrapper-oem:
