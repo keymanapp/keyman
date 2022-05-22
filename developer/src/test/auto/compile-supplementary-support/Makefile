@@ -2,7 +2,7 @@
 # test if KS=1 is in the right files, both in debug and non-debug versions
 #
 
-KMCOMP="..\..\..\..\bin\developer\kmcomp.exe"
+KMCOMP="..\..\..\..\bin\kmcomp.exe"
 KMCOMPD=$(KMCOMP) -d
 
 test: test-nodebug test-debug
