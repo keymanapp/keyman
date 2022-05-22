@@ -3,20 +3,19 @@
 # This file maps specific paths to build triggers
 #
 
-available_platforms=(android ios linux mac web windows)
+available_platforms=(android ios linux mac web windows developer)
 
 # the base folder for each pattern does not need to be included, nor oem folders
 # e.g. android='common/models|common/predictive-text'
 # will expand into android='^(android|(oem/[^/]+/android)|common/models|common/predictive-text)'
 
-watch_android='web|common/models|common/predictive-text|common/lexical-model-types|common/web'
-watch_ios='web|common/models|common/predictive-text|common/lexical-model-types|common/web'
+watch_android='web|common/models|common/predictive-text|common/web'
+watch_ios='web|common/models|common/predictive-text|common/web'
 watch_linux='core'
 watch_mac='core'
-watch_web='common/models|common/predictive-text|common/lexical-model-types|common/web'
-
-# Windows currently builds Developer and Desktop, so we need everything from common,developer,web
-watch_windows='common|core|developer|web'
+watch_web='common/models|common/predictive-text|common/web'
+watch_windows='common|core|web'
+watch_developer='common|core|web'
 
 #
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due
@@ -40,6 +39,7 @@ bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Common_KPAPI_TestPullRequests
 bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
 bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
 bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests)
+bc_test_developer=(Keyman_Developer_Test)
 # Keymanweb_TestPullRequestRegressions : currently this is timing out so disabled until we have
 #                                        time to investigate further
 
@@ -53,6 +53,7 @@ bc_master_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
 bc_master_mac=(KeymanMac_Master)
 bc_master_windows=(Keyman_Build)
 bc_master_web=(Keymanweb_Build)
+bc_master_developer=(Keyman_Developer_Release)
 
 vcs_master=HttpsGithubComKeymanappKeyman
 
@@ -64,6 +65,7 @@ bc_beta_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
 bc_beta_mac=(KeymanMac_Master)
 bc_beta_windows=(Keyman_Build)
 bc_beta_web=(Keymanweb_Build)
+bc_beta_developer=(Keyman_Developer_Release)
 
 vcs_beta=HttpsGithubComKeymanappKeyman
 
@@ -75,5 +77,9 @@ bc_stable_14_0_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
 bc_stable_14_0_mac=(KeymanMac_Master)
 bc_stable_14_0_windows=(Keyman_Build)
 bc_stable_14_0_web=(Keymanweb_Build)
+
+# 16.0+ Keyman Developer is split from Windows, but TC configuration will not fail
+# on older versions, just no-op
+bc_stable_14_0_developer=(Keyman_Developer_Release)
 
 vcs_stable_14_0=HttpsGithubComKeymanappKeyman
