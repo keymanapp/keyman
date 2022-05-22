@@ -53,6 +53,13 @@ setup: .virtual
 
 # ----------------------------------------------------------------------
 
+test: .virtual
+    cd $(DEVELOPER_ROOT)\src\test\auto
+    $(MAKE) $(TARGET)
+    cd $(DEVELOPER_ROOT)\src
+
+# ----------------------------------------------------------------------
+
 redist:
     copy $(WINDOWS_ROOT)\src\ext\sentry\sentry.dll $(DEVELOPER_ROOT)\bin
     copy $(WINDOWS_ROOT)\src\ext\sentry\sentry.x64.dll $(DEVELOPER_ROOT)\bin
@@ -87,8 +94,7 @@ do-build-release:
     $(MAKE) build-tools
     cd $(DEVELOPER_ROOT)\src
     $(MAKE) build-release-dependencies
-    $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build
-# unit-tests <-- to do
+    $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build test
     $(MAKE) signcode
 #   $(MAKE) "TARGET=test" test <-- to do
 
