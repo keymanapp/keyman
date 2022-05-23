@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.251 beta 2022-05-23
+
+* fix(ios): stops leaking memory on system keyboard rotation (#6552)
+* fix(android/engine): Fix sticky long-press keys (#6637)
+
 ## 15.0.250 beta 2022-05-20
 
 * feat(android/app): Provide haptic feedback when typing (#6626)
