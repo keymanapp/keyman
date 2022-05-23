@@ -57,7 +57,7 @@ fi
 # Ensures that the lexical model compiler has been built locally.
 echo_heading "Preparing Lexical Model Compiler for test use"
 pushd "$KEYMAN_ROOT/developer/js/"
-npm run build
+./build.sh
 popd
 
 test-headless ( ) {
