@@ -11,11 +11,12 @@
   ],
 
   "files": [
+    "../../common/web/lm-worker/build/index.ts-nocheck.ts",
     "kmwbase.ts",
 		"keymanweb.ts",
 		"kmwembedded.ts",
 		"kmwinit.ts",
-		"kmwapi.ts"
+		"kmwapi.ts",
   ],
 
 	"exclude": [
