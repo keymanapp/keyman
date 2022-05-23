@@ -20,10 +20,5 @@
   "files": [
     "text/inputProcessor.ts",
     "../../../../node_modules/eventemitter3/index.js",
-
-    // By renaming the output JS as TS, and including the @ts-nocheck directive, we can
-    // bypass wrapped-worker typing issues while still bundling the file as part of the
-    // tsc build!
-    "../../lm-worker/build/index.ts-nocheck.ts"
   ]
 }

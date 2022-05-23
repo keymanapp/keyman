@@ -11,7 +11,6 @@
   ],
 
   "files": [
-    "../../common/web/lm-worker/build/index.ts-nocheck.ts",
 		"kmwbase.ts",
 		"keymanweb.ts",
 		"kmwnative.ts",
