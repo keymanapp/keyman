@@ -1,5 +1,5 @@
-bin/
-build/
-debug/
-lib/
-release/
+/bin/
+/build/
+/debug/
+/lib/
+/release/
