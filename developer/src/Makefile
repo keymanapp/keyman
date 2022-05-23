@@ -3,9 +3,9 @@
 #
 
 !ifdef NODELPHI
-TARGETS=kmcmpdll kmanalyze kmdecomp
+TARGETS=kmcmpdll kmanalyze kmdecomp server kmlmc
 !else
-TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp
+TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmlmc
 !endif
 
 MANIFESTS=kmcomp tike setup
@@ -49,6 +49,14 @@ samples: .virtual
 
 setup: .virtual
     cd $(DEVELOPER_ROOT)\src\setup
+    $(MAKE) $(TARGET)
+
+server: .virtual
+    cd $(DEVELOPER_ROOT)\src\server
+    $(MAKE) $(TARGET)
+
+kmlmc: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmlmc
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
@@ -96,7 +104,6 @@ do-build-release:
     $(MAKE) build-release-dependencies
     $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build test
     $(MAKE) signcode
-#   $(MAKE) "TARGET=test" test <-- to do
 
     cd $(DEVELOPER_ROOT)\src\inst
     $(MAKE)

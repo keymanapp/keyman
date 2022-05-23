@@ -50,7 +50,7 @@ var
   KeymanRoot: string;
 begin
   if TKeymanPaths.RunningFromSource(KeymanRoot)
-    then Result := KeymanRoot + 'developer\server\'
+    then Result := KeymanRoot + 'developer\src\server\'
     else Result := ExtractFilePath(ParamStr(0)) + 'server\';
 end;
 

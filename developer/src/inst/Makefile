@@ -8,7 +8,7 @@
 
 DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj kmlmc.wixobj server.wixobj
 
-setup: pull-server
+setup:
 #
 # Prepare file version information
 #
@@ -35,25 +35,6 @@ setup: pull-server
 
     cd $(DEVELOPER_ROOT)\src\inst
     $(MAKE) -fdownload.mak
-
-pull-server:
-#
-# Requires us to build developer/server (which in turn build kmw) in order to
-# get the output files If GIT_BASH_FOR_KEYMAN variable is not defined, then will
-# just throw up a new window to do the build. This means we lose logging and
-# potentially exit values as well. So GIT_BASH should be set for build agents,
-# etc, to something like
-#
-# GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file
-# "c:\Program Files\Git\etc\profile" -l
-#
-    cd $(DEVELOPER_ROOT)\server
-
-!ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh --production --test
-!else
-    start /wait ./build.sh --production --test
-!endif
 
 build:
     @rem

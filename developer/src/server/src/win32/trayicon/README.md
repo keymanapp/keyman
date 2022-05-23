@@ -7,4 +7,4 @@ bundled libraries target for specific versions of node.
 * Version: 3.0.0
 * Tree: https://github.com/mceSystems/node-windows-trayicon/tree/cbd7543ac186ca15ee8d7141aac43f26ceae1655
 * License: MIT
-* Built from: /developer/server/win32/node-windows-trayicon
+* Built from: /developer/src/server/win32/node-windows-trayicon

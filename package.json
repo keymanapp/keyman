@@ -12,7 +12,7 @@
   "workspaces": [
     "resources/gosh",
     "developer/src/kmlmc",
-    "developer/server",
+    "developer/src/server",
     "common/models/*",
     "common/web/*",
     "common/predictive-text",
