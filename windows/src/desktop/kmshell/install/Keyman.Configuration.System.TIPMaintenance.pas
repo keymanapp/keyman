@@ -229,7 +229,10 @@ begin
       // The keyboard was not found
       KL.Log('lang not found: BCP47Tag = %s, CanonicalTag = %s', [BCP47Tag, CanonicalTag]);
       // Additonal Sentry logging added to track TIP crash git hub issue #6619
-      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,Format('lang not found: BCP47Tag = %s, CanonicalTag = %s', [BCP47Tag, CanonicalTag]),TRUE);
+      if TKeymanSentryClient.Client <> nil then
+        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
+          Format('TTIPMaintenance.DoInstall: lang not found: BCP47Tag = %s, CanonicalTag = %s', [BCP47Tag, CanonicalTag]),
+          TRUE);
       Exit(False);
     end;
 
@@ -249,8 +252,11 @@ begin
       // We were not able to find a TIP, perhaps all transient TIPs have been used
 
       // Additonal Sentry logging added to track TIP crash git hub issue #6619
-      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, Format('TIPM.FindInstallationLangID failed kbID[%s] BCP47Tag[%s] CanonicalTag[%s] lang.BCP47Tag[%s]. Result LangID[%d] TempKeyboardID[%s] RegistrationRequired[%d]',
-      [KeyboardID,  BCP47Tag, CanonicalTag, lang.BCP47Code , LangId, TemporaryKeyboardID, RegistrationRequired] ), TRUE);
+      if TKeymanSentryClient.Client <> nil then
+        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
+          Format('TTIPMaintenance.DoInstall: FindInstallationLangID failed kbID[%s] BCP47Tag[%s] CanonicalTag[%s] lang.BCP47Tag[%s]. Result LangID[%d] TempKeyboardID[%s] RegistrationRequired[%d]',
+            [KeyboardID,  BCP47Tag, CanonicalTag, lang.BCP47Code, LangId, TemporaryKeyboardID, RegistrationRequired]), 
+          TRUE);
       Exit(False);
     end;
 
