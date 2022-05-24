@@ -11,6 +11,9 @@ TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp
 MANIFESTS=kmcomp tike setup
 CLEANS=clean-developer
 
+EXCLUDEPATHDEFINES=1
+BUILDPREREQ=global-versions
+
 !include Header.mak
 
 # ----------------------------------------------------------------------
