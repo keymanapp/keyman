@@ -3,8 +3,9 @@ unit Keyman.Configuration.System.TIPMaintenance;
 interface
 
 uses
+  Sentry.Client,
   System.Classes,
-
+  utiltsf,
   KeymanAPI_TLB;
 
 type
@@ -62,7 +63,47 @@ uses
   utilexecute,
   utilsystem;
 
-{ TTIPMaintenance }
+  { For temporary debugging couldn't include utilkeyman.pas so extracted needed function }
+
+function GetShortKeyboardName(const FileName: string): string;
+begin
+  if (LowerCase(ExtractFileExt(FileName)) = '.kmx') or
+      (LowerCase(ExtractFileExt(FileName)) = '.kxx') or
+      (LowerCase(ExtractFileExt(FileName)) = '.kmp')
+    then Result := ChangeFileExt(ExtractFileName(FileName), '')
+    else Result := FileName;
+end;
+
+// https://stackoverflow.com/questions/9004870/enumerate-registry-subkeys-in-delphi
+procedure GetSubKeyList(RootKey: HKEY; const Key: string; var KeyList: string);
+var
+  Registry: TRegistry;
+  SubKeyNames: TStringList;
+  Name: string;
+begin
+  Registry := TRegistry.Create(KEY_READ);
+  KeyList := '';
+  Try
+    Registry.RootKey := RootKey;
+    if not Registry.OpenKeyReadOnly(Key) then
+    begin
+      KeyList := '<Unable to open key>';
+      Exit;
+    end;
+    SubKeyNames := TStringList.Create;
+    Try
+      Registry.GetKeyNames(SubKeyNames);
+      for Name in SubKeyNames do
+        KeyList := KeyList + ' ' + Name;
+    Finally
+      SubKeyNames.Free;
+    End;
+  Finally
+    Registry.Free;
+  End;
+end;
+
+  { TTIPMaintenance }
 
 class function TTIPMaintenance.InstallTipsForPackages(Packages: TStrings): Boolean;
 var
@@ -179,8 +220,8 @@ var
   RegistrationRequired: WordBool;
   TemporaryKeyboardID: WideString;
   LangID: Integer;
-  childExitCode: Cardinal;
-  CanonicalTag, Command: string;
+  childExitCode, elevatedExitCode: Cardinal;
+  CanonicalTag, Command, RootPath, KeyList: string;
 begin
   Result := False;
   KL.MethodEnter(nil, 'TTIPMaintenance.DoInstall', [KeyboardID, BCP47Tag]);
@@ -191,6 +232,11 @@ begin
     begin
       // The keyboard was not found
       KL.Log('lang not found: BCP47Tag = %s, CanonicalTag = %s', [BCP47Tag, CanonicalTag]);
+      // Additonal Sentry logging added to track TIP crash git hub issue #6619
+      if TKeymanSentryClient.Client <> nil then
+        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
+          Format('TTIPMaintenance.DoInstall: lang not found: BCP47Tag = %s, CanonicalTag = %s', [BCP47Tag, CanonicalTag]),
+          TRUE);
       Exit(False);
     end;
 
@@ -208,6 +254,13 @@ begin
     begin
       KL.Log('Failed to find installation langid');
       // We were not able to find a TIP, perhaps all transient TIPs have been used
+
+      // Additonal Sentry logging added to track TIP crash git hub issue #6619
+      if TKeymanSentryClient.Client <> nil then
+        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
+          Format('TTIPMaintenance.DoInstall: FindInstallationLangID failed kbID[%s] BCP47Tag[%s] CanonicalTag[%s] lang.BCP47Tag[%s] Result LangID[%x] TempKeyboardID[%s] RegistrationRequired[%s]',
+          [KeyboardID,  BCP47Tag, CanonicalTag, lang.BCP47Code, LangId, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True)]),
+          TRUE);
       Exit(False);
     end;
 
@@ -218,8 +271,26 @@ begin
       Command := '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" '+GetUserDefaultLangParameterString;
       KL.Log('Calling elevated kmshell %s', [Command]);
       // This calls back into TTIPMaintenance.RegisterTip
-      if WaitForElevatedConfiguration(0, Command) <> 0 then
-        Exit(False);
+      elevatedExitCode := WaitForElevatedConfiguration(0, Command);
+      if elevatedExitCode <> 0 then
+        // Additonal Sentry logging added to track TIP crash git hub issue #6619
+        if TKeymanSentryClient.Client <> nil then
+          // Log command line, state of variables and registry subkeys in the language profile
+          if IsTransientLanguageID(LangID) then
+          begin
+            RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
+          end
+          else
+          begin
+            RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_LanguageProfiles;
+          end;
+          GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
+          TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
+            Format('TTIPMaintenance.DoInstall: ElevatedRegistration child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] TempKeyboardID[%s] ' +
+            'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
+            [Command, KeyboardID,  BCP47Tag, CanonicalTag, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True), elevatedExitCode, KeyList]),
+            TRUE);
+        Exit(False); // sentry log
     end;
 
     Command := '-install-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" "'+TemporaryKeyboardID+'"';
@@ -229,6 +300,23 @@ begin
       (childExitCode <> 0) then
     begin
       kmcom.Refresh;
+      // Additional Sentry logging added to track TIP crash git hub issue #6619
+      if TKeymanSentryClient.Client <> nil then
+        //  Log command line, state of variables and registry subkeys in the language profile.
+        if IsTransientLanguageID(LangID) then
+        begin
+          RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
+        end
+        else
+        begin
+          RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_LanguageProfiles;
+        end;
+        GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
+        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
+          Format('TTIPMaintenance.DoInstall: InstallTip child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] ' +
+          'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
+          [Command, KeyboardID,  BCP47Tag, CanonicalTag, BoolToStr(RegistrationRequired, True), childExitCode, KeyList] ),
+          TRUE);
       Exit(False);
     end;
 
