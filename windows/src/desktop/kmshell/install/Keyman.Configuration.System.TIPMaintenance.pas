@@ -259,7 +259,7 @@ begin
       if TKeymanSentryClient.Client <> nil then
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
           Format('TTIPMaintenance.DoInstall: FindInstallationLangID failed kbID[%s] BCP47Tag[%s] CanonicalTag[%s] lang.BCP47Tag[%s] Result LangID[%x] TempKeyboardID[%s] RegistrationRequired[%s]',
-            [KeyboardID,  BCP47Tag, CanonicalTag, lang.BCP47Code, LangId, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True)]),
+          [KeyboardID,  BCP47Tag, CanonicalTag, lang.BCP47Code, LangId, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True)]),
           TRUE);
       Exit(False);
     end;
@@ -287,8 +287,9 @@ begin
           GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
           TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
             Format('TTIPMaintenance.DoInstall: ElevatedRegistration child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] TempKeyboardID[%s] ' +
-                    'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
-                    [Command, KeyboardID,  BCP47Tag, CanonicalTag, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True), elevatedExitCode, KeyList]), TRUE);
+            'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
+            [Command, KeyboardID,  BCP47Tag, CanonicalTag, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True), elevatedExitCode, KeyList]),
+            TRUE);
         Exit(False); // sentry log
     end;
 
@@ -313,8 +314,9 @@ begin
         GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
           Format('TTIPMaintenance.DoInstall: InstallTip child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] ' +
-                  'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
-                  [Command, KeyboardID,  BCP47Tag, CanonicalTag, BoolToStr(RegistrationRequired, True), childExitCode, KeyList] ), TRUE);
+          'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
+          [Command, KeyboardID,  BCP47Tag, CanonicalTag, BoolToStr(RegistrationRequired, True), childExitCode, KeyList] ),
+          TRUE);
       Exit(False);
     end;
 
