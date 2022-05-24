@@ -85,7 +85,11 @@ begin
   KeyList := '';
   Try
     Registry.RootKey := RootKey;
-    Registry.OpenKeyReadOnly(Key);
+    if not Registry.OpenKeyReadOnly(Key) then
+    begin
+      KeyList := '<Unable to open key>';
+      Exit;
+    end;
     SubKeyNames := TStringList.Create;
     Try
       Registry.GetKeyNames(SubKeyNames);
@@ -254,8 +258,8 @@ begin
       // Additonal Sentry logging added to track TIP crash git hub issue #6619
       if TKeymanSentryClient.Client <> nil then
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
-          Format('TTIPMaintenance.DoInstall: FindInstallationLangID failed kbID[%s] BCP47Tag[%s] CanonicalTag[%s] lang.BCP47Tag[%s]. Result LangID[%d] TempKeyboardID[%s] RegistrationRequired[%d]',
-            [KeyboardID,  BCP47Tag, CanonicalTag, lang.BCP47Code, LangId, TemporaryKeyboardID, RegistrationRequired]), 
+          Format('TTIPMaintenance.DoInstall: FindInstallationLangID failed kbID[%s] BCP47Tag[%s] CanonicalTag[%s] lang.BCP47Tag[%s] Result LangID[%x] TempKeyboardID[%s] RegistrationRequired[%s]',
+            [KeyboardID,  BCP47Tag, CanonicalTag, lang.BCP47Code, LangId, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True)]),
           TRUE);
       Exit(False);
     end;
@@ -270,21 +274,21 @@ begin
       elevatedExitCode := WaitForElevatedConfiguration(0, Command);
       if elevatedExitCode <> 0 then
         // Additonal Sentry logging added to track TIP crash git hub issue #6619
-        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
-          Format('TIPM.ElevatedRegistration child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] TempKeyboardID[%s] RegistrationRequired[%d] Exit Code[%d]',
-          [Command, KeyboardID,  BCP47Tag, CanonicalTag, TemporaryKeyboardID, RegistrationRequired, elevatedExitCode] ), TRUE);
-         // Log registry subkeys in the language profile.
-        if IsTransientLanguageID(LangID) then
-        begin
-          RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
-        end
-        else
-        begin
-          RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_LanguageProfiles;
-        end;
-        GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
-        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
-          Format('TIPM.ElevatedRegistration child process failed LP Registry Keys[%s]', [KeyList] ), TRUE);
+        if TKeymanSentryClient.Client <> nil then
+          // Log command line, state of variables and registry subkeys in the language profile
+          if IsTransientLanguageID(LangID) then
+          begin
+            RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
+          end
+          else
+          begin
+            RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_LanguageProfiles;
+          end;
+          GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
+          TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
+            Format('TTIPMaintenance.DoInstall: ElevatedRegistration child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] TempKeyboardID[%s] ' +
+                    'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
+                    [Command, KeyboardID,  BCP47Tag, CanonicalTag, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True), elevatedExitCode, KeyList]), TRUE);
         Exit(False); // sentry log
     end;
 
@@ -296,21 +300,21 @@ begin
     begin
       kmcom.Refresh;
       // Additional Sentry logging added to track TIP crash git hub issue #6619
-      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
-        Format('TIPM.InstallTip child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] RegistrationRequired[%d] Exit Code[%d]',
-        [Command, KeyboardID,  BCP47Tag, CanonicalTag, RegistrationRequired, childExitCode] ), TRUE);
-      // Log the Registry subkeys in the language profile.
-      if IsTransientLanguageID(LangID) then
-      begin
-        RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
-      end
-      else
-      begin
-        RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_LanguageProfiles;
-      end;
-      GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
+      if TKeymanSentryClient.Client <> nil then
+        //  Log command line, state of variables and registry subkeys in the language profile.
+        if IsTransientLanguageID(LangID) then
+        begin
+          RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
+        end
+        else
+        begin
+          RootPath := SRegKey_InstalledKeyboards_LM+'\'+GetShortKeyboardName(KeyboardID) + SRegSubKey_LanguageProfiles;
+        end;
+        GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
-        Format('TIPM.InstallTip child process failed LP Registry Keys[%s]', [KeyList] ), TRUE);
+          Format('TTIPMaintenance.DoInstall: InstallTip child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] ' +
+                  'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
+                  [Command, KeyboardID,  BCP47Tag, CanonicalTag, BoolToStr(RegistrationRequired, True), childExitCode, KeyList] ), TRUE);
       Exit(False);
     end;
 
