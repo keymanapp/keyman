@@ -5,8 +5,7 @@
   // for certain down-line builds if the two tsconfigs are not differentiated.
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outFile": "../build/index.bundled.js" //,
-    //"declaration": false,
+    "outFile": "../build/index.bundled.js",
   },
   "references": [
     // Prepended by lm-worker.

@@ -27,6 +27,6 @@
     "testing"
   ],
   "files": [
-    "../web/lm-worker/build/index.ts-nocheck.ts"
+    "../web/lm-worker/build/index.wrapped-for-bundle.ts"
   ]
 }
