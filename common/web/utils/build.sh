@@ -24,6 +24,8 @@ display_usage ( ) {
 # Establish default build parameters
 set_default_vars ( ) {
     FETCH_DEPS=true
+    # We need to build keyman-version and lm-worker with a script for now
+    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 }
 
 set_default_vars

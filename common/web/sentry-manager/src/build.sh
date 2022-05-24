@@ -43,6 +43,8 @@ done
 
 if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
+    # We need to build keyman-version with a script for now
+    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 fi
 
 npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
