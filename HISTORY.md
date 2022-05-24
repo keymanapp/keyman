@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.292 stable 2022-05-24
+
+* fix(windows): sentry debuglogging for DoInstall (#6648)
+
 ## 14.0.291 stable 2022-05-07
 
 * fix(windows): don't log before checking nil when installing keyboard (#6506)
