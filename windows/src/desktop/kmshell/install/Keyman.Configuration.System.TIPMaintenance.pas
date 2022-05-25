@@ -271,10 +271,12 @@ begin
       Command := '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" '+GetUserDefaultLangParameterString;
       KL.Log('Calling elevated kmshell %s', [Command]);
       // This calls back into TTIPMaintenance.RegisterTip
-      elevatedExitCode := WaitForElevatedConfiguration(0, Command);
+      elevatedExitCode := WaitForElevatedConfiguration(0, Command, True, False);
       if elevatedExitCode <> 0 then
+      begin
         // Additonal Sentry logging added to track TIP crash git hub issue #6619
         if TKeymanSentryClient.Client <> nil then
+        begin
           // Log command line, state of variables and registry subkeys in the language profile
           if IsTransientLanguageID(LangID) then
           begin
@@ -286,11 +288,16 @@ begin
           end;
           GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
           TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
-            Format('TTIPMaintenance.DoInstall: ElevatedRegistration child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] TempKeyboardID[%s] ' +
-            'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
-            [Command, KeyboardID,  BCP47Tag, CanonicalTag, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True), elevatedExitCode, KeyList]),
+            Format('TTIPMaintenance.DoInstall: ElevatedRegistration child process failed CommandLine[%s] kbID[%s] BCP47Tag[%s] '+
+            'CanonicalTag[%s] TempKeyboardID[%s] RegistrationRequired[%s] '+
+            'Exit Code[%d,%d] '#13#10' %s:[%s]',
+            [Command, KeyboardID,  BCP47Tag,
+             CanonicalTag, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True),
+             elevatedExitCode, GetLastError, RootPath, KeyList]),
             TRUE);
+        end;
         Exit(False); // sentry log
+      end;
     end;
 
     Command := '-install-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" "'+TemporaryKeyboardID+'"';

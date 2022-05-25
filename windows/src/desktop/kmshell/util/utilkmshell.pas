@@ -101,7 +101,7 @@ function TSFInstalled: Boolean;
 
 function GetLongFileName(const fname: string): string;
 
-function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean = True): Cardinal;
+function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean = True; ShowError: Boolean = True): Cardinal;
 function RunConfiguration(WindowHandle: THandle; const Parameters: WideString): Boolean;
 function DefaultServersXMLTags: string;
 function DefaultVersionXMLTags: string;
@@ -582,7 +582,7 @@ begin
   Result := TUtilExecute.Shell(WindowHandle, ParamStr(0), ExtractFileDir(ParamStr(0)), Parameters);
 end;
 
-function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean): Cardinal;
+function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean; ShowError: Boolean = True): Cardinal;
 var
   execinfo: TShellExecuteInfoW;
 begin
@@ -600,7 +600,8 @@ begin
   begin
     if FWait then
     begin
-      EnableWindow(WindowHandle, False);   // I4169
+      if WindowHandle <> 0 then
+        EnableWindow(WindowHandle, False);   // I4169
       repeat
         if not GetExitCodeProcess(execinfo.hProcess, Result) then
         begin
@@ -610,13 +611,14 @@ begin
         Sleep(10);
         Application.ProcessMessages;
       until Result <> STILL_ACTIVE;
-      EnableWindow(WindowHandle, True);   // I4169
+      if WindowHandle <> 0 then
+        EnableWindow(WindowHandle, True);   // I4169
     end
     else
       Result := 0;
     CloseHandle(execinfo.hProcess);
   end
-  else
+  else if ShowError then
     ShowMessage(SysErrorMessage(GetLastError));
 end;
 
