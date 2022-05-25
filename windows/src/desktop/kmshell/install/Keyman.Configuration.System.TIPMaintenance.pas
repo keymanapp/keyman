@@ -220,7 +220,7 @@ var
   RegistrationRequired: WordBool;
   TemporaryKeyboardID: WideString;
   LangID: Integer;
-  childExitCode, elevatedExitCode: Cardinal;
+  LastError, childExitCode, elevatedExitCode: Cardinal;
   CanonicalTag, Command, RootPath, KeyList: string;
 begin
   Result := False;
@@ -277,6 +277,7 @@ begin
         // Additonal Sentry logging added to track TIP crash git hub issue #6619
         if TKeymanSentryClient.Client <> nil then
         begin
+          LastError := GetLastError;
           // Log command line, state of variables and registry subkeys in the language profile
           if IsTransientLanguageID(LangID) then
           begin
@@ -291,9 +292,9 @@ begin
             Format('TTIPMaintenance.DoInstall: ElevatedRegistration child process failed CommandLine[%s] kbID[%s] BCP47Tag[%s] '+
             'CanonicalTag[%s] TempKeyboardID[%s] RegistrationRequired[%s] '+
             'Exit Code[%d,%d] '#13#10' %s:[%s]',
-            [Command, KeyboardID,  BCP47Tag,
+            [Command, KeyboardID, BCP47Tag,
              CanonicalTag, TemporaryKeyboardID, BoolToStr(RegistrationRequired, True),
-             elevatedExitCode, GetLastError, RootPath, KeyList]),
+             elevatedExitCode, LastError, RootPath, KeyList]),
             TRUE);
         end;
         Exit(False); // sentry log
@@ -306,9 +307,11 @@ begin
     if not TUtilExecute.WaitForProcess('"'+ParamStr(0)+'" '+Command, GetCurrentDir, childExitCode) or
       (childExitCode <> 0) then
     begin
+      LastError := GetLastError;
       kmcom.Refresh;
       // Additional Sentry logging added to track TIP crash git hub issue #6619
       if TKeymanSentryClient.Client <> nil then
+      begin
         //  Log command line, state of variables and registry subkeys in the language profile.
         if IsTransientLanguageID(LangID) then
         begin
@@ -320,10 +323,12 @@ begin
         end;
         GetSubKeyList(HKEY_LOCAL_MACHINE,RootPath,KeyList);
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO,
-          Format('TTIPMaintenance.DoInstall: InstallTip child process failed CommadLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] ' +
-          'RegistrationRequired[%s] Exit Code[%d] '#13#10' Registry Values for Languages[%s]',
-          [Command, KeyboardID,  BCP47Tag, CanonicalTag, BoolToStr(RegistrationRequired, True), childExitCode, KeyList] ),
+          Format('TTIPMaintenance.DoInstall: InstallTip child process failed CommandLine[%s] kbID[%s] BCP47Tag[%s] CanonicalTag[%s] ' +
+          'RegistrationRequired[%s] Exit Code[%d,%d] '#13#10' %s:[%s]',
+          [Command, KeyboardID, BCP47Tag, CanonicalTag,
+           BoolToStr(RegistrationRequired, True), childExitCode, LastError, RootPath, KeyList] ),
           TRUE);
+      end;
       Exit(False);
     end;
 
