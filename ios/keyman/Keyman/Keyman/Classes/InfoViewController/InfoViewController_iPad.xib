@@ -1,39 +1,73 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InfoViewController">
             <connections>
+                <outlet property="backButton" destination="TLs-g2-xbM" id="jNT-EB-krs"/>
+                <outlet property="forwardButton" destination="QUu-pQ-ATm" id="hlc-dV-pzs"/>
                 <outlet property="view" destination="1" id="26"/>
                 <outlet property="webView" destination="46" id="47"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="1">
-            <rect key="frame" x="0.0" y="64" width="768" height="960"/>
+            <rect key="frame" x="0.0" y="0.0" width="768" height="974"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="3">
-                    <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    <subviews>
-                        <webView contentMode="scaleToFill" id="46">
-                            <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                        </webView>
-                    </subviews>
-                </scrollView>
+                <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="46">
+                    <rect key="frame" x="0.0" y="0.0" width="768" height="924"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </webView>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fsh-gd-wpz">
+                    <rect key="frame" x="0.0" y="924" width="768" height="50"/>
+                    <items>
+                        <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="rEo-7j-3D9"/>
+                        <barButtonItem image="chevron.left" catalog="system" id="TLs-g2-xbM">
+                            <connections>
+                                <action selector="back:" destination="-1" id="QxZ-wD-p3z"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem width="42" style="plain" systemItem="fixedSpace" id="aOV-hW-Vog"/>
+                        <barButtonItem image="chevron.right" catalog="system" id="QUu-pQ-ATm">
+                            <connections>
+                                <action selector="forward:" destination="-1" id="nek-4k-IZn"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="5kj-Re-lwh"/>
+                        <barButtonItem image="UIAccessoryButtonX.png" id="tui-2v-Hnv">
+                            <connections>
+                                <action selector="close:" destination="-1" id="Z6P-DT-vrW"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="aR8-Uo-xOo"/>
+                    </items>
+                </toolbar>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <viewLayoutGuide key="safeArea" id="4Nv-Di-iZ0"/>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="4Nv-Di-iZ0" firstAttribute="bottom" secondItem="fsh-gd-wpz" secondAttribute="bottom" id="DeX-v1-YPt"/>
+                <constraint firstItem="46" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="JKp-EJ-WRW"/>
+                <constraint firstAttribute="trailing" secondItem="46" secondAttribute="trailing" id="S6m-BM-jgq"/>
+                <constraint firstItem="fsh-gd-wpz" firstAttribute="trailing" secondItem="4Nv-Di-iZ0" secondAttribute="trailing" id="Umy-Nq-soY"/>
+                <constraint firstItem="fsh-gd-wpz" firstAttribute="top" secondItem="46" secondAttribute="bottom" id="ask-9d-0a8"/>
+                <constraint firstItem="fsh-gd-wpz" firstAttribute="leading" secondItem="4Nv-Di-iZ0" secondAttribute="leading" id="bQX-03-Vyz"/>
+                <constraint firstItem="46" firstAttribute="top" secondItem="1" secondAttribute="top" id="yQr-5s-ut4"/>
+            </constraints>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+            <point key="canvasLocation" x="-166.40625" y="69.7265625"/>
         </view>
     </objects>
-    <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar"/>
-        <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination"/>
-    </simulatedMetricsContainer>
+    <resources>
+        <image name="UIAccessoryButtonX.png" width="22" height="22"/>
+        <image name="chevron.left" catalog="system" width="96" height="128"/>
+        <image name="chevron.right" catalog="system" width="96" height="128"/>
+    </resources>
 </document>

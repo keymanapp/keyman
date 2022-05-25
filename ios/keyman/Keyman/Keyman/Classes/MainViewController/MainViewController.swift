@@ -192,7 +192,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     view?.addSubview(textView!)
 
     // Setup Info View
-    infoView = InfoViewController()
+    infoView = InfoViewController {
+      self.infoButtonClick(nil)
+    }
     if UIDevice.current.userInterfaceIdiom != .phone {
       textSize *= 2
       textView.font = textView?.font?.withSize(textSize)
