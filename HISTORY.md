@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.293 stable 2022-05-25
+
+* fix(windows): unbreak keyboard install (#6662)
+
 ## 14.0.292 stable 2022-05-24
 
 * fix(windows): sentry debuglogging for DoInstall (#6648)
