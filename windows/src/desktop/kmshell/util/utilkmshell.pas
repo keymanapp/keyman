@@ -582,7 +582,7 @@ begin
   Result := TUtilExecute.Shell(WindowHandle, ParamStr(0), ExtractFileDir(ParamStr(0)), Parameters);
 end;
 
-function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean; ShowError: Boolean = True): Cardinal;
+function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait, ShowError: Boolean): Cardinal;
 var
   execinfo: TShellExecuteInfoW;
 begin
