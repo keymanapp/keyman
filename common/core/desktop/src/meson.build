@@ -1,4 +1,4 @@
-# Copyright:    © 2018 SIL International.
+# Copyright:    © 2018-2022 SIL International.
 # Description:  Cross platform build script to compile libkmnkbp.
 # Create Date:  2 Oct 2018
 # Authors:      Tim Eves (TSE)
@@ -9,11 +9,9 @@ version_res = []
 
 if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
   warns = [
-     '-Wall',
      '-Wctor-dtor-privacy',
      '-Wdouble-promotion',
      '-Wendif-labels',
-     '-Wextra',
      '-Wno-unknown-pragmas',
      '-Wno-missing-field-initializers',
      '-Wnon-virtual-dtor',
