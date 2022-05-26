@@ -257,16 +257,12 @@ set_version ( ) {
 #   set_npm_version
 #
 set_npm_version () {
-  local version="$VERSION_WITH_TAG"
   # We use --no-git-tag-version because our CI system controls version numbering and
   # already tags releases. We also want to have the version of this match the
   # release of Keyman Developer -- these two versions should be in sync. Because this
   # is a large repo with multiple projects and build systems, it's better for us that
   # individual build systems don't take too much ownership of git tagging. :)
-  pushd . > /dev/null
-  cd "${KEYMAN_ROOT}"
-  npm run version "$version"  || fail "Could not set package versions to $version."
-  popd > /dev/null
+  npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
 }
 
 # Initializes use of the npm packages within the repo.

@@ -7,6 +7,7 @@ set -eu
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage() {
@@ -73,7 +74,7 @@ rm -rf "$KEYMAN_WIX_TEMP_MODELCOMPILER"
 
 # Step 1 - npm-pack the model compiler package, then unpack it in our bundling
 # directory. This automatically strips the package to its barebones.
-npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
+set_npm_version
 npm pack
 mv keymanapp-lexical-model-compiler*.tgz kmlmc.tgz
 mv kmlmc.tgz "$KEYMAN_WIX_TEMP_BASE"
@@ -97,7 +98,7 @@ mkdir -p "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/"
 cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/models-types" "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/"
 
 cd "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/models-types"
-npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
+set_npm_version
 npm pack
 mv keymanapp-models-types*.tgz kmtypes.tgz
 mv kmtypes.tgz "$KEYMAN_WIX_TEMP_MODELCOMPILER"
