@@ -2,12 +2,12 @@ import LexicalModelCompiler from '../dist/lexical-model-compiler/lexical-model-c
 import {assert} from 'chai';
 import 'mocha';
 
-import path = require('path');
 import { compileModelSourceCode } from './helpers';
+import { makePathToFixture } from './helpers';
 
 describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
   const MODEL_ID = 'example.qaa.trivial';
-  const PATH = path.join(__dirname, 'fixtures', MODEL_ID);
+  const PATH = makePathToFixture(MODEL_ID);
 
   describe('specifying custom methods: applyCasing and searchTermToKey', function () {
     let casingWithPrependedSymbols: CasingFunction = function(casingName: CasingForm, text: string, defaultApplyCasing: CasingFunction) {

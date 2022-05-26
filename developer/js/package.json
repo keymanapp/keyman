@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "tsc -b",
-    "test": "mocha",
+    "test": "cd tests && tsc -b && cd .. && mocha",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -56,7 +56,6 @@
     "ts-node": "^9.1.1"
   },
   "mocha": {
-    "require": "ts-node/register",
-    "spec": "tests/**/test-*.ts"
+    "spec": "dist-tests/**/test-*.js"
   }
 }
