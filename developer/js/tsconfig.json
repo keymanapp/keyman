@@ -1,6 +1,8 @@
 {
+  "extends": "../../tsconfig-base.json",
+
   "compilerOptions": {
-    "module": "commonjs",
+    //"module": "commonjs",
     "target": "es2017",
     "moduleResolution": "node",
     "sourceMap": true,
@@ -16,5 +18,11 @@
   },
   "include": [
     "source/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../common/web/keyman-version" },
+    { "path": "../../common/models/types" },
+    { "path": "../../common/models/templates" },
+    { "path": "../../common/models/wordbreakers" },
   ]
 }

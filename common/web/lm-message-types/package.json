@@ -1,6 +1,5 @@
 {
   "name": "@keymanapp/lm-message-types",
-  "version": "15.0.233",
   "description": "Type definitions in used in the lm layer (lexical model/predictive text) component of Keyman.",
   "types": "./message.d.ts",
   "scripts": {

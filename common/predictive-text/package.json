@@ -1,6 +1,5 @@
 {
   "name": "@keymanapp/lexical-model-layer",
-  "version": "15.0.233",
   "description": "Keyman/Predictive Text integration layer",
   "main": "build/index.js",
   "scripts": {

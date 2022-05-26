@@ -1,0 +1,17 @@
+{
+  "name": "@keymanapp/keyman-version",
+  "description": "Keyman global version data",
+  "main": "./build/index.js",
+  "exports": "./build/index.js",
+  "scripts": {
+    "build": "echo 'Building @keymanapp/keyman-version' && tsc -b",
+    "clean": "tsc -b --clean",
+    "postinstall": "gosh ./build.sh build",
+    "postci": "gosh ./build.sh build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.5.4",
+    "@keymanapp/resources-gosh": "*"
+  }
+}

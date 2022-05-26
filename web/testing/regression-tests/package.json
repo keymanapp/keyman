@@ -1,6 +1,5 @@
 {
   "name": "regression-tests",
-  "version": "1.0.0",
   "description": "Automated regression test suite for KeymanWeb",
   "main": "index.js",
   "scripts": {

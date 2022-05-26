@@ -1,6 +1,5 @@
 {
   "name": "@keymanapp/es6-shim",
-  "version": "15.0.230",
   "description": "Keyman/es6-shim",
   "main": "build/index.js",
   "scripts": {
