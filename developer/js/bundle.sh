@@ -108,7 +108,6 @@ mv kmtypes.tgz "$KEYMAN_WIX_TEMP_MODELCOMPILER"
 cd "$KEYMAN_WIX_TEMP_MODELCOMPILER"
 # package-lock.json wasn't bundled; this is needed to keep dependency versions
 # consistent.
-# cp "$KEYMAN_MODELCOMPILER_TEMP/package-lock.json" "$KEYMAN_WIX_TEMP_MODELCOMPILER/"
 
 # as of npm v8.x, even though we are only working with `dependencies`,
 # `devDependencies` is still checked, and as these modules are present in
