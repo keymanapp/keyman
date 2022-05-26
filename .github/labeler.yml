@@ -21,7 +21,6 @@ common/:
   - resources/**
 common/core/: common/core/**
 common/core/desktop/: common/core/desktop/**
-common/core/web/: common/core/web/**
 
 common/models/: common/models/**
 common/models/types/: common/models/types/**

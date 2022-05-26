@@ -11,7 +11,7 @@
     "lib": ["es6"]
   },
   "references": [
-    { "path": "../core/web/utils" },
+    { "path": "../web/utils" },
     { "path": "../web/es6-shim" },
     { "path": "../models/types"},
     { "path": "../models/wordbreakers"},

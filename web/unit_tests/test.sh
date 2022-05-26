@@ -129,7 +129,7 @@ cd ../tools/recorder
 # Run our headless tests first.
 
 # First:  Web-core tests.
-pushd "$KEYMAN_ROOT/common/core/web/input-processor"
+pushd "$KEYMAN_ROOT/common/web/input-processor"
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd

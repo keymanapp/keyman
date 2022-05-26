@@ -11,11 +11,6 @@
   "scripts": {},
   "workspaces": [
     "resources/gosh",
-    "common/core/web/input-processor",
-    "common/core/web/keyboard-processor",
-    "common/core/web/tools/recorder",
-    "common/core/web/tools/sentry-manager",
-    "common/core/web/utils",
     "developer/js",
     "developer/server",
     "common/models/*",

@@ -372,7 +372,7 @@ fi
 
     # Build the sentry-manager module - it's used in embedded contexts and on one testing page.
     #echo_heading "Compiling KeymanWeb's sentry-manager module..."
-    #pushd ../../common/core/web/tools/sentry-manager/src
+    #pushd ../../common/web/sentry-manager/src
     #./build.sh $CORE_FLAGS || fail "Failed to compile the sentry-manager module"
     #popd
     #echo_heading "sentry-manager module compiled successfully."
@@ -382,7 +382,7 @@ fi
     #fi
 
     # Ensure that the Input Processor module compiles properly.
-    #cd ../../common/core/web/input-processor/src
+    #cd ../../common/web/input-processor/src
     #echo ""
     #echo_heading "Compiling local KeymanWeb dependencies..."
     #./build.sh $CORE_FLAGS || fail "Failed to compile KeymanWeb dependencies"

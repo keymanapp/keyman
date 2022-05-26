@@ -17,10 +17,10 @@
 
   "references": [
     { "path": "../../../common/web/web-environment" },
-    { "path": "../../../common/core/web/utils" },
-    { "path": "../../../common/core/web/keyboard-processor/src" },
-    { "path": "../../../common/core/web/input-processor/src" },
-    { "path": "../../../common/core/web/tools/recorder/src" },
+    { "path": "../../../common/web/utils" },
+    { "path": "../../../common/web/keyboard-processor/src" },
+    { "path": "../../../common/web/input-processor/src" },
+    { "path": "../../../common/web/recorder/src" },
     { "path": "../../../common/web/lm-message-types" }
   ]
 }

@@ -9,7 +9,7 @@ On Linux, you can build the following projects:
 <!-- TODO: document how to build for Android, Web, Core-Wasm and Common/Web on Linux. See TC build agent for details. -->
 * Keyman for Android
 * Keyman Core (wasm targets)
-* Common/Web (aka common/core/web)
+* Common/Web
 * KeymanWeb
 
 The following projects **cannot** be built on Linux:
