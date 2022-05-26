@@ -203,6 +203,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     infoView.view?.isHidden = true
     infoView.view?.backgroundColor = UIColor(named: "InputBackground")!
     view?.addSubview(infoView!.view)
+    // Don't forget to add the child view's controller, too!
+    // Its safe area layout guide won't work correctly without this!
+    self.addChild(infoView)
 
     resizeViews(withKeyboardVisible: textView.isFirstResponder)
 
@@ -389,12 +392,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.frame = CGRect(x: margin, y: barHeights + margin,
                              width: width - 2 * margin, height: height - 2 * margin)
     infoView?.view?.frame = CGRect(x: 0, y: barHeights, width: width, height: height + kbHeight)
-
-    // Partly because it breaks the InfoView's safe area insets!
-    // This is programmatic correction for a bug our approach has caused.
-    var fixedSafeArea = UIEdgeInsets()
-    fixedSafeArea.bottom += bottomPadding
-    infoView?.additionalSafeAreaInsets = fixedSafeArea
   }
 
   private func navBarWidth() -> CGFloat {
