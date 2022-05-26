@@ -17,12 +17,21 @@
     "dom/targets/contentEditable.ts",
     "dom/targets/designIFrame.ts",
     "dom/targets/touchAlias.ts",
+    "dom/targets/outputTarget.ts",
+    "dom/touchAliasElement.ts",
+    "kmwexthtml.ts",
+    "kmwdevice.ts",
+    "dom/utils.ts",
+    "utils/styleConstants.ts",
+    "kmwtypedefs.ts",
   ],
 
   "references": [
-    { "path": "../../common/core/web/keyboard-processor/src" },
-    { "path": "../../resources/web-environment" },
-    { "path": "../../common/core/web/utils" },
+    { "path": "../../resources/web-environment", "prepend": true },
+    { "path": "../../common/core/web/utils", "prepend": true },
+    { "path": "../../common/predictive-text/browser.tsconfig.json", "prepend": true },
+    { "path": "../../common/core/web/input-processor/src", "prepend": true },
+    { "path": "../../common/core/web/keyboard-processor/src", "prepend": true },
     { "path": "../../common/web/lm-message-types" }
   ]
 }

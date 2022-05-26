@@ -92,6 +92,11 @@ done
 # Check if Node.JS/npm is installed.
 verify_npm_setup $fetch_deps
 
+if $fetch_deps; then
+  # We need to build web-environment with a script for now
+  "$KEYMAN_ROOT/resources/web-environment/build.sh" || fail "Could not build web-environment"
+fi
+
 build-browser || fail "Browser-oriented compilation failed."
 build-headless || fail "Headless compilation failed."
 echo "Typescript compilation successful."
