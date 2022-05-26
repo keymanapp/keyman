@@ -3,7 +3,7 @@
 
   "compilerOptions": {
     "allowJs": true,
-    "outFile": "build/index.js",
+    "outFile": "./build/index.js",
     "module": "none",
     "inlineSources": true,
     "sourceMap": true,

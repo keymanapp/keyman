@@ -45,7 +45,7 @@ if [ "$FETCH_DEPS" = true ]; then
 fi
 
 # Definition of global compile constants
-OUTPUT_DIR="dist"
+OUTPUT_DIR="build"
 OUTPUT="index.js"
 
 # Ensures that we rely first upon the local npm-based install of Typescript.

@@ -218,7 +218,7 @@ readonly SOURCE
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
-PATH="../node_modules/.bin:$PATH"
+PATH="../../node_modules/.bin:$PATH"
 
 compiler="npm run tsc --"
 compilecmd="$compiler"

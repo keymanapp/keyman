@@ -6,7 +6,7 @@
     "target": "es2017",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "dist/",
     "declaration": true,
     "alwaysStrict": true,
     "noImplicitThis": true,

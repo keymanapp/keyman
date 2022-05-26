@@ -275,7 +275,7 @@ init_npm() {
     fail "KEYMAN_ROOT not defined; cannot install repo's dependencies"
   fi
   pushd "$KEYMAN_ROOT" > /dev/null
-  npm install --no-optional
+  npm ci
   popd > /dev/null
 }
 
