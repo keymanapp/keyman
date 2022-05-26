@@ -23,56 +23,52 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="q0q-mp-JYD">
-                    <rect key="frame" x="0.0" y="0.0" width="428" height="818"/>
-                    <subviews>
-                        <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="38">
-                            <rect key="frame" x="0.0" y="0.0" width="428" height="769"/>
-                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        </webView>
-                        <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DPl-QD-inD">
-                            <rect key="frame" x="0.0" y="769" width="428" height="49"/>
-                            <items>
-                                <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="PE1-7X-Amq"/>
-                                <barButtonItem image="chevron.left" catalog="system" id="ptS-kA-9Tw">
-                                    <connections>
-                                        <action selector="back:" destination="-1" id="2rM-Md-H8q"/>
-                                    </connections>
-                                </barButtonItem>
-                                <barButtonItem width="42" style="plain" systemItem="fixedSpace" id="fLB-0C-ctw"/>
-                                <barButtonItem image="chevron.right" catalog="system" id="OvI-rz-OW9">
-                                    <connections>
-                                        <action selector="forward:" destination="-1" id="bYZ-fr-4LT"/>
-                                    </connections>
-                                </barButtonItem>
-                                <barButtonItem systemItem="flexibleSpace" id="pdo-sP-gkn"/>
-                                <barButtonItem image="UIAccessoryButtonX.png" id="Etw-CW-3uh">
-                                    <connections>
-                                        <action selector="close:" destination="-1" id="Or7-qh-Vf6"/>
-                                    </connections>
-                                </barButtonItem>
-                                <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="hfW-UQ-U3N"/>
-                            </items>
-                        </toolbar>
-                    </subviews>
+                    <rect key="frame" x="0.0" y="804" width="428" height="34"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <constraints>
-                        <constraint firstItem="DPl-QD-inD" firstAttribute="top" secondItem="38" secondAttribute="bottom" id="Ejj-Y4-pzk"/>
-                        <constraint firstItem="38" firstAttribute="top" secondItem="q0q-mp-JYD" secondAttribute="top" id="LRX-hu-nAg"/>
-                        <constraint firstAttribute="trailing" secondItem="DPl-QD-inD" secondAttribute="trailing" id="TYo-px-TFZ"/>
-                        <constraint firstItem="38" firstAttribute="leading" secondItem="q0q-mp-JYD" secondAttribute="leading" id="Vdj-pf-UAE"/>
-                        <constraint firstAttribute="bottom" secondItem="DPl-QD-inD" secondAttribute="bottom" id="n3a-Am-nFt"/>
-                        <constraint firstAttribute="trailing" secondItem="38" secondAttribute="trailing" id="nwI-JB-3nD"/>
-                        <constraint firstItem="DPl-QD-inD" firstAttribute="leading" secondItem="q0q-mp-JYD" secondAttribute="leading" id="ogP-zo-V31"/>
-                    </constraints>
                 </view>
+                <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="38">
+                    <rect key="frame" x="0.0" y="0.0" width="428" height="755"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </webView>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DPl-QD-inD">
+                    <rect key="frame" x="0.0" y="755" width="428" height="49"/>
+                    <items>
+                        <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="PE1-7X-Amq"/>
+                        <barButtonItem image="chevron.left" catalog="system" id="ptS-kA-9Tw">
+                            <connections>
+                                <action selector="back:" destination="-1" id="2rM-Md-H8q"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem width="42" style="plain" systemItem="fixedSpace" id="fLB-0C-ctw"/>
+                        <barButtonItem image="chevron.right" catalog="system" id="OvI-rz-OW9">
+                            <connections>
+                                <action selector="forward:" destination="-1" id="bYZ-fr-4LT"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="pdo-sP-gkn"/>
+                        <barButtonItem image="UIAccessoryButtonX.png" id="Etw-CW-3uh">
+                            <connections>
+                                <action selector="close:" destination="-1" id="Or7-qh-Vf6"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="hfW-UQ-U3N"/>
+                    </items>
+                </toolbar>
             </subviews>
             <viewLayoutGuide key="safeArea" id="TI6-wh-wgp"/>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="TI6-wh-wgp" firstAttribute="bottom" secondItem="q0q-mp-JYD" secondAttribute="bottom" constant="-14" id="0Hb-ri-MP5"/>
-                <constraint firstItem="q0q-mp-JYD" firstAttribute="leading" secondItem="TI6-wh-wgp" secondAttribute="leading" id="2Di-cj-RDH"/>
-                <constraint firstItem="q0q-mp-JYD" firstAttribute="top" secondItem="TI6-wh-wgp" secondAttribute="top" id="Pxf-g6-xoM"/>
-                <constraint firstItem="TI6-wh-wgp" firstAttribute="trailing" secondItem="q0q-mp-JYD" secondAttribute="trailing" id="k0p-fB-jZG"/>
+                <constraint firstItem="q0q-mp-JYD" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="DuX-dg-5mP"/>
+                <constraint firstItem="q0q-mp-JYD" firstAttribute="top" secondItem="TI6-wh-wgp" secondAttribute="bottom" id="EGB-3c-vKb"/>
+                <constraint firstItem="q0q-mp-JYD" firstAttribute="bottom" secondItem="1" secondAttribute="bottom" id="L2a-LF-e0z"/>
+                <constraint firstItem="q0q-mp-JYD" firstAttribute="trailing" secondItem="1" secondAttribute="trailing" id="MR2-Kw-FFc"/>
+                <constraint firstItem="DPl-QD-inD" firstAttribute="top" secondItem="38" secondAttribute="bottom" id="N05-AY-Vks"/>
+                <constraint firstItem="DPl-QD-inD" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="Uyx-jL-nrb"/>
+                <constraint firstItem="38" firstAttribute="top" secondItem="TI6-wh-wgp" secondAttribute="top" id="a6J-fg-ykX"/>
+                <constraint firstItem="38" firstAttribute="leading" secondItem="TI6-wh-wgp" secondAttribute="leading" id="k6F-H4-Dgi"/>
+                <constraint firstItem="38" firstAttribute="trailing" secondItem="TI6-wh-wgp" secondAttribute="trailing" id="udC-CP-YSS"/>
+                <constraint firstItem="DPl-QD-inD" firstAttribute="trailing" secondItem="1" secondAttribute="trailing" id="wiY-98-IhB"/>
+                <constraint firstItem="q0q-mp-JYD" firstAttribute="top" secondItem="DPl-QD-inD" secondAttribute="bottom" id="y3E-wq-FHx"/>
             </constraints>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
             <point key="canvasLocation" x="-72.89719626168224" y="79.049676025917933"/>
@@ -80,7 +76,7 @@
     </objects>
     <resources>
         <image name="UIAccessoryButtonX.png" width="22" height="22"/>
-        <image name="chevron.left" catalog="system" width="96" height="128"/>
+        <image name="chevron.left" catalog="system" width="32" height="32"/>
         <image name="chevron.right" catalog="system" width="96" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

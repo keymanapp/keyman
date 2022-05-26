@@ -373,14 +373,28 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // Resize textView and infoView
     let mainScreen: CGRect = UIScreen.main.bounds
     let margin: CGFloat = 2.0
-    let barHeights: CGFloat = AppDelegate.statusBarHeight() + navBarHeight()
     let kbHeight: CGFloat = keyboardVisible ? textView.inputView?.frame.height ?? 0 : 0
     let width: CGFloat = mainScreen.size.width
-    let height: CGFloat = mainScreen.size.height - barHeights - kbHeight
 
+    // This sort of thing really should be handled by the iOS layout engine, not programatically
+    // as it has been.  The original code was written pre-iOS 11 & safe areas!
+    // But, in the interest of a quick pre-release fix...
+    let window = UIApplication.shared.windows.first
+    let topPadding = window?.safeAreaInsets.top ?? 0
+    let bottomPadding = window?.safeAreaInsets.bottom ?? 0
+    let barHeights: CGFloat = (topPadding == 0 ? AppDelegate.statusBarHeight() : topPadding) + navBarHeight()
+    let height: CGFloat = mainScreen.height - barHeights /*- bottomPadding*/ - kbHeight
+
+    // Like really, this REALLY should be done with constraints.
     textView.frame = CGRect(x: margin, y: barHeights + margin,
                              width: width - 2 * margin, height: height - 2 * margin)
     infoView?.view?.frame = CGRect(x: 0, y: barHeights, width: width, height: height + kbHeight)
+
+    // Partly because it breaks the InfoView's safe area insets!
+    // This is programmatic correction for a bug our approach has caused.
+    var fixedSafeArea = UIEdgeInsets()
+    fixedSafeArea.bottom += bottomPadding
+    infoView?.additionalSafeAreaInsets = fixedSafeArea
   }
 
   private func navBarWidth() -> CGFloat {
