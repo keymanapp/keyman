@@ -3,7 +3,8 @@
  */
 
 var assert = require('chai').assert;
-var DummyModel = require('../../build/intermediate').models.DummyModel;
+const LMLayerWorker = require('../../../web/lm-worker/build/intermediate.js');
+var DummyModel = LMLayerWorker.models.DummyModel;
 
 describe('LMLayerWorker dummy model', function() {
   describe('instantiation', function () {

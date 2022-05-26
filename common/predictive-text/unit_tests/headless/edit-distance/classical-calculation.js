@@ -1,5 +1,6 @@
 var assert = require('chai').assert;
-var ClassicalDistanceCalculation = require('../../../build/intermediate').correction.ClassicalDistanceCalculation;
+const LMLayerWorker = require('../../../../web/lm-worker/build/intermediate.js');
+var ClassicalDistanceCalculation = LMLayerWorker.correction.ClassicalDistanceCalculation;
 
 function prettyPrintMatrix(matrix) {
   for(let r = 0; r < matrix.length; r++) {
@@ -34,14 +35,14 @@ function compute(input, match, mode, bandSize) {
           key: input.charAt(i)
         });
       }
-    
+
       for(let j = 0; j < match.length; j++) {
         buffer = buffer.addMatchChar({
           key: match.charAt(j)
         });
       }
       break;
-    case "MatchThenInput":    
+    case "MatchThenInput":
       for(let j = 0; j < match.length; j++) {
         buffer = buffer.addMatchChar({
           key: match.charAt(j)
@@ -175,7 +176,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
         assert.equal(compute("aadddres", "address", "InputThenMatch").getHeuristicFinalCost(), 4);
         assert.equal(compute("aadddres", "address", "MatchThenInput").getHeuristicFinalCost(), 4);
       });
-    
+
       it("'aadddres' -> 'address' (width 2) = 3", function() {
         // If diagonal set to '1', cost is reported as 4.
         assert.equal(compute("aadddres", "address", "InputThenMatch", 2).getHeuristicFinalCost(), 3);
@@ -191,7 +192,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       // Two transpositions:  abc -> ca, ig <- ghi.  Also, one deletion:  'd'.
       it("'abcdefig' -> 'caefghi' (width 1) = 7", function() {
         let buffer = compute("abcdefig", "caefghi", "InputThenMatch");
-        // This test case was constructed with the tranposition parts outside of the center diagonal.  
+        // This test case was constructed with the tranposition parts outside of the center diagonal.
         assert.equal(buffer.getHeuristicFinalCost(), 7);
       });
 
@@ -279,7 +280,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       // Two transpositions:  abc -> ca, ig <- ghi.  Also, one deletion:  'd'.
       it("'abcdefig' -> 'caefghi' (width 1->2) = 5", function() {
         let buffer = compute("abcdefig", "caefghi", "InputThenMatch", 1);
-        // This test case was constructed with the tranposition parts outside of the center diagonal.  
+        // This test case was constructed with the tranposition parts outside of the center diagonal.
         assert.equal(buffer.getHeuristicFinalCost(), 7);
 
         // 1 -> 2
@@ -290,7 +291,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       // Two transpositions:  abc -> ca, ig <- ghi.  Also, one deletion:  'd'.
       it("'abcdefigj' -> 'caefghij' (width 1->2) = 5", function() {
         let buffer = compute("abcdefigj", "caefghij", "InputThenMatch", 1);
-        // This test case was constructed with the tranposition parts outside of the center diagonal.  
+        // This test case was constructed with the tranposition parts outside of the center diagonal.
         assert.equal(buffer.getHeuristicFinalCost(), 7);
 
         // 1 -> 2
@@ -321,7 +322,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
         buffer = buffer.increaseMaxDistance();
         assert.equal(buffer.getHeuristicFinalCost(), 6);
       });
-      
+
       // Two transpositions:  abcd -> da, zw <- wxyz and two deletions ('gh')
       // The intermediate deletions help to ensure that the two transpositions are kept separate.
       it("'abcdefijzw' -> 'daefghijwxyz' (width 1->2) = 8", function() {
@@ -370,7 +371,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       });
     });
 
-    
+
     describe("Bounded final cost tests", function() {
       it("'adddress' -> 'address' has final cost within 4", function() {
         let buffer = compute("aadddres", "address", "InputThenMatch");
@@ -443,14 +444,14 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
     it("['jellyifhs' -> 'jellyfish'] trimmed to ['jelly' => 'jelly']", function() {
       let buffer = compute("jellyifhs", "jellyfish");
-      
+
       let trimmedBuffer = buffer.getSubset(5, 5);
       assert.equal(trimmedBuffer.getFinalCost(), 0)
     });
 
     it("['jellyifhs' -> 'jellyfish'] trimmed to ['jellyifh' => 'jellyfis']", function() {
       let buffer = compute("jellyifhs", "jellyfish");
-      
+
       let trimmedBuffer = buffer.getSubset(8, 8);
       assert.equal(trimmedBuffer.getFinalCost(), 2)
     });
@@ -470,7 +471,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
     it("'accomodate' -> 'accommodate'", function() {
       let buffer = compute("accomodate", "accommodate", "InputThenMatch");
-  
+
       let editSequence = [
       //  a     c     c     o     m
         op.m, op.m, op.m, op.m, op.m,
@@ -496,7 +497,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       let buffer = compute("access", "assess", "InputThenMatch");
 
       let editSequence = [
-        //  a    c/s   c/s    e     s    s   
+        //  a    c/s   c/s    e     s    s
           op.m, op.s, op.s, op.m, op.m, op.m
       ];
 
@@ -505,7 +506,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
     it("'ifhs' -> 'fish'", function() {
       let buffer = compute("ifhs", "fish");
-      
+
       let editSequence = [
           op.ts, op.te, op.ts, op.te
       ];

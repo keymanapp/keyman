@@ -2,7 +2,7 @@ var assert = require('chai').assert;
 var sinon = require('sinon');
 var fs = require('fs');
 
-let LMLayerWorker = require('../../build/intermediate');
+let LMLayerWorker = require('../../../web/lm-worker/build/intermediate.js');
 
 // Unit tests for instantiating and initializing the LMLayer Worker in isolation.
 //
@@ -19,7 +19,7 @@ describe('LMLayerWorker', function() {
       context.importScripts = importScriptsWith(context);
 
       var worker = LMLayerWorker.install(context);
-      
+
       // First the worker must receive config data...
       configWorker(worker);
 
@@ -69,7 +69,7 @@ describe('LMLayerWorker', function() {
 
       // First the worker must receive config data...
       configWorker(worker);
-      
+
       // Send a message; we should get something back.
       worker.onMessage(createMessageEventWithData({
         message: 'load',
@@ -79,7 +79,7 @@ describe('LMLayerWorker', function() {
         }
       }));
 
-      // It called the postMessage() in its global scope. 
+      // It called the postMessage() in its global scope.
       assert.isTrue(fakeWorkerGlobal.postMessage.calledOnce)
     });
   });
@@ -108,7 +108,7 @@ describe('LMLayerWorker', function() {
       context.importScripts = importScriptsWith(context);
 
       var worker = LMLayerWorker.install(context);
-      
+
       // Trigger the config message
       configWorker(worker);
 
