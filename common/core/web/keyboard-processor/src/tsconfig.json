@@ -15,7 +15,7 @@
   },
   "references": [
     { "path": "../../../../../common/models/types" },
-    { "path": "../../../../../resources/web-environment/" },
+    { "path": "../../../../../common/web/web-environment/" },
     { "path": "../../../../../common/core/web/utils/" }
   ],
   "include": ["./**/*.ts"],

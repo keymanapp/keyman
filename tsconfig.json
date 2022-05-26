@@ -22,7 +22,6 @@
     { "path": "./developer/server/tsconfig.json" },
     { "path": "./resources/build/version/tsconfig.json" },
     { "path": "./resources/build/version/tsconfig.production.json" },
-    { "path": "./resources/web-environment/tsconfig.json" },
     { "path": "./web/bulk_rendering/tsconfig.json" },
     { "path": "./web/source/tsconfig.json" },
     { "path": "./web/tools/recorder/tsconfig.json" },
@@ -30,5 +29,6 @@
     { "path": "./common/web/lm-message-types/" },
     { "path": "./common/web/lm-worker/" },
     { "path": "./common/web/keyman-version/" },
+    { "path": "./common/web/web-environment/tsconfig.json" },
   ]
 }

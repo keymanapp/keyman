@@ -13,7 +13,7 @@
     "outFile": "../build/index.js"
   },
   "references": [
-    { "path": "../../../../../resources/web-environment" },
+    { "path": "../../../../web/web-environment" },
     { "path": "../../utils" },
     { "path": "../../keyboard-processor/src" },
     { "path": "../../../../predictive-text/browser.tsconfig.json" },

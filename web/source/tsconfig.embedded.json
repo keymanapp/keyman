@@ -27,7 +27,7 @@
 	],
 
   "references": [
-    { "path": "../../resources/web-environment", "prepend": true },
+    { "path": "../../common/web/web-environment", "prepend": true },
     { "path": "../../common/core/web/utils", "prepend": true },
     { "path": "../../common/predictive-text/browser.tsconfig.json", "prepend": true },
     { "path": "../../common/core/web/input-processor/src", "prepend": true },

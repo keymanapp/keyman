@@ -66,7 +66,7 @@ test-headless ( ) {
 
   # Poor Man's Modules until we support ES6 throughout
   PREPEND=./tests/cases/prepend.js
-  (cat ../../../../resources/web-environment/build/index.js; echo) > $PREPEND
+  (cat ../../../web/web-environment/build/index.js; echo) > $PREPEND
   (cat ../utils/build/index.js; echo) >> $PREPEND
   (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
   (cat ../input-processor/build/index.js; echo) >> $PREPEND
