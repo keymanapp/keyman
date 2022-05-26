@@ -34,5 +34,6 @@
     { "path": "../../common/web/keyboard-processor/src", "prepend": true },
     { "path": "../../common/web/es6-shim", "prepend": true },
     { "path": "../../common/web/lm-message-types" },
+    { "path": "../../common/web/sentry-manager/src" },
 	]
 }
