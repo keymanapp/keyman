@@ -103,7 +103,14 @@ if builder_has_action configure; then
   builder_report configure success
 fi
 
-if builder_has_action clean; then
+# We always need to clean first because the wrapping function
+# breaks the typescript build, as it makes the index.tsbuildinfo file
+# inconsistent with the actual index.js and causes the file to be
+# corrupted on subsequent builds. In order to use the --build parameter
+# of typescript, we need to avoid this!
+# TODO: we should try and rework this to avoid the need to manually wrap
+
+if builder_has_action clean || builder_has_action build; then
   npm run clean
   builder_report clean success
 fi
@@ -112,16 +119,12 @@ if builder_has_action build; then
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."
 
-  # Test if we've already done the wrapper (e.g. if build is already up to
-  # date), and in that case don't re-wrap
-  if ! grep -q "LMLayerWorkerCode" "${WORKER_OUTPUT_FILENAME}"; then
-    # Wrap the worker code and create embedded_worker.js. Must be run after the
-    # worker is built for the first time.
-    echo "Wrapping worker in function LMLayerWorkerCode ${WORKER_OUTPUT_FILENAME}"
-    wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT_FILENAME}" > "${WORKER_OUTPUT_FILENAME}.tmp" || die
-    # Replace the default output file
-    mv "${WORKER_OUTPUT_FILENAME}.tmp" "${WORKER_OUTPUT_FILENAME}" || die
-  fi
+  # Wrap the worker code and create embedded index.js. Must be run after the
+  # worker is built
+  echo "Wrapping worker in function LMLayerWorkerCode ${WORKER_OUTPUT_FILENAME}"
+  wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT_FILENAME}" > "${WORKER_OUTPUT_FILENAME}.tmp" || die
+  # Replace the default output file
+  mv "${WORKER_OUTPUT_FILENAME}.tmp" "${WORKER_OUTPUT_FILENAME}" || die
 
   builder_report build success
 fi
