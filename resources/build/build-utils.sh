@@ -27,6 +27,11 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+# Setup variable for calling script's path
+if [ ! -z ${THIS_SCRIPT+x} ]; then
+  THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
+  readonly THIS_SCRIPT_PATH
+fi
 
 function die () {
     # TODO: consolidate this with fail() from shellHelperFunctions.sh
@@ -365,4 +370,8 @@ builder_report() {
   else
     echo "${COLOR_RED}Action '$1' Result: $2${COLOR_RESET}"
   fi
+}
+
+set_keyman_standard_build_path() {
+  PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
 }

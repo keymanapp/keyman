@@ -1,4 +1,4 @@
-/// <reference path="../../../../common/web/lm-message-types/message.d.ts" />
+/// <reference types="@keymanapp/models-types" />
 
 /**
  * Helpers and utilities for the Mocha tests.
