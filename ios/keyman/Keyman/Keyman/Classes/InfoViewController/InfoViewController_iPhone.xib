@@ -33,7 +33,6 @@
                 <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DPl-QD-inD">
                     <rect key="frame" x="0.0" y="755" width="428" height="49"/>
                     <items>
-                        <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="PE1-7X-Amq"/>
                         <barButtonItem image="chevron.left" catalog="system" id="ptS-kA-9Tw">
                             <connections>
                                 <action selector="back:" destination="-1" id="2rM-Md-H8q"/>
@@ -51,7 +50,6 @@
                                 <action selector="close:" destination="-1" id="Or7-qh-Vf6"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="hfW-UQ-U3N"/>
                     </items>
                 </toolbar>
             </subviews>
@@ -76,7 +74,7 @@
     </objects>
     <resources>
         <image name="UIAccessoryButtonX.png" width="22" height="22"/>
-        <image name="chevron.left" catalog="system" width="32" height="32"/>
+        <image name="chevron.left" catalog="system" width="96" height="128"/>
         <image name="chevron.right" catalog="system" width="96" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

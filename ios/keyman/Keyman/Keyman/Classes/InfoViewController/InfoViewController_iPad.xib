@@ -28,7 +28,6 @@
                 <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fsh-gd-wpz">
                     <rect key="frame" x="0.0" y="924" width="768" height="50"/>
                     <items>
-                        <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="rEo-7j-3D9"/>
                         <barButtonItem image="chevron.left" catalog="system" id="TLs-g2-xbM">
                             <connections>
                                 <action selector="back:" destination="-1" id="QxZ-wD-p3z"/>
@@ -46,7 +45,6 @@
                                 <action selector="close:" destination="-1" id="Z6P-DT-vrW"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem width="14" style="plain" systemItem="fixedSpace" id="aR8-Uo-xOo"/>
                     </items>
                 </toolbar>
             </subviews>

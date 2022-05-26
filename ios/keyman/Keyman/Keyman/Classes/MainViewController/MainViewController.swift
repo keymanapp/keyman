@@ -384,9 +384,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // But, in the interest of a quick pre-release fix...
     let window = UIApplication.shared.windows.first
     let topPadding = window?.safeAreaInsets.top ?? 0
-    let bottomPadding = window?.safeAreaInsets.bottom ?? 0
     let barHeights: CGFloat = (topPadding == 0 ? AppDelegate.statusBarHeight() : topPadding) + navBarHeight()
-    let height: CGFloat = mainScreen.height - barHeights /*- bottomPadding*/ - kbHeight
+    let height: CGFloat = mainScreen.height - barHeights - kbHeight
 
     // Like really, this REALLY should be done with constraints.
     textView.frame = CGRect(x: margin, y: barHeights + margin,
