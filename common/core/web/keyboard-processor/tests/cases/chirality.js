@@ -2,11 +2,11 @@ var assert = require('chai').assert;
 let fs = require('fs');
 let vm = require('vm');
 
-let KeyboardProcessor = require('../../dist');
-let KMWRecorder = require('../../../tools/recorder/dist/nodeProctor');
+let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
+global.keyman = {};
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+// Initialize supplementary plane string extensions
+String.kmwEnableSupplementaryPlane(false);
 
 describe('Engine - Chirality', function() {
   let testJSONtext = fs.readFileSync('../tests/resources/json/engine_tests/chirality.json');
@@ -41,7 +41,7 @@ describe('Engine - Chirality', function() {
   // Converts each test set into its own Mocha-level test.
   for(let set of testSuite.inputTestSets) {
     let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
-      
+
     if(!proctor.compatibleWithSuite(testSuite)) {
       it.skip(set.toTestName() + " - Cannot run this test suite on Node.");
     } else if(set.constraint.target == 'hardware') {

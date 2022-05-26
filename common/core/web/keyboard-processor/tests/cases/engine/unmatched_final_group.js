@@ -2,11 +2,11 @@ var assert = require('chai').assert;
 let fs = require('fs');
 let vm = require('vm');
 
-let KeyboardProcessor = require('../../../dist');
-let KMWRecorder = require('../../../../tools/recorder/dist/nodeProctor');
+let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
+global.keyman = {};
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+// Initialize supplementary plane string extensions
+String.kmwEnableSupplementaryPlane(false);
 
 describe('Engine - Unmatched Final Groups', function() {
   let testJSONtext = fs.readFileSync('../tests/resources/json/engine_tests/ghp_enter.json');

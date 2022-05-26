@@ -1,5 +1,3 @@
-///<reference path="index.ts" />
-///<reference path="../node_modules/@keymanapp/keyboard-processor/src/text/keyboardProcessor.ts" />
 
 namespace KMWRecorder {
   export class NodeProctor extends Proctor {

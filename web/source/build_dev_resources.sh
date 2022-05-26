@@ -1,5 +1,5 @@
 #! /bin/bash
-# 
+#
 # Compiles development-related KeymanWeb resources for use with developing/running tests.
 #   - the Recorder module (for engine tests)
 #   - the DOM module (for touch-alias and element-interface tests)
@@ -49,7 +49,7 @@ compilecmd="$compiler"
 
 for (( n=0; n<$PRODUCT_COUNT; n++ ))  # Apparently, args ends up zero-based, meaning $2 => n=1.
 do
-  $compilecmd -p $NODE_SOURCE/tsconfig.${SCRIPT_TAGS[$n]}.json
+  $compilecmd --build $NODE_SOURCE/tsconfig.${SCRIPT_TAGS[$n]}.json
   if [ $? -ne 0 ]; then
       fail "Typescript compilation failed for '${SCRIPT_TAGS[$n]}'."
   fi

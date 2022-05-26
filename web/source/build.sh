@@ -473,7 +473,7 @@ if [ $BUILD_COREWEB = true ]; then
 
     # TEMP STUB LMLayerWorkerCode
     pwd
-    cat $INTERMEDIATE/keymanweb.js ../../common/predictive-text/build/intermediate/index.js > $INTERMEDIATE/km1.js
+    cat $INTERMEDIATE/keymanweb.js <(echo) ../../common/predictive-text/build/index.js > $INTERMEDIATE/km1.js
     mv $INTERMEDIATE/km1.js $INTERMEDIATE/keymanweb.js
 
     echo Native TypeScript compiled as $INTERMEDIATE/keymanweb.js

@@ -1,19 +1,28 @@
 {
+  "extends": "../../../../../../tsconfig-base.json",
+
   "compilerOptions": {
-	"allowJs": true,
-	"module": "none",
-	"outDir": "../dist/",
-	"inlineSources": true,
-  "inlineSourceMap": true,
-  "target": "es5",
-  "types": ["node"],
-  "lib": ["es6"],
-  "outFile": "../dist/nodeProctor.js"
+    "allowJs": true,
+    "module": "none",
+    "outDir": "../build/nodeProctor/",
+    "outFile": "../build/nodeProctor/index.js",
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "target": "es5",
+    "types": ["node"],
+    "lib": ["es6"]
   },
+
   "files": [
-    "../node_modules/@keymanapp/models-types/index.d.ts",
-    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
-    "../node_modules/@keymanapp/web-utils/src/index.ts",
-		"nodeProctor.ts"
+    "index.ts",
+    "proctor.ts",
+    "nodeProctor.ts"
+  ],
+
+  "references": [
+    { "path": "../../../../../../resources/web-environment" },
+    { "path": "../../../../../../common/core/web/utils" },
+    { "path": "../../../../../../common/core/web/keyboard-processor/src" },
+    { "path": "../../../../../../common/web/lm-message-types" }
   ]
 }

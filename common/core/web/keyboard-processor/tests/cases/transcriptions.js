@@ -1,16 +1,15 @@
 var assert = require('chai').assert;
-let KeyboardProcessor = require('../../dist');
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+global.keyman = {};
 
+// Initialize supplementary plane string extensions
 String.kmwEnableSupplementaryPlane(false);
 
 describe("Transcriptions and Transforms", function() {
   var toSupplementaryPairString = function(code){
     var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
     var L = (code - 0x10000) % 0x400 + 0xDC00;
-  
+
     return String.fromCharCode(H, L);
   }
 
@@ -50,7 +49,7 @@ describe("Transcriptions and Transforms", function() {
       * Other modules coming later will need it, though.
       */
       var transcription = target.buildTranscriptionFrom(original, null);
-      
+
       assert.equal(transcription.transform.insert, "s", "Failed to recognize inserted text");
       assert.equal(transcription.transform.deleteLeft, 0, "Incorrectly detected left-of-caret deletions");
       assert.equal(transcription.transform.deleteRight, 0, "Incorrectly detected right-of-caret deletions");
@@ -322,11 +321,11 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       // could eventually run in 'headless' mode.
       var target = new Mock("apple");
       var original = Mock.from(target);
-      
+
       target.setDeadkeyCaret(4);
       target.insertDeadkeyBeforeCaret(0);
       target.setDeadkeyCaret(1);
-      target.insertDeadkeyBeforeCaret(1); 
+      target.insertDeadkeyBeforeCaret(1);
       target.setDeadkeyCaret(2);
       target.insertDeadkeyBeforeCaret(2); // 'a' dk(1) 'p' dk(2) | 'p' 'l' dk(0) 'e'
 
@@ -337,8 +336,8 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
       target.setDeadkeyCaret(3);
       target.deleteCharsBeforeCaret(2);
-      target.insertTextBeforeCaret("b"); 
-      target.insertDeadkeyBeforeCaret(3); // In effect: 'a' dk(1) 'b' dk(3) | 'l' dk(0) 'e' 
+      target.insertTextBeforeCaret("b");
+      target.insertDeadkeyBeforeCaret(3); // In effect: 'a' dk(1) 'b' dk(3) | 'l' dk(0) 'e'
 
       var transcription = target.buildTranscriptionFrom(original, null);
 
@@ -350,7 +349,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       var rem = transcription.removedDks;
       assert.equal(rem.length, 1, "Incorrect count for removed deadkeys");
       assert.deepEqual({d: rem[0].d, p: rem[0].p}, {d: 2, p: 2}, "Selected wrong deadkey as removed");
-      
+
       var ins = transcription.insertedDks;
       assert.equal(ins.length, 1, "Incorrect count for inserted deadkeys");
       assert.deepEqual({d: ins[0].d, p: ins[0].p}, {d: 3, p:2}, "Selected wrong deadkey as inserted");

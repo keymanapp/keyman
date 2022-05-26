@@ -1,6 +1,18 @@
 namespace com.keyman.keyboards {
   type KeyDistribution = text.KeyDistribution;
 
+  // TS 3.9 changed behavior of getters to make them
+  // non-enumerable by default. This broke our 'polyfill'
+  // functions which depended on enumeration to copy the
+  // relevant props over.
+  // https://github.com/microsoft/TypeScript/pull/32264#issuecomment-677718191
+  function Enumerable(
+    target: unknown,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+      descriptor.enumerable = true;
+  };
 
   export class ActiveKey implements LayoutKey {
 
@@ -52,6 +64,7 @@ namespace com.keyman.keyboards {
      *
      * Is used to determine the keycode for input events, rule-matching, and keystroke processing.
      */
+    @Enumerable
     public get baseKeyID(): string {
       if(typeof this.id === 'undefined') {
         return undefined;
@@ -78,6 +91,7 @@ namespace com.keyman.keyboards {
      *
      * Useful when the active layer of an input-event is already known.
      */
+    @Enumerable
     public get coreID(): string {
       if(typeof this.id === 'undefined') {
         return undefined;
@@ -110,6 +124,7 @@ namespace com.keyman.keyboards {
      *
      * Useful when only the active keyboard is known about an input event.
      */
+    @Enumerable
     public get elementID(): string {
       if(typeof this.id === 'undefined') {
         return undefined;

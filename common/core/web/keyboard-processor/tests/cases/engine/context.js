@@ -2,22 +2,26 @@ var assert = require('chai').assert;
 let fs = require('fs');
 let vm = require('vm');
 
-let KeyboardProcessor = require('../../../dist');
-let KMWRecorder = require('../../../../tools/recorder/dist/nodeProctor');
+let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
+global.keyman = {};
+global.com = com;
 
-/* 
+// Initialize supplementary plane string extensions
+String.kmwEnableSupplementaryPlane(false);
+
+/*
  * ABOUT THIS TEST SUITE
  * ---------------------
- * 
+ *
  * This suite contains two types of tests, both designed to test all possible variations
  * of behaviors that `KeyboardInterface.fullContextMatch` may be expected to handle.
- * 
+ *
  * Type 1:  White-box tests for validity of the generated context-cache
  * - uses only the `baseSequence` of each test spec definition; does not
  *   use any `fullMatchDefs` entries.
  * - uses the specified `contextCache` entry of each test spec in assertions
  * - CTRL+F `Tests "stage 1" of fullContextMatch` for more details.
- * 
+ *
  * Type 2:  Black-box rule-matching tests
  * - uses both `baseSequence` and `fullMatchDefs` entries of a test spec
  * - tests that each simulation sequence's output either passes or fails against
@@ -25,9 +29,6 @@ let KMWRecorder = require('../../../../tools/recorder/dist/nodeProctor');
  *   - Currently, `result` is always `true` for each spec's `baseSequence`.
  *     It should be a removable limitation, though.
  */
-
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 
 let device = {
   formFactor: 'desktop',
@@ -68,12 +69,13 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
 
       // Now for the real test!
       let processor = new KeyboardProcessor();
+      processor.device = device;
       processor.activeKeyboard = keyboard;
       var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, target, ruleDef.rule);
 
       var msg = matchTest.msg;
       if(!msg) {
-        msg = defaultNoun + " incorrectly reported as " + (matchTest.result ? "unmatched!" : "matched!"); 
+        msg = defaultNoun + " incorrectly reported as " + (matchTest.result ? "unmatched!" : "matched!");
       }
       assert.equal(res, matchTest.result, msg);
     }
@@ -463,7 +465,7 @@ var ANY_CONTEXT_TEST_2 = {
  *
  * store(ac) 'ac'
  * store(bc) 'bc'
- * 
+ *
  * 'c' any(ac) any(bc) context(3) context(2) > 'success'
  */
 var ANY_CONTEXT_TEST_3 = {
@@ -520,7 +522,7 @@ var ANY_CONTEXT_TEST_3 = {
  *
  * store(ab) 'ab'
  * store(bc) 'bc'
- * 
+ *
  * 'c' any(ab) index(bc, 2) 'a' > 'success'
  */
 var ANY_INDEX_TEST_1 = {
@@ -567,7 +569,7 @@ var ANY_INDEX_TEST_1 = {
  *
  * store(ab) 'ab'
  * store(bc) 'bc'
- * 
+ *
  * 'c' any(ab) index(bc, 2) index(bc, 2) index(ab, 2) > 'success'
  */
 var ANY_INDEX_TEST_2 = {
@@ -614,7 +616,7 @@ var ANY_INDEX_TEST_2 = {
  *
  * store(ab) 'ab'
  * store(bc) 'bc'
- * 
+ *
  * 'c' any(ab) any(bc) index(bc, 3) index(ab, 2) > 'success'
  */
 var ANY_INDEX_TEST_3 = {
@@ -747,7 +749,7 @@ var DEADKEY_STORE_TEST_2 = {
  *
  * store(match) dk(0) dk(1) dk(2)
  * store(abc) 'abc'
- * 
+ *
  * any(match) index(abc, 1) > 'success'
  */
 var DEADKEY_STORE_TEST_3 = {
@@ -880,7 +882,7 @@ var NOTANY_NUL_TEST_1 = {
  *
  * store(match) dk(0) dk(1) dk(2)
  * store(abc) 'abc'
- * 
+ *
  * notany(match) any(abc) > 'success'
  */
 var NOTANY_NUL_TEST_2 = {
@@ -917,7 +919,7 @@ var NOTANY_NUL_TEST_2 = {
  *
  * store(first) dk(0) 'b' dk(2)
  * store(second) 'a' dk(1) 'c'
- * 
+ *
  * notany(first) any(second) > 'success'
  */
 var NOTANY_NUL_TEST_3 = {
@@ -964,8 +966,8 @@ var NOTANY_NUL_TEST_3 = {
   }]
 };
 
-var DEADKEY_RULE_SET = [ DEADKEY_TEST_1, DEADKEY_TEST_2, DEADKEY_TEST_3, DEADKEY_TEST_4, 
-  DEADKEY_TEST_5, DEADKEY_TEST_6 
+var DEADKEY_RULE_SET = [ DEADKEY_TEST_1, DEADKEY_TEST_2, DEADKEY_TEST_3, DEADKEY_TEST_4,
+  DEADKEY_TEST_5, DEADKEY_TEST_6
 ];
 var ANY_CONTEXT_RULE_SET = [ ANY_CONTEXT_TEST_1, ANY_CONTEXT_TEST_2, ANY_CONTEXT_TEST_3 ];
 var ANY_INDEX_RULE_SET = [ ANY_INDEX_TEST_1, ANY_INDEX_TEST_2, ANY_INDEX_TEST_3 ];
@@ -1007,6 +1009,7 @@ describe('Engine - Context Matching', function() {
 
       // Now for the real test!
       let processor = new KeyboardProcessor();
+      processor.device = device;
       processor.activeKeyboard = keyboard;
       var res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, target);
 
@@ -1067,7 +1070,7 @@ describe('Engine - Context Matching', function() {
       runEngineRuleSet([ANY_INDEX_TEST_3]);
     });
   });
-  
+
   describe('handles interactions with deadkeys in stores', function() {
     it('for any on pure deadkey store:  DEADKEY_STORE_TEST_1', function() {
       runEngineRuleSet([DEADKEY_STORE_TEST_1]);

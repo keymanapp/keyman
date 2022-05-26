@@ -55,13 +55,43 @@ test-headless ( ) {
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/
+  # Poor Man's Modules until we support ES6 throughout
+  PREPEND=./tests/cases/prepend.js
+  rm -f $PREPEND
+  for n in tests/cases/*.js; do
+    echo $n
+    (cat ../../../../resources/web-environment/build/index.js; echo) > $PREPEND
+    (cat ../utils/build/index.js; echo) >> $PREPEND
+    (cat ../tools/recorder/build/nodeProctor/index.js; echo) >> $PREPEND
+    (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
+    (cat $n; echo) >> $PREPEND;
+    npm run mocha -- --recursive $FLAGS $PREPEND || die
+    rm $PREPEND
+  done
+
+  # Poor Man's Modules until we support ES6 throughout
+  PREPEND=./tests/cases/engine/prepend.js
+  rm -f $PREPEND
+  for n in tests/cases/engine/*.js; do
+    echo $n
+    (cat ../../../../resources/web-environment/build/index.js; echo) > $PREPEND
+    (cat ../utils/build/index.js; echo) >> $PREPEND
+    (cat ../tools/recorder/build/nodeProctor/index.js; echo) >> $PREPEND
+    (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
+    (cat $n; echo) >> $PREPEND;
+    npm run mocha -- --recursive $FLAGS $PREPEND || die
+    rm $PREPEND
+  done
+
+  # npm run mocha -- --recursive $FLAGS ./tests/cases/
 }
 
-# Build test dependency
-pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
-./build.sh -skip-package-install || fail "recorder-core compilation failed."
-popd
+if [ $FETCH_DEPS = true ]; then
+  # Build test dependency
+  pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
+  ./build.sh -skip-package-install || fail "recorder-core compilation failed."
+  popd
+fi
 
 # Run headless (browserless) tests.
 echo_heading "Running Keyboard Processor test suite"

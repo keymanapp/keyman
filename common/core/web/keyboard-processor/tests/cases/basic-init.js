@@ -2,15 +2,12 @@ var assert = require('chai').assert;
 var fs = require("fs");
 var vm = require("vm");
 
-let KeyboardProcessor = require('../../dist');
-
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
-global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
-                    // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
+let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
+global.keyman = {};
+global.com = com;
 
 // Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);    
+String.kmwEnableSupplementaryPlane(false);
 
 // Test the KeyboardProcessor interface.
 describe('KeyboardProcessor', function() {

@@ -54,22 +54,36 @@ if [ $FETCH_DEPS = true ]; then
 fi
 
 # Ensures that the lexical model compiler has been built locally.
-echo_heading "Preparing Lexical Model Compiler for test use"
-pushd $WORKING_DIRECTORY/node_modules/@keymanapp/lexical-model-compiler
-npm run build
-popd
+#echo_heading "Preparing Lexical Model Compiler for test use"
+#pushd $WORKING_DIRECTORY/node_modules/@keymanapp/lexical-model-compiler
+#npm run build
+#popd
 
 test-headless ( ) {
   if (( CI_REPORTING )); then
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/
+  # Poor Man's Modules until we support ES6 throughout
+  PREPEND=./tests/cases/prepend.js
+  (cat ../../../../resources/web-environment/build/index.js; echo) > $PREPEND
+  (cat ../utils/build/index.js; echo) >> $PREPEND
+  (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
+  (cat ../input-processor/build/index.js; echo) >> $PREPEND
+  (cat tests/cases/inputProcessor.js; echo) >> $PREPEND
+
+  # TODO: We will re-enable languageProcessor tests when we have sorted out
+  #       paths and modules for lmc
+  #(cat tests/cases/languageProcessor.js; echo) >> $PREPEND
+
+  npm run mocha -- --recursive $FLAGS ./tests/cases/prepend.js
+
+  rm $PREPEND
 }
 
 if [ $FETCH_DEPS = true ]; then
   # First, run tests on the keyboard processor.
-  pushd $WORKING_DIRECTORY/node_modules/@keymanapp/keyboard-processor
+  pushd "$KEYMAN_ROOT/common/core/web/keyboard-processor"
   ./test.sh -skip-package-install || fail "Tests failed by dependencies; aborting integration tests."
   popd
 fi

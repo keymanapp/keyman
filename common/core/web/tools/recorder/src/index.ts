@@ -1,4 +1,3 @@
-/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/keyEvent.ts" />
 /// <reference path="proctor.ts" />
 
 namespace KMWRecorder {
@@ -92,7 +91,7 @@ namespace KMWRecorder {
     static fromJSONObject(obj: any): RecordedKeystroke {
       if(obj && obj.type) {
         if(obj.type == "key") {
-          return new RecordedPhysicalKeystroke(obj as RecordedPhysicalKeystroke); 
+          return new RecordedPhysicalKeystroke(obj as RecordedPhysicalKeystroke);
         } else if(obj && obj.type) {
           return new RecordedSyntheticKeystroke(obj as RecordedSyntheticKeystroke);
         }
@@ -375,7 +374,7 @@ namespace KMWRecorder {
         this.id = activeStub.KLC;
         this.name = activeStub.KL;
         this.region = activeStub.KR;
-  
+
         // Fonts.
         if(activeStub.KFont) {
           this.font = new FontStubForLanguage(activeStub.KFont);
@@ -515,7 +514,7 @@ namespace KMWRecorder {
       this.result = output;
     }
   }
-  
+
   export interface TestSet<Sequence extends TestSequence<any>> {
     constraint: Constraint;
 
@@ -649,7 +648,7 @@ namespace KMWRecorder {
     public specVersion: com.keyman.utils.Version = KeyboardTest.CURRENT_VERSION;
 
     /**
-     * The version of KMW in which the Recorder was first written.  Worked from 10.0 to 13.0 with 
+     * The version of KMW in which the Recorder was first written.  Worked from 10.0 to 13.0 with
      * only backward-compatible changes and minor tweaks to conform to internal API shifts.
      */
     public static readonly FALLBACK_VERSION = new com.keyman.utils.Version("10.0");
@@ -667,8 +666,8 @@ namespace KMWRecorder {
     inputTestSets: TestSet<any>[];
 
     /**
-     * Reconstructs a KeyboardTest object from its JSON representation, restoring its methods. 
-     * @param fromJSON 
+     * Reconstructs a KeyboardTest object from its JSON representation, restoring its methods.
+     * @param fromJSON
      */
     constructor(fromJSON?: string|KeyboardStub|KeyboardTest) {
       if(!fromJSON) {
@@ -720,7 +719,7 @@ namespace KMWRecorder {
 
       var newSet = new RecordedSequenceTestSet(new Constraint(constraint));
       this.inputTestSets.push(newSet);
-      newSet.addTest(seq);      
+      newSet.addTest(seq);
     }
 
     test(proctor: Proctor) {
