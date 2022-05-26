@@ -17,6 +17,7 @@
       "@keymanapp/models-templates": ["./common/models/templates"],
       "@keymanapp/models-wordbreakers": ["./common/models/wordbreakers"],
       "@keymanapp/utils": ["./common/core/web/utils"],
+      "@keymanapp/lm-message-types": ["./common/web/lm-message-types"],
     }
   }
 }

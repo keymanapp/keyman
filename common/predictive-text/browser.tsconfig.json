@@ -10,14 +10,13 @@
     "target": "es5",
     "lib": ["es6", "dom"]
   },
-  "include" : [
-    "./*.ts"
-  ],
+  "include" : ["./*.ts"],
   "references": [
     { "path": "../../common/web/es6-shim" },
-    { "path": "../models/types"},
-    { "path": "../models/wordbreakers"},
-    { "path": "../models/templates"}
+    { "path": "../models/types" },
+    { "path": "../models/wordbreakers" },
+    { "path": "../models/templates" },
+    { "path": "../web/lm-message-types" }
   ],
   "exclude" : [
     "node-defaultWorker.ts",

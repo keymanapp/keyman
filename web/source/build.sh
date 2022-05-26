@@ -341,7 +341,7 @@ if [ $FETCH_DEPS = true ]; then
     ./build.sh
     popd > /dev/null
 
-    pushd "$KEYMAN_ROOT/common/predictive-text" > /dev/null
+    pushd "$KEYMAN_ROOT/common/web/lm-worker" > /dev/null
     ./build.sh
     popd > /dev/null
 

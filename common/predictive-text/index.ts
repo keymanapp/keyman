@@ -21,7 +21,7 @@
  */
 
 /// <reference path="promise-store.ts" />
-/// <reference path="message.d.ts" />
+/// <reference types="@keymanapp/lm-message-types" />
 /// <reference path="worker-interface.d.ts" />
 
 /**
