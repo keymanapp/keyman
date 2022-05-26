@@ -6,18 +6,15 @@ var vm = require("vm");
  * Unit tests for the Dummy prediction model.
  */
 
-var LexicalModelCompiler = require('@keymanapp/lexical-model-compiler/dist/lexical-model-compiler/lexical-model-compiler').default;
+var LexicalModelCompiler = require('../../../../../../developer/js/dist/lexical-model-compiler/lexical-model-compiler').default;
 var path = require('path');
 
-let InputProcessor = require('../../dist');
-
 // Required initialization setup.
-global.com = InputProcessor.com; // exports all keyboard-processor namespacing.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 
 // Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false); 
+String.kmwEnableSupplementaryPlane(false);
 
 let LanguageProcessor = com.keyman.text.prediction.LanguageProcessor;
 
@@ -49,8 +46,8 @@ describe('LanguageProcessor', function() {
   describe('.predict', function() {
     let compiler = new LexicalModelCompiler();
     const MODEL_ID = 'example.qaa.trivial';
-    const PATH = path.join(__dirname, '../../node_modules/@keymanapp/lexical-model-compiler/tests/fixtures', MODEL_ID);
-  
+    const PATH = path.join(__dirname, '../../../../../../developer/js/tests/fixtures', MODEL_ID);
+
     describe('using angle brackets for quotes', function() {
       let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
@@ -108,21 +105,21 @@ describe('LanguageProcessor', function() {
           languageUsesCasing: true,
           //applyCasing // we rely on the compiler's default implementation here.
         }, PATH);
-  
+
         let modelSpec = {
           id: MODEL_ID,
           languages: ['en'],
           code: modelCode
         };
-  
+
         describe("does not alter casing when input is lowercased", function() {
           it("when input is fully lowercased", function(done) {
             let languageProcessor = new LanguageProcessor();
             languageProcessor.init();
-    
+
             let contextSource = new com.keyman.text.Mock("li", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
-    
+
             languageProcessor.loadModel(modelSpec).then(function() {
               languageProcessor.predict(transcription).then(function(suggestions) {
                 assert.isOk(suggestions);
@@ -139,10 +136,10 @@ describe('LanguageProcessor', function() {
           it("when input has non-initial uppercased letters", function(done) {
             let languageProcessor = new LanguageProcessor();
             languageProcessor.init();
-    
+
             let contextSource = new com.keyman.text.Mock("lI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
-    
+
             languageProcessor.loadModel(modelSpec).then(function() {
               languageProcessor.predict(transcription).then(function(suggestions) {
                 // The source suggestion is simply 'like'.
@@ -160,10 +157,10 @@ describe('LanguageProcessor', function() {
           it("unless the suggestion has uppercased letters", function(done) {
             let languageProcessor = new LanguageProcessor();
             languageProcessor.init();
-    
+
             let contextSource = new com.keyman.text.Mock("i", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
-    
+
             languageProcessor.loadModel(modelSpec).then(function() {
               languageProcessor.predict(transcription).then(function(suggestions) {
                 assert.isOk(suggestions);
@@ -182,10 +179,10 @@ describe('LanguageProcessor', function() {
           it("for suggestions with default casing  (== 'lower')", function(done) {
             let languageProcessor = new LanguageProcessor();
             languageProcessor.init();
-    
+
             let contextSource = new com.keyman.text.Mock("LI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
-    
+
             languageProcessor.loadModel(modelSpec).then(function() {
               languageProcessor.predict(transcription).then(function(suggestions) {
                 // The source suggestion is simply 'like'.
@@ -203,7 +200,7 @@ describe('LanguageProcessor', function() {
           it("for precapitalized suggestions", function(done) {
             let languageProcessor = new LanguageProcessor();
             languageProcessor.init();
-    
+
             let contextSource = new com.keyman.text.Mock("I", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
@@ -226,10 +223,10 @@ describe('LanguageProcessor', function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
               let languageProcessor = new LanguageProcessor();
               languageProcessor.init();
-      
+
               let contextSource = new com.keyman.text.Mock("L", 1);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
-      
+
               languageProcessor.loadModel(modelSpec).then(function() {
                 languageProcessor.predict(transcription).then(function(suggestions) {
                   // The source suggestion is simply 'like'.
@@ -249,10 +246,10 @@ describe('LanguageProcessor', function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
               let languageProcessor = new LanguageProcessor();
               languageProcessor.init();
-      
+
               let contextSource = new com.keyman.text.Mock("Li", 2);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
-      
+
               languageProcessor.loadModel(modelSpec).then(function() {
                 languageProcessor.predict(transcription).then(function(suggestions) {
                   // The source suggestion is simply 'like'.
