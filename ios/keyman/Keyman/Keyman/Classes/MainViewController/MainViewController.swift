@@ -183,6 +183,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // Setup Keyman TextView
     textSize = 16.0
     textView = TextView(frame: view.frame)
+    textView.translatesAutoresizingMaskIntoConstraints = false
     textView.setKeymanDelegate(self)
     textView.viewController = self
     textView.backgroundColor = UIColor(named: "InputBackground")!
@@ -190,6 +191,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.isUserInteractionEnabled = true
     textView.font = textView.font?.withSize(textSize)
     view?.addSubview(textView!)
+
+    textView.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor   ).isActive = true
+    textView.leftAnchor.constraint  (equalTo: view.safeAreaLayoutGuide.leftAnchor  ).isActive = true
+    textView.rightAnchor.constraint (equalTo: view.safeAreaLayoutGuide.rightAnchor ).isActive = true
+    textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
 
     // Setup Info View
     infoView = InfoViewController {
@@ -200,12 +206,19 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       textView.font = textView?.font?.withSize(textSize)
     }
 
+    infoView.view?.translatesAutoresizingMaskIntoConstraints = false
     infoView.view?.isHidden = true
     infoView.view?.backgroundColor = UIColor(named: "InputBackground")!
     view?.addSubview(infoView!.view)
+
     // Don't forget to add the child view's controller, too!
     // Its safe area layout guide won't work correctly without this!
     self.addChild(infoView)
+
+    infoView.view?.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+    infoView.view?.leftAnchor.constraint  (equalTo: view.leftAnchor  ).isActive = true
+    infoView.view?.rightAnchor.constraint (equalTo: view.rightAnchor ).isActive = true
+    infoView.view?.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 
     resizeViews(withKeyboardVisible: textView.isFirstResponder)
 
@@ -373,24 +386,23 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func resizeViews(withKeyboardVisible keyboardVisible: Bool) {
-    // Resize textView and infoView
-    let mainScreen: CGRect = UIScreen.main.bounds
-    let margin: CGFloat = 2.0
+    guard let window = UIApplication.shared.windows.first else {
+      return
+    }
+
+    // As the keyboard isn't naturally part of the safe area, we must
+    // adjust the safe area's size when it appears.
     let kbHeight: CGFloat = keyboardVisible ? textView.inputView?.frame.height ?? 0 : 0
-    let width: CGFloat = mainScreen.size.width
 
-    // This sort of thing really should be handled by the iOS layout engine, not programatically
-    // as it has been.  The original code was written pre-iOS 11 & safe areas!
-    // But, in the interest of a quick pre-release fix...
-    let window = UIApplication.shared.windows.first
-    let topPadding = window?.safeAreaInsets.top ?? 0
-    let barHeights: CGFloat = (topPadding == 0 ? AppDelegate.statusBarHeight() : topPadding) + navBarHeight()
-    let height: CGFloat = mainScreen.height - barHeights - kbHeight
+    let bottomPadding = window.safeAreaInsets.bottom
 
-    // Like really, this REALLY should be done with constraints.
-    textView.frame = CGRect(x: margin, y: barHeights + margin,
-                             width: width - 2 * margin, height: height - 2 * margin)
-    infoView?.view?.frame = CGRect(x: 0, y: barHeights, width: width, height: height + kbHeight)
+    var kbdSafeArea = UIEdgeInsets()
+    if keyboardVisible {
+      // The keyboard also contains the safe area when visible, and we only want
+      // to add the _additional_ height.
+      kbdSafeArea.bottom += kbHeight - bottomPadding
+    }
+    self.additionalSafeAreaInsets = kbdSafeArea
   }
 
   private func navBarWidth() -> CGFloat {
