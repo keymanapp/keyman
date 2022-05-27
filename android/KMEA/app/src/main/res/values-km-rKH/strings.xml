@@ -125,6 +125,8 @@
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">តើ​អ្នក​ចង់​លុប​បញ្ជី​ពាក្យនេះ​ឬ?</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">បានដំឡើង​ក្ដារចុច %1$s</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">ក្ដារចុចត្រូវបានលុបចេញ</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">បើក​ការកែពាក្យ</string>
     <!-- Context: Language Settings menu strings -->

@@ -1,0 +1,52 @@
+﻿c unmatched_final_group_model_interactions_6005 generated from template at 2022-04-11 11:51:48
+c with name "Vowel Hater"
+c
+c This test-oriented keyboard "hates" words with more than two consecutive vowels.
+c In order to test within-word applications of non-final rule matching with final rule non-matching,
+c Vowels are NOT emitted by keyboard rule; only by 'default' behavior.
+c
+c For test coverage, also really likes duplicating 'y' and 'Y'.
+
+store(&VERSION) '10.0'
+store(&NAME) 'Issue 6005 - "Vowel Hater"'
+store(&COPYRIGHT) '© SIL Int' U+0027 'l'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'unmatched_final_group_model_interactions_6005.kvks'
+store(&LAYOUTFILE) 'unmatched_final_group_model_interactions_6005.keyman-touch-layout'
+
+store(vowels)     'aeiouAEIOU' c Doesn't hate 'y' or 'Y'.
+store(vowel_keys) [K_A] [K_E] [K_I] [K_O] [K_U] \
+                  [SHIFT K_A] [SHIFT K_E] [SHIFT K_I] [SHIFT K_O] [SHIFT K_U] 
+store(cons)       'bcdfghjklmn' \
+                  'pqrstvwxz' \
+                  'BCDFGHJKLMN' \
+                  'PQRSTVWXZ'
+store(cons_keys)   [K_B] [K_C] [K_D] [K_F] [K_G] [K_H] \
+                    [K_J] [K_K] [K_L] [K_M] [K_N] \
+                  [K_P] [K_Q] [K_R] [K_S] [K_T] [K_V] \
+                    [K_W] [K_X] [K_Z] \
+                  [SHIFT K_B] [SHIFT K_C] [SHIFT K_D] [SHIFT K_F] [SHIFT K_G] [SHIFT K_H] \
+                    [SHIFT K_J] [SHIFT K_K] [SHIFT K_L] [SHIFT K_M] [SHIFT K_N] \
+                  [SHIFT K_P] [SHIFT K_Q] [SHIFT K_R] [SHIFT K_S] [SHIFT K_T] [SHIFT K_V] \
+                    [SHIFT K_W] [SHIFT K_X] [SHIFT K_Z]
+
+begin Unicode > use(main)
+
+group(main) using keys
++ any(cons_keys) > index(cons, 1)
+
+c Vowel-hating pass 1
++ any(vowel_keys) > use(vowel_tolerance)
+
+c Semi-vowel love (to test context manip early-match with no-match on later group)
++ [K_Y] > 'y' use(vowel_tolerance)
++ [SHIFT K_Y] > 'Y' use(vowel_tolerance)
+
+c Vowel-hating pass 2
+group(vowel_tolerance) using keys
+
+c By matching a contiguous vowel pair, further contiguous vowels will be blocked.
+c Note that 'tolerated' vowels are only emitted due to default behavior.
+
+any(vowels) any(vowels) + any(vowel_keys) > context

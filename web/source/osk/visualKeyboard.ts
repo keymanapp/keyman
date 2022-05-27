@@ -361,7 +361,14 @@ namespace com.keyman.osk {
       return offsetCoords;
     }
 
-    getTouchProbabilities(input: InputEventCoordinate): text.KeyDistribution {
+    /**
+     * Builds the fat-finger distribution used by predictive text as its source for likelihood
+     * of alternate keystroke sequences.
+     * @param input The input coordinate of the event that led to use of this function
+     * @param keySpec The spec of the key directly triggered by the input event.  May be for a subkey.
+     * @returns 
+     */
+    getTouchProbabilities(input: InputEventCoordinate, keySpec?: keyboards.ActiveKey): text.KeyDistribution {
       let keyman = com.keyman.singleton;
       if (!keyman.core.languageProcessor.mayCorrect) {
         return null;
@@ -381,7 +388,7 @@ namespace com.keyman.osk {
       let kbdAspectRatio = layerGroup.offsetWidth / this.kbdDiv.offsetHeight;
       let baseKeyProbabilities = this.kbdLayout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
 
-      if (!this.subkeyGesture || !this.subkeyGesture.baseKey.key) {
+      if (!keySpec || !this.subkeyGesture || !this.subkeyGesture.baseKey.key) {
         return baseKeyProbabilities;
       } else {
         // A temp-hack, as this was noted just before 14.0's release.
@@ -398,12 +405,8 @@ namespace com.keyman.osk {
         let popupKeyMass = 0.0;
         let popupKeyID: string = null;
 
-        // Note:  when embedded on Android (as of 14.0, at least), we don't get access to this.
-        // Just the base key.
-        if (this.keyPending && this.keyPending.key) {
-          popupKeyMass = 3.0;
-          popupKeyID = this.keyPending.key.spec.coreID;
-        }
+        popupKeyMass = 3.0;
+        popupKeyID = keySpec.coreID;
 
         // If the base key appears in the subkey array and was selected, merge the probability masses.
         if (popupKeyID == baseKeyID) {
@@ -997,7 +1000,7 @@ namespace com.keyman.osk {
 
       if (core.languageProcessor.isActive && input) {
         Lkc.source = input;
-        Lkc.keyDistribution = this.getTouchProbabilities(input);
+        Lkc.keyDistribution = this.getTouchProbabilities(input, keySpec);
       }
 
       // Return the event object.
@@ -1143,10 +1146,9 @@ namespace com.keyman.osk {
       if (usePreview) {
         this.showKeyTip(key, on);
       } else {
-        if (on) {
-          // May be called on already-unhighlighted keys, so we don't remove the tip here.
-          this.showKeyTip(null, false);
-        }
+        // No key tip should be shown. In some cases (e.g. multitap), we
+        // may still have a tip visible so let's always hide in that case
+        this.showKeyTip(null, false);
         key.key.highlight(on);
       }
     }
@@ -1660,8 +1662,7 @@ namespace com.keyman.osk {
     showKeyTip(key: KeyElement, on: boolean) {
       var tip = this.keytip;
 
-      // Do not change the key preview unless key or state has changed
-      if (tip == null || (key == tip.key && on == tip.state)) {
+      if (tip == null) {
         return;
       }
 

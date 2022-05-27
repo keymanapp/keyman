@@ -428,7 +428,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     boolean result = removeKeyboard(context, position);
 
     if (result) {
-      Toast.makeText(context, "Keyboard deleted", Toast.LENGTH_SHORT).show();
+      Toast.makeText(context, context.getString(R.string.keyboard_deleted_toast), Toast.LENGTH_SHORT).show();
       BaseAdapter adapter = (BaseAdapter) listAdapter;
       if(adapter != null) {
         adapter.notifyDataSetChanged();
@@ -500,7 +500,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
     if (result) {
       if(!silenceNotification) {
-        Toast.makeText(context, "" + "Model deleted", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.model_deleted), Toast.LENGTH_SHORT).show();
       }
       KMManager.deregisterLexicalModel(modelID);
     }

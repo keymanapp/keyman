@@ -47,6 +47,9 @@ Click on this to [adjust the keyboard height](adjust-keyboard-height).
 ## Spacebar Caption
 Click on this to [change the displayed keyboard name](spacebar-caption) on the spacebar.
 
+## Vibrate When Typing
+When enabled, the Keyman keyboard will provide haptic feedback (vibrate) when the user presses a key and generates output. The default preference is off.
+
 ## Always show banner
 This toggle is reserved for future features. When off, the text suggestion banner is only displayed when
 the dictionary is enabled. The language associated with the keyboard must match the language associated with

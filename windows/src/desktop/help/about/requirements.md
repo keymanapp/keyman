@@ -11,6 +11,7 @@ Windows operating systems:
 -   Windows 8
 -   Windows 8.1
 -   Windows 10
+-   Windows 11
 -   Windows Server 2008 and 2008 R2
 -   Windows Server 2012 and 2012 R2
 

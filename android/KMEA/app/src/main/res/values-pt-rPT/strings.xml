@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Context: Title for list -->
+    <plurals name="title_keyboards">
+        <item quantity="one">Teclado</item>
+        <item quantity="other">Teclados</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">Outro Método de Entrada</item>
+        <item quantity="other">Outros Métodos de Entrada</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <string name="title_add_keyboard" comment="Add a new keyboard">Adicionar novo teclado</string>
+    <!-- Context: Title for list -->
+    <string name="title_languages_settings" comment="List of installed languages">Idiomas instalados</string>
+    <!-- Context: Title for list -->
+    <string name="title_language_settings" comment="Keyman Settings for a language">Configurações de %1$s</string>
+    <!-- Context: Button label -->
+    <string name="label_add" comment="Button to add an item">Adicionar</string>
+    <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">Voltar</string>
+    <!-- Context: Button label -->
+    <string name="label_cancel" comment="Button to cancel an action">Instalar Mais Tarde</string>
+    <!-- Context: Button label -->
+    <string name="label_close" comment="Close a dialog">Fechar</string>
+    <!-- Context: Button label. Removed in Keyman 15 -->
+    <string name="label_close_keyman" comment="Close the Keyman application">Fechar keyman</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">Avançar</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">Próximo método de entrada</string>
+    <!-- Context: Button label -->
+    <string name="label_download" comment="Button to confirm downloading an item">BAIXAR</string>
+    <!-- Context: Button label -->
+    <string name="label_install" comment="Confirmation to install a package">Instalar</string>
+    <!-- Context: Button label -->
+    <string name="label_later" comment="Do an action at a later time">Mais tarde</string>
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">Próximo</string>
+    <!-- Context: Button label -->
+    <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
+    <!-- Context: Button label -->
+    <string name="label_update" comment="Dialog button to update a resource">Atualizar</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="cannot_connect" comment="Error message when network connection fails">Não foi possível conectar ao servidor Keyman!</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">Gostaria de excluir este teclado?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">Gostaria de baixar a versão mais recente deste teclado?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_update" comment="Confirmation to update several resources">Gostaria de atualizar teclados e dicionários agora?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_channel">Atualizações de Recursos</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">Atualizações de Recursos Disponíveis</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (Atualização Disponível)</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Atualizações disponíveis para o teclado %1$s: %2$s </string>
+    <!-- Context: Keyboard Updates -->
+    <string name="dictionary_update_message">Atualizações disponíveis para o dicionário %1$s: %2$s </string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version" comment="Label for keyboard version">Versão do teclado</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="help_link" comment="Label for help link">Link de ajuda</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">Desinstalar teclado</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_qr_code" comment="QR Code description">      Escaneie este código para carregar este teclado\nem outro dispositivo</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Bem-vindo(a) ao %1$s</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      Biblioteca de FileProvider necessária para ver o arquivo de ajuda: %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Erro fatal de teclado com %1$s:%2$s para %3$s idioma. Carregando o teclado padrão.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Erro no teclado %1$s:%2$s para %3$s idioma.</string>
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">Verificando o download do dicionário associado</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
+    <!-- Context: Model Updates -->
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Gostaria de baixar a versão mais recente deste dicionário?</string>
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">Nenhum dicionário para baixar</string>
+    <!-- Context: Model Updates -->
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">O catálogo de recursos está indisponível</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">Atualização de catálogo iniciada em segundo plano</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">      O catálogo ainda está baixando; por favor, tente novamente em alguns instantes!</string>
+    <!-- Context: Background download messages-->
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">Verificando o recurso</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">Download do teclado iniciado em segundo plano</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">O teclado selecionado já está baixando; por favor, tente novamente daqui a pouco!</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">O download do teclado terminou!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Download do dicionário iniciado em segundo plano</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">O dicionário selecionado já está baixando; por favor, tente novamente mais tarde!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">O download do dicionário terminou.</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">Download falhou</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Falha ao recuperar o arquivo baixado</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Falha ao acessar o servidor!</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_current" comment="Notification that all resources are up to date">"Todos os recursos estão atualizados!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">Um ou mais recursos falharam ao atualizar!</string>
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">Recursos atualizados com sucesso!</string>
+    <!-- Context: Model Info -->
+    <string name="model_version" comment="Title for a dictionary version">Versão do dicionário</string>
+    <!-- Context: Model Info -->
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">Desinstalar dicionário</string>
+    <!-- Context: Model Info -->
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Você gostaria de excluir este dicionário?</string>
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Teclado %1$s instalado</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Habilitar correções</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Habilitar previsões</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_label">Dicionário</string>
+    <plurals name="model_count">
+        <item quantity="one">Dictionary</item>
+        <item quantity="other">Dictionaries</item>
+    </plurals>
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">Verificar dicionário disponível</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_info_header" comment="Dictionary name">Dicionário: %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_picker_header" comment="Dictionaries for a specified language">%1$s dicionários</string>
+    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">Dicionário instalado</string>
+    <!-- Context: Language Settings menu strings -->
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d teclado)</item>
+        <item quantity="other">(%1$d teclados)</item>
+    </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">Idioma padrão</string>
+    <!-- Context: Content descriptions -->
+    <!-- Context: Content descriptions -->
+    <!-- Context: Popup menu labels -->
+    <string name="label_delete" comment="Confirmation to delete an item">Excluir</string>
+    <!-- Context: Shared preferences name -->
+    <!-- Context: Other strings -->
+    <string name="help_bubble_text">Toque aqui para alterar o teclado</string>
+</resources>

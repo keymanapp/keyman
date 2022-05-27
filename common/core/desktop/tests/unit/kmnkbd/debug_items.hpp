@@ -171,7 +171,7 @@ bool debug_items(
   auto act = km_kbp_state_debug_items(state, &n);
 
   for (auto &rhs: expected) {
-    if(--n < 0) {
+    if ((int)--n < 0) {
       std::cout << "expected longer than actual" << std::endl;
       print_debug_item("next expected item:", rhs);
       return false;
