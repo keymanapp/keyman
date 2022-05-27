@@ -272,10 +272,7 @@ namespace com.keyman.text {
             matchBehavior.mergeInDefaults(defaultBehavior);
           }
           matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
-        } else {
-          // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
-          matchBehavior = null;
-        }
+        } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default. 
 
         this.keyboardInterface.activeTargetOutput = null;
       }

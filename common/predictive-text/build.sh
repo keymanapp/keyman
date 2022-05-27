@@ -93,7 +93,8 @@ done
 verify_npm_setup $fetch_deps
 
 if $fetch_deps; then
-  # We need to build lm-worker with a script for now
+  # We need to build keyman-version and lm-worker with a script for now
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
   "$KEYMAN_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
 fi
 

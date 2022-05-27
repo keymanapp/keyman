@@ -20,7 +20,7 @@ using namespace std;
 #define U_1F609_WINKING_FACE u"\U0001F609"
 
 PKMX_WCHAR find_ptr_to_last_character(PKMX_WCHAR p_first) {
-  int length = std::u16string(p_first).length();
+  auto length = std::u16string(p_first).length();
   if (length > 0)
     return p_first + length - 1;
   else

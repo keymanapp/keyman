@@ -304,7 +304,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Yiylo kesɗitine yontere kala e jaajol to www.tavultesoft.com </string>
+  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Yiylo kesɗitine yontere kala e jaajol to keyman.com</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
@@ -796,7 +796,7 @@ Jokku\?</string>
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">Haɓɓere inniraande %1$s ena aafaa kisa.  Aafto ngaafaa hesere ndee ?</string>
+  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">Haɓɓere inniraande %1$s ena aafaa kisa.  Aafto ngaafaa hesere ndee?</string>
   <!-- Parameters: %1$s = Keyboard name -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
@@ -806,7 +806,7 @@ Jokku\?</string>
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
   <!-- String Type: FormatString -->
-  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">Tappirde \'%1$s\' jeyaa ko haɓɓere \'%2$s\'.  Haɓɓere ndee fof ena foti aafteede e kuuɓal.  Jokku ?</string>
+  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">Tappirde \'%1$s\' jeyaa ko haɓɓere \'%2$s\'.  Haɓɓere ndee fof ena foti aafteede e kuuɓal.  Jokku?</string>
   <!-- PArameters: %1$s = BCP 47 code -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 14.0.211 -->
@@ -888,11 +888,11 @@ Jokku\?</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">L\'information de débogage de Keyman sera stockée sur le Bureau dans un fichier texte nommé keymanlog\system.log.  Vous devez quitter Keyman avant de lire ou de supprimer ce fichier.
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">L\'information de débogage de Keyman sera stockée sur le Bureau dans un fichier texte nommé %LOCALAPPDATA%\Keyman\Diag\system#.etl.  Vous devez quitter Keyman avant de lire ou de supprimer ce fichier.
   
   ATTENTION. Ce fichier peut devenir important très rapidement.  Activer le débogage ralentira le sytème et ne doit être fait qu\'à la demande du support Tavultesoft.
   
-  CONFIDENTIALITÉ : Veuillez noter que le fichier journal de débogage enregistre toutes les frappes que vous exécutez.  Vous ne devez activer le journal de débogage que pendant la durée de la session de débogage ou de diagnostic, et vous devez effacer le fichier  [Bureau]\keymanlog\system.log file dès que possible.</string>
+  CONFIDENTIALITÉ: Veuillez noter que le fichier journal de débogage enregistre toutes les frappes que vous exécutez.  Vous ne devez activer le journal de débogage que pendant la durée de la session de débogage ou de diagnostic, et vous devez effacer le fichier  [Bureau]\keymanlog\system.log file dès que possible.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

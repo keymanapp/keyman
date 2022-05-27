@@ -94,6 +94,8 @@ type npm >/dev/null ||\
 
 if (( install_dependencies )) ; then
   verify_npm_setup
+  # We need to build keyman-version and lm-worker with a script for now
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 fi
 
 build || fail "Compilation failed."

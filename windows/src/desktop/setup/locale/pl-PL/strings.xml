@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Polski</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Konfiguracja</string>
+  <string name="ssTitle">Zainstaluj $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION została zainstalowana pomyślnie.</string>
+  <string name="ssCancelQuery">Czy na pewno chcesz anulować instalację $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Rozpakowywanie pakietu...</string>
+  <string name="ssBootstrapCheckingPackages">Sprawdzanie pakietów...</string>
+  <string name="ssBootstrapCheckingForUpdates">Sprawdzanie aktualizacji online...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Sprawdzanie zainstalowanych wersji...</string>
+  <string name="ssBootstrapReady">Kończenie...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s dla %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Nie ma czego zainstalować.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s do pobrania)</string>
+  <string name="ssActionInstall">Konfiguracja zainstaluje:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION jest darmowa i otwartoźródłowa</string>
+  <string name="ssLicenseLink">&amp;Przeczytaj licencję</string>
+  <string name="ssInstallOptionsLink">Zainstaluj &amp;opcje</string>
+  <string name="ssMessageBoxTitle">$APPNAME Konfiguracja</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Zainstaluj</string>
+  <string name="ssCancelButton">Anuluj</string>
+  <string name="ssExitButton">W&amp;yjdź</string>
+  <string name="ssStatusInstalling">Instalowanie $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Usuwanie starszych wersji</string>
+  <string name="ssStatusComplete">Instalacja zakończona</string>
+  <string name="ssQueryRestart">Musisz zrestartować Windows przed zakończeniem instalacji. Po ponownym uruchomieniu systemu konfiguracja będzie kontynuowana.
+
+Zrestartować teraz?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows nie był w stanie automatycznie uruchomić się ponownie. Powinieneś zrestartować Windows zanim spróbujesz i uruchomić $APPNAME.</string>
+  <string name="ssMustRestart">Musisz zrestartować Windows, aby ukończyć konfigurację. Po ponownym uruchomieniu systemu Windows, konfiguracja zostanie zakończona.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION wymaga Windows 7 lub później, aby zainstalować. Wykryto jednak pulpit Keyman 7, 8 lub 9. Czy chcesz zainstalować klawiatury zawarte w tym instalatorze w zainstalowanej wersji desktopowej Keyman?</string>
+  <string name="ssOldOsVersionDownload">Ta wersja $APPNAME wymaga zainstalowania systemu Windows 7 lub nowszego. Czy chcesz pobrać pulpit Keyman 8?</string>
+  <string name="ssOptionsTitle">Opcje instalacji</string>
+  <string name="ssOptionsTitleInstallOptions">Opcje instalacji</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Domyślne ustawienia $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Moduły do instalacji lub aktualizacji</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Powiązany język klawiatury</string>
+  <string name="ssOptionsTitleLocation">Wersja do instalacji</string>
+  <string name="ssOptionsStartWithWindows">Rozpocznij $APPNAME , gdy Windows się uruchomi</string>
+  <string name="ssOptionsStartAfterInstall">Uruchom $APPNAME po zakończeniu instalacji</string>
+  <string name="ssOptionsCheckForUpdates">Okresowo sprawdzaj aktualizacje online</string>
+  <string name="ssOptionsUpgradeKeyboards">Uaktualnij klawiatury zainstalowane ze starszymi wersjami do wersji $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Udostępnij anonimowe statystyki użytkowania dla keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Konfiguracja wersji: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Zainstaluj $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Ulepsz $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s jest już zainstalowany.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Pobierz wersję %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Wersja %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Zainstaluj %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Pobierz wersję %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Wersja %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Wybierz język, który chcesz powiązać z klawiaturą %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Domyślny język</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Pobieranie %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Pobieranie %0:s</string>
+  <string name="ssOffline">$APPNAME Konfiguracja nie mogła połączyć się z keyman.com, aby pobrać dodatkowe zasoby.
+
+Sprawdź, czy jesteś online, i daj $APPNAME uprawnień konfiguracji do dostępu do Internetu w ustawieniach zapory.
+
+Kliknij przycisk Anuluj, aby wyjść z konfiguracji, spróbuj ponownie i pobrać zasoby ponownie, lub ignoruj aby kontynuować tryb offline.</string>
+</resources>

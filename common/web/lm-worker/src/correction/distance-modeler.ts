@@ -8,7 +8,7 @@ namespace correction {
     traversal: LexiconTraversal
   }
 
-  export const QUEUE_NODE_COMPARATOR: any /*models.Comparator<SearchNode>*/ = function(arg1, arg2) { // @ts-ignore
+  export const QUEUE_NODE_COMPARATOR: models.Comparator<SearchNode> = function(arg1, arg2) {
     return arg1.currentCost - arg2.currentCost;
   }
 

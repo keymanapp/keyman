@@ -15,6 +15,8 @@ Windows operating systems:
 
 -   Windows 10
 
+-   Windows 11
+
 -   Windows Server 2012 and 2012 R2
 
 **Note:**

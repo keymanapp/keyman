@@ -6,9 +6,9 @@ namespace com.keyman.osk.embedded {
     private showPreview: (x: number, y: number, width: number, height: number, text: string) => void;
     private clearPreview: () => void;
 
-    constructor(showPreview: typeof KeyTip.prototype.showPreview, 
+    constructor(showPreview: typeof KeyTip.prototype.showPreview,
                 clearPreview: () => void) {
-      
+
       if(showPreview == null || typeof showPreview == 'function') {
         this.showPreview = showPreview;
       }
@@ -32,7 +32,7 @@ namespace com.keyman.osk.embedded {
             break;
           }
         }
-          
+
         if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
           this.showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
         }
