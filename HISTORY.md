@@ -44,6 +44,33 @@
 
 * chore: move to 16.0 (#6318)
 
+## 15.0.252 beta 2022-05-25
+
+* fix(ios): fixes OSK mispositioning bug in iOS 15 (#6631)
+
+## 15.0.251 beta 2022-05-23
+
+* fix(ios): stops leaking memory on system keyboard rotation (#6552)
+* fix(android/engine): Fix sticky long-press keys (#6637)
+
+## 15.0.250 beta 2022-05-20
+
+* feat(android/app): Provide haptic feedback when typing (#6626)
+* fix(ios): disables transparent nav bar for ios 15 (#6633)
+
+## 15.0.249 beta 2022-05-19
+
+* chore(common): improve PR reporting of changes (#6624)
+
+## 15.0.248 beta 2022-05-17
+
+* fix(windows): use GlobalGetAtomName to access global list (#6580)
+
+## 15.0.247 beta 2022-05-16
+
+* chore(common/resources): Update langtags.json (#6594)
+* fix(android/engine): Refresh OSK when changing spacebar text (#6620)
+
 ## 15.0.246 beta 2022-05-11
 
 * chore(ios): Set transparent background on "more" icons (#6598)

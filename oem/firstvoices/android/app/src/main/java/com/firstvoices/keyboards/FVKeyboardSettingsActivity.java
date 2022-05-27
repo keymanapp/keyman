@@ -106,11 +106,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
       }
 
       // If the active keyboard is for this language, immediately enact the new pref setting.
-      Keyboard currentKeyboard = KMManager.getCurrentKeyboardInfo(context);
-      if (currentKeyboard != null && BCP47.languageEquals(currentKeyboard.getLanguageID(), lgCode)) {
-        // Not only registers the model but also applies our modeling preferences.
-        KMManager.registerAssociatedLexicalModel(lgCode);
-      }
+      registerMatchingLexicalModel(lgCode);
     }
   }
 
@@ -307,10 +303,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
         if(immediateRegister) {
           // Register associated lexical model if it matches the active keyboard's language code;
           // it's safe since we're on the same thread.  Needs to be called AFTER deinstalling the old one.
-          String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
-          if(BCP47.languageEquals(kbdLgCode, languageID)) {
-            KMManager.registerAssociatedLexicalModel(languageID);
-          }
+          registerMatchingLexicalModel(languageID);
         }
 
         // Force a display refresh.
@@ -366,6 +359,16 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     CloudDownloadMgr.getInstance().executeAsDownload(
       context, _downloadid, null, _callback,
       aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+  }
+
+  // Register associated lexical model if it matches the active keyboard's language code
+  private void registerMatchingLexicalModel(String languageID) {
+    if (context != null) {
+      Keyboard currentKeyboard = KMManager.getCurrentKeyboardInfo(context);
+      if (currentKeyboard != null && BCP47.languageEquals(currentKeyboard.getLanguageID(), languageID)) {
+        KMManager.registerAssociatedLexicalModel(languageID);
+      }
+    }
   }
 
   @Override
