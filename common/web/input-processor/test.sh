@@ -31,6 +31,7 @@ display_usage ( ) {
 FLAGS=
 CI_REPORTING=0
 FETCH_DEPS=true
+CHAINING_FLAGS=-skip-package-install
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -42,6 +43,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
     -CI)
       CI_REPORTING=1
+      CHAINING_FLAGS="$CHAINING_FLAGS -CI"
       ;;
     -skip-package-install|-S)
       FETCH_DEPS=false
@@ -49,6 +51,10 @@ while [[ $# -gt 0 ]] ; do
   esac
   shift # past argument
 done
+
+if (( CI_REPORTING )); then
+  FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
+fi
 
 if [ $FETCH_DEPS = true ]; then
   verify_npm_setup
@@ -61,10 +67,6 @@ pushd "$KEYMAN_ROOT/developer/js/"
 popd
 
 test-headless ( ) {
-  if (( CI_REPORTING )); then
-    FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
-  fi
-
   npm run mocha -- --recursive $FLAGS ./tests/cases/
 }
 
@@ -77,7 +79,7 @@ fi
 
 # First, run tests on the keyboard processor.
 pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
-./test.sh -skip-package-install || fail "Tests failed by dependencies; aborting integration tests."
+./test.sh "$CHAINING_FLAGS" || fail "Tests failed by dependencies; aborting integration tests."
 popd
 
 # Build the leaf-style, bundled version of input-processor for use in testing.
