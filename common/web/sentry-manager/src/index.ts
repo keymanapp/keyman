@@ -99,13 +99,15 @@ namespace com.keyman {
     // Sanitizes the event object (in-place) to remove sensitive information
     // from the breadcrumbs and url
     sanitizeEvent(event: any) {
-      event.breadcrumbs.forEach((b: any) => {
-        if (b.category == 'navigation') {
-          let NAVIGATION_PATTERN = /(.*)?(keyboard\.html#[^-]+)-.*/;
-          b.data.from = b.data.from.replace(NAVIGATION_PATTERN, '$1$2');
-          b.data.to = b.data.to.replace(NAVIGATION_PATTERN, '$1$2');
-        }
-      });
+      if (event && event.breadcrumbs) {
+        event.breadcrumbs.forEach((b: any) => {
+          if (b.category == 'navigation') {
+            let NAVIGATION_PATTERN = /(.*)?(keyboard\.html#[^-]+)-.*/;
+            b.data.from = b.data.from.replace(NAVIGATION_PATTERN, '$1$2');
+            b.data.to = b.data.to.replace(NAVIGATION_PATTERN, '$1$2');
+          }
+        });
+      }
 
       if (event.request.url) {
         let URL_PATTERN = /#.*$/;

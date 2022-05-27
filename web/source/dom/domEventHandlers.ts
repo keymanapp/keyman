@@ -551,8 +551,8 @@ namespace com.keyman.dom {
       DOMEventHandlers.states.setFocusTimer();
 
       var tEvent: {
-        clientX: number;
-        clientY: number;
+        pageX: number;
+        pageY: number;
         target?: EventTarget;
       };
 
@@ -564,7 +564,7 @@ namespace com.keyman.dom {
           return;
         }
       } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
-        tEvent={clientX:0, clientY:0}
+        tEvent={pageX:0, pageY:0}
 
         // Will usually be called from setActiveElement, which should define DOMEventHandlers.states.lastActiveElement
         if(this.keyman.domManager.lastActiveElement) {
@@ -584,8 +584,8 @@ namespace com.keyman.dom {
     }.bind(this);
 
     // Also handles initial touch responses.
-    setFocusWithTouch(tEvent: {clientX: number, clientY: number, target?: EventTarget}) {
-      var touchX=tEvent.clientX,touchY=tEvent.clientY;
+    setFocusWithTouch(tEvent: {pageX: number, pageY: number, target?: EventTarget}) {
+      var touchX=tEvent.pageX,touchY=tEvent.pageY;
 
       // Some specifics rely upon which child of the TouchAliasElement received the actual event.
       let tTarg=tEvent.target as HTMLElement;
@@ -628,8 +628,8 @@ namespace com.keyman.dom {
       // If clicked on DIV on the main element, rather than any part of the text representation,
       // set caret to end of text
       if(tTarg && tTarg == target) {
-        var x,cp;
-        x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);
+        let cp: number;
+        let x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);
         if(target.dir == 'rtl') {
           x += (scroller.firstChild as HTMLElement).offsetWidth;
           cp=(touchX > x ? 0 : 100000);
@@ -640,70 +640,9 @@ namespace com.keyman.dom {
         target.setTextCaret(cp);
         target.scrollInput();
         // nextSibling - the scrollbar element.
-      } else if(tTarg != scroller.nextSibling) { // Otherwise, if clicked on text in SPAN, set at touch position
-        var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
-        caret=scroller.childNodes[1]; //caret span
-        cpMin=0;
-        cpMax=target.getText()._kmwLength();
-        cp=target.getTextCaret();
-        dy=document.body.scrollTop;
-
-        // Vertical scrolling
-        if(target.base instanceof target.base.ownerDocument.defaultView.HTMLTextAreaElement) {
-          yRow=Math.round(target.base.offsetHeight/(target.base as HTMLTextAreaElement).rows);
-          for(iLoop=0; iLoop<16; iLoop++)
-          {
-            y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret
-            if(y > touchY && cp > cpMin && cp != cpMax) {cpMax=cp; cp=Math.round((cp+cpMin)/2);}
-            else if(y < touchY-yRow && cp < cpMax && cp != cpMin) {cpMin=cp; cp=Math.round((cp+cpMax)/2);}
-            else break;
-            target.setTextCaret(cp);
-          }
-
-          while(dom.Utils.getAbsoluteY(caret)-dy > touchY && cp > cpMin) {
-            target.setTextCaret(--cp);
-          }
-
-          while(dom.Utils.getAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) {
-            target.setTextCaret(++cp);
-          }
-        }
-
-        // Caret repositioning for horizontal scrolling of RTL text
-
-        // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
-        // Think of it as performing a floor() function, but the floor depends on the origin's direction.
-        var snapOrder;
-        if(target.dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
-          snapOrder = function(a, b) {
-            return a < b;
-          };
-        } else {
-          snapOrder = function(a, b) {
-            return a > b;
-          };
-        }
-
-        for(iLoop=0; iLoop<16; iLoop++) {
-          x=dom.Utils.getAbsoluteX(caret);  //left of caret
-          if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
-            cpMax=cp;
-            cp=Math.round((cp+cpMin)/2);
-          } else if(!snapOrder(x, touchX) && cp < cpMax && cp != cpMin) {
-            cpMin=cp;
-            cp=Math.round((cp+cpMax)/2);
-          } else {
-            break;
-          }
-          target.setTextCaret(cp);
-        }
-
-        while(snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp > cpMin) {
-          target.setTextCaret(--cp);
-        }
-        while(!snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp < cpMax) {
-          target.setTextCaret(++cp);
-        }
+      } else if(tTarg != scroller.nextSibling) {
+        // Otherwise, if clicked on text in SPAN, set at touch position
+        target.executeCaretSearch(touchX, touchY);
       }
 
       /*

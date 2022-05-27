@@ -51,8 +51,6 @@ const getAssociatedPRInformation = async (
     return undefined;
   }
 
-  //console.log(JSON.stringify(response));
-
   const {
     repository: {
       commit: {
@@ -60,12 +58,7 @@ const getAssociatedPRInformation = async (
           nodes: [
             {
               associatedPullRequests: {
-                nodes: [
-                  {
-                    title: title,
-                    number: number
-                  }
-                ]
+                nodes: nodes
               }
             }
           ]
@@ -74,7 +67,8 @@ const getAssociatedPRInformation = async (
     }
   } = response;
 
-  return { title, number };
+  const node = nodes.find(node => node.state == 'MERGED');
+  return node ? { title: node.title, number: node.number } : undefined;
 };
 
 /**

@@ -31,8 +31,8 @@
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
  */
-type PostMessage = any; //typeof DedicatedWorkerGlobalScope.prototype.postMessage; // @ts-ignore
-type ImportScripts = any; //typeof DedicatedWorkerGlobalScope.prototype.importScripts; // @ts-ignore
+type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 
 
 /**
