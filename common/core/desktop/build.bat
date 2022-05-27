@@ -103,8 +103,9 @@ rem ----------------------------------
 
 rem Standalone build, so we'll make the environment available to the caller
 rem Also setup
+rem Note: Visual Studio 2022 doesn't provide vcvarsall.bat, so we'll have to find a different solution
 endlocal
-for /f "usebackq tokens=*" %%i in (`..\..\..\resources\build\vswhere -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
+for /f "usebackq tokens=*" %%i in (`..\..\..\resources\build\vswhere -version [15^,17^) -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
   set VCVARSALL="%%i"
 )
 %VCVARSALL% %1

@@ -29,6 +29,12 @@ sentryManager.init();
 window.addEventListener('load', init, false);
 
 function init() {
+    // As of iOS 15, Safari WebViews will try to avoid letting us use the "safe area"
+    // at the bottom of iPhone X style devices.  While `-webkit-fill-available` will partly
+    // counteract this... it's only a "partly".  Fortunately, we can manually force the
+    // page to our desired size.
+    document.body.style.height = window.outerHeight;
+
     var kmw=window['keyman'];
     // We could convert to relying on the promise, but the underlying input element
     // tends to show a bit due to the delay when we do so.

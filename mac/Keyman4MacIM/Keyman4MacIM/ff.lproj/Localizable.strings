@@ -1,0 +1,68 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "Aɗa yenanaa yiɗde momtude tappirde '%@' ndee?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "Ngal baɗal waawaa firteede.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "Haaytu";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "Momtu";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "Aaf tappirde Keyman?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "Aɗa yiɗi yoo Keyman aaf tappirde wonnde e fiilde '%@'?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "Haaytu";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "Aaf";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "Horiima tarde fiilde Keyman '%@'.";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(juumre tuma loowgol tappirde)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "anndaaka";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "OK";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Yamre %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Nana aawtoo...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Aawtagol timmii.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Haaytu";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Gasii";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Tappirɗe:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Ponte:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Yamre Haɓɓere:";
+
+/* author label in the Package Information window */
+"author-label" = "Topaajo:";
+
+/* website label in the Package Information window */
+"website-label" = "Lowre Geese:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Copyright:";

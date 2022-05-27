@@ -38,6 +38,8 @@ class KeymanWebViewController: UIViewController {
   let storage: Storage
   weak var delegate: KeymanWebDelegate?
   private var useSpecialFont = false
+  private var userContentController = WKUserContentController()
+  private let keymanWebViewName: String = "keyman"
 
   // Views
   var webView: KeymanWebView?
@@ -120,11 +122,8 @@ class KeymanWebViewController: UIViewController {
     prefs.javaScriptEnabled = true
     config.preferences = prefs
     config.suppressesIncrementalRendering = false
-
-    let userContentController = WKUserContentController()
-    userContentController.add(self, name: "keyman")
-    config.userContentController = userContentController
-
+    config.userContentController = self.userContentController
+    
     webView = KeymanWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
     webView!.isOpaque = false
     webView!.translatesAutoresizingMaskIntoConstraints = false
@@ -150,6 +149,7 @@ class KeymanWebViewController: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    self.userContentController.add(self, name: keymanWebViewName)
   }
   
   // Very useful for immediately adjusting the WebView's properties upon loading.
@@ -159,6 +159,10 @@ class KeymanWebViewController: UIViewController {
     // Initialize the keyboard's size/scale.  In iOS 13 (at least), the system
     // keyboard's width will be set at this stage, but not in viewWillAppear.
     keyboardSize = view.bounds.size
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    self.userContentController.removeScriptMessageHandler(forName: keymanWebViewName)
   }
 }
 

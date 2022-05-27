@@ -141,6 +141,9 @@ function setKeymanLanguage(k) {
 function setSpacebarText(mode) {
   keyman.options['spacebarText'] = mode;
   keyman.osk.show(true);
+
+  // Refresh KMW OSK
+  keyman.correctOSKTextSize();
 }
 
 /**
@@ -238,7 +241,18 @@ function updateKMSelectionRange(start, end) {
   }
 }
 
+var lastKeyTip = null;
 function oskCreateKeyPreview(x,y,w,h,t) {
+  if(lastKeyTip &&
+      lastKeyTip.t == t &&
+      lastKeyTip.x == x &&
+      lastKeyTip.y == y &&
+      lastKeyTip.w == w &&
+      lastKeyTip.h == h) {
+    return;
+    }
+  lastKeyTip = {x:x,y:y,w:w,h:h,t:t};
+
   fragmentToggle = (fragmentToggle + 1) % 100;
   var div = document.createElement('div');
   div.innerHTML = t;
@@ -247,6 +261,7 @@ function oskCreateKeyPreview(x,y,w,h,t) {
 }
 
 function oskClearKeyPreview() {
+  lastKeyTip = null;
   fragmentToggle = (fragmentToggle + 1) % 100;
   window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
 }

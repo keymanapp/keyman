@@ -29,6 +29,7 @@ import com.android.installreferrer.api.InstallReferrerStateListener;
 import com.android.installreferrer.api.ReferrerDetails;
 import com.tavultesoft.kmapro.MainActivity;
 import com.tavultesoft.kmapro.R;
+import com.tavultesoft.kmea.KmpInstallMode;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 
@@ -78,6 +79,9 @@ public class CheckInstallReferrer {
           case InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE:
             // Connection couldn't be established; log to Sentry
             KMLog.LogError(TAG, "onInstallReferrerSetupFinished:SERVICE_UNAVAILABLE");
+            break;
+          case InstallReferrerClient.InstallReferrerResponse.PERMISSION_ERROR:
+            KMLog.LogError(TAG, "onInstallReferrerSetupFinished.PERMISSION_ERROR");
             break;
           default:
             // There are some other error codes; log to Sentry

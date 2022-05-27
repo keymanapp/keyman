@@ -40,6 +40,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -206,6 +207,9 @@ public final class KMManager {
   protected static String currentBanner = KM_BANNER_STATE_BLANK;
 
 
+  // Special override for when the keyboard may have haptic feedback when typing
+  private static boolean mayHaveHapticFeedback = false;
+
   // Special override for when keyboard is entering a password text field.
   // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
   // regardless what the Settings preference is.
@@ -235,6 +239,7 @@ public final class KMManager {
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
   public static final String KMKey_FontFamily = "family";
+  public static final String KMKey_KMPInstall_Mode = "kmpInstallMode";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
@@ -1207,6 +1212,20 @@ public final class KMManager {
   }
 
   /**
+   * If the override is true, vibrate when user types on the Keyman keyboard
+   * @param override - boolean
+   */
+  public static void setHapticFeedback(boolean override) {
+    mayHaveHapticFeedback = override;
+  }
+
+  /**
+   * Get the value of mayHaveHapticFeedback. Default is false
+   * @return boolean
+   */
+  public static boolean getHapticFeedback() { return mayHaveHapticFeedback; };
+
+  /**
    * If override is true, embedded KMW crash reports are allowed to be sent to sentry.keyman.com
    * @param override - boolean
    */
@@ -1492,7 +1511,9 @@ public final class KMManager {
       result2 = SystemKeyboard.setKeyboard(keyboardInfo);
 
     if (keyboardInfo != null) {
-      registerAssociatedLexicalModel(keyboardInfo.getLanguageID());
+      String languageID = keyboardInfo.getLanguageID();
+      toggleSuggestionBanner(languageID, result1, result2);
+      registerAssociatedLexicalModel(languageID);
     }
 
     return (result1 || result2);
@@ -1521,19 +1542,7 @@ public final class KMManager {
       result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
     }
 
-    if(result1 || result2)
-    {
-      //reset banner state if new language has no lexical model
-      if(currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
-        && getAssociatedLexicalModel(languageID)==null)
-        currentBanner = KMManager.KM_BANNER_STATE_BLANK;
-
-      if(result1)
-        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
-      if(result2)
-        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
-    }
-
+    toggleSuggestionBanner(languageID, result1, result2);
     registerAssociatedLexicalModel(languageID);
 
     return (result1 || result2);
@@ -2124,6 +2133,21 @@ public final class KMManager {
 
   public static void setGlobeKeyState(GlobeKeyState state) {
     globeKeyState = state;
+  }
+
+  private static void toggleSuggestionBanner(String languageID, boolean inappKeyboardChanged, boolean systemKeyboardChanged) {
+    //reset banner state if new language has no lexical model
+    if (currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
+      && getAssociatedLexicalModel(languageID)==null) {
+      currentBanner = KMManager.KM_BANNER_STATE_BLANK;
+    }
+
+    if(inappKeyboardChanged) {
+      InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
+    if(systemKeyboardChanged) {
+      SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
   }
 
   /**
@@ -2791,6 +2815,9 @@ public final class KMManager {
           // Collapse the selection
           textView.setSelection(start + s.length());
           textView.endBatchEdit();
+          if (mayHaveHapticFeedback) {
+            textView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+          }
         }
       });
     }
@@ -2932,6 +2959,10 @@ public final class KMManager {
           }
 
           ic.endBatchEdit();
+          ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();
+          if (parent != null && mayHaveHapticFeedback) {
+            parent.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+          }
         }
       });
     }

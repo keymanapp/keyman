@@ -151,4 +151,6 @@
   <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Keyboard package aɗika hulfur mnyayeri natǝ kǝ kǝɓa kari natǝ mda ata hara instal wa</string>
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Metadata aɗi kalkal wa/ku sha akwa package</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    Keyboard requires a newer version of Keyman</string>
 </resources>

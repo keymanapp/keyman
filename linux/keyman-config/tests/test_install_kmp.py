@@ -1,8 +1,11 @@
 #!/usr/bin/python3
+import os
+import tempfile
 import unittest
 from unittest.mock import patch, ANY
-
-from keyman_config.install_kmp import InstallKmp
+from keyman_config import __version__
+from keyman_config.get_kmp import InstallLocation
+from keyman_config.install_kmp import InstallError, InstallKmp
 
 
 class InstallKmpTests(unittest.TestCase):
@@ -20,6 +23,23 @@ class InstallKmpTests(unittest.TestCase):
         patcher4 = patch('keyman_config.install_kmp.GnomeKeyboardsUtil')
         self.mockGnomeKeyboardsUtilClass = patcher4.start()
         self.addCleanup(patcher4.stop)
+        patcher5 = patch('keyman_config.install_kmp.get_keyboard_dir')
+        self.mockGetKeyboardDir = patcher5.start()
+        self.addCleanup(patcher5.stop)
+        patcher6 = patch('keyman_config.install_kmp.extract_kmp')
+        self.mockExtractKmp = patcher6.start()
+        self.addCleanup(patcher6.stop)
+        patcher7 = patch('keyman_config.install_kmp.extractico')
+        self.mockExtractIco = patcher7.start()
+        self.addCleanup(patcher7.stop)
+        patcher8 = patch('keyman_config.install_kmp.is_gnome_shell')
+        self.mockIsGnomeShell = patcher8.start()
+        self.addCleanup(patcher8.stop)
+        self.mockIsGnomeShell.return_value = False
+        patcher9 = patch('keyman_config.install_kmp.is_fcitx_running')
+        self.mockIsFcitxRunning = patcher9.start()
+        self.addCleanup(patcher9.stop)
+        self.mockIsFcitxRunning.return_value = False
 
     def test_InstallKeyboardsToIbus_NoIbus(self):
         # Setup
@@ -182,7 +202,7 @@ class InstallKmpTests(unittest.TestCase):
             {'id': 'dyo'}
         ]
 
-        for data in [
+        for testcase in [
             {'given': 'de', 'expected': 'de'},
             {'given': 'esi', 'expected': 'esi-Latn'},
             {'given': 'esi-Latn', 'expected': 'esi-Latn'},
@@ -193,12 +213,12 @@ class InstallKmpTests(unittest.TestCase):
             {'given': 'dyo-latn', 'expected': 'dyo-Latn'},
             {'given': 'dyo', 'expected': 'dyo-Latn'},
         ]:
-            with self.subTest(data = data):
+            with self.subTest(data=testcase):
                 # Execute
-                result = InstallKmp()._normalize_language(languages, data['given'])
+                result = InstallKmp()._normalize_language(languages, testcase['given'])
 
                 # Verify
-                self.assertEqual(result, data['expected'])
+                self.assertEqual(result, testcase['expected'])
 
     def test_normalizeLanguage_noLanguages(self):
         # Setup
@@ -209,6 +229,77 @@ class InstallKmpTests(unittest.TestCase):
 
         # Verify
         self.assertEqual(result, '')
+
+    def _createEmptyKmp(self, workdir):
+        kmpfile = os.path.join(workdir, 'foo.kmp')
+        with open(kmpfile, 'w') as file:
+            file.write('')
+        return kmpfile
+
+    def _createKmpJson(self, packagedir, fileVersionString):
+        with open(os.path.join(packagedir, 'kmp.json'), 'w') as file:
+            file.write('''{
+                "system": {
+                    "keymanDeveloperVersion": "15.0"
+                    ''' + fileVersionString + '''
+                },
+                "files": [ {
+                    "name": "khmer_angkor.kmx",
+                    "description": "Keyboard Khmer Angkor"
+                    }, {
+                    "name": "kmp.json",
+                    "description": "Package information (JSON)"
+                    } ],
+                "keyboards": [ {
+                    "name": "Khmer Angkor",
+                    "id": "khmer_angkor",
+                    "version": "1.1",
+                    "languages": [ {
+                        "name": "Central Khmer (Khmer, Cambodia)",
+                        "id": "km"
+                        } ]}
+                ]}''')
+
+    def test_InstallKmp_FutureKeymanVersion(self):
+        # Setup
+        workdir = tempfile.TemporaryDirectory().name
+        os.makedirs(workdir)
+        packagedir = tempfile.TemporaryDirectory().name
+        os.makedirs(packagedir)
+        self.mockGetKeyboardDir.return_value = packagedir
+        kmpfile = self._createEmptyKmp(workdir)
+        self._createKmpJson(packagedir, ', "fileVersion": "99.0"')
+
+        # Execute
+        with self.assertRaises(InstallError) as context:
+            InstallKmp()._install_kmp(kmpfile, False, 'km', InstallLocation.User)
+
+        # Verify
+        self.assertTrue('foo.kmp requires Keyman 99.0 or higher' in context.exception.message)
+        self.mockInstallToIbus.assert_not_called()
+
+    def test_InstallKmp(self):
+        for testcase in [
+            {'name': 'PreviousKeymanVersion', 'fileVersion': ', "fileVersion": "7.0"'},
+            {'name': 'SameKeymanVersion', 'fileVersion': ', "fileVersion": "' + __version__ + '"'},
+            {'name': 'NoFileVersion', 'fileVersion': ''}
+        ]:
+            with self.subTest(msg=testcase['name'], data=testcase['fileVersion']):
+                # Setup
+                self.mockInstallToIbus.reset_mock()
+                workdir = tempfile.TemporaryDirectory().name
+                os.makedirs(workdir)
+                packagedir = tempfile.TemporaryDirectory().name
+                os.makedirs(packagedir)
+                self.mockGetKeyboardDir.return_value = packagedir
+                kmpfile = self._createEmptyKmp(workdir)
+                self._createKmpJson(packagedir, testcase['fileVersion'])
+
+                # Execute
+                InstallKmp()._install_kmp(kmpfile, False, 'km', InstallLocation.User)
+
+                # Verify
+                self.mockInstallToIbus.assert_called_once()
 
 
 if __name__ == '__main__':

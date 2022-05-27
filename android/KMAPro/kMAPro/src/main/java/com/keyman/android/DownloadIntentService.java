@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 
+import com.tavultesoft.kmea.KmpInstallMode;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 
@@ -22,8 +23,7 @@ public class DownloadIntentService extends IntentService {
     String filename = intent.getStringExtra("filename");
     String destination = intent.getStringExtra("destination");
     String languageID = intent.getStringExtra("language");
-    KmpInstallMode installMode = (KmpInstallMode) intent.getSerializableExtra("installMode");
-    if(installMode == null) installMode = KmpInstallMode.Full;
+    KmpInstallMode installMode = KmpInstallMode.fromString(intent.getStringExtra("installMode"));
     final ResultReceiver receiver = intent.getParcelableExtra("receiver");
     Bundle bundle = new Bundle();
 
@@ -34,7 +34,7 @@ public class DownloadIntentService extends IntentService {
           bundle.putString("filename", filename);
           bundle.putString("destination", destination);
           bundle.putString("language", languageID);
-          bundle.putSerializable("installMode", installMode);
+          bundle.putString("installMode", installMode.toString());
           receiver.send(FileUtils.DOWNLOAD_SUCCESS, bundle);
         } else {
           receiver.send(FileUtils.DOWNLOAD_CANCELLED, bundle);

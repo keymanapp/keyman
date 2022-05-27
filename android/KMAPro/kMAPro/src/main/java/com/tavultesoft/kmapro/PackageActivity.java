@@ -16,11 +16,11 @@ import android.view.View;
 
 import android.widget.Toast;
 
-import com.keyman.android.KmpInstallMode;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
+import com.tavultesoft.kmea.KmpInstallMode;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
@@ -47,10 +47,6 @@ public class PackageActivity extends AppCompatActivity implements
   private StepperLayout mStepperLayout;
   private StepperAdapter mStepperAdapter;
 
-  // Due to the disconnection between the package install and the welcome
-  // display, this flag currently has to be globally accessible.
-  public static KmpInstallMode lastInstallMode = KmpInstallMode.Full;
-
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -70,9 +66,7 @@ public class PackageActivity extends AppCompatActivity implements
         showErrorToast(context, getString(R.string.failed_to_extract));
         return;
       }
-      installMode = (KmpInstallMode) bundle.getSerializable("installMode");
-      if(installMode == null) installMode = KmpInstallMode.Full;
-      lastInstallMode = installMode;
+      installMode = KmpInstallMode.fromString(bundle.getString("installMode"));
       languageID = bundle.getString("language", null);
       if (languageID != null && !languageID.isEmpty()) {
         languageList.add(languageID);
