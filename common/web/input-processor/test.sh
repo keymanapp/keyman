@@ -69,16 +69,16 @@ test-headless ( ) {
 }
 
 if [ $FETCH_DEPS = true ]; then
-  # First, run tests on the keyboard processor.
-  pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
-  ./test.sh -skip-package-install || fail "Tests failed by dependencies; aborting integration tests."
-  popd
-
   # Next, build the lm-worker in its proper, wrapped form
   pushd "$KEYMAN_ROOT/common/web/lm-worker"
   ./build.sh
   popd
 fi
+
+# First, run tests on the keyboard processor.
+pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
+./test.sh -skip-package-install || fail "Tests failed by dependencies; aborting integration tests."
+popd
 
 # Build the leaf-style, bundled version of input-processor for use in testing.
 npm run tsc -- -b src/tsconfig.bundled.json || fail "Failed to compile the core/web/input-processor module."
