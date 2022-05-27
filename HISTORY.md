@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.253 beta 2022-05-27
+
+* chore(ios): FV certificate hash (#6673)
+
 ## 15.0.252 beta 2022-05-25
 
 * fix(ios): fixes OSK mispositioning bug in iOS 15 (#6631)
