@@ -79,7 +79,7 @@ fi
 
 # First, run tests on the keyboard processor.
 pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
-./test.sh "$CHAINING_FLAGS" || fail "Tests failed by dependencies; aborting integration tests."
+./test.sh $CHAINING_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 popd
 
 # Build the leaf-style, bundled version of input-processor for use in testing.
