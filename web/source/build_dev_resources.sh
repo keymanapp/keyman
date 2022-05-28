@@ -25,4 +25,5 @@ if [ $? -ne 0 ]; then
     fail "Typescript compilation failed for 'dev_resources'."
 fi
 
-cp ../release/dev_resources/dev_resources.js "$ENGINE_TEST_OUTPUT/dev_resources.js.map"
+cp ../release/dev_resources/dev_resources.js "$ENGINE_TEST_OUTPUT/dev_resources.js"
+cp ../release/dev_resources/dev_resources.js.map "$ENGINE_TEST_OUTPUT/dev_resources.js.map"
