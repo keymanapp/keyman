@@ -7,6 +7,7 @@ import * as program from 'commander';
 import * as fs from 'fs';
 import KmpCompiler from './package-compiler/kmp-compiler';
 import { SysExits } from './util/sysexits';
+const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
 
 let inputFilename: string;
 

@@ -3,7 +3,7 @@ import { defaultApplyCasing,
          defaultSearchTermToKey
        } from "./model-defaults";
 
-const KEYMAN_VERSION = require("@keymanapp/keyman-version");
+const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
 
 /**
  * Processes certain defined model behaviors in such a way that the needed closures

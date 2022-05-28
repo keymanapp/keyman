@@ -12,7 +12,7 @@ import { SysExits } from './util/sysexits';
 
 let inputFilename: string;
 
-/// <reference types="@keymanapp/keyman-version" />
+const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
 
 /* Arguments */
 program
