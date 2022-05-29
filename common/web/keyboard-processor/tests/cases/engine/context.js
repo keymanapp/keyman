@@ -2,12 +2,12 @@ var assert = require('chai').assert;
 let fs = require('fs');
 let vm = require('vm');
 
-let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
-global.keyman = {};
-global.com = com;
+let KeyboardProcessor = require('../../../build/index.bundled.js');
 
-// Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);
+// Required initialization setup.
+global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+
+let KMWRecorder = require('../../../../recorder/build/nodeProctor');
 
 /*
  * ABOUT THIS TEST SUITE
@@ -68,8 +68,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       ruleSeq.test(proctor, target);
 
       // Now for the real test!
-      let processor = new KeyboardProcessor();
-      processor.device = device;
+      let processor = new KeyboardProcessor(device);
       processor.activeKeyboard = keyboard;
       var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, target, ruleDef.rule);
 
@@ -983,7 +982,7 @@ var NOTANY_NUL_RULE_SET = [ NOTANY_NUL_TEST_1, NOTANY_NUL_TEST_2, NOTANY_NUL_TES
 
 describe('Engine - Context Matching', function() {
   before(function() {
-    let kp = new KeyboardProcessor();
+    let kp = new KeyboardProcessor(device);
 
     // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
     // automatically set the keyboard as active.
@@ -1008,8 +1007,7 @@ describe('Engine - Context Matching', function() {
       ruleSeq.test(proctor, target);
 
       // Now for the real test!
-      let processor = new KeyboardProcessor();
-      processor.device = device;
+      let processor = new KeyboardProcessor(device);
       processor.activeKeyboard = keyboard;
       var res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, target);
 

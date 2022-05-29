@@ -2,11 +2,11 @@ var assert = require('chai').assert;
 let fs = require('fs');
 let vm = require('vm');
 
-let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
-global.keyman = {};
+let KeyboardProcessor = require('../../build/index.bundled.js');
+let KMWRecorder = require('../../../recorder/build/nodeProctor');
 
-// Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);
+// Required initialization setup.
+global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 
 describe('Engine - Chirality', function() {
   let testJSONtext = fs.readFileSync('../../test/resources/json/engine_tests/chirality.json');

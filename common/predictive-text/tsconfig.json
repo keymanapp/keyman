@@ -23,5 +23,11 @@
     "web-defaultWorker.ts",
     "node_modules",
     "testing"
+  ],
+  "files": [
+    // By renaming the output JS as TS, and including the @ts-nocheck directive, we can
+    // bypass wrapped-worker typing issues while still bundling the file as part of the
+    // tsc build!
+    "../web/lm-worker/build/index.wrapped-for-bundle.ts"
   ]
 }

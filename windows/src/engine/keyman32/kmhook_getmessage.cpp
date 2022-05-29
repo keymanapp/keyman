@@ -430,7 +430,7 @@ ProcessWMKeymanControl(WPARAM wParam, LPARAM lParam) {
       }
       WORD wAtom = HIWORD(lParam);
       char atomStr[128];
-      if (GetAtomName(wAtom, atomStr, 128)) {
+      if (GlobalGetAtomName(wAtom, atomStr, 128)) {
         isKeymanKeyboardActive = strstr(atomStr, cs_clsidKMTipTextService) != nullptr;
       }
       break;

@@ -89,7 +89,7 @@ bool action_items(
   auto act = km_kbp_state_action_items(state, &n);
 
   for (auto &rhs: expected) {
-    if(--n < 0) {
+    if ((int)--n < 0) {
       std::cout << "expected longer than actual" << std::endl;
       print_action_item("next expected item:", rhs);
       return false;

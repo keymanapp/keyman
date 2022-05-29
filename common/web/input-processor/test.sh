@@ -55,39 +55,17 @@ if [ $FETCH_DEPS = true ]; then
 fi
 
 # Ensures that the lexical model compiler has been built locally.
-#echo_heading "Preparing Lexical Model Compiler for test use"
-#pushd $WORKING_DIRECTORY/node_modules/@keymanapp/lexical-model-compiler
-#npm run build
-#popd
+echo_heading "Preparing Lexical Model Compiler for test use"
+pushd "$KEYMAN_ROOT/developer/js/"
+./build.sh
+popd
 
 test-headless ( ) {
   if (( CI_REPORTING )); then
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  # TODO: Poor Man's Modules until we support ES6 throughout
-
-  PREPEND=./tests/cases/prepend.js
-  (cat ../web-environment/build/index.js; echo) > $PREPEND
-  (cat ../utils/build/index.js; echo) >> $PREPEND
-  (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
-  (cat ../input-processor/build/index.js; echo) >> $PREPEND
-  (cat tests/cases/inputProcessor.js; echo) >> $PREPEND
-
-  npm run mocha -- --recursive $FLAGS ./tests/cases/prepend.js
-
-  PREPEND=./tests/cases/prepend.js
-  (cat ../web-environment/build/index.js; echo) > $PREPEND
-  (cat ../../predictive-text/build/headless.js; echo) >> $PREPEND
-  (cat ../utils/build/index.js; echo) >> $PREPEND
-  (cat ../keyboard-processor/build/index.js; echo) >> $PREPEND
-  (cat ../input-processor/build/index.js; echo) >> $PREPEND
-  (cat ../lm-worker/build/index.js; echo) >> $PREPEND
-  (cat tests/cases/languageProcessor.js; echo) >> $PREPEND
-
-  npm run mocha -- --recursive $FLAGS ./tests/cases/prepend.js
-
-  rm $PREPEND
+  npm run mocha -- --recursive $FLAGS ./tests/cases/
 }
 
 if [ $FETCH_DEPS = true ]; then
@@ -95,7 +73,15 @@ if [ $FETCH_DEPS = true ]; then
   pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
   ./test.sh -skip-package-install || fail "Tests failed by dependencies; aborting integration tests."
   popd
+
+  # Next, build the lm-worker in its proper, wrapped form
+  pushd "$KEYMAN_ROOT/common/web/lm-worker"
+  ./build.sh
+  popd
 fi
+
+# Build the leaf-style, bundled version of input-processor for use in testing.
+npm run tsc -- -b src/tsconfig.bundled.json || fail "Failed to compile the core/web/input-processor module."
 
 # Now we run our local tests.
 echo_heading "Running Input Processor test suite"

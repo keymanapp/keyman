@@ -4,7 +4,7 @@
 namespace com.keyman.utils {
   // Dotted-decimal version
   export class Version {
-    public static readonly CURRENT = new Version(com.keyman.environment.VERSION);
+    public static readonly CURRENT = new Version(com.keyman.KEYMAN_VERSION.VERSION_RELEASE);
 
     // Represents a default version value for keyboards compiled before this was compiled into keyboards.
     // The exact version is unknown at this point, but the value is "good enough" for what we need.

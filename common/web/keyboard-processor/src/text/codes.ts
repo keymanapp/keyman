@@ -74,6 +74,27 @@ namespace com.keyman.text {
     codesUS: [
       ['0123456789',';=,-./`', '[\\]\''],
       [')!@#$%^&*(',':+<_>?~', '{|}"']
-    ]
+    ],
+
+    isKnownOSKModifierKey(keyID: string): boolean {
+      switch(keyID) {
+        case 'K_SHIFT':
+        case 'K_LOPT':
+        case 'K_ROPT':
+        case 'K_NUMLOCK': // Often used for numeric layers.
+        case 'K_CAPS':
+          return true;
+        default:
+          // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
+          // layer shifting keys.  To be safe, we currently let K_TABBACK and
+          // K_TABFWD through, though we might be able to drop them too.
+          let code = com.keyman.text.Codes[keyID];
+          if(code > 50000 && code < 50011) {
+            return true;
+          }
+      }
+
+      return false;
+    }
   }
 }

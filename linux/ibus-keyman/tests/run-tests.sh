@@ -5,7 +5,7 @@ BASEDIR=$(realpath $(dirname $0))
 TESTDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman/test_kmx
 PID_FILE=/tmp/ibus-keyman-test-pids
 
-if [ -v DEB_BUILD_MULTIARCH ]; then
+if [ -v KEYMAN_PKG_BUILD ]; then
   # During package builds we skip these tests that require to start ibus because
   # ibus requires to find /var/lib/dbus/machine-id or /etc/machine-id, otherwise it fails with:
   # "Bail out! IBUS-FATAL-WARNING: Unable to load /var/lib/dbus/machine-id: Failed to open file

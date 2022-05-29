@@ -29,6 +29,5 @@
     { "path": "./common/web/lm-message-types/" },
     { "path": "./common/web/lm-worker/" },
     { "path": "./common/web/keyman-version/" },
-    { "path": "./common/web/web-environment/tsconfig.json" },
   ]
 }

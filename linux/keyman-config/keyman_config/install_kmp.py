@@ -6,8 +6,9 @@ import os
 import zipfile
 from shutil import rmtree
 from enum import Enum
+from distutils.version import StrictVersion
 
-from keyman_config import _, secure_lookup
+from keyman_config import _, __version__, secure_lookup
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
 from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
 from keyman_config.get_kmp import get_keyboard_data, get_keyboard_dir, get_keyman_doc_dir
@@ -116,8 +117,19 @@ class InstallKmp():
         else:
             restart_ibus()
 
-        info, _, _, keyboards, files = get_metadata(self.packageDir)
+        info, system, options, keyboards, files = get_metadata(self.packageDir)
 
+        if system:
+            fileVersion = secure_lookup(system, 'fileVersion')
+            if not fileVersion:
+                fileVersion = '7.0'
+            if StrictVersion(fileVersion) > StrictVersion(__version__):
+                logging.error("install_kmp.py: error: %s requires a newer version of Keyman (%s)",
+                              inputfile, fileVersion)
+                rmtree(self.packageDir)
+                message = _("{packageFile} requires Keyman {keymanVersion} or higher").format(
+                    packageFile=inputfile, keymanVersion=fileVersion)
+                raise InstallError(InstallStatus.Abort, message)
         if keyboards:
             logging.info("Installing %s", secure_lookup(info, 'name', 'description'))
             if online:

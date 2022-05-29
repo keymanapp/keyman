@@ -159,12 +159,12 @@ namespace com.keyman {
       this.osk = this['osk'] = null;
 
       // Load properties from their static variants.
-      this['build'] = com.keyman.environment.BUILD;
+      this['build'] = Number.parseInt(com.keyman.KEYMAN_VERSION.VERSION_PATCH, 10);
       this.srcPath = KeymanBase._srcPath;
       this.rootPath = KeymanBase._rootPath;
       this.protocol = KeymanBase._protocol;
 
-      this['version'] = com.keyman.environment.VERSION;
+      this['version'] = com.keyman.KEYMAN_VERSION.VERSION_RELEASE;
       this['helpURL'] = 'http://help.keyman.com/go';
       this.setInitialized(0);
 

@@ -383,7 +383,7 @@ class LMLayerWorker {
    *
    * @param scope A global scope to install upon.
    */
-  static install(scope: any /* DedicatedWorkerGlobalScope */): LMLayerWorker {  // @ts-ignore
+  static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
     let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
     worker.self = scope;

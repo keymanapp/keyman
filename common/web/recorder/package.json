@@ -18,7 +18,7 @@
   "dependencies": {
     "@keymanapp/keyboard-processor": "*",
     "@keymanapp/models-types": "*",
-    "@keymanapp/web-environment": "*",
+    "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4"
   },

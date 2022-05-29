@@ -74,7 +74,7 @@ module.exports = function(config) {
 
   var CURRENT_WIN_LAUNCHERS = {
     // Currently, Firefox launcher is unstable; see https://github.com/karma-runner/karma-firefox-launcher/issues/93
-    // (in particular "not maintained" commentary). 
+    // (in particular "not maintained" commentary).
     //bs_firefox_win: {
     //  os: 'Windows',
     //  os_version: '10',

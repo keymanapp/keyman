@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Hollu tappirde yaynirde sahaa kala";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Huutoro tonnginagol Ginorde njuutnuka";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Wallitorde";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Aawto Tappirde...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Teeltagol Keyman";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Rutto";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Tappirɗe";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "So tonnginagol njuuñukka ena hurmi, maa Keyman tonngino baɗe baawɗe wallitde Wallirorde Keyman yiytuse caɗeele. Yuɓɓo Ginorde ndee ena waawi huutoreede ngam yiyde tonnginagol ɓatakuuje Keyman. E Ginorde ndee, seɗtu ngam hollude ɓatakuuje iwɗe e silsil Keyman ɗee fof. Ngol tonnginagol ena waawi jiggiteede kadi neldee to wallitorde Keyman so sokkaama.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Yeeso";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Jaɓɓorgo";
+
+/* Options button text */
+"frd-No-seV.label" = "Cuɓe";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Tappirde Aafaande";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Huɓɓu ɗuum so aɗa jogii caɗeele e tappirde heeriinde walla e Keyman jaati.";

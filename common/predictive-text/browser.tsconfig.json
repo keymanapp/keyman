@@ -25,5 +25,8 @@
     "worker-interface.d.ts",
     "node_modules",
     "testing"
+  ],
+  "files": [
+    "../web/lm-worker/build/index.wrapped-for-bundle.ts"
   ]
 }

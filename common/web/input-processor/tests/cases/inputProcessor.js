@@ -2,11 +2,12 @@ var assert = require('chai').assert;
 var fs = require("fs");
 var vm = require("vm");
 
+let InputProcessor = require('../../build/index.bundled.js');
+
 // Required initialization setup.
+global.com = InputProcessor.com; // exports all keyboard-processor namespacing.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
-
-let InputProcessor = com.keyman.text.InputProcessor;
 
 let device = {
   formFactor: 'phone',
@@ -54,7 +55,7 @@ describe('InputProcessor', function() {
     var keyboard;
 
     // Easy peasy long context:  use the input processor's full source!
-    let coreSourceCode = fs.readFileSync('build/index.js', 'utf-8');
+    let coreSourceCode = fs.readFileSync('build/index.bundled.js', 'utf-8');
 
     // At the time this test block was written...  810485 chars.
     // Let's force it to the same order of magnitude, even if the codebase grows.

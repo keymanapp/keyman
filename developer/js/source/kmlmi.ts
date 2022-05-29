@@ -9,6 +9,7 @@ import * as path from 'path';
 import KmpCompiler from './package-compiler/kmp-compiler';
 import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from './model-info-compiler/model-info-compiler';
 import { SysExits } from './util/sysexits';
+const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
 
 let inputFilename: string;
 

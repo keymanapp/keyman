@@ -99,13 +99,15 @@ namespace com.keyman {
     // Sanitizes the event object (in-place) to remove sensitive information
     // from the breadcrumbs and url
     sanitizeEvent(event: any) {
-      event.breadcrumbs.forEach((b: any) => {
-        if (b.category == 'navigation') {
-          let NAVIGATION_PATTERN = /(.*)?(keyboard\.html#[^-]+)-.*/;
-          b.data.from = b.data.from.replace(NAVIGATION_PATTERN, '$1$2');
-          b.data.to = b.data.to.replace(NAVIGATION_PATTERN, '$1$2');
-        }
-      });
+      if (event && event.breadcrumbs) {
+        event.breadcrumbs.forEach((b: any) => {
+          if (b.category == 'navigation') {
+            let NAVIGATION_PATTERN = /(.*)?(keyboard\.html#[^-]+)-.*/;
+            b.data.from = b.data.from.replace(NAVIGATION_PATTERN, '$1$2');
+            b.data.to = b.data.to.replace(NAVIGATION_PATTERN, '$1$2');
+          }
+        });
+      }
 
       if (event.request.url) {
         let URL_PATTERN = /#.*$/;
@@ -174,8 +176,8 @@ namespace com.keyman {
         // Not using beforeBreadcrumb because that caused breadcrumbs to get lost in Sentry
         debug: DEBUG,
         dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@o1005580.ingest.sentry.io/5983524', // keyman-web DSN
-        release: com.keyman.environment.SENTRY_RELEASE,
-        environment: com.keyman.environment.ENVIRONMENT
+        release: com.keyman.KEYMAN_VERSION.SENTRY_RELEASE,
+        environment: com.keyman.KEYMAN_VERSION.VERSION_ENVIRONMENT
       });
     }
 

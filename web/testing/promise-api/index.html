@@ -19,7 +19,9 @@
       body {font-family: Tahoma,helvetica;}
       h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
       .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      .log  {font-size: 1em; width:80%; min-height:80px; max-height: 80px; border: 1px solid gray;}
       #KeymanWebControl {width:50%;min-width:600px;}
+      .active {font-weight:bold}
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
@@ -36,12 +38,12 @@
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
     <script src="promisehdr.js"></script>
+    <script src="eventLogging.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       // Thank you to https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
       const alertType = (new URLSearchParams(window.location.search)).get("useAlerts") != "false";
-      var alertText = alertType ? 'enabled(default)' : 'disabled';
 
       var kmw=window.keyman;
 
@@ -71,8 +73,7 @@
       for any of the three keyboard-adding options at the bottom of the page.
     </p>
 
-    <p id="modeSelect">You are currently testing under the internal alerts <em id="mode"> </em> mode.
-    Two alert modes are available:
+    <p id="modeSelect">Two internal-alert testing modes are available:
     <a id="alert_disabled" href="./index.html?useAlerts=false">Disabled</a> or
     <a id="alert_default" href="./index.html">Enabled (Default)</a></p>
     <p>This will only affect whether or not KeymanWeb's alert modal is displayed.
@@ -80,9 +81,21 @@
       setting when stub fetch errors occur.
     </p>
 
-<script>
-      document.getElementById("mode").textContent = alertText;
-    </script>
+    <hr>
+    <p>Two keyboard-change related event-logging modes are available:
+      <div>
+        <input type='radio' id='eventLog-off' name='eventLog' value='off' onchange='eventLogChange()' checked>
+        <label id='event-label-off' for='eventLog-off' class='active'>No logging</label>
+
+        <input type='radio' id='eventLog-on' name='eventLog' value='on' onchange='eventLogChange()'>
+        <label id='event-label-on' for='eventLog-on'>Logging</label>
+      </div>
+    </p>
+    <div id='logZone' style='display:none'>
+      <textarea id='eventLogging' class='log' disabled></textarea>
+      <input type='button' id='logFlusher' style='display: block' onclick='flushLogs();' value='Clear event logs' />
+    </div>
+    <hr>
 
     <div>
     <!--

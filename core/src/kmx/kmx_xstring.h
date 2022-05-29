@@ -12,8 +12,8 @@ namespace kmx {
 
 #define Uni_SurrogateToUTF32(ch, cl) (((ch) - 0xD800) * 0x400 + ((cl) - 0xDC00) + 0x10000)
 
-#define Uni_UTF32ToSurrogate1(ch) (((ch) - 0x10000) / 0x400 + 0xD800)
-#define Uni_UTF32ToSurrogate2(ch) (((ch) - 0x10000) % 0x400 + 0xDC00)
+#define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - 0x10000) / 0x400 + 0xD800)
+#define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - 0x10000) % 0x400 + 0xDC00)
 
 PKMX_WCHAR incxstr(PKMX_WCHAR p);
 PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart);

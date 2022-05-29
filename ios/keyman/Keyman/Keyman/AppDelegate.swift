@@ -63,6 +63,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ = log
     _ = KeymanEngine.log
 
+    // In iOS 15, navigation bars become transparent by default when the edge
+    // of the scrollable content aligns with the edge of the navigation bar.
+    // Force the appearance back to the pre-iOS 15 default behavior.
+    if #available(iOS 15, *) {
+        UINavigationBar.appearance().scrollEdgeAppearance = UINavigationBarAppearance()
+    }
     UniversalLinks.externalLinkLauncher = { url in
       UIApplication.shared.open(url)
     }

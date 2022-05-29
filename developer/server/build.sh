@@ -180,6 +180,10 @@ if (( production )) ; then
   rm -f node_modules/ngrok/bin/ngrok.exe
   popd
 
+  # @keymanapp/keyman-version is required in dist now but we need to copy it in manually
+  mkdir -p "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+
   # We'll build in the build/ folder
   rm -rf build/
   mkdir build/

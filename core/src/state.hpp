@@ -84,7 +84,7 @@ void actions::push_alert() {
 inline
 void actions::push_backspace(km_kbp_backspace_type expected_type, uintptr_t expected_value) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  km_kbp_action_item item = {KM_KBP_IT_BACK};
+  km_kbp_action_item item = {KM_KBP_IT_BACK, {}, {}};
   item.backspace.expected_type = expected_type;
   item.backspace.expected_value = expected_value;
   emplace_back(item);
