@@ -8,6 +8,7 @@ TARGETS=kmcmpdll kmanalyze kmdecomp server kmlmc
 TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmlmc
 !endif
 
+EXCLUDEPATHDEFINES=1
 MANIFESTS=kmcomp tike setup
 CLEANS=clean-developer
 
@@ -15,47 +16,47 @@ CLEANS=clean-developer
 
 # ----------------------------------------------------------------------
 
-imsample: .virtual
+imsample: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\imsample
     $(MAKE) $(TARGET)
 
-kmcmpdll: .virtual
+kmcmpdll: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\kmcmpdll
     $(MAKE) $(TARGET)
 
-kmdecomp: .virtual
+kmdecomp: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\kmdecomp
     $(MAKE) $(TARGET)
 
-kmcomp: kmcmpdll
+kmcomp: build-tools kmcmpdll
     cd $(DEVELOPER_ROOT)\src\kmcomp
     $(MAKE) $(TARGET)
 
-kmanalyze: .virtual
+kmanalyze: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\kmanalyze
     $(MAKE) $(TARGET)
 
-kmconvert: .virtual
+kmconvert: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\kmconvert
     $(MAKE) $(TARGET)
 
-tike: kmcmpdll redist
+tike: build-tools kmcmpdll redist
     cd $(DEVELOPER_ROOT)\src\tike
     $(MAKE) $(TARGET)
 
-samples: .virtual
+samples: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\samples
     $(MAKE) $(TARGET)
 
-setup: .virtual
+setup: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\setup
     $(MAKE) $(TARGET)
 
-server: .virtual
+server: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\server
     $(MAKE) $(TARGET)
 
-kmlmc: .virtual
+kmlmc: build-tools .virtual
     cd $(DEVELOPER_ROOT)\src\kmlmc
     $(MAKE) $(TARGET)
 
@@ -200,6 +201,30 @@ global-versions:
     echo Continue Global-Versions
     cd $(DEVELOPER_ROOT)\src
     echo End Global-Versions
+
+#
+# Tools needed to complete a build
+#
+
+build-tools:
+    @if not exist $(WINDOWS_ROOT)\src\global\inc\keymanversion_build.h $(MAKE) global-versions
+!ifdef NODELPHI
+    echo Skipping build-tools
+!else
+# we need to build devtools directly because otherwise we have a
+# chicken-and-egg issue with PathDefines.mak
+    @if not exist $(WINDOWS_ROOT)\src\PathDefines.mak $(MAKE) build-tools-internal
+!endif
+
+build-tools-internal:
+# We'll build a default PathDefines.mak if it is missing here so we can
+# go on and do the rest of the build. Build all the ext/global/build-tools
+# things we need...
+    cd $(WINDOWS_ROOT)\src\buildtools\devtools
+    $(MAKE)
+    $(WINDOWS_PROGRAM)\buildtools\devtools -ti
+    cd $(WINDOWS_ROOT)\src
+    $(MAKE) ext global buildtools
 
 # ----------------------------------------------------------------------
 
