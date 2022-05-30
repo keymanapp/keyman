@@ -480,7 +480,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       let vAdjPort: CGFloat = UIScreen.main.scale == 2.0 ? -3.6 : -2.6
       let vAdjLscpe: CGFloat = -1.6
 
-      let infoDoneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
+      let doneString = NSLocalizedString("command-done", bundle: Bundle(for: Manager.self), comment: "")
+      let infoDoneButton = UIBarButtonItem(title: doneString, style: .plain, target: self,
                                            action: #selector(self.infoButtonClick))
       infoDoneButton.setBackgroundVerticalPositionAdjustment(vAdjPort, for: UIBarMetrics.default)
       infoDoneButton.setBackgroundVerticalPositionAdjustment(vAdjLscpe, for: UIBarMetrics.compact)
@@ -596,7 +597,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let doneButton = UIButton(type: .roundedRect)
     doneButton.addTarget(self, action: #selector(self.dismissTextSizeVC), for: .touchUpInside)
 
-    doneButton.setTitle("Done", for: .normal)
+    let doneString = NSLocalizedString("command-done", bundle: Bundle(for: Manager.self), comment: "")
+    doneButton.setTitle(doneString, for: .normal)
     doneButton.titleLabel?.font = doneButton.titleLabel?.font?.withSize(21.0)
     doneButton.setTitleColor(UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0), for: .normal)
     doneButton.layer.cornerRadius = 4.0
