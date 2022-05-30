@@ -126,6 +126,72 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     fatalError("init(coder:) has not been implemented")
   }
 
+  private func constructAndAddHostedViews() {
+    self.constructAndAddMainTextView()
+    self.constructAndAddInfoView()
+    self.constructAndAddTextSizeController()
+    resizeViews(withKeyboardVisible: textView.isFirstResponder)
+  }
+
+  private func constructAndAddMainTextView() {
+    // Setup Keyman TextView
+    textSize = 16.0
+    textView = TextView(frame: view.frame)
+    textView.translatesAutoresizingMaskIntoConstraints = false
+    textView.setKeymanDelegate(self)
+    textView.viewController = self
+    textView.backgroundColor = UIColor(named: "InputBackground")!
+    textView.isScrollEnabled = true
+    textView.isUserInteractionEnabled = true
+    textView.font = textView.font?.withSize(textSize)
+    view?.addSubview(textView!)
+
+    textView.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor   ).isActive = true
+    textView.leftAnchor.constraint  (equalTo: view.safeAreaLayoutGuide.leftAnchor  ).isActive = true
+    textView.rightAnchor.constraint (equalTo: view.safeAreaLayoutGuide.rightAnchor ).isActive = true
+    textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+
+    if UIDevice.current.userInterfaceIdiom != .phone {
+      textSize *= 2
+      textView.font = textView?.font?.withSize(textSize)
+    }
+  }
+
+  private func constructAndAddInfoView() {
+    // Setup Info View
+    infoView = InfoViewController {
+      self.infoButtonClick(nil)
+    }
+
+    infoView.view?.translatesAutoresizingMaskIntoConstraints = false
+    infoView.view?.isHidden = true
+    infoView.view?.backgroundColor = UIColor(named: "InputBackground")!
+    view?.addSubview(infoView!.view)
+
+    // Don't forget to add the child view's controller, too!
+    // Its safe area layout guide won't work correctly without this!
+    self.addChild(infoView)
+
+    infoView.view?.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+    infoView.view?.leftAnchor.constraint  (equalTo: view.leftAnchor  ).isActive = true
+    infoView.view?.rightAnchor.constraint (equalTo: view.rightAnchor ).isActive = true
+    infoView.view?.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+  }
+
+  private func constructAndAddTextSizeController() {
+    // Setup Text Size Controller
+    textSizeController = UISlider()
+    textSizeController.frame = CGRect.zero
+    textSizeController.minimumValue = 0.0
+    textSizeController.maximumValue = Float(maxTextSize - minTextSize)
+    textSizeController.value = Float(textSize - minTextSize)
+    let textSizeUp = #imageLiteral(resourceName: "textsize_up.png").resize(to: CGSize(width: 20, height: 20))
+    textSizeController.maximumValueImage = textSizeUp
+    let textSizeDown = #imageLiteral(resourceName: "textsize_up.png").resize(to: CGSize(width: 15, height: 15))
+    textSizeController.minimumValueImage = textSizeDown
+    textSizeController.addTarget(self, action: #selector(self.sliderValueChanged), for: .valueChanged)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -180,59 +246,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navbarBackground.setOrientation(UIApplication.shared.statusBarOrientation)
     }
 
-    // Setup Keyman TextView
-    textSize = 16.0
-    textView = TextView(frame: view.frame)
-    textView.translatesAutoresizingMaskIntoConstraints = false
-    textView.setKeymanDelegate(self)
-    textView.viewController = self
-    textView.backgroundColor = UIColor(named: "InputBackground")!
-    textView.isScrollEnabled = true
-    textView.isUserInteractionEnabled = true
-    textView.font = textView.font?.withSize(textSize)
-    view?.addSubview(textView!)
-
-    textView.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor   ).isActive = true
-    textView.leftAnchor.constraint  (equalTo: view.safeAreaLayoutGuide.leftAnchor  ).isActive = true
-    textView.rightAnchor.constraint (equalTo: view.safeAreaLayoutGuide.rightAnchor ).isActive = true
-    textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-
-    // Setup Info View
-    infoView = InfoViewController {
-      self.infoButtonClick(nil)
-    }
-    if UIDevice.current.userInterfaceIdiom != .phone {
-      textSize *= 2
-      textView.font = textView?.font?.withSize(textSize)
-    }
-
-    infoView.view?.translatesAutoresizingMaskIntoConstraints = false
-    infoView.view?.isHidden = true
-    infoView.view?.backgroundColor = UIColor(named: "InputBackground")!
-    view?.addSubview(infoView!.view)
-
-    // Don't forget to add the child view's controller, too!
-    // Its safe area layout guide won't work correctly without this!
-    self.addChild(infoView)
-
-    infoView.view?.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-    infoView.view?.leftAnchor.constraint  (equalTo: view.leftAnchor  ).isActive = true
-    infoView.view?.rightAnchor.constraint (equalTo: view.rightAnchor ).isActive = true
-    infoView.view?.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-
-    resizeViews(withKeyboardVisible: textView.isFirstResponder)
-
-    // Setup Text Size Controller
-    textSizeController = UISlider()
-    textSizeController.frame = CGRect.zero
-    textSizeController.minimumValue = 0.0
-    textSizeController.maximumValue = Float(maxTextSize - minTextSize)
-    textSizeController.value = Float(textSize - minTextSize)
-    let textSizeUp = #imageLiteral(resourceName: "textsize_up.png").resize(to: CGSize(width: 20, height: 20))
-    textSizeController.maximumValueImage = textSizeUp
-    let textSizeDown = #imageLiteral(resourceName: "textsize_up.png").resize(to: CGSize(width: 15, height: 15))
-    textSizeController.minimumValueImage = textSizeDown
-    textSizeController.addTarget(self, action: #selector(self.sliderValueChanged), for: .valueChanged)
+    self.constructAndAddHostedViews()
 
     setNavBarButtons()
     loadSavedUserText()
