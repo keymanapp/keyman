@@ -447,7 +447,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private func keyboardLoaded() {
     didKeyboardLoad = true
     dismissActivityIndicator()
-    textView.becomeFirstResponder()
+
+    // Defer display of the keyboard until the current "message" on the main dispatch
+    // queue is complete.  There are still ongoing calculations - including within the
+    // keyboard's WebView itself!  (This function's call is actually triggered _by_ it!)
+    DispatchQueue.main.async {
+      self.textView.becomeFirstResponder()
+    }
     if shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
@@ -502,11 +508,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navigationItem.titleView = nil
       navigationItem.rightBarButtonItem = nil
       setNavBarButtons()
-      if wasKeyboardVisible {
-        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
-      }
       if shouldShowGetStarted {
         perform(#selector(self.showGetStartedView), with: nil, afterDelay: 0.75)
+      } else if wasKeyboardVisible {
+        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
       }
     } else {
       _ = dismissDropDownMenu()
@@ -518,7 +523,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       let vAdjPort: CGFloat = UIScreen.main.scale == 2.0 ? -3.6 : -2.6
       let vAdjLscpe: CGFloat = -1.6
 
-      let infoDoneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
+      let doneString = NSLocalizedString("command-done", bundle: Bundle(for: Manager.self), comment: "")
+      let infoDoneButton = UIBarButtonItem(title: doneString, style: .plain, target: self,
                                            action: #selector(self.infoButtonClick))
       infoDoneButton.setBackgroundVerticalPositionAdjustment(vAdjPort, for: UIBarMetrics.default)
       infoDoneButton.setBackgroundVerticalPositionAdjustment(vAdjLscpe, for: UIBarMetrics.compact)
@@ -634,7 +640,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let doneButton = UIButton(type: .roundedRect)
     doneButton.addTarget(self, action: #selector(self.dismissTextSizeVC), for: .touchUpInside)
 
-    doneButton.setTitle("Done", for: .normal)
+    let doneString = NSLocalizedString("command-done", bundle: Bundle(for: Manager.self), comment: "")
+    doneButton.setTitle(doneString, for: .normal)
     doneButton.titleLabel?.font = doneButton.titleLabel?.font?.withSize(21.0)
     doneButton.setTitleColor(UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0), for: .normal)
     doneButton.layer.cornerRadius = 4.0
