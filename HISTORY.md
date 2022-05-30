@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.254 beta 2022-05-30
+
+* fix(ios): missed i18n site (#6667)
+* fix(ios): keyboard height on app load (#6672)
+* feat(ios): adds back and forward navigation buttons for in-app help (#6654)
+* change(ios): modernization of the Keyman app main screen's layout logic (#6666)
+
 ## 15.0.253 beta 2022-05-27
 
 * chore(ios): FV certificate hash (#6673)
