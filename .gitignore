@@ -31,8 +31,35 @@
 /windows/src/**/*.suo
 /windows/src/**/.idea
 
+/common/windows/**/*.err
+/common/windows/**/*.Build.CppClean.log
+/common/windows/**/*.dproj.local
+/common/windows/**/*.groupproj.local
+/common/windows/**/*.bdsproj.local
+/common/windows/**/*.stat
+/common/windows/**/*.hpp
+/common/windows/**/*.sdf
+/common/windows/**/error.log
+/common/windows/**/.vs/
+/common/windows/**/version.RES
+/common/windows/**/__history/
+/common/windows/**/__recovery/
+/common/windows/**/*.identcache
+/common/windows/**/*.vcxproj.user
+/common/windows/**/version.res
+/common/windows/**/*.pch
+/common/windows/**/*.wixobj
+/common/windows/**/*.sbr
+/common/windows/**/*.bsc
+/common/windows/**/*.dll.embed.manifest
+/common/windows/**/*.ilk
+/common/windows/**/*.log
+/common/windows/**/*.idb
+/common/windows/**/*.suo
+/common/windows/**/.idea
+
 # Temp files generated during release build
-/windows/src/buildtools/inst/copydebug.mak
+/common/windows/buildtools/inst/copydebug.mak
 /windows/src/desktop/inst/desktop_resources.res
 /windows/src/desktop/inst/desktopui.wxs
 
@@ -44,15 +71,15 @@
 # /global/delphi/cust/messageidentifierconsts.pas
 
 # global build files
-/windows/src/global/help/version.out
-/windows/src/global/inst/data/UnicodeData.mdb
-/windows/src/global/delphi/general/SourceRootPath.pas
+/common/windows/global/help/version.out
+/common/windows/global/inst/data/UnicodeData.mdb
+/common/windows/global/delphi/general/SourceRootPath.pas
 
 # /buildtools/genkmnp/
-/windows/src/buildtools/genkmnp/*.identcache
+/common/windows/buildtools/genkmnp/*.identcache
 
 # /buildtools/inst/
-/windows/src/buildtools/inst/srcbackup.mak
+/common/windows/buildtools/inst/srcbackup.mak
 
 # /desktop/branding/
 /windows/src/desktop/branding/desktop_pro.pxx

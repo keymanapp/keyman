@@ -1,0 +1,25 @@
+**/*.aps
+**/BuildLog.htm
+**/*.recipe
+**/manifest.res
+
+# These are intermediate and output folders for VC++ and Delphi projects
+**/obj/Win32/
+**/obj/Win64/
+**/obj/x64/
+**/bin/Win32/
+**/bin/Win64/
+**/bin/x64/
+
+# Temporary build files for VC++
+**/*.FileListAbsolute.txt
+
+# These files are generated during build
+tds_file.txt
+global/delphi/cust/MessageIdentifierConsts.pas
+
+# These are built from corresponding manifest.in and version.in
+**/manifest.xml
+
+# Breakpad files generated for Sentry
+**/*.sym
