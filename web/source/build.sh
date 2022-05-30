@@ -400,11 +400,6 @@ if [ $BUILD_EMBED = true ]; then
     fi
     assert $INTERMEDIATE/keyman.js
 
-    # TEMP STUB LMLayerWorkerCode
-    pwd
-    cat $INTERMEDIATE/keyman.js <(echo) ../../common/web/lm-worker/build/index.js > $INTERMEDIATE/km1.js
-    mv $INTERMEDIATE/km1.js $INTERMEDIATE/keyman.js
-
     echo Embedded TypeScript compiled as $INTERMEDIATE/keyman.js
 
     copy_resources "$INTERMEDIATE"  # Very useful for local testing.
@@ -470,11 +465,6 @@ if [ $BUILD_COREWEB = true ]; then
         fail "Typescript compilation failed."
     fi
     assert $INTERMEDIATE/keymanweb.js
-
-    # TEMP STUB LMLayerWorkerCode
-    pwd
-    cat $INTERMEDIATE/keymanweb.js <(echo) ../../common/web/lm-worker/build/index.js > $INTERMEDIATE/km1.js
-    mv $INTERMEDIATE/km1.js $INTERMEDIATE/keymanweb.js
 
     echo Native TypeScript compiled as $INTERMEDIATE/keymanweb.js
 

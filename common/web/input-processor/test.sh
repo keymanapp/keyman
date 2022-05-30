@@ -85,11 +85,6 @@ popd
 # Build the leaf-style, bundled version of input-processor for use in testing.
 npm run tsc -- -b src/tsconfig.bundled.json || fail "Failed to compile the core/web/input-processor module."
 
-# TEMP STUB LMLayerWorkerCode
-pwd
-cat ./build/index.bundled.js <(echo) ../lm-worker/build/index.js > ./build/bundledWithWorker.js
-mv ./build/bundledWithWorker.js ./build/index.bundled.js
-
 # Now we run our local tests.
 echo_heading "Running Input Processor test suite"
 test-headless || fail "Input Processor tests failed!"

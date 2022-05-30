@@ -15,7 +15,7 @@
 		"keymanweb.ts",
 		"kmwembedded.ts",
 		"kmwinit.ts",
-		"kmwapi.ts"
+		"kmwapi.ts",
   ],
 
 	"exclude": [

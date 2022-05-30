@@ -5,7 +5,7 @@
   // for certain down-line builds if the two tsconfigs are not differentiated.
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outFile": "../build/index.bundled.js"
+    "outFile": "../build/index.bundled.js",
   },
   "references": [
     // Prepended by lm-worker.
@@ -15,5 +15,9 @@
     // For headless tests, we need the headless version of the compile.
     { "path": "../../../predictive-text/tsconfig.json", "prepend": true },
     { "path": "../..//es6-shim", "prepend": true }
+  ],
+  "files": [
+    "text/inputProcessor.ts",
+    "../../../../node_modules/eventemitter3/index.js",
   ]
 }
