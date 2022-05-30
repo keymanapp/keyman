@@ -409,7 +409,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private func keyboardLoaded() {
     didKeyboardLoad = true
     dismissActivityIndicator()
-    textView.becomeFirstResponder()
+
+    // Defer display of the keyboard until the current "message" on the main dispatch
+    // queue is complete.  There are still ongoing calculations - including within the
+    // keyboard's WebView itself!  (This function's call is actually triggered _by_ it!)
+    DispatchQueue.main.async {
+      self.textView.becomeFirstResponder()
+    }
     if shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
@@ -464,11 +470,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navigationItem.titleView = nil
       navigationItem.rightBarButtonItem = nil
       setNavBarButtons()
-      if wasKeyboardVisible {
-        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
-      }
       if shouldShowGetStarted {
         perform(#selector(self.showGetStartedView), with: nil, afterDelay: 0.75)
+      } else if wasKeyboardVisible {
+        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
       }
     } else {
       _ = dismissDropDownMenu()
