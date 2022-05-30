@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.252 beta 2022-05-25
+
+* fix(ios): fixes OSK mispositioning bug in iOS 15 (#6631)
+
 ## 15.0.251 beta 2022-05-23
 
 * fix(ios): stops leaking memory on system keyboard rotation (#6552)
