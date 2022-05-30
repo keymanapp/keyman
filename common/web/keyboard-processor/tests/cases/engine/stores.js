@@ -2,11 +2,10 @@ var assert = require('chai').assert;
 let fs = require('fs');
 let vm = require('vm');
 
-let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
-global.keyman = {};
+let KeyboardProcessor = require('../../../build/index.bundled.js');
 
-// Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);
+// Required initialization setup.
+global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 
 let device = {
   formFactor: 'desktop',
@@ -23,8 +22,7 @@ describe('Engine - Stores', function() {
   }
 
   it('Store \'Explosion\'', function() {
-    let processor = new KeyboardProcessor();
-    processor.device = device;
+    let processor = new KeyboardProcessor(device);
     // A 'hollow' Keyboard that only follows default rules.  That said, we need a Keyboard
     // instance to host cache data for our exploded store tests.
     processor.activeKeyboard = new com.keyman.keyboards.Keyboard();

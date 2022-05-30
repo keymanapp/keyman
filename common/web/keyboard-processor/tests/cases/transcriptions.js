@@ -1,8 +1,9 @@
 var assert = require('chai').assert;
+let KeyboardProcessor = require('../../build/index.bundled.js');
 
-global.keyman = {};
+// Required initialization setup.
+global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 
-// Initialize supplementary plane string extensions
 String.kmwEnableSupplementaryPlane(false);
 
 describe("Transcriptions and Transforms", function() {
