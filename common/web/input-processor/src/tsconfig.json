@@ -14,7 +14,7 @@
     "outFile": "../build/index.js"
   },
   "references": [
-    { "path": "../../web-environment" },
+    { "path": "../../keyman-version" },
     { "path": "../../utils" },
     { "path": "../../keyboard-processor/src" },
     { "path": "../../../predictive-text/browser.tsconfig.json" },

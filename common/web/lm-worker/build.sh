@@ -116,6 +116,9 @@ if builder_has_action clean || builder_has_action build; then
 fi
 
 if builder_has_action build; then
+  # Ensure keyman-version is properly build (requires build script)
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."
 

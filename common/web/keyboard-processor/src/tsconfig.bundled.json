@@ -9,7 +9,7 @@
   },
   "references": [
     { "path": "../../../models/types" },
-    { "path": "../../web-environment/", "prepend": true },
+    { "path": "../../keyman-version/", "prepend": true },
     { "path": "../../utils/", "prepend": true}
   ]
 }

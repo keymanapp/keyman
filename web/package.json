@@ -55,7 +55,7 @@
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
-    "@keymanapp/web-environment": "*",
+    "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",

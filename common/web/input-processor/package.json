@@ -35,7 +35,7 @@
     "@keymanapp/keyboard-processor": "*",
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
-    "@keymanapp/web-environment": "*",
+    "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "eventemitter3": "^4.0.0"
   }

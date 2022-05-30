@@ -19,7 +19,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@keymanapp/web-environment": "*",
+    "@keymanapp/keyman-version": "*",
     "@sentry/browser": "^5.27.4"
   }
 }

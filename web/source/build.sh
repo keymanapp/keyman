@@ -334,17 +334,10 @@ if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
 
     # Temporary patch for build -- ensure that predictive-text is
-    # built (because of its wrapper requirements), and that the
-    # web-environment file is generated (because it uses a script
-    # to do this at present).
-    echo "Temp: Building dependencies that have manual build requirements"
-    pushd "$KEYMAN_ROOT/common/web/web-environment" > /dev/null
-    ./build.sh
-    popd > /dev/null
-
-    pushd "$KEYMAN_ROOT/common/web/lm-worker" > /dev/null
-    ./build.sh
-    popd > /dev/null
+    # built (because of its wrapper requirements), and that the keyman-version
+    # file is generated (because it uses a script to do this at present).
+    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+    "$KEYMAN_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
 
     echo "Copying testing resource ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
     cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
