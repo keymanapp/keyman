@@ -146,10 +146,10 @@
     <None Include="KEYMAN32.DEF">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\..\global\res\bmp\arrow.bmp">
+    <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\global\res\bmp\mask.bmp">
+    <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
