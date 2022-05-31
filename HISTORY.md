@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.255 beta 2022-05-31
+
+* fix(web): osk shrinkage from rounding (#6658)
+
 ## 15.0.254 beta 2022-05-30
 
 * fix(ios): missed i18n site (#6667)
