@@ -13,9 +13,6 @@ build:
 
   cd $(ROOT)\src\global\inst
   $(MAKE) $(TARGET)
-
-  cd $(ROOT)\src\global\wix
-  $(MAKE) $(TARGET)
 !endif
 
 build-release:
@@ -32,9 +29,6 @@ clean:
   $(MAKE) clean
 
   cd $(ROOT)\src\global\inst
-  $(MAKE) clean
-
-  cd $(ROOT)\src\global\wix
   $(MAKE) clean
 
 signcode:
