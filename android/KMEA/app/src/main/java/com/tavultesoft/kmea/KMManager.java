@@ -298,6 +298,7 @@ public final class KMManager {
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
+  protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
@@ -802,6 +803,7 @@ public final class KMManager {
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
+      copyAsset(context, KMFilename_JSPolyfill, "", true);
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
