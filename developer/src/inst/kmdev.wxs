@@ -374,8 +374,8 @@
 
     <UIRef Id="WixUI_FeatureTree"/>
 
-    <Icon Id="TIKE.ico" SourceFile="..\..\..\windows\src\global\res\90\developer\KeymanDeveloper90.ico" />
-    <Icon Id="samples.ico" SourceFile="..\..\..\windows\src\global\res\ico\samples.ico" />
+    <Icon Id="TIKE.ico" SourceFile="..\images\KeymanDeveloper90.ico" />
+    <Icon Id="samples.ico" SourceFile="..\images\samples.ico" />
 
     <CustomAction Id='AlreadyUpdated' Error='[ProductName] has already been updated to $(var.VERSION) or newer.' />
     <CustomAction Id='NoDowngrade' Error='A later version of [ProductName] is already installed.' />

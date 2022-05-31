@@ -126,11 +126,11 @@
               </Component>
 
               <Component>
-                <File Id="appicon.ico" Name="appicon.ico" Source="..\..\global\res\90\desktop\appicon.ico" KeyPath="yes" />
+                <File Id="appicon.ico" Name="appicon.ico" Source="..\..\desktop\branding\appicon.ico" KeyPath="yes" />
               </Component>
 
               <Component>
-                <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\..\global\res\90\desktop\cfgicon.ico" KeyPath="yes" />
+                <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\..\desktop\branding\cfgicon.ico" KeyPath="yes" />
               </Component>
 
               <Component>
@@ -304,8 +304,8 @@
 
     <UIRef Id="WixUI_FeatureTree"/>
 
-    <Icon Id="appicon.ico" SourceFile="..\..\global\res\90\desktop\appicon.ico" />
-    <Icon Id="KMSHELL.ico" SourceFile="..\..\global\res\90\desktop\cfgicon.ico" />
+    <Icon Id="appicon.ico" SourceFile="..\..\desktop\branding\appicon.ico" />
+    <Icon Id="KMSHELL.ico" SourceFile="..\..\desktop\branding\cfgicon.ico" />
 
     <Binary Id="insthelp.exe" SourceFile="..\..\..\bin\desktop\insthelp.exe" />
 
