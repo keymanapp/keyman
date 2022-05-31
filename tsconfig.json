@@ -16,7 +16,6 @@
     { "path": "./common/predictive-text/testing/two-stage-embedded-webworker/tsconfig.json" },
     { "path": "./common/predictive-text/testing/two-stage-embedded-webworker/worker/tsconfig.json" },
     { "path": "./common/predictive-text/tsconfig.json" },
-    { "path": "./common/web/es6-shim/tsconfig.json" },
     { "path": "./developer/js/tests/tsconfig.json" },
     { "path": "./developer/js/tsconfig.json" },
     { "path": "./developer/server/tsconfig.json" },
