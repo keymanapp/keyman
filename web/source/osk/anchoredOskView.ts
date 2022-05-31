@@ -62,7 +62,7 @@ namespace com.keyman.osk {
     protected postKeyboardLoad() {
       // Initializes the size of a touch keyboard.
       if(this.vkbd && this.device.touchable) {
-        let targetOSKHeight = this.vkbd.computedAdjustedOskHeight(this.getDefaultKeyboardHeight());
+        let targetOSKHeight = this.getDefaultKeyboardHeight();
         this.setSize(this.getDefaultWidth(), targetOSKHeight + this.banner.height);
       }
 

@@ -22,7 +22,7 @@ namespace com.keyman.osk {
                        layout: keyboards.ActiveLayout,
                        layer: keyboards.ActiveLayer) {
       this.spec = layer;
-      
+
       const gDiv = this.element = document.createElement('div');
       const gs=gDiv.style;
       gDiv.className='kmw-key-layer';
@@ -38,7 +38,7 @@ namespace com.keyman.osk {
       this.nextlayer = gDiv['layer'] = layer['id'];
       if(typeof layer['nextlayer'] == 'string') {
         // The gDiv['nextLayer'] is no longer referenced in KMW 15.0+, but is
-        // maintained for partial back-compat in case any site devs actually 
+        // maintained for partial back-compat in case any site devs actually
         // relied on its value from prior versions.
         //
         // We won't pay attention to any mutations to the gDiv copy, though.
@@ -90,10 +90,10 @@ namespace com.keyman.osk {
     public refreshLayout(vkbd: VisualKeyboard, paddedHeight: number, trueHeight: number) {
       // Check the heights of each row, in case different layers have different row counts.
       let nRows = this.rows.length;
-      let rowHeight = Math.floor(trueHeight/(nRows == 0 ? 1 : nRows));
+      let rowHeight = Math.floor(paddedHeight/(nRows == 0 ? 1 : nRows));
 
       if(vkbd.usesFixedHeightScaling) {
-        this.element.style.height=(paddedHeight)+'px';
+        this.element.style.height=(trueHeight)+'px';
       }
 
       for(let nRow=0; nRow<nRows; nRow++) {
@@ -102,8 +102,8 @@ namespace com.keyman.osk {
 
         if(vkbd.usesFixedHeightScaling) {
           // Calculate the exact vertical coordinate of the row's center.
-          this.spec.row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
-        
+          this.spec.row[nRow].proportionalY = ((trueHeight - bottom) - rowHeight/2) / paddedHeight;
+
           if(nRow == nRows-1) {
             oskRow.element.style.bottom = '1px';
           }

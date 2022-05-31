@@ -366,7 +366,7 @@ namespace com.keyman.osk {
      * of alternate keystroke sequences.
      * @param input The input coordinate of the event that led to use of this function
      * @param keySpec The spec of the key directly triggered by the input event.  May be for a subkey.
-     * @returns 
+     * @returns
      */
     getTouchProbabilities(input: InputEventCoordinate, keySpec?: keyboards.ActiveKey): text.KeyDistribution {
       let keyman = com.keyman.singleton;
@@ -1235,9 +1235,9 @@ namespace com.keyman.osk {
       let b = this.layerGroup.element as HTMLElement;
       let gs = this.kbdDiv.style;
       let bs = b.style;
-      if (this.usesFixedHeightScaling) {
+      if (this.usesFixedHeightScaling && this.height) {
         // Sets the layer group to the correct height.
-        gs.height = gs.maxHeight = paddedHeight + 'px';
+        gs.height = gs.maxHeight = this.height + 'px';
       }
 
       // The font-scaling applied on the layer group.
