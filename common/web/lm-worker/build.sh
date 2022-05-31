@@ -59,25 +59,26 @@ wrap-worker-code ( ) {
   # This one's a minimal, targeted polyfill.  es6-shim could do the same,
   # but also adds a lot more code the worker doesn't need to use.
   # Recommended by MDN while keeping the worker lean and efficient.
-  cat "../../../node_modules/string.prototype.codepointat/codepointat.js" # Needed for Android / Chromium browser pre-41.
+  # Needed for Android / Chromium browser pre-41.
+  cat "../../../node_modules/string.prototype.codepointat/codepointat.js" || die
 
   # These two are straight from MDN - I didn't find any NPM ones that don't
   # use the node `require` statement for the second.  They're also relatively
   # short and simple, which is good.
-  cat "src/polyfills/array.fill.js"  # Needed for Android / Chromium browser pre-45.
-  cat "src/polyfills/array.from.js"  # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.fill.js" || die # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.from.js" || die # Needed for Android / Chromium browser pre-45.
 
   # For Object.values, for iteration over object-based associate arrays.
-  cat "src/polyfills/object.values.js" # Needed for Android / Chromium browser pre-54.
+  cat "src/polyfills/object.values.js" || die # Needed for Android / Chromium browser pre-54.
 
   # Needed to support Symbol.iterator, as used by the correction algorithm.
-  cat "src/polyfills/symbol-es6.min.js"  # Needed for Android / Chromium browser pre-43.
+  cat "src/polyfills/symbol-es6.min.js" || die # Needed for Android / Chromium browser pre-43.
 
   # Needed to 'support' String.normalize within iOS 9.
   # For our limited use case thereof; is definitely NOT a general polyfill.
   # (The file size on a true one would be quite high.)
   # TBD:  should we drop this, since we only support iOS 12+ for the mobile app?
-  cat "src/polyfills/string.normalize.js"
+  cat "src/polyfills/string.normalize.js" || die
 
   echo ""
 
