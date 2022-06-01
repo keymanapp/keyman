@@ -124,20 +124,11 @@ DELPHIDPRPARAMS=-Q -B -GD -H -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+
 DELPHIDPRPARAMS64=-Q -B -GD -H -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win64\$(TARGET_PATH) -E.\bin\Win64\$(TARGET_PATH)
 DELPHIDPKPARAMS=-Q -B -GD -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData -NUobj\Win32\$(TARGET_PATH)
 
-!IFDEF NOUI
+# we are using cmd /c because dcc32/dcc64 are failing on direct execution
+# from nmake
 DCC32=cmd /c "$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
 DCC32DPK=cmd /c "$(DCC32PATH)\dcc32.exe" $(DELPHIDPKPARAMS)
-!ELSE
-!IFDEF QUIET
-DCC32=@$(DEVTOOLS) -dccq  $(DELPHIDPRPARAMS)
-DCC32DPK=@$(DEVTOOLS) -dccq $(DELPHIDPKPARAMS)
-!ELSE
-DCC32=@$(DEVTOOLS) -dcc $(DELPHIDPRPARAMS)
-DCC32DPK=@$(DEVTOOLS) -dcc $(DELPHIDPKPARAMS)
-!ENDIF
-!ENDIF
-
-DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
+DCC64=cmd /c "$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 
 #
 # Delphi MSBuild related commands and macros

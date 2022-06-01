@@ -20,9 +20,6 @@ unit DevIncludePaths;
 
 interface
 
-uses
-  DevDelphiCompileWrapper;
-
 type
   TIncludePaths = class
     //class function Get: string;

@@ -36,8 +36,6 @@ uses
   Winapi.Windows,
   Winapi.ActiveX,
   DevCheckGitStatus,   // I5087
-  DevDelphiCompileWrapper,
-  DevDelphiStarterCompileWrapper,
   DevInstallPackages,
   DevIncludePaths,
   DevReleaseBuildCheck,
@@ -73,9 +71,6 @@ begin
       writeln('  -ai path[;path...]   : add include path(s)');
       writeln('  -ri                  : reset include paths');
       writeln('  -ti                  : touch PathDefines.mak (create if not present)');
-      writeln('  -dcc ...             : wrap a call to DCC32');    // I3339
-      writeln('  -dccx dpr [dcp-target] [bpl-target] : Delphi Starter support - BDS.EXE -b ...');
-      writeln('  -dccq ...            : wrap a call to DCC32, ignoring hints and warnings');    // I3339  // I3378
       writeln('  -rt                  : check release build prereqs, e.g. HKCU\'+SRegKey_KeymanDebug_CU);   // I3726
       writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087
       writeln('  -buildmessageconstants <strings.xml> <messageidentifierconsts.pas>: build MessageIdentifierConsts.pas from current strings.xml');
@@ -94,14 +89,6 @@ begin
       Success := TIncludePaths.Reset
     else if (ParamStr(1) = '-ti') and (ParamCount = 1) then
       Success := TIncludePaths.Touch
-    else if (ParamStr(1) = '-dcc') then  // I3339
-      Success := TDelphiCompileWrapper.Run
-    else if (ParamStr(1) = '-dccx') then  // I3339
-      Success := TDelphiStarterCompileWrapper.Run
-    else if (ParamStr(1) = '-dccs') then  // I3339
-      Success := TDelphiCompileWrapper.Run(False, True)
-    else if (ParamStr(1) = '-dccq') then  // I3339  // I3378
-      Success := TDelphiCompileWrapper.Run(True)
     else if (ParamStr(1) = '-rt') then   // I3726
       Success := TReleaseBuildCheck.Run
     else if (ParamStr(1) = '-git') then   // I3726   // I5087

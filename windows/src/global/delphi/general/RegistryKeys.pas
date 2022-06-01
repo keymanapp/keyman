@@ -445,9 +445,6 @@ const
   SRegKey_KeymanDebug_CU = SRegKey_KeymanRoot_CU + '\Debug';
   SRegValue_Debug_TikeDebugMode = 'TikeDebugMode';
 
-  SRegKey_DelphiProjectManager_CU = SRegKey_SoftwareKeyman_CU + '\DelphiProjectManager';
-  SRegValue_CallbackWindow = 'CallbackWindow';
-
   SRegKey_Keyman_Exception_CU = SRegKey_KeymanRoot_CU + '\Exception';
   SRegValue_SymbolPath = 'SymbolPath';
 
