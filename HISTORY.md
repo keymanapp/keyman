@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.256 beta 2022-06-01
+
+* chore(android,ios,mac): Update crowdin strings for Spanish (Latin America) (#6650)
+
 ## 15.0.255 beta 2022-05-31
 
 * fix(web): osk shrinkage from rounding (#6658)
