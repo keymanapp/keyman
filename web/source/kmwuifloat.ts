@@ -56,14 +56,16 @@ if(!window['keyman']['ui']['name']) {
      */
     ui.toggleOSK = function()
     {
+      keymanweb['activatingUI'](true);
       // As the Float UI uses more advanced minification, we must preserve the 'osk' field name.
       let osk = keymanweb['osk'];
-      keymanweb['focusLastActiveElement']();
       if(osk && osk['show'])
       {
         if(osk['isEnabled']()) osk['hide'](); else osk['show'](true);
       }
       if(window.event) window.event.returnValue=false;
+      keymanweb['focusLastActiveElement']();
+      keymanweb['activatingUI'](false);
       return false;
     }
 
@@ -397,6 +399,7 @@ if(!window['keyman']['ui']['name']) {
      */
     ui.SelectKeyboardChange = function(e)
     {
+      keymanweb['activatingUI'](true);
       if(ui.KeyboardSelector.value != '-')
       {
         var i=ui.KeyboardSelector.selectedIndex;
@@ -408,6 +411,7 @@ if(!window['keyman']['ui']['name']) {
 
       //if(osk['show']) osk['show'](osk['isEnabled']()); handled by keyboard change event???
       keymanweb['focusLastActiveElement']();
+      keymanweb['activatingUI'](false);
       ui.selecting = true;
     }
 
