@@ -751,7 +751,8 @@ if(!window['keyman']['ui']['name']) {
      **/
     ui.showOSK = function(event)
     {
-      let osk = keymanweb.osk;
+      // As the Toolbar UI uses more advanced minification, we must preserve the 'osk' field name.
+      let osk = keymanweb['osk'];
 
       if(!osk) {
         return;
@@ -914,7 +915,8 @@ if(!window['keyman']['ui']['name']) {
             }
             else
             {
-              let osk = keymanweb.osk;
+              // As the Toolbar UI uses more advanced minification, we must preserve the 'osk' field name.
+              let osk = keymanweb['osk'];
               ui.oskButtonNode.className = (osk && osk['isEnabled']()) ? 'kmw_button_selected' : 'kmw_button';
             }
           }
@@ -1013,7 +1015,8 @@ if(!window['keyman']['ui']['name']) {
 
 
     ui.registerEvents = function() {
-      let osk = keymanweb.osk;
+      // As the Toolbar UI uses more advanced minification, we must preserve the 'osk' field name.
+      let osk = keymanweb['osk'];
       if(!osk) {
         return;
       }
