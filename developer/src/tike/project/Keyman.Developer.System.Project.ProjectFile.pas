@@ -325,6 +325,7 @@ uses
   System.AnsiStrings,
   System.IniFiles,
   System.DateUtils,
+  System.Hash,
   System.StrUtils,
   System.Variants,
 
@@ -336,7 +337,6 @@ uses
   Keyman.Developer.System.Project.UrlRenderer,
   RedistFiles,
   RegistryKeys,
-  UMD5Hash,
   Unicode,
   utildir,
   utilsystem;
@@ -635,8 +635,8 @@ end;
 procedure TProjectFile.UpdateID;
 begin
   if Assigned(FProject)
-    then FID := CleanID(MD5Hash(LowerCase( ExtractRelativePath(FProject.FileName, FFileName) )))   // I4709
-    else FID := CleanID(MD5Hash(LowerCase(FFileName)));
+    then FID := CleanID(THashMD5.GetHashString(LowerCase( ExtractRelativePath(FProject.FileName, FFileName) )))   // I4709
+    else FID := CleanID(THashMD5.GetHashString(LowerCase(FFileName)));
 end;
 
 procedure TProjectFile.SetFileName(Value: string);

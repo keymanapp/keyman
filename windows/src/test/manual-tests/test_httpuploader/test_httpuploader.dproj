@@ -74,10 +74,9 @@
 			<DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
 			<DCCReference Include="..\..\global\delphi\crypt\DCPbase64.pas"/>
-			<DCCReference Include="..\..\global\delphi\crypt\DCPblockciphers.pas"/>
 			<DCCReference Include="..\..\global\delphi\crypt\DCPconst.pas"/>
 			<DCCReference Include="..\..\global\delphi\crypt\DCPcrypt2.pas"/>
-			<DCCReference Include="..\..\global\delphi\crypt\Ciphers\DCPrc4.pas"/>
+			<DCCReference Include="..\..\global\delphi\crypt\DCPrc4.pas"/>
 			<DCCReference Include="..\..\global\delphi\online\UfrmOnlineUpdateSetup.pas">
 				<Form>frmOnlineUpdateSetup</Form>
 			</DCCReference>

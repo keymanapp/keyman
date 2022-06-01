@@ -67,7 +67,6 @@ uses
   VisualKeyboardLoaderXML in '..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardSaverBinary in '..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
-  UMD5Hash in '..\..\..\windows\src\global\delphi\general\UMD5Hash.pas',
   Keyman.Developer.System.KMConvertParameters in 'Keyman.Developer.System.KMConvertParameters.pas',
   Keyman.Developer.System.ImportKeyboardDLL in 'Keyman.Developer.System.ImportKeyboardDLL.pas',
   ScanCodeMap in '..\..\..\windows\src\global\delphi\general\ScanCodeMap.pas',

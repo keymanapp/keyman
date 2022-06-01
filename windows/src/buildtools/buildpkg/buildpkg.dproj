@@ -145,8 +145,7 @@
         <DCCReference Include="..\..\ext\dcpcrypt\DCPcrypt2.pas"/>
         <DCCReference Include="..\..\ext\dcpcrypt\DCPbase64.pas"/>
         <DCCReference Include="..\..\ext\dcpcrypt\DCPconst.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\Ciphers\DCPrc4.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\Hashes\DCPmd5.pas"/>
+        <DCCReference Include="..\..\ext\dcpcrypt\DCPrc4.pas"/>
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas"/>
         <DCCReference Include="..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>

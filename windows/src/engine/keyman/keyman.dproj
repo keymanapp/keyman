@@ -179,7 +179,7 @@
         <DCCReference Include="..\..\global\delphi\crypt\DCPcrypt2.pas"/>
         <DCCReference Include="..\..\global\delphi\crypt\DCPbase64.pas"/>
         <DCCReference Include="..\..\global\delphi\crypt\DCPconst.pas"/>
-        <DCCReference Include="..\..\global\delphi\crypt\Ciphers\DCPrc4.pas"/>
+        <DCCReference Include="..\..\global\delphi\crypt\DCPrc4.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanControlMessages.pas"/>
         <DCCReference Include="viskbd\UfrmOSKFontHelper.pas">
             <Form>frmOSKFontHelper</Form>

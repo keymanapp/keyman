@@ -81,7 +81,6 @@ uses
   Keyman.Developer.System.Project.kpsProjectFile in '..\tike\project\Keyman.Developer.System.Project.kpsProjectFile.pas',
   Keyman.Developer.System.Project.kvkProjectFile in '..\tike\project\Keyman.Developer.System.Project.kvkProjectFile.pas',
   Keyman.Developer.System.Project.ProjectLog in '..\tike\project\Keyman.Developer.System.Project.ProjectLog.pas',
-  UMD5Hash in '..\..\..\windows\src\global\delphi\general\UMD5Hash.pas',
   UserMessages in '..\..\..\windows\src\global\delphi\general\UserMessages.pas',
   VisualKeyboardLoaderBinary in '..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
   VisualKeyboardLoaderXML in '..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',

@@ -65,7 +65,7 @@ uses
   DCPcrypt2 in '..\..\global\delphi\crypt\DCPcrypt2.pas',
   DCPbase64 in '..\..\global\delphi\crypt\DCPbase64.pas',
   DCPconst in '..\..\global\delphi\crypt\DCPconst.pas',
-  DCPrc4 in '..\..\global\delphi\crypt\Ciphers\DCPrc4.pas',
+  DCPrc4 in '..\..\global\delphi\crypt\DCPrc4.pas',
   KeymanControlMessages in '..\..\global\delphi\general\KeymanControlMessages.pas',
   UfrmOSKFontHelper in 'viskbd\UfrmOSKFontHelper.pas' {frmOSKFontHelper},
   HintConsts in '..\..\global\delphi\hints\HintConsts.pas',
