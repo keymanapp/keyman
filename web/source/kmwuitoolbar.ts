@@ -253,7 +253,9 @@ if(!window['keyman']['ui']['name']) {
       aNode = ui.createNode('a', null, 'kmw_button_a');
       aNode.href = '#';
       aNode.onclick = ui.showOSK;
-      aNode.onmousedown = function() { keymanweb['activatingUI'](true); };
+      aNode.onmousedown = function() {
+        keymanweb['activatingUI'](true);
+      };
       aNode.title = ui.ToolBar_Text.ShowOSK;
       aNode.appendChild(ui.createNode('div', 'kmw_img_osk', 'kmw_img'));
       //aNode.appendChild(ui.createNode('div', null, 'kmw_a', 'On Screen Keyboard'));
@@ -506,7 +508,7 @@ if(!window['keyman']['ui']['name']) {
         var p1=ui.ToolBar_Text['SelectKeyboardPre']+kbd['Name'],p2=ui.ToolBar_Text['SelectKeyboardSuf'];
         if(p1.toLowerCase().indexOf(p2.toLowerCase()) < 0) p1=p1+' '+ p2;
         aNode.title = p1;
-        aNode.onclick = function(event) { return ui.selectLanguage(event, lang) }; // FINDME
+        aNode.onclick = function(event) { return ui.selectLanguage(event, lang) };
         aNode.appendChild(ui.createNode('div', 'kmw_img_kbd', 'kmw_img'));
 
         ui.lgText=ui.truncate(lang.name,28);
@@ -759,6 +761,7 @@ if(!window['keyman']['ui']['name']) {
       let osk = keymanweb['osk'];
 
       if(!osk) {
+        keymanweb['activatingUI'](false);
         return;
       }
       //Toggle OSK on or off
@@ -920,7 +923,6 @@ if(!window['keyman']['ui']['name']) {
             }
             else
             {
-              // As the Toolbar UI uses more advanced minification, we must preserve the 'osk' field name.
               let osk = keymanweb['osk'];
               ui.oskButtonNode.className = (osk && osk['isEnabled']()) ? 'kmw_button_selected' : 'kmw_button';
             }
@@ -1020,7 +1022,6 @@ if(!window['keyman']['ui']['name']) {
 
 
     ui.registerEvents = function() {
-      // As the Toolbar UI uses more advanced minification, we must preserve the 'osk' field name.
       let osk = keymanweb['osk'];
       if(!osk) {
         return;

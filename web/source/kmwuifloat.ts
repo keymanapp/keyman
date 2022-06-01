@@ -57,7 +57,6 @@ if(!window['keyman']['ui']['name']) {
     ui.toggleOSK = function()
     {
       keymanweb['activatingUI'](true);
-      // As the Float UI uses more advanced minification, we must preserve the 'osk' field name.
       let osk = keymanweb['osk'];
       if(osk && osk['show'])
       {
@@ -332,7 +331,6 @@ if(!window['keyman']['ui']['name']) {
           ui.addButtonOSK();
         });
 
-      // As the Float UI uses more advanced minification, we must preserve the 'osk' field name.
       let osk = keymanweb['osk'];
       if(!osk) {
         return;
@@ -485,7 +483,6 @@ if(!window['keyman']['ui']['name']) {
         else
         {
           ui.oskButton.style.display = 'block';
-          // As the Float UI uses more advanced minification, we must preserve the 'osk' field name.
           let osk = keymanweb['osk'];
           if(osk) {
             ui.oskButtonState(osk['isEnabled']());
