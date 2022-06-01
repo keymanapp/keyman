@@ -253,6 +253,7 @@ if(!window['keyman']['ui']['name']) {
       aNode = ui.createNode('a', null, 'kmw_button_a');
       aNode.href = '#';
       aNode.onclick = ui.showOSK;
+      aNode.onmousedown = function() { keymanweb['activatingUI'](true); };
       aNode.title = ui.ToolBar_Text.ShowOSK;
       aNode.appendChild(ui.createNode('div', 'kmw_img_osk', 'kmw_img'));
       //aNode.appendChild(ui.createNode('div', null, 'kmw_a', 'On Screen Keyboard'));
@@ -505,7 +506,7 @@ if(!window['keyman']['ui']['name']) {
         var p1=ui.ToolBar_Text['SelectKeyboardPre']+kbd['Name'],p2=ui.ToolBar_Text['SelectKeyboardSuf'];
         if(p1.toLowerCase().indexOf(p2.toLowerCase()) < 0) p1=p1+' '+ p2;
         aNode.title = p1;
-        aNode.onclick = function(event) { return ui.selectLanguage(event, lang) };
+        aNode.onclick = function(event) { return ui.selectLanguage(event, lang) }; // FINDME
         aNode.appendChild(ui.createNode('div', 'kmw_img_kbd', 'kmw_img'));
 
         ui.lgText=ui.truncate(lang.name,28);
@@ -667,6 +668,7 @@ if(!window['keyman']['ui']['name']) {
      * @return      {boolean}
      **/
     ui.selectKeyboard = function(event,lang,kbd,updateKeyman:boolean) {
+      keymanweb['activatingUI'](true);
       if(ui.selectedLanguage) {
         var found = ui.findListedKeyboard(ui.selectedLanguage);
         if(found != null) {
@@ -694,6 +696,7 @@ if(!window['keyman']['ui']['name']) {
       // Always save current state when selecting a keyboard
       ui.saveCookie();
       ui.enableControls();
+      keymanweb['activatingUI'](false);
       return ui.hideKeyboardsPopup(event) || ui.hideKeyboardsForLanguage(event);
     }
 
@@ -751,6 +754,7 @@ if(!window['keyman']['ui']['name']) {
      **/
     ui.showOSK = function(event)
     {
+      keymanweb['activatingUI'](true);
       // As the Toolbar UI uses more advanced minification, we must preserve the 'osk' field name.
       let osk = keymanweb['osk'];
 
@@ -763,6 +767,7 @@ if(!window['keyman']['ui']['name']) {
         if(osk['isEnabled']()) osk['hide'](); else osk['show'](true);
       }
       ui.setLastFocus();
+      keymanweb['activatingUI'](false);
       return ui.eventCapture(event);
     }
 
