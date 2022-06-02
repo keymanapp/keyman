@@ -159,6 +159,7 @@ function TCompilePackage.Compile: Boolean;
 var
   buf: array[0..260] of Char;
   n: Integer;
+  b: Boolean;
   f: TSearchRec;
 begin
   Result := False;
@@ -187,10 +188,15 @@ begin
   FTempPath := buf;
 
   GetTempFileName(PChar(FTempPath), 'kmn', 0, buf);
-  FTempPath := buf;
-  if FileExists(FTempPath) then DeleteFile(FTempPath);
+  FTempPath := buf + '.dir';
+  b := CreateDir(FTempPath);
+  if not b then
+  begin
+    FatalMessage('Unable to create temp folder '+FTempPath);
+    if FileExists(buf) then DeleteFile(buf);
+    Exit;
+  end;
 
-  CreateDir(FTempPath);
   try
     Result := BuildKMP;
   finally
@@ -205,6 +211,7 @@ begin
       FindClose(f);
     end;
     RemoveDirectory(PChar(FTempPath));
+    if FileExists(buf) then DeleteFile(buf);
   end;
 end;
 
