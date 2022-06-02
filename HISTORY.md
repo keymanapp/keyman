@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.294 stable 2022-06-02
+
+* fix(web): crash in highlightKey (#6686)
+
 ## 14.0.293 stable 2022-05-25
 
 * fix(windows): unbreak keyboard install (#6662)
