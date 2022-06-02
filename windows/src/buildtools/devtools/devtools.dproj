@@ -78,7 +78,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_CWD>C:\Projects\keyman\apps\windows\src\ext\dcpcrypt</Debugger_CWD>
+        <Debugger_CWD></Debugger_CWD>
         <Debugger_RunParams>-buildsetupstrings ..\..\desktop\setup\locale ..\..\desktop\setup</Debugger_RunParams>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>None</Manifest_File>

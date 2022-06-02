@@ -38,7 +38,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <SanitizedProjectName>buildunidata</SanitizedProjectName>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <DCC_UnitSearchPath>C:\keyman\9.0\src\ext\vclzip;c:\keyman\9.0\src\ext\jedi\jwa\branches\2.3\common;c:\keyman\9.0\src\ext\jedi\jwa\branches\2.3\win32api;c:\keyman\9.0\src\ext\dcpcrypt;c:\keyman\9.0\src\ext\dcpcrypt\ciphers;c:\keyman\9.0\src\ext\dcpcrypt\hashes;$(DELPHI)\lib;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(DELPHI)\lib;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_Define>VERSION_KEYMAN_DEVELOPER;$(DCC_Define)</DCC_Define>
         <DCC_Optimize>false</DCC_Optimize>
         <VerInfo_Build>23</VerInfo_Build>
