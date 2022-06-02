@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common jedi mbcolor scfontcombobox cef4delphi
+TARGETS=dcpcrypt #jedi mbcolor scfontcombobox cef4delphi
 !endif
 
 # jedi has no packages
@@ -18,30 +18,24 @@ CLEANS=
 
 # ----------------------------------------------------------------------
 
-common: .virtual
-    cd $(COMMON_ROOT)\ext
+cef4delphi: .virtual
+    cd $(COMMON_ROOT)\ext\cef4delphi
     $(MAKE) $(TARGET)
 
-# ----------------------------------------------------------------------
-
-cef4delphi: .virtual
-    cd $(ROOT)\src\ext\cef4delphi
+dcpcrypt: .virtual
+    cd $(COMMON_ROOT)\ext\dcpcrypt
     $(MAKE) $(TARGET)
 
 jedi: .virtual
-    cd $(ROOT)\src\ext\jedi
+    cd $(COMMON_ROOT)\ext\jedi
     $(MAKE) $(TARGET)
 
 mbcolor: .virtual
-    cd $(ROOT)\src\ext\mbcolor
-    $(MAKE) $(TARGET)
-
-vclzip: .virtual
-    cd $(ROOT)\src\ext\vclzip
+    cd $(COMMON_ROOT)\ext\mbcolor
     $(MAKE) $(TARGET)
 
 scfontcombobox: .virtual
-    cd $(ROOT)\src\ext\scfontcombobox
+    cd $(COMMON_ROOT)\ext\scfontcombobox
     $(MAKE) $(TARGET)
 
 #

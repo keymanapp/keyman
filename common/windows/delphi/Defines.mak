@@ -1,35 +1,21 @@
 # DEBUG=1
 
+# TODO: this should be a shared Defines.mak for common,developer,windows. So we
+# need to move any project-specific stuff into a defines-windows.mak,
+# defines-etc.mak
+
 #
 # Paths
 #
 
 !IFNDEF KEYMAN_ROOT
-KEYMAN_ROOT=c:\keyman
+!ERROR KEYMAN_ROOT must be defined!
 !ENDIF
 
-ROOT=$(KEYMAN_ROOT)\windows
 COMMON_ROOT=$(KEYMAN_ROOT)\common\windows\delphi
-# TODO: include COMMON_ROOT's defines.mak
+WINDOWS_ROOT=$(KEYMAN_ROOT)\windows
 
-EXT=$(ROOT)\src\ext
-
-INCLUDE=$(ROOT)\src\global\inc;$(INCLUDE)
-
-!ifndef EXCLUDEPATHDEFINES
-!ifndef NODELPHI
-!include $(ROOT)\src\PathDefines.mak
-!endif
-!endif
-
-PROGRAM=$(ROOT)\bin
-BUILD=$(ROOT)\build
-DEBUGPATH=$(ROOT)\debug
-OUTLIB=$(ROOT)\lib
-
-INSTALLPATH_KEYMANDESKTOP=%ProgramFiles(X86)%\Keyman\Keyman Desktop
-INSTALLPATH_KEYMANDEVELOPER=%ProgramFiles(X86)%\Keyman\Keyman Developer
-INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
+# INCLUDE=$(ROOT)\src\global\inc;$(INCLUDE)
 
 !IFDEF DEBUG
 MAKEFLAG_DEBUG="DEBUG=$(DEBUG)"
@@ -50,14 +36,6 @@ MAKEFLAG_SC_TIMESTAMP="SC_TIMESTAMP=$(SC_TIMESTAMP)"
 MAKEFLAG_BUILDHELP="BUILDHELP=$(BUILDHELP)"
 !ENDIF
 
-!IFDEF BUILDRTF
-MAKEFLAG_BUILDRTF="BUILDRTF=$(BUILDRTF)"
-!ENDIF
-
-!IFDEF REL_SUFFIX
-!ERROR Not using REL_SUFFIX any more!
-!ENDIF
-
 !IFDEF LINT
 MAKEFLAG_LINT="LINT=$(LINT)"
 !ENDIF
@@ -74,17 +52,15 @@ MAKEFLAG_QUIET="QUIET=$(QUIET)"
 MAKEFLAG_RELEASE_OEM="RELEASE_OEM=$(RELEASE_OEM)"
 !ENDIF
 
-!IFDEF QUICK_BUILD_KEYMAN
-MAKEFLAG_QUICK_BUILD_KEYMAN="QUICK_BUILD_KEYMAN=$(QUICK_BUILD_KEYMAN)"
-!ENDIF
-
 #
 # USERDEFINES allows the developer to specify overrides for various settings. We need a variable
 # because Makefiles cannot test for file existence
 #
 
+# TODO: can we eliminate this?
+
 !ifdef USERDEFINES
-!include $(ROOT)\src\UserDefines.mak
+!include $(WINDOWS_ROOT)\src\UserDefines.mak
 !endif
 
 #
@@ -113,8 +89,8 @@ TARGET_PATH=Debug
 TARGET_PATH=Release
 !ENDIF
 
-# DEVTOOLS=$(ROOT)\src\buildtools\devtools\devtools.exe
-DEVTOOLS=$(PROGRAM)\buildtools\devtools.exe
+# TODO: move to common
+DEVTOOLS=$(WINDOWS_ROOT)\bin\buildtools\devtools.exe
 
 !IFDEF LINT
 DELPHIWARNINGS=-W+MESSAGE_DIRECTIVE -W+IMPLICIT_STRING_CAST -W+IMPLICIT_STRING_CAST_LOSS -W+EXPLICIT_STRING_CAST -W+EXPLICIT_STRING_CAST_LOSS -W+CVT_WCHAR_TO_ACHAR -W+CVT_NARROWING_STRING_LOST -W+CVT_ACHAR_TO_WCHAR -W+CVT_WIDENING_STRING_LOST -W+UNICODE_TO_LOCALE -W+LOCALE_TO_UNICODE -W+IMPLICIT_VARIANTS
@@ -136,7 +112,7 @@ DCC64=cmd /c "$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 # Delphi MSBuild related commands and macros
 #
 
-DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
+DELPHI_MSBUILD=$(WINDOWS_ROOT)\src\buildtools\msbuild-wrapper.bat "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
 
 !IFDEF NODELPHI
 DCC32=echo skipping
@@ -156,9 +132,6 @@ WIN64_TARGET_PATH=bin\Win64\$(TARGET_PATH)
 #
 # Other program build commands
 #
-
-PHPDIR=\php
-PHPEXE=$(PHPDIR)\php.exe
 
 BRCC32=rc.exe
 
@@ -184,13 +157,10 @@ WZZIPPATH="C:\program files\7-zip\7z.exe"
 WZZIP=$(WZZIPPATH) a
 WZUNZIP=$(WZZIPPATH) e
 
-# TDSPACK=error! $(ROOT)\src\buildtools\tdspack\tdspack -e
-# TDSPACKCOMPRESS=error! $(ROOT)\src\buildtools\tdspack\tdspack -o
-
 # we are using cmd /c because tds2dbg is failing on direct execution
 # from nmake
-TDS2DBG=cmd /c $(ROOT)\bin\buildtools\tds2dbg
-SENTRYTOOL=$(ROOT)\bin\buildtools\sentrytool
+TDS2DBG=cmd /c $(WINDOWS_ROOT)\bin\buildtools\tds2dbg
+SENTRYTOOL=$(WINDOWS_ROOT)\buildtools\sentrytool
 SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep -r $(KEYMAN_ROOT) -i $(DELPHIINCLUDES)
 
 WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
@@ -223,11 +193,11 @@ MAKE=$(MAKE)
 #
 
 !IFNDEF SC_PFX_SHA1
-SC_PFX_SHA1="$(ROOT)\src\buildtools\certificates\keymantest-sha1.pfx"
+SC_PFX_SHA1="$(WINDOWS_ROOT)\src\buildtools\certificates\keymantest-sha1.pfx"
 !ENDIF
 
 !IFNDEF SC_PFX_SHA256
-SC_PFX_SHA256="$(ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
+SC_PFX_SHA256="$(WINDOWS_ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
 !ENDIF
 
 !IFNDEF SC_URL
@@ -238,12 +208,11 @@ SC_URL="https://keyman.com/"
 SC_PWD=""
 !ENDIF
 
-SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
+SIGNCODE=@$(WINDOWS_ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
 
 #
 # On some computers, the PLATFORM environment variable is set to x86. This can break msbuild
 # with our projects. This may be resolvable in the future, but for now the easy fix is ...
-# This may be exacerbated by a bug in Delphi MAKE - https://quality.embarcadero.com/browse/RSP-18245
 #
 
 PLATFORM=Win32
@@ -254,9 +223,9 @@ PLATFORM=Win32
 #
 
 !ifdef GIT_BASH_FOR_KEYMAN
-MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\mkver.sh
+MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(WINDOWS_ROOT)\src\buildtools\mkver.sh
 !else
-MKVER_SH=start /wait $(ROOT)\src\buildtools\mkver.sh
+MKVER_SH=start /wait $(WINDOWS_ROOT)\src\buildtools\mkver.sh
 !endif
 
 MKVER_M=$(MKVER_SH) manifest.in manifest.xml
