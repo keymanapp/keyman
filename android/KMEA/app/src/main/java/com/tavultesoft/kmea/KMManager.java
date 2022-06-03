@@ -210,7 +210,6 @@ public final class KMManager {
   // Special override for when the keyboard may have haptic feedback when typing.
   // haptic feedback disabled for hardware keystrokes
   private static boolean mayHaveHapticFeedback = false;
-  private static boolean executingHardwareKeystroke = false;
 
   // Special override for when keyboard is entering a password text field.
   // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
@@ -461,7 +460,6 @@ public final class KMManager {
   public static InputMethodService getInputMethodService() { return IMService; }
 
   public static boolean executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
-    executingHardwareKeystroke = true;
     if (SystemKeyboard != null) {
       return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM, lstates, eventModifiers);
     } else if (InAppKeyboard != null) {
@@ -473,7 +471,6 @@ public final class KMManager {
 
   public static boolean executeHardwareKeystroke(
     int code, int shift, KeyboardType keyboard, int lstates, int eventModifiers) {
-    executingHardwareKeystroke = true;
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       InAppKeyboard.executeHardwareKeystroke(code, shift, lstates, eventModifiers);
       return true;
@@ -2711,7 +2708,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s, final int dr) {
+    public void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke) {
       if(dr != 0) {
         Log.d(TAG, "Right deletions requested but are not presently supported by the in-app keyboard.");
       }
@@ -2822,7 +2819,6 @@ public final class KMManager {
           if (mayHaveHapticFeedback && !executingHardwareKeystroke) {
             textView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
           }
-          executingHardwareKeystroke = false;
         }
       });
     }
@@ -2874,7 +2870,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s, final int dr) {
+    public void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke) {
       // TODO: Unify in-app and system insertText
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
@@ -2968,7 +2964,6 @@ public final class KMManager {
           if (parent != null && mayHaveHapticFeedback && !executingHardwareKeystroke) {
             parent.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
           }
-          executingHardwareKeystroke = false;
         }
       });
     }

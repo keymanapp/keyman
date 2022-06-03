@@ -146,6 +146,15 @@ function setSpacebarText(mode) {
   keyman.correctOSKTextSize();
 }
 
+// #6665: we need to know when the user has pressed a hardware key so we don't
+// generate haptic feedback when text changes are made via insertText. We know
+// that the executeHardware->insertText process is a non-reentrant
+// single-threaded sequence so this global flag tracking whether we are
+// currently executing a hardware keystroke event is safe here. We can't do this
+// on the Java side, because the Java<-->JS interface is asynchronous, and we
+// cannot reliably know when each hardware keystroke has completed processing.
+var executingHardwareKeystroke = false;
+
 /**
  * Inserts the selected string <i>s</i>
  * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
@@ -156,7 +165,7 @@ function insertText(dn, s, dr) {
   console_debug('insertText(dn='+dn+',s='+s+',dr='+dr+')');
   dr = dr || 0; // Sets a default value of zero when dr is undefined
   //window.console.log('insertText('+ dn +', ' + s +', ' + dr + ');');
-  window.jsInterface.insertText(dn, s, dr);
+  window.jsInterface.insertText(dn, s, dr, executingHardwareKeystroke);
 }
 
 function deregisterModel(modelID) {
@@ -345,15 +354,16 @@ function executePopupKey(keyID, keyText) {
 
 function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
   console_debug('executeHardwareKeystroke(code='+code+',shift='+shift+',lstates='+lstates+',eventModifiers='+eventModifiers+')');
-  var kmw=window['keyman'];
-  //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
   try {
-    if (kmw['executeHardwareKeystroke'](code, shift, lstates)) { // false if matched, true if not
+    executingHardwareKeystroke = true;
+    if (window.keyman.executeHardwareKeystroke(code, shift, lstates)) { // false if matched, true if not
       // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
       window.jsInterface.dispatchKey(code, eventModifiers);
     }
+    executingHardwareKeystroke = false;
   } catch(e) {
     window.console.log('executeHardwareKeystroke exception: '+e);
+    executingHardwareKeystroke = false;
   }
 }
 
