@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.257 beta 2022-06-03
+
+* fix(developer): kmcomp package compiler race condition (#6696)
+* fix(developer): install keyboard call should quote kmshell.exe path (#6691)
+
 ## 15.0.256 beta 2022-06-01
 
 * chore(android,ios,mac): Update crowdin strings for Spanish (Latin America) (#6650)
