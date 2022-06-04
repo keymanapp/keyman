@@ -145,6 +145,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(langId), true);
         KMManager.setBannerOptions(mayPredict);
+      } else {
+        KMManager.setBannerOptions(false);
       }
     }
 
