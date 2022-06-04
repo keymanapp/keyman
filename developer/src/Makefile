@@ -3,9 +3,9 @@
 #
 
 !ifdef NODELPHI
-TARGETS=kmcmpdll kmanalyze kmdecomp server kmlmc
+TARGETS=build-tools kmcmpdll kmanalyze kmdecomp server kmlmc
 !else
-TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmlmc
+TARGETS=build-tools kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmlmc
 !endif
 
 EXCLUDEPATHDEFINES=1
@@ -16,47 +16,47 @@ CLEANS=clean-developer
 
 # ----------------------------------------------------------------------
 
-imsample: build-tools .virtual
+imsample: .virtual
     cd $(DEVELOPER_ROOT)\src\imsample
     $(MAKE) $(TARGET)
 
-kmcmpdll: build-tools .virtual
+kmcmpdll: .virtual
     cd $(DEVELOPER_ROOT)\src\kmcmpdll
     $(MAKE) $(TARGET)
 
-kmdecomp: build-tools .virtual
+kmdecomp: .virtual
     cd $(DEVELOPER_ROOT)\src\kmdecomp
     $(MAKE) $(TARGET)
 
-kmcomp: build-tools kmcmpdll
+kmcomp: kmcmpdll
     cd $(DEVELOPER_ROOT)\src\kmcomp
     $(MAKE) $(TARGET)
 
-kmanalyze: build-tools .virtual
+kmanalyze: .virtual
     cd $(DEVELOPER_ROOT)\src\kmanalyze
     $(MAKE) $(TARGET)
 
-kmconvert: build-tools .virtual
+kmconvert: .virtual
     cd $(DEVELOPER_ROOT)\src\kmconvert
     $(MAKE) $(TARGET)
 
-tike: build-tools kmcmpdll redist
+tike: kmcmpdll redist
     cd $(DEVELOPER_ROOT)\src\tike
     $(MAKE) $(TARGET)
 
-samples: build-tools .virtual
+samples: .virtual
     cd $(DEVELOPER_ROOT)\src\samples
     $(MAKE) $(TARGET)
 
-setup: build-tools .virtual
+setup: .virtual
     cd $(DEVELOPER_ROOT)\src\setup
     $(MAKE) $(TARGET)
 
-server: build-tools .virtual
+server: .virtual
     cd $(DEVELOPER_ROOT)\src\server
     $(MAKE) $(TARGET)
 
-kmlmc: build-tools .virtual
+kmlmc: .virtual
     cd $(DEVELOPER_ROOT)\src\kmlmc
     $(MAKE) $(TARGET)
 
@@ -217,9 +217,7 @@ build-tools:
 !ifdef NODELPHI
     echo Skipping build-tools
 !else
-# we need to build devtools directly because otherwise we have a
-# chicken-and-egg issue with PathDefines.mak
-    @if not exist $(WINDOWS_ROOT)\src\PathDefines.mak $(MAKE) build-tools-internal
+    $(MAKE) build-tools-internal
 !endif
 
 build-tools-internal:
