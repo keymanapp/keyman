@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=browse4folder common
+TARGETS=browse4folder mbcolor common
 !endif
 
 CLEANS=
@@ -18,6 +18,10 @@ CLEANS=
 
 browse4folder: .virtual
     cd $(DEVELOPER_ROOT)\src\ext\browse4folder
+    $(MAKE) $(TARGET)
+
+mbcolor: .virtual
+    cd $(DEVELOPER_ROOT)\src\ext\mbcolor
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------

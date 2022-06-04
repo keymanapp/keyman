@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common jedi mbcolor scfontcombobox cef4delphi
+TARGETS=common jedi scfontcombobox cef4delphi
 !endif
 
 # jedi has no packages
@@ -30,10 +30,6 @@ cef4delphi: .virtual
 
 jedi: .virtual
     cd $(ROOT)\src\ext\jedi
-    $(MAKE) $(TARGET)
-
-mbcolor: .virtual
-    cd $(ROOT)\src\ext\mbcolor
     $(MAKE) $(TARGET)
 
 vclzip: .virtual
