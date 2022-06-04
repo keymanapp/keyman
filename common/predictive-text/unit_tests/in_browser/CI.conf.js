@@ -74,7 +74,7 @@ module.exports = function(config) {
 
   var CURRENT_WIN_LAUNCHERS = {
     // Currently, Firefox launcher is unstable; see https://github.com/karma-runner/karma-firefox-launcher/issues/93
-    // (in particular "not maintained" commentary). 
+    // (in particular "not maintained" commentary).
     //bs_firefox_win: {
     //  os: 'Windows',
     //  os_version: '10',
@@ -133,7 +133,7 @@ module.exports = function(config) {
   var specifics = {
     // BrowserStack configuration options
     browserStack: {
-      video: false,
+      video: true,
       browserDisconnectTimeout: 3e5,
       retryLimit: 1, // 0 is ignored.
       startTunnel: true,
@@ -153,7 +153,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['teamcity'],
+    reporters: ['teamcity', 'BrowserStack'],
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
