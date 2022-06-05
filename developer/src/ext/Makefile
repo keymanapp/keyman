@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=browse4folder mbcolor scfontcombobox common
+TARGETS=browse4folder jedi mbcolor scfontcombobox common
 !endif
 
 CLEANS=
@@ -18,6 +18,10 @@ CLEANS=
 
 browse4folder: .virtual
     cd $(DEVELOPER_ROOT)\src\ext\browse4folder
+    $(MAKE) $(TARGET)
+
+jedi: .virtual
+    cd $(DEVELOPER_ROOT)\src\ext\jedi
     $(MAKE) $(TARGET)
 
 mbcolor: .virtual

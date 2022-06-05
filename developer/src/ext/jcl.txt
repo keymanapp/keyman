@@ -2,8 +2,8 @@ Keyman Third Party Package Readme: JCL
 =======================================
 
 Name:              JCL
-Purpose:           Various libraries for Delphi -- used for exception management
-Source:            
+Purpose:           Various libraries for Delphi -- used only for docking components in TIKE
+Source:
 Version:           28 Feb 2017
 License:           MPL 1.1
 Updated for:       Delphi 10.1 Berlin
@@ -15,13 +15,16 @@ Include Paths:     $(EXT)\jcl\jcl\source\common;$(EXT)\jcl\jcl\source\include;$(
 Installation notes
 ------------------
 
-Download from site above. 
+Download from site above.
 
 Build notes
 -----------
 
 No package required; relevant files are included by each project. Extraneous files removed to make repository smaller; only source included.
 Could remove additional source files, e.g. zlib, etc.
+
+NOTE: we have removed the majority of files from this library, as they are unused,
+and as we continue to deprecate use of Delphi.
 
 License - MPL 1.1
 ----------------
