@@ -8,7 +8,7 @@ uses
   System.SysUtils,
   Winapi.Windows,
 
-  JclDebug;
+  Keyman.System.JclMapScanner;
 
 type
   TMapToSymFindFileProc = function(const UnitName: string): string;
@@ -69,7 +69,7 @@ var
   s: TJclMapScannerCracker;
   r: TStringList;
   i: Integer;
-  fileName, groupName, unitName: string;
+  fileName, unitName: string;
   procCount, lineCount: Integer;
   procLen, lineIndex, lineLen: Integer;
   procName: string;
