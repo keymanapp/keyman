@@ -4,7 +4,6 @@
 **/*.groupproj.local
 **/*.bdsproj.local
 **/*.stat
-**/*.hpp
 **/*.sdf
 **/error.log
 **/.vs/
