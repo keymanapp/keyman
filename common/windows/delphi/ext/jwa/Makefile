@@ -4,13 +4,11 @@
 
 !include ..\..\Defines.mak
 
-build: dirs
-    $(MAKE) install-paths
-
+build: install-paths
 install: install-paths
 
 install-paths:
-    $(DEVTOOLS) -ai $(EXT)\jedi\jwa\branches\2.3\Win32API
+    $(DEVTOOLS) -ai $(COMMON_ROOT)\ext\jwa\Win32API
 
 clean:
     rem
