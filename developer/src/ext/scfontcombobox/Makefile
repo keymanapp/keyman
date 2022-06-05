@@ -11,7 +11,7 @@ build: dirs
 
 install:
     $(DEVTOOLS) -ip $(OUTLIB)\scFontCombo.bpl
-    $(DEVTOOLS) -ai $(EXT)\scfontcombobox
+    $(DEVTOOLS) -ai $(DEVELOPER_ROOT)\src\ext\scfontcombobox
 
 clean: def-clean
 

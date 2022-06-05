@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common jedi scfontcombobox cef4delphi
+TARGETS=common jedi cef4delphi
 !endif
 
 # jedi has no packages
@@ -34,10 +34,6 @@ jedi: .virtual
 
 vclzip: .virtual
     cd $(ROOT)\src\ext\vclzip
-    $(MAKE) $(TARGET)
-
-scfontcombobox: .virtual
-    cd $(ROOT)\src\ext\scfontcombobox
     $(MAKE) $(TARGET)
 
 #
