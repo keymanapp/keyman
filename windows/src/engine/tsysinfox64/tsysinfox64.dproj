@@ -129,8 +129,8 @@
         <DCCReference Include="si_processes.pas"/>
         <DCCReference Include="sysinfo_util.pas"/>
         <DCCReference Include="main.pas"/>
-        <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
-        <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>

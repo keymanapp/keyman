@@ -223,7 +223,7 @@
 
     </Directory>
 
-    <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\ext\sentry">
+    <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\..\..\common\windows\delphi\ext\sentry">
       <Component>
         <File Id="sentry.dll" KeyPath="yes" />
       </Component>

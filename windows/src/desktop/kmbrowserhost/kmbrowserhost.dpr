@@ -16,8 +16,8 @@ uses
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
-  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
-  sentry in '..\..\ext\sentry\sentry.pas',
+  Sentry.Client in '..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas',
+  sentry in '..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {R icons.res}

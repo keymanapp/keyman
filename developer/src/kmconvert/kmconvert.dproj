@@ -191,9 +191,9 @@
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas">
             <Form>$R icons.RES</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\ext\sentry\Sentry.Client.pas"/>
-        <DCCReference Include="..\..\..\windows\src\ext\sentry\Sentry.Client.Console.pas"/>
-        <DCCReference Include="..\..\..\windows\src\ext\sentry\sentry.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.Console.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>

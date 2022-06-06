@@ -126,8 +126,8 @@
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
-        <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
