@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.258 beta 2022-06-06
+
+* chore: add 14.0 entries to beta HISTORY.md (#6705)
+* chore(web): switch on additional BrowserStack reporting (#6707)
+* fix(web): fixes OSK-interaction issues in Float, Toolbar UI modules (#6689)
+
 ## 15.0.257 beta 2022-06-03
 
 * fix(developer): kmcomp package compiler race condition (#6696)
