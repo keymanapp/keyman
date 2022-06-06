@@ -1477,6 +1477,111 @@
 
 * chore: prepare 15.0 alpha (#4129)
 
+## 14.0.292 stable 2022-05-24
+
+* fix(windows): sentry debuglogging for DoInstall (#6648)
+
+## 14.0.291 stable 2022-05-07
+
+* fix(windows): don't log before checking nil when installing keyboard (#6506)
+* fix(windows): put correct HK_ALT flag for modifier (#6587)
+
+## 14.0.290 stable 2022-03-31
+
+* chore(oem/fv/android): Update dependencies (#6452)
+
+## 14.0.289 stable 2022-03-30
+
+* chore(linux): Remove versions that are no longer supported (#6388)
+* chore(windows): move crash metadata to extra (#6398)
+* fix(android/engine): Test fileVersion during package install (#6423)
+* fix(mac): invalid keyboard breaks configuration (#6420)
+* chore(android):   Update Play publishing plugin to 3.5.0 and other plugins (#6224)
+* fix(web): track load error detail (#6443)
+
+## 14.0.288 stable 2022-03-15
+
+* chore(linux): Update changelogs for 14.0.287 (#6373)
+
+## 14.0.287 stable 2022-03-04
+
+* chore(ios): certificate update (#6210)
+* fix(windows): create Keyman/Diag folder in redirected profile (#6222)
+* fix(web): stop masking error (#6332)
+
+## 14.0.286 stable 2022-01-27
+
+* chore(linux): Update changelogs for 14.0.284 (#6131)
+* chore(linux): Revert workaround for Python bug (#6134)
+* fix: only auto-merge if `auto:` prefix in title (#6148)
+* fix(developer): work around devDependencies bug in npm (#6142)
+* chore(ios): certificate update (#6166)
+* fix(mac): Check for CODE_SETSYSTEMSTORE (#6170)
+
+## 14.0.285 stable 2022-01-20
+
+* fix(linux): Fix lintian errors :cherries: (#6107)
+* fix(linux): Add workaround for Python bug :cherries: (#6125)
+* fix(web): Use regex to determine display layer and functional layers (#6123)
+
+## 14.0.284 stable 2022-01-11
+
+* chore(android,oem/fv/android): Update targetSDKVersion to 30 (#5934)
+* fix(web): popupBaseKey null check (#5948)
+* fix(linux): Add test targets to Makefile (#5975)
+* fix(android/engine): Fix font paths (#5990)
+* chore(linux): Remove lintian warning (#5993)
+* chore(linux): Allow to specify debian revision (#5998)
+* chore(linux): Update changelogs for 14.0.283 :package: (#6007)
+* fix(linux): fix release version number for Sentry reporting :cherries: (#6053)
+* chore(common): Check in crowdin strings for Spanish (Latin America) (#6060)
+* fix(linux): fix release version number for Sentry reporting :cherries: (#6069)
+* chore(android/samples): Add -no-daemon flag to KMSample2 build script (#6083)
+* fix(linux): Fix attribute error :cherries: (#6087)
+
+## 14.0.283 stable 2021-11-17
+
+* chore(windows): fix broken links in help (#5766)
+* chore(linux): copy Keyman for Linux 15 reference to 14 (#5764)
+* fix(linux): Fix debian package script (#5772)
+* chore(common): Enhance cherry-pick labeling (#5773)
+* fix(common): Fix cherry-pick labeling (:cherries:) (#5783)
+* fix(linux): Don't crash displaying keyboard details (#5757)
+* chore(linux): Update changelog files for 14.0.282 (#5793)
+* fix(linux): Don't crash with non-keyboard package file (#5754)
+* chore: sentry.io dsn  ‍ ️ (#5788)
+* fix(windows): handle edge cases using default language (#5775)
+* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5806)
+* fix(web): remove canvas use for iOS compatibility (#5916)
+
+## 14.0.282 stable 2021-09-27
+
+* fix(mac): add support for M1 processor (#5737)
+* chore(mac): Add help links for installing Keyman and keyboards (#5748)
+* fix: help.keyman.com script file cleanup (#5750)
+
+## 14.0.281 stable 2021-09-17
+
+* fix(common/models): keep/suggestion diacritic sensitivity when de-duping (#5552)
+* feat(ios): adds option for Simulator-compatible testing artifact (#5569)
+* chore(ios,windows): Update crowdin strings for Azerbaijani (#5487)
+* fix(oem/fv/ios): build configuration for 14.0's test-oriented simulator artifact (#5596)
+* fix(linux): Handle corrupt icon file (#5589)
+* fix(linux): Check for valid kmp file (#5590)
+* chore: fixup stable HISTORY.md (#5605)
+* chore(linux): Improve debian package script (#5624)
+* chore(linux): Fix uploading to Sentry (#5625)
+* chore(linux): Update changelog files (#5636)
+* fix(ios): iOS 13 and 14 only - stuck settings toggles (#5611)
+* fix(web): Fix layers for embedded longpress keys (#5651)
+* fix(linux): Use first keyboard language if none given (#5657)
+* fix(android/engine): Fix backspace on Android 5.0 (#5674)
+* chore(common): report-history (#5678)
+* fix(developer): ensure file modified after import from layout (#5677)
+* test(windows): investigate TIP crash (#5679)
+* fix(common/core/web): Remove empty rows in OSK (#5703)
+* fix(windows): fallback to filename if `&name` not set (#5685)
+
 ## 14.0.280 stable 2021-08-02
 
 * fix(android): displayName for keyboard was not optional (#5492)
