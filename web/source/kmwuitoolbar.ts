@@ -756,14 +756,11 @@ if(!window['keyman']['ui']['name']) {
      **/
     ui.showOSK = function(event)
     {
-      keymanweb['activatingUI'](true);
-      // As the Toolbar UI uses more advanced minification, we must preserve the 'osk' field name.
       let osk = keymanweb['osk'];
-
       if(!osk) {
-        keymanweb['activatingUI'](false);
         return;
       }
+      keymanweb['activatingUI'](true);
       //Toggle OSK on or off
       if(osk && keymanweb['getActiveKeyboard']() != '')
       {
