@@ -7,7 +7,7 @@ build:
     $(MAKE) install
 
 install:
-    -mkdir $(KEYMAN_ROOT)\windows\bin\buildtools
+    -mkdir $(KEYMAN_ROOT)\common\windows\bin\buildtools
     $(COPY) $(WIN32_TARGET_PATH)\tds2dbg.exe $(KEYMAN_ROOT)\common\windows\bin\buildtools
 
 #
