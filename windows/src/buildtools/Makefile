@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=devtools sentrytool tds2dbg \
+TARGETS=devtools sentrytool \
   buildunidata build_standards_data buildpkg test-klog
 !endif
 
@@ -43,10 +43,6 @@ buildpkg: .virtual
 
 test-klog: .virtual
     cd $(ROOT)\src\buildtools\test-klog
-    $(MAKE) $(TARGET)
-
-tds2dbg: .virtual
-    cd $(ROOT)\src\buildtools\tds2dbg
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------

@@ -159,7 +159,7 @@ WZUNZIP=$(WZZIPPATH) e
 
 # we are using cmd /c because tds2dbg is failing on direct execution
 # from nmake
-TDS2DBG=cmd /c $(WINDOWS_ROOT)\bin\buildtools\tds2dbg
+TDS2DBG=cmd /c $(KEYMAN_ROOT)\common\windows\bin\buildtools\tds2dbg
 SENTRYTOOL=$(WINDOWS_ROOT)\buildtools\sentrytool
 SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep -r $(KEYMAN_ROOT) -i $(DELPHIINCLUDES)
 
