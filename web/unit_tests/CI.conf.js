@@ -124,7 +124,7 @@ module.exports = function(config) {
   var specifics = {
     // BrowserStack configuration options
     browserStack: {
-      video: false,
+      video: true,
       browserDisconnectTimeout: 3e5,
       retryLimit: 1, // 0 is ignored.
       startTunnel: true,
@@ -144,7 +144,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['teamcity'],
+    reporters: ['teamcity', 'BrowserStack'],
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
