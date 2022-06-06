@@ -14,6 +14,12 @@ namespace com.keyman.osk {
     public readonly numKey:      OSKBaseKey;
     public readonly scrollKey:   OSKBaseKey;
 
+    private _rowHeight: number;
+
+    public get rowHeight(): number {
+      return this._rowHeight;
+    }
+
     public get id(): string {
       return this.spec.id;
     }
@@ -89,8 +95,8 @@ namespace com.keyman.osk {
 
     public refreshLayout(vkbd: VisualKeyboard, paddedHeight: number, trueHeight: number) {
       // Check the heights of each row, in case different layers have different row counts.
-      let nRows = this.rows.length;
-      let rowHeight = Math.floor(paddedHeight/(nRows == 0 ? 1 : nRows));
+      const nRows = this.rows.length;
+      const rowHeight = this._rowHeight = Math.floor(paddedHeight/(nRows == 0 ? 1 : nRows));
 
       if(vkbd.usesFixedHeightScaling) {
         this.element.style.height=(trueHeight)+'px';
@@ -98,7 +104,7 @@ namespace com.keyman.osk {
 
       for(let nRow=0; nRow<nRows; nRow++) {
         const oskRow = this.rows[nRow];
-        let bottom = (nRows-nRow-1)*rowHeight+1;
+        const bottom = (nRows-nRow-1)*rowHeight+1;
 
         if(vkbd.usesFixedHeightScaling) {
           // Calculate the exact vertical coordinate of the row's center.
