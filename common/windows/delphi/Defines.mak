@@ -14,6 +14,7 @@
 
 COMMON_ROOT=$(KEYMAN_ROOT)\common\windows\delphi
 WINDOWS_ROOT=$(KEYMAN_ROOT)\windows
+OUTLIB=$(WINDOWS_ROOT)\lib
 
 # INCLUDE=$(ROOT)\src\global\inc;$(INCLUDE)
 

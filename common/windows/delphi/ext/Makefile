@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=dcpcrypt jwa tds2dbg # cef4delphi
+TARGETS=cef4delphi dcpcrypt jwa tds2dbg
 !endif
 
 # jedi has no packages

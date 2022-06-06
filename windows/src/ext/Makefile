@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common cef4delphi
+TARGETS=common
 !endif
 
 CLEANS=
@@ -21,10 +21,6 @@ common: .virtual
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
-
-cef4delphi: .virtual
-    cd $(ROOT)\src\ext\cef4delphi
-    $(MAKE) $(TARGET)
 
 #
 #
