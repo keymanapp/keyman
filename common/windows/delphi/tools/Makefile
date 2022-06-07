@@ -44,7 +44,7 @@ test-klog: .virtual
 
 # ----------------------------------------------------------------------
 
-clean-buildtools:
+clean-tools:
     cd $(COMMON_ROOT)\tools
     -del version.txt
 
