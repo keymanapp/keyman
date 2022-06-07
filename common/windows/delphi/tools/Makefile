@@ -7,9 +7,8 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=build_standards_data
-# devtools sentrytool \
-# buildunidata build_standards_data buildpkg test-klog
+TARGETS=build_standards_data buildunidata
+# devtools sentrytool test-klog
 !endif
 
 CLEANS=clean-tools
