@@ -6,8 +6,8 @@
 
 test: build
 
-STANDARDS_DATA_PATH=$(ROOT)\..\resources\standards-data
-STANDARDS_OUT_PATH=$(ROOT)\src\global\delphi\standards
+STANDARDS_DATA_PATH=$(KEYMAN_ROOT)\resources\standards-data
+STANDARDS_OUT_PATH=$(WINDOWS_ROOT)\src\global\delphi\standards
 
 ISO6393_DATA=$(STANDARDS_DATA_PATH)\iso639-3\iso639-3.tab
 ISO6393_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.ISO6393ToBCP47Registry.pas
@@ -33,6 +33,6 @@ build:
     $(WIN32_TARGET_PATH)\build_standards_data.exe langtags $(LANGTAGS_DATA) $(LANGTAGS_PAS)
 
 clean: def-clean
-    -rd /s/q Win32
+#    -rd /s/q Win32
 
 !include ..\..\Target.mak

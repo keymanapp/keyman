@@ -1,5 +1,5 @@
 #
-# Keyman buildtools Makefile
+# Keyman common tools Makefile
 #
 
 NOTARGET_SIGNCODE=yes
@@ -7,48 +7,45 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common devtools sentrytool \
-  buildunidata buildpkg test-klog
+TARGETS=build_standards_data
+# devtools sentrytool \
+# buildunidata build_standards_data buildpkg test-klog
 !endif
 
-CLEANS=clean-buildtools
+CLEANS=clean-tools
 
 !include ..\Header.mak
 
 # ----------------------------------------------------------------------
 
-common: .virtual
-    cd $(KEYMAN_ROOT)\common\windows\delphi\tools
+build_standards_data: .virtual
+    cd $(COMMON_ROOT)\tools\build_standards_data
     $(MAKE) $(TARGET)
 
 sentrytool: .virtual
-    cd $(ROOT)\src\buildtools\sentrytool
+    cd $(COMMON_ROOT)\tools\sentrytool
     $(MAKE) $(TARGET)
 
 buildunidata: .virtual
-    cd $(ROOT)\src\buildtools\buildunidata
+    cd $(COMMON_ROOT)\tools\buildunidata
     $(MAKE) $(TARGET)
 
 devtools: .virtual
 !ifdef NODELPHI
     echo Skipping devtools
 !else
-    cd $(ROOT)\src\buildtools\devtools
+    cd $(COMMON_ROOT)\tools\devtools
     $(MAKE) $(TARGET)
 !endif
 
-buildpkg: .virtual
-    cd $(ROOT)\src\buildtools\buildpkg
-    $(MAKE) $(TARGET)
-
 test-klog: .virtual
-    cd $(ROOT)\src\buildtools\test-klog
+    cd $(COMMON_ROOT)\tools\test-klog
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
 
 clean-buildtools:
-    cd $(ROOT)\src\buildtools
+    cd $(COMMON_ROOT)\tools
     -del version.txt
 
 !include ..\Target.mak
