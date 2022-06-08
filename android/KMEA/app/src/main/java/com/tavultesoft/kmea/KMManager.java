@@ -1994,7 +1994,25 @@ public final class KMManager {
 
   public static int getCurrentKeyboardIndex(Context context) {
     String key = KMKeyboard.currentKeyboard();
-    return KeyboardController.getInstance().getKeyboardIndex(key);
+    // This may be used either _before_ or while the KMKeyboard's host page is still being set up,
+    // either case being before there is an actual value ready for `currentKeyboard`.
+    // (In fact, it may be used to initialize it!)
+    //
+    // So, if there is no current keyboard... we read our cached value for the index of
+    // the user's last selected keyboard.
+    //
+    // For documentation purposes:  "before" can happen for the system keyboard; there's no guarantee
+    // that the host page will finish its async load before the `onStartInput` method is called.
+    if(key == null) {
+      SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+      if (index < 0) {
+        index = 0;
+      }
+      return index;
+    } else {
+      return KeyboardController.getInstance().getKeyboardIndex(key);
+    }
   }
 
   public static Keyboard getCurrentKeyboardInfo(Context context) {
@@ -2230,12 +2248,7 @@ public final class KMManager {
       if (url.startsWith("file")) { // TODO: is this test necessary?
         InAppKeyboardLoaded = true;
 
-        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-        if (index < 0) {
-          index = 0;
-        }
-        Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
+        Keyboard keyboardInfo = KMManager.getCurrentKeyboardInfo(context);
         String langId = null;
         if (keyboardInfo != null) {
           langId = keyboardInfo.getLanguageID();
@@ -2468,12 +2481,7 @@ public final class KMManager {
       if (url.startsWith("file:")) { // TODO: is this test necessary?
         SystemKeyboardLoaded = true;
 
-        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-        if (index < 0) {
-          index = 0;
-        }
-        Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
+        Keyboard keyboardInfo = KMManager.getCurrentKeyboardInfo(context);
         String langId = null;
         if (keyboardInfo != null) {
           langId  = keyboardInfo.getLanguageID();
