@@ -82,5 +82,5 @@ public abstract class KMKeyboardJSHandler {
    * @param dr  Number of post-caret code points to delete.
    */
   @JavascriptInterface
-  public abstract void insertText(final int dn, final String s, final int dr);
+  public abstract void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke);
 }
