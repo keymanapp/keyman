@@ -14,12 +14,11 @@ EXCLUDEPATHDEFINES=1
 
 !include ..\..\Defines.mak
 
-build: dirs
+build:
     $(DELPHI_MSBUILD) devtools.dproj
-    $(COPY) $(WIN32_TARGET_PATH)\devtools.exe $(PROGRAM)\buildtools
 
 test-releasebuildcheck: build
-    $(PROGRAM)\buildtools\devtools.exe -rt
+    $(DEVTOOLS) -rt
 
 clean: def-clean
 
