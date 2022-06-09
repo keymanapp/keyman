@@ -32,13 +32,15 @@ type
     class function GetFirstLanguage(Keyboard: IKeymanKeyboardInstalled): string; overload;
     class function GetFirstLanguage(Keyboard: IKeymanKeyboardFile): string; overload;
 
-    /// <summary>Get the BCP47 tag for the user's default language</summary>
+    /// <summary>Get the canonicalized BCP47 tag for the user's default language</summary>
     class function GetUserDefaultLanguage: string; overload; static;
     class procedure GetUserDefaultLanguage(var BCP47: string; var LangID: Integer); overload; static;
 
-    /// <summary>Get the -default-lang parameter string for kmshell</summary>
+    /// <summary>Get the canonicalized -default-lang parameter string for kmshell</summary>
     class function GetUserDefaultLangParameterString: string; static;
   private
+    // Get the IKeymanKeyboardLanguageInstalled Object corresponding to the BCBP47Tag or **Add** it if not found for the supplied KeyboardID.
+    // Returns Nil if no Keyboard is found with the supplied KeyboardID.
     class function GetKeyboardLanguage(const KeyboardID,
       BCP47Tag: string): IKeymanKeyboardLanguageInstalled; static;
   end;
@@ -342,7 +344,7 @@ begin
             if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + key) and
               r.ValueExists(v) then
             begin
-              BCP47 := key;
+              BCP47 := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(key);
               LangID := GetLangIDFromValueName;
               Break;
             end;
@@ -359,7 +361,7 @@ begin
           r.ReadMultiString(SRegValue_CPIUP_Languages, tags);
           if tags.Count > 0 then
           begin
-            BCP47 := tags[0].Trim;
+            BCP47 := (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(tags[0].Trim);
             if r.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47) then
               LangID := GetLangIDFromValueName;
           end;
