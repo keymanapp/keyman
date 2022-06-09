@@ -105,7 +105,7 @@ release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uia
 
 clean-pathdefines: test-releasebuildcheck
 # test-releasebuildcheck builds devtools for us
-    $(PROGRAM)\buildtools\devtools -ri
+    $(DEVTOOLS) -ri
 
 #
 # Test that the CEF file path is accessible from env var KEYMAN_CEF4DELPHI_ROOT
@@ -172,7 +172,7 @@ test-releaseexists:
 #
 
 test-releasebuildcheck: global-versions
-    cd $(ROOT)\src\buildtools\devtools
+    cd $(COMMON_ROOT)\tools\devtools
     $(MAKE) test-releasebuildcheck
     cd $(ROOT)\src
 
@@ -276,18 +276,17 @@ build-tools: global-versions
 !else
 # we need to build devtools directly because otherwise we have a
 # chicken-and-egg issue with PathDefines.mak
-    cd $(ROOT)\src\buildtools\devtools
-    $(MAKE)
+    $(MAKE) devtools-app
 # We'll build a default PathDefines.mak if it is missing here so we can
 # go on and do the rest of the build
-    $(PROGRAM)\buildtools\devtools -ti
+    $(DEVTOOLS) -ti
 !endif
 
 message-constants: build-tools
 !ifdef NODELPHI
     echo Skipping message-constants
 !else
-    $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
+    $(DEVTOOLS) -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
 !endif
 
 #

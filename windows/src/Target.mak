@@ -16,8 +16,8 @@ versionhistory-app2:
     $(MAKE) versionhistory
 
 devtools-app: dirs
-    cd $(ROOT)\src\buildtools
-    $(MAKE) devtools
+    cd $(COMMON_ROOT)\tools\devtools
+    $(MAKE)
     cd $(ROOT)\src
 
 version.res: version.rc
