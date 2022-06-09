@@ -98,6 +98,7 @@ unit-tests:
 
 release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert test-hhc test-7zip test-wix clean
     cd $(ROOT)\src
+    $(MAKE) devtools-app
     $(MAKE) global-versions
     $(MAKE) build-release-wrapper
 #   $(MAKE) clean  <-- this makes it harder to do OEM builds
