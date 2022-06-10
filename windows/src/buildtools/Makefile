@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common sentrytool buildpkg test-klog
+TARGETS=common buildpkg test-klog
 !endif
 
 CLEANS=clean-buildtools
@@ -18,10 +18,6 @@ CLEANS=clean-buildtools
 
 common: .virtual
     cd $(KEYMAN_ROOT)\common\windows\delphi\tools
-    $(MAKE) $(TARGET)
-
-sentrytool: .virtual
-    cd $(ROOT)\src\buildtools\sentrytool
     $(MAKE) $(TARGET)
 
 buildpkg: .virtual
