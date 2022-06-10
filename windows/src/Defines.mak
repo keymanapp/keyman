@@ -241,7 +241,7 @@ SC_URL="https://keyman.com/"
 SC_PWD=""
 !ENDIF
 
-SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
+SIGNCODE=@"$(KEYMAN_ROOT)\common\windows\signtime.bat" signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
 
 #
 # On some computers, the PLATFORM environment variable is set to x86. This can break msbuild
