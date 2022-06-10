@@ -91,7 +91,7 @@ inst: redist
 # release
 # ----------------------------------------------------------------------
 
-release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-releaseexists test-cert test-7zip test-wix clean clean-output
+release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-releaseexists test-cert test-7zip test-wix test-klog clean clean-output
     cd $(DEVELOPER_ROOT)\src
     echo Continuing Release
     $(MAKE) do-build-release
@@ -180,6 +180,15 @@ test-wix:
 
 test-7zip:
     if not exist $(WZZIPPATH) exit 1
+
+#
+# Test that klog is disabled
+#
+
+test-klog:
+    cd $(COMMON_ROOT)\tools\test-klog
+    $(MAKE) verify
+    cd $(ROOT)\src
 
 #
 # Test that we haven't already built this release

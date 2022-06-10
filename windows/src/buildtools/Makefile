@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common buildpkg test-klog
+TARGETS=common buildpkg
 !endif
 
 CLEANS=clean-buildtools
@@ -22,10 +22,6 @@ common: .virtual
 
 buildpkg: .virtual
     cd $(ROOT)\src\buildtools\buildpkg
-    $(MAKE) $(TARGET)
-
-test-klog: .virtual
-    cd $(ROOT)\src\buildtools\test-klog
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
