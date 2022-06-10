@@ -99,7 +99,6 @@ unit-tests:
 release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert test-hhc test-7zip test-wix clean
     cd $(ROOT)\src
     $(MAKE) devtools-app
-    $(MAKE) global-versions
     $(MAKE) build-release-wrapper
 #   $(MAKE) clean  <-- this makes it harder to do OEM builds
     cd $(ROOT)\src
@@ -264,14 +263,7 @@ build-release-wrapper-oem:
 # Tools needed to complete a build
 #
 
-global-versions:
-# Build our root version.txt
-    cd $(ROOT)\src
-
-    $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h
-    $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc
-
-build-tools: global-versions
+build-tools:
 !ifdef NODELPHI
     echo Skipping build-tools
 !else
@@ -287,7 +279,9 @@ message-constants: build-tools
 !ifdef NODELPHI
     echo Skipping message-constants
 !else
+!if "$(TARGET)" != "clean"
     $(DEVTOOLS) -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
+!endif
 !endif
 
 #
