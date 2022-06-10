@@ -113,9 +113,9 @@ clean-pathdefines: test-releasebuildcheck
 test-release-cef-path:
 !ifndef SC_TIMESTAMP
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\cef-checkout.sh
+    $(GIT_BASH_FOR_KEYMAN) $(KEYMAN_ROOT)\common\windows\cef-checkout.sh
 !else
-    start /wait $(ROOT)\src\buildtools\cef-checkout.sh
+    start /wait $(KEYMAN_ROOT)\common\windows\cef-checkout.sh
 !endif
 !endif
 

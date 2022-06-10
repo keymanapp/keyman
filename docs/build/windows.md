@@ -293,7 +293,7 @@ repo on your local machine.
 
 The version of CEF in use is determined by CEF_VERSION.md. This maps to a branch
 prefixed with `v` e.g. `v89.0.18` in the CEF4Delphi_binary repository. During a
-release build, the buildtools/cef-checkout.sh script will checkout the correct
+release build, the common/windows/cef-checkout.sh script will checkout the correct
 branch of the repository automatically and extract any compressed files found in
 it.
 
