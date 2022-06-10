@@ -1620,9 +1620,11 @@ namespace com.keyman.osk {
       // If popup is visible, need to move over popup, not over main keyboard
       // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
       if (key1 && key1['subKeys'] != null && this.initTouchCoord) {
-        // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-        if ((this.initTouchCoord.y - input.y > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
-          this.pendingSubkey.resolve();
+        if(this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
+          // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
+          if (this.initTouchCoord.y - input.y > this.getLongpressFlickThreshold()) {
+            this.pendingSubkey.resolve();
+          }
         }
       }
 
@@ -1633,6 +1635,16 @@ namespace com.keyman.osk {
       }
 
       return false;
+    }
+
+    private getLongpressFlickThreshold(): number {
+      const rowHeight = this.currentLayer.rowHeight;
+
+      // If larger than 5 (and it likely is), new threshold = 1/4 the std. key height.
+      const proportionalThreshold = rowHeight / 4;
+
+      // 5 - the longpress-flick triggering threshold before 15.0.
+      return Math.max(proportionalThreshold, 5);
     }
 
     optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
