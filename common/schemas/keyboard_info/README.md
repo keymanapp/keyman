@@ -5,7 +5,7 @@
 
 Documentation at https://help.keyman.com/developer/cloud/keyboard_info
 
-New versions should be deployed to **keymanapp/keyman/windows/src/global/inst/keyboard_info** and **keymanapp/keyboards/tools**
+New versions should be deployed to **keymanapp/keyman/common/schemas/keyboard_info** and **keymanapp/keyboards/tools**
 
 # .keyboard_info version history
 

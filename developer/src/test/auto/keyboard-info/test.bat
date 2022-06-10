@@ -34,7 +34,7 @@ goto :eof
 
 :should-pass
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -s -vs -schema-path "%KEYMAN_ROOT%\windows\src\global\inst\data\keyboard_info" "%2"
+"%compiler%" -s -vs -schema-path "%KEYMAN_ROOT%\common\schemas\keyboard_info" "%2"
 if %ERRORLEVEL% EQU 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0
@@ -44,7 +44,7 @@ exit /b 1
 
 :should-fail
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -s -vs -schema-path "%KEYMAN_ROOT%\windows\src\global\inst\data\keyboard_info" "%2"
+"%compiler%" -s -vs -schema-path "%KEYMAN_ROOT%\common\schemas\keyboard_info" "%2"
 if %ERRORLEVEL% GTR 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0
