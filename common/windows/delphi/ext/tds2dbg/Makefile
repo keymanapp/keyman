@@ -7,8 +7,8 @@ build:
     $(MAKE) install
 
 install:
-    -mkdir $(KEYMAN_ROOT)\common\windows\bin\buildtools
-    $(COPY) $(WIN32_TARGET_PATH)\tds2dbg.exe $(KEYMAN_ROOT)\common\windows\bin\buildtools
+    -mkdir $(KEYMAN_ROOT)\common\windows\bin\tools
+    $(COPY) $(WIN32_TARGET_PATH)\tds2dbg.exe $(KEYMAN_ROOT)\common\windows\bin\tools
 
 #
 # The following builds require Borland C++ compiler to be installed and in the path; see Readme.txt for details.

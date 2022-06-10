@@ -51,7 +51,6 @@
 
 # global build files
 /windows/src/global/help/version.out
-/windows/src/global/inst/data/UnicodeData.mdb
 /windows/src/global/delphi/general/SourceRootPath.pas
 
 # /buildtools/genkmnp/

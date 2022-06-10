@@ -138,7 +138,7 @@
               </Component>
 
               <Component>
-                <File Name="unicodedata.mdb" Source="..\..\global\inst\data\unicodedata.mdb" />
+                <File Name="unicodedata.mdb" Source="..\..\..\..\common\windows\bin\data\unicodedata.mdb" />
               </Component>
 
               <Component>

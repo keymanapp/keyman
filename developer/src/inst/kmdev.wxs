@@ -210,7 +210,7 @@
       </Component>
 
       <Component>
-        <File Name="unicodedata.mdb" Source="..\..\..\windows\src\global\inst\data\" KeyPath="yes" />
+        <File Name="unicodedata.mdb" Source="..\..\..\common\windows\bin\data\" KeyPath="yes" />
       </Component>
 
       <Component>
