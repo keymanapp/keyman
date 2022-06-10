@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.259 beta 2022-06-10
+
+* fix(android/engine): Disable haptic feedback on hardware keystrokes (#6671)
+* fix(windows): Install TIP crash with inconsistent bcp47tag (#6727)
+* change(web): adjusts minimum distance needed for quick-display of subkeys (#6714)
+* change(web): browser test timeout tweaks (#6718)
+
 ## 15.0.258 beta 2022-06-06
 
 * chore: add 14.0 entries to beta HISTORY.md (#6705)
