@@ -83,7 +83,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\global\vc\VKScanCodes.cpp" />
+    <ClCompile Include="..\..\..\..\global\cpp\VKScanCodes.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="import_rules.cpp" />
     <ClCompile Include="kmxfile.cpp" />

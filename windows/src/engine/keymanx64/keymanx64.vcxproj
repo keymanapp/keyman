@@ -136,7 +136,7 @@
     </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\global\vc\keymansentry.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp" />
     <ClCompile Include="keymanx64.cpp" />
   </ItemGroup>
   <ItemGroup>

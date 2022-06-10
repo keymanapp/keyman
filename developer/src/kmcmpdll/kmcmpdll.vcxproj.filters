@@ -91,15 +91,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
-    <ClCompile Include="..\..\global\vc\ConvertUTF.c" />
-    <ClCompile Include="..\..\global\vc\crc32.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\ConvertUTF.c" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\crc32.cpp" />
     <ClCompile Include="Edition.cpp" />
     <ClCompile Include="NamedCodeConstants.cpp" />
-    <ClCompile Include="..\..\global\vc\rc4.cpp" />
-    <ClCompile Include="..\..\global\vc\registry.cpp" />
-    <ClCompile Include="..\..\global\vc\unicode.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\rc4.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp" />
     <ClCompile Include="virtualcharkeys.cpp" />
-    <ClCompile Include="..\..\global\vc\xstring.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
     <ClCompile Include="..\ext\json-schema-validator\json-schema-draft4.json.cpp" />
     <ClCompile Include="..\ext\json-schema-validator\json-uri.cpp" />
     <ClCompile Include="..\ext\json-schema-validator\json-validator.cpp" />
