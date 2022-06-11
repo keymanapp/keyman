@@ -359,7 +359,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="keymanengine.h" />
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h" />
+    <ClInclude Include="..\..\..\include\kmtip_guids.h" />
     <ClInclude Include="addins.h" />
     <ClInclude Include="appint\aiTIP.h" />
     <ClInclude Include="appint\aiWin2000Unicode.h" />

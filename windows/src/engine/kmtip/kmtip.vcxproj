@@ -419,7 +419,7 @@
     <ClInclude Include="..\..\..\..\common\windows\cpp\include\vkeys.h" />
     <ClInclude Include="..\..\global\inc\certificate_check.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h" />
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h" />
+    <ClInclude Include="..\..\..\include\kmtip_guids.h" />
     <ClInclude Include="editsess.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="..\..\global\inc\KEYNAMES.H" />

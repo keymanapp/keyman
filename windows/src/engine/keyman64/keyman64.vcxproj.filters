@@ -75,12 +75,12 @@
     <ClInclude Include="..\keyman32\serialkeyeventserver.h" />
     <ClInclude Include="..\keyman32\SharedBuffers.h" />
     <ClInclude Include="..\keyman32\syskbd.h" />
-    <ClInclude Include="..\..\global\inc\testkeymanfunctioning.h" />
+    <ClInclude Include="..\keyman32\testkeymanfunctioning.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />
     <ClInclude Include="..\keyman32\vkscancodes.h" />
     <ClInclude Include="..\keyman32\keymanengine.h" />
     <ClInclude Include="..\keyman32\kmprocessactions.h" />
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h" />
+    <ClInclude Include="..\..\..\include\kmtip_guids.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\keyman32\keyman-debug-etw.man" />

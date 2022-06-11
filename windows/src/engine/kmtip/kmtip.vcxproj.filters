@@ -114,7 +114,7 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h">
+    <ClInclude Include="..\..\..\include\kmtip_guids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\windows\cpp\include\vkeys.h">
