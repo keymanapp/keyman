@@ -289,7 +289,7 @@
     <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema.hpp" />
     <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json\json.hpp" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\certificate_check.h" />
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Comperr.h" />
+    <ClInclude Include="comperr.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Compfile.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Compiler.h" />
     <ClInclude Include="CasedKeys.h" />

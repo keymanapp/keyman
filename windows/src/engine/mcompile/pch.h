@@ -13,7 +13,5 @@
 #include "mc_syskbd.h"
 #include "../../global/inc/crc32.h"
 #include "../../global/inc/compiler.h"
-#include "../../global/inc/compfile.h"
-#include "../../global/inc/comperr.h"
 #include "../../global/inc/xstring.h"
 #include "../../global/inc/keymansentry.h"

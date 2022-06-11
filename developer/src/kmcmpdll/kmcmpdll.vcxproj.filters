@@ -10,7 +10,7 @@
     <ClInclude Include="..\..\global\inc\certificate_check.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\Comperr.h">
+    <ClInclude Include="comperr.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\global\inc\Compfile.h">
