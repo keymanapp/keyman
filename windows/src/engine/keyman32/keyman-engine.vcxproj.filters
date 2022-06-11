@@ -192,7 +192,7 @@
     <ClInclude Include="..\..\global\inc\keyman64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymancontrol.h">
+    <ClInclude Include="keymancontrol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keystate.h">
@@ -237,7 +237,7 @@
     <ClInclude Include="serialkeyeventserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymanengine.h">
+    <ClInclude Include="keymanengine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kmprocessactions.h">

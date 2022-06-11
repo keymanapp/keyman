@@ -276,7 +276,7 @@
     <ResourceCompile Include="Keyman64.RC" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\global\inc\keymanengine.h" />
+    <ClInclude Include="..\keyman32\keymanengine.h" />
     <ClInclude Include="..\..\global\inc\kmtip_guids.h" />
     <ClInclude Include="..\keyman32\addins.h" />
     <ClInclude Include="..\keyman32\appint\aiTIP.h" />
@@ -295,7 +295,7 @@
     <ClInclude Include="..\keyman32\k32_res.h" />
     <ClInclude Include="..\keyman32\KBD.H" />
     <ClInclude Include="..\..\global\inc\keyman64.h" />
-    <ClInclude Include="..\..\global\inc\keymancontrol.h" />
+    <ClInclude Include="..\keyman32\keymancontrol.h" />
     <ClInclude Include="..\..\global\inc\KEYNAMES.H" />
     <ClInclude Include="..\keyman32\keyman-debug-etw.h" />
     <ClInclude Include="..\keyman32\keyeventsenderthread.h" />

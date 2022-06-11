@@ -57,7 +57,7 @@
     <ClInclude Include="..\keyman32\k32_res.h" />
     <ClInclude Include="..\keyman32\KBD.H" />
     <ClInclude Include="..\..\global\inc\keyman64.h" />
-    <ClInclude Include="..\..\global\inc\keymancontrol.h" />
+    <ClInclude Include="..\keyman32\keymancontrol.h" />
     <ClInclude Include="..\..\global\inc\KEYNAMES.H" />
     <ClInclude Include="..\keyman32\keyman-debug-etw.h" />
     <ClInclude Include="..\keyman32\keyeventsenderthread.h" />
@@ -78,7 +78,7 @@
     <ClInclude Include="..\..\global\inc\testkeymanfunctioning.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />
     <ClInclude Include="..\keyman32\vkscancodes.h" />
-    <ClInclude Include="..\..\global\inc\keymanengine.h" />
+    <ClInclude Include="..\keyman32\keymanengine.h" />
     <ClInclude Include="..\keyman32\kmprocessactions.h" />
     <ClInclude Include="..\..\global\inc\kmtip_guids.h" />
   </ItemGroup>

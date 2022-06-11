@@ -369,7 +369,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\global\inc\keymanengine.h" />
+    <ClInclude Include="keymanengine.h" />
     <ClInclude Include="addins.h" />
     <ClInclude Include="appint\aiTIP.h" />
     <ClInclude Include="appint\aiWin2000Unicode.h" />
@@ -385,7 +385,7 @@
     <ClInclude Include="KBD.H" />
     <ClInclude Include="keyboardoptions.h" />
     <ClInclude Include="..\..\global\inc\keyman64.h" />
-    <ClInclude Include="..\..\global\inc\keymancontrol.h" />
+    <ClInclude Include="keymancontrol.h" />
     <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
