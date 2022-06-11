@@ -30,7 +30,7 @@
 #include <windows.h>
 #include <assert.h>
 
-#include "compiler.h"
+#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "xstring.h"
 
 #include "registry.h"

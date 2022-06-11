@@ -38,7 +38,7 @@
 #include <windows.h>
 #include <assert.h>
 #include <msctf.h>
-#include "compiler.h"
+#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include <keyman/keyboardprocessor.h>
 
 /***************************************************************************/

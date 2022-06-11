@@ -12,6 +12,6 @@
 #include "mc_kmxfile.h"
 #include "mc_syskbd.h"
 #include "../../global/inc/crc32.h"
-#include "../../global/inc/compiler.h"
+#include "legacy_kmx_file.h"
 #include "../../global/inc/xstring.h"
 #include "../../global/inc/keymansentry.h"

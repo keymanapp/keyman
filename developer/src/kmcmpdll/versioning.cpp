@@ -1,6 +1,5 @@
 #include "pch.h"
 #include <compfile.h>
-#include <compiler.h>
 #include <comperr.h>
 #include <kmcmpdll.h>
 

@@ -291,7 +291,7 @@
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\certificate_check.h" />
     <ClInclude Include="comperr.h" />
     <ClInclude Include="compfile.h" />
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Compiler.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h" />
     <ClInclude Include="CasedKeys.h" />
     <ClInclude Include="CharToKeyConversion.h" />
     <ClInclude Include="CheckForDuplicates.h" />

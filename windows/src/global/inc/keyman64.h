@@ -75,7 +75,7 @@
 #include <windows.h>
 #include <assert.h>
 #include <msctf.h>
-#include "compiler.h"
+#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 
 #ifdef _WIN64
 #define LIBRARY_NAME "KEYMAN64"

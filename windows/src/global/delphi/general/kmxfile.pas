@@ -103,7 +103,7 @@ function SUBLANGID(n: DWORD): WORD;
   break on-disk struct sizes when we cross
   compilers, bitness and platforms. They must
   correspond to the equivalent constants in
-  compiler.h
+  $(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h
 }
 const
   KEYBOARDFILEHEADER_SIZE = 64;
