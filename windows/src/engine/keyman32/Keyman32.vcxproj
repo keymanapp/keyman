@@ -385,7 +385,6 @@
     <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
-    <ClInclude Include="..\..\global\inc\rc4.h" />
     <ClInclude Include="..\..\global\inc\registry.h" />
     <ClInclude Include="security.h" />
     <ClInclude Include="serialkeyeventclient.h" />

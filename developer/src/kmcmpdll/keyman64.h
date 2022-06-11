@@ -1,18 +1,18 @@
 /*
   Name:             keyman64
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      22 Mar 2010
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          22 Mar 2010 - mcdurdin - Compiler fixup - x64 support
                     25 Oct 2016 - mcdurdin - I5135 - Remove product and licensing references from Developer projects
 */
@@ -35,8 +35,6 @@
 
 #include "registry.h"
 #include "unicode.h"
-#include "rc4.h"
-   // I5135
 #include "crc32.h"
 
 #endif

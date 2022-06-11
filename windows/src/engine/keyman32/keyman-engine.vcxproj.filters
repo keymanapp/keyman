@@ -201,9 +201,6 @@
     <ClInclude Include="keystate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\rc4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\global\inc\registry.h">
       <Filter>Header Files</Filter>
     </ClInclude>

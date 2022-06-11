@@ -70,7 +70,6 @@
     <ClInclude Include="..\keyman32\kmprot.h" />
     <ClInclude Include="..\..\global\inc\kmprot_hwkey.h" />
     <ClInclude Include="..\..\global\inc\kmprot_licencenumber.h" />
-    <ClInclude Include="..\..\global\inc\rc4.h" />
     <ClInclude Include="..\..\global\inc\registration.h" />
     <ClInclude Include="..\..\global\inc\registry.h" />
     <ClInclude Include="..\keyman32\pch.h" />
