@@ -13,7 +13,7 @@
     <ClInclude Include="comperr.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\Compfile.h">
+    <ClInclude Include="compfile.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\global\inc\Compiler.h">

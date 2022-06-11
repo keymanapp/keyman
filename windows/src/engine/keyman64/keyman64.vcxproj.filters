@@ -47,7 +47,6 @@
     <ClInclude Include="..\keyman32\calldll.h" />
     <ClInclude Include="..\keyman32\capsstate.h" />
     <ClInclude Include="..\..\global\inc\certificate_check.h" />
-    <ClInclude Include="..\..\global\inc\Compfile.h" />
     <ClInclude Include="..\..\global\inc\Compiler.h" />
     <ClInclude Include="..\..\global\inc\ConvertUTF.h" />
     <ClInclude Include="..\..\global\inc\crc32.h" />
