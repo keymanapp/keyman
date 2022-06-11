@@ -16,8 +16,8 @@
   History:          12 Oct 2012 - mcdurdin - I3467 - V9.0 - Upgrade KMDECOMP to compile with KM9 source tree
 */
 
-#define STRICT
-#include <windows.h>
+#include "pch.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <keymansentry.h>
