@@ -52,7 +52,6 @@
     <ClInclude Include="..\..\global\inc\crc32.h" />
     <ClInclude Include="..\..\global\inc\crypt_guid.h" />
     <ClInclude Include="..\..\global\inc\crypt_user.h" />
-    <ClInclude Include="..\..\global\inc\debugstore.h" />
     <ClInclude Include="..\keyman32\globals.h" />
     <ClInclude Include="..\keyman32\hotkeys.h" />
     <ClInclude Include="..\keyman32\k32_res.h" />

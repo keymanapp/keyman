@@ -300,7 +300,7 @@
     <ClInclude Include="comprc.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\ConvertUTF.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\crc32.h" />
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\debugstore.h" />
+    <ClInclude Include="debugstore.h" />
     <ClInclude Include="DeprecationChecks.h" />
     <ClInclude Include="Edition.h" />
     <ClInclude Include="keyman64.h" />
