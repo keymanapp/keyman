@@ -75,9 +75,6 @@
     <ClCompile Include="kmprocess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\rc4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

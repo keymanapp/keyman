@@ -22,7 +22,6 @@
     <ClCompile Include="..\keyman32\kmhook_callwndproc.cpp" />
     <ClCompile Include="..\keyman32\kmhook_getmessage.cpp" />
     <ClCompile Include="..\keyman32\kmprocess.cpp" />
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\rc4.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp" />
     <ClCompile Include="..\keyman32\pch.cpp" />
     <ClCompile Include="..\keyman32\preservedkeymap.cpp" />
