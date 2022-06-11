@@ -316,7 +316,6 @@
     <ClInclude Include="..\keyman32\syskbd.h" />
     <ClInclude Include="..\..\global\inc\testkeymanfunctioning.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />
-    <ClInclude Include="..\..\global\inc\Vkeys.h" />
     <ClInclude Include="..\keyman32\vkscancodes.h" />
   </ItemGroup>
   <ItemGroup>

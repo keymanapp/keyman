@@ -179,6 +179,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\common\windows\cpp\include\vkeys.h" />
     <ClInclude Include="..\..\..\common\windows\delphi\ext\sentry\sentry.h" />
     <ClInclude Include="..\..\..\windows\src\global\inc\keyman64.h" />
     <ClInclude Include="..\..\..\windows\src\global\inc\keymansentry.h" />
@@ -193,6 +194,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
+    <ClCompile Include="..\..\..\common\windows\cpp\src\vkeys.cpp" />
     <ClCompile Include="kmanalyze.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

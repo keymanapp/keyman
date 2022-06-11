@@ -377,7 +377,7 @@ std::string unicode_escape(std::wstring s) {
   return r;
 }
 
-#include <vkeys.h>
+#include "../../../common/windows/cpp/include/vkeys.h"
 
 std::wstring GetKeyName(UINT key) {
   WCHAR buf[64];
