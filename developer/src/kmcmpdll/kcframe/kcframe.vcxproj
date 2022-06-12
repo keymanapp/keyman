@@ -257,9 +257,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="keyman64.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\kmcmpdll.vcxproj">
       <Project>{7e26fe08-721e-424b-9da0-4a0dca88a86e}</Project>
     </ProjectReference>

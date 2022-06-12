@@ -24,9 +24,6 @@
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\sentry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\windows\src\global\inc\keyman64.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h">
       <Filter>Header Files</Filter>
     </ClInclude>

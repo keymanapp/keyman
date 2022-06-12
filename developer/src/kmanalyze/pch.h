@@ -12,10 +12,12 @@
 // TODO: add headers that you want to pre-compile here
 
 #define STRICT
-#define _KEYMAN64_LIGHT
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
 #include "../../../common/windows/cpp/include/keymansentry.h"
-#include "keyman64.h"
+#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
+#include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
+#include "../../../common/windows/cpp/include/unicode.h"
+#include "../../../common/windows/cpp/include/xstring.h"
 #endif //PCH_H
