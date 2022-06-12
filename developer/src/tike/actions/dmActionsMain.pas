@@ -258,7 +258,6 @@ uses
   Forms,
   Graphics,
   Messages,
-  OnlineConstants,
   Keyman.Developer.UI.TikeOnlineUpdateCheck,
   Printers,
   Vcl.Clipbrd,
@@ -507,7 +506,7 @@ begin
     Exit;
   end;
 
-  with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, OnlineProductID_KeymanDeveloper_100, True, False, False, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
+  with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, True, False, False, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
   try
     if Run = oucShutDown then
       frmKeymanDeveloper.Close;

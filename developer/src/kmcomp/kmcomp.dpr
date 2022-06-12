@@ -24,7 +24,6 @@ uses
   klog in '..\..\..\windows\src\global\delphi\general\klog.pas',
   KeyNames in '..\..\..\windows\src\global\delphi\general\KeyNames.pas',
   StockFileNames in '..\..\..\windows\src\global\delphi\cust\StockFileNames.pas',
-  OnlineConstants in '..\..\..\windows\src\global\delphi\productactivation\OnlineConstants.pas',
   KeymanDeveloperOptions in '..\tike\main\KeymanDeveloperOptions.pas',
   Upload_Settings in '..\..\..\windows\src\global\delphi\general\Upload_Settings.pas',
   utilstr in '..\..\..\windows\src\global\delphi\general\utilstr.pas',

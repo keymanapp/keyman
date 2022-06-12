@@ -12,7 +12,6 @@ uses
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
   PackageInfo in '..\..\global\delphi\general\PackageInfo.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
-  OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   utilstr in '..\..\global\delphi\general\utilstr.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',

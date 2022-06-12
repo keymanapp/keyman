@@ -97,7 +97,6 @@
         <DCCReference Include="..\..\..\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utilstr.pas"/>

@@ -18,7 +18,6 @@ uses
   KeyboardParser in '..\TIKE\main\KeyboardParser.pas',
   kmxfile in '..\..\..\windows\src\global\delphi\general\kmxfile.pas',
   kmxfileconsts in '..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas',
-  OnlineConstants in '..\..\..\windows\src\global\delphi\productactivation\OnlineConstants.pas',
   ExtShiftState in '..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas',
   utilsystem in '..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   VKeys in '..\..\..\windows\src\global\delphi\general\VKeys.pas',

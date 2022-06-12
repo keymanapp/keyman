@@ -75,7 +75,6 @@ type
     Bitmap: Vcl.Graphics.TBitmap;
     Icon: TIcon;
     MemoryDump: TMemoryStream;
-    ProductID: Integer;
     MnemonicLayout: Boolean;
     KMW_RTL: Boolean;
     WindowsLanguages: WideString;
@@ -185,7 +184,6 @@ implementation
 uses
   crc32,
   KeyNames,
-  OnlineConstants,
   utildir,
   utilfiletypes;
 
@@ -249,8 +247,6 @@ begin
     Read(signature, 4);
     if signature <> FILEID_COMPILED then
       raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
-
-    ki.ProductID := OnlineProductID_KeymanDesktop_100;  // I3377
 
     Position := 0;
     Read(kfh, SizeOf(TKeyboardFileHeader));

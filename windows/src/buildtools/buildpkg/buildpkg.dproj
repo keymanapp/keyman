@@ -99,7 +99,6 @@
         <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>

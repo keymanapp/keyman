@@ -20,7 +20,6 @@ uses
   utilsystem in '..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   wininet5 in '..\..\..\windows\src\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\..\windows\src\global\delphi\general\GlobalProxySettings.pas',
-  OnlineConstants in '..\..\..\windows\src\global\delphi\productactivation\OnlineConstants.pas',
   ErrorControlledRegistry in '..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\..\windows\src\global\delphi\general\Unicode.pas',
   utilexecute in '..\..\..\windows\src\global\delphi\general\utilexecute.pas',

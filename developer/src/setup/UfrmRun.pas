@@ -1,18 +1,18 @@
 (*
   Name:             UfrmRun
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Jun 2007
 
   Modified Date:    11 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Jun 2007 - mcdurdin - Initial version
                     05 Jun 2007 - mcdurdin - I817 - Fix install label display when no keyboards installing
                     08 Jun 2007 - mcdurdin - I876 - Use labels from setup.inf
@@ -122,7 +122,6 @@ implementation
 uses
   Unicode, utilexecute,
   utilsystem, shlobj,
-  OnlineConstants,
   TntDialogHelp,
   types, upload_settings,
   httpuploader,
@@ -397,7 +396,7 @@ function TfrmRun.DoInstall(Silent, PromptForReboot: Boolean): Boolean;  // I1901
 begin
   FPromptForReboot := PromptForReboot;  // I3355   // I3500
   FSilent := Silent;
-  
+
 
   SetCursor(LoadCursor(0, IDC_WAIT));
   try
@@ -484,7 +483,7 @@ begin
   FLogo := LoadBitmap(HInstance, MAKEINTRESOURCE(21));
 
   SetWindowText(Handle, PWideChar(FInstallInfo.Text(ssApplicationTitle)));
-  
+
   { Change the font size for the title }
   SetFontProperties(IDC_TITLE, FW_BOLD, ssFontSize_Title, ssFontName_Title);
   SetFontProperties(IDOK, FW_BOLD, ssFontSize_InstallButton, ssFontName_InstallButton); //e StrToIntDef(FInstallInfo.Text(ssFontSize_InstallButton), 18), FW_BOLD, FInstallInfo.Text(ssFontName_InstallButton));
@@ -695,9 +694,9 @@ begin
     end;
   end;
 
-  if not FSilent then  
+  if not FSilent then
     MsiSetInternalUI(INSTALLUILEVEL_FULL, nil);
-  
+
   if FNewVersion.Filename <> '' then
   begin
     //Run the setup app silently  // I2680.5

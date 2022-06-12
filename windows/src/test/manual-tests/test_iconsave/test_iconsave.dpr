@@ -8,7 +8,6 @@ uses
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
   crypt_base in '..\..\global\delphi\productactivation\crypt_base.pas',
   crypt_guid in '..\..\global\delphi\productactivation\crypt_guid.pas',
-  OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   productactivation in '..\..\global\delphi\productactivation\productactivation.pas',
   tavultesoft_certificate in '..\..\global\delphi\productactivation\tavultesoft_certificate.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',

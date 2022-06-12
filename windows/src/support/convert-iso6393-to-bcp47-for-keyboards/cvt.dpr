@@ -13,7 +13,6 @@ uses
   Keyman.System.Standards.LCIDToBCP47Registry in 'C:\Projects\keyman\open\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   utilfiletypes in 'C:\Projects\keyman\open\windows\src\global\delphi\general\utilfiletypes.pas',
   utildir in 'C:\Projects\keyman\open\windows\src\global\delphi\general\utildir.pas',
-  OnlineConstants in 'C:\Projects\keyman\open\windows\src\global\delphi\productactivation\OnlineConstants.pas',
   kmxfile in 'C:\Projects\keyman\open\windows\src\global\delphi\general\kmxfile.pas',
   CRC32 in 'C:\Projects\keyman\open\windows\src\global\delphi\general\CRC32.pas',
   KeyNames in 'C:\Projects\keyman\open\windows\src\global\delphi\general\KeyNames.pas',

@@ -158,7 +158,6 @@ uses
   JsonUtil,
   Keyman.Developer.System.KeymanDeveloperPaths,
   utilsystem,
-  OnlineConstants,
   GetOSVersion;
 
 var

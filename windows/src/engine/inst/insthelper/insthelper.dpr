@@ -20,7 +20,6 @@ uses
   CRC32 in '..\..\..\global\delphi\general\CRC32.pas',
   VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
   GetOsVersion in '..\..\..\global\delphi\general\GetOsVersion.pas',
-  OnlineConstants in '..\..\..\global\delphi\productactivation\OnlineConstants.pas',
   KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
   preuninstallunit in 'preuninstallunit.pas',
   input_installlayoutortip in '..\..\..\global\delphi\winapi\input_installlayoutortip.pas',

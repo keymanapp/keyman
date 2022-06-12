@@ -171,7 +171,6 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\cust\StockFileNames.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="..\TIKE\main\KeymanDeveloperOptions.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Upload_Settings.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilstr.pas"/>

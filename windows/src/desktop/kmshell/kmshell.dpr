@@ -57,7 +57,6 @@ uses
   OnlineUpdateCheckMessages in 'main\OnlineUpdateCheckMessages.pas',
   WelcomeXMLRenderer in 'render\WelcomeXMLRenderer.pas',
   ValidateKeymanInstalledSystemKeyboards in 'main\ValidateKeymanInstalledSystemKeyboards.pas',
-  OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   uninstall in 'install\uninstall.pas',
   KeymanControlMessages in '..\..\global\delphi\general\KeymanControlMessages.pas',
   HintConsts in '..\..\global\delphi\hints\HintConsts.pas',

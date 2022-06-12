@@ -585,7 +585,6 @@ uses
   KeymanVersion,
   KMDevResourceStrings,
   kmxfile,
-  OnlineConstants,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.kmnProjectFileAction,

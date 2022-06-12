@@ -49,7 +49,6 @@ type
 
   TOnlineUpdateCheck = class(TThread)
   private
-    FOnlineProductID: Integer;
     FThread: Boolean;
     FSilent: Boolean;
     FForce: Boolean;
@@ -78,7 +77,7 @@ type
     procedure Execute; override;
 
   public
-    constructor Create(ARootKey: string; AOnlineProductID: Integer; AForce, ASilent, AThread: Boolean; AProxyServer: string; AProxyPort: Integer; AProxyUsername, AProxyPassword: string);
+    constructor Create(ARootKey: string; AForce, ASilent, AThread: Boolean; AProxyServer: string; AProxyPort: Integer; AProxyUsername, AProxyPassword: string);
     destructor Destroy; override;
     function Run: TOnlineUpdateCheckResult;
     class function Running: Boolean;
@@ -110,7 +109,7 @@ uses
 
 { TOnlineUpdateCheck }
 
-constructor TOnlineUpdateCheck.Create(ARootKey: string; AOnlineProductID: Integer; AForce, ASilent, AThread: Boolean; AProxyServer: string; AProxyPort: Integer; AProxyUsername, AProxyPassword: string);
+constructor TOnlineUpdateCheck.Create(ARootKey: string; AForce, ASilent, AThread: Boolean; AProxyServer: string; AProxyPort: Integer; AProxyUsername, AProxyPassword: string);
 begin
   Assert(not FRunning);
   FRunning := True;
@@ -119,7 +118,6 @@ begin
   FCurrentVersion := GetVersionString;
   FParams.Result := oucUnknown;
   FRootKey := ARootKey;
-  FOnlineProductID := AOnlineProductID;
   FSilent := ASilent;
   FForce := AForce;
   FThread := AThread;
@@ -130,7 +128,6 @@ begin
 
 
   KL.Log('TOnlineUpdateCheck.Create: FRootKey = '+FRootKey);
-  KL.Log('TOnlineUpdateCheck.Destroy: OnlineProductID = '+IntToStr(FOnlineProductID));
   inherited Create(True);
 end;
 

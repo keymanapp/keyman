@@ -201,7 +201,6 @@
             <Form>frmLanguageSwitch</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
-        <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="viskbd\UfrmOSKOnScreenKeyboard.pas">
             <Form>frmOSKOnScreenKeyboard</Form>
         </DCCReference>

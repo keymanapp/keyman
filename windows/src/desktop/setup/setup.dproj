@@ -116,7 +116,6 @@
         <DCCReference Include="Keyman.Setup.System.MsiUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="UfrmRunDesktop.pas">
             <Form>frmRunDesktop</Form>
         </DCCReference>
