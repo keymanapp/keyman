@@ -140,7 +140,7 @@
     <ClCompile Include="keymanx64.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\global\inc\keymansentry.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keymansentry.h" />
     <ClInclude Include="keymanx64.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

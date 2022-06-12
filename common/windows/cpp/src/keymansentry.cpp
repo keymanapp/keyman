@@ -1,9 +1,9 @@
 
 #include <Windows.h>
-#include <keymansentry.h>
+#include "../include/keymansentry.h"
 #include <keymanversion.h>
 #include <sentry.h>
-#include <registry.h>
+#include "../include/registry.h"
 #include <stdio.h>
 #include <shlobj.h>
 #include <string.h>

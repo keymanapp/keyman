@@ -1,18 +1,18 @@
 /*
   Name:             registry
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      13 Jul 2007
 
   Modified Date:    20 Nov 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          13 Jul 2007 - mcdurdin - I934 - Prep for x64
                     30 Nov 2009 - mcdurdin - I934 - Prep for x64 - registry keys
                     11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
@@ -23,7 +23,7 @@
 */
 
 #include "pch.h"
-#include "registry.h"
+#include "../include/registry.h"
 
 RegistryReadOnly::RegistryReadOnly(HKEY AhRootKey)
 {
@@ -48,7 +48,7 @@ BOOL RegistryReadOnly::CloseKey(void)
 BOOL RegistryFullAccess::CreateKey(LPCSTR AKey)
 {
 	DWORD dwDisposition;
-	return WrapError(RegCreateKeyEx(FhKey ? FhKey : FhRootKey, AKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, 
+	return WrapError(RegCreateKeyEx(FhKey ? FhKey : FhRootKey, AKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL,
 		&FhKey, &dwDisposition));
 }
 
@@ -59,7 +59,7 @@ BOOL RegistryFullAccess::RecursiveDeleteKey(LPCSTR AKey)
 	if(RegOpenKeyEx(FhKey ? FhKey : FhRootKey, AKey, 0, KEY_ALL_ACCESS, &hkey) != ERROR_SUCCESS)
 		return FALSE;
 
-	if(!IntRecursiveDeleteKey(hkey)) 
+	if(!IntRecursiveDeleteKey(hkey))
 	{
 		RegCloseKey(hkey);
 		return FALSE;
@@ -233,7 +233,7 @@ RegistryReadOnly *Reg_GetKeymanInstalledKeyboard(LPSTR kbname)
 	{
 		delete reg;
 		reg = new RegistryReadOnly(HKEY_CURRENT_USER);
-		if(!reg->OpenKeyReadOnly(REGSZ_KeymanInstalledKeyboardsCU) || !reg->OpenKeyReadOnly(kbname)) 
+		if(!reg->OpenKeyReadOnly(REGSZ_KeymanInstalledKeyboardsCU) || !reg->OpenKeyReadOnly(kbname))
 		{
 			delete reg;
 			return NULL;

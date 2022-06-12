@@ -29,7 +29,7 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymansentry.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keymansentry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

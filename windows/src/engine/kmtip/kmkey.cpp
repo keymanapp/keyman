@@ -38,7 +38,7 @@
 #include "kmtip.h"
 #include "editsess.h"
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
-#include "registry.h"
+#include "../../../../common/windows/cpp/include/registry.h"
 #include "..\keymanmc\keymanmc.h"
 
 struct deadkeyinfo
