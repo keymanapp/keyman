@@ -1,7 +1,7 @@
 
 #include <Windows.h>
 #include "../include/keymansentry.h"
-#include <keymanversion.h>
+#include "../include/keymanversion.h"
 #include <sentry.h>
 #include "../include/registry.h"
 #include <stdio.h>
