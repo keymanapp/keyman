@@ -7,10 +7,10 @@ program cvt;
 uses
   System.SysUtils,
   cv in 'cv.pas',
-  Keyman.System.Standards.ISO6393ToBCP47Registry in 'C:\Projects\keyman\open\windows\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in 'C:\Projects\keyman\open\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.System.KMXFileLanguages in 'C:\Projects\keyman\open\windows\src\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
   utilstr in 'C:\Projects\keyman\open\windows\src\global\delphi\general\utilstr.pas',
-  Keyman.System.Standards.LCIDToBCP47Registry in 'C:\Projects\keyman\open\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in 'C:\Projects\keyman\open\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   utilfiletypes in 'C:\Projects\keyman\open\windows\src\global\delphi\general\utilfiletypes.pas',
   utildir in 'C:\Projects\keyman\open\windows\src\global\delphi\general\utildir.pas',
   kmxfile in 'C:\Projects\keyman\open\windows\src\global\delphi\general\kmxfile.pas',

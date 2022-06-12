@@ -39,10 +39,10 @@ uses
   Keyman.System.KeyboardJSInfo in '..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
   Keyman.System.KeyboardUtils in '..\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
   Keyman.System.KMXFileLanguages in '..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
-  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
-  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
-  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
   Keyman.System.PackageInfoRefreshKeyboards in '..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
   Keyman.Developer.System.Project.ProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.ProjectFile.pas',
@@ -86,7 +86,7 @@ uses
   sentry in '..\..\..\common\windows\delphi\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\..\windows\src\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
   KeymanPaths in '..\..\..\windows\src\global\delphi\general\KeymanPaths.pas',
-  Keyman.System.Standards.LangTagsRegistry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
+  Keyman.System.Standards.LangTagsRegistry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
   Keyman.System.LexicalModelUtils in '..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas';
 

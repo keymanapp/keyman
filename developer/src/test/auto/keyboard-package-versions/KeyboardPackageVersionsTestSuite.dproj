@@ -126,8 +126,8 @@
         <DCCReference Include="..\..\..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas"/>
         <DCCReference Include="..\..\..\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas"/>
         <DCCReference Include="..\..\..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\main\RedistFiles.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\DebugPaths.pas"/>
@@ -170,13 +170,13 @@
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\BCP47Tag.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\main\TextFileFormat.pas"/>
         <DCCReference Include="..\..\..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
         <DCCReference Include="..\..\..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas"/>
