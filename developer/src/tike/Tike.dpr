@@ -237,7 +237,7 @@ uses
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.CEFManager in '..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
-  Keyman.System.HttpServer.Base in '..\..\..\windows\src\global\delphi\web\Keyman.System.HttpServer.Base.pas',
+  Keyman.System.HttpServer.Base in '..\..\..\common\windows\delphi\web\Keyman.System.HttpServer.Base.pas',
   Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas',
   Keyman.UI.FontUtils in '..\..\..\windows\src\global\delphi\general\Keyman.UI.FontUtils.pas',
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in '..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',

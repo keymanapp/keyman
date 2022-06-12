@@ -308,7 +308,7 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.pas"/>
-        <DCCReference Include="..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\web\Keyman.System.HttpServer.Base.pas"/>
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.SharedData.pas"/>
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.OnlineUpdate.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas"/>
