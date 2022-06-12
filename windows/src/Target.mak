@@ -21,7 +21,7 @@ global-versions:
 # Build our root version.txt
     cd $(ROOT)\src
 
-    $(MKVER_U)$(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.in $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h
+    $(MKVER_U) $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.in $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h
     $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc
 
 devtools-app: dirs
