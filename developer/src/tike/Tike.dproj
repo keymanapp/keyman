@@ -204,11 +204,11 @@
             <Form>frmBitmapEditor</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\HintLabel.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardExportHTML.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardImportXML.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportHTML.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardImportXML.pas"/>
         <DCCReference Include="dialogs\UfrmVisualKeyboardImportKMX.pas">
             <Form>frmVisualKeyboardImportKMX</Form>
         </DCCReference>
@@ -324,8 +324,8 @@
             <Form>frmTikeOnlineUpdateSetup</Form>
         </DCCReference>
         <DCCReference Include="update\Keyman.Developer.System.TikeOnlineUpdateCheckMessages.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardExportBMP.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardExportPNG.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportBMP.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportPNG.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas"/>
         <DCCReference Include="main\CharacterInfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompilePackageInstaller.pas"/>
@@ -377,13 +377,13 @@
         <DCCReference Include="main\UframeTextEditor.pas">
             <Form>frameTextEditor</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\UfrmVisualKeyboardExportBMPParams.pas">
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\UfrmVisualKeyboardExportBMPParams.pas">
             <Form>frmVisualKeyboardExportBMPParams</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\UfrmVisualKeyboardExportHTMLParams.pas">
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\UfrmVisualKeyboardExportHTMLParams.pas">
             <Form>frmVisualKeyboardExportHTMLParams</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\UfrmVisualKeyboardKeyBitmap.pas">
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\UfrmVisualKeyboardKeyBitmap.pas">
             <Form>frmVisualKeyboardKeyBitmap</Form>
         </DCCReference>
         <DCCReference Include="dialogs\UfrmOptions.pas">
@@ -406,7 +406,7 @@
         <DCCReference Include="oskbuilder\UfrmSelectTouchLayoutTemplate.pas">
             <Form>frmSelectTouchLayoutTemplate</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="oskbuilder\TouchLayout.pas"/>
         <DCCReference Include="oskbuilder\TouchLayoutDefinitions.pas"/>
         <DCCReference Include="main\CharMapDropTool_TntCustomEdit.pas"/>
@@ -450,10 +450,10 @@
         <DCCReference Include="..\..\..\common\windows\delphi\charmap\utilcheckfontchars.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\findfonts.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanPaths.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\DropTarget.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\CloseButtonPageControl.pas"/>
         <DCCReference Include="dockforms\UfrmTIKEDock.pas">

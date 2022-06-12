@@ -111,10 +111,10 @@
         <DCCReference Include="..\..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\..\global\delphi\comp\ExtShiftState.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>

@@ -212,7 +212,7 @@
         <DCCReference Include="..\..\global\delphi\general\BitmapIPicture.pas"/>
         <DCCReference Include="processes\visualkeyboard\KPUninstallVisualKeyboard.pas"/>
         <DCCReference Include="processes\visualkeyboard\KPInstallVisualKeyboard.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="com\customisation\keymancustomisation.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationStorage.pas"/>
@@ -263,10 +263,10 @@
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanMutex.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanOptionNames.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Windows8LanguageList.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>

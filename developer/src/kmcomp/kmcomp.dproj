@@ -187,7 +187,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompilePackageInstaller.pas"/>
         <DCCReference Include="..\TIKE\main\UTikeDebugMode.pas"/>
         <DCCReference Include="..\TIKE\compile\CompileKeymanWeb.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\TIKE\compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas"/>
@@ -232,10 +232,10 @@
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UserMessages.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="kccompilekvk.pas"/>
         <DCCReference Include="..\TIKE\compile\ValidateKeyboardInfo.pas"/>
         <DCCReference Include="..\TIKE\compile\MergeKeyboardInfo.pas"/>
