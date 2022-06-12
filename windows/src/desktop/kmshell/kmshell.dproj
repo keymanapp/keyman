@@ -283,8 +283,8 @@
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards9Plus.pas"/>
         <DCCReference Include="install\Keyman.Configuration.UI.MitigationForWin10_1803.pas"/>
-        <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas"/>
         <DCCReference Include="help\UfrmHelp.pas">
             <Form>frmHelp</Form>
             <FormType>dfm</FormType>

@@ -226,7 +226,7 @@
         <DCCReference Include="main\MessageIdentifiers.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
+        <DCCReference Include="..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
             <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas"/>
@@ -477,7 +477,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.App.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\web\Keyman.System.HttpServer.Base.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.AppSource.pas"/>

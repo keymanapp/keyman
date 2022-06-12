@@ -113,7 +113,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas"/>
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>

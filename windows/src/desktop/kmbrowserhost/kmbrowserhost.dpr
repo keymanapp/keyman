@@ -3,7 +3,7 @@ program kmbrowserhost;
 uses
   System.SysUtils,
   Winapi.Windows,
-  Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
+  Keyman.System.CEFManager in '..\..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
