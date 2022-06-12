@@ -184,7 +184,6 @@ uses
   LanguagesXMLRenderer,
   MessageIdentifierConsts,
   MessageIdentifiers,
-  onlineconstants,
   OnlineUpdateCheck,
   OptionsXMLRenderer,
   Keyman.Configuration.System.UmodWebHttpServer,
