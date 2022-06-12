@@ -24,7 +24,7 @@ uses
   Unicode in '..\..\..\windows\src\global\delphi\general\Unicode.pas',
   utilexecute in '..\..\..\windows\src\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
-  SFX in '..\..\..\windows\src\global\delphi\setup\SFX.pas',
+  SFX in '..\..\..\common\windows\delphi\setup\SFX.pas',
   Keyman.System.UpdateCheckResponse in '..\..\..\windows\src\global\delphi\general\Keyman.System.UpdateCheckResponse.pas';
 
 {$R icons.res}

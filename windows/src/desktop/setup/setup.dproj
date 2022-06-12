@@ -130,7 +130,7 @@
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
-        <DCCReference Include="..\..\global\delphi\setup\SFX.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\setup\SFX.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas"/>
         <DCCReference Include="Keyman.Setup.System.InstallInfo.pas"/>
