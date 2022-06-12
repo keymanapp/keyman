@@ -270,15 +270,15 @@
             <Form>frmBitmapEditorText</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UFixFontDialogBold.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\UnicodeData.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\CharacterDragObject.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\CharacterMapSettings.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\CharacterRanges.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\CharMapInsertMode.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\UfrmCharacterMapFilter.pas">
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\CharacterDragObject.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\CharacterMapSettings.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\CharacterRanges.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\CharMapInsertMode.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\UfrmCharacterMapFilter.pas">
             <Form>frmCharacterMapFilter</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\UfrmUnicodeDataStatus.pas">
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\UfrmUnicodeDataStatus.pas">
             <Form>frmUnicodeDataStatus</Form>
         </DCCReference>
         <DCCReference Include="debug\UfrmDebugStatus_RegTest.pas">
@@ -371,7 +371,7 @@
             <Form>modActionsTextEditor</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\UfrmCharacterMapNew.pas">
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\UfrmCharacterMapNew.pas">
             <Form>frmCharacterMapNew</Form>
         </DCCReference>
         <DCCReference Include="main\UframeTextEditor.pas">
@@ -447,7 +447,7 @@
         <DCCReference Include="main\UfrmCharacterIdentifier.pas">
             <Form>frmCharacterIdentifier</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\utilcheckfontchars.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\utilcheckfontchars.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\findfonts.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>

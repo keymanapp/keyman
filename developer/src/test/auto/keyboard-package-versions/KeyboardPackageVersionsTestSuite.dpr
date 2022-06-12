@@ -73,7 +73,7 @@ uses
   KeymanWebKeyCodes in '..\..\..\tike\compile\KeymanWebKeyCodes.pas',
   kmxfileutils in '..\..\..\..\..\windows\src\global\delphi\general\kmxfileutils.pas',
   TikeUnicodeData in '..\..\..\tike\main\TikeUnicodeData.pas',
-  UnicodeData in '..\..\..\..\..\windows\src\global\delphi\charmap\UnicodeData.pas',
+  UnicodeData in '..\..\..\..\..\common\windows\delphi\charmap\UnicodeData.pas',
   ADODB_TLB in '..\..\..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas',
   ADOX_TLB in '..\..\..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas',
   ttinfo in '..\..\..\..\..\windows\src\global\delphi\general\ttinfo.pas',

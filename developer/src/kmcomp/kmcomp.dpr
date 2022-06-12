@@ -62,7 +62,7 @@ uses
   TempFileManager in '..\..\..\windows\src\global\delphi\general\TempFileManager.pas',
   JsonUtil in '..\..\..\windows\src\global\delphi\general\JsonUtil.pas',
   TikeUnicodeData in '..\tike\main\TikeUnicodeData.pas',
-  UnicodeData in '..\..\..\windows\src\global\delphi\charmap\UnicodeData.pas',
+  UnicodeData in '..\..\..\common\windows\delphi\charmap\UnicodeData.pas',
   ttinfo in '..\..\..\windows\src\global\delphi\general\ttinfo.pas',
   ADODB_TLB in '..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas',
   ADOX_TLB in '..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas',

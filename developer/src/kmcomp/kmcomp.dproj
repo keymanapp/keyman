@@ -212,7 +212,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="..\TIKE\main\TikeUnicodeData.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\charmap\UnicodeData.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas"/>

@@ -7,7 +7,7 @@ uses
   SysUtils,
   buildunidata_main in 'buildunidata_main.pas',
   TTInfo in '..\..\..\..\..\windows\src\global\delphi\general\TTInfo.pas',
-  UnicodeData in '..\..\..\..\..\windows\src\global\delphi\charmap\UnicodeData.pas',
+  UnicodeData in '..\..\charmap\UnicodeData.pas',
   ADOX_TLB in '..\..\..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas',
   ADODB_TLB in '..\..\..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas',
   utilsystem in '..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas',

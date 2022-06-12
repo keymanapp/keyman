@@ -91,7 +91,7 @@
         </DelphiCompile>
         <DCCReference Include="buildunidata_main.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\TTInfo.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\charmap\UnicodeData.pas"/>
+        <DCCReference Include="..\..\charmap\UnicodeData.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas"/>

@@ -153,7 +153,7 @@
         <DCCReference Include="..\..\..\developer\TIKE\compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\kmxfileutils.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\main\TikeUnicodeData.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\charmap\UnicodeData.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
         <DCCReference Include="..\..\..\global\delphi\tlb\ADODB_TLB.pas"/>
         <DCCReference Include="..\..\..\global\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\ttinfo.pas"/>

@@ -144,22 +144,22 @@
             <Form>frmOSKEntryHelper</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\TTInfo.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UnicodeData.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\CharacterMapSettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\CharacterRanges.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\CharMapInsertMode.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UfrmCharacterMapNew.pas">
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharacterMapSettings.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharacterRanges.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharMapInsertMode.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmCharacterMapNew.pas">
             <Form>frmCharacterMapNew</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\tlb\ADODB_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UfrmUnicodeDataStatus.pas">
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmUnicodeDataStatus.pas">
             <Form>frmUnicodeDataStatus</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\CharacterDragObject.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UfrmCharacterMapFilter.pas">
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharacterDragObject.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmCharacterMapFilter.pas">
             <Form>frmCharacterMapFilter</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\comp\FixedTrackbar.pas"/>
