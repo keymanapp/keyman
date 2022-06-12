@@ -16,11 +16,13 @@ test:
 developer-tests: \
   compile-supplementary-support \
   keyboard-info \
+  keyboard-js-info \
   keyboard-package-versions \
   kmcomp \
   kmcomp-empty-store-names \
   kmcomp-x64-structures \
   kmconvert \
+  kmx-file-languages \
   lexical-model-compiler \
   model-ts-parser
 
@@ -33,6 +35,14 @@ compile-supplementary-support: .virtual
 keyboard-info: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\keyboard-info
   $(MAKE) $(TARGET)
+
+keyboard-js-info: .virtual
+    cd $(DEVELOPER_ROOT)\src\test\auto\keyboard-js-info
+    $(MAKE) $(TARGET)
+
+kmx-file-languages: .virtual
+    cd $(DEVELOPER_ROOT)\src\test\auto\kmx-file-languages
+    $(MAKE) $(TARGET)
 
 keyboard-package-versions: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\keyboard-package-versions

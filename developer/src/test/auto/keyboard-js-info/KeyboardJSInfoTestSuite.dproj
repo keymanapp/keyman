@@ -1,9 +1,9 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{A9388625-2992-4E7C-9AE8-4B2A25BC30E3}</ProjectGuid>
+        <ProjectGuid>{231E46DD-7A38-4D9B-BA20-163B0ECB6B17}</ProjectGuid>
         <ProjectVersion>18.8</ProjectVersion>
         <FrameworkType>None</FrameworkType>
-        <MainSource>KMXFileLanguagesTestSuite.dpr</MainSource>
+        <MainSource>KeyboardJSInfoTestSuite.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -53,7 +53,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <DCC_UnitSearchPath>$(DUnitX);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <SanitizedProjectName>KMXFileLanguagesTestSuite</SanitizedProjectName>
+        <SanitizedProjectName>KeyboardJSInfoTestSuite</SanitizedProjectName>
         <DCC_Define>$(CI);$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>3081</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -91,24 +91,11 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\..\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\kmxfile.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\cust\StockFileNames.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
-        <DCCReference Include="Keyman.Test.System.KMXFileLanguagesTest.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\kmxfileconsts.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
+        <DCCReference Include="Keyman.Test.System.KeyboardJSInfoTest.pas"/>
+        <DCCReference Include="..\..\..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas"/>
+        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
+        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
+        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -127,7 +114,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">KMXFileLanguagesTestSuite.dpr</Source>
+                    <Source Name="MainSource">KeyboardJSInfoTestSuite.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -155,14 +142,14 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\KMXFileLanguagesTestSuite.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>KMXFileLanguagesTestSuite.exe</RemoteName>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
+                <DeployFile LocalName="bin\Win32\Debug\KeyboardJSInfoTestSuite.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>KeyboardJSInfoTestSuite.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

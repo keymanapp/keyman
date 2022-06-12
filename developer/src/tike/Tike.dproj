@@ -463,13 +463,13 @@
         <DCCReference Include="dockforms\UfrmCharacterMapDock.pas">
             <Form>frmCharacterMapDock</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas"/>
+        <DCCReference Include="..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\keyboards\Keyman.System.KeyboardUtils.pas"/>
+        <DCCReference Include="..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas"/>
+        <DCCReference Include="..\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\BCP47Tag.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
+        <DCCReference Include="..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.UpdateCheckResponse.pas"/>
@@ -496,11 +496,11 @@
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
+        <DCCReference Include="..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>
+        <DCCReference Include="..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kmnProjectFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas"/>
+        <DCCReference Include="..\common\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.modelTsProjectFileUI.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ModelProjectTemplate.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ProjectTemplate.pas"/>
@@ -511,7 +511,7 @@
         <DCCReference Include="child\Keyman.Developer.UI.UframeWordlistEditor.pas">
             <Form>frameWordlistEditor</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas"/>
+        <DCCReference Include="..\common\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.WelcomeRenderer.pas"/>
         <DCCReference Include="..\ext\browse4folder\Browse4Folder.pas"/>
