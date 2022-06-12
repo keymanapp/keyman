@@ -224,7 +224,7 @@
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportHTML.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\MSXML2_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
         <DCCReference Include="main\UImportOlderVersionSettings.pas"/>

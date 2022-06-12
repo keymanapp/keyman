@@ -87,7 +87,7 @@ uses
   VisualKeyboardExportHTML in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportHTML.pas',
   VisualKeyboardExportXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas',
   VisualKeyboardParameters in '..\..\global\delphi\visualkeyboard\VisualKeyboardParameters.pas',
-  MSXML2_TLB in '..\..\global\delphi\tlb\MSXML2_TLB.pas',
+  MSXML2_TLB in '..\..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
   UImportOlderVersionSettings in 'main\UImportOlderVersionSettings.pas',

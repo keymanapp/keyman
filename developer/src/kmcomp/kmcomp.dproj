@@ -214,8 +214,8 @@
         <DCCReference Include="..\TIKE\main\TikeUnicodeData.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\ttinfo.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UKeymanTargets.pas"/>
         <DCCReference Include="kccompileproject.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectFile.pas"/>

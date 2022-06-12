@@ -151,8 +151,8 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmCharacterMapNew.pas">
             <Form>frmCharacterMapNew</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\tlb\ADOX_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\ADODB_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmUnicodeDataStatus.pas">
             <Form>frmUnicodeDataStatus</Form>
         </DCCReference>
@@ -175,7 +175,7 @@
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilxml.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\MSXML2_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanControlMessages.pas"/>
         <DCCReference Include="viskbd\UfrmOSKFontHelper.pas">
             <Form>frmOSKFontHelper</Form>
