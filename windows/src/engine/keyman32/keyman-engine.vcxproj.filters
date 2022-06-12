@@ -57,7 +57,7 @@
     <ClCompile Include="KEYMAN32.CPP">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\cpp\keynames.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="keystate.cpp">

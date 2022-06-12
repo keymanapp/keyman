@@ -213,7 +213,7 @@
     </ClCompile>
     <ClCompile Include="..\keyman32\keyboardoptions.cpp" />
     <ClCompile Include="..\keyman32\Keyman32.cpp" />
-    <ClCompile Include="..\..\global\cpp\keynames.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp" />
     <ClCompile Include="..\keyman32\keystate.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
@@ -296,7 +296,7 @@
     <ClInclude Include="..\keyman32\KBD.H" />
     <ClInclude Include="..\..\global\inc\keyman64.h" />
     <ClInclude Include="..\keyman32\keymancontrol.h" />
-    <ClInclude Include="..\..\global\inc\KEYNAMES.H" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h" />
     <ClInclude Include="..\keyman32\keyman-debug-etw.h" />
     <ClInclude Include="..\keyman32\keyeventsenderthread.h" />
     <ClInclude Include="..\keyman32\keystate.h" />

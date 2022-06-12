@@ -1,6 +1,6 @@
 #include "pch.h"
 
-LPSTR KeyNames[256] = {
+LPCSTR KeyNames[256] = {
 // Key Codes
 	"?00",					// &H0
 	"?Left Mouse Button",	// &H1
