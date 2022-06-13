@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
-let LMLayerWorker = require('../../build/intermediate');
+const LMLayerWorker = require('../../../web/lm-worker/build/intermediate.js');
 
 
 describe('LMLayerWorker', function () {
@@ -36,7 +36,7 @@ describe('LMLayerWorker', function () {
 
       var worker = LMLayerWorker.install(context);
       configWorker(worker);
-      
+
       worker.onMessage(createMessageEventWithData({
         message: 'load',
         source: {
@@ -47,7 +47,7 @@ describe('LMLayerWorker', function () {
       sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
         message: 'ready',
       });
-      
+
       var token = randomToken();
 
       // Now predict! We should get the suggestions back.

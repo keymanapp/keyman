@@ -2,14 +2,14 @@ import LexicalModelCompiler from '../dist/lexical-model-compiler/lexical-model-c
 import {assert} from 'chai';
 import 'mocha';
 
-import path = require('path');
 import { compileModelSourceCode } from './helpers';
+import { makePathToFixture } from './helpers';
 
 
 describe('LexicalModelCompiler', function () {
   describe('specifying punctuation', function () {
     const MODEL_ID = 'example.qaa.trivial';
-    const PATH = path.join(__dirname, 'fixtures', MODEL_ID)
+    const PATH = makePathToFixture(MODEL_ID);
 
     it('should compile punctuation into the generated code', function () {
       let compiler = new LexicalModelCompiler;

@@ -7,13 +7,14 @@ import * as program from 'commander';
 import * as fs from 'fs';
 import KmpCompiler from './package-compiler/kmp-compiler';
 import { SysExits } from './util/sysexits';
+const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
 
 let inputFilename: string;
 
 /* Arguments */
 program
   .description('Compiles Keyman lexical model packages')
-  .version(require('../package.json').version)
+  .version(KEYMAN_VERSION.VERSION_WITH_TAG)
   .arguments('<infile>')
   .action(infile => inputFilename = infile)
   .option('-o, --outFile <filename>', 'where to save the resultant file');

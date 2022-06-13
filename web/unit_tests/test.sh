@@ -127,10 +127,9 @@ cd ../tools/recorder
 ./build.sh || fail "KMW recorder-module compilation failed."
 
 # Run our headless tests first.
-# Since we're using `lerna`, this actually puts us within the projects when run in-repo!
 
 # First:  Web-core tests.
-pushd $WORKING_DIRECTORY/node_modules/@keymanapp/input-processor
+pushd "$KEYMAN_ROOT/common/web/input-processor"
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd

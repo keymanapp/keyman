@@ -1,6 +1,7 @@
 var assert = require('chai').assert;
-let models = require('../../../build/intermediate').models;
-let correction = require('../../../build/intermediate').correction;
+const LMLayerWorker = require('../../../../web/lm-worker/build/intermediate.js');
+let models = LMLayerWorker.models;
+let correction = LMLayerWorker.correction;
 
 function assertEdgeChars(edge, input, match) {
   assert.isTrue(edgeHasChars(edge, input, match));
@@ -113,7 +114,7 @@ describe('Correction Distance Modeler', function() {
         // us to make an assertion on the relationship between costs for each edit type.
         for(let child of rootTraversal.children()) {
           expectedChildCount++;
-          
+
           let matchingEdge = findEdgeWithChars(edges, mass.sample.insert, child.char);
 
           // Substitution - matching char
@@ -249,7 +250,7 @@ describe('Correction Distance Modeler', function() {
     let checkResults_teh = function(iter) {
       let firstSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(firstSet.done);
-      
+
       firstSet = firstSet.value; // Retrieves <actual value>
       // No checks on the first set's cost.
       assert.equal(firstSet.length, 1); // A single sequence ("ten") should be the best match.
@@ -264,7 +265,7 @@ describe('Correction Distance Modeler', function() {
 
       let secondSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(secondSet.done);
-      
+
       secondSet = secondSet.value; // Retrieves <actual value>
       assert.isAbove(secondSet[0].totalCost, firstSet[0].totalCost); // assert it 'costs more'.
       assert.equal(secondSet.length, secondBatch.length);
@@ -282,7 +283,7 @@ describe('Correction Distance Modeler', function() {
 
       let thirdSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(thirdSet.done);
-      
+
       thirdSet = thirdSet.value; // Retrieves <actual value>
       assert.isAbove(thirdSet[0].totalCost, secondSet[0].totalCost); // assert it 'costs more'.
       assert.equal(thirdSet.length, thirdBatch.length);
@@ -407,7 +408,7 @@ describe('Correction Distance Modeler', function() {
       // Just one suggestion should be returned.
       assert.equal(results.length, 1);
       assert.equal(results[0].totalCost, 0);             // Gives a perfect match
-      assert.equal(results[0].inputSequence.length, 0);  // for a state with no input and 
+      assert.equal(results[0].inputSequence.length, 0);  // for a state with no input and
       assert.equal(results[0].matchString, '');          // an empty match string.
       assert.isFalse(resultState.done);
     });

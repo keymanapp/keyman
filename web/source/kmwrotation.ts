@@ -24,7 +24,7 @@ namespace com.keyman {
     private oskVisible: boolean;
     private isActive: boolean;
 
-    // iOS-oriented members 
+    // iOS-oriented members
     // --------------------
     // We'll assume permutations are complete after this many 'update' iterations.
     private static readonly IDLE_PERMUTATION_CAP = 15;
@@ -36,7 +36,7 @@ namespace com.keyman {
     private updateTimer: number;
     private static readonly UPDATE_INTERVAL = 20; // 20 ms, that is.
     // --------------------
-    
+
     constructor(keyman: KeymanBase) {
       this.keyman = keyman;
     }
@@ -51,7 +51,7 @@ namespace com.keyman {
       if(this.keyman.core.activeKeyboard) {
         this.keyman.core.activeKeyboard.refreshLayouts();
       }
-      
+
       osk._Load();
       if(this.oskVisible) {
         osk.refreshLayout();
@@ -92,7 +92,7 @@ namespace com.keyman {
       /* iOS is rather inconsistent about these events, with changes to important window state information -
        * especially to `window.innerWidth` - possible after the events trigger!  They don't always trigger
        * the same amount or in a consistently predictable manner.
-       * 
+       *
        * The overall idea is to wait out all those changes so that we don't produce a bad keyboard layout.
        */
         util.attachDOMEvent(window, 'orientationchange', function() {
@@ -106,7 +106,7 @@ namespace com.keyman {
       } else if(os == 'Android') {
         // Android's far more consistent with its event generation than iOS.
         if('onmozorientationchange' in screen) {
-          util.attachDOMEvent(screen, 'mozorientationchange', function() {
+          util.attachDOMEvent(<any>screen, 'mozorientationchange', function() {
             rotationManager.initNewRotation();
             return false;
           });
@@ -123,7 +123,7 @@ namespace com.keyman {
         });
       }
     }
-    
+
     iOSEventHandler() {
       if(!this.isActive) {
         this.initNewRotation();

@@ -1,7 +1,5 @@
 // Includes KeymanWeb's Device class, as it's quite a useful resource for KMW-related projects.
 /// <reference path="../source/kmwdevice.ts" />
-// Ensure that Promises are within scope.
-/// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
 
 type KeyboardMap = {[id: string]: any};
 

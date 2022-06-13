@@ -1,0 +1,18 @@
+{
+  "extends": "../../../tsconfig-base.json",
+
+  "compilerOptions": {
+    "allowJs": false,
+    "declaration": true,
+    "module": "none",
+    "outFile": "./build/index.js",
+    "sourceMap": true,
+    "lib": ["es6"],
+    "target": "es5",
+    "downlevelIteration": true,
+  },
+  "include": [
+    "index.ts",
+    "version.inc.ts"
+  ]
+}

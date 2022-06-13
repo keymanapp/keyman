@@ -1,4 +1,6 @@
 {
+  "extends": "../../tsconfig-base.json",
+
   "compilerOptions": {
     "allowJs": true,
     "outFile": "build/headless.js",
@@ -8,12 +10,24 @@
     "target": "es5",
     "lib": ["es6"]
   },
-  "include" : [
-    "./*.ts"
+  "references": [
+    { "path": "../web/utils" },
+    { "path": "../web/es6-shim" },
+    { "path": "../models/types"},
+    { "path": "../models/wordbreakers"},
+    { "path": "../web/lm-message-types"},
+    { "path": "../models/templates"},
   ],
+  "include" : [ "./*.ts" ],
   "exclude" : [
     "web-defaultWorker.ts",
     "node_modules",
     "testing"
+  ],
+  "files": [
+    // By renaming the output JS as TS, and including the @ts-nocheck directive, we can
+    // bypass wrapped-worker typing issues while still bundling the file as part of the
+    // tsc build!
+    "../web/lm-worker/build/index.wrapped-for-bundle.ts"
   ]
 }

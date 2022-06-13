@@ -128,11 +128,9 @@ if [ "$action" == "commit" ]; then
 
   npm run version -- "$NEWVERSION"
 
-  # Version info will be updated in lerna.json and all the lerna-managed package.json files.
-  git add lerna.json
-  # Iterates through all lerna-managed packages in serial mode (--concurrency 1),
-  # git-adding only the updated package.json and package-lock.json files.
-  npm run lerna -- exec --concurrency 1 -- git add package.json package-lock.json
+  # Version info will be updated in package.json and all workspace package.json files.
+  git add package.json package-lock.json
+  npm add **/package.json **/package-lock.json
 
   # Now that all version-related changes are ready and git-added, it's time to commit.
   git commit -m "$message"

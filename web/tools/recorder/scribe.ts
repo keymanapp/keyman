@@ -1,22 +1,20 @@
-/// <reference path="../../node_modules/@keymanapp/recorder-core/src/index.ts" />
-/// <reference path="../../node_modules/eventemitter3/index.js" />
 
 //Since TS won't recognize the types b/c no "import"/"require" statements.
 // A small-scale manual definition.
-declare class EventEmitter {
-  /** Add a listener for a given event */
-  on(event: string, func: (...args: any[]) => boolean, context?: any);
-  /** Add a one-time listener for a given event */
-  once(event: string, func: (...args: any[]) => boolean, context?: any);
-  removeListener(event: string, func: (...args: any[]) => boolean, context?: any, once?: boolean);
+// declare class EventEmitter {
+//   /** Add a listener for a given event */
+//   on(event: string, func: (...args: any[]) => boolean, context?: any);
+//   /** Add a one-time listener for a given event */
+//   once(event: string, func: (...args: any[]) => boolean, context?: any);
+//   removeListener(event: string, func: (...args: any[]) => boolean, context?: any, once?: boolean);
 
-  // Defines their alternately-themed aliases.
-  addListener: typeof EventEmitter.prototype.on;
-  off: typeof EventEmitter.prototype.removeListener;
+//   // Defines their alternately-themed aliases.
+//   addListener: typeof EventEmitter.prototype.on;
+//   off: typeof EventEmitter.prototype.removeListener;
 
-  // Defines the actual event-raising function.
-  emit(eventName: string, ...args: any[]);
-}
+//   // Defines the actual event-raising function.
+//   emit(eventName: string, ...args: any[]);
+// }
 
 // Makes sure the code below knows that the namespaces exist.
 namespace com.keyman {
@@ -35,8 +33,8 @@ namespace com.keyman {
 
 namespace KMWRecorder {
   /**
-   * Contains browser-dependent code used to transcribe browser-based events 
-   * so that thay may be reconstructed for use in KMW testing. 
+   * Contains browser-dependent code used to transcribe browser-based events
+   * so that thay may be reconstructed for use in KMW testing.
    */
   export class Scribe extends EventEmitter {
     //#region Static methods for recording input events
@@ -155,7 +153,7 @@ namespace KMWRecorder {
       } else {
         delete this.currentSequence.msg;
       }
-    
+
       this.raiseRecordChanged();
     }
 
@@ -196,7 +194,7 @@ namespace KMWRecorder {
         window.setTimeout(function() {
           recorderScribe.addInputRecord(recording, in_output.getText());
         }, 1);
-        
+
         return retVal;
       }
 
@@ -244,7 +242,7 @@ namespace KMWRecorder {
           recorderScribe.emit('stub-changed', JSON.stringify(kbdRecord));
           // var ta_activeStub = document.getElementById('activeStub');
           // ta_activeStub.value = JSON.stringify(kbdRecord);
-          
+
           if(!sameKbd && !recorderScribe.keyboardJustActivated) {
             recorderScribe.testDefinition = new KMWRecorder.KeyboardTest(kbdRecord);
           }

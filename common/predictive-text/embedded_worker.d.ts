@@ -24,12 +24,12 @@
 // The worker code MUST be compiled before this file is compiled.
 // If you see a 'File: embedded_worker.js not found.' error message, please
 // compile the worker first (stage one).
-/// <reference path="build/intermediate/embedded_worker.js" />
+/*/// <reference path="build/intermediate/embedded_worker.js" />*/
 
 /**
  * The body of this function contains code that should run
  * inside a Web Worker context.
- * 
+ *
  * Convert this code into a blob URI with LMLayer.asBlobURI(),
  * and pass the URI into the new Worker() constructor.
  */

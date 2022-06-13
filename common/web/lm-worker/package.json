@@ -1,0 +1,47 @@
+{
+  "name": "@keymanapp/lm-worker",
+  "description": "Keyman/Predictive Text worker",
+  "main": "build/index.js",
+  "scripts": {
+    "karma": "karma",
+    "mocha": "mocha",
+    "test": "gosh ./test/test.sh",
+    "build": "tsc -b",
+    "clean": "tsc -b --clean"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@keymanapp/models-types": "*",
+    "@keymanapp/resources-gosh": "*",
+    "@types/node": "^10.17.21",
+    "chai": "^4.3.4",
+    "karma": "^6.3.4",
+    "karma-browserstack-launcher": "^1.6.0",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-edge-launcher": "^0.4.2",
+    "karma-firefox-launcher": "^1.1.0",
+    "karma-fixture": "^0.2.6",
+    "karma-html2js-preprocessor": "^1.1.0",
+    "karma-ie-launcher": "^1.0.0",
+    "karma-json-fixtures-preprocessor": "0.0.6",
+    "karma-mocha": "^2.0.1",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-safari-launcher": "^1.0.0",
+    "karma-teamcity-reporter": "^1.1.0",
+    "mocha": "^8.4.0",
+    "mocha-teamcity-reporter": "^4.0.0",
+    "sinon": "^7.1.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@keymanapp/models-templates": "*",
+    "@keymanapp/models-wordbreakers": "*",
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/web-utils": "*",
+    "es6-shim": "^0.35.5",
+    "string.prototype.codepointat": "^0.2.1",
+    "string.prototype.startswith": "^0.2.0"
+  }
+}

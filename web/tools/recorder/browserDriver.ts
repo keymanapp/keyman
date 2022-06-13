@@ -1,5 +1,3 @@
-/// <reference path="../../node_modules/@keymanapp/recorder-core/src/index.ts" />
-
 namespace KMWRecorder {
   export class BrowserDriver {
     static readonly physicalEventClass: string = "KeyboardEvent";
@@ -44,7 +42,7 @@ namespace KMWRecorder {
         event = document.createEvent(BrowserDriver.physicalEventClass);
         // An override to ensure that IE's method gets called.
         // Many thanks to https://gist.github.com/termi/4654819, line 142 at the time of writing this.
-        var success = (<any>event).initKeyboardEvent(BrowserDriver.physicalEventType, false, true, null, eventSpec.key, /*this.code,*/ eventSpec.location, 
+        var success = (<any>event).initKeyboardEvent(BrowserDriver.physicalEventType, false, true, null, eventSpec.key, /*this.code,*/ eventSpec.location,
           eventSpec.generateModifierString(), 0, 0);
       }
 

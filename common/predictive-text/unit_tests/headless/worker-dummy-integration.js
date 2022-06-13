@@ -2,9 +2,12 @@ var assert = require('chai').assert;
 var fs = require('fs');
 let LMLayer = require('../../build/headless');
 
+// Load the LMLayerWorkerCode function into this context
+require('node:vm').runInThisContext(fs.readFileSync(__dirname + '/../../../web/lm-worker/build/index.js', 'utf-8'));
+
 /*
  * Shows off the LMLayer API, using the full prediction interface.
- * The dummy model (or mock model) is a language model which has 
+ * The dummy model (or mock model) is a language model which has
  * **injectable** suggestions: that is, you, as the tester, have
  * to provide the predictions. The dummy model does not create any
  * suggestions on its own. The dummy model can take in a series
@@ -108,7 +111,7 @@ describe('LMLayer using dummy model', function () {
       }).then(function () {
         // We'll keep it simple here, as this is primarily an integration test.
         // Functionality is handled in the 'headless' test case 'default-word-breaker.js'.
-        let context = { 
+        let context = {
           left: 'The quick brown fox jumped', startOfBuffer: true,
           right: ' over the lazy dog.', endOfBuffer: true
         };

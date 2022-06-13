@@ -1,10 +1,13 @@
 {
+  "extends": "../../tsconfig-base.json",
+
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "dist/",
+    "rootDir": "source/",
     "declaration": true,
     "alwaysStrict": true,
     "noImplicitThis": true,
@@ -16,5 +19,11 @@
   },
   "include": [
     "source/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../common/web/keyman-version" },
+    { "path": "../../common/models/types" },
+    { "path": "../../common/models/templates" },
+    { "path": "../../common/models/wordbreakers" },
   ]
 }

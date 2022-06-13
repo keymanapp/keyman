@@ -1,3 +1,4 @@
+///<reference types="@keymanapp/models-types" />
 namespace wordBreakers {
   /**
    * Splits ASCII words.

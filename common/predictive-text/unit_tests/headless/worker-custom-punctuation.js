@@ -3,8 +3,9 @@
  */
 
 var assert = require('chai').assert;
-var DummyModel = require('../../build/intermediate').models.DummyModel;
-var ModelCompositor = require('../../build/intermediate').ModelCompositor;
+const LMLayerWorker = require('../../../web/lm-worker/build/intermediate.js');
+var DummyModel = LMLayerWorker.models.DummyModel;
+var ModelCompositor = LMLayerWorker.ModelCompositor;
 
 describe('Custom Punctuation', function () {
   it('appears in the keep suggestion', function () {

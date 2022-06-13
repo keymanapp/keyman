@@ -1,10 +1,13 @@
 {
+  "extends": "../../tsconfig-base.json",
+
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "dist/",
+    "rootDir": "src/",
     "declaration": true,
     "alwaysStrict": true,
     "noImplicitThis": true,
@@ -16,5 +19,8 @@
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../common/web/keyman-version" }
   ]
 }

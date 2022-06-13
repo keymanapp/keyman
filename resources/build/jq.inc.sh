@@ -8,16 +8,16 @@
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+JQ_THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 # . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 case "${OSTYPE}" in
   "cygwin")
-    JQ=$(dirname "$THIS_SCRIPT")/jq-win64.exe
+    JQ=$(dirname "$JQ_THIS_SCRIPT")/jq-win64.exe
     ;;
   "msys")
-    JQ=$(dirname "$THIS_SCRIPT")/jq-win64.exe
+    JQ=$(dirname "$JQ_THIS_SCRIPT")/jq-win64.exe
     ;;
   *)
     JQ=jq

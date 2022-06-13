@@ -1,11 +1,7 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
-// Includes a promise polyfill (needed for IE)
-/// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
-// Defines the core text processor.
-/// <reference path="../node_modules/@keymanapp/input-processor/src/text/inputProcessor.ts" />
 // Extends KeyboardInterface with DOM-oriented offerings.
 /// <reference path="text/domKbdInterface.ts" />
 // Defines the web-page interface object.
@@ -163,12 +159,12 @@ namespace com.keyman {
       this.osk = this['osk'] = null;
 
       // Load properties from their static variants.
-      this['build'] = com.keyman.environment.BUILD;
+      this['build'] = Number.parseInt(com.keyman.KEYMAN_VERSION.VERSION_PATCH, 10);
       this.srcPath = KeymanBase._srcPath;
       this.rootPath = KeymanBase._rootPath;
       this.protocol = KeymanBase._protocol;
 
-      this['version'] = com.keyman.environment.VERSION;
+      this['version'] = com.keyman.KEYMAN_VERSION.VERSION_RELEASE;
       this['helpURL'] = 'http://help.keyman.com/go';
       this.setInitialized(0);
 

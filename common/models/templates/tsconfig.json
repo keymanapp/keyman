@@ -1,16 +1,17 @@
 {
+  "extends": "../../../tsconfig-base.json",
   "compilerOptions": {
     "declaration": true,
     "module": "none",
-    "outFile": "index.js",
+    "outFile": "./build/index.js",
     "sourceMap": true,
     "lib": ["es6"],
     "target": "es5",
-    "typeRoots": [
-      "./node_modules/@keymanapp",
-      "./node_modules/@types"
-    ]
   },
+  "references": [
+    { "path": "../../web/utils" },
+    { "path": "../types" }
+  ],
   "include": [
 	"src/**/*.ts"
   ],

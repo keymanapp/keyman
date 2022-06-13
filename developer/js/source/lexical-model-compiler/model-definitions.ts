@@ -3,6 +3,8 @@ import { defaultApplyCasing,
          defaultSearchTermToKey
        } from "./model-defaults";
 
+const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
+
 /**
  * Processes certain defined model behaviors in such a way that the needed closures
  * may be safely compiled to a JS file and loaded within the LMLayer.
@@ -49,7 +51,7 @@ export class ModelDefinitions {
     version: string;
     applyCasing?: CasingFunction;
   } = {
-    version: process.env.npm_package_version
+    version: KEYMAN_VERSION.VERSION_WITH_TAG
   };
 
   /**
