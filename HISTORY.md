@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.11 alpha 2022-05-27
+
+* chore: A16S2 beta to master (#6670)
+* chore(ios): FV certificate hash (#6674)
+
 ## 16.0.10 alpha 2022-05-15
 
 * chore: beta to master A16S1 (#6614)
