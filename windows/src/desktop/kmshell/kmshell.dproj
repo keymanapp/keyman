@@ -137,7 +137,7 @@
         <DCCReference Include="startup\UfrmSplash.pas">
             <Form>frmSplash</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\ui\UfrmKeymanBase.pas">
+        <DCCReference Include="main\UfrmKeymanBase.pas">
             <Form>frmKeymanBase</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
@@ -165,7 +165,7 @@
         <DCCReference Include="install\UfrmInstallKeyboardFromWeb.pas">
             <Form>frmInstallKeyboardFromWeb</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\ui\UfrmWebContainer.pas">
+        <DCCReference Include="main\UfrmWebContainer.pas">
             <Form>frmWebContainer</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
