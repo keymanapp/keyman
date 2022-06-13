@@ -121,7 +121,7 @@
         <DCCReference Include="comp\PaintPanel.pas"/>
         <DCCReference Include="comp\HintLabel.pas"/>
         <DCCReference Include="comp\HeadingCheckListBox.pas"/>
-        <DCCReference Include="visualkeyboard\VisualKeyboardParameters.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="comp\PanelOverlapped.pas"/>
         <DCCReference Include="comp\StringGridEditControlled.pas"/>
         <DCCReference Include="comp\BitmapEditor.pas"/>
@@ -136,7 +136,7 @@
         <DCCReference Include="general\usp10.pas"/>
         <DCCReference Include="vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="comp\CaptionPanel.pas"/>
-        <DCCReference Include="visualkeyboard\OnScreenKeyboardData.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="comp\LeftTabbedPageControl.pas"/>
         <DCCReference Include="general\Glossary.pas"/>
         <DCCReference Include="general\RegistryKeys.pas"/>
