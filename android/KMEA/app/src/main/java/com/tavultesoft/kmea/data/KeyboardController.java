@@ -207,7 +207,7 @@ public class KeyboardController {
       }
     }
 
-    Log.w(TAG, "getKeyboardIndex failed for key " + key);
+    KMLog.LogError(TAG, "getKeyboardIndex failed for key " + key);
     return index;
   }
 
