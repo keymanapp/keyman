@@ -93,13 +93,13 @@ namespace com.keyman.osk {
       return null;
     }
 
-    public refreshLayout(vkbd: VisualKeyboard, paddedHeight: number, trueHeight: number) {
+    public refreshLayout(vkbd: VisualKeyboard, layerHeight: number) {
       // Check the heights of each row, in case different layers have different row counts.
       const nRows = this.rows.length;
-      const rowHeight = this._rowHeight = Math.floor(paddedHeight/(nRows == 0 ? 1 : nRows));
+      const rowHeight = this._rowHeight = Math.floor(layerHeight/(nRows == 0 ? 1 : nRows));
 
       if(vkbd.usesFixedHeightScaling) {
-        this.element.style.height=(trueHeight)+'px';
+        this.element.style.height=(layerHeight)+'px';
       }
 
       for(let nRow=0; nRow<nRows; nRow++) {
@@ -108,7 +108,7 @@ namespace com.keyman.osk {
 
         if(vkbd.usesFixedHeightScaling) {
           // Calculate the exact vertical coordinate of the row's center.
-          this.spec.row[nRow].proportionalY = ((trueHeight - bottom) - rowHeight/2) / paddedHeight;
+          this.spec.row[nRow].proportionalY = ((layerHeight - bottom) - rowHeight/2) / layerHeight;
 
           if(nRow == nRows-1) {
             oskRow.element.style.bottom = '1px';
