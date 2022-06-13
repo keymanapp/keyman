@@ -182,7 +182,7 @@
         <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutDefinitions.pas"/>
         <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutUtils.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyboardFonts.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilicon.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompileErrorCodes.pas"/>
         <DCCReference Include="Keyman.Developer.System.ModelProjectTemplate.pas"/>

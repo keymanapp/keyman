@@ -495,7 +495,7 @@
         <DCCReference Include="main\Keyman.Developer.UI.ImportWindowsKeyboardDialogManager.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>
         <DCCReference Include="..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kmnProjectFile.pas"/>

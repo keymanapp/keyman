@@ -249,7 +249,7 @@ uses
   Keyman.Developer.UI.ImportWindowsKeyboardDialogManager in 'main\Keyman.Developer.UI.ImportWindowsKeyboardDialogManager.pas',
   Keyman.Developer.System.ImportWindowsKeyboard in '..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas',
   Keyman.Developer.System.ImportKeyboardDLL in '..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas',
-  Keyman.System.Util.RenderLanguageIcon in '..\..\..\windows\src\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
+  Keyman.System.Util.RenderLanguageIcon in '..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   Keyman.System.PackageInfoRefreshLexicalModels in '..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
   Keyman.System.LexicalModelUtils in '..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
   Keyman.Developer.System.Project.kmnProjectFile in 'project\Keyman.Developer.System.Project.kmnProjectFile.pas',
