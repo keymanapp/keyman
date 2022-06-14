@@ -539,21 +539,12 @@ namespace com.keyman.dom {
 
       // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
       // Think of it as performing a floor() function, but the floor depends on the origin's direction.
-      let snapOrder: (x: number, y: number) => boolean;
+      const isRTL = (this as unknown as HTMLElement).dir == 'rtl';
+      const snapOrder = isRTL ? (a, b) => a < b : (a, b) => a > b;
+
       // Used to signify a few pixels of leniency in the 'rtl'-appropriate direction for final
       // caret placement.
-      let snapLeniency: number;
-      if((this as unknown as HTMLElement).dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
-        snapOrder = function(a, b) {
-          return a < b;
-        };
-        snapLeniency = -TouchAliasData.X_SNAP_LENIENCY_PIXELS;
-      } else {
-        snapOrder = function(a, b) {
-          return a > b;
-        };
-        snapLeniency = TouchAliasData.X_SNAP_LENIENCY_PIXELS;
-      }
+      const snapLeniency = isRTL ? -TouchAliasData.X_SNAP_LENIENCY_PIXELS : TouchAliasData.X_SNAP_LENIENCY_PIXELS;
 
       // Now to binary-search the x-coordinate.
       // Pre-condition:  [cpMin, cpMax] === [start of row, end of row], both within the same line.
