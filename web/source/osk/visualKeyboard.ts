@@ -257,6 +257,15 @@ namespace com.keyman.osk {
       }
     }
 
+    get internalHeight(): ParsedLengthStyle {
+      if (this.usesFixedHeightScaling) {
+        // Touch OSKs may apply internal padding to prevent row cropping at the edges.
+        return ParsedLengthStyle.inPixels(this.layoutHeight.val - this.getVerticalLayerGroupPadding());
+      } else {
+        return ParsedLengthStyle.forScalar(1);
+      }
+    }
+
     get fontSize(): ParsedLengthStyle {
       if (!this._fontSize) {
         this._fontSize = new ParsedLengthStyle('1em');
@@ -1275,8 +1284,14 @@ namespace com.keyman.osk {
 
       // Needs the refreshed layout info to work correctly.
       if(this.currentLayer) {
-        this.currentLayer.refreshLayout(this, paddedHeight, this._computedHeight);
+        this.currentLayer.refreshLayout(this, this._computedHeight - this.getVerticalLayerGroupPadding());
       }
+    }
+
+    private getVerticalLayerGroupPadding(): number {
+      // For touch-based OSK layouts, kmwosk.css may include top & bottom padding on the layer-group element.
+      const computedGroupStyle = getComputedStyle(this.layerGroup.element);
+      return parseInt(computedGroupStyle.paddingTop, 10) + parseInt(computedGroupStyle.paddingBottom, 10);
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
