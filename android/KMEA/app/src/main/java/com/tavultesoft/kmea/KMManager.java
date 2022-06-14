@@ -2000,6 +2000,16 @@ public final class KMManager {
 
   public static Keyboard getCurrentKeyboardInfo(Context context) {
     int index = getCurrentKeyboardIndex(context);
+    if(index < 0) {
+      // As of 15.0-beta and 15.0-stable, this only appears to occur when
+      // #6703 would trigger.  This logging may help us better identify the
+      // root cause.
+      String key = KMKeyboard.currentKeyboard();
+      // Even if it's null, it's still a notable error.  This function shouldn't
+      // be reachable in execution (15.0) at a time this variable would be set to `null`.
+      KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      return null;
+    }
     return KeyboardController.getInstance().getKeyboardInfo(index);
   }
 
