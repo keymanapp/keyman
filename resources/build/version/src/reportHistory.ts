@@ -26,7 +26,7 @@ const getPullRequestInformation = async (
         }
       ]
     }
-  } = response;
+  }: any = response;
 
   return commit_id;
 };
@@ -47,7 +47,7 @@ const getAssociatedPRInformation = async (
     { sha: commit_id }
   );
 
-  if (response === null || response.repository.commit === null) {
+  if (response === null || (<any>response).repository.commit === null) {
     return undefined;
   }
 
@@ -65,7 +65,7 @@ const getAssociatedPRInformation = async (
         }
       }
     }
-  } = response;
+  }: any = response;
 
   const node = nodes.find(node => node.state == 'MERGED');
   return node ? { title: node.title, number: node.number } : undefined;
