@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.12 alpha 2022-06-14
+
+* chore(web): replace lerna with npm workspaces and ts projects (#6525)
+* fix(common): update increment-version for new tsc, node versions (#6762)
+
 ## 16.0.11 alpha 2022-05-27
 
 * chore: A16S2 beta to master (#6670)
