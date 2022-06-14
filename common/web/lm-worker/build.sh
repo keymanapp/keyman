@@ -74,12 +74,6 @@ wrap-worker-code ( ) {
   # Needed to support Symbol.iterator, as used by the correction algorithm.
   cat "src/polyfills/symbol-es6.min.js" || die # Needed for Android / Chromium browser pre-43.
 
-  # Needed to 'support' String.normalize within iOS 9.
-  # For our limited use case thereof; is definitely NOT a general polyfill.
-  # (The file size on a true one would be quite high.)
-  # TBD:  should we drop this, since we only support iOS 12+ for the mobile app?
-  cat "src/polyfills/string.normalize.js" || die
-
   echo ""
 
   cat "${js}"
