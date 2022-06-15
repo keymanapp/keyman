@@ -7,11 +7,11 @@ module.exports = {
   basePath: './',
 
   client: {
-    /* `client.args` here is passed to the test runner page as `__karma__.config.args`.  
+    /* `client.args` here is passed to the test runner page as `__karma__.config.args`.
      *
      * Karma doc type spec says "array", so we use an array.  It also gives us room to add alternate
      * configuration details later if we need to, though on a CI vs local basis only.
-     * 
+     *
      * Timeouts below are in milliseconds
      */
     args: [{
@@ -32,10 +32,11 @@ module.exports = {
   // list of files / patterns to load in the browser
   files: [
     // Include the generated worker code.  Make sure it's linked before any of the test cases.
+    '../../../web/lm-worker/build/index.js',
     '../../build/index.js',
     'helpers.js',    // Provides utility helpers and objects for tests.
     'cases/**/*.js', // Where the tests actually reside.
-    
+
     // We don't have anything in these locations... yet.  But they'll be useful for test resources.
     'json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.

@@ -195,7 +195,7 @@ export const fixupHistory = async (
   try {
     pulls = await reportHistory(octokit, base, force, true);
   } catch(e) {
-    logWarning(e);
+    logWarning(String(e));
     return -1;
   }
 

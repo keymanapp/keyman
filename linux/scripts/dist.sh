@@ -68,7 +68,7 @@ for proj in ${extra_projects}; do
     dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
         --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
         --tar-ignore=.github --tar-ignore=.vscode --tar-ignore=android \
-        --tar-ignore=common/core/web --tar-ignore=common/lexical-model-types \
+        --tar-ignore=common/lexical-model-types \
         --tar-ignore=common/models --tar-ignore=common/predictive-text \
         --tar-ignore=common/test --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
         --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
@@ -77,7 +77,7 @@ for proj in ${extra_projects}; do
         --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
         --tar-ignore=linux/build* --tar-ignore=common/core/desktop/build \
         --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
-        --tar-ignore=resources/scopes --tar-ignore=resources/web-environment \
+        --tar-ignore=resources/scopes --tar-ignore=common/web \
         --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
         --tar-ignore=resources/build/vswhere* --tar-ignore=results \
         --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \

@@ -107,7 +107,7 @@ namespace com.keyman {
           }
 
           // Windows Phone and Tablet PC
-          if(typeof navigator.msMaxTouchPoints == 'number' && navigator.msMaxTouchPoints > 0) {
+          if(typeof (<any>navigator).msMaxTouchPoints == 'number' && (<any>navigator).msMaxTouchPoints > 0) {
             this.touchable=true;
           }
         }

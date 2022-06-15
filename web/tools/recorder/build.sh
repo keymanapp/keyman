@@ -1,5 +1,5 @@
 #! /bin/bash
-# 
+#
 # Compiles development-related KeymanWeb resources for use with developing/running tests.
 #   - the Recorder module (for engine tests)
 #   - the DOM module (for touch-alias and element-interface tests)
@@ -28,14 +28,14 @@ readonly ENGINE_TEST_OUTPUT
 # (Facilitates automated setup for build agents.)
 PATH="../../node_modules/.bin:$PATH"
 
-pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
+pushd "$KEYMAN_ROOT/common/web/recorder/src"
 ./build.sh -skip-package-install || fail "recorder-core compilation failed."
 popd
 
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
-$compilecmd -p "$SCRIPT_DIR/tsconfig.json"
+$compilecmd --build "$SCRIPT_DIR/tsconfig.json"
 if [ $? -ne 0 ]; then
     fail "KeymanWeb test sequence recorder compilation failed."
 fi

@@ -2,16 +2,15 @@
  * Integration tests for the model compositor with the trie model.
  */
 
-const { models, wordBreakers } = require('../../build/intermediate');
+const { models, wordBreakers, ModelCompositor } = require('../../../web/lm-worker/build/intermediate.js');
 
 var assert = require('chai').assert;
-var TrieModel = require('../../build/intermediate').models.TrieModel;
-var ModelCompositor = require('../../build/intermediate').ModelCompositor;
+var TrieModel = models.TrieModel;
 
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
     describe('Basic suggestion generation', function() {
-      var plainModel = new TrieModel(jsonFixture('tries/english-1000'), 
+      var plainModel = new TrieModel(jsonFixture('tries/english-1000'),
         {wordBreaker: wordBreakers.default}
       );
 
@@ -28,7 +27,7 @@ describe('ModelCompositor', function() {
 
         let suggestions = compositor.predict(inputTransform, context);
         suggestions.forEach(function(suggestion) {
-          // Suggstions are built based on the context state BEFORE the triggering 
+          // Suggstions are built based on the context state BEFORE the triggering
           // input, replacing the prediction's root with the complete word.
           //
           // This is necessary, in part, for proper display-string construction.
@@ -239,22 +238,22 @@ describe('ModelCompositor', function() {
       it('should produce suggestions from uncased input', function() {
         let model = uncasedModel;
         var composite = new ModelCompositor(model);
-        
+
         // Initialize context
         let context = {
           left: 'th', startOfBuffer: false, endOfBuffer: true,
         };
         composite.predict({insert: '', deleteLeft: 0}, context);
-    
+
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
         var suggestions = composite.predict([thr, the], context);
-    
+
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
         var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
-    
+
         // Sanity check: do we have actual real-valued probabilities?
         assert.isAbove(thrSuggestion.p, 0.0);
         assert.isBelow(thrSuggestion.p, 1.0);
@@ -267,18 +266,18 @@ describe('ModelCompositor', function() {
       it('should not produce suggestions from cased input', function() {
         let model = uncasedModel;
         var composite = new ModelCompositor(model);
-        
+
         // Initialize context
         let context = {
           left: 'TH', startOfBuffer: false, endOfBuffer: true,
         };
         composite.predict({insert: '', deleteLeft: 0}, context);
-    
+
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'R', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'E', deleteLeft: 0}, p: 0.55 };
         var suggestions = composite.predict([thr, the], context);
-    
+
         // We should only receive a 'keep' suggestion.
         assert.equal(suggestions.length, 1);
         assert.equal(suggestions[0].tag, 'keep');
@@ -314,22 +313,22 @@ describe('ModelCompositor', function() {
       it('should produce suggestions from uncased input', function() {
         let model = casedModel;
         var composite = new ModelCompositor(model);
-        
+
         // Initialize context
         let context = {
           left: 'th', startOfBuffer: false, endOfBuffer: true,
         };
         composite.predict({insert: '', deleteLeft: 0}, context);
-    
+
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
         var suggestions = composite.predict([thr, the], context);
-    
+
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
         var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
-    
+
         // Sanity check: do we have actual real-valued probabilities?
         assert.isAbove(thrSuggestion.p, 0.0);
         assert.isBelow(thrSuggestion.p, 1.0);
@@ -342,22 +341,22 @@ describe('ModelCompositor', function() {
       it('should produce capitalized suggestions from fully-uppercased input', function() {
         let model = casedModel;
         var composite = new ModelCompositor(model);
-        
+
         // Initialize context
         let context = {
           left: 'TH', startOfBuffer: false, endOfBuffer: true,
         };
         composite.predict({insert: '', deleteLeft: 0}, context);
-    
+
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'R', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'E', deleteLeft: 0}, p: 0.55 };
         var suggestions = composite.predict([thr, the], context);
-    
+
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'THE' || s.displayAs === '“THE”'; })[0];
         var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('THR'); })[0];
-    
+
         // Sanity check: do we have actual real-valued probabilities?
         assert.isAbove(thrSuggestion.p, 0.0);
         assert.isBelow(thrSuggestion.p, 1.0);
@@ -370,22 +369,22 @@ describe('ModelCompositor', function() {
       it('should produce "initial-case" suggestions from input with an initial capital', function() {
         let model = casedModel;
         var composite = new ModelCompositor(model);
-        
+
         // Initialize context
         let context = {
           left: 'Th', startOfBuffer: false, endOfBuffer: true,
         };
         composite.predict({insert: '', deleteLeft: 0}, context);
-    
+
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
         var suggestions = composite.predict([thr, the], context);
-    
+
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'The' || s.displayAs === '“The”'; })[0];
         var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('Thr'); })[0];
-    
+
         // Sanity check: do we have actual real-valued probabilities?
         assert.isAbove(thrSuggestion.p, 0.0);
         assert.isBelow(thrSuggestion.p, 1.0);
@@ -398,22 +397,22 @@ describe('ModelCompositor', function() {
       it('also from input with partial capitalization when including an initial capital', function() {
         let model = casedModel;
         var composite = new ModelCompositor(model);
-        
+
         // Initialize context
         let context = {
           left: 'TH', startOfBuffer: false, endOfBuffer: true,
         };
         composite.predict({insert: '', deleteLeft: 0}, context);
-    
+
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
         var suggestions = composite.predict([thr, the], context);
-    
+
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('The'); })[0];
         var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('Thr'); })[0];
-    
+
         // Sanity check: do we have actual real-valued probabilities?
         assert.isAbove(thrSuggestion.p, 0.0);
         assert.isBelow(thrSuggestion.p, 1.0);
@@ -429,22 +428,22 @@ describe('ModelCompositor', function() {
         jsonFixture('tries/english-1000')
       );
       var composite = new ModelCompositor(model);
-      
+
       // Initialize context
       let context = {
         left: 'th', startOfBuffer: false, endOfBuffer: true,
       };
       composite.predict({insert: '', deleteLeft: 0}, context);
-  
+
       // Pretend to fat finger "the" as "thr"
       var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
       var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
       var suggestions = composite.predict([thr, the], context);
-  
+
       // Get the top suggest for 'the' and 'thr*'.
       var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
       var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
-  
+
       // Sanity check: do we have actual real-valued probabilities?
       assert.isAbove(thrSuggestion.p, 0.0);
       assert.isBelow(thrSuggestion.p, 1.0);
@@ -453,31 +452,31 @@ describe('ModelCompositor', function() {
       // 'the' should be the intended the result here.
       assert.isAbove(theSuggestion.p, thrSuggestion.p);
     });
-  
+
     it('should compose suggestions from a fat-fingered keypress (keying needed)', function () {
       var model = new TrieModel(
         jsonFixture('tries/english-1000')
       );
       var composite = new ModelCompositor(model);
-      
+
       // Initialize context
       let context = {
         left: 'Th', startOfBuffer: false, endOfBuffer: true,
       };
       composite.predict({insert: '', deleteLeft: 0}, context);
-  
+
       // Pretend to fat finger "the" as "thr"
       var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
       var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
       var suggestions = composite.predict([thr, the], context);
-  
+
       // Get the top suggest for 'the' and 'thr*'.
       // As of 15.0+, because of #5429, the keep suggestion `"The"` will not be merged
       // with the model's suggestion of `the`.
       var capTheSuggestion = suggestions.filter(function (s) { return s.displayAs === '“The”'; })[0];
       var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the'})[0];
       var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
-  
+
       // Sanity check: do we have actual real-valued probabilities?
       assert.isAbove(thrSuggestion.p, 0.0);
       assert.isBelow(thrSuggestion.p, 1.0);
@@ -516,10 +515,10 @@ describe('ModelCompositor', function() {
         let options = {
           punctuation: punctuation
         };
-  
+
         let model = new models.DummyModel(options);
         let compositor = new ModelCompositor(model);
-  
+
         var keep;
         if(quoteStyle) {
           keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep', quoteStyle);
@@ -529,7 +528,7 @@ describe('ModelCompositor', function() {
 
         // Make sure we didn't accidentally leak any mutations to the parameter.
         assert.notDeepEqual(keep, baseSuggestion);
-  
+
         assert.equal(keep.displayAs, displayText);
         assert.equal(keep.tag, 'keep');
       }
@@ -588,11 +587,11 @@ describe('ModelCompositor', function() {
         id: 1,
         displayAs: 'hello'
       };
-  
+
       let baseContext = {
         left: 'he', startOfBuffer: true, endOfBuffer: true
       }
-    
+
       // Represents the keystroke that triggered the suggestion.  It's not technically part
       // of the Context when the suggestion is built.
       let postTransform = {
@@ -631,11 +630,11 @@ describe('ModelCompositor', function() {
         id: 0,
         displayAs: 'world'
       };
-  
+
       let baseContext = {
         left: 'hello wot', startOfBuffer: true, endOfBuffer: true
       }
-    
+
       // Represents the keystroke that triggered the suggestion.  It's not technically part
       // of the Context when the suggestion is built.
       let postTransform = {
@@ -674,7 +673,7 @@ describe('ModelCompositor', function() {
         id: 0,
         displayAs: 'world'
       };
-  
+
       let baseContext = {
         left: 'hello wot', startOfBuffer: true, endOfBuffer: true
       }
@@ -710,11 +709,11 @@ describe('ModelCompositor', function() {
         id: 0,
         displayAs: 'hello'
       };
-  
+
       let baseContext = {
         left: 'he', startOfBuffer: true, endOfBuffer: true
       }
-    
+
       // Represents the keystroke that triggered the suggestion.  It's not technically part
       // of the Context when the suggestion is built.
       let postTransform = {
@@ -772,11 +771,11 @@ describe('ModelCompositor', function() {
         id: 0,
         displayAs: 'hello'
       };
-  
+
       let baseContext = {
         left: 'he', startOfBuffer: true, endOfBuffer: true
       }
-    
+
       // Represents the keystroke that triggered the suggestion.  It's not technically part
       // of the Context when the suggestion is built.
       let postTransform = {
@@ -795,7 +794,7 @@ describe('ModelCompositor', function() {
       assert.equal(appliedContext.left, "hello ");
 
       let suggestions = compositor.applyReversion(reversion, appliedContext);
-      
+
       // As this test is a bit... 'hard-wired', we only get the 'keep' suggestion.
       // It should still be accurate, though.
       assert.equal(suggestions.length, 1);
@@ -811,11 +810,11 @@ describe('ModelCompositor', function() {
       // This setup matches 'acceptSuggestion' the test case
       // it('first word of context + postTransform provided, .deleteLeft > 0')
       // seen earlier in the file.
-  
+
       let baseContext = {
         left: 'he', startOfBuffer: true, endOfBuffer: true
       }
-    
+
       // Represents the keystroke that triggered the suggestion.  It's not technically part
       // of the Context when the suggestion is built.
       let postTransform = {
@@ -838,7 +837,7 @@ describe('ModelCompositor', function() {
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       let reversionSuggestions = compositor.applyReversion(reversion, appliedContext);
-      
+
       // The returned suggestion list should match the original suggestion list.
       assert.deepEqual(reversionSuggestions, initialSuggestions);
     });
@@ -846,11 +845,11 @@ describe('ModelCompositor', function() {
     it('model with traversals: properly tracks context state', function() {
       // Could be merged with the previous test case, but I think it's good to have the error
       // sets flagged separately.
-  
+
       let baseContext = {
         left: 'he', startOfBuffer: true, endOfBuffer: true
       }
-    
+
       // Represents the keystroke that triggered the suggestion.  It's not technically part
       // of the Context when the suggestion is built.
       let postTransform = {

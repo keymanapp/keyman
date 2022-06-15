@@ -7,12 +7,12 @@
 
 /common/                      @mcdurdin     @jahorton
 /common/core/desktop/         @mcdurdin     @jahorton
-/common/core/web/             @jahorton     @ermshiperete
 /common/lexical-model-types/  @jahorton     @mcdurdin
 /common/models/               @jahorton     @mcdurdin
 /common/predictive-text/      @jahorton     @mcdurdin
 /common/schemas/              @mcdurdin     @jahorton
 /common/test/                 @mcdurdin     @ermshiperete
+/common/web/                  @jahorton     @ermshiperete   @mcdurdin
 
 /developer/                   @mcdurdin     @darcywong00
 /docs/                        @mcdurdin     @jahorton

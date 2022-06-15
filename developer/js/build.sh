@@ -94,9 +94,9 @@ type npm >/dev/null ||\
 
 if (( install_dependencies )) ; then
   verify_npm_setup
+  # We need to build keyman-version and lm-worker with a script for now
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 fi
-
-set_npm_version || fail "Setting version failed."
 
 build || fail "Compilation failed."
 echo "Typescript compilation successful."
@@ -111,6 +111,8 @@ if (( should_publish )); then
   else
     npm_dist_tag=$TIER
   fi
+
+  set_npm_version
 
   # Note: In either case, npm publish MUST be given --access public to publish
   # a package in the @keymanapp scope on the public npm package index.

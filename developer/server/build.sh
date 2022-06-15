@@ -14,6 +14,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 EX_USAGE=64
 
+. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+
 pushd "$(dirname "$THIS_SCRIPT")"
 
 # Build the main script.
@@ -95,12 +97,10 @@ type npm >/dev/null ||\
 
 if (( install_dependencies )) ; then
   verify_npm_setup
-  npm install --production=false
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
-  rm -f node_modules/ngrok/bin/ngrok.exe
+  # TODO: this is horrible; is there a way we can avoid this?
+  rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok.exe
 fi
-
-set_npm_version || fail "Setting version failed."
 
 # ----------------------------------------
 # Rebuild and bundle addins
@@ -126,24 +126,6 @@ if (( build_keymanweb )); then
   pushd "$KEYMAN_ROOT/web/source"
   ./build.sh -no_minify
   popd
-
-  # TODO: This is gross, but lerna is stripping out @keymanapp/resources-gosh
-  # from our local node-modules folder during the KeymanWeb build, and I don't
-  # want to try and figure out why just at this minute.
-  #
-  # This causes `npm run postbuild` (which also happens after `npm run build`)
-  # to fall over because `gosh` cannot be found. An alternative fix was to
-  # change the postbuild script from:
-  #
-  #   npx gosh ./postbuild.sh
-  #
-  # to:
-  #
-  #   npx -p file:../../resources/gosh -q gosh ./postbuild.sh
-  #
-  # Which is also gross and should not be required!
-  #
-  npm install --production=false
 fi
 
 if (( copy_keymanweb )); then
@@ -180,13 +162,32 @@ fi
 # ----------------------------------------
 
 if (( production )) ; then
-  # We'll build in the build/ folder
-  rm -rf build/
-  mkdir build/
-  cp -R dist/ package.json package-lock.json build/
-  cd build/
+  # We need to build in a tmp folder so that npm doesn't get confused by our
+  # monorepo setup, and so we can copy the relevant node_modules in, because
+  # we'll need them in order to build the deployable version.
+
+  PRODBUILDTEMP=`mktemp -d`
+  echo "Preparing in $PRODBUILDTEMP"
+  # Remove @keymanapp devDependencies because they won't install outside the
+  # monorepo context
+  cat package.json | "$JQ" \
+    '. | del(.devDependencies."@keymanapp/resources-gosh") | del(.devDependencies."@keymanapp/keyman-version")' \
+    > "$PRODBUILDTEMP/package.json"
+
+  pushd "$PRODBUILDTEMP"
   npm install --omit=dev --omit=optional
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   rm -f node_modules/ngrok/bin/ngrok.exe
-  cd ..
+  popd
+
+  # @keymanapp/keyman-version is required in dist now but we need to copy it in manually
+  mkdir -p "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+
+  # We'll build in the build/ folder
+  rm -rf build/
+  mkdir build/
+  cp -R dist/* build/
+  cp -R "$PRODBUILDTEMP"/* build/
+  rm -rf "$PRODBUILDTEMP"
 fi

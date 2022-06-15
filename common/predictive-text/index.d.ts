@@ -1,12 +1,13 @@
 /**
  * Defines TS method typing for the LMLayer's public API.
- * 
+ *
  * Unfortunately, it is not possible to do this programmatically at this time, as TS won't output declarations
  * if any JS files are allowed in compilation.  We can't convert the embedded worker's intermediate file to TS
  * safely due to DedicatedWorkerGlobalScope and a few other typing issues.
  */
 
-/// <reference path="message.d.ts" />
+/// <reference types="@keymanapp/lm-message-types" />
+/// <reference types="@keymanapp/models-types" />
 
 declare namespace com.keyman.text.prediction {
   class LMLayer {
@@ -14,7 +15,7 @@ declare namespace com.keyman.text.prediction {
     /**
      * Construct the top-level LMLayer interface. This also starts the underlying Worker.
      * Make sure to call .load() when using the default Worker.
-     * 
+     *
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
@@ -51,9 +52,9 @@ declare namespace com.keyman.text.prediction {
      * Converts the INSIDE of a function into a blob URI that can
      * be passed as a valid URI for a Worker.
      * @param fn Function whose body will be referenced by a URI.
-     * 
+     *
      * This function makes the following possible:
-     * 
+     *
      *    let worker = new Worker(LMLayer.asBlobURI(function myWorkerCode () {
      *      postMessage('inside Web Worker')
      *      function onmessage(event) {

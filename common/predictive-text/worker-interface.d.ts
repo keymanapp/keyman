@@ -2,12 +2,12 @@
 // relevance.
 
 /** A message received by a target object. */
-interface MessageEvent {
+interface MessageEvent<T = any> {
   /**
    * Returns the data of the message.
    */
-  readonly data: any;
-  
+  readonly data: T;
+
   // Other properties exist; we just don't use them yet.
 }
 
@@ -20,6 +20,6 @@ interface Worker {
   onmessage: ((this: Worker, ev: MessageEvent) => any) | null;
   postMessage(message: any): void;
   terminate(): void;
-  
+
   // addEventListener and removeEventListener also exist, but we don't utilize them.
 }

@@ -58,7 +58,7 @@
     //   attachType: 'auto',
     // });
 
-    
+
 
     window.addEventListener("onload", function() {
       keyman.init({
@@ -67,7 +67,7 @@
 
       document.getElementById("body").focus();
     });
-    
+
   </script>
 </head>
 
@@ -99,7 +99,7 @@
         <div id="stubHelp" style="display: none">
           <h3>Setup help</h3>
           <p>If using apache2 for local web testing, you may wish to add an Alias entry to the relevant httpd.conf file as follows:</p>
-          <pre><code>Alias "/resources" "&lt;repo-path&gt;/common/core/web/tests/resources"</code></pre>
+          <pre><code>Alias "/resources" "&lt;repo-path&gt;/common/test/resources"</code></pre>
         </div>
       </td>
     </tr>
@@ -117,11 +117,11 @@
         <h3>Add a keyboard by keyboard name:</h3>
         <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
         <input type='button' id='btn1' onclick='addKeyboard(1);' value='Add' />
-      
+
         <h3>Add a keyboard by BCP-47 language code:</h3>
         <input type='input' id='kbd_id2' class='kmw-disabled' onkeypress="clickOnEnter(event,2);"/>
         <input type='button' id='btn2' onclick='addKeyboard(2);' value='Add' />
-      
+
         <h3>Add a keyboard by language name:</h3>
         <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
         <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />
@@ -134,7 +134,7 @@
       <td style="width:50%;" >
         <h2>Keyboard Selection</h2>
         <p>Each defined test set should utilize the same keyboard.</p>
-        <p>Select a keyboard: <select id='KMW_Keyboard' onchange='KMW_KeyboardChange()'><option value=''>-disabled-</option></select></p> 
+        <p>Select a keyboard: <select id='KMW_Keyboard' onchange='KMW_KeyboardChange()'><option value=''>-disabled-</option></select></p>
         <p>Please ensure a copy of this keyboard's *.js resides at the specified location within the <code>unit_tests/</code> folder.</p>
       </td>
       <td style="width:50%;">
@@ -142,7 +142,7 @@
         <textarea id='activeStub' style="width:80%; height:100px" readonly></textarea>
       </td>
     </tr>
-  </table>  
+  </table>
   <hr/>
   <table style="width:100%">
     <tr>
@@ -179,7 +179,7 @@
         <nobr><input type="checkbox" id="browser_ie" onclick="setBrowserAny();" value="ie">
           <label for="browser_ie">IE</label></nobr>
         <nobr><input type="checkbox" id="browser_opera" onclick="setBrowserAny();" value="opera">
-          <label for="browser_opera">Opera</label></nobr>        
+          <label for="browser_opera">Opera</label></nobr>
       </td>
     </tr>
   </table>
@@ -192,7 +192,7 @@
           <input type='text' id='errorText' onchange="errorUpdate();"/>
           <p>Record input here:</p>
           <input type='text' id='receiver'/>
-          <p>You must click 'Set Sequence' to save any changes to an input sequence above 
+          <p>You must click 'Set Sequence' to save any changes to an input sequence above
             before continuing input recording, or they will be lost upon new input.</p>
       </td>
       <td style="width:50%">

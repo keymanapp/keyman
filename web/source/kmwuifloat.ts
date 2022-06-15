@@ -1,5 +1,3 @@
-/// <reference path="../node_modules/@keymanapp/web-utils/src/kmwstring.ts" />
-
 /***
    KeymanWeb 11.0
    Copyright 2019 SIL International

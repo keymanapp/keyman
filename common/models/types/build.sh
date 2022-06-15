@@ -88,8 +88,6 @@ if (( install_dependencies )) ; then
   npm install || fail "Could not download dependencies."
 fi
 
-set_npm_version || fail "Setting version failed."
-
 if (( run_tests )); then
   npm test || fail "Tests failed"
 fi
@@ -100,6 +98,8 @@ if (( should_publish )); then
   else
     npm_dist_tag=$TIER
   fi
+
+  set_npm_version
 
   # Note: In either case, npm publish MUST be given --access public to publish
   # a package in the @keymanapp scope on the public npm package index.

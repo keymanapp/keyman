@@ -58,11 +58,11 @@ type!
 Usage within keymanapp/keyman repo
 ----------------------------------
 
-To use it in other subprojects within keymanapp/keyman, ensure that this
-package is linked using **Lerna**. From the root of the repository, run:
+To use it in other subprojects within keymanapp/keyman, ensure that this package
+is linked using `"*"`. Add this dependency to your subproject like so:
 
-    npx lerna bootstrap
-
-Add this dependency to your subproject like so:
-
-    npx lerna add @keymanapp/models-types path/to/your/subproject
+```json
+  "dependencies": {
+    "@keymanapp/models-types": "*",
+  }
+```

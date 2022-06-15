@@ -1,7 +1,8 @@
 var assert = require('chai').assert;
-var ContextTracker = require('../../../build/intermediate/index').correction.ContextTracker;
-var ModelCompositor = require('../../../build/intermediate/index').ModelCompositor;
-var models = require('../../../build/intermediate/index').models;
+const LMLayerWorker = require('../../../../web/lm-worker/build/intermediate.js');
+var ContextTracker = LMLayerWorker.correction.ContextTracker;
+var ModelCompositor = LMLayerWorker.ModelCompositor;
+var models = LMLayerWorker.models;
 
 describe('ContextTracker', function() {
   function toWrapperDistribution(transform) {
@@ -121,11 +122,11 @@ describe('ContextTracker', function() {
         id: 1,
         displayAs: 'world'
       };
-  
+
       let baseContext = {
         left: 'hello wor', startOfBuffer: true, endOfBuffer: true
       };
-    
+
       // Represents the keystroke that triggered the suggestion.  It's not technically part
       // of the Context when the suggestion is built.
       let postTransform = {

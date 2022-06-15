@@ -1,5 +1,59 @@
 # Keyman Version History
 
+## 16.0.12 alpha 2022-06-14
+
+* chore(web): replace lerna with npm workspaces and ts projects (#6525)
+* fix(common): update increment-version for new tsc, node versions (#6762)
+
+## 16.0.11 alpha 2022-05-27
+
+* chore: A16S2 beta to master (#6670)
+* chore(ios): FV certificate hash (#6674)
+
+## 16.0.10 alpha 2022-05-15
+
+* chore: beta to master A16S1 (#6614)
+
+## 16.0.9 alpha 2022-04-29
+
+* chore(common): merge beta to master B15S7 (Part 2) (#6579)
+
+## 16.0.8 alpha 2022-04-17
+
+* chore: merge beta to master B15S7 (#6537)
+
+## 16.0.7 alpha 2022-04-07
+
+* chore: beta to master B15S6 (#6490)
+* fix(ios): use CFBundleShortVersionString for version (#6496)
+
+## 16.0.6 alpha 2022-04-05
+
+* chore(deps): bump ansi-regex from 3.0.0 to 3.0.1 in /web/testing/regression-tests (#6470)
+* chore(deps-dev): bump minimist from 1.2.5 to 1.2.6 in /web/testing/regression-tests (#6471)
+* chore(deps): bump minimist from 1.2.5 to 1.2.6 in /developer/server (#6472)
+
+## 16.0.5 alpha 2022-04-04
+
+* chore(common): beta to master B15S6 (#6467)
+
+## 16.0.4 alpha 2022-03-22
+
+* chore: B15S4 beta->alpha (#6402)
+
+## 16.0.3 alpha 2022-03-16
+
+* chore: merge beta changes to alpha B15S4 (#6376)
+* chore(common/core/desktop): Improve meson build file  ️ (#6183)
+
+## 16.0.2 alpha 2022-03-03
+
+* chore(deps-dev): bump karma from 6.3.14 to 6.3.16 in /web/testing/regression-tests (#6322)
+
+## 16.0.1 alpha 2022-03-02
+
+* chore: move to 16.0 (#6318)
+
 ## 15.0.259 beta 2022-06-10
 
 * fix(android/engine): Disable haptic feedback on hardware keystrokes (#6671)
@@ -280,6 +334,9 @@
 * change(web): tightens call signature for banner selection (#4966)
 * fix(windows): cleanup edge cases in k32_load (#5197)
 * feat(ios): refinement of spacebar-captioning PR (#5368)
+
+## 15.0.205 alpha 2022-03-02
+
 * fix(developer): move ngrok to Server/bin/ (#6304)
 * fix(linux): Gracefully handle keyboard download failure (#6285)
 * fix(linux): Gracefully handle makedirs failures (#6287)

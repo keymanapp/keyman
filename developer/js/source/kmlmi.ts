@@ -9,13 +9,14 @@ import * as path from 'path';
 import KmpCompiler from './package-compiler/kmp-compiler';
 import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from './model-info-compiler/model-info-compiler';
 import { SysExits } from './util/sysexits';
+const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
 
 let inputFilename: string;
 
 /* Arguments */
 program
   .description('Merges Keyman lexical model model_info files. Intended for use within the keymanapp/lexical-models repository.')
-  .version(require('../package.json').version)
+  .version(KEYMAN_VERSION.VERSION_WITH_TAG)
   .arguments('<infile>')
   .action(infile => inputFilename = infile)
   .option('-o, --outFile <filename>', 'where to save the resultant file')

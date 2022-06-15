@@ -1,5 +1,3 @@
-/// <reference path="../node_modules/@keymanapp/web-utils/src/kmwstring.ts" />
-
 /***
    KeymanWeb 11.0
    Copyright 2019 SIL International
@@ -8,13 +6,13 @@
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!window['keyman']['ui']['name']) { 
+if(!window['keyman']['ui']['name']) {
   /********************************/
   /*                              */
   /* Toggle User Interface Code   */
   /*                              */
   /********************************/
-      
+
   /**
    * Do not enclose in an anonymous function, as the compiler may create
    * global scope variables to replace true, false, null, which may collide
@@ -22,18 +20,18 @@ if(!window['keyman']['ui']['name']) {
    * Instead, use the --output-wrapper command during optimization, which will
    * add the anonymous function to enclose all code, including those optimized
    * variables which would otherwise have global scope.
-   **/  
+   **/
 
   try {
 
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
     var keymanweb=window['keyman'],util=keymanweb['util'];
     var dbg=keymanweb['debug'];
-    
+
     // Disable UI for touch devices
     if(util['isTouchDevice']()) throw '';
 
-    // Initialize user interface common variables       
+    // Initialize user interface common variables
     var ui:any=keymanweb['ui'] = {
       name: 'toggle',
       initialized: false,
@@ -45,22 +43,22 @@ if(!window['keyman']['ui']['name']) {
       lastActiveKeyboard: -1,
       selectedMenuItem: null,
       updateList: true,
-      updateTimer: null    
+      updateTimer: null
     }
-    
+
     /**
      * Update the KeymanWeb user interface when an input element is focused or blurred
-     * 
+     *
      * @param       {Object}            someElement     focused element
      * @param       {(boolean|number)}  focusing        true if focusing
      * @param       {Object}            activeControl   Object representing API specs for the control, if it exists and is now focused.
-     */    
+     */
     ui.doFocus = function(someElement,focusing, activeControl) {
       // This callback must be ignored until UI is initialized, or for touch devices (which can never initialize the UI)
       if(!ui.initialized) {
         return;
       }
-      
+
       // We don't want to shift the controller to something that's not an input element,
       // but do want to account for window.event's data when legitimate.
       if(window.event && keymanweb['isAttached'](window.event.srcElement)) {
@@ -70,23 +68,23 @@ if(!window['keyman']['ui']['name']) {
       if(focusing)
       {
         ui.controller.style.display = 'block';
-      } 
-      else 
+      }
+      else
       {
         if(!(keymanweb['getUIState']()['activationPending']) && !ui.controllerHovered)
         {
-          ui.controller.style.display = 'none';   
+          ui.controller.style.display = 'none';
         }
       }
-      
-    /* I2406 - Find an appropriate position for the controller */  
+
+    /* I2406 - Find an appropriate position for the controller */
       var x, y, w, h, p;
-    
+
       p = util['getAbsolute'](someElement); x = p['x']; y=p['y'];
 
       var ownerDoc = someElement.ownerDocument;
       if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement)
-      { 
+      {
         w = ownerDoc.defaultView.frameElement.clientWidth;
         h = ownerDoc.defaultView.frameElement.clientHeight;
       }
@@ -99,15 +97,15 @@ if(!window['keyman']['ui']['name']) {
         y += h;
       else
       {
-        x += w + 2;  
+        x += w + 2;
         //y += h - ui.controller.offsetHeight - 1; // ui.controller.offsetheight is returned as its prior value, which results in incorrect UI positioning
         // so better to set the offset absolutely JMD 11/2/11
-        y += h - 29; //prevent UI being positioned *above* the top of the element 
+        y += h - 29; //prevent UI being positioned *above* the top of the element
       }
-        
+
       if(isNaN(x) || isNaN(y)) return;
       ui.controller.style.left = x + 'px';
-      ui.controller.style.top = y + 'px';    
+      ui.controller.style.top = y + 'px';
     }
 
     keymanweb['addEventListener']('controlfocused',function(params){ui.doFocus(params.target,true, params['activeControl']);});
@@ -129,27 +127,27 @@ if(!window['keyman']['ui']['name']) {
 
           return oskPosition;
         });
-      
+
       osk['addEventListener']('hide', function(byUser) {
           if(byUser['HiddenByUser']) ui.oskButton._setSelected(false);
       });
     };
-    
+
     /**
-     * Toggle the on screen keyboard display - KMW button control event 
+     * Toggle the on screen keyboard display - KMW button control event
      **/
     ui.switchOsk = function()
     {
       // Check that user control of OSK is allowed
-      if((keymanweb['getActiveKeyboard']() == '') || keymanweb['isCJK']() ) return;  
-      
+      if((keymanweb['getActiveKeyboard']() == '') || keymanweb['isCJK']() ) return;
+
       if(keymanweb.osk) {
-        keymanweb.osk['show'](!keymanweb.osk['isEnabled']());  
+        keymanweb.osk['show'](!keymanweb.osk['isEnabled']());
       }
     }
-    
+
     /**
-     * Toggle a single keyboard on or off - KMW button control event 
+     * Toggle a single keyboard on or off - KMW button control event
      **/
     ui.switchSingleKbd = function()
     {
@@ -169,9 +167,9 @@ if(!window['keyman']['ui']['name']) {
       }
       if(ui.kbdButton) ui.kbdButton._setSelected(_v);
     }
-    
+
     /**
-     * Switch to the next keyboard in the list - KMW button control event 
+     * Switch to the next keyboard in the list - KMW button control event
      **/
     ui.switchNextKbd = function()
     {
@@ -194,26 +192,26 @@ if(!window['keyman']['ui']['name']) {
         else
         {
           kbdName = ui.keyboards[++ui.lastActiveKeyboard]._InternalName;
-          lgCode = ui.keyboards[ui.lastActiveKeyboard]._LanguageCode; 
+          lgCode = ui.keyboards[ui.lastActiveKeyboard]._LanguageCode;
           keymanweb['setActiveKeyboard'](kbdName,lgCode);
           _v = true;
         }
       }
       if(ui.kbdButton) ui.kbdButton._setSelected(_v);
     }
-    
+
     /**
      * Create a button object for KeymanWeb UI buttons
-     * 
-     * @constructor   
+     *
+     * @constructor
      * @param       {string}    _src
      * @param       {string}    _caption
      * @param       {boolean}   _selected
-     * @return      {Object}    
-     * 
+     * @return      {Object}
+     *
      * @suppress {suspiciousCode}  // Closure isn't smart enough to realize that _onmouseover
      *                             // and the like are defined on individual instances later.
-     *                             // It thinks they're always null.        
+     *                             // It thinks they're always null.
      **/
     ui.button = function(_src, _caption, _selected)
     {
@@ -224,12 +222,12 @@ if(!window['keyman']['ui']['name']) {
       this._down = false;
       this._over = false;
       this._selected = _selected;
-    
+
       /*public*/ this.getElem = function()
       {
         return this._owningObject._elem;
       };
-      
+
       /*private*/ this.__updatestyle = function()
       {
         var ss=this._owningObject._elem.style;
@@ -258,7 +256,7 @@ if(!window['keyman']['ui']['name']) {
           ss.border = 'none';
         }
       };
-      
+
       /*private*/ this.__mouseover = function()
       {
         ui.controllerHovered = true;
@@ -266,23 +264,23 @@ if(!window['keyman']['ui']['name']) {
         if(this._owningObject._onmouseover != null) this._owningObject._onmouseover();
         this._owningObject.__updatestyle();
       };
-      
+
       /*private*/ this.__mouseout = function()
-      { 
+      {
         ui.controllerHovered = false;
         this._owningObject._over = false;
         if(this._owningObject._onmouseout != null) this._owningObject._onmouseout();
         this._owningObject.__updatestyle();
       };
-      
+
       /*private*/ this.__click = function()
-      { 
+      {
         keymanweb['activatingUI'](false); // Clear activating UI flag once click is acknowledged
-        if(this._owningObject._onclick != null) 
+        if(this._owningObject._onclick != null)
             return this._owningObject._onclick();
         return false;
       };
-    
+
       /*private*/ this.__mousedown = function()
       {
         keymanweb['activatingUI'](true);  // Set activating UI flag (to manage focus/blur) on any UI mouse down event
@@ -290,37 +288,37 @@ if(!window['keyman']['ui']['name']) {
         this._owningObject.__updatestyle();
         return false;
       };
-      
+
       /*private*/ this.__mouseup = function()
       {
         this._owningObject._down = false;
         this._owningObject.__updatestyle();
       };
-      
+
       /*public*/ this._setSelected = function(_value)
       {
         keymanweb['activatingUI'](false); // Always clear activating UI flag after selecting UI
         this._owningObject._selected = _value;
         this._owningObject.__updatestyle();
       };
-      
+
       /*public*/ this._getSelected = function()
       {
         return this._owningObject._selected;
       };
-    
+
       /*public*/ this._getOver = function()
       {
         return this._owningObject._over;
       };
-      
+
       /*public*/ this._getDown = function()
       {
         return this._owningObject._down;
       };
-    
+
       this._owningObject = this; // simplifies meaning of 'this'
-      
+
       var imgPath=util['getOption']('resources') + 'ui/toggle/';
       var _elemImg = util['createElement']('img');
       this._elem = util['createElement']('div');
@@ -334,7 +332,7 @@ if(!window['keyman']['ui']['name']) {
       this._elem.style.zIndex = '10002';
       this._elem.style.lineHeight = '100%';
       this._elem.style.styleFloat = this._elem.style.cssFloat = 'left';
-    
+
       _elemImg.title = _caption;
       _elemImg.alt = _caption;
       this._elem.appendChild(_elemImg);
@@ -344,44 +342,44 @@ if(!window['keyman']['ui']['name']) {
       this._elem.onmouseup = this.__mouseup;
       _elemImg._owningObject = this;
       _elemImg.onclick = this.__click;
-      
+
       this.__updatestyle();
-      
+
       return this;
     };
-    
+
     /**
      * Function     Initialize
-     * Scope        Private   
+     * Scope        Private
      * Description  Initialize Toggle User Interface
-     **/   
+     **/
     ui['initialize'] = ui.Initialize = function()
-    { 
+    {
       //Never initialize before KMW!
       if(!keymanweb['initialized'] || util['isTouchDevice']()) return;
-        
+
       if(!ui.initialized)  // I2403 - Allow toggle design to be loaded twice
       {
         ui.controller = util['createElement']('div');
       }
       else
         ui.controller.innerHTML = '';  // I2403 - Allow toggle design to be loaded twice
-      
-      var imgPath = util['getOption']('resources')+'ui/toggle/';	
-      ui.controller.style.background = 'url('+imgPath+'kmwcontroller2x.gif)';    
+
+      var imgPath = util['getOption']('resources')+'ui/toggle/';
+      ui.controller.style.background = 'url('+imgPath+'kmwcontroller2x.gif)';
       ui.controller.style.padding = '1px 2px';
 
       // Create keyboard list and OSK control buttones, and set initial styles
       var v1=util['loadCookie']('KeymanWeb_Keyboard'),kbdEnabledOnLoad=false;
       if(typeof(v1['current'])!='undefined') kbdEnabledOnLoad = (v1['current'].indexOf('---') < 0);
-      ui.kbdButton = new ui.button('kmw_logo_16.gif', 'Use Web Keyboard', kbdEnabledOnLoad); 
+      ui.kbdButton = new ui.button('kmw_logo_16.gif', 'Use Web Keyboard', kbdEnabledOnLoad);
       ui.controller.appendChild(ui.kbdButton.getElem());
-    
-      var v2 = util['loadCookie']('KeymanWeb_OnScreenKeyboard'),oskEnabledOnLoad=true; 
-      if(typeof(v2['visible'])!='undefined') oskEnabledOnLoad=(v2['visible'] == 1); 
-    
+
+      var v2 = util['loadCookie']('KeymanWeb_OnScreenKeyboard'),oskEnabledOnLoad=true;
+      if(typeof(v2['visible'])!='undefined') oskEnabledOnLoad=(v2['visible'] == 1);
+
       // Add keyboard icon
-      ui.oskButton = new ui.button('kmw_osk_16.gif','Show On Screen Keyboard',oskEnabledOnLoad); 
+      ui.oskButton = new ui.button('kmw_osk_16.gif','Show On Screen Keyboard',oskEnabledOnLoad);
       ui.oskButton._onclick = ui.switchOsk;
       ui.controller.appendChild(ui.oskButton.getElem());
 
@@ -389,22 +387,22 @@ if(!window['keyman']['ui']['name']) {
       if(!ui.initialized) ui.controller.style.display = 'none';
       ui.controller.style.zIndex = '10001';
       ui.controller.style.position = 'absolute';
-      
+
       // The following three lines prevent the UI from being positioned incorrectly when the page is resized,
       // but don't fix the problem completely, as the kbd icon still moves.  probably need to insert a DIV
-      // between the button and the container, and make that DIV fixed height and overflow:hidden 
-      //ui.controller.style.maxHeight = '26px';  
-      //ui.oskButton.getElem().style.position = 'relative';  
-      //ui.oskButton.getElem().style.overflow = 'hidden';	
-      
+      // between the button and the container, and make that DIV fixed height and overflow:hidden
+      //ui.controller.style.maxHeight = '26px';
+      //ui.oskButton.getElem().style.position = 'relative';
+      //ui.oskButton.getElem().style.overflow = 'hidden';
+
       if(!ui.initialized)  // I2403 - Allow toggle design to be loaded more than once if necessary
-        document.body.appendChild(ui.controller);	   
-    
-      // Set initialized true  
+        document.body.appendChild(ui.controller);
+
+      // Set initialized true
       ui.initialized = true;  // I2403 - Allow toggle design to be loaded more than once if needed
 
       // Then update the keyboard list if keyboards already loaded (i.e. in page script)
-      ui.updateKeyboardList();     
+      ui.updateKeyboardList();
       ui.registerEvents();
     }
 
@@ -418,17 +416,17 @@ if(!window['keyman']['ui']['name']) {
 
     /**
      * Function     updateKeyboardList
-     * Scope        Private   
+     * Scope        Private
      * Description  Rebuild the UI and keyboard list
-     **/   
+     **/
     ui.updateKeyboardList=function()
-    {                 
+    {
       if(!(keymanweb['initialized'] || ui.initialized)) return; //TODO: may want to restart the timer??
-                      
+
       ui.updateList = false;
 
-      var _kbds=keymanweb['getKeyboards'](),imgPath=util['getOption']('resources') +'ui/toggle/';	   
-  
+      var _kbds=keymanweb['getKeyboards'](),imgPath=util['getOption']('resources') +'ui/toggle/';
+
       // Check the number of installed keyboards to determine whether or not we will have a dropdown
       if(_kbds.length > 1)
       {
@@ -436,9 +434,9 @@ if(!window['keyman']['ui']['name']) {
         var _kmw_ctrl_img=<HTMLImageElement> document.getElementById('KMW_Controller_Img')
         _kmw_ctrl_img.src = imgPath+'kmw_logo_16_down.gif';
         _kmw_ctrl_img.style.width = '100%';
-            
+
         ui.controller.style.background = 'url('+imgPath+'kmwcontroller2x.gif)';
-        
+
         ui.kbdButton.getElem().id = 'kmwico';
         ui.kbdButton.getElem().style.width = '36px';
         ui.kbdButton._onmouseover = function()
@@ -457,12 +455,12 @@ if(!window['keyman']['ui']['name']) {
       {
         var _kmw_ctrl_img=<HTMLImageElement> document.getElementById('KMW_Controller_Img')
         _kmw_ctrl_img.src = imgPath+'kmw_logo_16.gif';
-        
+
         ui.kbdButton.getElem().id = 'kmwico';
         ui.kbdButton.getElem().style.width = '24px';
 
-        var Lki=_kbds[0]['InternalName'];    
-        var Lklc=_kbds[0]['LanguageCode'];  
+        var Lki=_kbds[0]['InternalName'];
+        var Lklc=_kbds[0]['LanguageCode'];
         ui.controller.style.background = 'url('+imgPath+'kmwcontroller2.gif)';
         ui.keyboards.push({_InternalName: Lki, _LanguageCode: Lklc, _Index: 0});
         ui.kbdButton._onclick = ui.switchSingleKbd;
@@ -475,60 +473,60 @@ if(!window['keyman']['ui']['name']) {
         // Must remove menu if keyboards have been removed leaving only a single keyboard
         if(typeof(ui.keyboardMenu) != 'undefined') delete ui.keyboardMenu;
       }
-      
+
       // Highlight the last active keyboard
       var sk=keymanweb['getSavedKeyboard']().split(':');
       ui.updateMenu(sk[0],sk[1]);
-    }  
+    }
 
     /**
      * Keyboard registration event handler
-     *    
-     * Set a timer to update the UI keyboard list on timeout after each keyboard is registered, 
+     *
+     * Set a timer to update the UI keyboard list on timeout after each keyboard is registered,
      * thus updating only once when only if multiple keyboards are registered together
-     */   
-    keymanweb['addEventListener']('keyboardregistered', 
+     */
+    keymanweb['addEventListener']('keyboardregistered',
       function(p)
-      {   
+      {
           ui.updateList = true;
           if(ui.updateTimer) clearTimeout(ui.updateTimer);
           ui.updateTimer = setTimeout(ui.updateKeyboardList,200);
-      });       
+      });
 
 
     /**
      * Keyboard change event handler
-     *        
+     *
      * Update menu selection and control OSK display appropriately
      */
-    keymanweb['addEventListener']('keyboardchange',  
+    keymanweb['addEventListener']('keyboardchange',
       function(p)
       {
-        ui.updateMenu(p['internalName'],p['languageCode']);  
+        ui.updateMenu(p['internalName'],p['languageCode']);
       });
-    
+
     /* ----------------------------------------
       Drop down menu
       ---------------------------------------- */
-    
+
   //  var  _SelectedMenuItem;
-    
+
     /**
      * Function     selecKbd
-     * Scope        Private 
-     * @param       {number}  _kbd         
-     * Description  Select a keyboard from the drop down menu 
+     * Scope        Private
+     * @param       {number}  _kbd
+     * Description  Select a keyboard from the drop down menu
      **/
     ui.selectKbd = function(_kbd)
     {
         var _name,_lgCode,_index;
-        if(_kbd < 0) 
-        { 
-          _name = ''; _lgCode='';_index = ''; 
+        if(_kbd < 0)
+        {
+          _name = ''; _lgCode='';_index = '';
         }
-        else 
-        { 
-          _name = ui.keyboards[_kbd]._InternalName; _lgCode = ui.keyboards[_kbd]._LanguageCode; _index = ui.keyboards[_kbd]._Index; 
+        else
+        {
+          _name = ui.keyboards[_kbd]._InternalName; _lgCode = ui.keyboards[_kbd]._LanguageCode; _index = ui.keyboards[_kbd]._Index;
         }
         keymanweb['setActiveKeyboard'](_name,_lgCode);
         keymanweb['focusLastActiveElement']();
@@ -537,24 +535,24 @@ if(!window['keyman']['ui']['name']) {
 
         return false;
     };
-    
+
     /**
      * Function     updateMenu
      * Scope        Private
      * @param       {string}    kbdName
      * @param       {?string=}  lgCode
      * Description  Updates the menu selection when a change is required
-     **/    
+     **/
     ui.updateMenu = function(kbdName,lgCode)
-    {        
+    {
       var i,_k=document.getElementById('KMWSel_$');
 
       for(i=0; i<ui.keyboards.length; i++)
-      { 
+      {
         if(ui.keyboards[i]._InternalName == kbdName && ui.keyboards[i]._LanguageCode == lgCode)
           _k=document.getElementById('KMWSel_'+ui.keyboards[i]._InternalName+'$'+ui.keyboards[i]._Index);
       }
-    
+
       if(_k)
       {
         if(ui.selectedMenuItem != null) ui.selectedMenuItem.className='';
@@ -604,13 +602,13 @@ if(!window['keyman']['ui']['name']) {
         "padding: 0;"+
         "background: white;"+
         "max-height: 300px;"+
-        "overflow-y: scroll;"+ 
+        "overflow-y: scroll;"+
         "overflow-x: hidden;"+
         "white-space: nowrap;"+
         "z-index: 10001; /* above the osk */"+
       "}"+
-      ((util['getIEVersion']() < 7) ? 
-        "* html #KeymanWeb_KbdList {height: expression(this.scrollHeight > 299 ? '300px' : 'auto');}" : "")+    
+      ((util['getIEVersion']() < 7) ?
+        "* html #KeymanWeb_KbdList {height: expression(this.scrollHeight > 299 ? '300px' : 'auto');}" : "")+
       ".sfunhover#KeymanWeb_KbdList {"+
         "display: none; left: -999px;"+
       "}"+
@@ -642,14 +640,14 @@ if(!window['keyman']['ui']['name']) {
         "background-color: #ad4a28;"+
         "text-decoration: underline;"+
       "}");
-    
+
     /**
      * Function     createMenu
-     * Scope        Private   
-     * Description  Create the drop down menu and populate with loaded KeymanWeb keyboards 
+     * Scope        Private
+     * Description  Create the drop down menu and populate with loaded KeymanWeb keyboards
      **/
     ui.createMenu = function()
-    {    
+    {
       if(typeof(ui.keyboardMenu) == 'undefined')  // I2403 - Allow toggle design to be loaded twice
       {
         ui.keyboardMenu=util['createElement']('ul');
@@ -657,7 +655,7 @@ if(!window['keyman']['ui']['name']) {
         ui.keyboardMenu.className='sfunhover';
       }
       else ui.keyboardMenu.innerHTML = '';  // I2403 - Allow toggle design to be loaded twice
-      
+
       var _li=util['createElement']('li');
       var _a=util['createElement']('a');
       _a.innerHTML='(System keyboard)';
@@ -666,10 +664,10 @@ if(!window['keyman']['ui']['name']) {
       _a.id='KMWSel_$';
       _a.className='selected';
       _li.appendChild(_a);
-      
+
       ui.selectedMenuItem=_a;
       ui.keyboardMenu.appendChild(_li);
-        
+
       var _kbds=keymanweb['getKeyboards'](), _added=[];
       ui.keyboards=[];
       for(var _kbd = 0; _kbd < _kbds.length; _kbd++)
@@ -679,31 +677,31 @@ if(!window['keyman']['ui']['name']) {
           _a1.innerHTML=_kbds[_kbd]['LanguageName'] + ' - ' + _kbds[_kbd]['Name'];
           if(!_added[_kbds[_kbd]['InternalName']]) _added[_kbds[_kbd]['InternalName']]=0;
           _added[_kbds[_kbd]['InternalName']]++;
-    
+
           var _n=_added[_kbds[_kbd]['InternalName']];
           ui.keyboards.push({_InternalName: _kbds[_kbd]['InternalName'], _LanguageCode:_kbds[_kbd]['LanguageCode'], _Index: _n});
 
           _a1.href="#";
           _a1.onclick = (function(x) { return function() { return ui.selectKbd(x); } })(ui.keyboards.length-1);
           _a1.id='KMWSel_'+_kbds[_kbd]['InternalName']+'$'+_n;
-    
+
           _li1.appendChild(_a1);
           ui.keyboardMenu.appendChild(_li1);
       }
-      
+
       //if(!ui.initialized) // I2403 - Allow toggle design to be loaded twice
-      if(ui.keyboardMenu.parentNode != ui.kbdButton.getElem()) ui.kbdButton.getElem().appendChild(ui.keyboardMenu);  
+      if(ui.keyboardMenu.parentNode != ui.kbdButton.getElem()) ui.kbdButton.getElem().appendChild(ui.keyboardMenu);
     };
-    
+
     keymanweb['addHotKey'](191,0x20,ui.switchSingleKbd);
     keymanweb['addHotKey'](191,0x30,ui.switchNextKbd);
     keymanweb['addHotKey'](191,0x40,ui.switchOsk);
 
     // Initialize after KMW is fully initialized
     keymanweb['addEventListener']('loaduserinterface',ui.Initialize);
-    
+
     // but also execute here, for asynchronous UI script loading (occurring after KMW initialization)
     ui.Initialize();
-      
+
   } catch(ex){}
 }

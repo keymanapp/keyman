@@ -1,4 +1,4 @@
-/// <reference path="../../node_modules/@keymanapp/models-types/index.d.ts" />
+/// <reference types="@keymanapp/models-types" />
 
 /**
  * Helpers and utilities for the Mocha tests.
@@ -16,14 +16,14 @@ export interface CompilationResult {
 
 /**
  * Builds a path to the fixture with the given path components.
- * 
+ *
  * e.g., makePathToFixture('example.qaa.trivial')
  * e.g., makePathToFixture('example.qaa.trivial', 'model.ts')
- * 
+ *
  * @param components One or more path components.
  */
 export function makePathToFixture(...components: string[]): string {
-  return path.join(__dirname, '..', 'fixtures', ...components);
+  return path.join(__dirname, '..', '..', 'tests', 'fixtures', ...components);
 }
 
 /**
@@ -132,7 +132,7 @@ export class LogHoarder {
   clear() {
     this.messages = [];
   }
-  
+
   /**
    * Hoards a log message for later perusal.
    */
@@ -159,7 +159,7 @@ export class LogHoarder {
   /**
    * Overrides the global log handler, allowing one to browse log messages
    * later.
-   * 
+   *
    * Remember to uninstall the log handler afterwards!
    */
   install(): this {
@@ -169,7 +169,7 @@ export class LogHoarder {
 
   /**
    * Return the log message handler to its default.
-   * 
+   *
    * Note: You MUST uninstall the hoarder after use!
    * It's recommended you put this in an afterEach() callback.
    */

@@ -1,4 +1,4 @@
-/// <reference path="../../node_modules/@keymanapp/models-types/index.d.ts" />
+/// <reference types="@keymanapp/models-types" />
 
 /**
  * Returns a word breaker that joins spans of an existing word breaker.

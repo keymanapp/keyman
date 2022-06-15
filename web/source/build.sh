@@ -3,6 +3,7 @@
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
 
+# set -x
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -53,7 +54,7 @@ EMBED_TARGET=( "keyman.js" )
 PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
 
-: ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler-java}
+: ${CLOSURECOMPILERPATH:=../../node_modules/google-closure-compiler-java}
 : ${JAVA:=java}
 
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
@@ -217,7 +218,7 @@ readonly SOURCE
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
-PATH="../node_modules/.bin:$PATH"
+PATH="../../node_modules/.bin:$PATH"
 
 compiler="npm run tsc --"
 compilecmd="$compiler"
@@ -227,7 +228,8 @@ set_default_vars ( ) {
     BUILD_LMLAYER=true
     BUILD_CORE=true
     BUILD_UI=true
-    BUILD_EMBED=true
+    BUILD_EMBED=false
+    #true
     BUILD_FULLWEB=true
     BUILD_DEBUG_EMBED=false
     BUILD_COREWEB=true
@@ -266,6 +268,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -embed)
             set_default_vars
+            BUILD_EMBED=true
             BUILD_FULLWEB=false
             BUILD_UI=false
             BUILD_COREWEB=false
@@ -330,6 +333,12 @@ if [ $FETCH_DEPS = true ]; then
     # Ensure the dependencies are downloaded.
     verify_npm_setup
 
+    # Temporary patch for build -- ensure that predictive-text is
+    # built (because of its wrapper requirements), and that the keyman-version
+    # file is generated (because it uses a script to do this at present).
+    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+    "$KEYMAN_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
+
     echo "Copying testing resource ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
     cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
 fi
@@ -351,29 +360,29 @@ if [ $DO_MINIFY = true ]; then
     fi
 fi
 
-if [ $BUILD_CORE = true ]; then
-    CORE_FLAGS="-skip-package-install"
+#if [ $BUILD_CORE = true ]; then
+    #CORE_FLAGS="-skip-package-install"
 
     # Build the sentry-manager module - it's used in embedded contexts and on one testing page.
-    echo_heading "Compiling KeymanWeb's sentry-manager module..."
-    pushd ../../common/core/web/tools/sentry-manager/src
-    ./build.sh $CORE_FLAGS || fail "Failed to compile the sentry-manager module"
-    popd
-    echo_heading "sentry-manager module compiled successfully."
+    #echo_heading "Compiling KeymanWeb's sentry-manager module..."
+    #pushd ../../common/web/sentry-manager/src
+    #./build.sh $CORE_FLAGS || fail "Failed to compile the sentry-manager module"
+    #popd
+    #echo_heading "sentry-manager module compiled successfully."
 
-    if [ $BUILD_LMLAYER = false ]; then
-        CORE_FLAGS="$CORE_FLAGS -test"
-    fi
+    #if [ $BUILD_LMLAYER = false ]; then
+    #    CORE_FLAGS="$CORE_FLAGS -test"
+    #fi
 
     # Ensure that the Input Processor module compiles properly.
-    cd ../../common/core/web/input-processor/src
-    echo ""
-    echo_heading "Compiling local KeymanWeb dependencies..."
-    ./build.sh $CORE_FLAGS || fail "Failed to compile KeymanWeb dependencies"
-    cd $WORKING_DIRECTORY
-    echo_heading "Local KeymanWeb dependency compilations completed successfully."
-    echo ""
-fi
+    #cd ../../common/web/input-processor/src
+    #echo ""
+    #echo_heading "Compiling local KeymanWeb dependencies..."
+    #./build.sh $CORE_FLAGS || fail "Failed to compile KeymanWeb dependencies"
+    #cd $WORKING_DIRECTORY
+    #echo_heading "Local KeymanWeb dependency compilations completed successfully."
+    #echo ""
+#fi
 
 if [ $FULL_BUILD = true ]; then
     echo Compiling version $VERSION
@@ -385,11 +394,12 @@ fi
 if [ $BUILD_EMBED = true ]; then
     echo Compile KMEI/KMEA version $VERSION
 
-    $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
+    $compilecmd -b $NODE_SOURCE/tsconfig.embedded.json
     if [ $? -ne 0 ]; then
         fail "Typescript compilation failed."
     fi
     assert $INTERMEDIATE/keyman.js
+
     echo Embedded TypeScript compiled as $INTERMEDIATE/keyman.js
 
     copy_resources "$INTERMEDIATE"  # Very useful for local testing.
@@ -450,11 +460,12 @@ fi
 if [ $BUILD_COREWEB = true ]; then
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb...
-    $compilecmd -p $NODE_SOURCE/tsconfig.web.json
+    $compilecmd -b $NODE_SOURCE/tsconfig.json -v
     if [ $? -ne 0 ]; then
         fail "Typescript compilation failed."
     fi
     assert $INTERMEDIATE/keymanweb.js
+
     echo Native TypeScript compiled as $INTERMEDIATE/keymanweb.js
 
     copy_resources "$INTERMEDIATE"
@@ -484,7 +495,7 @@ fi
 
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
-    $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
+    $compilecmd -b $NODE_SOURCE/tsconfig.ui.json
 
     if [ $? -ne 0 ]; then
         fail "Typescript compilation of the UI modules failed."
@@ -493,8 +504,8 @@ if [ $BUILD_UI = true ]; then
     CURRENT_PATH=`pwd`
     # Since the batch compiler for the UI modules outputs them within a subdirectory,
     # we need to copy them up to the base /intermediate/ folder.
-    cd "$INTERMEDIATE/source"
-    cp * ../
+    cd "$INTERMEDIATE/web/source"
+    cp * ../../
     cd $CURRENT_PATH
 
     assert $INTERMEDIATE/kmwuitoolbar.js

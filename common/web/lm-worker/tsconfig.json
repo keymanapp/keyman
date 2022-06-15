@@ -1,0 +1,27 @@
+{
+  "extends": "../../../tsconfig-base.json",
+
+  "compilerOptions": {
+    "allowJs": false,
+    "declaration": true,
+    "module": "none",
+    "outFile": "./build/index.js",
+    "sourceMap": true,
+    "lib": ["webworker", "es6"],
+    "target": "es5",
+    "downlevelIteration": true,
+  },
+  "references": [
+    // types
+    { "path": "../../models/types" },
+    { "path": "../lm-message-types" },
+    // modules
+    { "path": "../keyman-version", "prepend": true },
+    { "path": "../utils", "prepend": true },
+    { "path": "../../models/templates", "prepend": true },
+    { "path": "../../models/wordbreakers", "prepend": true },
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
+}

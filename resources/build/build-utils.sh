@@ -27,6 +27,11 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+# Setup variable for calling script's path
+if [ ! -z ${THIS_SCRIPT+x} ]; then
+  THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
+  readonly THIS_SCRIPT_PATH
+fi
 
 function die () {
     # TODO: consolidate this with fail() from shellHelperFunctions.sh
@@ -257,4 +262,116 @@ replaceVersionStrings_Mkver() {
     s/\$RELEASE_MINOR/$VERSION_MINOR/g;
     s/\$RELEASE/$VERSION_RELEASE/g;
     " "$infile" > "$outfile"
+}
+
+################################################################################
+# Standard build script functions for managing command line, actions and targets
+################################################################################
+
+# TODO: colors are defined here and in shellHelperFunctions.sh
+# The following allows coloring of warning and error lines, but only works if there's a
+# terminal attached, so not on the build machine.
+if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+    COLOR_RED=$(tput setaf 1)
+    COLOR_GREEN=$(tput setaf 2)
+    COLOR_BLUE=$(tput setaf 4)
+    COLOR_YELLOW=$(tput setaf 3)
+    COLOR_RESET=$(tput sgr0)
+else
+    COLOR_RED=
+    COLOR_GREEN=
+    COLOR_BLUE=
+    COLOR_YELLOW=
+    COLOR_RESET=
+fi
+###
+
+#
+# builder_ names are reserved.
+#
+
+# returns 1 if first parameter is in the array passed as second parameter
+#
+# Usage:
+#   if item_in_array "item" "${array[@]}"; then ...; fi
+# Parameters:
+#   1: item       item to search for in array
+#   2: array      bash array, e.g. array=(one two three)
+item_in_array() {
+  local e match="$1"
+  shift
+  for e; do [[ "$e" == "$match" ]] && return 0; done
+  return 1
+}
+
+# Returns 1 if the action named 'name' has been passed in on the command line
+#
+# Usage:
+#   if build_has_action name; then ...; fi
+# Parameters:
+#   1: name       action name
+builder_has_action() {
+  if item_in_array "$1" "${builder_chosen_actions[@]}"; then
+    echo "${COLOR_BLUE}Action '$1' Starting${COLOR_RESET}"
+    return 0
+  fi
+  return 1
+}
+
+# Initializes a build.sh script, parses command line. Will abort the script if
+# invalid parameters are passed in.
+#
+# Usage:
+#   builder_init "action1 action2 ..." "$@"
+# Parameters
+#   1: actions    space-separated list of possible actions
+#   [2: targets]  space-separated list of possible targets [TODO]
+#   3: $@         command-line arguments
+builder_init() {
+  local possible_actions=($1)
+  shift
+  builder_verbose=
+  builder_chosen_actions=()
+  # Process command-line arguments
+  while [[ $# -gt 0 ]] ; do
+    key="$1"
+    if item_in_array "$key" "${possible_actions[@]}"; then
+      builder_chosen_actions+=("$key")
+    else
+      case "$key" in
+        --help|-h)
+          display_usage
+          exit 0
+          ;;
+        --verbose|-v)
+          builder_verbose=--verbose
+          ;;
+        *)
+          echo "$0: invalid option: $key"
+          display_usage
+          exit 64
+      esac
+    fi
+    shift # past the processed argument
+  done
+
+  # TODO: not sure if this is appropriate or if we should error?
+  if ! (( ${#builder_chosen_actions[@]} )); then
+    builder_chosen_actions+=("build")
+  fi
+}
+
+builder_report() {
+  local action="$1"
+  local result="$2"
+
+  if [ $result == success ]; then
+    echo "${COLOR_GREEN}Action '$1' Result: $2${COLOR_RESET}"
+  else
+    echo "${COLOR_RED}Action '$1' Result: $2${COLOR_RESET}"
+  fi
+}
+
+set_keyman_standard_build_path() {
+  PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
 }

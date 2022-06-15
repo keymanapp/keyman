@@ -9,7 +9,6 @@ const WindowsConsole = require("./win32/console");
 const open = require("open");
 
 module.exports = class Win32Tray {
-  private readonly signals = ['exit']; //, 'SIGINT', 'uncaughtException'];
   private myTrayApp: any;
 
   public restart(localPort: number, ngrokAddress: string) {
@@ -81,7 +80,7 @@ module.exports = class Win32Tray {
     });
 
     //console.log('starting tray icon');
-    this.signals.forEach(signal => process.on(signal, this.shutdown.bind(this)));
+    process.on('exit', this.shutdown.bind(this));
   }
 
   public shutdown() {

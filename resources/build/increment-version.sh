@@ -31,10 +31,12 @@ gitbranch=`git branch --show-current`
 FORCE=0
 HISTORY_FORCE=
 
-if [[ "$1" == "-f" ]]; then
-  FORCE=1
-  HISTORY_FORCE=--force
-  shift
+if [[ $# -gt 0 ]]; then
+  if [[ "$1" == "-f" ]]; then
+    FORCE=1
+    HISTORY_FORCE=--force
+    shift
+  fi
 fi
 
 if [[ $# -gt 0 ]]; then
@@ -75,18 +77,23 @@ fi
 
 # Let's ensure our base is up to date with GitHub to
 # avoid transient errors
+echo "increment-version.sh: updating branch $base from GitHub"
 git pull origin $base
 
 #
 # Run the increment + history refresh
 #
 
-pushd "$KEYMAN_ROOT/resources/build/version" > /dev/null
-npm install
-npm run build:ts
-popd > /dev/null
+echo "increment-version.sh: building resources/build/version"
+pushd "$KEYMAN_ROOT"
+npm ci
 
-pushd "$KEYMAN_ROOT" > /dev/null
+pushd "$KEYMAN_ROOT/resources/build/version"
+npm run build:ts
+popd
+
+echo "increment-version.sh: running resources/build/version"
+pushd "$KEYMAN_ROOT"
 ABORT=0
 node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
 
@@ -112,6 +119,7 @@ popd > /dev/null
 #
 
 if [ "$action" == "commit" ]; then
+  echo "increment-version.sh: committing to repository and tagging release version $VERSION_WITH_TAG"
   VERSION_MD="$KEYMAN_ROOT/VERSION.md"
   NEWVERSION=`cat $VERSION_MD | tr -d "[:space:]"`
 
@@ -121,18 +129,6 @@ if [ "$action" == "commit" ]; then
   git tag -a "release-$VERSION_WITH_TAG" -m "Keyman release $VERSION_WITH_TAG"
   git checkout -b "$branch"
   git add VERSION.md HISTORY.md
-
-  # Also updates package versions, committing those changes
-  # Uses the 'version' run script defined in the base package.json.
-  npm install
-
-  npm run version -- "$NEWVERSION"
-
-  # Version info will be updated in lerna.json and all the lerna-managed package.json files.
-  git add lerna.json
-  # Iterates through all lerna-managed packages in serial mode (--concurrency 1),
-  # git-adding only the updated package.json and package-lock.json files.
-  npm run lerna -- exec --concurrency 1 -- git add package.json package-lock.json
 
   # Now that all version-related changes are ready and git-added, it's time to commit.
   git commit -m "$message"
