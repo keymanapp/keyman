@@ -231,7 +231,6 @@
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\HeadingCheckListBox.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\BitmapEditor.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\StringGridEditControlled.pas"/>
         <DCCReference Include="main\KMDevResourceStrings.pas"/>

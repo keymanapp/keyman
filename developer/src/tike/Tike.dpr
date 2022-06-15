@@ -86,7 +86,6 @@ uses
   Keyman.UI.UframeCEFHost in '..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas',
   klog in '..\..\..\windows\src\global\delphi\general\klog.pas',
-  HeadingCheckListBox in '..\..\..\windows\src\global\delphi\comp\HeadingCheckListBox.pas',
   BitmapEditor in '..\..\..\windows\src\global\delphi\comp\BitmapEditor.pas',
   StringGridEditControlled in '..\..\..\windows\src\global\delphi\comp\StringGridEditControlled.pas',
   KMDevResourceStrings in 'main\KMDevResourceStrings.pas',
