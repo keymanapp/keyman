@@ -209,9 +209,12 @@ public final class ModelPickerActivity extends BaseActivity {
         if(immediateRegister) {
           // Register associated lexical model if it matches the active keyboard's language code;
           // it's safe since we're on the same thread.  Needs to be called AFTER deinstalling the old one.
-          String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
-          if(BCP47.languageEquals(kbdLgCode, languageID)) {
-            KMManager.registerAssociatedLexicalModel(languageID);
+          com.tavultesoft.kmea.data.Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(context);
+          if(kbInfo != null) {
+            String kbdLgCode = kbInfo.getLanguageID();
+            if(BCP47.languageEquals(kbdLgCode, languageID)) {
+              KMManager.registerAssociatedLexicalModel(languageID);
+            }
           }
         }
 

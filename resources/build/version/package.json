@@ -14,7 +14,7 @@
     "ts-node": "^8.6.2"
   },
   "engines": {
-    "node": "12"
+    "node": "16"
   },
   "files": [
     "dist",
@@ -23,8 +23,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "name": "@keymanapp/auto-history-action",
-  "private": false,
-  "repository": "https://github.com/keymanapp/auto-history-action",
+  "private": true,
   "scripts": {
     "build": "npm run clean:dist; npm run build:dist",
     "build:dist": "ncc build src/index.ts --minify --source-map --v8-cache",

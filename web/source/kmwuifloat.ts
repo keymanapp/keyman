@@ -54,13 +54,15 @@ if(!window['keyman']['ui']['name']) {
      */
     ui.toggleOSK = function()
     {
-      let osk = keymanweb.osk;
-      keymanweb['focusLastActiveElement']();
+      keymanweb['activatingUI'](true);
+      let osk = keymanweb['osk'];
       if(osk && osk['show'])
       {
         if(osk['isEnabled']()) osk['hide'](); else osk['show'](true);
       }
       if(window.event) window.event.returnValue=false;
+      keymanweb['focusLastActiveElement']();
+      keymanweb['activatingUI'](false);
       return false;
     }
 
@@ -327,7 +329,7 @@ if(!window['keyman']['ui']['name']) {
           ui.addButtonOSK();
         });
 
-      let osk = keymanweb.osk;
+      let osk = keymanweb['osk'];
       if(!osk) {
         return;
       }
@@ -393,6 +395,7 @@ if(!window['keyman']['ui']['name']) {
      */
     ui.SelectKeyboardChange = function(e)
     {
+      keymanweb['activatingUI'](true);
       if(ui.KeyboardSelector.value != '-')
       {
         var i=ui.KeyboardSelector.selectedIndex;
@@ -404,6 +407,7 @@ if(!window['keyman']['ui']['name']) {
 
       //if(osk['show']) osk['show'](osk['isEnabled']()); handled by keyboard change event???
       keymanweb['focusLastActiveElement']();
+      keymanweb['activatingUI'](false);
       ui.selecting = true;
     }
 
@@ -477,8 +481,9 @@ if(!window['keyman']['ui']['name']) {
         else
         {
           ui.oskButton.style.display = 'block';
-          if(keymanweb.osk) {
-            ui.oskButtonState(keymanweb.osk['isEnabled']());
+          let osk = keymanweb['osk'];
+          if(osk) {
+            ui.oskButtonState(osk['isEnabled']());
           } else {
             ui.oskButtonState(false);
           }

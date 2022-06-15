@@ -11,6 +11,7 @@
   "scripts": {},
   "workspaces": [
     "resources/gosh",
+    "resources/build/version",
     "developer/js",
     "developer/server",
     "common/models/*",

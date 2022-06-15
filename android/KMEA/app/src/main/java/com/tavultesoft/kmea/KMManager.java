@@ -207,7 +207,8 @@ public final class KMManager {
   protected static String currentBanner = KM_BANNER_STATE_BLANK;
 
 
-  // Special override for when the keyboard may have haptic feedback when typing
+  // Special override for when the keyboard may have haptic feedback when typing.
+  // haptic feedback disabled for hardware keystrokes
   private static boolean mayHaveHapticFeedback = false;
 
   // Special override for when keyboard is entering a password text field.
@@ -1999,6 +2000,16 @@ public final class KMManager {
 
   public static Keyboard getCurrentKeyboardInfo(Context context) {
     int index = getCurrentKeyboardIndex(context);
+    if(index < 0) {
+      // As of 15.0-beta and 15.0-stable, this only appears to occur when
+      // #6703 would trigger.  This logging may help us better identify the
+      // root cause.
+      String key = KMKeyboard.currentKeyboard();
+      // Even if it's null, it's still a notable error.  This function shouldn't
+      // be reachable in execution (15.0) at a time this variable would be set to `null`.
+      KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      return null;
+    }
     return KeyboardController.getInstance().getKeyboardInfo(index);
   }
 
@@ -2707,7 +2718,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s, final int dr) {
+    public void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke) {
       if(dr != 0) {
         Log.d(TAG, "Right deletions requested but are not presently supported by the in-app keyboard.");
       }
@@ -2815,7 +2826,7 @@ public final class KMManager {
           // Collapse the selection
           textView.setSelection(start + s.length());
           textView.endBatchEdit();
-          if (mayHaveHapticFeedback) {
+          if (mayHaveHapticFeedback && !executingHardwareKeystroke) {
             textView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
           }
         }
@@ -2869,7 +2880,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s, final int dr) {
+    public void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke) {
       // TODO: Unify in-app and system insertText
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
@@ -2960,7 +2971,7 @@ public final class KMManager {
 
           ic.endBatchEdit();
           ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();
-          if (parent != null && mayHaveHapticFeedback) {
+          if (parent != null && mayHaveHapticFeedback && !executingHardwareKeystroke) {
             parent.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
           }
         }

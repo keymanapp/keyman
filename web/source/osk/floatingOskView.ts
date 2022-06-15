@@ -555,6 +555,11 @@ namespace com.keyman.osk {
       }
     }
 
+    ['show'](bShow: boolean) {
+      super['show'](bShow);
+      this.saveCookie();
+    }
+
     /**
      * Function     userPositioned
      * Scope        Public

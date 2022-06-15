@@ -253,6 +253,9 @@ if(!window['keyman']['ui']['name']) {
       aNode = ui.createNode('a', null, 'kmw_button_a');
       aNode.href = '#';
       aNode.onclick = ui.showOSK;
+      aNode.onmousedown = function() {
+        keymanweb['activatingUI'](true);
+      };
       aNode.title = ui.ToolBar_Text.ShowOSK;
       aNode.appendChild(ui.createNode('div', 'kmw_img_osk', 'kmw_img'));
       //aNode.appendChild(ui.createNode('div', null, 'kmw_a', 'On Screen Keyboard'));
@@ -667,6 +670,7 @@ if(!window['keyman']['ui']['name']) {
      * @return      {boolean}
      **/
     ui.selectKeyboard = function(event,lang,kbd,updateKeyman:boolean) {
+      keymanweb['activatingUI'](true);
       if(ui.selectedLanguage) {
         var found = ui.findListedKeyboard(ui.selectedLanguage);
         if(found != null) {
@@ -694,6 +698,7 @@ if(!window['keyman']['ui']['name']) {
       // Always save current state when selecting a keyboard
       ui.saveCookie();
       ui.enableControls();
+      keymanweb['activatingUI'](false);
       return ui.hideKeyboardsPopup(event) || ui.hideKeyboardsForLanguage(event);
     }
 
@@ -751,17 +756,18 @@ if(!window['keyman']['ui']['name']) {
      **/
     ui.showOSK = function(event)
     {
-      let osk = keymanweb.osk;
-
+      let osk = keymanweb['osk'];
       if(!osk) {
         return;
       }
+      keymanweb['activatingUI'](true);
       //Toggle OSK on or off
       if(osk && keymanweb['getActiveKeyboard']() != '')
       {
         if(osk['isEnabled']()) osk['hide'](); else osk['show'](true);
       }
       ui.setLastFocus();
+      keymanweb['activatingUI'](false);
       return ui.eventCapture(event);
     }
 
@@ -914,7 +920,7 @@ if(!window['keyman']['ui']['name']) {
             }
             else
             {
-              let osk = keymanweb.osk;
+              let osk = keymanweb['osk'];
               ui.oskButtonNode.className = (osk && osk['isEnabled']()) ? 'kmw_button_selected' : 'kmw_button';
             }
           }
@@ -1013,7 +1019,7 @@ if(!window['keyman']['ui']['name']) {
 
 
     ui.registerEvents = function() {
-      let osk = keymanweb.osk;
+      let osk = keymanweb['osk'];
       if(!osk) {
         return;
       }
