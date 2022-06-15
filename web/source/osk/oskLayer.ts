@@ -14,6 +14,12 @@ namespace com.keyman.osk {
     public readonly numKey:      OSKBaseKey;
     public readonly scrollKey:   OSKBaseKey;
 
+    private _rowHeight: number;
+
+    public get rowHeight(): number {
+      return this._rowHeight;
+    }
+
     public get id(): string {
       return this.spec.id;
     }
@@ -22,7 +28,7 @@ namespace com.keyman.osk {
                        layout: keyboards.ActiveLayout,
                        layer: keyboards.ActiveLayer) {
       this.spec = layer;
-      
+
       const gDiv = this.element = document.createElement('div');
       const gs=gDiv.style;
       gDiv.className='kmw-key-layer';
@@ -38,7 +44,7 @@ namespace com.keyman.osk {
       this.nextlayer = gDiv['layer'] = layer['id'];
       if(typeof layer['nextlayer'] == 'string') {
         // The gDiv['nextLayer'] is no longer referenced in KMW 15.0+, but is
-        // maintained for partial back-compat in case any site devs actually 
+        // maintained for partial back-compat in case any site devs actually
         // relied on its value from prior versions.
         //
         // We won't pay attention to any mutations to the gDiv copy, though.
@@ -87,23 +93,23 @@ namespace com.keyman.osk {
       return null;
     }
 
-    public refreshLayout(vkbd: VisualKeyboard, paddedHeight: number, trueHeight: number) {
+    public refreshLayout(vkbd: VisualKeyboard, layerHeight: number) {
       // Check the heights of each row, in case different layers have different row counts.
-      let nRows = this.rows.length;
-      let rowHeight = Math.floor(trueHeight/(nRows == 0 ? 1 : nRows));
+      const nRows = this.rows.length;
+      const rowHeight = this._rowHeight = Math.floor(layerHeight/(nRows == 0 ? 1 : nRows));
 
       if(vkbd.usesFixedHeightScaling) {
-        this.element.style.height=(paddedHeight)+'px';
+        this.element.style.height=(layerHeight)+'px';
       }
 
       for(let nRow=0; nRow<nRows; nRow++) {
         const oskRow = this.rows[nRow];
-        let bottom = (nRows-nRow-1)*rowHeight+1;
+        const bottom = (nRows-nRow-1)*rowHeight+1;
 
         if(vkbd.usesFixedHeightScaling) {
           // Calculate the exact vertical coordinate of the row's center.
-          this.spec.row[nRow].proportionalY = ((paddedHeight - bottom) - rowHeight/2) / paddedHeight;
-        
+          this.spec.row[nRow].proportionalY = ((layerHeight - bottom) - rowHeight/2) / layerHeight;
+
           if(nRow == nRows-1) {
             oskRow.element.style.bottom = '1px';
           }

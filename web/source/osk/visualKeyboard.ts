@@ -257,6 +257,15 @@ namespace com.keyman.osk {
       }
     }
 
+    get internalHeight(): ParsedLengthStyle {
+      if (this.usesFixedHeightScaling) {
+        // Touch OSKs may apply internal padding to prevent row cropping at the edges.
+        return ParsedLengthStyle.inPixels(this.layoutHeight.val - this.getVerticalLayerGroupPadding());
+      } else {
+        return ParsedLengthStyle.forScalar(1);
+      }
+    }
+
     get fontSize(): ParsedLengthStyle {
       if (!this._fontSize) {
         this._fontSize = new ParsedLengthStyle('1em');
@@ -366,7 +375,7 @@ namespace com.keyman.osk {
      * of alternate keystroke sequences.
      * @param input The input coordinate of the event that led to use of this function
      * @param keySpec The spec of the key directly triggered by the input event.  May be for a subkey.
-     * @returns 
+     * @returns
      */
     getTouchProbabilities(input: InputEventCoordinate, keySpec?: keyboards.ActiveKey): text.KeyDistribution {
       let keyman = com.keyman.singleton;
@@ -1235,9 +1244,9 @@ namespace com.keyman.osk {
       let b = this.layerGroup.element as HTMLElement;
       let gs = this.kbdDiv.style;
       let bs = b.style;
-      if (this.usesFixedHeightScaling) {
+      if (this.usesFixedHeightScaling && this.height) {
         // Sets the layer group to the correct height.
-        gs.height = gs.maxHeight = paddedHeight + 'px';
+        gs.height = gs.maxHeight = this.height + 'px';
       }
 
       // The font-scaling applied on the layer group.
@@ -1275,8 +1284,14 @@ namespace com.keyman.osk {
 
       // Needs the refreshed layout info to work correctly.
       if(this.currentLayer) {
-        this.currentLayer.refreshLayout(this, paddedHeight, this._computedHeight);
+        this.currentLayer.refreshLayout(this, this._computedHeight - this.getVerticalLayerGroupPadding());
       }
+    }
+
+    private getVerticalLayerGroupPadding(): number {
+      // For touch-based OSK layouts, kmwosk.css may include top & bottom padding on the layer-group element.
+      const computedGroupStyle = getComputedStyle(this.layerGroup.element);
+      return parseInt(computedGroupStyle.paddingTop, 10) + parseInt(computedGroupStyle.paddingBottom, 10);
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
@@ -1620,9 +1635,11 @@ namespace com.keyman.osk {
       // If popup is visible, need to move over popup, not over main keyboard
       // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
       if (key1 && key1['subKeys'] != null && this.initTouchCoord) {
-        // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-        if ((this.initTouchCoord.y - input.y > 5) && this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
-          this.pendingSubkey.resolve();
+        if(this.pendingSubkey && this.pendingSubkey instanceof browser.PendingLongpress) {
+          // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
+          if (this.initTouchCoord.y - input.y > this.getLongpressFlickThreshold()) {
+            this.pendingSubkey.resolve();
+          }
         }
       }
 
@@ -1633,6 +1650,16 @@ namespace com.keyman.osk {
       }
 
       return false;
+    }
+
+    private getLongpressFlickThreshold(): number {
+      const rowHeight = this.currentLayer.rowHeight;
+
+      // If larger than 5 (and it likely is), new threshold = 1/4 the std. key height.
+      const proportionalThreshold = rowHeight / 4;
+
+      // 5 - the longpress-flick triggering threshold before 15.0.
+      return Math.max(proportionalThreshold, 5);
     }
 
     optionKey(e: KeyElement, keyName: string, keyDown: boolean) {

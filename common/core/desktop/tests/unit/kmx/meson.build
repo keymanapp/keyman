@@ -87,7 +87,7 @@ tests = [
 ]
 
 if build_machine.system() == 'windows'
-  kmcomp = find_program('kmcomp.exe', required: false)
+  kmcomp = find_program(join_paths(meson.source_root(),'..','..','..','windows','bin','developer','kmcomp.exe'), 'kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
   copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
   cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']

@@ -13,14 +13,21 @@ import Reachability
 class InfoViewController: UIViewController, UIWebViewDelegate {
   @IBOutlet var webView: UIWebView!
 
+  @IBOutlet var backButton: UIBarButtonItem!
+  @IBOutlet var forwardButton: UIBarButtonItem!
+
   private var networkReachable: Reachability?
 
-  convenience init() {
+  private var exitClosure: (() -> Void)? = nil;
+
+  convenience init(exitClosure: @escaping () -> Void) {
     if UIDevice.current.userInterfaceIdiom == .phone {
       self.init(nibName: "InfoViewController_iPhone", bundle: nil)
     } else {
       self.init(nibName: "InfoViewController_iPad", bundle: nil)
     }
+
+    self.exitClosure = exitClosure
   }
 
   override func viewDidLoad() {
@@ -40,6 +47,39 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
 
   @objc func networkStatusChanged(_ notification: Notification) {
     reloadKeymanHelp()
+  }
+
+  private func updateButtons() {
+    backButton.isEnabled = webView.canGoBack
+    forwardButton.isEnabled = webView.canGoForward
+  }
+
+  func webViewDidStartLoad(_ webView: UIWebView) {
+    UIApplication.shared.isNetworkActivityIndicatorVisible = true
+    updateButtons()
+  }
+
+  func webViewDidFinishLoad(_ webView: UIWebView) {
+    UIApplication.shared.isNetworkActivityIndicatorVisible = false
+    updateButtons()
+  }
+
+  func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
+    UIApplication.shared.isNetworkActivityIndicatorVisible = false
+    updateButtons()
+    log.debug(error)
+  }
+
+  @IBAction func back(_ sender: Any) {
+    webView.goBack()
+  }
+
+  @IBAction func forward(_ sender: Any) {
+    webView.goForward()
+  }
+
+  @objc func close(_ sender: Any?) {
+    self.exitClosure?()
   }
 
   func reloadKeymanHelp() {

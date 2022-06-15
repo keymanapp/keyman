@@ -9,7 +9,7 @@ namespace com.keyman.osk {
     public readonly keys: OSKBaseKey[];
     public readonly heightFraction: number;
 
-    public constructor(vkbd: VisualKeyboard, 
+    public constructor(vkbd: VisualKeyboard,
                        layerSpec: keyboards.ActiveLayer,
                        rowSpec: keyboards.ActiveRow) {
       const rDiv = this.element = document.createElement('div');
@@ -30,7 +30,7 @@ namespace com.keyman.osk {
       for(let j=0; j<keys.length; j++) {
         const key = keys[j];
         var keyObj = new OSKBaseKey(key as OSKKeySpec, layerSpec.id, this);
-        
+
         var element = keyObj.construct(vkbd);
         this.keys.push(keyObj);
 
@@ -55,7 +55,7 @@ namespace com.keyman.osk {
     public refreshLayout(vkbd: VisualKeyboard) {
       const rs = this.element.style;
 
-      const rowHeight = vkbd.layoutHeight.scaledBy(this.heightFraction);
+      const rowHeight = vkbd.internalHeight.scaledBy(this.heightFraction);
       if(vkbd.usesFixedHeightScaling) {
         rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
       }
