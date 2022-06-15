@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.13 alpha 2022-06-15
+
+* chore: beta to master merge A16S4 (#6771)
+
 ## 16.0.12 alpha 2022-06-14
 
 * chore(web): replace lerna with npm workspaces and ts projects (#6525)
