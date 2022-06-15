@@ -52,7 +52,6 @@ contains
   UnicodePanel in 'comp\UnicodePanel.pas',
   PaintPanel in 'comp\PaintPanel.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
-  PanelOverlapped in 'comp\PanelOverlapped.pas',
   StringGridEditControlled in 'comp\StringGridEditControlled.pas',
   BitmapEditor in 'comp\BitmapEditor.pas',
   FixedTrackbar in 'comp\FixedTrackbar.pas',

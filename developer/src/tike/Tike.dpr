@@ -72,7 +72,6 @@ uses
   VisualKeyboardSaverXML in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   VisualKeyboardImportXML in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardImportXML.pas',
   UfrmVisualKeyboardImportKMX in 'dialogs\UfrmVisualKeyboardImportKMX.pas' {frmVisualKeyboardImportKMX},
-  PanelOverlapped in '..\..\..\windows\src\global\delphi\comp\PanelOverlapped.pas',
   ScanCodeMap in '..\..\..\windows\src\global\delphi\general\ScanCodeMap.pas',
   UfrmRegressionTestFailure in 'dialogs\UfrmRegressionTestFailure.pas' {frmRegressionTestFailure},
   XString in '..\..\..\windows\src\global\delphi\general\XString.pas',
