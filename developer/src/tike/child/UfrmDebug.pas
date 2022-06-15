@@ -29,7 +29,6 @@ uses
   CaptionPanel,
   debugdeadkeys,
   debugkeyboard,
-  HintLabel,
   PaintPanel,
   KeymanDeveloperDebuggerMemo,
   Keyman.System.Debug.DebugCore,

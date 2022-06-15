@@ -119,7 +119,6 @@
         <DCCReference Include="comp\KeyBtn.pas"/>
         <DCCReference Include="comp\UnicodePanel.pas"/>
         <DCCReference Include="comp\PaintPanel.pas"/>
-        <DCCReference Include="comp\HintLabel.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="comp\PanelOverlapped.pas"/>
         <DCCReference Include="comp\StringGridEditControlled.pas"/>

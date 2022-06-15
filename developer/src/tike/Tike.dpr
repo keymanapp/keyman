@@ -66,7 +66,6 @@ uses
   kmpinffile in '..\..\..\windows\src\global\delphi\general\kmpinffile.pas',
   RedistFiles in 'main\RedistFiles.pas',
   UfrmBitmapEditor in 'child\UfrmBitmapEditor.pas' {frmBitmapEditor},
-  HintLabel in '..\..\..\windows\src\global\delphi\comp\HintLabel.pas',
   VisualKeyboard in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas',
   VisualKeyboardExportHTML in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportHTML.pas',
   VisualKeyboardParameters in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
