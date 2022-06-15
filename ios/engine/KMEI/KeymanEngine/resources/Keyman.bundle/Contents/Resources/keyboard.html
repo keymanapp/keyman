@@ -7,10 +7,21 @@
         <script src="keyman-sentry.js"></script>
         <script src="ios-host.js"></script>
         <style type="text/css">
-            body {background-color: rgb(210,214,220);}
+            /*body {background-color: rgb(210,214,220);}*/
+
+            div.reset {
+              height: 100%;
+              width: 100%;
+              z-index: 10;
+              position: absolute;
+              top: 0px;
+              left: 0px;
+            }
         </style>
     </head>
     <body class="kmw-embedded keyman-app" style="height: -webkit-fill-available">
         <textarea id="ta" cols="1" rows="1" style="visibility:hidden;" disabled></textarea>
+        <div class="reset" id="reset_shim" onclick="console.log('in-page reset')">
+        </div>
     </body>
 </html>

@@ -154,6 +154,7 @@ class KeymanWebViewController: UIViewController {
 
   // Very useful for immediately adjusting the WebView's properties upon loading.
   override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
     fixLayout()
 
     // Initialize the keyboard's size/scale.  In iOS 13 (at least), the system
@@ -162,6 +163,7 @@ class KeymanWebViewController: UIViewController {
   }
 
   override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
     self.userContentController.removeScriptMessageHandler(forName: keymanWebViewName)
   }
 }
