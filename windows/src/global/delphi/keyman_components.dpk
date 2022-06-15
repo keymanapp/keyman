@@ -49,7 +49,6 @@ contains
   debugbitbtn in 'comp\debugbitbtn.pas',
   MenuImgList in 'comp\MenuImgList.pas',
   KeyBtn in 'comp\KeyBtn.pas',
-  UnicodePanel in 'comp\UnicodePanel.pas',
   PaintPanel in 'comp\PaintPanel.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   StringGridEditControlled in 'comp\StringGridEditControlled.pas',

@@ -117,7 +117,6 @@
         <DCCReference Include="comp\debugbitbtn.pas"/>
         <DCCReference Include="comp\MenuImgList.pas"/>
         <DCCReference Include="comp\KeyBtn.pas"/>
-        <DCCReference Include="comp\UnicodePanel.pas"/>
         <DCCReference Include="comp\PaintPanel.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="comp\StringGridEditControlled.pas"/>

@@ -150,7 +150,6 @@
             <Form>frmSelectKey</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\keybtn.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\unicodepanel.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\PaintPanel.pas"/>

@@ -23,7 +23,6 @@ uses
   MenuImgList in '..\..\..\windows\src\global\delphi\comp\MenuImgList.pas',
   UfrmSelectKey in 'dialogs\UfrmSelectKey.pas' {frmSelectKey},
   keybtn in '..\..\..\windows\src\global\delphi\comp\keybtn.pas',
-  unicodepanel in '..\..\..\windows\src\global\delphi\comp\unicodepanel.pas',
   ttinfo in '..\..\..\windows\src\global\delphi\general\ttinfo.pas',
   KeyNames in '..\..\..\windows\src\global\delphi\general\KeyNames.pas',
   PaintPanel in '..\..\..\windows\src\global\delphi\comp\PaintPanel.pas',

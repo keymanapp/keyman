@@ -126,7 +126,7 @@ uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   UfrmMDIChild, Buttons, StdCtrls, KeyBtn, ComCtrls, ExtCtrls,
-  UnicodePanel, Menus, ExtDlgs,
+  Menus, ExtDlgs,
   Keyman.Developer.System.Project.ProjectFile, UfrmMDIEditor, CharMapInsertMode,
   Contnrs, Unicode, UframeBitmapEditor, OnScreenKeyboardData,
   UframeTextEditor, UfrmDebug, ExtShiftState,
