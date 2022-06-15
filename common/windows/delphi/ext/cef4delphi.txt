@@ -92,8 +92,6 @@ Tsysinfo
     sysinfo_main
 
 Global
-    WebBrowserManager [*]
-      {Keyman}
     UfrmWebContainer [*]
       {Keyman, KMShell}
     UfrmHint [*]
