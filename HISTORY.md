@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.260 stable 2022-06-15
+
+* chore: Release version 15.0
+
 ## 15.0.259 beta 2022-06-10
 
 * fix(android/engine): Disable haptic feedback on hardware keystrokes (#6671)
