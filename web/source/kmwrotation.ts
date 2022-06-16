@@ -45,8 +45,7 @@ namespace com.keyman {
       this.keyman.alignInputs();
 
       var osk = this.keyman.osk;
-      // TODO:  Reattach later in the refactoring process!
-      //osk.hideLanguageList();
+      osk.hideLanguageMenu();
 
       osk.setNeedsLayout()
       if(this.oskVisible) {
