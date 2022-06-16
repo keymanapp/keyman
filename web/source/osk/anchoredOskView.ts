@@ -22,6 +22,8 @@ namespace com.keyman.osk {
     x: number;
     y: number;
 
+    private isResizing: boolean = false;
+
     // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
     modifierCodes = text.Codes.modifierCodes;
     modifierBitmasks = text.Codes.modifierBitmasks;
@@ -59,12 +61,34 @@ namespace com.keyman.osk {
       s.position = 'fixed';
     }
 
-    protected postKeyboardLoad() {
-      // Initializes the size of a touch keyboard.
+    /**
+     * @override
+     */
+    public refreshLayout(pending?: boolean): void {
+      // Prevent a circular call-stack chain.
+      if(this.isResizing) {
+        return;
+      }
+
+      try {
+        this.isResizing = true;
+        this.doResize();
+      } finally {
+        this.isResizing = false;
+      }
+      super.refreshLayout(pending);
+    }
+
+    protected doResize() {
       if(this.vkbd && this.device.touchable) {
         let targetOSKHeight = this.getDefaultKeyboardHeight();
         this.setSize(this.getDefaultWidth(), targetOSKHeight + this.banner.height);
       }
+    }
+
+    protected postKeyboardLoad() {
+      // Initializes the size of a touch keyboard.
+      this.doResize();
 
       this._Visible = false;  // I3363 (Build 301)
 

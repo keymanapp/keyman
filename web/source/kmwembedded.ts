@@ -256,10 +256,7 @@ namespace com.keyman.text {
    */
   keymanweb['correctOSKTextSize']=function() {
     let osk: com.keyman.osk.AnchoredOSKView = keymanweb.osk;
-    if(osk?.vkbd) {
-      osk._Load(); // TODO:  replace with osk.refreshLayout() in the future once it can perfectly
-                   //        handle rotations.
-    }
+    osk.refreshLayout();
   };
 
   /**
@@ -287,7 +284,7 @@ namespace com.keyman.text {
     /*
      * If a longpress popup was visible, but is no longer, this means that the
      * associated longpress gesture was cancelled.  It is possible for the base
-     * key to emit if selected at this time; detection of this is managed by 
+     * key to emit if selected at this time; detection of this is managed by
      * the `SubkeyDelegator` class.
      */
     if(!isVisible) {
