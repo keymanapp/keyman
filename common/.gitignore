@@ -1,0 +1,3 @@
+# Helps prevent git-noise when swapping from 15.0 stable to 16.0, given the latter's repo filesystem restructure.
+**/build
+**/*.inc.ts
