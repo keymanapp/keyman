@@ -141,27 +141,29 @@ namespace com.keyman.text {
 
       // If it's a key that we 'optimize out' of our fat-finger correction algorithm,
       // we MUST NOT trigger it for this keystroke.
-      let isOnlyLayerShift = text.Codes.isKnownOSKModifierKey(keyEvent.kName);
+      let isOnlyLayerSwitchKey = text.Codes.isKnownOSKModifierKey(keyEvent.kName);
 
       // Best-guess stopgap for possible custom modifier keys.
       // If a key (1) does not affect the context and (2) shifts the active layer,
       // we assume it's a modifier key.  (Touch keyboards may define custom modifier keys.)
       //
-      // Note:  this could cause an issue in the niche scenario where:
+      // Note:  this will mean we won't generate alternates in the niche scenario where:
       // 1.  Keypress does not alter the actual context
       // 2.  It DOES emit a deadkey with an earlier processing rule.
       // 3.  The FINAL processing rule does not match.
       // 4.  The key ALSO signals a layer shift.
       // If any of the four above conditions aren't met - no problem!
       // So it's a pretty niche scenario.
-      if((ruleBehavior.transcription?.transform as TextTransform).isNoOp() && keyEvent.kNextLayer) {
-        isOnlyLayerShift = true;
+      if((ruleBehavior?.transcription?.transform as TextTransform)?.isNoOp() && keyEvent.kNextLayer) {
+        isOnlyLayerSwitchKey = true;
       }
 
       const keepRuleBehavior = ruleBehavior != null;
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
-      if(keepRuleBehavior && !isOnlyLayerShift) {
-        let alternates = this.buildAlternates(ruleBehavior, keyEvent, preInputMock);
+      if(keepRuleBehavior) {
+        // alternates are our fat-finger alternate outputs. We don't build these for keys we detect as
+        // layer switch keys
+        let alternates = isOnlyLayerSwitchKey ? null : this.buildAlternates(ruleBehavior, keyEvent, preInputMock);
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
@@ -173,7 +175,7 @@ namespace com.keyman.text {
         if(alternates && alternates.length > 0) {
           ruleBehavior.transcription.alternates = alternates;
         }
-      } else if(ruleBehavior == null) {
+      } else {
         // We need a dummy RuleBehavior for keys which have no output (e.g. Shift)
         ruleBehavior = new RuleBehavior();
         ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
