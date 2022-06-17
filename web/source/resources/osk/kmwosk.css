@@ -403,7 +403,10 @@ div.android div.kmw-keytip-tip {
 }
 
 div.android div.kmw-keytip-cap {
+  position: absolute;
   background: #999;
+  border-radius: 0 0 5px 5px;
+  border-bottom: solid 1px #8a8d90
 }
 
 /* Dark mode - ensure text is colored appropriately for key tips. */
