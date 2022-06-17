@@ -402,6 +402,10 @@ div.android div.kmw-keytip-tip {
   background: #999;
 }
 
+div.android div.kmw-keytip-cap {
+  background: #999;
+}
+
 /* Dark mode - ensure text is colored appropriately for key tips. */
 @media (prefers-color-scheme: dark) {
   div.ios div.kmw-keytip {
