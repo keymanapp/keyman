@@ -710,7 +710,11 @@ namespace com.keyman {
 
       PKbd = PKbd || this.core.activeKeyboard;
 
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.computedHeight);
+      // help.keyman.com will set this function in place, so we'll give it priority.
+      let targetHeight = (this['getOskHeight'] as () => number)();
+      targetHeight = targetHeight || this.osk.computedHeight || 200;
+
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, targetHeight);
     }
   }
 }
