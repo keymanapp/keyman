@@ -1786,7 +1786,7 @@ namespace com.keyman.osk {
       this.keyPending = null;
       this.touchPending = null;
 
-      this.keytip.show(null, false, this);
+      this.keytip?.show(null, false, this);
       this.subkeyGesture?.clear();
       this.pendingMultiTap?.cancel();
       this.pendingSubkey?.cancel();
