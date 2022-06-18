@@ -8,7 +8,7 @@ NOTARGET_SIGNCODE=yes
 TARGETS=.virtual
 !else
 TARGETS=devtools sentrytool tds2dbg \
-  buildunidata build_standards_data buildpkg test-klog delphiprojectmanager
+  buildunidata build_standards_data buildpkg test-klog
 !endif
 
 CLEANS=clean-buildtools
@@ -27,10 +27,6 @@ sentrytool: .virtual
 
 buildunidata: .virtual
     cd $(ROOT)\src\buildtools\buildunidata
-    $(MAKE) $(TARGET)
-
-delphiprojectmanager: .virtual
-    cd $(ROOT)\src\buildtools\delphiprojectmanager
     $(MAKE) $(TARGET)
 
 devtools: .virtual
