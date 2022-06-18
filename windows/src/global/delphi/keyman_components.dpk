@@ -52,7 +52,6 @@ contains
   PaintPanel in 'comp\PaintPanel.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   StringGridEditControlled in 'comp\StringGridEditControlled.pas',
-  BitmapEditor in 'comp\BitmapEditor.pas',
   FixedTrackbar in 'comp\FixedTrackbar.pas',
   KMDActions in 'comp\KMDActions.pas',
   CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',

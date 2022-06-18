@@ -83,7 +83,7 @@ uses
   Keyman.UI.UframeCEFHost in '..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas',
   klog in '..\..\..\windows\src\global\delphi\general\klog.pas',
-  BitmapEditor in '..\..\..\windows\src\global\delphi\comp\BitmapEditor.pas',
+  BitmapEditor in '..\common\delphi\components\BitmapEditor.pas',
   StringGridEditControlled in '..\..\..\windows\src\global\delphi\comp\StringGridEditControlled.pas',
   KMDevResourceStrings in 'main\KMDevResourceStrings.pas',
   httpuploader in '..\..\..\windows\src\global\delphi\general\httpuploader.pas',

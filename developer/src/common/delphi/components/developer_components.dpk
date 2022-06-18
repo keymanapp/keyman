@@ -1,6 +1,6 @@
 package developer_components;
 
-{R *.res}
+{$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -28,6 +28,10 @@ package developer_components;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  rtl,
+  vcl;
+
+contains
+  BitmapEditor in 'BitmapEditor.pas';
 
 end.
