@@ -122,7 +122,7 @@
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>

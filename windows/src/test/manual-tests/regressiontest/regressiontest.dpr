@@ -20,7 +20,7 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   utilexception in '..\..\global\delphi\general\utilexception.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   keyman32_int in '..\..\global\delphi\general\keyman32_int.pas',

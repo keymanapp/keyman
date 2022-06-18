@@ -7,7 +7,7 @@ uses
   klog in '..\..\..\..\..\windows\src\global\delphi\general\klog.pas',
   VersionInfo in '..\..\..\..\..\windows\src\global\delphi\general\VersionInfo.pas',
   ErrorControlledRegistry in '..\..\..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas',
-  Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas';
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas';
 
 begin
   if KLEnabled then

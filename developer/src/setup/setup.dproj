@@ -119,7 +119,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\GlobalProxySettings.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\setup\SFX.pas"/>

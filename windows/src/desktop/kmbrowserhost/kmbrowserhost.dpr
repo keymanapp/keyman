@@ -12,7 +12,7 @@ uses
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',

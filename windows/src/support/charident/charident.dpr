@@ -13,7 +13,7 @@ uses
   urlutil in '..\..\global\delphi\general\urlutil.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   UfrmRenderingTestCases in 'UfrmRenderingTestCases.pas' {frmRenderingTestCases},
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   pngextra in '..\..\..\cmpsrc\PngDelphi\pngextra.pas',
   pngimage in '..\..\..\cmpsrc\PngDelphi\pngimage.pas',
   pnglang in '..\..\..\cmpsrc\PngDelphi\pnglang.pas',

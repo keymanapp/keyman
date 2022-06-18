@@ -21,7 +21,7 @@ uses
   wininet5 in '..\..\..\windows\src\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\..\windows\src\global\delphi\general\GlobalProxySettings.pas',
   ErrorControlledRegistry in '..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas',
-  Unicode in '..\..\..\windows\src\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\common\windows\delphi\general\Unicode.pas',
   utilexecute in '..\..\..\windows\src\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
   SFX in '..\..\..\common\windows\delphi\setup\SFX.pas',

@@ -30,7 +30,7 @@ uses
   Keyman.Winapi.VersionHelpers in '..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
   DebugPaths in '..\..\..\global\delphi\general\DebugPaths.pas',
   ErrorControlledRegistry in '..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
-  Unicode in '..\..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
   utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
   KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas';

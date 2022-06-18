@@ -21,7 +21,7 @@ uses
   utilfiletypes in '..\..\..\..\..\windows\src\global\delphi\general\utilfiletypes.pas',
   StockFileNames in '..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas',
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
-  Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   JsonUtil in '..\..\..\..\..\windows\src\global\delphi\general\JsonUtil.pas',
   KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
   utildir in '..\..\..\..\..\windows\src\global\delphi\general\utildir.pas',

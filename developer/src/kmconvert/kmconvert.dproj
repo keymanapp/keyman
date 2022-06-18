@@ -118,7 +118,7 @@
         <DCCReference Include="Keyman.Developer.System.KeyboardProjectTemplate.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UKeymanTargets.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\TIKE\main\KeyboardParser.pas"/>

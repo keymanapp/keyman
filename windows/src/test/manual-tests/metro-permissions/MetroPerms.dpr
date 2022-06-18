@@ -14,7 +14,7 @@ uses
   KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
-  Unicode in '..\..\..\global\delphi\general\Unicode.pas';
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas';
 
 begin
   try

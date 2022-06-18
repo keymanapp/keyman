@@ -109,7 +109,7 @@
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

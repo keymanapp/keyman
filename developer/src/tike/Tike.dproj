@@ -182,7 +182,7 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.ProjectLoader.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.ProjectSaver.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeys.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="main\Keyman.System.Debug.DebugUIStatus.pas"/>
         <DCCReference Include="rel\keymanstrings.pas"/>
         <DCCReference Include="help\kwhelp.pas"/>

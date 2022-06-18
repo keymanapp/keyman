@@ -12,7 +12,7 @@ uses
   ADODB_TLB in '..\..\..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas',
   utilsystem in '..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
-  Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   RegistryKeys in '..\..\..\..\..\windows\src\global\delphi\general\RegistryKeys.pas',
   JRO_TLB in '..\..\..\..\..\common\windows\delphi\tlb\JRO_TLB.pas',

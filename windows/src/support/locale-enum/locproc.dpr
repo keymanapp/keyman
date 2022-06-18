@@ -7,7 +7,7 @@ program locproc;
 uses
   System.SysUtils,
   elp in 'elp.pas',
-  Unicode in 'C:\Projects\keyman\open\windows\src\global\delphi\general\Unicode.pas',
+  Unicode in 'C:\Projects\keyman\open\common\windows\delphi\general\Unicode.pas',
   utilstr in 'C:\Projects\keyman\open\windows\src\global\delphi\general\utilstr.pas';
 
 begin

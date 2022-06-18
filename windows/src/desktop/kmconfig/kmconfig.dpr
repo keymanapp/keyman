@@ -13,7 +13,7 @@ uses
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  unicode in '..\..\global\delphi\general\unicode.pas',
+  unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   Keyman.System.KMConfigMain in 'Keyman.System.KMConfigMain.pas',
   Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas';

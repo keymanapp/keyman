@@ -177,7 +177,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilkeyboard.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\unicode.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilhttp.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\TIKE\main\UfrmTike.pas">

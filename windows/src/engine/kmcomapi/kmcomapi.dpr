@@ -110,7 +110,7 @@ uses
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   kprecompilemnemonickeyboard in 'processes\keyboard\kprecompilemnemonickeyboard.pas',

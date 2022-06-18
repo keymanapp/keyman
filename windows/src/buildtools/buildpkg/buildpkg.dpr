@@ -14,7 +14,7 @@ uses
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilstr in '..\..\global\delphi\general\utilstr.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',

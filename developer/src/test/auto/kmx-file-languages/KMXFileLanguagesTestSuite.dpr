@@ -20,7 +20,7 @@ uses
   KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
   StockFileNames in '..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas',
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
-  Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.Test.System.KMXFileLanguagesTest in 'Keyman.Test.System.KMXFileLanguagesTest.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',

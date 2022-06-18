@@ -30,7 +30,7 @@ uses
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   si_base in 'si_base.pas',

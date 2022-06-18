@@ -17,7 +17,7 @@ uses
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   UfrmHTML in 'main\UfrmHTML.pas' {frmHTML},
   HotkeyUtils in '..\..\global\delphi\general\HotkeyUtils.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   exceptionw in '..\..\global\delphi\general\exceptionw.pas',
   utilkmshell in 'util\utilkmshell.pas',
   custinterfaces in '..\..\global\delphi\cust\custinterfaces.pas',

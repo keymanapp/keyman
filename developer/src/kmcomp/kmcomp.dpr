@@ -30,7 +30,7 @@ uses
   utilsystem in '..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   utildir in '..\..\..\windows\src\global\delphi\general\utildir.pas',
   utilkeyboard in '..\..\..\windows\src\global\delphi\general\utilkeyboard.pas',
-  unicode in '..\..\..\windows\src\global\delphi\general\unicode.pas',
+  unicode in '..\..\..\common\windows\delphi\general\Unicode.pas',
   utilhttp in '..\..\..\windows\src\global\delphi\general\utilhttp.pas',
   GetOsVersion in '..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   UfrmTike in '..\tike\main\UfrmTike.pas' {TikeForm: TTntForm},

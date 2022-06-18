@@ -10,7 +10,7 @@ uses
   crypt_guid in '..\..\global\delphi\productactivation\crypt_guid.pas',
   productactivation in '..\..\global\delphi\productactivation\productactivation.pas',
   tavultesoft_certificate in '..\..\global\delphi\productactivation\tavultesoft_certificate.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   crypt_user in '..\..\global\delphi\productactivation\crypt_user.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',

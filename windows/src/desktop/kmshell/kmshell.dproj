@@ -123,7 +123,7 @@
             <Form>frmHTML</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\HotkeyUtils.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="util\utilkmshell.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>

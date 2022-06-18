@@ -127,7 +127,7 @@
         <DCCReference Include="RegistryHelpers.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\setup\SFX.pas"/>

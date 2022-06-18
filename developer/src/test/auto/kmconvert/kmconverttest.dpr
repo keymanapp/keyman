@@ -21,7 +21,7 @@ uses
   Keyman.System.KeyboardUtils in '..\..\..\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
   Keyman.System.LexicalModelUtils in '..\..\..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
-  Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',

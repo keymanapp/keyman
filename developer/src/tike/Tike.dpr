@@ -49,7 +49,7 @@ uses
   Keyman.Developer.System.Project.ProjectLoader in 'project\Keyman.Developer.System.Project.ProjectLoader.pas',
   Keyman.Developer.System.Project.ProjectSaver in 'project\Keyman.Developer.System.Project.ProjectSaver.pas',
   VKeys in '..\..\..\windows\src\global\delphi\general\VKeys.pas',
-  Unicode in '..\..\..\windows\src\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\common\windows\delphi\general\Unicode.pas',
   Keyman.System.Debug.DebugUIStatus in 'main\Keyman.System.Debug.DebugUIStatus.pas',
   keymanstrings in 'rel\keymanstrings.pas',
   kwhelp in 'help\kwhelp.pas',

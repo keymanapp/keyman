@@ -9,7 +9,7 @@ uses
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   utilstr in '..\..\global\delphi\general\utilstr.pas';
 
 {$R *.res}

@@ -110,7 +110,6 @@
         <DCCReference Include="dclstd.dcp"/>
         <DCCReference Include="xmlrtl.dcp"/>
         <DCCReference Include="general\scancodemap.pas"/>
-        <DCCReference Include="general\unicode.pas"/>
         <DCCReference Include="comp\exImageList.pas"/>
         <DCCReference Include="comp\KeymanTextEditorRichEdit.pas"/>
         <DCCReference Include="general\usp10.pas"/>

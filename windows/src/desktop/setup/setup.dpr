@@ -24,7 +24,7 @@ uses
   RegistryHelpers in 'RegistryHelpers.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
   SFX in '..\..\..\..\common\windows\delphi\setup\SFX.pas',

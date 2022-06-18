@@ -12,7 +12,7 @@ uses
   Keyman.Developer.System.KeyboardProjectTemplate in 'Keyman.Developer.System.KeyboardProjectTemplate.pas',
   UKeymanTargets in '..\..\..\windows\src\global\delphi\general\UKeymanTargets.pas',
   utilstr in '..\..\..\windows\src\global\delphi\general\utilstr.pas',
-  Unicode in '..\..\..\windows\src\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\common\windows\delphi\general\Unicode.pas',
   StockFileNames in '..\..\..\windows\src\global\delphi\cust\StockFileNames.pas',
   utilfiletypes in '..\..\..\windows\src\global\delphi\general\utilfiletypes.pas',
   KeyboardParser in '..\TIKE\main\KeyboardParser.pas',
