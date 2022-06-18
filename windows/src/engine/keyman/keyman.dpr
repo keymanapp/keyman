@@ -28,7 +28,7 @@ uses
   KeymanMenuItem in 'KeymanMenuItem.pas',
   utilhotkey in '..\..\global\delphi\general\utilhotkey.pas',
   InterfaceHotkeys in '..\..\global\delphi\general\InterfaceHotkeys.pas',
-  ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
+  ExtShiftState in '..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\global\delphi\general\CleartypeDrawCharacter.pas',
   MLang in '..\..\global\delphi\general\MLang.pas',
   OnScreenKeyboard in '..\..\global\delphi\comp\OnScreenKeyboard.pas',

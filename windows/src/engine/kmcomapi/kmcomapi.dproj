@@ -228,7 +228,7 @@
         <DCCReference Include="util\utilolepicture.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilxml.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\extshiftstate.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\extshiftstate.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>

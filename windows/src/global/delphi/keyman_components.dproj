@@ -109,7 +109,6 @@
         <DCCReference Include="dclact.dcp"/>
         <DCCReference Include="dclstd.dcp"/>
         <DCCReference Include="xmlrtl.dcp"/>
-        <DCCReference Include="comp\extshiftstate.pas"/>
         <DCCReference Include="general\scancodemap.pas"/>
         <DCCReference Include="general\unicode.pas"/>
         <DCCReference Include="comp\KeyBtn.pas"/>

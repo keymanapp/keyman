@@ -137,7 +137,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>

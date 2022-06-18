@@ -90,7 +90,7 @@ uses
   utilolepicture in 'util\utilolepicture.pas',
   utilxml in '..\..\global\delphi\general\utilxml.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
-  extshiftstate in '..\..\global\delphi\comp\extshiftstate.pas',
+  extshiftstate in '..\..\..\..\common\windows\delphi\visualkeyboard\extshiftstate.pas',
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
   utilstr in '..\..\global\delphi\general\utilstr.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',

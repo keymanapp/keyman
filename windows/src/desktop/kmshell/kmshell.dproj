@@ -226,7 +226,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="main\UImportOlderVersionSettings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanMutex.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>

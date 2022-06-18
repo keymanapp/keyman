@@ -39,7 +39,7 @@ uses
   CompileKeymanWeb in '..\tike\compile\CompileKeymanWeb.pas',
   VisualKeyboard in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas',
   KeymanWebKeyCodes in '..\tike\compile\KeymanWebKeyCodes.pas',
-  ExtShiftState in '..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas',
+  ExtShiftState in '..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   kmxfileconsts in '..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas',
   wininet5 in '..\..\..\windows\src\global\delphi\general\wininet5.pas',
   kmxfileutils in '..\..\..\windows\src\global\delphi\general\kmxfileutils.pas',

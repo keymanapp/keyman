@@ -11,7 +11,7 @@ uses
   OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   VisualKeyboard in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
-  ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
+  ExtShiftState in '..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\global\delphi\general\CleartypeDrawCharacter.pas',
   usp10 in '..\..\global\delphi\general\usp10.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',

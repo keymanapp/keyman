@@ -259,7 +259,7 @@
             <Form>frmHelp</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\OnScreenKeyboard.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="main\CharMapDropTool.pas"/>
         <DCCReference Include="dialogs\UfrmBitmapEditorText.pas">

@@ -110,7 +110,7 @@ uses
   KMDActionInterfaces in '..\common\delphi\components\KMDActionInterfaces.pas',
   UfrmHelp in 'main\UfrmHelp.pas' {frmHelp},
   OnScreenKeyboard in '..\..\..\windows\src\global\delphi\comp\OnScreenKeyboard.pas',
-  ExtShiftState in '..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas',
+  ExtShiftState in '..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\..\windows\src\global\delphi\general\CleartypeDrawCharacter.pas',
   CharMapDropTool in 'main\CharMapDropTool.pas',
   UfrmBitmapEditorText in 'dialogs\UfrmBitmapEditorText.pas' {frmBitmapEditorText},

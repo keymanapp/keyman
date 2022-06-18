@@ -189,7 +189,7 @@
         <DCCReference Include="..\TIKE\compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\TIKE\compile\KeymanWebKeyCodes.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfileutils.pas"/>

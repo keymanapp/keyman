@@ -47,7 +47,7 @@ uses
   VisualKeyboardSaverBinary in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
-  ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
+  ExtShiftState in '..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',

@@ -30,7 +30,7 @@ uses
   utilexecute in '..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas',
   GetOsVersion in '..\..\..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
   VersionInfo in '..\..\..\..\..\windows\src\global\delphi\general\VersionInfo.pas',
-  ExtShiftState in '..\..\..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas',
+  ExtShiftState in '..\..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   VisualKeyboardLoaderBinary in '..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
   VisualKeyboardLoaderXML in '..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardSaverBinary in '..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',

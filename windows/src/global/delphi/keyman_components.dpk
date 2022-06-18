@@ -41,7 +41,6 @@ requires
   xmlrtl;
 
 contains
-  extshiftstate in 'comp\extshiftstate.pas',
   scancodemap in 'general\scancodemap.pas',
   unicode in 'general\unicode.pas',
   KeyBtn in 'comp\KeyBtn.pas',

@@ -110,7 +110,7 @@
         <DCCReference Include="..\..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\comp\ExtShiftState.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>

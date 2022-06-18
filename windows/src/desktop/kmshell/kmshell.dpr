@@ -89,7 +89,7 @@ uses
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   MSXML2_TLB in '..\..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
-  ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
+  ExtShiftState in '..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   UImportOlderVersionSettings in 'main\UImportOlderVersionSettings.pas',
   KeymanMutex in '..\..\global\delphi\general\KeymanMutex.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
