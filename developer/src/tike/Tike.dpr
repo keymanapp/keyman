@@ -215,7 +215,7 @@ uses
   DropTarget in '..\..\..\windows\src\global\delphi\general\DropTarget.pas',
   CloseButtonPageControl in '..\common\delphi\components\CloseButtonPageControl.pas',
   UfrmTIKEDock in 'dockforms\UfrmTIKEDock.pas' {TIKEDockForm},
-  KeymanDeveloperDebuggerMemo in '..\..\..\windows\src\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas',
+  KeymanDeveloperDebuggerMemo in '..\common\delphi\components\KeymanDeveloperDebuggerMemo.pas',
   UfrmCharacterMapDock in 'dockforms\UfrmCharacterMapDock.pas' {frmCharacterMapDock},
   Keyman.System.PackageInfoRefreshKeyboards in '..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',

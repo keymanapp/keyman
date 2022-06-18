@@ -132,7 +132,6 @@
         <DCCReference Include="general\Glossary.pas"/>
         <DCCReference Include="general\RegistryKeys.pas"/>
         <DCCReference Include="general\KeymanVersion.pas"/>
-        <DCCReference Include="comp\KeymanDeveloperDebuggerMemo.pas"/>
         <DCCReference Include="..\..\..\..\developer\src\tike\main\TextFileFormat.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

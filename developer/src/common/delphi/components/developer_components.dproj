@@ -132,6 +132,7 @@
         <DCCReference Include="DebugBitBtn.pas"/>
         <DCCReference Include="DebugListBox.pas"/>
         <DCCReference Include="DebugListView.pas"/>
+        <DCCReference Include="KeymanDeveloperDebuggerMemo.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

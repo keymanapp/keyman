@@ -455,7 +455,7 @@
         <DCCReference Include="dockforms\UfrmTIKEDock.pas">
             <Form>TIKEDockForm</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas"/>
+        <DCCReference Include="..\common\delphi\components\KeymanDeveloperDebuggerMemo.pas"/>
         <DCCReference Include="dockforms\UfrmCharacterMapDock.pas">
             <Form>frmCharacterMapDock</Form>
         </DCCReference>

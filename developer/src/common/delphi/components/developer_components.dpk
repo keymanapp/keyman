@@ -37,6 +37,7 @@ contains
   CloseButtonPageControl in 'CloseButtonPageControl.pas',
   DebugBitBtn in 'DebugBitBtn.pas',
   DebugListBox in 'DebugListBox.pas',
-  DebugListView in 'DebugListView.pas';
+  DebugListView in 'DebugListView.pas',
+  KeymanDeveloperDebuggerMemo in 'KeymanDeveloperDebuggerMemo.pas';
 
 end.

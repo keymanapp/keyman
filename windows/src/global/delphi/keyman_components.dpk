@@ -64,7 +64,6 @@ contains
   Glossary in 'general\Glossary.pas',
   RegistryKeys in 'general\RegistryKeys.pas',
   KeymanVersion in 'general\KeymanVersion.pas',
-  KeymanDeveloperDebuggerMemo in 'comp\KeymanDeveloperDebuggerMemo.pas',
   TextFileFormat in '..\..\..\..\developer\src\tike\main\TextFileFormat.pas';
 
 end.
