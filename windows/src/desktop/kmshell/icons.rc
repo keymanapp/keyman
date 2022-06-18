@@ -1,8 +1,8 @@
 
-KEYCAPSMOOTH BITMAP DISCARDABLE "..\\..\\global\\res\\bmp\\keycap.bmp"
+KEYCAPSMOOTH BITMAP DISCARDABLE "..\\..\\..\\..\\common\\resources\\bitmaps\\keycap.bmp"
 
-1 ICON DISCARDABLE "..\\..\\global\\res\\90\\desktop\\appicon.ico"
-2 ICON DISCARDABLE "..\\..\\global\\res\\90\\desktop\\cfgicon.ico"
-3 ICON DISCARDABLE "..\\..\\global\\res\\90\\filetypes\\kmx.ico"
-4 ICON DISCARDABLE "..\\..\\global\\res\\90\\filetypes\\kmp.ico"
-7 ICON DISCARDABLE "..\\..\\global\\res\\90\\filetypes\\kvk.ico"
+1 ICON DISCARDABLE "..\\branding\\appicon.ico"
+2 ICON DISCARDABLE "..\\branding\\cfgicon.ico"
+3 ICON DISCARDABLE "..\\..\\..\\..\\common\\resources\\icons\\filetypes\\kmx.ico"
+4 ICON DISCARDABLE "..\\..\\..\\..\\common\\resources\\icons\\filetypes\\kmp.ico"
+7 ICON DISCARDABLE "..\\..\\..\\..\\common\\resources\\icons\\filetypes\\kvk.ico"

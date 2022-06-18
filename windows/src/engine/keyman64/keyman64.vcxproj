@@ -331,8 +331,8 @@
     <ClInclude Include="..\keyman32\vkscancodes.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\global\res\bmp\arrow.bmp" />
-    <None Include="..\..\global\res\bmp\mask.bmp" />
+    <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp" />
+    <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp" />
     <CustomBuild Include="..\keyman32\keyman-debug-etw.man">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

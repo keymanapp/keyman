@@ -97,7 +97,7 @@
     <ResourceCompile Include="Keyman64.RC" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\global\res\bmp\arrow.bmp" />
-    <None Include="..\..\global\res\bmp\mask.bmp" />
+    <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp" />
+    <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp" />
   </ItemGroup>
 </Project>
