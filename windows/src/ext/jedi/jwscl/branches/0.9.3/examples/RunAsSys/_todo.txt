@@ -1,2 +1,0 @@
-* better error handling
-* use GetFullPathName for input file, so service gets full path 
