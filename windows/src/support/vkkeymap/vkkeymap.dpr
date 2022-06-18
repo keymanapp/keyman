@@ -7,7 +7,7 @@ uses
   OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   ExtShiftState in '..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
-  CleartypeDrawCharacter in '..\..\global\delphi\general\CleartypeDrawCharacter.pas',
+  CleartypeDrawCharacter in '..\..\..\..\common\windows\delphi\general\CleartypeDrawCharacter.pas',
   usp10 in '..\..\global\delphi\general\usp10.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',

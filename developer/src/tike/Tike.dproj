@@ -260,7 +260,7 @@
         </DCCReference>
         <DCCReference Include="..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\CleartypeDrawCharacter.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="main\CharMapDropTool.pas"/>
         <DCCReference Include="dialogs\UfrmBitmapEditorText.pas">
             <Form>frmBitmapEditorText</Form>

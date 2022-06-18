@@ -111,7 +111,6 @@
         <DCCReference Include="xmlrtl.dcp"/>
         <DCCReference Include="general\scancodemap.pas"/>
         <DCCReference Include="general\unicode.pas"/>
-        <DCCReference Include="general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="general\getosversion.pas"/>
         <DCCReference Include="comp\exImageList.pas"/>
         <DCCReference Include="comp\KeymanTextEditorRichEdit.pas"/>

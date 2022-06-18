@@ -111,7 +111,7 @@ uses
   UfrmHelp in 'main\UfrmHelp.pas' {frmHelp},
   OnScreenKeyboard in '..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas',
   ExtShiftState in '..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
-  CleartypeDrawCharacter in '..\..\..\windows\src\global\delphi\general\CleartypeDrawCharacter.pas',
+  CleartypeDrawCharacter in '..\..\..\common\windows\delphi\general\CleartypeDrawCharacter.pas',
   CharMapDropTool in 'main\CharMapDropTool.pas',
   UfrmBitmapEditorText in 'dialogs\UfrmBitmapEditorText.pas' {frmBitmapEditorText},
   UFixFontDialogBold in '..\..\..\windows\src\global\delphi\general\UFixFontDialogBold.pas',

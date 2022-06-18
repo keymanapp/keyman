@@ -146,7 +146,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CleartypeDrawCharacter.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="..\..\global\delphi\general\usp10.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>

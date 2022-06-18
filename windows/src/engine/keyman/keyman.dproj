@@ -131,7 +131,7 @@
         <DCCReference Include="..\..\global\delphi\general\utilhotkey.pas"/>
         <DCCReference Include="..\..\global\delphi\general\InterfaceHotkeys.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CleartypeDrawCharacter.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="..\..\global\delphi\general\MLang.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas"/>
         <DCCReference Include="viskbd\UfrmOSKPlugInBase.pas">
