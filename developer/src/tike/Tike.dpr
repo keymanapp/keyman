@@ -213,7 +213,7 @@ uses
   VisualKeyboardLoaderBinary in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
   VisualKeyboardSaverBinary in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   DropTarget in '..\..\..\windows\src\global\delphi\general\DropTarget.pas',
-  CloseButtonPageControl in '..\..\..\windows\src\global\delphi\comp\CloseButtonPageControl.pas',
+  CloseButtonPageControl in '..\common\delphi\components\CloseButtonPageControl.pas',
   UfrmTIKEDock in 'dockforms\UfrmTIKEDock.pas' {TIKEDockForm},
   KeymanDeveloperDebuggerMemo in '..\..\..\windows\src\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas',
   UfrmCharacterMapDock in 'dockforms\UfrmCharacterMapDock.pas' {frmCharacterMapDock},

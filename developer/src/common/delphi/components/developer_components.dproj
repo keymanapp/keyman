@@ -128,6 +128,7 @@
         <DCCReference Include="vcl.dcp"/>
         <DCCReference Include="BitmapEditor.pas"/>
         <DCCReference Include="CaptionPanel.pas"/>
+        <DCCReference Include="CloseButtonPageControl.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -228,7 +228,7 @@
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\BitmapEditor.pas"/>
+        <DCCReference Include="..\common\delphi\components\BitmapEditor.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\StringGridEditControlled.pas"/>
         <DCCReference Include="main\KMDevResourceStrings.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\httpuploader.pas"/>
@@ -393,7 +393,7 @@
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\CaptionPanel.pas"/>
+        <DCCReference Include="..\common\delphi\components\CaptionPanel.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Glossary.pas"/>
         <DCCReference Include="oskbuilder\UframeTouchLayoutBuilder.pas">
             <Form>frameTouchLayoutBuilder</Form>
@@ -451,7 +451,7 @@
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\DropTarget.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\CloseButtonPageControl.pas"/>
+        <DCCReference Include="..\common\delphi\components\CloseButtonPageControl.pas"/>
         <DCCReference Include="dockforms\UfrmTIKEDock.pas">
             <Form>TIKEDockForm</Form>
         </DCCReference>

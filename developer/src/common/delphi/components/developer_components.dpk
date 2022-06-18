@@ -33,6 +33,7 @@ requires
 
 contains
   BitmapEditor in 'BitmapEditor.pas',
-  CaptionPanel in 'CaptionPanel.pas';
+  CaptionPanel in 'CaptionPanel.pas',
+  CloseButtonPageControl in 'CloseButtonPageControl.pas';
 
 end.
