@@ -32,6 +32,7 @@ requires
   vcl;
 
 contains
-  BitmapEditor in 'BitmapEditor.pas';
+  BitmapEditor in 'BitmapEditor.pas',
+  CaptionPanel in 'CaptionPanel.pas';
 
 end.

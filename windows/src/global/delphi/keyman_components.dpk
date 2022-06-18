@@ -62,7 +62,6 @@ contains
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
   usp10 in 'general\usp10.pas',
   ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',
-  CaptionPanel in 'comp\CaptionPanel.pas',
   OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   LeftTabbedPageControl in 'comp\LeftTabbedPageControl.pas',
   Glossary in 'general\Glossary.pas',
