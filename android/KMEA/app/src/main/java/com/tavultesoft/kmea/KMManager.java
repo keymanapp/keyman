@@ -1744,6 +1744,9 @@ public final class KMManager {
 
   public static Keyboard getCurrentKeyboardInfo(Context context) {
     int index = getCurrentKeyboardIndex(context);
+    if(index < 0) {
+      return null;
+    }
     return KeyboardController.getInstance().getKeyboardInfo(index);
   }
 

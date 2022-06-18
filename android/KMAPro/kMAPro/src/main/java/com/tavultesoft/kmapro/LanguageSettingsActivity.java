@@ -87,11 +87,14 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         return;
       }
 
-      // If the active keyboard is for this language, immediately enact the new pref setting.
-      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
-      if (kbdLgCode.equals(lgCode)) {
-        // Not only registers the model but also applies our modeling preferences.
-        KMManager.registerAssociatedLexicalModel(lgCode);
+      Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(context);
+      if(kbInfo != null) {
+        // If the active keyboard is for this language, immediately enact the new pref setting.
+        String kbdLgCode = kbInfo.getLanguageID();
+        if (kbdLgCode.equals(lgCode)) {
+          // Not only registers the model but also applies our modeling preferences.
+          KMManager.registerAssociatedLexicalModel(lgCode);
+        }
       }
     }
   }
