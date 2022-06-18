@@ -11,7 +11,7 @@ build: dirs
 
 install:
     $(DEVTOOLS) -ip $(OUTLIB)\mbColorLibD10.bpl
-    $(DEVTOOLS) -ai $(EXT)\mbcolor
+    $(DEVTOOLS) -ai $(DEVELOPER_ROOT)\src\ext\mbcolor
 
 clean: def-clean
 
