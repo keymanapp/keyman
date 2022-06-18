@@ -16,6 +16,10 @@ CLEANS=clean-developer
 
 # ----------------------------------------------------------------------
 
+common: .virtual
+    cd $(DEVELOPER_ROOT)\src\common\delphi\components
+    $(MAKE) $(TARGET)
+
 imsample: .virtual
     cd $(DEVELOPER_ROOT)\src\imsample
     $(MAKE) $(TARGET)
@@ -215,6 +219,7 @@ test-releasebuildcheck: global-versions
 
 build-tools:
     @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    $(MAKE) common
 !ifdef NODELPHI
     echo Skipping build-tools
 !else
