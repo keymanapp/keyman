@@ -266,7 +266,7 @@ uses
   Keyman.System.WordlistTsvFile in '..\..\..\windows\src\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas',
   Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas',
   Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas',
-  Browse4Folder in '..\..\..\windows\src\ext\browse4folder\Browse4Folder.pas',
+  Browse4Folder in '..\ext\browse4folder\Browse4Folder.pas',
   DelphiZXIngQRCode in '..\..\..\windows\src\ext\zxingqrcode\Source\DelphiZXIngQRCode.pas',
   Keyman.System.QRCode in '..\..\..\windows\src\global\delphi\general\Keyman.System.QRCode.pas',
   Keyman.Developer.UI.UfrmModelEditor in 'child\Keyman.Developer.UI.UfrmModelEditor.pas' {frmModelEditor},

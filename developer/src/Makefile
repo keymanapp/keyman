@@ -65,6 +65,12 @@ kmlmc: build-tools .virtual
 
 # ----------------------------------------------------------------------
 
+ext: .virtual
+    cd $(DEVELOPER_ROOT)\src\ext
+    $(MAKE) $(TARGET)
+
+# ----------------------------------------------------------------------
+
 test: .virtual
     cd $(DEVELOPER_ROOT)\src\test\auto
     $(MAKE) $(TARGET)
@@ -228,6 +234,8 @@ build-tools-internal:
     $(WINDOWS_PROGRAM)\buildtools\devtools -ti
     cd $(WINDOWS_ROOT)\src
     $(MAKE) ext global buildtools
+    cd $(DEVELOPER_ROOT)\src
+    $(MAKE) ext
 
 # ----------------------------------------------------------------------
 

@@ -144,7 +144,6 @@
         <DCCReference Include="comp\CloseButtonPageControl.pas"/>
         <DCCReference Include="comp\KeymanDeveloperDebuggerMemo.pas"/>
         <DCCReference Include="..\..\developer\TIKE\main\TextFileFormat.pas"/>
-        <DCCReference Include="..\..\ext\browse4folder\Browse4Folder.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
