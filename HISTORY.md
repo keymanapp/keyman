@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.261 stable 2022-06-18
+
+* fix(web): crash on custom modifier keys (#6789)
+
 ## 15.0.260 stable 2022-06-15
 
 * chore: Release version 15.0
