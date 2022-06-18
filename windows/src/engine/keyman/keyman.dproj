@@ -176,10 +176,6 @@
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilxml.pas"/>
         <DCCReference Include="..\..\global\delphi\tlb\MSXML2_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\crypt\DCPcrypt2.pas"/>
-        <DCCReference Include="..\..\global\delphi\crypt\DCPbase64.pas"/>
-        <DCCReference Include="..\..\global\delphi\crypt\DCPconst.pas"/>
-        <DCCReference Include="..\..\global\delphi\crypt\DCPrc4.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanControlMessages.pas"/>
         <DCCReference Include="viskbd\UfrmOSKFontHelper.pas">
             <Form>frmOSKFontHelper</Form>
@@ -308,9 +304,9 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>keyman.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -320,9 +316,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>keyman.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

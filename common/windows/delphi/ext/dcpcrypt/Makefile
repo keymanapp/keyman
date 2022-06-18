@@ -7,7 +7,7 @@
 build: install
 
 install:
-    $(DEVTOOLS) -ai $(EXT)\dcpcrypt
+    $(DEVTOOLS) -ai $(COMMON_ROOT)\ext\dcpcrypt
 
 clean: def-clean
     $(CLEAN) *.bpl
