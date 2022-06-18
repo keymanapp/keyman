@@ -103,7 +103,7 @@
             <Form>Form1</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\comp\OnScreenKeyboard.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>

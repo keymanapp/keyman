@@ -43,11 +43,9 @@ requires
 contains
   scancodemap in 'general\scancodemap.pas',
   unicode in 'general\unicode.pas',
-  KeyBtn in 'comp\KeyBtn.pas',
   PaintPanel in 'comp\PaintPanel.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
-  OnScreenKeyboard in 'comp\OnScreenKeyboard.pas',
   getosversion in 'general\getosversion.pas',
   exImageList in 'comp\exImageList.pas',
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',

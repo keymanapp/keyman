@@ -7,7 +7,7 @@ program oskbulkrenderer;
 uses
   System.SysUtils,
   Keyman.System.OSKBulkRenderer in 'Keyman.System.OSKBulkRenderer.pas',
-  OnScreenKeyboard in '..\..\global\delphi\comp\OnScreenKeyboard.pas',
+  OnScreenKeyboard in '..\..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas',
   OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   VisualKeyboard in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
@@ -33,7 +33,7 @@ uses
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   VisualKeyboardExportPNG in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportPNG.pas',
   VisualKeyboardExportBMP in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportBMP.pas',
-  keybtn in '..\..\global\delphi\comp\keybtn.pas',
+  keybtn in '..\..\..\..\common\windows\delphi\components\keybtn.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas';
 
 begin

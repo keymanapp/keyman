@@ -3,7 +3,7 @@ program vkkeymap;
 uses
   Vcl.Forms,
   UfrmVKKeyMap in 'UfrmVKKeyMap.pas' {Form1},
-  OnScreenKeyboard in '..\..\global\delphi\comp\OnScreenKeyboard.pas',
+  OnScreenKeyboard in '..\..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas',
   OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   ExtShiftState in '..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',

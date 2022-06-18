@@ -141,7 +141,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="Keyman.System.OSKBulkRenderer.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\OnScreenKeyboard.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
@@ -167,7 +167,7 @@
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportPNG.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportBMP.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\keybtn.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\components\keybtn.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

@@ -149,7 +149,7 @@
         <DCCReference Include="dialogs\UfrmSelectKey.pas">
             <Form>frmSelectKey</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\keybtn.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\components\keybtn.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\PaintPanel.pas"/>
@@ -258,7 +258,7 @@
         <DCCReference Include="main\UfrmHelp.pas">
             <Form>frmHelp</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\OnScreenKeyboard.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="main\CharMapDropTool.pas"/>
