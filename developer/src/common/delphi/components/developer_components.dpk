@@ -34,6 +34,9 @@ requires
 contains
   BitmapEditor in 'BitmapEditor.pas',
   CaptionPanel in 'CaptionPanel.pas',
-  CloseButtonPageControl in 'CloseButtonPageControl.pas';
+  CloseButtonPageControl in 'CloseButtonPageControl.pas',
+  DebugBitBtn in 'DebugBitBtn.pas',
+  DebugListBox in 'DebugListBox.pas',
+  DebugListView in 'DebugListView.pas';
 
 end.

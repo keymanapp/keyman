@@ -112,9 +112,6 @@
         <DCCReference Include="comp\extshiftstate.pas"/>
         <DCCReference Include="general\scancodemap.pas"/>
         <DCCReference Include="general\unicode.pas"/>
-        <DCCReference Include="comp\debuglistbox.pas"/>
-        <DCCReference Include="comp\debuglistview.pas"/>
-        <DCCReference Include="comp\debugbitbtn.pas"/>
         <DCCReference Include="comp\MenuImgList.pas"/>
         <DCCReference Include="comp\KeyBtn.pas"/>
         <DCCReference Include="comp\PaintPanel.pas"/>

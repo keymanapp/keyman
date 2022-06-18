@@ -191,9 +191,9 @@
             <Form>frmSelectSystemKeyboard</Form>
         </DCCReference>
         <DCCReference Include="debug\RegressionTest.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\DebugListView.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\DebugBitBtn.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\DebugListBox.pas"/>
+        <DCCReference Include="..\common\delphi\components\DebugListView.pas"/>
+        <DCCReference Include="..\common\delphi\components\DebugBitBtn.pas"/>
+        <DCCReference Include="..\common\delphi\components\DebugListBox.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageFileFormats.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageInfo.pas"/>
