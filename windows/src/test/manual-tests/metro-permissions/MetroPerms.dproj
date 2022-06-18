@@ -145,7 +145,7 @@
         <DCCReference Include="..\..\..\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Unicode.pas"/>
         <BuildConfiguration Include="Release">

@@ -132,6 +132,7 @@
         <DCCReference Include="..\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="..\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="..\general\usp10.pas"/>
+        <DCCReference Include="..\general\GetOsVersion.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

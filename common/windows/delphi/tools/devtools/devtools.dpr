@@ -16,7 +16,7 @@ uses
   utilsystem in '..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   utilexecute in '..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas',
-  GetOsVersion in '..\..\..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   SourceRootPath in 'SourceRootPath.pas',
   Keyman.System.DevTools.BuildMessageConstants in 'Keyman.System.DevTools.BuildMessageConstants.pas',
   Keyman.System.DevTools.BuildSetupStringTranslations in 'Keyman.System.DevTools.BuildSetupStringTranslations.pas',

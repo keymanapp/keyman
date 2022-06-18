@@ -179,7 +179,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilkeyboard.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\unicode.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilhttp.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\TIKE\main\UfrmTike.pas">
             <Form>TikeForm</Form>
             <DesignClass>TTntForm</DesignClass>

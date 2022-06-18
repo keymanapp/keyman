@@ -107,7 +107,7 @@
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="TntDialogHelp.pas"/>
         <DCCReference Include="SetupForm.pas"/>
         <DCCReference Include="resource.pas"/>

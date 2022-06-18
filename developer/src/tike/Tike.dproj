@@ -194,7 +194,7 @@
         <DCCReference Include="..\common\delphi\components\DebugListView.pas"/>
         <DCCReference Include="..\common\delphi\components\DebugBitBtn.pas"/>
         <DCCReference Include="..\common\delphi\components\DebugListBox.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageFileFormats.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmpinffile.pas"/>

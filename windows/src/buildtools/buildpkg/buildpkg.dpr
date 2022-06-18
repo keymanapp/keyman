@@ -17,7 +17,7 @@ uses
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   KeymanDeveloperOptions in '..\..\..\..\developer\src\tike\main\KeymanDeveloperOptions.pas',
   RedistFiles in '..\..\..\..\developer\src\tike\main\RedistFiles.pas',

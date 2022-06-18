@@ -13,7 +13,7 @@ uses
   utilsystem in '..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
   Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas',
-  GetOsVersion in '..\..\..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   RegistryKeys in '..\..\..\..\..\windows\src\global\delphi\general\RegistryKeys.pas',
   JRO_TLB in '..\..\..\..\..\common\windows\delphi\tlb\JRO_TLB.pas',
   ErrorControlledRegistry in '..\..\..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas',

@@ -24,7 +24,7 @@ uses
   ttinfo in '..\..\global\delphi\general\ttinfo.pas',
   Upload_Settings in '..\..\global\delphi\general\Upload_Settings.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',

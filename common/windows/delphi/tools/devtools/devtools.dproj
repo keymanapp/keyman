@@ -107,7 +107,7 @@
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="SourceRootPath.pas"/>
         <DCCReference Include="Keyman.System.DevTools.BuildMessageConstants.pas"/>
         <DCCReference Include="Keyman.System.DevTools.BuildSetupStringTranslations.pas"/>

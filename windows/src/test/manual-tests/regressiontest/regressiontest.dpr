@@ -12,7 +12,7 @@ uses
   ResourceStrings in '..\..\global\delphi\general\ResourceStrings.pas',
   keymanstrings in 'keymanstrings.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   RedistFiles in '..\..\developer\TIKE\main\RedistFiles.pas',

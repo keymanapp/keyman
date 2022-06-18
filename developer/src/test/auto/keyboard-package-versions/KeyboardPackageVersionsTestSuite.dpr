@@ -28,7 +28,7 @@ uses
   utilsystem in '..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   RegistryKeys in '..\..\..\..\..\windows\src\global\delphi\general\RegistryKeys.pas',
   utilexecute in '..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas',
-  GetOsVersion in '..\..\..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   VersionInfo in '..\..\..\..\..\windows\src\global\delphi\general\VersionInfo.pas',
   ExtShiftState in '..\..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   VisualKeyboardLoaderBinary in '..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',

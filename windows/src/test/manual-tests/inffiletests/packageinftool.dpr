@@ -17,7 +17,7 @@ uses
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
   packageinf in 'packageinf.pas',

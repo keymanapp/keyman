@@ -8,7 +8,7 @@ uses
   findfonts in '..\..\global\delphi\general\findfonts.pas',
   KeymanTrayIcon in '..\..\engine\keyman\KeymanTrayIcon.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   urlutil in '..\..\global\delphi\general\urlutil.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',

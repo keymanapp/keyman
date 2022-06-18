@@ -158,7 +158,7 @@
         <DCCReference Include="..\..\..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>

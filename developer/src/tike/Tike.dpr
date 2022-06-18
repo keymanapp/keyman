@@ -59,7 +59,7 @@ uses
   DebugListView in '..\common\delphi\components\DebugListView.pas',
   DebugBitBtn in '..\common\delphi\components\DebugBitBtn.pas',
   DebugListBox in '..\common\delphi\components\DebugListBox.pas',
-  GetOsVersion in '..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   PackageFileFormats in '..\..\..\windows\src\global\delphi\general\PackageFileFormats.pas',
   PackageInfo in '..\..\..\windows\src\global\delphi\general\PackageInfo.pas',
   kmpinffile in '..\..\..\windows\src\global\delphi\general\kmpinffile.pas',

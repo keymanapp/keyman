@@ -12,7 +12,7 @@ uses
   Registry,
   UfrmMain in 'main\UfrmMain.pas' {frmMain},
   kmint in 'util\kmint.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   UfrmHTML in 'main\UfrmHTML.pas' {frmHTML},

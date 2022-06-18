@@ -43,7 +43,6 @@ requires
 contains
   scancodemap in 'general\scancodemap.pas',
   unicode in 'general\unicode.pas',
-  getosversion in 'general\getosversion.pas',
   exImageList in 'comp\exImageList.pas',
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
   ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',

@@ -117,7 +117,7 @@
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\msctf.pas"/>
         <DCCReference Include="..\..\engine\keyman\langswitch\LoadIndirectStringUnit.pas"/>
         <DCCReference Include="LangManager.pas"/>

@@ -111,7 +111,7 @@
         <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
         <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifiers.pas"/>

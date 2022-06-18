@@ -50,7 +50,7 @@ uses
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   RegKeyboards in '..\..\global\delphi\general\RegKeyboards.pas',
   HotkeyUtils in '..\..\global\delphi\general\HotkeyUtils.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',

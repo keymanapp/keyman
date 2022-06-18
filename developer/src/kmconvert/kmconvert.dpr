@@ -22,7 +22,7 @@ uses
   utilsystem in '..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   VKeys in '..\..\..\windows\src\global\delphi\general\VKeys.pas',
   WindowsLanguages in '..\..\..\windows\src\global\delphi\general\WindowsLanguages.pas',
-  GetOsVersion in '..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   CRC32 in '..\..\..\windows\src\global\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\windows\src\global\delphi\general\KeyNames.pas',
   utildir in '..\..\..\windows\src\global\delphi\general\utildir.pas',

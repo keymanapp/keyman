@@ -32,7 +32,7 @@ uses
   utilkeyboard in '..\..\..\windows\src\global\delphi\general\utilkeyboard.pas',
   unicode in '..\..\..\windows\src\global\delphi\general\unicode.pas',
   utilhttp in '..\..\..\windows\src\global\delphi\general\utilhttp.pas',
-  GetOsVersion in '..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   UfrmTike in '..\tike\main\UfrmTike.pas' {TikeForm: TTntForm},
   CompilePackageInstaller in '..\..\..\windows\src\global\delphi\general\CompilePackageInstaller.pas',
   UTikeDebugMode in '..\tike\main\UTikeDebugMode.pas',

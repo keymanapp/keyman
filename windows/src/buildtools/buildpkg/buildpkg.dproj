@@ -104,7 +104,7 @@
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\developer\src\tike\main\KeymanDeveloperOptions.pas"/>
         <DCCReference Include="..\..\..\..\developer\src\tike\main\RedistFiles.pas"/>

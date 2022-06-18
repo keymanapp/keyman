@@ -24,7 +24,7 @@ uses
   utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
   RegistryKeys in '..\..\..\global\delphi\general\RegistryKeys.pas',
   utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
-  GetOsVersion in '..\..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
   SetupStrings in '..\..\..\desktop\setup\SetupStrings.pas',
   kmpinffile in '..\..\..\global\delphi\general\kmpinffile.pas',

@@ -37,6 +37,7 @@ contains
   OnScreenKeyboard in 'OnScreenKeyboard.pas',
   VisualKeyboardParameters in '..\visualkeyboard\VisualKeyboardParameters.pas',
   CleartypeDrawCharacter in '..\general\CleartypeDrawCharacter.pas',
-  usp10 in '..\general\usp10.pas';
+  usp10 in '..\general\usp10.pas',
+  GetOsVersion in '..\general\GetOsVersion.pas';
 
 end.

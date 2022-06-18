@@ -13,7 +13,7 @@ uses
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   Sentry.Client in '..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas',

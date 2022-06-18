@@ -9,7 +9,7 @@ uses
   ExtShiftState in '..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\..\..\common\windows\delphi\general\CleartypeDrawCharacter.pas',
   usp10 in '..\..\..\..\common\windows\delphi\general\usp10.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
   ScanCodeMap in '..\..\global\delphi\general\ScanCodeMap.pas',

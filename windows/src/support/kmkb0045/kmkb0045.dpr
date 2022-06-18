@@ -3,7 +3,7 @@ program kmkb0045;
 uses
   Forms,
   kbdpatchmain in 'kbdpatchmain.pas' {Form1},
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas';
 
 {$R *.res}

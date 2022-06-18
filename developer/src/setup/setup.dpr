@@ -11,7 +11,7 @@ uses
   klog in '..\..\..\windows\src\global\delphi\general\klog.pas',
   Upload_Settings in '..\..\..\windows\src\global\delphi\general\Upload_Settings.pas',
   DebugPaths in '..\..\..\windows\src\global\delphi\general\DebugPaths.pas',
-  GetOsVersion in '..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   TntDialogHelp in 'TntDialogHelp.pas',
   httpuploader_messageprocessor_windows in 'httpuploader_messageprocessor_windows.pas',
   SetupForm in 'SetupForm.pas',

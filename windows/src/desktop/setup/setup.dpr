@@ -8,7 +8,7 @@ uses
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   Upload_Settings in '..\..\global\delphi\general\Upload_Settings.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
-  GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
+  GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   TntDialogHelp in 'TntDialogHelp.pas',
   SetupForm in 'SetupForm.pas',
   resource in 'resource.pas',
