@@ -126,7 +126,6 @@
         <DCCReference Include="general\usp10.pas"/>
         <DCCReference Include="vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
-        <DCCReference Include="comp\LeftTabbedPageControl.pas"/>
         <DCCReference Include="general\Glossary.pas"/>
         <DCCReference Include="general\RegistryKeys.pas"/>
         <DCCReference Include="general\KeymanVersion.pas"/>

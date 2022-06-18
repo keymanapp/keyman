@@ -186,7 +186,7 @@ uses
   Winapi.UxTheme,
   CheckboxGridHelper in '..\..\..\windows\src\global\delphi\general\CheckboxGridHelper.pas',
   UfrmAddKeyboardFeature in 'dialogs\UfrmAddKeyboardFeature.pas' {frmAddKeyboardFeature},
-  LeftTabbedPageControl in '..\..\..\windows\src\global\delphi\comp\LeftTabbedPageControl.pas',
+  LeftTabbedPageControl in '..\common\delphi\components\LeftTabbedPageControl.pas',
   UmodWebHttpServer in 'web\UmodWebHttpServer.pas' {modWebHttpServer: TDataModule},
   TempFileManager in '..\..\..\windows\src\global\delphi\general\TempFileManager.pas',
   UfrmKeymanWizard in 'child\UfrmKeymanWizard.pas' {frmKeymanWizard},

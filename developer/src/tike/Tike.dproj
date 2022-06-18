@@ -410,7 +410,7 @@
         <DCCReference Include="dialogs\UfrmAddKeyboardFeature.pas">
             <Form>frmAddKeyboardFeature</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\LeftTabbedPageControl.pas"/>
+        <DCCReference Include="..\common\delphi\components\LeftTabbedPageControl.pas"/>
         <DCCReference Include="web\UmodWebHttpServer.pas">
             <Form>modWebHttpServer</Form>
             <DesignClass>TDataModule</DesignClass>

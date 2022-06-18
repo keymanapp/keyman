@@ -58,7 +58,6 @@ contains
   usp10 in 'general\usp10.pas',
   ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',
   OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
-  LeftTabbedPageControl in 'comp\LeftTabbedPageControl.pas',
   Glossary in 'general\Glossary.pas',
   RegistryKeys in 'general\RegistryKeys.pas',
   KeymanVersion in 'general\KeymanVersion.pas';
