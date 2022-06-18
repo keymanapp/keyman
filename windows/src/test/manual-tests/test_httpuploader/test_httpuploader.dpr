@@ -22,10 +22,9 @@ uses
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   DCPbase64 in '..\..\global\delphi\crypt\DCPbase64.pas',
-  DCPblockciphers in '..\..\global\delphi\crypt\DCPblockciphers.pas',
   DCPconst in '..\..\global\delphi\crypt\DCPconst.pas',
   DCPcrypt2 in '..\..\global\delphi\crypt\DCPcrypt2.pas',
-  DCPrc4 in '..\..\global\delphi\crypt\Ciphers\DCPrc4.pas',
+  DCPrc4 in '..\..\global\delphi\crypt\DCPrc4.pas',
   UfrmOnlineUpdateSetup in '..\..\global\delphi\online\UfrmOnlineUpdateSetup.pas' {frmOnlineUpdateSetup};
 
 {$R *.res}

@@ -222,8 +222,7 @@
         <DCCReference Include="..\..\ext\dcpcrypt\DCPcrypt2.pas"/>
         <DCCReference Include="..\..\ext\dcpcrypt\DCPbase64.pas"/>
         <DCCReference Include="..\..\ext\dcpcrypt\DCPconst.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\Hashes\DCPsha256.pas"/>
-        <DCCReference Include="..\..\ext\dcpcrypt\Ciphers\DCPrc4.pas"/>
+        <DCCReference Include="..\..\ext\dcpcrypt\DCPrc4.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="keymanapi_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>

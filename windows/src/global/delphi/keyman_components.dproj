@@ -129,7 +129,7 @@
         <DCCReference Include="comp\KMDActions.pas"/>
         <DCCReference Include="general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="comp\OnScreenKeyboard.pas"/>
-        <DCCReference Include="..\..\developer\TIKE\actions\KMDActionInterfaces.pas"/>
+        <DCCReference Include="..\..\..\..\developer\src\tike\actions\KMDActionInterfaces.pas"/>
         <DCCReference Include="general\getosversion.pas"/>
         <DCCReference Include="comp\exImageList.pas"/>
         <DCCReference Include="comp\KeymanTextEditorRichEdit.pas"/>
@@ -143,7 +143,7 @@
         <DCCReference Include="general\KeymanVersion.pas"/>
         <DCCReference Include="comp\CloseButtonPageControl.pas"/>
         <DCCReference Include="comp\KeymanDeveloperDebuggerMemo.pas"/>
-        <DCCReference Include="..\..\developer\TIKE\main\TextFileFormat.pas"/>
+        <DCCReference Include="..\..\..\..\developer\src\tike\main\TextFileFormat.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

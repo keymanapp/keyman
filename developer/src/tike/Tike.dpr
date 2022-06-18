@@ -206,7 +206,6 @@ uses
   UfrmSendURLsToEmail in 'dialogs\UfrmSendURLsToEmail.pas' {frmSendURLsToEmail},
   MSXMLDomCreate in '..\..\..\windows\src\global\delphi\general\MSXMLDomCreate.pas',
   webhelp in 'help\webhelp.pas',
-  UMD5Hash in '..\..\..\windows\src\global\delphi\general\UMD5Hash.pas',
   Vcl.Themes,
   Vcl.Styles,
   UfrmMain in 'main\UfrmMain.pas' {frmKeymanDeveloper},

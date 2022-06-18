@@ -86,7 +86,6 @@ uses
   Keyman.Developer.System.Project.kpsProjectFileAction in '..\..\..\tike\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
   CompilePackageInstaller in '..\..\..\..\..\windows\src\global\delphi\general\CompilePackageInstaller.pas',
   utilhttp in '..\..\..\..\..\windows\src\global\delphi\general\utilhttp.pas',
-  UMD5Hash in '..\..\..\..\..\windows\src\global\delphi\general\UMD5Hash.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
   DUnitX.Loggers.TeamCity in '..\..\..\..\..\windows\src\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
