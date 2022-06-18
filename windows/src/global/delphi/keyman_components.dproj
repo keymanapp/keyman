@@ -112,7 +112,6 @@
         <DCCReference Include="comp\extshiftstate.pas"/>
         <DCCReference Include="general\scancodemap.pas"/>
         <DCCReference Include="general\unicode.pas"/>
-        <DCCReference Include="comp\MenuImgList.pas"/>
         <DCCReference Include="comp\KeyBtn.pas"/>
         <DCCReference Include="comp\PaintPanel.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>

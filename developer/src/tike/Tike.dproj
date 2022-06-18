@@ -145,7 +145,7 @@
         <DCCReference Include="child\UfrmEditor.pas">
             <Form>frmEditor</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\MenuImgList.pas"/>
+        <DCCReference Include="..\common\delphi\components\MenuImgList.pas"/>
         <DCCReference Include="dialogs\UfrmSelectKey.pas">
             <Form>frmSelectKey</Form>
         </DCCReference>

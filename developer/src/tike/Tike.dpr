@@ -20,7 +20,7 @@ uses
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',
   CRC32 in '..\..\..\windows\src\global\delphi\general\CRC32.pas',
   UfrmEditor in 'child\UfrmEditor.pas' {frmEditor},
-  MenuImgList in '..\..\..\windows\src\global\delphi\comp\MenuImgList.pas',
+  MenuImgList in '..\common\delphi\components\MenuImgList.pas',
   UfrmSelectKey in 'dialogs\UfrmSelectKey.pas' {frmSelectKey},
   keybtn in '..\..\..\windows\src\global\delphi\comp\keybtn.pas',
   ttinfo in '..\..\..\windows\src\global\delphi\general\ttinfo.pas',

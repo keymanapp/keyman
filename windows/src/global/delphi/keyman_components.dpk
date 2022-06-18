@@ -44,7 +44,6 @@ contains
   extshiftstate in 'comp\extshiftstate.pas',
   scancodemap in 'general\scancodemap.pas',
   unicode in 'general\unicode.pas',
-  MenuImgList in 'comp\MenuImgList.pas',
   KeyBtn in 'comp\KeyBtn.pas',
   PaintPanel in 'comp\PaintPanel.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
