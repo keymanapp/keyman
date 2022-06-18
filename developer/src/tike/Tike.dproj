@@ -344,7 +344,7 @@
             <Form>Form1</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeyChars.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\usp10.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\usp10.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilmsxml.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>

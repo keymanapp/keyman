@@ -155,7 +155,7 @@ uses
   GlobalProxySettings in '..\..\..\windows\src\global\delphi\general\GlobalProxySettings.pas',
   UfrmFontHelper in 'dialogs\UfrmFontHelper.pas' {Form1},
   VKeyChars in '..\..\..\windows\src\global\delphi\general\VKeyChars.pas',
-  usp10 in '..\..\..\windows\src\global\delphi\general\usp10.pas',
+  usp10 in '..\..\..\common\windows\delphi\general\usp10.pas',
   UserMessages in '..\..\..\windows\src\global\delphi\general\UserMessages.pas',
   utilmsxml in '..\..\..\windows\src\global\delphi\general\utilmsxml.pas',
   ErrorControlledRegistry in '..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas',

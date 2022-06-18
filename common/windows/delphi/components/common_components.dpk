@@ -35,6 +35,8 @@ contains
   FixedTrackbar in 'FixedTrackbar.pas',
   keybtn in 'keybtn.pas',
   OnScreenKeyboard in 'OnScreenKeyboard.pas',
-  VisualKeyboardParameters in '..\visualkeyboard\VisualKeyboardParameters.pas';
+  VisualKeyboardParameters in '..\visualkeyboard\VisualKeyboardParameters.pas',
+  CleartypeDrawCharacter in '..\general\CleartypeDrawCharacter.pas',
+  usp10 in '..\general\usp10.pas';
 
 end.

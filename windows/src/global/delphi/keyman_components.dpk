@@ -46,7 +46,6 @@ contains
   getosversion in 'general\getosversion.pas',
   exImageList in 'comp\exImageList.pas',
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
-  usp10 in 'general\usp10.pas',
   ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',
   OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   Glossary in 'general\Glossary.pas',

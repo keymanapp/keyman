@@ -188,7 +188,7 @@
         <DCCReference Include="..\..\global\delphi\general\WideStringClass.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\usp10.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\usp10.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="UfrmKeymanMenu.pas">
             <Form>frmKeymanMenu</Form>

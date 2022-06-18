@@ -72,7 +72,7 @@ uses
   WideStringClass in '..\..\global\delphi\general\WideStringClass.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
-  usp10 in '..\..\global\delphi\general\usp10.pas',
+  usp10 in '..\..\..\..\common\windows\delphi\general\usp10.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   UfrmKeymanMenu in 'UfrmKeymanMenu.pas' {frmKeymanMenu},
   UILanguages in '..\..\desktop\kmshell\util\UILanguages.pas',
