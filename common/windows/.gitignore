@@ -1,3 +1,5 @@
 /bin/
 delphi/tools/*/bin/
 delphi/tools/*/obj/
+delphi/**/*.local
+delphi/**/*.~*
