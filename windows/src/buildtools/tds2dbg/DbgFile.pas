@@ -204,10 +204,10 @@ type
 implementation
 
 uses
+  System.RegularExpressions,
   Winapi.ActiveX,
   Winapi.ShlObj,
   AnsiStrings,
-  RegExpr,
   Unicode;
 
 { TDbgFile }
@@ -255,26 +255,23 @@ end;
 procedure TDbgFile.LoadDprPaths(FDprFileName: string);   // I8274
 var
   i: Integer;
-  re: TRegExpr;
+  re: TRegEx;
+  m: TMatch;
 begin
-  re := TRegExpr.Create;
+  re := TRegEx.Create('^\s*[a-zA-Z0-9_]+ in ''(.+)''');
+  with TStringList.Create do
   try
-    re.Expression := '^\s*[a-zA-Z0-9_]+ in ''(.+)''';
-    with TStringList.Create do
-    try
-      LoadFromFile(FDprFileName);
-      for i := 0 to Count - 1 do
+    LoadFromFile(FDprFileName);
+    for i := 0 to Count - 1 do
+    begin
+      m := re.Match(Strings[i]);
+      if m.Success then
       begin
-        if re.Exec(Strings[i]) then
-        begin
-          FDprPaths.Add(ExtractFileName(re.Match[1])+'='+re.Match[1]);
-        end;
+        FDprPaths.Add(ExtractFileName(m.Groups[1].Value)+'='+m.Groups[1].Value);
       end;
-    finally
-      Free;
     end;
   finally
-    re.Free;
+    Free;
   end;
 end;
 

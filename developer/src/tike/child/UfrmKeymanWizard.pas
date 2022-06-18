@@ -592,7 +592,6 @@ uses
   Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.UfrmMessageDlgWithSave,
-  RegExpr,
   ErrorControlledRegistry,
   RedistFiles,
   RegistryKeys,
