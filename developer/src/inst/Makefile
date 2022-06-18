@@ -2,7 +2,7 @@
 # Keyman Developer installation builder Makefile
 #
 
-!include ..\..\Defines.mak
+!include ..\Defines.mak
 
 # ----------------------------------------------------------------------
 
@@ -12,8 +12,8 @@ setup: pull-server
 #
 # Prepare file version information
 #
-    cd $(ROOT)\src\developer\inst
-    $(MKVER_U) download.in download.mak
+    cd $(DEVELOPER_ROOT)\src\inst
+    $(MKVER_U) download.in.mak download.mak
 
 #
 # Build the installation archive
@@ -33,7 +33,7 @@ setup: pull-server
 # Copy the installation archive
 #
 
-    cd $(ROOT)\src\developer\inst
+    cd $(DEVELOPER_ROOT)\src\inst
     $(MAKE) -fdownload.mak
 
 pull-server:
@@ -47,7 +47,7 @@ pull-server:
 # GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file
 # "c:\Program Files\Git\etc\profile" -l
 #
-    cd $(ROOT)\..\developer\server
+    cd $(DEVELOPER_ROOT)\server
 
 !ifdef GIT_BASH_FOR_KEYMAN
     $(GIT_BASH_FOR_KEYMAN) build.sh --production --test
@@ -65,7 +65,7 @@ wrap-symbols:
     @rem
 
 clean:
-    cd $(ROOT)\src\developer\inst
+    cd $(DEVELOPER_ROOT)\src\inst
     -del /Q download.mak
     -del /Q *.msi
     -del /Q *.msp
@@ -82,8 +82,8 @@ clean:
     -del /Q kmlmc.wxs
 
 test-releaseexists:
-    cd $(ROOT)\src\developer\inst
-    $(MKVER_U) download.in download.mak
+    cd $(DEVELOPER_ROOT)\src\inst
+    $(MKVER_U) download.in.mak download.mak
 
     $(MAKE) -fdownload.mak test-releaseexists
 
@@ -92,7 +92,7 @@ install:
 
 # ----------------------------------------------------------------------
 
-!include ..\..\Target.mak
+!include ..\Target.mak
 
 # ----------------------------------------------------------------------
 # EOF

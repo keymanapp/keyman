@@ -1,4 +1,4 @@
-!include ..\..\Defines.mak
+!include ..\Defines.mak
 
 ##
 ## In this file, $Version, $VersionWin, and $VersionRelease will be replaced by mkver. These are not
@@ -19,20 +19,20 @@ KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build\templates
 KEYMAN_WIX_TEMP_MODELCOMPILER=$(TEMP)\keyman_wix_build\ModelCompiler
 KEYMAN_WIX_TEMP_SERVER=$(TEMP)\keyman_wix_build\Server
 
-KEYMAN_WIX_KMDEV_SERVER=$(KEYMAN_ROOT)\developer\server\build
-KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
+KEYMAN_WIX_KMDEV_SERVER=$(DEVELOPER_ROOT)\server\build
+KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(DEVELOPER_ROOT)\src\kmconvert\data
 
 copykmdev: makeinstaller
-    -mkdir $(ROOT)\release\$Version
-    copy /Y $(ROOT)\src\developer\inst\keymandeveloper.msi $(ROOT)\release\$Version\keymandeveloper.msi
-    copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$Version.exe $(ROOT)\release\$Version\keymandeveloper-$Version.exe
+    -mkdir $(DEVELOPER_ROOT)\release\$Version
+    copy /Y $(DEVELOPER_ROOT)\src\inst\keymandeveloper.msi $(DEVELOPER_ROOT)\release\$Version\keymandeveloper.msi
+    copy /Y $(DEVELOPER_ROOT)\src\inst\keymandeveloper-$Version.exe $(DEVELOPER_ROOT)\release\$Version\keymandeveloper-$Version.exe
 
 test-releaseexists:
-    if exist $(ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update VERSION.md and try again & exit 1
+    if exist $(DEVELOPER_ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update VERSION.md and try again & exit 1
 
 candle: heat-cef heat-xml heat-templates heat-model-compiler heat-server
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease kmdev.wxs
-    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dXmlSourceDir=$(DEVELOPER_ROOT)\src\tike\xml xml.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
@@ -44,7 +44,7 @@ heat-xml:
 # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
     -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)
     mkdir $(KEYMAN_WIX_TEMP_XML)
-    xcopy $(ROOT)\src\developer\TIKE\xml\* $(KEYMAN_WIX_TEMP_XML)\ /s
+    xcopy $(DEVELOPER_ROOT)\src\tike\xml\* $(KEYMAN_WIX_TEMP_XML)\ /s
     -del /f /s /q $(KEYMAN_WIX_TEMP_XML)\Thumbs.db
     -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)\app\node_modules
     -for /f %i in ('dir /a:d /s /b $(KEYMAN_WIX_TEMP_XML)\.vs') do rd /s /q %i
@@ -92,7 +92,7 @@ heat-model-compiler:
 !endif
 
 # Build the .wxs file
-    cd $(ROOT)\src\developer\inst
+    cd $(DEVELOPER_ROOT)\src\inst
     $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_MODELCOMPILER) -o kmlmc.wxs -ag -cg ModelCompiler -dr INSTALLDIR -var var.ModelCompilerSourceDir -wx -nologo
 
 clean-heat-model-compiler:
@@ -101,11 +101,11 @@ clean-heat-model-compiler:
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
 
 makeinstaller:
-    cd $(ROOT)\src\developer\inst
+    cd $(DEVELOPER_ROOT)\src\inst
     echo [Setup] > setup.inf
     echo Version=$Version >> setup.inf
     echo MSIFileName=keymandeveloper.msi >> setup.inf
     echo Title=Keyman Developer $VersionRelease >>setup.inf
     $(WZZIP) setup.zip keymandeveloper.msi setup.inf
-    copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$Version.exe
+    copy /b $(DEVELOPER_PROGRAM)\setup.exe + setup.zip keymandeveloper-$Version.exe
     $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$Version.exe

@@ -127,7 +127,7 @@ function GetRedistProjectTemplatePath: string;
 var
   root: string;
 const
-  DevProjectTemplatePath = 'windows\src\developer\kmconvert\data\';
+  DevProjectTemplatePath = 'developer\src\kmconvert\data\';
 begin
   if TKeymanPaths.RunningFromSource(root)
     then Result := root + DevProjectTemplatePath
@@ -139,7 +139,7 @@ function GetDebugKMCmpDllPath: string;
 var
   root: string;
 const
-  DevCompilerPath = 'windows\bin\developer';
+  DevCompilerPath = 'developer\bin';
 begin
   if TKeymanPaths.RunningFromSource(root) and
     FileExists(root + DevCompilerPath + '\kmcmpdll.dll')
@@ -152,7 +152,7 @@ function GetXMLTemplatePath: string;
 var
   root: string;
 const
-  DevTemplatePath = 'windows\src\developer\tike\xml\';
+  DevTemplatePath = 'developer\src\tike\xml\';
 begin
   if TKeymanPaths.RunningFromSource(root)
     then Result := root + DevTemplatePath

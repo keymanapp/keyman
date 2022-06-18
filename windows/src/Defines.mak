@@ -9,7 +9,6 @@ KEYMAN_ROOT=c:\keyman
 !ENDIF
 
 ROOT=$(KEYMAN_ROOT)\windows
-KEYMAN_MODELCOMPILER_ROOT=$(KEYMAN_ROOT)\developer\kmlmc
 
 EXT=$(ROOT)\src\ext
 

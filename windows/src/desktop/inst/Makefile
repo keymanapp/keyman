@@ -65,6 +65,12 @@ check-unicodedata:
     cd $(ROOT)\src\global\inst
     $(MAKE)
 
+test-releaseexists:
+    cd $(ROOT)\src\desktop\inst
+    $(MKVER_U) download.in download.mak
+
+    $(MAKE) -fdownload.mak test-releaseexists
+
 # ----------------------------------------------------------------------
 
 !include ..\..\Target.mak

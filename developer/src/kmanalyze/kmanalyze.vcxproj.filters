@@ -18,13 +18,13 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymansentry.h">
+    <ClInclude Include="..\..\..\windows\src\global\inc\keymansentry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ext\sentry\sentry.h">
+    <ClInclude Include="..\..\..\windows\src\ext\sentry\sentry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keyman64.h">
+    <ClInclude Include="..\..\..\windows\src\global\inc\keyman64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,13 +35,13 @@
     <ClCompile Include="kmanalyze.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\xstring.cpp">
+    <ClCompile Include="..\..\..\windows\src\global\vc\xstring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\crc32.cpp">
+    <ClCompile Include="..\..\..\windows\src\global\vc\crc32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\keymansentry.cpp">
+    <ClCompile Include="..\..\..\windows\src\global\vc\keymansentry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

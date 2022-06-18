@@ -61,7 +61,7 @@ contains
   KMDActions in 'comp\KMDActions.pas',
   CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
   OnScreenKeyboard in 'comp\OnScreenKeyboard.pas',
-  KMDActionInterfaces in '..\..\developer\TIKE\actions\KMDActionInterfaces.pas',
+  KMDActionInterfaces in '..\..\..\..\developer\src\tike\actions\KMDActionInterfaces.pas',
   getosversion in 'general\getosversion.pas',
   exImageList in 'comp\exImageList.pas',
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
@@ -75,7 +75,7 @@ contains
   KeymanVersion in 'general\KeymanVersion.pas',
   CloseButtonPageControl in 'comp\CloseButtonPageControl.pas',
   KeymanDeveloperDebuggerMemo in 'comp\KeymanDeveloperDebuggerMemo.pas',
-  TextFileFormat in '..\..\developer\TIKE\main\TextFileFormat.pas',
+  TextFileFormat in '..\..\..\..\developer\src\tike\main\TextFileFormat.pas',
   Browse4Folder in '..\..\ext\browse4folder\Browse4Folder.pas';
 
 end.

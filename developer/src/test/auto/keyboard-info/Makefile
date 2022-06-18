@@ -1,5 +1,5 @@
 #
-# Test that kmcomp passes various compile tests
+# Test that .keyboard_info validation works correctly
 #
 # Uses kmcomp.exe rather than attempting to run a separate test
 #
@@ -7,15 +7,12 @@
 !include ..\..\..\Defines.mak
 
 test: build
-    test.bat -c "$(PROGRAM)\developer\kmcomp.exe"
+    test.bat "$(DEVELOPER_PROGRAM)\kmcomp.exe"
 
 build:
     rem Nothing to do
 
 clean: def-clean
-    -del *.kmx
-    -del *.js
-    -del *.kmp
-    -del *.kpj.user
+    -rd /s/q Win32
 
 !include ..\..\..\Target.mak

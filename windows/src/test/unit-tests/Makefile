@@ -4,17 +4,22 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler kmcomp-x64-structures \
-        androidstringtokeymanlocalestring \
-        keyboard-info keyboard-js-info keyboard-package-versions \
-        kmx-file-languages package-info jsonutil windows-setup \
-        ui-language-manager standards-data compile-supplementary-support \
-        kmconvert
+TARGETS=windows-tests shared-tests
 
 test:
     $(MAKE) "TARGET=test" $(TARGETS)
 
 !include ..\..\Header.mak
+
+# ----------------------------------------------------------------------
+
+# TODO: move shared-tests to /common
+shared-tests: androidstringtokeymanlocalestring keyboard-js-info \
+        kmx-file-languages package-info jsonutil \
+        standards-data
+
+windows-tests: group-helper-rsp19902 shared-data \
+        windows-setup ui-language-manager
 
 # ----------------------------------------------------------------------
 
@@ -26,37 +31,8 @@ group-helper-rsp19902: .virtual
     cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902
     $(MAKE) $(TARGET)
 
-kmcomp: .virtual
-    cd $(ROOT)\src\test\unit-tests\kmcomp
-    $(MAKE) $(TARGET)
-
-kmconvert: .virtual
-    cd $(ROOT)\src\test\unit-tests\kmconvert
-    $(MAKE) $(TARGET)
-
 shared-data: .virtual
     cd $(ROOT)\src\test\unit-tests\shared-data
-    $(MAKE) $(TARGET)
-
-lexical-model-compiler: .virtual
-    cd $(KEYMAN_MODELCOMPILER_ROOT)
-
-!ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh -test
-!else
-    start /wait ./build.sh -test
-!endif
-
-kmcomp-x64-structures: .virtual
-	cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902
-	$(MAKE) $(TARGET)
-
-keyboard-info: .virtual
-    cd $(ROOT)\src\test\unit-tests\keyboard-info
-    $(MAKE) $(TARGET)
-
-keyboard-package-versions: .virtual
-    cd $(ROOT)\src\test\unit-tests\keyboard-package-versions
     $(MAKE) $(TARGET)
 
 keyboard-js-info: .virtual
@@ -85,10 +61,6 @@ ui-language-manager: .virtual
 
 standards-data: .virtual
     cd $(ROOT)\src\test\unit-tests\standards-data
-    $(MAKE) $(TARGET)
-
-compile-supplementary-support: .virtual
-    cd $(ROOT)\src\test\unit-tests\compile-supplementary-support
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------

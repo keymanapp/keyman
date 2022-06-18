@@ -2,7 +2,7 @@
 # Kmcomp Makefile
 #
 
-!include ..\..\Defines.mak
+!include ..\Defines.mak
 
 TARGET_BASE=kmcomp
 TARGET_EXT=exe
@@ -13,8 +13,8 @@ build: version.res manifest.res dirs icons
 
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmcomp.exe -dpr kmcomp.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\kmcomp.exe
-    $(COPY) $(WIN32_TARGET_PATH)\kmcomp.exe $(PROGRAM)\developer
-    if exist $(WIN32_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN32_TARGET_PATH)\kmcomp.dbg $(DEBUGPATH)\developer
+    $(COPY) $(WIN32_TARGET_PATH)\kmcomp.exe $(DEVELOPER_PROGRAM)
+    if exist $(WIN32_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN32_TARGET_PATH)\kmcomp.dbg $(DEVELOPER_DEBUGPATH)
 
     $(DELPHI_MSBUILD) kmcomp.dproj "/p:Platform=Win64"
 
@@ -26,8 +26,8 @@ build: version.res manifest.res dirs icons
     ren $(WIN64_TARGET_PATH)\kmcomp.map kmcomp.x64.map
 
 #   $(SENTRYTOOL_DELPHIPREP) $(WIN64_TARGET_PATH)\kmcomp.x64.exe -dpr kmcomp.dpr
-    $(COPY) $(WIN64_TARGET_PATH)\kmcomp.x64.exe $(PROGRAM)\developer\kmcomp.x64.exe
-    if exist $(WIN64_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN64_TARGET_PATH)\kmcomp.dbg $(DEBUGPATH)\developer\kmcomp.x64.dbg
+    $(COPY) $(WIN64_TARGET_PATH)\kmcomp.x64.exe $(DEVELOPER_PROGRAM)\kmcomp.x64.exe
+    if exist $(WIN64_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN64_TARGET_PATH)\kmcomp.dbg $(DEVELOPER_DEBUGPATH)\kmcomp.x64.dbg
 
 icons:
     rc icons.rc
@@ -36,22 +36,22 @@ clean: def-clean
     if exist icons.res del icons.res
 
 signcode:
-    $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(PROGRAM)\developer\kmcomp.exe
-    $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(PROGRAM)\developer\kmcomp.x64.exe
+    $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(DEVELOPER_PROGRAM)\kmcomp.exe
+    $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(DEVELOPER_PROGRAM)\kmcomp.x64.exe
 
 wrap-symbols:
-    $(SYMSTORE) $(PROGRAM)\developer\kmcomp.exe /t keyman-developer
-    $(SYMSTORE) $(PROGRAM)\developer\kmcomp.x64.exe /t keyman-developer
-    $(SYMSTORE) $(DEBUGPATH)\developer\kmcomp.dbg /t keyman-developer
-#TODO: $(SYMSTORE) $(DEBUGPATH)\developer\kmcomp.x64.dbg /t keyman-developer
+    $(SYMSTORE) $(DEVELOPER_PROGRAM)\kmcomp.exe /t keyman-developer
+    $(SYMSTORE) $(DEVELOPER_PROGRAM)\kmcomp.x64.exe /t keyman-developer
+    $(SYMSTORE) $(DEVELOPER_DEBUGPATH)\kmcomp.dbg /t keyman-developer
+#TODO: $(SYMSTORE) $(DEVELOPER_DEBUGPATH)\kmcomp.x64.dbg /t keyman-developer
 
 test-manifest:
 # test that (a) linked manifest exists and correct
-    $(MT) -nologo -inputresource:$(PROGRAM)\developer\kmcomp.exe -validate_manifest
-    $(MT) -nologo -inputresource:$(PROGRAM)\developer\kmcomp.x64.exe -validate_manifest
+    $(MT) -nologo -inputresource:$(DEVELOPER_PROGRAM)\kmcomp.exe -validate_manifest
+    $(MT) -nologo -inputresource:$(DEVELOPER_PROGRAM)\kmcomp.x64.exe -validate_manifest
 
 install:
-    $(COPY) $(PROGRAM)\developer\kmcomp.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmcomp.exe"
-    $(COPY) $(PROGRAM)\developer\kmcomp.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmcomp.x64.exe"
+    $(COPY) $(DEVELOPER_PROGRAM)\kmcomp.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmcomp.exe"
+    $(COPY) $(DEVELOPER_PROGRAM)\kmcomp.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmcomp.x64.exe"
 
-!include ..\..\Target.mak
+!include ..\Target.mak

@@ -15,7 +15,7 @@ if "%1"=="-c" (
   shift
 )
 if "%1"=="" (
-  set compiler=..\..\..\..\bin\developer\kmcomp.exe
+  set compiler=..\..\..\..\bin\kmcomp.exe
 ) else (
   set compiler=%1
 )
@@ -34,7 +34,7 @@ goto :eof
 
 :should-pass
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -s -vs -schema-path ..\..\..\global\inst\data\keyboard_info "%2"
+"%compiler%" -s -vs -schema-path "%KEYMAN_ROOT%\windows\src\global\inst\data\keyboard_info" "%2"
 if %ERRORLEVEL% EQU 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0
@@ -44,7 +44,7 @@ exit /b 1
 
 :should-fail
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -s -vs -schema-path ..\..\..\global\inst\data\keyboard_info "%2"
+"%compiler%" -s -vs -schema-path "%KEYMAN_ROOT%\windows\src\global\inst\data\keyboard_info" "%2"
 if %ERRORLEVEL% GTR 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0
@@ -55,4 +55,4 @@ exit /b 1
 :usage
 echo Usage: test.bat [-c] [path-to-kmcomp.exe]
 echo -c will add colour via ANSI escapes (don't use in redirected scripts)
-echo path-to-kmcomp.exe, if not included will default to ..\..\..\..\bin\developer\kmcomp.exe
+echo path-to-kmcomp.exe, if not included will default to ..\..\..\..\bin\kmcomp.exe

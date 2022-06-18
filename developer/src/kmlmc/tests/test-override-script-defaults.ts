@@ -1,6 +1,6 @@
 var assert = require('chai').assert;
 
-const defaultWordBreaker = require('../../../common/models/wordbreakers/build').wordBreakers['default'];
+const defaultWordBreaker = require('../../../../common/models/wordbreakers/build').wordBreakers['default'];
 import {decorateWithScriptOverrides} from '../dist/lexical-model-compiler/script-overrides-decorator';
 
 const THIN_SPACE = "\u2009";

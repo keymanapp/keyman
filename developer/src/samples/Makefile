@@ -3,13 +3,13 @@
 #
 
 TARGETS=imsample
-!include ..\..\Header.mak
+!include ..\Header.mak
 
 imsample: .virtual
-    cd $(ROOT)\src\developer\samples\imsample
+    cd $(DEVELOPER_ROOT)\src\samples\imsample
     $(MAKE) $(TARGET)
 
-!include ..\..\Target.mak
+!include ..\Target.mak
 
 # ----------------------------------------------------------------------
 # EOF
