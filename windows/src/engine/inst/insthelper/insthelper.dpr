@@ -15,7 +15,7 @@ library insthelper;
 uses
   SysUtils,
   Classes,
-  RegistryKeys in '..\..\..\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   klog in '..\..\..\global\delphi\general\klog.pas',
   CRC32 in '..\..\..\global\delphi\general\CRC32.pas',
   VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
@@ -29,7 +29,7 @@ uses
   Keyman.System.Security in '..\..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
   DebugPaths in '..\..\..\global\delphi\general\DebugPaths.pas',
-  ErrorControlledRegistry in '..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
+  ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
   utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',

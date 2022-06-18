@@ -41,13 +41,8 @@ requires
   xmlrtl;
 
 contains
-  scancodemap in 'general\scancodemap.pas',
   exImageList in 'comp\exImageList.pas',
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
-  ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',
-  OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
-  Glossary in 'general\Glossary.pas',
-  RegistryKeys in 'general\RegistryKeys.pas',
   KeymanVersion in 'general\KeymanVersion.pas';
 
 end.

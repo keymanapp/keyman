@@ -3,7 +3,7 @@ program kmconfig;
 uses
   System.SysUtils,
   Keyman.System.SettingsManager in '..\..\global\delphi\general\Keyman.System.SettingsManager.pas',
-  RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   Keyman.System.Settings in '..\..\global\delphi\general\Keyman.System.Settings.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
@@ -14,7 +14,7 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
-  ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
+  ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   Keyman.System.KMConfigMain in 'Keyman.System.KMConfigMain.pas',
   Keyman.System.SettingsManagerFile in '..\..\global\delphi\general\Keyman.System.SettingsManagerFile.pas';
 

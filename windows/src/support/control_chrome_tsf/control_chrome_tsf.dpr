@@ -4,7 +4,7 @@ uses
   System.SysUtils,
   Winapi.Windows,
   Keyman.System.SettingsManager in '..\..\global\delphi\general\Keyman.System.SettingsManager.pas',
-  RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   Keyman.System.Settings in '..\..\global\delphi\general\Keyman.System.Settings.pas';
 

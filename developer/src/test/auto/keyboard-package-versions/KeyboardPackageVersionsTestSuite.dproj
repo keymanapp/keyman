@@ -106,7 +106,7 @@
         <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\VersionInfo.pas"/>
@@ -117,7 +117,7 @@
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\VKeys.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\kmxfile.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\KeyNames.pas"/>

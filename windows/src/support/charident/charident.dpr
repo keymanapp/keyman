@@ -11,7 +11,7 @@ uses
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   urlutil in '..\..\global\delphi\general\urlutil.pas',
-  ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
+  ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   UfrmRenderingTestCases in 'UfrmRenderingTestCases.pas' {frmRenderingTestCases},
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   pngextra in '..\..\..\cmpsrc\PngDelphi\pngextra.pas',

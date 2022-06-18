@@ -6,7 +6,7 @@ uses
   SysUtils,
   klog in '..\..\..\..\..\windows\src\global\delphi\general\klog.pas',
   VersionInfo in '..\..\..\..\..\windows\src\global\delphi\general\VersionInfo.pas',
-  ErrorControlledRegistry in '..\..\..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas',
+  ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas';
 
 begin

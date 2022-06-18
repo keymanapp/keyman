@@ -132,7 +132,7 @@
         <DCCReference Include="dialogs\UfrmAboutTike.pas">
             <Form>frmAboutTike</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\compile.pas"/>
         <DCCReference Include="main\KeymanDeveloperOptions.pas"/>
@@ -210,7 +210,7 @@
         <DCCReference Include="dialogs\UfrmVisualKeyboardImportKMX.pas">
             <Form>frmVisualKeyboardImportKMX</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\ScanCodeMap.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\ScanCodeMap.pas"/>
         <DCCReference Include="dialogs\UfrmRegressionTestFailure.pas">
             <Form>frmRegressionTestFailure</Form>
         </DCCReference>
@@ -347,7 +347,7 @@
         <DCCReference Include="..\..\..\common\windows\delphi\general\usp10.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilmsxml.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="main\UframeBitmapEditor.pas">
             <Form>frameBitmapEditor</Form>
             <DesignClass>TFrame</DesignClass>
@@ -394,7 +394,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\common\delphi\components\CaptionPanel.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Glossary.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="oskbuilder\UframeTouchLayoutBuilder.pas">
             <Form>frameTouchLayoutBuilder</Form>
         </DCCReference>

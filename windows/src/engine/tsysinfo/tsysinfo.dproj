@@ -162,7 +162,7 @@
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilkeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
@@ -176,7 +176,7 @@
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
@@ -196,7 +196,7 @@
         </DCCReference>
         <DCCReference Include="UframeAttachedFiles.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>

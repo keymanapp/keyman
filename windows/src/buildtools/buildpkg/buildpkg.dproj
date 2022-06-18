@@ -105,7 +105,7 @@
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\developer\src\tike\main\KeymanDeveloperOptions.pas"/>
         <DCCReference Include="..\..\..\..\developer\src\tike\main\RedistFiles.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
@@ -125,10 +125,10 @@
         <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="..\..\..\..\developer\src\tike\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>

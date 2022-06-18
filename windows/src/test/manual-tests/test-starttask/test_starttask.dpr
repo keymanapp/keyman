@@ -8,9 +8,9 @@ uses
   System.SysUtils,
   Keyman.System.KeymanStartTask in '..\..\desktop\kmshell\util\Keyman.System.KeymanStartTask.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
-  RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas',
-  ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
+  ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   Keyman.System.Test.KeymanStartTaskTest in 'Keyman.System.Test.KeymanStartTaskTest.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas';

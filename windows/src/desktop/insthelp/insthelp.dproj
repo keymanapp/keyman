@@ -93,7 +93,7 @@
         </DelphiCompile>
         <DCCReference Include="main.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="Keyman.System.InstHelp.KeymanStartTaskUninstall.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\TaskScheduler_TLB.pas"/>

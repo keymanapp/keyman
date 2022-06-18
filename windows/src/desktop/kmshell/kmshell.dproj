@@ -111,7 +111,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="main\initprog.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="main\UfrmMain.pas">
             <Form>frmMain</Form>
         </DCCReference>
@@ -229,13 +229,13 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="main\UImportOlderVersionSettings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanMutex.pas"/>
-        <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\MSXMLDomCreate.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BaseKeyboards.pas"/>
         <DCCReference Include="..\..\engine\keyman\langswitch\LoadIndirectStringUnit.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="install\UfrmInstallKeyboardLanguage.pas">
             <Form>frmInstallKeyboardLanguage</Form>
         </DCCReference>

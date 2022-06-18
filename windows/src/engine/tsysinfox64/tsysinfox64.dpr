@@ -12,8 +12,8 @@ uses
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
-  ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
-  RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
+  ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
+  RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas';

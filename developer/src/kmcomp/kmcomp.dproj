@@ -154,7 +154,7 @@
         <DCCReference Include="main.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\compile.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="kccompilepackage.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompilePackage.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CRC32.pas"/>
@@ -196,11 +196,11 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\GlobalProxySettings.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilmsxml.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfile.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Glossary.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompileErrorCodes.pas"/>
         <DCCReference Include="..\TIKE\oskbuilder\TouchLayout.pas"/>

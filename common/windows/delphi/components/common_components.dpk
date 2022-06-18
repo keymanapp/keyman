@@ -40,6 +40,9 @@ contains
   usp10 in '..\general\usp10.pas',
   GetOsVersion in '..\general\GetOsVersion.pas',
   Unicode in '..\general\Unicode.pas',
-  OnScreenKeyboardData in '..\visualkeyboard\OnScreenKeyboardData.pas';
+  OnScreenKeyboardData in '..\visualkeyboard\OnScreenKeyboardData.pas',
+  Glossary in '..\general\Glossary.pas',
+  RegistryKeys in '..\general\RegistryKeys.pas',
+  ErrorControlledRegistry in '..\vcl\ErrorControlledRegistry.pas';
 
 end.

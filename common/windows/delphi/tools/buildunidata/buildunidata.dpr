@@ -14,9 +14,9 @@ uses
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
-  RegistryKeys in '..\..\..\..\..\windows\src\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   JRO_TLB in '..\..\..\..\..\common\windows\delphi\tlb\JRO_TLB.pas',
-  ErrorControlledRegistry in '..\..\..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas',
+  ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
   utildir in '..\..\..\..\..\windows\src\global\delphi\general\utildir.pas';

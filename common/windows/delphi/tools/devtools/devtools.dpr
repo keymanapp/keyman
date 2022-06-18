@@ -11,7 +11,7 @@ uses
   DevUtils in 'DevUtils.pas',
   DevReleaseBuildCheck in 'DevReleaseBuildCheck.pas',
   DevCheckGitStatus in 'DevCheckGitStatus.pas',
-  RegistryKeys in '..\..\..\..\..\windows\src\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
   utilsystem in '..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   utilexecute in '..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas',

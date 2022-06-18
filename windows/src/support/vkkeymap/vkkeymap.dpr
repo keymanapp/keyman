@@ -11,10 +11,10 @@ uses
   usp10 in '..\..\..\..\common\windows\delphi\general\usp10.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
-  Glossary in '..\..\global\delphi\general\Glossary.pas',
-  ScanCodeMap in '..\..\global\delphi\general\ScanCodeMap.pas',
-  ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
-  RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
+  Glossary in '..\..\..\..\common\windows\delphi\general\Glossary.pas',
+  ScanCodeMap in '..\..\..\..\common\windows\delphi\general\ScanCodeMap.pas',
+  ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
+  RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas';
 

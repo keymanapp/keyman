@@ -17,7 +17,7 @@ uses
   httpuploader in 'httpuploader.pas',
   Upload_Settings in '..\..\global\delphi\general\Upload_Settings.pas',
   urlutil in '..\..\global\delphi\general\urlutil.pas',
-  RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',

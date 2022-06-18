@@ -105,7 +105,7 @@
         <DCCReference Include="CommonControls.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\httpuploader.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Upload_Settings.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\DebugPaths.pas"/>
@@ -118,7 +118,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>

@@ -112,7 +112,7 @@
         </DelphiCompile>
         <DCCReference Include="Keyman.Developer.System.KeymanConvertMain.pas"/>
         <DCCReference Include="Keyman.Developer.System.ImportWindowsKeyboard.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="Keyman.Developer.System.KeyboardProjectTemplate.pas"/>
@@ -156,7 +156,7 @@
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectSaver.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectFileType.pas"/>
         <DCCReference Include="..\TIKE\main\mrulist.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\TIKE\main\RedistFiles.pas"/>
@@ -175,7 +175,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="Keyman.Developer.System.KMConvertParameters.pas"/>
         <DCCReference Include="Keyman.Developer.System.ImportKeyboardDLL.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\ScanCodeMap.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\ScanCodeMap.pas"/>
         <DCCReference Include="Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="..\TIKE\oskbuilder\TouchLayout.pas"/>

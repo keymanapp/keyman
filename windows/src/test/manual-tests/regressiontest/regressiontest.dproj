@@ -100,7 +100,7 @@
 				<Form>frmRegressionTests</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
 			<DCCReference Include="..\..\global\delphi\vcl\Registry.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\ResourceStrings.pas"/>
 			<DCCReference Include="keymanstrings.pas"/>
@@ -109,7 +109,7 @@
 			<DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
 			<DCCReference Include="..\..\developer\TIKE\main\RedistFiles.pas"/>
-			<DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\utilexception.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>

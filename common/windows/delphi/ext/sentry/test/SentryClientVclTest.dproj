@@ -118,9 +118,9 @@
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\KeymanPaths.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <BuildConfiguration Include="Release">

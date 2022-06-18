@@ -22,7 +22,7 @@ uses
   KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
   utildir in '..\..\..\global\delphi\general\utildir.pas',
   utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
-  RegistryKeys in '..\..\..\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',

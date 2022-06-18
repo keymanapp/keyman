@@ -8,7 +8,7 @@ uses
   System.SysUtils,
   Keyman.System.Test.MetroPermissions in 'Keyman.System.Test.MetroPermissions.pas',
   Keyman.System.Security in '..\..\..\global\delphi\general\Keyman.System.Security.pas',
-  RegistryKeys in '..\..\..\global\delphi\general\RegistryKeys.pas',
+  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
   Keyman.Winapi.VersionHelpers in '..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
   KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',

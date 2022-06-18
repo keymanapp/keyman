@@ -106,7 +106,7 @@
         <DCCReference Include="UfrmKeyman7Main.pas">
             <Form>frmKeyman7Main</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\IntegerList.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
         <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
@@ -123,7 +123,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardInfo.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportHTML.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ScanCodeMap.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\ScanCodeMap.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="main.pas"/>
         <DCCReference Include="KeymanTrayIcon.pas"/>
@@ -199,11 +199,11 @@
         <DCCReference Include="langswitch\UfrmLanguageSwitch.pas">
             <Form>frmLanguageSwitch</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="viskbd\UfrmOSKOnScreenKeyboard.pas">
             <Form>frmOSKOnScreenKeyboard</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="viskbd\UfrmVisualKeyboard.pas">
             <Form>frmVisualKeyboard</Form>
         </DCCReference>

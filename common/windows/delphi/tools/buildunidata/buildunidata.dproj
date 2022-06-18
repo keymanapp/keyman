@@ -98,9 +98,9 @@
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\tlb\JRO_TLB.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utildir.pas"/>

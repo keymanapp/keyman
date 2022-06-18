@@ -102,7 +102,7 @@
         <DCCReference Include="DevUtils.pas"/>
         <DCCReference Include="DevReleaseBuildCheck.pas"/>
         <DCCReference Include="DevCheckGitStatus.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
