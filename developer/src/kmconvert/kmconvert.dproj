@@ -132,7 +132,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\TIKE\main\TextFileFormat.pas"/>
+        <DCCReference Include="..\common\delphi\general\TextFileFormat.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kpsfile.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\JsonUtil.pas"/>

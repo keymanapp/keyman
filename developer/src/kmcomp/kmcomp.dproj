@@ -252,7 +252,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
-        <DCCReference Include="..\TIKE\main\TextFileFormat.pas"/>
+        <DCCReference Include="..\common\delphi\general\TextFileFormat.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFileAction.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas"/>
         <DCCReference Include="..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>

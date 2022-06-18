@@ -252,9 +252,9 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilkeyboard.pas"/>
         <DCCReference Include="main\KeyboardParser.pas"/>
-        <DCCReference Include="main\TextFileFormat.pas"/>
+        <DCCReference Include="..\common\delphi\general\TextFileFormat.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\KMDActions.pas"/>
-        <DCCReference Include="actions\KMDActionInterfaces.pas"/>
+        <DCCReference Include="..\common\delphi\components\KMDActionInterfaces.pas"/>
         <DCCReference Include="main\UfrmHelp.pas">
             <Form>frmHelp</Form>
         </DCCReference>

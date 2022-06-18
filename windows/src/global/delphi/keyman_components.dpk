@@ -50,10 +50,8 @@ contains
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   StringGridEditControlled in 'comp\StringGridEditControlled.pas',
   FixedTrackbar in 'comp\FixedTrackbar.pas',
-  KMDActions in 'comp\KMDActions.pas',
   CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
   OnScreenKeyboard in 'comp\OnScreenKeyboard.pas',
-  KMDActionInterfaces in '..\..\..\..\developer\src\tike\actions\KMDActionInterfaces.pas',
   getosversion in 'general\getosversion.pas',
   exImageList in 'comp\exImageList.pas',
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
@@ -63,7 +61,6 @@ contains
   LeftTabbedPageControl in 'comp\LeftTabbedPageControl.pas',
   Glossary in 'general\Glossary.pas',
   RegistryKeys in 'general\RegistryKeys.pas',
-  KeymanVersion in 'general\KeymanVersion.pas',
-  TextFileFormat in '..\..\..\..\developer\src\tike\main\TextFileFormat.pas';
+  KeymanVersion in 'general\KeymanVersion.pas';
 
 end.

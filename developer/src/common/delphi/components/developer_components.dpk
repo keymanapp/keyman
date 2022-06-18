@@ -38,6 +38,9 @@ contains
   DebugBitBtn in 'DebugBitBtn.pas',
   DebugListBox in 'DebugListBox.pas',
   DebugListView in 'DebugListView.pas',
-  KeymanDeveloperDebuggerMemo in 'KeymanDeveloperDebuggerMemo.pas';
+  KeymanDeveloperDebuggerMemo in 'KeymanDeveloperDebuggerMemo.pas',
+  KMDActionInterfaces in 'KMDActionInterfaces.pas',
+  KMDActions in 'KMDActions.pas',
+  TextFileFormat in '..\general\TextFileFormat.pas';
 
 end.

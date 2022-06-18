@@ -26,7 +26,7 @@ uses
   CRC32 in '..\..\..\windows\src\global\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\windows\src\global\delphi\general\KeyNames.pas',
   utildir in '..\..\..\windows\src\global\delphi\general\utildir.pas',
-  TextFileFormat in '..\TIKE\main\TextFileFormat.pas',
+  TextFileFormat in '..\common\delphi\general\TextFileFormat.pas',
   kpsfile in '..\..\..\windows\src\global\delphi\general\kpsfile.pas',
   PackageInfo in '..\..\..\windows\src\global\delphi\general\PackageInfo.pas',
   JsonUtil in '..\..\..\windows\src\global\delphi\general\JsonUtil.pas',

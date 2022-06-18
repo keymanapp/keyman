@@ -173,7 +173,7 @@
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\..\developer\TIKE\main\TextFileFormat.pas"/>
+        <DCCReference Include="..\..\..\developer\common\delphi\general\TextFileFormat.pas"/>
         <DCCReference Include="..\..\..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
         <DCCReference Include="..\..\..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>

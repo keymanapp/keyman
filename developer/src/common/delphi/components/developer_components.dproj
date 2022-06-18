@@ -133,6 +133,9 @@
         <DCCReference Include="DebugListBox.pas"/>
         <DCCReference Include="DebugListView.pas"/>
         <DCCReference Include="KeymanDeveloperDebuggerMemo.pas"/>
+        <DCCReference Include="KMDActionInterfaces.pas"/>
+        <DCCReference Include="KMDActions.pas"/>
+        <DCCReference Include="..\general\TextFileFormat.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

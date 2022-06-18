@@ -118,10 +118,8 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="comp\StringGridEditControlled.pas"/>
         <DCCReference Include="comp\FixedTrackbar.pas"/>
-        <DCCReference Include="comp\KMDActions.pas"/>
         <DCCReference Include="general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="comp\OnScreenKeyboard.pas"/>
-        <DCCReference Include="..\..\..\..\developer\src\tike\actions\KMDActionInterfaces.pas"/>
         <DCCReference Include="general\getosversion.pas"/>
         <DCCReference Include="comp\exImageList.pas"/>
         <DCCReference Include="comp\KeymanTextEditorRichEdit.pas"/>
@@ -132,7 +130,6 @@
         <DCCReference Include="general\Glossary.pas"/>
         <DCCReference Include="general\RegistryKeys.pas"/>
         <DCCReference Include="general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\..\developer\src\tike\main\TextFileFormat.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
