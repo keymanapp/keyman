@@ -51,7 +51,7 @@ uses
   FixedTrackbar in '..\..\..\..\common\windows\delphi\components\FixedTrackbar.pas',
   Menu_KeyboardItems in 'Menu_KeyboardItems.pas',
   Keyman.System.DebugLogManager in '..\..\global\delphi\debug\Keyman.System.DebugLogManager.pas',
-  PaintPanel in '..\..\global\delphi\comp\PaintPanel.pas',
+  PaintPanel in '..\..\..\..\common\windows\delphi\components\PaintPanel.pas',
   exImageList in '..\..\global\delphi\comp\exImageList.pas',
   utilhttp in '..\..\global\delphi\general\utilhttp.pas',
   VistaMessages in 'VistaMessages.pas',

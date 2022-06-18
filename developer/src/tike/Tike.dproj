@@ -152,7 +152,7 @@
         <DCCReference Include="..\..\..\common\windows\delphi\components\keybtn.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\PaintPanel.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\components\PaintPanel.pas"/>
         <DCCReference Include="child\UfrmMDIEditor.pas">
             <Form>frmTikeEditor</Form>
         </DCCReference>

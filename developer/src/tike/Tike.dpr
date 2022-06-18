@@ -25,7 +25,7 @@ uses
   keybtn in '..\..\..\common\windows\delphi\components\keybtn.pas',
   ttinfo in '..\..\..\windows\src\global\delphi\general\ttinfo.pas',
   KeyNames in '..\..\..\windows\src\global\delphi\general\KeyNames.pas',
-  PaintPanel in '..\..\..\windows\src\global\delphi\comp\PaintPanel.pas',
+  PaintPanel in '..\..\..\common\windows\delphi\components\PaintPanel.pas',
   UfrmMDIEditor in 'child\UfrmMDIEditor.pas' {frmTikeEditor},
   Keyman.Developer.UI.Project.UfrmProject in 'project\Keyman.Developer.UI.Project.UfrmProject.pas' {frmProject},
   Keyman.Developer.System.Project.ProjectFile in 'project\Keyman.Developer.System.Project.ProjectFile.pas',

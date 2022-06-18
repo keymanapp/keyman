@@ -111,8 +111,6 @@
         <DCCReference Include="xmlrtl.dcp"/>
         <DCCReference Include="general\scancodemap.pas"/>
         <DCCReference Include="general\unicode.pas"/>
-        <DCCReference Include="comp\PaintPanel.pas"/>
-        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="general\getosversion.pas"/>
         <DCCReference Include="comp\exImageList.pas"/>

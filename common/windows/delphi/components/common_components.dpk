@@ -31,6 +31,10 @@ requires
   rtl;
 
 contains
-  ExtShiftState in '..\visualkeyboard\ExtShiftState.pas';
+  ExtShiftState in '..\visualkeyboard\ExtShiftState.pas',
+  FixedTrackbar in 'FixedTrackbar.pas',
+  keybtn in 'keybtn.pas',
+  OnScreenKeyboard in 'OnScreenKeyboard.pas',
+  VisualKeyboardParameters in '..\visualkeyboard\VisualKeyboardParameters.pas';
 
 end.

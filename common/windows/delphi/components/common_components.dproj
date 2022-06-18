@@ -3,7 +3,7 @@
         <ProjectGuid>{D95665F6-1640-4E32-B4AD-2C0AF09152B5}</ProjectGuid>
         <MainSource>common_components.dpk</MainSource>
         <ProjectVersion>18.8</ProjectVersion>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -69,7 +69,7 @@
         <DCC_K>false</DCC_K>
         <GenDll>true</GenDll>
         <GenPackage>true</GenPackage>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <SanitizedProjectName>common_components</SanitizedProjectName>
         <DCC_DcpOutput>..\..\lib</DCC_DcpOutput>
@@ -126,6 +126,10 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="..\visualkeyboard\ExtShiftState.pas"/>
+        <DCCReference Include="FixedTrackbar.pas"/>
+        <DCCReference Include="keybtn.pas"/>
+        <DCCReference Include="OnScreenKeyboard.pas"/>
+        <DCCReference Include="..\visualkeyboard\VisualKeyboardParameters.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -169,7 +173,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\common_components.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\lib\common_components.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>common_components.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

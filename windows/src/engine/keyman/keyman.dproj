@@ -165,7 +165,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\components\FixedTrackbar.pas"/>
         <DCCReference Include="Menu_KeyboardItems.pas"/>
         <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\PaintPanel.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\components\PaintPanel.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\exImageList.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
         <DCCReference Include="VistaMessages.pas"/>

@@ -43,8 +43,6 @@ requires
 contains
   scancodemap in 'general\scancodemap.pas',
   unicode in 'general\unicode.pas',
-  PaintPanel in 'comp\PaintPanel.pas',
-  VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
   getosversion in 'general\getosversion.pas',
   exImageList in 'comp\exImageList.pas',
