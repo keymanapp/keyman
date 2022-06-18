@@ -17,6 +17,8 @@ CLEANS=clean-developer
 # ----------------------------------------------------------------------
 
 common: .virtual
+    cd $(KEYMAN_ROOT)\windows\delphi\components
+    $(MAKE) $(TARGET)
     cd $(DEVELOPER_ROOT)\src\common\delphi\components
     $(MAKE) $(TARGET)
 

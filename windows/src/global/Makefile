@@ -5,6 +5,9 @@ build:
 !ifdef NODELPHI
   echo Skipping global
 !else
+  cd $(KEYMAN_ROOT)\windows\delphi\components
+  $(MAKE) $(TARGET)
+
   cd $(ROOT)\src\global\delphi
   $(MAKE) $(TARGET)
 
