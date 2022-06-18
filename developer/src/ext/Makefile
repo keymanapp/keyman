@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=browse4folder mbcolor common
+TARGETS=browse4folder mbcolor scfontcombobox common
 !endif
 
 CLEANS=
@@ -22,6 +22,10 @@ browse4folder: .virtual
 
 mbcolor: .virtual
     cd $(DEVELOPER_ROOT)\src\ext\mbcolor
+    $(MAKE) $(TARGET)
+
+scfontcombobox: .virtual
+    cd $(DEVELOPER_ROOT)\src\ext\scfontcombobox
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
