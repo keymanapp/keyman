@@ -19,7 +19,7 @@ KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build\templates
 KEYMAN_WIX_TEMP_MODELCOMPILER=$(TEMP)\keyman_wix_build\ModelCompiler
 KEYMAN_WIX_TEMP_SERVER=$(TEMP)\keyman_wix_build\Server
 
-KEYMAN_WIX_KMDEV_SERVER=$(DEVELOPER_ROOT)\server\build
+KEYMAN_WIX_KMDEV_SERVER=$(DEVELOPER_ROOT)\src\server\build
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(DEVELOPER_ROOT)\src\kmconvert\data
 
 copykmdev: makeinstaller
@@ -80,16 +80,9 @@ heat-server:
     -rmdir /s/q $(KEYMAN_WIX_TEMP_SERVER)
 
 heat-model-compiler:
-# Build kmlmc
     cd $(KEYMAN_MODELCOMPILER_ROOT)
-
-!ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh
+# Build the distributable package
     $(GIT_BASH_FOR_KEYMAN) bundle.sh --build-path "$(KEYMAN_WIX_TEMP_BASE)"
-!else
-    start /wait .\build.sh
-    start /wait .\bundle.sh --build-path "$(KEYMAN_WIX_TEMP_BASE)"
-!endif
 
 # Build the .wxs file
     cd $(DEVELOPER_ROOT)\src\inst

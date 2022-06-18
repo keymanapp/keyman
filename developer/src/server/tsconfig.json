@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig-base.json",
+  "extends": "../../../tsconfig-base.json",
 
   "compilerOptions": {
     "module": "commonjs",
@@ -21,6 +21,6 @@
     "src/**/*.ts"
   ],
   "references": [
-    { "path": "../../common/web/keyman-version" }
+    { "path": "../../../common/web/keyman-version" }
   ]
 }
