@@ -162,7 +162,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmCharacterMapFilter.pas">
             <Form>frmCharacterMapFilter</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\comp\FixedTrackbar.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\components\FixedTrackbar.pas"/>
         <DCCReference Include="Menu_KeyboardItems.pas"/>
         <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogManager.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\PaintPanel.pas"/>

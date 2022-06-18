@@ -101,7 +101,7 @@ uses
   mrulist in 'main\mrulist.pas',
   Upload_Settings in '..\..\..\windows\src\global\delphi\general\Upload_Settings.pas',
   MLang in '..\..\..\windows\src\global\delphi\general\MLang.pas',
-  FixedTrackbar in '..\..\..\windows\src\global\delphi\comp\FixedTrackbar.pas',
+  FixedTrackbar in '..\..\..\common\windows\delphi\components\FixedTrackbar.pas',
   utilstr in '..\..\..\windows\src\global\delphi\general\utilstr.pas',
   utilkeyboard in '..\..\..\windows\src\global\delphi\general\utilkeyboard.pas',
   KeyboardParser in 'main\KeyboardParser.pas',

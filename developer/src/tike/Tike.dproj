@@ -248,7 +248,7 @@
         <DCCReference Include="main\mrulist.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Upload_Settings.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\MLang.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\FixedTrackbar.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\components\FixedTrackbar.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilkeyboard.pas"/>
         <DCCReference Include="main\KeyboardParser.pas"/>

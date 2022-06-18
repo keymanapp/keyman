@@ -48,7 +48,7 @@ uses
   utilstr in '..\..\global\delphi\general\utilstr.pas',
   CharacterDragObject in '..\..\..\..\common\windows\delphi\charmap\CharacterDragObject.pas',
   UfrmCharacterMapFilter in '..\..\..\..\common\windows\delphi\charmap\UfrmCharacterMapFilter.pas' {frmCharacterMapFilter},
-  FixedTrackbar in '..\..\global\delphi\comp\FixedTrackbar.pas',
+  FixedTrackbar in '..\..\..\..\common\windows\delphi\components\FixedTrackbar.pas',
   Menu_KeyboardItems in 'Menu_KeyboardItems.pas',
   Keyman.System.DebugLogManager in '..\..\global\delphi\debug\Keyman.System.DebugLogManager.pas',
   PaintPanel in '..\..\global\delphi\comp\PaintPanel.pas',

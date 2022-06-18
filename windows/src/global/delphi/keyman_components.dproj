@@ -114,7 +114,6 @@
         <DCCReference Include="comp\KeyBtn.pas"/>
         <DCCReference Include="comp\PaintPanel.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
-        <DCCReference Include="comp\FixedTrackbar.pas"/>
         <DCCReference Include="general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="comp\OnScreenKeyboard.pas"/>
         <DCCReference Include="general\getosversion.pas"/>
