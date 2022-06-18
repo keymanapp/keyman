@@ -138,6 +138,7 @@
         <DCCReference Include="..\general\TextFileFormat.pas"/>
         <DCCReference Include="LeftTabbedPageControl.pas"/>
         <DCCReference Include="MenuImgList.pas"/>
+        <DCCReference Include="StringGridEditControlled.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -47,7 +47,6 @@ contains
   KeyBtn in 'comp\KeyBtn.pas',
   PaintPanel in 'comp\PaintPanel.pas',
   VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
-  StringGridEditControlled in 'comp\StringGridEditControlled.pas',
   FixedTrackbar in 'comp\FixedTrackbar.pas',
   CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
   OnScreenKeyboard in 'comp\OnScreenKeyboard.pas',

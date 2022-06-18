@@ -84,7 +84,7 @@ uses
   UnitDrawArrow in '..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas',
   klog in '..\..\..\windows\src\global\delphi\general\klog.pas',
   BitmapEditor in '..\common\delphi\components\BitmapEditor.pas',
-  StringGridEditControlled in '..\..\..\windows\src\global\delphi\comp\StringGridEditControlled.pas',
+  StringGridEditControlled in '..\common\delphi\components\StringGridEditControlled.pas',
   KMDevResourceStrings in 'main\KMDevResourceStrings.pas',
   httpuploader in '..\..\..\windows\src\global\delphi\general\httpuploader.pas',
   httpuploader_messageprocessor_forms in '..\..\..\windows\src\global\delphi\general\httpuploader_messageprocessor_forms.pas',

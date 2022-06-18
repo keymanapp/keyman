@@ -43,6 +43,7 @@ contains
   KMDActions in 'KMDActions.pas',
   TextFileFormat in '..\general\TextFileFormat.pas',
   LeftTabbedPageControl in 'LeftTabbedPageControl.pas',
-  MenuImgList in 'MenuImgList.pas';
+  MenuImgList in 'MenuImgList.pas',
+  StringGridEditControlled in 'StringGridEditControlled.pas';
 
 end.

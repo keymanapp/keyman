@@ -229,7 +229,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\common\delphi\components\BitmapEditor.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\StringGridEditControlled.pas"/>
+        <DCCReference Include="..\common\delphi\components\StringGridEditControlled.pas"/>
         <DCCReference Include="main\KMDevResourceStrings.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\httpuploader_messageprocessor_forms.pas"/>
