@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.15 alpha 2022-06-18
+
+* fix(web): crash on custom modifier keys (#6790)
+* chore: add trigger definitions for stable-15.0 and fixup force param for increment-version.sh (#6776)
+
 ## 16.0.14 alpha 2022-06-17
 
 * chore(web): add 'index.html' to parent links in test pages (#6791)
