@@ -7,7 +7,7 @@ uses
   Keyman.Developer.System.KeymanConvertMain in 'Keyman.Developer.System.KeymanConvertMain.pas',
   Keyman.Developer.System.ImportWindowsKeyboard in 'Keyman.Developer.System.ImportWindowsKeyboard.pas',
   RegistryKeys in '..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   utilexecute in '..\..\..\windows\src\global\delphi\general\utilexecute.pas',
   Keyman.Developer.System.KeyboardProjectTemplate in 'Keyman.Developer.System.KeyboardProjectTemplate.pas',
   UKeymanTargets in '..\..\..\windows\src\global\delphi\general\UKeymanTargets.pas',

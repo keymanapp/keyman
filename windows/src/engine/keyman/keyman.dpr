@@ -84,7 +84,7 @@ uses
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   UfrmVisualKeyboard in 'viskbd\UfrmVisualKeyboard.pas' {frmVisualKeyboard},
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
   OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',

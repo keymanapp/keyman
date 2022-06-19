@@ -173,7 +173,7 @@ uses
   UfrmDebug in 'child\UfrmDebug.pas' {frmDebug},
   UfrmPackageEditor in 'child\UfrmPackageEditor.pas' {frmPackageEditor},
   utilexecute in '..\..\..\windows\src\global\delphi\general\utilexecute.pas',
-  KeymanVersion in '..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   CaptionPanel in '..\common\\delphi\components\CaptionPanel.pas',
   Glossary in '..\..\..\common\windows\delphi\general\Glossary.pas',
   UframeTouchLayoutBuilder in 'oskbuilder\UframeTouchLayoutBuilder.pas' {frameTouchLayoutBuilder},

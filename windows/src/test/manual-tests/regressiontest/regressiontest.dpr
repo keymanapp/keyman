@@ -14,7 +14,7 @@ uses
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   RedistFiles in '..\..\developer\TIKE\main\RedistFiles.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',

@@ -97,7 +97,7 @@
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>

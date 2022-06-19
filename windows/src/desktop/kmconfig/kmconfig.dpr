@@ -4,7 +4,7 @@ uses
   System.SysUtils,
   Keyman.System.SettingsManager in '..\..\global\delphi\general\Keyman.System.SettingsManager.pas',
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   Keyman.System.Settings in '..\..\global\delphi\general\Keyman.System.Settings.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
   Sentry.Client.Console in '..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.Console.pas',

@@ -125,6 +125,8 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="vcl.dcp"/>
+        <DCCReference Include="xmlrtl.dcp"/>
         <DCCReference Include="..\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="FixedTrackbar.pas"/>
         <DCCReference Include="keybtn.pas"/>
@@ -138,6 +140,9 @@
         <DCCReference Include="..\general\Glossary.pas"/>
         <DCCReference Include="..\general\RegistryKeys.pas"/>
         <DCCReference Include="..\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\general\ScanCodeMap.pas"/>
+        <DCCReference Include="PaintPanel.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

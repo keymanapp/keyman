@@ -392,7 +392,7 @@
             <Form>frmPackageEditor</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\common\delphi\components\CaptionPanel.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="oskbuilder\UframeTouchLayoutBuilder.pas">

@@ -11,7 +11,7 @@ uses
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
   Keyman.Winapi.VersionHelpers in '..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
-  KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas';

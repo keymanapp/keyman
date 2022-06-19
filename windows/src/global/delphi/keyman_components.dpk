@@ -42,7 +42,6 @@ requires
 
 contains
   exImageList in 'comp\exImageList.pas',
-  KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
-  KeymanVersion in 'general\KeymanVersion.pas';
+  KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas';
 
 end.

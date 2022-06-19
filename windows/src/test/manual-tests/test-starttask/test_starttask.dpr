@@ -11,7 +11,7 @@ uses
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   Keyman.System.Test.KeymanStartTaskTest in 'Keyman.System.Test.KeymanStartTaskTest.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas';
 

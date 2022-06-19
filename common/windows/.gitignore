@@ -5,3 +5,4 @@ delphi/tools/*/obj/
 delphi/**/*.local
 delphi/**/*.~*
 delphi/**/__recovery/
+delphi/general/keymanversion_build.inc

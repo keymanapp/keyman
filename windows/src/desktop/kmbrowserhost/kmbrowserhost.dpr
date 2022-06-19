@@ -6,7 +6,7 @@ uses
   Keyman.System.CEFManager in '..\..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas',
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',

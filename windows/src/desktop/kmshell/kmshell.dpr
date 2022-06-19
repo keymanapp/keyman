@@ -95,7 +95,7 @@ uses
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   BaseKeyboards in '..\..\global\delphi\general\BaseKeyboards.pas',
   LoadIndirectStringUnit in '..\..\engine\keyman\langswitch\LoadIndirectStringUnit.pas',
   Glossary in '..\..\..\..\common\windows\delphi\general\Glossary.pas',

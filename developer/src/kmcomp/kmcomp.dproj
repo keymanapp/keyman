@@ -198,7 +198,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilmsxml.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfile.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeys.pas"/>

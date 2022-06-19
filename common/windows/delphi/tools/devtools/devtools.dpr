@@ -12,7 +12,7 @@ uses
   DevReleaseBuildCheck in 'DevReleaseBuildCheck.pas',
   DevCheckGitStatus in 'DevCheckGitStatus.pas',
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   utilsystem in '..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   utilexecute in '..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',

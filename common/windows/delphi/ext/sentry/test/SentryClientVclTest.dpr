@@ -7,7 +7,7 @@ uses
   sentry in '..\sentry.pas',
   Sentry.Client.Vcl in '..\Sentry.Client.Vcl.pas',
   Keyman.System.KeymanSentryClient in '..\..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
-  KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas',
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   DebugPaths in '..\..\..\global\delphi\general\DebugPaths.pas',

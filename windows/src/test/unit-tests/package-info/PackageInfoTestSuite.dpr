@@ -13,7 +13,7 @@ uses
   utilstr in '..\..\..\global\delphi\general\utilstr.pas',
   StockFileNames in '..\..\..\global\delphi\cust\StockFileNames.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
-  KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
   utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
   utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',

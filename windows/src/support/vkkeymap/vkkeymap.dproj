@@ -115,7 +115,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\ScanCodeMap.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

@@ -13,7 +13,7 @@ uses
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   crypt_user in '..\..\global\delphi\productactivation\crypt_user.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
   kmcomapi_TLB in '..\..\engine\kmcomapi\kmcomapi_TLB.pas',

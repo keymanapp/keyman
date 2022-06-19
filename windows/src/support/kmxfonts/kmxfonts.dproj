@@ -230,7 +230,7 @@
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilkeyboard.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

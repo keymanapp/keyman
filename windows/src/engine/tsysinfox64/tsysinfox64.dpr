@@ -14,7 +14,7 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas';
 

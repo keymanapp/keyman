@@ -25,7 +25,7 @@ uses
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
   SFX in '..\..\..\..\common\windows\delphi\setup\SFX.pas',
   Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas',

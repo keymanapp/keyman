@@ -37,7 +37,7 @@ uses
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   Glossary in '..\..\..\..\common\windows\delphi\general\Glossary.pas',
   Keyman.Developer.System.Project.ProjectLog in '..\..\..\..\developer\src\tike\project\Keyman.Developer.System.Project.ProjectLog.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',

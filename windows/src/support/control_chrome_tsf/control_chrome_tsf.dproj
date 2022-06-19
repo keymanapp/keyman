@@ -113,7 +113,7 @@
         </DelphiCompile>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.SettingsManager.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.Settings.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

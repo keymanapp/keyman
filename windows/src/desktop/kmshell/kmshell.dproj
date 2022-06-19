@@ -232,7 +232,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\MSXMLDomCreate.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BaseKeyboards.pas"/>
         <DCCReference Include="..\..\engine\keyman\langswitch\LoadIndirectStringUnit.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Glossary.pas"/>

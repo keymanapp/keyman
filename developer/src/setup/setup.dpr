@@ -23,7 +23,7 @@ uses
   ErrorControlledRegistry in '..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\..\common\windows\delphi\general\Unicode.pas',
   utilexecute in '..\..\..\windows\src\global\delphi\general\utilexecute.pas',
-  KeymanVersion in '..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   SFX in '..\..\..\common\windows\delphi\setup\SFX.pas',
   Keyman.System.UpdateCheckResponse in '..\..\..\windows\src\global\delphi\general\Keyman.System.UpdateCheckResponse.pas';
 

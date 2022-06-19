@@ -107,7 +107,7 @@
 			<DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
 			<DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
 			<DCCReference Include="..\..\developer\TIKE\main\RedistFiles.pas"/>
 			<DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>

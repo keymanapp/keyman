@@ -7,7 +7,7 @@ uses
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   utilstr in '..\..\global\delphi\general\utilstr.pas';

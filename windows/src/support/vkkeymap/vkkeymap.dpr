@@ -15,7 +15,7 @@ uses
   ScanCodeMap in '..\..\..\..\common\windows\delphi\general\ScanCodeMap.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas';
 
 {$R *.res}

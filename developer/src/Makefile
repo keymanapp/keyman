@@ -17,7 +17,7 @@ CLEANS=clean-developer
 # ----------------------------------------------------------------------
 
 common: .virtual
-    cd $(KEYMAN_ROOT)\windows\delphi\components
+    cd $(KEYMAN_ROOT)\common\windows\delphi\components
     $(MAKE) $(TARGET)
     cd $(DEVELOPER_ROOT)\src\common\delphi\components
     $(MAKE) $(TARGET)
@@ -108,7 +108,7 @@ release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-rel
 
 do-build-release:
     echo Starting Release Build
-    cd $(DEVELOPER_ROOT)\src
+    cd $(COMMON_ROOT)
     $(MAKE) global-versions
     cd $(DEVELOPER_ROOT)\src
     $(MAKE) dirs
@@ -220,13 +220,18 @@ test-releasebuildcheck: global-versions
 #
 
 build-tools:
-    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    $(MAKE) global-versions
     $(MAKE) common
 !ifdef NODELPHI
     echo Skipping build-tools
 !else
     $(MAKE) build-tools-internal
 !endif
+
+global-versions:
+    cd $(COMMON_ROOT)
+    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    cd $(DEVELOPER_ROOT)\src
 
 build-tools-internal:
 # We'll build a default PathDefines.mak if it is missing here so we can

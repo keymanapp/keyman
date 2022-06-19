@@ -48,7 +48,7 @@ uses
   utilmsxml in '..\..\..\windows\src\global\delphi\general\utilmsxml.pas',
   ErrorControlledRegistry in '..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\..\windows\src\global\delphi\general\utilexecute.pas',
-  KeymanVersion in '..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   kmxfile in '..\..\..\windows\src\global\delphi\general\kmxfile.pas',
   Glossary in '..\..\..\common\windows\delphi\general\Glossary.pas',
   VKeys in '..\..\..\windows\src\global\delphi\general\VKeys.pas',

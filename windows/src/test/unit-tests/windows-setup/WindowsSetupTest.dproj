@@ -109,7 +109,7 @@
         <DCCReference Include="..\..\..\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\JsonUtil.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>

@@ -18,7 +18,7 @@ uses
   JRO_TLB in '..\..\..\..\..\common\windows\delphi\tlb\JRO_TLB.pas',
   ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas',
-  KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   utildir in '..\..\..\..\..\windows\src\global\delphi\general\utildir.pas';
 
 begin

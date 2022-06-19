@@ -28,7 +28,9 @@ package common_components;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  rtl,
+  vcl,
+  xmlrtl;
 
 contains
   ExtShiftState in '..\visualkeyboard\ExtShiftState.pas',
@@ -43,6 +45,9 @@ contains
   OnScreenKeyboardData in '..\visualkeyboard\OnScreenKeyboardData.pas',
   Glossary in '..\general\Glossary.pas',
   RegistryKeys in '..\general\RegistryKeys.pas',
-  ErrorControlledRegistry in '..\vcl\ErrorControlledRegistry.pas';
+  ErrorControlledRegistry in '..\vcl\ErrorControlledRegistry.pas',
+  KeymanVersion in '..\general\KeymanVersion.pas',
+  ScanCodeMap in '..\general\ScanCodeMap.pas',
+  PaintPanel in 'PaintPanel.pas';
 
 end.

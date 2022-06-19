@@ -112,7 +112,7 @@ uses
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   kprecompilemnemonickeyboard in 'processes\keyboard\kprecompilemnemonickeyboard.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',

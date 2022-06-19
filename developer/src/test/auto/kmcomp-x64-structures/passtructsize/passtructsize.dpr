@@ -9,7 +9,7 @@ uses
   compile in '..\..\..\..\..\..\windows\src\global\delphi\general\compile.pas',
   kmxfileconsts in '..\..\..\..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas',
   RegistryKeys in '..\..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   RedistFiles in '..\..\..\..\tike\main\RedistFiles.pas',
   ErrorControlledRegistry in '..\..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   Upload_Settings in '..\..\..\..\..\..\windows\src\global\delphi\general\Upload_Settings.pas',

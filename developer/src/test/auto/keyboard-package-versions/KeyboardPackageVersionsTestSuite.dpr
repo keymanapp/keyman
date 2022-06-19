@@ -23,7 +23,7 @@ uses
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   JsonUtil in '..\..\..\..\..\windows\src\global\delphi\general\JsonUtil.pas',
-  KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   utildir in '..\..\..\..\..\windows\src\global\delphi\general\utildir.pas',
   utilsystem in '..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas',
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
