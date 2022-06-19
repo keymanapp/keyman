@@ -16,7 +16,7 @@ keyman-developer-components: dirs compile install
 #   $(COPY) keyman_components.bpl $(OUTLIB)
 
 compile:
-#   @-mkdir obj\Win32\$(TARGET_PATH)
+    @-mkdir obj\Win32\$(TARGET_PATH)
     $(DEVELOPER_DCC32DPK) developer_components.dpk
 
 install:
