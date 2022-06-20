@@ -21,7 +21,7 @@
     <ClInclude Include="..\..\..\windows\src\global\inc\keymansentry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\windows\src\ext\sentry\sentry.h">
+    <ClInclude Include="..\..\..\common\windows\delphi\ext\sentry\sentry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\windows\src\global\inc\keyman64.h">

@@ -79,9 +79,9 @@ test: .virtual
 # ----------------------------------------------------------------------
 
 redist:
-    copy $(WINDOWS_ROOT)\src\ext\sentry\sentry.dll $(DEVELOPER_ROOT)\bin
-    copy $(WINDOWS_ROOT)\src\ext\sentry\sentry.x64.dll $(DEVELOPER_ROOT)\bin
-    copy $(WINDOWS_ROOT)\src\ext\sentry\crashpad_handler.exe $(DEVELOPER_ROOT)\bin
+    copy $(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\sentry.dll $(DEVELOPER_ROOT)\bin
+    copy $(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\sentry.x64.dll $(DEVELOPER_ROOT)\bin
+    copy $(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\crashpad_handler.exe $(DEVELOPER_ROOT)\bin
 
 # ----------------------------------------------------------------------
 

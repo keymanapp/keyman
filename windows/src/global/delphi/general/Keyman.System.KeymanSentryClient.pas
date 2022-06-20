@@ -88,9 +88,9 @@ const
   KEYMAN_ROOT = 'KEYMAN_ROOT'; // environment variable
 
 {$IFDEF WIN64}
-  DEV_SENTRY_PATH = 'windows\src\ext\sentry\sentry.x64.dll';
+  DEV_SENTRY_PATH = 'common\windows\delphi\ext\sentry\sentry.x64.dll';
 {$ELSE WIN64}
-  DEV_SENTRY_PATH = 'windows\src\ext\sentry\sentry.dll';
+  DEV_SENTRY_PATH = 'common\windows\delphi\ext\sentry\sentry.dll';
 {$ENDIF}
 
 { TKeymanSentryClient }

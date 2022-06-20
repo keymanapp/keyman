@@ -114,9 +114,9 @@ uses
   Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
   Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas',
-  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
-  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
-  sentry in '..\..\ext\sentry\sentry.pas',
+  Sentry.Client in '..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
   Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas';
 

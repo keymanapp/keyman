@@ -533,9 +533,9 @@
         <DCCReference Include="dialogs\UfrmMustIncludeDebug.pas">
             <Form>frmMustIncludeDebug</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\ext\sentry\Sentry.Client.pas"/>
-        <DCCReference Include="..\..\..\windows\src\ext\sentry\Sentry.Client.Vcl.pas"/>
-        <DCCReference Include="..\..\..\windows\src\ext\sentry\sentry.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.Vcl.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.UrlRenderer.pas"/>

@@ -56,9 +56,9 @@ uses
   Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
-  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
-  sentry in '..\..\ext\sentry\sentry.pas',
+  Sentry.Client in '..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {$R *.res}
