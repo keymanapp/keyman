@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=dcpcrypt jwa # cef4delphi
+TARGETS=dcpcrypt jwa tds2dbg # cef4delphi
 !endif
 
 # jedi has no packages
@@ -28,6 +28,10 @@ dcpcrypt: .virtual
 
 jwa: .virtual
     cd $(COMMON_ROOT)\ext\jwa
+    $(MAKE) $(TARGET)
+
+tds2dbg: .virtual
+    cd $(COMMON_ROOT)\ext\tds2dbg
     $(MAKE) $(TARGET)
 
 #

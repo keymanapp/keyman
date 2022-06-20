@@ -1,14 +1,14 @@
 
 !include ..\..\Defines.mak
 
-build: dirs
-# tds2dbg.exe test.exe
+build:
     -mkdir $(WIN32_TARGET_PATH)
     $(COPY) tds2dbg.bin $(WIN32_TARGET_PATH)\tds2dbg.exe
     $(MAKE) install
 
 install:
-    $(COPY) $(WIN32_TARGET_PATH)\tds2dbg.exe $(ROOT)\bin\buildtools
+    -mkdir $(KEYMAN_ROOT)\common\windows\bin\buildtools
+    $(COPY) $(WIN32_TARGET_PATH)\tds2dbg.exe $(KEYMAN_ROOT)\common\windows\bin\buildtools
 
 #
 # The following builds require Borland C++ compiler to be installed and in the path; see Readme.txt for details.
