@@ -164,7 +164,7 @@ WZUNZIP=$(WZZIPPATH) e
 # we are using cmd /c because tds2dbg is failing on direct execution
 # from nmake
 TDS2DBG=cmd /c $(KEYMAN_ROOT)\common\windows\bin\buildtools\tds2dbg
-SENTRYTOOL=$(WINDOWS_ROOT)\buildtools\sentrytool
+SENTRYTOOL=$(COMMON_ROOT)\tools\sentrytool\$(WIN32_TARGET_PATH)\sentrytool.exe
 SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep -r $(KEYMAN_ROOT) -i $(DELPHIINCLUDES)
 
 WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
