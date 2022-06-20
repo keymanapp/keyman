@@ -29,7 +29,6 @@ uses
   InterfaceHotkeys in '..\..\global\delphi\general\InterfaceHotkeys.pas',
   ExtShiftState in '..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\..\..\common\windows\delphi\general\CleartypeDrawCharacter.pas',
-  MLang in '..\..\global\delphi\general\MLang.pas',
   OnScreenKeyboard in '..\..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas',
   UfrmOSKPlugInBase in 'viskbd\UfrmOSKPlugInBase.pas' {frmOSKPlugInBase},
   UfrmOSKCharacterMap in 'viskbd\UfrmOSKCharacterMap.pas' {frmOSKCharacterMap},
