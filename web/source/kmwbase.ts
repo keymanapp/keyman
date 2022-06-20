@@ -710,7 +710,12 @@ namespace com.keyman {
 
       PKbd = PKbd || this.core.activeKeyboard;
 
-      // help.keyman.com will set this function in place, so we'll give it priority.
+      // help.keyman.com will (lkudingly) set this function in place to specify the desired
+      // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
+      // "temporary" (but actually permanent) solutions from yesteryear.
+      //
+      // Note that the main intended use of that function is for embedded KMW on the mobile apps...
+      // but they never call `BuildVisualKeyboard`, so it's all good.
       const getOskHeight = this['getOskHeight'];
       let targetHeight = (typeof getOskHeight == 'function') ? getOskHeight() : this.osk.computedHeight || 200;
 
