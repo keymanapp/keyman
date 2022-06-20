@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common devtools sentrytool buildpkg test-klog
+TARGETS=common sentrytool buildpkg test-klog
 !endif
 
 CLEANS=clean-buildtools
@@ -23,14 +23,6 @@ common: .virtual
 sentrytool: .virtual
     cd $(ROOT)\src\buildtools\sentrytool
     $(MAKE) $(TARGET)
-
-devtools: .virtual
-!ifdef NODELPHI
-    echo Skipping devtools
-!else
-    cd $(ROOT)\src\buildtools\devtools
-    $(MAKE) $(TARGET)
-!endif
 
 buildpkg: .virtual
     cd $(ROOT)\src\buildtools\buildpkg

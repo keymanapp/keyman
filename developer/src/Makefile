@@ -147,7 +147,7 @@ clean-output:
 
 clean-pathdefines: test-releasebuildcheck
 # test-releasebuildcheck builds devtools for us
-    $(WINDOWS_PROGRAM)\buildtools\devtools -ri
+    $(DEVTOOLS) -ri
 
 #
 # Test that the CEF file path is accessible from env var KEYMAN_CEF4DELPHI_ROOT
@@ -198,7 +198,7 @@ test-releaseexists:
 #
 
 test-releasebuildcheck: global-versions
-    cd $(WINDOWS_ROOT)\src\buildtools\devtools
+    cd $(COMMON_ROOT)\tools\devtools
     $(MAKE) test-releasebuildcheck
     cd $(DEVELOPER_ROOT)\src
 
@@ -227,9 +227,8 @@ build-tools-internal:
 # We'll build a default PathDefines.mak if it is missing here so we can
 # go on and do the rest of the build. Build all the ext/global/build-tools
 # things we need...
-    cd $(WINDOWS_ROOT)\src\buildtools\devtools
-    $(MAKE)
-    $(WINDOWS_PROGRAM)\buildtools\devtools -ti
+    $(MAKE) devtools-app
+    $(DEVTOOLS) -ti
     cd $(WINDOWS_ROOT)\src
     $(MAKE) ext global buildtools
     cd $(DEVELOPER_ROOT)\src
