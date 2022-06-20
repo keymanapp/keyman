@@ -61,6 +61,13 @@ class KeyboardViewController: InputViewController {
   }
 
   func setupTopBarImage(size: CGSize) {
+    // We override the height in getTopBarImage, but not width.
+    // If width is 0, we return null from that function; this'll
+    // trigger the guard below.
+    if size.width == 0 {
+      return
+    }
+
     let imgPath = getTopBarImage(size: size)
     guard let path = imgPath else {
       SentryManager.captureAndLog("No image specified for the image banner!")
