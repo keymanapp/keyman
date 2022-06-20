@@ -536,21 +536,25 @@ namespace com.keyman.text {
      * @returns
      */
     private getEventModifiers(e: KeyEvent): number {
+      const CHIRAL_ALT  = Codes.modifierCodes["LALT"]  | Codes.modifierCodes["RALT"];
+      const CHIRAL_CTRL = Codes.modifierCodes["LCTRL"] | Codes.modifierCodes["RCTRL"];
+
       let modifiers = e.Lmodifiers;
       const keyboard_bitmask = this.activeKeyboard.modifierBitmask;
 
-      // If this keyboard is explicitly non-chiral...
-      const kbd_chiral_intersection = keyboard_bitmask & Codes.modifierBitmasks["CHIRAL"];
-      if(kbd_chiral_intersection == Codes.modifierCodes["SHIFT"] || !kbd_chiral_intersection) {
-        const CHIRAL_ALT  = Codes.modifierCodes["LALT"]  | Codes.modifierCodes["RALT"];
-        const CHIRAL_CTRL = Codes.modifierCodes["LCTRL"] | Codes.modifierCodes["RCTRL"];
+      // If this keyboard does not use chiral alt...
+      if(!(keyboard_bitmask & CHIRAL_ALT)) {
         const alt_intersection  = modifiers & CHIRAL_ALT;
-        const ctrl_intersection = modifiers & CHIRAL_CTRL;
 
         if(alt_intersection) {
           // Undo the chiral part          and replace with non-chiral.
           modifiers ^= alt_intersection  | Codes.modifierCodes["ALT"];
         }
+      }
+
+      // If this keyboard does not use chiral ctrl...
+      if(!(keyboard_bitmask & CHIRAL_CTRL)) {
+        const ctrl_intersection = modifiers & CHIRAL_CTRL;
 
         if(ctrl_intersection) {
           // Undo the chiral part          and replace with non-chiral.
