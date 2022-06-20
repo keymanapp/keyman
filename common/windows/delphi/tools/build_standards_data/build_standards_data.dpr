@@ -11,7 +11,7 @@ uses
   Keyman.Console.BuildStandardsData in 'Keyman.Console.BuildStandardsData.pas',
   Keyman.System.BuildLCIDToBCP47Registry in 'Keyman.System.BuildLCIDToBCP47Registry.pas',
   Keyman.System.BuildLangTags in 'Keyman.System.BuildLangTags.pas',
-  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
+  JsonUtil in '..\..\..\..\..\windows\src\global\delphi\general\JsonUtil.pas';
 
 begin
   try

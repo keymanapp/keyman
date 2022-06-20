@@ -98,7 +98,7 @@
         <DCCReference Include="Keyman.Console.BuildStandardsData.pas"/>
         <DCCReference Include="Keyman.System.BuildLCIDToBCP47Registry.pas"/>
         <DCCReference Include="Keyman.System.BuildLangTags.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
+        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\JsonUtil.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
