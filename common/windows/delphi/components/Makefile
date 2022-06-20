@@ -22,6 +22,9 @@ compile:
 install:
     $(DEVTOOLS) -ip $(COMMON_OUTLIB)\common_components.bpl
 
+signcode:
+  @rem no signcode
+
 # ----------------------------------------------------------------------
 # clean target
 # ----------------------------------------------------------------------
