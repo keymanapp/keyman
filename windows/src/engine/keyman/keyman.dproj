@@ -183,7 +183,6 @@
         <DCCReference Include="..\..\global\delphi\hints\Hints.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilcheckfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\WideStringClass.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\usp10.pas"/>

@@ -67,7 +67,6 @@ uses
   Hints in '..\..\global\delphi\hints\Hints.pas',
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',
-  WideStringClass in '..\..\global\delphi\general\WideStringClass.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   usp10 in '..\..\..\..\common\windows\delphi\general\usp10.pas',
