@@ -78,7 +78,6 @@ uses
   Keyman.Developer.UI.UfrmMessageDlgWithSave in 'dialogs\Keyman.Developer.UI.UfrmMessageDlgWithSave.pas' {frmMessageDlgWithSave},
   debugdeadkeys in 'debug\debugdeadkeys.pas',
   MessageIdentifiers in 'main\MessageIdentifiers.pas',
-  exceptionw in '..\..\..\windows\src\global\delphi\general\exceptionw.pas',
   kpsfile in '..\..\..\windows\src\global\delphi\general\kpsfile.pas',
   Keyman.UI.UframeCEFHost in '..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas',

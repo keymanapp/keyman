@@ -64,7 +64,6 @@ uses
   kmpinffile in '..\..\global\delphi\general\kmpinffile.pas',
   PackageInfo in '..\..\global\delphi\general\PackageInfo.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
-  exceptionw in '..\..\global\delphi\general\exceptionw.pas',
   ttinfo in '..\..\global\delphi\general\ttinfo.pas',
   keymanerrorcodes in 'util\keymanerrorcodes.pas',
   kpuninstallpackage in 'processes\package\kpuninstallpackage.pas',

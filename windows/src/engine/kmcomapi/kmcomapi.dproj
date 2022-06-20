@@ -202,7 +202,6 @@
         <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="util\keymanerrorcodes.pas"/>
         <DCCReference Include="processes\package\kpuninstallpackage.pas"/>

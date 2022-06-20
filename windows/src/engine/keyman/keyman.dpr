@@ -7,7 +7,6 @@ uses
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   IntegerList in '..\..\global\delphi\general\IntegerList.pas',
   custinterfaces in '..\..\global\delphi\cust\custinterfaces.pas',
-  exceptionw in '..\..\global\delphi\general\exceptionw.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   CRC32 in '..\..\global\delphi\general\CRC32.pas',

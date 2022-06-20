@@ -221,7 +221,6 @@
         </DCCReference>
         <DCCReference Include="debug\debugdeadkeys.pas"/>
         <DCCReference Include="main\MessageIdentifiers.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kpsfile.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
             <Form>frameCEFHost</Form>
