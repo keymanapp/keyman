@@ -36,8 +36,8 @@ the root of the cloned repo in order to run Keyman Developer.
 
 Note that some of the files in the CEF4Delphi_binary repo are larger
 than 100MB, which GitHub does not handle, so they have been zipped.
-buildtools/cef-checkout.sh will extract them during a release build, but
-for development use, you'll need to extract them yourself.
+/common/windows/cef-checkout.sh will extract them during a release
+build, but for development use, you'll need to extract them yourself.
 
 Debug symbols for CEF can be found at:
 https://cef-builds.spotifycdn.com/index.html#windows32
