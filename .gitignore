@@ -30,6 +30,12 @@
 /windows/src/**/*.idb
 /windows/src/**/*.suo
 /windows/src/**/.idea
+/common/windows/delphi/**/*.dcu
+/common/windows/delphi/**/*.dcp
+/common/windows/delphi/**/*.drc
+/common/windows/delphi/**/*.bpl
+/common/windows/delphi/**/*.map
+/common/windows/delphi/**/*.tds
 
 # Temp files generated during release build
 /windows/src/buildtools/inst/copydebug.mak

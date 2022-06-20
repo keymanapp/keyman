@@ -4,7 +4,7 @@
 
 !include ..\..\Defines.mak
 
-build: dirs
+build:
     cd packages
     @-mkdir obj\Win32\$(TARGET_PATH)
     $(DCC32DPK) CEF4Delphi.dpk
@@ -13,7 +13,7 @@ build: dirs
 
 install:
     $(DEVTOOLS) -ip $(OUTLIB)\CEF4Delphi.bpl
-    $(DEVTOOLS) -ai $(EXT)\cef4delphi\source
+    $(DEVTOOLS) -ai $(KEYMAN_ROOT)\common\windows\delphi\ext\cef4delphi\source
 
 clean: def-clean
     $(CLEAN) packages\*.bpl
