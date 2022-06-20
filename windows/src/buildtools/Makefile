@@ -7,8 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common devtools sentrytool \
-  buildunidata buildpkg test-klog
+TARGETS=common devtools sentrytool buildpkg test-klog
 !endif
 
 CLEANS=clean-buildtools
@@ -23,10 +22,6 @@ common: .virtual
 
 sentrytool: .virtual
     cd $(ROOT)\src\buildtools\sentrytool
-    $(MAKE) $(TARGET)
-
-buildunidata: .virtual
-    cd $(ROOT)\src\buildtools\buildunidata
     $(MAKE) $(TARGET)
 
 devtools: .virtual
