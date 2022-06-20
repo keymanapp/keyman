@@ -75,11 +75,11 @@
 
 #include "virtualcharkeys.h"
 
-#include "../../../../common/windows/cpp/include/crc32.h"
-#include "../../../../common/windows/cpp/include/ConvertUTF.h"
+#include "../../../common/windows/cpp/include/crc32.h"
+#include "../../../common/windows/cpp/include/ConvertUTF.h"
 #include "debugstore.h"
 #include "namedcodeconstants.h"
-#include "../../../../common/windows/cpp/include/unicode.h"
+#include "../../../common/windows/cpp/include/unicode.h"
 
 #include "edition.h"
 
