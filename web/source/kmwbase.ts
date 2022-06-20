@@ -717,7 +717,7 @@ namespace com.keyman {
       // Note that the main intended use of that function is for embedded KMW on the mobile apps...
       // but they never call `BuildVisualKeyboard`, so it's all good.
       const getOskHeight = this['getOskHeight'];
-      let targetHeight = (typeof getOskHeight == 'function') ? getOskHeight() : this.osk.computedHeight || 200;
+      let targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : this.osk.computedHeight) || 200;
 
       return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, targetHeight);
     }
