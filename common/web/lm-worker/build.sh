@@ -80,8 +80,9 @@ wrap-worker-code ( ) {
 
   echo ""
 
-  cat "${js}"
+  cat "${js}" || die
   printf "\n}\n"
+  echo "// --END:LMLlayerWorkerCode"
 }
 
 ################################ Main script ################################
