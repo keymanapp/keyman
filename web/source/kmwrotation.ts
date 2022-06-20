@@ -47,9 +47,9 @@ namespace com.keyman {
       var osk = this.keyman.osk;
       osk.hideLanguageMenu();
 
-      osk.setNeedsLayout()
+      osk.setNeedsLayout();
       if(this.oskVisible) {
-        osk.show();
+        osk.show(true);
       }
 
       this.isActive = false;

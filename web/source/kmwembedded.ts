@@ -255,8 +255,7 @@ namespace com.keyman.text {
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    let osk: com.keyman.osk.AnchoredOSKView = keymanweb.osk;
-    osk.refreshLayout();
+    keymanweb.osk?.refreshLayout();
   };
 
   /**
