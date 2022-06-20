@@ -154,7 +154,6 @@ uses
   VKeyChars in '..\..\..\windows\src\global\delphi\general\VKeyChars.pas',
   usp10 in '..\..\..\common\windows\delphi\general\usp10.pas',
   UserMessages in '..\..\..\windows\src\global\delphi\general\UserMessages.pas',
-  utilmsxml in '..\..\..\windows\src\global\delphi\general\utilmsxml.pas',
   ErrorControlledRegistry in '..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   UframeBitmapEditor in 'main\UframeBitmapEditor.pas' {frameBitmapEditor: TFrame},
   UfrmMessages in 'main\UfrmMessages.pas' {frmMessages},

@@ -75,7 +75,6 @@ uses
   utiluac in '..\..\global\delphi\general\utiluac.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   UILanguages in 'util\UILanguages.pas',
-  utilmsxml in '..\..\global\delphi\general\utilmsxml.pas',
   UfrmKeyboardOptions in 'main\UfrmKeyboardOptions.pas' {frmKeyboardOptions},
   UfrmOnlineUpdateIcon in 'main\UfrmOnlineUpdateIcon.pas' {frmOnlineUpdateIcon},
   KeymanTrayIcon in '..\..\engine\keyman\KeymanTrayIcon.pas',
