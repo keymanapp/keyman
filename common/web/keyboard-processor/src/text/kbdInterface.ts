@@ -530,20 +530,21 @@ namespace com.keyman.text {
     }
 
     /**
-     * Maps a KeyEvent's modifiers to their appropriate value for key-rule evaluation.
-     * Mostly used to correct for chiral OSK-keys used on non-chiral keyboards.
+     * Maps a KeyEvent's modifiers to their appropriate value for key-rule evaluation
+     * based on the rule's specified target modifier set.
+     *
+     * Mostly used to correct chiral OSK-keys targeting non-chiral rules.
      * @param e The source KeyEvent
      * @returns
      */
-    private getEventModifiers(e: KeyEvent): number {
+    private static getEventRuleModifiers(e: KeyEvent, targetModifierMask: number): number {
       const CHIRAL_ALT  = Codes.modifierCodes["LALT"]  | Codes.modifierCodes["RALT"];
       const CHIRAL_CTRL = Codes.modifierCodes["LCTRL"] | Codes.modifierCodes["RCTRL"];
 
       let modifiers = e.Lmodifiers;
-      const keyboard_bitmask = this.activeKeyboard.modifierBitmask;
 
-      // If this keyboard does not use chiral alt...
-      if(!(keyboard_bitmask & CHIRAL_ALT)) {
+      // If the target rule does not use chiral alt...
+      if(!(targetModifierMask & CHIRAL_ALT)) {
         const alt_intersection  = modifiers & CHIRAL_ALT;
 
         if(alt_intersection) {
@@ -552,8 +553,8 @@ namespace com.keyman.text {
         }
       }
 
-      // If this keyboard does not use chiral ctrl...
-      if(!(keyboard_bitmask & CHIRAL_CTRL)) {
+      // If the target rule does not use chiral ctrl...
+      if(!(targetModifierMask & CHIRAL_CTRL)) {
         const ctrl_intersection = modifiers & CHIRAL_CTRL;
 
         if(ctrl_intersection) {
@@ -583,7 +584,7 @@ namespace com.keyman.text {
       var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
       var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
-      const eventModifiers = this.getEventModifiers(e);
+      const eventModifiers = KeyboardInterface.getEventRuleModifiers(e, Lruleshift);
 
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
