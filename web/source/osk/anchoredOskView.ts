@@ -65,13 +65,19 @@ namespace com.keyman.osk {
      * @override
      */
     public refreshLayout(pending?: boolean): void {
-      // Prevent a circular call-stack chain.
+      // This function is generally triggered whenever the OSK's dimensions change, among other
+      // things.
       if(this.isResizing) {
         return;
       }
 
       try {
         this.isResizing = true;
+        // This resizes the OSK to what is appropriate for the device's current orientation,
+        // which will often trigger a resize event... which in turn triggers a layout refresh.
+        //
+        // So, we mark and unmark the `isResizing` flag to prevent triggering a circular
+        // call-stack chain from this call.
         this.doResize();
       } finally {
         this.isResizing = false;
