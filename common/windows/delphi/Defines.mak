@@ -197,11 +197,11 @@ MAKE=$(MAKE)
 #
 
 !IFNDEF SC_PFX_SHA1
-SC_PFX_SHA1="$(WINDOWS_ROOT)\src\buildtools\certificates\keymantest-sha1.pfx"
+SC_PFX_SHA1="$(COMMON_ROOT)\tools\certificates\keymantest-sha1.pfx"
 !ENDIF
 
 !IFNDEF SC_PFX_SHA256
-SC_PFX_SHA256="$(WINDOWS_ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
+SC_PFX_SHA256="$(COMMON_ROOT)\tools\certificates\keymantest-sha256.pfx"
 !ENDIF
 
 !IFNDEF SC_URL
