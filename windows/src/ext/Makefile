@@ -10,8 +10,6 @@ TARGETS=.virtual
 TARGETS=common jedi cef4delphi
 !endif
 
-# jedi has no packages
-
 CLEANS=
 
 !include ..\Header.mak
@@ -30,10 +28,6 @@ cef4delphi: .virtual
 
 jedi: .virtual
     cd $(ROOT)\src\ext\jedi
-    $(MAKE) $(TARGET)
-
-vclzip: .virtual
-    cd $(ROOT)\src\ext\vclzip
     $(MAKE) $(TARGET)
 
 #
