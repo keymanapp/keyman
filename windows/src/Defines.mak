@@ -257,9 +257,9 @@ PLATFORM=Win32
 #
 
 !ifdef GIT_BASH_FOR_KEYMAN
-MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\mkver.sh
+MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(KEYMAN_ROOT)\common\windows\mkver.sh
 !else
-MKVER_SH=start /wait $(ROOT)\src\buildtools\mkver.sh
+MKVER_SH=start /wait $(KEYMAN_ROOT)\common\windows\mkver.sh
 !endif
 
 MKVER_M=$(MKVER_SH) manifest.in manifest.xml
