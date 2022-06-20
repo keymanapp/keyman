@@ -102,7 +102,6 @@ uses
   kmxfileusedchars in '..\..\global\delphi\general\kmxfileusedchars.pas',
   kmxfileusedscripts in '..\..\global\delphi\general\kmxfileusedscripts.pas',
   UnicodeBlocks in '..\..\global\delphi\general\UnicodeBlocks.pas' { UnicodeBlock: CoClass},
-  IntegerArray in '..\..\global\delphi\general\IntegerArray.pas',
   KeymanControlMessages in '..\..\global\delphi\general\KeymanControlMessages.pas',
   internalinterfaces in 'util\internalinterfaces.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',

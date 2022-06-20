@@ -242,7 +242,6 @@
         <DCCReference Include="..\..\global\delphi\general\UnicodeBlocks.pas">
             <CoClasses> UnicodeBlock</CoClasses>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\general\IntegerArray.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanControlMessages.pas"/>
         <DCCReference Include="util\internalinterfaces.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
