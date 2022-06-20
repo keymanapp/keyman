@@ -225,7 +225,6 @@
         <DCCReference Include="..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
             <Form>frameCEFHost</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\common\delphi\components\BitmapEditor.pas"/>
         <DCCReference Include="..\common\delphi\components\StringGridEditControlled.pas"/>
