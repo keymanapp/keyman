@@ -67,8 +67,6 @@
     <ClInclude Include="CheckFilenameConsistency.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema.hpp" />
-    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json\json.hpp" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\certificate_check.h">
       <Filter>Header files</Filter>
     </ClInclude>
@@ -82,6 +80,12 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\common\windows\cpp\include\vkeys.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json\json.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>
