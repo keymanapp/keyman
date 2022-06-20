@@ -133,7 +133,7 @@ DCC64=cmd /c "$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 # Delphi MSBuild related commands and macros
 #
 
-DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
+DELPHI_MSBUILD="$(COMMON_ROOT)\tools\msbuild-wrapper.bat" "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
 
 !IFDEF NODELPHI
 DCC32=echo skipping
