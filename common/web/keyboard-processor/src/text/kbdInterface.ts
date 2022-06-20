@@ -530,6 +530,38 @@ namespace com.keyman.text {
     }
 
     /**
+     * Maps a KeyEvent's modifiers to their appropriate value for key-rule evaluation.
+     * Mostly used to correct for chiral OSK-keys used on non-chiral keyboards.
+     * @param e The source KeyEvent
+     * @returns
+     */
+    private getEventModifiers(e: KeyEvent): number {
+      let modifiers = e.Lmodifiers;
+      const keyboard_bitmask = this.activeKeyboard.modifierBitmask;
+
+      // If this keyboard is explicitly non-chiral...
+      const kbd_chiral_intersection = keyboard_bitmask & Codes.modifierBitmasks["CHIRAL"];
+      if(kbd_chiral_intersection == Codes.modifierCodes["SHIFT"] || !kbd_chiral_intersection) {
+        const CHIRAL_ALT  = Codes.modifierCodes["LALT"]  | Codes.modifierCodes["RALT"];
+        const CHIRAL_CTRL = Codes.modifierCodes["LCTRL"] | Codes.modifierCodes["RCTRL"];
+        const alt_intersection  = modifiers & CHIRAL_ALT;
+        const ctrl_intersection = modifiers & CHIRAL_CTRL;
+
+        if(alt_intersection) {
+          // Undo the chiral part          and replace with non-chiral.
+          modifiers ^= alt_intersection  | Codes.modifierCodes["ALT"];
+        }
+
+        if(ctrl_intersection) {
+          // Undo the chiral part          and replace with non-chiral.
+          modifiers ^= ctrl_intersection | Codes.modifierCodes["CTRL"];
+        }
+      }
+
+      return modifiers;
+    }
+
+    /**
      * Function     keyMatch      KKM
      * Scope        Public
      * @param       {Object}      e           keystroke event
@@ -547,13 +579,15 @@ namespace com.keyman.text {
       var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
       var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
+      const eventModifiers = this.getEventModifiers(e);
+
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
       }
 
       if(e.LisVirtualKey || keyCode > 255) {
         if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255)) { // added keyCode test to support extended keys
-          retVal = ((Lrulekey == keyCode) && ((Lruleshift & modifierBitmask) == e.Lmodifiers)); //I3318, I3555
+          retVal = ((Lrulekey == keyCode) && ((Lruleshift & modifierBitmask) == eventModifiers)); //I3318, I3555
           retVal = retVal && this.stateMatch(e, Lruleshift & stateBitmask);
         }
       } else if((Lruleshift & 0x4000) == 0) {
