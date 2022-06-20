@@ -94,7 +94,7 @@ inst: redist
 # release
 # ----------------------------------------------------------------------
 
-release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-releaseexists test-cert test-7zip test-wix clean clean-output
+release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-releaseexists test-cert test-7zip test-wix test-klog clean clean-output
     cd $(DEVELOPER_ROOT)\src
     echo Continuing Release
     $(MAKE) do-build-release
@@ -107,6 +107,7 @@ do-build-release:
     echo Starting Release Build
     cd $(DEVELOPER_ROOT)\src
     $(MAKE) global-versions
+    cd $(DEVELOPER_ROOT)\src
     $(MAKE) dirs
     cd $(WINDOWS_ROOT)\src
     $(MAKE) build-tools
@@ -185,6 +186,15 @@ test-7zip:
     if not exist $(WZZIPPATH) exit 1
 
 #
+# Test that klog is disabled
+#
+
+test-klog:
+    cd $(COMMON_ROOT)\tools\test-klog
+    $(MAKE) verify
+    cd $(DEVELOPER_ROOT)\src
+
+#
 # Test that we haven't already built this release
 #
 
@@ -201,15 +211,6 @@ test-releasebuildcheck: global-versions
     cd $(COMMON_ROOT)\tools\devtools
     $(MAKE) test-releasebuildcheck
     cd $(DEVELOPER_ROOT)\src
-
-global-versions:
-# Build our root version.txt
-    cd $(WINDOWS_ROOT)\src
-    $(MKVER_U) $(WINDOWS_ROOT)\src\global\inc\keymanversion_build.in $(WINDOWS_ROOT)\src\global\inc\keymanversion_build.h
-    $(MKVER_U) $(WINDOWS_ROOT)\src\global\delphi\general\keymanversion_build.in $(WINDOWS_ROOT)\src\global\delphi\general\keymanversion_build.inc
-    echo Continue Global-Versions
-    cd $(DEVELOPER_ROOT)\src
-    echo End Global-Versions
 
 #
 # Tools needed to complete a build

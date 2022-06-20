@@ -153,7 +153,7 @@ test-7zip:
 #
 
 test-klog:
-    cd $(ROOT)\src\buildtools\test-klog
+    cd $(COMMON_ROOT)\tools\test-klog
     $(MAKE) verify
     cd $(ROOT)\src
 
