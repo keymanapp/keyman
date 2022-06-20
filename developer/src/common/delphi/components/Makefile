@@ -22,6 +22,9 @@ compile:
 install:
     $(DEVTOOLS) -ip $(DEVELOPER_OUTLIB)\developer_components.bpl
 
+signcode:
+  @rem no signcode
+
 # ----------------------------------------------------------------------
 # clean target
 # ----------------------------------------------------------------------
