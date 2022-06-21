@@ -537,7 +537,7 @@ namespace com.keyman.text {
      * @param e The source KeyEvent
      * @returns
      */
-    private static getEventRuleModifiers(eventModifiers: number, targetModifierMask: number): number {
+    private static matchModifiersToRuleChirality(eventModifiers: number, targetModifierMask: number): number {
       const CHIRAL_ALT  = Codes.modifierCodes["LALT"]  | Codes.modifierCodes["RALT"];
       const CHIRAL_CTRL = Codes.modifierCodes["LCTRL"] | Codes.modifierCodes["RCTRL"];
 
@@ -584,7 +584,7 @@ namespace com.keyman.text {
       var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
       var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
-      const eventModifiers = KeyboardInterface.getEventRuleModifiers(e.Lmodifiers, Lruleshift);
+      const eventModifiers = KeyboardInterface.matchModifiersToRuleChirality(e.Lmodifiers, Lruleshift);
 
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
