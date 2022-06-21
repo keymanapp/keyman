@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.16 alpha 2022-06-21
+
+* fix(web): key tip constraint logic requires .bottom CSS (#6784)
+* fix(ios): overzealous error about missing banner image (#6807)
+* chore(linux): Update Debian changelog (#6810)
+
 ## 16.0.15 alpha 2022-06-18
 
 * fix(web): crash on custom modifier keys (#6790)
