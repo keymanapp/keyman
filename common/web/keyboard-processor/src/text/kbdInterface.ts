@@ -537,29 +537,29 @@ namespace com.keyman.text {
      * @param e The source KeyEvent
      * @returns
      */
-    private static getEventRuleModifiers(e: KeyEvent, targetModifierMask: number): number {
+    private static getEventRuleModifiers(eventModifiers: number, targetModifierMask: number): number {
       const CHIRAL_ALT  = Codes.modifierCodes["LALT"]  | Codes.modifierCodes["RALT"];
       const CHIRAL_CTRL = Codes.modifierCodes["LCTRL"] | Codes.modifierCodes["RCTRL"];
 
-      let modifiers = e.Lmodifiers;
+      let modifiers = eventModifiers;
 
       // If the target rule does not use chiral alt...
       if(!(targetModifierMask & CHIRAL_ALT)) {
-        const alt_intersection  = modifiers & CHIRAL_ALT;
+        const altIntersection  = modifiers & CHIRAL_ALT;
 
-        if(alt_intersection) {
-          // Undo the chiral part          and replace with non-chiral.
-          modifiers ^= alt_intersection  | Codes.modifierCodes["ALT"];
+        if(altIntersection) {
+          // Undo the chiral part         and replace with non-chiral.
+          modifiers ^= altIntersection  | Codes.modifierCodes["ALT"];
         }
       }
 
       // If the target rule does not use chiral ctrl...
       if(!(targetModifierMask & CHIRAL_CTRL)) {
-        const ctrl_intersection = modifiers & CHIRAL_CTRL;
+        const ctrlIntersection = modifiers & CHIRAL_CTRL;
 
-        if(ctrl_intersection) {
-          // Undo the chiral part          and replace with non-chiral.
-          modifiers ^= ctrl_intersection | Codes.modifierCodes["CTRL"];
+        if(ctrlIntersection) {
+          // Undo the chiral part         and replace with non-chiral.
+          modifiers ^= ctrlIntersection | Codes.modifierCodes["CTRL"];
         }
       }
 
@@ -584,7 +584,7 @@ namespace com.keyman.text {
       var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
       var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
-      const eventModifiers = KeyboardInterface.getEventRuleModifiers(e, Lruleshift);
+      const eventModifiers = KeyboardInterface.getEventRuleModifiers(e.Lmodifiers, Lruleshift);
 
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
