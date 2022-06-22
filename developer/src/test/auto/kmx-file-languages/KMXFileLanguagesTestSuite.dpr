@@ -12,7 +12,7 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   Keyman.System.KMXFileLanguages in '..\..\..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
-  kmxfile in '..\..\..\..\..\windows\src\global\delphi\general\kmxfile.pas',
+  kmxfile in '..\..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas',
   CRC32 in '..\..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\..\..\common\windows\delphi\general\KeyNames.pas',
   utildir in '..\..\..\..\..\common\windows\delphi\general\utildir.pas',
@@ -26,7 +26,7 @@ uses
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
-  kmxfileconsts in '..\..\..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas',
+  kmxfileconsts in '..\..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas';
 

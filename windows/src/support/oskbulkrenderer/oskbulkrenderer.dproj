@@ -155,7 +155,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\ScanCodeMap.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>

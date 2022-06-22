@@ -226,7 +226,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Windows8LanguageList.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\BCP47Tag.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogClient.pas"/>
         <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas"/>
         <DCCReference Include="Keyman.System.SharedBuffers.pas"/>

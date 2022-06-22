@@ -220,7 +220,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="keymanapi_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas"/>
         <DCCReference Include="util\utilhandleexception.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationMenu.pas"/>
@@ -235,8 +235,8 @@
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanEngineControl.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfileutils.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfileutils.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileusedchars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileusedscripts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UnicodeBlocks.pas">

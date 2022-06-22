@@ -13,7 +13,7 @@ uses
   keymanstrings in 'keymanstrings.pas',
   VKeys in '..\..\..\..\common\windows\delphi\general\VKeys.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
-  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
+  kmxfileconsts in '..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   RedistFiles in '..\..\developer\TIKE\main\RedistFiles.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',

@@ -4,7 +4,7 @@ uses
   Vcl.Forms,
   test_iconsave_form in 'test_iconsave_form.pas' {Form1},
   utilicon in '..\..\..\..\common\windows\delphi\general\utilicon.pas',
-  kmxfile in '..\..\global\delphi\general\kmxfile.pas',
+  kmxfile in '..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas',
   CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   crypt_base in '..\..\global\delphi\productactivation\crypt_base.pas',
   crypt_guid in '..\..\global\delphi\productactivation\crypt_guid.pas',

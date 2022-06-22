@@ -102,7 +102,7 @@ uses
   VisualKeyboardSaverXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   Windows8LanguageList in '..\..\global\delphi\general\Windows8LanguageList.pas',
   BCP47Tag in '..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
-  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
+  kmxfileconsts in '..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   Keyman.System.DebugLogClient in '..\..\global\delphi\debug\Keyman.System.DebugLogClient.pas',
   Keyman.System.DebugLogCommon in '..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas',
   Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas',

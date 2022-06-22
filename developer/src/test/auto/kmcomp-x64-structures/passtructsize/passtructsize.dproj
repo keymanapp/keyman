@@ -92,7 +92,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="..\..\..\..\global\delphi\general\compile.pas"/>
-        <DCCReference Include="..\..\..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\..\developer\TIKE\main\RedistFiles.pas"/>

@@ -92,7 +92,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="..\..\..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\kmxfile.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utildir.pas"/>
@@ -106,7 +106,7 @@
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <BuildConfiguration Include="Release">
