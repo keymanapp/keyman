@@ -8,7 +8,7 @@ build:
   cd $(ROOT)\src\global\delphi
   $(MAKE) $(TARGET)
 
-  cd $(ROOT)\src\global\inst
+  cd $(KEYMAN_ROOT)\common\windows\data
   $(MAKE) $(TARGET)
 !endif
 
@@ -22,7 +22,7 @@ clean:
   cd $(ROOT)\src\global\delphi
   $(MAKE) clean
 
-  cd $(ROOT)\src\global\inst
+  cd $(KEYMAN_ROOT)\common\windows\data
   $(MAKE) clean
 
 signcode:
