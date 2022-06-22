@@ -8,9 +8,6 @@ build:
   cd $(ROOT)\src\global\delphi
   $(MAKE) $(TARGET)
 
-  cd $(ROOT)\src\global\help
-  $(MAKE) $(TARGET)
-
   cd $(ROOT)\src\global\inst
   $(MAKE) $(TARGET)
 !endif
@@ -23,9 +20,6 @@ clean:
   -del $(ROOT)\src\global\inc\keymanversion_build.h
 
   cd $(ROOT)\src\global\delphi
-  $(MAKE) clean
-
-  cd $(ROOT)\src\global\help
   $(MAKE) clean
 
   cd $(ROOT)\src\global\inst
