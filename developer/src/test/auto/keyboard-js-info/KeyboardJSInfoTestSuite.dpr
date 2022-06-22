@@ -13,7 +13,7 @@ uses
   DUnitX.TestFramework,
   Keyman.Test.System.KeyboardJSInfoTest in 'Keyman.Test.System.KeyboardJSInfoTest.pas',
   Keyman.System.KeyboardJSInfo in '..\..\..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
-  Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\..\..\common\windows\delphi\vcl\Keyman.System.RegExGroupHelperRSP19902.pas',
   DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas';
 

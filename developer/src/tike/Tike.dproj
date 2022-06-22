@@ -463,7 +463,7 @@
         <DCCReference Include="..\..\..\common\windows\delphi\general\BCP47Tag.pas"/>
         <DCCReference Include="..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\vcl\Keyman.System.RegExGroupHelperRSP19902.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\Keyman.System.UpdateCheckResponse.pas"/>
         <DCCReference Include="help\Keyman.Developer.System.HelpTopics.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>

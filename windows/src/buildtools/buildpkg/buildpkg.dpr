@@ -58,7 +58,7 @@ uses
   Keyman.System.KeyboardJSInfo in '..\..\..\..\developer\src\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
   Keyman.System.KeyboardUtils in '..\..\..\..\developer\src\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\..\common\windows\delphi\vcl\Keyman.System.RegExGroupHelperRSP19902.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
   BCP47Tag in '..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',

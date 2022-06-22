@@ -93,7 +93,7 @@
         </DelphiCompile>
         <DCCReference Include="Keyman.Test.System.KeyboardJSInfoTest.pas"/>
         <DCCReference Include="..\..\..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\Keyman.System.RegExGroupHelperRSP19902.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <BuildConfiguration Include="Release">

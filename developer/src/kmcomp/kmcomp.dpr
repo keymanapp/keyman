@@ -97,7 +97,7 @@ uses
   Keyman.System.KeyboardInfoFile in '..\common\delphi\keyboards\Keyman.System.KeyboardInfoFile.pas',
   BCP47Tag in '..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\common\windows\delphi\vcl\Keyman.System.RegExGroupHelperRSP19902.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   TextFileFormat in '..\common\delphi\general\TextFileFormat.pas',

@@ -86,7 +86,7 @@ uses
   CompilePackageInstaller in '..\..\..\..\..\windows\src\global\delphi\general\CompilePackageInstaller.pas',
   utilhttp in '..\..\..\..\..\common\windows\delphi\general\utilhttp.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
+  Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\..\..\common\windows\delphi\vcl\Keyman.System.RegExGroupHelperRSP19902.pas',
   DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   BCP47Tag in '..\..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
