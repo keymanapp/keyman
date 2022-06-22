@@ -59,7 +59,7 @@
     <ClCompile Include="import_rules.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\global\vc\VKScanCodes.cpp">
+    <ClCompile Include="..\..\..\..\global\cpp\VKScanCodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syskbdnt32.cpp">

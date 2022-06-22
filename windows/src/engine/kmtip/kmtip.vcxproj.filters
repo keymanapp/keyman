@@ -42,10 +42,10 @@
     <ClCompile Include="inserttext.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\keynames.cpp">
+    <ClCompile Include="..\..\global\cpp\keynames.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\registry.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
@@ -69,7 +69,7 @@
     <ClCompile Include="keyman32interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\kmtip_guids.cpp">
+    <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
   </ItemGroup>

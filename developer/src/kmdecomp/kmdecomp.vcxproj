@@ -132,7 +132,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="$(KEYMAN_ROOT)\windows\src\global\vc\keymansentry.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp" />
     <ClCompile Include="crc32.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>

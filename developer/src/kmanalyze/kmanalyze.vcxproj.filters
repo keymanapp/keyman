@@ -35,13 +35,13 @@
     <ClCompile Include="kmanalyze.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\windows\src\global\vc\xstring.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\windows\src\global\vc\crc32.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\crc32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\windows\src\global\vc\keymansentry.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

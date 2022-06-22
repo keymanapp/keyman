@@ -57,7 +57,7 @@
     <ClCompile Include="KEYMAN32.CPP">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\keynames.cpp">
+    <ClCompile Include="..\..\global\cpp\keynames.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="keystate.cpp">
@@ -75,10 +75,10 @@
     <ClCompile Include="kmprocess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\rc4.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\rc4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\registry.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="selectkeyboard.cpp">
@@ -93,7 +93,7 @@
     <ClCompile Include="syskbdnt64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\unicode.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="versioninfo.cpp">
@@ -102,7 +102,7 @@
     <ClCompile Include="VKScanCodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\xstring.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="preservedkeymap.cpp">
