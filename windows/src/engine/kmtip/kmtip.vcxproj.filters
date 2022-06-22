@@ -42,7 +42,7 @@
     <ClCompile Include="inserttext.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\cpp\keynames.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp">
@@ -102,7 +102,7 @@
     <ClInclude Include="globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\KEYNAMES.H">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kmtip.h">
@@ -114,7 +114,7 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h">
+    <ClInclude Include="..\..\..\include\kmtip_guids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\common\windows\cpp\include\vkeys.h">

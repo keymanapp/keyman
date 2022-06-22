@@ -57,7 +57,7 @@
     <ClCompile Include="KEYMAN32.CPP">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\cpp\keynames.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="keystate.cpp">
@@ -195,7 +195,7 @@
     <ClInclude Include="..\..\global\inc\keyman64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymancontrol.h">
+    <ClInclude Include="keymancontrol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keystate.h">
@@ -240,13 +240,13 @@
     <ClInclude Include="serialkeyeventserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymanengine.h">
+    <ClInclude Include="keymanengine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kmprocessactions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h">
+    <ClInclude Include="..\..\..\include\kmtip_guids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

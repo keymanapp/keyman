@@ -340,7 +340,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\global\cpp\keynames.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -419,10 +419,10 @@
     <ClInclude Include="..\..\..\..\common\windows\cpp\include\vkeys.h" />
     <ClInclude Include="..\..\global\inc\certificate_check.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h" />
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h" />
+    <ClInclude Include="..\..\..\include\kmtip_guids.h" />
     <ClInclude Include="editsess.h" />
     <ClInclude Include="globals.h" />
-    <ClInclude Include="..\..\global\inc\KEYNAMES.H" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h" />
     <ClInclude Include="kmtip.h" />
     <ClInclude Include="..\..\global\inc\registry.h" />
     <ClInclude Include="pch.h" />

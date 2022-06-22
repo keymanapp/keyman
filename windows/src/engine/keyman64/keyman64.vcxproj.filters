@@ -17,7 +17,7 @@
     <ClCompile Include="..\keyman32\keybd_shift.cpp" />
     <ClCompile Include="..\keyman32\keyboardoptions.cpp" />
     <ClCompile Include="..\keyman32\Keyman32.cpp" />
-    <ClCompile Include="..\..\global\cpp\keynames.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp" />
     <ClCompile Include="..\keyman32\keystate.cpp" />
     <ClCompile Include="..\keyman32\kmhook_callwndproc.cpp" />
     <ClCompile Include="..\keyman32\kmhook_getmessage.cpp" />
@@ -57,8 +57,8 @@
     <ClInclude Include="..\keyman32\k32_res.h" />
     <ClInclude Include="..\keyman32\KBD.H" />
     <ClInclude Include="..\..\global\inc\keyman64.h" />
-    <ClInclude Include="..\..\global\inc\keymancontrol.h" />
-    <ClInclude Include="..\..\global\inc\KEYNAMES.H" />
+    <ClInclude Include="..\keyman32\keymancontrol.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h" />
     <ClInclude Include="..\keyman32\keyman-debug-etw.h" />
     <ClInclude Include="..\keyman32\keyeventsenderthread.h" />
     <ClInclude Include="..\keyman32\keystate.h" />
@@ -75,12 +75,12 @@
     <ClInclude Include="..\keyman32\serialkeyeventserver.h" />
     <ClInclude Include="..\keyman32\SharedBuffers.h" />
     <ClInclude Include="..\keyman32\syskbd.h" />
-    <ClInclude Include="..\..\global\inc\testkeymanfunctioning.h" />
+    <ClInclude Include="..\keyman32\testkeymanfunctioning.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />
     <ClInclude Include="..\keyman32\vkscancodes.h" />
-    <ClInclude Include="..\..\global\inc\keymanengine.h" />
+    <ClInclude Include="..\keyman32\keymanengine.h" />
     <ClInclude Include="..\keyman32\kmprocessactions.h" />
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h" />
+    <ClInclude Include="..\..\..\include\kmtip_guids.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\keyman32\keyman-debug-etw.man" />

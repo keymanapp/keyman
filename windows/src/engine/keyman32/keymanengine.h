@@ -263,8 +263,8 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "vkscancodes.h"
 
 #include "testkeymanfunctioning.h"
-#include "keynames.h"
-#include "kmtip_guids.h"
+#include "..\..\..\..\common\windows\cpp\include\keynames.h"
+#include "..\..\..\include\kmtip_guids.h"
 
 #include "crc32.h"
 
