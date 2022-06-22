@@ -16,7 +16,7 @@ uses
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
-  VKeys in '..\..\global\delphi\general\VKeys.pas';
+  VKeys in '..\..\..\..\common\windows\delphi\general\VKeys.pas';
 
 {$R *.res}
 

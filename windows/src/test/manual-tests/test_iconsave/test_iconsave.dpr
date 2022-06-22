@@ -12,10 +12,10 @@ uses
   tavultesoft_certificate in '..\..\global\delphi\productactivation\tavultesoft_certificate.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   crypt_user in '..\..\global\delphi\productactivation\crypt_user.pas',
-  KeyNames in '..\..\global\delphi\general\KeyNames.pas',
+  KeyNames in '..\..\..\..\common\windows\delphi\general\KeyNames.pas',
   KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
-  utildir in '..\..\global\delphi\general\utildir.pas',
-  utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
+  utildir in '..\..\..\..\common\windows\delphi\general\utildir.pas',
+  utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   kmcomapi_TLB in '..\..\engine\kmcomapi\kmcomapi_TLB.pas',
   utilolepicture in '..\..\engine\kmcomapi\util\utilolepicture.pas';
 

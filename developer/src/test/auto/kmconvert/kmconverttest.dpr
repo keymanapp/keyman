@@ -15,19 +15,19 @@ uses
   Keyman.Developer.System.KMConvertParameters in '..\..\..\kmconvert\Keyman.Developer.System.KMConvertParameters.pas',
   UKeymanTargets in '..\..\..\..\..\windows\src\global\delphi\general\UKeymanTargets.pas',
   BCP47Tag in '..\..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
-  Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  Keyman.System.LanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.System.KeyboardUtils in '..\..\..\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
   Keyman.System.LexicalModelUtils in '..\..\..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
-  utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
+  utilstr in '..\..\..\..\..\common\windows\delphi\general\utilstr.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
-  utilfiletypes in '..\..\..\..\..\windows\src\global\delphi\general\utilfiletypes.pas',
+  utilfiletypes in '..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   StockFileNames in '..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas';
 
 var

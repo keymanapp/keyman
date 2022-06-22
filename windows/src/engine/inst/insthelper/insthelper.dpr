@@ -16,9 +16,9 @@ uses
   SysUtils,
   Classes,
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  klog in '..\..\..\global\delphi\general\klog.pas',
+  klog in '..\..\..\..\..\common\windows\delphi\general\klog.pas',
   CRC32 in '..\..\..\..\..\common\windows\delphi\general\CRC32.pas',
-  VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
+  VersionInfo in '..\..\..\..\..\common\windows\delphi\general\VersionInfo.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   preuninstallunit in 'preuninstallunit.pas',
@@ -28,12 +28,12 @@ uses
   Keyman.System.Install.EnginePostInstall in 'Keyman.System.Install.EnginePostInstall.pas',
   Keyman.System.Security in '..\..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
-  DebugPaths in '..\..\..\global\delphi\general\DebugPaths.pas',
+  DebugPaths in '..\..\..\..\..\common\windows\delphi\general\DebugPaths.pas',
   ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
-  utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
-  utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
-  KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas';
+  utilexecute in '..\..\..\..\..\common\windows\delphi\general\utilexecute.pas',
+  utilsystem in '..\..\..\..\..\common\windows\delphi\general\utilsystem.pas',
+  KeymanPaths in '..\..\..\..\..\common\windows\delphi\general\KeymanPaths.pas';
 
 {$R *.RES}
 {$R VERSION.RES}

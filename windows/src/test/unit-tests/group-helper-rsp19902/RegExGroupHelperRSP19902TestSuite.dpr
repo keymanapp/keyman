@@ -13,7 +13,7 @@ uses
   DUnitX.TestFramework,
   Keyman.Test.RegExGroupHelperRSP19902Test in 'Keyman.Test.RegExGroupHelperRSP19902Test.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
-  DUnitX.Loggers.TeamCity in '..\..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas';
 
 var
   runner : ITestRunner;
