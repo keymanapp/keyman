@@ -91,7 +91,7 @@
 			</DCCReference>
 			<DCCReference Include="..\..\global\delphi\general\utilicon.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
 			<DCCReference Include="..\..\global\delphi\productactivation\crypt_base.pas"/>
 			<DCCReference Include="..\..\global\delphi\productactivation\crypt_guid.pas"/>
 			<DCCReference Include="..\..\global\delphi\productactivation\productactivation.pas"/>

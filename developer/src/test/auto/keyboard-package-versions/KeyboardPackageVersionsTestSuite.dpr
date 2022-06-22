@@ -39,7 +39,7 @@ uses
   VKeys in '..\..\..\..\..\windows\src\global\delphi\general\VKeys.pas',
   ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   kmxfile in '..\..\..\..\..\windows\src\global\delphi\general\kmxfile.pas',
-  CRC32 in '..\..\..\..\..\windows\src\global\delphi\general\CRC32.pas',
+  CRC32 in '..\..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\..\..\windows\src\global\delphi\general\KeyNames.pas',
   KeymanDeveloperOptions in '..\..\..\tike\main\KeymanDeveloperOptions.pas',
   Keyman.System.PackageInfoRefreshKeyboards in '..\..\..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',

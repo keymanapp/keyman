@@ -141,7 +141,7 @@
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompilePackage.pas"/>
         <DCCReference Include="main\KeymanDeveloperUtils.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\CRC32.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="child\UfrmEditor.pas">
             <Form>frmEditor</Form>
         </DCCReference>

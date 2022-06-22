@@ -17,7 +17,7 @@ uses
   Classes,
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   klog in '..\..\..\global\delphi\general\klog.pas',
-  CRC32 in '..\..\..\global\delphi\general\CRC32.pas',
+  CRC32 in '..\..\..\..\..\common\windows\delphi\general\CRC32.pas',
   VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',

@@ -31,7 +31,7 @@ uses
   utilhttp in '..\..\global\delphi\general\utilhttp.pas',
   kmxfile in '..\..\global\delphi\general\kmxfile.pas',
   utilkeyboard in '..\..\global\delphi\general\utilkeyboard.pas',
-  CRC32 in '..\..\global\delphi\general\CRC32.pas',
+  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',

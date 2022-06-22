@@ -157,7 +157,7 @@
         <DCCReference Include="..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="kccompilepackage.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompilePackage.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\CRC32.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kpsfile.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageFileFormats.pas"/>

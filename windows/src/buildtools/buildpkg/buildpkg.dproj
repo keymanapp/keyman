@@ -121,7 +121,7 @@
         <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilkeyboard.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>

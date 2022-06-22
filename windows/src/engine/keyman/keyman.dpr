@@ -9,7 +9,7 @@ uses
   custinterfaces in '..\..\global\delphi\cust\custinterfaces.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
-  CRC32 in '..\..\global\delphi\general\CRC32.pas',
+  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   MessageIdentifiers in '..\..\global\delphi\cust\MessageIdentifiers.pas',
   kmint in 'kmint.pas',

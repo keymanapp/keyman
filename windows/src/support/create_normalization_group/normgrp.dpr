@@ -9,7 +9,7 @@ uses
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
   kmxfileusedchars in '..\..\global\delphi\general\kmxfileusedchars.pas',
   kmxfileutils in '..\..\global\delphi\general\kmxfileutils.pas',
-  CRC32 in '..\..\global\delphi\general\CRC32.pas',
+  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',

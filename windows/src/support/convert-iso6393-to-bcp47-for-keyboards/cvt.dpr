@@ -14,7 +14,7 @@ uses
   utilfiletypes in 'C:\Projects\keyman\open\windows\src\global\delphi\general\utilfiletypes.pas',
   utildir in 'C:\Projects\keyman\open\windows\src\global\delphi\general\utildir.pas',
   kmxfile in 'C:\Projects\keyman\open\windows\src\global\delphi\general\kmxfile.pas',
-  CRC32 in 'C:\Projects\keyman\open\windows\src\global\delphi\general\CRC32.pas',
+  CRC32 in 'C:\Projects\keyman\open\common\windows\delphi\general\CRC32.pas',
   KeyNames in 'C:\Projects\keyman\open\windows\src\global\delphi\general\KeyNames.pas',
   KeymanVersion in 'C:\Projects\keyman\open\common\windows\delphi\general\KeymanVersion.pas',
   StockFileNames in 'C:\Projects\keyman\open\windows\src\global\delphi\cust\StockFileNames.pas',

@@ -247,7 +247,7 @@
         <DCCReference Include="..\..\engine\kmcomapi\util\utilolepicture.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\input_installlayoutortip.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KPInstallPackageStartMenu.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>

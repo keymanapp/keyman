@@ -47,7 +47,7 @@ uses
   isadmin in 'util\isadmin.pas',
   baseerror in 'util\baseerror.pas',
   utilkeyman in 'util\utilkeyman.pas',
-  CRC32 in '..\..\global\delphi\general\CRC32.pas',
+  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',

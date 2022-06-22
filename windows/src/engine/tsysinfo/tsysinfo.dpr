@@ -19,7 +19,7 @@ uses
   kmxfile in '..\..\global\delphi\general\kmxfile.pas',
   utilkeyboard in '..\..\global\delphi\general\utilkeyboard.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
-  CRC32 in '..\..\global\delphi\general\CRC32.pas',
+  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   ttinfo in '..\..\global\delphi\general\ttinfo.pas',
   Upload_Settings in '..\..\global\delphi\general\Upload_Settings.pas',
