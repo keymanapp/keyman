@@ -6,7 +6,7 @@ program packageinftool;
 
 uses
   System.SysUtils,
-  PackageInfo in '..\..\global\delphi\general\PackageInfo.pas',
+  PackageInfo in '..\..\..\..\common\windows\delphi\packages\PackageInfo.pas',
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   utilstr in '..\..\..\..\common\windows\delphi\general\utilstr.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
@@ -19,9 +19,9 @@ uses
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
-  PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
+  PackageFileFormats in '..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas',
   packageinf in 'packageinf.pas',
-  kmpinffile in '..\..\global\delphi\general\kmpinffile.pas',
+  kmpinffile in '..\..\..\..\common\windows\delphi\packages\kmpinffile.pas',
   JsonUtil in '..\..\..\..\common\windows\delphi\general\JsonUtil.pas';
 
 begin

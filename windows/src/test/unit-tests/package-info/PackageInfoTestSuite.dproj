@@ -91,7 +91,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\..\global\delphi\general\PackageInfo.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\packages\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\global\delphi\cust\StockFileNames.pas"/>
@@ -104,7 +104,7 @@
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\PackageFileFormats.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas"/>
         <DCCReference Include="PackageInfoTest.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas"/>

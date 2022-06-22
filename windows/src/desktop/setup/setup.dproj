@@ -135,14 +135,14 @@
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas"/>
         <DCCReference Include="Keyman.Setup.System.InstallInfo.pas"/>
         <DCCReference Include="Keyman.Setup.System.OnlineResourceCheck.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\JsonUtil.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\kmpinffile.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas"/>
         <DCCReference Include="Keyman.Setup.System.ResourceDownloader.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.MITLicense.pas"/>

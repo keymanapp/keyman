@@ -199,9 +199,9 @@
         <DCCReference Include="keymancontext.pas"/>
         <DCCReference Include="util\utilvararray.pas"/>
         <DCCReference Include="processes\package\kpinstallpackage.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\kmpinffile.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\PackageInfo.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\ttinfo.pas"/>
         <DCCReference Include="util\keymanerrorcodes.pas"/>
         <DCCReference Include="processes\package\kpuninstallpackage.pas"/>

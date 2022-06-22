@@ -8,7 +8,7 @@ uses
   {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX,
   {$ENDIF }
-  PackageInfo in '..\..\..\global\delphi\general\PackageInfo.pas',
+  PackageInfo in '..\..\..\..\..\common\windows\delphi\packages\PackageInfo.pas',
   utilfiletypes in '..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   utilstr in '..\..\..\..\..\common\windows\delphi\general\utilstr.pas',
   StockFileNames in '..\..\..\global\delphi\cust\StockFileNames.pas',
@@ -21,7 +21,7 @@ uses
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   kpsfile in '..\..\..\global\delphi\general\kpsfile.pas',
-  PackageFileFormats in '..\..\..\global\delphi\general\PackageFileFormats.pas',
+  PackageFileFormats in '..\..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas',
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
