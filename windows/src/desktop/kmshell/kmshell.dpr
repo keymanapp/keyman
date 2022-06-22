@@ -130,7 +130,7 @@ uses
   VisualKeyboardLoaderXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardSaverBinary in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
-  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  BCP47Tag in '..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
   Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas',

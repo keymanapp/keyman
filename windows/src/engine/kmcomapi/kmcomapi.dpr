@@ -127,7 +127,7 @@ uses
   VisualKeyboardSaverXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   Windows8LanguageList in '..\..\global\delphi\general\Windows8LanguageList.pas',
-  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  BCP47Tag in '..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',

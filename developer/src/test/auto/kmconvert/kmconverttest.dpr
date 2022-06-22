@@ -14,7 +14,7 @@ uses
   Keyman.Developer.System.Test.KMConvertParametersTest in 'Keyman.Developer.System.Test.KMConvertParametersTest.pas',
   Keyman.Developer.System.KMConvertParameters in '..\..\..\kmconvert\Keyman.Developer.System.KMConvertParameters.pas',
   UKeymanTargets in '..\..\..\..\..\windows\src\global\delphi\general\UKeymanTargets.pas',
-  BCP47Tag in '..\..\..\..\..\windows\src\global\delphi\general\BCP47Tag.pas',
+  BCP47Tag in '..\..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',

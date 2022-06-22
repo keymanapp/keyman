@@ -60,7 +60,7 @@ uses
   Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
-  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  BCP47Tag in '..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',

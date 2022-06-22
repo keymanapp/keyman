@@ -14,7 +14,7 @@ uses
   Keyman.Test.System.Standards.LangTagsRegistryTest in 'Keyman.Test.System.Standards.LangTagsRegistryTest.pas',
   Keyman.Test.System.CanonicalLanguageCodeUtilsTest in 'Keyman.Test.System.CanonicalLanguageCodeUtilsTest.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  BCP47Tag in '..\..\..\global\delphi\general\BCP47Tag.pas',
+  BCP47Tag in '..\..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',

@@ -33,7 +33,7 @@ uses
   VersionInfo in '..\..\..\windows\src\global\delphi\general\VersionInfo.pas',
   PackageFileFormats in '..\..\..\windows\src\global\delphi\general\PackageFileFormats.pas',
   Keyman.Developer.System.Project.ProjectLog in '..\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas',
-  BCP47Tag in '..\..\..\windows\src\global\delphi\general\BCP47Tag.pas',
+  BCP47Tag in '..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   Keyman.System.KeyboardJSInfo in '..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',

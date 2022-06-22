@@ -150,7 +150,7 @@
         <DCCReference Include="Keyman.Developer.System.Test.KMConvertParametersTest.pas"/>
         <DCCReference Include="..\..\..\developer\kmconvert\Keyman.Developer.System.KMConvertParameters.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\UKeymanTargets.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\BCP47Tag.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\BCP47Tag.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
