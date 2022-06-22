@@ -30,10 +30,10 @@ rem ----------------------------------
 :all
 
 setlocal
-cd %KEYMAN_ROOT%\common\core\desktop
+cd %KEYMAN_ROOT%\core
 cmd /c build.bat x86 %2 %3 %4 %5 || exit !errorlevel!
 
-cd %KEYMAN_ROOT%\common\core\desktop
+cd %KEYMAN_ROOT%\core
 cmd /c build.bat x64 %2 %3 %4 %5 || exit !errorlevel!
 
 goto :eof
@@ -49,7 +49,7 @@ set ARCH=%1
 echo === Locating Visual Studio ===
 
 rem From https://github.com/microsoft/vswhere
-for /f "usebackq tokens=*" %%i in (`..\..\..\resources\build\vswhere -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
+for /f "usebackq tokens=*" %%i in (`..\resources\build\vswhere -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
   set VCVARSALL="%%i"
 )
 
@@ -66,7 +66,7 @@ if not exist "!VCVARSALL!" (
 echo === Configuring VC++ ===
 call !VCVARSALL! !ARCH! || exit !errorlevel!
 
-cd %KEYMAN_ROOT%\common\core\desktop
+cd %KEYMAN_ROOT%\core
 
 set BUILDTYPE=%2
 
@@ -105,7 +105,7 @@ rem Standalone build, so we'll make the environment available to the caller
 rem Also setup
 rem Note: Visual Studio 2022 doesn't provide vcvarsall.bat, so we'll have to find a different solution
 endlocal
-for /f "usebackq tokens=*" %%i in (`..\..\..\resources\build\vswhere -version [15^,17^) -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
+for /f "usebackq tokens=*" %%i in (`..\resources\build\vswhere -version [15^,17^) -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
   set VCVARSALL="%%i"
 )
 %VCVARSALL% %1

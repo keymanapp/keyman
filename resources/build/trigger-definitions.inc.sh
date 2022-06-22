@@ -11,12 +11,12 @@ available_platforms=(android ios linux mac web windows)
 
 watch_android='web|common/models|common/predictive-text|common/lexical-model-types|common/web'
 watch_ios='web|common/models|common/predictive-text|common/lexical-model-types|common/web'
-watch_linux='common/core/desktop'
-watch_mac='common/core/desktop'
+watch_linux='core'
+watch_mac='core'
 watch_web='common/models|common/predictive-text|common/lexical-model-types|common/web'
 
 # Windows currently builds Developer and Desktop, so we need everything from common,developer,web
-watch_windows='common|developer|web'
+watch_windows='common|core|developer|web'
 
 #
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due

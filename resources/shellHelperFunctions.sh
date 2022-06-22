@@ -3,7 +3,7 @@
 #
 # WARNING: this file is copied into other locations during package builds; do not
 #          include other files or make path assumptions when changing this file.
-#          See `common/core/desktop/build.sh` for more details.
+#          See `core/build.sh` for more details.
 #
 
 _shf_base_dir=$(dirname "$BASH_SOURCE")/..

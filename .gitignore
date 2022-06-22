@@ -164,7 +164,7 @@ compile_flags.txt
 resources/environment.sh
 
 # Copy of the master VERSION.md used for Linux packaging
-/common/core/desktop/VERSION.md
+/core/VERSION.md
 
 **/node_modules/
 

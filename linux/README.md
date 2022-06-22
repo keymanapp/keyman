@@ -5,7 +5,7 @@
 - [keyman-config](./keyman-config) - km-config and some other tools to install, uninstall
   and view information about Keyman keyboard packages.
 - [ibus-keyman](./ibus-keyman) - IBUS integration to use .kmp Keyman keyboards
-- [core](../common/core/desktop) - common keyboardprocessor library
+- [core](../core) - common keyboardprocessor library
 - [legacy/kmflcomp](./legacy/kmflcomp) - KMFL keyboard compiler
 - [legacy/libkmfl](./legacy/libkmfl) - older KMFL core library
 - [legacy/ibus-kmfl](./legacy/ibus-kmfl) - IBUS integration to use KMFL

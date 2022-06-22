@@ -64,13 +64,13 @@ All tests can be run at once with `./build.sh --debug tests`.
 Alternatively it's possible to run a single test with:
 
 ```bash
-cd common/core/desktop
+cd core
 build/arch/debug/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys.kmn' 'tests/unit/kmx/038 - punctkeys.kmx'
 ```
 
 or shorter:
 
 ```bash
-cd common/core/desktop
+cd core
 build/arch/debug/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys'.km{n,x}
 ```

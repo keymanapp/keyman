@@ -44,7 +44,7 @@ BUILD_DEBUG=
 !endif
 
 pull-core:
-    cd $(ROOT)\..\common\core\desktop
+    cd $(ROOT)\..\core
     $(CALLER) ./build.sh -p native $(BUILD_DEBUG)
     cd $(ROOT)\src\engine\keyman32
 

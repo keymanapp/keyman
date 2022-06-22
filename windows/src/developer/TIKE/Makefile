@@ -11,7 +11,7 @@ build: version.res manifest.res icons dirs xml xsd pull-core
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tike.exe
     $(COPY) $(WIN32_TARGET_PATH)\tike.exe $(PROGRAM)\developer
     $(COPY) kmlmc.cmd $(PROGRAM)\developer
-    $(COPY) $(ROOT)\..\common\core\desktop\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(PROGRAM)\developer
+    $(COPY) $(ROOT)\..\core\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(PROGRAM)\developer
     if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEBUGPATH)\developer
 
 xsd:
@@ -28,7 +28,7 @@ sentry-init.js:
     $(MKVER_U) init.js.in init.js
 
 pull-core:
-    cd $(ROOT)\..\common\core\desktop
+    cd $(ROOT)\..\core
 !ifdef GIT_BASH_FOR_KEYMAN
 !ifdef DEBUG
     $(GIT_BASH_FOR_KEYMAN) build.sh --debug

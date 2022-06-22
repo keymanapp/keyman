@@ -75,7 +75,7 @@ for proj in ${extra_projects}; do
         --tar-ignore=linux/help --tar-ignore=linux/Jenkinsfile \
         --tar-ignore=linux/keyboardprocessor --tar-ignore=linux/legacy \
         --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
-        --tar-ignore=linux/build* --tar-ignore=common/core/desktop/build \
+        --tar-ignore=linux/build* --tar-ignore=core/build \
         --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
         --tar-ignore=resources/scopes --tar-ignore=common/web \
         --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \

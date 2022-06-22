@@ -2,13 +2,13 @@
   "configurations": [
     {
       "name": "linux",
-      "includePath": ["${workspaceFolder}/common/core/desktop/include/**"],
+      "includePath": ["${workspaceFolder}/core/include/**"],
       "defines": [],
       "compilerPath": "/usr/lib/ccache/clang",
       "cStandard": "c11",
       "cppStandard": "c++14",
       "intelliSenseMode": "clang-x64",
-      "compileCommands": "${workspaceFolder}/common/core/desktop/build/arch/debug/compile_commands.json"
+      "compileCommands": "${workspaceFolder}/core/build/arch/debug/compile_commands.json"
     }
   ],
   "version": 4
