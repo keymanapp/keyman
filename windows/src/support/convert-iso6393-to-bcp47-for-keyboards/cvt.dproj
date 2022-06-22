@@ -108,7 +108,7 @@
         <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\KeyNames.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\windows\src\..\..\common\windows\delphi\general\StockFileNames.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\JsonUtil.pas"/>
         <BuildConfiguration Include="Release">

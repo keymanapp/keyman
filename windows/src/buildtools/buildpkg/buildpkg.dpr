@@ -23,7 +23,7 @@ uses
   RedistFiles in '..\..\..\..\developer\src\tike\main\RedistFiles.pas',
   DebugPaths in '..\..\..\..\common\windows\delphi\general\DebugPaths.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   klog in '..\..\..\..\common\windows\delphi\general\klog.pas',
   httpuploader in '..\..\..\..\common\windows\delphi\general\httpuploader.pas',
   Upload_Settings in '..\..\..\..\common\windows\delphi\general\Upload_Settings.pas',

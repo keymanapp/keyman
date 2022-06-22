@@ -110,7 +110,7 @@
         <DCCReference Include="..\..\..\..\developer\src\tike\main\RedistFiles.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationStorage.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Upload_Settings.pas"/>

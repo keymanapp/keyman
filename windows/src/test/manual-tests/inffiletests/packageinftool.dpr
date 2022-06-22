@@ -9,7 +9,7 @@ uses
   PackageInfo in '..\..\..\..\common\windows\delphi\packages\PackageInfo.pas',
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   utilstr in '..\..\..\..\common\windows\delphi\general\utilstr.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   VersionInfo in '..\..\..\..\common\windows\delphi\general\VersionInfo.pas',

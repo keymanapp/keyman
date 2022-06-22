@@ -84,7 +84,7 @@ uses
   keymanapi_TLB in 'keymanapi_TLB.pas',
   kmxfile in '..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas',
   utilhandleexception in 'util\utilhandleexception.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   CustomisationMenu in '..\..\global\delphi\cust\CustomisationMenu.pas',
   utilolepicture in 'util\utilolepicture.pas',
   utilxml in '..\..\..\..\common\windows\delphi\general\utilxml.pas',

@@ -35,7 +35,7 @@ uses
   PackageInfo in '..\..\..\..\common\windows\delphi\packages\PackageInfo.pas',
   utilstr in '..\..\..\..\common\windows\delphi\general\utilstr.pas',
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   utildir in '..\..\..\..\common\windows\delphi\general\utildir.pas',
   JsonUtil in '..\..\..\..\common\windows\delphi\general\JsonUtil.pas',
   kmpinffile in '..\..\..\..\common\windows\delphi\packages\kmpinffile.pas',

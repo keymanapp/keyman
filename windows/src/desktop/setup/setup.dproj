@@ -138,7 +138,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\packages\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\packages\kmpinffile.pas"/>
