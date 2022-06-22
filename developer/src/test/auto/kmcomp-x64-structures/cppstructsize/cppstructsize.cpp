@@ -2,7 +2,7 @@
 //
 
 #include "pch.h"
-#include "../../../../../../windows/src/global/inc/Compfile.h"
+#include "../../../../kmcmpdll/compfile.h"
 #include <iostream>
 
 int main()

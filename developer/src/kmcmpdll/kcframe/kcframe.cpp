@@ -22,7 +22,6 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include <compiler.h>
 #include <compfile.h>
 
 int WINAPI msgproc(int line, DWORD dwMsgCode, LPSTR szText)

@@ -177,7 +177,7 @@
     <ClInclude Include="capsstate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\Compiler.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="globals.h">

@@ -2,7 +2,6 @@
 #include "pch.h"
 
 #include <compfile.h>
-#include <compiler.h>
 #include <comperr.h>
 #include <kmcmpdll.h>
 
@@ -15,7 +14,7 @@ BOOL WarnDeprecatedHeader() {   // I4866
 
 /* Flag presence of deprecated features */
 BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
-  /* 
+  /*
     For Keyman 10, we deprecated:
       // < Keyman 7
       #define TSS_LANGUAGE			4
@@ -24,7 +23,7 @@ BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
       #define TSS_ETHNOLOGUECODE		15
 
       // Keyman 7
-      #define TSS_WINDOWSLANGUAGES 29 
+      #define TSS_WINDOWSLANGUAGES 29
   */
   int currentLineBackup = currentLine;
   DWORD i;

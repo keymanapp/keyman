@@ -1,8 +1,8 @@
 /*
-  Name:             Compiler
+  Name:             legacy_kmx_file
   Copyright:        Copyright (C) SIL International.
   Documentation:
-  Description:
+  Description:      Describes .kmx binary format. To be replaced with Core's kmx_file.h
   Create Date:      4 Jan 2007
 
   Modified Date:    24 Aug 2015

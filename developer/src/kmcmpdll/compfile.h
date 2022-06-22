@@ -1,18 +1,18 @@
 /*
   Name:             Compfile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      25 Jan 2007
 
   Modified Date:    25 May 2010
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          25 Jan 2007 - mcdurdin - Add GLOBAL_BUFSIZE, enlarge LINESIZE
                     25 May 2010 - mcdurdin - I1632 - Keyboard Options
 */
@@ -20,7 +20,7 @@
 #ifndef _COMPFILE_H
 #define _COMPFILE_H
 
-#include "compiler.h"
+#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 
 #define LINESIZE 8192
 #define GLOBAL_BUFSIZE  4096
@@ -128,7 +128,7 @@ struct FILE_KEYBOARD {
 
 	PFILE_STORE dpStoreArray;	// address of first item in store array, from start of store structure
 	PFILE_GROUP dpGroupArray;	// address of first item in group array, from start of group structure
-	
+
 	DWORD cxStoreArray;			// in number of items
 	DWORD cxGroupArray;			// in number of items
 	DWORD StartGroup[2];		// index of starting groups [ANSI=0, Unicode=1]
@@ -139,10 +139,10 @@ struct FILE_KEYBOARD {
 	WCHAR szLanguageName[SZMAX_LANGUAGENAME];	// Language name
 	WCHAR szCopyright[SZMAX_COPYRIGHT];			// Copyright information
 	WCHAR szMessage[SZMAX_MESSAGE];				// General information about the keyboard
-	PBYTE lpBitmap;			
+	PBYTE lpBitmap;
 	DWORD dwBitmapSize;
 	DWORD dwFlags;					// Flags for the keyboard file
-	
+
 	DWORD currentGroup;				// temp - current processing group
 	DWORD currentStore;				// temp - current processing store
 	DWORD cxDeadKeyArray;
@@ -171,7 +171,7 @@ struct COMPMSG {
 	DWORD Line;
 	DWORD dwMsgCode;
 	};
-	
+
 typedef COMPMSG *PCOMPMSG;
 
 struct COMPILEMESSAGES {

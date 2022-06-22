@@ -289,9 +289,9 @@
     <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema.hpp" />
     <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json\json.hpp" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\certificate_check.h" />
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Comperr.h" />
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Compfile.h" />
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\Compiler.h" />
+    <ClInclude Include="comperr.h" />
+    <ClInclude Include="compfile.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h" />
     <ClInclude Include="CasedKeys.h" />
     <ClInclude Include="CharToKeyConversion.h" />
     <ClInclude Include="CheckForDuplicates.h" />
@@ -300,7 +300,7 @@
     <ClInclude Include="comprc.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\ConvertUTF.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\crc32.h" />
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\debugstore.h" />
+    <ClInclude Include="debugstore.h" />
     <ClInclude Include="DeprecationChecks.h" />
     <ClInclude Include="Edition.h" />
     <ClInclude Include="keyman64.h" />

@@ -10,13 +10,13 @@
     <ClInclude Include="..\..\global\inc\certificate_check.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\Comperr.h">
+    <ClInclude Include="comperr.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\Compfile.h">
+    <ClInclude Include="compfile.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\Compiler.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="comprc.h">
@@ -28,7 +28,7 @@
     <ClInclude Include="..\..\global\inc\crc32.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\debugstore.h">
+    <ClInclude Include="debugstore.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="Edition.h">
