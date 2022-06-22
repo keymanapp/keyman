@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.17 alpha 2022-06-22
+
+* chore(web): updates error-reporting lib uploader (#6818)
+* fix(web): fixes doc-keyboard generation (#6793)
+
 ## 16.0.16 alpha 2022-06-21
 
 * fix(web): key tip constraint logic requires .bottom CSS (#6784)
