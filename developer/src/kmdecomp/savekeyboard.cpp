@@ -24,15 +24,14 @@
 */
 
 
-#define STRICT
-#include <windows.h>
+#include "pch.h"
+
 #include <stdio.h>
 
 #define _KEYMAN64_LIGHT
 
 #include "keyman64.h"
-//#include "keymanedition.h"
-#include "vkeys.h"
+#include "../../../common/windows/cpp/include/vkeys.h"
 
 #define SSN__PREFIX		L"&"
 

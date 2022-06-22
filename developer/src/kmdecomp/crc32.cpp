@@ -1,6 +1,4 @@
-
-#define STRICT
-#include <windows.h>
+#include "pch.h"
 
 /*
  * Instead of performing a straightforward calculation of the 32 bit

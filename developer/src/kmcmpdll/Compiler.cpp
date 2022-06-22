@@ -68,7 +68,7 @@
 
 #include <compfile.h>
 #include <comperr.h>
-#include <vkeys.h>
+#include "../../../common/windows/cpp/include/vkeys.h"
 #include <versioning.h>
 #include <kmcmpdll.h>
 #include <DeprecationChecks.h>
