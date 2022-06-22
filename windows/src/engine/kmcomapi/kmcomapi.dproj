@@ -278,7 +278,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilicon.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilicon.pas"/>
         <DCCReference Include="processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas"/>
         <DCCReference Include="processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas"/>
         <DCCReference Include="processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas"/>

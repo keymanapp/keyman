@@ -76,7 +76,7 @@ uses
   TouchLayoutUtils in '..\TIKE\oskbuilder\TouchLayoutUtils.pas',
   KeyboardFonts in '..\..\..\windows\src\global\delphi\general\KeyboardFonts.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
-  utilicon in '..\..\..\windows\src\global\delphi\general\utilicon.pas',
+  utilicon in '..\..\..\common\windows\delphi\general\utilicon.pas',
   CompileErrorCodes in '..\..\..\windows\src\global\delphi\general\CompileErrorCodes.pas',
   Keyman.Developer.System.ModelProjectTemplate in 'Keyman.Developer.System.ModelProjectTemplate.pas',
   Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
