@@ -92,11 +92,11 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="buildpkgmain.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CompilePackageInstaller.pas"/>
+        <DCCReference Include="..\..\..\..\developer\src\common\delphi\compiler\CompilePackageInstaller.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CompilePackage.pas"/>
+        <DCCReference Include="..\..\..\..\developer\src\common\delphi\compiler\CompilePackage.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\packages\kmpinffile.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
+        <DCCReference Include="..\..\..\..\developer\src\common\delphi\packages\kpsfile.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\packages\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilstr.pas"/>

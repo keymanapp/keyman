@@ -24,7 +24,7 @@ uses
   VersionInfo in '..\..\..\..\common\windows\delphi\general\VersionInfo.pas',
   klog in '..\..\..\..\common\windows\delphi\general\klog.pas',
   keyman32_int in '..\..\global\delphi\general\keyman32_int.pas',
-  compile in '..\..\global\delphi\general\compile.pas',
+  compile in '..\..\..\..\developer\src\common\delphi\compiler\compile.pas',
   SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   msctf in '..\..\global\delphi\winapi\msctf.pas',
   DebugUtils in 'DebugUtils.pas',

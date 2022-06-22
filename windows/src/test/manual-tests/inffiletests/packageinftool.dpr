@@ -18,7 +18,7 @@ uses
   utildir in '..\..\..\..\common\windows\delphi\general\utildir.pas',
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
-  kpsfile in '..\..\global\delphi\general\kpsfile.pas',
+  kpsfile in '..\..\..\..\developer\src\common\delphi\packages\kpsfile.pas',
   PackageFileFormats in '..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas',
   packageinf in 'packageinf.pas',
   kmpinffile in '..\..\..\..\common\windows\delphi\packages\kmpinffile.pas',

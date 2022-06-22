@@ -20,7 +20,7 @@ uses
   utildir in '..\..\..\..\..\common\windows\delphi\general\utildir.pas',
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
-  kpsfile in '..\..\..\global\delphi\general\kpsfile.pas',
+  kpsfile in '..\..\..\..\..\developer\src\common\delphi\packages\kpsfile.pas',
   PackageFileFormats in '..\..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas',
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,

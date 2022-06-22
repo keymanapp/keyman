@@ -6,7 +6,7 @@ program passtructsize;
 
 uses
   System.SysUtils,
-  compile in '..\..\..\..\..\..\windows\src\global\delphi\general\compile.pas',
+  compile in '..\..\..\..\common\delphi\compiler\compile.pas',
   kmxfileconsts in '..\..\..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   RegistryKeys in '..\..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
