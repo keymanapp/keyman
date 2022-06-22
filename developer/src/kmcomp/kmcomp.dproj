@@ -229,7 +229,6 @@
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFile.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kvkProjectFile.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\UserMessages.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>

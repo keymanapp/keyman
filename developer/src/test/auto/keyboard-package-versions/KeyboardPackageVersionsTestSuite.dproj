@@ -165,7 +165,6 @@
         <DCCReference Include="..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas"/>
         <DCCReference Include="..\..\..\..\..\developer\src\common\delphi\compiler\CompilePackageInstaller.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilhttp.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\Keyman.System.RegExGroupHelperRSP19902.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas"/>

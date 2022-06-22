@@ -172,7 +172,6 @@
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="Keyman.Developer.System.KMConvertParameters.pas"/>
         <DCCReference Include="Keyman.Developer.System.ImportKeyboardDLL.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\ScanCodeMap.pas"/>
