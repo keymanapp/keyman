@@ -22,7 +22,6 @@
     <ClCompile Include="..\keyman32\kmhook_callwndproc.cpp" />
     <ClCompile Include="..\keyman32\kmhook_getmessage.cpp" />
     <ClCompile Include="..\keyman32\kmprocess.cpp" />
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\rc4.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp" />
     <ClCompile Include="..\keyman32\pch.cpp" />
     <ClCompile Include="..\keyman32\preservedkeymap.cpp" />
@@ -51,7 +50,6 @@
     <ClInclude Include="..\..\global\inc\Comperr.h" />
     <ClInclude Include="..\..\global\inc\Compfile.h" />
     <ClInclude Include="..\..\global\inc\Compiler.h" />
-    <ClInclude Include="..\..\global\inc\compv4.h" />
     <ClInclude Include="..\..\global\inc\ConvertUTF.h" />
     <ClInclude Include="..\..\global\inc\crc32.h" />
     <ClInclude Include="..\..\global\inc\crypt_guid.h" />
@@ -71,7 +69,6 @@
     <ClInclude Include="..\keyman32\kmprot.h" />
     <ClInclude Include="..\..\global\inc\kmprot_hwkey.h" />
     <ClInclude Include="..\..\global\inc\kmprot_licencenumber.h" />
-    <ClInclude Include="..\..\global\inc\rc4.h" />
     <ClInclude Include="..\..\global\inc\registration.h" />
     <ClInclude Include="..\..\global\inc\registry.h" />
     <ClInclude Include="..\keyman32\pch.h" />

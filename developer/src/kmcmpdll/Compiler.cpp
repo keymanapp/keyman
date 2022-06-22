@@ -84,7 +84,6 @@
 
 #include "edition.h"
 
-#include "onlineconstants.h"
 #include "CharToKeyConversion.h"
 #include "CasedKeys.h"
 #include "CheckNCapsConsistency.h"

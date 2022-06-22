@@ -238,12 +238,6 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\rc4.cpp">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-    </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp" />
     <ClCompile Include="..\keyman32\kmprocessactions.cpp" />
     <ClCompile Include="..\keyman32\pch.cpp">
@@ -294,7 +288,6 @@
     <ClInclude Include="..\..\global\inc\Comperr.h" />
     <ClInclude Include="..\..\global\inc\Compfile.h" />
     <ClInclude Include="..\..\global\inc\Compiler.h" />
-    <ClInclude Include="..\..\global\inc\compv4.h" />
     <ClInclude Include="..\..\global\inc\ConvertUTF.h" />
     <ClInclude Include="..\..\global\inc\crc32.h" />
     <ClInclude Include="..\..\global\inc\crypt_guid.h" />
@@ -315,7 +308,6 @@
     <ClInclude Include="..\keyman32\kmprot.h" />
     <ClInclude Include="..\..\global\inc\kmprot_hwkey.h" />
     <ClInclude Include="..\..\global\inc\kmprot_licencenumber.h" />
-    <ClInclude Include="..\..\global\inc\rc4.h" />
     <ClInclude Include="..\..\global\inc\registration.h" />
     <ClInclude Include="..\..\global\inc\registry.h" />
     <ClInclude Include="..\keyman32\pch.h" />

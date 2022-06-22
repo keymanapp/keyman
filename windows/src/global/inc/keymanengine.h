@@ -261,7 +261,6 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 
 #include "syskbd.h"
 #include "vkscancodes.h"
-#include "rc4.h"
 
 #include "testkeymanfunctioning.h"
 #include "keynames.h"

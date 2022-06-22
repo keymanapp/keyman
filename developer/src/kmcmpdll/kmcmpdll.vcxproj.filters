@@ -95,7 +95,6 @@
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\crc32.cpp" />
     <ClCompile Include="Edition.cpp" />
     <ClCompile Include="NamedCodeConstants.cpp" />
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\rc4.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp" />
     <ClCompile Include="virtualcharkeys.cpp" />
