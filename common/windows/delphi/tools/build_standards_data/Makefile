@@ -7,7 +7,7 @@
 test: build
 
 STANDARDS_DATA_PATH=$(KEYMAN_ROOT)\resources\standards-data
-STANDARDS_OUT_PATH=$(WINDOWS_ROOT)\src\global\delphi\standards
+STANDARDS_OUT_PATH=$(KEYMAN_ROOT)\common\windows\delphi\standards
 
 ISO6393_DATA=$(STANDARDS_DATA_PATH)\iso639-3\iso639-3.tab
 ISO6393_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.ISO6393ToBCP47Registry.pas

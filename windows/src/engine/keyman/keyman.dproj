@@ -120,9 +120,9 @@
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\kmcomapi\keymanapi_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardInfo.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportHTML.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardInfo.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportHTML.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ScanCodeMap.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="main.pas"/>
@@ -144,22 +144,22 @@
             <Form>frmOSKEntryHelper</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\TTInfo.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UnicodeData.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\CharacterMapSettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\CharacterRanges.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\CharMapInsertMode.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UfrmCharacterMapNew.pas">
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharacterMapSettings.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharacterRanges.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharMapInsertMode.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmCharacterMapNew.pas">
             <Form>frmCharacterMapNew</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\tlb\ADOX_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\ADODB_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UfrmUnicodeDataStatus.pas">
+        <DCCReference Include="..\..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmUnicodeDataStatus.pas">
             <Form>frmUnicodeDataStatus</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\CharacterDragObject.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UfrmCharacterMapFilter.pas">
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharacterDragObject.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UfrmCharacterMapFilter.pas">
             <Form>frmCharacterMapFilter</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\comp\FixedTrackbar.pas"/>
@@ -170,12 +170,12 @@
         <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
         <DCCReference Include="VistaMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilxml.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\MSXML2_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanControlMessages.pas"/>
         <DCCReference Include="viskbd\UfrmOSKFontHelper.pas">
             <Form>frmOSKFontHelper</Form>
@@ -211,7 +211,7 @@
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\MSXMLDomCreate.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
@@ -224,10 +224,10 @@
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanEngineControl.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
-        <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Windows8LanguageList.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>

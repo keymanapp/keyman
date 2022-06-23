@@ -200,8 +200,8 @@
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
-        <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
+        <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
             <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>

@@ -21,14 +21,14 @@ uses
   StockFileNames in '..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas',
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
   Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas',
-  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.Test.System.KMXFileLanguagesTest in 'Keyman.Test.System.KMXFileLanguagesTest.pas',
-  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
   DUnitX.Loggers.TeamCity in '..\..\..\..\..\windows\src\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
   kmxfileconsts in '..\..\..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas',
-  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas';
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas';
 
 var
   runner : ITestRunner;

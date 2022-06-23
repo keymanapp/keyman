@@ -91,15 +91,15 @@
         </DelphiCompile>
         <DCCReference Include="buildunidata_main.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\TTInfo.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\charmap\UnicodeData.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas"/>
+        <DCCReference Include="..\..\charmap\UnicodeData.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\tlb\JRO_TLB.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\tlb\JRO_TLB.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>

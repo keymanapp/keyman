@@ -98,10 +98,10 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="cv.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utildir.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\kmxfile.pas"/>

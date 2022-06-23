@@ -122,7 +122,7 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\setup\SFX.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\setup\SFX.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.UpdateCheckResponse.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
