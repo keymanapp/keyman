@@ -1,18 +1,18 @@
 (*
   Name:             keymankeyboardsinstalled
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add AutoApplyKeyman call
                     04 Dec 2006 - mcdurdin - Fix IKeymanKeyboardsInstalled function
@@ -78,7 +78,6 @@ uses
   KLog,
   kpinstallkeyboard,
   keyman_msctf,
-  OnlineConstants,
   regkeyboards,
   RegistryKeys,
   utilexecute,

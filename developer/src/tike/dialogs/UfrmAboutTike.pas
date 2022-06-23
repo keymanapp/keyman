@@ -1,18 +1,18 @@
 (*
   Name:             UfrmAboutTike
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     28 Sep 2006 - mcdurdin - Version 7
                     25 May 2010 - mcdurdin - I2392 - Activation Client integration
@@ -65,7 +65,6 @@ uses
   Keyman.Developer.System.HelpTopics,
 
   KeymanVersion,
-  onlineconstants,
   Upload_Settings,
   VersionInfo,
   utilexecute;

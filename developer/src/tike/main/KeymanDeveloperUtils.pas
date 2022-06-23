@@ -90,7 +90,7 @@ uses
   Winapi.ShellApi,
   Classes, SysUtils,
   ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
-     utilsystem, Forms, kmxfile, OnlineConstants, Dialogs, utilexecute,
+     utilsystem, Forms, kmxfile, Dialogs, utilexecute,
      KeymanVersion, CRC32, VisualKeyboard, Controls;
 
 function GetKMShellPath(var ps: string): Boolean; forward;  // I3655

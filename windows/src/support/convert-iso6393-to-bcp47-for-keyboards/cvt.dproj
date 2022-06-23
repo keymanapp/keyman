@@ -104,7 +104,6 @@
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\kmxfile.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\CRC32.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\KeyNames.pas"/>

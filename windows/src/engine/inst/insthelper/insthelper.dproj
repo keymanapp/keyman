@@ -109,7 +109,6 @@
         <DCCReference Include="..\..\..\global\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="preuninstallunit.pas"/>
         <DCCReference Include="..\..\..\global\delphi\winapi\input_installlayoutortip.pas"/>

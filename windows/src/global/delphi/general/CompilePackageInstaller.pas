@@ -55,7 +55,6 @@ uses
   System.Classes,
   System.Zip,
   RedistFiles,
-  OnlineConstants,
   utildir,
   utilsystem;
 

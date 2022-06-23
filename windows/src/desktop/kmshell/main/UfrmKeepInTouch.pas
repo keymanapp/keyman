@@ -1,18 +1,18 @@
 (*
   Name:             UfrmKeepInTouch
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      15 Apr 2015
 
   Modified Date:    6 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          15 Apr 2015 - mcdurdin - I4658 - V9.0 - Add Keep in Touch screen
                     06 Jun 2015 - mcdurdin - I4740 - Don't show "keep in touch" for non-keyman products
 *)
@@ -46,7 +46,6 @@ implementation
 uses
   kmint,
   ErrorControlledRegistry,
-  OnlineConstants,
   RegistryKeys,
   Upload_Settings,
   UtilCheckOnline,

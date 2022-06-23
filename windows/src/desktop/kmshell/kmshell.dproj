@@ -182,7 +182,6 @@
         <DCCReference Include="main\OnlineUpdateCheckMessages.pas"/>
         <DCCReference Include="render\WelcomeXMLRenderer.pas"/>
         <DCCReference Include="main\ValidateKeymanInstalledSystemKeyboards.pas"/>
-        <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="install\uninstall.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanControlMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\hints\HintConsts.pas"/>

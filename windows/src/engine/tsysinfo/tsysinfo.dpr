@@ -21,7 +21,6 @@ uses
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
-  OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   ttinfo in '..\..\global\delphi\general\ttinfo.pas',
   Upload_Settings in '..\..\global\delphi\general\Upload_Settings.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',

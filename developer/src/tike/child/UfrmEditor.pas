@@ -1,18 +1,18 @@
 (*
   Name:             UfrmEditor
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    27 Feb 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rework for Keyman 7, part 1
                     02 Aug 2006 - mcdurdin - Rework menus as sp-TBX
@@ -40,7 +40,7 @@ interface
 uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, Menus, ToolWin, ComCtrls, ImgList, ErrorControlledRegistry, 
+  StdCtrls, ExtCtrls, Menus, ToolWin, ComCtrls, ImgList, ErrorControlledRegistry,
   RegistryKeys, UfrmMDIChild, MenuImgList, Printers,
   UfrmKeyTest,
 
@@ -125,7 +125,6 @@ uses
   Keyman.Developer.System.Project.kmnProjectFile,
   kmxfile,
   kwhelp,
-  OnlineConstants,
   Keyman.Developer.System.Project.Project,
   KeymanDeveloperOptions,
   KMDevResourceStrings,

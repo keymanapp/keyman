@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.System.Project.ProjectSaver
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     04 Dec 2006 - mcdurdin - Add MRU IDs for right-click options
                     04 Jan 2007 - mcdurdin - Add activated module information to project
@@ -29,7 +29,7 @@
                     06 May 2015 - mcdurdin - I4704 - V9.0 - Project files should be formatted XML
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
-                    
+
 *)
 unit Keyman.Developer.System.Project.ProjectSaver;  // I3306
 
@@ -63,7 +63,6 @@ implementation
 uses
   System.Win.ComObj,
 
-  OnlineConstants,
   Keyman.Developer.System.Project.ProjectFiles,
   utilfiletypes;
 

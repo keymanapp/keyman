@@ -138,7 +138,6 @@ uses
 
   JsonUtil,
   JvDockControlForm,
-  OnlineConstants,
   RedistFiles,
   ErrorControlledRegistry,
   RegistryKeys,

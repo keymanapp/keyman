@@ -94,8 +94,6 @@
         </DelphiCompile>
         <DCCReference Include="Keyman.Test.System.CompilePackageVersioningTest.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\CompilePackage.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\kmpinffile.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\kpsfile.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\PackageFileFormats.pas"/>

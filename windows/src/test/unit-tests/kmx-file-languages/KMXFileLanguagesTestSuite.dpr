@@ -17,7 +17,6 @@ uses
   KeyNames in '..\..\..\global\delphi\general\KeyNames.pas',
   utildir in '..\..\..\global\delphi\general\utildir.pas',
   utilfiletypes in '..\..\..\global\delphi\general\utilfiletypes.pas',
-  OnlineConstants in '..\..\..\global\delphi\productactivation\OnlineConstants.pas',
   KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
   StockFileNames in '..\..\..\global\delphi\cust\StockFileNames.pas',
   utilstr in '..\..\..\global\delphi\general\utilstr.pas',

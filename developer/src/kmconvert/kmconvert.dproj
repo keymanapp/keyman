@@ -124,7 +124,6 @@
         <DCCReference Include="..\TIKE\main\KeyboardParser.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfile.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeys.pas"/>

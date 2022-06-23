@@ -99,7 +99,6 @@ uses
   CompileKeymanWeb in 'compile\CompileKeymanWeb.pas',
   KeymanWebKeyCodes in 'compile\KeymanWebKeyCodes.pas',
   utildir in '..\..\..\windows\src\global\delphi\general\utildir.pas',
-  OnlineConstants in '..\..\..\windows\src\global\delphi\productactivation\OnlineConstants.pas',
   ADOX_TLB in '..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas',
   ADODB_TLB in '..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas',
   utilhttp in '..\..\..\windows\src\global\delphi\general\utilhttp.pas',

@@ -95,7 +95,6 @@ uses
   utilstr in '..\..\global\delphi\general\utilstr.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
-  OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   MessageIdentifierConsts in '..\..\global\delphi\cust\MessageIdentifierConsts.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',

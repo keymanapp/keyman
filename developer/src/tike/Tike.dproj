@@ -246,7 +246,6 @@
         <DCCReference Include="compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\productactivation\OnlineConstants.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\tlb\ADODB_TLB.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilhttp.pas"/>

@@ -17,7 +17,6 @@ uses
   Keyman.Setup.System.MsiUtils in 'Keyman.Setup.System.MsiUtils.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   UfrmRunDesktop in 'UfrmRunDesktop.pas' {frmRunDesktop},
   UfrmInstallOptions in 'UfrmInstallOptions.pas' {frmInstallOptions},
   RunTools in 'RunTools.pas',

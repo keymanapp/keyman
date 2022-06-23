@@ -216,7 +216,6 @@ uses
   KeyNames,
   kmxfile,
   kmxfileconsts,
-  OnlineConstants,
   ErrorControlledRegistry,
   RegistryKeys,
   KeymanDeveloperOptions,

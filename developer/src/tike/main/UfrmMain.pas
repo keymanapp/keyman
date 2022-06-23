@@ -434,7 +434,6 @@ uses
   HTMLHelpViewer,
   KLog,
   KeymanVersion,
-  OnlineConstants,
   Keyman.System.KeymanSentryClient,
   Keyman.Developer.UI.TikeOnlineUpdateCheck,
   GlobalProxySettings,
@@ -725,7 +724,7 @@ begin
 
   if True then //FKeymanDeveloperOptions.AutoCheckForUpdates then
   begin
-    with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, OnlineProductID_KeymanDeveloper_100, False, True, True, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
+    with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, False, True, True, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
       Run;
   end;
 end;

@@ -1,18 +1,18 @@
 (*
   Name:             main
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     02 Aug 2006 - mcdurdin - Timeout when Beta expires
                     25 Jan 2007 - mcdurdin - Add -x option to encrypt kmx and kct files
@@ -31,7 +31,7 @@
                     03 Aug 2015 - mcdurdin - I4825 - Make kmcomp command line details consistent
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
 *)
 unit main;  // I3306
 
@@ -50,7 +50,6 @@ uses
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.ProjectLogConsole,
   Keyman.Developer.System.ValidateRepoChanges,
-  OnlineConstants,
   VersionInfo,
   compile,
   KCCompilePackage,
@@ -318,7 +317,7 @@ begin
 
   if TProjectLogConsole.Instance.HasWarning and FWarnAsError then Result := False;   // I4706
 
-  if Result 
+  if Result
     then TProjectLogConsole.Instance.Log(plsSuccess, FInFile, 'Keyboard '+FInFile+' compiled, output saved as '+FOutFile+'.', 0, 0)
   	else TProjectLogConsole.Instance.Log(plsFailure, FInFile, 'Keyboard '+FInFile+' could not be compiled.', 0, 0);
 end;

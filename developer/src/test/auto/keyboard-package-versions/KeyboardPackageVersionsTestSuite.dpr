@@ -13,7 +13,6 @@ uses
   DUnitX.TestFramework,
   Keyman.Test.System.CompilePackageVersioningTest in 'Keyman.Test.System.CompilePackageVersioningTest.pas',
   CompilePackage in '..\..\..\..\..\windows\src\global\delphi\general\CompilePackage.pas',
-  OnlineConstants in '..\..\..\..\..\windows\src\global\delphi\productactivation\OnlineConstants.pas',
   VisualKeyboard in '..\..\..\..\..\windows\src\global\delphi\visualkeyboard\VisualKeyboard.pas',
   kmpinffile in '..\..\..\..\..\windows\src\global\delphi\general\kmpinffile.pas',
   kpsfile in '..\..\..\..\..\windows\src\global\delphi\general\kpsfile.pas',
