@@ -217,7 +217,7 @@ test-releasebuildcheck: global-versions
 #
 
 build-tools:
-    @if not exist $(WINDOWS_ROOT)\src\global\inc\keymanversion_build.h $(MAKE) global-versions
+    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
 !ifdef NODELPHI
     echo Skipping build-tools
 !else
