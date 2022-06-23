@@ -137,13 +137,13 @@
         <DCCReference Include="startup\UfrmSplash.pas">
             <Form>frmSplash</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\ui\UfrmKeymanBase.pas">
+        <DCCReference Include="main\UfrmKeymanBase.pas">
             <Form>frmKeymanBase</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\global\delphi\general\httpuploader_messageprocessor_forms.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\global\delphi\ui\XMLRenderer.pas"/>
+        <DCCReference Include="render\XMLRenderer.pas"/>
         <DCCReference Include="render\KeyboardListXMLRenderer.pas"/>
         <DCCReference Include="render\OptionsXMLRenderer.pas"/>
         <DCCReference Include="render\HotkeysXMLRenderer.pas"/>
@@ -165,7 +165,7 @@
         <DCCReference Include="install\UfrmInstallKeyboardFromWeb.pas">
             <Form>frmInstallKeyboardFromWeb</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\ui\UfrmWebContainer.pas">
+        <DCCReference Include="main\UfrmWebContainer.pas">
             <Form>frmWebContainer</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
@@ -201,7 +201,7 @@
         <DCCReference Include="..\..\global\delphi\general\utilcheckfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\ui\UFixupMissingFile.pas"/>
+        <DCCReference Include="util\UFixupMissingFile.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards.pas"/>
         <DCCReference Include="main\UImportOlderKeyboardUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>

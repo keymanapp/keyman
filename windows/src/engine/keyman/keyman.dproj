@@ -186,7 +186,6 @@
         <DCCReference Include="..\..\global\delphi\general\utilcheckfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\WideStringClass.pas"/>
-        <DCCReference Include="..\..\global\delphi\ui\UFixupMissingFile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\usp10.pas"/>
@@ -212,7 +211,7 @@
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\MSXMLDomCreate.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
-        <DCCReference Include="..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
         <DCCReference Include="GlobalKeyboardChangeManager.pas"/>
