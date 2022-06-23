@@ -416,15 +416,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\common\windows\cpp\include\vkeys.h" />
-    <ClInclude Include="..\..\global\inc\certificate_check.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h" />
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
     <ClInclude Include="editsess.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h" />
     <ClInclude Include="kmtip.h" />
-    <ClInclude Include="..\..\global\inc\registry.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

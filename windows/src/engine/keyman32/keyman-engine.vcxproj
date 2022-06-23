@@ -389,14 +389,14 @@
     <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
-    <ClInclude Include="..\..\global\inc\registry.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h" />
     <ClInclude Include="security.h" />
     <ClInclude Include="serialkeyeventclient.h" />
     <ClInclude Include="serialkeyeventcommon.h" />
     <ClInclude Include="serialkeyeventserver.h" />
     <ClInclude Include="SharedBuffers.h" />
     <ClInclude Include="syskbd.h" />
-    <ClInclude Include="..\..\global\inc\unicode.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\unicode.h" />
     <ClInclude Include="vkscancodes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

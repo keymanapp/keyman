@@ -67,19 +67,18 @@
     <ClInclude Include="CheckFilenameConsistency.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\certificate_check.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema.hpp" />
+    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json\json.hpp" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\ConvertUTF.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\ConvertUTF.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\crc32.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\crc32.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\unicode.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="$(KEYMAN_ROOT)\windows\src\global\inc\unicode.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\common\windows\cpp\include\vkeys.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema.hpp">
@@ -112,7 +111,7 @@
     <ClCompile Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema-draft4.json.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-uri.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-validator.cpp" />
-    <ClCompile Include="..\..\..\common\windows\cpp\src\vkeys.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\vkeys.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Compiler.rc" />

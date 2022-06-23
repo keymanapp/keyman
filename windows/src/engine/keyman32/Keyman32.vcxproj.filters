@@ -201,13 +201,13 @@
     <ClInclude Include="keystate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\registry.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="syskbd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\unicode.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\unicode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vkscancodes.h">

@@ -31,10 +31,9 @@
 #include <assert.h>
 
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
-#include "xstring.h"
-
-#include "registry.h"
-#include "unicode.h"
-#include "crc32.h"
+#include "../../../common/windows/cpp/include/xstring.h"
+#include "../../../common/windows/cpp/include/registry.h"
+#include "../../../common/windows/cpp/include/unicode.h"
+#include "../../../common/windows/cpp/include/crc32.h"
 
 #endif

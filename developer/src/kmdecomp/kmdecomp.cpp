@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <keymansentry.h>
+#include "../../../common/windows/cpp/include/keymansentry.h"
 
 #define _KEYMAN64_LIGHT
 #include "keyman64.h"

@@ -198,8 +198,8 @@ typedef struct tagKEYBOARD
 } KEYBOARD, * LPKEYBOARD;
 
 /*********************************************************************/
-#include "registry.h"
-#include "unicode.h"
-#include "xstring.h"
+#include "../../../../common/windows/cpp/include/registry.h"
+#include "../../../../common/windows/cpp/include/unicode.h"
+#include "../../../../common/windows/cpp/include/xstring.h"
 
 #endif	// _KEYMAN64_H

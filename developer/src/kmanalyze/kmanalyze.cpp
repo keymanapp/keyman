@@ -2,7 +2,7 @@
 //
 
 #include "pch.h"
-#include "crc32.h"
+#include "../../../common/windows/cpp/include/crc32.h"
 #include <iostream>
 #include <vector>
 #include <codecvt>
