@@ -78,6 +78,12 @@
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-schema.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(KEYMAN_ROOT)\developer\src\ext\json\json.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
