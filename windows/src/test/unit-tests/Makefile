@@ -14,8 +14,7 @@ test:
 # ----------------------------------------------------------------------
 
 # TODO: move shared-tests to /common
-shared-tests: androidstringtokeymanlocalestring keyboard-js-info \
-        kmx-file-languages package-info jsonutil \
+shared-tests: androidstringtokeymanlocalestring package-info jsonutil \
         standards-data
 
 windows-tests: group-helper-rsp19902 shared-data \
@@ -33,14 +32,6 @@ group-helper-rsp19902: .virtual
 
 shared-data: .virtual
     cd $(ROOT)\src\test\unit-tests\shared-data
-    $(MAKE) $(TARGET)
-
-keyboard-js-info: .virtual
-    cd $(ROOT)\src\test\unit-tests\keyboard-js-info
-    $(MAKE) $(TARGET)
-
-kmx-file-languages: .virtual
-    cd $(ROOT)\src\test\unit-tests\kmx-file-languages
     $(MAKE) $(TARGET)
 
 package-info: .virtual

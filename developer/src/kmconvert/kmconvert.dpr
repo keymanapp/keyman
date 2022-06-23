@@ -36,15 +36,15 @@ uses
   BCP47Tag in '..\..\..\windows\src\global\delphi\general\BCP47Tag.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.KeyboardJSInfo in '..\..\..\windows\src\global\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
-  Keyman.System.KeyboardUtils in '..\..\..\windows\src\global\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
-  Keyman.System.KMXFileLanguages in '..\..\..\windows\src\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
+  Keyman.System.KeyboardJSInfo in '..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
+  Keyman.System.KeyboardUtils in '..\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
+  Keyman.System.KMXFileLanguages in '..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
-  Keyman.System.PackageInfoRefreshKeyboards in '..\..\..\windows\src\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
+  Keyman.System.PackageInfoRefreshKeyboards in '..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas',
   Keyman.Developer.System.Project.ProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.ProjectFile.pas',
   Keyman.Developer.System.Project.ProjectFiles in '..\TIKE\project\Keyman.Developer.System.Project.ProjectFiles.pas',
   Keyman.Developer.System.Project.ProjectSaver in '..\TIKE\project\Keyman.Developer.System.Project.ProjectSaver.pas',
@@ -88,7 +88,7 @@ uses
   KeymanPaths in '..\..\..\windows\src\global\delphi\general\KeymanPaths.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
-  Keyman.System.LexicalModelUtils in '..\..\..\windows\src\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas';
+  Keyman.System.LexicalModelUtils in '..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas';
 
 {$R icons.RES}
 {$R version.res}

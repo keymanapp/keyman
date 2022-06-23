@@ -1,4 +1,4 @@
-program kmconverttest;
+program KMXFileLanguagesTestSuite;
 
 {$IFNDEF TESTINSIGHT}
 {$APPTYPE CONSOLE}
@@ -11,24 +11,24 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
-  Keyman.Developer.System.Test.KMConvertParametersTest in 'Keyman.Developer.System.Test.KMConvertParametersTest.pas',
-  Keyman.Developer.System.KMConvertParameters in '..\..\..\kmconvert\Keyman.Developer.System.KMConvertParameters.pas',
-  UKeymanTargets in '..\..\..\..\..\windows\src\global\delphi\general\UKeymanTargets.pas',
-  BCP47Tag in '..\..\..\..\..\windows\src\global\delphi\general\BCP47Tag.pas',
-  Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  Keyman.System.LanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
-  Keyman.System.Standards.LangTagsRegistry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
-  Keyman.System.KeyboardUtils in '..\..\..\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas',
-  Keyman.System.LexicalModelUtils in '..\..\..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
+  Keyman.System.KMXFileLanguages in '..\..\..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas',
+  kmxfile in '..\..\..\..\..\windows\src\global\delphi\general\kmxfile.pas',
+  CRC32 in '..\..\..\..\..\windows\src\global\delphi\general\CRC32.pas',
+  KeyNames in '..\..\..\..\..\windows\src\global\delphi\general\KeyNames.pas',
+  utildir in '..\..\..\..\..\windows\src\global\delphi\general\utildir.pas',
+  utilfiletypes in '..\..\..\..\..\windows\src\global\delphi\general\utilfiletypes.pas',
+  KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas',
+  StockFileNames in '..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas',
   utilstr in '..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas',
   Unicode in '..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas',
-  GetOsVersion in '..\..\..\..\..\windows\src\global\delphi\general\GetOsVersion.pas',
-  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.Test.System.KMXFileLanguagesTest in 'Keyman.Test.System.KMXFileLanguagesTest.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
-  utilfiletypes in '..\..\..\..\..\windows\src\global\delphi\general\utilfiletypes.pas',
-  StockFileNames in '..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas';
+  Keyman.System.LanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\windows\src\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
+  kmxfileconsts in '..\..\..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\windows\src\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas';
 
 var
   runner : ITestRunner;
@@ -69,6 +69,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);
