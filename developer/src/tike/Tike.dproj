@@ -145,7 +145,7 @@
         <DCCReference Include="child\UfrmEditor.pas">
             <Form>frmEditor</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\MenuImgList.pas"/>
+        <DCCReference Include="..\common\delphi\components\MenuImgList.pas"/>
         <DCCReference Include="dialogs\UfrmSelectKey.pas">
             <Form>frmSelectKey</Form>
         </DCCReference>
@@ -191,9 +191,9 @@
             <Form>frmSelectSystemKeyboard</Form>
         </DCCReference>
         <DCCReference Include="debug\RegressionTest.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\DebugListView.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\DebugBitBtn.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\DebugListBox.pas"/>
+        <DCCReference Include="..\common\delphi\components\DebugListView.pas"/>
+        <DCCReference Include="..\common\delphi\components\DebugBitBtn.pas"/>
+        <DCCReference Include="..\common\delphi\components\DebugListBox.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageFileFormats.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageInfo.pas"/>
@@ -228,8 +228,8 @@
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\BitmapEditor.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\StringGridEditControlled.pas"/>
+        <DCCReference Include="..\common\delphi\components\BitmapEditor.pas"/>
+        <DCCReference Include="..\common\delphi\components\StringGridEditControlled.pas"/>
         <DCCReference Include="main\KMDevResourceStrings.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\httpuploader_messageprocessor_forms.pas"/>
@@ -252,9 +252,9 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilkeyboard.pas"/>
         <DCCReference Include="main\KeyboardParser.pas"/>
-        <DCCReference Include="main\TextFileFormat.pas"/>
+        <DCCReference Include="..\common\delphi\general\TextFileFormat.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\KMDActions.pas"/>
-        <DCCReference Include="actions\KMDActionInterfaces.pas"/>
+        <DCCReference Include="..\common\delphi\components\KMDActionInterfaces.pas"/>
         <DCCReference Include="main\UfrmHelp.pas">
             <Form>frmHelp</Form>
         </DCCReference>
@@ -393,7 +393,7 @@
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\CaptionPanel.pas"/>
+        <DCCReference Include="..\common\delphi\components\CaptionPanel.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Glossary.pas"/>
         <DCCReference Include="oskbuilder\UframeTouchLayoutBuilder.pas">
             <Form>frameTouchLayoutBuilder</Form>
@@ -410,7 +410,7 @@
         <DCCReference Include="dialogs\UfrmAddKeyboardFeature.pas">
             <Form>frmAddKeyboardFeature</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\LeftTabbedPageControl.pas"/>
+        <DCCReference Include="..\common\delphi\components\LeftTabbedPageControl.pas"/>
         <DCCReference Include="web\UmodWebHttpServer.pas">
             <Form>modWebHttpServer</Form>
             <DesignClass>TDataModule</DesignClass>
@@ -451,11 +451,11 @@
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\DropTarget.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\CloseButtonPageControl.pas"/>
+        <DCCReference Include="..\common\delphi\components\CloseButtonPageControl.pas"/>
         <DCCReference Include="dockforms\UfrmTIKEDock.pas">
             <Form>TIKEDockForm</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\KeymanDeveloperDebuggerMemo.pas"/>
+        <DCCReference Include="..\common\delphi\components\KeymanDeveloperDebuggerMemo.pas"/>
         <DCCReference Include="dockforms\UfrmCharacterMapDock.pas">
             <Form>frmCharacterMapDock</Form>
         </DCCReference>

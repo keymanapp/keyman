@@ -1,16 +1,41 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{CB0DF7C0-19BB-4F2B-AFCC-2E51DAB3A1AA}</ProjectGuid>
-        <MainSource>kmcomp.dpr</MainSource>
-        <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
-        <TargetedPlatforms>3</TargetedPlatforms>
-        <AppType>Console</AppType>
-        <FrameworkType>None</FrameworkType>
+        <ProjectGuid>{07B49B5D-DCB7-4CAA-BFB2-677600659E4E}</ProjectGuid>
+        <MainSource>developer_components.dpk</MainSource>
         <ProjectVersion>18.8</ProjectVersion>
+        <FrameworkType>VCL</FrameworkType>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Package</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Base)'=='true') or '$(Base_Android)'!=''">
+        <Base_Android>true</Base_Android>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Base)'=='true') or '$(Base_Android64)'!=''">
+        <Base_Android64>true</Base_Android64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice32' and '$(Base)'=='true') or '$(Base_iOSDevice32)'!=''">
+        <Base_iOSDevice32>true</Base_iOSDevice32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Base)'=='true') or '$(Base_iOSDevice64)'!=''">
+        <Base_iOSDevice64>true</Base_iOSDevice64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSSimulator' and '$(Base)'=='true') or '$(Base_iOSSimulator)'!=''">
+        <Base_iOSSimulator>true</Base_iOSSimulator>
+        <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
@@ -18,12 +43,7 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
-        <Base_Win64>true</Base_Win64>
-        <CfgParent>Base</CfgParent>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
         <Cfg_1>true</Cfg_1>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
@@ -34,329 +54,127 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
-        <Cfg_1_Win64>true</Cfg_1_Win64>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-        <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
-        <Cfg_2_Win64>true</Cfg_2_Win64>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
-        <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <SanitizedProjectName>kmcomp</SanitizedProjectName>
-        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
-        <DCC_UnitSearchPath>..\..\..\windows\src\global\delphi\vclzip;..\..\resellers;C:\keyman\8.0\src\global\delphi\jedi;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <DCC_Define>KPSMALL;VERSION_KEYMAN_DEVELOPER;$(DCC_Define)</DCC_Define>
-        <DCC_ImageBase>00400000</DCC_ImageBase>
-        <DCC_IOChecking>false</DCC_IOChecking>
-        <VerInfo_Build>14</VerInfo_Build>
-        <VerInfo_MajorVer>0</VerInfo_MajorVer>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Winapi;Vcl;System.Win;Vcl.Imaging;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_WriteableConstants>true</DCC_WriteableConstants>
-        <DCC_Alignment>1</DCC_Alignment>
-        <DCC_MapFile>3</DCC_MapFile>
-        <VerInfo_MinorVer>8</VerInfo_MinorVer>
-        <DCC_F>false</DCC_F>
-        <DCC_E>false</DCC_E>
-        <VerInfo_Locale>3081</VerInfo_Locale>
-        <DCC_S>false</DCC_S>
-        <DCC_N>true</DCC_N>
-        <DCC_K>false</DCC_K>
-        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-        <VerInfo_Keys>CompanyName=CASEG Practice Computing;FileDescription=Blue Chip;FileVersion=0.8.0.14;InternalName=BlueChip;LegalCopyright=Copyright © 1997-1999 CASEG Practice Computing;LegalTrademarks=;OriginalFilename=BlueChip.exe;ProductName=Blue Chip;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <DCC_UsePackage>VCL40;VCLX40;VCLDB40;VCLDBX40;VCLSMP40;QRPT40;TEEUI40;TEEDB40;TEE40;ibevnt40;nmfast40;bcutil;VCLJPG40;bccomp;bcdb;bcacct;bcappt;$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_AssertionsAtRuntime>false</DCC_AssertionsAtRuntime>
-        <ImageDebugInfo>true</ImageDebugInfo>
-        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
-        <DCC_ExeOutput>.\bin\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_DcuOutput>.\obj\$(Platform)\$(Config)</DCC_DcuOutput>
-        <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_E>false</DCC_E>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+        <GenDll>true</GenDll>
+        <GenPackage>true</GenPackage>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
+        <SanitizedProjectName>developer_components</SanitizedProjectName>
+        <DCC_DcpOutput>..\..\..\..\lib</DCC_DcpOutput>
+        <DCC_BplOutput>..\..\..\..\lib</DCC_BplOutput>
+        <VerInfo_Locale>3081</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Android)'!=''">
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
+        <EnabledSysJars>android-support-v4.dex.jar;cloud-messaging.dex.jar;com-google-android-gms.play-services-ads-base.17.2.0.dex.jar;com-google-android-gms.play-services-ads-identifier.16.0.0.dex.jar;com-google-android-gms.play-services-ads-lite.17.2.0.dex.jar;com-google-android-gms.play-services-ads.17.2.0.dex.jar;com-google-android-gms.play-services-analytics-impl.16.0.8.dex.jar;com-google-android-gms.play-services-analytics.16.0.8.dex.jar;com-google-android-gms.play-services-base.16.0.1.dex.jar;com-google-android-gms.play-services-basement.16.2.0.dex.jar;com-google-android-gms.play-services-gass.17.2.0.dex.jar;com-google-android-gms.play-services-identity.16.0.0.dex.jar;com-google-android-gms.play-services-maps.16.1.0.dex.jar;com-google-android-gms.play-services-measurement-base.16.4.0.dex.jar;com-google-android-gms.play-services-measurement-sdk-api.16.4.0.dex.jar;com-google-android-gms.play-services-stats.16.0.1.dex.jar;com-google-android-gms.play-services-tagmanager-v4-impl.16.0.8.dex.jar;com-google-android-gms.play-services-tasks.16.0.1.dex.jar;com-google-android-gms.play-services-wallet.16.0.1.dex.jar;com-google-firebase.firebase-analytics.16.4.0.dex.jar;com-google-firebase.firebase-common.16.1.0.dex.jar;com-google-firebase.firebase-iid-interop.16.0.1.dex.jar;com-google-firebase.firebase-iid.17.1.1.dex.jar;com-google-firebase.firebase-measurement-connector.17.0.1.dex.jar;com-google-firebase.firebase-messaging.17.5.0.dex.jar;fmx.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar</EnabledSysJars>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Android64)'!=''">
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
+        <EnabledSysJars>android-support-v4.dex.jar;cloud-messaging.dex.jar;com-google-android-gms.play-services-ads-base.17.2.0.dex.jar;com-google-android-gms.play-services-ads-identifier.16.0.0.dex.jar;com-google-android-gms.play-services-ads-lite.17.2.0.dex.jar;com-google-android-gms.play-services-ads.17.2.0.dex.jar;com-google-android-gms.play-services-analytics-impl.16.0.8.dex.jar;com-google-android-gms.play-services-analytics.16.0.8.dex.jar;com-google-android-gms.play-services-base.16.0.1.dex.jar;com-google-android-gms.play-services-basement.16.2.0.dex.jar;com-google-android-gms.play-services-gass.17.2.0.dex.jar;com-google-android-gms.play-services-identity.16.0.0.dex.jar;com-google-android-gms.play-services-maps.16.1.0.dex.jar;com-google-android-gms.play-services-measurement-base.16.4.0.dex.jar;com-google-android-gms.play-services-measurement-sdk-api.16.4.0.dex.jar;com-google-android-gms.play-services-stats.16.0.1.dex.jar;com-google-android-gms.play-services-tagmanager-v4-impl.16.0.8.dex.jar;com-google-android-gms.play-services-tasks.16.0.1.dex.jar;com-google-android-gms.play-services-wallet.16.0.1.dex.jar;com-google-firebase.firebase-analytics.16.4.0.dex.jar;com-google-firebase.firebase-common.16.1.0.dex.jar;com-google-firebase.firebase-iid-interop.16.0.1.dex.jar;com-google-firebase.firebase-iid.17.1.1.dex.jar;com-google-firebase.firebase-measurement-connector.17.0.1.dex.jar;com-google-firebase.firebase-messaging.17.5.0.dex.jar;fmx.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar</EnabledSysJars>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSDevice32)'!=''">
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSSimulator)'!=''">
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <Icon_MainIcon>kmcomp_Icon.ico</Icon_MainIcon>
-        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <Icon_MainIcon>kmcomp_Icon.ico</Icon_MainIcon>
-        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>(None)</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
-        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
-        <DCC_DebugInformation>0</DCC_DebugInformation>
-        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_RunParams>c:\temp\foo.kps -schema-path C:\Projects\keyman\app\common\schemas\kps\</Debugger_RunParams>
-        <DCC_AssertionsAtRuntime>true</DCC_AssertionsAtRuntime>
-        <DCC_DebugInformation>2</DCC_DebugInformation>
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-        <Icon_MainIcon>kmcomp_Icon.ico</Icon_MainIcon>
-        <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
-        <DCC_SymbolReferenceInfo>2</DCC_SymbolReferenceInfo>
-        <DCC_DebugDCUs>true</DCC_DebugDCUs>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <Icon_MainIcon>kmcomp_Icon.ico</Icon_MainIcon>
-        <DCC_AssertionsAtRuntime>true</DCC_AssertionsAtRuntime>
-        <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
-        <DCC_DebugInformation>1</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
-        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
-        <DCC_Optimize>false</DCC_Optimize>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>khmer_angkor.kpj</Debugger_RunParams>
-        <Debugger_CWD>C:\Projects\keyman\keyboards\release\k\khmer_angkor</Debugger_CWD>
-        <DCC_DebugDCUs>true</DCC_DebugDCUs>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-        <Icon_MainIcon>kmcomp_Icon.ico</Icon_MainIcon>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <Icon_MainIcon>kmcomp_Icon.ico</Icon_MainIcon>
-        <Debugger_RunParams>khmer_angkor.kpj</Debugger_RunParams>
-        <Debugger_CWD>C:\Projects\keyman\keyboards\release\k\khmer_angkor</Debugger_CWD>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="main.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\compile.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="kccompilepackage.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompilePackage.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageInfo.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageFileFormats.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmpinffile.pas"/>
-        <DCCReference Include="..\TIKE\main\RedistFiles.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\httpuploader.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\httpuploader_messageprocessor_forms.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\cust\CustomisationStorage.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\cust\StockFileNames.pas"/>
-        <DCCReference Include="..\TIKE\main\KeymanDeveloperOptions.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Upload_Settings.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilkeyboard.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\unicode.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilhttp.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\TIKE\main\UfrmTike.pas">
-            <Form>TikeForm</Form>
-            <DesignClass>TTntForm</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompilePackageInstaller.pas"/>
-        <DCCReference Include="..\TIKE\main\UTikeDebugMode.pas"/>
-        <DCCReference Include="..\TIKE\compile\CompileKeymanWeb.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
-        <DCCReference Include="..\TIKE\compile\KeymanWebKeyCodes.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\ExtShiftState.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\wininet5.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfileutils.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeyChars.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilmsxml.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\vcl\ErrorControlledRegistry.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmxfile.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Glossary.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeys.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompileErrorCodes.pas"/>
-        <DCCReference Include="..\TIKE\oskbuilder\TouchLayout.pas"/>
-        <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutDefinitions.pas"/>
-        <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutUtils.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyboardFonts.pas"/>
-        <DCCReference Include="..\TIKE\main\KeyboardParser.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\WindowsLanguages.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\TempFileManager.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\JsonUtil.pas"/>
-        <DCCReference Include="..\TIKE\main\TikeUnicodeData.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\ttinfo.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\UKeymanTargets.pas"/>
-        <DCCReference Include="kccompileproject.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\main\mrulist.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.Project.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectFiles.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectFileType.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectLoader.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectSaver.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kmxProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kvkProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\UMD5Hash.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\UserMessages.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
-        <DCCReference Include="kccompilekvk.pas"/>
-        <DCCReference Include="..\TIKE\compile\ValidateKeyboardInfo.pas"/>
-        <DCCReference Include="..\TIKE\compile\MergeKeyboardInfo.pas"/>
-        <DCCReference Include="..\TIKE\compile\JsonExtractKeyboardInfo.pas"/>
-        <DCCReference Include="..\common\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas"/>
-        <DCCReference Include="..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas"/>
-        <DCCReference Include="..\common\delphi\keyboards\Keyman.System.KeyboardUtils.pas"/>
-        <DCCReference Include="..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
-        <DCCReference Include="..\common\delphi\keyboards\Keyman.System.KeyboardInfoFile.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\BCP47Tag.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
-        <DCCReference Include="..\common\delphi\general\TextFileFormat.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFileAction.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas"/>
-        <DCCReference Include="..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas"/>
-        <DCCReference Include="..\common\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas"/>
-        <DCCReference Include="..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
-        <DCCReference Include="Keyman.Developer.System.Project.ProjectLogConsole.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.Console.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\sentry.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeymanPaths.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
-        <DCCReference Include="Keyman.Developer.System.ValidateRepoChanges.pas"/>
-        <DCCReference Include="..\TIKE\main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas"/>
-        <BuildConfiguration Include="Debug">
+        <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="vcl.dcp"/>
+        <DCCReference Include="BitmapEditor.pas"/>
+        <DCCReference Include="CaptionPanel.pas"/>
+        <DCCReference Include="CloseButtonPageControl.pas"/>
+        <DCCReference Include="DebugBitBtn.pas"/>
+        <DCCReference Include="DebugListBox.pas"/>
+        <DCCReference Include="DebugListView.pas"/>
+        <DCCReference Include="KeymanDeveloperDebuggerMemo.pas"/>
+        <DCCReference Include="KMDActionInterfaces.pas"/>
+        <DCCReference Include="KMDActions.pas"/>
+        <DCCReference Include="..\general\TextFileFormat.pas"/>
+        <DCCReference Include="LeftTabbedPageControl.pas"/>
+        <DCCReference Include="MenuImgList.pas"/>
+        <DCCReference Include="StringGridEditControlled.pas"/>
+        <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
-        <BuildConfiguration Include="Release">
+        <BuildConfiguration Include="Debug">
             <Key>Cfg_1</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Delphi.Personality.12</Borland.Personality>
-        <Borland.ProjectType>VCLApplication</Borland.ProjectType>
+        <Borland.ProjectType>Package</Borland.ProjectType>
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">kmcomp.dpr</Source>
+                    <Source Name="MainSource">developer_components.dpk</Source>
                 </Source>
-                <Language>
-                    <Language Name="ProjectLang">$00000C09</Language>
-                </Language>
-                <VersionInfo>
-                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
-                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
-                    <VersionInfo Name="MajorVer">0</VersionInfo>
-                    <VersionInfo Name="MinorVer">8</VersionInfo>
-                    <VersionInfo Name="Release">0</VersionInfo>
-                    <VersionInfo Name="Build">14</VersionInfo>
-                    <VersionInfo Name="Debug">False</VersionInfo>
-                    <VersionInfo Name="PreRelease">False</VersionInfo>
-                    <VersionInfo Name="Special">False</VersionInfo>
-                    <VersionInfo Name="Private">False</VersionInfo>
-                    <VersionInfo Name="DLL">False</VersionInfo>
-                    <VersionInfo Name="Locale">3081</VersionInfo>
-                    <VersionInfo Name="CodePage">1252</VersionInfo>
-                </VersionInfo>
-                <VersionInfoKeys>
-                    <VersionInfoKeys Name="CompanyName">CASEG Practice Computing</VersionInfoKeys>
-                    <VersionInfoKeys Name="FileDescription">Blue Chip</VersionInfoKeys>
-                    <VersionInfoKeys Name="FileVersion">0.8.0.14</VersionInfoKeys>
-                    <VersionInfoKeys Name="InternalName">BlueChip</VersionInfoKeys>
-                    <VersionInfoKeys Name="LegalCopyright">Copyright © 1997-1999 CASEG Practice Computing</VersionInfoKeys>
-                    <VersionInfoKeys Name="LegalTrademarks"/>
-                    <VersionInfoKeys Name="OriginalFilename">BlueChip.exe</VersionInfoKeys>
-                    <VersionInfoKeys Name="ProductName">Blue Chip</VersionInfoKeys>
-                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
-                    <VersionInfoKeys Name="Comments"/>
-                </VersionInfoKeys>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="c:\projects\keyman\app\windows\lib\DCPdelphi2009.bpl">File c:\projects\keyman\app\windows\lib\DCPdelphi2009.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="c:\projects\keyman\app\windows\lib\delphiprojectmanager.bpl">File c:\projects\keyman\app\windows\lib\delphiprojectmanager.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
-            <Platforms>
-                <Platform value="Win32">True</Platform>
-                <Platform value="Win64">True</Platform>
-            </Platforms>
             <Deployment Version="3">
+                <DeployFile LocalName="..\..\..\..\lib\developer_components.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>developer_components.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Win64\Release\kmcomp.exe" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Win64">
-                        <RemoteName>kmcomp.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="bin\Win32\Release\kmcomp.exe" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmcomp.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="kmcomp.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmcomp.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -367,11 +185,6 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
-                    <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -741,29 +554,7 @@
                         <Operation>0</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="iPad_Launch1024">
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
                 <DeployClass Name="iPad_Launch1024x768">
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="iPad_Launch1536">
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
                     </Platform>
@@ -797,17 +588,6 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="iPad_Launch1668x2388">
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="iPad_Launch2048">
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
                     </Platform>
@@ -863,17 +643,6 @@
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="iPad_Launch2732x2048">
-                    <Platform Name="iOSDevice32">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSDevice64">
-                        <Operation>1</Operation>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="iPad_Launch768">
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
                     </Platform>
@@ -1170,10 +939,21 @@
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
             </Deployment>
+            <Platforms>
+                <Platform value="Android">False</Platform>
+                <Platform value="Android64">False</Platform>
+                <Platform value="iOSDevice32">False</Platform>
+                <Platform value="iOSDevice64">False</Platform>
+                <Platform value="iOSSimulator">False</Platform>
+                <Platform value="OSX32">False</Platform>
+                <Platform value="OSX64">False</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
-    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
     <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
 </Project>

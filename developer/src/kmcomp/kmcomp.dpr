@@ -101,7 +101,7 @@ uses
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
-  TextFileFormat in '..\tike\main\TextFileFormat.pas',
+  TextFileFormat in '..\common\delphi\general\TextFileFormat.pas',
   Keyman.Developer.System.Project.kmnProjectFileAction in '..\tike\project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
   Keyman.Developer.System.Project.kpsProjectFileAction in '..\tike\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
   Keyman.System.PackageInfoRefreshLexicalModels in '..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',

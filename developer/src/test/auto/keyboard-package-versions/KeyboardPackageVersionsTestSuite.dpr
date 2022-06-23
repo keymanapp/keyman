@@ -92,7 +92,7 @@ uses
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  TextFileFormat in '..\..\..\tike\main\TextFileFormat.pas',
+  TextFileFormat in '..\..\..\common\delphi\general\TextFileFormat.pas',
   Keyman.System.LexicalModelUtils in '..\..\..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
   Keyman.System.PackageInfoRefreshLexicalModels in '..\..\..\common\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
