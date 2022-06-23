@@ -24,7 +24,8 @@ developer-tests: \
   kmconvert \
   kmx-file-languages \
   lexical-model-compiler \
-  model-ts-parser
+  model-ts-parser \
+  package-info
 
 # ----------------------------------------------------------------------
 
@@ -74,6 +75,10 @@ model-ts-parser: .virtual
   rem TODO
 #  cd $(DEVELOPER_ROOT)\src\test\auto\model-ts-parser
 #  $(MAKE) $(TARGET)
+
+package-info: .virtual
+  cd $(DEVELOPER_ROOT)\src\test\auto\package-info
+  $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
 

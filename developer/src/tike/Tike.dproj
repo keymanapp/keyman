@@ -214,7 +214,7 @@
         <DCCReference Include="dialogs\UfrmRegressionTestFailure.pas">
             <Form>frmRegressionTestFailure</Form>
         </DCCReference>
-        <DCCReference Include="main\XString.pas"/>
+        <DCCReference Include="debug\XString.pas"/>
         <DCCReference Include="debug\debugkeyboard.pas"/>
         <DCCReference Include="dialogs\Keyman.Developer.UI.UfrmMessageDlgWithSave.pas">
             <Form>frmMessageDlgWithSave</Form>
@@ -249,7 +249,7 @@
         <DCCReference Include="..\..\..\common\windows\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\keyboards\utilkeyboard.pas"/>
         <DCCReference Include="main\KeyboardParser.pas"/>
-        <DCCReference Include="..\common\windows\delphi\general\TextFileFormat.pas"/>
+        <DCCReference Include="..\common\delphi\general\TextFileFormat.pas"/>
         <DCCReference Include="..\common\delphi\components\KMDActions.pas"/>
         <DCCReference Include="..\common\delphi\components\KMDActionInterfaces.pas"/>
         <DCCReference Include="main\UfrmHelp.pas">
@@ -333,7 +333,7 @@
             <Form>frmSelectBCP47Language</Form>
             <DesignClass>TTntForm</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\common\windows\delphi\general\WindowsLanguages.pas"/>
+        <DCCReference Include="..\common\delphi\general\WindowsLanguages.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\wininet5.pas"/>
         <DCCReference Include="main\TextFileTemplates.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\GlobalProxySettings.pas"/>
@@ -419,10 +419,10 @@
             <Form>frmKeyboardFonts</Form>
         </DCCReference>
         <DCCReference Include="..\common\delphi\compiler\CompileErrorCodes.pas"/>
-        <DCCReference Include="..\common\windows\delphi\general\KeyboardFonts.pas"/>
+        <DCCReference Include="..\common\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="main\TikeUnicodeData.pas"/>
-        <DCCReference Include="..\common\windows\delphi\general\UKeymanTargets.pas"/>
+        <DCCReference Include="..\common\delphi\general\UKeymanTargets.pas"/>
         <DCCReference Include="dialogs\UfrmSMTPSetup.pas">
             <Form>frmSMTPSetup</Form>
         </DCCReference>

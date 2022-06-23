@@ -103,7 +103,7 @@
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\..\..\..\developer\src\common\delphi\packages\kpsfile.pas"/>
+        <DCCReference Include="..\..\..\common\delphi\packages\kpsfile.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas"/>
         <DCCReference Include="PackageInfoTest.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\JsonUtil.pas"/>

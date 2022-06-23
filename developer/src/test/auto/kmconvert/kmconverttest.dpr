@@ -13,7 +13,7 @@ uses
   DUnitX.TestFramework,
   Keyman.Developer.System.Test.KMConvertParametersTest in 'Keyman.Developer.System.Test.KMConvertParametersTest.pas',
   Keyman.Developer.System.KMConvertParameters in '..\..\..\kmconvert\Keyman.Developer.System.KMConvertParameters.pas',
-  UKeymanTargets in '..\..\..\common\windows\delphi\general\UKeymanTargets.pas',
+  UKeymanTargets in '..\..\..\common\delphi\general\UKeymanTargets.pas',
   BCP47Tag in '..\..\..\..\..\common\windows\delphi\general\BCP47Tag.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.LanguageCodeUtils in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas',

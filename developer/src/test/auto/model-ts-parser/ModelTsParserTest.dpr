@@ -12,8 +12,8 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   Keyman.System.Test.LexicalModelParserTest in 'Keyman.System.Test.LexicalModelParserTest.pas',
-  Keyman.Developer.System.LexicalModelParser in '..\..\..\developer\TIKE\main\Keyman.Developer.System.LexicalModelParser.pas',
-  Keyman.Developer.System.LexicalModelParserTypes in '..\..\..\developer\TIKE\main\Keyman.Developer.System.LexicalModelParserTypes.pas';
+  Keyman.Developer.System.LexicalModelParser in '..\..\..\tike\main\Keyman.Developer.System.LexicalModelParser.pas',
+  Keyman.Developer.System.LexicalModelParserTypes in '..\..\..\tike\main\Keyman.Developer.System.LexicalModelParserTypes.pas';
 
 var
   runner : ITestRunner;
