@@ -150,7 +150,6 @@
             <Form>frmSelectKey</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\keybtn.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\unicodepanel.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\PaintPanel.pas"/>
@@ -203,7 +202,6 @@
         <DCCReference Include="child\UfrmBitmapEditor.pas">
             <Form>frmBitmapEditor</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\HintLabel.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportHTML.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas"/>
@@ -212,7 +210,6 @@
         <DCCReference Include="dialogs\UfrmVisualKeyboardImportKMX.pas">
             <Form>frmVisualKeyboardImportKMX</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\PanelOverlapped.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\ScanCodeMap.pas"/>
         <DCCReference Include="dialogs\UfrmRegressionTestFailure.pas">
             <Form>frmRegressionTestFailure</Form>
@@ -231,7 +228,6 @@
         </DCCReference>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\comp\HeadingCheckListBox.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\BitmapEditor.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\comp\StringGridEditControlled.pas"/>
         <DCCReference Include="main\KMDevResourceStrings.pas"/>
