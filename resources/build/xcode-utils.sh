@@ -151,3 +151,9 @@ function phaseSentryDsymUpload() {
     buildWarning "sentry-cli not installed; please run \"brew install getsentry/tools/sentry-cli\" to remedy"
   fi
 }
+
+function logScriptsToFile() {
+  exec >> $KEYMAN_ROOT/ios/scripts.log 2>&1
+}
+
+logScriptsToFile

@@ -23,6 +23,18 @@ cd "$(dirname "$THIS_SCRIPT")"
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
 
+function printScriptLogs() {
+  echo "printScriptLogs: reporting script results from previous xcode build"
+  if [ -f "$KEYMAN_ROOT/ios/scripts.log" ]; then
+    cat "$KEYMAN_ROOT/ios/scripts.log"
+    rm "$KEYMAN_ROOT/ios/scripts.log"
+  else
+    echo "printScriptLogs: $KEYMAN_ROOT/ios/scripts.log not found"
+  fi
+  echo "printScriptLogs: done"
+  echo
+}
+
 display_usage ( ) {
     echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-add-sim-artifact] [-no-build] [-upload-sentry]"
     echo
@@ -253,10 +265,13 @@ xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
            UPLOAD_SENTRY=$UPLOAD_SENTRY
 
 if [ $? -ne 0 ]; then
+  printScriptLogs
   fail "KMEI build failed."
 fi
 
 assertDirExists "$KEYMAN_XCFRAMEWORK"
+
+printScriptLogs
 
 echo "KMEI build complete."
 
@@ -283,9 +298,11 @@ if [ $DO_KEYMANAPP = true ]; then
                 UPLOAD_SENTRY=$UPLOAD_SENTRY
 
     if [ $? -ne 0 ]; then
+      printScriptLogs
       fail "Keyman app build failed."
     fi
 
+    printScriptLogs
   else
     # Time to prepare the deployment archive data.
     echo ""
@@ -298,6 +315,7 @@ if [ $DO_KEYMANAPP = true ]; then
                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
                 UPLOAD_SENTRY=$UPLOAD_SENTRY
 
+    printScriptLogs
     assertDirExists "$ARCHIVE_PATH"
 
     if [ $DO_CODE_SIGN == true ]; then
@@ -307,6 +325,7 @@ if [ $DO_KEYMANAPP = true ]; then
       xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
                   -exportOptionsPlist exportAppStore.plist \
                   -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
+      printScriptLogs
     fi
   fi
 
@@ -322,8 +341,10 @@ if [ $DO_KEYMANAPP = true ]; then
 
   echo ""
   if [ $? = 0 ]; then
+      printScriptLogs
       echo "Build succeeded."
   else
+      printScriptLogs
       fail "Build failed - please see the log above for details."
   fi
 fi
