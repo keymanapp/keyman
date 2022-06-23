@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.18 alpha 2022-06-23
+
+* chore(core): move common/core/desktop/ to core/ (#6629)
+
 ## 16.0.17 alpha 2022-06-22
 
 * chore(web): updates error-reporting lib uploader (#6818)
