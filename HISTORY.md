@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.262 stable 2022-06-23
+
+* fix(web): key preview styling, positioning issues (#6795)
+* chore(linux): Update Debian changelog (#6809)
+* fix(linux): Deal with non-existing files (#6812)
+* fix(linux): Catch KeyboardInterrupt (#6814)
+* fix(ios): blocks known non-error "error" report (#6816)
+* fix(web): fixes doc-keyboard generation (#6817)
+* chore(web): updates error-reporting lib uploader (pseudo- ) (#6819)
+
 ## 15.0.261 stable 2022-06-18
 
 * fix(web): crash on custom modifier keys (#6789)
