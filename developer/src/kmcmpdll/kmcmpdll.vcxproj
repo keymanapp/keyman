@@ -303,7 +303,6 @@
     <ClInclude Include="debugstore.h" />
     <ClInclude Include="DeprecationChecks.h" />
     <ClInclude Include="Edition.h" />
-    <ClInclude Include="keyman64.h" />
     <ClInclude Include="kmcmpdll.h" />
     <ClInclude Include="NamedCodeConstants.h" />
     <ClInclude Include="pch.h" />

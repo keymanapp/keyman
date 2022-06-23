@@ -21,9 +21,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "../../../common/windows/cpp/include/keymansentry.h"
-
-#define _KEYMAN64_LIGHT
-#include "keyman64.h"
+#include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
+#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWORD *cbBitmap);
 

@@ -28,9 +28,8 @@
 
 #include <stdio.h>
 
-#define _KEYMAN64_LIGHT
-
-#include "keyman64.h"
+#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
+#include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/windows/cpp/include/vkeys.h"
 
 #define SSN__PREFIX		L"&"

@@ -181,7 +181,6 @@
   <ItemGroup>
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\sentry.h" />
-    <ClInclude Include="..\..\..\windows\src\global\inc\keyman64.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keymansentry.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

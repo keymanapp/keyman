@@ -239,7 +239,6 @@ DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep);
 void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 
 //#define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
-#ifndef _KEYMAN64_LIGHT
 
 #ifndef _WIN64   // I4326
 #include "hotkeys.h"
@@ -276,5 +275,4 @@ BOOL SelectKeyboardTSF(DWORD KeymanID, BOOL foreground);   // I3933   // I3949  
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
-#endif  // _KEYMAN64_LIGHT
 #endif  // _KEYMANENGINE_H

@@ -52,7 +52,7 @@
     <ClInclude Include="..\keyman32\hotkeys.h" />
     <ClInclude Include="..\keyman32\k32_res.h" />
     <ClInclude Include="..\keyman32\KBD.H" />
-    <ClInclude Include="..\..\global\inc\keyman64.h" />
+    <ClInclude Include="..\keyman32\keyman64.h" />
     <ClInclude Include="..\keyman32\keymancontrol.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h" />
     <ClInclude Include="..\keyman32\keyman-debug-etw.h" />

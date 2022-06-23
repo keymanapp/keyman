@@ -384,7 +384,7 @@
     <ClInclude Include="k32_tsf.h" />
     <ClInclude Include="KBD.H" />
     <ClInclude Include="keyboardoptions.h" />
-    <ClInclude Include="..\..\global\inc\keyman64.h" />
+    <ClInclude Include="keyman64.h" />
     <ClInclude Include="keymancontrol.h" />
     <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
