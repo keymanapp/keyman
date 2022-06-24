@@ -51,7 +51,6 @@ namespace com.keyman {
   }
 
   export class KeymanBase {
-    _IE = 0;                   // browser version identification
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
     warned = false;            // Warning flag (to prevent multiple warnings)
@@ -240,37 +239,6 @@ namespace com.keyman {
      */
     ['addEventListener'](event: string, func): boolean {
       return this.util.addEventListener('kmw.'+event, func);
-    }
-
-      /**
-     * Function     _GetEventObject
-     * Scope        Private
-     * @param       {Event=}     e     Event object if passed by browser
-     * @return      {Event|null}       Event object
-     * Description Gets the event object from the window when using Internet Explorer
-     *             and handles getting the event correctly in frames
-     */
-    _GetEventObject<E extends Event>(e: E) {  // I2404 - Attach to controls in IFRAMEs
-      if (!e) {
-        e = window.event as E;
-        if(!e) {
-          var elem: HTMLElement = this.domManager.lastActiveElement;
-          if(elem) {
-            let doc = elem.ownerDocument;
-            var win: Window;
-            if(doc) {
-              win = doc.defaultView;
-            }
-            if(!win) {
-              return null;
-            }
-
-            e = win.event as E;
-          }
-        }
-      }
-
-      return e;
     }
 
     /**

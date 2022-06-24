@@ -76,9 +76,7 @@ namespace com.keyman.dom {
     _ControlFocus: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
       var Ltarg: HTMLElement;
       var device = this.keyman.util.device;
-      var osk = this.keyman.osk;
 
-      e = this.keyman._GetEventObject<FocusEvent>(e);     // I2404 - Manage IE events in IFRAMEs
       Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
       if (Ltarg == null) {
         return true;
@@ -175,10 +173,7 @@ namespace com.keyman.dom {
      * Respond to KMW losing focus on event
      */
     _ControlBlur: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
-      var Ltarg: HTMLElement;
-
-      e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs
-      Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
+      let Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
       if (Ltarg == null) {
         return true;
       }
@@ -249,7 +244,6 @@ namespace com.keyman.dom {
         activeKeyboard.notify(0, Utils.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
       }
 
-      //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
       this.doControlBlurred(Ltarg, e, isActivating);
 
       this.doChangeEvent(Ltarg);
@@ -332,11 +326,9 @@ namespace com.keyman.dom {
     _CommonFocusHelper(target: HTMLElement): boolean {
       let keyman = com.keyman.singleton;
       var uiManager = this.keyman.uiManager;
-      //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
-      //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
+
       if(target.ownerDocument && target instanceof target.ownerDocument.defaultView.HTMLIFrameElement) {
-        if(!this.keyman.domManager._IsIEEditableIframe(target, 1) ||
-            !this.keyman.domManager._IsMozillaEditableIframe(target, 1)) {
+        if(!this.keyman.domManager._IsEditableIframe(target, 1)) {
           DOMEventHandlers.states._DisableInput = true;
           return true;
         }
@@ -412,14 +404,8 @@ namespace com.keyman.dom {
 
     doChangeEvent(_target: HTMLElement) {
       if(DOMEventHandlers.states.changed) {
-        var event: Event;
-        if(typeof Event == 'function') {
-          event = new Event('change', {"bubbles": true, "cancelable": false});
-        } else { // IE path
-          event = document.createEvent("HTMLEvents");
-          event.initEvent('change', true, false);
-        }
-
+        let event = new Event('change', {"bubbles": true, "cancelable": false});
+        
         // Ensure that touch-aliased elements fire as if from the aliased element.
         if(_target['base'] && _target['base']['kmw_ip']) {
           _target = _target['base'];
@@ -741,7 +727,7 @@ namespace com.keyman.dom {
     /**
      * Handle the touch end event for an input element
      */
-    dragEnd: (e: TouchEvent|MouseEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent|MouseEvent) {
+    dragEnd: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
       e.stopPropagation();
       this.firstTouch = null;
     }.bind(this);
@@ -749,7 +735,7 @@ namespace com.keyman.dom {
     /**
      * Handle the touch move event for an input element
      */
-    dragInput: (e: TouchEvent|MouseEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent|MouseEvent) {
+    dragInput: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
       // Prevent dragging window
       if(e.cancelable) {
         // If a touch-alias element is scrolling, this may be false.
@@ -784,16 +770,9 @@ namespace com.keyman.dom {
         return;
       }
 
-      var x, y;
-
-      if(dom.Utils.instanceof(e, "TouchEvent")) {
-        x = touch.screenX;
-        y = touch.screenY;
-      } else {
-        x = (e as MouseEvent).screenX;
-        y = (e as MouseEvent).screenY;
-      }
-
+      const x = touch.screenX;
+      const y = touch.screenY;
+      
       // Allow content of input elements to be dragged horizontally or vertically
       if(typeof this.firstTouch == 'undefined' || this.firstTouch == null) {
         this.firstTouch={x:x,y:y};

@@ -219,9 +219,6 @@ namespace com.keyman.dom {
       // c.f. http://www.w3.org/WAI/GL/WCAG20/WD-WCAG20-TECHS/SCR29.html
       divThis.tabIndex=0;
 
-      // Disable (internal) pan and zoom on KMW input elements for IE10
-      (<any>divThis.style).msTouchAction='none';
-
       ds.minWidth=xs.width;
       ds.height=xs.height;
 
@@ -431,7 +428,7 @@ namespace com.keyman.dom {
      * the text form of the context given the page coordinate of a `TouchEvent`.  Takes great
      * care to remain O(log N); some layout-triggering operations are required, making O(N)
      * unacceptable.
-     * 
+     *
      * Even a few thousand characters is enough to become unacceptably laggy if O(N).
      * @param touchPageX  The target .pageX value for the caret
      * @param touchPageY  The target .pageY value for the caret
@@ -542,21 +539,12 @@ namespace com.keyman.dom {
 
       // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
       // Think of it as performing a floor() function, but the floor depends on the origin's direction.
-      let snapOrder: (x: number, y: number) => boolean;
+      const isRTL = (this as unknown as HTMLElement).dir == 'rtl';
+      const snapOrder = isRTL ? (a, b) => a < b : (a, b) => a > b;
+
       // Used to signify a few pixels of leniency in the 'rtl'-appropriate direction for final
       // caret placement.
-      let snapLeniency: number;
-      if((this as unknown as HTMLElement).dir == 'rtl') {  // I would use arrow functions, but IE doesn't like 'em.
-        snapOrder = function(a, b) {
-          return a < b;
-        };
-        snapLeniency = -TouchAliasData.X_SNAP_LENIENCY_PIXELS;
-      } else {
-        snapOrder = function(a, b) {
-          return a > b;
-        };
-        snapLeniency = TouchAliasData.X_SNAP_LENIENCY_PIXELS;
-      }
+      const snapLeniency = isRTL ? -TouchAliasData.X_SNAP_LENIENCY_PIXELS : TouchAliasData.X_SNAP_LENIENCY_PIXELS;
 
       // Now to binary-search the x-coordinate.
       // Pre-condition:  [cpMin, cpMax] === [start of row, end of row], both within the same line.

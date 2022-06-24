@@ -52,48 +52,37 @@ wrap-worker-code ( ) {
   echo "// --START:LMLayerWorkerCode--"
   printf "function %s () {\n" "${name}"
 
-  # TODO: I don't know if this is still true, or if we can add the polyfills to
-  # the project directly now?
-  #
   # Since the worker is compiled with "allowJS=false" so that we can make
   # declaration files, we have to insert polyfills here.
 
-  # This one's a minimal, targeted polyfill.  es6-shim could do the same, but
-  # also adds a lot more code the worker doesn't need to use. Recommended by MDN
-  # while keeping the worker lean and efficient.
-  # TODO: determine which platforms+versions require this?
+  ### NOTE ###
+  # Android API 21 (our current minimum) released with Chrome for Android 37.
+  # It's also updatable as of this version, but we can't guarantee that the user
+  # actually updated it, especially on first launch of the Android app/keyboard.
+
+  # This one's a minimal, targeted polyfill.  es6-shim could do the same,
+  # but also adds a lot more code the worker doesn't need to use.
+  # Recommended by MDN while keeping the worker lean and efficient.
+  # Needed for Android / Chromium browser pre-41.
   cat "../../../node_modules/string.prototype.codepointat/codepointat.js" || die
 
-  # Needed to ensure functionality on some older Android devices. (API 19-23 or
-  # so)
-  # TODO: determine exactly which versions require this?
-  cat "../../../node_modules/string.prototype.startswith/startswith.js" || die
-
-  # These two are straight from MDN - I didn't find any NPM ones that don't use
-  # the node `require` statement for the second.  They're also relatively short
-  # and simple, which is good.
-  # TODO: determine which platforms+versions require this?
-  cat "src/polyfills/array.fill.js" || die
-  cat "src/polyfills/array.from.js" || die
+  # These two are straight from MDN - I didn't find any NPM ones that don't
+  # use the node `require` statement for the second.  They're also relatively
+  # short and simple, which is good.
+  cat "src/polyfills/array.fill.js" || die # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.from.js" || die # Needed for Android / Chromium browser pre-45.
 
   # For Object.values, for iteration over object-based associate arrays.
-  # TODO: determine which platforms+versions require this?
-  cat "src/polyfills/object.values.js" || die
+  cat "src/polyfills/object.values.js" || die # Needed for Android / Chromium browser pre-54.
 
   # Needed to support Symbol.iterator, as used by the correction algorithm.
-  # TODO: determine which platforms+versions require this?
-  cat "src/polyfills/symbol-es6.min.js" || die
-
-  # Needed to 'support' String.normalize within iOS 9. For our limited use case
-  # thereof; is definitely NOT a general polyfill. (The file size on a true one
-  # would be quite high.)
-  cat "src/polyfills/string.normalize.js" || die
+  cat "src/polyfills/symbol-es6.min.js" || die # Needed for Android / Chromium browser pre-43.
 
   echo ""
 
   cat "${js}" || die
   printf "\n}\n"
-  echo "// --END:LMLayerWorkerCode--"
+  echo "// --END:LMLlayerWorkerCode"
 }
 
 ################################ Main script ################################

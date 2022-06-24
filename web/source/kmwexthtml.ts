@@ -27,12 +27,6 @@ interface Element {
     dismiss: () => void
 }
 
-interface HTMLDivElement {
-    onmspointerdown: any,
-    onmspointerup: any,
-    onmspointermove: any
-}
-
 interface CSSStyleDeclaration {
     MozBoxSizing: any,
     // For legacy 'selection' management.
