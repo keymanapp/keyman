@@ -2,6 +2,7 @@
 import logging
 import os
 import subprocess
+import sys
 from gi.repository import Gio
 
 from gi.overrides.GLib import Variant
@@ -62,16 +63,24 @@ class GSettings():
 
     def get(self, key):
         if self.is_sudo:
-            process = subprocess.run(
-                ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-                 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
-                 'gsettings', 'get', self.schema_id, key],
-                capture_output=True)
-            if process.returncode == 0:
-                value = eval(process.stdout)
+            args = ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+                    'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
+                    'gsettings', 'get', self.schema_id, key]
+            if sys.version_info.major <= 3 and sys.version_info.minor < 7:
+                # capture_output got added in Python 3.7
+                try:
+                    output = subprocess.check_output(args)
+                    value = eval(output)
+                except(subprocess.CalledProcessError):
+                    value = None
+                    logging.warning('Could not convert to sources')
             else:
-                value = None
-                logging.warning('Could not convert to sources')
+                process = subprocess.run(args, capture_output=True)
+                if process.returncode == 0:
+                    value = eval(process.stdout)
+                else:
+                    value = None
+                    logging.warning('Could not convert to sources')
         else:
             variant = self.schema.get_value(key)
             value = self._convert_variant_to_array(variant)

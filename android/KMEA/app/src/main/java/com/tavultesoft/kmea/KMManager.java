@@ -40,6 +40,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -206,6 +207,10 @@ public final class KMManager {
   protected static String currentBanner = KM_BANNER_STATE_BLANK;
 
 
+  // Special override for when the keyboard may have haptic feedback when typing.
+  // haptic feedback disabled for hardware keystrokes
+  private static boolean mayHaveHapticFeedback = false;
+
   // Special override for when keyboard is entering a password text field.
   // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
   // regardless what the Settings preference is.
@@ -235,6 +240,7 @@ public final class KMManager {
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
   public static final String KMKey_FontFamily = "family";
+  public static final String KMKey_KMPInstall_Mode = "kmpInstallMode";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
@@ -293,6 +299,7 @@ public final class KMManager {
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
+  protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
@@ -797,6 +804,7 @@ public final class KMManager {
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
+      copyAsset(context, KMFilename_JSPolyfill, "", true);
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
@@ -1207,6 +1215,20 @@ public final class KMManager {
   }
 
   /**
+   * If the override is true, vibrate when user types on the Keyman keyboard
+   * @param override - boolean
+   */
+  public static void setHapticFeedback(boolean override) {
+    mayHaveHapticFeedback = override;
+  }
+
+  /**
+   * Get the value of mayHaveHapticFeedback. Default is false
+   * @return boolean
+   */
+  public static boolean getHapticFeedback() { return mayHaveHapticFeedback; };
+
+  /**
    * If override is true, embedded KMW crash reports are allowed to be sent to sentry.keyman.com
    * @param override - boolean
    */
@@ -1492,7 +1514,9 @@ public final class KMManager {
       result2 = SystemKeyboard.setKeyboard(keyboardInfo);
 
     if (keyboardInfo != null) {
-      registerAssociatedLexicalModel(keyboardInfo.getLanguageID());
+      String languageID = keyboardInfo.getLanguageID();
+      toggleSuggestionBanner(languageID, result1, result2);
+      registerAssociatedLexicalModel(languageID);
     }
 
     return (result1 || result2);
@@ -1521,19 +1545,7 @@ public final class KMManager {
       result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
     }
 
-    if(result1 || result2)
-    {
-      //reset banner state if new language has no lexical model
-      if(currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
-        && getAssociatedLexicalModel(languageID)==null)
-        currentBanner = KMManager.KM_BANNER_STATE_BLANK;
-
-      if(result1)
-        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
-      if(result2)
-        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
-    }
-
+    toggleSuggestionBanner(languageID, result1, result2);
     registerAssociatedLexicalModel(languageID);
 
     return (result1 || result2);
@@ -1990,6 +2002,16 @@ public final class KMManager {
 
   public static Keyboard getCurrentKeyboardInfo(Context context) {
     int index = getCurrentKeyboardIndex(context);
+    if(index < 0) {
+      // As of 15.0-beta and 15.0-stable, this only appears to occur when
+      // #6703 would trigger.  This logging may help us better identify the
+      // root cause.
+      String key = KMKeyboard.currentKeyboard();
+      // Even if it's null, it's still a notable error.  This function shouldn't
+      // be reachable in execution (15.0) at a time this variable would be set to `null`.
+      KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      return null;
+    }
     return KeyboardController.getInstance().getKeyboardInfo(index);
   }
 
@@ -2124,6 +2146,21 @@ public final class KMManager {
 
   public static void setGlobeKeyState(GlobeKeyState state) {
     globeKeyState = state;
+  }
+
+  private static void toggleSuggestionBanner(String languageID, boolean inappKeyboardChanged, boolean systemKeyboardChanged) {
+    //reset banner state if new language has no lexical model
+    if (currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
+      && getAssociatedLexicalModel(languageID)==null) {
+      currentBanner = KMManager.KM_BANNER_STATE_BLANK;
+    }
+
+    if(inappKeyboardChanged) {
+      InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
+    if(systemKeyboardChanged) {
+      SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
   }
 
   /**
@@ -2683,7 +2720,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s, final int dr) {
+    public void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke) {
       if(dr != 0) {
         Log.d(TAG, "Right deletions requested but are not presently supported by the in-app keyboard.");
       }
@@ -2791,6 +2828,9 @@ public final class KMManager {
           // Collapse the selection
           textView.setSelection(start + s.length());
           textView.endBatchEdit();
+          if (mayHaveHapticFeedback && !executingHardwareKeystroke) {
+            textView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+          }
         }
       });
     }
@@ -2842,7 +2882,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s, final int dr) {
+    public void insertText(final int dn, final String s, final int dr, final boolean executingHardwareKeystroke) {
       // TODO: Unify in-app and system insertText
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
@@ -2932,6 +2972,10 @@ public final class KMManager {
           }
 
           ic.endBatchEdit();
+          ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();
+          if (parent != null && mayHaveHapticFeedback && !executingHardwareKeystroke) {
+            parent.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+          }
         }
       });
     }

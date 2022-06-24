@@ -52,8 +52,10 @@ namespace com.keyman.osk {
     }
 
     public static isValidTarget(vkbd: VisualKeyboard, baseKey: KeyElement) {
+      // Could use String.includes, but Chrome for Android must be version 41+.
+      // We support down to version 37.
       return (
-        baseKey['keyId'].includes('K_SHIFT') &&
+        baseKey['keyId'].indexOf('K_SHIFT') >= 0 &&
         vkbd.layerGroup.layers['caps'] &&
         !baseKey['subKeys'] &&
         vkbd.touchCount == 1

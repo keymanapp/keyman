@@ -15,7 +15,7 @@
 		"keymanweb.ts",
 		"kmwembedded.ts",
 		"kmwinit.ts",
-		"kmwapi.ts"
+		"kmwapi.ts",
   ],
 
 	"exclude": [
@@ -27,13 +27,15 @@
 	],
 
   "references": [
-    { "path": "../../common/web/web-environment", "prepend": true },
+    { "path": "../../common/web/keyman-version", "prepend": true },
     { "path": "../../common/web/utils", "prepend": true },
     { "path": "../../common/predictive-text/browser.tsconfig.json", "prepend": true },
     { "path": "../../common/web/input-processor/src", "prepend": true },
     { "path": "../../common/web/keyboard-processor/src", "prepend": true },
-    { "path": "../../common/web/es6-shim", "prepend": true },
     { "path": "../../common/web/lm-message-types" },
-    { "path": "../../common/web/sentry-manager/src" }, // We don't prepend this, because it will be loaded separately
+    // sentry-manager is used by Keyman for Android and Keyman for iOS but not
+    // directly by KeymanWeb, but it's neater to reference it here and get the
+    // automatic build result, than to reference it directly in those projects.
+    { "path": "../../common/web/sentry-manager/src" },
 	]
 }

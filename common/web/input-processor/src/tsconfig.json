@@ -7,17 +7,17 @@
     "declaration": true,
     "inlineSources": true,
     "sourceMap": true,
+    "sourceRoot": "keyman/",
     "target": "es5",
     "types": ["node"],
     "lib": ["es6"],
     "outFile": "../build/index.js"
   },
   "references": [
-    { "path": "../../web-environment" },
+    { "path": "../../keyman-version" },
     { "path": "../../utils" },
     { "path": "../../keyboard-processor/src" },
     { "path": "../../../predictive-text/browser.tsconfig.json" },
-    { "path": "../../es6-shim" }
   ],
   "include": ["./**/*.ts"],
   "files": [

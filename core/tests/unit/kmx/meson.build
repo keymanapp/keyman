@@ -5,6 +5,16 @@
 # History:      19  Oct 2018 - TSE - Added test for context API functions.
 #
 
+if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
+  warns = [
+     '-Wno-missing-field-initializers',
+     '-Wno-unused-parameter'
+  ]
+else
+  warns = []
+endif
+
+
 if compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
   source_path = '/'
@@ -18,7 +28,7 @@ endif
 kmx = executable('kmx',
     'kmx.cpp',
     'kmx_test_source.cpp',
-    cpp_args: defns,
+    cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
     objects: lib.extract_all_objects())
@@ -77,7 +87,7 @@ tests = [
 ]
 
 if build_machine.system() == 'windows'
-  kmcomp = find_program('kmcomp.exe', required: false)
+  kmcomp = find_program(join_paths(meson.source_root(),'..','..','..','windows','bin','developer','kmcomp.exe'), 'kmcomp.exe', required: false)
   kmcomp_cmd = [kmcomp]
   copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
   cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']
@@ -205,7 +215,8 @@ endif
 # test for km_kbp_keyboard_get_key_list
 
 key_e = executable('key_list', 'kmx_key_list.cpp',
-                cpp_args: defns,include_directories: [inc, libsrc],
+                cpp_args: defns + warns,
+                include_directories: [inc, libsrc],
                 link_args: links,
                 objects: lib.extract_all_objects())
 test_kbd = 'kmx_key_list'
@@ -217,7 +228,7 @@ if kmcomp.found()
     input: kbd_src,
     command: kmcomp_cmd + ['-s', '-d', '@INPUT@', kbd_obj, '@OUTPUT@']
   )
-    test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
+  test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
 else
   kbd_obj = join_paths(meson.current_source_dir(), test_kbd) + '.kmx'
   test('key_list', key_e, args: [kbd_obj] )
@@ -226,7 +237,8 @@ endif
 # test for imx list
 
 imx_e = executable('imx_list', 'kmx_imx.cpp',
-                cpp_args: defns,include_directories: [inc, libsrc],
+                cpp_args: defns + warns,
+                include_directories: [inc, libsrc],
                 link_args: links,
                 objects: lib.extract_all_objects())
 

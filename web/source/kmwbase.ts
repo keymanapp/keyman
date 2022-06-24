@@ -51,7 +51,6 @@ namespace com.keyman {
   }
 
   export class KeymanBase {
-    _IE = 0;                   // browser version identification
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
     warned = false;            // Warning flag (to prevent multiple warnings)
@@ -159,12 +158,12 @@ namespace com.keyman {
       this.osk = this['osk'] = null;
 
       // Load properties from their static variants.
-      this['build'] = com.keyman.environment.BUILD;
+      this['build'] = Number.parseInt(com.keyman.KEYMAN_VERSION.VERSION_PATCH, 10);
       this.srcPath = KeymanBase._srcPath;
       this.rootPath = KeymanBase._rootPath;
       this.protocol = KeymanBase._protocol;
 
-      this['version'] = com.keyman.environment.VERSION;
+      this['version'] = com.keyman.KEYMAN_VERSION.VERSION_RELEASE;
       this['helpURL'] = 'http://help.keyman.com/go';
       this.setInitialized(0);
 
@@ -240,37 +239,6 @@ namespace com.keyman {
      */
     ['addEventListener'](event: string, func): boolean {
       return this.util.addEventListener('kmw.'+event, func);
-    }
-
-      /**
-     * Function     _GetEventObject
-     * Scope        Private
-     * @param       {Event=}     e     Event object if passed by browser
-     * @return      {Event|null}       Event object
-     * Description Gets the event object from the window when using Internet Explorer
-     *             and handles getting the event correctly in frames
-     */
-    _GetEventObject<E extends Event>(e: E) {  // I2404 - Attach to controls in IFRAMEs
-      if (!e) {
-        e = window.event as E;
-        if(!e) {
-          var elem: HTMLElement = this.domManager.lastActiveElement;
-          if(elem) {
-            let doc = elem.ownerDocument;
-            var win: Window;
-            if(doc) {
-              win = doc.defaultView;
-            }
-            if(!win) {
-              return null;
-            }
-
-            e = win.event as E;
-          }
-        }
-      }
-
-      return e;
     }
 
     /**
@@ -710,7 +678,16 @@ namespace com.keyman {
 
       PKbd = PKbd || this.core.activeKeyboard;
 
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.computedHeight);
+      // help.keyman.com will (lkudingly) set this function in place to specify the desired
+      // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
+      // "temporary" (but actually permanent) solutions from yesteryear.
+      //
+      // Note that the main intended use of that function is for embedded KMW on the mobile apps...
+      // but they never call `BuildVisualKeyboard`, so it's all good.
+      const getOskHeight = this['getOskHeight'];
+      let targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
+
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, targetHeight);
     }
   }
 }

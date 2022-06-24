@@ -69,6 +69,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
+    boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
+    KMManager.setHapticFeedback(mayHaveHapticFeedback);
+
     KMManager.executeResourceUpdate(this);
   }
 
@@ -145,6 +148,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(langId), true);
         KMManager.setBannerOptions(mayPredict);
+      } else {
+        KMManager.setBannerOptions(false);
       }
     }
 

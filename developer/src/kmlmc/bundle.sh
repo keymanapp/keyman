@@ -104,12 +104,20 @@ npm pack
 mv keymanapp-models-types*.tgz kmtypes.tgz
 mv kmtypes.tgz "$KEYMAN_WIX_TEMP_MODELCOMPILER"
 
+
+cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version" "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/"
+
+cd "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/keyman-version"
+set_npm_version
+npm pack
+mv keymanapp-keyman-version*.tgz kmver.tgz
+mv kmver.tgz "$KEYMAN_WIX_TEMP_MODELCOMPILER"
+
 # Step 3 - install just the bare essentials by using our packed local
 # dependency, followed by all external production dependencies.
 cd "$KEYMAN_WIX_TEMP_MODELCOMPILER"
 # package-lock.json wasn't bundled; this is needed to keep dependency versions
 # consistent.
-# cp "$KEYMAN_MODELCOMPILER_TEMP/package-lock.json" "$KEYMAN_WIX_TEMP_MODELCOMPILER/"
 
 # as of npm v8.x, even though we are only working with `dependencies`,
 # `devDependencies` is still checked, and as these modules are present in
@@ -125,10 +133,12 @@ cat "$KEYMAN_MODELCOMPILER_TEMP/package.json" | "$JQ" \
   > "package.json"
 
 npm install kmtypes.tgz --production --no-optional
+npm install kmver.tgz --production --no-optional
 npm install --production --no-optional
 
 # Clean up the npm pack artifacts for the dependencies.
 rm kmtypes.tgz
+rm kmver.tgz
 
 # We don't need the unit tests
 rm -rf "$KEYMAN_WIX_TEMP_MODELCOMPILER/tests"

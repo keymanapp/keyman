@@ -2,11 +2,12 @@ var assert = require('chai').assert;
 let fs = require('fs');
 let vm = require('vm');
 
-let KeyboardProcessor = com.keyman.text.KeyboardProcessor;
-global.keyman = {};
+let KeyboardProcessor = require('../../build/index.bundled.js');
 
-// Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);
+// Required initialization setup.
+global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+
+let KMWRecorder = require('../../../recorder/build/nodeProctor');
 
 describe('Engine - Basic Simulation', function() {
   let testJSONtext = fs.readFileSync('../../test/resources/json/engine_tests/basic_lao_simulation.json');

@@ -4,7 +4,6 @@ c expected: \U0001F601yx
 c context:
 
 store(&version) '10.0'
-c store(&name) '028smp'
 
 begin Unicode > use(Main)
 

@@ -4,6 +4,15 @@
 # Authors:      Tim Eves (TSE)
 #
 
+if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
+  warns = [
+     '-Wno-missing-field-initializers',
+     '-Wno-unused-parameter'
+  ]
+else
+  warns = []
+endif
+
 defns=['-DKMN_KBP_STATIC']
 tests = [
   ['context-api', 'context_api.cpp'],
@@ -17,7 +26,7 @@ tests = [
 
 foreach t : tests
   bin = executable(t[0], t[1],
-    cpp_args: defns,
+    cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links,
     objects: lib.extract_all_objects())

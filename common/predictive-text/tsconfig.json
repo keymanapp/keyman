@@ -12,7 +12,6 @@
   },
   "references": [
     { "path": "../web/utils" },
-    { "path": "../web/es6-shim" },
     { "path": "../models/types"},
     { "path": "../models/wordbreakers"},
     { "path": "../web/lm-message-types"},
@@ -23,5 +22,11 @@
     "web-defaultWorker.ts",
     "node_modules",
     "testing"
+  ],
+  "files": [
+    // By renaming the output JS as TS, and including the @ts-nocheck directive, we can
+    // bypass wrapped-worker typing issues while still bundling the file as part of the
+    // tsc build!
+    "../web/lm-worker/build/index.wrapped-for-bundle.ts"
   ]
 }

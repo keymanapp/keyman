@@ -80,11 +80,11 @@ type
     function CacheMSIFile(msiLocation: TInstallInfoFileLocation): WideString;
     procedure FinishCacheMSIFile(msiLocation: TInstallInfoFileLocation;
       InstallSuccess: Boolean);
-    function InstallMSI(msiLocation: TInstallInfoFileLocation): Boolean;
+    function InstallMSI(msiLocation: TInstallInfoFileLocation; var InstallDefaults: Boolean; ContinueSetup: Boolean): Boolean;
     procedure ConfigFirstRun(StartKeyman,StartWithWindows,
-      CheckForUpdates,StartDisabled,StartWithConfiguration,
+      CheckForUpdates,StartDisabled,StartWithConfiguration,InstallDefaults,
       AutomaticallyReportUsage: Boolean);
-    procedure PrepareForReboot(res: Cardinal);
+    procedure PrepareForReboot(res: Cardinal; InstallDefaults: Boolean);
     function RestartWindows: Boolean;
     procedure RunVersion6Upgrade(const kmshellpath: WideString);
     procedure RunVersion7Upgrade(const KMShellPath: WideString);
@@ -102,7 +102,7 @@ type
     procedure CheckInternetConnectedState;
     function DoInstall(Handle: THandle;
       StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
-      StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
+      StartWithConfiguration, InstallDefaults, AutomaticallyReportUsage, ContinueSetup: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
     procedure LogInfo(const msg: string; ShowDialogIfNotSilent: Boolean = False);
 
@@ -195,7 +195,7 @@ end;
 
 function TRunTools.DoInstall(Handle: THandle;
   StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
-  StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
+  StartWithConfiguration, InstallDefaults, AutomaticallyReportUsage, ContinueSetup: Boolean): Boolean;
 var
   msiLocation: TInstallInfoFileLocation;
 begin
@@ -220,12 +220,12 @@ begin
 
     CloseKeymanApplications;  // I2740
 
-    if not InstallMSI(msiLocation) then
+    if not InstallMSI(msiLocation, InstallDefaults, ContinueSetup) then
       Exit(False);
   end;
 
   ConfigFirstRun(StartAfterInstall,StartWithWindows,CheckForUpdates,
-    StartDisabled,StartWithConfiguration,AutomaticallyReportUsage);
+    StartDisabled,StartWithConfiguration,InstallDefaults,AutomaticallyReportUsage);
 
   Result := True;
 end;
@@ -499,7 +499,7 @@ begin
   end;
 end;
 
-function TRunTools.InstallMSI(msiLocation: TInstallInfoFileLocation): Boolean;
+function TRunTools.InstallMSI(msiLocation: TInstallInfoFileLocation;var InstallDefaults: Boolean; ContinueSetup: Boolean): Boolean;
 var
   pcode: array[0..39] of Char;
   res: Cardinal;
@@ -534,6 +534,14 @@ begin
       end;
     end;
 
+    //  InstallDefaults may have already been set True from the command line if not then
+    //  update the InstallDefaults flag based on current installed version information.
+    if not(InstallDefaults) and not (ContinueSetup) then
+    begin
+      if Assigned(FInstallInfo.MsiInstallLocation) and (FInstallInfo.InstalledVersion.Version = '') then
+        InstallDefaults := True;
+    end;
+
     { Log the install to the diag folder }
 
     FLogFileName := TKeymanPaths.ErrorLogPath(ChangeFileExt(ExtractFileName(msiLocation.Path), ''));  // I1610 // I2755 // I2792
@@ -556,7 +564,7 @@ begin
       ERROR_SUCCESS: ;
       ERROR_SUCCESS_REBOOT_REQUIRED, ERROR_SUCCESS_REBOOT_INITIATED:
         begin
-          PrepareForReboot(res); // We need to continue this install after reboot
+          PrepareForReboot(res, InstallDefaults); // We need to continue this install after reboot
           Result := False;
           Exit;
         end;
@@ -581,13 +589,12 @@ begin
 end;
 
 procedure TRunTools.ConfigFirstRun(StartKeyman,StartWithWindows,CheckForUpdates,
-  StartDisabled,StartWithConfiguration,AutomaticallyReportUsage: Boolean);
+  StartDisabled,StartWithConfiguration,InstallDefaults,AutomaticallyReportUsage: Boolean);
 var
   i: Integer;
   s: WideString;
   FKMShellPath: WideString;
   FExitCode: Cardinal;
-  msiLocation: TInstallInfoFileLocation;
   FKMShellVersion: string;
 
   procedure DoInstallPackages;
@@ -681,10 +688,7 @@ begin
     if CheckForUpdates then s := s + 'CheckForUpdates,';
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
-    msiLocation := FInstallInfo.MsiInstallLocation;
-    if Assigned(msiLocation) and (
-        (FInstallInfo.InstalledVersion.Version = '') or (FInstallInfo.InstalledVersion.ProductCode <> msiLocation.ProductCode)
-      ) then
+    if InstallDefaults then
     begin
       s := s + 'InstallDefaults,';  // I2651
       s := s + ' -defaultuilanguage='+TSetupUILanguageManager.ActiveLocale;
@@ -740,9 +744,10 @@ begin
   Status(FInstallInfo.Text(ssStatusComplete));
 end;
 
-procedure TRunTools.PrepareForReboot(res: Cardinal);
+procedure TRunTools.PrepareForReboot(res: Cardinal; InstallDefaults: Boolean);
 var
   FTempFilename: string;
+  s: string;
 begin
   FMustReboot := True;
 
@@ -752,7 +757,10 @@ begin
     begin
       FTempFilename := KGetTempFilename;
       FInstallInfo.SaveToJSONFile(FTempFilename);
-      WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c "'+FTempFilename+'"');
+      s := '"'+ParamStr(0)+'" -c "'+FTempFilename+'"';
+      if InstallDefaults then
+        s := s + ' -d';
+      WriteString(SRegValue_WindowsRunOnce_Setup, s);
     end;
   finally
     Free;

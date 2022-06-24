@@ -124,18 +124,18 @@ module.exports = function(config) {
   var specifics = {
     // BrowserStack configuration options
     browserStack: {
-      video: false,
-      browserDisconnectTimeout: 3e5,
-      retryLimit: 1, // 0 is ignored.
+      video: true,
+      browserDisconnectTimeout: 6e4, // 1 minute (60s => 60,000ms)
+      retryLimit: 3, // 0 is ignored.
       startTunnel: true,
     },
 
     // Attempts to avoid generating a 'fail' exit code if one of our selected browsers on BrowserStack goes poof.
     failOnEmptyTestSuite: false,
 
-    captureTimeout: 6e5, // in milliseconds
-    browserNoActivityTimeout: 3e5,
-    browserDisconnectTimeout: 3e5,
+    captureTimeout: 1.2e5, // in milliseconds
+    browserNoActivityTimeout: 6e4,
+    browserDisconnectTimeout: 6e4,
     browserDisconnectTolerance: 3,
 
     // Avoids generating a 'fail' exit code if one of our selected browsers on BrowserStack goes poof.
@@ -144,7 +144,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['teamcity'],
+    reporters: ['teamcity', 'BrowserStack'],
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG

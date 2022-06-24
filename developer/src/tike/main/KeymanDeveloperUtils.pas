@@ -305,7 +305,7 @@ begin
   if not GetKMShellPath(kmshell) then   // I3655
     Exit;
 
-  if not TUtilExecute.WaitForProcess(kmshell+' -i "'+nm+'"', ExtractFilePath(nm)) then  // I3475
+  if not TUtilExecute.WaitForProcess('"'+kmshell+'" -i "'+nm+'"', ExtractFilePath(nm)) then  // I3475
     ShowMessage('Failed to install keyboard');
 end;
 

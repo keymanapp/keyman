@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProjectUser>
+  <ViewState>
+    <tab>1</tab>
+    <showhelp>1</showhelp>
+    <path>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\unmatched_final_group_model_interactions_6005.kpj</path>
+    <file ID="id_ce4234903ee2da9404650af1baaeff37" Expanded="1"/>
+    <file ID="id_662849508b9a7885735a354908c0a3bb" Expanded="1"/>
+  </ViewState>
+  <FileStates>
+    <FileState>
+      <ID>id_4f5496a37662e0a9f4c58a8fa7f278fe</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\source\unmatched_final_group_model_interactions_6005.kmn</FullPath>
+      <IDEState>
+        <LayoutDisplay102Key>0</LayoutDisplay102Key>
+        <DebugDefaultFont>1</DebugDefaultFont>
+        <DebugFont>Consolas|-9|   |0</DebugFont>
+        <CodeFont>Consolas|-9|   |0</CodeFont>
+        <CharFont>Consolas|-9|   |0</CharFont>
+      </IDEState>
+      <Debug>False</Debug>
+    </FileState>
+    <FileState>
+      <ID>id_662849508b9a7885735a354908c0a3bb</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\source\unmatched_final_group_model_interactions_6005.kps</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_ede98e4633e239f933cbfd1f4e1b766c</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\HISTORY.md</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_53e892b8b41cc4caece1cfd5ef21d6e7</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\LICENSE.md</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_0730bb7c2e8f9ea2438b52e419dd86c9</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\README.md</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_e85e92b4c5fbf57dc8ae85f00ce5a068</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\source\..\build\unmatched_final_group_model_interactions_6005.kmx</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_80197977032e3d5266b571033e0f0ff4</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\source\..\build\unmatched_final_group_model_interactions_6005.js</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_4e56168448a8471df8611394620e7775</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\source\..\build\unmatched_final_group_model_interactions_6005.kvk</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_356e5d149c1e539356d72698c1e401a6</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\source\welcome.htm</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_8da344c4cea6f467013357fe099006f5</ID>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\source\readme.htm</FullPath>
+    </FileState>
+  </FileStates>
+  <MRU>
+    <File>
+      <ID>id_MRU0</ID>
+      <Filename>unmatched_final_group_model_interactions_6005.kmn</Filename>
+      <FileType>.kmn</FileType>
+      <FullPath>C:\keymanapp\keyman\common\test\keyboards\unmatched_final_group_model_interactions_6005\source\unmatched_final_group_model_interactions_6005.kmn</FullPath>
+    </File>
+  </MRU>
+</KeymanDeveloperProjectUser>

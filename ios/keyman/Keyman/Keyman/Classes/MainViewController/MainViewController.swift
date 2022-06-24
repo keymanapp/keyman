@@ -126,6 +126,72 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     fatalError("init(coder:) has not been implemented")
   }
 
+  private func constructAndAddHostedViews() {
+    self.constructAndAddMainTextView()
+    self.constructAndAddInfoView()
+    self.constructAndAddTextSizeController()
+    resizeViews(withKeyboardVisible: textView.isFirstResponder)
+  }
+
+  private func constructAndAddMainTextView() {
+    // Setup Keyman TextView
+    textSize = 16.0
+    textView = TextView(frame: view.frame)
+    textView.translatesAutoresizingMaskIntoConstraints = false
+    textView.setKeymanDelegate(self)
+    textView.viewController = self
+    textView.backgroundColor = UIColor(named: "InputBackground")!
+    textView.isScrollEnabled = true
+    textView.isUserInteractionEnabled = true
+    textView.font = textView.font?.withSize(textSize)
+    view?.addSubview(textView!)
+
+    textView.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor   ).isActive = true
+    textView.leftAnchor.constraint  (equalTo: view.safeAreaLayoutGuide.leftAnchor  ).isActive = true
+    textView.rightAnchor.constraint (equalTo: view.safeAreaLayoutGuide.rightAnchor ).isActive = true
+    textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+
+    if UIDevice.current.userInterfaceIdiom != .phone {
+      textSize *= 2
+      textView.font = textView?.font?.withSize(textSize)
+    }
+  }
+
+  private func constructAndAddInfoView() {
+    // Setup Info View
+    infoView = InfoViewController {
+      self.infoButtonClick(nil)
+    }
+
+    infoView.view?.translatesAutoresizingMaskIntoConstraints = false
+    infoView.view?.isHidden = true
+    infoView.view?.backgroundColor = UIColor(named: "InputBackground")!
+    view?.addSubview(infoView!.view)
+
+    // Don't forget to add the child view's controller, too!
+    // Its safe area layout guide won't work correctly without this!
+    self.addChild(infoView)
+
+    infoView.view?.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+    infoView.view?.leftAnchor.constraint  (equalTo: view.leftAnchor  ).isActive = true
+    infoView.view?.rightAnchor.constraint (equalTo: view.rightAnchor ).isActive = true
+    infoView.view?.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+  }
+
+  private func constructAndAddTextSizeController() {
+    // Setup Text Size Controller
+    textSizeController = UISlider()
+    textSizeController.frame = CGRect.zero
+    textSizeController.minimumValue = 0.0
+    textSizeController.maximumValue = Float(maxTextSize - minTextSize)
+    textSizeController.value = Float(textSize - minTextSize)
+    let textSizeUp = #imageLiteral(resourceName: "textsize_up.png").resize(to: CGSize(width: 20, height: 20))
+    textSizeController.maximumValueImage = textSizeUp
+    let textSizeDown = #imageLiteral(resourceName: "textsize_up.png").resize(to: CGSize(width: 15, height: 15))
+    textSizeController.minimumValueImage = textSizeDown
+    textSizeController.addTarget(self, action: #selector(self.sliderValueChanged), for: .valueChanged)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -180,41 +246,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navbarBackground.setOrientation(UIApplication.shared.statusBarOrientation)
     }
 
-    // Setup Keyman TextView
-    textSize = 16.0
-    textView = TextView(frame: view.frame)
-    textView.setKeymanDelegate(self)
-    textView.viewController = self
-    textView.backgroundColor = UIColor(named: "InputBackground")!
-    textView.isScrollEnabled = true
-    textView.isUserInteractionEnabled = true
-    textView.font = textView.font?.withSize(textSize)
-    view?.addSubview(textView!)
-
-    // Setup Info View
-    infoView = InfoViewController()
-    if UIDevice.current.userInterfaceIdiom != .phone {
-      textSize *= 2
-      textView.font = textView?.font?.withSize(textSize)
-    }
-
-    infoView.view?.isHidden = true
-    infoView.view?.backgroundColor = UIColor(named: "InputBackground")!
-    view?.addSubview(infoView!.view)
-
-    resizeViews(withKeyboardVisible: textView.isFirstResponder)
-
-    // Setup Text Size Controller
-    textSizeController = UISlider()
-    textSizeController.frame = CGRect.zero
-    textSizeController.minimumValue = 0.0
-    textSizeController.maximumValue = Float(maxTextSize - minTextSize)
-    textSizeController.value = Float(textSize - minTextSize)
-    let textSizeUp = #imageLiteral(resourceName: "textsize_up.png").resize(to: CGSize(width: 20, height: 20))
-    textSizeController.maximumValueImage = textSizeUp
-    let textSizeDown = #imageLiteral(resourceName: "textsize_up.png").resize(to: CGSize(width: 15, height: 15))
-    textSizeController.minimumValueImage = textSizeDown
-    textSizeController.addTarget(self, action: #selector(self.sliderValueChanged), for: .valueChanged)
+    self.constructAndAddHostedViews()
 
     setNavBarButtons()
     loadSavedUserText()
@@ -368,17 +400,23 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func resizeViews(withKeyboardVisible keyboardVisible: Bool) {
-    // Resize textView and infoView
-    let mainScreen: CGRect = UIScreen.main.bounds
-    let margin: CGFloat = 2.0
-    let barHeights: CGFloat = AppDelegate.statusBarHeight() + navBarHeight()
-    let kbHeight: CGFloat = keyboardVisible ? textView.inputView?.frame.height ?? 0 : 0
-    let width: CGFloat = mainScreen.size.width
-    let height: CGFloat = mainScreen.size.height - barHeights - kbHeight
+    guard let window = UIApplication.shared.windows.first else {
+      return
+    }
 
-    textView.frame = CGRect(x: margin, y: barHeights + margin,
-                             width: width - 2 * margin, height: height - 2 * margin)
-    infoView?.view?.frame = CGRect(x: 0, y: barHeights, width: width, height: height + kbHeight)
+    // As the keyboard isn't naturally part of the safe area, we must
+    // adjust the safe area's size when it appears.
+    let kbHeight: CGFloat = keyboardVisible ? textView.inputView?.frame.height ?? 0 : 0
+
+    let bottomPadding = window.safeAreaInsets.bottom
+
+    var kbdSafeArea = UIEdgeInsets()
+    if keyboardVisible {
+      // The keyboard also contains the safe area when visible, and we only want
+      // to add the _additional_ height.
+      kbdSafeArea.bottom += kbHeight - bottomPadding
+    }
+    self.additionalSafeAreaInsets = kbdSafeArea
   }
 
   private func navBarWidth() -> CGFloat {
@@ -409,7 +447,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private func keyboardLoaded() {
     didKeyboardLoad = true
     dismissActivityIndicator()
-    textView.becomeFirstResponder()
+
+    // Defer display of the keyboard until the current "message" on the main dispatch
+    // queue is complete.  There are still ongoing calculations - including within the
+    // keyboard's WebView itself!  (This function's call is actually triggered _by_ it!)
+    DispatchQueue.main.async {
+      self.textView.becomeFirstResponder()
+    }
     if shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
@@ -464,11 +508,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navigationItem.titleView = nil
       navigationItem.rightBarButtonItem = nil
       setNavBarButtons()
-      if wasKeyboardVisible {
-        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
-      }
       if shouldShowGetStarted {
         perform(#selector(self.showGetStartedView), with: nil, afterDelay: 0.75)
+      } else if wasKeyboardVisible {
+        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
       }
     } else {
       _ = dismissDropDownMenu()
@@ -480,7 +523,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       let vAdjPort: CGFloat = UIScreen.main.scale == 2.0 ? -3.6 : -2.6
       let vAdjLscpe: CGFloat = -1.6
 
-      let infoDoneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
+      let doneString = NSLocalizedString("command-done", bundle: Bundle(for: Manager.self), comment: "")
+      let infoDoneButton = UIBarButtonItem(title: doneString, style: .plain, target: self,
                                            action: #selector(self.infoButtonClick))
       infoDoneButton.setBackgroundVerticalPositionAdjustment(vAdjPort, for: UIBarMetrics.default)
       infoDoneButton.setBackgroundVerticalPositionAdjustment(vAdjLscpe, for: UIBarMetrics.compact)
@@ -596,7 +640,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let doneButton = UIButton(type: .roundedRect)
     doneButton.addTarget(self, action: #selector(self.dismissTextSizeVC), for: .touchUpInside)
 
-    doneButton.setTitle("Done", for: .normal)
+    let doneString = NSLocalizedString("command-done", bundle: Bundle(for: Manager.self), comment: "")
+    doneButton.setTitle(doneString, for: .normal)
     doneButton.titleLabel?.font = doneButton.titleLabel?.font?.withSize(21.0)
     doneButton.setTitleColor(UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0), for: .normal)
     doneButton.layer.cornerRadius = 4.0

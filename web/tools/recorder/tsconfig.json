@@ -16,11 +16,11 @@
   ],
 
   "references": [
-    { "path": "../../../common/web/web-environment" },
+    { "path": "../../../common/web/keyman-version" },
     { "path": "../../../common/web/utils" },
     { "path": "../../../common/web/keyboard-processor/src" },
     { "path": "../../../common/web/input-processor/src" },
-    { "path": "../../../common/web/recorder/src" },
+    { "path": "../../../common/web/recorder/src", "prepend": true },
     { "path": "../../../common/web/lm-message-types" }
   ]
 }

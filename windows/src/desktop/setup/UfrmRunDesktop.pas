@@ -117,6 +117,7 @@ type
     FStartWithWindows: Boolean;
     FAutomaticallyReportUsage: Boolean;
     FDisableUpgradeFrom6Or7Or8: Boolean;  // I2847   // I4293
+    FInstallDefaults: Boolean;
     procedure CheckVersion6Upgrade;
     procedure CheckVersion7Upgrade;
     procedure CheckVersion8Upgrade;   // I4293
@@ -136,6 +137,7 @@ type
     property ContinueSetup: Boolean read FContinueSetup write FContinueSetup;
     property StartAfterInstall: Boolean read FStartAfterInstall write FStartAfterInstall;  // I2738
     property DisableUpgradeFrom6Or7Or8: Boolean read FDisableUpgradeFrom6Or7Or8 write FDisableUpgradeFrom6Or7Or8; // I2847   // I4293
+    property InstallDefaults: Boolean read FInstallDefaults write FInstallDefaults;
   end;
 
 implementation
@@ -521,7 +523,8 @@ begin
     SetupMSI; // I2644
 
     if GetRunTools.DoInstall(Handle, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
-      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FAutomaticallyReportUsage) then
+      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FInstallDefaults,
+      FAutomaticallyReportUsage, FContinueSetup) then
     begin
       if not Silent and not FStartAfterInstall then   // I2610
         ShowMessage(FInstallInfo.Text(ssInstallSuccess));

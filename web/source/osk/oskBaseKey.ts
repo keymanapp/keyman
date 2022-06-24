@@ -131,7 +131,7 @@ namespace com.keyman.osk {
 
       if(vkbd.usesFixedHeightScaling) {
         // Matches its row's height.
-        this.square.style.height = vkbd.layoutHeight.scaledBy(this.row.heightFraction).styleString;
+        this.square.style.height = vkbd.internalHeight.scaledBy(this.row.heightFraction).styleString;
       } else {
         this.square.style.height = '100%'; // use the full row height
       }

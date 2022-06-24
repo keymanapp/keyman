@@ -1,5 +1,222 @@
 # Keyman Version History
 
+## 16.0.18 alpha 2022-06-23
+
+* chore(core): move common/core/desktop/ to core/ (#6629)
+
+## 16.0.17 alpha 2022-06-22
+
+* chore(web): updates error-reporting lib uploader (#6818)
+* fix(web): fixes doc-keyboard generation (#6793)
+
+## 16.0.16 alpha 2022-06-21
+
+* fix(web): key tip constraint logic requires .bottom CSS (#6784)
+* fix(ios): overzealous error about missing banner image (#6807)
+* chore(linux): Update Debian changelog (#6810)
+
+## 16.0.15 alpha 2022-06-18
+
+* fix(web): crash on custom modifier keys (#6790)
+* chore: add trigger definitions for stable-15.0 and fixup force param for increment-version.sh (#6776)
+
+## 16.0.14 alpha 2022-06-17
+
+* chore(web): add 'index.html' to parent links in test pages (#6791)
+
+## 16.0.13 alpha 2022-06-15
+
+* chore: beta to master merge A16S4 (#6771)
+
+## 16.0.12 alpha 2022-06-14
+
+* chore(web): replace lerna with npm workspaces and ts projects (#6525)
+* fix(common): update increment-version for new tsc, node versions (#6762)
+
+## 16.0.11 alpha 2022-05-27
+
+* chore: A16S2 beta to master (#6670)
+* chore(ios): FV certificate hash (#6674)
+
+## 16.0.10 alpha 2022-05-15
+
+* chore: beta to master A16S1 (#6614)
+
+## 16.0.9 alpha 2022-04-29
+
+* chore(common): merge beta to master B15S7 (Part 2) (#6579)
+
+## 16.0.8 alpha 2022-04-17
+
+* chore: merge beta to master B15S7 (#6537)
+
+## 16.0.7 alpha 2022-04-07
+
+* chore: beta to master B15S6 (#6490)
+* fix(ios): use CFBundleShortVersionString for version (#6496)
+
+## 16.0.6 alpha 2022-04-05
+
+* chore(deps): bump ansi-regex from 3.0.0 to 3.0.1 in /web/testing/regression-tests (#6470)
+* chore(deps-dev): bump minimist from 1.2.5 to 1.2.6 in /web/testing/regression-tests (#6471)
+* chore(deps): bump minimist from 1.2.5 to 1.2.6 in /developer/server (#6472)
+
+## 16.0.5 alpha 2022-04-04
+
+* chore(common): beta to master B15S6 (#6467)
+
+## 16.0.4 alpha 2022-03-22
+
+* chore: B15S4 beta->alpha (#6402)
+
+## 16.0.3 alpha 2022-03-16
+
+* chore: merge beta changes to alpha B15S4 (#6376)
+* chore(common/core/desktop): Improve meson build file  ️ (#6183)
+
+## 16.0.2 alpha 2022-03-03
+
+* chore(deps-dev): bump karma from 6.3.14 to 6.3.16 in /web/testing/regression-tests (#6322)
+
+## 16.0.1 alpha 2022-03-02
+
+* chore: move to 16.0 (#6318)
+
+## 15.0.259 beta 2022-06-10
+
+* fix(android/engine): Disable haptic feedback on hardware keystrokes (#6671)
+* fix(windows): Install TIP crash with inconsistent bcp47tag (#6727)
+* change(web): adjusts minimum distance needed for quick-display of subkeys (#6714)
+* change(web): browser test timeout tweaks (#6718)
+
+## 15.0.258 beta 2022-06-06
+
+* chore: add 14.0 entries to beta HISTORY.md (#6705)
+* chore(web): switch on additional BrowserStack reporting (#6707)
+* fix(web): fixes OSK-interaction issues in Float, Toolbar UI modules (#6689)
+
+## 15.0.257 beta 2022-06-03
+
+* fix(developer): kmcomp package compiler race condition (#6696)
+* fix(developer): install keyboard call should quote kmshell.exe path (#6691)
+
+## 15.0.256 beta 2022-06-01
+
+* chore(android,ios,mac): Update crowdin strings for Spanish (Latin America) (#6650)
+
+## 15.0.255 beta 2022-05-31
+
+* fix(web): osk shrinkage from rounding (#6658)
+
+## 15.0.254 beta 2022-05-30
+
+* fix(ios): missed i18n site (#6667)
+* fix(ios): keyboard height on app load (#6672)
+* feat(ios): adds back and forward navigation buttons for in-app help (#6654)
+* change(ios): modernization of the Keyman app main screen's layout logic (#6666)
+
+## 15.0.253 beta 2022-05-27
+
+* chore(ios): FV certificate hash (#6673)
+
+## 15.0.252 beta 2022-05-25
+
+* fix(ios): fixes OSK mispositioning bug in iOS 15 (#6631)
+
+## 15.0.251 beta 2022-05-23
+
+* fix(ios): stops leaking memory on system keyboard rotation (#6552)
+* fix(android/engine): Fix sticky long-press keys (#6637)
+
+## 15.0.250 beta 2022-05-20
+
+* feat(android/app): Provide haptic feedback when typing (#6626)
+* fix(ios): disables transparent nav bar for ios 15 (#6633)
+
+## 15.0.249 beta 2022-05-19
+
+* chore(common): improve PR reporting of changes (#6624)
+
+## 15.0.248 beta 2022-05-17
+
+* fix(windows): use GlobalGetAtomName to access global list (#6580)
+
+## 15.0.247 beta 2022-05-16
+
+* chore(common/resources): Update langtags.json (#6594)
+* fix(android/engine): Refresh OSK when changing spacebar text (#6620)
+
+## 15.0.246 beta 2022-05-11
+
+* chore(ios): Set transparent background on "more" icons (#6598)
+* chore(common): Add crowdin strings for Polish (#6593)
+
+## 15.0.245 beta 2022-05-10
+
+* chore(common): Add crowdin strings for Italian (#6592)
+
+## 15.0.244 beta 2022-05-09
+
+* fix(windows): Don't reset defaults on Keyman upgrade (#6491)
+
+## 15.0.243 beta 2022-05-03
+
+* chore(web): report on file size (#6584)
+* chore(android/engine): Ignore DownloadManager if ID not found (#6581)
+* fix(common/models): prevents preemptive tokenization of potential contractions (#6574)
+* fix(web): fixes fat-finger distrib when subkey selected (#6526)
+
+## 15.0.242 beta 2022-04-29
+
+* docs(windows): Update OS and whatsnew in help (#6560)
+* fix(android/engine): Check suggestion banner after setting keyboard (#6559)
+* chore(common): Update Crowdin strings for Fula (#6562)
+
+## 15.0.241 beta 2022-04-27
+
+* change(web): touch alias optimization followup (#6566)
+* fix(common/core/web): Fix forEach loop in SentryManager (#6569)
+* fix(linux): Fix shared keyboard (un-)installation in Bionic (#6565)
+
+## 15.0.240 beta 2022-04-26
+
+* feat(web): adds .getKeyboard().IsRTL, .HasLoaded (#6567)
+* fix(android): Don't show welcome.htm on keyboard package update (#6555)
+* fix(android/engine): Localize some Toast notifications (#6561)
+
+## 15.0.239 beta 2022-04-22
+
+* fix(web): optimizes, enhances caret placement within text on mobile devices (#6551)
+
+## 15.0.238 beta 2022-04-21
+
+* chore(linux): Fix failure in Debian reproducibility testing (#6548)
+* chore(linux): Update Linux dependencies (#6549)
+
+## 15.0.237 beta 2022-04-20
+
+* feat(linux): WIP - implement capslock handling with Wayland  ️ (#6213)
+
+## 15.0.236 beta 2022-04-19
+
+* fix(android): key tip sticky with multitap (#6494)
+* fix(web): blocks modifier key fat-fingering (#6473)
+
+## 15.0.235 beta 2022-04-18
+
+* chore(android,windows): Update crowdin strings for bwr-NG (#6532)
+
+## 15.0.234 beta 2022-04-14
+
+* chore(common): Add Crowdin strings for Portuguese (pt-PT) (#6509)
+* chore(linux): Fix l10n language mappings (#6529)
+* chore(linux): Update Debian changelog (#6530)
+
+## 15.0.233 beta 2022-04-13
+
+* chore(android/app): Add description for referrer response error (#6524)
+* fix(linux): test fileVersion during package install (#6522)
+
 ## 15.0.232 beta 2022-04-11
 
 * fix(linux): Remove tab completion warning (#6482)
@@ -145,6 +362,9 @@
 * change(web): tightens call signature for banner selection (#4966)
 * fix(windows): cleanup edge cases in k32_load (#5197)
 * feat(ios): refinement of spacebar-captioning PR (#5368)
+
+## 15.0.205 alpha 2022-03-02
+
 * fix(developer): move ngrok to Server/bin/ (#6304)
 * fix(linux): Gracefully handle keyboard download failure (#6285)
 * fix(linux): Gracefully handle makedirs failures (#6287)
@@ -1354,6 +1574,111 @@
 ## 15.0.1 alpha 2020-12-14
 
 * chore: prepare 15.0 alpha (#4129)
+
+## 14.0.292 stable 2022-05-24
+
+* fix(windows): sentry debuglogging for DoInstall (#6648)
+
+## 14.0.291 stable 2022-05-07
+
+* fix(windows): don't log before checking nil when installing keyboard (#6506)
+* fix(windows): put correct HK_ALT flag for modifier (#6587)
+
+## 14.0.290 stable 2022-03-31
+
+* chore(oem/fv/android): Update dependencies (#6452)
+
+## 14.0.289 stable 2022-03-30
+
+* chore(linux): Remove versions that are no longer supported (#6388)
+* chore(windows): move crash metadata to extra (#6398)
+* fix(android/engine): Test fileVersion during package install (#6423)
+* fix(mac): invalid keyboard breaks configuration (#6420)
+* chore(android):   Update Play publishing plugin to 3.5.0 and other plugins (#6224)
+* fix(web): track load error detail (#6443)
+
+## 14.0.288 stable 2022-03-15
+
+* chore(linux): Update changelogs for 14.0.287 (#6373)
+
+## 14.0.287 stable 2022-03-04
+
+* chore(ios): certificate update (#6210)
+* fix(windows): create Keyman/Diag folder in redirected profile (#6222)
+* fix(web): stop masking error (#6332)
+
+## 14.0.286 stable 2022-01-27
+
+* chore(linux): Update changelogs for 14.0.284 (#6131)
+* chore(linux): Revert workaround for Python bug (#6134)
+* fix: only auto-merge if `auto:` prefix in title (#6148)
+* fix(developer): work around devDependencies bug in npm (#6142)
+* chore(ios): certificate update (#6166)
+* fix(mac): Check for CODE_SETSYSTEMSTORE (#6170)
+
+## 14.0.285 stable 2022-01-20
+
+* fix(linux): Fix lintian errors :cherries: (#6107)
+* fix(linux): Add workaround for Python bug :cherries: (#6125)
+* fix(web): Use regex to determine display layer and functional layers (#6123)
+
+## 14.0.284 stable 2022-01-11
+
+* chore(android,oem/fv/android): Update targetSDKVersion to 30 (#5934)
+* fix(web): popupBaseKey null check (#5948)
+* fix(linux): Add test targets to Makefile (#5975)
+* fix(android/engine): Fix font paths (#5990)
+* chore(linux): Remove lintian warning (#5993)
+* chore(linux): Allow to specify debian revision (#5998)
+* chore(linux): Update changelogs for 14.0.283 :package: (#6007)
+* fix(linux): fix release version number for Sentry reporting :cherries: (#6053)
+* chore(common): Check in crowdin strings for Spanish (Latin America) (#6060)
+* fix(linux): fix release version number for Sentry reporting :cherries: (#6069)
+* chore(android/samples): Add -no-daemon flag to KMSample2 build script (#6083)
+* fix(linux): Fix attribute error :cherries: (#6087)
+
+## 14.0.283 stable 2021-11-17
+
+* chore(windows): fix broken links in help (#5766)
+* chore(linux): copy Keyman for Linux 15 reference to 14 (#5764)
+* fix(linux): Fix debian package script (#5772)
+* chore(common): Enhance cherry-pick labeling (#5773)
+* fix(common): Fix cherry-pick labeling (:cherries:) (#5783)
+* fix(linux): Don't crash displaying keyboard details (#5757)
+* chore(linux): Update changelog files for 14.0.282 (#5793)
+* fix(linux): Don't crash with non-keyboard package file (#5754)
+* chore: sentry.io dsn  ‍ ️ (#5788)
+* fix(windows): handle edge cases using default language (#5775)
+* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5806)
+* fix(web): remove canvas use for iOS compatibility (#5916)
+
+## 14.0.282 stable 2021-09-27
+
+* fix(mac): add support for M1 processor (#5737)
+* chore(mac): Add help links for installing Keyman and keyboards (#5748)
+* fix: help.keyman.com script file cleanup (#5750)
+
+## 14.0.281 stable 2021-09-17
+
+* fix(common/models): keep/suggestion diacritic sensitivity when de-duping (#5552)
+* feat(ios): adds option for Simulator-compatible testing artifact (#5569)
+* chore(ios,windows): Update crowdin strings for Azerbaijani (#5487)
+* fix(oem/fv/ios): build configuration for 14.0's test-oriented simulator artifact (#5596)
+* fix(linux): Handle corrupt icon file (#5589)
+* fix(linux): Check for valid kmp file (#5590)
+* chore: fixup stable HISTORY.md (#5605)
+* chore(linux): Improve debian package script (#5624)
+* chore(linux): Fix uploading to Sentry (#5625)
+* chore(linux): Update changelog files (#5636)
+* fix(ios): iOS 13 and 14 only - stuck settings toggles (#5611)
+* fix(web): Fix layers for embedded longpress keys (#5651)
+* fix(linux): Use first keyboard language if none given (#5657)
+* fix(android/engine): Fix backspace on Android 5.0 (#5674)
+* chore(common): report-history (#5678)
+* fix(developer): ensure file modified after import from layout (#5677)
+* test(windows): investigate TIP crash (#5679)
+* fix(common/core/web): Remove empty rows in OSK (#5703)
+* fix(windows): fallback to filename if `&name` not set (#5685)
 
 ## 14.0.280 stable 2021-08-02
 

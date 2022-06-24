@@ -109,7 +109,7 @@ const main = async (): Promise<void> => {
   // Increment the version number if history has any entries
   //
 
-  if(argv._.includes('version') && changeCount > 0) {
+  if(argv._.includes('version') && (changeCount > 0 || argv.force)) {
     logInfo(`# Incrementing version from ${version}`);
     const newVersion = incrementVersion();
     logInfo(`# New version is ${newVersion}\n`);

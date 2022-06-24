@@ -334,6 +334,16 @@ namespace correction {
         ignorePenultimateMatch = true;
       }
 
+      // Can happen for the first text input after backspace deletes a wordbreaking character,
+      // thus the new input continues a previous word while dropping the empty word after 
+      // that prior wordbreaking character.
+      //
+      // We can't handle it reliably from this match state, but a previous entry (without the empty token)
+      // should still be in the cache and will be reliable for this example case.
+      if(tailIndex > 0 && editPath[tailIndex-1] == 'delete' && editPath[tailIndex] == 'substitute') {
+        return null;
+      }
+
       // Now to check everything in-between:  should be exclusively 'match'es.
       for(let index = 1; index < editPath.length - (ignorePenultimateMatch ? 2 : 1); index++) {
         if(editPath[index] != 'match') {

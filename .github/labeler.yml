@@ -27,7 +27,7 @@ common/models/templates/: common/models/templates/**
 common/models/wordbreakers/: common/models/wordbreakers/**
 
 common/resources/: resources/**
-common/web/: core/web/**
+common/web/: common/web/**
 
 common/core/:
   - core/**

@@ -20,7 +20,7 @@
   ],
 
   "references": [
-    { "path": "../../web-environment" },
+    { "path": "../../keyman-version" },
     { "path": "../../utils" },
     { "path": "../../keyboard-processor/src" },
     { "path": "../../lm-message-types" }

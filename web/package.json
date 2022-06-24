@@ -19,7 +19,7 @@
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
     "@keymanapp/web-sentry-manager": "*",
-    "@sentry/cli": "^1.52.3",
+    "@sentry/cli": "2.2.0",
     "chai": "^4.3.4",
     "google-closure-compiler-java": "^20200224.0.0",
     "karma": "^6.3.4",
@@ -52,13 +52,12 @@
   "dependencies": {
     "@keymanapp/input-processor": "*",
     "@keymanapp/keyboard-processor": "*",
+    "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
-    "@keymanapp/web-environment": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4",
-    "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0"
   }
 }

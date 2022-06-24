@@ -9,7 +9,10 @@ var vm = require("vm");
 var LexicalModelCompiler = require('../../../../../developer/src/kmlmc/dist/lexical-model-compiler/lexical-model-compiler').default;
 var path = require('path');
 
+let InputProcessor = require('../../build/index.bundled.js');
+
 // Required initialization setup.
+global.com = InputProcessor.com; // exports all keyboard-processor namespacing.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 

@@ -96,7 +96,13 @@ namespace com.keyman.dom {
     __caretTimerId: number;
     __activeCaret: boolean = false;
 
+    __executingCaretSearch: boolean = false;
+
     __resizeHandler: () => void;
+
+    // The number of pixels a touch may lie within the 'next' character before we
+    // bump the caret AFTER that next character.
+    static readonly X_SNAP_LENIENCY_PIXELS: number = 5;
 
     private static device: Device;
 
@@ -212,9 +218,6 @@ namespace com.keyman.dom {
       // Set the tabindex to 0 to allow a DIV to accept focus and keyboard input
       // c.f. http://www.w3.org/WAI/GL/WCAG20/WD-WCAG20-TECHS/SCR29.html
       divThis.tabIndex=0;
-
-      // Disable (internal) pan and zoom on KMW input elements for IE10
-      (<any>divThis.style).msTouchAction='none';
 
       ds.minWidth=xs.width;
       ds.height=xs.height;
@@ -361,7 +364,10 @@ namespace com.keyman.dom {
       this.__preCaret.textContent=t1;
       this.__postCaret.textContent=t2;
 
-      this.updateBaseElement(); // KMW-3, KMW-29
+      // Disable if a caret search is operational; no need to alter page layout or scroll just yet.
+      if(!this.__executingCaretSearch) {
+        this.updateBaseElement(); // KMW-3, KMW-29
+      }
     }
 
     getTextBeforeCaret() {
@@ -384,9 +390,9 @@ namespace com.keyman.dom {
       tLen=t.length;
       tLen=tLen+this.__postCaret.textContent.length;
 
-      // Update the base element then scroll into view if necessary
-      this.updateBaseElement(); //KMW-3, KMW-29
-      this.scrollInput();
+      if(!this.__executingCaretSearch) {
+        this.finalizeCaret();
+      }
     }
 
     getTextCaret(): number {
@@ -396,6 +402,186 @@ namespace com.keyman.dom {
     setTextCaret(cp: number): void {
       this.setText(null,cp);
       this.showCaret();
+    }
+
+    /**
+     * An outer wrapper for the caret position update function.  Disables unnecessary DOM-manipulation
+     * (& layout-triggering) operations during the search while guaranteeing that normal caret updates
+     * resume after the search, whether or not an error occurs.
+    *
+     * Some layout-triggering is still needed for the search to work, but the quantity is greatly reduced.
+     * @param touchPageX  The target .pageX value for the caret
+     * @param touchPageY  The target .pageY value for the caret
+     */
+    executeCaretSearch(touchPageX: number, touchPageY: number) {
+      this.__executingCaretSearch = true;
+      try {
+        this.performCaretSearch(touchPageX, touchPageY);
+      } finally {
+        this.__executingCaretSearch = false;
+        this.finalizeCaret();
+      }
+    }
+
+    /**
+     * The core functionality for efficiently determining the intended caret placement within
+     * the text form of the context given the page coordinate of a `TouchEvent`.  Takes great
+     * care to remain O(log N); some layout-triggering operations are required, making O(N)
+     * unacceptable.
+     *
+     * Even a few thousand characters is enough to become unacceptably laggy if O(N).
+     * @param touchPageX  The target .pageX value for the caret
+     * @param touchPageY  The target .pageY value for the caret
+     */
+    private performCaretSearch(touchX: number, touchY: number) {
+      const dy=document.body.scrollTop;
+      const contextLength = this.getText()._kmwLength();
+      let cpMin=0;
+      let cpMax=contextLength;
+      let cp=this.getTextCaret();
+
+      // Vertical scrolling
+      // instanceof this.base.[...] in case the element lies within an iframe.
+      if(this.base instanceof this.base.ownerDocument.defaultView.HTMLTextAreaElement) {
+        // Approximates the height of a row.
+        const yRow=Math.round(this.base.offsetHeight/(this.base as HTMLTextAreaElement).rows);
+        const maxY = touchY;
+        const minY = touchY - yRow;
+
+        // Performs a binary search for a valid caret based on the y-position.
+        // cp:  the previously-set caret position.
+
+        // Break the binary search if our final search window is extremely small.
+        while(cpMax - cpMin > 1) {
+
+          const y=dom.Utils.getAbsoluteY(this.__caretSpan)-dy;  //top of caret
+
+          if(y > maxY && cp > cpMin) {
+            // If caret's prior placement is below (after) the touch's y-pos...
+            cpMax=cp;  // new max position
+            cp=Math.round((cp+cpMin)/2); // guess the halfway mark
+          } else if(y < minY && cp < cpMax) {
+            // If caret's prior placement is above (before) the touch's y-pos - 1 row height...
+            cpMin=cp; // new min posiiton
+            cp=Math.round((cp+cpMax)/2); // guess the halfway mark
+          } else {
+            // Great guess:  the y-position lines up, so cp is within the target row.
+            // At this point, the only thing that matters is that we've found ONE caret
+            // position that matches the target line.
+            break;
+          }
+          // Actively set our caret to the determined matching y-position.
+          this.setTextCaret(cp);  // mutates `caret`'s position
+        }
+
+        // Tweak slightly if the caret position still falls out of bounds, but only enough to get in-bounds.
+        // Since our final window is small, we only need single-position shifts here (if needed at all).
+        if(dom.Utils.getAbsoluteY(this.__caretSpan)-dy > maxY && cp > cpMin) {
+          this.setTextCaret(--cp); // mutates `caret`'s position
+        }
+
+        if(dom.Utils.getAbsoluteY(this.__caretSpan)-dy < minY && cp < cpMax) {
+          this.setTextCaret(++cp); // mutates `caret`'s position
+        }
+
+        // Guarantees:  cp is 'close' to both bounds, as it lies within the target row.
+        // Therefore, it caps the search interval for the x-coordinate versions of both cpMin and cpMax.
+        //
+        // Now to meet the pre-condition for the x-coord search later in the function:
+        // we need those bounds to be [cpMin, cpMax] === [start of row, end of row], both within the same line.
+
+        // Determine minimum caret position on the target row; prep the x-coord cpMin.
+        // cpMin is guaranteed to lie strictly before the target row unless at the start of the first row.
+        // It is neither guaranteed to have changed since its initialization nor to be close to the target row.
+        let minCpMin = cpMin;
+        let maxCpMin = cp;
+        while(maxCpMin != minCpMin) {
+          // Our logic will auto-increment if too low, so favor the lower index.
+          const searchPt = Math.floor((maxCpMin+minCpMin)/2);
+          this.setTextCaret(searchPt);
+
+          const y=dom.Utils.getAbsoluteY(this.__caretSpan)-dy;  //top of caret
+          if(y < minY) {
+            // We already know it's not on this row, so the minimum possible index should be increased.
+            cpMin = minCpMin = searchPt+1;
+          } else {
+            // Still in the same row, so the boundary can only be at or before this point.
+            cpMin = maxCpMin = searchPt;
+          }
+        }
+
+        // Determine maximum caret position on the target row; prep the x-coord cpMax.
+        // cpMax is guaranteed to lie strictly after the target row unless at the end of the final row.
+        // It is neither guaranteed to have changed since its initialization nor to be close to the target row.
+        let minCpMax = cp;
+        let maxCpMax = cpMax;
+        while(maxCpMax != minCpMax) {
+          // Our logic will auto-decrement if too high, so favor the higher index.
+          const searchPt = Math.round((maxCpMax+minCpMax)/2);
+          this.setTextCaret(searchPt);
+
+          const y=dom.Utils.getAbsoluteY(this.__caretSpan)-dy;  //top of caret
+          if(y > maxY) {
+            // We already know it's not on this row, so the maximum possible index should be decreased.
+            cpMax = maxCpMax = searchPt-1;
+          } else {
+            // Still in the same row, so the boundary can only be at or after this point.
+            cpMax = minCpMax = searchPt;
+          }
+        }
+
+        // Set the potential caret in the middle of the range.
+        cp = Math.round((cpMin + cpMax)/2);
+        this.setTextCaret(cp);
+      }
+
+      // Caret repositioning for horizontal scrolling of RTL text
+
+      // snapOrder - 'snaps' the touch location in a manner corresponding to the 'ltr' vs 'rtl' orientation.
+      // Think of it as performing a floor() function, but the floor depends on the origin's direction.
+      const isRTL = (this as unknown as HTMLElement).dir == 'rtl';
+      const snapOrder = isRTL ? (a, b) => a < b : (a, b) => a > b;
+
+      // Used to signify a few pixels of leniency in the 'rtl'-appropriate direction for final
+      // caret placement.
+      const snapLeniency = isRTL ? -TouchAliasData.X_SNAP_LENIENCY_PIXELS : TouchAliasData.X_SNAP_LENIENCY_PIXELS;
+
+      // Now to binary-search the x-coordinate.
+      // Pre-condition:  [cpMin, cpMax] === [start of row, end of row], both within the same line.
+      // Automatically met for `<input`>-based instances.
+      // Break the binary search if our final search window is extremely small.
+      while(cpMax - cpMin > 1) {
+        const x=dom.Utils.getAbsoluteX(this.__caretSpan);  //left of caret
+
+        if(snapOrder(x, touchX) && cp > cpMin) {
+          cpMax=cp;
+          cp=Math.round((cp+cpMin)/2);
+        } else if(!snapOrder(x, touchX) && cp < cpMax) {
+          cpMin=cp;
+          cp=Math.round((cp+cpMax)/2);
+        } else {
+          break;
+        }
+        this.setTextCaret(cp);
+      }
+
+      // LTR:  if caret x-pos > touchPosition, push caret earlier.
+      if(snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan), touchX) && cp > cpMin) {
+        this.setTextCaret(--cp);
+      }
+
+      // LTR:  if caret x-pos + leniency <= touchPosition, push caret later.
+      // Allows the touch to "bleed over" a couple pixels into the next char without
+      // bumping it later.
+      if(!snapOrder(dom.Utils.getAbsoluteX(this.__caretSpan) + snapLeniency, touchX) && cp < cpMax) {
+        this.setTextCaret(++cp);
+      }
+    }
+
+    private finalizeCaret() {
+      // Update the base element then scroll into view if necessary
+      this.updateBaseElement(); //KMW-3, KMW-29
+      this.scrollInput();
     }
 
     /**
@@ -452,11 +638,14 @@ namespace com.keyman.dom {
       cs.visibility='hidden';   // best to wait for timer to display caret
       this.__activeCaret = true;
 
-      // Scroll into view if required
-      this.scrollBody();
+      // Disable if a caret search is operational; no need to alter page layout or scroll just yet.
+      if(!this.__executingCaretSearch) {
+        // Scroll into view if required
+        this.scrollBody();
 
-      // Display and position the scrollbar if necessary
-      this.setScrollBar();
+        // Display and position the scrollbar if necessary
+        this.setScrollBar();
+      }
     }
 
     hideCaret() {

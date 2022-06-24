@@ -83,3 +83,14 @@ bc_stable_14_0_web=(Keymanweb_Build)
 bc_stable_14_0_developer=(Keyman_Developer_Release)
 
 vcs_stable_14_0=HttpsGithubComKeymanappKeyman
+
+# Stable 15.0 Build Configurations
+
+bc_stable_15_0_android=(KeymanAndroid_Build)
+bc_stable_15_0_ios=(Keyman_iOS_Master)
+bc_stable_15_0_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
+bc_stable_15_0_mac=(KeymanMac_Master)
+bc_stable_15_0_windows=(Keyman_Build)
+bc_stable_15_0_web=(Keymanweb_Build)
+
+vcs_stable_15_0=HttpsGithubComKeymanappKeyman

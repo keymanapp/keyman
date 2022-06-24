@@ -7,6 +7,8 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export PYBUILD_NAME=keyman-config
 export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
 
+export KEYMAN_PKG_BUILD=1
+
 # xenial needs this to be explicit
 export LC_ALL=C.UTF-8
 
