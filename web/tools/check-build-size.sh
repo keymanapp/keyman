@@ -120,7 +120,7 @@ if (( $LOCAL_FILE_SIZE <= $REMOTE_FILE_SIZE )); then
   # We are good -- the new build is smaller than the old one
   RESULT_STATE=success
   REPORT_CODE=0
-  RESULT_MESSAGE="✅ Excellent! keymanweb.js is $(printf "%'d" $DIFF) bytes ($PERCENT_DIFF%) smaller than $REMOTE_VERSION, at $(printf "%'d" $LOCAL_FILE_SIZE) bytes"
+  RESULT_MESSAGE="✅ Excellent! keymanweb.js is $(printf "%'d" $DIFF) bytes ($PERCENT_DIFF%) smaller than $REMOTE_VERSION, now $(printf "%'d" $LOCAL_FILE_SIZE) bytes"
 elif (( $DIFF < $SIZE_THRESHOLD )); then
   # Warning, larger, but less than 1kb larger
   RESULT_STATE=success
