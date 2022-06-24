@@ -6,13 +6,13 @@ uses
   Sentry.Client in '..\Sentry.Client.pas',
   sentry in '..\sentry.pas',
   Sentry.Client.Vcl in '..\Sentry.Client.Vcl.pas',
-  Keyman.System.KeymanSentryClient in '..\..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  Keyman.System.KeymanSentryClient in '..\..\..\general\Keyman.System.KeymanSentryClient.pas',
   KeymanVersion in '..\..\..\general\KeymanVersion.pas',
-  KeymanPaths in '..\..\..\..\..\..\windows\src\global\delphi\general\KeymanPaths.pas',
+  KeymanPaths in '..\..\..\general\KeymanPaths.pas',
   RegistryKeys in '..\..\..\general\RegistryKeys.pas',
-  DebugPaths in '..\..\..\..\..\..\windows\src\global\delphi\general\DebugPaths.pas',
+  DebugPaths in '..\..\..\general\DebugPaths.pas',
   ErrorControlledRegistry in '..\..\..\vcl\ErrorControlledRegistry.pas',
-  utilexecute in '..\..\..\..\..\..\windows\src\global\delphi\general\utilexecute.pas',
+  utilexecute in '..\..\..\general\utilexecute.pas',
   Unicode in '..\..\..\general\Unicode.pas';
 
 {$R *.res}

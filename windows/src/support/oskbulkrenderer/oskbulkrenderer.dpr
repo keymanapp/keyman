@@ -22,19 +22,19 @@ uses
   KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   ScanCodeMap in '..\..\..\..\common\windows\delphi\general\ScanCodeMap.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
-  VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
+  VKeyChars in '..\..\..\..\common\windows\delphi\general\VKeyChars.pas',
   VisualKeyboardLoaderBinary in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
   VisualKeyboardLoaderXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardSaverBinary in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
-  utilstr in '..\..\global\delphi\general\utilstr.pas',
-  utilsystem in '..\..\global\delphi\general\utilsystem.pas',
-  utilexecute in '..\..\global\delphi\general\utilexecute.pas',
-  VKeys in '..\..\global\delphi\general\VKeys.pas',
+  utilstr in '..\..\..\..\common\windows\delphi\general\utilstr.pas',
+  utilsystem in '..\..\..\..\common\windows\delphi\general\utilsystem.pas',
+  utilexecute in '..\..\..\..\common\windows\delphi\general\utilexecute.pas',
+  VKeys in '..\..\..\..\common\windows\delphi\general\VKeys.pas',
   VisualKeyboardExportPNG in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportPNG.pas',
   VisualKeyboardExportBMP in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportBMP.pas',
   keybtn in '..\..\..\..\common\windows\delphi\components\keybtn.pas',
-  VersionInfo in '..\..\global\delphi\general\VersionInfo.pas';
+  VersionInfo in '..\..\..\..\common\windows\delphi\general\VersionInfo.pas';
 
 begin
 

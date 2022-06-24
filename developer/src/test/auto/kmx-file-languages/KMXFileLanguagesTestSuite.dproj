@@ -93,19 +93,19 @@
         </DelphiCompile>
         <DCCReference Include="..\..\..\common\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\kmxfile.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilfiletypes.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utildir.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="Keyman.Test.System.KMXFileLanguagesTest.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>

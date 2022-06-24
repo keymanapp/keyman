@@ -5,7 +5,7 @@ uses
   check_shortcuts in 'check_shortcuts.pas' {Form1},
   HotkeyUtils in '..\..\global\delphi\general\HotkeyUtils.pas',
   utilhotkey in '..\..\global\delphi\general\utilhotkey.pas',
-  KeyNames in '..\..\global\delphi\general\KeyNames.pas',
+  KeyNames in '..\..\..\..\common\windows\delphi\general\KeyNames.pas',
   kmcomapi_TLB in '..\..\engine\kmcomapi\kmcomapi_TLB.pas';
 
 {$R *.res}

@@ -112,8 +112,8 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="Keyman.Test.RegExGroupHelperRSP19902Test.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\Keyman.System.RegExGroupHelperRSP19902.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

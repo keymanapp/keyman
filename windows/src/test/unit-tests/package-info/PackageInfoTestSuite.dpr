@@ -9,15 +9,15 @@ uses
   TestInsight.DUnitX,
   {$ENDIF }
   PackageInfo in '..\..\..\global\delphi\general\PackageInfo.pas',
-  utilfiletypes in '..\..\..\global\delphi\general\utilfiletypes.pas',
-  utilstr in '..\..\..\global\delphi\general\utilstr.pas',
+  utilfiletypes in '..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
+  utilstr in '..\..\..\..\..\common\windows\delphi\general\utilstr.pas',
   StockFileNames in '..\..\..\global\delphi\cust\StockFileNames.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
-  VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
-  utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
-  utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
-  utildir in '..\..\..\global\delphi\general\utildir.pas',
+  VersionInfo in '..\..\..\..\..\common\windows\delphi\general\VersionInfo.pas',
+  utilsystem in '..\..\..\..\..\common\windows\delphi\general\utilsystem.pas',
+  utilexecute in '..\..\..\..\..\common\windows\delphi\general\utilexecute.pas',
+  utildir in '..\..\..\..\..\common\windows\delphi\general\utildir.pas',
   RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
   kpsfile in '..\..\..\global\delphi\general\kpsfile.pas',
@@ -26,8 +26,8 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   PackageInfoTest in 'PackageInfoTest.pas',
-  JsonUtil in '..\..\..\global\delphi\general\JsonUtil.pas',
-  DUnitX.Loggers.TeamCity in '..\..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas';
+  JsonUtil in '..\..\..\..\..\common\windows\delphi\general\JsonUtil.pas',
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas';
 
 var
   runner : ITestRunner;

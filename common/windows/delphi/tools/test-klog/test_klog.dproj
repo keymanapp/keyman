@@ -210,8 +210,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\VersionInfo.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\klog.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <BuildConfiguration Include="Debug">

@@ -12,10 +12,10 @@ uses
   KeymanVersion in '..\..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   RedistFiles in '..\..\..\..\tike\main\RedistFiles.pas',
   ErrorControlledRegistry in '..\..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
-  Upload_Settings in '..\..\..\..\..\..\windows\src\global\delphi\general\Upload_Settings.pas',
-  DebugPaths in '..\..\..\..\..\..\windows\src\global\delphi\general\DebugPaths.pas',
-  KeymanPaths in '..\..\..\..\..\..\windows\src\global\delphi\general\KeymanPaths.pas',
-  VersionInfo in '..\..\..\..\..\..\windows\src\global\delphi\general\VersionInfo.pas';
+  Upload_Settings in '..\..\..\..\..\..\common\windows\delphi\general\Upload_Settings.pas',
+  DebugPaths in '..\..\..\..\..\..\common\windows\delphi\general\DebugPaths.pas',
+  KeymanPaths in '..\..\..\..\..\..\common\windows\delphi\general\KeymanPaths.pas',
+  VersionInfo in '..\..\..\..\..\..\common\windows\delphi\general\VersionInfo.pas';
 
 {
   These size values are used in unit tests to ensure

@@ -4,8 +4,8 @@ program test_klog;
 
 uses
   SysUtils,
-  klog in '..\..\..\..\..\windows\src\global\delphi\general\klog.pas',
-  VersionInfo in '..\..\..\..\..\windows\src\global\delphi\general\VersionInfo.pas',
+  klog in '..\..\..\..\..\common\windows\delphi\general\klog.pas',
+  VersionInfo in '..\..\..\..\..\common\windows\delphi\general\VersionInfo.pas',
   ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas';
 

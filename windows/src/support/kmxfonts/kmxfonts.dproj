@@ -217,7 +217,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\findfonts.pas"/>
         <DCCReference Include="kmxfontsmain.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilcheckfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
@@ -225,10 +225,10 @@
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileutils.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilfiletypes.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\utildir.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilkeyboard.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
