@@ -54,17 +54,17 @@ class InfoViewController: UIViewController, WKNavigationDelegate {
     forwardButton.isEnabled = webView.canGoForward
   }
 
-  func didStartProvisionalNvaigation(_ webView: WKWebView) {
+  func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = true
     updateButtons()
   }
 
-  func didFinishNavigation(_ webView: WKWebView) {
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
   }
 
-  func didFailNavigation(_ webView: WKWebView, didFailLoadWithError error: Error) {
+  func webView(_ webView: WKWebView, didFailNavigation error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
     log.debug(error)
