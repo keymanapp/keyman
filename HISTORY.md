@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 15.0.263 stable 2022-06-24
+
+* chore(ios): add manageAppVersionAndBuildNumber=false (#6837)
+
 ## 15.0.262 stable 2022-06-23
 
 * fix(web): key preview styling, positioning issues (#6795)
