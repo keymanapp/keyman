@@ -28,7 +28,6 @@ namespace com.keyman.osk {
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: document.body,
-    //     coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
     //   };
 
     //   return new MouseEventEngine(config);
@@ -40,7 +39,6 @@ namespace com.keyman.osk {
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: document.body,
-    //     coordConstrainedWithinInteractiveBounds: function() { return true; }
     //   };
 
     //   return new MouseEventEngine(config);

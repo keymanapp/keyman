@@ -27,6 +27,10 @@ namespace com.keyman.osk {
       processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
       processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
 
+      processingConfig.inputStartBounds = processingConfig.inputStartBounds ?? processingConfig.targetRoot;
+      processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
+      processingConfig.safeBounds = processingConfig.safeBounds ?? new ViewportZoneSource(2);
+
       return processingConfig;
     }
 

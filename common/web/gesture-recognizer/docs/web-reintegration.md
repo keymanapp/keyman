@@ -17,3 +17,20 @@ config object.
 Rather than specifying callback methods, we also shift to use of `EventEmitter` and an event-based model.
 At this stage, the event parameters should be relatively easy to interpret and forward to the original methods.
 
+## From feat/web/gesture-recognizer-bounds
+
+This adds abstraction + generalization for gesture detection boundary logic.  To translate the new config
+parameters to KeymanWeb's VisualKeyboard...
+
+`inputStartBounds`: would be left undefined.  Default behavior is a perfect match here.
+
+`maxRoamingBounds`: would be backed by an invisible VisualKeyboard-managed element.  This element would be
+and resized with the other VisualKeyboard elements.  Represents the currently 1/3-a-row buffer above the
+keyboard that supports continued interaction before cancelling it.
+
+Alternatively, this _could_ receive a custom wrapper implementation of the interface that simply appends
+extra space to each side of the main target-element's `getBoundingClientRect` value.  (One issue with this
+approach is that the padding value may differ per device orientation.)
+
+`safeBounds`: would be left undefined.  The default behavior is modeled directly after VisualKeyboard's
+viewport-aware bounds detection & logic.

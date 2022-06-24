@@ -14,24 +14,15 @@ namespace com.keyman.osk {
 
     protected readonly config: GestureRecognizerConfiguration;
 
-    protected static preprocessConfig(config: GestureRecognizerConfiguration): GestureRecognizerConfiguration {
-      // Allows configuration pre-processing during this method.
-      let processingConfig: Mutable<GestureRecognizerConfiguration> = Object.assign({}, config);
-      processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
-      processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
-
-      return processingConfig;
-    }
-
     public constructor(config: GestureRecognizerConfiguration) {
       super();
-
-      config = InputEventEngine.preprocessConfig(config);
       this.config = config;
     }
 
     abstract registerEventHandlers();
     abstract unregisterEventHandlers();
+
+    // TODO:  draft up the bounds logic based on the new config parameters!
 
     onInputStart(coord: InputEventCoordinate) {
       this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.START, coord);
