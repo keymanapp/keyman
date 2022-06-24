@@ -15,7 +15,7 @@ uses
   Keyman.System.KeyboardJSInfo in '..\..\..\common\delphi\keyboards\Keyman.System.KeyboardJSInfo.pas',
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\..\..\..\windows\src\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
   DUnitX.Loggers.TeamCity in '..\..\..\..\..\windows\src\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
-  KeymanVersion in '..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas';
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas';
 
 var
   runner : ITestRunner;

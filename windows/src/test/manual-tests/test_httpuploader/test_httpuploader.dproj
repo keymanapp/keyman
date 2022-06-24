@@ -69,7 +69,7 @@
 			<DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\urlutil.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>

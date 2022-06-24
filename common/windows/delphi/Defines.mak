@@ -12,9 +12,12 @@
 !ERROR KEYMAN_ROOT must be defined!
 !ENDIF
 
+# TODO: COMMON_ROOT should be common\windows
 COMMON_ROOT=$(KEYMAN_ROOT)\common\windows\delphi
 WINDOWS_ROOT=$(KEYMAN_ROOT)\windows
 OUTLIB=$(WINDOWS_ROOT)\lib
+COMMON_OUTLIB=$(KEYMAN_ROOT)\windows\lib
+COMMON_BIN=$(KEYMAN_ROOT)\windows\bin
 
 # INCLUDE=$(ROOT)\src\global\inc;$(INCLUDE)
 
@@ -100,10 +103,13 @@ DELPHIDPRPARAMS=-Q -B -GD -H -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+
 DELPHIDPRPARAMS64=-Q -B -GD -H -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win64\$(TARGET_PATH) -E.\bin\Win64\$(TARGET_PATH)
 DELPHIDPKPARAMS=-Q -B -GD -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData -NUobj\Win32\$(TARGET_PATH)
 
+COMMON_DELPHIDPKPARAMS=-Q -B -GD -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(COMMON_OUTLIB) -LN$(COMMON_OUTLIB) -NSData -NUobj\Win32\$(TARGET_PATH)
+
 # we are using cmd /c because dcc32/dcc64 are failing on direct execution
 # from nmake
 DCC32=cmd /c "$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
 DCC32DPK=cmd /c "$(DCC32PATH)\dcc32.exe" $(DELPHIDPKPARAMS)
+COMMON_DCC32DPK=cmd /c "$(DCC32PATH)\dcc32.exe" $(COMMON_DELPHIDPKPARAMS)
 DCC64=cmd /c "$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 
 #

@@ -97,10 +97,10 @@
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="..\..\..\..\..\windows\src\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="Keyman.Test.System.KMXFileLanguagesTest.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>

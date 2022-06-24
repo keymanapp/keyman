@@ -15,7 +15,7 @@ uses
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   klog in '..\..\global\delphi\general\klog.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   BCP47SuppressScriptRegistry in '..\..\global\delphi\general\BCP47SuppressScriptRegistry.pas';
 
 begin

@@ -15,16 +15,8 @@ versionhistory-app2:
     cd $(ROOT)\src\buildtools
     $(MAKE) versionhistory
 
-
-# TODO: move to common
-global-versions:
-# Build our root version.txt
-    cd $(ROOT)\src
-
-    $(MKVER_U) $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.in $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h
-    $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc
-
 devtools-app: dirs
+    cd $(COMMON_ROOT)
     @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
     cd $(COMMON_ROOT)\tools\devtools
     $(MAKE)

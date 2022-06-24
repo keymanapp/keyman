@@ -22,7 +22,7 @@ uses
   Keyman.System.Standards.LangTagsRegistry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.System.Standards.LCIDToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
   utilstr in '..\..\..\global\delphi\general\utilstr.pas',
-  Unicode in '..\..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in 'GetOsVersion.pas';
 
 var

@@ -8,13 +8,13 @@ uses
   kmxfileusedchars in '..\..\global\delphi\general\kmxfileusedchars.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
   kmxfileutils in '..\..\global\delphi\general\kmxfileutils.pas',
-  Unicode in '..\..\global\delphi\general\Unicode.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
   utilkeyboard in '..\..\global\delphi\general\utilkeyboard.pas',
-  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
+  KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas';
 
 {$R *.res}

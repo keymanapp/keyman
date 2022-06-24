@@ -41,23 +41,7 @@ requires
   xmlrtl;
 
 contains
-  extshiftstate in 'comp\extshiftstate.pas',
-  scancodemap in 'general\scancodemap.pas',
-  unicode in 'general\unicode.pas',
-  KeyBtn in 'comp\KeyBtn.pas',
-  PaintPanel in 'comp\PaintPanel.pas',
-  VisualKeyboardParameters in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardParameters.pas',
-  FixedTrackbar in 'comp\FixedTrackbar.pas',
-  CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
-  OnScreenKeyboard in 'comp\OnScreenKeyboard.pas',
-  getosversion in 'general\getosversion.pas',
   exImageList in 'comp\exImageList.pas',
-  KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
-  usp10 in 'general\usp10.pas',
-  ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',
-  OnScreenKeyboardData in '..\..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
-  Glossary in 'general\Glossary.pas',
-  RegistryKeys in 'general\RegistryKeys.pas',
-  KeymanVersion in 'general\KeymanVersion.pas';
+  KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas';
 
 end.

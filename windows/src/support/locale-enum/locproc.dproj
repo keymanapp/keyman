@@ -105,7 +105,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="elp.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utilstr.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

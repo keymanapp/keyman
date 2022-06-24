@@ -93,10 +93,10 @@
         </DelphiCompile>
         <DCCReference Include="..\..\..\..\global\delphi\general\compile.pas"/>
         <DCCReference Include="..\..\..\..\global\delphi\general\kmxfileconsts.pas"/>
-        <DCCReference Include="..\..\..\..\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\..\..\developer\TIKE\main\RedistFiles.pas"/>
-        <DCCReference Include="..\..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\..\..\global\delphi\general\Upload_Settings.pas"/>
         <DCCReference Include="..\..\..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\..\..\global\delphi\general\VersionInfo.pas"/>
