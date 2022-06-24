@@ -14,34 +14,34 @@ namespace com.keyman.osk {
       this._touchEnd   = this.onTouchEnd.bind(this);
     }
 
-    public static forVisualKeyboard(vkbd: VisualKeyboard) {
-      let config: InputEventEngineConfig = {
-        targetRoot: vkbd.element,
-        eventRoot: vkbd.element,
-        inputStartHandler: vkbd.touch.bind(vkbd),
-        inputMoveHandler: vkbd.moveOver.bind(vkbd),
-        inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
-        inputEndHandler: vkbd.release.bind(vkbd),
-        coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
-      };
+    // public static forVisualKeyboard(vkbd: VisualKeyboard) {
+    //   let config: InputEventEngineConfig = {
+    //     targetRoot: vkbd.element,
+    //     eventRoot: vkbd.element,
+    //     inputStartHandler: vkbd.touch.bind(vkbd),
+    //     inputMoveHandler: vkbd.moveOver.bind(vkbd),
+    //     inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
+    //     inputEndHandler: vkbd.release.bind(vkbd),
+    //     coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
+    //   };
 
-      return new TouchEventEngine(config);
-    }
+    //   return new TouchEventEngine(config);
+    // }
 
-    public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
-      const config: InputEventEngineConfig = {
-        targetRoot: banner.getDiv(),
-        // document.body is the event root b/c we need to track the mouse if it leaves
-        // the VisualKeyboard's hierarchy.
-        eventRoot: banner.getDiv(),
-        inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
-        inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
-        inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
-        coordConstrainedWithinInteractiveBounds: function() { return true; }
-      };
+    // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
+    //   const config: InputEventEngineConfig = {
+    //     targetRoot: banner.getDiv(),
+    //     // document.body is the event root b/c we need to track the mouse if it leaves
+    //     // the VisualKeyboard's hierarchy.
+    //     eventRoot: banner.getDiv(),
+    //     inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
+    //     inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
+    //     inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
+    //     coordConstrainedWithinInteractiveBounds: function() { return true; }
+    //   };
 
-      return new TouchEventEngine(config);
-    }
+    //   return new TouchEventEngine(config);
+    // }
 
     registerEventHandlers() {
       this.config.eventRoot.addEventListener('touchstart', this._touchStart, true);

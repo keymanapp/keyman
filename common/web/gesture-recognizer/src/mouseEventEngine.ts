@@ -17,36 +17,36 @@ namespace com.keyman.osk {
       this._mouseEnd   = this.onMouseEnd.bind(this);
     }
 
-    public static forVisualKeyboard(vkbd: VisualKeyboard) {
-      const config: InputEventEngineConfig = {
-        targetRoot: vkbd.element,
-        // document.body is the event root b/c we need to track the mouse if it leaves
-        // the VisualKeyboard's hierarchy.
-        eventRoot: document.body,
-        inputStartHandler: vkbd.touch.bind(vkbd),
-        inputMoveHandler: vkbd.moveOver.bind(vkbd),
-        inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
-        inputEndHandler: vkbd.release.bind(vkbd),
-        coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
-      };
+    // public static forVisualKeyboard(vkbd: VisualKeyboard) {
+    //   const config: InputEventEngineConfig = {
+    //     targetRoot: vkbd.element,
+    //     // document.body is the event root b/c we need to track the mouse if it leaves
+    //     // the VisualKeyboard's hierarchy.
+    //     eventRoot: document.body,
+    //     inputStartHandler: vkbd.touch.bind(vkbd),
+    //     inputMoveHandler: vkbd.moveOver.bind(vkbd),
+    //     inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
+    //     inputEndHandler: vkbd.release.bind(vkbd),
+    //     coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
+    //   };
 
-      return new MouseEventEngine(config);
-    }
+    //   return new MouseEventEngine(config);
+    // }
 
-    public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
-      const config: InputEventEngineConfig = {
-        targetRoot: banner.getDiv(),
-        // document.body is the event root b/c we need to track the mouse if it leaves
-        // the VisualKeyboard's hierarchy.
-        eventRoot: document.body,
-        inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
-        inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
-        inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
-        coordConstrainedWithinInteractiveBounds: function() { return true; }
-      };
+    // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
+    //   const config: InputEventEngineConfig = {
+    //     targetRoot: banner.getDiv(),
+    //     // document.body is the event root b/c we need to track the mouse if it leaves
+    //     // the VisualKeyboard's hierarchy.
+    //     eventRoot: document.body,
+    //     inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
+    //     inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
+    //     inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
+    //     coordConstrainedWithinInteractiveBounds: function() { return true; }
+    //   };
 
-      return new MouseEventEngine(config);
-    }
+    //   return new MouseEventEngine(config);
+    // }
 
     registerEventHandlers() {
       this.config.eventRoot.addEventListener('mousedown', this._mouseStart, true);

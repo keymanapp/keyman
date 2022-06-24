@@ -3,6 +3,7 @@ namespace com.keyman.osk {
    * Represents the current location of the current cursor / touchpoint during
    * an ongoing OSK input event.  This class standardizes to .pageX (document)
    * coordinates, rather than .clientX (viewport) coordinates.
+   * 
    */
   export class InputEventCoordinate {
     public readonly x: number;
