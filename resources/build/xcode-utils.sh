@@ -156,8 +156,17 @@ function phaseSentryDsymUpload() {
   fi
 }
 
+#
+# All calls to xcode-utils.sh scripts will have their output redirected to
+# $KEYMAN_ROOT/xcodebuild-scripts.log. This will redirect both stdout and stderr
+# to this log file. See the corresponding printXCodeBuildScriptLogs function in
+# build-utils.sh to print the log after xcodebuild returns.
+#
+# More information in the build-utils.sh.
+#
 function logScriptsToFile() {
-  exec >> $KEYMAN_ROOT/ios/scripts.log 2>&1
+  local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"
+  exec >> "$SCRIPT_LOG" 2>&1
 }
 
 logScriptsToFile

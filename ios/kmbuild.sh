@@ -23,18 +23,6 @@ cd "$(dirname "$THIS_SCRIPT")"
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
 
-function printScriptLogs() {
-  echo "printScriptLogs: reporting script results from previous xcode build"
-  if [ -f "$KEYMAN_ROOT/ios/scripts.log" ]; then
-    cat "$KEYMAN_ROOT/ios/scripts.log"
-    rm "$KEYMAN_ROOT/ios/scripts.log"
-  else
-    echo "printScriptLogs: $KEYMAN_ROOT/ios/scripts.log not found"
-  fi
-  echo "printScriptLogs: done"
-  echo
-}
-
 display_usage ( ) {
     echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-add-sim-artifact] [-no-build] [-upload-sentry]"
     echo
@@ -258,20 +246,13 @@ if [ -d "$BUILD_PATH/$CONFIG-universal" ]; then
   rm -r $BUILD_PATH/$CONFIG-universal
 fi
 
-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
+run-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
            VERSION=$VERSION \
            VERSION_WITH_TAG=$VERSION_WITH_TAG \
            VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
            UPLOAD_SENTRY=$UPLOAD_SENTRY
 
-if [ $? -ne 0 ]; then
-  printScriptLogs
-  fail "KMEI build failed."
-fi
-
 assertDirExists "$KEYMAN_XCFRAMEWORK"
-
-printScriptLogs
 
 echo "KMEI build complete."
 
@@ -291,23 +272,16 @@ if [ $DO_KEYMANAPP = true ]; then
   fi
 
   if [ $DO_ARCHIVE = false ]; then
-    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 VERSION=$VERSION \
                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
                 UPLOAD_SENTRY=$UPLOAD_SENTRY
-
-    if [ $? -ne 0 ]; then
-      printScriptLogs
-      fail "Keyman app build failed."
-    fi
-
-    printScriptLogs
   else
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .xcarchive for real devices."
-    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -archivePath $ARCHIVE_PATH \
                 archive -allowProvisioningUpdates \
                 VERSION=$VERSION \
@@ -315,23 +289,21 @@ if [ $DO_KEYMANAPP = true ]; then
                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
                 UPLOAD_SENTRY=$UPLOAD_SENTRY
 
-    printScriptLogs
     assertDirExists "$ARCHIVE_PATH"
 
     if [ $DO_CODE_SIGN == true ]; then
       echo "Preparing .ipa file for deployment to real devices"
       # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
       # Xcode to generate a build error.
-      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
+      run-xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
                   -exportOptionsPlist exportAppStore.plist \
                   -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
-      printScriptLogs
     fi
   fi
 
   if [ $DO_SIMULATOR_TARGET == true ]; then
     echo "Preparing .app file for simulator-targeted artifact for testing"
-    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -sdk iphonesimulator \
                 VERSION=$VERSION \
                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
@@ -339,12 +311,6 @@ if [ $DO_KEYMANAPP = true ]; then
                 UPLOAD_SENTRY=$UPLOAD_SENTRY
   fi
 
-  echo ""
-  if [ $? = 0 ]; then
-      printScriptLogs
-      echo "Build succeeded."
-  else
-      printScriptLogs
-      fail "Build failed - please see the log above for details."
-  fi
+  echo
+  echo "Build succeeded."
 fi

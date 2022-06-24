@@ -168,3 +168,6 @@ resources/environment.sh
 
 **/node_modules/
 
+# Temporary file for logging scripts in xcode runs, see build-utils.sh for
+# details
+/xcodebuild-scripts.log

@@ -127,9 +127,9 @@ if [ $DO_UPDATE = true ]; then
 fi
 
 if [ $CODE_SIGN = true ]; then
-  xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
+  run-xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
 else
-  xcodebuild -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS="" -target "$TARGET" -config "$CONFIG"
+  run-xcodebuild -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS="" -target "$TARGET" -config "$CONFIG"
 fi
 
 if [ $? = 0 ]; then

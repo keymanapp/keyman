@@ -375,3 +375,53 @@ builder_report() {
 set_keyman_standard_build_path() {
   PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
 }
+
+#
+# printXCodeBuildScriptLogs: xcodebuild does not emit stdout from scripts in
+# PBXShellScriptBuildPhase phases. This is a real problem for us because if
+# there is an issue, we just can't see it. So we capture the output in a
+# separate logfile, and then call printXCodeBuildScriptLogs after any xcodebuild
+# call to get the output.
+#
+# This file is captured in xcode-utils.sh, logScriptsToFile function, and each
+# script phase will append to the log file, until funprintXCodeBuildScriptLogs
+# is called, at which point the logfile will be deleted.
+#
+# The logfile is placed in $KEYMAN_ROOT/xcodebuild-scripts.log. It is used for
+# both iOS and macOS builds.
+#
+# If there is no logfile, then this function will not emit anything.
+#
+printXCodeBuildScriptLogs() {
+  local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"
+  if [ -f "$SCRIPT_LOG" ]; then
+    echo "printXCodeBuildScriptLogs: reporting script results from previous xcode build"
+    cat "$SCRIPT_LOG"
+    rm "$SCRIPT_LOG"
+    echo "printXCodeBuildScriptLogs: done"
+    echo
+  fi
+}
+
+#
+# Wraps xcodebuild with error handling and log printing
+#
+run-xcodebuild() {
+  typeset cmnd="$*"
+  typeset ret_code
+  local hasSetErrExit=false
+  if [ -o errexit ]; then
+    hasSetErrExit=true
+    set +e
+  fi
+  eval xcodebuild $cmnd
+  ret_code=$?
+  if $hasSetErrExit; then
+    set -e
+  fi
+
+  printXCodeBuildScriptLogs
+  if [ $ret_code != 0 ]; then
+    fail "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
+  fi
+}
