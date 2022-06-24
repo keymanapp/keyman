@@ -198,7 +198,7 @@
         <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\TempFileManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas">

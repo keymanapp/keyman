@@ -94,7 +94,7 @@ uses
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   KeymanDesktopShell in 'KeymanDesktopShell.pas',
   KeymanPaths in '..\..\..\..\common\windows\delphi\general\KeymanPaths.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
   VisualKeyboardLoaderBinary in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
   VisualKeyboardLoaderXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',

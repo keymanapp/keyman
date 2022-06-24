@@ -18,7 +18,7 @@ uses
   utildir in '..\..\..\..\..\common\windows\delphi\general\utildir.pas',
   utilfiletypes in '..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
-  StockFileNames in '..\..\..\..\..\windows\src\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   utilstr in '..\..\..\..\..\common\windows\delphi\general\utilstr.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\..\..\..\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',

@@ -15,7 +15,7 @@ uses
   Keyman.Setup.System.InstallInfo in '..\..\..\desktop\setup\Keyman.Setup.System.InstallInfo.pas',
   PackageInfo in '..\..\..\..\..\common\windows\delphi\packages\PackageInfo.pas',
   utilfiletypes in '..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
-  StockFileNames in '..\..\..\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   utilstr in '..\..\..\..\..\common\windows\delphi\general\utilstr.pas',
   Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
   JsonUtil in '..\..\..\..\..\common\windows\delphi\general\JsonUtil.pas',

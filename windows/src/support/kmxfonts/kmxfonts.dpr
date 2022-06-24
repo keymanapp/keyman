@@ -15,7 +15,7 @@ uses
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   utilkeyboard in '..\..\..\..\common\windows\delphi\keyboards\utilkeyboard.pas',
   KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas';
+  StockFileNames in '..\..\..\..\common\windows\delphi\general\StockFileNames.pas';
 
 {$R *.res}
 

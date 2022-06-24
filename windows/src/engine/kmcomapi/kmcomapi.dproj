@@ -222,7 +222,7 @@
         <DCCReference Include="keymanapi_TLB.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas"/>
         <DCCReference Include="util\utilhandleexception.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationMenu.pas"/>
         <DCCReference Include="util\utilolepicture.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilxml.pas"/>

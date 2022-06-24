@@ -123,7 +123,7 @@ uses
   utilfocusappwnd in 'util\utilfocusappwnd.pas',
   UImportOlderVersionKeyboards8 in 'main\UImportOlderVersionKeyboards8.pas',
   KeymanPaths in '..\..\..\..\common\windows\delphi\general\KeymanPaths.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
   KeymanOptionNames in '..\..\global\delphi\general\KeymanOptionNames.pas',
   VisualKeyboardLoaderBinary in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',

@@ -49,7 +49,7 @@ uses
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   Glossary in '..\..\..\..\common\windows\delphi\general\Glossary.pas',
   TempFileManager in '..\..\..\..\common\windows\delphi\general\TempFileManager.pas',
-  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in '..\..\..\..\common\windows\delphi\general\StockFileNames.pas',
   kmxfileconsts in '..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   Keyman.System.CEFManager in '..\..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas',
   Keyman.UI.UframeCEFHost in '..\..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},

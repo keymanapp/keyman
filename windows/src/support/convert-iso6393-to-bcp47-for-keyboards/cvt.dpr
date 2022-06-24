@@ -17,7 +17,7 @@ uses
   CRC32 in 'C:\Projects\keyman\open\common\windows\delphi\general\CRC32.pas',
   KeyNames in 'C:\Projects\keyman\open\common\windows\delphi\general\KeyNames.pas',
   KeymanVersion in 'C:\Projects\keyman\open\common\windows\delphi\general\KeymanVersion.pas',
-  StockFileNames in 'C:\Projects\keyman\open\windows\src\global\delphi\cust\StockFileNames.pas',
+  StockFileNames in 'C:\Projects\keyman\open\windows\src\..\..\common\windows\delphi\general\StockFileNames.pas',
   Unicode in 'C:\Projects\keyman\open\common\windows\delphi\general\Unicode.pas',
   JsonUtil in 'C:\Projects\keyman\open\common\windows\delphi\general\JsonUtil.pas';
 

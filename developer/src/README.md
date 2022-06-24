@@ -1,79 +1,114 @@
-# Keyman Developer for Windows
+# Keyman Developer
 
 This is the current home for Keyman Developer.
 
-# Transition steps
+# Cross-dependencies
 
-1. Split .kps and model compilers into separate paths
+We do not have 100% clean separation between Keyman Developer and Keyman for
+Windows. Shared units are intended to live in common, however the following
+projects will need to be updated in the future.
+
+* buildpkg in Windows depends on various compiler units in multiple folders.
+* kmbrowserhost in Windows is included as part of Keyman Developer.
 
 # Folders
 
+## src/common
 
-## inst
+Units shared among Keyman Developer projects, Delphi
 
-Contains a minimal distribution of node.js intended just for compiling
-lexical models. If more  dependencies are required, then the
-developer will be expected to install node.js themselves; this gets
-users going without requiring a large installer or a full node.js
-install.
+## src/ext
 
-## kmlmc
+3rd party code and components, mostly Delphi
 
-Source files for node-based compilers kmlmc, kmlmi, and kmlmp
+## src/inst - keymandeveloper.msi
 
-## inst - keymandeveloper.msi
+Building and signing of the installation archive keymandeveloper.msi.
 
-Building and signing of the installation archive keymandeveloper.msi
+### src/inst/node
 
-## kmanalyze - kmanalyze.exe
+Contains a minimal distribution of node.js intended just for compiling lexical
+models. If more dependencies are required, then the developer will be expected
+to install node.js themselves; this gets users going without requiring a large
+installer or a full node.js install.
 
-A keyboard source analysis and automated regression test tool. Testing for logical errors of a keyboard.
+## src/kmanalyze - kmanalyze.exe
 
+A keyboard source analysis and automated regression test tool. Testing for
+logical errors of a keyboard.
 
-## kcmpdll - kmcmpdll.dll & kmcmpdll.x64.dll
+## src/kmcmpdll - kmcmpdll.dll & kmcmpdll.x64.dll
 
-This is the main source code for the keyboard compiler, packaged as dynamic linked library. The consumers will call 'CompileKeyboardFile'
+This is the main source code for the keyboard compiler, packaged as a dynamic
+linked library for Windows. The consumers will call 'CompileKeyboardFile'.
 
-## kcframe.exe & kcframe.x64.exe
+### src/kmcmpdll/kcframe - kcframe.exe & kcframe.x64.exe
 
-Located under kmcomp folder this is used for debugging in Visual Studio.  A command line program compiler for a keyboard file 'kmn' into a binary format 'kmx'. Has hardcoded default arguments.
+Located under kmcmpdll folder this is used for debugging in Visual Studio.  A
+command line program compiler for a keyboard file 'kmn' into a binary format
+'kmx'. Has hardcoded default arguments.
 
-## kmcomp - kmcomp.exe & kmcomp.x64.exe
+## src/kmcomp - kmcomp.exe & kmcomp.x64.exe
 
-The main command line compiler for a keyboard. It compiles keyboards (.kmn), packages (.kps), and projects (.kpj).
+The main command line compiler for a keyboard. It compiles keyboards (.kmn),
+packages (.kps), and projects (.kpj).
 
-## kmconvert - kmconvert.exe & kmconvert.x64.exe
+## src/kmconvert - kmconvert.exe & kmconvert.x64.exe
 
-KMConvert converts keyboard layouts between different formats. KMConvert will generate a full Keyman template project from the imported layout or data, in a new folder named with the ID of the keyboard. It will not overwrite an existing folder.
+KMConvert converts keyboard layouts between different formats. KMConvert will
+generate a full Keyman template project from the imported layout or data, in a
+new folder named with the ID of the keyboard. It will not overwrite an existing
+folder. Also used to generate new projects from templates.
 
-## kmdecomp - kmdecomp.exe
+## src/kmdecomp - kmdecomp.exe
 
-Unsupported utility decompiles a Keyman .kmx keyboard. It will produce a .kmn source file and optionally a .ico or
-.bmp image. see kmdecomp/kmdecomp.md for details.
+Unsupported utility decompiles a Keyman .kmx keyboard. It will produce a .kmn
+source file and optionally a .ico or .bmp image. see kmdecomp/kmdecomp.md for
+details.
 
-## samples
+## src/kmlmc
 
-Contains sample keyboards and sample developer projects. See readme.txt for details.
+node-based compilers for lexical models
 
-## setup - setup.exe
+### src/kmlmc/kmlmc - Lexical Model Compiler
 
-Installation program for Keyman Developer.
+The Lexical Model Compiler, kmlmc, runs on nodeJS on all supported desktop
+platforms.
 
-## TIKE - Tavultesoft Integrated Keyboard Editor
+### src/kmlmc/kmlmp - Package Compiler
 
-This is the designer side of the Developer. Used for designing, developing, testing and packing keyboards for distribution.
+The package compiler is broadly compatible with the kmcomp .kps package
+compiler. However at this stage it is only tested with lexical models, and use
+with keyboards (either .js or .kmx) is not tested or supported. It is likely in
+the future that the kmcomp .kps compiler will be deprecated in favour of this
+one.
 
-# kmlmc - Lexical Model Compiler
+### src/kmlmc/kmlmi - Model Info Compiler
 
-The Lexical Model Compiler, kmlmc, and the node-based
-Package Compiler run on nodeJS on all supported desktop platforms.
+Merges .model_info files for use on the Keyman Cloud lexical model repository
+at https://github.com/keymanapp/lexical-models.
 
-## kmlmc/kmlmp - Package Compiler
+## src/samples
 
-The package compiler is broadly compatible with the kmcomp .kps
-package compiler. However at this stage it is only tested with
-lexical models, and use with keyboards (either .js or .kmx) is not
-tested or supported. It is likely in the future that the kmcomp
-.kps compiler will be deprecated in favour of this one.
+Contains sample keyboards and sample developer projects. See readme.txt for
+details.
 
-## kmlmc/kmlmi - Model Info Compiler
+## src/server
+
+Keyman Developer Server. Node-based, cross platform host app for Keyman
+Developer. Used currently for web-based test and deployment. In future, will
+be the foundation for a web-based Keyman Developer project.
+
+## src/setup - setup.exe
+
+Installation program for Keyman Developer for Windows. Bundles with
+keymandeveloper.msi to generate single deployable installer executable.
+
+## src/tike - "Tavultesoft Integrated Keyboard Editor"
+
+This is the designer side of the Developer. Used for designing, developing,
+testing and packing keyboards for distribution.
+
+## src/tools
+
+Various build-time tools for Keyman Developer.

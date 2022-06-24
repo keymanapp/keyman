@@ -218,7 +218,7 @@
         <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
         <DCCReference Include="KeymanDesktopShell.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanPaths.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanEngineControl.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>

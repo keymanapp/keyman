@@ -266,7 +266,7 @@
         <DCCReference Include="util\utilfocusappwnd.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards8.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanPaths.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanEngineControl.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanOptionNames.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
