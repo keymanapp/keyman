@@ -118,7 +118,7 @@
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\kmxfile.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\main\KeymanDeveloperOptions.pas"/>
@@ -141,7 +141,7 @@
         <DCCReference Include="..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectFiles.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectFileType.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\main\mrulist.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectLoader.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectSaver.pas"/>
@@ -151,7 +151,7 @@
         <DCCReference Include="..\..\..\developer\TIKE\main\KeyboardParser.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\WindowsLanguages.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\compile\KeymanWebKeyCodes.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\kmxfileutils.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\keyboards\kmxfileutils.pas"/>
         <DCCReference Include="..\..\..\developer\TIKE\main\TikeUnicodeData.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>

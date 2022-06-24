@@ -21,7 +21,7 @@ uses
   RegistryKeys in '..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   ScanCodeMap in '..\..\..\..\common\windows\delphi\general\ScanCodeMap.pas',
-  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
+  kmxfileconsts in '..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   VKeyChars in '..\..\..\..\common\windows\delphi\general\VKeyChars.pas',
   VisualKeyboardLoaderBinary in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
   VisualKeyboardLoaderXML in '..\..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',

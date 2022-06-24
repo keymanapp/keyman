@@ -163,8 +163,8 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilhttp.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfile.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilkeyboard.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\utilkeyboard.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeyNames.pas"/>
@@ -199,7 +199,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Glossary.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.System.CEFManager.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
             <Form>frameCEFHost</Form>
