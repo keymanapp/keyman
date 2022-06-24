@@ -49,7 +49,7 @@ namespace com.keyman {
 
       osk.setNeedsLayout();
       if(this.oskVisible) {
-        osk.show(true);
+        osk.present();
       }
 
       this.isActive = false;
