@@ -7,10 +7,10 @@
 //
 
 import KeymanEngine
-import UIKit
+import WebKit
 
-class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertViewDelegate {
-  @IBOutlet var webView: UIWebView!
+class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertViewDelegate {
+  @IBOutlet var webView: WKWebView!
   @IBOutlet var navBar: UINavigationBar!
   @IBOutlet var toolBar: UIToolbar!
   @IBOutlet var navBarTopConstraint: NSLayoutConstraint!
@@ -51,7 +51,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       observer: self,
       function: WebBrowserViewController.keyboardPickerDismissed)
 
-    webView.delegate = self
+    webView.navigationDelegate = self
     webView.scalesPageToFit = true
 
     if #available(iOS 13.0, *) {
@@ -113,7 +113,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let lastUrlStr = userData.object(forKey: webBrowserLastURLKey) as? String ?? "https://www.google.com/"
     if let url = URL(string: lastUrlStr) {
       let request = URLRequest(url: url)
-      webView.loadRequest(request)
+      webView.load(request)
     }
   }
 
@@ -154,7 +154,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       url = URL(string: "http://\(urlString)") ?? url
     }
     let request = URLRequest(url: url)
-    webView.loadRequest(request)
+    webView.load(request)
   }
 
   func loadSearchString(_ searchString: String) {
@@ -201,9 +201,10 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     dismiss(animated: true, completion: nil)
   }
 
-  func webView(_ webView: UIWebView,
-               shouldStartLoadWith request: URLRequest,
-               navigationType: UIWebView.NavigationType) -> Bool {
+  func webView(_ webView: WKWebView,
+               decidePolicyFor navigationAction: WKNavigationAction,
+               decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) -> Void {
+    let request = navigationAction.request
     if request.url?.lastPathComponent.hasSuffix(".kmp") ?? false {
       // Can't have the browser auto-download with no way to select a different page.
       // Can't just ignore it, either, as the .kmp may result from a redirect from
@@ -213,7 +214,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       userData.synchronize()
 
       // The user is trying to download a .kmp, but the standard
-      // UIWebView can't handle it properly.
+      // WKWebView can't handle it properly.
 
       ResourceDownloadManager.shared.downloadRawKMP(from: request.url!) { file, error in
         // do something!
@@ -234,24 +235,26 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
         }
       }
 
-      return false
+      decisionHandler(WKNavigationActionPolicy.cancel)
+      return
     }
     updateAddress(request)
-    return true
+    decisionHandler(WKNavigationActionPolicy.allow)
+    return
   }
 
-  func webViewDidStartLoad(_ webView: UIWebView) {
+  func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = true
     updateButtons()
   }
 
-  func webViewDidFinishLoad(_ webView: UIWebView) {
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     appendCSSFontFamily()
     updateButtons()
   }
 
-  func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
+  func webView(_ webView: WKWebView, didFailNavigation error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
 
