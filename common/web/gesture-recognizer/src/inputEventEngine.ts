@@ -1,31 +1,27 @@
 /// <reference path="inputEventCoordinate.ts" />
+/// <reference path="gestureRecognizerConfiguration.ts" />
 
 namespace com.keyman.osk {
+  type Mutable<Type> = {
+    -readonly [Property in keyof Type]: Type[Property];
+  };
+
   export type InputHandler = (coord: InputEventCoordinate) => void;
 
-  export interface InputEventEngineConfig {
-    /**
-     * Specifies the element that input listeners should be attached to.
-     */
-    readonly eventRoot: HTMLElement;
-    /**
-     * Specifies the most specific common ancestor element of any event target
-     * that the InputEventEngine should consider.
-     */
-    readonly targetRoot: HTMLElement;
-
-    readonly coordConstrainedWithinInteractiveBounds: (coord: InputEventCoordinate) => boolean;
-
-    readonly inputStartHandler?:      InputHandler;
-    readonly inputMoveHandler?:       InputHandler;
-    readonly inputMoveCancelHandler?: InputHandler;
-    readonly inputEndHandler?:        InputHandler;
-  }
-
   export abstract class InputEventEngine {
-    protected readonly config: InputEventEngineConfig;
+    protected readonly config: GestureRecognizerConfiguration;
 
-    public constructor(config: InputEventEngineConfig) {
+    protected static preprocessConfig(config: GestureRecognizerConfiguration): GestureRecognizerConfiguration {
+      // Allows configuration pre-processing during this method.
+      let processingConfig: Mutable<GestureRecognizerConfiguration> = Object.assign({}, config);
+      processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
+      processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
+
+      return processingConfig;
+    }
+
+    public constructor(config: GestureRecognizerConfiguration) {
+      config = InputEventEngine.preprocessConfig(config);
       this.config = config;
     }
 

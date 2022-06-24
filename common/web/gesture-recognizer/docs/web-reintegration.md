@@ -9,5 +9,8 @@ will list notable changes to facilitate reintegration once this module is ready.
 The OSK helper functions for `MouseEventEngine` and for `TouchEventEngine` have been disabled, as they
 are references to components external to this module.
 
+## From feat/web/gesture-recognizer-base
 
+Starts work on a unified mouse+touch object - `GestureRecognizer` - and starts work on the unified
+config object.
 
