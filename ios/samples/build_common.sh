@@ -7,6 +7,12 @@ set -u
 # set -x: Debugging use, print each statement
 # set -x
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" == *"darwin" ]]; then
   echo "This build script will only run in a Mac environment."
@@ -127,9 +133,9 @@ if [ $DO_UPDATE = true ]; then
 fi
 
 if [ $CODE_SIGN = true ]; then
-  xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
+  run_xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
 else
-  xcodebuild -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS="" -target "$TARGET" -config "$CONFIG"
+  run_xcodebuild -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS="" -target "$TARGET" -config "$CONFIG"
 fi
 
 if [ $? = 0 ]; then

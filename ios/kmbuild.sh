@@ -246,15 +246,11 @@ if [ -d "$BUILD_PATH/$CONFIG-universal" ]; then
   rm -r $BUILD_PATH/$CONFIG-universal
 fi
 
-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
+run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
            VERSION=$VERSION \
            VERSION_WITH_TAG=$VERSION_WITH_TAG \
            VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
            UPLOAD_SENTRY=$UPLOAD_SENTRY
-
-if [ $? -ne 0 ]; then
-  fail "KMEI build failed."
-fi
 
 assertDirExists "$KEYMAN_XCFRAMEWORK"
 
@@ -276,21 +272,16 @@ if [ $DO_KEYMANAPP = true ]; then
   fi
 
   if [ $DO_ARCHIVE = false ]; then
-    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 VERSION=$VERSION \
                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
                 UPLOAD_SENTRY=$UPLOAD_SENTRY
-
-    if [ $? -ne 0 ]; then
-      fail "Keyman app build failed."
-    fi
-
   else
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .xcarchive for real devices."
-    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -archivePath $ARCHIVE_PATH \
                 archive -allowProvisioningUpdates \
                 VERSION=$VERSION \
@@ -304,7 +295,7 @@ if [ $DO_KEYMANAPP = true ]; then
       echo "Preparing .ipa file for deployment to real devices"
       # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
       # Xcode to generate a build error.
-      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
+      run_xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
                   -exportOptionsPlist exportAppStore.plist \
                   -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
     fi
@@ -312,7 +303,7 @@ if [ $DO_KEYMANAPP = true ]; then
 
   if [ $DO_SIMULATOR_TARGET == true ]; then
     echo "Preparing .app file for simulator-targeted artifact for testing"
-    xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -sdk iphonesimulator \
                 VERSION=$VERSION \
                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
@@ -320,10 +311,6 @@ if [ $DO_KEYMANAPP = true ]; then
                 UPLOAD_SENTRY=$UPLOAD_SENTRY
   fi
 
-  echo ""
-  if [ $? = 0 ]; then
-      echo "Build succeeded."
-  else
-      fail "Build failed - please see the log above for details."
-  fi
+  echo
+  echo "Build succeeded."
 fi
