@@ -23,10 +23,6 @@ namespace com.keyman.osk {
     //   let config: GestureRecognizerConfiguration = {
     //     targetRoot: vkbd.element,
     //     eventRoot: vkbd.element,
-    //     inputStartHandler: vkbd.touch.bind(vkbd),
-    //     inputMoveHandler: vkbd.moveOver.bind(vkbd),
-    //     inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
-    //     inputEndHandler: vkbd.release.bind(vkbd),
     //     coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
     //   };
 
@@ -39,9 +35,6 @@ namespace com.keyman.osk {
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: banner.getDiv(),
-    //     inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
-    //     inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
-    //     inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
     //     coordConstrainedWithinInteractiveBounds: function() { return true; }
     //   };
 
