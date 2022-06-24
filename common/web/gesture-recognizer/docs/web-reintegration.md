@@ -14,3 +14,6 @@ are references to components external to this module.
 Starts work on a unified mouse+touch object - `GestureRecognizer` - and starts work on the unified
 config object.
 
+Rather than specifying callback methods, we also shift to use of `EventEmitter` and an event-based model.
+At this stage, the event parameters should be relatively easy to interpret and forward to the original methods.
+

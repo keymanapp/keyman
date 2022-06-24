@@ -19,10 +19,5 @@ namespace com.keyman.osk {
     readonly targetRoot: HTMLElement;
 
     readonly coordConstrainedWithinInteractiveBounds: (coord: InputEventCoordinate) => boolean;
-
-    readonly inputStartHandler?:      InputHandler;
-    readonly inputMoveHandler?:       InputHandler;
-    readonly inputMoveCancelHandler?: InputHandler;
-    readonly inputEndHandler?:        InputHandler;
   }
 }

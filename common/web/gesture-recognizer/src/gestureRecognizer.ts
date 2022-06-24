@@ -1,11 +1,21 @@
 /// <reference path="gestureRecognizerConfiguration.ts" />
+/// <reference path="includes/events.ts" />
 
 namespace com.keyman.osk {
   type Mutable<Type> = {
     -readonly [Property in keyof Type]: Type[Property];
   };
 
-  export class GestureRecognizer {
+  export enum TrackedInputState {
+    START = "start",
+    END = "end",
+    MOVE = "move",
+    CANCEL = "cancel"
+  };
+
+  export class GestureRecognizer extends EventEmitter {
+    public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "trackedInputUpdate";
+
     protected readonly config: GestureRecognizerConfiguration;
 
     private readonly mouseEngine?: MouseEventEngine;
@@ -21,6 +31,7 @@ namespace com.keyman.osk {
     }
 
     public constructor(config: GestureRecognizerConfiguration) {
+      super();
       config = GestureRecognizer.preprocessConfig(config);
       this.config = config;
 
@@ -29,6 +40,17 @@ namespace com.keyman.osk {
 
       this.mouseEngine?.registerEventHandlers();
       this.touchEngine?.registerEventHandlers();
+
+      const _this = this;
+      this.mouseEngine?.on(InputEventEngine.INPUT_UPDATE_EVENT_NAME, function(state, coord) {
+        _this.emit(GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, state, coord);
+        return false;
+      });
+
+      this.touchEngine?.on(InputEventEngine.INPUT_UPDATE_EVENT_NAME, function(state, coord) {
+        _this.emit(GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, state, coord);
+        return false;
+      });
     }
 
     public destroy() {

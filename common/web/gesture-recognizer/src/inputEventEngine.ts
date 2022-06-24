@@ -1,5 +1,6 @@
 /// <reference path="inputEventCoordinate.ts" />
 /// <reference path="gestureRecognizerConfiguration.ts" />
+/// <reference path="includes/events.ts" />
 
 namespace com.keyman.osk {
   type Mutable<Type> = {
@@ -8,7 +9,9 @@ namespace com.keyman.osk {
 
   export type InputHandler = (coord: InputEventCoordinate) => void;
 
-  export abstract class InputEventEngine {
+  export abstract class InputEventEngine extends EventEmitter {
+    public static readonly INPUT_UPDATE_EVENT_NAME = "inputUpdate";
+
     protected readonly config: GestureRecognizerConfiguration;
 
     protected static preprocessConfig(config: GestureRecognizerConfiguration): GestureRecognizerConfiguration {
@@ -21,6 +24,8 @@ namespace com.keyman.osk {
     }
 
     public constructor(config: GestureRecognizerConfiguration) {
+      super();
+
       config = InputEventEngine.preprocessConfig(config);
       this.config = config;
     }
@@ -29,27 +34,19 @@ namespace com.keyman.osk {
     abstract unregisterEventHandlers();
 
     onInputStart(coord: InputEventCoordinate) {
-      if(this.config.inputStartHandler) {
-        this.config.inputStartHandler(coord);
-      }
+      this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.START, coord);
     }
 
     onInputMove(coord: InputEventCoordinate) {
-      if(this.config.inputMoveHandler) {
-        this.config.inputMoveHandler(coord);
-      }
+      this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.MOVE, coord);
     }
 
     onInputMoveCancel(coord: InputEventCoordinate) {
-      if(this.config.inputMoveCancelHandler) {
-        this.config.inputMoveCancelHandler(coord);
-      }
+      this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.CANCEL, coord);
     }
 
     onInputEnd(coord: InputEventCoordinate) {
-      if(this.config.inputEndHandler) {
-        this.config.inputEndHandler(coord);
-      }
+      this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.END, coord);
     }
   }
 }
