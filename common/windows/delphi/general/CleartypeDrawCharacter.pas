@@ -31,7 +31,7 @@ unit CleartypeDrawCharacter;
 interface
 
 uses
-  Windows, Classes, Graphics, Types, MLang, ComCtrls, usp10,
+  Windows, Classes, Graphics, Types, ComCtrls, usp10,
   System.Character;
 
 (*

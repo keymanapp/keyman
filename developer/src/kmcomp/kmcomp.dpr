@@ -45,7 +45,6 @@ uses
   kmxfileutils in '..\..\..\windows\src\global\delphi\general\kmxfileutils.pas',
   GlobalProxySettings in '..\..\..\windows\src\global\delphi\general\GlobalProxySettings.pas',
   VKeyChars in '..\..\..\windows\src\global\delphi\general\VKeyChars.pas',
-  utilmsxml in '..\..\..\windows\src\global\delphi\general\utilmsxml.pas',
   ErrorControlledRegistry in '..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\..\windows\src\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',

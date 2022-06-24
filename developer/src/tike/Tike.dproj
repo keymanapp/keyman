@@ -221,12 +221,10 @@
         </DCCReference>
         <DCCReference Include="debug\debugdeadkeys.pas"/>
         <DCCReference Include="main\MessageIdentifiers.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kpsfile.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
             <Form>frameCEFHost</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\UnitDrawArrow.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\common\delphi\components\BitmapEditor.pas"/>
         <DCCReference Include="..\common\delphi\components\StringGridEditControlled.pas"/>
@@ -247,7 +245,6 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilhttp.pas"/>
         <DCCReference Include="main\mrulist.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\Upload_Settings.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\MLang.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\components\FixedTrackbar.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilkeyboard.pas"/>
@@ -346,7 +343,6 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\usp10.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\UserMessages.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\utilmsxml.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="main\UframeBitmapEditor.pas">
             <Form>frameBitmapEditor</Form>

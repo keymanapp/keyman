@@ -124,7 +124,6 @@
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\HotkeyUtils.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="util\utilkmshell.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
         <DCCReference Include="install\UfrmInstallKeyboard.pas">
@@ -207,7 +206,6 @@
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="util\UILanguages.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilmsxml.pas"/>
         <DCCReference Include="main\UfrmKeyboardOptions.pas">
             <Form>frmKeyboardOptions</Form>
         </DCCReference>

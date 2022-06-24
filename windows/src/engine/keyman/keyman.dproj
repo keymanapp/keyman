@@ -109,7 +109,6 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\general\IntegerList.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
@@ -132,7 +131,6 @@
         <DCCReference Include="..\..\global\delphi\general\InterfaceHotkeys.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\visualkeyboard\ExtShiftState.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\CleartypeDrawCharacter.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\MLang.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\components\OnScreenKeyboard.pas"/>
         <DCCReference Include="viskbd\UfrmOSKPlugInBase.pas">
             <Form>frmOSKPlugInBase</Form>
@@ -185,7 +183,6 @@
         <DCCReference Include="..\..\global\delphi\hints\Hints.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilcheckfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\WideStringClass.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\usp10.pas"/>
@@ -302,9 +299,9 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>keyman.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -314,9 +311,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>keyman.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
