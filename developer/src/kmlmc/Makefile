@@ -1,5 +1,5 @@
 #
-# Keyman Developer Server Makefile
+# Keyman Developer - Lexical Model Compiler Makefile
 #
 
 !include ..\Defines.mak

@@ -12,6 +12,9 @@ EXCLUDEPATHDEFINES=1
 MANIFESTS=kmcomp tike setup
 CLEANS=clean-developer
 
+EXCLUDEPATHDEFINES=1
+BUILDPREREQ=global-versions
+
 !include Header.mak
 
 # ----------------------------------------------------------------------
