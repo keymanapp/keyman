@@ -192,7 +192,7 @@ if [ $CODE_SIGN = true ]; then
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .ipa file for deployment to real devices."
-    run-xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates \
+    run_xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
 
@@ -201,17 +201,17 @@ if [ $CODE_SIGN = true ]; then
 
     # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
     # Xcode to generate a build error.
-    run-xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
+    run_xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
                -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
   else
-    run-xcodebuild $XCODEFLAGS_EXT -scheme "$TARGET" \
+    run_xcodebuild $XCODEFLAGS_EXT -scheme "$TARGET" \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
   fi
 else
-  run-xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+  run_xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
              $XCODEFLAGS_EXT -scheme "$TARGET" \
              VERSION=$VERSION \
              VERSION_WITH_TAG=$VERSION_WITH_TAG
@@ -219,7 +219,7 @@ fi
 
 if [ $DO_SIMULATOR_TARGET == true ]; then
   echo "Preparing .app file as Simulator-targeted build artifact."
-  run-xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+  run_xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
              $XCODEFLAGS_EXT -scheme "$TARGET" \
              -sdk iphonesimulator \
              VERSION=$VERSION \

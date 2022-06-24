@@ -406,7 +406,7 @@ printXCodeBuildScriptLogs() {
 #
 # Wraps xcodebuild with error handling and log printing
 #
-run-xcodebuild() {
+run_xcodebuild() {
   typeset cmnd="$*"
   typeset ret_code
   local hasSetErrExit=false

@@ -246,7 +246,7 @@ if [ -d "$BUILD_PATH/$CONFIG-universal" ]; then
   rm -r $BUILD_PATH/$CONFIG-universal
 fi
 
-run-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
+run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
            VERSION=$VERSION \
            VERSION_WITH_TAG=$VERSION_WITH_TAG \
            VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
@@ -272,7 +272,7 @@ if [ $DO_KEYMANAPP = true ]; then
   fi
 
   if [ $DO_ARCHIVE = false ]; then
-    run-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 VERSION=$VERSION \
                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
@@ -281,7 +281,7 @@ if [ $DO_KEYMANAPP = true ]; then
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .xcarchive for real devices."
-    run-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -archivePath $ARCHIVE_PATH \
                 archive -allowProvisioningUpdates \
                 VERSION=$VERSION \
@@ -295,7 +295,7 @@ if [ $DO_KEYMANAPP = true ]; then
       echo "Preparing .ipa file for deployment to real devices"
       # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
       # Xcode to generate a build error.
-      run-xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
+      run_xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
                   -exportOptionsPlist exportAppStore.plist \
                   -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
     fi
@@ -303,7 +303,7 @@ if [ $DO_KEYMANAPP = true ]; then
 
   if [ $DO_SIMULATOR_TARGET == true ]; then
     echo "Preparing .app file for simulator-targeted artifact for testing"
-    run-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+    run_xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                 -sdk iphonesimulator \
                 VERSION=$VERSION \
                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
