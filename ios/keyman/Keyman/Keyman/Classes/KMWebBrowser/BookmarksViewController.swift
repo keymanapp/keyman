@@ -62,7 +62,12 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
         selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
         name: UITextField.textDidChangeNotification, object: textField)
       textField.placeholder = "Title"
-      textField.text = self.webBrowser?.webView?.stringByEvaluatingJavaScript(from: "document.title")
+      self.webBrowser?.webView?.evaluateJavaScript("document.title") { val, _ in
+        if let str = val as? String {
+          textField.text = str
+          self.updateAddButtonEnableState()
+        }
+      }
       textField.autocapitalizationType = .sentences
       textField.font = UIFont.systemFont(ofSize: 17)
       textField.keyboardType = .default
@@ -75,7 +80,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
           selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
           name: UITextField.textDidChangeNotification, object: textField)
       textField.placeholder = "URL"
-      textField.text = self.webBrowser?.webView?.request?.mainDocumentURL?.absoluteString
+      textField.text = self.webBrowser?.webView?.url?.absoluteString
       textField.autocapitalizationType = .none
       textField.font = UIFont.systemFont(ofSize: 17)
       textField.keyboardType = UIKeyboardType.URL
@@ -186,7 +191,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
   private func performAction(for indexPath: IndexPath) {
     let bookmark = bookmarks[indexPath.section]
     if let urlString = bookmark[bookmarkUrlKey], let url = URL(string: urlString) {
-      webBrowser?.webView?.loadRequest(URLRequest(url: url))
+      webBrowser?.webView?.load(URLRequest(url: url))
     }
     dismiss(animated: true, completion: nil)
   }

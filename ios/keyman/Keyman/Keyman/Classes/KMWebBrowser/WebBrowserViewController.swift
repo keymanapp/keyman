@@ -52,7 +52,6 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
       function: WebBrowserViewController.keyboardPickerDismissed)
 
     webView.navigationDelegate = self
-    webView.scalesPageToFit = true
 
     if #available(iOS 13.0, *) {
       // Dark mode settings must be applied through this new property,
@@ -203,7 +202,7 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
 
   func webView(_ webView: WKWebView,
                decidePolicyFor navigationAction: WKNavigationAction,
-               decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) -> Void {
+               decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
     let request = navigationAction.request
     if request.url?.lastPathComponent.hasSuffix(".kmp") ?? false {
       // Can't have the browser auto-download with no way to select a different page.
@@ -292,7 +291,7 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
       "style.type = 'text/css';" +
       "style.innerHTML = '*{font-family:\"\(fontFamily)\" !important;}';" +
     "document.getElementsByTagName('head')[0].appendChild(style);"
-    webView?.stringByEvaluatingJavaScript(from: jsStr)
+    webView.evaluateJavaScript(jsStr)
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
