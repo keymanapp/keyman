@@ -461,7 +461,7 @@ fi
 if [ $BUILD_COREWEB = true ]; then
     echo "Compiling the detached @keymanapp/gesture-recognizer module"
     pushd "$KEYMAN_ROOT/common/web/gesture-recognizer/src"
-    ./build.sh build
+    ./build.sh build || fail "@keymanapp/gesture-recognizer build was unsuccessful."
     popd
 fi
 
