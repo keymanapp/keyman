@@ -94,10 +94,10 @@
         </DelphiCompile>
         <DCCReference Include="Keyman.Test.System.CompilePackageVersioningTest.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\CompilePackage.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\kmpinffile.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\packages\kmpinffile.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\PackageFileFormats.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\PackageInfo.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\packages\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilfiletypes.pas"/>
         <DCCReference Include="..\..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilstr.pas"/>

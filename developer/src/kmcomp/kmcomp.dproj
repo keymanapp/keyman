@@ -159,9 +159,9 @@
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\CompilePackage.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\..\windows\src\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageInfo.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\PackageFileFormats.pas"/>
-        <DCCReference Include="..\..\..\windows\src\global\delphi\general\kmpinffile.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\packages\PackageInfo.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\packages\PackageFileFormats.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\packages\kmpinffile.pas"/>
         <DCCReference Include="..\TIKE\main\RedistFiles.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\httpuploader.pas"/>

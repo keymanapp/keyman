@@ -250,9 +250,9 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\input_installlayoutortip.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KPInstallPackageStartMenu.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\kmpinffile.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\PackageFileFormats.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\packages\PackageInfo.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilstr.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilwow64.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KPUninstallPackageStartMenu.pas"/>
