@@ -6,19 +6,19 @@ uses
   Sentry.Client in '..\Sentry.Client.pas',
   sentry in '..\sentry.pas',
   Sentry.Client.Vcl in '..\Sentry.Client.Vcl.pas',
-  Keyman.System.KeymanSentryClient in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.KeymanSentryClient.pas',
-  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
-  KeymanPaths in '..\..\..\..\..\common\windows\delphi\general\KeymanPaths.pas',
-  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
-  DebugPaths in '..\..\..\..\..\common\windows\delphi\general\DebugPaths.pas',
-  ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
-  utilexecute in '..\..\..\..\..\common\windows\delphi\general\utilexecute.pas',
-  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas';
+  Keyman.System.KeymanSentryClient in '..\..\..\general\Keyman.System.KeymanSentryClient.pas',
+  KeymanVersion in '..\..\..\general\KeymanVersion.pas',
+  KeymanPaths in '..\..\..\general\KeymanPaths.pas',
+  RegistryKeys in '..\..\..\general\RegistryKeys.pas',
+  DebugPaths in '..\..\..\general\DebugPaths.pas',
+  ErrorControlledRegistry in '..\..\..\vcl\ErrorControlledRegistry.pas',
+  utilexecute in '..\..\..\general\utilexecute.pas',
+  Unicode in '..\..\..\general\Unicode.pas';
 
 {$R *.res}
 
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, '');
   try
     Application.Initialize;
     Application.MainFormOnTaskbar := True;

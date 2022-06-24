@@ -170,7 +170,7 @@ uses
   UfrmPackageEditor in 'child\UfrmPackageEditor.pas' {frmPackageEditor},
   utilexecute in '..\..\..\common\windows\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
-  CaptionPanel in '..\common\\delphi\components\CaptionPanel.pas',
+  CaptionPanel in '..\common\delphi\components\CaptionPanel.pas',
   Glossary in '..\..\..\common\windows\delphi\general\Glossary.pas',
   UframeTouchLayoutBuilder in 'oskbuilder\UframeTouchLayoutBuilder.pas' {frameTouchLayoutBuilder},
   TouchLayoutUtils in 'oskbuilder\TouchLayoutUtils.pas',
