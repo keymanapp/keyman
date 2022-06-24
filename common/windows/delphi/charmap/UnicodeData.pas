@@ -1,18 +1,18 @@
 (*
   Name:             UnicodeData
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    10 Jun 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Rework for Keyman Developer 7 Character map
                     23 Aug 2006 - mcdurdin - Add ShortName property and FindDataByName function
                     23 Aug 2006 - mcdurdin - Add GetUnicodeRangeFromFilter function
@@ -214,7 +214,7 @@ function GetUnicodeRangeFromFilter(filter: WideString; var RangeStart, RangeStop
 
 const
   UnicodeDataTxtName = 'UnicodeData.txt';
-  UnicodeDataMdbName = 'UnicodeData.mdb';
+  UnicodeDataMdbName = 'unicodedata.mdb';
 
 implementation
 
@@ -337,7 +337,7 @@ const
     '  CharacterID INT IDENTITY(1,1) CONSTRAINT PrimaryKey PRIMARY KEY,'+
     '  BlockID INT NOT NULL,'+
     '  CodeValue INT NOT NULL,'+
-    '  NameIsDescription BIT,'+ 
+    '  NameIsDescription BIT,'+
     '  CharacterName VARCHAR(240) NOT NULL,'+
 {    '  GeneralCategory VARCHAR(2),'+
     '  CanonicalCombiningClasses INT NOT NULL,'+
@@ -667,7 +667,7 @@ begin
       echar := nil;
     end;
 
-    { Save the block cache data } 
+    { Save the block cache data }
     eblocks := CoRecordset.Create;
     eblocks.Open('eBlock', FDatabase, adOpenForwardOnly, adLockOptimistic, adCmdTable);
     try
@@ -809,7 +809,7 @@ begin
       echar := nil;
     end;
 
-    { Save the block cache data } 
+    { Save the block cache data }
     eblocks := CoRecordset.Create;
     eblocks.Open('eBlock', FDatabase, adOpenForwardOnly, adLockOptimistic, adCmdTable);
     try
@@ -947,7 +947,7 @@ begin
       on E:Exception do
       begin
         FDatabase := nil;
-        FBlocks.Clear;                
+        FBlocks.Clear;
         if FUnicodeDataUIManager.UDUI_ShouldStartRebuildOnError(E.Message) then
           BuildDatabase;
       end;
@@ -1284,7 +1284,7 @@ begin
       end;
       Exit;
     end;
-    
+
   end;
 
   if GetUnicodeRangeFromFilter(filter, RangeStart, RangeStop) then
@@ -1387,7 +1387,7 @@ begin
         ub.FCacheCharCount := 0;
         Result.Add(ub);
       end;
-                       
+
       if (ub.FCacheCharCount mod 100) = 0 then
       begin
         ReallocMem(ub.FCacheCharData, (ub.FCacheCharCount+100) * SizeOf(Integer));
