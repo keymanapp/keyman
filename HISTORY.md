@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.19 alpha 2022-06-24
+
+* change(web): drops old IE-related handling code (#6557)
+* chore(deps): bump got from 11.8.3 to 11.8.5 (#6821)
+* chore(ios): log script actions and fixup export settings to avoid version being clobbered (#6835)
+
 ## 16.0.18 alpha 2022-06-23
 
 * chore(core): move common/core/desktop/ to core/ (#6629)

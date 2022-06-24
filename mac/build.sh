@@ -306,6 +306,8 @@ execBuildCommand() {
     ret_code=$?
     set -e
 
+    printXCodeBuildScriptLogs
+
     if [ $ret_code != 0 ]; then
         fail "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
     fi
