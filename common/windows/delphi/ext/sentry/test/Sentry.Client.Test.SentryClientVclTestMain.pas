@@ -39,7 +39,7 @@ end;
 
 procedure TfrmSentryClientVclTestMain.cmdSendEventClick(Sender: TObject);
 begin
-  TKeymanSentryClient.Client.MessageEvent(SENTRY_LEVEL_INFO, 'custom', 'This is a message from the VCL test app');
+  TKeymanSentryClient.Client.MessageEvent(SENTRY_LEVEL_INFO, 'This is a message from the VCL test app');
 end;
 
 end.
