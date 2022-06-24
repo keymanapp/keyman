@@ -457,7 +457,17 @@ fi
 
 ### -embed section complete.
 
+### TEMP - to link @keymanapp/gesture-recognizer in for CI while detached
 if [ $BUILD_COREWEB = true ]; then
+    echo "Compiling the detached @keymanapp/gesture-recognizer module"
+    pushd "$KEYMAN_ROOT/common/web/gesture-recognizer/src"
+    ./build.sh build
+    popd
+fi
+
+
+if [ $BUILD_COREWEB = true ]; then
+
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb...
     $compilecmd -b $NODE_SOURCE/tsconfig.json -v
