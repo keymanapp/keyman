@@ -120,18 +120,18 @@ if (( $LOCAL_FILE_SIZE <= $REMOTE_FILE_SIZE )); then
   # We are good -- the new build is smaller than the old one
   RESULT_STATE=success
   REPORT_CODE=0
-  RESULT_MESSAGE="✅ Excellent! This build of keymanweb.js is $(printf "%'d" $LOCAL_FILE_SIZE) bytes, $(printf "%'d" $DIFF) bytes ($PERCENT_DIFF%) smaller than build $REMOTE_VERSION."
+  RESULT_MESSAGE="✅ Excellent! keymanweb.js is $(printf "%'d" $DIFF) bytes ($PERCENT_DIFF%) smaller than $REMOTE_VERSION, now $(printf "%'d" $LOCAL_FILE_SIZE) bytes"
 elif (( $DIFF < $SIZE_THRESHOLD )); then
   # Warning, larger, but less than 1kb larger
   RESULT_STATE=success
   REPORT_CODE=1
-  RESULT_MESSAGE="⚠️ Warning: This build of keymanweb.js is $(printf "%'d" $LOCAL_FILE_SIZE) bytes, $(printf "%'d" $DIFF) bytes ($PERCENT_DIFF%) larger than build $REMOTE_VERSION."
+  RESULT_MESSAGE="⚠️ Warning: keymanweb.js is $(printf "%'d" $DIFF) bytes ($PERCENT_DIFF%) larger than $REMOTE_VERSION, now $(printf "%'d" $LOCAL_FILE_SIZE) bytes"
 else
   # Failure - new build is significantly larger
   DIFF=$(($LOCAL_FILE_SIZE - $REMOTE_FILE_SIZE))
   RESULT_STATE=failure
   REPORT_CODE=2
-  RESULT_MESSAGE="❌ Oh dear! This build of keymanweb.js is $(printf "%'d" $LOCAL_FILE_SIZE) bytes, $(printf "%'d" $DIFF) bytes ($PERCENT_DIFF%) larger than build $REMOTE_VERSION."
+  RESULT_MESSAGE="❌ Oh dear! keymanweb.js is $(printf "%'d" $DIFF) bytes ($PERCENT_DIFF%) larger than $REMOTE_VERSION, now $(printf "%'d" $LOCAL_FILE_SIZE) bytes"
 fi
 
 echo "$RESULT_MESSAGE"
