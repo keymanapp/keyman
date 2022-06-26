@@ -1024,7 +1024,10 @@ begin
 
   if IsKeyboardVersion10OrLater() and (pwsz^ <> #0) then
   begin
-    Result := Result + nlt+Format('k.KDC(%d,t);', [ len ] );   // I3681
+    if not fgp.fReadOnly then
+    begin
+      Result := Result + nlt+Format('k.KDC(%d,t);', [ len ] );   // I3681
+    end;
     len := -1;
   end;
 
@@ -1048,7 +1051,10 @@ begin
               n := 1;
               while pwszContext^ <> '' do   // I4611
               begin
-                Result := Result + ContextChar(n, pwszContext);
+                if not fgp.fReadOnly then
+                begin
+                  Result := Result + ContextChar(n, pwszContext);
+                end;
                 Inc(n);
                 pwszContext := incxstr(pwszContext);
               end;
@@ -1060,20 +1066,33 @@ begin
           end;
         CODE_CONTEXTEX:
           begin
-            pwszContext := fkp.dpContext; for i := 1 to rec.ContextEx.Index - 1 do pwszContext := incxstr(pwszContext);
-            Result := Result + ContextChar(rec.ContextEx.Index, pwszContext);   // I4611
+            pwszContext := fkp.dpContext;
+            for i := 1 to rec.ContextEx.Index - 1 do
+            begin
+              pwszContext := incxstr(pwszContext);
+            end;
 
+            if not fgp.fReadOnly then
+            begin
+              Result := Result + ContextChar(rec.ContextEx.Index, pwszContext);   // I4611
+            end;
             len := -1;
           end;
         CODE_BEEP:
           begin
-            if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
-            Result := Result + nlt+'k.KB(t);';   // I3681
+            if not fgp.fReadOnly then
+            begin
+              if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+              Result := Result + nlt+'k.KB(t);';   // I3681
+            end;
             len := -1;
           end;
         CODE_NUL:
           begin
-            if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            if not fgp.fReadOnly then
+            begin
+              if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            end;
             len := -1;
           end;
         CODE_INDEX:
@@ -1088,31 +1107,45 @@ begin
 
             Index := AdjustIndex(fkp.dpContext, rec.Index.Index);   // I3910
 
-            Result := Result + nlt+Format('k.KIO(%d,this.s%s,%d,t);', [len, JavaScript_Name(rec.Index.StoreIndex, rec.Index.Store.szName),
-              // I783 - was: rec.Index.Index [2007-06-04]
-              // I783 again.  Returned to rec.Index.Index.  Was previously: [2008-08-15]
-              //              xstrlen(fkp.dpContext) + 1 - rec.Index.Index]);
-              //      this was wrong.  Can't find any reason why this change was made
-              //      which suggests it was in response to another bug and poorly traced (bad Marc)
-              //      and not properly tested (bad, bad Marc).  Anyway, now tested with test_i783
-              Index]);   // I3681   // I3910
+            if not fgp.fReadOnly then
+            begin
+              Result := Result + nlt+Format('k.KIO(%d,this.s%s,%d,t);', [len, JavaScript_Name(rec.Index.StoreIndex, rec.Index.Store.szName),
+                // I783 - was: rec.Index.Index [2007-06-04]
+                // I783 again.  Returned to rec.Index.Index.  Was previously: [2008-08-15]
+                //              xstrlen(fkp.dpContext) + 1 - rec.Index.Index]);
+                //      this was wrong.  Can't find any reason why this change was made
+                //      which suggests it was in response to another bug and poorly traced (bad Marc)
+                //      and not properly tested (bad, bad Marc).  Anyway, now tested with test_i783
+                Index]);   // I3681   // I3910
+            end;
             len := -1;
           end;
         CODE_DEADKEY:
           begin
-            Result := Result + nlt+Format('k.KDO(%d,t,%d);', [len, rec.Deadkey.Deadkey]);   // I3681
+            if not fgp.fReadOnly then
+            begin
+              Result := Result + nlt+Format('k.KDO(%d,t,%d);', [len, rec.Deadkey.Deadkey]);   // I3681
+            end;
             len := -1;
           end;
         CODE_USE:
           begin
-            if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            if not fgp.fReadOnly then
+            begin
+              if len > 0 then
+                Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            end;
             Result := Result + nlt+Format('r=this.g%s(t,e);', [JavaScript_Name(rec.Use.GroupIndex, rec.Use.Group.szName)]);    // I1959   // I3681
             Result := Result + nlt+'m=2;';  // #5440 - match desktop behavior
             len := -1;
           end;
         CODE_CALL:
           begin
-            if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            if not fgp.fReadOnly then
+            begin
+              if len > 0 then
+                Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            end;
             n := FCallFunctions.IndexOf(CallFunctionName(rec.Call.Store.dpString));
             if n = -1 then
               n := FCallFunctions.Add(CallFunctionName(rec.Call.Store.dpString));
@@ -1122,7 +1155,11 @@ begin
           end;
         CODE_SETOPT:    // I3429
           begin
-            if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            if not fgp.fReadOnly then
+            begin
+              if len > 0 then
+                Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            end;
             Result := Result + nlt+Format('this.s%s=this.s%s;',
               [JavaScript_Name(rec.SetOpt.StoreIndex1,rec.SetOpt.Store1.szName),
               JavaScript_Name(rec.SetOpt.StoreIndex2,rec.SetOpt.Store2.szName)]);  // I3429   // I3681
@@ -1130,7 +1167,11 @@ begin
           end;
         CODE_RESETOPT:  // I3429
           begin
-            if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            if not fgp.fReadOnly then
+            begin
+              if len > 0 then
+                Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            end;
 
             Result := Result + nlt+Format('this.s%s=k.KLOAD(this.KI,"%s",%s);',
               [JavaScript_Name(rec.ResetOpt.StoreIndex,rec.ResetOpt.Store.szName),
@@ -1140,7 +1181,11 @@ begin
           end;
         CODE_SAVEOPT:  // I3429
           begin
-            if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);
+            if not fgp.fReadOnly then
+            begin
+              if len > 0 then
+                Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);
+            end;
             Result := Result + nlt+Format('k.KSAVE("%s",this.s%s);',
               [JavaScript_Name(rec.SaveOpt.StoreIndex,rec.SaveOpt.Store.szName,True),   // I3690
               JavaScript_Name(rec.SaveOpt.StoreIndex,rec.SaveOpt.Store.szName)]); // I3429   // I3659   // I3681
@@ -1148,7 +1193,11 @@ begin
           end;
         CODE_SETSYSTEMSTORE:  // I3437
           begin
-            if len > 0 then Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            if not fgp.fReadOnly then
+            begin
+              if len > 0 then
+                Result := Result + nlt+Format('k.KO(%d,t,"");', [len]);   // I3681
+            end;
             Result := Result + nlt+Format('k.KSETS(%d,this.s%s,t);',   // I3681
               [rec.SetSystemStore.dwSystemID,
               JavaScript_Name(rec.SetSystemStore.StoreIndex, rec.SetSystemStore.Store.szName)]);
@@ -1167,12 +1216,18 @@ begin
     begin
 			if not InQuotes then
       begin
-        Result := Result + nlt+Format('k.KO(%d,t,"', [len]);   // I3681
+        if not fgp.fReadOnly then
+        begin
+          Result := Result + nlt+Format('k.KO(%d,t,"', [len]);   // I3681
+        end;
         InQuotes := True; len := -1;
       end;
 
       if rec.ChrVal in [Ord('"'), Ord('\')] then Result := Result + '\';
-      Result := Result + Javascript_String(rec.ChrVal);  // I2242
+      if not fgp.fReadOnly then
+      begin
+        Result := Result + Javascript_String(rec.ChrVal);  // I2242
+      end;
     end;
 
     pwsz := incxstr(pwsz);
