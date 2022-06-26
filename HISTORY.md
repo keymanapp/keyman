@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.20 alpha 2022-06-26
+
+* chore(web): shorten check/web/file-size check message (#6780)
+
 ## 16.0.19 alpha 2022-06-24
 
 * change(web): drops old IE-related handling code (#6557)
