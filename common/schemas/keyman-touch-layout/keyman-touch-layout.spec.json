@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$ref": "#/definitions/touch-layout",
+
+  "definitions": {
+    "touch-layout": {
+      "type": "object",
+      "properties": {
+        "tablet": { "$ref": "#/definitions/platform" },
+        "phone": { "$ref": "#/definitions/platform" },
+        "desktop": { "$ref": "#/definitions/platform" }
+      }
+    },
+
+    "platform": {
+      "type": "object",
+      "properties": {
+        "font": { "$ref": "#/definitions/font-spec" },
+        "fontsize": { "$ref": "#/definitions/fontsize-spec" },
+        "layer": { "$ref": "#/definitions/layers" },
+        "displayUnderlying": { "type": "boolean" }
+      },
+      "required": ["layer"],
+      "additionalProperties": false
+    },
+
+    "layers": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/layer" }
+    },
+
+    "layer": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/layer-id" },
+        "row": { "$ref": "#/definitions/rows" }
+      },
+      "required": ["id", "row"],
+      "additionalProperties": false
+    },
+
+    "layer-id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+
+    "rows": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/row" }
+    },
+
+    "row": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/row-id" },
+        "key": { "$ref": "#/definitions/keys" }
+      },
+      "required": ["id", "key"],
+      "additionalProperties": false
+    },
+
+    "row-id": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+
+    "keys": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/key" }
+    },
+
+    "key": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/key-id" },
+        "text": { "type": "string" },
+        "layer": { "$ref": "#/definitions/layer-id" },
+        "nextlayer": { "$ref": "#/definitions/layer-id" },
+        "sp": { "type": "string", "pattern": "^[0-9]+$" },
+        "pad": { "type": "string" },
+        "width": { "type": "string" },
+        "sk": { "$ref": "#/definitions/subkeys" }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+
+    "key-id": {
+      "type": "string",
+      "pattern": "^[TKUtku]_[a-zA-Z0-9_]+$"
+    },
+
+    "subkeys": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/subkey" }
+    },
+
+    "subkey": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/key-id" },
+        "text": { "type": "string" },
+        "layer": { "$ref": "#/definitions/layer-id" },
+        "nextlayer": { "$ref": "#/definitions/layer-id" },
+        "sp": { "type": "string", "pattern": "^[0-9]+$" }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+
+    "font-spec": {
+      "type": "string"
+    },
+
+    "fontsize-spec": {
+      "type": "string"
+    }
+  }
+}
