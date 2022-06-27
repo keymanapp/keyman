@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.21 alpha 2022-06-27
+
+* chore(ios): modernizes app-help's internals (#6836)
+* fix(linux): Deal with non-existing files (#6840)
+* fix(linux): Catch KeyboardInterrupt (#6841)
+
 ## 16.0.20 alpha 2022-06-26
 
 * chore(web): shorten check/web/file-size check message (#6780)
