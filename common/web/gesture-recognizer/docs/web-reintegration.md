@@ -31,6 +31,10 @@ keyboard that supports continued interaction before cancelling it.
 Alternatively, this _could_ receive a custom wrapper implementation of the interface that simply appends
 extra space to each side of the main target-element's `getBoundingClientRect` value.  (One issue with this
 approach is that the padding value may differ per device orientation.)
+- This could be supported via paddedZoneSource with negative padding toward the top.
 
 `safeBounds`: would be left undefined.  The default behavior is modeled directly after VisualKeyboard's
 viewport-aware bounds detection & logic.
+
+`safeBoundsPadding` models the slightly-inset boundaries that are used to disable `safeBounds` near an edge
+should the initial touch have started near that edge.

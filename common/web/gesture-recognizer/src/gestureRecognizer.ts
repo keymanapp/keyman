@@ -16,28 +16,30 @@ namespace com.keyman.osk {
   export class GestureRecognizer extends EventEmitter {
     public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "trackedInputUpdate";
 
-    protected readonly config: GestureRecognizerConfiguration;
+    protected readonly config: FinalizedGestureRecognizerConfiguration;
 
     private readonly mouseEngine?: MouseEventEngine;
     private readonly touchEngine?: TouchEventEngine;
 
-    protected static preprocessConfig(config: GestureRecognizerConfiguration): GestureRecognizerConfiguration {
+    protected static preprocessConfig(config: GestureRecognizerConfiguration): FinalizedGestureRecognizerConfiguration {
       // Allows configuration pre-processing during this method.
-      let processingConfig: Mutable<GestureRecognizerConfiguration> = Object.assign({}, config);
+      let processingConfig: Mutable<FinalizedGestureRecognizerConfiguration> = Object.assign({}, config) as FinalizedGestureRecognizerConfiguration;
       processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
       processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
 
       processingConfig.inputStartBounds = processingConfig.inputStartBounds ?? processingConfig.targetRoot;
       processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
-      processingConfig.safeBounds = processingConfig.safeBounds ?? new ViewportZoneSource(2);
+      processingConfig.safeBounds       = processingConfig.safeBounds       ?? new ViewportZoneSource(2);
+      processingConfig.safeBoundPadding = processingConfig.safeBoundPadding ?? 3;
+
+      processingConfig.paddedSafeBounds = new PaddedZoneSource(processingConfig.safeBounds, processingConfig.safeBoundPadding);
 
       return processingConfig;
     }
 
     public constructor(config: GestureRecognizerConfiguration) {
       super();
-      config = GestureRecognizer.preprocessConfig(config);
-      this.config = config;
+      this.config = GestureRecognizer.preprocessConfig(config);
 
       this.mouseEngine = new MouseEventEngine(config);
       this.touchEngine = new TouchEventEngine(config);

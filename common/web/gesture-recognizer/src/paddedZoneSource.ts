@@ -1,7 +1,7 @@
-/// <reference path="recognitionZoneSource.ts" />
-
 namespace com.keyman.osk {
-  export class ViewportZoneSource implements RecognitionZoneSource {
+
+  export class PaddedZoneSource implements RecognitionZoneSource {
+    private readonly root: RecognitionZoneSource;
 
     /**
      * [0]: x (left)
@@ -9,9 +9,12 @@ namespace com.keyman.osk {
      * [2]: width (left+right)
      * [3]: height (top+bottom)
      */
-    readonly edgePadding: number[];
+    private edgePadding: number[];
 
-    constructor(edgePadding?: number|number[]) {
+    // Positive values 'shrink' the new zone compared to the old zone, while negative ones
+    // 'expand' it instead.
+    constructor(rootZoneSource: RecognitionZoneSource, edgePadding?: number|number[]) {
+      this.root = rootZoneSource;
       // In case it isn't yet defined.
       edgePadding = edgePadding || 0;
 
@@ -43,15 +46,13 @@ namespace com.keyman.osk {
     }
 
     getBoundingClientRect(): DOMRect {
-      // Viewport dimension detection is based on https://stackoverflow.com/a/8876069.
-      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-      const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+      const rootZone = this.root.getBoundingClientRect();
 
       return DOMRect.fromRect({
-        x: this.edgePadding[0],
-        y: this.edgePadding[1],
-        width:  vw - this.edgePadding[2],
-        height: vh - this.edgePadding[3]
+        x: rootZone.x + this.edgePadding[0],
+        y: rootZone.y + this.edgePadding[1],
+        width: rootZone.width   - this.edgePadding[2],
+        height: rootZone.height - this.edgePadding[3]
       });
     }
   }
