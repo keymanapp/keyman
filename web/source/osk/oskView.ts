@@ -449,6 +449,12 @@ namespace com.keyman.osk {
         return;
       }
 
+      // Proper layout cannot occur if the OSKView's dimensions have not yet
+      // been properly specified in some fashion.
+      if(!this.width || !this.height) {
+        return;
+      }
+
       // Step 1:  have the necessary conditions been met?
       const fixedSize = this.width && this.height && this.width.absolute && this.height.absolute;
       const computedStyle = getComputedStyle(this._Box);
