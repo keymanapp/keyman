@@ -26,10 +26,14 @@
                     <rect key="frame" x="0.0" y="804" width="428" height="34"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                 </view>
-                <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="38">
+                <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="38">
                     <rect key="frame" x="0.0" y="0.0" width="428" height="755"/>
                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                </webView>
+                    <wkWebViewConfiguration key="configuration">
+                        <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                        <wkPreferences key="preferences"/>
+                    </wkWebViewConfiguration>
+                </wkWebView>
                 <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DPl-QD-inD">
                     <rect key="frame" x="0.0" y="755" width="428" height="49"/>
                     <items>
