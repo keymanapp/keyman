@@ -7,7 +7,9 @@ namespace com.keyman.osk {
     private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
     private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
-    public constructor(config: GestureRecognizerConfiguration) {
+    private disabledSafeBounds: number = 0;
+
+    public constructor(config: FinalizedGestureRecognizerConfiguration) {
       super(config);
 
       this._touchStart = this.onTouchStart.bind(this);
@@ -68,14 +70,24 @@ namespace com.keyman.osk {
 
     onTouchStart(event: TouchEvent) {
       this.preventPropagation(event);
-      this.onInputStart(InputEventCoordinate.fromEvent(event));
+      const coord = InputEventCoordinate.fromEvent(event)
+
+      if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(coord, this.config)) {
+        this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(coord, this.config);
+      } else {
+        this.disabledSafeBounds = 0;
+        // TODO:  disable tracking for the specific `Touch` that just started.
+        // Requires explicit implementation of multi-touch tracking, which has not yet been added.
+      }
+
+      this.onInputStart(coord);
     }
 
     onTouchMove(event: TouchEvent) {
       this.preventPropagation(event);
       const coord = InputEventCoordinate.fromEvent(event);
 
-      if(this.config.coordConstrainedWithinInteractiveBounds(coord)) {
+      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(coord, this.config, this.disabledSafeBounds)) {
         this.onInputMove(coord);
       } else {
         this.onInputMoveCancel(coord);

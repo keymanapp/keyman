@@ -8,9 +8,10 @@ namespace com.keyman.osk {
     private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
 
     private hasActiveClick: boolean = false;
+    private disabledSafeBounds: number = 0;
     private ignoreSequence: boolean = false;
 
-    public constructor(config: GestureRecognizerConfiguration) {
+    public constructor(config: FinalizedGestureRecognizerConfiguration) {
       super(config);
 
       this._mouseStart = this.onMouseStart.bind(this);
@@ -77,7 +78,13 @@ namespace com.keyman.osk {
       }
 
       this.preventPropagation(event);
-      this.onInputStart(InputEventCoordinate.fromEvent(event));
+      const coord = InputEventCoordinate.fromEvent(event);
+
+      if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(coord, this.config)) {
+        this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(coord, this.config);
+      }
+
+      this.onInputStart(coord);
       this.hasActiveClick = true;
     }
 
@@ -101,7 +108,7 @@ namespace com.keyman.osk {
 
       this.preventPropagation(event);
 
-      if(this.config.coordConstrainedWithinInteractiveBounds(coord)) {
+      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(coord, this.config, this.disabledSafeBounds)) {
         this.onInputMove(coord);
       } else {
         this.onInputMoveCancel(coord);

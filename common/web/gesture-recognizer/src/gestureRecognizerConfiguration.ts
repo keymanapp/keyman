@@ -55,10 +55,6 @@ namespace com.keyman.osk {
      * If not specified, this will default to a padding of 3px inside the standard safeBounds.
      */
     readonly safeBoundPadding?: number | number[];
-
-    // TBD:  rip this out.  It should be replaced with an implementation based on the previous
-    // four properties WITHIN THIS PR.
-    readonly coordConstrainedWithinInteractiveBounds: (coord: InputEventCoordinate) => boolean;
   }
 
   export interface FinalizedGestureRecognizerConfiguration extends Nonoptional<GestureRecognizerConfiguration> {

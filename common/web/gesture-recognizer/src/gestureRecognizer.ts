@@ -41,8 +41,8 @@ namespace com.keyman.osk {
       super();
       this.config = GestureRecognizer.preprocessConfig(config);
 
-      this.mouseEngine = new MouseEventEngine(config);
-      this.touchEngine = new TouchEventEngine(config);
+      this.mouseEngine = new MouseEventEngine(this.config);
+      this.touchEngine = new TouchEventEngine(this.config);
 
       this.mouseEngine?.registerEventHandlers();
       this.touchEngine?.registerEventHandlers();
