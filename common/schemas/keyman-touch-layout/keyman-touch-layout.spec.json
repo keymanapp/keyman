@@ -60,9 +60,17 @@
     },
 
     "row-id": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        }
+      ]
     },
 
     "keys": {
@@ -77,18 +85,27 @@
         "text": { "type": "string" },
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
-        "sp": { "type": "string", "pattern": "^[0-9]+$" },
-        "pad": { "type": "string" },
-        "width": { "type": "string" },
+        "fontsize": { "type": "string" },
+        "font": { "$ref": "#/definitions/font-spec" },
+        "dk": { "type": "string" },
+        "sp": { "$ref" : "#/definitions/numeric" },
+        "pad": { "$ref" : "#/definitions/numeric" },
+        "width": { "$ref" : "#/definitions/numeric" },
         "sk": { "$ref": "#/definitions/subkeys" }
       },
-      "required": ["id"],
       "additionalProperties": false
+    },
+
+    "numeric": {
+      "oneOf": [
+        { "type": "string", "pattern": "^[0-9]+(\\.?[0-9]*)$|^$" },
+        { "type": "number" }
+      ]
     },
 
     "key-id": {
       "type": "string",
-      "pattern": "^[TKUtku]_[a-zA-Z0-9_]+$"
+      "pattern": "^[TKUtku]_[a-zA-Z0-9_]+$|^$"
     },
 
     "subkeys": {
@@ -103,7 +120,12 @@
         "text": { "type": "string" },
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
-        "sp": { "type": "string", "pattern": "^[0-9]+$" }
+        "sp": { "$ref" : "#/definitions/numeric" },
+        "pad": { "$ref" : "#/definitions/numeric" },
+        "width": { "$ref" : "#/definitions/numeric" },
+        "fontsize": { "type": "string" },
+        "font": { "$ref": "#/definitions/font-spec" },
+        "dk": { "type": "string" }
       },
       "required": ["id"],
       "additionalProperties": false
