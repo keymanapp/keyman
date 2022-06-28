@@ -57,7 +57,7 @@ class KeyboardViewController: InputViewController {
   }
 
   func getTopBarImage(size: CGSize) -> String? {
-    return topBarImageSource.renderAsBase64(size: CGSize(width: size.width, height: self.activeTopBarHeight))
+    return topBarImageSource.renderAsBase64(size: CGSize(width: size.width, height: InputViewController.topBarHeight))
   }
 
   func setupTopBarImage(size: CGSize) {
