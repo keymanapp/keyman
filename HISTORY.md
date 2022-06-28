@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.22 alpha 2022-06-28
+
+* fix(ios): eliminates conditional height for banner image (#6855)
+
 ## 16.0.21 alpha 2022-06-27
 
 * chore(ios): modernizes app-help's internals (#6836)
