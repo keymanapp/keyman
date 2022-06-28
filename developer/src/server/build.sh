@@ -186,8 +186,8 @@ if (( production )) ; then
 
   # We'll build in the build/ folder
   rm -rf build/
-  mkdir build/
-  cp -R dist/* build/
+  mkdir -p build/dist/
+  cp -R dist/* build/dist/
   cp -R "$PRODBUILDTEMP"/* build/
   rm -rf "$PRODBUILDTEMP"
 fi
