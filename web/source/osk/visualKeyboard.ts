@@ -1781,6 +1781,7 @@ namespace com.keyman.osk {
 
       if(this.deleting) {
         window.clearTimeout(this.deleting);
+        this.deleting = 0;
       }
 
       this.keyPending = null;
