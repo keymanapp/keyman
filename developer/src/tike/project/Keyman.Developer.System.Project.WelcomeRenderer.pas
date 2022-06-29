@@ -16,6 +16,7 @@ uses
   Winapi.Shlobj,
   Xml.Win.msxmldom,
 
+  KeymanVersion,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.UrlRenderer,
   RegistryKeys,
@@ -72,7 +73,7 @@ begin
       end;
 
       node := doc.createElement('Version');
-      node.appendChild(doc.createTextNode(GetVersionString));
+      node.appendChild(doc.createTextNode(CKeymanVersionInfo.VersionWithTag));
       root.appendChild(node);
 
       TProjectUrlRenderer.AddUrls(root);

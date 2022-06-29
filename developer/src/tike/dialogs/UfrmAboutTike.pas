@@ -79,7 +79,7 @@ begin
   inherited;
   Caption := SCaption;
   lblWebsite.Caption := MakeKeymanURL(URLPath_KeymanDeveloperHome_Presentation);
-  lblVersion.Caption := 'Version ' + GetVersionString;
+  lblVersion.Caption := 'Version ' + CKeymanVersionInfo.VersionWithTag;
   lblCopyright.Caption := GetVersionCopyright;
 end;
 

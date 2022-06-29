@@ -270,7 +270,7 @@ void keyman_sentry_test_crash() {
 #define SENTRY_DLL SENTRY_BASE_DLL
 #endif
 #define SENTRY_INSTALL_PATH "sentry-0.4.9\\" SENTRY_DLL
-#define SENTRY_DEV_PATH "windows\\src\\ext\\sentry\\" SENTRY_DLL
+#define SENTRY_DEV_PATH "common\\windows\\delphi\\ext\\sentry\\" SENTRY_DLL
 #define ENV_KEYMAN_ROOT "KEYMAN_ROOT"
 
 HMODULE LoadSentryLibrary() {
