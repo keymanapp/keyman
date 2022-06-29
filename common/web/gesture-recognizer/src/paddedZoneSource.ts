@@ -13,10 +13,10 @@ namespace com.keyman.osk {
 
     // Positive values 'shrink' the new zone compared to the old zone, while negative ones
     // 'expand' it instead.
-    constructor(rootZoneSource: RecognitionZoneSource, edgePadding?: number|number[]) {
+    constructor(rootZoneSource: RecognitionZoneSource, ...edgePadding: number[]) {
       this.root = rootZoneSource;
       // In case it isn't yet defined.
-      edgePadding = edgePadding || 0;
+      edgePadding = edgePadding || [0, 0, 0, 0];
 
       if(typeof edgePadding == 'number') {
         this.edgePadding = [edgePadding, edgePadding, 2 * edgePadding, 2 * edgePadding];
@@ -25,22 +25,31 @@ namespace com.keyman.osk {
         // Modeled after CSS styling definitions... just with preprocessed numbers, not strings.
         switch(edgePadding.length) {
           case 1:
+            // all sides equal
             const val = edgePadding[0];
             this.edgePadding = [val, val, 2 * val, 2 * val];
             break;
           case 2:
+            // top & bottom, left & right
             const yVal = edgePadding[0];
             const xVal = edgePadding[1];
             this.edgePadding = [yVal, xVal, 2 * yVal, 2 * xVal];
             break;
-          case 4:
+          case 3:
+            // top, left & right, bottom
             this.edgePadding = [edgePadding[0],
                                 edgePadding[1],
+                                edgePadding[0] + edgePadding[2],
+                                2*edgePadding[1]];
+          case 4:
+            // top, right, bottom, left
+            this.edgePadding = [edgePadding[0],
+                                edgePadding[3], // we want the `left` entry internally, not the `right`.
                                 edgePadding[0] + edgePadding[2],
                                 edgePadding[1] + edgePadding[3]];
             break;
           default:
-            throw new Error("Invalid parameter - must be an array of type `number` with length 1, 2, or 4.");
+            throw new Error("Invalid parameter - must be an array of type `number` with length from 1 to 4.");
         }
       }
     }
