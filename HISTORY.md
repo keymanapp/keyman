@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.23 alpha 2022-06-29
+
+* fix(web): clears repeating bksp on keyboard reload  ️ (#6786)
+* fix(web): null-guard for refreshLayout (#6854)
+
 ## 16.0.22 alpha 2022-06-28
 
 * fix(ios): eliminates conditional height for banner image (#6855)
