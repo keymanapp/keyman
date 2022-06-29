@@ -1778,6 +1778,19 @@ namespace com.keyman.osk {
       if(this.inputEngine) {
         this.inputEngine.unregisterEventHandlers();
       }
+
+      if(this.deleting) {
+        window.clearTimeout(this.deleting);
+        this.deleting = 0;
+      }
+
+      this.keyPending = null;
+      this.touchPending = null;
+
+      this.keytip?.show(null, false, this);
+      this.subkeyGesture?.clear();
+      this.pendingMultiTap?.cancel();
+      this.pendingSubkey?.cancel();
     }
   }
 }
