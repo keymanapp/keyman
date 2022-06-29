@@ -92,6 +92,7 @@ final class KMKeyboard extends WebView {
   public PopupWindow subKeysWindow = null;
   public PopupWindow keyPreviewWindow = null;
   public PopupWindow helpBubbleWindow = null;
+  public float[] helpBubblePos = null;
 
   public ArrayList<HashMap<String, String>> subKeysList = null;
   public String[] subKeysWindowPos = {"0", "0"};
@@ -1321,8 +1322,28 @@ final class KMKeyboard extends WebView {
       @Override
       public void onDismiss() {
         helpBubbleWindow = null;
+        helpBubblePos = null;
       }
     });
+
+    helpBubblePos = new float[]{px, py};
+
+    helpBubbleWindow.setAnimationStyle(R.style.PopupAnim);
+    if (getWindowToken() != null) {
+      this.repositionHelpBubble();
+    } else {
+      helpBubbleWindow = null;
+      ShouldShowHelpBubble = true;
+    }
+  }
+
+  protected void repositionHelpBubble() {
+    if(helpBubbleWindow == null || helpBubblePos == null) {
+      return;
+    }
+
+    float px = helpBubblePos[0];
+    float py = helpBubblePos[1];
 
     int posX, posY;
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
@@ -1337,13 +1358,26 @@ final class KMKeyboard extends WebView {
       posY = kbPos[1] + (int) py;
     }
 
-    helpBubbleWindow.setAnimationStyle(R.style.PopupAnim);
-    if (getWindowToken() != null) {
-      helpBubbleWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
-    } else {
-      helpBubbleWindow = null;
-      ShouldShowHelpBubble = true;
-    }
+    helpBubbleWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
+  }
+
+  // This is called by KMManager to control the keyboard's size - and particularly, its height.
+  // If swapping a keyboard changes the keyboard's height (enable/disable the banner), this can
+  // cause the new position of the help bubble to be wrong.
+  @Override public void setLayoutParams(ViewGroup.LayoutParams params) {
+    super.setLayoutParams(params);
+    Log.i("HELLO", "World");
+
+    Handler handler = new Handler();
+    handler.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        if(helpBubbleWindow != null) {
+          // Update positioning!  Addresses #6734.
+          repositionHelpBubble();
+        }
+      }
+    }, 10);
   }
 
   protected boolean dismissHelpBubble() {
