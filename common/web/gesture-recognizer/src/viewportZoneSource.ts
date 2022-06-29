@@ -4,10 +4,10 @@ namespace com.keyman.osk {
   export class ViewportZoneSource implements RecognitionZoneSource {
 
     /**
-     * [0]: x (left)
-     * [1]: y (top)
-     * [2]: width (left+right)
-     * [3]: height (top+bottom)
+     * [0]: y (top)
+     * [1]: x (left)
+     * [2]: height (top+bottom)
+     * [3]: width (left+right)
      */
     readonly edgePadding: number[];
 
@@ -26,9 +26,9 @@ namespace com.keyman.osk {
             this.edgePadding = [val, val, 2 * val, 2 * val];
             break;
           case 2:
-            const xVal = edgePadding[0];
-            const yVal = edgePadding[1];
-            this.edgePadding = [xVal, yVal, 2 * xVal, 2 * yVal];
+            const yVal = edgePadding[0];
+            const xVal = edgePadding[1];
+            this.edgePadding = [yVal, xVal, 2 * yVal, 2 * xVal];
             break;
           case 4:
             this.edgePadding = [edgePadding[0],
@@ -48,10 +48,10 @@ namespace com.keyman.osk {
       const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
       return DOMRect.fromRect({
-        x: this.edgePadding[0],
-        y: this.edgePadding[1],
-        width:  vw - this.edgePadding[2],
-        height: vh - this.edgePadding[3]
+        y: this.edgePadding[0],
+        x: this.edgePadding[1],
+        height: vh - this.edgePadding[2],
+        width:  vw - this.edgePadding[3]
       });
     }
   }

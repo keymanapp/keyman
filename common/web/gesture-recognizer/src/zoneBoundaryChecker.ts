@@ -3,10 +3,10 @@ namespace com.keyman.osk {
     // This class exists for static methods & fields.
     private constructor() { }
 
-    public static readonly FAR_LEFT:   0x0008 = 0x0008;
-    public static readonly FAR_RIGHT:  0x0004 = 0x0004;
-    public static readonly FAR_TOP:    0x0002 = 0x0002;
-    public static readonly FAR_BOTTOM: 0x0001 = 0x0001;
+    public static readonly FAR_TOP   : 0x0008 = 0x0008;
+    public static readonly FAR_LEFT  : 0x0004 = 0x0004;
+    public static readonly FAR_BOTTOM: 0x0002 = 0x0002;
+    public static readonly FAR_RIGHT : 0x0001 = 0x0001;
 
     /**
      * Determines the relationship of an input coordinate to one of the gesture engine's

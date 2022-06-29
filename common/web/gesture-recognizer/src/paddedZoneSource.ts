@@ -4,10 +4,10 @@ namespace com.keyman.osk {
     private readonly root: RecognitionZoneSource;
 
     /**
-     * [0]: x (left)
-     * [1]: y (top)
-     * [2]: width (left+right)
-     * [3]: height (top+bottom)
+     * [0]: y (top)
+     * [1]: x (left)
+     * [2]: height (top+bottom)
+     * [3]: width (left+right)
      */
     private edgePadding: number[];
 
@@ -29,9 +29,9 @@ namespace com.keyman.osk {
             this.edgePadding = [val, val, 2 * val, 2 * val];
             break;
           case 2:
-            const xVal = edgePadding[0];
-            const yVal = edgePadding[1];
-            this.edgePadding = [xVal, yVal, 2 * xVal, 2 * yVal];
+            const yVal = edgePadding[0];
+            const xVal = edgePadding[1];
+            this.edgePadding = [yVal, xVal, 2 * yVal, 2 * xVal];
             break;
           case 4:
             this.edgePadding = [edgePadding[0],
@@ -49,10 +49,10 @@ namespace com.keyman.osk {
       const rootZone = this.root.getBoundingClientRect();
 
       return DOMRect.fromRect({
-        x: rootZone.x + this.edgePadding[0],
-        y: rootZone.y + this.edgePadding[1],
-        width: rootZone.width   - this.edgePadding[2],
-        height: rootZone.height - this.edgePadding[3]
+        y: rootZone.y + this.edgePadding[0],
+        x: rootZone.x + this.edgePadding[1],
+        height: rootZone.height - this.edgePadding[2],
+        width: rootZone.width   - this.edgePadding[3]
       });
     }
   }
