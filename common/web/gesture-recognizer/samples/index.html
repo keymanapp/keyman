@@ -1,0 +1,116 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {
+        font-family: Tahoma,helvetica;
+        background-color: dimgray;
+      }
+      /* h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px} */
+
+      .center {
+        margin: auto;
+        min-width: 50%;
+        max-width: 90%;
+        min-height: 90%;
+        background-color: white;
+        border: 2px solid black;
+        padding: 10px;
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      #main-ux {
+        margin:    auto;
+        max-width: fit-content;
+      }
+
+      #menu-container {
+        padding: 10px;
+        min-width: 160px;
+      }
+
+      .legend {
+        margin: auto;
+        max-width: fit-content;
+      }
+
+      .legend div {
+        margin: 2px;
+      }
+
+      .legend .block {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        margin: 0px;
+      }
+
+      .legend p {
+        position: relative;
+        bottom: 2px;
+        display: inline-block;
+        padding-left: 4px;
+        margin: 0px;
+      }
+
+      @media only screen and (max-width: 500px) {
+        .flex {
+          flex-direction: column;
+        }
+      }
+    </style>
+
+    <link rel="stylesheet" href="gestureHost.css">
+
+    <script src="../build/index.js"></script>
+
+    <title>Gesture Recognizer - Demo Host Page</title>
+  </head>
+  <body>
+    <div class="center">
+      <p>
+        <h2 style="text-align:center">Gesture Recognizer - Demo Host Page</h2>
+      </p>
+      <p>
+        The area below represents a simulated page with its corresponding screen, page, and gesture-reception area.
+      </p><p>
+        Click or touch anywhere within the beige area to test gesture-recognizer behavior.
+      </p>
+
+      <!-- CSS classes for demo configuration should only be applied here, to `demoContainer`. -->
+      <div id="main-ux" class="flex">
+        <div id="demoContainer" class="screen1 bounds2">
+          <div class="faux-screen">
+            <div class="faux-screen-border"></div>
+            <div id="faux-page">
+              <div class="main-receiver">
+                <div id="roaming-bounds"></div>
+              </div>
+            </div>
+          </div>
+          <p></p>
+          <!-- end main demo section, start legend re: demo's coloration -->
+          <div class="legend">
+            <div><div class="block bounds-color"></div><p> - represents screen boundaries</p></div>
+            <div><div class="block receiver-color"></div><p> - the primary gesture receiver</p></div>
+            <div><div class="block roaming-color"></div><p> - permitted "roaming" zone</p></div>
+          </div>
+        </div>
+        <!-- end `demoContainer` -->
+        <div id="menu-container">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+.bounds-color {
+  background-color: black;
+}
+
+.receiver-color {
+  background-color: beige;
+}
+
+.roaming-color {
+  background-color: lightblue;
+}
+
+#demoContainer {
+  max-width: fit-content;
+  max-height: fit-content;
+}
+
+#demoContainer.screen4.bounds1 {
+  padding: 20px 0px 0px 0px;
+}
+
+#demoContainer.screen4.bounds2 {
+  padding: 30px 10px 0px 10px;
+}
+
+.faux-screen {
+  margin: auto;
+  max-width: fit-content;
+  max-height: fit-content;
+  background-color: black;
+  border: 4px solid black;
+  position: relative;
+}
+
+.faux-screen-border {
+  border: 4px solid black;
+  position: absolute;
+  margin: -4px;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+#faux-page {
+  margin: auto;
+  background-color: white;
+  max-width: fit-content;
+  max-height: fit-content;
+  overflow: visible;
+  position: relative;
+  z-index: 2
+}
+
+.screen1 #faux-page {
+  padding: 100px 2px 4px 20px;
+}
+
+.screen2 #faux-page {
+  padding: 180px 0px 0px 0px;
+}
+
+.screen3 #faux-page {
+  padding: 120px 20px 40px 20px;
+}
+
+.screen4 #faux-page {
+  padding: 0px;
+}
+
+.main-receiver {
+  margin: auto;
+  width:  240px;
+  height: 180px;
+  background-color: beige;
+  position: relative;
+  z-index: initial; /* resets z-index stacking, allowing the child "roaming-bounds" to be placed behind it */
+}
+
+#roaming-bounds {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: lightblue;
+}
+
+.bounds1 #roaming-bounds {
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 112.5%;
+}
+
+.bounds2 #roaming-bounds {
+  bottom: 0px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 30px);
+}
