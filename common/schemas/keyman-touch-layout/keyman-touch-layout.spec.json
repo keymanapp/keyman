@@ -1,6 +1,8 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "$ref": "#/definitions/touch-layout",
+  "$comment": "Version: 15.0",
+  "description": "A Keyman Touch Layout file, per version 15.0, loose specification that allows for legacy such as numbers as strings",
 
   "definitions": {
     "touch-layout": {
