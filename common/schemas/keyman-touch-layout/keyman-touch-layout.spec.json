@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "$ref": "#/definitions/touch-layout",
-  "$comment": "Version: 15.0",
-  "description": "A Keyman Touch Layout file, per version 15.0, loose specification that allows for legacy such as numbers as strings",
+  "$comment": "Version: 16.0",
+  "description": "A Keyman Touch Layout file, per version 16.0, loose specification that allows for legacy such as numbers as strings",
 
   "definitions": {
     "touch-layout": {
@@ -93,7 +93,9 @@
         "sp": { "$ref" : "#/definitions/numeric" },
         "pad": { "$ref" : "#/definitions/numeric" },
         "width": { "$ref" : "#/definitions/numeric" },
-        "sk": { "$ref": "#/definitions/subkeys" }
+        "sk": { "$ref": "#/definitions/subkeys" },
+        "flick": { "$ref": "#/definitions/flick" },
+        "multitap": { "$ref": "#/definitions/subkeys" }
       },
       "additionalProperties": false
     },
@@ -130,6 +132,14 @@
         "dk": { "type": "string" }
       },
       "required": ["id"],
+      "additionalProperties": false
+    },
+
+    "flick": {
+      "type": "object",
+      "patternProperties": {
+        "^(n|s|e|w|ne|nw|se|sw)$": { "$ref": "#/definitions/subkey" }
+      },
       "additionalProperties": false
     },
 
