@@ -23,7 +23,19 @@ window.addEventListener('load', function(ev) {
   }
 
   for(entry of receiverGroup) {
-    entry.addEventListener('change', updateConfig);
+    if(entry.value == 'full') {
+      entry.addEventListener('change', function() {
+        let topRange = document.getElementById('topOnlyRadio');
+        topRange.checked = 'checked';
+        updateConfig();
+      });
+    } else { // Popup will be the 'default' case - we may want to test multiple 'popup' configs.
+      entry.addEventListener('change', function() {
+        let popupRange = document.getElementById('popupRadio');
+        popupRange.checked = 'checked';
+        updateConfig();
+      });
+    }
   }
 
   updateConfig();
