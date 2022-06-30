@@ -8,89 +8,29 @@
     <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
 
-    <!-- Your page CSS -->
-    <style type='text/css'>
-      body {
-        font-family: Tahoma,helvetica;
-        background-color: dimgray;
-      }
-      /* h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px} */
-
-      .center {
-        margin: auto;
-        min-width: 50%;
-        max-width: 90%;
-        min-height: 90%;
-        background-color: white;
-        border: 2px solid black;
-        padding: 10px;
-      }
-
-      .flex {
-        display: flex;
-      }
-
-      #main-ux {
-        margin:    auto;
-        max-width: fit-content;
-      }
-
-      #menu-container {
-        padding: 10px;
-        min-width: 160px;
-      }
-
-      .legend {
-        margin: auto;
-        max-width: fit-content;
-      }
-
-      .legend div {
-        margin: 2px;
-      }
-
-      .legend .block {
-        display: inline-block;
-        width: 1em;
-        height: 1em;
-        margin: 0px;
-      }
-
-      .legend p {
-        position: relative;
-        bottom: 2px;
-        display: inline-block;
-        padding-left: 4px;
-        margin: 0px;
-      }
-
-      @media only screen and (max-width: 500px) {
-        .flex {
-          flex-direction: column;
-        }
-      }
-    </style>
-
+    <link rel="stylesheet" href="pageStyle.css">
     <link rel="stylesheet" href="gestureHost.css">
 
     <script src="../build/index.js"></script>
+    <script src="hostConfiguration.js"></script>
 
     <title>Gesture Recognizer - Demo Host Page</title>
   </head>
   <body>
-    <div class="center">
-      <p>
+    <div class="main">
+      <p class="center">
         <h2 style="text-align:center">Gesture Recognizer - Demo Host Page</h2>
       </p>
-      <p>
+      <p class="center">
         The area below represents a simulated page with its corresponding screen, page, and gesture-reception area.
-      </p><p>
+      </p>
+      <p class="center">
         Click or touch anywhere within the beige area to test gesture-recognizer behavior.
       </p>
 
       <!-- CSS classes for demo configuration should only be applied here, to `demoContainer`. -->
       <div id="main-ux" class="flex">
-        <div id="demoContainer" class="screen1 bounds2">
+        <div id="demo-container" class="screen2 bounds1">
           <div class="faux-screen">
             <div class="faux-screen-border"></div>
             <div id="faux-page">
@@ -109,6 +49,21 @@
         </div>
         <!-- end `demoContainer` -->
         <div id="menu-container">
+          <form name="config">
+            <fieldset>
+              <h4 class="radio-header">Screen & Layout Style</h4>
+              <label class="block"><input type="radio" value="screen2" name="screen" checked="checked">Mobile-device keyboard</label>
+              <label class="block"><input type="radio" value="screen4" name="screen">WebView-embedded emulation</label>
+              <label class="block"><input type="radio" value="screen3" name="screen">Mid-page floater</label>
+              <label class="block"><input type="radio" value="screen1" name="screen">Loosely bottom-right aligned</label>
+            </fieldset>
+            <fieldset>
+              <h4 class="radio-header">Legal Roaming Behavior</h4>
+              <label class="block"><input type="radio" value="bounds1" name="bounds" checked="checked">Top-overflow only</label>
+              <label class="block"><input type="radio" value="bounds2" name="bounds">Loose omni-directional</label>
+              <label class="block"><input type="radio" value="bounds3" name="bounds">None</label>
+            </fieldset>
+          </form>
         </div>
       </div>
     </div>

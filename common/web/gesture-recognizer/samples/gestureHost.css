@@ -10,16 +10,16 @@
   background-color: lightblue;
 }
 
-#demoContainer {
+#demo-container {
   max-width: fit-content;
   max-height: fit-content;
 }
 
-#demoContainer.screen4.bounds1 {
+#demo-container.screen4.bounds1 {
   padding: 20px 0px 0px 0px;
 }
 
-#demoContainer.screen4.bounds2 {
+#demo-container.screen4.bounds2 {
   padding: 30px 10px 0px 10px;
 }
 
@@ -94,8 +94,13 @@
 }
 
 .bounds2 #roaming-bounds {
-  bottom: 0px;
+  bottom: -10px;
   left: -10px;
   width: calc(100% + 20px);
-  height: calc(100% + 30px);
+  height: calc(100% + 40px);
+}
+
+.bounds3 #roaming-bounds {
+  width:  0%;
+  height: 0%;
 }
