@@ -69,6 +69,31 @@ p.center {
   display: block;
 }
 
+.radio-header {
+  margin-top: 0px;
+  margin-bottom: 4px;
+}
+
+#logging-zone {
+  padding-top: 10px;
+  max-width: 85%;
+  margin: auto;
+}
+
+#logging-host {
+  flex: 2;
+}
+
+#logging-controls {
+  padding-left: 10px;
+  flex: 1;
+}
+
+#event-log {
+  width: 100%;
+}
+
+
 @media only screen and (max-width: 500px) {
   .flex {
     flex-direction: column;
@@ -83,9 +108,9 @@ p.center {
     margin: auto;
     padding-top: 10px;
   }
-}
 
-.radio-header {
-  margin-top: 0px;
-  margin-bottom: 4px;
+  #logging-controls {
+    padding-left: unset;
+    padding-top: 10px;
+  }
 }

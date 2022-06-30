@@ -28,9 +28,10 @@
         Click or touch anywhere within the beige area to test gesture-recognizer behavior.
       </p>
 
-      <!-- CSS classes for demo configuration should only be applied here, to `demoContainer`. -->
+      <!-- Start the self-adjusting layout region -->
       <div id="main-ux" class="flex">
         <div id="demo-and-legend">
+          <!-- CSS classes for demo configuration should only be applied here, to `demoContainer`. -->
           <div id="demo-container" class="screen2 bounds1">
             <div class="faux-screen">
               <div class="faux-screen-border"></div>
@@ -75,6 +76,16 @@
               <label class="block"><input type="radio" value="popup" name="receiver">Subkey menu (right-aligned)</label>
             </fieldset>
           </form>
+        </div>
+      </div>
+      <!-- End the self-adjusting layout region -->
+      <hr>
+      <div id="logging-zone" class="flex">
+        <div id="logging-host">
+          <textarea id="event-log" readonly rows="6"></textarea>
+        </div>
+        <div id="logging-controls">
+          <input type="button" value="Reset logs">
         </div>
       </div>
     </div>
