@@ -1251,6 +1251,11 @@ final class KMKeyboard extends WebView {
 
   @SuppressLint("InflateParams")
   protected void showHelpBubble(Context context, float fx, float fy) {
+    // Remove any leftover artifacts from previous help-bubbles.  If we've made it this far,
+    // we're building the new one (should it be shown) from scratch anyway.
+    dismissHelpBubble();
+    helpBubbleWindow = null;
+
     if (!isHelpBubbleEnabled || keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       return; // Help bubble is disabled for System-wide keyboard
     }
@@ -1274,7 +1279,6 @@ final class KMKeyboard extends WebView {
     // We can't properly display the help bubble if this token is null.  Abort and try again
     // next time.
     if (getWindowToken() == null) {
-      helpBubbleWindow = null;
       ShouldShowHelpBubble = true;
       return;
     }
@@ -1323,7 +1327,6 @@ final class KMKeyboard extends WebView {
 
     popoverView.redraw();
 
-    dismissHelpBubble();
     helpBubbleWindow = new PopupWindow(contentView, (int) pvWidth, (int) pvHeight, false);
     helpBubbleWindow.setTouchable(true);
     helpBubbleWindow.setOnDismissListener(new OnDismissListener() {
