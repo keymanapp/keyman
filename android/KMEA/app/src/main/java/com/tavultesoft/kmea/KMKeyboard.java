@@ -1271,6 +1271,14 @@ final class KMKeyboard extends WebView {
       }
     }
 
+    // We can't properly display the help bubble if this token is null.  Abort and try again
+    // next time.
+    if (getWindowToken() == null) {
+      helpBubbleWindow = null;
+      ShouldShowHelpBubble = true;
+      return;
+    }
+
     WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
     DisplayMetrics metrics = new DisplayMetrics();
     wm.getDefaultDisplay().getMetrics(metrics);
@@ -1329,12 +1337,7 @@ final class KMKeyboard extends WebView {
     helpBubblePos = new float[]{px, py};
 
     helpBubbleWindow.setAnimationStyle(R.style.PopupAnim);
-    if (getWindowToken() != null) {
-      this.repositionHelpBubble();
-    } else {
-      helpBubbleWindow = null;
-      ShouldShowHelpBubble = true;
-    }
+    this.repositionHelpBubble();
   }
 
   protected void repositionHelpBubble() {
