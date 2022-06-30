@@ -10,17 +10,33 @@
   background-color: lightblue;
 }
 
+.shim-color {
+  background-color: lightgray;
+}
+
 #demo-container {
   max-width: fit-content;
   max-height: fit-content;
 }
 
-#demo-container.screen4.bounds1 {
+#demo-container.screen4.bounds1.full {
   padding: 20px 0px 0px 0px;
 }
 
-#demo-container.screen4.bounds2 {
+#demo-container.screen4.bounds2.full {
   padding: 30px 10px 0px 10px;
+}
+
+#demo-container.bounds4.full {
+  padding: 0px 0px 45px 0px;
+}
+
+#demo-container.screen3.bounds4.full {
+  padding: 0px;
+}
+
+#demo-container.screen4.bounds4.full {
+  padding: 25px 0px 45px 0px;
 }
 
 .faux-screen {
@@ -67,13 +83,39 @@
   padding: 0px;
 }
 
-.main-receiver {
+.receiver-host {
   margin: auto;
   width:  240px;
   height: 180px;
-  background-color: beige;
   position: relative;
   z-index: initial; /* resets z-index stacking, allowing the child "roaming-bounds" to be placed behind it */
+}
+
+.main-receiver { /* is the full ".full" definition */
+  width:  100%;
+  height: 100%;
+  background-color: beige;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+}
+
+.popup .main-receiver {
+  width: 160px;
+  height: 45px;
+  right: 0px;
+  bottom: 90px;
+  top: unset;
+}
+
+#simmed-shim {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background-color: lightgray;
 }
 
 #roaming-bounds {
@@ -90,7 +132,7 @@
   bottom: 0px;
   left: 0px;
   width: 100%;
-  height: 112.5%;
+  height: calc(100% + 25px);
 }
 
 .bounds2 #roaming-bounds {
@@ -103,4 +145,11 @@
 .bounds3 #roaming-bounds {
   width:  0%;
   height: 0%;
+}
+
+.bounds4 #roaming-bounds {
+  bottom: -45px;
+  left: -25px;
+  width: calc(100% + 50px);
+  height: calc(100% + 70px);
 }
