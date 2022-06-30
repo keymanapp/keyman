@@ -1366,16 +1366,14 @@ final class KMKeyboard extends WebView {
   // cause the new position of the help bubble to be wrong.
   @Override public void setLayoutParams(ViewGroup.LayoutParams params) {
     super.setLayoutParams(params);
-    Log.i("HELLO", "World");
 
     Handler handler = new Handler();
     handler.postDelayed(new Runnable() {
       @Override
       public void run() {
-        if(helpBubbleWindow != null) {
-          // Update positioning!  Addresses #6734.
-          repositionHelpBubble();
-        }
+        // #6734 - help bubble position may need update after keyboard relayout
+        // This (`protected`) function does/should do any needed null checks on our behalf.
+        repositionHelpBubble();
       }
     }, 10);
   }
