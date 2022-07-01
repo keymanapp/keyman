@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 15.0.264 stable 2022-07-01
+
+* fix(ios): eliminates conditional height for banner image (#6857)
+* fix(web): clears repeating bksp on keyboard reload  ️ (#6863)
+* fix(web): better stability during transient OSK load state (#6861)
+* fix(developer): readonly groups should never emit output (#6873)
+* fix(web): Maintain separate Caps Lock states for touch and physical (#6874)
+
 ## 15.0.263 stable 2022-06-24
 
 * chore(ios): add manageAppVersionAndBuildNumber=false (#6837)
