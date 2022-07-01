@@ -16,7 +16,11 @@
                 <link rel='stylesheet' type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.css</xsl:attribute></link>
                 <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-1.10.2.js</xsl:attribute></script>
                 <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui.js</xsl:attribute></script>
-                <script>var KVKL = <xsl:value-of select='/TouchLayoutBuilder/LayoutJS' />;</script>
+  <script>
+    var KVKL = <xsl:value-of select='/TouchLayoutBuilder/LayoutJS' />;
+    window.builder = {};
+  </script>
+  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>constants.js</xsl:attribute></script>
                 <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.js</xsl:attribute></script>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>undo.js</xsl:attribute></script>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>platform-controls.js</xsl:attribute></script>
