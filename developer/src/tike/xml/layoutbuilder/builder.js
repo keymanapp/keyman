@@ -8,8 +8,6 @@ $(function() {
     }
   })(location.search);
 
-  this.undoStack = [];
-  this.redoStack = [];
   this.xscale = 1;
   this.yscale = 1;
   this.uniqId = 1;
@@ -1061,62 +1059,6 @@ $(function() {
     }
   }
 
-  this.undo = function () {
-    if (builder.undoStack.length == 0) {
-      return;
-    }
-    builder.saveUndo(1);
-    var s = builder.undoStack.pop();
-    this.loadUndo(s);
-  }
-
-  this.redo = function () {
-    if (builder.redoStack.length == 0) {
-      return;
-    }
-    builder.saveUndo(2);
-    var s = builder.redoStack.pop();
-    this.loadUndo(s);
-  }
-
-  this.loadUndo = function (s) {
-    KVKL = JSON.parse(s.KVKL);
-
-    builder.preparePlatforms();
-    builder.enableUndoControls();
-
-    $('#selPlatform').val(s.platform);
-    builder.selectPlatform();
-    $('#selLayer').val(s.layer);
-    builder.selectLayer();
-    builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.id; }).first());
-    if (s.subkey) builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === s.subkey; }).first());
-  }
-
-  this.saveUndo = function (saveToRedo) {
-    if (!saveToRedo) {
-      builder.redoStack = [];
-    }
-    builder.generate(true,false);
-    var s = {
-      KVKL: JSON.stringify(KVKL),
-      platform: builder.lastPlatform,
-      layer: builder.lastLayerIndex,
-      key: builder.selectedKey().data('id')
-    };
-    var key = builder.selectedSubKey();
-    if (key.length > 0) {
-      s.subkey = $(key).data('id');
-    }
-
-    var stack = (saveToRedo == 1 ? builder.redoStack : builder.undoStack);
-    stack.push(s);
-    if (stack.length > 100) {
-      stack.shift();
-    }
-    builder.enableUndoControls();
-    builder.command('modified');
-  }
 
   this.commands = [];
 
@@ -1136,23 +1078,6 @@ $(function() {
       }, 10);
     }
     builder.commands.push(cmd);
-  }
-
-  this.enableUndoControls = function () {
-    if (builder.undoStack.length == 0) {
-      builder.command('undo-disable');
-      $('#btnUndo').attr('disabled', 'disabled');
-    } else {
-      builder.command('undo-enable');
-      $('#btnUndo').removeAttr('disabled');
-    }
-    if (builder.redoStack.length == 0) {
-      builder.command('redo-disable');
-      $('#btnRedo').attr('disabled', 'disabled');
-    } else {
-      builder.command('redo-enable');
-      $('#btnRedo').removeAttr('disabled');
-    }
   }
 
   this.addRow = function (position) {
@@ -1913,14 +1838,6 @@ $(function() {
     builder.lastFocus = this;
   });
 
-  $('#btnUndo').click(function () {
-    builder.undo();
-  });
-
-  $('#btnRedo').click(function () {
-    builder.redo();
-  });
-
   $('#btnTemplate').click(function () {
     builder.command('template');
   });
@@ -2048,8 +1965,12 @@ $(function() {
     }
   };
 
-  builder.preparePlatforms();
-  builder.enableUndoControls();
-
-  builder.loadState();
 }.bind(builder));
+
+function initBuilder() {
+  $(function() {
+    builder.preparePlatforms();
+    builder.enableUndoControls();
+    builder.loadState();
+  });
+}

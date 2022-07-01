@@ -18,16 +18,13 @@
                 <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui.js</xsl:attribute></script>
                 <script>var KVKL = <xsl:value-of select='/TouchLayoutBuilder/LayoutJS' />;</script>
                 <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.js</xsl:attribute></script>
+  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>undo.js</xsl:attribute></script>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>platform-controls.js</xsl:attribute></script>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>layer-controls.js</xsl:attribute></script>
                 <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder-charmap.js</xsl:attribute></script>
+  <script>initBuilder();</script>
             </head>
             <body>
-              <div id="wedgeAddRowAbove" class="kcontrol wedge-horz"><span>+</span></div>
-              <div id="wedgeAddRowBelow" class="kcontrol wedge-horz"><span>+</span></div>
-              <div id="wedgeAddKeyLeft" class="kcontrol wedge-vert"><span>+</span></div>
-              <div id="wedgeAddKeyRight" class="kcontrol wedge-vert"><span>+</span></div>
-              <div id="btnDelKey">x</div>
 
               <div id='toolbar'>
                     <div id='controlToolbar'>
