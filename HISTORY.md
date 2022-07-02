@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.24 alpha 2022-07-02
+
+* fix(common): trigger builds correctly for stable builds (#6847)
+* fix(windows): show full version number (#6867)
+
 ## 16.0.23 alpha 2022-06-29
 
 * fix(web): clears repeating bksp on keyboard reload  ️ (#6786)
