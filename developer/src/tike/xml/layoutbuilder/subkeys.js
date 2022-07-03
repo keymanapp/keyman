@@ -4,59 +4,72 @@ $(function() {
   // Popup keys
   //
 
-  this.addSubKeyArray = function () {
-    var key = builder.selectedKey();
-    if ($(key).data('sk')) return;
-    var sk = [{ id: 'T_new_' + builder.uniqId}];
-    builder.uniqId++;
-    $(key).data('sk', sk);
-    builder.prepareKey();
-  }
-
-  this.delSubKeyArray = function () {
-    var key = builder.selectedKey();
-    $(key).removeData('sk');
-    builder.prepareKey();
-    builder.selectSubKey(null);
-    builder.enableSubKeyControls();
+  this.delSubKeyArray = function (type) {
   }
 
   this.delSelectedSubKey = function () {
-    var key = builder.selectedSubKey();
+    let key = builder.selectedSubKey();
     if (key.length == 0) return;
-    var nextKey = $(key).next('.key');
+    let nextKey = $(key).next('.key');
     if (nextKey.length == 0) nextKey = $(key).prev('.key');
-    if (nextKey.length == 0) return;
+    if (nextKey.length == 0) {
+      $(builder.selectedKey()).removeData($(key).data('type'));
+      builder.prepareKey();
+      builder.selectSubKey(null);
+      builder.enableSubKeyControls();
+      builder.enableKeyControls();
+      return;
+    }
     $(key).remove();
     builder.selectSubKey(nextKey);
+    builder.generateSubKeys();
+    builder.addKeyAnnotations(builder.selectedKey());
   };
 
   this.selectedSubKey = function () {
-    return $('#sk .selected');
+    return $('#sub-key-groups .selected');
   };
 
   this.generateSubKeys = function () {
-    var key = builder.selectedKey();
-    var sk = [];
-    var keys = $('#sk > div.key').filter(':not(.ui-draggable-dragging)');
-    for (var i = 0; i < keys.length; i++) {
-      sk.push({
-        text: $(keys[i]).data('text'),
-        id: $(keys[i]).data('id'),
-        sp: $(keys[i]).data('sp'),
-        font: $(keys[i]).data('font'),
-        fontsize: $(keys[i]).data('fontsize'),
-        nextlayer: $(keys[i]).data('nextlayer'),
-        layer: $(keys[i]).data('layer')
-      });
+
+    function generateItems(parent) {
+      let keys = $(parent+' > div.key').filter(':not(.ui-draggable-dragging)').get();
+      let items = [];
+      for (let key of keys) {
+        items.push({
+          text: $(key).data('text'),
+          id: $(key).data('id'),
+          sp: $(key).data('sp'),
+          font: $(key).data('font'),
+          fontsize: $(key).data('fontsize'),
+          nextlayer: $(key).data('nextlayer'),
+          layer: $(key).data('layer'),
+          direction: $(key).data('direction')
+        });
+      }
+      return items;
     }
-    key.data('sk', sk);
+
+    let key = builder.selectedKey();
+    key.data('longpress', generateItems('#longpress'));
+    key.data('flick', generateItems('#flick'));
+    key.data('multitap', generateItems('#multitap'));
   }
 
   this.prepareSubKey = function () {
     var key = builder.selectedSubKey();
 
-    $('#inpSubKeyCap').val($(key).data('text'));
+    let type = $(key).data('type'), gestureType = '';
+    switch(type) {
+      case 'flick': gestureType = 'Flick ('+$(key).data('direction').toUpperCase()+')'; break;
+      case 'longpress': gestureType = 'Longpress'; break;
+      case 'multitap': gestureType = 'Multitap'; break;
+    }
+
+    $('#inpSubKeyGestureType').val(gestureType);
+    let val = $(key).data('text');
+    $('#inpSubKeyCap').val(val);
+    $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
     $('#inpSubKeyName').val($(key).data('id'));
     $('#selSubKeyType').val($(key).data('sp') ? $(key).data('sp') : 0);
     $('#selSubKeyNextLayer').val($(key).data('nextlayer'));
@@ -77,37 +90,59 @@ $(function() {
     .autocomplete({
       source: builder.lookupKeyNames,
       change: subKeyNameChange,
-      select: wrapInstant(subKeyNameChange)
+      select: builder.wrapInstant(subKeyNameChange)
     }).blur(function () {
       builder.hasSavedKeyUndo = false;
     });
 
-  builder.updateSubKeyCap = function (val) {
+
+  const inpSubKeyCapChange = builder.wrapChange(function () {
     var k = builder.selectedSubKey();
     if (k.length == 0) return;
+    let val = $(this).val();
     $('.text', k).text(builder.renameSpecialKey(val));
     k.data('text', val);
+    $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
 
     builder.updateCharacterMap(val, true);
     builder.generateSubKeys();
-  };
+  }, {saveOnce: true});
 
-  const inpSubKeyCapChange = builder.wrapChange(function () {
-    builder.updateSubKeyCap($(this).val());
+  const inpSubKeyCapUnicodeChange = builder.wrapChange(function () {
+    var k = builder.selectedSubKey();
+    if (k.length == 0) return;
+    const val = builder.fromUnicodeString($(this).val());
+    $('.text', k).text(builder.renameSpecialKey(val));
+    k.data('text', val);
+    $('#inpSubKeyCap').val(val);
+
+    builder.updateCharacterMap(val, true);
+    builder.generateSubKeys();
   }, {saveOnce: true});
 
   $('#inpSubKeyCap')
     .change(inpSubKeyCapChange)
-    .autocomplete({
+    /*.autocomplete({
       source: builder.specialKeyNames,
       change: inpSubKeyCapChange,
-      select: wrapInstant(inpSubKeyCapChange)
-    })
+      select: builder.wrapInstant(inpSubKeyCapChange)
+    })*/
     .on('input', inpSubKeyCapChange)
     .mouseup(function () {
       builder.updateCharacterMap($(this).val(), false);
     }).focus(function () {
       builder.updateCharacterMap($(this).val(), false);
+    }).blur(function () {
+      builder.hasSavedSubKeyUndo = false;
+    });
+
+  $('#inpSubKeyCapUnicode')
+    .change(inpSubKeyCapUnicodeChange)
+    .on('input', inpSubKeyCapUnicodeChange)
+    .mouseup(function () {
+      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
+    }).focus(function () {
+      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
     }).blur(function () {
       builder.hasSavedSubKeyUndo = false;
     });
@@ -131,19 +166,21 @@ $(function() {
 
   $('#selSubKeyLayerOverride').change(selSubKeyLayerOverrideChange);
 
-  $('#wedgeAddSubKeyLeft').click(builder.wrapChange(function () {
-    builder.selectSubKey(builder.addKey('before-subkey', true));
+  $('#wedgeAddSubKeyLeft').click(builder.wrapChange(function (event) {
+    event.stopPropagation();
+    builder.selectSubKey(builder.addKey(builder.selectedSubKey().data('type'), 'before-subkey', true));
     builder.generateSubKeys();
   }));
 
-  $('#wedgeAddSubKeyRight').click(builder.wrapChange(function () {
-    builder.selectSubKey(builder.addKey('after-subkey', true));
+  $('#wedgeAddSubKeyRight').click(builder.wrapChange(function (event) {
+    event.stopPropagation();
+    builder.selectSubKey(builder.addKey(builder.selectedSubKey().data('type'), 'after-subkey', true));
     builder.generateSubKeys();
   }));
 
-  $('#btnDelSubKey').click(builder.wrapChange(function () {
+  $('#btnDelSubKey').click(builder.wrapChange(function (event) {
+    event.stopPropagation();
     builder.delSelectedSubKey();
-    builder.generateSubKeys();
   }));
 
   const selSubKeyTypeChange = builder.wrapChange(function () {
@@ -160,35 +197,61 @@ $(function() {
 
   $('#selSubKeyType').change(selSubKeyTypeChange);
 
-  $('#btnAddSubKeyArray').click(builder.wrapChange(function () {
-    builder.addSubKeyArray();
-    builder.selectSubKey($('#sk > div')[0]);
-    if (builder.lastFocus) builder.lastFocus.focus();
-    builder.enableKeyControls();
+  $('.btn-add-flick').click(builder.wrapChange(function (event) {
+    event.stopPropagation();
+    const key = builder.addKey('flick', '#flick');
+    const direction = event.target.id.substring(6);  // delete 'flick-' from start of id
+    $(key).data('direction', direction).addClass('flick-'+direction);
+    builder.selectSubKey(key);
+    builder.generateSubKeys();
+    builder.addKeyAnnotations(builder.selectedKey());
   }));
 
-  $('#btnDelSubKeyArray').click(builder.wrapChange(function () {
-    builder.delSubKeyArray();
-    builder.enableKeyControls();
+  $('#btnAddLongpress').click(builder.wrapChange(function (event) {
+    event.stopPropagation();
+    builder.selectSubKey(builder.addKey('longpress', '#longpress'));
+    builder.generateSubKeys();
+    builder.addKeyAnnotations(builder.selectedKey());
+  }));
+
+  $('#btnAddMultitap').click(builder.wrapChange(function (event) {
+    event.stopPropagation();
+    builder.selectSubKey(builder.addKey('multitap', '#multitap'));
+    builder.generateSubKeys();
+    builder.addKeyAnnotations(builder.selectedKey());
   }));
 
   this.selectSubKey = function (key) {
     builder.selectedSubKey().removeClass('selected');
     if (key) {
       $(key).addClass('selected');
-      $('.skcontrol.wedge-horz,.skcontrol.wedge-vert,input#inpSubKeyCap').css('display', 'block');
-      $('div#btnDelSubKey').css('display', ($('#sk > div').length > 1) ? 'block' : '');
-      var offset = $(key).offset();
 
-      $('#wedgeAddSubKeyLeft').offset({ left: offset.left - 9, top: offset.top + $(key).outerHeight() + 2 });
-      $('#wedgeAddSubKeyRight').offset({ left: offset.left + $(key).outerWidth() - 7, top: offset.top + $(key).outerHeight() + 2 });
-      $('div#btnDelSubKey').offset({ left: offset.left + $(key).outerWidth() - 14, top: offset.top + 3 });
-      $('input#inpSubKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
-      builder.lastFocus = $('input#inpSubKeyCap');
+      let offset = $(key).offset();
+
+      if($(key).data('type') != 'flick') {
+        $('.skcontrol.wedge-horz,.skcontrol.wedge-vert').css('display', 'block');
+        $('#wedgeAddSubKeyLeft').offset({ left: offset.left - 9, top: offset.top + $(key).outerHeight() + 2 });
+        $('#wedgeAddSubKeyRight').offset({ left: offset.left + $(key).outerWidth() - 7, top: offset.top + $(key).outerHeight() + 2 });
+      } else {
+        $('.skcontrol.wedge-horz,.skcontrol.wedge-vert').css('display', '');
+      }
+
+      if(!builder.textControlsInToolbar()) {
+        $('input#inpSubKeyCap')
+          .css('display', 'block')
+          .offset({ left: offset.left + 16, top: offset.top + 4 })
+          .width($(key).width() - 32);
+      }
+      $('div#btnDelSubKey')
+        .css('display', 'block')
+        .offset({ left: offset.left + $(key).outerWidth() - 14, top: offset.top + 3 });
       this.prepareSubKey();
       builder.enableSubKeyControls();
     } else {
-      $('.skcontrol.wedge-horz,.skcontrol.wedge-vert,div#btnDelSubKey,input#inpSubKeyCap').css('display', '');
+      if(!builder.textControlsInToolbar()) {
+        $('input#inpSubKeyCap').css('display', '');
+      }
+      $('.skcontrol.wedge-horz,.skcontrol.wedge-vert,div#btnDelSubKey').css('display', '');
       builder.enableSubKeyControls();
     }
     builder.saveState();
@@ -197,13 +260,14 @@ $(function() {
   this.enableSubKeyControls = function () {
     var key = builder.selectedSubKey();
     if (key.length == 0) {
-      $('#subKeyToolbar').css('visibility', 'hidden');
+      $('#subKeyToolbar *').attr('disabled', 'disabled');
     } else {
-      $('#subKeyToolbar').css('visibility', '');
+      $('#subKeyToolbar *').removeAttr('disabled');
+      $('#subKeyToolbar #inpSubKeyGestureType').attr('disabled', 'disabled');
     }
   }
 
-  $('#sk').click(function () {
+  $('#sub-key-container').click(function (event) {
     builder.selectSubKey(null);
   });
 

@@ -1,10 +1,97 @@
 $(function() {
 
+  this.addKey = function (type, position, sp) {
+    var key = document.createElement('div');
+    var ktext = document.createElement('div');
+    var kid = document.createElement('div');
+    var kunderlying = document.createElement('div');
+    $(kid).addClass('id');
+    $(ktext).addClass('text');
+    $(kunderlying).addClass('underlying');
+    $(key).append(kid);
+    $(key).append(ktext);
+    $(key).append(kunderlying);
+    $(key).addClass('key');
+    $(key).data('id', 'T_new_' + this.uniqId);
+    $(key).data('type', type);
+    builder.uniqId++;
+    builder.updateKeyId(key);
+
+    if (type != 'key') {
+      $(key).click(function (event) {
+        event.stopPropagation();
+        builder.selectSubKey(this);
+        $(builder.lastFocus ?? '#inpSubKeyCap').focus().select();
+      }).dblclick(function (event) {
+        event.stopPropagation();
+        var layer = $(this).data('nextlayer');
+        if (layer) builder.selectLayerByName(layer);
+      });
+      $(kid).click(function (event) {
+        event.stopPropagation();
+        builder.selectSubKey(key);
+        $('#inpSubKeyName').focus().select();
+      });
+    } else {
+      $(key).click(function (event) {
+        event.stopPropagation();
+        builder.selectKey(this);
+        $(builder.lastFocus ?? '#inpKeyCap').focus().select();
+      }).dblclick(function (event) {
+        event.stopPropagation();
+        var layer = $(this).data('nextlayer');
+        if (layer) builder.selectLayerByName(layer);
+      });
+      $(kid).click(function (event) {
+        event.stopPropagation();
+        builder.selectKey(key);
+        $('#inpKeyName').focus().select();
+      });
+    }
+
+
+    if (position == 'before') {
+      builder.selectedKey().before(key);
+    } else if (position == 'after') {
+      builder.selectedKey().after(key);
+    } else if (position == 'before-subkey') {
+      builder.selectedSubKey().before(key);
+    } else if (position == 'after-subkey') {
+      builder.selectedSubKey().after(key);
+    } else {
+      $(position).append(key);
+    }
+
+    builder.makeKeyDraggable(key);
+    builder.formatKey(key, sp);
+
+    return key;
+  };
+
+  this.formatKey = function (key, sp) {
+    $(key)
+      .removeClass('key-modifier')
+      .removeClass('key-modifier-selected')
+      .removeClass('key-deadkey')
+      .removeClass('key-blank')
+      .removeClass('key-spacer');
+    if (sp) {
+      switch (parseInt(sp, 10)) {
+        case 1: $(key).addClass('key-modifier'); break;
+        case 2: $(key).addClass('key-modifier-selected'); break;
+        case 8: $(key).addClass('key-deadkey'); break;
+        case 9: $(key).addClass('key-blank'); break;
+        case 10: $(key).addClass('key-spacer'); break;
+      }
+    }
+  }
+
   this.prepareKey = function () {
-    builder.enableKeyControls();
     var key = builder.selectedKey();
     builder.hasSavedKeyUndo = false;
-    $('#inpKeyCap').val($(key).data('text'));
+    let val = $(key).data('text');
+    $('#inpKeyCap').val(val);
+    $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
     $('#inpKeyName').val($(key).data('id'));
     $('#inpKeyWidth').val($(key).data('width'));
     $('#inpKeyPadding').val($(key).data('pad'));
@@ -12,6 +99,57 @@ $(function() {
     $('#selKeyNextLayer').val($(key).data('nextlayer'));
     $('#selKeyLayerOverride').val($(key).data('layer'));
 
+    builder.makeKeyResizable(key);
+
+    //
+    // Prepare presentation of longpress keys, flicks and multitaps
+    //
+
+    builder.removeAllSubKeys();
+    let longpress = $(key).data('longpress'), flick = $(key).data('flick'), multitap = $(key).data('multitap');
+    const hasLongpress = Array.isArray(longpress) && !!longpress.length;
+    const hasFlick = Array.isArray(flick) && !!flick.length;
+    const hasMultitap = Array.isArray(multitap) && !!multitap.length;
+
+    function addSubKeys(keys, type) {
+      for(let key of keys) {
+        let nkey = builder.addKey(type, '#'+type);
+        let code = key.id ? String.fromCharCode(parseInt(key.id.substring(2), 16)) : 0;
+        let text = typeof key.text == 'string' ? key.text : (code.charCodeAt(0) < 32 ? '' : code);
+
+        if(key.direction) $(nkey).addClass('flick-'+key.direction); // TODO use data-direction? for css
+
+        $(nkey)
+          .data('text', text)
+          .data('id', key.id)
+          .data('sp', key.sp)
+          .data('font', key.font)
+          .data('fontsize', key.fontsize)
+          .data('nextlayer', key.nextlayer)
+          .data('layer', key.layer)
+          .data('direction', key.direction) // used only by flicks
+          .css('width', (100 * 0.7) + 'px')
+          .css('font-family', KVKL[builder.lastPlatform].font);
+
+        if(builder.specialCharacters[text]) {
+          $(nkey).addClass('key-special-text');
+        }
+
+        $('.text', nkey).text(builder.renameSpecialKey(text));
+        builder.updateKeyId(nkey);
+      }
+    }
+
+    if(hasLongpress) addSubKeys(longpress, 'longpress');
+    if(hasFlick) addSubKeys(flick, 'flick');
+    if(hasMultitap) addSubKeys(multitap, 'multitap');
+    builder.addKeyAnnotations(key);
+    builder.prepareSubKey();
+    builder.enableKeyControls();
+    builder.enableSubKeyControls();
+  }
+
+  builder.makeKeyResizable = function(key) {
     $(key).resizable({
       minWidth: 10 * this.xscale,
       minHeight: 100 * this.yscale,
@@ -19,61 +157,21 @@ $(function() {
       maxHeight: 100 * this.yscale,
       ghost: false,
       handles: "e",
-      resize: function (event, ui) {
-        builder.selectedKey().data('width', Math.round(ui.size.width / builder.xscale, 0));
-        $('#inpKeyWidth').val(Math.round(ui.size.width / builder.xscale, 0));
+      resize: function (_event, ui) {
+        let newWidth = Math.round(ui.size.width / builder.xscale, 0);
+        builder.selectedKey().data('width', newWidth);
+        $('#inpKeyWidth').val(newWidth);
+        builder.updateKeySizeInfo();
       },
-      start: function (event, ui) {
+      start: function (_event, ui) {
         builder.saveUndo();
         $(ui.originalElement).css('position', 'relative');
         $(ui.originalElement).css('left', '');
       },
-      stop: function (event, ui) {
+      stop: function (_event, _ui) {
         builder.rescale();
-        builder.post();
+        builder.generate();
       }
     });
-
-    //
-    // Prepare sub-key array
-    //
-
-    builder.removeAllSubKeys();
-    var skContainer = $('#sk');
-    var sk = $(key).data('sk');
-    if (typeof sk != 'object') {
-      $(key).removeClass('hasSubKeyArray');
-      builder.enableSubKeyControls();
-      return;
-    }
-
-    $(key).addClass('hasSubKeyArray');
-    for (var i = 0; i < sk.length; i++) {
-      var nkey = builder.addKey(skContainer, true);
-      var key = sk[i];
-
-      var code = key.id ? String.fromCharCode(parseInt(key.id.substring(2), 16)) : 0;
-      var text = typeof key.text == 'string' ? key.text : (code.charCodeAt(0) < 32 ? '' : code);
-
-      $(nkey)
-        .data('key-type', 'longpress')
-        .data('text', text)
-        .data('id', key.id)
-        .data('sp', key.sp)
-        .data('font', key.font)
-        .data('fontsize', key.fontsize)
-        .data('nextlayer', key.nextlayer)
-        .data('layer', key.layer)
-        .css('width', (100 * 0.7) + 'px')
-        .css('font-family', KVKL[builder.lastPlatform].font);
-
-      if(this.specialCharacters[text])
-        $(nkey).addClass('key-special-text');
-
-      $('.text', nkey).text(this.renameSpecialKey(text));
-      builder.updateKeyId(nkey);
-    }
-    builder.prepareSubKey();
-    builder.enableSubKeyControls();
   }
 }.bind(builder));

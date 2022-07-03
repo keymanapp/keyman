@@ -79,6 +79,7 @@ $(function() {
                     key.nextlayer = newLayerName;
                   }
 
+                  //TODO: key.multitap, key.flick
                   if (key.sk) {
                     for (var l = 0; l < key.sk.length; l++) {
                       if (key.sk[l].layer == oldLayerName) {
@@ -99,7 +100,7 @@ $(function() {
         builder.prepareLayers();
         $('#selLayer').val(builder.lastLayerIndex);
         builder.selectLayer();
-        builder.post();
+        builder.generate();
         $(this).dialog('close');
       },
       "Cancel": function () {
@@ -157,7 +158,9 @@ $(function() {
 
   $('#selLayer').change(function () {
     if (builder.lastPlatform) builder.generate(false,false);
+    let selection = builder.saveSelection();
     builder.selectLayer();
+    builder.restoreSelection(selection);
     builder.saveState();
   });
 

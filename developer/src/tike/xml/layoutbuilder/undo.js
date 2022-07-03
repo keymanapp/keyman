@@ -33,7 +33,7 @@ $(function() {
     $('#selLayer').val(s.layer);
     builder.selectLayer();
     builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.id; }).first());
-    if (s.subkey) builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === s.subkey; }).first());
+    if (s.subkey) builder.selectSubKey($('#sub-key-groups .key').filter(function (index) { return $(this).data('id') === s.subkey; }).first());
   }
 
   this.saveUndo = function (saveToRedo) {

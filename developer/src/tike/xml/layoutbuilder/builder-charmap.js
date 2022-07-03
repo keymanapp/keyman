@@ -5,7 +5,7 @@
 builder.dragDrop = {};
 (function(builder, dragDrop) {
   dragDrop.isSubKey = function(key) {
-    return key.parent().attr('id') == 'sk';
+    return key.data('type') == 'longpress';
   };
 
   dragDrop.getKeyElementFromElement = function(elem) {
@@ -126,8 +126,9 @@ builder.dragDrop = {};
       }
     } else {
       // Double-click insertion, so use last focused control
-      key = { key: builder.selectedSubKey(), isIdField: false };
-      if(!key.key || !key.key.length) {
+      if($.contains($('#subKeyToolbar')[0], builder.lastFocus)) {
+        key = { key: builder.selectedSubKey(), isIdField: false };
+      } else {
         key = { key: builder.selectedKey(), isIdField: false };
       }
     }

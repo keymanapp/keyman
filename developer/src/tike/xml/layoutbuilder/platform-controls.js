@@ -27,7 +27,9 @@ $(function() {
 
   $('#selPlatform').change(function () {
     if (builder.lastPlatform) builder.generate(false,false);
+    let selection = builder.saveSelection();
     builder.selectPlatform();
+    builder.restoreSelection(selection);
     builder.saveState();
   });
 

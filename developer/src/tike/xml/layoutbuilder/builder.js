@@ -18,10 +18,37 @@ $(function() {
     return platform;
   }
 
+  this.saveSelection = function() {
+    let key = builder.selectedKey(), subKey = builder.selectedSubKey();
+    return {
+      id: key ? $(key).data('id') : null,
+      subId: subKey ? $(subKey).data('id') : null
+    };
+  }
+
+  this.restoreSelection = function(selection) {
+    let key = $('#kbd .key').filter(function (_index) { return $(this).data('id') === selection.id; }).first();
+    if(!key || !key.length) {
+      let keys = $('#kbd div.key');
+      if(!keys.length) return;
+      key = keys[0];
+    }
+    builder.selectKey(key);
+    let subKey = $('#sub-key-groups .key').filter(function (_index) { return $(this).data('id') === selection.subId; }).first();
+    if(!subKey || !subKey.length) {
+      let subKeys = $('#sub-key-groups div.key');
+      if(!subKeys.length) return;
+      subKey = subKeys[0];
+    }
+    builder.selectSubKey(subKey);
+  }
+
   $('#selPlatformPresentation').change(function () {
+    let lastSelection = builder.saveSelection();
     builder.selectKey(null, false);
     builder.selectSubKey(null);
     builder.prepareLayer();
+    builder.restoreSelection(lastSelection);
     builder.saveState();
   });
 
@@ -30,6 +57,19 @@ $(function() {
     builder.fillModifierSelect();
     builder.prepareKey();
   });
+
+  builder.removeAllSubKeys = function() {
+    $('#sub-key-groups .key').remove();
+  }
+
+  builder.prepareKeyCapTypes = function() {
+    let types = $('#selKeyCapType'), subTypes = $('#selKeyCapSubType'), opts = '';
+    for(let name of builder.specialKeyNames) {
+      opts += '<option value="'+name+'">'+builder.renameSpecialKey(name)+'\t'+name+'</option>';
+    }
+    $(types).append(opts);
+    // $(subTypes).append(opts);
+  };
 
   this.preparePlatforms = function () {
     var firstPlatform = null;
@@ -204,6 +244,35 @@ $(function() {
     return (builder.getModifierCombinationFromLayerId(id) & this.modifierCodes.SHIFT) != 0;
   };
 
+  /**
+   * Adds annotating images to a key cap to indicate when it has sub keys
+   * @param {*} key
+   * @param {*} longpress
+   * @param {*} flick
+   * @param {*} multitap
+   */
+  this.addKeyAnnotations = function(key) {
+    const longpress = $(key).data('longpress'), flick = $(key).data('flick'), multitap = $(key).data('multitap');
+
+    $('.has-flick', key).remove();
+    if (flick && flick.length) {
+      for(let f of flick) {
+        $(key).append('<div class="has-flick has-flick-'+f.direction+'"></div>');
+      }
+    }
+
+    /* We add longpress after flick so that the longpress icon can be shifted down if there is a visual conflict */
+    $('.has-longpress', key).remove();
+    if (longpress && longpress.length) {
+      $(key).append('<div class="has-longpress"></div>');
+    }
+
+    $(key).remove('.has-multitap');
+    if (multitap && multitap.length) {
+      $(key).append('<div class="has-multitap"></div>');
+    }
+  }
+
   this.prepareLayer = function () {
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
 
@@ -235,7 +304,7 @@ $(function() {
       this.yscale = 0.5;
     }
 
-    $('#kbd,#sk')
+    $('#kbd,#sub-key-groups')
       .css('font-family', KVKL[builder.lastPlatform].font)
       .css('font-size', KVKL[builder.lastPlatform].fontsize || "1em");
 
@@ -249,10 +318,9 @@ $(function() {
       var calcKeyWidth = 0, calcGapWidth = 0;
       for (var j = 0; j < layer.row[i].key.length; j++) {
         var key = layer.row[i].key[j];
-        var nkey = builder.addKey(row, false, key.sp);
+        var nkey = builder.addKey('key', row, key.sp);
         var w = key.width ? key.width : 100;
         var p = (key.pad ? key.pad : builder.keyMargin) * this.xscale;
-        if (key.sk) $(nkey).addClass('hasSubKeyArray');
         var code = key.id ? String.fromCharCode(parseInt(key.id.substring(2), 16)) : 0;
         var text = typeof key.text == 'string' ? key.text : (code == '' || code.charCodeAt(0) < 32 ? '' : code);
 
@@ -269,7 +337,10 @@ $(function() {
           .data('nextlayer', key.nextlayer)
           .data('layer', key.layer)
           .data('text', text)
-          .data('sk', key.sk)
+          .data('longpress', key.sk)
+          .data('flick', builder.translateFlickObjectToArray(key.flick))
+          .data('multitap', key.multitap)
+          .data('type', 'key')
 
           .css('width', (w * this.xscale) + 'px')
           .css('height', (100 * this.yscale) + 'px')
@@ -281,6 +352,8 @@ $(function() {
         if(this.specialCharacters[text])
           $(nkey).addClass('key-special-text');
 
+        builder.addKeyAnnotations(nkey);
+
         $('.text', nkey).text(this.renameSpecialKey(text));
         if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
 
@@ -289,18 +362,32 @@ $(function() {
 
       var calcWidth = calcKeyWidth + calcGapWidth;
 
-      $('.key-size', row).html(layer.row[i].key.length + ' keys<br>' +
-         calcKeyWidth + ' key width<br>' +
-         calcGapWidth + ' padding<br>' +
-         calcWidth + ' total');
-
       $('#kbd').attr('class', builder.getPresentation()); //builder.lastPlatform); //css('background-position-y', '-200px');
     }
 
-    var div = document.createElement('div');
-    $(div).css('clear', 'both');
-    $('#kbd').append(div);
+    builder.updateKeySizeInfo(); //row, layer.row[i].key.length, calcKeyWidth, calcGapWidth);
+    // var div = document.createElement('div');
+    // $(div).css('clear', 'both');
+    // $('#kbd').append(div);
   };
+
+
+  this.updateKeySizeInfo = function() {
+    let rows = $('#kbd div.row');
+    rows.each(function() {
+      let keys = $('.key', this), keyWidth = 0, gapWidth = 0;
+      keys.each(function() {
+        let width = $(this).data('width'), pad = $(this).data('pad');
+        keyWidth += width ? parseInt(width, 10) : 100;
+        gapWidth += pad ? parseInt(pad, 10) : builder.keyMargin;
+      });
+      let count = keys.length, totalWidth = keyWidth + gapWidth;
+      $('.key-size', this).html(count + ' keys<br>' +
+        keyWidth + ' key width<br>' +
+        gapWidth + ' padding<br>' +
+        totalWidth + ' total');
+    });
+  }
 
   this.getStandardKeyCap = function (id, shifted) {
     id = id ? id.toUpperCase() : '';
@@ -334,10 +421,11 @@ $(function() {
   }
 
   this.selectLayer = function (val) {
+    let selection = builder.saveSelection();
     if(val) $('#selLayer').val(val);
     builder.lastLayerIndex = $('#selLayer').val();
     builder.prepareLayer();
-    builder.selectKey($('#kbd > div.row > div.key')[0]);
+    builder.restoreSelection(selection);
   }
 
   this.selectLayerByName = function (name) {
@@ -390,152 +478,6 @@ $(function() {
     return row;
   };
 
-  this.addKey = function (position, isSubKey, sp) {
-    var key = document.createElement('div');
-    var ktext = document.createElement('div');
-    var kid = document.createElement('div');
-    var kunderlying = document.createElement('div');
-    $(kid).addClass('id');
-    $(ktext).addClass('text');
-    $(kunderlying).addClass('underlying');
-    $(key).append(kid);
-    $(key).append(ktext);
-    $(key).append(kunderlying);
-    $(key).addClass('key');
-    $(key).data('id', 'T_new_' + this.uniqId);
-    builder.uniqId++;
-    builder.updateKeyId(key);
-
-    if (isSubKey) {
-      $(key).click(function (event) {
-        event.stopPropagation();
-        builder.selectSubKey(this);
-        if (builder.lastFocus) {
-          $(builder.lastFocus).focus().select();
-        }
-      }).dblclick(function (event) {
-        event.stopPropagation();
-        var layer = $(this).data('nextlayer');
-        if (layer) builder.selectLayerByName(layer);
-      });
-      $(kid).click(function (event) {
-        event.stopPropagation();
-        builder.selectSubKey(key);
-        $('#inpSubKeyName').focus().select();
-      });
-    } else {
-      $(key).click(function (event) {
-        event.stopPropagation();
-        builder.selectKey(this);
-        if (builder.lastFocus) {
-          $(builder.lastFocus).focus().select();
-        }
-      }).dblclick(function (event) {
-        event.stopPropagation();
-        var layer = $(this).data('nextlayer');
-        if (layer) builder.selectLayerByName(layer);
-      });
-      $(kid).click(function (event) {
-        event.stopPropagation();
-        builder.selectKey(key);
-        $('#inpKeyName').focus().select();
-      });
-    }
-
-
-    if (position == 'before') {
-      builder.selectedKey().before(key);
-    } else if (position == 'after') {
-      builder.selectedKey().after(key);
-    } else if (position == 'before-subkey') {
-      builder.selectedSubKey().before(key);
-    } else if (position == 'after-subkey') {
-      builder.selectedSubKey().after(key);
-    } else {
-      $(position).append(key);
-    }
-
-    $(key).draggable({
-      revert: "invalid",
-      stack: ".key",
-      zIndex: 100,
-      helper: "clone",
-      //appendTo: "body",
-      start: function (event, ui) {
-        var isSubKey = ($(this).parent().attr('id') == 'sk');
-        if (isSubKey)
-          builder.selectSubKey(null);
-        else
-          builder.selectKey(null, false);
-        var parent = isSubKey ? '#sk' : '#kbd';
-        var drag = this;
-        drag.overList = [];
-        var pos = $(this).position();
-        $(this).addClass('key-dragging');
-        $(parent + ' .key').before(function (index) {
-          if (this == drag) return '';
-          if ($(this).prev()[0] == drag) return '<div class="key-droppable key-current"></div>';
-          return '<div class="key-droppable"></div>';
-        });
-        $(isSubKey ? '#sk' : '.row').append('<div class="key-droppable"></div>');
-
-        $('.key-droppable').css('margin-top', $(this).css('margin-top')).css('height', $(this).css('height')).droppable({
-          accept: ".key",
-          tolerance: "touch",
-          over: function (event, ui) {
-            drag.overList.push(this);
-            $(drag.overList[0]).addClass('key-droppable-hover');
-          },
-          out: function (event, ui) {
-            var n = drag.overList.indexOf(this);
-            if (n >= 0)
-              drag.overList.splice(n, 1);
-            $(this).removeClass('key-droppable-hover');
-            if (drag.overList.length > 0) $(drag.overList[0]).addClass('key-droppable-hover');
-          },
-          drop: function (event, ui) {
-            //
-            // Drop the selected key into its new position
-            //
-            builder.saveUndo();
-            $(drag).detach().removeClass('key-dragging');
-            $(drag.overList[0]).after(drag);
-            //builder.selectKey(drag);
-            if (!isSubKey) builder.rescale(); else builder.generateSubKeys();
-            builder.post();
-          }
-        });
-        $('.key-current').css('width', $(drag).width() + 'px').css('margin-left', -($(drag).width()) + 'px');
-      },
-      stop: function (event, ui) {
-        $('.key-droppable').remove();
-        $(this).removeClass('key-dragging');
-        //builder.rescale();
-      }
-    });
-
-    builder.formatKey(key, sp);
-
-    return key;
-  };
-
-  this.formatKey = function (key, sp) {
-    $(key)
-      .removeClass('key-modifier')
-      .removeClass('key-modifier-selected')
-      .removeClass('key-deadkey')
-      .removeClass('key-blank')
-      .removeClass('key-spacer');
-    if (sp) {
-      switch (parseInt(sp, 10)) {
-        case 1: $(key).addClass('key-modifier'); break;
-        case 2: $(key).addClass('key-modifier-selected'); break;
-        case 8: $(key).addClass('key-deadkey'); break;
-        case 9: $(key).addClass('key-blank'); break;
-        case 10: $(key).addClass('key-spacer'); break;
-      }
-    }
-  }
 
   this.delSelectedKey = function () {
     var key = builder.selectedKey();
@@ -567,11 +509,17 @@ $(function() {
     if (arguments.length == 1 || adjustResizable)
       builder.selectedKey().resizable('destroy');
 
+    if(!builder.textControlsInToolbar()) {
+      $('input#inpSubKeyCap').css('display', '');
+    }
     $('.skcontrol.wedge-horz,.skcontrol.wedge-vert,div#btnDelSubKey,input#inpSubKeyCap').css('display', '');
     builder.selectedKey().removeClass('selected');
     if (key && $(key).length) {
       $(key).addClass('selected');
-      $('.kcontrol.wedge-horz,.kcontrol.wedge-vert,div#btnDelKey,input#inpKeyCap').css('display', 'block');
+      if(!builder.textControlsInToolbar()) {
+        $('input#inpKeyCap').css('display', 'block');
+      }
+      $('.kcontrol.wedge-horz,.kcontrol.wedge-vert,div#btnDelKey').css('display', 'block');
       var rowOffset = $(key).parent().offset();
       var offset = $(key).offset();
 
@@ -580,12 +528,21 @@ $(function() {
       $('#wedgeAddKeyLeft').offset({ left: offset.left - 9, top: offset.top + $(key).outerHeight() + 2 });
       $('#wedgeAddKeyRight').offset({ left: offset.left + $(key).outerWidth() - 7, top: offset.top + $(key).outerHeight() + 2 });
       $('div#btnDelKey').offset({ left: offset.left + $(key).outerWidth() - 14, top: offset.top + 3 });
-      $('input#inpKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
+      if(!builder.textControlsInToolbar()) {
+        $('input#inpKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
+      }
       this.prepareKey();
-      builder.lastFocus = $('input#inpKeyCap');
+      let subKeys = $('#sub-key-groups div.key');
+      if(subKeys.length) {
+        builder.selectSubKey(subKeys[0]);
+      }
+      //builder.lastFocus = $('input#inpKeyCap');
     } else {
-      $('.kcontrol.wedge-horz,.kcontrol.wedge-vert,div#btnDelKey,input#inpKeyCap').css('display', '');
-      $('#sk div').remove();
+      if(!builder.textControlsInToolbar()) {
+        $('input#inpKeyCap').css('display', '');
+      }
+      $('.kcontrol.wedge-horz,.kcontrol.wedge-vert,div#btnDelKey').css('display', '');
+      builder.removeAllSubKeys();
       builder.enableKeyControls();
       builder.enableSubKeyControls();
     }
@@ -603,16 +560,16 @@ $(function() {
           builder.saveUndo();
           builder.hasSavedKeyUndo = true;
         } else {
-      builder.command('modified');
-    }
+          builder.command('modified');
+        }
       } else {
         builder.saveUndo();
       }
-      var r = f.apply(this);
+      var r = f.apply(this, arguments);
       if(typeof opt == 'object' && opt.rescale) {
         builder.rescale();
       }
-      builder.post();
+      builder.generate();
       return r;
     }
   };
@@ -640,7 +597,7 @@ $(function() {
     builder.updateKeyId(builder.selectedKey());
   }, {saveOnce: true});
 
-  const wrapInstant = function(f) {
+  builder.wrapInstant = function(f) {
     return function() {
       window.setTimeout(f.bind(this), 0);
     }
@@ -651,7 +608,7 @@ $(function() {
     .autocomplete({
       source: builder.lookupKeyNames,
       change: inpKeyNameChange,
-      select: wrapInstant(inpKeyNameChange)
+      select: builder.wrapInstant(inpKeyNameChange)
     })
     .on('input', inpKeyNameChange)
     .blur(function () {
@@ -675,11 +632,48 @@ $(function() {
     }
   }
 
+  builder.toUnicodeString = function(s) {
+    if(typeof s != 'string') return '';
+    let r = '';
+    for(let ch of s) {
+      let code = ch.codePointAt(0).toString(16).toUpperCase();
+      r += 'U+' + code.padStart(4, '0') + ' ';
+    }
+    return r.trim();
+  }
+
+  builder.fromUnicodeString = function(s) {
+    if(typeof s != 'string') return '';
+    let chars = s.split(' '), r = '';
+    for(let ch of chars) {
+      if(!ch.match(/^u\+[0-9a-f]{1,6}$/i)) continue;
+      r += String.fromCodePoint(parseInt(ch.substring(2), 16));
+    }
+    return r;
+  }
+
   const inpKeyCapChange = builder.wrapChange(function (e) {
     const val = $(this).val();
     var k = builder.selectedKey();
     $('.text', k).text(builder.renameSpecialKey(val));
     k.data('text', val);
+    $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
+
+    if(builder.specialCharacters[val]) {
+      k.addClass('key-special-text');
+    } else {
+      k.removeClass('key-special-text');
+    }
+
+    builder.updateCharacterMap(val, false);
+  }, {saveOnce: true});
+
+  const inpKeyCapUnicodeChange = builder.wrapChange(function (e) {
+    const val = builder.fromUnicodeString($(this).val());
+    var k = builder.selectedKey();
+    $('.text', k).text(builder.renameSpecialKey(val));
+    k.data('text', val);
+    $('#inpKeyCap').val(val);
 
     if(builder.specialCharacters[val]) {
       k.addClass('key-special-text');
@@ -693,15 +687,26 @@ $(function() {
   $('#inpKeyCap')
     .on('input', inpKeyCapChange)
     .change(inpKeyCapChange)
-    .autocomplete({
+    /*.autocomplete({
       source: builder.specialKeyNames,
       change: inpKeyCapChange,
-      select: wrapInstant(inpKeyCapChange)
-    })
+      select: builder.wrapInstant(inpKeyCapChange)
+    })*/
     .mouseup(function () {
       builder.updateCharacterMap($(this).val(), false);
     }).focus(function () {
       builder.updateCharacterMap($(this).val(), false);
+    }).blur(function () {
+      builder.hasSavedKeyUndo = false;
+    });
+
+  $('#inpKeyCapUnicode')
+    .on('input', inpKeyCapUnicodeChange)
+    .change(inpKeyCapUnicodeChange)
+    .mouseup(function () {
+      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
+    }).focus(function () {
+      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
     }).blur(function () {
       builder.hasSavedKeyUndo = false;
     });
@@ -739,17 +744,10 @@ $(function() {
     var key = builder.selectedKey();
     if (key.length == 0) {
       $('#keyToolbar *').attr('disabled', 'disabled');
-      $('#btnAddSubKeyArray').css('display', '');
-      $('#btnDelSubKeyArray').css('display', 'none');
+      $('#sub-key-container').css('display', 'none');
     } else {
       $('#keyToolbar *').removeAttr('disabled');
-      if (builder.selectedKey().hasClass('hasSubKeyArray')) {
-        $('#btnAddSubKeyArray').css('display', 'none');
-        $('#btnDelSubKeyArray').css('display', '');
-      } else {
-        $('#btnAddSubKeyArray').css('display', '');
-        $('#btnDelSubKeyArray').css('display', 'none');
-      }
+      $('#sub-key-container').css('display', '');
     }
   }
 
@@ -760,6 +758,27 @@ $(function() {
     if (keyId !== null)
       builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === keyId; }).first());
   };
+
+  this.translateFlickArrayToObject = function(flicks) {
+    let res = {};
+    for(let flick of flicks) {
+      const {direction, ...item} = flick;
+      res[direction] = item;
+    }
+    return res;
+  };
+
+  this.translateFlickObjectToArray = function(flicks) {
+    if(!flicks) {
+      return [];
+    }
+
+    return Object.getOwnPropertyNames(flicks).map(
+      direction => {
+        return {...flicks[direction], direction: direction};
+      }
+    );
+  }
 
   this.generate = function (display, force) {
     var json = JSON.stringify(KVKL, null, '  ');
@@ -785,7 +804,12 @@ $(function() {
         key.fontsize = $(this).data('fontsize');
         key.nextlayer = $(this).data('nextlayer');
         key.layer = $(this).data('layer');
-        key.sk = $(this).data('sk');
+        let longpress = $(this).data('longpress');
+        if(longpress && longpress.length) key.sk = longpress;
+        let flick = $(this).data('flick');
+        if(flick && flick.length) key.flick = builder.translateFlickArrayToObject(flick);
+        let multitap = $(this).data('multitap');
+        if(multitap && multitap.length) key.multitap = multitap;
         row.key.push(key);
       });
       layer.row.push(row);
@@ -811,22 +835,20 @@ $(function() {
     }
   };
 
-  this.post = this.generate;
-
   $('#wedgeAddRowAbove').click(builder.wrapChange(function () {
-    var row = builder.addRow('above'); builder.selectKey(builder.addKey(row, false));
+    var row = builder.addRow('above'); builder.selectKey(builder.addKey('key', row));
   }, {rescale: true}));
 
   $('#wedgeAddRowBelow').click(builder.wrapChange(function () {
-    var row = builder.addRow('below'); builder.selectKey(builder.addKey(row, false));
+    var row = builder.addRow('below'); builder.selectKey(builder.addKey('key', row));
   }, {rescale: true}));
 
   $('#wedgeAddKeyLeft').click(builder.wrapChange(function () {
-    builder.selectKey(builder.addKey('before', false));
+    builder.selectKey(builder.addKey('key', 'before'));
   }, {rescale: true}));
 
   $('#wedgeAddKeyRight').click(builder.wrapChange(function () {
-    builder.selectKey(builder.addKey('after', false));
+    builder.selectKey(builder.addKey('key', 'after'));
   }, {rescale: true}));
 
   $('#btnDelKey').click(builder.wrapChange(function () {
@@ -838,17 +860,21 @@ $(function() {
   $('#chkDisplayUnderlying').click(function () {
     builder.saveUndo();
     var platform = $('#selPlatform').val();
-    builder.post();
+    builder.generate();
     builder.prepareLayer();
   });
 
 
   $('input').blur(function () {
-    builder.lastFocus = this;
+    //builder.lastFocus = this;
   });
 
   $('input').focus(function () {
     builder.lastFocus = this;
+  });
+
+  $('input').click(function (event) {
+    event.stopImmediatePropagation();
   });
 
   $('#btnTemplate').click(function () {
@@ -950,7 +976,7 @@ $(function() {
             builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === data.key; }).first());
           }
           if(data.subkey) {
-            builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === data.subkey; }).first());
+            builder.selectSubKey($('#sub-key-groups .key').filter(function (index) { return $(this).data('id') === data.subkey; }).first());
           }
         }
       }
@@ -974,10 +1000,16 @@ $(function() {
     }
   };
 
+  builder.textControlsInToolbar = function() {
+    return $('body').hasClass('text-controls-in-toolbar');
+  }
+
+
 }.bind(builder));
 
 function initBuilder() {
   $(function() {
+    builder.prepareKeyCapTypes();
     builder.preparePlatforms();
     builder.enableUndoControls();
     builder.loadState();
