@@ -393,8 +393,6 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.addListener('suggestionapplied', this.suggestionApplied);
     }
 
-    // tryRevert: () => boolean = function(this: SuggestionManager, returnObj: {shouldSwallow: boolean}) {
-
     /**
      * Handler for post-processing once a suggestion has been applied: calls
      * into the active keyboard's `begin postKeystroke` entry point.
