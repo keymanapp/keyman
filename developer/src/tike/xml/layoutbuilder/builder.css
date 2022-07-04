@@ -39,7 +39,7 @@ body {
   padding-left: 97px;
   padding-bottom: 88px;
   padding-right: 108px;
-  /* width: 1690px; */
+  width: 1024px;
 }
 
 #kbd.tablet-ipad-portrait {
@@ -50,7 +50,7 @@ body {
   padding-left: 99px;
   padding-bottom: 98px;
   padding-right: 168px;
-  /* width: 908px; */
+  width: 800px;
 }
 
 #kbd.phone-iphone5-landscape {
@@ -61,7 +61,7 @@ body {
   padding-bottom: 40px;
   padding-top: 66px;
   padding-right: 88px;
-  /* width: 1286px; */
+  width: 1042px;
 }
 
 #kbd.phone-iphone5-portrait {
@@ -72,7 +72,7 @@ body {
   padding-bottom: 170px;
   padding-top: 70px;
   padding-right: 116px;
-  /* width: 660px; */
+  width: 200px;
 }
 
 .toolbar-item {
@@ -309,7 +309,6 @@ body {
   padding: 8px;
   margin: 0px 0px 8px;
   min-height: 64px;
-  /* background: #eeeeee; */
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -341,9 +340,8 @@ body {
   padding: 8px;
   margin: 0px 0px 8px;
   background: #eeeeee;
-  /* overflow-x: auto; */
   white-space: nowrap;
-  min-width: 768px;
+  min-width: 770px;
   box-sizing: border-box;
 }
 
@@ -408,6 +406,12 @@ br.clear {
   clear: both;
 }
 
+#toolbar,
+#kbd-container,
+#sub-key-container {
+  min-width: 1020px;
+}
+
 #toolbar div {
   background: #DCDCDD;
   margin: -1px -1px -1px 0;
@@ -439,11 +443,6 @@ button {
 
 #keyToolbar, #subKeyToolbar {
   padding: 8px;
-}
-
-.toolbar-item#key-toolbar-longpress > div {
-  /* override the grid display for this item */
-  grid-column: 2;
 }
 
 #data {
@@ -578,7 +577,7 @@ body:not(.text-controls-in-toolbar) input#inpSubKeyCap {
   color: white;
 }
 
-/* Position flick keys relative to the flick grid, by hand for now */
+/* Position flick keys relative to the flick grid, by hand */
 
 #flick .key {
   position: absolute;

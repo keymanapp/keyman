@@ -2,7 +2,7 @@ $(function() {
   // Key drag and drop functionality
 
   builder.makeKeyDraggable = function(key) {
-    const selectedKeyType /**string*/ = $(key).data('type'); /// selectedKeyType: string
+    const selectedKeyType = $(key).data('type');
     if(!selectedKeyType.match(/^(key|longpress|multitap)$/)) return;
 
     $(key).draggable({
@@ -10,7 +10,6 @@ $(function() {
       stack: ".key",
       zIndex: 100,
       helper: "clone",
-      //appendTo: "body",
       start: function (event, ui) {
         const elements =
           selectedKeyType == 'key' ? ['#kbd', '.row'] :
@@ -55,7 +54,6 @@ $(function() {
             builder.saveUndo();
             $(drag).detach().removeClass('key-dragging');
             $(drag.overList[0]).after(drag);
-            //builder.selectKey(drag);
             if (selectedKeyType == 'key') builder.rescale(); else builder.generateSubKeys();
             builder.generate();
           }
@@ -65,7 +63,6 @@ $(function() {
       stop: function (_event, _ui) {
         $('.key-droppable').remove();
         $(this).removeClass('key-dragging');
-        //builder.rescale();
       }
     });
   }

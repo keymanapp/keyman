@@ -5,7 +5,7 @@
 builder.dragDrop = {};
 (function(builder, dragDrop) {
   dragDrop.isSubKey = function(key) {
-    return key.data('type') == 'longpress';
+    return key.data('type') != 'key';
   };
 
   dragDrop.getKeyElementFromElement = function(elem) {

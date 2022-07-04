@@ -246,10 +246,6 @@ $(function() {
 
   /**
    * Adds annotating images to a key cap to indicate when it has sub keys
-   * @param {*} key
-   * @param {*} longpress
-   * @param {*} flick
-   * @param {*} multitap
    */
   this.addKeyAnnotations = function(key) {
     const longpress = $(key).data('longpress'), flick = $(key).data('flick'), multitap = $(key).data('multitap');
@@ -261,7 +257,7 @@ $(function() {
       }
     }
 
-    /* We add longpress after flick so that the longpress icon can be shifted down if there is a visual conflict */
+    // We add longpress after flick so that the longpress icon can be shifted down if there is a visual conflict
     $('.has-longpress', key).remove();
     if (longpress && longpress.length) {
       $(key).append('<div class="has-longpress"></div>');
@@ -362,13 +358,10 @@ $(function() {
 
       var calcWidth = calcKeyWidth + calcGapWidth;
 
-      $('#kbd').attr('class', builder.getPresentation()); //builder.lastPlatform); //css('background-position-y', '-200px');
+      $('#kbd').attr('class', builder.getPresentation());
     }
 
-    builder.updateKeySizeInfo(); //row, layer.row[i].key.length, calcKeyWidth, calcGapWidth);
-    // var div = document.createElement('div');
-    // $(div).css('clear', 'both');
-    // $('#kbd').append(div);
+    builder.updateKeySizeInfo();
   };
 
 
@@ -690,11 +683,6 @@ $(function() {
   $('#inpKeyCap')
     .on('input', inpKeyCapChange)
     .change(inpKeyCapChange)
-    /*.autocomplete({
-      source: builder.specialKeyNames,
-      change: inpKeyCapChange,
-      select: builder.wrapInstant(inpKeyCapChange)
-    })*/
     .mouseup(function () {
       builder.updateCharacterMap($(this).val(), false);
     }).focus(function () {
@@ -864,15 +852,11 @@ $(function() {
   $('#btnGenerate').click(function () { builder.generate(false,false); });
 
   $('#chkDisplayUnderlying').click(function () {
+    let selection = builder.saveSelection();
     builder.saveUndo();
-    var platform = $('#selPlatform').val();
     builder.generate();
     builder.prepareLayer();
-  });
-
-
-  $('input').blur(function () {
-    //builder.lastFocus = this;
+    builder.restoreSelection(selection);
   });
 
   $('input').focus(function () {

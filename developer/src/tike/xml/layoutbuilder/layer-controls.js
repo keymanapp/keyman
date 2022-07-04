@@ -64,37 +64,36 @@ $(function() {
         var platform = KVKL[builder.lastPlatform];
         var oldLayerName = platform.layer[builder.lastLayerIndex].id;
 
-        for (var i = 0; i < platform.layer.length; i++) {
-          var layer = platform.layer[i];
-          if (layer.row) {
-            for (var j = 0; j < layer.row.length; j++) {
-              var row = layer.row[j];
-              if (row.key) {
-                for (var k = 0; k < row.key.length; k++) {
-                  var key = row.key[k];
-                  if (key.layer == oldLayerName) {
-                    key.layer = newLayerName;
-                  }
-                  if (key.nextlayer == oldLayerName) {
-                    key.nextlayer = newLayerName;
-                  }
-
-                  //TODO: key.multitap, key.flick
-                  if (key.sk) {
-                    for (var l = 0; l < key.sk.length; l++) {
-                      if (key.sk[l].layer == oldLayerName) {
-                        key.sk[l].layer = newLayerName;
-                      }
-                      if (key.sk[l].nextlayer == oldLayerName) {
-                        key.sk[l].nextlayer = newLayerName;
-                      }
-                    }
-                  }
-                }
-              }
-            }
+        let fixup = function(key) {
+          if (key.layer == oldLayerName) {
+            key.layer = newLayerName;
+          }
+          if (key.nextlayer == oldLayerName) {
+            key.nextlayer = newLayerName;
           }
         }
+
+        platform.layer.forEach(layer => {
+          if (layer.row) {
+            layer.row.forEach(row => {
+              if (row.key) {
+                row.key.forEach(key => {
+                  fixup(key);
+
+                  if (key.sk) {
+                    key.sk.forEach(k => fixup(k));
+                  }
+                  if (key.flick) {
+                    fkey.flick.forEach(k => fixup(k));
+                  }
+                  if (key.multitap) {
+                    fkey.multitap.forEach(k => fixup(k));
+                  }
+                });
+              }
+            });
+          }
+        });
 
         platform.layer[builder.lastLayerIndex].id = newLayerName;
         builder.prepareLayers();

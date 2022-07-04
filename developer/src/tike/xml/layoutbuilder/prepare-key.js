@@ -118,7 +118,7 @@ $(function() {
         let code = key.id ? String.fromCharCode(parseInt(key.id.substring(2), 16)) : 0;
         let text = typeof key.text == 'string' ? key.text : (code.charCodeAt(0) < 32 ? '' : code);
 
-        if(key.direction) $(nkey).addClass('flick-'+key.direction); // TODO use data-direction? for css
+        if(key.direction) $(nkey).addClass('flick-'+key.direction);
 
         $(nkey)
           .data('text', text)

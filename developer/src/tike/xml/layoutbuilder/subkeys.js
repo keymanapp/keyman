@@ -4,9 +4,6 @@ $(function() {
   // Popup keys
   //
 
-  this.delSubKeyArray = function (type) {
-  }
-
   this.delSelectedSubKey = function () {
     let key = builder.selectedSubKey();
     if (key.length == 0) return;
