@@ -14,6 +14,14 @@
   background-color: whitesmoke;
 }
 
+.safe-zone-color {
+  border: 1px dashed black;
+}
+
+.safe-proximity-color {
+  border: 1px dashed lightgray;
+}
+
 #demo-container {
   max-width: fit-content;
   max-height: fit-content;
@@ -61,10 +69,19 @@
 .safe-zone {
   border: 1px dashed black;
   position: absolute;
-  margin: 2px;
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
+  margin: 4px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
   z-index: 101;
+  pointer-events: none;
+}
+
+.safe-proximity {
+  border: 1px dashed lightgray;
+  position: absolute;
+  margin: 5px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
   pointer-events: none;
 }
 
