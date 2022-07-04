@@ -58,6 +58,16 @@
   pointer-events: none;
 }
 
+.safe-zone {
+  border: 1px dashed black;
+  position: absolute;
+  margin: 2px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  z-index: 101;
+  pointer-events: none;
+}
+
 #faux-page {
   margin: auto;
   background-color: white;
