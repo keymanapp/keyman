@@ -393,13 +393,15 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.addListener('suggestionapplied', this.suggestionApplied);
     }
 
+    // tryRevert: () => boolean = function(this: SuggestionManager, returnObj: {shouldSwallow: boolean}) {
+
     /**
      * Handler for post-processing once a suggestion has been applied: calls
      * into the active keyboard's `begin postKeystroke` entry point.
      * @param    outputTarget
      * @returns  true
      */
-    suggestionApplied(outputTarget: text.OutputTarget): boolean {
+    suggestionApplied: (outputTarget: text.OutputTarget) => boolean = function(this: SuggestionBanner, outputTarget: text.OutputTarget) {
       const keyman = com.keyman.singleton;
       // Tell the keyboard that the current layer has not changed
       keyman.core.keyboardProcessor.newLayerStore.set('');
@@ -411,7 +413,7 @@ namespace com.keyman.osk {
         ?.finalize(keyman.core.keyboardProcessor, outputTarget, true);
 
       return true;
-    };
+    }.bind(this);
 
     postConfigure() {
       let keyman = com.keyman.singleton;
@@ -427,6 +429,7 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.removeListener('suggestionsready', manager.updateSuggestions);
       keyman.core.languageProcessor.removeListener('tryaccept', manager.tryAccept);
       keyman.core.languageProcessor.removeListener('tryrevert', manager.tryRevert);
+      keyman.core.languageProcessor.removeListener('suggestionapplied', this.suggestionApplied);
     }
   }
 
