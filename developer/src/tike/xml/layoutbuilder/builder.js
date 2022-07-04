@@ -263,7 +263,7 @@ $(function() {
       $(key).append('<div class="has-longpress"></div>');
     }
 
-    $(key).remove('.has-multitap');
+    $('.has-multitap', key).remove();
     if (multitap && multitap.length) {
       $(key).append('<div class="has-multitap"></div>');
     }
