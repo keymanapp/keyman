@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 15.0.265 stable 2022-07-04
+
+* fix(common): trigger builds correctly for stable builds (#6879)
+* fix(web): post-keystroke processing after use of pred. text selection (#6886)
+
 ## 15.0.264 stable 2022-07-01
 
 * fix(ios): eliminates conditional height for banner image (#6857)
