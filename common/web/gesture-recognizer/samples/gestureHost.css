@@ -55,6 +55,7 @@
   width: 100%;
   height: 100%;
   z-index: 100;
+  pointer-events: none;
 }
 
 #faux-page {
@@ -92,6 +93,7 @@
 }
 
 .main-receiver { /* is the full ".full" definition */
+  user-select: none;
   width:  100%;
   height: 100%;
   background-color: beige;
@@ -127,6 +129,7 @@
   height: 100%;
   z-index: -1;
   background-color: lightblue;
+  pointer-events: none;
 }
 
 .bounds1 #roaming-bounds {

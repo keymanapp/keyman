@@ -1,3 +1,5 @@
+// -- BEGIN:  Code for controlling the layout-simulation elements --
+
 function updateConfig() {
   let layout = document.config.screen;
   let bounds = document.config.bounds;
@@ -6,8 +8,6 @@ function updateConfig() {
   let demoContainer = document.getElementById("demo-container");
   demoContainer.className = layout.value + " " + bounds.value + " " + receiver.value;
 }
-
-//////
 
 window.addEventListener('load', function(ev) {
   let layoutGroup = document.config.screen;
@@ -40,3 +40,29 @@ window.addEventListener('load', function(ev) {
 
   updateConfig();
 });
+
+// END: Layout-simulation setup & handling
+
+// START:  Gesture-recognizer integration code!
+
+// This will hold the main gesture-recognizer instance.
+// Not great standard practice... but this is a development/debugging page, so we want access to it.
+let recognizer;
+
+window.addEventListener('load', function() {
+  let recognizerConfig = {
+    mouseEventRoot: document.body,
+    targetRoot: document.getElementById('target-root'),
+    maxRoamingBounds: document.getElementById('roaming-bounds'),
+    safeBounds: new com.keyman.osk.PaddedZoneSource(document.getElementById('faux-viewport'), 2),
+    safeBoundsPadding: 3
+  };
+
+  recognizer = new com.keyman.osk.GestureRecognizer(recognizerConfig);
+
+  recognizer.on('trackedInputUpdate', function(state, coord) {
+    console.log(`state: ${state}, coord: ${coord}`);
+  });
+});
+
+// END:  Gesture-recognizer integration code.
