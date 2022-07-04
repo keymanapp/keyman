@@ -204,6 +204,8 @@ EMBEDDED="embedded"
 
 WEB_OUTPUT="../release/web"
 EMBED_OUTPUT="../release/embedded"
+GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/."
+GESTURE_RECOGNIZER_TARGET="../release/unminified/gesture-recognizer/"
 WEB_OUTPUT_NO_MINI="../release/unminified/web"
 EMBED_OUTPUT_NO_MINI="../release/unminified/embedded"
 INTERMEDIATE="../intermediate"
@@ -463,6 +465,13 @@ if [ $BUILD_COREWEB = true ]; then
     pushd "$KEYMAN_ROOT/common/web/gesture-recognizer/src"
     ./build.sh build || fail "@keymanapp/gesture-recognizer build was unsuccessful."
     popd
+
+    # Copy the build artifacts into web-space for CI testing
+    # Note:  make sure this doesn't break once KeymanWeb actually uses the module!
+    if ! [ -d $GESTURE_RECOGNIZER_TARGET ]; then
+        mkdir $GESTURE_RECOGNIZER_TARGET
+    fi
+    cp -a $GESTURE_RECOGNIZER_BUILD $GESTURE_RECOGNIZER_TARGET
 fi
 
 
