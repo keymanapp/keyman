@@ -63,12 +63,12 @@ $(function() {
   }
 
   builder.prepareKeyCapTypes = function() {
-    let types = $('#selKeyCapType'), subTypes = $('#selKeyCapSubType'), opts = '';
+    let types = $('#selKeyCapType'), subTypes = $('#selSubKeyCapType'), opts = '';
     for(let name of builder.specialKeyNames) {
-      opts += '<option value="'+name+'">'+builder.renameSpecialKey(name)+'\t'+name+'</option>';
+      opts += '<option value="'+name+'">'+builder.renameSpecialKey(name)+' &nbsp; &nbsp; '+name+'</option>';
     }
     $(types).append(opts);
-    // $(subTypes).append(opts);
+    $(subTypes).append(opts);
   };
 
   this.preparePlatforms = function () {
@@ -536,7 +536,6 @@ $(function() {
       if(subKeys.length) {
         builder.selectSubKey(subKeys[0]);
       }
-      //builder.lastFocus = $('input#inpKeyCap');
     } else {
       if(!builder.textControlsInToolbar()) {
         $('input#inpKeyCap').css('display', '');
@@ -652,37 +651,41 @@ $(function() {
     return r;
   }
 
-  const inpKeyCapChange = builder.wrapChange(function (e) {
-    const val = $(this).val();
-    var k = builder.selectedKey();
+  const keyCapChange = function(val) {
+    const k = builder.selectedKey();
     $('.text', k).text(builder.renameSpecialKey(val));
     k.data('text', val);
-    $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
-
     if(builder.specialCharacters[val]) {
       k.addClass('key-special-text');
     } else {
       k.removeClass('key-special-text');
     }
-
     builder.updateCharacterMap(val, false);
+  }
+
+  const inpKeyCapChange = builder.wrapChange(function (e) {
+    const val = $(this).val();
+    $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
+    keyCapChange(val);
   }, {saveOnce: true});
 
   const inpKeyCapUnicodeChange = builder.wrapChange(function (e) {
     const val = builder.fromUnicodeString($(this).val());
-    var k = builder.selectedKey();
-    $('.text', k).text(builder.renameSpecialKey(val));
-    k.data('text', val);
     $('#inpKeyCap').val(val);
-
-    if(builder.specialCharacters[val]) {
-      k.addClass('key-special-text');
-    } else {
-      k.removeClass('key-special-text');
-    }
-
-    builder.updateCharacterMap(val, false);
+    keyCapChange(val);
   }, {saveOnce: true});
+
+  const selKeyCapTypeChange = builder.wrapChange(function () {
+    var val = $(this).val();
+    $('#inpKeyCap').val(val);
+    $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
+    keyCapChange(val);
+    // We only EnableControls here because if the user types *BkSp* into the
+    // text field, we shouldn't hide the text field until next time the key is selected
+    builder.enableKeyControls();
+  });
+
+  $('#selKeyCapType').on('change', selKeyCapTypeChange);
 
   $('#inpKeyCap')
     .on('input', inpKeyCapChange)
@@ -745,9 +748,12 @@ $(function() {
     if (key.length == 0) {
       $('#keyToolbar *').attr('disabled', 'disabled');
       $('#sub-key-container').css('display', 'none');
+      $('#key-cap-unicode-toolbar-item, #key-cap-toolbar-item').css('display', 'none');
     } else {
+      let val = $(key).data('text');
       $('#keyToolbar *').removeAttr('disabled');
       $('#sub-key-container').css('display', '');
+      $('#key-cap-unicode-toolbar-item, #key-cap-toolbar-item').css('display', builder.specialCharacters[val] ? 'none' : '');
     }
   }
 

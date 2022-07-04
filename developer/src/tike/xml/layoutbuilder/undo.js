@@ -32,7 +32,7 @@ $(function() {
     builder.selectPlatform();
     $('#selLayer').val(s.layer);
     builder.selectLayer();
-    builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.id; }).first());
+    builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.key; }).first());
     if (s.subkey) builder.selectSubKey($('#sub-key-groups .key').filter(function (index) { return $(this).data('id') === s.subkey; }).first());
   }
 

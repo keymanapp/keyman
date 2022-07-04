@@ -13,10 +13,10 @@
   <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>
   <script src="/app/lib/sentry/init.js"><xsl:text> </xsl:text></script>
   <title>On Screen Keyboard Builder</title>
-  <link rel="stylesheet" type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui.css</xsl:attribute></link>
+  <link rel="stylesheet" type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui/jquery-ui.css</xsl:attribute></link>
   <link rel='stylesheet' type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.css</xsl:attribute></link>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-1.10.2.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui.js</xsl:attribute></script>
+  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui/jquery-ui.js</xsl:attribute></script>
   <script>
     var KVKL = <xsl:value-of select='/TouchLayoutBuilder/LayoutJS' />;
     window.builder = {};
@@ -72,10 +72,9 @@
     <div id='keyToolbar'>
 
       <div class='toolbar-item'>
-        <label for='selKeyCapType'>Keycap Type:</label>
+        <label for='selKeyCapType'>Keycap Value:</label>
         <select id='selKeyCapType'>
           <option value=''>Text</option>
-          <option value=''>Icon</option>
         </select>
       </div>
 
@@ -84,7 +83,7 @@
         <input id='inpKeyCap' type='text' size='16' />
       </div>
 
-      <div class='toolbar-item'>
+      <div class='toolbar-item' id='key-cap-unicode-toolbar-item'>
         <label for='inpKeyCapUnicode'>Unicode:</label>
         <input id='inpKeyCapUnicode' type='text' size='16' />
       </div>
@@ -177,11 +176,17 @@
         <label for='inpSubKeyGestureType'>Gesture Type:</label>
         <input id='inpSubKeyGestureType' type='text' size='16' disabled='disabled' />
       </div>
+      <div class='toolbar-item'>
+        <label for='selSubKeyCapType'>Keycap Value:</label>
+        <select id='selSubKeyCapType'>
+          <option value=''>Text</option>
+        </select>
+      </div>
       <div class='toolbar-item' id='sub-key-cap-toolbar-item'>
         <label>Text:</label>
         <input id='inpSubKeyCap' type='text' size='8' />
       </div>
-      <div class='toolbar-item'>
+      <div class='toolbar-item' id='sub-key-cap-unicode-toolbar-item'>
         <label>Unicode:</label>
         <input id='inpSubKeyCapUnicode' type='text' size='16' />
       </div>

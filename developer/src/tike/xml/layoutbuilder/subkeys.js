@@ -68,6 +68,7 @@ $(function() {
 
     $('#inpSubKeyGestureType').val(gestureType);
     let val = $(key).data('text');
+    $('#selSubKeyCapType').val(builder.specialCharacters[val] ? val : '');
     $('#inpSubKeyCap').val(val);
     $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
     $('#inpSubKeyName').val($(key).data('id'));
@@ -76,7 +77,7 @@ $(function() {
     $('#selSubKeyLayerOverride').val($(key).data('layer'));
   }
 
-  var subKeyNameChange = builder.wrapChange(function () {
+  const subKeyNameChange = builder.wrapChange(function () {
     var nkey = builder.selectedSubKey();
     if (nkey.length == 0) return;
     nkey.data('id', $(this).val());
@@ -95,38 +96,34 @@ $(function() {
       builder.hasSavedKeyUndo = false;
     });
 
-
-  const inpSubKeyCapChange = builder.wrapChange(function () {
+  const subKeyCapChange = function(val) {
     var k = builder.selectedSubKey();
     if (k.length == 0) return;
-    let val = $(this).val();
     $('.text', k).text(builder.renameSpecialKey(val));
     k.data('text', val);
-    $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
-
+    if(builder.specialCharacters[val]) {
+      k.addClass('key-special-text');
+    } else {
+      k.removeClass('key-special-text');
+    }
     builder.updateCharacterMap(val, true);
     builder.generateSubKeys();
+  }
+
+  const inpSubKeyCapChange = builder.wrapChange(function () {
+    let val = $(this).val();
+    $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
+    subKeyCapChange(val);
   }, {saveOnce: true});
 
   const inpSubKeyCapUnicodeChange = builder.wrapChange(function () {
-    var k = builder.selectedSubKey();
-    if (k.length == 0) return;
     const val = builder.fromUnicodeString($(this).val());
-    $('.text', k).text(builder.renameSpecialKey(val));
-    k.data('text', val);
     $('#inpSubKeyCap').val(val);
-
-    builder.updateCharacterMap(val, true);
-    builder.generateSubKeys();
+    subKeyCapChange(val);
   }, {saveOnce: true});
 
   $('#inpSubKeyCap')
     .change(inpSubKeyCapChange)
-    /*.autocomplete({
-      source: builder.specialKeyNames,
-      change: inpSubKeyCapChange,
-      select: builder.wrapInstant(inpSubKeyCapChange)
-    })*/
     .on('input', inpSubKeyCapChange)
     .mouseup(function () {
       builder.updateCharacterMap($(this).val(), false);
@@ -146,6 +143,19 @@ $(function() {
     }).blur(function () {
       builder.hasSavedSubKeyUndo = false;
     });
+
+  const selSubKeyCapTypeChange = builder.wrapChange(function (e) {
+    e.stopPropagation();
+    var val = $(this).val();
+    $('#inpSubKeyCap').val(val);
+    $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
+    subKeyCapChange(val);
+    // We only EnableControls here because if the user types *BkSp* into the
+    // text field, we shouldn't hide the text field until next time the key is selected
+    builder.enableSubKeyControls();
+  });
+
+  $('#selSubKeyCapType').on('change', selSubKeyCapTypeChange);
 
   const selSubKeyNextLayerChange = builder.wrapChange(function () {
     $(this).val() === '' ?
@@ -223,7 +233,7 @@ $(function() {
 
   this.selectSubKey = function (key) {
     builder.selectedSubKey().removeClass('selected');
-    if (key) {
+    if (key && $(key).length) {
       $(key).addClass('selected');
 
       let offset = $(key).offset();
@@ -262,12 +272,14 @@ $(function() {
     if (key.length == 0) {
       $('#subKeyToolbar *').attr('disabled', 'disabled');
     } else {
+      let val = $(key).data('text');
       $('#subKeyToolbar *').removeAttr('disabled');
       $('#subKeyToolbar #inpSubKeyGestureType').attr('disabled', 'disabled');
+      $('#sub-key-cap-unicode-toolbar-item, #sub-key-cap-toolbar-item').css('display', builder.specialCharacters[val] ? 'none' : '');
     }
   }
 
-  $('#sub-key-container').click(function (event) {
+  $('#sub-key-groups').click(function (event) {
     builder.selectSubKey(null);
   });
 

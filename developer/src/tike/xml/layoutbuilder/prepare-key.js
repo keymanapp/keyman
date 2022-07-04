@@ -90,6 +90,7 @@ $(function() {
     var key = builder.selectedKey();
     builder.hasSavedKeyUndo = false;
     let val = $(key).data('text');
+    $('#selKeyCapType').val(builder.specialCharacters[val] ? val : '');
     $('#inpKeyCap').val(val);
     $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
     $('#inpKeyName').val($(key).data('id'));
@@ -129,7 +130,8 @@ $(function() {
           .data('layer', key.layer)
           .data('direction', key.direction) // used only by flicks
           .css('width', (100 * 0.7) + 'px')
-          .css('font-family', KVKL[builder.lastPlatform].font);
+          .css('font-family', key.font)
+          .css('font-size', key.fontsize);
 
         if(builder.specialCharacters[text]) {
           $(nkey).addClass('key-special-text');
