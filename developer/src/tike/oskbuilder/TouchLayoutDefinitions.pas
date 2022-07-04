@@ -49,7 +49,18 @@ const
     (Name: 'fontsize'; ClassType: TJSONString)
   );
 
-  KeyDef: array[0..10] of TJSONDef = (
+  FlickDef: array[0..7] of TJSONDef = (
+    (Name: 'nw'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef)),
+    (Name: 'n'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef)),
+    (Name: 'ne'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef)),
+    (Name: 'w'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef)),
+    (Name: 'e'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef)),
+    (Name: 'sw'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef)),
+    (Name: 's'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef)),
+    (Name: 'se'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef))
+  );
+
+  KeyDef: array[0..12] of TJSONDef = (
     (Name: 'id'; ClassType: TJSONString),
     (Name: 'text'; ClassType: TJSONString),
     (Name: 'sp'; ClassType: TJSONValue),
@@ -60,7 +71,9 @@ const
     (Name: 'nextlayer'; ClassType: TJSONString),
     (Name: 'font'; ClassType: TJSONString),
     (Name: 'fontsize'; ClassType: TJSONString),
-    (Name: 'sk'; ClassType: TJSONArray; Value: @SkDef[0]; ValueSize: Length(SkDef))
+    (Name: 'sk'; ClassType: TJSONArray; Value: @SkDef[0]; ValueSize: Length(SkDef)),
+    (Name: 'flick'; ClassType: TJSONObject; Value: @FlickDef[0]; ValueSize: Length(FlickDef)),
+    (Name: 'multitap'; ClassType: TJSONArray; Value: @SkDef[0]; ValueSize: Length(SkDef))
   );
 
   RowDef: array[0..1] of TJSONDef = (

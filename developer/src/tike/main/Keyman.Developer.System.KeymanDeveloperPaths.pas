@@ -36,7 +36,7 @@ var
   KeymanRoot: string;
 begin
   if TKeymanPaths.RunningFromSource(KeymanRoot)
-    then Result := KeymanRoot + 'developer\src\inst\dist\node.exe'
+    then Result := KeymanRoot + 'developer\src\inst\node\dist\node.exe'
     else Result := ExtractFilePath(ParamStr(0)) + 'node.js\node.exe';
 end;
 
