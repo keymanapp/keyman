@@ -63,5 +63,7 @@ namespace com.keyman.osk {
      * coordinate to the `safeBounds`.
      */
     readonly paddedSafeBounds: RecognitionZoneSource;
+
+    readonly safeBoundPadding: number[];
   }
 }

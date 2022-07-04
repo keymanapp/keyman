@@ -30,9 +30,9 @@ namespace com.keyman.osk {
       processingConfig.inputStartBounds = processingConfig.inputStartBounds ?? processingConfig.targetRoot;
       processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
       processingConfig.safeBounds       = processingConfig.safeBounds       ?? new ViewportZoneSource(2);
-      processingConfig.safeBoundPadding = processingConfig.safeBoundPadding ?? 3;
+      processingConfig.safeBoundPadding = processingConfig.safeBoundPadding ?? [3];
 
-      processingConfig.paddedSafeBounds = new PaddedZoneSource(processingConfig.safeBounds, processingConfig.safeBoundPadding);
+      processingConfig.paddedSafeBounds = new PaddedZoneSource(processingConfig.safeBounds, ...processingConfig.safeBoundPadding);
 
       return processingConfig;
     }
