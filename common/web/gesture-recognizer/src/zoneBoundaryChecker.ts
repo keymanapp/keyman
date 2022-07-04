@@ -28,7 +28,7 @@ namespace com.keyman.osk {
       bitmask |= (coord.x < bounds.left)   ? ZoneBoundaryChecker.FAR_LEFT   : 0;
       bitmask |= (coord.x > bounds.right)  ? ZoneBoundaryChecker.FAR_RIGHT  : 0;
       bitmask |= (coord.y < bounds.top)    ? ZoneBoundaryChecker.FAR_TOP    : 0;
-      bitmask |= (coord.y < bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
+      bitmask |= (coord.y > bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
 
       return bitmask & (~ignoreBitmask); // returns zero if effectively 'within bounds'.
     }
@@ -58,7 +58,7 @@ namespace com.keyman.osk {
       ignoredSafeBoundFlags = ignoredSafeBoundFlags || 0;
       // If the coordinate lies outside the maximum supported range, fail the boundary check.
       if(!!this.getCoordZoneBitmask(coord, config.maxRoamingBounds)) {
-        return false;
+        return true;
       }
 
       return !!this.getCoordZoneBitmask(coord, config.safeBounds, ignoredSafeBoundFlags);
