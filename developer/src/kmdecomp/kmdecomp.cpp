@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "../../../common/windows/cpp/include/keymansentry.h"
+#include "../../../common/windows/cpp/include/keymanversion.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 
@@ -56,10 +57,13 @@ int run(int argc, char *argv[])
 
 	if(argc < 2 || !strcmp(argv[1], "--help"))
 	{
-		puts("KMDECOMP: Decompile Keyman .kmx keyboard");
-		puts("(C) SIL International");
-		puts("Usage: KMDECOMP <filename> [output]\n");
-		puts("Will create a .kmn and optionally a .bmp/.ico with the same filename and in the same location as the input");
+    printf(
+      "KMDECOMP: Decompile Keyman .kmx keyboard\n"
+      "Version %s, %s\n"
+      "Usage: KMDECOMP <filename> [output]\n"
+      "Will create a.kmn and optionally a.bmp / .ico with the same filename and in the same location as the input",
+      KEYMAN_VersionWithTag, KEYMAN_Copyright
+    );
 		return 1;
 	}
 

@@ -20,8 +20,14 @@
 #define KEYMANVERSION90W	L"9.0"
 #define KEYMANVERSION80W	L"8.0"
 
+// These macros may be used only in RC files
+
 #define KV_COMPANY_NAME  "SIL International\0"
 #define KV_LEGAL_COPYRIGHT "\xA9 SIL International\0"
 #define KV_LEGAL_TRADEMARKS "Keyman is a registered trademark in Australia\0"
+
+// These macros may be used in C++ files
+
+#define KEYMAN_Copyright "(C) SIL International"
 
 #endif

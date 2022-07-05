@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "../../../common/windows/cpp/include/crc32.h"
+#include "../../../common/windows/cpp/include/keymanversion.h"
 #include <iostream>
 #include <vector>
 #include <codecvt>
@@ -59,11 +60,14 @@ int run(int argc, char *argv[])
 
   if (argc < 2 || !strcmp(argv[1], "--help"))
   {
-    puts("KMANALYZE: Extract rules from a Keyman .kmx keyboard to use for building automated tests");
-    puts("(C) SIL International");
-    puts("Usage: KMANALYZE <filename> [outputfilename]\n");
-    puts("Will create a keyboard.tests from keyboard.js; if outputfilename is not specified,");
-    puts("then will put the output file in the same folder as filename.");
+    printf(
+      "KMANALYZE: Extract rules from a Keyman .kmx keyboard to use for building automated tests\n"
+      "Version %s, %s\n"
+      "Usage: KMANALYZE <filename> [outputfilename]\n\n"
+      "Will create a keyboard.tests from keyboard.js; if outputfilename is not specified,\n"
+      "then will put the output file in the same folder as filename.",
+      KEYMAN_VersionWithTag, KEYMAN_Copyright
+    );
     return 1;
   }
 

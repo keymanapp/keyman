@@ -494,8 +494,8 @@ begin
   SetFontProperties(IDC_CHECK1, FW_NORMAL, ssFontSize_Dialog, ssFontName_Dialog);
   SetFontProperties(IDCANCEL, FW_NORMAL, ssFontSize_Dialog, ssFontName_Dialog);
 
-  SetWindowText(GetDlgItem(Handle, IDC_TITLE), PWideChar(FInstallInfo.Text(ssTitle, [FInstallInfo.EditionTitle])));
-  SetWindowText(GetDlgItem(Handle, IDC_LOGOMESSAGE), PWideChar(FInstallInfo.Text(ssSIL, [FInstallInfo.EditionTitle])));
+  SetWindowText(GetDlgItem(Handle, IDC_TITLE), PWideChar(FInstallInfo.Text(ssTitle, [FInstallInfo.Version])));
+  SetWindowText(GetDlgItem(Handle, IDC_LOGOMESSAGE), PWideChar(FInstallInfo.Text(ssSIL, [])));
   SetWindowText(GetDlgItem(Handle, IDC_MESSAGE), PWideChar(FInstallInfo.Text(ssWelcome_Plain, [FInstallInfo.EditionTitle])));
 
   SetWindowText(GetDlgItem(Handle, IDC_CHECK1), PWideChar(FInstallInfo.Text(ssCheckForUpdates)));

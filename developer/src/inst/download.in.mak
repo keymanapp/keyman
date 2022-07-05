@@ -98,7 +98,7 @@ makeinstaller:
     echo [Setup] > setup.inf
     echo Version=$Version >> setup.inf
     echo MSIFileName=keymandeveloper.msi >> setup.inf
-    echo Title=Keyman Developer $VersionRelease >>setup.inf
+    echo Title=Keyman Developer $VersionWithTag >>setup.inf
     $(WZZIP) setup.zip keymandeveloper.msi setup.inf
     copy /b $(DEVELOPER_PROGRAM)\setup.exe + setup.zip keymandeveloper-$Version.exe
     $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$Version.exe

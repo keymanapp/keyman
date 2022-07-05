@@ -208,7 +208,7 @@ begin
 {$ELSE}
     writeln(SKeymanDeveloperName + ' Compiler (32-bit)');
 {$ENDIF}
-    writeln('Version ' + GetVersionString + ', ' + GetVersionCopyright);
+    writeln('Version ' + CKeymanVersionInfo.VersionWithTag + ', ' + GetVersionCopyright);
   end;
 
   if FError or (FParamInfile = '') then

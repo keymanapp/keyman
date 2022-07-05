@@ -148,7 +148,7 @@ end;
 procedure WriteBanner;
 begin
   writeln(SKeymanDeveloperName + ' Conversion Utility');
-  writeln('Version ' + GetVersionString + ', ' + GetVersionCopyright);
+  writeln('Version ' + CKeymanVersionInfo.VersionWithTag + ', ' + GetVersionCopyright);
   writeln;
 end;
 
