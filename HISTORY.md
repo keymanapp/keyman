@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.25 alpha 2022-07-05
+
+* chore(web): update readme (#6891)
+
 ## 16.0.24 alpha 2022-07-02
 
 * fix(common): trigger builds correctly for stable builds (#6847)
