@@ -9,7 +9,8 @@ namespace com.keyman.osk {
 
     private hasActiveClick: boolean = false;
     private disabledSafeBounds: number = 0;
-    private ignoreSequence: boolean = false;
+
+    private IDENTIFIER_SEED: number;
 
     public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
@@ -17,10 +18,22 @@ namespace com.keyman.osk {
       this._mouseStart = this.onMouseStart.bind(this);
       this._mouseMove  = this.onMouseMove.bind(this);
       this._mouseEnd   = this.onMouseEnd.bind(this);
+
+      // IDs should be unique.  Unfortunately, we can't exactly control the identifier values for
+      // the `touch` properties of TouchEvents... but they're usually non-negative, so this ought help.
+      this.IDENTIFIER_SEED = Math.round(Math.random() * (Number.MIN_SAFE_INTEGER - 10000)) - 10000;
     }
 
     private get eventRoot(): HTMLElement {
       return this.config.mouseEventRoot;
+    }
+
+    private generateIdentifier(): number {
+      return this.IDENTIFIER_SEED++;
+    }
+
+    private get activeIdentifier(): number {
+      return this.IDENTIFIER_SEED-1;
     }
 
     // public static forVisualKeyboard(vkbd: VisualKeyboard) {
@@ -72,63 +85,72 @@ namespace com.keyman.osk {
     }
 
     onMouseStart(event: MouseEvent) {
+      // If it's not an event we'd consider handling, do not prevent event
+      // propagation!  Just don't process it.
       if(!this.config.targetRoot.contains(event.target as Node)) {
-        this.ignoreSequence = true;
         return;
       }
 
       this.preventPropagation(event);
-      const coord = InputEventCoordinate.fromEvent(event);
 
-      if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(coord, this.config)) {
+      const sample: InputSample = {
+        x: event.clientX,
+        y: event.clientY,
+        t: performance.now()
+      };
+
+      if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
         // If we started very close to a safe zone border, remember which one(s).
         // This is important for input-sequence cancellation check logic.
-        this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(coord, this.config);
+        this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(sample, this.config);
       }
 
-      this.onInputStart(coord);
-      this.hasActiveClick = true;
+      this.onInputStart(this.generateIdentifier(), sample, event.target);
     }
 
     onMouseMove(event: MouseEvent) {
-      if(this.ignoreSequence) {
+      if(!this.hasActiveSequence(this.activeIdentifier)) {
         return;
       }
 
-      const coord = InputEventCoordinate.fromEvent(event);
+      const sample: InputSample = {
+        x: event.clientX,
+        y: event.clientY,
+        t: performance.now()
+      };
 
       if(!event.buttons) {
         if(this.hasActiveClick) {
           this.hasActiveClick = false;
-          this.onInputMoveCancel(coord);
+          this.onInputMoveCancel(this.activeIdentifier);
         }
-        return;
-      } else if(!this.hasActiveClick) {
-        // Can interfere with OSK drag-handlers (title bar, resize bar) otherwise.
         return;
       }
 
       this.preventPropagation(event);
 
-      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(coord, this.config, this.disabledSafeBounds)) {
-        this.onInputMove(coord);
+      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.disabledSafeBounds)) {
+        this.onInputMove(this.activeIdentifier, sample);
       } else {
-        this.hasActiveClick = false;
-        this.ignoreSequence = true;
-        this.onInputMoveCancel(coord);
+        this.onInputMoveCancel(this.activeIdentifier);
       }
     }
 
     onMouseEnd(event: MouseEvent) {
-      if(this.ignoreSequence) {
-        this.ignoreSequence = false;
+      if(!this.hasActiveSequence(this.activeIdentifier)) {
         return;
       }
 
       if(!event.buttons) {
         this.hasActiveClick = false;
       }
-      this.onInputEnd(InputEventCoordinate.fromEvent(event));
+
+      const sample: InputSample = {
+        x: event.clientX,
+        y: event.clientY,
+        t: performance.now()
+      };
+      this.onInputEnd(this.activeIdentifier, sample);
     }
   }
 }

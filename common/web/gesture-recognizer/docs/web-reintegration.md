@@ -38,3 +38,13 @@ viewport-aware bounds detection & logic.
 
 `safeBoundsPadding` models the slightly-inset boundaries that are used to disable `safeBounds` near an edge
 should the initial touch have started near that edge.
+
+## From feat/web/recognizer-multipoint-tracking
+
+This makes things a _bit_ more complicated than with gesture-recognizer-base.  Now, the `GestureRecognizer`
+object's lone event will yield an `InputSequence` corresponding to its triggering `mousedown` or `touchstart`.
+Further events for that "tracked point" will arise from its `InputSequence`.  This approach provides the
+perspective of each touch point individually for further processing... effectively splitting multi-touchpoint
+events into multiple _individual_ events.
+
+

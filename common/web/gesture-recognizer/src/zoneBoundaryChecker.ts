@@ -17,10 +17,10 @@ namespace com.keyman.osk {
      * @param zone          An object defining a 'recognition zone' of the gesture engine.
      * @param ignoreBitmask A bitmask indicating select boundaries to ignore for the check.
      */
-    static getCoordZoneBitmask(coord: InputEventCoordinate, zone: RecognitionZoneSource): number {
-      // coord currently uses page-based coords, not client-based!
-      let screenX = coord.x - document.body.scrollLeft;
-      let screenY = coord.y - document.body.scrollTop;
+    static getCoordZoneBitmask(coord: InputSample, zone: RecognitionZoneSource): number {
+      // coord uses page-based coords, not client-based!
+      let screenX = coord.x;
+      let screenY = coord.y;
 
       const bounds = zone.getBoundingClientRect();
 
@@ -37,7 +37,7 @@ namespace com.keyman.osk {
      * Confirms whether or not the input coordinate lies within the accepted coordinate bounds
      * for a gesture input sequence's first coordinate.
      */
-    static inputStartOutOfBoundsCheck(coord: InputEventCoordinate, config: Nonoptional<GestureRecognizerConfiguration>): boolean {
+    static inputStartOutOfBoundsCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration>): boolean {
       return !!this.getCoordZoneBitmask(coord, config.inputStartBounds); // true if out of bounds.
     }
 
@@ -48,11 +48,11 @@ namespace com.keyman.osk {
      * This value should be provided as the third argument to `inputMoveCancellationCheck` for
      * updated input coordinates for the current input sequence.
      */
-    static inputStartSafeBoundProximityCheck(coord: InputEventCoordinate, config: Nonoptional<GestureRecognizerConfiguration>): number {
+    static inputStartSafeBoundProximityCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration>): number {
       return this.getCoordZoneBitmask(coord, config.paddedSafeBounds);
     }
 
-    static inputMoveCancellationCheck(coord: InputEventCoordinate,
+    static inputMoveCancellationCheck(coord: InputSample,
                                       config: Nonoptional<GestureRecognizerConfiguration>,
                                       ignoredSafeBoundFlags?: number): boolean {
       ignoredSafeBoundFlags = ignoredSafeBoundFlags || 0;

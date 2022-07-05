@@ -68,36 +68,29 @@ window.addEventListener('load', function() {
 
   let console = {};
   let logElement = document.getElementById('event-log');
-  // Erase any logs from before a page reload.
-  logElement.value = '';
-
-
   console.log = function(str) {
-    str = str === undefined ? '' : str;
     logElement.value += str + '\n';
   }
-
 
   let logClearButton = document.getElementById('log-clear-button');
   logClearButton.onclick = function() {
     logElement.value = '';
   }
 
+  recognizer.on('inputstart', function(sequence) {
+    console.log(`new input sequence started: identifier ${sequence.identifier}`);
 
-  recognizer.on('trackedInputUpdate', function(state, coord) {
-    if(state != 'move') {
-      let meta = "";
-      if(coord.isFromMouse) {
-        meta = "isFromMouse";
-      } else {
-        try {
-          meta = "touchpoint id: " + coord.source.changedTouches[0].identifier;
-        } catch (e) {
-          meta = "touchpoint id: error";
-        }
-      }
-      console.log(`state: ${state}, meta: ${meta}`);
-    }
+    sequence.on('inputupdate', function(seq, sample) {
+      console.log(`identifier ${seq.identifier}:  ${JSON.stringify(sample)}`);
+    });
+
+    sequence.on('inputcancel', function(seq) {
+      console.log(`identifier ${seq.identifier} cancelled`);
+    });
+
+    sequence.on('inputend', function(seq) {
+      console.log(`identifier ${seq.identifier} ended`);
+    });
   });
 });
 

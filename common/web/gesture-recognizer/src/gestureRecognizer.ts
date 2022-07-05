@@ -11,7 +11,7 @@ namespace com.keyman.osk {
   };
 
   export class GestureRecognizer extends EventEmitter {
-    public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "trackedInputUpdate";
+    public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "inputstart";
 
     protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
@@ -59,8 +59,8 @@ namespace com.keyman.osk {
         return false;
       }
 
-      this.mouseEngine.on(InputEventEngine.INPUT_UPDATE_EVENT_NAME, forwardingUpdateHandler);
-      this.touchEngine.on(InputEventEngine.INPUT_UPDATE_EVENT_NAME, forwardingUpdateHandler);
+      this.mouseEngine.on(InputEventEngine.INPUT_START_EVENT_NAME, forwardingUpdateHandler);
+      this.touchEngine.on(InputEventEngine.INPUT_START_EVENT_NAME, forwardingUpdateHandler);
     }
 
     public destroy() {

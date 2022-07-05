@@ -3,6 +3,11 @@
 /// <reference path="nonoptional.ts" />
 
 namespace com.keyman.osk {
+  // Note:  we may add properties in the future that aren't explicitly readonly;
+  // it's just that the ELEMENTS and zone definitions involved shouldn't be shifting
+  // after configuration.
+  //
+  // For example, customization of a longpress timer's length need not be readonly.
   export interface GestureRecognizerConfiguration {
     /**
      * Specifies the element that mouse input listeners should be attached to.  If
