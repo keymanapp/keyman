@@ -143,7 +143,6 @@ uses
   Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
   KeymanVersion,
-  OnlineConstants,
   RegistryHelpers,
   RegistryKeys,
   SetupStrings,

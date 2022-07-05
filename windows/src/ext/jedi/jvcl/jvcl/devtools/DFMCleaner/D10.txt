@@ -1,6 +1,0 @@
-*.PopupMode
-*.PopupParent
-*.ExplicitLeft
-*.ExplicitTop
-*.ExplicitWidth
-*.ExplicitHeight

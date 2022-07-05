@@ -1,3 +1,0 @@
-SenseEvents implements COM callback interface for notifiying Logon, Logoff and similar events.
-
-http://msdn.microsoft.com/en-us/library/aa377576%28VS.85%29.aspx

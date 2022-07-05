@@ -1,0 +1,13 @@
+
+2 ICON DISCARDABLE "..\\..\\..\\common\\resources\\icons\\filetypes\\kmn.ico"
+3 ICON DISCARDABLE "..\\..\\..\\common\\resources\\icons\\filetypes\\kps.ico"
+6 ICON DISCARDABLE "..\\..\\..\\common\\resources\\icons\\filetypes\\kpj.ico"
+7 ICON DISCARDABLE "..\\..\\..\\common\\resources\\icons\\filetypes\\kmx.ico"
+8 ICON DISCARDABLE "..\\..\\..\\common\\resources\\icons\\filetypes\\kmp.ico"
+11 ICON DISCARDABLE "..\\..\\..\\common\\resources\\icons\\filetypes\\kvk.ico"
+12 ICON DISCARDABLE "..\\..\\..\\common\\resources\\icons\\filetypes\\kvks.ico"
+
+
+DRAG_ARROW_MASK BITMAP "..\\..\\..\\common\\resources\\bitmaps\\drag_arrow_mask.bmp"
+DRAG_ARROW_IMAGE BITMAP "..\\..\\..\\common\\resources\\bitmaps\\drag_arrow_image.bmp"
+KEYCAPSMOOTH BITMAP DISCARDABLE "..\\..\\..\\common\\resources\\bitmaps\\keycap.bmp"

@@ -1,18 +1,18 @@
 (*
   Name:             kpinstallpackage
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    3 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add AutoApplyKeyman call, avoid processmessages in unzip
                     14 Sep 2006 - mcdurdin - Send WM_FONTCHANGE after font install, not before!
@@ -74,7 +74,6 @@ uses
   KPInstallPackageStartMenu,
   kmpinffile, getosversion, utilsystem, shlobj, inifiles, messages,
   StockFileNames,
-  OnlineConstants,
   kpinstallfont, utilfiletypes, PackageInfo, ErrorControlledRegistry,
   RegistryKeys, utilkeyman, utildir,
 
