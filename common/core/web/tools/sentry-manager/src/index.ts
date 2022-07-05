@@ -184,10 +184,14 @@ namespace com.keyman {
     initConsole() {
       // creating function declarations for better stacktraces (otherwise they'd be anonymous function expressions)
       let oldConsoleError = console.error;
+      let _this = this;
+      // Note that Sentry may have overridden console.error so we are re-overriding it here post-init.
       console.error = reportingConsoleError; // defined via function hoisting
       function reportingConsoleError() {
         let args = Array.prototype.slice.call(arguments);
-        Sentry.captureException(reduceConsoleArgs(args), { level: 'error' });
+        if(_this._enabled) {
+          Sentry.captureException(reduceConsoleArgs(args), { level: 'error' });
+        }
         return oldConsoleError.apply(console, args);
       };
 
@@ -195,7 +199,9 @@ namespace com.keyman {
       console.warn = reportingConsoleWarn; // defined via function hoisting
       function reportingConsoleWarn() {
         let args = Array.prototype.slice.call(arguments);
-        Sentry.captureMessage(reduceConsoleArgs(args), { level: 'warning' });
+        if(_this._enabled) {
+          Sentry.captureMessage(reduceConsoleArgs(args), { level: 'warning' });
+        }
         return oldConsoleWarn.apply(console, args);
       }
 
