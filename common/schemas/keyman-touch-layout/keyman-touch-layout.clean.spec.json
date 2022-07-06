@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/schema#",
   "$ref": "#/definitions/touch-layout",
   "$comment": "Version: 16.0",
-  "description": "A Keyman Touch Layout file, per version 16.0, loose specification that allows for legacy such as numbers as strings",
+  "description": "A Keyman Touch Layout file, per version 16.0, clean spec, no legacy data or types",
 
   "definitions": {
     "touch-layout": {
@@ -62,17 +62,9 @@
     },
 
     "row-id": {
-      "oneOf": [
-        {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 100
-        },
-        {
-          "type": "string",
-          "pattern": "^[0-9]+$"
-        }
-      ]
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
     },
 
     "keys": {
@@ -87,12 +79,11 @@
         "text": { "type": "string" },
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
-        "fontsize": { "type": "string" },
         "font": { "$ref": "#/definitions/font-spec" },
-        "dk": { "type": "string" },
-        "sp": { "$ref" : "#/definitions/numeric" },
-        "pad": { "$ref" : "#/definitions/numeric" },
-        "width": { "$ref" : "#/definitions/numeric" },
+        "fontsize": { "type": "string" },
+        "sp": { "$ref": "#/definitions/key-sp" },
+        "pad": { "$ref" : "#/definitions/key-pad" },
+        "width": { "$ref" : "#/definitions/key-width" },
         "sk": { "$ref": "#/definitions/subkeys" },
         "flick": { "$ref": "#/definitions/flick" },
         "multitap": { "$ref": "#/definitions/subkeys" }
@@ -100,16 +91,26 @@
       "additionalProperties": false
     },
 
-    "numeric": {
-      "oneOf": [
-        { "type": "string", "pattern": "^[0-9]+(\\.?[0-9]*)$|^$" },
-        { "type": "number" }
-      ]
-    },
-
     "key-id": {
       "type": "string",
-      "pattern": "^[TKUtku]_[a-zA-Z0-9_]+$|^$"
+      "pattern": "^[TKUtku]_[a-zA-Z0-9_]+$"
+    },
+
+    "key-sp": {
+      "type": "integer",
+      "enum": [0, 1, 2, 8, 9, 10],
+    },
+
+    "key-pad": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10000
+    },
+
+    "key-width": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
     },
 
     "subkeys": {
@@ -124,12 +125,11 @@
         "text": { "type": "string" },
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
-        "sp": { "$ref" : "#/definitions/numeric" },
-        "pad": { "$ref" : "#/definitions/numeric" },
-        "width": { "$ref" : "#/definitions/numeric" },
-        "fontsize": { "type": "string" },
         "font": { "$ref": "#/definitions/font-spec" },
-        "dk": { "type": "string" }
+        "fontsize": { "type": "string" },
+        "sp": { "$ref": "#/definitions/key-sp" },
+        "pad": { "$ref" : "#/definitions/key-pad" },
+        "width": { "$ref" : "#/definitions/key-width" }
       },
       "required": ["id"],
       "additionalProperties": false

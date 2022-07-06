@@ -282,15 +282,36 @@ object](#sk-object). A `key` object has no required properties.
 
 * `sk`
 
-: If present, defines a list of keys presented when longpressing on the key,
-  an array of [`sk` objects](#sk-object).
+: If present, defines an array of keys presented when longpressing on the key,
+  an array of [`sk` objects](#sk-object). Longpress should not generally be used
+  on Spacebar and it is recommend to avoid using them on modifier keys and other
+  special keys.
+
+* `flick`
+
+: If present, defines additional keys that may be selected when using a
+  flick gesture on the key, with a [`flick` object](#flick-object). Flicks
+  should not be used on modifier keys, special keys, or the Spacebar. Keyman 16+.
+
+* `multitap`
+
+: If present, defines an array of keys that may be selected sequentially when
+  tapping multiple times on the key, an array of [`sk` objects](#sk-object).
+  Multitaps generally should not be used on modifier keys, special keys, or the
+  Spacebar. Beware of mixing multitaps with layer switching, as this can lead to
+  a confusing user experience. Keyman 16+.
+
+  Keyman 15+: the Shift key has a predefined multitap sequence to access the
+  `caps` layer, which is available if the `caps` layer is present. This is the
+  only multitap sequence supported in Keyman 15.
 
 ## `sk` object
 
 The `sk` object defines a key on a longpress menu. It has a subset of the
-properties on the `key` object. Currently, all properties on the `key` object
-are available, except for `sk`. However, the following properties are not fully
-supported as of Keyman 15: `font`, `fontsize`, `pad`, and `width`.
+properties on the `key` object. All properties on the `key` object are
+available, except for `sk`, `flick`, and `multitap`. However, the following
+properties are not fully supported as of Keyman 15: `font`, `fontsize`, `pad`,
+and `width`.
 
 * `id`
 : A string identifier for the longpress key. See `key` object for details.
@@ -340,6 +361,44 @@ supported as of Keyman 15: `font`, `fontsize`, `pad`, and `width`.
 : Number. Defines the width of the key. Not currently supported for longpress
   keys. See `key` object for details.
 
+## `flick` object
+
+A object with a set of properties that define flick keys for given directions.
+There may be up to eight properties, with the following reserved names. It is
+not recommended to use more than 4 directions on one key, as it can be difficult
+to select the correct flick if there are too many options.
+
+The following properties may be used, corresponding with a given direction from
+the center of the key. Each property must reference an [`sk` object](#sk-object):
+
+Property Name | Direction
+--------------|-----------
+`n`           | North
+`s`           | South
+`e`           | East
+`w`           | West
+`ne`          | North-East
+`nw`          | North-West
+`se`          | South-East
+`sw`          | South-West
+
+The flick direction starts at the center of the key, and continues in the direction
+shown in this diagram:
+
+```text
+nw       n       ne
+  \      |      /
+     ---------
+    |         |
+    |         |
+w - |         | - e
+    |         |
+    |         |
+     ---------
+  /      |      \
+sw       s       se
+```
+
 # Compiling .keyman-touch-layout files
 
 As of Keyman 15.0, the compiler embeds the .keyman-touch-layout file, into the
@@ -347,6 +406,9 @@ output .js file, and transforms any legacy formats (such as "number in a
 string") into the appropriate spec format.
 
 # .keyman-touch-layout version history
+
+## 2022-06-30 2.0 stable
+* Add support for flick and multitap. Aligns with Keyman 16.0.
 
 ## 2022-06-27 1.0 stable
 * Initial schema version and full documentation
