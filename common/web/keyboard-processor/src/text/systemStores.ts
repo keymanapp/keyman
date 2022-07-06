@@ -42,11 +42,9 @@ namespace com.keyman.text {
     }
 
     set(value: string) {
-      // No need to signal changes when things stay the same.
-      if(this._value == value) {
-        return;
-      }
-
+      // Even if things stay the same, we should still signal this.
+      // It's important for tracking if a rule directly set the layer
+      // versus if it passively remained.
       if(this.handler) {
         if(this.handler(this, value)) {
           return;
