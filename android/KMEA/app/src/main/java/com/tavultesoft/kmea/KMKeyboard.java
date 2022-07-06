@@ -169,7 +169,10 @@ final class KMKeyboard extends WebView {
           String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
           String sourceID = cm.sourceId().replaceAll(NAVIGATION_PATTERN, "$1$2");
           sendKMWError(cm.lineNumber(), sourceID, cm.message());
-          sendError(packageID, keyboardID, "");
+          // This duplicates the sendKMWError message, which itself duplicates the reporting now
+          // managed by sentry-manager on the js side in patch in #6890. It does not give us
+          // additional useful information.
+          //sendError(packageID, keyboardID, "");
         }
 
         return true;
