@@ -113,7 +113,7 @@ namespace com.keyman {
         });
       }
 
-      if (event.request && event.request.url) {
+      if (event && event.request && event.request.url) {
         let URL_PATTERN = /#.*$/;
         event.request.url = event.request.url.replace(URL_PATTERN, '');
       }
