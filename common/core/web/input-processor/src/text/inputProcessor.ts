@@ -11,8 +11,9 @@ namespace com.keyman.text {
     }
 
     /**
-     * Indicates the device (platform) to be used for context-only rules,
-     * such as those found in `postkeystroke` and `newcontext` groups.
+     * Indicates the device (platform) to be used for non-keystroke events,
+     * such as those sent to `begin postkeystroke` and `begin newcontext` 
+     * entry points.
      */
     private contextDevice: utils.DeviceSpec;
     private kbdProcessor: KeyboardProcessor;
