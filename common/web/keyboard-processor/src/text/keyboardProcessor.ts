@@ -728,7 +728,7 @@ namespace com.keyman.text {
       } else if(KeyboardProcessor.isModifier(Levent)) {
         this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
         // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-        if(!Levent.device.touchable) {
+        if(!this.contextDevice.touchable) {
           return this._UpdateVKShift(Levent); // I2187
         } else {
           return true;
@@ -737,7 +737,9 @@ namespace com.keyman.text {
 
       if(Levent.LmodifierChange) {
         this.activeKeyboard.notify(0, outputTarget, 1);
-        this._UpdateVKShift(Levent);
+        if(!this.contextDevice.touchable) {
+          this._UpdateVKShift(Levent);
+        }
       }
 
       // No modifier keypresses detected.
