@@ -451,7 +451,8 @@ namespace com.keyman.osk {
       }
 
       // Step 1:  have the necessary conditions been met?
-      const fixedSize = this.width && this.height && this.width.absolute && this.height.absolute;
+      const hasDimensions = this.width && this.height;
+      const fixedSize = hasDimensions && this.width.absolute && this.height.absolute;
       const computedStyle = getComputedStyle(this._Box);
       const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
 
@@ -459,7 +460,7 @@ namespace com.keyman.osk {
       if(fixedSize) {
         this._computedWidth  = this.width.val;
         this._computedHeight = this.height.val;
-      } else if(isInDOM) {
+      } else if(isInDOM && hasDimensions) {
         const parent = this._Box.offsetParent as HTMLElement;
         this._computedWidth  = this.width.val  * (this.width.absolute  ? 1 : parent.offsetWidth);
         this._computedHeight = this.height.val * (this.height.absolute ? 1 : parent.offsetHeight);

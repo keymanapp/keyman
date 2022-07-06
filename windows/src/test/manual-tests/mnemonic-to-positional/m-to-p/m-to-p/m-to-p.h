@@ -1,2 +1,0 @@
-
-void LogError(PWSTR message, ...);

@@ -9,6 +9,8 @@ KEYMAN_ROOT=c:\keyman
 !ENDIF
 
 ROOT=$(KEYMAN_ROOT)\windows
+COMMON_ROOT=$(KEYMAN_ROOT)\common\windows\delphi
+# TODO: include COMMON_ROOT's defines.mak
 
 EXT=$(ROOT)\src\ext
 
@@ -111,9 +113,6 @@ TARGET_PATH=Debug
 TARGET_PATH=Release
 !ENDIF
 
-# DEVTOOLS=$(ROOT)\src\buildtools\devtools\devtools.exe
-DEVTOOLS=$(PROGRAM)\buildtools\devtools.exe
-
 !IFDEF LINT
 DELPHIWARNINGS=-W+MESSAGE_DIRECTIVE -W+IMPLICIT_STRING_CAST -W+IMPLICIT_STRING_CAST_LOSS -W+EXPLICIT_STRING_CAST -W+EXPLICIT_STRING_CAST_LOSS -W+CVT_WCHAR_TO_ACHAR -W+CVT_NARROWING_STRING_LOST -W+CVT_ACHAR_TO_WCHAR -W+CVT_WIDENING_STRING_LOST -W+UNICODE_TO_LOCALE -W+LOCALE_TO_UNICODE -W+IMPLICIT_VARIANTS
 !ELSE
@@ -124,31 +123,22 @@ DELPHIDPRPARAMS=-Q -B -GD -H -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+
 DELPHIDPRPARAMS64=-Q -B -GD -H -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -NU.\obj\Win64\$(TARGET_PATH) -E.\bin\Win64\$(TARGET_PATH)
 DELPHIDPKPARAMS=-Q -B -GD -VT -^$C+ -^$D+ -^$J+ -^$L+ -^$O+ -^$Q- -^$R- -^$W+ -^$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData -NUobj\Win32\$(TARGET_PATH)
 
-!IFDEF NOUI
+# we are using cmd /c because dcc32/dcc64 are failing on direct execution
+# from nmake
 DCC32=cmd /c "$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
 DCC32DPK=cmd /c "$(DCC32PATH)\dcc32.exe" $(DELPHIDPKPARAMS)
-!ELSE
-!IFDEF QUIET
-DCC32=@$(DEVTOOLS) -dccq  $(DELPHIDPRPARAMS)
-DCC32DPK=@$(DEVTOOLS) -dccq $(DELPHIDPKPARAMS)
-!ELSE
-DCC32=@$(DEVTOOLS) -dcc $(DELPHIDPRPARAMS)
-DCC32DPK=@$(DEVTOOLS) -dcc $(DELPHIDPKPARAMS)
-!ENDIF
-!ENDIF
-
-DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
+DCC64=cmd /c "$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 
 #
 # Delphi MSBuild related commands and macros
 #
 
-DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
+DELPHI_MSBUILD="$(COMMON_ROOT)\tools\msbuild-wrapper.bat" "$(DCC32PATH)" $(DELPHI_MSBUILD_FLAG_DEBUG)
 
 !IFDEF NODELPHI
-DCC32=echo skipping 
-DCC32DPK=echo skipping 
-DCC64=echo skipping 
+DCC32=echo skipping
+DCC32DPK=echo skipping
+DCC64=echo skipping
 DELPHI_MSBUILD=echo skipping
 !ENDIF
 
@@ -159,6 +149,12 @@ X64_TARGET_PATH=bin\x64\$(TARGET_PATH)
 # Delphi x86, x64
 # WIN32_TARGET_PATH=...
 WIN64_TARGET_PATH=bin\Win64\$(TARGET_PATH)
+
+#
+# Shared devtools app for common Delphi source manipulation
+#
+
+DEVTOOLS=$(COMMON_ROOT)\tools\devtools\$(WIN32_TARGET_PATH)\devtools.exe
 
 #
 # Other program build commands
@@ -196,8 +192,8 @@ WZUNZIP=$(WZZIPPATH) e
 
 # we are using cmd /c because tds2dbg is failing on direct execution
 # from nmake
-TDS2DBG=cmd /c $(ROOT)\bin\buildtools\tds2dbg
-SENTRYTOOL=$(ROOT)\bin\buildtools\sentrytool
+TDS2DBG=cmd /c $(KEYMAN_ROOT)\common\windows\bin\tools\tds2dbg
+SENTRYTOOL=$(COMMON_ROOT)\tools\sentrytool\$(WIN32_TARGET_PATH)\sentrytool.exe
 SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep -r $(KEYMAN_ROOT) -i $(DELPHIINCLUDES)
 
 WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
@@ -230,11 +226,11 @@ MAKE=$(MAKE)
 #
 
 !IFNDEF SC_PFX_SHA1
-SC_PFX_SHA1="$(ROOT)\src\buildtools\certificates\keymantest-sha1.pfx"
+SC_PFX_SHA1="$(COMMON_ROOT)\tools\certificates\keymantest-sha1.pfx"
 !ENDIF
 
 !IFNDEF SC_PFX_SHA256
-SC_PFX_SHA256="$(ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
+SC_PFX_SHA256="$(COMMON_ROOT)\tools\certificates\keymantest-sha256.pfx"
 !ENDIF
 
 !IFNDEF SC_URL
@@ -245,7 +241,7 @@ SC_URL="https://keyman.com/"
 SC_PWD=""
 !ENDIF
 
-SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
+SIGNCODE=@"$(KEYMAN_ROOT)\common\windows\signtime.bat" signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
 
 #
 # On some computers, the PLATFORM environment variable is set to x86. This can break msbuild
@@ -261,9 +257,9 @@ PLATFORM=Win32
 #
 
 !ifdef GIT_BASH_FOR_KEYMAN
-MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\mkver.sh
+MKVER_SH=$(GIT_BASH_FOR_KEYMAN) $(KEYMAN_ROOT)\common\windows\mkver.sh
 !else
-MKVER_SH=start /wait $(ROOT)\src\buildtools\mkver.sh
+MKVER_SH=start /wait $(KEYMAN_ROOT)\common\windows\mkver.sh
 !endif
 
 MKVER_M=$(MKVER_SH) manifest.in manifest.xml

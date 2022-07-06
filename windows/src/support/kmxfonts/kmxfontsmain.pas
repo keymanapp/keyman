@@ -40,9 +40,7 @@ implementation
 uses
   kmxfile,
   kmxfileusedchars,
-  SysUtils,
-  TntSystem,
-  TntSysUtils;
+  SysUtils;
   
 procedure TCheckFonts.DisplayKeyboardFonts;
 var
@@ -57,16 +55,16 @@ begin
     for I := 0 to FKeyboard.Fonts.Count - 1 do
       if FKeyboard.Fonts[I].Coverage >= 50 then
       begin
-        writeln('"'+WideExtractFileName(WideParamStr(2))+'","'+FKeyboard.Fonts[I].FontName+'",'+IntToStr(FKeyboard.Fonts[I].Coverage));
+        writeln('"'+ExtractFileName(ParamStr(2))+'","'+FKeyboard.Fonts[I].FontName+'",'+IntToStr(FKeyboard.Fonts[I].Coverage));
         Found := True;
       end;
 
     if not Found then
-      writeln('"'+WideExtractFileName(WideParamStr(2))+'","*",0');
+      writeln('"'+ExtractFileName(ParamStr(2))+'","*",0');
   end
   else
   begin
-    writeln('Keyboard '+WideParamStr(1));
+    writeln('Keyboard '+ParamStr(1));
     for I := 0 to FKeyboard.Fonts.Count - 1 do
       if FKeyboard.Fonts[I].Coverage >= 50 then
       begin
@@ -90,7 +88,7 @@ var
   FCharsUsed: WideString;
 begin
   FCSVFormat := CSVFormat;
-  if not WideFileExists(KeyboardFileName) then
+  if not FileExists(KeyboardFileName) then
   begin
     writeln('File '+KeyboardFileName+' does not exist');
     Exit;
@@ -102,7 +100,7 @@ begin
   FCheckFontsThread.FreeOnTerminate := False;
   FCheckFontsThread.OnTerminate := CheckFontsThreadComplete;
   FCheckFontsThread.AddKeyboard(KeyboardFilename, KeyboardFilename, FCharsUsed);
-  FCheckFontsThread.Resume;
+  FCheckFontsThread.Start;
   FCheckFontsThread.WaitFor;
   FCheckFontsThread.Free;
 end;
@@ -119,9 +117,9 @@ begin
 
   with TCheckFonts.Create do
   try
-    if WideParamStr(1) = '-c' then
-      StartCheckingFonts(WideParamStr(2), True)
-    else StartCheckingFonts(WideParamStr(1), False);
+    if ParamStr(1) = '-c' then
+      StartCheckingFonts(ParamStr(2), True)
+    else StartCheckingFonts(ParamStr(1), False);
   finally
     Free;
   end;

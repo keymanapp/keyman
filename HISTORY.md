@@ -1,5 +1,67 @@
 # Keyman Version History
 
+## 16.0.25 alpha 2022-07-05
+
+* chore(web): update readme (#6891)
+
+## 16.0.24 alpha 2022-07-02
+
+* fix(common): trigger builds correctly for stable builds (#6847)
+* fix(windows): show full version number (#6867)
+
+## 16.0.23 alpha 2022-06-29
+
+* fix(web): clears repeating bksp on keyboard reload  ️ (#6786)
+* fix(web): null-guard for refreshLayout (#6854)
+
+## 16.0.22 alpha 2022-06-28
+
+* fix(ios): eliminates conditional height for banner image (#6855)
+
+## 16.0.21 alpha 2022-06-27
+
+* chore(ios): modernizes app-help's internals (#6836)
+* fix(linux): Deal with non-existing files (#6840)
+* fix(linux): Catch KeyboardInterrupt (#6841)
+
+## 16.0.20 alpha 2022-06-26
+
+* chore(web): shorten check/web/file-size check message (#6780)
+
+## 16.0.19 alpha 2022-06-24
+
+* change(web): drops old IE-related handling code (#6557)
+* chore(deps): bump got from 11.8.3 to 11.8.5 (#6821)
+* chore(ios): log script actions and fixup export settings to avoid version being clobbered (#6835)
+
+## 16.0.18 alpha 2022-06-23
+
+* chore(core): move common/core/desktop/ to core/ (#6629)
+
+## 16.0.17 alpha 2022-06-22
+
+* chore(web): updates error-reporting lib uploader (#6818)
+* fix(web): fixes doc-keyboard generation (#6793)
+
+## 16.0.16 alpha 2022-06-21
+
+* fix(web): key tip constraint logic requires .bottom CSS (#6784)
+* fix(ios): overzealous error about missing banner image (#6807)
+* chore(linux): Update Debian changelog (#6810)
+
+## 16.0.15 alpha 2022-06-18
+
+* fix(web): crash on custom modifier keys (#6790)
+* chore: add trigger definitions for stable-15.0 and fixup force param for increment-version.sh (#6776)
+
+## 16.0.14 alpha 2022-06-17
+
+* chore(web): add 'index.html' to parent links in test pages (#6791)
+
+## 16.0.13 alpha 2022-06-15
+
+* chore: beta to master merge A16S4 (#6771)
+
 ## 16.0.12 alpha 2022-06-14
 
 * chore(web): replace lerna with npm workspaces and ts projects (#6525)

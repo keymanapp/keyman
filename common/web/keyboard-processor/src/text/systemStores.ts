@@ -108,7 +108,6 @@ namespace com.keyman.text {
             
           case 'native':
             // This will return true for embedded KeymanWeb
-          case 'ie':
           case 'chrome':
           case 'firefox':
           case 'safari':

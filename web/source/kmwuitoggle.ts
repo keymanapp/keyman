@@ -584,7 +584,7 @@ if(!window['keyman']['ui']['name']) {
       "#KeymanWeb_KbdList {"+
         "display: block;"+
         "position: absolute;"+
-        "width: auto;"+ ((util['getIEVersion']() < 8) ? "200px;" : "auto;")+
+        "width: auto;"+
         "line-height: 100%;"+
         "margin: 0;"+
         "clear: both;"+
@@ -597,7 +597,6 @@ if(!window['keyman']['ui']['name']) {
         "box-shadow: 4px 4px 2px rgba(136,136,136,.5);"+
         "-webkit-box-shadow: 4px 4px 2px rgba(136,136,136,.5);"+
         "-moz-box-shadow: 4px 4px 2px rgba(136,136,136,.5);"+
-        ((util['getIEVersion']() < 99) ? "filter:progid:DXImageTransform.Microsoft.DropShadow(OffX=4,OffY=4,Color=#80646464);" : "")+
         "list-style: none;"+
         "padding: 0;"+
         "background: white;"+
@@ -607,8 +606,6 @@ if(!window['keyman']['ui']['name']) {
         "white-space: nowrap;"+
         "z-index: 10001; /* above the osk */"+
       "}"+
-      ((util['getIEVersion']() < 7) ?
-        "* html #KeymanWeb_KbdList {height: expression(this.scrollHeight > 299 ? '300px' : 'auto');}" : "")+
       ".sfunhover#KeymanWeb_KbdList {"+
         "display: none; left: -999px;"+
       "}"+

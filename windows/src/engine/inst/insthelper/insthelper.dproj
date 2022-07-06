@@ -104,13 +104,12 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\..\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\klog.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\CRC32.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\VersionInfo.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="preuninstallunit.pas"/>
         <DCCReference Include="..\..\..\global\delphi\winapi\input_installlayoutortip.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\utiltsf.pas"/>
@@ -118,12 +117,12 @@
         <DCCReference Include="Keyman.System.Install.EnginePostInstall.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.Security.pas"/>
         <DCCReference Include="..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\KeymanPaths.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\DebugPaths.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilsystem.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanPaths.pas"/>
         <None Include="ModelSupport_insthelper\default.txaPackage"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

@@ -6,7 +6,7 @@
 /android/                     @darcywong00  @rc-swag
 
 /common/                      @mcdurdin     @jahorton
-/common/core/desktop/         @mcdurdin     @jahorton
+/core/                        @mcdurdin     @jahorton
 /common/lexical-model-types/  @jahorton     @mcdurdin
 /common/models/               @jahorton     @mcdurdin
 /common/predictive-text/      @jahorton     @mcdurdin

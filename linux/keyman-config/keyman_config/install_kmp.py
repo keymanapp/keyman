@@ -201,6 +201,9 @@ class InstallKmp():
         return dir
 
     def _safeLinkFile(self, source, target):
+        if not os.path.isfile(source):
+            logging.error("Can't link file %s - source file doesn't exist", source)
+            return
         if os.path.isfile(target):
             return
         if os.path.exists(target):
