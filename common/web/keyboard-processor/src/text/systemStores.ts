@@ -42,6 +42,11 @@ namespace com.keyman.text {
     }
 
     set(value: string) {
+      // No need to signal changes when things stay the same.
+      if(this._value == value) {
+        return;
+      }
+
       if(this.handler) {
         if(this.handler(this, value)) {
           return;
@@ -105,7 +110,7 @@ namespace com.keyman.text {
               return false; // web matches anything other than 'native'
             }
             break;
-            
+
           case 'native':
             // This will return true for embedded KeymanWeb
           case 'chrome':
@@ -117,7 +122,7 @@ namespace com.keyman.text {
               return false;
             }
             break;
-            
+
           default:
             return false;
         }
