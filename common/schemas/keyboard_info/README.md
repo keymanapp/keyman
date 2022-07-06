@@ -5,7 +5,11 @@
 
 Documentation at https://help.keyman.com/developer/cloud/keyboard_info
 
-New versions should be deployed to **keymanapp/keyman/common/schemas/keyboard_info** and **keymanapp/keyboards/tools**
+* Primary version:
+  * https://github.com/keymanapp/api.keyman.com/tree/master/schemas/keyboard_info.source
+  * https://github.com/keymanapp/api.keyman.com/tree/master/schemas/keyboard_info.distribution
+* Synchronized copies at:
+  * https://github.com/keymanapp/keyman/tree/master/common/schemas/keyboard_info
 
 # .keyboard_info version history
 
