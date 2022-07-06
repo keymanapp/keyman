@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 16.0.26 alpha 2022-07-06
+
+* fix(developer): Show full version number (#6866)
+* feat(developer): .keyman-touch-layout schema for 15.0 (#6856)
+* feat(developer): add flick and multitap to touch layout schema and doc (#6877)
+* fix(linux): Fix post-install script (#6894)
+
 ## 16.0.25 alpha 2022-07-05
 
 * chore(web): update readme (#6891)
