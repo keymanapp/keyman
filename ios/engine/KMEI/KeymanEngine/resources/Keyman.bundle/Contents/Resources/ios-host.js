@@ -1,21 +1,24 @@
+let _debug = false;
 
-console = new Object();
-console.log = function(log) {
-    var iframe = document.createElement("IFRAME");
-    iframe.setAttribute("src", "ios-log:#iOS#" + log);
-    document.documentElement.appendChild(iframe);
-    iframe.parentNode.removeChild(iframe);
-    iframe = null;
-    if (typeof(window.webkit) != 'undefined')
-        window.webkit.messageHandlers.keyman.postMessage("ios-log:#iOS#" + log);
-};
-console.debug = console.log;
-console.info = console.log;
-console.warn = console.log;
-console.error = console.log;
-window.onerror = function(error, url, line) {
-    console.log('ERROR: '+error+' URL:'+url+' L:'+line);
-};
+if(_debug) {
+    console = new Object();
+    console.log = function(log) {
+        var iframe = document.createElement("IFRAME");
+        iframe.setAttribute("src", "ios-log:#iOS#" + log);
+        document.documentElement.appendChild(iframe);
+        iframe.parentNode.removeChild(iframe);
+        iframe = null;
+        if (typeof(window.webkit) != 'undefined')
+            window.webkit.messageHandlers.keyman.postMessage("ios-log:#iOS#" + log);
+    };
+    console.debug = console.log;
+    console.info = console.log;
+    console.warn = console.log;
+    console.error = console.log;
+    window.onerror = function(error, url, line) {
+        console.log('ERROR: '+error+' URL:'+url+' L:'+line);
+    };
+}
 
 var device = 'AppleMobile';
 var oskHeight = 0;
