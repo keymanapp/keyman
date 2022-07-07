@@ -190,6 +190,7 @@ namespace com.keyman {
       function reportingConsoleError() {
         let args = Array.prototype.slice.call(arguments);
         if(_this._enabled) {
+          //@ts-ignore
           Sentry.captureException(reduceConsoleArgs(args), { level: 'error' });
         }
         return oldConsoleError.apply(console, args);
@@ -200,6 +201,7 @@ namespace com.keyman {
       function reportingConsoleWarn() {
         let args = Array.prototype.slice.call(arguments);
         if(_this._enabled) {
+          //@ts-ignore
           Sentry.captureMessage(reduceConsoleArgs(args), { level: 'warning' });
         }
         return oldConsoleWarn.apply(console, args);
