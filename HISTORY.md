@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.27 alpha 2022-07-07
+
+* fix(web): improve `console.error()` reporting (#6890)
+
 ## 16.0.26 alpha 2022-07-06
 
 * fix(developer): Show full version number (#6866)
