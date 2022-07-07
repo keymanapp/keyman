@@ -8,6 +8,7 @@
 
 import KeymanEngine
 import WebKit
+import Sentry
 
 class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertViewDelegate {
   @IBOutlet var webView: WKWebView!
@@ -27,8 +28,10 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
   @IBOutlet var closeButton: UIBarButtonItem!
 
   var navbarBackground: KMNavigationBarBackgroundView!
-  var fontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
-  private var newFontFamily = ""
+  var font: Font?
+  var fontKeyboard: InstallableKeyboard?
+  private var newFont: Font?
+  private var newFontKeyboard: InstallableKeyboard?
 
   private let webBrowserLastURLKey = "KMWebBrowserLastURL"
 
@@ -287,24 +290,94 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
   }
 
   private func appendCSSFontFamily() {
-    let jsStr: String = "var style = document.createElement('style');" +
-      "style.type = 'text/css';" +
-      "style.innerHTML = '*{font-family:\"\(fontFamily)\" !important;}';" +
-    "document.getElementsByTagName('head')[0].appendChild(style);"
+    guard let font = font else {
+      return
+    }
+
+    guard let fontKeyboard = fontKeyboard else {
+      return
+    }
+
+    let fontCSS = "*{font-family:\"\(font.family)\" !important;}"
+    guard let fontFaceStyle = buildFontSheet(from: font, keyboard: fontKeyboard) else {
+      return
+    }
+
+    let jsStr: String = """
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = `
+    \(fontCSS)
+
+    \(fontFaceStyle)
+    `;
+
+    document.getElementsByTagName('head')[0].appendChild(style);
+    """
+
     webView.evaluateJavaScript(jsStr)
+
+  }
+
+  private func buildFontSheet(from font: Font, keyboard: InstallableKeyboard) -> String? {
+    guard let fontKeyboard = fontKeyboard,
+          let fontURL = Manager.shared.fontPathForKeyboard(withFullID: fontKeyboard.fullID) else {
+      return nil
+    }
+
+    guard let fontData = NSData(contentsOf: fontURL) else {
+      return nil
+    }
+
+    var dataType: String = ""
+    var fontFormat: String = ""
+    switch fontURL.pathExtension {
+      case "ttf":
+        dataType = "font/truetype"
+        fontFormat = "truetype"
+      case "woff":
+        dataType = "font/woff"
+        fontFormat = "woff"
+      case "woff2":
+        dataType = "font/woff2"
+        fontFormat = "woff2"
+      case "otf":
+        dataType = "font/opentype"
+        fontFormat = "opentype"
+      case "eot":
+        fontFormat = "application/vnd.ms-fontobject"
+        fontFormat = "embedded-opentype"
+      case "svg":
+        dataType = "image/svg+xml"
+        fontFormat = "svg"
+      default:
+        return nil
+    }
+
+    let styleString = """
+    @font-face {
+      font-family: "\(font.family)";
+      src: url(data:\(dataType);charset=utf-8;base64,\(fontData.base64EncodedString())); format('\(fontFormat)')
+    }
+    """
+
+    return styleString
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if let fontName = Manager.shared.fontNameForKeyboard(withFullID: kb.fullID) {
-      newFontFamily = fontName
+    if let font = kb.font {
+      newFont = font
+      newFontKeyboard = kb
     } else {
-      newFontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
+      newFont = nil
+      newFontKeyboard = nil
     }
   }
 
   private func keyboardPickerDismissed() {
-    if newFontFamily != fontFamily {
-      fontFamily = newFontFamily
+    if newFont?.family != font?.family {
+      font = newFont
+      fontKeyboard = newFontKeyboard
       webView?.reload()
     }
   }
