@@ -45,6 +45,17 @@ namespace com.keyman.osk {
 
       let sequenceWrapper = new Incomplete<InputSequence, InputSample>(sequence);
 
+      // External objects may desire to directly terminate handling of
+      // input sequences under specific conditions.
+      let _this = this;
+      sequenceWrapper.on('cancel', function() {
+        _this.cleanupSequenceWithId(identifier);
+      });
+
+      sequenceWrapper.on('end', function() {
+        _this.cleanupSequenceWithId(identifier);
+      });
+
       this._activeSequenceWrappers.push(sequenceWrapper);
       this.emit(InputEventEngine.INPUT_START_EVENT_NAME, sequenceWrapper);
     }
@@ -62,7 +73,6 @@ namespace com.keyman.osk {
         return;
       }
 
-      this.cleanupSequenceWithId(identifier);
       sequenceWrapper.cancel();
     }
 
@@ -73,7 +83,6 @@ namespace com.keyman.osk {
         return;
       }
 
-      this.cleanupSequenceWithId(identifier);
       sequenceWrapper.end();
     }
   }
