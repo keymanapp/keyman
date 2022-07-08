@@ -28,9 +28,7 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
   @IBOutlet var closeButton: UIBarButtonItem!
 
   var navbarBackground: KMNavigationBarBackgroundView!
-  var font: Font?
   var fontKeyboard: InstallableKeyboard?
-  private var newFont: Font?
   private var newFontKeyboard: InstallableKeyboard?
 
   private let webBrowserLastURLKey = "KMWebBrowserLastURL"
@@ -290,16 +288,14 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
   }
 
   private func appendCSSFontFamily() {
-    guard let font = font else {
+    guard let fontKeyboard = fontKeyboard, let font = fontKeyboard.font else {
       return
     }
 
-    guard let fontKeyboard = fontKeyboard else {
-      return
-    }
+    let styleFontFamily = font.family
 
-    let fontCSS = "*{font-family:\"\(font.family)\" !important;}"
-    guard let fontFaceStyle = buildFontSheet(from: font, keyboard: fontKeyboard) else {
+    let fontCSS = "*{font-family:\"\(styleFontFamily)\" !important;}"
+    guard let fontFaceStyle = buildFontSheet(keyboard: fontKeyboard, styleName: styleFontFamily) else {
       return
     }
 
@@ -319,7 +315,7 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
 
   }
 
-  private func buildFontSheet(from font: Font, keyboard: InstallableKeyboard) -> String? {
+  private func buildFontSheet(keyboard: InstallableKeyboard, styleName: String) -> String? {
     guard let fontKeyboard = fontKeyboard,
           let fontURL = Manager.shared.fontPathForKeyboard(withFullID: fontKeyboard.fullID) else {
       return nil
@@ -356,7 +352,7 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
 
     let styleString = """
     @font-face {
-      font-family: "\(font.family)";
+      font-family: "\( styleName )";
       src: url(data:\(dataType);charset=utf-8;base64,\(fontData.base64EncodedString())); format('\(fontFormat)')
     }
     """
@@ -365,18 +361,15 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if let font = kb.font {
-      newFont = font
+    if kb.font != nil {
       newFontKeyboard = kb
     } else {
-      newFont = nil
       newFontKeyboard = nil
     }
   }
 
   private func keyboardPickerDismissed() {
-    if newFont?.family != font?.family {
-      font = newFont
+    if newFontKeyboard?.font?.family != fontKeyboard?.font?.family {
       fontKeyboard = newFontKeyboard
       webView?.reload()
     }

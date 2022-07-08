@@ -1009,8 +1009,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     popover?.dismiss(animated: false)
     _ = dismissDropDownMenu()
     let webBrowserVC = WebBrowserViewController()
-    if let kbFont = Manager.shared.currentKeyboard?.font {
-      webBrowserVC.font = kbFont
+    if Manager.shared.currentKeyboard?.font != nil {
       webBrowserVC.fontKeyboard = Manager.shared.currentKeyboard
     }
     present(webBrowserVC, animated: true, completion: nil)
