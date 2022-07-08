@@ -78,18 +78,18 @@ window.addEventListener('load', function() {
   }
 
   recognizer.on('inputstart', function(sequence) {
-    console.log(`new input sequence started: identifier ${sequence.identifier}`);
+    console.log(`new input sequence started: identifier ${sequence.item.identifier}`);
 
-    sequence.on('inputupdate', function(seq, sample) {
-      console.log(`identifier ${seq.identifier}:  ${JSON.stringify(sample)}`);
+    sequence.on('update', function(seq, sample) {
+      console.log(`identifier ${seq.item.identifier}:  ${JSON.stringify(sample)}`);
     });
 
-    sequence.on('inputcancel', function(seq) {
-      console.log(`identifier ${seq.identifier} cancelled`);
+    sequence.on('cancel', function(seq) {
+      console.log(`identifier ${seq.item.identifier} cancelled`);
     });
 
-    sequence.on('inputend', function(seq) {
-      console.log(`identifier ${seq.identifier} ended`);
+    sequence.on('end', function(seq) {
+      console.log(`identifier ${seq.item.identifier} ended`);
     });
   });
 });

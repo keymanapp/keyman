@@ -1,6 +1,7 @@
 /// <reference path="inputSequence.ts" />
 /// <reference path="gestureRecognizerConfiguration.ts" />
 /// <reference path="includes/events.ts" />
+/// <reference path="incomplete.ts" />
 
 namespace com.keyman.osk {
   /**
@@ -13,8 +14,7 @@ namespace com.keyman.osk {
     public static readonly INPUT_START_EVENT_NAME = "inputstart";
 
     protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
-
-    private _activeSequences: InputSequence[] = [];
+    private _activeSequenceWrappers: Incomplete<InputSequence, InputSample>[] = [];
 
     public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super();
@@ -28,52 +28,53 @@ namespace com.keyman.osk {
      * @param identifier The identifier number corresponding to the input sequence.
      */
     hasActiveSequence(identifier: number) {
-      return this._activeSequences.findIndex((seq) => seq.identifier == identifier) != -1;
+      return this._activeSequenceWrappers.findIndex((seq) => seq.item.identifier == identifier) != -1;
     }
 
-    private getSequenceWithId(identifier: number) {
-      return this._activeSequences.find((seq) => seq.identifier == identifier);
-    }
-
-    public cancelSequenceWithId(identifier: number) {
-      let seq = this.getSequenceWithId(identifier);
-
-      if(!seq) {
-        return;
-      }
-
-      seq.cancel();
+    private getSequenceWrapperWithId(identifier: number) {
+      return this._activeSequenceWrappers.find((seq) => seq.item.identifier == identifier);
     }
 
     public cleanupSequenceWithId(identifier: number) {
-      this._activeSequences = this._activeSequences.filter((seq) => seq.identifier != identifier);
+      this._activeSequenceWrappers = this._activeSequenceWrappers.filter((seq) => seq.item.identifier != identifier);
     }
 
     onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
-      let sequence = new InputSequence(this, identifier, target, this instanceof TouchEventEngine);
+      let sequence = new InputSequence(identifier, target, this instanceof TouchEventEngine);
       sequence.addSample(sample);
 
-      this._activeSequences.push(sequence);
-      this.emit(InputEventEngine.INPUT_START_EVENT_NAME, sequence);
+      let sequenceWrapper = new Incomplete<InputSequence, InputSample>(sequence);
+
+      this._activeSequenceWrappers.push(sequenceWrapper);
+      this.emit(InputEventEngine.INPUT_START_EVENT_NAME, sequenceWrapper);
     }
 
     onInputMove(identifier: number, sample: InputSample) {
-      const sequence = this._activeSequences.find((seq) => seq.identifier == identifier);
-      sequence.addSample(sample);
+      const sequenceWrapper = this.getSequenceWrapperWithId(identifier);
+      sequenceWrapper.item.addSample(sample);
+      sequenceWrapper.signalUpdate(sample);
     }
 
     onInputMoveCancel(identifier: number) {
-      this.cancelSequenceWithId(identifier);
-    }
+      let sequenceWrapper = this.getSequenceWrapperWithId(identifier);
 
-    onInputEnd(identifier: number, sample: InputSample) {
-      let seq = this.getSequenceWithId(identifier);
-
-      if(!seq) {
+      if(!sequenceWrapper) {
         return;
       }
 
-      seq.end();
+      this.cleanupSequenceWithId(identifier);
+      sequenceWrapper.cancel();
+    }
+
+    onInputEnd(identifier: number, sample: InputSample) {
+      let sequenceWrapper = this.getSequenceWrapperWithId(identifier);
+
+      if(!sequenceWrapper) {
+        return;
+      }
+
+      this.cleanupSequenceWithId(identifier);
+      sequenceWrapper.end();
     }
   }
 }
