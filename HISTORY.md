@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.28 alpha 2022-07-08
+
+* chore(android): disable sendError for js errors (#6905)
+* fix(developer): add no-ops for symbol builds for components (#6908)
+
 ## 16.0.27 alpha 2022-07-07
 
 * fix(web): improve `console.error()` reporting (#6890)
