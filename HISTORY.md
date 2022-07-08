@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.266 stable 2022-07-08
+
+* fix(linux): Fix post-install script :cherries: (#6895)
+* fix(web): improve `console.error()` reporting (#6904)
+* fix(web): ncaps rules not matching on touch (#6913)
+
 ## 15.0.265 stable 2022-07-04
 
 * fix(common): trigger builds correctly for stable builds (#6879)
