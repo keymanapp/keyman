@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.29 alpha 2022-07-08
+
+* fix(web): ncaps rules not matching on touch (#6911)
+
 ## 16.0.28 alpha 2022-07-08
 
 * chore(android): disable sendError for js errors (#6905)
