@@ -118,12 +118,13 @@ if(!window['keyman']['initialized']) {
     util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);
 
     /**
-     * Reset OSK shift states when entering or exiting the active element
+     * Reset context when entering or exiting the active element.
+     * Will also trigger OSK shift state / layer reset.
      **/
     function resetVKShift() {
       let keyman = com.keyman.singleton;
       if(!keyman.uiManager.isActivating && keyman.osk?.vkbd) {
-        keyman.core.keyboardProcessor._UpdateVKShift(null);  //this should be enabled !!!!! TODO
+        keyman.core.resetContext(null);
       }
     }
 
