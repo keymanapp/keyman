@@ -5,7 +5,6 @@ namespace com.keyman.osk {
     public readonly identifier: number;
 
     private _currentTarget: EventTarget;
-    private _isEditable: boolean = true;
 
     private _sequence: InputSampleSequence = [];
 
@@ -21,18 +20,8 @@ namespace com.keyman.osk {
       return this._currentTarget;
     }
 
-    public get isEditable(): boolean {
-      return this._isEditable;
-    }
-
-    public disableEditing() {
-      this._isEditable = false;
-    }
-
     addSample(sample: InputSample) {
-      if(this.isEditable) {
-        this._sequence.push(sample);
-      }
+      this._sequence.push(sample);
     }
   }
 }
