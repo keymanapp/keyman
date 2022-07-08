@@ -288,13 +288,12 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
   }
 
   private func appendCSSFontFamily() {
-    guard let fontKeyboard = fontKeyboard, let font = fontKeyboard.font else {
+    guard let fontKeyboard = fontKeyboard else {
       return
     }
 
-    let styleFontFamily = font.family
+    let styleFontFamily = "KeymanEmbeddedBrowserFont"
 
-    let fontCSS = "*{font-family:\"\(styleFontFamily)\" !important;}"
     guard let fontFaceStyle = buildFontSheet(keyboard: fontKeyboard, styleName: styleFontFamily) else {
       return
     }
@@ -303,7 +302,9 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
     var style = document.createElement('style');
     style.type = 'text/css';
     style.innerHTML = `
-    \(fontCSS)
+    * {
+      font-family:\"\(styleFontFamily)\" !important;
+    }
 
     \(fontFaceStyle)
     `;
@@ -340,12 +341,6 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
       case "otf":
         dataType = "font/opentype"
         fontFormat = "opentype"
-      case "eot":
-        fontFormat = "application/vnd.ms-fontobject"
-        fontFormat = "embedded-opentype"
-      case "svg":
-        dataType = "image/svg+xml"
-        fontFormat = "svg"
       default:
         return nil
     }
