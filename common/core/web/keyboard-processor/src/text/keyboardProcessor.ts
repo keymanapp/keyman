@@ -386,6 +386,8 @@ namespace com.keyman.text {
 
       if(layerId.indexOf('caps') >= 0) {
         modifier |= Codes.modifierCodes['CAPS'];
+      } else {
+        modifier |= Codes.modifierCodes['NO_CAPS'];
       }
 
       return modifier;
