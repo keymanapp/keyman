@@ -332,15 +332,18 @@ class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertV
       case "ttf":
         dataType = "font/truetype"
         fontFormat = "truetype"
+      case "otf":
+        dataType = "font/opentype"
+        fontFormat = "opentype"
+      // The following two entries are here for completeness.  At present, we do not
+      // actually distribute these in .kmp packages; we only include one font within them,
+      // and these two are web-oriented, not main-OS oriented.
       case "woff":
         dataType = "font/woff"
         fontFormat = "woff"
       case "woff2":
         dataType = "font/woff2"
         fontFormat = "woff2"
-      case "otf":
-        dataType = "font/opentype"
-        fontFormat = "opentype"
       default:
         return nil
     }
