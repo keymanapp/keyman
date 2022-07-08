@@ -749,7 +749,9 @@ namespace com.keyman.text {
     resetContext() {
       this.layerId = 'default';
       this.keyboardInterface.resetContextCache();
-      this._UpdateVKShift(null);
+      if(this.contextDevice.touchable) {
+        this._UpdateVKShift(null);
+      }
     };
 
     setNumericLayer(device: utils.DeviceSpec) {
