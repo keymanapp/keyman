@@ -68,7 +68,11 @@ window.addEventListener('load', function() {
 
   let console = {};
   let logElement = document.getElementById('event-log');
+  // Erase any logs from before a page reload.
+  logElement.value = '';
+
   console.log = function(str) {
+    str = str === undefined ? '' : str;
     logElement.value += str + '\n';
   }
 
@@ -90,6 +94,8 @@ window.addEventListener('load', function() {
 
     sequence.on('end', function(seq) {
       console.log(`identifier ${seq.item.identifier} ended`);
+      console.log();
+      console.log(JSON.stringify(seq.item, com.keyman.osk.InputSequence._replacer, 2));
     });
   });
 });
