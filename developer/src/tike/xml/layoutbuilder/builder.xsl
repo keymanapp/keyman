@@ -30,6 +30,7 @@
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>layer-controls.js</xsl:attribute></script>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder-charmap.js</xsl:attribute></script>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>drag-drop.js</xsl:attribute></script>
+  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>cleanup.js</xsl:attribute></script>
   <script>initBuilder();</script>
 </head>
 <body class='text-controls-in-toolbar'>
