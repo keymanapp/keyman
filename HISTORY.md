@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.30 alpha 2022-07-11
+
+* fix(web): maps touch-layout chiral alt, ctrl to non-chiral when non-chiral keyboard is active (#6808)
+
 ## 16.0.29 alpha 2022-07-08
 
 * fix(web): ncaps rules not matching on touch (#6911)
