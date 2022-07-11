@@ -10,6 +10,7 @@ declare class EventEmitter {
   /** Add a one-time listener for a given event */
   once(event: string, func: (...args: any[]) => void, context?: any);
   removeListener(event: string, func: (...args: any[]) => void, context?: any, once?: boolean);
+  removeAllListeners(event?: string);
 
   // Defines their alternately-themed aliases.
   addListener: typeof EventEmitter.prototype.on;

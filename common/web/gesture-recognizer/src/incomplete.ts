@@ -30,6 +30,7 @@ namespace com.keyman.osk {
       if(this.isActive) {
         this.isActive = false;
         this.emit('cancel', this);
+        this.removeAllListeners();
       }
     }
 
@@ -37,6 +38,7 @@ namespace com.keyman.osk {
       if(this.isActive) {
         this.isActive = false;
         this.emit('end', this);
+        this.removeAllListeners();
       }
     }
   }
