@@ -5,7 +5,9 @@ body {
 /* h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px} */
 
 .main {
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
   min-width: 40%;
   max-width: 90%;
   min-height: 75%;

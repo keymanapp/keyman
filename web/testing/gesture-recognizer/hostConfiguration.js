@@ -79,7 +79,7 @@ window.addEventListener('load', function() {
 
 
   recognizer.on('trackedInputUpdate', function(state, coord) {
-    if(state != 'update') {
+    if(state != 'move') {
       let meta = "";
       if(coord.isFromMouse) {
         meta = "isFromMouse";
