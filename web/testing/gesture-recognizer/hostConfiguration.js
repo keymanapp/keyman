@@ -60,8 +60,38 @@ window.addEventListener('load', function() {
 
   recognizer = new com.keyman.osk.GestureRecognizer(recognizerConfig);
 
+  let console = {};
+  let logElement = document.getElementById('event-log');
+  // Erase any logs from before a page reload.
+  logElement.value = '';
+
+
+  console.log = function(str) {
+    str = str === undefined ? '' : str;
+    logElement.value += str + '\n';
+  }
+
+
+  let logClearButton = document.getElementById('log-clear-button');
+  logClearButton.onclick = function() {
+    logElement.value = '';
+  }
+
+
   recognizer.on('trackedInputUpdate', function(state, coord) {
-    console.log(`state: ${state}, coord: ${coord}`);
+    if(state != 'update') {
+      let meta = "";
+      if(coord.isFromMouse) {
+        meta = "isFromMouse";
+      } else {
+        try {
+          meta = "touchpoint id: " + coord.source.changedTouches[0].identifier;
+        } catch (e) {
+          meta = "touchpoint id: error";
+        }
+      }
+      console.log(`state: ${state}, meta: ${meta}`);
+    }
   });
 });
 
