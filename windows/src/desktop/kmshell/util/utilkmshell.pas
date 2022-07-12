@@ -1,18 +1,18 @@
 (*
   Name:             utilkmshell
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    1 May 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Remove old util functions
                     30 May 2007 - mcdurdin - Refactor OS checks for newer versions
@@ -34,7 +34,7 @@ interface
 
 uses
   System.UITypes,
-  Dialogs, Windows, ComObj, shlobj, controls, sysutils, classes, exceptionw;
+  Dialogs, Windows, ComObj, shlobj, controls, sysutils, classes;
 
 const
   CRLF = #13#10;

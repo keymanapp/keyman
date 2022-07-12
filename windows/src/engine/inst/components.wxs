@@ -110,17 +110,17 @@
 
       <Component Guid="{A7115FEE-A904-4C68-B093-AA5F1EF027B7}">
         <!-- #5166: This should *always* be version 2.3 of sentry.dll -->
-        <File Id="sentry.2.3.dll" KeyPath="yes" Source="..\..\ext\sentry\2.3\sentry.dll" />
+        <File Id="sentry.2.3.dll" KeyPath="yes" Source="..\..\..\..\common\windows\delphi\ext\sentry\2.3\sentry.dll" />
       </Component>
 
       <Component Guid="{909DABBB-914F-4ADF-8391-BB293778D70E}">
         <!-- #5166: This should *always* be version 2.3 of sentry.x64.dll -->
-        <File Id="sentry.x64.2.3.dll" KeyPath="yes" Source="..\..\ext\sentry\2.3\sentry.x64.dll" />
+        <File Id="sentry.x64.2.3.dll" KeyPath="yes" Source="..\..\..\..\common\windows\delphi\ext\sentry\2.3\sentry.x64.dll" />
       </Component>
 
       <Component Guid="{AF7C9288-7085-4C02-AA79-9DA4F152BDBB}">
         <!-- #5166: This should *always* be version 2.3 of crashpad_handler.exe -->
-        <File Id="crashpad_handler.2.3.exe" KeyPath="yes" Source="..\..\ext\sentry\2.3\crashpad_handler.exe" />
+        <File Id="crashpad_handler.2.3.exe" KeyPath="yes" Source="..\..\..\..\common\windows\delphi\ext\sentry\2.3\crashpad_handler.exe" />
       </Component>
 
       <Component Guid="{B8867245-9570-4B63-B631-00F1474F71D4}">
@@ -243,7 +243,7 @@
 
     </ComponentGroup>
 
-    <ComponentGroup Id="KeymanEngineSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\ext\sentry">
+    <ComponentGroup Id="KeymanEngineSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\..\..\common\windows\delphi\ext\sentry">
       <Component Guid="{95AB1B5C-2556-4282-B327-E2E417B26926}">
         <File Id="sentry.dll" KeyPath="yes" />
       </Component>

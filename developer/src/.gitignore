@@ -1,0 +1,92 @@
+**/*.err
+**/*.Build.CppClean.log
+**/*.dproj.local
+**/*.groupproj.local
+**/*.bdsproj.local
+**/*.stat
+**/*.sdf
+**/error.log
+**/.vs/
+**/version.RES
+**/__history/
+**/__recovery/
+**/*.identcache
+**/*.vcxproj.user
+**/version.res
+**/*.pch
+**/*.wixobj
+**/*.sbr
+**/*.bsc
+**/*.dll.embed.manifest
+**/*.ilk
+**/*.log
+**/*.idb
+**/*.suo
+**/.idea
+
+# Temp files generated during release build
+inst/cef.wxs
+inst/keymandeveloper.msi
+inst/setup.inf
+inst/setup.zip
+inst/templates.wxs
+inst/xml.wxs
+inst/kmlmc.wxs
+
+# /developer/TIKE/
+tike/stock.kct
+tike/kmcmpdll.dll
+
+# /developer/TIKE/redist/
+tike/redist/Addins
+tike/redist/Desktop
+tike/redist/UI
+
+# /developer/inst/
+inst/*.wixpdb
+inst/download.mak
+inst/copydev.mak
+
+# /developer/kmcmpdll/
+kmcmpdll/*.lastbuildstate
+
+stock/stock.kct
+uitemplates/keyman.kct
+
+##########################################################################################
+
+**/*.aps
+**/BuildLog.htm
+**/*.recipe
+**/manifest.res
+
+# These are intermediate and output folders for VC++ and Delphi projects
+**/obj/Win32/
+**/obj/Win64/
+**/obj/x64/
+**/bin/Win32/
+**/bin/Win64/
+**/bin/x64/
+
+# Temporary build files for VC++
+**/*.FileListAbsolute.txt
+
+# KeymanWeb is copied from /web/src during Developer build
+tike/xml/kmw/resource
+
+# These files are generated during build
+tike/icons.res
+kmcmpdll/Compiler.res
+kmcomp/icons.res
+tds_file.txt
+
+# These are built from corresponding manifest.in and version.in
+**/manifest.xml
+
+# Breakpad files generated for Sentry
+**/*.sym
+
+
+
+
+

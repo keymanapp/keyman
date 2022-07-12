@@ -1,27 +1,27 @@
 /*
   Name:             registryw
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Dec 2012
 
   Modified Date:    1 Dec 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          01 Dec 2012 - mcdurdin - I3622 - V9.0 - Add Registry*W classes for Unicode 
-                    
+  Bugs:
+  Todo:
+  Notes:
+  History:          01 Dec 2012 - mcdurdin - I3622 - V9.0 - Add Registry*W classes for Unicode
+
 */
 #ifndef _REGISTRYW_H   // I3622
 #define _REGISTRYW_H
 
 #include <windows.h>
 
-#include "keymanversion.h"
+#include "../../../../common/windows/cpp/include/keymanversion.h"
 
 #ifdef _WIN64
 
@@ -107,12 +107,12 @@
 #define REGSZ_KeymanEngineDebug_CU  L"software\\keyman\\keyman engine\\Debug"
 #define REGSZ_Flag_UseAutoStartTask L"Flag_UseAutoStartTask"
 
-/* Registry keys for upgrade purposes only */ 
+/* Registry keys for upgrade purposes only */
 
 //#define REGSZ_KeymanDeveloper50W	L"software\\tavultesoft\\keyman developer\\5.0"
 //#define REGSZ_Keyman50W			L"software\\tavultesoft\\keyman\\5.0"
 
-/* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry 
+/* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry
    correctly -- readonly wherever possible. */
 
 class RegistryReadOnlyW
@@ -142,7 +142,7 @@ public:
 
 class RegistryFullAccessW: public RegistryReadOnlyW
 {
-protected:	
+protected:
 	HKEY GetKey(LPCWSTR AKey);
 	BOOL IntRecursiveDeleteKey(HKEY hkey);
 

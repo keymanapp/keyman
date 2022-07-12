@@ -249,6 +249,7 @@ SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Prog
 ```
 
 **Additional requirements for release builds**:
+* [Certificates](#certificates)
 * [7-Zip](http://www.7-zip.org/), used for archiving build files
 * [HTML Help Workshop](http://web.archive.org/web/20160201063255/http://download.microsoft.com/download/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe) note: Microsoft no longer offer this download...
 * [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm)
@@ -260,6 +261,13 @@ choco install 7zip html-help-workshop
 choco install wixtoolset --version=3.11.1
 git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
 ```
+
+## Certificates
+
+In order to make a release build, you need to sign all the executables. See
+[windows/src/README.md#Certificates](../../windows/src/README.md#Certificates)
+for details on how to create test code signing certificates or specify your own
+certificates for the build.
 
 ## Notes on Environment Variables
 
@@ -285,7 +293,7 @@ repo on your local machine.
 
 The version of CEF in use is determined by CEF_VERSION.md. This maps to a branch
 prefixed with `v` e.g. `v89.0.18` in the CEF4Delphi_binary repository. During a
-release build, the buildtools/cef-checkout.sh script will checkout the correct
+release build, the common/windows/cef-checkout.sh script will checkout the correct
 branch of the repository automatically and extract any compressed files found in
 it.
 

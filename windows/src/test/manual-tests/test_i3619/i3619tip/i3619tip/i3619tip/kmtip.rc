@@ -1,13 +1,3 @@
 
 #include "version.rc"
 
-IDI_KMTIP               ICON    DISCARDABLE     "..\\..\\global\\res\\70\\desktop\\keyman_16x16.ico"
-
-KEYMAN			      BITMAP	DISCARDABLE	"..\\..\\global\\res\\70\\desktop\\tip\\keyman_off.bmp"
-KEYMANMASK    		BITMAP  DISCARDABLE	"..\\..\\global\\res\\70\\desktop\\tip\\keyman_off_mask.bmp"
-KBDNOBITMAP	    	BITMAP	DISCARDABLE	"..\\..\\global\\res\\70\\desktop\\tip\\no_icon.bmp"
-KBDNOBITMAP_MASK	BITMAP  DISCARDABLE	"..\\..\\global\\res\\70\\desktop\\tip\\no_icon_mask.bmp"
-MENU_CONFIG		    BITMAP	DISCARDABLE	"..\\..\\global\\res\\70\\desktop\\tip\\menu_config.bmp"
-MENU_CONFIG_MASK	BITMAP	DISCARDABLE	"..\\..\\global\\res\\70\\desktop\\tip\\menu_config_mask.bmp"
-MENU_HELP		      BITMAP	DISCARDABLE	"..\\..\\global\\res\\70\\desktop\\tip\\menu_help.bmp"
-MENU_HELP_MASK		BITMAP	DISCARDABLE	"..\\..\\global\\res\\70\\desktop\\tip\\menu_help_mask.bmp"

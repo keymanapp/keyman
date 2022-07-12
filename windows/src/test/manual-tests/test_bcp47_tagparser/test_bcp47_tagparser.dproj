@@ -84,7 +84,7 @@
         </DelphiCompile>
         <DCCReference Include="TestBCP47.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47SuppressScriptRegistry.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\BCP47Tag.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
