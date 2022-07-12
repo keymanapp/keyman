@@ -60,9 +60,10 @@ const
     (Name: 'se'; ClassType: TJSONObject; Value: @SKDef; ValueSize: Length(SkDef))
   );
 
-  KeyDef: array[0..12] of TJSONDef = (
+  KeyDef: array[0..13] of TJSONDef = (
     (Name: 'id'; ClassType: TJSONString),
     (Name: 'text'; ClassType: TJSONString),
+    (Name: 'hint'; ClassType: TJSONString),
     (Name: 'sp'; ClassType: TJSONValue),
     (Name: 'width'; ClassType: TJSONValue),
     (Name: 'pad'; ClassType: TJSONValue),
@@ -86,10 +87,11 @@ const
     (Name: 'row'; ClassType: TJSONArray; Required: True; Value: @RowDef[0]; ValueSize: Length(RowDef))
   );
 
-  PlatformDef: array[0..3] of TJSONDef = (
+  PlatformDef: array[0..4] of TJSONDef = (
     (Name: 'font'; ClassType: TJSONString),
     (Name: 'fontsize'; ClassType: TJSONString),   // I4062
     (Name: 'displayUnderlying'; ClassType: TJSONBool),
+    (Name: 'displayHint'; ClassType: TJSONString),
     (Name: 'layer'; ClassType: TJSONArray; Required: True; Value: @LayerDef[0]; ValueSize: Length(LayerDef))
   );
 
