@@ -1,21 +1,6 @@
 {
   "name": "@keymanapp/gesture-recognizer",
   "description": "The core gesture-recognition engine used by Keyman's Web-based OSKs.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/keymanapp/keyman.git"
-  },
-  "keywords": [
-    "input",
-    "languages",
-    "keyboards"
-  ],
-  "author": "SIL International",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/keymanapp/keyman/issues"
-  },
-  "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^11.9.4",
@@ -26,7 +11,7 @@
     "typescript": "^4.5.4"
   },
   "scripts": {
-    "build": "echo 'Building @keymanapp/gesture-recognizer' && tsc -b ./src/tsconfig.json",
+    "build": "echo 'Building @keymanapp/gesture-recognizer' && tsc -b ./tsconfig.json",
     "clean": "tsc -b --clean",
     "tsc": "tsc",
     "mocha": "mocha"
