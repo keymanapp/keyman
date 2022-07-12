@@ -954,10 +954,15 @@ $(function() {
             $('#selPlatform').val(data.platform);
           }
           builder.selectPlatform();
-          if(data.presentation && builder.presentations[data.presentation]) {
+          if(data.presentation &&
+              builder.presentations[data.presentation] &&
+              $('#selPlatformPresentation option[value="'+data.presentation+'"]').length) {
             $('#selPlatformPresentation').val(data.presentation);
-            builder.prepareLayer();
+          } else {
+            // The last selected presentation is no longer available; select the first option instead
+            $('#selPlatformPresentation').val($('#selPlatformPresentation option:first').val());
           }
+          builder.prepareLayer();
           if(data.layer && KVKL[builder.lastPlatform][data.layer]) {
             $('#selLayer').val(data.layer);
             builder.selectLayer();

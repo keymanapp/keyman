@@ -3323,6 +3323,7 @@ begin
     PromptChange := APromptChange;
     if ShowModal = mrOk then
     begin
+      frameTouchLayout.SaveToString;
       frameTouchLayout.TemplateFileName := TemplateFileName;
       frameTouchLayout.Load('', True, False);   // I4034
       Self.Modified := True;
