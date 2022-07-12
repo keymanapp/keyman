@@ -2041,7 +2041,7 @@ begin
   begin
     b := TBitmap.Create;
     try
-      DrawQRCode(lbDebugHosts.Items[lbDebugHosts.ItemIndex] + '/packages.html', b);
+      DrawQRCode(lbDebugHosts.Items[lbDebugHosts.ItemIndex], b);
       imgQRCode.Picture.Bitmap := b;
     finally
       b.Free;
