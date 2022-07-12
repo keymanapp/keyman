@@ -7,10 +7,8 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=dcpcrypt jedi mbcolor regexpr scfontcombobox cef4delphi
+TARGETS=common
 !endif
-
-# jedi, regexpr have no packages
 
 CLEANS=
 
@@ -18,33 +16,11 @@ CLEANS=
 
 # ----------------------------------------------------------------------
 
-cef4delphi: .virtual
-    cd $(ROOT)\src\ext\cef4delphi
+common: .virtual
+    cd $(COMMON_ROOT)\ext
     $(MAKE) $(TARGET)
 
-dcpcrypt: .virtual
-    cd $(ROOT)\src\ext\dcpcrypt
-    $(MAKE) $(TARGET)
-
-jedi: .virtual
-    cd $(ROOT)\src\ext\jedi
-    $(MAKE) $(TARGET)
-
-mbcolor: .virtual
-    cd $(ROOT)\src\ext\mbcolor
-    $(MAKE) $(TARGET)
-
-regexpr: .virtual
-    cd $(ROOT)\src\ext\regexpr
-    $(MAKE) $(TARGET)
-
-vclzip: .virtual
-    cd $(ROOT)\src\ext\vclzip
-    $(MAKE) $(TARGET)
-
-scfontcombobox: .virtual
-    cd $(ROOT)\src\ext\scfontcombobox
-    $(MAKE) $(TARGET)
+# ----------------------------------------------------------------------
 
 #
 #

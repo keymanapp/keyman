@@ -54,7 +54,7 @@ clean:
 
 check:
     if not exist $(ROOT)\src\engine\inst\keymanengine.msm $(MAKE) check-engine
-    if not exist $(ROOT)\src\global\inst\data\unicodedata.mdb $(MAKE) check-unicodedata
+    if not exist $(KEYMAN_ROOT)\common\windows\bin\data\unicodedata.mdb $(MAKE) check-unicodedata
 
 
 check-engine:
@@ -62,8 +62,14 @@ check-engine:
     $(MAKE)
 
 check-unicodedata:
-    cd $(ROOT)\src\global\inst
+    cd $(KEYMAN_ROOT)\common\windows\data
     $(MAKE)
+
+test-releaseexists:
+    cd $(ROOT)\src\desktop\inst
+    $(MKVER_U) download.in download.mak
+
+    $(MAKE) -fdownload.mak test-releaseexists
 
 # ----------------------------------------------------------------------
 

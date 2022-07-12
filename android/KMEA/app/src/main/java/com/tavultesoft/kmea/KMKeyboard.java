@@ -169,7 +169,10 @@ final class KMKeyboard extends WebView {
           String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
           String sourceID = cm.sourceId().replaceAll(NAVIGATION_PATTERN, "$1$2");
           sendKMWError(cm.lineNumber(), sourceID, cm.message());
-          sendError(packageID, keyboardID, "");
+          // This duplicates the sendKMWError message, which itself duplicates the reporting now
+          // managed by sentry-manager on the js side in patch in #6890. It does not give us
+          // additional useful information. So we don't re-send to Sentry.
+          sendError(packageID, keyboardID, "", false);
         }
 
         return true;
@@ -440,7 +443,7 @@ final class KMKeyboard extends WebView {
     }
 
     if (!KMManager.shouldAllowSetKeyboard() || kbInfo == null) {
-      sendError(packageID, keyboardID, languageID);
+      sendError(packageID, keyboardID, languageID, true);
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       retVal = false;
     } else {
@@ -471,7 +474,7 @@ final class KMKeyboard extends WebView {
 
     if (!KMManager.shouldAllowSetKeyboard() ||
         (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
-      sendError(packageID, keyboardID, languageID);
+      sendError(packageID, keyboardID, languageID, true);
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
@@ -525,7 +528,7 @@ final class KMKeyboard extends WebView {
 
     if (!KMManager.shouldAllowSetKeyboard() ||
         (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
-      sendError(packageID, keyboardID, languageID);
+      sendError(packageID, keyboardID, languageID, true);
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
@@ -610,14 +613,14 @@ final class KMKeyboard extends WebView {
 
   // Display localized Toast notification that keyboard selection failed, so loading default keyboard.
   // Also sends a message to Sentry (not localized)
-  private void sendError(String packageID, String keyboardID, String languageID) {
+  private void sendError(String packageID, String keyboardID, String languageID, boolean reportToSentry) {
     this.currentKeyboardErrorReports++;
 
     if(this.currentKeyboardErrorReports == 1) {
       BaseActivity.makeToast(context, R.string.fatal_keyboard_error_short, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
     }
 
-    if(this.currentKeyboardErrorReports < 5) {
+    if(this.currentKeyboardErrorReports < 5 && reportToSentry) {
       // We'll only report up to 5 errors in a given keyboard to avoid spamming
       // errors and using unnecessary bandwidth doing so
       // Don't use localized string R.string.fatal_keyboard_error msg for Sentry
@@ -685,7 +688,12 @@ final class KMKeyboard extends WebView {
         breadcrumb.setData("keyboardVersion", this.keyboardVersion);
       }
       Sentry.addBreadcrumb(breadcrumb);
-      Sentry.captureMessage(message, SentryLevel.ERROR);
+      //
+      // We now rely on Sentry within KMW to capture these errors
+      // We'll continue to capture breadcrumbs so we can associate
+      // java-side errors with javascript-side errors.
+      //Sentry.captureMessage(message, SentryLevel.ERROR);
+      //
     }
   }
 

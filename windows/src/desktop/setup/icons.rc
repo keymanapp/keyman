@@ -4,7 +4,7 @@
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-1                       ICON                    "..\\..\\global\\res\\90\\setup.ico"
+1                       ICON                    "..\\..\\..\\..\\common\\resources\\icons\\setup.ico"
 
 20                      BITMAP                  "kbd.bmp"
 

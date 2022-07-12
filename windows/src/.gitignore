@@ -14,13 +14,7 @@
 # Temporary build files for VC++
 **/*.FileListAbsolute.txt
 
-# KeymanWeb is copied from /web/src during Developer build
-developer/TIKE/xml/kmw/resource
-
 # These files are generated during build
-developer/TIKE/icons.res
-developer/kmcmpdll/Compiler.res
-developer/kmcomp/icons.res
 engine/keyman32/KEYMAN32.res
 engine/keyman64/Keyman64.res
 engine/keymanx64/keymanx64.res

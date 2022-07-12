@@ -42,10 +42,10 @@
     <ClCompile Include="inserttext.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\keynames.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\registry.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
@@ -69,8 +69,11 @@
     <ClCompile Include="keyman32interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\kmtip_guids.cpp">
+    <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp">
       <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\windows\cpp\src\vkeys.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,10 +90,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\global\inc\certificate_check.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\global\inc\Compiler.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="editsess.h">
@@ -99,19 +99,22 @@
     <ClInclude Include="globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\KEYNAMES.H">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kmtip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\registry.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\kmtip_guids.h">
+    <ClInclude Include="..\..\..\include\kmtip_guids.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

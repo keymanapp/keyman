@@ -1,3 +1,3 @@
-1	ICON	"..\\..\\global\\res\\90\\filetypes\\kmp.ico"
-2	ICON	"..\\..\\global\\res\\90\\filetypes\\kmx.ico"
-3	ICON	"..\\..\\global\\res\\90\\filetypes\\kvk.ico"
+1	ICON	"..\\..\\..\\..\\common\\resources\\icons\\filetypes\\kmp.ico"
+2	ICON	"..\\..\\..\\..\\common\\resources\\icons\\filetypes\\kmx.ico"
+3	ICON	"..\\..\\..\\..\\common\\resources\\icons\\filetypes\\kvk.ico"

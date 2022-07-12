@@ -61,7 +61,7 @@
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
 
-#include "kmtip_guids.h"
+#include "..\..\..\include\kmtip_guids.h"
 
 class Globals
 {
