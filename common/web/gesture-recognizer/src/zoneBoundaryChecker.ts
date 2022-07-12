@@ -68,5 +68,15 @@ namespace com.keyman.osk {
       // disable that part of the said border for any cancellation checks.
       return !!(borderProximityBitmask & ~ignoredSafeBoundFlags);
     }
+
+    static getRelativeCoord(coord: InputSample, config: FinalizedGestureRecognizerConfiguration): InputSample {
+      let parentRect = config.targetRoot.getBoundingClientRect();
+
+      return {
+        x: coord.x - parentRect.left,
+        y: coord.y - parentRect.top,
+        t: coord.t
+      };
+    }
   }
 }

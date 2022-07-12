@@ -41,7 +41,8 @@ namespace com.keyman.osk {
 
     onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
       let sequence = new InputSequence(identifier, target, this instanceof TouchEventEngine);
-      sequence.addSample(sample);
+      let mappedSample = ZoneBoundaryChecker.getRelativeCoord(sample, this.config);
+      sequence.addSample(mappedSample);
 
       let sequenceWrapper = new Incomplete<InputSequence, InputSample>(sequence);
 
@@ -61,9 +62,10 @@ namespace com.keyman.osk {
     }
 
     onInputMove(identifier: number, sample: InputSample) {
+      let mappedSample = ZoneBoundaryChecker.getRelativeCoord(sample, this.config);
       const sequenceWrapper = this.getSequenceWrapperWithId(identifier);
-      sequenceWrapper.item.addSample(sample);
-      sequenceWrapper.signalUpdate(sample);
+      sequenceWrapper.item.addSample(mappedSample);
+      sequenceWrapper.signalUpdate(mappedSample);
     }
 
     onInputMoveCancel(identifier: number) {
