@@ -1,18 +1,18 @@
 /*
   Name:             globals
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    28 Mar 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Removed ARRAYSIZE define
                     05 Nov 2007 - mcdurdin - CHange msctf reference
                     07 Sep 2009 - mcdurdin - I2095 - Threadsafe
@@ -29,7 +29,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "kmtip_guids.h"
+#include "..\..\..\include\kmtip_guids.h"
 #define assert(x)
 
 //
@@ -57,7 +57,7 @@ void Log(WCHAR *fmt, ...);
 BOOL ShouldDebug();
 int SendDebugMessage_1(char *file, int line, PWCHAR msg);   // I4379
 int SendDebugMessageFormat_1(char *file, int line, PWCHAR fmt, ...);   // I4379
-void DebugLastError_1(char *file, int line, char *func, PWCHAR msg, DWORD err); 
+void DebugLastError_1(char *file, int line, char *func, PWCHAR msg, DWORD err);
 
 #define SendDebugMessage(msg) (SendDebugMessage_1(__FILE__, __LINE__, (msg)))
 #define SendDebugMessageFormat(msg,...) (SendDebugMessageFormat_1(__FILE__, __LINE__, (msg),__VA_ARGS__))
@@ -88,7 +88,7 @@ BOOL _LogSUCCEEDED(char *file, int line, PWSTR caller, PSTR callee, HRESULT hr);
     {                           \
         (punk)->Release();      \
     }                           \
-}                   
+}
 
 #define SafeReleaseClear(punk)  \
 {                               \
@@ -97,7 +97,7 @@ BOOL _LogSUCCEEDED(char *file, int line, PWSTR caller, PSTR callee, HRESULT hr);
         (punk)->Release();      \
         (punk) = NULL;          \
     }                           \
-}                   
+}
 
 extern HINSTANCE g_hInst;
 

@@ -1,0 +1,9 @@
+/bin/
+/lib/
+delphi/tools/*/bin/
+delphi/tools/*/obj/
+delphi/**/*.local
+delphi/**/*.~*
+delphi/**/__recovery/
+delphi/**/__history/
+delphi/general/keymanversion_build.inc

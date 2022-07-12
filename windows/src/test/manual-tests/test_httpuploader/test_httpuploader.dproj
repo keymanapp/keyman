@@ -61,23 +61,22 @@
 			<DCCReference Include="..\..\global\delphi\excmagic\unit\ExcMagicDlg.pas"/>
 			<DCCReference Include="..\..\global\delphi\excmagic\unit\ExcMagicPatch.pas"/>
 			<DCCReference Include="..\..\global\delphi\excmagic\unit\ExcStackTracer.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\VersionInfo.pas"/>
 			<DCCReference Include="..\..\global\delphi\excmagic\unit\ExcMagicDefaultFilter.pas"/>
 			<DCCReference Include="main.pas">
 				<Form>Form2</Form>
 			</DCCReference>
-			<DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\httpuploader.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\Upload_Settings.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\urlutil.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
-			<DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\DebugPaths.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\wininet5.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\general\GlobalProxySettings.pas"/>
 			<DCCReference Include="..\..\global\delphi\crypt\DCPbase64.pas"/>
-			<DCCReference Include="..\..\global\delphi\crypt\DCPblockciphers.pas"/>
 			<DCCReference Include="..\..\global\delphi\crypt\DCPconst.pas"/>
 			<DCCReference Include="..\..\global\delphi\crypt\DCPcrypt2.pas"/>
-			<DCCReference Include="..\..\global\delphi\crypt\Ciphers\DCPrc4.pas"/>
+			<DCCReference Include="..\..\global\delphi\crypt\DCPrc4.pas"/>
 			<DCCReference Include="..\..\global\delphi\online\UfrmOnlineUpdateSetup.pas">
 				<Form>frmOnlineUpdateSetup</Form>
 			</DCCReference>

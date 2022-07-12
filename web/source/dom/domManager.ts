@@ -1623,9 +1623,7 @@ namespace com.keyman.dom {
 
       // Exit initialization here if we're using an embedded code path.
       if(this.keyman.isEmbedded) {
-        if(!this.keyman.keyboardManager.setDefaultKeyboard()) {
-          console.error("No keyboard stubs exist - cannot initialize keyboard!");
-        }
+        this.keyman.keyboardManager.setDefaultKeyboard();
         return Promise.resolve();
       }
 

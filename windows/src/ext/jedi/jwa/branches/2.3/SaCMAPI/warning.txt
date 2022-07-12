@@ -1,6 +1,0 @@
-The content of this folder comes from
-Setup and Config Manager API
-and should be the same.
-
-Its only used to include the files there
-because Delphi does not support spaces in include paths. ($I ...)

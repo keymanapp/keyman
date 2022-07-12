@@ -95,11 +95,11 @@
         <DCCReference Include="InstallCustomLanguageMain.pas"/>
         <DCCReference Include="..\..\engine\kmcomapi\keymanapi_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\TempFileManager.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\utildir.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\klog.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47SuppressScriptRegistry.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

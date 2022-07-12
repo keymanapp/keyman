@@ -4,7 +4,7 @@ program test_xmlencode;
 
 uses
   SysUtils,
-  utilxml in '..\..\global\delphi\general\utilxml.pas',
+  utilxml in '..\..\..\..\common\windows\delphi\general\utilxml.pas',
   main_testxmlencode in 'main_testxmlencode.pas';
 
 begin

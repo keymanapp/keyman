@@ -37,7 +37,7 @@ case "$1" in
       fi
 
       # Verify that it's running now
-      ! ibusdaemon=`ps --user ${SUDO_USER} -o s= -o cmd | grep --regexp="^[^ZT] ibus-daemon .*--xim.*"`
+      ! ibusdaemon=`ps --user ${SUDO_USER:=$USER} -o s= -o cmd | grep --regexp="^[^ZT] ibus-daemon .*--xim.*"`
       if [ "x$ibusdaemon" = "x" ]; then
         # otherwise try to start it for the user installing the package
         if [ "x$is_gnome_shell" = "x1" ]; then

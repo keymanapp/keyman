@@ -401,7 +401,6 @@ uses
   KeymanPaths,
   KeymanVersion,
   kmint,
-  OnlineConstants,
   Winapi.ShellApi,
   BitmapIPicture,
   Winapi.ActiveX,

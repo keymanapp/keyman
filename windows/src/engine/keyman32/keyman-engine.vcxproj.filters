@@ -57,7 +57,7 @@
     <ClCompile Include="KEYMAN32.CPP">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\keynames.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="keystate.cpp">
@@ -75,10 +75,7 @@
     <ClCompile Include="kmprocess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\rc4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\global\vc\registry.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="selectkeyboard.cpp">
@@ -93,7 +90,7 @@
     <ClCompile Include="syskbdnt64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\unicode.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="versioninfo.cpp">
@@ -102,7 +99,7 @@
     <ClCompile Include="VKScanCodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\xstring.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="preservedkeymap.cpp">
@@ -143,10 +140,10 @@
     <None Include="KEYMAN32.DEF">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\..\global\res\bmp\arrow.bmp">
+    <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\global\res\bmp\mask.bmp">
+    <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -177,7 +174,7 @@
     <ClInclude Include="capsstate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\Compiler.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="globals.h">
@@ -192,25 +189,22 @@
     <ClInclude Include="keyboardoptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keyman64.h">
+    <ClInclude Include="keyman64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymancontrol.h">
+    <ClInclude Include="keymancontrol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keystate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\rc4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\global\inc\registry.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="syskbd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\unicode.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\unicode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vkscancodes.h">
@@ -243,7 +237,7 @@
     <ClInclude Include="serialkeyeventserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\global\inc\keymanengine.h">
+    <ClInclude Include="keymanengine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kmprocessactions.h">

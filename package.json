@@ -12,8 +12,8 @@
   "workspaces": [
     "resources/gosh",
     "resources/build/version",
-    "developer/js",
-    "developer/server",
+    "developer/src/kmlmc",
+    "developer/src/server",
     "common/models/*",
     "common/web/*",
     "common/predictive-text",

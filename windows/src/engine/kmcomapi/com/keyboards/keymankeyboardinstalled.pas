@@ -1,18 +1,18 @@
 (*
   Name:             keymankeyboardinstalled
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    13 Mar 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Add Serialize
                     14 Sep 2006 - mcdurdin - Draw keyboard icons as bitmaps for xml serializing
                     14 Sep 2006 - mcdurdin - Support icons instead of bitmaps for keyboards
@@ -127,7 +127,6 @@ uses
 
   KPUninstallKeyboard,
   isadmin,
-  OnlineConstants,
   kmxfile,
   ErrorControlledRegistry,
   RegistryKeys,
