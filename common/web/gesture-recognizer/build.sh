@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Builds the include script for the current Keyman version.
 #
@@ -9,7 +9,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -44,17 +44,17 @@ fi
 
 if builder_has_action clean; then
   npm run clean
-  rm -rf ../build
+  rm -rf build/
   builder_report clean success
 fi
 
 if builder_has_action build; then
   # Build
-  npm run build -- $builder_verbose || die "Could not build @keymanapp/gesture-recognizer."
+  npm run build -- $builder_verbose
   builder_report build success
 fi
 
 if builder_has_action test; then
-  npm test || fail "Tests failed"
+  npm test
   builder_report test success
 fi
