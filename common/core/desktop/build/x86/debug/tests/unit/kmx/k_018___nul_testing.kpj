@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath>$PROJECTPATH</BuildPath>
+    <CompilerWarningsAsErrors>false</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>false</WarnDeprecatedCode>
+    <CheckFilenameConventions>false</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_k_018___nul_testing_1</ID>
+      <Filename>k_018___nul_testing.kmn</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_018___nul_testing.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>018 - nul testing</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_k_018___nul_testing_2</ID>
+      <Filename>k_018___nul_testing.kps</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_018___nul_testing.kps</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>018 - nul testing</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_k_018___nul_testing_3</ID>
+      <Filename>k_018___nul_testing.kmx</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_018___nul_testing.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_k_018___nul_testing_2</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

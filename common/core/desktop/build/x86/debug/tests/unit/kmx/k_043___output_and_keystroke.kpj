@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath>$PROJECTPATH</BuildPath>
+    <CompilerWarningsAsErrors>false</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>false</WarnDeprecatedCode>
+    <CheckFilenameConventions>false</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_k_043___output_and_keystroke_1</ID>
+      <Filename>k_043___output_and_keystroke.kmn</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_043___output_and_keystroke.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>043 - output and keystroke</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_k_043___output_and_keystroke_2</ID>
+      <Filename>k_043___output_and_keystroke.kps</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_043___output_and_keystroke.kps</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>043 - output and keystroke</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_k_043___output_and_keystroke_3</ID>
+      <Filename>k_043___output_and_keystroke.kmx</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_043___output_and_keystroke.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_k_043___output_and_keystroke_2</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

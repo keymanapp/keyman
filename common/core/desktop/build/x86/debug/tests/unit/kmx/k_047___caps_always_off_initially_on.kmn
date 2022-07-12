@@ -1,0 +1,24 @@
+store(&NAME) '047 - caps always off initially on'
+c Description: Tests Caps Lock always off, entry to the test has Caps Lock
+c              on to test that it is then switched off on first keystroke event.
+c keys: [K_1][K_CAPS][K_2][K_CAPS][K_3]
+c expected: pass.pass.pass.
+c capsLock: 1
+c context:
+
+store(&version) '10.0'
+
+store(&capsalwaysoff) '1'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [CAPS K_1] > 'fail.'
++ [NCAPS K_1] > 'pass.'
+
++ [CAPS K_2] > 'fail.'
++ [NCAPS K_2] > 'pass.'
+
++ [CAPS K_3] > 'fail.'
++ [NCAPS K_3] > 'pass.'

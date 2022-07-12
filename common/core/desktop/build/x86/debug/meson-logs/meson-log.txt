@@ -1,0 +1,1595 @@
+Build started at 2021-12-08T17:38:40.947932
+Main binary: C:\Python310\python.exe
+Build Options: -Dbuildtype=debug -Ddefault_library=both -Dwerror=True
+Python system: Windows
+The Meson build system
+Version: 0.60.2
+Source dir: C:\Projects\keyman\keyman\common\core\desktop
+Build dir: C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug
+Build type: native build
+Program getversion.bat found: YES (C:\Projects\keyman\keyman\common\core\desktop\getversion.bat)
+Running command: C:\Projects\keyman\keyman\common\core\desktop\getversion.bat
+--- stdout ---
+15.0.163
+
+--- stderr ---
+
+
+Project name: keyboardprocessor
+Project version: 15.0.163
+Sanity testing C compiler: cl
+Is cross compiler: False.
+Sanity check compiler command line: cl sanitycheckc.c /Fesanitycheckc.exe /MTd /nologo /showIncludes /utf-8 /link
+Sanity check compile stdout:
+sanitycheckc.c
+
+-----
+Sanity check compile stderr:
+
+-----
+Running test binary command: C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\sanitycheckc.exe
+C compiler for the host machine: cl (msvc 19.29.30137 "Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30137 for x86")
+C linker for the host machine: link link 14.29.30137.0
+Sanity testing C++ compiler: cl
+Is cross compiler: False.
+Sanity check compiler command line: cl sanitycheckcpp.cc /Fesanitycheckcpp.exe /MTd /nologo /showIncludes /utf-8 /link
+Sanity check compile stdout:
+sanitycheckcpp.cc
+
+-----
+Sanity check compile stderr:
+
+-----
+Running test binary command: C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\sanitycheckcpp.exe
+C++ compiler for the host machine: cl (msvc 19.29.30137 "Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30137 for x86")
+C++ linker for the host machine: link link 14.29.30137.0
+Sanity testing C compiler: cl
+Is cross compiler: False.
+Sanity check compiler command line: cl sanitycheckc.c /Fesanitycheckc.exe /MTd /nologo /showIncludes /utf-8 /link
+Sanity check compile stdout:
+sanitycheckc.c
+
+-----
+Sanity check compile stderr:
+
+-----
+Running test binary command: C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\sanitycheckc.exe
+C compiler for the build machine: cl (msvc 19.29.30137 "Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30137 for x86")
+C linker for the build machine: link link 14.29.30137.0
+Sanity testing C++ compiler: cl
+Is cross compiler: False.
+Sanity check compiler command line: cl sanitycheckcpp.cc /Fesanitycheckcpp.exe /MTd /nologo /showIncludes /utf-8 /link
+Sanity check compile stdout:
+sanitycheckcpp.cc
+
+-----
+Sanity check compile stderr:
+
+-----
+Running test binary command: C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\sanitycheckcpp.exe
+C++ compiler for the build machine: cl (msvc 19.29.30137 "Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30137 for x86")
+C++ linker for the build machine: link link 14.29.30137.0
+Build machine cpu family: x86
+Build machine cpu: x86
+Host machine cpu family: x86
+Host machine cpu: x86
+Target machine cpu family: x86
+Target machine cpu: x86
+Message: meson.project_version(): 15.0.163
+
+'utf-8' codec can't decode byte 0x90 in position 2: invalid start byte
+Unusable script 'C:\\Python310\\python.exe'
+Message: host_machine.system(): windows
+Message: compiler.get_id(): msvc
+Message: rust library path is: C:/Projects/keyman/keyman/common/core/desktop/build/x86/debug/../../rust/x86/debug
+Running compile:
+Working directory:  C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\tmp_1sfuka4
+Command line:  cl C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\tmp_1sfuka4\testfile.c /FeC:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\tmp_1sfuka4\output.exe /nologo /showIncludes /utf-8 /MTd /nologo /showIncludes /utf-8 /Od /Oi- 
+
+Code:
+ #include<stdio.h>
+        
+        int main(void) {
+            printf("%ld\n", (long)(sizeof(void *)));
+            return 0;
+        }
+Compiler stdout:
+ testfile.c
+Note: including file: C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdio.h
+Note: including file:  C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\corecrt.h
+Note: including file:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vcruntime.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\sal.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\concurrencysal.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vadefs.h
+Note: including file:  C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\corecrt_wstdio.h
+Note: including file:   C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\corecrt_stdio_config.h
+
+Compiler stderr:
+ 
+Program stdout:
+
+4
+
+Program stderr:
+
+
+Library keyman_keyboard_processor_native found: YES
+Program hotdoc found: NO
+Configuring keyboardprocessor_version.h using configuration
+Windows resource compiler: Microsoft (R) Windows (R) Resource Compiler Version 10.0.10011.16384
+Running command: C:\Python310\python.exe -c import ctypes; print(ctypes.sizeof(ctypes.c_void_p))
+--- stdout ---
+8
+
+--- stderr ---
+
+
+Running compile:
+Working directory:  C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\tmplcrh0qmk
+Command line:  cl C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\tmplcrh0qmk\testfile.cpp /FeC:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\meson-private\tmplcrh0qmk\output.exe /nologo /showIncludes /utf-8 /MTd /nologo /showIncludes /utf-8 /Od /Oi- /EHsc /std:c++14 /permissive- 
+
+Code:
+ #include<stdio.h>
+        
+        int main(void) {
+            printf("%ld\n", (long)(sizeof(void *)));
+            return 0;
+        }
+Compiler stdout:
+ testfile.cpp
+Note: including file: C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdio.h
+Note: including file:  C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\corecrt.h
+Note: including file:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vcruntime.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\sal.h
+Note: including file:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\concurrencysal.h
+Note: including file:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vadefs.h
+Note: including file:  C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\corecrt_wstdio.h
+Note: including file:   C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\corecrt_stdio_config.h
+
+Compiler stderr:
+ 
+Program stdout:
+
+4
+
+Program stderr:
+
+
+Checking for size of "void *" : 4
+Message: Python ctypes is incompatible with built shared object. Disabling some tests.
+Adding test "jsontest"
+Adding test "jsontestOutput"
+Adding test "utftest"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "context-api"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "keyboard-api"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "options-api"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "state-api"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "debug-api"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "kmx_xstring"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "kmx_context"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Program kmcomp.exe found: YES (C:\Program Files (x86)\Keyman\Keyman Developer\kmcomp.exe)
+Program cmd.exe found: YES (C:\Windows\system32\cmd.exe)
+Program cmd.exe found: YES (C:\Windows\system32\cmd.exe)
+Configuring kmp.json using configuration
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\000 - null keyboard.kmn
+--- stdout ---
+c Description: Tests null keyboard 
+c keys: [K_A][RALT K_B][SHIFT K_C]
+c expected: aC
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+         
+
+--- stderr ---
+
+
+Configuring k_000___null_keyboard.kmn using configuration
+Configuring k_000___null_keyboard.kpj using configuration
+Configuring k_000___null_keyboard.kps using configuration
+Adding test "000 - null keyboard"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\001 - basic input UnicodeI.kmn
+--- stdout ---
+c Description: Tests basic input with simple context rules, ANSI characters used only
+c keys: [SHIFT K_A][SHIFT K_B][SHIFT K_C][SHIFT K_SPACE][SHIFT K_D][SHIFT K_E][SHIFT K_F]
+c expected: abc def
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ 'A' > 'a'
++ 'B' > 'b'
++ 'C' > 'c'
+
+'DE' + 'F' > 'def'
+
+--- stderr ---
+
+
+Configuring k_001___basic_input_unicodei.kmn using configuration
+Configuring k_001___basic_input_unicodei.kpj using configuration
+Configuring k_001___basic_input_unicodei.kps using configuration
+Adding test "001 - basic input UnicodeI"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\002 - basic input Unicode.kmn
+--- stdout ---
+c Description: Tests basic input with simple context rules (Unicode)
+c keys: [SHIFT K_A][SHIFT K_B][SHIFT K_C][SHIFT K_SPACE][SHIFT K_D][SHIFT K_E][SHIFT K_F]
+c expected: \u0E01\u0E02\u0E03\u0020\u0E04\u0E05\u0E06
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ 'A' > U+0E01
++ 'B' > U+0E02
++ 'C' > U+0E03
+
+'DE' + 'F' > U+0E04 U+0E05 U+0E06
+
+--- stderr ---
+
+
+Configuring k_002___basic_input_unicode.kmn using configuration
+Configuring k_002___basic_input_unicode.kpj using configuration
+Configuring k_002___basic_input_unicode.kps using configuration
+Adding test "002 - basic input Unicode"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\003 - nul.kmn
+--- stdout ---
+c Description: Tests nul context
+c keys: [K_A][K_A][K_A]
+c expected: cd
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+nul + 'a' > 'b'
+'b' + 'a' > 'c'
++ 'a' > 'd'
+
+--- stderr ---
+
+
+Configuring k_003___nul.kmn using configuration
+Configuring k_003___nul.kpj using configuration
+Configuring k_003___nul.kps using configuration
+Adding test "003 - nul"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\004 - basic input (shift 2).kmn
+--- stdout ---
+c Description: Tests basic vkey input with shift only (Unicode)
+c keys: [SHIFT K_A][SHIFT K_B][SHIFT K_C][SHIFT K_SPACE][SHIFT K_D][SHIFT K_E][SHIFT K_F]
+c expected: \u0E01\u0E02\u0E03\u0020\u0E04\u0E05\u0E06
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+         
+group(Main) using keys
+
++ [SHIFT K_A] > U+0E01
++ [SHIFT K_B] > U+0E02
++ [SHIFT K_C] > U+0E03
+
+'DE' + [SHIFT K_F] > U+0E04 U+0E05 U+0E06
+
+--- stderr ---
+
+
+Configuring k_004___basic_input__shift_2_.kmn using configuration
+Configuring k_004___basic_input__shift_2_.kpj using configuration
+Configuring k_004___basic_input__shift_2_.kps using configuration
+Adding test "004 - basic input (shift 2)"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\005 - nul with initial context.kmn
+--- stdout ---
+c Description: Tests nul context with an initial context supplied
+c keys: [K_A][K_A]
+c expected: xdd
+c context: x
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+nul + 'a' > 'b'
+'b' + 'a' > 'c'
++ 'a' > 'd'
+
+--- stderr ---
+
+
+Configuring k_005___nul_with_initial_context.kmn using configuration
+Configuring k_005___nul_with_initial_context.kpj using configuration
+Configuring k_005___nul_with_initial_context.kps using configuration
+Adding test "005 - nul with initial context"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\006 - vkey input (shift ctrl).kmn
+--- stdout ---
+c Description: Tests basic vkey input with shift and control (Unicode)
+c keys: [LCTRL SHIFT K_A][SHIFT K_B][RCTRL SHIFT K_C][K_SPACE][SHIFT K_D][SHIFT K_E][SHIFT K_F]
+c expected: \u0E01\u0E02\u0E03\u0020\u0E04\u0E05\u0E06
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+      
+group(Main) using keys
+
++ [SHIFT CTRL K_A] > U+0E01
++ [SHIFT K_B] > U+0E02
++ [SHIFT CTRL K_C] > U+0E03
+
+'DE' + [SHIFT K_F] > U+0E04 U+0E05 U+0E06
+
+--- stderr ---
+
+
+Configuring k_006___vkey_input__shift_ctrl_.kmn using configuration
+Configuring k_006___vkey_input__shift_ctrl_.kpj using configuration
+Configuring k_006___vkey_input__shift_ctrl_.kps using configuration
+Adding test "006 - vkey input (shift ctrl)"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\007 - vkey input (ctrl alt).kmn
+--- stdout ---
+c Description: Tests basic vkey input with control and alt (Unicode)
+c keys: [LCTRL LALT K_A][K_B][RCTRL RALT K_C][K_SPACE][K_D][K_E][LCTRL LALT K_F]
+c expected: \u0E01\u0E02\u0E03\u0020\u0E04\u0E05\u0E06
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+         
++ [CTRL ALT K_A] > U+0E01
++ [K_B] > U+0E02
++ [CTRL ALT K_C] > U+0E03
+
+'de' + [CTRL ALT K_F] > U+0E04 U+0E05 U+0E06
+
+--- stderr ---
+
+
+Configuring k_007___vkey_input__ctrl_alt_.kmn using configuration
+Configuring k_007___vkey_input__ctrl_alt_.kpj using configuration
+Configuring k_007___vkey_input__ctrl_alt_.kps using configuration
+Adding test "007 - vkey input (ctrl alt)"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\008 - vkey input (ctrl alt 2).kmn
+--- stdout ---
+c Description: Tests basic vkey input with control and alt (Unicode)
+c keys: [LCTRL LALT K_A][LCTRL LALT K_B][LCTRL LALT K_C]
+c expected: \u0E01\u0E03
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+      
+group(Main) using keys
+
++ [CTRL ALT K_A] > U+0E01
++ [CTRL ALT K_C] > U+0E03
+
+--- stderr ---
+
+
+Configuring k_008___vkey_input__ctrl_alt_2_.kmn using configuration
+Configuring k_008___vkey_input__ctrl_alt_2_.kpj using configuration
+Configuring k_008___vkey_input__ctrl_alt_2_.kps using configuration
+Adding test "008 - vkey input (ctrl alt 2)"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\012 - ralt.kmn
+--- stdout ---
+c Description: Tests Right Alt processing: requires Ctrl+Alt simulation off.
+c env.simulate_altgr: 0
+c keys: [RALT K_A][RALT K_O][LCTRL LALT K_A][LCTRL LALT K_O]
+c expected: \u05d6\u05e8\u0062\u0063
+c context: 
+
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [RAlt K_A] > U+05D6 
++ [RAlt K_O] > U+05E8
++ [Ctrl Alt K_A] > "b" 
++ [Ctrl Alt K_O] > "c" 
+
+--- stderr ---
+
+
+Configuring k_012___ralt.kmn using configuration
+Configuring k_012___ralt.kpj using configuration
+Configuring k_012___ralt.kps using configuration
+Adding test "012 - ralt"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\013 - deadkeys.kmn
+--- stdout ---
+c Description: Tests a simple deadkey rule in Unicode
+c keys: [SHIFT K_6][K_A]
+c expected: \u00E2
+c context:
+
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ '^' > deadkey(1)
+
+dk(1) + 'a' >  U+00E2
+
+--- stderr ---
+
+
+Configuring k_013___deadkeys.kmn using configuration
+Configuring k_013___deadkeys.kpj using configuration
+Configuring k_013___deadkeys.kps using configuration
+Adding test "013 - deadkeys"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\014 - groups and virtual keys.kmn
+--- stdout ---
+c Description: Tests multiple groups and virtual keys with mnemonic layout
+c keys: [K_A][SHIFT K_2][K_A][LCTRL K_2][K_A]
+c expected: \u03B1\u1FB0\u1FB1
+
+store(&VERSION) '9.0'
+
+begin Unicode > use(UMain)
+
+store(&MnemonicLayout) "0"
+
+c ----------------------------------------------
+
+group(UMain) using keys 
+  + [K_A] > U+03B1
+  + [CTRL  K_2] > deadkey(MacronBug)
+  + [ALT  K_2] > deadkey(MacronBug)
+  + [SHIFT    K_2] > deadkey(BreveBug)
+      
+  match > use(DK1)
+ 
+c ----------------------------------------------
+
+group(DK1)           
+  deadkey(MacronBug) U+03B1 > U+1FB1 c won't work
+  deadkey(BreveBug)  U+03B1 > U+1FB0 c works
+
+--- stderr ---
+
+
+Configuring k_014___groups_and_virtual_keys.kmn using configuration
+Configuring k_014___groups_and_virtual_keys.kpj using configuration
+Configuring k_014___groups_and_virtual_keys.kps using configuration
+Adding test "014 - groups and virtual keys"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\015 - ralt 2.kmn
+--- stdout ---
+c Description: Tests Right Alt processing with non-US kbds.
+c keys: [K_A][K_B][K_C][RALT K_A]
+c expected: abcd
+
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+'c' + [RAlt K_A] > "cd"
+
+
+--- stderr ---
+
+
+Configuring k_015___ralt_2.kmn using configuration
+Configuring k_015___ralt_2.kpj using configuration
+Configuring k_015___ralt_2.kps using configuration
+Adding test "015 - ralt 2"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\017 - space mnemonic kbd.kmn
+--- stdout ---
+c Description: Tests Space handling in mnemonic keyboards (failed with Win 98)
+c keys: [K_A][K_B][K_SPACE][K_C][K_SPACE][K_D][K_SPACE][K_D][K_E]
+c expected: XYZ
+
+store(&VERSION) '9.0'
+NAME "Alt key tests"
+HOTKEY "[CTRL SHIFT K_A]"
+store(&mnemoniclayout) "1"
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+  'ab'  + ' ' > 'X'  C bug: space ignored
+  'c '  + 'd' > 'Y'  C bug: space ignored
+  ' d'  + 'e' > 'Z'  C works OK
+
+--- stderr ---
+
+
+Configuring k_017___space_mnemonic_kbd.kmn using configuration
+Configuring k_017___space_mnemonic_kbd.kpj using configuration
+Configuring k_017___space_mnemonic_kbd.kps using configuration
+Adding test "017 - space mnemonic kbd"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\018 - nul testing.kmn
+--- stdout ---
+c Description: Tests the processing of nul in LHS of rules
+c keys: [K_A][K_A]
+c expected: OKa
+
+VERSION 9.0   
+NAME "Nul test"
+HOTKEY "[CTRL SHIFT K_N]"
+
+begin unicode > use(main)                   
+
+group(Main) using keys
+    nul + 'a' > 'OK'
+
+c EOF
+
+
+--- stderr ---
+
+
+Configuring k_018___nul_testing.kmn using configuration
+Configuring k_018___nul_testing.kpj using configuration
+Configuring k_018___nul_testing.kps using configuration
+Adding test "018 - nul testing"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\019 - multiple deadkeys.kmn
+--- stdout ---
+c Description: Tests deadkey scenarios
+c 1. One deadkey in context                   dk(1) + '1'
+c 2. One char and one deadkey in context      'a' dk(2) + '2'
+c 3. One deadkey and one char in context      dk(3) 'a' + '3'
+c 4. Two deadkeys in a row in context         dk(4a) dk(4b) + '4'
+c 5. One char and two deadkeys in context     'a' dk(5a) dk(5b) + '5'
+c 6. One char and two deadkeys and one char in context     'a' dk(6a) dk(6b) 'b' + '6'
+c 7. Two deadkeys and one char in context     dk(7a) dk(7b) 'a' + '7'
+c 8. Three deadkeys in context                dk(8a) dk(8b) dk(8c) + '8'
+c 9. Replacing deadkeys in context via rule   [9][x][x]
+c keys: [K_1][K_X][K_2][K_X][K_3][K_X][K_4][K_X][K_5][K_X][K_6][K_X][K_7][K_X][K_8][K_X][K_9][K_X][K_X]
+c expected: 1=OK 2=OK 3=OK 4=OK 5=OK 6=OK 7=OK 8=OK 9=OK
+c context:
+
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ '1' > dk(1)
+dk(1) + 'x' > '1=OK '
+
++ '2' > 'a' dk(2)
+'a' dk(2) + 'x' > '2=OK '
+
++ '3' > dk(3) 'a'
+dk(3) 'a' + 'x' > '3=OK '
+
++ '4' > dk(4a) dk(4b)
+dk(4a) dk(4b) + 'x' > '4=OK '
+
++ '5' > 'a' dk(5a) dk(5b)
+'a' dk(5a) dk(5b) + 'x' > '5=OK '
+
++ '6' > 'a' dk(6a) dk(6b) 'b'
+'a' dk(6a) dk(6b) 'b' + 'x' > '6=OK '
+
++ '7' > dk(7a) dk(7b) 'a'
+dk(7a) dk(7b) 'a' + 'x' > '7=OK '
+dk(7a) 'a' + 'x' > '7=Fail1 '
+dk(7b) 'a' + 'x' > '7=Fail2 '
+
++ '8' > dk(8a) dk(8b) dk(8c)
+dk(8a) dk(8b) dk(8c) + 'x' > '8=OK '
+dk(8a) + 'x' > '8=Fail1 '
+dk(8b) + 'x' > '8=Fail2 '
+dk(8c) + 'x' > '8=Fail3 '
+dk(8a) dk(8b) + 'x' > '8=Fail4 '
+dk(8a) dk(8c) + 'x' > '8=Fail5 '
+dk(8b) dk(8c) + 'x' > '8=Fail6 '
+
+c [K_9] [K_X] [K_X] -> test that
+
++ '9' > '{' dk(9a) dk(9b) '}' dk(9c) dk(9d)
+
+dk(9b) '}' dk(9c) dk(9d) + 'x' > dk(9e) '}' dk(9f) dk(9g)
+'{' dk(9a) dk(9e) '}' dk(9f) dk(9g) + 'x' > '9=OK'
+--- stderr ---
+
+
+Configuring k_019___multiple_deadkeys.kmn using configuration
+Configuring k_019___multiple_deadkeys.kpj using configuration
+Configuring k_019___multiple_deadkeys.kps using configuration
+Adding test "019 - multiple deadkeys"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\020 - deadkeys and backspace.kmn
+--- stdout ---
+c Description: Tests deadkey backspacing
+c 1. One deadkey in context                   dk(1) + BKSP = nul
+c 2. One char and one deadkey in context      'a' dk(2) + BKSP = nul
+c 3. One deadkey and one char in context      dk(3) 'a' + BKSP = nul
+c 4. Two deadkeys in a row in context         dk(4a) dk(4b) + BKSP = nul
+c 5. One char and two deadkeys in context     'a' dk(5a) dk(5b) 'b' + BKSP = 'a'
+c 6. One char and two deadkeys and one char and two deadkeys in context     'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d) + BKSP = 'a'
+c keys: [K_1][K_BKSP][K_2][K_BKSP][K_3][K_BKSP][K_4][K_BKSP][K_5][K_BKSP][K_6][K_BKSP]
+c expected: 78aa
+c context: 7890
+
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ '1' > dk(1)
++ '2' > 'a' dk(2)
++ '3' > dk(3) 'a'
++ '4' > dk(4a) dk(4b)
++ '5' > 'a' dk(5a) dk(5b) 'b'
++ '6' > 'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d)
+
+--- stderr ---
+
+
+Configuring k_020___deadkeys_and_backspace.kmn using configuration
+Configuring k_020___deadkeys_and_backspace.kpj using configuration
+Configuring k_020___deadkeys_and_backspace.kps using configuration
+Adding test "020 - deadkeys and backspace"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\021 - options.kmn
+--- stdout ---
+c Description: Tests basic option rules
+c keys: [K_A][K_1][K_A][K_0][K_A]
+c expected: no foo.foo.no foo.
+c context: 
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.'
+if(foo = '0') + 'a' > 'no foo.'
++ '1' > set(foo = '1')
++ '0' > set(foo = '0')
+
+--- stderr ---
+
+
+Configuring k_021___options.kmn using configuration
+Configuring k_021___options.kpj using configuration
+Configuring k_021___options.kps using configuration
+Adding test "021 - options"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\022 - options with preset.kmn
+--- stdout ---
+c Description: Tests basic option rules with a preset supplied
+c keys: [K_A][K_1][K_A][K_0][K_A]
+c expected: foo.foo.no foo.
+c context: 
+c option: foo=1
+c expected option: foo=0
+c saved option: foo=0
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.'
+if(foo = '0') + 'a' > 'no foo.'
++ '1' > set(foo = '1') save(foo)
++ '0' > set(foo = '0') save(foo)
+
+--- stderr ---
+
+
+Configuring k_022___options_with_preset.kmn using configuration
+Configuring k_022___options_with_preset.kpj using configuration
+Configuring k_022___options_with_preset.kps using configuration
+Adding test "022 - options with preset"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\023 - options with save.kmn
+--- stdout ---
+c Description: Tests basic option rules with save
+c keys: [K_A][K_1][K_A][K_0][K_A][K_2]
+c expected: no foo.foo.no foo.
+c context: 
+c expected option: foo=0
+c saved option: foo=0
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.'
+if(foo = '0') + 'a' > 'no foo.'
++ '1' > set(foo = '1')
++ '0' > set(foo = '0')
++ '2' > save(foo)
+--- stderr ---
+
+
+Configuring k_023___options_with_save.kmn using configuration
+Configuring k_023___options_with_save.kpj using configuration
+Configuring k_023___options_with_save.kps using configuration
+Adding test "023 - options with save"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\024 - options with save and preset.kmn
+--- stdout ---
+c Description: Tests basic option rules with save
+c keys: [K_A][K_1][K_A][K_0][K_A][K_2]
+c expected: foo.foo.no foo.
+c context: 
+c option: foo=1
+c expected option: foo=0
+c saved option: foo=0
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.'
+if(foo = '0') + 'a' > 'no foo.'
++ '1' > set(foo = '1')
++ '0' > set(foo = '0')
+if(foo = '0') + '2' > save(foo) 
+
+--- stderr ---
+
+
+Configuring k_024___options_with_save_and_preset.kmn using configuration
+Configuring k_024___options_with_save_and_preset.kpj using configuration
+Configuring k_024___options_with_save_and_preset.kps using configuration
+Adding test "024 - options with save and preset"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\025 - options with reset.kmn
+--- stdout ---
+c Description: Tests basic option rules with reset
+c keys: [K_A][K_1][K_A][K_0][K_A][K_3]
+c expected: foo.foo.no foo.
+c context: 
+c option: foo=1
+c expected option: foo=1
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.'
+if(foo = '0') + 'a' > 'no foo.'
++ '1' > set(foo = '1')
++ '0' > set(foo = '0')
++ '3' > reset(foo)
+
+--- stderr ---
+
+
+Configuring k_025___options_with_reset.kmn using configuration
+Configuring k_025___options_with_reset.kpj using configuration
+Configuring k_025___options_with_reset.kps using configuration
+Adding test "025 - options with reset"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\026 - system stores.kmn
+--- stdout ---
+c Description: Tests platform and baselayout system store rules
+c keys: [K_1][K_2][K_3][K_4][K_A][K_B]
+c expected: windows.desktop.hardware.native.en-US.kbdus.dll.
+c context: 
+c (default) option: &platform=windows desktop hardware native <-- ignored by test
+c (default) option: &baseLayout=kbdus.dll <-- ignored by test
+c (default) option: &baseLayoutAlt=en-US <-- ignored by test
+
+store(&version) '10.0'
+
+store(digit)  '1234567890'
+store(letter) 'abcdefghij'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+platform('windows') + '1' > 'windows.'
+platform('desktop') + '2' > 'desktop.'
+platform('hardware') + '3' > 'hardware.'
+platform('native') + '4' > 'native.'
++ any(digit) > 'platform-fail.'
+
+baselayout('en-US') + 'a' > 'en-US.'
+baselayout('kbdus.dll') + 'b' > 'kbdus.dll.'
++ any(letter) > 'baselayout-fail.'
+
+--- stderr ---
+
+
+Configuring k_026___system_stores.kmn using configuration
+Configuring k_026___system_stores.kpj using configuration
+Configuring k_026___system_stores.kps using configuration
+Adding test "026 - system stores"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\027 - system stores 2.kmn
+--- stdout ---
+c Description: Tests platform and baselayout system store rules
+c keys: [K_1][K_2][K_3][K_4][K_A][K_B]
+c expected: linux.desktop.hardware.native.fr-FR.kbdfr.dll.
+c context: 
+c option: &platform=linux desktop hardware native
+c option: &baseLayout=kbdfr.dll
+c option: &baseLayoutAlt=fr-FR
+
+store(&version) '10.0'
+
+store(digit)  '1234567890'
+store(letter) 'abcdefghij'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+platform('linux') + '1' > 'linux.'
+platform('desktop') + '2' > 'desktop.'
+platform('hardware') + '3' > 'hardware.'
+platform('native') + '4' > 'native.'
++ any(digit) > 'platform-fail.'
+
+baselayout('fr-FR') + 'a' > 'fr-FR.'
+baselayout('kbdfr.dll') + 'b' > 'kbdfr.dll.'
++ any(letter) > 'baselayout-fail.'
+
+--- stderr ---
+
+
+Configuring k_027___system_stores_2.kmn using configuration
+Configuring k_027___system_stores_2.kpj using configuration
+Configuring k_027___system_stores_2.kps using configuration
+Adding test "027 - system stores 2"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\028 - smp.kmn
+--- stdout ---
+c Description: Tests SMP characters; see #4361 [1-4], #5561 [5]
+c keys: [K_1][K_2][K_3][K_4][K_5]
+c expected: \U0001F601yx
+c context:
+
+store(&version) '10.0'
+store(&name) '028smp'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+c Tests #4361:
+
++ [K_1] > U+1F642
+U+1F642 + [K_2] > context 'hi' U+1F600
+U+1F600 + [K_3] > 'x'
+U+1F642 'hix' + [K_4] > U+1F601 'y'
+
+c Tests #5561 (#5465):
+
++ [K_5] > U+10333 use(second)
+
+group(second)
+
+U+10333 > 'x'
+
+--- stderr ---
+
+
+Configuring k_028___smp.kmn using configuration
+Configuring k_028___smp.kpj using configuration
+Configuring k_028___smp.kps using configuration
+Adding test "028 - smp"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\029 - beep.kmn
+--- stdout ---
+c Description: Tests beep
+c keys: [K_1]
+c expected: \b
+c context: 
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [K_1] > beep
+
+--- stderr ---
+
+
+Configuring k_029___beep.kmn using configuration
+Configuring k_029___beep.kpj using configuration
+Configuring k_029___beep.kps using configuration
+Adding test "029 - beep"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\030 - multiple groups.kmn
+--- stdout ---
+c Description: Tests multiple groups. Purpose here is to interleave output and backspaces from kmx processor to consumer
+c keys: [K_1][K_2]
+c expected: abc
+c context: 
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [K_1] > 'a'
+'b' + [K_2] > context use(b)
+
+match > use(a)
+
+group(a)
+
+'a' > 'b'
+
+group(b)
+
+'b' > 'abc'
+
+--- stderr ---
+
+
+Configuring k_030___multiple_groups.kmn using configuration
+Configuring k_030___multiple_groups.kpj using configuration
+Configuring k_030___multiple_groups.kps using configuration
+Adding test "030 - multiple groups"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\031 - caps lock.kmn
+--- stdout ---
+c Description: Tests Caps Lock
+c keys: [K_1][SHIFT K_2][SHIFT K_3][K_A][SHIFT K_B]
+c expected: pass.pass.pass.pass.pass.
+c capsLock: 1
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [NCAPS K_1] > 'fail.'
++ [CAPS K_1] > 'pass.'
+
++ [NCAPS SHIFT K_2] > 'fail.'
++ [CAPS SHIFT K_2] > 'pass.'
+
++ '#' > 'pass.'
++ '3' > 'fail.'
+
++ 'a' > 'fail.'
++ 'A' > 'pass.'
+
++ 'b' > 'pass.'
++ 'B' > 'fail.'
+
+--- stderr ---
+
+
+Configuring k_031___caps_lock.kmn using configuration
+Configuring k_031___caps_lock.kpj using configuration
+Configuring k_031___caps_lock.kps using configuration
+Adding test "031 - caps lock"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\032 - caps control.kmn
+--- stdout ---
+c Description: Tests Caps Lock env set
+c keys: [K_1][K_CAPS][K_2][SHIFT K_3][K_4][K_CAPS][K_5][K_CAPS][K_6][K_SHIFT][K_7]
+c expected: pass.pass.pass.pass.pass.pass.pass.
+c capsLock: 0
+c context:
+
+store(&version) '10.0'
+
+store(&shiftfreescaps) '1'
+store(&capsononly) '1'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [CAPS K_1] > 'fail.'
++ [NCAPS K_1] > 'pass.'
+
++ [NCAPS K_2] > 'fail.'
++ [CAPS K_2] > 'pass.'
+
+c Shift will free caps lock when it is released, so this test should still have Caps Lock on.
++ [NCAPS SHIFT K_3] > 'fail.'
++ [CAPS SHIFT K_3] > 'pass.'
+
++ [CAPS K_4] > 'fail.'
++ [NCAPS K_4] > 'pass.'
+
++ [NCAPS K_5] > 'fail.'
++ [CAPS K_5] > 'pass.'
+
++ [NCAPS K_6] > 'fail.'
++ [CAPS K_6] > 'pass.'
+
+c Shift was pressed and released ([K_SHIFT]) so Caps should be off before this
++ [CAPS K_7] > 'fail.'
++ [NCAPS K_7] > 'pass.'
+
+--- stderr ---
+
+
+Configuring k_032___caps_control.kmn using configuration
+Configuring k_032___caps_control.kpj using configuration
+Configuring k_032___caps_control.kps using configuration
+Adding test "032 - caps control"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\033 - caps always off.kmn
+--- stdout ---
+c Description: Tests Caps Lock always off
+c keys: [K_1][K_CAPS][K_2][K_CAPS][K_3]
+c expected: pass.pass.pass.
+c capsLock: 0
+c context:
+
+store(&version) '10.0'
+
+store(&capsalwaysoff) '1'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [CAPS K_1] > 'fail.'
++ [NCAPS K_1] > 'pass.'
+
++ [CAPS K_2] > 'fail.'
++ [NCAPS K_2] > 'pass.'
+
++ [CAPS K_3] > 'fail.'
++ [NCAPS K_3] > 'pass.'
+
+--- stderr ---
+
+
+Configuring k_033___caps_always_off.kmn using configuration
+Configuring k_033___caps_always_off.kpj using configuration
+Configuring k_033___caps_always_off.kps using configuration
+Adding test "033 - caps always off"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\034 - options double set reset.kmn
+--- stdout ---
+c Description: Tests basic option rules with save reset+set+reset
+c keys: [K_A][K_A]
+c expected: foo.foo.
+c context: 
+c option: foo=1
+c expected option: foo=1
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.' set(foo='2') reset(foo) set(foo='3') reset(foo)
+if(foo = '2') + 'a' > 'bar.'
+if(foo = '3') + 'a' > 'baz.'
+if(foo = '0') + 'a' > 'no foo.'
+
+--- stderr ---
+
+
+Configuring k_034___options_double_set_reset.kmn using configuration
+Configuring k_034___options_double_set_reset.kpj using configuration
+Configuring k_034___options_double_set_reset.kps using configuration
+Adding test "034 - options double set reset"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\035 - options double set staged.kmn
+--- stdout ---
+c Description: Tests basic option rules with save reset+set+reset
+c keys: [K_A][K_B][K_C][K_B][K_A]
+c expected: foo.foo.
+c context:
+c option: foo=1
+c expected option: foo=2
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.' set(foo='2')
++ 'b' > reset(foo)
++ 'c' > set(foo='3')
+if(foo = '2') + 'a' > 'bar.'
+if(foo = '3') + 'a' > 'baz.'
+if(foo = '0') + 'a' > 'no foo.'
+
+--- stderr ---
+
+
+Configuring k_035___options_double_set_staged.kmn using configuration
+Configuring k_035___options_double_set_staged.kpj using configuration
+Configuring k_035___options_double_set_staged.kps using configuration
+Adding test "035 - options double set staged"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\036 - options - double reset staged.kmn
+--- stdout ---
+c Description: Tests basic option rules with save reset+reset
+c keys: [K_A][K_B][K_B][K_A]
+c expected: foo.foo.
+c context:
+c option: foo=1
+c expected option: foo=2
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.' set(foo='2')
++ 'b' > reset(foo)
+if(foo = '2') + 'a' > 'bar.'
+if(foo = '0') + 'a' > 'no foo.'
+
+--- stderr ---
+
+
+Configuring k_036___options___double_reset_staged.kmn using configuration
+Configuring k_036___options___double_reset_staged.kpj using configuration
+Configuring k_036___options___double_reset_staged.kps using configuration
+Adding test "036 - options - double reset staged"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\037 - options - double reset.kmn
+--- stdout ---
+c Description: Tests basic option rules with save reset+reset
+c keys: [K_A][K_A]
+c expected: foo.foo.
+c context: 
+c option: foo=1
+c expected option: foo=1
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.' set(foo='2') reset(foo) reset(foo)
+if(foo = '2') + 'a' > 'bar.'
+if(foo = '0') + 'a' > 'no foo.'
+
+--- stderr ---
+
+
+Configuring k_037___options___double_reset.kmn using configuration
+Configuring k_037___options___double_reset.kpj using configuration
+Configuring k_037___options___double_reset.kps using configuration
+Adding test "037 - options - double reset"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\038 - punctkeys.kmn
+--- stdout ---
+c Description: Tests punctuation keys (Unicode)
+c keys: [K_A][K_COLON][K_A][K_EQUAL][K_A][K_COMMA][K_A][K_HYPHEN][K_A][K_PERIOD][K_A][K_SLASH][K_A][K_BKQUOTE][K_A][K_LBRKT][K_A][K_BKSLASH][K_A][K_RBRKT][K_A][K_QUOTE][K_A][K_oE2]
+c expected: efghijklmnop
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+      
+group(Main) using keys
+
+'a' + [K_COLON] > 'e'
+'a' + [K_EQUAL] > 'f'
+'a' + [K_COMMA] > 'g'
+'a' + [K_HYPHEN] > 'h'
+'a' + [K_PERIOD] > 'i'
+'a' + [K_SLASH] > 'j'
+'a' + [K_BKQUOTE] > 'k'
+'a' + [K_LBRKT] > 'l'
+'a' + [K_BKSLASH] > 'm'
+'a' + [K_RBRKT] > 'n'
+'a' + [K_QUOTE] > 'o'
+'a' + [K_oE2] > 'p'
+
+--- stderr ---
+
+
+Configuring k_038___punctkeys.kmn using configuration
+Configuring k_038___punctkeys.kpj using configuration
+Configuring k_038___punctkeys.kps using configuration
+Adding test "038 - punctkeys"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\039 - generic ctrlalt.kmn
+--- stdout ---
+c Description: Tests generic alt and control (Unicode)
+c keys: [K_A][K_A][LCTRL K_B][K_A][LALT K_C][K_A][RCTRL K_B][K_A][RALT K_C]
+c expected: abcbc
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+'a' + [CTRL K_B] > 'b'
+'a' + [ALT K_C] > 'c'
+
+--- stderr ---
+
+
+Configuring k_039___generic_ctrlalt.kmn using configuration
+Configuring k_039___generic_ctrlalt.kpj using configuration
+Configuring k_039___generic_ctrlalt.kps using configuration
+Adding test "039 - generic ctrlalt"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\040 - long context.kmn
+--- stdout ---
+c Description: Tests context longer than 64 chars
+c keys: [K_SPACE][K_F]
+c expected: 012345678901234567890123456789012345678901234567890123456789012\u0020
+c context:  012345678901234567890123456789012345678901234567890123456789012
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [K_SPACE] > U+0020
+
+c prevent entering symbols after space
+U+0020 + 'f' > U+0020
+
+--- stderr ---
+
+
+Configuring k_040___long_context.kmn using configuration
+Configuring k_040___long_context.kpj using configuration
+Configuring k_040___long_context.kps using configuration
+Adding test "040 - long context"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\041 - long context and deadkeys.kmn
+--- stdout ---
+c Description: Tests that we don't split a dk in context:set. Note that we start with a context
+c with length MAXCONTEXT-1 (abc...fgh is 60 characters/bytes long + 3 bytes for dk(1)).
+c keys: [K_Z][K_1][K_2][K_3][K_4]
+c context:
+c expected: PASS
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+c Setup
++ [K_Z] > dk(1) 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh'
+
+c Test 1
+dk(1) 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh' + '1' > context '1'
+
+c Test 2: Test that we haven't split a deadkey code: UC_SENTINEL CODE_DEADKEY <deadkey_number>
+c         because: CODE_DEADKEY = U+0008; deadkey_number = U+0001
+U+0008 U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh1' + '2' > 'FAIL TEST 2'
+U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh1' + '2' > 'FAIL TEST 2'
+'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh1' + '2' > context '2'
+
+c Test 3: Test that we haven't split a deadkey code: UC_SENTINEL CODE_DEADKEY <deadkey_number>
+c         because: CODE_DEADKEY = U+0008; deadkey_number = U+0001
+U+0008 U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh12' + '3' > 'FAIL TEST 3'
+U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh12' + '3' > 'FAIL TEST 3'
+'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh12' + '3' > 'abcdefghijklmnopqrstuvwxyz123'
+
+c Convert to a visible result:
+dk(1) 'abcdefghijklmnopqrstuvwxyz123' + '4' > 'PASS'
+
+--- stderr ---
+
+
+Configuring k_041___long_context_and_deadkeys.kmn using configuration
+Configuring k_041___long_context_and_deadkeys.kpj using configuration
+Configuring k_041___long_context_and_deadkeys.kps using configuration
+Adding test "041 - long context and deadkeys"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\042 - long context and split deadkeys.kmn
+--- stdout ---
+c Description: Tests that we don't split a dk in context. Note that we start with a context with length MAXCONTEXT.
+c keys: [K_Z][K_SPACE][K_1][K_2]
+c context:
+c expected: PASS
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+c Setup
++ [K_Z] > dk(1) 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk'
+
+c Test 1: Test that we haven't split a deadkey code: UC_SENTINEL CODE_DEADKEY <deadkey_number>
+c         Here, looking at last char only: deadkey_number = U+0001
+U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk' + ' ' > 'FAIL'
+dk(1) 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk' + ' ' > 'UNEXPECTED'
+
+c Convert to a visible result:
+'defghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk ' + '1' > 'def'
+dk(1) 'abcdef' + '2' > 'PASS'
+
+
+--- stderr ---
+
+
+Configuring k_042___long_context_and_split_deadkeys.kmn using configuration
+Configuring k_042___long_context_and_split_deadkeys.kpj using configuration
+Configuring k_042___long_context_and_split_deadkeys.kps using configuration
+Adding test "042 - long context and split deadkeys"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\043 - output and keystroke.kmn
+--- stdout ---
+c Description: Tests the 'emit default key' function by having an empty 'using keys' final group
+c keys: [K_1][K_2][K_3]
+c expected: abd3
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [K_1] > 'a'
+'b' + [K_2] > context use(b)
+'abc' + [K_3] > context(1) context(2) 'd' use(emit)
+
+match > use(a)
+
+group(a)
+
+'a' > 'b'
+
+group(b)
+
+'b' > 'abc'
+
+group(emit) using keys
+
+--- stderr ---
+
+
+Configuring k_043___output_and_keystroke.kmn using configuration
+Configuring k_043___output_and_keystroke.kpj using configuration
+Configuring k_043___output_and_keystroke.kps using configuration
+Adding test "043 - output and keystroke"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\044 - if and context.kmn
+--- stdout ---
+c Description: Tests that context(x) takes if() statements into account. See #4275.
+c keys: [K_A][K_B]
+c expected: ex
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+store(nfc) '0'
+store(diaeresisBase) 'ae'
+
++ 'a' > 'exay'
+
+c Test #1 for if() with context(n)
+
+if(nfc = "0") any(diaeresisBase) 'x' any(diaeresisBase) 'y' + 'b' > context(2) context(3)
+
+--- stderr ---
+
+
+Configuring k_044___if_and_context.kmn using configuration
+Configuring k_044___if_and_context.kpj using configuration
+Configuring k_044___if_and_context.kps using configuration
+Adding test "044 - if and context"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\045 - deadkey and context.kmn
+--- stdout ---
+c Description: Tests that context emits deadkeys correctly. See #4275.
+c keys: [K_Y][K_Z][SHIFT K_SLASH]
+c expected: correct
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ 'y' > dk(1) 'a' dk(2) 'b' dk(3)
+
+c Test #2 for dk(d) and context
+
+dk(1) 'a' dk(2) 'b' dk(3) + 'z' > '<' context '>'
+'<' dk(1) 'a' dk(2) 'b' dk(3) '>' + '?' > 'correct'
+
+--- stderr ---
+
+
+Configuring k_045___deadkey_and_context.kmn using configuration
+Configuring k_045___deadkey_and_context.kpj using configuration
+Configuring k_045___deadkey_and_context.kps using configuration
+Adding test "045 - deadkey and context"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\046 - deadkey and contextex.kmn
+--- stdout ---
+c Description: Tests that context() emits deadkeys correctly. See #4275.
+c keys: [K_Y][SHIFT K_M][SHIFT K_SLASH]
+c expected: correct
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ 'y' > dk(1) 'a' dk(2) 'b' dk(3)
+
+c Test #3 for dk(d) and context(n)
+
+dk(1) 'a' dk(2) 'b' dk(3) + 'M' > '<' context(1) '>'
+'<' dk(1) '>' + '?' > 'correct'
+
+--- stderr ---
+
+
+Configuring k_046___deadkey_and_contextex.kmn using configuration
+Configuring k_046___deadkey_and_contextex.kpj using configuration
+Configuring k_046___deadkey_and_contextex.kps using configuration
+Adding test "046 - deadkey and contextex"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\047 - caps always off initially on.kmn
+--- stdout ---
+c Description: Tests Caps Lock always off, entry to the test has Caps Lock
+c              on to test that it is then switched off on first keystroke event.
+c keys: [K_1][K_CAPS][K_2][K_CAPS][K_3]
+c expected: pass.pass.pass.
+c capsLock: 1
+c context:
+
+store(&version) '10.0'
+
+store(&capsalwaysoff) '1'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [CAPS K_1] > 'fail.'
++ [NCAPS K_1] > 'pass.'
+
++ [CAPS K_2] > 'fail.'
++ [NCAPS K_2] > 'pass.'
+
++ [CAPS K_3] > 'fail.'
++ [NCAPS K_3] > 'pass.'
+
+--- stderr ---
+
+
+Configuring k_047___caps_always_off_initially_on.kmn using configuration
+Configuring k_047___caps_always_off_initially_on.kpj using configuration
+Configuring k_047___caps_always_off_initially_on.kps using configuration
+Adding test "047 - caps always off initially on"
+Running command: C:\Windows\system32\cmd.exe /c type C:\Projects\keyman\keyman\common\core\desktop\tests\unit\kmx\048 - modifier keys keep context.kmn
+--- stdout ---
+c Description: Tests that modifier keys don't reset context (#5591)
+c keys: [K_A][K_SHIFT][K_B][K_A][K_ALT][K_B][K_A][K_CAPS][K_B]
+c expected: pass.pass.pass.
+c context:
+
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'a'
+
+'a' + [K_B] > 'pass.'
+
+--- stderr ---
+
+
+Configuring k_048___modifier_keys_keep_context.kmn using configuration
+Configuring k_048___modifier_keys_keep_context.kpj using configuration
+Configuring k_048___modifier_keys_keep_context.kps using configuration
+Adding test "048 - modifier keys keep context"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "key_list"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "rust-keyboard-api"
+WARNING: extract_all_objects called without setting recursive
+keyword argument. Meson currently defaults to
+non-recursive to maintain backward compatibility but
+the default will be changed in the future.
+
+Adding test "rust-state-api"
+Build targets in project: 62
+
+keyboardprocessor 15.0.163
+
+  User defined options
+    buildtype      : debug
+    default_library: both
+    werror         : True
+
+Found ninja-1.10.2 at C:\ProgramData\chocolatey\bin\ninja.EXE

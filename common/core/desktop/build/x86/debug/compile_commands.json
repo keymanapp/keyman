@@ -1,0 +1,248 @@
+[
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\option.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/option.cpp.obj \"/c\" ../../../src/option.cpp",
+    "file": "../../../src/option.cpp",
+    "output": "src/kmnkbp0-0.dll.p/option.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\keyboard.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/keyboard.cpp.obj \"/c\" ../../../src/keyboard.cpp",
+    "file": "../../../src/keyboard.cpp",
+    "output": "src/kmnkbp0-0.dll.p/keyboard.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\state.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/state.cpp.obj \"/c\" ../../../src/state.cpp",
+    "file": "../../../src/state.cpp",
+    "output": "src/kmnkbp0-0.dll.p/state.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\km_kbp_context_api.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/km_kbp_context_api.cpp.obj \"/c\" ../../../src/km_kbp_context_api.cpp",
+    "file": "../../../src/km_kbp_context_api.cpp",
+    "output": "src/kmnkbp0-0.dll.p/km_kbp_context_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\km_kbp_keyboard_api.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/km_kbp_keyboard_api.cpp.obj \"/c\" ../../../src/km_kbp_keyboard_api.cpp",
+    "file": "../../../src/km_kbp_keyboard_api.cpp",
+    "output": "src/kmnkbp0-0.dll.p/km_kbp_keyboard_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\km_kbp_options_api.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/km_kbp_options_api.cpp.obj \"/c\" ../../../src/km_kbp_options_api.cpp",
+    "file": "../../../src/km_kbp_options_api.cpp",
+    "output": "src/kmnkbp0-0.dll.p/km_kbp_options_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\km_kbp_state_api.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/km_kbp_state_api.cpp.obj \"/c\" ../../../src/km_kbp_state_api.cpp",
+    "file": "../../../src/km_kbp_state_api.cpp",
+    "output": "src/kmnkbp0-0.dll.p/km_kbp_state_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\km_kbp_debug_api.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/km_kbp_debug_api.cpp.obj \"/c\" ../../../src/km_kbp_debug_api.cpp",
+    "file": "../../../src/km_kbp_debug_api.cpp",
+    "output": "src/kmnkbp0-0.dll.p/km_kbp_debug_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\km_kbp_processevent_api.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/km_kbp_processevent_api.cpp.obj \"/c\" ../../../src/km_kbp_processevent_api.cpp",
+    "file": "../../../src/km_kbp_processevent_api.cpp",
+    "output": "src/kmnkbp0-0.dll.p/km_kbp_processevent_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\json.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/json.cpp.obj \"/c\" ../../../src/json.cpp",
+    "file": "../../../src/json.cpp",
+    "output": "src/kmnkbp0-0.dll.p/json.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\mock_mock_processor.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/mock_mock_processor.cpp.obj \"/c\" ../../../src/mock/mock_processor.cpp",
+    "file": "../../../src/mock/mock_processor.cpp",
+    "output": "src/kmnkbp0-0.dll.p/mock_mock_processor.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\rust_rust_mock_processor.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/rust_rust_mock_processor.cpp.obj \"/c\" ../../../src/rust/rust_mock_processor.cpp",
+    "file": "../../../src/rust/rust_mock_processor.cpp",
+    "output": "src/kmnkbp0-0.dll.p/rust_rust_mock_processor.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_consts.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_consts.cpp.obj \"/c\" ../../../src/kmx/kmx_consts.cpp",
+    "file": "../../../src/kmx/kmx_consts.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_consts.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_processevent.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_processevent.cpp.obj \"/c\" ../../../src/kmx/kmx_processevent.cpp",
+    "file": "../../../src/kmx/kmx_processevent.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_processevent.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_actions.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_actions.cpp.obj \"/c\" ../../../src/kmx/kmx_actions.cpp",
+    "file": "../../../src/kmx/kmx_actions.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_actions.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_capslock.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_capslock.cpp.obj \"/c\" ../../../src/kmx/kmx_capslock.cpp",
+    "file": "../../../src/kmx/kmx_capslock.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_capslock.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_context.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_context.cpp.obj \"/c\" ../../../src/kmx/kmx_context.cpp",
+    "file": "../../../src/kmx/kmx_context.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_context.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_conversion.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_conversion.cpp.obj \"/c\" ../../../src/kmx/kmx_conversion.cpp",
+    "file": "../../../src/kmx/kmx_conversion.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_conversion.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_debug.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_debug.cpp.obj \"/c\" ../../../src/kmx/kmx_debug.cpp",
+    "file": "../../../src/kmx/kmx_debug.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_debug.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_debugger.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_debugger.cpp.obj \"/c\" ../../../src/kmx/kmx_debugger.cpp",
+    "file": "../../../src/kmx/kmx_debugger.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_debugger.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_environment.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_environment.cpp.obj \"/c\" ../../../src/kmx/kmx_environment.cpp",
+    "file": "../../../src/kmx/kmx_environment.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_environment.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_file.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_file.cpp.obj \"/c\" ../../../src/kmx/kmx_file.cpp",
+    "file": "../../../src/kmx/kmx_file.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_file.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_modifiers.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_modifiers.cpp.obj \"/c\" ../../../src/kmx/kmx_modifiers.cpp",
+    "file": "../../../src/kmx/kmx_modifiers.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_modifiers.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_options.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_options.cpp.obj \"/c\" ../../../src/kmx/kmx_options.cpp",
+    "file": "../../../src/kmx/kmx_options.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_options.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_processor.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_processor.cpp.obj \"/c\" ../../../src/kmx/kmx_processor.cpp",
+    "file": "../../../src/kmx/kmx_processor.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_processor.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\kmx_kmx_xstring.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/kmx_kmx_xstring.cpp.obj \"/c\" ../../../src/kmx/kmx_xstring.cpp",
+    "file": "../../../src/kmx/kmx_xstring.cpp",
+    "output": "src/kmnkbp0-0.dll.p/kmx_kmx_xstring.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Isrc\\kmnkbp0-0.dll.p\" \"-Isrc\" \"-I..\\..\\..\\src\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_EXPORTING\" \"-D_SCL_SECURE_NO_WARNINGS\" \"-D_CRT_SECURE_NO_WARNINGS\" \"-DUNICODE\" \"/Fdsrc\\kmnkbp0-0.dll.p\\utfcodec.cpp.pdb\" /Fosrc/kmnkbp0-0.dll.p/utfcodec.cpp.obj \"/c\" ../../../src/utfcodec.cpp",
+    "file": "../../../src/utfcodec.cpp",
+    "output": "src/kmnkbp0-0.dll.p/utfcodec.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\json\\jsontest.exe.p\" \"-Itests\\unit\\json\" \"-I..\\..\\..\\tests\\unit\\json\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"/Fdtests\\unit\\json\\jsontest.exe.p\\jsontest.cpp.pdb\" /Fotests/unit/json/jsontest.exe.p/jsontest.cpp.obj \"/c\" ../../../tests/unit/json/jsontest.cpp",
+    "file": "../../../tests/unit/json/jsontest.cpp",
+    "output": "tests/unit/json/jsontest.exe.p/jsontest.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\utftest\\utftest.exe.p\" \"-Itests\\unit\\utftest\" \"-I..\\..\\..\\tests\\unit\\utftest\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"/Fdtests\\unit\\utftest\\utftest.exe.p\\utftest.cpp.pdb\" /Fotests/unit/utftest/utftest.exe.p/utftest.cpp.obj \"/c\" ../../../tests/unit/utftest/utftest.cpp",
+    "file": "../../../tests/unit/utftest/utftest.cpp",
+    "output": "tests/unit/utftest/utftest.exe.p/utftest.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmnkbd\\context-api.exe.p\" \"-Itests\\unit\\kmnkbd\" \"-I..\\..\\..\\tests\\unit\\kmnkbd\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmnkbd\\context-api.exe.p\\context_api.cpp.pdb\" /Fotests/unit/kmnkbd/context-api.exe.p/context_api.cpp.obj \"/c\" ../../../tests/unit/kmnkbd/context_api.cpp",
+    "file": "../../../tests/unit/kmnkbd/context_api.cpp",
+    "output": "tests/unit/kmnkbd/context-api.exe.p/context_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmnkbd\\keyboard-api.exe.p\" \"-Itests\\unit\\kmnkbd\" \"-I..\\..\\..\\tests\\unit\\kmnkbd\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmnkbd\\keyboard-api.exe.p\\keyboard_api.cpp.pdb\" /Fotests/unit/kmnkbd/keyboard-api.exe.p/keyboard_api.cpp.obj \"/c\" ../../../tests/unit/kmnkbd/keyboard_api.cpp",
+    "file": "../../../tests/unit/kmnkbd/keyboard_api.cpp",
+    "output": "tests/unit/kmnkbd/keyboard-api.exe.p/keyboard_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmnkbd\\options-api.exe.p\" \"-Itests\\unit\\kmnkbd\" \"-I..\\..\\..\\tests\\unit\\kmnkbd\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmnkbd\\options-api.exe.p\\options_api.cpp.pdb\" /Fotests/unit/kmnkbd/options-api.exe.p/options_api.cpp.obj \"/c\" ../../../tests/unit/kmnkbd/options_api.cpp",
+    "file": "../../../tests/unit/kmnkbd/options_api.cpp",
+    "output": "tests/unit/kmnkbd/options-api.exe.p/options_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmnkbd\\state-api.exe.p\" \"-Itests\\unit\\kmnkbd\" \"-I..\\..\\..\\tests\\unit\\kmnkbd\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmnkbd\\state-api.exe.p\\state_api.cpp.pdb\" /Fotests/unit/kmnkbd/state-api.exe.p/state_api.cpp.obj \"/c\" ../../../tests/unit/kmnkbd/state_api.cpp",
+    "file": "../../../tests/unit/kmnkbd/state_api.cpp",
+    "output": "tests/unit/kmnkbd/state-api.exe.p/state_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmnkbd\\debug-api.exe.p\" \"-Itests\\unit\\kmnkbd\" \"-I..\\..\\..\\tests\\unit\\kmnkbd\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmnkbd\\debug-api.exe.p\\debug_api.cpp.pdb\" /Fotests/unit/kmnkbd/debug-api.exe.p/debug_api.cpp.obj \"/c\" ../../../tests/unit/kmnkbd/debug_api.cpp",
+    "file": "../../../tests/unit/kmnkbd/debug_api.cpp",
+    "output": "tests/unit/kmnkbd/debug-api.exe.p/debug_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmnkbd\\kmx_xstring.exe.p\" \"-Itests\\unit\\kmnkbd\" \"-I..\\..\\..\\tests\\unit\\kmnkbd\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmnkbd\\kmx_xstring.exe.p\\test_kmx_xstring.cpp.pdb\" /Fotests/unit/kmnkbd/kmx_xstring.exe.p/test_kmx_xstring.cpp.obj \"/c\" ../../../tests/unit/kmnkbd/test_kmx_xstring.cpp",
+    "file": "../../../tests/unit/kmnkbd/test_kmx_xstring.cpp",
+    "output": "tests/unit/kmnkbd/kmx_xstring.exe.p/test_kmx_xstring.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmnkbd\\kmx_context.exe.p\" \"-Itests\\unit\\kmnkbd\" \"-I..\\..\\..\\tests\\unit\\kmnkbd\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmnkbd\\kmx_context.exe.p\\test_kmx_context.cpp.pdb\" /Fotests/unit/kmnkbd/kmx_context.exe.p/test_kmx_context.cpp.obj \"/c\" ../../../tests/unit/kmnkbd/test_kmx_context.cpp",
+    "file": "../../../tests/unit/kmnkbd/test_kmx_context.cpp",
+    "output": "tests/unit/kmnkbd/kmx_context.exe.p/test_kmx_context.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmx\\kmx.exe.p\" \"-Itests\\unit\\kmx\" \"-I..\\..\\..\\tests\\unit\\kmx\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmx\\kmx.exe.p\\kmx.cpp.pdb\" /Fotests/unit/kmx/kmx.exe.p/kmx.cpp.obj \"/c\" ../../../tests/unit/kmx/kmx.cpp",
+    "file": "../../../tests/unit/kmx/kmx.cpp",
+    "output": "tests/unit/kmx/kmx.exe.p/kmx.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmx\\kmx.exe.p\" \"-Itests\\unit\\kmx\" \"-I..\\..\\..\\tests\\unit\\kmx\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmx\\kmx.exe.p\\kmx_test_source.cpp.pdb\" /Fotests/unit/kmx/kmx.exe.p/kmx_test_source.cpp.obj \"/c\" ../../../tests/unit/kmx/kmx_test_source.cpp",
+    "file": "../../../tests/unit/kmx/kmx_test_source.cpp",
+    "output": "tests/unit/kmx/kmx.exe.p/kmx_test_source.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\kmx\\key_list.exe.p\" \"-Itests\\unit\\kmx\" \"-I..\\..\\..\\tests\\unit\\kmx\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\kmx\\key_list.exe.p\\kmx_key_list.cpp.pdb\" /Fotests/unit/kmx/key_list.exe.p/kmx_key_list.cpp.obj \"/c\" ../../../tests/unit/kmx/kmx_key_list.cpp",
+    "file": "../../../tests/unit/kmx/kmx_key_list.cpp",
+    "output": "tests/unit/kmx/key_list.exe.p/kmx_key_list.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\rust_mock\\rust-keyboard-api.exe.p\" \"-Itests\\unit\\rust_mock\" \"-I..\\..\\..\\tests\\unit\\rust_mock\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\rust_mock\\rust-keyboard-api.exe.p\\keyboard_api.cpp.pdb\" /Fotests/unit/rust_mock/rust-keyboard-api.exe.p/keyboard_api.cpp.obj \"/c\" ../../../tests/unit/rust_mock/keyboard_api.cpp",
+    "file": "../../../tests/unit/rust_mock/keyboard_api.cpp",
+    "output": "tests/unit/rust_mock/rust-keyboard-api.exe.p/keyboard_api.cpp.obj"
+  },
+  {
+    "directory": "C:\\Projects\\keyman\\keyman\\common\\core\\desktop\\build\\x86\\debug",
+    "command": "\"cl\" \"-Itests\\unit\\rust_mock\\rust-state-api.exe.p\" \"-Itests\\unit\\rust_mock\" \"-I..\\..\\..\\tests\\unit\\rust_mock\" \"-Iinclude\" \"-I..\\..\\..\\include\" \"-Isrc\" \"-I..\\..\\..\\src\" \"/MTd\" \"/nologo\" \"/showIncludes\" \"/W2\" \"/WX\" \"/EHsc\" \"/std:c++14\" \"/permissive-\" \"/Od\" \"/Zi\" \"/source-charset:utf-8\" \"-DKMN_KBP_STATIC\" \"/Fdtests\\unit\\rust_mock\\rust-state-api.exe.p\\state_api.cpp.pdb\" /Fotests/unit/rust_mock/rust-state-api.exe.p/state_api.cpp.obj \"/c\" ../../../tests/unit/rust_mock/state_api.cpp",
+    "file": "../../../tests/unit/rust_mock/state_api.cpp",
+    "output": "tests/unit/rust_mock/rust-state-api.exe.p/state_api.cpp.obj"
+  }
+]

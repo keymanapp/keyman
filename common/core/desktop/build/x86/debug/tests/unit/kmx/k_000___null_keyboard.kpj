@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath>$PROJECTPATH</BuildPath>
+    <CompilerWarningsAsErrors>false</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>false</WarnDeprecatedCode>
+    <CheckFilenameConventions>false</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
+  <Files>
+    <File>
+      <ID>id_k_000___null_keyboard_1</ID>
+      <Filename>k_000___null_keyboard.kmn</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_000___null_keyboard.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>000 - null keyboard</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_k_000___null_keyboard_2</ID>
+      <Filename>k_000___null_keyboard.kps</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_000___null_keyboard.kps</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>000 - null keyboard</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_k_000___null_keyboard_3</ID>
+      <Filename>k_000___null_keyboard.kmx</Filename>
+      <Filepath>C:\Projects\keyman\keyman\common\core\desktop\build\x86\debug\tests\unit\kmx/k_000___null_keyboard.kmx</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kmx</FileType>
+      <ParentFileID>id_k_000___null_keyboard_2</ParentFileID>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

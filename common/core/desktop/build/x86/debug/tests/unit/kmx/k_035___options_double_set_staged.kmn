@@ -1,0 +1,22 @@
+store(&NAME) '035 - options double set staged'
+c Description: Tests basic option rules with save reset+set+reset
+c keys: [K_A][K_B][K_C][K_B][K_A]
+c expected: foo.foo.
+c context:
+c option: foo=1
+c expected option: foo=2
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.' set(foo='2')
++ 'b' > reset(foo)
++ 'c' > set(foo='3')
+if(foo = '2') + 'a' > 'bar.'
+if(foo = '3') + 'a' > 'baz.'
+if(foo = '0') + 'a' > 'no foo.'

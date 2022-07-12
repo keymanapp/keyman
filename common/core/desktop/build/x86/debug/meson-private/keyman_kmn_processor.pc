@@ -1,0 +1,10 @@
+prefix=c:/
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: keyman_kmn_processor
+Description: Keyman processor for KMN keyboards.
+Version: 15.0.163
+Libs: -L${libdir} -lkmnkbp0
+Libs.private: C:/Projects/keyman/keyman/common/core/desktop/build/x86/debug/../../rust/x86/debug/keyman_keyboard_processor_native.lib
+Cflags: -I${includedir}
