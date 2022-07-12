@@ -752,7 +752,7 @@ namespace com.keyman.text {
     resetContext() {
       this.layerId = 'default';
       this.keyboardInterface.resetContextCache();
-      if(this.contextDevice.touchable) {
+      if(!this.contextDevice.touchable) {
         this._UpdateVKShift(null);
       }
     };
