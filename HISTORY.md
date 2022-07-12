@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.31 alpha 2022-07-12
+
+* fix(developer): QR Code for Package Editor had wrong path (#6926)
+
 ## 16.0.30 alpha 2022-07-11
 
 * fix(web): maps touch-layout chiral alt, ctrl to non-chiral when non-chiral keyboard is active (#6808)
