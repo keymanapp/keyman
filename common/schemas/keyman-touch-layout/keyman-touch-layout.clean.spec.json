@@ -22,7 +22,8 @@
         "font": { "$ref": "#/definitions/font-spec" },
         "fontsize": { "$ref": "#/definitions/fontsize-spec" },
         "layer": { "$ref": "#/definitions/layers" },
-        "displayUnderlying": { "type": "boolean" }
+        "displayUnderlying": { "type": "boolean" },
+        "displayHint": { "type": "string", "enum": ["none","dot","text"] }
       },
       "required": ["layer"],
       "additionalProperties": false
@@ -91,7 +92,8 @@
         "width": { "$ref" : "#/definitions/key-width" },
         "sk": { "$ref": "#/definitions/subkeys" },
         "flick": { "$ref": "#/definitions/flick" },
-        "multitap": { "$ref": "#/definitions/subkeys" }
+        "multitap": { "$ref": "#/definitions/subkeys" },
+        "hint": { "type": "string" }
       },
       "anyOf": [
         {"required": ["id"]},

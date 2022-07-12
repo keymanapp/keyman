@@ -84,6 +84,19 @@ optionally contain three additional properties: `font`, `fontsize`, and
 : A boolean value, if `true`, then the base layout's key cap will be displayed
   in the top left of the key cap. Defaults to `false`.
 
+* `displayHint`
+
+: A string value, one of `"none"`, `"dot"`, or `"text"`. Defaults to `"dot"`.
+  Controls the display of the hint on the key cap:
+
+  * `"none"`: show no hint on the key cap.
+  * `"dot"`: show a dot on top-right of key cap if a longpress menu
+    is available, default and only option for Keyman 15.0 and earlier.
+  * `"text"`: show the text `hint` property if present, often on
+    top-right of key cap.
+
+  Introduced in Keyman 16.0.
+
 ## `layer` object
 
 The `layer` object describes one visible layer on a touch keyboard. It has two
@@ -201,6 +214,10 @@ object](#sk-object). A `key` object must include either an `id` or `sp` property
 * `text`
 
 : String. The string displayed on the key cap.
+
+* `hint`
+
+: String. If present, a small hint, often shown at top right of key cap.
 
 * `layer`
 
