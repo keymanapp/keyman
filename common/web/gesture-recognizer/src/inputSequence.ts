@@ -8,7 +8,7 @@ namespace com.keyman.osk {
 
     private _currentTarget: EventTarget;
 
-    private _sequence: InputSampleSequence = [];
+    private samples: InputSampleSequence = [];
 
     constructor(identifier: number,
                 parsedObj: JSONInputSequence);
@@ -32,7 +32,7 @@ namespace com.keyman.osk {
     }
 
     addSample(sample: InputSample) {
-      this._sequence.push(sample);
+      this.samples.push(sample);
     }
 
     // For use with JSON.stringify.

@@ -66,36 +66,47 @@ window.addEventListener('load', function() {
 
   recognizer = new com.keyman.osk.GestureRecognizer(recognizerConfig);
 
-  let console = {};
+  let recordingObj = {};
   let logElement = document.getElementById('event-log');
   // Erase any logs from before a page reload.
   logElement.value = '';
 
-  console.log = function(str) {
-    str = str === undefined ? '' : str;
-    logElement.value += str + '\n';
-  }
-
   let logClearButton = document.getElementById('log-clear-button');
   logClearButton.onclick = function() {
     logElement.value = '';
+    recordingObj = {}; // erase previously-recorded sequences
   }
 
-  recognizer.on('inputstart', function(sequence) {
-    console.log(`new input sequence started: identifier ${sequence.item.identifier}`);
 
-    sequence.on('update', function(seq, sample) {
-      console.log(`identifier ${seq.item.identifier}:  ${JSON.stringify(sample)}`);
+  recognizer.on('inputstart', function(sequence) {
+    recordingObj[sequence.item.identifier] = {sequence: sequence.item, result: null};
+
+    objectPrinter = function() {
+      logElement.value = '';
+
+      let arr = [];
+
+      for(let entry in recordingObj) {
+        arr.push(recordingObj[entry]);
+      }
+
+      logElement.value = JSON.stringify(arr, com.keyman.osk.InputSequence._replacer, 2);
+    }
+
+    objectPrinter();
+
+    sequence.on('update', function() {
+      objectPrinter();
     });
 
     sequence.on('cancel', function(seq) {
-      console.log(`identifier ${seq.item.identifier} cancelled`);
+      recordingObj[seq.item.identifier].result = 'canceled';
+      objectPrinter();
     });
 
     sequence.on('end', function(seq) {
-      console.log(`identifier ${seq.item.identifier} ended`);
-      console.log();
-      console.log(JSON.stringify(seq.item, com.keyman.osk.InputSequence._replacer, 2));
+      recordingObj[seq.item.identifier].result = 'ended';
+      objectPrinter();
     });
   });
 });
