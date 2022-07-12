@@ -26,21 +26,24 @@ builder.dragDrop = {};
 
   dragDrop.getKeyElementFromDragTarget = function(target) {
     let key = dragDrop.getKeyElementFromElement(target);
-    let isIdField = false;
+    let fieldType = 'text';
 
     if(key) {
       key = $(key);
     } else {
-      if(target.id == 'inpKeyCap') {
+      if(target.id == 'inpKeyCap' || target.id == 'inpKeyCapUnicode') {
         key = builder.selectedKey();
       } else if(target.id == 'inpKeyName') {
         key = builder.selectedKey();
-        isIdField = true;
-      } else if(target.id == 'inpSubKeyCap') {
+        fieldType = 'id';
+      } else if(target.id == 'inpKeyHint' || target.id == 'inpKeyHintUnicode') {
+        key = builder.selectedKey();
+        fieldType = 'hint';
+      } else if(target.id == 'inpSubKeyCap' || target.id == 'inpSubKeyCapUnicode') {
         key = builder.selectedSubKey();
       } else if(target.id == 'inpSubKeyName') {
         key = builder.selectedSubKey();
-        isIdField = true;
+        fieldType = 'id';
       }
 
       if(!key) {
@@ -48,7 +51,7 @@ builder.dragDrop = {};
       }
     }
 
-    return { key: key, isIdField: isIdField };
+    return { key: key, fieldType: fieldType };
   };
 
   dragDrop.charToUnicodeValue = function(s) {
@@ -126,10 +129,12 @@ builder.dragDrop = {};
       }
     } else {
       // Double-click insertion, so use last focused control
-      if($.contains($('#subKeyToolbar')[0], builder.lastFocus)) {
-        key = { key: builder.selectedSubKey(), isIdField: false };
+      if(builder.lastFocus?.id == '#inpKeyHint' || builder.lastFocus?.id == '#inpKeyHintUnicode') {
+        key = { key: builder.selectedKey(), fieldType: 'hint' };
+      } else if($.contains($('#subKeyToolbar')[0], builder.lastFocus)) {
+        key = { key: builder.selectedSubKey(), fieldType: 'text' };
       } else {
-        key = { key: builder.selectedKey(), isIdField: false };
+        key = { key: builder.selectedKey(), fieldType: 'text' };
       }
     }
 
@@ -137,23 +142,27 @@ builder.dragDrop = {};
       return false;
     }
 
-    const target = $(dragDrop.isSubKey(key.key) ? '#inpSubKeyCap' : '#inpKeyCap');
+    const target = $(
+      key.fieldType == 'hint' ? '#inpKeyHint' :
+      dragDrop.isSubKey(key.key) ? '#inpSubKeyCap' :
+      '#inpKeyCap');
+
     const text = (o.shift ? target.val() : '') + o.text;
 
     // Focus the control and add the text
-    if(key.isIdField || key.key.data('id').startsWith('T_new_') || o.ctrl) {
+    if(key.fieldType == 'id' || key.key.data('id').startsWith('T_new_') || o.ctrl) {
       const idTarget = $(dragDrop.isSubKey(key.key) ? '#inpSubKeyName' : '#inpKeyName');
       const chars = [...text]; // Split o.text into array of codepoints, keeping surrogate pairs together
       let id = chars.reduce((prev,curr) => prev+'_'+dragDrop.charToUnicodeValue(curr).toUpperCase(), 'U');
       idTarget.val(id);
 
-      if(key.isIdField) {
+      if(key.fieldType == 'id') {
         idTarget.focus();
       }
       idTarget.change();
     }
 
-    if(!key.isIdField) {
+    if(!key.fieldType != 'id') {
       target.focus();
       target.val(text);
       target.change();

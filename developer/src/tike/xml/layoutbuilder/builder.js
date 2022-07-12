@@ -333,6 +333,7 @@ $(function() {
           .data('nextlayer', key.nextlayer)
           .data('layer', key.layer)
           .data('text', text)
+          .data('hint', key.hint)
           .data('longpress', key.sk)
           .data('flick', builder.translateFlickObjectToArray(key.flick))
           .data('multitap', key.multitap)
@@ -351,7 +352,9 @@ $(function() {
         builder.addKeyAnnotations(nkey);
 
         $('.text', nkey).text(this.renameSpecialKey(text));
+        $('.hint', nkey).text(key.hint);
         if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
+
 
         builder.updateKeyId(nkey);
       }
@@ -668,6 +671,26 @@ $(function() {
     keyCapChange(val);
   }, {saveOnce: true});
 
+  const keyHintChange = function(val) {
+    const k = builder.selectedKey();
+    $('.hint', k).text(val);
+    k.data('hint', val);
+    builder.updateCharacterMap(val, false);
+  }
+
+  const inpKeyHintChange = builder.wrapChange(function (e) {
+    const val = $(this).val();
+    $('#inpKeyHintUnicode').val(builder.toUnicodeString(val));
+    keyHintChange(val);
+  }, {saveOnce: true});
+
+  const inpKeyHintUnicodeChange = builder.wrapChange(function (e) {
+    const val = builder.fromUnicodeString($(this).val());
+    $('#inpKeyHint').val(val);
+    keyHintChange(val);
+  }, {saveOnce: true});
+
+
   const selKeyCapTypeChange = builder.wrapChange(function () {
     var val = $(this).val();
     $('#inpKeyCap').val(val);
@@ -694,6 +717,28 @@ $(function() {
   $('#inpKeyCapUnicode')
     .on('input', inpKeyCapUnicodeChange)
     .change(inpKeyCapUnicodeChange)
+    .mouseup(function () {
+      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
+    }).focus(function () {
+      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
+    }).blur(function () {
+      builder.hasSavedKeyUndo = false;
+    });
+
+  $('#inpKeyHint')
+    .on('input', inpKeyHintChange)
+    .change(inpKeyHintChange)
+    .mouseup(function () {
+      builder.updateCharacterMap($(this).val(), false);
+    }).focus(function () {
+      builder.updateCharacterMap($(this).val(), false);
+    }).blur(function () {
+      builder.hasSavedKeyUndo = false;
+    });
+
+  $('#inpKeyHintUnicode')
+    .on('input', inpKeyHintUnicodeChange)
+    .change(inpKeyHintUnicodeChange)
     .mouseup(function () {
       builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
     }).focus(function () {
@@ -798,6 +843,7 @@ $(function() {
         key.fontsize = $(this).data('fontsize');
         key.nextlayer = $(this).data('nextlayer');
         key.layer = $(this).data('layer');
+        key.hint = $(this).data('hint');
         let longpress = $(this).data('longpress');
         if(longpress && longpress.length) key.sk = longpress;
         let flick = $(this).data('flick');

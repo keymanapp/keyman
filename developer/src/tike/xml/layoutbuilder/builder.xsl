@@ -89,6 +89,16 @@
         <input id='inpKeyCapUnicode' type='text' size='16' />
       </div>
 
+      <div class='toolbar-item' id='key-hint-toolbar-item'>
+        <label for='inpKeyHint'>Hint:</label>
+        <input id='inpKeyHint' type='text' size='16' />
+      </div>
+
+      <div class='toolbar-item' id='key-hint-unicode-toolbar-item'>
+        <label for='inpKeyHintUnicode'>Unicode:</label>
+        <input id='inpKeyHintUnicode' type='text' size='16' />
+      </div>
+
       <div class='toolbar-item'>
         <label for='selKeyType'>Key Type:</label>
         <select id='selKeyType'>

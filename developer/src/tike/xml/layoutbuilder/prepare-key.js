@@ -3,13 +3,16 @@ $(function() {
   this.addKey = function (type, position, sp) {
     var key = document.createElement('div');
     var ktext = document.createElement('div');
+    var khint = document.createElement('div');
     var kid = document.createElement('div');
     var kunderlying = document.createElement('div');
     $(kid).addClass('id');
     $(ktext).addClass('text');
+    $(khint).addClass('hint');
     $(kunderlying).addClass('underlying');
     $(key).append(kid);
     $(key).append(ktext);
+    $(key).append(khint);
     $(key).append(kunderlying);
     $(key).addClass('key');
     $(key).data('id', 'T_new_' + this.uniqId);
@@ -93,6 +96,11 @@ $(function() {
     $('#selKeyCapType').val(builder.specialCharacters[val] ? val : '');
     $('#inpKeyCap').val(val);
     $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
+
+    val = $(key).data('hint');
+    $('#inpKeyHint').val(val);
+    $('#inpKeyHintUnicode').val(builder.toUnicodeString(val));
+
     $('#inpKeyName').val($(key).data('id'));
     $('#inpKeyWidth').val($(key).data('width'));
     $('#inpKeyPadding').val($(key).data('pad'));
