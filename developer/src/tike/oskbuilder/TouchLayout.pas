@@ -34,6 +34,19 @@ type
   ETouchLayoutValidate = class(Exception)
   end;
 
+  TTouchLayoutFlickDirection = (
+    tlfdNorth, tlfdSouth, tlfdEast, tlfdWest,
+    tlfdNorthEast, tlfdNorthWest,
+    tlfdSouthEast, tlfdSouthWest
+  );
+
+const
+  STouchLayoutFlickDirectionName: array[TTouchLayoutFlickDirection] of string = (
+    'n', 's', 'e', 'w',
+    'ne', 'nw',
+    'se', 'sw'
+  );
+
 type
   // TouchKeyType
   TTouchKeyType = (tktNormal = 0, tktSpecial = 1, tktSpecialActive = 2, tktDeadkey = 8, tktBlank = 9, tktSpacer = 10);   // I4119
@@ -105,6 +118,12 @@ type
   TTouchLayoutSubKeys = class(TObjectList<TTouchLayoutSubKey>)
   end;
 
+  TTouchLayoutMultiTaps = class(TObjectList<TTouchLayoutSubKey>)
+  end;
+
+  TTouchLayoutFlicks = class(TObjectDictionary<TTouchLayoutFlickDirection, TTouchLayoutSubKey>)
+  end;
+
   TTouchLayoutKey = class(TTouchLayoutObject)
   private
     FNextLayer: string;
@@ -117,6 +136,8 @@ type
     FPad: Integer;
     FSp: Integer;
     FSk: TTouchlayoutSubKeys;
+    FFlick: TTouchLayoutFlicks;
+    FMultiTap: TTouchLayoutMultiTaps;
     FText: string;
     function GetSpT: TTouchKeyType;   // I4119
     procedure SetSpT(const Value: TTouchKeyType);   // I4119
@@ -138,6 +159,8 @@ type
     property Font: string read FFont write FFont;
     property FontSize: string read FFontSize write FFontSize;
     property Sk: TTouchlayoutSubKeys read FSk;
+    property Flick: TTouchLayoutFlicks read FFlick;
+    property MultiTap: TTouchLayoutMultiTaps read FMultiTap;
   end;
 
   TTouchLayoutKeys = class(TObjectList<TTouchLayoutKey>)
@@ -831,15 +854,24 @@ constructor TTouchLayoutKey.Create(AParent: TTouchLayoutObject);
 begin
   inherited Create(AParent);
   FSk := TTouchLayoutSubKeys.Create;
+  FFlick := TTouchLayoutFlicks.Create;
+  FMultiTap := TTouchLayoutMultiTaps.Create;
 end;
 
 destructor TTouchLayoutKey.Destroy;
 begin
   FreeAndNil(FSk);
+  FreeAndNil(FFlick);
+  FreeAndNil(FMultiTap);
   inherited Destroy;
 end;
 
 procedure TTouchLayoutKey.DoRead;
+var
+  v: TJSONValue;
+  o: TJSONObject;
+  d: TTouchLayoutFlickDirection;
+  sk: TTouchLayoutSubKey;
 begin
   GetValue('nextlayer', FNextLayer);
   GetValue('fontsize', FFontSize);
@@ -853,13 +885,30 @@ begin
   GetValue('text', FText);
   ReadArray('sk', TTouchLayoutSubKey,
     procedure (obj: TTouchLayoutObject) begin FSk.Add(obj as TTouchLayoutSubKey); end);
+  if GetValue('flick', v) and (v is TJSONObject) then
+  begin
+    o := v as TJSONObject;
+    for d := Low(TTouchLayoutFlickDirection) to High(TTouchLayoutFlickDirection) do
+    begin
+      v := o.GetValue(STouchLayoutFlickDirectionName[d]);
+      if Assigned(v) and (v is TJSONObject) then
+      begin
+        sk := TTouchLayoutSubKey.Create(Self);
+        sk.Read(v as TJSONObject);
+        FFlick.Add(d, sk);
+      end;
+    end;
+  end;
+  ReadArray('multitap', TTouchLayoutSubKey,
+    procedure (obj: TTouchLayoutObject) begin FMultiTap.Add(obj as TTouchLayoutSubKey); end);
 end;
 
 procedure TTouchLayoutKey.DoWrite(JSON: TJSONObject);
 var
   i: Integer;
   v: TJSONArray;
-  o: TJSONObject;
+  o, f: TJSONObject;
+  d: TTouchLayoutFlickDirection;
 begin
   AddJSONValue(JSON, 'nextlayer', FNextLayer);
   AddJSONValue(JSON, 'fontsize', FFontSize);
@@ -883,6 +932,31 @@ begin
     end;
     JSON.AddPair('sk', v);
   end;
+
+  if FFlick.Count > 0 then
+  begin
+    f := TJSONObject.Create;
+    for d in FFlick.Keys do
+    begin
+      o := TJSONObject.Create;
+      FFlick[d].Write(o);
+      f.AddPair(STouchLayoutFlickDirectionName[d], o);
+    end;
+    JSON.AddPair('flick', f);
+  end;
+
+  if FMultiTap.Count > 0 then
+  begin
+    v := TJSONArray.Create;
+    for i := 0 to FMultiTap.Count - 1 do
+    begin
+      o := TJSONObject.Create;
+      FMultiTap[i].Write(o);
+      v.Add(o);
+    end;
+    JSON.AddPair('multitap', v);
+  end;
+
 end;
 
 function TTouchLayoutKey.GetSpT: TTouchKeyType;   // I4119
