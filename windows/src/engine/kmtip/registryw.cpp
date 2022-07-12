@@ -17,7 +17,6 @@
                     13 Dec 2012 - mcdurdin - I3675 - V9.0 - Minor updates to I3622 for consistency
 */
 #include "pch.h"
-#include "keyman64.h"   // I3622
 #include "registryw.h"
 
 RegistryReadOnlyW::RegistryReadOnlyW(HKEY AhRootKey)

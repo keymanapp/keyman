@@ -27,7 +27,7 @@
 
 #include "pch.h"
 #include "kmtip.h"
-#include "registry.h"
+#include "../../../../common/windows/cpp/include/registry.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -154,7 +154,7 @@ STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL 
   WCHAR bufClsid[40] = L"", bufProfile[40] = L"";
   if (StringFromGUID2(clsid, bufClsid, 40) == 0) bufClsid[0] = 0;
   if (StringFromGUID2(guidProfile, bufProfile, 40) == 0) bufProfile[0] = 0;
-  
+
   if(IsEqualGUID(clsid, c_clsidKMTipTextService)) {
     SendDebugMessageFormat(L"CKMTipTextService::OnActivated(c_clsidKMTipTextService, %s, %d)", bufProfile, fActivated);
     TIPNotifyActivate(fActivated ? (GUID *)&guidProfile : NULL);

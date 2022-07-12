@@ -1,0 +1,53 @@
+package common_components;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl,
+  xmlrtl;
+
+contains
+  ExtShiftState in '..\visualkeyboard\ExtShiftState.pas',
+  FixedTrackbar in 'FixedTrackbar.pas',
+  keybtn in 'keybtn.pas',
+  OnScreenKeyboard in 'OnScreenKeyboard.pas',
+  VisualKeyboardParameters in '..\visualkeyboard\VisualKeyboardParameters.pas',
+  CleartypeDrawCharacter in '..\general\CleartypeDrawCharacter.pas',
+  usp10 in '..\general\usp10.pas',
+  GetOsVersion in '..\general\GetOsVersion.pas',
+  Unicode in '..\general\Unicode.pas',
+  OnScreenKeyboardData in '..\visualkeyboard\OnScreenKeyboardData.pas',
+  Glossary in '..\general\Glossary.pas',
+  RegistryKeys in '..\general\RegistryKeys.pas',
+  ErrorControlledRegistry in '..\vcl\ErrorControlledRegistry.pas',
+  KeymanVersion in '..\general\KeymanVersion.pas',
+  ScanCodeMap in '..\general\ScanCodeMap.pas',
+  PaintPanel in 'PaintPanel.pas';
+
+end.

@@ -1,1 +1,0 @@
-{$R VistaUAC.res}

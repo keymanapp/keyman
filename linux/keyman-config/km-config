@@ -50,5 +50,8 @@ if __name__ == '__main__':
     else:
         from keyman_config.view_installed import ViewInstalledWindow
         w = ViewInstalledWindow()
-        w.run()
+        try:
+            w.run()
+        except KeyboardInterrupt:
+            logging.debug('User cancelled the app')
         w.destroy()

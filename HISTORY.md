@@ -1,5 +1,53 @@
 # Keyman Version History
 
+## 16.0.30 alpha 2022-07-11
+
+* fix(web): maps touch-layout chiral alt, ctrl to non-chiral when non-chiral keyboard is active (#6808)
+
+## 16.0.29 alpha 2022-07-08
+
+* fix(web): ncaps rules not matching on touch (#6911)
+
+## 16.0.28 alpha 2022-07-08
+
+* chore(android): disable sendError for js errors (#6905)
+* fix(developer): add no-ops for symbol builds for components (#6908)
+
+## 16.0.27 alpha 2022-07-07
+
+* fix(web): improve `console.error()` reporting (#6890)
+
+## 16.0.26 alpha 2022-07-06
+
+* fix(developer): Show full version number (#6866)
+* feat(developer): .keyman-touch-layout schema for 15.0 (#6856)
+* feat(developer): add flick and multitap to touch layout schema and doc (#6877)
+* fix(linux): Fix post-install script (#6894)
+
+## 16.0.25 alpha 2022-07-05
+
+* chore(web): update readme (#6891)
+
+## 16.0.24 alpha 2022-07-02
+
+* fix(common): trigger builds correctly for stable builds (#6847)
+* fix(windows): show full version number (#6867)
+
+## 16.0.23 alpha 2022-06-29
+
+* fix(web): clears repeating bksp on keyboard reload  ️ (#6786)
+* fix(web): null-guard for refreshLayout (#6854)
+
+## 16.0.22 alpha 2022-06-28
+
+* fix(ios): eliminates conditional height for banner image (#6855)
+
+## 16.0.21 alpha 2022-06-27
+
+* chore(ios): modernizes app-help's internals (#6836)
+* fix(linux): Deal with non-existing files (#6840)
+* fix(linux): Catch KeyboardInterrupt (#6841)
+
 ## 16.0.20 alpha 2022-06-26
 
 * chore(web): shorten check/web/file-size check message (#6780)
