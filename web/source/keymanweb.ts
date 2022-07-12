@@ -121,7 +121,7 @@ if(!window['keyman']['initialized']) {
      * Reset context when entering or exiting the active element.
      * Will also trigger OSK shift state / layer reset.
      **/
-    function resetVKShift() {
+    keymanweb.pageFocusHandler = function() {
       let keyman = com.keyman.singleton;
       if(!keyman.uiManager.isActivating && keyman.osk?.vkbd) {
         keyman.core.resetContext(null);
@@ -129,9 +129,8 @@ if(!window['keyman']['initialized']) {
     }
 
     // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
-    keymanweb['pageFocusHandler'] = resetVKShift;
-    util.attachDOMEvent(window, 'focus', keymanweb['pageFocusHandler'], false);  // I775
-    util.attachDOMEvent(window, 'blur', keymanweb['pageFocusHandler'], false);   // I775
+    util.attachDOMEvent(window, 'focus', keymanweb.pageFocusHandler, false);  // I775
+    util.attachDOMEvent(window, 'blur', keymanweb.pageFocusHandler, false);   // I775
 
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(true);
