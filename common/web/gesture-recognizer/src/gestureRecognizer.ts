@@ -26,7 +26,7 @@ namespace com.keyman.osk {
 
       processingConfig.inputStartBounds = processingConfig.inputStartBounds ?? processingConfig.targetRoot;
       processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
-      processingConfig.safeBounds       = processingConfig.safeBounds       ?? new ViewportZoneSource(2);
+      processingConfig.safeBounds       = processingConfig.safeBounds       ?? new PaddedZoneSource(2);
       if(typeof config.safeBoundPadding == 'number') {
         processingConfig.safeBoundPadding = [ config.safeBoundPadding ];
       }
