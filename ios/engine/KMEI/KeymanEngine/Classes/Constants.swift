@@ -122,9 +122,7 @@ public enum Util {
 
   /// The version of the Keyman SDK
   public static let sdkVersion: String = {
-    let url = Resources.bundle.url(forResource: "KeymanEngine-Info", withExtension: "plist")!
-    let info = NSDictionary(contentsOf: url)!
-    return info["CFBundleShortVersionString"] as! String
+    return Version.current.plainString
   }()
 }
 
