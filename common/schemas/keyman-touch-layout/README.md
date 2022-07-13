@@ -84,16 +84,26 @@ optionally contain three additional properties: `font`, `fontsize`, and
 : A boolean value, if `true`, then the base layout's key cap will be displayed
   in the top left of the key cap. Defaults to `false`.
 
-* `displayHint`
+* `defaultHint`
 
-: A string value, one of `"none"`, `"dot"`, or `"text"`. Defaults to `"dot"`.
-  Controls the display of the hint on the key cap:
+: A string value. Default is `"dot"`.  Controls the display of the hint text on
+  the key cap, which is shown at the top right of the key cap.
 
   * `"none"`: show no hint on the key cap.
-  * `"dot"`: show a dot on top-right of key cap if a longpress menu
-    is available, default and only option for Keyman 15.0 and earlier.
-  * `"text"`: show the text `hint` property if present, often on
-    top-right of key cap.
+  * `"dot"`: show a dot on top-right of key cap if a longpress menu is
+    available, default. Matches behavior for Keyman 15.0 and earlier.
+  * `"longpress"`: show the default longpress key cap, if it exists.
+  * `"multitap"`: show the first multitap key cap, if it exists.
+  * `"flick"`: show the first flick key cap, selected in clockwise order,
+    starting from North.
+  * `"flick-n"`: show the key cap from the North flick, if it exists.
+  * `"flick-ne"`: show the key cap from the North-East flick, if it exists.
+  * `"flick-e"`: show the key cap from the East flick, if it exists.
+  * `"flick-se"`: show the key cap from the South-East flick, if it exists.
+  * `"flick-s"`: show the key cap from the South flick, if it exists.
+  * `"flick-sw"`: show the key cap from the South-West flick, if it exists.
+  * `"flick-w"`: show the key cap from the West flick, if it exists.
+  * `"flick-nw"`: show the key cap from the North-West flick, if it exists.
 
   Introduced in Keyman 16.0.
 
@@ -219,6 +229,9 @@ object](#sk-object). A `key` object must include either an `id` or `sp` property
 
 : String. If present, a small hint, often shown at top right of key cap.
 
+  Introduced in Keyman 16.0.
+
+
 * `layer`
 
 : String. If specified, overrides the modifier associated with the layer (this
@@ -309,7 +322,9 @@ object](#sk-object). A `key` object must include either an `id` or `sp` property
 
 : If present, defines additional keys that may be selected when using a
   flick gesture on the key, with a [`flick` object](#flick-object). Flicks
-  should not be used on modifier keys, special keys, or the Spacebar. Keyman 16+.
+  should not be used on modifier keys, special keys, or the Spacebar.
+
+  Introduced in Keyman 16.0.
 
 * `multitap`
 
@@ -317,11 +332,14 @@ object](#sk-object). A `key` object must include either an `id` or `sp` property
   tapping multiple times on the key, an array of [`sk` objects](#sk-object).
   Multitaps generally should not be used on modifier keys, special keys, or the
   Spacebar. Beware of mixing multitaps with layer switching, as this can lead to
-  a confusing user experience. Keyman 16+.
+  a confusing user experience.
 
   Keyman 15+: the Shift key has a predefined multitap sequence to access the
   `caps` layer, which is available if the `caps` layer is present. This is the
-  only multitap sequence supported in Keyman 15.
+  only multitap sequence supported in Keyman 15. This multitap sequence cannot
+  be overridden.
+
+  Introduced in Keyman 16.0.
 
 ## `sk` object
 
@@ -428,7 +446,7 @@ string") into the appropriate spec format.
 # .keyman-touch-layout version history
 
 ## 2022-06-30 2.0 stable
-* Add support for flick and multitap. Aligns with Keyman 16.0.
+* Add support for flick, multitap, hint, defaultHint. Aligns with Keyman 16.0.
 
 ## 2022-06-27 1.0 stable
 * Initial schema version and full documentation

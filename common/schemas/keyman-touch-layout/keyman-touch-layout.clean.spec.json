@@ -23,7 +23,7 @@
         "fontsize": { "$ref": "#/definitions/fontsize-spec" },
         "layer": { "$ref": "#/definitions/layers" },
         "displayUnderlying": { "type": "boolean" },
-        "displayHint": { "type": "string", "enum": ["none","dot","text"] }
+        "defaultHint": { "type": "string", "enum": ["none","dot","longpress","multitap","flick","flick-n","flick-ne","flick-e","flick-se","flick-s","flick-sw","flick-w","flick-nw"] }
       },
       "required": ["layer"],
       "additionalProperties": false

@@ -199,6 +199,10 @@ body {
   text-align: right;
 }
 
+.key .hint.custom-hint {
+  color: #0cb901;
+}
+
 .key.key-modifier .id {
   color: #808080;
 }
@@ -220,18 +224,6 @@ body {
   top: 1px;
   width: 10px;
   height: 10px;
-}
-
-.display-hint-none .has-longpress,
-.display-hint-text .has-longpress {
-  /* Fade out the has-longpress icon if displayHint is none or text */
-  opacity: 0.5;
-}
-
-.display-hint-dot .hint,
-.display-hint-none .hint {
-  /* Fade out the hint text if displayHint is dot or none */
-  color: #cccccc;
 }
 
 /* If we have both flick-n and longpress, we need to move the longpress icon down */
@@ -559,11 +551,11 @@ div#btnDelKey, div#btnDelSubKey {
     color: #FFFFFF;
     font-family: Tahoma;
     font-size: 10px;
-    height: 9px;
-    line-height: 6px;
+    height: 13px;
+    line-height: 8px;
     position: absolute;
     text-align: center;
-    width: 9px;
+    width: 13px;
 }
 
 div#btnDelKey:hover, div#btnDelSubKey:hover {

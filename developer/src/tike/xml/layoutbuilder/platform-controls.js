@@ -35,7 +35,7 @@ $(function() {
 
   $('#btnEditPlatform').click(function () {
     $('#chkDisplayUnderlying')[0].checked = KVKL[builder.lastPlatform].displayUnderlying;
-    $('#selDisplayHint').val(KVKL[builder.lastPlatform].displayHint ?? 'dot');
+    $('#selDefaultHint').val(KVKL[builder.lastPlatform].defaultHint ?? 'dot');
     $('#platformPropertiesDialog').dialog('open');
   });
 
@@ -83,12 +83,12 @@ $(function() {
     builder.restoreSelection(selection);
   });
 
-  $('#selDisplayHint').change(function () {
+  $('#selDefaultHint').change(function () {
     let selection = builder.saveSelection();
     builder.saveUndo();
-    KVKL[builder.lastPlatform].displayHint = $('#selDisplayHint').val();
-    if(KVKL[builder.lastPlatform].displayHint == 'dot') {
-      delete KVKL[builder.lastPlatform].displayHint;
+    KVKL[builder.lastPlatform].defaultHint = $('#selDefaultHint').val();
+    if(KVKL[builder.lastPlatform].defaultHint == 'dot') {
+      delete KVKL[builder.lastPlatform].defaultHint;
     }
     builder.generate();
     builder.prepareLayer();
@@ -97,8 +97,8 @@ $(function() {
 
   $('#platformPropertiesDialog').dialog({
     autoOpen: false,
-    height: 300,
-    width: 350,
+    height: 400,
+    width: 450,
     modal: true,
     buttons: {
       "Close": function () {

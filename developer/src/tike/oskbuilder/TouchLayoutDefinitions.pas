@@ -91,7 +91,7 @@ const
     (Name: 'font'; ClassType: TJSONString),
     (Name: 'fontsize'; ClassType: TJSONString),   // I4062
     (Name: 'displayUnderlying'; ClassType: TJSONBool),
-    (Name: 'displayHint'; ClassType: TJSONString),
+    (Name: 'defaultHint'; ClassType: TJSONString),
     (Name: 'layer'; ClassType: TJSONArray; Required: True; Value: @LayerDef[0]; ValueSize: Length(LayerDef))
   );
 

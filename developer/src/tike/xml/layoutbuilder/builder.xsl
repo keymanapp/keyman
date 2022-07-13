@@ -304,15 +304,25 @@
         <label for='chkDisplayUnderlying'>Display underlying key label</label>
       </fieldset>
       <fieldset>
-        <div>Control display of text hints on the key. Note that when in "dot" mode,
-          the dot is not shown in the Touch Layout Editor, but will be visible when
-          using the compiled keyboard.<br/><br/>
+        <div>Default hint source for keys for this platform. These can be
+          overridden on a key-by-key basis. "Show a dot if a longpress is present"
+          is the behavior in Keyman 15 and earlier versions and is the default option.<br/><br/>
         </div>
-        <label for='selDisplayHint'>Display hint:</label>
-        <select id='selDisplayHint'>
-          <option value='none'>None</option>
-          <option value='dot'>Dot for longpress</option>
-          <option value='text'>Text hints</option>
+        <label for='selDefaultHint'>Default hint source:</label>
+        <select id='selDefaultHint'>
+          <option value='none'>No default hint</option>
+          <option value='dot'>Show a dot if a longpress is present</option>
+          <option value='longpress'>Use first longpress key cap</option>
+          <option value='multitap'>Use first multitap key cap</option>
+          <option value='flick'>Use first flick key cap (priority: n,ne,e,se,s,sw,w,nw)</option>
+          <option value='flick-n'>Use flick north key cap</option>
+          <option value='flick-ne'>Use flick north-east key cap</option>
+          <option value='flick-e'>Use flick east key cap</option>
+          <option value='flick-se'>Use flick south-east key cap</option>
+          <option value='flick-s'>Use flick south key cap</option>
+          <option value='flick-sw'>Use flick south-west key cap</option>
+          <option value='flick-w'>Use flick west key cap</option>
+          <option value='flick-nw'>Use flick north-west key cap</option>
         </select>
       </fieldset>
     </form>
