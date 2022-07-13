@@ -1,3 +1,4 @@
+#pragma once      // _S2
 #include "../../../../developer/kmcompx/include/pch.h"              // _S2 #include "pch"
 #include "../../../../developer/kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
 #include "../../../../developer/kmcompx/include/compiler.h"         // _S2 #include <compiler.h>

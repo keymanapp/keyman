@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <keyman/keyboardprocessor.h>
-#include "option.hpp"
+#include "../option.hpp"
 
 #include "kmx_base.h"
 #include "kmx_debugger.h"

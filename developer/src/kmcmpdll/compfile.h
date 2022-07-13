@@ -16,10 +16,11 @@
   History:          25 Jan 2007 - mcdurdin - Add GLOBAL_BUFSIZE, enlarge LINESIZE
                     25 May 2010 - mcdurdin - I1632 - Keyboard Options
 */
-
+#pragma once 			// _S2
 #ifndef _COMPFILE_H
 #define _COMPFILE_H
 
+#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 
 #define LINESIZE 8192

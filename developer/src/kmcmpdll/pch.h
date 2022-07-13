@@ -11,6 +11,8 @@
 #include <windows.h>
 #include <assert.h>
 
+
+#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../../common/windows/cpp/include/xstring.h"
 

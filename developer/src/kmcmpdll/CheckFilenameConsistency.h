@@ -1,7 +1,7 @@
 #pragma once
 
 #include <windows.h>
-#include <Compfile.h>
+#include "Compfile.h"          // _S2 #include <Compfile.h>
 
 DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk);
 DWORD CheckFilenameConsistency(char const * Filename, BOOL ReportMissingFile);

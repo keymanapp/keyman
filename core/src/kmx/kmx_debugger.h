@@ -11,7 +11,7 @@
 #pragma once
 
 #include "kmx_base.h"
-#include <debug.hpp>
+#include "../debug.hpp"     //  _S2 #include <debug.hpp>
 
 namespace km {
 namespace kbp {

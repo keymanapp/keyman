@@ -52,7 +52,7 @@
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
 */
 /***************************************************************************/   // I4006   // I4169
-
+#pragma once        // _ S2
 #ifndef _KEYMAN64_H
 #define _KEYMAN64_H
 
@@ -75,6 +75,8 @@
 #include <windows.h>
 #include <assert.h>
 #include <msctf.h>
+
+#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../../common/windows/cpp/include/registry.h"
 #include "../../../../common/windows/cpp/include/unicode.h"

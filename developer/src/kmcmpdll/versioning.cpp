@@ -1,7 +1,7 @@
 #include "pch.h"
-#include <compfile.h>
-#include <comperr.h>
-#include <kmcmpdll.h>
+#include "compfile.h"      //_S2 #include <compfile.h>
+#include "comperr.h"    // _S2 #include <comperr.h>
+#include "kmcmpdll.h">"   // _S2 #include <kmcmpdll.h>
 
 BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
   char buf[128];

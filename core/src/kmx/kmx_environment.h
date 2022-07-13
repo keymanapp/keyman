@@ -1,7 +1,8 @@
 #pragma once
 
 #include <string>
-#include "option.hpp"
+
+#include "../option.hpp"     //  _S2 #include "option.hpp"
 #include "kmx_base.h"
 
 namespace km {

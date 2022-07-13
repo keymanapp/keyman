@@ -18,9 +18,9 @@
 
 #include "pch.h"
 
-#define lpuch(x) L ## x
+#define lpuch(x) u ## x
 
-PCWSTR VKeyNames[256] = {
+ const char16_t* VKeyNames[256] = { 
 // Key Codes
   lpuch("K_?00"),				// &H0
   lpuch("K_LBUTTON"),			// &H1
@@ -292,7 +292,7 @@ PCWSTR VKeyNames[256] = {
   lpuch("K_?FF")				// &HFF
   };
 
-PCWSTR VKeyISO9995Names[256] = {
+ const char16_t* VKeyISO9995Names[256] = {
   // Key Codes
   lpuch(""), // lpuch("K_?00"),				// &H0
   lpuch(""), // lpuch("K_LBUTTON"),			// &H1
