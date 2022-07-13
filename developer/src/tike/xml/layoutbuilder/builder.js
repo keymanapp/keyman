@@ -890,10 +890,6 @@ $(function() {
     builder.lastFocus = this;
   });
 
-  $('input').click(function (event) {
-    event.stopImmediatePropagation();
-  });
-
   $('#btnTemplate').click(function () {
     builder.command('template');
   });

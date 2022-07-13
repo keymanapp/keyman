@@ -69,29 +69,39 @@ $(function() {
     }
   });
 
+  //
+  // Platform Properties Dialog
+  //
+
+  $('#chkDisplayUnderlying').click(function (event) {
+    event.stopImmediatePropagation();
+    let selection = builder.saveSelection();
+    builder.saveUndo();
+    KVKL[builder.lastPlatform].displayUnderlying = $('#chkDisplayUnderlying')[0].checked;
+    builder.generate();
+    builder.prepareLayer();
+    builder.restoreSelection(selection);
+  });
+
+  $('#selDisplayHint').change(function () {
+    let selection = builder.saveSelection();
+    builder.saveUndo();
+    KVKL[builder.lastPlatform].displayHint = $('#selDisplayHint').val();
+    if(KVKL[builder.lastPlatform].displayHint == 'dot') {
+      delete KVKL[builder.lastPlatform].displayHint;
+    }
+    builder.generate();
+    builder.prepareLayer();
+    builder.restoreSelection(selection);
+  });
+
   $('#platformPropertiesDialog').dialog({
     autoOpen: false,
     height: 300,
     width: 350,
     modal: true,
     buttons: {
-      "OK": function () {
-
-        KVKL[builder.lastPlatform].displayUnderlying = $('#chkDisplayUnderlying')[0].checked;
-        KVKL[builder.lastPlatform].displayHint = $('#selDisplayHint').val();
-        if(KVKL[builder.lastPlatform].displayHint == 'dot') {
-          delete KVKL[builder.lastPlatform].displayHint;
-        }
-
-        let selection = builder.saveSelection();
-        builder.saveUndo();
-        builder.generate();
-        builder.prepareLayer();
-        builder.restoreSelection(selection);
-
-        $(this).dialog('close');
-      },
-      "Cancel": function () {
+      "Close": function () {
         $(this).dialog('close');
       }
     }

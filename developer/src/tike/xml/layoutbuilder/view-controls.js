@@ -5,19 +5,20 @@ $(function() {
     $('#viewOptionsDialog').dialog('open');
   });
 
+  $('#chkShowAllModifierOptions').click(function (event) {
+    event.stopImmediatePropagation();
+    builder.showAllModifierCombinations = $('#chkShowAllModifierOptions')[0].checked;
+    builder.fillModifierSelect();
+    builder.prepareKey();
+  });
+
   $('#viewOptionsDialog').dialog({
     autoOpen: false,
     height: 300,
     width: 350,
     modal: true,
     buttons: {
-      "OK": function () {
-        builder.showAllModifierCombinations = $('#chkShowAllModifierOptions')[0].checked;
-        builder.fillModifierSelect();
-        builder.prepareKey();
-        $(this).dialog('close');
-      },
-      "Cancel": function () {
+      "Close": function () {
         $(this).dialog('close');
       }
     }
