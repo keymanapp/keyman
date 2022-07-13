@@ -1,11 +1,8 @@
 /// <reference path="recognitionZoneSource.ts" />
 /// <reference path="viewportZoneSource.ts" />
+/// <reference path="nonoptional.ts" />
 
 namespace com.keyman.osk {
-  type Nonoptional<Type> = {
-    [Property in keyof Type]-?: Type[Property];
-  };
-
   export interface GestureRecognizerConfiguration {
     /**
      * Specifies the element that mouse input listeners should be attached to.  If
