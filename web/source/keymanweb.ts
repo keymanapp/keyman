@@ -117,17 +117,6 @@ if(!window['keyman']['initialized']) {
 
     util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);
 
-    /**
-     * Reset context when entering or exiting the active element.
-     * Will also trigger OSK shift state / layer reset.
-     **/
-    keymanweb.pageFocusHandler = function() {
-      let keyman = com.keyman.singleton;
-      if(!keyman.uiManager.isActivating && keyman.osk?.vkbd) {
-        keyman.core.resetContext(null);
-      }
-    }
-
     // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
     util.attachDOMEvent(window, 'focus', keymanweb.pageFocusHandler, false);  // I775
     util.attachDOMEvent(window, 'blur', keymanweb.pageFocusHandler, false);   // I775
