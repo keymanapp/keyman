@@ -81,6 +81,8 @@ namespace com.keyman.osk {
       const coord = InputEventCoordinate.fromEvent(event);
 
       if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(coord, this.config)) {
+        // If we started very close to a safe zone border, remember which one(s).
+        // This is important for input-sequence cancellation check logic.
         this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(coord, this.config);
       }
 
