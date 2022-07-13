@@ -1,8 +1,8 @@
 # Web Re-integration Guide
 
-As this is based on refactored KeymanWeb 15.0 code, there will eventually come a time to integrate this
-module into KeymanWeb and replace the old version.  As there has been some refactoring, this document
-will list notable changes to facilitate reintegration once this module is ready.
+As this is based on refactored Keyman Engine for Web 15.0 code, there will eventually come a time to
+integrate this module back into it and replace the old version.  As there has been some refactoring,
+this document will list notable changes to facilitate reintegration once this module is ready.
 
 ## From feat/web/gesture-recognizer-main
 
