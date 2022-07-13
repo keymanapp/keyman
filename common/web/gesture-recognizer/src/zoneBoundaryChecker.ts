@@ -17,11 +17,7 @@ namespace com.keyman.osk {
      * @param zone          An object defining a 'recognition zone' of the gesture engine.
      * @param ignoreBitmask A bitmask indicating select boundaries to ignore for the check.
      */
-    static getCoordZoneBitmask(coord: InputEventCoordinate, zone: RecognitionZoneSource, ignoreBitmask?: number): number {
-      if(!ignoreBitmask) {
-        ignoreBitmask = 0;
-      }
-
+    static getCoordZoneBitmask(coord: InputEventCoordinate, zone: RecognitionZoneSource): number {
       const bounds = zone.getBoundingClientRect();
 
       let bitmask = 0;
@@ -30,7 +26,7 @@ namespace com.keyman.osk {
       bitmask |= (coord.y < bounds.top)    ? ZoneBoundaryChecker.FAR_TOP    : 0;
       bitmask |= (coord.y > bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
 
-      return bitmask & (~ignoreBitmask); // returns zero if effectively 'within bounds'.
+      return bitmask; // returns zero if effectively 'within bounds'.
     }
 
     /**
@@ -56,12 +52,17 @@ namespace com.keyman.osk {
                                       config: FinalizedGestureRecognizerConfiguration,
                                       ignoredSafeBoundFlags?: number): boolean {
       ignoredSafeBoundFlags = ignoredSafeBoundFlags || 0;
+
       // If the coordinate lies outside the maximum supported range, fail the boundary check.
-      if(!!this.getCoordZoneBitmask(coord, config.maxRoamingBounds)) {
+      if(!!(this.getCoordZoneBitmask(coord, config.maxRoamingBounds))) {
         return true;
       }
 
-      return !!this.getCoordZoneBitmask(coord, config.safeBounds, ignoredSafeBoundFlags);
+      let borderProximityBitmask = this.getCoordZoneBitmask(coord, config.safeBounds);
+
+      // If the active input sequence started close enough to a safe zone border, we
+      // disable that part of the said border for any cancellation checks.
+      return !!(borderProximityBitmask & ~ignoredSafeBoundFlags);
     }
   }
 }

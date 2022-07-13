@@ -22,8 +22,6 @@ namespace com.keyman.osk {
     abstract registerEventHandlers();
     abstract unregisterEventHandlers();
 
-    // TODO:  draft up the bounds logic based on the new config parameters!
-
     onInputStart(coord: InputEventCoordinate) {
       this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.START, coord);
     }
