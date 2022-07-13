@@ -52,12 +52,6 @@ $(function() {
     builder.saveState();
   });
 
-  $('#chkShowAllModifierOptions').click(function () {
-    builder.showAllModifierCombinations = $('#chkShowAllModifierOptions')[0].checked;
-    builder.fillModifierSelect();
-    builder.prepareKey();
-  });
-
   builder.removeAllSubKeys = function() {
     $('#sub-key-groups .key').remove();
   }
@@ -362,6 +356,8 @@ $(function() {
       var calcWidth = calcKeyWidth + calcGapWidth;
 
       $('#kbd').attr('class', builder.getPresentation());
+      $('#kbd').addClass('display-hint-'+(KVKL[builder.lastPlatform].displayHint ?? 'dot'));
+
     }
 
     builder.updateKeySizeInfo();
@@ -409,8 +405,6 @@ $(function() {
       option.attr('value', i).text(this.presentations[i].name);
       listContainer.append(option);
     }
-
-    $('#chkDisplayUnderlying')[0].checked = KVKL[builder.lastPlatform].displayUnderlying;
 
     builder.prepareLayers();
     builder.selectLayer(0);
@@ -822,11 +816,6 @@ $(function() {
   this.generate = function (display, force) {
     var json = JSON.stringify(KVKL, null, '  ');
 
-    if(!display) {
-      // Save changed settings -- only when not saving undo
-      KVKL[builder.lastPlatform].displayUnderlying = $('#chkDisplayUnderlying')[0].checked;
-    }
-
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
     layer.row = [];
 
@@ -896,14 +885,6 @@ $(function() {
   }, {rescale: true}));
 
   $('#btnGenerate').click(function () { builder.generate(false,false); });
-
-  $('#chkDisplayUnderlying').click(function () {
-    let selection = builder.saveSelection();
-    builder.saveUndo();
-    builder.generate();
-    builder.prepareLayer();
-    builder.restoreSelection(selection);
-  });
 
   $('input').focus(function () {
     builder.lastFocus = this;

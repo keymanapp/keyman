@@ -33,6 +33,12 @@ $(function() {
     builder.saveState();
   });
 
+  $('#btnEditPlatform').click(function () {
+    $('#chkDisplayUnderlying')[0].checked = KVKL[builder.lastPlatform].displayUnderlying;
+    $('#selDisplayHint').val(KVKL[builder.lastPlatform].displayHint ?? 'dot');
+    $('#platformPropertiesDialog').dialog('open');
+  });
+
   //
   // Platform dialogs
   //
@@ -62,4 +68,33 @@ $(function() {
       }
     }
   });
+
+  $('#platformPropertiesDialog').dialog({
+    autoOpen: false,
+    height: 300,
+    width: 350,
+    modal: true,
+    buttons: {
+      "OK": function () {
+
+        KVKL[builder.lastPlatform].displayUnderlying = $('#chkDisplayUnderlying')[0].checked;
+        KVKL[builder.lastPlatform].displayHint = $('#selDisplayHint').val();
+        if(KVKL[builder.lastPlatform].displayHint == 'dot') {
+          delete KVKL[builder.lastPlatform].displayHint;
+        }
+
+        let selection = builder.saveSelection();
+        builder.saveUndo();
+        builder.generate();
+        builder.prepareLayer();
+        builder.restoreSelection(selection);
+
+        $(this).dialog('close');
+      },
+      "Cancel": function () {
+        $(this).dialog('close');
+      }
+    }
+  });
+
 }.bind(builder));

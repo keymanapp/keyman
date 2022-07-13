@@ -1,9 +1,12 @@
-
 @font-face {
   font-family: KeymanwebOsk;
   font-style:  normal;
   font-weight: normal;
   src: url('keymanweb-osk.ttf')  format('truetype');
+}
+
+* {
+  box-sizing: border-box;
 }
 
 #selKeyCapType,
@@ -17,6 +20,8 @@ body {
   font-size: 18pt;
   padding: 0;
   margin: 0;
+  display: grid;
+  grid-template-columns: 152px 1fr;
 }
 
 .ui-dialog {
@@ -82,6 +87,15 @@ body {
   padding-bottom: 2px;
 }
 
+.toolbar-item.toolbar-single-column {
+  grid-template-columns: 1fr;
+}
+
+.toolbar-item.toolbar-2-small-buttons {
+  grid-template-columns: 1fr 24px 24px;
+  column-gap: 4px;
+}
+
 .toolbar-item label {
   padding: 0.75em 0;
 }
@@ -90,8 +104,11 @@ body {
 .toolbar-item input,
 .toolbar-item button {
   padding: 6px;
-  width: 140px;
-  box-sizing: border-box;
+  width: 100%;
+}
+
+.toolbar-item button.emoji-button {
+  padding: 6px 0;
 }
 
 .key-droppable
@@ -203,6 +220,18 @@ body {
   top: 1px;
   width: 10px;
   height: 10px;
+}
+
+.display-hint-none .has-longpress,
+.display-hint-text .has-longpress {
+  /* Fade out the has-longpress icon if displayHint is none or text */
+  opacity: 0.5;
+}
+
+.display-hint-dot .hint,
+.display-hint-none .hint {
+  /* Fade out the hint text if displayHint is dot or none */
+  color: #cccccc;
 }
 
 /* If we have both flick-n and longpress, we need to move the longpress icon down */
@@ -414,7 +443,6 @@ br.clear {
   clear: both;
 }
 
-#toolbar,
 #kbd-container,
 #sub-key-container {
   min-width: 1020px;
@@ -422,21 +450,29 @@ br.clear {
 
 #toolbar div {
   background: #DCDCDD;
-  margin: -1px -1px -1px 0;
-  padding: 8px;
-  float: left;
+}
+
+#toolbar h3 {
+  margin: 0;
+  padding: 0 0 4px 0;
+  font-size: 10pt;
+}
+
+#toolbar #controlToolbar > div {
+  margin: 4px 0;
+  padding: 4px;
+  line-height: 1.4em;
 }
 
 #toolbar #layoutToolbar > div {
-  margin: 0;
-  padding: 0 8px;
-  border-left: 1px solid #444444;
-  line-height: 24px;
+  margin: 4px 0;
+  padding: 4px;
+  border-top: 1px solid #444444;
+  line-height: 1.4em;
 }
 
 button, input, select {
   font: 9pt Tahoma;
-  margin: 1px 2px;
 }
 
 button {
