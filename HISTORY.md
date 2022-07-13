@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.32 alpha 2022-07-13
+
+* fix(ios): ignore CFBundleShortVersionString (#6934)
+
 ## 16.0.31 alpha 2022-07-12
 
 * fix(developer): QR Code for Package Editor had wrong path (#6926)
