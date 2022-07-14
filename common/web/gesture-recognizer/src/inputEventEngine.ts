@@ -3,10 +3,6 @@
 /// <reference path="includes/events.ts" />
 
 namespace com.keyman.osk {
-  type Mutable<Type> = {
-    -readonly [Property in keyof Type]: Type[Property];
-  };
-
   export type InputHandler = (coord: InputEventCoordinate) => void;
 
   export abstract class InputEventEngine extends EventEmitter {

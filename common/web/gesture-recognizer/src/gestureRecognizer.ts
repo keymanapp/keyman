@@ -47,7 +47,6 @@ namespace com.keyman.osk {
       this.mouseEngine.registerEventHandlers();
       this.touchEngine.registerEventHandlers();
 
-      const _this = this;
       const forwardingUpdateHandler = (state, coord) => {
         this.emit(GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, state, coord);
         return false;
