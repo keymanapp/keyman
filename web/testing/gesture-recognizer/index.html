@@ -32,7 +32,7 @@
       <div id="main-ux" class="flex">
         <div id="demo-and-legend">
           <!-- CSS classes for demo configuration should only be applied here, to `demoContainer`. -->
-          <div id="demo-container" class="screen2 bounds1">
+          <div id="demo-container" class="screen2 bounds1 full safe-loose">
             <div id='faux-viewport' class="faux-screen">
               <div class="faux-screen-border"></div>
               <div id="safe-zone" class="safe-zone">
@@ -79,6 +79,12 @@
               <h4 class="radio-header">Receiver Form</h4>
               <label class="block"><input type="radio" value="full" name="receiver" checked="checked">On-screen keyboard</label>
               <label class="block"><input type="radio" value="popup" name="receiver">Subkey menu (right-aligned)</label>
+            </fieldset>
+            <fieldset>
+              <h4 class="radio-header">Safe Zone mode</h4>
+              <label class="block"><input type="radio" value="safe-default" name="safeZone">Module-default</label>
+              <label class="block"><input type="radio" value="safe-loose" name="safeZone" checked="checked">Double-spaced</label>
+              <label class="block"><input type="radio" value="safe-generous" name="safeZone">Very generous</label>
             </fieldset>
           </form>
         </div>

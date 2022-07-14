@@ -4,15 +4,17 @@ function updateConfig() {
   let layout = document.config.screen;
   let bounds = document.config.bounds;
   let receiver = document.config.receiver;
+  let safe = document.config.safeZone;
 
   let demoContainer = document.getElementById("demo-container");
-  demoContainer.className = layout.value + " " + bounds.value + " " + receiver.value;
+  demoContainer.className = layout.value + " " + bounds.value + " " + receiver.value + " " + safe.value;
 }
 
 window.addEventListener('load', function(ev) {
   let layoutGroup = document.config.screen;
   let boundsGroup = document.config.bounds;
   let receiverGroup = document.config.receiver;
+  let safeGroup = document.config.safeZone;
 
   for(entry of layoutGroup) {
     entry.addEventListener('change', updateConfig);
@@ -36,6 +38,10 @@ window.addEventListener('load', function(ev) {
         updateConfig();
       });
     }
+  }
+
+  for(entry of safeGroup) {
+    entry.addEventListener('change', updateConfig);
   }
 
   updateConfig();
