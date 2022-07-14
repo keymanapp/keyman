@@ -327,7 +327,7 @@ begin
           //TBX.TBXSetTheme('OfficeXP2');
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  try
+          try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally
