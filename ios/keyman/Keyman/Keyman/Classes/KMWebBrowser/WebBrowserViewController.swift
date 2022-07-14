@@ -7,10 +7,11 @@
 //
 
 import KeymanEngine
-import UIKit
+import WebKit
+import Sentry
 
-class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertViewDelegate {
-  @IBOutlet var webView: UIWebView!
+class WebBrowserViewController: UIViewController, WKNavigationDelegate, UIAlertViewDelegate {
+  @IBOutlet var webView: WKWebView!
   @IBOutlet var navBar: UINavigationBar!
   @IBOutlet var toolBar: UIToolbar!
   @IBOutlet var navBarTopConstraint: NSLayoutConstraint!
@@ -27,8 +28,8 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   @IBOutlet var closeButton: UIBarButtonItem!
 
   var navbarBackground: KMNavigationBarBackgroundView!
-  var fontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
-  private var newFontFamily = ""
+  var fontKeyboard: InstallableKeyboard?
+  private var newFontKeyboard: InstallableKeyboard?
 
   private let webBrowserLastURLKey = "KMWebBrowserLastURL"
 
@@ -51,8 +52,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       observer: self,
       function: WebBrowserViewController.keyboardPickerDismissed)
 
-    webView.delegate = self
-    webView.scalesPageToFit = true
+    webView.navigationDelegate = self
 
     if #available(iOS 13.0, *) {
       // Dark mode settings must be applied through this new property,
@@ -113,7 +113,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let lastUrlStr = userData.object(forKey: webBrowserLastURLKey) as? String ?? "https://www.google.com/"
     if let url = URL(string: lastUrlStr) {
       let request = URLRequest(url: url)
-      webView.loadRequest(request)
+      webView.load(request)
     }
   }
 
@@ -154,7 +154,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       url = URL(string: "http://\(urlString)") ?? url
     }
     let request = URLRequest(url: url)
-    webView.loadRequest(request)
+    webView.load(request)
   }
 
   func loadSearchString(_ searchString: String) {
@@ -201,9 +201,10 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     dismiss(animated: true, completion: nil)
   }
 
-  func webView(_ webView: UIWebView,
-               shouldStartLoadWith request: URLRequest,
-               navigationType: UIWebView.NavigationType) -> Bool {
+  func webView(_ webView: WKWebView,
+               decidePolicyFor navigationAction: WKNavigationAction,
+               decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    let request = navigationAction.request
     if request.url?.lastPathComponent.hasSuffix(".kmp") ?? false {
       // Can't have the browser auto-download with no way to select a different page.
       // Can't just ignore it, either, as the .kmp may result from a redirect from
@@ -213,7 +214,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       userData.synchronize()
 
       // The user is trying to download a .kmp, but the standard
-      // UIWebView can't handle it properly.
+      // WKWebView can't handle it properly.
 
       ResourceDownloadManager.shared.downloadRawKMP(from: request.url!) { file, error in
         // do something!
@@ -234,24 +235,26 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
         }
       }
 
-      return false
+      decisionHandler(WKNavigationActionPolicy.cancel)
+      return
     }
     updateAddress(request)
-    return true
+    decisionHandler(WKNavigationActionPolicy.allow)
+    return
   }
 
-  func webViewDidStartLoad(_ webView: UIWebView) {
+  func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = true
     updateButtons()
   }
 
-  func webViewDidFinishLoad(_ webView: UIWebView) {
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     appendCSSFontFamily()
     updateButtons()
   }
 
-  func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
+  func webView(_ webView: WKWebView, didFailNavigation error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
 
@@ -285,24 +288,87 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   }
 
   private func appendCSSFontFamily() {
-    let jsStr: String = "var style = document.createElement('style');" +
-      "style.type = 'text/css';" +
-      "style.innerHTML = '*{font-family:\"\(fontFamily)\" !important;}';" +
-    "document.getElementsByTagName('head')[0].appendChild(style);"
-    webView?.stringByEvaluatingJavaScript(from: jsStr)
+    guard let fontKeyboard = fontKeyboard else {
+      return
+    }
+
+    let styleFontFamily = "KeymanEmbeddedBrowserFont"
+
+    guard let fontFaceStyle = buildFontSheet(keyboard: fontKeyboard, styleName: styleFontFamily) else {
+      return
+    }
+
+    let jsStr: String = """
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = `
+    * {
+      font-family:\"\(styleFontFamily)\" !important;
+    }
+
+    \(fontFaceStyle)
+    `;
+
+    document.getElementsByTagName('head')[0].appendChild(style);
+    """
+
+    webView.evaluateJavaScript(jsStr)
+
+  }
+
+  private func buildFontSheet(keyboard: InstallableKeyboard, styleName: String) -> String? {
+    guard let fontKeyboard = fontKeyboard,
+          let fontURL = Manager.shared.fontPathForKeyboard(withFullID: fontKeyboard.fullID) else {
+      return nil
+    }
+
+    guard let fontData = NSData(contentsOf: fontURL) else {
+      return nil
+    }
+
+    var dataType: String = ""
+    var fontFormat: String = ""
+    switch fontURL.pathExtension {
+      case "ttf":
+        dataType = "font/truetype"
+        fontFormat = "truetype"
+      case "otf":
+        dataType = "font/opentype"
+        fontFormat = "opentype"
+      // The following two entries are here for completeness.  At present, we do not
+      // actually distribute these in .kmp packages; we only include one font within them,
+      // and these two are web-oriented, not main-OS oriented.
+      case "woff":
+        dataType = "font/woff"
+        fontFormat = "woff"
+      case "woff2":
+        dataType = "font/woff2"
+        fontFormat = "woff2"
+      default:
+        return nil
+    }
+
+    let styleString = """
+    @font-face {
+      font-family: "\( styleName )";
+      src: url(data:\(dataType);charset=utf-8;base64,\(fontData.base64EncodedString())); format('\(fontFormat)')
+    }
+    """
+
+    return styleString
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
-    if let fontName = Manager.shared.fontNameForKeyboard(withFullID: kb.fullID) {
-      newFontFamily = fontName
+    if kb.font != nil {
+      newFontKeyboard = kb
     } else {
-      newFontFamily = UIFont.systemFont(ofSize: UIFont.systemFontSize).fontName
+      newFontKeyboard = nil
     }
   }
 
   private func keyboardPickerDismissed() {
-    if newFontFamily != fontFamily {
-      fontFamily = newFontFamily
+    if newFontKeyboard?.font?.family != fontKeyboard?.font?.family {
+      fontKeyboard = newFontKeyboard
       webView?.reload()
     }
   }
