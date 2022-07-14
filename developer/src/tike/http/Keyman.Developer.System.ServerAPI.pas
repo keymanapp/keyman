@@ -119,7 +119,7 @@ var
   ss: TStringStream;
 begin
   try
-    fs := TFileStream.Create(TKeymanDeveloperPaths.ServerDataPath + 'pid.json', fmOpenRead);
+    fs := TFileStream.Create(Filename, fmOpenRead);
     try
       ss := TStringStream.Create('', TEncoding.UTF8);
       try
