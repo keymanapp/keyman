@@ -185,12 +185,12 @@ namespace com.keyman {
      * Reset context when entering or exiting the active element.
      * Will also trigger OSK shift state / layer reset.
      **/
-    pageFocusHandler: () => boolean = function(this: KeymanBase) {
+    pageFocusHandler = () => {
       if(!this.uiManager.isActivating && this.osk?.vkbd) {
         this.core.resetContext(null);
       }
       return false;
-    }.bind(this);
+    }
 
     /**
      * Triggers a KeymanWeb engine shutdown to facilitate a full system reset.
