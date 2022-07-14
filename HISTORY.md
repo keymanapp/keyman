@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.33 alpha 2022-07-14
+
+* feat(developer): Option to skip embed of compiler version (#6920)
+* chore(ios): updates core internals for the in-app browser (#6838)
+
 ## 16.0.32 alpha 2022-07-13
 
 * fix(ios): ignore CFBundleShortVersionString (#6934)
