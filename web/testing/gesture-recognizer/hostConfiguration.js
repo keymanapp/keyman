@@ -55,7 +55,7 @@ window.addEventListener('load', function() {
     targetRoot: document.getElementById('target-root'),
     maxRoamingBounds: document.getElementById('roaming-bounds'),
     safeBounds: document.getElementById('safe-zone'),
-    safeBoundPadding: 6
+    paddedSafeBounds: document.getElementById('padded-safe-zone')
   };
 
   recognizer = new com.keyman.osk.GestureRecognizer(recognizerConfig);
