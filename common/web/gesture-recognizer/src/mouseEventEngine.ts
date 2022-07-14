@@ -1,4 +1,5 @@
 /// <reference path="inputEventEngine.ts" />
+/// <reference path="gestureRecognizerConfiguration.ts" />
 
 namespace com.keyman.osk {
   export class MouseEventEngine extends InputEventEngine {
@@ -9,7 +10,7 @@ namespace com.keyman.osk {
     private hasActiveClick: boolean = false;
     private ignoreSequence: boolean = false;
 
-    public constructor(config: InputEventEngineConfig) {
+    public constructor(config: GestureRecognizerConfiguration) {
       super(config);
 
       this._mouseStart = this.onMouseStart.bind(this);
@@ -17,16 +18,16 @@ namespace com.keyman.osk {
       this._mouseEnd   = this.onMouseEnd.bind(this);
     }
 
+    private get eventRoot(): HTMLElement {
+      return this.config.mouseEventRoot;
+    }
+
     // public static forVisualKeyboard(vkbd: VisualKeyboard) {
-    //   const config: InputEventEngineConfig = {
+    //   const config: GestureRecognizerConfiguration = {
     //     targetRoot: vkbd.element,
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: document.body,
-    //     inputStartHandler: vkbd.touch.bind(vkbd),
-    //     inputMoveHandler: vkbd.moveOver.bind(vkbd),
-    //     inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
-    //     inputEndHandler: vkbd.release.bind(vkbd),
     //     coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
     //   };
 
@@ -34,14 +35,11 @@ namespace com.keyman.osk {
     // }
 
     // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
-    //   const config: InputEventEngineConfig = {
+    //   const config: GestureRecognizerConfiguration = {
     //     targetRoot: banner.getDiv(),
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: document.body,
-    //     inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
-    //     inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
-    //     inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
     //     coordConstrainedWithinInteractiveBounds: function() { return true; }
     //   };
 
@@ -49,16 +47,16 @@ namespace com.keyman.osk {
     // }
 
     registerEventHandlers() {
-      this.config.eventRoot.addEventListener('mousedown', this._mouseStart, true);
-      this.config.eventRoot.addEventListener('mousemove',  this._mouseMove, false);
+      this.eventRoot.addEventListener('mousedown', this._mouseStart, true);
+      this.eventRoot.addEventListener('mousemove',  this._mouseMove, false);
       // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
-      this.config.eventRoot.addEventListener('mouseup',   this._mouseEnd, true);
+      this.eventRoot.addEventListener('mouseup',   this._mouseEnd, true);
     }
 
     unregisterEventHandlers() {
-      this.config.eventRoot.removeEventListener('mousedown', this._mouseStart, true);
-      this.config.eventRoot.removeEventListener('mousemove',  this._mouseMove, false);
-      this.config.eventRoot.removeEventListener('mouseup',   this._mouseEnd, true);
+      this.eventRoot.removeEventListener('mousedown', this._mouseStart, true);
+      this.eventRoot.removeEventListener('mousemove',  this._mouseMove, false);
+      this.eventRoot.removeEventListener('mouseup',   this._mouseEnd, true);
     }
 
     private preventPropagation(e: MouseEvent) {

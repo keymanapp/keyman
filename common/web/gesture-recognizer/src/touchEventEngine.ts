@@ -1,4 +1,5 @@
 /// <reference path="inputEventEngine.ts" />
+/// <reference path="gestureRecognizerConfiguration.ts" />
 
 namespace com.keyman.osk {
   export class TouchEventEngine extends InputEventEngine {
@@ -6,7 +7,7 @@ namespace com.keyman.osk {
     private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
     private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
-    public constructor(config: InputEventEngineConfig) {
+    public constructor(config: GestureRecognizerConfiguration) {
       super(config);
 
       this._touchStart = this.onTouchStart.bind(this);
@@ -14,14 +15,14 @@ namespace com.keyman.osk {
       this._touchEnd   = this.onTouchEnd.bind(this);
     }
 
+    private get eventRoot(): HTMLElement {
+      return this.config.touchEventRoot;
+    }
+
     // public static forVisualKeyboard(vkbd: VisualKeyboard) {
-    //   let config: InputEventEngineConfig = {
+    //   let config: GestureRecognizerConfiguration = {
     //     targetRoot: vkbd.element,
     //     eventRoot: vkbd.element,
-    //     inputStartHandler: vkbd.touch.bind(vkbd),
-    //     inputMoveHandler: vkbd.moveOver.bind(vkbd),
-    //     inputMoveCancelHandler: vkbd.moveCancel.bind(vkbd),
-    //     inputEndHandler: vkbd.release.bind(vkbd),
     //     coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
     //   };
 
@@ -29,14 +30,11 @@ namespace com.keyman.osk {
     // }
 
     // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
-    //   const config: InputEventEngineConfig = {
+    //   const config: GestureRecognizerConfiguration = {
     //     targetRoot: banner.getDiv(),
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: banner.getDiv(),
-    //     inputStartHandler: handlerRoot.touchStart.bind(handlerRoot),
-    //     inputMoveHandler:  handlerRoot.touchMove.bind(handlerRoot),
-    //     inputEndHandler:   handlerRoot.touchEnd.bind(handlerRoot),
     //     coordConstrainedWithinInteractiveBounds: function() { return true; }
     //   };
 
@@ -44,16 +42,18 @@ namespace com.keyman.osk {
     // }
 
     registerEventHandlers() {
-      this.config.eventRoot.addEventListener('touchstart', this._touchStart, true);
-      this.config.eventRoot.addEventListener('touchmove',  this._touchMove, false);
+      // The 'passive' property ensures we can prevent MouseEvent followups from TouchEvents.
+      // It is only specified during `addEventListener`, not during `removeEventListener`.
+      this.eventRoot.addEventListener('touchstart', this._touchStart, {capture: true, passive: false});
+      this.eventRoot.addEventListener('touchmove',  this._touchMove, {capture: false, passive: false});
       // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
-      this.config.eventRoot.addEventListener('touchend',   this._touchEnd, true);
+      this.eventRoot.addEventListener('touchend',   this._touchEnd, {capture: true, passive: false});
     }
 
     unregisterEventHandlers() {
-      this.config.eventRoot.removeEventListener('touchstart', this._touchStart, true);
-      this.config.eventRoot.removeEventListener('touchmove',  this._touchMove, false);
-      this.config.eventRoot.removeEventListener('touchend',   this._touchEnd, true);
+      this.eventRoot.removeEventListener('touchstart', this._touchStart, true);
+      this.eventRoot.removeEventListener('touchmove',  this._touchMove, false);
+      this.eventRoot.removeEventListener('touchend',   this._touchEnd, true);
     }
 
     private preventPropagation(e: TouchEvent) {
@@ -69,6 +69,7 @@ namespace com.keyman.osk {
     }
 
     onTouchStart(event: TouchEvent) {
+      this.preventPropagation(event);
       this.onInputStart(InputEventCoordinate.fromEvent(event));
     }
 
@@ -84,6 +85,7 @@ namespace com.keyman.osk {
     }
 
     onTouchEnd(event: TouchEvent) {
+      this.preventPropagation(event);
       this.onInputEnd(InputEventCoordinate.fromEvent(event));
     }
   }

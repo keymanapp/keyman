@@ -1,31 +1,28 @@
 /// <reference path="inputEventCoordinate.ts" />
+/// <reference path="gestureRecognizerConfiguration.ts" />
+/// <reference path="includes/events.ts" />
 
 namespace com.keyman.osk {
   export type InputHandler = (coord: InputEventCoordinate) => void;
 
-  export interface InputEventEngineConfig {
-    /**
-     * Specifies the element that input listeners should be attached to.
-     */
-    readonly eventRoot: HTMLElement;
-    /**
-     * Specifies the most specific common ancestor element of any event target
-     * that the InputEventEngine should consider.
-     */
-    readonly targetRoot: HTMLElement;
+  export abstract class InputEventEngine extends EventEmitter {
+    public static readonly INPUT_UPDATE_EVENT_NAME = "inputUpdate";
 
-    readonly coordConstrainedWithinInteractiveBounds: (coord: InputEventCoordinate) => boolean;
+    protected readonly config: GestureRecognizerConfiguration;
 
-    readonly inputStartHandler?:      InputHandler;
-    readonly inputMoveHandler?:       InputHandler;
-    readonly inputMoveCancelHandler?: InputHandler;
-    readonly inputEndHandler?:        InputHandler;
-  }
+    protected static preprocessConfig(config: GestureRecognizerConfiguration): GestureRecognizerConfiguration {
+      // Allows configuration pre-processing during this method.
+      let processingConfig: Mutable<GestureRecognizerConfiguration> = Object.assign({}, config);
+      processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
+      processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
 
-  export abstract class InputEventEngine {
-    protected readonly config: InputEventEngineConfig;
+      return processingConfig;
+    }
 
-    public constructor(config: InputEventEngineConfig) {
+    public constructor(config: GestureRecognizerConfiguration) {
+      super();
+
+      config = InputEventEngine.preprocessConfig(config);
       this.config = config;
     }
 
@@ -33,27 +30,19 @@ namespace com.keyman.osk {
     abstract unregisterEventHandlers();
 
     onInputStart(coord: InputEventCoordinate) {
-      if(this.config.inputStartHandler) {
-        this.config.inputStartHandler(coord);
-      }
+      this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.START, coord);
     }
 
     onInputMove(coord: InputEventCoordinate) {
-      if(this.config.inputMoveHandler) {
-        this.config.inputMoveHandler(coord);
-      }
+      this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.MOVE, coord);
     }
 
     onInputMoveCancel(coord: InputEventCoordinate) {
-      if(this.config.inputMoveCancelHandler) {
-        this.config.inputMoveCancelHandler(coord);
-      }
+      this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.CANCEL, coord);
     }
 
     onInputEnd(coord: InputEventCoordinate) {
-      if(this.config.inputEndHandler) {
-        this.config.inputEndHandler(coord);
-      }
+      this.emit(InputEventEngine.INPUT_UPDATE_EVENT_NAME, TrackedInputState.END, coord);
     }
   }
 }
