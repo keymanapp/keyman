@@ -1,11 +1,8 @@
 /// <reference path="recognitionZoneSource.ts" />
 /// <reference path="viewportZoneSource.ts" />
+/// <reference path="nonoptional.ts" />
 
 namespace com.keyman.osk {
-  type Nonoptional<Type> = {
-    [Property in keyof Type]-?: Type[Property];
-  };
-
   export interface GestureRecognizerConfiguration {
     /**
      * Specifies the element that mouse input listeners should be attached to.  If
@@ -52,18 +49,21 @@ namespace com.keyman.osk {
      * of its corresponding input sequence.  May be a number or an array of 1, 2, or 4 numbers,
      * as with CSS styling.
      *
-     * If not specified, this will default to a padding of 3px inside the standard safeBounds.
+     * If not specified, this will default to a padding of 3px inside the standard safeBounds
+     * unless `paddedSafeBounds` is defined.
+     *
+     * If `paddedSafeBounds` was specified initially, this will be set to `undefined`.
      */
     readonly safeBoundPadding?: number | number[];
-  }
 
-  export interface FinalizedGestureRecognizerConfiguration extends Nonoptional<GestureRecognizerConfiguration> {
     /**
-     * A slightly-padded `safeBounds` used to detect proximity of each input-sequence's first
-     * coordinate to the `safeBounds`.
+     * Used to define when an input coordinate is "close" to `safeBounds` borders via exclusion.
+     * If this is not defined while `safeBoundPadding` is, this will be built automatically to
+     * match the spec set by `safeBoundPadding`.
+     *
+     * Defining this directly will cause `safeBoundPadding` to be ignored in favor of the bounds
+     * set here.
      */
-    readonly paddedSafeBounds: RecognitionZoneSource;
-
-    readonly safeBoundPadding: number[];
+    readonly paddedSafeBounds?: RecognitionZoneSource;
   }
 }

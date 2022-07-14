@@ -3,18 +3,14 @@
 /// <reference path="includes/events.ts" />
 
 namespace com.keyman.osk {
-  type Mutable<Type> = {
-    -readonly [Property in keyof Type]: Type[Property];
-  };
-
   export type InputHandler = (coord: InputEventCoordinate) => void;
 
   export abstract class InputEventEngine extends EventEmitter {
     public static readonly INPUT_UPDATE_EVENT_NAME = "inputUpdate";
 
-    protected readonly config: FinalizedGestureRecognizerConfiguration;
+    protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
-    public constructor(config: FinalizedGestureRecognizerConfiguration) {
+    public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super();
       this.config = config;
     }

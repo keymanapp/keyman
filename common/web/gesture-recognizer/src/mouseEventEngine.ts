@@ -11,7 +11,7 @@ namespace com.keyman.osk {
     private disabledSafeBounds: number = 0;
     private ignoreSequence: boolean = false;
 
-    public constructor(config: FinalizedGestureRecognizerConfiguration) {
+    public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
 
       this._mouseStart = this.onMouseStart.bind(this);
