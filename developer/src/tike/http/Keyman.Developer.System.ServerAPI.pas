@@ -17,6 +17,8 @@ type
     class function IsDebugObjectRegistered(const objectType, id: string): Boolean; static;
     class procedure Post(const api: string; mfd: TMultipartFormData); static;
     class function HostName: string; static;
+    class function LoadFileToString(const Filename: string;
+      var s: string): Boolean; static;
   public
     // Server Control functions
     class function Running: Boolean; static;
@@ -111,14 +113,41 @@ begin
   LastGetStatusTime := 0;
 end;
 
+class function TServerDebugAPI.LoadFileToString(const Filename: string; var s: string): Boolean;
+var
+  fs: TFileStream;
+  ss: TStringStream;
+begin
+  try
+    fs := TFileStream.Create(TKeymanDeveloperPaths.ServerDataPath + 'pid.json', fmOpenRead);
+    try
+      ss := TStringStream.Create('', TEncoding.UTF8);
+      try
+        ss.CopyFrom(fs, 0);
+        s := ss.DataString;
+        Result := True;
+      finally
+        ss.Free;
+      end;
+    finally
+      fs.Free;
+    end;
+  except
+    on E:EFileStreamError do
+    begin
+      // TODO: Log this error?
+      Result := False;
+    end;
+  end;
+end;
+
 class function TServerDebugAPI.Running: Boolean;
 var
-  s: TStringStream;
+  s: string;
   pid: Integer;
   h: THandle;
   buf: array[0..MAX_PATH] of char;
   sz: DWord;
-  fs: TFileStream;
 begin
   Result := False;
 
@@ -137,20 +166,10 @@ begin
     Exit;
   end;}
 
-  fs := TFileStream.Create(TKeymanDeveloperPaths.ServerDataPath + 'pid.json', fmOpenRead);
-  try
-    s := TStringStream.Create('', TEncoding.UTF8);
-    try
-      s.CopyFrom(fs, 0);
-
-      if not TryStrToInt(s.DataString.Trim, pid) then
-        Exit;
-    finally
-      s.Free;
-    end;
-  finally
-    fs.Free;
-  end;
+  if not LoadFileToString(TKeymanDeveloperPaths.ServerDataPath + 'pid.json', s) then
+    Exit;
+  if not TryStrToInt(s.Trim, pid) then
+    Exit;
 
   // check the pid, and if it is node, we'll basically assume it's our one
 
@@ -232,7 +251,7 @@ end;
 
 class function TServerDebugAPI.UpdateStatus: Boolean;
 begin
-  if GetTickCount64 - LastGetStatusTime > 1000
+  if (GetTickCount64 - LastGetStatusTime > 1000)
     then Result := GetStatus
     else Result := True;
 end;
@@ -243,8 +262,15 @@ var
   res: IHTTPResponse;
   o: TJSONObject;
 begin
+// TODO: Consider reporting this info by file to save http transaction cost?
+//  if not LoadFileToString(TKeymanDeveloperPaths.ServerDataPath + 'status.json', s) then
+//    Exit(False);
+
   FngrokEnabled := False;
   FngrokEndpoint := '';
+
+  if not Running then
+    Exit(False);
 
   http := THttpClient.Create;
   try

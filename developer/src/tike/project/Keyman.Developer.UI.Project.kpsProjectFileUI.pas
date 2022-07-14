@@ -57,6 +57,7 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectUIFileType,
+  Keyman.Developer.UI.ServerUI,
   UfrmMain,
   UfrmMessages,
   UfrmMDIEditor,
@@ -76,7 +77,9 @@ begin
 
   Result := ProjectFile.CompilePackage(GetPack, FSilent);
 
-  if Result and TServerDebugAPI.IsPackageRegistered(ProjectFile.TargetFileName) then
+  if Result and
+      TServerDebugAPI.Running and
+      TServerDebugAPI.IsPackageRegistered(ProjectFile.TargetFileName) then
     TestPackageOnline;
 end;
 
@@ -141,9 +144,11 @@ begin
   if not FileExists(FCompiledName) then
     Exit(False);
 
-  TServerDebugAPI.RegisterPackage(FCompiledName, ProjectFile.Header_Name);
-
-  packageEditor.NotifyStartedWebDebug;   // I4021
+  if TServerUI.VerifyServerRunning then
+  begin
+    TServerDebugAPI.RegisterPackage(FCompiledName, ProjectFile.Header_Name);
+    packageEditor.NotifyStartedWebDebug;   // I4021
+  end;
 
   Result := True;
 end;

@@ -3087,6 +3087,15 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         object mnuToolsWebDebuggerCopyToClipboard: TMenuItem
           Action = modActionsMain.actToolsWebCopyPublicUrl
         end
+        object N11: TMenuItem
+          Caption = '-'
+        end
+        object Startserver1: TMenuItem
+          Action = modActionsMain.actToolsWebStartServer
+        end
+        object Stopserver1: TMenuItem
+          Action = modActionsMain.actToolsWebStopServer
+        end
         object N7: TMenuItem
           Caption = '-'
         end
