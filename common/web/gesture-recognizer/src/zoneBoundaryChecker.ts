@@ -69,7 +69,7 @@ namespace com.keyman.osk {
       return !!(borderProximityBitmask & ~ignoredSafeBoundFlags);
     }
 
-    static getRelativeCoord(coord: InputSample, config: FinalizedGestureRecognizerConfiguration): InputSample {
+    static getRelativeCoord(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration>): InputSample {
       let parentRect = config.targetRoot.getBoundingClientRect();
 
       return {
