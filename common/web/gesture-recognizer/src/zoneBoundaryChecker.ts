@@ -19,8 +19,8 @@ namespace com.keyman.osk {
      */
     static getCoordZoneBitmask(coord: InputEventCoordinate, zone: RecognitionZoneSource): number {
       // coord currently uses page-based coords, not client-based!
-      let screenX = coord.x + document.documentElement.scrollLeft;
-      let screenY = coord.y + document.documentElement.scrollTop;
+      let screenX = coord.x - document.body.scrollLeft;
+      let screenY = coord.y - document.body.scrollTop;
 
       const bounds = zone.getBoundingClientRect();
 
