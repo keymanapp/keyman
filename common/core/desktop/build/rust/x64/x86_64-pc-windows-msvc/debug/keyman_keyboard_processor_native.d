@@ -1,1 +1,0 @@
-C:/Projects/keyman/keyman/common/core/desktop/build/rust/x64\x86_64-pc-windows-msvc\debug\keyman_keyboard_processor_native.lib: C:\Projects\keyman\keyman\common\core\desktop\src\rust\keyman_keyboard_processor\src\lib.rs C:\Projects\keyman\keyman\common\core\desktop\src\rust\native\src\lib.rs

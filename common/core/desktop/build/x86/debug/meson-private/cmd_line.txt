@@ -1,7 +1,0 @@
-[options]
-buildtype = debug
-default_library = both
-werror = True
-
-[properties]
-
