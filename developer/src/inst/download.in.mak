@@ -113,13 +113,17 @@ make-kmcomp-install-zip: copy-schemas
     cd $(DEVELOPER_ROOT)\bin
 
     $(WZZIP) -bd -bb0 $(KMCOMP_ZIP) \
-        kmcomp.exe kmcmpdll.dll kmcomp.x64.exe kmcmpdll.x64.dll \
+        kmcomp.exe kmcmpdll.dll \
+        kmcomp.x64.exe kmcmpdll.x64.dll \
         kmconvert.exe \
+        sentry.dll sentry.x64.dll \
+        kmdecomp.exe \
         keyboard_info.source.json keyboard_info.distribution.json \
         keyman-touch-layout.spec.json keyman-touch-layout.clean.spec.json \
         xml\layoutbuilder\*.keyman-touch-layout \
         projects\* \
         server\*
+
 
 copy-schemas:
     copy $(KEYMAN_ROOT)\common\schemas\keyboard_info\keyboard_info.source.json $(DEVELOPER_ROOT)\bin
