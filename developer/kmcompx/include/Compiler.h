@@ -331,7 +331,7 @@
 #define KEYBOARDFILEGROUP_SIZE  24
 #define KEYBOARDFILEKEY_SIZE    20
 
-
+#if 0
 struct COMP_STORE {
 	KMX_DWORD dwSystemID;
 	KMX_DWORD dpName;
@@ -404,11 +404,12 @@ typedef COMP_STORE *PCOMP_STORE;
 typedef COMP_KEY *PCOMP_KEY;
 typedef COMP_GROUP *PCOMP_GROUP;
 
-typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
-extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile, 
-    PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, 
-	KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc) ;  // I4865   // I4866
+#endif
 
+typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
+extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile,
+    PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors,
+	KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc) ;  // I4865   // I4866
 
 //---- old ------------------------------------------------------------------------
 /*

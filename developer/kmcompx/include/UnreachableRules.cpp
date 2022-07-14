@@ -1,7 +1,7 @@
 # pragma once
 
 
-#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
+//#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
 #include "../../../../developer/kmcompx/include/pch.h"              // _S2 #include "pch"
 #include "../../../../developer/kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
 #include "../../../../developer/kmcompx/include/compiler.h"         // _S2 #include <compiler.h>
@@ -45,7 +45,7 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         currentLine = kp->Line;
-        // _S2 needs to be added 
+        // _S2 needs to be added
         //sprintf(ErrExtra, "  character offset:%d", ErrChr);            // _S2 wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
         AddWarning(CHINT_UnreachableRule);
       }

@@ -20,8 +20,8 @@
 #ifndef _COMPFILE_H
 #define _COMPFILE_H
 
-#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
-#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
+//#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
+//#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 
 #define LINESIZE 8192
 #define GLOBAL_BUFSIZE  4096

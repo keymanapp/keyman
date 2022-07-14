@@ -4,7 +4,7 @@
 #pragma once
 #include <stdint.h>
 
-#include "keyman/keyboardprocessor.h"	
+#include "keyman/keyboardprocessor.h"
 #include "keyman/keyboardprocessor_bits.h"
 
 
@@ -42,7 +42,7 @@ typedef PKMX_WSTR * LPKMX_STR;       // s ??
 typedef PKMX_WSTR * PPKMX_WSTR;      // s ??
 typedef KMX_WCHART* LPKMX_WCHART;      // s ??
 typedef KMX_WCHAR* LPKMX_WCHAR;      // s ??
-//typedef KMX_PWSTR * LPKMX_STR;      
+//typedef KMX_PWSTR * LPKMX_STR;
 
 //DWORD x;
 namespace km {
@@ -113,7 +113,7 @@ typedef struct KMX_tagINTKEYBOARDOPTIONS
 typedef struct KMX_tagINTKEYBOARDINFO
 {
   KMX_DWORD      KeymanID;
-  KMX_CHAR       Name[256];   // _S2 :this was original:  char       Name[256];     
+  KMX_CHAR       Name[256];   // _S2 :this was original:  char       Name[256];
   LPKMX_KEYBOARD Keyboard;
   LPKMX_INTKEYBOARDOPTIONS KeyboardOptions;
 } KMX_INTKEYBOARDINFO, *LPKMX_INTKEYBOARDINFO;
@@ -132,3 +132,5 @@ enum KMX_ProcessStringReturn { KMX_psrPostMessages, KMX_psrCheckMatches };
 } // namespace kmx
 } // namespace kbp
 } // namespace km
+
+#include "./compiler.h"

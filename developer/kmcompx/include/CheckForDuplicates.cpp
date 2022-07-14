@@ -2,7 +2,7 @@
 #pragma once          // _S2
 
 
-#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
+//#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
 #include "../../../../developer/kmcompx/include/pch.h"              // _S2 #include "pch"
 #include "../../../../developer/kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
 #include "../../../../developer/kmcompx/include/compiler.h"         // _S2 #include <compiler.h>
@@ -26,7 +26,7 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
     if (gp0 == gp) {
       continue;
     }
-    if (u16icmp(gp0->szName, gp->szName) == 0)       // _S2 if (_wcsicmp(gp0->szName, gp->szName) == 0) 
+    if (u16icmp(gp0->szName, gp->szName) == 0)       // _S2 if (_wcsicmp(gp0->szName, gp->szName) == 0)
     {
       // _ S2   needs to be included again     // wsprintf(ErrExtra, "Group '%ls' declared on line %d", gp0->szName, gp0->Line);
       return CERR_DuplicateGroup;

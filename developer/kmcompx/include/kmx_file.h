@@ -7,9 +7,9 @@
 
 #include "kmcompx.h"    //#include "kmx_base.h"
 
-namespace km {
-namespace kbp {
-namespace kmx {
+// namespace km {
+// namespace kbp {
+// namespace kmx {
 
 /* */
 
@@ -123,8 +123,9 @@ namespace kmx {
 #define TSS_KMW_EMBEDCSS     37
 
 #define TSS_TARGETS         38
+#define TSS_CASEDKEYS       39
 
-#define TSS__MAX        38
+#define TSS__MAX        39
 
 /* wm_keyman_control_internal message control codes */
 
@@ -185,6 +186,9 @@ namespace kmx {
 #define CODE_SETSYSTEMSTORE 0x18
 
 #define CODE_LASTCODE   0x18
+
+extern const int CODE__SIZE[];
+#define CODE__SIZE_MAX 5
 
 #define KF_SHIFTFREESCAPS 0x0001
 #define KF_CAPSONONLY   0x0002
@@ -283,6 +287,6 @@ static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOA
 static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
 static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
-} // namespace kmx
-} // namespace kbp
-} // namespace km
+// } // namespace kmx
+// } // namespace kbp
+// } // namespace km

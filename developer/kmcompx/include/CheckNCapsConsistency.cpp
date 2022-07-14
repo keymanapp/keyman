@@ -2,7 +2,7 @@
 
 #pragma once  // _S2
 
-#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
+//#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
 
 #include "../../../../developer/kmcompx/include/pch.h"     // _S2 #include "pch.h"
 #include "CheckNCapsConsistency.h"

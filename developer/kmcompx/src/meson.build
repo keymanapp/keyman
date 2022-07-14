@@ -73,11 +73,13 @@ lib = library('kmcompx',
   '../../src/kmcmpdll/NamedCodeConstants.cpp',
   '../../src/kmcmpdll/versioning.cpp',
   '../../src/kmcmpdll/virtualcharkeys.cpp',
+  '../../src/kmcmpdll/xstring.cpp',
 
   '../../../common/windows/cpp/src/ConvertUTF.c',
   '../../../common/windows/cpp/src/crc32.cpp',
   '../../../common/windows/cpp/src/registry.cpp',
   '../../../common/windows/cpp/src/unicode.cpp',
+  '../../../common/windows/cpp/src/vkeys.cpp',
   '../../../common/windows/cpp/src/xstring.cpp',
 
   '../../src/ext/json-schema-validator/json-schema-draft4.json.cpp',

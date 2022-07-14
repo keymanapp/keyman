@@ -11,9 +11,11 @@
 #include <windows.h>
 #include <assert.h>
 
+#include "../../../../developer/kmcompx/include/pch.h"
 
-#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
-#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
+/*
+//#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
+//#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../../common/windows/cpp/include/xstring.h"
 
 #include "../../../../common/windows/cpp/include/registry.h"
@@ -24,3 +26,4 @@
 #include <stdio.h>
 
 #include <string.h>
+*/
