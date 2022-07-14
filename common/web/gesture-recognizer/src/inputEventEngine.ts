@@ -8,9 +8,9 @@ namespace com.keyman.osk {
   export abstract class InputEventEngine extends EventEmitter {
     public static readonly INPUT_UPDATE_EVENT_NAME = "inputUpdate";
 
-    protected readonly config: FinalizedGestureRecognizerConfiguration;
+    protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
-    public constructor(config: FinalizedGestureRecognizerConfiguration) {
+    public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super();
       this.config = config;
     }

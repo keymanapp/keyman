@@ -9,7 +9,7 @@ namespace com.keyman.osk {
 
     private disabledSafeBounds: number = 0;
 
-    public constructor(config: FinalizedGestureRecognizerConfiguration) {
+    public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
 
       this._touchStart = this.onTouchStart.bind(this);

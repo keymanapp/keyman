@@ -33,7 +33,7 @@ namespace com.keyman.osk {
      * Confirms whether or not the input coordinate lies within the accepted coordinate bounds
      * for a gesture input sequence's first coordinate.
      */
-    static inputStartOutOfBoundsCheck(coord: InputEventCoordinate, config: FinalizedGestureRecognizerConfiguration): boolean {
+    static inputStartOutOfBoundsCheck(coord: InputEventCoordinate, config: Nonoptional<GestureRecognizerConfiguration>): boolean {
       return !!this.getCoordZoneBitmask(coord, config.inputStartBounds); // true if out of bounds.
     }
 
@@ -44,12 +44,12 @@ namespace com.keyman.osk {
      * This value should be provided as the third argument to `inputMoveCancellationCheck` for
      * updated input coordinates for the current input sequence.
      */
-    static inputStartSafeBoundProximityCheck(coord: InputEventCoordinate, config: FinalizedGestureRecognizerConfiguration): number {
+    static inputStartSafeBoundProximityCheck(coord: InputEventCoordinate, config: Nonoptional<GestureRecognizerConfiguration>): number {
       return this.getCoordZoneBitmask(coord, config.paddedSafeBounds);
     }
 
     static inputMoveCancellationCheck(coord: InputEventCoordinate,
-                                      config: FinalizedGestureRecognizerConfiguration,
+                                      config: Nonoptional<GestureRecognizerConfiguration>,
                                       ignoredSafeBoundFlags?: number): boolean {
       ignoredSafeBoundFlags = ignoredSafeBoundFlags || 0;
 

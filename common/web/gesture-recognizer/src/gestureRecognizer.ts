@@ -13,26 +13,33 @@ namespace com.keyman.osk {
   export class GestureRecognizer extends EventEmitter {
     public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "trackedInputUpdate";
 
-    protected readonly config: FinalizedGestureRecognizerConfiguration;
+    protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
     private readonly mouseEngine: MouseEventEngine;
     private readonly touchEngine: TouchEventEngine;
 
-    protected static preprocessConfig(config: GestureRecognizerConfiguration): FinalizedGestureRecognizerConfiguration {
+    protected static preprocessConfig(config: GestureRecognizerConfiguration): Nonoptional<GestureRecognizerConfiguration> {
       // Allows configuration pre-processing during this method.
-      let processingConfig: Mutable<FinalizedGestureRecognizerConfiguration> = {...config} as FinalizedGestureRecognizerConfiguration;
+      let processingConfig: Mutable<Nonoptional<GestureRecognizerConfiguration>> = {...config} as Nonoptional<GestureRecognizerConfiguration>;
       processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
       processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
 
       processingConfig.inputStartBounds = processingConfig.inputStartBounds ?? processingConfig.targetRoot;
       processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
       processingConfig.safeBounds       = processingConfig.safeBounds       ?? new PaddedZoneSource(2);
-      if(typeof config.safeBoundPadding == 'number') {
-        processingConfig.safeBoundPadding = [ config.safeBoundPadding ];
-      }
-      processingConfig.safeBoundPadding = processingConfig.safeBoundPadding ?? [3];
 
-      processingConfig.paddedSafeBounds = new PaddedZoneSource(processingConfig.safeBounds, ...processingConfig.safeBoundPadding);
+      if(!config.paddedSafeBounds) {
+        let paddingArray = config.safeBoundPadding;
+        if(typeof paddingArray == 'number') {
+          paddingArray = [ paddingArray ];
+        }
+        paddingArray = paddingArray ?? [3];
+
+        processingConfig.paddedSafeBounds = new PaddedZoneSource(processingConfig.safeBounds, ...paddingArray as number[]);
+      } else {
+        // processingConfig.paddedSafeBounds is already set via the spread operator above.
+        delete processingConfig.safeBoundPadding;
+      }
 
       return processingConfig;
     }
