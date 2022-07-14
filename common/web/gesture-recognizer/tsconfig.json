@@ -18,6 +18,7 @@
     // { "path": "../../utils" },
   ],
   "include": ["./src/**/*.ts"],
+  "exclude": ["./src/tools/**/*.ts"],
   "files": [
     "../../../node_modules/eventemitter3/index.js"
   ]
