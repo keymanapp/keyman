@@ -25,15 +25,23 @@ touchscreen!
 To facilitate this, we have implemented a "safe zone" of sorts, traditionally based on the
 available viewport.  Should a touchpoint cross the boundary of the safe zone - and thus,
 become very close to a device boundary - that may then be used as criteria for a cancellation.
+In reference to the [demo/host page](../../../../web/testing/gesture-recognizer/), this is
+visualized as the outer, darker-colored set of dashed lines nested closely to the emulated
+device borders.
 
 However!  What if the user _starts_ their input sequence very close to the safe zone?
 Especially with touch-based input, there can be natural shifts in position of the input point
 that may accidentally cross that boundary... and it is entirely possible to _start_ in an
 "unsafe" area.  To prevent this from auto-canceling user input in these scenarios, we have
-also noted a need for "safe zone padding".  Any input sequence _starting_ within an "unsafe"
-area, as extended by such padding, may ignore the boundaries of the safe zone - but only for
-the "padded" safe zone borders violated by its initial coordinate.  Other borders will remain
-active for that input sequence.
+also noted a need for "safe zone padding".  In reference to the
+[demo/host page](../../../../web/testing/gesture-recognizer/), this is
+visualized as the inner, lighter-colored set of dashed lines.
+
+![Reference image for the host page](./host-page-viz.png)
+
+Any input sequence _starting_ within an "unsafe" area - between the lightly-colored dashed
+lines and the emulated device border, may ignore the boundaries of the safe zone -
+but only for borders on the same side(s) as the violated "padded safe zone" border.
 
 To recap:
 - The "safe zone" is designed to facilitate input-sequence cancellation at borders offset from
@@ -42,7 +50,8 @@ To recap:
   sequences that start very close to them.
 
 We have generalized the "safe zone" somewhat by allowing versions based on sources aside from
-the available viewport.  This is largely intended to facilitate interactive demos and testing.
+the available viewport.  This is largely intended to facilitate interactive demos and testing
+such as the page (and corresponding image) referenced above.
 
 ## On "roaming bounds"
 
@@ -54,4 +63,5 @@ recognized.  For longpresses, it is also possible for the subkey menu may be dis
 this area - though the subkey menu's handling of the input sequence should probably be
 handled in its own implementation of `GestureRecognizer`.
 
-The option for "Roaming bounds" exists in order to address such conditions.
+The option for "Roaming bounds" exists in order to address such conditions.  This is visualized
+in blue in the image seen earlier.
