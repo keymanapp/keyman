@@ -20,13 +20,11 @@
                     03 Nov 2012 - mcdurdin - I3512 - V9.0 - Merge of I3056 - If file was not found in first search folder, named code constants failed to compile
                     13 Dec 2012 - mcdurdin - I3641 - V9.0 - compiler dll buffer overrun bugs
 */
-#pragma once      // _S2
 #include "pch.h"
 #include <io.h>
 #include <limits.h>
 #include "NamedCodeConstants.h"
 #include "../../../../developer/kmcompx/include/kmcmpdll.h"
-//#include "../../../../common/core/desktop/src/kmx/kmx_xstring.h"   // added _S2
 #include "../../../../core/src/kmx/kmx_xstring.h"
 
 extern char CompileDir[];

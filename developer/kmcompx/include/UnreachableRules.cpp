@@ -1,22 +1,18 @@
-# pragma once
-
-
-//#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
 #include "../../../../developer/kmcompx/include/pch.h"              // _S2 #include "pch"
 #include "../../../../developer/kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
 #include "../../../../developer/kmcompx/include/compiler.h"         // _S2 #include <compiler.h>
 #include "../../../../developer/kmcompx/include/comperr.h"          // _S2 #include <comperr.h>
 #include "../../../../developer/kmcompx/include/kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
-/*
 
+/*
 #include "pch.h"
 #include <compfile.h>
 #include <compiler.h>
 #include <comperr.h>
 #include <kmcmpdll.h>
-
 #include <vkeys.h>
 */
+
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
@@ -45,8 +41,12 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         currentLine = kp->Line;
-        // _S2 needs to be added
-        //sprintf(ErrExtra, "  character offset:%d", ErrChr);            // _S2 wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
+
+        // _S2 wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
+        PKMX_WCHAR p_ErrExtra;
+        char16_t text[256] = u"Overridden by rule on line ";
+        u16printf(&p_ErrExtra, 'd', 0x002e, createIntVector((int)(k1.Line)),   text );            
+
         AddWarning(CHINT_UnreachableRule);
       }
     }

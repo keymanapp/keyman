@@ -23,7 +23,6 @@
 					- struct FILE_STORE <--- struct KMX_FILE_STORE
 
 */
-#pragma once    // _S2
 #ifndef _COMPFILE_H
 #define _COMPFILE_H
 

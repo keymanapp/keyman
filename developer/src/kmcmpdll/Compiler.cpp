@@ -88,7 +88,6 @@
 #include "../../../../developer/kmcompx/include/pch.h"
 
 #include "../../../../developer/kmcompx/include/kmx_u16.cpp"
-//#include "../../../../developer/kmcompx/include/kmx_u16.h"      // _S2 why can`t I include .h  ???  :-(
 
 //#include "pch.h"
     // instead of pch.d do:
@@ -103,9 +102,8 @@
         //#include "registry.h"
         //#include "rc4.h"
 
-
         #include <assert.h>
-         #include "../../../common/windows/cpp/include/crc32.h"       // _S2   //#include "crc32.h"   // _S2 include .ccp ????
+        #include "../../../common/windows/cpp/include/crc32.h"       // _S2   //#include "crc32.h"   // _S2 include .ccp ????
 
         #include <windows.h>            // -> windows.h from here
         //#include "xstring.h"          // FOR INCXSTR IGNOREIFOPT:::
@@ -214,7 +212,7 @@ KMX_WCHAR const * LineTokens[] = {
    u"LANGUAGE ",  u"LAYOUT ",  u"COPYRIGHT ",  u"MESSAGE ",  u"LANGUAGENAME ",
    u"BITMAPS " };
 
-#define SSN__PREFIX		u"&"      // _S2 used to be : #define SSN__PREFIX		L"&"
+#define SSN__PREFIX		u"&"      // _S2  #define SSN__PREFIX		L"&"
 
 
 KMX_WCHAR const * StoreTokens[TSS__MAX + 2] = {
@@ -258,15 +256,17 @@ KMX_WCHAR const * StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX u"KMW_EMBEDCSS",
   SSN__PREFIX u"TARGETS",   // I4504
   SSN__PREFIX u"CASEDKEYS", // #2241
+  SSN__PREFIX u"", // TSS_BEGIN_NEWCONTEXT
+  SSN__PREFIX u"", // TSS_BEGIN_POSTKEYSTROKE
+  SSN__PREFIX u"NEWLAYER",
+  SSN__PREFIX u"OLDLAYER",
   NULL
 };
 
 
 static_assert(_countof(StoreTokens) == TSS__MAX + 2, "StoreTokens should have exactly TSS__MAX+2 elements");
 
-/**/
 /* Compile target */
-
 
 HINSTANCE g_hInstance;
 CompilerMessageProc msgproc = NULL;
@@ -275,9 +275,10 @@ KMX_CHAR CompileDir[MAX_PATH];
 int ErrChr;
 KMX_CHAR ErrExtra[256];
 KMX_BOOL FSaveDebug, FCompilerWarningsAsErrors, FWarnDeprecatedCode;   // I4865   // I4866
-
+KMX_BOOL FShouldAddCompilerVersion = TRUE;
 KMX_BOOL FOldCharPosMatching = FALSE, FMnemonicLayout = FALSE;
 NamedCodeConstants *CodeConstants = NULL;
+
 /* Compile target */
 
 int CompileTarget;
@@ -285,10 +286,8 @@ int CompileTarget;
 #define CKF_KEYMAN    0
 #define CKF_KEYMANWEB 1
 
-
 KMX_WCHAR const * DeadKeyChars =
 u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
-
 
 /* _S2 */   //#define DebugLog(msg,...) (km::kbp::kmx::ShouldDebug() ? km::kbp::kmx::DebugLog1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
 
@@ -337,14 +336,14 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg)
 
   if (msg & CERR_FATAL)
   {
-    LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);    // _S2 LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);
+    LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);    
     (*msgproc)(currentLine + 1, msg, szText);
     nErrors++;
     return TRUE;
   }
 
   if (msg & CERR_ERROR) nErrors++;
-  LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);      // _S2 LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);
+  LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);      
   if (ErrChr > 0)
     sprintf(strchr(szText, 0), "  character offset:%d", ErrChr);            // _S2 wsprintf(strchr(szText, 0), " chr:%d", ErrChr);
   if (*ErrExtra)
@@ -357,9 +356,26 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg)
   return FALSE;
 }
 
+typedef struct _COMPILER_OPTIONS {
+  KMX_DWORD dwSize;
+  BOOL ShouldAddCompilerVersion;
+} COMPILER_OPTIONS;
+
+typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
+
+extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
+  if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
+    return FALSE;
+  }
+  FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
+  return TRUE;
+}
+
+
+
+
 extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
-  DWORD gck;
   FILE* fp_in  = NULL;
   FILE* fp_out = NULL;
   KMX_BOOL err;
@@ -409,7 +425,6 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
   if (fp_in  == NULL)                                                         //if (hInfile == INVALID_HANDLE_VALUE)   // I3228   // I3510
   {
     return CERR_CannotCreateTempfile;
-
   }
 
    fp_out = fopen(pszOutfile,"wb");                                          //  hOutfile = CreateFileA(pszOutfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
@@ -556,17 +571,18 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
     fk->dwHotKey = 0;
 
     /* Add a store for the Keyman 6.0 copyright information string */
+    if(FShouldAddCompilerVersion) {
+      KMX_DWORD vmajor, vminor;
+      GetVersionInfo(&vmajor, &vminor);
+      //char buf[256];
+      char16_t Text[256]  = u"Created with Keyman Developer version ";
+      u16printf(&str,  'd', 0x002e, createIntVector(HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor)) ,Text    );
+      //swprintf(str, LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));  // I3481
 
-    KMX_DWORD vmajor, vminor;
-    GetVersionInfo(&vmajor, &vminor);
-    //char buf[256];
-    char16_t Text[256]  = u"Created with Keyman Developer version ";
-    u16printf(&str,  'd', 0x002e, createIntVector(HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor)) ,Text    );
-    //swprintf(str, LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));  // I3481
-
-    //PWSTR pw = strtowstr(buf);
-    AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
-    //delete pw;
+      //PWSTR pw = strtowstr(buf);
+      AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
+      //delete pw;
+    }
 
     /* Add a system store for the Keyman edition number */
     u16printf(&str, 'd', 0x0020, createIntVector(0));      //  _S2  swprintf(str, LINESIZE, L"%d", 0);  // I3481
@@ -628,10 +644,8 @@ if ((msg = AddCompilerVersionStore(fk)) != CERR_None) SetError(msg);
 
 if ((msg = BuildVKDictionary(fk)) != CERR_None) SetError(msg);  // I3438
 
-
-    /* _S2 definition of CheckFilenameConsistency needs to be changed   */
-if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) SetError(msg);   // _S2 not able to use here why??
-
+/* _S2 no idea how to change that to use with char16_t on non-windows platforms */
+if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) SetError(msg);   
 
 delete str;
 
@@ -639,11 +653,10 @@ if (!CheckKeyboardFinalVersion(fk)) {
   return FALSE;
 }
 
-  /* Warn on inconsistent use of NCAPS */
-  if (!FMnemonicLayout) {
-    CheckNCapsConsistency(fk);
-  }
-
+/* Warn on inconsistent use of NCAPS */
+if (!FMnemonicLayout) {
+  CheckNCapsConsistency(fk);
+}
 
 /* Flag presence of deprecated features */
 CheckForDeprecatedFeatures(fk);
@@ -991,7 +1004,7 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
     AddDebugStore(fk, tstr);
   }
 
-  return CERR_None;
+  return CheckForDuplicateGroup(fk, gp);
 }
 
 int cmpkeys(const void *key, const void *elem)
@@ -1035,7 +1048,7 @@ KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
   if ((msg = ExpandCapsRulesForGroup(fk, gp)) != CERR_None) return msg;
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), cmpkeys);
 
-  return CERR_None;
+  return VerifyUnreachableRules(gp);
 }
 
 /***************************************
@@ -1105,12 +1118,10 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
     // Add a single char store as a defined character constant
     if (Uni_IsSurrogate1(*sp->dpString))
-      //CodeConstants_S2->KMX_AddCode_S2(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), sp->szName, fk->cxStoreArray);
       CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), sp->szName, fk->cxStoreArray);
     else
       CodeConstants->AddCode(sp->dpString[0], sp->szName, fk->cxStoreArray);
       //CodeConstants_S2->KMX_AddCode_S2(sp->dpString[0], sp->szName, fk->cxStoreArray);
-    //CodeConstants_S2->KMX_reindex_S2(); // has to be done after every character add due to possible use in another store.   // I4982
     CodeConstants->reindex(); // has to be done after every character add due to possible use in another store.   // I4982
   }
 
@@ -1120,7 +1131,8 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   // needs to be changesd. was if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;
     //if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;    //if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;
     return msg;
-  return CERR_None;   //  _ S2 needs to be: return CheckForDuplicateStore(fk, sp);
+  //return CERR_None;   //  _ S2 needs to be: return CheckForDuplicateStore(fk, sp);
+  return CheckForDuplicateStore(fk, sp);
 }
 
 KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID)
@@ -1387,11 +1399,10 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       delete[] sp->dpString;
       sp->dpString = q;
 
-    /* _S2 needs to be included
-          if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-            return msg;
-          }
-    */
+      // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
+      if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+        return msg;
+      }    
     }
     break;
   case TSS_KMW_RTL:
@@ -1402,18 +1413,18 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_KMW_HELPFILE:
   case TSS_KMW_EMBEDJS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
-
-
-    /* _S2 definition of CheckFilenameConsistency needs to be changed   */
+    // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
     if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
       return msg;
     }
-    /**/
-
     break;
 
   case TSS_KMW_EMBEDCSS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
+    // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
+    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+      return msg;
+    }
     break;
 
   case TSS_TARGETS:   // I4504
@@ -1463,11 +1474,10 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_LAYOUTFILE:  // I3483
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
 
-    /* _S2 definition of CheckFilenameConsistency needs to be changed   */
+    // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
     if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
           return msg;
-        }
-    /**/
+    }
 
     // Used by KMW compiler
     break;
@@ -1549,6 +1559,11 @@ KMX_BOOL GetFileVersion(KMX_CHAR *filename, KMX_WORD *d1, KMX_WORD *d2, KMX_WORD
 
 KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk)
 {
+  
+  if(!FShouldAddCompilerVersion) {
+    return CERR_None;
+  }
+  
   KMX_WCHAR verstr[32];
   PKMX_WCHAR p_verstr = verstr;
   KMX_WORD d1, d2, d3, d4;
@@ -3591,7 +3606,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token)
   }
   return FALSE;
 }
-
+/*
 KMX_BOOL IsRelativePath(KMX_CHAR *p)
 {
   // Relative path (returns TRUE):
@@ -3610,7 +3625,7 @@ KMX_BOOL IsRelativePath(KMX_CHAR *p)
   if (*p && *(p + 1) == ':') return FALSE;
 
   return TRUE;
-}
+}*/
 
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 {
@@ -3636,6 +3651,12 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
     fp = fopen(( const PKMX_CHAR) szNewName, "rb");                   // _S2   fp = _wfsopen(szNewName, L"rb", _SH_DENYWR);                     //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if ( fp == NULL)                                                  // if (hFile == INVALID_HANDLE_VALUE)
       return CERR_CannotReadBitmapFile;
+  }
+
+  KMX_DWORD msg;
+
+  if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
+    return msg;
   }
 
   auto sz = ftell(fp);                                                // *FileSize = GetFileSize(hFile, NULL);

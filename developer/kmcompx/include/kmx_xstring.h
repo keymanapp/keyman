@@ -1,3 +1,4 @@
+/*
 #pragma once
 
 #include "kmcompx.h"
@@ -42,3 +43,4 @@ PKMX_WCHAR strtowstr(PKMX_CHAR in);
 } // namespace kmx
 } // namespace kbp
 } // namespace km
+*/

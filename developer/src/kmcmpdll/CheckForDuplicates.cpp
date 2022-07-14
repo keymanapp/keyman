@@ -8,7 +8,7 @@
 #include "CheckForDuplicates.h"
 
 
-DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
+KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
   DWORD i;
   PFILE_GROUP gp0 = fk->dpGroupArray;
   for (i = 0; i < fk->cxGroupArray; i++, gp0++) {
@@ -23,7 +23,7 @@ DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
   return CERR_None;
 }
 
-DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
+KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
   if (!sp->szName[0]) {
     // Stores with zero length names are reserved system stores.
     // They cannot be defined in user code. This is not an issue.

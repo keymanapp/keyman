@@ -1,4 +1,3 @@
-#pragma once    // _S2
 #ifndef _NAMEDCODECONSTANTS_H
 #define _NAMEDCODECONSTANTS_H
 

@@ -44,7 +44,7 @@
 #define VERSION_100 0x00000A00
 
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_100
+//#define VERSION_MAX VERSION_100                 // _S2  
 
 //
 // Backspace types
@@ -125,7 +125,7 @@
 #define TSS_TARGETS         38
 #define TSS_CASEDKEYS       39
 
-#define TSS__MAX        39
+// #define TSS__MAX        39   // _S2
 
 /* wm_keyman_control_internal message control codes */
 

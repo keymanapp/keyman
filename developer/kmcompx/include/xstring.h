@@ -9,7 +9,7 @@ int  xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p);
 PKMX_WCHAR  xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr);
 int  xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2);
 
-//****old ******************************************************************************
+//**** _S2 old ******************************************************************************
 //PWSTR incxstr(PWSTR p);
 //PWSTR decxstr(PWSTR p, PWSTR pStart);
 //int xstrlen(PWSTR p);

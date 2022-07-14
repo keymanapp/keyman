@@ -1,8 +1,3 @@
-
-#pragma once          // _S2
-
-
-//#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
 #include "../../../../developer/kmcompx/include/pch.h"              // _S2 #include "pch"
 #include "../../../../developer/kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
 #include "../../../../developer/kmcompx/include/compiler.h"         // _S2 #include <compiler.h>
@@ -28,7 +23,14 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
     }
     if (u16icmp(gp0->szName, gp->szName) == 0)       // _S2 if (_wcsicmp(gp0->szName, gp->szName) == 0)
     {
-      // _ S2   needs to be included again     // wsprintf(ErrExtra, "Group '%ls' declared on line %d", gp0->szName, gp0->Line);
+      // _ S2    wsprintf(ErrExtra, "Group '%ls' declared on line %d", gp0->szName, gp0->Line);
+          PKMX_WCHAR p_ErrExtra ;
+          KMX_WCHAR T1[250]  = u"Group '";
+			    KMX_WCHAR T3[250]  = u"' declared on line ";
+          u16ncat(T1, gp0->szName, xstrlen(T1));
+          u16ncat(T1, T3, xstrlen(T1));
+          u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)gp0->Line), T1);
+
       return CERR_DuplicateGroup;
     }
   }
@@ -49,7 +51,13 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
     }
     if (u16icmp(sp0->szName, sp->szName) == 0)   // _S2 if (_wcsicmp(sp0->szName, sp->szName) == 0)
      {
-      // _ S2   needs to be included again     // wsprintf(ErrExtra, "Store '%ls' declared on line %d", sp0->szName, sp0->line);
+      // _ S2    wsprintf(ErrExtra, "Store '%ls' declared on line %d", sp0->szName, sp0->line);
+          PKMX_WCHAR p_ErrExtra ;
+          KMX_WCHAR T1[250]  = u"Store '";
+			    KMX_WCHAR T3[250]  = u"' declared on line ";
+          u16ncat(T1, sp0->szName, xstrlen(T1));
+          u16ncat(T1, T3, xstrlen(T1));
+          u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)sp0->line), T1);
       return CERR_DuplicateStore;
     }
   }

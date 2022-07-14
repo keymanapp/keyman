@@ -18,7 +18,7 @@ extern int currentLine;
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID);
 
-//***old***********************************************************
+// _S2 **** old ***************************
 /*
 BOOL AddCompileString(LPSTR buf);
 BOOL AddCompileMessage(DWORD msg);
