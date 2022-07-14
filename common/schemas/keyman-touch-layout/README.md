@@ -330,14 +330,14 @@ object](#sk-object). A `key` object must include either an `id` or `sp` property
 
 : If present, defines an array of keys that may be selected sequentially when
   tapping multiple times on the key, an array of [`sk` objects](#sk-object).
-  Multitaps generally should not be used on modifier keys, special keys, or the
+  Multitaps may not be used on layer switch keys, special keys such as the globe key, or the
   Spacebar. Beware of mixing multitaps with layer switching, as this can lead to
   a confusing user experience.
 
   Keyman 15+: the Shift key has a predefined multitap sequence to access the
   `caps` layer, which is available if the `caps` layer is present. This is the
   only multitap sequence supported in Keyman 15. This multitap sequence cannot
-  be overridden.
+  be overridden, and is the sole case where multitap input may cause a layer switch.
 
   Introduced in Keyman 16.0.
 
