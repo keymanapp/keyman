@@ -1,3 +1,5 @@
+// This script allows user-interactive use of the user-testing oriented unit-test-resource objects.
+
 const controller = new Testing.HostFixtureLayoutController();
 let loadPromise = controller.connect();
 let recorder;
