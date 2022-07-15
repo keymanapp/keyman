@@ -6,10 +6,10 @@ namespace Testing {
     private _loadPromise: Promise<com.keyman.osk.GestureRecognizer>;
 
     private _hostFixture: HTMLElement;
-    private _layoutConfig: FixtureLayoutConfig;
+    private _layoutConfig: FixtureLayoutConfiguration;
 
     public constructor() {
-      this._layoutConfig = new FixtureLayoutConfig();
+      this._layoutConfig = new FixtureLayoutConfiguration();
     }
 
     public get recognizer() {
@@ -20,12 +20,14 @@ namespace Testing {
       return !!this._recognizer;
     }
 
-    public get layoutConfig(): FixtureLayoutConfig {
+    public get layoutConfiguration(): FixtureLayoutConfiguration {
       return this._layoutConfig;
     }
 
-    public set layoutConfig(config: FixtureLayoutConfig) {
+    public set layoutConfiguration(config: FixtureLayoutConfiguration) {
       this._layoutConfig = config;
+
+      // TODO:  raise a 'changed configuration' event that SequenceRecorder may listen to?
 
       if(this.isReady) {
         this._applyLayoutConfig();

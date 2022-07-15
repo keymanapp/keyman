@@ -10,18 +10,18 @@ namespace Testing {
   type WrappedInputSequence = com.keyman.osk.Incomplete<InputSequence, InputSample>;
 
   export class SequenceRecorder {
-    recognizer: com.keyman.osk.GestureRecognizer;
+    controller: HostFixtureLayoutController;
     wrappers: {[identifier: string]: WrappedInputSequence}  = {};
     records:  {[identifier: string]: RecordedInputSequence} = {};
 
-    constructor(recognizer: com.keyman.osk.GestureRecognizer) {
-      this.recognizer = recognizer;
+    constructor(controller: HostFixtureLayoutController) {
+      this.controller = controller;
 
       this._attachRecognizerHooks();
     }
 
     private _attachRecognizerHooks() {
-      this.recognizer.on(com.keyman.osk.GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, (wrappedSequence: WrappedInputSequence) => {
+      this.controller.recognizer.on(com.keyman.osk.GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, (wrappedSequence: WrappedInputSequence) => {
         const id = wrappedSequence.item.fullIdentifier;
         this.wrappers[id] = wrappedSequence;
         this.records[id]  = { sequence: wrappedSequence.item };
@@ -50,7 +50,17 @@ namespace Testing {
         arr.push(this.records[entry]);
       }
 
-      return JSON.stringify(arr, com.keyman.osk.InputSequence._replacer, 2);
+      let jsonOut = {
+        set: arr,
+        config: this.controller.layoutConfiguration
+      }
+
+      return JSON.stringify(jsonOut, com.keyman.osk.InputSequence._replacer, 2);
+    }
+
+    public clear() {
+      this.records = {};
+      this.wrappers = {};
     }
   }
 }

@@ -28,7 +28,7 @@ namespace Testing {
     GENEROUS = "safe-generous"
   }
 
-  export class FixtureLayoutConfig {
+  export class FixtureLayoutConfiguration {
     public deviceStyle:   DeviceLayoutClass;
     public roamingStyle:  RoamingLayoutClass;
     public receiverStyle: ReceiverLayoutClass;
