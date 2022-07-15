@@ -202,7 +202,10 @@ window.onload = function() {
       keyman.osk = null;
     }
 
+    // Create a new on screen keyboard view and tell KeymanWeb that
+    // we are using the targetDevice for context input.
     newOSK = new com.keyman.osk.InlinedOSKView(targetDevice, keyman.util.device.coreSpec);
+    keyman.core.contextDevice = targetDevice;
 
     if(document.body.offsetWidth < targetDevice.dimensions[0]) {
       newOSK.setSize('320px', '200px');

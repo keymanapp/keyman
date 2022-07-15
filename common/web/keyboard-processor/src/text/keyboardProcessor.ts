@@ -46,7 +46,13 @@ namespace com.keyman.text {
     modStateFlags: number = 0;
 
     keyboardInterface: KeyboardInterface;
-    device: utils.DeviceSpec;
+
+    /**
+     * Indicates the device (platform) to be used for non-keystroke events,
+     * such as those sent to `begin postkeystroke` and `begin newcontext` 
+     * entry points.
+     */
+    contextDevice: utils.DeviceSpec;
 
     baseLayout: string;
 
@@ -60,7 +66,7 @@ namespace com.keyman.text {
         options = KeyboardProcessor.DEFAULT_OPTIONS;
       }
 
-      this.device = device;
+      this.contextDevice = device;
 
       this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
       this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
