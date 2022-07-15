@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 16.0.34 alpha 2022-07-15
+
+* fix(developer): set contextDevice in web debugger  ️ (#6906)
+* fix(web): layer-setting ops should not trigger for hardware keystroke processing  ️ (#6902)
+* fix(developer): kmdecomp virtual character key output (#6940)
+* fix(developer): crash on exit when checking for updates (#6941)
+* fix(developer): crash when switching back a tab (#6942)
+* chore(web): remove invalid warning msg (#6950)
+
 ## 16.0.33 alpha 2022-07-14
 
 * feat(developer): Option to skip embed of compiler version (#6920)
