@@ -1,4 +1,3 @@
-/// <reference path="../../../gestureRecognizer.ts" />
 /// <reference path="fixtureLayoutConfiguration.ts" />
 
 namespace Testing {

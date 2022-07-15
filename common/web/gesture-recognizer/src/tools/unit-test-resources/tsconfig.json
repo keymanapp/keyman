@@ -16,5 +16,5 @@
   "references": [
     { "path": "../../../." }
   ],
-  "include": ["./**/*.ts"]
+  "include": ["./src/**/*.ts"]
 }
