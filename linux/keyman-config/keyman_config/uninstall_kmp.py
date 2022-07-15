@@ -11,7 +11,7 @@ from keyman_config.ibus_util import uninstall_from_ibus, get_ibus_bus, restart_i
 from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_ibus_keyboard_id, is_gnome_shell
 
 
-def delete_dir(dir):
+def delete_dir(dir: str) -> bool:
     if not os.path.isdir(dir):
         logging.error("%s is not a directory", dir)
         return False
@@ -40,12 +40,12 @@ def uninstall_kmp_shared(packageID):
     logging.info("Uninstalling shared keyboard: %s", packageID)
     if not os.access(kbdir, os.X_OK | os.W_OK):  # Check for write access of keyman dir
         logging.error(
-            "You do not have permissions to uninstall the keyboard files. You need to run this with `sudo`")
+          "You do not have permissions to uninstall the keyboard files. You need to run this with `sudo`")
         exit(3)
     if os.path.isdir(kbdocdir):
         if not os.access(kbdocdir, os.X_OK | os.W_OK):  # Check for write access of keyman doc dir
             logging.error(
-                "You do not have permissions to uninstall the documentation. You need to run this with `sudo`")
+              "You do not have permissions to uninstall the documentation. You need to run this with `sudo`")
             exit(3)
         delete_dir(kbdocdir)
         logging.info("Removed documentation directory: %s", kbdocdir)
@@ -54,7 +54,7 @@ def uninstall_kmp_shared(packageID):
     if os.path.isdir(kbfontdir):
         if not os.access(kbfontdir, os.X_OK | os.W_OK):  # Check for write access of keyman fonts
             logging.error(
-                "You do not have permissions to uninstall the font files. You need to run this with `sudo`")
+              "You do not have permissions to uninstall the font files. You need to run this with `sudo`")
             exit(3)
         delete_dir(kbfontdir)
         logging.info("Removed font directory: %s", kbfontdir)

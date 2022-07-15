@@ -59,8 +59,8 @@ class ViewInstalledWindowBase(Gtk.Window):
     def on_installfile_clicked(self, button):
         logging.debug("Install from file clicked")
         dlg = Gtk.FileChooserDialog(
-            _("Choose a kmp file..."), self, Gtk.FileChooserAction.OPEN,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+          _("Choose a kmp file..."), self, Gtk.FileChooserAction.OPEN,
+          (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         dlg.resize(640, 480)
         filter_text = Gtk.FileFilter()
         # i18n: file type in file selection dialog

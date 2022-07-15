@@ -42,7 +42,7 @@ class DownloadKmpWindow(Gtk.Dialog):
         self.resize(800, 450)
         self.show_all()
 
-    def _process_kmp(self, url, downloadfile):
+    def _process_kmp(self, url, downloadfile: str):
         logging.info("Downloading kmp file to %s", downloadfile)
         if download_kmp_file(url, downloadfile):
             logging.info("File downloaded")

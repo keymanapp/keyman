@@ -13,6 +13,7 @@ except ImportError:
 
 
 class CanonicalLanguageCodeUtils():
+    @staticmethod
     def findBestTag(tag, addRegion, addScriptIfNotSuppressed):
         """
         Find a language code with appropriate script and region subtags</summary>
