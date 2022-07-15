@@ -186,8 +186,8 @@ namespace com.keyman {
      * Will also trigger OSK shift state / layer reset.
      **/
     pageFocusHandler = () => {
-      if(!this.uiManager.isActivating && this.osk?.vkbd) {
-        this.core.resetContext(null);
+      if(!this.uiManager.isActivating && this.osk?.vkbd && this.core.contextDevice.touchable) {
+        this.core.keyboardProcessor._UpdateVKShift(null);
       }
       return false;
     }
