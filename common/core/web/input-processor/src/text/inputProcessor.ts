@@ -10,7 +10,12 @@ namespace com.keyman.text {
       baseLayout: 'us'
     }
 
-    private device: utils.DeviceSpec;
+    /**
+     * Indicates the device (platform) to be used for non-keystroke events,
+     * such as those sent to `begin postkeystroke` and `begin newcontext` 
+     * entry points.
+     */
+    private contextDevice: utils.DeviceSpec;
     private kbdProcessor: KeyboardProcessor;
     private lngProcessor: prediction.LanguageProcessor;
 
@@ -23,7 +28,7 @@ namespace com.keyman.text {
         options = InputProcessor.DEFAULT_OPTIONS;
       }
 
-      this.device = device;
+      this.contextDevice = device;
       this.kbdProcessor = new KeyboardProcessor(device, options);
       this.lngProcessor = new prediction.LanguageProcessor();
     }
@@ -65,7 +70,7 @@ namespace com.keyman.text {
      *                                    all matched keyboard rules
      */
      processNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
-      const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.device, outputTarget);
+      const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.contextDevice, outputTarget);
 
       if(ruleBehavior) {
         ruleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
@@ -193,7 +198,7 @@ namespace com.keyman.text {
       this.keyboardProcessor.newLayerStore.set(hasLayerChanged ? this.keyboardProcessor.layerId : '');
       this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
 
-      let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(keyEvent.device, outputTarget);
+      let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget);
       if(postRuleBehavior) {
         postRuleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
       }
