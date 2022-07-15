@@ -15,11 +15,14 @@
   <!--
     To facilitate fixture extraction & insertion, the ONLY contents of the document's body
     should be those of the desired 'fixture'.
+
+    While it's possible to write the fixture directly outside of this... viewing the file
+    directly would be heavily affected by the missing necessary CSS.
   -->
   <body>
     <!-- START:  recognizer host fixture -->
     <!-- CSS classes for demo configuration should only be applied here, to `demoContainer`. -->
-    <div id="host-fixture" class="screen2 bounds1">
+    <div id="host-fixture" class="screen2 bounds1 safe-loose">
       <div id='faux-viewport' class="faux-screen">
         <div class="faux-screen-border"></div>
         <div id="safe-zone" class="safe-zone">

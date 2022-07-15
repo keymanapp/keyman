@@ -1,0 +1,122 @@
+body {
+  font-family: Tahoma,helvetica;
+  background-color: dimgray;
+}
+/* h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px} */
+
+.main {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  min-width: 40%;
+  max-width: 90%;
+  min-height: 75%;
+  width:fit-content;
+  height:fit-content;
+  background-color: white;
+  border: 2px solid black;
+  padding: max(10px, min(30px, 2.5%));
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+}
+
+p.center, h3.center {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: fit-content;
+}
+
+.flex {
+  display: flex;
+}
+
+#main-ux {
+  margin:    auto;
+  max-width: fit-content;
+}
+
+#menu-container {
+  padding-left: 40px;
+  min-width: 160px;
+}
+
+.legend {
+  margin: auto;
+  max-width: fit-content;
+}
+
+.legend div {
+  margin: 2px;
+}
+
+.legend .block {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin: 0px;
+}
+
+.legend p {
+  position: relative;
+  bottom: 2px;
+  display: inline-block;
+  padding-left: 4px;
+  margin: 0px;
+}
+
+.block {
+  display: block;
+}
+
+.radio-header {
+  margin-top: 0px;
+  margin-bottom: 4px;
+}
+
+#logging-zone {
+  padding-top: 10px;
+  max-width: 85%;
+  margin: auto;
+}
+
+#logging-host {
+  flex: 4;
+}
+
+#logging-controls {
+  padding-left: 10px;
+  flex: 1;
+}
+
+#event-log {
+  width: 100%;
+}
+
+.log-button {
+  padding: 2px;
+  margin: 2px;
+}
+
+@media only screen and (max-width: 500px) {
+  .flex {
+    flex-direction: column;
+  }
+
+  #demo-container {
+    margin: auto;
+  }
+
+  #menu-container {
+    padding-left: unset;
+    margin: auto;
+    padding-top: 10px;
+  }
+
+  #logging-controls {
+    padding-left: unset;
+    padding-top: 10px;
+  }
+}
