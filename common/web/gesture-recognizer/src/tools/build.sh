@@ -28,7 +28,12 @@ display_usage ( ) {
 }
 
 build ( ) {
-  npm run tsc -- -b "$(dirname $THIS_SCRIPT)/tsconfig.json"
+  echo "Building recorder page"
+  ./recorder/build.sh build
+  echo "Building unit-test resources module"
+  ./unit-test-resources/build.sh build
+  echo "Extracting fixture"
+  ./host-fixture/extract-fixture.sh > ../../build/tools/host-fixture.html
 }
 
 ################################ Main script ################################
@@ -46,9 +51,6 @@ if builder_has_action clean; then
 fi
 
 if builder_has_action build; then
-  echo "Building recorder page"
-  ./recorder/build.sh build
-  echo "Building unit-test resources module"
-  ./unit-test-resources/build.sh build
+  build
   builder_report build success
 fi
