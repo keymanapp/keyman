@@ -29,6 +29,7 @@ display_usage ( ) {
 
 build_recorder_page ( ) {
   cp src/pageStyle.css    build/pageStyle.css
+  cp src/recorder.js      build/recorder.js
 
   cp ../host-fixture/gestureHost.css  build/gestureHost.css
 

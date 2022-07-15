@@ -8,6 +8,10 @@ namespace com.keyman.osk {
    * - 'end':     all gesture recognition on the sequence is to be resolved.
    */
   export class Incomplete<Type, UpdateType> extends EventEmitter {
+    public static readonly UPDATE_EVENT = 'update';
+    public static readonly CANCEL_EVENT = 'cancel';
+    public static readonly END_EVENT    = 'end';
+
     public readonly item: Type;
 
     private isActive = true;

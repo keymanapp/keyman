@@ -31,6 +31,11 @@ namespace com.keyman.osk {
       return this._currentTarget;
     }
 
+    public get fullIdentifier(): string {
+      const prefix = this.isFromTouch ? 'touch' : 'mouse';
+      return `${prefix}:sequence.item.identifier`;
+    }
+
     addSample(sample: InputSample) {
       this.samples.push(sample);
     }

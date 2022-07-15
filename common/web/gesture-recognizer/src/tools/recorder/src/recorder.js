@@ -4,6 +4,7 @@
 
 // -- BEGIN:  Code for controlling the layout-simulation elements --
 
+// TODO: Convert to use unit-test-resource's config class.
 function updateConfig() {
   let layout = document.config.screen;     // Referred to radio-group values on the actual host page.
   let bounds = document.config.bounds;
@@ -13,6 +14,7 @@ function updateConfig() {
   demoContainer.className = layout.value + " " + bounds.value + " " + receiver.value;
 }
 
+// TODO: This too. (re prev TODO)
 window.addEventListener('load', function(ev) {
   updateConfig();
 });
@@ -37,6 +39,7 @@ window.addEventListener('load', function() {
 
   recognizer = new com.keyman.osk.GestureRecognizer(recognizerConfig);
 
+  // TODO:  convert to use unit-test-resources's recorder class.
   let recordingObj = {};
 
   // DOM-oriented logging setup.
@@ -54,6 +57,8 @@ window.addEventListener('load', function() {
   recognizer.on('inputstart', function(sequence) {
     recordingObj[sequence.item.identifier] = {sequence: sequence.item, result: null};
 
+    // The actual printing-to-page-element will need local code.
+    // The prepping-to-print code should be shifted into the recorder.
     objectPrinter = function() {
       logElement.value = '';
 
@@ -73,12 +78,10 @@ window.addEventListener('load', function() {
     });
 
     sequence.on('cancel', function(seq) {
-      recordingObj[seq.item.identifier].result = 'canceled';
       objectPrinter();
     });
 
     sequence.on('end', function(seq) {
-      recordingObj[seq.item.identifier].result = 'ended';
       objectPrinter();
     });
   });
