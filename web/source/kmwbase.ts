@@ -177,14 +177,25 @@ namespace com.keyman {
     }
 
     /**
+     * Reset context when entering or exiting the active element.
+     * Will also trigger OSK shift state / layer reset.
+     **/
+    pageFocusHandler = () => {
+      if(!this.uiManager.isActivating && this.osk?.vkbd) {
+        this.core.resetContext(null);
+      }
+      return false;
+    }
+
+    /**
      * Triggers a KeymanWeb engine shutdown to facilitate a full system reset.
      * This function is designed for use with KMW unit-testing, which reloads KMW
      * multiple times to test the different initialization paths.
      */
     ['shutdown']() {
       // Disable page focus/blur events, which can sometimes trigger and cause parallel KMW instances in testing.
-      this.util.detachDOMEvent(window, 'focus', this['pageFocusHandler'], false);
-      this.util.detachDOMEvent(window, 'blur', this['pageFocusHandler'], false);
+      this.util.detachDOMEvent(window, 'focus', this.pageFocusHandler, false);
+      this.util.detachDOMEvent(window, 'blur', this.pageFocusHandler, false);
 
       this.domManager.shutdown();
       this.osk.shutdown();
