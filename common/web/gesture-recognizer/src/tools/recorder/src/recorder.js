@@ -1,7 +1,3 @@
-// FIXME:  DELETE THIS FILE.  I ONLY COPIED IT HERE FOR EASE OF REFERENCE.
-
-// Refer to gestureHost.css for the different layout CSS classes.
-
 const controller = new Testing.HostFixtureLayoutController();
 let loadPromise = controller.connect();
 let recorder;
