@@ -5,16 +5,28 @@ namespace com.keyman.osk {
    */
   export interface InputSample {
     /**
-     * Represents the x-coordinate of one sample of the input
+     * Represents the x-coordinate of the input sample
      * in 'client' / viewport coordinates.
      */
-    x: number;
+    clientX: number;
 
     /**
-     * Represents the y-coordinate of one sample of the input
+     * Represents the x-coordinate of the input sample in
+     * coordinates relative to the recognizer's `targetRoot`.
+     */
+    targetX: number;
+
+    /**
+     * Represents the y-coordinate of the input sample
      * in 'client' / viewport coordinates.
      */
-    y: number;
+    clientY: number;
+
+    /**
+     * Represents the y-coordinate of the input sample in
+     * coordinates relative to the recognizer's `targetRoot`.
+     */
+    targetY: number;
 
     /**
      * Represents the timestamp at which the input was observed

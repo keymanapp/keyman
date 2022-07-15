@@ -39,10 +39,20 @@ namespace com.keyman.osk {
       this._activeSequenceWrappers = this._activeSequenceWrappers.filter((seq) => seq.item.identifier != identifier);
     }
 
+    protected buildSampleFor(clientX, clientY): InputSample {
+      const targetRect = this.config.targetRoot.getBoundingClientRect();
+      return {
+        clientX: clientX,
+        clientY: clientY,
+        targetX: clientX - targetRect.left,
+        targetY: clientY - targetRect.top,
+        t: performance.now()
+      };
+    }
+
     onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
       let sequence = new InputSequence(identifier, target, this instanceof TouchEventEngine);
-      let mappedSample = ZoneBoundaryChecker.getRelativeCoord(sample, this.config);
-      sequence.addSample(mappedSample);
+      sequence.addSample(sample);
 
       let sequenceWrapper = new Incomplete<InputSequence, InputSample>(sequence);
 
@@ -62,10 +72,9 @@ namespace com.keyman.osk {
     }
 
     onInputMove(identifier: number, sample: InputSample) {
-      let mappedSample = ZoneBoundaryChecker.getRelativeCoord(sample, this.config);
       const sequenceWrapper = this.getSequenceWrapperWithId(identifier);
-      sequenceWrapper.item.addSample(mappedSample);
-      sequenceWrapper.signalUpdate(mappedSample);
+      sequenceWrapper.item.addSample(sample);
+      sequenceWrapper.signalUpdate(sample);
     }
 
     onInputMoveCancel(identifier: number) {

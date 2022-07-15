@@ -18,17 +18,13 @@ namespace com.keyman.osk {
      * @param ignoreBitmask A bitmask indicating select boundaries to ignore for the check.
      */
     static getCoordZoneBitmask(coord: InputSample, zone: RecognitionZoneSource): number {
-      // coord uses page-based coords, not client-based!
-      let screenX = coord.x;
-      let screenY = coord.y;
-
       const bounds = zone.getBoundingClientRect();
 
       let bitmask = 0;
-      bitmask |= (screenX < bounds.left)   ? ZoneBoundaryChecker.FAR_LEFT   : 0;
-      bitmask |= (screenX > bounds.right)  ? ZoneBoundaryChecker.FAR_RIGHT  : 0;
-      bitmask |= (screenY < bounds.top)    ? ZoneBoundaryChecker.FAR_TOP    : 0;
-      bitmask |= (screenY > bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
+      bitmask |= (coord.clientX < bounds.left)   ? ZoneBoundaryChecker.FAR_LEFT   : 0;
+      bitmask |= (coord.clientX > bounds.right)  ? ZoneBoundaryChecker.FAR_RIGHT  : 0;
+      bitmask |= (coord.clientY < bounds.top)    ? ZoneBoundaryChecker.FAR_TOP    : 0;
+      bitmask |= (coord.clientY > bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
 
       return bitmask; // returns zero if effectively 'within bounds'.
     }
@@ -67,16 +63,6 @@ namespace com.keyman.osk {
       // If the active input sequence started close enough to a safe zone border, we
       // disable that part of the said border for any cancellation checks.
       return !!(borderProximityBitmask & ~ignoredSafeBoundFlags);
-    }
-
-    static getRelativeCoord(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration>): InputSample {
-      let parentRect = config.targetRoot.getBoundingClientRect();
-
-      return {
-        x: coord.x - parentRect.left,
-        y: coord.y - parentRect.top,
-        t: coord.t
-      };
     }
   }
 }

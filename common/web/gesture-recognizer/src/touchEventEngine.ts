@@ -74,6 +74,10 @@ namespace com.keyman.osk {
       delete this.safeBoundMaskMap[identifier];
     }
 
+    private buildSampleFromTouch(touch: Touch): InputSample {
+      return this.buildSampleFor(touch.clientX, touch.clientY);
+    }
+
     onTouchStart(event: TouchEvent) {
       // If it's not an event we'd consider handling, do not prevent event
       // propagation!  Just don't process it.
@@ -85,12 +89,7 @@ namespace com.keyman.osk {
 
       for(let i=0; i < event.changedTouches.length; i++) {
         const touch = event.changedTouches.item(i);
-
-        const sample: InputSample = {
-          x: touch.clientX,
-          y: touch.clientY,
-          t: performance.now()
-        };
+        const sample = this.buildSampleFromTouch(touch);
 
         if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
           // If we started very close to a safe zone border, remember which one(s).
@@ -115,11 +114,7 @@ namespace com.keyman.osk {
 
         this.preventPropagation(event);
 
-        const sample: InputSample = {
-          x: touch.clientX,
-          y: touch.clientY,
-          t: performance.now()
-        };
+        const sample = this.buildSampleFromTouch(touch);
 
         if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.safeBoundMaskMap[touch.identifier])) {
           this.onInputMove(touch.identifier, sample);
@@ -139,11 +134,7 @@ namespace com.keyman.osk {
 
         this.preventPropagation(event);
 
-        const sample: InputSample = {
-          x: touch.clientX,
-          y: touch.clientY,
-          t: performance.now()
-        };
+        const sample = this.buildSampleFromTouch(touch);
 
         this.onInputEnd(touch.identifier, sample);
       }

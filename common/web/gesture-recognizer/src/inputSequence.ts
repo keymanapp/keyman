@@ -37,9 +37,11 @@ namespace com.keyman.osk {
 
     // For use with JSON.stringify.
     static _replacer(key: string, value: any) {
-      if(key == "_currentTarget") {
+      if(key == "_currentTarget") { // No point in trying to save an HTMLElement to JSON.
         return undefined;
-      } else if(key == "identifier") {
+      } else if(key == "identifier") { // Only matters when receiving input, not when replaying it.
+        return undefined;
+      } else if(key == "clientX" || key == "clientY") { // We can reconstruct them from the `target[X|Y]` values.
         return undefined;
       } else {
         return value;

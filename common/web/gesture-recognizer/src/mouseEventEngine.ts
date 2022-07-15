@@ -84,6 +84,10 @@ namespace com.keyman.osk {
       }
     }
 
+    private buildSampleFromEvent(event: MouseEvent): InputSample {
+      return this.buildSampleFor(event.clientX, event.clientY);
+    }
+
     onMouseStart(event: MouseEvent) {
       // If it's not an event we'd consider handling, do not prevent event
       // propagation!  Just don't process it.
@@ -93,11 +97,7 @@ namespace com.keyman.osk {
 
       this.preventPropagation(event);
 
-      const sample: InputSample = {
-        x: event.clientX,
-        y: event.clientY,
-        t: performance.now()
-      };
+      const sample = this.buildSampleFromEvent(event);
 
       if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
         // If we started very close to a safe zone border, remember which one(s).
@@ -113,11 +113,7 @@ namespace com.keyman.osk {
         return;
       }
 
-      const sample: InputSample = {
-        x: event.clientX,
-        y: event.clientY,
-        t: performance.now()
-      };
+      const sample = this.buildSampleFromEvent(event);
 
       if(!event.buttons) {
         if(this.hasActiveClick) {
@@ -145,11 +141,7 @@ namespace com.keyman.osk {
         this.hasActiveClick = false;
       }
 
-      const sample: InputSample = {
-        x: event.clientX,
-        y: event.clientY,
-        t: performance.now()
-      };
+      const sample = this.buildSampleFromEvent(event);
       this.onInputEnd(this.activeIdentifier, sample);
     }
   }
