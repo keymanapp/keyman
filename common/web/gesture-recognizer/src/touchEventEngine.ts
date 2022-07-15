@@ -7,7 +7,9 @@ namespace com.keyman.osk {
     private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
     private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
-    public constructor(config: GestureRecognizerConfiguration) {
+    private disabledSafeBounds: number = 0;
+
+    public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
 
       this._touchStart = this.onTouchStart.bind(this);
@@ -23,7 +25,6 @@ namespace com.keyman.osk {
     //   let config: GestureRecognizerConfiguration = {
     //     targetRoot: vkbd.element,
     //     eventRoot: vkbd.element,
-    //     coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
     //   };
 
     //   return new TouchEventEngine(config);
@@ -35,7 +36,6 @@ namespace com.keyman.osk {
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: banner.getDiv(),
-    //     coordConstrainedWithinInteractiveBounds: function() { return true; }
     //   };
 
     //   return new TouchEventEngine(config);
@@ -70,14 +70,26 @@ namespace com.keyman.osk {
 
     onTouchStart(event: TouchEvent) {
       this.preventPropagation(event);
-      this.onInputStart(InputEventCoordinate.fromEvent(event));
+      const coord = InputEventCoordinate.fromEvent(event)
+
+      if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(coord, this.config)) {
+        // If we started very close to a safe zone border, remember which one(s).
+        // This is important for input-sequence cancellation check logic.
+        this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(coord, this.config);
+      } else {
+        this.disabledSafeBounds = 0;
+        // TODO:  disable tracking for the specific `Touch` that just started.
+        // Requires explicit implementation of multi-touch tracking, which has not yet been added.
+      }
+
+      this.onInputStart(coord);
     }
 
     onTouchMove(event: TouchEvent) {
       this.preventPropagation(event);
       const coord = InputEventCoordinate.fromEvent(event);
 
-      if(this.config.coordConstrainedWithinInteractiveBounds(coord)) {
+      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(coord, this.config, this.disabledSafeBounds)) {
         this.onInputMove(coord);
       } else {
         this.onInputMoveCancel(coord);

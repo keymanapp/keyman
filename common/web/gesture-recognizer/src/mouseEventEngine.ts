@@ -8,9 +8,10 @@ namespace com.keyman.osk {
     private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
 
     private hasActiveClick: boolean = false;
+    private disabledSafeBounds: number = 0;
     private ignoreSequence: boolean = false;
 
-    public constructor(config: GestureRecognizerConfiguration) {
+    public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
 
       this._mouseStart = this.onMouseStart.bind(this);
@@ -28,7 +29,6 @@ namespace com.keyman.osk {
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: document.body,
-    //     coordConstrainedWithinInteractiveBounds: vkbd.detectWithinInteractiveBounds.bind(vkbd)
     //   };
 
     //   return new MouseEventEngine(config);
@@ -40,7 +40,6 @@ namespace com.keyman.osk {
     //     // document.body is the event root b/c we need to track the mouse if it leaves
     //     // the VisualKeyboard's hierarchy.
     //     eventRoot: document.body,
-    //     coordConstrainedWithinInteractiveBounds: function() { return true; }
     //   };
 
     //   return new MouseEventEngine(config);
@@ -79,7 +78,15 @@ namespace com.keyman.osk {
       }
 
       this.preventPropagation(event);
-      this.onInputStart(InputEventCoordinate.fromEvent(event));
+      const coord = InputEventCoordinate.fromEvent(event);
+
+      if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(coord, this.config)) {
+        // If we started very close to a safe zone border, remember which one(s).
+        // This is important for input-sequence cancellation check logic.
+        this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(coord, this.config);
+      }
+
+      this.onInputStart(coord);
       this.hasActiveClick = true;
     }
 
@@ -103,7 +110,7 @@ namespace com.keyman.osk {
 
       this.preventPropagation(event);
 
-      if(this.config.coordConstrainedWithinInteractiveBounds(coord)) {
+      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(coord, this.config, this.disabledSafeBounds)) {
         this.onInputMove(coord);
       } else {
         this.onInputMoveCancel(coord);

@@ -8,21 +8,10 @@ namespace com.keyman.osk {
   export abstract class InputEventEngine extends EventEmitter {
     public static readonly INPUT_UPDATE_EVENT_NAME = "inputUpdate";
 
-    protected readonly config: GestureRecognizerConfiguration;
+    protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
-    protected static preprocessConfig(config: GestureRecognizerConfiguration): GestureRecognizerConfiguration {
-      // Allows configuration pre-processing during this method.
-      let processingConfig: Mutable<GestureRecognizerConfiguration> = Object.assign({}, config);
-      processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
-      processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
-
-      return processingConfig;
-    }
-
-    public constructor(config: GestureRecognizerConfiguration) {
+    public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super();
-
-      config = InputEventEngine.preprocessConfig(config);
       this.config = config;
     }
 

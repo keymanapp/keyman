@@ -1,3 +1,7 @@
+/// <reference path="recognitionZoneSource.ts" />
+/// <reference path="viewportZoneSource.ts" />
+/// <reference path="nonoptional.ts" />
+
 namespace com.keyman.osk {
   export interface GestureRecognizerConfiguration {
     /**
@@ -18,6 +22,48 @@ namespace com.keyman.osk {
      */
     readonly targetRoot: HTMLElement;
 
-    readonly coordConstrainedWithinInteractiveBounds: (coord: InputEventCoordinate) => boolean;
+    /**
+     * A boundary constraining the legal coordinates for supported touchstart and mousedown
+     * events.  If not specified, this will be set to `targetRoot`.
+     */
+    readonly inputStartBounds?: RecognitionZoneSource;
+
+    /**
+     * A boundary constraining the maximum range that an ongoing input may travel before it
+     * is forceably canceled.  If not specified, this will be set to `targetRoot`.
+     */
+    readonly maxRoamingBounds?: RecognitionZoneSource;
+
+    /**
+     * A boundary constraining the "safe range" for ongoing touch events.  Events that leave a
+     * safe boundary that did not start outside its respective "padded" bound will be canceled.
+     *
+     * If not specified, this will be based on the active viewport, padded internally by 2px on
+     * all sides.
+     */
+    readonly safeBounds?: RecognitionZoneSource;
+
+    /**
+     * Used to define a "boundary" slightly more constrained than `safeBounds`.  Events that
+     * start within this pixel range from a safe bound will disable that bound for the duration
+     * of its corresponding input sequence.  May be a number or an array of 1, 2, or 4 numbers,
+     * as with CSS styling.
+     *
+     * If not specified, this will default to a padding of 3px inside the standard safeBounds
+     * unless `paddedSafeBounds` is defined.
+     *
+     * If `paddedSafeBounds` was specified initially, this will be set to `undefined`.
+     */
+    readonly safeBoundPadding?: number | number[];
+
+    /**
+     * Used to define when an input coordinate is "close" to `safeBounds` borders via exclusion.
+     * If this is not defined while `safeBoundPadding` is, this will be built automatically to
+     * match the spec set by `safeBoundPadding`.
+     *
+     * Defining this directly will cause `safeBoundPadding` to be ignored in favor of the bounds
+     * set here.
+     */
+    readonly paddedSafeBounds?: RecognitionZoneSource;
   }
 }
