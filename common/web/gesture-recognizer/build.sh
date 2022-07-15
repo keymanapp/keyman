@@ -32,7 +32,7 @@ display_usage ( ) {
 
 ################################ Main script ################################
 
-builder_init "clean configure build" "$@"
+builder_init "clean configure build tools test" "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
@@ -57,4 +57,9 @@ fi
 if builder_has_action test; then
   npm test
   builder_report test success
+fi
+
+if builder_has_action tools; then
+  src/tools/build.sh build
+  builder_report tools success
 fi
