@@ -477,7 +477,10 @@ begin
     with PCWPSTRUCT(lParam)^ do
       if message = WM_INPUTLANGCHANGE then
         PostMessage(frmKeymanDeveloper.Handle, WM_USER_INPUTLANGCHANGE, wParam, lParam);
-  Result := CallNextHookEx(frmKeymanDeveloper.hInputLangChangeHook, nCode, wParam, lParam);
+  if frmKeymanDeveloper <> nil then
+    Result := CallNextHookEx(frmKeymanDeveloper.hInputLangChangeHook, nCode, wParam, lParam)
+  else
+    Result := 0;
 end;
 
 
