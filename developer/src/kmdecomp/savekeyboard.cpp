@@ -251,7 +251,7 @@ PWCHAR ExtString(PWCHAR str)
 				str++;
 				if(*str & VIRTUALCHARKEY)
 					wsprintfW(p, L"[%s%c%c%c] ", flagstr(*str), *(str+1) == L'"' ? L'\'' : L'"',
-						str+1, *(str+1) == L'"' ? L'\'' : L'"');
+						*(str+1), *(str+1) == L'"' ? L'\'' : L'"');
 				else
         {
           if(*(str+1) > VK__MAX)  // I3438
