@@ -29,6 +29,10 @@ loadPromise.then((recognizer) => {
     recorder.clear();
   }
 
+  controller.on(Testing.HostFixtureLayoutController.CONFIG_CHANGED_EVENT, () => {
+    logElement.value = '';
+  });
+
   let logSaveButton = document.getElementById('log-save-button');
   logSaveButton.onclick = function() {
     presentSavableJSON(recorder.recordingsToJSON());

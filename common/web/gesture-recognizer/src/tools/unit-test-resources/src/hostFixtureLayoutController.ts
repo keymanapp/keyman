@@ -1,7 +1,9 @@
 /// <reference path="fixtureLayoutConfiguration.ts" />
 
 namespace Testing {
-  export class HostFixtureLayoutController {
+  export class HostFixtureLayoutController extends EventEmitter {
+    public static readonly CONFIG_CHANGED_EVENT = "configchanged";
+
     private _recognizer: com.keyman.osk.GestureRecognizer;
     private _loadPromise: Promise<com.keyman.osk.GestureRecognizer>;
 
@@ -9,6 +11,7 @@ namespace Testing {
     private _layoutConfig: FixtureLayoutConfiguration;
 
     public constructor() {
+      super();
       this._layoutConfig = new FixtureLayoutConfiguration();
     }
 
@@ -27,7 +30,7 @@ namespace Testing {
     public set layoutConfiguration(config: FixtureLayoutConfiguration) {
       this._layoutConfig = config;
 
-      // TODO:  raise a 'changed configuration' event that SequenceRecorder may listen to?
+      this.emit(HostFixtureLayoutController.CONFIG_CHANGED_EVENT, config);
 
       if(this.isReady) {
         this._applyLayoutConfig();

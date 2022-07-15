@@ -16,6 +16,9 @@ namespace Testing {
 
     constructor(controller: HostFixtureLayoutController) {
       this.controller = controller;
+      controller.on(HostFixtureLayoutController.CONFIG_CHANGED_EVENT, () => {
+        this.clear();
+      });
 
       this._attachRecognizerHooks();
     }

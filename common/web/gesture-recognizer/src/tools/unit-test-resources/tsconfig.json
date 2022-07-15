@@ -16,5 +16,8 @@
   "references": [
     { "path": "../../../." }
   ],
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts"],
+  "files": [
+    "../../../../../../node_modules/eventemitter3/index.js"
+  ]
 }
