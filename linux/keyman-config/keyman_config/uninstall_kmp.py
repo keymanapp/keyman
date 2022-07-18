@@ -4,6 +4,7 @@ import logging
 import os
 from shutil import rmtree
 
+from keyman_config import _
 from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.get_kmp import InstallLocation, get_keyboard_dir, get_keyman_doc_dir, get_keyman_font_dir
 from keyman_config.kmpmetadata import get_metadata
