@@ -183,7 +183,7 @@ KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *l
 
   if(*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED))
   {
-    delete buf;
+    delete [] buf;
     DebugLog("Invalid file - signature is invalid");
     return FALSE;
   }
@@ -198,7 +198,11 @@ KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *l
 
   if(!kbp) return FALSE;
 
-  if(kbp->dwIdentifier != FILEID_COMPILED) { delete buf; DebugLog("errNotFileID"); return FALSE; }
+  if(kbp->dwIdentifier != FILEID_COMPILED) {
+    delete [] buf;
+    DebugLog("errNotFileID");
+    return FALSE;
+  }
 
   *lpKeyboard = kbp;
 
