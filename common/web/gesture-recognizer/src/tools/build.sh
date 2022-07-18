@@ -34,6 +34,7 @@ build ( ) {
   ./unit-test-resources/build.sh build
   echo "Extracting fixture"
   ./host-fixture/extract-fixture.sh > ../../build/tools/host-fixture.html
+  cp ./host-fixture/gestureHost.css ../../build/tools/gestureHost.css
 }
 
 ################################ Main script ################################

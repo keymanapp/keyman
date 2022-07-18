@@ -93,7 +93,6 @@ window.addEventListener('load', function(ev) {
   updateConfig();
 });
 
-// TODO: Convert to use unit-test-resource's config class.
 function updateConfig() {
   let layout = document.config.screen;     // Referred to radio-group values on the actual host page.
   let bounds = document.config.bounds;

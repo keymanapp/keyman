@@ -3,11 +3,13 @@
 # Extracts and returns the fixture contents of `host-fixture.html`.
 #
 
+set -eu
+
 # This script operates from the perspective of its own directory.
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 cd $(dirname "$THIS_SCRIPT")
 
-FIXTURE=`cat host-fixture.html`
+FIXTURE_START="    <!-- START: recognizer host fixture -->"
+FIXTURE_END="    <!-- END: recognizer host fixture -->"
 
-# Drops most whitespace, unfortunately.  But it does the job otherwise, so... we'll take it.
-echo $FIXTURE | sed -e "s/.*<body>\(.*\)<\/body>.*/\1/"
+sed -n "/$FIXTURE_START/, /$FIXTURE_END/{ /$FIXTURE_START/! { /$FIXTURE_END/! p } }" host-fixture.html
