@@ -22,11 +22,11 @@ class KeymanConfigService(dbus.service.Object):
         dbus.service.Object.__init__(self, bus_name, OBJECT_PATH)
 
     @dbus.service.signal(BUS_NAME)
-    def KeyboardListChangedSignal(self) -> None:
+    def KeyboardListChangedSignal(self):
         pass
 
     @dbus.service.method(BUS_NAME)
-    def keyboard_list_changed(self) -> None:
+    def keyboard_list_changed(self):
         logging.debug("%s: -------------keyboard_list_changed--------------------" % os.getpid())
         if self.__keyboard_list_changed_handler:
             self.__keyboard_list_changed_handler()
