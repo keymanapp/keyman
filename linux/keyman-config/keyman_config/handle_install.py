@@ -1,11 +1,11 @@
 import logging
 import os
-
 from urllib.parse import parse_qs, urlparse
-from keyman_config import KeymanComUrl, __tier__
-from keyman_config.install_window import InstallKmpWindow
-from keyman_config.get_kmp import get_download_folder, download_kmp_file
 from zipfile import is_zipfile
+
+from keyman_config import KeymanComUrl, __tier__
+from keyman_config.get_kmp import download_kmp_file, get_download_folder
+from keyman_config.install_window import InstallKmpWindow
 
 
 def download_and_install_package(url):

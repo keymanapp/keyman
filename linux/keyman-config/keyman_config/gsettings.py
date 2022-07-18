@@ -3,9 +3,9 @@ import logging
 import os
 import subprocess
 import sys
-from gi.repository import Gio
 
 from gi.overrides.GLib import Variant
+from gi.repository import Gio
 
 
 class GSettings():
