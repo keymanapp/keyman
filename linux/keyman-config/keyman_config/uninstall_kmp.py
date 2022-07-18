@@ -5,10 +5,14 @@ import os
 from shutil import rmtree
 
 from keyman_config.fcitx_util import is_fcitx_running
-from keyman_config.get_kmp import InstallLocation, get_keyboard_dir, get_keyman_doc_dir, get_keyman_font_dir
+from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
+                                   get_keyman_doc_dir, get_keyman_font_dir)
+from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
+                                                get_ibus_keyboard_id,
+                                                is_gnome_shell)
+from keyman_config.ibus_util import (get_ibus_bus, restart_ibus,
+                                     uninstall_from_ibus)
 from keyman_config.kmpmetadata import get_metadata
-from keyman_config.ibus_util import uninstall_from_ibus, get_ibus_bus, restart_ibus
-from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_ibus_keyboard_id, is_gnome_shell
 
 
 def delete_dir(dir: str) -> bool:

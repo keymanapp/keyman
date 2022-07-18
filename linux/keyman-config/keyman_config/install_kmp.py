@@ -4,20 +4,23 @@ import json
 import logging
 import os
 import zipfile
-from shutil import rmtree
-from enum import Enum
 from distutils.version import StrictVersion
+from enum import Enum
+from shutil import rmtree
 
 from keyman_config import _, __version__, secure_lookup
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
+from keyman_config.convertico import checkandsaveico, extractico
 from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
-from keyman_config.get_kmp import get_keyboard_data, get_keyboard_dir, get_keyman_doc_dir
-from keyman_config.get_kmp import get_keyman_font_dir, InstallLocation
-from keyman_config.kmpmetadata import get_metadata, KMFileTypes
-from keyman_config.convertico import extractico, checkandsaveico
+from keyman_config.get_kmp import (InstallLocation, get_keyboard_data,
+                                   get_keyboard_dir, get_keyman_doc_dir,
+                                   get_keyman_font_dir)
+from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
+                                                get_ibus_keyboard_id,
+                                                is_gnome_shell)
+from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, restart_ibus
+from keyman_config.kmpmetadata import KMFileTypes, get_metadata
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
-from keyman_config.ibus_util import install_to_ibus, restart_ibus, get_ibus_bus
-from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_ibus_keyboard_id, is_gnome_shell
 
 # TODO userdir install
 # special processing for kmn if needed

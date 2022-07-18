@@ -7,24 +7,29 @@ import os
 import pathlib
 import subprocess
 import sys
-import webbrowser
 import tempfile
+import webbrowser
+
 import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 
-from gi.repository import Gtk, WebKit2
 from distutils.version import StrictVersion
+
+from gi.repository import Gtk, WebKit2
+
 from keyman_config import _, secure_lookup
-from keyman_config.fcitx_util import is_fcitx_running
-from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
-from keyman_config.list_installed_kmp import get_kmp_version
-from keyman_config.kmpmetadata import get_fonts
-from keyman_config.welcome import WelcomeView
-from keyman_config.uninstall_kmp import uninstall_kmp
-from keyman_config.get_kmp import InstallLocation, get_keyboard_dir, get_keyman_dir
 from keyman_config.accelerators import bind_accelerator, init_accel
+from keyman_config.fcitx_util import is_fcitx_running
+from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
+                                   get_keyman_dir)
+from keyman_config.install_kmp import (InstallError, InstallStatus,
+                                       extract_kmp, get_metadata, install_kmp)
+from keyman_config.kmpmetadata import get_fonts
+from keyman_config.list_installed_kmp import get_kmp_version
+from keyman_config.uninstall_kmp import uninstall_kmp
+from keyman_config.welcome import WelcomeView
 
 
 def find_keyman_image(image_file):
