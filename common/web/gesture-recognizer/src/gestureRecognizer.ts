@@ -13,7 +13,7 @@ namespace com.keyman.osk {
   export class GestureRecognizer extends EventEmitter {
     public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "inputstart";
 
-    protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
+    public readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
     private readonly mouseEngine: MouseEventEngine;
     private readonly touchEngine: TouchEventEngine;

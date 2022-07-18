@@ -1,4 +1,4 @@
-let assert = chai.assert;
+var assert = chai.assert;
 
 describe("'Canary' checks", function() {
   this.timeout(testconfig.timeouts.standard);
