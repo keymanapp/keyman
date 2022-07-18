@@ -25,6 +25,7 @@ display_usage ( ) {
   echo "  all                    runs all unit test sets in CI mode"
   echo "  ci                     runs selected unit tests via BrowserStack with CI-oriented reporting"
   echo "  local                  runs selected unit test sets locally with local-oriented reporting"
+  echo "  browser-debug          runs all browser-based unit tests in persistent local mode."
 }
 
 test-headless ( ) {
@@ -32,13 +33,17 @@ test-headless ( ) {
 }
 
 test-browser ( ) {
-  if [ $REPORT_STYLE == "local" ]; then
+  KARMA_FLAGS=
+  if [[ $# -eq 1  && $1 == "debug" ]]; then
+    KARMA_CONFIG="manual.conf.js"
+    KARMA_FLAGS="--no-single-run"
+  elif [ $REPORT_STYLE == "local" ]; then
     KARMA_CONFIG="manual.conf.js"
   else
     KARMA_CONFIG="CI.conf.js"
   fi
 
-  npm run karma -- start src/test/auto/browser/$KARMA_CONFIG
+  npm run karma -- start src/test/auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
 }
 
 ################################ Main script ################################
@@ -46,7 +51,7 @@ test-browser ( ) {
 # Yes, this is a test script, not a build script.  But why not use the new
 # style anyway?
 
-builder_init "headless browser all ci local" "$@"
+builder_init "headless browser all ci local browser-debug" "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
@@ -92,7 +97,10 @@ if builder_has_action headless; then
   builder_report headless success
 fi
 
-if builder_has_action browser; then
+if builder_has_action browser-debug; then
+  test-browser debug
+  builder_report browser-debug success
+elif builder_has_action browser; then
   test-browser
   builder_report browser success
 fi

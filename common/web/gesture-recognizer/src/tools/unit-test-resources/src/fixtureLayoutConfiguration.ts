@@ -1,3 +1,5 @@
+/// <reference path="inputRecording.ts" />
+
 namespace Testing {
   /*
    * Cross-reference all enum definitions in this class with those of host-fixture/gestureHost.css.
@@ -35,14 +37,29 @@ namespace Testing {
     public safeZoneStyle: SafeLayoutClass;
 
     constructor()
+    constructor(recordedConfig: JSONObject<FixtureLayoutConfiguration>)
     constructor(deviceStyle?: DeviceLayoutClass,
                 roamingStyle?: RoamingLayoutClass,
                 receiverStyle?: ReceiverLayoutClass,
                 safeZoneStyle?: SafeLayoutClass);
-    constructor(deviceStyle?: DeviceLayoutClass,
+    constructor(param1?: DeviceLayoutClass | JSONObject<FixtureLayoutConfiguration>,
                 roamingStyle?: RoamingLayoutClass,
                 receiverStyle?: ReceiverLayoutClass,
                 safeZoneStyle?: SafeLayoutClass) {
+      let deviceStyle: DeviceLayoutClass;
+
+      // Determine constructor form utilized & disambiguate.
+      if(param1 && typeof param1 != "string") {
+        const recordedConfig = param1;
+
+        deviceStyle   = recordedConfig.deviceStyle;
+        roamingStyle  = recordedConfig.roamingStyle;
+        receiverStyle = recordedConfig.receiverStyle;
+        safeZoneStyle = recordedConfig.safeZoneStyle;
+      } else {
+        deviceStyle = param1 as DeviceLayoutClass;
+      }
+
       this.deviceStyle   = deviceStyle   ?? DeviceLayoutClass.MOBILE_PHONE_PAGE;
       this.roamingStyle  = roamingStyle  ?? RoamingLayoutClass.TOP_OVERFLOW;
       this.receiverStyle = receiverStyle ?? ReceiverLayoutClass.KEYBOARD_STYLE;

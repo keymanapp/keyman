@@ -29,6 +29,7 @@
     "clean": "tsc -b --clean",
     "karma": "karma",
     "mocha": "mocha",
+    "test": "gosh ./src/test/test.sh",
     "tsc": "tsc"
   },
   "dependencies": {

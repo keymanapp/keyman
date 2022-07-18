@@ -73,7 +73,7 @@ module.exports = {
 
   // Settings to properly configure how JSON fixtures are automatically loaded by Karma.
   jsonFixturesPreprocessor: {
-    stripPrefix: 'src/test/resources/json',
+    stripPrefix: 'src/test/resources/json/',
     variableName: '__json__'
   },
 
