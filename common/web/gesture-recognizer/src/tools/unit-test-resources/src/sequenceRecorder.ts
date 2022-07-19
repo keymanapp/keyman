@@ -11,8 +11,12 @@ namespace Testing {
 
   export class SequenceRecorder {
     controller: HostFixtureLayoutController;
-    wrappers: {[identifier: string]: WrappedInputSequence}  = {};
-    records:  {[identifier: string]: RecordedInputSequence} = {};
+    records:  {[identifier: string]: RecordedCoordSequence} = {};
+
+    /**
+     * Tracks the order in which each sequence was first detected.
+     */
+    startOrder: string[] = [];
 
     constructor(controller: HostFixtureLayoutController) {
       this.controller = controller;
@@ -26,8 +30,11 @@ namespace Testing {
     private _attachRecognizerHooks() {
       this.controller.recognizer.on(com.keyman.osk.GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, (wrappedSequence: WrappedInputSequence) => {
         const id = wrappedSequence.item.fullIdentifier;
-        this.wrappers[id] = wrappedSequence;
+        // TS, by default, doesn't like how we're "publicizing" the private field by doing this.
+        //@ts-ignore (To override it selectively in this location.)
         this.records[id]  = { sequence: wrappedSequence.item };
+
+        this.startOrder.push(id);
 
         this._attachWrappedSequenceHooks(wrappedSequence);
       });
@@ -49,7 +56,9 @@ namespace Testing {
     public recordingsToJSON() {
       let arr = [];
 
-      for(let entry in this.records) {
+      // Ensure a deterministic ordering for the recording's sequences.
+      // This facilitates copmarison checks needed for unit testing.
+      for(let entry of this.startOrder) {
         arr.push(this.records[entry]);
       }
 
@@ -63,7 +72,7 @@ namespace Testing {
 
     public clear() {
       this.records = {};
-      this.wrappers = {};
+      this.startOrder = [];
     }
   }
 }

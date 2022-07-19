@@ -83,5 +83,9 @@ namespace Testing {
     private _applyLayoutConfig() {
       this._hostFixture.className = this._layoutConfig.asClassList();
     }
+
+    public destroy() {
+      this.recognizer.destroy();
+    }
   }
 }

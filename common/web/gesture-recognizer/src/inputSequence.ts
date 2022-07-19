@@ -33,7 +33,7 @@ namespace com.keyman.osk {
 
     public get fullIdentifier(): string {
       const prefix = this.isFromTouch ? 'touch' : 'mouse';
-      return `${prefix}:sequence.item.identifier`;
+      return `${prefix}:${this.identifier}`;
     }
 
     addSample(sample: InputSample) {
