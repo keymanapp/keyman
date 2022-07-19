@@ -181,6 +181,8 @@ namespace Testing {
         if(sequence.isFromTouch) {
           let otherTouches = [...sequenceTouches];
           otherTouches.splice(selectedSequence, 1);
+          // Now that we've removed the entry for the current touchpoint, filter out any null entries.
+          otherTouches = otherTouches.filter((val) => !!val);
 
           sequenceTouches[selectedSequence] = this.replayTouchSample(sample, state, selectedSequence, otherTouches);
           if(appendEndEvent) {

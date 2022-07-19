@@ -57,7 +57,8 @@ describe("Layer one - DOM -> InputSequence", function() {
       'hardBorderCancel',
       'popupLongRoamingEnd',
       'popupShimCancel',
-      'popupSafePersistence'
+      'popupSafePersistence',
+      'basicMultitouch'
     ];
 
     for(let recordingID of testRecordings) {
