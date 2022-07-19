@@ -131,9 +131,15 @@ cd ../tools/recorder
 # First:  Web-core tests.
 pushd "$KEYMAN_ROOT/common/web/input-processor"
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
-# Once done, now we run the integrated (KeymanWeb) tests.
 popd
 
+# For now, we'll also link in the gesture-recognizer unit tests here.
+echo_heading "Running gesture-recognizer test suite"
+pushd "$KEYMAN_ROOT/common/web/gesture-recognizer"
+./build.sh tools test
+popd
+
+# Once done, now we run the integrated (KeymanWeb) tests.
 echo_heading "Running KeymanWeb integration test suite"
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
 npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
