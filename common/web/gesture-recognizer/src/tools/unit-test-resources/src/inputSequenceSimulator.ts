@@ -30,7 +30,8 @@ namespace Testing {
                              target: config.targetRoot,
                              ...mappedSample});
 
-      let touchEventDict = {
+      let touchEventDict: TouchEventInit = {
+        bubbles: true,
         touches: [touch],
         changedTouches: [touch]
       }
@@ -47,16 +48,21 @@ namespace Testing {
           break;
       }
 
-      config.touchEventRoot.dispatchEvent(event);
+      config.targetRoot.dispatchEvent(event);
 
       return touch;
     }
 
     replayMouseSample(sample: JSONObject<com.keyman.osk.InputSample>, state: string) {
-      let eventRoot = this.controller.recognizer.config.mouseEventRoot;
+      let config = this.controller.recognizer.config;
 
       let event: MouseEvent;
-      let eventDict = {...this.getSampleClientPos(sample)};
+      let eventDict: MouseEventInit = {
+        bubbles: true,
+        buttons: state == 'end' ? 0 : 1,
+        ...this.getSampleClientPos(sample)
+      };
+
       switch(state) {
         case 'start':
           event = new MouseEvent('mousedown', eventDict);
@@ -69,10 +75,28 @@ namespace Testing {
           break;
       }
 
-      eventRoot.dispatchEvent(event);
+      config.targetRoot.dispatchEvent(event);
     }
 
-    replay(set: RecordedSequence[], config: JSONObject<FixtureLayoutConfiguration>) {
+    /**
+     * Given a previously-recorded sequence of sampled input coordinates, this function
+     * reproduces their corresponding events and runs them through this instance's linked
+     * gesture-recognizer instance.
+     *
+     * It will re-use the original fixture-layout configuration, **but** it will ignore
+     * all timestamp information, as that is nigh-impossible to perfectly reproduce without
+     * busy-waiting.
+     * @param sequenceTestSpec A previously-recorded sequence of sampled input coordinates.
+     * @returns A recording of the reproduced version of that sequence.
+     */
+    replay(sequenceTestSpec: RecordedCoordSequenceSet): RecordedCoordSequenceSet {
+      const set = sequenceTestSpec.set;
+      const config = sequenceTestSpec.config;
+
+      // We're going to record the test spec as we replay it, eventually returning the
+      // final result.
+      const recorder = new Testing.SequenceRecorder(this.controller);
+
       this.controller.layoutConfiguration = new FixtureLayoutConfiguration(config);
 
       /**
@@ -83,7 +107,7 @@ namespace Testing {
       let sequenceProgress: number[] = new Array(set.length).fill(0);
       let sequenceTouches: Touch[] = new Array(set.length).fill(null);
 
-      while(sequenceProgress.find((number) => number != Number.MAX_VALUE)) {
+      while(sequenceProgress.find((number) => number != Number.MAX_VALUE) !== undefined) {
         // Determine the sequence that has the chronologically next-in-line sample
         // to reproduce.
         let minTimestamp = Number.MAX_VALUE;
@@ -97,6 +121,10 @@ namespace Testing {
         for(let index=0; index < set.length; index++) {
           const sequence = set[index].sequence;
           const indexInSequence = sequenceProgress[index];
+
+          if(indexInSequence == Number.MAX_VALUE) {
+            continue;
+          }
 
           if(sequence.samples[indexInSequence].t < minTimestamp) {
             minTimestamp = sequence.samples[indexInSequence].t;
@@ -137,6 +165,11 @@ namespace Testing {
           }
         }
       }
+
+      // We technically don't have access to 'samples' for the actual recorded object.
+      // Obtaining a 'deep copy' (though methodless) works around this nicely and
+      // matches the original `sequenceTestSpec`'s format to boot.
+      return JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
     }
   }
 }

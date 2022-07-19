@@ -39,7 +39,7 @@ describe("'Canary' checks", function() {
     controller.connect().then(() => {
       assert.isTrue(targetRoot.className.indexOf('screen4') > -1, "Could not apply configuration spec from recorded JSON!");
       done();
-    });
+    }).finally(() => controller.destroy());
   })
 
   after(function() {
