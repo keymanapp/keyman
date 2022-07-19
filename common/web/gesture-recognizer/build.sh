@@ -54,12 +54,12 @@ if builder_has_action build; then
   builder_report build success
 fi
 
-if builder_has_action test; then
-  npm test
-  builder_report test success
-fi
-
 if builder_has_action tools; then
   src/tools/build.sh build
   builder_report tools success
+fi
+
+if builder_has_action test; then
+  npm test
+  builder_report test success
 fi
