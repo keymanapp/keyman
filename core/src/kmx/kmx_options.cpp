@@ -118,7 +118,7 @@ KMX_Options::~KMX_Options()
     if(_kp->KeyboardOptions[i].Value)
     {
       _kp->Keyboard->dpStoreArray[i].dpString = _kp->KeyboardOptions[i].OriginalStore;
-      delete _kp->KeyboardOptions[i].Value;
+      delete [] _kp->KeyboardOptions[i].Value;
     }
   delete _kp->KeyboardOptions;
   _kp->KeyboardOptions = NULL;
@@ -147,7 +147,7 @@ void KMX_Options::Set(int nStoreToSet, std::u16string const & rValueToSet)
   auto & rStoreToSetValue = _kp->KeyboardOptions[nStoreToSet].Value;
   if(rStoreToSetValue)
   {
-    delete rStoreToSetValue;
+    delete [] rStoreToSetValue;
   }
 
   if(m_debug_items) {
@@ -187,7 +187,7 @@ void KMX_Options::Reset(abstract_processor & ap, int nStoreToReset)
   if (rOptionToReset.Value)
   {
     rStoreToReset.dpString = rOptionToReset.OriginalStore;
-    delete rOptionToReset.Value;
+    delete [] rOptionToReset.Value;
     rOptionToReset.Value = nullptr;
   }
 
