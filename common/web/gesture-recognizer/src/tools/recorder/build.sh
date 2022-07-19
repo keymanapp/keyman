@@ -28,6 +28,7 @@ display_usage ( ) {
 }
 
 build_recorder_page ( ) {
+  mkdir build
   cp src/pageStyle.css    build/pageStyle.css
   cp src/recorder.js      build/recorder.js
 
