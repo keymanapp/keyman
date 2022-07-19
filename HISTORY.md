@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.35 alpha 2022-07-19
+
+* fix(common): Fix `delete` (#6965)
+
 ## 16.0.34 alpha 2022-07-15
 
 * fix(developer): set contextDevice in web debugger  ️ (#6906)
