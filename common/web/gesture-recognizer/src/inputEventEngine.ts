@@ -77,23 +77,27 @@ namespace com.keyman.osk {
       sequenceWrapper.signalUpdate(sample);
     }
 
-    onInputMoveCancel(identifier: number) {
+    onInputMoveCancel(identifier: number, sample: InputSample) {
       let sequenceWrapper = this.getSequenceWrapperWithId(identifier);
 
       if(!sequenceWrapper) {
         return;
       }
 
+      sequenceWrapper.item.addSample(sample);
+      sequenceWrapper.signalUpdate(sample);
       sequenceWrapper.cancel();
     }
 
-    onInputEnd(identifier: number, sample: InputSample) {
+    onInputEnd(identifier: number) {
       let sequenceWrapper = this.getSequenceWrapperWithId(identifier);
 
       if(!sequenceWrapper) {
         return;
       }
 
+      // We do not add a sample here because any 'end' event immediately follows a
+      // 'move' if it occurred simultaneously.
       sequenceWrapper.end();
     }
   }

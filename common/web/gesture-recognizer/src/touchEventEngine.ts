@@ -119,7 +119,7 @@ namespace com.keyman.osk {
         if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.safeBoundMaskMap[touch.identifier])) {
           this.onInputMove(touch.identifier, sample);
         } else {
-          this.onInputMoveCancel(touch.identifier);
+          this.onInputMoveCancel(touch.identifier, sample);
         }
       }
     }
@@ -134,9 +134,7 @@ namespace com.keyman.osk {
 
         this.preventPropagation(event);
 
-        const sample = this.buildSampleFromTouch(touch);
-
-        this.onInputEnd(touch.identifier, sample);
+        this.onInputEnd(touch.identifier);
       }
     }
   }

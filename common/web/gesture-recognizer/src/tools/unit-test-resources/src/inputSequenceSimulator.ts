@@ -20,31 +20,60 @@ namespace Testing {
       }
     }
 
+    private buildSyntheticTouchEvent(name: string, dict: TouchEventInit): TouchEvent {
+      let config = this.controller.recognizer.config;
+
+      let fullDict = {
+        srcElement: config.touchEventRoot,
+        view: window,
+        ...dict
+      } as any;
+
+      return new Event('touchstart', fullDict) as TouchEvent;
+    }
+
     replayTouchSample(sample: JSONObject<com.keyman.osk.InputSample>, state: string, identifier: number, otherTouches: Touch[]): Touch {
       let config = this.controller.recognizer.config;
 
       let event: TouchEvent;
       const mappedSample = this.getSampleClientPos(sample);
 
-      let touch = new Touch({identifier: identifier,
-                             target: config.targetRoot,
-                             ...mappedSample});
+      let touch: Touch;
+      let touchDict = {identifier: identifier,
+                       target: config.targetRoot,
+                       ...mappedSample};
+      if(window['Touch'] !== undefined) {
+        touch = new Touch(touchDict);
+      } else {
+        // When not performing touch-emulation, some desktop browsers will leave `Touch` undefined.
+        touch = touchDict as any;
+      }
+
+      otherTouches = otherTouches || [];
 
       let touchEventDict: TouchEventInit = {
         bubbles: true,
-        touches: [touch],
-        changedTouches: [touch]
+        touches: [touch, ...otherTouches],
+        changedTouches: [touch],
+      }
+
+      let buildEvent = (type: string, dict: TouchEventInit) => {
+        if(window['TouchEvent'] !== undefined) {
+          return new TouchEvent(type, dict);
+        } else {
+          return this.buildSyntheticTouchEvent(type, dict);
+        }
       }
 
       switch(state) {
         case 'start':
-          event = new TouchEvent('touchstart', touchEventDict);
+          event = buildEvent('touchstart', touchEventDict);
           break;
         case 'move':
-          event = new TouchEvent('touchmove', touchEventDict);
+          event = buildEvent('touchmove', touchEventDict);
           break;
         case 'end':
-          event = new TouchEvent('touchend', touchEventDict);
+          event = buildEvent('touchend', touchEventDict);
           break;
       }
 
@@ -169,7 +198,9 @@ namespace Testing {
       // We technically don't have access to 'samples' for the actual recorded object.
       // Obtaining a 'deep copy' (though methodless) works around this nicely and
       // matches the original `sequenceTestSpec`'s format to boot.
-      return JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
+      let recording = JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
+      recorder.clear();
+      return recording;
     }
   }
 }

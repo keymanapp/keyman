@@ -25,6 +25,12 @@
       <p class="center">
         The area below represents a simulated page with its corresponding screen, page, and gesture-reception area.
       </p>
+      <p class="center">
+        NOTE:  For setting up touch-based sequences from a normal computer, use of Firefox's touch-emulation mode is
+        advised.  Chrome's version tends to produce touch events with subpixel coordinates, whereas Firefox's doesn't.
+
+        You may also need to manually tweak the final coordinate a little bit for cross-browser consistency.
+      </p>
 
       <!-- Start the self-adjusting layout region -->
       <div id="main-ux" class="flex">

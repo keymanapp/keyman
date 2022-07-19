@@ -118,7 +118,7 @@ namespace com.keyman.osk {
       if(!event.buttons) {
         if(this.hasActiveClick) {
           this.hasActiveClick = false;
-          this.onInputMoveCancel(this.activeIdentifier);
+          this.onInputMoveCancel(this.activeIdentifier, sample);
         }
         return;
       }
@@ -128,7 +128,7 @@ namespace com.keyman.osk {
       if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.disabledSafeBounds)) {
         this.onInputMove(this.activeIdentifier, sample);
       } else {
-        this.onInputMoveCancel(this.activeIdentifier);
+        this.onInputMoveCancel(this.activeIdentifier, sample);
       }
     }
 
@@ -141,8 +141,7 @@ namespace com.keyman.osk {
         this.hasActiveClick = false;
       }
 
-      const sample = this.buildSampleFromEvent(event);
-      this.onInputEnd(this.activeIdentifier, sample);
+      this.onInputEnd(this.activeIdentifier);
     }
   }
 }
