@@ -120,6 +120,21 @@ function updateConfig() {
   );
 
   controller.layoutConfiguration = layoutSpec;
+
+  // Check sub-pixel alignment of the main fixture element; we can't do exact repros for unit testing
+  // if the recorded sequence has sub-pixel coordinates.  This may happen otherwise due to the page's
+  // formatting.
+  let aligner = document.getElementById('aligner');
+  let hostFixture = document.getElementById('host-fixture');
+  aligner.style.left = 0;
+  aligner.style.top = 0;
+
+  let clientRect = hostFixture.getBoundingClientRect();
+  let roundX = Math.round(clientRect.x);
+  let roundY = Math.round(clientRect.y);
+
+  aligner.style.left = roundX - clientRect.x;
+  aligner.style.top  = roundY - clientRect.y;
 }
 
 // END: Layout-simulation setup & handling
