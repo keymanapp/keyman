@@ -56,14 +56,13 @@ describe("Layer one - DOM -> InputSequence", function() {
       'embeddedBorderCancel',
       'hardBorderCancel',
       'popupLongRoamingEnd',
-      'popupShimCancel'
+      'popupShimCancel',
+      'popupSafePersistence'
     ];
 
     for(let recordingID of testRecordings) {
       it(`${recordingID}.json`, function() {
         let testObj = __json__[recordingID];
-
-        console.log(`expected terminator: ${testObj.set[0].terminationEvent}`)
 
         // 'describe' has a notably different `this` reference than `it`, `before`, etc.
         replayAndCompare.call(this, testObj);

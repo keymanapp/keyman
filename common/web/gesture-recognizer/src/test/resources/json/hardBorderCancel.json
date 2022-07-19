@@ -1,0 +1,28 @@
+{
+  "set": [
+    {
+      "sequence": {
+        "samples": [
+          {
+            "targetX": 231,
+            "targetY": 82,
+            "t": 131762
+          },
+          {
+            "targetX": 242,
+            "targetY": 81,
+            "t": 131976
+          }
+        ],
+        "isFromTouch": true
+      },
+      "terminationEvent": "cancel"
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen4",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}
