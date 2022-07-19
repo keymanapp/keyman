@@ -86,6 +86,8 @@ window.addEventListener('load', function(ev) {
     }
   }
 
+  document.addEventListener('scroll', updateAlignment);
+
   for(entry of safeGroup) {
     entry.addEventListener('change', updateConfig);
   }
@@ -121,6 +123,10 @@ function updateConfig() {
 
   controller.layoutConfiguration = layoutSpec;
 
+  updateAlignment();
+}
+
+function updateAlignment() {
   // Check sub-pixel alignment of the main fixture element; we can't do exact repros for unit testing
   // if the recorded sequence has sub-pixel coordinates.  This may happen otherwise due to the page's
   // formatting.
