@@ -58,7 +58,11 @@ namespace Testing {
       return event;
     }
 
-    replayTouchSample(sample: JSONObject<com.keyman.osk.InputSample>, state: string, identifier: number, otherTouches: Touch[]): Touch {
+    replayTouchSample(sample: JSONObject<com.keyman.osk.InputSample>,
+                      state: string,
+                      identifier: number,
+                      otherTouches: Touch[],
+                      targetElement?: HTMLElement): Touch {
       let config = this.controller.recognizer.config;
 
       let event: TouchEvent;
@@ -66,7 +70,7 @@ namespace Testing {
 
       let touch: Touch;
       let touchDict = {identifier: identifier,
-                       target: config.targetRoot,
+                       target: targetElement || config.targetRoot,
                        ...mappedSample};
       if(window['Touch'] !== undefined) {
         touch = new Touch(touchDict);

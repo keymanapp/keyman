@@ -23,7 +23,6 @@ describe("Layer one - DOM -> InputSequence", function() {
   describe('recorded input sequences', function() {
     // We rely on this function to have the same context as `it` - the test-definition function.
     let replayAndCompare = function(testObj) {
-      // Everything else can be extracted to a common test function... probably.
       let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
       let result = playbackEngine.replay(testObj);
 

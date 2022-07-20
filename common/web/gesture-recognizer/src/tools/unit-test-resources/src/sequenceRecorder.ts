@@ -27,6 +27,10 @@ namespace Testing {
       this._attachRecognizerHooks();
     }
 
+    public get count(): number {
+      return this.startOrder.length;
+    }
+
     private _attachRecognizerHooks() {
       this.controller.recognizer.on(com.keyman.osk.GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, (wrappedSequence: WrappedInputSequence) => {
         const id = wrappedSequence.item.fullIdentifier;
