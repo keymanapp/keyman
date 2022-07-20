@@ -33,12 +33,9 @@ build_recorder_page ( ) {
 
   cp ../host-fixture/gestureHost.css  build/gestureHost.css
 
-  FIXTURE=`$FIXTURE_SCRIPT`
-  FIXTURE_TARGET="<!--INSERT_FIXTURE-->"
-
   # Thanks to https://stackoverflow.com/a/10107668 for this tidbit.
   # Searches for FIXTURE_TARGET above and replaces it with the actual fixture!
-  awk -v r="$FIXTURE" "{gsub(/$FIXTURE_TARGET/,r)}1" src/index.html > build/index.html
+  node update-index.js build/index.html
 }
 
 FIXTURE_SCRIPT=../host-fixture/extract-fixture.sh

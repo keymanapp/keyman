@@ -9,7 +9,6 @@ set -eu
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 cd $(dirname "$THIS_SCRIPT")
 
-FIXTURE_START="    <!-- START: recognizer host fixture -->"
-FIXTURE_END="    <!-- END: recognizer host fixture -->"
-
-sed -n "/$FIXTURE_START/, /$FIXTURE_END/{ /$FIXTURE_START/! { /$FIXTURE_END/! p } }" host-fixture.html
+# On Windows, `node extractor.js` cannot be directly piped; that requires `node.exe`.
+# But that doesn't make sense on other platforms, so... wrapper script.
+node extractor.js
