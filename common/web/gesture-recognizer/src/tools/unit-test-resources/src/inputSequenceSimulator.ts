@@ -23,13 +23,39 @@ namespace Testing {
     private buildSyntheticTouchEvent(name: string, dict: TouchEventInit): TouchEvent {
       let config = this.controller.recognizer.config;
 
-      let fullDict = {
+      let baseDict = {
         srcElement: config.touchEventRoot,
-        view: window,
-        ...dict
+        view: window
       } as any;
 
-      return new Event('touchstart', fullDict) as TouchEvent;
+      if(dict.bubbles !== undefined) {
+        baseDict.bubbles = dict.bubbles; // is an event read-only property; can't assign it later!
+        delete dict.bubbles;
+      }
+
+      // Produces a hacky-but-sufficient implementation of TouchList for our purposes
+      // in environments that avoid direct touch-support.
+      const arrToTouchList = (arr: Touch[]): TouchList => {
+        return {
+          //@ts-ignore
+          _arr: arr, // Obviously, this isn't a standard member of TouchList.
+          length: arr.length,
+          item: function(i: number) { return this._arr[i]; }
+        }
+      }
+
+      //@ts-ignore
+      dict.touches = arrToTouchList(dict.touches);
+      //@ts-ignore
+      dict.changedTouches = arrToTouchList(dict.changedTouches);
+
+      let event = new Event(name, baseDict) as TouchEvent;
+
+      // Since touch-related properties aren't expected by some browsers' Event constructors,
+      // we must add them "in post" when testing in some non-touch environments.  For those,
+      // the Event constructor will neglect to copy them from `baseDict`.
+      Object.assign(event, dict);
+      return event;
     }
 
     replayTouchSample(sample: JSONObject<com.keyman.osk.InputSample>, state: string, identifier: number, otherTouches: Touch[]): Touch {
@@ -59,8 +85,10 @@ namespace Testing {
 
       let buildEvent = (type: string, dict: TouchEventInit) => {
         if(window['TouchEvent'] !== undefined) {
+          // Nothing beats the real thing.
           return new TouchEvent(type, dict);
         } else {
+          // Effectively, an internal polyfill.  But, if at ALL possible, use a real version instead!
           return this.buildSyntheticTouchEvent(type, dict);
         }
       }

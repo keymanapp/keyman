@@ -43,7 +43,7 @@ module.exports = function(config) {
   var CURRENT_MAC_LAUNCHERS = {
     bs_firefox_mac: {
       browser: 'firefox',
-      browser_version: '62',
+      browser_version: '100',
       os: 'OS X',
       os_version: 'Mojave'
     },
@@ -61,29 +61,12 @@ module.exports = function(config) {
     }
   };
 
-  // BrowserStack does not appear to properly support automated JavaScript testing at this time.
-  // See https://www.browserstack.com/list-of-browsers-and-platforms?product=js_testing for the reference.
-  var CURRENT_IOS_LAUNCHERS = {}; /*{
-    bs_iphoneX: {
-      device: 'iPhone X', // Ideally, we'd use 'iPhone X', but BrowserStack's version is being problematic lately.
-      real_mobile: true,
-      os: 'ios',
-      os_version: '11.0'
-    },
-    bs_ipad6: {
-      device: 'iPad 5th',
-      real_mobile: true,
-      os: 'ios',
-      os_version: '11.0'
-    }
-  };*/
-
   var CURRENT_WIN_LAUNCHERS = {
     bs_firefox_win: {
       os: 'Windows',
       os_version: '10',
       browser: 'firefox',
-      browser_version: '62.0'
+      browser_version: '100.0'
     },
     bs_chrome_win: {
       os: 'Windows',
@@ -109,7 +92,6 @@ module.exports = function(config) {
    * Final selection of the sets to be used for BrowserStack testing.
    */
   var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_ANDROID_LAUNCHERS,
-                                            CURRENT_IOS_LAUNCHERS,
                                             CURRENT_WIN_LAUNCHERS,
                                             CURRENT_MAC_LAUNCHERS);
 
