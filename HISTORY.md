@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.36 alpha 2022-07-20
+
+* chore(linux): Code cleanup (#6957)
+* fix(linux): Another attempt at fixing postinst script (#6960)
+* fix(linux): Fix uninstallation when using fcitx5 (#6963)
+
 ## 16.0.35 alpha 2022-07-19
 
 * fix(common): Fix `delete` (#6965)
