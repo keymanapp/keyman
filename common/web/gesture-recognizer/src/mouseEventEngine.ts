@@ -113,6 +113,8 @@ namespace com.keyman.osk {
       if(!ZoneBoundaryChecker.inputMoveCancellationCheck(coord, this.config, this.disabledSafeBounds)) {
         this.onInputMove(coord);
       } else {
+        this.hasActiveClick = false;
+        this.ignoreSequence = true;
         this.onInputMoveCancel(coord);
       }
     }

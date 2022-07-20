@@ -18,13 +18,17 @@ namespace com.keyman.osk {
      * @param ignoreBitmask A bitmask indicating select boundaries to ignore for the check.
      */
     static getCoordZoneBitmask(coord: InputEventCoordinate, zone: RecognitionZoneSource): number {
+      // coord currently uses page-based coords, not client-based!
+      let screenX = coord.x - document.body.scrollLeft;
+      let screenY = coord.y - document.body.scrollTop;
+
       const bounds = zone.getBoundingClientRect();
 
       let bitmask = 0;
-      bitmask |= (coord.x < bounds.left)   ? ZoneBoundaryChecker.FAR_LEFT   : 0;
-      bitmask |= (coord.x > bounds.right)  ? ZoneBoundaryChecker.FAR_RIGHT  : 0;
-      bitmask |= (coord.y < bounds.top)    ? ZoneBoundaryChecker.FAR_TOP    : 0;
-      bitmask |= (coord.y > bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
+      bitmask |= (screenX < bounds.left)   ? ZoneBoundaryChecker.FAR_LEFT   : 0;
+      bitmask |= (screenX > bounds.right)  ? ZoneBoundaryChecker.FAR_RIGHT  : 0;
+      bitmask |= (screenY < bounds.top)    ? ZoneBoundaryChecker.FAR_TOP    : 0;
+      bitmask |= (screenY > bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
 
       return bitmask; // returns zero if effectively 'within bounds'.
     }
