@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
 import datetime
-import time
 import logging
+import os
+import time
+
 import requests
 import requests_cache
-import os
 from gi.repository import GObject
+
 from keyman_config import KeymanApiUrl, KeymanDownloadsUrl
 from keyman_config.deprecated_decorator import deprecated
 

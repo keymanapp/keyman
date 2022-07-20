@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 
 import logging
-import numpy as np
 import os
-import sys
 import struct
+import sys
+
+import numpy as np
 from PIL import Image, ImageFile
+
 Image.LOAD_TRUNCATED_IMAGES = True
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 

@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 
-import json
 import configparser
+import json
 import logging
-import sys
 import os
-import magic
+import sys
 from enum import Enum
 from json.decoder import JSONDecodeError
+
+import magic
 
 from keyman_config import secure_lookup
 
