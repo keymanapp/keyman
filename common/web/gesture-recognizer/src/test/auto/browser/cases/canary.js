@@ -42,7 +42,70 @@ describe("'Canary' checks", function() {
     }).finally(() => controller.destroy());
   })
 
-  after(function() {
+  afterEach(function() {
     fixture.cleanup();
   })
+
+  describe('event simulation', function() {
+    beforeEach(function(done) {
+      fixture.load('host-fixture.html');
+      this.controller = new Testing.HostFixtureLayoutController();
+      this.controller.connect().then(() => done());
+    });
+
+    afterEach(function() {
+      this.controller.destroy();
+      fixture.cleanup();
+    });
+
+    it("InputSequenceSimulator.replayTouchSample", function() {
+      let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
+      let layout = new Testing.FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
+      this.controller.layoutConfiguration = layout;
+
+      let fireEvent = () => {
+        playbackEngine.replayTouchSample(/*relative coord:*/ {targetX: 10, targetY: 10},
+                                          /*state:*/         "start",
+                                          /*identifier:*/    1,
+                                          /*otherTouches:*/  [],
+                                        );
+      }
+
+      // Ensure that the expected handler is called.
+      let proto = com.keyman.osk.TouchEventEngine.prototype;
+      let trueHandler = proto.onTouchStart;
+      let fakeHandler = proto.onTouchStart = sinon.fake();
+      fireEvent();
+      try {
+        assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
+      } finally {
+        // Restore the true implementation.
+        proto.onTouchStart = trueHandler;
+      }
+    });
+
+    it("InputSequenceSimulator.replayMouseSample", function() {
+      let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
+      let layout = new Testing.FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
+      this.controller.layoutConfiguration = layout;
+
+      let fireEvent = () => {
+        playbackEngine.replayMouseSample(/*relative coord:*/ {targetX: 15, targetY: 15},
+                                          /*state:*/         "start"
+                                        );
+      }
+
+      // Ensure that the expected handler is called.
+      let proto = com.keyman.osk.MouseEventEngine.prototype;
+      let trueHandler = proto.onMouseStart;
+      let fakeHandler = proto.onMouseStart = sinon.fake();
+      fireEvent();
+      try {
+        assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
+      } finally {
+        // Restore the true implementation.
+        proto.onMouseStart = trueHandler;
+      }
+    });
+  });
 });

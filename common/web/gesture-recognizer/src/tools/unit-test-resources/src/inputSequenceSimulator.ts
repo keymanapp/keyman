@@ -114,7 +114,7 @@ namespace Testing {
       return touch;
     }
 
-    replayMouseSample(sample: JSONObject<com.keyman.osk.InputSample>, state: string) {
+    replayMouseSample(sample: JSONObject<com.keyman.osk.InputSample>, state: string, targetElement?: HTMLElement) {
       let config = this.controller.recognizer.config;
 
       let event: MouseEvent;
@@ -136,7 +136,12 @@ namespace Testing {
           break;
       }
 
-      config.targetRoot.dispatchEvent(event);
+      targetElement = targetElement || config.targetRoot;
+
+      // Implies that `targetElement` is the target element; .target cannot be set separately
+      // for mouse events, so we can't use config.mouseEventRoot.  Don't worry, the
+      // listener will still receive the event b/c bubbling.
+      targetElement.dispatchEvent(event);
     }
 
     /**
