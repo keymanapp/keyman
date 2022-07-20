@@ -1,24 +1,24 @@
-.bounds-color {
+.bounds-legend {
   background-color: black;
 }
 
-.receiver-color {
+.receiver-legend {
   background-color: beige;
 }
 
-.roaming-color {
+.roaming-legend {
   background-color: lightblue;
 }
 
-.shim-color {
+.shim-legend {
   background-color: whitesmoke;
 }
 
-.safe-zone-color {
+.safe-zone-legend {
   border: 1px dashed black;
 }
 
-.safe-proximity-color {
+.safe-proximity-legend {
   border: 1px dashed lightgray;
 }
 
