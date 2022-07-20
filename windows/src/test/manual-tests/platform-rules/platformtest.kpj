@@ -4,6 +4,8 @@
     <BuildPath></BuildPath>
     <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
     <WarnDeprecatedCode>True</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
   </Options>
   <Files>
     <File>

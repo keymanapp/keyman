@@ -147,10 +147,14 @@
 
 
  // _S2 why can`t I include .h  ???  :-(
-#include "../../../../developer/kmcompx/include/CheckNCapsConsistency.cpp"              //#include "CheckNCapsConsistency.h"
-#include "../../../../developer/kmcompx/include/CheckFilenameConsistency.cpp"           //#include "CheckFilenameConsistency.h"
-#include "../../../../developer/kmcompx/include/UnreachableRules.cpp"                   //#include "UnreachableRules.h"
-#include "../../../../developer/kmcompx/include/CheckForDuplicates.cpp"                 //#include "CheckForDuplicates.h"
+//#include "../../../../developer/kmcompx/include/CheckNCapsConsistency.cpp"              //
+#include "CheckNCapsConsistency.cpp"
+//#include "../../../../developer/kmcompx/include/CheckFilenameConsistency.cpp"           //
+#include "CheckFilenameConsistency.cpp"
+//#include "../../../../developer/kmcompx/include/UnreachableRules.cpp"                   //
+#include "UnreachableRules.cpp"
+//#include "../../../../developer/kmcompx/include/CheckForDuplicates.cpp"                 //
+#include "CheckForDuplicates.cpp"
 
 
 
@@ -288,8 +292,6 @@ int CompileTarget;
 
 KMX_WCHAR const * DeadKeyChars =
 u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
-
-/* _S2 */   //#define DebugLog(msg,...) (km::kbp::kmx::ShouldDebug() ? km::kbp::kmx::DebugLog1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
 
 KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved)
 {

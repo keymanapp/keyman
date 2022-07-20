@@ -1,10 +1,18 @@
-
+#include "../../kmcompx/include/pch.h"              // _S2 #include "pch"
 #include "pch.h"
+#include "../../kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
+#include "../../kmcompx/include/compiler.h"         // _S2 #include <compiler.h>
+#include "../../kmcompx/include/comperr.h"          // _S2 #include <comperr.h>
+#include "../../kmcompx/include/kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
 
+/*
+#include "pch.h"
 #include <compfile.h>
+#include <compiler.h>
 #include <comperr.h>
-#include "../../../common/windows/cpp/include/vkeys.h"
 #include <kmcmpdll.h>
+#include <vkeys.h>
+*/
 
 #include <unordered_map>
 #include <unordered_set>
@@ -20,9 +28,9 @@ std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
   return key.str();
 }
 
-DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
+KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;
-  DWORD i;
+  KMX_DWORD i;
 
   std::unordered_map<std::wstring, FILE_KEY> map;
   std::unordered_set<int> reportedLines;
@@ -34,7 +42,12 @@ DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         currentLine = kp->Line;
-        wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
+
+        // _S2 wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
+        PKMX_WCHAR p_ErrExtra;
+        char16_t text[256] = u"Overridden by rule on line ";
+        u16printf(&p_ErrExtra, 'd', 0x002e, createIntVector((int)(k1.Line)),   text );            
+
         AddWarning(CHINT_UnreachableRule);
       }
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.h>
-#include "Compfile.h"       //_S2   #include <Compfile.h>
+//#include "../../../../developer/kmcompx/include/kmcompx.h"          // _S2  #include <windows.h>
+#include "../..//kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
 
-BOOL CheckNCapsConsistency(PFILE_KEYBOARD fk);
+bool CheckNCapsConsistency(PFILE_KEYBOARD fk);
