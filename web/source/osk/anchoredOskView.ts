@@ -150,17 +150,27 @@ namespace com.keyman.osk {
         return keymanweb['getOskHeight']();
       }
 
-      var oskHeightLandscapeView=Math.floor(Math.min(screen.availHeight,screen.availWidth)/2),
+      let baseWidth  = document?.documentElement?.clientWidth;
+      let baseHeight = document?.documentElement?.clientHeight;
+      if(typeof baseWidth == 'undefined') {
+        baseWidth  = Math.min(screen.height, screen.width);
+        baseHeight = Math.max(screen.height, screen.width);
+
+        if(!keymanweb.util.portraitView()) {
+          let temp = baseWidth;
+          baseWidth = baseHeight;
+          baseHeight = temp;
+        }
+      }
+
+      var oskHeightLandscapeView=Math.floor(Math.min(baseHeight, baseWidth)/2),
           height=oskHeightLandscapeView;
 
       if(device.formFactor == 'phone') {
-        var sx=Math.min(screen.height,screen.width),
-            sy=Math.max(screen.height,screen.width);
-
         if(keymanweb.util.portraitView())
-          height=Math.floor(Math.max(screen.availHeight,screen.availWidth)/3);
+          height=Math.floor(baseHeight/2.4);
         else
-          height=height*(sy/sx)/1.6;  //adjust for aspect ratio, increase slightly for iPhone 5
+          height=Math.floor(baseHeight/1.6);  //adjust for aspect ratio, increase slightly for iPhone 5
       }
 
       // Correct for viewport scaling (iOS - Android 4.2 does not want this, at least on Galaxy Tab 3))
@@ -186,18 +196,18 @@ namespace com.keyman.osk {
       }
 
       var width: number;
-      if(device.OS == 'iOS') {
-        // iOS does not interchange these values when the orientation changes!
-        //width = util.portraitView() ? screen.width : screen.height;
-        width = window.innerWidth;
-      } else if(device.OS == 'Android') {
-        try {
-          width=document.documentElement.clientWidth;
-        } catch(ex) {
+
+      width = document?.documentElement?.clientWidth;
+      if(typeof width == 'undefined') {
+        if(device.OS == 'iOS') {
+          // iOS does not interchange these values when the orientation changes!
+          //width = util.portraitView() ? screen.width : screen.height;
+          width = window.innerWidth;
+        } else if(device.OS == 'Android') {
           width=screen.availWidth;
+        } else {
+          width=screen.width;
         }
-      } else {
-        width=screen.width;
       }
 
       return width;
