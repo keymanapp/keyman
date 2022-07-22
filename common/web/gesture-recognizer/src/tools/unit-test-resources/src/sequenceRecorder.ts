@@ -67,7 +67,7 @@ namespace Testing {
         config: this.controller.layoutConfiguration
       }
 
-      return JSON.stringify(jsonOut, com.keyman.osk.InputSequence._replacer, 2);
+      return JSON.stringify(jsonOut, null, 2);
     }
 
     public clear() {
