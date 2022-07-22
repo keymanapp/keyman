@@ -10,7 +10,7 @@ On Linux, you can build the following projects:
 * Keyman for Android
 * Keyman Core (wasm targets)
 * Common/Web
-* KeymanWeb
+* [KeymanWeb](#keymanweb)
 
 The following projects **cannot** be built on Linux:
 
@@ -38,6 +38,33 @@ $HOME/keyman/
     ...
 ```
 
+## Project Requirements
+
+### Keyman for Linux
+
+All dependencies are already installed if you followed the instructions under [Prerequisites](#Prerequisites).
+
+Building:
+
+* [Building Keyman for Linux](../../linux/README.md)
+
+### Keyman Core
+
+All dependencies are already installed if you followed the instructions under [Prerequisites](#Prerequisites).
+
+Building:
+
+* [Building Keyman Core](../../core/doc/BUILDING.md)
+
+### KeymanWeb
+
+Dependencies:
+* [Base](#base-dependencies)
+* [Web](#web-dependencies)
+
+Building:
+* [Building KeymanWeb](../../web/README.md)
+
 ## Prerequisites
 
 The current list of dependencies can be found in the `Build-Depends` section of `linux/debian/control`.
@@ -49,21 +76,35 @@ sudo apt install devscripts equivs
 sudo mk-build-deps --install linux/debian/control
 ```
 
-## Keyman for Linux
+### Base Dependencies
 
-All dependencies are already installed if you followed the instructions under [Prerequisites](#Prerequisites).
+**Projects**:
 
-Building:
+* all projects
 
-* [Building Keyman for Linux](../../linux/README.md)
+**Requirements**:
 
-## Keyman Core
+* git
+* jq
+* Python 3
+* Meson 0.56+
+* Ninja
+* Pandoc
 
-All dependencies are already installed if you followed the instructions under [Prerequisites](#Prerequisites).
+<!-- document how to install these dependencies -->
 
-Building:
+### Web Dependencies
 
-* [Building Keyman Core](../../core/doc/BUILDING.md)
+**Projects**:
+
+* Keyman for Android
+* KeymanWeb
+
+**Requirements**:
+
+* node.js 14+
+* emscripten 2.0.23+
+* openjdk 8+
 
 ## Docker Builder
 
@@ -97,5 +138,4 @@ docker run -it --rm -v $(pwd)/..:/home/build -v $(pwd)/build/linux:/home/build/c
 cd keymanapp/keyman
 docker run -it --rm -v $(pwd):/home/build/src/keyman -u root -w /home/build/src/keyman keymanapp/keyman-linux-builder:latest bash -c "cd linux && make reconf && make fullbuild && make install"
 ```
-
 
