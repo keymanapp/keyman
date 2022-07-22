@@ -11,6 +11,7 @@ from shutil import rmtree
 from keyman_config import _, __version__, secure_lookup
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
 from keyman_config.convertico import checkandsaveico, extractico
+from keyman_config.dbus_util import get_keyman_config_service
 from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_data,
                                    get_keyboard_dir, get_keyman_doc_dir,
@@ -320,6 +321,9 @@ def install_kmp(inputfile, online=False, sharedarea=False, language=None):
         has_ui(bool, default=True): whether we're displaying a window or running UI less from the command line
     """
     if sharedarea:
-        return InstallKmp().install_kmp_shared(inputfile, online, language)
+        return_value = InstallKmp().install_kmp_shared(inputfile, online, language)
     else:
-        return InstallKmp().install_kmp_user(inputfile, online, language)
+        return_value = InstallKmp().install_kmp_user(inputfile, online, language)
+
+    get_keyman_config_service().keyboard_list_changed()
+    return return_value

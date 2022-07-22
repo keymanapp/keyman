@@ -16,6 +16,7 @@ from gi.repository import GdkPixbuf, Gtk
 
 from keyman_config import _
 from keyman_config.accelerators import bind_accelerator, init_accel
+from keyman_config.dbus_util import get_keyman_config_service
 from keyman_config.downloadkeyboard import DownloadKmpWindow
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
                                    get_keyman_dir)
@@ -32,6 +33,7 @@ class ViewInstalledWindowBase(Gtk.Window):
         self.accelerators = None
         Gtk.Window.__init__(self, title=_("Keyman Configuration"))
         init_accel(self)
+        self._config_service = get_keyman_config_service(self.refresh_installed_kmp)
 
     def refresh_installed_kmp(self):
         pass
