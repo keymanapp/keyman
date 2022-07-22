@@ -188,7 +188,7 @@ class InstallKmp():
                 logging.info(o)
             rmtree(self.packageDir)
             message = _("No kmp.json or kmp.inf found in {packageFile}").format(
-                packageFile=inputfile)
+              packageFile=inputfile)
             raise InstallError(InstallStatus.Abort, message)
 
     def _safeMakeDirs(self, dir):
@@ -197,6 +197,12 @@ class InstallKmp():
                 os.makedirs(dir)
             except NotADirectoryError:
                 logging.error("Can't create directory %s", dir)
+                return None
+            except PermissionError:
+                logging.error("No permissions to create directory %s", dir)
+                return None
+            except Exception as e:
+                logging.warning('Exception %s creating %s %s', type(e), dir, e.args)
                 return None
         return dir
 
