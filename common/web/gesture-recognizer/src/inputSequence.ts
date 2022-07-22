@@ -8,7 +8,7 @@ namespace com.keyman.osk {
 
     private _currentTarget: EventTarget;
 
-    private samples: InputSampleSequence = [];
+    public readonly samples: InputSampleSequence = [];
 
     constructor(identifier: number,
                 parsedObj: JSONInputSequence);
@@ -24,6 +24,7 @@ namespace com.keyman.osk {
         this.isFromTouch = isFromTouch;
       } else {
         Object.assign(this, obj);
+        this.samples = [...obj.samples.map((obj) => ({...obj} as InputSample))];
       }
     }
 
@@ -35,17 +36,19 @@ namespace com.keyman.osk {
       this.samples.push(sample);
     }
 
-    // For use with JSON.stringify.
-    static _replacer(key: string, value: any) {
-      if(key == "_currentTarget") { // No point in trying to save an HTMLElement to JSON.
-        return undefined;
-      } else if(key == "identifier") { // Only matters when receiving input, not when replaying it.
-        return undefined;
-      } else if(key == "clientX" || key == "clientY") { // We can reconstruct them from the `target[X|Y]` values.
-        return undefined;
-      } else {
-        return value;
+    toJSON() {
+      let jsonClone = new InputSequence(this.identifier, this) as any;
+
+      // Remove components that shouldn't be serialized.
+      delete jsonClone._currentTarget;
+      delete jsonClone.identifier;
+
+      for(let sample of jsonClone.samples) {
+        delete sample.clientX;
+        delete sample.clientY;
       }
+
+      return jsonClone as JSONInputSequence;
     }
   }
 }
