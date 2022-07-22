@@ -294,7 +294,8 @@ uses
   Keyman.Developer.System.ValidateKpsFile in '..\..\global\delphi\general\Keyman.Developer.System.ValidateKpsFile.pas',
   Keyman.Developer.UI.UfrmServerOptions in 'dialogs\Keyman.Developer.UI.UfrmServerOptions.pas' {frmServerOptions},
   Keyman.Developer.System.ServerAPI in 'http\Keyman.Developer.System.ServerAPI.pas',
-  Keyman.System.FontLoadUtil in 'main\Keyman.System.FontLoadUtil.pas';
+  Keyman.System.FontLoadUtil in 'main\Keyman.System.FontLoadUtil.pas',
+  Keyman.Developer.UI.ServerUI in 'http\Keyman.Developer.UI.ServerUI.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

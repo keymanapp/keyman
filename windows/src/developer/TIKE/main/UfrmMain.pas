@@ -281,6 +281,9 @@ type
     mnuToolsWebDebuggerCopyToClipboard: TMenuItem;
     N7: TMenuItem;
     mnuToolsWebDebuggerConfigure: TMenuItem;
+    N11: TMenuItem;
+    Startserver1: TMenuItem;
+    Stopserver1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);

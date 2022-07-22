@@ -563,6 +563,7 @@
         </DCCReference>
         <DCCReference Include="http\Keyman.Developer.System.ServerAPI.pas"/>
         <DCCReference Include="main\Keyman.System.FontLoadUtil.pas"/>
+        <DCCReference Include="http\Keyman.Developer.UI.ServerUI.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

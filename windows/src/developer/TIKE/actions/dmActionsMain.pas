@@ -137,6 +137,8 @@ type
     actToolsWebCopyPublicUrl: TAction;
     actToolsWebOpenPublicUrl: TAction;
     actToolsWebConfigure: TAction;
+    actToolsWebStartServer: TAction;
+    actToolsWebStopServer: TAction;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -237,6 +239,10 @@ type
     procedure actToolsWebConfigureExecute(Sender: TObject);
     procedure actToolsWebCopyPublicUrlUpdate(Sender: TObject);
     procedure actToolsWebOpenPublicUrlUpdate(Sender: TObject);
+    procedure actToolsWebStartServerExecute(Sender: TObject);
+    procedure actToolsWebStartServerUpdate(Sender: TObject);
+    procedure actToolsWebStopServerExecute(Sender: TObject);
+    procedure actToolsWebStopServerUpdate(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
@@ -789,6 +795,26 @@ begin
   if actToolsWebOpenPublicUrl.Enabled
     then actToolsWebOpenPublicUrl.Caption := 'Open '+TServerDebugAPI.ngrokEndpoint+' in browser'
     else actToolsWebOpenPublicUrl.Caption := 'Open in browser';
+end;
+
+procedure TmodActionsMain.actToolsWebStartServerExecute(Sender: TObject);
+begin
+  TServerDebugAPI.StartServer;
+end;
+
+procedure TmodActionsMain.actToolsWebStartServerUpdate(Sender: TObject);
+begin
+  actToolsWebStartServer.Visible := not TServerDebugAPI.Running;
+end;
+
+procedure TmodActionsMain.actToolsWebStopServerExecute(Sender: TObject);
+begin
+  TServerDebugAPI.StopServer;
+end;
+
+procedure TmodActionsMain.actToolsWebStopServerUpdate(Sender: TObject);
+begin
+  actToolsWebStopServer.Visible := TServerDebugAPI.Running;
 end;
 
 procedure TmodActionsMain.actViewCharacterIdentifierExecute(Sender: TObject);   // I4807
