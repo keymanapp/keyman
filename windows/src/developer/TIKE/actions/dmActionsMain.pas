@@ -1022,6 +1022,8 @@ procedure TmodActionsMain.actWindowPrevExecute(Sender: TObject);
 begin
   with frmKeymanDeveloper do
   begin
+    if ChildWindows.Count = 0 then
+      Exit;
     if ActiveChildIndex = 0
       then ActiveChildIndex := ChildWindows.Count - 1
       else ActiveChildIndex := ActiveChildIndex - 1;
