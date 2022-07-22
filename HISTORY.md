@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.37 alpha 2022-07-22
+
+* fix(linux): Catch PermissionError exception (#6968)
+* chore(linux): Update Debian changelog :cherries: (#6973)
+* chore(linux): Add support for Ubuntu 22.10 "Kinetic Kudu" (#6975)
+* fix(developer): reduce timeouts if server shut down (#6943)
+* fix(linux): Implement refresh after keyboard installation (#6956)
+
 ## 16.0.36 alpha 2022-07-20
 
 * chore(linux): Code cleanup (#6957)
