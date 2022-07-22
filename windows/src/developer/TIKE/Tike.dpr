@@ -331,6 +331,7 @@ begin
             Application.Run;
           finally
             FreeAndNil(modWebHttpServer);
+            FreeAndNil(frmKeymanDeveloper);
           end;
         end;
       finally
