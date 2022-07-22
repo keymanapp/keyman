@@ -204,6 +204,12 @@ class InstallKmp():
             except NotADirectoryError:
                 logging.error("Can't create directory %s", dir)
                 return None
+            except PermissionError:
+                logging.error("No permissions to create directory %s", dir)
+                return None
+            except Exception as e:
+                logging.warning('Exception %s creating %s %s', type(e), dir, e.args)
+                return None
         return dir
 
     def _safeLinkFile(self, source, target):
