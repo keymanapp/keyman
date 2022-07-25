@@ -33,6 +33,12 @@ $(function() {
     builder.saveState();
   });
 
+  $('#btnEditPlatform').click(function () {
+    $('#chkDisplayUnderlying')[0].checked = KVKL[builder.lastPlatform].displayUnderlying;
+    $('#selDefaultHint').val(KVKL[builder.lastPlatform].defaultHint ?? 'dot');
+    $('#platformPropertiesDialog').dialog('open');
+  });
+
   //
   // Platform dialogs
   //
@@ -62,4 +68,43 @@ $(function() {
       }
     }
   });
+
+  //
+  // Platform Properties Dialog
+  //
+
+  $('#chkDisplayUnderlying').click(function (event) {
+    event.stopImmediatePropagation();
+    let selection = builder.saveSelection();
+    builder.saveUndo();
+    KVKL[builder.lastPlatform].displayUnderlying = $('#chkDisplayUnderlying')[0].checked;
+    builder.generate();
+    builder.prepareLayer();
+    builder.restoreSelection(selection);
+  });
+
+  $('#selDefaultHint').change(function () {
+    let selection = builder.saveSelection();
+    builder.saveUndo();
+    KVKL[builder.lastPlatform].defaultHint = $('#selDefaultHint').val();
+    if(KVKL[builder.lastPlatform].defaultHint == 'dot') {
+      delete KVKL[builder.lastPlatform].defaultHint;
+    }
+    builder.generate();
+    builder.prepareLayer();
+    builder.restoreSelection(selection);
+  });
+
+  $('#platformPropertiesDialog').dialog({
+    autoOpen: false,
+    height: 400,
+    width: 450,
+    modal: true,
+    buttons: {
+      "Close": function () {
+        $(this).dialog('close');
+      }
+    }
+  });
+
 }.bind(builder));

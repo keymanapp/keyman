@@ -52,12 +52,6 @@ $(function() {
     builder.saveState();
   });
 
-  $('#chkShowAllModifierOptions').click(function () {
-    builder.showAllModifierCombinations = $('#chkShowAllModifierOptions')[0].checked;
-    builder.fillModifierSelect();
-    builder.prepareKey();
-  });
-
   builder.removeAllSubKeys = function() {
     $('#sub-key-groups .key').remove();
   }
@@ -248,7 +242,7 @@ $(function() {
    * Adds annotating images to a key cap to indicate when it has sub keys
    */
   this.addKeyAnnotations = function(key) {
-    const longpress = $(key).data('longpress'), flick = $(key).data('flick'), multitap = $(key).data('multitap');
+    const longpress = $(key).data('longpress'), flick = $(key).data('flick'), multitap = $(key).data('multitap'), hint = $(key).data('hint');
 
     $('.has-flick', key).remove();
     if (flick && flick.length) {
@@ -267,6 +261,60 @@ $(function() {
     if (multitap && multitap.length) {
       $(key).append('<div class="has-multitap"></div>');
     }
+
+    if(hint && hint.length) {
+      $('.hint', key).addClass('custom-hint');
+    } else {
+      $('.hint', key).removeClass('custom-hint');
+    }
+  }
+
+  this.inferKeyText = function(key) {
+    let code = key.id ? String.fromCharCode(parseInt(key.id.substring(2), 16)) : 0;
+    let text = typeof key.text == 'string' ? key.text : (code == '' || code.charCodeAt(0) < 32 ? '' : code);
+    return text;
+  }
+
+  this.inferKeyHintText = function(keyHint, longpress, flick, multitap) {
+    let hint = keyHint;
+    if(!hint) {
+      switch(KVKL[builder.lastPlatform].defaultHint ?? 'dot') {
+        case 'none':
+          break;
+        case 'dot':
+          // Default for Keyman 15
+          if(longpress && longpress.length) hint = '•';
+          break;
+        case 'longpress':
+          if(longpress && longpress.length) hint = builder.inferKeyText(longpress[0]);
+          break;
+        case 'multitap':
+          if(multitap && multitap.length) hint = builder.inferKeyText(multitap[0]);
+          break;
+        case 'flick':
+          for(let direction of ['n','ne','e','se','s','sw','w','nw']) {
+            if(flick && flick[direction]) {
+              hint = builder.inferKeyText(flick[direction]);
+              break;
+            }
+          }
+          break;
+        case 'flick-n':
+        case 'flick-ne':
+        case 'flick-e':
+        case 'flick-se':
+        case 'flick-s':
+        case 'flick-sw':
+        case 'flick-w':
+        case 'flick-nw':
+          let direction = source.substr(6);
+          if(flick && flick[direction]) hint = builder.inferKeyText(flick[direction]);
+          break;
+      }
+    }
+
+    if(hint == null) return '';
+    return hint;
   }
 
   this.prepareLayer = function () {
@@ -317,8 +365,7 @@ $(function() {
         var nkey = builder.addKey('key', row, key.sp);
         var w = key.width ? key.width : 100;
         var p = (key.pad ? key.pad : builder.keyMargin) * this.xscale;
-        var code = key.id ? String.fromCharCode(parseInt(key.id.substring(2), 16)) : 0;
-        var text = typeof key.text == 'string' ? key.text : (code == '' || code.charCodeAt(0) < 32 ? '' : code);
+        let text = builder.inferKeyText(key);
 
         calcKeyWidth += parseInt(w, 10);
         calcGapWidth += parseInt(key.pad ? key.pad : builder.keyMargin, 10);
@@ -333,6 +380,7 @@ $(function() {
           .data('nextlayer', key.nextlayer)
           .data('layer', key.layer)
           .data('text', text)
+          .data('hint', key.hint)
           .data('longpress', key.sk)
           .data('flick', builder.translateFlickObjectToArray(key.flick))
           .data('multitap', key.multitap)
@@ -351,7 +399,9 @@ $(function() {
         builder.addKeyAnnotations(nkey);
 
         $('.text', nkey).text(this.renameSpecialKey(text));
+        $('.hint', nkey).text(this.inferKeyHintText(key.hint, key.sk, key.flick, key.multitap));
         if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
+
 
         builder.updateKeyId(nkey);
       }
@@ -406,8 +456,6 @@ $(function() {
       option.attr('value', i).text(this.presentations[i].name);
       listContainer.append(option);
     }
-
-    $('#chkDisplayUnderlying')[0].checked = KVKL[builder.lastPlatform].displayUnderlying;
 
     builder.prepareLayers();
     builder.selectLayer(0);
@@ -520,7 +568,7 @@ $(function() {
       $('#wedgeAddRowBelow').offset({ left: rowOffset.left - 18, top: rowOffset.top + $(key).parent().outerHeight() - 7 });
       $('#wedgeAddKeyLeft').offset({ left: offset.left - 9, top: offset.top + $(key).outerHeight() + 2 });
       $('#wedgeAddKeyRight').offset({ left: offset.left + $(key).outerWidth() - 7, top: offset.top + $(key).outerHeight() + 2 });
-      $('div#btnDelKey').offset({ left: offset.left + $(key).outerWidth() - 14, top: offset.top + 3 });
+      $('div#btnDelKey').offset({ left: offset.left + $(key).outerWidth() - 5, top: offset.top - 8 });
       if(!builder.textControlsInToolbar()) {
         $('input#inpKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
       }
@@ -668,6 +716,32 @@ $(function() {
     keyCapChange(val);
   }, {saveOnce: true});
 
+  const keyHintChange = function(val) {
+    const key = builder.selectedKey();
+    key.data('hint', val);
+    $('.hint', key).text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
+    if(val && val.length) {
+      $('.hint', key).addClass('custom-hint');
+    } else {
+      $('.hint', key).removeClass('custom-hint');
+    }
+
+    builder.updateCharacterMap(val, false);
+  }
+
+  const inpKeyHintChange = builder.wrapChange(function (e) {
+    const val = $(this).val();
+    $('#inpKeyHintUnicode').val(builder.toUnicodeString(val));
+    keyHintChange(val);
+  }, {saveOnce: true});
+
+  const inpKeyHintUnicodeChange = builder.wrapChange(function (e) {
+    const val = builder.fromUnicodeString($(this).val());
+    $('#inpKeyHint').val(val);
+    keyHintChange(val);
+  }, {saveOnce: true});
+
+
   const selKeyCapTypeChange = builder.wrapChange(function () {
     var val = $(this).val();
     $('#inpKeyCap').val(val);
@@ -694,6 +768,28 @@ $(function() {
   $('#inpKeyCapUnicode')
     .on('input', inpKeyCapUnicodeChange)
     .change(inpKeyCapUnicodeChange)
+    .mouseup(function () {
+      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
+    }).focus(function () {
+      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
+    }).blur(function () {
+      builder.hasSavedKeyUndo = false;
+    });
+
+  $('#inpKeyHint')
+    .on('input', inpKeyHintChange)
+    .change(inpKeyHintChange)
+    .mouseup(function () {
+      builder.updateCharacterMap($(this).val(), false);
+    }).focus(function () {
+      builder.updateCharacterMap($(this).val(), false);
+    }).blur(function () {
+      builder.hasSavedKeyUndo = false;
+    });
+
+  $('#inpKeyHintUnicode')
+    .on('input', inpKeyHintUnicodeChange)
+    .change(inpKeyHintUnicodeChange)
     .mouseup(function () {
       builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
     }).focus(function () {
@@ -777,11 +873,6 @@ $(function() {
   this.generate = function (display, force) {
     var json = JSON.stringify(KVKL, null, '  ');
 
-    if(!display) {
-      // Save changed settings -- only when not saving undo
-      KVKL[builder.lastPlatform].displayUnderlying = $('#chkDisplayUnderlying')[0].checked;
-    }
-
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
     layer.row = [];
 
@@ -798,6 +889,7 @@ $(function() {
         key.fontsize = $(this).data('fontsize');
         key.nextlayer = $(this).data('nextlayer');
         key.layer = $(this).data('layer');
+        key.hint = $(this).data('hint');
         let longpress = $(this).data('longpress');
         if(longpress && longpress.length) key.sk = longpress;
         let flick = $(this).data('flick');
@@ -851,20 +943,8 @@ $(function() {
 
   $('#btnGenerate').click(function () { builder.generate(false,false); });
 
-  $('#chkDisplayUnderlying').click(function () {
-    let selection = builder.saveSelection();
-    builder.saveUndo();
-    builder.generate();
-    builder.prepareLayer();
-    builder.restoreSelection(selection);
-  });
-
   $('input').focus(function () {
     builder.lastFocus = this;
-  });
-
-  $('input').click(function (event) {
-    event.stopImmediatePropagation();
   });
 
   $('#btnTemplate').click(function () {
