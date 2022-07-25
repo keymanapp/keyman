@@ -1672,6 +1672,7 @@ var
   FSubKey: TTouchLayoutSubKey;
   FRequiredKeys: set of TRequiredKey;
   FDictionary: TStringList;
+  FDirection: TTouchLayoutFlickDirection;
 
     function IsValidUnicodeValue(ch: Integer): Boolean;   // I4198
     begin
@@ -1873,6 +1874,11 @@ begin
               CheckKey(FKey.Id, FKey.Text, FKey.NextLayer, FKey.SpT);   // I4119
               for FSubKey in FKey.Sk do
                 CheckKey(FSubKey.Id, FKey.Text, FSubKey.NextLayer, FSubKey.SpT);   // I4119
+              for FDirection in FKey.Flick.Keys do
+                CheckKey(FKey.Flick[FDirection].Id, FKey.Flick[FDirection].Text,
+                  FKey.Flick[FDirection].NextLayer, FKey.Flick[FDirection].SpT);
+              for FSubKey in FKey.MultiTap do
+                CheckKey(FSubKey.Id, FKey.Text, FSubKey.NextLayer, FSubKey.SpT);
             end;
 
           if FRequiredKeys <> CRequiredKeys then
