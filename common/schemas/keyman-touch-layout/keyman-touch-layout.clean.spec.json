@@ -11,7 +11,9 @@
         "tablet": { "$ref": "#/definitions/platform" },
         "phone": { "$ref": "#/definitions/platform" },
         "desktop": { "$ref": "#/definitions/platform" }
-      }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
     },
 
     "platform": {
@@ -28,7 +30,8 @@
 
     "layers": {
       "type": "array",
-      "items": { "$ref": "#/definitions/layer" }
+      "items": { "$ref": "#/definitions/layer" },
+      "minItems": 1
     },
 
     "layer": {
@@ -48,7 +51,8 @@
 
     "rows": {
       "type": "array",
-      "items": { "$ref": "#/definitions/row" }
+      "items": { "$ref": "#/definitions/row" },
+      "minItems": 1
     },
 
     "row": {
@@ -69,7 +73,8 @@
 
     "keys": {
       "type": "array",
-      "items": { "$ref": "#/definitions/key" }
+      "items": { "$ref": "#/definitions/key" },
+      "minItems": 1
     },
 
     "key": {
@@ -88,6 +93,13 @@
         "flick": { "$ref": "#/definitions/flick" },
         "multitap": { "$ref": "#/definitions/subkeys" }
       },
+      "anyOf": [
+        {"required": ["id"]},
+        {"required": ["sp"]},
+        {"required": ["sk"]},
+        {"required": ["flick"]},
+        {"required": ["multitap"]}
+      ],
       "additionalProperties": false
     },
 
@@ -98,24 +110,25 @@
 
     "key-sp": {
       "type": "integer",
-      "enum": [0, 1, 2, 8, 9, 10],
+      "enum": [0, 1, 2, 8, 9, 10]
     },
 
     "key-pad": {
       "type": "number",
       "minimum": 0,
-      "maximum": 10000
+      "maximum": 100000
     },
 
     "key-width": {
       "type": "number",
       "minimum": 0,
-      "maximum": 1000
+      "maximum": 100000
     },
 
     "subkeys": {
       "type": "array",
-      "items": { "$ref": "#/definitions/subkey" }
+      "items": { "$ref": "#/definitions/subkey" },
+      "minItems": 1
     },
 
     "subkey": {
@@ -140,6 +153,7 @@
       "patternProperties": {
         "^(n|s|e|w|ne|nw|se|sw)$": { "$ref": "#/definitions/subkey" }
       },
+      "minProperties": 1,
       "additionalProperties": false
     },
 

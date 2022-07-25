@@ -813,7 +813,7 @@ $(function() {
   };
 
   this.saveJSON = function(force) {
-    builder.removeEmptyRows();
+    builder.cleanupKVKL();
     var newJson = JSON.stringify(KVKL, null, '  ');
     if(force || newJson != json) {
       // When adding or deleting layers and platforms, we need to force because
@@ -978,23 +978,6 @@ $(function() {
     );
   };
 
-  builder.removeEmptyRows = function() {
-    var json = JSON.stringify(KVKL, null, '  ');
-    for (var platform in KVKL) {
-      for (let layer of KVKL[platform].layer) {
-        let newRow = [], n = 1;
-        for(let row of layer.row) {
-          if(row.key.length > 0) {
-            row.id = n;
-            n++;
-            newRow.push(row);
-          }
-        }
-        layer.row = newRow;
-      }
-    }
-  };
-
   builder.textControlsInToolbar = function() {
     return $('body').hasClass('text-controls-in-toolbar');
   }
@@ -1004,6 +987,7 @@ $(function() {
 
 function initBuilder() {
   $(function() {
+    builder.cleanupKVKL();
     builder.prepareKeyCapTypes();
     builder.preparePlatforms();
     builder.enableUndoControls();
