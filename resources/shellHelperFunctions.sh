@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # WARNING: this file is copied into other locations during package builds; do not

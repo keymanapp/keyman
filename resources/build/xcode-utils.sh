@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script will automatically have Xcode's build environment (and variables),
 # so there's no need to do anything extra to fetch them.

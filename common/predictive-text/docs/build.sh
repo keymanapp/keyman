@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # The diagram is built using the Graphviz suite.
 # You can get it with most package managers, e.g.,

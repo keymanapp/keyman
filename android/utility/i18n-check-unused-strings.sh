@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Based on /windows/src/test/i18n-check-unused-strings
 #
@@ -15,7 +15,7 @@
 # build artifacts. Because of this, and because the script takes a little while to run,
 # I'm not adding the script to the standard build at this time.
 #
-# Note: strings that aren't expected to be found generally should have `translateable="false"`` so they don't get 
+# Note: strings that aren't expected to be found generally should have `translateable="false"`` so they don't get
 # translated in crowdin.
 #
 

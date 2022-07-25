@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Compiles common TS-based utility functions for use among Keyman's codebase
 set -eu

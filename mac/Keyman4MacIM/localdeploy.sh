@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" != "darwin"* ]]; then
@@ -30,7 +30,7 @@ KM4MIM_APP_PATH="$1/$KMIM_APPNAME"
 if ! [[ -d "$KM4MIM_APP_PATH" ]]; then
     display_usage
 fi
- 
+
 pid=$(pgrep Keyman)
 if [[ -n $pid ]]; then
 	kill $pid
