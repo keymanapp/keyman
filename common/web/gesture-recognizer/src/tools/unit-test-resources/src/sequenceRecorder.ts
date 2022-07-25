@@ -4,7 +4,7 @@ namespace Testing {
    *  verification itself.
    */
 
-  type InputSequence = com.keyman.osk.InputSequence;
+  type InputSequence = com.keyman.osk.TrackedPoint;
   type InputSample = com.keyman.osk.InputSample;
 
   type WrappedInputSequence = com.keyman.osk.Incomplete<InputSequence, InputSample>;
@@ -29,7 +29,7 @@ namespace Testing {
 
     private _attachRecognizerHooks() {
       this.controller.recognizer.on(com.keyman.osk.GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, (wrappedSequence: WrappedInputSequence) => {
-        const id = wrappedSequence.item.fullIdentifier;
+        const id = wrappedSequence.item.identifier;
         // TS, by default, doesn't like how we're "publicizing" the private field by doing this.
         //@ts-ignore (To override it selectively in this location.)
         this.records[id]  = { sequence: wrappedSequence.item };
@@ -45,11 +45,11 @@ namespace Testing {
       const END_EVENT    = com.keyman.osk.Incomplete.END_EVENT;
 
       wrappedSequence.on(CANCEL_EVENT, () => {
-        this.records[wrappedSequence.item.fullIdentifier].terminationEvent = CANCEL_EVENT;
+        this.records[wrappedSequence.item.identifier].terminationEvent = CANCEL_EVENT;
       });
 
       wrappedSequence.on(END_EVENT, () => {
-        this.records[wrappedSequence.item.fullIdentifier].terminationEvent = END_EVENT;
+        this.records[wrappedSequence.item.identifier].terminationEvent = END_EVENT;
       })
     }
 

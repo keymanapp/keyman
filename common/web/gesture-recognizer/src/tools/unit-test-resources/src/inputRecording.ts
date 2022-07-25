@@ -2,7 +2,7 @@
 
 namespace Testing {
   export interface RecordedCoordSequence {
-    sequence: JSONObject<com.keyman.osk.InputSequence> & { samples: JSONObject<com.keyman.osk.InputSample>[] };
+    sequence: JSONObject<com.keyman.osk.TrackedPoint> & { samples: JSONObject<com.keyman.osk.InputSample>[] };
     terminationEvent?: "cancel" | "end";
   }
 
