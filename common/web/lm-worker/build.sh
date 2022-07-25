@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications.
 # Designed for optimal compatibility with the Keyman Suite.
@@ -19,19 +19,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
-
-display_usage ( ) {
-  echo "Usage: $0 [configure] [clean] [build] [test]"
-  echo "          [--verbose|-v]"
-  echo "       $0 -h|--help"
-  echo
-  echo "  clean                  removes build/ folder"
-  echo "  configure              runs 'npm ci' on root folder"
-  echo "  build                  builds wrapped version of package"
-  echo "                           [if required will: configure]"
-  echo "  test                   runs tests (builds as req'd)"
-  echo "                           [if required will: build]"
-}
 
 WORKER_OUTPUT=build
 WORKER_OUTPUT_FILENAME=$WORKER_OUTPUT/index.js
@@ -87,14 +74,14 @@ wrap-worker-code ( ) {
 
 ################################ Main script ################################
 
-builder_init "clean configure build test" "$@"
+builder_init "configure clean build test" "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
 if builder_has_action configure; then
   verify_npm_setup
-  builder_report configure success
+  builder_report success configure
 fi
 
 # We always need to clean first because the wrapping function
@@ -104,9 +91,9 @@ fi
 # of typescript, we need to avoid this!
 # TODO: we should try and rework this to avoid the need to manually wrap
 
-if builder_has_action clean || builder_has_action build; then
+if builder_has_action clean || builder_has_action build >/dev/null; then
   npm run clean
-  builder_report clean success
+  builder_report success clean
 fi
 
 if builder_has_action build; then
@@ -124,10 +111,10 @@ if builder_has_action build; then
   wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT}/intermediate.js" > "${WORKER_OUTPUT_FILENAME}" || die
   cp "${WORKER_OUTPUT_FILENAME}" "${WORKER_TEST_BUNDLE_TARGET_FILENAME}" || die
 
-  builder_report build success
+  builder_report success build
 fi
 
 if builder_has_action test; then
   npm test || fail "Tests failed"
-  builder_report test success
+  builder_report success test
 fi
