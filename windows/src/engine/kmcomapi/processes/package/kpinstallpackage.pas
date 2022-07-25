@@ -161,6 +161,7 @@ begin
       FTempOutPath := buf; FTempOutPath := FTempOutPath + '\';
 
       inf := nil;
+      // #TODO 6570Check we can access the file and display an error if we can't, then exit.
       FZip := TZipFile.Create;
       try
         FZip.Open(FileName, TZipMode.zmRead);
