@@ -1,9 +1,9 @@
-/// <reference path="inputSample.ts" />
+/// <reference path="trackedPath.ts" />
 
 namespace com.keyman.osk {
-  type JSONTrackedPoint = {
+  export type JSONTrackedPoint = {
     isFromTouch: boolean;
-    samples: TrackedPoint['path']; // ensures type match with public class property.
+    path: JSONTrackedPath; // ensures type match with public class property.
   }
 
   /**
@@ -24,13 +24,13 @@ namespace com.keyman.osk {
 
     private _initialTarget: EventTarget;
 
-    private samples: InputSampleSequence = [];
+    private _path: TrackedPath;
 
     /**
      * Tracks the coordinates and timestamps of each update for the lifetime of this `TrackedPoint`.
      */
-    public get path(): readonly InputSample[] {
-      return this.samples;
+    public get path(): TrackedPath {
+      return this._path;
     }
 
     /**
@@ -56,11 +56,22 @@ namespace com.keyman.osk {
       if(obj instanceof EventTarget) {
         this._initialTarget = obj;
         this.isFromTouch = isFromTouch;
+        this._path = new TrackedPath();
       } else {
         // @ts-ignore
         this.isFromTouch = obj.isFromTouch;
+
+        // TEMP:  conversion of old format
         // @ts-ignore
-        this.samples = [...obj.samples.map((obj) => ({...obj} as InputSample))];
+        let path = obj.path;
+        if(obj['samples']) {
+          // @ts-ignore
+          path = {
+            coords: obj['samples']
+          };
+        }
+
+        this._path = new TrackedPath(path);
       }
     }
 
@@ -77,26 +88,10 @@ namespace com.keyman.osk {
       return `${prefix}:${this.rawIdentifier}`;
     }
 
-    addSample(sample: InputSample) {
-      this.samples.push(sample);
-    }
-
     toJSON(): JSONTrackedPoint {
       let jsonClone: JSONTrackedPoint = {
         isFromTouch: this.isFromTouch,
-        // Replicate array and its entries, but with certain fields of each entry missing.
-        // No .clientX, no .clientY.
-        samples: [...this.samples.map((obj) => ({
-          targetX: obj.targetX,
-          targetY: obj.targetY,
-          t:       obj.t
-        }))]
-      }
-
-      // Removes components of each sample that we don't want serialized.
-      for(let sample of jsonClone.samples) {
-        delete sample.clientX;
-        delete sample.clientY;
+        path: this.path.toJSON()
       }
 
       return jsonClone;

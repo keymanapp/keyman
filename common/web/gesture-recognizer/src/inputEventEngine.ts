@@ -56,7 +56,7 @@ namespace com.keyman.osk {
 
     onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
       let sequence = new TrackedPoint(identifier, target, this instanceof TouchEventEngine);
-      sequence.addSample(sample);
+      sequence.path.addSample(sample);
 
       let sequenceWrapper = new Incomplete<TrackedPoint, InputSample>(sequence);
 
@@ -77,7 +77,7 @@ namespace com.keyman.osk {
 
     onInputMove(identifier: number, sample: InputSample) {
       const sequenceWrapper = this.getSequenceWrapperWithId(identifier);
-      sequenceWrapper.item.addSample(sample);
+      sequenceWrapper.item.path.addSample(sample);
       sequenceWrapper.signalUpdate(sample);
     }
 
