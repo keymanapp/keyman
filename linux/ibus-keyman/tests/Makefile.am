@@ -54,7 +54,7 @@ ibus_keyman_tests_SOURCES = \
   testfixture.cpp \
   testmodule.c \
   testmodule.h \
-  ../../../core/src/json.cpp \
+  ../../../core/src/jsonpp.cpp \
   ../../../core/src/keyboard.cpp \
   ../../../core/src/kmx/kmx_actions.cpp \
   ../../../core/src/kmx/kmx_actions.h \
