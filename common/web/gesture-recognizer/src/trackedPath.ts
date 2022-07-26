@@ -12,6 +12,7 @@ namespace com.keyman.osk {
 
   export class TrackedPath extends EventEmitter<EventMap> {
     private samples: InputSample[] = [];
+    private isComplete: boolean = false;
 
     constructor();
     /**
@@ -24,10 +25,16 @@ namespace com.keyman.osk {
 
       if(jsonObj) {
         this.samples = [...jsonObj.coords.map((obj) => ({...obj} as InputSample))];
+        // If we're reconstructing this from a JSON.parse, it's a previously-recorded, completed path.
+        this.isComplete = true;
       }
     }
 
     addSample(sample: InputSample) {
+      if(this.isComplete) {
+        throw "Invalid state:  this TrackedPath has already terminated."
+      }
+
       this.samples.push(sample);
       this.emit('step', sample);
     }

@@ -18,14 +18,6 @@ namespace com.keyman.osk {
       this.item = item;
     }
 
-    signalUpdate(updateItem: UpdateType) {
-      if(this.isActive) {
-        this.emit('update', this, updateItem);
-      } else {
-        throw "No further updates to this object are permitted.";
-      }
-    }
-
     cancel() {
       if(this.isActive) {
         this.isActive = false;

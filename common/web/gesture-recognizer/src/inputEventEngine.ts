@@ -78,7 +78,6 @@ namespace com.keyman.osk {
     onInputMove(identifier: number, sample: InputSample) {
       const sequenceWrapper = this.getSequenceWrapperWithId(identifier);
       sequenceWrapper.item.path.addSample(sample);
-      sequenceWrapper.signalUpdate(sample);
     }
 
     onInputMoveCancel(identifier: number) {
