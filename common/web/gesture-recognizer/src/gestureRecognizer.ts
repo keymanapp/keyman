@@ -10,7 +10,7 @@ namespace com.keyman.osk {
     CANCEL = "cancel"
   };
 
-  export class GestureRecognizer extends EventEmitter {
+  export class GestureRecognizer extends EventEmitter<'inputstart'> {
     public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "inputstart";
 
     protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
