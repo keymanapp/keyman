@@ -3,16 +3,20 @@
 namespace com.keyman.osk {
   export type JSONTrackedPath = {
     coords: InputSample[]; // ensures type match with public class property.
+    wasCancelled?: boolean;
   }
 
   interface EventMap {
-    'step': (sample: InputSample) => void
+    'step': (sample: InputSample) => void,
+    'complete': () => void,
+    'invalidated': () => void
     // 'segmentation': (endingSegment: Segment, openingSegment: Segment) => void
   }
 
   export class TrackedPath extends EventEmitter<EventMap> {
     private samples: InputSample[] = [];
-    private isComplete: boolean = false;
+    private _isComplete: boolean = false;
+    private wasCancelled?: boolean;
 
     constructor();
     /**
@@ -26,17 +30,37 @@ namespace com.keyman.osk {
       if(jsonObj) {
         this.samples = [...jsonObj.coords.map((obj) => ({...obj} as InputSample))];
         // If we're reconstructing this from a JSON.parse, it's a previously-recorded, completed path.
-        this.isComplete = true;
+        this._isComplete = true;
+        this.wasCancelled = jsonObj.wasCancelled;
       }
     }
 
+    public get isComplete() {
+      return this._isComplete;
+    }
+
     addSample(sample: InputSample) {
-      if(this.isComplete) {
-        throw "Invalid state:  this TrackedPath has already terminated."
+      if(this._isComplete) {
+        throw "Invalid state:  this TrackedPath has already terminated.";
       }
 
       this.samples.push(sample);
       this.emit('step', sample);
+    }
+
+    terminate(cancel: boolean = false) {
+      if(this._isComplete) {
+        throw "Invalid state:  this TrackedPath has already terminated.";
+      }
+      this.wasCancelled = cancel;
+      this._isComplete = true;
+
+      if(cancel) {
+        this.emit('invalidated');
+      } else {
+        this.emit('complete');
+      }
+      this.removeAllListeners();
     }
 
     public get coords(): readonly InputSample[] {
@@ -52,7 +76,8 @@ namespace com.keyman.osk {
           targetX: obj.targetX,
           targetY: obj.targetY,
           t:       obj.t
-        }))]
+        }))],
+        wasCancelled: this.wasCancelled
       }
 
       // Removes components of each sample that we don't want serialized.

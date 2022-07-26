@@ -58,6 +58,10 @@ namespace com.keyman.osk {
         this.isFromTouch = isFromTouch;
         this._path = new TrackedPath();
       } else {
+        // TEMP:  conversion of old format.
+        if(obj['sequence']) {
+          obj = obj['sequence'];
+        }
         // @ts-ignore
         this.isFromTouch = obj.isFromTouch;
 

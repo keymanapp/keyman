@@ -1,24 +1,16 @@
 /// <reference path="trackedPoint.ts" />
 /// <reference path="gestureRecognizerConfiguration.ts" />
 /// <reference path="includes/events.ts" />
-/// <reference path="incomplete.ts" />
+/// <reference path="trackedInput.ts" />
 
 namespace com.keyman.osk {
   interface EventMap {
-    'inputstart': (sequence: Incomplete<TrackedPoint, InputSample>) => void
+    'pointstart': (input: TrackedPoint) => void
   }
 
-  /**
-   * Supported events:
-   *
-   * - 'inputstart' - a new mouse or touch input sequence has begun.
-   *   - further events are supported on the sequence itself.
-   */
   export abstract class InputEventEngine extends EventEmitter<EventMap> {
-    public static readonly INPUT_START_EVENT_NAME = "inputstart";
-
     protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
-    private _activeSequenceWrappers: Incomplete<TrackedPoint, InputSample>[] = [];
+    private _activeTouchpoints: TrackedPoint[] = [];
 
     public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super();
@@ -31,16 +23,16 @@ namespace com.keyman.osk {
     /**
      * @param identifier The identifier number corresponding to the input sequence.
      */
-    hasActiveSequence(identifier: number) {
-      return this._activeSequenceWrappers.findIndex((seq) => seq.item.rawIdentifier == identifier) != -1;
+    hasActiveTouchpoint(identifier: number) {
+      return this._activeTouchpoints.findIndex((point) => point.rawIdentifier == identifier) != -1;
     }
 
-    private getSequenceWrapperWithId(identifier: number) {
-      return this._activeSequenceWrappers.find((seq) => seq.item.rawIdentifier == identifier);
+    private getTouchpointWithId(identifier: number) {
+      return this._activeTouchpoints.find((point) => point.rawIdentifier == identifier);
     }
 
-    public cleanupSequenceWithId(identifier: number) {
-      this._activeSequenceWrappers = this._activeSequenceWrappers.filter((seq) => seq.item.rawIdentifier != identifier);
+    public dropTouchpointWithId(identifier: number) {
+      this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
     }
 
     protected buildSampleFor(clientX, clientY): InputSample {
@@ -55,49 +47,51 @@ namespace com.keyman.osk {
     }
 
     onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
-      let sequence = new TrackedPoint(identifier, target, this instanceof TouchEventEngine);
-      sequence.path.addSample(sample);
+      let touchpoint = new TrackedPoint(identifier, target, this instanceof TouchEventEngine);
+      touchpoint.path.addSample(sample);
 
-      let sequenceWrapper = new Incomplete<TrackedPoint, InputSample>(sequence);
+      this._activeTouchpoints.push(touchpoint);
 
       // External objects may desire to directly terminate handling of
       // input sequences under specific conditions.
       let _this = this;
-      sequenceWrapper.on('cancel', function() {
-        _this.cleanupSequenceWithId(identifier);
+      touchpoint.path.on('invalidated', function() {
+        _this.dropTouchpointWithId(identifier);
       });
 
-      sequenceWrapper.on('end', function() {
-        _this.cleanupSequenceWithId(identifier);
+      touchpoint.path.on('complete', function() {
+        _this.dropTouchpointWithId(identifier);
       });
 
-      this._activeSequenceWrappers.push(sequenceWrapper);
-      this.emit(InputEventEngine.INPUT_START_EVENT_NAME, sequenceWrapper);
+      this.emit('pointstart', touchpoint);
     }
 
     onInputMove(identifier: number, sample: InputSample) {
-      const sequenceWrapper = this.getSequenceWrapperWithId(identifier);
-      sequenceWrapper.item.path.addSample(sample);
+      const touchpoint = this.getTouchpointWithId(identifier);
+      touchpoint.path.addSample(sample);
     }
 
-    onInputMoveCancel(identifier: number) {
-      let sequenceWrapper = this.getSequenceWrapperWithId(identifier);
+    onInputMoveCancel(identifier: number, sample: InputSample) {
+      let touchpoint = this.getTouchpointWithId(identifier);
 
-      if(!sequenceWrapper) {
+      if(!touchpoint) {
         return;
       }
 
-      sequenceWrapper.cancel();
+      touchpoint.path.addSample(sample);
+      touchpoint.path.terminate(true);
     }
 
-    onInputEnd(identifier: number, sample: InputSample) {
-      let sequenceWrapper = this.getSequenceWrapperWithId(identifier);
+    onInputEnd(identifier: number) {
+      let touchpoint = this.getTouchpointWithId(identifier);
 
-      if(!sequenceWrapper) {
+      if(!touchpoint) {
         return;
       }
 
-      sequenceWrapper.end();
+      // We do not add a sample here because any 'end' event immediately follows a
+      // 'move' if it occurred simultaneously.
+      touchpoint.path.terminate(false);
     }
   }
 }
