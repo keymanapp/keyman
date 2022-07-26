@@ -156,7 +156,23 @@ namespace Testing {
      * @returns A recording of the reproduced version of that sequence.
      */
     replay(sequenceTestSpec: RecordedCoordSequenceSet): RecordedCoordSequenceSet {
-      const set = sequenceTestSpec.set;
+      // TEMP:  ['set'] is for the old form of the recording spec.
+      let inputs = sequenceTestSpec.inputs;
+      if(inputs === undefined) {
+        inputs = sequenceTestSpec.inputs = sequenceTestSpec['set'].map((entry) => {
+          return {
+            touchpoints: [entry]
+          };
+        });
+      }
+
+      // TEMP:  while structures are in flux, a migration round
+      for(let entry of inputs) {
+        if(entry['sequence']) {
+          entry.touchpoints = [ entry['sequence'] ];
+        }
+      }
+
       const config = sequenceTestSpec.config;
 
       // We're going to record the test spec as we replay it, eventually returning the
@@ -170,8 +186,8 @@ namespace Testing {
        * next sample to be 'replayed'.  If the full sequence has already been
        * replayed, its corresponding entry will be set to Number.MAX_VALUE instead.
        */
-      let sequenceProgress: number[] = new Array(set.length).fill(0);
-      let sequenceTouches: Touch[] = new Array(set.length).fill(null);
+      let sequenceProgress: number[] = new Array(inputs.length).fill(0);
+      let sequenceTouches: Touch[] = new Array(inputs.length).fill(null);
 
       while(sequenceProgress.find((number) => number != Number.MAX_VALUE) !== undefined) {
         // Determine the sequence that has the chronologically next-in-line sample
@@ -184,26 +200,26 @@ namespace Testing {
          */
         let selectedSequence = -1;
 
-        for(let index=0; index < set.length; index++) {
-          const sequence = set[index].sequence;
+        for(let index=0; index < inputs.length; index++) {
+          const touchpoint = new com.keyman.osk.TrackedPoint(index, inputs[index].touchpoints[0]);
           const indexInSequence = sequenceProgress[index];
 
           if(indexInSequence == Number.MAX_VALUE) {
             continue;
           }
 
-          if(sequence.samples[indexInSequence].t < minTimestamp) {
-            minTimestamp = sequence.samples[indexInSequence].t;
+          if(touchpoint.path.coords[indexInSequence].t < minTimestamp) {
+            minTimestamp = touchpoint.path.coords[indexInSequence].t;
             selectedSequence = index;
           }
         }
 
-        const sequence = set[selectedSequence].sequence;
+        const touchpoint = new com.keyman.osk.TrackedPoint(selectedSequence, inputs[selectedSequence].touchpoints[0]);
         const indexInSequence = sequenceProgress[selectedSequence];
         let state: string = "move";
 
         let appendEndEvent = false;
-        if(indexInSequence + 1 >= sequence.samples.length) {
+        if(indexInSequence + 1 >= touchpoint.path.coords.length) {
           sequenceProgress[selectedSequence] = Number.MAX_VALUE;
           appendEndEvent = true;
         } else {
@@ -214,8 +230,8 @@ namespace Testing {
           state = "start"
         }
 
-        const sample = sequence.samples[indexInSequence];
-        if(sequence.isFromTouch) {
+        const sample = touchpoint.path.coords[indexInSequence];
+        if(touchpoint.isFromTouch) {
           let otherTouches = [...sequenceTouches];
           otherTouches.splice(selectedSequence, 1);
           // Now that we've removed the entry for the current touchpoint, filter out any null entries.
