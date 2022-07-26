@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 15.0.267 stable 2022-07-26
+
+* fix(developer): QR Code for Package Editor had wrong path (#6927)
+* fix(ios): ignore CFBundleShortVersionString (#6935)
+* fix(web): context-only rule effects, set(&layer) from physical keystrokes  ️ (#6949)
+* chore(web): remove invalid warning msg (#6951)
+* fix(common): Fix `delete` :cherries: (#6966)
+* fix(linux): Another attempt at fixing postinst script :cherries: (#6961)
+* fix(linux): Fix uninstallation when using fcitx5 :cherries: (#6964)
+* fix(linux): Catch PermissionError exception :cherries: (#6969)
+* chore(linux): Update Debian changelog (#6972)
+* fix(developer): kmdecomp virtual character key output (#6945)
+* fix(developer): crash on exit when checking for updates (#6946)
+* fix(developer): crash when switching back a tab (#6947)
+* fix(developer): reduce timeouts if server shut down (#6948)
+* fix(android): rework longpress movement trigger (#6992)
+* chore(linux): Update changelog (#6987)
+* fix(developer): improve error message for multi-part key ids on <15.0 (#6990)
+
 ## 15.0.266 stable 2022-07-08
 
 * fix(linux): Fix post-install script :cherries: (#6895)
