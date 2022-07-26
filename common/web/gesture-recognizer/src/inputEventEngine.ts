@@ -4,13 +4,17 @@
 /// <reference path="incomplete.ts" />
 
 namespace com.keyman.osk {
+  interface EventMap {
+    'inputstart': (sequence: Incomplete<TrackedPoint, InputSample>) => void
+  }
+
   /**
    * Supported events:
    *
    * - 'inputstart' - a new mouse or touch input sequence has begun.
    *   - further events are supported on the sequence itself.
    */
-  export abstract class InputEventEngine extends EventEmitter {
+  export abstract class InputEventEngine extends EventEmitter<EventMap> {
     public static readonly INPUT_START_EVENT_NAME = "inputstart";
 
     protected readonly config: Nonoptional<GestureRecognizerConfiguration>;

@@ -10,7 +10,12 @@ namespace com.keyman.osk {
     CANCEL = "cancel"
   };
 
-  export class GestureRecognizer extends EventEmitter<'inputstart'> {
+  // Documents the types of events that GestureRecognizer supports.
+  interface EventMap {
+    'inputstart': (sequence: Incomplete<TrackedPoint, InputSample>) => any
+  }
+
+  export class GestureRecognizer extends EventEmitter<EventMap> {
     public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "inputstart";
 
     protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
@@ -54,8 +59,8 @@ namespace com.keyman.osk {
       this.mouseEngine.registerEventHandlers();
       this.touchEngine.registerEventHandlers();
 
-      const forwardingUpdateHandler = (state, coord) => {
-        this.emit(GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, state, coord);
+      const forwardingUpdateHandler = (sequence: Incomplete<TrackedPoint, InputSample>) => {
+        this.emit(GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, sequence);
         return false;
       }
 
