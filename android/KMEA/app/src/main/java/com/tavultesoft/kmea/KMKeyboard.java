@@ -188,9 +188,20 @@ final class KMKeyboard extends WebView {
       }
 
       @Override
+      public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        if(e2.getY() - e1.getY() < -5) { // TODO: get better threshold value from KMW
+          if (subKeysList != null && (subKeysWindow == null || !subKeysWindow.isShowing())) {
+            showSubKeys(context);
+            return true;
+          }
+        }
+        return false;
+      }
+
+      @Override
       public void onLongPress(MotionEvent event) {
         // This is also called for banner longpresses!  Need a way to differentiate the sources.
-        if (subKeysList != null && subKeysWindow != null && !subKeysWindow.isShowing()) {
+        if (subKeysList != null && (subKeysWindow == null || !subKeysWindow.isShowing())) {
           showSubKeys(context);
           return;
         } else if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
@@ -286,17 +297,12 @@ final class KMKeyboard extends WebView {
     // Come to think of it, I wonder if suggestionMenuWindow was work being done to link with
     // suggestion banner longpresses - if so, it's not yet ready for proper integration...
     // and would need its own rung in this if-else ladder.
-    if (subKeysWindow != null && suggestionMenuWindow == null) {
+    if (subKeysWindow != null && suggestionMenuWindow == null && subKeysWindow.isShowing()) {
       // Passes KMKeyboard (subclass of WebView)'s touch events off to our subkey window
       // if active, allowing for smooth, integrated gesture control.
       subKeysWindow.getContentView().findViewById(R.id.grid).dispatchTouchEvent(event);
     } else {
-      //handleTouchEvent(event);
       gestureDetector.onTouchEvent(event);
-      if (action == MotionEvent.ACTION_MOVE && subKeysList != null && subKeysWindow == null) {
-        // Display subkeys during move
-        showSubKeys(context);
-      }
     }
 
     if (action == MotionEvent.ACTION_UP) {
