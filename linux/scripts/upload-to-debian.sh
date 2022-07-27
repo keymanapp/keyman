@@ -1,18 +1,31 @@
-#!/bin/bash
-# Upload the latest release to mentors.debian.net. Call from stable-* branch.
-# Usage: upload-to-debian.sh -k <Debian signing key>
-# Requires an entry in ~/.dput.cf:
-# ```
-# [mentors]
-# fqdn = mentors.debian.net
-# incoming = /upload
-# method = https
-# allow_unsigned_uploads = 0
-# progress_indicator = 2
-# allowed_distributions = .*
-# ```
+#!/usr/bin/env bash
+set -eu
 
-set -e
+usage()
+{
+    cat - <<- END
+
+${0} -k <Debian signing key> [-n] [--push]
+
+Create source package for latest stable release and upload to Debian,
+and update (and optionally push) changelog file.
+
+    -k <key>    The PGP key used to sign the source package
+    -n          Simulate upload
+    --push      Push changelog changes to GitHub
+    --help      Display usage help
+
+Requires an entry in ~/.dput.cf:
+    [mentors]
+    fqdn = mentors.debian.net
+    incoming = /upload
+    method = https
+    allow_unsigned_uploads = 0
+    progress_indicator = 2
+    allowed_distributions = .*
+END
+}
+
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -20,73 +33,49 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-PROGRAM_NAME="$(basename "$0")"
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-error()
-{
-	echo -e "${RED}$PROGRAM_NAME: $1${NC}" >&2
-}
-
-log()
-{
-	echo -e "${GREEN}$PROGRAM_NAME: $1${NC}"
-}
-
-usage()
-{
-    echo ""
-    echo "Usage:"
-    echo "${0} -k <Debian signing key> [-n] [--push]"
-    echo ""
-    echo "Create source package for latest stable release and upload to Debian,"
-    echo "and update (and optionally push) changelog file."
-    echo ""
-    echo "    -k <key>    The PGP key used to sign the source package"
-    echo "    -n          Simulate upload"
-    echo "    --push      Push changelog changes to GitHub"
-    echo "    --help      Display usage help"
-}
+NOOP=
+PUSH=
+DEBKEYID=
 
 while (( $# )); do
     case $1 in
-        -k) shift; debkeyid=$1;;
+        -k) shift; [ ! $# -eq 0 ] && DEBKEYID=$1 || fail "Error: The last argument is missing a value. Exiting.";;
         -n) NOOP=: ;;
         --help) usage ; exit 0 ;;
         --push) PUSH=1 ;;
-        *) error "Error: Unexpected argument \"$1\". Exiting." ; exit 1 ;;
+        *) fail "Error: Unexpected argument \"$1\". Exiting." ;;
     esac
-    shift || (error "Error: The last argument is missing a value. Exiting."; false) || exit 2
+    shift || fail "Error: The last argument is missing a value. Exiting."
 done
 
-if [ -z "$debkeyid" ]; then
+if [ -z "$DEBKEYID" ]; then
     usage
-    exit 3
+    exit 2
 fi
 
 if ! git diff --quiet; then
-    error "You have changed files in your git working directory. Exiting."
-    exit 4
+    fail "You have changed files in your git working directory. Exiting."
 fi
 
+echo_heading "Fetching latest changes"
+git fetch -p origin
 stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
 stable_branch=${stable_branch##* }
 git checkout ${stable_branch#origin/}
 
 cd $KEYMAN_ROOT/linux
-log "Building source package"
+echo_heading "Building source package"
 DIST=unstable scripts/debian.sh
 cd debianpackage/
-log "Signing source package"
-debsign -k$debkeyid --re-sign *.changes
-log "Uploading packages to mentors.debian.net"
+echo_heading "Signing source package"
+debsign -k$DEBKEYID --re-sign *.changes
+echo_heading "Uploading packages to mentors.debian.net"
 $NOOP dput mentors *.changes
 cd ..
 
-log "Updating changelog"
-git fetch -p origin
+echo_heading "Updating changelog"
 git checkout -B chore/linux/changelog $stable_branch
 cp debianpackage/keyman-*/debian/changelog debian/
 git add debian/changelog
@@ -100,3 +89,6 @@ git cherry-pick -x chore/linux/changelog
 if [ -n "$PUSH" ]; then
     $NOOP git push origin chore/linux/cherry-pick/changelog
 fi
+
+echo_heading "Finishing"
+git checkout master
