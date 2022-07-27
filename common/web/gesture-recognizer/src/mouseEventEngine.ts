@@ -111,7 +111,7 @@ namespace com.keyman.osk {
     }
 
     onMouseMove(event: MouseEvent) {
-      if(!this.hasActiveSequence(this.activeIdentifier)) {
+      if(!this.hasActiveTouchpoint(this.activeIdentifier)) {
         return;
       }
 
@@ -135,7 +135,7 @@ namespace com.keyman.osk {
     }
 
     onMouseEnd(event: MouseEvent) {
-      if(!this.hasActiveSequence(this.activeIdentifier)) {
+      if(!this.hasActiveTouchpoint(this.activeIdentifier)) {
         return;
       }
 

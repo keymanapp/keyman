@@ -8,7 +8,7 @@ namespace com.keyman.osk {
      * Represents the x-coordinate of the input sample
      * in 'client' / viewport coordinates.
      */
-    clientX: number;
+    clientX?: number;
 
     /**
      * Represents the x-coordinate of the input sample in
@@ -20,7 +20,7 @@ namespace com.keyman.osk {
      * Represents the y-coordinate of the input sample
      * in 'client' / viewport coordinates.
      */
-    clientY: number;
+    clientY?: number;
 
     /**
      * Represents the y-coordinate of the input sample in
