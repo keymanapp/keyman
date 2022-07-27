@@ -19,9 +19,9 @@ namespace com.keyman.osk {
       this._mouseMove  = this.onMouseMove.bind(this);
       this._mouseEnd   = this.onMouseEnd.bind(this);
 
-      // IDs should be unique.  Unfortunately, we can't exactly control the identifier values for
-      // the `touch` properties of TouchEvents... but they're usually non-negative, so this ought help.
-      this.IDENTIFIER_SEED = Math.round(Math.random() * (Number.MIN_SAFE_INTEGER - 10000)) - 10000;
+      // IDs should be unique.  Fortunately, they're disambiguated by their corresponding TrackedPoint,
+      // which has gives a globally-unique string-based identifier based partly on the numeric ID set here.
+      this.IDENTIFIER_SEED = 0;
     }
 
     private get eventRoot(): HTMLElement {
