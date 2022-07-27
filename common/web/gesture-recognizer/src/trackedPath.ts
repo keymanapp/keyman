@@ -39,7 +39,7 @@ namespace com.keyman.osk {
       return this._isComplete;
     }
 
-    addSample(sample: InputSample) {
+    extend(sample: InputSample) {
       if(this._isComplete) {
         throw "Invalid state:  this TrackedPath has already terminated.";
       }
@@ -67,7 +67,6 @@ namespace com.keyman.osk {
       return this.samples;
     }
 
-    //
     toJSON() {
       let jsonClone: JSONTrackedPath = {
         // Replicate array and its entries, but with certain fields of each entry missing.

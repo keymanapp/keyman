@@ -48,7 +48,7 @@ namespace com.keyman.osk {
 
     onInputStart(identifier: number, sample: InputSample, target: EventTarget) {
       let touchpoint = new TrackedPoint(identifier, target, this instanceof TouchEventEngine);
-      touchpoint.path.addSample(sample);
+      touchpoint.path.extend(sample);
 
       this._activeTouchpoints.push(touchpoint);
 
@@ -68,7 +68,7 @@ namespace com.keyman.osk {
 
     onInputMove(identifier: number, sample: InputSample) {
       const touchpoint = this.getTouchpointWithId(identifier);
-      touchpoint.path.addSample(sample);
+      touchpoint.path.extend(sample);
     }
 
     onInputMoveCancel(identifier: number, sample: InputSample) {
@@ -78,7 +78,7 @@ namespace com.keyman.osk {
         return;
       }
 
-      touchpoint.path.addSample(sample);
+      touchpoint.path.extend(sample);
       touchpoint.path.terminate(true);
     }
 
