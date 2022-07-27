@@ -1,22 +1,26 @@
 {
-  "set": [
+  "inputs": [
     {
-      "sequence": {
-        "samples": [
-          {
-            "targetX": 231,
-            "targetY": 82,
-            "t": 131762
-          },
-          {
-            "targetX": 242,
-            "targetY": 81,
-            "t": 131976
+      "touchpoints": [
+        {
+          "isFromTouch": true,
+          "path": {
+            "coords": [
+              {
+                "targetX": 231,
+                "targetY": 82,
+                "t": 131762
+              },
+              {
+                "targetX": 242,
+                "targetY": 81,
+                "t": 131976
+              }
+            ],
+            "wasCancelled": true
           }
-        ],
-        "isFromTouch": true
-      },
-      "terminationEvent": "cancel"
+        }
+      ]
     }
   ],
   "config": {
