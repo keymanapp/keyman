@@ -3,21 +3,12 @@
 /// <reference path="includes/events.ts" />
 
 namespace com.keyman.osk {
-  // export enum TrackedInputState {
-  //   START = "start",
-  //   END = "end",
-  //   MOVE = "move",
-  //   CANCEL = "cancel"
-  // };
-
   // Documents the types of events that GestureRecognizer supports.
   interface EventMap {
     'inputstart': (input: TrackedInput) => any
   }
 
   export class GestureRecognizer extends EventEmitter<EventMap> {
-    public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "inputstart";
-
     protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
     private readonly mouseEngine: MouseEventEngine;
@@ -65,7 +56,7 @@ namespace com.keyman.osk {
         const newInput = new TrackedInput(touchpoint);
         this._activeInputs[touchpoint.identifier] = newInput;
 
-        this.emit(GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, newInput);
+        this.emit('inputstart', newInput);
         return false;
       }
 

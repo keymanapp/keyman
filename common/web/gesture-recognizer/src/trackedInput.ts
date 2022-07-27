@@ -1,24 +1,37 @@
 namespace com.keyman.osk {
+  /**
+   * Documents the expected typing of serialized versions of the `TrackedInput` class.
+   */
   export interface JSONTrackedInput {
     touchpoints: JSONTrackedPoint[];
+    // gesture: Gesture;
   }
 
   interface EventMap {
     'end':    () => void;
     'cancel': () => void;
   }
+
+
   /**
-   * Supported events:
+   * Models a single ongoing input event, which may or may not involve multiple
+   * touchpoints.
    *
-   * - 'cancel':  all gesture recognition on the sequence is to be cancelled
+   * _Supported events_:
+   *
+   * `'cancel'`:  all gesture recognition for this input is to be cancelled
    *                   and left incomplete.
-   * - 'end':     all gesture recognition on the sequence is to be resolved.
+   * - Provides no parameters.
+   *
+   * `'end'`:     all gesture recognition for this input is to be resolved.
+   *   - Provides no parameters.
    */
   export class TrackedInput extends EventEmitter<EventMap> {
-    public static readonly CANCEL_EVENT = 'cancel';
-    public static readonly END_EVENT    = 'end';
-
     public readonly touchpoints: TrackedPoint[];
+
+    // --- Future design aspects ---
+    // private _gesture: Gesture;
+    // public get gesture() { return this._gesture };
 
     private isActive = true;
 
@@ -59,6 +72,10 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * Creates a serialization-friendly version of this instance for use by
+     * `JSON.stringify`.
+     */
     toJSON(): JSONTrackedInput {
       return {
         touchpoints: this.touchpoints.map((point) => point.toJSON())

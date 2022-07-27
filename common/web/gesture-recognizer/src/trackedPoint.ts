@@ -1,9 +1,13 @@
 /// <reference path="trackedPath.ts" />
 
 namespace com.keyman.osk {
+  /**
+   * Documents the expected typing of serialized versions of the `TrackedPoint` class.
+   */
   export type JSONTrackedPoint = {
     isFromTouch: boolean;
-    path: JSONTrackedPath; // ensures type match with public class property.
+    path: JSONTrackedPath;
+    // identifier is not included b/c it's only needed during live processing.
   }
 
   /**
@@ -79,6 +83,9 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * The event target for the first `Event` corresponding to this `TrackedPoint`.
+     */
     public get initialTarget(): EventTarget {
       return this._initialTarget;
     }
@@ -92,6 +99,10 @@ namespace com.keyman.osk {
       return `${prefix}:${this.rawIdentifier}`;
     }
 
+    /**
+     * Creates a serialization-friendly version of this instance for use by
+     * `JSON.stringify`.
+     */
     toJSON(): JSONTrackedPoint {
       let jsonClone: JSONTrackedPoint = {
         isFromTouch: this.isFromTouch,
