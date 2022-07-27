@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.39 alpha 2022-07-27
+
+* chore(linux): Update debian changelog (#6996)
+
 ## 16.0.38 alpha 2022-07-26
 
 * feat(developer): add hint support to Touch Layout Editor and schema (#6936)
