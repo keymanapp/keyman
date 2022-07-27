@@ -136,7 +136,9 @@ public final class KeyboardInfoActivity extends BaseActivity {
           } else {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(customHelpLink));
-            startActivity(i);
+            if (i.resolveActivity(getPackageManager()) != null) {
+              startActivity(i);
+            }
           }
         }
       }

@@ -160,7 +160,9 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
           Bundle args = kbd.buildDownloadBundle();
           Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
           i.putExtras(args);
-          startActivity(i);
+          if (i.resolveActivity(getPackageManager()) != null) {
+            startActivity(i);
+          }
           finish();
 
         // "Help" link clicked

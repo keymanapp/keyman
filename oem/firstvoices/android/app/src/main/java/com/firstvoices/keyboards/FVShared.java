@@ -252,7 +252,9 @@ final class FVShared {
         String helpUrl = String.format("%s%s", FVKeyboardHelpLink, id);
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(helpUrl));
-        localContext.startActivity(i);
+        if (i.resolveActivity(getPackageManager()) != null) {
+          localContext.startActivity(i);
+        }
     }
 
     private void updateActiveKeyboardsList() {

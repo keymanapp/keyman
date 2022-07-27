@@ -113,7 +113,9 @@ public class KMPBrowserActivity extends BaseActivity {
 
           // All links that aren't internal Keyman keyboard links open in user's browser
           Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-          startActivity(intent);
+          if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+          }
           return true;
         }
         if (lowerURL.startsWith("keyman:")) {
