@@ -26,12 +26,7 @@ describe("Layer one - DOM -> InputSequence", function() {
       let playbackEngine = new Testing.InputSequenceSimulator(this.controller);
       let result = playbackEngine.replay(testObj);
 
-      // TEMP
-      if(testObj.set) {
-        assert.equal(result.inputs.length, testObj.set.length);
-      } else {
-        assert.equal(result.inputs.length, testObj.inputs.length);
-      }
+      assert.equal(result.inputs.length, testObj.inputs.length);
 
       // Removes the timestamp element; we know that this component won't match, as the playback engine
       // doesn't care about it.
@@ -39,28 +34,11 @@ describe("Layer one - DOM -> InputSequence", function() {
 
       // Returns just the observed, cleaned samples for a sequence object.  The recorded coordinates
       // should match perfectly.
-      let seqCleaner = (seq) => {
-        if(seq.sequence) {
-          // Old style
-          return seq.sequence.samples.map(sampleCleaner);
-        } else {
-          // New style
-          return seq.touchpoints[0].path.coords.map(sampleCleaner);
-        }
+      let seqCleaner = (input) => {
+        return input.touchpoints[0].path.coords.map(sampleCleaner);
       };
 
-      let cleanOriginalSet;
-      // TEMP
-      if(testObj.set) {
-        cleanOriginalSet = testObj.set.map(seqCleaner);
-      } else {
-        cleanOriginalSet = testObj.inputs.map(seqCleaner);
-      }
-
-      // TEMP STATEMENT - logs the new JSON format for old-format JSON recordings.
-      if(testObj.set) {
-        console.log(JSON.stringify(result, null, 2));
-      }
+      let cleanOriginalSet = testObj.inputs.map(seqCleaner);
       let cleanResultSet   = result .inputs.map(seqCleaner);
 
       expect(cleanResultSet).to.deep.equal(cleanOriginalSet);
@@ -68,21 +46,10 @@ describe("Layer one - DOM -> InputSequence", function() {
       // The 'terminationEvent' property should match.  Any sequence that was "canceled" should still
       // cancel; that's a pretty critical detail!
       let terminationEventMapper = (seq) => {
-        if(seq.terminationEvent) {
-          // Old form
-          return seq.terminationEvent == 'cancel';
-        } else {
-          // New form
-          return seq.touchpoints[0].path.wasCancelled;
-        }
+        return seq.touchpoints[0].path.wasCancelled;
       }
 
-      // TEMP
-      if(testObj.set) {
-        expect(result.inputs.map(terminationEventMapper)).to.deep.equal(testObj.set.map(terminationEventMapper));
-      } else {
-        expect(result.inputs.map(terminationEventMapper)).to.deep.equal(testObj.inputs.map(terminationEventMapper));
-      }
+      expect(result.inputs.map(terminationEventMapper)).to.deep.equal(testObj.inputs.map(terminationEventMapper));
     }
 
     // List all relevant fixtures in src/test/resources/json.
@@ -104,7 +71,6 @@ describe("Layer one - DOM -> InputSequence", function() {
         let testObj = __json__[recordingID];
 
         // 'describe' has a notably different `this` reference than `it`, `before`, etc.
-        console.log(`${recordingID}.json`);
         replayAndCompare.call(this, testObj);
       });
     }
