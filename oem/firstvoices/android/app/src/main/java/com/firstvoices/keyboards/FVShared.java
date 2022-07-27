@@ -252,7 +252,7 @@ final class FVShared {
         String helpUrl = String.format("%s%s", FVKeyboardHelpLink, id);
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(helpUrl));
-        if (i.resolveActivity(getPackageManager()) != null) {
+        if (i.resolveActivity(localContext.getPackageManager()) != null) {
           localContext.startActivity(i);
         }
     }
