@@ -19,7 +19,8 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
-builder_init "configure clean build test" "$@"
+builder_describe "Build the include script for current Keyman version" configure clean build test
+builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified

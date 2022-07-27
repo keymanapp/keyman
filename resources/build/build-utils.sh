@@ -433,7 +433,7 @@ _builder_get_default_description() {
     configure) description="install dependencies, e.g. npm" ;;
     build)     description="build target(s)" ;;
     test)      description="run automated tests" ;;
-    ":project")  description="this project" ;;
+    :project)  description="this project" ;;
     :app)      description="main app" ;;
     :engine)   description="engine module" ;;
     :module)   description="this module" ;;
@@ -441,26 +441,6 @@ _builder_get_default_description() {
     --debug)   description="debug build" ;;
   esac
   echo "$description"
-}
-
-# Initializes a build.sh script, parses command line. Will abort the script if
-# invalid parameters are passed in. This is a shorthand for builder_describe
-# followed by builder_parse, useful for simple scripts which don't need
-# additional detail in parameters or multiple targets.
-#
-# Usage:
-#   builder_init "action1 action2" "$@"
-# Parameters
-#   1: _builder_actions    space-separated list of possible actions
-#   2: $@         command-line arguments
-builder_init() {
-  _builder_actions=($1)
-  _builder_targets=(:project)
-  _builder_options=()
-  declare -A -g _builder_params
-  declare -A -g _builder_options_short
-  shift
-  builder_parse "$@"
 }
 
 # Initializes a build.sh script, parses command line. Will abort the script if

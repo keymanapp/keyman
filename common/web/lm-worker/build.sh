@@ -74,7 +74,11 @@ wrap-worker-code ( ) {
 
 ################################ Main script ################################
 
-builder_init "configure clean build test" "$@"
+builder_describe \
+  "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
+  configure clean build test
+
+builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified

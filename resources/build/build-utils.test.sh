@@ -10,11 +10,12 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# Shorthand builder_init
+# First up, test the simple case with a default :project target
 
-builder_init "clean build" "build"
+builder_describe - clean build
+builder_parse "build"
 if [[ "${_builder_chosen_action_targets[@]}" != "build:project" ]]; then
-  fail "  Test: builder_init, shorthand form 'build' should give us 'build:project"
+  fail "  Test: builder_parse, shorthand form 'build' should give us 'build:project"
 fi
 
 if builder_has_action build; then
