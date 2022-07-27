@@ -68,8 +68,8 @@ namespace com.keyman.osk {
       }
     }
 
-    public cleanupSequenceWithId(identifier: number) {
-      super.cleanupSequenceWithId(identifier);
+    public dropTouchpointWithId(identifier: number) {
+      super.dropTouchpointWithId(identifier);
 
       delete this.safeBoundMaskMap[identifier];
     }
@@ -108,7 +108,7 @@ namespace com.keyman.osk {
       for(let i=0; i < event.changedTouches.length; i++) {
         const touch = event.changedTouches.item(i);
 
-        if(!this.hasActiveSequence(touch.identifier)) {
+        if(!this.hasActiveTouchpoint(touch.identifier)) {
           continue;
         }
 
@@ -128,7 +128,7 @@ namespace com.keyman.osk {
       for(let i=0; i < event.changedTouches.length; i++) {
         const touch = event.changedTouches.item(i);
 
-        if(!this.hasActiveSequence(touch.identifier)) {
+        if(!this.hasActiveTouchpoint(touch.identifier)) {
           continue;
         }
 

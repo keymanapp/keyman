@@ -3,20 +3,18 @@
 /// <reference path="includes/events.ts" />
 
 namespace com.keyman.osk {
-  export enum TrackedInputState {
-    START = "start",
-    END = "end",
-    MOVE = "move",
-    CANCEL = "cancel"
-  };
+  // Documents the types of events that GestureRecognizer supports.
+  interface EventMap {
+    'inputstart': (input: TrackedInput) => any
+  }
 
-  export class GestureRecognizer extends EventEmitter {
-    public static readonly TRACKED_INPUT_UPDATE_EVENT_NAME = "inputstart";
-
+  export class GestureRecognizer extends EventEmitter<EventMap> {
     protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
     private readonly mouseEngine: MouseEventEngine;
     private readonly touchEngine: TouchEventEngine;
+
+    private _activeInputs: {[id: string]: TrackedInput} = {};
 
     protected static preprocessConfig(config: GestureRecognizerConfiguration): Nonoptional<GestureRecognizerConfiguration> {
       // Allows configuration pre-processing during this method.
@@ -54,13 +52,16 @@ namespace com.keyman.osk {
       this.mouseEngine.registerEventHandlers();
       this.touchEngine.registerEventHandlers();
 
-      const forwardingUpdateHandler = (state, coord) => {
-        this.emit(GestureRecognizer.TRACKED_INPUT_UPDATE_EVENT_NAME, state, coord);
+      const forwardingUpdateHandler = (touchpoint: TrackedPoint) => {
+        const newInput = new TrackedInput(touchpoint);
+        this._activeInputs[touchpoint.identifier] = newInput;
+
+        this.emit('inputstart', newInput);
         return false;
       }
 
-      this.mouseEngine.on(InputEventEngine.INPUT_START_EVENT_NAME, forwardingUpdateHandler);
-      this.touchEngine.on(InputEventEngine.INPUT_START_EVENT_NAME, forwardingUpdateHandler);
+      this.mouseEngine.on('pointstart', forwardingUpdateHandler);
+      this.touchEngine.on('pointstart', forwardingUpdateHandler);
     }
 
     public destroy() {
