@@ -49,7 +49,7 @@ inherited frmModelEditor: TfrmModelEditor
         object panWordlists: TPanel
           AlignWithMargins = True
           Left = 4
-          Top = 261
+          Top = 279
           Width = 611
           Height = 232
           Margins.Left = 4
@@ -59,6 +59,7 @@ inherited frmModelEditor: TfrmModelEditor
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
+          ExplicitTop = 261
           DesignSize = (
             611
             232)
@@ -81,7 +82,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 200
             Width = 415
             Height = 13
-            Caption =
+            Caption = 
               'The editor was unable to parse the source file. Details shown he' +
               're are read-only.'
           end
@@ -132,7 +133,7 @@ inherited frmModelEditor: TfrmModelEditor
           Left = 4
           Top = 6
           Width = 611
-          Height = 247
+          Height = 265
           Margins.Left = 4
           Margins.Top = 6
           Margins.Right = 4
@@ -144,7 +145,7 @@ inherited frmModelEditor: TfrmModelEditor
           TabOrder = 0
           DesignSize = (
             611
-            247)
+            265)
           object lblFormat: TLabel
             Left = 12
             Top = 30
@@ -176,7 +177,7 @@ inherited frmModelEditor: TfrmModelEditor
           end
           object lblComments: TLabel
             Left = 12
-            Top = 163
+            Top = 181
             Width = 50
             Height = 13
             Caption = 'Comme&nts'
@@ -246,12 +247,12 @@ inherited frmModelEditor: TfrmModelEditor
           end
           object memoComments: TMemo
             Left = 106
-            Top = 160
+            Top = 178
             Width = 498
             Height = 87
             Anchors = [akLeft, akTop, akRight]
             BevelOuter = bvNone
-            TabOrder = 6
+            TabOrder = 7
             OnChange = memoCommentsChange
           end
           object cbInsertAfterWord: TComboBox
@@ -293,6 +294,15 @@ inherited frmModelEditor: TfrmModelEditor
             OnClick = cbCloseQuoteClick
             OnKeyUp = cbCloseQuoteKeyUp
           end
+          object chkLanguageUsesCasing: TCheckBox
+            Left = 106
+            Top = 155
+            Width = 145
+            Height = 17
+            Caption = 'Language uses casing'
+            TabOrder = 6
+            OnClick = chkLanguageUsesCasingClick
+          end
         end
       end
     end
@@ -318,7 +328,7 @@ inherited frmModelEditor: TfrmModelEditor
           Top = 13
           Width = 333
           Height = 13
-          Caption =
+          Caption = 
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
@@ -363,7 +373,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 72
             Width = 389
             Height = 26
-            Caption =
+            Caption = 
               'Optionally, select a compiled keyboard with which to test this l' +
               'exical model. Any keyboards already loaded in the web debugger w' +
               'ill also be available.'
