@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.40 alpha 2022-07-28
+
+* chore(linux): Add script to upload to debian (#6997)
+
 ## 16.0.39 alpha 2022-07-27
 
 * chore(linux): Update debian changelog (#6996)
