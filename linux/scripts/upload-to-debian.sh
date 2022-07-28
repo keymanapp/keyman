@@ -65,7 +65,7 @@ stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
 stable_branch=${stable_branch##* }
 git checkout ${stable_branch#origin/}
 
-cd $KEYMAN_ROOT/linux
+cd "$KEYMAN_ROOT/linux"
 echo_heading "Building source package"
 DIST=unstable scripts/debian.sh
 cd debianpackage/

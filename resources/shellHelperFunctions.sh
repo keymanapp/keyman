@@ -90,7 +90,8 @@ if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; th
     COLOR_BLUE=$(tput setaf 4)
     COLOR_YELLOW=$(tput setaf 3)
     COLOR_RESET=$(tput sgr0)
-    SETMARK='\x1b]1337;SetMark\x07'
+    # e.g. VSCode https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support
+    HEADING_SETMARK='\x1b]1337;SetMark\x07'
 else
     COLOR_RED=
     COLOR_GREEN=
@@ -101,7 +102,7 @@ else
 fi
 
 echo_heading() {
-  echo -e "${SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
+  echo -e "${HEADING_SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
 }
 
 log_error() {
