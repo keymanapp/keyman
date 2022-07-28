@@ -284,12 +284,19 @@ else
     COLOR_YELLOW=
     COLOR_RESET=
 fi
-###
+
+####################################################################################
+#
+# builder_ functions for standard build script parameter and process management
+#
+####################################################################################
 
 #
 # builder_ names are reserved.
 # _builder_ names are internal use and subject to change
 #
+_builder_default_action=build
+_builder_debug=true
 
 # returns 0 if first parameter is in the array passed as second parameter
 #
@@ -367,15 +374,35 @@ _builder_trim() {
 }
 
 #
-# Optionally describes a build script, will be used in reporting a parameter
-# failure or with --help. Use together with builder_parse
+# Describes a build script, defines available parameters
+# and their meanings. Use together with builder_parse
+# to process input parameters
 #
 # Usage:
 #    builder_describe description param_desc...
 # Parameters:
 #    description   A short description of what the script does
-#    param_desc    Name and description of parameter, e.g. "build   Builds the target"
+#    param_desc    Space separated name and description of parameter, e.g.
+#                  "build   Builds the target"
 #                  May be repeated to describe all parameters
+#
+# There are three types of parameters that may be specified:
+#
+# * Option, param_desc format: "--option[,-o]   [One line description]"
+#   All options must have a longhand form with two prefix hyphens,
+#   e.g. --option. The ",-o" shorthand form is optional. When testing if
+#   the option is set with `builder_has_option``, always use the longhand
+#   form.
+#
+# * Action, param_desc format: "action   [One line description]"
+#   Actions must be a single word, lower case. To specify an action
+#   as the default, append a '+' to the action name, e.g.
+#   "test+   Test the project". If there is no default specified, then
+#   it will be 'build'
+#
+# * Target, param_desc format: ":target   [One line description]"
+#   A target always starts with colon, e.g. :project.
+#
 builder_describe() {
   _builder_description="$1"
   _builder_actions=()
@@ -392,9 +419,12 @@ builder_describe() {
     if [[ $key =~ [[:space:]] ]]; then
       description=$(_builder_trim "$(echo "$key" | cut -d" " -f 2- -)")
     fi
+
     if [[ $value =~ ^: ]]; then
+      # Parameter is a target
       _builder_targets+=($value)
     elif [[ $value =~ ^-- ]]; then
+      # Parameter is an option
       # Look for a shorthand version of the option
       if [[ $value =~ , ]]; then
         local option_long="$(echo "$value" | cut -d, -f 1 -)"
@@ -406,6 +436,12 @@ builder_describe() {
         _builder_options+=($value)
       fi
     else
+      # Parameter is an action
+      if [[ $value =~ \+$ ]]; then
+        # If the action name has a '+' suffix then it is the default action
+        value=${value//+}
+        _builder_default_action=$value
+      fi
       _builder_actions+=($value)
     fi
 
@@ -465,29 +501,32 @@ builder_parse() {
 
     if [[ $key =~ : ]]; then
       IFS=: read -r action target <<< $key
+      target=:$target
     else
       action="$key"
       target=
     fi
 
     _builder_item_in_array "$action" "${_builder_actions[@]}" && has_action=1 || has_action=0
-    _builder_item_in_array ":$target" "${_builder_targets[@]}" && has_target=1 || has_target=0
+    _builder_item_in_array "$target" "${_builder_targets[@]}" && has_target=1 || has_target=0
 
+    # Expand short -o to --option in options lookup
     if [[ ! -z ${_builder_options_short[$key]+x} ]]; then
-      key="${_builder_options_short[$key]}"
+      key=${_builder_options_short[$key]}
     fi
     _builder_item_in_array "$key" "${_builder_options[@]}" && has_option=1 || has_option=0
 
     if (( has_action )) && (( has_target )); then
+      # apply the selected action and selected target
       _builder_chosen_action_targets+=("$key")
     elif (( has_action )); then
+      # apply the selected action to all targets
       for e in "${_builder_targets[@]}"; do
         _builder_chosen_action_targets+=("$action$e")
       done
     elif (( has_target )); then
-      for e in "${_builder_actions[@]}"; do
-        _builder_chosen_action_targets+=("$e:$target")
-      done
+      # apply the default action to the selected target
+      _builder_chosen_action_targets+=("$_builder_default_action$target")
     elif (( has_option )); then
       _builder_chosen_options+=("$key")
     else
@@ -509,10 +548,21 @@ builder_parse() {
     shift # past the processed argument
   done
 
-  # TODO: not sure if this is appropriate or if we should error?
   if (( ! ${#_builder_chosen_action_targets[@]} )); then
     for e in "${_builder_targets[@]}"; do
-      _builder_chosen_action_targets+=("build$e")
+      _builder_chosen_action_targets+=("$_builder_default_action$e")
+    done
+  fi
+
+  if $_builder_debug; then
+    echo "[DEBUG] Selected actions and targets:"
+    for e in "${_builder_chosen_action_targets[@]}"; do
+      echo "* $e"
+    done
+    echo
+    echo "[DEBUG] Selected options:"
+    for e in "${_builder_chosen_options[@]}"; do
+      echo "* $e"
     done
   fi
 }
@@ -544,7 +594,7 @@ builder_display_usage() {
     echo
   fi
 
-  echo "Usage: $program [options] [action][:target]..."
+  echo "Usage: $program [options...] [action][:target]..."
   echo
   echo "Actions: "
 
@@ -580,6 +630,10 @@ builder_display_usage() {
 
   _builder_pad $width "  --verbose, -v" "Verbose logging"
   _builder_pad $width "  --help, -h" "Show this help"
+  echo
+  echo "* If action is not specified, default action is '$_builder_default_action'"
+  echo "* If :target is not specified, will apply action to all targets"
+  echo "* If no actions or :targets are specified, '$_builder_default_action' action will run on all targets"
   echo
 }
 

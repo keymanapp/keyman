@@ -45,6 +45,14 @@ builder_describe_parse_short_test "clean build test" ":module :tools :app" "buil
 builder_describe_parse_short_test "clean build test" ":module :tools :app" "build:app clean:module" "build:app clean:module"
 builder_describe_parse_short_test "clean build test" ":module :tools :app :project" "clean:module clean:tools clean:app clean:project build:app build:project" "clean build:app build:project"
 
+# Test different default action
+
+builder_describe "-" clean build test 'default+' :module :tools :app
+
+if [[ $_builder_default_action != "default" ]]; then
+  fail "FAIL: default action should have been 'default'"
+fi
+
 # Shorthand form where we don't have a :target (default is ":project")
 if builder_has_action build; then
   echo "building project"
