@@ -296,7 +296,7 @@ fi
 # _builder_ names are internal use and subject to change
 #
 _builder_default_action=build
-_builder_debug=true
+_builder_debug=false
 
 # returns 0 if first parameter is in the array passed as second parameter
 #
