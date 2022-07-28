@@ -98,7 +98,7 @@ else
     COLOR_BLUE=
     COLOR_YELLOW=
     COLOR_RESET=
-    SETMARK=
+    HEADING_SETMARK=
 fi
 
 echo_heading() {
