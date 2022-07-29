@@ -494,6 +494,18 @@ object modActionsMain: TmodActionsMain
       Caption = 'Co&nfigure...'
       OnExecute = actToolsWebConfigureExecute
     end
+    object actToolsWebStartServer: TAction
+      Category = 'Tools'
+      Caption = '&Start server'
+      OnExecute = actToolsWebStartServerExecute
+      OnUpdate = actToolsWebStartServerUpdate
+    end
+    object actToolsWebStopServer: TAction
+      Category = 'Tools'
+      Caption = '&Stop server'
+      OnExecute = actToolsWebStopServerExecute
+      OnUpdate = actToolsWebStopServerUpdate
+    end
   end
   object ActionManager1: TActionManager
     ActionBars = <

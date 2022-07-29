@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "**TODO** Update script to work with new history/versioning"
 exit 1

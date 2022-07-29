@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Build KMAPro
 
 # Set sensible script defaults:

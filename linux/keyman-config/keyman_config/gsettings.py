@@ -3,8 +3,8 @@ import logging
 import os
 import subprocess
 import sys
-from gi.repository import Gio
 
+from gi.repository import Gio # needs to come before gi.overrides.GLib!
 from gi.overrides.GLib import Variant
 
 
@@ -90,9 +90,9 @@ class GSettings():
         if self.is_sudo:
             variant = str(value)
             subprocess.run(
-                ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
-                 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
-                 'gsettings', 'set', self.schema_id, key, variant])
+              ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
+               'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus' % os.environ.get('SUDO_UID'),
+               'gsettings', 'set', self.schema_id, key, variant])
         else:
             variant = self._convert_array_to_variant(value, type)
             self.schema.set_value(key, variant)

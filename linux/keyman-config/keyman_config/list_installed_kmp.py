@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
+import json
 import logging
 import os
-import json
+
 from keyman_config import secure_lookup
-from keyman_config.kmpmetadata import parsemetadata, parseinfdata
-from keyman_config.get_kmp import get_keyman_dir, InstallLocation
 from keyman_config.deprecated_decorator import deprecated
+from keyman_config.get_kmp import InstallLocation, get_keyman_dir
+from keyman_config.kmpmetadata import parseinfdata, parsemetadata
 
 
 @deprecated('Use get_keyman_dir(area) instead')

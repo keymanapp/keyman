@@ -281,6 +281,9 @@ type
     mnuToolsWebDebuggerCopyToClipboard: TMenuItem;
     N7: TMenuItem;
     mnuToolsWebDebuggerConfigure: TMenuItem;
+    N11: TMenuItem;
+    Startserver1: TMenuItem;
+    Stopserver1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -477,7 +480,10 @@ begin
     with PCWPSTRUCT(lParam)^ do
       if message = WM_INPUTLANGCHANGE then
         PostMessage(frmKeymanDeveloper.Handle, WM_USER_INPUTLANGCHANGE, wParam, lParam);
-  Result := CallNextHookEx(frmKeymanDeveloper.hInputLangChangeHook, nCode, wParam, lParam);
+  if frmKeymanDeveloper <> nil then
+    Result := CallNextHookEx(frmKeymanDeveloper.hInputLangChangeHook, nCode, wParam, lParam)
+  else
+    Result := 0;
 end;
 
 

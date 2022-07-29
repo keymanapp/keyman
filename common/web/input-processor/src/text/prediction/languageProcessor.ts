@@ -157,9 +157,6 @@ namespace com.keyman.text.prediction {
       } else if(outputTarget) {
         let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
         this.predict_internal(transcription, true, layerId);
-      } else {
-        // Shouldn't be possible, and we'll want to know if and when it is.
-        console.warn("OutputTarget missing during an invalidateContext call");
       }
     }
 

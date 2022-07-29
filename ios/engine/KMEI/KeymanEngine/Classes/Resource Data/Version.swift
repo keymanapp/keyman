@@ -25,8 +25,7 @@ public class Version: NSObject, Comparable {
   public static let latestFeature = packageBasedFileReorg
 
   public static var current: Version {
-    let engineInfo = Bundle(for: Manager.self).infoDictionary
-    return Version(engineInfo!["CFBundleShortVersionString"] as! String)!
+    return Version(Version.currentTagged.plainString)!
   }
 
   public static var currentTagged: Version {

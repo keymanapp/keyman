@@ -192,7 +192,7 @@ PWCHAR ifvalue(WCHAR ch)
   return L"=";
 }
 
-#define BUFSIZE 512
+#define BUFSIZE 2048
 PWCHAR ExtString(PWCHAR str)
 {
 	static WCHAR buf[2][BUFSIZE], bufpointer = 0;	// allows for multiple strings in one printf
@@ -251,7 +251,7 @@ PWCHAR ExtString(PWCHAR str)
 				str++;
 				if(*str & VIRTUALCHARKEY)
 					wsprintfW(p, L"[%s%c%c%c] ", flagstr(*str), *(str+1) == L'"' ? L'\'' : L'"',
-						str+1, *(str+1) == L'"' ? L'\'' : L'"');
+						*(str+1), *(str+1) == L'"' ? L'\'' : L'"');
 				else
         {
           if(*(str+1) > VK__MAX)  // I3438
@@ -369,17 +369,18 @@ void wr(FILE *fp, PWSTR buf)
 	fwrite(buf, wcslen(buf) * 2, 1, fp);
 }
 
-int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *filename, char *bmpfile)
+int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char* filename, char* bmpfile)
 {
-	PWCHAR buf;
-	FILE *fp;
-	LPSTORE sp;
-	LPGROUP gp;
-	LPKEY kp;
-	unsigned int i, j;
-  char bmpbuf[256];
+  PWCHAR buf;
+  FILE* fp;
+  LPSTORE sp;
+  LPGROUP gp;
+  LPKEY kp;
+  unsigned int i, j;
+  char bmpbuf[_MAX_PATH];
+  char bmp_drive[_MAX_DRIVE], bmp_dir[_MAX_DIR], bmp_filename[_MAX_FNAME], bmp_ext[_MAX_EXT];
 
-	buf = new WCHAR[1024];
+	buf = new WCHAR[2048];
 
 	g_kbd = kbd;
 
@@ -405,7 +406,10 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
 
     if(sp->dwSystemID == TSS_BITMAP)
     {
-      WideCharToMultiByte(CP_ACP, 0, sp->dpString, -1, bmpbuf, 256, NULL, NULL);
+      WideCharToMultiByte(CP_ACP, 0, sp->dpString, -1, bmpbuf, _MAX_PATH, NULL, NULL);
+      _splitpath_s(bmpbuf, NULL, NULL, NULL, NULL, bmp_filename, _MAX_FNAME, bmp_ext, _MAX_EXT);
+      _splitpath_s(bmpfile, bmp_drive, _MAX_DRIVE, bmp_dir, _MAX_DIR, NULL, NULL, NULL, NULL);
+      _makepath_s(bmpbuf, _MAX_PATH, bmp_drive, bmp_dir, bmp_filename, bmp_ext);
       bmpfile = bmpbuf;
     }
 		wr(fp, buf);
@@ -452,7 +456,9 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
 	wsprintfW(buf, L"c EOF\n\n"); wr(fp, buf);
 	fclose(fp);
 
-	SaveBitmapFile(lpBitmap, cbBitmap, bmpfile);
+  if (lpBitmap && cbBitmap && bmpfile && *bmpfile) {
+    SaveBitmapFile(lpBitmap, cbBitmap, bmpfile);
+  }
 
 	return 0;
 }

@@ -2,8 +2,8 @@
 
 import logging
 import subprocess
-import webbrowser
 import urllib.parse
+import webbrowser
 
 
 def check_mime_type(webview, frame, request, mimetype, policy_decision):

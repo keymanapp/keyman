@@ -222,6 +222,11 @@ void keyman_sentry_report_start() {
 }
 
 int keyman_sentry_main(bool is_keyman_developer, const char *logger, int argc, char *argv[], int (*run)(int, char**)) {
+  if (GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "wine_get_version") != NULL) {
+    // We always disable Sentry when running under WINE, because
+    // Sentry/dbghelp calls are failing on WINE.
+    return run(argc, argv);
+  }
   keyman_sentry_init(is_keyman_developer, logger);
   keyman_sentry_setexceptionfilter();
   keyman_sentry_report_start();

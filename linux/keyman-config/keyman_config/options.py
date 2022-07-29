@@ -1,17 +1,20 @@
 #!/usr/bin/python3
 
-import gi
 import logging
-import webbrowser
 import urllib.parse
-from gi.repository import Gtk, WebKit2
+import webbrowser
 from urllib.parse import parse_qsl, urlencode
-from keyman_config import _
-from keyman_config.accelerators import init_accel
-from keyman_config.dconf_util import get_option, set_option
+
+import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
+
+from gi.repository import Gtk, WebKit2
+
+from keyman_config import _
+from keyman_config.accelerators import init_accel
+from keyman_config.dconf_util import get_option, set_option
 
 
 class OptionsView(Gtk.Window):
