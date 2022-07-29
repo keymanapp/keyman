@@ -191,7 +191,7 @@ var
 begin
   doc := ARequestInfo.Document;
   Delete(doc, 1, Length('/app/source/toucheditor/lib/'));
-  if (Pos('/', doc) > 0) or (Pos('\', doc) > 0) then
+  if Pos('..', doc) > 0 then
     Respond404(AContext, ARequestInfo, AResponseInfo)
   else
     RespondFile(GetLayoutBuilderPath + doc, AContext, ARequestInfo, AResponseInfo);

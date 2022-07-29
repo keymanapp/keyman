@@ -27,10 +27,12 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
-# Setup variable for calling script's path
+# Setup variable for calling script's path and name
 if [ ! -z ${THIS_SCRIPT+x} ]; then
   THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
   readonly THIS_SCRIPT_PATH
+  THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
+  readonly THIS_SCRIPT_NAME
 fi
 
 function die () {

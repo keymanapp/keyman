@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 16.0.40 alpha 2022-07-28
+
+* chore(linux): Add script to upload to debian (#6997)
+
+## 16.0.39 alpha 2022-07-27
+
+* chore(linux): Update debian changelog (#6996)
+
+## 16.0.38 alpha 2022-07-26
+
+* feat(developer): add hint support to Touch Layout Editor and schema (#6936)
+* fix(developer): improve error message for multi-part key ids on <15.0 (#6989)
+* fix(android): rework longpress movement trigger (#6984)
+* chore(linux): Update changelog (#6988)
+
 ## 16.0.37 alpha 2022-07-22
 
 * fix(linux): Catch PermissionError exception (#6968)
