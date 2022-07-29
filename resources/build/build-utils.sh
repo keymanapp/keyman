@@ -272,6 +272,12 @@ replaceVersionStrings_Mkver() {
 
 # The following allows coloring of warning and error lines, but only works if there's a
 # terminal attached, so not on the build machine.
+
+# Overrides default colorization of logging; can be used in command-line with
+# --color or --no-color, or overridden as necessary on a per-script basis.
+#
+# Parameters
+#  1: use_color       true or false
 builder_use_color() {
   if $1; then
     COLOR_RED=$(tput setaf 1)
