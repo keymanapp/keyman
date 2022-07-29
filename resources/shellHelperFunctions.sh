@@ -84,19 +84,27 @@ get_platform_folder() {
 
 # The following allows coloring of warning and error lines, but only works if there's a
 # terminal attached, so not on the build machine.
-if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+shell_helper_color() {
+  if $1; then
     COLOR_RED=$(tput setaf 1)
     COLOR_GREEN=$(tput setaf 2)
     COLOR_BLUE=$(tput setaf 4)
     COLOR_YELLOW=$(tput setaf 3)
     COLOR_RESET=$(tput sgr0)
-else
+  else
     COLOR_RED=
     COLOR_GREEN=
     COLOR_BLUE=
     COLOR_YELLOW=
     COLOR_RESET=
-fi
+  fi
+}
+
+if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+  shell_helper_color true
+else
+  shell_helper_color false
+fi;
 
 echo_heading() {
   echo "${COLOR_BLUE}$*${COLOR_RESET}"

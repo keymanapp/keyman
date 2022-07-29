@@ -129,4 +129,4 @@ fi
 
 echo "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
 
-builder_parse --help
+builder_parse --no-color --help

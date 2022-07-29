@@ -295,7 +295,6 @@ fi
 # builder_ names are reserved.
 # _builder_ names are internal use and subject to change
 #
-_builder_default_action=build
 _builder_debug=false
 
 # returns 0 if first parameter is in the array passed as second parameter
@@ -408,6 +407,7 @@ builder_describe() {
   _builder_actions=()
   _builder_targets=()
   _builder_options=()
+  _builder_default_action=build
   declare -A -g _builder_params
   declare -A -g _builder_options_short
   shift
@@ -479,6 +479,16 @@ _builder_get_default_description() {
   echo "$description"
 }
 
+# Overrides default colorization of logging; can be used in command-line with
+# --color or --no-color, or overridden as necessary on a per-script basis.
+#
+# Parameters
+#  1: use_color       true or false
+builder_use_color() {
+  local use_color=$1
+  shell_helper_color $use_color
+}
+
 # Initializes a build.sh script, parses command line. Will abort the script if
 # invalid parameters are passed in. Use together with builder_describe which
 # sets up the possible command line parameters
@@ -534,6 +544,12 @@ builder_parse() {
         --help|-h)
           builder_display_usage
           exit 0
+          ;;
+        --color)
+          builder_use_color true
+          ;;
+        --no-color)
+          builder_use_color false
           ;;
         --verbose|-v)
           _builder_chosen_options+=(--verbose)
@@ -629,11 +645,16 @@ builder_display_usage() {
   done
 
   _builder_pad $width "  --verbose, -v" "Verbose logging"
+  _builder_pad $width "  --color" "Force colorized output"
+  _builder_pad $width "  --no-color" "Never use colorized output"
   _builder_pad $width "  --help, -h" "Show this help"
+  local c1="${COLOR_BLUE:=<}"
+  local c0="${COLOR_RESET:=>}"
   echo
-  echo "* If action is not specified, default action is '$_builder_default_action'"
-  echo "* If :target is not specified, will apply action to all targets"
-  echo "* If no actions or :targets are specified, '$_builder_default_action' action will run on all targets"
+  echo "* Specify ${c1}action:target${c0} to run a specific ${c1}action${c0} against a specific ${c1}:target${c0}."
+  echo "* If ${c1}action${c0} is specified without a ${c1}target${c0} suffix, it will be applied to all ${c1}:target${c0}s."
+  echo "* If ${c1}:target${c0} is specified without an ${c1}action${c0} prefix, ${c1}$_builder_default_action:target${c0} will be inferred."
+  echo "* If no ${c1}action${c0}, ${c1}:target${c0}, or ${c1}action:target${c0} entries are specified, ${c1}$_builder_default_action${c0} will run on all ${c1}:target${c0}s."
   echo
 }
 
