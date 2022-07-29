@@ -1,3 +1,25 @@
+keyman (15.0.267-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Tue, 26 Jul 2022 10:38:41 +0200
+
+keyman (15.0.266-2) unstable; urgency=high
+
+  * Team upload.
+  * debian/patches/0001-fix-common-Fix-delete.patch: Apply upstream
+    trunk patch to fix FTBFS with GCC 12. (Closes: #1012958)
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 24 Jul 2022 01:07:36 -0400
+
+keyman (15.0.266-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Tue, 12 Jul 2022 16:51:32 +0200
+
 keyman (15.0.260-1) unstable; urgency=medium
 
   * New upstream release

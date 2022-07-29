@@ -20,7 +20,8 @@
         "font": { "$ref": "#/definitions/font-spec" },
         "fontsize": { "$ref": "#/definitions/fontsize-spec" },
         "layer": { "$ref": "#/definitions/layers" },
-        "displayUnderlying": { "type": "boolean" }
+        "displayUnderlying": { "type": "boolean" },
+        "defaultHint": { "type": "string", "enum": ["none","dot","longpress","multitap","flick","flick-n","flick-ne","flick-e","flick-se","flick-s","flick-sw","flick-w","flick-nw"] }
       },
       "required": ["layer"],
       "additionalProperties": false
@@ -95,7 +96,8 @@
         "width": { "$ref" : "#/definitions/numeric" },
         "sk": { "$ref": "#/definitions/subkeys" },
         "flick": { "$ref": "#/definitions/flick" },
-        "multitap": { "$ref": "#/definitions/subkeys" }
+        "multitap": { "$ref": "#/definitions/subkeys" },
+        "hint": { "type": "string" }
       },
       "additionalProperties": false
     },

@@ -60,6 +60,7 @@ uses
   UfrmMain,
   UfrmMDIEditor,
   Keyman.Developer.System.ServerAPI,
+  Keyman.Developer.UI.ServerUI,
   Keyman.Developer.UI.UfrmModelEditor,
   KeymanDeveloperUtils,
   KeymanDeveloperOptions,
@@ -99,8 +100,9 @@ begin
 
   Result := ProjectFile.CompileModel;
 
-
-  if Result and TServerDebugAPI.IsModelRegistered(ProjectFile.TargetFileName) then
+  if Result and
+      TServerDebugAPI.Running and
+      TServerDebugAPI.IsModelRegistered(ProjectFile.TargetFileName) then
     TestKeymanWeb(True);
 end;
 
@@ -134,11 +136,14 @@ begin
   if not TestModelState(FCompiledName, FSilent) then
     Exit(False);
 
-  if FileExists(ProjectFile.TestKeyboard) then
-    TServerDebugAPI.RegisterKeyboard(ProjectFile.TestKeyboard, '1.0', '', '');
-  TServerDebugAPI.RegisterModel(FCompiledName);
+  if TServerUI.VerifyServerRunning then
+  begin
+    if FileExists(ProjectFile.TestKeyboard) then
+      TServerDebugAPI.RegisterKeyboard(ProjectFile.TestKeyboard, '1.0', '', '');
+    TServerDebugAPI.RegisterModel(FCompiledName);
 
-  wizard.NotifyStartedWebDebug;   // I4021
+    wizard.NotifyStartedWebDebug;   // I4021
+  end;
 
   Result := True;
 end;

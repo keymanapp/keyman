@@ -1637,7 +1637,7 @@ end;
 
 function TCompileKeymanWeb.ValidateLayoutFile(var sLayoutFile: string; const sVKDictionary: string): Boolean;   // I4060   // I4139
 type
-  TKeyIdType = (Key_Invalid, Key_Constant, Key_Touch, Key_Unicode);   // I4142
+  TKeyIdType = (Key_Invalid, Key_Constant, Key_Touch, Key_Unicode, Key_Unicode_Multi);   // I4142
 const
   CRequiredKeys: TRequiredKeys = [K_LOPT, K_BKSP, K_ENTER];   // I4447
 
@@ -1672,6 +1672,7 @@ var
   FSubKey: TTouchLayoutSubKey;
   FRequiredKeys: set of TRequiredKey;
   FDictionary: TStringList;
+  FDirection: TTouchLayoutFlickDirection;
 
     function IsValidUnicodeValue(ch: Integer): Boolean;   // I4198
     begin
@@ -1680,18 +1681,18 @@ var
         ((ch >= $00A0) and (ch <= $10FFFF));
     end;
 
-    function AreValidUnicodeValues(const value: string): Boolean;
+    function GetKeyIdUnicodeType(const value: string): TKeyIdType;
     var
       v: string;
       values: TArray<string>;
     begin
       values := value.Split(['_']);
-      if (Length(values) > 1) and not IsKeyboardVersion15OrLater then
-        Exit(False);
       for v in values do
         if not IsValidUnicodeValue(StrToIntDef('$'+v, 0)) then
-          Exit(False);
-      Result := True;
+          Exit(Key_Invalid);
+      if Length(values) > 1 then
+        Exit(Key_Unicode_Multi);
+      Result := Key_Unicode;
     end;
 
     function KeyIdType(const FId: string): TKeyIdType;   // I4142
@@ -1699,7 +1700,7 @@ var
       Result := Key_Invalid;
       case UpCase(FId[1]) of
         'T': Result := Key_Touch;
-        'U': if (Copy(FId, 1, 2) = 'U_') and AreValidUnicodeValues(FId.Substring(2)) then Result := Key_Unicode;   // I4198
+        'U': if (Copy(FId, 1, 2) = 'U_') then Result := GetKeyIdUnicodeType(FId.Substring(2));
         else if FindVKeyName(FId) <> $FFFF then Result := Key_Constant;
       end;
     end;
@@ -1742,8 +1743,11 @@ var
       if FValid = Key_Invalid then
       begin
         ReportError(0, CERR_TouchLayoutInvalidIdentifier, 'Key "'+FId+'" on "'+FPlatform.Name+'", layer "'+FLayer.Id+'" has an invalid identifier.');
+      end
+      else if (FValid = Key_Unicode_Multi) and not IsKeyboardVersion15OrLater then
+      begin
+        ReportError(0, CERR_TouchLayoutInvalidIdentifier, 'Key "'+FId+'" on "'+FPlatform.Name+'", layer "'+FLayer.Id+'" has a multi-part identifier which requires version 15.0 or newer.');
       end;
-
       //
       // Check that each custom key code has at least *a* rule associated with it
       //
@@ -1873,6 +1877,11 @@ begin
               CheckKey(FKey.Id, FKey.Text, FKey.NextLayer, FKey.SpT);   // I4119
               for FSubKey in FKey.Sk do
                 CheckKey(FSubKey.Id, FKey.Text, FSubKey.NextLayer, FSubKey.SpT);   // I4119
+              for FDirection in FKey.Flick.Keys do
+                CheckKey(FKey.Flick[FDirection].Id, FKey.Flick[FDirection].Text,
+                  FKey.Flick[FDirection].NextLayer, FKey.Flick[FDirection].SpT);
+              for FSubKey in FKey.MultiTap do
+                CheckKey(FSubKey.Id, FKey.Text, FSubKey.NextLayer, FSubKey.SpT);
             end;
 
           if FRequiredKeys <> CRequiredKeys then

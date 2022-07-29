@@ -107,6 +107,7 @@ namespace com.keyman.osk {
     }
 
     onTouchMove(event: TouchEvent) {
+      let propagationActive = true;
       for(let i=0; i < event.changedTouches.length; i++) {
         const touch = event.changedTouches.item(i);
 
@@ -114,7 +115,10 @@ namespace com.keyman.osk {
           continue;
         }
 
-        this.preventPropagation(event);
+        if(propagationActive) {
+          this.preventPropagation(event);
+          propagationActive = false;
+        }
 
         const sample = this.buildSampleFromTouch(touch);
 
@@ -127,6 +131,7 @@ namespace com.keyman.osk {
     }
 
     onTouchEnd(event: TouchEvent) {
+      let propagationActive = true;
       for(let i=0; i < event.changedTouches.length; i++) {
         const touch = event.changedTouches.item(i);
 
@@ -134,7 +139,10 @@ namespace com.keyman.osk {
           continue;
         }
 
-        this.preventPropagation(event);
+        if(propagationActive) {
+          this.preventPropagation(event);
+          propagationActive = false;
+        }
 
         this.onInputEnd(touch.identifier);
       }

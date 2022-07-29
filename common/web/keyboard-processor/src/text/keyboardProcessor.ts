@@ -46,7 +46,13 @@ namespace com.keyman.text {
     modStateFlags: number = 0;
 
     keyboardInterface: KeyboardInterface;
-    device: utils.DeviceSpec;
+
+    /**
+     * Indicates the device (platform) to be used for non-keystroke events,
+     * such as those sent to `begin postkeystroke` and `begin newcontext` 
+     * entry points.
+     */
+    contextDevice: utils.DeviceSpec;
 
     baseLayout: string;
 
@@ -60,7 +66,7 @@ namespace com.keyman.text {
         options = KeyboardProcessor.DEFAULT_OPTIONS;
       }
 
-      this.device = device;
+      this.contextDevice = device;
 
       this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
       this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
@@ -725,7 +731,7 @@ namespace com.keyman.text {
       } else if(KeyboardProcessor.isModifier(Levent)) {
         this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
         // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-        if(!Levent.device.touchable) {
+        if(!this.contextDevice.touchable) {
           return this._UpdateVKShift(Levent); // I2187
         } else {
           return true;
@@ -734,7 +740,9 @@ namespace com.keyman.text {
 
       if(Levent.LmodifierChange) {
         this.activeKeyboard.notify(0, outputTarget, 1);
-        this._UpdateVKShift(Levent);
+        if(!this.contextDevice.touchable) {
+          this._UpdateVKShift(Levent);
+        }
       }
 
       // No modifier keypresses detected.
@@ -744,7 +752,9 @@ namespace com.keyman.text {
     resetContext() {
       this.layerId = 'default';
       this.keyboardInterface.resetContextCache();
-      this._UpdateVKShift(null);
+      if(!this.contextDevice.touchable) {
+        this._UpdateVKShift(null);
+      }
     };
 
     setNumericLayer(device: utils.DeviceSpec) {

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 #
 # Compiles development-related KeymanWeb resources for use with developing/running tests.
 #   - the Recorder module (for engine tests)

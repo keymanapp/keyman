@@ -69,6 +69,7 @@ uses
   UfrmMDIEditor,
   UmodWebHttpServer,
   Keyman.Developer.System.ServerAPI,
+  Keyman.Developer.UI.ServerUI,
   KeyboardFonts,
   KeymanDeveloperUtils,
   KeymanDeveloperOptions,
@@ -130,7 +131,9 @@ begin
 
   Result := ProjectFile.CompileKeyboard;
 
-  if Result and TServerDebugAPI.IsKeyboardRegistered(ProjectFile.TargetFileName) then
+  if Result and
+      TServerDebugAPI.Running and
+      TServerDebugAPI.IsKeyboardRegistered(ProjectFile.TargetFileName) then
     TestKeymanWeb(True);
 end;
 
@@ -218,7 +221,8 @@ var
     begin
       strm := TMemoryStream.Create;
       try
-        if TFontLoadUtil.LoadFontData(fontname, strm) then
+        if TFontLoadUtil.LoadFontData(fontname, strm) and
+            TServerDebugAPI.Running then
           TServerDebugAPI.RegisterFont(strm, fontname);
       finally
         strm.Free;
@@ -250,16 +254,19 @@ begin
       RegisterFont(Wizard.FontInfo[i].Name);
   end;
 
-  TServerDebugAPI.RegisterKeyboard(
-    FCompiledName,
-    ProjectFile.FileVersion,
-    // We only need to specify the char + osk fonts here
-    // as the others are referenced in the touch layout definition directly
-    Wizard.FontInfo[kfontChar].Name,
-    Wizard.FontInfo[kfontOSK].Name
-  );
+  if TServerUI.VerifyServerRunning then
+  begin
+    TServerDebugAPI.RegisterKeyboard(
+      FCompiledName,
+      ProjectFile.FileVersion,
+      // We only need to specify the char + osk fonts here
+      // as the others are referenced in the touch layout definition directly
+      Wizard.FontInfo[kfontChar].Name,
+      Wizard.FontInfo[kfontOSK].Name
+    );
 
-  wizard.NotifyStartedWebDebug;   // I4021
+    wizard.NotifyStartedWebDebug;   // I4021
+  end;
 
   Result := True;
 end;

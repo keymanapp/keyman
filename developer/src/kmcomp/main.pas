@@ -62,6 +62,7 @@ uses
   MergeKeyboardInfo;
 
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean; forward;   // I4706
+function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean; forward;
 //function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall; forward;
 
 procedure Run;
@@ -84,6 +85,7 @@ var
   FJsonExtract: Boolean;
   FParamDistribution: Boolean;
   FMergingValidateIds: Boolean;
+  FShouldAddCompilerVersion: Boolean;
   FJsonSchemaPath: string;
   FParamSourcePath: string;
   FParamHelpLink: string;
@@ -108,6 +110,8 @@ begin
   FParamDistribution := False;
   FInstallerMSI := '';
   FColorMode := cmDefault;
+
+  FShouldAddCompilerVersion := True;
 
   FParamInfile := '';
   FParamOutfile := '';
@@ -181,6 +185,8 @@ begin
       FColorMode := cmForceColor
     else if s = '-no-color' then
       FColorMode := cmForceNoColor
+    else if s = '-no-compiler-version' then
+      FShouldAddCompilerVersion := False
     else if (s = '-help') or (s = '-h') then
     begin
       // Force help
@@ -218,7 +224,7 @@ begin
     writeln('');
     writeln('Usage: '+cmd+' [-s[s]] [-nologo] [-c] [-d] [-w] [-cfc] [-v[s|d]] [-source-path path] [-schema-path path] ');
     writeln('       '+spc+' [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
-    writeln('       '+spc+' [-add-help-link path] [-color|-no-color]');
+    writeln('       '+spc+' [-add-help-link path] [-color|-no-color] [-no-compiler-version]');
     writeln('       '+spc+' [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
     writeln('                        if -v specified, can also be a .keyboard_info file');
@@ -240,6 +246,8 @@ begin
     writeln('          -color         If specified, forces color log messages on');
     writeln('          -no-color      If specified, forces color log messages off. If neither specified,');
     writeln('                         uses console mode to determine whether color should be used.');
+    writeln;
+    writeln('          -no-compiler-version   Don''t embed the compiler version stores, useful for regression tests.');
     writeln;
     writeln(' JSON .keyboard_info compile targets:');
     writeln('          -v[s]    validate infile against source schema');
@@ -271,6 +279,8 @@ begin
 
     TProjectLogConsole.Create(FSilent, FFullySilent, hOutfile, FColorMode);
 
+    KCSetCompilerOptions(FParamInfile, FShouldAddCompilerVersion);
+
     if FValidateRepoChanges then
       FError := not TValidateRepoChanges.Execute(FParamInfile, FParamOutfile)
     else if FMerging then
@@ -295,10 +305,25 @@ begin
     ExitCode := 1;
 end;
 
-function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean;   // I4706
+function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean;
+var
+  opt: TCompilerOptions;
 begin
   TProjectLogConsole.Instance.Filename := FInFile;
 
+  opt.dwSize := sizeof(TCompilerOptions);
+  opt.ShouldAddCompilerVersion := FShouldAddCompilerVersion;
+
+  Result := SetCompilerOptions(@opt, @CompilerMessageW);
+
+  if not Result then
+  begin
+    TProjectLogConsole.Instance.Log(plsError, FInFile, 'Could not set compiler options', 0, 0);
+  end;
+end;
+
+function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean;   // I4706
+begin
   if SameText(ExtractFileExt(FOutFile), '.js') then
   begin
     with TCompileKeymanWeb.Create do
@@ -311,7 +336,7 @@ begin
   else
   begin
     if FOutFile = '' then FOutFile := ChangeFileExt(FInFile, '.kmx');
-  	Result := CompileKeyboardFile(PChar(FInFile), PChar(FOutFile), FDebug, FWarnAsError, True, @CompilerMessage) <> 0;   // I4865   // I4866
+    Result := CompileKeyboardFile(PChar(FInFile), PChar(FOutFile), FDebug, FWarnAsError, True, @CompilerMessage) <> 0;   // I4865   // I4866
     Result := Result and CompileVisualKeyboardFromKMX(FInFile, FOutFile);
   end;
 

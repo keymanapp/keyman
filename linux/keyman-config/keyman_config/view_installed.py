@@ -11,19 +11,21 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 
-from gi.repository import Gtk, GdkPixbuf
+from gi.overrides.GLib import GError
+from gi.repository import GdkPixbuf, Gtk
 
 from keyman_config import _
-from keyman_config.list_installed_kmp import get_installed_kmp
-from keyman_config.welcome import WelcomeView
-from keyman_config.options import OptionsView
-from keyman_config.keyboard_details import KeyboardDetailsView
-from keyman_config.downloadkeyboard import DownloadKmpWindow
-from keyman_config.install_window import InstallKmpWindow, find_keyman_image
-from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.accelerators import bind_accelerator, init_accel
-from keyman_config.get_kmp import InstallLocation, get_keyboard_dir, get_keyman_dir
-from gi.overrides.GLib import GError
+from keyman_config.dbus_util import get_keyman_config_service
+from keyman_config.downloadkeyboard import DownloadKmpWindow
+from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
+                                   get_keyman_dir)
+from keyman_config.install_window import InstallKmpWindow, find_keyman_image
+from keyman_config.keyboard_details import KeyboardDetailsView
+from keyman_config.list_installed_kmp import get_installed_kmp
+from keyman_config.options import OptionsView
+from keyman_config.uninstall_kmp import uninstall_kmp
+from keyman_config.welcome import WelcomeView
 
 
 class ViewInstalledWindowBase(Gtk.Window):
@@ -31,6 +33,7 @@ class ViewInstalledWindowBase(Gtk.Window):
         self.accelerators = None
         Gtk.Window.__init__(self, title=_("Keyman Configuration"))
         init_accel(self)
+        self._config_service = get_keyman_config_service(self.refresh_installed_kmp)
 
     def refresh_installed_kmp(self):
         pass
@@ -59,8 +62,8 @@ class ViewInstalledWindowBase(Gtk.Window):
     def on_installfile_clicked(self, button):
         logging.debug("Install from file clicked")
         dlg = Gtk.FileChooserDialog(
-            _("Choose a kmp file..."), self, Gtk.FileChooserAction.OPEN,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+          _("Choose a kmp file..."), self, Gtk.FileChooserAction.OPEN,
+          (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         dlg.resize(640, 480)
         filter_text = Gtk.FileFilter()
         # i18n: file type in file selection dialog

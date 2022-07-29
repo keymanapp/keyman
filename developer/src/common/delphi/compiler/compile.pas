@@ -170,6 +170,17 @@ function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; Compil
 function Compiler_Diagnostic(mode: Integer): Integer;
 procedure Compiler_Diagnostic_Console(mode: Integer);
 
+type
+  TCompilerOptions = record
+    dwSize: DWORD;
+    ShouldAddCompilerVersion: BOOL;
+  end;
+
+  COMPILER_OPTIONS = TCompilerOptions;
+  PCOMPILER_OPTIONS = ^COMPILER_OPTIONS;
+
+function SetCompilerOptions(options: PCOMPILER_OPTIONS; CallBack: TCompilerCallback): BOOL; cdecl;
+
 //
 // For unit tests, point to a known-current version of kmcmpdll.dll
 //
@@ -194,6 +205,8 @@ type
   TCompileKeyboardFileToBuffer = function (kmnFile: PAnsiChar; buf: PFILE_KEYBOARD;  // I3310
     CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;   // I4865   // I4866
     CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;         // TODO: K9: Convert to Unicode
+
+  TSetCompilerOptions = function (options: PCOMPILER_OPTIONS): BOOL; cdecl;
 
 function LoadCompiler(CallBack: TCompilerCallback = nil): Boolean;
 var
@@ -229,6 +242,24 @@ begin
     end;
   end;
   Result := True;
+end;
+
+function SetCompilerOptions(options: PCOMPILER_OPTIONS; CallBack: TCompilerCallback): BOOL;
+var
+  sco: TSetCompilerOptions;
+begin
+  if not LoadCompiler(Callback) then
+    Exit(False);
+
+  @sco := GetProcAddress(HKMCmpDll, 'SetCompilerOptions');
+  if not Assigned(@sco) then
+  begin
+    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that '+kmcmpdll_lib+' is in the program directory '+   // I4706
+      'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
+    Exit(False);
+  end;
+
+  Result := sco(options);
 end;
 
 function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer;   // I4865   // I4866

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # CI script to publish specified app APKs to the Play Store.
 # The APKs should already have been built from a separate script
 

@@ -2,20 +2,21 @@
 
 # Keyboard details window
 
-import logging
 import json
-from os import path
-import qrcode
+import logging
 import tempfile
+from os import path
 
 import gi
+import qrcode
+
+gi.require_version('Gtk', '3.0')
+
 from gi.repository import Gtk
 
 from keyman_config import KeymanComUrl, _, secure_lookup
 from keyman_config.accelerators import init_accel
 from keyman_config.kmpmetadata import parsemetadata
-
-gi.require_version('Gtk', '3.0')
 
 # basics: keyboard name, package version, description
 # other things: filename (of kmx), ,

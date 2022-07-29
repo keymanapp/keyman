@@ -921,7 +921,8 @@ namespace com.keyman.text {
      */
     setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       this.resetContextCache();
-      if(systemId == KeyboardInterface.TSS_LAYER) {
+      // Unique case:  we only allow set(&layer) ops from keyboard rules triggered by touch OSKs.
+      if(systemId == KeyboardInterface.TSS_LAYER && this.activeDevice.touchable) {
         // Denote the changed store as part of the matched rule's behavior.
         this.ruleBehavior.setStore[systemId] = strValue;
       } else {

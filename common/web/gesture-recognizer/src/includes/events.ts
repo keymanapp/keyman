@@ -5,6 +5,9 @@
 // A full copy of the module's actual .d.ts file, save for the one line that prevents us from
 // actually referencing it.  (Since the project doesn't use modules.)
 //
+// Removes `export = EventEmitter` line - that's what breaks compilation when included with
+// our non-module-based code.
+//
 // Compare against the file referenced below.  (In VS Code, remove first comment, then
 // the IDE will hot-link to it.)
 // ///<reference path="../../../../../node_modules/eventemitter3/index.d.ts" />

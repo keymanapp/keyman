@@ -17,49 +17,49 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-display_usage ( ) {
-  echo "Usage: $0 [configure] [clean] [build] [test]"
-  echo "          [--verbose|-v]"
-  echo "       $0 -h|--help"
-  echo
-  echo "  clean                  removes build/ folder"
-  echo "  configure              runs 'npm ci' on root folder"
-  echo "  build                  builds wrapped version of package"
-  echo "                           [if required will: configure]"
-  echo "  test                   runs tests (builds as req'd)"
-  echo "                           [if required will: build]"
-}
-
 ################################ Main script ################################
 
-builder_init "clean configure build tools test" "$@"
+builder_describe "Builds the gesture-recognition model for Web-based on-screen keyboards" \
+  "clean" \
+  "configure" \
+  "build" \
+  "test" \
+  ":module" \
+  ":tools tools for testing & developing test resources for this module"
+
+builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_has_action configure; then
+if builder_has_action configure :module; then
   verify_npm_setup
-  builder_report configure success
+  builder_report success configure :module
 fi
 
-if builder_has_action clean; then
+if builder_has_action clean :tools; then
+  src/tools/build.sh clean
+  builder_report success clean :tools
+fi
+
+if builder_has_action clean :module; then
   npm run clean
   rm -rf build/
-  builder_report clean success
+  builder_report success clean :module
 fi
 
-if builder_has_action build; then
+if builder_has_action build :module; then
   # Build
   npm run build -- $builder_verbose
-  builder_report build success
+  builder_report success build :module
 fi
 
-if builder_has_action tools; then
+if builder_has_action build :tools; then
   src/tools/build.sh build
-  builder_report tools success
+  builder_report success build :tools
 fi
 
-if builder_has_action test; then
+if builder_has_action test :module; then
   npm test
-  builder_report test success
+  builder_report success test :module
 fi

@@ -211,7 +211,7 @@ char CompileDir[MAX_PATH];
 int ErrChr;
 char ErrExtra[256];
 BOOL FSaveDebug, FCompilerWarningsAsErrors, FWarnDeprecatedCode;   // I4865   // I4866
-
+BOOL FShouldAddCompilerVersion = TRUE;
 BOOL FOldCharPosMatching = FALSE, FMnemonicLayout = FALSE;
 NamedCodeConstants *CodeConstants = NULL;
 
@@ -285,6 +285,21 @@ BOOL AddCompileMessage(DWORD msg)
   if (!(*msgproc)(currentLine, msg, szText)) return TRUE;
 
   return FALSE;
+}
+
+typedef struct _COMPILER_OPTIONS {
+  DWORD dwSize;
+  BOOL ShouldAddCompilerVersion;
+} COMPILER_OPTIONS;
+
+typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
+
+extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
+  if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
+    return FALSE;
+  }
+  FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
+  return TRUE;
 }
 
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
@@ -480,15 +495,14 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 
   /* Add a store for the Keyman 6.0 copyright information string */
 
-  DWORD vmajor, vminor;
-  GetVersionInfo(&vmajor, &vminor);
-  //char buf[256];
-  swprintf(str, LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor),
-    LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));  // I3481
+  if(FShouldAddCompilerVersion) {
+    DWORD vmajor, vminor;
+    GetVersionInfo(&vmajor, &vminor);
+    swprintf(str, LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor),
+      LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));  // I3481
 
-//PWSTR pw = strtowstr(buf);
-  AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
-  //delete pw;
+    AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
+  }
 
   /* Add a system store for the Keyman edition number */
 
@@ -1434,6 +1448,10 @@ BOOL GetFileVersion(char *filename, WORD *d1, WORD *d2, WORD *d3, WORD *d4)
 
 DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk)
 {
+  if(!FShouldAddCompilerVersion) {
+    return CERR_None;
+  }
+
   WCHAR verstr[32];
   WORD d1, d2, d3, d4;
   DWORD msg;

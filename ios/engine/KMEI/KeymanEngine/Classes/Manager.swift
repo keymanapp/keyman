@@ -654,6 +654,17 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     return nil
   }
 
+  /// - Returns: The font name for the given keyboard ID and languageID, or returns nil if
+  ///   - The keyboard doesn't have a font
+  ///   - The keyboard info is not available in the user keyboards list
+  public func fontPathForKeyboard(withFullID fullID: FullKeyboardID) -> URL? {
+    if let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID),
+       let filename = kb.font?.source.first(where: { $0.hasFontExtension }) {
+      return Storage.active.fontURL(forResource: kb, filename: filename)!
+    }
+    return nil
+  }
+
   /// - Returns: the OSK font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list
