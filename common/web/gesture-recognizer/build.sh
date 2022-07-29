@@ -23,37 +23,43 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
   "clean" \
   "configure" \
   "build" \
-  "tools" \
-  "test"
+  "test" \
+  ":module" \
+  ":tools tools for testing & developing test resources for this module"
 
 builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_has_action configure; then
+if builder_has_action configure :module; then
   verify_npm_setup
-  builder_report success configure
+  builder_report success configure :module
 fi
 
-if builder_has_action clean; then
+if builder_has_action clean :tools; then
+  src/tools/build.sh clean
+  builder_report success clean :tools
+fi
+
+if builder_has_action clean :module; then
   npm run clean
   rm -rf build/
-  builder_report success clean
+  builder_report success clean :module
 fi
 
-if builder_has_action build; then
+if builder_has_action build :module; then
   # Build
   npm run build -- $builder_verbose
-  builder_report success build
+  builder_report success build :module
 fi
 
-if builder_has_action tools; then
+if builder_has_action build :tools; then
   src/tools/build.sh build
-  builder_report success tools
+  builder_report success build :tools
 fi
 
-if builder_has_action test; then
+if builder_has_action test :module; then
   npm test
-  builder_report success test
+  builder_report success test :module
 fi
