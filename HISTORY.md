@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.41 alpha 2022-07-29
+
+* chore(common): builder script `:target` and `--option` support (#6986)
+* chore(linux): Add code comment (#7009)
+
 ## 16.0.40 alpha 2022-07-28
 
 * chore(linux): Add script to upload to debian (#6997)
