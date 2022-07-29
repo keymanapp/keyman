@@ -7,7 +7,7 @@ namespace com.keyman.osk {
     private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
     private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
-    private disabledSafeBounds: number = 0;
+    private safeBoundMaskMap: {[id: number]: number} = {};
 
     public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
@@ -68,37 +68,82 @@ namespace com.keyman.osk {
       }
     }
 
-    onTouchStart(event: TouchEvent) {
-      this.preventPropagation(event);
-      const coord = InputEventCoordinate.fromEvent(event)
+    public dropTouchpointWithId(identifier: number) {
+      super.dropTouchpointWithId(identifier);
 
-      if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(coord, this.config)) {
-        // If we started very close to a safe zone border, remember which one(s).
-        // This is important for input-sequence cancellation check logic.
-        this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(coord, this.config);
-      } else {
-        this.disabledSafeBounds = 0;
-        // TODO:  disable tracking for the specific `Touch` that just started.
-        // Requires explicit implementation of multi-touch tracking, which has not yet been added.
+      delete this.safeBoundMaskMap[identifier];
+    }
+
+    private buildSampleFromTouch(touch: Touch): InputSample {
+      return this.buildSampleFor(touch.clientX, touch.clientY);
+    }
+
+    onTouchStart(event: TouchEvent) {
+      // If it's not an event we'd consider handling, do not prevent event
+      // propagation!  Just don't process it.
+      if(!this.config.targetRoot.contains(event.target as Node)) {
+        return;
       }
 
-      this.onInputStart(coord);
+      this.preventPropagation(event);
+
+      for(let i=0; i < event.changedTouches.length; i++) {
+        const touch = event.changedTouches.item(i);
+        const sample = this.buildSampleFromTouch(touch);
+
+        if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
+          // If we started very close to a safe zone border, remember which one(s).
+          // This is important for input-sequence cancellation check logic.
+          this.safeBoundMaskMap[touch.identifier] = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(sample, this.config);
+        } else {
+          // This touchpoint shouldn't be considered; do not signal a touchstart for it.
+          continue;
+        }
+
+        this.onInputStart(touch.identifier, sample, event.target);
+      }
     }
 
     onTouchMove(event: TouchEvent) {
-      this.preventPropagation(event);
-      const coord = InputEventCoordinate.fromEvent(event);
+      let propagationActive = true;
+      for(let i=0; i < event.changedTouches.length; i++) {
+        const touch = event.changedTouches.item(i);
 
-      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(coord, this.config, this.disabledSafeBounds)) {
-        this.onInputMove(coord);
-      } else {
-        this.onInputMoveCancel(coord);
+        if(!this.hasActiveTouchpoint(touch.identifier)) {
+          continue;
+        }
+
+        if(propagationActive) {
+          this.preventPropagation(event);
+          propagationActive = false;
+        }
+
+        const sample = this.buildSampleFromTouch(touch);
+
+        if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, this.config, this.safeBoundMaskMap[touch.identifier])) {
+          this.onInputMove(touch.identifier, sample);
+        } else {
+          this.onInputMoveCancel(touch.identifier, sample);
+        }
       }
     }
 
     onTouchEnd(event: TouchEvent) {
-      this.preventPropagation(event);
-      this.onInputEnd(InputEventCoordinate.fromEvent(event));
+      let propagationActive = true;
+      for(let i=0; i < event.changedTouches.length; i++) {
+        const touch = event.changedTouches.item(i);
+
+        if(!this.hasActiveTouchpoint(touch.identifier)) {
+          continue;
+        }
+
+        if(propagationActive) {
+          this.preventPropagation(event);
+          propagationActive = false;
+        }
+
+        this.onInputEnd(touch.identifier);
+      }
     }
   }
 }

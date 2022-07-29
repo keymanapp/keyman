@@ -17,18 +17,14 @@ namespace com.keyman.osk {
      * @param zone          An object defining a 'recognition zone' of the gesture engine.
      * @param ignoreBitmask A bitmask indicating select boundaries to ignore for the check.
      */
-    static getCoordZoneBitmask(coord: InputEventCoordinate, zone: RecognitionZoneSource): number {
-      // coord currently uses page-based coords, not client-based!
-      let screenX = coord.x - document.body.scrollLeft;
-      let screenY = coord.y - document.body.scrollTop;
-
+    static getCoordZoneBitmask(coord: InputSample, zone: RecognitionZoneSource): number {
       const bounds = zone.getBoundingClientRect();
 
       let bitmask = 0;
-      bitmask |= (screenX < bounds.left)   ? ZoneBoundaryChecker.FAR_LEFT   : 0;
-      bitmask |= (screenX > bounds.right)  ? ZoneBoundaryChecker.FAR_RIGHT  : 0;
-      bitmask |= (screenY < bounds.top)    ? ZoneBoundaryChecker.FAR_TOP    : 0;
-      bitmask |= (screenY > bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
+      bitmask |= (coord.clientX < bounds.left)   ? ZoneBoundaryChecker.FAR_LEFT   : 0;
+      bitmask |= (coord.clientX > bounds.right)  ? ZoneBoundaryChecker.FAR_RIGHT  : 0;
+      bitmask |= (coord.clientY < bounds.top)    ? ZoneBoundaryChecker.FAR_TOP    : 0;
+      bitmask |= (coord.clientY > bounds.bottom) ? ZoneBoundaryChecker.FAR_BOTTOM : 0;
 
       return bitmask; // returns zero if effectively 'within bounds'.
     }
@@ -37,7 +33,7 @@ namespace com.keyman.osk {
      * Confirms whether or not the input coordinate lies within the accepted coordinate bounds
      * for a gesture input sequence's first coordinate.
      */
-    static inputStartOutOfBoundsCheck(coord: InputEventCoordinate, config: Nonoptional<GestureRecognizerConfiguration>): boolean {
+    static inputStartOutOfBoundsCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration>): boolean {
       return !!this.getCoordZoneBitmask(coord, config.inputStartBounds); // true if out of bounds.
     }
 
@@ -48,11 +44,11 @@ namespace com.keyman.osk {
      * This value should be provided as the third argument to `inputMoveCancellationCheck` for
      * updated input coordinates for the current input sequence.
      */
-    static inputStartSafeBoundProximityCheck(coord: InputEventCoordinate, config: Nonoptional<GestureRecognizerConfiguration>): number {
+    static inputStartSafeBoundProximityCheck(coord: InputSample, config: Nonoptional<GestureRecognizerConfiguration>): number {
       return this.getCoordZoneBitmask(coord, config.paddedSafeBounds);
     }
 
-    static inputMoveCancellationCheck(coord: InputEventCoordinate,
+    static inputMoveCancellationCheck(coord: InputSample,
                                       config: Nonoptional<GestureRecognizerConfiguration>,
                                       ignoredSafeBoundFlags?: number): boolean {
       ignoredSafeBoundFlags = ignoredSafeBoundFlags || 0;

@@ -66,38 +66,38 @@ window.addEventListener('load', function() {
 
   recognizer = new com.keyman.osk.GestureRecognizer(recognizerConfig);
 
-  let console = {};
+  let recordingArr = [];
   let logElement = document.getElementById('event-log');
   // Erase any logs from before a page reload.
   logElement.value = '';
 
-
-  console.log = function(str) {
-    str = str === undefined ? '' : str;
-    logElement.value += str + '\n';
-  }
-
-
   let logClearButton = document.getElementById('log-clear-button');
   logClearButton.onclick = function() {
     logElement.value = '';
+    recordingArr = []; // erase previously-recorded sequences
   }
 
+  recognizer.on('inputstart', function(input) {
+    let touchpoint = input.touchpoints[0];
+    recordingArr.push(touchpoint);
 
-  recognizer.on('trackedInputUpdate', function(state, coord) {
-    if(state != 'move') {
-      let meta = "";
-      if(coord.isFromMouse) {
-        meta = "isFromMouse";
-      } else {
-        try {
-          meta = "touchpoint id: " + coord.source.changedTouches[0].identifier;
-        } catch (e) {
-          meta = "touchpoint id: error";
-        }
-      }
-      console.log(`state: ${state}, meta: ${meta}`);
+    objectPrinter = function() {
+      logElement.value = JSON.stringify(recordingArr, null, 2);
     }
+
+    objectPrinter();
+
+    input.on('update', function() {
+      objectPrinter();
+    });
+
+    input.on('cancel', function() {
+      objectPrinter();
+    });
+
+    input.on('end', function() {
+      objectPrinter();
+    });
   });
 });
 
