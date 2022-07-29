@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#set -x 
+#set -x
 #DEBUG=1
 
 _hu_base_dir=$(dirname "$BASH_SOURCE")/../../..

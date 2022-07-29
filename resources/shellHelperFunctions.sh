@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # WARNING: this file is copied into other locations during package builds; do not
@@ -84,7 +84,8 @@ get_platform_folder() {
 
 # The following allows coloring of warning and error lines, but only works if there's a
 # terminal attached, so not on the build machine.
-if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+shell_helper_color() {
+  if $1; then
     COLOR_RED=$(tput setaf 1)
     COLOR_GREEN=$(tput setaf 2)
     COLOR_BLUE=$(tput setaf 4)
@@ -92,13 +93,20 @@ if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; th
     COLOR_RESET=$(tput sgr0)
     # e.g. VSCode https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support
     HEADING_SETMARK='\x1b]1337;SetMark\x07'
-else
+  else
     COLOR_RED=
     COLOR_GREEN=
     COLOR_BLUE=
     COLOR_YELLOW=
     COLOR_RESET=
     HEADING_SETMARK=
+  fi
+}
+
+if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+  shell_helper_color true
+else
+  shell_helper_color false
 fi
 
 echo_heading() {

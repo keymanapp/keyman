@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Download default keyboard and lexical model packages from downloads.keyman.com
 
 # Set sensible script defaults:

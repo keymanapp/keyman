@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Builds the include script for the current Keyman version.
 #
@@ -17,35 +17,23 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-display_usage ( ) {
-  echo "Usage: $0 [configure] [clean] [build] [test]"
-  echo "          [--verbose|-v]"
-  echo "       $0 -h|--help"
-  echo
-  echo "  clean                  removes build/ folder"
-  echo "  configure              runs 'npm ci' on root folder"
-  echo "  build                  builds wrapped version of package"
-  echo "                           [if required will: configure]"
-  echo "  test                   runs tests (builds as req'd)"
-  echo "                           [if required will: build]"
-}
-
 ################################ Main script ################################
 
-builder_init "clean configure build" "$@"
+builder_describe "Build the include script for current Keyman version" configure clean build test
+builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
 if builder_has_action configure; then
   verify_npm_setup
-  builder_report configure success
+  builder_report success configure
 fi
 
 if builder_has_action clean; then
   npm run clean
   rm -f ./version.inc.ts
-  builder_report clean success
+  builder_report success clean
 fi
 
 if builder_has_action build; then
@@ -70,10 +58,10 @@ if builder_has_action build; then
 
   # Build
   npm run build -- $builder_verbose || die "Could not build worker."
-  builder_report build success
+  builder_report success build
 fi
 
 if builder_has_action test; then
   npm test || fail "Tests failed"
-  builder_report test success
+  builder_report success test
 fi

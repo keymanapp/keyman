@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Build Keyman Engine Android using Keyman Web artifacts
 #
 # Abbreviations:

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 # A testing script designed for automating in-browser testing.
 # It's designed to be called by this folder's ./test.sh.
