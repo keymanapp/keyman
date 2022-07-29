@@ -10,7 +10,7 @@ namespace com.keyman.osk {
     private hasActiveClick: boolean = false;
     private disabledSafeBounds: number = 0;
 
-    private IDENTIFIER_SEED: number;
+    private static IDENTIFIER_SEED: number;
 
     public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
@@ -21,7 +21,7 @@ namespace com.keyman.osk {
 
       // IDs should be unique.  Fortunately, they're disambiguated by their corresponding TrackedPoint,
       // which has gives a globally-unique string-based identifier based partly on the numeric ID set here.
-      this.IDENTIFIER_SEED = 0;
+      MouseEventEngine.IDENTIFIER_SEED = 0;
     }
 
     private get eventRoot(): HTMLElement {
@@ -29,11 +29,11 @@ namespace com.keyman.osk {
     }
 
     private generateIdentifier(): number {
-      return this.IDENTIFIER_SEED++;
+      return MouseEventEngine.IDENTIFIER_SEED++;
     }
 
     private get activeIdentifier(): number {
-      return this.IDENTIFIER_SEED-1;
+      return MouseEventEngine.IDENTIFIER_SEED-1;
     }
 
     // public static forVisualKeyboard(vkbd: VisualKeyboard) {

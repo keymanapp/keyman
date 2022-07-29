@@ -24,7 +24,7 @@ namespace com.keyman.osk {
      * @param identifier The identifier number corresponding to the input sequence.
      */
     hasActiveTouchpoint(identifier: number) {
-      return this._activeTouchpoints.findIndex((point) => point.rawIdentifier == identifier) != -1;
+      return this.getTouchpointWithId(identifier) !== undefined;
     }
 
     private getTouchpointWithId(identifier: number) {
@@ -71,13 +71,8 @@ namespace com.keyman.osk {
 
     onInputMoveCancel(identifier: number, sample: InputSample) {
       const touchpoint = this.getTouchpointWithId(identifier);
-
-      if(!touchpoint) {
-        return;
-      }
-
-      touchpoint.path.extend(sample);
-      touchpoint.path.terminate(true);
+      touchpoint?.path.extend(sample);
+      touchpoint?.path.terminate(true);
     }
 
     onInputEnd(identifier: number) {
