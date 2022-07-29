@@ -1,14 +1,17 @@
 import express = require('express');
-import { DebugObject, isValidId } from "../../../data";
+import { DebugObject, isValidId, simplifyId } from "../../../data";
 import fs = require('fs');
 import chalk = require('chalk');
 
 export default function apiUnregister<O extends DebugObject> (root:{ [id: string]: O }, req: express.Request, res: express.Response, next: express.NextFunction) {
-  const id = req.body['id'];
+  let id = req.body['id'];
   if(!isValidId(id)) {
     res.sendStatus(400);
     return;
   }
+
+  id = simplifyId(id);
+
   const o = root[id];
 
   if(!o) {

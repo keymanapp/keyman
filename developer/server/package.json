@@ -8,7 +8,7 @@
     "postbuild": "npx gosh ./postbuild.sh",
     "prod": "node .",
     "test": "mocha",
-    "watch": "npm run postbuild && tsc-watch --onSuccess \"node .\" --onFailure \"node .\""
+    "watch": "npm run postbuild && tsc-watch --onSuccess \"node --inspect .\" --onFailure \"node --inspect .\""
   },
   "author": "",
   "license": "MIT",
