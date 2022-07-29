@@ -6,23 +6,12 @@ set -u
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-# NOTE: this is slightly non-standard; see longer discussion below
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# This script does not use our normal shared build-utils.sh because Linux package builds
-# cannot access anything outside of the `core` directory. This means that:
-# 1. `shellHelperFunctions.sh`, `VERSION.md` and `TIER.md` are copied here by the script
-#    `linux/scripts/dist.sh` for inclusion locally in Linux package builds.
-# 2. `getversion.sh` and `gettier.sh` will use current folder if we can't access the
-#    root level `VERSION.md` and `TIER.md`.
-# 3. `$SCRIPTS_DIR` is set to this folder by the package build Makefile
-#    `core/debian/rules`
-SCRIPTS_DIR=${SCRIPTS_DIR:-$(dirname "$THIS_SCRIPT")/../resources}
-. "${SCRIPTS_DIR}/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-THIS_DIR="$(dirname "$THIS_SCRIPT")"
-
-pushd $THIS_DIR > /dev/null
+pushd "$THIS_SCRIPT_PATH" > /dev/null
 VERSION=$(./getversion.sh)
 TIER=$(./gettier.sh)
 popd > /dev/null
@@ -64,7 +53,7 @@ TESTS_CPP=false
 INSTALL_CPP=false
 UNINSTALL_CPP=false
 QUIET=false
-TARGET_PATH="$THIS_DIR/build"
+TARGET_PATH="$THIS_SCRIPT_PATH/build"
 ADDITIONAL_ARGS=
 PLATFORM=native
 
@@ -224,7 +213,7 @@ build_standard() {
   # Build meson targets
   if $CONFIGURE; then
     echo_heading "======= Configuring C++ library for $BUILD_PLATFORM ======="
-    pushd "$THIS_DIR" > /dev/null
+    pushd "$THIS_SCRIPT_PATH" > /dev/null
     meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET $STANDARD_MESON_ARGS $ADDITIONAL_ARGS
     popd > /dev/null
   fi
