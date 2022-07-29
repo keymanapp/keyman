@@ -86,8 +86,6 @@ module.exports = function(config) {
     }
   }
 
-  // Sadly, legacy IE isn't very testable with Mocha.  One of its dependencies requires a feature that is IE11+.
-
   /*
    * Final selection of the sets to be used for BrowserStack testing.
    */
