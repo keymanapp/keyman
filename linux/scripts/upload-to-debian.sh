@@ -63,6 +63,7 @@ echo_heading "Fetching latest changes"
 git fetch -p origin
 stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
 stable_branch=${stable_branch##* }
+# Checkout stable branch so that `scripts/debian.sh` picks up correct version
 git checkout ${stable_branch#origin/}
 
 cd "$KEYMAN_ROOT/linux"
@@ -76,6 +77,7 @@ $NOOP dput mentors *.changes
 cd ..
 
 echo_heading "Updating changelog"
+# base changelog branch on remote stable branch
 git checkout -B chore/linux/changelog $stable_branch
 cp debianpackage/keyman-*/debian/changelog debian/
 git add debian/changelog
