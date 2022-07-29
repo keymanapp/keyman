@@ -12,25 +12,35 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. $KEYMAN_ROOT/resources/shellHelperFunctions.sh
+
 # This script runs from its own folder
 cd "$(dirname $THIS_SCRIPT)"
 
-display_usage ( ) {
-  echo "Usage: $0 [configure] [clean] [build] [test]"
-  echo "          [--verbose|-v]"
-  echo "       $0 -h|--help"
-  echo
-  echo "  headless               runs all headless unit tests (CI or local)"
-  echo "  browser                runs all browser-based unit tests in CI mode"
-  echo "  all                    runs all unit test sets in CI mode"
-  echo "  ci                     runs selected unit tests via BrowserStack with CI-oriented reporting"
-  echo "  local                  runs selected unit test sets locally with local-oriented reporting"
-  echo "  browser-debug          runs all browser-based unit tests in persistent local mode."
-}
+################################ Main script ################################
 
-test-headless ( ) {
-  echo "Headless unit tests for this module have not yet been defined."
-}
+builder_describe "Runs all tests for the gesture-recognizer module" \
+  "test+" \
+  ":headless  Runs headless user tests" \
+  ":browser   Runs browser-based user tests" \
+  "--ci       Uses CI-based test configurations & emits CI-friendly test reports" \
+  "--debug    Activates developer-friendly debug mode for unit tests where applicable"
+
+builder_parse "$@"
+
+# TODO: build if out-of-date if test is specified
+# TODO: configure if npm has not been run, and build is specified
+
+# START - Script parameter configuration
+REPORT_STYLE="local"  # Default setting.
+
+if builder_has_option --ci; then
+  REPORT_STYLE="ci"
+
+  echo "Replacing user-friendly test reports & configurations with CI-friendly versions."
+fi
+
+# END - Script parameter configuration
 
 test-browser ( ) {
   KARMA_FLAGS=
@@ -46,61 +56,18 @@ test-browser ( ) {
   npm run karma -- start src/test/auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
 }
 
-################################ Main script ################################
-
-# Yes, this is a test script, not a build script.  But why not use the new
-# style anyway?
-
-builder_init "headless browser all ci local browser-debug" "$@"
-
-# TODO: build if out-of-date if test is specified
-# TODO: configure if npm has not been run, and build is specified
-
-# START - Script parameter configuration
-
-if builder_has_action build >/dev/null; then
-  builder_chosen_actions+=("all");
+if builder_has_action test :headless; then
+  echo "Headless unit tests for this module have not yet been defined."
+  builder_report success test :headless
 fi
 
-if builder_has_action all >/dev/null; then
-  builder_chosen_actions+=("headless");
-  builder_chosen_actions+=("browser");
-fi
-
-if builder_has_action all-local >/dev/null; then
-  builder_chosen_actions+=("headless");
-  builder_chosen_actions+=("browser");
-fi
-
-if builder_has_action local >/dev/null; then
-  REPORT_STYLE="local"
-elif builder_has_action ci >/dev/null; then
-  REPORT_STYLE="ci"
-else
-  # Attempt a TC-auto-detect.
-  echo "Auto-detecting optimal testing style..."
-  if [ ! -z "${TEAMCITY_VERSION-}" ]; then
-    echo "TeamCity detected:  running in CI mode."
-    builder_chosen_actions+=("ci");
-    REPORT_STYLE="ci"
+if builder_has_action test :browser; then
+  if builder_has_option --debug; then
+    echo "Running browser-based unit tests in debug-mode configuration..."
+    echo "${COLOR_YELLOW}You must manually terminate this mode (CTRL-C) for the script to exit.${COLOR_RESET}"
+    test-browser debug
   else
-    echo "TeamCity not detected:  running in local mode."
-    builder_chosen_actions+=("local");
-    REPORT_STYLE="local"
+    test-browser
   fi
-fi
-
-# END - Script parameter configuration
-
-if builder_has_action headless; then
-  test-headless
-  builder_report headless success
-fi
-
-if builder_has_action browser-debug; then
-  test-browser debug
-  builder_report browser-debug success
-elif builder_has_action browser; then
-  test-browser
-  builder_report browser success
+  builder_report success test :browser
 fi
