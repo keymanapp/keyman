@@ -7,7 +7,7 @@ namespace com.keyman.osk {
   export type JSONTrackedPath = {
     coords: InputSample[]; // ensures type match with public class property.
     wasCancelled?: boolean;
-    // segments: Segment[];
+    //segments: Segment[];
   }
 
   interface EventMap {
@@ -36,6 +36,8 @@ namespace com.keyman.osk {
    */
   export class TrackedPath extends EventEmitter<EventMap> {
     private samples: InputSample[] = [];
+    private _segments: Segment[] = [new Segment()];
+
     private _isComplete: boolean = false;
     private wasCancelled?: boolean;
 
@@ -80,6 +82,7 @@ namespace com.keyman.osk {
       }
 
       this.samples.push(sample);
+      this.segments[0].add(sample);
       this.emit('step', sample);
     }
 
@@ -108,6 +111,10 @@ namespace com.keyman.osk {
      */
     public get coords(): readonly InputSample[] {
       return this.samples;
+    }
+
+    public get segments(): readonly Segment[] {
+      return this._segments;
     }
 
     /**
