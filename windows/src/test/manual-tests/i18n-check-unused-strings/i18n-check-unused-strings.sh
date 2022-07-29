@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # This script finds all references to strings in strings.xml in order to make sure that old

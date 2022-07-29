@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell

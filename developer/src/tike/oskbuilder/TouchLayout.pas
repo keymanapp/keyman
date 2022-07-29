@@ -1,18 +1,18 @@
 (*
   Name:             TouchLayout
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      29 Nov 2013
 
   Modified Date:    27 May 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          29 Nov 2013 - mcdurdin - I3982 - V9.0 - Touch layout editor should not override special keys when swapping layouts
                     07 Feb 2014 - mcdurdin - I4035 - V9.0 - Parsing of UTF-8 in JSON layout file crashes TIKE
                     21 Feb 2014 - mcdurdin - I4060 - V9.0 - KeymanWeb compiler should validate the layout file
@@ -33,6 +33,19 @@ uses
 type
   ETouchLayoutValidate = class(Exception)
   end;
+
+  TTouchLayoutFlickDirection = (
+    tlfdNorth, tlfdSouth, tlfdEast, tlfdWest,
+    tlfdNorthEast, tlfdNorthWest,
+    tlfdSouthEast, tlfdSouthWest
+  );
+
+const
+  STouchLayoutFlickDirectionName: array[TTouchLayoutFlickDirection] of string = (
+    'n', 's', 'e', 'w',
+    'ne', 'nw',
+    'se', 'sw'
+  );
 
 type
   // TouchKeyType
@@ -105,6 +118,12 @@ type
   TTouchLayoutSubKeys = class(TObjectList<TTouchLayoutSubKey>)
   end;
 
+  TTouchLayoutMultiTaps = class(TObjectList<TTouchLayoutSubKey>)
+  end;
+
+  TTouchLayoutFlicks = class(TObjectDictionary<TTouchLayoutFlickDirection, TTouchLayoutSubKey>)
+  end;
+
   TTouchLayoutKey = class(TTouchLayoutObject)
   private
     FNextLayer: string;
@@ -117,7 +136,10 @@ type
     FPad: Integer;
     FSp: Integer;
     FSk: TTouchlayoutSubKeys;
+    FFlick: TTouchLayoutFlicks;
+    FMultiTap: TTouchLayoutMultiTaps;
     FText: string;
+    FHint: string;
     function GetSpT: TTouchKeyType;   // I4119
     procedure SetSpT(const Value: TTouchKeyType);   // I4119
   protected
@@ -128,6 +150,7 @@ type
     destructor Destroy; override;
     property Id: string read FId write FId;
     property Text: string read FText write FText;
+    property Hint: string read FHint write FHint;
     property Sp: Integer read FSp write FSp;
     property SpT: TTouchKeyType read GetSpT write SetSpT;   // I4119
     property Width: Integer read FWidth write FWidth;
@@ -138,6 +161,8 @@ type
     property Font: string read FFont write FFont;
     property FontSize: string read FFontSize write FFontSize;
     property Sk: TTouchlayoutSubKeys read FSk;
+    property Flick: TTouchLayoutFlicks read FFlick;
+    property MultiTap: TTouchLayoutMultiTaps read FMultiTap;
   end;
 
   TTouchLayoutKeys = class(TObjectList<TTouchLayoutKey>)
@@ -181,12 +206,26 @@ type
     function IndexOfId(const AId: string): Integer;
   end;
 
+  TTouchLayoutDefaultHint = (
+    tldhNone, tldhLongpress, tldhMultitap, tldhFlick,
+    tldhFlickN, tldhFlickNE, tldhFlickE, tldhFlickSE, tldhFlickS, tldhFlickSW, tldhFlickW, tldhFlickNW
+  );
+
+const
+  STouchLayoutDefaultHintName: array[TTouchLayoutDefaultHint] of string =
+    ('none','longpress','multitap','flick','flick-n','flick-ne','flick-e','flick-se','flick-s','flick-sw','flick-w','flick-nw');
+
+
+function DefaultHintFromString(const s: string): TTouchLayoutDefaultHint;
+
+type
   TTouchLayoutPlatform = class(TTouchLayoutObject)
   private
     FName: string;
     FLayers: TTouchLayoutLayers;
     FFontSize: string;   // I4062
     FDisplayUnderlying: Boolean;
+    FDefaultHint: TTouchLayoutDefaultHint;
     FFont: string;
   protected
     procedure DoRead; override;
@@ -195,6 +234,7 @@ type
     constructor Create(AParent: TTouchLayoutObject); override;
     destructor Destroy; override;
     property DisplayUnderlying: Boolean read FDisplayUnderlying write FDisplayUnderlying;
+    property DefaultHint: TTouchLayoutDefaultHint read FDefaultHint write FDefaultHint;
     property Name: string read FName write FName;
     property Font: string read FFont write FFont;
     property FontSize: string read FFontSize write FFontSize;   // I4062
@@ -747,10 +787,15 @@ begin
 end;
 
 procedure TTouchLayoutPlatform.DoRead;
+var
+  s: string;
 begin
   GetValue('font', FFont);
   GetValue('fontsize', FFontSize);
   GetValue('displayUnderlying', FDisplayUnderlying);
+  if GetValue('defaultHint', s)
+    then FDefaultHint := DefaultHintFromString(s)
+    else FDefaultHint := tldhNone;
   ReadArray('layer', TTouchLayoutLayer,
     procedure (obj: TTouchLayoutObject) begin FLayers.Add(obj as TTouchLayoutLayer); end);
 end;
@@ -764,6 +809,8 @@ begin
   AddJSONValue(JSON, 'font', FFont);
   AddJSONValue(JSON, 'fontsize', FFontSize);
   AddJSONValue(JSON, 'displayUnderlying', FDisplayUnderlying);
+  if FDefaultHint <> tldhNone then
+    AddJSONValue(JSON, 'defaultHint', STouchLayoutDefaultHintName[FDefaultHint]);
 
   if FLayers.Count > 0 then
   begin
@@ -831,15 +878,24 @@ constructor TTouchLayoutKey.Create(AParent: TTouchLayoutObject);
 begin
   inherited Create(AParent);
   FSk := TTouchLayoutSubKeys.Create;
+  FFlick := TTouchLayoutFlicks.Create;
+  FMultiTap := TTouchLayoutMultiTaps.Create;
 end;
 
 destructor TTouchLayoutKey.Destroy;
 begin
   FreeAndNil(FSk);
+  FreeAndNil(FFlick);
+  FreeAndNil(FMultiTap);
   inherited Destroy;
 end;
 
 procedure TTouchLayoutKey.DoRead;
+var
+  v: TJSONValue;
+  o: TJSONObject;
+  d: TTouchLayoutFlickDirection;
+  sk: TTouchLayoutSubKey;
 begin
   GetValue('nextlayer', FNextLayer);
   GetValue('fontsize', FFontSize);
@@ -851,15 +907,33 @@ begin
   GetValue('pad', FPad);
   GetValue('sp', FSp);
   GetValue('text', FText);
+  GetValue('hint', FHint);
   ReadArray('sk', TTouchLayoutSubKey,
     procedure (obj: TTouchLayoutObject) begin FSk.Add(obj as TTouchLayoutSubKey); end);
+  if GetValue('flick', v) and (v is TJSONObject) then
+  begin
+    o := v as TJSONObject;
+    for d := Low(TTouchLayoutFlickDirection) to High(TTouchLayoutFlickDirection) do
+    begin
+      v := o.GetValue(STouchLayoutFlickDirectionName[d]);
+      if Assigned(v) and (v is TJSONObject) then
+      begin
+        sk := TTouchLayoutSubKey.Create(Self);
+        sk.Read(v as TJSONObject);
+        FFlick.Add(d, sk);
+      end;
+    end;
+  end;
+  ReadArray('multitap', TTouchLayoutSubKey,
+    procedure (obj: TTouchLayoutObject) begin FMultiTap.Add(obj as TTouchLayoutSubKey); end);
 end;
 
 procedure TTouchLayoutKey.DoWrite(JSON: TJSONObject);
 var
   i: Integer;
   v: TJSONArray;
-  o: TJSONObject;
+  o, f: TJSONObject;
+  d: TTouchLayoutFlickDirection;
 begin
   AddJSONValue(JSON, 'nextlayer', FNextLayer);
   AddJSONValue(JSON, 'fontsize', FFontSize);
@@ -871,6 +945,7 @@ begin
   if FPad <> 0 then AddJSONValue(JSON, 'pad', IntToStr(FPad));
   if FSp <> 0 then AddJSONValue(JSON, 'sp', IntToStr(FSp));
   AddJSONValue(JSON, 'text', FText);
+  AddJSONValue(JSON, 'hint', FHint);
 
   if FSk.Count > 0 then
   begin
@@ -883,6 +958,31 @@ begin
     end;
     JSON.AddPair('sk', v);
   end;
+
+  if FFlick.Count > 0 then
+  begin
+    f := TJSONObject.Create;
+    for d in FFlick.Keys do
+    begin
+      o := TJSONObject.Create;
+      FFlick[d].Write(o);
+      f.AddPair(STouchLayoutFlickDirectionName[d], o);
+    end;
+    JSON.AddPair('flick', f);
+  end;
+
+  if FMultiTap.Count > 0 then
+  begin
+    v := TJSONArray.Create;
+    for i := 0 to FMultiTap.Count - 1 do
+    begin
+      o := TJSONObject.Create;
+      FMultiTap[i].Write(o);
+      v.Add(o);
+    end;
+    JSON.AddPair('multitap', v);
+  end;
+
 end;
 
 function TTouchLayoutKey.GetSpT: TTouchKeyType;   // I4119
@@ -1014,6 +1114,13 @@ begin
     if Items[i].Id = AId then
       Exit(i);
   Result := -1;
+end;
+
+function DefaultHintFromString(const s: string): TTouchLayoutDefaultHint;
+begin
+  for Result := Low(TTouchLayoutDefaultHint) to High(TTouchLayoutDefaultHint) do
+    if s = STouchLayoutDefaultHintName[Result] then Exit;
+  Result := tldhNone;
 end;
 
 end.

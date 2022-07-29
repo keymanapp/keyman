@@ -5,15 +5,17 @@ import os
 import urllib.parse
 
 import gi
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 
 from gi.repository import Gtk, WebKit2
-from keyman_config.get_kmp import get_download_folder, download_kmp_file
-from keyman_config.install_window import InstallKmpWindow
+
+from keyman_config import KeymanComUrl, _, __releaseversion__, __tier__
 from keyman_config.accelerators import init_accel
 from keyman_config.get_info import GetInfo
-from keyman_config import __releaseversion__, __tier__, KeymanComUrl, _
+from keyman_config.get_kmp import download_kmp_file, get_download_folder
+from keyman_config.install_window import InstallKmpWindow
 
 
 class DownloadKmpWindow(Gtk.Dialog):
@@ -42,7 +44,7 @@ class DownloadKmpWindow(Gtk.Dialog):
         self.resize(800, 450)
         self.show_all()
 
-    def _process_kmp(self, url, downloadfile):
+    def _process_kmp(self, url, downloadfile: str):
         logging.info("Downloading kmp file to %s", downloadfile)
         if download_kmp_file(url, downloadfile):
             logging.info("File downloaded")

@@ -1,4 +1,3 @@
-
 @font-face {
   font-family: KeymanwebOsk;
   font-style:  normal;
@@ -6,11 +5,23 @@
   src: url('keymanweb-osk.ttf')  format('truetype');
 }
 
+* {
+  box-sizing: border-box;
+}
+
+#selKeyCapType,
+#selSubKeyCapType {
+  font-family: KeymanwebOsk, Tahoma;
+  font-size: 10pt;
+}
+
 body {
   font-family: Tahoma;
   font-size: 18pt;
   padding: 0;
   margin: 0;
+  display: grid;
+  grid-template-columns: 152px 1fr;
 }
 
 .ui-dialog {
@@ -33,6 +44,7 @@ body {
   padding-left: 97px;
   padding-bottom: 88px;
   padding-right: 108px;
+  width: 1024px;
 }
 
 #kbd.tablet-ipad-portrait {
@@ -42,7 +54,8 @@ body {
   padding-top: 34px;
   padding-left: 99px;
   padding-bottom: 98px;
-  padding-right: 200px;
+  padding-right: 168px;
+  width: 800px;
 }
 
 #kbd.phone-iphone5-landscape {
@@ -52,7 +65,8 @@ body {
   padding-left: 144px;
   padding-bottom: 40px;
   padding-top: 66px;
-  padding-right: 158px;
+  padding-right: 88px;
+  width: 1042px;
 }
 
 #kbd.phone-iphone5-portrait {
@@ -62,7 +76,39 @@ body {
   padding-left: 92px;
   padding-bottom: 170px;
   padding-top: 70px;
-  padding-right: 108px;
+  padding-right: 116px;
+  width: 200px;
+}
+
+.toolbar-item {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  vertical-align: baseline;
+  padding-bottom: 2px;
+}
+
+.toolbar-item.toolbar-single-column {
+  grid-template-columns: 1fr;
+}
+
+.toolbar-item.toolbar-2-small-buttons {
+  grid-template-columns: 1fr 24px 24px;
+  column-gap: 4px;
+}
+
+.toolbar-item label {
+  padding: 0.75em 0;
+}
+
+.toolbar-item select,
+.toolbar-item input,
+.toolbar-item button {
+  padding: 6px;
+  width: 100%;
+}
+
+.toolbar-item button.emoji-button {
+  padding: 6px 0;
 }
 
 .key-droppable
@@ -83,7 +129,8 @@ body {
 .key-droppable-hover {
   border: solid 1px #cccccc;
   margin-left: 3px;
-  width: 50px;
+  width: 75px;
+  background: #eeffee;
 }
 
 .key-dragging
@@ -91,7 +138,8 @@ body {
   background: #cccccc !important;
 }
 
-.key {
+.key,
+.key-placeholder {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   display: inline-block;
@@ -109,13 +157,26 @@ body {
   left: 0; top: 0;
 }
 
+.key-placeholder {
+  border-radius: 24px;
+  border-color: #cccccc;
+  color: #cccccc;
+}
+
+.key-placeholder:hover {
+  background: #80ff80;
+  color: rgb(75, 185, 75);
+  border-color: rgb(75, 185, 75);
+  box-shadow: 0px 0px 20px rgba(75, 185, 75, 0.5);
+}
+
 .key .id {
   font-family: Tahoma;
   font-size: 10px;
   color: #8080f0;
   position: absolute;
-  bottom: 2px;
-  right: 4px;
+  bottom: 4px;
+  right: 3px;
   text-align: right;
   cursor: pointer;
 }
@@ -130,25 +191,118 @@ body {
   text-align: left;
 }
 
+.key .hint {
+  font-size: 12px;
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  text-align: right;
+}
+
+.key .hint.custom-hint {
+  color: #0cb901;
+}
+
 .key.key-modifier .id {
   color: #808080;
 }
 
-.key .text {
-
+.has-multitap {
+  background: no-repeat url('multitap.svg') 0 0 / 100%;
+  position: absolute;
+  right: 2px;
+  bottom: 12px;
+  width: 10px;
+  height: 6px;
 }
 
-.hasSubKeyArray {
-  background-image: url('skflag.png');
-  background-position: top right;
-  background-repeat: no-repeat;
+.has-longpress {
+  background: no-repeat url('longpress.svg') 0 0 / 100%;
+  position: absolute;
+  margin-left: 50%;
+  left: -5px;
+  top: 1px;
+  width: 10px;
+  height: 10px;
 }
 
-.hasSubKeyArray.selected {
-  background-image: url('skflags.png');
+/* If we have both flick-n and longpress, we need to move the longpress icon down */
+.has-flick-n ~ .has-longpress {
+  top: 5px;
+}
+
+.has-flick {
+  position: absolute;
+  display: block;
+  width: 5px;
+  height: 5px;
+}
+
+.has-flick-nw {
+  background:no-repeat url('flick-nw.svg') 0 0 / 100%;
+  left: 1px;
+  top: 1px;
+}
+
+.has-flick-n {
+  background:no-repeat url('flick-n.svg') 0 0 / 100%;
+  left: 50%;
+  margin-left: -2.5px;
+  top: 1px;
+}
+
+.has-flick-ne {
+  background:no-repeat url('flick-ne.svg') 0 0 / 100%;
+  right: 1px;
+  top: 1px;
+}
+
+.has-flick-w {
+  background:no-repeat url('flick-w.svg') 0 0 / 50%;
+  left: 1px;
+  top: 50%;
+  width: 7.5px;
+  height: 7.5px;
+  margin-top: -2.5px;
+}
+
+.has-flick-e {
+  background:no-repeat url('flick-e.svg') 0 0 / 50%;
+  right: -1px;
+  top: 50%;
+  width: 7.5px;
+  height: 7.5px;
+  margin-top: -2.5px;
+}
+
+.has-flick-sw {
+  background:no-repeat url('flick-sw.svg') 0 0 / 100%;
+  left: 1px;
+  bottom: 1px;
+}
+
+.has-flick-s {
+  background:no-repeat url('flick-s.svg') 0 0 / 100%;
+  left: 50%;
+  margin-left: -2.5px;
+  bottom: -1px;
+}
+
+.has-flick-se {
+  background:no-repeat url('flick-se.svg') 0 0 / 100%;
+  right: 1px;
+  bottom: 1px;
+}
+
+.key:hover {
+  background: #e0e0ff;
+  color: #8080ff;
+  border-color: #8080ff !important;
+  box-shadow: 0px 0px 20px rgba(150, 150, 255, 0.5);
 }
 
 .key.selected {
+  background: #d0d0ff;
   border-color: #4040ff !important;
   box-shadow: 0px 0px 20px rgba(100, 100, 255, 0.5);
 }
@@ -159,32 +313,103 @@ body {
   position: relative;
 }
 
-#sk {
-  clear:left;
+#sub-key-container {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  white-space: nowrap;
+  border-bottom: solid 1px black;
+  border-top: solid 1px black;
+}
+
+#sub-key-groups > div,
+#subKeyToolbar {
+  background-color: white;
+}
+
+#sub-key-groups {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 1px;
+  background-color: black;
+}
+
+#longpress,
+#multitap {
   padding: 8px;
   margin: 0px 0px 8px;
-  min-height: 69px;
-  background: #eeeeee;
+  min-height: 64px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#longpress,
+#multitap,
+#flick {
+  padding: 8px 0 8px 8px;
+  min-width: 256px;
+  box-sizing: border-box;
+}
+
+#longpress .key-placeholder,
+#multitap .key-placeholder {
+  order: 1;
+}
+
+#kbd-container {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+}
+
+#kbd-scroll-container {
   overflow-x: auto;
-  white-space: nowrap;
-  border-top: solid 1px #333333;
-  position: relative;
 }
 
 #kbd {
-  float: left;
   padding: 8px;
   margin: 0px 0px 8px;
   background: #eeeeee;
-  overflow-x: auto;
   white-space: nowrap;
+  min-width: 770px;
+  box-sizing: border-box;
 }
 
-#sk .key
-{
+#longpress .key,
+#flick .key,
+.key-placeholder,
+#multitap .key {
   height: 48px;
-  padding-top: 5px;
   margin-left: 3px;
+}
+
+#longpress .key,
+#flick .key,
+#multitap .key {
+  padding-top: 5px;
+}
+
+#flick {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  padding: 8px;
+  position: relative;
+}
+
+#longpress .key,
+#flick .key,
+#multitap .key,
+.key-placeholder {
+  width: 70px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  margin-top: 3px;
+}
+
+.key-placeholder#flick-center,
+.key-placeholder#flick-center:hover {
+  background-color: #cccccc;
+  border-color: #cccccc;
+  box-shadow: none;
 }
 
 .key-modifier { background: #dddddd; }
@@ -210,23 +435,36 @@ br.clear {
   clear: both;
 }
 
+#kbd-container,
+#sub-key-container {
+  min-width: 1020px;
+}
+
 #toolbar div {
   background: #DCDCDD;
-  margin: -1px -1px -1px 0;
-  padding: 8px;
-  float: left;
+}
+
+#toolbar h3 {
+  margin: 0;
+  padding: 0 0 4px 0;
+  font-size: 10pt;
+}
+
+#toolbar #controlToolbar > div {
+  margin: 4px 0;
+  padding: 4px;
+  line-height: 1.4em;
 }
 
 #toolbar #layoutToolbar > div {
-  margin: 0;
-  padding: 0 8px;
-  border-left: 1px solid #444444;
-  line-height: 24px;
+  margin: 4px 0;
+  padding: 4px;
+  border-top: 1px solid #444444;
+  line-height: 1.4em;
 }
 
 button, input, select {
   font: 9pt Tahoma;
-  margin: 1px 2px;
 }
 
 button {
@@ -240,9 +478,7 @@ button {
 }
 
 #keyToolbar, #subKeyToolbar {
-  margin: -9px 0px 0;
   padding: 8px;
-  clear: left;
 }
 
 #data {
@@ -315,11 +551,11 @@ div#btnDelKey, div#btnDelSubKey {
     color: #FFFFFF;
     font-family: Tahoma;
     font-size: 10px;
-    height: 9px;
-    line-height: 6px;
+    height: 13px;
+    line-height: 8px;
     position: absolute;
     text-align: center;
-    width: 9px;
+    width: 13px;
 }
 
 div#btnDelKey:hover, div#btnDelSubKey:hover {
@@ -327,7 +563,13 @@ div#btnDelKey:hover, div#btnDelSubKey:hover {
     border: 1px solid #ff0000;
 }
 
-input#inpKeyCap, input#inpSubKeyCap {
+body:not(.text-controls-in-toolbar) #key-cap-toolbar-item label,
+body:not(.text-controls-in-toolbar) #sub-key-cap-toolbar-item label {
+  display: none;
+}
+
+body:not(.text-controls-in-toolbar) input#inpKeyCap,
+body:not(.text-controls-in-toolbar) input#inpSubKeyCap {
   font-size: 24px;
   z-index: 100;
   position: absolute;
@@ -337,32 +579,90 @@ input#inpKeyCap, input#inpSubKeyCap {
 }
 
 .key-size {
-  color: white;
-  font: 9pt Calibri;
-  left: 100%;
-  margin-left: 16px;
-  margin-top: 16px;
+  font-family: Calibri;
   position: absolute;
-  top: 0;
   z-index: 10;
   line-height: 1em;
 }
 
 #kbd.phone-iphone5-portrait .key-size {
-  color: black;
-  margin-left: 48px;
+  left: 567px;
+  top: 16px;
   font-size: 8pt;
+  color: black;
 }
 
 #kbd.phone-iphone5-landscape .key-size {
+  left: 737px;
+  top: 8px;
   font-size: 8pt;
-  margin-left: 16px;
-  margin-top: 8px;
-  background: rgba(0,0,0,0.5);
-  border-radius: 2px;
+  color: white;
 }
 
 #kbd.tablet-ipad-portrait .key-size {
-  color: black;
-  margin-left: 90px;
+  left: 607px;
+  top: 20px;
+  font-size: 8pt;
+  color: white;
+}
+
+#kbd.tablet-ipad-landscape .key-size {
+  left: 836px;
+  top: 16px;
+  font-size: 9pt;
+  color: white;
+}
+
+/* Position flick keys relative to the flick grid, by hand */
+
+#flick .key {
+  position: absolute;
+}
+
+.key.flick-nw {
+  left: 8px;
+  top: 8px;
+}
+
+.key.flick-n {
+  left: 87px;
+  top: 8px;
+}
+
+.key.flick-ne {
+  left: 166px;
+  top: 8px;
+}
+
+.key.flick-w {
+  left: 8px;
+  top: 65px;
+}
+
+.key.flick-e {
+  left: 166px;
+  top: 65px;
+}
+
+.key.flick-sw {
+  left: 8px;
+  top: 122px;
+}
+
+.key.flick-s {
+  left: 87px;
+  top: 122px;
+}
+
+.key.flick-se {
+  left: 166px;
+  top: 122px;
+}
+
+.tab {
+  font-size: 16px;
+  padding: 4px 0 0 4px;
+  display: block;
+  background: #DCDCDD;
+  padding: 4px 8px;
 }

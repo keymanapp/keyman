@@ -137,6 +137,8 @@ type
     actToolsWebCopyPublicUrl: TAction;
     actToolsWebOpenPublicUrl: TAction;
     actToolsWebConfigure: TAction;
+    actToolsWebStartServer: TAction;
+    actToolsWebStopServer: TAction;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -237,6 +239,10 @@ type
     procedure actToolsWebConfigureExecute(Sender: TObject);
     procedure actToolsWebCopyPublicUrlUpdate(Sender: TObject);
     procedure actToolsWebOpenPublicUrlUpdate(Sender: TObject);
+    procedure actToolsWebStartServerExecute(Sender: TObject);
+    procedure actToolsWebStartServerUpdate(Sender: TObject);
+    procedure actToolsWebStopServerExecute(Sender: TObject);
+    procedure actToolsWebStopServerUpdate(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
@@ -790,6 +796,26 @@ begin
     else actToolsWebOpenPublicUrl.Caption := 'Open in browser';
 end;
 
+procedure TmodActionsMain.actToolsWebStartServerExecute(Sender: TObject);
+begin
+  TServerDebugAPI.StartServer;
+end;
+
+procedure TmodActionsMain.actToolsWebStartServerUpdate(Sender: TObject);
+begin
+  actToolsWebStartServer.Visible := not TServerDebugAPI.Running;
+end;
+
+procedure TmodActionsMain.actToolsWebStopServerExecute(Sender: TObject);
+begin
+  TServerDebugAPI.StopServer;
+end;
+
+procedure TmodActionsMain.actToolsWebStopServerUpdate(Sender: TObject);
+begin
+  actToolsWebStopServer.Visible := TServerDebugAPI.Running;
+end;
+
 procedure TmodActionsMain.actViewCharacterIdentifierExecute(Sender: TObject);   // I4807
 begin
   frmCharacterIdentifier.ToggleVisibility;
@@ -1021,6 +1047,8 @@ procedure TmodActionsMain.actWindowPrevExecute(Sender: TObject);
 begin
   with frmKeymanDeveloper do
   begin
+    if ChildWindows.Count = 0 then
+      Exit;
     if ActiveChildIndex = 0
       then ActiveChildIndex := ChildWindows.Count - 1
       else ActiveChildIndex := ActiveChildIndex - 1;

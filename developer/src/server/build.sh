@@ -28,7 +28,7 @@ display_usage ( ) {
   echo "       $0 --help"
   echo
   echo "  --help                      displays this screen and exits"
-  echo "  --production, -p            builds production release in build/"
+  echo "  --production, -p            builds production release in /developer/bin/server/"
   echo "  --skip-package-install, -S  don't run npm install (not valid with --production)"
   echo "  --test, -t                  runs unit tests after building"
   #echo "  --watch, -w                 builds dev server in watch mode"
@@ -184,10 +184,10 @@ if (( production )) ; then
   mkdir -p "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
 
-  # We'll build in the build/ folder
-  rm -rf build/
-  mkdir -p build/dist/
-  cp -R dist/* build/dist/
-  cp -R "$PRODBUILDTEMP"/* build/
+  # We'll build in the $KEYMAN_ROOT/developer/bin/server/ folder
+  rm -rf "$KEYMAN_ROOT/developer/bin/server/"
+  mkdir -p "$KEYMAN_ROOT/developer/bin/server/dist/"
+  cp -R dist/* "$KEYMAN_ROOT/developer/bin/server/dist/"
+  cp -R "$PRODBUILDTEMP"/* "$KEYMAN_ROOT/developer/bin/server/"
   rm -rf "$PRODBUILDTEMP"
 fi

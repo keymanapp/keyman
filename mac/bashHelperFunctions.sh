@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # TODO: deprecate and replace with shellHelperFunctions.sh.
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Controls uploading and downloading Crowdin l10n files for
 # Keyman for Windows.

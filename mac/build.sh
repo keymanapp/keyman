@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
