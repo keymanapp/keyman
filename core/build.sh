@@ -11,11 +11,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-pushd "$THIS_SCRIPT_PATH" > /dev/null
-VERSION=$(./getversion.sh)
-TIER=$(./gettier.sh)
-popd > /dev/null
-
 display_usage() {
   echo "usage: build.sh [build options] [targets] [-- options to pass to c++ configure]"
   echo
