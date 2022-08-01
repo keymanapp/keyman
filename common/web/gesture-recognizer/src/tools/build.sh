@@ -15,16 +15,16 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
-cd "$(dirname $THIS_SCRIPT)"
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
 builder_describe "Testing-oriented tools for the Gesture Recognizer module of web-based Keyman OSKs" \
   "clean" \
   "build" \
-  ":fixture The HTML-element fixture and CSS fixture used for both user-testing and unit-testing" \
-  ":recorder The web page used for recording input sequences for use in unit-testing" \
-  ":test-module The TS library used to interface with the main gesture-recognizer module for tests"
+  ":fixture       The HTML-element fixture and CSS fixture used for both user-testing and unit-testing" \
+  ":recorder      The web page used for recording input sequences for use in unit-testing" \
+  ":test-module   The TS library used to interface with the main gesture-recognizer module for tests"
 
 builder_parse "$@"
 
@@ -75,6 +75,6 @@ if builder_has_action build :recorder; then
 fi
 
 if builder_has_action build :test-module; then
-  npm run tsc -- -b "$(dirname $THIS_SCRIPT)/unit-test-resources/tsconfig.json"
+  npm run tsc -- -b "$THIS_SCRIPT_PATH/unit-test-resources/tsconfig.json"
   builder_report success build :test-module
 fi
