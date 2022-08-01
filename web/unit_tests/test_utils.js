@@ -3,6 +3,16 @@
 com = com || {};
 com.keyman = com.keyman || {};
 com.keyman.karma = com.keyman.karma || {};
+com.keyman.karma.DEVICE_DETECT_FAILURE = false;
+
+// If we've set things up to support Device dection without loading KMW...
+try {
+  let device = new com.keyman.Device();
+  device.detect();
+} catch (err) {
+  // Sets a warning flag that unit-test files can use to disable themselves.
+  com.keyman.karma.DEVICE_DETECT_FAILURE = true;
+}
 
 // Keyman test suite utility methods
 
