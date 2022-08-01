@@ -219,6 +219,11 @@ endif
 
 # test for km_kbp_keyboard_get_key_list
 
+# For following tests, we need to be copying from source_path,
+# not build_path, so we'll just update test_path accordingly. This
+# should work for Linux, macOS, and WASM.
+test_path = source_path
+
 key_e = executable('key_list', 'kmx_key_list.cpp',
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
