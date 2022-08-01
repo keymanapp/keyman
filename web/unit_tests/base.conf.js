@@ -37,15 +37,16 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'web/unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
-    'web/unit_tests/dev_resources.js',  // Defines com.keyman.dom objects separate from KMW for unit testing.
+    'web/unit_tests/modernizr.js',              // A dependency-managed utility script that helps with browser feature detection.
+    'web/unit_tests/dev_resources.js',          // Defines com.keyman.dom objects separate from KMW for unit testing.
     'common/web/recorder/build/index.js',
-    'web/unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
-                                          // Includes KMW's Device class, which is used by test_utils below.
-    'web/unit_tests/test_init_check.js', // Ensures that tests will initialize properly
-    'web/unit_tests/test_utils.js', // A basic utility script useful for constructing tests
-    'web/unit_tests/cases/**/*.js', // Where the tests actually reside.
-    'common/test/resources/json/**/*.json', // Where pre-loaded JSON resides.
+    'web/unit_tests/recorder_InputEvents.js',   // The object definitions used to generate/replicate key events for engine tests.
+                                                // Includes KMW's Device class, which is used by test_utils below.
+    'web/unit_tests/test_init_check.js',        // Ensures that tests will initialize properly
+    'common/test/resources/timeout-adapter.js', // Handles configuration timeout setup at runtime.
+    'web/unit_tests/test_utils.js',             // A basic utility script useful for constructing tests
+    'web/unit_tests/cases/**/*.js',             // Where the tests actually reside.
+    'common/test/resources/json/**/*.json',     // Where pre-loaded JSON resides.
     {pattern: 'common/test/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
     {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
     {pattern: 'web/release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources

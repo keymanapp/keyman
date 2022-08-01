@@ -1,7 +1,7 @@
 var assert = chai.assert;
 
 describe('Text Selection', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   /* Utility functions */
 
@@ -82,13 +82,13 @@ describe('Text Selection', function() {
         fixture.setBase('fixtures');
         fixture.load("single"+inputType+".html");
 
-        this.timeout(kmwconfig.timeouts.scriptLoad*2);
+        this.timeout(testconfig.timeouts.scriptLoad*2);
         setupKMW(null, function() {
           loadKeyboardFromJSON("/keyboards/web_context_tests.json", function() {
             keyman.setActiveKeyboard("web_context_tests");
             done();
-          }, kmwconfig.timeouts.scriptLoad);
-        }, kmwconfig.timeouts.scriptLoad);
+          }, testconfig.timeouts.scriptLoad);
+        }, testconfig.timeouts.scriptLoad);
       });
 
       after(function() {
@@ -101,7 +101,7 @@ describe('Text Selection', function() {
         fixture.load("single"+inputType+".html");
         window.setTimeout(function(){
           done();
-        }, kmwconfig.timeouts.eventDelay);
+        }, testconfig.timeouts.eventDelay);
       });
 
       /*

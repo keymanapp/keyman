@@ -3,43 +3,6 @@
 com = com || {};
 com.keyman = com.keyman || {};
 com.keyman.karma = com.keyman.karma || {};
-com.keyman.karma.DEVICE_DETECT_FAILURE = false;
-
-(function() {
-  // Default value in case of device-detection failure.
-  var mobile = false;
-
-  try {
-    var device = new com.keyman.Device();
-    device.detect();
-
-    mobile = (device.formFactor != 'desktop');
-  } catch (err) {
-    // Sets a warning flag that unit-test files can use to disable themselves.
-    com.keyman.karma.DEVICE_DETECT_FAILURE = true;
-  }
-
-  var kmwconfig = window['kmwconfig'] = {mobile: mobile};
-
-  var configArgs = window['__karma__'].config.args;  // Where Karma gives us our custom args.
-  for(var i = 0; i < configArgs.length; configArgs++) {
-    switch(configArgs[i].type) {
-      case 'timeouts':
-        var timeouts = JSON.parse(JSON.stringify(configArgs[i]));
-        delete timeouts.type;
-
-        if(mobile) {
-          for(var key in timeouts) {
-            if(key != 'mobileFactor') {
-              timeouts[key] = timeouts[key] * timeouts['mobileFactor'];
-            }
-          }
-        }
-        kmwconfig['timeouts'] = timeouts;
-        break;
-    }
-  }
-})();
 
 // Keyman test suite utility methods
 
@@ -342,7 +305,7 @@ if(typeof(DynamicElements) == 'undefined') {
     if(loadCallback) {
       frame.addEventListener('load', function() {
         // Give KMW's attachment events a chance to run first.
-        window.setTimeout(loadCallback, Math.max(100, kmwconfig.timeouts.scriptLoad));
+        window.setTimeout(loadCallback, Math.max(100, testconfig.timeouts.scriptLoad));
       });
     }
     frame.setAttribute("src", "resources/html/iframe.html");
@@ -404,7 +367,7 @@ if(typeof(DynamicElements) == 'undefined') {
       window.setTimeout(function() {
         assertion();
         done();
-      }, kmwconfig.timeouts.eventDelay);
+      }, testconfig.timeouts.eventDelay);
     } else {
       assertion();
     }
@@ -418,7 +381,7 @@ if(typeof(DynamicElements) == 'undefined') {
       window.setTimeout(function() {
         assertion();
         done();
-      }, kmwconfig.timeouts.eventDelay);
+      }, testconfig.timeouts.eventDelay);
     } else {
       assertion();
     }

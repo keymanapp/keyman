@@ -4,7 +4,7 @@ var DefaultWorker = com.keyman.text.prediction.DefaultWorker;
 
 describe('LMLayerWorker', function () {
   // This one makes multiple subsequent calls across the WebWorker boundary, so we should be generous here.
-  this.timeout(Math.max(config.timeouts.standard, 5000));
+  this.timeout(Math.max(testconfig.timeouts.standard, 5000));
 
   describe('LMLayerWorkerCode', function() {
     it('should exist!', function() {

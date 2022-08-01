@@ -5,12 +5,12 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
  * How to run the worlist
  */
 describe('LMLayer using the trie model', function () {
-  this.timeout(config.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
-      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
+      this.timeout(testconfig.timeouts.standard * 3); // This one makes multiple subsequent calls across
                                                   // the WebWorker boundary, so we should be generous here.
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
 

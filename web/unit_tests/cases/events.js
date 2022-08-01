@@ -1,10 +1,10 @@
 var assert = chai.assert;
 
 describe('Event Management', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   before(function(done) {
-    this.timeout(kmwconfig.timeouts.scriptLoad * 2);
+    this.timeout(testconfig.timeouts.scriptLoad * 2);
     fixture.setBase('fixtures');
     fixture.load("eventTestConfig.html");
 
@@ -15,11 +15,11 @@ describe('Event Management', function() {
         // Interestingly, when auto-testing there's a Safari bug that prevents
         // this from being preserved after the first forced blur command below.
         done();
-      }, kmwconfig.timeouts.scriptLoad);
-    }, kmwconfig.timeouts.scriptLoad);
+      }, testconfig.timeouts.scriptLoad);
+    }, testconfig.timeouts.scriptLoad);
 
   });
-  
+
   after(function() {
     teardownKMW();
   });

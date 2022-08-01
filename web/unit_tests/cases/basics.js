@@ -1,7 +1,7 @@
 var assert = chai.assert;
 
 describe('Basic KeymanWeb', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   before(function() {
     // These tests require use of KMW's device-detection functionality.
@@ -9,18 +9,18 @@ describe('Basic KeymanWeb', function() {
   })
 
   beforeEach(function(done) {
-    this.timeout(kmwconfig.timeouts.scriptLoad);
+    this.timeout(testconfig.timeouts.scriptLoad);
 
     fixture.setBase('fixtures');
     fixture.load("singleInput.html");
-    setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
+    setupKMW(null, done, testconfig.timeouts.scriptLoad);
   });
-  
+
   afterEach(function() {
     fixture.cleanup();
     teardownKMW();
   });
-  
+
   describe('Initialization', function() {
     it('KMW should attach to the input element.', function() {
       var singleton = document.getElementById('singleton');
@@ -35,17 +35,17 @@ describe('Basic KeymanWeb', function() {
 Modernizr.on('touchevents', function(result) {
   if(!result) {
     describe('Basic Toggle UI', function() {
-      this.timeout(kmwconfig.timeouts.scriptLoad);
+      this.timeout(testconfig.timeouts.scriptLoad);
 
       beforeEach(function(done) {
-        this.timeout(kmwconfig.timeouts.uiLoad);
+        this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
         // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('toggle', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
+        setupKMW('toggle', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
       });
-      
+
       afterEach(function() {
         fixture.cleanup();
         teardownKMW();
@@ -53,7 +53,7 @@ Modernizr.on('touchevents', function(result) {
 
       it('The Toggle UI initializes correctly.', function() {
         assert(keyman.ui.initialized, 'Initialization flag is set to false!');
-        
+
         assert.isNotNull(keyman.ui.controller, 'Failed to create the controller element!');
 
         var divs = document.getElementsByTagName("div");
@@ -72,14 +72,14 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Button UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(kmwconfig.timeouts.uiLoad);
+        this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
         // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('button', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
+        setupKMW('button', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
       });
-      
+
       afterEach(function() {
         fixture.cleanup();
         teardownKMW();
@@ -93,14 +93,14 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Float UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(kmwconfig.timeouts.uiLoad);
+        this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
         // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('float', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
+        setupKMW('float', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
       });
-      
+
       afterEach(function() {
         fixture.cleanup();
         teardownKMW();
@@ -108,7 +108,7 @@ Modernizr.on('touchevents', function(result) {
 
       it('The Float UI initializes correctly.', function() {
         assert(keyman.ui.initialized, 'Initialization flag is set to false!');
-        
+
         assert.isNotNull(keyman.ui.outerDiv, 'Failed to create the floating controller element!');
 
         var divs = document.getElementsByTagName("div");
@@ -127,13 +127,13 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Toolbar UI', function() {
 
       beforeEach(function(done) {
-        this.timeout(kmwconfig.timeouts.uiLoad);
+        this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toolbar', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
+        setupKMW('toolbar', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
       });
-      
+
       afterEach(function() {
         fixture.cleanup();
         teardownKMW();
@@ -141,7 +141,7 @@ Modernizr.on('touchevents', function(result) {
 
       it('The Toolbar UI initializes correctly.', function() {
         assert(keyman.ui.init, 'Initialization flag is set to false!');
-        
+
         var kwc = document.getElementById('KeymanWebControl');
         assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');
 
