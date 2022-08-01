@@ -21,10 +21,10 @@ cd "$(dirname $THIS_SCRIPT)"
 
 builder_describe "Runs all tests for the gesture-recognizer module" \
   "test+" \
-  ":headless  Runs headless user tests" \
-  ":browser   Runs browser-based user tests" \
-  "--ci       Uses CI-based test configurations & emits CI-friendly test reports" \
-  "--debug    Activates developer-friendly debug mode for unit tests where applicable"
+  ":headless   Runs headless user tests" \
+  ":browser    Runs browser-based user tests" \
+  "--ci        Uses CI-based test configurations & emits CI-friendly test reports" \
+  "--debug,-d  Activates developer-friendly debug mode for unit tests where applicable"
 
 builder_parse "$@"
 
@@ -64,7 +64,9 @@ fi
 if builder_has_action test :browser; then
   if builder_has_option --debug; then
     echo "Running browser-based unit tests in debug-mode configuration..."
+    echo
     echo "${COLOR_YELLOW}You must manually terminate this mode (CTRL-C) for the script to exit.${COLOR_RESET}"
+    sleep 2
     test-browser debug
   else
     test-browser
