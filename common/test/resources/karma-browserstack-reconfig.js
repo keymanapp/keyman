@@ -50,43 +50,43 @@ module.exports = function(baseConfigParams  /* the project's base configuration 
   var PRIMARY_LAUNCHERS = {
     bs_safari_mac_m: {
       browser: 'safari',
-      browser_version: '13',
+      browser_version: '15.3',
       os: 'OS X',
-      os_version: 'Catalina'
+      os_version: 'Monterey'
     },
     bs_chrome_win: {
       os: 'Windows',
       os_version: '10',
       browser: 'chrome',
-      browser_version: '70.0'
+      browser_version: '100.0'
     },
     bs_chrome_android: {
       os: 'android',
-      os_version: '7.1',
+      os_version: '10.0',
       browser: 'chrome',
       real_mobile: true,
-      device: 'Samsung Galaxy Note 8'
+      device: 'Samsung Galaxy Note 20'
     }
   }
 
   var SECONDARY_LAUNCHERS = {
     bs_firefox_mac: {
       browser: 'firefox',
-      browser_version: '62',
+      browser_version: '100',
       os: 'OS X',
-      os_version: 'Mojave'
+      os_version: 'Monterey'
     },
     bs_chrome_mac: {
       browser: 'chrome',
-      browser_version: '70.0',
+      browser_version: '100',
       os: 'OS X',
-      os_version: 'Mojave'
+      os_version: 'Monterey'
     },
     bs_firefox_win: {
       os: 'Windows',
       os_version: '10',
       browser: 'firefox',
-      browser_version: '62.0'
+      browser_version: '100'
     }
   }
 
