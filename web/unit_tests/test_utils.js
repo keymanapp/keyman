@@ -91,7 +91,7 @@ var setupScript = function(src, timeout, functor) {
     Lscript.async = false;
 
     const timer = window.setTimeout(() => {
-      reject();
+      reject("Script load attempt timed out.");
     }, timeout);
 
     Lscript.onload = Lscript.onreadystatechange = () => {
@@ -102,9 +102,9 @@ var setupScript = function(src, timeout, functor) {
       }
     }
 
-    Lscript.onerror = () => {
+    Lscript.onerror = (err) => {
       window.clearTimeout(timer);
-      reject();
+      reject(err);
     }
 
     Lscript.src = src;
@@ -144,11 +144,9 @@ var loadKeyboardStub = function(stub, timeout, params) {
 
   keyman.addKeyboards(stub);
   if(!params || !params.passive) {
-    keyman.setActiveKeyboard(kbdName, stub.languages.id);
-  }
-
-  if(keyman.getActiveKeyboard() != kbdName) {
-    return setupScript(stub.filename, timeout, (ele) =>{
+    return keyman.setActiveKeyboard(kbdName, stub.languages.id);
+  } else if(keyman.getActiveKeyboard() != kbdName) {
+    return setupScript(stub.filename, timeout, (ele) => {
       fixture.el.appendChild(ele);
     });
   } else {
