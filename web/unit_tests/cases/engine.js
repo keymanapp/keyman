@@ -257,11 +257,8 @@ describe('Engine - Browser Interactions', function() {
         .then(test_callback);
     });
 
-    it.skip('Automatically sets first available keyboard', function() {
-      // While not the original test mentioned by https://github.com/keymanapp/keyman/issues/5799,
-      // it's showing that same instability now.  It appears that the lazy-init code for the first
-      // added keyboard stub isn't working consistently.
-      this.timeout(testconfig.timeouts.scriptLoad);
+    it('Automatically sets first available keyboard', function() {
+      this.timeout(2 * testconfig.timeouts.scriptLoad);
 
       var test_callback = function() {
         assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
@@ -270,9 +267,38 @@ describe('Engine - Browser Interactions', function() {
         assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
       }
 
-      // Still acting flaky, though... Hmm.
       return loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad, {passive: true})
-        .then(test_callback);
+        .then(() => {
+          // Because we're loading the keyboard 'passively', KMW's setActiveKeyboard function is auto-called
+          // on the stub-add.  That specific call (for first keyboard auto-activation) is outside of KMW's
+          // current Promise chain, so we can't _directly_ rely on a KMW Promise to test it.
+          return new Promise((resolve) => {
+            let hasResolved = false;
+            // So, we give KMW the time needed for auto-activation to happen, polling a bit actively so that we don't
+            // wait unnecessarily long after it occurs.
+            let absoluteTimer = window.setTimeout(() => {
+              if(!hasResolved) {
+                resolve();
+                hasResolved = true;
+              }
+
+              window.clearTimeout(intervalTimer);
+            }, testconfig.timeouts.scriptLoad);
+
+            let intervalTimer = window.setInterval(() => {
+              if(keyman.getActiveKeyboard() != '') {
+                window.clearTimeout(intervalTimer);
+                window.clearTimeout(absoluteTimer);
+
+                if(!hasResolved) {
+                  resolve();
+                  hasResolved = true;
+                }
+              }
+            }, 50);
+          });
+          // Once this delay-Promise resolves successfully (either way)...
+        }).then(test_callback);  // THEN we run our checks.
     });
   });
 });
