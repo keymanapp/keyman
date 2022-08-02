@@ -3,17 +3,16 @@ var assert = chai.assert;
 describe('Event Management', function() {
   this.timeout(testconfig.timeouts.standard);
 
-  before(function(done) {
+  before(function() {
     this.timeout(testconfig.timeouts.scriptLoad * 2);
     fixture.setBase('fixtures');
     fixture.load("eventTestConfig.html");
 
-    setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
+    return setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
       // We use this keyboard since we only need minimal input functionality for these tests.
       // Smaller is better when dealing with net latency.
-      loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", testconfig.timeouts.scriptLoad).then(done);
+      return loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", testconfig.timeouts.scriptLoad);
     });
-
   });
 
   after(function() {

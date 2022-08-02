@@ -76,17 +76,16 @@ describe('Text Selection', function() {
   // TODO: Add automated tests for editable DIV, designMode iframe
   for(var inputType of ['Input', 'TextArea']) {
     describe('Text Selection in '+inputType, function() {
-      before(function(done) {
+      before(function() {
         // These tests require use of KMW's device-detection functionality.
         assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
         fixture.setBase('fixtures');
         fixture.load("single"+inputType+".html");
 
         this.timeout(testconfig.timeouts.scriptLoad*2);
-        setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
-          loadKeyboardFromJSON("/keyboards/web_context_tests.json", testconfig.timeouts.scriptLoad).then(() => {
-            keyman.setActiveKeyboard("web_context_tests");
-            done();
+        return setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
+          return loadKeyboardFromJSON("/keyboards/web_context_tests.json", testconfig.timeouts.scriptLoad).then(() => {
+            return keyman.setActiveKeyboard("web_context_tests");
           });
         });
       });
