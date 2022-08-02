@@ -1,4 +1,55 @@
 /**
+ * Defines our 'primary' set of browser configurations to unit-test against via BrowserStack.
+ */
+var PRIMARY_LAUNCHERS = {
+  bs_safari_mac_m: {
+    browser: 'safari',
+    browser_version: '15.3',
+    os: 'OS X',
+    os_version: 'Monterey'
+  },
+  bs_chrome_win: {
+    os: 'Windows',
+    os_version: '10',
+    browser: 'chrome',
+    browser_version: '100.0'
+  },
+  bs_chrome_android: {
+    os: 'android',
+    os_version: '10.0',
+    browser: 'chrome',
+    real_mobile: true,
+    device: 'Samsung Galaxy Note 20'
+  }
+}
+
+/**
+ * Defines our 'secondary' set of browser configurations to unit-test against via BrowserStack.
+ */
+var SECONDARY_LAUNCHERS = {
+  bs_firefox_mac: {
+    browser: 'firefox',
+    browser_version: '100',
+    os: 'OS X',
+    os_version: 'Monterey'
+  },
+  bs_chrome_mac: {
+    browser: 'chrome',
+    browser_version: '100',
+    os: 'OS X',
+    os_version: 'Monterey'
+  },
+  bs_firefox_win: {
+    os: 'Windows',
+    os_version: '10',
+    browser: 'firefox',
+    browser_version: '100'
+  }
+}
+
+/* --- End of test environment definitions. --- */
+
+/**
  * Provides an exportable function for configuring a Karma setup for execution in our CI processes
  * via BrowserStack.
  *
@@ -45,49 +96,6 @@ module.exports = function(baseConfigParams  /* the project's base configuration 
     }
 
     return list;
-  }
-
-  var PRIMARY_LAUNCHERS = {
-    bs_safari_mac_m: {
-      browser: 'safari',
-      browser_version: '15.3',
-      os: 'OS X',
-      os_version: 'Monterey'
-    },
-    bs_chrome_win: {
-      os: 'Windows',
-      os_version: '10',
-      browser: 'chrome',
-      browser_version: '100.0'
-    },
-    bs_chrome_android: {
-      os: 'android',
-      os_version: '10.0',
-      browser: 'chrome',
-      real_mobile: true,
-      device: 'Samsung Galaxy Note 20'
-    }
-  }
-
-  var SECONDARY_LAUNCHERS = {
-    bs_firefox_mac: {
-      browser: 'firefox',
-      browser_version: '100',
-      os: 'OS X',
-      os_version: 'Monterey'
-    },
-    bs_chrome_mac: {
-      browser: 'chrome',
-      browser_version: '100',
-      os: 'OS X',
-      os_version: 'Monterey'
-    },
-    bs_firefox_win: {
-      os: 'Windows',
-      os_version: '10',
-      browser: 'firefox',
-      browser_version: '100'
-    }
   }
 
   /*
