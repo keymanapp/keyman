@@ -83,12 +83,12 @@ describe('Text Selection', function() {
         fixture.load("single"+inputType+".html");
 
         this.timeout(testconfig.timeouts.scriptLoad*2);
-        setupKMW(null, function() {
-          loadKeyboardFromJSON("/keyboards/web_context_tests.json", function() {
+        setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
+          loadKeyboardFromJSON("/keyboards/web_context_tests.json", testconfig.timeouts.scriptLoad).then(() => {
             keyman.setActiveKeyboard("web_context_tests");
             done();
-          }, testconfig.timeouts.scriptLoad);
-        }, testconfig.timeouts.scriptLoad);
+          });
+        });
       });
 
       after(function() {

@@ -13,7 +13,7 @@ describe('Basic KeymanWeb', function() {
 
     fixture.setBase('fixtures');
     fixture.load("singleInput.html");
-    setupKMW(null, done, testconfig.timeouts.scriptLoad);
+    setupKMW(null, testconfig.timeouts.scriptLoad).then(done);
   });
 
   afterEach(function() {
@@ -42,8 +42,8 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('toggle', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        setupKMW('toggle', testconfig.timeouts.uiLoad).then(done);
       });
 
       afterEach(function() {
@@ -76,8 +76,8 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('button', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        setupKMW('button', testconfig.timeouts.uiLoad).then(done);
       });
 
       afterEach(function() {
@@ -97,8 +97,8 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('float', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        setupKMW('float', testconfig.timeouts.uiLoad).then(done);
       });
 
       afterEach(function() {
@@ -131,7 +131,8 @@ Modernizr.on('touchevents', function(result) {
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toolbar', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        setupKMW('toolbar', testconfig.timeouts.uiLoad).then(done);
       });
 
       afterEach(function() {

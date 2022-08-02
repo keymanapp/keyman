@@ -16,7 +16,7 @@ try {
 
 // Keyman test suite utility methods
 
-var setupKMW = function(kmwOptions, done, timeout, uiInitCheck) {
+var setupKMW = function(kmwOptions, timeout) {
   var ui;
 
   if(typeof(kmwOptions) == 'string' || typeof(kmwOptions) == 'undefined' || kmwOptions == null) {
@@ -33,8 +33,9 @@ var setupKMW = function(kmwOptions, done, timeout, uiInitCheck) {
     }
   }
 
-  var kmw = setupScript('source/keymanweb.js', done, timeout, uiInitCheck);
-  fixture.el.appendChild(kmw);
+  const kmwPromise = setupScript('source/keymanweb.js', timeout, (scriptEle) => {
+    fixture.el.appendChild(scriptEle);
+  });
 
   ui = kmwOptions.ui;
 
@@ -48,43 +49,68 @@ var setupKMW = function(kmwOptions, done, timeout, uiInitCheck) {
     kmwOptions.resources = '../../../../source';
   }
 
+  let uiPromise;
   if(ui) {
-    var ui = setupScript('source/kmwui' + ui + '.js');
-    fixture.el.appendChild(ui);
+    uiPromise = setupScript('source/kmwui' + ui + '.js', timeout, (scriptEle) => {
+      fixture.el.appendChild(scriptEle);
+    });
 
     kmwOptions.ui=ui;
   }
 
-  var initFunc = function() {
-    if(window['keyman']) {
-      window['keyman'].init(kmwOptions);
-    } else {
-      window.setTimeout(function() {
-        initFunc();
-      })
-    }
-  };
-
-  /* Keep this timeout short - if set too long, kmwinit's default initialization
-   * will kick in and prevent our settings from going through!
-   */
-  window.setTimeout(function() {
-    initFunc();
-  }, 5);
-}
-
-var setupScript = function(src, done, timeout, uiInitCheck) {
-  var Lscript = document.createElement('script');
-  Lscript.charset="UTF-8";        // KMEW-89
-  Lscript.type = 'text/javascript';
-  Lscript.async = false;
-  if(done) {
-    Lscript.onload = initTimer(done, timeout, uiInitCheck);
+  let compositePromise = kmwPromise;
+  if(uiPromise) {
+    compositePromise = Promise.all([kmwPromise, uiPromise]);
   }
 
-  Lscript.src = src;
+  return finalPromise = compositePromise.then(() => {
+    if(window['keyman']) {
+      return window['keyman'].init(kmwOptions);
+    } else {
+      return Promise.reject();
+    }
+  });
+}
 
-  return Lscript;
+/**
+ * Produces a script element tied to a Promise for its eventual load (or failure thereof).
+ *
+ * The script element is only available via callback due to implementation constraints.
+ *
+ * @param {*} src       The source script's (relative) path on the test server.
+ * @param {*} timeout
+ * @param {*} functor   A callback to handle the script element.
+ * @returns
+ */
+var setupScript = function(src, timeout, functor) {
+  return new Promise((resolve, reject) => {
+    const Lscript = document.createElement('script');
+    let hasResolved = false;
+    Lscript.charset="UTF-8";        // KMEW-89
+    Lscript.type = 'text/javascript';
+    Lscript.async = false;
+
+    const timer = window.setTimeout(() => {
+      reject();
+    }, timeout);
+
+    Lscript.onload = Lscript.onreadystatechange = () => {
+      window.clearTimeout(timer);
+      if(!hasResolved && (Lscript.readyState === undefined || Lscript.readyState == "complete")) {
+        hasResolved = true;
+        resolve();
+      }
+    }
+
+    Lscript.onerror = () => {
+      window.clearTimeout(timer);
+      reject();
+    }
+
+    Lscript.src = src;
+
+    functor(Lscript);
+  });
 }
 
 var teardownKMW = function() {
@@ -113,90 +139,7 @@ var teardownKMW = function() {
   }
 }
 
-// Make sure the main script loads...
-var initTimer = function(done, timeout, uiInitCheck) {
-  var uiLoadDelay;
-  if(typeof(uiInitCheck) != 'function') {
-    uiInitCheck = function() { return true; };
-    uiLoadDelay = false;
-  } else {
-    uiLoadDelay = true;
-  }
-
-  // We need managed state for this.
-  var InitializationManager = function() {
-    this.killSwitch = false;
-
-    this.initCheckCallback = function() {
-      if(window['keyman'] && window['keyman'].initialized == 2 && uiInitCheck()) {
-        if(done) {
-          this.timer = window.setTimeout(function() {
-            // There can be some odd cross-interference with the UI modules and their initialization.
-            // We use a significant delay here to avoid said problems.
-            done();
-          }, uiLoadDelay ? 2000 : 0);
-        }
-      } else if(!this.killSwitch) {
-        this.timer = window.setTimeout(this.initCheckCallback, 50);
-      }
-    }.bind(this);
-
-    if(timeout) {
-      window.setTimeout(function() {
-        this.killSwitch = true;
-
-        if(this.timer) {
-          window.clearTimeout(this.timer);
-          this.timer = 0;
-        }
-      }.bind(this), timeout);
-    }
-  }
-
-  var im = new InitializationManager();
-  return im.initCheckCallback;
-};
-
-// Make sure the main script loads...
-var onScriptLoad = function(scriptURL, callback, timeout) {
-  var ScriptLoadObserver = function() {
-    this.target = document.createElement('a');
-    this.target.href = scriptURL;
-
-    if(timeout) {
-      this.timer = window.setTimeout(function() {
-        if(this.mo) {
-          this.mo.disconnect();
-        }
-      }.bind(this), timeout);
-    }
-
-    var moCallback = function(mutations) {
-      for(var i=0; i < mutations.length; i++) {
-        var mutation = mutations[i];
-        for(var j=0; j < mutation.addedNodes.length; j++) {
-          var child = mutation.addedNodes[j];
-          if(child instanceof HTMLScriptElement) {
-            if(child.src == this.target.href) {
-              child.onload = callback;
-            }
-          }
-        }
-      }
-    }
-
-    this.observe = function() {
-      var config = { childList: true, subtree: true };
-      this.mo = new MutationObserver(moCallback.bind(this));
-      this.mo.observe(document, config);
-    }
-  }
-
-  var slo = new ScriptLoadObserver();
-  slo.observe();
-};
-
-var loadKeyboardStub = function(stub, callback, timeout, params) {
+var loadKeyboardStub = function(stub, timeout, params) {
   var kbdName = "Keyboard_" + stub.id;
 
   keyman.addKeyboards(stub);
@@ -205,18 +148,18 @@ var loadKeyboardStub = function(stub, callback, timeout, params) {
   }
 
   if(keyman.getActiveKeyboard() != kbdName) {
-    onScriptLoad(stub.filename, function() {
-      callback();
-    }, timeout);
+    return setupScript(stub.filename, timeout, (ele) =>{
+      fixture.el.appendChild(ele);
+    });
   } else {
-    callback();
+    return Promise.resolve();
   }
 }
 
-var loadKeyboardFromJSON = function(jsonPath, callback, timeout) {
+var loadKeyboardFromJSON = function(jsonPath, timeout, params) {
   var stub = fixture.load(jsonPath, true);
 
-  loadKeyboardStub(stub, callback, timeout);
+  return loadKeyboardStub(stub, timeout, params);
 }
 
 function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
@@ -234,11 +177,11 @@ function runKeyboardTestFromJSON(jsonPath, params, callback, assertCallback, tim
   let device = new com.keyman.Device();
   device.detect();
 
-  loadKeyboardStub(testSpec.keyboard, function() {
+  loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
     runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
     keyman.removeKeyboards(testSpec.keyboard.id);
     callback();
-  }, timeout);
+  });
 }
 
 function retrieveAndReset(Pelem) {

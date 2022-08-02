@@ -8,15 +8,11 @@ describe('Event Management', function() {
     fixture.setBase('fixtures');
     fixture.load("eventTestConfig.html");
 
-    setupKMW(null, function() {
+    setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
       // We use this keyboard since we only need minimal input functionality for these tests.
       // Smaller is better when dealing with net latency.
-      loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", function() {
-        // Interestingly, when auto-testing there's a Safari bug that prevents
-        // this from being preserved after the first forced blur command below.
-        done();
-      }, testconfig.timeouts.scriptLoad);
-    }, testconfig.timeouts.scriptLoad);
+      loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", testconfig.timeouts.scriptLoad).then(done);
+    });
 
   });
 

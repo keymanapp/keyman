@@ -5,7 +5,7 @@ describe('Engine - Browser Interactions', function() {
 
   before(function(done) {
     fixture.setBase('fixtures');
-    setupKMW(null, done, testconfig.timeouts.scriptLoad);
+    setupKMW(null, testconfig.timeouts.scriptLoad).then(done);
   });
 
   beforeEach(function(done) {
@@ -215,7 +215,7 @@ describe('Unmatched Final Groups', function() {
 
   before(function(done) {
     fixture.setBase('fixtures');
-    setupKMW(null, done, testconfig.timeouts.scriptLoad + testconfig.timeouts.eventDelay);
+    setupKMW(null, testconfig.timeouts.scriptLoad + testconfig.timeouts.eventDelay).then(done);
   });
 
   beforeEach(function(done) {

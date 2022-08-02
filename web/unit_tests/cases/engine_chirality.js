@@ -5,7 +5,7 @@ describe('Engine - Chirality', function() {
 
   before(function(done) {
     fixture.setBase('fixtures');
-    setupKMW(null, done, testconfig.timeouts.scriptLoad);
+    setupKMW(null, testconfig.timeouts.scriptLoad).then(done);
   });
 
   beforeEach(function(done) {
