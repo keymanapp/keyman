@@ -1,7 +1,7 @@
 var assert = chai.assert;
 
 describe('TouchAliasElement', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   before(function() {
     fixture.setBase('fixtures');
@@ -25,7 +25,7 @@ describe('TouchAliasElement', function() {
       it('correctly reports the state of its content and caret (no SMP)', function() {
         var ta = document.getElementById(DynamicElements.addTouchAlias());
         String.kmwEnableSupplementaryPlane(false);
-        
+
         // The "White-box" part of the test - we directly assign text to its internal objects here.
         ta.__preCaret.textContent = '12';
         ta.__postCaret.textContent = '345';
@@ -48,7 +48,7 @@ describe('TouchAliasElement', function() {
       it('correctly reports the state of its content and caret (with SMP)', function() {
         var ta = document.getElementById(DynamicElements.addTouchAlias());
         String.kmwEnableSupplementaryPlane(true);
-        
+
         // Makes a nice Unicode shortcut.
         var u = toSupplementaryPairString;
         var apple = 'a'+u(0x1d5c9)+'p'+'l'+u(0x1d5be) // Mixed-SMP 'apple', where the first 'p' and the 'e' are SMP.
@@ -97,7 +97,7 @@ describe('TouchAliasElement', function() {
       // These tests require use of KMW's device-detection functionality.
       assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
     })
-    
+
     it('correctly aliases upon construction', function(done) {
       var input = document.getElementById(DynamicElements.addInput());
       input.value = "apples";

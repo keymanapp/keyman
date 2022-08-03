@@ -1,11 +1,11 @@
 var assert = chai.assert;
 
 describe('Engine - Browser Interactions', function() {
-  this.timeout(kmwconfig.timeouts.scriptLoad);
+  this.timeout(testconfig.timeouts.scriptLoad);
 
   before(function(done) {
     fixture.setBase('fixtures');
-    setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
+    setupKMW(null, done, testconfig.timeouts.scriptLoad);
   });
 
   beforeEach(function(done) {
@@ -13,7 +13,7 @@ describe('Engine - Browser Interactions', function() {
 
     window.setTimeout(function() {
       done()
-    }, kmwconfig.timeouts.eventDelay);
+    }, testconfig.timeouts.eventDelay);
   });
 
   after(function() {
@@ -26,7 +26,7 @@ describe('Engine - Browser Interactions', function() {
 
   describe('Keyboard Loading', function() {
     it('Local', function(done) {
-      this.timeout(kmwconfig.timeouts.scriptLoad);
+      this.timeout(testconfig.timeouts.scriptLoad);
 
       var test_callback = function() {
         assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
@@ -36,7 +36,7 @@ describe('Engine - Browser Interactions', function() {
         done();
       }
 
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, kmwconfig.timeouts.scriptLoad, {passive: true});
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, testconfig.timeouts.scriptLoad, {passive: true});
     });
   });
 
@@ -44,7 +44,7 @@ describe('Engine - Browser Interactions', function() {
     it.skip('RegisterStub on same keyboard twice', function(done) {
       // mcdurdin: skipping this test for now as it is sporadically failing and have not been able to trace source of issue
       // see https://github.com/keymanapp/keyman/issues/5799
-      this.timeout(kmwconfig.timeouts.scriptLoad);
+      this.timeout(testconfig.timeouts.scriptLoad);
 
       var test_callback = function() {
         assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
@@ -54,7 +54,7 @@ describe('Engine - Browser Interactions', function() {
         done();
       }
 
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, kmwconfig.timeouts.scriptLoad, {passive: true});
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, testconfig.timeouts.scriptLoad, {passive: true});
 
       var stub = {
         'KI': 'Keyboard_lao_2008_basic',
@@ -70,10 +70,10 @@ describe('Engine - Browser Interactions', function() {
   });
 
   describe('Variable Stores', function() {
-    this.timeout(kmwconfig.timeouts.scriptLoad + kmwconfig.timeouts.standard);
+    this.timeout(testconfig.timeouts.scriptLoad + testconfig.timeouts.standard);
 
     beforeEach(function(done) {
-      loadKeyboardFromJSON("/keyboards/options_with_save.json", done, kmwconfig.timeouts.scriptLoad);
+      loadKeyboardFromJSON("/keyboards/options_with_save.json", done, testconfig.timeouts.scriptLoad);
     });
 
     after(function() {
@@ -112,12 +112,12 @@ describe('Engine - Browser Interactions', function() {
 
         loadKeyboardFromJSON("/keyboards/options_with_save.json", function() {
           keyman.setActiveKeyboard(keyboardID, 'en').then(remainderOfTest);
-        }, kmwconfig.timeouts.scriptLoad);
+        }, testconfig.timeouts.scriptLoad);
       });
     });
 
     it("Multiple-sequence check", function(done) {
-      this.timeout(kmwconfig.timeouts.standard + kmwconfig.timeouts.scriptLoad * 3);
+      this.timeout(testconfig.timeouts.standard + testconfig.timeouts.scriptLoad * 3);
       var keyboardID = "options_with_save";
       var storeName = "foo";
 
@@ -130,11 +130,11 @@ describe('Engine - Browser Interactions', function() {
           keyman.removeKeyboards(keyboardID, true);
 
           // Second test:  expects option to still be "off" b/c cookies.
-          runKeyboardTestFromJSON('/engine_tests/options_with_save_2.json', {usingOSK: false}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
+          runKeyboardTestFromJSON('/engine_tests/options_with_save_2.json', {usingOSK: false}, done, assert.equal, testconfig.timeouts.scriptLoad);
         };
 
         // First test:  expects option to be "on" from cookie-init setting, emitting "foo.", then turning option "off".
-        runKeyboardTestFromJSON('/engine_tests/options_with_save_1.json', {usingOSK: false}, finalCheck, assert.equal, kmwconfig.timeouts.scriptLoad);
+        runKeyboardTestFromJSON('/engine_tests/options_with_save_1.json', {usingOSK: false}, finalCheck, assert.equal, testconfig.timeouts.scriptLoad);
       });
     });
   });
@@ -142,11 +142,11 @@ describe('Engine - Browser Interactions', function() {
   // Performs basic processing system checks/tests to ensure the sequence testing
   // is based on correct assumptions about the code.
   describe('Integrated Simulation Checks', function() {
-    this.timeout(kmwconfig.timeouts.standard);
+    this.timeout(testconfig.timeouts.standard);
 
     before(function(done){
-      this.timeout = kmwconfig.timeouts.scriptLoad;
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, kmwconfig.timeouts.scriptLoad);
+      this.timeout = testconfig.timeouts.scriptLoad;
+      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, testconfig.timeouts.scriptLoad);
     });
 
     beforeEach(function() {
@@ -198,24 +198,24 @@ describe('Engine - Browser Interactions', function() {
   })
 
   describe('Sequence Simulation Checks', function() {
-    this.timeout(kmwconfig.timeouts.scriptLoad);
+    this.timeout(testconfig.timeouts.scriptLoad);
 
     it('Keyboard simulation', function(done) {
-      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: false}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
+      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: false}, done, assert.equal, testconfig.timeouts.scriptLoad);
     });
 
     it('OSK simulation', function(done) {
-      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: true}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
+      runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: true}, done, assert.equal, testconfig.timeouts.scriptLoad);
     })
   });
 });
 
 describe('Unmatched Final Groups', function() {
-  this.timeout(kmwconfig.timeouts.scriptLoad);
+  this.timeout(testconfig.timeouts.scriptLoad);
 
   before(function(done) {
     fixture.setBase('fixtures');
-    setupKMW(null, done, kmwconfig.timeouts.scriptLoad + kmwconfig.timeouts.eventDelay);
+    setupKMW(null, done, testconfig.timeouts.scriptLoad + testconfig.timeouts.eventDelay);
   });
 
   beforeEach(function(done) {
@@ -223,7 +223,7 @@ describe('Unmatched Final Groups', function() {
 
     window.setTimeout(function() {
       done()
-    }, kmwconfig.timeouts.eventDelay);
+    }, testconfig.timeouts.eventDelay);
   });
 
   after(function() {
@@ -237,6 +237,6 @@ describe('Unmatched Final Groups', function() {
   it('matches rule from early group AND performs default behavior', function(done) {
     // While a TAB-oriented version would be nice, it's much harder to write the test
     // to detect change in last input element.
-    runKeyboardTestFromJSON('/engine_tests/ghp_enter.json', {usingOSK: true}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
+    runKeyboardTestFromJSON('/engine_tests/ghp_enter.json', {usingOSK: true}, done, assert.equal, testconfig.timeouts.scriptLoad);
   });
 });
