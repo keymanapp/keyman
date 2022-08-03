@@ -149,35 +149,15 @@ namespace Testing {
      * reproduces their corresponding events and runs them through this instance's linked
      * gesture-recognizer instance.
      *
-     * It will re-use the original fixture-layout configuration, **but** it will ignore
-     * all timestamp information, as that is nigh-impossible to perfectly reproduce without
-     * busy-waiting.
+     * It will re-use the original fixture-layout configuration.
      * @param sequenceTestSpec A previously-recorded sequence of sampled input coordinates.
-     * @returns A recording of the reproduced version of that sequence.
+     * @param replayExecutor A middleman function to use when simulating the actual events.
+     * @returns The final sample to be simulated.
      */
-    replay(sequenceTestSpec: RecordedCoordSequenceSet): RecordedCoordSequenceSet {
-      // TEMP:  ['set'] is for the old form of the recording spec.
+    private replayCore(sequenceTestSpec: RecordedCoordSequenceSet,
+      replayExecutor: (func: () => void, sample?: com.keyman.osk.InputSample) => void): com.keyman.osk.InputSample {
       let inputs = sequenceTestSpec.inputs;
-      if(inputs === undefined) {
-        inputs = sequenceTestSpec.inputs = sequenceTestSpec['set'].map((entry) => {
-          return {
-            touchpoints: [entry]
-          };
-        });
-      }
-
-      // TEMP:  while structures are in flux, a migration round
-      for(let entry of inputs) {
-        if(entry['sequence']) {
-          entry.touchpoints = [ entry['sequence'] ];
-        }
-      }
-
       const config = sequenceTestSpec.config;
-
-      // We're going to record the test spec as we replay it, eventually returning the
-      // final result.
-      const recorder = new Testing.SequenceRecorder(this.controller);
 
       this.controller.layoutConfiguration = new FixtureLayoutConfiguration(config);
 
@@ -188,6 +168,8 @@ namespace Testing {
        */
       let sequenceProgress: number[] = new Array(inputs.length).fill(0);
       let sequenceTouches: Touch[] = new Array(inputs.length).fill(null);
+
+      let lastSample = null;
 
       while(sequenceProgress.find((number) => number != Number.MAX_VALUE) !== undefined) {
         // Determine the sequence that has the chronologically next-in-line sample
@@ -201,6 +183,7 @@ namespace Testing {
         let selectedSequence = -1;
 
         for(let index=0; index < inputs.length; index++) {
+          // TODO:  does not iterate over all touchpoints.  Not that we can have more than one at present...
           const touchpoint = new com.keyman.osk.TrackedPoint(index, inputs[index].touchpoints[0]);
           const indexInSequence = sequenceProgress[index];
 
@@ -237,18 +220,50 @@ namespace Testing {
           // Now that we've removed the entry for the current touchpoint, filter out any null entries.
           otherTouches = otherTouches.filter((val) => !!val);
 
-          sequenceTouches[selectedSequence] = this.replayTouchSample(sample, state, selectedSequence, otherTouches);
+          replayExecutor(() => {
+            sequenceTouches[selectedSequence] = this.replayTouchSample(sample, state, selectedSequence, otherTouches);
+          }, sample);
           if(appendEndEvent) {
-            this.replayTouchSample(sample, "end", selectedSequence, otherTouches);
+            // Synchronous in sync mode, but set with a timeout in async mode.
+            replayExecutor(() => {
+              this.replayTouchSample(sample, "end", selectedSequence, otherTouches);
+            }, sample);
             sequenceTouches[selectedSequence] = null;
           }
         } else {
-          this.replayMouseSample(sample, state);
+          replayExecutor(() => {
+            this.replayMouseSample(sample, state);
+          }, sample);
           if(appendEndEvent) {
-            this.replayMouseSample(sample, "end");
+            replayExecutor(() => {
+              this.replayMouseSample(sample, "end");
+            }, sample);
           }
         }
+
+        lastSample = sample;
       }
+
+      return lastSample;
+    }
+
+    /**
+     * Given a previously-recorded sequence of sampled input coordinates, this function
+     * reproduces their corresponding events and runs them through this instance's linked
+     * gesture-recognizer instance.  The original timestamps are ignored; only the relative
+     * order of events will be enforced.
+     *
+     * It will re-use the original fixture-layout configuration.
+     * @param sequenceTestSpec A previously-recorded sequence of sampled input coordinates.
+     * @returns A recording of the reproduced version of that sequence.
+     */
+     replaySync(sequenceTestSpec: RecordedCoordSequenceSet): RecordedCoordSequenceSet {
+      // We're going to record the test spec as we replay it, eventually returning the
+      // final result.
+      const recorder = new Testing.SequenceRecorder(this.controller);
+
+      // We're operating synchronously, so just simulate the events on the spot.
+      this.replayCore(sequenceTestSpec, (func) => { func() });
 
       // We technically don't have access to 'samples' for the actual recorded object.
       // Obtaining a 'deep copy' (though methodless) works around this nicely and
@@ -256,6 +271,45 @@ namespace Testing {
       let recording = JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
       recorder.clear();
       return recording;
+    }
+
+
+    /**
+     * Given a previously-recorded sequence of sampled input coordinates, this function
+     * reproduces their corresponding events and runs them through this instance's linked
+     * gesture-recognizer instance.  The original timestamps will be used; if a timer-stubbing
+     * package (like SinonJS) is used, they should be reproduced to ~1ms precision.
+     *
+     * (Experimentally, the actual value tends to be Math.floor() - not Math.round().)
+     *
+     * It will re-use the original fixture-layout configuration.
+     * @param sequenceTestSpec A previously-recorded sequence of sampled input coordinates.
+     * @returns A Promise for a recording of the reproduced version of that sequence.
+     */
+     replayAsync(sequenceTestSpec: RecordedCoordSequenceSet): Promise<RecordedCoordSequenceSet> {
+      // We're going to record the test spec as we replay it, eventually returning the
+      // final result.
+      const recorder = new Testing.SequenceRecorder(this.controller);
+
+      // We're operating asynchronously, so we wrap each simulated event in a timeout.
+      // NOTE:  this will be much less precise without stubbed timeout systems like the one
+      // included within SinonJS.
+      const finalSample = this.replayCore(sequenceTestSpec, (func, sample) => {
+        window.setTimeout(() => {
+          func();
+        }, sample.t);
+      });
+
+      return new Promise((resolve) => {
+        window.setTimeout(() => {
+          // We technically don't have access to 'samples' for the actual recorded object.
+          // Obtaining a 'deep copy' (though methodless) works around this nicely and
+          // matches the original `sequenceTestSpec`'s format to boot.
+          let recording = JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
+          recorder.clear();
+          resolve(recording);
+        }, finalSample.t + 30);
+      });
     }
   }
 }
