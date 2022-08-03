@@ -107,7 +107,10 @@ module.exports = function(baseConfigParams  /* the project's base configuration 
     FINAL_LAUNCHER_DEFS = mergeLaunchers( PRIMARY_LAUNCHERS,
                                           SECONDARY_LAUNCHERS);
   } else {
-    FINAL_LAUNCHER_DEFS = PRIMARY_LAUNCHERS;
+    // The function also does some necessary bookkeeping that makes for
+    // cleaner definitions at the file's top, so we call it even if we
+    // aren't merging lists.
+    FINAL_LAUNCHER_DEFS = mergeLaunchers(PRIMARY_LAUNCHERS);
   }
 
   var FINAL_BROWSER_LIST = toBrowserList(FINAL_LAUNCHER_DEFS);
