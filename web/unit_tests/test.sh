@@ -136,7 +136,7 @@ popd
 # For now, we'll also link in the gesture-recognizer unit tests here.
 echo_heading "Running gesture-recognizer test suite"
 pushd "$KEYMAN_ROOT/common/web/gesture-recognizer"
-./build.sh tools test
+./build.sh test
 popd
 
 # Once done, now we run the integrated (KeymanWeb) tests.
