@@ -5,7 +5,7 @@
 # History:      19  Oct 2018 - TSE - Added test for context API functions.
 #
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
+if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
   warns = [
      '-Wno-missing-field-initializers',
      '-Wno-unused-parameter'
@@ -204,6 +204,11 @@ if kmcomp.found()
   endforeach
 else
   foreach kbd : tests
+    if compiler.get_id() == 'emscripten'
+      kbd_basename = kbd
+    else
+      kbd_basename = 'k_' + kbd.underscorify().to_lower()
+    endif
     kbd_src = join_paths(test_path, kbd_basename) + '.kmn'
     kbd_obj = join_paths(test_path, kbd_basename) + '.kmx'
 
@@ -214,10 +219,15 @@ endif
 
 # test for km_kbp_keyboard_get_key_list
 
+# For following tests, we need to be copying from source_path,
+# not build_path, so we'll just update test_path accordingly. This
+# should work for Linux, macOS, and WASM.
+test_path = source_path
+
 key_e = executable('key_list', 'kmx_key_list.cpp',
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
-                link_args: links,
+                link_args: links + tests_flags,
                 objects: lib.extract_all_objects())
 test_kbd = 'kmx_key_list'
 if kmcomp.found()
@@ -230,7 +240,7 @@ if kmcomp.found()
   )
   test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
 else
-  kbd_obj = join_paths(meson.current_source_dir(), test_kbd) + '.kmx'
+  kbd_obj = join_paths(test_path, test_kbd) + '.kmx'
   test('key_list', key_e, args: [kbd_obj] )
 endif
 
@@ -239,7 +249,7 @@ endif
 imx_e = executable('imx_list', 'kmx_imx.cpp',
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
-                link_args: links,
+                link_args: links + tests_flags,
                 objects: lib.extract_all_objects())
 
 test_kbd = 'kmx_imsample'
@@ -253,7 +263,7 @@ if kmcomp.found()
   )
     test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
 else
-  kbd_obj = join_paths(meson.current_source_dir(), test_kbd) + '.kmx'
+  kbd_obj = join_paths(test_path, test_kbd) + '.kmx'
   test('imx_list', imx_e, args: [kbd_obj] )
 endif
 
