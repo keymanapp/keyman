@@ -3,26 +3,23 @@ var assert = chai.assert;
 describe('Attachment API', function() {
   this.timeout(testconfig.timeouts.standard);
 
-  before(function(done) {
+  before(function() {
     assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
     fixture.setBase('fixtures');
 
     this.timeout(testconfig.timeouts.scriptLoad * 3);
-    setupKMW({ attachType:'manual' }, function() {
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", function() {
-        // Sequential so we don't have to worry about race conditions and such
-        // to signal completion with done().
-
-        loadKeyboardFromJSON("/keyboards/khmer_angkor.json", function() {
-          keyman.setActiveKeyboard("lao_2008_basic");
-          done();
-        }, testconfig.timeouts.scriptLoad);
-      }, testconfig.timeouts.scriptLoad);
-    }, testconfig.timeouts.scriptLoad);
+    return setupKMW({ attachType:'manual' }, testconfig.timeouts.scriptLoad).then(() => {
+      const kbd1 = loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad, { passive: true });
+      const kbd2 = loadKeyboardFromJSON("/keyboards/khmer_angkor.json",   testconfig.timeouts.scriptLoad, { passive: true });
+      return Promise.all([kbd1, kbd2]).then(() => {
+        return keyman.setActiveKeyboard("lao_2008_basic");
+      });
+    });
   });
 
   after(function() {
     keyman.removeKeyboards('lao_2008_basic');
+    keyman.removeKeyboards('khmer_angkor');
     teardownKMW();
   });
 
@@ -193,11 +190,11 @@ Modernizr.on('touchevents', function(result) {
 
       this.timeout(testconfig.timeouts.standard);
 
-      before(function(done) {
+      before(function() {
         this.timeout(testconfig.timeouts.scriptLoad);
 
         fixture.setBase('fixtures');
-        setupKMW({ attachType:'auto' }, done, testconfig.timeouts.scriptLoad);
+        return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
       });
 
       beforeEach(function() {
@@ -261,11 +258,11 @@ Modernizr.on('touchevents', function(result) {
 
       this.timeout(testconfig.timeouts.standard);
 
-      before(function(done) {
+      before(function() {
         this.timeout(testconfig.timeouts.scriptLoad);
 
         fixture.setBase('fixtures');
-        setupKMW({ attachType:'auto' }, done, testconfig.timeouts.scriptLoad);
+        return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
       });
 
       beforeEach(function() {

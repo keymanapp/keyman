@@ -8,12 +8,12 @@ describe('Basic KeymanWeb', function() {
     assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
   })
 
-  beforeEach(function(done) {
+  beforeEach(function() {
     this.timeout(testconfig.timeouts.scriptLoad);
 
     fixture.setBase('fixtures');
     fixture.load("singleInput.html");
-    setupKMW(null, done, testconfig.timeouts.scriptLoad);
+    return setupKMW(null, testconfig.timeouts.scriptLoad);
   });
 
   afterEach(function() {
@@ -37,13 +37,13 @@ Modernizr.on('touchevents', function(result) {
     describe('Basic Toggle UI', function() {
       this.timeout(testconfig.timeouts.scriptLoad);
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('toggle', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('toggle', testconfig.timeouts.uiLoad);
       });
 
       afterEach(function() {
@@ -71,13 +71,13 @@ Modernizr.on('touchevents', function(result) {
 
     describe('Basic Button UI', function() {
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('button', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('button', testconfig.timeouts.uiLoad);
       });
 
       afterEach(function() {
@@ -92,13 +92,13 @@ Modernizr.on('touchevents', function(result) {
 
     describe('Basic Float UI', function() {
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('float', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('float', testconfig.timeouts.uiLoad);
       });
 
       afterEach(function() {
@@ -126,12 +126,13 @@ Modernizr.on('touchevents', function(result) {
 
     describe('Basic Toolbar UI', function() {
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toolbar', done, testconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('toolbar', testconfig.timeouts.uiLoad);
       });
 
       afterEach(function() {

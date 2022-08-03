@@ -3,9 +3,9 @@ var assert = chai.assert;
 describe('Engine - Browser Interactions', function() {
   this.timeout(testconfig.timeouts.scriptLoad);
 
-  before(function(done) {
+  before(function() {
     fixture.setBase('fixtures');
-    setupKMW(null, done, testconfig.timeouts.scriptLoad);
+    return setupKMW(null, testconfig.timeouts.scriptLoad);
   });
 
   beforeEach(function(done) {
@@ -24,26 +24,8 @@ describe('Engine - Browser Interactions', function() {
     fixture.cleanup();
   });
 
-  describe('Keyboard Loading', function() {
-    it('Local', function(done) {
-      this.timeout(testconfig.timeouts.scriptLoad);
-
-      var test_callback = function() {
-        assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
-        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
-        keyman.removeKeyboards('lao_2008_basic');
-        assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
-        done();
-      }
-
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, testconfig.timeouts.scriptLoad, {passive: true});
-    });
-  });
-
   describe('RegisterStub', function() {
-    it.skip('RegisterStub on same keyboard twice', function(done) {
-      // mcdurdin: skipping this test for now as it is sporadically failing and have not been able to trace source of issue
-      // see https://github.com/keymanapp/keyman/issues/5799
+    it('RegisterStub on same keyboard twice', function() {
       this.timeout(testconfig.timeouts.scriptLoad);
 
       var test_callback = function() {
@@ -51,10 +33,10 @@ describe('Engine - Browser Interactions', function() {
         assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
         keyman.removeKeyboards('lao_2008_basic');
         assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
-        done();
       }
 
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", test_callback, testconfig.timeouts.scriptLoad, {passive: true});
+      let finalPromise = loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad)
+        .then(test_callback);
 
       var stub = {
         'KI': 'Keyboard_lao_2008_basic',
@@ -64,7 +46,7 @@ describe('Engine - Browser Interactions', function() {
         'KF': 'resources/keyboards/lao_2008_basic.js'
       };
       assert.equal(com.keyman.text.KeyboardInterface.prototype.registerStub(stub), 1, "Registering existing keyboard should return 1!");
-      done();
+      return finalPromise;
     });
 
   });
@@ -72,8 +54,8 @@ describe('Engine - Browser Interactions', function() {
   describe('Variable Stores', function() {
     this.timeout(testconfig.timeouts.scriptLoad + testconfig.timeouts.standard);
 
-    beforeEach(function(done) {
-      loadKeyboardFromJSON("/keyboards/options_with_save.json", done, testconfig.timeouts.scriptLoad);
+    beforeEach(function() {
+      return loadKeyboardFromJSON("/keyboards/options_with_save.json", testconfig.timeouts.scriptLoad);
     });
 
     after(function() {
@@ -110,9 +92,10 @@ describe('Engine - Browser Interactions', function() {
           done();
         }
 
-        loadKeyboardFromJSON("/keyboards/options_with_save.json", function() {
-          keyman.setActiveKeyboard(keyboardID, 'en').then(remainderOfTest);
-        }, testconfig.timeouts.scriptLoad);
+        return loadKeyboardFromJSON("/keyboards/options_with_save.json", testconfig.timeouts.scriptLoad)
+          .then(() => {
+            return keyman.setActiveKeyboard(keyboardID, 'en');
+          }).then(remainderOfTest);
       });
     });
 
@@ -144,9 +127,9 @@ describe('Engine - Browser Interactions', function() {
   describe('Integrated Simulation Checks', function() {
     this.timeout(testconfig.timeouts.standard);
 
-    before(function(done){
+    before(function() {
       this.timeout = testconfig.timeouts.scriptLoad;
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", done, testconfig.timeouts.scriptLoad);
+      return loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad);
     });
 
     beforeEach(function() {
@@ -213,9 +196,9 @@ describe('Engine - Browser Interactions', function() {
 describe('Unmatched Final Groups', function() {
   this.timeout(testconfig.timeouts.scriptLoad);
 
-  before(function(done) {
+  before(function() {
     fixture.setBase('fixtures');
-    setupKMW(null, done, testconfig.timeouts.scriptLoad + testconfig.timeouts.eventDelay);
+    return setupKMW(null, testconfig.timeouts.scriptLoad + testconfig.timeouts.eventDelay);
   });
 
   beforeEach(function(done) {
@@ -238,5 +221,84 @@ describe('Unmatched Final Groups', function() {
     // While a TAB-oriented version would be nice, it's much harder to write the test
     // to detect change in last input element.
     runKeyboardTestFromJSON('/engine_tests/ghp_enter.json', {usingOSK: true}, done, assert.equal, testconfig.timeouts.scriptLoad);
+  });
+});
+
+// Kept separate to maintain an extra-clean setup for this test.
+describe('Engine - Browser Interactions', function() {
+  this.timeout(testconfig.timeouts.scriptLoad);
+
+  before(function() {
+    fixture.setBase('fixtures');
+  });
+
+  beforeEach(function() {
+    fixture.load("singleInput.html");
+    return setupKMW(null, testconfig.timeouts.scriptLoad);
+  });
+
+  afterEach(function() {
+    fixture.cleanup();
+    teardownKMW();
+  });
+
+  describe('Keyboard Loading', function() {
+    it('Local', function() {
+      this.timeout(testconfig.timeouts.scriptLoad);
+
+      var test_callback = function() {
+        assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
+        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
+        keyman.removeKeyboards('lao_2008_basic');
+        assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
+      }
+
+      return loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad)
+        .then(test_callback);
+    });
+
+    it('Automatically sets first available keyboard', function() {
+      this.timeout(2 * testconfig.timeouts.scriptLoad);
+
+      var test_callback = function() {
+        assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
+        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
+        keyman.removeKeyboards('lao_2008_basic');
+        assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
+      }
+
+      return loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad, {passive: true})
+        .then(() => {
+          // Because we're loading the keyboard 'passively', KMW's setActiveKeyboard function is auto-called
+          // on the stub-add.  That specific call (for first keyboard auto-activation) is outside of KMW's
+          // current Promise chain, so we can't _directly_ rely on a KMW Promise to test it.
+          return new Promise((resolve) => {
+            let hasResolved = false;
+            // So, we give KMW the time needed for auto-activation to happen, polling a bit actively so that we don't
+            // wait unnecessarily long after it occurs.
+            let absoluteTimer = window.setTimeout(() => {
+              if(!hasResolved) {
+                resolve();
+                hasResolved = true;
+              }
+
+              window.clearTimeout(intervalTimer);
+            }, testconfig.timeouts.scriptLoad);
+
+            let intervalTimer = window.setInterval(() => {
+              if(keyman.getActiveKeyboard() != '') {
+                window.clearTimeout(intervalTimer);
+                window.clearTimeout(absoluteTimer);
+
+                if(!hasResolved) {
+                  resolve();
+                  hasResolved = true;
+                }
+              }
+            }, 50);
+          });
+          // Once this delay-Promise resolves successfully (either way)...
+        }).then(test_callback);  // THEN we run our checks.
+    });
   });
 });
