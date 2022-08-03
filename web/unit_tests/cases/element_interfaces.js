@@ -969,7 +969,7 @@ if(typeof InterfaceTests == 'undefined') {
 }
 
 describe('Element Input/Output Interfacing', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   before(function() {
     fixture.setBase('fixtures');
@@ -1267,7 +1267,7 @@ describe('Element Input/Output Interfacing', function() {
   describe('Wrapper: Design-Mode IFrames', function() {
     // We're asynchronously loading IFrames, and sequentially at that.
     // We'll need a larger timeout.
-    this.timeout(kmwconfig.timeouts.scriptLoad);
+    this.timeout(testconfig.timeouts.scriptLoad);
 
     before(function() {
       // These tests require use of KMW's device-detection functionality.

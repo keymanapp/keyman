@@ -1,28 +1,25 @@
 var assert = chai.assert;
 
 describe('Attachment API', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
-  before(function(done) {
+  before(function() {
     assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
     fixture.setBase('fixtures');
 
-    this.timeout(kmwconfig.timeouts.scriptLoad * 3);
-    setupKMW({ attachType:'manual' }, function() {
-      loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", function() {
-        // Sequential so we don't have to worry about race conditions and such
-        // to signal completion with done().
-
-        loadKeyboardFromJSON("/keyboards/khmer_angkor.json", function() {
-          keyman.setActiveKeyboard("lao_2008_basic");
-          done();
-        }, kmwconfig.timeouts.scriptLoad);
-      }, kmwconfig.timeouts.scriptLoad);
-    }, kmwconfig.timeouts.scriptLoad);
+    this.timeout(testconfig.timeouts.scriptLoad * 3);
+    return setupKMW({ attachType:'manual' }, testconfig.timeouts.scriptLoad).then(() => {
+      const kbd1 = loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad, { passive: true });
+      const kbd2 = loadKeyboardFromJSON("/keyboards/khmer_angkor.json",   testconfig.timeouts.scriptLoad, { passive: true });
+      return Promise.all([kbd1, kbd2]).then(() => {
+        return keyman.setActiveKeyboard("lao_2008_basic");
+      });
+    });
   });
 
   after(function() {
     keyman.removeKeyboards('lao_2008_basic');
+    keyman.removeKeyboards('khmer_angkor');
     teardownKMW();
   });
 
@@ -34,7 +31,7 @@ describe('Attachment API', function() {
     fixture.cleanup();
     window.setTimeout(function(){
       done();
-    }, kmwconfig.timeouts.eventDelay);
+    }, testconfig.timeouts.eventDelay);
   });
 
   it("Attachment/Detachment", function(done) {
@@ -63,7 +60,7 @@ describe('Attachment API', function() {
       assert.equal(val, DynamicElements.enabledLaoOutput, "'Attached' element did not perform keystroke processing!");
 
       done();
-    }, kmwconfig.timeouts.eventDelay);
+    }, testconfig.timeouts.eventDelay);
   });
 
   it("Enablement/Disablement", function(done) {
@@ -90,14 +87,14 @@ describe('Attachment API', function() {
           val = retrieveAndReset(ele);
           assert.equal(val, DynamicElements.enabledLaoOutput, "'Enabled' element did not perform keystroke processing!");
           done();
-        }, kmwconfig.timeouts.eventDelay);
-      }, kmwconfig.timeouts.eventDelay);
-    }, kmwconfig.timeouts.eventDelay);
+        }, testconfig.timeouts.eventDelay);
+      }, testconfig.timeouts.eventDelay);
+    }, testconfig.timeouts.eventDelay);
   });
 
   it("Keyboard Management (active control)", function() {
     // It appears that event generation + inline event dispatching is a bit time-intensive on some browsers.
-    this.timeout(kmwconfig.timeouts.standard * 2);
+    this.timeout(testconfig.timeouts.standard * 2);
 
     var input = document.getElementById(DynamicElements.addInput());
     var textarea = document.getElementById(DynamicElements.addText());
@@ -139,7 +136,7 @@ describe('Attachment API', function() {
 
   it("Keyboard Management (inactive control)", function() {
     // It appears that event generation + inline event dispatching is a bit time-intensive on some browsers.
-    this.timeout(kmwconfig.timeouts.standard * 2);
+    this.timeout(testconfig.timeouts.standard * 2);
 
     var input = document.getElementById(DynamicElements.addInput());
     var textarea = document.getElementById(DynamicElements.addText());
@@ -191,13 +188,13 @@ Modernizr.on('touchevents', function(result) {
   if(result) {
     describe('Device-specific Attachment Checks (Touch, \'auto\')', function() {
 
-      this.timeout(kmwconfig.timeouts.standard);
+      this.timeout(testconfig.timeouts.standard);
 
-      before(function(done) {
-        this.timeout(kmwconfig.timeouts.scriptLoad);
+      before(function() {
+        this.timeout(testconfig.timeouts.scriptLoad);
 
         fixture.setBase('fixtures');
-        setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
+        return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
       });
 
       beforeEach(function() {
@@ -212,7 +209,7 @@ Modernizr.on('touchevents', function(result) {
         fixture.cleanup();
         window.setTimeout(function(){
           done();
-        }, kmwconfig.timeouts.eventDelay);
+        }, testconfig.timeouts.eventDelay);
       });
 
       describe('Element Type', function() {
@@ -231,7 +228,7 @@ Modernizr.on('touchevents', function(result) {
         });
 
         it.skip('<iframe>', function(done) {
-          this.timeout(kmwconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
+          this.timeout(testconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
 
           var ID = DynamicElements.addIFrame(function() {
             var ele = document.getElementById(ID);
@@ -243,7 +240,7 @@ Modernizr.on('touchevents', function(result) {
 
             window.setTimeout(function() {
               done();
-            }, kmwconfig.timeouts.eventDelay);
+            }, testconfig.timeouts.eventDelay);
           });
         });
 
@@ -259,13 +256,13 @@ Modernizr.on('touchevents', function(result) {
   } else {
     describe('Device-specific Attachment Checks (Desktop, \'auto\')', function() {
 
-      this.timeout(kmwconfig.timeouts.standard);
+      this.timeout(testconfig.timeouts.standard);
 
-      before(function(done) {
-        this.timeout(kmwconfig.timeouts.scriptLoad);
+      before(function() {
+        this.timeout(testconfig.timeouts.scriptLoad);
 
         fixture.setBase('fixtures');
-        setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
+        return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
       });
 
       beforeEach(function() {
@@ -280,7 +277,7 @@ Modernizr.on('touchevents', function(result) {
         fixture.cleanup();
         window.setTimeout(function(){
           done();
-        }, kmwconfig.timeouts.eventDelay);
+        }, testconfig.timeouts.eventDelay);
       })
 
       describe('Element Type', function() {
@@ -299,7 +296,7 @@ Modernizr.on('touchevents', function(result) {
         });
 
         it.skip('<iframe>', function(done) {
-          this.timeout(kmwconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
+          this.timeout(testconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
 
           var ID = DynamicElements.addIFrame(function() {
             var ele = document.getElementById(ID);
@@ -313,7 +310,7 @@ Modernizr.on('touchevents', function(result) {
 
             window.setTimeout(function() {
               done();
-            }, kmwconfig.timeouts.eventDelay);
+            }, testconfig.timeouts.eventDelay);
           });
         });
 

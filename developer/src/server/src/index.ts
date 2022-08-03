@@ -54,7 +54,7 @@ process.on('exit', () => {
 /* Server Setup */
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 1024*1024*10 /*10MB*/ } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 1024*1024*100 /*100MB*/ } });
 
 /* Websockets */
 

@@ -22,6 +22,7 @@ type
     FIsRTL: Boolean;
     FOpenQuote: string;
     FCloseQuote: string;
+    FLanguageUsesCasing: Boolean;
     function GetText: string;
     procedure PrepareText;
     procedure SetComment(const Value: string);
@@ -44,6 +45,8 @@ type
 
     function JSONEncodeString(const s: string): string;
     function JSONDecodeString(s: string): string;
+    procedure SetLanguageUsesCasing(const Value: Boolean);
+    function ReplaceLanguageUsesCasing(const m: TMatch): string;
   public
     constructor Create(Source: string);
     destructor Destroy; override;
@@ -54,6 +57,7 @@ type
     property Comment: string read FComment write SetComment;
     property IsEditable: Boolean read FIsEditable;
     property IsRTL: Boolean read FIsRTL write SetIsRTL;
+    property LanguageUsesCasing: Boolean read FLanguageUsesCasing write SetLanguageUsesCasing;
     property OpenQuote: string read FOpenQuote write SetOpenQuote;
     property CloseQuote: string read FCloseQuote write SetCloseQuote;
     property InsertAfterWord: string read FInsertAfterWord write SetInsertAfterWord;
@@ -62,6 +66,7 @@ type
     const
       CDefaultInsertAfterWord = ' ';
       CDefaultIsRTL = False;
+      CDefaultLanguageUsesCasing = False;
       CDefaultOpenQuote = Char($201c);
       CDefaultCloseQuote = Char($201d);
   end;
@@ -80,6 +85,9 @@ const
   SWordBreaker = 'wordBreaker\s*:\s*([''"])(.+?)(\1)';
   SSources = 'sources\s*:\s*\[(.*?)\]';
   SSource = '\s*([''"])(.+?)(\1)\s*(,?)';
+
+  SLanguageUsesCasingID = 'languageUsesCasing';
+  SLanguageUsesCasing = SLanguageUsesCasingID+'\s*:\s*(true|false)';
 
   SEndOfObject = '\s*};';
   SPunctuationID = 'punctuation';
@@ -182,6 +190,7 @@ begin
 
   FInsertAfterWord := CDefaultInsertAfterWord;
   FIsRTL := CDefaultIsRTL;
+  FLanguageUsesCasing := CDefaultLanguageUsesCasing;
   FOpenQuote := CDefaultOpenQuote;
   FCloseQuote := CDefaultCloseQuote;
 
@@ -231,6 +240,13 @@ begin
   if m.Success then
     FIsRTL := m.Groups[1].Value = 'true'
   else if TRegEx.Match(s, SIsRTLID, [roMultiLine]).Success then
+    FIsEditable := False;
+
+  // languageUsesCasing: true
+  m := TRegEx.Match(s, SLanguageUsesCasing, [roMultiLine]);
+  if m.Success then
+    FLanguageUsesCasing := m.Groups[1].Value = 'true'
+  else if TRegEx.Match(s, SLanguageUsesCasingID, [roMultiLine]).Success then
     FIsEditable := False;
 
   // quotesForKeepSuggestion: We assume that both open and close are defined,
@@ -293,6 +309,14 @@ begin
     m.Value.Substring(m.Groups[1].Index - m.Index + m.Groups[1].Length);
 end;
 
+function TLexicalModelParser.ReplaceLanguageUsesCasing(const m: TMatch): string;
+begin
+  Result := m.Value.Substring(0, m.Groups[1].Index - m.Index);
+  if FLanguageUsesCasing
+    then Result := Result + 'true'
+    else Result := Result + 'false';
+end;
+
 function TLexicalModelParser.ReplaceInsertAfterWord(const punctuation: string): string;
 begin
   if punctuation = ''
@@ -339,6 +363,15 @@ begin
   s := TRegEx.Replace(s, SFormat, ReplaceFormat, [roMultiLine]);
   s := TRegEx.Replace(s, SWordBreaker, ReplaceWordBreaker, [roMultiLine]);
   s := TRegEx.Replace(s, SSources, ReplaceSources, [roMultiLine]);
+
+  if TRegEx.IsMatch(s, SLanguageUsesCasing, [roMultiLine]) then
+    s := TRegEx.Replace(s, SLanguageUsesCasing, ReplaceLanguageUsesCasing, [roMultiLine])
+  else if FLanguageUsesCasing then
+  begin
+    m := TRegEx.Match(s, SEndOfObject, [roMultiLine]);
+    if m.Success then
+      s := s.Substring(0, m.Index - 1) + ','#13#10'  languageUsesCasing: true' + s.Substring(m.Index);
+  end;
 
   s := TRegEx.Replace(s, SPunctuation, '', [roMultiLine]);
 
@@ -421,6 +454,16 @@ begin
   if FIsRTL <> Value then
   begin
     FIsRTL := Value;
+    Modify;
+  end;
+end;
+
+procedure TLexicalModelParser.SetLanguageUsesCasing(const Value: Boolean);
+begin
+  Assert(FIsEditable);
+  if FLanguageUsesCasing <> Value then
+  begin
+    FLanguageUsesCasing := Value;
     Modify;
   end;
 end;

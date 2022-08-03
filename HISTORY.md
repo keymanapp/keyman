@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 16.0.42 alpha 2022-08-01
+
+* feat(developer): add languageUsesCasing to Model Editor (#7008)
+* fix(developer): increase maximum file size for server (#7003)
+* fix(developer): rebuilding a model would not refresh it in server (#7015)
+* chore(common): GitHub issue template tweaks (#7022)
+
+## 16.0.41 alpha 2022-07-29
+
+* chore(common): builder script `:target` and `--option` support (#6986)
+* chore(linux): Add code comment (#7009)
+
 ## 16.0.40 alpha 2022-07-28
 
 * chore(linux): Add script to upload to debian (#6997)
