@@ -19,7 +19,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 ################################ Main script ################################
 
-builder_describe "Build the include script for current Keyman version" configure clean build test
+builder_describe "Build the include script for current Keyman version" configure clean build
 builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
@@ -59,9 +59,4 @@ if builder_has_action build; then
   # Build
   npm run build -- $builder_verbose || die "Could not build worker."
   builder_report success build
-fi
-
-if builder_has_action test; then
-  npm test || fail "Tests failed"
-  builder_report success test
 fi
