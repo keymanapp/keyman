@@ -227,7 +227,7 @@ namespace Testing {
         }
 
         if(indexInSequence == 0) {
-          state = "start"
+          state = "start";
         }
 
         const sample = touchpoint.path.coords[indexInSequence];
