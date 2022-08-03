@@ -70,6 +70,7 @@ get_OS
 get_browser_set_for_OS
 
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
+SH_FLAGS=
 DEBUG=false
 FLAGS=
 HEADLESS_FLAGS=-skip-package-install
@@ -81,6 +82,7 @@ while [[ $# -gt 0 ]] ; do
         -CI)
             CONFIG=CI.conf.js
             HEADLESS_FLAGS="$HEADLESS_FLAGS -CI"
+            SH_FLAGS="--ci"
             ;;
         -log-level)
             shift
@@ -136,7 +138,7 @@ popd
 # For now, we'll also link in the gesture-recognizer unit tests here.
 echo_heading "Running gesture-recognizer test suite"
 pushd "$KEYMAN_ROOT/common/web/gesture-recognizer"
-./build.sh test
+npm run test -- $SH_FLAGS
 popd
 
 # Once done, now we run the integrated (KeymanWeb) tests.
