@@ -43,7 +43,7 @@ module.exports = {
 
     '../../../node_modules/sinon/pkg/sinon.js',
 
-    'src/test/auto/browser/timeoutConfiguration.js', // Handles timeout configuration for local vs BrowserStack-based testing
+    '../../../common/test/resources/timeout-adapter.js', // Handles timeout configuration for local vs BrowserStack-based testing
 
     'src/test/auto/browser/cases/**/*.js', // Where the tests actually reside.
 
