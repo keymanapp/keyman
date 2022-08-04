@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.268 stable 2022-08-04
+
+* chore(linux): Update debian changelog (#6995)
+* fix(developer): increase maximum file size for server (#7004)
+* fix(developer): rebuilding a model would not refresh it in server (#7016)
+* chore(linux): Add script to upload to debian (#7017)
+* fix(developer): stack overflow when compiling non-web keyboard (#7034)
+* fix(developer): prevent crash attempting to compile ansi keyboard (#7035)
+
 ## 15.0.267 stable 2022-07-26
 
 * fix(developer): QR Code for Package Editor had wrong path (#6927)
