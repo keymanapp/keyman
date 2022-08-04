@@ -526,8 +526,6 @@ namespace correction {
       let searchSpace = this;
       let currentReturns: {[mapKey: string]: SearchNode} = {};
 
-      // JS measures time by the number of milliseconds since Jan 1, 1970.
-      let timeStart = Date.now();
       let maxTime: number;
       if(waitMillis == 0) {
         maxTime = Infinity;
@@ -535,6 +533,70 @@ namespace correction {
         maxTime = SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
       } else  {
         maxTime = waitMillis;
+      }
+
+      class ExecutionTimer {
+        private start: number;
+        private loopStart: number;
+        private maxExecutionTime: number;
+        private maxTrueTime: number;
+
+        private executionTime: number;
+
+        /**
+         * Used to track intervals in which potential context swaps by the OS may
+         * have occurred.
+         */
+        private largestIntervals: number[] = [0];
+        private iterationCount: number = 0;
+
+        constructor(maxExecutionTime: number, maxTrueTime: number) {
+          // JS measures time by the number of milliseconds since Jan 1, 1970.
+          this.loopStart = this.start = Date.now();
+          this.maxExecutionTime = maxExecutionTime;
+          this.maxTrueTime = maxTrueTime;
+        }
+
+        startLoop() {
+          this.loopStart = Date.now();
+        }
+
+        markIteration() {
+          const now = Date.now();
+          const delta = now - this.loopStart;
+          this.executionTime += delta;
+          this.iterationCount++;
+
+          if(delta) {
+            if(this.largestIntervals.length > 2 && delta > this.largestIntervals[0]) {
+              this.largestIntervals[0] = delta;
+            } else {
+              this.largestIntervals.push(delta);
+            }
+            this.largestIntervals.sort();
+          }
+        }
+
+        shouldTimeout(): boolean {
+          const now = Date.now();
+          if(this.start - now > this.maxTrueTime) {
+            return true;
+          }
+
+          // Look at the 'intervals' for a possible over-large outliers.
+          if(this.largestIntervals.length > 2) {
+            if(this.largestIntervals[2] > 2 * (this.largestIntervals[0] + this.largestIntervals[1])) {
+              this.executionTime -= this.largestIntervals[2];
+              this.largestIntervals.pop();
+            }
+          }
+
+          return this.executionTime > this.maxExecutionTime;
+        }
+
+        resetOutlierCheck() {
+          this.largestIntervals = [];
+        }
       }
 
       class BatchingAssistant {
@@ -582,17 +644,22 @@ namespace correction {
 
       let batcher = new BatchingAssistant();
 
+      const timer = new ExecutionTimer(maxTime*3, maxTime);
+
       // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
       let returnedValues = Object.values(this.returnedValues);
       if(returnedValues.length > 0) {
         let preprocessedQueue = new models.PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, returnedValues);
 
         // Build batches of same-cost entries.
+        timer.startLoop();
         while(preprocessedQueue.count > 0) {
           let entry = preprocessedQueue.dequeue();
           let batch = batcher.checkAndAdd(entry);
+          timer.markIteration();
 
           if(batch) {
+            // Do not track yielded time.
             yield batch;
           }
         }
@@ -601,11 +668,13 @@ namespace correction {
         // finalize the last preprocessed group without issue.
         let batch = batcher.tryFinalize();
         if(batch) {
+          // Do not track yielded time.
           yield batch;
         }
       }
 
       // Stage 2:  the fun part; actually searching!
+      timer.startLoop();
       let timedOut = false;
       do {
         let newResult: PathResult;
@@ -613,10 +682,9 @@ namespace correction {
         // Search for a 'complete' path, skipping all partial paths as long as time remains.
         do {
           newResult = this.handleNextNode();
+          timer.markIteration();
 
-          // (Naive) timeout check!
-          let now = Date.now();
-          if(now - timeStart > maxTime) {
+          if(timer.shouldTimeout()) {
             timedOut = true;
           }
         } while(!timedOut && newResult.type == 'intermediate')
