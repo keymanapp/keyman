@@ -145,16 +145,11 @@
       </div>
         <div class="list_detail">
           <xsl:attribute name="id">list_detail_keyboard_<xsl:value-of select="id"/></xsl:attribute>
+          <div class="flex-container">
 
-          <div class="grid-container" id="keyboard_grid">
-            <xsl:if test="id">
-              <div class="grid_item">
-                <xsl:value-of select="$locale/string[@name='S_Caption_Filename']"/>
-              </div>
-              <div class="grid_item">
-                <xsl:value-of select="id"/>.kmx
-              </div>
-            </xsl:if>
+          <div class="grid-container grid_rows_hide">
+            <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/></xsl:attribute>
+
             <xsl:if test="version">
               <div class="grid_item">
                 <xsl:value-of select="$locale/string[@name='S_Caption_KeyboardVersion']"/>
@@ -163,19 +158,10 @@
                 <xsl:value-of select="version"/>
               </div>
             </xsl:if>
-            <xsl:if test="$singlekeyboardpackage = '1'">
-              <div class="grid_item">
-                <xsl:value-of select="$locale/string[@name='S_Caption_Package']"/>
-              </div>
-              <div class="grid_item">
-                <xsl:value-of select="../../name"/>
-              </div>
-            </xsl:if>
-            <!--- The following rows will have the data-hide attribute -->
-            <div class="grid_item" data-hide="">
+            <div class="grid_item">
               <xsl:value-of select="$locale/string[@name='S_Caption_Languages']"/>
             </div>
-            <div class="grid_item" data-hide="">
+            <div class="grid_item">
                 <xsl:apply-templates select="KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]" />
                 <div class='list-languages-add'>
                   <xsl:call-template name="button">
@@ -184,11 +170,32 @@
                   </xsl:call-template>
                 </div>
             </div>
+
+            <!--- The following rows will have the data-hide attribute -->
+
+            <xsl:if test="id">
+              <div class="grid_item" data-hide="">
+                <xsl:value-of select="$locale/string[@name='S_Caption_Filename']"/>
+              </div>
+              <div class="grid_item" data-hide="">
+                <xsl:value-of select="id"/>.kmx
+              </div>
+            </xsl:if>
+            <xsl:if test="$singlekeyboardpackage = '1'">
+              <div class="grid_item" data-hide="">
+                <xsl:value-of select="$locale/string[@name='S_Caption_Package']"/>
+              </div>
+              <div class="grid_item" data-hide="">
+                <xsl:value-of select="../../name"/>
+              </div>
+            </xsl:if>
+
+
             <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
               <div class="grid_item" data-hide="">
                 <xsl:value-of select="$locale/string[@name='S_Caption_Version']"/>
               </div>
-              <div class="grid_item">
+              <div class="grid_item" data-hide="">
                 <xsl:value-of select="../../detail[@name='version']"/>
               </div>
             </xsl:if>
@@ -262,9 +269,12 @@
               </div>
             </xsl:if>
 
+            <div class="grid_item">
+              <xsl:attribute name='onclick'>return more_detail('keyboard_grid_<xsl:value-of select="$id"/>');</xsl:attribute>
+              More
+            </div>
 
-
-            <div class="keyboard_options grid_col_span_2">
+            <div class="keyboard_options grid_col_span_2 grid_item">
               <xsl:call-template name="button">
                 <xsl:with-param name="caption">Help</xsl:with-param>
                 <xsl:with-param name="command">keyman:keyboardlanguage_install?id=<xsl:value-of select="id"/></xsl:with-param>
@@ -292,21 +302,28 @@
           </div> <!---end keyboard details grid container -->
 
                       <!--- comment insert QR code here -->
+          <div class="qrcode flex-item-qr">
+            <xsl:attribute name='id'>qrcode-<xsl:value-of select="../../id" /></xsl:attribute>
+              <div>
+                <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="../../id" /></xsl:attribute>
+              </div>
+              <div class='qrcode-caption'>
+                <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>
+                <a>
+                  <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
+                  <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_Link']"/>
+                </a>
+                <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_LinkSuffix']"/>
+              </div>
+              <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="../../id"/>"), {
+                text: '<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id"/>/share',
+                width: 128,
+                height: 128
+              });
+            </script>
+          </div>
+          </div>
 
-            <div class='qrcode'>
-              <xsl:attribute name='id'>qrcode-<xsl:value-of select="../../id" /></xsl:attribute>
-                <div>
-                  <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="../../id" /></xsl:attribute>
-                </div>
-                <div class='qrcode-caption'>
-                  <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>
-                  <a>
-                    <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
-                    <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_Link']"/>
-                  </a>
-                  <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_LinkSuffix']"/>
-                </div>
-            </div>
 
 
                       <!--- end qr commment -->

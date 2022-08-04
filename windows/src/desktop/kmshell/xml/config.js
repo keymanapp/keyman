@@ -200,12 +200,10 @@ document.addEventListener("DOMContentLoaded", windowResize);
     return false;
   }
 
-  function advanced_detail(event,n) {
-    var k = document.getElementById('list_'+n);
-    $(k).toggleClass('expanded');
-    k.focus();
-    save_state();
-    return false;
+  function more_detail(n) {
+    var k = document.getElementById(n);
+    $(k).toggleClass('grid_rows_hide');
+    //document.querySelector('.grid-container').classList.toggle("grid_rows_hide");
   }
 
   var loading_state = false;
