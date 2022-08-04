@@ -48,6 +48,7 @@ if(!window['keyman']['ui']['name']) {
     ui.updateTimer = null;  // prevent unnecessary list refreshing
     ui.floatRight = false;  // align left by default
     ui.initialized = false; // initialization flag
+    ui.initTimer = null;
 
     /**
      * Display or hide the OSK from the OSK icon link
@@ -74,12 +75,16 @@ if(!window['keyman']['ui']['name']) {
     ui['initialize'] = ui.Initialize = function()
     {
       // Must always initialize after keymanWeb itself, otherwise options are undefined
-      if(!keymanweb['initialized'])
-      {
-        window.setTimeout(ui.Initialize,50); return;
+      if(!keymanweb['initialized']) {
+        ui.initTimer = window.setTimeout(ui.Initialize,50);
+        return;
       }
 
-      if(ui.initialized || util['isTouchDevice']()) return;
+      if(ui.initialized || util['isTouchDevice']()) {
+        return;
+      }
+
+      window.clearTimeout(ui.initTimer);
 
       var imgPath=util['getOption']('resources')+"ui/float/";
 
@@ -540,9 +545,6 @@ if(!window['keyman']['ui']['name']) {
 
     if(window.addEventListener)
       window.addEventListener('resize', ui._Resize, false);
-
-    // Initialize after KMW is fully initialized, if UI already loaded
-    keymanweb['addEventListener']('loaduserinterface',ui.Initialize);
 
     // but also call initialization when script loaded, which is after KMW initialization for asynchronous script loading
     ui.Initialize();
