@@ -200,6 +200,14 @@ document.addEventListener("DOMContentLoaded", windowResize);
     return false;
   }
 
+  function advanced_detail(event,n) {
+    var k = document.getElementById('list_'+n);
+    $(k).toggleClass('expanded');
+    k.focus();
+    save_state();
+    return false;
+  }
+
   var loading_state = false;
 
   function save_state() {

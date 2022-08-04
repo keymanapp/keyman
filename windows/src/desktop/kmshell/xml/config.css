@@ -428,6 +428,71 @@ table tr
   margin: 0 8px 0 0;
 }
 
+/* grid styles */
+.grid-container {
+  display: grid;
+  position: relative;
+  grid-template-columns: max-content 250px ;
+}
+
+.grid_item
+{
+  position: relative;
+  font-size: 11px;
+  font-weight: bold;
+  margin: 0px;
+  padding: 5px;
+  background: #ffffff;
+}
+
+.grid_debug_text::before
+{
+  content: 'Name:';
+  position: relative;
+}
+
+/* Just for testing layout */
+.grid_item::before {
+ /* content: 'Name:';
+  position:relative;
+  */
+ /* font-size: 25px;
+  font-weight: bold;
+  top: 10px;
+  left: 15px;*/
+
+}
+
+
+.grid_item_text
+{
+  content: 'blah detail';
+  position: relative;
+  font-size: 11px;
+  font-weight: normal;
+
+  margin: 0px;
+  background: #f0f0ff;
+  clear: both;
+}
+
+.grid_col_span_2
+{
+  grid-column: span 2;
+}
+
+
+.grid_rows_hide{
+  grid-template-rows: minmax(11px, auto) minmax(11px, auto) minmax(11px, auto) repeat(10, 0px);
+
+}
+
+.grid_rows_hide [data-hide] {
+  visibility: hidden;
+}
+
+
+
 /* Keyboard Styles */
 .keyboard_header
 {
