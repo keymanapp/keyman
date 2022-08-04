@@ -150,9 +150,25 @@ namespace com.keyman.osk {
         return keymanweb['getOskHeight']();
       }
 
+      /*
+       * We've noticed some fairly inconsistent behavior in the past when attempting to base
+       * this logic on window.innerWidth/Height, as there can be very unexpected behavior
+       * on mobile devices during and after rotation.
+       *
+       * Online forums (such as https://stackoverflow.com/a/54812656) seem to indicate that
+       * document.documentElement.clientWidth/Height seem to be the most stable analogues
+       * to a window's size in the situations where it matters for Keyman Engine for Web.
+       *
+       * That said, an important note:  this gets the dimensions of the _document element_,
+       * not the screen or even the window.
+       */
       let baseWidth  = document?.documentElement?.clientWidth;
       let baseHeight = document?.documentElement?.clientHeight;
       if(typeof baseWidth == 'undefined') {
+        /*
+         * Fallback logic.  We _shouldn't_ need this, but it's best to have _something_
+         * for the sake of robustness.
+         */
         baseWidth  = Math.min(screen.height, screen.width);
         baseHeight = Math.max(screen.height, screen.width);
 
@@ -167,6 +183,15 @@ namespace com.keyman.osk {
           height=oskHeightLandscapeView;
 
       if(device.formFactor == 'phone') {
+        /**
+         * Assuming the first-pass detection of width and height work correctly, note
+         * that these calculations are based on the document's size, not the device's
+         * resolution.  This _particularly_ matters for height.
+         *
+         * - Is the mobile-device browser showing a URL bar?  That's not included.
+         * - The standard signal-strength, battery-strength, etc device status bar?
+         *   Also not included.
+         */
         if(keymanweb.util.portraitView())
           height=Math.floor(baseHeight/2.4);
         else
@@ -200,8 +225,6 @@ namespace com.keyman.osk {
       width = document?.documentElement?.clientWidth;
       if(typeof width == 'undefined') {
         if(device.OS == 'iOS') {
-          // iOS does not interchange these values when the orientation changes!
-          //width = util.portraitView() ? screen.width : screen.height;
           width = window.innerWidth;
         } else if(device.OS == 'Android') {
           width=screen.availWidth;
