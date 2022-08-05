@@ -1,5 +1,15 @@
+#pragma once
+#ifndef XSTRING_H
+#define SXTRING_H
+/**/
+PWSTR incxstr(PWSTR p);
+PWSTR decxstr(PWSTR p, PWSTR pStart);
+int xstrlen(PWSTR p);
+int xstrlen_ignoreifopt(PWSTR p);
+int xstrpos(PWSTR p1, PWSTR p);
+PWSTR xstrchr(PWSTR buf, PWSTR chr);
+int xchrcmp(PWSTR ch1, PWSTR ch2);
 
-#include "kmx_u16.h"
 
 PKMX_WCHAR incxstr(PKMX_WCHAR p);
 PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart);
@@ -17,3 +27,5 @@ int  xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2);
 //int xstrpos(PWSTR p1, PWSTR p);
 //PWSTR xstrchr(PWSTR buf, PWSTR chr);
 //int xchrcmp(PWSTR ch1, PWSTR ch2);
+
+#endif // XSTRING_H

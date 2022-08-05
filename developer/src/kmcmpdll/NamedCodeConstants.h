@@ -4,8 +4,8 @@
 #define MAX_ENAME	128
 #define ALLOC_SIZE	256
 
-#include "../../../../developer/kmcompx/include/kmcompx.h"
-#include "../../../../developer/kmcompx/include/kmx_u16.h"
+//#include "../../../../developer/kmcompx/include/kmcompx.h"
+//#include "kmx_u16.h"
 
 struct NCCENTRY_NEW
 {

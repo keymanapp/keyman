@@ -1,9 +1,7 @@
 #pragma once
 
-//#include <windows.h>       // Can be removed here :-)
-#include "../../../../developer/kmcompx/include/Compfile.h"
-#include <Compfile.h>
-#include "../../../../developer/kmcompx/include/kmcompx.h"
+#include <windows.h>       // Can be removed here :-)
+#include "Compfile.h"
 
 #define VERIFY_KEYBOARD_VERSION(fk, ver, err) { \
   if(!VerifyKeyboardVersion((fk), (ver))) \

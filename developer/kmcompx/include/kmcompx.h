@@ -4,8 +4,12 @@
 #pragma once
 #include <stdint.h>
 
-#include "keyman/keyboardprocessor.h"
-#include "keyman/keyboardprocessor_bits.h"
+//#include "keyman/keyboardprocessor.h"
+//#include "keyman/keyboardprocessor_bits.h"
+
+
+#include "../../src/kmcmpdll/keyman/keyboardprocessor.h"
+#include "../../src/kmcmpdll/keyman/keyboardprocessor_bits.h"
 
 
 
@@ -44,6 +48,10 @@ typedef KMX_WCHART* LPKMX_WCHART;      // s ??
 typedef KMX_WCHAR* LPKMX_WCHAR;      // s ??
 //typedef KMX_PWSTR * LPKMX_STR;
 
+
+
+
+#include "compiler.h"
 //DWORD x;
 namespace km {
 namespace kbp {
@@ -133,4 +141,4 @@ enum KMX_ProcessStringReturn { KMX_psrPostMessages, KMX_psrCheckMatches };
 } // namespace kbp
 } // namespace km
 
-#include "./compiler.h"
+//#include "./compiler.h"

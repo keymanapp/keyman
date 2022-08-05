@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "kmcompx.h"    //#include "kmx_base.h"
+#include "kmcompx.h"    // _S2 #include "kmx_base.h"
 
 // namespace km {
 // namespace kbp {

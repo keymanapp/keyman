@@ -140,6 +140,7 @@ value and all results are returned via outparams passed to the function.
 ```c
 */
 enum km_kbp_status_codes {
+
   KM_KBP_STATUS_OK = 0,
   KM_KBP_STATUS_NO_MEM = 1,
   KM_KBP_STATUS_IO_ERROR = 2,

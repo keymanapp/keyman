@@ -1,15 +1,10 @@
 #pragma once
 #include "pch.h"
-#include "../../kmcompx/include/pch.h"     // _S2 #include "pch.h"
 
-#include "../../kmcompx/include/comperr.h"                        //_S2 #include <comperr.h>       // double?    // _S2 #include <comperr.h>
-//#include "../../../../developer/kmcompx/include/compfile.h"     // _S2 #include <compfile.h>
-//#include "../../../../developer/kmcompx/include/compiler.h"     // _S2  #include <compiler.h>
+#include "Compfile.h"         // _S2 #include <Compfile.h>
+#include "comperr.h"                        //_S2 #include <comperr.h>       // double?    // _S2 #include <comperr.h>
 
-
-#include <kmcmpdll.h>
-
-#include "CheckNCapsConsistency.h"
+#include "kmcmpdll.h"
 #include "CharToKeyConversion.h"
 
 

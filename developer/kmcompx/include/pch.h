@@ -24,10 +24,13 @@
 
 #include "kmcompx.h"
 #include "kmx_file.h"
-#include "kmx_u16.h"
+ //#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
+
+#include "../../src/kmcmpdll/kmx_u16.h"
 
 #include "../../../common/windows/cpp/include/unicode.h"
-#include "../../../common/windows/cpp/include/xstring.h"
+//#include "../../../common/windows/cpp/include/xstring.h"
+#include "../../src/kmcmpdll/xstring.h"
 
 #include "../../../common/windows/cpp/include/registry.h"
 #include "../../../common/windows/cpp/include/crc32.h"

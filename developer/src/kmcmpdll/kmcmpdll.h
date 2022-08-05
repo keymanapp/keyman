@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <windows.h>       // Can be removed here :-)
+#include <windows.h>       // Can be removed here :-)
 #include "compfile.h"
 
 

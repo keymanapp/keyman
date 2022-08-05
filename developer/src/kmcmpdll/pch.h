@@ -11,19 +11,17 @@
 #include <windows.h>
 #include <assert.h>
 
-#include "../../../../developer/kmcompx/include/pch.h"
+#include "../../kmcompx/include/kmx_file.h"         //_S2 
+#include "kmx_u16.h"                                //_S2 
 
-/*
-//#include "../../../core/src/kmx/kmx_processevent.h"       // _S2 included before all to prevent use of legacy_kmx_file
-//#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
-#include "../../../../common/windows/cpp/include/xstring.h"
+//#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
+//#include "../../../common/windows/cpp/include/xstring.h"
 
-#include "../../../../common/windows/cpp/include/registry.h"
-#include "../../../../common/windows/cpp/include/unicode.h"
-#include "../../../../common/windows/cpp/include/crc32.h"
+#include "../../../common/windows/cpp/include/registry.h"
+#include "../../../common/windows/cpp/include/unicode.h"
+#include "../../../common/windows/cpp/include/crc32.h"
 
 #include <ctype.h>
 #include <stdio.h>
 
 #include <string.h>
-*/

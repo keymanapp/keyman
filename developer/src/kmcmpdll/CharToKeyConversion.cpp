@@ -1,6 +1,5 @@
 
 
-#include "../../kmcompx/include/pch.h"            // added _S2
 #include "pch.h"    
 #include "CharToKeyConversion.h"
 

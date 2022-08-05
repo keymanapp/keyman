@@ -333,6 +333,7 @@
     </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\vkeys.cpp" />
+    <ClCompile Include="ABC.cpp" />
     <ClCompile Include="CasedKeys.cpp" />
     <ClCompile Include="CharToKeyConversion.cpp" />
     <ClCompile Include="CheckForDuplicates.cpp" />

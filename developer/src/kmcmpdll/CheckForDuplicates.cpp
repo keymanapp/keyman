@@ -1,9 +1,13 @@
 #pragma once
-#include "../../kmcompx/include/pch.h"              // _S2 #include "pch"
+
 #include "pch.h"
-#include "../../kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
-#include "../../kmcompx/include/comperr.h"          // _S2 #include <comperr.h>
-#include "../../kmcompx/include/kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
+
+#include "Compfile.h"         // _S2 #include <Compfile.h>
+#include "comperr.h"          // _S2 #include <comperr.h>
+#include "kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
+//#include "../../../common/windows/cpp/include/xstring.h"
+#include "xstring.h"
+#include "kmx_u16.h"
 
 #include "CheckForDuplicates.h"
 
@@ -22,8 +26,8 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
 
           KMX_WCHAR T1[250]  = u"Group '";
 			    KMX_WCHAR T3[250]  = u"' declared on line ";
-          u16ncat(T1, gp0->szName, xstrlen(T1));
-          u16ncat(T1, T3, xstrlen(T1));
+          u16ncat(T1, gp0->szName, xstrlen_S2__(T1));
+          u16ncat(T1, T3, xstrlen_S2__(T1));
           u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)gp0->Line), T1);
 
       return CERR_DuplicateGroup;
@@ -50,8 +54,8 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
           PKMX_WCHAR p_ErrExtra ;
           KMX_WCHAR T1[250]  = u"Store '";
 			    KMX_WCHAR T3[250]  = u"' declared on line ";
-          u16ncat(T1, sp0->szName, xstrlen(T1));
-          u16ncat(T1, T3, xstrlen(T1));
+          u16ncat(T1, sp0->szName, xstrlen_S2__(T1));
+          u16ncat(T1, T3, xstrlen_S2__(T1));
           u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)sp0->line), T1);
       return CERR_DuplicateStore;
     }

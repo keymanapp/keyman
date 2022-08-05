@@ -1,6 +1,6 @@
 
 #include "pch.h"
-
+// used to be  windows/src/global/vc/xstring.cpp
 /*
 * int xstrlen( PKMX_BYTE p );
 *
@@ -120,7 +120,6 @@ PKMX_WCHAR xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
       return buf;
   return NULL;
 }
-
 
 const int CODE__SIZE[] = {
     -1,  // undefined                0x00

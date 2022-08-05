@@ -1,18 +1,9 @@
-#include "../../kmcompx/include/pch.h"              // _S2 #include "pch"
-#include "pch.h"
-#include "../../kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
-#include "../../kmcompx/include/compiler.h"         // _S2 #include <compiler.h>
-#include "../../kmcompx/include/comperr.h"          // _S2 #include <comperr.h>
-#include "../../kmcompx/include/kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
 
-/*
 #include "pch.h"
-#include <compfile.h>
-#include <compiler.h>
-#include <comperr.h>
-#include <kmcmpdll.h>
-#include <vkeys.h>
-*/
+#include "Compfile.h"         // _S2 #include <Compfile.h>
+#include "comperr.h"          // _S2 #include <comperr.h>
+#include "../../../common/windows/cpp/include/vkeys.h"
+#include "kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
 
 #include <unordered_map>
 #include <unordered_set>

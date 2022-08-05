@@ -2,18 +2,10 @@
 #pragma once      // _S2
 
 #include "pch.h"
-#include "../../kmcompx/include/pch.h"              // _S2 #include "pch"
-#include "../../kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
-//#include "../../kmcompx/include/compiler.h"         // _S2 #include <compiler.h>
-#include "../../kmcompx/include/comperr.h"          // _S2 #include <comperr.h>
-#include "../..//kmcompx/include/kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
-/*
-#include "pch.h"
-#include <compfile.h>
-#include <compiler.h>
-#include <comperr.h>
-#include <kmcmpdll.h>
-*/
+
+#include "Compfile.h"         // _S2 #include <Compfile.h>
+#include "comperr.h"          // _S2 #include <comperr.h>
+#include "kmcmpdll.h"         // _S2 #include <kmcmpdll.h> 
 #include <io.h>
 #include <string>
 #include "CheckFilenameConsistency.h"

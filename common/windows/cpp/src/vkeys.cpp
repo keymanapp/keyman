@@ -17,7 +17,7 @@
 */
 
 #include "pch.h"
-#include "../../../../developer/kmcompx/include/pch.h"
+//#include "../../../../developer/kmcompx/include/pch.h"
 
 #define lpuch(x) u ## x
 

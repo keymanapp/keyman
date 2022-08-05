@@ -1,17 +1,14 @@
+
+#ifndef KMX_U16H_H
+#define KMX_U16H_H
 #pragma once      // _S2
-#include "keyman/keyboardprocessor.h"
-//#include "kmx_file.h"
-//#include "compfile.h"
-//#include "compiler.h"
-#include "kmcompx.h"
 
 #include <cmath>
 #include <vector>
-#include <ctype.h>          // _S2 is OK ->windows ???
+#include <ctype.h>          
 #include <string>
 
 
-size_t  u16lenQ(const KMX_WCHAR *p);
 size_t  u16len(const KMX_WCHAR *p);
 int  u16cmp(const KMX_WCHAR *p, const KMX_WCHAR *q);
 int   u16icmp(const KMX_WCHAR *p, const KMX_WCHAR *q);
@@ -35,6 +32,11 @@ const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max);
 
 //int  xstrlen_ignoreifopt(PKMX_WCHAR p);
 //int  xstrlen(PKMX_WCHAR p);
+PKMX_WCHAR incxstr_S2__(PKMX_WCHAR p);
+
+int xstrlen_S2__(PKMX_WCHAR p);
+
+
 /*
 
 int  xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p);
@@ -56,3 +58,5 @@ int  xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2);
   int  u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count) ;
   */
   //km_kbp_cp * u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) ;
+
+  #endif  //KMX_U16_H

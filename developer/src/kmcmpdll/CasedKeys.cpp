@@ -2,15 +2,13 @@
 
 #pragma once  // _S2
 #include "pch.h"
-#include "../../../../developer/kmcompx/include/pch.h"            // added S
-
-#include "../../kmcompx/include/Compfile.h"         // _S2 #include <Compfile.h>
-#include "../../kmcompx/include/comperr.h"          // _S2 #include <comperr.h>
+#include "Compfile.h"         // _S2 #include <Compfile.h>
+#include "comperr.h"          // _S2 #include <comperr.h>
 #include "../../../common/windows/cpp/include/vkeys.h"
-#include "../../kmcompx/include/kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
+#include "kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
 
 #include "CharToKeyConversion.h"
-#include "../../../../developer/kmcompx/include/kmx_u16.h"
+#include "kmx_u16.h"
 
 extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
 
@@ -60,7 +58,7 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
     *q++ = UC_SENTINEL_EXTENDEDEND;
     *q = 0;
 
-    p = incxstr(p);
+    p = incxstr_S2__(p);
   }
 
   delete[] sp->dpString;
@@ -116,7 +114,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   }
 
   PKMX_WCHAR p = sp->dpString;
-  for (; *p; p = incxstr(p)) {
+  for (; *p; p = incxstr_S2__(p)) {
     // We've already verified that the store contains only virtual keys in VerifyCasedKeys
     if (*(p + 3) == key) {
       break;
