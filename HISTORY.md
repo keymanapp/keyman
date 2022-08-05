@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 16.0.43 alpha 2022-08-05
+
+* chore(web): centralizes web-based modules' CI unit test configurations (#7024)
+* refactor(web): converts test_utils funcs to Promise use (#7027)
+* chore(core): get wasm core building again (#7023)
+* chore(common): build-utils.sh minor tweaks (#7018)
+* change(web): rotation polish - OSK reload no longer needed  ️ (#6787)
+* change(web): updates mobile screen dimension detection code  ️ (#6979)
+
 ## 16.0.42 alpha 2022-08-01
 
 * feat(developer): add languageUsesCasing to Model Editor (#7008)
