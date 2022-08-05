@@ -147,6 +147,8 @@ namespace kmx {
 
 #define TSS__KEYMAN_150_MAX  43
 
+#define TSS_LDML    44
+
 #define TSS__MAX        43
 
 /* wm_keyman_control_internal message control codes */

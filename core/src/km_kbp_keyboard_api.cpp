@@ -14,16 +14,26 @@
 #include "keyboard.hpp"
 #include "processor.hpp"
 #include "kmx/kmx_processor.hpp"
+#include "ldml/ldml_processor.hpp"
 #include "mock/mock_processor.hpp"
 
 using namespace km::kbp;
 
 namespace
 {
-  abstract_processor * processor_factory(path const & kb_path)
-  {
+  bool is_kmxplus_file(path const & kb_path, void** buf, size_t& sz) {
+    // TODO-LDML: sniff file header for LDML flag, return in buf + sz
+    return false;
+  }
+
+  abstract_processor * processor_factory(path const & kb_path) {
     // Some legacy packages may include upper-case file extensions
     if (kb_path.suffix() == ".kmx" || kb_path.suffix() == ".KMX") {
+      void* buf = nullptr;
+      size_t sz = -1;
+      if(is_kmxplus_file(kb_path, &buf, sz)) {
+        return new ldml_processor(buf, sz);
+      }
       return new kmx_processor(kb_path);
     }
     else if (kb_path.suffix() == ".mock") {
