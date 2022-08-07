@@ -340,6 +340,12 @@ struct COMP_KEYBOARD {
   KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
 };
 
+// TODO-LDML: fill this in
+struct COMP_KEYBOARD_EX {
+  KMX_DWORD dpKMXPlus;   // 0040 <sect header is first>
+  KMX_DWORD cxKMXPlus;   // 0048
+  };
+
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
 typedef COMP_STORE *PCOMP_STORE;
 typedef COMP_KEY *PCOMP_KEY;
