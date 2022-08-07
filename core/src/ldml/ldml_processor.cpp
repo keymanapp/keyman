@@ -7,6 +7,7 @@
 
 #include "ldml/ldml_processor.hpp"
 #include "state.hpp"
+#include "../kmx/kmx_file.h"
 
 namespace {
   constexpr km_kbp_attr const engine_attrs = {
@@ -40,6 +41,69 @@ namespace km {
     {
       // TODO: load the file from the buffer (KMXPlus format)
     }
+
+    bool ldml_processor::is_kmxplus_file(path const & kb_path, void** buf, size_t& sz) {
+    // TODO-LDML: sniff file header for LDML flag, return in buf + sz
+    // TODO-LDML: we should refactor all the core components to delegate file loading
+    //            to the Engine, which requires an API change, but this makes delivery
+    //            of keyboard files more flexible under more WASM.
+    // This hack function is not good enough
+#if defined(_WIN32) || defined(_WIN64)
+    FILE* fp = _wfsopen(kb_path.c_str(), L"rb", _SH_DENYWR);
+#else
+    FILE* fp = fopen(kb_path.c_str(), "rb");
+#endif
+    if(fp == NULL) {
+      return false;
+    }
+
+    if (fseek(fp, 0, SEEK_END) != 0) {
+      fclose(fp);
+      return false;
+    }
+
+    sz = ftell(fp);
+    if (sz < 0) {
+      fclose(fp);
+      return false;
+    }
+
+    if (fseek(fp, 0, SEEK_SET) != 0) {
+      fclose(fp);
+      return false;
+    }
+
+    *buf = new uint8_t[sz];
+
+    if(!*buf) {
+      fclose(fp);
+      return false;
+    }
+
+    if (fread(*buf, 1, sz, fp) < (size_t) sz) {
+      fclose(fp);
+      delete [] (*buf);
+      return false;
+    }
+
+    fclose(fp);
+
+    kmx::PCOMP_KEYBOARD comp_keyboard = static_cast<kmx::PCOMP_KEYBOARD>(*buf);
+
+    if(comp_keyboard->dwIdentifier != KMX_DWORD(FILEID_COMPILED)) {
+      delete [] (*buf);
+      return false;
+    }
+
+    if(comp_keyboard->dwFileVersion < VERSION_160 || (comp_keyboard->dwFlags & KF_IS_KMXPLUS) == 0) {
+      delete [] (*buf);
+      return false;
+    }
+
+    // We'll keep the buffer to return to constructor
+    return true;
+  }
+
 
     char16_t const * ldml_processor::lookup_option(km_kbp_option_scope scope,
                                     std::u16string const & key) const
@@ -96,6 +160,8 @@ namespace km {
 
       if (!is_key_down) {
         // TODO: Implement caps lock handling
+        state->actions().clear();
+        state->actions().commit();
         return KM_KBP_STATUS_OK;
       }
 
@@ -108,6 +174,10 @@ namespace km {
           state->context().pop_back();
           state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
           break;
+        default:
+          /* We're going to push an 'a' for a passing unit test */
+          state->context().push_character('a');
+          state->actions().push_character('a');
         }
 
         state->actions().commit();

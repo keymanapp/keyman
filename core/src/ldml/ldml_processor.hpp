@@ -26,6 +26,8 @@ namespace kbp
     ldml_processor(void *data, size_t len);
 //    ~ldml_processor() override;
 
+    static bool is_kmxplus_file(path const & kb_path, void** buf, size_t& sz);
+
     km_kbp_status
     process_event(
       km_kbp_state *state,
