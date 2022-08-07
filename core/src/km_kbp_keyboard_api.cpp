@@ -9,6 +9,7 @@
                                     into keyboard.hpp
 */
 #include <cassert>
+#include <vector>
 
 #include <keyman/keyboardprocessor.h>
 #include "keyboard.hpp"
@@ -24,11 +25,9 @@ namespace
   abstract_processor * processor_factory(path const & kb_path) {
     // Some legacy packages may include upper-case file extensions
     if (kb_path.suffix() == ".kmx" || kb_path.suffix() == ".KMX") {
-      void* buf = nullptr;
-      size_t sz = -1;
-      if(ldml_processor::is_kmxplus_file(kb_path, &buf, sz)) {
-        abstract_processor * result = new ldml_processor(buf, sz);
-        delete [] buf;
+      std::vector<uint8_t> buf;
+      if(ldml_processor::is_kmxplus_file(kb_path, buf)) {
+        abstract_processor * result = new ldml_processor(kb_path, buf);
         return result;
       }
       return new kmx_processor(kb_path);

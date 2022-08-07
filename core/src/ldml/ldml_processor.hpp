@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <keyman/keyboardprocessor.h>
 
@@ -16,17 +17,24 @@
 #include "option.hpp"
 
 namespace km {
-namespace kbp
-{
-  class ldml_processor : public abstract_processor
-  {
-    std::unordered_map<std::u16string, std::u16string> _options;
+namespace kbp {
+
+#define KM_KBP_LDML_VERSION u"1.0"
+
+  class ldml_processor : public abstract_processor {
 
   public:
-    ldml_processor(void *data, size_t len);
+    ldml_processor(
+      path const & kb_path,
+      const std::vector<uint8_t> data
+    );
+
 //    ~ldml_processor() override;
 
-    static bool is_kmxplus_file(path const & kb_path, void** buf, size_t& sz);
+    static bool is_kmxplus_file(
+      path const & kb_path,
+      std::vector<uint8_t>& data
+    );
 
     km_kbp_status
     process_event(
@@ -39,19 +47,22 @@ namespace kbp
     virtual km_kbp_attr const & attributes() const override;
     km_kbp_status               validate() const override;
 
-
     char16_t const *
     lookup_option(
       km_kbp_option_scope,
       std::u16string const & key
-    ) const override;
+    ) const override {
+      return nullptr;
+    }
 
     option
     update_option(
       km_kbp_option_scope,
       std::u16string const & key,
       std::u16string const & value
-    ) override;
+    ) override {
+      return option();
+    }
 
     km_kbp_status process_queued_actions(km_kbp_state *state) override;
 

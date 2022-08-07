@@ -11,6 +11,7 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
+#define KMX_MAX_ALLOWED_FILE_SIZE (128 * 1024 * 1024)  /* 128MB */
 /* */
 
 #define KEYMAN_LAYOUT_DEFAULT 0x000005FE
@@ -146,8 +147,6 @@ namespace kmx {
 #define TSS_OLDLAYER     43
 
 #define TSS__KEYMAN_150_MAX  43
-
-#define TSS_LDML    44
 
 #define TSS__MAX        43
 
