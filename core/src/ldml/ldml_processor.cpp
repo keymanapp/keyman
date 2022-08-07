@@ -62,7 +62,7 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
     return false;
   }
 
-  if(comp_keyboard->dwFileVersion < VERSION_160 || (comp_keyboard->dwFlags & KF_IS_KMXPLUS) == 0) {
+  if(comp_keyboard->dwFileVersion < VERSION_160 || (comp_keyboard->dwFlags & KF_KMXPLUS) == 0) {
     return false;
   }
 
