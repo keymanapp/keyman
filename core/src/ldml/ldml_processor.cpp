@@ -24,7 +24,7 @@ namespace {
 namespace km {
 namespace kbp {
 
-ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> data)
+ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> _kmn_unused(data))
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LDML_VERSION, kb_path.parent(), {})
   )
@@ -38,7 +38,7 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
 //            to the Engine, which requires an API change, but this makes delivery
 //            of keyboard files more flexible under more WASM.
 
-  std::ifstream file(static_cast<std::wstring>(kb_path), std::ios::binary | std::ios::ate);
+  std::ifstream file(static_cast<std::string>(kb_path), std::ios::binary | std::ios::ate);
   if(!file.good()) {
     return false;
   }

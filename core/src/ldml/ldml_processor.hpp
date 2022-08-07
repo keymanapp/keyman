@@ -49,17 +49,17 @@ namespace kbp {
 
     char16_t const *
     lookup_option(
-      km_kbp_option_scope,
-      std::u16string const & key
+      km_kbp_option_scope _kmn_unused(scope),
+      std::u16string const & _kmn_unused(key)
     ) const override {
       return nullptr;
     }
 
     option
     update_option(
-      km_kbp_option_scope,
-      std::u16string const & key,
-      std::u16string const & value
+      km_kbp_option_scope _kmn_unused(scope),
+      std::u16string const & _kmn_unused(key),
+      std::u16string const & _kmn_unused(value)
     ) override {
       return option();
     }
