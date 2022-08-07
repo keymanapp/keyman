@@ -71,9 +71,9 @@
 #define VERSION_100 0x00000A00
 #define VERSION_140 0x00000E00
 #define VERSION_150 0x00000F00
-
+#define VERSION_160 0x00001000
 #define VERSION_MIN	VERSION_50
-#define VERSION_MAX	VERSION_150
+#define VERSION_MAX	VERSION_160
 
 /*
  Special flag for WM_CHAR/WM_KEY???/WM_SYSKEY???: says that key has been
