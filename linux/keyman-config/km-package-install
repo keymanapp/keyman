@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
-from distutils.version import StrictVersion
+from pkg_resources import parse_version
 import logging
 import sys
 import os
@@ -144,8 +144,8 @@ def main():
             sys.exit(3)
         kbdata_v = secure_lookup(kbdata, 'version')
         if installed_kmp_v and kbdata_v:
-            kbdata_version = StrictVersion(kbdata_v)
-            installed_kmp_ver = StrictVersion(installed_kmp_v)
+            kbdata_version = parse_version(kbdata_v)
+            installed_kmp_ver = parse_version(installed_kmp_v)
             if kbdata_version == installed_kmp_ver:
                 print("km-package-install: Version %s of the %s keyboard package is already installed."
                       % (installed_kmp_ver, args.package))
