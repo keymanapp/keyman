@@ -45,8 +45,10 @@ namespace kmx {
 #define VERSION_140 0x00000E00
 #define VERSION_150 0x00000F00
 
+#define VERSION_160 0x00001000
+
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_150
+#define VERSION_MAX VERSION_160
 
 //
 // Backspace types
@@ -332,7 +334,7 @@ struct COMP_KEYBOARD {
 
   KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
   KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
-  };
+};
 
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
 typedef COMP_STORE *PCOMP_STORE;
