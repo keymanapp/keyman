@@ -26,7 +26,7 @@ namespace kbp {
 
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> _kmn_unused(data))
 : abstract_processor(
-    keyboard_attributes(kb_path.stem(), KM_KBP_LDML_VERSION, kb_path.parent(), {})
+    keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
   )
 {
   // TODO-LDML: load the file from the buffer (KMXPlus format)

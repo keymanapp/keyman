@@ -24,6 +24,7 @@ namespace
 {
   abstract_processor * processor_factory(path const & kb_path) {
     // Some legacy packages may include upper-case file extensions
+    // TODO-LDML: move file io out of core and into engine
     if (kb_path.suffix() == ".kmx" || kb_path.suffix() == ".KMX") {
       std::vector<uint8_t> buf;
       if(ldml_processor::is_kmxplus_file(kb_path, buf)) {

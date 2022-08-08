@@ -342,8 +342,8 @@ struct COMP_KEYBOARD {
 
 // TODO-LDML: fill this in
 struct COMP_KEYBOARD_EX {
-  KMX_DWORD dpKMXPlus;   // 0040 <sect header is first>
-  KMX_DWORD cxKMXPlus;   // 0048
+  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
+  KMX_DWORD dwKMXPlusSize;  // 0048 size in bytes of entire KMXPlus data
   };
 
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;

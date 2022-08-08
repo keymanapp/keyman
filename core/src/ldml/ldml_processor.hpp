@@ -1,9 +1,8 @@
 /*
-  Copyright:    © 2018 SIL International.
-  Description:  Internal keyboard class and adaptor class for the API.
-  Create Date:  2 Oct 2018
-  Authors:      Tim Eves (TSE)
-  History:      2 Oct 2018 - TSE - Refactored out of km_kbp_keyboard_api.cpp
+  Copyright:    © SIL International.
+  Description:  Internal keyboard class and adaptor class for the LDML Keyboard Processor.
+  Create Date:  6 Aug 2022
+  Authors:      Marc Durdin
 */
 
 #pragma once
@@ -19,7 +18,7 @@
 namespace km {
 namespace kbp {
 
-#define KM_KBP_LDML_VERSION u"1.0"
+#define KM_KBP_LMDL_PROCESSOR_VERSION u"1.0"
 
   class ldml_processor : public abstract_processor {
 
