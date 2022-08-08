@@ -1,3 +1,5 @@
+// TODO: merge and replace with kmx_file.h from core
+
 /*
   Name:             legacy_kmx_file
   Copyright:        Copyright (C) SIL International.
@@ -282,6 +284,9 @@
 #define KF_CAPSALWAYSOFF	0x0004
 #define KF_LOGICALLAYOUT	0x0008
 #define KF_AUTOMATICVERSION 0x0010
+
+// 16.0: Support for LDML Keyboards in KMXPlus file format
+#define KF_KMXPLUS  0x0020
 
 #define HK_ALT			0x00010000
 #define HK_CTRL			0x00020000
