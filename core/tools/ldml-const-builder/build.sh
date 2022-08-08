@@ -32,20 +32,20 @@ fi
 
 if builder_has_action clean; then
 #   npm run clean
-  rm -rf build/
+  rm -rf ../../include/ldml/build/
   # TODO: clean .h?
   builder_report success clean
 fi
 
 if builder_has_action build; then
   # Generate index.ts
-  npx tsc -b
+  npx tsc -b ../../include/ldml/
 
   builder_report success build
 fi
 
 if builder_has_action run; then
-  node build/ldml-const-builder.js
+  node ../../include/ldml/build/core/include/ldml/ldml-const-builder.js
 
   builder_report success run
 fi
