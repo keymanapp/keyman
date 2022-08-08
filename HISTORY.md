@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.44 alpha 2022-08-08
+
+* chore(linux): Update debian changelog (#7041)
+
 ## 16.0.43 alpha 2022-08-05
 
 * chore(web): centralizes web-based modules' CI unit test configurations (#7024)
