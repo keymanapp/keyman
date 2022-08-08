@@ -17,6 +17,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
+KBP_LDML_H_FILE="../../include/ldml/keyboardprocessor_ldml.h"
+
 ################################ Main script ################################
 
 builder_describe "Build and run the constant builder for LDML" configure clean build run
@@ -32,7 +34,7 @@ fi
 
 if builder_has_action clean; then
 #   npm run clean
-  rm -rf ../../include/ldml/build/
+  rm -rf ../../include/ldml/build/ ${KBP_LDML_H_FILE}
   # TODO: clean .h?
   builder_report success clean
 fi
@@ -45,7 +47,9 @@ if builder_has_action build; then
 fi
 
 if builder_has_action run; then
-  node ../../include/ldml/build/core/include/ldml/ldml-const-builder.js
+  node ../../include/ldml/build/core/include/ldml/ldml-const-builder.js > ${KBP_LDML_H_FILE}
+  echo "Updated ${KBP_LDML_H_FILE}"
 
   builder_report success run
 fi
+

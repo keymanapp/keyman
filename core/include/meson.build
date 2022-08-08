@@ -8,3 +8,4 @@
 
 inc = include_directories('.', is_system: true)
 subdir('keyman')
+subdir('ldml')

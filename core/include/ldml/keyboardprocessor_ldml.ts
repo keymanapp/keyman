@@ -7,6 +7,33 @@
          * The version of the LDML processor
          */
         version: '1.0',
+
+        section_keys: 'keys',
+        section_loca: 'loca',
+        section_meta: 'meta',
         section_sect: 'sect',
-    };
+        section_strs: 'strs',
+
+        /**
+         * bitwise or value for fallback=omit in meta.settings
+         */
+         meta_settings_fallback_omit: 1,
+        /**
+         * bitwise or value for transformFailure=omit in meta.settings
+         */
+         meta_settings_transformFailure_omit: 2,
+        /**
+         * bitwise or value for transformPartial=hide in meta.settings
+         */
+         meta_settings_transformPartial_hide: 4,
+
+         /**
+          * bitwise or value for extend in strs[key].flags.
+          * If bit is 1, then 'to' is a string.
+          * If bit is 0, then 'to' is an offset.
+          *
+          * `extend = flags & strs_flags_extend`
+          */
+         strs_flags_extend: 1,
+        };
 // }
