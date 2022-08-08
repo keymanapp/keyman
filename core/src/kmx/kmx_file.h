@@ -11,6 +11,7 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
+#define KMX_MAX_ALLOWED_FILE_SIZE (128 * 1024 * 1024)  /* 128MB */
 /* */
 
 #define KEYMAN_LAYOUT_DEFAULT 0x000005FE
@@ -338,6 +339,12 @@ struct COMP_KEYBOARD {
   KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
   KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
 };
+
+// TODO-LDML: fill this in
+struct COMP_KEYBOARD_EX {
+  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
+  KMX_DWORD dwKMXPlusSize;  // 0048 size in bytes of entire KMXPlus data
+  };
 
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
 typedef COMP_STORE *PCOMP_STORE;
