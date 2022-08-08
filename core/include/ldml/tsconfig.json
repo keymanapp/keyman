@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "system",
+        "composite": true,
+        "outFile": "keyboardprocessor_ldml.js",
+        "declaration": true
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "keyboardprocessor_ldml.ts"
+    ]
+}

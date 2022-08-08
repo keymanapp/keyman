@@ -39,13 +39,13 @@ fi
 
 if builder_has_action build; then
   # Generate index.ts
-  npx tsc --outDir build/  ldml-const-builder.ts
+  npx tsc -b
 
   builder_report success build
 fi
 
 if builder_has_action run; then
-  node build/tools/ldml-const-builder/ldml-const-builder.js
+  node build/ldml-const-builder.js
 
   builder_report success run
 fi
