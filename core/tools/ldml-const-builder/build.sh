@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Builds the include script for the current Keyman version.
+# Builds /core/include/ldml/keyboardprocessor_ldml.h from /core/include/ldml/keyboardprocessor_ldml.ts
 #
 
 # Exit on command failure and when using unset variables:
@@ -21,19 +21,14 @@ KBP_LDML_H_FILE="../../include/ldml/keyboardprocessor_ldml.h"
 
 ################################ Main script ################################
 
-builder_describe "Build and run the constant builder for LDML" configure clean build run
+builder_describe "Build and run the constant builder for LDML" clean build run
 builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_has_action configure; then
-#   verify_npm_setup
-  builder_report success configure
-fi
 
 if builder_has_action clean; then
-#   npm run clean
   rm -rf ../../include/ldml/build/
   # Not removing ${KBP_LDML_H_FILE} as it is checked in
   builder_report success clean
