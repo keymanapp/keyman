@@ -9,9 +9,10 @@
 //
 // It is not updated automatically.
 
-// namespace com.keyman.core.ldml {
+// TODO-LDML: namespace com.keyman.core.ldml {
     /**
-     * Constants shared between the data access layer and the compiler
+     * Constants for the KMXPlus data format
+     * These are shared between the data access layer and the compiler
      */
     export const constants = {
         /**
@@ -19,10 +20,25 @@
          */
         version: '1.0',
 
+        /**
+         * Section ID for the keybag
+         */
         section_keys: 'keys',
+        /**
+         * Section ID for the locale list
+         */
         section_loca: 'loca',
+        /**
+         * Section ID for the metadata
+         */
         section_meta: 'meta',
+        /**
+         * Section ID for the section header
+         */
         section_sect: 'sect',
+        /**
+         * Section ID for the string table
+         */
         section_strs: 'strs',
 
         /**

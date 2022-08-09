@@ -9,10 +9,15 @@
 #define LDML_META_SETTINGS_FALLBACK_OMIT 1
 #define LDML_META_SETTINGS_TRANSFORMFAILURE_OMIT 2
 #define LDML_META_SETTINGS_TRANSFORMPARTIAL_HIDE 4
+// Section ID
 #define LDML_SECTION_KEYS ((uint32_t)'keys')
+// Section ID
 #define LDML_SECTION_LOCA ((uint32_t)'loca')
+// Section ID
 #define LDML_SECTION_META ((uint32_t)'meta')
+// Section ID
 #define LDML_SECTION_SECT ((uint32_t)'sect')
+// Section ID
 #define LDML_SECTION_STRS ((uint32_t)'strs')
 #define LDML_STRS_FLAGS_EXTEND 1
-#define LDML_VERSION 1.0
+#define LDML_VERSION "1.0"

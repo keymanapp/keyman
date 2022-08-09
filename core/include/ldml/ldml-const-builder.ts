@@ -14,9 +14,14 @@ console.log(`//
 for (const key of keys) {
     const value = constants[key];
     const upkey = key.toUpperCase();
-    if (typeof value === 'string' && value.length === 4) {
+    const type = typeof value;
+    if ((key.indexOf('section_') === 0) && type === 'string' && value.length === 4) {
+        // the 4-char section ID strings get handled specially
+        console.log('// Section ID');
         console.log(`#define LDML_${upkey} ((uint32_t)'${value}')`);
-    } else {
+    } else if (type === 'number') {
         console.log(`#define LDML_${upkey} ${value}`);
+    } else if (type === 'string') {
+        console.log(`#define LDML_${upkey} "${value}"`);
     }
 }
