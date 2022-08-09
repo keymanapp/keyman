@@ -9,6 +9,7 @@
 #include "ldml/ldml_processor.hpp"
 #include "state.hpp"
 #include "../kmx/kmx_file.h"
+#include "ldml/keyboardprocessor_ldml.h"
 
 namespace {
   constexpr km_kbp_attr const engine_attrs = {

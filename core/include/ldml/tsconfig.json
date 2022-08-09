@@ -1,0 +1,17 @@
+{
+    "extends": "../../../tsconfig-base.json",
+    "compilerOptions": {
+        "composite": true,
+        "declaration": true,
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "outDir": "build/",
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "keyboardprocessor_ldml.ts",
+        "ldml-const-builder.ts"
+    ]
+}
