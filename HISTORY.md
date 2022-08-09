@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.45 alpha 2022-08-09
+
+* feat(linux): Replace deprecated distutils (#7051)
+* chore(linux): Adjust Linux source package to restructured code (#7056)
+
 ## 16.0.44 alpha 2022-08-08
 
 * chore(linux): Update debian changelog (#7041)
