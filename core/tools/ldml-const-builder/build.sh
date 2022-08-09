@@ -34,8 +34,8 @@ fi
 
 if builder_has_action clean; then
 #   npm run clean
-  rm -rf ../../include/ldml/build/ ${KBP_LDML_H_FILE}
-  # TODO: clean .h?
+  rm -rf ../../include/ldml/build/
+  # Not removing ${KBP_LDML_H_FILE} as it is checked in
   builder_report success clean
 fi
 

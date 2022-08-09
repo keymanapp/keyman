@@ -1,3 +1,14 @@
+
+// Notice!
+//
+// If you update this file, you *must* be sure to re-run
+//
+//  core/tools/ldml-const-builder/build.sh clean build run
+//
+// To update keyboardprocessor_ldml.h, and commit the result.
+//
+// It is not updated automatically.
+
 // namespace com.keyman.core.ldml {
     /**
      * Constants shared between the data access layer and the compiler
