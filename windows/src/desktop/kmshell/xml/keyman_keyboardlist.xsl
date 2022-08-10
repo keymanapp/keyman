@@ -123,10 +123,6 @@
           </div>
         </div>
 
-
-        <div class="list_expand">
-          <xsl:attribute name="id">list_expand_keyboard_<xsl:value-of select="id"/></xsl:attribute>
-        </div>
         <div style="float:right">
           <div style="float: left; padding: 1px 3px 1px 0px;">
             <a class="hotkey" tabindex="-1">
@@ -275,11 +271,13 @@
             </div>
 
             <div class="keyboard_options grid_col_span_2 grid_item">
-              <xsl:call-template name="button">
-                <xsl:with-param name="caption">Help</xsl:with-param>
-                <xsl:with-param name="command">keyman:keyboardlanguage_install?id=<xsl:value-of select="id"/></xsl:with-param>
-              </xsl:call-template>
 
+              <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
+                <xsl:call-template name="button">
+                  <xsl:with-param name="caption">Help</xsl:with-param>
+                  <xsl:with-param name="command">keyman:package_welcome?id=<xsl:value-of select="$package_id" /></xsl:with-param>
+                </xsl:call-template>
+              </xsl:if>
 
             <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id] and ../../options">
               <xsl:call-template name="button">
@@ -290,13 +288,23 @@
 
               <xsl:call-template name="button">
                 <xsl:with-param name="caption">Disable</xsl:with-param>
-                <xsl:with-param name="command">keyman:keyboardlanguage_install?id=<xsl:value-of select="id"/></xsl:with-param>
+                <xsl:with-param name="id"><xsl:value-of select="id"/></xsl:with-param>
+                <xsl:with-param name="onclick">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
               </xsl:call-template>
-              <xsl:call-template name="button">
-                <xsl:with-param name="caption">Uninstall</xsl:with-param>
-                <xsl:with-param name="command">keyman:keyboardlanguage_install?id=<xsl:value-of select="id"/></xsl:with-param>
-              </xsl:call-template>
-
+              <xsl:choose>
+                <xsl:when test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
+                  <xsl:call-template name="button">
+                    <xsl:with-param name="caption">Uninstall</xsl:with-param>
+                    <xsl:with-param name="command">keyman:package_uninstall?id=<xsl:value-of select="$package_id"/></xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="button">
+                    <xsl:with-param name="caption">Uninstall</xsl:with-param>
+                    <xsl:with-param name="command">keyman:keyboard_uninstall?id=<xsl:value-of select="$id"/></xsl:with-param>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
             </div>
 
           </div> <!---end keyboard details grid container -->

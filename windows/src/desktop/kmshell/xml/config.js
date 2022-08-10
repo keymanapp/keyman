@@ -194,10 +194,28 @@ document.addEventListener("DOMContentLoaded", windowResize);
 
   function list_detail(event,n) {
     var k = document.getElementById('list_'+n);
-    $(k).toggleClass('expanded');
+    //$(k).toggleClass('expanded');
+    list_expanded_selected (k);
     k.focus();
     save_state();
     return false;
+  }
+
+  function list_expanded_selected (n){
+    if(loading_state) return;
+    var keyboards = $('div.list_item');
+    keyboards.each(function(index) {
+      //const name = $(this).data('name');
+      //if(name = n) {
+      if(this.id == n.id){
+        //$(this).addClass('expanded');
+        $(this).toggleClass('expanded');
+      }
+      else
+      {
+        $(this).removeClass('expanded');
+      }
+    });
   }
 
   function more_detail(n) {
@@ -302,6 +320,26 @@ function options_basekeyboard() {
 function keyboard_checkclick(n,toggle) {
   var k = document.getElementById('keyboardcheck_'+n), li = document.getElementById('list_keyboard_'+n);
   if(toggle) k.checked = !k.checked;
+  location.href='keyman:keyboard_clickcheck?id='+n+'&value='+k.checked;
+  var liTitle = document.getElementById('listtitle_keyboard_'+n);
+  liTitle.className = k.checked ? 'list_title keyboard_loaded' : 'list_title keyboard_unloaded';
+  li.focus();
+  return true;
+}
+
+/* Disable/Enable Button replaces checkbox for now still use the "check" function in delphi webserver */
+function keyboard_toggle(n) {
+  var k = document.getElementById('keyboardcheck_'+n), li = document.getElementById('list_keyboard_'+n);
+  var btn = document.getElementById('button_'+n);
+
+  k.checked = !k.checked;
+  if (k.checked){
+    btn.value = "Disable";
+  }
+  else{
+    btn.value = "Enable";
+  }
+
   location.href='keyman:keyboard_clickcheck?id='+n+'&value='+k.checked;
   var liTitle = document.getElementById('listtitle_keyboard_'+n);
   liTitle.className = k.checked ? 'list_title keyboard_loaded' : 'list_title keyboard_unloaded';
