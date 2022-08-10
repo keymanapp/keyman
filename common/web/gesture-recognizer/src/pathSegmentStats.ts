@@ -1,5 +1,5 @@
 namespace com.keyman.osk {
-  export class SegmentStats {
+  export class PathSegmentStats {
     private static TIME_DIST_WEIGHT = .033; // Effect:  33ms ~= 1px distance.
 
     private xLinearSum: number = 0;
@@ -20,6 +20,16 @@ namespace com.keyman.osk {
     private coordArcSum: number = 0;
     private spacetimeArcSum: number = 0;
 
+    private speedLinearSum: number = 0;
+    private speedQuadSum:   number = 0;
+
+    private cosLinearSum:   number = 0;
+    private sinLinearSum:   number = 0;
+    private sinCosCrossSum: number = 0;
+    private cosQuadSum:     number = 0;
+    private sinQuadSum:     number = 0;
+    private arcSampleCount: number = 0;
+
     /**
      * The base sample used to transpose all other received samples.  Use of this helps
      * avoid potential "catastrophic cancellation" effects that can occur when diffing two
@@ -35,34 +45,34 @@ namespace com.keyman.osk {
      */
     private initialSample?: InputSample;
 
-    private lastSample?: InputSample;
+    public lastSample?: InputSample;
     private followingSample?: InputSample;
     private sampleCount = 0;
 
     constructor();
     constructor(sample: InputSample);
-    constructor(instance: SegmentStats);
-    constructor(obj?: InputSample | SegmentStats) {
+    constructor(instance: PathSegmentStats);
+    constructor(obj?: InputSample | PathSegmentStats) {
       if(!obj) {
         return;
       }
 
       // Will worry about JSON form later.
-      if(obj instanceof SegmentStats) {
+      if(obj instanceof PathSegmentStats) {
         Object.assign(this, obj);
       } else if(isAnInputSample(obj)) {
         Object.assign(this, this.unionWith(obj));
       }
     }
 
-    public unionWith(sample: InputSample): SegmentStats {
+    public unionWith(sample: InputSample): PathSegmentStats {
       if(!this.initialSample) {
         this.initialSample = sample;
         this.baseSample = sample;
       } else {
         this.followingSample = sample;
       }
-      const result = new SegmentStats(this);
+      const result = new PathSegmentStats(this);
 
       // Helps prevent "catastrophic cancellation" issues from floating-point computation
       // for these statistical properties and properties based upon them.
@@ -86,18 +96,38 @@ namespace com.keyman.osk {
         // arc length stuff!
         const xDelta = sample.targetX - this.lastSample.targetX;
         const yDelta = sample.targetY - this.lastSample.targetY;
-        const tDeltaInSec = (sample.t - this.lastSample.t) / 1000;
-        const weightedTDelta = (sample.t - this.lastSample.t) * SegmentStats.TIME_DIST_WEIGHT;
+        const tDelta = sample.t       - this.lastSample.t;
+        const tDeltaInSec = tDelta / 1000;
+        const weightedTDelta = tDelta * PathSegmentStats.TIME_DIST_WEIGHT;
 
-        const coordArcSq = xDelta * xDelta + yDelta * yDelta;
+        const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
+        const coordArcDelta = Math.sqrt(coordArcDeltaSq);
 
-        result.coordArcSum     += Math.sqrt(coordArcSq);
-        result.spacetimeArcSum += Math.sqrt(coordArcSq + weightedTDelta * weightedTDelta);
+        result.coordArcSum     += Math.sqrt(coordArcDeltaSq);
+        result.spacetimeArcSum += Math.sqrt(coordArcDeltaSq + weightedTDelta * weightedTDelta);
 
         // Approximates weighting the time spent at each coord by splitting the time since
         // last event evenly for both coordinates.  Note:  does NOT shift based upon .baseSample!
         result.xCentroidSum += 0.5 * tDeltaInSec * (sample.targetX + this.lastSample.targetX);
         result.yCentroidSum += 0.5 * tDeltaInSec * (sample.targetY + this.lastSample.targetY);
+
+        if(xDelta || yDelta) {
+          const cos = -yDelta / coordArcDelta;  // alignment with <0, -1> in the DOM
+          const sin =  xDelta / coordArcDelta;  // alignment with <1,  0> in the DOM
+          result.cosLinearSum   += cos;
+          result.sinLinearSum   += sin;
+
+          result.sinCosCrossSum += sin * cos;
+          result.cosQuadSum     += cos * cos;
+          result.sinQuadSum     += sin * sin;
+
+          result.arcSampleCount += 1;
+        }
+
+        if(tDeltaInSec) {
+          result.speedLinearSum += Math.sqrt(coordArcDeltaSq) / tDeltaInSec;
+          result.speedQuadSum   += coordArcDeltaSq / (tDeltaInSec * tDeltaInSec);
+        }
       }
 
       result.lastSample = sample;
@@ -106,8 +136,8 @@ namespace com.keyman.osk {
       return result;
     }
 
-    public withoutPrefixSubset(subsetStats: SegmentStats): SegmentStats {
-      const result = new SegmentStats(this);
+    public withoutPrefixSubset(subsetStats: PathSegmentStats): PathSegmentStats {
+      const result = new PathSegmentStats(this);
 
       if(!subsetStats.followingSample || !subsetStats.lastSample) {
         throw 'Invalid argument:  stats missing necessary tracking variable.';
@@ -129,7 +159,9 @@ namespace com.keyman.osk {
       if(subsetStats.followingSample && subsetStats.lastSample) {
         const xDelta = subsetStats.followingSample.targetX - subsetStats.lastSample.targetX;
         const yDelta = subsetStats.followingSample.targetY - subsetStats.lastSample.targetY;
-        const tDelta = (subsetStats.followingSample.t - subsetStats.lastSample.t) * SegmentStats.TIME_DIST_WEIGHT;
+        const tDelta = subsetStats.followingSample.t       - subsetStats.lastSample.t;
+        const weightedTDelta = tDelta * PathSegmentStats.TIME_DIST_WEIGHT;
+        const tDeltaInSec = tDelta / 1000;
 
         const coordArcSq = xDelta * xDelta + yDelta * yDelta;
 
@@ -138,16 +170,31 @@ namespace com.keyman.osk {
         // 'remaining' subset (operand 1 below) before the portion wholly within what remains (the result)
         result.coordArcSum     -= Math.sqrt(coordArcSq);
         result.coordArcSum     -= subsetStats.coordArcSum;
-        result.spacetimeArcSum -= Math.sqrt(coordArcSq + tDelta * tDelta);
+        result.spacetimeArcSum -= Math.sqrt(coordArcSq + weightedTDelta * weightedTDelta);
         result.spacetimeArcSum -= subsetStats.spacetimeArcSum;
 
         // Centroid sum management!
-        const tDeltaInMs = (subsetStats.followingSample.t - subsetStats.lastSample.t) / 1000;
         // Same reasoning pattern as for the 'arc length stuff'.
-        result.xCentroidSum -= 0.5 * tDeltaInMs * (subsetStats.followingSample.targetX + subsetStats.lastSample.targetX)
+        result.xCentroidSum -= 0.5 * tDeltaInSec * (subsetStats.followingSample.targetX + subsetStats.lastSample.targetX)
         result.xCentroidSum -= subsetStats.xCentroidSum;
-        result.yCentroidSum -= 0.5 * tDeltaInMs * (subsetStats.followingSample.targetY + subsetStats.lastSample.targetY)
+        result.yCentroidSum -= 0.5 * tDeltaInSec * (subsetStats.followingSample.targetY + subsetStats.lastSample.targetY)
         result.yCentroidSum -= subsetStats.yCentroidSum;
+
+        result.cosLinearSum   -= subsetStats.cosLinearSum;
+        result.sinLinearSum   -= subsetStats.sinLinearSum;
+        result.sinCosCrossSum -= subsetStats.sinCosCrossSum;
+        result.sinQuadSum     -= subsetStats.sinQuadSum;
+        result.cosQuadSum     -= subsetStats.cosQuadSum;
+
+        result.arcSampleCount -= subsetStats.arcSampleCount;
+
+        result.speedLinearSum -= subsetStats.speedLinearSum;
+        result.speedQuadSum   -= subsetStats.speedQuadSum;
+
+        if(tDeltaInSec) {
+          result.speedLinearSum -= Math.sqrt(coordArcSq) / tDeltaInSec;
+          result.speedQuadSum   -= coordArcSq / (tDeltaInSec * tDeltaInSec);
+        }
       }
 
       result.sampleCount -= subsetStats.sampleCount;
@@ -312,25 +359,81 @@ namespace com.keyman.osk {
     // px per s.
     public get speed() {
       // this.duration is already in seconds, not milliseconds.
-      return this.duration ? this.directDistance / this.duration : 0;
+      return this.duration ? this.directDistance / this.duration : Number.NaN;
+    }
+
+    // ... may not be "right".
+    public get speedMean() {
+      return this.speedLinearSum / (this.sampleCount-1);
+    }
+
+    public get speedVariance() {
+      return this.speedQuadSum / (this.sampleCount-1) - (this.speedMean * this.speedMean);
+    }
+
+    public get sinVariance() {
+      const sinMean = this.sinLinearSum / this.arcSampleCount;
+      return this.sinQuadSum / (this.arcSampleCount) - sinMean * sinMean;
+    }
+
+    public get cosVariance() {
+      const cosMean = this.cosLinearSum / this.arcSampleCount;
+      return this.cosQuadSum / this.arcSampleCount - cosMean * cosMean;
+    }
+
+    public get angleMean() {
+      if(this.arcSampleCount == 0) {
+        return Number.NaN;
+      }
+      // Neato reference: https://rosettacode.org/wiki/Averages/Mean_angle
+      // But we don't actually need to divide by sample count; `atan2` handles that!
+      const sinMean = this.sinLinearSum / this.arcSampleCount;
+      const cosMean = this.cosLinearSum / this.arcSampleCount;
+
+      let angle = Math.atan2(sinMean, cosMean);  // result:  on the interval (-pi, pi]
+      // Convert to [0, 2*pi).
+      if(angle < 0) {
+        angle = angle + 2 * Math.PI;
+      }
+
+      return angle;
+    }
+
+    // Based on https://www.ebi.ac.uk/thornton-srv/software/PROCHECK/nmr_manual/man_cv.html
+    public get angleVariance() {
+      if(this.arcSampleCount == 0) {
+        return Number.NaN;
+      }
+      const rSquared = this.cosLinearSum * this.cosLinearSum + this.sinLinearSum * this.sinLinearSum;
+      return 1 - (rSquared / (this.arcSampleCount * this.arcSampleCount));
     }
 
     public toJSON() {
+      // return {
+      //   xtCorrelation:     this.xtCorrelation,
+      //   ytCorrelation:     this.ytCorrelation,
+      //   xyCorrelation:     this.xyCorrelation,
+      //   directnessRatio:   this.directnessRatio,
+      //   directDistance:    this.directDistance,
+      //   movementRatio:     this.movementRatio,
+      //   angle:             this.angle,
+      //   speed:             this.speed,
+      //   cardinalDirection: this.cardinalDirection,
+      //   centroid:          this.centroid,
+      //   duration:          this.duration,
+      //   // Probably doesn't need to be reported in the long run, but useful while we're still nailing down the math & such.
+      //   sampleMean:        {x: this.baseSample.targetX + this.xSampleMean, y: this.baseSample.targetY + this.ySampleMean}
+      // };
       return {
-        xtCorrelation:     this.xtCorrelation,
-        ytCorrelation:     this.ytCorrelation,
-        xyCorrelation:     this.xyCorrelation,
-        directnessRatio:   this.directnessRatio,
-        directDistance:    this.directDistance,
-        movementRatio:     this.movementRatio,
-        angle:             this.angle,
-        speed:             this.speed,
-        cardinalDirection: this.cardinalDirection,
-        centroid:          this.centroid,
-        duration:          this.duration,
-        // Probably doesn't need to be reported in the long run, but useful while we're still nailing down the math & such.
-        sampleMean:        {x: this.baseSample.targetX + this.xSampleMean, y: this.baseSample.targetY + this.ySampleMean}
-      };
+        angleMean: this.angleMean,
+        angleVariance: this.angleVariance,
+        speedMean: this.speedMean,
+        speedVariance: this.speedVariance,
+        coordArcSum: this.coordArcSum,
+        asTheBirdFlies: this.directDistance,
+        duration: this.duration,
+        sampleCount: this.sampleCount
+      }
     }
   }
 

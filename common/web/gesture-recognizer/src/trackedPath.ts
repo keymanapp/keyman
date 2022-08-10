@@ -36,7 +36,9 @@ namespace com.keyman.osk {
    */
   export class TrackedPath extends EventEmitter<EventMap> {
     private samples: InputSample[] = [];
-    private _segments: Segment[] = [new Segment()];
+    private _segments: Segment[] = [];
+
+    private segmenter = new PathSegmenter();
 
     private _isComplete: boolean = false;
     private wasCancelled?: boolean;
@@ -82,7 +84,7 @@ namespace com.keyman.osk {
       }
 
       this.samples.push(sample);
-      this.segments[0].add(sample);
+      this.segmenter.add(sample);
       this.emit('step', sample);
     }
 
@@ -96,6 +98,7 @@ namespace com.keyman.osk {
       }
       this.wasCancelled = cancel;
       this._isComplete = true;
+      this.segmenter.close();
 
       if(cancel) {
         this.emit('invalidated');
