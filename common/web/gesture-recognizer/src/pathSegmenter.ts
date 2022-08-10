@@ -17,6 +17,10 @@ namespace com.keyman.osk {
     // But until resolved, we probably want to keep an array.
     private _stats: PathSegmentStats[];
 
+    // Currently used as an in-development diagnostic assist... but these
+    // directly represent actual path segments as produced by the prototype
+    // algorithm.  Just... the stats analysis of the path segment, without
+    // obvious / public members to relevant coordinates.
     private _protoSegments: PathSegmentStats[] = [];
 
     private repeatTimer: number | NodeJS.Timeout;
@@ -81,14 +85,14 @@ namespace com.keyman.osk {
       let preWindowEnd = 0;
       // Do not consider the just-added `extendedStats` entry.
       for(let i = this.stats.length-2; i >=0 ; i--) {
-        if(this.stats[i].lastSample.t + this.SLIDING_WINDOW_INTERVAL < sample.t) {
+        if(this.stats[i].lastTimestamp + this.SLIDING_WINDOW_INTERVAL < sample.t) {
           preWindowEnd = i;
           break;
         }
       }
 
       // Do not consider segmenting before at least two samples exist before the current
-      // sliding time window.  (At least two samples are needed for 'over time'
+      // sliding time window.  (A minimum of two samples are needed for 'over time'
       // properties to have a chance at becoming 'defined'.)
       //console.log(sample);
       if(preWindowEnd > 0) {
@@ -105,9 +109,7 @@ namespace com.keyman.osk {
         }
 
         // Run a comparison on various stats of the two.
-
-        // FIXME:  VERY temp logging.
-        if(preCandidate.duration * 1000 >= this.SLIDING_WINDOW_INTERVAL /* / 2000*/) {
+        if(preCandidate.duration * 1000 >= this.SLIDING_WINDOW_INTERVAL) { // sec vs millisec.
           let performSegmentation = false;
 
           let angleSplitVariance = preCandidate.angleVariance + postCandidate.angleVariance;
@@ -143,6 +145,9 @@ namespace com.keyman.osk {
           // Hmm.  Perhaps this should only serve as the "okay, let's segment" trigger... to then
           // find the BEST segmentation.
 
+          // FIXME: DO NOT RELEASE.
+          // This is exploratory / diagnostic code assisting development of the path segmentation
+          // algorithm.
           if(performSegmentation) {
             console.log("------------------------------------------------------------------");
           }
@@ -165,16 +170,18 @@ namespace com.keyman.osk {
 
             console.log();
 
-            this._stats = this._stats.slice(preWindowEnd+1);
+            this._stats = this._stats.slice(preWindowEnd+1);  // DO release this line.
             console.log("Dropped samples: " + (preWindowEnd+1));
             console.log("Remaining samples: " + this._stats.length);
 
             console.log("Prototype segment: ");
             console.log(preCandidate);
-            this._protoSegments.push(preCandidate);
-            this.choppedStats = cumulativePreCandidate;
 
             console.log("------------------------------------------------------------------");
+            // END:  DO NOT RELEASE.
+
+            this._protoSegments.push(preCandidate);
+            this.choppedStats = cumulativePreCandidate;
           }
         }
       }
