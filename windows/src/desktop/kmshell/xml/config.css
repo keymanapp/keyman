@@ -197,9 +197,7 @@ html
 }
 
 /* List Styles */
-.list
-{
-}
+
 .list_packageitem
 {
   display: block;
@@ -250,26 +248,32 @@ html
 }
 .list_detail
 {
-  background: #f0f0ff;
+  /*background: #f0f0ff;*/
+  background: #ffffff;
+  /*border: solid 1px #79c3da;*/
   clear: both;
   font-size: 11px;
-  margin: 1px;
   display: none;
 }
 
+.check_box_invisible
+{
+  display: none;
+}
+/*
 .list_detail > table > tbody > tr > td
 {
   border: solid 1px #79c3da;
   vertical-align: top;
 }
-
+*/
 
 .list_item.expanded .list_detail
 {
   display: block;
 }
 
-
+/*
 .list_help
 {
   float: right;
@@ -290,17 +294,17 @@ html
   height: 20px;
   margin: 2px 4px 0 0;
 }
-
+*/
 .list_item:hover
 {
   background: #79c3da;
 }
-
+/*
 .expanded .list_close
 {
   visibility: visible;
 }
-
+*/
 table tr
 {
   text-align: left;
@@ -426,7 +430,10 @@ table tr
 
 .flex-item-qr
 {
+  padding-right: 20px;
   width: 128px;
+  font-size: 11px;
+
 }
 
 
@@ -434,6 +441,7 @@ table tr
   display: grid;
   position: relative;
   grid-template-columns: max-content 250px;
+  padding: 1px;
 }
 
 .grid_item
@@ -444,6 +452,7 @@ table tr
   margin: 0px;
   padding: 5px;
   background: #ffffff;
+  /*background: #f0f0ff;*/
 }
 
 .grid_debug_text::before
@@ -1128,6 +1137,6 @@ th
 .qrcode .qrcode-caption {
   display: block;
   white-space: normal;
-  font-size: 12pt;
+  font-size: 8pt;
   padding: 8px;
 }

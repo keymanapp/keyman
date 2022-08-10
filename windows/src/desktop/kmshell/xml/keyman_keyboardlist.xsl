@@ -98,12 +98,14 @@
           list_title <xsl:choose><xsl:when test='loaded'>keyboard_loaded</xsl:when><xsl:otherwise>keyboard_unloaded</xsl:otherwise></xsl:choose>
         </xsl:attribute>
         <div style="float:left; margin-top: 3px;">
+          <div class="check_box_invisible">
           <input type='checkbox'>
             <xsl:attribute name="id">keyboardcheck_<xsl:value-of select="id"/></xsl:attribute>
             <xsl:attribute name='onmousedown'>event.stopPropagation();return false;</xsl:attribute>
             <xsl:attribute name='onclick'>return keyboard_checkclick('<xsl:value-of select="$id"/>');</xsl:attribute>
             <xsl:if test='loaded'><xsl:attribute name='checked'>checked</xsl:attribute></xsl:if>
           </input>
+          </div>
           <div class="list_icon">
             <img style="width: 16px; height:16px;">
               <xsl:choose>
@@ -270,7 +272,7 @@
               More
             </div>
 
-            <div class="keyboard_options grid_col_span_2 grid_item">
+            <div class="grid_col_span_2 grid_item">
 
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
                 <xsl:call-template name="button">
@@ -318,7 +320,8 @@
               <div class='qrcode-caption'>
                 <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>
                 <a>
-                  <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
+                  <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share  </xsl:attribute>
+                  &#x0020;
                   <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_Link']"/>
                 </a>
                 <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_LinkSuffix']"/>
