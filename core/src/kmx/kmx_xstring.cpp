@@ -12,17 +12,6 @@
 using namespace km::kbp;
 using namespace kmx;
 
-
-const km_kbp_cp * u16ncat(km_kbp_cp *dst, const km_kbp_cp *src, size_t max) {
-  km_kbp_cp* o = dst;
-  dst = dst + max;
-  while (*src) {
-    *dst++ = *src++;
-  }
-  *dst = 0;
-  return o;
-}
-
 const km_kbp_cp *km::kbp::kmx::u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   while (*p) {
     if (*p == ch) return p;

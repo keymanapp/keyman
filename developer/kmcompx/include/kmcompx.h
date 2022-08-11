@@ -4,16 +4,6 @@
 #pragma once
 #include <stdint.h>
 
-//#include "keyman/keyboardprocessor.h"
-//#include "keyman/keyboardprocessor_bits.h"
-
-
-#include "../../src/kmcmpdll/keyman/keyboardprocessor.h"
-#include "../../src/kmcmpdll/keyman/keyboardprocessor_bits.h"
-
-
-
-
 // typedef:old ->new
 typedef uint32_t            KMX_DWORD;
 typedef uint32_t            KMX_UINT;
@@ -22,7 +12,7 @@ typedef uint8_t             KMX_BYTE;
 typedef int32_t             KMX_BOOL;
 typedef int                 INT_PKMX;
 typedef char                KMX_CHAR;
-//typedef char16_t          km_kbp_cp
+typedef char16_t            km_kbp_cp;
 typedef km_kbp_cp           KMX_WCHAR;    // wc,   16-bit UNICODE character -> char16_t
 typedef wchar_t             KMX_WCHART;    // wc,   16-bit UNICODE character-> wchar_t
 
