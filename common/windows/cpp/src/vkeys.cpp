@@ -17,11 +17,18 @@
 */
 
 #include "pch.h"
-//#include "../../../../developer/kmcompx/include/pch.h"
 
+#ifdef USE_CHAR16_T
 #define lpuch(x) u ## x
+typedef  char16_t KMX_UCHAR;
+#else
+#define lpuch(x) L ## x
+typedef  wchar_t KMX_UCHAR;
+#endif
 
- const char16_t* KMX_VKeyNames[256] = { 
+typedef KMX_UCHAR* KMX_PUCHAR;
+
+ const KMX_UCHAR* KMX_VKeyNames[256] = { 
 // Key Codes
   lpuch("K_?00"),				// &H0
   lpuch("K_LBUTTON"),			// &H1
@@ -293,7 +300,9 @@
   lpuch("K_?FF")				// &HFF
   };
 
- const char16_t* KMX_VKeyISO9995Names[256] = {
+
+
+ const KMX_UCHAR* KMX_VKeyISO9995Names[256] = {
   // Key Codes
   lpuch(""), // lpuch("K_?00"),				// &H0
   lpuch(""), // lpuch("K_LBUTTON"),			// &H1
