@@ -99,7 +99,8 @@ ldml_processor::process_event(
   km_kbp_state *state,
   km_kbp_virtual_key vk,
   uint16_t _kmn_unused(modifier_state),
-  uint8_t is_key_down
+  uint8_t is_key_down,
+  uint16_t /*event_flags*/ // TODO-LDML: unused... for now...
 ) {
   assert(state);
   if (!state)

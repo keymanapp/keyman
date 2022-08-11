@@ -190,7 +190,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     }
 
     for (auto key_down = 1; key_down >= 0; key_down--) {
-      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down));
+      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, 0)); // TODO-LDML: for now. Should send touch and hardware events.
 
       for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
         apply_action(test_state, *act, text_store, test_context, test_source);
