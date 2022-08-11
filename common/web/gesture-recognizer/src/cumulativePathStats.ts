@@ -206,7 +206,7 @@ namespace com.keyman.osk {
       }
     }
 
-    public get directDistance() {
+    public get netDistance() {
       // No issue with a net distance of 0 due to a single point.
       if(!this.lastSample || !this.initialSample) {
         return Number.NaN;
@@ -233,14 +233,14 @@ namespace com.keyman.osk {
     public get angle() {
       if(this.sampleCount == 1 || !this.lastSample || !this.initialSample) {
         return Number.NaN;
-      } else if(this.directDistance < 1) {
+      } else if(this.netDistance < 1) {
         // < 1 px, thus sub-pixel, means we have nothing relevant enough to base an angle on.
         return Number.NaN;
       }
 
       const xDelta = this.lastSample.targetX - this.initialSample.targetX;
       const yDelta = this.lastSample.targetY - this.initialSample.targetY;
-      const yAngleDiff = Math.acos(-yDelta / this.directDistance);
+      const yAngleDiff = Math.acos(-yDelta / this.netDistance);
 
       return xDelta < 0 ? (2 * Math.PI - yAngleDiff) : yAngleDiff;
     }
@@ -269,7 +269,7 @@ namespace com.keyman.osk {
     // px per s.
     public get speed() {
       // this.duration is already in seconds, not milliseconds.
-      return this.duration ? this.directDistance / this.duration : Number.NaN;
+      return this.duration ? this.netDistance / this.duration : Number.NaN;
     }
 
     // ... may not be "right".
@@ -344,6 +344,25 @@ namespace com.keyman.osk {
       return Math.sqrt(-Math.log(this.angleRSquared));
     }
 
+    public get rawDistance() {
+      return this.coordArcSum;
+    }
+
+    public get maxEndpointDistanceFromCentroid() {
+      if(!this.initialSample || !this.lastSample) {
+        return 0;
+      }
+
+      const centroid = this.centroid;
+      const startXDist = centroid.x - this.initialSample.targetX;
+      const startYDist = centroid.y - this.initialSample.targetY;
+      const endXDist   = this.lastSample.targetX - centroid.x;
+      const endYDist   = this.lastSample.targetY - centroid.y;
+
+      return Math.sqrt(Math.max(startXDist * startXDist + startYDist * startYDist,
+                                endXDist   * endXDist   + endYDist   * endYDist));
+    }
+
     // TODO:  is this actually ideal?  This was certainly useful for experimentation via interactive
     // debugging, but it may not be the best thing long-term.
     public toJSON() {
@@ -353,7 +372,9 @@ namespace com.keyman.osk {
         angleDeviation: this.angleDeviation,
         speedMean: this.speedMean,
         speedVariance: this.speedVariance,
-        coordArcSum: this.coordArcSum,
+        rawDistance: this.rawDistance,
+        netDistance: this.netDistance,
+        distanceFromCentroid: this.maxEndpointDistanceFromCentroid,
         duration: this.duration,
         sampleCount: this.sampleCount
       }

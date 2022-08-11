@@ -8,11 +8,14 @@ namespace com.keyman.osk {
     readonly post:  CumulativePathStats;
     readonly union: CumulativePathStats;
     readonly chopPoint: CumulativePathStats;
+    readonly baseChop:  CumulativePathStats;
 
     constructor(steppedStats: CumulativePathStats[],
                 choppedStats: CumulativePathStats,
                 splitIndex: number) {
+      this.baseChop  = choppedStats;
       this.chopPoint = steppedStats[splitIndex];
+
       this.pre       = steppedStats[splitIndex].deaccumulate(choppedStats);
 
       // Keep stats value components based on the final point of the 'pre' segment.
@@ -89,6 +92,8 @@ namespace com.keyman.osk {
      */
     private steppedCumulativeStats: CumulativePathStats[];
 
+    private lingeringSubsegmentations: PotentialSegmentation[];
+
     // Currently used as an in-development diagnostic assist... but these
     // directly represent actual path segments as produced by the prototype
     // algorithm.  Just... the stats analysis of the path segment, without
@@ -118,6 +123,7 @@ namespace com.keyman.osk {
 
     constructor() {
       this.steppedCumulativeStats = [];
+      this.lingeringSubsegmentations = [];
     }
 
     public add(sample: InputSample) {
@@ -146,14 +152,16 @@ namespace com.keyman.osk {
       clearInterval(this.repeatTimer);
       this.repeatTimer = null;
 
-      let intervalStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length-1];
-      if(this.choppedStats) {
-        intervalStats = intervalStats.deaccumulate(this.choppedStats);
-      }
-      this._protoSegments.push(intervalStats);
+      // The way things are structured, finalization.pre = final segment.  It's some happy
+      // 'fallout' from the implementation's design.
+      let finalization = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, this.steppedCumulativeStats.length-1);
+
+      this.filterSubsegmentation(finalization, true); // forces out the final segment.
+                                                      // Hacky, but "enough" for now.
 
       // FIXME:  temporary statement to facilitate exploration, experimentation, & debugging
       console.log(this._protoSegments);
+      console.log(this._protoSegments.map((val) => (val.toJSON())));
     }
 
     private observe(sample: InputSample, timeDelta: number) {
@@ -278,16 +286,69 @@ namespace com.keyman.osk {
         } while(true);
       }
 
+      // First phase of segmentation:  complete!
+
+      // But... there are some cases where we want to prevent segmentation from fully happening.
+      // TODO:  That.
+
       // FIXME: DO NOT RELEASE.
       // This is exploratory / diagnostic code assisting development of the path segmentation
       // algorithm.
       this._debugLogSegmentationReport(candidateSplit);
       // END:  DO NOT RELEASE.
 
-      this.steppedCumulativeStats = this.steppedCumulativeStats.slice(splitPoint+1);  // DO release this line.
-
-      this._protoSegments.push(candidateSplit.pre);
+      this.steppedCumulativeStats = this.steppedCumulativeStats.slice(splitPoint);
       this.choppedStats = candidateSplit.chopPoint;
+
+      this.filterSubsegmentation(candidateSplit);
+    }
+
+    // NOTE:  This function, as well as code called by it, are still very much still in prototyping.
+    private filterSubsegmentation(subsegmentation: PotentialSegmentation, force?: boolean) {
+      force = !!force;
+      const mergeSubsegmentations = function(array: PotentialSegmentation[]) {
+        if(array.length == 1) {
+          return array[0].pre; // It's pre-calculated, so just use it.
+        } else {
+          const finalSubsegmentation = array[array.length-1];
+          return finalSubsegmentation.chopPoint.deaccumulate(array[0].baseChop);
+        }
+      }
+
+      if(this.lingeringSubsegmentations.length) {
+        // First:  check if the newly-finished subsegment should be merged with the lingering ones.
+        const lastSubsegment = this.lingeringSubsegmentations[this.lingeringSubsegmentations.length-1];
+
+        if(!PathSegmenter.shouldMergeSubsegments(lastSubsegment.pre, subsegmentation.pre)) {
+          // Emit as separate subsegment.
+          const finishedSegment = mergeSubsegmentations(this.lingeringSubsegmentations);
+          this._protoSegments.push(finishedSegment);
+          this.lingeringSubsegmentations = [];
+
+          // IN DEVELOPMENT:  does this happen much?  If so... maybe we need intervening checks to pre-filter even
+          // if not segmenting.
+          console.warn("Did not merge a lingering subsegment with the incoming one!");
+        } else {
+          console.log("Will merge in old subsegments!");
+        }
+      }
+
+      if(!force && PathSegmenter.shouldMergeSubsegments(subsegmentation.pre, subsegmentation.post)) {
+        this.lingeringSubsegmentations.push(subsegmentation);
+      } else {
+        // Merge all as a completed segment!
+        const finishedSegment = mergeSubsegmentations([...this.lingeringSubsegmentations, subsegmentation]);
+        this._protoSegments.push(finishedSegment);
+      }
+    }
+
+    private static shouldMergeSubsegments(segment1: CumulativePathStats, segment2: CumulativePathStats): boolean {
+      // Known case #1:
+      //   Almost identical direction, but heavy speed variance.
+      //   Speed's still high enough to not be a 'wait'.
+      // Known case #2:
+      //   Low-speed pivot; angle change caught on very low velocity for both subsegments.
+      return false;
     }
   }
 }
