@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <assert.h>
 
+#define USE_CHAR16_T
 #include "../../kmcompx/include/kmx_file.h"         //_S2 
 #include "kmx_u16.h"                                //_S2 
 
