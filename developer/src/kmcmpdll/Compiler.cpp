@@ -2672,7 +2672,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           {
             for (i = 0; i <= VK__MAX; i++)
             {
-              if (u16icmp(vkname, KMX_VKeyNames[i]) == 0 || u16icmp(vkname, KMX_VKeyISO9995Names[i]) == 0)
+              if (u16icmp(vkname, VKeyNames[i]) == 0 || u16icmp(vkname, VKeyISO9995Names[i]) == 0)
                 break;
             }
           }
@@ -3298,7 +3298,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
     j = (int)(INT_PTR)(r - q);
 
     for (i = 0; i <= VK__MAX; i++)  // I3438
-      if (j == (int) u16len(KMX_VKeyNames[i]) && u16ncmp(q, KMX_VKeyNames[i], j) == 0) break;
+      if (j == (int) u16len(VKeyNames[i]) && u16ncmp(q, VKeyNames[i], j) == 0) break;
       // _S2 if (j == (int)wcslen(KMX_VKeyNames[i]) && _wcsnicmp(q, KMX_VKeyNames[i], j) == 0) break;
 
     if (i == VK__MAX + 1) return CERR_InvalidToken;  // I3438

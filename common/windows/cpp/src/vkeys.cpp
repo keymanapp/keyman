@@ -28,7 +28,7 @@ typedef  wchar_t KMX_UCHAR;
 
 typedef KMX_UCHAR* KMX_PUCHAR;
 
- const KMX_UCHAR* KMX_VKeyNames[256] = { 
+ const KMX_UCHAR* VKeyNames[256] = { 
 // Key Codes
   lpuch("K_?00"),				// &H0
   lpuch("K_LBUTTON"),			// &H1
@@ -302,7 +302,7 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 
 
 
- const KMX_UCHAR* KMX_VKeyISO9995Names[256] = {
+ const KMX_UCHAR* VKeyISO9995Names[256] = {
   // Key Codes
   lpuch(""), // lpuch("K_?00"),				// &H0
   lpuch(""), // lpuch("K_LBUTTON"),			// &H1

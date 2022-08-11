@@ -1,6 +1,15 @@
 #pragma once
 
-extern  const char16_t* KMX_VKeyNames[256];
-extern  const char16_t* KMX_VKeyISO9995Names[256];
+#ifdef USE_CHAR16_T
+#define lpuch(x) u ## x
+typedef  char16_t KMX_UCHAR;
+#else
+#define lpuch(x) L ## x
+typedef  wchar_t KMX_UCHAR;
+#endif
 
-extern  const wchar_t* VKeyNames[256];
+typedef KMX_UCHAR* KMX_PUCHAR;
+
+extern  const KMX_UCHAR* VKeyNames[256];
+extern  const KMX_UCHAR* VKeyISO9995Names[256];
+
