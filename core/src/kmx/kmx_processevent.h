@@ -1,6 +1,9 @@
 
 #pragma once
 
+#define KMN_KBP
+#define USE_CHAR16_T
+
 #include <assert.h>
 #include <string>
 #include <string.h>

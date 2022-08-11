@@ -59,4 +59,6 @@
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_import_flag)
 #endif
 
+#define KMN_KBP
+#define USE_CHAR16_T
 #include <km_types.h>

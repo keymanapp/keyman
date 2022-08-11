@@ -4,6 +4,9 @@
  * Keyman Core - KMX Extended String unit tests
  */
 
+#define KMN_KBP
+#define USE_CHAR16_T
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
