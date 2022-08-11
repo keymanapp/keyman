@@ -130,24 +130,9 @@
 
 // include cpp ??????!!!!
 //#include "../../../../developer/kmcompx/include/kmx_u16.cpp"
-//#include "kmx_u16.h"
-#include "kmx_u16.cpp"
+#include "kmx_u16.h"
+//#include "kmx_u16.cpp"
 
-
-#include"abc.h"
-
-bool myfun22(int s)
-{
-  bool retVal = true;
-  if (s==3) 
-    return retVal;
-  else return !retVal;
-}
-
-//#include"abc.cpp"
-//bool retVal27=myfun(44);
-bool ret22 = myfun22(44);
-/**/
 
 
 // _S2 --why do I need to define those functions here? -------------------------------------------------------------------------------- 
@@ -171,11 +156,11 @@ PKMX_WCHAR incxstr_S2(PKMX_WCHAR p) {
     return p + 1;
   }
 
-  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE_S2_[*(p + 1)] == -1) {
+  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
     return p + 1;
   }
 
-  int deltaptr = 2 + CODE__SIZE_S2_[*(p + 1)];
+  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
 
   // check for \0 between UC_SENTINEL(FFFF) and next printable character
   for (int i = 0; i < deltaptr; i++) {
@@ -222,7 +207,7 @@ PKMX_WCHAR decxstr_S2(PKMX_WCHAR p, PKMX_WCHAR pStart)
   q = p;
   for (int i = 0; i < CODE__SIZE_MAX && q >= pStart; i++, q--) {
     //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
-    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE_S2_[*(q + 1)] + 1 == i)
+    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
       return q;
   }
 
@@ -1134,8 +1119,8 @@ KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
   if ((msg = ExpandCapsRulesForGroup(fk, gp)) != CERR_None) return msg;
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), cmpkeys);
 
-  // _S2_return VerifyUnreachableRules(gp);
-   return CERR_None;
+  return VerifyUnreachableRules(gp);
+  // _S2_ return CERR_None;
 }
 
 /***************************************
