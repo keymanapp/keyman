@@ -123,8 +123,14 @@ namespace com.keyman.osk {
      *                    from this instance's current accumulation.
      * @returns
      */
-    public deaccumulate(subsetStats: CumulativePathStats): CumulativePathStats {
+    public deaccumulate(subsetStats?: CumulativePathStats): CumulativePathStats {
       const result = new CumulativePathStats(this);
+
+      // We actually WILL accept a `null` argument; makes some of the segmentation
+      // logic simpler.
+      if(!subsetStats) {
+        return result;
+      }
 
       if(!subsetStats.followingSample || !subsetStats.lastSample) {
         throw 'Invalid argument:  stats missing necessary tracking variable.';

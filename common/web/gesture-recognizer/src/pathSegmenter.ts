@@ -1,6 +1,44 @@
 /// <reference path="cumulativePathStats.ts" />
 
 namespace com.keyman.osk {
+  class PotentialSegmentation {
+    readonly pre:   CumulativePathStats;
+    readonly post:  CumulativePathStats;
+    readonly union: CumulativePathStats;
+    readonly chopPoint: CumulativePathStats;
+
+    constructor(steppedStats: CumulativePathStats[],
+                choppedStats: CumulativePathStats,
+                splitIndex: number) {
+      this.chopPoint = steppedStats[splitIndex];
+      this.pre       = steppedStats[splitIndex].deaccumulate(choppedStats);
+
+      // Keep stats value components based on the final point of the 'pre' segment.
+      const finalStats = steppedStats[steppedStats.length-1];
+      this.post      = finalStats.deaccumulate(steppedStats[splitIndex-1]);
+      this.union     = finalStats.deaccumulate(choppedStats);
+    }
+
+    // Note:  circular variance is defined separately from circular std. deviation.
+    // They _are_ close, though.  But which is "best" to use here?
+    // Even if sourced differently, the best initial guess is to compare variance
+    // to variance.
+    //
+    // Also note that if there is no motion in either segmentation candidate, angleVariance
+    // is undefined, thus NaN, mathematically.  Practically... no angle = no variance.
+    public get angleVarianceRatio() {
+      const preVariance  = (isNaN(this.pre.angleVariance)  ? 0 :  this.pre.angleVariance);
+      const postVariance = (isNaN(this.post.angleVariance) ? 0 : this.post.angleVariance);
+
+      return this.union.angleVariance / (preVariance + postVariance);
+    }
+
+    public get speedVarianceRatio() {
+      const splitVariance = this.pre.speedVariance + this.post.speedVariance;
+      return this.union.speedVariance / splitVariance;
+    }
+  }
+
   export class PathSegmenter {
     /**
      * The minimum amount of time (in ms) to wait between sample repetitions
@@ -84,6 +122,9 @@ namespace com.keyman.osk {
         intervalStats = intervalStats.deaccumulate(this.choppedStats);
       }
       this._protoSegments.push(intervalStats);
+
+      // FIXME:  temporary statement to facilitate exploration, experimentation, & debugging
+      console.log(this._protoSegments);
     }
 
     private observe(sample: InputSample, timeDelta: number) {
@@ -99,10 +140,47 @@ namespace com.keyman.osk {
       const extendedStats = cumulativeStats.extend(sample);
       this.steppedCumulativeStats.push(extendedStats);
 
+      this.attemptSegmentation();
+    }
+
+    private _debugLogSegmentationReport(candidateSplit: PotentialSegmentation) {
+      console.log("------------------------------------------------------------------");
+
+      console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
+      console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
+
+      console.log("Combined: ");
+      console.log(candidateSplit.union.toJSON());
+      console.log(candidateSplit.union);
+      console.log("Pre: ")
+      console.log(candidateSplit.pre.toJSON());
+      console.log(candidateSplit.pre);
+      console.log("Post: ");
+      console.log(candidateSplit.post.toJSON());
+      console.log(candidateSplit.post);
+      console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
+      console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
+
+      console.log();
+
+      console.log("Prototype segment: ");
+      console.log(candidateSplit.pre);
+
+      console.log("------------------------------------------------------------------");
+        // END:  DO NOT RELEASE.
+    }
+
+    private attemptSegmentation() {
+      const extendedStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length - 1];
       let preWindowEnd = 0;
       // Do not consider the just-added `extendedStats` entry.
-      for(let i = this.steppedCumulativeStats.length-2; i >=0 ; i--) {
-        if(this.steppedCumulativeStats[i].lastTimestamp + this.SLIDING_WINDOW_INTERVAL < sample.t) {
+      //
+      // Note:  even if we do reconsider the segmentation point... I don't think we
+      // should reconsider anything earlier than where this marker falls.
+      //
+      // If we didn't segment earlier before, why would we suddenly do so now?
+      for(let i = this.steppedCumulativeStats.length-2; i >=0; i--) {
+        if(this.steppedCumulativeStats[i].lastTimestamp + this.SLIDING_WINDOW_INTERVAL < extendedStats.lastTimestamp) {
           preWindowEnd = i;
           break;
         }
@@ -111,39 +189,15 @@ namespace com.keyman.osk {
       // Do not consider segmenting before at least two samples exist before the current
       // sliding time window.  (A minimum of two samples are needed for 'over time'
       // properties to have a chance at becoming 'defined'.)
-      //console.log(sample);
       if(preWindowEnd > 0) {
         // We split the cumulative stats on a specific point, which then resides on the edge
         // of both of the resulting intervals.
-        const cumulativePreCandidate = this.steppedCumulativeStats[preWindowEnd+1];
-        let preCandidate = cumulativePreCandidate;
-        if(this.choppedStats) {
-          preCandidate = preCandidate.deaccumulate(this.choppedStats);
-        }
-        let postCandidate = extendedStats.deaccumulate(this.steppedCumulativeStats[preWindowEnd]);
-
-        let combined = extendedStats;
-        if(this.choppedStats) {
-          combined = combined.deaccumulate(this.choppedStats);
-        }
+        let candidateSplit = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, preWindowEnd+1);
 
         // Run a comparison on various stats of the two.
-        if(preCandidate.duration * 1000 >= this.SLIDING_WINDOW_INTERVAL) { // sec vs millisec.
+        // Oh.  And _there's_ why - if we didn't check before b/c minimum time req't.
+        if(candidateSplit.pre.duration * 1000 >= this.SLIDING_WINDOW_INTERVAL) { // sec vs millisec.
           let performSegmentation = false;
-
-          // Note:  circular variance is defined separately from circular std. deviation.
-          // They _are_ close, though.  But which is "best" to use here?
-          // Even if sourced differently, the best initial guess is to compare variance
-          // to variance.
-          //
-          // Also note that if there is no motion in either segmentation candidate, angleVariance
-          // is undefined, thus NaN, mathematically.  Practically... no angle = no variance.
-          let angleSplitVariance = (isNaN(preCandidate.angleVariance)  ? 0 :  preCandidate.angleVariance) +
-                                   (isNaN(postCandidate.angleVariance) ? 0 : postCandidate.angleVariance);
-          let angleVarianceRatio = combined.angleVariance / angleSplitVariance;
-
-          const speedSplitVariance = preCandidate.speedVariance + postCandidate.speedVariance;
-          const speedVarianceRatio = combined.speedVariance / speedSplitVariance;
 
           /*
            * Okay, so this isn't probably quite the most statistically well-founded approach, but...
@@ -165,7 +219,7 @@ namespace com.keyman.osk {
            * - moderate difference in both angle and speed between the segment candidates (equal levels)
            * - very strong difference in speed between the segment candidates.
            */
-          if(angleVarianceRatio + speedVarianceRatio / 2 > 1.5) {
+          if(candidateSplit.angleVarianceRatio + candidateSplit.speedVarianceRatio / 2 > 1.5) {
             performSegmentation = true;
           }
 
@@ -176,39 +230,18 @@ namespace com.keyman.osk {
           // This is exploratory / diagnostic code assisting development of the path segmentation
           // algorithm.
           if(performSegmentation) {
-            console.log("------------------------------------------------------------------");
+            this._debugLogSegmentationReport(candidateSplit);
+          } else {
+            console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
+            console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
           }
-
-          console.log("Angle variance ratio: " + angleVarianceRatio);
-          console.log("Speed variance ratio: " + speedVarianceRatio);
+          // END:  DO NOT RELEASE.
 
           if(performSegmentation) {
-            console.log("Combined: ");
-            console.log(combined.toJSON());
-            console.log(combined);
-            console.log("Pre: ")
-            console.log(preCandidate.toJSON());
-            console.log(preCandidate);
-            console.log("Post: ");
-            console.log(postCandidate.toJSON());
-            console.log(postCandidate);
-            console.log("Angle variance ratio: " + angleVarianceRatio);
-            console.log("Speed variance ratio: " + speedVarianceRatio);
-
-            console.log();
-
             this.steppedCumulativeStats = this.steppedCumulativeStats.slice(preWindowEnd+1);  // DO release this line.
-            console.log("Dropped samples: " + (preWindowEnd+1));
-            console.log("Remaining samples: " + this.steppedCumulativeStats.length);
 
-            console.log("Prototype segment: ");
-            console.log(preCandidate);
-
-            console.log("------------------------------------------------------------------");
-            // END:  DO NOT RELEASE.
-
-            this._protoSegments.push(preCandidate);
-            this.choppedStats = cumulativePreCandidate;
+            this._protoSegments.push(candidateSplit.pre);
+            this.choppedStats = candidateSplit.chopPoint;
           }
         }
       }
