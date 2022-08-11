@@ -38,7 +38,7 @@ namespace com.keyman.osk {
     private samples: InputSample[] = [];
     private _segments: Segment[] = [];
 
-    private segmenter = new PathSegmenter();
+    private readonly segmenter: PathSegmenter;
 
     private _isComplete: boolean = false;
     private wasCancelled?: boolean;
@@ -60,10 +60,16 @@ namespace com.keyman.osk {
 
       if(jsonObj) {
         this.samples = [...jsonObj.coords.map((obj) => ({...obj} as InputSample))];
-        // If we're reconstructing this from a JSON.parse, it's a previously-recorded, completed path.
+        // If we're reconstructing this from a JSON.parse, it's a previously-recorded,
+        // completed path.
         this._isComplete = true;
         this.wasCancelled = jsonObj.wasCancelled;
       }
+
+      // Keep this as the _final_ statement in the constructor.  `PathSegmenter` will
+      // need a reference to this instance, even if only via closure.
+      // (Most likely; not yet done.) Kinda awkward, but it's useful for compartmentalization.
+      this.segmenter = new PathSegmenter();
     }
 
     /**

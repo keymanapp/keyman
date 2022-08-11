@@ -1,39 +1,56 @@
-/// <reference path="pathSegmentStats.ts" />
+/// <reference path="cumulativePathStats.ts" />
 
 namespace com.keyman.osk {
   export class PathSegmenter {
+    /**
+     * The minimum amount of time (in ms) to wait between sample repetitions
+     * once inputs stop arriving, so long as the path is still active.
+     */
     private readonly REPEAT_INTERVAL = 33;
+
+    /**
+     * The time-interval length (in ms) at the end of the path to consider
+     * when determining whether or not to trigger path segmentation.
+     */
     private readonly SLIDING_WINDOW_INTERVAL = 50;
 
-    // May be best to keep an array of these, one per sample.
-    // Can then diff the stats to determine better cut-offs.
-    // Though... the whole arc-dist aspect will need a mite more help.
-    // - chopping off from the end:  ez-pz.  Raw diff is great.
-    //   - or, well, just use the appropriate one from mid-way.
-    // - chopping off from the beginning:  need an extra sample reference.
-    //   - .nextSample.
-    //
-    // The FINAL version, once resolved, may be published.
-    // But until resolved, we probably want to keep an array.
-    private _stats: PathSegmentStats[];
+    /**
+     * Tracks the mathematical values used to provide path segment stats
+     * at each point on the path.  Individual steps may be removed (and
+     * batched into `choppedStats`) once their respective points on the
+     * path have been fully processed.
+     */
+    private steppedCumulativeStats: CumulativePathStats[];
 
     // Currently used as an in-development diagnostic assist... but these
     // directly represent actual path segments as produced by the prototype
     // algorithm.  Just... the stats analysis of the path segment, without
     // obvious / public members to relevant coordinates.
-    private _protoSegments: PathSegmentStats[] = [];
+    private _protoSegments: CumulativePathStats[] = [];
 
+    /**
+     * Used to 'repeat' the most-recently observed incoming sample if no
+     * other replaces it before it triggers.
+     *
+     * A repeating sample indicates lack of motion, which is valuable
+     * information for stats-based segmentation.
+     */
     private repeatTimer: number | NodeJS.Timeout;
+
+    /**
+     * The timestamp of observation of the most recently observed sample's
+     * most recent repetition - even if it's only the first evaluation.
+     */
     private repeatTimestamp: number;
 
-    private choppedStats: PathSegmentStats = null;
+    /**
+     * Represents the cumulative statistics of all points on the path
+     * that lie on already-fully-segmented parts of it.
+     */
+    private choppedStats: CumulativePathStats = null;
 
     constructor() {
-      this._stats = [];
-    }
-
-    public get stats(): readonly PathSegmentStats[] {
-      return this._stats;
+      this.steppedCumulativeStats = [];
     }
 
     public add(sample: InputSample) {
@@ -62,30 +79,30 @@ namespace com.keyman.osk {
       clearInterval(this.repeatTimer);
       this.repeatTimer = null;
 
-      let intervalStats = this.stats[this.stats.length-1];
+      let intervalStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length-1];
       if(this.choppedStats) {
-        intervalStats = intervalStats.withoutPrefixSubset(this.choppedStats);
+        intervalStats = intervalStats.deaccumulate(this.choppedStats);
       }
       this._protoSegments.push(intervalStats);
     }
 
     private observe(sample: InputSample, timeDelta: number) {
-      let baseStats: PathSegmentStats;
-      if(this.stats.length) {
-        baseStats = this.stats[this.stats.length-1];
+      let cumulativeStats: CumulativePathStats;
+      if(this.steppedCumulativeStats.length) {
+        cumulativeStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length-1];
       } else {
-        baseStats = new PathSegmentStats();
+        cumulativeStats = new CumulativePathStats();
       }
 
       sample = {... sample};
       sample.t += timeDelta;
-      const extendedStats = baseStats.unionWith(sample);
-      this._stats.push(extendedStats);
+      const extendedStats = cumulativeStats.extend(sample);
+      this.steppedCumulativeStats.push(extendedStats);
 
       let preWindowEnd = 0;
       // Do not consider the just-added `extendedStats` entry.
-      for(let i = this.stats.length-2; i >=0 ; i--) {
-        if(this.stats[i].lastTimestamp + this.SLIDING_WINDOW_INTERVAL < sample.t) {
+      for(let i = this.steppedCumulativeStats.length-2; i >=0 ; i--) {
+        if(this.steppedCumulativeStats[i].lastTimestamp + this.SLIDING_WINDOW_INTERVAL < sample.t) {
           preWindowEnd = i;
           break;
         }
@@ -96,23 +113,33 @@ namespace com.keyman.osk {
       // properties to have a chance at becoming 'defined'.)
       //console.log(sample);
       if(preWindowEnd > 0) {
-        const cumulativePreCandidate = this.stats[preWindowEnd+1];
+        // We split the cumulative stats on a specific point, which then resides on the edge
+        // of both of the resulting intervals.
+        const cumulativePreCandidate = this.steppedCumulativeStats[preWindowEnd+1];
         let preCandidate = cumulativePreCandidate;
         if(this.choppedStats) {
-          preCandidate = preCandidate.withoutPrefixSubset(this.choppedStats);
+          preCandidate = preCandidate.deaccumulate(this.choppedStats);
         }
-        let postCandidate = extendedStats.withoutPrefixSubset(this.stats[preWindowEnd]);
+        let postCandidate = extendedStats.deaccumulate(this.steppedCumulativeStats[preWindowEnd]);
 
         let combined = extendedStats;
         if(this.choppedStats) {
-          combined = combined.withoutPrefixSubset(this.choppedStats);
+          combined = combined.deaccumulate(this.choppedStats);
         }
 
         // Run a comparison on various stats of the two.
         if(preCandidate.duration * 1000 >= this.SLIDING_WINDOW_INTERVAL) { // sec vs millisec.
           let performSegmentation = false;
 
-          let angleSplitVariance = preCandidate.angleVariance + postCandidate.angleVariance;
+          // Note:  circular variance is defined separately from circular std. deviation.
+          // They _are_ close, though.  But which is "best" to use here?
+          // Even if sourced differently, the best initial guess is to compare variance
+          // to variance.
+          //
+          // Also note that if there is no motion in either segmentation candidate, angleVariance
+          // is undefined, thus NaN, mathematically.  Practically... no angle = no variance.
+          let angleSplitVariance = (isNaN(preCandidate.angleVariance)  ? 0 :  preCandidate.angleVariance) +
+                                   (isNaN(postCandidate.angleVariance) ? 0 : postCandidate.angleVariance);
           let angleVarianceRatio = combined.angleVariance / angleSplitVariance;
 
           const speedSplitVariance = preCandidate.speedVariance + postCandidate.speedVariance;
@@ -170,9 +197,9 @@ namespace com.keyman.osk {
 
             console.log();
 
-            this._stats = this._stats.slice(preWindowEnd+1);  // DO release this line.
+            this.steppedCumulativeStats = this.steppedCumulativeStats.slice(preWindowEnd+1);  // DO release this line.
             console.log("Dropped samples: " + (preWindowEnd+1));
-            console.log("Remaining samples: " + this._stats.length);
+            console.log("Remaining samples: " + this.steppedCumulativeStats.length);
 
             console.log("Prototype segment: ");
             console.log(preCandidate);

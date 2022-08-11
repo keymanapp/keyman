@@ -1,5 +1,12 @@
 namespace com.keyman.osk {
-  export class PathSegmentStats {
+  /**
+   * As the name suggests, this class exists to track cumulative mathematical values, etc
+   * necessary to provide statistical information.  This information is used to facilitate
+   * path segmentation.
+   *
+   * Instances of this class are immutable.
+   */
+  export class CumulativePathStats {
     private xCentroidSum: number = 0;
     private yCentroidSum: number = 0;
 
@@ -10,8 +17,6 @@ namespace com.keyman.osk {
 
     private cosLinearSum:   number = 0;
     private sinLinearSum:   number = 0;
-    private cosQuadSum:     number = 0;
-    private sinQuadSum:     number = 0;
     private arcSampleCount: number = 0;
 
     /**
@@ -35,28 +40,35 @@ namespace com.keyman.osk {
 
     constructor();
     constructor(sample: InputSample);
-    constructor(instance: PathSegmentStats);
-    constructor(obj?: InputSample | PathSegmentStats) {
+    constructor(instance: CumulativePathStats);
+    constructor(obj?: InputSample | CumulativePathStats) {
       if(!obj) {
         return;
       }
 
       // Will worry about JSON form later.
-      if(obj instanceof PathSegmentStats) {
+      if(obj instanceof CumulativePathStats) {
         Object.assign(this, obj);
       } else if(isAnInputSample(obj)) {
-        Object.assign(this, this.unionWith(obj));
+        Object.assign(this, this.extend(obj));
       }
     }
 
-    public unionWith(sample: InputSample): PathSegmentStats {
+    /**
+     * Statistically "observes" a new sample point on the touchpath, accumulating values
+     * useful for provision of relevant statistical properties.
+     * @param sample A newly-sampled point on the touchpath.
+     * @returns A new, separate instance for the cumulative properties up to the
+     *          newly-sampled point.
+     */
+    public extend(sample: InputSample): CumulativePathStats {
       if(!this.initialSample) {
         this.initialSample = sample;
         this.baseSample = sample;
       } else {
         this.followingSample = sample;
       }
-      const result = new PathSegmentStats(this);
+      const result = new CumulativePathStats(this);
 
       // Helps prevent "catastrophic cancellation" issues from floating-point computation
       // for these statistical properties and properties based upon them.
@@ -82,14 +94,13 @@ namespace com.keyman.osk {
         result.yCentroidSum += 0.5 * tDeltaInSec * (sample.targetY + this.lastSample.targetY);
 
         if(xDelta || yDelta) {
-          const cos = -yDelta / coordArcDelta;  // alignment with <0, -1> in the DOM
-          const sin =  xDelta / coordArcDelta;  // alignment with <1,  0> in the DOM
-          result.cosLinearSum   += cos;
-          result.sinLinearSum   += sin;
-
-          result.cosQuadSum     += cos * cos;
-          result.sinQuadSum     += sin * sin;
-
+          // We wish to measure angle clockwise from <0, -1> in the DOM.  So, cos values should
+          // align with that axis, while sin values should align with the positive x-axis.
+          //
+          // This provides a mathematical 'transformation' to the axes used by `atan2` in the
+          // `angleMean` property.
+          result.cosLinearSum   += -yDelta / coordArcDelta;
+          result.sinLinearSum   +=  xDelta / coordArcDelta;
           result.arcSampleCount += 1;
         }
 
@@ -105,8 +116,15 @@ namespace com.keyman.osk {
       return result;
     }
 
-    public withoutPrefixSubset(subsetStats: PathSegmentStats): PathSegmentStats {
-      const result = new PathSegmentStats(this);
+    /**
+     * "De-accumulates" currently-accumulated values corresponding to the specified
+     * subset, which should represent an earlier, previously-observed part of the path.
+     * @param subsetStats The accumulated stats for the part of the path being removed
+     *                    from this instance's current accumulation.
+     * @returns
+     */
+    public deaccumulate(subsetStats: CumulativePathStats): CumulativePathStats {
+      const result = new CumulativePathStats(this);
 
       if(!subsetStats.followingSample || !subsetStats.lastSample) {
         throw 'Invalid argument:  stats missing necessary tracking variable.';
@@ -136,9 +154,6 @@ namespace com.keyman.osk {
 
         result.cosLinearSum   -= subsetStats.cosLinearSum;
         result.sinLinearSum   -= subsetStats.sinLinearSum;
-        result.sinQuadSum     -= subsetStats.sinQuadSum;
-        result.cosQuadSum     -= subsetStats.cosQuadSum;
-
         result.arcSampleCount -= subsetStats.arcSampleCount;
 
         result.speedLinearSum -= subsetStats.speedLinearSum;
@@ -260,16 +275,6 @@ namespace com.keyman.osk {
       return this.speedQuadSum / (this.sampleCount-1) - (this.speedMean * this.speedMean);
     }
 
-    public get sinVariance() {
-      const sinMean = this.sinLinearSum / this.arcSampleCount;
-      return this.sinQuadSum / (this.arcSampleCount) - sinMean * sinMean;
-    }
-
-    public get cosVariance() {
-      const cosMean = this.cosLinearSum / this.arcSampleCount;
-      return this.cosQuadSum / this.arcSampleCount - cosMean * cosMean;
-    }
-
     /**
      * Returns the represented interval's 'mean angle' clockwise from the DOM's
      * <0, -1> (the unit vector toward the top of the screen) in radians.
@@ -296,6 +301,19 @@ namespace com.keyman.osk {
     }
 
     /**
+     * Provides the rSquared value needed internally for circular-statistic properties.
+     *
+     * Range:  floating-point values on the interval [0, 1].
+     */
+    private get angleRSquared() {
+      // https://www.ebi.ac.uk/thornton-srv/software/PROCHECK/nmr_manual/man_cv.html may be a useful
+      // reference for this tidbit.  The Wikipedia article's more dense... not that this link isn't
+      // a bit dense itself.
+      const rSquaredBase = this.cosLinearSum * this.cosLinearSum + this.sinLinearSum * this.sinLinearSum;
+      return rSquaredBase / (this.arcSampleCount * this.arcSampleCount);
+    }
+
+    /**
      * The **circular variance** of the represented interval's angle observations.
      *
      * Refer to https://en.wikipedia.org/wiki/Directional_statistics#Variance.
@@ -304,11 +322,7 @@ namespace com.keyman.osk {
       if(this.arcSampleCount == 0) {
         return Number.NaN;
       }
-      // https://www.ebi.ac.uk/thornton-srv/software/PROCHECK/nmr_manual/man_cv.html may be a useful
-      // reference for this tidbit.  The Wikipedia article's more dense... not that this link isn't
-      // a bit dense itself.
-      const rSquared = this.cosLinearSum * this.cosLinearSum + this.sinLinearSum * this.sinLinearSum;
-      return 1 - (rSquared / (this.arcSampleCount * this.arcSampleCount));
+      return 1 - (this.angleRSquared);
     }
 
     /**
@@ -321,13 +335,11 @@ namespace com.keyman.osk {
         return Number.NaN;
       }
 
-      // Excludes the divisor; we can add that in the following line.
-      // https://www.ebi.ac.uk/thornton-srv/software/PROCHECK/nmr_manual/man_cv.html may be a useful
-      // reference for this as well.
-      const rSquared = this.cosLinearSum * this.cosLinearSum + this.sinLinearSum * this.sinLinearSum;
-      return Math.sqrt(Math.log(this.arcSampleCount * this.arcSampleCount / rSquared));
+      return Math.sqrt(-Math.log(this.angleRSquared));
     }
 
+    // TODO:  is this actually ideal?  This was certainly useful for experimentation via interactive
+    // debugging, but it may not be the best thing long-term.
     public toJSON() {
       return {
         angleMean: this.angleMean,
