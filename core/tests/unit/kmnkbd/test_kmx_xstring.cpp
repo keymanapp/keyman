@@ -11,7 +11,7 @@
 #include <iterator>
 #include <string>
 #include "../../../src/kmx/kmx_xstring.h"
-#include "../../../src/kmx/kmx_file.h"
+#include <kmx_file.h>
 #include "../test_assert.h"
 
 using namespace km::kbp::kmx;

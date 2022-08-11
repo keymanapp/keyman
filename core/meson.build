@@ -37,6 +37,10 @@ message('compiler.get_id(): ' + compiler.get_id())
 
 cc = meson.get_compiler('c')
 
+# TODO: Shared includes may use namespaces, etc which need future tidyup.
+# For now, we use KMN_KBP to inject the km::kbp::kmx namespace
+defns = ['-DKMN_KBP']
+
 subdir('doc')
 subdir('include')
 subdir('src')
