@@ -9,6 +9,7 @@
 
 #include "CharToKeyConversion.h"
 #include "kmx_u16.h"
+#include "xstring.h"
 
 extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
 
@@ -58,7 +59,7 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
     *q++ = UC_SENTINEL_EXTENDEDEND;
     *q = 0;
 
-    p = incxstr_S2__(p);
+    p = incxstr(p);
   }
 
   delete[] sp->dpString;
@@ -114,7 +115,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   }
 
   PKMX_WCHAR p = sp->dpString;
-  for (; *p; p = incxstr_S2__(p)) {
+  for (; *p; p = incxstr(p)) {
     // We've already verified that the store contains only virtual keys in VerifyCasedKeys
     if (*(p + 3) == key) {
       break;

@@ -3,50 +3,9 @@
 #include "kmx_u16.h"	
 //#include "../../../common/windows/cpp/include/xstring.h"
 
-//#include "../../src/kmcmpdll/xstring.h"
+#include "xstring.h"
+#include "km_types.h"
 #include <kmx_file.h>
-
-PKMX_WCHAR incxstr_S2__(PKMX_WCHAR p) {
-
-  if (*p == 0)
-    return p;
-  if (*p != UC_SENTINEL) {
-    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)
-      return p + 2;
-    return p + 1;
-  }
-  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
-  if (*(p + 1) == CODE_EXTENDED) {
-    p += 2;
-    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
-      p++;
-
-    if (*p == 0)        return p;
-    return p + 1;
-  }
-
-  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
-    return p + 1;
-  }
-
-  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
-
-  // check for \0 between UC_SENTINEL(FFFF) and next printable character
-  for (int i = 0; i < deltaptr; i++) {
-    if (*p == 0)
-      return p;
-    p++;
-  }
-  return p;
-}
-
-int xstrlen_S2__(PKMX_WCHAR p)
-{
-  int i;
-  for(i = 0; *p; i++, p=incxstr_S2__(p));
-  return i;
-}
-
 
 std::vector<signed long long> createIntVector(signed long long in1, signed long long in2 , signed long long in3 , signed long long in4 )
 {
@@ -96,7 +55,7 @@ void u16printf(km_kbp_cp** dst, char sys, km_kbp_cp sep, std::vector<signed long
 	km_kbp_cp* o = cpl;
 
 	if (sys == 'i')	
-		u16ncat(src1, src2, xstrlen_S2__(src1));	
+		u16ncat(src1, src2, u16len(src1));	
 
 	// handle first text src1
 	if (src1 != NULL) {

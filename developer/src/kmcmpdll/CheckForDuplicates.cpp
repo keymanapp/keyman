@@ -9,6 +9,8 @@
 #include "xstring.h"
 #include "kmx_u16.h"
 
+#include "kmcompx.h"
+
 #include "CheckForDuplicates.h"
 
 
@@ -26,8 +28,8 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
 
           KMX_WCHAR T1[250]  = u"Group '";
 			    KMX_WCHAR T3[250]  = u"' declared on line ";
-          u16ncat(T1, gp0->szName, xstrlen_S2__(T1));
-          u16ncat(T1, T3, xstrlen_S2__(T1));
+          u16ncat(T1, gp0->szName, xstrlen(T1));
+          u16ncat(T1, T3, xstrlen(T1));
           u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)gp0->Line), T1);
 
       return CERR_DuplicateGroup;
@@ -54,8 +56,8 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
           PKMX_WCHAR p_ErrExtra ;
           KMX_WCHAR T1[250]  = u"Store '";
 			    KMX_WCHAR T3[250]  = u"' declared on line ";
-          u16ncat(T1, sp0->szName, xstrlen_S2__(T1));
-          u16ncat(T1, T3, xstrlen_S2__(T1));
+          u16ncat(T1, sp0->szName, xstrlen(T1));
+          u16ncat(T1, T3, xstrlen(T1));
           u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)sp0->line), T1);
       return CERR_DuplicateStore;
     }

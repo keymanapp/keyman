@@ -30,13 +30,6 @@ void u16printf(KMX_WCHAR** dst, KMX_WCHAR* src1,  KMX_WCHAR* src2);
 const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max);
 //void u16printf(km_kbp_cp** dst, char sys, km_kbp_cp sep, std::vector<signed long long> V_in,  km_kbp_cp* src1 = 0, const km_kbp_cp* src2 = 0, const km_kbp_cp* src3 = 0);
 
-//int  xstrlen_ignoreifopt(PKMX_WCHAR p);
-//int  xstrlen(PKMX_WCHAR p);
-PKMX_WCHAR incxstr_S2__(PKMX_WCHAR p);
-
-int xstrlen_S2__(PKMX_WCHAR p);
-
-
 /*
 
 int  xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p);

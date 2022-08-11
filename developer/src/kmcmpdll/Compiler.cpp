@@ -88,24 +88,21 @@
 #pragma once
 
 #include "pch.h"
-//#include "../../../../developer/kmcompx/include/pch.h"
-
-//#include "../../../../developer/kmcompx/include/compfile.h"
 #include "compfile.h"
 //#include <compiler.h>
 #include "comperr.h"
-#include "../../../common/windows/cpp/include/vkeys.h"      //_S2 #include "vkeys.h"
+#include "../../../common/windows/cpp/include/vkeys.h"      
 
 #include <cuchar>
 
-#include "versioning.h"    // _S2   #include <versioning.h>
+#include "versioning.h"   
 #include "kmcmpdll.h"
-#include "DeprecationChecks.h"      // _S2 #include <DeprecationChecks.h>
+#include "DeprecationChecks.h"      
 #include "virtualcharkeys.h"
 
-#include "../../../common/windows/cpp/include/crc32.h"      // _S2 //#include "crc32.h"
+#include "../../../common/windows/cpp/include/crc32.h"      
 
-#include "../../../common/windows/cpp/include/ConvertUTF.h"   // _S2 #include "ConvertUTF.h"
+#include "../../../common/windows/cpp/include/ConvertUTF.h"  
 #include "debugstore.h"
 #include "namedcodeconstants.h"
 
@@ -117,106 +114,11 @@
 #include <vector>
 
 #include "../../src/kmcmpdll/xstring.h"
-
 #include "CheckNCapsConsistency.h"
-//#include "../../../../developer/kmcompx/include/CheckFilenameConsistency.cpp"           //
 #include "CheckFilenameConsistency.h"
-
-#include "UnreachableRules.h"
- 
+#include "UnreachableRules.h" 
 #include "CheckForDuplicates.h"
-
 #include "kmx_u16.h"
-
-// _S2 --why do I need to define those functions here? -------------------------------------------------------------------------------- 
-
-PKMX_WCHAR incxstr_S2(PKMX_WCHAR p) {
-
-  if (*p == 0)
-    return p;
-  if (*p != UC_SENTINEL) {
-    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)
-      return p + 2;
-    return p + 1;
-  }
-  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
-  if (*(p + 1) == CODE_EXTENDED) {
-    p += 2;
-    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
-      p++;
-
-    if (*p == 0)        return p;
-    return p + 1;
-  }
-
-  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
-    return p + 1;
-  }
-
-  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
-
-  // check for \0 between UC_SENTINEL(FFFF) and next printable character
-  for (int i = 0; i < deltaptr; i++) {
-    if (*p == 0)
-      return p;
-    p++;
-  }
-  return p;
-}
-
-PKMX_WCHAR decxstr_S2(PKMX_WCHAR p, PKMX_WCHAR pStart)
-{
-  PKMX_WCHAR q;
-
-  if(p <= pStart) {
-    return NULL;
-  }
-
-  p--;
-  if(*p == UC_SENTINEL_EXTENDEDEND) {
-    int n = 0;
-    while (p >= pStart && *p != UC_SENTINEL && n < 10) {
-      p--; n++; }
-
-    if(p < pStart) {
-      // May be a malformed virtual key
-      return pStart;
-    }
-    return p;
-  }
-
-  if (p == pStart) {
-    // Don't allow test before pStart
-    return p;
-  }
-
-  if(*p >= 0xDC00 && *p <= 0xDFFF && *(p-1) >= 0xD800 && *(p-1) <= 0xDBFF) {
-    return p-1;
-  }
-
-  // Look for a UC_SENTINEL to jump to
-  // note: If we are pointing to the middle of a UC_SENTINEL CODE_x, then we won't treat it as valid,
-  //       and will just go back a single wchar
-  q = p;
-  for (int i = 0; i < CODE__SIZE_MAX && q >= pStart; i++, q--) {
-    //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
-    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
-      return q;
-  }
-
-  return p;
-}
-
-PKMX_WCHAR xstrchr_S2(PKMX_WCHAR buf, PKMX_WCHAR chr)
-{
-  for(PKMX_WCHAR q = incxstr_S2(buf); *buf; buf = q, q = incxstr_S2(buf))
-    if(!u16ncmp(buf, chr, (intptr_t)(q-buf)))
-      return buf;
-  return NULL;
-}
-
-// _S2 ----------------------------------------------------------------------------------
-
 
 enum KMX_LinePrefixType { KMX_lptNone, KMX_lptKeymanAndKeymanWeb, KMX_lptKeymanWebOnly, KMX_lptKeymanOnly, KMX_lptOther };
 
@@ -793,7 +695,7 @@ KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p) {
         return CERR_ContextAndIndexInvalidInMatchNomatch;
       }
     }
-    p = incxstr_S2(p);
+    p = incxstr(p);
   }
   return CERR_None;
 }
@@ -1082,8 +984,8 @@ int cmpkeys(const void *key, const void *elem)
   char_elem = VKToChar(aelem->Key, aelem->ShiftFlags);
   if (char_key == char_elem) //akey->Key == aelem->Key)
   {
-    l1 = xstrlen_S2__(akey->dpContext);
-    l2 = xstrlen_S2__(aelem->dpContext);
+    l1 = xstrlen(akey->dpContext);
+    l2 = xstrlen(aelem->dpContext);
     if (l1 == l2)
     {
       if (akey->Line < aelem->Line) return -1;
@@ -1174,7 +1076,7 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
     delete[] temp;
   }
 
-  if (xstrlen_S2__(sp->dpString) == 1 && *sp->dpString != UC_SENTINEL &&
+  if (xstrlen(sp->dpString) == 1 && *sp->dpString != UC_SENTINEL &&
     sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0))
   {
     // In this case, we want to change behaviour for older versioned keyboards so that
@@ -1648,12 +1550,12 @@ KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk)
 KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR context, PKMX_WCHAR output, PKMX_WCHAR key) {
   PKMX_WCHAR p, q;
   int i;
-  for (p = output; *p; p = incxstr_S2(p)) {
+  for (p = output; *p; p = incxstr(p)) {
     if (*p == UC_SENTINEL) {
       if (*(p + 1) == CODE_INDEX) {
         int indexStore = *(p + 2) - 1;
         int contextOffset = *(p + 3);
-        for (q = context, i = 1; *q && i < contextOffset; q = incxstr_S2(q), i++);
+        for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
 
         if (*q == 0) {
           if (!gp->fUsingKeys)
@@ -1671,18 +1573,18 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
 
         int anyStore = *(q + 2) - 1;
 
-        if (xstrlen_S2__(fk->dpStoreArray[indexStore].dpString) < xstrlen_S2__(fk->dpStoreArray[anyStore].dpString)) {
+        if (xstrlen(fk->dpStoreArray[indexStore].dpString) < xstrlen(fk->dpStoreArray[anyStore].dpString)) {
           AddWarning(CWARN_IndexStoreShort); //TODO: if this fails, then we return FALSE instead of an error
         }
       } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);
-        if (contextOffset > xstrlen_S2__(context))
+        if (contextOffset > xstrlen(context))
           return CERR_ContextExHasInvalidOffset;
 
         // Due to a limitation in earlier versions of KeymanWeb, the minimum version
         // for context() referring to notany() is 14.0. See #917 for details.
         if (CompileTarget == CKF_KEYMANWEB) {
-          for (q = context, i = 1; *q && i < contextOffset; q = incxstr_S2(q), i++);
+          for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
           if (*q == UC_SENTINEL && *(q + 1) == CODE_NOTANY) {
             VERIFY_KEYBOARD_VERSION(fk, VERSION_140, CERR_140FeatureOnlyContextAndNotAnyWeb);
           }
@@ -1704,7 +1606,7 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
 KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context)
 {
   KMX_BOOL hadContextChar = FALSE;
-  for (PKMX_WCHAR p = context; *p; p = incxstr_S2(p)) {
+  for (PKMX_WCHAR p = context; *p; p = incxstr(p)) {
     if (*p == UC_SENTINEL) {
       switch (*(p + 1)) {
       case CODE_NUL:
@@ -1736,7 +1638,7 @@ KMX_DWORD CheckUseStatementsInOutput(const PFILE_GROUP gp,PKMX_WCHAR output)
 {
   KMX_BOOL HasUse = FALSE;
   PKMX_WCHAR p;
-  for (p = output; *p; p = incxstr_S2(p)) {
+  for (p = output; *p; p = incxstr(p)) {
     if (*p == UC_SENTINEL && *(p + 1) == CODE_USE) {
       HasUse = TRUE;
     } else if (HasUse) {
@@ -1770,7 +1672,7 @@ KMX_DWORD InjectContextToReadonlyOutput(PKMX_WCHAR pklOut) {
  */
 KMX_DWORD CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PKMX_WCHAR output) {  // I4867
   PKMX_WCHAR p;
-  for (p = output; *p; p = incxstr_S2(p)) {
+  for (p = output; *p; p = incxstr(p)) {
     if (*p != UC_SENTINEL) {
       return CERR_OutputInReadonlyGroup;
     }
@@ -1842,7 +1744,7 @@ KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
       str = p + 1;
       if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(INT_PTR)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
       if (pklKey[0] == 0) return CERR_ZeroLengthString;
-      if (xstrlen_S2__(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
+      if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
     } else {
       if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(INT_PTR)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
       if (pklIn[0] == 0) return CERR_ZeroLengthString;
@@ -1953,13 +1855,13 @@ KMX_DWORD ExpandKp_ReplaceIndex(PFILE_KEYBOARD fk, PFILE_KEY k, KMX_DWORD keyInd
   int i;
   PKMX_WCHAR pIndex, pStore;
 
-  for (pIndex = k->dpOutput; *pIndex; pIndex = incxstr_S2(pIndex))
+  for (pIndex = k->dpOutput; *pIndex; pIndex = incxstr(pIndex))
   {
     if (*pIndex == UC_SENTINEL && *(pIndex + 1) == CODE_INDEX && *(pIndex + 3) == keyIndex)
     {
       s = &fk->dpStoreArray[*(pIndex + 2) - 1];
-      for (i = 0, pStore = s->dpString; i < nAnyIndex; i++, pStore = incxstr_S2(pStore));
-      PKMX_WCHAR qStore = incxstr_S2(pStore);
+      for (i = 0, pStore = s->dpString; i < nAnyIndex; i++, pStore = incxstr(pStore));
+      PKMX_WCHAR qStore = incxstr(pStore);
 
       int w = (int)(INT_PTR)(qStore - pStore);
       if (w > 4)
@@ -1992,9 +1894,9 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
   PKMX_WCHAR dpContext = kpp->dpContext;
   PKMX_WCHAR dpOutput = kpp->dpOutput;
 
-  nchrs = xstrlen_S2__(sp->dpString);
+  nchrs = xstrlen(sp->dpString);
   pn = sp->dpString;
-  keyIndex = xstrlen_S2__(dpContext) + 1;
+  keyIndex = xstrlen(dpContext) + 1;
 
   /*
    Now we change them to plain characters in the output in multiple rules,
@@ -2011,7 +1913,7 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
   gp->dpKeyArray = k;
   gp->cxKeyArray += nchrs - 1;
 
-  for (k = kpp, n = 0, pn = sp->dpString; *pn; pn = incxstr_S2(pn), k++, n++)
+  for (k = kpp, n = 0, pn = sp->dpString; *pn; pn = incxstr(pn), k++, n++)
   {
     //k->dpContext = new WCHAR[sizeof((KMX_WCHAR)dpContext) + 1];  Sab
     k->dpContext = new KMX_WCHAR[u16len(dpContext) + 1];
@@ -2061,7 +1963,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
   if (*q != dOpen) return NULL;
 
   q++;
-  r = xstrchr_S2(q, &dClose);			        // Find closing delimiter   //r = wcschr(q, dClose);			        // Find closing delimiter
+  r = xstrchr(q, &dClose);			        // Find closing delimiter   //r = wcschr(q, dClose);			        // Find closing delimiter
   if (!r) return NULL;
 
   if (Flags & GDS_CUTLEAD)
@@ -2074,7 +1976,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
       r++;
-      *r = 0; r = xstrchr_S2((r + 1), &dClose);      //*r = 0; r = wcschr((r + 1), dClose);
+      *r = 0; r = xstrchr((r + 1), &dClose);      //*r = 0; r = wcschr((r + 1), dClose);
     }
   else *r = 0;
 
@@ -2964,7 +2866,7 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, 
     return CERR_ExpansionMustFollowCharacterOrVKey;
   }
   LPKMX_WCHAR p = &tstr[*mx];
-  p = decxstr_S2(p, tstr);
+  p = decxstr(p, tstr);
   if (*p == UC_SENTINEL) {
     if (*(p + 1) != CODE_EXTENDED) {
       return CERR_ExpansionMustFollowCharacterOrVKey;
