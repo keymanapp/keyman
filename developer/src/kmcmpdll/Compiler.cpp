@@ -365,8 +365,10 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
 
   // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
   // What about really large files?  Transfer to a temp file...
-  len =ftell(fp_in);
-  if( !fread(str,1,len,fp_in))                                               //if (!ReadFile(hInfile, str, 3, &len, NULL))
+  fseek(fp_in, 0, SEEK_END);
+  len = ftell(fp_in);
+  fseek(fp_in, 0, SEEK_SET);
+  if( !fread(str,1,3,fp_in))                                               //if (!ReadFile(hInfile, str, 3, &len, NULL))
   {
     fclose(fp_in);                                                           //CloseHandle(hInfile);
     return CERR_CannotReadInfile;
