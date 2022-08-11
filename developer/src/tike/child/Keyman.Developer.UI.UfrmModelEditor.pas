@@ -90,6 +90,7 @@ type
     editOutPath: TEdit;
     cmdCopyDebuggerLink: TButton;
     cmdConfigureWebDebugger: TButton;
+    chkLanguageUsesCasing: TCheckBox;
     procedure FormDestroy(Sender: TObject);
     procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
@@ -118,6 +119,7 @@ type
     procedure cmdOpenBuildFolderClick(Sender: TObject);
     procedure cmdOpenProjectFolderClick(Sender: TObject);
     procedure cmdCopyDebuggerLinkClick(Sender: TObject);
+    procedure chkLanguageUsesCasingClick(Sender: TObject);
   private
     type
       TWordlist = class
@@ -401,6 +403,7 @@ begin
   lblCloseQuote.Enabled := e;
   cbCloseQuote.Enabled := e;
   chkIsRTL.Enabled := e;
+  chkLanguageUsesCasing.Enabled := e;
 
   memoComments.Enabled := e;
   cmdAddWordlist.Enabled := e;
@@ -606,6 +609,7 @@ begin
   TComboStringOption.SetValue(COpenQuoteOptions, parser.OpenQuote, cbOpenQuote);
   TComboStringOption.SetValue(CCloseQuoteOptions, parser.CloseQuote, cbCloseQuote);
   chkIsRTL.Checked := parser.IsRTL;
+  chkLanguageUsesCasing.Checked := parser.LanguageUsesCasing;
 
   memoComments.Text := parser.Comment;
 
@@ -780,6 +784,14 @@ begin
   if FSetup > 0 then
     Exit;
   parser.IsRTL := chkIsRTL.Checked;
+  Modified := True;
+end;
+
+procedure TfrmModelEditor.chkLanguageUsesCasingClick(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  parser.LanguageUsesCasing := chkLanguageUsesCasing.Checked;
   Modified := True;
 end;
 

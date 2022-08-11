@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # This file maps specific paths to build triggers
 #
@@ -13,7 +13,7 @@ watch_android='web|common/models|common/predictive-text|common/web'
 watch_ios='web|common/models|common/predictive-text|common/web'
 watch_linux='core'
 watch_mac='core'
-watch_web='common/models|common/predictive-text|common/web'
+watch_web='common/models|common/predictive-text|common/web|core'
 watch_windows='common|core|web'
 watch_developer='common|core|web'
 
@@ -38,7 +38,7 @@ bc_test_ios=(Keyman_iOS_TestPullRequests Keyman_iOS_TestSamplesAndTestProjects)
 bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_Linux pipeline-keyman-packaging_Jenkins)
 bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
 bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
-bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests)
+bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
 bc_test_developer=(Keyman_Developer_Test)
 # Keymanweb_TestPullRequestRegressions : currently this is timing out so disabled until we have
 #                                        time to investigate further

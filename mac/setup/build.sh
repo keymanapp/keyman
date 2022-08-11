@@ -1,10 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 set -u
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 # Include our resource functions; they're pretty useful!
-. ../../resources/shellHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac

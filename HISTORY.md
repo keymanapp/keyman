@@ -1,5 +1,90 @@
 # Keyman Version History
 
+## 16.0.45 alpha 2022-08-09
+
+* feat(linux): Replace deprecated distutils (#7051)
+* chore(linux): Adjust Linux source package to restructured code (#7056)
+
+## 16.0.44 alpha 2022-08-08
+
+* chore(linux): Update debian changelog (#7041)
+
+## 16.0.43 alpha 2022-08-05
+
+* chore(web): centralizes web-based modules' CI unit test configurations (#7024)
+* refactor(web): converts test_utils funcs to Promise use (#7027)
+* chore(core): get wasm core building again (#7023)
+* chore(common): build-utils.sh minor tweaks (#7018)
+* change(web): rotation polish - OSK reload no longer needed  ️ (#6787)
+* change(web): updates mobile screen dimension detection code  ️ (#6979)
+
+## 16.0.42 alpha 2022-08-01
+
+* feat(developer): add languageUsesCasing to Model Editor (#7008)
+* fix(developer): increase maximum file size for server (#7003)
+* fix(developer): rebuilding a model would not refresh it in server (#7015)
+* chore(common): GitHub issue template tweaks (#7022)
+
+## 16.0.41 alpha 2022-07-29
+
+* chore(common): builder script `:target` and `--option` support (#6986)
+* chore(linux): Add code comment (#7009)
+
+## 16.0.40 alpha 2022-07-28
+
+* chore(linux): Add script to upload to debian (#6997)
+
+## 16.0.39 alpha 2022-07-27
+
+* chore(linux): Update debian changelog (#6996)
+
+## 16.0.38 alpha 2022-07-26
+
+* feat(developer): add hint support to Touch Layout Editor and schema (#6936)
+* fix(developer): improve error message for multi-part key ids on <15.0 (#6989)
+* fix(android): rework longpress movement trigger (#6984)
+* chore(linux): Update changelog (#6988)
+
+## 16.0.37 alpha 2022-07-22
+
+* fix(linux): Catch PermissionError exception (#6968)
+* chore(linux): Update Debian changelog :cherries: (#6973)
+* chore(linux): Add support for Ubuntu 22.10 "Kinetic Kudu" (#6975)
+* fix(developer): reduce timeouts if server shut down (#6943)
+* fix(linux): Implement refresh after keyboard installation (#6956)
+
+## 16.0.36 alpha 2022-07-20
+
+* chore(linux): Code cleanup (#6957)
+* fix(linux): Another attempt at fixing postinst script (#6960)
+* fix(linux): Fix uninstallation when using fcitx5 (#6963)
+
+## 16.0.35 alpha 2022-07-19
+
+* fix(common): Fix `delete` (#6965)
+
+## 16.0.34 alpha 2022-07-15
+
+* fix(developer): set contextDevice in web debugger  ️ (#6906)
+* fix(web): layer-setting ops should not trigger for hardware keystroke processing  ️ (#6902)
+* fix(developer): kmdecomp virtual character key output (#6940)
+* fix(developer): crash on exit when checking for updates (#6941)
+* fix(developer): crash when switching back a tab (#6942)
+* chore(web): remove invalid warning msg (#6950)
+
+## 16.0.33 alpha 2022-07-14
+
+* feat(developer): Option to skip embed of compiler version (#6920)
+* chore(ios): updates core internals for the in-app browser (#6838)
+
+## 16.0.32 alpha 2022-07-13
+
+* fix(ios): ignore CFBundleShortVersionString (#6934)
+
+## 16.0.31 alpha 2022-07-12
+
+* fix(developer): QR Code for Package Editor had wrong path (#6926)
+
 ## 16.0.30 alpha 2022-07-11
 
 * fix(web): maps touch-layout chiral alt, ctrl to non-chiral when non-chiral keyboard is active (#6808)

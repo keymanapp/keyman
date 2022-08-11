@@ -1,21 +1,21 @@
 var assert = chai.assert;
 
 describe('Engine - Chirality', function() {
-  this.timeout(kmwconfig.timeouts.scriptLoad);
+  this.timeout(testconfig.timeouts.scriptLoad);
 
-  before(function(done) {
+  before(function() {
     fixture.setBase('fixtures');
-    setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
+    return setupKMW(null, testconfig.timeouts.scriptLoad);
   });
 
   beforeEach(function(done) {
     fixture.load("singleInput.html");
-    
+
     window.setTimeout(function() {
       done()
-    }, kmwconfig.timeouts.eventDelay);
+    }, testconfig.timeouts.eventDelay);
   });
-  
+
   after(function() {
     teardownKMW();
   });
@@ -25,7 +25,7 @@ describe('Engine - Chirality', function() {
   });
 
   it('Keyboard + OSK simulation', function(done) {
-    this.timeout(kmwconfig.timeouts.scriptLoad * (kmwconfig.mobile ? 1 : 2));
+    this.timeout(testconfig.timeouts.scriptLoad * (testconfig.mobile ? 1 : 2));
     /* Interestingly, this still works on iOS, probably because we're able to force-set
      * the 'location' property in the simulated event on mobile devices, even when iOS neglects to
      * set it for real events.
@@ -35,12 +35,12 @@ describe('Engine - Chirality', function() {
          *
          * The 'phone' and 'layout' versions take shortcuts that bypass any tricky chiral logic;
          * a better test for those would be to ensure the touch OSK is constructed properly.
-         */ 
-        if(!kmwconfig.mobile) {
-          runKeyboardTestFromJSON('/engine_tests/chirality.json', {usingOSK: true}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
+         */
+        if(!testconfig.mobile) {
+          runKeyboardTestFromJSON('/engine_tests/chirality.json', {usingOSK: true}, done, assert.equal, testconfig.timeouts.scriptLoad);
         } else {
           done();
         }
-      }, assert.equal, kmwconfig.timeouts.scriptLoad);
+      }, assert.equal, testconfig.timeouts.scriptLoad);
   });
 });

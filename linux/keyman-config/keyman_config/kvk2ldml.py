@@ -3,6 +3,7 @@
 import logging
 import struct
 import sys
+
 from lxml import etree
 
 # .kvk file format

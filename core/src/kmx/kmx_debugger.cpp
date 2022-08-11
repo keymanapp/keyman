@@ -21,7 +21,7 @@ void KMX_DebugItems::push_item(
   PKMX_WORD index_stack
 ) {
   _items->assert_push_entry();
-  km_kbp_state_debug_item item = {type, flags};
+  km_kbp_state_debug_item item = {type, flags, {}, {}};
   item.kmx_info.rule = key;
   if(item.kmx_info.rule && index_stack) {
     this->fill_store_offsets(&item.kmx_info, index_stack);
@@ -43,7 +43,7 @@ void KMX_DebugItems::push_set_option(
   KMX_WCHAR const * value
 ) {
   _items->assert_push_entry();
-  km_kbp_state_debug_item item = {KM_KBP_DEBUG_SET_OPTION, 0};
+  km_kbp_state_debug_item item = {KM_KBP_DEBUG_SET_OPTION, 0, {}, {}};
   item.kmx_info.first_action = first_action;
   item.kmx_info.rule = nullptr;
   item.kmx_info.group = nullptr;

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications.
 # Designed for optimal compatibility with the Keyman Suite.

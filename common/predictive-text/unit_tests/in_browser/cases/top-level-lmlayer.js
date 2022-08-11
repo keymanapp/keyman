@@ -3,7 +3,7 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
 var DefaultWorker = com.keyman.text.prediction.DefaultWorker;
 
 describe('LMLayer', function () {
-  this.timeout(config.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   describe('[[constructor]]', function () {
     it('should construct with a single argument', function () {

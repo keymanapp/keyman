@@ -4122,7 +4122,7 @@ KMX_CHAR CompileDir[MAX_PATH];
 int ErrChr;
 KMX_CHAR ErrExtra[256];
 KMX_BOOL FSaveDebug, FCompilerWarningsAsErrors, FWarnDeprecatedCode;   // I4865   // I4866
-
+KMX_BOOL FShouldAddCompilerVersion = TRUE;
 KMX_BOOL FOldCharPosMatching = FALSE, FMnemonicLayout = FALSE;
 NamedCodeConstants *CodeConstants = NULL;
 
@@ -4210,6 +4210,24 @@ KMX_BOOL AddCompileMessage(DWORD msg)
 /*
 // is old version of CompileKeyboardFile
 extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
+
+typedef struct _COMPILER_OPTIONS {
+  DWORD dwSize;
+  BOOL ShouldAddCompilerVersion;
+} COMPILER_OPTIONS;
+
+typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
+
+extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
+  if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
+    return FALSE;
+  }
+  FShouldAddCompilerVersion = options->ShouldAddCompilerVersion;
+  return TRUE;
+}
+
+extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
+
 {
   HANDLE hInfile = INVALID_HANDLE_VALUE, hOutfile = INVALID_HANDLE_VALUE;
   KMX_BOOL err;
@@ -4488,15 +4506,14 @@ KMX_BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 
   // Add a store for the Keyman 6.0 copyright information string //
 
-  KMX_DWORD vmajor, vminor;
-  KMX_GetVersionInfo(&vmajor, &vminor);
-  //char buf[256];
-  swprintf(str, LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor),
-    LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));  // I3481
+  if(FShouldAddCompilerVersion) {
+    KMX_DWORD vmajor, vminor;
+    KMX_GetVersionInfo(&vmajor, &vminor);
+    swprintf(str, LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor),
+      LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));  // I3481
 
-//PWSTR pw = strtowstr(buf);
-  KMX_AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
-  //delete pw;
+    KMX_AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
+  }
 
   // Add a system store for the Keyman edition number //
 
@@ -5394,6 +5411,10 @@ KMX_BOOL GetFileVersion(KMX_CHAR *filename, KMX_WORD *d1, KMX_WORD *d2, KMX_WORD
 /*  // _S2
 KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk)
 {
+  if(!FShouldAddCompilerVersion) {
+    return CERR_None;
+  }
+
   KMX_WCHART verstr[32];
   KMX_WORD d1, d2, d3, d4;
   KMX_WORD msg;

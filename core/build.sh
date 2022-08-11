@@ -6,26 +6,10 @@ set -u
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-# NOTE: this is slightly non-standard; see longer discussion below
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# This script does not use our normal shared build-utils.sh because Linux package builds
-# cannot access anything outside of the `core` directory. This means that:
-# 1. `shellHelperFunctions.sh`, `VERSION.md` and `TIER.md` are copied here by the script
-#    `linux/scripts/dist.sh` for inclusion locally in Linux package builds.
-# 2. `getversion.sh` and `gettier.sh` will use current folder if we can't access the
-#    root level `VERSION.md` and `TIER.md`.
-# 3. `$SCRIPTS_DIR` is set to this folder by the package build Makefile
-#    `core/debian/rules`
-SCRIPTS_DIR=${SCRIPTS_DIR:-$(dirname "$THIS_SCRIPT")/../resources}
-. "${SCRIPTS_DIR}/shellHelperFunctions.sh"
-
-THIS_DIR="$(dirname "$THIS_SCRIPT")"
-
-pushd $THIS_DIR > /dev/null
-VERSION=$(./getversion.sh)
-TIER=$(./gettier.sh)
-popd > /dev/null
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 display_usage() {
   echo "usage: build.sh [build options] [targets] [-- options to pass to c++ configure]"
@@ -64,7 +48,7 @@ TESTS_CPP=false
 INSTALL_CPP=false
 UNINSTALL_CPP=false
 QUIET=false
-TARGET_PATH="$THIS_DIR/build"
+TARGET_PATH="$THIS_SCRIPT_PATH/build"
 ADDITIONAL_ARGS=
 PLATFORM=native
 
@@ -224,7 +208,7 @@ build_standard() {
   # Build meson targets
   if $CONFIGURE; then
     echo_heading "======= Configuring C++ library for $BUILD_PLATFORM ======="
-    pushd "$THIS_DIR" > /dev/null
+    pushd "$THIS_SCRIPT_PATH" > /dev/null
     meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET $STANDARD_MESON_ARGS $ADDITIONAL_ARGS
     popd > /dev/null
   fi
@@ -258,10 +242,32 @@ build_standard() {
   fi
 }
 
+#
+# We don't want to rely on emcc being on the path, because Emscripten puts far
+# too many things onto the path (in particular for us, node).
+#
+# The following comment suggests that we don't need emcc on the path.
+# https://github.com/emscripten-core/emscripten/issues/4848#issuecomment-1097357775
+#
+# So we try and locate emcc in common locations ourselves. The search pattern
+# is:
+#
+# 1. Look for $EMSCRIPTEN_BASE (our primary emscripten variable), which should
+#    point to the folder that emcc is located in
+# 2. Look for $EMCC which should point to the emcc executable
+# 3. Look for emcc on the path
+#
 locate_emscripten() {
-  local EMCC=`which emcc`
-  [ -z "$EMCC" ] && fail "Could not locate emscripten (emcc)"
-  EMSCRIPTEN_BASE="$(dirname "$EMCC")"
+  if [[ -z ${EMSCRIPTEN_BASE+x} ]]; then
+    if [[ -z ${EMCC+x} ]]; then
+      local EMCC=`which emcc`
+      [[ -z $EMCC ]] && fail "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
+    fi
+    [[ -x $EMCC ]] || fail "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
+    EMSCRIPTEN_BASE="$(dirname "$EMCC")"
+  fi
+
+  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || fail "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
 }
 
 build_meson_cross_file_for_wasm() {

@@ -1,17 +1,18 @@
 #!/usr/bin/python3
 
-import os
-import time
-import gi
 import logging
+import os
 import re
 import subprocess
-from keyman_config.gnome_keyboards_util import is_gnome_shell
+import time
 
-from keyman_config.gsettings import GSettings
+import gi
 
 gi.require_version('IBus', '1.0')
 from gi.repository import IBus
+
+from keyman_config.gnome_keyboards_util import is_gnome_shell
+from keyman_config.gsettings import GSettings
 
 
 class IbusUtil():
