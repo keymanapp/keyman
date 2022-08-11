@@ -1,9 +1,8 @@
 
-#include "pch.h"
-
-#include "compfile.h"      // _S2  #include <compfile.h>
-#include "comperr.h"     // _S2 #include <comperr.h>
-#include "kmcmpdll.h"    // _S2 #include <kmcmpdll.h>
+#include <pch.h>
+#include <compfile.h>
+#include <comperr.h>
+#include <kmcmpdll.h>
 
 BOOL WarnDeprecatedHeader() {   // I4866
   if (FWarnDeprecatedCode) {

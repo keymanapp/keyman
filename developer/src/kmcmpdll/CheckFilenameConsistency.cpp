@@ -1,14 +1,13 @@
 
 #pragma once      // _S2
 
-#include "pch.h"
-
-#include "Compfile.h"         // _S2 #include <Compfile.h>
-#include "comperr.h"          // _S2 #include <comperr.h>
-#include "kmcmpdll.h"         // _S2 #include <kmcmpdll.h> 
+#include <pch.h>
+#include <Compfile.h>
+#include <comperr.h>
+#include <kmcmpdll.h> 
 #include <io.h>
 #include <string>
-#include "CheckFilenameConsistency.h"
+#include <CheckFilenameConsistency.h>
 
 // _S2 : 
 // Why do we use wchar* for filenames in CheckFilenameConsistency ? (or convert them to wchar* first if called with char* )  

@@ -1,11 +1,11 @@
 #pragma once
-#include "pch.h"
+#include <pch.h>
 
-#include "Compfile.h"         // _S2 #include <Compfile.h>
-#include "comperr.h"                        //_S2 #include <comperr.h>       // double?    // _S2 #include <comperr.h>
+#include <Compfile.h>
+#include <comperr.h>       
 
-#include "kmcmpdll.h"
-#include "CharToKeyConversion.h"
+#include <kmcmpdll.h>
+#include <CharToKeyConversion.h>
 
 
 

@@ -9,9 +9,9 @@
 #include "xstring.h"
 #include "kmx_u16.h"
 
-#include "kmcompx.h"
+#include <kmcompx.h>
 
-#include "CheckForDuplicates.h"
+#include <CheckForDuplicates.h>
 
 
 KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
