@@ -20,7 +20,7 @@ configure_file(
 inc = include_directories( # '.', is_system: true)
   '.',
   '../../../common/include',
-  '../../../windows/src/developer/kmcmpdll',
+  '../../src/kmcmpdll',
   '../../src/ext/json',
   '../../src/ext/json-schema-validator'
 )

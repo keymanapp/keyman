@@ -118,22 +118,15 @@
 
 #include "../../src/kmcmpdll/xstring.h"
 
- // _S2 why can`t I include .h  ???  :-(
-//#include "../../../../developer/kmcompx/include/CheckNCapsConsistency.cpp"              //
 #include "CheckNCapsConsistency.h"
 //#include "../../../../developer/kmcompx/include/CheckFilenameConsistency.cpp"           //
 #include "CheckFilenameConsistency.h"
-//#include "../../../../developer/kmcompx/include/UnreachableRules.cpp"                   //
- #include "UnreachableRules.h"
-//#include "../../../../developer/kmcompx/include/CheckForDuplicates.cpp"                 //
+
+#include "UnreachableRules.h"
+ 
 #include "CheckForDuplicates.h"
 
-// include cpp ??????!!!!
-//#include "../../../../developer/kmcompx/include/kmx_u16.cpp"
 #include "kmx_u16.h"
-//#include "kmx_u16.cpp"
-
-
 
 // _S2 --why do I need to define those functions here? -------------------------------------------------------------------------------- 
 
@@ -221,7 +214,6 @@ PKMX_WCHAR xstrchr_S2(PKMX_WCHAR buf, PKMX_WCHAR chr)
       return buf;
   return NULL;
 }
-
 
 // _S2 ----------------------------------------------------------------------------------
 
@@ -715,7 +707,7 @@ if ((msg = AddCompilerVersionStore(fk)) != CERR_None) SetError(msg);
 if ((msg = BuildVKDictionary(fk)) != CERR_None) SetError(msg);  // I3438
 
 /* _S2 no idea how to change that to use with char16_t on non-windows platforms */
-// _S2_ if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) SetError(msg);   
+ if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) SetError(msg);   
 
 delete str;
 
@@ -725,7 +717,7 @@ if (!CheckKeyboardFinalVersion(fk)) {
 
 /* Warn on inconsistent use of NCAPS */
 if (!FMnemonicLayout) {
-  // _S2_ CheckNCapsConsistency(fk);
+   CheckNCapsConsistency(fk);
 }
 
 /* Flag presence of deprecated features */
@@ -1203,8 +1195,8 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   // needs to be changesd. was if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;
     //if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;    //if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;
     return msg;
-  return CERR_None;   //  _S2_ needs to be: return CheckForDuplicateStore(fk, sp);
-  //return CheckForDuplicateStore(fk, sp);
+  //return CERR_None;   //  _S2_ needs to be: return CheckForDuplicateStore(fk, sp);
+  return CheckForDuplicateStore(fk, sp);
 }
 
 KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID)
@@ -1472,9 +1464,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       sp->dpString = q;
 
       // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
-      // _S2_ if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-      // _S2_   return msg;
-      // _S2_ }    
+      if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+        return msg;
+      }    
     }
     break;
   case TSS_KMW_RTL:
@@ -1486,17 +1478,17 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_KMW_EMBEDJS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
     // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
-    // _S2_ if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-    // _S2_   return msg;
-    // _S2_ }
+     if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+       return msg;
+     }
     break;
 
   case TSS_KMW_EMBEDCSS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
     // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
-    // _S2_ if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-      // _S2_ return msg;
-    // _S2_ }
+     if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+       return msg;
+     }
     break;
 
   case TSS_TARGETS:   // I4504
@@ -1547,9 +1539,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
 
     // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
-    // _S2_ if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-    // _S2_       return msg;
-    // _S2_ }
+     if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+           return msg;
+     }
 
     // Used by KMW compiler
     break;

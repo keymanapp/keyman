@@ -28,6 +28,8 @@ message('compiler.get_id(): ' + compiler.get_id())
 
 cc = meson.get_compiler('c')
 
+#defns=["-DUSE_CHAR16_T"]
+
 # subdir('doc')
 subdir('include')
 subdir('src')
