@@ -1,7 +1,7 @@
 #pragma once
 #ifndef XSTRING_H
 #define SXTRING_H
-#include "km_types.h"
+#include <km_types.h>
 
 KMX_UCHAR* incxstr(KMX_UCHAR* p);
 KMX_UCHAR* decxstr(KMX_UCHAR* p, KMX_UCHAR* pStart);

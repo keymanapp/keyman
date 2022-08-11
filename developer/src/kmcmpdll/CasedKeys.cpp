@@ -1,15 +1,13 @@
 
-
-#pragma once  // _S2
-#include "pch.h"
-#include "Compfile.h"         // _S2 #include <Compfile.h>
-#include "comperr.h"          // _S2 #include <comperr.h>
-#include "../../../common/windows/cpp/include/vkeys.h"
-#include "kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
+#include <pch.h>
+#include <Compfile.h>
+#include <comperr.h>
+#include <../../../common/windows/cpp/include/vkeys.h>
+#include <kmcmpdll.h>
 
 #include "CharToKeyConversion.h"
-#include "kmx_u16.h"
-#include "xstring.h"
+#include <kmx_u16.h>
+#include <xstring.h>
 
 extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
 
@@ -28,7 +26,6 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
 
   PKMX_WCHAR p = sp->dpString;
   
-  //PKMX_WSTR buf = new KMX_WCHAR[std::u16string(p).length() * 5 + 1];  // extended keys are 5 units long, so this is the max length
   PKMX_WCHAR buf = new KMX_WCHAR[u16len(p) * 5 + 1];  // extended keys are 5 units long, so this is the max length
   PKMX_WCHAR q = buf;
 
@@ -141,11 +138,10 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   k = &k[gp->cxKeyArray - 1];
   
   k->dpContext = new KMX_WCHAR[u16len(kpp->dpContext) + 1];
-  k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];
-  
-  // copy the output.
-  u16cpy(k->dpContext, kpp->dpContext );
-  u16cpy(k->dpOutput, kpp->dpOutput );
+  k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];  
+ 
+  u16cpy(k->dpContext, kpp->dpContext );  // copy the context.
+  u16cpy(k->dpOutput, kpp->dpOutput );    // copy the output.
   
   k->Key = key;
   k->Line = kpp->Line;

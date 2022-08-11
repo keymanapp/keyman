@@ -1,10 +1,10 @@
 #pragma once
-#include "../../kmcompx/include/kmcompx.h"
-#include "kmx_u16.h"	
+#include <../../kmcompx/include/kmcompx.h>
+#include <kmx_u16.h>
 //#include "../../../common/windows/cpp/include/xstring.h"
 
-#include "xstring.h"
-#include "km_types.h"
+#include <xstring.h>
+#include <km_types.h>
 #include <kmx_file.h>
 
 std::vector<signed long long> createIntVector(signed long long in1, signed long long in2 , signed long long in3 , signed long long in4 )

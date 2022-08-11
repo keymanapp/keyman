@@ -1,8 +1,5 @@
 #pragma once
 
-//#include "../../../../developer/kmcompx/include/kmcompx.h"
-#include <windows.h>       // _S2 
-
 #define VK_COLON	0xBA
 #define VK_EQUAL	0xBB
 #define VK_COMMA	0xBC

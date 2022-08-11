@@ -4,9 +4,6 @@
 #define MAX_ENAME	128
 #define ALLOC_SIZE	256
 
-//#include "../../../../developer/kmcompx/include/kmcompx.h"
-//#include "kmx_u16.h"
-
 struct NCCENTRY_NEW
 {
 	char16_t name[MAX_ENAME+1];

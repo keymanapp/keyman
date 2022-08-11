@@ -21,14 +21,11 @@
                     13 Dec 2012 - mcdurdin - I3641 - V9.0 - compiler dll buffer overrun bugs
 */
 
-#pragma once      // _S2
 #include "pch.h"
 #include <io.h>
 #include <limits.h>
-#include "NamedCodeConstants.h"
-#include "kmcmpdll.h"
-//#include "../../../../core/src/kmx/kmx_xstring.h"
-
+#include <NamedCodeConstants.h>
+#include <kmcmpdll.h>
 
 extern char CompileDir[];
 
