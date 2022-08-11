@@ -10,41 +10,6 @@
 #define strncasecmp _strnicmp
 #endif
 
-#if defined(__LP64__) || defined(_LP64)
-/* 64-bit, g++ */
-#define KMX_64BIT
-#endif
-
-#if defined(_WIN64) && !defined(USE_64)
-/* 64-bit, Windows */
-#define KMX_64BIT
-#endif
-
-typedef uint32_t            KMX_DWORD;
-typedef int32_t             KMX_BOOL;
-typedef uint8_t             KMX_BYTE;
-typedef uint16_t            KMX_WORD;
-
-typedef km_kbp_cp KMX_WCHAR;    // wc,   16-bit UNICODE character
-typedef KMX_WCHAR *PKMX_WCHAR;
-
-typedef char KMX_CHAR;
-typedef KMX_CHAR *PKMX_CHAR;
-
-typedef uint32_t             KMX_UINT;
-
-typedef KMX_BYTE *PKMX_BYTE;
-typedef KMX_WORD *PKMX_WORD;
-typedef KMX_DWORD *PKMX_DWORD;
-
-#ifndef FALSE
-#define FALSE               0
-#endif
-
-#ifndef TRUE
-#define TRUE                1
-#endif
-
 namespace km {
 namespace kbp {
 namespace kmx {
