@@ -6,7 +6,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <compiler.h>
+#include "kmcompx.h"
 
 int WINAPI msgproc(int line, KMX_DWORD dwMsgCode, char* szText)
 {

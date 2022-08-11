@@ -14,11 +14,15 @@ typedef KMX_BYTE *  LPKMX_BYTE;        // never used?
 typedef KMX_WORD *  LPKMX_WORD;        // KMX_WORD  * never used?  (KMX_WORD  is used)
 typedef KMX_DWORD * LPKMX_DWORD;       // KMX_DWORD * never used?  (KMX_DWORD is used)
 typedef char *       PKMX_STR;
-
-typedef PKMX_WSTR *  PKMX_PWSTR;      // s ??
-typedef PKMX_WSTR * LPKMX_STR;       // s ??
-typedef PKMX_WSTR * PPKMX_WSTR;      // s ??
-typedef KMX_WCHART* LPKMX_WCHART;      // s ??
 typedef KMX_WCHAR* LPKMX_WCHAR;      // s ??
 
-#include "compiler.h"
+// TODO: Windows-specific
+#ifndef CALLBACK
+#define CALLBACK 
+#endif
+
+typedef int (CALLBACK *CompilerMessageProc)(int line, KMX_DWORD dwMsgCode, char* szText);
+extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile,
+    PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors,
+	KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc) ;  // I4865   // I4866
+
