@@ -2,6 +2,8 @@
 
 namespace com.keyman.osk {
   class PotentialSegmentation {
+    public static readonly SPLIT_CRITERION_THRESHOLD = 1.5;
+
     readonly pre:   CumulativePathStats;
     readonly post:  CumulativePathStats;
     readonly union: CumulativePathStats;
@@ -36,6 +38,33 @@ namespace com.keyman.osk {
     public get speedVarianceRatio() {
       const splitVariance = this.pre.speedVariance + this.post.speedVariance;
       return this.union.speedVariance / splitVariance;
+    }
+
+    public get splitCriterion() {
+      /*
+      * Okay, so this isn't probably quite the most statistically well-founded approach, but...
+      *
+      * A "variance ratio" of 1 indicates something of a break-even point; exceeding that threshold
+      * means that the variations in value seen between the two potential segments are better
+      * explained as being from two separate segments than from a single segment.  (Loosely speaking;
+      * it'd take some effort to cement the statistical basis here; this is more 'inspired by' what
+      * the values represent.)
+      *
+      * Of course... when it comes to speed, acceleration and such are factors.  It'd be all
+      * too easy to split the slow and fast parts of an accelerating linear motion as two separate
+      * pieces.  Requiring a higher degree of separation alleviates this - hence, the `/2` in the
+      * condition below.  (That divisor's not the most statistically-based thing to do, but it
+      * works well here.)
+      *
+      * So to reach the threshold set below, these three conditions will work:
+      * - strong difference in angle between the segment candidates
+      * - moderate difference in both angle and speed between the segment candidates (equal levels)
+      * - very strong difference in speed between the segment candidates.
+      */
+
+      const angleComponent = isNaN(this.angleVarianceRatio) ? 0 : this.angleVarianceRatio;
+      const speedComponent = isNaN(this.speedVarianceRatio) ? 0 : (this.speedVarianceRatio / 2);
+      return angleComponent + speedComponent;
     }
   }
 
@@ -171,8 +200,14 @@ namespace com.keyman.osk {
     }
 
     private attemptSegmentation() {
-      const extendedStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length - 1];
-      let preWindowEnd = 0;
+      const cumulativeStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length - 1];
+      const unsegmentedDuration = cumulativeStats.lastTimestamp - this.steppedCumulativeStats[0].lastTimestamp;
+
+      if(unsegmentedDuration < this.SLIDING_WINDOW_INTERVAL * 2) {
+        return;
+      }
+
+      let splitPoint = 0;
       // Do not consider the just-added `extendedStats` entry.
       //
       // Note:  even if we do reconsider the segmentation point... I don't think we
@@ -180,71 +215,79 @@ namespace com.keyman.osk {
       //
       // If we didn't segment earlier before, why would we suddenly do so now?
       for(let i = this.steppedCumulativeStats.length-2; i >=0; i--) {
-        if(this.steppedCumulativeStats[i].lastTimestamp + this.SLIDING_WINDOW_INTERVAL < extendedStats.lastTimestamp) {
-          preWindowEnd = i;
+        if(this.steppedCumulativeStats[i].lastTimestamp < cumulativeStats.lastTimestamp - this.SLIDING_WINDOW_INTERVAL) {
+          splitPoint = i+1;
           break;
         }
       }
 
-      // Do not consider segmenting before at least two samples exist before the current
-      // sliding time window.  (A minimum of two samples are needed for 'over time'
-      // properties to have a chance at becoming 'defined'.)
-      if(preWindowEnd > 0) {
-        // We split the cumulative stats on a specific point, which then resides on the edge
-        // of both of the resulting intervals.
-        let candidateSplit = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, preWindowEnd+1);
+      // We split the cumulative stats on a specific point, which then resides on the edge
+      // of both of the resulting intervals.
+      let candidateSplit = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint);
 
-        // Run a comparison on various stats of the two.
-        // Oh.  And _there's_ why - if we didn't check before b/c minimum time req't.
-        if(candidateSplit.pre.duration * 1000 >= this.SLIDING_WINDOW_INTERVAL) { // sec vs millisec.
-          let performSegmentation = false;
+      // Run a comparison on various stats of the two.
+      // Oh.  And _there's_ why - if we didn't check before b/c minimum time req't.
+      let performSegmentation = false;
 
-          /*
-           * Okay, so this isn't probably quite the most statistically well-founded approach, but...
-           *
-           * A "variance ratio" of 1 indicates something of a break-even point; exceeding that threshold
-           * means that the variations in value seen between the two potential segments are better
-           * explained as being from two separate segments than from a single segment.  (Loosely speaking;
-           * it'd take some effort to cement the statistical basis here; this is more 'inspired by' what
-           * the values represent.)
-           *
-           * Of course... when it comes to speed, acceleration and such are factors.  It'd be all
-           * too easy to split the slow and fast parts of an accelerating linear motion as two separate
-           * pieces.  Requiring a higher degree of separation alleviates this - hence, the `/2` in the
-           * condition below.  (That divisor's not the most statistically-based thing to do, but it
-           * works well here.)
-           *
-           * So to reach the threshold set below, these three conditions will work:
-           * - strong difference in angle between the segment candidates
-           * - moderate difference in both angle and speed between the segment candidates (equal levels)
-           * - very strong difference in speed between the segment candidates.
-           */
-          if(candidateSplit.angleVarianceRatio + candidateSplit.speedVarianceRatio / 2 > 1.5) {
-            performSegmentation = true;
-          }
-
-          // Hmm.  Perhaps this should only serve as the "okay, let's segment" trigger... to then
-          // find the BEST segmentation.
-
-          // FIXME: DO NOT RELEASE.
-          // This is exploratory / diagnostic code assisting development of the path segmentation
-          // algorithm.
-          if(performSegmentation) {
-            this._debugLogSegmentationReport(candidateSplit);
-          } else {
-            console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
-            console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
-          }
-          // END:  DO NOT RELEASE.
-
-          if(performSegmentation) {
-            this.steppedCumulativeStats = this.steppedCumulativeStats.slice(preWindowEnd+1);  // DO release this line.
-
-            this._protoSegments.push(candidateSplit.pre);
-            this.choppedStats = candidateSplit.chopPoint;
-          }
-        }
+      const initialSplitCriterion = candidateSplit.splitCriterion;
+      if(initialSplitCriterion > PotentialSegmentation.SPLIT_CRITERION_THRESHOLD) {
+        performSegmentation = true;
       }
+
+      if(!performSegmentation) {
+        // // Debug logging statements:
+        console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
+        console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
+        return;
+      }
+
+      // We've met the conditions to trigger segmentation.  Now... is there a better segmentation point?
+      //
+
+      let currentSplitCriterion = initialSplitCriterion;
+      let leftCandidate = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint-1);
+      let rightCandidate = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint+1);
+
+      const criteria = [leftCandidate.splitCriterion, candidateSplit.splitCriterion, rightCandidate.splitCriterion];
+      let sortedCriteria = [...criteria].sort();
+
+      const delta = criteria.indexOf(sortedCriteria[2])-1;  // -1 if 'left' is best, 1 if 'right' is best.
+
+      if(delta != 0) {
+        // We can get better segmentation by shifting.  Proceed in the optimal direction.
+        do {
+          let nextCandidate = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint + delta);
+          let nextSplitCriterion = nextCandidate.splitCriterion;
+
+          // Prevent overly-short intervals / over-segmentation.
+          if(nextCandidate.pre.duration * 1000 < this.SLIDING_WINDOW_INTERVAL / 2) {
+            break;
+          } else if(nextCandidate.post.duration * 1000 < this.SLIDING_WINDOW_INTERVAL / 2) {
+            break;
+          }
+
+          // Not an improvement?  Guess we found the best spot.
+          if(nextSplitCriterion < currentSplitCriterion) {
+            break;
+          } else {
+            splitPoint += delta;
+            currentSplitCriterion = nextSplitCriterion;
+            candidateSplit = nextCandidate;
+          }
+          // If we found a new best segmentation point, we then ask if we can get even better by shifting further.
+        } while(true);
+      }
+
+      // FIXME: DO NOT RELEASE.
+      // This is exploratory / diagnostic code assisting development of the path segmentation
+      // algorithm.
+      this._debugLogSegmentationReport(candidateSplit);
+      // END:  DO NOT RELEASE.
+
+      this.steppedCumulativeStats = this.steppedCumulativeStats.slice(splitPoint+1);  // DO release this line.
+
+      this._protoSegments.push(candidateSplit.pre);
+      this.choppedStats = candidateSplit.chopPoint;
     }
   }
 }
