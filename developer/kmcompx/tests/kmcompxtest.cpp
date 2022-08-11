@@ -22,5 +22,16 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	return CompileKeyboardFile(argv[1], argv[2], TRUE, FALSE, TRUE, msgproc) ? 0 : 1;
+	for(char *p = argv[1]; *p; p++) {
+		if(*p == '/') *p = '\\';
+	}
+
+	for(char *p = argv[2]; *p; p++) {
+		if(*p == '/') *p = '\\';
+	}
+
+	puts(argv[1]);
+	puts(argv[2]);
+
+  return CompileKeyboardFile(argv[1], argv[2], TRUE, FALSE, TRUE, msgproc); // == 0 ? 0 : 1;
 }

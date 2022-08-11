@@ -79,3 +79,23 @@ tests = [
 
     test(kbd, kmcompxtest, args: [kbd_src, kbd_obj])
   endforeach
+
+
+if build_machine.system() == 'windows'
+  test_source = run_command('get_test_source.bat', check: true)
+else
+  test_source = run_command('get_test_source.sh', check: true)
+endif
+
+tests = test_source.stdout().strip().split('\n')
+
+foreach kbd : tests
+  kbd_src = join_paths(input_path, kbd)
+  kbd_obj = join_paths(output_path, kbd)
+  kbd_obj = kbd_obj.split('.')[0] + '.kmx'
+  test_name = kbd_obj.split('/')
+  test_name = test_name[test_name.length() - 1]
+
+  test(test_name, kmcompxtest, args: [kbd_src, kbd_obj])
+endforeach
+
