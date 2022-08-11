@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 /*
 #if defined(_WIN32) || defined(_WIN64)
