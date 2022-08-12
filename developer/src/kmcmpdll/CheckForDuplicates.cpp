@@ -52,13 +52,20 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
     }
     if (u16icmp(sp0->szName, sp->szName) == 0)   // _S2 if (_wcsicmp(sp0->szName, sp->szName) == 0)
      {
+      
+          PKMX_WCHAR ErrExtra ;
       // _ S2    wsprintf(ErrExtra, "Store '%ls' declared on line %d", sp0->szName, sp0->line);
+      /*
           PKMX_WCHAR p_ErrExtra ;
           KMX_WCHAR T1[250]  = u"Store '";
 			    KMX_WCHAR T3[250]  = u"' declared on line ";
           u16ncat(T1, sp0->szName, xstrlen(T1));
           u16ncat(T1, T3, xstrlen(T1));
           u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)sp0->line), T1);
+*/
+          u16sprintf(ErrExtra, 1024, L"Store '%ls' declared on line %d", u16fmt(sp0->szName), sp0->line);
+
+
       return CERR_DuplicateStore;
     }
   }

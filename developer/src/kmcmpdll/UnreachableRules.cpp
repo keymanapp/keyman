@@ -35,10 +35,10 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
         currentLine = kp->Line;
 
         // _S2 wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
-        PKMX_WCHAR p_ErrExtra;
-        char16_t text[256] = u"Overridden by rule on line ";
-        u16printf(&p_ErrExtra, 'd', 0x002e, createIntVector((int)(k1.Line)),   text );            
-
+        PKMX_WCHAR ErrExtra;
+        //char16_t text[256] = u"Overridden by rule on line ";
+        //u16printf(&p_ErrExtra, 'd', 0x002e, createIntVector((int)(k1.Line)),   text );            
+        u16sprintf(ErrExtra, 1024, L"Overridden by rule on line %d", k1.Line);
         AddWarning(CHINT_UnreachableRule);
       }
     }
