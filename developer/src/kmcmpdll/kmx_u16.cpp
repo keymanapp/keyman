@@ -203,9 +203,10 @@ void u16printf(KMX_WCHAR** dst, KMX_WCHAR* src1,  KMX_WCHAR* src2)
 const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
   KMX_WCHAR* o = dst;
   dst = (KMX_WCHAR*) u16chr(dst, 0);
-	max -= (dst-o);
+	//max -= (dst-o);
   while (*src && max > 0) {
     *dst++ = *src++;
+    max--;
   }
 	if(max > 0)
   	*dst = 0;
