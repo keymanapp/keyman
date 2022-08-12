@@ -1,6 +1,4 @@
 
-#pragma once      // _S2
-
 #include <pch.h>
 #include <Compfile.h>
 #include <comperr.h>

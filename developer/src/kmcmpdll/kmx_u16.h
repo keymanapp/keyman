@@ -9,6 +9,14 @@
 #include <string>
 
 
+std::string string_from_wstring(std::wstring const str);
+std::wstring wstring_from_string(std::string const str);
+std::u16string u16string_from_string(std::string const str);
+std::string string_from_u16string(std::u16string const str);
+
+std::wstring u16fmt(const km_kbp_cp* str);
+void u16sprintf(km_kbp_cp* dst, const size_t sz, const wchar_t* fmt, ...) ;
+
 size_t  u16len(const KMX_WCHAR *p);
 int  u16cmp(const KMX_WCHAR *p, const KMX_WCHAR *q);
 int   u16icmp(const KMX_WCHAR *p, const KMX_WCHAR *q);

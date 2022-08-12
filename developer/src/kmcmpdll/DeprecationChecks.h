@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.h>     
+//#include <windows.h>     
 #include <Compfile.h>
 
 KMX_BOOL WarnDeprecatedHeader();

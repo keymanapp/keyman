@@ -6,6 +6,68 @@
 #include <xstring.h>
 #include <km_types.h>
 #include <kmx_file.h>
+#include <codecvt>
+#include <stdarg.h>
+
+std::string string_from_wstring(std::wstring const str) {
+	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+	return converter.to_bytes(str);
+}
+
+std::wstring wstring_from_string(std::string const str) {
+	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+	return converter.from_bytes(str);
+}
+
+std::u16string u16string_from_string(std::string const str) {
+	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+	return converter.from_bytes(str);
+}
+
+std::string string_from_u16string(std::u16string const str) {
+	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+	return converter.to_bytes(str);
+}
+
+long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)   
+{
+	auto s = string_from_u16string(str);
+	char* t;
+	long int result = strtol(s.c_str(), &t, base);
+	if(endptr != nullptr) *endptr = (KMX_WCHAR*) str + (t-s.c_str());
+	return result;
+}
+
+
+
+
+std::wstring u16fmt(const km_kbp_cp* str) {
+	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+	std::string utf8str = convert.to_bytes(str);
+	std::wstring wstr = convert_wstring.from_bytes(utf8str);
+	return wstr;
+}
+
+void u16sprintf(km_kbp_cp* dst, const size_t sz, const wchar_t* fmt, ...) {
+	wchar_t* wbuf = new wchar_t[sz];
+	va_list args;
+	va_start(args, fmt);
+	vswprintf(wbuf, sz, fmt, args);
+	va_end(args);
+
+	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+	std::string utf8str = convert_wstring.to_bytes(wbuf);
+	std::u16string u16str = convert.from_bytes(utf8str);
+	u16ncpy(dst, u16str.c_str(), sz);
+
+	delete[] wbuf;
+}
+
+
+
+
 
 std::vector<signed long long> createIntVector(signed long long in1, signed long long in2 , signed long long in3 , signed long long in4 )
 {
@@ -139,12 +201,14 @@ void u16printf(KMX_WCHAR** dst, KMX_WCHAR* src1,  KMX_WCHAR* src2)
 }
 
 const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
-  KMX_WCHAR* o = dst;  
-  dst = dst + max;
-  while (*src) {
+  KMX_WCHAR* o = dst;
+  dst = (KMX_WCHAR*) u16chr(dst, 0);
+	max -= (dst-o);
+  while (*src && max > 0) {
     *dst++ = *src++;
   }
-  *dst = 0;
+	if(max > 0)
+  	*dst = 0;
   return o;
 }
 
@@ -260,7 +324,7 @@ km_kbp_cp * u16tok(km_kbp_cp* p,  km_kbp_cp* ch, km_kbp_cp** ctx) {
 	}
 	return p;
 }
-
+/*
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)   
 {
 	int pwr;
@@ -296,7 +360,7 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
 	}
 	return num;
 }
-
+*/
 double u16tof( KMX_WCHAR* str)
 {
 	double val = 0;

@@ -254,29 +254,27 @@ KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved
   return TRUE;
 }
 
-mbstate_t state;
-PKMX_WCHAR strtowstr(PKMX_STR in)
-{
+
+PKMX_WCHAR strtowstr(PKMX_STR in) {
   PKMX_WCHAR result;
-  size_t len=0;
 
-  mbrtoc16(NULL, in, strlen(in) ,&state );  // I3481      //mbstowcs_s(&len, NULL, 0, in, strlen(in));  // I3481
-  result = new KMX_WCHAR[len + 1];
-  mbrtoc16(result, in, strlen(in) ,&state );  // I3481   // I3641     //mbstowcs_s(&len, result, len + 1, in, strlen(in));  // I3481   // I3641
-  result[len] = 0;
+  auto c = u16string_from_string(in);
+
+  result = new KMX_WCHAR[c.length() + 1];
+  u16cpy(result, c.c_str());
   return result;
 }
 
-PKMX_STR wstrtostr(PKMX_WCHAR in)
-{
+PKMX_STR wstrtostr(PKMX_WCHAR in) {
   PKMX_STR result;
-  size_t len=0;
-  c16rtomb( NULL, *in,  &state  );  // I3481   // I3641    //wcstombs_s(&len, NULL, 0, in, wcslen(in));  // I3481
-  result = new char[len + 1];
-  c16rtomb( result, *in,  &state  );  // I3481   // I3641    //wcstombs_s(&len, result, len + 1, in, wcslen(in));  // I3481   // I3641
-  result[len] = 0;
+
+  auto c = string_from_u16string(in);
+
+  result = new KMX_CHAR[c.length() + 1];
+  strcpy(result, c.c_str());
   return result;
 }
+
 
 KMX_BOOL AddCompileString(LPSTR buf)
 {
@@ -303,8 +301,10 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg)
   LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);      
   if (ErrChr > 0)
     sprintf(strchr(szText, 0), "  character offset:%d", ErrChr);            // _S2 wsprintf(strchr(szText, 0), " chr:%d", ErrChr);
+    
   if (*ErrExtra)
     sprintf(strchr(szText, 0), " extra:%s", ErrExtra);   // _S2 wsprintf(strchr(szText, 0), " extra:%s", ErrExtra);
+    //u16sprintf(strtowstr(strchr(szText, 0)), 1024,L" extra:%s", ErrExtra);
 
   ErrChr = 0; *ErrExtra = 0;
 
@@ -535,8 +535,13 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
       GetVersionInfo(&vmajor, &vminor);
       //char buf[256];
       char16_t Text[256]  = u"Created with Keyman Developer version ";
-      u16printf(&str,  'd', 0x002e, createIntVector(HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor)) ,Text    );
+      //u16printf(&str,  'd', 0x002e, createIntVector(HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor)) ,Text    );
       //swprintf(str, LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));  // I3481
+
+      u16sprintf(str,LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));
+
+
+
 
       //PWSTR pw = strtowstr(buf);
       AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
@@ -544,7 +549,9 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
     }
 
     /* Add a system store for the Keyman edition number */
-    u16printf(&str, 'd', 0x0020, createIntVector(0));      //  _S2  swprintf(str, LINESIZE, L"%d", 0);  // I3481
+    //u16printf(&str, 'd', 0x0020, createIntVector(0));      //  _S2  swprintf(str, LINESIZE, L"%d", 0);  // I3481
+    u16sprintf(str, LINESIZE, L"%d", 0);  // I3481
+    
     AddStore(fk, TSS_CUSTOMKEYMANEDITION, str);
     PKMX_WCHAR tbuf = strtowstr((KMX_CHAR*) "Keyman");
     AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, tbuf);
@@ -870,7 +877,11 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
 
         //wcscat(tstr, pw);
 
-        u16printf(&p_tstr, 'd',  0x0020 , createIntVector((int) fk->currentGroup), (PKMX_WCHAR) DEBUGSTORE_MATCH, gp->szName);  // I3481   //swprintf(tstr, _countof(tstr), L"%ls%d %ls", DEBUGSTORE_MATCH, (int) fk->currentGroup, gp->szName);  // I3481
+        //u16printf(&p_tstr, 'd',  0x0020 , createIntVector((int) fk->currentGroup), (PKMX_WCHAR) DEBUGSTORE_MATCH, gp->szName);  // I3481   //swprintf(tstr, _countof(tstr), L"%ls%d %ls", DEBUGSTORE_MATCH, (int) fk->currentGroup, gp->szName);  // I3481
+        
+        u16sprintf(tstr, _countof(tstr), L"%ls%d %ls",u16fmt( DEBUGSTORE_MATCH), (int) fk->currentGroup, u16fmt(gp->szName));  // I3481
+        
+        
         AddDebugStore(fk, tstr);
       }
     }
@@ -903,8 +914,8 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
         KMX_WCHAR tstr[128];
         PKMX_WCHAR p_tstr;    // _S2
         /* Record a system store for the line number of the begin statement */
-        u16printf(&p_tstr,'d',  0x0020 , createIntVector(  fk->currentGroup),(PKMX_WCHAR) DEBUGSTORE_NOMATCH, gp->szName);  // I3481     //swprintf(tstr, _countof(tstr), L"%ls%d %ls", DEBUGSTORE_NOMATCH, fk->currentGroup, gp->szName);  // I3481
-
+        //u16printf(&p_tstr,'d',  0x0020 , createIntVector(  fk->currentGroup),(PKMX_WCHAR) DEBUGSTORE_NOMATCH, gp->szName);  // I3481     //swprintf(tstr, _countof(tstr), L"%ls%d %ls", DEBUGSTORE_NOMATCH, fk->currentGroup, gp->szName);  // I3481
+        u16sprintf(tstr, _countof(tstr), L"%ls%d %ls", u16fmt(DEBUGSTORE_NOMATCH), fk->currentGroup, u16fmt(gp->szName));  // I3481
         AddDebugStore(fk, tstr);
       }
     }
@@ -959,7 +970,9 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
     KMX_WCHAR tstr[128];
     PKMX_WCHAR p_tstr;    // _S2
     /* Record a system store for the line number of the begin statement */
-    u16printf(&p_tstr,'d',  0x0020 , createIntVector(  fk->cxGroupArray - 1),(PKMX_WCHAR) DEBUGSTORE_GROUP, gp->szName);  // I3481     //swprintf(tstr, _countof(tstr), u"%ls%d %ls", DEBUGSTORE_GROUP, fk->cxGroupArray - 1, gp->szName);  // I3481
+    //u16printf(&p_tstr,'d',  0x0020 , createIntVector(  fk->cxGroupArray - 1),(PKMX_WCHAR) DEBUGSTORE_GROUP, gp->szName);  // I3481     //swprintf(tstr, _countof(tstr), u"%ls%d %ls", DEBUGSTORE_GROUP, fk->cxGroupArray - 1, gp->szName);  // I3481
+    u16sprintf(tstr, _countof(tstr), L"%ls%d %ls", u16fmt(DEBUGSTORE_GROUP), fk->cxGroupArray - 1, u16fmt(gp->szName));  // I3481
+    
     AddDebugStore(fk, tstr);
   }
 
@@ -1089,9 +1102,10 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   fk->cxStoreArray++;	// increment now, because GetXString refers to stores
 
   if (i > 0)
-  // needs to be changesd. was if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;
+  // needs to be changesd. was
+  if ((msg = ProcessSystemStore(fk, i, sp)) != CERR_None) return msg;
     //if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;    //if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;
-    return msg;
+    //return msg;
   //return CERR_None;   //  _S2_ needs to be: return CheckForDuplicateStore(fk, sp);
   return CheckForDuplicateStore(fk, sp);
 }
@@ -1137,7 +1151,8 @@ KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
   PFILE_STORE sp;
   KMX_WCHAR tstr[16];
   PKMX_WCHAR p_tstr=tstr;
-  u16printf(&p_tstr, 'd', 0x0020, createIntVector(currentLine));            // _S2  swprintf(tstr, _countof(tstr), L"%d", currentLine);  // I3481
+  //u16printf(&p_tstr, 'd', 0x0020, createIntVector(currentLine));            // _S2  swprintf(tstr, _countof(tstr), L"%d", currentLine);  // I3481
+  u16sprintf(tstr, _countof(tstr), L"%d", currentLine);  // I3481
 
   sp = new FILE_STORE[fk->cxStoreArray + 1];
   if (!sp) return CERR_CannotAllocateMemory;
@@ -1217,7 +1232,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_HOTKEY:
     if ((msg = ProcessHotKey(sp->dpString, &fk->dwHotKey)) != CERR_None) return msg;
-    u16printf(&buf,  'd', 0x002e, createIntVector((int)fk->dwHotKey));     //_S2 swprintf(buf, GLOBAL_BUFSIZE, L"%d", (int)fk->dwHotKey);  // I3481
+    //u16printf(&buf,  'd', 0x002e, createIntVector((int)fk->dwHotKey));     //_S2 swprintf(buf, GLOBAL_BUFSIZE, L"%d", (int)fk->dwHotKey);  // I3481
+    u16sprintf(buf, GLOBAL_BUFSIZE, L"%d", (int)fk->dwHotKey);  // I3481
     delete[] sp->dpString;
     sp->dpString = new KMX_WCHAR[u16len(buf) + 1];
     u16ncpy(sp->dpString, buf, u16len(buf) + 1);  // I3481
@@ -1262,7 +1278,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
     fk->KeyboardID = (KMX_DWORD)MAKELANGID(i, j);
 
-    u16printf(&buf,  'x', 0x0020, createIntVector(i,j));     //_S2 swprintf(buf, GLOBAL_BUFSIZE, L"%x %x", i, j);  // I3481
+    //u16printf(&buf,  'x', 0x0020, createIntVector(i,j));     //_S2 swprintf(buf, GLOBAL_BUFSIZE, L"%x %x", i, j);  // I3481
+    u16sprintf(buf, GLOBAL_BUFSIZE, L"%x %x", i, j);  // I3481
     delete[] sp->dpString;
     sp->dpString = new KMX_WCHAR[u16len(buf) + 1];
     u16ncpy(sp->dpString, buf, u16len(buf) + 1);  // I3481
@@ -1415,7 +1432,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
         return CERR_InvalidLanguageLine;
       }
 
-      u16printf(&buf,  'u', 0x002e, createIntVector(n));     //_S2 swprintf(r, szQ - (size_t)(r - q), L"x%04.4x ", n);  // I3481
+      //u16printf(&buf,  'u', 0x002e, createIntVector(n));     //_S2 swprintf(r, szQ - (size_t)(r - q), L"x%04.4x ", n);  // I3481
+      u16sprintf(r, szQ - (size_t)(r - q), L"x%04.4x ", n);  // I3481
       p = u16tok(NULL, sep_s, &context);  // I3481
       r = (KMX_WCHAR*) u16chr(q, 0);  // I3481
     }
@@ -1532,8 +1550,8 @@ KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk)
 
   GetFileVersion(NULL, &d1, &d2, &d3, &d4);
 
-  u16printf(&p_verstr, 'd', 0x002e,createIntVector(d1, d2, d3, d4));   // _S2 swprintf(verstr, _countof(verstr), L"%d.%d.%d.%d", d1, d2, d3, d4);  // I3481
-
+  //u16printf(&p_verstr, 'd', 0x002e,createIntVector(d1, d2, d3, d4));   // _S2 swprintf(verstr, _countof(verstr), L"%d.%d.%d.%d", d1, d2, d3, d4);  // I3481
+  u16sprintf(verstr, _countof(verstr), L"%d.%d.%d.%d", d1, d2, d3, d4);  // I3481
   if ((msg = AddStore(fk, TSS_COMPILEDVERSION, verstr)) != CERR_None) return msg;
 
   return CERR_None;
@@ -2143,7 +2161,8 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           //wsprintf(ErrExtra, "token: %c", (int)*p);    //_S2 wsprint needs to be exchanged!! How ??    -> should write token: ß (when *p is value of ß)
           char16_t text_[256] = u"token: "; // _S2
           PKMX_WCHAR p_ErrExtra =strtowstr(ErrExtra);    // _S2
-          u16printf(&p_ErrExtra, text_, p);
+          //u16printf(&p_ErrExtra, text_, p);
+          u16sprintf(p_ErrExtra, (int)*p, L"token: %c");
         }
         return CERR_InvalidToken;
 
@@ -3780,7 +3799,8 @@ void RecordDeadkeyNames(PFILE_KEYBOARD fk)
   KMX_DWORD i;
   for (i = 0; i < fk->cxDeadKeyArray; i++)
   {
-    u16printf(&p_buf,'d', 0x0020, createIntVector( (int)i), (PKMX_WCHAR) DEBUGSTORE_DEADKEY, fk->dpDeadKeyArray[i].szName) ;      // _S2 swprintf(buf, _countof(buf), L"%ls%d %ls", DEBUGSTORE_DEADKEY, (int)i, fk->dpDeadKeyArray[i].szName);  // I3481
+    //u16printf(&p_buf,'d', 0x0020, createIntVector( (int)i), (PKMX_WCHAR) DEBUGSTORE_DEADKEY, fk->dpDeadKeyArray[i].szName) ;      // _S2 swprintf(buf, _countof(buf), L"%ls%d %ls", DEBUGSTORE_DEADKEY, (int)i, fk->dpDeadKeyArray[i].szName);  // I3481
+    u16sprintf(buf, _countof(buf), L"%ls%d %ls", u16fmt(DEBUGSTORE_DEADKEY), (int)i, u16fmt(fk->dpDeadKeyArray[i].szName));  // I3481
     AddDebugStore(fk, buf);
   }
 }
@@ -3803,6 +3823,7 @@ KMX_BOOL IsValidCallStore(PFILE_STORE fs)
 
 FILE* CreateTempFile()
 {
+  return tmpfile();
   KMX_CHAR szTempPathBuffer[MAX_PATH], szTempFileName[MAX_PATH];   // I3228   // I3510
 
   if (!tmpfile())                                     // if (!GetTempPath(MAX_PATH, szTempPathBuffer))
@@ -3810,7 +3831,8 @@ FILE* CreateTempFile()
   if (!tmpnam(szTempPathBuffer))                      //  if (!GetTempFileName(szTempPathBuffer, "kmx", 0, szTempFileName))
     return NULL;                                      //    return INVALID_HANDLE_VALUE;     // I3228   // I3510
 
-  return  fopen(szTempFileName, "rb");                //  return CreateFile(szTempFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
+  return  fopen(szTempFileName, "rb+");                //  return CreateFile(szTempFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
+  //return tmpfile();  //_S2_
 }
 
 ///////////////////
@@ -3831,7 +3853,9 @@ DWORD len2;
 KMX_WCHAR prolog = 0xFEFF;
 fwrite(&prolog,2, 1, fp_out);                   //WriteFile(hOutfile, &prolog, 2, &len2, NULL);   // already replaced
 
+fseek(fp_in, 0, SEEK_END);
 len = ftell(fp_in);                             // len = GetFileSize(hInfile, NULL);
+fseek(fp_in, 0, SEEK_SET);
 if (hasPreamble) {
   fseek( fp_in,3,SEEK_SET);                     // SetFilePointer(hInfile, 3, NULL, FILE_BEGIN); // Cut off UTF-8 marker
   len -= 3;
@@ -3897,4 +3921,3 @@ PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID)
   }
   return NULL;
 }
- 
