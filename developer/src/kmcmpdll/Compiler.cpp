@@ -879,7 +879,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
 
         //u16printf(&p_tstr, 'd',  0x0020 , createIntVector((int) fk->currentGroup), (PKMX_WCHAR) DEBUGSTORE_MATCH, gp->szName);  // I3481   //swprintf(tstr, _countof(tstr), L"%ls%d %ls", DEBUGSTORE_MATCH, (int) fk->currentGroup, gp->szName);  // I3481
         
-        u16sprintf(tstr, _countof(tstr), L"%ls%d %ls",u16fmt( DEBUGSTORE_MATCH), (int) fk->currentGroup, u16fmt(gp->szName));  // I3481
+        u16sprintf(tstr, _countof(tstr), L"%ls%d %ls",u16fmt( DEBUGSTORE_MATCH).c_str(), (int) fk->currentGroup, u16fmt(gp->szName).c_str());  // I3481
         
         
         AddDebugStore(fk, tstr);
@@ -915,7 +915,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
         PKMX_WCHAR p_tstr;    // _S2
         /* Record a system store for the line number of the begin statement */
         //u16printf(&p_tstr,'d',  0x0020 , createIntVector(  fk->currentGroup),(PKMX_WCHAR) DEBUGSTORE_NOMATCH, gp->szName);  // I3481     //swprintf(tstr, _countof(tstr), L"%ls%d %ls", DEBUGSTORE_NOMATCH, fk->currentGroup, gp->szName);  // I3481
-        u16sprintf(tstr, _countof(tstr), L"%ls%d %ls", u16fmt(DEBUGSTORE_NOMATCH), fk->currentGroup, u16fmt(gp->szName));  // I3481
+        u16sprintf(tstr, _countof(tstr), L"%ls%d %ls", u16fmt(DEBUGSTORE_NOMATCH).c_str(), fk->currentGroup, u16fmt(gp->szName).c_str());  // I3481
         AddDebugStore(fk, tstr);
       }
     }
@@ -971,7 +971,7 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
     PKMX_WCHAR p_tstr;    // _S2
     /* Record a system store for the line number of the begin statement */
     //u16printf(&p_tstr,'d',  0x0020 , createIntVector(  fk->cxGroupArray - 1),(PKMX_WCHAR) DEBUGSTORE_GROUP, gp->szName);  // I3481     //swprintf(tstr, _countof(tstr), u"%ls%d %ls", DEBUGSTORE_GROUP, fk->cxGroupArray - 1, gp->szName);  // I3481
-    u16sprintf(tstr, _countof(tstr), L"%ls%d %ls", u16fmt(DEBUGSTORE_GROUP), fk->cxGroupArray - 1, u16fmt(gp->szName));  // I3481
+    u16sprintf(tstr, _countof(tstr), L"%ls%d %ls", u16fmt(DEBUGSTORE_GROUP).c_str(), fk->cxGroupArray - 1, u16fmt(gp->szName).c_str());  // I3481
     
     AddDebugStore(fk, tstr);
   }
@@ -3445,7 +3445,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
 
  return 0;
 }
-  
+
 
 KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 {
@@ -3802,7 +3802,7 @@ void RecordDeadkeyNames(PFILE_KEYBOARD fk)
   for (i = 0; i < fk->cxDeadKeyArray; i++)
   {
     //u16printf(&p_buf,'d', 0x0020, createIntVector( (int)i), (PKMX_WCHAR) DEBUGSTORE_DEADKEY, fk->dpDeadKeyArray[i].szName) ;      // _S2 swprintf(buf, _countof(buf), L"%ls%d %ls", DEBUGSTORE_DEADKEY, (int)i, fk->dpDeadKeyArray[i].szName);  // I3481
-    u16sprintf(buf, _countof(buf), L"%ls%d %ls", u16fmt(DEBUGSTORE_DEADKEY), (int)i, u16fmt(fk->dpDeadKeyArray[i].szName));  // I3481
+    u16sprintf(buf, _countof(buf), L"%ls%d %ls", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i, u16fmt(fk->dpDeadKeyArray[i].szName).c_str());  // I3481
     AddDebugStore(fk, buf);
   }
 }
