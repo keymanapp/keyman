@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.46 alpha 2022-08-12
+
+* docs(core): cleanup in keyboardprocessor.h (#7065)
+
 ## 16.0.45 alpha 2022-08-09
 
 * feat(linux): Replace deprecated distutils (#7051)
