@@ -72,19 +72,18 @@ if(!window['keyman']['ui']['name']) {
      * Scope        Private
      * Description  UI Initialization
      **/
-    ui['initialize'] = ui.Initialize = function()
-    {
+    ui['initialize'] = ui.Initialize = function() {
+      window.clearTimeout(ui.initTimer);
+
       // Must always initialize after keymanWeb itself, otherwise options are undefined
       if(!keymanweb['initialized']) {
-        ui.initTimer = window.setTimeout(ui.Initialize,50);
+        ui.initTimer = window.setTimeout(ui.Initialize, 50);
         return;
       }
 
       if(ui.initialized || util['isTouchDevice']()) {
         return;
       }
-
-      window.clearTimeout(ui.initTimer);
 
       var imgPath=util['getOption']('resources')+"ui/float/";
 

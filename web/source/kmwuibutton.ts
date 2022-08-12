@@ -279,9 +279,11 @@ if(!window['keyman']['ui']['name']) {
      * Initialize Button User Interface
      **/
     ui['initialize'] = ui.Initialize = function() {
+      window.clearTimeout(ui.initTimer);
+
       //Never initialize UI before KMW (parameters will be undefined)
       if(!keymanweb['initialized']) {
-        ui.initTimer = window.setTimeout(ui.Initialize,250);
+        ui.initTimer = window.setTimeout(ui.Initialize, 50);
         return;
       }
 
@@ -290,11 +292,6 @@ if(!window['keyman']['ui']['name']) {
       }
 
       ui.init = true;
-      // While the `ui.init` check above will prevent the timeout's call from
-      // re-evaluating _this instance_'s method, it can have nasty cross-effects
-      // in unit testing if not cleared, calling this modules' `Initialize`
-      // _on a different module_!
-      window.clearTimeout(ui.initTimer);
 
       util['addStyleSheet'](ui._Appearance);
 
