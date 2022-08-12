@@ -3610,25 +3610,28 @@ KMX_BOOL IsRelativePath(KMX_CHAR *p)
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 {
   FILE *fp;
-  KMX_CHAR szNewName[260], *p;
+  KMX_WCHAR szNewName[260], *p;
 
-  p = wstrtostr(szName);
-/*  // _S2_
-  if (IsRelativePath(p))
+  if (IsRelativePath(szName))
   {
-    strcpy_s(szNewName, _countof(szNewName), CompileDir);  // I3481
-    strcat_s(szNewName, _countof(szNewName), p);  // I3481
+    PKMX_WCHAR WCompileDir = strtowstr(CompileDir);
+    u16ncpy(szNewName, WCompileDir, _countof(szNewName));  // I3481       // _S2 wcscpy_s(Name, _countof(Name), WCompileDir);  // I3481
+    u16ncat(szNewName,szName,   _countof(szNewName ));  // I3481      
+
+    //u16cpy(szNewName, _countof(szNewName), CompileDir);  // I3481
+    //strcat_s(szNewName, _countof(szNewName), p);  // I3481
   }
   else
-    strcpy_s(szNewName, _countof(szNewName), p);  // I3481
-*/
-  delete[] p;
+    u16ncpy(szNewName, szName, _countof(szNewName));  // I3481
+
                                                                       // _S2 can I just use fopen here?
-  fp = fopen( ( const PKMX_CHAR) szNewName, "rb");                    // _S2 fp = _wfsopen(*szNewName, L"rb", _SH_DENYWR);                           hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+  //fp = fopen( ( const PKMX_CHAR) szNewName, "rb");                    // _S2 fp = _
+  fp =_wfsopen((wchar_t*)szNewName, L"rb", _SH_DENYWR);                           //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if ( fp == NULL)                                                    //if (hFile == INVALID_HANDLE_VALUE)
   {
-    strcat_s(szNewName, _countof(szNewName), ".bmp");  // I3481
-    fp = fopen(( const PKMX_CHAR) szNewName, "rb");                   // _S2   fp = _wfsopen(szNewName, L"rb", _SH_DENYWR);                     //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
+    //fp = fopen(( const PKMX_CHAR) szNewName, "rb");                   // _S2   
+    fp = _wfsopen((wchar_t*)szNewName, L"rb", _SH_DENYWR);                     //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if ( fp == NULL)                                                  // if (hFile == INVALID_HANDLE_VALUE)
       return CERR_CannotReadBitmapFile;
   }
@@ -3639,24 +3642,19 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   // _S2_   return msg;
  // _S2_  }
 
+
+  fseek(fp, 0, SEEK_END);
   auto sz = ftell(fp);                                                // *FileSize = GetFileSize(hFile, NULL);
+  fseek(fp ,0,SEEK_SET);
   if (sz < 0) {
     fclose(fp);
-    return FALSE;
+    return CERR_CannotReadBitmapFile;
   }
 
   if (sz < 2) return CERR_CannotReadBitmapFile;                       //if (*FileSize < 2) return CERR_CannotReadBitmapFile;
   *Buf = new KMX_BYTE[sz];                                            // *Buf = new KMX_BYTE[*FileSize];
 
-  if (fread(Buf, 1, sz, fp) < (size_t) sz) {
-    fclose(fp);
-    return FALSE;
-  }
-
-  fclose(fp);
-
-  if (!fread( *Buf, 1,sz, fp) )                                       //if (!ReadFile(hFile, *Buf, *FileSize, (PDWORD) FileSize, NULL))    // _S2: (PDWORD)
-  {
+  if (fread(*Buf, 1, sz, fp) < (size_t) sz) {
     delete[] * Buf;
     *Buf = NULL;
     return CERR_CannotReadBitmapFile;
