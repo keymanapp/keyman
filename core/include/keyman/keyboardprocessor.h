@@ -1052,6 +1052,7 @@ enum km_kbp_tech_value {
  * Bit flags to be used with the event_flags parameter of km_kbp_process_event
  */
 enum km_kbp_event_flags {
+  KM_KBP_EVENT_FLAG_DEFAULT = 0, // default value: hardware
   KM_KBP_EVENT_FLAG_TOUCH = 1, // set if the event is touch, otherwise hardware
 };
 

@@ -114,5 +114,6 @@ class State:
 def process_event(vk: VirtualKey,
                   modifier_state,
                   state: State,
-                  acts: ActionList):
+                  acts: ActionList,
+                  event_flags):
     pass
