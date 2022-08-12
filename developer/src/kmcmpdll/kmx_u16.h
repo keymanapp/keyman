@@ -21,6 +21,7 @@ size_t  u16len(const KMX_WCHAR *p);
 int  u16cmp(const KMX_WCHAR *p, const KMX_WCHAR *q);
 int   u16icmp(const KMX_WCHAR *p, const KMX_WCHAR *q);
 int   u16ncmp(const KMX_WCHAR *p, const KMX_WCHAR *q, size_t count);
+int   u16nicmp(const KMX_WCHAR *p, const KMX_WCHAR *q, size_t count) ;
 const KMX_WCHAR *  u16ncpy(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max);
 const KMX_WCHAR *  u16cpy(KMX_WCHAR *dst, const KMX_WCHAR *src);
 const KMX_WCHAR * u16chr(const KMX_WCHAR *p, KMX_WCHAR ch) ;

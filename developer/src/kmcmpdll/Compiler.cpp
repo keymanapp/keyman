@@ -643,10 +643,10 @@ q = ( PKMX_WCHAR) u16chr(p, '>');
 if (!q) return CERR_NoTokensFound;
 
 while (iswspace(*p)) p++;
-if (u16ncmp(p, u"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;      //if (_wcsnicmp(p, L"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;
-else if (u16ncmp(p, u"ansi", 4) == 0) BeginMode = BEGIN_ANSI;     //else if (_wcsnicmp(p, L"ansi", 4) == 0) BeginMode = BEGIN_ANSI;
-else if (u16ncmp(p, u"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;     //  else if (_wcsnicmp(p, L"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;
-else if (u16ncmp(p, u"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;     //  else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
+if (u16nicmp(p, u"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;      //if (_wcsnicmp(p, L"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;
+else if (u16nicmp(p, u"ansi", 4) == 0) BeginMode = BEGIN_ANSI;     //else if (_wcsnicmp(p, L"ansi", 4) == 0) BeginMode = BEGIN_ANSI;
+else if (u16nicmp(p, u"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;     //  else if (_wcsnicmp(p, L"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;
+else if (u16nicmp(p, u"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;     //  else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
 else if (*p != '>') return CERR_InvalidToken;
 else BeginMode = BEGIN_ANSI;
 
@@ -3432,7 +3432,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
   KMX_DWORD dwBytesWritten = 0;
 
  // WriteFile(hOutfile, buf, (KMX_DWORD)size, &dwBytesWritten, NULL);   // old S
-  fwrite(buf, (KMX_DWORD)size , 1, fp_out);
+  dwBytesWritten = fwrite(buf,1, (KMX_DWORD)size ,  fp_out);
 
   if (dwBytesWritten != size) {
     delete[] buf;
@@ -3445,7 +3445,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
 
  return 0;
 }
-
+  
 
 KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 {
@@ -3456,12 +3456,16 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   KMX_WCHAR currentQuotes = 0;
   KMX_WCHAR str[LINESIZE + 3];
   len = fread( str , 1 ,LINESIZE * 2  ,fp_in   );               //  if (!ReadFile(hInfile, str, LINESIZE * 2, &len, NULL))
-  if (!len )
+  if (ferror(fp_in) )
     return CERR_CannotReadInfile;
   len /= 2;
-  str[len] = 0;
+  str[len] = 0; auto cur = ftell(fp_in);
+  fseek(fp_in, 0, SEEK_END);
+  auto fsize = ftell(fp_in);
+  fseek(fp_in, cur, SEEK_SET);
 
-  if (fseek(fp_in, 0 , SEEK_CUR) == ftell(fp_in))               //if (SetFilePointer(hInfile, 0, NULL, FILE_CURRENT) == GetFileSize(hInfile, NULL))
+  if (cur == fsize)
+
     // Always a "\r\n" to the EOF, avoids funny bugs
     u16ncat(str, u"\r\n", _countof(str));  // I3481
 

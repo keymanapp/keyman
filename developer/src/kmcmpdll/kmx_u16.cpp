@@ -260,6 +260,19 @@ int   u16cmp(const KMX_WCHAR *p, const KMX_WCHAR *q) {
   return *p - *q;
 }
 
+int   u16nicmp(const KMX_WCHAR *p, const KMX_WCHAR *q, size_t count) {
+  while (*p && *q && count) {
+    if (toupper(*p) != toupper(*q)) return *p - *q;
+    p++;
+    q++;
+    count--;
+  }
+  if (count)
+    return *p - *q;
+  return 0;
+}
+
+
 int   u16icmp(const KMX_WCHAR *p, const KMX_WCHAR *q) {
   while (*p && *q) {
     if (toupper(*p) != toupper(*q)) return *p - *q;
@@ -310,13 +323,13 @@ km_kbp_cp * u16tok(km_kbp_cp* p,  km_kbp_cp* ch, km_kbp_cp** ctx) {
 	}
 
 	km_kbp_cp* q = p;
-	while (*q && *q != *ch) {
+	while (*q && !u16chr(ch, *q)) {
 		q++;
 	}
 	if (*q) {
 		*q = 0;
 		q++;
-		while (*q == *ch) q++;
+		while (u16chr(ch, *q)) q++;
 		*ctx = q;
 	}
 	else {
@@ -324,6 +337,7 @@ km_kbp_cp * u16tok(km_kbp_cp* p,  km_kbp_cp* ch, km_kbp_cp** ctx) {
 	}
 	return p;
 }
+
 /*
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)   
 {
