@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboard SYSTEM "ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+
+  <names>
+    <name value="TestKbd" />
+  </names>
+
+  <keys>
+    <key id="hmaqtua" to="ħ" />
+    <key id="say" to="ថា" />
+  </keys>
+
+  <layerMaps form="hardware">
+    <layerMap id="base">
+      <row keys="hmaqtua say" />
+    </layerMap>
+  </layerMaps>
+</keyboard>
