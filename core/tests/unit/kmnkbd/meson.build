@@ -13,7 +13,7 @@ else
   warns = []
 endif
 
-defns=['-DKMN_KBP_STATIC']
+defns+=['-DKMN_KBP_STATIC']
 tests = [
   ['context-api', 'context_api.cpp'],
   ['keyboard-api', 'keyboard_api.cpp'],

@@ -4,7 +4,7 @@
 # Authors:      Tim Eves (TSE)
 #
 
-defns = ['-DKMN_KBP_EXPORTING']
+defns += ['-DKMN_KBP_EXPORTING']
 version_res = []
 
 if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
@@ -54,7 +54,7 @@ endif
 if compiler.get_id() == 'emscripten'
   warns = []
   flags = []
-  defns = []
+  defns = ['-DKMN_KBP']
   links = []
 endif
 

@@ -60,12 +60,12 @@ function buildproject() {
 	if [[ "${BUILDONLY}" == "no" ]]; then
 		echo "Configuring $proj"
 		if [[ "${INSTALLDIR}" == "/tmp/kmfl" ]]; then # don't install ibus-kmfl or ibus-keyman into ibus
-			../${subdir}$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/arch/release/include -I\$(top_builddir)/../../core/include" \
+			../${subdir}$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/arch/release/include -I\$(top_builddir)/../../common/include -I\$(top_builddir)/../../core/include" \
 				CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" \
 				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/arch/release/src -lkmnkbp0" \
 				LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
 		else	# install ibus-kmfl and ibus-keyman into ibus
-			../${subdir}$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/arch/release/include -I\$(top_builddir)/../../core/include" \
+			../${subdir}$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/arch/release/include -I\$(top_builddir)/../../common/include -I\$(top_builddir)/../../core/include" \
 				CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" \
 				LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" \
 				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/arch/release/src -lkmnkbp0" \

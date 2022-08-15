@@ -70,7 +70,7 @@ ibus_keyman_tests_SOURCES = \
   ../../../core/src/kmx/kmx_environment.cpp \
   ../../../core/src/kmx/kmx_environment.h \
   ../../../core/src/kmx/kmx_file.cpp \
-  ../../../core/src/kmx/kmx_file.h \
+  ../../../common/include/kmx_file.h \
   ../../../core/src/kmx/kmx_modifiers.cpp \
   ../../../core/src/kmx/kmx_options.cpp \
   ../../../core/src/kmx/kmx_options.h \
