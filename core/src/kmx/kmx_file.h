@@ -340,13 +340,17 @@ struct COMP_KEYBOARD {
   KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
 };
 
+struct COMP_KEYBOARD_KMXPLUSINFO {
+  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
+  KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
+};
+
 /**
  * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
  */
 struct COMP_KEYBOARD_EX {
-  COMP_KEYBOARD comp_keyboard;     // 0000 see COMP_KEYBOARD
-  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
-  KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
+  COMP_KEYBOARD comp_keyboard;              // 0000 see COMP_KEYBOARD
+  COMP_KEYBOARD_KMXPLUSINFO comp_keyboard_kmxplusinfo;  // 0040 see COMP_KEYBOARD_EXTRA
 };
 
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
