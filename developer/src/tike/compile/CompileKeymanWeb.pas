@@ -1038,7 +1038,8 @@ begin
     begin
 			if InQuotes then
       begin
-        Result := Result + '");';
+        if not fgp.fReadOnly then
+          Result := Result + '");';
         InQuotes := False;
       end;
 
@@ -1223,9 +1224,9 @@ begin
         InQuotes := True; len := -1;
       end;
 
-      if rec.ChrVal in [Ord('"'), Ord('\')] then Result := Result + '\';
       if not fgp.fReadOnly then
       begin
+        if rec.ChrVal in [Ord('"'), Ord('\')] then Result := Result + '\';
         Result := Result + Javascript_String(rec.ChrVal);  // I2242
       end;
     end;
@@ -1233,7 +1234,13 @@ begin
     pwsz := incxstr(pwsz);
 	end;
 
-	if InQuotes then Result := Result + '");';
+	if InQuotes then
+  begin
+    if not fgp.fReadOnly then
+    begin
+      Result := Result + '");';
+    end;
+  end;
 end;
 
 function TCompileKeymanWeb.JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
