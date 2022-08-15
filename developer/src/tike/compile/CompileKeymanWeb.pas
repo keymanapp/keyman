@@ -2200,11 +2200,11 @@ begin
 	{ Write the groups out }
 
   // I853 - begin unicode missing causes crash
-{  if fk.StartGroup[BEGIN_UNICODE] = $FFFFFFFF then
+  if fk.StartGroup[BEGIN_UNICODE] = $FFFFFFFF then
   begin
-    FCallback(fkp.Line, $4005, PChar('A "begin unicode" statement is required to compile a KeymanWeb keyboard'));
+    ReportError(0, CERR_InvalidBegin, 'A "begin unicode" statement is required to compile a KeymanWeb keyboard');
     Exit;
-  end;}
+  end;
 
   Result := Result + WriteBeginStatement('gs', fk.StartGroup[BEGIN_UNICODE]);
   rec := ExpandSentinel(PChar(sBegin_NewContext));
