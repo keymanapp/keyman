@@ -308,7 +308,7 @@ km_kbp_process_event(
   vk: km_kbp_virtual_key;
   modifier_state: uint16_t;
   is_key_down: uint8_t;
-  event_flags: uint16_t;
+  event_flags: uint16_t
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 const
