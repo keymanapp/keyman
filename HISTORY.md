@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.47 alpha 2022-08-15
+
+* chore(core): refactor kmx_file.h to common (#7062)
+* fix(developer): stack overflow when compiling non-web keyboard (#7031)
+* fix(developer): prevent crash attempting to compile ansi keyboard (#7033)
+* chore(linux): Refactor `jenkins.sh` (#7060)
+* fix(developer): compiler emitting garbage for readonly groups (#7013)
+
 ## 16.0.46 alpha 2022-08-12
 
 * docs(core): cleanup in keyboardprocessor.h (#7065)
