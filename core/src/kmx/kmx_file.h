@@ -341,7 +341,7 @@ struct COMP_KEYBOARD {
 };
 
 /**
- * Only valid if comp_keyboard.dwFlags&0x20
+ * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
  */
 struct COMP_KEYBOARD_EX {
   COMP_KEYBOARD comp_keyboard;     // 0000 see COMP_KEYBOARD
