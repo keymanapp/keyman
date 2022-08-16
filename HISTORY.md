@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.48 alpha 2022-08-16
+
+* fix(web): button, float init timer cleanup (#7036)
+
 ## 16.0.47 alpha 2022-08-15
 
 * chore(core): refactor kmx_file.h to common (#7062)
