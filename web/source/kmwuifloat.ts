@@ -73,7 +73,10 @@ if(!window['keyman']['ui']['name']) {
      * Description  UI Initialization
      **/
     ui['initialize'] = ui.Initialize = function() {
-      window.clearTimeout(ui.initTimer);
+      if(ui.initTimer) {
+        window.clearTimeout(ui.initTimer);
+        ui.initTimer = null;
+      }
 
       // Must always initialize after keymanWeb itself, otherwise options are undefined
       if(!keymanweb['initialized']) {

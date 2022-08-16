@@ -279,7 +279,10 @@ if(!window['keyman']['ui']['name']) {
      * Initialize Button User Interface
      **/
     ui['initialize'] = ui.Initialize = function() {
-      window.clearTimeout(ui.initTimer);
+      if(ui.initTimer) {
+        window.clearTimeout(ui.initTimer);
+        ui.initTimer = null;
+      }
 
       //Never initialize UI before KMW (parameters will be undefined)
       if(!keymanweb['initialized']) {
