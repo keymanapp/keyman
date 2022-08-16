@@ -70,6 +70,7 @@ get_OS
 get_browser_set_for_OS
 
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
+SH_FLAGS=
 DEBUG=false
 FLAGS=
 HEADLESS_FLAGS=-skip-package-install
@@ -81,6 +82,7 @@ while [[ $# -gt 0 ]] ; do
         -CI)
             CONFIG=CI.conf.js
             HEADLESS_FLAGS="$HEADLESS_FLAGS -CI"
+            SH_FLAGS="--ci"
             ;;
         -log-level)
             shift
@@ -131,9 +133,15 @@ cd ../tools/recorder
 # First:  Web-core tests.
 pushd "$KEYMAN_ROOT/common/web/input-processor"
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
-# Once done, now we run the integrated (KeymanWeb) tests.
 popd
 
+# For now, we'll also link in the gesture-recognizer unit tests here.
+echo_heading "Running gesture-recognizer test suite"
+pushd "$KEYMAN_ROOT/common/web/gesture-recognizer"
+npm run test -- $SH_FLAGS
+popd
+
+# Once done, now we run the integrated (KeymanWeb) tests.
 echo_heading "Running KeymanWeb integration test suite"
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
 npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG

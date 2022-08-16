@@ -12,9 +12,11 @@ namespace com.keyman.osk {
     public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
 
-      this._touchStart = this.onTouchStart.bind(this);
-      this._touchMove  = this.onTouchMove.bind(this);
-      this._touchEnd   = this.onTouchEnd.bind(this);
+      // We use this approach, rather than .bind, because _this_ version allows hook
+      // insertion for unit tests via prototype manipulation.  The .bind version doesn't.
+      this._touchStart = (event: TouchEvent) => this.onTouchStart(event);
+      this._touchMove  = (event: TouchEvent) => this.onTouchMove(event);
+      this._touchEnd   = (event: TouchEvent) => this.onTouchEnd(event);
     }
 
     private get eventRoot(): HTMLElement {

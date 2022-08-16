@@ -25,7 +25,8 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
   "build" \
   "test" \
   ":module" \
-  ":tools tools for testing & developing test resources for this module"
+  ":tools  tools for testing & developing test resources for this module" \
+  "--ci    sets the --ci option for child scripts (i.e, the `test` action)"
 
 builder_parse "$@"
 
@@ -60,6 +61,10 @@ if builder_has_action build :tools; then
 fi
 
 if builder_has_action test :module; then
-  npm test
+  if builder_has_option --ci; then
+    npm test -- --ci
+  else
+    npm test
+  fi
   builder_report success test :module
 fi

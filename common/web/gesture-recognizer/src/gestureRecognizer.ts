@@ -9,7 +9,7 @@ namespace com.keyman.osk {
   }
 
   export class GestureRecognizer extends EventEmitter<EventMap> {
-    protected readonly config: Nonoptional<GestureRecognizerConfiguration>;
+    public readonly config: Nonoptional<GestureRecognizerConfiguration>;
 
     private readonly mouseEngine: MouseEventEngine;
     private readonly touchEngine: TouchEventEngine;

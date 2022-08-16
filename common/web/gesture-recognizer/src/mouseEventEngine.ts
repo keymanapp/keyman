@@ -15,9 +15,11 @@ namespace com.keyman.osk {
     public constructor(config: Nonoptional<GestureRecognizerConfiguration>) {
       super(config);
 
-      this._mouseStart = this.onMouseStart.bind(this);
-      this._mouseMove  = this.onMouseMove.bind(this);
-      this._mouseEnd   = this.onMouseEnd.bind(this);
+      // We use this approach, rather than .bind, because _this_ version allows hook
+      // insertion for unit tests via prototype manipulation.  The .bind version doesn't.
+      this._mouseStart = (event: MouseEvent) => this.onMouseStart(event);
+      this._mouseMove  = (event: MouseEvent) => this.onMouseMove(event);
+      this._mouseEnd   = (event: MouseEvent) => this.onMouseEnd(event);
 
       // IDs should be unique.  Fortunately, they're disambiguated by their corresponding TrackedPoint,
       // which has gives a globally-unique string-based identifier based partly on the numeric ID set here.

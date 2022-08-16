@@ -24,6 +24,10 @@ namespace Testing {
       this._attachRecognizerHooks();
     }
 
+    public get count(): number {
+      return this.startOrder.length;
+    }
+
     private _attachRecognizerHooks() {
       this.controller.recognizer.on('inputstart', (wrappedSequence: WrappedInputSequence) => {
         const id = wrappedSequence.touchpoints[0].identifier;
