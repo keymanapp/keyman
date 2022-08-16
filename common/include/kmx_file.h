@@ -5,11 +5,14 @@
 
 #pragma once
 
-#include "kmx_base.h"
+#include <km_types.h>
 
+#ifdef KMN_KBP
+// TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
 namespace kbp {
 namespace kmx {
+#endif
 
 /* */
 
@@ -352,6 +355,8 @@ static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOA
 static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
 static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
+#ifdef KMN_KBP
 } // namespace kmx
 } // namespace kbp
 } // namespace km
+#endif

@@ -270,21 +270,37 @@ replaceVersionStrings_Mkver() {
 # Standard build script functions for managing command line, actions and targets
 ################################################################################
 
-# TODO: colors are defined here and in shellHelperFunctions.sh
 # The following allows coloring of warning and error lines, but only works if there's a
 # terminal attached, so not on the build machine.
-if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+
+# Overrides default colorization of logging; can be used in command-line with
+# --color or --no-color, or overridden as necessary on a per-script basis.
+#
+# Parameters
+#  1: use_color       true or false
+builder_use_color() {
+  if $1; then
     COLOR_RED=$(tput setaf 1)
     COLOR_GREEN=$(tput setaf 2)
     COLOR_BLUE=$(tput setaf 4)
     COLOR_YELLOW=$(tput setaf 3)
     COLOR_RESET=$(tput sgr0)
-else
+    # e.g. VSCode https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support
+    HEADING_SETMARK='\x1b]1337;SetMark\x07'
+  else
     COLOR_RED=
     COLOR_GREEN=
     COLOR_BLUE=
     COLOR_YELLOW=
     COLOR_RESET=
+    HEADING_SETMARK=
+  fi
+}
+
+if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+  builder_use_color true
+else
+  builder_use_color false
 fi
 
 ####################################################################################
@@ -324,16 +340,21 @@ _builder_item_is_target() {
 # Returns 0 if the user has asked to perform action on target on the command line
 #
 # Usage:
-#   if build_has_action action :target; then ...; fi
+#   if build_has_action action[:target]; then ...; fi
 # Parameters:
 #   1: action    name of action
-#   2: target    name of target, :-prefixed
+#   2: :target    name of target, :-prefixed, as part of first param or space separated ok
 # Example:
 #   if build_has_action build :app; then
+#   if build_has_action build:app; then
 #
 builder_has_action() {
   local action="$1" target
-  if [[ -z ${2+x} ]]; then
+
+  if [[ $action =~ : ]]; then
+    IFS=: read -r action target <<< $action
+    target=:$target
+  elif [[ -z ${2+x} ]]; then
     target=:project
   else
     target="$2"
@@ -481,14 +502,15 @@ _builder_get_default_description() {
   echo "$description"
 }
 
-# Overrides default colorization of logging; can be used in command-line with
-# --color or --no-color, or overridden as necessary on a per-script basis.
-#
-# Parameters
-#  1: use_color       true or false
-builder_use_color() {
-  local use_color=$1
-  shell_helper_color $use_color
+_builder_parameter_error() {
+  local program="$1"
+  local type="$2"
+  local param="$3"
+  echo "$COLOR_RED$program: invalid $type: $param$COLOR_RESET"
+  echo
+  builder_display_usage
+  exit 64
+
 }
 
 # Initializes a build.sh script, parses command line. Will abort the script if
@@ -533,11 +555,22 @@ builder_parse() {
       _builder_chosen_action_targets+=("$key")
     elif (( has_action )); then
       # apply the selected action to all targets
+      if [[ ! -z $target ]]; then
+        # A target was specified but is not valid
+        _builder_parameter_error "$0" target "$target"
+      fi
+
       for e in "${_builder_targets[@]}"; do
         _builder_chosen_action_targets+=("$action$e")
       done
     elif (( has_target )); then
       # apply the default action to the selected target
+
+      if [[ ! -z $action ]]; then
+        # An action was specified but is not valid
+        _builder_parameter_error "$0" action "$action"
+      fi
+
       _builder_chosen_action_targets+=("$_builder_default_action$target")
     elif (( has_option )); then
       _builder_chosen_options+=("$key")
@@ -558,9 +591,7 @@ builder_parse() {
           builder_verbose=--verbose
           ;;
         *)
-          echo "$0: invalid option: $key"
-          builder_display_usage
-          exit 64
+          _builder_parameter_error "$0" parameter "$key"
       esac
     fi
     shift # past the processed argument
@@ -646,10 +677,10 @@ builder_display_usage() {
     fi
   done
 
-  _builder_pad $width "  --verbose, -v" "Verbose logging"
-  _builder_pad $width "  --color" "Force colorized output"
-  _builder_pad $width "  --no-color" "Never use colorized output"
-  _builder_pad $width "  --help, -h" "Show this help"
+  _builder_pad $width "  --verbose, -v"  "Verbose logging"
+  _builder_pad $width "  --color"        "Force colorized output"
+  _builder_pad $width "  --no-color"     "Never use colorized output"
+  _builder_pad $width "  --help, -h"     "Show this help"
   local c1="${COLOR_BLUE:=<}"
   local c0="${COLOR_RESET:=>}"
   echo
@@ -664,7 +695,10 @@ builder_report() {
   local result="$1"
   local action="$2" target
 
-  if [[ -z ${3+x} ]]; then
+  if [[ $action =~ : ]]; then
+    IFS=: read -r action target <<< $action
+    target=:$target
+  elif [[ -z ${3+x} ]]; then
     target=:project
   else
     target="$3"

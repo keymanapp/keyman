@@ -1038,7 +1038,8 @@ begin
     begin
 			if InQuotes then
       begin
-        Result := Result + '");';
+        if not fgp.fReadOnly then
+          Result := Result + '");';
         InQuotes := False;
       end;
 
@@ -1223,9 +1224,9 @@ begin
         InQuotes := True; len := -1;
       end;
 
-      if rec.ChrVal in [Ord('"'), Ord('\')] then Result := Result + '\';
       if not fgp.fReadOnly then
       begin
+        if rec.ChrVal in [Ord('"'), Ord('\')] then Result := Result + '\';
         Result := Result + Javascript_String(rec.ChrVal);  // I2242
       end;
     end;
@@ -1233,7 +1234,13 @@ begin
     pwsz := incxstr(pwsz);
 	end;
 
-	if InQuotes then Result := Result + '");';
+	if InQuotes then
+  begin
+    if not fgp.fReadOnly then
+    begin
+      Result := Result + '");';
+    end;
+  end;
 end;
 
 function TCompileKeymanWeb.JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
@@ -2200,11 +2207,11 @@ begin
 	{ Write the groups out }
 
   // I853 - begin unicode missing causes crash
-{  if fk.StartGroup[BEGIN_UNICODE] = $FFFFFFFF then
+  if fk.StartGroup[BEGIN_UNICODE] = $FFFFFFFF then
   begin
-    FCallback(fkp.Line, $4005, PChar('A "begin unicode" statement is required to compile a KeymanWeb keyboard'));
+    ReportError(0, CERR_InvalidBegin, 'A "begin unicode" statement is required to compile a KeymanWeb keyboard');
     Exit;
-  end;}
+  end;
 
   Result := Result + WriteBeginStatement('gs', fk.StartGroup[BEGIN_UNICODE]);
   rec := ExpandSentinel(PChar(sBegin_NewContext));

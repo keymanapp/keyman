@@ -71,6 +71,11 @@ These dependencies are also listed below if you'd prefer to install manually.
   brew install node emscripten openjdk@8
   ```
 
+  Note: if you install emscripten with brew on macOS, only emscripten binaries
+  are added to the path via symlinks. This makes it reasonably safe to have
+  emscripten on the path, unlike on other platforms where emscripten also ends
+  up adding its versions of node, python, and other binaries to the path.
+
 * iOS: swiftlint, carthage
 
   ```shell

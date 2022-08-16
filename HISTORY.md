@@ -1,5 +1,35 @@
 # Keyman Version History
 
+## 16.0.47 alpha 2022-08-15
+
+* chore(core): refactor kmx_file.h to common (#7062)
+* fix(developer): stack overflow when compiling non-web keyboard (#7031)
+* fix(developer): prevent crash attempting to compile ansi keyboard (#7033)
+* chore(linux): Refactor `jenkins.sh` (#7060)
+* fix(developer): compiler emitting garbage for readonly groups (#7013)
+
+## 16.0.46 alpha 2022-08-12
+
+* docs(core): cleanup in keyboardprocessor.h (#7065)
+
+## 16.0.45 alpha 2022-08-09
+
+* feat(linux): Replace deprecated distutils (#7051)
+* chore(linux): Adjust Linux source package to restructured code (#7056)
+
+## 16.0.44 alpha 2022-08-08
+
+* chore(linux): Update debian changelog (#7041)
+
+## 16.0.43 alpha 2022-08-05
+
+* chore(web): centralizes web-based modules' CI unit test configurations (#7024)
+* refactor(web): converts test_utils funcs to Promise use (#7027)
+* chore(core): get wasm core building again (#7023)
+* chore(common): build-utils.sh minor tweaks (#7018)
+* change(web): rotation polish - OSK reload no longer needed  ️ (#6787)
+* change(web): updates mobile screen dimension detection code  ️ (#6979)
+
 ## 16.0.42 alpha 2022-08-01
 
 * feat(developer): add languageUsesCasing to Model Editor (#7008)

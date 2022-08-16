@@ -50,7 +50,7 @@ void teardown() {
 void setup(const char *keyboard) {
   teardown();
 
-  km::kbp::path path = km::kbp::path::join(arg_path, "..", "kmx", keyboard);
+  km::kbp::path path = km::kbp::path::join(arg_path, keyboard);
 
   try_status(km_kbp_keyboard_load(path.native().c_str(), &test_kb));
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));

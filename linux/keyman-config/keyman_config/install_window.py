@@ -15,7 +15,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 
-from distutils.version import StrictVersion
+from pkg_resources import parse_version
 
 from gi.repository import Gtk, WebKit2
 
@@ -107,8 +107,8 @@ class InstallKmpWindow(Gtk.Dialog):
                     try:
                         logging.info("package version %s", secure_lookup(info, 'version', 'description'))
                         logging.info("installed kmp version %s", installed_kmp_ver)
-                        if StrictVersion(secure_lookup(info, 'version',
-                                                       'description')) <= StrictVersion(installed_kmp_ver):
+                        if parse_version(secure_lookup(info, 'version',
+                                                       'description')) <= parse_version(installed_kmp_ver):
                             dialog = Gtk.MessageDialog(
                               viewkmp, 0, Gtk.MessageType.QUESTION,
                               Gtk.ButtonsType.YES_NO, _("Keyboard is installed already"))

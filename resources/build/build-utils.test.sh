@@ -62,8 +62,15 @@ else
 fi
 
 if builder_has_action clean :app; then
-  echo "Cleaning app"
+  echo "Cleaning <clean :app>"
   builder_report success clean :app
+else
+  fail "FAIL: should have matched action clean for :app"
+fi
+
+if builder_has_action clean:app; then
+  echo "Cleaning <clean:app>"
+  builder_report success clean:app
 else
   fail "FAIL: should have matched action clean for :app"
 fi
