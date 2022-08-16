@@ -349,8 +349,8 @@ struct COMP_KEYBOARD_KMXPLUSINFO {
  * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
  */
 struct COMP_KEYBOARD_EX {
-  COMP_KEYBOARD comp_keyboard;              // 0000 see COMP_KEYBOARD
-  COMP_KEYBOARD_KMXPLUSINFO comp_keyboard_kmxplusinfo;  // 0040 see COMP_KEYBOARD_EXTRA
+  COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
+  COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
 };
 
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
