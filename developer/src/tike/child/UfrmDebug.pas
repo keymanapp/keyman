@@ -462,7 +462,7 @@ begin
   if not SetKeyEventContext then
     Exit(False);
 
-  if km_kbp_process_event(FDebugCore.State, Message.WParam, modifier, 1) = KM_KBP_STATUS_OK then
+  if km_kbp_process_event(FDebugCore.State, Message.WParam, modifier, 1, KM_KBP_EVENT_FLAG_DEFAULT) = KM_KBP_STATUS_OK then
   begin
     // Process keystroke
     Result := True;

@@ -277,13 +277,20 @@ class Tech(IntFlag):
     KMN = 1
     LDML = 2
 
+class EventFlag(IntFlag):
+    KM_KBP_EVENT_FLAG_DEFAULT = 0
+    """default value: hardware"""
+    KM_KBP_EVENT_FLAG_TOUCH = 1
+    """set if the event is touch, otherwise hardware"""
+
 
 __method(None, 'get_engine_attrs', POINTER(Attributes))
 
 __method(None, 'process_event', Status,
          (State_p, Dir.IN, 'state'),
          (VirtualKey, Dir.IN, 'vkey'),
-         (c_uint16, Dir.IN, 'modifier_state'))
+         (c_uint16, Dir.IN, 'modifier_state'),
+         (c_uint16, Dir.IN, 'event_flags'))
 
 
 class Modifier(IntFlag):
