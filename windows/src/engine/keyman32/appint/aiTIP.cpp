@@ -258,15 +258,12 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->TIPGetContext = ctfunc;
 
   AppContextWithStores *savedContext = NULL;  // I4370   // I4978
-  AppContext *savedContextUsingCore  = NULL;  // used for common core
-  km_kbp_option_item *SavedKBDOptions = NULL; // used for common core
+
   if (!Updateable) {
-    if (isUsingCoreProcessor) {
-      savedContextUsingCore = new AppContext();
-      _td->app->CopyContext(savedContextUsingCore);
-      SavedKBDOptions = SaveKeyboardOptionsCore(_td->lpActiveKeyboard);
-    } else {                                                                                   // I4370
-      savedContext = new AppContextWithStores(_td->lpActiveKeyboard->Keyboard->cxStoreArray);  // I4978
+    // The core processor km_kbp_process_event is only called once per key stroke
+    // therefore there is no  need to preserve context and keyboard actions
+    if (!isUsingCoreProcessor) {                                                                                   
+      savedContext = new AppContextWithStores(_td->lpActiveKeyboard->Keyboard->cxStoreArray);  // I4370 // I4978 
       _td->app->SaveContext(savedContext);
     }
   }
@@ -274,17 +271,8 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   BOOL res = ProcessHook();
 
   if (!Updateable) {
-    if (isUsingCoreProcessor) {
-      if (res) {
-        // Reset the context if match found
-        _td->app->RestoreContextOnly(savedContextUsingCore);
-        RestoreKeyboardOptionsCore(_td->lpActiveKeyboard->lpCoreKeyboardState, SavedKBDOptions);
-        DisposeKeyboardOptionsCore(&SavedKBDOptions);
-        delete savedContextUsingCore;
-        savedContextUsingCore = NULL;
-      }
-    } else {      // I4370
-      if (res) {  // I4585
+    if (!isUsingCoreProcessor) {  
+      if (res) {  // I4585  // I4370
         // Reset the context if match found
         _td->app->RestoreContext(savedContext);
         delete savedContext;
