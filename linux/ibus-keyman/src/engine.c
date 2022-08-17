@@ -634,7 +634,16 @@ process_persist_action(
 
 static gboolean
 process_emit_keystroke_action(IBusKeymanEngine *keyman) {
-  keyman->commit_item->emitting_keystroke = TRUE;
+  if (((IBusEngine*)keyman)->client_capabilities & IBUS_CAP_PREFILTER) {
+    keyman->commit_item->emitting_keystroke = TRUE;
+  } else {
+    if (keyman->commit_item->char_buffer != NULL) {
+      ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
+      g_free(keyman->commit_item->char_buffer);
+      keyman->commit_item->char_buffer = NULL;
+    }
+    keyman->commit_item->emitting_keystroke = TRUE;
+  }
   return TRUE;
 }
 
@@ -688,19 +697,32 @@ commit_text(IBusKeymanEngine *keyman) {
 static gboolean
 process_end_action(IBusKeymanEngine *keyman) {
   g_assert(keyman != NULL);
-  keyman->commit_item++;
-  if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE-1]) {
-    g_error("Overflow of keyman commit_queue!");
-    // TODO: log to Sentry
-    keyman->commit_item--;
+  if (((IBusEngine *)keyman)->client_capabilities & IBUS_CAP_PREFILTER) {
+    keyman->commit_item++;
+    if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE-1]) {
+      g_error("Overflow of keyman commit_queue!");
+      // TODO: log to Sentry
+      keyman->commit_item--;
+    }
+
+    // Forward a fake key event to get the correct order of events so that any backspace key we
+    // generated will be processed before the character we're adding. We need to send a
+    // valid keyval/keycode combination so that it doesn't get swallowed by GTK but which
+    // isn't very likely used in real keyboards. F24 seems to work for that.
+    ibus_engine_forward_key_event((IBusEngine*)keyman, KEYMAN_NOCHAR_KEYSYM, KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL, IBUS_PREFILTER_MASK);
+  } else {
+    if (keyman->commit_item->char_buffer != NULL) {
+      ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
+      g_free(keyman->commit_item->char_buffer);
+      keyman->commit_item->char_buffer = NULL;
+    }
+    if (keyman->commit_item->emitting_keystroke) {
+      keyman->commit_item->emitting_keystroke = FALSE;
+      return FALSE;
+    }
   }
 
-  // Forward a fake key event to get the correct order of events so that any backspace key we
-  // generated will be processed before the character we're adding. We need to send a
-  // valid keyval/keycode combination so that it doesn't get swallowed by GTK but which
-  // isn't very likely used in real keyboards. F24 seems to work for that.
   return TRUE;
-  ibus_engine_forward_key_event((IBusEngine*)keyman, KEYMAN_NOCHAR_KEYSYM, KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL, IBUS_PREFILTER_MASK);
 }
 
 static gboolean
@@ -773,12 +795,13 @@ ibus_keyman_engine_process_key_event(
 
   g_message("-----------------------------------------------------------------------------------------------------------------");
   g_message(
-      "DAR: ibus_keyman_engine_process_key_event - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d", keyval, keycode,
-      state, isKeyDown);
+      "DAR: ibus_keyman_engine_process_key_event - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, supports_prefilter=%d", keyval, keycode,
+      state, isKeyDown, engine->client_capabilities & IBUS_CAP_PREFILTER);
 
   // This keycode is a fake keycode that we send when it's time to commit the text, ensuring the
   // correct output order of backspace and text.
-  if (keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL && (state & IBUS_PREFILTER_MASK)) {
+  if ((engine->client_capabilities & IBUS_CAP_PREFILTER) && keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL &&
+      (state & IBUS_PREFILTER_MASK)) {
     commit_text(keyman);
     return TRUE;
   }
@@ -855,8 +878,10 @@ ibus_keyman_engine_process_key_event(
   keyman->commit_item->char_buffer                    = NULL;
   const km_kbp_action_item *action_items = km_kbp_state_action_items(keyman->state, &num_action_items);
 
-  if (!process_actions(engine, action_items, num_action_items))
-    return TRUE;
+  if (!process_actions(engine, action_items, num_action_items) &&
+      !(engine->client_capabilities & IBUS_CAP_PREFILTER)) {
+    return FALSE;
+  }
 
   context = km_kbp_state_context(keyman->state);
   g_message("after processing all actions");
