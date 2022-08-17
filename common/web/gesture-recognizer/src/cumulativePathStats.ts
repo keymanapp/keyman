@@ -7,8 +7,21 @@ namespace com.keyman.osk {
    * Instances of this class are immutable.
    */
   export class CumulativePathStats {
+    private xLinearSum: number = 0;
+    private yLinearSum: number = 0;
+    private tLinearSum: number = 0;
+
     private xCentroidSum: number = 0;
     private yCentroidSum: number = 0;
+
+    private xQuadSum: number = 0;
+    private yQuadSum: number = 0;
+    private tQuadSum: number = 0;
+
+    private xtCrossSum: number = 0;
+    private ytCrossSum: number = 0;
+    // As x and y are both treated as dependent on t, we don't need their cross-sum
+    // with each other.
 
     private coordArcSum: number = 0;
 
@@ -65,16 +78,28 @@ namespace com.keyman.osk {
       if(!this.initialSample) {
         this.initialSample = sample;
         this.baseSample = sample;
-      } else {
-        this.followingSample = sample;
       }
       const result = new CumulativePathStats(this);
+
+      // Set _after_ deep-copying this for the result.
+      this.followingSample = sample;
 
       // Helps prevent "catastrophic cancellation" issues from floating-point computation
       // for these statistical properties and properties based upon them.
       const x = sample.targetX - this.baseSample.targetX;
       const y = sample.targetY - this.baseSample.targetY;
       const t = sample.t - this.baseSample.t;
+
+      result.xLinearSum += x;
+      result.yLinearSum += y;
+      result.tLinearSum += t;
+
+      result.xtCrossSum += x * t;
+      result.ytCrossSum += y * t;
+
+      result.xQuadSum += x * x;
+      result.yQuadSum += y * y;
+      result.tQuadSum += t * t;
 
       if(this.lastSample) {
         // arc length stuff!
@@ -124,6 +149,18 @@ namespace com.keyman.osk {
      * @returns
      */
     public deaccumulate(subsetStats?: CumulativePathStats): CumulativePathStats {
+      // Possible TODO:  Because of the properties of statistical variance & mean...
+      // we could further prevent catastrophic cancellation by re-centering
+      // all the linear, cross, and quad sums.
+      // - mostly noteworthy for _long_ duration touches that wander long distances.
+      // - basically, for cases that'd cause the floating-point error to exceed our
+      //   test thresholds.  Re-centering would keep that error consistently below
+      //   our thresholds.
+      //
+      // We could then take the new mean coordinates as a 'base sample'.
+      // Kinda has to be the new mean b/c of the stats identities we'd be abusing,
+      // but that's also the best catastrophic-cancellation prevention move we
+      // could take.  So, this limitation's not really a negative.
       const result = new CumulativePathStats(this);
 
       // We actually WILL accept a `null` argument; makes some of the segmentation
@@ -135,6 +172,17 @@ namespace com.keyman.osk {
       if(!subsetStats.followingSample || !subsetStats.lastSample) {
         throw 'Invalid argument:  stats missing necessary tracking variable.';
       }
+
+      result.xLinearSum -= subsetStats.xLinearSum;
+      result.yLinearSum -= subsetStats.yLinearSum;
+      result.tLinearSum -= subsetStats.tLinearSum;
+
+      result.xtCrossSum -= subsetStats.xtCrossSum;
+      result.ytCrossSum -= subsetStats.ytCrossSum;
+
+      result.xQuadSum -= subsetStats.xQuadSum;
+      result.yQuadSum -= subsetStats.yQuadSum;
+      result.tQuadSum -= subsetStats.tQuadSum;
 
       // arc length stuff!
       if(subsetStats.followingSample && subsetStats.lastSample) {
@@ -189,6 +237,22 @@ namespace com.keyman.osk {
       return this.lastSample?.t;
     }
 
+    public get count() {
+      return this.sampleCount;
+    }
+
+    private get xSampleMean() {
+      return this.xLinearSum / this.sampleCount;
+    }
+
+    private get ySampleMean() {
+      return this.yLinearSum / this.sampleCount;
+    }
+
+    private get tSampleMean() {
+      return this.tLinearSum / this.sampleCount;
+    }
+
     public get centroid(): {x: number, y: number} {
       if(this.sampleCount == 0) {
         return undefined;
@@ -204,6 +268,140 @@ namespace com.keyman.osk {
           y: this.yCentroidSum * coeff
         };
       }
+    }
+
+    public get xtCovariance() {
+      return this.xtCrossSum / this.sampleCount - (this.xSampleMean * this.tSampleMean);
+    }
+
+    public get ytCovariance() {
+      return this.ytCrossSum / this.sampleCount - (this.ySampleMean * this.tSampleMean);
+    }
+
+    public get xVariance() {
+      return this.xQuadSum / this.sampleCount - (this.xSampleMean * this.xSampleMean);
+    }
+
+    public get yVariance() {
+      return this.yQuadSum / this.sampleCount - (this.ySampleMean * this.ySampleMean);
+    }
+
+    public get tVariance() {
+      return this.tQuadSum / this.sampleCount - (this.tSampleMean * this.tSampleMean);
+    }
+
+    public get xRegressionSlope() {
+      return this.xtCovariance / this.tVariance;
+    }
+
+    public get yRegressionSlope() {
+      return this.ytCovariance / this.tVariance;
+    }
+
+    public get xRegressionIntercept() {
+      return (this.xSampleMean) - this.xRegressionSlope * this.tSampleMean;
+    }
+
+    public get yRegressionIntercept() {
+      return (this.ySampleMean) - this.yRegressionSlope * this.tSampleMean;
+    }
+
+    public get xRegressionSSE() {
+      return this.sampleCount * (this.xVariance - (this.xRegressionSlope * this.xtCovariance));
+    }
+
+    public get yRegressionSSE() {
+      return this.sampleCount * (this.yVariance - (this.yRegressionSlope * this.ytCovariance));
+    }
+
+    public get xRegressionModeledVariance() {
+      return this.xRegressionSlope * this.xtCovariance * this.sampleCount;
+    }
+
+    public get yRegressionModeledVariance() {
+      return this.yRegressionSlope * this.ytCovariance * this.sampleCount;
+    }
+
+    public get xRegressionCOD() {
+      // In truth, the proper answer is NaN (not defined).  But for our purposes,
+      // it's a perfect fit, so we'll indicate "perfect fit".
+      if(this.xVariance == 0) {
+        return 1;
+      }
+
+      return this.xtCovariance * this.xtCovariance / (this.xVariance * this.tVariance);
+    }
+
+    public get yRegressionCOD() {
+      // In truth, the proper answer is NaN (not defined).  But for our purposes,
+      // it's a perfect fit, so we'll indicate "perfect fit".
+      if(this.yVariance == 0) {
+        return 1;
+      }
+
+      return this.ytCovariance * this.ytCovariance / (this.yVariance * this.tVariance);
+    }
+
+    public get xRegressionFinalE() {
+      if(!this.lastSample || !this.baseSample) {
+        return undefined;
+      }
+
+      const time = this.lastSample.t - this.baseSample.t;
+      const adjustedX = this.lastSample.targetX - this.baseSample.targetX;
+      const error = adjustedX - (this.xRegressionSlope * time + this.xRegressionIntercept);
+      return error;// * error;
+    }
+
+    public get xRegressionFinalSE() {
+      return this.xRegressionFinalE * this.xRegressionFinalE;
+    }
+
+    public get yRegressionFinalE() {
+      if(!this.lastSample || !this.baseSample) {
+        return undefined;
+      }
+
+      const time = this.lastSample.t - this.baseSample.t;
+      const adjustedY = this.lastSample.targetY - this.baseSample.targetY;
+      const error = adjustedY - (this.yRegressionSlope * time + this.yRegressionIntercept);
+      return error;// * error;
+    }
+
+    public get yRegressionFinalSE() {
+      return this.yRegressionFinalE * this.yRegressionFinalE;
+    }
+
+    public get xRegressionInitialE() {
+      if(!this.initialSample || !this.baseSample) {
+        return undefined;
+      }
+
+      const time = this.initialSample.t - this.baseSample.t;
+      const adjustedX = this.initialSample.targetX - this.baseSample.targetX;
+      const error = adjustedX - (this.xRegressionSlope * time + this.xRegressionIntercept);
+      return error;// * error;
+    }
+
+    //public
+
+    public get xRegressionInitialSE() {
+      return this.xRegressionInitialE * this.xRegressionInitialE;
+    }
+
+    public get yRegressionInitialE() {
+      if(!this.initialSample || !this.baseSample) {
+        return undefined;
+      }
+
+      const time = this.initialSample.t - this.baseSample.t;
+      const adjustedY = this.initialSample.targetY - this.baseSample.targetY;
+      const error = adjustedY - (this.yRegressionSlope * time + this.yRegressionIntercept);
+      return error;// * error;
+    }
+
+    public get yRegressionInitialSE() {
+      return this.yRegressionInitialE * this.yRegressionInitialE;
     }
 
     public get netDistance() {
