@@ -56,7 +56,7 @@ struct COMP_KMXPLUS_STRS {
    * @param bufsiz buffer size in bytes
    * @return NULL or a pointer to the output buffer
    */
-    PKMX_WCHAR get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz);
+  PKMX_WCHAR get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched size of section strs");
@@ -123,7 +123,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched 
  * @return COMP_KMXPLUS_ALLDATA* or null
  */
 static inline const COMP_KMXPLUS_HEADER *
-validate_as_section(void *data, uint32_t ident) {
+validate_as_section(const uint8_t *data, uint32_t ident) {
   if (!data) {
     return NULL;
   }
@@ -142,7 +142,7 @@ validate_as_section(void *data, uint32_t ident) {
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_SECT *
-as_kmxplus_sect(void *data) {
+as_kmxplus_sect(const uint8_t *data) {
   const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_SECT);
   return reinterpret_cast<const COMP_KMXPLUS_SECT *>(all);
 }
@@ -152,7 +152,7 @@ as_kmxplus_sect(void *data) {
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_STRS *
-as_kmxplus_strs(void *data) {
+as_kmxplus_strs(const uint8_t *data) {
   const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_STRS);
   return reinterpret_cast<const COMP_KMXPLUS_STRS *>(all);
 }
@@ -162,7 +162,7 @@ as_kmxplus_strs(void *data) {
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_KEYS *
-as_kmxplus_keys(void *data) {
+as_kmxplus_keys(const uint8_t *data) {
   const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_KEYS);
   return reinterpret_cast<const COMP_KMXPLUS_KEYS *>(all);
 }
@@ -171,7 +171,7 @@ as_kmxplus_keys(void *data) {
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_LOCA *
-as_kmxplus_loca(void *data) {
+as_kmxplus_loca(const uint8_t *data) {
   const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_LOCA);
   return reinterpret_cast<const COMP_KMXPLUS_LOCA *>(all);
 }
@@ -180,7 +180,7 @@ as_kmxplus_loca(void *data) {
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_META *
-as_kmxplus_meta(void *data) {
+as_kmxplus_meta(const uint8_t *data) {
   const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_META);
   return reinterpret_cast<const COMP_KMXPLUS_META *>(all);
 }
@@ -189,12 +189,10 @@ as_kmxplus_meta(void *data) {
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_VKEY *
-as_kmxplus_vkey(void *data) {
+as_kmxplus_vkey(const uint8_t *data) {
   const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_VKEY);
   return reinterpret_cast<const COMP_KMXPLUS_VKEY *>(all);
 }
-
-
 
 /**
  * @brief Temporary function to dump raw data
