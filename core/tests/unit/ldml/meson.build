@@ -34,6 +34,7 @@ ldml = executable('ldml',
 
 tests = [
   '000_null_keyboard',
+  '001_tiny'
 ]
 
 if build_machine.system() == 'windows'
