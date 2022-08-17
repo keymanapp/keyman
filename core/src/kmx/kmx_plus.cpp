@@ -29,7 +29,19 @@ dump_kmxplus_keys(const uint8_t* /*data*/, const COMP_KMXPLUS_KEYS* keys) {
     return;
   }
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)keys);
-  // TODO-LDML
+  printf(" count: #0x%X\n", keys->count);
+  for (KMX_DWORD i = 0; i<keys->count; i++) {
+    printf(" #0x%d\n", i);
+    const COMP_KMXPLUS_KEYS_ENTRY& entry = keys->entries[i];
+    printf("  vkey\t0x%X\n", entry.vkey);
+    printf("  mod\t0x%X\n", entry.mod);
+    printf("  flags\t0x%X\n", entry.flags);
+    if (entry.flags & LDML_KEYS_FLAGS_EXTEND) {
+        printf("  \t Extend: String #0x%X\n", entry.to);
+    } else {
+        printf("  \t UTF-32:U+%04X\n", entry.to);
+    }
+  }
 }
 
 static void
@@ -40,6 +52,9 @@ dump_kmxplus_loca(const uint8_t* /*data*/, const COMP_KMXPLUS_LOCA* loca) {
   }
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)loca);
   // TODO-LDML
+  for(KMX_DWORD i=0; i<loca->count; i++) {
+    printf(" Locale #%d: #0x%X\n", i, loca->entries[i].locale);
+  }
 }
 
 static void
@@ -49,7 +64,13 @@ dump_kmxplus_meta(const uint8_t* /*data*/, const COMP_KMXPLUS_META* meta) {
     return;
   }
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)meta);
-  // TODO-LDML
+  printf(" name:\t#0x%X\n", meta->name);
+  printf(" author:\t#0x%X\n", meta->author);
+  printf(" conform:\t#0x%X\n", meta->conform);
+  printf(" layout:\t#0x%X\n", meta->layout);
+  printf(" normalization:\t#0x%X\n", meta->normalization);
+  printf(" indicator:\t#0x%X\n", meta->indicator);
+  printf(" settings:\t0x%X\n", meta->settings);
 }
 
 static void

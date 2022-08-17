@@ -66,13 +66,13 @@ export const constants = {
 
     length_strs: 16,
     /**
-     * bitwise or value for extend in strs[key].flags.
+     * bitwise or value for extend in keys[key].flags.
      * If bit is 1, then 'to' is a string.
-     * If bit is 0, then 'to' is an offset.
+     * If bit is 0, then 'to' is a UTF-32LE codepoint
      *
-     * `extend = flags & strs_flags_extend`
+     * `extend = flags & keys_flags_extend`
      */
-    strs_flags_extend: 1,
+    keys_flags_extend: 1,
 
     section_vkey: 'vkey',
     length_vkey: 12,

@@ -129,8 +129,8 @@ validate_as_section(const uint8_t *data, uint32_t ident) {
   }
   const COMP_KMXPLUS_HEADER *all = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(data);
   // TODO-LDML these fail on 000null ..
-  // assert(all->size >= LDML_LENGTH_HEADER);
-  // assert(ident == all->ident);
+  assert(all->size >= LDML_LENGTH_HEADER);
+  assert(ident == all->ident);
   if (ident != all->ident || (all->size < LDML_LENGTH_HEADER)) {
     return NULL;  // invalid header or wrong section
   }
