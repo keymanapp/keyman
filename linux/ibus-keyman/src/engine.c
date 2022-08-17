@@ -51,32 +51,50 @@
 #define KEYMAN_LALT  56 // 0x38
 #define KEYMAN_RCTRL 97 // 0x61
 #define KEYMAN_RALT 100 // 0x64
+#define KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL  202
+#define KEYMAN_NOCHAR_KEYSYM (0xffff | 0x1000000) // Unicode NOCHAR
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
 
-struct _IBusKeymanEngine {
-	IBusEngine parent;
+#define MAX_QUEUE_SIZE 100
 
-    /* members */
-    km_kbp_keyboard *keyboard;
-    km_kbp_state    *state;
-    gchar           *ldmlfile;
-    gchar           *kb_name;
-    gchar           *char_buffer;
-    gboolean         lctrl_pressed;
-    gboolean         rctrl_pressed;
-    gboolean         lalt_pressed;
-    gboolean         ralt_pressed;
-    gboolean         emitting_keystroke;
-    IBusProperty    *status_prop;
-    IBusPropList    *prop_list;
+struct commit_queue_item {
+  gchar *char_buffer;
+  gboolean emitting_keystroke;
+  guint keyval;
+  guint keycode;
+  guint state;
+};
+
+struct _IBusKeymanEngine {
+  IBusEngine parent;
+
+  /* members */
+  km_kbp_keyboard *keyboard;
+  km_kbp_state    *state;
+  gchar           *ldmlfile;
+  gchar           *kb_name;
+  gchar           *char_buffer;
+  gboolean         lctrl_pressed;
+  gboolean         rctrl_pressed;
+  gboolean         lalt_pressed;
+  gboolean         ralt_pressed;
+  gboolean         emitting_keystroke;
+  guint            event_keyval;
+  guint            event_keycode;
+  guint            event_state;
+  IBusProperty    *status_prop;
+  IBusPropList    *prop_list;
 #ifdef GDK_WINDOWING_X11
-    Display         *xdisplay;
+  Display         *xdisplay;
 #endif
 #ifdef GDK_WINDOWING_WAYLAND
-    GdkWaylandDisplay *wldisplay;
+  GdkWaylandDisplay *wldisplay;
 #endif
+
+  struct commit_queue_item commit_queue[MAX_QUEUE_SIZE];
+  int queue_end;
 };
 
 struct _IBusKeymanEngineClass {
@@ -609,12 +627,8 @@ process_persist_action(
   return TRUE;
 }
 
-static gboolean process_emit_keystroke_action(IBusKeymanEngine *keyman) {
-  if (keyman->char_buffer != NULL) {
-    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-    g_free(keyman->char_buffer);
-    keyman->char_buffer = NULL;
-  }
+static gboolean
+process_emit_keystroke_action(IBusKeymanEngine *keyman) {
   keyman->emitting_keystroke = TRUE;
   return TRUE;
 }
@@ -648,17 +662,41 @@ process_capslock_action(
   return TRUE;
 }
 
-static gboolean process_end_action(IBusKeymanEngine *keyman) {
-  if (keyman->char_buffer != NULL) {
-    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-    g_free(keyman->char_buffer);
-    keyman->char_buffer = NULL;
+static void
+commit_text(IBusKeymanEngine *keyman) {
+  if (keyman->queue_end > 0) {
+    if (keyman->commit_queue[0].char_buffer != NULL) {
+      ibus_keyman_engine_commit_string(keyman, keyman->commit_queue[0].char_buffer);
+      g_free(keyman->commit_queue[0].char_buffer);
+    }
+    if (keyman->commit_queue[0].emitting_keystroke) {
+      ibus_engine_forward_key_event(keyman, keyman->commit_queue[0].keyval, keyman->commit_queue[0].keycode, keyman->commit_queue[0].state);
+    }
+    keyman->queue_end--;
+    memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(struct commit_queue_item) * keyman->queue_end);
   }
-  if (keyman->emitting_keystroke) {
-    keyman->emitting_keystroke = FALSE;
-    return FALSE;
-  }
+}
 
+static gboolean
+process_end_action(IBusKeymanEngine *keyman) {
+  keyman->commit_queue[keyman->queue_end].char_buffer        = keyman->char_buffer;
+  keyman->commit_queue[keyman->queue_end].emitting_keystroke = keyman->emitting_keystroke;
+  keyman->commit_queue[keyman->queue_end].keyval             = keyman->event_keyval;
+  keyman->commit_queue[keyman->queue_end].keycode            = keyman->event_keycode;
+  keyman->commit_queue[keyman->queue_end].state              = keyman->event_state;
+  keyman->queue_end++;
+  if (keyman->queue_end >= MAX_QUEUE_SIZE) {
+    g_error("Overflow of keyman commit_queue!");
+    keyman->queue_end = MAX_QUEUE_SIZE - 1;
+  }
+  keyman->char_buffer = NULL;
+  keyman->emitting_keystroke = FALSE;
+
+  // Forward a fake key event to get the correct order of events so that any backspace key we
+  // generated will be processed before the character we're adding. We need to send a
+  // valid keyval/keycode combination so that it doesn't get swallowed by GTK but which
+  // isn't very likely used in real keyboards. F24 seems to work for that.
+  ibus_engine_forward_key_event(keyman, KEYMAN_NOCHAR_KEYSYM, KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL, IBUS_PREFILTER_MASK);
   return TRUE;
 }
 
@@ -724,6 +762,9 @@ ibus_keyman_engine_process_key_event(
   guint state
 ) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  keyman->event_keyval     = keyval;
+  keyman->event_keycode    = keycode;
+  keyman->event_state      = state;
 
   gboolean isKeyDown = !(state & IBUS_RELEASE_MASK);
 
@@ -731,6 +772,11 @@ ibus_keyman_engine_process_key_event(
   g_message(
       "DAR: ibus_keyman_engine_process_key_event - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d", keyval, keycode,
       state, isKeyDown);
+
+  if (keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL && (state & IBUS_PREFILTER_MASK)) {
+    commit_text(keyman);
+    return TRUE;
+  }
 
   // REVIEW: why don't we handle these keys?
   switch (keycode) {
@@ -805,7 +851,7 @@ ibus_keyman_engine_process_key_event(
   const km_kbp_action_item *action_items = km_kbp_state_action_items(keyman->state, &num_action_items);
 
   if (!process_actions(engine, action_items, num_action_items))
-    return FALSE;
+    return TRUE;
 
   context = km_kbp_state_context(keyman->state);
   g_message("after processing all actions");
