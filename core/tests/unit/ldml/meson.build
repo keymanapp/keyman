@@ -166,3 +166,12 @@ else
     test(kbd, ldml, args: [kbd_src, kbd_obj])
   endforeach
 endif
+
+
+e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc],
+    link_args: links + tests_flags,
+    objects: lib.extract_all_objects())
+test('test_kmx_plus', e)
+

@@ -9,6 +9,7 @@
 #include "ldml/ldml_processor.hpp"
 #include "state.hpp"
 #include "../kmx/kmx_file.h"
+#include "../kmx/kmx_plus.h"
 #include "ldml/keyboardprocessor_ldml.h"
 
 namespace {
@@ -66,6 +67,9 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
   if(comp_keyboard->dwFileVersion < VERSION_160 || (comp_keyboard->dwFlags & KF_KMXPLUS) == 0) {
     return false;
   }
+
+  // Dump data
+  dump_kmxplus_data(comp_keyboard);
 
   // A KMXPlus file is in the buffer (although more validation is required)
   return true;

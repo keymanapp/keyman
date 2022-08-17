@@ -1,0 +1,157 @@
+/*
+  Copyright:        Copyright (C) 2022 SIL International.
+  Authors:          srl295
+  This file defines the structure of a kmx_plus file, starting at COMP_KEYBOARD_KMXPLUSINFO.dpKMXPlus
+*/
+
+#pragma once
+
+#include <assert.h>
+#include <kmx/kmx_file.h>
+#include <ldml/keyboardprocessor_ldml.h>
+
+namespace km {
+namespace kbp {
+namespace kmx {
+
+struct COMP_KMXPLUS_HEADER {
+  KMX_DWORD ident;  // 0000 Section name
+  KMX_DWORD size;   // 0004 Section length
+};
+
+// Assert that the length matches the declared length
+static_assert(sizeof(struct COMP_KMXPLUS_HEADER) == LDML_LENGTH_HEADER, "mismatched size of section header");
+
+struct COMP_KMXPLUS_SECT_ENTRY {
+  KMX_DWORD sect;    // 0010+ Section identity
+  KMX_DWORD offset;  // 0014+ Section offset relative to dpKMXPlus of section
+};
+
+struct COMP_KMXPLUS_SECT {
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD total;                     // 0008 KMXPlus entire length
+  KMX_DWORD count;                     // 000B number of section headers
+  COMP_KMXPLUS_SECT_ENTRY entries[0];  // 0010 section entries
+};
+
+// Assert that the length matches the declared length
+static_assert(sizeof(struct COMP_KMXPLUS_SECT) == LDML_LENGTH_SECT, "mismatched size of section sect");
+
+struct COMP_KMXPLUS_STRS_ENTRY {
+    KMX_DWORD offset;                 // 0010+ offset from this blob
+    KMX_DWORD length;                 // 0014+ str length (UTF-16LE units)
+};
+
+struct COMP_KMXPLUS_STRS {
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count;                    // 0008 count of str entries
+  KMX_DWORD reserved;                 // 000C padding
+  COMP_KMXPLUS_STRS_ENTRY entries[0]; // 0010+ entries
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched size of section strs");
+
+struct COMP_KMXPLUS_META {
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD name;
+  KMX_DWORD author;
+  KMX_DWORD conform;
+  KMX_DWORD layout;
+  KMX_DWORD normalization;
+  KMX_DWORD indicator;
+  KMX_DWORD settings;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META, "mismatched size of section meta");
+
+struct COMP_KMXPLUS_LOCA_ENTRY {
+  KMX_DWORD locale; // 000C+ locale string entry
+};
+
+struct COMP_KMXPLUS_LOCA {
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count; // 0008 number of locales
+  COMP_KMXPLUS_LOCA_ENTRY entries[0];
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LOCA) == LDML_LENGTH_LOCA, "mismatched size of section loca");
+
+struct COMP_KMXPLUS_KEYS_ENTRY {
+    KMX_DWORD vkey;
+    KMX_DWORD mod;
+    KMX_DWORD to;
+    KMX_DWORD flags;
+};
+
+struct COMP_KMXPLUS_KEYS {
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count;    // number of keys
+  KMX_DWORD reserved; // padding
+  COMP_KMXPLUS_KEYS_ENTRY entries[0];
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_KEYS) == LDML_LENGTH_KEYS, "mismatched size of section keys");
+
+struct COMP_KMXPLUS_VKEY_ENTRY {
+    KMX_DWORD vkey;
+    KMX_DWORD target;
+};
+
+struct COMP_KMXPLUS_VKEY {
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count;
+  COMP_KMXPLUS_VKEY_ENTRY entries[0];
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched size of section vkey");
+
+/**
+ * @brief Validate that this data is the named section.
+ *
+ * @param data raw data
+ * @param ident 4-byte section type
+ * @return COMP_KMXPLUS_ALLDATA* or null
+ */
+static inline const COMP_KMXPLUS_HEADER *
+validate_as_section(void *data, uint32_t ident) {
+  if (!data) {
+    return NULL;
+  }
+  const COMP_KMXPLUS_HEADER *all = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(data);
+  // TODO-LDML these fail on 000null ..
+  // assert(all->size >= LDML_LENGTH_HEADER);
+  // assert(ident == all->ident);
+  if (ident != all->ident || (all->size < LDML_LENGTH_HEADER)) {
+    return NULL;  // invalid header or wrong section
+  }
+  return all;
+}
+
+/**
+ * convert raw data to section
+ * @return section data or null on error
+ */
+static inline const COMP_KMXPLUS_SECT *
+as_kmxplus_sect(void *data) {
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_SECT);
+  return reinterpret_cast<const COMP_KMXPLUS_SECT *>(all);
+}
+
+// TODO-LDML: add as_kmxplus_keys, etc.
+
+/**
+ * @brief Temporary function to dump raw data
+ *
+ */
+void dump_kmxplus_data(void *kmxplusdata);
+
+/**
+ * @brief Temporary functino to dump raw data
+ *
+ * @param keyboard
+ */
+void dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard);
+
+}  // namespace kmx
+}  // namespace kbp
+}  // namespace km
