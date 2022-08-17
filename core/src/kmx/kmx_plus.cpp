@@ -20,14 +20,29 @@ dump_kmxplus_header(const COMP_KMXPLUS_HEADER* hdr) {
 }
 
 static void
-dump_kmxplus_sect(const uint8_t* /*data*/, const COMP_KMXPLUS_SECT* sect) {
+dump_kmxplus_strs(const uint8_t* /*data*/, const COMP_KMXPLUS_STRS* strs) {
+  dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)strs);
+  printf("strs: count 0x%X\n", strs->count);
+}
+
+static void
+dump_kmxplus_sect(const uint8_t* data, const COMP_KMXPLUS_SECT* sect) {
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)sect);
   printf("sect: total 0x%X\n", sect->total);
   printf("sect: count 0x%X\n", sect->count);
 
   for (KMX_DWORD i = 0; i < sect->count; i++) {
-    dump_section_name(sect->entries[i].sect);
-    printf(" sect#%d: %X @ %X\n", i, sect->entries[i].sect, sect->entries[i].offset);
+    const COMP_KMXPLUS_SECT_ENTRY& entry = sect->entries[i];
+    dump_section_name(entry.sect);
+    printf(" sect#%d: %X @ %X\n", i, entry.sect, entry.offset);
+
+    switch(entry.sect) {
+        case LDML_SECTION_STRS:
+            dump_kmxplus_strs(data, as_kmxplus_strs((void*)(data+entry.offset)));
+            break;
+        default:
+            ;
+    }
   }
 }
 
@@ -53,6 +68,24 @@ dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
   printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
   const uint8_t* rawdata = reinterpret_cast<const uint8_t*>(keyboard);
   dump_kmxplus_data(rawdata + ex->kmxplus.dpKMXPlus);
+}
+
+ PKMX_WCHAR
+COMP_KMXPLUS_STRS::get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz) {
+    assert(entry < count);
+    if (entry >= count) {
+        return NULL;
+    }
+    KMX_DWORD offset = entries[entry].offset;
+    KMX_DWORD length = entries[entry].length;
+    assert(bufsiz > (length+1)); // assert bufsiz big enough
+    assert(offset+((length+1)*2) <= header.size); // assert not out of bounds
+    const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(this);
+    const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
+    for(KMX_DWORD i=0;i<=length;i++) {
+        buf[i] = start[i];
+    }
+    return buf;
 }
 
 }  // namespace kmx

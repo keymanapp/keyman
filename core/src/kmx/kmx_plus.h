@@ -47,6 +47,16 @@ struct COMP_KMXPLUS_STRS {
   KMX_DWORD count;                    // 0008 count of str entries
   KMX_DWORD reserved;                 // 000C padding
   COMP_KMXPLUS_STRS_ENTRY entries[0]; // 0010+ entries
+
+  /**
+   * @brief Get a string entry
+   *
+   * @param entry entry number
+   * @param buf output buffer
+   * @param bufsiz buffer size in bytes
+   * @return NULL or a pointer to the output buffer
+   */
+    PKMX_WCHAR get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz);
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched size of section strs");
@@ -137,7 +147,54 @@ as_kmxplus_sect(void *data) {
   return reinterpret_cast<const COMP_KMXPLUS_SECT *>(all);
 }
 
-// TODO-LDML: add as_kmxplus_keys, etc.
+/**
+ * convert raw data to section
+ * @return section data or null on error
+ */
+static inline const COMP_KMXPLUS_STRS *
+as_kmxplus_strs(void *data) {
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_STRS);
+  return reinterpret_cast<const COMP_KMXPLUS_STRS *>(all);
+}
+
+/**
+ * convert raw data to section
+ * @return section data or null on error
+ */
+static inline const COMP_KMXPLUS_KEYS *
+as_kmxplus_keys(void *data) {
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_KEYS);
+  return reinterpret_cast<const COMP_KMXPLUS_KEYS *>(all);
+}
+/**
+ * convert raw data to section
+ * @return section data or null on error
+ */
+static inline const COMP_KMXPLUS_LOCA *
+as_kmxplus_loca(void *data) {
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_LOCA);
+  return reinterpret_cast<const COMP_KMXPLUS_LOCA *>(all);
+}
+/**
+ * convert raw data to section
+ * @return section data or null on error
+ */
+static inline const COMP_KMXPLUS_META *
+as_kmxplus_meta(void *data) {
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_META);
+  return reinterpret_cast<const COMP_KMXPLUS_META *>(all);
+}
+/**
+ * convert raw data to section
+ * @return section data or null on error
+ */
+static inline const COMP_KMXPLUS_VKEY *
+as_kmxplus_vkey(void *data) {
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_VKEY);
+  return reinterpret_cast<const COMP_KMXPLUS_VKEY *>(all);
+}
+
+
 
 /**
  * @brief Temporary function to dump raw data
