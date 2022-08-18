@@ -19,7 +19,6 @@ export const constants = {
      * The version of the LDML processor
      */
     version: '1.0',
-
     /**
      * Length of a raw section header, in bytes
      */
@@ -28,16 +27,27 @@ export const constants = {
      * Section ID for the keybag
      */
     section_keys: 'keys',
+    /**
+     * Minimum length of the 'keys' section
+     * not including variable parts
+     */
     length_keys: 16,
     /**
      * Section ID for the locale list
      */
     section_loca: 'loca',
+    /**
+     * Minimum length of the 'loca' section
+     * not including variable parts
+     */
     length_loca: 12,
     /**
      * Section ID for the metadata
      */
     section_meta: 'meta',
+    /**
+     * length of the 'meta' section
+     */
     length_meta: 36,
     /**
      * bitwise or value for fallback=omit in meta.settings
@@ -63,7 +73,10 @@ export const constants = {
      * Section ID for the string table
      */
     section_strs: 'strs',
-
+    /**
+     * Minimum length of the 'strs' section
+     * not including variable parts
+     */
     length_strs: 16,
     /**
      * bitwise or value for extend in keys[key].flags.
@@ -73,9 +86,14 @@ export const constants = {
      * `extend = flags & keys_flags_extend`
      */
     keys_flags_extend: 1,
-
+    /**
+     * Section ID for the vkeys map
+     */
     section_vkey: 'vkey',
+    /**
+     * Minimum length of the 'vkey' section
+     * not including variable parts
+     */
     length_vkey: 12,
-
 };
 // }
