@@ -1,10 +1,26 @@
 /// <reference path="cumulativePathStats.ts" />
 
 namespace com.keyman.osk {
-  // We do NOT want to be computing this thing at run-time.  Fortunately, it's very common
-  // in stats circles to just... use a lookup table for finding p-values for things
-  // following the f-distribution.
+
+  // https://en.wikipedia.org/wiki/F-distribution
+  // Mostly used here to compare the sum-squared error components of segmented regressions
+  // to the sum-squared "modeled" components of their overall variance.  Those are the two
+  // "independent random variables" we're examining.  Variances (which are sums of squared
+  // values themselves) tend to be chi-squared distributed, fulfilling the conditions.
+  //
+  // We do NOT want to be computing this thing at run-time.  (Just take one look at the
+  // equations found in that Wikipedia article!)  Fortunately, it's very common in stats
+  // circles to just... use a lookup table for finding p-values for things following
+  // the f-distribution.
+  //
+  // For future non-stats-inclined maintainers:
+  // One could say that the p-value = the chance that what we have just "randomly" happened
+  // to occur without our expectations actually being met.  It's a super-common
+  // stats term; they'd then say that if the p-value is sufficiently low, then we\
+  // "reject the null hypothesis" - the theory that it actually DID happen randomly - in
+  // favor of the high likelihood that we really are onto something.
   class FDistribution {
+
     /**
      * Indexing: [threshold-index][num-2][denom-1].
      *
@@ -19,6 +35,9 @@ namespace com.keyman.osk {
      * - p-value of .100:  0
      * - p-value of .050:  1
      *
+     * The f-statistic value must match or exceed its corresponding entry in
+     * the table below, based on the detected DoF (degrees of freedom) for the
+     * 'numerator' and 'denominator' components.
      */
     private static readonly table = [
       // p = .100
@@ -119,74 +138,133 @@ namespace com.keyman.osk {
       this.union = union;
     }
 
-    private get xSegmentationSSE() {
+    private get xtSegmentationSSE() {
       // Technically double-counts the split point... but we're not preventing two separate predicted
       // values AT the split point, each with their own error...
-      const summedSSE = this.pre.xRegressionSSE + this.post.xRegressionSSE/* - this.pre.xRegressionFinalSE*/;
+      const summedSSE = this.pre.xtRegressionSSE + this.post.xtRegressionSSE/* - this.pre.xRegressionFinalSE*/;
 
       // 1e-8:  catastrophic cancellation may cause small residuals due to floating-point arithmetic.
       // Such residuals may be negative (same reason), but a true SSE value never will be.
       return summedSSE > 1e-8 ? summedSSE : 0;
     }
 
-    private get ySegmentationSSE() {
+    private get ytSegmentationSSE() {
       // Technically double-counts the split point... but we're not preventing two separate predicted
       // values AT the split point, each with their own error...
-      const summedSSE = this.pre.yRegressionSSE + this.post.yRegressionSSE/* - this.pre.yRegressionFinalSE*/;
+      const summedSSE = this.pre.ytRegressionSSE + this.post.ytRegressionSSE/* - this.pre.yRegressionFinalSE*/;
 
       // 1e-8:  catastrophic cancellation may cause small residuals due to floating-point arithmetic.
       // Such residuals may be negative (same reason), but a true SSE value never will be.
       return summedSSE > 1e-8 ? summedSSE: 0;
     }
 
-    private get xSegmentationModeledVariance() {
+    private get yxSegmentationSSE() {
       // Technically double-counts the split point... but we're not preventing two separate predicted
-      // values AT the split point.  It's even trickier to adjust here than in the SSE properties,
-      // and it "balances out" (roughly) by existing in both components of the test statistic.
-      //
-      // Note:  "balances out" is not a formal mathematical declaration.  I'm playing things a bit
-      // loose here in the name of implementation clarity & simplicity.
-      const summedModeledVar = this.pre.xRegressionModeledVariance + this.post.xRegressionModeledVariance;
-      return summedModeledVar > 1e-8 ? summedModeledVar : 0;
+      // values AT the split point, each with their own error...
+      const summedSSE = this.pre.yxRegressionSSE + this.post.yxRegressionSSE/* - this.pre.yRegressionFinalSE*/;
+
+      // 1e-8:  catastrophic cancellation may cause small residuals due to floating-point arithmetic.
+      // Such residuals may be negative (same reason), but a true SSE value never will be.
+      return summedSSE > 1e-8 ? summedSSE: 0;
     }
 
-    private get ySegmentationModeledVariance() {
+    private get xySegmentationSSE() {
       // Technically double-counts the split point... but we're not preventing two separate predicted
-      // values AT the split point.  It's even trickier to adjust here than in the SSE properties,
-      // and it "balances out" (roughly) by existing in both components of the test statistic.
-      //
-      // Note:  "balances out" is not a formal mathematical declaration.  I'm playing things a bit
-      // loose here in the name of implementation clarity & simplicity.
-     const summedModeledVar = this.pre.yRegressionModeledVariance + this.post.yRegressionModeledVariance;
-     return summedModeledVar > 1e-8 ? summedModeledVar : 0;
-   }
+      // values AT the split point, each with their own error...
+      const summedSSE = this.pre.xyRegressionSSE + this.post.xyRegressionSSE/* - this.pre.yRegressionFinalSE*/;
 
-    public get xSegmentedRegressionCOD() {
+      // 1e-8:  catastrophic cancellation may cause small residuals due to floating-point arithmetic.
+      // Such residuals may be negative (same reason), but a true SSE value never will be.
+      return summedSSE > 1e-8 ? summedSSE: 0;
+    }
+
+    // private get xtSegmentationModeledVariance() {
+    //   // Technically double-counts the split point... but we're not preventing two separate predicted
+    //   // values AT the split point.  It's even trickier to adjust here than in the SSE properties,
+    //   // and it "balances out" (roughly) by existing in both components of the test statistic.
+    //   //
+    //   // Note:  "balances out" is not a formal mathematical declaration.  I'm playing things a bit
+    //   // loose here in the name of implementation clarity & simplicity.
+    //   // const prePart  = (this.xtSegmentedRegressionCOD - this.pre.xtRegressionCOD)  * this.pre.xVariance  * this.pre.count;
+    //   // const postPart = (this.xtSegmentedRegressionCOD - this.post.xtRegressionCOD) * this.post.xVariance * this.post.count;
+
+    //   const summedModeledVar = this.pre.xtRegressionModeledVariance + this.post.xtRegressionModeledVariance;
+    //   // const summedModeledVar = prePart + postPart;
+    //   return summedModeledVar > 1e-8 ? summedModeledVar : 0;
+    // }
+
+    // private get ytSegmentationModeledVariance() {
+    //   // Technically double-counts the split point... but we're not preventing two separate predicted
+    //   // values AT the split point.  It's even trickier to adjust here than in the SSE properties,
+    //   // and it "balances out" (roughly) by existing in both components of the test statistic.
+    //   //
+    //   // Note:  "balances out" is not a formal mathematical declaration.  I'm playing things a bit
+    //   // loose here in the name of implementation clarity & simplicity.
+    //   // const prePart  = (this.ytSegmentedRegressionCOD - this.pre.ytRegressionCOD)  * this.pre.yVariance  * this.pre.count;
+    //   // const postPart = (this.ytSegmentedRegressionCOD - this.post.ytRegressionCOD) * this.post.yVariance * this.post.count;
+
+    //   const summedModeledVar = this.pre.ytRegressionModeledVariance + this.post.ytRegressionModeledVariance;
+    //   // const summedModeledVar = prePart + postPart;
+    //   return summedModeledVar > 1e-8 ? summedModeledVar : 0;
+    // }
+
+    // private get yxSegmentationModeledVariance() {
+    //   // Technically double-counts the split point... but we're not preventing two separate predicted
+    //   // values AT the split point.  It's even trickier to adjust here than in the SSE properties,
+    //   // and it "balances out" (roughly) by existing in both components of the test statistic.
+    //   //
+    //   // Note:  "balances out" is not a formal mathematical declaration.  I'm playing things a bit
+    //   // loose here in the name of implementation clarity & simplicity.
+    //   // const prePart  = (this.ytSegmentedRegressionCOD - this.pre.ytRegressionCOD)  * this.pre.yVariance  * this.pre.count;
+    //   // const postPart = (this.ytSegmentedRegressionCOD - this.post.ytRegressionCOD) * this.post.yVariance * this.post.count;
+
+    //   const summedModeledVar = this.pre.yxRegressionModeledVariance + this.post.yxRegressionModeledVariance;
+    //   // const summedModeledVar = prePart + postPart;
+    //   return summedModeledVar > 1e-8 ? summedModeledVar : 0;
+    // }
+
+    public get xtSegmentedRegressionCOD() {
       if(!this.union.xVariance) {
         return 1;
       }
       // The point @ the segmentation split point would be double-counted without the .xRegressionFinalSE part.
-      return 1 - this.xSegmentationSSE / (this.union.xVariance * this.union.count);
+      return 1 - this.xtSegmentationSSE / (this.union.xVariance * this.union.count);
     }
 
-    public get ySegmentedRegressionCOD() {
+    public get ytSegmentedRegressionCOD() {
       if(!this.union.yVariance) {
         return 1;
       }
       // The point @ the segmentation split point would be double-counted without the .yRegressionFinalSE part.
-      return 1 - this.ySegmentationSSE / (this.union.yVariance * this.union.count);
+      return 1 - this.ytSegmentationSSE / (this.union.yVariance * this.union.count);
     }
 
-    public get xUnsegmentedRegressionCOD() {
-      return this.union.xRegressionCOD;
+    public get yxSegmentedRegressionCOD() {
+      if(!this.union.yVariance || !this.union.xVariance) {
+        return 1;
+      }
+      // The point @ the segmentation split point would be double-counted without the .yRegressionFinalSE part.
+      return 1 - this.yxSegmentationSSE / (this.union.yVariance * this.union.count);
     }
 
-    public get yUnsegmentedRegressionCOD() {
-      return this.union.yRegressionCOD;
+    public get xtUnsegmentedRegressionCOD() {
+      return this.union.xtRegressionCOD;
     }
 
-    /*private*/ get xFTestConfiguration() {
-      const fStat = this.xSegmentationModeledVariance / this.xSegmentationSSE;
+    public get ytUnsegmentedRegressionCOD() {
+      return this.union.ytRegressionCOD;
+    }
+
+    public get yxUnsegmentedRegressionCOD() {
+      return this.union.yxRegressionCOD;
+    }
+
+    /*private*/ get xtFTestConfiguration() {
+      // const fStat = this.xtSegmentationModeledVariance / this.xtSegmentationSSE;
+      // TODO:  Is this right?  Seems more reasonable than before, to say the least...
+      // But I've seen cases where the segmented version gives WORSE?
+      let doubledError = this.union.regressionXErrorForSampleByT(this.pre.lastSample);
+      const fStat = (this.union.xtRegressionSSE + doubledError * doubledError - this.xtSegmentationSSE) / this.xtSegmentationSSE;
       let numDoF = 3;
       // Cases where there clearly may as well be 'no slope' at all.
       // This saves us a degree of freedom, which is VERY useful for segmenting
@@ -199,6 +277,17 @@ namespace com.keyman.osk {
       }
       const denomDoF = this.union.count - 2 - numDoF;
 
+      if(!isNaN(fStat) && fStat < 0) {
+        console.error("F-stat calculation should never be negative: xt!");
+        console.error({
+          fStat: fStat,
+          numDoF: numDoF,
+          denomDoF: denomDoF,
+          baseObject: this,
+          doubledErrorSq: doubledError * doubledError
+        });
+      }
+
       // So... kind of requires at least 6 observations to have a valid test.  YAY.
       return {
         fStat: fStat,
@@ -207,8 +296,12 @@ namespace com.keyman.osk {
       };
     }
 
-    /*private*/ get yFTestConfiguration() {
-      const fStat = this.ySegmentationModeledVariance / this.ySegmentationSSE;
+    /*private*/ get ytFTestConfiguration() {
+      // const fStat = this.ytSegmentationModeledVariance / this.ytSegmentationSSE;
+      // TODO:  Is this right?  Seems more reasonable than before, to say the least...
+      // But I've seen cases where the segmented version gives WORSE?
+      let doubledError = this.union.regressionYErrorForSampleByT(this.pre.lastSample);
+      const fStat = (this.union.ytRegressionSSE + doubledError * doubledError - this.ytSegmentationSSE) / this.ytSegmentationSSE;
       let numDoF = 3;
       // Cases where there clearly may as well be 'no slope' at all.
       // This saves us a degree of freedom, which is VERY useful for segmenting
@@ -221,6 +314,95 @@ namespace com.keyman.osk {
       }
       const denomDoF = this.union.count - 2 - numDoF;
 
+      if(!isNaN(fStat) && fStat < 0) {
+        console.error("F-stat calculation should never be negative: yt!");
+        console.error({
+          fStat: fStat,
+          numDoF: numDoF,
+          denomDoF: denomDoF,
+          baseObject: this,
+          doubledErrorSq: doubledError * doubledError
+        });
+      }
+
+      // So... kind of requires at least 6 observations to have a valid test.  YAY.
+      return {
+        fStat: fStat,
+        numDoF: numDoF,
+        denomDoF: denomDoF
+      };
+    }
+
+    /*private*/ get yxFTestConfiguration() {
+      // const fStat = this.yxSegmentationModeledVariance / this.yxSegmentationSSE;
+      // TODO:  Is this right?  Seems more reasonable than before, to say the least...
+      // But I've seen cases where the segmented version gives WORSE?  (for yx)
+      let doubledError = this.union.regressionYErrorForSampleByX(this.pre.lastSample);
+      const fStat = (this.union.yxRegressionSSE + doubledError * doubledError - this.yxSegmentationSSE) / this.yxSegmentationSSE;
+      let numDoF = 3;
+      // TODO:  Do these cases actually make sense for the xy-case?
+      // Cases where there clearly may as well be 'no slope' at all.
+      // This saves us a degree of freedom, which is VERY useful for segmenting
+      // the boundary between a 'hold' and a 'move'.
+      if(this.pre.yVariance * this.pre.count < 1e-8) {
+        numDoF--;
+      }
+      if(this.post.yVariance * this.post.count < 1e-8) {
+        numDoF--;
+      }
+      // TODO:  proper handling of the non-variant x case?
+      let denomDoF = this.union.count - 2 - numDoF;
+
+      if(!isNaN(fStat) && fStat < 0) {
+        console.error("F-stat calculation should never be negative: yx!");
+        console.error({
+          fStat: fStat,
+          numDoF: numDoF,
+          denomDoF: denomDoF,
+          baseObject: this,
+          doubledErrorSq: doubledError * doubledError
+        });
+      }
+
+      // So... kind of requires at least 6 observations to have a valid test.  YAY.
+      return {
+        fStat: fStat,
+        numDoF: numDoF,
+        denomDoF: denomDoF
+      };
+    }
+
+    /*private*/ get xyFTestConfiguration() {
+      // const fStat = this.yxSegmentationModeledVariance / this.yxSegmentationSSE;
+      // TODO:  Is this right?  Seems more reasonable than before, to say the least...
+      let doubledError = this.union.regressionXErrorForSampleByY(this.pre.lastSample);
+      // But I've seen cases where the segmented version gives WORSE?  (for yx)
+      const fStat = (this.union.xyRegressionSSE + doubledError * doubledError - this.xySegmentationSSE) / this.xySegmentationSSE;
+      let numDoF = 3;
+      // TODO:  Do these cases actually make sense for the xy-case?
+      // Cases where there clearly may as well be 'no slope' at all.
+      // This saves us a degree of freedom, which is VERY useful for segmenting
+      // the boundary between a 'hold' and a 'move'.
+      if(this.pre.xVariance * this.pre.count < 1e-8) {
+        numDoF--;
+      }
+      if(this.post.xVariance * this.post.count < 1e-8) {
+        numDoF--;
+      }
+      // TODO:  proper handling of the non-variant x case?
+      let denomDoF = this.union.count - 2 - numDoF;
+
+      if(!isNaN(fStat) && fStat < 0) {
+        console.error("F-stat calculation should never be negative: yx!");
+        console.error({
+          fStat: fStat,
+          numDoF: numDoF,
+          denomDoF: denomDoF,
+          baseObject: this,
+          doubledErrorSq: doubledError * doubledError
+        });
+      }
+
       // So... kind of requires at least 6 observations to have a valid test.  YAY.
       return {
         fStat: fStat,
@@ -231,18 +413,34 @@ namespace com.keyman.osk {
 
     get segmentationMerited(): boolean {
       let totalThreshold = 0;
-      const xTestConfig = this.xFTestConfiguration;
-      const yTestConfig = this.yFTestConfiguration;
+      const xTestConfig = this.xtFTestConfiguration;
+      const yTestConfig = this.ytFTestConfiguration;
 
       totalThreshold += FDistribution.thresholdTier(xTestConfig.fStat, xTestConfig.numDoF, xTestConfig.denomDoF);
       totalThreshold += FDistribution.thresholdTier(yTestConfig.fStat, yTestConfig.numDoF, yTestConfig.denomDoF);
 
       return totalThreshold >= 2;
     }
+
+    get mergeMerited(): boolean {
+      // Because of caret-like motions, we need to text for regression on both axes.
+      // I think?  Or does it really make any sort of difference?
+      const xTestConfig = this.xyFTestConfiguration;
+      const yTestConfig = this.yxFTestConfiguration;
+
+      // If we don't get a p-value less than .100, then as far as x & y are concerned - and thus the user
+      // is concerned - it's the same segment.  Speed may be different, but not the direction.
+      if(FDistribution.thresholdTier(yTestConfig.fStat, yTestConfig.numDoF, yTestConfig.denomDoF) != 0) {
+        return false;
+      }
+
+      return FDistribution.thresholdTier(xTestConfig.fStat, xTestConfig.numDoF, xTestConfig.denomDoF) == 0;
+    }
   }
 
   class PotentialSegmentation extends Segmentation {
     readonly chopPoint: CumulativePathStats;
+    readonly endOfPre:  CumulativePathStats;
     readonly baseChop:  CumulativePathStats;
 
     constructor(steppedStats: CumulativePathStats[],
@@ -258,6 +456,7 @@ namespace com.keyman.osk {
       super(pre, post, union);
       this.baseChop  = choppedStats;
       this.chopPoint = steppedStats[splitIndex-1];
+      this.endOfPre  = steppedStats[splitIndex];
     }
   }
 
@@ -276,7 +475,7 @@ namespace com.keyman.osk {
         return array[0].pre; // It's pre-calculated, so just use it.
       } else {
         const finalSubsegmentation = array[array.length-1];
-        return finalSubsegmentation.chopPoint.deaccumulate(array[0].baseChop);
+        return finalSubsegmentation.endOfPre.deaccumulate(array[0].baseChop);
       }
     }
 
@@ -308,6 +507,7 @@ namespace com.keyman.osk {
     // algorithm.  Just... the stats analysis of the path segment, without
     // obvious / public members to relevant coordinates.
     private _protoSegments: CumulativePathStats[] = [];
+    private _protoSegmentSets: CumulativePathStats[][] = [];
 
     /**
      * Used to 'repeat' the most-recently observed incoming sample if no
@@ -366,11 +566,13 @@ namespace com.keyman.osk {
       // 'fallout' from the implementation's design.
       let finalization = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, this.steppedCumulativeStats.length-1);
 
+      console.log("! Finalization !");
       this.filterSubsegmentation(finalization, true); // forces out the final segment.
                                                       // Hacky, but "enough" for now.
 
       // FIXME:  temporary statement to facilitate exploration, experimentation, & debugging
       console.log(this._protoSegments);
+      console.log(this._protoSegmentSets);
       console.log(this._protoSegments.map((val) => (val.toJSON())));
     }
 
@@ -405,8 +607,8 @@ namespace com.keyman.osk {
 
       console.log();
 
-      const xF = candidateSplit.xFTestConfiguration;
-      const yF = candidateSplit.yFTestConfiguration;
+      const xF = candidateSplit.xtFTestConfiguration;
+      const yF = candidateSplit.ytFTestConfiguration;
       console.log(`x F-test: F_(${xF.numDoF}, ${xF.denomDoF}) = ${xF.fStat}`);
       console.log(`y F-test: F_(${yF.numDoF}, ${yF.denomDoF}) = ${yF.fStat}`);
 
@@ -453,8 +655,8 @@ namespace com.keyman.osk {
         // console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
         // console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
 
-        const xF = candidateSplit.xFTestConfiguration;
-        const yF = candidateSplit.yFTestConfiguration;
+        const xF = candidateSplit.xtFTestConfiguration;
+        const yF = candidateSplit.ytFTestConfiguration;
         console.log(`x F-test: F_(${xF.numDoF}, ${xF.denomDoF}) = ${xF.fStat}`);
         console.log(`y F-test: F_(${yF.numDoF}, ${yF.denomDoF}) = ${yF.fStat}`);
 
@@ -546,10 +748,13 @@ namespace com.keyman.osk {
         const lastSubsegment = this.lingeringSubsegmentations[this.lingeringSubsegmentations.length-1];
 
         const tailUnion = mergeSubsegmentations([lastSubsegment, subsegmentation]);
+        console.log("Lingering segment(s) considered for linking: ");
+        console.log(this.lingeringSubsegmentations);
         if(!PathSegmenter.shouldMergeSubsegments(lastSubsegment.pre, subsegmentation.pre, tailUnion)) {
           // Emit as separate subsegment.
           const finishedSegment = mergeSubsegmentations(this.lingeringSubsegmentations);
           this._protoSegments.push(finishedSegment);
+          this._protoSegmentSets.push(this.lingeringSubsegmentations.map((val) => val.pre));
           this.lingeringSubsegmentations = [];
 
           // IN DEVELOPMENT:  does this happen much?  If so... maybe we need intervening checks to pre-filter even
@@ -561,6 +766,7 @@ namespace com.keyman.osk {
         }
       }
 
+      console.log("Double-checking newly split subsegments for xy/yx correlation");
       if(!force && PathSegmenter.shouldMergeSubsegments(subsegmentation.pre, subsegmentation.post, subsegmentation.union)) {
         this.lingeringSubsegmentations.push(subsegmentation);
       } else {
@@ -568,6 +774,7 @@ namespace com.keyman.osk {
         const finishedSegment = mergeSubsegmentations([...this.lingeringSubsegmentations, subsegmentation]);
         this.lingeringSubsegmentations = [];
         this._protoSegments.push(finishedSegment);
+        this._protoSegmentSets.push([...this.lingeringSubsegmentations.map((val) => val.pre), subsegmentation.pre]);
       }
     }
 
@@ -582,9 +789,16 @@ namespace com.keyman.osk {
       // //   Low-speed pivot; angle change caught on very low velocity for both subsegments.
       // //   ... or should this be merged?  Multiple mini-segments from 'wiggling' could just go ignored instead...
 
-      // if(segment1.speedMean < 160) return; // SUPER TEMP: needs further work; avoids the "low-speed pivot" case.
+      if(segment1.speedMean < 80 && segment2.speedMean > 80) {
+        console.log("desegmentation exception");
+        return; // SUPER TEMP: needs further work; avoids the "low-speed pivot" case.
+      }
+      if(segment1.speedMean > 80 && segment2.speedMean < 80) {
+        console.log("desegmentation exception");
+        return;
+      }
 
-      // const asSegmentation = new Segmentation(segment1, segment2, combined);
+      const asSegmentation = new Segmentation(segment1, segment2, combined);
 
       // // If 'speed' is overwhelmingly the cause of segmentation, not angle, maybe don't segment.
       // // At breakeven with minimum threshold, we'd have 0.375 vs (2.25 / 2) = 1.5.
@@ -603,7 +817,16 @@ namespace com.keyman.osk {
       //   return true;
       // }
 
-      return false;
+      console.log("Desegmentation under consideration: ");
+      console.log(asSegmentation);
+      console.log(`yx CoDs:  1 = ${segment1.yxRegressionCOD}, 2 = ${segment2.yxRegressionCOD} vs 1+2 = ${combined.yxRegressionCOD}`);
+      const yxFConfig = asSegmentation.yxFTestConfiguration;
+      const xyFConfig = asSegmentation.xyFTestConfiguration;
+      console.log(`merger F-test (yx): F_(${yxFConfig.numDoF}, ${yxFConfig.denomDoF}) = ${yxFConfig.fStat}`);
+      console.log(`merger F-test (xy): F_(${xyFConfig.numDoF}, ${xyFConfig.denomDoF}) = ${xyFConfig.fStat}`);
+      console.log(`will remerge: ${asSegmentation.mergeMerited}`);
+
+      return asSegmentation.mergeMerited;
     }
   }
 }

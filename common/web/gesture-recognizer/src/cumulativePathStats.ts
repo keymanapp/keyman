@@ -20,8 +20,10 @@ namespace com.keyman.osk {
 
     private xtCrossSum: number = 0;
     private ytCrossSum: number = 0;
-    // As x and y are both treated as dependent on t, we don't need their cross-sum
-    // with each other.
+    // While it's not used to _segment_, it's used within criteria referenced when
+    // recombining segments same-angle segments that were only split because of
+    // time-based (i.e, speed) differences.
+    private yxCrossSum: number = 0;
 
     private coordArcSum: number = 0;
 
@@ -47,7 +49,7 @@ namespace com.keyman.osk {
      */
     private initialSample?: InputSample;
 
-    private lastSample?: InputSample;
+    /*private*/ lastSample?: InputSample;
     private followingSample?: InputSample;
     private sampleCount = 0;
 
@@ -96,6 +98,7 @@ namespace com.keyman.osk {
 
       result.xtCrossSum += x * t;
       result.ytCrossSum += y * t;
+      result.yxCrossSum += x * y;
 
       result.xQuadSum += x * x;
       result.yQuadSum += y * y;
@@ -179,6 +182,7 @@ namespace com.keyman.osk {
 
       result.xtCrossSum -= subsetStats.xtCrossSum;
       result.ytCrossSum -= subsetStats.ytCrossSum;
+      result.yxCrossSum -= subsetStats.yxCrossSum;
 
       result.xQuadSum -= subsetStats.xQuadSum;
       result.yQuadSum -= subsetStats.yQuadSum;
@@ -278,6 +282,10 @@ namespace com.keyman.osk {
       return this.ytCrossSum / this.sampleCount - (this.ySampleMean * this.tSampleMean);
     }
 
+    public get yxCovariance() {
+      return this.yxCrossSum / this.sampleCount - (this.xSampleMean * this.ySampleMean);
+    }
+
     public get xVariance() {
       return this.xQuadSum / this.sampleCount - (this.xSampleMean * this.xSampleMean);
     }
@@ -290,39 +298,72 @@ namespace com.keyman.osk {
       return this.tQuadSum / this.sampleCount - (this.tSampleMean * this.tSampleMean);
     }
 
-    public get xRegressionSlope() {
+    public get xtRegressionSlope() {
       return this.xtCovariance / this.tVariance;
     }
 
-    public get yRegressionSlope() {
+    public get ytRegressionSlope() {
       return this.ytCovariance / this.tVariance;
     }
 
-    public get xRegressionIntercept() {
-      return (this.xSampleMean) - this.xRegressionSlope * this.tSampleMean;
+    public get yxRegressionSlope() {  // gets the 'a' of y=ax+b.
+      return this.yxCovariance / this.xVariance;
     }
 
-    public get yRegressionIntercept() {
-      return (this.ySampleMean) - this.yRegressionSlope * this.tSampleMean;
+    public get xyRegressionSlope() {
+      // xyCovariance and yxCovariance would be identical.
+      return this.yxCovariance / this.yVariance;
     }
 
-    public get xRegressionSSE() {
-      return this.sampleCount * (this.xVariance - (this.xRegressionSlope * this.xtCovariance));
+    public get xtRegressionIntercept() {
+      return (this.xSampleMean) - this.xtRegressionSlope * this.tSampleMean;
     }
 
-    public get yRegressionSSE() {
-      return this.sampleCount * (this.yVariance - (this.yRegressionSlope * this.ytCovariance));
+    public get ytRegressionIntercept() {
+      return (this.ySampleMean) - this.ytRegressionSlope * this.tSampleMean;
     }
 
-    public get xRegressionModeledVariance() {
-      return this.xRegressionSlope * this.xtCovariance * this.sampleCount;
+    public get yxRegressionIntercept() {
+      return (this.ySampleMean) - this.yxRegressionSlope * this.xSampleMean;
     }
 
-    public get yRegressionModeledVariance() {
-      return this.yRegressionSlope * this.ytCovariance * this.sampleCount;
+    public get xyRegressionIntercept() {
+      return (this.xSampleMean) - this.xyRegressionSlope * this.ySampleMean;
     }
 
-    public get xRegressionCOD() {
+    public get xtRegressionSSE() {
+      return this.sampleCount * (this.xVariance - (this.xtRegressionSlope * this.xtCovariance));
+    }
+
+    public get ytRegressionSSE() {
+      return this.sampleCount * (this.yVariance - (this.ytRegressionSlope * this.ytCovariance));
+    }
+
+    public get yxRegressionSSE() {
+      return this.sampleCount * (this.yVariance - (this.yxRegressionSlope * this.yxCovariance));
+    }
+
+    public get xyRegressionSSE() {
+      return this.sampleCount * (this.xVariance - (this.xyRegressionSlope * this.yxCovariance));
+    }
+
+    public get xtRegressionModeledVariance() {
+      return this.xtRegressionSlope * this.xtCovariance * this.sampleCount;
+    }
+
+    public get ytRegressionModeledVariance() {
+      return this.ytRegressionSlope * this.ytCovariance * this.sampleCount;
+    }
+
+    public get yxRegressionModeledVariance() {
+      return this.yxRegressionSlope * this.yxCovariance * this.sampleCount;
+    }
+
+    public get xyRegressionModeledVariance() {
+      return this.xyRegressionSlope * this.yxCovariance * this.sampleCount;
+    }
+
+    public get xtRegressionCOD() {
       // In truth, the proper answer is NaN (not defined).  But for our purposes,
       // it's a perfect fit, so we'll indicate "perfect fit".
       if(this.xVariance == 0) {
@@ -332,7 +373,7 @@ namespace com.keyman.osk {
       return this.xtCovariance * this.xtCovariance / (this.xVariance * this.tVariance);
     }
 
-    public get yRegressionCOD() {
+    public get ytRegressionCOD() {
       // In truth, the proper answer is NaN (not defined).  But for our purposes,
       // it's a perfect fit, so we'll indicate "perfect fit".
       if(this.yVariance == 0) {
@@ -342,67 +383,117 @@ namespace com.keyman.osk {
       return this.ytCovariance * this.ytCovariance / (this.yVariance * this.tVariance);
     }
 
-    public get xRegressionFinalE() {
-      if(!this.lastSample || !this.baseSample) {
-        return undefined;
+    public get yxRegressionCOD() {
+      // In truth, the proper answer is NaN (not defined).  But for our purposes,
+      // it's a perfect fit, so we'll indicate "perfect fit".
+      if(this.yVariance == 0 || this.xVariance == 0) {
+        return 1;
       }
 
-      const time = this.lastSample.t - this.baseSample.t;
-      const adjustedX = this.lastSample.targetX - this.baseSample.targetX;
-      const error = adjustedX - (this.xRegressionSlope * time + this.xRegressionIntercept);
-      return error;// * error;
+      return this.yxCovariance * this.yxCovariance / (this.yVariance * this.xVariance);
     }
 
-    public get xRegressionFinalSE() {
-      return this.xRegressionFinalE * this.xRegressionFinalE;
+    public regressionXFitForT(t: number) {
+      const internalT = t - this.baseSample.t;
+      return this.xtRegressionIntercept + this.xtRegressionSlope * internalT + this.baseSample.targetX;
     }
 
-    public get yRegressionFinalE() {
-      if(!this.lastSample || !this.baseSample) {
-        return undefined;
-      }
-
-      const time = this.lastSample.t - this.baseSample.t;
-      const adjustedY = this.lastSample.targetY - this.baseSample.targetY;
-      const error = adjustedY - (this.yRegressionSlope * time + this.yRegressionIntercept);
-      return error;// * error;
+    public regressionYFitForT(t: number) {
+      const internalT = t - this.baseSample.t;
+      return this.ytRegressionIntercept + this.ytRegressionSlope * internalT + this.baseSample.targetY;
     }
 
-    public get yRegressionFinalSE() {
-      return this.yRegressionFinalE * this.yRegressionFinalE;
+    public regressionXErrorForSampleByT(sample: InputSample) {
+      const fitX = this.regressionXFitForT(sample.t);
+      return sample.targetX - fitX;
     }
 
-    public get xRegressionInitialE() {
-      if(!this.initialSample || !this.baseSample) {
-        return undefined;
-      }
-
-      const time = this.initialSample.t - this.baseSample.t;
-      const adjustedX = this.initialSample.targetX - this.baseSample.targetX;
-      const error = adjustedX - (this.xRegressionSlope * time + this.xRegressionIntercept);
-      return error;// * error;
+    public regressionYErrorForSampleByT(sample: InputSample) {
+      const fitY = this.regressionYFitForT(sample.t);
+      return sample.targetY - fitY;
     }
 
-    //public
-
-    public get xRegressionInitialSE() {
-      return this.xRegressionInitialE * this.xRegressionInitialE;
+    public regressionXFitForY(y: number) {
+      const internalY = y - this.baseSample.targetY;
+      return this.xyRegressionIntercept + this.xyRegressionSlope * internalY + this.baseSample.targetX;
     }
 
-    public get yRegressionInitialE() {
-      if(!this.initialSample || !this.baseSample) {
-        return undefined;
-      }
-
-      const time = this.initialSample.t - this.baseSample.t;
-      const adjustedY = this.initialSample.targetY - this.baseSample.targetY;
-      const error = adjustedY - (this.yRegressionSlope * time + this.yRegressionIntercept);
-      return error;// * error;
+    public regressionYFitForX(x: number) {
+      const internalX = x - this.baseSample.targetX;
+      return this.yxRegressionIntercept + this.yxRegressionSlope * internalX + this.baseSample.targetY;
     }
 
-    public get yRegressionInitialSE() {
-      return this.yRegressionInitialE * this.yRegressionInitialE;
+    public regressionXErrorForSampleByY(sample: InputSample) {
+      const fitX = this.regressionXFitForY(sample.targetY);
+      return sample.targetX - fitX;
     }
+
+    public regressionYErrorForSampleByX(sample: InputSample) {
+      const fitY = this.regressionYFitForX(sample.targetX);
+      return sample.targetY - fitY;
+    }
+
+    // public get xtRegressionFinalE() {
+    //   if(!this.lastSample || !this.baseSample) {
+    //     return undefined;
+    //   }
+
+    //   const time = this.lastSample.t - this.baseSample.t;
+    //   const adjustedX = this.lastSample.targetX - this.baseSample.targetX;
+    //   const error = adjustedX - (this.xtRegressionSlope * time + this.xtRegressionIntercept);
+    //   return error;// * error;
+    // }
+
+    // public get xtRegressionFinalSE() {
+    //   return this.xtRegressionFinalE * this.xtRegressionFinalE;
+    // }
+
+    // public get ytRegressionFinalE() {
+    //   if(!this.lastSample || !this.baseSample) {
+    //     return undefined;
+    //   }
+
+    //   const time = this.lastSample.t - this.baseSample.t;
+    //   const adjustedY = this.lastSample.targetY - this.baseSample.targetY;
+    //   const error = adjustedY - (this.ytRegressionSlope * time + this.ytRegressionIntercept);
+    //   return error;// * error;
+    // }
+
+    // public get ytRegressionFinalSE() {
+    //   return this.ytRegressionFinalE * this.ytRegressionFinalE;
+    // }
+
+    // public get xtRegressionInitialE() {
+    //   if(!this.initialSample || !this.baseSample) {
+    //     return undefined;
+    //   }
+
+    //   const time = this.initialSample.t - this.baseSample.t;
+    //   const adjustedX = this.initialSample.targetX - this.baseSample.targetX;
+    //   const error = adjustedX - (this.xtRegressionSlope * time + this.xtRegressionIntercept);
+    //   return error;// * error;
+    // }
+
+    // //public
+
+    // public get xtRegressionInitialSE() {
+    //   return this.xtRegressionInitialE * this.xtRegressionInitialE;
+    // }
+
+    // public get ytRegressionInitialE() {
+    //   if(!this.initialSample || !this.baseSample) {
+    //     return undefined;
+    //   }
+
+    //   const time = this.initialSample.t - this.baseSample.t;
+    //   const adjustedY = this.initialSample.targetY - this.baseSample.targetY;
+    //   const error = adjustedY - (this.ytRegressionSlope * time + this.ytRegressionIntercept);
+    //   return error;// * error;
+    // }
+
+    // public get ytRegressionInitialSE() {
+    //   return this.ytRegressionInitialE * this.ytRegressionInitialE;
+    // }
 
     public get netDistance() {
       // No issue with a net distance of 0 due to a single point.
@@ -566,13 +657,11 @@ namespace com.keyman.osk {
     public toJSON() {
       return {
         angleMean: this.angleMean,
+        angleMeanDegrees: this.angleMean * 180 / Math.PI,
         angleVariance: this.angleVariance,
-        angleDeviation: this.angleDeviation,
         speedMean: this.speedMean,
         speedVariance: this.speedVariance,
         rawDistance: this.rawDistance,
-        netDistance: this.netDistance,
-        distanceFromCentroid: this.maxEndpointDistanceFromCentroid,
         duration: this.duration,
         sampleCount: this.sampleCount
       }
