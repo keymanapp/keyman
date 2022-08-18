@@ -250,30 +250,23 @@ reset_context(IBusEngine *engine) {
 
     g_message("reset_context");
     context = km_kbp_state_context(keyman->state);
-    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
-    {
-        current_context_utf8 = get_current_context_text(context);
+    km_kbp_context_clear(context);
+
+    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
 
         ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
-        context_pos = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
-        context_start = context_pos > MAXCONTEXT_ITEMS ? context_pos - MAXCONTEXT_ITEMS : 0;
-        surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_pos);
-        g_message("new context is:%u:%s: cursor:%d anchor:%d", context_pos - context_start, surrounding_text, cursor_pos, anchor_pos);
 
-        g_message(":%s:%s:", surrounding_text, current_context_utf8);
-        if (!g_str_has_suffix(surrounding_text, current_context_utf8))
-        {
-            g_message("setting context because it has changed from expected");
-            if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
-                km_kbp_context_set(context, context_items);
-            }
-            km_kbp_context_items_dispose(context_items);
+        context_pos      = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
+        context_start    = context_pos > MAXCONTEXT_ITEMS ? context_pos - MAXCONTEXT_ITEMS : 0;
+        surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_pos);
+        g_message("%s: new context is :%s: (len:%u) cursor:%d anchor:%d", __FUNCTION__,
+          surrounding_text, context_pos - context_start, cursor_pos, anchor_pos);
+
+        if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
+          km_kbp_context_set(context, context_items);
         }
+        km_kbp_context_items_dispose(context_items);
         g_free(surrounding_text);
-        g_free(current_context_utf8);
-    }
-    else {
-        km_kbp_context_clear(context);
     }
 }
 
