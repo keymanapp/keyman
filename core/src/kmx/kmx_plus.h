@@ -32,6 +32,13 @@ struct COMP_KMXPLUS_SECT {
   KMX_DWORD total;                     // 0008 KMXPlus entire length
   KMX_DWORD count;                     // 000B number of section headers
   COMP_KMXPLUS_SECT_ENTRY entries[0];  // 0010 section entries
+  /**
+   * @brief Get the offset of a section, or 0
+   *
+   * @param ident section id such as 'strs'. Never 'sect'
+   * @return KMX_DWORD offset from beginning of kmxplus
+   */
+  KMX_DWORD find(KMX_DWORD ident) const;
 };
 
 // Assert that the length matches the declared length
@@ -98,6 +105,7 @@ struct COMP_KMXPLUS_KEYS {
   KMX_DWORD count;    // number of keys
   KMX_DWORD reserved; // padding
   COMP_KMXPLUS_KEYS_ENTRY entries[0];
+  const COMP_KMXPLUS_KEYS_ENTRY *find(KMX_DWORD vkey, KMX_DWORD mod) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_KEYS) == LDML_LENGTH_KEYS, "mismatched size of section keys");

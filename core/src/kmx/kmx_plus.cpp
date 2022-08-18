@@ -83,8 +83,6 @@ dump_kmxplus_vkey(const uint8_t* /*data*/, const COMP_KMXPLUS_VKEY* vkey) {
   // TODO-LDML
 }
 
-
-
 static void
 dump_kmxplus_strs(const uint8_t* /*data*/, const COMP_KMXPLUS_STRS* strs) {
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)strs);
@@ -106,6 +104,15 @@ dump_kmxplus_strs(const uint8_t* /*data*/, const COMP_KMXPLUS_STRS* strs) {
     }
     printf("\n");
   }
+}
+
+KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
+  for (KMX_DWORD i = 0; i < count; i++) {
+    if (ident == entries[i].sect) {
+        return entries[i].offset;
+    }
+  }
+  return 0;
 }
 
 static void
@@ -168,7 +175,17 @@ dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
   dump_kmxplus_data(rawdata + ex->kmxplus.dpKMXPlus);
 }
 
- PKMX_WCHAR
+const COMP_KMXPLUS_KEYS_ENTRY *COMP_KMXPLUS_KEYS::find(KMX_DWORD vkey, KMX_DWORD mod) const {
+    // TODO-LDML: eventually, assume sorted order & binary search
+    for (KMX_DWORD i=0; i<count; i++) {
+        if(entries[i].vkey == vkey && entries[i].mod == mod) {
+            return &entries[i];
+        }
+    }
+    return NULL;
+}
+
+PKMX_WCHAR
 COMP_KMXPLUS_STRS::get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz) const {
     assert(entry < count);
     if (entry >= count) {

@@ -12,6 +12,38 @@
 #include "../kmx/kmx_plus.h"
 #include "ldml/keyboardprocessor_ldml.h"
 
+// extern "C" {
+// #include "../../../common/windows/cpp/src/ConvertUTF.c"
+// }
+
+// HACK
+enum ConversionResult {
+  conversionOK,
+  conversionNotOk
+};
+enum ConversionFlags {
+  strictConversion
+};
+
+typedef KMX_WCHAR UTF16;
+typedef KMX_DWORD UTF32;
+
+ConversionResult ConvertUTF32toUTF16(
+		UTF32** sourceStart, const UTF32* sourceEnd,
+		UTF16** targetStart, const UTF16* targetEnd, const ConversionFlags /*flags*/) {
+    if(sourceEnd > (*sourceStart+1)) return conversionNotOk; // Don't support >1 char
+    if(**sourceStart & 0xFFFF0000) {
+      // Don't support supplemental chars yet
+      return conversionNotOk;
+    }
+    *((*targetStart)++) = (UTF16)((*(*sourceStart)++) & 0xFFFF); // BMP
+
+    assert(*sourceStart==sourceEnd);
+    assert(*targetStart <= targetEnd);
+    return(conversionOK);
+}
+
+
 namespace {
   constexpr km_kbp_attr const engine_attrs = {
     256,
@@ -26,13 +58,22 @@ namespace {
 namespace km {
 namespace kbp {
 
-ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> _kmn_unused(data))
+ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  )
+  ), rawdata(data) // TODO-LDML: load instead of clone
 {
   // TODO-LDML: load the file from the buffer (KMXPlus format)
   // Note: kb_path is essentially debug metadata here
+
+  if (data.size() == 0) {
+    std::ifstream file(static_cast<std::string>(kb_path), std::ios::binary | std::ios::ate);
+    const std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    rawdata.reserve((size_t)size);
+    file.read((char *) rawdata.data(), size);
+    file.close();
+  }
 }
 
 bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>& data) {
@@ -68,7 +109,7 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
     return false;
   }
 
-  // Dump data
+  // Dump data. This also does some validation.
   dump_kmxplus_data(comp_keyboard);
 
   // A KMXPlus file is in the buffer (although more validation is required)
@@ -102,7 +143,7 @@ km_kbp_status
 ldml_processor::process_event(
   km_kbp_state *state,
   km_kbp_virtual_key vk,
-  uint16_t _kmn_unused(modifier_state),
+  uint16_t modifier_state,
   uint8_t is_key_down,
   uint16_t /*event_flags*/ // TODO-LDML: unused... for now...
 ) {
@@ -127,9 +168,65 @@ ldml_processor::process_event(
       state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
       break;
     default:
-      /* We're going to push an 'a' for a passing unit test */
-      state->context().push_character('a');
-      state->actions().push_character('a');
+      // TODO-LDML: temporary code here
+      // Don't want to do this work each time
+      const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)rawdata.data();
+      assert(comp_keyboard->dwFlags & KF_KMXPLUS);
+      const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
+
+      // printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
+      const uint8_t* kmxplusdata = rawdata.data() + ex->kmxplus.dpKMXPlus;
+      // Get out the SECT header
+      const kmx::COMP_KMXPLUS_SECT *sect = kmx::as_kmxplus_sect(kmxplusdata);
+      assert(sect != NULL);
+      assert(sect->header.ident == LDML_SECTION_SECT);
+      KMX_DWORD offset;
+      // Fill out the other sections we need.
+      offset = sect->find(LDML_SECTION_STRS);
+      assert(offset != 0); // or else section not found
+      const kmx::COMP_KMXPLUS_STRS *strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
+      assert(strs->header.ident == LDML_SECTION_STRS);
+      offset = sect->find(LDML_SECTION_KEYS);
+      assert(offset != 0); // or else section not found
+      const kmx::COMP_KMXPLUS_KEYS *keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
+      assert(keys->header.ident == LDML_SECTION_KEYS);
+      // Look up the key
+      const kmx::COMP_KMXPLUS_KEYS_ENTRY *key =  keys->find(vk, modifier_state);
+      assert(key != NULL);
+      if (!key) {
+        return KM_KBP_STATUS_KEY_ERROR;
+      }
+      // Prepare output chars
+      KMX_DWORD len = 0;
+      KMX_WCHAR out[BUFSIZ];
+      if (key->flags && LDML_KEYS_FLAGS_EXTEND) {
+        // It's a string.
+        assert(NULL != strs->get(key->to, out, BUFSIZ));
+        // u_strlen()
+        for(len=0; len<BUFSIZ && out[len]; len++);
+      } else {
+        UTF32 buf32[2];
+        buf32[0] = key->to; // UTF-32
+        buf32[1] = 0; // to avoid UMR warning
+        UTF32 *sourceStart = &buf32[0];
+        const UTF32 *sourceEnd = &buf32[1]; // Reference off the end. NULL to avoid UMR.
+        UTF16 *targetStart = (UTF16*)out;
+        const UTF16 *targetEnd = (UTF16*)out+BUFSIZ-1;
+        ConversionResult result = ::ConvertUTF32toUTF16(&sourceStart, sourceEnd, &targetStart, targetEnd, strictConversion);
+        assert(result == conversionOK);
+        *targetStart = 0;
+        len = 1; // TODO=LDML calculate
+        // len = (targetStart - out);
+        assert(len>=1 && len <= 2);
+      }
+      assert(len>=0);
+      assert(len<BUFSIZ);
+      assert(out[len] == 0); // null termination
+
+      for(KMX_DWORD i=0; i<len; i++) {
+        state->context().push_character(out[i]);
+        state->actions().push_character(out[i]);
+      }
     }
 
     state->actions().commit();
