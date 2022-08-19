@@ -134,6 +134,7 @@ namespace com.keyman.osk {
     readonly pre:   CumulativePathStats;
     readonly post:  CumulativePathStats;
     readonly union: CumulativePathStats;
+    readonly endpoint: CumulativePathStats;
 
     static readonly segmentationComparison = class SegmentedRegression {
       host: Segmentation;
@@ -249,10 +250,14 @@ namespace com.keyman.osk {
       }
     }
 
-    constructor(pre: CumulativePathStats, post: CumulativePathStats, union: CumulativePathStats) {
+    constructor(pre: CumulativePathStats,
+                post: CumulativePathStats,
+                union: CumulativePathStats,
+                cumulativeEndpoint: CumulativePathStats) {
       this.pre = pre;
       this.post = post;
       this.union = union;
+      this.endpoint = cumulativeEndpoint;
     }
 
     public segReg(dependentAxis: 'x' | 'y' | 't', independentAxis: 'x' | 'y' | 't') {
@@ -306,7 +311,7 @@ namespace com.keyman.osk {
       const post       = finalStats.deaccumulate(steppedStats[splitIndex-1]);
       const union      = finalStats.deaccumulate(choppedStats);
 
-      super(pre, post, union);
+      super(pre, post, union, finalStats);
       this.baseChop  = choppedStats;
       this.chopPoint = steppedStats[splitIndex-1];
       this.endOfPre  = steppedStats[splitIndex];
@@ -314,23 +319,28 @@ namespace com.keyman.osk {
   }
 
   /* FIXME:  Note that this function is a temporary development stopgap and will likely shift
-    * as development continues for a few reasons:
-    * 1. In its current form, it'd be better to return a completed `Segment`; this is being used
-    *    to finalize `Segment`s, after all.
-    * 2. Except... we'll actually want it for uncompleted `Segment`s too, for the tail member of
-    *    the public `path.segments` array, which'll need UPDATING, not replacement.
-    * 3. In some cases, subsegmentation provides an advantage for constructing / updating `Segment`s.
-    *    E.g: Flicks threshold based on top speed, and the faster subsegment's stats are far better
-    *    for this than the combined interval's stats.
-    */
-    const mergeSubsegmentations = function(array: PotentialSegmentation[]) {
-      if(array.length == 1) {
-        return array[0].pre; // It's pre-calculated, so just use it.
-      } else {
-        const finalSubsegmentation = array[array.length-1];
-        return finalSubsegmentation.endOfPre.deaccumulate(array[0].baseChop);
-      }
+   * as development continues for a few reasons:
+   * 1. In its current form, it'd be better to return a completed `Segment`; this is being used
+   *    to finalize `Segment`s, after all.
+   * 2. Except... we'll actually want it for uncompleted `Segment`s too, for the tail member of
+   *    the public `path.segments` array, which'll need UPDATING, not replacement.
+   * 3. In some cases, subsegmentation provides an advantage for constructing / updating `Segment`s.
+   *    E.g: Flicks threshold based on top speed, and the faster subsegment's stats are far better
+   *    for this than the combined interval's stats.
+   *
+   * Also worth note: makes a LOT of assumptions about how it will be used; namely, that
+   * the members of the array originally were contiguous and are in their original
+   * segmentation order.  This holds for current use cases, but this is why the func
+   * will not be exported.
+   */
+  const mergeSubsegmentations = function(array: PotentialSegmentation[]) {
+    if(array.length == 1) {
+      return array[0].pre; // It's pre-calculated, so just use it.
+    } else {
+      const finalSubsegmentation = array[array.length-1];
+      return finalSubsegmentation.endOfPre.deaccumulate(array[0].baseChop);
     }
+  }
 
   export class PathSegmenter {
     /**
@@ -592,6 +602,8 @@ namespace com.keyman.osk {
           if(nextSplit.segRating <= currentSplit.segRating) {
             break;
           } else if(!nextSplit.segmentationMerited && currentSplit.segmentationMerited) {
+            // Note:  this can happen if segmentation is triggered due to divergence on both axes
+            // if one of them drops a threshold tier and the other fails to improve sufficiently.
             console.warn("aborting split-point relocation due to no longer segmenting");
             break;
           } else {
@@ -632,44 +644,59 @@ namespace com.keyman.osk {
     private filterSubsegmentation(subsegmentation: PotentialSegmentation, force?: boolean) {
       force = !!force;
 
+      let predecessor = subsegmentation.pre;
+      let firstChopPoint = subsegmentation.baseChop;
       if(this.lingeringSubsegmentations.length) {
         // First:  check if the newly-finished subsegment should be merged with the lingering ones.
-        const lastSubsegment = this.lingeringSubsegmentations[this.lingeringSubsegmentations.length-1];
+        // const lastSubsegment = this.lingeringSubsegmentations[this.lingeringSubsegmentations.length-1];
+        const mergedPrecursors = mergeSubsegmentations(this.lingeringSubsegmentations);
 
-        const tailUnion = mergeSubsegmentations([lastSubsegment, subsegmentation]);
-        console.log("Lingering segment(s) considered for linking: ");
+        // const tailUnion = mergeSubsegmentations([lastSubsegment, subsegmentation]);
+        const tailUnion = mergeSubsegmentations([...this.lingeringSubsegmentations, subsegmentation]);
+        console.log("Verifying linkage to pending merges: ");
         console.log(this.lingeringSubsegmentations);
-        if(!PathSegmenter.shouldMergeSubsegments(lastSubsegment.pre, subsegmentation.pre, tailUnion)) {
+        console.log("verification check:");
+        console.log(mergedPrecursors);
+        const precursorMergeSegmentation = new Segmentation(mergedPrecursors, subsegmentation.pre, tailUnion, subsegmentation.endOfPre);
+        // Sometimes the start of a harsh turn seems like it's part of the same thing for a moment, but as it continues,
+        // becomes something VERY different.  Validate that we should still merge the left-hand with its predecessors.
+        if(!PathSegmenter.shouldMergeSubsegments(precursorMergeSegmentation)) {
           // Emit as separate subsegment.
           const finishedSegment = mergeSubsegmentations(this.lingeringSubsegmentations);
           this._protoSegments.push(finishedSegment);
           this._protoSegmentSets.push(this.lingeringSubsegmentations.map((val) => val.pre));
           this.lingeringSubsegmentations = [];
 
-          // IN DEVELOPMENT:  does this happen much?  If so... maybe we need intervening checks to pre-filter even
-          // if not segmenting.
-          // So far... not _much_, but I've seen it a few times.
-          console.warn("Did not merge a lingering subsegment with the incoming one!");
+          console.log("Proto-segments length: " + this._protoSegments.length);
+
+          console.log("Did not merge a lingering subsegment with the incoming one!");
         } else {
+          predecessor = tailUnion;
+          firstChopPoint = this.lingeringSubsegmentations[0].baseChop;
           console.log("Will merge in old subsegments!");
         }
       }
 
-      console.log("Double-checking newly split subsegments for xy/yx correlation");
-      if(!force && PathSegmenter.shouldMergeSubsegments(subsegmentation.pre, subsegmentation.post, subsegmentation.union)) {
+      console.log("Double-checking right-side split subsegment for xy/yx correlation with prior segment candidate(s)");
+      const fullUnion = subsegmentation.endpoint.deaccumulate(firstChopPoint);
+      const fullMergeSegmentation = new Segmentation(predecessor, subsegmentation.post, fullUnion, subsegmentation.endpoint);
+      console.log("segmentation-prevention check:")
+      console.log(fullMergeSegmentation);
+      // if(!force && PathSegmenter.shouldMergeSubsegments(subsegmentation.pre, subsegmentation.post, subsegmentation.union)) {
+      if(!force && PathSegmenter.shouldMergeSubsegments(fullMergeSegmentation)) {
         this.lingeringSubsegmentations.push(subsegmentation);
       } else {
         // Merge all as a completed segment!
-        const finishedSegment = mergeSubsegmentations([...this.lingeringSubsegmentations, subsegmentation]);
-        this._protoSegments.push(finishedSegment);
+        // const finishedSegment = mergeSubsegmentations([...this.lingeringSubsegmentations, subsegmentation]);
+        this._protoSegments.push(predecessor);
         this._protoSegmentSets.push([...this.lingeringSubsegmentations.map((val) => val.pre), subsegmentation.pre]);
         this.lingeringSubsegmentations = [];
+
+        console.log("Proto-segments length: " + this._protoSegments.length);
       }
     }
 
-    private static shouldMergeSubsegments(segment1: CumulativePathStats,
-                                          segment2: CumulativePathStats,
-                                          combined: CumulativePathStats): boolean {
+    private static shouldMergeSubsegments(segmentation: Segmentation): boolean {
       // // Known case #1:
       // //   Near-identical direction, but heavy speed difference.
       // //   Speed's still high enough to not be a 'wait'.
@@ -678,27 +705,25 @@ namespace com.keyman.osk {
       // //   Low-speed pivot; angle change caught on very low velocity for both subsegments.
       // //   ... or should this be merged?  Multiple mini-segments from 'wiggling' could just go ignored instead...
 
-      if(segment1.speedMean < 80 && segment2.speedMean > 80) {
+      if(segmentation.pre.speedMean < 80 && segmentation.post.speedMean > 80) {
         console.log("desegmentation exception");
         return; // SUPER TEMP: needs further work; avoids the "low-speed pivot" case.
       }
-      if(segment1.speedMean > 80 && segment2.speedMean < 80) {
+      if(segmentation.pre.speedMean > 80 && segmentation.post.speedMean < 80) {
         console.log("desegmentation exception");
         return;
       }
 
-      const asSegmentation = new Segmentation(segment1, segment2, combined);
-
       console.log("Desegmentation under consideration: ");
-      console.log(asSegmentation);
+      console.log(segmentation);
 
-      const xF = asSegmentation.segReg('x', 'y');
-      const yF = asSegmentation.segReg('y', 'x');
+      const xF = segmentation.segReg('x', 'y');
+      const yF = segmentation.segReg('y', 'x');
       console.log(`merger F-test (xy): F_(${xF.fDoF1}, ${xF.fDoF2}) = ${xF.fStat} @ ${xF.certaintyThreshold}`);
       console.log(`merger F-test (yx): F_(${yF.fDoF1}, ${yF.fDoF2}) = ${yF.fStat} @ ${yF.certaintyThreshold}`);
-      console.log(`will remerge: ${asSegmentation.mergeMerited}`);
+      console.log(`will remerge: ${segmentation.mergeMerited}`);
 
-      return asSegmentation.mergeMerited;
+      return segmentation.mergeMerited;
     }
   }
 }
