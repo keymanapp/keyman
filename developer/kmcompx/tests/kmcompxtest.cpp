@@ -33,5 +33,34 @@ int main(int argc, char *argv[])
 	puts(argv[1]);
 	puts(argv[2]);
 
-  return CompileKeyboardFile(argv[1], argv[2], TRUE, FALSE, TRUE, msgproc) ? 0 : 1;
+  if (CompileKeyboardFile(argv[1], argv[2], FALSE, FALSE, TRUE, msgproc)) {
+    // TODO: compare argv[2] to ../build/argv[2]
+    FILE* fp1 = fopen(argv[2], "rb");
+    char fname[260];
+    strcpy(fname, argv[2]);
+    char* p = strrchr(fname, '\\');
+    if (!p) p = fname;
+    strcpy(p, "\\..\\build\\");
+    char* q = strrchr(argv[2], '\\');
+    if (!q) q = argv[2]; else q++;
+    strcat(p, q);
+    FILE* fp2 = fopen(fname, "rb");
+    if (!fp2) return 0; //assume pass if no reference kmx file
+    fseek(fp1, 0, SEEK_END);
+    auto sz1 = ftell(fp1);
+    fseek(fp1, 0, SEEK_SET);
+
+    fseek(fp2, 0, SEEK_END);
+    auto sz2 = ftell(fp2);
+    fseek(fp2, 0, SEEK_SET);
+
+    if (sz1 != sz2) return 2;
+
+    char* buf1 = new char[sz1];
+    char* buf2 = new char[sz1];
+    fread(buf1, 1, sz1, fp1);
+    fread(buf2, 1, sz1, fp2);
+    return memcmp(buf1, buf2, sz1) ? 3 : 0;
+  }
+  else return 1;
 }
