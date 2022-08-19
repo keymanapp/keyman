@@ -662,8 +662,25 @@ namespace com.keyman.osk {
 
     // Convert to a `toJSON` method for use during investigative debugging.
     private toDebuggingJSON() {
+      // This `likelyState` value is extremely prototyped & just here for reviewer/tester convenience.
+      // It'll need to be developed a bit more fully, but follows my intuitions from development &
+      // testing.
+      let likelyState = 'unknown';
+
+      if(this.mean('v') < 80 && this.rawDistance < 12 && this.duration > 0.1) {
+        likelyState = 'hold';
+      } else if(this.mean('v') < 80 && this.rawDistance < 6) {
+        likelyState = 'hold';
+      }
+
+      if(this.mean('v') > 400 || (this.mean('v') > 200 && this.duration > 0.1) || this.netDistance > 20) {
+        likelyState = 'move';
+      }
+
       return {
         angle: this.angle,
+        cardinal: this.cardinalDirection,
+        likelyType: likelyState,
         speedMean: this.mean('v'),
         rawDistance: this.rawDistance,
         duration: this.duration,
