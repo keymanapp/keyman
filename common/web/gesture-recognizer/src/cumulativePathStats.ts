@@ -7,23 +7,84 @@ namespace com.keyman.osk {
    * Instances of this class are immutable.
    */
   export class CumulativePathStats {
-    private xLinearSum: number = 0;
-    private yLinearSum: number = 0;
-    private tLinearSum: number = 0;
+    // So... class-level "inner classes" are possible in TS... if defined via assignment to a field.
+    static readonly regression = class RegressionFromSums {
+      readonly independent: 'x' | 'y' | 't';
+      readonly dependent:   'x' | 'y' | 't';
+      readonly paired:      'tx' | 'ty' | 'xy';
+
+      readonly accumulator: CumulativePathStats;
+
+      constructor(mainStats: CumulativePathStats, dependentAxis: 'x' | 'y' | 't', independentAxis: 'x' | 'y' | 't') {
+        if(dependentAxis == independentAxis) {
+          throw "Two different axes must be specified for the regression object.";
+        }
+
+        this.accumulator = mainStats;
+
+        this.dependent   = dependentAxis;
+        this.independent = independentAxis;
+
+        if(dependentAxis < independentAxis) {
+          this.paired = dependentAxis.concat(independentAxis) as 'tx' | 'ty' | 'xy';
+        } else {
+          this.paired = independentAxis.concat(dependentAxis) as 'tx' | 'ty' | 'xy';
+        }
+      }
+
+      get slope(): number {
+        // The technical definition is the commented-out line, but the denominator component of both
+        // cancels out - it's 'more efficient' to use the following line as a result.
+
+        // this.accumulator.covariance(this.paired) / this.accumulator.variance(this.independent);
+        const val = this.accumulator.crossSum(this.paired) / this.accumulator.squaredSum(this.independent);
+        return val;
+      }
+
+      get intercept(): number {
+        // Performing a regression based on these pre-summed values means that our obtained intercept is in
+        // the mapped coordinate system.
+        const mappedIntercept = this.accumulator.mappedMean(this.dependent) - this.slope * this.accumulator.mappedMean(this.independent);
+
+        const val =  mappedIntercept + this.accumulator.mappingConstant(this.dependent) -
+          this.slope * this.accumulator.mappingConstant(this.independent);
+
+        return val;
+      }
+
+      get sumOfSquaredError(): number {
+        return this.accumulator.squaredSum(this.dependent) - this.sumOfSquaredModeled;
+      }
+
+      get sumOfSquaredModeled(): number {
+        return this.slope * this.accumulator.crossSum(this.paired);
+      }
+
+      get coefficientOfDetermination(): number {
+        if(this.accumulator.squaredSum(this.dependent) == 0 || this.accumulator.squaredSum(this.independent) == 0) {
+          return 1;
+        }
+
+        const acc = this.accumulator;
+        const num = acc.crossSum(this.paired) * acc.crossSum(this.paired);
+        const denom = acc.squaredSum(this.dependent) * acc.squaredSum(this.independent);
+
+        return num / denom;
+      }
+
+      predictFromValue(value: number) {
+        return this.slope * value + this.intercept;
+      }
+    }
+
+    private rawLinearSums: {'x': number, 'y': number, 't': number} = {'x': 0, 'y': 0, 't': 0};
 
     private xCentroidSum: number = 0;
     private yCentroidSum: number = 0;
 
-    private xQuadSum: number = 0;
-    private yQuadSum: number = 0;
-    private tQuadSum: number = 0;
+    private rawSquaredSums: {'x': number, 'y': number, 't': number} = {'x': 0, 'y': 0, 't': 0};
 
-    private xtCrossSum: number = 0;
-    private ytCrossSum: number = 0;
-    // While it's not used to _segment_, it's used within criteria referenced when
-    // recombining segments same-angle segments that were only split because of
-    // time-based (i.e, speed) differences.
-    private yxCrossSum: number = 0;
+    private rawCrossSums: {'tx': number, 'ty': number, 'xy': number} = {'tx': 0, 'ty': 0, 'xy': 0};
 
     private coordArcSum: number = 0;
 
@@ -64,6 +125,10 @@ namespace com.keyman.osk {
       // Will worry about JSON form later.
       if(obj instanceof CumulativePathStats) {
         Object.assign(this, obj);
+
+        this.rawLinearSums = {...obj.rawLinearSums};
+        this.rawCrossSums  = {...obj.rawCrossSums};
+        this.rawSquaredSums   = {...obj.rawSquaredSums};
       } else if(isAnInputSample(obj)) {
         Object.assign(this, this.extend(obj));
       }
@@ -92,17 +157,17 @@ namespace com.keyman.osk {
       const y = sample.targetY - this.baseSample.targetY;
       const t = sample.t - this.baseSample.t;
 
-      result.xLinearSum += x;
-      result.yLinearSum += y;
-      result.tLinearSum += t;
+      result.rawLinearSums['x'] += x;
+      result.rawLinearSums['y'] += y;
+      result.rawLinearSums['t'] += t;
 
-      result.xtCrossSum += x * t;
-      result.ytCrossSum += y * t;
-      result.yxCrossSum += x * y;
+      result.rawCrossSums['tx'] += t * x;
+      result.rawCrossSums['ty'] += t * y;
+      result.rawCrossSums['xy'] += x * y;
 
-      result.xQuadSum += x * x;
-      result.yQuadSum += y * y;
-      result.tQuadSum += t * t;
+      result.rawSquaredSums['x'] += x * x;
+      result.rawSquaredSums['y'] += y * y;
+      result.rawSquaredSums['t'] += t * t;
 
       if(this.lastSample) {
         // arc length stuff!
@@ -176,17 +241,17 @@ namespace com.keyman.osk {
         throw 'Invalid argument:  stats missing necessary tracking variable.';
       }
 
-      result.xLinearSum -= subsetStats.xLinearSum;
-      result.yLinearSum -= subsetStats.yLinearSum;
-      result.tLinearSum -= subsetStats.tLinearSum;
+      for(let dim in result.rawLinearSums) {
+        result.rawLinearSums[dim] -= subsetStats.rawLinearSums[dim];
+      }
 
-      result.xtCrossSum -= subsetStats.xtCrossSum;
-      result.ytCrossSum -= subsetStats.ytCrossSum;
-      result.yxCrossSum -= subsetStats.yxCrossSum;
+      for(let dimPair in result.rawCrossSums) {
+        result.rawCrossSums[dimPair] -= subsetStats.rawCrossSums[dimPair];
+      }
 
-      result.xQuadSum -= subsetStats.xQuadSum;
-      result.yQuadSum -= subsetStats.yQuadSum;
-      result.tQuadSum -= subsetStats.tQuadSum;
+      for(let dim in result.rawSquaredSums) {
+        result.rawSquaredSums[dim] -= subsetStats.rawSquaredSums[dim];
+      }
 
       // arc length stuff!
       if(subsetStats.followingSample && subsetStats.lastSample) {
@@ -245,16 +310,22 @@ namespace com.keyman.osk {
       return this.sampleCount;
     }
 
-    private get xSampleMean() {
-      return this.xLinearSum / this.sampleCount;
+    private mappingConstant(dim: 'x' | 'y' | 't') {
+      if(!this.baseSample) {
+        return undefined;
+      }
+
+      if(dim == 't') {
+        return this.baseSample.t;
+      } else if(dim == 'x') {
+        return this.baseSample.targetX;
+      } else {
+        return this.baseSample.targetY;
+      }
     }
 
-    private get ySampleMean() {
-      return this.yLinearSum / this.sampleCount;
-    }
-
-    private get tSampleMean() {
-      return this.tLinearSum / this.sampleCount;
+    private mappedMean(dim: 'x' | 'y' | 't') {
+      return this.rawLinearSums[dim] / this.sampleCount;
     }
 
     public get centroid(): {x: number, y: number} {
@@ -274,226 +345,71 @@ namespace com.keyman.osk {
       }
     }
 
-    public get xtCovariance() {
-      return this.xtCrossSum / this.sampleCount - (this.xSampleMean * this.tSampleMean);
+    public squaredSum(dim: 'x' | 'y' | 't') {
+      const x2 = this.rawSquaredSums[dim];
+      const x1 = this.rawLinearSums[dim];
+
+      const val = x2 - x1 * x1 / this.sampleCount;
+
+      return val > 1e-8 ? val : 0;
     }
 
-    public get ytCovariance() {
-      return this.ytCrossSum / this.sampleCount - (this.ySampleMean * this.tSampleMean);
-    }
+    public crossSum(dimPair: 'tx' | 'ty' | 'xy') {
+      const dim1 = dimPair.charAt(0);
+      const dim2 = dimPair.charAt(1);
 
-    public get yxCovariance() {
-      return this.yxCrossSum / this.sampleCount - (this.xSampleMean * this.ySampleMean);
-    }
-
-    public get xVariance() {
-      return this.xQuadSum / this.sampleCount - (this.xSampleMean * this.xSampleMean);
-    }
-
-    public get yVariance() {
-      return this.yQuadSum / this.sampleCount - (this.ySampleMean * this.ySampleMean);
-    }
-
-    public get tVariance() {
-      return this.tQuadSum / this.sampleCount - (this.tSampleMean * this.tSampleMean);
-    }
-
-    public get xtRegressionSlope() {
-      return this.xtCovariance / this.tVariance;
-    }
-
-    public get ytRegressionSlope() {
-      return this.ytCovariance / this.tVariance;
-    }
-
-    public get yxRegressionSlope() {  // gets the 'a' of y=ax+b.
-      return this.yxCovariance / this.xVariance;
-    }
-
-    public get xyRegressionSlope() {
-      // xyCovariance and yxCovariance would be identical.
-      return this.yxCovariance / this.yVariance;
-    }
-
-    public get xtRegressionIntercept() {
-      return (this.xSampleMean) - this.xtRegressionSlope * this.tSampleMean;
-    }
-
-    public get ytRegressionIntercept() {
-      return (this.ySampleMean) - this.ytRegressionSlope * this.tSampleMean;
-    }
-
-    public get yxRegressionIntercept() {
-      return (this.ySampleMean) - this.yxRegressionSlope * this.xSampleMean;
-    }
-
-    public get xyRegressionIntercept() {
-      return (this.xSampleMean) - this.xyRegressionSlope * this.ySampleMean;
-    }
-
-    public get xtRegressionSSE() {
-      return this.sampleCount * (this.xVariance - (this.xtRegressionSlope * this.xtCovariance));
-    }
-
-    public get ytRegressionSSE() {
-      return this.sampleCount * (this.yVariance - (this.ytRegressionSlope * this.ytCovariance));
-    }
-
-    public get yxRegressionSSE() {
-      return this.sampleCount * (this.yVariance - (this.yxRegressionSlope * this.yxCovariance));
-    }
-
-    public get xyRegressionSSE() {
-      return this.sampleCount * (this.xVariance - (this.xyRegressionSlope * this.yxCovariance));
-    }
-
-    public get xtRegressionModeledVariance() {
-      return this.xtRegressionSlope * this.xtCovariance * this.sampleCount;
-    }
-
-    public get ytRegressionModeledVariance() {
-      return this.ytRegressionSlope * this.ytCovariance * this.sampleCount;
-    }
-
-    public get yxRegressionModeledVariance() {
-      return this.yxRegressionSlope * this.yxCovariance * this.sampleCount;
-    }
-
-    public get xyRegressionModeledVariance() {
-      return this.xyRegressionSlope * this.yxCovariance * this.sampleCount;
-    }
-
-    public get xtRegressionCOD() {
-      // In truth, the proper answer is NaN (not defined).  But for our purposes,
-      // it's a perfect fit, so we'll indicate "perfect fit".
-      if(this.xVariance == 0) {
-        return 1;
+      let orderedDims: string = dimPair;
+      if(dim2 < dim1) {
+        orderedDims = dim2.concat(dim1);
       }
 
-      return this.xtCovariance * this.xtCovariance / (this.xVariance * this.tVariance);
+      const ab = this.rawCrossSums[orderedDims];
+      const a  = this.rawLinearSums[dim1];
+      const b  = this.rawLinearSums[dim2];
+
+      const val = ab - a * b / this.sampleCount;
+
+      return val > 1e-8 ? val : 0;
     }
 
-    public get ytRegressionCOD() {
-      // In truth, the proper answer is NaN (not defined).  But for our purposes,
-      // it's a perfect fit, so we'll indicate "perfect fit".
-      if(this.yVariance == 0) {
-        return 1;
+    public covariance(dimPair: 'tx' | 'ty' | 'xy') {
+      return this.crossSum(dimPair) / (this.sampleCount - 1);
+    }
+
+    public variance(dim: 'x' | 'y' | 't') {
+      return this.squaredSum(dim) / (this.sampleCount - 1);
+    }
+
+    public buildRenormalized(): CumulativePathStats {
+      let result = new CumulativePathStats(this);
+
+      // By abusing the statistical identities for calculating various expressions
+      // related to regression, we can re-center our mapped coordinate system on
+      // our current mean.  We shouldn't do so too frequently, but this should help
+      // moderate effects from catastrophic cancellation.
+
+      let newBase: InputSample = {
+        targetX: this.mappedMean['x'] + this.baseSample.targetX,
+        targetY: this.mappedMean['y'] + this.baseSample.targetY,
+        t:       this.mappedMean['t'] + this.baseSample.t
+      };
+
+      result.baseSample = newBase;
+
+      for(const dimPair in result.rawCrossSums) {
+        result.rawCrossSums[dimPair] = this.crossSum(dimPair as 'tx' | 'ty' | 'xy');
       }
 
-      return this.ytCovariance * this.ytCovariance / (this.yVariance * this.tVariance);
-    }
-
-    public get yxRegressionCOD() {
-      // In truth, the proper answer is NaN (not defined).  But for our purposes,
-      // it's a perfect fit, so we'll indicate "perfect fit".
-      if(this.yVariance == 0 || this.xVariance == 0) {
-        return 1;
+      for(const dim in result.rawSquaredSums) {
+        result.rawSquaredSums[dim] = this.squaredSum(dim as 'x' | 'y' | 't');
       }
 
-      return this.yxCovariance * this.yxCovariance / (this.yVariance * this.xVariance);
+      return result;
     }
 
-    public regressionXFitForT(t: number) {
-      const internalT = t - this.baseSample.t;
-      return this.xtRegressionIntercept + this.xtRegressionSlope * internalT + this.baseSample.targetX;
+    public fitRegression(dependent: 'x' | 'y' | 't', independent: 'x' | 'y' | 't') {
+      return new CumulativePathStats.regression(this, dependent, independent);
     }
-
-    public regressionYFitForT(t: number) {
-      const internalT = t - this.baseSample.t;
-      return this.ytRegressionIntercept + this.ytRegressionSlope * internalT + this.baseSample.targetY;
-    }
-
-    public regressionXErrorForSampleByT(sample: InputSample) {
-      const fitX = this.regressionXFitForT(sample.t);
-      return sample.targetX - fitX;
-    }
-
-    public regressionYErrorForSampleByT(sample: InputSample) {
-      const fitY = this.regressionYFitForT(sample.t);
-      return sample.targetY - fitY;
-    }
-
-    public regressionXFitForY(y: number) {
-      const internalY = y - this.baseSample.targetY;
-      return this.xyRegressionIntercept + this.xyRegressionSlope * internalY + this.baseSample.targetX;
-    }
-
-    public regressionYFitForX(x: number) {
-      const internalX = x - this.baseSample.targetX;
-      return this.yxRegressionIntercept + this.yxRegressionSlope * internalX + this.baseSample.targetY;
-    }
-
-    public regressionXErrorForSampleByY(sample: InputSample) {
-      const fitX = this.regressionXFitForY(sample.targetY);
-      return sample.targetX - fitX;
-    }
-
-    public regressionYErrorForSampleByX(sample: InputSample) {
-      const fitY = this.regressionYFitForX(sample.targetX);
-      return sample.targetY - fitY;
-    }
-
-    // public get xtRegressionFinalE() {
-    //   if(!this.lastSample || !this.baseSample) {
-    //     return undefined;
-    //   }
-
-    //   const time = this.lastSample.t - this.baseSample.t;
-    //   const adjustedX = this.lastSample.targetX - this.baseSample.targetX;
-    //   const error = adjustedX - (this.xtRegressionSlope * time + this.xtRegressionIntercept);
-    //   return error;// * error;
-    // }
-
-    // public get xtRegressionFinalSE() {
-    //   return this.xtRegressionFinalE * this.xtRegressionFinalE;
-    // }
-
-    // public get ytRegressionFinalE() {
-    //   if(!this.lastSample || !this.baseSample) {
-    //     return undefined;
-    //   }
-
-    //   const time = this.lastSample.t - this.baseSample.t;
-    //   const adjustedY = this.lastSample.targetY - this.baseSample.targetY;
-    //   const error = adjustedY - (this.ytRegressionSlope * time + this.ytRegressionIntercept);
-    //   return error;// * error;
-    // }
-
-    // public get ytRegressionFinalSE() {
-    //   return this.ytRegressionFinalE * this.ytRegressionFinalE;
-    // }
-
-    // public get xtRegressionInitialE() {
-    //   if(!this.initialSample || !this.baseSample) {
-    //     return undefined;
-    //   }
-
-    //   const time = this.initialSample.t - this.baseSample.t;
-    //   const adjustedX = this.initialSample.targetX - this.baseSample.targetX;
-    //   const error = adjustedX - (this.xtRegressionSlope * time + this.xtRegressionIntercept);
-    //   return error;// * error;
-    // }
-
-    // //public
-
-    // public get xtRegressionInitialSE() {
-    //   return this.xtRegressionInitialE * this.xtRegressionInitialE;
-    // }
-
-    // public get ytRegressionInitialE() {
-    //   if(!this.initialSample || !this.baseSample) {
-    //     return undefined;
-    //   }
-
-    //   const time = this.initialSample.t - this.baseSample.t;
-    //   const adjustedY = this.initialSample.targetY - this.baseSample.targetY;
-    //   const error = adjustedY - (this.ytRegressionSlope * time + this.ytRegressionIntercept);
-    //   return error;// * error;
-    // }
-
-    // public get ytRegressionInitialSE() {
-    //   return this.ytRegressionInitialE * this.ytRegressionInitialE;
-    // }
 
     public get netDistance() {
       // No issue with a net distance of 0 due to a single point.
@@ -635,21 +551,6 @@ namespace com.keyman.osk {
 
     public get rawDistance() {
       return this.coordArcSum;
-    }
-
-    public get maxEndpointDistanceFromCentroid() {
-      if(!this.initialSample || !this.lastSample) {
-        return 0;
-      }
-
-      const centroid = this.centroid;
-      const startXDist = centroid.x - this.initialSample.targetX;
-      const startYDist = centroid.y - this.initialSample.targetY;
-      const endXDist   = this.lastSample.targetX - centroid.x;
-      const endYDist   = this.lastSample.targetY - centroid.y;
-
-      return Math.sqrt(Math.max(startXDist * startXDist + startYDist * startYDist,
-                                endXDist   * endXDist   + endYDist   * endYDist));
     }
 
     // TODO:  is this actually ideal?  This was certainly useful for experimentation via interactive
