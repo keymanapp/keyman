@@ -1,10 +1,21 @@
 #include <kmx/kmx_plus.h>
+
+/**
+ * @def KMXPLUS_DEBUG Set to 1 to enable debug output
+ */
+#define KMXPLUS_DEBUG 1
+
+#if KMXPLUS_DEBUG
 #include <stdio.h>
+#endif
+
+#include <assert.h>
 
 namespace km {
 namespace kbp {
 namespace kmx {
 
+#if KMXPLUS_DEBUG
 static void
 dump_section_name(KMX_DWORD ident) {
   for (int i = 0; i < 4; i++) {
@@ -106,15 +117,6 @@ dump_kmxplus_strs(const uint8_t* /*data*/, const COMP_KMXPLUS_STRS* strs) {
   }
 }
 
-KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
-  for (KMX_DWORD i = 0; i < count; i++) {
-    if (ident == entries[i].sect) {
-        return entries[i].offset;
-    }
-  }
-  return 0;
-}
-
 static void
 dump_kmxplus_sect(const uint8_t* data, const COMP_KMXPLUS_SECT* sect) {
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)sect);
@@ -150,19 +152,23 @@ dump_kmxplus_sect(const uint8_t* data, const COMP_KMXPLUS_SECT* sect) {
     }
   }
 }
+#endif
 
 void
 dump_kmxplus_data(const uint8_t* data) {
+#if KMXPLUS_DEBUG
   const COMP_KMXPLUS_SECT* sect = as_kmxplus_sect(data);
   if (sect == NULL) {
     printf("Err: 'sect' null from %p\n", data);
     return;
   }
   dump_kmxplus_sect(data, sect);
+#endif
 }
 
 void
 dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
+#if KMXPLUS_DEBUG
   printf("dump_kmxplus_data(): Got a PCOMP_KEYBOARD at %p\n", keyboard);
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
     printf("Err: flags KF_KMXPLUS not set\n");
@@ -173,6 +179,7 @@ dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
   printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
   const uint8_t* rawdata = reinterpret_cast<const uint8_t*>(keyboard);
   dump_kmxplus_data(rawdata + ex->kmxplus.dpKMXPlus);
+#endif
 }
 
 const COMP_KMXPLUS_KEYS_ENTRY *COMP_KMXPLUS_KEYS::find(KMX_DWORD vkey, KMX_DWORD mod) const {
@@ -183,6 +190,15 @@ const COMP_KMXPLUS_KEYS_ENTRY *COMP_KMXPLUS_KEYS::find(KMX_DWORD vkey, KMX_DWORD
         }
     }
     return NULL;
+}
+
+KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
+  for (KMX_DWORD i = 0; i < count; i++) {
+    if (ident == entries[i].sect) {
+        return entries[i].offset;
+    }
+  }
+  return 0;
 }
 
 PKMX_WCHAR

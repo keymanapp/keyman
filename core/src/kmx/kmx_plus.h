@@ -146,7 +146,7 @@ validate_as_section(const uint8_t *data, uint32_t ident) {
 }
 
 /**
- * convert raw data to section
+ * cast raw data to section
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_SECT *
@@ -156,7 +156,7 @@ as_kmxplus_sect(const uint8_t *data) {
 }
 
 /**
- * convert raw data to section
+ * cast raw data to section
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_STRS *
@@ -166,7 +166,7 @@ as_kmxplus_strs(const uint8_t *data) {
 }
 
 /**
- * convert raw data to section
+ * cast raw data to section
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_KEYS *
@@ -175,7 +175,7 @@ as_kmxplus_keys(const uint8_t *data) {
   return reinterpret_cast<const COMP_KMXPLUS_KEYS *>(all);
 }
 /**
- * convert raw data to section
+ * cast raw data to section
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_LOCA *
@@ -184,7 +184,7 @@ as_kmxplus_loca(const uint8_t *data) {
   return reinterpret_cast<const COMP_KMXPLUS_LOCA *>(all);
 }
 /**
- * convert raw data to section
+ * cast raw data to section
  * @return section data or null on error
  */
 static inline const COMP_KMXPLUS_META *
@@ -204,14 +204,15 @@ as_kmxplus_vkey(const uint8_t *data) {
 
 /**
  * @brief Temporary function to dump raw data
- *
+ * May have no output if KMXPLUS_DEBUG is 0
+ * @param kmxplusdata data from the beginning of the KMXPlus section
  */
 void dump_kmxplus_data(void *kmxplusdata);
 
 /**
  * @brief Temporary functino to dump raw data
- *
- * @param keyboard
+ * May have no output if KMXPLUS_DEBUG is 0
+ * @param keyboard pointer to PCOMP_KEYBOARD with plus data following
  */
 void dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard);
 

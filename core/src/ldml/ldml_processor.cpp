@@ -58,22 +58,14 @@ namespace {
 namespace km {
 namespace kbp {
 
-ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> data)
+ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), rawdata(data) // TODO-LDML: load instead of clone
+  ), rawdata(data) // TODO-LDML: parse the data, don't just copy it
 {
   // TODO-LDML: load the file from the buffer (KMXPlus format)
   // Note: kb_path is essentially debug metadata here
-
-  if (data.size() == 0) {
-    std::ifstream file(static_cast<std::string>(kb_path), std::ios::binary | std::ios::ate);
-    const std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
-    rawdata.reserve((size_t)size);
-    file.read((char *) rawdata.data(), size);
-    file.close();
-  }
+  assert(data.size() != 0);
 }
 
 bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>& data) {
@@ -92,7 +84,7 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
 
   file.seekg(0, std::ios::beg);
 
-  data.reserve((size_t)size);
+  data.resize((size_t)size);
   if(!file.read((char *) data.data(), size)) {
     return false;
   }

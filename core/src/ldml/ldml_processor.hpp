@@ -25,7 +25,7 @@ namespace kbp {
   public:
     ldml_processor(
       path const & kb_path,
-      const std::vector<uint8_t> data
+      const std::vector<uint8_t> & data
     );
 
 //    ~ldml_processor() override;
