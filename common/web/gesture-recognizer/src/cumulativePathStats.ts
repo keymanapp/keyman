@@ -1,13 +1,16 @@
 namespace com.keyman.osk {
   /**
-   * As the name suggests, this class exists to track cumulative mathematical values, etc
-   * necessary to provide statistical information.  This information is used to facilitate
-   * path segmentation.
+   * As the name suggests, this class facilitates tracking of cumulative mathematical values, etc
+   * necessary to perform the statistical operations necessary for path segmentation.
    *
    * Instances of this class are immutable.
    */
   export class CumulativePathStats {
     // So... class-level "inner classes" are possible in TS... if defined via assignment to a field.
+    /**
+     * Provides linear-regression statistics & fitting values based on the underlying `CumulativePathStats`
+     * object used to generate it.  All operations are O(1).
+     */
     static readonly regression = class RegressionFromSums {
       readonly independent: 'x' | 'y' | 't';
       readonly dependent:   'x' | 'y' | 't';
@@ -15,6 +18,13 @@ namespace com.keyman.osk {
 
       readonly accumulator: CumulativePathStats;
 
+      /**
+       *
+       * @param mainStats       The `CumulativePathStats` instance to base all regression data on.
+       * @param dependentAxis   The 'output' axis / dimension; the axis whose behavior should be predicted based on
+       *                        existing data of its relationship with the independent axis.
+       * @param independentAxis The 'input' axis/dimension.
+       */
       constructor(mainStats: CumulativePathStats, dependentAxis: 'x' | 'y' | 't', independentAxis: 'x' | 'y' | 't') {
         if(dependentAxis == independentAxis) {
           throw "Two different axes must be specified for the regression object.";
@@ -32,6 +42,10 @@ namespace com.keyman.osk {
         }
       }
 
+      /**
+       * The 'slope' of the 'slope-intercept' form of the line that best fits the relationship between
+       * this regression's selected axes.
+       */
       get slope(): number {
         // The technical definition is the commented-out line, but the denominator component of both
         // cancels out - it's 'more efficient' to use the following line as a result.
@@ -41,6 +55,10 @@ namespace com.keyman.osk {
         return val;
       }
 
+      /**
+       * The 'intercept' of the 'slope-intercept' form of the line that best fits the relationship between
+       * this regression's selected axes.
+       */
       get intercept(): number {
         // Performing a regression based on these pre-summed values means that our obtained intercept is in
         // the mapped coordinate system.
@@ -52,10 +70,20 @@ namespace com.keyman.osk {
         return val;
       }
 
+      /**
+       * The total summed squared-distances of the best fitting line from actually-observed values;
+       * in other words, the "sum of the squared errors".
+       *
+       * Statistically, this is the portion of the dependent variable's variance (un-normalized)
+       * that is unexplained by this regression.
+       */
       get sumOfSquaredError(): number {
         return this.accumulator.squaredSum(this.dependent) - this.sumOfSquaredModeled;
       }
 
+      /**
+       * The portion of the dependent variable's variance that is successfully explained by this regression.
+       */
       get sumOfSquaredModeled(): number {
         // If we have a perfectly straight vertical line, from the perspective of our independent axis,
         // we get infinite slope.  That's... not great for the math.
@@ -68,6 +96,10 @@ namespace com.keyman.osk {
         }
       }
 
+      /**
+       * A statistical term that signals how successful the regression is.  Always has values on
+       * the interval [0, 1], with 1 being a perfect fit.
+       */
       get coefficientOfDetermination(): number {
         if(this.accumulator.squaredSum(this.dependent) == 0 || this.accumulator.squaredSum(this.independent) == 0) {
           return 1;
@@ -80,33 +112,41 @@ namespace com.keyman.osk {
         return num / denom;
       }
 
+      /**
+       * Gets the value of the dependent axis that lies on the regression's fitted line
+       * for a specified independent axis value.
+       *
+       * @param value The input value to use for the independent axis's variable.
+       * @returns     The predicted dependent axis value.
+       */
       predictFromValue(value: number) {
         return this.slope * value + this.intercept;
       }
     }
 
-    private rawLinearSums: {'x': number, 'y': number, 't': number} = {'x': 0, 'y': 0, 't': 0};
-
-    private xCentroidSum: number = 0;
-    private yCentroidSum: number = 0;
-
-    private rawSquaredSums: {'x': number, 'y': number, 't': number} = {'x': 0, 'y': 0, 't': 0};
-
+    private rawLinearSums: {'x': number, 'y': number, 't': number, 'v': number} = {'x': 0, 'y': 0, 't': 0, 'v': 0};
+    private rawSquaredSums: {'x': number, 'y': number, 't': number, 'v': number} = {'x': 0, 'y': 0, 't': 0, 'v': 0};
+    // Would 'tv' (time vs velocity) be worth it to track?  And possibly even do a regression for?
+    // If so, maybe throw that in.
     private rawCrossSums: {'tx': number, 'ty': number, 'xy': number} = {'tx': 0, 'ty': 0, 'xy': 0};
 
     private coordArcSum: number = 0;
+    private arcSampleCount: number = 0;
 
-    private speedLinearSum: number = 0;
-    private speedQuadSum:   number = 0;
-
+    // These two are kept separate because of their extreme interconnectedness - after all,
+    // they actually represent a SINGLE (polar) axis - the angle.
+    //
+    // Sadly, there's no straightforward, well-founded way to use these to give a proper
+    // statistical sense of 'fit' or 'regression' here, _especially_ in regard to segmentation.
+    // Proper angle-[other] cross-sums are pretty much impossible, at least as efficiently
+    // as the others are handled [O(1)].
     private cosLinearSum:   number = 0;
     private sinLinearSum:   number = 0;
-    private arcSampleCount: number = 0;
 
     /**
      * The base sample used to transpose all other received samples.  Use of this helps
-     * avoid potential "catastrophic cancellation" effects that can occur when diffing two
-     * numbers far from the sample-space's mathematical origin.
+     * avoid potential "catastrophic cancellation" effects that can occur when diffing
+     * two numbers far from the sample-space's mathematical origin.
      *
      * Refer to https://en.wikipedia.org/wiki/Catastrophic_cancellation.
      */
@@ -118,9 +158,9 @@ namespace com.keyman.osk {
      */
     private initialSample?: InputSample;
 
-    /*private*/ lastSample?: InputSample;
+    private _lastSample?: InputSample;
     private followingSample?: InputSample;
-    private sampleCount = 0;
+    private _sampleCount = 0;
 
     constructor();
     constructor(sample: InputSample);
@@ -189,11 +229,6 @@ namespace com.keyman.osk {
 
         result.coordArcSum     += Math.sqrt(coordArcDeltaSq);
 
-        // Approximates weighting the time spent at each coord by splitting the time since
-        // last event evenly for both coordinates.  Note:  does NOT shift based upon .baseSample!
-        result.xCentroidSum += 0.5 * tDeltaInSec * (sample.targetX + this.lastSample.targetX);
-        result.yCentroidSum += 0.5 * tDeltaInSec * (sample.targetY + this.lastSample.targetY);
-
         if(xDelta || yDelta) {
           // We wish to measure angle clockwise from <0, -1> in the DOM.  So, cos values should
           // align with that axis, while sin values should align with the positive x-axis.
@@ -206,12 +241,12 @@ namespace com.keyman.osk {
         }
 
         if(tDeltaInSec) {
-          result.speedLinearSum += Math.sqrt(coordArcDeltaSq) / tDeltaInSec;
-          result.speedQuadSum   += coordArcDeltaSq / (tDeltaInSec * tDeltaInSec);
+          result.rawLinearSums['v']  += Math.sqrt(coordArcDeltaSq) / tDeltaInSec;
+          result.rawSquaredSums['v'] += coordArcDeltaSq / (tDeltaInSec * tDeltaInSec);
         }
       }
 
-      result.lastSample = sample;
+      result._lastSample = sample;
       result.sampleCount = this.sampleCount + 1;
 
       return result;
@@ -225,18 +260,20 @@ namespace com.keyman.osk {
      * @returns
      */
     public deaccumulate(subsetStats?: CumulativePathStats): CumulativePathStats {
-      // Possible TODO:  Because of the properties of statistical variance & mean...
-      // we could further prevent catastrophic cancellation by re-centering
-      // all the linear, cross, and quad sums.
-      // - mostly noteworthy for _long_ duration touches that wander long distances.
-      // - basically, for cases that'd cause the floating-point error to exceed our
-      //   test thresholds.  Re-centering would keep that error consistently below
-      //   our thresholds.
+      // Possible addition:  use `this.buildRenormalized` on the returned version
+      // if catastrophic cancellation effects (random, small floating point errors)
+      // are not sufficiently mitigated & handled by the measures currently in place.
       //
-      // We could then take the new mean coordinates as a 'base sample'.
-      // Kinda has to be the new mean b/c of the stats identities we'd be abusing,
-      // but that's also the best catastrophic-cancellation prevention move we
-      // could take.  So, this limitation's not really a negative.
+      // Even then, we'd need to apply such generated objects carefully - we can't
+      // re-merge the accumulated values or remap them to their old coordinate system
+      // afterward.`buildRenormalize`'s remapping maneuver is a one-way stats-abuse trick.
+      //
+      // Hint: we'd need to pay attention to the "lingering segments" aspects in which
+      // detected sub-segments might be "re-merged".
+      // - Whenever they're merged & cleared, we should be clear to recentralize
+      //   the cumulative stats that follow.  If any are still active, we can't
+      //   recentralize.
+
       const result = new CumulativePathStats(this);
 
       // We actually WILL accept a `null` argument; makes some of the segmentation
@@ -276,23 +313,13 @@ namespace com.keyman.osk {
         result.coordArcSum     -= Math.sqrt(coordArcSq);
         result.coordArcSum     -= subsetStats.coordArcSum;
 
-        // Centroid sum management!
-        // Same reasoning pattern as for the 'arc length stuff'.
-        result.xCentroidSum -= 0.5 * tDeltaInSec * (subsetStats.followingSample.targetX + subsetStats.lastSample.targetX)
-        result.xCentroidSum -= subsetStats.xCentroidSum;
-        result.yCentroidSum -= 0.5 * tDeltaInSec * (subsetStats.followingSample.targetY + subsetStats.lastSample.targetY)
-        result.yCentroidSum -= subsetStats.yCentroidSum;
-
         result.cosLinearSum   -= subsetStats.cosLinearSum;
         result.sinLinearSum   -= subsetStats.sinLinearSum;
         result.arcSampleCount -= subsetStats.arcSampleCount;
 
-        result.speedLinearSum -= subsetStats.speedLinearSum;
-        result.speedQuadSum   -= subsetStats.speedQuadSum;
-
         if(tDeltaInSec) {
-          result.speedLinearSum -= Math.sqrt(coordArcSq) / tDeltaInSec;
-          result.speedQuadSum   -= coordArcSq / (tDeltaInSec * tDeltaInSec);
+          result.rawLinearSums['v']  -= Math.sqrt(coordArcSq) / tDeltaInSec;
+          result.rawSquaredSums['v'] -= coordArcSq / (tDeltaInSec * tDeltaInSec);
         }
       }
 
@@ -310,15 +337,30 @@ namespace com.keyman.osk {
       return result;
     }
 
+    public get lastSample() {
+      return this._lastSample;
+    }
+
     public get lastTimestamp(): number {
       return this.lastSample?.t;
     }
 
-    public get count() {
-      return this.sampleCount;
+    public get sampleCount() {
+      return this._sampleCount;
     }
 
-    private mappingConstant(dim: 'x' | 'y' | 't') {
+    private set sampleCount(value: number) {
+      this._sampleCount = value;
+    }
+
+    /**
+     * In order to mitigate the accumulation of small floating-point errors during the
+     * various accumulations performed by this class, the domain of incoming values
+     * is remapped near to the origin via axis-specific mapping constants.
+     * @param dim
+     * @returns
+     */
+    private mappingConstant(dim: 'x' | 'y' | 't' | 'v') {
       if(!this.baseSample) {
         return undefined;
       }
@@ -327,33 +369,42 @@ namespace com.keyman.osk {
         return this.baseSample.t;
       } else if(dim == 'x') {
         return this.baseSample.targetX;
-      } else {
+      } else if(dim == 'y') {
         return this.baseSample.targetY;
+      } else {
+        return 0;
       }
     }
 
-    private mappedMean(dim: 'x' | 'y' | 't') {
+    /**
+     * Gets the statistical mean, utilizing the internal 'mapped' coordinate space.
+     * This is the version compatible with cross-sums and squared-sums.
+     * @param dim
+     * @returns
+     */
+    private mappedMean(dim: 'x' | 'y' | 't' |'v') {
       return this.rawLinearSums[dim] / this.sampleCount;
     }
 
-    public get centroid(): {x: number, y: number} {
-      if(this.sampleCount == 0) {
-        return undefined;
-      } else if(this.sampleCount == 1) {
-        return {
-          x: this.lastSample.targetX,
-          y: this.lastSample.targetY
-        };
-      } else {
-        const coeff = 1 / (this.duration); // * (this.sampleCount-1));
-        return {
-          x: this.xCentroidSum * coeff,
-          y: this.yCentroidSum * coeff
-        };
-      }
+    /**
+     * Gets the statistical mean value of the samples observed during the represented
+     * interval on the specified axis.
+     * @param dim
+     * @returns
+     */
+    public mean(dim: 'x' | 'y' | 't' | 'v') {
+      // This external-facing version needs to provide values in 'external'-friendly
+      // coordinate space.
+      return this.mappedMean(dim) + this.mappingConstant(dim);
     }
 
-    public squaredSum(dim: 'x' | 'y' | 't') {
+    /**
+     * Gets the sum of the squared distance from the mean seen in samples observed
+     * during the represented interval on the specified axis.
+     * @param dim
+     * @returns
+     */
+    public squaredSum(dim: 'x' | 'y' | 't' | 'v') {
       const x2 = this.rawSquaredSums[dim];
       const x1 = this.rawLinearSums[dim];
 
@@ -362,6 +413,12 @@ namespace com.keyman.osk {
       return val > 1e-8 ? val : 0;
     }
 
+    /**
+     * Gets the sum of the statistical 'cross' term "distance" away from the mean
+     * observed during the represented interval on the specified axis.
+     * @param dimPair
+     * @returns
+     */
     public crossSum(dimPair: 'tx' | 'ty' | 'xy') {
       const dim1 = dimPair.charAt(0);
       const dim2 = dimPair.charAt(1);
@@ -381,21 +438,38 @@ namespace com.keyman.osk {
       return Math.abs(val) > 1e-8 ? val : 0;
     }
 
+    /**
+     * Gets the unbiased covariance between the specified pair of axes for samples
+     * observed during the represented interval.
+     * @param dimPair
+     * @returns
+     */
     public covariance(dimPair: 'tx' | 'ty' | 'xy') {
       return this.crossSum(dimPair) / (this.sampleCount - 1);
     }
 
-    public variance(dim: 'x' | 'y' | 't') {
+    /**
+     * Gets the unbiased variance on the specified axis for samples observed
+     * during the represented interval.
+     */
+    public variance(dim: 'x' | 'y' | 't' | 'v') {
       return this.squaredSum(dim) / (this.sampleCount - 1);
     }
 
+    /**
+     * Utilizing (and possibly abusing) statistical identities, this function produces
+     * an equivalent, but-recentered copy of this instance's statistical accumulations
+     * that will be less prone to catastrophic cancellation.
+     *
+     * In non-stats speak, the new instance will suffer smaller floating-point
+     * errors than the old instance whenever they do occur.
+     * @returns
+     */
     public buildRenormalized(): CumulativePathStats {
+      // Other (internal) notes:  the internal mapping of the new instance will not
+      // match that of the old instance.  This should not affect the practical
+      // results of any mapping to and from the external coordinate space, however.
       let result = new CumulativePathStats(this);
-
-      // By abusing the statistical identities for calculating various expressions
-      // related to regression, we can re-center our mapped coordinate system on
-      // our current mean.  We shouldn't do so too frequently, but this should help
-      // moderate effects from catastrophic cancellation.
 
       let newBase: InputSample = {
         targetX: this.mappedMean['x'] + this.baseSample.targetX,
@@ -416,10 +490,23 @@ namespace com.keyman.osk {
       return result;
     }
 
+    /**
+     * Provides a linear-regression perspective on two specified axes over the represented
+     * interval.
+     * @param dependent
+     * @param independent
+     * @returns
+     */
     public fitRegression(dependent: 'x' | 'y' | 't', independent: 'x' | 'y' | 't') {
       return new CumulativePathStats.regression(this, dependent, independent);
     }
 
+    /**
+     * Provides the direct Euclidean distance between the start and end points of the segment
+     * (or curve) of the interval represented by this instance.
+     *
+     * This will likely not match the actual pixel distance traveled.
+     */
     public get netDistance() {
       // No issue with a net distance of 0 due to a single point.
       if(!this.lastSample || !this.initialSample) {
@@ -432,6 +519,11 @@ namespace com.keyman.osk {
       return Math.sqrt(xDelta * xDelta + yDelta * yDelta);
     }
 
+    /**
+     * Gets the duration of the represented interval, in seconds.
+     *
+     * Note: input samples provide their timestamps in milliseconds.
+     */
     public get duration() {
       // no issue with a duration of zero from just one sample.
       if(!this.lastSample || !this.initialSample) {
@@ -459,10 +551,21 @@ namespace com.keyman.osk {
       return xDelta < 0 ? (2 * Math.PI - yAngleDiff) : yAngleDiff;
     }
 
+    /**
+     * Returns the angle (in degrees) traveled by the corresponding segment clockwise
+     * from the unit vector <0, -1> in the DOM (the unit "upward" direction).
+     */
     public get angleInDegrees() {
       return this.angle * 180 / Math.PI;
     }
 
+    /**
+     * Returns the cardinal or intercardinal direction on the screen that most
+     * closely matches the direction of movement represented by the represented
+     * segment.
+     *
+     * @return A string one or two letters in length.  (e.g:  'n', 'sw')
+     */
     public get cardinalDirection() {
       if(this.sampleCount == 1 || !this.lastSample || !this.initialSample) {
         return undefined;
@@ -480,26 +583,22 @@ namespace com.keyman.osk {
       return 'n';
     }
 
-    // px per s.
+    /**
+     * Measured in pixels per second.
+     */
     public get speed() {
       // this.duration is already in seconds, not milliseconds.
       return this.duration ? this.netDistance / this.duration : Number.NaN;
-    }
-
-    // ... may not be "right".
-    public get speedMean() {
-      return this.speedLinearSum / (this.sampleCount-1);
-    }
-
-    public get speedVariance() {
-      return this.speedQuadSum / (this.sampleCount-1) - (this.speedMean * this.speedMean);
     }
 
     /**
      * Returns the represented interval's 'mean angle' clockwise from the DOM's
      * <0, -1> (the unit vector toward the top of the screen) in radians.
      *
-     * Uses the 'circular mean'.  Refer to https://en.wikipedia.org/wiki/Circular_mean.
+     * Based upon the 'circular mean'.  Refer to https://en.wikipedia.org/wiki/Circular_mean.
+     *
+     * Note that very slow-moving segments may be heavily affected by pixel aliasing
+     * effects; mouse and touch events usually do not provide sub-pixel resolution.
      */
     public get angleMean() {
       if(this.arcSampleCount == 0) {
@@ -534,21 +633,16 @@ namespace com.keyman.osk {
     }
 
     /**
-     * The **circular variance** of the represented interval's angle observations.
-     *
-     * Refer to https://en.wikipedia.org/wiki/Directional_statistics#Variance.
-     */
-    public get angleVariance() {
-      if(this.arcSampleCount == 0) {
-        return Number.NaN;
-      }
-      return 1 - (this.angleRSquared);
-    }
-
-    /**
      * The **circular standard deviation** of the represented interval's angle observations.
      *
      * Refer to https://en.wikipedia.org/wiki/Directional_statistics#Standard_deviation.
+     *
+     * Note that very slow-moving segments may be heavily affected by pixel aliasing
+     * effects; mouse and touch events usually do not provide sub-pixel resolution.
+     * This can result in very high deviation values.
+     *
+     * In less-technical terms - the "stair-stepping" effect seen on high zoom levels means we don't
+     * get perfectly straight lines, and that can cause this value to be unexpectedly high.
      */
     public get angleDeviation() {
       if(this.arcSampleCount == 0) {
@@ -558,23 +652,33 @@ namespace com.keyman.osk {
       return Math.sqrt(-Math.log(this.angleRSquared));
     }
 
+    /**
+     * Provides the actual, pixel-based distance actually traveled by the represented segment.
+     * May not be an integer (because diagonals are a thing).
+     */
     public get rawDistance() {
       return this.coordArcSum;
     }
 
-    // TODO:  is this actually ideal?  This was certainly useful for experimentation via interactive
-    // debugging, but it may not be the best thing long-term.
-    public toJSON() {
+    // Convert to a `toJSON` method for use during investigative debugging.
+    private toDebuggingJSON() {
       return {
-        angleMean: this.angleMean,
-        angleMeanDegrees: this.angleMean * 180 / Math.PI,
-        angleVariance: this.angleVariance,
-        speedMean: this.speedMean,
-        speedVariance: this.speedVariance,
+        angle: this.angle,
+        speedMean: this.mean('v'),
         rawDistance: this.rawDistance,
         duration: this.duration,
-        sampleCount: this.sampleCount
+        sampleCount: this.sampleCount,
+        angleMeanDegrees: this.angleMean * 180 / Math.PI,
+        angleDeviation: this.angleDeviation,
+        speedVariance: this.variance('v')
       }
+    }
+
+    public toJSON() {
+      // We're not actually saving the JSON out to anything yet or loading/parsing it
+      // for any use beyond direct human interpretation, so... it's "okay" to
+      // leave like this for now.
+      return this.toDebuggingJSON();
     }
   }
 
