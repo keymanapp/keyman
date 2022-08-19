@@ -57,7 +57,15 @@ namespace com.keyman.osk {
       }
 
       get sumOfSquaredModeled(): number {
-        return this.slope * this.accumulator.crossSum(this.paired);
+        // If we have a perfectly straight vertical line, from the perspective of our independent axis,
+        // we get infinite slope.  That's... not great for the math.
+        //
+        // Fortunately, it ALSO means that we can perfectly model the segment.
+        if(this.accumulator.squaredSum(this.independent) == 0) {
+          return this.accumulator.squaredSum(this.dependent);
+        } else {
+          return this.slope * this.accumulator.crossSum(this.paired);
+        }
       }
 
       get coefficientOfDetermination(): number {
