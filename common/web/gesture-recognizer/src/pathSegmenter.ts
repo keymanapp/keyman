@@ -135,7 +135,7 @@ namespace com.keyman.osk {
     readonly post:  CumulativePathStats;
     readonly union: CumulativePathStats;
 
-    private static readonly segmentationComparison = class SegmentedRegression {
+    static readonly segmentationComparison = class SegmentedRegression {
       host: Segmentation;
       readonly independent: 'x' | 'y' | 't';
       readonly dependent:   'x' | 'y' | 't';
@@ -479,6 +479,7 @@ namespace com.keyman.osk {
       const unsegmentedDuration = cumulativeStats.lastTimestamp - this.steppedCumulativeStats[0].lastTimestamp;
 
       if(unsegmentedDuration < this.SLIDING_WINDOW_INTERVAL * 2) {
+        console.log("Interval too short for segmentation.");
         return;
       }
 
@@ -503,13 +504,13 @@ namespace com.keyman.osk {
       const lastIntervalDuration = this.lastIntervalDuration;
       this.lastIntervalDuration = unsegmentedDuration;
 
+      const xF = candidateSplit.segReg('x', 't');
+      const yF = candidateSplit.segReg('y', 't');
       if(!candidateSplit.segmentationMerited) {
         // // Debug logging statements:
         // console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
         // console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
 
-        const xF = candidateSplit.segReg('x', 't');
-        const yF = candidateSplit.segReg('y', 't');
         console.log(`x F-test: F_(${xF.fDoF1}, ${xF.fDoF2}) = ${xF.fStat} @ ${xF.certaintyThreshold}`);
         console.log(`y F-test: F_(${yF.fDoF1}, ${yF.fDoF2}) = ${yF.fStat} @ ${yF.certaintyThreshold}`);
 
@@ -520,6 +521,90 @@ namespace com.keyman.osk {
         //   return;
         // }
       }
+
+      // We either have the conditions to trigger segmentation or just became long enough to consider it.
+      // If we're only just long enough to consider it, there may be a better segmentation point to start with.
+      // Now... is there a better segmentation point?
+
+      class SplitSearchState {
+        readonly xTest: typeof Segmentation.segmentationComparison.prototype;
+        readonly yTest: typeof Segmentation.segmentationComparison.prototype;
+        readonly candidate: PotentialSegmentation;
+
+        constructor(candidate?: PotentialSegmentation) {
+          this.candidate = candidate;
+
+          if(candidate == null) {
+            return;
+          }
+
+          this.xTest = candidate.segReg('x', 't');
+          this.yTest = candidate.segReg('y', 't');
+        }
+
+        get segRating() {
+          if(this.candidate) {
+            return Math.max(this.xTest.coefficientOfDetermination, this.yTest.coefficientOfDetermination);
+          } else {
+            return 0;
+          }
+        }
+
+        get segmentationMerited() {
+          return this.candidate?.segmentationMerited ?? false;
+        }
+      }
+
+      let currentSplit = new SplitSearchState(candidateSplit);
+
+      let leftSplit = new SplitSearchState(new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint-1));
+      let rightCandidate: PotentialSegmentation = null;
+      if(splitPoint+1 < this.steppedCumulativeStats.length) {
+        rightCandidate = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint+1);
+      }
+      let rightSplit = new SplitSearchState(rightCandidate);
+
+      const criteria = [leftSplit.segRating, currentSplit.segRating, rightSplit.segRating];
+      let sortedCriteria = [...criteria].sort();
+
+      // TODO: if we're better on both axes on one side, let's start shifting.
+      const delta = criteria.indexOf(sortedCriteria[2])-1;  // -1 if 'left' is best, 1 if 'right' is best.
+
+      if(delta != 0) {
+        // We can get better segmentation by shifting.  Proceed in the optimal direction.
+        do {
+          const nextSplitIndex = splitPoint + delta;
+          if(nextSplitIndex >= this.steppedCumulativeStats.length || nextSplitIndex < 0) {
+            break;
+          }
+
+          let nextCandidate = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint + delta);
+          let nextSplit = new SplitSearchState(nextCandidate);
+
+          // Prevent overly-short intervals / over-segmentation.
+          if(nextCandidate.pre.duration * 1000 < this.SLIDING_WINDOW_INTERVAL / 2) {
+            break;
+          } else if(nextCandidate.post.duration * 1000 < this.SLIDING_WINDOW_INTERVAL / 2) {
+            break;
+          }
+
+          // Not an improvement?  Guess we found the best spot.
+          if(nextSplit.segRating <= currentSplit.segRating) {
+            break;
+          } else if(!nextSplit.segmentationMerited && currentSplit.segmentationMerited) {
+            console.warn("aborting split-point relocation due to no longer segmenting");
+            break;
+          } else {
+            splitPoint += delta;
+            currentSplit = nextSplit;
+            candidateSplit = nextCandidate;
+          }
+          // If we found a new best segmentation point, we then ask if we can get even better by shifting further.
+        } while(true);
+      }
+
+      console.log("best split: ");
+      console.log(candidateSplit);
 
       if(!candidateSplit.segmentationMerited) {
         return;
