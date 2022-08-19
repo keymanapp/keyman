@@ -360,7 +360,7 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
   currentLine = 0;
   nErrors = 0;
 
-  fp_in = fopen(pszInfile,"rb");                                            // hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+  fp_in = fopen((const char*)pszInfile,"rb");                                            // hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if (fp_in == NULL) SetError(CERR_InfileNotExist);                         // if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
 
   // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
@@ -386,7 +386,7 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
     return CERR_CannotCreateTempfile;
   }
 
-   fp_out = fopen(pszOutfile,"wb");                                          //  hOutfile = CreateFileA(pszOutfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+   fp_out = fopen((const char*)pszOutfile,"wb");                                          //  hOutfile = CreateFileA(pszOutfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
   if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);                    //  if (hOutfile == INVALID_HANDLE_VALUE) SetError(CERR_CannotCreateOutfile);
 
   KMX_DWORD msg;
@@ -2016,17 +2016,17 @@ KMX_LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
   while (__iswcsym(*s)) s++;
   if (*s != ':') return KMX_lptNone;
 
-  if (u16ncmp(q, u"$keyman:", 8) == 0)    //if (_wcsnicmp(q, L"$keyman:", 8) == 0)
+  if (u16nicmp(q, u"$keyman:", 8) == 0)    //if (_wcsnicmp(q, L"$keyman:", 8) == 0)
   {
     *p += 8;
     return KMX_lptKeymanAndKeymanWeb;
   }
-  if (u16ncmp(q, u"$keymanweb:", 11) == 0)    //if (_wcsnicmp(q, L"$keymanweb:", 11) == 0)
+  if (u16nicmp(q, u"$keymanweb:", 11) == 0)    //if (_wcsnicmp(q, L"$keymanweb:", 11) == 0)
   {
     *p += 11;
     return KMX_lptKeymanWebOnly;
   }
-  if (u16ncmp(q, u"$keymanonly:", 12) == 0)    //if (_wcsnicmp(q, L"$keymanonly:", 12) == 0)
+  if (u16nicmp(q, u"$keymanonly:", 12) == 0)    //if (_wcsnicmp(q, L"$keymanonly:", 12) == 0)
   {
     *p += 12;
     return KMX_lptKeymanOnly;
@@ -2054,7 +2054,7 @@ int LineTokenType(PKMX_WCHAR *str)
     for (i = 0; i <= T_W_END - T_W_START; i++)
     {
       l = u16len(LineTokens[i + 1]);                    //l = wcslen(LineTokens[i + 1]);
-      if (u16ncmp(p, LineTokens[i + 1], l) == 0)    //if (_wcsnicmp(p, LineTokens[i + 1], l) == 0)
+      if (u16nicmp(p, LineTokens[i + 1], l) == 0)    //if (_wcsnicmp(p, LineTokens[i + 1], l) == 0)
       {
         p += l; while (iswspace(*p)) p++; *str = p;
         return i + T_W_START;
@@ -2167,8 +2167,8 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         return CERR_InvalidToken;
 
       case 0:                                            // _S2  if (_wcsnicmp(p, L"deadkey", z = 7) == 0 ||
-        if (u16ncmp(p, u"deadkey", z = 7) == 0 ||
-          u16ncmp(p, u"dk", z = 2) == 0)
+        if (u16nicmp(p, u"deadkey", z = 7) == 0 ||
+          u16nicmp(p, u"dk", z = 2) == 0)
         {
           p += z;
           q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2214,7 +2214,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         p = q + 1;
         continue;
       case 3:
-        if (u16ncmp(p, u"any", 3) != 0) return CERR_InvalidToken;
+        if (u16nicmp(p, u"any", 3) != 0) return CERR_InvalidToken;
         if (sFlag) return CERR_AnyInVirtualKeySection;
         p += 3;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2235,7 +2235,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         tstr[mx] = 0;
         continue;
       case 4:
-        if (u16ncmp(p, u"beep", 4) == 0)
+        if (u16nicmp(p, u"beep", 4) == 0)
         {
           if (sFlag) return CERR_BeepInVirtualKeySection;
           p += 4;
@@ -2243,7 +2243,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           tstr[mx++] = CODE_BEEP;
           tstr[mx] = 0;
         }
-        else if (u16ncmp(p, u"baselayout", 10) == 0)  // I3430
+        else if (u16nicmp(p, u"baselayout", 10) == 0)  // I3430
         {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
           if (sFlag) return CERR_InvalidInVirtualKeySection;
@@ -2258,7 +2258,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 
         continue;
       case 5:
-        if (u16ncmp(p, u"if", 2) == 0)
+        if (u16nicmp(p, u"if", 2) == 0)
         {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           if (sFlag) return CERR_InvalidInVirtualKeySection;
@@ -2271,7 +2271,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         }
         else
         {
-          if (u16ncmp(p, u"index", 5) != 0) return CERR_InvalidToken;
+          if (u16nicmp(p, u"index", 5) != 0) return CERR_InvalidToken;
           if (sFlag) return CERR_IndexInVirtualKeySection;
           p += 5;
           q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2305,7 +2305,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         }
         continue;
       case 6:
-        if (u16ncmp(p, u"outs", 4) != 0) return CERR_InvalidToken;
+        if (u16nicmp(p, u"outs", 4) != 0) return CERR_InvalidToken;
         if (sFlag) return CERR_OutsInVirtualKeySection;
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2328,7 +2328,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         continue;
       case 7:
         if (iswspace(*(p + 1))) break;		// is a comment -- pre-stripped - so why this test?
-        if (u16ncmp(p, u"context", 7) == 0)
+        if (u16nicmp(p, u"context", 7) == 0)
         {
           if (sFlag) return CERR_ContextInVirtualKeySection;
           p += 7;
@@ -2352,14 +2352,14 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
             tstr[mx] = 0;
           }
         }
-        else if (u16ncmp(p, u"clearcontext", 12) == 0)
+        else if (u16nicmp(p, u"clearcontext", 12) == 0)
         {
           p += 12;
           tstr[mx++] = UC_SENTINEL;
           tstr[mx++] = CODE_CLEARCONTEXT;
           tstr[mx] = 0;
         }
-        else if (u16ncmp(p, u"call", 4) == 0)
+        else if (u16nicmp(p, u"call", 4) == 0)
         {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_501, CERR_501FeatureOnly_Call);
           if (sFlag) return CERR_CallInVirtualKeySection;
@@ -2387,7 +2387,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           return CERR_InvalidToken;
         continue;
       case 8:
-        if (u16ncmp(p, u"notany", 6) == 0)
+        if (u16nicmp(p, u"notany", 6) == 0)
         {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly)
             if (sFlag) return CERR_AnyInVirtualKeySection;
@@ -2407,7 +2407,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           tstr[mx] = 0;
           continue;
         }
-        if (u16ncmp(p, u"nul", 3) != 0) return CERR_InvalidToken;
+        if (u16nicmp(p, u"nul", 3) != 0) return CERR_InvalidToken;
 
         p += 3;
         tstr[mx++] = UC_SENTINEL;
@@ -2415,7 +2415,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         tstr[mx] = 0;
         continue;
       case 9:
-        if (u16ncmp(p, u"use", 3) != 0)
+        if (u16nicmp(p, u"use", 3) != 0)
         {
           if (*(p + 1) == '+')
           {
@@ -2441,7 +2441,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         tstr[++mx] = 0;
         continue;
       case 10:
-        if (u16ncmp(p, u"reset", 5) == 0)
+        if (u16nicmp(p, u"reset", 5) == 0)
         {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           if (sFlag) return CERR_InvalidInVirtualKeySection;
@@ -2454,7 +2454,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         }
         else
         {
-          if (u16ncmp(p, u"return", 6) != 0) return CERR_InvalidToken;
+          if (u16nicmp(p, u"return", 6) != 0) return CERR_InvalidToken;
 
           p += 6;
           tstr[mx++] = UC_SENTINEL;
@@ -2477,38 +2477,38 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           switch (towupper(*p))
           {
           case 'N':
-            if (u16ncmp(p, u"NCAPS", 5) == 0)
+            if (u16nicmp(p, u"NCAPS", 5) == 0)
               sFlag |= NOTCAPITALFLAG, p += 5;
             else finished = TRUE;
             break;
           case 'L':
-            if (u16ncmp(p, u"LALT", 4) == 0)
+            if (u16nicmp(p, u"LALT", 4) == 0)
               sFlag |= LALTFLAG, p += 4;
-            else if (u16ncmp(p, u"LCTRL", 5) == 0)
+            else if (u16nicmp(p, u"LCTRL", 5) == 0)
               sFlag |= LCTRLFLAG, p += 5;
             else finished = TRUE;
             break;
           case 'R':
-            if (u16ncmp(p, u"RALT", 4) == 0)
+            if (u16nicmp(p, u"RALT", 4) == 0)
               sFlag |= RALTFLAG, p += 4;
-            else if (u16ncmp(p, u"RCTRL", 5) == 0)
+            else if (u16nicmp(p, u"RCTRL", 5) == 0)
               sFlag |= RCTRLFLAG, p += 5;
             else finished = TRUE;
             break;
           case 'A':
-            if (u16ncmp(p, u"ALT", 3) == 0)
+            if (u16nicmp(p, u"ALT", 3) == 0)
               sFlag |= K_ALTFLAG, p += 3;
             else finished = TRUE;
             break;
           case 'C':
-            if (u16ncmp(p, u"CTRL", 4) == 0)
+            if (u16nicmp(p, u"CTRL", 4) == 0)
               sFlag |= K_CTRLFLAG, p += 4;
-            else if (u16ncmp(p, u"CAPS", 4) == 0)
+            else if (u16nicmp(p, u"CAPS", 4) == 0)
               sFlag |= CAPITALFLAG, p += 4;
             else finished = TRUE;
             break;
           case 'S':
-            if (u16ncmp(p, u"SHIFT", 5) == 0)
+            if (u16nicmp(p, u"SHIFT", 5) == 0)
               sFlag |= K_SHIFTFLAG, p += 5;
             else finished = TRUE;
             break;
@@ -2612,7 +2612,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 
         continue;
       case 14:
-        if (u16ncmp(p, u"set", 3) == 0)
+        if (u16nicmp(p, u"set", 3) == 0)
         {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           p += 3;
@@ -2622,7 +2622,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           err = process_set(fk, q, tstr, &mx);
           if (err != CERR_None) return err;
         }
-        else if (u16ncmp(p, u"save", 4) == 0)
+        else if (u16nicmp(p, u"save", 4) == 0)
         {
           VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           p += 4;
@@ -2634,7 +2634,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         }
         else
         {
-          if (u16ncmp(p, u"switch", 6) != 0) return CERR_InvalidToken;
+          if (u16nicmp(p, u"switch", 6) != 0) return CERR_InvalidToken;
           p += 6;
           q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
           if (!q || !*q) return CERR_InvalidSwitch;
@@ -2645,7 +2645,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         }
         continue;
       case 15:
-        if (u16ncmp(p, u"fix", 3) == 0)
+        if (u16nicmp(p, u"fix", 3) == 0)
         {
           p += 3;
           tstr[mx++] = UC_SENTINEL;
@@ -2675,7 +2675,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         p = q;
         continue;
       case 17:
-        if (u16ncmp(p, u"platform", 8) != 0) return CERR_InvalidToken;  // I3430
+        if (u16nicmp(p, u"platform", 8) != 0) return CERR_InvalidToken;  // I3430
         VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
         if (sFlag) return CERR_InvalidInVirtualKeySection;
         p += 8;
@@ -2685,7 +2685,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         if (err != CERR_None) return err;
         continue;
       case 18:  // I3437
-        if (u16ncmp(p, u"layer", 5) != 0) return CERR_InvalidToken;
+        if (u16nicmp(p, u"layer", 5) != 0) return CERR_InvalidToken;
         VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);
         if (sFlag) return CERR_InvalidInVirtualKeySection;
         p += 5;
@@ -3188,9 +3188,9 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
     {
       while (iswspace(*q)) q++;
 
-      if (u16ncmp(q, u"ALT", 3) == 0) sFlag |= HK_ALT, q += 3;
-      else if (u16ncmp(q, u"CTRL", 4) == 0) sFlag |= HK_CTRL, q += 4;
-      else if (u16ncmp(q, u"SHIFT", 5) == 0) sFlag |= HK_SHIFT, q += 5;
+      if (u16nicmp(q, u"ALT", 3) == 0) sFlag |= HK_ALT, q += 3;
+      else if (u16nicmp(q, u"CTRL", 4) == 0) sFlag |= HK_CTRL, q += 4;
+      else if (u16nicmp(q, u"SHIFT", 5) == 0) sFlag |= HK_SHIFT, q += 5;
       else if (towupper(*q) != 'K') return CERR_InvalidToken;
     } while (towupper(*q) != 'K');
 
@@ -3206,7 +3206,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
     j = (int)(INT_PTR)(r - q);
 
     for (i = 0; i <= VK__MAX; i++)  // I3438
-      if (j == (int) u16len(VKeyNames[i]) && u16ncmp(q, VKeyNames[i], j) == 0) break;
+      if (j == (int) u16len(VKeyNames[i]) && u16nicmp(q, VKeyNames[i], j) == 0) break;
       // _S2 if (j == (int)wcslen(KMX_VKeyNames[i]) && _wcsnicmp(q, KMX_VKeyNames[i], j) == 0) break;
 
     if (i == VK__MAX + 1) return CERR_InvalidToken;  // I3438
@@ -3581,7 +3581,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token)
   PKMX_WCHAR q;
   q = *p;
   while (iswspace(*q)) q++;
-  if (u16ncmp(q, token, u16len(token)) == 0)    //if (_wcsnicmp(q, token, wcslen(token)) == 0)
+  if (u16nicmp(q, token, u16len(token)) == 0)    //if (_wcsnicmp(q, token, wcslen(token)) == 0)
   {
     q += u16len(token);   //q += wcslen(token);
     while (iswspace(*q)) q++;
@@ -3633,18 +3633,18 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   fp =_wfsopen((wchar_t*)szNewName, L"rb", _SH_DENYWR);                           //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if ( fp == NULL)                                                    //if (hFile == INVALID_HANDLE_VALUE)
   {
-    u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
+    //u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
     //fp = fopen(( const PKMX_CHAR) szNewName, "rb");                   // _S2
-    fp = _wfsopen((wchar_t*)szNewName, L"rb", _SH_DENYWR);                     //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    fp = _wfsopen((const wchar_t*)szNewName, L"rb", _SH_DENYWR);                     //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if ( fp == NULL)                                                  // if (hFile == INVALID_HANDLE_VALUE)
       return CERR_CannotReadBitmapFile;
   }
 
   KMX_DWORD msg;
 
-  // _S2_ if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
-  // _S2_   return msg;
- // _S2_  }
+  if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
+    return msg;
+  }
 
 
   fseek(fp, 0, SEEK_END);
