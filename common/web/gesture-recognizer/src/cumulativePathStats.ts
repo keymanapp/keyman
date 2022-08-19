@@ -369,7 +369,8 @@ namespace com.keyman.osk {
 
       const val = ab - a * b / this.sampleCount;
 
-      return val > 1e-8 ? val : 0;
+      // Don't forget - cross-sums can be negative!
+      return Math.abs(val) > 1e-8 ? val : 0;
     }
 
     public covariance(dimPair: 'tx' | 'ty' | 'xy') {
