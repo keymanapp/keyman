@@ -1,6 +1,18 @@
 /// <reference path="cumulativePathStats.ts" />
 
+/* FIXME:  Too much `console`.
+ *
+ * There's an AWFUL LOT of `console.log`-ing in this file at present.
+ * It was definitely useful for prototyping & development of its (and
+ * of `cumulativePathStats`'s) code, but it's GOTTA be cleaned up
+ * in the next PR... if not sooner.
+ */
+
 namespace com.keyman.osk {
+  // Note:  the only `export`-ed class from this file is `PathSegmenter`, hence the helper
+  // classes being placed within the same file.  Not to say we _couldn't_ put them elsewhere.
+
+  // ------------
 
   // Mostly used here to compare the sum-squared error components of segmented regressions
   // to the sum-squared "modeled" components of their overall variance.  Those are the two
@@ -540,10 +552,13 @@ namespace com.keyman.osk {
      * @param sample
      */
     public add(sample: InputSample) {
+      // Set up the input-repeater (in case we don't get further feedback but remain active)
       const repeater = (timeDelta: number) => {
         this.observe(sample, timeDelta);
       }
 
+      // If we previously set up an input-repeater, cancel it.  We've got a more up-to-date
+      // coordinate on the touchpath now.
       if(this.repeatTimer) {
         // @ts-ignore
         clearInterval(this.repeatTimer);
@@ -566,16 +581,16 @@ namespace com.keyman.osk {
       // The Node clearTimeout & DOM clearTimeout appear to TS as overloads of each other,
       // and their type definitions will conflict.  A simple @ts-ignore will bypass this issue.
       // @ts-ignore
-      clearInterval(this.repeatTimer);
+      clearInterval(this.repeatTimer);  // Cancels the input-repeater.
       this.repeatTimer = null;
 
-      // The way things are structured, finalization.pre = final segment.  It's some happy
-      // 'fallout' from the implementation's design.
+      // The way things are structured, finalization.pre = final segment.  It's a bit hacky, but
+      // it _is_ happy, intentional 'fallout' from the implementation's design.  `post` is effectively
+      // a single-point 'subsegment' and will go effectively unutilized by the phase 2 subsegment linker.
       let finalization = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, this.steppedCumulativeStats.length-1);
 
       console.log("! Finalization !");
-      this.filterSubsegmentation(finalization, true); // forces out the final segment.
-                                                      // Hacky, but "enough" for now.
+      this.processSubsegmentation(finalization, true);
 
       // TODO:  these are temporary statements to facilitate exploration, experimentation, & debugging.
       //        We should be providing output to the touchpath object (`.path.segments`).
@@ -612,9 +627,6 @@ namespace com.keyman.osk {
 
     private _debugLogSegmentationReport(candidateSplit: PotentialSegmentation) {
       console.log("------------------------------------------------------------------");
-
-      // console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
-      // console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
 
       console.log("Combined: ");
       console.log(candidateSplit.union.toJSON());
@@ -653,18 +665,16 @@ namespace com.keyman.osk {
       const cumulativeStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length - 1];
       const unsegmentedDuration = cumulativeStats.lastTimestamp - this.steppedCumulativeStats[0].lastTimestamp;
 
+      // STEP 1:  Determine the range of the sliding time window for the most recent samples.
+
       if(unsegmentedDuration < this.SLIDING_WINDOW_INTERVAL * 2) {
         console.log("Interval too short for segmentation.");
         return;
       }
 
       let splitPoint = 0;
-      // Do not consider the just-added `extendedStats` entry.
-      //
-      // Note:  even if we do reconsider the segmentation point... I don't think we
-      // should reconsider anything earlier than where this marker falls.
-      //
-      // If we didn't segment earlier before, why would we suddenly do so now?
+      // Do not consider the just-added `extendedStats` entry when building the sliding
+      // time window.
       for(let i = this.steppedCumulativeStats.length-2; i >=0; i--) {
         if(this.steppedCumulativeStats[i].lastTimestamp < cumulativeStats.lastTimestamp - this.SLIDING_WINDOW_INTERVAL) {
           splitPoint = i+1;
@@ -672,26 +682,28 @@ namespace com.keyman.osk {
         }
       }
 
+
       // We split the cumulative stats on a specific point, which then resides on the edge
-      // of both of the resulting intervals.
+      // of both of the resulting intervals.  This completes "step 1".
       let candidateSplit = new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint);
 
-      const xF = candidateSplit.segReg('x', 't');
-      const yF = candidateSplit.segReg('y', 't');
+      // STEP 2:  given the proposed time window, do we have a basis for segmentation?  And is there a better
+      // candidate split point nearby?
+
+      // NOTE:  During initial development, I actually had a hard rule about not even searching if segmentation
+      // failed on the initially-constructed sliding window.  Some analysis may be wise here, as it'd be nice
+      // to optimize away the 'need to search' if we can find hard & fast rules about when we'll never need
+      // to go looking.  But... being too aggressive can cause nasty problems.
+
       if(!candidateSplit.segmentationMerited) {
         // // Debug logging statements:
-        // console.log("Angle variance ratio: " + candidateSplit.angleVarianceRatio);
-        // console.log("Speed variance ratio: " + candidateSplit.speedVarianceRatio);
-
-        console.log(`x F-test: F_(${xF.fDoF1}, ${xF.fDoF2}) = ${xF.fStat} @ ${xF.certaintyThreshold}`);
-        console.log(`y F-test: F_(${yF.fDoF1}, ${yF.fDoF2}) = ${yF.fStat} @ ${yF.certaintyThreshold}`);
+        const xTest = candidateSplit.segReg('x', 't');
+        const yTest = candidateSplit.segReg('y', 't');
+        console.log(`x F-test: F_(${xTest.fDoF1}, ${xTest.fDoF2}) = ${xTest.fStat} @ ${xTest.certaintyThreshold}`);
+        console.log(`y F-test: F_(${yTest.fDoF1}, ${yTest.fDoF2}) = ${yTest.fStat} @ ${yTest.certaintyThreshold}`);
 
         console.log("candidate split: " );
         console.log(candidateSplit);
-        // QUESTION:  wait, what if we don't exit early?  Does that help 'wait' detection?
-        // if(lastIntervalDuration >= this.SLIDING_WINDOW_INTERVAL * 2) {
-        //   return;
-        // }
       }
 
       // We either have the conditions to trigger segmentation or just became long enough to consider it.
@@ -730,6 +742,17 @@ namespace com.keyman.osk {
         }
       }
 
+      // Start:  split-point search
+
+      /* We'll use our initial sliding window as a starting point.  It's close to the active location
+       * of the touch, so we're unlikely to miss a proper segmentation point if it lies close.
+       * We'll find the local maximum (best split point for the local part of the path)
+       * via gradient descent.
+       *
+       * Note:  binary search is a 'bad idea', as the touchpath is likely not following a
+       * monotonous path, mathematically speaking.  (It'd be possible to overshoot a "peak" or
+       * "valley" quite easily.)
+       */
       let currentSplit = new SplitSearchState(candidateSplit);
 
       let leftSplit = new SplitSearchState(new PotentialSegmentation(this.steppedCumulativeStats, this.choppedStats, splitPoint-1));
@@ -739,11 +762,13 @@ namespace com.keyman.osk {
       }
       let rightSplit = new SplitSearchState(rightCandidate);
 
+      // Step 2a:  detect which direction gives the best improvement in segmentation potential.
       const criteria = [leftSplit.segRating, currentSplit.segRating, rightSplit.segRating];
       let sortedCriteria = [...criteria].sort();
 
       const delta = criteria.indexOf(sortedCriteria[2])-1;  // -1 if 'left' is best, 1 if 'right' is best.
 
+      // Step 2b: we've found the direction:  go searching!
       if(delta != 0) {
         // We can get better segmentation by shifting.  Proceed in the optimal direction.
         do {
@@ -778,7 +803,9 @@ namespace com.keyman.osk {
           // If we found a new best segmentation point, we then ask if we can get even better by shifting further.
         } while(true);
       }
+      // Step 2 complete.
 
+      // Step 3:  evaluate our candidate split-point - do we sub-segment?  If so, do so.
       console.log("best split: ");
       console.log(candidateSplit);
 
@@ -797,11 +824,12 @@ namespace com.keyman.osk {
       this.steppedCumulativeStats = this.steppedCumulativeStats.slice(splitPoint);
       this.choppedStats = candidateSplit.chopPoint;
 
+      // Step 4:  process the implications.
 
       // There are some cases where we want to prevent segmentation from fully happening.
       // The next method will both handle that and the signal of any completed segments that
       // may result.
-      this.filterSubsegmentation(candidateSplit);
+      this.processSubsegmentation(candidateSplit);
     }
 
     /**
@@ -814,7 +842,7 @@ namespace com.keyman.osk {
      * @param finalize         Set to `true` for a terminating touchpath, indicating that
      *                         no further subsegmentation will occur for this touchpath.
      */
-    private filterSubsegmentation(subsegmentation: PotentialSegmentation, finalize?: boolean) {
+    private processSubsegmentation(subsegmentation: PotentialSegmentation, finalize?: boolean) {
       finalize = !!finalize;
 
       // This function makes a LOT of assumptions particular to this method and class.
@@ -827,6 +855,9 @@ namespace com.keyman.osk {
           return finalSubsegmentation.endOfPre.deaccumulate(array[0].baseChop);
         }
       }
+
+      // Step 1:  did we previously note that any previous subsegments are likely to be 'linked' to
+      // the new, incoming left-hand subsegment?  If so, validate that expectation & act accordingly.
 
       let predecessor = subsegmentation.pre;
       let firstChopPoint = subsegmentation.baseChop;
@@ -842,7 +873,7 @@ namespace com.keyman.osk {
         const precursorMergeSegmentation = new Segmentation(mergedPrecursors, subsegmentation.pre, tailUnion, subsegmentation.endOfPre);
         // Sometimes the start of a harsh turn seems like it's part of the same thing for a moment, but as it continues,
         // becomes something VERY different.  Validate that we should still merge the left-hand with its predecessors.
-        if(!PathSegmenter.shouldMergeSubsegments(precursorMergeSegmentation)) {
+        if(!PathSegmenter.shouldLinkSubsegments(precursorMergeSegmentation)) {
           // Emit as separate subsegment.
           const finishedSegment = mergeSubsegmentationAccumulations(this.lingeringSubsegmentations);
           this._protoSegments.push(finishedSegment);
@@ -859,13 +890,16 @@ namespace com.keyman.osk {
         }
       }
 
+      // Step 2:  okay, predecessor handling complete.  Now, do we think the newly-starting right-hand
+      // subsegment is likely to be 'linked' to the newly-completed left-hand subsegment?
+
       console.log("Double-checking right-side split subsegment for xy/yx correlation with prior segment candidate(s)");
       const fullUnion = subsegmentation.endpoint.deaccumulate(firstChopPoint);
       const fullMergeSegmentation = new Segmentation(predecessor, subsegmentation.post, fullUnion, subsegmentation.endpoint);
       console.log("segmentation-prevention check:")
       console.log(fullMergeSegmentation);
       // if(!force && PathSegmenter.shouldMergeSubsegments(subsegmentation.pre, subsegmentation.post, subsegmentation.union)) {
-      if(!finalize && PathSegmenter.shouldMergeSubsegments(fullMergeSegmentation)) {
+      if(!finalize && PathSegmenter.shouldLinkSubsegments(fullMergeSegmentation)) {
         this.lingeringSubsegmentations.push(subsegmentation);
       } else {
         // Merge all as a completed segment!
@@ -885,7 +919,7 @@ namespace com.keyman.osk {
      * @param segmentation
      * @returns
      */
-    private static shouldMergeSubsegments(segmentation: Segmentation): boolean {
+    private static shouldLinkSubsegments(segmentation: Segmentation): boolean {
       // // Known case #1:
       // //   Near-identical direction, but heavy speed difference.
       // //   Speed's still high enough to not be a 'wait'.
