@@ -149,11 +149,11 @@ namespace com.keyman.osk {
      */
     private static readonly CANCELLATION_EPSILON = Math.sqrt(Number.EPSILON);
 
-    private rawLinearSums: {'x': number, 'y': number, 't': number, 'v': number} = {'x': 0, 'y': 0, 't': 0, 'v': 0};
-    private rawSquaredSums: {'x': number, 'y': number, 't': number, 'v': number} = {'x': 0, 'y': 0, 't': 0, 'v': 0};
+    private rawLinearSums  = {'x': 0, 'y': 0, 't': 0, 'v': 0};
+    private rawSquaredSums = {'x': 0, 'y': 0, 't': 0, 'v': 0};
     // Would 'tv' (time vs velocity) be worth it to track?  And possibly even do a regression for?
     // If so, maybe throw that in.
-    private rawCrossSums: {'tx': number, 'ty': number, 'xy': number} = {'tx': 0, 'ty': 0, 'xy': 0};
+    private rawCrossSums  = {'tx': 0, 'ty': 0, 'xy': 0};
 
     private coordArcSum: number = 0;
     private arcSampleCount: number = 0;
@@ -232,17 +232,17 @@ namespace com.keyman.osk {
       const y = sample.targetY - this.baseSample.targetY;
       const t = sample.t - this.baseSample.t;
 
-      result.rawLinearSums['x'] += x;
-      result.rawLinearSums['y'] += y;
-      result.rawLinearSums['t'] += t;
+      result.rawLinearSums.x += x;
+      result.rawLinearSums.y += y;
+      result.rawLinearSums.t += t;
 
-      result.rawCrossSums['tx'] += t * x;
-      result.rawCrossSums['ty'] += t * y;
-      result.rawCrossSums['xy'] += x * y;
+      result.rawCrossSums.tx += t * x;
+      result.rawCrossSums.ty += t * y;
+      result.rawCrossSums.xy += x * y;
 
-      result.rawSquaredSums['x'] += x * x;
-      result.rawSquaredSums['y'] += y * y;
-      result.rawSquaredSums['t'] += t * t;
+      result.rawSquaredSums.x += x * x;
+      result.rawSquaredSums.y += y * y;
+      result.rawSquaredSums.t += t * t;
 
       if(this.lastSample) {
         // arc length stuff!
@@ -267,8 +267,8 @@ namespace com.keyman.osk {
         }
 
         if(tDelta) {
-          result.rawLinearSums['v']  += coordArcDelta / tDelta;
-          result.rawSquaredSums['v'] += coordArcDeltaSq / (tDelta * tDelta);
+          result.rawLinearSums.v  += coordArcDelta   / tDelta;
+          result.rawSquaredSums.v += coordArcDeltaSq / (tDelta * tDelta);
         }
       }
 
@@ -344,8 +344,8 @@ namespace com.keyman.osk {
         result.arcSampleCount -= subsetStats.arcSampleCount;
 
         if(tDelta) {
-          result.rawLinearSums['v']  -= coordArcDelta / tDelta;
-          result.rawSquaredSums['v'] -= coordArcDeltaSq / (tDelta * tDelta);
+          result.rawLinearSums.v  -= coordArcDelta   / tDelta;
+          result.rawSquaredSums.v -= coordArcDeltaSq / (tDelta * tDelta);
         }
       }
 
@@ -495,9 +495,9 @@ namespace com.keyman.osk {
       let result = new CumulativePathStats(this);
 
       let newBase: InputSample = {
-        targetX: this.mappedMean['x'] + this.baseSample.targetX,
-        targetY: this.mappedMean['y'] + this.baseSample.targetY,
-        t:       this.mappedMean['t'] + this.baseSample.t
+        targetX: this.mappedMean('x') + this.baseSample.targetX,
+        targetY: this.mappedMean('y') + this.baseSample.targetY,
+        t:       this.mappedMean('t') + this.baseSample.t
       };
 
       result.baseSample = newBase;

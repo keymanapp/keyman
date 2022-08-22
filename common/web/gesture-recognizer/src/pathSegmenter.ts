@@ -390,8 +390,11 @@ namespace com.keyman.osk {
 
       // Our testing thresholds are for p=0.05 and p=0.10, which correspond to certainties of 95% and
       // 90% that our segmentation did not arrive from random chance based on the axis being tested.
-      totalThreshold += xTest.certaintyThreshold >= 0.95 ? 2 : (xTest.certaintyThreshold >= 0.90 ? 1 : 0) ;
-      totalThreshold += yTest.certaintyThreshold >= 0.95 ? 2 : (yTest.certaintyThreshold >= 0.90 ? 1 : 0) ;
+      const p05 = 0.95; // 1 - 0.05
+      const p10 = 0.9;  // 1 - 0.10
+
+      totalThreshold += xTest.certaintyThreshold >= p05 ? 2 : (xTest.certaintyThreshold >= p10 ? 1 : 0) ;
+      totalThreshold += yTest.certaintyThreshold >= p05 ? 2 : (yTest.certaintyThreshold >= p10 ? 1 : 0) ;
 
       return totalThreshold >= 2;
     }
