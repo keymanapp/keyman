@@ -133,10 +133,6 @@ namespace com.keyman.osk {
         return 1;
       }
 
-      if(numDoF > 3) {
-        numDoF = 3;
-      }
-
       const numIndex   = (numDoF > 3 ? 3 : numDoF) - 2;
       const denomIndex = (denomDoF > 20 ? 20 : denomDoF) - 1;
 
@@ -191,8 +187,8 @@ namespace com.keyman.osk {
      */
     static readonly segmentationComparison = class SegmentedRegression {
       host: Segmentation;
-      readonly independent: 'x' | 'y' | 't';
-      readonly dependent:   'x' | 'y' | 't';
+      readonly independent: PathCoordAxis;
+      readonly dependent:   PathCoordAxis;
       readonly paired:      'tx' | 'ty' | 'xy';
 
       /**
@@ -210,7 +206,7 @@ namespace com.keyman.osk {
        */
       union: typeof CumulativePathStats.regression.prototype;
 
-      constructor(host: Segmentation, dependentAxis: 'x' | 'y' | 't', independentAxis: 'x' | 'y' | 't') {
+      constructor(host: Segmentation, dependentAxis: PathCoordAxis, independentAxis: PathCoordAxis) {
         if(dependentAxis == independentAxis) {
           throw "Two different axes must be specified for the regression object.";
         }
@@ -377,7 +373,7 @@ namespace com.keyman.osk {
      * @param independent
      * @returns
      */
-    public segReg(dependentAxis: 'x' | 'y' | 't', independentAxis: 'x' | 'y' | 't') {
+    public segReg(dependentAxis: PathCoordAxis, independentAxis: PathCoordAxis) {
       return new Segmentation.segmentationComparison(this, dependentAxis, independentAxis);
     }
 
@@ -392,6 +388,8 @@ namespace com.keyman.osk {
       const xTest = new Segmentation.segmentationComparison(this, 'x', 't');
       const yTest = new Segmentation.segmentationComparison(this, 'y', 't');
 
+      // Our testing thresholds are for p=0.05 and p=0.10, which correspond to certainties of 95% and
+      // 90% that our segmentation did not arrive from random chance based on the axis being tested.
       totalThreshold += xTest.certaintyThreshold >= 0.95 ? 2 : (xTest.certaintyThreshold >= 0.90 ? 1 : 0) ;
       totalThreshold += yTest.certaintyThreshold >= 0.95 ? 2 : (yTest.certaintyThreshold >= 0.90 ? 1 : 0) ;
 
@@ -404,7 +402,7 @@ namespace com.keyman.osk {
      * maintain the same direction but differ only in observed speed.
      */
     get mergeMerited(): boolean {
-      // Because of caret-like motions (as in, in the '^' shape), we need to test for
+      // Because of caret-like motions (as in, in the '^' shape), we need to text for
       // regression on both axes.  One may have notably higher variance than the other.
       //
       // These tests ignore time, and therefore speed.  Only the raw geometry of the motion

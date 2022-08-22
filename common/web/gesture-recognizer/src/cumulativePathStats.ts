@@ -1,20 +1,39 @@
 namespace com.keyman.osk {
   /**
+   * Denotes one dimension utilized by touchpath input coordinates - 'x' and y' for space,
+   * 't' for time.
+   */
+  export type PathCoordAxis = 'x' | 'y' | 't';
+
+  /**
+   * Denotes a pair of dimensions utilized by touchpath input coordinates.  The two axes
+   * (see `PathCoordAxis`) must be specified in alphabetical order.
+   */
+  export type PathCoordAxisPair = 'tx' | 'ty' | 'xy';
+
+  /**
+   * Denotes one dimension or feature (velocity) that this class tracks statistics for.
+   *
+   * Sine and Cosine stats are currently excluded due to their necessary lack of statistical
+   * independence.
+   */
+  type StatAxis = PathCoordAxis | 'v';
+
+  /**
    * As the name suggests, this class facilitates tracking of cumulative mathematical values, etc
    * necessary to perform the statistical operations necessary for path segmentation.
    *
    * Instances of this class are immutable.
    */
   export class CumulativePathStats {
-    // So... class-level "inner classes" are possible in TS... if defined via assignment to a field.
     /**
      * Provides linear-regression statistics & fitting values based on the underlying `CumulativePathStats`
      * object used to generate it.  All operations are O(1).
      */
     static readonly regression = class RegressionFromSums {
-      readonly independent: 'x' | 'y' | 't';
-      readonly dependent:   'x' | 'y' | 't';
-      readonly paired:      'tx' | 'ty' | 'xy';
+      readonly independent: PathCoordAxis;
+      readonly dependent:   PathCoordAxis;
+      readonly paired:      PathCoordAxisPair;
 
       readonly accumulator: CumulativePathStats;
 
@@ -25,7 +44,7 @@ namespace com.keyman.osk {
        *                        existing data of its relationship with the independent axis.
        * @param independentAxis The 'input' axis/dimension.
        */
-      constructor(mainStats: CumulativePathStats, dependentAxis: 'x' | 'y' | 't', independentAxis: 'x' | 'y' | 't') {
+      constructor(mainStats: CumulativePathStats, dependentAxis: PathCoordAxis, independentAxis: PathCoordAxis) {
         if(dependentAxis == independentAxis) {
           throw "Two different axes must be specified for the regression object.";
         }
@@ -36,9 +55,9 @@ namespace com.keyman.osk {
         this.independent = independentAxis;
 
         if(dependentAxis < independentAxis) {
-          this.paired = dependentAxis.concat(independentAxis) as 'tx' | 'ty' | 'xy';
+          this.paired = dependentAxis.concat(independentAxis) as PathCoordAxisPair;
         } else {
-          this.paired = independentAxis.concat(dependentAxis) as 'tx' | 'ty' | 'xy';
+          this.paired = independentAxis.concat(dependentAxis) as PathCoordAxisPair;
         }
       }
 
@@ -124,6 +143,12 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * Floating-point errors may result from cross-sum calculations, and they may be slightly larger than
+     * Number.EPSILON as the sums grow.  (Taking the difference of cross-sums)
+     */
+    private static readonly CANCELLATION_EPSILON = Math.sqrt(Number.EPSILON);
+
     private rawLinearSums: {'x': number, 'y': number, 't': number, 'v': number} = {'x': 0, 'y': 0, 't': 0, 'v': 0};
     private rawSquaredSums: {'x': number, 'y': number, 't': number, 'v': number} = {'x': 0, 'y': 0, 't': 0, 'v': 0};
     // Would 'tv' (time vs velocity) be worth it to track?  And possibly even do a regression for?
@@ -179,6 +204,8 @@ namespace com.keyman.osk {
         this.rawSquaredSums   = {...obj.rawSquaredSums};
       } else if(isAnInputSample(obj)) {
         Object.assign(this, this.extend(obj));
+      } else {
+        throw "A constructor for this input pattern has not yet been implemented";
       }
     }
 
@@ -305,12 +332,13 @@ namespace com.keyman.osk {
         const tDelta = subsetStats.followingSample.t       - subsetStats.lastSample.t;
         const tDeltaInSec = tDelta / 1000;
 
-        const coordArcSq = xDelta * xDelta + yDelta * yDelta;
+        const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
+        const coordArcDelta = Math.sqrt(coordArcDeltaSq);
 
         // Due to how arc length stuff gets segmented.
         // There's the arc length within the prefix subset (operand 2 below) AND the part connecting it to the
         // 'remaining' subset (operand 1 below) before the portion wholly within what remains (the result)
-        result.coordArcSum     -= Math.sqrt(coordArcSq);
+        result.coordArcSum     -= coordArcDelta;
         result.coordArcSum     -= subsetStats.coordArcSum;
 
         result.cosLinearSum   -= subsetStats.cosLinearSum;
@@ -318,8 +346,8 @@ namespace com.keyman.osk {
         result.arcSampleCount -= subsetStats.arcSampleCount;
 
         if(tDeltaInSec) {
-          result.rawLinearSums['v']  -= Math.sqrt(coordArcSq) / tDeltaInSec;
-          result.rawSquaredSums['v'] -= coordArcSq / (tDeltaInSec * tDeltaInSec);
+          result.rawLinearSums['v']  -= coordArcDelta / tDeltaInSec;
+          result.rawSquaredSums['v'] -= coordArcDeltaSq / (tDeltaInSec * tDeltaInSec);
         }
       }
 
@@ -360,7 +388,7 @@ namespace com.keyman.osk {
      * @param dim
      * @returns
      */
-    private mappingConstant(dim: 'x' | 'y' | 't' | 'v') {
+    private mappingConstant(dim: StatAxis) {
       if(!this.baseSample) {
         return undefined;
       }
@@ -382,7 +410,7 @@ namespace com.keyman.osk {
      * @param dim
      * @returns
      */
-    private mappedMean(dim: 'x' | 'y' | 't' |'v') {
+    private mappedMean(dim: StatAxis) {
       return this.rawLinearSums[dim] / this.sampleCount;
     }
 
@@ -392,7 +420,7 @@ namespace com.keyman.osk {
      * @param dim
      * @returns
      */
-    public mean(dim: 'x' | 'y' | 't' | 'v') {
+    public mean(dim: StatAxis) {
       // This external-facing version needs to provide values in 'external'-friendly
       // coordinate space.
       return this.mappedMean(dim) + this.mappingConstant(dim);
@@ -404,7 +432,7 @@ namespace com.keyman.osk {
      * @param dim
      * @returns
      */
-    public squaredSum(dim: 'x' | 'y' | 't' | 'v') {
+    public squaredSum(dim: StatAxis) {
       const x2 = this.rawSquaredSums[dim];
       const x1 = this.rawLinearSums[dim];
 
@@ -419,14 +447,11 @@ namespace com.keyman.osk {
      * @param dimPair
      * @returns
      */
-    public crossSum(dimPair: 'tx' | 'ty' | 'xy') {
+    public crossSum(dimPair: PathCoordAxisPair) {
       const dim1 = dimPair.charAt(0);
       const dim2 = dimPair.charAt(1);
 
       let orderedDims: string = dimPair;
-      if(dim2 < dim1) {
-        orderedDims = dim2.concat(dim1);
-      }
 
       const ab = this.rawCrossSums[orderedDims];
       const a  = this.rawLinearSums[dim1];
@@ -444,7 +469,7 @@ namespace com.keyman.osk {
      * @param dimPair
      * @returns
      */
-    public covariance(dimPair: 'tx' | 'ty' | 'xy') {
+    public covariance(dimPair: PathCoordAxisPair) {
       return this.crossSum(dimPair) / (this.sampleCount - 1);
     }
 
@@ -452,7 +477,7 @@ namespace com.keyman.osk {
      * Gets the unbiased variance on the specified axis for samples observed
      * during the represented interval.
      */
-    public variance(dim: 'x' | 'y' | 't' | 'v') {
+    public variance(dim: StatAxis) {
       return this.squaredSum(dim) / (this.sampleCount - 1);
     }
 
@@ -480,11 +505,11 @@ namespace com.keyman.osk {
       result.baseSample = newBase;
 
       for(const dimPair in result.rawCrossSums) {
-        result.rawCrossSums[dimPair] = this.crossSum(dimPair as 'tx' | 'ty' | 'xy');
+        result.rawCrossSums[dimPair] = this.crossSum(dimPair as PathCoordAxisPair);
       }
 
       for(const dim in result.rawSquaredSums) {
-        result.rawSquaredSums[dim] = this.squaredSum(dim as 'x' | 'y' | 't');
+        result.rawSquaredSums[dim] = this.squaredSum(dim as PathCoordAxis);
       }
 
       return result;
@@ -497,7 +522,7 @@ namespace com.keyman.osk {
      * @param independent
      * @returns
      */
-    public fitRegression(dependent: 'x' | 'y' | 't', independent: 'x' | 'y' | 't') {
+    public fitRegression(dependent: PathCoordAxis, independent: PathCoordAxis) {
       return new CumulativePathStats.regression(this, dependent, independent);
     }
 
@@ -510,7 +535,7 @@ namespace com.keyman.osk {
     public get netDistance() {
       // No issue with a net distance of 0 due to a single point.
       if(!this.lastSample || !this.initialSample) {
-        return Number.NaN;
+        return 0;
       }
 
       const xDelta = this.lastSample.targetX - this.initialSample.targetX;
@@ -527,7 +552,7 @@ namespace com.keyman.osk {
     public get duration() {
       // no issue with a duration of zero from just one sample.
       if(!this.lastSample || !this.initialSample) {
-        return Number.NaN;
+        return 0;
       }
       return (this.lastSample.t - this.initialSample.t) * 0.001;
     }
@@ -572,16 +597,12 @@ namespace com.keyman.osk {
         return undefined;
       }
 
-      const angle = this.angleInDegrees;
-      const buckets = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+      const buckets = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'n'];
 
-      for(let threshold = 22.5, bucketIndex = 0; threshold < 360; threshold += 45, bucketIndex += 1) {
-        if(angle < threshold) {
-          return buckets[bucketIndex];
-        }
-      }
-
-      return 'n';
+      // We could be 'more efficient' and use radians here instead, but this
+      // version helps a bit more with easy maintainability.
+      const bucketIndex = Math.ceil((this.angleInDegrees - 22.5)/45);
+      return buckets[bucketIndex];
     }
 
     /**
@@ -627,9 +648,14 @@ namespace com.keyman.osk {
      * Range:  floating-point values on the interval [0, 1].
      */
     private get angleRSquared() {
-      // https://www.ebi.ac.uk/thornton-srv/software/PROCHECK/nmr_manual/man_cv.html may be a useful
-      // reference for this tidbit.  The Wikipedia article's more dense... not that this link isn't
-      // a bit dense itself.
+      // Refer to https://en.wikipedia.org/wiki/Directional_statistics#Distribution_of_the_mean.
+      // We're computing the squared value of that page's R-bar stat.
+      //
+      // Now, why it's called that?  ... good question.  My best guess is that it's meant to
+      // correspond to linear regression's 'r' stat, which when squared serves as the
+      // coefficient of determination for the regression.  Intuitively, that does seem to
+      // match what this represents - though for normal regressions, the c.o.d isn't normally
+      // used to compute deviation or variance!
       const rSquaredBase = this.cosLinearSum * this.cosLinearSum + this.sinLinearSum * this.sinLinearSum;
       return rSquaredBase / (this.arcSampleCount * this.arcSampleCount);
     }
@@ -667,22 +693,22 @@ namespace com.keyman.osk {
       // This `likelyState` value is extremely prototyped & just here for reviewer/tester convenience.
       // It'll need to be developed a bit more fully, but follows my intuitions from development &
       // testing.
-      let likelyState = 'unknown';
+      let likelyType = 'unknown';
 
       if(this.mean('v') < 80 && this.rawDistance < 12 && this.duration > 0.1) {
-        likelyState = 'hold';
+        likelyType = 'hold';
       } else if(this.mean('v') < 80 && this.rawDistance < 6) {
-        likelyState = 'hold';
+        likelyType = 'hold';
       }
 
       if(this.mean('v') > 400 || (this.mean('v') > 200 && this.duration > 0.1) || this.netDistance > 20) {
-        likelyState = 'move';
+        likelyType = 'move';
       }
 
       return {
         angle: this.angle,
         cardinal: this.cardinalDirection,
-        likelyType: likelyState,
+        likelyType: likelyType,
         speedMean: this.mean('v'),
         rawDistance: this.rawDistance,
         duration: this.duration,
