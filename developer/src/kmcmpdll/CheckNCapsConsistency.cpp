@@ -2,12 +2,9 @@
 #include <pch.h>
 
 #include <Compfile.h>
-#include <comperr.h>       
-
+#include <comperr.h>   
 #include <kmcmpdll.h>
 #include <CharToKeyConversion.h>
-
-
 
 /**
  * If any rule uses CAPS or NCAPS for a given key, then every rule that
@@ -36,7 +33,6 @@
  *
  * @param fk     Keyboard to check
  */
-
 bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
   struct CapsUsage {
     int ncaps_line, caps_line, neither_line;

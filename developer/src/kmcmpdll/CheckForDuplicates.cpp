@@ -2,10 +2,9 @@
 
 #include "pch.h"
 
-#include "Compfile.h"         // _S2 #include <Compfile.h>
-#include "comperr.h"          // _S2 #include <comperr.h>
-#include "kmcmpdll.h"         // _S2 #include <kmcmpdll.h>
-//#include "../../../common/windows/cpp/include/xstring.h"
+#include <Compfile.h>
+#include <comperr.h>
+#include <kmcmpdll.h>
 #include "xstring.h"
 #include "kmx_u16.h"
 

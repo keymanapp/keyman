@@ -132,7 +132,7 @@ struct FILE_KEYBOARD {
 
 	PFILE_STORE dpStoreArray;	// address of first item in store array, from start of store structure
 	PFILE_GROUP dpGroupArray;	// address of first item in group array, from start of group structure
-	
+
 	KMX_DWORD cxStoreArray;			// in number of items
 	KMX_DWORD cxGroupArray;			// in number of items
 	KMX_DWORD StartGroup[2];		// index of starting groups [ANSI=0, Unicode=1]
@@ -143,16 +143,16 @@ struct FILE_KEYBOARD {
 	KMX_WCHAR szLanguageName[SZMAX_LANGUAGENAME];	// Language name
 	KMX_WCHAR szCopyright[SZMAX_COPYRIGHT];			// Copyright information
 	KMX_WCHAR szMessage[SZMAX_MESSAGE];				// General information about the keyboard
-	PKMX_BYTE lpBitmap;			
+	PKMX_BYTE lpBitmap;
 	KMX_DWORD dwBitmapSize;
 	KMX_DWORD dwFlags;					// Flags for the keyboard file
-	
+
 	KMX_DWORD currentGroup;				// temp - current processing group
 	KMX_DWORD currentStore;				// temp - current processing store
 	KMX_DWORD cxDeadKeyArray;
 	PFILE_DEADKEY dpDeadKeyArray;	// temp - dead key array
 	KMX_DWORD cxVKDictionary;
-	PFILE_VKDICTIONARY dpVKDictionary; // temp - virtual key dictionary  
+	PFILE_VKDICTIONARY dpVKDictionary; // temp - virtual key dictionary
 	};
 typedef FILE_KEYBOARD *PFILE_KEYBOARD;
 
@@ -221,4 +221,3 @@ extern TVersion FVersionInfo;
 */
 
 #endif	// _COMPFILE_H
-

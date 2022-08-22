@@ -109,7 +109,6 @@
     <ClCompile Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-uri.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator\json-validator.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\vkeys.cpp" />
-    <ClCompile Include="ABC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Compiler.rc" />

@@ -21,7 +21,11 @@ std::wstring wstring_from_string(std::string const str) {
 
 std::u16string u16string_from_string(std::string const str) {
 	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
-	return converter.from_bytes(str);
+	std::u16string ret = 
+		converter.
+		from_bytes(str);
+	return ret;
+	//return converter.from_bytes(str);
 }
 
 std::string string_from_u16string(std::u16string const str) {

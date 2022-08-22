@@ -1,5 +1,6 @@
 
 #include <pch.h>
+
 #include <Compfile.h>
 #include <comperr.h>
 #include <../../../common/windows/cpp/include/vkeys.h>
@@ -91,8 +92,8 @@ KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
     if ((msg = ExpandCapsRule(gp, &gp->dpKeyArray[i], sp)) != CERR_None) {
       return msg;
     }
-  }  
-  return CERR_None; 
+  }
+  return CERR_None;
 }
 
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
@@ -118,7 +119,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
       break;
     }
   }
- 
+
   if (!*p) {
     // This key is not modified by Caps Lock
     return CERR_None;
@@ -135,11 +136,9 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   gp->dpKeyArray = k;
   gp->cxKeyArray++;
 
-  k = &k[gp->cxKeyArray - 1];
-  
+  k = &k[gp->cxKeyArray - 1];  
   k->dpContext = new KMX_WCHAR[u16len(kpp->dpContext) + 1];
-  k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];  
- 
+  k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];   
   u16cpy(k->dpContext, kpp->dpContext );  // copy the context.
   u16cpy(k->dpOutput, kpp->dpOutput );    // copy the output.
   

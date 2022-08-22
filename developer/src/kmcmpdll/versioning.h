@@ -1,6 +1,5 @@
 #pragma once
 
-//#include <windows.h>       // Can be removed here :-)
 #include <Compfile.h>
 
 #define VERIFY_KEYBOARD_VERSION(fk, ver, err) { \
