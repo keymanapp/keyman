@@ -521,7 +521,7 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   // must preprocess for group and store names -> this isn't really necessary, but never mind!
   while ((msg = ReadLine(hInfile, str, TRUE)) == CERR_None)
   {
-    if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
+    //if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
     p = str;
     switch (LineTokenType(&p))
     {
@@ -555,7 +555,7 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
   while ((msg = ReadLine(hInfile, str, FALSE)) == CERR_None)
   {
-    if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
+    //if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
     msg = ParseLine(fk, str);
     if (msg != CERR_None) SetError(msg);
   }
