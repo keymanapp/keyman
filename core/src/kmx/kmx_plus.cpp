@@ -1,3 +1,9 @@
+/*
+  Copyright:        Copyright (C) 2022 SIL International.
+  Authors:          srl295
+  Implementation for the KMX Plus utilities
+*/
+
 #include <kmx/kmx_plus.h>
 
 /**

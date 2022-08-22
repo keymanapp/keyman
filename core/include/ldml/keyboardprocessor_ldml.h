@@ -1,3 +1,11 @@
+
+/*
+  Copyright:        Copyright (C) 2022 SIL International.
+  Authors:          srl295
+  This file provides constants for the KMX Plus (LDML support) binary format,
+  to be shared between TypeScript and C++ via the generator (below)
+*/
+
 //
 // Generated File - do not edit
 //
