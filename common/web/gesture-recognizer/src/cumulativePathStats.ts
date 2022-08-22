@@ -227,7 +227,7 @@ namespace com.keyman.osk {
         const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
         const coordArcDelta = Math.sqrt(coordArcDeltaSq);
 
-        result.coordArcSum     += Math.sqrt(coordArcDeltaSq);
+        result.coordArcSum     += coordArcDelta;
 
         if(xDelta || yDelta) {
           // We wish to measure angle clockwise from <0, -1> in the DOM.  So, cos values should
@@ -241,7 +241,7 @@ namespace com.keyman.osk {
         }
 
         if(tDeltaInSec) {
-          result.rawLinearSums['v']  += Math.sqrt(coordArcDeltaSq) / tDeltaInSec;
+          result.rawLinearSums['v']  += coordArcDelta / tDeltaInSec;
           result.rawSquaredSums['v'] += coordArcDeltaSq / (tDeltaInSec * tDeltaInSec);
         }
       }
@@ -564,7 +564,8 @@ namespace com.keyman.osk {
      * closely matches the direction of movement represented by the represented
      * segment.
      *
-     * @return A string one or two letters in length.  (e.g:  'n', 'sw')
+     * @return A string one or two letters in length (e.g:  'n', 'sw'), or
+               `undefined` if not enough data to determine a direction.
      */
     public get cardinalDirection() {
       if(this.sampleCount == 1 || !this.lastSample || !this.initialSample) {
@@ -585,6 +586,7 @@ namespace com.keyman.osk {
 
     /**
      * Measured in pixels per second.
+     * @return a speed in pixels per second, or `Number.NaN` if no data
      */
     public get speed() {
       // this.duration is already in seconds, not milliseconds.

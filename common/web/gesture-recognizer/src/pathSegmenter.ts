@@ -392,9 +392,6 @@ namespace com.keyman.osk {
       const xTest = new Segmentation.segmentationComparison(this, 'x', 't');
       const yTest = new Segmentation.segmentationComparison(this, 'y', 't');
 
-      // const xTestConfig = this.xtFTestConfiguration;
-      // const yTestConfig = this.ytFTestConfiguration;
-
       totalThreshold += xTest.certaintyThreshold >= 0.95 ? 2 : (xTest.certaintyThreshold >= 0.90 ? 1 : 0) ;
       totalThreshold += yTest.certaintyThreshold >= 0.95 ? 2 : (yTest.certaintyThreshold >= 0.90 ? 1 : 0) ;
 
@@ -407,7 +404,7 @@ namespace com.keyman.osk {
      * maintain the same direction but differ only in observed speed.
      */
     get mergeMerited(): boolean {
-      // Because of caret-like motions (as in, in the '^' shape), we need to text for
+      // Because of caret-like motions (as in, in the '^' shape), we need to test for
       // regression on both axes.  One may have notably higher variance than the other.
       //
       // These tests ignore time, and therefore speed.  Only the raw geometry of the motion
