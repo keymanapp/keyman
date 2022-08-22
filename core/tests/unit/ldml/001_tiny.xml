@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Note that the corresponding .kmx is currently
+  hand-crafted
+
+@@keys: [K_Q][K_W][K_Q]
+@@expected: \u0127\u1790\u17B6\u0127
+
+-->
 <!DOCTYPE keyboard SYSTEM "../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
