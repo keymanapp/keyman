@@ -20,6 +20,24 @@ namespace com.keyman.osk {
   type StatAxis = PathCoordAxis | 'v';
 
   /**
+   * Acts as a subtraction operation with a built-in, adaptive "significance" check.
+   * If the result * 2^30 (~ * 10^9) is still smaller in magnitude than an operand, we
+   * assume it to be a floating-point error that should have been 0 and act accordingly,
+   * returning 0.
+   *
+   * For reference, (32-bit) floats have 23 bits of significand precision, while (64-bit)
+   * doubles have 52.  Therefore, we'll still be more precise than baseline floats.
+   */
+  function sigMinus(operand1: number, operand2: number) {
+    const diff = operand1 - operand2;
+
+    const logDiff = Math.log2(Math.abs(operand1)) - Math.log2(Math.abs(operand2));
+    // If an operand is 2^30 (or ~10^9) larger than the result of the difference, it's
+    // nigh-certainly a floating-point error at play.
+    return logDiff < 30 ? diff : 0;
+  }
+
+  /**
    * As the name suggests, this class facilitates tracking of cumulative mathematical values, etc
    * necessary to perform the statistical operations necessary for path segmentation.
    *
@@ -434,9 +452,7 @@ namespace com.keyman.osk {
       const x2 = this.rawSquaredSums[dim];
       const x1 = this.rawLinearSums[dim];
 
-      const val = x2 - x1 * x1 / this.sampleCount;
-
-      return val > 1e-8 ? val : 0;
+      return sigMinus(x2, x1 * x1 / this.sampleCount);
     }
 
     /**
@@ -455,10 +471,7 @@ namespace com.keyman.osk {
       const a  = this.rawLinearSums[dim1];
       const b  = this.rawLinearSums[dim2];
 
-      const val = ab - a * b / this.sampleCount;
-
-      // Don't forget - cross-sums can be negative!
-      return Math.abs(val) > 1e-8 ? val : 0;
+      return sigMinus(ab, a * b / this.sampleCount);
     }
 
     /**
@@ -507,6 +520,14 @@ namespace com.keyman.osk {
       }
 
       for(const dim in result.rawSquaredSums) {
+        // 'v' does not need renormalization.
+        if(dim == 'v') {
+          break;
+        }
+
+        // The identity we're using to renormalize rawCrossSums and rawSquaredSums
+        // automatically guarantees a mean of 0 after the renormalization.
+        result.rawLinearSums[dim]  = 0;
         result.rawSquaredSums[dim] = this.squaredSum(dim as PathCoordAxis);
       }
 
