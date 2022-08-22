@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.49 alpha 2022-08-22
+
+* fix: remove saving and restoring context kbd options (#7077)
+* chore(deps): bump @actions/core from 1.8.2 to 1.9.1 (#7087)
+
 ## 16.0.48 alpha 2022-08-16
 
 * fix(web): button, float init timer cleanup (#7036)
