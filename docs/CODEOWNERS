@@ -3,11 +3,11 @@
 #
 # @darcywong00 @mcdurdin @ermshiperete @rc-swag @SabineSIL @sgschantz
 
-/android/                     @darcywong00  @rc-swag
+/android/                     @darcywong00  @mcdurdin
 
-/common/                      @mcdurdin     @jahorton
-/common/core/desktop/         @mcdurdin     @jahorton
-/common/core/web/             @jahorton     @ermshiperete
+/common/                      @mcdurdin     @rc-swag
+/common/core/desktop          @mcdurdin     @rc-swag
+/common/core/web/             @jahorton     @sgschantz     @mcdurdin
 /common/lexical-model-types/  @jahorton     @mcdurdin
 /common/models/               @jahorton     @mcdurdin
 /common/predictive-text/      @jahorton     @mcdurdin
@@ -16,19 +16,18 @@
 
 /developer/                   @mcdurdin     @darcywong00
 /docs/                        @mcdurdin     @jahorton
-/ios/                         @sgschantz    @mcdurdin
+/ios/                         @sgschantz    @jahorton
 /linux/                       @ermshiperete @darcywong00
 /mac/                         @sgschantz    @SabineSIL
 
-/oem/firstvoices/android/     @darcywong00  @rc-swag
-/oem/firstvoices/common/      @mcdurdin     @jahorton
-/oem/firstvoices/ios/         @sgschantz    @mcdurdin
-/oem/firstvoices/windows/     @rc-swag      @sgschantz
+/oem/firstvoices/android/     @darcywong00  @mcdurdin
+/oem/firstvoices/common/      @mcdurdin     @rc-swag
+/oem/firstvoices/ios/         @sgschantz    @jahorton
+/oem/firstvoices/windows/     @rc-swag      @ermshiperete
 /resources/                   @mcdurdin     @jahorton
 
 # Web is currently shared between Marc and Joshua:
-/web/                         @jahorton     @ermshiperete   @mcdurdin
+/web/                         @jahorton     @sgschantz     @mcdurdin
 
-/windows/                     @rc-swag      @sgschantz
-# Override for windows/src:
-/windows/src/developer/       @mcdurdin     @darcywong00
+/windows/                     @rc-swag      @ermshiperete
+
