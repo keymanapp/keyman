@@ -11,7 +11,6 @@
 #include <vector>
 #include <unordered_map>
 #include <keyman/keyboardprocessor.h>
-
 #include "processor.hpp"
 #include "option.hpp"
 
@@ -21,11 +20,12 @@ namespace kbp {
 #define KM_KBP_LMDL_PROCESSOR_VERSION u"1.0"
 
   class ldml_processor : public abstract_processor {
-
+  private:
+    std::vector<uint8_t> rawdata; // TODO-LDML: should be 'unpacked' format instead.
   public:
     ldml_processor(
       path const & kb_path,
-      const std::vector<uint8_t> data
+      const std::vector<uint8_t> & data
     );
 
 //    ~ldml_processor() override;
