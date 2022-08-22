@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.packages.PackageProcessor;
@@ -254,6 +255,8 @@ final class FVShared {
         i.setData(Uri.parse(helpUrl));
         if (i.resolveActivity(localContext.getPackageManager()) != null) {
           localContext.startActivity(i);
+        } else {
+            Toast.makeText(localContext, localContext.getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
         }
     }
 

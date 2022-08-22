@@ -764,12 +764,21 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.android.chrome"));
             if (intent.resolveActivity(getPackageManager()) != null) {
               startActivity(intent);
+            } else {
+              intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
+              if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+              } else {
+                Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+              }
             }
           } catch (android.content.ActivityNotFoundException e) {
             // Link to Chrome if user is not signed in to Play Store
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
             if (intent.resolveActivity(getPackageManager()) != null) {
               startActivity(intent);
+            } else {
+              Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
             }
           }
         }

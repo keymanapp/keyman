@@ -26,6 +26,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tavultesoft.kmea.ConfirmDialogFragment;
 import com.tavultesoft.kmea.KMHelpFileActivity;
@@ -162,6 +163,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
           i.putExtras(args);
           if (i.resolveActivity(getPackageManager()) != null) {
             startActivity(i);
+          } else {
+            Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
           }
           finish();
 

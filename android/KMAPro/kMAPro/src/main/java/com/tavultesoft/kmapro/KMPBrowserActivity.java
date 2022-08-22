@@ -18,6 +18,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.BaseActivity;
@@ -115,6 +116,8 @@ public class KMPBrowserActivity extends BaseActivity {
           Intent intent = new Intent(Intent.ACTION_VIEW, uri);
           if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
+          } else {
+            Toast.makeText(context, getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
           }
           return true;
         }

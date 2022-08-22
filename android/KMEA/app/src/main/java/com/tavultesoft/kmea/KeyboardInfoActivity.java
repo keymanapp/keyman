@@ -138,6 +138,8 @@ public final class KeyboardInfoActivity extends BaseActivity {
             i.setData(Uri.parse(customHelpLink));
             if (i.resolveActivity(getPackageManager()) != null) {
               startActivity(i);
+            } else {
+              Toast.makeText(context, getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
             }
           }
         }
