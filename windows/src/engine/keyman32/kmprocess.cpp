@@ -190,7 +190,7 @@ BOOL ProcessHook()
     }
 
     if (!_td->TIPFUpdateable) {
-      ProcessActionsTestParse(&fOutputKeystroke);
+      ProcessActionsNonUpdatableParse(&fOutputKeystroke);
     } else {
       ProcessActions(&fOutputKeystroke);
     }
