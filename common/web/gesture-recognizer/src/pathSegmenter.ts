@@ -927,12 +927,12 @@ namespace com.keyman.osk {
       // at least at this stage of development.  (Most testing was done with Chrome emulation of
       // an iPhone SE.)
 
-      // .mean('v') < 80:  the mean speed (taken timestamp to timestamp) does not exceed 80px/sec.
-      if(segmentation.pre.mean('v') < 80 && segmentation.post.mean('v') > 80) {
+      // .mean('v') < 0.08:  the mean speed (taken timestamp to timestamp) does not exceed 0.08px/millisec.
+      if(segmentation.pre.mean('v') < 0.08 && segmentation.post.mean('v') > 0.08) {
         console.log("desegmentation exception");
         return;
       }
-      if(segmentation.pre.mean('v') > 80 && segmentation.post.mean('v') < 80) {
+      if(segmentation.pre.mean('v') > 0.08 && segmentation.post.mean('v') < 0.08) {
         console.log("desegmentation exception");
         return;
       }

@@ -249,7 +249,6 @@ namespace com.keyman.osk {
         const xDelta = sample.targetX - this.lastSample.targetX;
         const yDelta = sample.targetY - this.lastSample.targetY;
         const tDelta = sample.t       - this.lastSample.t;
-        const tDeltaInSec = tDelta / 1000;
 
         const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
         const coordArcDelta = Math.sqrt(coordArcDeltaSq);
@@ -267,9 +266,9 @@ namespace com.keyman.osk {
           result.arcSampleCount += 1;
         }
 
-        if(tDeltaInSec) {
-          result.rawLinearSums['v']  += coordArcDelta / tDeltaInSec;
-          result.rawSquaredSums['v'] += coordArcDeltaSq / (tDeltaInSec * tDeltaInSec);
+        if(tDelta) {
+          result.rawLinearSums['v']  += coordArcDelta / tDelta;
+          result.rawSquaredSums['v'] += coordArcDeltaSq / (tDelta * tDelta);
         }
       }
 
@@ -330,7 +329,6 @@ namespace com.keyman.osk {
         const xDelta = subsetStats.followingSample.targetX - subsetStats.lastSample.targetX;
         const yDelta = subsetStats.followingSample.targetY - subsetStats.lastSample.targetY;
         const tDelta = subsetStats.followingSample.t       - subsetStats.lastSample.t;
-        const tDeltaInSec = tDelta / 1000;
 
         const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
         const coordArcDelta = Math.sqrt(coordArcDeltaSq);
@@ -345,9 +343,9 @@ namespace com.keyman.osk {
         result.sinLinearSum   -= subsetStats.sinLinearSum;
         result.arcSampleCount -= subsetStats.arcSampleCount;
 
-        if(tDeltaInSec) {
-          result.rawLinearSums['v']  -= coordArcDelta / tDeltaInSec;
-          result.rawSquaredSums['v'] -= coordArcDeltaSq / (tDeltaInSec * tDeltaInSec);
+        if(tDelta) {
+          result.rawLinearSums['v']  -= coordArcDelta / tDelta;
+          result.rawSquaredSums['v'] -= coordArcDeltaSq / (tDelta * tDelta);
         }
       }
 
@@ -545,16 +543,14 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Gets the duration of the represented interval, in seconds.
-     *
-     * Note: input samples provide their timestamps in milliseconds.
+     * Gets the duration of the represented interval in milliseconds.
      */
     public get duration() {
       // no issue with a duration of zero from just one sample.
       if(!this.lastSample || !this.initialSample) {
         return 0;
       }
-      return (this.lastSample.t - this.initialSample.t) * 0.001;
+      return (this.lastSample.t - this.initialSample.t);
     }
 
     /**
@@ -607,10 +603,9 @@ namespace com.keyman.osk {
 
     /**
      * Measured in pixels per second.
-     * @return a speed in pixels per second, or `Number.NaN` if no data
+     * @return a speed in pixels per millisecond, or `Number.NaN` if no data
      */
     public get speed() {
-      // this.duration is already in seconds, not milliseconds.
       return this.duration ? this.netDistance / this.duration : Number.NaN;
     }
 
@@ -695,13 +690,13 @@ namespace com.keyman.osk {
       // testing.
       let likelyType = 'unknown';
 
-      if(this.mean('v') < 80 && this.rawDistance < 12 && this.duration > 0.1) {
+      if(this.mean('v') < 0.08 && this.rawDistance < 12 && this.duration > 100) {
         likelyType = 'hold';
-      } else if(this.mean('v') < 80 && this.rawDistance < 6) {
+      } else if(this.mean('v') < 0.08 && this.rawDistance < 6) {
         likelyType = 'hold';
       }
 
-      if(this.mean('v') > 400 || (this.mean('v') > 200 && this.duration > 0.1) || this.netDistance > 20) {
+      if(this.mean('v') > 0.4 || (this.mean('v') > 0.2 && this.duration > 80) || this.netDistance > 20) {
         likelyType = 'move';
       }
 
