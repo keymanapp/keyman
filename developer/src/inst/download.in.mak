@@ -17,6 +17,7 @@ KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build\xml
 KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build\cef
 KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build\templates
 KEYMAN_WIX_TEMP_MODELCOMPILER=$(TEMP)\keyman_wix_build\ModelCompiler
+KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER=$(TEMP)\keyman_wix_build\LDMLKeyboardCompiler
 KEYMAN_WIX_TEMP_SERVER=$(TEMP)\keyman_wix_build\Server
 
 KEYMAN_WIX_KMDEV_SERVER=$(DEVELOPER_ROOT)\bin\server
@@ -30,15 +31,16 @@ copykmdev: makeinstaller make-kmcomp-install-zip
 test-releaseexists:
     if exist $(DEVELOPER_ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update VERSION.md and try again & exit 1
 
-candle: heat-cef heat-xml heat-templates heat-model-compiler heat-server
+candle: heat-cef heat-xml heat-templates heat-model-compiler heat-server heat-ldml-keyboard-compiler
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease kmdev.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dXmlSourceDir=$(DEVELOPER_ROOT)\src\tike\xml xml.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dLDMLKeyboardCompilerSourceDir=$(KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER) kmldmlc.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dServerSourceDir=$(KEYMAN_WIX_KMDEV_SERVER) server.wxs
 
-clean-heat: clean-heat-model-compiler
+clean-heat: clean-heat-model-compiler clean-heat-ldml-keyboard-compiler
 
 heat-xml:
 # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
@@ -78,6 +80,20 @@ heat-server:
     $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_SERVER) -o server.wxs -ag -cg Server -dr INSTALLDIR -var var.ServerSourceDir -wx -nologo
 # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
     -rmdir /s/q $(KEYMAN_WIX_TEMP_SERVER)
+
+heat-ldml-keyboard-compiler:
+    cd $(KEYMAN_LDMLKEYBOARDCOMPILER_ROOT)
+# Build the distributable package
+    $(GIT_BASH_FOR_KEYMAN) build.sh bundle --build-path "$(KEYMAN_WIX_TEMP_BASE)"
+
+# Build the .wxs file
+    cd $(DEVELOPER_ROOT)\src\inst
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER) -o kmldmlc.wxs -ag -cg LDMLKeyboardCompiler -dr INSTALLDIR -var var.LDMLKeyboardCompilerSourceDir -wx -nologo
+
+clean-heat-ldml-keyboard-compiler:
+# the production build generates files that are not in source, e.g. .ps1 scripts
+# When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER)
 
 heat-model-compiler:
     cd $(KEYMAN_MODELCOMPILER_ROOT)
