@@ -19,7 +19,10 @@
 // TODO-LDML: namespace com.keyman.core.ldml {
 /**
  * Constants for the KMXPlus data format
- * These are shared between the data access layer and the compiler
+ * These are shared between the data access layer and the compiler.
+ * Note that the section IDs (section_keys etc.) are 32 bit hex
+ * values that are designed to appear as text when written in little endian
+ * format, so 0x7379656b = 'keys'
  */
 export const constants = {
     /**
@@ -33,7 +36,7 @@ export const constants = {
     /**
      * Section ID for the keybag
      */
-    section_keys: 'keys',
+    section_keys: 0x7379656B,
     /**
      * Minimum length of the 'keys' section
      * not including variable parts
@@ -42,7 +45,7 @@ export const constants = {
     /**
      * Section ID for the locale list
      */
-    section_loca: 'loca',
+    section_loca: 0x61636F6C,
     /**
      * Minimum length of the 'loca' section
      * not including variable parts
@@ -51,7 +54,7 @@ export const constants = {
     /**
      * Section ID for the metadata
      */
-    section_meta: 'meta',
+    section_meta: 0x6174656D,
     /**
      * length of the 'meta' section
      */
@@ -71,7 +74,7 @@ export const constants = {
     /**
      * Section ID for the section header
      */
-    section_sect: 'sect',
+    section_sect: 0x74636573,
     /**
      * Minimum length of the 'sect' section, not including entries
      */
@@ -79,7 +82,7 @@ export const constants = {
     /**
      * Section ID for the string table
      */
-    section_strs: 'strs',
+    section_strs: 0x73727473,
     /**
      * Minimum length of the 'strs' section
      * not including variable parts
@@ -96,7 +99,7 @@ export const constants = {
     /**
      * Section ID for the vkeys map
      */
-    section_vkey: 'vkey',
+    section_vkey: 0x79656b76,
     /**
      * Minimum length of the 'vkey' section
      * not including variable parts

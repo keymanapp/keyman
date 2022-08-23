@@ -23,18 +23,15 @@ console.log(`
 // based on core/include/ldml/keyboardprocessor_ldml.ts
 //
 
-#pragma once`);
+#pragma once
+`);
 
 for (const key of keys) {
     const value = constants[key];
     const upkey = key.toUpperCase();
     const type = typeof value;
-    if ((key.indexOf('section_') === 0) && type === 'string' && value.length === 4) {
-        // the 4-char section ID strings get handled specially
-        console.log('// Section ID');
-        console.log(`#define LDML_${upkey} ((uint32_t)'${value}')`);
-    } else if (type === 'number') {
-        console.log(`#define LDML_${upkey} ${value}`);
+    if (type === 'number') {
+        console.log(`#define LDML_${upkey} 0x${value.toString(16).toUpperCase()}`);
     } else if (type === 'string') {
         console.log(`#define LDML_${upkey} "${value}"`);
     }
