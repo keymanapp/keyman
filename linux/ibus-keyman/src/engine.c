@@ -634,7 +634,9 @@ process_persist_action(
 
 static gboolean
 process_emit_keystroke_action(IBusKeymanEngine *keyman) {
-  if (((IBusEngine*)keyman)->client_capabilities & IBUS_CAP_PREFILTER) {
+  IBusEngine *engine = (IBusEngine *)keyman;
+  if ((engine->client_capabilities & IBUS_CAP_PREFILTER) &&
+      !(engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT)) {
     keyman->commit_item->emitting_keystroke = TRUE;
   } else {
     if (keyman->commit_item->char_buffer != NULL) {
@@ -647,8 +649,8 @@ process_emit_keystroke_action(IBusKeymanEngine *keyman) {
   return TRUE;
 }
 
-static gboolean process_invalidate_context_action(IBusEngine *engine) {
-  IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+static gboolean
+process_invalidate_context_action(IBusEngine *engine) {
   reset_context(engine);
   return TRUE;
 }
@@ -697,7 +699,9 @@ commit_text(IBusKeymanEngine *keyman) {
 static gboolean
 process_end_action(IBusKeymanEngine *keyman) {
   g_assert(keyman != NULL);
-  if (((IBusEngine *)keyman)->client_capabilities & IBUS_CAP_PREFILTER) {
+  IBusEngine *engine = (IBusEngine *)keyman;
+  if ((engine->client_capabilities & IBUS_CAP_PREFILTER) &&
+      !(engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT)) {
     guint state = keyman->commit_item->state;
     keyman->commit_item++;
     if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE-1]) {
@@ -806,8 +810,9 @@ ibus_keyman_engine_process_key_event(
 
   // This keycode is a fake keycode that we send when it's time to commit the text, ensuring the
   // correct output order of backspace and text.
-  if ((engine->client_capabilities & IBUS_CAP_PREFILTER) && keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL &&
-      (state & IBUS_PREFILTER_MASK)) {
+  if ((engine->client_capabilities & IBUS_CAP_PREFILTER) &&
+      !(engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) &&
+      keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL && (state & IBUS_PREFILTER_MASK)) {
     commit_text(keyman);
     return TRUE;
   }
@@ -885,7 +890,7 @@ ibus_keyman_engine_process_key_event(
   const km_kbp_action_item *action_items = km_kbp_state_action_items(keyman->state, &num_action_items);
 
   if (!process_actions(engine, action_items, num_action_items) &&
-      !(engine->client_capabilities & IBUS_CAP_PREFILTER)) {
+      (!(engine->client_capabilities & IBUS_CAP_PREFILTER) || (engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT))) {
     return FALSE;
   }
 
