@@ -9,7 +9,7 @@
 /**
  * @def KMXPLUS_DEBUG Set to 1 to enable debug output
  */
-#define KMXPLUS_DEBUG 1
+#define KMXPLUS_DEBUG 0
 
 #if KMXPLUS_DEBUG
 #include <stdio.h>
@@ -167,21 +167,31 @@ dump_kmxplus_sect(const uint8_t* data, const COMP_KMXPLUS_SECT* sect) {
 }
 #endif
 
+#if !KMXPLUS_DEBUG
+void
+dump_kmxplus_data(const uint8_t* ) {
+  // no op
+}
+
+void
+dump_kmxplus_data(kmx::PCOMP_KEYBOARD) {
+  // no op
+}
+
+#else
+
 void
 dump_kmxplus_data(const uint8_t* data) {
-#if KMXPLUS_DEBUG
   const COMP_KMXPLUS_SECT* sect = as_kmxplus_sect(data);
   if (sect == nullptr) {
     printf("Err: 'sect' NULL from %p\n", data);
     return;
   }
   dump_kmxplus_sect(data, sect);
-#endif
 }
 
 void
 dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
-#if KMXPLUS_DEBUG
   printf("dump_kmxplus_data(): Got a PCOMP_KEYBOARD at %p\n", keyboard);
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
     printf("Err: flags KF_KMXPLUS not set\n");
@@ -192,8 +202,8 @@ dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
   printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
   const uint8_t* rawdata = reinterpret_cast<const uint8_t*>(keyboard);
   dump_kmxplus_data(rawdata + ex->kmxplus.dpKMXPlus);
-#endif
 }
+#endif
 
 const COMP_KMXPLUS_KEYS_ENTRY *COMP_KMXPLUS_KEYS::find(KMX_DWORD vkey, KMX_DWORD mod) const {
     // TODO-LDML: eventually, assume sorted order & binary search
