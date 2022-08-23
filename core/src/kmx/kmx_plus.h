@@ -31,7 +31,7 @@ struct COMP_KMXPLUS_SECT {
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD total;                     // 0008 KMXPlus entire length
   KMX_DWORD count;                     // 000B number of section headers
-  COMP_KMXPLUS_SECT_ENTRY entries[0];  // 0010 section entries
+  COMP_KMXPLUS_SECT_ENTRY entries[];  // 0010 section entries
   /**
    * @brief Get the offset of a section, or 0
    *
@@ -53,7 +53,7 @@ struct COMP_KMXPLUS_STRS {
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count;                    // 0008 count of str entries
   KMX_DWORD reserved;                 // 000C padding
-  COMP_KMXPLUS_STRS_ENTRY entries[0]; // 0010+ entries
+  COMP_KMXPLUS_STRS_ENTRY entries[]; // 0010+ entries
 
   /**
    * @brief Get a string entry
@@ -88,7 +88,7 @@ struct COMP_KMXPLUS_LOCA_ENTRY {
 struct COMP_KMXPLUS_LOCA {
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count; // 0008 number of locales
-  COMP_KMXPLUS_LOCA_ENTRY entries[0];
+  COMP_KMXPLUS_LOCA_ENTRY entries[];
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_LOCA) == LDML_LENGTH_LOCA, "mismatched size of section loca");
@@ -104,7 +104,7 @@ struct COMP_KMXPLUS_KEYS {
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count;    // number of keys
   KMX_DWORD reserved; // padding
-  COMP_KMXPLUS_KEYS_ENTRY entries[0];
+  COMP_KMXPLUS_KEYS_ENTRY entries[];
   const COMP_KMXPLUS_KEYS_ENTRY *find(KMX_DWORD vkey, KMX_DWORD mod) const;
 };
 
@@ -118,7 +118,7 @@ struct COMP_KMXPLUS_VKEY_ENTRY {
 struct COMP_KMXPLUS_VKEY {
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count;
-  COMP_KMXPLUS_VKEY_ENTRY entries[0];
+  COMP_KMXPLUS_VKEY_ENTRY entries[];
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched size of section vkey");
