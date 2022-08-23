@@ -4,11 +4,11 @@
 
 !include ..\Defines.mak
 
+build: configure .virtual
+    $(GIT_BASH_FOR_KEYMAN) build.sh build
+
 configure: .virtual
     $(GIT_BASH_FOR_KEYMAN) build.sh configure
-
-build: .virtual
-    $(GIT_BASH_FOR_KEYMAN) build.sh build
 
 clean: .virtual
     $(GIT_BASH_FOR_KEYMAN) build.sh clean

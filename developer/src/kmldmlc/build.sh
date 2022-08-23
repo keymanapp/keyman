@@ -23,7 +23,8 @@ builder_describe "Build Keyman LDML Keyboard Compiler kmldmlc" \
   "bundle        creates a bundled version of kmldmlc" \
   "test          run automated tests for kmldmlc" \
   "publish       publish to npm" \
-  "--dry-run     ???"
+  "--build-dir=BUILD_DIR  Build directory for bundle" \
+  "--dry-run,-n  Don't actually publish, just dry run"
 
 builder_parse "$@"
 
@@ -58,7 +59,8 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_has_action bundle; then
-  echo TODO: Bundle
+  . ./bundle.inc.sh
+  bundle "$BUILD_DIR"
   builder_report success bundle
 fi
 
