@@ -61,7 +61,7 @@ struct COMP_KMXPLUS_STRS {
    * @param entry entry number
    * @param buf output buffer
    * @param bufsiz buffer size in bytes
-   * @return NULL or a pointer to the output buffer
+   * @return nullptr or a pointer to the output buffer
    */
   PKMX_WCHAR get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz) const;
 };
@@ -133,14 +133,14 @@ static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched 
 static inline const COMP_KMXPLUS_HEADER *
 validate_as_section(const uint8_t *data, uint32_t ident) {
   if (!data) {
-    return NULL;
+    return nullptr;
   }
   const COMP_KMXPLUS_HEADER *all = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(data);
   // TODO-LDML these fail on 000null ..
   assert(all->size >= LDML_LENGTH_HEADER);
   assert(ident == all->ident);
   if (ident != all->ident || (all->size < LDML_LENGTH_HEADER)) {
-    return NULL;  // invalid header or wrong section
+    return nullptr;  // invalid header or wrong section
   }
   return all;
 }
