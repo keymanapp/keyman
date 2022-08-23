@@ -152,7 +152,7 @@ namespace com.keyman.osk {
   /**
    * Represents a "subsegmentation" - one part of a phase 1 segmentation split.
    */
-  interface Subsegmentation {
+  export interface Subsegmentation {
     /**
      * The stats for observations comprising the subsegment.
      */
@@ -476,19 +476,18 @@ namespace com.keyman.osk {
      */
     private steppedCumulativeStats: CumulativePathStats[];
 
-    /**
-     * Tracks all subsegments awaiting completion of their overall segment.
-     */
-    private lingeringSubsegmentations: Subsegmentation[];
+    // /**
+    //  * Tracks all subsegments awaiting completion of their overall segment.
+    //  */
+    // private lingeringSubsegmentations: Subsegmentation[];
 
     /**
-     * Represents the cumulative statistics of all points on the path
-     * that lie on parts preceding currently-incomplete Segments.
+     * Tracks the segment currently under construction.
      *
-     * This will not include components for any Subsegments held within
-     * `lingeringSubsegmentations`.
+     * May also model an "empty" tail on the touchpath in order to track
+     * which part of the path's accumulation is no longer under consideration.
      */
-    private lingeringBaseChop: CumulativePathStats = null;
+    private constructingSegment: ConstructingSegment = new ConstructingSegment(null);
 
     /**
      * TODO: These directly represent path segments produced by the prototype
@@ -498,18 +497,7 @@ namespace com.keyman.osk {
      * In follow-up work, this should be used to build & to update
      * cleaner, public-facing segment objects for the touch path.
      */
-    private _protoSegments: CumulativePathStats[] = [];
-
-    /**
-     * TODO: These directly represent the subsegments comprising their
-     * corresponding path segments (in `_protoSegments`) produced by the
-     * prototype algorithm.  Just... the stats analysis of each subsegment.
-     *
-     * In follow-up work, these should be used internally to build & update
-     * the internals of TBD cleaner, public-facing segment objects for the
-     * touch path.
-     */
-    private _protoSegmentSets: CumulativePathStats[][] = [];
+    private _protoSegments: ConstructingSegment[] = [];
 
     /**
      * Used to 'repeat' the most-recently observed incoming sample if no
@@ -534,7 +522,6 @@ namespace com.keyman.osk {
 
     constructor() {
       this.steppedCumulativeStats = [];
-      this.lingeringSubsegmentations = [];
     }
 
     /**
@@ -585,15 +572,16 @@ namespace com.keyman.osk {
       console.log("! Finalization !");
       // No need to check if this matches any predecessor subsegments; that already happened during
       // the last `performSubsegmentation` call.  There's no new data since then.
-      this.lingeringSubsegmentations.push(finalSubsegment);
+      this.constructingSegment.updatePendingPortion(finalSubsegment);
+      // As we're finalizing, we do NOT need to recall maintainRecentSegment.
+      this.constructingSegment.commitPendingPortion();
       this.finalizeSegment();
 
       // TODO:  these are temporary statements to facilitate exploration, experimentation, & debugging.
       //        We should be providing output to the touchpath object (`.path.segments`).
       //        But... that'll be left for a follow-up PR.
       console.log(this._protoSegments);
-      console.log(this._protoSegmentSets);
-      console.log(this._protoSegments.map((val) => (val.toJSON())));
+      console.log(this._protoSegments.map((val) => (val.committedInterval.toJSON())));
     }
 
     /**
@@ -811,6 +799,7 @@ namespace com.keyman.osk {
       console.log("best split: ");
       console.log(candidateSplit);
 
+      this.constructingSegment.updatePendingPortion(candidateSplit.pre);
       this.maintainRecentSegment(candidateSplit.pre);
 
       if(!candidateSplit.segmentationMerited) {
@@ -828,7 +817,7 @@ namespace com.keyman.osk {
 
       // TODO:  if there are no lingering segments, there is no corresponding Segment instance.
       //        Emit one!  (Class definition still pending at this time.)
-      this.lingeringSubsegmentations.push(candidateSplit.pre);
+      this.constructingSegment.commitPendingPortion();
       this.choppedStats = this.steppedCumulativeStats[splitPoint-1];
       this.steppedCumulativeStats = this.steppedCumulativeStats.slice(splitPoint);
 
@@ -836,26 +825,15 @@ namespace com.keyman.osk {
       //          Does the right-hand (still-constructing) subsegment appear reasonable to
       //          'link' with its predecessors?  If not, finalize the predecessors.
 
+      this.constructingSegment.updatePendingPortion(candidateSplit.post);
       this.maintainRecentSegment(candidateSplit.post);
     }
 
     private finalizeSegment() {
-      // This function makes a LOT of assumptions particular to this method and class.
-      // It is not safe to make this class-level, and it's especially unsafe to make it `public`.
-      const mergeSubsegmentationAccumulations = function(array: Subsegmentation[], baseChop: CumulativePathStats): CumulativePathStats {
-        if(array.length == 1) {
-          return array[0].stats; // It's pre-calculated, so just use it.
-        } else {
-          const finalSubsegmentation = array[array.length-1];
-          return finalSubsegmentation.endingAccumulation.deaccumulate(baseChop);
-        }
-      }
+      this.constructingSegment.finalize();
+      this._protoSegments.push(this.constructingSegment);
 
-      const finishedSegment = mergeSubsegmentationAccumulations(this.lingeringSubsegmentations, this.lingeringBaseChop);
-      this._protoSegments.push(finishedSegment);
-      this._protoSegmentSets.push(this.lingeringSubsegmentations.map((val) => val.stats));
-      this.lingeringSubsegmentations = [];
-      this.lingeringBaseChop = this.choppedStats;
+      this.constructingSegment = new ConstructingSegment(this.choppedStats);
 
       console.log("Proto-segments length: " + this._protoSegments.length);
     }
@@ -876,41 +854,26 @@ namespace com.keyman.osk {
      *                     else `true`.
      */
     private maintainRecentSegment(subsegmentation: Subsegmentation): boolean {
-      // This function is the primary reason for the outer function's stated assumptions.
-      // Said assumptions allow this helper to be far simpler than would otherwise be possible.
-      const getIntervalStats = function(array: Subsegmentation[], baseChop: CumulativePathStats): CumulativePathStats {
-        if(array.length == 1) {
-          // It's pre-calculated, so just use it.
-          // That said, the code in the `else` block will recompute this just fine.
-          return array[0].stats;
-        } else {
-          const finalSubsegmentation = array[array.length-1];
-          return finalSubsegmentation.endingAccumulation.deaccumulate(baseChop);
-        }
-      }
-
-      if(!this.lingeringSubsegmentations.length) {
+      if(!this.constructingSegment.subsegmentations.length) {
         return true;
       } else {
-        const baseChop = this.lingeringBaseChop;
-
         // First:  check if the newly-finished subsegment should be merged with the lingering ones.
-        const mergedPrecursors: Subsegmentation = {
-          stats:              getIntervalStats(this.lingeringSubsegmentations, baseChop),
-          endingAccumulation: subsegmentation.endingAccumulation
-        }
+        const mergedPrecursors: Subsegmentation = this.constructingSegment.committedIntervalAsSubsegmentation;
+        const tailUnion = this.constructingSegment.buildIntervalFromBase(subsegmentation.stats);
 
-        const tailUnion = getIntervalStats([...this.lingeringSubsegmentations, subsegmentation], baseChop);
         console.log("Verifying linkage to pending merges: ");
-        console.log(this.lingeringSubsegmentations);
+        console.log(this.constructingSegment.subsegmentations);
         console.log("verification check:");
         console.log(mergedPrecursors);
-        const precursorMergeSegmentation = new SegmentationSplit(mergedPrecursors, subsegmentation, tailUnion);
+        const precursorLinkSegmentationSplit = new SegmentationSplit(mergedPrecursors, subsegmentation, tailUnion);
         // Sometimes the start of a harsh turn seems like it's part of the same thing for a moment, but as it continues,
         // becomes something VERY different.  Validate that we should still merge the left-hand with its predecessors.
-        if(!PathSegmenter.shouldLinkSubsegments(precursorMergeSegmentation)) {
+        if(!PathSegmenter.shouldLinkSubsegments(precursorLinkSegmentationSplit)) {
           // Emit as separate subsegment.
           this.finalizeSegment();
+          this.constructingSegment.updatePendingPortion(subsegmentation);
+          // No need to recursively re-call ourselves - the new segment cannot have conflicting subsegments.
+          // But otherwise, the pattern does match.
 
           return false;
         } else {
