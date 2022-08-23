@@ -1,0 +1,37 @@
+#
+# Keyman Developer - LDML Keyboard Compiler Makefile
+#
+
+!include ..\Defines.mak
+
+configure: .virtual
+    $(GIT_BASH_FOR_KEYMAN) build.sh configure
+
+build: .virtual
+    $(GIT_BASH_FOR_KEYMAN) build.sh build
+
+clean: .virtual
+    $(GIT_BASH_FOR_KEYMAN) build.sh clean
+
+test: .virtual
+    $(GIT_BASH_FOR_KEYMAN) build.sh test
+
+bundle: .virtual
+    $(GIT_BASH_FOR_KEYMAN) build.sh bundle
+
+publish: .virtual
+    $(GIT_BASH_FOR_KEYMAN) build.sh publish
+
+signcode:
+    @rem nothing to do
+
+wrap-symbols:
+    @rem nothing to do
+
+test-manifest:
+    @rem nothing to do
+
+install:
+    @rem nothing to do
+
+!include ..\Target.mak
