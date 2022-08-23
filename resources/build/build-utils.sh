@@ -470,11 +470,15 @@ builder_describe() {
         local option_short="$(echo "$value" | cut -d, -f 2 -)"
         _builder_options+=($option_long)
         _builder_options_short[$option_short]="$option_long"
-        _builder_options_var[$option_long]="$option_var"
+        if [[ ! -z "$option_var" ]]; then
+          _builder_options_var[$option_long]="$option_var"
+        fi
         value="$option_long, $option_short"
       else
         _builder_options+=($value)
-        _builder_options_var[$value]="$option_var"
+        if [[ ! -z "$option_var" ]]; then
+          _builder_options_var[$value]="$option_var"
+        fi
       fi
 
       if [[ ! -z $option_var ]]; then
