@@ -211,7 +211,7 @@ ldml_processor::process_event(
         // len = (targetStart - out);
         assert(len>=1 && len <= 2);
       }
-      assert(len>=0);
+      assert(len>0);
       assert(len<BUFSIZ);
       assert(out[len] == 0); // null termination
 
