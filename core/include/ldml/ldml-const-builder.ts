@@ -34,5 +34,18 @@ for (const key of keys) {
         console.log(`#define LDML_${upkey} 0x${value.toString(16).toUpperCase()}`);
     } else if (type === 'string') {
         console.log(`#define LDML_${upkey} "${value}"`);
+    } else if (key === 'section') {
+        // handle section table
+        const subkeys = Object.keys(value);
+        subkeys.sort();
+        for (const subkey of subkeys) {
+            const upsubkey = subkey.toUpperCase();
+            const subvalue = subkeys[subkey];
+            const asnum = constants.hex_section_id(subkey);
+            console.log(`#define LDML_${upkey}ID_${upsubkey} 0x${asnum.toString(16).toUpperCase()} /* "${subkey}" */`);
+            console.log(`#define LDML_${upkey}NAME_${upsubkey}             "${subkey}"`);
+        }
+    } else if (type !== 'function') {
+        console.error(`Unrecognized key ${key}`);
     }
 }

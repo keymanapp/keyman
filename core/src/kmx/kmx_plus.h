@@ -167,7 +167,7 @@ validate_as_section(const uint8_t *data, uint32_t ident) {
  */
 static inline const COMP_KMXPLUS_SECT *
 as_kmxplus_sect(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_SECT);
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_SECT);
   return reinterpret_cast<const COMP_KMXPLUS_SECT *>(all);
 }
 
@@ -177,7 +177,7 @@ as_kmxplus_sect(const uint8_t *data) {
  */
 static inline const COMP_KMXPLUS_STRS *
 as_kmxplus_strs(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_STRS);
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_STRS);
   return reinterpret_cast<const COMP_KMXPLUS_STRS *>(all);
 }
 
@@ -187,7 +187,7 @@ as_kmxplus_strs(const uint8_t *data) {
  */
 static inline const COMP_KMXPLUS_KEYS *
 as_kmxplus_keys(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_KEYS);
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_KEYS);
   return reinterpret_cast<const COMP_KMXPLUS_KEYS *>(all);
 }
 /**
@@ -196,7 +196,7 @@ as_kmxplus_keys(const uint8_t *data) {
  */
 static inline const COMP_KMXPLUS_LOCA *
 as_kmxplus_loca(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_LOCA);
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_LOCA);
   return reinterpret_cast<const COMP_KMXPLUS_LOCA *>(all);
 }
 /**
@@ -205,7 +205,7 @@ as_kmxplus_loca(const uint8_t *data) {
  */
 static inline const COMP_KMXPLUS_META *
 as_kmxplus_meta(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_META);
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_META);
   return reinterpret_cast<const COMP_KMXPLUS_META *>(all);
 }
 /**
@@ -214,7 +214,7 @@ as_kmxplus_meta(const uint8_t *data) {
  */
 static inline const COMP_KMXPLUS_VKEY *
 as_kmxplus_vkey(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTION_VKEY);
+  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_VKEY);
   return reinterpret_cast<const COMP_KMXPLUS_VKEY *>(all);
 }
 

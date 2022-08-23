@@ -34,27 +34,15 @@ export const constants = {
      */
     length_header: 8,
     /**
-     * Section ID for the keybag
-     */
-    section_keys: 0x7379656B,
-    /**
      * Minimum length of the 'keys' section
      * not including variable parts
      */
     length_keys: 16,
     /**
-     * Section ID for the locale list
-     */
-    section_loca: 0x61636F6C,
-    /**
      * Minimum length of the 'loca' section
      * not including variable parts
      */
     length_loca: 12,
-    /**
-     * Section ID for the metadata
-     */
-    section_meta: 0x6174656D,
     /**
      * length of the 'meta' section
      */
@@ -72,17 +60,9 @@ export const constants = {
      */
     meta_settings_transformPartial_hide: 4,
     /**
-     * Section ID for the section header
-     */
-    section_sect: 0x74636573,
-    /**
      * Minimum length of the 'sect' section, not including entries
      */
     length_sect: 16,
-    /**
-     * Section ID for the string table
-     */
-    section_strs: 0x73727473,
     /**
      * Minimum length of the 'strs' section
      * not including variable parts
@@ -97,13 +77,38 @@ export const constants = {
      */
     keys_flags_extend: 1,
     /**
-     * Section ID for the vkeys map
-     */
-    section_vkey: 0x79656b76,
-    /**
      * Minimum length of the 'vkey' section
      * not including variable parts
      */
     length_vkey: 12,
+
+    /**
+     * All section IDs.
+     */
+    section: {
+        keys: 'keys',
+        loca: 'loca',
+        meta: 'meta',
+        sect: 'sect',
+        strs: 'strs',
+        vkey: 'vkey',
+    },
+
+    /**
+     * Use to convert 4-char string into hex
+     * @param id section id such as 'sect'
+     * @returns hex ID such as 0x74636573
+     */
+    hex_section_id: function(id:string) {
+        if(!id || typeof id !== 'string' || !id.match(/[a-z][a-z][a-z][a-z]/)) {
+            throw Error(`hex_section_id(${id}) - need a 4-character string`);
+        }
+        let r = 0;
+        for (let i = 3; i>=0; i--) {
+            r = (r << 8 | id.charCodeAt(i));
+        }
+        return r;
+    },
+
 };
 // }

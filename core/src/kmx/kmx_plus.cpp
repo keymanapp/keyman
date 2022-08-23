@@ -142,22 +142,22 @@ dump_kmxplus_sect(const uint8_t* data, const COMP_KMXPLUS_SECT* sect) {
     printf(" sect#%d: %X @ %X\n", i, entry.sect, entry.offset);
     const uint8_t* entrydata = (data+entry.offset);
     switch(entry.sect) {
-        case LDML_SECTION_KEYS:
+        case LDML_SECTIONID_KEYS:
             dump_kmxplus_keys(data, as_kmxplus_keys(entrydata));
             break;
-        case LDML_SECTION_LOCA:
+        case LDML_SECTIONID_LOCA:
             dump_kmxplus_loca(data, as_kmxplus_loca(entrydata));
             break;
-        case LDML_SECTION_META:
+        case LDML_SECTIONID_META:
             dump_kmxplus_meta(data, as_kmxplus_meta(entrydata));
             break;
-        case LDML_SECTION_SECT:
-            printf("! Cowardly refusing to dump nested 'sect' section.\n");
+        case LDML_SECTIONID_SECT:
+            printf("! Cowardly refusing to dump invalid nested 'sect' section.\n");
             break;
-        case LDML_SECTION_STRS:
+        case LDML_SECTIONID_STRS:
             dump_kmxplus_strs(data, as_kmxplus_strs(entrydata));
             break;
-        case LDML_SECTION_VKEY:
+        case LDML_SECTIONID_VKEY:
             dump_kmxplus_vkey(data, as_kmxplus_vkey(entrydata));
             break;
         default:

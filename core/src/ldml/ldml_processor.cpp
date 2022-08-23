@@ -175,17 +175,17 @@ ldml_processor::process_event(
       // Get out the SECT header
       const kmx::COMP_KMXPLUS_SECT *sect = kmx::as_kmxplus_sect(kmxplusdata);
       assert(sect != nullptr);
-      assert(sect->header.ident == LDML_SECTION_SECT);
+      assert(sect->header.ident == LDML_SECTIONID_SECT);
       KMX_DWORD offset;
       // Fill out the other sections we need.
-      offset = sect->find(LDML_SECTION_STRS);
+      offset = sect->find(LDML_SECTIONID_STRS);
       assert(offset != 0); // or else section not found
       const kmx::COMP_KMXPLUS_STRS *strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
-      assert(strs->header.ident == LDML_SECTION_STRS);
-      offset = sect->find(LDML_SECTION_KEYS);
+      assert(strs->header.ident == LDML_SECTIONID_STRS);
+      offset = sect->find(LDML_SECTIONID_KEYS);
       assert(offset != 0); // or else section not found
       const kmx::COMP_KMXPLUS_KEYS *keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
-      assert(keys->header.ident == LDML_SECTION_KEYS);
+      assert(keys->header.ident == LDML_SECTIONID_KEYS);
       // Look up the key
       const kmx::COMP_KMXPLUS_KEYS_ENTRY *key =  keys->find(vk, modifier_state);
       assert(key != nullptr);
