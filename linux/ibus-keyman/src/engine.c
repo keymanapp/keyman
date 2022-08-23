@@ -698,6 +698,7 @@ static gboolean
 process_end_action(IBusKeymanEngine *keyman) {
   g_assert(keyman != NULL);
   if (((IBusEngine *)keyman)->client_capabilities & IBUS_CAP_PREFILTER) {
+    guint state = keyman->commit_item->state;
     keyman->commit_item++;
     if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE-1]) {
       g_error("Overflow of keyman commit_queue!");
@@ -709,7 +710,12 @@ process_end_action(IBusKeymanEngine *keyman) {
     // generated will be processed before the character we're adding. We need to send a
     // valid keyval/keycode combination so that it doesn't get swallowed by GTK but which
     // isn't very likely used in real keyboards. F24 seems to work for that.
-    ibus_engine_forward_key_event((IBusEngine*)keyman, KEYMAN_NOCHAR_KEYSYM, KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL, IBUS_PREFILTER_MASK);
+    ibus_engine_forward_key_event((IBusEngine*)keyman,
+      KEYMAN_NOCHAR_KEYSYM,
+      KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL,
+      (state & IBUS_RELEASE_MASK)
+        ? IBUS_PREFILTER_MASK | IBUS_RELEASE_MASK
+        : IBUS_PREFILTER_MASK);
   } else {
     if (keyman->commit_item->char_buffer != NULL) {
       ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
