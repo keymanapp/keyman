@@ -35,13 +35,14 @@ bundle() {
 
   cd "$KEYMAN_LDMLKEYBOARDCOMPILER_TEMP"
 
-  # We use `npm pack` to extract only the aspects of the model-compiler actually
+  # We use `npm pack` to extract only the aspects of the compiler actually
   # needed for distribution. While we could use npm-bundle or similar, that adds
-  # extra, unwanted cruft; our approach gives us more control of the set of files
-  # distributed with the Keyman Developer installer.
+  # extra, unwanted cruft; our approach gives us more control of the set of
+  # files distributed with the Keyman Developer installer.
   #
-  # For users on other operating systems, node.js is a dependency and the compiler
-  # can be installed with `npm install @keymanapp/ldml-keyboard-compiler`.
+  # For users on other operating systems, node.js is a dependency and the
+  # compiler can be installed with `npm install
+  # @keymanapp/ldml-keyboard-compiler`.
 
   # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc
   # from harvesting

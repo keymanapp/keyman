@@ -16,8 +16,8 @@ clean: .virtual
 test: .virtual
     $(GIT_BASH_FOR_KEYMAN) build.sh test
 
-bundle: .virtual
-    $(GIT_BASH_FOR_KEYMAN) build.sh bundle
+# build.sh bundle must be run from shell as it requires a temp folder to be
+# passed in. See inst/download.in.mak for instantiation.
 
 publish: .virtual
     $(GIT_BASH_FOR_KEYMAN) build.sh publish
