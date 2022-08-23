@@ -3,12 +3,22 @@
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 bundle() {
-  local BUILD_PATH="$1"
-
-  if [[ -z $BUILD_PATH ]]; then
+  if [[ $# -eq 0 ]]; then
     echo "Parameter --build-path is required"
     exit 64
   fi
+
+  local BUILD_PATH="$1"
+
+  # Input may be from a Windows build script, so we'll use cygpath to translate
+  case $(uname) in
+    CYGWIN* )
+      BUILD_PATH=$(cygpath -u "$BUILD_PATH")
+      ;;
+    MINGW* )
+      BUILD_PATH=$(cygpath -u "$BUILD_PATH")
+      ;;
+  esac
 
   KEYMAN_WIX_TEMP_BASE="$BUILD_PATH"
   KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER="$BUILD_PATH/LDMLKeyboardCompiler"
