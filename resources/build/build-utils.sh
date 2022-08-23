@@ -27,6 +27,11 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
 # Setup variable for calling script's path and name
 if [ ! -z ${THIS_SCRIPT+x} ]; then
   THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
@@ -597,7 +602,10 @@ builder_parse() {
           _builder_parameter_error "$0" parameter "$key"
         fi
         # Set the variable associated with this option to the next parameter value
-        eval ${_builder_options_var[$key]}="$1"
+        # A little bit of hoop jumping here to avoid issues with cygwin paths being
+        # corrupted too early in the game
+        local varname=${_builder_options_var[$key]}
+        declare -g $varname="$1"
       fi
 
     else
