@@ -67,6 +67,7 @@ uses
   UfrmKeymanWizard,
   UfrmKeyboardFonts,
   UfrmMDIEditor,
+  UKeymanTargets,
   UmodWebHttpServer,
   Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.ServerUI,
@@ -133,7 +134,8 @@ begin
 
   if Result and
       TServerDebugAPI.Running and
-      TServerDebugAPI.IsKeyboardRegistered(ProjectFile.TargetFileName) then
+      TServerDebugAPI.IsKeyboardRegistered(ProjectFile.TargetFileName) and
+      (ProjectFile.Targets * KMWKeymanTargets <> []) then
     TestKeymanWeb(True);
 end;
 
@@ -235,7 +237,13 @@ begin
     Exit(False);
   wizard := editor as TfrmKeymanWizard;
 
+  if ProjectFile.Targets * KMWKeymanTargets = [] then
+    Exit(False);
+
   FCompiledName := ProjectFile.JSTargetFilename;
+  if FCompiledName = '' then
+    Exit(False);
+
   if not TestKeyboardState(FCompiledName, FSilent) then
     Exit(False);
 

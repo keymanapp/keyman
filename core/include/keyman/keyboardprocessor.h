@@ -110,13 +110,6 @@ extern "C"
 #endif
 // Basic types
 //
-#if defined(__cplusplus)
-typedef char16_t   km_kbp_cp;
-typedef char32_t   km_kbp_usv;
-#else
-typedef uint16_t    km_kbp_cp;          // code point
-typedef uint32_t    km_kbp_usv;         // Unicode Scalar Value
-#endif
 typedef uint16_t    km_kbp_virtual_key; // A virtual key code.
 typedef uint32_t    km_kbp_status;      // Status return code.
 
@@ -650,7 +643,7 @@ undefined. The returned buffer uses UTF-8 encoding.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 - `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 ##### Parameters:
-- __opts__: An opaque pointer to a state object.
+- __state__: An opaque pointer to a state object.
 - __buf__: A pointer to the buffer to place the C string containing the JSON
 document into, can be null.
 - __space__: A pointer to a size_t variable. This variable must contain the
@@ -793,7 +786,7 @@ km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
 Free the allocated memory belonging to a keyboard key list previously
 returned by `km_kbp_keyboard_get_key_list`.
 ##### Parameters:
-- __keyboard__: A pointer to the keyboard key list to be
+- __key_list__: A pointer to the keyboard key list to be
     disposed of.
 
 ```c
@@ -1127,10 +1120,6 @@ In the event the `state` pointer is null
 
 ##### Parameters:
 - __state__: A pointer to the opaque state object.
-- __vk__: A virtual key to be processed.
-- __modifier_state__:
-The combinations of modifier keys set at the time key `vk` was pressed, bitmask
-from the `km_kbp_modifier_state` enum.
 
 ```c
 */
