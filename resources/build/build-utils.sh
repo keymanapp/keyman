@@ -667,7 +667,6 @@ builder_display_usage() {
 
   for e in "${!_builder_params[@]}"; do
     if (( ${#e} > $width )); then
-      echo ${#e}
       width=${#e}
     fi
   done
