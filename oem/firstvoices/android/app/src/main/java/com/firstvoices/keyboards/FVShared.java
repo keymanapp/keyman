@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.packages.PackageProcessor;
@@ -252,7 +253,11 @@ final class FVShared {
         String helpUrl = String.format("%s%s", FVKeyboardHelpLink, id);
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(helpUrl));
-        localContext.startActivity(i);
+        if (i.resolveActivity(localContext.getPackageManager()) != null) {
+          localContext.startActivity(i);
+        } else {
+            Toast.makeText(localContext, localContext.getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void updateActiveKeyboardsList() {

@@ -3,10 +3,10 @@
 
     <!-- Device type  -->
     <string name="device_type" translatable="false">AndroidMobile</string>
-    
+
     <!-- Application name (Keyman Engine for Android) -->
     <string name="app_name" translatable="false">KMEA</string>
-    
+
     <!-- Context: Title for list -->
     <plurals name="title_keyboards">
       <item quantity="one">Keyboard</item>
@@ -267,4 +267,6 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Tap here to change keyboard</string>
 
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>
