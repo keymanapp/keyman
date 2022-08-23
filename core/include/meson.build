@@ -6,5 +6,5 @@
 # History:     6 Oct 2018 - TSE - Move into keyman folder.
 #
 
-inc = include_directories('.', is_system: true)
+inc = include_directories('.', '../../common/include', is_system: true)
 subdir('keyman')
