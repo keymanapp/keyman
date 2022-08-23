@@ -14,6 +14,14 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
+/**
+ * Using C99 flexible array initializers: entries[]
+ * https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-levels-2-and-4-c4200
+ */
+#if defined(_WIN32)
+#pragma warning ( disable : 4200 )
+#endif
+
 struct COMP_KMXPLUS_HEADER {
   KMX_DWORD ident;  // 0000 Section name
   KMX_DWORD size;   // 0004 Section length
@@ -122,6 +130,14 @@ struct COMP_KMXPLUS_VKEY {
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched size of section vkey");
+
+/**
+ * See above
+ */
+#if defined(_WIN32)
+#pragma warning ( default : 4200 )
+#endif
+
 
 /**
  * @brief Validate that this data is the named section.
