@@ -45,7 +45,7 @@ class CompilerCallbacks {
   }
 }
 
-function compileKeyboard(inputFilename: string): Buffer {
+function compileKeyboard(inputFilename: string): Uint8Array {
   const c = new CompilerCallbacks();
   const k = new Compiler(c);
   return k.compile(inputFilename);
