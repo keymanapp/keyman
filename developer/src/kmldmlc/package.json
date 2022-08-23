@@ -36,5 +36,9 @@
   },
   "mocha": {
     "spec": "build-tests/**/test-*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
   }
 }

@@ -16,7 +16,7 @@ Install `kmlmdlc` globally:
 Usage
 -----
 
-To compile a lexical model from its `.xml` source, use `kmldmlc`:
+To compile an LDML keyboard from its `.xml` source, use `kmldmlc`:
 
     kmldmlc my-keyboard.xml --outFile my-keyboard.kmx
 
