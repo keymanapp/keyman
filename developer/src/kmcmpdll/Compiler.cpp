@@ -1102,11 +1102,8 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   fk->cxStoreArray++;	// increment now, because GetXString refers to stores
 
   if (i > 0)
-  // needs to be changesd. was
-  if ((msg = ProcessSystemStore(fk, i, sp)) != CERR_None) return msg;
-    //if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;    //if ((msg = KMX_ProcessSystemStore_S2(fk, i, sp)) != CERR_None) return msg;
-    //return msg;
-  //return CERR_None;   //  _S2_ needs to be: return CheckForDuplicateStore(fk, sp);
+    if ((msg = ProcessSystemStore(fk, i, sp)) != CERR_None) return msg;
+    
   return CheckForDuplicateStore(fk, sp);
 }
 
@@ -3633,8 +3630,9 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   fp =_wfsopen((wchar_t*)szNewName, L"rb", _SH_DENYWR);                           //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   if ( fp == NULL)                                                    //if (hFile == INVALID_HANDLE_VALUE)
   {
-    //u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
-    //fp = fopen(( const PKMX_CHAR) szNewName, "rb");                   // _S2
+    // _S2 CAUTION !!  if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp ?!?!
+    u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
+                                                                      //fp = fopen(( const PKMX_CHAR) szNewName, "rb");                   // _S2
     fp = _wfsopen((const wchar_t*)szNewName, L"rb", _SH_DENYWR);                     //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if ( fp == NULL)                                                  // if (hFile == INVALID_HANDLE_VALUE)
       return CERR_CannotReadBitmapFile;
@@ -3825,7 +3823,7 @@ KMX_BOOL IsValidCallStore(PFILE_STORE fs)
 
 FILE* CreateTempFile()
 {
-  return tmpfile();
+  //return tmpfile();
   KMX_CHAR szTempPathBuffer[MAX_PATH], szTempFileName[MAX_PATH];   // I3228   // I3510
 
   if (!tmpfile())                                     // if (!GetTempPath(MAX_PATH, szTempPathBuffer))
@@ -3833,8 +3831,8 @@ FILE* CreateTempFile()
   if (!tmpnam(szTempPathBuffer))                      //  if (!GetTempFileName(szTempPathBuffer, "kmx", 0, szTempFileName))
     return NULL;                                      //    return INVALID_HANDLE_VALUE;     // I3228   // I3510
 
-  return  fopen(szTempFileName, "rb+");                //  return CreateFile(szTempFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
-  //return tmpfile();  //_S2_
+  //return  fopen(szTempFileName, "rb+");                //  return CreateFile(szTempFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
+  return tmpfile();  //_S2_
 }
 
 ///////////////////
