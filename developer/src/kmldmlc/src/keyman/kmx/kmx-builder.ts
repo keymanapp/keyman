@@ -1,6 +1,11 @@
 import KMXFile from './kmx';
 
-class MEM_KEYBOARD_HEADER {
+// These type-checking structures are here to ensure that
+// we match the structures from kmx.ts in the generator
+//
+// They are used internally when building a .kmx file
+
+interface BUILDER_COMP_KEYBOARD {
   dwIdentifier: number;
   dwFileVersion: number;
   dwCheckSum: number;
@@ -25,7 +30,7 @@ class MEM_KEYBOARD_HEADER {
   dwBitmapSize: number;
 };
 
-class MEM_KEYBOARD_KMXPLUSINFO {
+interface BUILDER_COMP_KEYBOARD_KMXPLUSINFO {
   dpKMXPlus: number;
   dwKMXPlusSize: number;
 };
@@ -36,7 +41,7 @@ export default class KMXBuilder {
     this.file = file;
   }
 
-  compiledHeader(): MEM_KEYBOARD_HEADER {
+  compiledHeader(): BUILDER_COMP_KEYBOARD {
     return {
       dwIdentifier: KMXFile.FILEID_COMPILED,
       dwFileVersion: KMXFile.VERSION_160,
@@ -57,7 +62,7 @@ export default class KMXBuilder {
     };
   }
 
-  compiledKMXPlusHeader(): MEM_KEYBOARD_KMXPLUSINFO {
+  compiledKMXPlusHeader(): BUILDER_COMP_KEYBOARD_KMXPLUSINFO {
     return {
       dpKMXPlus: 0,
       dwKMXPlusSize: 0
