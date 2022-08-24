@@ -167,7 +167,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 }
 
 BOOL
-ProcessActionsTestParse(BOOL* emitKeyStroke) {
+ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) {
     return FALSE;
@@ -184,12 +184,15 @@ ProcessActionsTestParse(BOOL* emitKeyStroke) {
     switch (act->type) {
     case KM_KBP_IT_EMIT_KEYSTROKE:
       *emitKeyStroke = TRUE;
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsTestParse EMIT_KEYSTROKE: act->type=%d", act->type);
+      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse EMIT_KEYSTROKE: act->type=[%d]", act->type);
       continueProcessingActions = TRUE;
       _td->CoreProcessEventRun = FALSE; // If we emit the key stroke on this parse we don't need the second parse
       break;
     case KM_KBP_IT_CAPSLOCK:
       continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable);
+      break;
+    case KM_KBP_IT_INVALIDATE_CONTEXT:
+      continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
       break;
     }
     if (!continueProcessingActions) {

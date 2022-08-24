@@ -18,6 +18,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.BaseActivity;
@@ -113,7 +114,11 @@ public class KMPBrowserActivity extends BaseActivity {
 
           // All links that aren't internal Keyman keyboard links open in user's browser
           Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-          startActivity(intent);
+          if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+          } else {
+            Toast.makeText(context, getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+          }
           return true;
         }
         if (lowerURL.startsWith("keyman:")) {

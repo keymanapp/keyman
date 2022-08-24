@@ -94,7 +94,7 @@ builder_parse_test() {
   shift
   shift
   local parameters="$@"
-  echo "Testing: builder_parse $parameters"
+  echo "${COLOR_BLUE}## Testing: builder_parse $parameters${COLOR_RESET}"
   builder_parse $parameters || fail "builder_parse died under curious circumstances"
   if [[ "$expected" != "${_builder_chosen_action_targets[@]}" ]]; then
     fail "  Test: builder_parse $parameters action:target != \"$expected\""
@@ -112,7 +112,8 @@ builder_describe \
   ":app" \
   ":engine      Thomas, y'know" \
   "--power,-p   Use powerful mode" \
-  "--zoom,-z    Use zoom mode"
+  "--zoom,-z    Use zoom mode" \
+  "--feature=FOO Enable feature foo"
 
 # Test --options
 
@@ -130,6 +131,21 @@ if builder_has_option --zoom; then
   echo "PASS: --zoom option found"
 else
   fail "FAIL: --zoom option not found"
+fi
+
+# Test --feature <foo>
+
+echo "${COLOR_BLUE}## Testing: builder_parse --feature xyzzy${COLOR_RESET}"
+builder_parse --feature xyzzy
+
+if builder_has_option --feature; then
+  if [[ $FOO == xyzzy ]]; then
+    echo "PASS: --feature option variable \$FOO has expected value 'xyzzy'"
+  else
+    echo "FAIL: --feature option variable \$FOO had value '$FOO' but should have had 'xyzzy'"
+  fi
+else
+  echo "FAIL: --feature option not found"
 fi
 
 # Finally, run with --help so we can see what it looks like
