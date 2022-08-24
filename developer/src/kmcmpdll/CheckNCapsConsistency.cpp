@@ -1,10 +1,9 @@
-#pragma once
-#include <pch.h>
+#include "pch.h"
 
-#include <Compfile.h>
-#include <comperr.h>   
+#include <compfile.h>
+#include <comperr.h>
 #include <kmcmpdll.h>
-#include <CharToKeyConversion.h>
+#include "CharToKeyConversion.h"
 
 /**
  * If any rule uses CAPS or NCAPS for a given key, then every rule that

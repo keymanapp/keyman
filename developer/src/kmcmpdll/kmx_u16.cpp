@@ -1,4 +1,3 @@
-#pragma once
 #include <../../kmcompx/include/kmcompx.h>
 #include <kmx_u16.h>
 //#include "../../../common/windows/cpp/include/xstring.h"

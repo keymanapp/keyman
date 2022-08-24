@@ -1,9 +1,9 @@
 
-#include <pch.h>
+#include "pch.h"
 
-#include <Compfile.h>
+#include <compfile.h>
 #include <comperr.h>
-#include <kmcmpdll.h> 
+#include <kmcmpdll.h>
 #include <io.h>
 #include <string>
 #include <CheckFilenameConsistency.h>

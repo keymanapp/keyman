@@ -1,9 +1,9 @@
 
-#include <pch.h>
+#include "pch.h"
 
-#include <Compfile.h>
+#include <compfile.h>
 #include <comperr.h>
-#include <../../../common/windows/cpp/include/vkeys.h>
+#include "../../../common/windows/cpp/include/vkeys.h"
 #include <kmcmpdll.h>
 
 #include "CharToKeyConversion.h"
