@@ -6,14 +6,15 @@ namespace com.keyman.osk {
    */
   export class ConstructingSegment {
     /**
-     * Marks the accumulated stats on the touchpath that precede the in-construction Segment.
+     * Marks previously-accumulated stats on the touchpath for the portion that precedes
+     * the in-construction Segment.
      */
-    private readonly preIntervalAccumulation: CumulativePathStats;
+    readonly baseAccumulation: CumulativePathStats;
 
     /**
      * Notes all subsegments identified as part of the overall segment being constructed.
      */
-    subsegmentations: Subsegmentation[] = [];  // TODO:  `private`?
+    private subsegmentations: Subsegmentation[] = [];
 
     /**
      * Marks a potential follow-up subsegment.  This portion is not automatically
@@ -21,10 +22,11 @@ namespace com.keyman.osk {
      */
     private pendingSubsegmentation: Subsegmentation = null;
 
-    constructor(preIntervalAccumulation: CumulativePathStats,) {
-      this.preIntervalAccumulation = preIntervalAccumulation;
+    constructor(preIntervalAccumulation: CumulativePathStats, initialPendingSubsegment: Subsegmentation) {
+      this.baseAccumulation = preIntervalAccumulation;
 
       this.subsegmentations = [];
+      this.pendingSubsegmentation = initialPendingSubsegment;
     }
 
     /**
@@ -34,7 +36,7 @@ namespace com.keyman.osk {
      * @returns
      */
     public buildIntervalFromBase(accumulation: CumulativePathStats) {
-      return accumulation.deaccumulate(this.preIntervalAccumulation);
+      return accumulation.deaccumulate(this.baseAccumulation);
     }
 
     /**
@@ -70,34 +72,117 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Denotes the currently in-construction subsegment that **may** be included in the
-     * Segment.
+     * Checks if the committed portion of the constructing segment are "compatible" with
+     * a potential following subsegment.  Appending said subsegment may not change the
+     * 'type' of segment being constructed or certain properties of it.
+     *
+     * @returns `true` if compatible, `false` if not.
+     */
+    public isCompatible(subsegment: Subsegmentation): boolean {
+      if(this.subsegmentations.length == 0) {
+        return true;
+      }
+
+      const committed = this.committedIntervalAsSubsegmentation;
+
+      const preStats = committed.stats;
+      const postStats = subsegment.stats;
+
+      // // Known case #1:
+      // //   Near-identical direction, but heavy speed difference.
+      // //   Speed's still high enough to not be a 'wait'.
+      // //   We may want to 'note' the higher speed; that may be relevant for flick detection.
+      // // Known case #2:
+      // //   Low-speed pivot; angle change caught on very low velocity for both subsegments.
+      // //   ... or should this be merged?  Multiple mini-segments from 'wiggling' could just go ignored instead...
+
+      // This is kinda plain and arbitrary, but it seems to work "well enough" for now,
+      // at least at this stage of development.  (Most testing was done with Chrome emulation of
+      // an iPhone SE.)
+
+      // TODO:  where to move logging, if doing so
+      console.log("Verifying linkage to pending merges: ");
+      console.log(this.subsegmentations);
+      console.log("verification check:");
+      console.log(this.committedIntervalAsSubsegmentation);
+      // TODO:  end of "where to move"
+
+      // .mean('v') < 0.08:  the mean speed (taken timestamp to timestamp) does not exceed 0.08px/millisec.
+      if(preStats.mean('v') < 0.08 && postStats.mean('v') > 0.08) {
+        console.log("desegmentation exception");
+        return false;
+      }
+      if(preStats.mean('v') > 0.08 && postStats.mean('v') < 0.08) {
+        console.log("desegmentation exception");
+        return false;
+      }
+
+      if(preStats.cardinalDirection == postStats.cardinalDirection &&
+        // TODO:  base this on 'detected as move', not 'not a confirmed hold'.
+        preStats.mean('v') > 0.08 && postStats.mean('v') > 0.08) {
+        // Same cardinal direction + recognized move?
+
+        console.log("subsegments are both moving sufficiently quickly in the same direction:  will remerge");
+        return true;
+      }
+
+      const segmentationSplit = new SegmentationSplit(committed, subsegment, this.buildIntervalFromBase(subsegment.endingAccumulation));
+
+      // TODO:  where to move logging, if preserving it?
+      console.log("Desegmentation under consideration: ");
+      console.log(segmentationSplit);
+
+      const xF = segmentationSplit.segReg('x', 'y');
+      const yF = segmentationSplit.segReg('y', 'x');
+      console.log(`merger F-test (xy): F_(${xF.fDoF1}, ${xF.fDoF2}) = ${xF.fStat} @ ${xF.certaintyThreshold}`);
+      console.log(`merger F-test (yx): F_(${yF.fDoF1}, ${yF.fDoF2}) = ${yF.fStat} @ ${yF.certaintyThreshold}`);
+      console.log(`will remerge: ${segmentationSplit.mergeMerited}`);
+      // TODO:  end of "where to move"
+
+      return segmentationSplit.mergeMerited;
+    }
+
+    /**
+     * Call this to denote the current state of an in-construction subsegment that **will** be included
+     * in the final Segment once completed if it does not diverge.
      *
      * If the pending subsegment appears to belong to the current Segment, it contains valuable info
      * about the state of the as-of-yet unresolved Segment, including the most recent location
      * of the corresponding touchpoint.
      * @param subsegmentation
      */
-    public updatePendingPortion(subsegmentation: Subsegmentation) {
-      // Would be awfully convenient if setting the value here auto-triggered an update of the
-      // public-facing Segment.
-      //
-      // But, CURRENTLY, it's set here first, then a check for compatibility is run.
+    public updatePendingSubsegment(subsegmentation: Subsegmentation) {
+      // TODO:  neat updates & events.
       this.pendingSubsegmentation = subsegmentation;
     }
 
-    public commitPendingPortion() {
+    /**
+     * Call to clear a previously-tracked in-construction subsegment that has diverged and is no
+     * longer compatible.
+     */
+    public clearPendingSubsegment() {
+      // Probably does not need to trigger an event; if called, there's a new, follow-up segment
+      // coming that will maintain the current coordinate with its events instead.  Assuming
+      // the need to rely on Segment events for that; even that's better off handled with path.coords
+      // events instead.
+      this.pendingSubsegmentation = null;
+    }
+
+    public commitPendingSubsegment() {
       if(this.pendingSubsegmentation) {
         this.subsegmentations.push(this.pendingSubsegmentation);
-        this.clearPendingPortion();
+        this.pendingSubsegmentation = null;
       } else {
         throw "Illegal state - `commitPendingPortion` should never be called with nothing pending.";
       }
     }
 
     public finalize() {
-      // does NOT include an uncommited pending portion!
-      this.pendingSubsegmentation = null;
+      if(this.pendingSubsegmentation) {
+        this.commitPendingSubsegment();
+      }
+
+      // TODO: fully 'recognize' the Segment.
     }
 
     // Obviously, needs better specification.  'hold' / 'move' / 'unknown'?
