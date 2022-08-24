@@ -1,10 +1,10 @@
 <!-- TODO: this is not yet a valid keyboard file
 
   Note that the corresponding .kmx is currently
-  hand-crafted and semi-valid.
+  hand-crafted and invalid
 
-@@keys: [K_A][K_B][K_C]
-@@expect-error: 4
+@@keys: [K_Q][K_W][K_A]
+@@expected: FAIL.FAIL.FAIL.
 
 -->
 <keyboard />

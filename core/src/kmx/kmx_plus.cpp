@@ -27,8 +27,8 @@ namespace kmx {
 static void
 dump_section_name(KMX_DWORD ident) {
   for (int i = 0; i < 4; i++) {
-    putchar((ident & 0xFF000000) >> 24);
-    ident <<= 8;
+    putchar(ident & 0xFF);
+    ident >>= 8;
   }
 }
 

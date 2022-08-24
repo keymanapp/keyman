@@ -33,7 +33,7 @@ ldml = executable('ldml',
     objects: lib.extract_all_objects())
 
 tests = [
-  # '000_null_keyboard',
+  '000_null_keyboard',
   '001_tiny'
 ]
 
