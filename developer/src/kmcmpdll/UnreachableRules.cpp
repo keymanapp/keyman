@@ -1,6 +1,5 @@
 
 #include "pch.h"
-
 #include <compfile.h>
 #include <comperr.h>
 #include "../../../common/windows/cpp/include/vkeys.h"
