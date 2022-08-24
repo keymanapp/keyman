@@ -126,7 +126,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      const segmentationSplit = new SegmentationSplit(committed, subsegment, this.buildIntervalFromBase(subsegment.endingAccumulation));
+      const segmentationSplit = new SegmentationSplit(committed, subsegment, this.baseAccumulation);
 
       // TODO:  where to move logging, if preserving it?
       console.log("Desegmentation under consideration: ");
