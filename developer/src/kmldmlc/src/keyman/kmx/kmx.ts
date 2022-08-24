@@ -263,10 +263,11 @@ export default class KMXFile {
   public static readonly K_MODIFIERFLAG    = 0x007F;
   public static readonly K_NOTMODIFIERFLAG = 0xFF00;   // I4548
 
-  public static readonly KEYBOARDFILEHEADER_SIZE = 64;
-  public static readonly KEYBOARDFILESTORE_SIZE  = 12;
-  public static readonly KEYBOARDFILEGROUP_SIZE  = 24;
-  public static readonly KEYBOARDFILEKEY_SIZE    = 20;
+  public static readonly COMP_KEYBOARD_SIZE = 64;
+  public static readonly COMP_KEYBOARD_KMXPLUSINFO_SIZE = 8;
+  public static readonly COMP_STORE_SIZE  = 12;
+  public static readonly COMP_GROUP_SIZE  = 24;
+  public static readonly COMP_KEY_SIZE    = 20;
 
   /* In-memory representation of the keyboard */
 
@@ -281,13 +282,13 @@ export default class KMXFile {
     // Binary-correct structures matching kmx_file.h
 
     this.COMP_STORE = new r.Struct({
-      dwSystemID: r.uint32,
-      dpName: r.uint32,
-      dpString: r.uint32
+      dwSystemID: r.uint32le,
+      dpName: r.uint32le,
+      dpString: r.uint32le
     });
 
-    if(this.COMP_STORE.size() != KMXFile.KEYBOARDFILESTORE_SIZE) {
-      throw "COMP_STORE size is "+this.COMP_STORE.size()+" but should be "+KMXFile.KEYBOARDFILESTORE_SIZE+" bytes";
+    if(this.COMP_STORE.size() != KMXFile.COMP_STORE_SIZE) {
+      throw "COMP_STORE size is "+this.COMP_STORE.size()+" but should be "+KMXFile.COMP_STORE_SIZE+" bytes";
     }
 
     this.COMP_KEY = new r.Struct({
@@ -299,8 +300,8 @@ export default class KMXFile {
       dpContext: r.uint32le
     });
 
-    if(this.COMP_KEY.size() != KMXFile.KEYBOARDFILEKEY_SIZE) {
-      throw "COMP_KEY size is "+this.COMP_KEY.size()+" but should be "+KMXFile.KEYBOARDFILEKEY_SIZE+" bytes";
+    if(this.COMP_KEY.size() != KMXFile.COMP_KEY_SIZE) {
+      throw "COMP_KEY size is "+this.COMP_KEY.size()+" but should be "+KMXFile.COMP_KEY_SIZE+" bytes";
     }
 
     this.COMP_GROUP = new r.Struct({
@@ -312,14 +313,18 @@ export default class KMXFile {
       fUsingKeys: r.uint32le   // group(xx) [using keys] <-- specified or not
     });
 
-    if(this.COMP_GROUP.size() != KMXFile.KEYBOARDFILEGROUP_SIZE) {
-      throw "COMP_GROUP size is "+this.COMP_GROUP.size()+" but should be "+KMXFile.KEYBOARDFILEGROUP_SIZE+" bytes";
+    if(this.COMP_GROUP.size() != KMXFile.COMP_GROUP_SIZE) {
+      throw "COMP_GROUP size is "+this.COMP_GROUP.size()+" but should be "+KMXFile.COMP_GROUP_SIZE+" bytes";
     }
 
     this.COMP_KEYBOARD_KMXPLUSINFO = new r.Struct({
       dpKMXPlus: r.uint32le,      // 0040 offset of KMXPlus data, <sect> header is first
       dwKMXPlusSize: r.uint32le  // 0044 size in bytes of entire KMXPlus data
     });
+
+    if(this.COMP_KEYBOARD_KMXPLUSINFO.size() != KMXFile.COMP_KEYBOARD_KMXPLUSINFO_SIZE) {
+      throw "COMP_KEYBOARD_KMXPLUSINFO size is "+this.COMP_KEYBOARD_KMXPLUSINFO.size()+" but should be "+KMXFile.COMP_KEYBOARD_KMXPLUSINFO_SIZE+" bytes";
+    }
 
     this.COMP_KEYBOARD = new r.Struct({
       dwIdentifier: r.uint32le,   // 0000 Keyman compiled keyboard id
@@ -348,8 +353,8 @@ export default class KMXFile {
       dwBitmapSize: r.uint32le   // 003C size in bytes of the bitmaps
     });
 
-    if(this.COMP_KEYBOARD.size() != KMXFile.KEYBOARDFILEHEADER_SIZE) {
-      throw "COMP_KEYBOARD size is "+this.COMP_KEYBOARD.size()+" but should be "+KMXFile.KEYBOARDFILEHEADER_SIZE+" bytes";
+    if(this.COMP_KEYBOARD.size() != KMXFile.COMP_KEYBOARD_SIZE) {
+      throw "COMP_KEYBOARD size is "+this.COMP_KEYBOARD.size()+" but should be "+KMXFile.COMP_KEYBOARD_SIZE+" bytes";
     }
   }
 }

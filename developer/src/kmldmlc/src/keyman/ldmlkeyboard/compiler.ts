@@ -27,7 +27,7 @@ export default class Compiler {
     // TODO: transform LDMLXMLSourceFile to the kmx data
 
     // Use the builder to generate the binary output file
-    let builder = new KMXBuilder(kmx);
+    let builder = new KMXBuilder(kmx, true);
     return builder.compile();
   }
 }
