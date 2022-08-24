@@ -18,12 +18,12 @@ BOOL ProcessActions(BOOL* emitKeyStroke);
 
 /**
  * This function process the actions queued in the core processor in
- * the non updateable parse of a keystroke.
- * Emit keystroke and capslock are required to be processed in this phase.
+ * the non-updateable parse of a keystroke.
+ * Emit keystroke, capslock and possibly invalidate key stroke are required to be processed in this parse.
  *
  * @param  [in, out] emitKeyStroke  is set to true if requested by the core action queue
  * @return BOOL  True if actions were successfully processed
  */
-BOOL ProcessActionsTestParse(BOOL* emitKeyStroke);
+BOOL ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke);
 
 #endif

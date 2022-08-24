@@ -105,7 +105,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
                 }
                 else {
                     Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(i);
+                    if (i.resolveActivity(getPackageManager()) != null) {
+                        startActivity(i);
+                    } else {
+                      Toast.makeText(context, getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 return true;
