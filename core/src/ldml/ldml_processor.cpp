@@ -8,8 +8,8 @@
 #include <fstream>
 #include "ldml/ldml_processor.hpp"
 #include "state.hpp"
-#include "../kmx/kmx_file.h"
-#include "../kmx/kmx_plus.h"
+#include "kmx/kmx_file.h"
+#include "kmx/kmx_plus.h"
 #include "ldml/keyboardprocessor_ldml.h"
 
 // extern "C" {
@@ -28,6 +28,10 @@ enum ConversionFlags {
 typedef KMX_WCHAR UTF16;
 typedef KMX_DWORD UTF32;
 
+/**
+ * This is a temporary patch for now.
+ * API surface somewhat modelled after ConvertUTF.h
+ */
 ConversionResult ConvertUTF32toUTF16(
 		UTF32** sourceStart, const UTF32* sourceEnd,
 		UTF16** targetStart, const UTF16* targetEnd, const ConversionFlags /*flags*/) {
@@ -170,21 +174,21 @@ ldml_processor::process_event(
       const uint8_t* kmxplusdata = rawdata.data() + ex->kmxplus.dpKMXPlus;
       // Get out the SECT header
       const kmx::COMP_KMXPLUS_SECT *sect = kmx::as_kmxplus_sect(kmxplusdata);
-      assert(sect != NULL);
-      assert(sect->header.ident == LDML_SECTION_SECT);
+      assert(sect != nullptr);
+      assert(sect->header.ident == LDML_SECTIONID_SECT);
       KMX_DWORD offset;
       // Fill out the other sections we need.
-      offset = sect->find(LDML_SECTION_STRS);
+      offset = sect->find(LDML_SECTIONID_STRS);
       assert(offset != 0); // or else section not found
       const kmx::COMP_KMXPLUS_STRS *strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
-      assert(strs->header.ident == LDML_SECTION_STRS);
-      offset = sect->find(LDML_SECTION_KEYS);
+      assert(strs->header.ident == LDML_SECTIONID_STRS);
+      offset = sect->find(LDML_SECTIONID_KEYS);
       assert(offset != 0); // or else section not found
       const kmx::COMP_KMXPLUS_KEYS *keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
-      assert(keys->header.ident == LDML_SECTION_KEYS);
+      assert(keys->header.ident == LDML_SECTIONID_KEYS);
       // Look up the key
       const kmx::COMP_KMXPLUS_KEYS_ENTRY *key =  keys->find(vk, modifier_state);
-      assert(key != NULL);
+      assert(key != nullptr);
       if (!key) {
         return KM_KBP_STATUS_KEY_ERROR;
       }
@@ -193,7 +197,7 @@ ldml_processor::process_event(
       KMX_WCHAR out[BUFSIZ];
       if (key->flags && LDML_KEYS_FLAGS_EXTEND) {
         // It's a string.
-        assert(NULL != strs->get(key->to, out, BUFSIZ));
+        assert(nullptr != strs->get(key->to, out, BUFSIZ));
         // u_strlen()
         for(len=0; len<BUFSIZ && out[len]; len++);
       } else {
@@ -211,7 +215,7 @@ ldml_processor::process_event(
         // len = (targetStart - out);
         assert(len>=1 && len <= 2);
       }
-      assert(len>=0);
+      assert(len>0);
       assert(len<BUFSIZ);
       assert(out[len] == 0); // null termination
 
