@@ -36,13 +36,13 @@ fi
 
 if builder_has_action build; then
   # Generate index.ts
-  npx tsc -b ../../include/ldml/
+  npx tsc -b ../../include/ldml/tsconfig.build.json
 
   builder_report success build
 fi
 
 if builder_has_action run; then
-  node ../../include/ldml/build/core/include/ldml/ldml-const-builder.js > ${KBP_LDML_H_FILE}
+  node ../../include/ldml/ldml-const-builder/ldml-const-builder.js > ${KBP_LDML_H_FILE}
   echo "Updated ${KBP_LDML_H_FILE}"
 
   builder_report success run
