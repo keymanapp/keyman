@@ -22,7 +22,7 @@
                     20 Nov 2012 - mcdurdin - I3584 - V9.0 - IntRecursiveDeleteKey needed a buf len reset after each iteration
 */
 
-#include <pch.h>
+#include "pch.h"
 #include "../include/registry.h"
 
 RegistryReadOnly::RegistryReadOnly(HKEY AhRootKey)

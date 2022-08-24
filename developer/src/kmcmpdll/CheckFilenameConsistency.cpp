@@ -1,7 +1,7 @@
 
-#include <pch.h>
+#include "pch.h"
 
-#include <Compfile.h>
+#include <compfile.h>
 #include <comperr.h>
 #include <kmcmpdll.h> 
 #include <io.h>

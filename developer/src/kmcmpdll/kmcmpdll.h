@@ -1,7 +1,7 @@
 #pragma once
 
-#include <windows.h>
-#include "compfile.h"
+//#include <windows.h>
+#include <compfile.h>
 
 KMX_BOOL AddCompileString(LPSTR buf);
 KMX_BOOL AddCompileMessage(KMX_DWORD msg);

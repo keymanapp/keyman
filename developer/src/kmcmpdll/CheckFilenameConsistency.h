@@ -1,5 +1,6 @@
+#pragma once
 
-#include <windows.h>
+//#include <windows.h>
 #include <Compfile.h>
 
 // _S2 commented out functionality because I have no idea how to change to use with char16_t on non-windows platforms

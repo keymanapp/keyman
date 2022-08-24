@@ -1,8 +1,8 @@
 
-#include <pch.h>
-#include <Compfile.h>
+#include "pch.h"
+#include <compfile.h>
 #include <comperr.h>
-#include <../../../common/windows/cpp/include/vkeys.h>
+#include "../../../common/windows/cpp/include/vkeys.h"
 #include <kmcmpdll.h>
 
 #include <unordered_map>
@@ -10,7 +10,7 @@
 #include <string>
 #include <sstream>
 
-#include <UnreachableRules.h>
+#include "UnreachableRules.h"
 
 std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
   std::wstringstream key;

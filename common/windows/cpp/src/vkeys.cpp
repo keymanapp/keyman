@@ -16,7 +16,7 @@
   History:          22 Mar 2010 - mcdurdin - Compiler fixup - tidy up
 */
 
-#include <pch.h>
+#include "pch.h"
 #include "../include/vkeys.h"
 
  const KMX_UCHAR* VKeyNames[256] = { 

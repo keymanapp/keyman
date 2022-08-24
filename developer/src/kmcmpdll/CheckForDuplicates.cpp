@@ -1,16 +1,15 @@
-#pragma once
 
-#include "pch.h"
+#include <pch.h>
 
-#include <Compfile.h>
+#include <compfile.h>
 #include <comperr.h>
 #include <kmcmpdll.h>
-#include "xstring.h"
-#include "kmx_u16.h"
+#include <xstring.h>
+#include <kmx_u16.h>
 
 #include <kmcompx.h>
 
-#include <CheckForDuplicates.h>
+#include "CheckForDuplicates.h"
 
 
 KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
