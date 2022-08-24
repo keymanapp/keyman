@@ -105,6 +105,7 @@ static void
 dump_kmxplus_strs(const uint8_t* /*data*/, const COMP_KMXPLUS_STRS* strs) {
   if (strs == nullptr) {
     printf("! could not load 'strs' section\n");
+    return;
   }
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)strs);
   printf("strs: count 0x%X\n", strs->count);
