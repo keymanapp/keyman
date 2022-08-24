@@ -12,7 +12,6 @@
   "workspaces": [
     "resources/gosh",
     "resources/build/version",
-    "core/include/ldml",
     "developer/src/kmlmc",
     "developer/src/kmldmlc",
     "developer/src/server",
