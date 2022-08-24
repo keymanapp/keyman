@@ -41,6 +41,7 @@ namespace com.keyman.osk {
 
     /**
      * Returns the stats accumulation covering all currently-committed subsegments.
+     * May be `null` if there are no committed subsegments.
      */
     public get committedInterval(): CumulativePathStats {
       return this.committedIntervalAsSubsegmentation.stats;
@@ -54,7 +55,8 @@ namespace com.keyman.osk {
       if(this.subsegmentations.length == 0) {
         return {
           stats: null,
-          endingAccumulation: null
+          endingAccumulation: null,
+          baseAccumulation: this.baseAccumulation
         };
       } else {
         const tailSub = this.subsegmentations[this.subsegmentations.length - 1];
@@ -62,7 +64,8 @@ namespace com.keyman.osk {
 
         return {
           stats: this.buildIntervalFromBase(tail),
-          endingAccumulation: tail
+          endingAccumulation: tail,
+          baseAccumulation: this.baseAccumulation
         };
       }
     }
@@ -126,18 +129,10 @@ namespace com.keyman.osk {
         return true;
       }
 
-      const segmentationSplit = new SegmentationSplit(committed, subsegment, this.baseAccumulation);
+      const segmentationSplit = new SegmentationSplit(committed, subsegment);
 
-      // TODO:  where to move logging, if preserving it?
-      console.log("Desegmentation under consideration: ");
-      console.log(segmentationSplit);
-
-      const xF = segmentationSplit.segReg('x', 'y');
-      const yF = segmentationSplit.segReg('y', 'x');
-      console.log(`merger F-test (xy): F_(${xF.fDoF1}, ${xF.fDoF2}) = ${xF.fStat} @ ${xF.certaintyThreshold}`);
-      console.log(`merger F-test (yx): F_(${yF.fDoF1}, ${yF.fDoF2}) = ${yF.fStat} @ ${yF.certaintyThreshold}`);
-      console.log(`will remerge: ${segmentationSplit.mergeMerited}`);
-      // TODO:  end of "where to move"
+      // TODO:  remove for production / feature-branch merge
+      segmentationSplit._debugLogAlignmentReport();
 
       return segmentationSplit.mergeMerited;
     }
@@ -183,19 +178,6 @@ namespace com.keyman.osk {
       }
 
       // TODO: fully 'recognize' the Segment.
-    }
-
-    // Obviously, needs better specification.  'hold' / 'move' / 'unknown'?
-    public type(): string {
-      return undefined;
-    }
-
-    public get isEmpty(): boolean {
-      if(this.subsegmentations.length != 0) {
-        return false;
-      } else {
-        return this.pendingSubsegmentation == null
-      }
     }
   }
 }

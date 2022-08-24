@@ -1,19 +1,13 @@
 /// <reference path="cumulativePathStats.ts" />
 
-/* FIXME:  Too much `console`.
+/* FIXME:  There exists code emitting to the `console` at present.
+ * Do not release before fixing this.
  *
- * There's an AWFUL LOT of `console.log`-ing in this file at present.
- * It was definitely useful for prototyping & development of its (and
- * of `cumulativePathStats`'s) code, but it's GOTTA be cleaned up
- * in the next PR... if not sooner.
+ * Developer's note:  for debugging the algorithm seen in this file,
+ * CTRL+F `_debugLogPath` and its notes.
  */
 
 namespace com.keyman.osk {
-  // Note:  the only `export`-ed class from this file is `PathSegmenter`, hence the helper
-  // classes being placed within the same file.  Not to say we _couldn't_ put them elsewhere.
-
-  // ------------
-
   // Mostly used here to compare the sum-squared error components of segmented regressions
   // to the sum-squared "modeled" components of their overall variance.  Those are the two
   // "independent random variables" we're examining.  Variances (which are sums of squared
@@ -163,6 +157,12 @@ namespace com.keyman.osk {
      * accumulated components that precede the subsegment entirely.
      */
     endingAccumulation: CumulativePathStats;
+
+    /**
+     * The cumulative stats up to the point before the subsegment's start
+     * point, not including any accumulation for components within the subsegment.
+     */
+    baseAccumulation: CumulativePathStats;
   }
 
   /**
@@ -364,14 +364,17 @@ namespace com.keyman.osk {
       get certaintyThreshold() {
         return 1 - FDistribution.thresholdTier(this.fStat, this.fDoF1, this.fDoF2);
       }
+
+      get prettyPrint(): string {
+        return `F_(${this.fDoF1}, ${this.fDoF2}) = ${this.fStat} @ ${this.certaintyThreshold}`
+      }
     }
 
     constructor(pre: Subsegmentation,
-                post: Subsegmentation,
-                baseAccumulation: CumulativePathStats) {
+                post: Subsegmentation) {
       this.pre = pre;
       this.post = post;
-      this.union = post.endingAccumulation.deaccumulate(baseAccumulation);
+      this.union = post.endingAccumulation.deaccumulate(pre.baseAccumulation);
     }
 
     static fromTrackedStats(steppedStats: CumulativePathStats[],
@@ -379,18 +382,21 @@ namespace com.keyman.osk {
                             splitIndex: number) {
       let intervalEndStats = steppedStats[splitIndex];
       const pre: Subsegmentation = {
-      stats:              intervalEndStats.deaccumulate(baseAccumulation),
-      endingAccumulation: intervalEndStats
+        stats:              intervalEndStats.deaccumulate(baseAccumulation),
+        endingAccumulation: intervalEndStats,
+        baseAccumulation:   baseAccumulation
       };
 
       // Keep stats value components based on the final point of the 'pre' segment.
       intervalEndStats = steppedStats[steppedStats.length-1];
+      const postBaseAccumulation = steppedStats[splitIndex-1];
       const post: Subsegmentation = {
-      stats:              intervalEndStats.deaccumulate(steppedStats[splitIndex-1]),
-      endingAccumulation: intervalEndStats
+        stats:              intervalEndStats.deaccumulate(postBaseAccumulation),
+        endingAccumulation: intervalEndStats,
+        baseAccumulation:   postBaseAccumulation
       }
 
-      return new SegmentationSplit(pre, post, baseAccumulation);
+      return new SegmentationSplit(pre, post);
     }
 
     /**
@@ -448,6 +454,41 @@ namespace com.keyman.osk {
 
       return yTest.certaintyThreshold == 0;
     }
+
+    public _debugLogSplitReport(demarcate?: boolean) {
+      if(demarcate) {
+        console.log("------------------------------------------------------------------");
+      }
+
+      console.log("Split object: ");
+      console.log(this);
+
+      console.log();
+
+      const xF = this.segReg('x', 't');
+      const yF = this.segReg('y', 't');
+      console.log(`x F-test: ${xF.prettyPrint}`);
+      console.log(`y F-test: ${yF.prettyPrint}`);
+
+      console.log();
+
+      if(demarcate) {
+        console.log("------------------------------------------------------------------");
+      }
+    }
+
+    public _debugLogAlignmentReport() {
+      console.log("Desegmentation under consideration: ");
+      console.log(this);
+
+      console.log();
+
+      const xF = this.segReg('x', 'y');
+      const yF = this.segReg('y', 'x');
+      console.log(`merger F-test (xy): ${xF.prettyPrint}`);
+      console.log(`merger F-test (yx): ${yF.prettyPrint}`);
+      console.log(`will remerge: ${this.mergeMerited}`);
+    }
   }
 
   /**
@@ -485,11 +526,6 @@ namespace com.keyman.osk {
      */
     private steppedCumulativeStats: CumulativePathStats[];
 
-    // /**
-    //  * Tracks all subsegments awaiting completion of their overall segment.
-    //  */
-    // private lingeringSubsegmentations: Subsegmentation[];
-
     /**
      * Tracks the segment currently under construction.
      *
@@ -504,7 +540,7 @@ namespace com.keyman.osk {
      * public-facing Segment to their corresponding TrackedPath, but this has
      * not yet been implemented.
      */
-    private _protoSegments: ConstructingSegment[] = [];
+    private segmentConstructors: ConstructingSegment[] = [];
 
     /**
      * Used to 'repeat' the most-recently observed incoming sample if no
@@ -573,10 +609,10 @@ namespace com.keyman.osk {
       const finalAccumulation = this.steppedCumulativeStats[this.steppedCumulativeStats.length - 1]
       let finalSubsegment: Subsegmentation = {
         stats:              finalAccumulation.deaccumulate(this.choppedStats),
-        endingAccumulation: finalAccumulation
+        endingAccumulation: finalAccumulation,
+        baseAccumulation:   this.choppedStats
       }
 
-      console.log("! Finalization !");
       // No need to check if this matches any predecessor subsegments; that already happened during
       // the last `performSubsegmentation` call.  There's no new data since then.
       // (Actually... this should already be in place now, after recent changes!)
@@ -585,11 +621,29 @@ namespace com.keyman.osk {
       this.constructingSegment.commitPendingSubsegment();
       this.finalizeSubsegment();
 
-      // TODO:  these are temporary statements to facilitate exploration, experimentation, & debugging.
+      // TODO:  this is a temporary statement to facilitate exploration, experimentation, & debugging.
       //        We should be providing output to the touchpath object (`.path.segments`).
       //        But... that'll be left for a follow-up PR.
-      console.log(this._protoSegments);
-      console.log(this._protoSegments.map((val) => (val.committedInterval.toJSON())));
+      this._debugLogPath();
+    }
+
+    // TODO:  goal - support a 'debug event' or some-such that emits the constructors for
+    // debugging analysis without directly needing to `console.log`.
+    private _debugLogPath() {
+      /*
+       * Debugging assistance notes:  in many modern browsers, you can right-click a logged object
+       * and say to "Store object as global variable", giving you console access to the array logged
+       * below.
+       *
+       * From there, you can use this line to examine the debug-log reports for any contiguous
+       * Subsegment pair like this, where `temp1` is the name auto-assigned by the "store object" command:
+       *
+       * `new com.keyman.osk.SegmentationSplit(temp1[1].subsegmentations[0], temp1[1].subsegmentations[1])`
+       *
+       * Note that they won't quite be the _same_ answers you'd get while in-process, but it should give useful
+       * info nonetheless.
+       */
+      console.log(this.segmentConstructors);
     }
 
     /**
@@ -617,32 +671,6 @@ namespace com.keyman.osk {
       this.performSubsegmentation();
     }
 
-    private static _debugLogSegmentationReport(candidateSplit: SegmentationSplit) {
-      console.log("------------------------------------------------------------------");
-
-      console.log("Combined: ");
-      console.log(candidateSplit.union.toJSON());
-      console.log("Pre: ")
-      console.log(candidateSplit.pre.stats.toJSON());
-      console.log("Post: ");
-      console.log(candidateSplit.post.stats.toJSON());
-
-      console.log();
-
-      const xF = candidateSplit.segReg('x', 't');
-      const yF = candidateSplit.segReg('y', 't');
-      console.log(`x F-test: F_(${xF.fDoF1}, ${xF.fDoF2}) = ${xF.fStat} @ ${xF.certaintyThreshold}`);
-      console.log(`y F-test: F_(${yF.fDoF1}, ${yF.fDoF2}) = ${yF.fStat} @ ${yF.certaintyThreshold}`);
-
-      console.log();
-
-      console.log("Split object: ");
-      console.log(candidateSplit);
-
-      console.log("------------------------------------------------------------------");
-        // END:  DO NOT RELEASE.
-    }
-
     // The "reported via event" aspect mentioned below is necessary because this may be
     // called via setTimeout callback on a held touchpoint.  We need that `setTimeout`
     // (which replicates the most recently-seen input coordinate) in order to have good
@@ -660,7 +688,6 @@ namespace com.keyman.osk {
       // STEP 1:  Determine the range of the initial sliding time window for the most recent samples.
 
       if(unsegmentedDuration < this.SLIDING_WINDOW_INTERVAL * 2) {
-        console.log("Interval too short for segmentation.");
         return;
       }
 
@@ -682,25 +709,11 @@ namespace com.keyman.osk {
       // STEP 2:  given the proposed time window, do we have a basis for segmentation?  And is there a better
       // candidate split point nearby?
 
-      // NOTE:  During initial development, I actually had a hard rule about not even searching if segmentation
-      // failed on the initially-constructed sliding window.  Some analysis may be wise here, as it'd be nice
-      // to optimize away the 'need to search' if we can find hard & fast rules about when we'll never need
-      // to go looking.  But... being too aggressive can cause nasty problems.
-
-      if(!candidateSplit.segmentationMerited) {
-        // // Debug logging statements:
-        const xTest = candidateSplit.segReg('x', 't');
-        const yTest = candidateSplit.segReg('y', 't');
-        console.log(`x F-test: F_(${xTest.fDoF1}, ${xTest.fDoF2}) = ${xTest.fStat} @ ${xTest.certaintyThreshold}`);
-        console.log(`y F-test: F_(${yTest.fDoF1}, ${yTest.fDoF2}) = ${yTest.fStat} @ ${yTest.certaintyThreshold}`);
-
-        console.log("candidate split: " );
-        console.log(candidateSplit);
-      }
-
       // We either have the conditions to trigger segmentation or just became long enough to consider it.
       // If we're only just long enough to consider it, there may be a better segmentation point to start with.
-      // Now... is there a better segmentation point?
+      // Now... is there a better segmentation point?  But first... how do we facilitate searching for one?
+
+      // Start:  split-point search helper local-class.
       class SplitSearchState {
         readonly xTest: typeof SegmentationSplit.segmentationComparison.prototype;
         readonly yTest: typeof SegmentationSplit.segmentationComparison.prototype;
@@ -735,6 +748,11 @@ namespace com.keyman.osk {
       }
 
       // Start:  split-point search
+
+      // NOTE:  During initial development, I actually had a hard rule about not even searching if segmentation
+      // failed on the initially-constructed sliding window.  Some analysis may be wise here, as it'd be nice
+      // to optimize away the 'need to search' if we can find hard & fast rules about when we'll never need
+      // to go looking.  But... being too aggressive can cause nasty problems.
 
       /* We'll use our initial sliding window as a starting point.  It's close to the active location
        * of the touch, so we're unlikely to miss a proper segmentation point if it lies close.
@@ -785,7 +803,6 @@ namespace com.keyman.osk {
           } else if(!nextSplit.segmentationMerited && currentSplit.segmentationMerited) {
             // Note:  this can happen if segmentation is triggered due to divergence on both axes
             // if one of them drops a threshold tier and the other fails to improve sufficiently.
-            console.warn("aborting split-point relocation due to no longer segmenting");
             break;
           } else {
             splitPoint += delta;
@@ -797,29 +814,17 @@ namespace com.keyman.osk {
       }
       // Step 2 complete.
 
-      // Step 3:  verify whether or not we'd still maintain a link with any previous (lingering) subsegments were
-      //          we to perform subsegmentation here.
+      // Step 3:  evaluate validity of the left-hand subsegment reasonably continuing the in-construction segment.
       //          A classic example case:  same direction, different speeds.
-      //
-      // If the link wasn't maintained, then this function will finalize the related Segment.
-      // Also, set up a new Segment.
-      console.log("best split: ");
-      console.log(candidateSplit);
 
       this.updateSegmentConstruction(candidateSplit.pre);
-
-      if(!candidateSplit.segmentationMerited) {
-        return;
-      }
 
       // First phase of segmentation:  complete!
       // Step 4:  basic bookkeeping.
 
-      // FIXME: DO NOT RELEASE.
-      // This is exploratory / diagnostic code assisting development of the path segmentation
-      // algorithm.
-      PathSegmenter._debugLogSegmentationReport(candidateSplit);
-      // END:  DO NOT RELEASE.
+      if(!candidateSplit.segmentationMerited) {
+        return;
+      }
 
       this.constructingSegment.commitPendingSubsegment();
       this.choppedStats = this.steppedCumulativeStats[splitPoint-1];
@@ -835,9 +840,7 @@ namespace com.keyman.osk {
     private finalizeSubsegment() {
       if(this.constructingSegment) {
         this.constructingSegment.finalize();
-        this._protoSegments.push(this.constructingSegment);
-
-        console.log("Proto-segments length: " + this._protoSegments.length);
+        this.segmentConstructors.push(this.constructingSegment);
       }
     }
 
