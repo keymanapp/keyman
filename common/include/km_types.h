@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 /*
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf

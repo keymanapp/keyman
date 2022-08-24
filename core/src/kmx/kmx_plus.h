@@ -7,7 +7,9 @@
 #pragma once
 
 #include <assert.h>
-#include <kmx/kmx_file.h>
+#include <km_types.h>
+#include <kmx/kmx_base.h>
+#include <kmx_file.h>
 #include <ldml/keyboardprocessor_ldml.h>
 
 namespace km {
