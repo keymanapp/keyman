@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 
 /*
 #if defined(_WIN32) || defined(_WIN64)
