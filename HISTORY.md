@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.50 alpha 2022-08-23
+
+* chore(core): Remove obsolete python keyboardprocessor (#7094)
+
 ## 16.0.49 alpha 2022-08-22
 
 * fix: remove saving and restoring context kbd options (#7077)
