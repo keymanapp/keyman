@@ -19,7 +19,10 @@
 // TODO-LDML: namespace com.keyman.core.ldml {
 /**
  * Constants for the KMXPlus data format
- * These are shared between the data access layer and the compiler
+ * These are shared between the data access layer and the compiler.
+ * Note that the section IDs (section_keys etc.) are 32 bit hex
+ * values that are designed to appear as text when written in little endian
+ * format, so 0x7379656b = 'keys'
  */
 export const constants = {
     /**
@@ -31,27 +34,15 @@ export const constants = {
      */
     length_header: 8,
     /**
-     * Section ID for the keybag
-     */
-    section_keys: 'keys',
-    /**
      * Minimum length of the 'keys' section
      * not including variable parts
      */
     length_keys: 16,
     /**
-     * Section ID for the locale list
-     */
-    section_loca: 'loca',
-    /**
      * Minimum length of the 'loca' section
      * not including variable parts
      */
     length_loca: 12,
-    /**
-     * Section ID for the metadata
-     */
-    section_meta: 'meta',
     /**
      * length of the 'meta' section
      */
@@ -69,17 +60,9 @@ export const constants = {
      */
     meta_settings_transformPartial_hide: 4,
     /**
-     * Section ID for the section header
-     */
-    section_sect: 'sect',
-    /**
      * Minimum length of the 'sect' section, not including entries
      */
     length_sect: 16,
-    /**
-     * Section ID for the string table
-     */
-    section_strs: 'strs',
     /**
      * Minimum length of the 'strs' section
      * not including variable parts
@@ -94,13 +77,38 @@ export const constants = {
      */
     keys_flags_extend: 1,
     /**
-     * Section ID for the vkeys map
-     */
-    section_vkey: 'vkey',
-    /**
      * Minimum length of the 'vkey' section
      * not including variable parts
      */
     length_vkey: 12,
+
+    /**
+     * All section IDs.
+     */
+    section: {
+        keys: 'keys',
+        loca: 'loca',
+        meta: 'meta',
+        sect: 'sect',
+        strs: 'strs',
+        vkey: 'vkey',
+    },
+
+    /**
+     * Use to convert 4-char string into hex
+     * @param id section id such as 'sect'
+     * @returns hex ID such as 0x74636573
+     */
+    hex_section_id: function(id:string) {
+        if(!id || typeof id !== 'string' || !id.match(/[a-z][a-z][a-z][a-z]/)) {
+            throw Error(`hex_section_id(${id}) - need a 4-character string`);
+        }
+        let r = 0;
+        for (let i = 3; i>=0; i--) {
+            r = (r << 8 | id.charCodeAt(i));
+        }
+        return r;
+    },
+
 };
 // }

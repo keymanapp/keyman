@@ -4,12 +4,14 @@
   Implementation for the KMX Plus utilities
 */
 
+#include <km_types.h>
+#include <kmx_file.h>
 #include <kmx/kmx_plus.h>
 
 /**
  * @def KMXPLUS_DEBUG Set to 1 to enable debug output
  */
-#define KMXPLUS_DEBUG 1
+#define KMXPLUS_DEBUG 0
 
 #if KMXPLUS_DEBUG
 #include <stdio.h>
@@ -32,8 +34,9 @@ dump_section_name(KMX_DWORD ident) {
 
 static void
 dump_kmxplus_header(const COMP_KMXPLUS_HEADER* hdr) {
-  if (hdr == NULL) {
+  if (hdr == nullptr) {
     printf("! dump_kmxplus_header: NULL header\n");
+    return;
   }
   dump_section_name(hdr->ident);
   printf(": (%X) size 0x%X\n", hdr->ident, hdr->size);
@@ -41,7 +44,7 @@ dump_kmxplus_header(const COMP_KMXPLUS_HEADER* hdr) {
 
 static void
 dump_kmxplus_keys(const uint8_t* /*data*/, const COMP_KMXPLUS_KEYS* keys) {
-  if(keys == NULL) {
+  if(keys == nullptr) {
     printf("! could not load 'keys' section\n");
     return;
   }
@@ -63,7 +66,7 @@ dump_kmxplus_keys(const uint8_t* /*data*/, const COMP_KMXPLUS_KEYS* keys) {
 
 static void
 dump_kmxplus_loca(const uint8_t* /*data*/, const COMP_KMXPLUS_LOCA* loca) {
-  if(loca == NULL) {
+  if(loca == nullptr) {
     printf("! could not load 'loca' section\n");
     return;
   }
@@ -76,7 +79,7 @@ dump_kmxplus_loca(const uint8_t* /*data*/, const COMP_KMXPLUS_LOCA* loca) {
 
 static void
 dump_kmxplus_meta(const uint8_t* /*data*/, const COMP_KMXPLUS_META* meta) {
-  if(meta == NULL) {
+  if(meta == nullptr) {
     printf("! could not load 'meta' section\n");
     return;
   }
@@ -92,7 +95,7 @@ dump_kmxplus_meta(const uint8_t* /*data*/, const COMP_KMXPLUS_META* meta) {
 
 static void
 dump_kmxplus_vkey(const uint8_t* /*data*/, const COMP_KMXPLUS_VKEY* vkey) {
-  if(vkey == NULL) {
+  if (vkey == nullptr) {
     printf("! could not load 'vkey' section\n");
     return;
   }
@@ -102,6 +105,10 @@ dump_kmxplus_vkey(const uint8_t* /*data*/, const COMP_KMXPLUS_VKEY* vkey) {
 
 static void
 dump_kmxplus_strs(const uint8_t* /*data*/, const COMP_KMXPLUS_STRS* strs) {
+  if (strs == nullptr) {
+    printf("! could not load 'strs' section\n");
+    return;
+  }
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)strs);
   printf("strs: count 0x%X\n", strs->count);
   for (KMX_DWORD i=0; i<strs->count; i++) {
@@ -113,10 +120,10 @@ dump_kmxplus_strs(const uint8_t* /*data*/, const COMP_KMXPLUS_STRS* strs) {
         continue;
     }
     for(int j=0; str[j] && j<0x30; j++) {
-        if (str[j] < 0x7F && str[j] != 0x0020 && str[j] > 0x20) {
+        if (str[j] < 0x7F && str[j] > 0x20) {
             putchar(str[j]);
         } else {
-            printf("U+%04X ", str[j]);
+            printf(" U+%04X ", str[j]);
         }
     }
     printf("\n");
@@ -125,6 +132,9 @@ dump_kmxplus_strs(const uint8_t* /*data*/, const COMP_KMXPLUS_STRS* strs) {
 
 static void
 dump_kmxplus_sect(const uint8_t* data, const COMP_KMXPLUS_SECT* sect) {
+  if (sect == nullptr) {
+    printf("! could not load 'sect' section\n");
+  }
   dump_kmxplus_header((const COMP_KMXPLUS_HEADER*)sect);
   printf("sect: total 0x%X\n", sect->total);
   printf("sect: count 0x%X\n", sect->count);
@@ -135,22 +145,22 @@ dump_kmxplus_sect(const uint8_t* data, const COMP_KMXPLUS_SECT* sect) {
     printf(" sect#%d: %X @ %X\n", i, entry.sect, entry.offset);
     const uint8_t* entrydata = (data+entry.offset);
     switch(entry.sect) {
-        case LDML_SECTION_KEYS:
+        case LDML_SECTIONID_KEYS:
             dump_kmxplus_keys(data, as_kmxplus_keys(entrydata));
             break;
-        case LDML_SECTION_LOCA:
+        case LDML_SECTIONID_LOCA:
             dump_kmxplus_loca(data, as_kmxplus_loca(entrydata));
             break;
-        case LDML_SECTION_META:
+        case LDML_SECTIONID_META:
             dump_kmxplus_meta(data, as_kmxplus_meta(entrydata));
             break;
-        case LDML_SECTION_SECT:
-            printf("! Cowardly refusing to dump nested 'sect' section.\n");
+        case LDML_SECTIONID_SECT:
+            printf("! Cowardly refusing to dump invalid nested 'sect' section.\n");
             break;
-        case LDML_SECTION_STRS:
+        case LDML_SECTIONID_STRS:
             dump_kmxplus_strs(data, as_kmxplus_strs(entrydata));
             break;
-        case LDML_SECTION_VKEY:
+        case LDML_SECTIONID_VKEY:
             dump_kmxplus_vkey(data, as_kmxplus_vkey(entrydata));
             break;
         default:
@@ -160,21 +170,31 @@ dump_kmxplus_sect(const uint8_t* data, const COMP_KMXPLUS_SECT* sect) {
 }
 #endif
 
+#if !KMXPLUS_DEBUG
+void
+dump_kmxplus_data(const uint8_t* ) {
+  // no op
+}
+
+void
+dump_kmxplus_data(kmx::PCOMP_KEYBOARD) {
+  // no op
+}
+
+#else
+
 void
 dump_kmxplus_data(const uint8_t* data) {
-#if KMXPLUS_DEBUG
   const COMP_KMXPLUS_SECT* sect = as_kmxplus_sect(data);
-  if (sect == NULL) {
-    printf("Err: 'sect' null from %p\n", data);
+  if (sect == nullptr) {
+    printf("Err: 'sect' NULL from %p\n", data);
     return;
   }
   dump_kmxplus_sect(data, sect);
-#endif
 }
 
 void
 dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
-#if KMXPLUS_DEBUG
   printf("dump_kmxplus_data(): Got a PCOMP_KEYBOARD at %p\n", keyboard);
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
     printf("Err: flags KF_KMXPLUS not set\n");
@@ -185,8 +205,8 @@ dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
   printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
   const uint8_t* rawdata = reinterpret_cast<const uint8_t*>(keyboard);
   dump_kmxplus_data(rawdata + ex->kmxplus.dpKMXPlus);
-#endif
 }
+#endif
 
 const COMP_KMXPLUS_KEYS_ENTRY *COMP_KMXPLUS_KEYS::find(KMX_DWORD vkey, KMX_DWORD mod) const {
     // TODO-LDML: eventually, assume sorted order & binary search
@@ -195,7 +215,7 @@ const COMP_KMXPLUS_KEYS_ENTRY *COMP_KMXPLUS_KEYS::find(KMX_DWORD vkey, KMX_DWORD
             return &entries[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
@@ -211,7 +231,7 @@ PKMX_WCHAR
 COMP_KMXPLUS_STRS::get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz) const {
     assert(entry < count);
     if (entry >= count) {
-        return NULL;
+        return nullptr;
     }
     KMX_DWORD offset = entries[entry].offset;
     KMX_DWORD length = entries[entry].length;

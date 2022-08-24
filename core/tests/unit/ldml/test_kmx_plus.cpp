@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
-#include <kmx/kmx_plus.h>
+#include "kmx/kmx_plus.h"
 
 using namespace km::kbp::kmx;
 

@@ -42,4 +42,6 @@
     <!-- Context: KMP Package strings -->
     <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Invalid/Missing metadata in package</string>
 
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>
