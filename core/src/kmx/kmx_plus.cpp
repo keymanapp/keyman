@@ -4,6 +4,8 @@
   Implementation for the KMX Plus utilities
 */
 
+#include <km_types.h>
+#include <kmx_file.h>
 #include <kmx/kmx_plus.h>
 
 /**

@@ -8,7 +8,7 @@
 #include <fstream>
 #include "ldml/ldml_processor.hpp"
 #include "state.hpp"
-#include "kmx/kmx_file.h"
+#include "kmx_file.h"
 #include "kmx/kmx_plus.h"
 #include "ldml/keyboardprocessor_ldml.h"
 
