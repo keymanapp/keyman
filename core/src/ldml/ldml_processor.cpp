@@ -65,11 +65,17 @@ namespace kbp {
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), rawdata(data) // TODO-LDML: parse the data, don't just copy it
+  ), _valid(false), rawdata(data) // TODO-LDML: parse the data, don't just copy it
 {
   // TODO-LDML: load the file from the buffer (KMXPlus format)
   // Note: kb_path is essentially debug metadata here
   assert(data.size() != 0);
+
+  const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)data.data();
+
+  if (validate_kmxplus_data(comp_keyboard)) {
+    _valid = true;
+  }
 }
 
 bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>& data) {
@@ -104,9 +110,6 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
   if(comp_keyboard->dwFileVersion < VERSION_160 || (comp_keyboard->dwFlags & KF_KMXPLUS) == 0) {
     return false;
   }
-
-  // Dump data. This also does some validation.
-  dump_kmxplus_data(comp_keyboard);
 
   // A KMXPlus file is in the buffer (although more validation is required)
   return true;
@@ -253,7 +256,9 @@ km_kbp_context_item * ldml_processor::get_intermediate_context() {
   return citems;
 }
 
-km_kbp_status ldml_processor::validate() const { return KM_KBP_STATUS_OK; }
+km_kbp_status ldml_processor::validate() const {
+  return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
+}
 
 } // namespace kbp
 } // namespace km

@@ -21,6 +21,7 @@ namespace kbp {
 
   class ldml_processor : public abstract_processor {
   private:
+    bool _valid;
     std::vector<uint8_t> rawdata; // TODO-LDML: should be 'unpacked' format instead.
   public:
     ldml_processor(
