@@ -89,7 +89,7 @@ export default class KMXBuilder {
     return [base, base + string.length * 2 + 2]; // include trailing zero
   }
 
-  prepareFileBuffers() {
+  private build() {
     this.base_keyboard = 0;
     this.base_kmxplus = 0;
 
@@ -195,27 +195,24 @@ export default class KMXBuilder {
       groupBase += KMXFile.COMP_GROUP_SIZE;
     }
 
-    size += this.calculateBitmapSize();
-    size += this.calculateKMXPlusSize(size);
+    size += this.buildBitmap();
+    size += this.buildKMXPlus(size);
 
     return size;
   }
 
-  calculateBitmapSize() {
+  buildBitmap() {
     // TODO
     return 0;
   }
 
-  calculateKMXPlusSize(base: number) {
+  buildKMXPlus(base: number) {
     if(!(this.file instanceof KMXPlusFile)) {
       return 0;
     }
 
     const plusbuilder: KMXPlusBuilder = new KMXPlusBuilder(this.file, this.writeDebug);
     this.comp_kmxplus_data = plusbuilder.compile();
-
-    // Reserve space for KMXPlus header; we'll come back and fill in details
-    // once we know base kmx file size.
     this.comp_kmxplus = {
       dpKMXPlus: base,
       dwKMXPlusSize: this.comp_kmxplus_data.length
@@ -242,7 +239,7 @@ export default class KMXBuilder {
   }
 
   compile(): Uint8Array {
-    const fileSize = this.prepareFileBuffers();
+    const fileSize = this.build();
 
     let file: Uint8Array = new Uint8Array(fileSize);
 
