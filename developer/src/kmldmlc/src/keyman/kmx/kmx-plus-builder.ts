@@ -23,7 +23,7 @@ interface BUILDER_STRS_ITEM {
   // While we use length which is number of utf-16 code units excluding null terminator,
   // we always write a null terminator, so we can get restructure to do that for us here
   offset: number; //? new r.Pointer(r.uint32le, new r.String(null, 'utf16le')),
-  length: number;
+  length: number; // in UTF-16 code units
   _value: string
 };
 
@@ -73,22 +73,30 @@ interface BUILDER_VKEY extends BUILDER_SECTION {
 
 
 export default class KMXPlusBuilder {
-  file: KMXPlusFile;
-  writeDebug: boolean;
+  private file: KMXPlusFile;
+  //private writeDebug: boolean;
 
-  constructor(file: KMXPlusFile, writeDebug: boolean) {
+  constructor(file: KMXPlusFile, _writeDebug: boolean) {
     this.file = file;
-    this.writeDebug = writeDebug;
+    //this.writeDebug = _writeDebug;
   }
 
-  sect_sect: BUILDER_SECT;
-  sect_strs: BUILDER_STRS;
-  sect_meta: BUILDER_META;
-  sect_loca: BUILDER_LOCA;
-  sect_keys: BUILDER_KEYS;
-  sect_vkey: BUILDER_VKEY;
+  private sect_sect: BUILDER_SECT;
+  private sect_strs: BUILDER_STRS;
+  private sect_meta: BUILDER_META;
+  private sect_loca: BUILDER_LOCA;
+  private sect_keys: BUILDER_KEYS;
+  private sect_vkey: BUILDER_VKEY;
 
-  alloc_string(value: string) {
+  private alloc_string(value: string) {
+    if(typeof value != 'string') {
+      if(value === undefined || value === null) {
+        value = '';
+      } else {
+        throw 'unexpected value '+value;
+      }
+    }
+
     let idx = this.sect_strs.items.findIndex(v => v._value == value);
     if(idx >= 0) {
       return idx;
@@ -100,10 +108,10 @@ export default class KMXPlusBuilder {
       offset: 0 // will be filled in later
     };
 
-    return this.sect_strs.items.push(item);
+    return this.sect_strs.items.push(item) - 1;
   }
 
-  build_sect(): BUILDER_SECT {
+  private build_sect(): BUILDER_SECT {
     return {
       ident: constants.hex_section_id(constants.section.sect),
       size: 0, // finalized later
@@ -114,7 +122,7 @@ export default class KMXPlusBuilder {
     };
   }
 
-  build_strs(): BUILDER_STRS {
+  private build_strs(): BUILDER_STRS {
     return {
       ident: constants.hex_section_id(constants.section.strs),
       size: 0,  // finalized later
@@ -125,7 +133,7 @@ export default class KMXPlusBuilder {
     };
   }
 
-  build_meta(): BUILDER_META {
+  private build_meta(): BUILDER_META {
     return {
       ident: constants.hex_section_id(constants.section.meta),
       size: constants.length_meta,
@@ -136,11 +144,11 @@ export default class KMXPlusBuilder {
       layout: this.alloc_string(this.file.kmxplus.meta.layout),
       normalization: this.alloc_string(this.file.kmxplus.meta.normalization),
       indicator: this.alloc_string(this.file.kmxplus.meta.indicator),
-      settings: this.file.kmxplus.meta.settings,
+      settings: this.file.kmxplus.meta.settings ?? 0,
     };
   }
 
-  build_loca(): BUILDER_LOCA {
+  private build_loca(): BUILDER_LOCA {
     let loca: BUILDER_LOCA = {
       ident: constants.hex_section_id(constants.section.loca),
       size: constants.length_loca + constants.length_loca_item * this.file.kmxplus.loca.locales.length,
@@ -157,7 +165,7 @@ export default class KMXPlusBuilder {
     return loca;
   }
 
-  build_keys(): BUILDER_KEYS {
+  private build_keys(): BUILDER_KEYS {
     if(!this.file.kmxplus.keys.keys.length) {
       return null;
     }
@@ -184,7 +192,7 @@ export default class KMXPlusBuilder {
     return keys;
   }
 
-  build_vkey(): BUILDER_VKEY {
+  private build_vkey(): BUILDER_VKEY {
     if(!this.file.kmxplus.vkey.vkeys.length) {
       return null;
     }
@@ -208,18 +216,18 @@ export default class KMXPlusBuilder {
     return vkey;
   }
 
-  finalize_strs() {
+  private finalize_strs() {
     this.sect_strs.count = this.sect_strs.items.length;
     let offset = constants.length_strs + constants.length_strs_item * this.sect_strs.count;
     // TODO: consider padding
     for(let item of this.sect_strs.items) {
       item.offset = offset;
-      offset += item.length + 2; /* + sizeof null terminator */
+      offset += item.length * 2 + 2; /* UTF-16 code units + sizeof null terminator */
     }
     this.sect_strs.size = offset;
   }
 
-  finalize_sect_item(sect: BUILDER_SECTION, offset: number): number {
+  private finalize_sect_item(sect: BUILDER_SECTION, offset: number): number {
     if(!sect) {
       // Don't include null sections
       return offset;
@@ -230,7 +238,7 @@ export default class KMXPlusBuilder {
     return offset + sect.size;
   }
 
-  finalize_sect() {
+  private finalize_sect() {
     // 'sect' section
     // TODO: order sects alpha
     this.sect_sect.count = 3;
@@ -255,7 +263,7 @@ export default class KMXPlusBuilder {
     this.sect_sect.total = offset;
   }
 
-  prepareFileBuffers() {
+  private build() {
     // Required sections: sect, strs, loca, meta
 
     this.sect_sect = this.build_sect();
@@ -273,20 +281,36 @@ export default class KMXPlusBuilder {
     return this.sect_sect.total;
   }
 
-  compile(): Uint8Array {
-    const fileSize = this.prepareFileBuffers();
+  private emitSection(file: Uint8Array, comp: any, sect: BUILDER_SECTION) {
+    if(sect) {
+      file.set(comp.toBuffer(sect), sect._offset);
+    }
+  }
+
+  private emitStrings(file: Uint8Array) {
+    for(let item of this.sect_strs.items) {
+      if(item._value === '') {
+        // We have a special case for the zero-length string
+        let sbuf = r.uint16le;
+        file.set(sbuf.toBuffer(0), item.offset + this.sect_strs._offset);
+      } else {
+        let sbuf = new r.String(null, 'utf16le');
+        file.set(sbuf.toBuffer(item._value), item.offset + this.sect_strs._offset);
+      }
+    }
+  }
+
+  public compile(): Uint8Array {
+    const fileSize = this.build();
     let file: Uint8Array = new Uint8Array(fileSize);
 
-    file.set(this.file.COMP_PLUS_SECT.toBuffer(this.sect_sect), this.sect_sect._offset);
-    file.set(this.file.COMP_PLUS_STRS.toBuffer(this.sect_strs), this.sect_strs._offset);
-    for(let item of this.sect_strs.items) {
-      let sbuf = new r.String(null, 'utf16le');
-      file.set(sbuf.toBuffer(item._value), item.offset + this.sect_strs._offset);
-    }
-    file.set(this.file.COMP_PLUS_META.toBuffer(this.sect_meta), this.sect_meta._offset);
-    file.set(this.file.COMP_PLUS_LOCA.toBuffer(this.sect_loca), this.sect_loca._offset);
-    file.set(this.file.COMP_PLUS_KEYS.toBuffer(this.sect_keys), this.sect_keys._offset);
-    file.set(this.file.COMP_PLUS_VKEY.toBuffer(this.sect_vkey), this.sect_vkey._offset);
+    this.emitSection(file, this.file.COMP_PLUS_SECT, this.sect_sect);
+    this.emitSection(file, this.file.COMP_PLUS_STRS, this.sect_strs);
+    this.emitStrings(file);
+    this.emitSection(file, this.file.COMP_PLUS_META, this.sect_meta);
+    this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect_loca);
+    this.emitSection(file, this.file.COMP_PLUS_KEYS, this.sect_keys);
+    this.emitSection(file, this.file.COMP_PLUS_VKEY, this.sect_vkey);
 
     return file;
   }

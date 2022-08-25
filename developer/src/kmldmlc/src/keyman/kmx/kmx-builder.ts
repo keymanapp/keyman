@@ -119,6 +119,7 @@ export default class KMXBuilder {
     if(this.file instanceof KMXPlusFile) {
       // Reserve space for KMXPlus header; we'll come back and fill in details
       // once we know base kmx file size.
+      this.comp_header.dwFlags |= KMXFile.KF_KMXPLUS;
       this.base_kmxplus = size;
       size += KMXFile.COMP_KEYBOARD_KMXPLUSINFO_SIZE;
     }

@@ -27,7 +27,7 @@ export class Meta extends Section {
 };
 
 export class Loca extends Section {
-  locales: string[];
+  locales: string[] = [];
 };
 
 export enum KeyFlags {
@@ -44,7 +44,7 @@ export class KeysItem {
 };
 
 export class Keys extends Section {
-  keys: KeysItem[];
+  keys: KeysItem[] = [];
 };
 
 export class VkeyItem {
@@ -53,7 +53,7 @@ export class VkeyItem {
 }
 
 export class Vkey extends Section {
-  vkeys: VkeyItem[];
+  vkeys: VkeyItem[] = [];
 };
 
 export default class KMXPlusFile extends KMXFile {
@@ -87,10 +87,10 @@ export default class KMXPlusFile extends KMXFile {
     keys: Keys;
     vkey: Vkey;
   } = {
-    loca: null,
-    meta: null,
-    keys: null,
-    vkey: null
+    loca: new Loca(),
+    meta: new Meta(),
+    keys: new Keys(),
+    vkey: new Vkey()
   };
 
   constructor() {
@@ -123,7 +123,7 @@ export default class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.reserved(r.uint32le), // padding
+      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
     });
 
@@ -159,7 +159,7 @@ export default class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
-      reserved: new r.reserved(r.uint32le), // padding
+      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_KEYS_ITEM, 'count')
     });
 
