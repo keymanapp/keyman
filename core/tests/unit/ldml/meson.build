@@ -34,7 +34,8 @@ ldml = executable('ldml',
 
 tests = [
   '000_null_keyboard',
-  '001_tiny'
+  '001_tiny',
+  '002_null_invalid'
 ]
 
 if build_machine.system() == 'windows'
@@ -174,4 +175,3 @@ e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
     link_args: links + tests_flags,
     objects: lib.extract_all_objects())
 test('test_kmx_plus', e)
-

@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <assert.h>
 #include <km_types.h>
 #include <kmx/kmx_base.h>
 #include <kmx_file.h>
@@ -154,8 +153,6 @@ validate_as_section(const uint8_t *data, uint32_t ident) {
     return nullptr;
   }
   const COMP_KMXPLUS_HEADER *all = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(data);
-  assert(all->size >= LDML_LENGTH_HEADER);
-  assert(ident == all->ident);
   if (ident != all->ident || (all->size < LDML_LENGTH_HEADER)) {
     return nullptr;  // invalid header or wrong section
   }
@@ -220,18 +217,16 @@ as_kmxplus_vkey(const uint8_t *data) {
 }
 
 /**
- * @brief Temporary function to dump raw data
- * May have no output if KMXPLUS_DEBUG is 0
  * @param kmxplusdata data from the beginning of the KMXPlus section
+ * @return true if valid
  */
-void dump_kmxplus_data(void *kmxplusdata);
+bool validate_kmxplus_data(void *kmxplusdata);
 
 /**
- * @brief Temporary functino to dump raw data
- * May have no output if KMXPLUS_DEBUG is 0
  * @param keyboard pointer to PCOMP_KEYBOARD with plus data following
+ * @return true if valid
  */
-void dump_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard);
+bool validate_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard);
 
 }  // namespace kmx
 }  // namespace kbp
