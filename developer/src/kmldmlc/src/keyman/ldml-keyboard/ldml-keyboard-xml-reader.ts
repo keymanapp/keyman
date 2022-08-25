@@ -22,10 +22,14 @@ export default class LDMLKeyboardXMLSourceFileReader {
     box(source?.keyboard, 'layerMaps');
     box(source?.keyboard?.names, 'name');
     box(source?.keyboard?.keys, 'key');
-    for(let layerMaps of source?.keyboard?.layerMaps) {
-      box(layerMaps, 'layerMap');
-      for(let layerMap of layerMaps?.layerMap) {
-        box(layerMap, 'row');
+    if(source?.keyboard?.layerMaps) {
+      for(let layerMaps of source?.keyboard?.layerMaps) {
+        box(layerMaps, 'layerMap');
+        if(layerMaps?.layerMap) {
+          for(let layerMap of layerMaps?.layerMap) {
+            box(layerMap, 'row');
+          }
+        }
       }
     }
     return source;

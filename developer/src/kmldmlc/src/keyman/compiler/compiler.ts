@@ -108,18 +108,18 @@ export default class Compiler {
 
     // Transform source xml structures to kmxplus
 
-    kmx.kmxplus.meta.name = source.keyboard.names.name[0].value;
-    kmx.kmxplus.meta.author = source.keyboard.info.author;
+    kmx.kmxplus.meta.name = source.keyboard.names?.name?.[0]?.value;
+    kmx.kmxplus.meta.author = source.keyboard.info?.author;
     kmx.kmxplus.meta.conform = source.keyboard.conformsTo;
-    kmx.kmxplus.meta.layout = source.keyboard.info.layout;
-    kmx.kmxplus.meta.normalization = source.keyboard.info.normalization;
-    kmx.kmxplus.meta.indicator = source.keyboard.info.indicator;
+    kmx.kmxplus.meta.layout = source.keyboard.info?.layout;
+    kmx.kmxplus.meta.normalization = source.keyboard.info?.normalization;
+    kmx.kmxplus.meta.indicator = source.keyboard.info?.indicator;
 
     kmx.kmxplus.loca.locales.push(source.keyboard.locale);
 
     // Use LayerMap + keys to generate compiled keys for hardware
 
-    if(source.keyboard.layerMaps[0].form == 'hardware') {
+    if(source.keyboard.layerMaps?.[0]?.form == 'hardware') {
       for(let layer of source.keyboard.layerMaps[0].layerMap) {
         this.compileHardwareLayer(source.keyboard, layer, kmx);
       }
