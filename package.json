@@ -13,6 +13,7 @@
     "resources/gosh",
     "resources/build/version",
     "developer/src/kmlmc",
+    "developer/src/kmldmlc",
     "developer/src/server",
     "common/models/*",
     "common/web/*",
