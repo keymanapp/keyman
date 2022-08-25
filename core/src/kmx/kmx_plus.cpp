@@ -42,7 +42,7 @@ validate_section_name(KMX_DWORD ident) {
     unsigned char ch = ident & 0xFF;
     if (ch < 0x20 || ch > 0x7F) {
       valid = false;
-      KMXPLUS_PRINTF(("\x%02X", ch));
+      KMXPLUS_PRINTF(("\\x%02X", ch));
     } else {
       KMXPLUS_PRINTF(("%c", ch));
     }

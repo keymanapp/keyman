@@ -21,6 +21,7 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 
 - Data is divided into several sections. The very first section is the `'sect'` section which is the table of contents.
 - All sections, including the first, begin on a 128-bit boundary with zero padding as needed.
+- All variable length sections have the variable part begin on a 128-bit boundary, with zero padding as needed.
 - All sections begin with a 32-bit (four character) section identifier, and a 32-bit section size.
 - Other than the `sect` table itself, the rest of the sections follow in binary order in the file.  In other words, the binary ordering of the section identifiers determines the order of the file layout.
 
@@ -99,6 +100,7 @@ The `settings` is a 32-bit bitfield as below:
 | 0 |  32  | ident   | `loca`                                   |
 | 4 |  32  | size    | int: Length of section                   |
 | 8 |  32  | count   | int: Number of locales                   |
+|12 |  32  | reserved| padding                                  |
 
 `count` is always ≥1, because a keyboard always has a primary locale identifier.
 
@@ -106,7 +108,7 @@ For each locale ID in `count`
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-|12+|  32  | locale  | str: Locale ID in BCP47 format           |
+|16+|  32  | locale  | str: Locale ID in BCP47 format           |
 
 The first locale ID is always the primary locale identifier.  The rest of the locale IDs (starting at offset 16) are in sorted binary order.
 
@@ -146,7 +148,8 @@ For each key:
 |---|------|---------|------------------------------------------|
 | 0 |  32  | ident   | `vkey`                                   |
 | 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Number of vkeys                      |
+| 8 |  32  | count   | int: Number of vkeys                     |
+|12 |  32  | reserved| padding                                  |
 
 The keys are sorted in binary order based on the `vkey` field.
 
@@ -154,8 +157,8 @@ For each key:
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-|12+|  32  | vkey    | int: source vkey ID (0…255)              |
-|16+|  32  | target  | int: target vkey ID (0…255)              |
+|16+|  32  | vkey    | int: source vkey ID (0…255)              |
+|20+|  32  | target  | int: target vkey ID (0…255)              |
 
 - `vkey`: Is the standard vkey, 0-255
 - `target`: Is the target (resolved) vkey, 0-255.

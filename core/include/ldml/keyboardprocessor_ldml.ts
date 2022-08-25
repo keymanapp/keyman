@@ -42,7 +42,7 @@ export const constants = {
      * Minimum length of the 'loca' section
      * not including variable parts
      */
-    length_loca: 12,
+    length_loca: 16,
     /**
      * length of the 'meta' section
      */
@@ -80,7 +80,7 @@ export const constants = {
      * Minimum length of the 'vkey' section
      * not including variable parts
      */
-    length_vkey: 12,
+    length_vkey: 16,
 
     /**
      * All section IDs.
