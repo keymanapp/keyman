@@ -147,9 +147,10 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
   bool expected_beep = false;
+  bool expected_error = false;
   km::tests::LdmlTestSource test_source;
 
-  int result = test_source.load_source(source, keys, expected, context, expected_beep);
+  int result = test_source.load_source(source, keys, expected, context, expected_beep, expected_error);
   if (result != 0) return result;
 
   std::cout << "source file   = " << source << std::endl
@@ -190,10 +191,15 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     }
 
     for (auto key_down = 1; key_down >= 0; key_down--) {
-      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT)); // TODO-LDML: for now. Should send touch and hardware events.
+      // expected error only applies to key down
+      const km_kbp_status expect_status = (key_down == 1 && expected_error) ? KM_KBP_STATUS_KEY_ERROR : KM_KBP_STATUS_OK;
+      assert_equal(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT), expect_status); // TODO-LDML: for now. Should send touch and hardware events.
 
-      for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
-        apply_action(test_state, *act, text_store, test_context, test_source);
+      if (!expected_error) {
+        // If we expected an error, don't try to apply the action.
+        for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
+          apply_action(test_state, *act, text_store, test_context, test_source);
+        }
       }
     }
 

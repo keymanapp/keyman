@@ -95,11 +95,13 @@ LdmlTestSource::load_source(
     std::string &keys,
     std::u16string &expected,
     std::u16string &context,
-    bool &expected_beep) {
+    bool &expected_beep,
+    bool &expected_error) {
   const std::string s_keys = "@@keys: ";
   const std::string s_expected = "@@expected: ";
   const std::string s_context = "@@context: ";
   const std::string s_capsLock = "@@capsLock: ";
+  const std::string s_expecterror = "@@expect-error: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected
   // result
@@ -123,6 +125,8 @@ LdmlTestSource::load_source(
       } else {
         expected = parse_source_string(line);
       }
+    } else if (is_token(s_expecterror, line)) {
+      expected_error = true;
     } else if (is_token(s_context, line)) {
       context = parse_source_string(line);
     } else if (is_token(s_capsLock, line)) {
