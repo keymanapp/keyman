@@ -573,6 +573,8 @@ namespace com.keyman.osk {
      * @param sample
      */
     public add(sample: InputSample) {
+      // TODO:  if this is the first received input sample, generate & publish a "start" segment.
+
       // Set up the input-repeater (in case we don't get further feedback but remain active)
       const repeater = (timeDelta: number) => {
         this.observe(sample, timeDelta);
@@ -619,7 +621,9 @@ namespace com.keyman.osk {
       this.constructingSegment.updatePendingSubsegment(finalSubsegment);
       // As we're finalizing, we do NOT need to recall maintainRecentSegment.
       this.constructingSegment.commitPendingSubsegment();
-      this.finalizeSubsegment();
+      this.finalizeSegment();
+
+      // TODO:  create + publish an "end" segment.
 
       // TODO:  this is a temporary statement to facilitate exploration, experimentation, & debugging.
       //        We should be providing output to the touchpath object (`.path.segments`).
@@ -837,10 +841,11 @@ namespace com.keyman.osk {
       this.updateSegmentConstruction(candidateSplit.post);
     }
 
-    private finalizeSubsegment() {
+    private finalizeSegment() {
       if(this.constructingSegment) {
         this.constructingSegment.finalize();
         this.segmentConstructors.push(this.constructingSegment);
+        this.constructingSegment = null;
       }
     }
 
@@ -848,8 +853,8 @@ namespace com.keyman.osk {
       if(this.constructingSegment && this.constructingSegment.isCompatible(subsegment)) {
         this.constructingSegment.updatePendingSubsegment(subsegment);
       } else {
-        this.finalizeSubsegment();
-        this.constructingSegment = new ConstructingSegment(this.choppedStats, subsegment);
+        this.finalizeSegment();
+        this.constructingSegment = new ConstructingSegment(subsegment);
         // TODO:  trigger publishing of the newly-constructing Segment!
       }
     }

@@ -1,10 +1,90 @@
 namespace com.keyman.osk {
+  class CompatibilityAnalyzer {
+    readonly classifier: SegmentClassifier;
+    private split: SegmentationSplit;
+
+    constructor(subsegmentationSplit: SegmentationSplit) {
+      this.split = subsegmentationSplit;
+
+      this.classifier = new SegmentClassifier();
+    }
+
+    private get preStats() {
+      return this.split.pre.stats;
+    }
+
+    private get postStats() {
+      return this.split.post.stats;
+    }
+
+    private get unionStats() {
+      return this.split.union;
+    }
+
+    get directionCompatible(): boolean {
+      if(!this.preStats ||this.regressionDirectionCompatible) {
+        return true;
+      } else if(this.cardinalDirectionCompatible && this.preStats.mean('v') > 0.08 && this.postStats.mean('v') > 0.08) {
+          return true;
+      } else {
+        return false;
+      }
+    }
+
+    get cardinalDirectionCompatible(): boolean {
+      return !this.preStats ||this.preStats.cardinalDirection == this.postStats.cardinalDirection;
+    }
+
+    get regressionDirectionCompatible(): boolean {
+      return !this.preStats || this.split.mergeMerited;
+    }
+
+    get classificationIfCompatible(): SegmentClass {
+      // Get the baseline subsegment classification for each subsegment.
+      let leftClass  = this.classifier.classifySubsegment(this.preStats);
+      let rightClass = this.classifier.classifySubsegment(this.postStats);
+      let unionClass = this.classifier.classifySubsegment(this.unionStats);
+
+      // Choose the first non-null one as a fallback, then apply it.
+      let fallbackClass = leftClass || rightClass || unionClass;
+
+      leftClass  = leftClass || fallbackClass;
+      rightClass = rightClass || fallbackClass;
+      unionClass = unionClass || fallbackClass;
+
+      // If all classes (post-fallback) match, that's the class if compatible.
+      if(leftClass == rightClass && leftClass == unionClass) {
+        return fallbackClass;  // can technically still be null.
+      } else {
+        return undefined;
+      }
+    }
+
+    get isCompatible(): boolean {
+      const commonClass = this.classificationIfCompatible;
+
+      // If two adjacent hold subsegments also make a hold when combined...
+      // just merge the two holds & call 'em compatible.
+      if(!this.preStats || commonClass == 'hold') {
+        return true;
+      } else if(commonClass === undefined) {
+        return false;
+      }
+
+      // if(null || 'move'):  as 'null' looks like a not-quite-there-yet 'move',
+      // we treat it as such here.  Such subsegments are only compatible if
+      // their directions are compatible.
+      return this.directionCompatible;
+    }
+  }
+
   /**
    * This class is responsible for managing the construction of public-facing Segments while keeping
    * all the internal parts... internal.  As such, it includes state management for parts of
    * PathSegmenter's operations.
    */
   export class ConstructingSegment {
+
     /**
      * Marks previously-accumulated stats on the touchpath for the portion that precedes
      * the in-construction Segment.
@@ -22,8 +102,9 @@ namespace com.keyman.osk {
      */
     private pendingSubsegmentation: Subsegmentation = null;
 
-    constructor(preIntervalAccumulation: CumulativePathStats, initialPendingSubsegment: Subsegmentation) {
-      this.baseAccumulation = preIntervalAccumulation;
+    constructor(initialPendingSubsegment: Subsegmentation) {
+      // Note:  may be null!  Occurs for the first processed subsegment.
+      this.baseAccumulation = initialPendingSubsegment.baseAccumulation;
 
       this.subsegmentations = [];
       this.pendingSubsegmentation = initialPendingSubsegment;
@@ -81,60 +162,42 @@ namespace com.keyman.osk {
      *
      * @returns `true` if compatible, `false` if not.
      */
-    public isCompatible(subsegment: Subsegmentation): boolean {
+    public isCompatible(subsegmentation: Subsegmentation): boolean {
+      return this.analyzeCompatibility(subsegmentation).isCompatible;
+    }
+
+    public analyzeCompatibility(subsegmentation: Subsegmentation): CompatibilityAnalyzer {
+      const committed = this.committedIntervalAsSubsegmentation;
+      const segmentationSplit = new SegmentationSplit(committed, subsegmentation);
+
+      return new CompatibilityAnalyzer(segmentationSplit);
+    }
+
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    // TODO:  remake into a function on the analyzer object.
+    public debugLogCompabilityReport(subsegmentation: Subsegmentation) {
+      const committed = this.committedIntervalAsSubsegmentation;
+      const segmentationSplit = new SegmentationSplit(committed, subsegmentation);
+
+      const analyzer = new CompatibilityAnalyzer(segmentationSplit);
+
       if(this.subsegmentations.length == 0) {
-        return true;
+        console.log("No prior subsegments - thus, no compatibility conflicts are possible.");
       }
 
-      const committed = this.committedIntervalAsSubsegmentation;
+      // TODO:  Possible 'polished way' to provide feedback:
+      //        Build an object with annotations for each condition under consideration.
+      //        Object's then easily loggable & is even returnable.
+      //        Split:  isCompatible vs analyzeCompatibility
 
-      const preStats = committed.stats;
-      const postStats = subsegment.stats;
-
-      // // Known case #1:
-      // //   Near-identical direction, but heavy speed difference.
-      // //   Speed's still high enough to not be a 'wait'.
-      // //   We may want to 'note' the higher speed; that may be relevant for flick detection.
-      // // Known case #2:
-      // //   Low-speed pivot; angle change caught on very low velocity for both subsegments.
-      // //   ... or should this be merged?  Multiple mini-segments from 'wiggling' could just go ignored instead...
-
-      // This is kinda plain and arbitrary, but it seems to work "well enough" for now,
-      // at least at this stage of development.  (Most testing was done with Chrome emulation of
-      // an iPhone SE.)
-
-      // TODO:  where to move logging, if doing so
       console.log("Verifying linkage to pending merges: ");
       console.log(this.subsegmentations);
       console.log("verification check:");
       console.log(this.committedIntervalAsSubsegmentation);
-      // TODO:  end of "where to move"
 
-      // .mean('v') < 0.08:  the mean speed (taken timestamp to timestamp) does not exceed 0.08px/millisec.
-      if(preStats.mean('v') < 0.08 && postStats.mean('v') > 0.08) {
-        console.log("desegmentation exception");
-        return false;
-      }
-      if(preStats.mean('v') > 0.08 && postStats.mean('v') < 0.08) {
-        console.log("desegmentation exception");
-        return false;
-      }
+      // TODO: log report detalis
 
-      if(preStats.cardinalDirection == postStats.cardinalDirection &&
-        // TODO:  base this on 'detected as move', not 'not a confirmed hold'.
-        preStats.mean('v') > 0.08 && postStats.mean('v') > 0.08) {
-        // Same cardinal direction + recognized move?
-
-        console.log("subsegments are both moving sufficiently quickly in the same direction:  will remerge");
-        return true;
-      }
-
-      const segmentationSplit = new SegmentationSplit(committed, subsegment);
-
-      // TODO:  remove for production / feature-branch merge
       segmentationSplit._debugLogAlignmentReport();
-
-      return segmentationSplit.mergeMerited;
     }
 
     /**
