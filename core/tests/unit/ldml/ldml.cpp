@@ -163,7 +163,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   assert_equal(km_kbp_keyboard_load(compiled.c_str(), &test_kb), expect_load_status);
 
   if (expected_error) {
-    std::cout << "Keyboard was expected to be invalid, so exitting " << std::endl;
+    std::cout << "Keyboard was expected to be invalid, so exiting " << std::endl;
     return 0;
   }
 
