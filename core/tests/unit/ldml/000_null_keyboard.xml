@@ -4,7 +4,7 @@
   hand-crafted and semi-valid.
 
 @@keys: [K_A][K_B][K_C]
-@@expect-error: 4
+@@expect:
 
 -->
 <keyboard />

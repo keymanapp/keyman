@@ -189,7 +189,8 @@ ldml_processor::process_event(
       // Look up the key
       const kmx::COMP_KMXPLUS_KEYS_ENTRY *key =  keys->find(vk, modifier_state);
       if (!key) {
-        return KM_KBP_STATUS_KEY_ERROR;
+        state->actions().commit(); // finish up and
+        return KM_KBP_STATUS_OK; // Nothing to do- no key
       }
       // Prepare output chars
       KMX_DWORD len = 0;
