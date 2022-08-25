@@ -1374,8 +1374,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       delete[] sp->dpString;
       sp->dpString = q;
 
-      // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
-      if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+                                                          // S_S2 if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None)
+      if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
         return msg;
       }
     }
@@ -1388,16 +1388,18 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_KMW_HELPFILE:
   case TSS_KMW_EMBEDJS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
-    // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
-     if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+    
+    // S_S2 if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+     if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
        return msg;
      }
     break;
 
   case TSS_KMW_EMBEDCSS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
-    // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
-     if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+    
+    // S_S2 f ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+     if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
        return msg;
      }
     break;
@@ -1450,8 +1452,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_LAYOUTFILE:  // I3483
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
 
-    // S_S2 do we use char16_t* for filenames here  (elsewhere we use *char) ???
-     if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+    // S_S2 if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
+     if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
            return msg;
      }
 
@@ -3611,9 +3613,8 @@ KMX_BOOL IsRelativePath(KMX_CHAR *p)
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 {
   FILE *fp;
-  KMX_WCHAR szNewName[260], *p;
-
-  if (IsRelativePath(szName))
+  KMX_WCHAR szNewName[260], *p;  
+  if (IsRelativePath(u16fmt(szName).c_str()))         //_S2  if (IsRelativePath(szName))
   {
     PKMX_WCHAR WCompileDir = strtowstr(CompileDir);
     u16ncpy(szNewName, WCompileDir, _countof(szNewName));  // I3481       // _S2 wcscpy_s(Name, _countof(Name), WCompileDir);  // I3481
@@ -3639,11 +3640,10 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   }
 
   KMX_DWORD msg;
-
-  if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
+  // _S2 if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
+  if ((msg = CheckFilenameConsistency(u16fmt(szNewName).c_str(), FALSE)) != CERR_None) {
     return msg;
   }
-
 
   fseek(fp, 0, SEEK_END);
   *FileSize = ftell(fp);                                                // *FileSize = GetFileSize(hFile, NULL);
