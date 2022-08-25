@@ -147,9 +147,10 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
   bool expected_beep = false;
+  bool expected_error = false;
   km::tests::LdmlTestSource test_source;
 
-  int result = test_source.load_source(source, keys, expected, context, expected_beep);
+  int result = test_source.load_source(source, keys, expected, context, expected_beep, expected_error);
   if (result != 0) return result;
 
   std::cout << "source file   = " << source << std::endl
@@ -158,7 +159,13 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
 
-  try_status(km_kbp_keyboard_load(compiled.c_str(), &test_kb));
+  const km_kbp_status expect_load_status = expected_error ? KM_KBP_STATUS_INVALID_KEYBOARD : KM_KBP_STATUS_OK;
+  assert_equal(km_kbp_keyboard_load(compiled.c_str(), &test_kb), expect_load_status);
+
+  if (expected_error) {
+    std::cout << "Keyboard was expected to be invalid, so exiting " << std::endl;
+    return 0;
+  }
 
   // Setup state, environment
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
@@ -190,6 +197,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     }
 
     for (auto key_down = 1; key_down >= 0; key_down--) {
+      // expected error only applies to key down
       try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT)); // TODO-LDML: for now. Should send touch and hardware events.
 
       for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {

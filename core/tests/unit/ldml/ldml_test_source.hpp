@@ -20,7 +20,8 @@ public:
       std::string &keys,
       std::u16string &expected,
       std::u16string &context,
-      bool &expected_beep);
+      bool &expected_beep,
+      bool &expected_error);
 
   key_event next_key(std::string &keys);
 
