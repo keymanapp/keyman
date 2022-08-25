@@ -200,7 +200,6 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
       // expected error only applies to key down
       try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT)); // TODO-LDML: for now. Should send touch and hardware events.
 
-      // If we expected an error, don't try to apply the action.
       for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
         apply_action(test_state, *act, text_store, test_context, test_source);
       }
