@@ -145,6 +145,7 @@ export default class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_LOCA_ITEM, 'count')
     });
 
@@ -172,6 +173,7 @@ export default class KMXPlusFile extends KMXFile {
       ident: r.uint32le,
       size: r.uint32le,
       count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_VKEY_ITEM, 'count')
     });
   }

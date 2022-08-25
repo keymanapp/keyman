@@ -45,6 +45,7 @@ interface BUILDER_META extends BUILDER_SECTION {
 
 interface BUILDER_LOCA extends BUILDER_SECTION {
   count: number;
+  reserved: number;
   items: number[]; //str[]
 };
 
@@ -68,6 +69,7 @@ interface BUILDER_VKEY_ITEM {
 
 interface BUILDER_VKEY extends BUILDER_SECTION {
   count: number;
+  reserved: number;
   items: BUILDER_VKEY_ITEM[];
 };
 
@@ -154,7 +156,7 @@ export default class KMXPlusBuilder {
       size: constants.length_loca + constants.length_loca_item * this.file.kmxplus.loca.locales.length,
       _offset: 0,
       count: this.file.kmxplus.loca.locales.length,
-      //reserved: 0,
+      reserved: 0,
       items: []
     };
 
@@ -201,7 +203,7 @@ export default class KMXPlusBuilder {
       ident: constants.hex_section_id(constants.section.vkey),
       size: constants.length_vkey + constants.length_vkey_item * this.file.kmxplus.vkey.vkeys.length,
       _offset: 0,
-      //reserved: 0,
+      reserved: 0,
       count: this.file.kmxplus.vkey.vkeys.length,
       items: []
     };
