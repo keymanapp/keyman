@@ -6,12 +6,13 @@
         "module": "CommonJS",
         "moduleResolution": "node",
         "rootDir": ".",
-        "outDir": "build/",
+        "outDir": "ldml-const-builder/",
     },
     "exclude": [
         "node_modules"
     ],
     "files": [
-        "keyboardprocessor_ldml.ts"
+        "keyboardprocessor_ldml.ts",
+        "ldml-const-builder.ts"
     ]
 }
