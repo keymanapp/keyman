@@ -14,27 +14,28 @@
 //
 
 #pragma once
-#define LDML_KEYS_FLAGS_EXTEND 1
-#define LDML_LENGTH_HEADER 8
-#define LDML_LENGTH_KEYS 16
-#define LDML_LENGTH_LOCA 12
-#define LDML_LENGTH_META 36
-#define LDML_LENGTH_SECT 16
-#define LDML_LENGTH_STRS 16
-#define LDML_LENGTH_VKEY 12
-#define LDML_META_SETTINGS_FALLBACK_OMIT 1
-#define LDML_META_SETTINGS_TRANSFORMFAILURE_OMIT 2
-#define LDML_META_SETTINGS_TRANSFORMPARTIAL_HIDE 4
-// Section ID
-#define LDML_SECTION_KEYS ((uint32_t)'keys')
-// Section ID
-#define LDML_SECTION_LOCA ((uint32_t)'loca')
-// Section ID
-#define LDML_SECTION_META ((uint32_t)'meta')
-// Section ID
-#define LDML_SECTION_SECT ((uint32_t)'sect')
-// Section ID
-#define LDML_SECTION_STRS ((uint32_t)'strs')
-// Section ID
-#define LDML_SECTION_VKEY ((uint32_t)'vkey')
+
+#define LDML_KEYS_FLAGS_EXTEND 0x1
+#define LDML_LENGTH_HEADER 0x8
+#define LDML_LENGTH_KEYS 0x10
+#define LDML_LENGTH_LOCA 0xC
+#define LDML_LENGTH_META 0x24
+#define LDML_LENGTH_SECT 0x10
+#define LDML_LENGTH_STRS 0x10
+#define LDML_LENGTH_VKEY 0xC
+#define LDML_META_SETTINGS_FALLBACK_OMIT 0x1
+#define LDML_META_SETTINGS_TRANSFORMFAILURE_OMIT 0x2
+#define LDML_META_SETTINGS_TRANSFORMPARTIAL_HIDE 0x4
+#define LDML_SECTIONID_KEYS 0x7379656B /* "keys" */
+#define LDML_SECTIONNAME_KEYS             "keys"
+#define LDML_SECTIONID_LOCA 0x61636F6C /* "loca" */
+#define LDML_SECTIONNAME_LOCA             "loca"
+#define LDML_SECTIONID_META 0x6174656D /* "meta" */
+#define LDML_SECTIONNAME_META             "meta"
+#define LDML_SECTIONID_SECT 0x74636573 /* "sect" */
+#define LDML_SECTIONNAME_SECT             "sect"
+#define LDML_SECTIONID_STRS 0x73727473 /* "strs" */
+#define LDML_SECTIONNAME_STRS             "strs"
+#define LDML_SECTIONID_VKEY 0x79656B76 /* "vkey" */
+#define LDML_SECTIONNAME_VKEY             "vkey"
 #define LDML_VERSION "1.0"
