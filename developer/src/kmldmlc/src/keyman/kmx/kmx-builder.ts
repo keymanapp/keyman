@@ -1,6 +1,8 @@
 import * as r from 'restructure';
 import * as crc32 from 'crc-32';
 import KMXFile, { GROUP, KEY, STORE } from './kmx';
+import KMXPlusFile from './kmx-plus';
+import KMXPlusBuilder from './kmx-plus-builder';
 
 // These type-checking structures are here to ensure that
 // we match the structures from kmx.ts in the generator
@@ -70,6 +72,7 @@ export default class KMXBuilder {
   comp_kmxplus: BUILDER_COMP_KEYBOARD_KMXPLUSINFO;
   comp_stores: {base: number, store: STORE, obj: BUILDER_COMP_STORE}[] = [];
   comp_groups: {base: number, group: GROUP, obj: BUILDER_COMP_GROUP, keys: {base: number, key: KEY, obj: BUILDER_COMP_KEY}[]}[] = [];
+  comp_kmxplus_data: Uint8Array;
   writeDebug: boolean = false;
 
   constructor(file: KMXFile, writeDebug: boolean) {
@@ -113,14 +116,10 @@ export default class KMXBuilder {
 
     let size = KMXFile.COMP_KEYBOARD_SIZE;
 
-    if(this.file.keyboard.isKMXPlus) {
+    if(this.file instanceof KMXPlusFile) {
+      // Reserve space for KMXPlus header; we'll come back and fill in details
+      // once we know base kmx file size.
       this.base_kmxplus = size;
-
-      this.comp_kmxplus = {
-        dpKMXPlus: 0,
-        dwKMXPlusSize: 0
-      };
-
       size += KMXFile.COMP_KEYBOARD_KMXPLUSINFO_SIZE;
     }
 
@@ -196,7 +195,7 @@ export default class KMXBuilder {
     }
 
     size += this.calculateBitmapSize();
-    size += this.calculateKMXPlusSize();
+    size += this.calculateKMXPlusSize(size);
 
     return size;
   }
@@ -206,9 +205,22 @@ export default class KMXBuilder {
     return 0;
   }
 
-  calculateKMXPlusSize() {
-    // TODO
-    return 0;
+  calculateKMXPlusSize(base: number) {
+    if(!(this.file instanceof KMXPlusFile)) {
+      return 0;
+    }
+
+    const plusbuilder: KMXPlusBuilder = new KMXPlusBuilder(this.file, this.writeDebug);
+    this.comp_kmxplus_data = plusbuilder.compile();
+
+    // Reserve space for KMXPlus header; we'll come back and fill in details
+    // once we know base kmx file size.
+    this.comp_kmxplus = {
+      dpKMXPlus: base,
+      dwKMXPlusSize: this.comp_kmxplus_data.length
+    };
+
+    return this.comp_kmxplus.dwKMXPlusSize;
   }
 
   setString(file: Uint8Array, pos: number, str: string, requireString: boolean = false): void {
@@ -230,6 +242,7 @@ export default class KMXBuilder {
 
   compile(): Uint8Array {
     const fileSize = this.prepareFileBuffers();
+
     let file: Uint8Array = new Uint8Array(fileSize);
 
     // Write headers
@@ -237,7 +250,7 @@ export default class KMXBuilder {
     const header = this.file.COMP_KEYBOARD.toBuffer(this.comp_header);
     file.set(header, this.base_keyboard);
 
-    if(this.file.keyboard.isKMXPlus) {
+    if(this.file instanceof KMXPlusFile) {
       const kmxplus: Uint8Array = this.file.COMP_KEYBOARD_KMXPLUSINFO.toBuffer(this.comp_kmxplus);
       file.set(kmxplus, this.base_kmxplus);
     }
@@ -268,6 +281,12 @@ export default class KMXBuilder {
         this.setString(file, key.obj.dpContext, key.key.dpContext, true);
         this.setString(file, key.obj.dpOutput, key.key.dpOutput, true);
       }
+    }
+
+    // Write KMXPlus data stream
+
+    if(this.file instanceof KMXPlusFile) {
+      file.set(this.comp_kmxplus_data, this.comp_kmxplus.dpKMXPlus);
     }
 
     // Finally, calculate and write the checksum

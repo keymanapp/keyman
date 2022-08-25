@@ -30,28 +30,30 @@ export const constants = {
      * Length of a raw section header, in bytes
      */
     length_header: 8,
+
     /**
-     * Section ID for the keybag
+     * Minimum length of the 'sect' section, not including entries
      */
-    section_keys: 'keys',
+     length_sect: 16,
+
+     length_sect_item: 8,
+
     /**
      * Minimum length of the 'keys' section
      * not including variable parts
      */
     length_keys: 16,
-    /**
-     * Section ID for the locale list
-     */
-    section_loca: 'loca',
+
+    length_keys_item: 16,
+
     /**
      * Minimum length of the 'loca' section
      * not including variable parts
      */
     length_loca: 12,
-    /**
-     * Section ID for the metadata
-     */
-    section_meta: 'meta',
+
+    length_loca_item: 4,
+
     /**
      * length of the 'meta' section
      */
@@ -68,23 +70,18 @@ export const constants = {
      * bitwise or value for transformPartial=hide in meta.settings
      */
     meta_settings_transformPartial_hide: 4,
-    /**
-     * Section ID for the section header
-     */
-    section_sect: 'sect',
-    /**
-     * Minimum length of the 'sect' section, not including entries
-     */
-    length_sect: 16,
-    /**
-     * Section ID for the string table
-     */
-    section_strs: 'strs',
+
     /**
      * Minimum length of the 'strs' section
      * not including variable parts
      */
     length_strs: 16,
+    /**
+     * Length of each item in the 'strs' section
+     * variable part
+     */
+    length_strs_item: 8,
+
     /**
      * bitwise or value for extend in keys[key].flags.
      * If bit is 1, then 'to' is a string.
@@ -102,5 +99,35 @@ export const constants = {
      * not including variable parts
      */
     length_vkey: 12,
+    length_vkey_item: 8,
+
+    /**
+     * All section IDs.
+     */
+    section: {
+        keys: 'keys',
+        loca: 'loca',
+        meta: 'meta',
+        sect: 'sect',
+        strs: 'strs',
+        vkey: 'vkey',
+    },
+
+    /**
+     * Use to convert 4-char string into hex
+     * @param id section id such as 'sect'
+     * @returns hex ID such as 0x74636573
+     */
+    hex_section_id: function(id:string) {
+        if(!id || typeof id !== 'string' || !id.match(/[a-z][a-z][a-z][a-z]/)) {
+            throw Error(`hex_section_id(${id}) - need a 4-character string`);
+        }
+        let r = 0;
+        for (let i = 3; i>=0; i--) {
+            r = (r << 8 | id.charCodeAt(i));
+        }
+        return r;
+    },
+
 };
 // }

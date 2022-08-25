@@ -6,7 +6,6 @@ import * as r from 'restructure';
 // kmx-builder will transform these to the corresponding COMP_xxxx
 
 export class KEYBOARD {
-  isKMXPlus: boolean;
   //TODO: additional header fields
   groups: GROUP[];
   stores: STORE[];
@@ -272,7 +271,6 @@ export default class KMXFile {
   /* In-memory representation of the keyboard */
 
   public keyboard: KEYBOARD = {
-    isKMXPlus: false,
     groups: [],
     stores: []
   };
