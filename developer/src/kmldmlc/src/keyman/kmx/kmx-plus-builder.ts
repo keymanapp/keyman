@@ -273,19 +273,6 @@ export default class KMXPlusBuilder {
     return this.sect_sect.total;
   }
 
-  setString(file: Uint8Array, pos: number, str: string, requireString: boolean = false): void {
-    if(requireString && !str.length) {
-      // Just write zero terminator, as r.String for a zero-length string
-      // seems to fail.
-      let sbuf = r.uint16le;
-      file.set(sbuf.toBuffer(0), pos);
-    }
-    else if(pos && str.length) {
-      let sbuf = new r.String(null, 'utf16le'); // null-terminated string
-      file.set(sbuf.toBuffer(str), pos);
-    }
-  }
-
   compile(): Uint8Array {
     const fileSize = this.prepareFileBuffers();
     let file: Uint8Array = new Uint8Array(fileSize);
