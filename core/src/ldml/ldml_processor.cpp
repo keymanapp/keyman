@@ -80,7 +80,7 @@ namespace kbp {
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), rawdata(data), sect(NULL), strs(NULL), keys(NULL) // TODO-LDML: parse the data, don't just copy it
+  ), _valid(false), vkey_to_string()
 {
 
 /**
@@ -93,24 +93,27 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     _valid = false; \
     return; \
   }
+  const kmx::COMP_KMXPLUS_SECT *sect = nullptr;
+  const kmx::COMP_KMXPLUS_STRS *strs = nullptr;
+  const kmx::COMP_KMXPLUS_KEYS *keys = nullptr;
 
   // TODO-LDML: load the file from the buffer (KMXPlus format)
   // Note: kb_path is essentially debug metadata here
-  KMXPLUS_ASSERT(true, rawdata.size() > sizeof(kmx::COMP_KEYBOARD_EX));
+  KMXPLUS_ASSERT(true, data.size() > sizeof(kmx::COMP_KEYBOARD_EX));
 
   // Locate the structs here, but still retain ptrs to the raw structs.
-  const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)rawdata.data();
+  const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)data.data();
   KMXPLUS_ASSERT(true, !!(comp_keyboard->dwFlags & KF_KMXPLUS));
   const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
 
   // validate size and offset
   KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize >  LDML_LENGTH_SECT);
-  KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize <  (rawdata.size() - sizeof(kmx::COMP_KEYBOARD_EX)));
+  KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize <  (data.size() - sizeof(kmx::COMP_KEYBOARD_EX)));
   KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     >= sizeof(kmx::COMP_KEYBOARD_EX));
-  KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     <  rawdata.size());
+  KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     <  data.size());
 
   // calculate pointers to start and end of kmxplus
-  const uint8_t* kmxplusdata   = rawdata.data() + ex->kmxplus.dpKMXPlus;      // Start of + data
+  const uint8_t * const kmxplusdata   = data.data() + ex->kmxplus.dpKMXPlus;      // Start of + data
   // const uint8_t* kmxpluslimit  = kmxplusdata    + ex->kmxplus.dwKMXPlusSize;  // End of   + data
 
   // Now load sections.
@@ -130,8 +133,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
 
   // Fill out the other sections we need.
   {
-    KMX_DWORD offset;
-    offset = sect->find(LDML_SECTIONID_STRS);
+    const KMX_DWORD offset = sect->find(LDML_SECTIONID_STRS);
     KMXPLUS_ASSERT(true, offset != 0);
     KMXPLUS_ASSERT(true, offset < ex->kmxplus.dwKMXPlusSize);
     strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
@@ -141,15 +143,14 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
   }
 
   {
-    KMX_DWORD offset;
-    offset = sect->find(LDML_SECTIONID_KEYS);
+    const KMX_DWORD offset = sect->find(LDML_SECTIONID_KEYS);
     KMXPLUS_ASSERT(true, offset != 0);
     keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
     KMXPLUS_ASSERT(true, keys != nullptr);
     // Specified data size fits in total
     KMXPLUS_ASSERT(true, (offset+keys->header.size) < ex->kmxplus.dwKMXPlusSize);
 
-    // read from keys
+    // read all keys into array
     for (KMX_DWORD i=0; i<keys->count; i++) {
       const kmx::COMP_KMXPLUS_KEYS_ENTRY &entry = keys->entries[i];
       KMX_DWORD len = 0;

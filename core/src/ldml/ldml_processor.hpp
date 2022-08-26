@@ -32,12 +32,6 @@ namespace kbp {
   class ldml_processor : public abstract_processor {
   private:
     bool _valid;
-    std::vector<uint8_t> rawdata; // TODO-LDML: should be 'unpacked' format instead.
-
-    const kmx::COMP_KMXPLUS_SECT *sect;
-    const kmx::COMP_KMXPLUS_STRS *strs;
-    const kmx::COMP_KMXPLUS_KEYS *keys;
-
     std::map<ldml_vkey_id, std::u16string> vkey_to_string;
 
   public:
