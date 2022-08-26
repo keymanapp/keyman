@@ -59,6 +59,21 @@ namespace {
   };
 }
 
+/**
+ * @brief Usage: `KMXPLUS_PRINTF(("str: %s\n", "something"));`
+ * Note double parens
+ * \def KMXPLUS_DEBUG
+ */
+#if KMXPLUS_DEBUG
+#include <iostream>
+#define KMXPLUS_NOTEQUAL(expect, actual) std::cerr << __FILE__ << ":" << __LINE__ << ": ASSERT FAILED: " \
+              << #actual << "=" << (actual) << ", expected " << (expect) << std::endl
+#define KMXPLUS_PRINTLN(msg) std::cerr  << __FILE__ << ":" << __LINE__ << ": " msg << std::endl;
+#else
+#define KMXPLUS_NOTEQUAL(expect, actual)
+#define KMXPLUS_PRINTLN(msg)
+#endif
+
 namespace km {
 namespace kbp {
 
@@ -67,54 +82,76 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
   ), _valid(false), rawdata(data), sect(NULL), strs(NULL), keys(NULL) // TODO-LDML: parse the data, don't just copy it
 {
+
+/**
+ * Assert something, just in this function
+ * If fails, print a message and exit as invalid
+ * \def KMXPLUS_ASSERT
+ */
+#define KMXPLUS_ASSERT(expect,actual) if ((expect) != (actual)) { \
+    KMXPLUS_NOTEQUAL(expect, actual); \
+    _valid = false; \
+    return; \
+  }
+
   // TODO-LDML: load the file from the buffer (KMXPlus format)
   // Note: kb_path is essentially debug metadata here
-  assert(rawdata.size() != 0);
-
-    // TODO-LDML: Halfway process here.
+  KMXPLUS_ASSERT(true, rawdata.size() > sizeof(kmx::COMP_KEYBOARD_EX));
 
   // Locate the structs here, but still retain ptrs to the raw structs.
   const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)rawdata.data();
-  assert(comp_keyboard->dwFlags & KF_KMXPLUS);
+  KMXPLUS_ASSERT(true, !!(comp_keyboard->dwFlags & KF_KMXPLUS));
   const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
 
+  // validate size and offset
+  KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize >  LDML_LENGTH_SECT);
+  KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize <  (rawdata.size() - sizeof(kmx::COMP_KEYBOARD_EX)));
+  KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     >= sizeof(kmx::COMP_KEYBOARD_EX));
+  KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     <  rawdata.size());
 
-  // printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
-  const uint8_t* kmxplusdata = rawdata.data() + ex->kmxplus.dpKMXPlus;
-
+  // calculate pointers to start and end of kmxplus
+  const uint8_t* kmxplusdata   = rawdata.data() + ex->kmxplus.dpKMXPlus;      // Start of + data
+  // const uint8_t* kmxpluslimit  = kmxplusdata    + ex->kmxplus.dwKMXPlusSize;  // End of   + data
 
   // Now load sections.
 
   // This will validate (and possibly print) all data.
   // TODO-LDML: we will be replacing this validation with validation-as-we-go below.
-  if (!kmx::validate_kmxplus_data(kmxplusdata)) {
-    _valid = false;
-    return;
-  }
+  KMXPLUS_ASSERT(true, kmx::validate_kmxplus_data(kmxplusdata));
 
   // Get out the SECT header
-  sect = kmx::as_kmxplus_sect(kmxplusdata);
-  if (sect == nullptr) {
-    _valid = false;
-    return;
+  {
+    const KMX_DWORD offset = 0;
+    sect = kmx::as_kmxplus_sect(kmxplusdata+offset);
+    KMXPLUS_ASSERT(true, sect != nullptr);
+    // Specified data size fits in total
+    KMXPLUS_ASSERT(true, (offset+sect->header.size) < ex->kmxplus.dwKMXPlusSize);
   }
 
   // Fill out the other sections we need.
   {
     KMX_DWORD offset;
     offset = sect->find(LDML_SECTIONID_STRS);
-    assert(offset != 0); // or else section not found
+    KMXPLUS_ASSERT(true, offset != 0);
+    KMXPLUS_ASSERT(true, offset < ex->kmxplus.dwKMXPlusSize);
     strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
-    assert(strs->header.ident == LDML_SECTIONID_STRS);
+    KMXPLUS_ASSERT(true, strs != nullptr);
+    // Specified data size fits in total
+    KMXPLUS_ASSERT(true, (offset+strs->header.size) < ex->kmxplus.dwKMXPlusSize);
   }
 
   {
     KMX_DWORD offset;
     offset = sect->find(LDML_SECTIONID_KEYS);
-    assert(offset != 0); // or else section not found
+    KMXPLUS_ASSERT(true, offset != 0);
     keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
-    assert(keys->header.ident == LDML_SECTIONID_KEYS);
+    KMXPLUS_ASSERT(true, keys != nullptr);
+    // Specified data size fits in total
+    KMXPLUS_ASSERT(true, (offset+keys->header.size) < ex->kmxplus.dwKMXPlusSize);
   }
+  KMXPLUS_PRINTLN("_valid = true");
+
+#undef KMXPLUS_ASSERT
   _valid = true;
 }
 
@@ -151,7 +188,8 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
     return false;
   }
 
-  // A KMXPlus file is in the buffer (although more validation is required)
+  // A KMXPlus file is in the buffer (although more validation is required and will
+  // be done in the constructor)
   return true;
 }
 
