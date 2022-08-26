@@ -65,17 +65,57 @@ namespace kbp {
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), rawdata(data) // TODO-LDML: parse the data, don't just copy it
+  ), _valid(false), rawdata(data), sect(NULL), strs(NULL), keys(NULL) // TODO-LDML: parse the data, don't just copy it
 {
   // TODO-LDML: load the file from the buffer (KMXPlus format)
   // Note: kb_path is essentially debug metadata here
-  assert(data.size() != 0);
+  assert(rawdata.size() != 0);
 
-  const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)data.data();
+    // TODO-LDML: Halfway process here.
 
-  if (validate_kmxplus_data(comp_keyboard)) {
-    _valid = true;
+  // Locate the structs here, but still retain ptrs to the raw structs.
+  const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)rawdata.data();
+  assert(comp_keyboard->dwFlags & KF_KMXPLUS);
+  const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
+
+
+  // printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
+  const uint8_t* kmxplusdata = rawdata.data() + ex->kmxplus.dpKMXPlus;
+
+
+  // Now load sections.
+
+  // This will validate (and possibly print) all data.
+  // TODO-LDML: we will be replacing this validation with validation-as-we-go below.
+  if (!kmx::validate_kmxplus_data(kmxplusdata)) {
+    _valid = false;
+    return;
   }
+
+  // Get out the SECT header
+  sect = kmx::as_kmxplus_sect(kmxplusdata);
+  if (sect == nullptr) {
+    _valid = false;
+    return;
+  }
+
+  // Fill out the other sections we need.
+  {
+    KMX_DWORD offset;
+    offset = sect->find(LDML_SECTIONID_STRS);
+    assert(offset != 0); // or else section not found
+    strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
+    assert(strs->header.ident == LDML_SECTIONID_STRS);
+  }
+
+  {
+    KMX_DWORD offset;
+    offset = sect->find(LDML_SECTIONID_KEYS);
+    assert(offset != 0); // or else section not found
+    keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
+    assert(keys->header.ident == LDML_SECTIONID_KEYS);
+  }
+  _valid = true;
 }
 
 bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>& data) {
@@ -167,28 +207,7 @@ ldml_processor::process_event(
       state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
       break;
     default:
-      // TODO-LDML: temporary code here
-      // Don't want to do this work each time
-      const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)rawdata.data();
-      assert(comp_keyboard->dwFlags & KF_KMXPLUS);
-      const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
 
-      // printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
-      const uint8_t* kmxplusdata = rawdata.data() + ex->kmxplus.dpKMXPlus;
-      // Get out the SECT header
-      const kmx::COMP_KMXPLUS_SECT *sect = kmx::as_kmxplus_sect(kmxplusdata);
-      assert(sect != nullptr);
-      assert(sect->header.ident == LDML_SECTIONID_SECT);
-      KMX_DWORD offset;
-      // Fill out the other sections we need.
-      offset = sect->find(LDML_SECTIONID_STRS);
-      assert(offset != 0); // or else section not found
-      const kmx::COMP_KMXPLUS_STRS *strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
-      assert(strs->header.ident == LDML_SECTIONID_STRS);
-      offset = sect->find(LDML_SECTIONID_KEYS);
-      assert(offset != 0); // or else section not found
-      const kmx::COMP_KMXPLUS_KEYS *keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
-      assert(keys->header.ident == LDML_SECTIONID_KEYS);
       // Look up the key
       const kmx::COMP_KMXPLUS_KEYS_ENTRY *key =  keys->find(vk, modifier_state);
       if (!key) {

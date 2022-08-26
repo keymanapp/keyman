@@ -8,11 +8,6 @@
 #include <kmx_file.h>
 #include <kmx/kmx_plus.h>
 
-/**
- * @def KMXPLUS_DEBUG Set to 1 to enable debug output
- */
-#define KMXPLUS_DEBUG 0
-
 #if KMXPLUS_DEBUG
 #include <stdio.h>
 #endif
