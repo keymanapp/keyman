@@ -4,15 +4,6 @@
 # Authors:      Marc Durdin
 #
 
-if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang' or compiler.get_id() == 'emscripten'
-  warns = [
-     '-Wno-missing-field-initializers',
-     '-Wno-unused-parameter'
-  ]
-else
-  warns = []
-endif
-
 tests = [
 # disabling 000 and 002 until we have updates to core or to the keyboards so that they pass
 #  'k_000_null_keyboard',

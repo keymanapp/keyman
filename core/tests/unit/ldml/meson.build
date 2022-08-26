@@ -16,7 +16,12 @@ endif
 # Build all keyboards in output folder; these are defined here and used in the
 # keyboards subdir
 
-subdir('keyboards')
+node = find_program('node', required: false)
+if node.found()
+  subdir('keyboards')
+else
+  tests = []
+endif
 
 # Build ldml test executable
 
