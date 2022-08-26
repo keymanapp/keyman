@@ -13,6 +13,7 @@ interface BUILDER_SECT_ITEM {
   offset: number; //? new r.VoidPointer(r.uint32le, {type: 'global'})
 };
 
+// Builder for the 'sect' (Section table of contents) section
 interface BUILDER_SECT extends BUILDER_SECTION {
   total: number;
   count: number;
