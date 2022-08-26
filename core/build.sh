@@ -291,7 +291,8 @@ if $TESTS_CPP; then
   # it's too complicated at present due to old meson versions in
   # debian packaging environments
   if [[ ! -f "$KEYMAN_ROOT/developer/src/kmldmlc/build/kmldmlc.js" ]]; then
-    "$KEYMAN_ROOT/developer/src/kmldmlc/build.sh" configure build
+    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" configure build
+    "$KEYMAN_ROOT/developer/src/kmldmlc/build.sh" build
   fi
 fi
 
