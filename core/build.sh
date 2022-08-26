@@ -285,15 +285,13 @@ if $CLEAN; then
   clean
 fi
 
-if $TESTS_CPP; then
-  # check dependency for ldml - kmldmlc
-  # TODO: in the future this should be part of the meson build, but
-  # it's too complicated at present due to old meson versions in
-  # debian packaging environments
-  if [[ ! -f "$KEYMAN_ROOT/developer/src/kmldmlc/build/kmldmlc.js" ]]; then
-    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" configure build
-    "$KEYMAN_ROOT/developer/src/kmldmlc/build.sh" build
-  fi
+# check dependency for ldml - kmldmlc
+# TODO: in the future this should be part of the meson build, but
+# it's too complicated at present due to old meson versions in
+# debian packaging environments
+if [[ ! -f "$KEYMAN_ROOT/developer/src/kmldmlc/build/kmldmlc.js" ]]; then
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" configure build
+  "$KEYMAN_ROOT/developer/src/kmldmlc/build.sh" build
 fi
 
 if [[ $PLATFORM == native ]]; then
