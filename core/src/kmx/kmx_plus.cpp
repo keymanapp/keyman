@@ -244,16 +244,6 @@ validate_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
   return validate_kmxplus_data(rawdata + ex->kmxplus.dpKMXPlus);
 }
 
-const kmx::COMP_KMXPLUS_KEYS_ENTRY *COMP_KMXPLUS_KEYS::find(KMX_DWORD vkey, KMX_DWORD mod) const {
-    // TODO-LDML: eventually, assume sorted order & binary search
-    for (KMX_DWORD i=0; i<count; i++) {
-        if(entries[i].vkey == vkey && entries[i].mod == mod) {
-            return &entries[i];
-        }
-    }
-    return nullptr;
-}
-
 KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
   for (KMX_DWORD i = 0; i < count; i++) {
     if (ident == entries[i].sect) {

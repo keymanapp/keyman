@@ -125,7 +125,6 @@ struct COMP_KMXPLUS_KEYS {
   KMX_DWORD count;    // number of keys
   KMX_DWORD reserved; // padding
   COMP_KMXPLUS_KEYS_ENTRY entries[];
-  const COMP_KMXPLUS_KEYS_ENTRY *find(KMX_DWORD vkey, KMX_DWORD mod) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_KEYS) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");

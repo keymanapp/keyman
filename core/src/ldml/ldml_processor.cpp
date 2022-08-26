@@ -148,6 +148,35 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     KMXPLUS_ASSERT(true, keys != nullptr);
     // Specified data size fits in total
     KMXPLUS_ASSERT(true, (offset+keys->header.size) < ex->kmxplus.dwKMXPlusSize);
+
+    // read from keys
+    for (KMX_DWORD i=0; i<keys->count; i++) {
+      const kmx::COMP_KMXPLUS_KEYS_ENTRY &entry = keys->entries[i];
+      KMX_DWORD len = 0;
+      KMX_WCHAR out[BUFSIZ];
+      if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
+        KMXPLUS_ASSERT(false, nullptr == strs->get(entry.to, out, BUFSIZ));
+        for(len=0; len<BUFSIZ && out[len]; len++);
+      } else {
+        UTF32 buf32[2];
+        buf32[0] = entry.to; // UTF-32
+        buf32[1] = 0; // to avoid UMR warning
+        UTF32 *sourceStart = &buf32[0];
+        const UTF32 *sourceEnd = &buf32[1]; // Reference off the end. NULL to avoid UMR.
+        UTF16 *targetStart = (UTF16*)out;
+        const UTF16 *targetEnd = (UTF16*)out+BUFSIZ-1;
+        ConversionResult result = ::ConvertUTF32toUTF16(&sourceStart, sourceEnd, &targetStart, targetEnd, strictConversion);
+        KMXPLUS_ASSERT(conversionOK, result);
+        *targetStart = 0;
+        len = 1; // TODO=LDML calculate
+        // len = (targetStart - out);
+        KMXPLUS_ASSERT(true, len>=1 && len <= 2);
+      }
+      KMXPLUS_ASSERT(true, len>0 && len < BUFSIZ);
+      KMXPLUS_ASSERT(0, out[len]); // null termination
+      ldml_vkey_id vkey_id((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod);
+      vkey_to_string[vkey_id] = std::u16string(out, len); // assign the string
+    }
   }
   KMXPLUS_PRINTLN("_valid = true");
 
@@ -245,46 +274,20 @@ ldml_processor::process_event(
       state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
       break;
     default:
-
       // Look up the key
-      const kmx::COMP_KMXPLUS_KEYS_ENTRY *key =  keys->find(vk, modifier_state);
-      if (!key) {
+      const ldml_vkey_id vkey_id(vk, modifier_state);
+      const auto key = vkey_to_string.find(vkey_id);
+      if (key == vkey_to_string.end()) {
+        // not found
         state->actions().commit(); // finish up and
         return KM_KBP_STATUS_OK; // Nothing to do- no key
       }
-      // Prepare output chars
-      KMX_DWORD len = 0;
-      KMX_WCHAR out[BUFSIZ];
-      if (key->flags && LDML_KEYS_FLAGS_EXTEND) {
-        // It's a string.
-        assert(nullptr != strs->get(key->to, out, BUFSIZ));
-        // u_strlen()
-        for(len=0; len<BUFSIZ && out[len]; len++);
-      } else {
-        UTF32 buf32[2];
-        buf32[0] = key->to; // UTF-32
-        buf32[1] = 0; // to avoid UMR warning
-        UTF32 *sourceStart = &buf32[0];
-        const UTF32 *sourceEnd = &buf32[1]; // Reference off the end. NULL to avoid UMR.
-        UTF16 *targetStart = (UTF16*)out;
-        const UTF16 *targetEnd = (UTF16*)out+BUFSIZ-1;
-        ConversionResult result = ::ConvertUTF32toUTF16(&sourceStart, sourceEnd, &targetStart, targetEnd, strictConversion);
-        assert(result == conversionOK);
-        *targetStart = 0;
-        len = 1; // TODO=LDML calculate
-        // len = (targetStart - out);
-        assert(len>=1 && len <= 2);
-      }
-      assert(len>0);
-      assert(len<BUFSIZ);
-      assert(out[len] == 0); // null termination
-
-      for(KMX_DWORD i=0; i<len; i++) {
-        state->context().push_character(out[i]);
-        state->actions().push_character(out[i]);
+      const std::u16string &str = key->second;
+      for(size_t i=0; i<str.length(); i++) {
+        state->context().push_character(str[i]);
+        state->actions().push_character(str[i]);
       }
     }
-
     state->actions().commit();
   } catch (std::bad_alloc &) {
     state->actions().clear();
