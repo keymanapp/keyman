@@ -33,16 +33,27 @@ export const constants = {
      * Length of a raw section header, in bytes
      */
     length_header: 8,
+
+    /**
+     * Minimum length of the 'sect' section, not including entries
+     */
+    length_sect: 16,
+    length_sect_item: 8,
+
     /**
      * Minimum length of the 'keys' section
      * not including variable parts
      */
     length_keys: 16,
+    length_keys_item: 16,
+
     /**
      * Minimum length of the 'loca' section
      * not including variable parts
      */
     length_loca: 16,
+    length_loca_item: 4,
+
     /**
      * length of the 'meta' section
      */
@@ -59,15 +70,18 @@ export const constants = {
      * bitwise or value for transformPartial=hide in meta.settings
      */
     meta_settings_transformPartial_hide: 4,
-    /**
-     * Minimum length of the 'sect' section, not including entries
-     */
-    length_sect: 16,
+
     /**
      * Minimum length of the 'strs' section
      * not including variable parts
      */
     length_strs: 16,
+    /**
+     * Length of each item in the 'strs' section
+     * variable part
+     */
+    length_strs_item: 8,
+
     /**
      * bitwise or value for extend in keys[key].flags.
      * If bit is 1, then 'to' is a string.
@@ -81,6 +95,7 @@ export const constants = {
      * not including variable parts
      */
     length_vkey: 16,
+    length_vkey_item: 8,
 
     /**
      * All section IDs.
