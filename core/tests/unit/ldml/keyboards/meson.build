@@ -5,26 +5,15 @@
 #
 
 tests = [
-# disabling 000 and 002 until we have updates to core or to the keyboards so that they pass
+# disabling 000 until we have updates to core or to the keyboard so that it passes
 #  'k_000_null_keyboard',
-  'k_001_tiny',
-#  'k_002_null_invalid'
+  'k_001_tiny'
 ]
-
-# Setup copying of source .xml files
-
-if build_machine.system() == 'windows'
-  kmldmlc_host = find_program('node.exe', required: true)
-  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
-else
-  kmldmlc_host = find_program('node', required: true)
-  copy_cmd = [find_program('cp', required: true)]
-endif
 
 # Setup kmldmlc
 
 kmldmlc_root = join_paths(meson.source_root(),'..','developer','src','kmldmlc')
-kmldmlc_cmd = [kmldmlc_host, kmldmlc_root]
+kmldmlc_cmd = [node, kmldmlc_root]
 
 # Build all keyboards in output folder
 
