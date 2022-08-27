@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as program from 'commander';
 
-import Compiler from './keyman/ldmlkeyboard/compiler';
+import Compiler from './keyman/compiler/compiler';
 
 let inputFilename: string;
 
@@ -48,7 +48,18 @@ class CompilerCallbacks {
 function compileKeyboard(inputFilename: string): Uint8Array {
   const c = new CompilerCallbacks();
   const k = new Compiler(c);
-  return k.compile(inputFilename);
+  let source = k.load(inputFilename);
+  if(!source) {
+    return null;
+  }
+  if(!k.validate(source)) {
+    return null;
+  }
+  let kmx = k.compile(source);
+  if(!kmx) {
+    return null;
+  }
+  return k.write(kmx);
 }
 
 // Compile:

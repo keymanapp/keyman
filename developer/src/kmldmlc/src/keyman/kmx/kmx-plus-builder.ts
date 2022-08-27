@@ -1,5 +1,5 @@
 import * as r from 'restructure';
-import KMXPlusFile from "./kmx-plus";
+import KMXPlusFile, { KeyFlags } from "./kmx-plus";
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 interface BUILDER_SECTION {
@@ -188,7 +188,7 @@ export default class KMXPlusBuilder {
         mod: item.mod,
         // todo: support 'extend'
         to: this.alloc_string(item.to),
-        flags: 0 // todo: support extend
+        flags: KeyFlags.extend // todo: support non-extended
       });
     }
 
