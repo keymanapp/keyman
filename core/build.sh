@@ -295,6 +295,7 @@ if $CONFIGURE; then
     if [[ ! -f "$KEYMAN_ROOT/developer/src/kmldmlc/build/kmldmlc.js" ]]; then
       "$KEYMAN_ROOT/common/web/keyman-version/build.sh" configure build
       "$KEYMAN_ROOT/developer/src/kmldmlc/build.sh" build
+      "$KEYMAN_ROOT/core/tools/hextobin/build.sh" build
     fi
   else
     echo "Note: could not find node, skipping kmldmlc dependency build, ldml tests will not be run"
