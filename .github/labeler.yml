@@ -18,7 +18,6 @@ android/samples/: android/Samples/**
 
 common/:
   - common/**
-  - core/**
   - resources/**
 
 common/models/: common/models/**
@@ -29,7 +28,7 @@ common/models/wordbreakers/: common/models/wordbreakers/**
 common/resources/: resources/**
 common/web/: common/web/**
 
-common/core/:
+core/:
   - core/**
 
 developer/:
