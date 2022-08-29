@@ -7,14 +7,14 @@ namespace com.keyman.osk {
   export type JSONTrackedPath = {
     coords: InputSample[]; // ensures type match with public class property.
     wasCancelled?: boolean;
-    //segments: Segment[];
+    segments: Segment[];
   }
 
   interface EventMap {
     'step': (sample: InputSample) => void,
     'complete': () => void,
     'invalidated': () => void
-    // 'segmentation': (endingSegment: Segment, openingSegment: Segment) => void
+    'segmentation': (segment: Segment) => void
   }
 
   /**
@@ -69,7 +69,14 @@ namespace com.keyman.osk {
       // Keep this as the _final_ statement in the constructor.  `PathSegmenter` will
       // need a reference to this instance, even if only via closure.
       // (Most likely; not yet done.) Kinda awkward, but it's useful for compartmentalization.
-      this.segmenter = new PathSegmenter();
+      // - DO use 'via closure.'  That allows us to have the segment passing done via
+      // `private` method.
+      const segmentStartClosure = (segment: Segment) => {
+        this._segments.push(segment);
+        this.emit('segmentation', segment);
+      }
+
+      this.segmenter = new PathSegmenter(segmentStartClosure);
     }
 
     /**
@@ -139,6 +146,7 @@ namespace com.keyman.osk {
           targetY: obj.targetY,
           t:       obj.t
         }))],
+        segments: [...this.segments],
         wasCancelled: this.wasCancelled
       }
 

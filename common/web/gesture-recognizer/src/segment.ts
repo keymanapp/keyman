@@ -14,6 +14,8 @@ namespace com.keyman.osk {
 
     private _type?: SegmentClass;
 
+    private _stats: CumulativePathStats;
+
     private _recognitionPromise: Promise<SegmentClass>;
     private _recognitionPromiseResolver: (type: SegmentClass | PromiseLike<SegmentClass>) => void;
 
@@ -40,13 +42,15 @@ namespace com.keyman.osk {
       this._peakSpeed = speed;
     }
 
-    private _stats: CumulativePathStats;
-
     protected updateStats(totalStats: CumulativePathStats) {
       this._stats = totalStats;
     }
 
     protected classifyType(type: SegmentClass) {
+      if(!this._stats) {
+        throw "Implementation error";
+      }
+
       if(this._type === undefined) {
         this._type = type;
 
@@ -63,6 +67,10 @@ namespace com.keyman.osk {
     get lastCoord(): InputSample {
       return this._stats.lastSample;
     };
+
+    get duration(): number {
+      return this._stats.duration;
+    }
 
     get speed(): number {
       return this._stats.speed;
@@ -89,6 +97,9 @@ namespace com.keyman.osk {
     }
 
     protected resolve() {
+      if(!this._stats) {
+        throw "Implementation error";
+      }
       this._resolutionPromiseResolver();
     }
   }

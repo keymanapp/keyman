@@ -563,8 +563,11 @@ namespace com.keyman.osk {
      */
     private choppedStats: CumulativePathStats = null;
 
-    constructor() {
+    private readonly segmentForwarder: (segment: Segment) => void;
+
+    constructor(segmentStartClosure: (segment: Segment) => void) {
       this.steppedCumulativeStats = [];
+      this.segmentForwarder = segmentStartClosure;
     }
 
     /**
@@ -910,9 +913,9 @@ namespace com.keyman.osk {
 
       this.constructingSegment?.clearPendingSubsegment();
       this.finalizeSegment();
-      this.constructingSegment = new ConstructingSegment(subsegment, new SegmentClassifier());
 
-      // TODO:  trigger publishing of the newly-constructing Segment!
+      this.constructingSegment = new ConstructingSegment(subsegment, new SegmentClassifier());
+      this.segmentForwarder(this.constructingSegment.pathSegment);
 
       return true;
     }

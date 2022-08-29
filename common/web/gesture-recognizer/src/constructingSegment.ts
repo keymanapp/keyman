@@ -140,7 +140,7 @@ namespace com.keyman.osk {
      */
     private _pendingLocked: boolean = false;
 
-    private publicSegment: SegmentImplementation;
+    private _pathSegment: SegmentImplementation;
 
     constructor(initialPendingSubsegment: Subsegmentation, classifier: SegmentClassifier) {
       // Note:  may be null!  Occurs for the first processed subsegment.
@@ -206,7 +206,7 @@ namespace com.keyman.osk {
       // TODO:  does not sufficiently check against the pending section yet for the forced-break scenario!
 
       // this.publicSegment.type, if set, will match the previous round's .classificationIfCompatible.
-      if(this.hasPrecommittedSubsegment && this.publicSegment.type && this.publicSegment.type != classification) {
+      if(this.hasPrecommittedSubsegment && this.pathSegment.type && this.pathSegment.type != classification) {
         // TODO:  SPECIAL CASE:  'forced break'.
         return false;
       } else {
@@ -299,18 +299,18 @@ namespace com.keyman.osk {
 
         // If the classification would change after updating the pending subsegment, block the update &
         // report update failure.
-        if(this.publicSegment.type != classification) {
+        if(this.pathSegment.type != classification) {
           return false;
         }
       }
 
       this.pendingSubsegmentation = subsegmentation;
 
-      // TODO:  any other kind of updates to do here?
-
       if(isFirstUpdate) {
-        this.publicSegment = new SegmentImplementation();
+        this.pathSegment = new SegmentImplementation();
       }
+
+      this.pathSegment.updateStats(fullStatsWithIncoming);
 
       // Check the length of time that's elapsed.  If we've surpassed the recognition threshold,
       // it's time to commit to classifying the in-construction Segment.
@@ -318,7 +318,7 @@ namespace com.keyman.osk {
       const recognitionWaitTime = this.classifier.config.holdMinimumDuration - alreadyElapsed;
 
       // `undefined` if and only if still unrecognized.
-      if(recognitionWaitTime <= 0 && this.publicSegment.type === undefined) {
+      if(recognitionWaitTime <= 0 && this._pathSegment.type === undefined) {
         const classification = this.classifier.classifySegment(fullStatsWithIncoming);
 
         // Based on the specification for segment classification, there WILL be a classification
@@ -329,12 +329,8 @@ namespace com.keyman.osk {
 
         // auto-resolve the recognition promise & 'lock' the classification (and also the portion
         // of the touchpath that triggered it).
-        this.publicSegment.classifyType(classification);
+        this.pathSegment.classifyType(classification);
         this.hasPrecommittedSubsegment = true;
-      }
-
-      if(isFirstUpdate) {
-        // TODO:  publish segment
       }
 
       return true;
@@ -363,10 +359,10 @@ namespace com.keyman.osk {
         this.hasPrecommittedSubsegment = false;
 
         // Recognition check!
-        if(!this.publicSegment.type) {
+        if(!this.pathSegment.type) {
           const classification = this.classifier.classifySegment(this.committedInterval);
           if(classification) {
-            this.publicSegment.classifyType(classification);
+            this.pathSegment.classifyType(classification);
           }
         }
       } else {
@@ -380,20 +376,19 @@ namespace com.keyman.osk {
       }
 
       // Fully 'recognize' the Segment if it somehow hasn't yet been recognized.
-      if(this.publicSegment.type === undefined) {
-        this.publicSegment.classifyType(this.classifier.classifySegment(this.committedInterval));
+      if(this.pathSegment.type === undefined) {
+        this.pathSegment.classifyType(this.classifier.classifySegment(this.committedInterval));
       }
 
-      this.publicSegment.resolve();
-    }
-
-    // TEMP:  for until we have properly published Segment objects
-    public get classification() {
-      return this.classifier.classifySegment(this.committedInterval);
+      this.pathSegment.resolve();
     }
 
     public get pathSegment() {
-      return this.publicSegment;
+      return this._pathSegment;
+    }
+
+    public set pathSegment(segment: SegmentImplementation) {
+      this._pathSegment = segment;
     }
   }
 }
