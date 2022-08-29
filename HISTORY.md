@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 16.0.53 alpha 2022-08-29
+
+* feat(linux): Dockerfile for linux builder (#7133)
+
+## 16.0.52 alpha 2022-08-26
+
+* fix(android/engine): Lower the max height for landscape orientation (#7119)
+* fix(linux): Remove wrong `ok_for_single_backspace` method (#7123)
+
+## 16.0.51 alpha 2022-08-24
+
+* fix(android): verify browser before starting activity (#7001)
+* chore: Change platform advocates per discussion (#7096)
+* fix(windows): Add invalidate context action to non-updatable parse (#7089)
+* feat(common): add parameter variable support to `builder_` functions (#7103)
+
 ## 16.0.50 alpha 2022-08-23
 
 * chore(core): Remove obsolete python keyboardprocessor (#7094)
