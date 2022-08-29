@@ -12,6 +12,7 @@
         "node_modules"
     ],
     "files": [
+        "index.ts",
         "hextobin.ts"
     ]
 }

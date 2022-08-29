@@ -9,7 +9,7 @@ invalid_tests = [
 ]
 
 
-hextobin_root = join_paths(meson.source_root(),'tools','hextobin')
+hextobin_root = join_paths(meson.source_root(),'..','common','tools','hextobin')
 hextobin_cmd = [node, hextobin_root]
 
 if build_machine.system() == 'windows'
