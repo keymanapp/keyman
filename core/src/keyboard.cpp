@@ -6,7 +6,7 @@
   History:      7 Oct 2018 - TSE - Refactored out of km_kbp_keyboard_api.cpp
 */
 #include "keyboard.hpp"
-#include "json.hpp"
+#include "jsonpp.hpp"
 
 using namespace km::kbp;
 
