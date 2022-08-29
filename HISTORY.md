@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.53 alpha 2022-08-29
+
+* feat(linux): Dockerfile for linux builder (#7133)
+
 ## 16.0.52 alpha 2022-08-26
 
 * fix(android/engine): Lower the max height for landscape orientation (#7119)
