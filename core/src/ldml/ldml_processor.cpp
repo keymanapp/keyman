@@ -147,7 +147,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
     KMXPLUS_ASSERT(true, keys != nullptr);
     // Specified data size fits in total
-16    KMXPLUS_ASSERT(true, (offset+keys->header.size) <= ex->kmxplus.dwKMXPlusSize);
+    KMXPLUS_ASSERT(true, (offset+keys->header.size) <= ex->kmxplus.dwKMXPlusSize);
 
     // read all keys into array
     for (KMX_DWORD i=0; i<keys->count; i++) {
