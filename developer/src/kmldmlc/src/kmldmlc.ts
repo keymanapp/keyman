@@ -18,7 +18,7 @@ program
   .description('Compiles Keyman LDML keyboards')
   .version(KEYMAN_VERSION.VERSION_WITH_TAG)
   .arguments('<infile>')
-  .action(infile => inputFilename = infile)
+  .action((infile:any) => inputFilename = infile)
   .option('-o, --outFile <filename>', 'where to save the resulting .kmx file');
 
 program.parse(process.argv);
@@ -69,5 +69,6 @@ let code = compileKeyboard(inputFilename);
 
 if(code) {
   const outFile = program.outFile ?? path.join(path.dirname(inputFilename), path.basename(inputFilename, '.xml') + '.kmx');
+  console.log(`Writing compiled keyboard to ${outFile}`);
   fs.writeFileSync(outFile, code);
 }

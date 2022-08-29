@@ -39,8 +39,8 @@ struct COMP_KMXPLUS_SECT_ENTRY {
 struct COMP_KMXPLUS_SECT {
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD total;                     // 0008 KMXPlus entire length
-  KMX_DWORD count;                     // 000B number of section headers
-  COMP_KMXPLUS_SECT_ENTRY entries[];  // 0010 section entries
+  KMX_DWORD count;                     // 000C number of section headers
+  COMP_KMXPLUS_SECT_ENTRY entries[];   // 0010 section entries
   /**
    * @brief Get the offset of a section, or 0
    *
@@ -63,7 +63,7 @@ struct COMP_KMXPLUS_STRS {
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count;                    // 0008 count of str entries
   KMX_DWORD reserved;                 // 000C padding
-  COMP_KMXPLUS_STRS_ENTRY entries[]; // 0010+ entries
+  COMP_KMXPLUS_STRS_ENTRY entries[];  // 0010+ entries
 
   /**
    * @brief Get a string entry
@@ -93,7 +93,7 @@ struct COMP_KMXPLUS_META {
 static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META, "mismatched size of section meta");
 
 struct COMP_KMXPLUS_LOCA_ENTRY {
-  KMX_DWORD locale; // 000C+ locale string entry
+  KMX_DWORD locale; // 0010+ locale string entry
 };
 
 struct COMP_KMXPLUS_LOCA {
