@@ -11,6 +11,13 @@
 #include <kmx_file.h>
 #include <ldml/keyboardprocessor_ldml.h>
 
+/**
+ * @def KMXPLUS_DEBUG Set to 1 to enable debug output
+ */
+#ifndef KMXPLUS_DEBUG
+#define KMXPLUS_DEBUG 0
+#endif
+
 namespace km {
 namespace kbp {
 namespace kmx {
@@ -118,7 +125,6 @@ struct COMP_KMXPLUS_KEYS {
   KMX_DWORD count;    // number of keys
   KMX_DWORD reserved; // padding
   COMP_KMXPLUS_KEYS_ENTRY entries[];
-  const COMP_KMXPLUS_KEYS_ENTRY *find(KMX_DWORD vkey, KMX_DWORD mod) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_KEYS) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
@@ -227,7 +233,7 @@ as_kmxplus_vkey(const uint8_t *data) {
  * @param kmxplusdata data from the beginning of the KMXPlus section
  * @return true if valid
  */
-bool validate_kmxplus_data(void *kmxplusdata);
+bool validate_kmxplus_data(const uint8_t *kmxplusdata);
 
 /**
  * @param keyboard pointer to PCOMP_KEYBOARD with plus data following

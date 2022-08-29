@@ -8,11 +8,6 @@
 #include <kmx_file.h>
 #include <kmx/kmx_plus.h>
 
-/**
- * @def KMXPLUS_DEBUG Set to 1 to enable debug output
- */
-#define KMXPLUS_DEBUG 0
-
 #if KMXPLUS_DEBUG
 #include <stdio.h>
 #endif
@@ -247,16 +242,6 @@ validate_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard) {
   KMXPLUS_PRINTF(("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize));
   const uint8_t* rawdata = reinterpret_cast<const uint8_t*>(keyboard);
   return validate_kmxplus_data(rawdata + ex->kmxplus.dpKMXPlus);
-}
-
-const kmx::COMP_KMXPLUS_KEYS_ENTRY *COMP_KMXPLUS_KEYS::find(KMX_DWORD vkey, KMX_DWORD mod) const {
-    // TODO-LDML: eventually, assume sorted order & binary search
-    for (KMX_DWORD i=0; i<count; i++) {
-        if(entries[i].vkey == vkey && entries[i].mod == mod) {
-            return &entries[i];
-        }
-    }
-    return nullptr;
 }
 
 KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
