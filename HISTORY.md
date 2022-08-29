@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.269 stable 2022-08-29
+
+* chore(linux): Update debian changelog (#7040)
+* feat(linux): Replace deprecated distutils :cherries: (#7052)
+* fix(developer): compiler emitting garbage for readonly groups (#7014)
+* chore: Change platform advocates per discussion (#7114)
+* fix(windows): remove saving and restoring context kbd options (#7107)
+* fix(windows): Add invalidate context action to non-updatable parse (#7108)
+* fix(android/engine): :cherries: Lower the max height for landscape orientation (#7128)
+
 ## 15.0.268 stable 2022-08-04
 
 * chore(linux): Update debian changelog (#6995)
