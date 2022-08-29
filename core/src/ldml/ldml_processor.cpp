@@ -127,7 +127,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     sect = kmx::as_kmxplus_sect(kmxplusdata+offset);
     KMXPLUS_ASSERT(true, sect != nullptr);
     // Specified data size fits in total
-    KMXPLUS_ASSERT(true, (offset+sect->header.size) < ex->kmxplus.dwKMXPlusSize);
+    KMXPLUS_ASSERT(true, (offset+sect->header.size) <= ex->kmxplus.dwKMXPlusSize);
   }
 
   // Fill out the other sections we need.
@@ -138,7 +138,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
     KMXPLUS_ASSERT(true, strs != nullptr);
     // Specified data size fits in total
-    KMXPLUS_ASSERT(true, (offset+strs->header.size) < ex->kmxplus.dwKMXPlusSize);
+    KMXPLUS_ASSERT(true, (offset+strs->header.size) <= ex->kmxplus.dwKMXPlusSize);
   }
 
   {
@@ -147,7 +147,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
     KMXPLUS_ASSERT(true, keys != nullptr);
     // Specified data size fits in total
-    KMXPLUS_ASSERT(true, (offset+keys->header.size) < ex->kmxplus.dwKMXPlusSize);
+16    KMXPLUS_ASSERT(true, (offset+keys->header.size) <= ex->kmxplus.dwKMXPlusSize);
 
     // read all keys into array
     for (KMX_DWORD i=0; i<keys->count; i++) {
@@ -156,7 +156,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       KMX_WCHAR out[BUFSIZ];
       if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
         KMXPLUS_ASSERT(false, nullptr == strs->get(entry.to, out, BUFSIZ));
-        for(len=0; len<BUFSIZ && out[len]; len++); // TODO-LDML: validate string length here, #7134 
+        for(len=0; len<BUFSIZ && out[len]; len++); // TODO-LDML: validate string length here, #7134
       } else {
         UTF32 buf32[2];
         buf32[0] = entry.to; // UTF-32
