@@ -1,0 +1,122 @@
+0x0000:            #  struct COMP_KEYBOARD {
+  4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
+
+  00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
+
+  fc 29 af f8      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
+  00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
+
+  00 00 00 00      #    KMX_DWORD cxStoreArray;   // 0018 in array entries
+  00 00 00 00      #    KMX_DWORD cxGroupArray;   // 001C in array entries
+
+  00 00 00 00      #    KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
+  00 00 00 00      #    KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
+
+  ff ff ff ff      #    KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
+  ff ff ff ff      #
+
+  20 00 00 00      #    KMX_DWORD dwFlags;        // 0030 Flags for the keyboard file
+
+  00 00 00 00      #    KMX_DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+
+  00 00 00 00      #    KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
+  00 00 00 00      #    KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
+                   #  };
+
+
+0x0040:            #  struct COMP_KEYBOARD_KMXPLUSINFO {
+  48 00 00 00      #    KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
+  52 01 00 00      #    KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
+                   #  };
+
+0x0048:            #  struct COMP_KMXPLUS_SECT {
+  73 65 63 74      #    KMX_DWORD header.ident;   // 0000 Section name
+  30 00 00 00      #    KMX_DWORD header.size;    // 0004 Section length
+  52 01 00 00      #    KMX_DWORD total;          // 0008 KMXPlus entire length
+  04 00 00 00      #    KMX_DWORD count;          // 000C number of section headers
+
+  73 74 72 73      #    KMX_DWORD sect;    // 0010+ Section identity - strs
+  30 00 00 00      #    KMX_DWORD offset;  // 0014+ Section offset relative to dpKMXPlus of section
+
+  6d 65 74 61      #    KMX_DWORD sect;    // 0010+ Section identity - meta
+  ea 00 00 00      #    KMX_DWORD offset;  // 0014+ Section offset relative to dpKMXPlus of section
+
+  6c 6f 63 61      #    KMX_DWORD sect;    // 0010+ Section identity - loca
+  0e 01 00 00      #    KMX_DWORD offset;  // 0014+ Section offset relative to dpKMXPlus of section
+
+  6b 65 79 73      #    KMX_DWORD sect;    // 0010+ Section identity - keys
+  22 01 00 00      #    KMX_DWORD offset;  // 0014+ Section offset relative to dpKMXPlus of section
+                   #  };
+
+0x0078:            #  struct COMP_KMXPLUS_STRS {
+  73 74 72 73      #    KMX_DWORD header.ident;   // 0000 Section name - strs
+  ba 00 00 00      #    KMX_DWORD header.size;    // 0004 Section length
+  09 00 00 00      #    KMX_DWORD count;          // 0008 count of str entries
+  00 00 00 00      #    KMX_DWORD reserved;       // 000C padding
+
+  58 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  07 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+  68 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  06 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+  76 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  0b 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+  8e 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  06 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+  9c 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  03 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+  a4 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  02 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+  aa 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  02 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+  b0 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  01 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+  b4 00 00 00      #    KMX_DWORD offset;         // 0010+ offset from this blob
+  02 00 00 00      #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+                   # };
+
+# String table
+
+  54 00 65 00 73 00 74 00 4b 00 62 00 64 00 00 00 # 0:TestKbd
+  73 00 72 00 6c 00 32 00 39 00 35 00 00 00       # 1:srl295
+  74 00 65 00 63 00 68 00 70 00 72 00 65 00 76 00
+  69 00 65 00 77 00 00 00                         # 2:techpreview
+  71 00 77 00 65 00 72 00 74 00 79 00 00 00       # 3:qwerty
+  4e 00 46 00 43 00 00 00                         # 4:NFC
+  3d d8 40 de 00 00                               # 5:🙀
+  6d 00 74 00 00 00                               # 6:mt
+  27 01 00 00                                     # 7:ħ
+  90 17 b6 17 00 00                               # 8:ថា
+
+0x132:             # struct COMP_KMXPLUS_META {
+  6d 65 74 61      #    KMX_DWORD header.ident;   // 0000 Section name - meta
+  24 00 00 00      #    KMX_DWORD header.size;    // 0004 Section length
+  00 00 00 00      #   KMX_DWORD name;
+  01 00 00 00      #   KMX_DWORD author;
+  02 00 00 00      #   KMX_DWORD conform;
+  03 00 00 00      #   KMX_DWORD layout;
+  04 00 00 00      #   KMX_DWORD normalization;
+  05 00 00 00      #   KMX_DWORD indicator;
+  00 00 00 00      #   KMX_DWORD settings;
+                   # };
+
+0x0156:            # struct COMP_KMXPLUS_LOCA {
+  6c 6f 63 61      #    KMX_DWORD header.ident;   // 0000 Section name - loca
+  14 00 00 00      #    KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00      #    KMX_DWORD count; // 0008 number of locales
+  00 00 00 00      #    KMX_DWORD reserved;
+  06 00 00 00      #    KMX_DWORD locale; // 0010+ locale string entry = 'mt'
+                   # };
+
+0x016a:            # struct COMP_KMXPLUS_KEYS {
+  6b 65 79 73      #    KMX_DWORD header.ident;   // 0000 Section name - keys
+  30 00 00 00      #    KMX_DWORD header.size;    // 0004 Section length
+  02 00 00 00      #    KMX_DWORD count;    // number of keys
+  00 00 00 00      #    KMX_DWORD reserved; // padding
+                   # };
+
+# Keys data:
+
+  c0 00 00 00  00 00 00 00  07 00 00 00  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
+  31 00 00 00  00 00 00 00  08 00 00 00  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
