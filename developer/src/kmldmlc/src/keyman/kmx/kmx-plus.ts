@@ -136,7 +136,7 @@ export default class KMXPlusFile extends KMXFile {
       layout: r.uint32le, //str
       normalization: r.uint32le, //str
       indicator: r.uint32le, //str
-      settings: new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
+      settings: r.uint32le, //new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
     });
 
     this.COMP_PLUS_LOCA_ITEM = r.uint32le; //str
@@ -153,7 +153,7 @@ export default class KMXPlusFile extends KMXFile {
       vkey: r.uint32le,
       mod: r.uint32le,
       to: r.uint32le, //str or UTF-32 char depending on value of 'extend'
-      flags: new r.Bitfield(r.uint32le, ['extend'])
+      flags: r.uint32le, //new r.Bitfield(r.uint32le, ['extend'])
     });
 
     this.COMP_PLUS_KEYS = new r.Struct({
