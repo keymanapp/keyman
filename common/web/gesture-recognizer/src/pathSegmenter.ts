@@ -577,6 +577,7 @@ namespace com.keyman.osk {
      */
     public add(sample: InputSample) {
       // TODO:  if this is the first received input sample, generate & publish a "start" segment.
+      // Bypass ConstructingSegment for this?  (So, directly instantiate SegmentImplementation)
 
       // Set up the input-repeater (in case we don't get further feedback but remain active)
       const repeater = (timeDelta: number) => {
@@ -627,6 +628,7 @@ namespace com.keyman.osk {
       this.finalizeSegment();
 
       // TODO:  create + publish an "end" segment.
+      // Bypass ConstructingSegment for this?  (So, directly instantiate SegmentImplementation)
 
       // TODO:  this is a temporary statement to facilitate exploration, experimentation, & debugging.
       //        We should be providing output to the touchpath object (`.path.segments`).
