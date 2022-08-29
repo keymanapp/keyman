@@ -19,6 +19,10 @@
     "common/models/*",
     "common/web/*",
     "common/predictive-text",
+    "common/tools/hextobin",
     "web"
-  ]
+  ],
+  "dependencies": {
+    "@keymanapp/hextobin": "file:common/tools/hextobin"
+  }
 }

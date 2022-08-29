@@ -8,6 +8,16 @@ invalid_tests = [
   'ik_000_null_invalid'
 ]
 
+
+hextobin_root = join_paths(meson.source_root(),'..','common','tools','hextobin')
+hextobin_cmd = [node, hextobin_root]
+
+if build_machine.system() == 'windows'
+  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
+else
+  copy_cmd = [find_program('cp', required: true)]
+endif
+
 # Build all keyboards in output folder
 
 foreach kbd : invalid_tests
@@ -18,8 +28,8 @@ foreach kbd : invalid_tests
   )
 
   configure_file(
-    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
+    command: hextobin_cmd + ['@INPUT@', '@OUTPUT@'],
     output: kbd + '.kmx',
-    input: kbd + '.kmx'
+    input: kbd + '.txt'
   )
 endforeach
