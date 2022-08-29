@@ -1,18 +1,4 @@
 namespace com.keyman.osk {
-  // TODO NOTE:
-  //
-  // Maintain an access to the segment class and just raw-update its stats.  Don't go full encapsulation.
-  // BUT have the object inherit from EventEmitter & support fields for the Promises.
-  //
-  // 1. The consumer needs a consistent reference for the object & event listening
-  // 2. That object doesn't HAVE to be hyper-encapsulated.  Just a convenient "hook" point.
-  // 3. We can maintain the Promises for recognized, resolved, etc HERE, making a copy of their
-  //    references for the object.
-
-  //
-  // Or we can subclass a parent with protected funcs & make 'em public.  We 'publish' A, even implement
-  // most of the stuff in there... but we instantiate B so that we can do maintenance.
-
   class CompatibilityAnalyzer {
     readonly classifier: SegmentClassifier;
     private split: SegmentationSplit;
@@ -123,7 +109,7 @@ namespace com.keyman.osk {
      * Notes all subsegments identified as part of the overall segment being constructed.
      */
     // TODO:  Re-private this!
-    /*private*/ subsegmentations: Subsegmentation[] = [];
+    private subsegmentations: Subsegmentation[] = [];
 
     /**
      * Marks a potential follow-up subsegment.  This portion is not automatically
@@ -169,6 +155,10 @@ namespace com.keyman.osk {
       return this.committedIntervalAsSubsegmentation.stats;
     }
 
+    public get subsegmentCount(): number {
+      return this.subsegmentations.length;
+    }
+
     /**
      * Returns a merged form of all currently-committed subsegments in
      * Subsegmentation form.
@@ -201,17 +191,7 @@ namespace com.keyman.osk {
      */
     public isCompatible(subsegmentation: Subsegmentation): boolean {
       const pendingAnalyzer = this.analyzeCompatibility(subsegmentation);
-      const classification = pendingAnalyzer.classificationIfCompatible;
-
-      // TODO:  does not sufficiently check against the pending section yet for the forced-break scenario!
-
-      // this.publicSegment.type, if set, will match the previous round's .classificationIfCompatible.
-      if(this.hasPrecommittedSubsegment && this.pathSegment.type && this.pathSegment.type != classification) {
-        // TODO:  SPECIAL CASE:  'forced break'.
-        return false;
-      } else {
-        return pendingAnalyzer.isCompatible;
-      }
+      return pendingAnalyzer.isCompatible;
     }
 
     public analyzeCompatibility(subsegmentation: Subsegmentation): CompatibilityAnalyzer {
@@ -355,6 +335,15 @@ namespace com.keyman.osk {
     public commitPendingSubsegment() {
       if(this.pendingSubsegmentation) {
         this.subsegmentations.push(this.pendingSubsegmentation);
+
+        // Check the peak speed & update if needed.
+        const commitStats = this.pendingSubsegment.stats;
+        let peakSpeed = commitStats.mean('v') + Math.sqrt(commitStats.variance('v'));
+        if(peakSpeed > this.pathSegment.peakSpeed) {
+          this.pathSegment.setPeakSpeed(peakSpeed);
+        }
+
+        // Clear 'pending'-related fields.
         this.pendingSubsegmentation = null;
         this.hasPrecommittedSubsegment = false;
 

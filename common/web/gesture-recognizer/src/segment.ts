@@ -1,5 +1,17 @@
 namespace com.keyman.osk {
 
+  export interface JSONSegment {
+    type: SegmentClass,
+    duration: number,
+    distance: number,
+    speed: number,
+    peakSpeed: number
+    angle: number,
+    cardinalDirection: string,
+    initialCoord: InputSample,
+    lastCoord: InputSample
+  }
+
   export class Segment {
     /**
      * Denotes the highest (mean + 1-sigma) speed seen among all subsegments comprising
@@ -14,7 +26,7 @@ namespace com.keyman.osk {
 
     private _type?: SegmentClass;
 
-    private _stats: CumulativePathStats;
+    private _stats: CumulativePathStats | JSONSegment;
 
     private _recognitionPromise: Promise<SegmentClass>;
     private _recognitionPromiseResolver: (type: SegmentClass | PromiseLike<SegmentClass>) => void;
@@ -22,16 +34,25 @@ namespace com.keyman.osk {
     private _resolutionPromise: Promise<void>;
     private _resolutionPromiseResolver: () => void;
 
-    public constructor() {
-      this._peakSpeed = 0;
+    public constructor(serializedObj?: JSONSegment) {
+      if(serializedObj) {
+        // We'll use the loaded object as our core reference.
+        this._stats = serializedObj;
 
-      this._recognitionPromise = new Promise<SegmentClass>((resolve) => {
-        this._recognitionPromiseResolver = resolve;
-      });
+        // Ensure that the two promises are properly initialized for this construction type.
+        this._recognitionPromise = Promise.resolve(serializedObj.type);
+        this._resolutionPromise  = Promise.resolve();
+      } else {
+        this._peakSpeed = 0;
 
-      this._resolutionPromise = new Promise<void>((resolve) => {
-        this._resolutionPromiseResolver = resolve;
-      })
+        this._recognitionPromise = new Promise<SegmentClass>((resolve) => {
+          this._recognitionPromiseResolver = resolve;
+        });
+
+        this._resolutionPromise = new Promise<void>((resolve) => {
+          this._resolutionPromiseResolver = resolve;
+        })
+      }
     }
 
     get peakSpeed(): number {
@@ -61,15 +82,31 @@ namespace com.keyman.osk {
     }
 
     get initialCoord(): InputSample {
-      return this._stats.initialSample;
+      if(this._stats instanceof CumulativePathStats) {
+        return this._stats.initialSample;
+      } else {
+        return this._stats.initialCoord;
+      }
     };
 
     get lastCoord(): InputSample {
-      return this._stats.lastSample;
+      if(this._stats instanceof CumulativePathStats) {
+        return this._stats.lastSample;
+      } else {
+        return this._stats.lastCoord;
+      }
     };
 
     get duration(): number {
       return this._stats.duration;
+    }
+
+    get distance(): number {
+      if(this._stats instanceof CumulativePathStats) {
+        return this._stats.netDistance;
+      } else {
+        return this._stats.distance;
+      }
     }
 
     get speed(): number {
@@ -101,6 +138,28 @@ namespace com.keyman.osk {
         throw "Implementation error";
       }
       this._resolutionPromiseResolver();
+    }
+
+    public toJSON(): JSONSegment {
+      const cleanSample: (sample: InputSample) => InputSample = (sample) => {
+        const clone = {... sample};
+        delete clone.clientX;
+        delete clone.clientY;
+
+        return clone;
+      }
+
+      return {
+        type: this.type,
+        duration: this.duration,
+        cardinalDirection: this.direction,
+        speed: this.speed,
+        distance: this.distance,
+        angle: this.angle,
+        peakSpeed: this.peakSpeed,
+        initialCoord: cleanSample(this.initialCoord),
+        lastCoord: cleanSample(this.lastCoord)
+      };
     }
   }
 

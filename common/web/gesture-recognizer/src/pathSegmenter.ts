@@ -650,7 +650,9 @@ namespace com.keyman.osk {
        * Note that they won't quite be the _same_ answers you'd get while in-process, but it should give useful
        * info nonetheless.
        */
+
       console.log(this.segmentConstructors);
+      console.log(this.segmentConstructors.map((obj) => obj.pathSegment));
     }
 
     /**
@@ -873,7 +875,7 @@ namespace com.keyman.osk {
 
     private finalizeSegment() {
       if(this.constructingSegment) {
-        if(this.constructingSegment.subsegmentations.length == 0) {
+        if(this.constructingSegment.subsegmentCount == 0) {
           throw "Implementation error!";
         }
         this.constructingSegment.finalize();
