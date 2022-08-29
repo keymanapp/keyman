@@ -199,7 +199,7 @@ namespace com.keyman.osk {
      * The initial sample included by this instance's computed stats.  Needed for
      * the 'directness' properties.
      */
-    private initialSample?: InputSample;
+    private _initialSample?: InputSample;
 
     private _lastSample?: InputSample;
     private followingSample?: InputSample;
@@ -235,8 +235,8 @@ namespace com.keyman.osk {
      *          newly-sampled point.
      */
     public extend(sample: InputSample): CumulativePathStats {
-      if(!this.initialSample) {
-        this.initialSample = sample;
+      if(!this._initialSample) {
+        this._initialSample = sample;
         this.baseSample = sample;
       }
       const result = new CumulativePathStats(this);
@@ -376,7 +376,7 @@ namespace com.keyman.osk {
       // ANY case except the timestamp (.t) - and even then, not far from the baseSample's timestamp value.
 
       // initialSample, though, we need to update b/c of the 'directness' properties.
-      result.initialSample = subsetStats.followingSample;
+      result._initialSample = subsetStats.followingSample;
 
       return result;
     }
@@ -395,6 +395,10 @@ namespace com.keyman.osk {
 
     private set sampleCount(value: number) {
       this._sampleCount = value;
+    }
+
+    public get initialSample() {
+      return this._initialSample;
     }
 
     /**
@@ -705,7 +709,7 @@ namespace com.keyman.osk {
     }
 
     // Convert to a `toJSON` method for use during investigative debugging.
-    private toDebuggingJSON() {
+    public get summaryObject() {
       // This `likelyState` value is extremely prototyped & just here for reviewer/tester convenience.
       // It'll need to be developed a bit more fully, but follows my intuitions from development &
       // testing.
@@ -726,20 +730,14 @@ namespace com.keyman.osk {
         cardinal: this.cardinalDirection,
         likelyType: likelyType,
         speedMean: this.mean('v'),
-        rawDistance: this.rawDistance,
+        netDistance: this.netDistance,
         duration: this.duration,
         sampleCount: this.sampleCount,
         angleMeanDegrees: this.angleMean * 180 / Math.PI,
         angleDeviation: this.angleDeviation,
+        rawDistance: this.rawDistance,
         speedVariance: this.variance('v')
       }
-    }
-
-    public toJSON() {
-      // We're not actually saving the JSON out to anything yet or loading/parsing it
-      // for any use beyond direct human interpretation, so... it's "okay" to
-      // leave like this for now.
-      return this.toDebuggingJSON();
     }
   }
 

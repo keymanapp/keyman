@@ -819,9 +819,30 @@ namespace com.keyman.osk {
       // Step 2 complete.
 
       // Step 3:  evaluate validity of the left-hand subsegment reasonably continuing the in-construction segment.
+      //          (In sort, subsegment "compatibility" with what came before.)
       //          A classic example case:  same direction, different speeds.
+      //
+      // Also, we must handle a somewhat complex case:  if we triggered a wait since the last observation,
+      // we must maintain that portion of the timeline as a wait subsegment - even if the newly-obtained
+      // subsegment is otherwise "incompatible".  To do THAT, we revert to the prior subsegmentation.
 
-      this.updateSegmentConstruction(candidateSplit.pre);
+      let updateSuccess = this.updateSegmentConstruction(candidateSplit.pre);
+
+      // If an update wasn't successful, that means we had to revert to a prior round's segmentation and
+      // have committed that instead.  So, we need to rebuild based on that...
+      if(!updateSuccess) {
+        // What's the split point that was used?  Since we've committed a prior subsegmentation,
+        // we can note the committed portion's endingAccumulation.
+        const priorLastAccumulation = this.constructingSegment.committedIntervalAsSubsegmentation.endingAccumulation;
+        const priorSplitPoint = this.steppedCumulativeStats.indexOf(priorLastAccumulation);
+        this.choppedStats = this.steppedCumulativeStats[priorSplitPoint-1];
+        this.steppedCumulativeStats = this.steppedCumulativeStats.slice(priorSplitPoint);
+
+        // It's quite possible that segmentation is possible in the leftover section post-reversion.
+        // There is a pretty good chance that it'll instantly abort, but no guarantee.
+        this.performSubsegmentation();
+        return;
+      }
 
       // First phase of segmentation:  complete!
       // Step 4:  basic bookkeeping.
@@ -830,6 +851,7 @@ namespace com.keyman.osk {
         return;
       }
 
+      // A successful update will ensure a valid .constructingSegment instance exists.
       this.constructingSegment.commitPendingSubsegment();
       this.choppedStats = this.steppedCumulativeStats[splitPoint-1];
       this.steppedCumulativeStats = this.steppedCumulativeStats.slice(splitPoint);
@@ -838,25 +860,61 @@ namespace com.keyman.osk {
       //          Does the right-hand (still-constructing) subsegment appear reasonable to
       //          'link' with its predecessors?  If not, finalize the predecessors.
 
+      // As this occurs after a `commitPending`, there is currently no pending subsegment.
+      // As such, this update will either:
+      // - initialize a new pending subsegment for the in-construction Segment if compatible
+      // - or finalize the Segment if incompatible, then use this subsegment to start a new Segment.
+      // As a result, this update call will always succeed; there's no prior pending state that may be reverted to.
       this.updateSegmentConstruction(candidateSplit.post);
     }
 
     private finalizeSegment() {
       if(this.constructingSegment) {
+        if(this.constructingSegment.subsegmentations.length == 0) {
+          throw "Implementation error!";
+        }
         this.constructingSegment.finalize();
         this.segmentConstructors.push(this.constructingSegment);
         this.constructingSegment = null;
       }
     }
 
-    private updateSegmentConstruction(subsegment: Subsegmentation) {
-      if(this.constructingSegment && this.constructingSegment.isCompatible(subsegment)) {
-        this.constructingSegment.updatePendingSubsegment(subsegment);
-      } else {
-        this.finalizeSegment();
-        this.constructingSegment = new ConstructingSegment(subsegment);
-        // TODO:  trigger publishing of the newly-constructing Segment!
+    private updateSegmentConstruction(subsegment: Subsegmentation): boolean {
+      let updateFlag: boolean;
+      if(this.constructingSegment) {
+        if(!this.constructingSegment.isCompatible(subsegment)) {
+          // unknown:  is pending locked or not?
+          updateFlag = false;
+        } else {
+          // Note that this call may semi-silently precommit the subsegment if this update is the
+          // first to surpass the configured segment recognition timer threshold.
+          //
+          // Alternatively, if updating the pending subsegment results in incompatibility while
+          // a pre-existing precomitted version does not, the update will fail.
+
+          updateFlag = this.constructingSegment.updatePendingSubsegment(subsegment);
+          if(updateFlag) {
+            return true;
+          }
+        }
       }
+
+      // If the segment under construction was registered as a 'hold' segment in the
+      // middle of the subsegment, we now require the 'pending subsegment' to maintain
+      // the same type.  But, reaching here means it's no longer compatible - so we
+      // use the previously-registered subsegmentation here instead.
+      if(updateFlag === false && this.constructingSegment.hasPrecommittedSubsegment) {
+        this.constructingSegment.commitPendingSubsegment();
+        return false;
+      }
+
+      this.constructingSegment?.clearPendingSubsegment();
+      this.finalizeSegment();
+      this.constructingSegment = new ConstructingSegment(subsegment, new SegmentClassifier());
+
+      // TODO:  trigger publishing of the newly-constructing Segment!
+
+      return true;
     }
   }
 }

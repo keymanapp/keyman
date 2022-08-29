@@ -12,7 +12,12 @@ namespace com.keyman.osk {
     holdMoveTolerance: number;
   }
 
-  export type SegmentClass = 'move' | 'hold';
+  export enum SegmentClass {
+    START = 'start',
+    END   = 'end',
+    HOLD  = 'hold',
+    MOVE  = 'move'
+  }
 
   export class SegmentClassifier {
     // TODO:  This should be defined somewhere that can be configured by
@@ -23,7 +28,7 @@ namespace com.keyman.osk {
       holdMoveTolerance: 5
     };
 
-    private readonly config: SegmentClassifierConfig;
+    readonly config: SegmentClassifierConfig;
 
     constructor(config?: SegmentClassifierConfig) {
       this.config = config || SegmentClassifier.DEFAULT_CONFIG;
@@ -50,7 +55,7 @@ namespace com.keyman.osk {
       // If following a 'move', this is probably the first part of a 'hold', and that's nice
       // to capture.  (Or, if preceding a 'move', the last part of a 'hold'.)
       if(stats.speed <= this.breakevenSpeed) {
-        return 'hold';
+        return SegmentClass.HOLD;
         // Otherwise, there's a strong chance - but not a guarantee - of transitioning into a
         // 'move' classification.  It's best to blend with whichever neighboring subsegment
         // will take it, if any.
@@ -66,11 +71,11 @@ namespace com.keyman.osk {
       // If the segment's net traveled distance exceeds the configured 'wait' distance
       // threshold, it must be classified as a 'move'.
       if(stats.netDistance > this.config.holdMoveTolerance) {
-        return 'move';
+        return SegmentClass.MOVE;
         // If it does not, and the duration of the segment exceeds the configured minimum
         // 'hold' time threshold, it's therefore a 'hold'.
       } else if(stats.duration >= this.config.holdMinimumDuration) {
-        return 'hold';
+        return SegmentClass.HOLD;
         // Otherwise, it cannot be 'recognized' as a formal segment.
       } else {
         return null;

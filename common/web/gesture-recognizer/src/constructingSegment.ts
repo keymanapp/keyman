@@ -1,12 +1,26 @@
 namespace com.keyman.osk {
+  // TODO NOTE:
+  //
+  // Maintain an access to the segment class and just raw-update its stats.  Don't go full encapsulation.
+  // BUT have the object inherit from EventEmitter & support fields for the Promises.
+  //
+  // 1. The consumer needs a consistent reference for the object & event listening
+  // 2. That object doesn't HAVE to be hyper-encapsulated.  Just a convenient "hook" point.
+  // 3. We can maintain the Promises for recognized, resolved, etc HERE, making a copy of their
+  //    references for the object.
+
+  //
+  // Or we can subclass a parent with protected funcs & make 'em public.  We 'publish' A, even implement
+  // most of the stuff in there... but we instantiate B so that we can do maintenance.
+
   class CompatibilityAnalyzer {
     readonly classifier: SegmentClassifier;
     private split: SegmentationSplit;
 
-    constructor(subsegmentationSplit: SegmentationSplit) {
+    constructor(subsegmentationSplit: SegmentationSplit, classifier: SegmentClassifier) {
       this.split = subsegmentationSplit;
 
-      this.classifier = new SegmentClassifier();
+      this.classifier = classifier;
     }
 
     private get preStats() {
@@ -22,17 +36,30 @@ namespace com.keyman.osk {
     }
 
     get directionCompatible(): boolean {
-      if(!this.preStats ||this.regressionDirectionCompatible) {
+      if(!this.preStats || this.regressionDirectionCompatible) {
         return true;
-      } else if(this.cardinalDirectionCompatible && this.preStats.mean('v') > 0.08 && this.postStats.mean('v') > 0.08) {
-          return true;
-      } else {
+      }
+
+      let preMatchesMove  = this.classifier.classifySubsegment(this.preStats)  != SegmentClass.HOLD;
+      let postMatchesMove = this.classifier.classifySubsegment(this.postStats) != SegmentClass.HOLD;
+
+      if(preMatchesMove != postMatchesMove) {
+        // If one subsegment appears to be a 'hold' while the other does not, well... holds
+        // don't (practically) have a direction, which mismatches with the 'move' that does
+        // have a direction.
         return false;
+      } else if(!preMatchesMove) {
+        // If both are 'hold' subsegments, both should be treated as directionless.
+        return true;
+      } else {
+        // If both are 'move' / 'move'-like subsegments, only merge if their directional
+        // classification falls into the same 'direction bucket'.
+        return this.cardinalDirectionCompatible;
       }
     }
 
     get cardinalDirectionCompatible(): boolean {
-      return !this.preStats ||this.preStats.cardinalDirection == this.postStats.cardinalDirection;
+      return !this.preStats || this.preStats.cardinalDirection == this.postStats.cardinalDirection;
     }
 
     get regressionDirectionCompatible(): boolean {
@@ -84,6 +111,7 @@ namespace com.keyman.osk {
    * PathSegmenter's operations.
    */
   export class ConstructingSegment {
+    readonly classifier: SegmentClassifier;
 
     /**
      * Marks previously-accumulated stats on the touchpath for the portion that precedes
@@ -94,7 +122,8 @@ namespace com.keyman.osk {
     /**
      * Notes all subsegments identified as part of the overall segment being constructed.
      */
-    private subsegmentations: Subsegmentation[] = [];
+    // TODO:  Re-private this!
+    /*private*/ subsegmentations: Subsegmentation[] = [];
 
     /**
      * Marks a potential follow-up subsegment.  This portion is not automatically
@@ -102,12 +131,24 @@ namespace com.keyman.osk {
      */
     private pendingSubsegmentation: Subsegmentation = null;
 
-    constructor(initialPendingSubsegment: Subsegmentation) {
+    /**
+     * A flag that is only set once the in-construction segment is first recognized as a 'wait'.
+     * If set, this indicates that the current - and _only_ the current - `pendingSubsegmentation`
+     * may only be replaced by an update that would still be compatible if the field's current
+     * value were already committed.  (Goal: prevent the 'locked' pending section from becoming
+     * not-committed in to the 'wait' role that triggered the 'lock'.)
+     */
+    private _pendingLocked: boolean = false;
+
+    private publicSegment: SegmentImplementation;
+
+    constructor(initialPendingSubsegment: Subsegmentation, classifier: SegmentClassifier) {
       // Note:  may be null!  Occurs for the first processed subsegment.
       this.baseAccumulation = initialPendingSubsegment.baseAccumulation;
+      this.classifier = classifier;
 
       this.subsegmentations = [];
-      this.pendingSubsegmentation = initialPendingSubsegment;
+      this.updatePendingSubsegment(initialPendingSubsegment);
     }
 
     /**
@@ -151,10 +192,6 @@ namespace com.keyman.osk {
       }
     }
 
-    public clearPendingPortion() {
-      this.pendingSubsegmentation = null;
-    }
-
     /**
      * Checks if the committed portion of the constructing segment are "compatible" with
      * a potential following subsegment.  Appending said subsegment may not change the
@@ -163,14 +200,35 @@ namespace com.keyman.osk {
      * @returns `true` if compatible, `false` if not.
      */
     public isCompatible(subsegmentation: Subsegmentation): boolean {
-      return this.analyzeCompatibility(subsegmentation).isCompatible;
+      const pendingAnalyzer = this.analyzeCompatibility(subsegmentation);
+      const classification = pendingAnalyzer.classificationIfCompatible;
+
+      // TODO:  does not sufficiently check against the pending section yet for the forced-break scenario!
+
+      // this.publicSegment.type, if set, will match the previous round's .classificationIfCompatible.
+      if(this.hasPrecommittedSubsegment && this.publicSegment.type && this.publicSegment.type != classification) {
+        // TODO:  SPECIAL CASE:  'forced break'.
+        return false;
+      } else {
+        return pendingAnalyzer.isCompatible;
+      }
     }
 
     public analyzeCompatibility(subsegmentation: Subsegmentation): CompatibilityAnalyzer {
       const committed = this.committedIntervalAsSubsegmentation;
       const segmentationSplit = new SegmentationSplit(committed, subsegmentation);
 
-      return new CompatibilityAnalyzer(segmentationSplit);
+      return new CompatibilityAnalyzer(segmentationSplit, this.classifier);
+    }
+
+    private wholeSegmentation(subsegmentation: Subsegmentation): Subsegmentation {
+      const whole: Subsegmentation = {
+        stats: subsegmentation.endingAccumulation.deaccumulate(this.baseAccumulation),
+        baseAccumulation: this.baseAccumulation,
+        endingAccumulation: subsegmentation.endingAccumulation
+      };
+
+      return whole;
     }
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -178,8 +236,6 @@ namespace com.keyman.osk {
     public debugLogCompabilityReport(subsegmentation: Subsegmentation) {
       const committed = this.committedIntervalAsSubsegmentation;
       const segmentationSplit = new SegmentationSplit(committed, subsegmentation);
-
-      const analyzer = new CompatibilityAnalyzer(segmentationSplit);
 
       if(this.subsegmentations.length == 0) {
         console.log("No prior subsegments - thus, no compatibility conflicts are possible.");
@@ -200,18 +256,88 @@ namespace com.keyman.osk {
       segmentationSplit._debugLogAlignmentReport();
     }
 
+    public get pendingSubsegment(): Subsegmentation {
+      return this.pendingSubsegmentation;
+    }
+
+    /**
+     * A subsegment is pre-committed when it is required to successfully classify the in-construction
+     * segment after reaching the configured time threshold for segment recognition - that is,
+     * when previously-committed subsegments are insufficient to support the classification of a
+     * 'recognized' Segment.
+     *
+     * In such a case, the precommitted portion must be maintained.  In the event that extending the
+     * subsegment (on future updates) would render it incompatible, the subsegment must be forceably
+     * segmented in order to commit the precommitted portion.
+     */
+    public get hasPrecommittedSubsegment() {
+      return this._pendingLocked;
+    }
+
+    private set hasPrecommittedSubsegment(flag: boolean) {
+      this._pendingLocked = flag;
+    }
+
     /**
      * Call this to denote the current state of an in-construction subsegment that **will** be included
-     * in the final Segment once completed if it does not diverge.
+     * in the final Segment once completed if the pending subsegment does not diverge in a later update.
      *
      * If the pending subsegment appears to belong to the current Segment, it contains valuable info
      * about the state of the as-of-yet unresolved Segment, including the most recent location
      * of the corresponding touchpoint.
+     *
      * @param subsegmentation
+     * @returns `true` unless the subsegment
      */
-    public updatePendingSubsegment(subsegmentation: Subsegmentation) {
-      // TODO:  neat updates & events.
+    public updatePendingSubsegment(subsegmentation: Subsegmentation): boolean {
+      const isFirstUpdate = !this.pendingSubsegmentation && this.subsegmentations.length == 0;
+      const fullStatsWithIncoming = this.wholeSegmentation(subsegmentation).stats;
+
+      // Do we have a locked pending section?  If so, check to be sure that an update won't break things.
+      if(this.hasPrecommittedSubsegment) {
+        const classification = this.classifier.classifySegment(fullStatsWithIncoming);
+
+        // If the classification would change after updating the pending subsegment, block the update &
+        // report update failure.
+        if(this.publicSegment.type != classification) {
+          return false;
+        }
+      }
+
       this.pendingSubsegmentation = subsegmentation;
+
+      // TODO:  any other kind of updates to do here?
+
+      if(isFirstUpdate) {
+        this.publicSegment = new SegmentImplementation();
+      }
+
+      // Check the length of time that's elapsed.  If we've surpassed the recognition threshold,
+      // it's time to commit to classifying the in-construction Segment.
+      const alreadyElapsed = fullStatsWithIncoming.duration;
+      const recognitionWaitTime = this.classifier.config.holdMinimumDuration - alreadyElapsed;
+
+      // `undefined` if and only if still unrecognized.
+      if(recognitionWaitTime <= 0 && this.publicSegment.type === undefined) {
+        const classification = this.classifier.classifySegment(fullStatsWithIncoming);
+
+        // Based on the specification for segment classification, there WILL be a classification
+        // assigned here.  It's an implementation error if not.
+        if(!classification) {
+          throw "Implementation error - segment was not properly recognized";
+        }
+
+        // auto-resolve the recognition promise & 'lock' the classification (and also the portion
+        // of the touchpath that triggered it).
+        this.publicSegment.classifyType(classification);
+        this.hasPrecommittedSubsegment = true;
+      }
+
+      if(isFirstUpdate) {
+        // TODO:  publish segment
+      }
+
+      return true;
     }
 
     /**
@@ -219,6 +345,10 @@ namespace com.keyman.osk {
      * longer compatible.
      */
     public clearPendingSubsegment() {
+      if(this.hasPrecommittedSubsegment) {
+        throw "Invalid state:  must fully commit a subsection due to a precommitted portion"!;
+      }
+
       // Probably does not need to trigger an event; if called, there's a new, follow-up segment
       // coming that will maintain the current coordinate with its events instead.  Assuming
       // the need to rely on Segment events for that; even that's better off handled with path.coords
@@ -230,6 +360,15 @@ namespace com.keyman.osk {
       if(this.pendingSubsegmentation) {
         this.subsegmentations.push(this.pendingSubsegmentation);
         this.pendingSubsegmentation = null;
+        this.hasPrecommittedSubsegment = false;
+
+        // Recognition check!
+        if(!this.publicSegment.type) {
+          const classification = this.classifier.classifySegment(this.committedInterval);
+          if(classification) {
+            this.publicSegment.classifyType(classification);
+          }
+        }
       } else {
         throw "Illegal state - `commitPendingPortion` should never be called with nothing pending.";
       }
@@ -240,7 +379,21 @@ namespace com.keyman.osk {
         this.commitPendingSubsegment();
       }
 
-      // TODO: fully 'recognize' the Segment.
+      // Fully 'recognize' the Segment if it somehow hasn't yet been recognized.
+      if(this.publicSegment.type === undefined) {
+        this.publicSegment.classifyType(this.classifier.classifySegment(this.committedInterval));
+      }
+
+      this.publicSegment.resolve();
+    }
+
+    // TEMP:  for until we have properly published Segment objects
+    public get classification() {
+      return this.classifier.classifySegment(this.committedInterval);
+    }
+
+    public get pathSegment() {
+      return this.publicSegment;
     }
   }
 }

@@ -1,15 +1,6 @@
 namespace com.keyman.osk {
+
   export class Segment {
-    /**
-     * Gets the accumulated stats across the full represented interval.
-     *
-     * This should be referenced for most statistical values that may be requested of the interval.
-     */
-    private stats: CumulativePathStats;
-
-    // Does NOT track the subsegment stats.  That said, will maintain internal fields
-    // with values sourced FROM subsegment stats as needed.
-
     /**
      * Denotes the highest (mean + 1-sigma) speed seen among all subsegments comprising
      * this segment.
@@ -21,36 +12,110 @@ namespace com.keyman.osk {
      */
     private _peakSpeed: number;
 
+    private _type?: SegmentClass;
+
+    private _recognitionPromise: Promise<SegmentClass>;
+    private _recognitionPromiseResolver: (type: SegmentClass | PromiseLike<SegmentClass>) => void;
+
+    private _resolutionPromise: Promise<void>;
+    private _resolutionPromiseResolver: () => void;
+
+    public constructor() {
+      this._peakSpeed = 0;
+
+      this._recognitionPromise = new Promise<SegmentClass>((resolve) => {
+        this._recognitionPromiseResolver = resolve;
+      });
+
+      this._resolutionPromise = new Promise<void>((resolve) => {
+        this._resolutionPromiseResolver = resolve;
+      })
+    }
+
     get peakSpeed(): number {
       return this._peakSpeed;
     }
 
-    // get initialCoord(): InputSample;
-    // get lastCoord(): InputSample;
+    protected setPeakSpeed(speed: number) {
+      this._peakSpeed = speed;
+    }
 
-    // get meanSpeed(): number;
+    private _stats: CumulativePathStats;
 
-    // get angle();
-    // get direction(): string; // (n, nw, ...)
+    protected updateStats(totalStats: CumulativePathStats) {
+      this._stats = totalStats;
+    }
 
-    // In-dev notes:
+    protected classifyType(type: SegmentClass) {
+      if(this._type === undefined) {
+        this._type = type;
 
-    // can get speed from best entry in subsegment stats
-    // subsegments should have consistent direction:  get direction from cumulative stats
+        this._recognitionPromiseResolver(type);
+      } else if(this._type != type) {
+        throw "May not change segment type once set!";
+      }
+    }
 
-    // interface to update subsegments?
-    // as this'll be a public object, we prob don't want to public-expose the related method(s).
-    // but we want a consistent object for the user / 'library consumer'.  How to?
-    // Idea:  public interface
-    // - private implementation
-    // - (possible) safety wrapper for the private implementation
-    //   - but, as far as Web (TS) goes, private-implementation parts won't be accessible.
+    get initialCoord(): InputSample {
+      return this._stats.initialSample;
+    };
 
-    // segment 'type' / 'classification'
+    get lastCoord(): InputSample {
+      return this._stats.lastSample;
+    };
 
-    // events?  or Promises?
-    // - 'recognized' - from 'unknown' to something specific.
-    // - 'resolved'   - when the segment is definitively finished.
-    // Promises might actually be simpler to work with externally - a segment could, in theory, be auto-recognized.
+    get speed(): number {
+      return this._stats.speed;
+    };
+
+    get angle(): number {
+      return this._stats.angle;
+    };
+
+    get direction(): string {
+      return this._stats.cardinalDirection;
+    };
+
+    get type(): SegmentClass {
+      return this._type;
+    }
+
+    get recognitionPromise(): Promise<SegmentClass> {
+      return this._recognitionPromise;
+    }
+
+    get resolutionPromise(): Promise<void> {
+      return this._resolutionPromise;
+    }
+
+    protected resolve() {
+      this._resolutionPromiseResolver();
+    }
+  }
+
+  /**
+   * Provides an editable typing for Segment; casting to the superclass provides an
+   * uneditable version instead.
+   */
+  export class SegmentImplementation extends Segment {
+    constructor() {
+      super();
+    }
+
+    public setPeakSpeed(speed: number) {
+      super.setPeakSpeed(speed);
+    }
+
+    public updateStats(stats: CumulativePathStats) {
+      super.updateStats(stats);
+    }
+
+    public classifyType(type: SegmentClass) {
+      super.classifyType(type);
+    }
+
+    public resolve() {
+      super.resolve();
+    }
   }
 }
