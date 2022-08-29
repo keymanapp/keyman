@@ -102,15 +102,14 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
   KMXPLUS_ASSERT(true, data.size() > sizeof(kmx::COMP_KEYBOARD_EX));
 
   // Locate the structs here, but still retain ptrs to the raw structs.
-  const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)data.data();
+  const kmx::COMP_KEYBOARD* comp_keyboard = (kmx::COMP_KEYBOARD*)data.data();
   KMXPLUS_ASSERT(true, !!(comp_keyboard->dwFlags & KF_KMXPLUS));
   const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
 
   // validate size and offset
-  KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize >  LDML_LENGTH_SECT);
-  KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize <  (data.size() - sizeof(kmx::COMP_KEYBOARD_EX)));
+  KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize >= LDML_LENGTH_SECT);
   KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     >= sizeof(kmx::COMP_KEYBOARD_EX));
-  KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     <  data.size());
+  KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize <= data.size());
 
   // calculate pointers to start and end of kmxplus
   const uint8_t * const kmxplusdata   = data.data() + ex->kmxplus.dpKMXPlus;      // Start of + data
@@ -157,7 +156,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       KMX_WCHAR out[BUFSIZ];
       if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
         KMXPLUS_ASSERT(false, nullptr == strs->get(entry.to, out, BUFSIZ));
-        for(len=0; len<BUFSIZ && out[len]; len++);
+        for(len=0; len<BUFSIZ && out[len]; len++); // TODO-LDML: validate string length here, #7134 
       } else {
         UTF32 buf32[2];
         buf32[0] = entry.to; // UTF-32
