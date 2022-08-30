@@ -135,6 +135,34 @@ namespace com.keyman.osk {
       return this.samples;
     }
 
+    /**
+     * Returns the segmented form of the touchpath over its lifetime thus far.  It is
+     * possible for certain parts of the path to go unrepresented if they are detected as
+     * insignificant.
+     *
+     * Also of note:  for the common case, the final coordinate of one Segment will usually
+     * be the initial point of the following Segment.  Usually, but not always.  This is
+     * the only overlap that may occur.
+     *
+     * Note:  segment events and updates will always occur in the following order:
+     *
+     * 1. A segment's role is 'recognized' - its classification becomes known.
+     * 2. The segment is 'resolved' - the segment is marked as completed.
+     * 3. The next segment is added to this field, with on('segmentation') is raised
+     *    for it.
+     *
+     * Note that it is possible for a segment to be 'recognized' and even 'resolved'
+     * before its event is raised (thus, before it is added here) under some scenarios.
+     * In particular, 'start' and 'end'-type segments are always 'recognized' and
+     * 'resolved'.
+     *
+     * While the touchpath is active, there is a very high chance that the final
+     * segment listed will not be resolved.  There will also be a distinct chance
+     * that it is not yet recognized.
+     *
+     * The first Segment should always be a 'start', while the final Segment - once
+     * _all_ input for the ongoing touchpath is complete - will be an 'end'.
+     */
     public get segments(): readonly Segment[] {
       return this._segments;
     }
