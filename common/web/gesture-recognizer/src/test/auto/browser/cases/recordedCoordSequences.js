@@ -101,6 +101,7 @@ describe("Layer one - DOM -> InputSequence", function() {
 
     for(let recordingID of testRecordings) {
       it(`${recordingID}.json`, function() {
+        this.timeout(2 * testconfig.timeouts.standard);
         let testObj = __json__[recordingID];
 
         // 'describe' has a notably different `this` reference than `it`, `before`, etc,

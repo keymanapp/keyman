@@ -42,6 +42,16 @@ fi
 
 # END - Script parameter configuration
 
+test-headless ( ) {
+  MOCHA_FLAGS=
+
+  if [ $REPORT_STYLE == "ci" ]; then
+    MOCHA_FLAGS="--reporter mocha-teamcity-reporter"
+  fi
+
+  npm run mocha -- --recursive $MOCHA_FLAGS ./src/test/auto/headless/
+}
+
 test-browser ( ) {
   KARMA_FLAGS=
   if [[ $# -eq 1  && $1 == "debug" ]]; then
@@ -57,7 +67,7 @@ test-browser ( ) {
 }
 
 if builder_has_action test :headless; then
-  echo "Headless unit tests for this module have not yet been defined."
+  test-headless
   builder_report success test :headless
 fi
 

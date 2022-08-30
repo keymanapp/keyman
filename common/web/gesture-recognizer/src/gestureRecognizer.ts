@@ -76,3 +76,14 @@ namespace com.keyman.osk {
     }
   }
 }
+
+(function () {
+  let ns = com.keyman.osk;
+
+  // Lets the GestureRecognizer be available both in the browser and in Node.
+  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ns.GestureRecognizer;
+    //@ts-ignore
+    ns.GestureRecognizer.com = com; // Export the root namespace so that all GestureRecognizer classes are accessible by unit tests.
+  }
+}());
