@@ -1,12 +1,5 @@
 /// <reference path="cumulativePathStats.ts" />
 
-/* FIXME:  There exists code emitting to the `console` at present.
- * Do not release before fixing this.
- *
- * Developer's note:  for debugging the algorithm seen in this file,
- * CTRL+F `_debugLogPath` and its notes.
- */
-
 namespace com.keyman.osk {
   // Mostly used here to compare the sum-squared error components of segmented regressions
   // to the sum-squared "modeled" components of their overall variance.  Those are the two
@@ -530,14 +523,6 @@ namespace com.keyman.osk {
     private constructingSegment: ConstructingSegment;
 
     /**
-     * TODO: These Segment-construction objects directly represent path segments
-     * produced by the prototype algorithm.  This field should be decommissioned
-     * once implementation of this class is complete; the produced Segments
-     * are retrievable from TrackedPath.segments.
-     */
-    private segmentConstructors: ConstructingSegment[] = [];
-
-    /**
      * Used to 'repeat' the most-recently observed incoming sample if no
      * other replaces it before it triggers.
      *
@@ -655,32 +640,6 @@ namespace com.keyman.osk {
       endSegment.resolve();
 
       this.segmentForwarder(endSegment);
-
-      // TODO:  this is a temporary statement to facilitate exploration, experimentation, & debugging.
-      //        The true goal is to provide output to the touchpath object (`.path.segments`).
-      //        So, once implementation is complete, we should probably eliminate this method.
-      this._debugLogPath();
-    }
-
-    // TODO:  alt goal - support a 'debug event' or some-such that emits the constructors for
-    // debugging analysis without directly needing to `console.log`.
-    private _debugLogPath() {
-      /*
-       * Debugging assistance notes:  in many modern browsers, you can right-click a logged object
-       * and say to "Store object as global variable", giving you console access to the array logged
-       * below.
-       *
-       * From there, you can use this line to examine the debug-log reports for any contiguous
-       * Subsegment pair like this, where `temp1` is the name auto-assigned by the "store object" command:
-       *
-       * `new com.keyman.osk.SegmentationSplit(temp1[1].subsegmentations[0], temp1[1].subsegmentations[1])`
-       *
-       * Note that they won't quite be the _same_ answers you'd get while in-process, but it should give useful
-       * info nonetheless.
-       */
-
-      console.log(this.segmentConstructors);
-      console.log(this.segmentConstructors.map((obj) => obj.pathSegment));
     }
 
     /**
@@ -880,6 +839,10 @@ namespace com.keyman.osk {
       // First phase of segmentation:  complete!
       // Step 4:  basic bookkeeping.
 
+      /*
+       * NOTE:  this marks a very good location to call _debugLogSplitReport() if a deep-dive
+       * inspection of the subsegmentation algorithm and its decisions is needed.
+       */
       if(!candidateSplit.segmentationMerited) {
         return;
       }
@@ -907,7 +870,20 @@ namespace com.keyman.osk {
           throw "Implementation error!";
         }
         this.constructingSegment.finalize();
-        this.segmentConstructors.push(this.constructingSegment);
+
+        /*
+         * NOTE:  if a deep-dive investigation is needed, it may prove helpful to emit each finalized
+         * `constructingSegment` instance to the console here.  Like, _**precisely**_ here, immediately
+         * after this multiline comment.
+         *
+         * From there, note that in many modern browsers, you can right-click a logged object and say
+         * to "Store object as global variable", giving you console access to any such logged instances.
+         *
+         * `SubsegmentCompatibilityAnalyzer` is designed for ease-of-use with the members of
+         * `ConstructingSegment.subsegmentations` via `SegmentationSplit`, facilitating interactive
+         * inspection of which subsegments are and are not recombined into `Segment`s and why.
+         */
+
         this.constructingSegment = null;
       }
     }
