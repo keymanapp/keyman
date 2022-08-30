@@ -1,5 +1,7 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Meta } from "../kmx/kmx-plus";
+import { KeyboardSettings, Meta, Meta_NormalizationForm } from "../kmx/kmx-plus";
+import { isValidEnumValue } from "../util/util";
+import { CompilerErrors } from "./errors";
 import { SectionCompiler } from "./section-compiler";
 
 export class MetaCompiler extends SectionCompiler {
@@ -9,19 +11,31 @@ export class MetaCompiler extends SectionCompiler {
   }
 
   public validate(): boolean {
-    //
-    return true;
+    let valid = true;
+
+    const normalization = this.keyboard.info?.normalization;
+    if(normalization !== undefined) {
+      if(!isValidEnumValue(Meta_NormalizationForm, normalization)) {
+        this.callbacks.reportMessage(CompilerErrors.ERROR_InvalidNormalization, `Invalid normalization form '${normalization}'`);
+        valid = false;
+      }
+    }
+
+    return valid;
   }
 
   public compile(): Meta {
     let result = new Meta();
-    result.name = this.source.keyboard.names?.name?.[0]?.value;
-    result.author = this.source.keyboard.info?.author;
-    result.conform = this.source.keyboard.conformsTo;
-    result.layout = this.source.keyboard.info?.layout;
-    result.normalization = this.source.keyboard.info?.normalization;
-    result.indicator = this.source.keyboard.info?.indicator;
-    result.settings = 0;
+    result.name = this.keyboard.names?.name?.[0]?.value;
+    result.author = this.keyboard.info?.author;
+    result.conform = this.keyboard.conformsTo;
+    result.layout = this.keyboard.info?.layout;
+    result.normalization = this.keyboard.info?.normalization as Meta_NormalizationForm;
+    result.indicator = this.keyboard.info?.indicator;
+    result.settings =
+      (this.keyboard.settings?.fallback == "omit" ? KeyboardSettings.fallback : 0) |
+      (this.keyboard.settings?.transformFailure == "omit" ? KeyboardSettings.transformFailure : 0) |
+      (this.keyboard.settings?.transformPartial == "hide" ? KeyboardSettings.transformPartial : 0);
     return result;
   }
 }

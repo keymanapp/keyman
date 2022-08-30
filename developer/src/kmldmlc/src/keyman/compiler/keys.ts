@@ -14,8 +14,8 @@ export class KeysCompiler extends SectionCompiler {
   public compile(): Keys {
     // Use LayerMap + keys to generate compiled keys for hardware
 
-    if(this.source.keyboard.layerMaps?.[0]?.form == 'hardware') {
-      for(let layer of this.source.keyboard.layerMaps[0].layerMap) {
+    if(this.keyboard.layerMaps?.[0]?.form == 'hardware') {
+      for(let layer of this.keyboard.layerMaps[0].layerMap) {
         let sect = this.compileHardwareLayer(layer);
         return sect;
       }
@@ -49,7 +49,7 @@ export class KeysCompiler extends SectionCompiler {
           break;
         }
 
-        let keydef = this.source.keyboard.keys?.key?.find(x => x.id == key);
+        let keydef = this.keyboard.keys?.key?.find(x => x.id == key);
         if(!keydef) {
           this.callbacks.reportMessage(0,
             `Key ${key} in position #${x+1} on row #${y+1} of layer ${layer.id}, form 'hardware' not found in key bag`);
