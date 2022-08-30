@@ -53,7 +53,6 @@ uses
   CompileErrorCodes in '..\common\delphi\compiler\CompileErrorCodes.pas',
   TouchLayout in '..\tike\oskbuilder\TouchLayout.pas',
   TouchLayoutDefinitions in '..\tike\oskbuilder\TouchLayoutDefinitions.pas',
-  TouchLayoutUtils in '..\tike\oskbuilder\TouchLayoutUtils.pas',
   KeyboardFonts in '..\common\delphi\general\KeyboardFonts.pas',
   KeyboardParser in '..\tike\main\KeyboardParser.pas',
   WindowsLanguages in '..\common\delphi\general\WindowsLanguages.pas',

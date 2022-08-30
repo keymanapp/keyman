@@ -15,7 +15,7 @@
 #include <keyman/keyboardprocessor.h>
 
 #include "context.hpp"
-#include "json.hpp"
+#include "jsonpp.hpp"
 #include "utfcodec.hpp"
 
 namespace {
