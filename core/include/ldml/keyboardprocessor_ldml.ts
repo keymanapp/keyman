@@ -5,6 +5,29 @@
   to be shared between TypeScript and C++ via the generator (below)
 */
 
+// This defines the section identifiers and ensures that we include each and
+// every one of them in the `sections` block and gives us a type which we can
+// iterate through
+
+export type SectionIdent =
+  'keys' |
+  'loca' |
+  'meta' |
+  'sect' |
+  'strs' |
+  'vkey';
+
+type SectionMap = {
+  [id in SectionIdent]: SectionIdent;
+}
+
+interface Constants_Section {
+  // For now, only defining one property as other types
+  // can be inferred
+  section: SectionMap;
+}
+
+type Constants = Constants_Section & {[id:string]:any};
 
 // Notice!
 //
@@ -24,7 +47,7 @@
  * values that are designed to appear as text when written in little endian
  * format, so 0x7379656b = 'keys'
  */
-export const constants = {
+export const constants: Constants = {
     /**
      * The version of the LDML processor
      */

@@ -1,3 +1,5 @@
+import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { Keys } from '../kmx/kmx-plus';
 import * as LDMLKeyboard from '../ldml-keyboard/ldml-keyboard-xml';
 import { USVirtualKeyMap } from "../ldml-keyboard/us-virtual-keys";
 
@@ -5,19 +7,29 @@ import { SectionCompiler } from "./section-compiler";
 
 export class KeysCompiler extends SectionCompiler {
 
-  public execute() {
+  public get id() {
+    return constants.section.keys;
+  }
+
+  public compile(): Keys {
     // Use LayerMap + keys to generate compiled keys for hardware
 
     if(this.source.keyboard.layerMaps?.[0]?.form == 'hardware') {
       for(let layer of this.source.keyboard.layerMaps[0].layerMap) {
-        this.compileHardwareLayer(layer);
+        let sect = this.compileHardwareLayer(layer);
+        return sect;
       }
     }
+
+    // TODO: generate vkey mapping for touch-only keys
+
+    return null;
   }
 
   private compileHardwareLayer(
     layer: LDMLKeyboard.LKLayerMap
-  ) {
+  ): Keys {
+    let result = new Keys();
     const mod = this.translateLayerIdToModifier(layer.id);
 
     let y = -1;
@@ -44,7 +56,7 @@ export class KeysCompiler extends SectionCompiler {
           continue;
         }
 
-        this.kmx.kmxplus.keys.keys.push({
+        result.keys.push({
           vkey: USVirtualKeyMap[y][x],
           mod: mod,
           to: keydef.to,
@@ -52,6 +64,8 @@ export class KeysCompiler extends SectionCompiler {
         });
       }
     }
+
+    return result;
   }
 
   private translateLayerIdToModifier(id: string) {

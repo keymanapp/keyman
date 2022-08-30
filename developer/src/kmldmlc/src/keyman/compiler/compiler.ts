@@ -1,5 +1,5 @@
-import KMXBuilder from '../kmx/kmx-builder';
-import KMXPlusFile from '../kmx/kmx-plus';
+import { constants } from '@keymanapp/ldml-keyboard-constants';
+import KMXPlusFile, { Vkey } from '../kmx/kmx-plus';
 import LDMLKeyboardXMLSourceFile from '../ldml-keyboard/ldml-keyboard-xml';
 import LDMLKeyboardXMLSourceFileReader from '../ldml-keyboard/ldml-keyboard-xml-reader';
 import CompilerCallbacks from './callbacks';
@@ -7,73 +7,74 @@ import { KeysCompiler } from './keys';
 import { LocaCompiler } from './loca';
 import { MetaCompiler } from './meta';
 
+const SECTION_COMPILERS = [
+  MetaCompiler,
+  LocaCompiler,
+  KeysCompiler,
+];
+
 export default class Compiler {
-  private callbacks: CompilerCallbacks;
+  private readonly callbacks: CompilerCallbacks;
+
   constructor (callbacks: CompilerCallbacks) {
     this.callbacks = callbacks;
+  }
 
-    //TEMP
-    this.callbacks.reportMessage(0, "Instantiated compiler successfully");
+  private buildSections(source: LDMLKeyboardXMLSourceFile) {
+    return SECTION_COMPILERS.map(c => new c(source, this.callbacks));
   }
 
   /**
-   * Loads a LDML Keyboard xml file and compiles into in-memory kmxplus
+   * Loads a LDML Keyboard xml file and compiles into in-memory xml
    * structures.
    * @param filename  input filename, will use callback to load from disk
    * @returns
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile {
-    let buf = this.callbacks.loadFile(filename, filename);
-    let reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
-    let source = reader.load(buf);
-    if(!source) {
-      return null;
-    }
-
-    // console.dir(source, {depth:15});
-
-    return source;
+    const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
+    const source = reader.loadFile(filename);
+    return source ?? null;
   }
 
   /**
-   * Validates that the LDML keyboard source file and lints. If this returns true,
-   * it is safe to pass `source` to .compile.
-   * @param source
-   * @returns
+   * Validates that the LDML keyboard source file and lints. Actually just
+   * compiles the keyboard and returns `true` if everything is good...
+   * @param     source
+   * @returns   true if the file validates
    */
   public validate(source: LDMLKeyboardXMLSourceFile): boolean {
-    /*
-    let validator: LDMLKeyboardValidator = new LDMLKeyboardValidator(this.callbacks);
-    if(!validator.validate(xml)) {
-      return null;
-    }*/
-    return true;
+    return !!this.compile(source);
   }
 
   /**
-   * Transforms in-memory LDML keyboard xml file to an intermediate representation
-   * of a .kmx file. Input source variable should have already passed validation.
+   * Transforms in-memory LDML keyboard xml file to an intermediate
+   * representation of a .kmx file.
    * @param   source  in-memory representation of LDML keyboard xml file
    * @returns         KMXPlusFile intermediate file
    */
   public compile(source: LDMLKeyboardXMLSourceFile): KMXPlusFile {
-    let kmx = new KMXPlusFile();
+    const sections = this.buildSections(source);
+    let passed = true;
+    const kmx = new KMXPlusFile();
+    for(let section of sections) {
+      if(!section.validate()) {
+        passed = false;
+        // We'll keep validating other sections anyway, so we get a full set of
+        // errors for the keyboard developer.
+        continue;
+      }
+      const sect = section.compile();
+      if(!sect) {
+        passed = false;
+        continue;
+      }
+      kmx.kmxplus[section.id] = sect as any;
+    }
 
-    // Transform source xml structures to kmxplus
+    // TEMP until we have a Vkey compiler
+    kmx.kmxplus[constants.section.vkey] = new Vkey() as any;
 
-    (new MetaCompiler(kmx, source, this.callbacks)).execute();
-    (new LocaCompiler(kmx, source, this.callbacks)).execute();
-    (new KeysCompiler(kmx, source, this.callbacks)).execute();
-
-    // TODO: generate vkey mapping for touch-only keys
-
-    return kmx;
-  }
-
-  public write(kmx: KMXPlusFile): Uint8Array {
-    // Use the builder to generate the binary output file
-    let builder = new KMXBuilder(kmx, true);
-    return builder.compile();
+    return passed ? kmx : null;
   }
 }
 
