@@ -96,9 +96,12 @@ namespace com.keyman.osk {
         throw "Invalid state:  this TrackedPath has already terminated.";
       }
 
+      // The tracked path should emit InputSample events before Segment events and
+      // resolution of Segment Promises.
       this.samples.push(sample);
-      this.segmenter.add(sample);
       this.emit('step', sample);
+
+      this.segmenter.add(sample);
     }
 
     /**
@@ -111,13 +114,16 @@ namespace com.keyman.osk {
       }
       this.wasCancelled = cancel;
       this._isComplete = true;
-      this.segmenter.close();
 
+      // The tracked path should emit InputSample events before Segment events and
+      // resolution of Segment Promises.
       if(cancel) {
         this.emit('invalidated');
       } else {
         this.emit('complete');
       }
+
+      this.segmenter.close();
       this.removeAllListeners();
     }
 

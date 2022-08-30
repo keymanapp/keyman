@@ -501,9 +501,6 @@ namespace com.keyman.osk {
      *
      * That said, this class does help marshall the constructed Segments to the
      * TrackedPath.
-     *
-     * TODO:  Well... such is the intended design, anyway.  That last part's not
-     * yet implemented.
      */
 
     /**
@@ -536,9 +533,9 @@ namespace com.keyman.osk {
 
     /**
      * TODO: These Segment-construction objects directly represent path segments
-     * produced by the prototype algorithm.  The plan is for them to emit a
-     * public-facing Segment to their corresponding TrackedPath, but this has
-     * not yet been implemented.
+     * produced by the prototype algorithm.  This field should be decommissioned
+     * once implementation of this class is complete; the produced Segments
+     * are retrievable from TrackedPath.segments.
      */
     private segmentConstructors: ConstructingSegment[] = [];
 
@@ -563,11 +560,20 @@ namespace com.keyman.osk {
      */
     private choppedStats: CumulativePathStats = null;
 
+    /**
+     * A closure used to 'forward' generated Segments, generally to their public-facing
+     * location on TrackedPath.segments.
+     */
     private readonly segmentForwarder: (segment: Segment) => void;
 
-    constructor(segmentStartClosure: (segment: Segment) => void) {
+    /**
+     * Denotes whether or not a first touchpath sample has been provided.
+     */
+    private hasStarted: boolean = false;
+
+    constructor(segmentForwarder: (segment: Segment) => void) {
       this.steppedCumulativeStats = [];
-      this.segmentForwarder = segmentStartClosure;
+      this.segmentForwarder = segmentForwarder;
     }
 
     /**
@@ -576,8 +582,19 @@ namespace com.keyman.osk {
      * @param sample
      */
     public add(sample: InputSample) {
-      // TODO:  if this is the first received input sample, generate & publish a "start" segment.
-      // Bypass ConstructingSegment for this?  (So, directly instantiate SegmentImplementation)
+      // If this is the first received input sample, generate & publish a "start" segment.
+      // As ConstructingSegment is designed to work with -sequences- of samples, it's less
+      // useful here... and unnecessary, as we already have all the info we need.
+      if(!this.hasStarted) {
+        this.hasStarted = true;
+
+        const startSegment = new SegmentImplementation();
+        startSegment.updateStats(new CumulativePathStats(sample));
+        startSegment.classifyType(SegmentClass.START);
+        startSegment.resolve();
+
+        this.segmentForwarder(startSegment);
+      }
 
       // Set up the input-repeater (in case we don't get further feedback but remain active)
       const repeater = (timeDelta: number) => {
@@ -611,6 +628,10 @@ namespace com.keyman.osk {
       clearInterval(this.repeatTimer);  // Cancels the input-repeater.
       this.repeatTimer = null;
 
+      if(this.steppedCumulativeStats.length == 0) {
+        return;
+      }
+
       // Make sure that the final part of the touchpath is given a subsegment & then handled.
       const finalAccumulation = this.steppedCumulativeStats[this.steppedCumulativeStats.length - 1]
       let finalSubsegment: Subsegmentation = {
@@ -627,16 +648,23 @@ namespace com.keyman.osk {
       this.constructingSegment.commitPendingSubsegment();
       this.finalizeSegment();
 
-      // TODO:  create + publish an "end" segment.
-      // Bypass ConstructingSegment for this?  (So, directly instantiate SegmentImplementation)
+      // Using the last-received sample, generate & publish an "end" segment.
+      // As ConstructingSegment is designed to work with -sequences- of samples, it's less
+      // useful here... and unnecessary, as we already have all the info we need.
+      const endSegment = new SegmentImplementation();
+      endSegment.updateStats(new CumulativePathStats(finalAccumulation.lastSample));
+      endSegment.classifyType(SegmentClass.END);
+      endSegment.resolve();
+
+      this.segmentForwarder(endSegment);
 
       // TODO:  this is a temporary statement to facilitate exploration, experimentation, & debugging.
-      //        We should be providing output to the touchpath object (`.path.segments`).
-      //        But... that'll be left for a follow-up PR.
+      //        The true goal is to provide output to the touchpath object (`.path.segments`).
+      //        So, once implementation is complete, we should probably eliminate this method.
       this._debugLogPath();
     }
 
-    // TODO:  goal - support a 'debug event' or some-such that emits the constructors for
+    // TODO:  alt goal - support a 'debug event' or some-such that emits the constructors for
     // debugging analysis without directly needing to `console.log`.
     private _debugLogPath() {
       /*

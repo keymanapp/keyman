@@ -628,10 +628,11 @@ namespace com.keyman.osk {
 
     /**
      * Measured in pixels per second.
-     * @return a speed in pixels per millisecond, or `Number.NaN` if no data
+     * @return a speed in pixels per millisecond.  May be 0 if no movement was observed
+     * among the samples.
      */
     public get speed() {
-      return this.duration ? this.netDistance / this.duration : Number.NaN;
+      return this.duration ? this.netDistance / this.duration : 0;
     }
 
     /**
