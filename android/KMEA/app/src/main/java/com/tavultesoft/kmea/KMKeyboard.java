@@ -372,8 +372,12 @@ final class KMKeyboard extends WebView {
 
   public void dismissSubKeysWindow() {
     try {
-      if (subKeysWindow != null && subKeysWindow.isShowing())
+      if (subKeysWindow != null && subKeysWindow.isShowing()) {
         subKeysWindow.dismiss();
+      }
+      if (subKeysList != null) {
+        subKeysList = null;
+      }
     } catch (Exception e) {
       KMLog.LogException(TAG, "", e);
     }
