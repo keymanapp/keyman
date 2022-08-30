@@ -12,11 +12,11 @@ describe('meta', function () {
     assert.equal(callbacks.messages.length, 0);
 
     assert.equal(meta.name, 'meta-minimal');
-    assert.isUndefined(meta.author);        // TODO: default author string "unknown"?
+    assert.isUndefined(meta.author);        // TODO-LDML: default author string "unknown"?
     assert.equal(meta.conform, 'techpreview');
-    assert.isUndefined(meta.layout);        // TODO: assumed layout?
-    assert.isUndefined(meta.normalization); // TODO: assumed normalization?
-    assert.isUndefined(meta.indicator);     // TODO: synthesize an indicator?
+    assert.isUndefined(meta.layout);        // TODO-LDML: assumed layout?
+    assert.isUndefined(meta.normalization); // TODO-LDML: assumed normalization?
+    assert.isUndefined(meta.indicator);     // TODO-LDML: synthesize an indicator?
     assert.equal(meta.settings, KeyboardSettings.none);
   });
 
