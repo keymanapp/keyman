@@ -65,6 +65,10 @@ namespace com.keyman.osk {
       return this.committedIntervalAsSubsegmentation.stats;
     }
 
+    /**
+     * Returns the number of already-committed subsegments that comprise the
+     * in-construction Segment thus far.
+     */
     public get subsegmentCount(): number {
       return this.subsegmentations.length;
     }
@@ -104,6 +108,11 @@ namespace com.keyman.osk {
       return pendingAnalyzer.isCompatible;
     }
 
+    /**
+     * Returns the analyzer instance used for the `isCompatible` check.  The returned
+     * object provides additional helper properties useful for inspecting compatibility
+     * logic.
+     */
     public analyzeCompatibility(subsegmentation: Subsegmentation): SubsegmentCompatibilityAnalyzer {
       const committed = this.committedIntervalAsSubsegmentation;
       const segmentationSplit = new SegmentationSplit(committed, subsegmentation);
@@ -111,6 +120,13 @@ namespace com.keyman.osk {
       return new SubsegmentCompatibilityAnalyzer(segmentationSplit, this.classifier);
     }
 
+    /**
+     * Returns the stats accumulation covering all currently-committed subsegments +
+     * the submitted `Subsegmentation` object (as if it were committed).
+     *
+     * Assumes that its parameter immediately follows any previously-committed
+     * subsegments.
+     */
     private wholeSegmentation(subsegmentation: Subsegmentation): Subsegmentation {
       const whole: Subsegmentation = {
         stats: subsegmentation.endingAccumulation.deaccumulate(this.baseAccumulation),
@@ -119,10 +135,6 @@ namespace com.keyman.osk {
       };
 
       return whole;
-    }
-
-    public get pendingSubsegment(): Subsegmentation {
-      return this.pendingSubsegmentation;
     }
 
     /**
@@ -217,12 +229,15 @@ namespace com.keyman.osk {
       this.pendingSubsegmentation = null;
     }
 
+    /**
+     * Commits a currently-pending subsegment as part of the in-construction Segment.
+     */
     public commitPendingSubsegment() {
       if(this.pendingSubsegmentation) {
         this.subsegmentations.push(this.pendingSubsegmentation);
 
         // Check the peak speed & update if needed.
-        const commitStats = this.pendingSubsegment.stats;
+        const commitStats = this.pendingSubsegmentation.stats;
         let peakSpeed = commitStats.mean('v') + Math.sqrt(commitStats.variance('v'));
         if(peakSpeed > this.pathSegment.peakSpeed) {
           this.pathSegment.setPeakSpeed(peakSpeed);
@@ -244,6 +259,10 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * Finalizes the Segment, committing any pending portions, classifying ('recognizing') it if
+     * necessary and resolving it.
+     */
     public finalize() {
       if(this.pendingSubsegmentation) {
         this.commitPendingSubsegment();
@@ -257,11 +276,15 @@ namespace com.keyman.osk {
       this.pathSegment.resolve();
     }
 
+    /**
+     * The in-construction Segment, as published to `TrackedPath.segments` & `TrackedPath`'s
+     * 'segmentation' event.
+     */
     public get pathSegment() {
       return this._pathSegment;
     }
 
-    public set pathSegment(segment: SegmentImplementation) {
+    private set pathSegment(segment: SegmentImplementation) {
       this._pathSegment = segment;
     }
   }

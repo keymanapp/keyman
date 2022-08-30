@@ -484,6 +484,12 @@ namespace com.keyman.osk {
     }
   }
 
+  export interface SegmentationConfiguration extends SegmentClassifierConfig {
+    // See `PathSegmenter.segmentationConfig`'s comment; we may wish to
+    // define & provide extra configuration parameters here... or wherever
+    // this type's final location ends up.
+  }
+
   /**
    * The core logic, algorithm, and manager for touchpath segmentation and
    * subsegmentation.
@@ -554,9 +560,29 @@ namespace com.keyman.osk {
      */
     private hasStarted: boolean = false;
 
-    constructor(segmentForwarder: (segment: Segment) => void) {
+    // For consideration:  should REPEAT_INTERVAL, SLIDING_WINDOW_INTERVAL, and other
+    // related values be defined here?
+    //
+    // Note:
+    // - hardcoded 2 * SLIDING_WINDOW_INTERVAL:  minimum interval required for a
+    //   subsegmentation attempt (to ensure sufficient observations on each side)
+    // - hardcoded SLIDING_WINDOW_INTERVAL / 2:  minimum interval that must
+    //   remain on each side after the sliding "optimum split point" search.
+    //
+    // NOTE: this will likely (eventually) be defined elsewhere, at a "higher level"
+    // within this module / package.
+    private segmentationConfig: SegmentationConfiguration;
+
+    public static readonly DEFAULT_CONFIG = {
+      holdMinimumDuration: 100,
+      holdMoveTolerance: 5
+    }
+
+    constructor(segmentationConfig: SegmentationConfiguration, segmentForwarder: (segment: Segment) => void) {
       this.steppedCumulativeStats = [];
       this.segmentForwarder = segmentForwarder;
+
+      this.segmentationConfig = segmentationConfig;
     }
 
     /**
@@ -920,7 +946,7 @@ namespace com.keyman.osk {
       this.constructingSegment?.clearPendingSubsegment();
       this.finalizeSegment();
 
-      this.constructingSegment = new ConstructingSegment(subsegment, new SegmentClassifier());
+      this.constructingSegment = new ConstructingSegment(subsegment, new SegmentClassifier(this.segmentationConfig));
       this.segmentForwarder(this.constructingSegment.pathSegment);
 
       return true;

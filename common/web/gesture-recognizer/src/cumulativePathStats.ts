@@ -709,27 +709,14 @@ namespace com.keyman.osk {
       return this.coordArcSum;
     }
 
-    // Convert to a `toJSON` method for use during investigative debugging.
+    /**
+     * Provides a JSON.stringify()-friendly object with the properties most useful for
+     * debugger-based inspection and/or console-logging statements.
+     */
     public get summaryObject() {
-      // This `likelyState` value is extremely prototyped & just here for reviewer/tester convenience.
-      // It'll need to be developed a bit more fully, but follows my intuitions from development &
-      // testing.
-      let likelyType = 'unknown';
-
-      if(this.mean('v') < 0.08 && this.rawDistance < 12 && this.duration > 100) {
-        likelyType = 'hold';
-      } else if(this.mean('v') < 0.08 && this.rawDistance < 6) {
-        likelyType = 'hold';
-      }
-
-      if(this.mean('v') > 0.4 || (this.mean('v') > 0.2 && this.duration > 80) || this.netDistance > 20) {
-        likelyType = 'move';
-      }
-
       return {
         angle: this.angle,
         cardinal: this.cardinalDirection,
-        likelyType: likelyType,
         speedMean: this.mean('v'),
         netDistance: this.netDistance,
         duration: this.duration,

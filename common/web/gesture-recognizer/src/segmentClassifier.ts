@@ -20,18 +20,10 @@ namespace com.keyman.osk {
   }
 
   export class SegmentClassifier {
-    // TODO:  This should be defined somewhere that can be configured by
-    // the library consumer and passed along until it reaches this class's
-    // constructor.  But... tomorrow's troubles are their own, for now.
-    static readonly DEFAULT_CONFIG: SegmentClassifierConfig = {
-      holdMinimumDuration: 100,
-      holdMoveTolerance: 5
-    };
-
     readonly config: SegmentClassifierConfig;
 
-    constructor(config?: SegmentClassifierConfig) {
-      this.config = config || SegmentClassifier.DEFAULT_CONFIG;
+    constructor(config: SegmentClassifierConfig) {
+      this.config = config;
     }
 
     /**
@@ -43,6 +35,13 @@ namespace com.keyman.osk {
       return this.config.holdMoveTolerance / this.config.holdMinimumDuration;
     }
 
+    /**
+     * Given the cumulative stats for an observed Subsegment, determines its
+     * segment-level classification - but only if we would commit to said
+     * classification.
+     * @param stats
+     * @returns
+     */
     public classifySubsegment(stats: CumulativePathStats): SegmentClass {
       const segmentClass = this.classifySegment(stats);
 
@@ -64,6 +63,13 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     *
+     * @param stats Given the cumulative stats for a potential Segment, determines
+     * the classification it would be assigned.  Will return `null` if it is not
+     * yet possible to commit to a classification.
+     * @returns
+     */
     public classifySegment(stats: CumulativePathStats): SegmentClass {
       if(!stats) {
         return null;

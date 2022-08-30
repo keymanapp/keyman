@@ -76,7 +76,7 @@ namespace com.keyman.osk {
         this.emit('segmentation', segment);
       }
 
-      this.segmenter = new PathSegmenter(segmentStartClosure);
+      this.segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, segmentStartClosure);
     }
 
     /**
