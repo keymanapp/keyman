@@ -1,9 +1,11 @@
 import KMXBuilder from '../kmx/kmx-builder';
 import KMXPlusFile from '../kmx/kmx-plus';
-import LDMLKeyboardXMLSourceFile, * as LDMLKeyboard from '../ldml-keyboard/ldml-keyboard-xml';
+import LDMLKeyboardXMLSourceFile from '../ldml-keyboard/ldml-keyboard-xml';
 import LDMLKeyboardXMLSourceFileReader from '../ldml-keyboard/ldml-keyboard-xml-reader';
-import { USVirtualKeyMap } from '../ldml-keyboard/us-virtual-keys';
 import CompilerCallbacks from './callbacks';
+import { KeysCompiler } from './keys';
+import { LocaCompiler } from './loca';
+import { MetaCompiler } from './meta';
 
 export default class Compiler {
   private callbacks: CompilerCallbacks;
@@ -12,55 +14,6 @@ export default class Compiler {
 
     //TEMP
     this.callbacks.reportMessage(0, "Instantiated compiler successfully");
-  }
-
-  private translateLayerIdToModifier(id: string) {
-    if(id == 'base') {
-      return 0;
-    }
-    // TODO: other modifiers
-    return 0;
-  }
-
-  private compileHardwareLayer(
-    keyboard: LDMLKeyboard.LKKeyboard,
-    layer: LDMLKeyboard.LKLayerMap,
-    kmx: KMXPlusFile
-  ) {
-    const mod = this.translateLayerIdToModifier(layer.id);
-
-    let y = -1;
-    for(let row of layer.row) {
-      y++;
-      if(y > USVirtualKeyMap.length) {
-        this.callbacks.reportMessage(0, `'hardware' layer has too many rows`);
-        break;
-      }
-
-      const keys = row.keys.split(' ');
-      let x = -1;
-      for(let key of keys) {
-        x++;
-        if(x > USVirtualKeyMap[y].length) {
-          this.callbacks.reportMessage(0, `Row #${y+1} on 'hardware' layer has too many keys`);
-          break;
-        }
-
-        let keydef = keyboard.keys?.key?.find(x => x.id == key);
-        if(!keydef) {
-          this.callbacks.reportMessage(0,
-            `Key ${key} in position #${x+1} on row #${y+1} of layer ${layer.id}, form 'hardware' not found in key bag`);
-          continue;
-        }
-
-        kmx.kmxplus.keys.keys.push({
-          vkey: USVirtualKeyMap[y][x],
-          mod: mod,
-          to: keydef.to,
-          flags: 0 // Note: 'expand' is never set here, only by the .kmx builder
-        });
-      }
-    }
   }
 
   /**
@@ -108,22 +61,9 @@ export default class Compiler {
 
     // Transform source xml structures to kmxplus
 
-    kmx.kmxplus.meta.name = source.keyboard.names?.name?.[0]?.value;
-    kmx.kmxplus.meta.author = source.keyboard.info?.author;
-    kmx.kmxplus.meta.conform = source.keyboard.conformsTo;
-    kmx.kmxplus.meta.layout = source.keyboard.info?.layout;
-    kmx.kmxplus.meta.normalization = source.keyboard.info?.normalization;
-    kmx.kmxplus.meta.indicator = source.keyboard.info?.indicator;
-
-    kmx.kmxplus.loca.locales.push(source.keyboard.locale);
-
-    // Use LayerMap + keys to generate compiled keys for hardware
-
-    if(source.keyboard.layerMaps?.[0]?.form == 'hardware') {
-      for(let layer of source.keyboard.layerMaps[0].layerMap) {
-        this.compileHardwareLayer(source.keyboard, layer, kmx);
-      }
-    }
+    (new MetaCompiler(kmx, source, this.callbacks)).execute();
+    (new LocaCompiler(kmx, source, this.callbacks)).execute();
+    (new KeysCompiler(kmx, source, this.callbacks)).execute();
 
     // TODO: generate vkey mapping for touch-only keys
 
@@ -136,3 +76,4 @@ export default class Compiler {
     return builder.compile();
   }
 }
+
