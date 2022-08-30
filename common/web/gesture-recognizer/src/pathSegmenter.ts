@@ -650,8 +650,9 @@ namespace com.keyman.osk {
       }
 
       // Needed for a very quick, simple tap - it may not last long enough to start subsegmentation!
+      let lateSegment: ConstructingSegment = null;
       if(!this.constructingSegment) {
-        this.constructingSegment = new ConstructingSegment(finalSubsegment, new SegmentClassifier(this.segmentationConfig));
+        lateSegment = this.constructingSegment = new ConstructingSegment(finalSubsegment, new SegmentClassifier(this.segmentationConfig));
       }
       // No need to check if this matches any predecessor subsegments; that already happened during
       // the last `performSubsegmentation` call.  There's no new data since then.
@@ -659,7 +660,11 @@ namespace com.keyman.osk {
       this.constructingSegment.updatePendingSubsegment(finalSubsegment);
       // As we're finalizing, we do NOT need to recall maintainRecentSegment.
       this.constructingSegment.commitPendingSubsegment();
-      this.finalizeSegment();
+      this.finalizeSegment(); // clears `this.constructingSegment`!
+
+      if(lateSegment) {
+        this.segmentForwarder(lateSegment.pathSegment);
+      }
 
       // Using the last-received sample, generate & publish an "end" segment.
       // As ConstructingSegment is designed to work with -sequences- of samples, it's less
