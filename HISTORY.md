@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 16.0.54 alpha 2022-08-30
+
+* chore(core): rename json.hpp to jsonpp.hpp (#6993)
+* chore(developer): remove unused dependencies from KeymanWeb compiler (#7000)
+* chore: update core/ label (#7138)
+* chore(linux): Update debian changelog (#7145)
+* fix(linux): Allow downgrades for installing build deps (#7147)
+* chore(core): emcc off path for linux (#7149)
+
 ## 16.0.53 alpha 2022-08-29
 
 * feat(linux): Dockerfile for linux builder (#7133)
