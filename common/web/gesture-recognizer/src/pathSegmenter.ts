@@ -573,7 +573,7 @@ namespace com.keyman.osk {
     // within this module / package.
     private segmentationConfig: SegmentationConfiguration;
 
-    public static readonly DEFAULT_CONFIG = {
+    public static readonly DEFAULT_CONFIG: SegmentationConfiguration = {
       holdMinimumDuration: 100,
       holdMoveTolerance: 5
     }
@@ -649,6 +649,10 @@ namespace com.keyman.osk {
         baseAccumulation:   this.choppedStats
       }
 
+      // Needed for a very quick, simple tap - it may not last long enough to start subsegmentation!
+      if(!this.constructingSegment) {
+        this.constructingSegment = new ConstructingSegment(finalSubsegment, new SegmentClassifier(this.segmentationConfig));
+      }
       // No need to check if this matches any predecessor subsegments; that already happened during
       // the last `performSubsegmentation` call.  There's no new data since then.
       // (Actually... this should already be in place now, after recent changes!)
