@@ -492,17 +492,15 @@ namespace com.keyman.osk {
   }
 
   /**
-   * The core logic, algorithm, and manager for touchpath segmentation.
+   * The core logic, algorithm, and manager for touchpath segmentation and
+   * subsegmentation.
+   *
+   * This class itself directly handles 'subsegmentation', as the first pass of
+   * our algorithm errs on the side of segmenting too much in order to never
+   * 'undersegment'.  It then delegates to other classes to recombine the
+   * results as appropriate before producing completed `Segment`s.
    */
   export class PathSegmenter {
-    /*
-     * NOTE:  internally, this class only directly handles _subsegmentation_;
-     * the real workload for synthesizing Segments is found in ConstructingSegment.
-     *
-     * That said, this class does help marshall the constructed Segments to the
-     * TrackedPath.
-     */
-
     /**
      * The minimum amount of time (in ms) to wait between sample repetitions
      * once inputs stop arriving, so long as the path is still active.

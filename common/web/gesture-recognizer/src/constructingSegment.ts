@@ -1,100 +1,11 @@
 namespace com.keyman.osk {
-  class CompatibilityAnalyzer {
-    readonly classifier: SegmentClassifier;
-    private split: SegmentationSplit;
-
-    constructor(subsegmentationSplit: SegmentationSplit, classifier: SegmentClassifier) {
-      this.split = subsegmentationSplit;
-
-      this.classifier = classifier;
-    }
-
-    private get preStats() {
-      return this.split.pre.stats;
-    }
-
-    private get postStats() {
-      return this.split.post.stats;
-    }
-
-    private get unionStats() {
-      return this.split.union;
-    }
-
-    get directionCompatible(): boolean {
-      if(!this.preStats || this.regressionDirectionCompatible) {
-        return true;
-      }
-
-      let preMatchesMove  = this.classifier.classifySubsegment(this.preStats)  != SegmentClass.HOLD;
-      let postMatchesMove = this.classifier.classifySubsegment(this.postStats) != SegmentClass.HOLD;
-
-      if(preMatchesMove != postMatchesMove) {
-        // If one subsegment appears to be a 'hold' while the other does not, well... holds
-        // don't (practically) have a direction, which mismatches with the 'move' that does
-        // have a direction.
-        return false;
-      } else if(!preMatchesMove) {
-        // If both are 'hold' subsegments, both should be treated as directionless.
-        return true;
-      } else {
-        // If both are 'move' / 'move'-like subsegments, only merge if their directional
-        // classification falls into the same 'direction bucket'.
-        return this.cardinalDirectionCompatible;
-      }
-    }
-
-    get cardinalDirectionCompatible(): boolean {
-      return !this.preStats || this.preStats.cardinalDirection == this.postStats.cardinalDirection;
-    }
-
-    get regressionDirectionCompatible(): boolean {
-      return !this.preStats || this.split.mergeMerited;
-    }
-
-    get classificationIfCompatible(): SegmentClass {
-      // Get the baseline subsegment classification for each subsegment.
-      let leftClass  = this.classifier.classifySubsegment(this.preStats);
-      let rightClass = this.classifier.classifySubsegment(this.postStats);
-      let unionClass = this.classifier.classifySubsegment(this.unionStats);
-
-      // Choose the first non-null one as a fallback, then apply it.
-      let fallbackClass = leftClass || rightClass || unionClass;
-
-      leftClass  = leftClass || fallbackClass;
-      rightClass = rightClass || fallbackClass;
-      unionClass = unionClass || fallbackClass;
-
-      // If all classes (post-fallback) match, that's the class if compatible.
-      if(leftClass == rightClass && leftClass == unionClass) {
-        return fallbackClass;  // can technically still be null.
-      } else {
-        return undefined;
-      }
-    }
-
-    get isCompatible(): boolean {
-      const commonClass = this.classificationIfCompatible;
-
-      // If two adjacent hold subsegments also make a hold when combined...
-      // just merge the two holds & call 'em compatible.
-      if(!this.preStats || commonClass == 'hold') {
-        return true;
-      } else if(commonClass === undefined) {
-        return false;
-      }
-
-      // if(null || 'move'):  as 'null' looks like a not-quite-there-yet 'move',
-      // we treat it as such here.  Such subsegments are only compatible if
-      // their directions are compatible.
-      return this.directionCompatible;
-    }
-  }
-
   /**
    * This class is responsible for managing the construction of public-facing Segments while keeping
    * all the internal parts... internal.  As such, it includes state management for parts of
    * PathSegmenter's operations.
+   *
+   * See also `SubsegmentCompatibilityAnalyzer`, which defines the criteria used within this class
+   * for determining when to recombine subsegments and when to uphold segmentation decisions.
    */
   export class ConstructingSegment {
     readonly classifier: SegmentClassifier;
@@ -108,7 +19,6 @@ namespace com.keyman.osk {
     /**
      * Notes all subsegments identified as part of the overall segment being constructed.
      */
-    // TODO:  Re-private this!
     private subsegmentations: Subsegmentation[] = [];
 
     /**
@@ -194,11 +104,11 @@ namespace com.keyman.osk {
       return pendingAnalyzer.isCompatible;
     }
 
-    public analyzeCompatibility(subsegmentation: Subsegmentation): CompatibilityAnalyzer {
+    public analyzeCompatibility(subsegmentation: Subsegmentation): SubsegmentCompatibilityAnalyzer {
       const committed = this.committedIntervalAsSubsegmentation;
       const segmentationSplit = new SegmentationSplit(committed, subsegmentation);
 
-      return new CompatibilityAnalyzer(segmentationSplit, this.classifier);
+      return new SubsegmentCompatibilityAnalyzer(segmentationSplit, this.classifier);
     }
 
     private wholeSegmentation(subsegmentation: Subsegmentation): Subsegmentation {
@@ -209,31 +119,6 @@ namespace com.keyman.osk {
       };
 
       return whole;
-    }
-
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    // TODO:  remake into a function on the analyzer object.
-    public debugLogCompabilityReport(subsegmentation: Subsegmentation) {
-      const committed = this.committedIntervalAsSubsegmentation;
-      const segmentationSplit = new SegmentationSplit(committed, subsegmentation);
-
-      if(this.subsegmentations.length == 0) {
-        console.log("No prior subsegments - thus, no compatibility conflicts are possible.");
-      }
-
-      // TODO:  Possible 'polished way' to provide feedback:
-      //        Build an object with annotations for each condition under consideration.
-      //        Object's then easily loggable & is even returnable.
-      //        Split:  isCompatible vs analyzeCompatibility
-
-      console.log("Verifying linkage to pending merges: ");
-      console.log(this.subsegmentations);
-      console.log("verification check:");
-      console.log(this.committedIntervalAsSubsegmentation);
-
-      // TODO: log report detalis
-
-      segmentationSplit._debugLogAlignmentReport();
     }
 
     public get pendingSubsegment(): Subsegmentation {
