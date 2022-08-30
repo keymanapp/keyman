@@ -15,7 +15,11 @@
  * @def KMXPLUS_DEBUG Set to 1 to enable debug output
  */
 #ifndef KMXPLUS_DEBUG
+#if defined(DEBUG)
+#define KMXPLUS_DEBUG 1
+#else
 #define KMXPLUS_DEBUG 0
+#endif
 #endif
 
 namespace km {
