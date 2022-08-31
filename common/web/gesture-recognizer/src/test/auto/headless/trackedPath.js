@@ -49,6 +49,10 @@ describe("TrackedPath", function() {
       assert.equal(spy.firstCall.args[0].type, 'start', "First event should provide a 'start'-type segment.");
       assert.equal(spy.secondCall.args[0].type, undefined, "Second event's segment should not be classified.");
       assert.equal(spy.thirdCall.args[0].type, 'end', "Third event should provide an 'end'-type segment.");
+
+      assert.deepEqual(touchpath.coords, [sample]);
+      assert.deepEqual(touchpath.segments, [spy.firstCall.args[0], spy.secondCall.args[0], spy.thirdCall.args[0]],
+        "The touchpath's segment array does not match the `Segment`s from raised events.");
     });
 
     it("'step', 'complete' events", function() {
@@ -70,6 +74,10 @@ describe("TrackedPath", function() {
       touchpath.extend(sample);
       try {
         assert(spyEventStep.calledOnce, "'step' event was not raised exactly once.");
+
+        const stepSample = spyEventStep.firstCall.args[0];
+        assert.equal(stepSample, sample, "'step' did not provide the expected sample.");
+
         assert(spyEventComplete.notCalled, "'complete' event was raised early.");
         assert(spyEventInvalidated.notCalled, "'invalidated' event was erroneously raised.");
       } finally {
@@ -99,6 +107,10 @@ describe("TrackedPath", function() {
       touchpath.extend(sample);
       try {
         assert(spyEventStep.calledOnce, "'step' event was not raised exactly once.");
+
+        const stepSample = spyEventStep.firstCall.args[0];
+        assert.equal(stepSample, sample, "'step' did not provide the expected sample.");
+
         assert(spyEventComplete.notCalled, "'complete' event was erroneously raised.");
         assert(spyEventInvalidated.notCalled, "'invalidated' event was raised early.");
       } finally {
@@ -133,6 +145,10 @@ describe("TrackedPath", function() {
         "'step' should be raised before 'segmentation'");
       assert(spyEventSegmentation.thirdCall.calledBefore(spyEventComplete.firstCall),
         "all 'segmentation' events should be raised before 'complete'");
+
+      const spy = spyEventSegmentation;
+      assert.deepEqual(touchpath.coords, [sample]);
+      assert.deepEqual(touchpath.segments, [spy.firstCall.args[0], spy.secondCall.args[0], spy.thirdCall.args[0]]);
     });
 
     it("event ordering - 'invalidated'", function() {
@@ -162,6 +178,11 @@ describe("TrackedPath", function() {
         "first 'segmentation' event ('start' segment) not raised before cancellation");
       assert(spyEventSegmentation.thirdCall.calledAfter(spyEventInvalidated.firstCall),
         "Cancellation event not raised before cancelled segment completion");
+
+      // Even though the touchpath was 'cancelled', we should still see the segments that finished processing.
+      const spy = spyEventSegmentation;
+      assert.deepEqual(touchpath.coords, [sample]);
+      assert.deepEqual(touchpath.segments, [spy.firstCall.args[0], spy.secondCall.args[0], spy.thirdCall.args[0]]);
     });
   });
 });
