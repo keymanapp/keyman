@@ -216,7 +216,7 @@ describe("TrackedPath", function() {
       this.fakeClock.restore();
     })
 
-    it("path.coords - no extra samples", async function() {
+    it("path.segments + path.coords - no extra samples", async function() {
       const spyEventStep         = sinon.fake();
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
@@ -240,27 +240,24 @@ describe("TrackedPath", function() {
         t: 1100  // total duration:  1 sec.
       };
 
-      // Timestamp 1:  segmentation begins, with an initial Sample recorded.
-      const firstPromise = timedPromise(() => {
-        touchpath.extend(startSample);
-      }, 0);
+      // Sample 'playback' Promise setup
+      const samples = [startSample, endSample];
 
-      // Timestamp 2:  segmentation continues... a second later.  A second Sample is recorded.
-      const secondSampleTestPromise = firstPromise.then(() => {
+      const samplePromises = samples.map((sample) => {
         return timedPromise(() => {
-          touchpath.extend(endSample);
-        }, 1000);
+          touchpath.extend(sample);
+        }, sample.t - startSample.t);
       });
 
-      // Timestamp 3: segmentation is then ended via a followup event.
-      const segmentationEndPromise = secondSampleTestPromise.then(() => {
+      // Finalization: segmentation is then ended via a followup event as soon as the
+      // final sample's execution returns down to the base event loop.
+      const segmentationEndPromise = Promise.all(samplePromises).then(() => {
         touchpath.terminate(false);
       }).then(() => {
         // The main test assertions.
         assert.deepEqual(touchpath.coords, [startSample, endSample]);
         assert.deepEqual(touchpath.segments, spyEventSegmentation.getCalls().map((call) => call.args[0]));
-        assert.equal(spyEventSegmentation.callCount, 3); // 'start', 'hold', 'end'.
-        assert.equal(spyEventSegmentation.secondCall.args[0].type, 'hold');
+        assert.deepEqual(spyEventSegmentation.getCalls().map((call) => call.args[0].type), ['start', 'hold', 'end']);
       });
 
       const finalPromise = segmentationEndPromise.catch((reason) => {
