@@ -7,6 +7,25 @@ const GestureRecognizer = require('../../../../build/index.js');
 const com = GestureRecognizer.com;
 const TrackedPath = com.keyman.osk.TrackedPath;
 
+/**
+ * Acts as a Promise-form of `setTimeout`.
+ * @param {*} func A function to run after the specified amount of time.
+ * @param {*} time The timeout to wait.
+ * @returns {*} A `Promise` that will either resolve or reject after the specified amount of time.
+ */
+ const timedPromise = (func, time) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        func();
+        resolve();
+      } catch (err) {
+        reject(err);
+      }
+    }, time);
+  });
+}
+
 describe("TrackedPath", function() {
   // // File paths need to be from the package's / module's root folder
   // let testJSONtext = fs.readFileSync('src/test/resources/json/canaryRecording.json');
@@ -51,7 +70,7 @@ describe("TrackedPath", function() {
       assert.equal(spy.thirdCall.args[0].type, 'end', "Third event should provide an 'end'-type segment.");
 
       assert.deepEqual(touchpath.coords, [sample]);
-      assert.deepEqual(touchpath.segments, [spy.firstCall.args[0], spy.secondCall.args[0], spy.thirdCall.args[0]],
+      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]),
         "The touchpath's segment array does not match the `Segment`s from raised events.");
     });
 
@@ -148,7 +167,8 @@ describe("TrackedPath", function() {
 
       const spy = spyEventSegmentation;
       assert.deepEqual(touchpath.coords, [sample]);
-      assert.deepEqual(touchpath.segments, [spy.firstCall.args[0], spy.secondCall.args[0], spy.thirdCall.args[0]]);
+      spy.call
+      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]));
     });
 
     it("event ordering - 'invalidated'", function() {
@@ -182,7 +202,78 @@ describe("TrackedPath", function() {
       // Even though the touchpath was 'cancelled', we should still see the segments that finished processing.
       const spy = spyEventSegmentation;
       assert.deepEqual(touchpath.coords, [sample]);
-      assert.deepEqual(touchpath.segments, [spy.firstCall.args[0], spy.secondCall.args[0], spy.thirdCall.args[0]]);
+      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]));
+    });
+  });
+
+
+  describe("Single held point", function() {
+    beforeEach(function() {
+      this.fakeClock = sinon.useFakeTimers();
+    })
+
+    afterEach(function() {
+      this.fakeClock.restore();
+    })
+
+    it("path.coords - no extra samples", async function() {
+      const spyEventStep         = sinon.fake();
+      const spyEventComplete     = sinon.fake();
+      const spyEventInvalidated  = sinon.fake();
+      const spyEventSegmentation = sinon.fake();
+
+      const touchpath = new TrackedPath();
+      touchpath.on('step', spyEventStep);
+      touchpath.on('complete', spyEventComplete);
+      touchpath.on('invalidated', spyEventInvalidated);
+      touchpath.on('segmentation', spyEventSegmentation);
+
+      const startSample = {
+        targetX: 1,
+        targetY: 1,
+        t: 100
+      };
+
+      const endSample = {
+        targetX: 1,
+        targetY: 1,
+        t: 1100  // total duration:  1 sec.
+      };
+
+      // Timestamp 1:  segmentation begins, with an initial Sample recorded.
+      const firstPromise = timedPromise(() => {
+        touchpath.extend(startSample);
+      }, 0);
+
+      // Timestamp 2:  segmentation continues... a second later.  A second Sample is recorded.
+      const secondSampleTestPromise = firstPromise.then(() => {
+        return timedPromise(() => {
+          touchpath.extend(endSample);
+        }, 1000);
+      });
+
+      // Timestamp 3: segmentation is then ended via a followup event.
+      const segmentationEndPromise = secondSampleTestPromise.then(() => {
+        touchpath.terminate(false);
+      }).then(() => {
+        // The main test assertions.
+        assert.deepEqual(touchpath.coords, [startSample, endSample]);
+        assert.deepEqual(touchpath.segments, spyEventSegmentation.getCalls().map((call) => call.args[0]));
+        assert.equal(spyEventSegmentation.callCount, 3); // 'start', 'hold', 'end'.
+        assert.equal(spyEventSegmentation.secondCall.args[0].type, 'hold');
+      });
+
+      const finalPromise = segmentationEndPromise.catch((reason) => {
+        if(!touchpath.isComplete) {
+          touchpath.terminate(true);
+        }
+        throw reason;
+      });
+
+      this.fakeClock.runAllAsync();
+
+      // This is the one that reports all of our async assertion failures.
+      return finalPromise;
     });
   });
 });
