@@ -10,6 +10,11 @@ export class LocaCompiler extends SectionCompiler {
     return constants.section.loca;
   }
 
+  /**
+   *
+   * @param keyboard
+   * @returns list of BCP 47 tags in the keyboard xml, potentially with invalid or repeated entries
+   */
   private getLocales =
     (keyboard: LKKeyboard) =>
     [keyboard.locale].concat(Array.isArray(keyboard.locales?.locale) ? keyboard.locales.locale.map(v => v.id) : [])
@@ -22,7 +27,7 @@ export class LocaCompiler extends SectionCompiler {
         new Intl.Locale(tag);
       } catch(e) {
         if(e instanceof RangeError) {
-          this.callbacks.reportMessage(CompilerErrors.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${tag}'`);
+          this.callbacks.reportMessage(CompilerErrors.InvalidLocale({tag}));
           valid = false;
         } else {
           throw e;
@@ -35,17 +40,19 @@ export class LocaCompiler extends SectionCompiler {
   public compile(): Loca {
     let result = new Loca();
 
-    let locales = this.getLocales(this.keyboard);
+    // This also minimizes locales according to Remove Likely Subtags algorithm:
+    // https://www.unicode.org/reports/tr35/#Likely_Subtags
+    let locales = this.getLocales(this.keyboard).map((locale: string) => new Intl.Locale(locale).minimize().toString());
+
     // TODO: remove `as any` cast: (Intl as any): ts lib version we have doesn't
     // yet include `getCanonicalLocales` but node 16 does include it so we can
     // safely use it. Also well supported in modern browsers.
-    result.locales = (Intl as any).getCanonicalLocales(locales);
+    result.locales = ((Intl as any).getCanonicalLocales(locales));
 
     if(result.locales.length < locales.length) {
       // TODO-LDML: hint on repeated locales
+      this.callbacks.reportMessage(CompilerErrors.OneOrMoreRepeatedLocales())
     }
-
-    // TODO-LDML: do we do any locale normalization (e.g. en-Latn-US => en-US)
 
     return result;
   }

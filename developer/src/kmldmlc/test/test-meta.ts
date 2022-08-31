@@ -39,7 +39,7 @@ describe('meta', function () {
     let meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-normalization.xml', callbacks) as Meta;
     assert.isNull(meta);
     assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], {code: CompilerErrors.ERROR_InvalidNormalization, message: "Invalid normalization form 'NFQ'"});
-  })
+    assert.deepEqual(callbacks.messages[0], CompilerErrors.InvalidNormalization({form:'NFQ'}));
+  });
 });
 

@@ -1,4 +1,9 @@
+export interface CompilerEvent {
+  code: number;
+  message: string;
+};
+
 export default interface CompilerCallbacks {
   loadFile(baseFilename: string, filename: string): Buffer;
-  reportMessage(code: number, message: string): void;
+  reportMessage(event: CompilerEvent): void;
 };
