@@ -10,7 +10,8 @@ export enum CompilerErrorSeverity {
 };
 
 export enum CompilerErrors {
-  ERROR_InvalidNormalization = CompilerErrorSeverity.Error | 0x0001 // `Invalid normalization form '${}'`
+  ERROR_InvalidNormalization = CompilerErrorSeverity.Error | 0x0001, // `Invalid normalization form '${}'`
+  ERROR_InvalidLocale        = CompilerErrorSeverity.Error | 0x0002, // `Invalid BCP 47 locale form '${}'`
 };
 
 export function getErrorSeverityName(code: number): string {
