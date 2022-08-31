@@ -192,9 +192,10 @@ class kmx_plus {
      * Caller must preserve the keyboard file memory
      * until after this object is destroyed.
      *
-     * @param keyboard the KMXPlus data
+     * @param keyboard the KMX data
+     * @param length length of the entire KMX file
      */
-    kmx_plus(const COMP_KEYBOARD *keyboard);
+    kmx_plus(const COMP_KEYBOARD *keyboard, size_t length);
     const COMP_KMXPLUS_KEYS *keys;
     const COMP_KMXPLUS_LOCA *loca;
     const COMP_KMXPLUS_META *meta;

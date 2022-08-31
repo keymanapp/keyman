@@ -95,66 +95,17 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     _valid = false; \
     return; \
   }
-//   const kmx::COMP_KMXPLUS_SECT *sect = nullptr;
-//   const kmx::COMP_KMXPLUS_STRS *strs = nullptr;
-//   const kmx::COMP_KMXPLUS_KEYS *keys = nullptr;
 
-//   // TODO-LDML: load the file from the buffer (KMXPlus format)
-//   // Note: kb_path is essentially debug metadata here
   KMXPLUS_ASSERT(true, data.size() > sizeof(kmx::COMP_KEYBOARD_EX));
 
 //   // Locate the structs here, but still retain ptrs to the raw structs.
   const kmx::COMP_KEYBOARD* comp_keyboard = (kmx::COMP_KEYBOARD*)data.data();
 
-  kmx::kmx_plus kplus(comp_keyboard);
+  kmx::kmx_plus kplus(comp_keyboard, data.size());
+
   KMXPLUS_ASSERT(true, kplus.is_valid());
 
-
-  // KMXPLUS_ASSERT(true, !!(comp_keyboard->dwFlags & KF_KMXPLUS));
-//   const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
-
-//   // validate size and offset
-//   KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize >= LDML_LENGTH_SECT);
-//   KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     >= sizeof(kmx::COMP_KEYBOARD_EX));
-//   KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize <= data.size());
-
-//   // calculate pointers to start and end of kmxplus
-//   const uint8_t * const kmxplusdata   = data.data() + ex->kmxplus.dpKMXPlus;      // Start of + data
-//   // const uint8_t* kmxpluslimit  = kmxplusdata    + ex->kmxplus.dwKMXPlusSize;  // End of   + data
-
-//   // Now load sections.
-
-//   // This will validate (and possibly print) all data.
-//   // TODO-LDML: we will be replacing this validation with validation-as-we-go below.
-//   KMXPLUS_ASSERT(true, kmx::validate_kmxplus_data(kmxplusdata));
-
-//   // Get out the SECT header
-//   {
-//     const KMX_DWORD offset = 0;
-//     sect = kmx::as_kmxplus_sect(kmxplusdata+offset);
-//     KMXPLUS_ASSERT(true, sect != nullptr);
-//     // Specified data size fits in total
-//     KMXPLUS_ASSERT(true, (offset+sect->header.size) <= ex->kmxplus.dwKMXPlusSize);
-//   }
-
-//   // Fill out the other sections we need.
-//   {
-//     const KMX_DWORD offset = sect->find(LDML_SECTIONID_STRS);
-//     KMXPLUS_ASSERT(true, offset != 0);
-//     KMXPLUS_ASSERT(true, offset < ex->kmxplus.dwKMXPlusSize);
-//     strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
-//     KMXPLUS_ASSERT(true, strs != nullptr);
-//     // Specified data size fits in total
-//     KMXPLUS_ASSERT(true, (offset+strs->header.size) <= ex->kmxplus.dwKMXPlusSize);
-//   }
-
-//   {
-//     const KMX_DWORD offset = sect->find(LDML_SECTIONID_KEYS);
-//     KMXPLUS_ASSERT(true, offset != 0);
-//     keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
-//     KMXPLUS_ASSERT(true, keys != nullptr);
-//     // Specified data size fits in total
-//     KMXPLUS_ASSERT(true, (offset+keys->header.size) <= ex->kmxplus.dwKMXPlusSize);
+  // Now, if we have keys, use them.
   if (kplus.keys != nullptr) {
     // read all keys into array
     for (KMX_DWORD i=0; i<kplus.keys->count; i++) {
@@ -186,7 +137,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       ldml_vkey_id vkey_id((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod);
       vkey_to_string[vkey_id] = std::u16string(out, len); // assign the string
     }
-  } // else: no keys!
+  } // else: no keys! but still valid. Just, no keys.
   KMXPLUS_PRINTLN("_valid = true");
 
 #undef KMXPLUS_ASSERT

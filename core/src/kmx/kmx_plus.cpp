@@ -89,6 +89,10 @@ header_from_bytes(const uint8_t *data, KMX_DWORD length, uint32_t ident) {
  */
 template <class T>
 const T *section_from_bytes(const uint8_t *data, KMX_DWORD length) {
+  if (length < sizeof(T)) { // Does not include dynamic data. First check.
+    debug_println("length < sizeof(section)");
+    return nullptr;
+  }
   const COMP_KMXPLUS_HEADER *header = header_from_bytes(data, length, T::IDENT);
   const T *section = reinterpret_cast<const T *>(header);
   if (section != nullptr && section->valid(length)) {
@@ -259,19 +263,30 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
   return overall_valid;
 }
 
-kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard)
+kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     : keys(nullptr), loca(nullptr), meta(nullptr),
       sect(nullptr), strs(nullptr), vkey(nullptr), valid(false) {
 
   KMXPLUS_PRINTF(("kmx_plus(): Got a COMP_KEYBOARD at %p\n", keyboard));
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
-    KMXPLUS_PRINTF(("Err: flags KF_KMXPLUS not set\n"));
+    KMXPLUS_PRINTF(("Err: flags COMP_KEYBOARD.dwFlags did not have KF_KMXPLUS set\n"));
     valid = false;
     return;
   }
   const COMP_KEYBOARD_EX* ex = reinterpret_cast<const COMP_KEYBOARD_EX*>(keyboard);
 
   KMXPLUS_PRINTF(("kmx_plus(): KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize));
+  if (ex->kmxplus.dpKMXPlus < sizeof(kmx::COMP_KEYBOARD_EX)) {
+    debug_println("dwKMXPlus is not past the end of COMP_KEYBOARD_EX");
+    valid = false;
+    return;
+  }
+  if ( ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
+    debug_println("dpKMXPlus + dwKMXPlusSize is past the end of the file");
+    valid = false;
+    return;
+  }
+
   const uint8_t* rawdata = reinterpret_cast<const uint8_t*>(keyboard);
 
   sect = section_from_bytes<COMP_KMXPLUS_SECT>(rawdata+ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
@@ -280,7 +295,8 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard)
     valid = false;
   } else {
     valid = true;
-    // load other sections
+    // load other sections, validating as we go
+    // these will be nullptr if they don't validate
     keys = section_from_sect<COMP_KMXPLUS_KEYS>(sect);
     loca = section_from_sect<COMP_KMXPLUS_LOCA>(sect);
     meta = section_from_sect<COMP_KMXPLUS_META>(sect);
