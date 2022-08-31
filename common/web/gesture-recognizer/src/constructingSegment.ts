@@ -155,6 +155,10 @@ namespace com.keyman.osk {
       this._pendingLocked = flag;
     }
 
+    public get hasPendingSubsegment() {
+      return !!this.pendingSubsegmentation;
+    }
+
     /**
      * Call this to denote the current state of an in-construction subsegment that **will** be included
      * in the final Segment once completed if the pending subsegment does not diverge in a later update.
@@ -195,13 +199,13 @@ namespace com.keyman.osk {
       const recognitionWaitTime = this.classifier.config.holdMinimumDuration - alreadyElapsed;
 
       // `undefined` if and only if still unrecognized.
-      if(recognitionWaitTime <= 0 && this._pathSegment.type === undefined) {
+      if(recognitionWaitTime <= 0 && !this._pathSegment.isRecognized) {
         const classification = this.classifier.classifySegment(fullStatsWithIncoming);
 
         // Based on the specification for segment classification, there WILL be a classification
         // assigned here.  It's an implementation error if not.
         if(!classification) {
-          throw "Implementation error - segment was not properly recognized";
+          throw new Error("Implementation error - segment was not properly recognized");
         }
 
         // auto-resolve the recognition promise & 'lock' the classification (and also the portion
@@ -219,7 +223,7 @@ namespace com.keyman.osk {
      */
     public clearPendingSubsegment() {
       if(this.hasPrecommittedSubsegment) {
-        throw "Invalid state:  must fully commit a subsection due to a precommitted portion"!;
+        throw new Error("Invalid state:  must fully commit a subsection due to a precommitted portion!");
       }
 
       // Probably does not need to trigger an event; if called, there's a new, follow-up segment
@@ -248,14 +252,14 @@ namespace com.keyman.osk {
         this.hasPrecommittedSubsegment = false;
 
         // Recognition check!
-        if(!this.pathSegment.type) {
+        if(!this.pathSegment.isRecognized) {
           const classification = this.classifier.classifySegment(this.committedInterval);
           if(classification) {
             this.pathSegment.classifyType(classification);
           }
         }
       } else {
-        throw "Illegal state - `commitPendingPortion` should never be called with nothing pending.";
+        throw new Error("Illegal state - `commitPendingPortion` should never be called with nothing pending.");
       }
     }
 
@@ -269,7 +273,7 @@ namespace com.keyman.osk {
       }
 
       // Fully 'recognize' the Segment if it somehow hasn't yet been recognized.
-      if(this.pathSegment.type === undefined) {
+      if(!this.pathSegment.isRecognized) {
         this.pathSegment.classifyType(this.classifier.classifySegment(this.committedInterval));
       }
 

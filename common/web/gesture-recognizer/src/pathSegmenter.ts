@@ -211,7 +211,7 @@ namespace com.keyman.osk {
 
       constructor(host: SegmentationSplit, dependentAxis: PathCoordAxis, independentAxis: PathCoordAxis) {
         if(dependentAxis == independentAxis) {
-          throw "Two different axes must be specified for the regression object.";
+          throw new Error("Two different axes must be specified for the regression object.");
         }
 
         this.host = host;
@@ -649,22 +649,11 @@ namespace com.keyman.osk {
         baseAccumulation:   this.choppedStats
       }
 
-      // Needed for a very quick, simple tap - it may not last long enough to start subsegmentation!
-      let lateSegment: ConstructingSegment = null;
-      if(!this.constructingSegment) {
-        lateSegment = this.constructingSegment = new ConstructingSegment(finalSubsegment, new SegmentClassifier(this.segmentationConfig));
-      }
       // No need to check if this matches any predecessor subsegments; that already happened during
       // the last `performSubsegmentation` call.  There's no new data since then.
       // (Actually... this should already be in place now, after recent changes!)
-      this.constructingSegment.updatePendingSubsegment(finalSubsegment);
-      // As we're finalizing, we do NOT need to recall maintainRecentSegment.
-      this.constructingSegment.commitPendingSubsegment();
-      this.finalizeSegment(); // clears `this.constructingSegment`!
-
-      if(lateSegment) {
-        this.segmentForwarder(lateSegment.pathSegment);
-      }
+      this.constructingSegment?.updatePendingSubsegment(finalSubsegment);
+      this.finalizeSegment(); // also commits pending subsegment
 
       // Using the last-received sample, generate & publish an "end" segment.
       // As ConstructingSegment is designed to work with -sequences- of samples, it's less
@@ -719,6 +708,11 @@ namespace com.keyman.osk {
       // STEP 1:  Determine the range of the initial sliding time window for the most recent samples.
 
       if(unsegmentedDuration < this.SLIDING_WINDOW_INTERVAL * 2) {
+        this.updateSegmentConstruction({
+          stats: cumulativeStats.deaccumulate(this.choppedStats),
+          endingAccumulation: cumulativeStats,
+          baseAccumulation: this.choppedStats
+        });
         return;
       }
 
@@ -901,8 +895,8 @@ namespace com.keyman.osk {
 
     private finalizeSegment() {
       if(this.constructingSegment) {
-        if(this.constructingSegment.subsegmentCount == 0) {
-          throw "Implementation error!";
+        if(this.constructingSegment.subsegmentCount == 0 && !this.constructingSegment.hasPendingSubsegment) {
+          throw new Error("Implementation error!");
         }
         this.constructingSegment.finalize();
 

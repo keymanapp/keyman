@@ -29,10 +29,22 @@ namespace com.keyman.osk {
    *
    * `'complete'`: the touchpoint is no longer active; a touch-end has been observed.
    *   - Provides no parameters.
+   *   - Will be the last event raised by its instance, after any final 'segmentation'
+   *     events.
    *
    * `'invalidated'`: the touchpoint is no longer active; the path has crossed
    * gesture-recognition boundaries and is no longer considered valid.
    *   - Provides no parameters.
+   *   - Will precede recognition Promise fulfillment on the `Segment` provided by
+   *     the most recently-preceding 'segmentation' event.
+   *   - Will precede the final 'segmentation' event for the 'end' segment
+   *
+   * `'segmentation'`:  a new segmentation boundary has been identified for the
+   * ongoing touchpath.
+   *   - Provides one parameter - a new `Segment` instance representing the
+   *     still-in-construction part of the touchpath until this event is
+   *     raised again. (That would indicate a new segmentation boundary
+   *     marking the end of the first event's returned `Segment`.)
    */
   export class TrackedPath extends EventEmitter<EventMap> {
     private samples: InputSample[] = [];
@@ -93,7 +105,7 @@ namespace com.keyman.osk {
      */
     extend(sample: InputSample) {
       if(this._isComplete) {
-        throw "Invalid state:  this TrackedPath has already terminated.";
+        throw new Error("Invalid state:  this TrackedPath has already terminated.");
       }
 
       // The tracked path should emit InputSample events before Segment events and
@@ -110,20 +122,23 @@ namespace com.keyman.osk {
      */
     terminate(cancel: boolean = false) {
       if(this._isComplete) {
-        throw "Invalid state:  this TrackedPath has already terminated.";
+        throw new Error("Invalid state:  this TrackedPath has already terminated.");
       }
       this.wasCancelled = cancel;
       this._isComplete = true;
 
-      // The tracked path should emit InputSample events before Segment events and
-      // resolution of Segment Promises.
+      // If cancelling, do so before finishing segments
       if(cancel) {
         this.emit('invalidated');
-      } else {
-        this.emit('complete');
       }
 
       this.segmenter.close();
+
+      // If not cancelling, signal completion after finishing segments.
+      if(!cancel) {
+        this.emit('complete');
+      }
+
       this.removeAllListeners();
     }
 

@@ -94,7 +94,7 @@ namespace com.keyman.osk {
 
     protected classifyType(type: SegmentClass) {
       if(!this._stats) {
-        throw "Cannot recognize the segment - lacking critical metadata";
+        throw new Error("Cannot recognize the segment - lacking critical metadata");
       }
 
       if(this._type === undefined) {
@@ -102,7 +102,7 @@ namespace com.keyman.osk {
 
         this._recognitionPromiseResolver(type);
       } else if(this._type != type) {
-        throw "May not change segment type once set!";
+        throw new Error("May not change segment type once set!");
       }
     }
 
@@ -180,6 +180,10 @@ namespace com.keyman.osk {
       return this._type || null;
     }
 
+    protected _isRecognized(): boolean {
+      return this._type !== undefined;
+    }
+
     /**
      * A `Promise` that resolves when the segment's classification is determined
      * - when we "recognize" its role in the touchpath.
@@ -200,7 +204,7 @@ namespace com.keyman.osk {
 
     protected resolve() {
       if(!this._stats) {
-        throw "Cannot resolve the segment - illegal state!";
+        throw new Error("Cannot resolve the segment - illegal state!");
       }
       this._resolutionPromiseResolver();
     }
@@ -257,6 +261,10 @@ namespace com.keyman.osk {
 
     public resolve() {
       super.resolve();
+    }
+
+    public get isRecognized() {
+      return super._isRecognized();
     }
   }
 }

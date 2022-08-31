@@ -64,7 +64,7 @@ namespace com.keyman.osk {
        */
       constructor(mainStats: CumulativePathStats, dependentAxis: PathCoordAxis, independentAxis: PathCoordAxis) {
         if(dependentAxis == independentAxis) {
-          throw "Two different axes must be specified for the regression object.";
+          throw new Error("Two different axes must be specified for the regression object.");
         }
 
         this.accumulator = mainStats;
@@ -223,7 +223,7 @@ namespace com.keyman.osk {
       } else if(isAnInputSample(obj)) {
         Object.assign(this, this.extend(obj));
       } else {
-        throw "A constructor for this input pattern has not yet been implemented";
+        throw new Error("A constructor for this input pattern has not yet been implemented");
       }
     }
 
