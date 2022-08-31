@@ -993,10 +993,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           String _downloadid = CloudLexicalModelMetaDataDownloadCallback.createDownloadId(languageID);
           CloudLexicalModelMetaDataDownloadCallback _callback = new CloudLexicalModelMetaDataDownloadCallback();
 
-          Toast.makeText(context,
-            context.getString(R.string.query_associated_model),
-            Toast.LENGTH_SHORT).show();
-
           ArrayList<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams = new ArrayList<>();
           String url = CloudRepository.prepareLexicalModelQuery(languageID);
           aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(

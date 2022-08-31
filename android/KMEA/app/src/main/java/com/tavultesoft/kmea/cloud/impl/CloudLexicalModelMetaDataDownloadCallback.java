@@ -148,7 +148,7 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
             KMLog.LogException(TAG, "Error parsing lexical model from api.keyman.com. ", e);
           }
         } else {
-          BaseActivity.makeToast(aContext, R.string.no_associated_model, Toast.LENGTH_SHORT);
+          // Don't make a Toast notification about nothing to download
         }
       }
 
