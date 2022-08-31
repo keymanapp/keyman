@@ -1,7 +1,6 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { Loca } from "../kmx/kmx-plus";
 import { SectionCompiler } from "./section-compiler";
-//import tags = require('language-tags');
 import { CompilerErrors } from "./errors";
 import { LKKeyboard } from "../ldml-keyboard/ldml-keyboard-xml";
 
