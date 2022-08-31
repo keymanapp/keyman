@@ -220,7 +220,14 @@ document.addEventListener("DOMContentLoaded", windowResize);
 
   function more_detail(n) {
     var k = document.getElementById(n);
+    var m = document.getElementById(n+'_more');
     $(k).toggleClass('grid_rows_hide');
+    if ($(k).hasClass('grid_rows_hide')){
+      $(m).attr("src","/app/expand20.png");
+    }
+    else {
+      $(m).attr("src","/app/collapse20.png");
+    }
     //document.querySelector('.grid-container').classList.toggle("grid_rows_hide");
   }
 

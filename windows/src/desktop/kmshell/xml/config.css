@@ -210,16 +210,27 @@ html
 .list_item
 {
   display: block;
-  background: none;
-  margin: 4px;
+  /*background: none;*/
+  background: #e0e5ef;
+  border-radius: 5px;
+  border: 1px solid #808080;
+  margin: 0px;
   padding: 0px;
   clear: left;
   cursor: default;
 }
 
+.list_item:focus{
+  /*background: url("transLightBlue.png") repeat !important;*/
+  outline: none;
+}
 .list_item_focus
 {
   background: url("transLightBlue.png") repeat !important;
+}
+
+.no_outline:focus{
+  outline: none;
 }
 
 .list_title
@@ -243,13 +254,13 @@ html
 .list_icon
 {
   display: inline;
-  margin: 2px 6px 0px 2px;
+  margin: 0px 6px 0px 2px;
   vertical-align: middle;
 }
 .list_detail
 {
-  /*background: #f0f0ff;*/
-  background: #ffffff;
+  background: #f0f0ff;
+  /*background: #ffffff;*/
   /*border: solid 1px #79c3da;*/
   clear: both;
   font-size: 11px;
@@ -295,10 +306,12 @@ html
   margin: 2px 4px 0 0;
 }
 */
-.list_item:hover
+/*.list_item:hover
 {
   background: #79c3da;
-}
+}*/
+
+
 /*
 .expanded .list_close
 {
@@ -430,12 +443,20 @@ table tr
 
 .flex-item-qr
 {
-  padding-right: 20px;
+  padding-top: 20px;
+  padding-right: 10px;
+  padding-left: 10px;
   width: 128px;
   font-size: 11px;
-
 }
 
+.flex-qrcode-caption
+{
+  display: block;
+  white-space: normal;
+  font-size: 10pt;
+  padding: 20px 20px 20px 2px;
+}
 
 .grid-container {
   display: grid;
@@ -447,11 +468,11 @@ table tr
 .grid_item
 {
   position: relative;
-  font-size: 11px;
-  font-weight: bold;
+  font-size: 12px;
   margin: 0px;
-  padding: 5px;
-  background: #ffffff;
+  padding: 1px;
+  margin: 0 0 0 5px;
+  /*background: #ffffff;*/
   /*background: #f0f0ff;*/
 }
 
@@ -461,17 +482,14 @@ table tr
   position: relative;
 }
 
-/* Just for testing layout */
-.grid_item::before {
- /* content: 'Name:';
-  position:relative;
-  */
- /* font-size: 25px;
+.grid_item_title{
   font-weight: bold;
-  top: 10px;
-  left: 15px;*/
+}
+/*
+.grid_item_content{
 
 }
+*/
 
 
 .grid_item_text
@@ -499,6 +517,7 @@ table tr
 .grid_col_span_2
 {
   grid-column: span 2;
+  padding-top: 10px;
 }
 
 
@@ -513,7 +532,19 @@ table tr
   display: none;
 }
 
+/*
+.grid_rows_hide [more]{
+  background: url('expand20.png') 0 0 no-repeat;
+}
 
+.grid_item [more] {
+  background: url('collapse20.png') 0 0 no-repeat;
+}
+*/
+
+/*#more {
+  background: url('collapse20.png') 0 0 no-repeat;
+}*/
 
 /* Keyboard Styles */
 .keyboard_header
@@ -598,15 +629,15 @@ table tr
 
 /* keyboard languages */
 
-.keyboard-language
+/*.keyboard-language
 {
   padding: 2px;
-}
+}*/
 
 .keyboard-language span
 {
   display: inline-block;
-  vertical-align: middle;
+ /* vertical-align: middle;*/
 }
 
 .keyboard-language a
@@ -618,24 +649,24 @@ table tr
 .keyboard-language a img
 {
   border: none;
-  vertical-align: middle;
+  /*vertical-align: middle;*/
 }
 
-.keyboard-language:hover
+/*.keyboard-language:hover
 {
   background: #79C3DA;
-}
-.keyboard-language:hover a
+}*/
+.keyboard-language a
 {
   position: relative;
   z-index: 10;
   visibility: visible;
 }
 
-.list-languages-add
+/*.list-languages-add
 {
   margin: 4px 6px;
-}
+}*/
 
 .language-icon
 {
@@ -643,11 +674,11 @@ table tr
   width: 16px;
   height: 15px;
   display: inline-block;
-  margin: 0 4px;
+  margin: 0 4px 0 0;
   background: #cccccc;
-  padding: 1px 0 0 0;
+
   text-align: center;
-  vertical-align: middle;
+
 }
 
 /* option styles */
@@ -1134,9 +1165,4 @@ th
   padding: 10px;
 }
 
-.qrcode .qrcode-caption {
-  display: block;
-  white-space: normal;
-  font-size: 8pt;
-  padding: 8px;
-}
+
