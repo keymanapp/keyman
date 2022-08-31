@@ -47,11 +47,11 @@ export class LocaCompiler extends SectionCompiler {
     // TODO: remove `as any` cast: (Intl as any): ts lib version we have doesn't
     // yet include `getCanonicalLocales` but node 16 does include it so we can
     // safely use it. Also well supported in modern browsers.
-    result.locales = ((Intl as any).getCanonicalLocales(locales));
+    result.locales = (Intl as any).getCanonicalLocales(locales);
 
     if(result.locales.length < locales.length) {
       // TODO-LDML: hint on repeated locales
-      this.callbacks.reportMessage(CompilerErrors.OneOrMoreRepeatedLocales())
+      this.callbacks.reportMessage(CompilerErrors.OneOrMoreRepeatedLocales());
     }
 
     return result;
