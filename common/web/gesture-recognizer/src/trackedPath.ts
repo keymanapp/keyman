@@ -31,13 +31,17 @@ namespace com.keyman.osk {
    *   - Provides no parameters.
    *   - Will be the last event raised by its instance, after any final 'segmentation'
    *     events.
+   *   - Still precedes resolution Promise fulfillment on the `Segment` provided by
+   *     the most recently-preceding 'segmentation' event.
+   *     - And possibly recognition Promise fulfillment.
    *
    * `'invalidated'`: the touchpoint is no longer active; the path has crossed
    * gesture-recognition boundaries and is no longer considered valid.
    *   - Provides no parameters.
-   *   - Will precede recognition Promise fulfillment on the `Segment` provided by
-   *     the most recently-preceding 'segmentation' event.
    *   - Will precede the final 'segmentation' event for the 'end' segment
+   *   - Will precede resolution Promise fulfillment on the `Segment` provided by
+   *     the most recently-preceding 'segmentation' event.
+   *     - And possibly recognition Promise fulfillment.
    *
    * `'segmentation'`:  a new segmentation boundary has been identified for the
    * ongoing touchpath.

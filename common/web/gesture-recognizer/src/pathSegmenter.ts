@@ -704,15 +704,16 @@ namespace com.keyman.osk {
     private performSubsegmentation() {
       const cumulativeStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length - 1];
       const unsegmentedDuration = cumulativeStats.lastTimestamp - this.steppedCumulativeStats[0].lastTimestamp;
+      const unsegmentedForm: Subsegmentation = {
+        stats: cumulativeStats.deaccumulate(this.choppedStats),
+        endingAccumulation: cumulativeStats,
+        baseAccumulation: this.choppedStats
+      }
 
       // STEP 1:  Determine the range of the initial sliding time window for the most recent samples.
 
       if(unsegmentedDuration < this.SLIDING_WINDOW_INTERVAL * 2) {
-        this.updateSegmentConstruction({
-          stats: cumulativeStats.deaccumulate(this.choppedStats),
-          endingAccumulation: cumulativeStats,
-          baseAccumulation: this.choppedStats
-        });
+        this.updateSegmentConstruction(unsegmentedForm);
         return;
       }
 
@@ -873,6 +874,7 @@ namespace com.keyman.osk {
        * inspection of the subsegmentation algorithm and its decisions is needed.
        */
       if(!candidateSplit.segmentationMerited) {
+        this.updateSegmentConstruction(unsegmentedForm);
         return;
       }
 
