@@ -4,6 +4,7 @@ import * as path from 'path';
 import {assert} from 'chai';
 import hextobin from '@keymanapp/hextobin';
 import Compiler from '../src/keyman/compiler/compiler';
+import KMXBuilder from '../src/keyman/kmx/kmx-builder';
 import {makePathToFixture} from './helpers/index';
 
 class CompilerCallbacks {
@@ -30,7 +31,10 @@ function compileKeyboard(inputFilename: string): Uint8Array {
   if(!kmx) {
     return null;
   }
-  return k.write(kmx);
+
+  // Use the builder to generate the binary output file
+  let builder = new KMXBuilder(kmx, true);
+  return builder.compile();
 }
 
 describe('compiler-tests', function() {

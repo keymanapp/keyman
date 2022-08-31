@@ -3,10 +3,10 @@ import LDMLKeyboardXMLSourceFile from './ldml-keyboard-xml';
 import CompilerCallbacks from '../compiler/callbacks';
 
 export default class LDMLKeyboardXMLSourceFileReader {
+  private readonly callbacks: CompilerCallbacks;
 
-  //private callbacks: CompilerCallbacks;
   constructor (callbacks: CompilerCallbacks) {
-    //this.callbacks = callbacks;
+    this.callbacks = callbacks;
   }
 
   /**
@@ -33,6 +33,11 @@ export default class LDMLKeyboardXMLSourceFileReader {
       }
     }
     return source;
+  }
+
+  public loadFile(filename: string) {
+    const buf = this.callbacks.loadFile(filename, filename);
+    return this.load(buf);
   }
 
   public load(file: Uint8Array): LDMLKeyboardXMLSourceFile {

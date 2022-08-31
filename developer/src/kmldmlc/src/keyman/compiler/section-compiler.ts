@@ -1,18 +1,26 @@
-import KMXPlusFile from "../kmx/kmx-plus";
+import { Section } from "../kmx/kmx-plus";
 import LDMLKeyboardXMLSourceFile from "../ldml-keyboard/ldml-keyboard-xml";
 import CompilerCallbacks from "./callbacks";
+import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 
 export class SectionCompiler {
-  private _kmx: KMXPlusFile;
-  private _source: LDMLKeyboardXMLSourceFile;
-  private _callbacks: CompilerCallbacks;
+  protected readonly source: LDMLKeyboardXMLSourceFile;
+  protected readonly callbacks: CompilerCallbacks;
 
-  constructor(kmx: KMXPlusFile, source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    this._kmx = kmx;
-    this._source = source;
+  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
+    this.source = source;
+    this.callbacks = callbacks;
   }
 
-  get kmx() { return this._kmx; }
-  get source() { return this._source; }
-  get callbacks() { return this._callbacks; }
+  public get id(): SectionIdent {
+    return null;
+  }
+
+  public compile(): Section {
+    return null;
+  }
+
+  public validate(): boolean {
+    return true;
+  }
 }

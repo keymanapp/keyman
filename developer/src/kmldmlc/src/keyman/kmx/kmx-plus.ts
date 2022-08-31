@@ -79,19 +79,14 @@ export default class KMXPlusFile extends KMXFile {
 
   /* File in-memory data */
 
-  // strs and sect are not kept in-memory
-
   public kmxplus: {
-    loca: Loca;
-    meta: Meta;
-    keys: Keys;
-    vkey: Vkey;
-  } = {
-    loca: new Loca(),
-    meta: new Meta(),
-    keys: new Keys(),
-    vkey: new Vkey()
-  };
+    sect?: Section; // sect is ignored here for writing
+    strs?: Section; // strs is ignored here for writing
+    loca?: Loca;
+    meta?: Meta;
+    keys?: Keys;
+    vkey?: Vkey;
+  } = { };
 
   constructor() {
     super();

@@ -8,6 +8,7 @@ import * as path from 'path';
 import * as program from 'commander';
 
 import Compiler from './keyman/compiler/compiler';
+import KMXBuilder from './keyman/kmx/kmx-builder';
 
 let inputFilename: string;
 
@@ -59,7 +60,10 @@ function compileKeyboard(inputFilename: string): Uint8Array {
   if(!kmx) {
     return null;
   }
-  return k.write(kmx);
+
+  // Use the builder to generate the binary output file
+  let builder = new KMXBuilder(kmx, true);
+  return builder.compile();
 }
 
 // Compile:
