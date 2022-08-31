@@ -7,22 +7,33 @@
 
 #pragma once
 
+#include <map>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 #include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 #include "option.hpp"
+
+// TODO-LDML: May not need this eventually
+#include <kmx/kmx_plus.h>
 
 namespace km {
 namespace kbp {
 
 #define KM_KBP_LMDL_PROCESSOR_VERSION u"1.0"
 
+ /**
+  * identifier for keybag lookup
+  */
+  typedef std::pair<km_kbp_virtual_key, uint16_t> ldml_vkey_id;
+
   class ldml_processor : public abstract_processor {
   private:
     bool _valid;
-    std::vector<uint8_t> rawdata; // TODO-LDML: should be 'unpacked' format instead.
+    std::map<ldml_vkey_id, std::u16string> vkey_to_string;
+
   public:
     ldml_processor(
       path const & kb_path,

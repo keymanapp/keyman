@@ -59,23 +59,129 @@ namespace {
   };
 }
 
+/**
+ * @brief Usage: `KMXPLUS_PRINTF(("str: %s\n", "something"));`
+ * Note double parens
+ * \def KMXPLUS_DEBUG
+ */
+#if KMXPLUS_DEBUG
+#include <iostream>
+#define KMXPLUS_NOTEQUAL(expect, actual) std::cerr << __FILE__ << ":" << __LINE__ << ": ASSERT FAILED: " \
+              << #actual << "=" << (actual) << ", expected " << (expect) << std::endl
+#define KMXPLUS_PRINTLN(msg) std::cerr  << __FILE__ << ":" << __LINE__ << ": " msg << std::endl;
+#else
+#define KMXPLUS_NOTEQUAL(expect, actual)
+#define KMXPLUS_PRINTLN(msg)
+#endif
+
 namespace km {
 namespace kbp {
 
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), rawdata(data) // TODO-LDML: parse the data, don't just copy it
+  ), _valid(false), vkey_to_string()
 {
+
+/**
+ * Assert something, just in this function
+ * If fails, print a message and exit as invalid
+ * \def KMXPLUS_ASSERT
+ */
+#define KMXPLUS_ASSERT(expect,actual) if ((expect) != (actual)) { \
+    KMXPLUS_NOTEQUAL(expect, actual); \
+    _valid = false; \
+    return; \
+  }
+  const kmx::COMP_KMXPLUS_SECT *sect = nullptr;
+  const kmx::COMP_KMXPLUS_STRS *strs = nullptr;
+  const kmx::COMP_KMXPLUS_KEYS *keys = nullptr;
+
   // TODO-LDML: load the file from the buffer (KMXPlus format)
   // Note: kb_path is essentially debug metadata here
-  assert(data.size() != 0);
+  KMXPLUS_ASSERT(true, data.size() > sizeof(kmx::COMP_KEYBOARD_EX));
 
-  const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)data.data();
+  // Locate the structs here, but still retain ptrs to the raw structs.
+  const kmx::COMP_KEYBOARD* comp_keyboard = (kmx::COMP_KEYBOARD*)data.data();
+  KMXPLUS_ASSERT(true, !!(comp_keyboard->dwFlags & KF_KMXPLUS));
+  const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
 
-  if (validate_kmxplus_data(comp_keyboard)) {
-    _valid = true;
+  // validate size and offset
+  KMXPLUS_ASSERT(true, ex->kmxplus.dwKMXPlusSize >= LDML_LENGTH_SECT);
+  KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus     >= sizeof(kmx::COMP_KEYBOARD_EX));
+  KMXPLUS_ASSERT(true, ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize <= data.size());
+
+  // calculate pointers to start and end of kmxplus
+  const uint8_t * const kmxplusdata   = data.data() + ex->kmxplus.dpKMXPlus;      // Start of + data
+  // const uint8_t* kmxpluslimit  = kmxplusdata    + ex->kmxplus.dwKMXPlusSize;  // End of   + data
+
+  // Now load sections.
+
+  // This will validate (and possibly print) all data.
+  // TODO-LDML: we will be replacing this validation with validation-as-we-go below.
+  KMXPLUS_ASSERT(true, kmx::validate_kmxplus_data(kmxplusdata));
+
+  // Get out the SECT header
+  {
+    const KMX_DWORD offset = 0;
+    sect = kmx::as_kmxplus_sect(kmxplusdata+offset);
+    KMXPLUS_ASSERT(true, sect != nullptr);
+    // Specified data size fits in total
+    KMXPLUS_ASSERT(true, (offset+sect->header.size) <= ex->kmxplus.dwKMXPlusSize);
   }
+
+  // Fill out the other sections we need.
+  {
+    const KMX_DWORD offset = sect->find(LDML_SECTIONID_STRS);
+    KMXPLUS_ASSERT(true, offset != 0);
+    KMXPLUS_ASSERT(true, offset < ex->kmxplus.dwKMXPlusSize);
+    strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
+    KMXPLUS_ASSERT(true, strs != nullptr);
+    // Specified data size fits in total
+    KMXPLUS_ASSERT(true, (offset+strs->header.size) <= ex->kmxplus.dwKMXPlusSize);
+  }
+
+  {
+    const KMX_DWORD offset = sect->find(LDML_SECTIONID_KEYS);
+    KMXPLUS_ASSERT(true, offset != 0);
+    keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
+    KMXPLUS_ASSERT(true, keys != nullptr);
+    // Specified data size fits in total
+    KMXPLUS_ASSERT(true, (offset+keys->header.size) <= ex->kmxplus.dwKMXPlusSize);
+
+    // read all keys into array
+    for (KMX_DWORD i=0; i<keys->count; i++) {
+      const kmx::COMP_KMXPLUS_KEYS_ENTRY &entry = keys->entries[i];
+      KMX_DWORD len = 0;
+      KMX_WCHAR out[BUFSIZ];
+      if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
+        KMXPLUS_ASSERT(false, nullptr == strs->get(entry.to, out, BUFSIZ));
+        for(len=0; len<BUFSIZ && out[len]; len++); // TODO-LDML: validate string length here, #7134
+      } else {
+        UTF32 buf32[2];
+        buf32[0] = entry.to; // UTF-32
+        buf32[1] = 0; // to avoid UMR warning
+        UTF32 *sourceStart = &buf32[0];
+        const UTF32 *sourceEnd = &buf32[1]; // Reference off the end. NULL to avoid UMR.
+        UTF16 *targetStart = (UTF16*)out;
+        const UTF16 *targetEnd = (UTF16*)out+BUFSIZ-1;
+        ConversionResult result = ::ConvertUTF32toUTF16(&sourceStart, sourceEnd, &targetStart, targetEnd, strictConversion);
+        KMXPLUS_ASSERT(conversionOK, result);
+        *targetStart = 0;
+        len = 1; // TODO=LDML calculate
+        // len = (targetStart - out);
+        KMXPLUS_ASSERT(true, len>=1 && len <= 2);
+      }
+      KMXPLUS_ASSERT(true, len>0 && len < BUFSIZ);
+      KMXPLUS_ASSERT(0, out[len]); // null termination
+      ldml_vkey_id vkey_id((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod);
+      vkey_to_string[vkey_id] = std::u16string(out, len); // assign the string
+    }
+  }
+  KMXPLUS_PRINTLN("_valid = true");
+
+#undef KMXPLUS_ASSERT
+  _valid = true;
 }
 
 bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>& data) {
@@ -111,7 +217,8 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
     return false;
   }
 
-  // A KMXPlus file is in the buffer (although more validation is required)
+  // A KMXPlus file is in the buffer (although more validation is required and will
+  // be done in the constructor)
   return true;
 }
 
@@ -167,67 +274,20 @@ ldml_processor::process_event(
       state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
       break;
     default:
-      // TODO-LDML: temporary code here
-      // Don't want to do this work each time
-      const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)rawdata.data();
-      assert(comp_keyboard->dwFlags & KF_KMXPLUS);
-      const kmx::COMP_KEYBOARD_EX* ex = reinterpret_cast<const kmx::COMP_KEYBOARD_EX*>(comp_keyboard);
-
-      // printf("KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
-      const uint8_t* kmxplusdata = rawdata.data() + ex->kmxplus.dpKMXPlus;
-      // Get out the SECT header
-      const kmx::COMP_KMXPLUS_SECT *sect = kmx::as_kmxplus_sect(kmxplusdata);
-      assert(sect != nullptr);
-      assert(sect->header.ident == LDML_SECTIONID_SECT);
-      KMX_DWORD offset;
-      // Fill out the other sections we need.
-      offset = sect->find(LDML_SECTIONID_STRS);
-      assert(offset != 0); // or else section not found
-      const kmx::COMP_KMXPLUS_STRS *strs = kmx::as_kmxplus_strs(kmxplusdata+offset);
-      assert(strs->header.ident == LDML_SECTIONID_STRS);
-      offset = sect->find(LDML_SECTIONID_KEYS);
-      assert(offset != 0); // or else section not found
-      const kmx::COMP_KMXPLUS_KEYS *keys = kmx::as_kmxplus_keys(kmxplusdata+offset);
-      assert(keys->header.ident == LDML_SECTIONID_KEYS);
       // Look up the key
-      const kmx::COMP_KMXPLUS_KEYS_ENTRY *key =  keys->find(vk, modifier_state);
-      if (!key) {
+      const ldml_vkey_id vkey_id(vk, modifier_state);
+      const auto key = vkey_to_string.find(vkey_id);
+      if (key == vkey_to_string.end()) {
+        // not found
         state->actions().commit(); // finish up and
         return KM_KBP_STATUS_OK; // Nothing to do- no key
       }
-      // Prepare output chars
-      KMX_DWORD len = 0;
-      KMX_WCHAR out[BUFSIZ];
-      if (key->flags && LDML_KEYS_FLAGS_EXTEND) {
-        // It's a string.
-        assert(nullptr != strs->get(key->to, out, BUFSIZ));
-        // u_strlen()
-        for(len=0; len<BUFSIZ && out[len]; len++);
-      } else {
-        UTF32 buf32[2];
-        buf32[0] = key->to; // UTF-32
-        buf32[1] = 0; // to avoid UMR warning
-        UTF32 *sourceStart = &buf32[0];
-        const UTF32 *sourceEnd = &buf32[1]; // Reference off the end. NULL to avoid UMR.
-        UTF16 *targetStart = (UTF16*)out;
-        const UTF16 *targetEnd = (UTF16*)out+BUFSIZ-1;
-        ConversionResult result = ::ConvertUTF32toUTF16(&sourceStart, sourceEnd, &targetStart, targetEnd, strictConversion);
-        assert(result == conversionOK);
-        *targetStart = 0;
-        len = 1; // TODO=LDML calculate
-        // len = (targetStart - out);
-        assert(len>=1 && len <= 2);
-      }
-      assert(len>0);
-      assert(len<BUFSIZ);
-      assert(out[len] == 0); // null termination
-
-      for(KMX_DWORD i=0; i<len; i++) {
-        state->context().push_character(out[i]);
-        state->actions().push_character(out[i]);
+      const std::u16string &str = key->second;
+      for(size_t i=0; i<str.length(); i++) {
+        state->context().push_character(str[i]);
+        state->actions().push_character(str[i]);
       }
     }
-
     state->actions().commit();
   } catch (std::bad_alloc &) {
     state->actions().clear();

@@ -24,6 +24,7 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 - All variable length sections have the variable part begin on a 128-bit boundary, with zero padding as needed.
 - All sections begin with a 32-bit (four character) section identifier, and a 32-bit section size.
 - Other than the `sect` table itself, the rest of the sections follow in binary order in the file.  In other words, the binary ordering of the section identifiers determines the order of the file layout.
+- All sections other than the `sect` table are optional
 
 ### C7043.2.1 `sect`—Section Table of contents
 
@@ -68,6 +69,8 @@ Then for each string:
 After the string offset table comes the actual UTF-16LE data. There is a null (\u0000) after each string, which is _not_ included in the string length.
 
 The string offset table, and then strings themselves, are sorted according to a binary codepoint sort, not including the null.
+
+A string may be zero length.
 
 ### C7043.2.3 `meta`—Metadata
 
@@ -140,7 +143,7 @@ For each key:
 |--------------|----------|---------------------------------------------|
 |       0      | extend   | 0: `to` is a char, 1: `to` is a string      |
 
-- `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to` is a 32 bit index into the `strs` table.
+- `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to` is a 32 bit index into the `strs` table. The string may be zero-length.
 
 ### C7043.2.6 `vkey`—VKey Map
 
