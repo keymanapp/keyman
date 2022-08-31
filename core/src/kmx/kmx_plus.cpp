@@ -274,7 +274,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard)
   KMXPLUS_PRINTF(("kmx_plus(): KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize));
   const uint8_t* rawdata = reinterpret_cast<const uint8_t*>(keyboard);
 
-  sect = section_from_bytes<COMP_KMXPLUS_SECT>(rawdata, ex->kmxplus.dwKMXPlusSize);
+  sect = section_from_bytes<COMP_KMXPLUS_SECT>(rawdata+ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
   if (sect == nullptr) {
     KMXPLUS_PRINTF(("kmx_plus(): 'sect' did not validate\n"));
     valid = false;
