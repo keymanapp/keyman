@@ -55,7 +55,7 @@ checkAndInstallRequirements()
 	fi
 
 	sudo mk-build-deps debian/control
-	sudo apt-get -qy install ./keyman-build-deps_*.deb
+	sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
 	sudo rm -f keyman-buid-deps_*
 }
 
