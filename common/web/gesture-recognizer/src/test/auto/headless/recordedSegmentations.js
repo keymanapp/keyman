@@ -70,8 +70,192 @@ describe("Segmentation", function() {
         assert.isTrue(await promiseStatus(segment.whenResolved)   == PromiseStatuses.PROMISE_RESOLVED);
       }
 
-      assertSegmentSimilarity(reproedSegments[1], originalSegments[1], 'hold');
-      assertSegmentSimilarity(reproedSegments[2], originalSegments[2], 'move');
+      assertSegmentSimilarity(reproedSegments[1], originalSegments[1], 'hold'); // ~200ms
+      assertSegmentSimilarity(reproedSegments[2], originalSegments[2], 'move'); // 'ne'
+    });
+
+    it("nonstationary_hold.json", async function() {
+      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/nonstationary_hold.json`);
+      let jsonObj = JSON.parse(testJSONtext);
+
+      // Prepare some of the basic setup.
+      let spy = sinon.fake();
+      const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
+
+      const configObj = {
+        replaySample: (sample) => segmenter.add(sample),
+        endSequence:  () => segmenter.close()
+      }
+
+      const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
+
+      await this.fakeClock.runAllAsync();
+      await testObj.compositePromise;
+
+      // Any post-sequence tests to run.
+      const originalSegments = testObj.originalSegments;
+      const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
+
+      const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+      const reproedSegmentTypeSequence  = reproedSegments.map((segment) => segment.type);
+
+      assert.sameOrderedMembers(reproedSegmentTypeSequence, originalSegmentTypeSequence);
+
+      // Ensure all relevant Promises resolved.
+      for(let segment of reproedSegments) {
+        assert.isTrue(await promiseStatus(segment.whenRecognized) == PromiseStatuses.PROMISE_RESOLVED);
+        assert.isTrue(await promiseStatus(segment.whenResolved)   == PromiseStatuses.PROMISE_RESOLVED);
+      }
+
+      assertSegmentSimilarity(reproedSegments[1], originalSegments[1], 'hold'); // ~1200ms
+    });
+
+    it("flick_ne_se.json", async function() {
+      // NOTE:  this recording's final 'hold' segment is somewhat tightly attuned to the DEFAULT_CONFIG
+      // hold time setting.  Changing default values there may necessitate a hand-edit tweak to the
+      // test recording's data in order for this test to continue passing as-is.
+
+      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/flick_ne_se.json`);
+      let jsonObj = JSON.parse(testJSONtext);
+
+      // Prepare some of the basic setup.
+      let spy = sinon.fake();
+      const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
+
+      const configObj = {
+        replaySample: (sample) => segmenter.add(sample),
+        endSequence:  () => segmenter.close()
+      }
+
+      const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
+
+      await this.fakeClock.runAllAsync();
+      await testObj.compositePromise;
+
+      // Any post-sequence tests to run.
+      const originalSegments = testObj.originalSegments;
+      const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
+
+      const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+      const reproedSegmentTypeSequence  = reproedSegments.map((segment) => segment.type);
+
+      assert.sameOrderedMembers(reproedSegmentTypeSequence, originalSegmentTypeSequence);
+
+      // Ensure all relevant Promises resolved.
+      for(let segment of reproedSegments) {
+        assert.isTrue(await promiseStatus(segment.whenRecognized) == PromiseStatuses.PROMISE_RESOLVED);
+        assert.isTrue(await promiseStatus(segment.whenResolved)   == PromiseStatuses.PROMISE_RESOLVED);
+      }
+
+      assertSegmentSimilarity(reproedSegments[1], originalSegments[1], 'hold');  // ~820ms
+      assertSegmentSimilarity(reproedSegments[2], originalSegments[2], 'move');  // 'ne'
+      assertSegmentSimilarity(reproedSegments[3], originalSegments[3], 'hold');  // ~580ms
+      assertSegmentSimilarity(reproedSegments[4], originalSegments[4], 'move');  // 'se'
+      assertSegmentSimilarity(reproedSegments[5], originalSegments[5], 'hold');  // ~300ms
+    });
+
+    it("longpress_to_ne.json", async function() {
+      // NOTE:  this recording's final 'hold' segment is somewhat tightly attuned to the DEFAULT_CONFIG
+      // hold time setting.  Changing default values there may necessitate a hand-edit tweak to the
+      // test recording's data in order for this test to continue passing as-is.
+
+      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/longpress_to_ne.json`);
+      let jsonObj = JSON.parse(testJSONtext);
+
+      // Prepare some of the basic setup.
+      let spy = sinon.fake();
+      const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
+
+      const configObj = {
+        replaySample: (sample) => segmenter.add(sample),
+        endSequence:  () => segmenter.close()
+      }
+
+      const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
+
+      await this.fakeClock.runAllAsync();
+      await testObj.compositePromise;
+
+      // Any post-sequence tests to run.
+      const originalSegments = testObj.originalSegments;
+      const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+
+      // Because of the sweeping arc motion, we won't assume a perfect match to the segmentation here.
+
+      // Ensure all relevant Promises resolved.
+      for(let segment of reproedSegments) {
+        assert.isTrue(await promiseStatus(segment.whenRecognized) == PromiseStatuses.PROMISE_RESOLVED);
+        assert.isTrue(await promiseStatus(segment.whenResolved)   == PromiseStatuses.PROMISE_RESOLVED);
+      }
+
+      assertSegmentSimilarity(reproedSegments[1], originalSegments[1], 'hold');  // ~1460ms
+      // there are actually a LOT of move segments here; the motion was in an arc.
+      // will make a good test case for the eventual longpress gesture.
+      assert.equal(reproedSegments[2].type, 'move');
+      assert.equal(reproedSegments[2].direction, 'n'); // the initial direction once motion started.
+    });
+
+    it("quick_small_square.json", async function() {
+      // NOTE:  this recording's final 'hold' segment is somewhat tightly attuned to the DEFAULT_CONFIG
+      // hold time setting.  Changing default values there may necessitate a hand-edit tweak to the
+      // test recording's data in order for this test to continue passing as-is.
+
+      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/quick_small_square.json`);
+      let jsonObj = JSON.parse(testJSONtext);
+
+      // Prepare some of the basic setup.
+      let spy = sinon.fake();
+      const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
+
+      const configObj = {
+        replaySample: (sample) => segmenter.add(sample),
+        endSequence:  () => segmenter.close()
+      }
+
+      const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
+
+      await this.fakeClock.runAllAsync();
+      await testObj.compositePromise;
+
+      // Any post-sequence tests to run.
+      const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+
+      // Ensure all relevant Promises resolved.
+      for(let segment of reproedSegments) {
+        assert.isTrue(await promiseStatus(segment.whenRecognized) == PromiseStatuses.PROMISE_RESOLVED);
+        assert.isTrue(await promiseStatus(segment.whenResolved)   == PromiseStatuses.PROMISE_RESOLVED);
+      }
+
+      const holds = reproedSegments.filter((segment) => segment.type == 'hold');
+      const moves = reproedSegments.filter((segment) => segment.type == 'move');
+      const nulls = reproedSegments.filter((segment) => segment.type === null);
+
+      assert.isEmpty(nulls);
+      assert.isEmpty(holds.filter((hold) => hold.duration > 200)); // all motions were very quick.
+
+      // True (intended) motions were 'e' -> 's' -> 'w' -> 'n', but the motions weren't that precise
+      // due to prioritizing speed.
+      const eMoveIndex = moves.findIndex((move) => move.direction.includes('e'));
+      const sMoveIndex = moves.findIndex((move) => move.direction.includes('s'));
+      const wMoveIndex = moves.findIndex((move) => move.direction.includes('w'));
+      const nMoveIndex = moves.findIndex((move) => move.direction.includes('n'));
+
+      assert.notEqual(eMoveIndex, -1);
+      assert.notEqual(sMoveIndex, -1);
+      assert.notEqual(wMoveIndex, -1);
+      assert.notEqual(nMoveIndex, -1);
+
+      // Again, the true (intended) motions were 'e' -> 's' -> 'w' -> 'n'.  This verifies the relative ordering.
+      assert.isBelow(eMoveIndex, sMoveIndex);
+      assert.isBelow(sMoveIndex, wMoveIndex);
+      assert.isBelow(wMoveIndex, nMoveIndex);
+
+      // Original's length: 12, but there are some borderline holds there & we don't want this test
+      // to be too rigid.
+      assert.isAtLeast(reproedSegments.length, 9);  // 2 = 'start' + 'end'
+                                                    // 2 = 1 hold after start, 1 hold before end
+                                                    // 4 cardinal directions
+                                                    // At least one notable hold during direction changes
     });
   });
 });
