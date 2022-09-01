@@ -6,6 +6,8 @@ import { Loca } from '../src/keyman/kmx/kmx-plus';
 import { CompilerErrors } from '../src/keyman/compiler/errors';
 
 describe('loca', function () {
+  this.slow(500); // 0.5 sec -- json schema validation takes a while
+
   it('should compile minimal loca data', function() {
     const callbacks = new CompilerCallbacks();
     let loca = loadSectionFixture(LocaCompiler, 'sections/loca/minimal.xml', callbacks) as Loca;

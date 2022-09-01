@@ -1,6 +1,8 @@
 import * as xml2js from 'xml2js';
 import LDMLKeyboardXMLSourceFile from './ldml-keyboard-xml';
 import CompilerCallbacks from '../compiler/callbacks';
+import Ajv from 'ajv';
+import { CompilerErrors } from '../compiler/errors';
 
 export default class LDMLKeyboardXMLSourceFileReader {
   private readonly callbacks: CompilerCallbacks;
@@ -16,7 +18,14 @@ export default class LDMLKeyboardXMLSourceFileReader {
    */
   private boxArrays(source: any) {
     let box = (o: any, x: string) => {
-      if(typeof o == 'object' && !Array.isArray(o[x])) o[x] = [o[x]];
+      if(typeof o == 'object' && !Array.isArray(o[x])) {
+        if(o[x] === null || o[x] === undefined) {
+          o[x] = [];
+        }
+        else {
+          o[x] = [o[x]];
+        }
+      }
     }
 
     box(source?.keyboard, 'layerMaps');
@@ -36,6 +45,16 @@ export default class LDMLKeyboardXMLSourceFileReader {
     return source;
   }
 
+  public validate(source: LDMLKeyboardXMLSourceFile): LDMLKeyboardXMLSourceFile {
+    const schema = JSON.parse(this.callbacks.loadLdmlKeyboardSchema().toString('utf8'));
+    const ajv = new Ajv();
+    if(!ajv.validate(schema, source)) {
+      this.callbacks.reportMessage(CompilerErrors.InvalidFile(ajv.errorsText()));
+      return null;
+    }
+    return source;
+  }
+
   public loadFile(filename: string) {
     const buf = this.callbacks.loadFile(filename, filename);
     return this.load(buf);
@@ -47,11 +66,12 @@ export default class LDMLKeyboardXMLSourceFileReader {
       let parser = new xml2js.Parser({
         explicitArray: false,
         mergeAttrs: true,
+        emptyTag: {}
       });
       parser.parseString(file, (e: unknown, r: unknown) => { a = r as LDMLKeyboardXMLSourceFile });
       return a;
     })();
 
-    return this.boxArrays(source);
+    return this.validate(this.boxArrays(source));
   }
 }

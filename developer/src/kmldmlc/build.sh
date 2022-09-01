@@ -46,6 +46,8 @@ fi
 
 if builder_has_action build; then
   npm run build
+  # We need the schema file at runtime and bundled
+  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   builder_report success build
 fi
 

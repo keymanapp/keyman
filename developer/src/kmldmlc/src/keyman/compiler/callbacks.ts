@@ -5,5 +5,6 @@ export interface CompilerEvent {
 
 export default interface CompilerCallbacks {
   loadFile(baseFilename: string, filename: string): Buffer;
+  loadLdmlKeyboardSchema(): Buffer;
   reportMessage(event: CompilerEvent): void;
 };

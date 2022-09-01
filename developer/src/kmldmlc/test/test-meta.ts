@@ -6,6 +6,8 @@ import { KeyboardSettings, Meta } from '../src/keyman/kmx/kmx-plus';
 import { CompilerErrors } from '../src/keyman/compiler/errors';
 
 describe('meta', function () {
+  this.slow(500); // 0.5 sec -- json schema validation takes a while
+
   it('should compile minimal metadata', function() {
     const callbacks = new CompilerCallbacks();
     let meta = loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', callbacks) as Meta;
