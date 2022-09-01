@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd"
+  Disabling doctype for this invalid file, not used by compiler, and avoids complaints in IDEs etc.
+-->
+<keyboard locale="mt" conformsTo="nothing-anyone-ever-heard-of">
+  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+
+  <names>
+    <name value="TestKbd" />
+  </names>
+
+  <keys>
+    <key id="hmaqtua" to="ħ" />
+    <key id="that" to="ថា" />
+  </keys>
+
+</keyboard>
