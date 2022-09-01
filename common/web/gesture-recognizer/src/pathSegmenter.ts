@@ -713,7 +713,12 @@ namespace com.keyman.osk {
       // STEP 1:  Determine the range of the initial sliding time window for the most recent samples.
 
       if(unsegmentedDuration < this.SLIDING_WINDOW_INTERVAL * 2) {
-        this.updateSegmentConstruction(unsegmentedForm);
+        // If it returns false, that only makes the interval _even shorter_.
+        if(!this.updateSegmentConstruction(unsegmentedForm)) {
+          // Updates our internal state tracking; no infinite loop will result.
+          this.performSubsegmentation();
+          // return will automatically happen via fall-through.
+        }
         return;
       }
 
@@ -844,22 +849,8 @@ namespace com.keyman.osk {
       //          (In sort, subsegment "compatibility" with what came before.)
       //          A classic example case:  same direction, different speeds.
       //
-      // Also, we must handle a somewhat complex case:  if we triggered a wait since the last observation,
-      // we must maintain that portion of the timeline as a wait subsegment - even if the newly-obtained
-      // subsegment is otherwise "incompatible".  To do THAT, we revert to the prior subsegmentation.
 
-      let updateSuccess = this.updateSegmentConstruction(candidateSplit.pre);
-
-      // If an update wasn't successful, that means we had to revert to a prior round's segmentation and
-      // have committed that instead.  So, we need to rebuild based on that...
-      if(!updateSuccess) {
-        // What's the split point that was used?  Since we've committed a prior subsegmentation,
-        // we can note the committed portion's endingAccumulation.
-        const priorLastAccumulation = this.constructingSegment.committedIntervalAsSubsegmentation.endingAccumulation;
-        const priorSplitPoint = this.steppedCumulativeStats.indexOf(priorLastAccumulation);
-        this.choppedStats = this.steppedCumulativeStats[priorSplitPoint-1];
-        this.steppedCumulativeStats = this.steppedCumulativeStats.slice(priorSplitPoint);
-
+      if(!this.updateSegmentConstruction(candidateSplit.pre)) {
         // It's quite possible that segmentation is possible in the leftover section post-reversion.
         // There is a pretty good chance that it'll instantly abort, but no guarantee.
         this.performSubsegmentation();
@@ -873,15 +864,17 @@ namespace com.keyman.osk {
        * NOTE:  this marks a very good location to call _debugLogSplitReport() if a deep-dive
        * inspection of the subsegmentation algorithm and its decisions is needed.
        */
+
       if(!candidateSplit.segmentationMerited) {
-        this.updateSegmentConstruction(unsegmentedForm);
+        if(!this.updateSegmentConstruction(unsegmentedForm)) {
+          this.performSubsegmentation();
+          //return will happen via fall-through here.
+        }
         return;
       }
 
       // A successful update will ensure a valid .constructingSegment instance exists.
-      this.constructingSegment.commitPendingSubsegment();
-      this.choppedStats = this.steppedCumulativeStats[splitPoint-1];
-      this.steppedCumulativeStats = this.steppedCumulativeStats.slice(splitPoint);
+      this.commitSubsegmentation();
 
       // Step 5:  now that subsegmentation & its bookkeeping is done... process the implications.
       //          Does the right-hand (still-constructing) subsegment appear reasonable to
@@ -919,6 +912,19 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * Updates the in-construction Segment with the specified subsegment's accumulation
+     * data.  If no Segment is currently under construction, it also creates a new one.
+     *
+     * In the case that an update must be blocked due to a "pending commit" (from having
+     * recognized the Segment while depending on the currently-constructing subsegment),
+     * it will return `false` to signal that it has overriden the subsegmentation with
+     * the most recently-valid prior version, committed that, and that the algorithm's
+     * current analysis is no longer valid.
+     * @param subsegment
+     * @returns `false` if the caller should restart due to forced change of segmentation
+     * state.
+     */
     private updateSegmentConstruction(subsegment: Subsegmentation): boolean {
       let updateFlag: boolean;
       if(this.constructingSegment) {
@@ -944,7 +950,10 @@ namespace com.keyman.osk {
       // the same type.  But, reaching here means it's no longer compatible - so we
       // use the previously-registered subsegmentation here instead.
       if(updateFlag === false && this.constructingSegment.hasPrecommittedSubsegment) {
-        this.constructingSegment.commitPendingSubsegment();
+        this.commitSubsegmentation();
+
+        // Signal our caller to refresh itself and restart segmentation for the round.
+        // Kinda dirty, but it's 100% internal to this class, at least.
         return false;
       }
 
@@ -955,6 +964,19 @@ namespace com.keyman.osk {
       this.segmentForwarder(this.constructingSegment.pathSegment);
 
       return true;
+    }
+
+    private commitSubsegmentation() {
+      this.constructingSegment.commitPendingSubsegment();
+
+      // Based on what we just committed, we can find the split point that led to the subsegmentation commit:
+      const splitPointAccumulation = this.constructingSegment.committedIntervalAsSubsegmentation.endingAccumulation;
+      const splitPoint = this.steppedCumulativeStats.indexOf(splitPointAccumulation);
+
+      // And given that split point, we can maintain our internal state accordingly.
+      // The exact point of the split is duplicated; we remove accumulation from everything before it.
+      this.choppedStats = this.steppedCumulativeStats[splitPoint-1];
+      this.steppedCumulativeStats = this.steppedCumulativeStats.slice(splitPoint);
     }
   }
 }
