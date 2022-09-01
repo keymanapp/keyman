@@ -1,8 +1,6 @@
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
-const fs = require('fs');
-
 const PromiseStatusModule = require('promise-status-async');
 const promiseStatus       = PromiseStatusModule.promiseStatus;
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
@@ -14,9 +12,6 @@ const PathSegmenter = com.keyman.osk.PathSegmenter;
 const timedPromise = require('../../resources/timedPromise.js');
 
 describe("Segmentation", function() {
-  // // File paths need to be from the package's / module's root folder
-  // let testJSONtext = fs.readFileSync('src/test/resources/json/canaryRecording.json');
-
   describe("Single-sample 'sequence'", function() {
     it("expected segment types", function() {
       let spy = sinon.fake();
