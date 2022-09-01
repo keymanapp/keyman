@@ -87,7 +87,6 @@ describe("Layer one - DOM -> InputSequence", function() {
 
     // List all relevant fixtures in src/test/resources/json.
     let testRecordings = [
-      'canaryRecording',
       'desktopRoamAndReturn',
       'mobileSafeZoneCancel',
       'mobileProximityApproach',
@@ -102,7 +101,7 @@ describe("Layer one - DOM -> InputSequence", function() {
     for(let recordingID of testRecordings) {
       it(`${recordingID}.json`, function() {
         this.timeout(2 * testconfig.timeouts.standard);
-        let testObj = __json__[recordingID];
+        let testObj = __json__['receiver/' + recordingID];
 
         // 'describe' has a notably different `this` reference than `it`, `before`, etc,
         // hence the `.call` construction.
