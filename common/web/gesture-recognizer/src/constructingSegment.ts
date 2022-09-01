@@ -197,9 +197,10 @@ namespace com.keyman.osk {
       // it's time to commit to classifying the in-construction Segment.
       const alreadyElapsed = fullStatsWithIncoming.duration;
       const recognitionWaitTime = this.classifier.config.holdMinimumDuration - alreadyElapsed;
+      const recognitionFromMove = (this.pathSegment.distance > this.classifier.config.holdMoveTolerance);
 
       // `undefined` if and only if still unrecognized.
-      if(recognitionWaitTime <= 0 && !this._pathSegment.isRecognized) {
+      if((recognitionFromMove || recognitionWaitTime <= 0) && !this._pathSegment.isRecognized) {
         const classification = this.classifier.classifySegment(fullStatsWithIncoming);
 
         // Based on the specification for segment classification, there WILL be a classification

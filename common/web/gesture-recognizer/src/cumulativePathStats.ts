@@ -584,10 +584,10 @@ namespace com.keyman.osk {
      */
     public get angle() {
       if(this.sampleCount == 1 || !this.lastSample || !this.initialSample) {
-        return Number.NaN;
+        return undefined;
       } else if(this.netDistance < 1) {
         // < 1 px, thus sub-pixel, means we have nothing relevant enough to base an angle on.
-        return Number.NaN;
+        return undefined;
       }
 
       const xDelta = this.lastSample.targetX - this.initialSample.targetX;
@@ -615,6 +615,10 @@ namespace com.keyman.osk {
      */
     public get cardinalDirection() {
       if(this.sampleCount == 1 || !this.lastSample || !this.initialSample) {
+        return undefined;
+      }
+
+      if(isNaN(this.angle) || this.angle === null || this.angle === undefined) {
         return undefined;
       }
 
