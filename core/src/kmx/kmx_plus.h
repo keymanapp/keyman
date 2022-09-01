@@ -37,6 +37,7 @@ namespace kmx {
 struct COMP_KMXPLUS_HEADER {
   KMX_DWORD ident;  // 0000 Section name
   KMX_DWORD size;   // 0004 Section length
+  bool valid(KMX_DWORD length) const;
 };
 
 // Assert that the length matches the declared length
@@ -48,6 +49,7 @@ struct COMP_KMXPLUS_SECT_ENTRY {
 };
 
 struct COMP_KMXPLUS_SECT {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_SECT;
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD total;                     // 0008 KMXPlus entire length
   KMX_DWORD count;                     // 000C number of section headers
@@ -59,6 +61,11 @@ struct COMP_KMXPLUS_SECT {
    * @return KMX_DWORD offset from beginning of kmxplus
    */
   KMX_DWORD find(KMX_DWORD ident) const;
+  /**
+   * @brief True if section is valid.
+   * Does not validate the entire file.
+   */
+  bool valid(KMX_DWORD length) const;
 };
 
 // Assert that the length matches the declared length
@@ -71,6 +78,7 @@ struct COMP_KMXPLUS_STRS_ENTRY {
 };
 
 struct COMP_KMXPLUS_STRS {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_STRS;
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count;                    // 0008 count of str entries
   KMX_DWORD reserved;                 // 000C padding
@@ -85,12 +93,17 @@ struct COMP_KMXPLUS_STRS {
    * @return nullptr or a pointer to the output buffer
    */
   PKMX_WCHAR get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz) const;
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched size of section strs");
 
 struct COMP_KMXPLUS_META {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_META;
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD name;
   KMX_DWORD author;
@@ -99,6 +112,10 @@ struct COMP_KMXPLUS_META {
   KMX_DWORD normalization;
   KMX_DWORD indicator;
   KMX_DWORD settings;
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META, "mismatched size of section meta");
@@ -108,10 +125,15 @@ struct COMP_KMXPLUS_LOCA_ENTRY {
 };
 
 struct COMP_KMXPLUS_LOCA {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_LOCA;
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count; // 0008 number of locales
   KMX_DWORD reserved;
   COMP_KMXPLUS_LOCA_ENTRY entries[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_LOCA) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
@@ -125,10 +147,15 @@ struct COMP_KMXPLUS_KEYS_ENTRY {
 };
 
 struct COMP_KMXPLUS_KEYS {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_KEYS;
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count;    // number of keys
   KMX_DWORD reserved; // padding
   COMP_KMXPLUS_KEYS_ENTRY entries[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_KEYS) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
@@ -140,110 +167,52 @@ struct COMP_KMXPLUS_VKEY_ENTRY {
 };
 
 struct COMP_KMXPLUS_VKEY {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_VKEY;
   COMP_KMXPLUS_HEADER header;
   KMX_DWORD count;
   KMX_DWORD reserved;
   COMP_KMXPLUS_VKEY_ENTRY entries[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_VKEY) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched size of section vkey");
 
 /**
- * See above
+ * @brief helper accessor object for
+ *
+ */
+class kmx_plus {
+  public:
+    /**
+     * @brief Construct a new kmx_plus object.
+     * Caller must preserve the keyboard file memory
+     * until after this object is destroyed.
+     *
+     * @param keyboard the KMX data
+     * @param length length of the entire KMX file
+     */
+    kmx_plus(const COMP_KEYBOARD *keyboard, size_t length);
+    const COMP_KMXPLUS_KEYS *keys;
+    const COMP_KMXPLUS_LOCA *loca;
+    const COMP_KMXPLUS_META *meta;
+    const COMP_KMXPLUS_SECT *sect;
+    const COMP_KMXPLUS_STRS *strs;
+    const COMP_KMXPLUS_VKEY *vkey;
+    inline bool is_valid() { return valid; }
+  private:
+    bool valid; // true if valid
+};
+
+/**
+ * See above - undo workaround for variable arrays
  */
 #if defined(_WIN32)
 #pragma warning ( default : 4200 )
 #endif
-
-
-/**
- * @brief Validate that this data is the named section.
- *
- * @param data raw data
- * @param ident 4-byte section type
- * @return COMP_KMXPLUS_ALLDATA* or null
- */
-static inline const COMP_KMXPLUS_HEADER *
-validate_as_section(const uint8_t *data, uint32_t ident) {
-  if (!data) {
-    return nullptr;
-  }
-  const COMP_KMXPLUS_HEADER *all = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(data);
-  if (ident != all->ident || (all->size < LDML_LENGTH_HEADER)) {
-    return nullptr;  // invalid header or wrong section
-  }
-  return all;
-}
-
-/**
- * cast raw data to section
- * @return section data or null on error
- */
-static inline const COMP_KMXPLUS_SECT *
-as_kmxplus_sect(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_SECT);
-  return reinterpret_cast<const COMP_KMXPLUS_SECT *>(all);
-}
-
-/**
- * cast raw data to section
- * @return section data or null on error
- */
-static inline const COMP_KMXPLUS_STRS *
-as_kmxplus_strs(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_STRS);
-  return reinterpret_cast<const COMP_KMXPLUS_STRS *>(all);
-}
-
-/**
- * cast raw data to section
- * @return section data or null on error
- */
-static inline const COMP_KMXPLUS_KEYS *
-as_kmxplus_keys(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_KEYS);
-  return reinterpret_cast<const COMP_KMXPLUS_KEYS *>(all);
-}
-/**
- * cast raw data to section
- * @return section data or null on error
- */
-static inline const COMP_KMXPLUS_LOCA *
-as_kmxplus_loca(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_LOCA);
-  return reinterpret_cast<const COMP_KMXPLUS_LOCA *>(all);
-}
-/**
- * cast raw data to section
- * @return section data or null on error
- */
-static inline const COMP_KMXPLUS_META *
-as_kmxplus_meta(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_META);
-  return reinterpret_cast<const COMP_KMXPLUS_META *>(all);
-}
-/**
- * convert raw data to section
- * @return section data or null on error
- */
-static inline const COMP_KMXPLUS_VKEY *
-as_kmxplus_vkey(const uint8_t *data) {
-  const COMP_KMXPLUS_HEADER *all = validate_as_section(data, LDML_SECTIONID_VKEY);
-  return reinterpret_cast<const COMP_KMXPLUS_VKEY *>(all);
-}
-
-/**
- * @param kmxplusdata data from the beginning of the KMXPlus section
- * @return true if valid
- */
-bool validate_kmxplus_data(const uint8_t *kmxplusdata);
-
-/**
- * @param keyboard pointer to PCOMP_KEYBOARD with plus data following
- * @return true if valid
- */
-bool validate_kmxplus_data(kmx::PCOMP_KEYBOARD keyboard);
 
 }  // namespace kmx
 }  // namespace kbp
