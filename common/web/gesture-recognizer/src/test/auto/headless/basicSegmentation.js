@@ -11,24 +11,7 @@ const GestureRecognizer = require('../../../../build/index.js');
 const com = GestureRecognizer.com;
 const PathSegmenter = com.keyman.osk.PathSegmenter;
 
-/**
- * Acts as a Promise-form of `setTimeout`.
- * @param {*} func A function to run after the specified amount of time.
- * @param {*} time The timeout to wait.
- * @returns {*} A `Promise` that will either resolve or reject after the specified amount of time.
- */
-const timedPromise = (func, time) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        func();
-        resolve();
-      } catch (err) {
-        reject(err);
-      }
-    }, time);
-  });
-}
+const timedPromise = require('../../resources/timedPromise.js');
 
 describe("Segmentation", function() {
   // // File paths need to be from the package's / module's root folder
