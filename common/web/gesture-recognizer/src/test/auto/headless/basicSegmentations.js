@@ -9,7 +9,7 @@ const GestureRecognizer = require('../../../../build/index.js');
 const com = GestureRecognizer.com;
 const PathSegmenter = com.keyman.osk.PathSegmenter;
 
-const timedPromise = require('../../resources/timedPromise.js');
+const timedPromise = require('../../../../build/tools/unit-test-resources.js').timedPromise;
 
 describe("Segmentation", function() {
   describe("Single-sample 'sequence'", function() {

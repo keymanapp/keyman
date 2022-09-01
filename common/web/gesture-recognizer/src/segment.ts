@@ -59,6 +59,7 @@ namespace com.keyman.osk {
         // We'll use the loaded object as our core reference.
         this._stats = serializedObj;
         this._peakSpeed = serializedObj.peakSpeed; // Is retrieved from `this`, not `this._stats`.
+        this._type = serializedObj.type;           // This one too.
 
         // Ensure that the two promises are properly initialized for this construction type.
         this._recognitionPromise = Promise.resolve(serializedObj.type);
