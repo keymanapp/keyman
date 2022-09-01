@@ -232,6 +232,9 @@ namespace com.keyman.osk {
       // the need to rely on Segment events for that; even that's better off handled with path.coords
       // events instead.
       this.pendingSubsegmentation = null;
+
+      // If there was a pending subsegment, we need to remove its components from the published segment stats.
+      this.pathSegment.updateStats(this.committedInterval);
     }
 
     /**
