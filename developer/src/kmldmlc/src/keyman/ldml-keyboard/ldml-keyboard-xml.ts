@@ -18,11 +18,20 @@ export interface LKKeyboard {
   locale?: string;
   conformsTo?: string;
 
+  locales?: LKLocales;
   info?: LKInfo;
   names?: LKNames;
   settings?: LKSettings;
   keys?: LKKeys;
   layerMaps?: LKLayerMaps[];
+};
+
+export interface LKLocales {
+  locale: LKLocale[];
+};
+
+export interface LKLocale {
+  id?: string;
 };
 
 export interface LKInfo {
@@ -36,14 +45,14 @@ export interface LKNames {
   name: LKName[];
 };
 
+export interface LKName {
+  value?: string;
+};
+
 export interface LKSettings {
   fallback: "omit";
   transformFailure: "omit";
   transformPartial: "hide";
-};
-
-export interface LKName {
-  value?: string;
 };
 
 export interface LKKeys {
