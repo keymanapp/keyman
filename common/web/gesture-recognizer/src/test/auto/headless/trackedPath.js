@@ -9,6 +9,15 @@ const TrackedPath = com.keyman.osk.TrackedPath;
 
 const timedPromise = require('../../../../build/tools/unit-test-resources.js').timedPromise;
 
+// For the integrated-style recording-based test.
+const Testing = require('../../../../build/tools/unit-test-resources.js');
+const HeadlessRecordingSimulator = Testing.HeadlessRecordingSimulator;
+
+const SEGMENT_TEST_JSON_FOLDER = 'src/test/resources/json/segmentation';
+
+const assertSegmentSimilarity = require('../../resources/assertSegmentSimilarity.js');
+// End of "for the integrated style..."
+
 describe("TrackedPath", function() {
   // // File paths need to be from the package's / module's root folder
   // let testJSONtext = fs.readFileSync('src/test/resources/json/canaryRecording.json');
@@ -254,6 +263,59 @@ describe("TrackedPath", function() {
 
       // This is the one that reports all of our async assertion failures.
       return finalPromise;
+    });
+  });
+
+  describe("Recording-based integration tests", function() {
+    beforeEach(function() {
+      this.fakeClock = sinon.useFakeTimers();
+    })
+
+    afterEach(function() {
+      // NOTE:  for debugging investigations, it may be necessary to use .only on
+      // the test under investigation and to disable the `this.fakeClock.restore()` line.
+      //
+      // Tests tend to timeout when interactively debugging, and having unmocked timers
+      // suddenly restored during investigation can cause some very confusing behavior.
+      this.fakeClock.restore();
+    })
+
+    // A near-duplication of the recordedSegments.js version, but integrated with TrackedPath.
+    it("flick_ne_se.json", async function() {
+      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/flick_ne_se.json`);
+      let jsonObj = JSON.parse(testJSONtext);
+
+      // Prepare some of the basic setup.
+      let spy = sinon.fake();
+      const trackedPath = new TrackedPath();
+      trackedPath.on('segmentation', spy);
+
+      //(PathSegmenter.DEFAULT_CONFIG, spy);
+
+      const configObj = {
+        replaySample: (sample) => trackedPath.extend(sample),
+        endSequence:  () => trackedPath.terminate(false)
+      }
+
+      const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
+
+      await this.fakeClock.runAllAsync();
+      await testObj.compositePromise;
+
+      // Any post-sequence tests to run.
+      const originalSegments = testObj.originalSegments;
+      const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
+
+      const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+      const reproedSegmentTypeSequence  = reproedSegments.map((segment) => segment.type);
+
+      assert.sameOrderedMembers(reproedSegmentTypeSequence, originalSegmentTypeSequence);
+
+      assertSegmentSimilarity(reproedSegments[1], originalSegments[1], 'hold');  // ~820ms
+      assertSegmentSimilarity(reproedSegments[2], originalSegments[2], 'move');  // 'ne'
+      assertSegmentSimilarity(reproedSegments[3], originalSegments[3], 'hold');  // ~580ms
+      assertSegmentSimilarity(reproedSegments[4], originalSegments[4], 'move');  // 'se'
+      assertSegmentSimilarity(reproedSegments[5], originalSegments[5], 'hold');  // ~300ms
     });
   });
 });

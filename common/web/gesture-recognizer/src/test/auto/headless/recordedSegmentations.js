@@ -111,10 +111,6 @@ describe("Segmentation", function() {
     });
 
     it("flick_ne_se.json", async function() {
-      // NOTE:  this recording's final 'hold' segment is somewhat tightly attuned to the DEFAULT_CONFIG
-      // hold time setting.  Changing default values there may necessitate a hand-edit tweak to the
-      // test recording's data in order for this test to continue passing as-is.
-
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/flick_ne_se.json`);
       let jsonObj = JSON.parse(testJSONtext);
 
@@ -155,10 +151,6 @@ describe("Segmentation", function() {
     });
 
     it("longpress_to_ne.json", async function() {
-      // NOTE:  this recording's final 'hold' segment is somewhat tightly attuned to the DEFAULT_CONFIG
-      // hold time setting.  Changing default values there may necessitate a hand-edit tweak to the
-      // test recording's data in order for this test to continue passing as-is.
-
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/longpress_to_ne.json`);
       let jsonObj = JSON.parse(testJSONtext);
 
@@ -196,9 +188,9 @@ describe("Segmentation", function() {
     });
 
     it("quick_small_square.json", async function() {
-      // NOTE:  this recording's final 'hold' segment is somewhat tightly attuned to the DEFAULT_CONFIG
-      // hold time setting.  Changing default values there may necessitate a hand-edit tweak to the
-      // test recording's data in order for this test to continue passing as-is.
+      // NOTE:  this recording has a number of borderline-duration 'hold' segments between its moves.
+      // Naturally, there has to be SOME kind of transition when sharply changing direction.
+      // NOTE: We wish to ensure that each 'edge' of the 'square' remains reasonably distinct.
 
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/quick_small_square.json`);
       let jsonObj = JSON.parse(testJSONtext);
