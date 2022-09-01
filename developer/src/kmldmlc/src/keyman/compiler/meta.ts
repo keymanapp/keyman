@@ -16,7 +16,7 @@ export class MetaCompiler extends SectionCompiler {
     const normalization = this.keyboard.info?.normalization;
     if(normalization !== undefined) {
       if(!isValidEnumValue(Meta_NormalizationForm, normalization)) {
-        this.callbacks.reportMessage(CompilerErrors.ERROR_InvalidNormalization, `Invalid normalization form '${normalization}'`);
+        this.callbacks.reportMessage(CompilerErrors.InvalidNormalization({form: normalization}));
         valid = false;
       }
     }

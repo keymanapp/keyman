@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import { SectionCompiler } from '../../src/keyman/compiler/section-compiler';
 import { Section } from '../../src/keyman/kmx/kmx-plus';
 import LDMLKeyboardXMLSourceFileReader from '../../src/keyman/ldml-keyboard/ldml-keyboard-xml-reader';
+import { CompilerEvent } from '../keyman/compiler/callbacks';
 
 /**
  * Builds a path to the fixture with the given path components.
@@ -20,13 +21,13 @@ export function makePathToFixture(...components: string[]): string {
 
 
 export class CompilerCallbacks {
-  messages: { code: number, message: string}[] = [];
+  messages: CompilerEvent[] = [];
   loadFile(baseFilename: string, filename:string): Buffer {
     // TODO: translate filename based on the baseFilename
     return fs.readFileSync(filename);
   }
-  reportMessage(code: number, message: string): void {
-    this.messages.push({code, message});
+  reportMessage(event: CompilerEvent): void {
+    this.messages.push(event);
   }
 }
 

@@ -18,13 +18,16 @@ describe('loca', function () {
   it('should compile multiple locales', function() {
     const callbacks = new CompilerCallbacks();
     let loca = loadSectionFixture(LocaCompiler, 'sections/loca/multiple.xml', callbacks) as Loca;
-    assert.equal(callbacks.messages.length, 0);
 
     // Note: multiple.xml includes fr-FR twice, with differing case, which should be canonicalized
+    assert.equal(callbacks.messages.length, 1);
+    assert.deepEqual(callbacks.messages[0], CompilerErrors.OneOrMoreRepeatedLocales());
+
+    // Original is 6 locales, now five minimized in the results
     assert.equal(loca.locales.length, 5);
     assert.equal(loca.locales[0], 'mt');
-    assert.equal(loca.locales[1], 'fr-FR');
-    assert.equal(loca.locales[2], 'km-Khmr-KH');
+    assert.equal(loca.locales[1], 'fr');  // Original fr-FR
+    assert.equal(loca.locales[2], 'km');  // Original km-Khmr-kh
     assert.equal(loca.locales[3], 'qq-Abcd-ZZ-x-foobar');
     assert.equal(loca.locales[4], 'en-fonipa');
   });
@@ -36,7 +39,7 @@ describe('loca', function () {
     assert.equal(callbacks.messages.length, 1);
     // We'll only test one invalid BCP 47 tag to verify that we are properly calling BCP 47 validation routines.
     // Furthermore, we are testing BCP 47 structure, not the validity of each subtag -- we must assume the author knows of new subtags!
-    assert.deepEqual(callbacks.messages[0], {code: CompilerErrors.ERROR_InvalidLocale, message: "Invalid BCP 47 locale form 'en-*'"});
+    assert.deepEqual(callbacks.messages[0], CompilerErrors.InvalidLocale({tag:'en-*'}));
   })
 });
 

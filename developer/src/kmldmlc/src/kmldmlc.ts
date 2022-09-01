@@ -9,7 +9,8 @@ import * as program from 'commander';
 
 import Compiler from './keyman/compiler/compiler';
 import KMXBuilder from './keyman/kmx/kmx-builder';
-import { getErrorSeverityName } from './keyman/compiler/errors';
+import { CompilerErrors } from './keyman/compiler/errors';
+import { CompilerEvent } from './keyman/compiler/callbacks';
 
 let inputFilename: string;
 
@@ -42,8 +43,8 @@ class CompilerCallbacks {
     // TODO: translate filename based on the baseFilename
     return fs.readFileSync(filename);
   }
-  reportMessage(code: number, message: string): void {
-    console.log(getErrorSeverityName(code) + ' ' + code.toString(16) + ': ' + message);
+  reportMessage(event: CompilerEvent): void {
+    console.log(CompilerErrors.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
   }
 }
 
