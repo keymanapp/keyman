@@ -7,7 +7,7 @@ const GestureRecognizer = require('../../../../build/index.js');
 const com = GestureRecognizer.com;
 const TrackedPath = com.keyman.osk.TrackedPath;
 
-const timedPromise = require('../../resources/timedPromise.js');
+const timedPromise = require('../../../../build/tools/unit-test-resources.js').timedPromise;
 
 describe("TrackedPath", function() {
   // // File paths need to be from the package's / module's root folder
