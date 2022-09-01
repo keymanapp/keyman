@@ -10,7 +10,7 @@ export class LocaCompiler extends SectionCompiler {
 
   public compile(): Loca {
     let result = new Loca();
-    result.locales.push(this.source.keyboard.locale);
+    result.locales.push(this.keyboard.locale);
     return result;
   }
 }

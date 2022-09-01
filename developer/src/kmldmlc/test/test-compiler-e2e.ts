@@ -5,21 +5,11 @@ import {assert} from 'chai';
 import hextobin from '@keymanapp/hextobin';
 import Compiler from '../src/keyman/compiler/compiler';
 import KMXBuilder from '../src/keyman/kmx/kmx-builder';
-import {makePathToFixture} from './helpers/index';
-
-class CompilerCallbacks {
-  loadFile(baseFilename: string, filename:string): Buffer {
-    // TODO: translate filename based on the baseFilename
-    return fs.readFileSync(filename);
-  }
-  reportMessage(severity: number, message: string): void {
-    console.log(message);
-  }
-}
+import {CompilerCallbacks, makePathToFixture} from './helpers/index';
 
 function compileKeyboard(inputFilename: string): Uint8Array {
-  const c = new CompilerCallbacks();
-  const k = new Compiler(c);
+  const callbacks = new CompilerCallbacks();
+  const k = new Compiler(callbacks);
   let source = k.load(inputFilename);
   if(!source) {
     return null;
@@ -34,7 +24,9 @@ function compileKeyboard(inputFilename: string): Uint8Array {
 
   // Use the builder to generate the binary output file
   let builder = new KMXBuilder(kmx, true);
-  return builder.compile();
+  let result = builder.compile();
+  assert(callbacks.messages.length == 0);
+  return result;
 }
 
 describe('compiler-tests', function() {

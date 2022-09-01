@@ -16,12 +16,14 @@ export enum KeyboardSettings {
   transformPartial = 1<<2,
 };
 
+export enum Meta_NormalizationForm { NFC='NFC', NFD='NFD', other='other' };
+
 export class Meta extends Section {
   name: string;
   author: string;
   conform: string;
   layout: string;
-  normalization: string;
+  normalization: Meta_NormalizationForm;
   indicator: string;
   settings: KeyboardSettings;
 };

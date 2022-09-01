@@ -20,6 +20,7 @@ export interface LKKeyboard {
 
   info?: LKInfo;
   names?: LKNames;
+  settings?: LKSettings;
   keys?: LKKeys;
   layerMaps?: LKLayerMaps[];
 };
@@ -33,6 +34,12 @@ export interface LKInfo {
 
 export interface LKNames {
   name: LKName[];
+};
+
+export interface LKSettings {
+  fallback: "omit";
+  transformFailure: "omit";
+  transformPartial: "hide";
 };
 
 export interface LKName {
