@@ -228,6 +228,7 @@ describe("Segmentation", function() {
         assert.isUndefined(holdSegment.angle);
         assert.isUndefined(holdSegment.direction);
         assert.equal(holdSegment.peakSpeed, 0);
+        assert.equal(holdSegment.distance, 0);
 
         // Samples may be cloned when passed through the segmenter!
         assert.deepEqual(holdSegment.initialCoord, startSample);
@@ -369,22 +370,23 @@ describe("Segmentation", function() {
       // This is the one that reports all of our async assertion failures.
       return finalPromise.then(() => {
         // The real checks.
-        const holdSegment = spy.secondCall.args[0];
+        const moveSegment = spy.secondCall.args[0];
 
-        assert.equal(holdSegment.type, 'move');
-        assert.isAtLeast(holdSegment.duration, samples[20].t - samples[0].t);
-        assert.equal(holdSegment.direction, 'se');
-        assert.equal(holdSegment.angle, (135 / 180) * Math.PI);
+        assert.equal(moveSegment.type, 'move');
+        assert.isAtLeast(moveSegment.duration, samples[20].t - samples[0].t);
+        assert.equal(moveSegment.direction, 'se');
+        assert.equal(moveSegment.distance, 40 * Math.SQRT2);
+        assert.equal(moveSegment.angle, (135 / 180) * Math.PI);
 
         // Speed:  our idealized sequence moves 2*sqrt(2) px distance every 10ms.
         const idealSpeed = 2 * Math.sqrt(2) / 10;
 
-        assert.isAtLeast(holdSegment.speed, 0.99 * idealSpeed);
-        assert.isAtLeast(holdSegment.peakSpeed, 0.99 * idealSpeed);
+        assert.isAtLeast(moveSegment.speed, 0.99 * idealSpeed);
+        assert.isAtLeast(moveSegment.peakSpeed, 0.99 * idealSpeed);
 
         // Samples may be cloned when passed through the segmenter!
-        assert.deepEqual(holdSegment.initialCoord, samples[0]);
-        assert.deepEqual(holdSegment.lastCoord, samples[20]);
+        assert.deepEqual(moveSegment.initialCoord, samples[0]);
+        assert.deepEqual(moveSegment.lastCoord, samples[20]);
       });
     });
   });

@@ -161,12 +161,6 @@ namespace com.keyman.osk {
       }
     }
 
-    /**
-     * Floating-point errors may result from cross-sum calculations, and they may be slightly larger than
-     * Number.EPSILON as the sums grow.  (Taking the difference of cross-sums)
-     */
-    private static readonly CANCELLATION_EPSILON = Math.sqrt(Number.EPSILON);
-
     private rawLinearSums  = {'x': 0, 'y': 0, 't': 0, 'v': 0};
     private rawSquaredSums = {'x': 0, 'y': 0, 't': 0, 'v': 0};
     // Would 'tv' (time vs velocity) be worth it to track?  And possibly even do a regression for?
@@ -359,7 +353,7 @@ namespace com.keyman.osk {
 
         result.cosLinearSum   -= subsetStats.cosLinearSum;
         result.sinLinearSum   -= subsetStats.sinLinearSum;
-        result.arcSampleCount -= subsetStats.arcSampleCount;
+        result.arcSampleCount -= (subsetStats.arcSampleCount + 1);
 
         if(tDelta) {
           result.rawLinearSums.v  -= coordArcDelta   / tDelta;
@@ -673,6 +667,10 @@ namespace com.keyman.osk {
      * Range:  floating-point values on the interval [0, 1].
      */
     private get angleRSquared() {
+      if(this.arcSampleCount == 0) {
+        return 1;
+      }
+
       // Refer to https://en.wikipedia.org/wiki/Directional_statistics#Distribution_of_the_mean.
       // We're computing the squared value of that page's R-bar stat.
       //
@@ -702,7 +700,8 @@ namespace com.keyman.osk {
         return Number.NaN;
       }
 
-      return Math.sqrt(-Math.log(this.angleRSquared));
+      const val = Math.sqrt(-Math.log(this.angleRSquared));
+      return isNaN(val) ? 0 : val;
     }
 
     /**
