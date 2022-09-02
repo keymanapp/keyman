@@ -168,6 +168,11 @@ namespace com.keyman.osk {
      * about the state of the as-of-yet unresolved Segment, including the most recent location
      * of the corresponding touchpoint.
      *
+     * NOTE:  Assumes that .isCompatible has been checked first!  This method (currently) does not
+     * perform the related check!
+     * - It is currently called when and where relevant in PathSegmenter, the only thing currently
+     *   calling this method.
+     *
      * @param subsegmentation
      * @returns `true` unless the subsegment
      */

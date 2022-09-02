@@ -446,5 +446,91 @@ describe("Iterative Segment Construction (ConstructingSegment)", function() {
         assert.equal(segment.type, 'move');
       });
     });
+
+    describe("adding subsegments", function() {
+      it("slow move (se) -> quick move (se)", async function() {
+        const firstSample = {
+          targetX: 10,
+          targetY: 20,
+          t: 100
+        };
+
+        const turtle = new TouchpathTurtle(firstSample);
+
+        const baseComponent = turtle.move(45, 4, 80, 10); // 45 degrees, 30px distance, 80ms, 10ms at a time.
+
+        // Initialization of the TouchpathTurtle provides a Subsegment for its base point.
+        const constructor = new ConstructingSegment(baseComponent, classifier);
+        assert.isTrue(constructor.hasPendingSubsegment);
+
+        const segment = constructor.pathSegment;
+        assert.exists(segment);
+        assert.equal(segment.type, null);
+        assert.equal(await promiseStatus(segment.whenRecognized), PromiseStatuses.PROMISE_PENDING);
+        assert.equal(await promiseStatus(segment.whenResolved), PromiseStatuses.PROMISE_PENDING);
+        assert.isFalse(constructor.hasPrecommittedSubsegment);
+
+        constructor.commitPendingSubsegment();
+
+        // Committing the short-move shouldn't change recognition status.
+        assert.equal(segment.type, null);
+        assert.equal(await promiseStatus(segment.whenRecognized), PromiseStatuses.PROMISE_PENDING);
+        assert.equal(await promiseStatus(segment.whenResolved), PromiseStatuses.PROMISE_PENDING);
+
+        const followup = turtle.move(45, 10, 160, 20); // 45 degrees, 10px distance, 160ms, 20ms at a time.
+
+        assert.isTrue(constructor.updatePendingSubsegment(followup));
+        assert.equal(segment.type, 'move');
+        assert.equal(await promiseStatus(segment.whenRecognized), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(segment.whenResolved), PromiseStatuses.PROMISE_PENDING);
+      });
+
+      it("hold -> 2px move -> hold -> 1px move", async function() {
+        const firstSample = {
+          targetX: 10,
+          targetY: 20,
+          t: 100
+        };
+
+        const turtle = new TouchpathTurtle(firstSample);
+
+        const baseComponent = turtle.wait(40, 20);
+
+        // Initialization of the TouchpathTurtle provides a Subsegment for its base point.
+        const constructor = new ConstructingSegment(baseComponent, classifier);
+        assert.isTrue(constructor.hasPendingSubsegment);
+
+        const segment = constructor.pathSegment;
+        assert.exists(segment);
+        assert.equal(segment.type, null);
+        assert.equal(await promiseStatus(segment.whenRecognized), PromiseStatuses.PROMISE_PENDING);
+        assert.equal(await promiseStatus(segment.whenResolved), PromiseStatuses.PROMISE_PENDING);
+
+        constructor.commitPendingSubsegment();
+        assert.equal(segment.type, null);
+        assert.equal(await promiseStatus(segment.whenRecognized), PromiseStatuses.PROMISE_PENDING);
+        assert.equal(await promiseStatus(segment.whenResolved), PromiseStatuses.PROMISE_PENDING);
+
+        // The public-facing Segment should already be recognized!
+        assert.isFalse(constructor.hasPrecommittedSubsegment);
+
+        let followup = turtle.move(90, 2, 60, 20);
+
+        assert.isTrue(constructor.updatePendingSubsegment(followup));
+        assert.equal(segment.type, 'hold'); // We've reached 100 ms.
+        assert.equal(await promiseStatus(segment.whenRecognized), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(segment.whenResolved), PromiseStatuses.PROMISE_PENDING);
+
+        constructor.commitPendingSubsegment();
+
+        followup = turtle.wait(50, 25);
+        assert.isTrue(constructor.isCompatible(followup)); // To verify the following method's precondition.
+        assert.isTrue(constructor.updatePendingSubsegment(followup));
+
+        followup = turtle.move(90, 100, 20, 20);
+        assert.isTrue(constructor.isCompatible(followup)); // To verify the following method's precondition.
+        assert.isTrue(constructor.updatePendingSubsegment(followup));
+      });
+    });
   });
 });
