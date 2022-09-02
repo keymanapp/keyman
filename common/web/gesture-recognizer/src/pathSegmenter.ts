@@ -293,7 +293,7 @@ namespace com.keyman.osk {
        * segmented regression.
        */
       get sumSquaredGainFromSegmentation(): number {
-        return this.unsegmentedSumSquaredError - this.remainingSumSquaredError;
+        return sigMinus(this.unsegmentedSumSquaredError, this.remainingSumSquaredError);
       }
 
       /**

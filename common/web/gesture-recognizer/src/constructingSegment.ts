@@ -2,7 +2,8 @@ namespace com.keyman.osk {
   /**
    * This class is responsible for managing the construction of public-facing Segments while keeping
    * all the internal parts... internal.  As such, it includes state management for parts of
-   * PathSegmenter's operations.
+   * PathSegmenter's operations.  Note that it makes many assumptions based upon its usage within
+   * PathSegmenter.
    *
    * See also `SubsegmentCompatibilityAnalyzer`, which defines the criteria used within this class
    * for determining when to recombine subsegments and when to uphold segmentation decisions.
@@ -53,7 +54,7 @@ namespace com.keyman.osk {
      * @param accumulation
      * @returns
      */
-    public buildIntervalFromBase(accumulation: CumulativePathStats) {
+    private buildIntervalFromBase(accumulation: CumulativePathStats) {
       return accumulation.deaccumulate(this.baseAccumulation);
     }
 

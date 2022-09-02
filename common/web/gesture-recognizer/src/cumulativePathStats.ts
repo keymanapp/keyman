@@ -28,10 +28,11 @@ namespace com.keyman.osk {
    * For reference, (32-bit) floats have 23 bits of significand precision, while (64-bit)
    * doubles have 52.  Therefore, we'll still be more precise than baseline floats.
    */
-  function sigMinus(operand1: number, operand2: number) {
+  export function sigMinus(operand1: number, operand2: number) {
     const diff = operand1 - operand2;
+    const magnitude = Math.max(Math.abs(operand1), Math.abs(operand2));
 
-    const logDiff = Math.log2(Math.abs(operand1)) - Math.log2(Math.abs(operand2));
+    const logDiff = Math.log2(magnitude) - Math.log2(Math.abs(diff));
     // If an operand is 2^30 (or ~10^9) larger than the result of the difference, it's
     // nigh-certainly a floating-point error at play.
     return logDiff < 30 ? diff : 0;
@@ -115,7 +116,7 @@ namespace com.keyman.osk {
        * that is unexplained by this regression.
        */
       get sumOfSquaredError(): number {
-        return this.accumulator.squaredSum(this.dependent) - this.sumOfSquaredModeled;
+        return sigMinus(this.accumulator.squaredSum(this.dependent), this.sumOfSquaredModeled);
       }
 
       /**
