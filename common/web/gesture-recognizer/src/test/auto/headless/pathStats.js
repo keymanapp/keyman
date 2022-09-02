@@ -1,5 +1,4 @@
 const assert = require('chai').assert;
-const sinon = require('sinon');
 
 const GestureRecognizer = require('../../../../build/index.js');
 const com = GestureRecognizer.com;

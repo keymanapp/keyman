@@ -11,7 +11,7 @@ const PathSegmenter = com.keyman.osk.PathSegmenter;
 
 const timedPromise = require('../../../../build/tools/unit-test-resources.js').timedPromise;
 
-describe("Segmentation", function() {
+describe("Basic segmentation cases", function() {
   describe("Single-sample 'sequence'", function() {
     it("expected segment types", function() {
       let spy = sinon.fake();
