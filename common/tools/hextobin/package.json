@@ -10,7 +10,7 @@
   "dependencies": {
     "commander": "^3.0.0"
   },
-  "main": "build/index.js",
+  "main": "build/hextobin.js",
   "bin": {
     "hextobin": "build/hextobin.js"
   },
