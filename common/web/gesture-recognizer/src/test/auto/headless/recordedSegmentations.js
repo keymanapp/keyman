@@ -41,8 +41,35 @@ describe("Segmentation", function() {
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/simple_ne_move.json`);
       let jsonObj = JSON.parse(testJSONtext);
 
-      // Prepare some of the basic setup.
-      let spy = sinon.fake();
+      // Some special setup - we're going to capture the 'move' segment in-process and run a check that way.
+      const recognitionTestCapturer = {
+        recognizedPromise: null
+      }
+
+      // Spy:  the method we pass in is _actually called_ while _also_ capturing metadata for every call.
+      let spy = sinon.spy((segment) => {
+        if(segment.type == 'move' && !recognitionTestCapturer.recognizedPromise) {
+          segment.whenRecognized.then(() => {
+            recognitionTestCapturer.recognizedPromise = new Promise((resolve, reject) => {
+              // Verify that we resolved because of distance, not time.
+              assert.isAtLeast(segment.distance, PathSegmenter.DEFAULT_CONFIG.holdMoveTolerance);
+              assert.isBelow(segment.duration, PathSegmenter.DEFAULT_CONFIG.holdMinimumDuration);
+
+              // Makes sure the segment isn't resolved at the same time it is recognized.
+              promiseStatus(segment.whenResolved).then((status) => {
+                assert.equal(status, PromiseStatuses.PROMISE_PENDING);
+                resolve();
+              }).catch((err) => {
+                reject(err);
+              });
+            });
+
+            return recognitionTestCapturer.recognizedPromise;
+          });
+        }
+      });
+
+      // Now the normal basic setup.
       const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
       const configObj = {
@@ -52,8 +79,10 @@ describe("Segmentation", function() {
 
       const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
 
+      // The fakeClock await must be first.  The other two should be fine in either order.
       await this.fakeClock.runAllAsync();
       await testObj.compositePromise;
+      await recognitionTestCapturer.recognizedPromise;
 
       // Any post-sequence tests to run.
       const originalSegments = testObj.originalSegments;
@@ -78,8 +107,35 @@ describe("Segmentation", function() {
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/nonstationary_hold.json`);
       let jsonObj = JSON.parse(testJSONtext);
 
-      // Prepare some of the basic setup.
-      let spy = sinon.fake();
+      // Some special setup - we're going to capture the 'hold' segment in-process and run a check that way.
+      const recognitionTestCapturer = {
+        recognizedPromise: null
+      }
+
+      // Spy:  the method we pass in is _actually called_ while _also_ capturing metadata for every call.
+      let spy = sinon.spy((segment) => {
+        if(segment.type == 'hold' && !recognitionTestCapturer.recognizedPromise) {
+          segment.whenRecognized.then(() => {
+            recognitionTestCapturer.recognizedPromise = new Promise((resolve, reject) => {
+              // Verify that we resolved because of time, not distance.
+              assert.isBelow(segment.distance, PathSegmenter.DEFAULT_CONFIG.holdMoveTolerance);
+              assert.isAtLeast(segment.duration, PathSegmenter.DEFAULT_CONFIG.holdMinimumDuration);
+
+              // Makes sure the segment isn't resolved at the same time it is recognized.
+              promiseStatus(segment.whenResolved).then((status) => {
+                assert.equal(status, PromiseStatuses.PROMISE_PENDING);
+                resolve();
+              }).catch((err) => {
+                reject(err);
+              });
+            });
+
+            return recognitionTestCapturer.recognizedPromise;
+          });
+        }
+      });
+
+      // Now the normal basic setup.
       const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
       const configObj = {
@@ -89,8 +145,10 @@ describe("Segmentation", function() {
 
       const testObj = HeadlessRecordingSimulator.prepareTest(jsonObj, configObj);
 
+      // The fakeClock await must be first.  The other two should be fine in either order.
       await this.fakeClock.runAllAsync();
       await testObj.compositePromise;
+      await recognitionTestCapturer.recognizedPromise;
 
       // Any post-sequence tests to run.
       const originalSegments = testObj.originalSegments;
@@ -114,7 +172,7 @@ describe("Segmentation", function() {
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/flick_ne_se.json`);
       let jsonObj = JSON.parse(testJSONtext);
 
-      // Prepare some of the basic setup.
+      // Prepares some basic setup - we won't set up segment-specific recognition tests here.
       let spy = sinon.fake();
       const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
@@ -154,7 +212,7 @@ describe("Segmentation", function() {
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/longpress_to_ne.json`);
       let jsonObj = JSON.parse(testJSONtext);
 
-      // Prepare some of the basic setup.
+      // Prepares some basic setup - we won't set up segment-specific recognition tests here.
       let spy = sinon.fake();
       const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
@@ -195,7 +253,7 @@ describe("Segmentation", function() {
       let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/quick_small_square.json`);
       let jsonObj = JSON.parse(testJSONtext);
 
-      // Prepare some of the basic setup.
+      // Prepares some basic setup - we won't set up segment-specific recognition tests here.
       let spy = sinon.fake();
       const segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, spy);
 
