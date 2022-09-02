@@ -104,7 +104,7 @@ export default async function hextobin(inputFilename: string, outputFilename?: s
         b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
         break;
       case 'index':
-        // sizeof can take a third parameter, divisor
+        // index can take a third parameter, divisor
         {
           let divisor = t.parameters.length > 2 ? parseInt(t.parameters[2],10) : 1;
           b.refs.push({type: 'index', blockName: t.parameters[0], blockName2: t.parameters[1], divisor: divisor, offset: b.hex.length / 2});
