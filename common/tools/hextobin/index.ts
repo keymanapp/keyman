@@ -8,70 +8,194 @@ export default async function hextobin(inputFilename: string, outputFilename?: s
 
   let reader = rd.createInterface(fs.createReadStream(inputFilename));
 
-  interface HexBlock {
-    offset: number;
-    hex: string;
+  interface HexBlockRef {
+    type: 'sizeof' | 'offset' | 'diff';
+    blockName: string;
+    blockName2?: string; // used only by diff
+    divisor?: number; // used only by sizeof
+    offset: number; // actual byte offset in hex data (i.e. offset in string is * 2)
   };
 
-  let data: HexBlock[] = [];
+  interface HexBlock {
+    name: string;
+    offset: number;   // calculated during reconciliation phase
+    hex: string;
+    refs: HexBlockRef[];
+  };
 
-  let lineNumber = 0;
+  let blocks: HexBlock[] = [];
 
-  for await (const l of reader) {
-    lineNumber++;
-    let tokens = l.split(/[ \t]+/);
+  let currentLine = '';
+  let currentLineNumber = 0;
 
-    while(tokens.length && tokens[0] == '') {
-      tokens.shift();
+  if(!await load()) {
+    return null;
+  }
+
+  if(!reconciliation()) {
+    return null;
+  }
+
+  return save();
+
+  function reportError(message) {
+    if(!options.silent) {
+      console.error(`Invalid input file: ${message} on line #${currentLineNumber}: "${currentLine}"`);
     }
+  }
 
-    if(tokens.length == 0) {
-      continue;
-    }
+  function currentBlock(): HexBlock {
+    return blocks.length ? blocks[blocks.length-1] : null;
+  }
 
-    if(tokens[0].endsWith(':')) {
-      let f = tokens.shift();
-      if(!f) {
-        continue;
-      }
-      data.push({offset: parseInt(f), hex:''});
-    }
-
-    if(data.length == 0) {
-      // no offset given, starting at 0
-      data.push({offset: 0, hex: ''});
-    }
-
-    for(let token of tokens) {
-      if(token == '') {
-        continue;
-      }
-      if(token.startsWith('#')) {
-        break;
-      }
+  function parseToken(token: string): { command: string, parameters: string[] } {
+    let m = /^([a-z]+)\((.+)\)$/.exec(token);
+    if(!m) {
       if(!token.match(/^[a-fA-F0-9]{2}$/)) {
-        if(!options.silent) {
-          console.error(`Invalid input file: expected hex for component "${token}" on line #${lineNumber}: "${l}"`);
-        }
         return null;
       }
-      data[data.length-1].hex += token;
+      // hex byte
+      return { command: 'data', parameters: [token] };
     }
+
+    // processing command
+    return { command: m[1], parameters: m[2].split(',') };
   }
 
-  let total = data.reduce((total: number, item: HexBlock) => Math.max(item.offset + item.hex.length/2, total), 0);
+  function token(token: string) {
+    const t = parseToken(token);
+    if(!t) {
+      reportError(`expected command or hex at token "${token}"`);
+      return false;
+    }
 
-  if(!options.silent) {
-    console.log(`${lineNumber} lines read; ${data.length} sections to write. Total file size = ${total} bytes.` );
-  }
-  let buffer = new Uint8Array(total);
-  data.forEach(item => {
-    let buf = Buffer.from(item.hex, 'hex');
-    buffer.set(buf, item.offset);
-  });
+    if(t.command == 'block') {
+      blocks.push({name: t.parameters[0], offset: 0, hex: '', refs: []});
+      return true;
+    }
 
-  if(outputFilename) {
-    fs.writeFileSync(outputFilename, buffer);
+    const b = currentBlock();
+    if(!b) {
+      reportError(`expected block() before data`);
+      return false;
+    }
+
+    switch(t.command) {
+      case 'offset':
+        b.refs.push({type: 'offset', blockName: t.parameters[0], offset: b.hex.length / 2});
+        b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        break;
+      case 'sizeof':
+        // sizeof can take a second parameter, divisor
+        let divisor = t.parameters.length > 1 ? parseInt(t.parameters[1],10) : 1;
+        b.refs.push({type: 'sizeof', blockName: t.parameters[0], divisor: divisor, offset: b.hex.length / 2});
+        b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        break;
+      case 'diff':
+        b.refs.push({type: 'diff', blockName: t.parameters[0], blockName2: t.parameters[1], offset: b.hex.length / 2});
+        b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        break;
+      case 'data':
+        b.hex += t.parameters[0];
+        break;
+      default:
+        reportError(`unknown command ${t.command}`);
+        return false;
+    }
+    return true;
   }
-  return buffer;
+
+  async function load() {
+    for await (const l of reader) {
+      // Error reporting variables
+      currentLine = l;
+      currentLineNumber++;
+
+      const tokens = l.split(/[ \t]+/);
+      for(let t of tokens) {
+        if(t.startsWith('#')) {
+          // comment, ignore all subsequent tokens to EOL
+          break;
+        }
+        if(t == '') {
+          continue;
+        }
+        if(!token(t)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function dwordLeToHex(v: number): string {
+    // hacky but who cares
+    let h = v.toString(16);
+    h = "0".repeat(8-h.length) + h;
+    return h.substring(6,8) + h.substring(4, 6) + h.substring(2, 4) + h.substring(0, 2);
+  }
+
+  function fillBlockPlaceholder(block: HexBlock, offset: number, value: number): void {
+    const hexvalue = dwordLeToHex(value);
+    block.hex = block.hex.substring(0, offset * 2) + hexvalue + block.hex.substring(offset * 2 + 8);
+  }
+
+  function reconciliation(): boolean {
+    let offset = 0;
+
+    // calculate block sizes
+    for(let b of blocks) {
+      b.offset = offset;
+      offset += b.hex.length / 2;
+    }
+
+    // reconcile block offsets and sizes
+    for(let b of blocks) {
+      for(let r of b.refs) {
+        const v = blocks.find(q => q.name == r.blockName);
+        if(!v) {
+          reportError(`Could not find block ${r.blockName} when reconciling ${b.name}`);
+          return false;
+        }
+        switch(r.type) {
+          case 'diff':
+            const v2 = blocks.find(q => q.name == r.blockName2);
+            if(!v2) {
+              reportError(`Could not find block ${r.blockName2} when reconciling ${b.name}`);
+              return false;
+            }
+            fillBlockPlaceholder(b, r.offset, v2.offset - v.offset);
+            break;
+          case 'offset':
+            fillBlockPlaceholder(b, r.offset, v.offset);
+            break;
+          case 'sizeof':
+            fillBlockPlaceholder(b, r.offset, v.hex.length / 2 / r.divisor);
+            break;
+          default:
+            reportError(`Invalid ref ${r.type}`);
+            return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function save(): Uint8Array {
+    let total = blocks.reduce((total: number, item: HexBlock) => Math.max(item.offset + item.hex.length/2, total), 0);
+
+    if(!options.silent) {
+      console.log(`${currentLineNumber} lines read; ${blocks.length} sections to write. Total file size = ${total} bytes.` );
+    }
+    let buffer = new Uint8Array(total);
+    blocks.forEach(item => {
+      let buf = Buffer.from(item.hex, 'hex');
+      buffer.set(buf, item.offset);
+    });
+
+    if(outputFilename) {
+      fs.writeFileSync(outputFilename, buffer);
+    }
+    return buffer;
+  }
 }
