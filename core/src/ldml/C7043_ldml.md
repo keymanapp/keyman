@@ -66,11 +66,22 @@ Then for each string:
 |16+|  32  | offset        | off: Offset to string                         |
 |20+|  32  | length        | int: Length of string in UTF-16LE code units  |
 
-After the string offset table comes the actual UTF-16LE data. There is a null (\u0000) after each string, which is _not_ included in the string length.
+After the string offset table comes the actual UTF-16LE data. There is a null
+(\u0000) after each string, which is _not_ included in the string length.
 
-The string offset table, and then strings themselves, are sorted according to a binary codepoint sort, not including the null.
+The string offset table, and then strings themselves, are sorted according to a
+binary codepoint sort, not including the null.
 
-A string may be zero length.
+The first string in the string table MUST always be the zero-length string. A
+zero-length string is considered the same as a null string. For metadata fields,
+references to this zero-length string will have the dword index value 0, which
+can safely be interpreted as "not set". There may be other locations which have
+required strings, but for which a zero-length string is permissible, and this
+index value of 0 can be used for that purpose.
+
+A distinction between zero-length string and optional should be avoided (e.g.
+the difference between "" and null in Javascript). If this is truly required, a
+separate flag field must be used to denote the difference.
 
 ### C7043.2.3 `meta`—Metadata
 
