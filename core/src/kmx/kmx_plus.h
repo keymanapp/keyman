@@ -34,6 +34,8 @@ namespace kmx {
 #pragma warning ( disable : 4200 )
 #endif
 
+typedef KMX_DWORD KMXPLUS_STR;
+
 struct COMP_KMXPLUS_HEADER {
   KMX_DWORD ident;  // 0000 Section name
   KMX_DWORD size;   // 0004 Section length
@@ -105,12 +107,13 @@ static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched 
 struct COMP_KMXPLUS_META {
   static const KMX_DWORD IDENT = LDML_SECTIONID_META;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD name;
-  KMX_DWORD author;
-  KMX_DWORD conform;
-  KMX_DWORD layout;
-  KMX_DWORD normalization;
-  KMX_DWORD indicator;
+  KMXPLUS_STR name;
+  KMXPLUS_STR author;
+  KMXPLUS_STR conform;
+  KMXPLUS_STR layout;
+  KMXPLUS_STR normalization;
+  KMXPLUS_STR indicator;
+  KMXPLUS_STR version;
   KMX_DWORD settings;
   /**
    * @brief True if section is valid.
@@ -121,7 +124,7 @@ struct COMP_KMXPLUS_META {
 static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META, "mismatched size of section meta");
 
 struct COMP_KMXPLUS_LOCA_ENTRY {
-  KMX_DWORD locale; // 0010+ locale string entry
+  KMXPLUS_STR locale; // 0010+ locale string entry
 };
 
 struct COMP_KMXPLUS_LOCA {
@@ -142,7 +145,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_LOCA) == LDML_LENGTH_LOCA, "mismatched 
 struct COMP_KMXPLUS_KEYS_ENTRY {
     KMX_DWORD vkey;
     KMX_DWORD mod;
-    KMX_DWORD to;
+    KMX_DWORD to;     // to may be KMXPLUS_STR or UTF32 char
     KMX_DWORD flags;
 };
 

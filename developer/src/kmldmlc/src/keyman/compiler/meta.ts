@@ -3,6 +3,7 @@ import { KeyboardSettings, Meta, Meta_NormalizationForm } from "../kmx/kmx-plus"
 import { isValidEnumValue } from "../util/util";
 import { CompilerErrors } from "./errors";
 import { SectionCompiler } from "./section-compiler";
+import * as semver from "semver";
 
 export class MetaCompiler extends SectionCompiler {
 
@@ -13,15 +14,31 @@ export class MetaCompiler extends SectionCompiler {
   public validate(): boolean {
     let valid = true;
 
-    const normalization = this.keyboard.info?.normalization;
-    if(normalization !== undefined) {
-      if(!isValidEnumValue(Meta_NormalizationForm, normalization)) {
-        this.callbacks.reportMessage(CompilerErrors.InvalidNormalization({form: normalization}));
-        valid = false;
-      }
-    }
+    valid &&= this.validateNormalization(this.keyboard.info?.normalization);
+    valid &&= this.validateVersion(this.keyboard.version?.number);
 
     return valid;
+  }
+
+  private validateVersion(versionNumber?: string) {
+    if(versionNumber !== undefined) {
+      if(versionNumber.match(/^[=v]/i)) {
+        // semver ignores a preceding '=' or 'v'
+        return false;
+      }
+      return !!semver.parse(versionNumber, {loose: false, includePrerelease: true});
+    }
+    return true;
+  }
+
+  private validateNormalization(normalization?: string) {
+    if (normalization !== undefined) {
+      if (!isValidEnumValue(Meta_NormalizationForm, normalization)) {
+        this.callbacks.reportMessage(CompilerErrors.InvalidNormalization({ form: normalization }));
+        return false;
+      }
+    }
+    return true;
   }
 
   public compile(): Meta {
@@ -32,6 +49,7 @@ export class MetaCompiler extends SectionCompiler {
     result.layout = this.keyboard.info?.layout;
     result.normalization = this.keyboard.info?.normalization as Meta_NormalizationForm;
     result.indicator = this.keyboard.info?.indicator;
+    result.version = this.keyboard.version?.number ?? "0";
     result.settings =
       (this.keyboard.settings?.fallback == "omit" ? KeyboardSettings.fallback : 0) |
       (this.keyboard.settings?.transformFailure == "omit" ? KeyboardSettings.transformFailure : 0) |

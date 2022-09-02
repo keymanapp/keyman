@@ -80,7 +80,7 @@ export const constants: Constants = {
     /**
      * length of the 'meta' section
      */
-    length_meta: 36,
+    length_meta: 40,
     /**
      * bitwise or value for fallback=omit in meta.settings
      */

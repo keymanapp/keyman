@@ -19,6 +19,7 @@ export interface LKKeyboard {
   conformsTo?: string;
 
   locales?: LKLocales;
+  version?: LKVersion;
   info?: LKInfo;
   names?: LKNames;
   settings?: LKSettings;
@@ -33,6 +34,10 @@ export interface LKLocales {
 export interface LKLocale {
   id?: string;
 };
+
+export interface LKVersion {
+  number: string; // semver string
+}
 
 export interface LKInfo {
   author?: string;
