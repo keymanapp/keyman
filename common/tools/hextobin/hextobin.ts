@@ -15,11 +15,13 @@ not currently supported.
 Format:
 
   # This is a comment
-  block(name)              # each part of file must be defined as a block
-  11 22 33 44 55 aa bb     # inserts hex bytes
-  offset(block)            # inserts 4 byte offset of block from BOF
-  sizeof(block[,divisor])  # inserts 4 byte size of block, optionally divided by divisor
-  diff(block1,block2)      # inserts 4 byte offset diff between start of block1 and block2
+  block(name)                     # each part of file must be defined as a block
+  11 22 33 44 55 aa bb            # inserts hex bytes
+  offset(block)                   # inserts 4 byte offset of block from BOF
+  sizeof(block[,divisor])         # inserts 4 byte size of block, optionally divided by divisor
+  diff(block1,block2)             # inserts 4 byte offset diff between start of block1 and block2
+  index(block1,block2[,divisor])  # inserts 4 byte index diff between block1 and block2,
+                                  # optionally divided by divisor
   # block names are required, but if not referenced can be reused (e.g. block(x))
 `
   )

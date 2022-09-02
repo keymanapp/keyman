@@ -8,11 +8,17 @@ export default async function hextobin(inputFilename: string, outputFilename?: s
 
   let reader = rd.createInterface(fs.createReadStream(inputFilename));
 
+  type HexBlockRefType =
+    'sizeof' |    // gets the size of a block, optionally divided by divisor: sizeof(block,divisor)
+    'offset' |    // gets the offset of a block in bytes from start of file: offset(block)
+    'diff' |      // gets the offset of a block in bytes from start of a base block: offset(baseBlock,block)
+    'index';      // gets the index of a block from a base block, optionally divided by divisor: index(baseBlock,block,divisor)
+
   interface HexBlockRef {
-    type: 'sizeof' | 'offset' | 'diff';
+    type: HexBlockRefType;
     blockName: string;
-    blockName2?: string; // used only by diff
-    divisor?: number; // used only by sizeof
+    blockName2?: string; // used only by diff, index
+    divisor?: number; // used only by sizeof, index
     offset: number; // actual byte offset in hex data (i.e. offset in string is * 2)
   };
 
@@ -87,13 +93,23 @@ export default async function hextobin(inputFilename: string, outputFilename?: s
         break;
       case 'sizeof':
         // sizeof can take a second parameter, divisor
-        let divisor = t.parameters.length > 1 ? parseInt(t.parameters[1],10) : 1;
-        b.refs.push({type: 'sizeof', blockName: t.parameters[0], divisor: divisor, offset: b.hex.length / 2});
-        b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        {
+          let divisor = t.parameters.length > 1 ? parseInt(t.parameters[1],10) : 1;
+          b.refs.push({type: 'sizeof', blockName: t.parameters[0], divisor: divisor, offset: b.hex.length / 2});
+          b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        }
         break;
       case 'diff':
         b.refs.push({type: 'diff', blockName: t.parameters[0], blockName2: t.parameters[1], offset: b.hex.length / 2});
         b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        break;
+      case 'index':
+        // sizeof can take a third parameter, divisor
+        {
+          let divisor = t.parameters.length > 2 ? parseInt(t.parameters[2],10) : 1;
+          b.refs.push({type: 'index', blockName: t.parameters[0], blockName2: t.parameters[1], divisor: divisor, offset: b.hex.length / 2});
+          b.hex += "_".repeat(8); // always 4 bytes, placeholder will be filled in during reconciliation phase
+        }
         break;
       case 'data':
         b.hex += t.parameters[0];
@@ -159,18 +175,30 @@ export default async function hextobin(inputFilename: string, outputFilename?: s
         }
         switch(r.type) {
           case 'diff':
-            const v2 = blocks.find(q => q.name == r.blockName2);
-            if(!v2) {
-              reportError(`Could not find block ${r.blockName2} when reconciling ${b.name}`);
-              return false;
+            {
+              const v2 = blocks.find(q => q.name == r.blockName2);
+              if(!v2) {
+                reportError(`Could not find block ${r.blockName2} when reconciling ${b.name}`);
+                return false;
+              }
+              fillBlockPlaceholder(b, r.offset, v2.offset - v.offset);
             }
-            fillBlockPlaceholder(b, r.offset, v2.offset - v.offset);
             break;
           case 'offset':
             fillBlockPlaceholder(b, r.offset, v.offset);
             break;
           case 'sizeof':
             fillBlockPlaceholder(b, r.offset, v.hex.length / 2 / r.divisor);
+            break;
+          case 'index':
+            {
+              const v2 = blocks.find(q => q.name == r.blockName2);
+              if(!v2) {
+                reportError(`Could not find block ${r.blockName2} when reconciling ${b.name}`);
+                return false;
+              }
+              fillBlockPlaceholder(b, r.offset, (blocks.indexOf(v2) - blocks.indexOf(v)) / r.divisor);
+            }
             break;
           default:
             reportError(`Invalid ref ${r.type}`);
