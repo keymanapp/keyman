@@ -9,9 +9,9 @@ import { MetaCompiler } from './meta';
 import { NameCompiler } from './name';
 
 const SECTION_COMPILERS = [
-  MetaCompiler,
-  LocaCompiler,
   KeysCompiler,
+  LocaCompiler,
+  MetaCompiler,
   NameCompiler
 ];
 

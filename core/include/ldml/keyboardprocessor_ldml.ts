@@ -23,11 +23,11 @@
  * through.
  */
 export type SectionIdent =
+  'sect' |
   'keys' |
   'loca' |
   'meta' |
   'name' |
-  'sect' |
   'strs' |
   'vkey';
 
@@ -170,11 +170,11 @@ export const constants: Constants = {
      * All section IDs.
      */
     section: {
+        sect: 'sect',
         keys: 'keys',
         loca: 'loca',
         meta: 'meta',
         name: 'name',
-        sect: 'sect',
         strs: 'strs',
         vkey: 'vkey',
     },
