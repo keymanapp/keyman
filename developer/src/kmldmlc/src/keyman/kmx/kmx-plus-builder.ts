@@ -134,11 +134,6 @@ export default class KMXPlusBuilder {
   private file: KMXPlusFile;
   //private writeDebug: boolean;
 
-  constructor(file: KMXPlusFile, _writeDebug: boolean) {
-    this.file = file;
-    //this.writeDebug = _writeDebug;
-  }
-
   private sect_sect: BUILDER_SECT;
   private sect_keys: BUILDER_KEYS;
   private sect_loca: BUILDER_LOCA;
@@ -146,6 +141,52 @@ export default class KMXPlusBuilder {
   private sect_name: BUILDER_NAME;
   private sect_strs: BUILDER_STRS;
   private sect_vkey: BUILDER_VKEY;
+
+  constructor(file: KMXPlusFile, _writeDebug: boolean) {
+    this.file = file;
+    //this.writeDebug = _writeDebug;
+  }
+
+  public compile(): Uint8Array {
+    const fileSize = this.build();
+    let file: Uint8Array = new Uint8Array(fileSize);
+
+    this.emitSection(file, this.file.COMP_PLUS_SECT, this.sect_sect);
+    this.emitSection(file, this.file.COMP_PLUS_KEYS, this.sect_keys);
+    this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect_loca);
+    this.emitSection(file, this.file.COMP_PLUS_META, this.sect_meta);
+    this.emitSection(file, this.file.COMP_PLUS_NAME, this.sect_name);
+    this.emitSection(file, this.file.COMP_PLUS_STRS, this.sect_strs);
+    this.emitStrings(file);
+    this.emitSection(file, this.file.COMP_PLUS_VKEY, this.sect_vkey);
+
+    return file;
+  }
+
+  private build() {
+    // Required sections: sect, strs, loca, meta
+
+    this.sect_sect = this.build_sect();
+
+    // We must prepare the strs section early so that other sections can
+    // reference it. However, it will be emitted in alpha order.
+    this.sect_strs = this.build_strs();
+    // per C7043, the first string in sect_strs MUST be the zero-length string.
+    this.alloc_string('');
+
+    this.sect_meta = this.build_meta();
+    this.sect_name = this.build_name();
+    this.sect_loca = this.build_loca();
+    this.sect_keys = this.build_keys();
+    this.sect_vkey = this.build_vkey();
+
+    // Finalize all sections
+
+    this.finalize_strs(); // must be done after all strings allocated
+    this.finalize_sect(); // must be done last
+
+    return this.sect_sect.total;
+  }
 
   private alloc_string(value: string) {
     if(typeof value != 'string') {
@@ -297,29 +338,6 @@ export default class KMXPlusBuilder {
     return vkey;
   }
 
-  private build() {
-    // Required sections: sect, strs, loca, meta
-
-    this.sect_sect = this.build_sect();
-    this.sect_strs = this.build_strs();
-
-    // per C7043, the first string in sect_strs MUST be the zero-length string.
-    this.alloc_string('');
-
-    this.sect_meta = this.build_meta();
-    this.sect_name = this.build_name();
-    this.sect_loca = this.build_loca();
-    this.sect_keys = this.build_keys();
-    this.sect_vkey = this.build_vkey();
-
-    // Finalize all sections
-
-    this.finalize_strs(); // must be done after all strings allocated
-    this.finalize_sect(); // must be done last
-
-    return this.sect_sect.total;
-  }
-
   private finalize_strs() {
     this.sect_strs.count = this.sect_strs.items.length;
     let offset = constants.length_strs + constants.length_strs_item * this.sect_strs.count;
@@ -329,17 +347,6 @@ export default class KMXPlusBuilder {
       offset += item.length * 2 + 2; /* UTF-16 code units + sizeof null terminator */
     }
     this.sect_strs.size = offset;
-  }
-
-  private finalize_sect_item(sect: BUILDER_SECTION, offset: number): number {
-    if(!sect) {
-      // Don't include null sections
-      return offset;
-    }
-    sect._offset = offset;
-    this.sect_sect.items.push({sect: sect.ident, offset: offset});
-    // TODO: padding
-    return offset + sect.size;
   }
 
   private finalize_sect() {
@@ -372,6 +379,17 @@ export default class KMXPlusBuilder {
     this.sect_sect.total = offset;
   }
 
+  private finalize_sect_item(sect: BUILDER_SECTION, offset: number): number {
+    if(!sect) {
+      // Don't include null sections
+      return offset;
+    }
+    sect._offset = offset;
+    this.sect_sect.items.push({sect: sect.ident, offset: offset});
+    // TODO: padding
+    return offset + sect.size;
+  }
+
   private emitSection(file: Uint8Array, comp: any, sect: BUILDER_SECTION) {
     if(sect) {
       file.set(comp.toBuffer(sect), sect._offset);
@@ -389,21 +407,5 @@ export default class KMXPlusBuilder {
         file.set(sbuf.toBuffer(item._value), item.offset + this.sect_strs._offset);
       }
     }
-  }
-
-  public compile(): Uint8Array {
-    const fileSize = this.build();
-    let file: Uint8Array = new Uint8Array(fileSize);
-
-    this.emitSection(file, this.file.COMP_PLUS_SECT, this.sect_sect);
-    this.emitSection(file, this.file.COMP_PLUS_KEYS, this.sect_keys);
-    this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect_loca);
-    this.emitSection(file, this.file.COMP_PLUS_META, this.sect_meta);
-    this.emitSection(file, this.file.COMP_PLUS_NAME, this.sect_name);
-    this.emitSection(file, this.file.COMP_PLUS_STRS, this.sect_strs);
-    this.emitStrings(file);
-    this.emitSection(file, this.file.COMP_PLUS_VKEY, this.sect_vkey);
-
-    return file;
   }
 }
