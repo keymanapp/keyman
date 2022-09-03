@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.55 alpha 2022-09-03
+
+* chore(android): Reduce Toast notification noise (#7178)
+
 ## 16.0.54 alpha 2022-08-30
 
 * chore(core): rename json.hpp to jsonpp.hpp (#6993)
