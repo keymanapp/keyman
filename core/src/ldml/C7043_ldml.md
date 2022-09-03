@@ -196,6 +196,31 @@ For each key:
 - `vkey`: Is the standard vkey, 0-255
 - `target`: Is the target (resolved) vkey, 0-255.
 
-### C7043.2.7 Transforms and friends
+### C7043.2.7 `name`—Names
+
+Defines the names of the keyboard as found in the source `<names>` element.
+While this section is optional in the binary format, in practice it will always
+be present, as the source format requires at least one name.
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0 |  32  | ident   | `name`                                   |
+| 4 |  32  | size    | int: Length of section                   |
+| 8 |  32  | count   | int: Number of names                     |
+|12 |  32  | reserved| padding                                  |
+
+Note that `count` is always ≥1, as the source format requires at least one name.
+
+For each name in `count`:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|16+|  32  | name    | str: A name for the keyboard             |
+
+Note that the first name is repeated in the `meta` section. The remaining names
+are stored in source file order, and the semantic meaning of each name is not
+defined here.
+
+### C7043.2.8 Transforms and friends
 
 > TODO: transforms

@@ -10,7 +10,7 @@
 #
 #    cd developer/src/kmldmlc
 #    # ./build.sh build    # if necessary
-#    node . test/fixtures/basic.xml /tmp/basic.kmx
+#    node . test/fixtures/basic.xml -o /tmp/basic.kmx
 #    xxd -g 1 -l 12 /tmp/basic.kmx | cut -d' ' -f 10-13
 #    # rm /tmp/basic.kmx   # or you may wish to examine it in more detail
 #
@@ -20,7 +20,7 @@ block(kmxheader)  #  struct COMP_KEYBOARD {
 
   00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  94 95 98 0d      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  46 bf 48 f2      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
   00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
@@ -52,7 +52,7 @@ block(sect)                         #  struct COMP_KMXPLUS_SECT {
   73 65 63 74                       #    KMX_DWORD header.ident;   // 0000 Section name
   sizeof(sect)                      #    KMX_DWORD header.size;    // 0004 Section length
   diff(sect,eof)                    #    KMX_DWORD total;          // 0008 KMXPlus entire length
-  04 00 00 00                       #    KMX_DWORD count;          // 000C number of section headers
+  05 00 00 00                       #    KMX_DWORD count;          // 000C number of section headers
                                     #  };
   # Next sections are sect entries
   #    KMX_DWORD sect;           // 0010+ Section identity
@@ -63,6 +63,9 @@ block(sect)                         #  struct COMP_KMXPLUS_SECT {
 
   6d 65 74 61
   diff(sect,meta)
+
+  6e 61 6d 65
+  diff(sect,name)
 
   6c 6f 63 61
   diff(sect,loca)
@@ -122,6 +125,14 @@ block(meta)                         # struct COMP_KMXPLUS_META {
   index(strNull,strIndicator,2)     #   KMXPLUS_STR indicator;
   index(strNull,strVersion,2)       #   KMXPLUS_STR version;
   00 00 00 00                       #   KMX_DWORD settings;
+                                    # };
+
+block(name)                         # struct COMP_KMXPLUS_META {
+  6e 61 6d 65                       #   KMX_DWORD header.ident;   // 0000 Section name - name
+  sizeof(name)                      #   KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of names
+  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
+  index(strNull,strName,2)          #   KMXPLUS_STR name;         // 0010+ name string entry = 'TestKbd'
                                     # };
 
 block(loca)                         # struct COMP_KMXPLUS_LOCA {

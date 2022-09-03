@@ -33,6 +33,10 @@ export class Loca extends Section {
   locales: string[] = [];
 };
 
+export class Name extends Section {
+  names: string[] = [];
+};
+
 export enum KeyFlags {
   none = 0,
   extend = 1<<0,  // note, this should be used only when streaming, ignored in-memory
@@ -71,6 +75,9 @@ export default class KMXPlusFile extends KMXFile {
 
   public readonly COMP_PLUS_META: any;
 
+  public readonly COMP_PLUS_NAME_ITEM: any;
+  public readonly COMP_PLUS_NAME: any;
+
   public readonly COMP_PLUS_LOCA_ITEM: any;
   public readonly COMP_PLUS_LOCA: any;
 
@@ -87,6 +94,7 @@ export default class KMXPlusFile extends KMXFile {
     strs?: Section; // strs is ignored here for writing
     loca?: Loca;
     meta?: Meta;
+    name?: Name;
     keys?: Keys;
     vkey?: Vkey;
   } = { };
@@ -136,6 +144,16 @@ export default class KMXPlusFile extends KMXFile {
       indicator: r.uint32le, //str
       version: r.uint32le, //str
       settings: r.uint32le, //new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
+    });
+
+    this.COMP_PLUS_NAME_ITEM = r.uint32le; //str
+
+    this.COMP_PLUS_NAME = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
+      items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
     });
 
     this.COMP_PLUS_LOCA_ITEM = r.uint32le; //str
