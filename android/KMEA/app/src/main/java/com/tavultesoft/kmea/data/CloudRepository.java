@@ -400,7 +400,6 @@ public class CloudRepository {
         BaseActivity.makeToast(context, R.string.catalog_download_is_running_in_background, Toast.LENGTH_SHORT);
       } else {
         updateIsRunning = true;
-        BaseActivity.makeToast(context, R.string.catalog_download_start_in_background, Toast.LENGTH_SHORT);
         CloudDownloadMgr.getInstance().executeAsDownload(
           context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
       }
