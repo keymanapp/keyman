@@ -3,7 +3,7 @@ import {assert} from 'chai';
 import { MetaCompiler } from '../src/keyman/compiler/meta';
 import { CompilerCallbacks, loadSectionFixture } from './helpers';
 import { KeyboardSettings, Meta } from '../src/keyman/kmx/kmx-plus';
-import { CompilerErrors } from '../src/keyman/compiler/errors';
+import { CompilerMessages } from '../src/keyman/compiler/messages';
 
 describe('meta', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
@@ -41,7 +41,7 @@ describe('meta', function () {
     let meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-normalization.xml', callbacks) as Meta;
     assert.isNull(meta);
     assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], CompilerErrors.InvalidNormalization({form:'NFQ'}));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidNormalization({form:'NFQ'}));
   });
 });
 

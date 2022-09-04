@@ -1,7 +1,7 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { Loca } from "../kmx/kmx-plus";
 import { SectionCompiler } from "./section-compiler";
-import { CompilerErrors } from "./errors";
+import { CompilerMessages } from "./messages";
 import { LKKeyboard } from "../ldml-keyboard/ldml-keyboard-xml";
 
 export class LocaCompiler extends SectionCompiler {
@@ -27,7 +27,7 @@ export class LocaCompiler extends SectionCompiler {
         new Intl.Locale(tag);
       } catch(e) {
         if(e instanceof RangeError) {
-          this.callbacks.reportMessage(CompilerErrors.InvalidLocale({tag}));
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidLocale({tag}));
           valid = false;
         } else {
           throw e;
@@ -46,7 +46,7 @@ export class LocaCompiler extends SectionCompiler {
     const locales = sourceLocales.map((sourceLocale: string) => {
       const locale = new Intl.Locale(sourceLocale).minimize().toString();
       if(locale != sourceLocale) {
-        this.callbacks.reportMessage(CompilerErrors.LocaleIsNotMinimalAndClean(sourceLocale, locale));
+        this.callbacks.reportMessage(CompilerMessages.Hint_LocaleIsNotMinimalAndClean(sourceLocale, locale));
       }
       return locale;
     });
@@ -57,7 +57,7 @@ export class LocaCompiler extends SectionCompiler {
     result.locales = (Intl as any).getCanonicalLocales(locales);
 
     if(result.locales.length < locales.length) {
-      this.callbacks.reportMessage(CompilerErrors.OneOrMoreRepeatedLocales());
+      this.callbacks.reportMessage(CompilerMessages.Hint_OneOrMoreRepeatedLocales());
     }
 
     return result;

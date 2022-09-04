@@ -9,7 +9,7 @@ import * as program from 'commander';
 
 import Compiler from './keyman/compiler/compiler';
 import KMXBuilder from './keyman/kmx/kmx-builder';
-import { CompilerErrors } from './keyman/compiler/errors';
+import { CompilerMessages } from './keyman/compiler/messages';
 import { CompilerEvent } from './keyman/compiler/callbacks';
 
 let inputFilename: string;
@@ -44,7 +44,7 @@ class CompilerCallbacks {
     return fs.readFileSync(filename);
   }
   reportMessage(event: CompilerEvent): void {
-    console.log(CompilerErrors.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
+    console.log(CompilerMessages.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
   }
   loadLdmlKeyboardSchema(): Buffer {
     return fs.readFileSync(path.join(__dirname, 'ldml-keyboard.schema.json'));
