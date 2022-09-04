@@ -42,7 +42,14 @@ export class LocaCompiler extends SectionCompiler {
 
     // This also minimizes locales according to Remove Likely Subtags algorithm:
     // https://www.unicode.org/reports/tr35/#Likely_Subtags
-    let locales = this.getLocales(this.keyboard).map((locale: string) => new Intl.Locale(locale).minimize().toString());
+    const sourceLocales = this.getLocales(this.keyboard);
+    const locales = sourceLocales.map((sourceLocale: string) => {
+      const locale = new Intl.Locale(sourceLocale).minimize().toString();
+      if(locale != sourceLocale) {
+        this.callbacks.reportMessage(CompilerErrors.LocaleIsNotMinimalAndClean(sourceLocale, locale));
+      }
+      return locale;
+    });
 
     // TODO: remove `as any` cast: (Intl as any): ts lib version we have doesn't
     // yet include `getCanonicalLocales` but node 16 does include it so we can
@@ -50,7 +57,6 @@ export class LocaCompiler extends SectionCompiler {
     result.locales = (Intl as any).getCanonicalLocales(locales);
 
     if(result.locales.length < locales.length) {
-      // TODO-LDML: hint on repeated locales
       this.callbacks.reportMessage(CompilerErrors.OneOrMoreRepeatedLocales());
     }
 
