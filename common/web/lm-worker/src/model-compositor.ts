@@ -16,30 +16,6 @@ class ModelCompositor {
     this.punctuation = ModelCompositor.determinePunctuationFromModel(lexicalModel);
   }
 
-  protected isWhitespace(transform: Transform): boolean {
-    // Matches prefixed text + any instance of a character with Unicode general property Z* or the following: CR, LF, and Tab.
-    let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u202f\u205f\u3000]/i;
-
-    // Filter out null-inserts; their high probability can cause issues.
-    if(transform.insert == '') { // Can actually register as 'whitespace'.
-      return false;
-    }
-
-    let insert = transform.insert;
-
-    insert = insert.replace(whitespaceRemover, '');
-
-    return insert == '';
-  }
-
-  protected isBackspace(transform: Transform): boolean {
-    return transform.insert == "" && transform.deleteLeft > 0;
-  }
-
-  protected isEmpty(transform: Transform): boolean {
-    return transform.insert == '' && transform.deleteLeft == 0;
-  }
-
   private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): Distribution<Suggestion> {
     let returnedPredictions: Distribution<Suggestion> = [];
 
@@ -98,8 +74,8 @@ class ModelCompositor {
     })[0].sample;
 
     // Only allow new-word suggestions if space was the most likely keypress.
-    let allowSpace = this.isWhitespace(inputTransform);
-    let allowBksp = this.isBackspace(inputTransform);
+    let allowSpace = TransformUtils.isWhitespace(inputTransform);
+    let allowBksp = TransformUtils.isBackspace(inputTransform);
 
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.wordbreak(postContext);
@@ -146,9 +122,9 @@ class ModelCompositor {
     } else {
       contextState = this.contextTracker.analyzeState(this.lexicalModel,
                                                       postContext,
-                                                      !this.isEmpty(inputTransform) ?
-                                                                    transformDistribution:
-                                                                    null
+                                                      !TransformUtils.isEmpty(inputTransform) ?
+                                                                      transformDistribution:
+                                                                      null
                                                       );
 
       // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
@@ -164,7 +140,7 @@ class ModelCompositor {
       // Detect if we're starting a new context state.
       let contextTokens = contextState.tokens;
       if(contextTokens.length == 0 || contextTokens[contextTokens.length - 1].isNew) {
-        if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
+        if(TransformUtils.isEmpty(inputTransform) || TransformUtils.isWhitespace(inputTransform)) {
           newEmptyToken = true;
           prefixTransform = inputTransform;
           context = postContext; // Ensure the whitespace token is preapplied!
