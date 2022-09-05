@@ -103,11 +103,16 @@ export default class KMXPlusFile extends KMXFile {
 
   public kmxplus: {
     sect?: Section; // sect is ignored here for writing
+    bksp?: Section; // TODO-LDML
+    elem?: Section; // TODO-LDML
+    finl?: Section; // TODO-LDML
     keys?: Keys;
     loca?: Loca;
     meta?: Meta;
     name?: Name;
+    ordr?: Section; // TODO-LDML
     strs?: Section; // strs is ignored here for writing
+    tran?: Section; // TODO-LDML
     vkey?: Vkey;
   } = { };
 
