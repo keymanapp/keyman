@@ -502,7 +502,6 @@ namespace correction {
      *
      * @param model
      * @param context
-     * @param mainTransform
      * @param transformDistribution
      */
     analyzeState(model: LexicalModel,
