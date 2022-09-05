@@ -413,7 +413,7 @@ namespace correction {
           let pushedToken = new TrackedContextToken();
           pushedToken.raw = tokenizedTail;
 
-          if(isWhitespace) {
+          if(isWhitespace || !primaryInput) {
             state.pushWhitespaceToTail(transformDistribution);
             // Continuing the earlier assumption, that 'pure-whitespace Transform' does not emit any initial characters
             // for the new word (token), so the input keystrokes do not correspond to the new text token.
