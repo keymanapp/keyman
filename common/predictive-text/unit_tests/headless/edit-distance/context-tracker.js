@@ -65,7 +65,7 @@ describe('ContextTracker', function() {
       assert.isEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
     });
 
-    it("properly matches and aligns when an implied 'wordbreak' occurs \"'\"", function() {
+    it("properly matches and aligns when an implied 'wordbreak' occurs (as when following \"'\")", function() {
       let existingContext = ["'"];
       let transform = {
         insert: 'a',
