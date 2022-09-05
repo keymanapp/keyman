@@ -414,7 +414,7 @@ namespace correction {
           pushedToken.raw = tokenizedTail;
 
           if(isWhitespace || !primaryInput) {
-            state.pushWhitespaceToTail(transformDistribution);
+            state.pushWhitespaceToTail(transformDistribution ?? []);
             // Continuing the earlier assumption, that 'pure-whitespace Transform' does not emit any initial characters
             // for the new word (token), so the input keystrokes do not correspond to the new text token.
             pushedToken.transformDistributions = [];
@@ -422,7 +422,7 @@ namespace correction {
             state.pushWhitespaceToTail();
             // Assumption: Since we only allow one-transform-at-a-time changes between states, we shouldn't be missing
             // any metadata used to construct the new context state token.
-            pushedToken.transformDistributions = [transformDistribution];
+            pushedToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
           }
 
           state.pushTail(pushedToken);
