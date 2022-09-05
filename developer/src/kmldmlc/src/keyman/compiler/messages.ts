@@ -10,7 +10,7 @@ export enum CompilerErrorSeverity {
 };
 
 const m = (code: number, message: string) => { return { code, message } };
-// const SevInfo = CompilerErrorSeverity.Info;
+const SevInfo = CompilerErrorSeverity.Info;
 const SevHint = CompilerErrorSeverity.Hint;
 // const SevWarn = CompilerErrorSeverity.Warn;
 const SevError = CompilerErrorSeverity.Error;
@@ -44,6 +44,22 @@ export class CompilerMessages {
   static Hint_LocaleIsNotMinimalAndClean = (sourceLocale: string, locale: string) =>
     m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${sourceLocale}' is not minimal or correctly formatted and should be '${locale}'`);
   static HINT_LocaleIsNotMinimalAndClean = SevHint | 0x0008;
+
+  static Error_VkeyIsNotValid = (vkey: string) =>
+    m(this.ERROR_VkeyIsNotValid, `Virtual key '${vkey}' is not found in the CLDR VKey Enum table.`);
+  static ERROR_VkeyIsNotValid = SevError | 0x0009;
+
+  static Hint_VkeyMapIsRedundant = (vkey: string) =>
+    m(this.HINT_VkeyMapIsRedundant, `Virtual key '${vkey}' is mapped to itself, which is redundant.`);
+  static HINT_VkeyMapIsRedundant = SevHint | 0x000A;
+
+  static Error_VkeyMapIsRepeated = (vkey: string) =>
+    m(this.ERROR_VkeyMapIsRepeated, `Virtual key '${vkey}' has more than one VkeyMap entry.`);
+  static ERROR_VkeyMapIsRepeated = SevError | 0x000B;
+
+  static Info_MultipleVkeyMapsHaveSameTarget = (vkey: string) =>
+    m(this.INFO_MultipleVkeyMapsHaveSameTarget, `Target virtual key '${vkey}' has multiple source mappings, which may be an error.`);
+  static INFO_MultipleVkeyMapsHaveSameTarget = SevInfo | 0x000C;
 
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;

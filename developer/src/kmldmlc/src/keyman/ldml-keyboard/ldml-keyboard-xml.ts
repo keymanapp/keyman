@@ -25,6 +25,7 @@ export interface LKKeyboard {
   settings?: LKSettings;
   keys?: LKKeys;
   layerMaps?: LKLayerMaps[];
+  vkeyMaps?: LKVkeyMaps;
 };
 
 export interface LKLocales {
@@ -81,4 +82,13 @@ export interface LKLayerMap {
 
 export interface LKRow {
   keys?: string;
+};
+
+export interface LKVkeyMaps {
+  vkeyMap?: LKVkeyMap[];
+};
+
+export interface LKVkeyMap {
+  from?: string;
+  to?: string;
 };

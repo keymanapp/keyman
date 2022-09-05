@@ -1,5 +1,4 @@
-import { constants } from '@keymanapp/ldml-keyboard-constants';
-import KMXPlusFile, { Vkey } from '../kmx/kmx-plus';
+import KMXPlusFile from '../kmx/kmx-plus';
 import LDMLKeyboardXMLSourceFile from '../ldml-keyboard/ldml-keyboard-xml';
 import LDMLKeyboardXMLSourceFileReader from '../ldml-keyboard/ldml-keyboard-xml-reader';
 import CompilerCallbacks from './callbacks';
@@ -7,12 +6,14 @@ import { KeysCompiler } from './keys';
 import { LocaCompiler } from './loca';
 import { MetaCompiler } from './meta';
 import { NameCompiler } from './name';
+import { VkeyCompiler } from './vkey';
 
 const SECTION_COMPILERS = [
   KeysCompiler,
   LocaCompiler,
   MetaCompiler,
-  NameCompiler
+  NameCompiler,
+  VkeyCompiler
 ];
 
 export default class Compiler {
@@ -67,14 +68,13 @@ export default class Compiler {
       }
       const sect = section.compile();
       if(!sect) {
+        // This should not really happen -- validate() should be telling us
+        // if something is going to fail to compiler
         passed = false;
         continue;
       }
       kmx.kmxplus[section.id] = sect as any;
     }
-
-    // TEMP until we have a Vkey compiler
-    kmx.kmxplus[constants.section.vkey] = new Vkey() as any;
 
     return passed ? kmx : null;
   }

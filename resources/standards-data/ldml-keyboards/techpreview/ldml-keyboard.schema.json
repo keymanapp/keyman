@@ -29,10 +29,7 @@
           "$ref": "#/definitions/settings"
         },
         "vkeyMaps": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/vkeyMaps"
-          }
+         "$ref": "#/definitions/vkeyMaps"
         },
         "displayMap": {
           "type": "array",

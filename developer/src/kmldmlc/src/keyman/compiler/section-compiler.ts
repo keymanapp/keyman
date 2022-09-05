@@ -16,6 +16,10 @@ export class SectionCompiler {
     return null;
   }
 
+  public get required(): boolean {
+    return true;
+  }
+
   public compile(): Section {
     return null;
   }

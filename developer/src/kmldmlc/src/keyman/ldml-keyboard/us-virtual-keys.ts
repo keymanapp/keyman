@@ -137,3 +137,59 @@ export const USVirtualKeyMap: number[][] = [
   // [shift] * Z X C V B N M , . / [shift] *=oE2
   [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ]
 ];
+
+/**
+ * Maps LDML VKey Names from CLDR VKey Enum in TR35 to Keyman virtual key codes
+ */
+export const LdmlVkeyNames: Record<string, number> = {
+  'SPACE':     0x20,  // A03
+  '0':         0x30,  // E10
+  '1':         0x31,  // E01
+  '2':         0x32,  // E02
+  '3':         0x33,  // E03
+  '4':         0x34,  // E04
+  '5':         0x35,  // E05
+  '6':         0x36,  // E06
+  '7':         0x37,  // E07
+  '8':         0x38,  // E08
+  '9':         0x39,  // E09
+  'A':         0x41,  // C01
+  'B':         0x42,  // B05
+  'C':         0x43,  // B03
+  'D':         0x44,  // C03
+  'E':         0x45,  // D03
+  'F':         0x46,  // C04
+  'G':         0x47,  // C05
+  'H':         0x48,  // C06
+  'I':         0x49,  // D08
+  'J':         0x4A,  // C07
+  'K':         0x4B,  // C08
+  'L':         0x4C,  // C09
+  'M':         0x4D,  // B07
+  'N':         0x4E,  // B06
+  'O':         0x4F,  // D09
+  'P':         0x50,  // D10
+  'Q':         0x51,  // D01
+  'R':         0x52,  // D04
+  'S':         0x53,  // C02
+  'T':         0x54,  // D05
+  'U':         0x55,  // D07
+  'V':         0x56,  // B05
+  'W':         0x57,  // D02
+  'X':         0x58,  // B02
+  'Y':         0x59,  // D06
+  'Z':         0x5A,  // B01
+  'SEMICOLON': 0xBA,  // C10
+  'EQUAL':     0xBB,  // E12
+  'COMMA':     0xBC,  // B08
+  'HYPHEN':    0xBD,  // E11
+  'PERIOD':    0xBE,  // B09
+  'SLASH':     0xBF,  // B10
+  'GRAVE':     0xC0,  // E00
+  'LBRACKET':  0xDB,  // D11
+  'BACKSLASH': 0xDC,  // D13
+  'RBRACKET':  0xDD,  // D12
+  'QUOTE':     0xDE,  // C11
+  'LESS-THAN': 0xE2,  // B00  102nd key on European layouts, right of left shift.
+  'ABNT2':     0xC1,  // B11  Extra key, left of right-shift
+};
