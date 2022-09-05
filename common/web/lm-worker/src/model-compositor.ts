@@ -136,12 +136,15 @@ class ModelCompositor {
       // The 'eventual' logic will be significantly more complex, though still manageable.
       let searchSpace = contextState.searchSpace[0];
 
-      let newEmptyToken = false;
+      let newToken = false;
       // Detect if we're starting a new context state.
       let contextTokens = contextState.tokens;
       if(contextTokens.length == 0 || contextTokens[contextTokens.length - 1].isNew) {
+        // Always note if we have a new token (so that we don't try to delete existing context)
+        newToken = true;
+        // If the new token is due to whitespace, or if we had a context-reset trigger this (thus, no input...)
+        // (Lingering question:  do we need the .isEmpty check here?  Track `prefixTransform` and find out.)
         if(TransformUtils.isEmpty(inputTransform) || TransformUtils.isWhitespace(inputTransform)) {
-          newEmptyToken = true;
           prefixTransform = inputTransform;
           context = postContext; // Ensure the whitespace token is preapplied!
         }
@@ -170,7 +173,7 @@ class ModelCompositor {
 
           let deleteLeft = 0;
           // remove actual token string.  If new token, there should be nothing to delete.
-          if(!newEmptyToken) {
+          if(!newToken) {
             // If this is triggered from a backspace, make sure to use its results
             // and also include its left-deletions!  It's the one post-input context case.
             if(allowBksp) {

@@ -27,13 +27,14 @@ namespace correction {
   export class TrackedContextToken {
     raw: string;
     replacementText: string;
+    newFlag: boolean = false;
 
     transformDistributions: Distribution<Transform>[] = [];
     replacements: TrackedContextSuggestion[];
     activeReplacementId: number = -1;
 
     get isNew(): boolean {
-      return this.transformDistributions.length == 0;
+      return this.newFlag;
     }
 
     get currentText(): string {
@@ -126,6 +127,7 @@ namespace correction {
       } else {
         this.searchSpace = [];
       }
+      token.newFlag = true;
       this.tokens.push(token);
 
       let state = this;
@@ -189,6 +191,7 @@ namespace correction {
       }
       // Replace old token's raw-text with new token's raw-text.
       editedToken.raw = tokenText;
+      editedToken.newFlag = false;
     }
 
     toRawTokenization() {
