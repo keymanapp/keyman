@@ -5,6 +5,10 @@
 package com.tavultesoft.kmea.util;
 
 import android.util.Log;
+import android.widget.Toast;
+
+import com.tavultesoft.kmea.BaseActivity;
+
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
@@ -34,6 +38,8 @@ public final class KMLog {
   public static void LogError(String tag, String msg) {
     if (msg != null && !msg.isEmpty()) {
       Log.e(tag, msg);
+
+      BaseActivity.makeToast(null, msg, Toast.LENGTH_SHORT);
 
       if (Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.ERROR);
