@@ -7,7 +7,7 @@
   </names>
 
   <vkeyMaps>
-    <!-- this is redundant so it should be emitted -->
+    <!-- this is redundant so it should be omitted -->
     <vkeyMap from="A" to="A" />
   </vkeyMaps>
 
