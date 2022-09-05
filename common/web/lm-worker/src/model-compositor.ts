@@ -100,18 +100,18 @@ class ModelCompositor {
         predictionRoots = [{sample: inputTransform, p: 1.0}];
         prefixTransform = inputTransform;
       } else {
-        predictionRoots = transformDistribution.map(function(alt) {
+        predictionRoots = transformDistribution.map((alt) => {
           let transform = alt.sample;
 
           // Filter out special keys unless they're expected.
-          if(this.isWhitespace(transform) && !allowSpace) {
+          if(TransformUtils.isWhitespace(transform) && !allowSpace) {
             return null;
-          } else if(this.isBackspace(transform) && !allowBksp) {
+          } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
             return null;
           }
 
           return alt;
-        }, this);
+        });
       }
 
       // Remove `null` entries.
