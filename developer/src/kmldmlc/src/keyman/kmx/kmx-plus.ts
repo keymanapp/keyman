@@ -1,3 +1,4 @@
+import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 
 import KMXFile from './kmx';
@@ -22,9 +23,9 @@ export type BkspItem = TranItem;
 
 export enum ElemElementFlags {
   none = 0,
-  unicode_set = 1<<0,       // TODO-LDML: this may not be needed in-memory, only for streaming
-  tertiary_base = 1<<1,     // used only by reorder element values
-  prebase = 1<<2,           // used only by reorder element values
+  unicode_set = constants.elem_flags_unicode_set,         // TODO-LDML: this may not be needed in-memory, only for streaming
+  tertiary_base = constants.elem_flags_tertiary_base,     // used only by reorder element values
+  prebase = constants.elem_flags_prebase,                 // used only by reorder element values
 };
 
 export class ElemElement {
@@ -32,6 +33,26 @@ export class ElemElement {
   order: number;            // -128 to +127; used only by reorder element values
   tertiary: number;         // -128 to +127; used only by reorder element values
   flags: ElemElementFlags;
+  isEqual(a: ElemElement) {
+    return a.value === this.value &&
+      a.order === this.order &&
+      a.tertiary === this.tertiary &&
+      a.flags === this.flags;
+  }
+};
+
+export class ElementString extends Array<ElemElement> {
+  isEqual(a: ElementString): boolean {
+    if(a.length != this.length) {
+      return false;
+    }
+    for(let i = 0; i < a.length; i++) {
+      if(!this[i].isEqual(a[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
 };
 
 export type Elem = Section;
@@ -97,8 +118,8 @@ export class Name extends Section {
 // 'ordr'
 
 export class OrdrItem {
-  elements: ElemElement[] = [];
-  before: ElemElement[] = [];
+  elements: ElementString = new ElementString();
+  before: ElementString = new ElementString();
 };
 
 export class Ordr extends Section {
@@ -117,9 +138,9 @@ export enum TranItemFlags {
 };
 
 export class TranItem extends Section {
-  from: ElemElement[] = [];
+  from: ElementString = new ElementString();
   to: string;
-  before: ElemElement[] = [];
+  before: ElementString = new ElementString();
   flags: TranItemFlags;
 };
 
