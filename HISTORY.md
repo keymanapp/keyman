@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.56 alpha 2022-09-05
+
+* chore(linux): Fix ibus-keyman.postinst script (#7192)
+
 ## 16.0.55 alpha 2022-09-03
 
 * chore(android): Reduce Toast notification noise (#7178)
