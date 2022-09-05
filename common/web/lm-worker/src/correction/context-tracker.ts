@@ -461,7 +461,9 @@ namespace correction {
       return state;
     }
 
-    static modelContextState(tokenizedContext: USVString[], lexicalModel: LexicalModel): TrackedContextState {
+    static modelContextState(tokenizedContext: USVString[],
+                             transformDistribution: Distribution<Transform>,
+                             lexicalModel: LexicalModel): TrackedContextState {
       let baseTokens = tokenizedContext.map(function(entry) {
         let token = new TrackedContextToken();
         token.raw = entry;
@@ -493,6 +495,17 @@ namespace correction {
         token.raw = '';
 
         state.pushTail(token);
+      }
+
+      for(let i = 0; i < state.tokens.length - 1; i++) {
+        state.tokens[i].newFlag = false;
+      }
+
+      const finalToken = state.tokens[state.tokens.length - 1];
+      const baseTransform = (transformDistribution && transformDistribution.length > 0) ? transformDistribution[0] : null;
+
+      if(!baseTransform || baseTransform.sample.insert != finalToken.raw) {
+        finalToken.newFlag = false;
       }
 
       return state;
@@ -537,7 +550,7 @@ namespace correction {
       //
       // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
       // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-      let state = ContextTracker.modelContextState(tokenizedContext.left, model);
+      let state = ContextTracker.modelContextState(tokenizedContext.left, transformDistribution, model);
       state.taggedContext = context;
       this.enqueue(state);
       return state;

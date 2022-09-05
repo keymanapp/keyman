@@ -638,7 +638,7 @@ class ModelCompositor {
     // than before.
     if(this.contextTracker) {
       let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
-      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, this.lexicalModel);
+      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, null, this.lexicalModel);
       this.contextTracker.enqueue(contextState);
     }
   }
