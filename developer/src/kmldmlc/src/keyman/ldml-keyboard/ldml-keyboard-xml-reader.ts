@@ -33,6 +33,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
     box(source?.keyboard?.vkeyMaps, 'vkeyMap');
     box(source?.keyboard?.keys, 'key');
     box(source?.keyboard?.locales, 'locale');
+    box(source?.keyboard, 'transforms');
     if(source?.keyboard?.layerMaps) {
       for(let layerMaps of source?.keyboard?.layerMaps) {
         box(layerMaps, 'layerMap');
@@ -43,6 +44,13 @@ export default class LDMLKeyboardXMLSourceFileReader {
         }
       }
     }
+    if(source?.keyboard?.transforms) {
+      for(let transform of source.keyboard.transforms)  {
+        box(transform, 'transform');
+      }
+    }
+    box(source?.keyboard?.reorders, 'reorder');
+    box(source?.keyboard?.backspaces, 'backspace');
     return source;
   }
 

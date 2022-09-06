@@ -26,6 +26,9 @@ export interface LKKeyboard {
   keys?: LKKeys;
   layerMaps?: LKLayerMaps[];
   vkeyMaps?: LKVkeyMaps;
+  transforms?: LKTransforms[];
+  reorders?: LKReorders;
+  backspaces?: LKBackspaces;
 };
 
 export interface LKLocales {
@@ -91,4 +94,42 @@ export interface LKVkeyMaps {
 export interface LKVkeyMap {
   from?: string;
   to?: string;
+};
+
+export interface LKTransforms {
+  type?: "simple" | "final";
+  transform: LKTransform[];
+};
+
+export interface LKTransform {
+  from?: string;
+  to?: string;
+  before?: string;
+  error?: "fail";
+};
+
+export interface LKReorders {
+  reorder: LKReorder[];
+};
+
+export interface LKReorder {
+  from?: string;
+  before?: string;
+  //after?: string; //TODO-LDML
+  order?: string;
+  tertiary?: string;
+  tertiary_base?: string;
+  prebase?: string;
+};
+
+export interface LKBackspaces {
+  backspace?: LKBackspace[];
+};
+
+export interface LKBackspace {
+  from?: string;
+  to?: string;
+  before?: string;
+  after?: string;
+  error?: "fail";
 };

@@ -1,6 +1,6 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Tran } from "../kmx-plus";
+import { Bksp, Finl, Tran } from "../kmx-plus";
 import { alloc_element_string, BUILDER_ELEM } from "./build-elem";
 import { alloc_string, BUILDER_STRS } from "./build-strs";
 import { BUILDER_SECTION } from "./builder-section";
@@ -23,15 +23,15 @@ export interface BUILDER_TRAN extends BUILDER_SECTION {
 };
 
 /**
-* Builder for the 'tran' section
+* Builder for the 'tran', 'finl', and 'bksp' sections, all of which use the BUILDER_TRAN layout
 */
-export function build_tran(source_tran: Tran, sect_strs: BUILDER_STRS, sect_elem: BUILDER_ELEM): BUILDER_TRAN {
+export function build_tran(source_tran: Tran|Finl|Bksp, sect_strs: BUILDER_STRS, sect_elem: BUILDER_ELEM): BUILDER_TRAN {
  if(!source_tran?.items.length) {
    return null;
  }
 
  let tran: BUILDER_TRAN = {
-   ident: constants.hex_section_id(constants.section.tran),
+   ident: constants.hex_section_id(source_tran.id),
    size: constants.length_tran + constants.length_tran_item * source_tran.items.length,
    _offset: 0,
    count: source_tran.items.length,
@@ -44,7 +44,7 @@ export function build_tran(source_tran: Tran, sect_strs: BUILDER_STRS, sect_elem
     from: alloc_element_string(sect_strs, sect_elem, item.from),
     to: alloc_string(sect_strs, item.to),
     before: alloc_element_string(sect_strs, sect_elem, item.before),
-    flags: 0
+    flags: item.flags
    });
  }
 

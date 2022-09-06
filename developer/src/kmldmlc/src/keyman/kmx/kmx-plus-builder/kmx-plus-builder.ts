@@ -186,9 +186,10 @@ export default class KMXPlusBuilder {
 
   private emitElements(file: Uint8Array) {
     if(this.sect_elem) {
-      for(let item of this.sect_elem.strings) {
-        if(item._items.length > 0) {
-          file.set(this.file.COMP_PLUS_ELEM_ELEMENT.toBuffer(item), item.offset + this.sect_elem._offset);
+      for(let str of this.sect_elem.strings) {
+        if(str.items.length > 0) {
+          let COMP_PLUS_ELEM_ELEMENTS = new r.Array(this.file.COMP_PLUS_ELEM_ELEMENT, str.items.length);
+          file.set(COMP_PLUS_ELEM_ELEMENTS.toBuffer(str.items), str.offset + this.sect_elem._offset);
         }
       }
     }

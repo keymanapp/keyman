@@ -1,5 +1,6 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
+import { ElementString } from './element-string';
 
 import KMXFile from './kmx';
 
@@ -12,61 +13,20 @@ export class Section {
 
 // 'sect'
 
-export type Sect = Section;
+export class Sect extends Section {};
 
 // 'bksp' -- see 'tran'
-
-export type Bksp = Tran;
-export type BkspItem = TranItem;
-
 // 'elem'
 
-export enum ElemElementFlags {
-  none = 0,
-  unicode_set = constants.elem_flags_unicode_set,         // TODO-LDML: this may not be needed in-memory, only for streaming
-  tertiary_base = constants.elem_flags_tertiary_base,     // used only by reorder element values
-  prebase = constants.elem_flags_prebase,                 // used only by reorder element values
-};
-
-export class ElemElement {
-  value: string;            // UnicodeSet or UCS32LE character
-  order: number;            // -128 to +127; used only by reorder element values
-  tertiary: number;         // -128 to +127; used only by reorder element values
-  flags: ElemElementFlags;
-  isEqual(a: ElemElement) {
-    return a.value === this.value &&
-      a.order === this.order &&
-      a.tertiary === this.tertiary &&
-      a.flags === this.flags;
-  }
-};
-
-export class ElementString extends Array<ElemElement> {
-  isEqual(a: ElementString): boolean {
-    if(a.length != this.length) {
-      return false;
-    }
-    for(let i = 0; i < a.length; i++) {
-      if(!this[i].isEqual(a[i])) {
-        return false;
-      }
-    }
-    return true;
-  }
-};
-
-export type Elem = Section;
+export class Elem extends Section {};
 
 // 'finl' -- see 'tran'
-
-export type Finl = Tran;
-export type FinlItem = TranItem;
 
 // 'keys'
 
 export enum KeyFlags {
   none = 0,
-  extend = 1<<0,  // note, this should be used only when streaming, ignored in-memory
+  extend = constants.keys_flags_extend,  // note, this should be used only when streaming, ignored in-memory
   // additional flags reserved for future use
 };
 
@@ -91,9 +51,9 @@ export class Loca extends Section {
 
 export enum KeyboardSettings {
   none = 0,
-  fallback = 1<<0,
-  transformFailure = 1<<1,
-  transformPartial = 1<<2,
+  fallback = constants.meta_settings_fallback_omit,
+  transformFailure = constants.meta_settings_transformFailure_omit,
+  transformPartial = constants.meta_settings_transformPartial_hide,
 };
 
 export enum Meta_NormalizationForm { NFC='NFC', NFD='NFD', other='other' };
@@ -118,8 +78,8 @@ export class Name extends Section {
 // 'ordr'
 
 export class OrdrItem {
-  elements: ElementString = new ElementString();
-  before: ElementString = new ElementString();
+  elements: ElementString;
+  before: ElementString;
 };
 
 export class Ordr extends Section {
@@ -134,19 +94,42 @@ export type Strs = Section;
 
 export enum TranItemFlags {
   none = 0,
-  error= 1<<0,
+  error = constants.tran_flags_error,
 };
 
 export class TranItem extends Section {
-  from: ElementString = new ElementString();
+  from: ElementString;
   to: string;
-  before: ElementString = new ElementString();
+  before: ElementString;
   flags: TranItemFlags;
 };
 
 export class Tran extends Section {
   items: TranItem[] = [];
+  get id() {
+    return constants.section.tran;
+  }
 };
+
+// alias types for 'bksp', 'finl'
+
+export class Bksp extends Tran {
+  override get id() {
+    return constants.section.bksp;
+  }
+};
+export class BkspItem extends TranItem {};
+export type BkspItemFlags = TranItemFlags;
+export const BkspItemFlags = TranItemFlags;
+
+export class Finl extends Tran {
+  override get id() {
+    return constants.section.finl;
+  }
+};
+export class FinlItem extends TranItem {};
+export type FinlItemFlags = TranItemFlags;
+export const FinlItemFlags = TranItemFlags;
 
 // 'vkey'
 
@@ -186,7 +169,7 @@ export default class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_BKSP: any;
 
   public readonly COMP_PLUS_ELEM_ELEMENT: any;
-  public readonly COMP_PLUS_ELEM_ITEM: any;
+  public readonly COMP_PLUS_ELEM_STRING: any;
   public readonly COMP_PLUS_ELEM: any;
 
   // COMP_PLUS_FINL == COMP_PLUS_TRAN
@@ -250,7 +233,7 @@ export default class KMXPlusFile extends KMXFile {
       flags: r.uint32le
     });
 
-    this.COMP_PLUS_ELEM_ITEM = new r.Struct({
+    this.COMP_PLUS_ELEM_STRING = new r.Struct({
       offset: r.uint32le,
       length: r.uint32le
     });
@@ -260,7 +243,7 @@ export default class KMXPlusFile extends KMXFile {
       size: r.uint32le,
       count: r.uint32le,
       reserved: new r.Reserved(r.uint32le), // padding
-      items: new r.Array(this.COMP_PLUS_ELEM_ITEM, 'count')
+      strings: new r.Array(this.COMP_PLUS_ELEM_STRING, 'count')
     });
 
     // 'finl' - see 'tran'

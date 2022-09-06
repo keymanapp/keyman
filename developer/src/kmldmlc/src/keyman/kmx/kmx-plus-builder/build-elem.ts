@@ -1,5 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { ElementString } from "../kmx-plus";
+import { ElementString } from "../element-string";
 import { alloc_string, BUILDER_STRS } from "./build-strs";
 import { BUILDER_SECTION } from "./builder-section";
 
@@ -15,7 +15,7 @@ interface BUILDER_ELEM_ELEMENT {
 interface BUILDER_ELEM_STRING {
   offset: number;
   length: number;
-  _items: BUILDER_ELEM_ELEMENT[];
+  items: BUILDER_ELEM_ELEMENT[];
   _value: ElementString;
 };
 
@@ -64,7 +64,7 @@ export function finalize_elem(sect_elem: BUILDER_ELEM): boolean {
 export function alloc_element_string(sect_strs: BUILDER_STRS, sect_elem: BUILDER_ELEM, value: ElementString) {
   if(value === undefined || value === null) {
     // the "null" element string
-    value = new ElementString();
+    value = new ElementString('');
   }
 
   const idx = sect_elem.strings.findIndex(v => value.isEqual(v._value));
@@ -74,20 +74,20 @@ export function alloc_element_string(sect_strs: BUILDER_STRS, sect_elem: BUILDER
 
   let str: BUILDER_ELEM_STRING = {
     _value: value,
-    _items: [],
+    items: [],
     length: value.length,
     offset: 0 // will be filled in later
   };
 
   for(let v of value) {
-    str._items.push({
+    str.items.push({
       // TODO: support UTF-32 char (!UnicodeSet)
       // TODO: support UnicodeSet properly
       element: alloc_string(sect_strs, v.value),
       flags: constants.elem_flags_unicode_set |
              v.flags |                                                             //
              ((v.order ?? 0) << constants.elem_flags_order_bitshift) |             // -128 to +127; used only by reorder element values
-             ((v.tertiary ?? 0) << constants.elem_flags_order_tertiary)            // -128 to +127; used only by reorder element values
+             ((v.tertiary ?? 0) << constants.elem_flags_tertiary_bitshift)            // -128 to +127; used only by reorder element values
     });
   }
 

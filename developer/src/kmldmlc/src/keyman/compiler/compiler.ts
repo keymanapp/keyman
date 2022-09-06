@@ -1,18 +1,25 @@
 import KMXPlusFile from '../kmx/kmx-plus';
 import LDMLKeyboardXMLSourceFile from '../ldml-keyboard/ldml-keyboard-xml';
 import LDMLKeyboardXMLSourceFileReader from '../ldml-keyboard/ldml-keyboard-xml-reader';
+import { BkspCompiler } from './bksp';
 import CompilerCallbacks from './callbacks';
 import { KeysCompiler } from './keys';
 import { LocaCompiler } from './loca';
 import { MetaCompiler } from './meta';
 import { NameCompiler } from './name';
+import { OrdrCompiler } from './ordr';
+import { FinlCompiler, TranCompiler } from './tran';
 import { VkeyCompiler } from './vkey';
 
 const SECTION_COMPILERS = [
+  BkspCompiler,
   KeysCompiler,
+  FinlCompiler,
   LocaCompiler,
   MetaCompiler,
   NameCompiler,
+  OrdrCompiler,
+  TranCompiler,
   VkeyCompiler
 ];
 
@@ -61,6 +68,7 @@ export default class Compiler {
     const kmx = new KMXPlusFile();
     for(let section of sections) {
       if(!section.validate()) {
+        //console.log(`failed to validate ${section.id}`);
         passed = false;
         // We'll keep validating other sections anyway, so we get a full set of
         // errors for the keyboard developer.
@@ -70,6 +78,7 @@ export default class Compiler {
       if(!sect) {
         // This should not really happen -- validate() should be telling us
         // if something is going to fail to compiler
+        //console.log(`failed to compile ${section.id}`);
         passed = false;
         continue;
       }
