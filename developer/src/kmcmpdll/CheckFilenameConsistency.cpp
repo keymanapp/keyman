@@ -91,7 +91,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissi
 
 #if defined(_WIN32) || defined(_WIN64)
   if (wcscmp(cptr1, fi.name) != 0) {            // _S2 if (wcscmp(Name, fi.name) != 0) {
-    u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", *cptr1, &fi.name);    // _S2 wsprintf(ErrExtra, "reference '%ls' does not match actual filename '%ls'", Name, fi.name);
+    //u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", *cptr1, &fi.name);    // _S2 wsprintf(ErrExtra, "reference '%ls' does not match actual filename '%ls'", Name, fi.name);
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
 #endif
