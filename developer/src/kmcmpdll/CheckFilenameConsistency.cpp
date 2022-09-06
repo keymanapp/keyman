@@ -8,7 +8,7 @@
 
 extern char CompileDir[MAX_PATH];
 /*
-BOOL FileExists(char const * filename) {
+bool FileExists(char const * filename) {
   _finddata_t fi;
   intptr_t n;
 
@@ -19,7 +19,7 @@ BOOL FileExists(char const * filename) {
   return FALSE;
 }
 */
-BOOL IsRelativePath(KMX_CHAR const * p) {
+bool IsRelativePath(KMX_CHAR const * p) {
   // Relative path (returns TRUE):
   //  ..\...\BITMAP.BMP
   //  PATH\BITMAP.BMP
@@ -34,7 +34,7 @@ BOOL IsRelativePath(KMX_CHAR const * p) {
   return TRUE;
 }
 
-BOOL IsRelativePath(KMX_WCHART const * p) {
+bool IsRelativePath(KMX_WCHART const * p) {
   // Relative path (returns TRUE):
   //  ..\...\BITMAP.BMP
   //  PATH\BITMAP.BMP
@@ -50,7 +50,7 @@ BOOL IsRelativePath(KMX_WCHART const * p) {
 }
 
 
-KMX_DWORD CheckFilenameConsistency(char const * Filename, BOOL ReportMissingFile) {
+KMX_DWORD CheckFilenameConsistency(char const * Filename, bool ReportMissingFile) {
   PKMX_WCHAR WFilename = strtowstr((char *)Filename);
   
   KMX_DWORD const result = CheckFilenameConsistency(u16fmt(WFilename).c_str(), ReportMissingFile);    // _S2KMX_DWORD const result = CheckFilenameConsistency(WFilename, ReportMissingFile);
@@ -58,12 +58,11 @@ KMX_DWORD CheckFilenameConsistency(char const * Filename, BOOL ReportMissingFile
   return result;
 }
 
-KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, BOOL ReportMissingFile) {  
-  KMX_CHAR ErrExtra[256];     // _S2
+KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissingFile) {
+  KMX_WCHAR ErrExtra[256];     // _S2
   KMX_WCHART Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
-  _wfinddata_t fi;
   intptr_t n;
-  
+
   if (IsRelativePath(Filename)) {
     PKMX_WCHAR WCompileDir = strtowstr(CompileDir);
     wcscpy_s(Name, _countof(Name), u16fmt(WCompileDir).c_str());  // I3481  // _S2    wcscpy_s(Name, _countof(Name), WCompileDir);  // I3481
@@ -72,21 +71,31 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, BOOL ReportMissi
   else {
     wcscpy_s(Name, _countof(Name), Filename);  // I3481
   }
-  
-  if ((n = _wfindfirst(Name, &fi)) == -1) {
+
+#if defined(_WIN32) || defined(_WIN64)
+  _wfinddata_t fi;
+  n = _wfindfirst(Name, &fi);
+#else
+  n= access(Name,F_OK);
+#endif
+
+  if (n == -1){
     if (ReportMissingFile) {
-      sprintf(ErrExtra, "referenced file '%ls'", Filename);    //_S2 wsprintf(ErrExtra, "referenced file '%ls'", Filename);
-      
+      u16sprintf(ErrExtra,_countof(ErrExtra),L"referenced file %ls",Filename); //_S2 wsprintf(ErrExtra, "referenced file '%ls'", Filename);   // right spfrintf fun?
       AddWarning(CWARN_MissingFile);
     }
     return CERR_None;
   }
-  _wsplitpath_s(Filename, nullptr, 0, nullptr, 0, FName, _MAX_FNAME, Ext, _MAX_EXT);
-  _wmakepath_s(Name, _MAX_PATH, nullptr, nullptr, FName, Ext);
-  if (wcscmp(Name, fi.name) != 0) {
-    sprintf(ErrExtra, "reference '%ls' does not match actual filename '%ls'", Name, fi.name);    // _S2 wsprintf(ErrExtra, "reference '%ls' does not match actual filename '%ls'", Name, fi.name);
+
+  const wchar_t* cptr1 = wcsrchr(Name, '\\');
+  cptr1++;
+
+#if defined(_WIN32) || defined(_WIN64)
+  if (wcscmp(cptr1, fi.name) != 0) {            // _S2 if (wcscmp(Name, fi.name) != 0) {
+    u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", *cptr1, &fi.name);    // _S2 wsprintf(ErrExtra, "reference '%ls' does not match actual filename '%ls'", Name, fi.name);
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
+#endif
   return CERR_None;
 }
 
