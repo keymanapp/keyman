@@ -19,12 +19,8 @@ std::wstring wstring_from_string(std::string const str) {
 }
 
 std::u16string u16string_from_string(std::string const str) {
-	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
-	std::u16string ret = 
-		converter.
-		from_bytes(str);
-	return ret;
-	//return converter.from_bytes(str);
+  std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+  return converter.from_bytes(str);
 }
 
 std::string string_from_u16string(std::u16string const str) {
@@ -40,8 +36,6 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
 	if(endptr != nullptr) *endptr = (KMX_WCHAR*) str + (t-s.c_str());
 	return result;
 }
-
-
 
 // _S2 use with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
 std::wstring u16fmt(const km_kbp_cp* str) {
