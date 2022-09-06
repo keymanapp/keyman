@@ -14,7 +14,7 @@ namespace wordBreakers {
       return [];
     }
 
-    // All non-empty strings have at least TWO boundaries at the start and end of
+    // All non-empty strings have at least TWO boundaries: at the start and at the end of
     // the string.
     let spans = [];
     for (let i = 0; i < boundaries.length - 1; i++) {
