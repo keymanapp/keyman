@@ -33,6 +33,18 @@ test-headless ( ) {
     _FLAGS="$_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
+  pushd "$KEYMAN_ROOT/common/models/wordbreakers"
+  npm run test || fail "models/wordbreakers tests failed"
+  popd
+
+  pushd "$KEYMAN_ROOT/common/models/templates"
+  npm run test || fail "models/templates tests failed"
+  popd
+
+  pushd "$KEYMAN_ROOT/common/models/types"
+  npm run test || fail "models/types tests failed"
+  popd
+
   npm run mocha -- --recursive $_FLAGS ./unit_tests/headless/*.js ./unit_tests/headless/**/*.js
 }
 
