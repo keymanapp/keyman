@@ -16,10 +16,10 @@ class TransformUtils {
   }
 
   static isBackspace(transform: Transform): boolean {
-    return transform.insert == "" && transform.deleteLeft > 0 && transform.deleteRight == 0;
+    return transform.insert == "" && transform.deleteLeft > 0 && !transform.deleteRight;
   }
 
   static isEmpty(transform: Transform): boolean {
-    return transform.insert == '' && transform.deleteLeft == 0 && transform.deleteRight == 0;
+    return transform.insert == '' && transform.deleteLeft == 0 && !transform.deleteRight;
   }
 }
