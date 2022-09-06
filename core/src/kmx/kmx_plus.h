@@ -34,6 +34,9 @@ namespace kmx {
 #pragma warning ( disable : 4200 )
 #endif
 
+/**
+ * Indicates an offset into the strs table (0 = zero length)
+ */
 typedef KMX_DWORD KMXPLUS_STR;
 
 struct COMP_KMXPLUS_HEADER {
