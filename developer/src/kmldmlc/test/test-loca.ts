@@ -22,8 +22,11 @@ describe('loca', function () {
     let loca = loadSectionFixture(LocaCompiler, 'sections/loca/multiple.xml', callbacks) as Loca;
 
     // Note: multiple.xml includes fr-FR twice, with differing case, which should be canonicalized
-    assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], CompilerErrors.OneOrMoreRepeatedLocales());
+    assert.equal(callbacks.messages.length, 4);
+    assert.deepEqual(callbacks.messages[0], CompilerErrors.LocaleIsNotMinimalAndClean('fr-FR','fr'));
+    assert.deepEqual(callbacks.messages[1], CompilerErrors.LocaleIsNotMinimalAndClean('km-khmr-kh', 'km'));
+    assert.deepEqual(callbacks.messages[2], CompilerErrors.LocaleIsNotMinimalAndClean('fr-fr', 'fr'));
+    assert.deepEqual(callbacks.messages[3], CompilerErrors.OneOrMoreRepeatedLocales());
 
     // Original is 6 locales, now five minimized in the results
     assert.equal(loca.locales.length, 5);

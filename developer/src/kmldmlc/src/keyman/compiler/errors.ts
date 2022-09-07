@@ -41,6 +41,10 @@ export class CompilerErrors {
     m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${errorText}`);
   static ERROR_InvalidFile = SevError | 0x0007;
 
+  static LocaleIsNotMinimalAndClean = (sourceLocale: string, locale: string) =>
+    m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${sourceLocale}' is not minimal or correctly formatted and should be '${locale}'`);
+  static HINT_LocaleIsNotMinimalAndClean = SevHint | 0x0008;
+
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;
     switch(severity) {
