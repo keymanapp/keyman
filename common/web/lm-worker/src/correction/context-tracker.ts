@@ -127,7 +127,6 @@ namespace correction {
       } else {
         this.searchSpace = [];
       }
-      token.newFlag = true;
       this.tokens.push(token);
 
       let state = this;
@@ -428,6 +427,7 @@ namespace correction {
             pushedToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
           }
 
+          pushedToken.newFlag = true;
           state.pushTail(pushedToken);
         } else { // We're editing the final context token.
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
@@ -448,6 +448,7 @@ namespace correction {
           let token = new TrackedContextToken();
           token.raw = tokenizedContext[0];
           token.transformDistributions = [transformDistribution];
+          token.newFlag = true;
           state.pushTail(token);
         } else { // Edit the lone context token.
           // Consider backspace entry for this case?
@@ -497,15 +498,11 @@ namespace correction {
         state.pushTail(token);
       }
 
-      for(let i = 0; i < state.tokens.length - 1; i++) {
-        state.tokens[i].newFlag = false;
-      }
-
       const finalToken = state.tokens[state.tokens.length - 1];
       const baseTransform = (transformDistribution && transformDistribution.length > 0) ? transformDistribution[0] : null;
 
-      if(!baseTransform || baseTransform.sample.insert != finalToken.raw) {
-        finalToken.newFlag = false;
+      if(baseTransform && baseTransform.sample.insert == finalToken.raw) {
+        finalToken.newFlag = true;
       }
 
       return state;
