@@ -4,9 +4,9 @@ import { VkeyCompiler } from '../src/keyman/compiler/vkey';
 import { CompilerCallbacks, loadSectionFixture } from './helpers';
 import { Vkey } from '../src/keyman/kmx/kmx-plus';
 import { CompilerMessages } from '../src/keyman/compiler/messages';
-import { USVirtualKeyCodes } from '../src/keyman/ldml-keyboard/us-virtual-keys';
+import { USVirtualKeyCodes } from '../src/keyman/ldml-keyboard/virtual-key-constants';
 
-describe('name', function () {
+describe('vkey compiler', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile minimal vkey data', function() {

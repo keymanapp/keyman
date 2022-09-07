@@ -1,7 +1,7 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { Keys } from '../kmx/kmx-plus';
 import * as LDMLKeyboard from '../ldml-keyboard/ldml-keyboard-xml';
-import { USVirtualKeyMap } from "../ldml-keyboard/us-virtual-keys";
+import { USVirtualKeyMap } from "../ldml-keyboard/virtual-key-constants";
 import { CompilerMessages } from './messages';
 
 import { SectionCompiler } from "./section-compiler";

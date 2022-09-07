@@ -1,6 +1,6 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { Vkey } from "../kmx/kmx-plus";
-import { LdmlVkeyNames } from "../ldml-keyboard/us-virtual-keys";
+import { LdmlVkeyNames } from "../ldml-keyboard/virtual-key-constants";
 import { CompilerMessages } from "./messages";
 import { SectionCompiler } from "./section-compiler";
 
