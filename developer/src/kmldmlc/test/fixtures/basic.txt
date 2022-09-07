@@ -14,13 +14,18 @@
 #    xxd -g 1 -l 12 /tmp/basic.kmx | cut -d' ' -f 10-13
 #    # rm /tmp/basic.kmx   # or you may wish to examine it in more detail
 #
+# To generate a binary file for comparison purposes:
+#
+#    node ../../../common/tools/hextobin/build/hextobin.js test/fixtures/basic.txt test/fixtures/basic-h.kmx
+#
+#
 
 block(kmxheader)  #  struct COMP_KEYBOARD {
   4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
 
   00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  62 78 ee 07      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  4c f9 ee bd      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
   00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
@@ -52,7 +57,7 @@ block(sect)                         #  struct COMP_KMXPLUS_SECT {
   73 65 63 74                       #    KMX_DWORD header.ident;   // 0000 Section name
   sizeof(sect)                      #    KMX_DWORD header.size;    // 0004 Section length
   diff(sect,eof)                    #    KMX_DWORD total;          // 0008 KMXPlus entire length
-  05 00 00 00                       #    KMX_DWORD count;          // 000C number of section headers
+  06 00 00 00                       #    KMX_DWORD count;          // 000C number of section headers
                                     #  };
   # Next sections are sect entries
   #    KMX_DWORD sect;           // 0010+ Section identity
@@ -72,6 +77,9 @@ block(sect)                         #  struct COMP_KMXPLUS_SECT {
 
   73 74 72 73
   diff(sect,strs)
+
+  76 6b 65 79
+  diff(sect,vkey)
 
 block(keys)                         # struct COMP_KMXPLUS_KEYS {
   6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
@@ -154,5 +162,14 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strKey2)             90 17 b6 17   block(x) 00 00                               # 'ថា'
 
 block(endstrs)                      # end of strs block
+
+block(vkey)                         # struct COMP_KMXPLUS_VKEY {
+  76 6b 65 79                       #   KMX_DWORD header.ident;   // 0000 Section name - vkey
+  sizeof(vkey)                      #   KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00                       #   KMX_DWORD count;          // 0008 Number of vkey maps
+  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
+
+  51 00 00 00    41 00 00 00        #   KMX_DWORD vkey;  KMX_DWORD target; // K_Q => K_A
+                                    # };
 
 block(eof)   # end of file

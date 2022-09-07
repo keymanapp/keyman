@@ -30,6 +30,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
 
     box(source?.keyboard, 'layerMaps');
     box(source?.keyboard?.names, 'name');
+    box(source?.keyboard?.vkeyMaps, 'vkeyMap');
     box(source?.keyboard?.keys, 'key');
     box(source?.keyboard?.locales, 'locale');
     if(source?.keyboard?.layerMaps) {
