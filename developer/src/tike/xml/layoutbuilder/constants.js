@@ -604,7 +604,8 @@ $(function() {
     "tablet-ipad-landscape": { "x": 829, "y": 299, "name": "iPad (landscape)" }, // 829x622 = iPad tablet box size; (97,101)-(926,723)
     "tablet-ipad-portrait": { "x": 605, "y": 300, "name": "iPad (portrait)" }, // 605x806 = iPad tablet box size; (98,94)-(703,900)
     "phone-iphone5-landscape": { "x": 731, "y": 196, "name": "iPhone 5 (landscape)" }, // 731x412 = iPhone box size; (144,39)-(875,451)
-    "phone-iphone5-portrait": { "x": 526, "y": 266, "name": "iPhone 5 (portrait)"}  // 528x936 = iPhone box size; (90,204)-(618,1040)
+    "phone-iphone5-portrait": { "x": 526, "y": 266, "name": "iPhone 5 (portrait)"}, // 528x936 = iPhone box size; (90,204)-(618,1040)
+    "desktop": { "x": 640, "y": 300, "name": "Desktop" },
   };
 
   this.keyMargin = 15;

@@ -613,6 +613,11 @@ body:not(.text-controls-in-toolbar) input#inpSubKeyCap {
   color: white;
 }
 
+#kbd.desktop .key-size {
+  /* the layout is fixed on desktop so key size is not useful */
+  display: none;
+}
+
 /* Position flick keys relative to the flick grid, by hand */
 
 #flick .key {

@@ -12,10 +12,7 @@ $(function() {
 
 
   this.getPresentation = function () {
-    var platform = $('#selPlatformPresentation').val();
-    //if(platform == 'tablet') return 'tablet-ipad';
-    //if(platform == 'phone') return 'phone-iphone5';
-    return platform;
+    return $('#selPlatformPresentation').val();
   }
 
   this.saveSelection = function() {
