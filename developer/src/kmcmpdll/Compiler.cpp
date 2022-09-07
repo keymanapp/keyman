@@ -64,6 +64,7 @@
                     23 Feb 2016 - mcdurdin - I4982 - Defined character constants cannot be referenced correctly in other stores
                     25 Oct 2016 - mcdurdin - I5135 - Remove product and licensing references from Developer projects
 */
+
 #include <pch.h>
 
 #include <compfile.h>
@@ -353,6 +354,7 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
   
   if (fp_in == NULL) SetError(CERR_InfileNotExist);                         //  _S2 if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
 
+
   // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
   // What about really large files?  Transfer to a temp file...
   fseek(fp_in, 0, SEEK_END);
@@ -380,13 +382,15 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
 //#if defined(_WIN32) || defined(_WIN64)
   //fp_out = _wfsopen(pszOutfile, L"wb", _SH_DENYWR);        //_S2 wchar_t* <-> char *
 //#else 
-   fp_out = fopen((const char*)pszOutfile,"wb");                                          //  _S2  hOutfile = CreateFileA(pszOutfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+   fp_out = fopen((const char*)pszOutfile,"wb");                                          //  hOutfile = CreateFileA(pszOutfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+
 //#endif
 
 
 
   
-  if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);                    //  _S2  if (hOutfile == INVALID_HANDLE_VALUE) SetError(CERR_CannotCreateOutfile);
+  if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);                    //  if (hOutfile == INVALID_HANDLE_VALUE) SetError(CERR_CannotCreateOutfile);
+
 
   KMX_DWORD msg;
   FILE_KEYBOARD fk;
@@ -754,9 +758,11 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   case T_COPYRIGHT:
     WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return CERR_InvalidCopyright;
+    if (!q) 
+      return CERR_InvalidCopyright;
 
-    if ((msg = AddStore(fk, TSS_COPYRIGHT, q)) != CERR_None) return msg;
+    if ((msg = AddStore(fk, TSS_COPYRIGHT, q)) != CERR_None) 
+      return msg;
     break;
 
   case T_MESSAGE:
@@ -3886,6 +3892,8 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
     fseek( fp_in,3,SEEK_SET);                     // SetFilePointer(hInfile, 3, NULL, FILE_BEGIN); // Cut off UTF-8 marker
     len -= 3;
   }
+  
+
 
   buf = new KMX_BYTE[len + 1];  // null terminated
   outbuf = new KMX_WCHAR[len + 1];
@@ -3896,7 +3904,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
     buf[len2] = 0;
     p = buf;
     poutbuf = outbuf;
-    if (hasPreamble) {
+      if (hasPreamble) {
           // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a
           // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
           ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
@@ -3918,6 +3926,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
           delete[] poutbuf;
         }
       }
+
       else {
         fwrite(outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2 , 1, fp_out);     //WriteFile(hOutfile, outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2, &len2, NULL);
       }
