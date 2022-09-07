@@ -4,7 +4,7 @@ export namespace data {
 /**
  * Valid values for a word break property.
  */
-export const enum WordBreakProperty {
+export const enum WordBreakProperty { // Scary bit:  this does not exist as an object at run-time!
   Other,
   LF,
   Newline,

@@ -62,12 +62,34 @@ namespace wordBreakers {
   }
 
   /**
+   * An abstraction supporting custom wordbreaker boundary rules.  While this doesn't provide
+   * support for more complex rules like WB4, WB15, or WB16, this is sufficient for all other
+   * default word-breaking rules.  Thus, this should cover the majority of cases requiring
+   * custom handling for specific languages.
+   *
+   * @see https://unicode.org/reports/tr29/#WB_Rule_Macros
+   */
+  export interface WordbreakerRule {
+    /**
+     * Indicates whether or not the rule applies in the specified context.
+     * @param context
+     */
+    match(context: BreakerContext): boolean;
+
+    /**
+     * Indicates whether or not the rule indicates a word boundary at the context's site when it matches.
+     */
+    breakIfMatch: boolean;
+  }
+
+  /**
    * Provides a useful presentation for wordbreaker's context for use in word-breaking rules.
    *
    * @see https://unicode.org/reports/tr29/#Word_Boundary_Rules
    */
   export class BreakerContext {
-    private  readonly text: string;
+    // Referenced by this object in order to facilitate `lookahead` maintenance.
+    private readonly text: string;
 
     /**
      * Represents the property of character immediately preceding `left`'s character.
@@ -163,7 +185,7 @@ namespace wordBreakers {
      * Return the value of the Word_Break property at the given string index.
      * @param pos position in the text.
      */
-     private wordbreakPropertyAt(pos: number) {
+    private wordbreakPropertyAt(pos: number) {
       if (pos < 0) {
         return WordBreakProperty.sot; // Always "start of string" before the string starts!
       } else if (pos >= this.text.length) {
@@ -216,11 +238,15 @@ namespace wordBreakers {
    *
    * @param text Text to find word boundaries in.
    */
-  function findBoundaries(text: string): number[] {
+  function findBoundaries(text: string, options?: WordbreakerRule[]): number[] {
     // WB1 and WB2: no boundaries if given an empty string.
     if (text.length === 0) {
       // There are no boundaries in an empty string!
       return [];
+    }
+
+    if(!options) {
+      options = [];
     }
 
     // This algorithm works by maintaining a sliding window of four SCALAR VALUES.
@@ -329,6 +355,22 @@ namespace wordBreakers {
       // See: https://unicode.org/reports/tr29/#WB_Rule_Macros
       const SET_AHLETTER   = [WordBreakProperty.ALetter,   WordBreakProperty.Hebrew_Letter];
       const SET_MIDNUMLETQ = [WordBreakProperty.MidNumLet, WordBreakProperty.Single_Quote];
+
+      // Start: Custom rules
+      let customMatch: boolean = false;
+      for(const rule of options) {
+        customMatch = rule.match(state);
+        if(customMatch) {
+          if(rule.breakIfMatch) {
+            boundaries.push(rightPos);
+          }
+          break; // as customMatch == true here, this will trigger the `continue` that follows.
+        }
+      }
+      if(customMatch) {
+        continue;
+      }
+      // End: Custom rules
 
       // WB5: Do not break between most letters.
       // if (isAHLetter(state.left) && isAHLetter(state.right))
