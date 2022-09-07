@@ -75,7 +75,6 @@
 #include <windows.h>
 #include <assert.h>
 #include <msctf.h>
-
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../../common/windows/cpp/include/registry.h"
 #include "../../../../common/windows/cpp/include/unicode.h"

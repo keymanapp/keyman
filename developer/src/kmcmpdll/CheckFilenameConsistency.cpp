@@ -57,7 +57,6 @@ bool IsRelativePath(KMX_WCHART const * p) {
   return TRUE;
 }
 
-
 KMX_DWORD CheckFilenameConsistency(char const * Filename, BOOL ReportMissingFile) {
   PKMX_WCHAR WFilename = strtowstr((char *)Filename);
   KMX_DWORD const result = CheckFilenameConsistency(u16fmt(WFilename).c_str(), ReportMissingFile);    // _S2 KMX_DWORD const result = CheckFilenameConsistency(WFilename, ReportMissingFile);

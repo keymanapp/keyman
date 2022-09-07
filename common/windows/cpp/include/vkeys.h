@@ -1,5 +1,4 @@
 #pragma once
-
 #include <km_types.h>
 
 extern  const KMX_UCHAR* VKeyNames[256];

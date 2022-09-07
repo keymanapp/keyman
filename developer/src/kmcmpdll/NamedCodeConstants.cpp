@@ -51,7 +51,7 @@ NamedCodeConstants::NamedCodeConstants()
   entries = NULL;
   nEntries_file = 0;
   entries_file = NULL;
-  reindex();        
+  reindex();
 }
 
 NamedCodeConstants::~NamedCodeConstants()

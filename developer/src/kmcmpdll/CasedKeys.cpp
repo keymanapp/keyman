@@ -26,7 +26,6 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   // We will rewrite this store with virtual keys
 
   PKMX_WCHAR p = sp->dpString;
-  
   PKMX_WCHAR buf = new KMX_WCHAR[u16len(p) * 5 + 1];  // extended keys are 5 units long, so this is the max length
   PKMX_WCHAR q = buf;
 
