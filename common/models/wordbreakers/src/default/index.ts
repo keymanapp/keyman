@@ -62,6 +62,121 @@ namespace wordBreakers {
   }
 
   /**
+   * Provides a useful presentation for wordbreaker's context for use in word-breaking rules.
+   *
+   * @see https://unicode.org/reports/tr29/#Word_Boundary_Rules
+   */
+  export class BreakerContext {
+    private  readonly text: string;
+
+    /**
+     * Represents the property of character immediately preceding `left`'s character.
+     */
+    readonly lookbehind: WordBreakProperty = WordBreakProperty.sot;
+
+    /**
+     * Represents the property of the character immediately preceding the potential word boundary.
+     */
+    readonly left:       WordBreakProperty = WordBreakProperty.sot;
+
+    /**
+     * Represents the property of the character immediately following the potential word boundary.
+     */
+    readonly right:      WordBreakProperty = WordBreakProperty.sot;
+
+    /**
+     * Represents the property of the character immediately following `right`'s character.
+     */
+    readonly lookahead:  WordBreakProperty;
+
+    /**
+     * Initializes the word-breaking context at the start of the word-breaker's boundary-detection
+     * algorithm.
+     * @param text          The text to be word-broken
+     * @param lookaheadPos  The position corresponding to `lookahead`.
+     */
+    constructor(text: string, lookaheadPos: number);
+    /**
+     * Used internally by the boundary-detection algorithm during context-shifting operations.
+     * @param text
+     * @param lookbehind
+     * @param left
+     * @param right
+     * @param lookahead
+     */
+    constructor(text: string,
+                lookbehind: WordBreakProperty,
+                left:       WordBreakProperty,
+                right:      WordBreakProperty,
+                lookahead:  WordBreakProperty);
+    constructor(text: string,
+                prop1:  WordBreakProperty | number,
+                prop2?: WordBreakProperty,
+                prop3?: WordBreakProperty,
+                prop4?: WordBreakProperty) {
+      this.text = text;
+
+      if(arguments.length == 2) {
+        this.lookahead = this.wordbreakPropertyAt(prop1);// prop1;
+      } else /*if(arguments.length == 5)*/ {
+        this.lookbehind = prop1 as WordBreakProperty;
+        this.left       = prop2 as WordBreakProperty;
+        this.right      = prop3 as WordBreakProperty;
+        this.lookahead  = prop4 as WordBreakProperty;
+      }
+    }
+
+    /**
+     * The general use-case when shifting boundary-check position if WB4 is not active.
+     * @param lookahead The WordBreakProperty for the character to become `lookahead`.
+     * @returns
+     */
+    public next(lookaheadPos: number): BreakerContext {
+      let newLookahead = this.wordbreakPropertyAt(lookaheadPos);
+      return new BreakerContext(this.text, this.left, this.right, this.lookahead, newLookahead);
+    }
+
+    /**
+     * Used for WB4:  when ignoring characters before an intervening linebreak, we
+     * replace `right` with the current `lookahead`, without affecting `lookbehind`
+     * or `left`.  A new `lookahead` is then needed.
+     * @param lookahead
+     * @returns
+     */
+    public ignoringRight(lookaheadPos: number) {
+      let newLookahead = this.wordbreakPropertyAt(lookaheadPos);
+      return new BreakerContext(this.text, this.lookbehind, this.left, this.lookahead, newLookahead);
+    }
+
+    /**
+     * Used for WB4:  when ignoring characters after an intervening linebreak, it's
+     * `lookahead` that gets replaced without shifting the other tracked properties.
+     * @param lookahead
+     * @returns
+     */
+    public ignoringLookahead(lookaheadPos: number) {
+      let newLookahead = this.wordbreakPropertyAt(lookaheadPos);
+      return new BreakerContext(this.text, this.lookbehind, this.left, this.right, newLookahead);
+    }
+
+    /**
+     * Return the value of the Word_Break property at the given string index.
+     * @param pos position in the text.
+     */
+     private wordbreakPropertyAt(pos: number) {
+      if (pos < 0) {
+        return WordBreakProperty.sot; // Always "start of string" before the string starts!
+      } else if (pos >= this.text.length) {
+        return WordBreakProperty.eot; // Always "end of string" after the string ends!
+      } else if (isStartOfSurrogatePair(this.text[pos])) {
+        // Surrogate pairs the next TWO items from the string!
+        return property(this.text[pos] + this.text[pos + 1]);
+      }
+      return property(this.text[pos]);
+    }
+  }
+
+  /**
    * Returns true when the chunk does not solely consist of whitespace.
    *
    * @param chunk a chunk of text. Starts and ends at word boundaries.
@@ -112,10 +227,7 @@ namespace wordBreakers {
     let rightPos: number;
     let lookaheadPos = 0; // lookahead, one scalar value to the right of right.
     // Before the start of the string is also the start of the string.
-    let lookbehind: WordBreakProperty;
-    let left = WordBreakProperty.sot;
-    let right = WordBreakProperty.sot;
-    let lookahead = wordbreakPropertyAt(0);
+    let state = new BreakerContext(text, lookaheadPos);
     // Count RIs to make sure we're not splitting emoji flags:
     let nConsecutiveRegionalIndicators = 0;
 
@@ -124,34 +236,33 @@ namespace wordBreakers {
       rightPos = lookaheadPos;
       lookaheadPos = positionAfter(lookaheadPos);
       // Shift all properties, one scalar value to the right.
-      [lookbehind, left, right, lookahead] =
-        [left, right, lookahead, wordbreakPropertyAt(lookaheadPos)];
+      state = state.next(lookaheadPos);
 
       // Break at the start and end of text, unless the text is empty.
       // WB1: Break at start of text...
-      if (left === WordBreakProperty.sot) {
+      if (state.left === WordBreakProperty.sot) {
         boundaries.push(rightPos);
         continue;
       }
       // WB2: Break at the end of text...
-      if (right === WordBreakProperty.eot) {
+      if (state.right === WordBreakProperty.eot) {
         boundaries.push(rightPos);
         break; // Reached the end of the string. We're done!
       }
       // WB3: Do not break within CRLF:
-      if (left === WordBreakProperty.CR && right === WordBreakProperty.LF)
+      if (state.left === WordBreakProperty.CR && state.right === WordBreakProperty.LF)
         continue;
       // WB3b: Otherwise, break after...
-      if (left === WordBreakProperty.Newline ||
-          left === WordBreakProperty.CR ||
-          left === WordBreakProperty.LF) {
+      if (state.left === WordBreakProperty.Newline ||
+          state.left === WordBreakProperty.CR ||
+          state.left === WordBreakProperty.LF) {
         boundaries.push(rightPos);
         continue;
       }
       // WB3a: ...and before newlines
-      if (right === WordBreakProperty.Newline ||
-          right === WordBreakProperty.CR ||
-          right === WordBreakProperty.LF) {
+      if (state.right === WordBreakProperty.Newline ||
+          state.right === WordBreakProperty.CR ||
+          state.right === WordBreakProperty.LF) {
         boundaries.push(rightPos);
         continue;
       }
@@ -163,7 +274,7 @@ namespace wordBreakers {
       // https://www.unicode.org/Public/emoji/12.0/emoji-zwj-sequences.txt
 
       // WB3d: Keep horizontal whitespace together
-      if (left === WordBreakProperty.WSegSpace && right == WordBreakProperty.WSegSpace)
+      if (state.left === WordBreakProperty.WSegSpace && state.right == WordBreakProperty.WSegSpace)
         continue;
 
       // WB4: Ignore format and extend characters
@@ -171,99 +282,99 @@ namespace wordBreakers {
       // See: Section 6.2: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
       // N.B.: The rule about "except after sot, CR, LF, and
       // Newline" already been by WB1, WB2, WB3a, and WB3b above.
-      while (right === WordBreakProperty.Format ||
-            right === WordBreakProperty.Extend ||
-            right === WordBreakProperty.ZWJ) {
+      while (state.right === WordBreakProperty.Format ||
+            state.right === WordBreakProperty.Extend ||
+            state.right === WordBreakProperty.ZWJ) {
         // Continue advancing in the string, as if these
         // characters do not exist. DO NOT update left and
         // lookbehind however!
         [rightPos, lookaheadPos] = [lookaheadPos, positionAfter(lookaheadPos)];
-        [right, lookahead] = [lookahead, wordbreakPropertyAt(lookaheadPos)];
+        state = state.ignoringRight(lookaheadPos);
       }
       // In ignoring the characters in the previous loop, we could
       // have fallen off the end of the string, so end the loop
       // prematurely if that happens!
-      if (right === WordBreakProperty.eot) {
+      if (state.right === WordBreakProperty.eot) {
         boundaries.push(rightPos);
         break;
       }
       // WB4 (continued): Lookahead must ALSO ignore these format,
       // extend, ZWJ characters!
-      while (lookahead === WordBreakProperty.Format ||
-            lookahead === WordBreakProperty.Extend ||
-            lookahead === WordBreakProperty.ZWJ) {
+      while (state.lookahead === WordBreakProperty.Format ||
+            state.lookahead === WordBreakProperty.Extend ||
+            state.lookahead === WordBreakProperty.ZWJ) {
         // Continue advancing in the string, as if these
         // characters do not exist. DO NOT update left and right,
         // however!
         lookaheadPos = positionAfter(lookaheadPos);
-        lookahead = wordbreakPropertyAt(lookaheadPos);
+        state = state.ignoringLookahead(lookaheadPos);
       }
 
       // WB5: Do not break between most letters.
-      if (isAHLetter(left) && isAHLetter(right))
+      if (isAHLetter(state.left) && isAHLetter(state.right))
         continue;
       // Do not break across certain punctuation
       // WB6: (Don't break before apostrophes in contractions)
-      if (isAHLetter(left) && isAHLetter(lookahead) &&
-        (right === WordBreakProperty.MidLetter || isMidNumLetQ(right)))
+      if (isAHLetter(state.left) && isAHLetter(state.lookahead) &&
+        (state.right === WordBreakProperty.MidLetter || isMidNumLetQ(state.right)))
         continue;
       // WB7: (Don't break after apostrophes in contractions)
-      if (isAHLetter(lookbehind) && isAHLetter(right) &&
-        (left === WordBreakProperty.MidLetter || isMidNumLetQ(left)))
+      if (isAHLetter(state.lookbehind) && isAHLetter(state.right) &&
+        (state.left === WordBreakProperty.MidLetter || isMidNumLetQ(state.left)))
         continue;
       // WB7a
-      if (left === WordBreakProperty.Hebrew_Letter && right === WordBreakProperty.Single_Quote)
+      if (state.left === WordBreakProperty.Hebrew_Letter && state.right === WordBreakProperty.Single_Quote)
         continue;
       // WB7b
-      if (left === WordBreakProperty.Hebrew_Letter && right === WordBreakProperty.Double_Quote &&
-          lookahead === WordBreakProperty.Hebrew_Letter)
+      if (state.left === WordBreakProperty.Hebrew_Letter && state.right === WordBreakProperty.Double_Quote &&
+          state.lookahead === WordBreakProperty.Hebrew_Letter)
         continue;
       // WB7c
-      if (lookbehind === WordBreakProperty.Hebrew_Letter && left === WordBreakProperty.Double_Quote &&
-          right === WordBreakProperty.Hebrew_Letter)
+      if (state.lookbehind === WordBreakProperty.Hebrew_Letter && state.left === WordBreakProperty.Double_Quote &&
+          state.right === WordBreakProperty.Hebrew_Letter)
         continue;
       // Do not break within sequences of digits, or digits adjacent to letters.
       // e.g., "3a" or "A3"
       // WB8
-      if (left === WordBreakProperty.Numeric && right === WordBreakProperty.Numeric)
+      if (state.left === WordBreakProperty.Numeric && state.right === WordBreakProperty.Numeric)
         continue;
       // WB9
-      if (isAHLetter(left) && right === WordBreakProperty.Numeric)
+      if (isAHLetter(state.left) && state.right === WordBreakProperty.Numeric)
         continue;
       // WB10
-      if (left === WordBreakProperty.Numeric && isAHLetter(right))
+      if (state.left === WordBreakProperty.Numeric && isAHLetter(state.right))
         continue;
       // Do not break within sequences, such as 3.2, 3,456.789
       // WB11
-      if (lookbehind === WordBreakProperty.Numeric && right === WordBreakProperty.Numeric &&
-        (left === WordBreakProperty.MidNum || isMidNumLetQ(left)))
+      if (state.lookbehind === WordBreakProperty.Numeric && state.right === WordBreakProperty.Numeric &&
+        (state.left === WordBreakProperty.MidNum || isMidNumLetQ(state.left)))
         continue;
       // WB12
-      if (left === WordBreakProperty.Numeric && lookahead === WordBreakProperty.Numeric &&
-          (right === WordBreakProperty.MidNum || isMidNumLetQ(right)))
+      if (state.left === WordBreakProperty.Numeric && state.lookahead === WordBreakProperty.Numeric &&
+          (state.right === WordBreakProperty.MidNum || isMidNumLetQ(state.right)))
         continue;
       // WB13: Do not break between Katakana
-      if (left === WordBreakProperty.Katakana && right === WordBreakProperty.Katakana)
+      if (state.left === WordBreakProperty.Katakana && state.right === WordBreakProperty.Katakana)
         continue;
       // Do not break from extenders (e.g., U+202F NARROW NO-BREAK SPACE)
       // WB13a
-      if ((isAHLetter(left) ||
-          left === WordBreakProperty.Numeric ||
-          left === WordBreakProperty.Katakana ||
-          left === WordBreakProperty.ExtendNumLet) &&
-          right === WordBreakProperty.ExtendNumLet)
+      if ((isAHLetter(state.left) ||
+          state.left === WordBreakProperty.Numeric ||
+          state.left === WordBreakProperty.Katakana ||
+          state.left === WordBreakProperty.ExtendNumLet) &&
+          state.right === WordBreakProperty.ExtendNumLet)
         continue;
       // WB13b
-      if ((isAHLetter(right) ||
-        right === WordBreakProperty.Numeric ||
-        right === WordBreakProperty.Katakana) && left === WordBreakProperty.ExtendNumLet)
+      if ((isAHLetter(state.right) ||
+        state.right === WordBreakProperty.Numeric ||
+        state.right === WordBreakProperty.Katakana) && state.left === WordBreakProperty.ExtendNumLet)
         continue;
 
       // WB15 & WB16:
       // Do not break within emoji flag sequences. That is, do not break between
       // regional indicator (RI) symbols if there is an odd number of RI
       // characters before the break point.
-      if (right === WordBreakProperty.Regional_Indicator) {
+      if (state.right === WordBreakProperty.Regional_Indicator) {
         // Emoji flags are actually composed of TWO scalar values, each being a
         // "regional indicator". These indicators correspond to Latin letters. Put
         // two of them together, and they spell out an ISO 3166-1-alpha-2 country
@@ -301,22 +412,6 @@ namespace wordBreakers {
       return pos + 1;
     }
 
-    /**
-     * Return the value of the Word_Break property at the given string index.
-     * @param pos position in the text.
-     */
-    function wordbreakPropertyAt(pos: number) {
-      if (pos < 0) {
-        return WordBreakProperty.sot; // Always "start of string" before the string starts!
-      } else if (pos >= text.length) {
-        return WordBreakProperty.eot; // Always "end of string" after the string ends!
-      } else if (isStartOfSurrogatePair(text[pos])) {
-        // Surrogate pairs the next TWO items from the string!
-        return property(text[pos] + text[pos + 1]);
-      }
-      return property(text[pos]);
-    }
-
     // Word_Break rule macros
     // See: https://unicode.org/reports/tr29/#WB_Rule_Macros
     function isAHLetter(prop: WordBreakProperty): boolean {
@@ -340,7 +435,7 @@ namespace wordBreakers {
    * Note that
    * @param character a scalar value
    */
-  function property(character: string): WordBreakProperty {
+  export function property(character: string): WordBreakProperty {
     // This MUST be a scalar value.
     // TODO: remove dependence on character.codepointAt()?
     let codepoint = character.codePointAt(0) as number;
@@ -383,6 +478,8 @@ namespace wordBreakers {
 // implementing a namespace, BUT we can manually make the
 // assignment and **declare** it as part of the namespace.
 wordBreakers['default'] = wordBreakers.default_;
+wordBreakers['unicodeProperty'] = wordBreakers.property;
 declare namespace wordBreakers {
   export { default_ as default };
+  export { property as unicodeProperty };
 }
