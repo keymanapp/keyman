@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.57 alpha 2022-09-07
+
+* fix(android/engine): Fix Backspace key to delete without errant subkeys (#7156)
+
 ## 16.0.56 alpha 2022-09-05
 
 * chore(linux): Fix ibus-keyman.postinst script (#7192)
