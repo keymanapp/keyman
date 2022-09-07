@@ -1,10 +1,11 @@
+
 #ifndef _NAMEDCODECONSTANTS_H
 #define _NAMEDCODECONSTANTS_H
 
 #define MAX_ENAME	128
 #define ALLOC_SIZE	256
 
-struct NCCENTRY_NEW
+struct NCCENTRY
 {
 	char16_t name[MAX_ENAME+1];
 	int code;
@@ -13,9 +14,9 @@ struct NCCENTRY_NEW
 class NamedCodeConstants
 {
 private:
-	NCCENTRY_NEW *entries_NEW;			// entries from &includecodes
-	NCCENTRY_NEW *entries_file_NEW;		// entries from store(myconst) x
-	int nEntries_NEW, nEntries_file_NEW;
+	NCCENTRY *entries;			// entries from &includecodes
+	NCCENTRY *entries_file;		// entries from store(myconst) x
+	int nEntries, nEntries_file;
 	int chrindexes_NEW[128];		 // A-Z, 0-9, -, _; simple index
 
 	int GetCode_IncludedCodes(const char16_t *codename);

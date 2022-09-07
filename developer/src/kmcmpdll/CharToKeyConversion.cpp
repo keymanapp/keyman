@@ -1,6 +1,5 @@
 
 #include "pch.h"
-
 #include <CharToKeyConversion.h>
 
 /* Following code lifted from syskbd.cpp and tweaked for compiler use. Todo: consolidate */
