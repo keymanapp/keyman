@@ -62,7 +62,57 @@ Then for `count` repetitions:
 
 This list is in sorted order based on the `sect` identifier.
 
-### C7043.2.2 `keys`—Keybag
+### C7043.2.2 `bksp`—Backspace transform
+
+See [C7043.2.11](#c7043211-tran-finl-and-bksptransforms).
+
+### C7043.2.3 `elem`—Transform and Reorder element strings
+
+| ∆ | Bits | Name     | Description                              |
+|---|------|----------|------------------------------------------|
+| 0 |  32  | ident    | `elem`                                   |
+| 4 |  32  | size     | int: Length of section                   |
+| 8 |  32  | count    | int: Number of element string entries    |
+|12 |  32  | reserved | padding                                  |
+
+Then for each element string:
+
+| ∆ | Bits | Name          | Description                                   |
+|---|------|---------------|-----------------------------------------------|
+|16+|  32  | offset        | off: Offset to element string                 |
+|20+|  32  | length        | int: Number of elements in element string     |
+
+The first entry in the element string list MUST be the null element string,
+which has zero length and zero offset.
+
+Each element string is made up of elements with the following item structure:
+
+| ∆ | Bits | Name      | Description                                              |
+|---|------|-----------|----------------------------------------------------------|
+| 0 |  32  | element   | str: output string OR UTF-32LE codepoint                 |
+| 4 |  32  | flags     | flags and order values                                   |
+
+- `element`: either a UnicodeSet stored in a `strs` section entry, or a UTF-32LE
+  codepoint; see also `unicode_set` flag.
+- `flags`: a 32-bit bitfield defined as below:
+
+  | Bit position | Meaning       | Description                      |
+  |--------------|---------------|----------------------------------|
+  |       0      | unicode_set   | `element` is 0: UTF-32LE, 1: str |
+  |       1      | tertiary_base | 1: tertiary_base is true         |
+  |       2      | prebase       | 1: prebase is true               |
+  |      3-15    | reserved      | reserved                         |
+  |     16-23    | order         | signed int: -128 to +127         |
+  |     24-31    | tertiary      | signed int: -128 to +127         |
+
+  For transforms, only `flags.unicode_set` will be used. The remaining flags are
+  used for reorders, `from` attribute only.
+
+### C7043.2.4 `finl`—Final transform
+
+See [C7043.2.11](#c7043211-tran-finl-and-bksptransforms).
+
+### C7043.2.5 `keys`—Keybag
 
 | ∆ | Bits | Name      | Description                              |
 |---|------|-----------|------------------------------------------|
@@ -96,7 +146,7 @@ For each key:
 - `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
   is a 32 bit index into the `strs` table. The string may be zero-length.
 
-### C7043.2.3 `loca`—Locales
+### C7043.2.6 `loca`—Locales
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
@@ -116,7 +166,7 @@ For each locale ID in `count`
 The first locale ID is always the primary locale identifier.  The rest of the
 locale IDs (starting at offset 16) are in sorted binary order.
 
-### C7043.2.4 `meta`—Metadata
+### C7043.2.7 `meta`—Metadata
 
 | ∆ | Bits | Name          | Description                         |
 |---|------|---------------|-------------------------------------|
@@ -138,7 +188,7 @@ The `settings` is a 32-bit bitfield as below:
 |       1      | transformFailure | transformFailure=omit        |
 |       2      | transformPartial | transformPartial=hide        |
 
-### C7043.2.5 `name`—Names
+### C7043.2.8 `name`—Names
 
 Defines the names of the keyboard as found in the source `<names>` element.
 While this section is optional in the binary format, in practice it will always
@@ -163,7 +213,27 @@ Note that the first name is repeated in the `meta` section. The remaining names
 are stored in source file order, and the semantic meaning of each name is not
 defined here.
 
-### C7043.2.6 `strs`—Strings
+### C7043.2.9 `ordr`—Reorders
+
+| ∆ | Bits | Name     | Description                              |
+|---|------|----------|------------------------------------------|
+| 0 |  32  | ident    | `ordr`                                   |
+| 4 |  32  | size     | int: Length of section                   |
+| 8 |  32  | count    | int: Number of reorders                  |
+|12 |  32  | reserved | padding                                  |
+
+For each reorder item:
+
+| ∆ | Bits | Name     | Description                                              |
+|---|------|----------|----------------------------------------------------------|
+|16+|  32  | elements | elem: string of elements, index into `elem` section      |
+|20+|  32  | before   | elem: look-behind required match, index into `elem`      |
+
+- `elements`: index into the `elem` section, coding `from`, `order`, `tertiary`,
+  `tertiary_base`, and `prebase` properties.
+- `before`: follows `transform/@before`
+
+### C7043.2.10 `strs`—Strings
 
 All strings are stored in the Strings section.
 
@@ -198,7 +268,44 @@ A distinction between zero-length string and optional should be avoided (e.g.
 the difference between "" and null in Javascript). If this is truly required, a
 separate flag field must be used to denote the difference.
 
-### C7043.2.7 `vkey`—VKey Map
+### C7043.2.11 `tran`, `finl`, and `bksp`—Transforms
+
+All three of these tables have the same format. and differ only in their
+identity. The simple transform table has the ident `tran`; the final transform
+table has the ident `finl`, and the backspaces table has the ident `bksp`.
+
+
+| ∆ | Bits | Name     | Description                              |
+|---|------|----------|------------------------------------------|
+| 0 |  32  | ident    | `tran` / `finl` / `bksp`                 |
+| 4 |  32  | size     | int: Length of section                   |
+| 8 |  32  | count    | int: Number of transforms                |
+|12 |  32  | reserved | padding                                  |
+
+
+The transforms are sorted in binary order based on the `from` field.
+
+For each transform:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|16+|  32  | from    | elem: combination of characters          |
+|20+|  32  | to      | str: output text                         |
+|24+|  32  | before  | elem: look-behind text (0 = omitted)     |
+|28+|  32  | flags   | int: per-transform flags                 |
+
+- `from`: the source text, index into `elem` section.
+- `to`: sequence of Unicode codepoints that replace `from`. May be the null
+  string for `bksp` entries.
+- `before`: optional look-behind text occurring before `from`, index into `elem`
+  section
+- `flags`: a 32-bit bitfield defined as below:
+
+  | Bit position | Meaning  |  Description         |
+  |--------------|----------|----------------------|
+  |       0      | error    | 1: `error="fail"`    |
+
+### C7043.2.12 `vkey`—VKey Map
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
@@ -219,6 +326,10 @@ For each key:
 - `vkey`: Is the standard vkey, 0-255
 - `target`: Is the target (resolved) vkey, 0-255.
 
-### C7043.2.8 Transforms and friends
+## TODO-LDML: various things that need to be completed here or fixed in-spec
 
-> TODO: transforms
+> * UnicodeSets
+> * spec: reference to `after` in reorders; various other @after refs
+> * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)
+> * spec: layerMaps.displayWidthInMm
+> * `keys.key.mod`: TODO define this.  0 for no modifiers.

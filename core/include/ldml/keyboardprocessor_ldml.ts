@@ -24,12 +24,18 @@
  */
 export type SectionIdent =
   'sect' |
+  'bksp' |
+  'elem' |
+  'finl' |
   'keys' |
   'loca' |
   'meta' |
   'name' |
+  'ordr' |
   'strs' |
+  'tran' |
   'vkey';
+
 
 type SectionMap = {
   [id in SectionIdent]: SectionIdent;
@@ -75,6 +81,116 @@ export const constants: Constants = {
     length_sect_item: 8,
 
     /* ------------------------------------------------------------------
+     * bksp section
+       ------------------------------------------------------------------ */
+
+    /**
+     * Minimum length of the 'bksp' section, not including entries
+     */
+    length_bksp: 16,
+    /**
+     *  Length of each item in the 'bksp' section variable part
+     */
+    length_bksp_item: 16,
+
+    /* ------------------------------------------------------------------
+     * elem section
+       ------------------------------------------------------------------ */
+
+    /**
+     * Minimum length of the 'elem' section, not including entries
+     */
+    length_elem: 16,
+    /**
+     *  Length of each elem string in the 'elem' section variable part
+     */
+    length_elem_item: 8,
+    /**
+     * Length of each element in an elem string
+     */
+    length_elem_item_element: 8,
+
+    /**
+     * bitwise or value for unicode_set in elem[elemstr][element].flags.
+     * If bit is 1, then 'element' is a UnicodeSet string.
+     * If bit is 0, then 'element' is a UTF-32LE codepoint
+     *
+     * `unicode_set = flags & elem_flags_unicode_set`
+     */
+    elem_flags_unicode_set:   0x00000001,
+
+    /**
+     * bitwise or value for tertiary_base in elem[elemstr][element].flags.
+     * If bit is 1, then tertiary_base is true.
+     * If bit is 0, then tertiary_base is false.
+     *
+     * Used only for `ordr`-type element strings.
+     *
+     * `tertiary_base = flags & elem_flags_tertiary_base`
+     */
+    elem_flags_tertiary_base: 0x00000002,
+
+    /**
+     * bitwise or value for tertiary_base in elem[elemstr][element].flags.
+     * If bit is 1, then prebase is true.
+     * If bit is 0, then prebase is false.
+     *
+     * Used only for `ordr`-type element strings.
+     *
+     * `prebase = flags & elem_flags_prebase`
+     */
+    elem_flags_prebase:       0x00000004,
+
+    /**
+     * bitwise mask for order in elem[elemstr][element].flags.
+     *
+     * Used only for `ordr`-type element strings. 1 byte signed integer.
+     *
+     * `order = (flags & elem_flags_order_mask) >> elem_flags_order_bitshift`
+     */
+    elem_flags_order_mask:    0x00FF0000,
+
+    /**
+     * bit shift for order in elem[elemstr][element].flags.
+     *
+     * Used only for `ordr`-type element strings.
+     *
+     * `order = (flags & elem_flags_order_mask) >> elem_flags_order_bitshift`
+     */
+    elem_flags_order_bitshift: 16,
+
+    /**
+     * bitwise mask for tertiary sort in elem[elemstr][element].flags.
+     *
+     * Used only for `ordr`-type element strings. 1 byte signed integer.
+     *
+     * `tertiary = (flags & elem_flags_tertiary_mask) >> elem_flags_tertiary_bitshift`
+     */
+    elem_flags_tertiary_mask: 0xFF000000,
+
+    /**
+     * bit shift for tertiary sort in elem[elemstr][element].flags.
+     *
+     * Used only for `ordr`-type element strings. 1 byte signed integer.
+     *
+     * `order = (flags & elem_flags_tertiary_mask) >> elem_flags_tertiary_bitshift`
+     */
+    elem_flags_tertiary_bitshift: 24,
+
+    /* ------------------------------------------------------------------
+     * finl section
+       ------------------------------------------------------------------ */
+
+    /**
+     * Minimum length of the 'finl' section, not including entries
+     */
+    length_finl: 16,
+    /**
+     *  Length of each item in the 'finl' section variable part
+     */
+    length_finl_item: 16,
+
+    /* ------------------------------------------------------------------
      * keys section
        ------------------------------------------------------------------ */
 
@@ -93,7 +209,7 @@ export const constants: Constants = {
      *
      * `extend = flags & keys_flags_extend`
      */
-     keys_flags_extend: 1,
+    keys_flags_extend: 1,
 
     /* ------------------------------------------------------------------
      * loca section
@@ -136,11 +252,24 @@ export const constants: Constants = {
     /**
      * Minimum length of the 'name' section not including variable parts
      */
-     length_name: 16,
-     /**
-      *  Length of each item in the 'name' section variable part
-      */
-     length_name_item: 4,
+    length_name: 16,
+    /**
+     *  Length of each item in the 'name' section variable part
+     */
+    length_name_item: 4,
+
+    /* ------------------------------------------------------------------
+     * ordr section
+       ------------------------------------------------------------------ */
+
+    /**
+     * Minimum length of the 'ordr' section, not including entries
+     */
+    length_ordr: 16,
+    /**
+     *  Length of each item in the 'ordr' section variable part
+     */
+    length_ordr_item: 8,
 
     /* ------------------------------------------------------------------
      * strs section
@@ -156,14 +285,29 @@ export const constants: Constants = {
     length_strs_item: 8,
 
     /* ------------------------------------------------------------------
+     * tran section
+       ------------------------------------------------------------------ */
+
+    /**
+     * Minimum length of the 'tran' section, not including entries
+     */
+    length_tran: 16,
+    /**
+     *  Length of each item in the 'tran' section variable part
+     */
+    length_tran_item: 16,
+
+    /* ------------------------------------------------------------------
      * vkey section
        ------------------------------------------------------------------ */
 
     /**
-     * Minimum length of the 'vkey' section
-     * not including variable parts
+     * Minimum length of the 'vkey' section not including variable parts
      */
     length_vkey: 16,
+    /**
+     *  Length of each item in the 'vkey' section variable part
+     */
     length_vkey_item: 8,
 
     /**
@@ -171,11 +315,16 @@ export const constants: Constants = {
      */
     section: {
         sect: 'sect',
+        bksp: 'bksp',
+        elem: 'elem',
+        finl: 'finl',
         keys: 'keys',
         loca: 'loca',
         meta: 'meta',
         name: 'name',
+        ordr: 'ordr',
         strs: 'strs',
+        tran: 'tran',
         vkey: 'vkey',
     },
 

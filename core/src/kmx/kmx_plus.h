@@ -38,6 +38,11 @@ namespace kmx {
  * Indicates an offset into the strs table (0 = zero length)
  */
 typedef KMX_DWORD KMXPLUS_STR;
+typedef KMX_DWORD KMXPLUS_ELEM;
+
+// forward declarations
+struct COMP_KMXPLUS_TRAN_ENTRY;
+struct COMP_KMXPLUS_TRAN;
 
 struct COMP_KMXPLUS_HEADER {
   KMX_DWORD ident;  // 0000 Section name
@@ -80,6 +85,53 @@ struct COMP_KMXPLUS_SECT {
 // Assert that the length matches the declared length
 static_assert(sizeof(struct COMP_KMXPLUS_SECT) == LDML_LENGTH_SECT, "mismatched size of section sect");
 static_assert(sizeof(struct COMP_KMXPLUS_SECT) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+
+/* ------------------------------------------------------------------
+ * bksp section
+   ------------------------------------------------------------------ */
+
+typedef COMP_KMXPLUS_TRAN_ENTRY COMP_KMXPLUS_BKSP_ENTRY;
+typedef COMP_KMXPLUS_TRAN COMP_KMXPLUS_BKSP;
+
+/* ------------------------------------------------------------------
+ * elem section
+   ------------------------------------------------------------------ */
+
+struct COMP_KMXPLUS_ELEM_ELEMENT {
+    KMX_DWORD element;                // str: output string or UTF-32LE codepoint
+    KMX_DWORD flags;                  // flag and order values
+};
+
+struct COMP_KMXPLUS_ELEM_ENTRY {
+    KMX_DWORD offset;                 // 0010+ offset from this blob
+    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
+};
+
+struct COMP_KMXPLUS_ELEM {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_ELEM;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count;                    // 0008 count of str entries
+  KMX_DWORD reserved;                 // 000C padding
+  COMP_KMXPLUS_ELEM_ENTRY entries[];  // 0010+ entries
+
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_ELEM) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_ELEM) == LDML_LENGTH_ELEM, "mismatched size of section elem");
+
+/* ------------------------------------------------------------------
+ * finl section
+   ------------------------------------------------------------------ */
+
+// TODO-LDML: IDENT
+typedef COMP_KMXPLUS_TRAN_ENTRY COMP_KMXPLUS_FINL_ENTRY;
+
+// TODO-LDML: IDENT
+typedef COMP_KMXPLUS_TRAN COMP_KMXPLUS_FINL;
 
 /* ------------------------------------------------------------------
  * keys section
@@ -177,6 +229,30 @@ static_assert(sizeof(struct COMP_KMXPLUS_NAME) % 0x10 == 0, "Structs prior to en
 static_assert(sizeof(struct COMP_KMXPLUS_NAME) == LDML_LENGTH_NAME, "mismatched size of section name");
 
 /* ------------------------------------------------------------------
+ * ordr section
+   ------------------------------------------------------------------ */
+
+struct COMP_KMXPLUS_ORDR_ENTRY {
+    KMXPLUS_ELEM elements;
+    KMXPLUS_ELEM before;
+};
+
+struct COMP_KMXPLUS_ORDR {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_ORDR;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count;
+  KMX_DWORD reserved;
+  COMP_KMXPLUS_ORDR_ENTRY entries[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_ORDR) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_ORDR) == LDML_LENGTH_ORDR, "mismatched size of section ordr");
+
+/* ------------------------------------------------------------------
  * strs section
    ------------------------------------------------------------------ */
 
@@ -209,6 +285,33 @@ struct COMP_KMXPLUS_STRS {
 
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched size of section strs");
+
+/* ------------------------------------------------------------------
+ * tran section
+   ------------------------------------------------------------------ */
+
+struct COMP_KMXPLUS_TRAN_ENTRY {
+    KMXPLUS_ELEM from;
+    KMXPLUS_STR to;
+    KMXPLUS_ELEM before;
+    KMX_DWORD flags;
+};
+
+
+struct COMP_KMXPLUS_TRAN {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_TRAN;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count;
+  KMX_DWORD reserved;
+  COMP_KMXPLUS_TRAN_ENTRY entries[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_TRAN) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_TRAN) == LDML_LENGTH_TRAN, "mismatched size of section tran");
 
 /* ------------------------------------------------------------------
  * vkey section
