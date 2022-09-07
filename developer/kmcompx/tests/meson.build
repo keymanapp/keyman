@@ -83,6 +83,7 @@ tests = [
 
 if build_machine.system() == 'windows'
   test_source = run_command('get_test_source_exclude_some_kmn.bat', check: true)
+  #test_source = run_command('get_test_source.bat', check: true)
 else
   test_source = run_command('get_test_source.sh', check: true)
 endif
