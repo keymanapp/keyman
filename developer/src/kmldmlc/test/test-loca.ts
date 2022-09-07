@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { LocaCompiler } from '../src/keyman/compiler/loca';
 import { CompilerCallbacks, loadSectionFixture } from './helpers';
 import { Loca } from '../src/keyman/kmx/kmx-plus';
-import { CompilerErrors } from '../src/keyman/compiler/errors';
+import { CompilerMessages } from '../src/keyman/compiler/messages';
 
 describe('loca', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
@@ -23,10 +23,10 @@ describe('loca', function () {
 
     // Note: multiple.xml includes fr-FR twice, with differing case, which should be canonicalized
     assert.equal(callbacks.messages.length, 4);
-    assert.deepEqual(callbacks.messages[0], CompilerErrors.LocaleIsNotMinimalAndClean('fr-FR','fr'));
-    assert.deepEqual(callbacks.messages[1], CompilerErrors.LocaleIsNotMinimalAndClean('km-khmr-kh', 'km'));
-    assert.deepEqual(callbacks.messages[2], CompilerErrors.LocaleIsNotMinimalAndClean('fr-fr', 'fr'));
-    assert.deepEqual(callbacks.messages[3], CompilerErrors.OneOrMoreRepeatedLocales());
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Hint_LocaleIsNotMinimalAndClean('fr-FR','fr'));
+    assert.deepEqual(callbacks.messages[1], CompilerMessages.Hint_LocaleIsNotMinimalAndClean('km-khmr-kh', 'km'));
+    assert.deepEqual(callbacks.messages[2], CompilerMessages.Hint_LocaleIsNotMinimalAndClean('fr-fr', 'fr'));
+    assert.deepEqual(callbacks.messages[3], CompilerMessages.Hint_OneOrMoreRepeatedLocales());
 
     // Original is 6 locales, now five minimized in the results
     assert.equal(loca.locales.length, 5);
@@ -44,7 +44,7 @@ describe('loca', function () {
     assert.equal(callbacks.messages.length, 1);
     // We'll only test one invalid BCP 47 tag to verify that we are properly calling BCP 47 validation routines.
     // Furthermore, we are testing BCP 47 structure, not the validity of each subtag -- we must assume the author knows of new subtags!
-    assert.deepEqual(callbacks.messages[0], CompilerErrors.InvalidLocale({tag:'en-*'}));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidLocale({tag:'en-*'}));
   })
 });
 

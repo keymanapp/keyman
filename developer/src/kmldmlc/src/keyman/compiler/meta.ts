@@ -1,7 +1,7 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KeyboardSettings, Meta, Meta_NormalizationForm } from "../kmx/kmx-plus";
 import { isValidEnumValue } from "../util/util";
-import { CompilerErrors } from "./errors";
+import { CompilerMessages } from "./messages";
 import { SectionCompiler } from "./section-compiler";
 import * as semver from "semver";
 
@@ -34,7 +34,7 @@ export class MetaCompiler extends SectionCompiler {
   private validateNormalization(normalization?: string) {
     if (normalization !== undefined) {
       if (!isValidEnumValue(Meta_NormalizationForm, normalization)) {
-        this.callbacks.reportMessage(CompilerErrors.InvalidNormalization({ form: normalization }));
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidNormalization({ form: normalization }));
         return false;
       }
     }

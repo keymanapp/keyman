@@ -2,7 +2,7 @@ import * as xml2js from 'xml2js';
 import LDMLKeyboardXMLSourceFile from './ldml-keyboard-xml';
 import CompilerCallbacks from '../compiler/callbacks';
 import Ajv from 'ajv';
-import { CompilerErrors } from '../compiler/errors';
+import { CompilerMessages } from '../compiler/messages';
 
 export default class LDMLKeyboardXMLSourceFileReader {
   private readonly callbacks: CompilerCallbacks;
@@ -49,7 +49,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
     const schema = JSON.parse(this.callbacks.loadLdmlKeyboardSchema().toString('utf8'));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
-      this.callbacks.reportMessage(CompilerErrors.InvalidFile(ajv.errorsText()));
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile(ajv.errorsText()));
       return null;
     }
     return source;
