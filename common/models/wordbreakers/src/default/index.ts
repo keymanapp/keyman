@@ -87,7 +87,7 @@ namespace wordBreakers {
     /**
      * Represents the property of the character immediately following `right`'s character.
      */
-    readonly lookahead:  WordBreakProperty;
+    readonly lookahead:  WordBreakProperty; // Always initialized by constructor.
 
     /**
      * Initializes the word-breaking context at the start of the word-breaker's boundary-detection
@@ -174,6 +174,25 @@ namespace wordBreakers {
       }
       return property(this.text[pos]);
     }
+
+    /**
+     * Returns `true` if and only if each member of the context has a property included within
+     * its corresponding set (when specified).  Any set may be replaced with null to disable
+     * a check against its corresponding property.
+     * @param lookbehindSet
+     * @param leftSet
+     * @param rightSet
+     * @param lookaheadSet
+     */
+    public match(lookbehindSet: WordBreakProperty[] | null,
+                 leftSet:       WordBreakProperty[] | null,
+                 rightSet:      WordBreakProperty[] | null,
+                 lookaheadSet:  WordBreakProperty[] | null) : boolean {
+      let result: boolean = lookbehindSet?.includes(this.lookbehind) ?? true;
+      result = result && (leftSet?.includes(this.left) ?? true);
+      result = result && (rightSet?.includes(this.right) ?? true);
+      return   result && (lookaheadSet?.includes(this.lookahead) ?? true);
+    }
   }
 
   /**
@@ -240,29 +259,28 @@ namespace wordBreakers {
 
       // Break at the start and end of text, unless the text is empty.
       // WB1: Break at start of text...
-      if (state.left === WordBreakProperty.sot) {
+      if (state.match(null, [WordBreakProperty.sot], null, null)) {
         boundaries.push(rightPos);
         continue;
       }
       // WB2: Break at the end of text...
-      if (state.right === WordBreakProperty.eot) {
+      if (state.match(null, null, [WordBreakProperty.eot], null)) {
         boundaries.push(rightPos);
         break; // Reached the end of the string. We're done!
       }
       // WB3: Do not break within CRLF:
-      if (state.left === WordBreakProperty.CR && state.right === WordBreakProperty.LF)
+      if (state.match(null, [WordBreakProperty.CR], [WordBreakProperty.LF], null)) {
         continue;
+      }
+
       // WB3b: Otherwise, break after...
-      if (state.left === WordBreakProperty.Newline ||
-          state.left === WordBreakProperty.CR ||
-          state.left === WordBreakProperty.LF) {
+      const NEWLINE_SET = [WordBreakProperty.Newline, WordBreakProperty.CR, WordBreakProperty.LF];
+      if(state.match(null, NEWLINE_SET, null, null)) {
         boundaries.push(rightPos);
         continue;
       }
       // WB3a: ...and before newlines
-      if (state.right === WordBreakProperty.Newline ||
-          state.right === WordBreakProperty.CR ||
-          state.right === WordBreakProperty.LF) {
+      if (state.match(null, null, NEWLINE_SET, null)) {
         boundaries.push(rightPos);
         continue;
       }
@@ -274,17 +292,17 @@ namespace wordBreakers {
       // https://www.unicode.org/Public/emoji/12.0/emoji-zwj-sequences.txt
 
       // WB3d: Keep horizontal whitespace together
-      if (state.left === WordBreakProperty.WSegSpace && state.right == WordBreakProperty.WSegSpace)
+      if (state.match(null, [WordBreakProperty.WSegSpace], [WordBreakProperty.WSegSpace], null)) {
         continue;
+      }
 
       // WB4: Ignore format and extend characters
       // This is to keep grapheme clusters together!
       // See: Section 6.2: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
       // N.B.: The rule about "except after sot, CR, LF, and
       // Newline" already been by WB1, WB2, WB3a, and WB3b above.
-      while (state.right === WordBreakProperty.Format ||
-            state.right === WordBreakProperty.Extend ||
-            state.right === WordBreakProperty.ZWJ) {
+      const SET_WB4_IGNORE = [WordBreakProperty.Format, WordBreakProperty.Extend, WordBreakProperty.ZWJ];
+      while (state.match(null, null, SET_WB4_IGNORE, null)) {
         // Continue advancing in the string, as if these
         // characters do not exist. DO NOT update left and
         // lookbehind however!
@@ -300,9 +318,7 @@ namespace wordBreakers {
       }
       // WB4 (continued): Lookahead must ALSO ignore these format,
       // extend, ZWJ characters!
-      while (state.lookahead === WordBreakProperty.Format ||
-            state.lookahead === WordBreakProperty.Extend ||
-            state.lookahead === WordBreakProperty.ZWJ) {
+      while (state.match(null, null, null, SET_WB4_IGNORE)) {
         // Continue advancing in the string, as if these
         // characters do not exist. DO NOT update left and right,
         // however!
@@ -310,65 +326,87 @@ namespace wordBreakers {
         state = state.ignoringLookahead(lookaheadPos);
       }
 
+      // See: https://unicode.org/reports/tr29/#WB_Rule_Macros
+      const SET_AHLETTER   = [WordBreakProperty.ALetter,   WordBreakProperty.Hebrew_Letter];
+      const SET_MIDNUMLETQ = [WordBreakProperty.MidNumLet, WordBreakProperty.Single_Quote];
+
       // WB5: Do not break between most letters.
-      if (isAHLetter(state.left) && isAHLetter(state.right))
+      // if (isAHLetter(state.left) && isAHLetter(state.right))
+      if(state.match(null, SET_AHLETTER, SET_AHLETTER, null)) {
         continue;
+      }
       // Do not break across certain punctuation
       // WB6: (Don't break before apostrophes in contractions)
-      if (isAHLetter(state.left) && isAHLetter(state.lookahead) &&
-        (state.right === WordBreakProperty.MidLetter || isMidNumLetQ(state.right)))
+      const SET_ALL_MIDLETTER = [WordBreakProperty.MidLetter, ...SET_MIDNUMLETQ];
+      if(state.match(null, SET_AHLETTER, SET_ALL_MIDLETTER, SET_AHLETTER)) {
         continue;
+      }
       // WB7: (Don't break after apostrophes in contractions)
-      if (isAHLetter(state.lookbehind) && isAHLetter(state.right) &&
-        (state.left === WordBreakProperty.MidLetter || isMidNumLetQ(state.left)))
+      if(state.match(SET_AHLETTER, SET_ALL_MIDLETTER, SET_AHLETTER, null)) {
         continue;
+      }
+
       // WB7a
-      if (state.left === WordBreakProperty.Hebrew_Letter && state.right === WordBreakProperty.Single_Quote)
+      if(state.match(null, [WordBreakProperty.Hebrew_Letter], [WordBreakProperty.Single_Quote], null)) {
         continue;
+      }
       // WB7b
-      if (state.left === WordBreakProperty.Hebrew_Letter && state.right === WordBreakProperty.Double_Quote &&
-          state.lookahead === WordBreakProperty.Hebrew_Letter)
+      if(state.match(null,
+                     [WordBreakProperty.Hebrew_Letter],
+                     [WordBreakProperty.Double_Quote],
+                     [WordBreakProperty.Hebrew_Letter])) {
         continue;
+      }
       // WB7c
-      if (state.lookbehind === WordBreakProperty.Hebrew_Letter && state.left === WordBreakProperty.Double_Quote &&
-          state.right === WordBreakProperty.Hebrew_Letter)
+      if(state.match([WordBreakProperty.Hebrew_Letter],
+                     [WordBreakProperty.Double_Quote],
+                     [WordBreakProperty.Hebrew_Letter],
+                     null)) {
         continue;
+      }
       // Do not break within sequences of digits, or digits adjacent to letters.
       // e.g., "3a" or "A3"
       // WB8
-      if (state.left === WordBreakProperty.Numeric && state.right === WordBreakProperty.Numeric)
+      if(state.match(null, [WordBreakProperty.Numeric], [WordBreakProperty.Numeric], null)) {
         continue;
+      }
       // WB9
-      if (isAHLetter(state.left) && state.right === WordBreakProperty.Numeric)
+      if(state.match(null, SET_AHLETTER, [WordBreakProperty.Numeric], null)) {
         continue;
+      }
       // WB10
-      if (state.left === WordBreakProperty.Numeric && isAHLetter(state.right))
+      if(state.match(null, [WordBreakProperty.Numeric], SET_AHLETTER, null)) {
         continue;
+      }
       // Do not break within sequences, such as 3.2, 3,456.789
       // WB11
-      if (state.lookbehind === WordBreakProperty.Numeric && state.right === WordBreakProperty.Numeric &&
-        (state.left === WordBreakProperty.MidNum || isMidNumLetQ(state.left)))
+      const SET_ALL_MIDNUM = [WordBreakProperty.MidNum, ...SET_MIDNUMLETQ];
+      if(state.match([WordBreakProperty.Numeric], SET_ALL_MIDNUM, [WordBreakProperty.Numeric], null)) {
         continue;
+      }
       // WB12
-      if (state.left === WordBreakProperty.Numeric && state.lookahead === WordBreakProperty.Numeric &&
-          (state.right === WordBreakProperty.MidNum || isMidNumLetQ(state.right)))
+      if(state.match(null, [WordBreakProperty.Numeric], SET_ALL_MIDNUM, [WordBreakProperty.Numeric])) {
         continue;
+      }
       // WB13: Do not break between Katakana
-      if (state.left === WordBreakProperty.Katakana && state.right === WordBreakProperty.Katakana)
+      if(state.match(null, [WordBreakProperty.Katakana], [WordBreakProperty.Katakana], null)) {
         continue;
+      }
       // Do not break from extenders (e.g., U+202F NARROW NO-BREAK SPACE)
       // WB13a
-      if ((isAHLetter(state.left) ||
-          state.left === WordBreakProperty.Numeric ||
-          state.left === WordBreakProperty.Katakana ||
-          state.left === WordBreakProperty.ExtendNumLet) &&
-          state.right === WordBreakProperty.ExtendNumLet)
+      const SET_NUM_KAT_LET = [WordBreakProperty.Katakana,
+                               WordBreakProperty.Numeric,
+                               ...SET_AHLETTER];
+      if(state.match(null, SET_NUM_KAT_LET, [WordBreakProperty.ExtendNumLet], null)) {
         continue;
+      }
+      if(state.match(null, [WordBreakProperty.ExtendNumLet], [WordBreakProperty.ExtendNumLet], null)) {
+        continue;
+      }
       // WB13b
-      if ((isAHLetter(state.right) ||
-        state.right === WordBreakProperty.Numeric ||
-        state.right === WordBreakProperty.Katakana) && state.left === WordBreakProperty.ExtendNumLet)
+      if(state.match(null, [WordBreakProperty.ExtendNumLet], SET_NUM_KAT_LET, null)) {
         continue;
+      }
 
       // WB15 & WB16:
       // Do not break within emoji flag sequences. That is, do not break between
@@ -410,18 +448,6 @@ namespace wordBreakers {
         return pos + 2;
       }
       return pos + 1;
-    }
-
-    // Word_Break rule macros
-    // See: https://unicode.org/reports/tr29/#WB_Rule_Macros
-    function isAHLetter(prop: WordBreakProperty): boolean {
-      return prop === WordBreakProperty.ALetter ||
-            prop === WordBreakProperty.Hebrew_Letter;
-    }
-
-    function isMidNumLetQ(prop: WordBreakProperty): boolean {
-      return prop === WordBreakProperty.MidNumLet ||
-            prop === WordBreakProperty.Single_Quote;
     }
   }
 
