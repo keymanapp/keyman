@@ -37,6 +37,10 @@ export class CompilerErrors {
     m(this.HINT_OneOrMoreRepeatedLocales, `After minimization, one or more locales is repeated and has been removed`);
   static HINT_OneOrMoreRepeatedLocales = SevHint | 0x0006;
 
+  static InvalidFile = (errorText: string) =>
+    m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${errorText}`);
+  static ERROR_InvalidFile = SevError | 0x0007;
+
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;
     switch(severity) {

@@ -29,6 +29,11 @@ export class CompilerCallbacks {
   reportMessage(event: CompilerEvent): void {
     this.messages.push(event);
   }
+  loadLdmlKeyboardSchema(): Buffer {
+    // Relative paths phooey!
+    return fs.readFileSync(path.join(__dirname, '..', '..', '..', '..', '..', '..',
+      'resources', 'standards-data', 'ldml-keyboards', 'techpreview', 'ldml-keyboard.schema.json'));
+  }
 }
 
 export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: CompilerCallbacks): Section {

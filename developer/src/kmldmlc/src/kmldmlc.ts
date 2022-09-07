@@ -46,6 +46,9 @@ class CompilerCallbacks {
   reportMessage(event: CompilerEvent): void {
     console.log(CompilerErrors.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
   }
+  loadLdmlKeyboardSchema(): Buffer {
+    return fs.readFileSync(path.join(__dirname, 'ldml-keyboard.schema.json'));
+  }
 }
 
 function compileKeyboard(inputFilename: string): Uint8Array {

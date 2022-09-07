@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc -b",
-    "test": "cd test && tsc -b && cd .. && mocha ",
+    "test": "cd test && tsc -b && cd .. && mocha",
     "prepublishOnly": "npm run build"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
@@ -19,6 +19,7 @@
     "kmldmlc": "build/src/kmldmlc.js"
   },
   "dependencies": {
+    "ajv": "^8.11.0",
     "commander": "^3.0.0",
     "crc-32": "^1.2.2",
     "restructure": "^3.0.0",
@@ -37,7 +38,9 @@
     "ts-node": "^9.1.1"
   },
   "mocha": {
-    "spec": "build/test/test-*.js"
+    "spec": "build/test/**/test-*.js",
+    "require": ["source-map-support/register"]
+
   },
   "repository": {
     "type": "git",

@@ -30,6 +30,8 @@ function compileKeyboard(inputFilename: string): Uint8Array {
 }
 
 describe('compiler-tests', function() {
+  this.slow(500); // 0.5 sec -- json schema validation takes a while
+
   it('should-build-fixtures', async function() {
     // Let's build basic.xml
     // It should match basic.kmx (built from basic.txt)
