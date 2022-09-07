@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <string>
 #include <km_types.h>
 #include <kmx/kmx_base.h>
 #include <kmx_file.h>
@@ -142,6 +143,12 @@ struct COMP_KMXPLUS_KEYS_ENTRY {
     KMX_DWORD mod;
     KMX_DWORD to;     // to may be KMXPLUS_STR or UTF32 char
     KMX_DWORD flags;
+    /**
+     * @brief Get the 'to' as a string, if not EXTEND
+     *
+     * @return std::u16string
+     */
+    std::u16string get_string() const;
 };
 
 struct COMP_KMXPLUS_KEYS {
@@ -276,7 +283,7 @@ struct COMP_KMXPLUS_STRS {
    * @param bufsiz buffer size in bytes
    * @return nullptr or a pointer to the output buffer
    */
-  PKMX_WCHAR get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz) const;
+  std::u16string get(KMX_DWORD entry) const;
   /**
    * @brief True if section is valid.
    */
