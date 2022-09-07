@@ -46,9 +46,9 @@ namespace kbp
 
     virtual km_kbp_status
     external_event(
-      km_kbp_state* state,
-      uint32_t event,
-      void* data
+      km_kbp_state* _kmn_unused(state),
+      uint32_t _kmn_unused(event),
+      void* _kmn_unused(data)
     ) {
       return KM_KBP_STATUS_OK;
     }
