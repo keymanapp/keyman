@@ -41,6 +41,7 @@ interface BUILDER_META extends BUILDER_SECTION {
   layout: number; //str
   normalization: number; //str
   indicator: number; //str
+  version: number; //str
   settings: number; //bitfield
 };
 
@@ -100,7 +101,7 @@ export default class KMXPlusBuilder {
       }
     }
 
-    let idx = this.sect_strs.items.findIndex(v => v._value == value);
+    let idx = this.sect_strs.items.findIndex(v => v._value === value);
     if(idx >= 0) {
       return idx;
     }
@@ -147,6 +148,7 @@ export default class KMXPlusBuilder {
       layout: this.alloc_string(this.file.kmxplus.meta.layout),
       normalization: this.alloc_string(this.file.kmxplus.meta.normalization),
       indicator: this.alloc_string(this.file.kmxplus.meta.indicator),
+      version: this.alloc_string(this.file.kmxplus.meta.version),
       settings: this.file.kmxplus.meta.settings ?? 0,
     };
   }

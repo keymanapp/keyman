@@ -25,6 +25,7 @@ export class Meta extends Section {
   layout: string;
   normalization: Meta_NormalizationForm;
   indicator: string;
+  version: string; // semver version string, defaults to "0"
   settings: KeyboardSettings;
 };
 
@@ -133,6 +134,7 @@ export default class KMXPlusFile extends KMXFile {
       layout: r.uint32le, //str
       normalization: r.uint32le, //str
       indicator: r.uint32le, //str
+      version: r.uint32le, //str
       settings: r.uint32le, //new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
     });
 

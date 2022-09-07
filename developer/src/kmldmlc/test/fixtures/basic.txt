@@ -3,7 +3,7 @@ block(kmxheader)  #  struct COMP_KEYBOARD {
 
   00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  fc 29 af f8      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  13 06 7c 19      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
   00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
@@ -53,7 +53,7 @@ block(sect)        #  struct COMP_KMXPLUS_SECT {
 block(strs)          #  struct COMP_KMXPLUS_STRS {
   73 74 72 73        #    KMX_DWORD header.ident;   // 0000 Section name - strs
   diff(strs,endstrs) #    KMX_DWORD header.size;    // 0004 Section length
-  09 00 00 00        #    KMX_DWORD count;          // 0008 count of str entries
+  0A 00 00 00        #    KMX_DWORD count;          // 0008 count of str entries
   00 00 00 00        #    KMX_DWORD reserved;       // 000C padding
 
   # Next sections are string entries
@@ -66,6 +66,7 @@ block(strs)          #  struct COMP_KMXPLUS_STRS {
   diff(strs,strLayout)     sizeof(strLayout,2)
   diff(strs,strNorm)       sizeof(strNorm,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
+  diff(strs,strVersion)    sizeof(strVersion,2)
   diff(strs,strLocale)     sizeof(strLocale,2)
   diff(strs,strKey1)       sizeof(strKey1,2)
   diff(strs,strKey2)       sizeof(strKey2,2)
@@ -81,6 +82,7 @@ block(strConformsTo)       74 00 65 00 63 00 68 00 70 00 72 00 65 00 76 00
 block(strLayout)           71 00 77 00 65 00 72 00 74 00 79 00   block(x) 00 00       # 3:qwerty
 block(strNorm)             4e 00 46 00 43 00   block(x) 00 00                         # 4:NFC
 block(strIndicator)        3d d8 40 de   block(x) 00 00                               # 5:🙀
+block(strVersion)          30 00   block(x) 00 00                                     # 6:0
 block(strLocale)           6d 00 74 00   block(x) 00 00                               # 7:mt
 block(strKey1)             27 01   block(x) 00 00                                     # 8:ħ
 block(strKey2)             90 17 b6 17   block(x) 00 00                               # 9:ថា
@@ -96,6 +98,7 @@ block(meta)        # struct COMP_KMXPLUS_META {
   03 00 00 00      #   KMX_DWORD layout;
   04 00 00 00      #   KMX_DWORD normalization;
   05 00 00 00      #   KMX_DWORD indicator;
+  06 00 00 00      #   KMX_DWORD version;
   00 00 00 00      #   KMX_DWORD settings;
                    # };
 
@@ -104,7 +107,7 @@ block(loca)        # struct COMP_KMXPLUS_LOCA {
   sizeof(loca)     #    KMX_DWORD header.size;    // 0004 Section length
   01 00 00 00      #    KMX_DWORD count; // 0008 number of locales
   00 00 00 00      #    KMX_DWORD reserved;
-  06 00 00 00      #    KMX_DWORD locale; // 0010+ locale string entry = 'mt'
+  07 00 00 00      #    KMX_DWORD locale; // 0010+ locale string entry = 'mt'
                    # };
 
 block(keys)        # struct COMP_KMXPLUS_KEYS {
@@ -116,7 +119,7 @@ block(keys)        # struct COMP_KMXPLUS_KEYS {
 
 # Keys data:
 
-  c0 00 00 00  00 00 00 00  07 00 00 00  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
-  31 00 00 00  00 00 00 00  08 00 00 00  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
+  c0 00 00 00  00 00 00 00  08 00 00 00  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
+  31 00 00 00  00 00 00 00  09 00 00 00  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
 
 block(eof)   # end of file

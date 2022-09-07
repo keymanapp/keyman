@@ -23,6 +23,7 @@
     "commander": "^3.0.0",
     "crc-32": "^1.2.2",
     "restructure": "^3.0.0",
+    "semver": "^7.3.7",
     "typescript": "^4.5.4",
     "xml2js": "^0.4.19"
   },
@@ -39,8 +40,9 @@
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",
-    "require": ["source-map-support/register"]
-
+    "require": [
+      "source-map-support/register"
+    ]
   },
   "repository": {
     "type": "git",
