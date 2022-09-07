@@ -63,46 +63,27 @@
                     06 Nov 2015 - mcdurdin - I4914 - kmcmpdll does not pick an index() statement that has an offset one past the key
                     23 Feb 2016 - mcdurdin - I4982 - Defined character constants cannot be referenced correctly in other stores
                     25 Oct 2016 - mcdurdin - I5135 - Remove product and licensing references from Developer projects
-
-                       nov 2021 - S - exchanged DataTypes in easy context
-                       nov 2021 - S - doubled all functions fun() to  KMX_fun()
-                       dec 2021 - S - overloaded some KMX_fun() + cast datatypes to use old + new version of datatypes in KMX_fun()
-                       jan 2022 - S - structs in kmcompx/include/Compiler.h
-                       jan 2022 - S - removed several overloaded KMX_fun() as only new versions of those KMX_fun() are used
-                       jan 2022 - S - KMX_fun() using HANDLE
-                       apr 2022 - S - check for unused parameters in own functions
-                       may 2022  - S - adress LNK 2019, LNK 1120
-
-                       TODO - S - DebugLog() does not work, can`t be included ( tried to include .h-Files of Folder /developer/kmcompx/include/XX )
-                       TODO - S - remove references to windows.h
-                       TODO - S - run other ( ~700 tests)
-                       TODO - S - if all is OK: remove old fun(), leave only KMX_fun(), rename again to fun()
-
-                       TODO - S - use CheckfilenameConsistency
-                       TODO - S - Why do I get LNK-Error when I #include some .h but works fine with .cpp ???
-
-
-
-
 */
-#pragma once
-
 #include <pch.h>
+
 #include <compfile.h>
-//#include <compiler.h>
 #include <comperr.h>
 #include <../../../common/windows/cpp/include/vkeys.h>
 #include <cuchar>
 #include <versioning.h>
 #include <kmcmpdll.h>
 #include <DeprecationChecks.h>
+
 #include <virtualcharkeys.h>
+
 #include <../../../common/windows/cpp/include/crc32.h>
 #include <../../../common/windows/cpp/include/ConvertUTF.h>
 #include <debugstore.h>
 #include <namedcodeconstants.h>
 #include <../../../common/windows/cpp/include/unicode.h>
+
 #include <edition.h>
+
 #include <CharToKeyConversion.h>
 #include <CasedKeys.h>
 #include <vector>
@@ -113,21 +94,24 @@
 #include <CheckForDuplicates.h>
 #include <kmx_u16.h>
 
-enum KMX_LinePrefixType { KMX_lptNone, KMX_lptKeymanAndKeymanWeb, KMX_lptKeymanWebOnly, KMX_lptKeymanOnly, KMX_lptOther };
-
 int xatoi(PKMX_WCHAR *p);
 int atoiW(PKMX_WCHAR p);
 void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax);
+
 int UTF32ToUTF16(int n, int *n1, int *n2);
 int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p);
+
 KMX_BOOL IsValidCallStore(PFILE_STORE fs);
 KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
+
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 int LineTokenType(PKMX_WCHAR *str);
+
 KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str);
+
 KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk);
 KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
@@ -136,9 +120,14 @@ KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode);
 KMX_DWORD ProcessEthnologueStore(PKMX_WCHAR p);
 KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk);
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf);
+
 KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex);
+
+KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess);
+
 KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out);
 KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk);
+
 int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk);
 KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID= NULL);
@@ -146,6 +135,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 void RecordDeadkeyNames(PFILE_KEYBOARD fk);
 KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk);
 KMX_BOOL CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
+
 KMX_DWORD process_if(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
 KMX_DWORD process_reset(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
 KMX_DWORD process_set(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
@@ -154,17 +144,12 @@ KMX_DWORD process_platform(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, i
 KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
 KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
 KMX_DWORD process_expansion(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx, int max);
+
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
-KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess);
+
 FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble);
 
-//**************************************************
-//**************************************************
-
-enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeymanOnly, lptOther };
-
-
-KMX_WCHAR const * LineTokens[] = {
+const KMX_WCHAR * LineTokens[] = {
    u"SVNBHBGMNSCCLLCMLB",  u"store",  u"VERSION ",  u"NAME ",
    u"BITMAP ",  u"HOTKEY ",  u"begin",  u"group",  u"match",  u"nomatch",
    u"SHIFT FREES CAPS",  u"CAPS ON ONLY",  u"CAPS ALWAYS OFF",
@@ -174,7 +159,7 @@ KMX_WCHAR const * LineTokens[] = {
 #define SSN__PREFIX		u"&"      // _S2  #define SSN__PREFIX		L"&"
 
 
-KMX_WCHAR const * StoreTokens[TSS__MAX + 2] = {
+const KMX_WCHAR * StoreTokens[TSS__MAX + 2] = {
   u"",
   SSN__PREFIX u"BITMAP",
   SSN__PREFIX u"COPYRIGHT",
@@ -222,8 +207,9 @@ KMX_WCHAR const * StoreTokens[TSS__MAX + 2] = {
   NULL
 };
 
-
 static_assert(_countof(StoreTokens) == TSS__MAX + 2, "StoreTokens should have exactly TSS__MAX+2 elements");
+
+enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeymanOnly, lptOther };
 
 /* Compile target */
 
@@ -245,17 +231,14 @@ int CompileTarget;
 #define CKF_KEYMAN    0
 #define CKF_KEYMANWEB 1
 
-KMX_WCHAR const * DeadKeyChars =
-u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
-
 KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved)
 {
   if (fdwReason == DLL_PROCESS_ATTACH) g_hInstance = hinst;
   return TRUE;
 }
 
-
-PKMX_WCHAR strtowstr(PKMX_STR in) {
+PKMX_WCHAR strtowstr(PKMX_STR in) 
+{
   PKMX_WCHAR result;
 
   auto c = u16string_from_string(in);
@@ -265,7 +248,8 @@ PKMX_WCHAR strtowstr(PKMX_STR in) {
   return result;
 }
 
-PKMX_STR wstrtostr(PKMX_WCHAR in) {
+PKMX_STR wstrtostr(PKMX_WCHAR in) 
+{
   PKMX_STR result;
 
   auto c = string_from_u16string(in);
@@ -274,7 +258,6 @@ PKMX_STR wstrtostr(PKMX_WCHAR in) {
   strcpy(result, c.c_str());
   return result;
 }
-
 
 KMX_BOOL AddCompileString(LPSTR buf)
 {
@@ -315,12 +298,12 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg)
 
 typedef struct _COMPILER_OPTIONS {
   KMX_DWORD dwSize;
-  BOOL ShouldAddCompilerVersion;
+  bool ShouldAddCompilerVersion;
 } COMPILER_OPTIONS;
 
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 
-extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
+extern "C" KMX_BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
   }
@@ -358,36 +341,52 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
 
   msgproc = pMsgProc;
   currentLine = 0;
-  nErrors = 0;
-
-  fp_in = fopen((const char*)pszInfile,"rb");                                            // hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-  if (fp_in == NULL) SetError(CERR_InfileNotExist);                         // if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
+  nErrors = 0;   
+    
+  // _S2 file is char*
+//#if defined(_WIN32) || defined(_WIN64)
+   //fp_in = _wfsopen((const wchar_t*)pszInfile, L"rb", _SH_DENYWR);                     //_S2 hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+//#else
+  fp_in = fopen((const char*)pszInfile,"rb");                                            // _S2  hInfile = CreateFileA(pszInfile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL); 
+//#endif
+  
+  
+  if (fp_in == NULL) SetError(CERR_InfileNotExist);                         //  _S2 if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
 
   // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
   // What about really large files?  Transfer to a temp file...
   fseek(fp_in, 0, SEEK_END);
   len = ftell(fp_in);
   fseek(fp_in, 0, SEEK_SET);
-  if( !fread(str,1,3,fp_in))                                               //if (!ReadFile(hInfile, str, 3, &len, NULL))
+  if( !fread(str,1,3,fp_in))                                               // _S2 if (!ReadFile(hInfile, str, 3, &len, NULL))
   {
-    fclose(fp_in);                                                           //CloseHandle(hInfile);
+    fclose(fp_in);                                                           // _S2 CloseHandle(hInfile);
     return CERR_CannotReadInfile;
   }
 
-  fseek( fp_in,0,SEEK_SET);                                                   //SetFilePointer(hInfile, 0, NULL, FILE_BEGIN);
+  fseek( fp_in,0,SEEK_SET);                                                   // _S2 SetFilePointer(hInfile, 0, NULL, FILE_BEGIN);
   if (str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
-    fp_in = UTF16TempFromUTF8(fp_in, TRUE);                               // hInfile = UTF16TempFromUTF8(hInfile, TRUE);
+    fp_in = UTF16TempFromUTF8(fp_in, TRUE);                               //  _S2 hInfile = UTF16TempFromUTF8(hInfile, TRUE);
   else if (str[0] == UTF16Sig[0] && str[1] == UTF16Sig[1])
-   fseek( fp_in,2,SEEK_SET);                                                  // SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
+   fseek( fp_in,2,SEEK_SET);                                                  //  _S2 SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
   else
-    fp_in = UTF16TempFromUTF8(fp_in, FALSE)   ;                           // hInfile = UTF16TempFromUTF8(hInfile, FALSE);  // Will fall back to ansi for invalid UTF-8
-  if (fp_in  == NULL)                                                         //if (hInfile == INVALID_HANDLE_VALUE)   // I3228   // I3510
+    fp_in = UTF16TempFromUTF8(fp_in, FALSE)   ;                           // _S2  hInfile = UTF16TempFromUTF8(hInfile, FALSE);  // Will fall back to ansi for invalid UTF-8
+  if (fp_in  == NULL)                                                         // _S2 if (hInfile == INVALID_HANDLE_VALUE)   // I3228   // I3510
   {
     return CERR_CannotCreateTempfile;
   }
 
-   fp_out = fopen((const char*)pszOutfile,"wb");                                          //  hOutfile = CreateFileA(pszOutfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
-  if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);                    //  if (hOutfile == INVALID_HANDLE_VALUE) SetError(CERR_CannotCreateOutfile);
+// pszOutfile is char*
+//#if defined(_WIN32) || defined(_WIN64)
+  //fp_out = _wfsopen(pszOutfile, L"wb", _SH_DENYWR);        //_S2 wchar_t* <-> char *
+//#else 
+   fp_out = fopen((const char*)pszOutfile,"wb");                                          //  _S2  hOutfile = CreateFileA(pszOutfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+//#endif
+
+
+
+  
+  if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);                    //  _S2  if (hOutfile == INVALID_HANDLE_VALUE) SetError(CERR_CannotCreateOutfile);
 
   KMX_DWORD msg;
   FILE_KEYBOARD fk;
@@ -402,14 +401,14 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
   else
     AddCompileMessage(CERR_InvalidValue);
 
-  fclose(fp_in);                                                              //CloseHandle(hInfile);
-  fclose(fp_out);                                                             //CloseHandle(hOutfile);
+  fclose(fp_in);                                                              // _S2 CloseHandle(hInfile);
+  fclose(fp_out);                                                             // _S2 CloseHandle(hOutfile);
 
   delete CodeConstants;
 
   if (nErrors > 0)
   {
-    remove(pszOutfile);                                                       //DeleteFile(pszOutfile);
+    remove(pszOutfile);                                                       // _S2 DeleteFile(pszOutfile);
     return FALSE;
   }
 
@@ -418,7 +417,7 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
 
 extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
 {
-  FILE* fp_in =NULL;                                                          //HANDLE hInfile = INVALID_HANDLE_VALUE;
+  FILE* fp_in =NULL;                                                          // _S2 HANDLE hInfile = INVALID_HANDLE_VALUE;
   KMX_BOOL err;
   KMX_DWORD len;
   KMX_DWORD len2;
@@ -438,14 +437,22 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PKMX_STR p
     strncpy_s(CompileDir, _countof(CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
     CompileDir[(INT_PTR)(p - pszInfile + 1)] = 0;
   }
-   else
+  else
     CompileDir[0] = 0;
 
   msgproc = pMsgProc;
   currentLine = 0;
   nErrors = 0;
 
+// pszInfile is char*
+//#if defined(_WIN32) || defined(_WIN64)
+  //fp_in = _wfsopen(pszInfile, L"rb", _SH_DENYWR);        //_S2 wchar_t* <-> char *
+//#else
   fp_in = fopen(pszInfile,"rb");                                                         //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+ //#endif
+
+
+
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);                                      // if (hInfile == INVALID_HANDLE_VALUE) SetError(CERR_InfileNotExist);
 
@@ -494,6 +501,7 @@ void GetVersionInfo(KMX_DWORD *VersionMajor, KMX_DWORD *VersionMinor)
 KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
 {
   PKMX_WCHAR str, p;
+
   KMX_DWORD msg;
 
   FMnemonicLayout = FALSE;
@@ -540,9 +548,6 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
 
       u16sprintf(str,LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));
 
-
-
-
       //PWSTR pw = strtowstr(buf);
       AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
       //delete pw;
@@ -582,109 +587,109 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
       }
     }
 
-if (msg != CERR_EndOfFile) SetError(msg);
+  if (msg != CERR_EndOfFile) SetError(msg);
 
-fseek( fp_in,2,SEEK_SET);                                             //   SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
-currentLine = 0;
+  fseek( fp_in,2,SEEK_SET);                                             //   SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
+  currentLine = 0;
 
-/* Reindex the list of codeconstants after stores added */
+  /* Reindex the list of codeconstants after stores added */
 
-CodeConstants->reindex();
+  CodeConstants->reindex();
 
-/* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
-while ((msg = ReadLine(fp_in, str, FALSE)) == CERR_None)        //  while ((msg = KMX_ReadLine(hInfile, str, FALSE)) == CERR_None)
-{
-  if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
-  msg = ParseLine(fk, str);
-  if (msg != CERR_None) SetError(msg);
-}
+  /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
+  while ((msg = ReadLine(fp_in, str, FALSE)) == CERR_None)        //  while ((msg = KMX_ReadLine(hInfile, str, FALSE)) == CERR_None)
+  {
+    if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
+    msg = ParseLine(fk, str);
+    if (msg != CERR_None) SetError(msg);
+  }
 
-if (msg != CERR_EndOfFile) SetError(msg);
+  if (msg != CERR_EndOfFile) SetError(msg);
 
-ProcessGroupFinish(fk);
+  ProcessGroupFinish(fk);
 
-if (FSaveDebug) RecordDeadkeyNames(fk);
+  if (FSaveDebug) RecordDeadkeyNames(fk);
 
-/* Add the compiler version as a system store */
-if ((msg = AddCompilerVersionStore(fk)) != CERR_None) SetError(msg);
+  /* Add the compiler version as a system store */
+  if ((msg = AddCompilerVersionStore(fk)) != CERR_None) SetError(msg);
 
-if ((msg = BuildVKDictionary(fk)) != CERR_None) SetError(msg);  // I3438
+  if ((msg = BuildVKDictionary(fk)) != CERR_None) SetError(msg);  // I3438
 
-/* _S2 no idea how to change that to use with char16_t on non-windows platforms */
- if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) SetError(msg);
+  /* _S2 no idea how to change that to use with char16_t on non-windows platforms */
+  if ((msg = CheckFilenameConsistencyForCalls(fk)) != CERR_None) SetError(msg);
 
-delete str;
+  delete str;
 
-if (!CheckKeyboardFinalVersion(fk)) {
-  return FALSE;
-}
+  if (!CheckKeyboardFinalVersion(fk)) {
+    return FALSE;
+  }
 
-/* Warn on inconsistent use of NCAPS */
-if (!FMnemonicLayout) {
-   CheckNCapsConsistency(fk);
-}
+  /* Warn on inconsistent use of NCAPS */
+  if (!FMnemonicLayout) {
+    CheckNCapsConsistency(fk);
+  }
 
-/* Flag presence of deprecated features */
-CheckForDeprecatedFeatures(fk);
+  /* Flag presence of deprecated features */
+  CheckForDeprecatedFeatures(fk);
 
-return TRUE;
+  return TRUE;
 }
 
 KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 {
-KMX_WCHAR tstr[128];
-PKMX_WCHAR q, pp;
-int BeginMode;
-KMX_DWORD msg;
+  KMX_WCHAR tstr[128];
+  PKMX_WCHAR q, pp;
+  int BeginMode;
+  KMX_DWORD msg;
 
-pp = p;
+  pp = p;
 
-q = ( PKMX_WCHAR) u16chr(p, '>');
-if (!q) return CERR_NoTokensFound;
+  q = ( PKMX_WCHAR) u16chr(p, '>');
+  if (!q) return CERR_NoTokensFound;
 
-while (iswspace(*p)) p++;
-if (u16nicmp(p, u"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;      //if (_wcsnicmp(p, L"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;
-else if (u16nicmp(p, u"ansi", 4) == 0) BeginMode = BEGIN_ANSI;     //else if (_wcsnicmp(p, L"ansi", 4) == 0) BeginMode = BEGIN_ANSI;
-else if (u16nicmp(p, u"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;     //  else if (_wcsnicmp(p, L"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;
-else if (u16nicmp(p, u"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;     //  else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
-else if (*p != '>') return CERR_InvalidToken;
-else BeginMode = BEGIN_ANSI;
+  while (iswspace(*p)) p++;
+  if (u16nicmp(p, u"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;      //if (_wcsnicmp(p, L"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;
+  else if (u16nicmp(p, u"ansi", 4) == 0) BeginMode = BEGIN_ANSI;     //else if (_wcsnicmp(p, L"ansi", 4) == 0) BeginMode = BEGIN_ANSI;
+  else if (u16nicmp(p, u"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;     //  else if (_wcsnicmp(p, L"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;
+  else if (u16nicmp(p, u"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;     //  else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
+  else if (*p != '>') return CERR_InvalidToken;
+  else BeginMode = BEGIN_ANSI;
 
-if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
+  if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
 
-if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) {
-  return CERR_InvalidBegin;
-}
-
-if (tstr[3] != 0) {
-  return CERR_InvalidToken;
-}
-
-if (BeginMode == BEGIN_ANSI || BeginMode == BEGIN_UNICODE)
-{
-    fk->StartGroup[BeginMode] = tstr[2] - 1;
-    //mcd-03-01-2000: removed the secondary group idea; this was undocumented and
-    //is not supported under Keyman 5.0: ugly!!
-    //if(tstr[3] == UC_SENTINEL && tstr[4] == CODE_USE) fk->StartGroup[1] = tstr[5] - 1;
-
-  if (FSaveDebug) {
-      /* Record a system store for the line number of the begin statement */
-      AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN u"Unicode" : DEBUGSTORE_BEGIN u"ANSI");  //KMX_AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN L"Unicode" : DEBUGSTORE_BEGIN L"ANSI");
+  if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) {
+    return CERR_InvalidBegin;
   }
-}
-else {
-    PFILE_GROUP gp = &fk->dpGroupArray[tstr[2] - 1];
-    if (!gp->fReadOnly) {
-      return BeginMode == BEGIN_NEWCONTEXT ?
-        CERR_NewContextGroupMustBeReadonly :
-        CERR_PostKeystrokeGroupMustBeReadonly;
+
+  if (tstr[3] != 0) {
+    return CERR_InvalidToken;
+  }
+
+  if (BeginMode == BEGIN_ANSI || BeginMode == BEGIN_UNICODE)
+  {
+      fk->StartGroup[BeginMode] = tstr[2] - 1;
+      //mcd-03-01-2000: removed the secondary group idea; this was undocumented and
+      //is not supported under Keyman 5.0: ugly!!
+      //if(tstr[3] == UC_SENTINEL && tstr[4] == CODE_USE) fk->StartGroup[1] = tstr[5] - 1;
+
+    if (FSaveDebug) {
+        /* Record a system store for the line number of the begin statement */
+        AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN u"Unicode" : DEBUGSTORE_BEGIN u"ANSI");  //KMX_AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN L"Unicode" : DEBUGSTORE_BEGIN L"ANSI");
     }
-    return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
   }
+  else {
+      PFILE_GROUP gp = &fk->dpGroupArray[tstr[2] - 1];
+      if (!gp->fReadOnly) {
+        return BeginMode == BEGIN_NEWCONTEXT ?
+          CERR_NewContextGroupMustBeReadonly :
+          CERR_PostKeystrokeGroupMustBeReadonly;
+      }
+      return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
+    }
 
 
 
-return CERR_None;
+  return CERR_None;
 }
 
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p) {
@@ -708,6 +713,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   PFILE_GROUP gp;
   KMX_DWORD msg;
   int IsUnicode = TRUE; // For NOW!
+
   KMX_WCHAR sep[2] = u"\n";
   PKMX_WCHAR p_sep =sep;
   p = str;
@@ -756,9 +762,11 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   case T_MESSAGE:
     WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return CERR_InvalidMessage;
+    if (!q) 
+      return CERR_InvalidMessage;
 
-    if ((msg = AddStore(fk, TSS_MESSAGE, q)) != CERR_None) return msg;
+    if ((msg = AddStore(fk, TSS_MESSAGE, q)) != CERR_None) 
+      return msg;
     break;
 
   case T_LANGUAGENAME:
@@ -928,6 +936,8 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   return CERR_None;
 }
 
+//**********************************************************************************************************************
+
 KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 {
   PFILE_GROUP gp;
@@ -992,8 +1002,7 @@ int cmpkeys(const void *key, const void *elem)
   char_elem = VKToChar(aelem->Key, aelem->ShiftFlags);
   if (char_key == char_elem) //akey->Key == aelem->Key)
   {
-    l1 = xstrlen(akey->dpContext);
-    l2 = xstrlen(aelem->dpContext);
+    l1 = xstrlen(akey->dpContext); l2 = xstrlen(aelem->dpContext);
     if (l1 == l2)
     {
       if (akey->Line < aelem->Line) return -1;
@@ -1022,7 +1031,6 @@ KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), cmpkeys);
 
   return VerifyUnreachableRules(gp);
-  // _S2_ return CERR_None;
 }
 
 /***************************************
@@ -1559,6 +1567,7 @@ KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk)
 /****************************
 * Rule lines
 */
+
 KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR context, PKMX_WCHAR output, PKMX_WCHAR key) {
   PKMX_WCHAR p, q;
   int i;
@@ -1613,8 +1622,6 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
  *   Context structure: [nul] [if()|baselayout()|platform()]+ [char|any|context()|deadkey()|dk()|index()|notany()|outs()]
  * Test that nul is first, then if(), baselayout(), platform() statements are before any other content
  */
-
-
 KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context)
 {
   KMX_BOOL hadContextChar = FALSE;
@@ -1643,17 +1650,17 @@ KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context)
 
   return TRUE;
 }
-
-
-// Checks if a use() statement is followed by other content in the output of a rule
+/**
+ *  Checks if a use() statement is followed by other content in the output of a rule
+ */
 KMX_DWORD CheckUseStatementsInOutput(const PFILE_GROUP gp,PKMX_WCHAR output)
 {
-  KMX_BOOL HasUse = FALSE;
+  KMX_BOOL hasUse = FALSE;
   PKMX_WCHAR p;
   for (p = output; *p; p = incxstr(p)) {
     if (*p == UC_SENTINEL && *(p + 1) == CODE_USE) {
-      HasUse = TRUE;
-    } else if (HasUse) {
+      hasUse = TRUE;
+    } else if (hasUse) {
       AddWarning(CWARN_UseNotLastStatementInRule);
       break;
     }
@@ -1776,7 +1783,7 @@ KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
     // Test that use() statements are not followed by other content
 
     if ((msg = CheckUseStatementsInOutput(gp, pklOut)) != CERR_None) {
-          return msg;   // I4867
+      return msg;   // I4867
     }
 
     if (gp->fReadOnly) {
@@ -1961,6 +1968,7 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
   return CERR_None;
 }
 
+
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags)
 {
   PKMX_WCHAR q, r;
@@ -1997,10 +2005,10 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
 
   *p = r;								    // Update pointer position
 
-  return  q;							// Return delimited string
+  return q;							// Return delimited string
 }
 
-KMX_LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
+LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
 {
   PKMX_WCHAR s = *p;
 
@@ -2008,30 +2016,30 @@ KMX_LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
 
   PKMX_WCHAR q = s;
 
-  if (*s != '$') return KMX_lptNone;
+  if (*s != '$') return lptNone;
 
   /* I1569 - fix named constants at the start of the line */
   s++;
   while (__iswcsym(*s)) s++;
-  if (*s != ':') return KMX_lptNone;
+  if (*s != ':') return lptNone;
 
   if (u16nicmp(q, u"$keyman:", 8) == 0)    //if (_wcsnicmp(q, L"$keyman:", 8) == 0)
   {
     *p += 8;
-    return KMX_lptKeymanAndKeymanWeb;
+    return lptKeymanAndKeymanWeb;
   }
   if (u16nicmp(q, u"$keymanweb:", 11) == 0)    //if (_wcsnicmp(q, L"$keymanweb:", 11) == 0)
   {
     *p += 11;
-    return KMX_lptKeymanWebOnly;
+    return lptKeymanWebOnly;
   }
   if (u16nicmp(q, u"$keymanonly:", 12) == 0)    //if (_wcsnicmp(q, L"$keymanonly:", 12) == 0)
   {
     *p += 12;
-    return KMX_lptKeymanOnly;
+    return lptKeymanOnly;
   }
 
-  return KMX_lptOther;
+  return lptOther;
 }
 
 int LineTokenType(PKMX_WCHAR *str)
@@ -2040,12 +2048,12 @@ int LineTokenType(PKMX_WCHAR *str)
   size_t l;
   PKMX_WCHAR p = *str;
 
-  KMX_LinePrefixType lpt = GetLinePrefixType(&p);
-  if (lpt == KMX_lptOther) return T_BLANK;
+  LinePrefixType lpt = GetLinePrefixType(&p);
+  if (lpt == lptOther) return T_BLANK;
 
   /* Test KeymanWeb, Keyman and KeymanOnly prefixes */
-  if (CompileTarget == CKF_KEYMAN && lpt == KMX_lptKeymanWebOnly) return T_BLANK;
-  if (CompileTarget == CKF_KEYMANWEB && lpt == KMX_lptKeymanOnly) return T_BLANK;
+  if (CompileTarget == CKF_KEYMAN && lpt == lptKeymanWebOnly) return T_BLANK;
+  if (CompileTarget == CKF_KEYMANWEB && lpt == lptKeymanOnly) return T_BLANK;
 
   while (iswspace(*p)) p++;
 
@@ -2076,6 +2084,9 @@ int LineTokenType(PKMX_WCHAR *str)
   }
   return T_UNKNOWN;
 }
+
+KMX_WCHAR const * DeadKeyChars =
+u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
 
 KMX_BOOL strvalidchrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 {
@@ -2116,12 +2127,12 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 
       ErrChr = (int)(INT_PTR)(p - str) + offset + 1;
 
-      //
-      //char *tokenTypes[] = {
-      //  "clearcontext", "deadkey", "context", "return", "switch",
-      //  "index", "outs", "beep", "nul", "use", "any", "fix", "dk", "k_", "x", "d", "c",
-      //  "[", "]" };
-      ///
+      /*
+      char *tokenTypes[] = {
+        "clearcontext", "deadkey", "context", "return", "switch",
+        "index", "outs", "beep", "nul", "use", "any", "fix", "dk", "k_", "x", "d", "c",
+        "[", "]" };
+      */
 
       switch (towupper(*p))
       {
@@ -2465,7 +2476,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
         }
         continue;
       case 11:
-        p++; sFlag = ISVIRTUALKEY ; finished = FALSE;       //  // 0 //  // _S2
+        p++; sFlag = ISVIRTUALKEY /* 0 */; finished = FALSE;
 
         //printf("--EXTENDEDSTRING--\n");
 
@@ -2559,7 +2570,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
             q++;
             while (iswspace(*q)) q++;
             if (*q != ']') return CERR_InvalidToken;
-            break; // out of while loop //
+            break; /* out of while loop */
           }
 
           for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
@@ -2734,6 +2745,20 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   return CERR_NoTokensFound;
 }
 
+KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);  // I3430
+
+KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3430
+{
+  /* baselayout(<XString+outs>) */
+  return process_if_synonym(TSS_BASELAYOUT, fk, q, tstr, mx);
+}
+
+KMX_DWORD process_platform(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3430
+{
+  /* platform(<XString+outs>) */
+  return process_if_synonym(TSS_PLATFORM, fk, q, tstr, mx);
+}
+
 KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3430
 {
   PKMX_WCHAR temp = new KMX_WCHAR[GLOBAL_BUFSIZE];
@@ -2766,18 +2791,6 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHA
   delete[] temp;
 
   return CERR_None;
-}
-
-KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3430
-{
-  /* baselayout(<XString+outs>) */
-  return process_if_synonym(TSS_BASELAYOUT, fk, q, tstr, mx);
-}
-
-KMX_DWORD process_platform(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3430
-{
-  /* platform(<XString+outs>) */
-  return process_if_synonym(TSS_PLATFORM, fk, q, tstr, mx);
 }
 
 KMX_DWORD process_if(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3431
@@ -2996,7 +3009,7 @@ KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCH
 
 KMX_DWORD process_set(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)
 {
-  // set(<store> <'='> <XString+outs> //
+  /* set(<store> <'='> <XString+outs> */
   LPKMX_WCHAR r = q, s = q;  // I3440
   while (*s && *s != u' ' && *s != u'=') s++;
   r = s;
@@ -3230,6 +3243,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
   return CERR_CodeInvalidInThisSection;
 }
 
+
 void SetChecksum(LPKMX_BYTE buf, LPKMX_DWORD CheckSum, KMX_DWORD sz)
 {
   BuildCRCTable();
@@ -3281,16 +3295,16 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
   size = sizeof(COMP_KEYBOARD) +
     fk->cxGroupArray * sizeof(COMP_GROUP) +
     fk->cxStoreArray * sizeof(COMP_STORE) +
-    //wcslen(fk->szName)*2 + 2 +//
-    //wcslen(fk->szCopyright)*2 + 2 +//
-    //wcslen(fk->szLanguageName)*2 + 2 +//
-    //wcslen(fk->szMessage)*2 + 2 +//
+    /*wcslen(fk->szName)*2 + 2 +
+    wcslen(fk->szCopyright)*2 + 2 +
+    wcslen(fk->szLanguageName)*2 + 2 +
+    wcslen(fk->szMessage)*2 + 2 +*/
     fk->dwBitmapSize;
 
   for (i = 0, fgp = fk->dpGroupArray; i < fk->cxGroupArray; i++, fgp++)
   {
     if (FSaveDebug) size += u16len(fgp->szName) * 2 + 2;
-    size += fgp->cxKeyArray * sizeof(COMP_KEY );
+    size += fgp->cxKeyArray * sizeof(COMP_KEY);
     for (j = 0, fkp = fgp->dpKeyArray; j < fgp->cxKeyArray; j++, fkp++)
     {
       size += u16len(fkp->dpOutput) * 2 + 2;
@@ -3328,21 +3342,21 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
 
   offset = sizeof(COMP_KEYBOARD);
 
-  //ck->dpLanguageName = offset;//
-  //wcscpy((PWSTR)(buf + offset), fk->szLanguageName);//
-  //offset += wcslen(fk->szLanguageName)*2 + 2;//
+  /*ck->dpLanguageName = offset;
+  wcscpy((PWSTR)(buf + offset), fk->szLanguageName);
+  offset += wcslen(fk->szLanguageName)*2 + 2;
 
-  //ck->dpName = offset;//
-  //wcscpy((PWSTR)(buf + offset), fk->szName);//
-  //offset += wcslen(fk->szName)*2 + 2;//
+  ck->dpName = offset;
+  wcscpy((PWSTR)(buf + offset), fk->szName);
+  offset += wcslen(fk->szName)*2 + 2;
 
-  //ck->dpCopyright = offset;//
-  //wcscpy((PWSTR)(buf + offset), fk->szCopyright);//
-  //offset += wcslen(fk->szCopyright)*2 + 2;//
+  ck->dpCopyright = offset;//
+  wcscpy((PWSTR)(buf + offset), fk->szCopyright);
+  offset += wcslen(fk->szCopyright)*2 + 2;
 
-  //ck->dpMessage = offset;//
-  //wcscpy((PWSTR)(buf + offset), fk->szMessage);//
-  //offset += wcslen(fk->szMessage)*2 + 2;//
+  ck->dpMessage = offset;
+  wcscpy((PWSTR)(buf + offset), fk->szMessage);
+  offset += wcslen(fk->szMessage)*2 + 2;*/
 
   ck->dpStoreArray = (KMX_DWORD)offset;
   sp = (PCOMP_STORE)(buf + offset);
@@ -3401,7 +3415,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
     gp->dpKeyArray = (KMX_DWORD)offset;
     kp = (PCOMP_KEY )(buf + offset);
     fkp = fgp->dpKeyArray;
-    offset += gp->cxKeyArray * sizeof(COMP_KEY );
+    offset += gp->cxKeyArray * sizeof(COMP_KEY);
     for (j = 0; j < gp->cxKeyArray; j++, kp++, fkp++)
     {
       kp->Key = fkp->Key;
@@ -3430,7 +3444,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
 
   KMX_DWORD dwBytesWritten = 0;
 
- // WriteFile(hOutfile, buf, (KMX_DWORD)size, &dwBytesWritten, NULL);   // old S
+ // WriteFile(hOutfile, buf, (KMX_DWORD)size, &dwBytesWritten, NULL);   // _S2
   dwBytesWritten = fwrite(buf,1, (KMX_DWORD)size ,  fp_out);
 
   if (dwBytesWritten != size) {
@@ -3444,7 +3458,6 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
 
  return 0;
 }
-
 
 KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 {
@@ -3626,15 +3639,28 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   else
     u16ncpy(szNewName, szName, _countof(szNewName));  // I3481
 
-                                                                      // _S2 can I just use fopen here?
-  //fp = fopen( ( const PKMX_CHAR) szNewName, "rb");                    // _S2 fp = _
+
+
+#if defined(_WIN32) || defined(_WIN64)
   fp =_wfsopen((wchar_t*)szNewName, L"rb", _SH_DENYWR);                           //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+#else
+  //fp = fopen( ( const PKMX_CHAR) szNewName, "rb");                    // _S2 fp = _ 
+#endif
+
+  
+  
   if ( fp == NULL)                                                    //if (hFile == INVALID_HANDLE_VALUE)
   {
-    // _S2 CAUTION !!  if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp ?!?!
-    u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
-                                                                      //fp = fopen(( const PKMX_CHAR) szNewName, "rb");                   // _S2
-    fp = _wfsopen((const wchar_t*)szNewName, L"rb", _SH_DENYWR);                     //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    // _S2 if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp ?!?! 
+   // if ( u16cmp(szNewName+u16len(szNewName)-4, u".bmp") )
+      u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
+        
+    #if defined(_WIN32) || defined(_WIN64)
+      fp = _wfsopen((const wchar_t*)szNewName, L"rb", _SH_DENYWR);                     //hFile = CreateFileA(szNewName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    #else
+      fp = fopen(( const PKMX_CHAR) szNewName, "rb");                   // _S2
+    #endif
+
     if ( fp == NULL)                                                  // if (hFile == INVALID_HANDLE_VALUE)
       return CERR_CannotReadBitmapFile;
   }
@@ -3664,7 +3690,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
 
   fclose(fp);                                                         //CloseHandle(hFile);
 
-  // Test for version 7.0 icon support //
+  /* Test for version 7.0 icon support */
   if (*((PKMX_CHAR)*Buf) != 'B' && *(((PKMX_CHAR)*Buf) + 1) != 'M') {
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
   }
@@ -3724,7 +3750,7 @@ KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk)
 {
   KMX_DWORD i;
   size_t len = 0;
-  if (fk->cxVKDictionary== 0) return CERR_None;
+  if (fk->cxVKDictionary == 0) return CERR_None;
   for (i = 0; i < fk->cxVKDictionary; i++)
   {
     len += u16len(fk->dpVKDictionary[i].szName) + 1;
@@ -3846,60 +3872,63 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
     return NULL;                               //return  INVALID_HANDLE_VALUE;
   }
 
-PKMX_BYTE buf, p;
-PKMX_WCHAR outbuf, poutbuf;
-KMX_DWORD len;
-DWORD len2;
-KMX_WCHAR prolog = 0xFEFF;
-fwrite(&prolog,2, 1, fp_out);                   //WriteFile(hOutfile, &prolog, 2, &len2, NULL);   // already replaced
+  PKMX_BYTE buf, p;
+  PKMX_WCHAR outbuf, poutbuf;
+  KMX_DWORD len;
+  DWORD len2;
+  KMX_WCHAR prolog = 0xFEFF;
+  fwrite(&prolog,2, 1, fp_out);                   //WriteFile(hOutfile, &prolog, 2, &len2, NULL);   // already replaced
 
-fseek(fp_in, 0, SEEK_END);
-len = ftell(fp_in);                             // len = GetFileSize(hInfile, NULL);
-fseek(fp_in, 0, SEEK_SET);
-if (hasPreamble) {
-  fseek( fp_in,3,SEEK_SET);                     // SetFilePointer(hInfile, 3, NULL, FILE_BEGIN); // Cut off UTF-8 marker
-  len -= 3;
-}
-
-buf = new KMX_BYTE[len + 1];  // null terminated
-outbuf = new KMX_WCHAR[len + 1];
-
-
-len2= fread(buf,1,len,fp_in);                   // if (ReadFile(hInfile, buf, len, &len2, NULL)) {
-if (len2) {
-  buf[len2] = 0;
-  p = buf;
-  poutbuf = outbuf;
+  fseek(fp_in, 0, SEEK_END);
+  len = ftell(fp_in);                             // len = GetFileSize(hInfile, NULL);
+  fseek(fp_in, 0, SEEK_SET);
   if (hasPreamble) {
-        // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a
-        // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
-        ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
-        fwrite(outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2 , 1, fp_out);   //WriteFile(hOutfile, outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2, &len2, NULL);
+    fseek( fp_in,3,SEEK_SET);                     // SetFilePointer(hInfile, 3, NULL, FILE_BEGIN); // Cut off UTF-8 marker
+    len -= 3;
   }
-  else {
-    // No preamble, so we attempt to read as strict UTF-8 and fall back to ANSI if that fails
-    ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
-    if (cr == sourceIllegal) {
-      // Not a valid UTF-8 file, so fall back to ANSI
-      //AddCompileMessage(CINFO_NonUnicodeFile);
-      // note, while this message is defined, for now we will not emit it
-      // because we don't support HINT/INFO messages yet and we don't want
-      // this to cause a blocking compile at this stage
-      poutbuf = strtowstr((PKMX_STR)buf);
-      fwrite(poutbuf, (KMX_DWORD)u16len(poutbuf) * 2 , 1, fp_out);                //WriteFile(hOutfile, poutbuf, (KMX_DWORD)wcslen(poutbuf) * 2, &len2, NULL);
-      delete[] poutbuf;
+
+  buf = new KMX_BYTE[len + 1];  // null terminated
+  outbuf = new KMX_WCHAR[len + 1];
+
+
+  len2= fread(buf,1,len,fp_in);                   // if (ReadFile(hInfile, buf, len, &len2, NULL)) {
+  if (len2) {
+    buf[len2] = 0;
+    p = buf;
+    poutbuf = outbuf;
+    if (hasPreamble) {
+          // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a
+          // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
+          ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
+          fwrite(outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2 , 1, fp_out);   //WriteFile(hOutfile, outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2, &len2, NULL);
     }
     else {
-      fwrite(outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2 , 1, fp_out);     //WriteFile(hOutfile, outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2, &len2, NULL);
+      // No preamble, so we attempt to read as strict UTF-8 and fall back to ANSI if that fails
+      ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
+      if (cr == sourceIllegal) {
+        // Not a valid UTF-8 file, so fall back to ANSI      
+        // AddCompileMessage(CHINT_NonUnicodeFile);
+        // note, while this message is defined, for now we will not emit it
+        // because we don't support HINT/INFO messages yet and we don't want
+        // this to cause a blocking compile at this stage
+        // do strtowstr only when no invalid characters are found
+        if( p==0){
+          poutbuf = strtowstr((PKMX_STR)buf);
+          fwrite(poutbuf, (KMX_DWORD)u16len(poutbuf) * 2 , 1, fp_out);                //WriteFile(hOutfile, poutbuf, (KMX_DWORD)wcslen(poutbuf) * 2, &len2, NULL);
+          delete[] poutbuf;
+        }
+      }
+      else {
+        fwrite(outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2 , 1, fp_out);     //WriteFile(hOutfile, outbuf, (KMX_DWORD)(INT_PTR)(poutbuf - outbuf) * 2, &len2, NULL);
+      }
     }
   }
-}
 
-fclose( fp_in);                             //CloseHandle(hInfile);
-delete[] buf;
-delete[] outbuf;
-fseek( fp_out,2,SEEK_SET);                  //  SetFilePointer(hOutfile, 2, NULL, FILE_BEGIN)
-return fp_out;  // _S2                       // return hOutfile; // _S2
+  fclose( fp_in);                             //CloseHandle(hInfile);
+  delete[] buf;
+  delete[] outbuf;
+  fseek( fp_out,2,SEEK_SET);                  //  SetFilePointer(hOutfile, 2, NULL, FILE_BEGIN)
+  return fp_out;  // _S2                       // return hOutfile; // _S2
 }
 
 extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {

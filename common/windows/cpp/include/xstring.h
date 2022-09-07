@@ -1,4 +1,3 @@
-#pragma once
 PWSTR incxstr(PWSTR p);
 PWSTR decxstr(PWSTR p, PWSTR pStart);
 int xstrlen(PWSTR p);

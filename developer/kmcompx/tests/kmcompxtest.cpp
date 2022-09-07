@@ -10,7 +10,7 @@
 
 int WINAPI msgproc(int line, KMX_DWORD dwMsgCode, char* szText)
 {
-	printf("line %d  error %x  %s\n", line, (unsigned int) dwMsgCode, szText);
+  printf("line %d  error %x  %s\n", line, (unsigned int)dwMsgCode, szText);
 	return 1;
 }
 

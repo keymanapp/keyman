@@ -1,28 +1,22 @@
 /*
   Name:             Compfile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      25 Jan 2007
 
   Modified Date:    25 May 2010
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          25 Jan 2007 - mcdurdin - Add GLOBAL_BUFSIZE, enlarge LINESIZE
                     25 May 2010 - mcdurdin - I1632 - Keyboard Options
-
-					- Sabine: 25.Nov.21:
-					- doubled all structs and consts; renamed them:  struct FILE_STORE ---> struct KMX_FILE_STORE
-					- New structs are needed for gradually exchanging variables in Compiler.cpp etc
-					- after all variables in compiler.cpp etc are replaced these structs will be renamed again:  
-					- struct FILE_STORE <--- struct KMX_FILE_STORE
-
 */
+
 #ifndef _COMPFILE_H
 #define _COMPFILE_H
 
@@ -110,20 +104,17 @@ struct FILE_GROUP {
 	};
 typedef FILE_GROUP *PFILE_GROUP;
 
-
 struct FILE_DEADKEY
 {
 	KMX_WCHAR szName[SZMAX_DEADKEYNAME];
 };
 typedef FILE_DEADKEY *PFILE_DEADKEY;
 
-
 struct FILE_VKDICTIONARY
 {
 	KMX_WCHAR szName[SZMAX_VKDICTIONARYNAME];
 };
 typedef FILE_VKDICTIONARY *PFILE_VKDICTIONARY;
-
 
 struct FILE_KEYBOARD {
 	KMX_DWORD KeyboardID;			// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
@@ -169,14 +160,13 @@ const KMX_DWORD sz_FILE_DEADKEY = sizeof(FILE_DEADKEY);
 const KMX_DWORD sz_FILE_VKDICTIONARY = sizeof(FILE_VKDICTIONARY);
 const KMX_DWORD sz_FILE_KEYBOARD = sizeof(FILE_KEYBOARD);
 
-
 struct COMPMSG {
 	KMX_CHAR szText[SZMAX_ERRORTEXT];
 	KMX_DWORD Line;
 	KMX_DWORD dwMsgCode;
 	};		
-typedef COMPMSG *PCOMPMSG;
 
+typedef COMPMSG *PCOMPMSG;
 
 struct COMPILEMESSAGES {
 	int nMessages;
@@ -189,6 +179,7 @@ struct COMPILEMESSAGES {
 
 	KMX_DWORD currentLine;
 	};
+
 typedef COMPILEMESSAGES *PCOMPILEMESSAGES;
 
 /*

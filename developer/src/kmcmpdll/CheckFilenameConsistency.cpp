@@ -1,4 +1,6 @@
+
 #include "pch.h"
+
 #include <compfile.h>
 #include <comperr.h>
 #include <kmcmpdll.h>
@@ -24,11 +26,14 @@ bool IsRelativePath(KMX_CHAR const * p) {
   //  ..\...\BITMAP.BMP
   //  PATH\BITMAP.BMP
   //  BITMAP.BMP
+
   // Semi-absolute path (returns FALSE):
   //  \...\BITMAP.BMP
+
   // Absolute path (returns FALSE):
   //  C:\...\BITMAP.BMP
   //  \\SERVER\SHARE\...\BITMAP.BMP
+
   if (*p == '\\') return FALSE;
   if (*p && *(p + 1) == ':') return FALSE;
   return TRUE;
@@ -39,11 +44,14 @@ bool IsRelativePath(KMX_WCHART const * p) {
   //  ..\...\BITMAP.BMP
   //  PATH\BITMAP.BMP
   //  BITMAP.BMP
+
   // Semi-absolute path (returns FALSE):
   //  \...\BITMAP.BMP
+
   // Absolute path (returns FALSE):
   //  C:\...\BITMAP.BMP
   //  \\SERVER\SHARE\...\BITMAP.BMP
+
   if (*p == L'\\') return FALSE;
   if (*p && *(p + 1) == L':') return FALSE;
   return TRUE;
@@ -52,15 +60,14 @@ bool IsRelativePath(KMX_WCHART const * p) {
 
 KMX_DWORD CheckFilenameConsistency(char const * Filename, BOOL ReportMissingFile) {
   PKMX_WCHAR WFilename = strtowstr((char *)Filename);
-  
   KMX_DWORD const result = CheckFilenameConsistency(u16fmt(WFilename).c_str(), ReportMissingFile);    // _S2 KMX_DWORD const result = CheckFilenameConsistency(WFilename, ReportMissingFile);
   delete WFilename;  
   return result;
 }
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissingFile) {
-  KMX_WCHAR ErrExtra[256];     // _S2
   KMX_WCHART Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
+  KMX_WCHAR ErrExtra[256];     // _S2
   intptr_t n;
 
   if (IsRelativePath(Filename)) {
@@ -105,7 +112,7 @@ KMX_DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk) {
   // file called function.call_js. This is ripe for rewrite!
   // But let's check what we have anyway
   PFILE_STORE sp;
-  DWORD i, msg;  
+  DWORD i, msg;
   for (i = 0, sp = fk->dpStoreArray; i < fk->cxStoreArray; i++, sp++) {
     if (!sp->fIsCall) continue;
 

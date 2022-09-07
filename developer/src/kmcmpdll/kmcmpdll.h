@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <windows.h>
+//#include <windows.h>      // _S2
 #include <compfile.h>
 
 KMX_BOOL AddCompileString(LPSTR buf);
@@ -11,6 +11,7 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg);
 
 extern BOOL FWarnDeprecatedCode;
 extern int currentLine;
+
 
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID);

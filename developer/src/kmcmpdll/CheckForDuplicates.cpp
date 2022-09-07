@@ -1,12 +1,11 @@
 
-#include <pch.h>
+#include "pch.h"
 
 #include <compfile.h>
 #include <comperr.h>
 #include <kmcmpdll.h>
 #include <xstring.h>
 #include <kmx_u16.h>
-
 #include <kmcompx.h>
 
 #include "CheckForDuplicates.h"
@@ -22,13 +21,15 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
     if (u16icmp(gp0->szName, gp->szName) == 0)       // _S2 if (_wcsicmp(gp0->szName, gp->szName) == 0)
     {
       // _ S2    wsprintf(ErrExtra, "Group '%ls' declared on line %d", gp0->szName, gp0->Line);
-          PKMX_WCHAR p_ErrExtra ;
+          PKMX_WCHAR ErrExtra =NULL;
+          //PKMX_WCHAR p_ErrExtra ;
 
-          KMX_WCHAR T1[250]  = u"Group '";
-			    KMX_WCHAR T3[250]  = u"' declared on line ";
-          u16ncat(T1, gp0->szName, xstrlen(T1));
-          u16ncat(T1, T3, xstrlen(T1));
-          u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)gp0->Line), T1);
+          //KMX_WCHAR T1[250]  = u"Group '";
+			   // KMX_WCHAR T3[250]  = u"' declared on line ";
+          //u16ncat(T1, gp0->szName, xstrlen(T1));
+          //u16ncat(T1, T3, xstrlen(T1));
+          //u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)gp0->Line), T1);
+          u16sprintf(ErrExtra, 1024, L"Group '%ls' declared on line %d", u16fmt(gp0->szName).c_str(), gp0->Line);
 
       return CERR_DuplicateGroup;
     }
@@ -51,7 +52,7 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
     if (u16icmp(sp0->szName, sp->szName) == 0)   // _S2 if (_wcsicmp(sp0->szName, sp->szName) == 0)
      {
       
-          PKMX_WCHAR ErrExtra ;
+          PKMX_WCHAR ErrExtra =NULL;
       // _ S2    wsprintf(ErrExtra, "Store '%ls' declared on line %d", sp0->szName, sp0->line);
       /*
           PKMX_WCHAR p_ErrExtra ;
@@ -61,7 +62,7 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
           u16ncat(T1, T3, xstrlen(T1));
           u16printf(&p_ErrExtra, 'd', 0x0020, createIntVector( (int)sp0->line), T1);
 */
-          u16sprintf(ErrExtra, 1024, L"Store '%ls' declared on line %d", u16fmt(sp0->szName), sp0->line);
+          u16sprintf(ErrExtra, 1024, L"Store '%ls' declared on line %d", u16fmt(sp0->szName).c_str(), sp0->line);
 
 
       return CERR_DuplicateStore;
