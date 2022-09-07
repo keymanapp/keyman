@@ -273,6 +273,10 @@ export default class KMXPlusBuilder {
 
     this.sect_sect = this.build_sect();
     this.sect_strs = this.build_strs();
+
+    // per C7043, the first string in sect_strs MUST be the zero-length string.
+    this.alloc_string('');
+
     this.sect_meta = this.build_meta();
     this.sect_loca = this.build_loca();
     this.sect_keys = this.build_keys();
