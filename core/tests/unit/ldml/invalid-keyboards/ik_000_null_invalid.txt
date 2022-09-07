@@ -1,5 +1,5 @@
 
-0x0000:            #  struct COMP_KEYBOARD {
+block(kmx)         #  struct COMP_KEYBOARD {
   4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
 
   00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
@@ -27,14 +27,15 @@
                    #  };
 
 
-0x0040:            #  struct COMP_KEYBOARD_KMXPLUSINFO {
+block(kmxplus)     #  struct COMP_KEYBOARD_KMXPLUSINFO {
   00 00 00 00      #  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
   00 00 00 00      #  KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
                    #};
 
-0x0050: 23 20 54 68 69 73 20 69 73 20 6e 6f 74 20 79 65  #  # This is not ye
-0x0060: 74 20 61 20 76 61 6c 69 64 20 2e 6b 6d 78 20 66  #  t a valid .kmx f
-0x0070: 69 6c 65 2e 20 48 61 6e 64 20 67 65 6e 65 72 61  #  ile. Hand genera
-0x0080: 74 65 64 20 74 6f 20 73 65 74 20 74 68 65 20 30  #  ted to set the 0
-0x0090: 78 32 30 20 76 61 6c 75 65 20 69 6e 20 64 77 46  #  x20 value in dwF
-0x00a0: 6c 61 67 73                                      #  lags
+block(kmxplusdata)
+  23 20 54 68 69 73 20 69 73 20 6e 6f 74 20 79 65  #  # This is not ye
+  74 20 61 20 76 61 6c 69 64 20 2e 6b 6d 78 20 66  #  t a valid .kmx f
+  69 6c 65 2e 20 48 61 6e 64 20 67 65 6e 65 72 61  #  ile. Hand genera
+  74 65 64 20 74 6f 20 73 65 74 20 74 68 65 20 30  #  ted to set the 0
+  78 32 30 20 76 61 6c 75 65 20 69 6e 20 64 77 46  #  x20 value in dwF
+  6c 61 67 73                                      #  lags
