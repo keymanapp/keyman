@@ -20,7 +20,7 @@ block(kmxheader)  #  struct COMP_KEYBOARD {
 
   00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  46 bf 48 f2      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  62 78 ee 07      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
   00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
@@ -58,8 +58,11 @@ block(sect)                         #  struct COMP_KMXPLUS_SECT {
   #    KMX_DWORD sect;           // 0010+ Section identity
   #    KMX_DWORD offset;         // 0014+ Section offset relative to dpKMXPlus of section
 
-  73 74 72 73
-  diff(sect,strs)
+  6b 65 79 73
+  diff(sect,keys)
+
+  6c 6f 63 61
+  diff(sect,loca)
 
   6d 65 74 61
   diff(sect,meta)
@@ -67,11 +70,49 @@ block(sect)                         #  struct COMP_KMXPLUS_SECT {
   6e 61 6d 65
   diff(sect,name)
 
-  6c 6f 63 61
-  diff(sect,loca)
+  73 74 72 73
+  diff(sect,strs)
 
-  6b 65 79 73
-  diff(sect,keys)
+block(keys)                         # struct COMP_KMXPLUS_KEYS {
+  6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
+  sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
+  02 00 00 00                       #   KMX_DWORD count;          // 0008 number of keys
+  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
+                                    # };
+
+# Keys data:
+
+  c0 00 00 00  00 00 00 00  index(strNull,strKey1,2)  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
+  31 00 00 00  00 00 00 00  index(strNull,strKey2,2)  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
+
+block(loca)                         # struct COMP_KMXPLUS_LOCA {
+  6c 6f 63 61                       #   KMX_DWORD header.ident;   // 0000 Section name - loca
+  sizeof(loca)                      #   KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of locales
+  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
+  index(strNull,strLocale,2)        #   KMXPLUS_STR locale;       // 0010+ locale string entry = 'mt'
+                                    # };
+
+block(meta)                         # struct COMP_KMXPLUS_META {
+  6d 65 74 61                       #   KMX_DWORD header.ident;   // 0000 Section name - meta
+  sizeof(meta)                      #   KMX_DWORD header.size;    // 0004 Section length
+  index(strNull,strName,2)          #   KMXPLUS_STR name;
+  index(strNull,strAuthor,2)        #   KMXPLUS_STR author;
+  index(strNull,strConformsTo,2)    #   KMXPLUS_STR conform;
+  index(strNull,strLayout,2)        #   KMXPLUS_STR layout;
+  index(strNull,strNorm,2)          #   KMXPLUS_STR normalization;
+  index(strNull,strIndicator,2)     #   KMXPLUS_STR indicator;
+  index(strNull,strVersion,2)       #   KMXPLUS_STR version;
+  00 00 00 00                       #   KMX_DWORD settings;
+                                    # };
+
+block(name)                         # struct COMP_KMXPLUS_META {
+  6e 61 6d 65                       #   KMX_DWORD header.ident;   // 0000 Section name - name
+  sizeof(name)                      #   KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of names
+  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
+  index(strNull,strName,2)          #   KMXPLUS_STR name;         // 0010+ name string entry = 'TestKbd'
+                                    # };
 
 block(strs)                         #  struct COMP_KMXPLUS_STRS {
   73 74 72 73                       #    KMX_DWORD header.ident;   // 0000 Section name - strs
@@ -113,46 +154,5 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strKey2)             90 17 b6 17   block(x) 00 00                               # 'ថា'
 
 block(endstrs)                      # end of strs block
-
-block(meta)                         # struct COMP_KMXPLUS_META {
-  6d 65 74 61                       #   KMX_DWORD header.ident;   // 0000 Section name - meta
-  sizeof(meta)                      #   KMX_DWORD header.size;    // 0004 Section length
-  index(strNull,strName,2)          #   KMXPLUS_STR name;
-  index(strNull,strAuthor,2)        #   KMXPLUS_STR author;
-  index(strNull,strConformsTo,2)    #   KMXPLUS_STR conform;
-  index(strNull,strLayout,2)        #   KMXPLUS_STR layout;
-  index(strNull,strNorm,2)          #   KMXPLUS_STR normalization;
-  index(strNull,strIndicator,2)     #   KMXPLUS_STR indicator;
-  index(strNull,strVersion,2)       #   KMXPLUS_STR version;
-  00 00 00 00                       #   KMX_DWORD settings;
-                                    # };
-
-block(name)                         # struct COMP_KMXPLUS_META {
-  6e 61 6d 65                       #   KMX_DWORD header.ident;   // 0000 Section name - name
-  sizeof(name)                      #   KMX_DWORD header.size;    // 0004 Section length
-  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of names
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
-  index(strNull,strName,2)          #   KMXPLUS_STR name;         // 0010+ name string entry = 'TestKbd'
-                                    # };
-
-block(loca)                         # struct COMP_KMXPLUS_LOCA {
-  6c 6f 63 61                       #   KMX_DWORD header.ident;   // 0000 Section name - loca
-  sizeof(loca)                      #   KMX_DWORD header.size;    // 0004 Section length
-  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of locales
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
-  index(strNull,strLocale,2)        #   KMXPLUS_STR locale;       // 0010+ locale string entry = 'mt'
-                                    # };
-
-block(keys)                         # struct COMP_KMXPLUS_KEYS {
-  6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
-  sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
-  02 00 00 00                       #   KMX_DWORD count;          // 0008 number of keys
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
-                                    # };
-
-# Keys data:
-
-  c0 00 00 00  00 00 00 00  index(strNull,strKey1,2)  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
-  31 00 00 00  00 00 00 00  index(strNull,strKey2,2)  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
 
 block(eof)   # end of file

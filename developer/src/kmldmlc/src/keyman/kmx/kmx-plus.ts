@@ -9,6 +9,34 @@ import KMXFile from './kmx';
 export class Section {
 }
 
+// 'sect'
+// 'keys'
+
+export enum KeyFlags {
+  none = 0,
+  extend = 1<<0,  // note, this should be used only when streaming, ignored in-memory
+  // additional flags reserved for future use
+};
+
+export class KeysItem {
+  vkey: number;
+  mod: number;
+  to: string;
+  flags: KeyFlags;
+};
+
+export class Keys extends Section {
+  keys: KeysItem[] = [];
+};
+
+// 'loca'
+
+export class Loca extends Section {
+  locales: string[] = [];
+};
+
+// 'meta'
+
 export enum KeyboardSettings {
   none = 0,
   fallback = 1<<0,
@@ -29,30 +57,14 @@ export class Meta extends Section {
   settings: KeyboardSettings;
 };
 
-export class Loca extends Section {
-  locales: string[] = [];
-};
+// 'name'
 
 export class Name extends Section {
   names: string[] = [];
 };
 
-export enum KeyFlags {
-  none = 0,
-  extend = 1<<0,  // note, this should be used only when streaming, ignored in-memory
-  // additional flags reserved for future use
-};
-
-export class KeysItem {
-  vkey: number;
-  mod: number;
-  to: string;
-  flags: KeyFlags;
-};
-
-export class Keys extends Section {
-  keys: KeysItem[] = [];
-};
+// 'strs'
+// 'vkey'
 
 export class VkeyItem {
   vkey: number;
@@ -70,19 +82,19 @@ export default class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_SECT_ITEM: any;
   public readonly COMP_PLUS_SECT: any;
 
-  public readonly COMP_PLUS_STRS_ITEM: any;
-  public readonly COMP_PLUS_STRS: any;
+  public readonly COMP_PLUS_KEYS_ITEM: any;
+  public readonly COMP_PLUS_KEYS: any;
+
+  public readonly COMP_PLUS_LOCA_ITEM: any;
+  public readonly COMP_PLUS_LOCA: any;
 
   public readonly COMP_PLUS_META: any;
 
   public readonly COMP_PLUS_NAME_ITEM: any;
   public readonly COMP_PLUS_NAME: any;
 
-  public readonly COMP_PLUS_LOCA_ITEM: any;
-  public readonly COMP_PLUS_LOCA: any;
-
-  public readonly COMP_PLUS_KEYS_ITEM: any;
-  public readonly COMP_PLUS_KEYS: any;
+  public readonly COMP_PLUS_STRS_ITEM: any;
+  public readonly COMP_PLUS_STRS: any;
 
   public readonly COMP_PLUS_VKEY_ITEM: any;
   public readonly COMP_PLUS_VKEY: any;
@@ -91,11 +103,11 @@ export default class KMXPlusFile extends KMXFile {
 
   public kmxplus: {
     sect?: Section; // sect is ignored here for writing
-    strs?: Section; // strs is ignored here for writing
+    keys?: Keys;
     loca?: Loca;
     meta?: Meta;
     name?: Name;
-    keys?: Keys;
+    strs?: Section; // strs is ignored here for writing
     vkey?: Vkey;
   } = { };
 
@@ -104,6 +116,8 @@ export default class KMXPlusFile extends KMXFile {
 
 
     // Binary-correct structures matching kmx_plus.h
+
+    // 'sect'
 
     this.COMP_PLUS_SECT_ITEM = new r.Struct({
       sect: r.uint32le,
@@ -117,6 +131,64 @@ export default class KMXPlusFile extends KMXFile {
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_SECT_ITEM, 'count')
     });
+
+    // 'keys'
+
+    this.COMP_PLUS_KEYS_ITEM = new r.Struct({
+      vkey: r.uint32le,
+      mod: r.uint32le,
+      to: r.uint32le, //str or UTF-32 char depending on value of 'extend'
+      flags: r.uint32le, //new r.Bitfield(r.uint32le, ['extend'])
+    });
+
+    this.COMP_PLUS_KEYS = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
+      items: new r.Array(this.COMP_PLUS_KEYS_ITEM, 'count')
+    });
+
+    // 'loca'
+
+    this.COMP_PLUS_LOCA_ITEM = r.uint32le; //str
+
+    this.COMP_PLUS_LOCA = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
+      items: new r.Array(this.COMP_PLUS_LOCA_ITEM, 'count')
+    });
+
+    // 'meta'
+
+    this.COMP_PLUS_META = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      name: r.uint32le, //str
+      author: r.uint32le, //str
+      conform: r.uint32le, //str
+      layout: r.uint32le, //str
+      normalization: r.uint32le, //str
+      indicator: r.uint32le, //str
+      version: r.uint32le, //str
+      settings: r.uint32le, //new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
+    });
+
+    // 'name'
+
+    this.COMP_PLUS_NAME_ITEM = r.uint32le; //str
+
+    this.COMP_PLUS_NAME = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
+      items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
+    });
+
+    // 'strs'
 
     this.COMP_PLUS_STRS_ITEM = new r.Struct({
       // While we use length which is number of utf-16 code units excluding null terminator,
@@ -133,53 +205,7 @@ export default class KMXPlusFile extends KMXFile {
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
     });
 
-    this.COMP_PLUS_META = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      name: r.uint32le, //str
-      author: r.uint32le, //str
-      conform: r.uint32le, //str
-      layout: r.uint32le, //str
-      normalization: r.uint32le, //str
-      indicator: r.uint32le, //str
-      version: r.uint32le, //str
-      settings: r.uint32le, //new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
-    });
-
-    this.COMP_PLUS_NAME_ITEM = r.uint32le; //str
-
-    this.COMP_PLUS_NAME = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
-      items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
-    });
-
-    this.COMP_PLUS_LOCA_ITEM = r.uint32le; //str
-
-    this.COMP_PLUS_LOCA = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
-      items: new r.Array(this.COMP_PLUS_LOCA_ITEM, 'count')
-    });
-
-    this.COMP_PLUS_KEYS_ITEM = new r.Struct({
-      vkey: r.uint32le,
-      mod: r.uint32le,
-      to: r.uint32le, //str or UTF-32 char depending on value of 'extend'
-      flags: r.uint32le, //new r.Bitfield(r.uint32le, ['extend'])
-    });
-
-    this.COMP_PLUS_KEYS = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      count: r.uint32le,
-      reserved: new r.Reserved(r.uint32le), // padding
-      items: new r.Array(this.COMP_PLUS_KEYS_ITEM, 'count')
-    });
+    // 'vkey'
 
     this.COMP_PLUS_VKEY_ITEM = new r.Struct({
       vkey: r.uint32le,

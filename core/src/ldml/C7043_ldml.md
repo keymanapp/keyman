@@ -62,7 +62,108 @@ Then for `count` repetitions:
 
 This list is in sorted order based on the `sect` identifier.
 
-### C7043.2.2 `strs`—Strings
+### C7043.2.2 `keys`—Keybag
+
+| ∆ | Bits | Name      | Description                              |
+|---|------|-----------|------------------------------------------|
+| 0 |  32  | ident     | `keys`                                   |
+| 4 |  32  | size      | int: Length of section                   |
+| 8 |  32  | count     | int: Number of keys                      |
+|12 |  32  | reserved  | reserved                                 |
+
+The keys are sorted in binary order based on the `vkey` and `mod` fields.
+
+For each key:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|16+|  32  | vkey    | int: vkey ID                             |
+|20+|  32  | mod     | int: modifier key flags                  |
+|24+|  32  | to      | str: output string OR UTF-32LE codepoint |
+|28+|  32  | flags   | int: per-key flags                       |
+
+- `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
+  etc.). It is resolved because the `vkeyMap` from LDML has already been
+  applied.  If this is 256 or above, it is a custom touch layout vkey generated
+  by the compiler.
+- `mod`: TODO define this.  0 for no modifiers.
+- `flags`: Flags is a 32-bit bitfield defined as below:
+
+| Bit position | Meaning  |  Description                                |
+|--------------|----------|---------------------------------------------|
+|       0      | extend   | 0: `to` is a char, 1: `to` is a string      |
+
+- `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
+  is a 32 bit index into the `strs` table. The string may be zero-length.
+
+### C7043.2.3 `loca`—Locales
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0 |  32  | ident   | `loca`                                   |
+| 4 |  32  | size    | int: Length of section                   |
+| 8 |  32  | count   | int: Number of locales                   |
+|12 |  32  | reserved| padding                                  |
+
+`count` is always ≥1, because a keyboard always has a primary locale identifier.
+
+For each locale ID in `count`
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|16+|  32  | locale  | str: Locale ID in BCP47 format           |
+
+The first locale ID is always the primary locale identifier.  The rest of the
+locale IDs (starting at offset 16) are in sorted binary order.
+
+### C7043.2.4 `meta`—Metadata
+
+| ∆ | Bits | Name          | Description                         |
+|---|------|---------------|-------------------------------------|
+| 0 |  32  | ident         | `meta`                              |
+| 4 |  32  | size          | int: Length of section              |
+| 8 |  32  | name          | str: Keyboard name                  |
+|12 |  32  | author        | str: Keyboard author                |
+|16 |  32  | conform       | str: CLDR 'conformsTo' version      |
+|20 |  32  | layout        | str: layout type                    |
+|24 |  32  | normalization | str: normalization mode             |
+|28 |  32  | indicator     | str: indicator                      |
+|32 |  32  | settings      | int: keyboard settings              |
+
+The `settings` is a 32-bit bitfield as below:
+
+| Bit position | Meaning          |  Description                 |
+|--------------|------------------|------------------------------|
+|       0      | fallback         | fallback=omit                |
+|       1      | transformFailure | transformFailure=omit        |
+|       2      | transformPartial | transformPartial=hide        |
+
+### C7043.2.5 `name`—Names
+
+Defines the names of the keyboard as found in the source `<names>` element.
+While this section is optional in the binary format, in practice it will always
+be present, as the source format requires at least one name.
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0 |  32  | ident   | `name`                                   |
+| 4 |  32  | size    | int: Length of section                   |
+| 8 |  32  | count   | int: Number of names                     |
+|12 |  32  | reserved| padding                                  |
+
+Note that `count` is always ≥1, as the source format requires at least one name.
+
+For each name in `count`:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|16+|  32  | name    | str: A name for the keyboard             |
+
+Note that the first name is repeated in the `meta` section. The remaining names
+are stored in source file order, and the semantic meaning of each name is not
+defined here.
+
+### C7043.2.6 `strs`—Strings
 
 All strings are stored in the Strings section.
 
@@ -97,85 +198,7 @@ A distinction between zero-length string and optional should be avoided (e.g.
 the difference between "" and null in Javascript). If this is truly required, a
 separate flag field must be used to denote the difference.
 
-### C7043.2.3 `meta`—Metadata
-
-| ∆ | Bits | Name          | Description                         |
-|---|------|---------------|-------------------------------------|
-| 0 |  32  | ident         | `meta`                              |
-| 4 |  32  | size          | int: Length of section              |
-| 8 |  32  | name          | str: Keyboard name                  |
-|12 |  32  | author        | str: Keyboard author                |
-|16 |  32  | conform       | str: CLDR 'conformsTo' version      |
-|20 |  32  | layout        | str: layout type                    |
-|24 |  32  | normalization | str: normalization mode             |
-|28 |  32  | indicator     | str: indicator                      |
-|32 |  32  | settings      | int: keyboard settings              |
-
-The `settings` is a 32-bit bitfield as below:
-
-| Bit position | Meaning          |  Description                 |
-|--------------|------------------|------------------------------|
-|       0      | fallback         | fallback=omit                |
-|       1      | transformFailure | transformFailure=omit        |
-|       2      | transformPartial | transformPartial=hide        |
-
-
-### C7043.2.4 `loca`—Locales
-
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `loca`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Number of locales                   |
-|12 |  32  | reserved| padding                                  |
-
-`count` is always ≥1, because a keyboard always has a primary locale identifier.
-
-For each locale ID in `count`
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-|16+|  32  | locale  | str: Locale ID in BCP47 format           |
-
-The first locale ID is always the primary locale identifier.  The rest of the
-locale IDs (starting at offset 16) are in sorted binary order.
-
-### C7043.2.5 `keys`—Keybag
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `keys`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Number of keys                      |
-|12 |  32  | reserved       | reserved                      |
-
-The keys are sorted in binary order based on the `vkey` and `mod` fields.
-
-For each key:
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-|16+|  32  | vkey    | int: vkey ID                             |
-|20+|  32  | mod     | int: modifier key flags                  |
-|24+|  32  | to      | str: output string OR UTF-32LE codepoint |
-|28+|  32  | flags   | int: per-key flags                       |
-
-- `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
-  etc.). It is resolved because the `vkeyMap` from LDML has already been
-  applied.  If this is 256 or above, it is a custom touch layout vkey generated
-  by the compiler.
-- `mod`: TODO define this.  0 for no modifiers.
-- `flags`: Flags is a 32-bit bitfield defined as below:
-
-| Bit position | Meaning  |  Description                                |
-|--------------|----------|---------------------------------------------|
-|       0      | extend   | 0: `to` is a char, 1: `to` is a string      |
-
-- `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
-  is a 32 bit index into the `strs` table. The string may be zero-length.
-
-### C7043.2.6 `vkey`—VKey Map
+### C7043.2.7 `vkey`—VKey Map
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
@@ -195,31 +218,6 @@ For each key:
 
 - `vkey`: Is the standard vkey, 0-255
 - `target`: Is the target (resolved) vkey, 0-255.
-
-### C7043.2.7 `name`—Names
-
-Defines the names of the keyboard as found in the source `<names>` element.
-While this section is optional in the binary format, in practice it will always
-be present, as the source format requires at least one name.
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `name`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Number of names                     |
-|12 |  32  | reserved| padding                                  |
-
-Note that `count` is always ≥1, as the source format requires at least one name.
-
-For each name in `count`:
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-|16+|  32  | name    | str: A name for the keyboard             |
-
-Note that the first name is repeated in the `meta` section. The remaining names
-are stored in source file order, and the semantic meaning of each name is not
-defined here.
 
 ### C7043.2.8 Transforms and friends
 
