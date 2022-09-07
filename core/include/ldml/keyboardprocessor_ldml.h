@@ -22,6 +22,8 @@
 #define LDML_LENGTH_LOCA 0x10
 #define LDML_LENGTH_LOCA_ITEM 0x4
 #define LDML_LENGTH_META 0x28
+#define LDML_LENGTH_NAME 0x10
+#define LDML_LENGTH_NAME_ITEM 0x4
 #define LDML_LENGTH_SECT 0x10
 #define LDML_LENGTH_SECT_ITEM 0x8
 #define LDML_LENGTH_STRS 0x10
@@ -37,6 +39,8 @@
 #define LDML_SECTIONNAME_LOCA             "loca"
 #define LDML_SECTIONID_META 0x6174656D /* "meta" */
 #define LDML_SECTIONNAME_META             "meta"
+#define LDML_SECTIONID_NAME 0x656D616E /* "name" */
+#define LDML_SECTIONNAME_NAME             "name"
 #define LDML_SECTIONID_SECT 0x74636573 /* "sect" */
 #define LDML_SECTIONNAME_SECT             "sect"
 #define LDML_SECTIONID_STRS 0x73727473 /* "strs" */

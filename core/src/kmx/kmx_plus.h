@@ -48,6 +48,10 @@ struct COMP_KMXPLUS_HEADER {
 // Assert that the length matches the declared length
 static_assert(sizeof(struct COMP_KMXPLUS_HEADER) == LDML_LENGTH_HEADER, "mismatched size of section header");
 
+/* ------------------------------------------------------------------
+ * sect section
+   ------------------------------------------------------------------ */
+
 struct COMP_KMXPLUS_SECT_ENTRY {
   KMX_DWORD sect;    // 0010+ Section identity
   KMX_DWORD offset;  // 0014+ Section offset relative to dpKMXPlus of section
@@ -76,6 +80,10 @@ struct COMP_KMXPLUS_SECT {
 // Assert that the length matches the declared length
 static_assert(sizeof(struct COMP_KMXPLUS_SECT) == LDML_LENGTH_SECT, "mismatched size of section sect");
 static_assert(sizeof(struct COMP_KMXPLUS_SECT) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+
+/* ------------------------------------------------------------------
+ * strs section
+   ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_STRS_ENTRY {
     KMX_DWORD offset;                 // 0010+ offset from this blob
@@ -107,6 +115,10 @@ struct COMP_KMXPLUS_STRS {
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) == LDML_LENGTH_STRS, "mismatched size of section strs");
 
+/* ------------------------------------------------------------------
+ * meta section
+   ------------------------------------------------------------------ */
+
 struct COMP_KMXPLUS_META {
   static const KMX_DWORD IDENT = LDML_SECTIONID_META;
   COMP_KMXPLUS_HEADER header;
@@ -126,6 +138,10 @@ struct COMP_KMXPLUS_META {
 
 static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META, "mismatched size of section meta");
 
+/* ------------------------------------------------------------------
+ * loca section
+   ------------------------------------------------------------------ */
+
 struct COMP_KMXPLUS_LOCA_ENTRY {
   KMXPLUS_STR locale; // 0010+ locale string entry
 };
@@ -144,6 +160,10 @@ struct COMP_KMXPLUS_LOCA {
 
 static_assert(sizeof(struct COMP_KMXPLUS_LOCA) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_LOCA) == LDML_LENGTH_LOCA, "mismatched size of section loca");
+
+/* ------------------------------------------------------------------
+ * keys section
+   ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_KEYS_ENTRY {
     KMX_DWORD vkey;
@@ -167,6 +187,10 @@ struct COMP_KMXPLUS_KEYS {
 static_assert(sizeof(struct COMP_KMXPLUS_KEYS) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_KEYS) == LDML_LENGTH_KEYS, "mismatched size of section keys");
 
+/* ------------------------------------------------------------------
+ * vkey section
+   ------------------------------------------------------------------ */
+
 struct COMP_KMXPLUS_VKEY_ENTRY {
     KMX_DWORD vkey;
     KMX_DWORD target;
@@ -186,6 +210,30 @@ struct COMP_KMXPLUS_VKEY {
 
 static_assert(sizeof(struct COMP_KMXPLUS_VKEY) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched size of section vkey");
+
+/* ------------------------------------------------------------------
+ * name section
+   ------------------------------------------------------------------ */
+
+struct COMP_KMXPLUS_NAME_ENTRY {
+    KMXPLUS_STR name;
+};
+
+struct COMP_KMXPLUS_NAME {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_NAME;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count;
+  KMX_DWORD reserved;
+  COMP_KMXPLUS_NAME_ENTRY entries[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_NAME) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_NAME) == LDML_LENGTH_NAME, "mismatched size of section name");
+
 
 /**
  * @brief helper accessor object for

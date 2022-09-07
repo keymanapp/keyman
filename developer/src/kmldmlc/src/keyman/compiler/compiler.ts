@@ -6,11 +6,13 @@ import CompilerCallbacks from './callbacks';
 import { KeysCompiler } from './keys';
 import { LocaCompiler } from './loca';
 import { MetaCompiler } from './meta';
+import { NameCompiler } from './name';
 
 const SECTION_COMPILERS = [
   MetaCompiler,
   LocaCompiler,
   KeysCompiler,
+  NameCompiler
 ];
 
 export default class Compiler {

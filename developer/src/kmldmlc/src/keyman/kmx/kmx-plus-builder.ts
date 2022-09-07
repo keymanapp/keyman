@@ -45,6 +45,12 @@ interface BUILDER_META extends BUILDER_SECTION {
   settings: number; //bitfield
 };
 
+interface BUILDER_NAME extends BUILDER_SECTION {
+  count: number;
+  reserved: number;
+  items: number[]; //str[]
+};
+
 interface BUILDER_LOCA extends BUILDER_SECTION {
   count: number;
   reserved: number;
@@ -88,6 +94,7 @@ export default class KMXPlusBuilder {
   private sect_sect: BUILDER_SECT;
   private sect_strs: BUILDER_STRS;
   private sect_meta: BUILDER_META;
+  private sect_name: BUILDER_NAME;
   private sect_loca: BUILDER_LOCA;
   private sect_keys: BUILDER_KEYS;
   private sect_vkey: BUILDER_VKEY;
@@ -169,6 +176,28 @@ export default class KMXPlusBuilder {
 
     return loca;
   }
+
+  private build_name(): BUILDER_NAME {
+    if(!this.file.kmxplus.name.names.length) {
+      return null;
+    }
+
+    let name: BUILDER_NAME = {
+      ident: constants.hex_section_id(constants.section.name),
+      size: constants.length_name + constants.length_name_item * this.file.kmxplus.name.names.length,
+      _offset: 0,
+      count: this.file.kmxplus.name.names.length,
+      reserved: 0,
+      items: []
+    };
+
+    for(let item of this.file.kmxplus.name.names) {
+      name.items.push(this.alloc_string(item));
+    }
+
+    return name;
+  }
+
 
   private build_keys(): BUILDER_KEYS {
     if(!this.file.kmxplus.keys.keys.length) {
@@ -255,12 +284,16 @@ export default class KMXPlusBuilder {
     if(this.sect_vkey) {
       this.sect_sect.count++;
     }
+    if(this.sect_name) {
+      this.sect_sect.count++;
+    }
 
     this.sect_sect.size = constants.length_sect + constants.length_sect_item * this.sect_sect.count;
 
     let offset = this.sect_sect.size;
     offset = this.finalize_sect_item(this.sect_strs, offset);
     offset = this.finalize_sect_item(this.sect_meta, offset);
+    offset = this.finalize_sect_item(this.sect_name, offset);
     offset = this.finalize_sect_item(this.sect_loca, offset);
     offset = this.finalize_sect_item(this.sect_keys, offset);
     offset = this.finalize_sect_item(this.sect_vkey, offset);
@@ -278,6 +311,7 @@ export default class KMXPlusBuilder {
     this.alloc_string('');
 
     this.sect_meta = this.build_meta();
+    this.sect_name = this.build_name();
     this.sect_loca = this.build_loca();
     this.sect_keys = this.build_keys();
     this.sect_vkey = this.build_vkey();
@@ -317,6 +351,7 @@ export default class KMXPlusBuilder {
     this.emitSection(file, this.file.COMP_PLUS_STRS, this.sect_strs);
     this.emitStrings(file);
     this.emitSection(file, this.file.COMP_PLUS_META, this.sect_meta);
+    this.emitSection(file, this.file.COMP_PLUS_NAME, this.sect_name);
     this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect_loca);
     this.emitSection(file, this.file.COMP_PLUS_KEYS, this.sect_keys);
     this.emitSection(file, this.file.COMP_PLUS_VKEY, this.sect_vkey);

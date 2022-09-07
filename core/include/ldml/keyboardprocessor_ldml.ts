@@ -1,18 +1,32 @@
 /*
   Copyright:        Copyright (C) 2022 SIL International.
-  Authors:          srl295
+  Authors:          srl295, mcdurdin
   This file provides constants for the KMX Plus (LDML support) binary format,
   to be shared between TypeScript and C++ via the generator (below)
 */
 
-// This defines the section identifiers and ensures that we include each and
-// every one of them in the `sections` block and gives us a type which we can
-// iterate through
 
+// NOTICE!
+//
+// If you update this file, you *must* be sure to re-run
+//
+//  core/tools/ldml-const-builder/build.sh clean build run
+//
+// To update keyboardprocessor_ldml.h, and commit the result.
+//
+// It is not updated automatically.
+
+
+/**
+ * Defines the section identifiers and ensures that we include each and every
+ * one of them in the `sections` block and gives us a type which we can iterate
+ * through.
+ */
 export type SectionIdent =
   'keys' |
   'loca' |
   'meta' |
+  'name' |
   'sect' |
   'strs' |
   'vkey';
@@ -22,22 +36,12 @@ type SectionMap = {
 }
 
 interface Constants_Section {
-  // For now, only defining one property as other types
-  // can be inferred
+  // For now, only defining one property as other types can be inferred
   section: SectionMap;
 }
 
 type Constants = Constants_Section & {[id:string]:any};
 
-// Notice!
-//
-// If you update this file, you *must* be sure to re-run
-//
-//  core/tools/ldml-const-builder/build.sh clean build run
-//
-// To update keyboardprocessor_ldml.h, and commit the result.
-//
-// It is not updated automatically.
 
 // TODO-LDML: namespace com.keyman.core.ldml {
 /**
@@ -57,25 +61,56 @@ export const constants: Constants = {
      */
     length_header: 8,
 
+    /* ------------------------------------------------------------------
+     * sect section
+       ------------------------------------------------------------------ */
+
     /**
      * Minimum length of the 'sect' section, not including entries
      */
     length_sect: 16,
+    /**
+     *  Length of each item in the 'sect' section variable part
+     */
     length_sect_item: 8,
 
-    /**
-     * Minimum length of the 'keys' section
-     * not including variable parts
-     */
-    length_keys: 16,
-    length_keys_item: 16,
+    /* ------------------------------------------------------------------
+     * keys section
+       ------------------------------------------------------------------ */
 
     /**
-     * Minimum length of the 'loca' section
-     * not including variable parts
+     * Minimum length of the 'keys' section not including variable parts
+     */
+    length_keys: 16,
+    /**
+     *  Length of each item in the 'keys' section variable part
+     */
+    length_keys_item: 16,
+    /**
+     * bitwise or value for extend in keys[key].flags.
+     * If bit is 1, then 'to' is a string.
+     * If bit is 0, then 'to' is a UTF-32LE codepoint
+     *
+     * `extend = flags & keys_flags_extend`
+     */
+     keys_flags_extend: 1,
+
+    /* ------------------------------------------------------------------
+     * loca section
+       ------------------------------------------------------------------ */
+
+    /**
+     * Minimum length of the 'loca' section not including variable parts
      */
     length_loca: 16,
+    /**
+     *  Length of each item in the 'loca' section variable part
+     */
     length_loca_item: 4,
+
+    /* ------------------------------------------------------------------
+     * meta section
+       ------------------------------------------------------------------ */
 
     /**
      * length of the 'meta' section
@@ -94,25 +129,36 @@ export const constants: Constants = {
      */
     meta_settings_transformPartial_hide: 4,
 
+    /* ------------------------------------------------------------------
+     * name section
+       ------------------------------------------------------------------ */
+
     /**
-     * Minimum length of the 'strs' section
-     * not including variable parts
+     * Minimum length of the 'name' section not including variable parts
+     */
+     length_name: 16,
+     /**
+      *  Length of each item in the 'name' section variable part
+      */
+     length_name_item: 4,
+
+    /* ------------------------------------------------------------------
+     * strs section
+       ------------------------------------------------------------------ */
+
+    /**
+     * Minimum length of the 'strs' section not including variable parts
      */
     length_strs: 16,
     /**
-     * Length of each item in the 'strs' section
-     * variable part
+     * Length of each item in the 'strs' section variable part
      */
     length_strs_item: 8,
 
-    /**
-     * bitwise or value for extend in keys[key].flags.
-     * If bit is 1, then 'to' is a string.
-     * If bit is 0, then 'to' is a UTF-32LE codepoint
-     *
-     * `extend = flags & keys_flags_extend`
-     */
-    keys_flags_extend: 1,
+    /* ------------------------------------------------------------------
+     * vkey section
+       ------------------------------------------------------------------ */
+
     /**
      * Minimum length of the 'vkey' section
      * not including variable parts
@@ -127,6 +173,7 @@ export const constants: Constants = {
         keys: 'keys',
         loca: 'loca',
         meta: 'meta',
+        name: 'name',
         sect: 'sect',
         strs: 'strs',
         vkey: 'vkey',
