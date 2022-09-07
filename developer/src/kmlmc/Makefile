@@ -5,13 +5,16 @@
 !include ..\Defines.mak
 
 build: .virtual
-    $(GIT_BASH_FOR_KEYMAN) build.sh -test
+    $(GIT_BASH_FOR_KEYMAN) build.sh
 
 clean: .virtual
 #TODO: move to build.sh `clean` target
     -rd /s/q dist
     -rd /s/q dist-tests
     -del tsconfig.tsbuildinfo
+
+test: .virtual
+    $(GIT_BASH_FOR_KEYMAN) build.sh -tdd
 
 signcode:
     @rem nothing to do
