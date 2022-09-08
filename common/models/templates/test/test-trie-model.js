@@ -3,7 +3,7 @@
  */
 
 var assert = require('chai').assert;
-var TrieModel = require('../').models.TrieModel;
+var TrieModel = require('../build/index.bundled.js').models.TrieModel;
 
 describe('LMLayerWorker trie model for word lists', function() {
   describe('instantiation', function () {
@@ -20,7 +20,7 @@ describe('LMLayerWorker trie model for word lists', function() {
           }
         }
       })
-      
+
       assert.equal(model.punctuation.insertAfterWord, spaceMark);
       assert.equal(model.punctuation.quotesForKeepSuggestion.open, openQuote);
       assert.equal(model.punctuation.quotesForKeepSuggestion.close, closeQuote);
@@ -176,7 +176,7 @@ describe('LMLayerWorker trie model for word lists', function() {
       );
     });
   });
-  
+
   describe('The default key function', function () {
     it('uses the default key function', function () {
       var model = new TrieModel(jsonFixture('tries/accented'));

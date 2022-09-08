@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 16.0.58 alpha 2022-09-08
+
+* fix(common/models): reconnects unit tests for worker-internal submodules (#7215)
+* feat(common/models): extra Unicode-based wordbreaker unit tests (#7217)
+
+## 16.0.57 alpha 2022-09-07
+
+* fix(android/engine): Fix Backspace key to delete without errant subkeys (#7156)
+
+## 16.0.56 alpha 2022-09-05
+
+* chore(linux): Fix ibus-keyman.postinst script (#7192)
+
+## 16.0.55 alpha 2022-09-03
+
+* chore(android): Reduce Toast notification noise (#7178)
+
 ## 16.0.54 alpha 2022-08-30
 
 * chore(core): rename json.hpp to jsonpp.hpp (#6993)
