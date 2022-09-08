@@ -301,7 +301,7 @@ typedef struct _COMPILER_OPTIONS {
 
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 
-extern "C" KMX_BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
+extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
   }
@@ -309,9 +309,9 @@ extern "C" KMX_BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS o
   return TRUE;
 }
 
-extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
+extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
-  FILE* fp_in  = NULL;
+  FILE* fp_in = NULL;
   FILE* fp_out = NULL;
   KMX_BOOL err;
   KMX_DWORD len;
@@ -336,9 +336,9 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
 
   msgproc = pMsgProc;
   currentLine = 0;
-  nErrors = 0;   
-    
-  fp_in = fopen((const char*)pszInfile,"rb");
+  nErrors = 0;
+
+  fp_in = fopen((const char*)pszInfile, "rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
 
@@ -348,33 +348,32 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
   fseek(fp_in, 0, SEEK_END);
   len = ftell(fp_in);
   fseek(fp_in, 0, SEEK_SET);
-  if( !fread(str,1,3,fp_in))
+  if (!fread(str, 1, 3, fp_in))
   {
     fclose(fp_in);
     return CERR_CannotReadInfile;
   }
 
-  fseek( fp_in,0,SEEK_SET);
+  fseek(fp_in, 0, SEEK_SET);
   if (str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
     fp_in = UTF16TempFromUTF8(fp_in, TRUE);
   else if (str[0] == UTF16Sig[0] && str[1] == UTF16Sig[1])
-   fseek( fp_in,2,SEEK_SET);
+    fseek(fp_in, 2, SEEK_SET);
   else
     fp_in = UTF16TempFromUTF8(fp_in, FALSE);
-  if (fp_in  == NULL)
+  if (fp_in == NULL)
   {
     return CERR_CannotCreateTempfile;
   }
 
-   fp_out = fopen((const char*)pszOutfile,"wb");
-  
+  fp_out = fopen((const char*)pszOutfile, "wb");
+
   if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);
 
 
   KMX_DWORD msg;
   FILE_KEYBOARD fk;
   CodeConstants = new NamedCodeConstants;
-
   err = CompileKeyboardHandle(fp_in, &fk);
   if (err)
   {
@@ -399,7 +398,8 @@ extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile
 }
 
 
-extern "C" KMX_BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
+
+extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
 {
   FILE* fp_in =NULL;
   KMX_BOOL err;
@@ -986,6 +986,7 @@ KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 /***************************************
 * Store management
 */
+
 KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 {
   PKMX_WCHAR q, pp;
@@ -1212,7 +1213,6 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     if (!q) return CERR_InvalidLanguageLine;
 
     i = xatoi(&q);
-
     KMX_WCHAR sep_n[4] = u" c\n";
     PKMX_WCHAR p_sep_n = sep_n;
     q = u16tok(NULL, p_sep_n, &context);  // I3481
@@ -1362,7 +1362,6 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     size_t szQ = u16len(sp->dpString) * 6 + 1;  // I3481
     q = new KMX_WCHAR[szQ]; // guaranteed to be enough space for recoding
     *q = 0; KMX_WCHAR *r = q;
-
     KMX_WCHAR sep_s[4] = u" ";
     PKMX_WCHAR p_sep_s = sep_s;
     p = u16tok(sp->dpString, p_sep_s, &context);  // I3481
@@ -1400,7 +1399,6 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
      if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
            return msg;
      }
-
     // Used by KMW compiler
     break;
 
@@ -1829,6 +1827,7 @@ KMX_DWORD ExpandKp_ReplaceIndex(PFILE_KEYBOARD fk, PFILE_KEY k, KMX_DWORD keyInd
   return CERR_None;
 }
 
+
 KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
 {
   PFILE_KEY k;
@@ -1911,7 +1910,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
   if (*q != dOpen) return NULL;
 
   q++;
-  
+
   r = xstrchr(q, &dClose);			        // Find closing delimiter
   if (!r) return NULL;
 
@@ -2042,13 +2041,11 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 
   __try
   {
-
     *tstr = 0;
 
     *output = 0;
 
     p = str;
-
     do
     {
       tokenFound = FALSE;
@@ -2095,7 +2092,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 
       switch (type)
       {
-       case 99:
+      case 99:
         if (tokenFound) break;
         {
           PKMX_WCHAR p_ErrExtra =strtowstr(ErrExtra);
@@ -2640,7 +2637,6 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
       default:
         return CERR_InvalidToken;
       }
-
       if (tokenFound)
       {
         *newp = p;
@@ -3160,7 +3156,6 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
     if (u16chr(q, '+')) *hk |= HK_SHIFT;
     if (u16chr(q, '%')) *hk |= HK_ALT;
     q = (PKMX_WCHAR) u16chr(q, 0) - 1;
-
     *hk |= *q;
     return CERR_None;
   }
@@ -3390,8 +3385,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   KMX_WCHAR currentQuotes = 0;
   KMX_WCHAR str[LINESIZE + 3];
   len = fread( str , 1 ,LINESIZE * 2,fp_in);
-  if (ferror(fp_in) )
-    return CERR_CannotReadInfile;
+  if (ferror(fp_in) ) return CERR_CannotReadInfile;
   len /= 2;
   str[len] = 0; auto cur = ftell(fp_in);
   fseek(fp_in, 0, SEEK_END);
@@ -3623,7 +3617,6 @@ int atoiW(PKMX_WCHAR p)
   delete[] q;
   return i;
 }
-
 
 int CheckUTF16(int n)
 {
