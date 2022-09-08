@@ -1,5 +1,5 @@
 const assert = require('chai').assert;
-const breakWords = require('..').wordBreakers['placeholder'];
+const breakWords = require('../build').wordBreakers['placeholder'];
 
 
 describe('The placeholder word breaker', function () {

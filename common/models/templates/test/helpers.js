@@ -7,8 +7,10 @@ var _ = global;
 // TODO: then mocha invocation is as follows:
 // TODO:     mocha -r @keymanapp/models-test-helpers test/
 
-// KMW string must be included, so do it here:
-require('@keymanapp/web-utils');
+// Ensure that we can successfully load the module & apply kmwLength, as it's
+// needed for some of the unit tests.
+require('../build/index.bundled.js');
+
 assert.ok('💩'.kmwLength);
 
 /**
@@ -21,7 +23,7 @@ _.jsonFixture = function (name) {
 /**
  * Returns the Context of an empty buffer; no text, at both the start and
  * end of the buffer.
- * 
+ *
  * @returns {Context}
  */
 _.emptyContext = function emptyContext() {
