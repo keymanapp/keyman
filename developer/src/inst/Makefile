@@ -6,7 +6,7 @@
 
 # ----------------------------------------------------------------------
 
-DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj kmlmc.wixobj server.wixobj kmldmlc.wixobj
+DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj kmlmc.wixobj server.wixobj kmc.wixobj
 
 setup:
 #

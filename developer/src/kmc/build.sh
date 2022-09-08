@@ -16,12 +16,12 @@ cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-builder_describe "Build Keyman LDML Keyboard Compiler kmldmlc" \
+builder_describe "Build Keyman LDML Keyboard Compiler kmc" \
   "configure                 runs 'npm ci' on root folder" \
-  "build                     (default) builds kmldmlc to build/" \
+  "build                     (default) builds kmc to build/" \
   "clean                     cleans build/ folder" \
-  "bundle                    creates a bundled version of kmldmlc" \
-  "test                      run automated tests for kmldmlc" \
+  "bundle                    creates a bundled version of kmc" \
+  "test                      run automated tests for kmc" \
   "build-fixtures            builds test fixtures for manual examination" \
   "publish                   publish to npm" \
   "--build-path=BUILD_PATH   build directory for bundle" \
