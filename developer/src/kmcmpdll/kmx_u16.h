@@ -30,8 +30,6 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)  ;
 double u16tof( KMX_WCHAR* str);
 
 std::string toHex(int num1);
-void u16printf(km_kbp_cp** dst, char sys, km_kbp_cp sep, std::vector<signed long long> V_in,  km_kbp_cp* src1 = 0, const km_kbp_cp* src2 = 0, const km_kbp_cp* src3 = 0);
-void u16printf(KMX_WCHAR** dst, KMX_WCHAR* src1,  KMX_WCHAR* src2);
 const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max);
 
 #endif  //KMX_U16_H

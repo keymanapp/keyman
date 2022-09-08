@@ -79,6 +79,7 @@ struct FILE_STORE {
 	KMX_BOOL fIsCall;
 	int line;
 	};
+
 typedef FILE_STORE * PFILE_STORE;
 
 

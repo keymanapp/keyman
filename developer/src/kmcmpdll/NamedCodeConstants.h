@@ -17,7 +17,7 @@ private:
 	NCCENTRY *entries;			// entries from &includecodes
 	NCCENTRY *entries_file;		// entries from store(myconst) x
 	int nEntries, nEntries_file;
-	int chrindexes[128];		 // A-Z, 0-9, -, _; simple index
+	int chrindexes[128];		// A-Z, 0-9, -, _; simple index
 
 	int GetCode_IncludedCodes(const char16_t *codename);
 	void AddCode_IncludedCodes(int n, const char16_t *p);
