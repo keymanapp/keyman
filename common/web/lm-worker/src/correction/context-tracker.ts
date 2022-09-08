@@ -27,15 +27,10 @@ namespace correction {
   export class TrackedContextToken {
     raw: string;
     replacementText: string;
-    newFlag: boolean = false;
 
     transformDistributions: Distribution<Transform>[] = [];
     replacements: TrackedContextSuggestion[];
     activeReplacementId: number = -1;
-
-    get isNew(): boolean {
-      return this.newFlag;
-    }
 
     get currentText(): string {
       if(this.replacementText === undefined || this.replacementText === null) {
@@ -190,7 +185,6 @@ namespace correction {
       }
       // Replace old token's raw-text with new token's raw-text.
       editedToken.raw = tokenText;
-      editedToken.newFlag = false;
     }
 
     toRawTokenization() {
@@ -427,7 +421,6 @@ namespace correction {
             pushedToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
           }
 
-          pushedToken.newFlag = true;
           state.pushTail(pushedToken);
         } else { // We're editing the final context token.
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
@@ -448,7 +441,6 @@ namespace correction {
           let token = new TrackedContextToken();
           token.raw = tokenizedContext[0];
           token.transformDistributions = [transformDistribution];
-          token.newFlag = true;
           state.pushTail(token);
         } else { // Edit the lone context token.
           // Consider backspace entry for this case?
@@ -496,13 +488,6 @@ namespace correction {
         token.raw = '';
 
         state.pushTail(token);
-      }
-
-      const finalToken = state.tokens[state.tokens.length - 1];
-      const baseTransform = (transformDistribution && transformDistribution.length > 0) ? transformDistribution[0] : null;
-
-      if(baseTransform && baseTransform.sample.insert == finalToken.raw) {
-        finalToken.newFlag = true;
       }
 
       return state;

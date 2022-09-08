@@ -85,7 +85,7 @@ class ModelCompositor {
 
     // Used to restore whitespaces if operations would remove them.
     let prefixTransform: Transform;
-    let contextState: correction.TrackedContextState = null;
+    let postContextState: correction.TrackedContextState = null;
 
     // Section 1:  determining 'prediction roots'.
     if(!this.contextTracker) {
@@ -120,12 +120,15 @@ class ModelCompositor {
       // Running in bulk over all suggestions, duplicate entries may be possible.
       rawPredictions = this.predictFromCorrections(predictionRoots, context);
     } else {
-      contextState = this.contextTracker.analyzeState(this.lexicalModel,
-                                                      postContext,
-                                                      !TransformUtils.isEmpty(inputTransform) ?
-                                                                      transformDistribution:
-                                                                      null
-                                                      );
+      // Token replacement benefits greatly from knowledge of the prior context state.
+      let contextState = this.contextTracker.analyzeState(this.lexicalModel, context, null);
+      // Corrections and predictions are based upon the post-context state, though.
+      postContextState = this.contextTracker.analyzeState(this.lexicalModel,
+                                                          postContext,
+                                                          !TransformUtils.isEmpty(inputTransform) ?
+                                                                          transformDistribution:
+                                                                          null
+                                                          );
 
       // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
       //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -134,20 +137,68 @@ class ModelCompositor {
       // let's just note that right now, there will only ever be one.
       //
       // The 'eventual' logic will be significantly more complex, though still manageable.
-      let searchSpace = contextState.searchSpace[0];
+      let searchSpace = postContextState.searchSpace[0];
 
-      let newToken = false;
-      // Detect if we're starting a new context state.
-      let contextTokens = contextState.tokens;
-      if(contextTokens.length == 0 || contextTokens[contextTokens.length - 1].isNew) {
-        // Always note if we have a new token (so that we don't try to delete existing context)
-        newToken = true;
-        // If the new token is due to whitespace, or if we had a context-reset trigger this (thus, no input...)
-        // (Lingering question:  do we need the .isEmpty check here?  Track `prefixTransform` and find out.)
-        if(TransformUtils.isEmpty(inputTransform) || TransformUtils.isWhitespace(inputTransform)) {
+      // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
+      // same amount of text.  We can handle this before the big 'prediction root' loop.
+      let deleteLeft = 0;
+
+      // The amount of text to 'replace' depends upon whatever sort of context change occurs
+      // from the received input.
+      let postContextLength = postContextState.tokens.length;
+      let contextLengthDelta = postContextState.tokens.length - contextState.tokens.length;
+      // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
+      if(postContextLength == 0 || contextLengthDelta > 0) {
+        // As the word/token being corrected/predicted didn't originally exist, there's no
+        // part of it to 'replace'.
+        deleteLeft = 0;
+
+        // If the new token is due to whitespace or due to a different input type that would
+        // likely imply a tokenization boundary...
+        if(TransformUtils.isWhitespace(inputTransform)) {
+          /* TODO:  consider/implement:  the second half of the comment above.
+           * For example:  on input of a `'`, predict new words instead of replacing the `'`.
+           * (since after a letter, the `'` will be ignored, anyway)
+           *
+           * Idea:  if the model's most likely prediction (with no root) would make a new
+           * token if appended to the current token, that's probably a good case.
+           * Keeps the check simple & quick.
+           *
+           * Might need a mixed mode, though:  ';' is close enough that `l` is a reasonable
+           * fat-finger guess.   So yeah, we're not addressing this idea right now.
+           * - so... consider multiple context behavior angles when building prediction roots?
+           *
+           * May need something similar to help handle contractions during their construction,
+           * but that'd be within `ContextTracker`.
+           * can' => [`can`, `'`]
+           * can't => [`can't`]  (WB6, 7 of https://unicode.org/reports/tr29/#Word_Boundary_Rules)
+           *
+           * (Would also helps WB7b+c for Hebrew text)
+           */
+
+          // Infer 'new word' mode, even if we received new text when reaching
+          // this position.  That new text didn't exist before, so still - nothing
+          // to 'replace'.
           prefixTransform = inputTransform;
-          context = postContext; // Ensure the whitespace token is preapplied!
+          context = postContext; // As far as predictions are concerned, the post-context state
+                                 // should not be replaced.  Predictions are to be rooted on
+                                 // text "up for correction" - so we want a null root for this
+                                 // branch.
+          contextState = postContextState;
         }
+        // If the tokenized context length is shorter... sounds like a backspace (or similar).
+      } else if (contextLengthDelta < 0) {
+        /* Ooh, we've dropped context here.  Almost certainly from a backspace.
+         * Even if we drop multiple tokens... well, we know exactly how many chars
+         * were actually deleted - `inputTransform.deleteLeft`.
+         * Since we replace a word being corrected/predicted, we take length of the remaining
+         * context's tail token in addition to however far was deleted to reach that state.
+         */
+        deleteLeft = this.wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
+      } else {
+        // Suggestions are applied to the pre-input context, so get the token's original length.
+        // We're on the same token, so just delete its text for the replacement op.
+        deleteLeft = this.wordbreak(context).kmwLength();
       }
 
       // TODO:  whitespace, backspace filtering.  Do it here.
@@ -169,19 +220,6 @@ class ModelCompositor {
             finalInput = match.inputSequence[match.inputSequence.length - 1].sample;
           } else {
             finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
-          }
-
-          let deleteLeft = 0;
-          // remove actual token string.  If new token, there should be nothing to delete.
-          if(!newToken) {
-            // If this is triggered from a backspace, make sure to use its results
-            // and also include its left-deletions!  It's the one post-input context case.
-            if(allowBksp) {
-              deleteLeft = this.wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
-            } else {
-              // Normal case - use the pre-input context.
-              deleteLeft = this.wordbreak(context).kmwLength();
-            }
           }
 
           // Replace the existing context with the correction.
@@ -390,8 +428,8 @@ class ModelCompositor {
 
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
-    if(contextState) {
-      contextState.tail.replacements = suggestions.map(function(suggestion) {
+    if(postContextState) {
+      postContextState.tail.replacements = suggestions.map(function(suggestion) {
         return {
           suggestion: suggestion,
           tokenWidth: 1
