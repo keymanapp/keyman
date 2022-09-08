@@ -12,22 +12,6 @@
 using namespace km::kbp;
 using namespace kmx;
 
-int
-km::kbp::kmx::Utf32CharToUtf16(const KMX_DWORD ch32, char16_single &ch16) {
-  int len;
-  if (Uni_IsBMP(ch32)) {
-    len        = 1;
-    ch16.ch[0] = Uni_UTF32BMPToUTF16(ch32);
-    ch16.ch[1] = 0;
-  } else {
-    len        = 2;
-    ch16.ch[0] = Uni_UTF32ToSurrogate1(ch32);
-    ch16.ch[1] = Uni_UTF32ToSurrogate2(ch32);
-    ch16.ch[2] = 0;
-  }
-  return len;
-}
-
 const km_kbp_cp *km::kbp::kmx::u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   while (*p) {
     if (*p == ch) return p;
