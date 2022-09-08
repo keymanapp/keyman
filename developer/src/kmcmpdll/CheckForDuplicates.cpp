@@ -18,10 +18,10 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
     if (gp0 == gp) {
       continue;
     }
-    if (u16icmp(gp0->szName, gp->szName) == 0)       // _S2 if (_wcsicmp(gp0->szName, gp->szName) == 0)
+    if (u16icmp(gp0->szName, gp->szName) == 0)
     {
       PKMX_WCHAR ErrExtra =NULL;
-      u16sprintf(ErrExtra, 1024, L"Group '%ls' declared on line %d", u16fmt(gp0->szName).c_str(), gp0->Line);// _ S2    wsprintf(ErrExtra, "Group '%ls' declared on line %d", gp0->szName, gp0->Line);
+      u16sprintf(ErrExtra, 1024, L"Group '%ls' declared on line %d", u16fmt(gp0->szName).c_str(), gp0->Line);
       return CERR_DuplicateGroup;
     }
   }
@@ -40,10 +40,10 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
     if (sp0 == sp) {
       continue;
     }
-    if (u16icmp(sp0->szName, sp->szName) == 0)   // _S2 if (_wcsicmp(sp0->szName, sp->szName) == 0)
+    if (u16icmp(sp0->szName, sp->szName) == 0)
      {
         PKMX_WCHAR ErrExtra =NULL;
-        u16sprintf(ErrExtra, 1024, L"Store '%ls' declared on line %d", u16fmt(sp0->szName).c_str(), sp0->line);      // _ S2    wsprintf(ErrExtra, "Store '%ls' declared on line %d", sp0->szName, sp0->line);
+        u16sprintf(ErrExtra, 1024, L"Store '%ls' declared on line %d", u16fmt(sp0->szName).c_str(), sp0->line);
       return CERR_DuplicateStore;
     }
   }
