@@ -130,16 +130,16 @@ NSString* _keymanDataPath = nil;
     result.tier = [keymanInfo objectForKey:@"Tier"];
     result.versionRelease = [keymanInfo objectForKey:@"VersionRelease"];
     result.versionWithTag = [keymanInfo objectForKey:@"VersionWithTag"];
-    if([result.tier isEqualToString:@"stable"]) {
-        result.keymanCom = @"keyman.com";
-        result.helpKeymanCom = @"help.keyman.com";
-        result.apiKeymanCom = @"api.keyman.com";
-    }
+    // if([result.tier isEqualToString:@"stable"]) {  // #7227 disabling:
+    result.keymanCom = @"keyman.com";
+    result.helpKeymanCom = @"help.keyman.com";
+    result.apiKeymanCom = @"api.keyman.com";
+    /*}
     else {
         result.keymanCom = @"keyman-staging.com";
         result.helpKeymanCom = @"help.keyman-staging.com";
         result.apiKeymanCom = @"api.keyman-staging.com";
-    }
+    }*/
     return result;
 }
 
@@ -632,11 +632,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
     NSString *path = [[self keymanDataPath] stringByAppendingPathComponent:packageFolder];
     KMPackageInfo *packageInfo = [self.packageReader loadPackageInfo:path];
-  
+
     if (packageInfo) {
         packageName = packageInfo.packageName;
     }
-  
+
     return packageName;
 }
 
@@ -1149,7 +1149,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self.receivedData writeToFile:filePath atomically:YES];
     [self unzipFile:filePath];
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-    
+
     [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-download-complete", nil)];
     NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
     [button setTitle:NSLocalizedString(@"button-download-complete", nil)];
