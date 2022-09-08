@@ -31,13 +31,6 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action configure; then
-  verify_npm_setup
-  builder_report success configure
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
 if builder_has_action clean; then
   rm -rf ./build/ ./tsconfig.tsbuildinfo
   builder_report success clean
@@ -45,10 +38,20 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
+if builder_has_action configure; then
+  verify_npm_setup
+
+  # We need the schema file at runtime and bundled
+  mkdir -p "$THIS_SCRIPT_PATH/build/src/"
+  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
+
+  builder_report success configure
+fi
+
+#-------------------------------------------------------------------------------------------------------------------
+
 if builder_has_action build; then
   npm run build
-  # We need the schema file at runtime and bundled
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   builder_report success build
 fi
 
