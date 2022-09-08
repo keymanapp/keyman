@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.58 alpha 2022-09-08
+
+* fix(common/models): reconnects unit tests for worker-internal submodules (#7215)
+* feat(common/models): extra Unicode-based wordbreaker unit tests (#7217)
+
 ## 16.0.57 alpha 2022-09-07
 
 * fix(android/engine): Fix Backspace key to delete without errant subkeys (#7156)
