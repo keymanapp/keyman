@@ -81,7 +81,7 @@
     </xsl:call-template></xsl:variable>
 
     <div tabindex="1" tagType="listitem">
-      <xsl:attribute name="class">list_item</xsl:attribute>
+      <xsl:attribute name="class">list_item kbd_list_item</xsl:attribute>
       <xsl:attribute name="id">list_keyboard_<xsl:value-of select="id"/></xsl:attribute>
       <xsl:attribute name="data-name"><xsl:value-of select="name"/></xsl:attribute>
 
@@ -90,7 +90,7 @@
 			<xsl:attribute name="onblur">return list_blur(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
 			<xsl:attribute name="oncontextmenu">event.cancelBubble=true;event.returnValue=false;</xsl:attribute>
 
-      <xsl:attribute name="style">left:0;top:0;width:99%</xsl:attribute>
+      <xsl:attribute name="style">left:0;top:0;</xsl:attribute>
       <div>
         <xsl:attribute name="onmousedown">return list_detail(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
         <xsl:attribute name="id">listtitle_keyboard_<xsl:value-of select="id"/></xsl:attribute>
@@ -119,14 +119,20 @@
 
         <div style="float:right">
           <div style="float: left; padding: 1px 20px 1px 0px;">
-            <a class="hotkey" tabindex="-1">
-              <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
-              <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
-              <xsl:choose>
-                <xsl:when test="hotkey"><xsl:value-of select="hotkey"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
-              </xsl:choose>
-            </a>
+            <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) = 1">
+              <xsl:for-each select="//KeymanLanguage"> <!-- Need the for each to get the correct position for the href -->
+                <xsl:if test="keymankeyboardid=$id">
+                  <a class="hotkey" tabindex="-1">
+                    <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
+                    <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
+                    <xsl:choose>
+                      <xsl:when test="hotkey"><xsl:value-of select="hotkey"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
+                    </xsl:choose>
+                  </a>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:if>
           </div>
         </div>
 
@@ -136,204 +142,171 @@
         <div class="list_detail">
           <xsl:attribute name="id">list_detail_keyboard_<xsl:value-of select="id"/></xsl:attribute>
           <div class="flex-container">
-
-          <div class="grid-container grid_rows_hide">
-            <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/></xsl:attribute>
-
-            <xsl:if test="version">
-              <div class="grid_item grid_item_title">
-                <xsl:value-of select="$locale/string[@name='S_Caption_KeyboardVersion']"/>
-              </div>
-              <div class="grid_item">
-                <xsl:value-of select="version"/>
-              </div>
-            </xsl:if>
-            <div class="grid_item grid_item_title">
-              <xsl:value-of select="$locale/string[@name='S_Caption_Languages']"/>
-            </div>
-            <div class="grid_item">
-                <xsl:apply-templates select="KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]" />
-                <div class='list-languages-add'>
-                  <input class="no_outline" type='image' src="/app/add-temp.png">
-                    <xsl:attribute name='onclick'>location.href="keyman:keyboardlanguage_install?id=<xsl:value-of select="id"/>"</xsl:attribute>
-                    <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/>_add_lang</xsl:attribute>
-                  </input>
-                </div>
-            </div>
-
-            <!--- The following rows will have the data-hide attribute -->
-
-            <xsl:if test="id">
-              <div class="grid_item grid_item_title" data-hide="">
-                <xsl:value-of select="$locale/string[@name='S_Caption_Filename']"/>
-              </div>
-              <div class="grid_item" data-hide="">
-                <xsl:value-of select="id"/>.kmx
-              </div>
-            </xsl:if>
-            <xsl:if test="$singlekeyboardpackage = '1'">
-              <div class="grid_item grid_item_title" data-hide="">
-                <xsl:value-of select="$locale/string[@name='S_Caption_Package']"/>
-              </div>
-              <div class="grid_item" data-hide="">
-                <xsl:value-of select="../../name"/>
-              </div>
-            </xsl:if>
-
-
-            <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
-              <div class="grid_item grid_item_title" data-hide="">
-                <xsl:value-of select="$locale/string[@name='S_Caption_Version']"/>
-              </div>
-              <div class="grid_item" data-hide="">
-                <xsl:value-of select="../../detail[@name='version']"/>
-              </div>
-            </xsl:if>
-
-            <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]/../../Fonts"><!-- I2216 -->
-              <div class="grid_item grid_item_title" data-hide="">
-                <xsl:value-of select="$locale/string[@name='S_Caption_Fonts']" />
-              </div>
-              <div class="grid_item" data-hide="">
-                <xsl:for-each select="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]/../../Fonts/Font">
-                  <xsl:value-of select="name"/>
-                  <xsl:if test="position() != last()">, </xsl:if>
-                </xsl:for-each>
-              </div>
-            </xsl:if>
-            <xsl:if test="encodings">
-              <div class="grid_item grid_item_title" data-hide="">
-                <xsl:value-of select="$locale/string[@name='S_Caption_Encodings']"/>
-              </div>
-              <div class="grid_item" data-hide="">
-                  <xsl:for-each select="encodings/encoding">
-                    <xsl:value-of select="."/>
-                    <xsl:if test="position() != last()">, </xsl:if>
-                  </xsl:for-each>
-              </div>
-            </xsl:if>
-            <div class="grid_item grid_item_title" data-hide="">
-              <xsl:value-of select="$locale/string[@name='S_Caption_LayoutType']"/>
-            </div>
-            <div class="grid_item" data-hide="">
-              <xsl:choose>
-                <xsl:when test="layoutpositional"><xsl:value-of select="$locale/string[@name='S_LayoutType_Positional']"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_LayoutType_Mnemonic']"/></xsl:otherwise>
-              </xsl:choose>
-            </div>
-
-            <div class="grid_item grid_item_title" data-hide="">
-              <xsl:value-of select="$locale/string[@name='S_Caption_OnScreenKeyboard']"/>
-            </div>
-            <div class="grid_item" data-hide="">
-              <xsl:choose>
-                <xsl:when test="../../usage"><xsl:value-of select="$locale/string[@name='S_OnScreenKeyboard_Custom']"/></xsl:when>
-                <xsl:when test="visualkeyboard"><xsl:value-of select="$locale/string[@name='S_OnScreenKeyboard_Installed']"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_OnScreenKeyboard_NotInstalled']"/></xsl:otherwise>
-              </xsl:choose>
-            </div>
-            <div class="grid_item grid_item_title" data-hide="">
-              <xsl:value-of select="$locale/string[@name='S_Caption_Documentation']"/>
-            </div>
-            <div class="grid_item" data-hide="">
-              <xsl:choose>
-                <xsl:when test="../../welcome"><xsl:value-of select="$locale/string[@name='S_Documentation_Installed']"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Documentation_NotInstalled']"/></xsl:otherwise>
-              </xsl:choose>
-            </div>
-
-            <xsl:if test="message">
-              <div class="grid_item grid_item_title" data-hide="">
-                <xsl:value-of select="$locale/string[@name='S_Caption_Message']"/>
-              </div>
-              <div class="grid_item" data-hide="">
-                  <xsl:value-of select="message"/>
-              </div>
-            </xsl:if>
-            <xsl:if test="copyright">
-              <div class="grid_item grid_item_title" data-hide="">
-                  <xsl:value-of select="$locale/string[@name='S_Caption_Copyright']"/>
-              </div>
-              <div class="grid_item" data-hide="">
-                  <xsl:value-of select="copyright"/>
-              </div>
-            </xsl:if>
-
-
-
-            <div class="grid_col_span_2 grid_item">
-                <input type='checkbox'>
-                  <xsl:attribute name="id">keyboardcheck_<xsl:value-of select="id"/></xsl:attribute>
-                  <xsl:attribute name='onmousedown'>event.stopPropagation();return false;</xsl:attribute>
-                  <xsl:attribute name='onclick'>return keyboard_checkclick('<xsl:value-of select="$id"/>');</xsl:attribute>
-                  <xsl:if test='loaded'><xsl:attribute name='checked'>checked</xsl:attribute></xsl:if>
+            <div class="flex-container-buttons">
+              <input type='checkbox'>
+                <xsl:attribute name="id">keyboardcheck_<xsl:value-of select="id"/></xsl:attribute>
+                <xsl:attribute name='onmousedown'>event.stopPropagation();return false;</xsl:attribute>
+                <xsl:attribute name='onclick'>return keyboard_checkclick('<xsl:value-of select="$id"/>');</xsl:attribute>
+                <xsl:if test='loaded'><xsl:attribute name='checked'>checked</xsl:attribute></xsl:if>
+              </input>
+              <input class="kbd_button" type="button" value="Disable">
+                <xsl:attribute name="id"><xsl:value-of select="id"/></xsl:attribute>
+                <xsl:attribute name='onclick'>return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:attribute>
+              </input>
+              <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id] and ../../options">
+                <input class="kbd_button" type="button">
+                  <xsl:attribute name="value"><xsl:value-of select="$locale/string[@name='S_Menu_Options']"/></xsl:attribute>
+                  <xsl:attribute name='onclick'>location.href="keyman:keyboard_options?id=<xsl:value-of select="id"/>"</xsl:attribute>
+                  <xsl:attribute name="id">keyboard_button_<xsl:value-of select="id"/></xsl:attribute>
                 </input>
-              <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
-                <xsl:call-template name="button">
-                  <xsl:with-param name="caption">Help</xsl:with-param>
-                  <xsl:with-param name="command">keyman:package_welcome?id=<xsl:value-of select="$package_id" /></xsl:with-param>
-                </xsl:call-template>
               </xsl:if>
-
-            <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id] and ../../options">
-              <xsl:call-template name="button">
-                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Menu_Options']"/></xsl:with-param>
-                <xsl:with-param name="command">keyman:keyboard_options?id=<xsl:value-of select="id"/></xsl:with-param>
-              </xsl:call-template>
-            </xsl:if>
-
-              <xsl:call-template name="button">
-                <xsl:with-param name="caption">Disable</xsl:with-param>
-                <xsl:with-param name="id"><xsl:value-of select="id"/></xsl:with-param>
-                <xsl:with-param name="onclick">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
-              </xsl:call-template>
+              <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
+                <input class="kbd_button" type="button" value="Help">
+                  <xsl:attribute name='onclick'>location.href="keyman:package_welcome?id=<xsl:value-of select="$package_id" />"</xsl:attribute>
+                  <xsl:attribute name="id">keyboard_button_<xsl:value-of select="id"/></xsl:attribute>
+                </input>
+              </xsl:if>
               <xsl:choose>
                 <xsl:when test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
-                  <xsl:call-template name="button">
-                    <xsl:with-param name="caption">Uninstall</xsl:with-param>
-                    <xsl:with-param name="command">keyman:package_uninstall?id=<xsl:value-of select="$package_id"/></xsl:with-param>
-                  </xsl:call-template>
+                  <input class="kbd_button" type="button" value="Uninstall">
+                    <xsl:attribute name="onclick">location.href="keyman:package_uninstall?id=<xsl:value-of select="$package_id"/>"</xsl:attribute>
+                  </input>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:call-template name="button">
-                    <xsl:with-param name="caption">Uninstall</xsl:with-param>
-                    <xsl:with-param name="command">keyman:keyboard_uninstall?id=<xsl:value-of select="$id"/></xsl:with-param>
-                  </xsl:call-template>
+                  <input class="kbd_button" type="button" value="Uninstall">
+                    <xsl:attribute name="onclick">location.href="keyman:keyboard_uninstall?id=<xsl:value-of select="$id"/>"</xsl:attribute>
+                  </input>
                 </xsl:otherwise>
               </xsl:choose>
+            </div> <!--- End buttons flex container -->
 
-              <input class="no_outline" type='image' src="/app/expand20.png">
-                <xsl:attribute name='onclick'>return more_detail('keyboard_grid_<xsl:value-of select="$id"/>');</xsl:attribute>
-                <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/>_more</xsl:attribute>
 
-              </input>
+            <div class="flex-vertical-line"> </div><!--- Vertical seperator  -->
 
-            </div>
-
-          </div> <!---end keyboard details grid container -->
-
-                      <!--- comment insert QR code here -->
-          <div class="qrcode flex-item-qr">
-            <xsl:attribute name='id'>qrcode-<xsl:value-of select="../../id" /></xsl:attribute>
-              <div>
-                <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="../../id" /></xsl:attribute>
+            <div class="grid-container grid_rows_hide">
+              <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/></xsl:attribute>
+              <xsl:if test="version">
+                <div class="grid_item grid_item_title">
+                  <xsl:value-of select="$locale/string[@name='S_Caption_KeyboardVersion']"/>
+                </div>
+                <div class="grid_item">
+                  <xsl:value-of select="version"/>
+                </div>
+              </xsl:if>
+              <div class="grid_item grid_item_title">
+                <xsl:value-of select="$locale/string[@name='S_Caption_Languages']"/>
               </div>
-              <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="../../id"/>"), {
-                text: '<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id"/>/share',
-                width: 96,
-                height: 96
-              });
-            </script>
-          </div>
-          <div class='flex-qrcode-caption'>
-            <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>&#160;
-            <a>
-              <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share  </xsl:attribute>
-              <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_Link']"/>
-            </a>
-            <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_LinkSuffix']"/>
-          </div>
-          </div>
+              <div class="grid_item">
+                  <xsl:apply-templates select="KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]" />
+              </div>
+
+              <div class="grid_col_span_2 grid_item">
+                <input class="no_outline" type='image' src="/app/expand20.png">
+                  <xsl:attribute name='onclick'>return more_detail('keyboard_grid_<xsl:value-of select="$id"/>');</xsl:attribute>
+                  <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/>_more</xsl:attribute>
+                </input>
+              </div>
+
+              <!--- The following rows will have the data-hide attribute -->
+
+              <xsl:if test="id">
+                <div class="grid_item grid_item_title" data-hide="">
+                  <xsl:value-of select="$locale/string[@name='S_Caption_Filename']"/>
+                </div>
+                <div class="grid_item" data-hide="">
+                  <xsl:value-of select="id"/>.kmx
+                </div>
+              </xsl:if>
+              <xsl:if test="$singlekeyboardpackage = '1'">
+                <div class="grid_item grid_item_title" data-hide="">
+                  <xsl:value-of select="$locale/string[@name='S_Caption_Package']"/>
+                </div>
+                <div class="grid_item" data-hide="">
+                  <xsl:value-of select="../../name"/>
+                </div>
+              </xsl:if>
+
+
+              <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
+                <div class="grid_item grid_item_title" data-hide="">
+                  <xsl:value-of select="$locale/string[@name='S_Caption_Version']"/>
+                </div>
+                <div class="grid_item" data-hide="">
+                  <xsl:value-of select="../../detail[@name='version']"/>
+                </div>
+              </xsl:if>
+
+              <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]/../../Fonts"><!-- I2216 -->
+                <div class="grid_item grid_item_title" data-hide="">
+                  <xsl:value-of select="$locale/string[@name='S_Caption_Fonts']" />
+                </div>
+                <div class="grid_item" data-hide="">
+                  <xsl:for-each select="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]/../../Fonts/Font">
+                    <xsl:value-of select="name"/>
+                    <xsl:if test="position() != last()">, </xsl:if>
+                  </xsl:for-each>
+                </div>
+              </xsl:if>
+              <xsl:if test="encodings">
+                <div class="grid_item grid_item_title" data-hide="">
+                  <xsl:value-of select="$locale/string[@name='S_Caption_Encodings']"/>
+                </div>
+                <div class="grid_item" data-hide="">
+                    <xsl:for-each select="encodings/encoding">
+                      <xsl:value-of select="."/>
+                      <xsl:if test="position() != last()">, </xsl:if>
+                    </xsl:for-each>
+                </div>
+              </xsl:if>
+              <div class="grid_item grid_item_title" data-hide="">
+                <xsl:value-of select="$locale/string[@name='S_Caption_LayoutType']"/>
+              </div>
+              <div class="grid_item" data-hide="">
+                <xsl:choose>
+                  <xsl:when test="layoutpositional"><xsl:value-of select="$locale/string[@name='S_LayoutType_Positional']"/></xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_LayoutType_Mnemonic']"/></xsl:otherwise>
+                </xsl:choose>
+              </div>
+
+              <div class="grid_item grid_item_title" data-hide="">
+                <xsl:value-of select="$locale/string[@name='S_Caption_OnScreenKeyboard']"/>
+              </div>
+              <div class="grid_item" data-hide="">
+                <xsl:choose>
+                  <xsl:when test="../../usage"><xsl:value-of select="$locale/string[@name='S_OnScreenKeyboard_Custom']"/></xsl:when>
+                  <xsl:when test="visualkeyboard"><xsl:value-of select="$locale/string[@name='S_OnScreenKeyboard_Installed']"/></xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_OnScreenKeyboard_NotInstalled']"/></xsl:otherwise>
+                </xsl:choose>
+              </div>
+              <div class="grid_item grid_item_title" data-hide="">
+                <xsl:value-of select="$locale/string[@name='S_Caption_Documentation']"/>
+              </div>
+              <div class="grid_item" data-hide="">
+                <xsl:choose>
+                  <xsl:when test="../../welcome"><xsl:value-of select="$locale/string[@name='S_Documentation_Installed']"/></xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Documentation_NotInstalled']"/></xsl:otherwise>
+                </xsl:choose>
+              </div>
+
+              <xsl:if test="message">
+                <div class="grid_item grid_item_title" data-hide="">
+                  <xsl:value-of select="$locale/string[@name='S_Caption_Message']"/>
+                </div>
+                <div class="grid_item" data-hide="">
+                    <xsl:value-of select="message"/>
+                </div>
+              </xsl:if>
+              <xsl:if test="copyright">
+                <div class="grid_item grid_item_title" data-hide="">
+                    <xsl:value-of select="$locale/string[@name='S_Caption_Copyright']"/>
+                </div>
+                <div class="grid_item" data-hide="">
+                    <xsl:value-of select="copyright"/>
+                </div>
+              </xsl:if>
+            </div> <!---end keyboard details grid container -->
+
+          </div> <!--- drop down expanded view -->
 
 
 
@@ -346,15 +319,41 @@
   </xsl:template>
 
   <xsl:template match="KeymanKeyboardLanguageInstalled">
-    <div class='keyboard-language'>
-      <a>
-        <xsl:attribute name="href">keyman:keyboardlanguage_uninstall?id=<xsl:value-of select='../../id'/>&amp;bcp47code=<xsl:value-of select="bcp47code"/></xsl:attribute>
-        <img src="/app/cross.png">
-          <xsl:attribute name="title"><xsl:value-of select="$locale/string[@name='S_Languages_Uninstall']"/></xsl:attribute>
-        </img>
-      </a>
+    <xsl:variable name="id"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="../../id" />
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
+    <xsl:variable name="bcp47code"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="bcp47code" />
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
+
+    <div class='keyboard-language'> <!-- makye a keyboard-language-poput class -->
+
       <span class="language-icon"><xsl:value-of select="substring(bcp47code, 1, 2)" /></span>
       <span><xsl:value-of select="langname" /> (<xsl:value-of select="bcp47code" />)</span>
+
+
+      <span class="hotkey" tabindex = "-1">
+
+        <xsl:for-each select="//KeymanLanguage">
+        <xsl:if test="keymankeyboardid=$id and bcp47code=$bcp47code">
+          <a>
+          <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
+          <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
+          <xsl:choose>
+            <xsl:when test="hotkey">
+              <xsl:value-of select="hotkey"/></xsl:when>
+            <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
+          </xsl:choose>
+        </a>
+        </xsl:if>
+      </xsl:for-each>
+
+    </span>
+
     </div>
   </xsl:template>
 

@@ -24,8 +24,11 @@
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 10;
-  background: #79C3DA;
+  outline: none;
+ /* background: #79C3DA;*/
 }
+
+
 #contentframe
 {
   position: absolute;
@@ -43,7 +46,7 @@
   bottom: 0;
   width: 100%;
   overflow: hidden;
-  background: #79C3DA;
+  /*background: #79C3DA;*/
   padding: 10px 8px 8px 8px;
 }
 
@@ -61,12 +64,12 @@
   padding: 4px;
   color: #000000;
   font-weight: bold;
-  background: #79C3DA;
+  /*background: #79C3DA;*/
 }
 
 #header-pad
 {
-  background: #79C3DA;
+  /*background: #79C3DA;*/
   width: 117px;
   height: 40px;
   position: absolute;
@@ -99,7 +102,7 @@
   font-size: 12px;
   padding: 8px 0px 8px 2px;
   border-right: 2px solid #888888;
-  background: #79C3DA !important;
+  /*background: #79C3DA !important;*/
   border-right: 1px solid #6D6C6F;
 }
 
@@ -124,7 +127,7 @@
 #menuframe_footer
 {
   height: 100%;
-  background: #79C3DA;
+ /* background: #79C3DA;*/
   border-right: 1px solid #6D6C6F;
 }
 
@@ -143,6 +146,26 @@ input[type='submit'], input[type='button'], button
   vertical-align: top;
 }
 
+/* for keyboard layouts page */
+input.kbd_button
+{
+  background: #dadddc;
+  border-radius: 4px;
+  color: #33333f;
+  border: none;
+  vertical-align: top;
+  font-size: 12px;
+  height: 25px;
+  margin-right: 8px;
+  border: 1px solid #dadddc;
+}
+
+input.kbd_button:hover
+{
+  background: #79c3da;
+}
+
+
 input[type='submit']:disabled, input[type='button']:disabled, button:disabled
 {
   color: #c0c0cf;
@@ -151,8 +174,8 @@ input[type='submit']:disabled, input[type='button']:disabled, button:disabled
 
 a.hotkey:link, a.hotkey:visited
 {
-  color: blue;
-  text-decoration: underline;
+  color: black;
+  text-decoration: none;
   cursor: pointer;
 }
 a.hotkey:active, a.hotkey:hover
@@ -210,20 +233,33 @@ html
 .list_item
 {
   display: block;
-  /*background: none;*/
-  background: #e0e5ef;
-  border-radius: 5px;
-  border: 1px solid #808080;
-  margin: 0px;
+  background: none;
+  margin: 4px;
   padding: 0px;
   clear: left;
   cursor: default;
 }
 
-.list_item:focus{
+.list_item.kbd_list_item
+{
+  display: block;
+  /*background: none;*/
+  background: #e0e5ef;
+  border-radius: 5px;
+  border: 1px solid #808080;
+  font-size: 12px;
+  margin: 7px;
+  padding: 4px 0 4px 0;
+  clear: left;
+  cursor: default;
+}
+
+
+.list_item.kbd_list_item:focus{
   /*background: url("transLightBlue.png") repeat !important;*/
   outline: none;
 }
+
 .list_item_focus
 {
   background: url("transLightBlue.png") repeat !important;
@@ -256,11 +292,12 @@ html
   display: inline;
   margin: 0px 6px 0px 2px;
   vertical-align: middle;
+  padding-top: 2px;
 }
 .list_detail
 {
-  background: #f0f0ff;
-  /*background: #ffffff;*/
+
+  background: #ffffff;
   /*border: solid 1px #79c3da;*/
   clear: both;
   font-size: 11px;
@@ -306,11 +343,11 @@ html
   margin: 2px 4px 0 0;
 }
 */
-/*.list_item:hover
+
+.list_item:hover
 {
   background: #79c3da;
-}*/
-
+}
 
 /*
 .expanded .list_close
@@ -340,7 +377,7 @@ table tr
   text-align: center;
   font-size: 12px;
   padding: 8px 0;
-  background: url(tab-unselected.png) top left no-repeat;
+ /* background: url(tab-unselected.png) top left no-repeat;*/
 }
 .menuframe_active
 {
@@ -437,9 +474,22 @@ table tr
 .flex-container
 {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start
+  /*justify-content: space-between;*/
+  align-items: flex-start;
+  padding: 5px;
+
 }
+
+.flex-container-buttons
+{
+  display: flex;
+  flex-direction: column;
+  /*justify-content: space-between;*/
+  /*align-items: flex-start;*/
+  gap: 10px;
+
+}
+
 
 .flex-item-qr
 {
@@ -458,11 +508,19 @@ table tr
   padding: 20px 20px 20px 2px;
 }
 
+.flex-vertical-line
+{
+  align-self: stretch;
+  border: 1px solid;
+  color: #e0e5ef;
+}
+
 .grid-container {
   display: grid;
   position: relative;
   grid-template-columns: max-content 250px;
   padding: 1px;
+  padding-left: 10px;
 }
 
 .grid_item
@@ -549,7 +607,7 @@ table tr
 /* Keyboard Styles */
 .keyboard_header
 {
-  font-size: 14.7px;
+  font-size: 15px;
 }
 .keyboard_hotkey
 {
@@ -628,7 +686,10 @@ table tr
 }
 
 /* keyboard languages */
-
+/*.keyboard-language-popup
+{
+  padding: 2px;
+}*/
 /*.keyboard-language
 {
   padding: 2px;
@@ -640,22 +701,22 @@ table tr
  /* vertical-align: middle;*/
 }
 
-.keyboard-language a
+.keyboard-language-popup a
 {
   float: right;
   visibility: hidden;
 }
 
-.keyboard-language a img
+.keyboard-language-pop-up a img
 {
   border: none;
   /*vertical-align: middle;*/
 }
 
-/*.keyboard-language:hover
+.keyboard-language:hover
 {
   background: #79C3DA;
-}*/
+}
 .keyboard-language a
 {
   position: relative;
@@ -671,8 +732,8 @@ table tr
 .language-icon
 {
   text-transform: uppercase;
-  width: 16px;
-  height: 15px;
+  width: 19px;
+  height: 17px;
   display: inline-block;
   margin: 0 4px 0 0;
   background: #cccccc;
