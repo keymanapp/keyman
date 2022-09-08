@@ -178,9 +178,14 @@ describe('The default word breaker', function () {
   });
 
   it('handles emoji flag sequences properly (WB15-16)', function() {
-    let breaks = breakWords(`🇨🇦🇰🇭🇽🇽`); // May not render well within VSCode.
+    // For clarity on what's being tested...
+    let CA_FLAG =      '\u{1f1e8}\u{1f1e6}' // '🇨🇦' (canadian flag emoji); should not be broken.
+    let KH_FLAG =      '\u{1f1f0}\u{1f1ed}' // '🇰🇭' (khmer flag emoji); same
+    let X_FLAG_PIECE = '\u{1f1fd}'          // '🇽'  (half of a flag emoji; '🇽🇽' doesn't match a flag)
+    let breaks = breakWords(`${CA_FLAG}${KH_FLAG}${X_FLAG_PIECE}${X_FLAG_PIECE}`);
     let words = breaks.map(span => span.text);
 
-    assert.deepEqual(words, ['🇨🇦', '🇰🇭', '🇽🇽']); // the last is two emoji in a row.
+    // Note that the emoji may not render well within VSCode, but they show up nicely on GitHub.
+    assert.deepEqual(words, ['🇨🇦', '🇰🇭', '🇽🇽']);
   });
 });
