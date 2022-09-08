@@ -18,11 +18,6 @@ namespace kmx {
 #define Uni_IsSurrogate2(ch) ((ch) >= 0xDC00 && (ch) <= 0xDFFF)
 
 /**
- * @brief Misnomer, actually returns true if "not BMP"
- * \def Uni_IsSMP
- */
-#define Uni_IsSMP(ch) ((ch) >= 0x10000)
-/**
  * @brief Returns true if BMP (Plane 0)
  * \def Uni_IsBMP
  */
@@ -84,6 +79,25 @@ km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx);
 km_kbp_cp *u16dup(km_kbp_cp *src);
 
 //KMX_BOOL MapUSCharToVK(KMX_WORD ch, PKMX_WORD puKey, PKMX_DWORD puShiftFlags);
+
+//  --- implementation ---
+
+inline int
+Utf32CharToUtf16(const KMX_DWORD ch32, char16_single &ch16) {
+  int len;
+  if (Uni_IsBMP(ch32)) {
+    len        = 1;
+    ch16.ch[0] = Uni_UTF32BMPToUTF16(ch32);
+    ch16.ch[1] = 0;
+  } else {
+    len        = 2;
+    ch16.ch[0] = Uni_UTF32ToSurrogate1(ch32);
+    ch16.ch[1] = Uni_UTF32ToSurrogate2(ch32);
+    ch16.ch[2] = 0;
+  }
+  return len;
+}
+
 
 } // namespace kmx
 } // namespace kbp

@@ -242,11 +242,10 @@ kmx_processor::process_event(
   for (auto c = cp.begin(); c != cp.end(); c++) {
     switch (c->type) {
     case KM_KBP_CT_CHAR:
-      if (Uni_IsSMP(c->character)) {
-        ctxt += Uni_UTF32ToSurrogate1(c->character);
-        ctxt += Uni_UTF32ToSurrogate2(c->character);
-      } else {
-        ctxt += (km_kbp_cp)c->character;
+      {
+        km::kbp::kmx::char16_single buf;
+        const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
+        ctxt.append(buf.ch, len);
       }
       break;
     case KM_KBP_CT_MARKER:

@@ -78,11 +78,12 @@ apply_action(
             0,
         },
         {act.character}});
-    if (Uni_IsSMP(act.character)) {
-      text_store.push_back(Uni_UTF32ToSurrogate1(act.character));
-      text_store.push_back(Uni_UTF32ToSurrogate2(act.character));
-    } else {
-      text_store.push_back((char16_t)act.character);
+    {
+      km::kbp::kmx::char16_single buf;
+      const int len = km::kbp::kmx::Utf32CharToUtf16(act.character, buf);
+      for(int i=0; i<len; i++) {
+        text_store.push_back(buf.ch[i]);
+      }
     }
     // std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
