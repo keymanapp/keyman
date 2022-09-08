@@ -144,7 +144,7 @@ struct COMP_KMXPLUS_KEYS_ENTRY {
     KMX_DWORD to;     // to may be KMXPLUS_STR or UTF32 char
     KMX_DWORD flags;
     /**
-     * @brief Get the 'to' as a string, if not EXTEND
+     * @brief Get the 'to' as a string, if flags&LDML_KEYS_FLAGS_EXTEND is not set
      *
      * @return std::u16string
      */
