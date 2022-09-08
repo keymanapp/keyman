@@ -13,7 +13,6 @@ describe('meta', function () {
     let meta = loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', callbacks) as Meta;
     assert.equal(callbacks.messages.length, 0);
 
-    assert.equal(meta.name, 'meta-minimal');
     assert.isUndefined(meta.author);        // TODO-LDML: default author string "unknown"?
     assert.equal(meta.conform, 'techpreview');
     assert.isUndefined(meta.layout);        // TODO-LDML: assumed layout?
@@ -27,7 +26,6 @@ describe('meta', function () {
     let meta = loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', callbacks) as Meta;
     assert.equal(callbacks.messages.length, 0);
 
-    assert.equal(meta.name, 'meta-maximal');
     assert.equal(meta.author, 'The Keyman Team');
     assert.equal(meta.conform, 'techpreview');
     assert.equal(meta.layout, 'QWIRKY');

@@ -12,7 +12,6 @@ import { BUILDER_SECTION } from "./builder-section";
  * Builder for the 'meta' section
  */
 export interface BUILDER_META extends BUILDER_SECTION {
-  name: number; //str
   author: number; //str
   conform: number; //str
   layout: number; //str
@@ -27,7 +26,6 @@ export function build_meta(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     ident: constants.hex_section_id(constants.section.meta),
     size: constants.length_meta,
     _offset: 0,
-    name: alloc_string(sect_strs, kmxplus.meta.name),
     author: alloc_string(sect_strs, kmxplus.meta.author),
     conform: alloc_string(sect_strs, kmxplus.meta.conform),
     layout: alloc_string(sect_strs, kmxplus.meta.layout),
