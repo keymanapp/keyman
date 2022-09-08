@@ -36,6 +36,7 @@ bool IsRelativePath(KMX_CHAR const * p) {
 
   if (*p == '\\') return FALSE;
   if (*p && *(p + 1) == ':') return FALSE;
+
   return TRUE;
 }
 
@@ -54,6 +55,7 @@ bool IsRelativePath(KMX_WCHART const * p) {
 
   if (*p == L'\\') return FALSE;
   if (*p && *(p + 1) == L':') return FALSE;
+
   return TRUE;
 }
 

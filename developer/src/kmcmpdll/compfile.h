@@ -145,6 +145,7 @@ struct FILE_KEYBOARD {
 	KMX_DWORD cxVKDictionary;
 	PFILE_VKDICTIONARY dpVKDictionary; // temp - virtual key dictionary
 	};
+
 typedef FILE_KEYBOARD *PFILE_KEYBOARD;
 
 /*
@@ -164,7 +165,7 @@ struct COMPMSG {
 	KMX_CHAR szText[SZMAX_ERRORTEXT];
 	KMX_DWORD Line;
 	KMX_DWORD dwMsgCode;
-	};		
+	};
 
 typedef COMPMSG *PCOMPMSG;
 
