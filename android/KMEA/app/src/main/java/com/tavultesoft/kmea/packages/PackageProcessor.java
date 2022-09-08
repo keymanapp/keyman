@@ -626,9 +626,6 @@ public class PackageProcessor {
       for (int j = 0; j < languages.length(); j++) {
         JSONObject language = languages.getJSONObject(j);
         String languageID = language.getString("id");
-        if (languageID != null) {
-          languageID = languageID.toLowerCase();
-        }
         String languageName = language.getString("name");
         if (!excludeInstalledLanguages ||
           !(KeyboardController.getInstance().keyboardExists(packageID, keyboardID, languageID))) {
