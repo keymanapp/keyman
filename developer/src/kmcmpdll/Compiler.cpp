@@ -1338,7 +1338,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_KMW_HELPFILE:
   case TSS_KMW_EMBEDJS:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);    
      if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
        return msg;
      }
@@ -1911,7 +1911,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
   if (*q != dOpen) return NULL;
 
   q++;
-
+  
   r = xstrchr(q, &dClose);			        // Find closing delimiter
   if (!r) return NULL;
 
