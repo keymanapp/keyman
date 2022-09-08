@@ -10,6 +10,37 @@ export class Section {
 }
 
 // 'sect'
+
+export type Sect = Section;
+
+// 'bksp' -- see 'tran'
+
+export type Bksp = Tran;
+export type BkspItem = TranItem;
+
+// 'elem'
+
+export enum ElemElementFlags {
+  none = 0,
+  unicode_set = 1<<0,       // TODO-LDML: this may not be needed in-memory, only for streaming
+  tertiary_base = 1<<1,     // used only by reorder element values
+  prebase = 1<<2,           // used only by reorder element values
+};
+
+export class ElemElement {
+  value: string;            // UnicodeSet or UCS32LE character
+  order: number;            // -128 to +127; used only by reorder element values
+  tertiary: number;         // -128 to +127; used only by reorder element values
+  flags: ElemElementFlags;
+};
+
+export type Elem = Section;
+
+// 'finl' -- see 'tran'
+
+export type Finl = Tran;
+export type FinlItem = TranItem;
+
 // 'keys'
 
 export enum KeyFlags {
@@ -63,7 +94,39 @@ export class Name extends Section {
   names: string[] = [];
 };
 
+// 'ordr'
+
+export class OrdrItem {
+  elements: ElemElement[] = [];
+  before: ElemElement[] = [];
+};
+
+export class Ordr extends Section {
+  items: OrdrItem[] = [];
+};
+
 // 'strs'
+
+export type Strs = Section;
+
+// 'tran'
+
+export enum TranItemFlags {
+  none = 0,
+  error= 1<<0,
+};
+
+export class TranItem extends Section {
+  from: ElemElement[] = [];
+  to: string;
+  before: ElemElement[] = [];
+  flags: TranItemFlags;
+};
+
+export class Tran extends Section {
+  items: TranItem[] = [];
+};
+
 // 'vkey'
 
 export class VkeyItem {
@@ -75,12 +138,39 @@ export class Vkey extends Section {
   vkeys: VkeyItem[] = [];
 };
 
+export interface KMXPlusData {
+    sect?: Strs; // sect is ignored in-memory
+    bksp?: Bksp;
+    elem?: Elem; // elem is ignored in-memory
+    finl?: Finl;
+    keys?: Keys;
+    loca?: Loca;
+    meta?: Meta;
+    name?: Name;
+    ordr?: Ordr;
+    strs?: Strs; // strs is ignored in-memory
+    tran?: Tran;
+    vkey?: Vkey;
+};
+
 export default class KMXPlusFile extends KMXFile {
 
   /* KMXPlus file structures */
 
   public readonly COMP_PLUS_SECT_ITEM: any;
   public readonly COMP_PLUS_SECT: any;
+
+  // COMP_PLUS_BKSP == COMP_PLUS_TRAN
+  public readonly COMP_PLUS_BKSP_ITEM: any;
+  public readonly COMP_PLUS_BKSP: any;
+
+  public readonly COMP_PLUS_ELEM_ELEMENT: any;
+  public readonly COMP_PLUS_ELEM_ITEM: any;
+  public readonly COMP_PLUS_ELEM: any;
+
+  // COMP_PLUS_FINL == COMP_PLUS_TRAN
+  public readonly COMP_PLUS_FINL_ITEM: any;
+  public readonly COMP_PLUS_FINL: any;
 
   public readonly COMP_PLUS_KEYS_ITEM: any;
   public readonly COMP_PLUS_KEYS: any;
@@ -93,28 +183,21 @@ export default class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_NAME_ITEM: any;
   public readonly COMP_PLUS_NAME: any;
 
+  public readonly COMP_PLUS_ORDR_ITEM: any;
+  public readonly COMP_PLUS_ORDR: any;
+
   public readonly COMP_PLUS_STRS_ITEM: any;
   public readonly COMP_PLUS_STRS: any;
+
+  public readonly COMP_PLUS_TRAN_ITEM: any;
+  public readonly COMP_PLUS_TRAN: any;
 
   public readonly COMP_PLUS_VKEY_ITEM: any;
   public readonly COMP_PLUS_VKEY: any;
 
   /* File in-memory data */
 
-  public kmxplus: {
-    sect?: Section; // sect is ignored here for writing
-    bksp?: Section; // TODO-LDML
-    elem?: Section; // TODO-LDML
-    finl?: Section; // TODO-LDML
-    keys?: Keys;
-    loca?: Loca;
-    meta?: Meta;
-    name?: Name;
-    ordr?: Section; // TODO-LDML
-    strs?: Section; // strs is ignored here for writing
-    tran?: Section; // TODO-LDML
-    vkey?: Vkey;
-  } = { };
+  public kmxplus: KMXPlusData = { };
 
   constructor() {
     super();
@@ -136,6 +219,30 @@ export default class KMXPlusFile extends KMXFile {
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_SECT_ITEM, 'count')
     });
+
+    // 'bksp' - see 'tran'
+
+    // 'elem'
+
+    this.COMP_PLUS_ELEM_ELEMENT = new r.Struct({
+      element: r.uint32le,
+      flags: r.uint32le
+    });
+
+    this.COMP_PLUS_ELEM_ITEM = new r.Struct({
+      offset: r.uint32le,
+      length: r.uint32le
+    });
+
+    this.COMP_PLUS_ELEM = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
+      items: new r.Array(this.COMP_PLUS_ELEM_ITEM, 'count')
+    });
+
+    // 'finl' - see 'tran'
 
     // 'keys'
 
@@ -193,6 +300,21 @@ export default class KMXPlusFile extends KMXFile {
       items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
     });
 
+    // 'ordr'
+
+    this.COMP_PLUS_ORDR_ITEM = new r.Struct({
+      elements: r.uint32le, //elem
+      before: r.uint32le //elem
+    });
+
+    this.COMP_PLUS_ORDR = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
+      items: new r.Array(this.COMP_PLUS_ORDR_ITEM, 'count')
+    });
+
     // 'strs'
 
     this.COMP_PLUS_STRS_ITEM = new r.Struct({
@@ -210,6 +332,23 @@ export default class KMXPlusFile extends KMXFile {
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
     });
 
+    // 'tran'
+
+    this.COMP_PLUS_TRAN_ITEM = new r.Struct({
+      from: r.uint32le, //elem
+      to: r.uint32le, //str
+      before: r.uint32le, //elem
+      flags: r.uint32le //bitfield
+    });
+
+    this.COMP_PLUS_TRAN = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      count: r.uint32le,
+      reserved: new r.Reserved(r.uint32le), // padding
+      items: new r.Array(this.COMP_PLUS_TRAN_ITEM, 'count')
+    });
+
     // 'vkey'
 
     this.COMP_PLUS_VKEY_ITEM = new r.Struct({
@@ -224,5 +363,12 @@ export default class KMXPlusFile extends KMXFile {
       reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_VKEY_ITEM, 'count')
     });
+
+    // Aliases
+
+    this.COMP_PLUS_BKSP_ITEM = this.COMP_PLUS_TRAN_ITEM;
+    this.COMP_PLUS_FINL_ITEM = this.COMP_PLUS_TRAN_ITEM;
+    this.COMP_PLUS_BKSP = this.COMP_PLUS_TRAN;
+    this.COMP_PLUS_FINL = this.COMP_PLUS_TRAN;
   }
 }

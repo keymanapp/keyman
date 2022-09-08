@@ -2,7 +2,7 @@ import * as r from 'restructure';
 import * as crc32 from 'crc-32';
 import KMXFile, { GROUP, KEY, STORE } from './kmx';
 import KMXPlusFile from './kmx-plus';
-import KMXPlusBuilder from './kmx-plus-builder';
+import KMXPlusBuilder from './kmx-plus-builder/kmx-plus-builder';
 
 // These type-checking structures are here to ensure that
 // we match the structures from kmx.ts in the generator
