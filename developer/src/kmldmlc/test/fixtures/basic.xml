@@ -26,4 +26,23 @@
       <row keys="hmaqtua that" />
     </layerMap>
   </layerMaps>
+
+  <transforms type="simple">
+    <transform from="^a" to="â" />
+  </transforms>
+
+  <transforms type="final">
+    <transform from="^^" to="^" error="fail" />
+  </transforms>
+
+  <reorders>
+    <!-- Northern Thai example from spec, lightly edited -->
+    <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
+  </reorders>
+
+  <backspaces>
+    <backspace from="^e" />
+  </backspaces>
+
+
 </keyboard>

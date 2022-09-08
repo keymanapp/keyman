@@ -17,14 +17,15 @@ cd "$THIS_SCRIPT_PATH"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Build Keyman LDML Keyboard Compiler kmldmlc" \
-  "configure     runs 'npm ci' on root folder" \
-  "build         (default) builds kmldmlc to build/" \
-  "clean         cleans build/ folder" \
-  "bundle        creates a bundled version of kmldmlc" \
-  "test          run automated tests for kmldmlc" \
-  "publish       publish to npm" \
-  "--build-path=BUILD_PATH  Build directory for bundle" \
-  "--dry-run,-n  Don't actually publish, just dry run"
+  "configure                 runs 'npm ci' on root folder" \
+  "build                     (default) builds kmldmlc to build/" \
+  "clean                     cleans build/ folder" \
+  "bundle                    creates a bundled version of kmldmlc" \
+  "test                      run automated tests for kmldmlc" \
+  "build-fixtures            builds test fixtures for manual examination" \
+  "publish                   publish to npm" \
+  "--build-path=BUILD_PATH   build directory for bundle" \
+  "--dry-run,-n              don't actually publish, just dry run"
 
 builder_parse "$@"
 
@@ -49,6 +50,21 @@ if builder_has_action build; then
   # We need the schema file at runtime and bundled
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   builder_report success build
+fi
+
+#-------------------------------------------------------------------------------------------------------------------
+
+if builder_has_action build-fixtures; then
+  # Build basic.kmx and emit its checksum
+  mkdir -p ./build/test/fixtures
+  node . ./test/fixtures/basic.xml -o ./build/test/fixtures/basic-xml.kmx
+  printf "${COLOR_GREY}Checksum for basic-xml.kmx: ${COLOR_PURPLE}%s${COLOR_RESET}\n" \
+    "$(xxd -g 1 -l 12 ./build/test/fixtures/basic-xml.kmx | cut -d' ' -f 10-13)"
+
+  # Generate a binary file from basic.txt for comparison purposes
+  node ../../../common/tools/hextobin/build/hextobin.js ./test/fixtures/basic.txt ./build/test/fixtures/basic-txt.kmx
+
+  builder_report success build-fixtures
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
