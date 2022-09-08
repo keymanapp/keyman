@@ -161,20 +161,10 @@ COMP_KMXPLUS_KEYS::valid(KMX_DWORD _kmn_unused(length)) const {
 
 std::u16string
 COMP_KMXPLUS_KEYS_ENTRY::get_string() const {
-  if (flags & LDML_KEYS_FLAGS_EXTEND) {
-    return std::u16string();  // error, extended
-  }
-  char16_t buf[2];
-  std::size_t len;
-  if (Uni_IsBMP(to)) {
-    buf[0] = (to & 0xFFFF);
-    len    = 1;
-  } else {
-    buf[0] = Uni_UTF32ToSurrogate1(to);
-    buf[1] = Uni_UTF32ToSurrogate2(to);
-    len    = 2;
-  }
-  return std::u16string(buf, len);
+  assert(!(flags & LDML_KEYS_FLAGS_EXTEND)); // should not be called.
+  char16_single buf;
+  const int len = Utf32CharToUtf16(to, buf);
+  return std::u16string(buf.ch, len);
 }
 
 bool
@@ -353,12 +343,11 @@ COMP_KMXPLUS_STRS::get(KMX_DWORD entry) const {
     if (entry >= count) {
         return std::u16string(); // Fallback: empty string
     }
-    KMX_DWORD offset = entries[entry].offset;
-    KMX_DWORD length = entries[entry].length;
+    const KMX_DWORD offset = entries[entry].offset;
+    const KMX_DWORD length = entries[entry].length;
     assert(offset+((length+1)*2) <= header.size); // assert not out of bounds
     const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(this);
     const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
-    assert(start[length] == 0); // assert null terminated
     return std::u16string(start, length);
 }
 
