@@ -199,11 +199,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
             languageList = new ArrayList<String>();
           }
           String selectedLanguageID = k.getLanguageID();
-          if (languageList.contains(selectedLanguageID)) {
-            languageList.remove(selectedLanguageID);
-          } else {
-            languageList.add(selectedLanguageID);
-          }
+          BCP47.toggleLanguage(languageList, selectedLanguageID);
         } else {
           // Otherwise, add the language association
           if (addKeyboardsList == null) {
