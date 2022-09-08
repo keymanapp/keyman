@@ -190,6 +190,41 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
 
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+      /**
+       * Utility to modify keyboardList. Based on BCP47.toggleLanguage
+       * If keyboard's languageID exists in the list, remove the keyboard.
+       * Otherwise, add the keyboard to the list.
+       * @param keyboardList
+       * @param k
+       */
+      private void toggleLanguage(ArrayList<Keyboard> keyboardList, Keyboard k) {
+        if (keyboardList != null) {
+          if (keyboardList.size() == 0) {
+            k.setLanguage(k.getLanguageID().toLowerCase(), k.getLanguageName());
+            keyboardList.add(k);
+            return;
+          }
+
+          boolean languageExists = false;
+          int index = 0;
+          // See if languageID already exists in the keyboardList
+          for (Keyboard l: keyboardList) {
+            if (BCP47.languageEquals(l.getLanguageID(), k.getLanguageID())) {
+              languageExists = true;
+              break;
+            }
+            index++;
+          }
+
+          if (languageExists && index < keyboardList.size()) {
+            keyboardList.remove(index);
+          } else {
+            k.setLanguage(k.getLanguageID().toLowerCase(), k.getLanguageName());
+            keyboardList.add(k);
+          }
+        }
+      }
+
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Keyboard k = availableKeyboardsList.get(position);
@@ -205,11 +240,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
           if (addKeyboardsList == null) {
             addKeyboardsList = new ArrayList<Keyboard>();
           }
-          if (addKeyboardsList.contains(k)) {
-            addKeyboardsList.remove(k);
-          } else {
-            addKeyboardsList.add(k);
-          }
+          toggleLanguage(addKeyboardsList, k);
         }
 
         // Disable install button if no languages selected or all languages already installed
