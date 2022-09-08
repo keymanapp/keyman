@@ -204,6 +204,15 @@ namespace correction {
       // TODO:  might should also track diagonalWidth.
       return inputString + models.SENTINEL_CODE_UNIT + matchString;
     }
+
+    get isFullReplacement(): boolean {
+      // If the known edit-distance cost is equal to the input length, this means
+      // that literally every input has been full-on replaced.  Thus, this is
+      // likely not a good 'root' to use for predictions.
+      //
+      // Logic exception:  0 cost, 0 length != a "replacement".
+      return this.knownCost && this.knownCost == this.priorInput.length;
+    }
   }
 
   class SearchSpaceTier {
@@ -590,6 +599,14 @@ namespace correction {
         // Build batches of same-cost entries.
         while(preprocessedQueue.count > 0) {
           let entry = preprocessedQueue.dequeue();
+
+          // Is the entry a reasonable result?
+          if(entry.isFullReplacement) {
+            // If the entry's 'match' fully replaces the input string, we consider it
+            // unreasonable and ignore it.
+            continue;
+          }
+
           let batch = batcher.checkAndAdd(entry);
 
           if(batch) {
@@ -626,6 +643,13 @@ namespace correction {
         if(newResult.type == 'none') {
           break;
         } else if(newResult.type == 'complete') {
+          // Is the entry a reasonable result?
+          if(newResult.finalNode.isFullReplacement) {
+            // If the entry's 'match' fully replaces the input string, we consider it
+            // unreasonable and ignore it.  Also, if we've reached this point...
+            // we can(?) assume that everything thereafter is as well.
+            break;
+          }
           batch = batcher.checkAndAdd(newResult.finalNode);
         }
 
