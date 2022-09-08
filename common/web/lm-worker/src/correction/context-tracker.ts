@@ -137,6 +137,8 @@ namespace correction {
       // Will be needed for phrase-level correction/prediction.
       if(transformDistribution) {
         whitespaceToken.transformDistributions = [transformDistribution];
+      } else {
+        whitespaceToken.transformDistributions = [];
       }
 
       whitespaceToken.raw = null;
