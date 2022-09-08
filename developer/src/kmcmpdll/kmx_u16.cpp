@@ -37,7 +37,7 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
 	return result;
 }
 
-// _S2 use with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
+//  often used with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
 std::wstring u16fmt(const km_kbp_cp* str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;

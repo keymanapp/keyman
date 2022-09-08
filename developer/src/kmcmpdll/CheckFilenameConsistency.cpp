@@ -61,19 +61,19 @@ bool IsRelativePath(KMX_WCHART const * p) {
 
 KMX_DWORD CheckFilenameConsistency(char const * Filename, BOOL ReportMissingFile) {
   PKMX_WCHAR WFilename = strtowstr((char *)Filename);
-  KMX_DWORD const result = CheckFilenameConsistency(u16fmt(WFilename).c_str(), ReportMissingFile);    // _S2 KMX_DWORD const result = CheckFilenameConsistency(WFilename, ReportMissingFile);
+  KMX_DWORD const result = CheckFilenameConsistency(u16fmt(WFilename).c_str(), ReportMissingFile);
   delete WFilename;  
   return result;
 }
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissingFile) {
   KMX_WCHART Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
-  KMX_WCHAR ErrExtra[256];     // _S2
+  KMX_WCHAR ErrExtra[256];
   intptr_t n;
 
   if (IsRelativePath(Filename)) {
     PKMX_WCHAR WCompileDir = strtowstr(CompileDir);
-    wcscpy_s(Name, _countof(Name), u16fmt(WCompileDir).c_str());  // I3481  // _S2    wcscpy_s(Name, _countof(Name), WCompileDir);  // I3481
+    wcscpy_s(Name, _countof(Name), u16fmt(WCompileDir).c_str());  // I3481
     wcscat_s(Name, _countof(Name), Filename);  // I3481
   }
   else {
@@ -89,7 +89,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissi
 
   if (n == -1){
     if (ReportMissingFile) {
-      u16sprintf(ErrExtra,_countof(ErrExtra),L"referenced file %ls",Filename); //_S2 wsprintf(ErrExtra, "referenced file '%ls'", Filename);   // right spfrintf fun?
+      u16sprintf(ErrExtra,_countof(ErrExtra),L"referenced file %ls",Filename);
       AddWarning(CWARN_MissingFile);
     }
     return CERR_None;
@@ -99,8 +99,8 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissi
   cptr1++;
 
 #if defined(_WIN32) || defined(_WIN64)
-  if (wcscmp(cptr1, fi.name) != 0) {            // _S2 if (wcscmp(Name, fi.name) != 0) {
-    u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);    // _S2 wsprintf(ErrExtra, "reference '%ls' does not match actual filename '%ls'", Name, fi.name);
+  if (wcscmp(cptr1, fi.name) != 0) {
+    u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
 #endif

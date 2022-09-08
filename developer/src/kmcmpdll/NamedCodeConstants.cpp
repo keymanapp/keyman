@@ -74,7 +74,7 @@ void NamedCodeConstants::AddCode(int n, const char16_t *p, KMX_DWORD storeIndex)
   }
 
   entries_file[nEntries_file].code = n;
-  u16ncpy(entries_file[nEntries_file].name, p, _countof(entries_file[nEntries_file].name));  // I3481   //wcsncpy_s(entries_file[nEntries_file].name, _countof(entries_file[nEntries_file].name), p, MAX_ENAME);  // I3481
+  u16ncpy(entries_file[nEntries_file].name, p, _countof(entries_file[nEntries_file].name));  // I3481
   entries_file[nEntries_file].name[MAX_ENAME] = 0;
 
   for (char16_t *r = entries_file[nEntries_file].name; *r; r++)
@@ -98,7 +98,7 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const char16_t *p)
   }
 
   entries[nEntries].code = n;
-  u16ncpy(entries[nEntries].name, p, MAX_ENAME);  // I3481    // _NEW wcsncpy_s(entries[nEntries].name, _countof(entries[nEntries].name), p, MAX_ENAME);  // I3481
+  u16ncpy(entries[nEntries].name, p, MAX_ENAME);  // I3481
   entries[nEntries].name[MAX_ENAME] = 0;
   for (char16_t *r = entries[nEntries].name; *r; r++)
     if (iswblank(*r)) *r = '_';
@@ -110,7 +110,9 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const char16_t *p)
 
 int __cdecl sort_entries(const void *elem1, const void *elem2)
 {
-  return u16icmp(  ((NCCENTRY *)elem1)->name,((NCCENTRY *)elem2)->name); //  _S2 return _wcsicmp(    ((NCCENTRY *    )elem1)->name,    ((NCCENTRY *    )elem2)->name);
+  return u16icmp(
+    ((NCCENTRY *)elem1)->name,
+    ((NCCENTRY *)elem2)->name);
 }
 
 KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
@@ -183,14 +185,14 @@ void NamedCodeConstants::reindex()
   wchar_t c = L'.', d;
   int i;
 
-  for(i = 0; i < 128; i++) chrindexes_NEW[i] = -1;
+  for(i = 0; i < 128; i++) chrindexes[i] = -1;
 
   if (entries != NULL) {
     for (i = 0; i < nEntries; i++)
     {
       d = towupper(entries[i].name[0]);
       if (d != c && d >= 32 && d <= 127)
-        chrindexes_NEW[c = d] = i;
+        chrindexes[c = d] = i;
     }
   }
 }
@@ -216,8 +218,8 @@ int NamedCodeConstants::GetCode_IncludedCodes(const char16_t *codename)
 
   if(IsHangulSyllable(codename, &code)) return code;
 
-  if(c < 32 || c > 127 || chrindexes_NEW[c] < 0) return 0;
-  for(int n = chrindexes_NEW[c]; n < nEntries && towupper(entries[n].name[0]) == c; n++)
+  if(c < 32 || c > 127 || chrindexes[c] < 0) return 0;
+  for(int n = chrindexes[c]; n < nEntries && towupper(entries[n].name[0]) == c; n++)
   {
     int cmp = u16icmp(codename, entries[n].name);
     if(cmp == 0) return entries[n].code;

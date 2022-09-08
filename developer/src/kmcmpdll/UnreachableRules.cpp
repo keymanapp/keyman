@@ -34,9 +34,8 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         currentLine = kp->Line;
-
         PKMX_WCHAR ErrExtra = NULL;
-        u16sprintf(ErrExtra, 1024, L"Overridden by rule on line %d", k1.Line);// _S2 wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
+        u16sprintf(ErrExtra, 1024, L"Overridden by rule on line %d", k1.Line);
         AddWarning(CHINT_UnreachableRule);
       }
     }
