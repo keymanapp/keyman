@@ -135,11 +135,7 @@ namespace correction {
 
       // Track the Transform that resulted in the whitespace 'token'.
       // Will be needed for phrase-level correction/prediction.
-      if(transformDistribution) {
-        whitespaceToken.transformDistributions = [transformDistribution];
-      } else {
-        whitespaceToken.transformDistributions = [];
-      }
+      whitespaceToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
 
       whitespaceToken.raw = null;
       this.tokens.push(whitespaceToken);
