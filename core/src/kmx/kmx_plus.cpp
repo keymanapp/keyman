@@ -7,6 +7,7 @@
 #include <km_types.h>
 #include <kmx_file.h>
 #include <kmx/kmx_plus.h>
+#include <kmx/kmx_xstring.h>
 
 #if KMXPLUS_DEBUG
 #include <iostream>
@@ -158,6 +159,14 @@ COMP_KMXPLUS_KEYS::valid(KMX_DWORD _kmn_unused(length)) const {
   return true;
 }
 
+std::u16string
+COMP_KMXPLUS_KEYS_ENTRY::get_string() const {
+  assert(!(flags & LDML_KEYS_FLAGS_EXTEND)); // should not be called.
+  char16_single buf;
+  const int len = Utf32CharToUtf16(to, buf);
+  return std::u16string(buf.ch, len);
+}
+
 bool
 COMP_KMXPLUS_LOCA::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
@@ -207,22 +216,36 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     return false;
   }
   for (KMX_DWORD i=0; i<this->count; i++) {
-    const size_t MYBUFSIZ = 256;
-    KMX_WCHAR buf[MYBUFSIZ];
     KMXPLUS_PRINTF(("#0x%X: ", i));
-    PKMX_WCHAR str = this->get(i, buf, MYBUFSIZ);
-    if (!str) {
-        KMXPLUS_PRINTF(("NULL/ERR\n"));
-        return false;
+    KMX_DWORD offset = entries[i].offset;
+    KMX_DWORD length = entries[i].length;
+    if(offset+((length+1)*2) > header.size) {
+      debug_println("expected end of string past header.size");
+      return false;
     }
-    for(int j=0; str[j] && j<0x30; j++) {
-        if (str[j] < 0x7F && str[j] > 0x20) {
-            KMXPLUS_PRINTF(("%c", str[j]));
+    const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(this);
+    const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
+    if(start[length] != 0) {
+      debug_println("String not null terminated");
+      return false;
+    }
+    // TODO-LDML: validate valid UTF-16LE?
+#if KMXPLUS_DEBUG
+    // first print it escaped
+    for(KMX_DWORD j=0; start[j] && j<length; j++) {
+        if (start[j] < 0x7F && start[j] > 0x20) {
+            KMXPLUS_PRINTF(("%c", start[j]));
         } else {
-            KMXPLUS_PRINTF((" U+%04X ", str[j]));
+            KMXPLUS_PRINTF((" U+%04X ", start[j]));
         }
     }
     KMXPLUS_PRINTF(("\n"));
+
+    // // now print it as a string
+    // TODO-LDML
+    // std::u16string str = get(i);
+    // std::cerr << str << std::endl;
+#endif
   }
   return true;
 }
@@ -314,23 +337,18 @@ KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
   return 0;
 }
 
-PKMX_WCHAR
-COMP_KMXPLUS_STRS::get(KMX_DWORD entry, PKMX_WCHAR buf, KMX_DWORD bufsiz) const {
+std::u16string
+COMP_KMXPLUS_STRS::get(KMX_DWORD entry) const {
     assert(entry < count);
     if (entry >= count) {
-        return nullptr;
+        return std::u16string(); // Fallback: empty string
     }
-    // TODO-LDML: will be improved in https://github.com/keymanapp/keyman/issues/7134
-    KMX_DWORD offset = entries[entry].offset;
-    KMX_DWORD length = entries[entry].length;
-    assert(bufsiz > (length+1)); // assert bufsiz big enough
+    const KMX_DWORD offset = entries[entry].offset;
+    const KMX_DWORD length = entries[entry].length;
     assert(offset+((length+1)*2) <= header.size); // assert not out of bounds
     const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(this);
     const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
-    for(KMX_DWORD i=0;i<=length;i++) {
-        buf[i] = start[i];
-    }
-    return buf;
+    return std::u16string(start, length);
 }
 
 }  // namespace kmx

@@ -10,43 +10,8 @@
 #include "state.hpp"
 #include "kmx_file.h"
 #include "kmx/kmx_plus.h"
+#include "kmx/kmx_xstring.h"
 #include "ldml/keyboardprocessor_ldml.h"
-
-// extern "C" {
-// #include "../../../common/windows/cpp/src/ConvertUTF.c"
-// }
-
-// HACK
-enum ConversionResult {
-  conversionOK,
-  conversionNotOk
-};
-enum ConversionFlags {
-  strictConversion
-};
-
-typedef KMX_WCHAR UTF16;
-typedef KMX_DWORD UTF32;
-
-/**
- * This is a temporary patch for now.
- * API surface somewhat modelled after ConvertUTF.h
- */
-ConversionResult ConvertUTF32toUTF16(
-		UTF32** sourceStart, const UTF32* sourceEnd,
-		UTF16** targetStart, const UTF16* targetEnd, const ConversionFlags /*flags*/) {
-    if(sourceEnd > (*sourceStart+1)) return conversionNotOk; // Don't support >1 char
-    if(**sourceStart & 0xFFFF0000) {
-      // Don't support supplemental chars yet
-      return conversionNotOk;
-    }
-    *((*targetStart)++) = (UTF16)((*(*sourceStart)++) & 0xFFFF); // BMP
-
-    assert(*sourceStart==sourceEnd);
-    assert(*targetStart <= targetEnd);
-    return(conversionOK);
-}
-
 
 namespace {
   constexpr km_kbp_attr const engine_attrs = {
@@ -109,33 +74,16 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
   if (kplus.keys != nullptr) {
     // read all keys into array
     for (KMX_DWORD i=0; i<kplus.keys->count; i++) {
+      std::u16string str;
       const kmx::COMP_KMXPLUS_KEYS_ENTRY &entry = kplus.keys->entries[i];
-      KMX_DWORD len = 0;
-      KMX_WCHAR out[BUFSIZ];
       if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
         KMXPLUS_ASSERT(false, nullptr == kplus.strs); // need a string table to get strings
-        KMXPLUS_ASSERT(false, nullptr == kplus.strs->get(entry.to, out, BUFSIZ));
-        for(len=0; len<BUFSIZ && out[len]; len++); // TODO-LDML: validate string length here, #7134
+        str = kplus.strs->get(entry.to);
       } else {
-        // TODO-LDML: restructure string code here, #7134
-        UTF32 buf32[2];
-        buf32[0] = entry.to; // UTF-32
-        buf32[1] = 0; // to avoid UMR warning
-        UTF32 *sourceStart = &buf32[0];
-        const UTF32 *sourceEnd = &buf32[1]; // Reference off the end. NULL to avoid UMR.
-        UTF16 *targetStart = (UTF16*)out;
-        const UTF16 *targetEnd = (UTF16*)out+BUFSIZ-1;
-        ConversionResult result = ::ConvertUTF32toUTF16(&sourceStart, sourceEnd, &targetStart, targetEnd, strictConversion);
-        KMXPLUS_ASSERT(conversionOK, result);
-        *targetStart = 0;
-        len = 1; // TODO=LDML calculate
-        // len = (targetStart - out);
-        KMXPLUS_ASSERT(true, len>=1 && len <= 2);
+        str = entry.get_string();
       }
-      KMXPLUS_ASSERT(true, len>0 && len < BUFSIZ);
-      KMXPLUS_ASSERT(0, out[len]); // null termination
       ldml_vkey_id vkey_id((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod);
-      vkey_to_string[vkey_id] = std::u16string(out, len); // assign the string
+      vkey_to_string[vkey_id] = str; // assign the string
     }
   } // else: no keys! but still valid. Just, no keys.
   KMXPLUS_PRINTLN("_valid = true");

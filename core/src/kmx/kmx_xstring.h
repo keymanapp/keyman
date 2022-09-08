@@ -6,14 +6,61 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
+/**
+ * @brief True if a lead surrogate
+ * \def Uni_IsSurrogate1
+ */
 #define Uni_IsSurrogate1(ch) ((ch) >= 0xD800 && (ch) <= 0xDBFF)
+/**
+ * @brief True if a trail surrogate
+ * \def Uni_IsSurrogate2
+ */
 #define Uni_IsSurrogate2(ch) ((ch) >= 0xDC00 && (ch) <= 0xDFFF)
-#define Uni_IsSMP(ch) ((ch) >= 0x10000)
 
+/**
+ * @brief Misnomer, actually returns true if "not BMP"
+ * \def Uni_IsSMP
+ */
+#define Uni_IsSMP(ch) ((ch) >= 0x10000)
+/**
+ * @brief Returns true if BMP (Plane 0)
+ * \def Uni_IsBMP
+ */
+#define Uni_IsBMP(ch) ((ch) < 0x10000)
+
+/**
+ * @brief Convert two UTF-16 surrogates into one UTF-32 codepoint
+ * @param ch lead surrogate - Uni_IsSurrogate1(ch) must == true
+ * @param cl trail surrogate - Uni_IsSurrogate2(cl) must == true
+ * \def Uni_SurrogateToUTF
+ */
 #define Uni_SurrogateToUTF32(ch, cl) (((ch) - 0xD800) * 0x400 + ((cl) - 0xDC00) + 0x10000)
+
+/**
+ * @brief Convert UTF-32 BMP to UTF-16 BMP
+ * @param ch codepoint - Uni_IsBMP(ch) must == true
+ * \def Uni_UTF32BMPToUTF16
+ */
+#define Uni_UTF32BMPToUTF16(ch) (ch & 0xFFFF)
 
 #define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - 0x10000) / 0x400 + 0xD800)
 #define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - 0x10000) % 0x400 + 0xDC00)
+
+/**
+ * char16_t array big enough to hold a single Unicode codepoint,
+ * including trailing null.
+ */
+typedef struct {
+  char16_t ch[3];
+} char16_single;
+
+/**
+ * Convert a UTF-32 codepoint to UTF-16 code unit(s).
+ * @param ch32 input codepoint
+ * @param ch16 output buffer
+ * @return int length returned (not including null). Will return 1 (BMP) or 2
+ */
+int Utf32CharToUtf16(const KMX_DWORD ch32, char16_single& ch16);
 
 PKMX_WCHAR incxstr(PKMX_WCHAR p);
 PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart);
