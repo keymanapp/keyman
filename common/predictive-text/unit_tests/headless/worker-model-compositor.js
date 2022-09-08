@@ -66,10 +66,51 @@ describe('ModelCompositor', function() {
           // Suggestions always delete the full root of the suggestion.
           //
           // After a backspace, that means the text 'the' - 3 chars.
-          // Char 4 is for the original backspace, as suggstions are built
+          // Char 4 is for the original backspace, as suggestions are built
           // based on the context state BEFORE the triggering input -
           // here, a backspace.
           assert.equal(suggestion.transform.deleteLeft, 4);
+        });
+      });
+
+      it('properly handles suggestions for the first letter after a ` `', function() {
+        let compositor = new ModelCompositor(plainModel);
+        let context = {
+          left: 'the', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        let inputTransform = {
+          insert: ' ',
+          deleteLeft: 0
+        };
+
+        let suggestions = compositor.predict(inputTransform, context);
+        suggestions.forEach(function(suggestion) {
+          // After a space, predictions are based on a new, zero-length root.
+          // With nothing to replace, .deleteLeft should be zero.
+          assert.equal(suggestion.transform.deleteLeft, 0);
+        });
+      });
+
+      it('properly handles suggestions for the first letter after a `\'`', function() {
+        let compositor = new ModelCompositor(plainModel);
+        let context = {
+          left: "the '", startOfBuffer: true, endOfBuffer: true,
+        };
+
+        // This results in a new word boundary (between the `'` and the `a`).
+        // Basically, an implied (but nonexistent) ` `.
+        let inputTransform = {
+          insert: "a",
+          deleteLeft: 0
+        };
+
+        let suggestions = compositor.predict(inputTransform, context);
+        suggestions.forEach(function(suggestion) {
+          // Suggestions always delete the full root of the suggestion.
+          // Which, here, didn't exist before the input.  Nothing to
+          // replace => nothing for the suggestion to delete.
+          assert.equal(suggestion.transform.deleteLeft, 0);
         });
       });
     });
