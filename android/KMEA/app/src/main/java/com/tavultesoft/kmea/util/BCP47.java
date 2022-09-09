@@ -28,28 +28,22 @@ public final class BCP47 {
    * @param languageID
    */
   public static void toggleLanguage(ArrayList<String> languageList, String languageID) {
-    if (languageList != null) {
-      if (languageList.size() == 0) {
-        languageList.add(languageID.toLowerCase());
-        return;
-      }
+    if (languageList == null) {
+      throw new InvalidParameterException("languageList must not be null");
+    }
+    if (languageID == null) {
+      throw new InvalidParameterException("languageID must not be null");
+    }
 
-      boolean languageExists = false;
-      int index = 0;
       // See if languageID already exists in the languageList
       for (String l: languageList) {
         if (languageEquals(l, languageID)) {
-          languageExists = true;
-          break;
+          languageList.remove(l);
+          return;
         }
-        index++;
       }
 
-      if (languageExists && index < languageList.size()) {
-        languageList.remove(index);
-      } else {
-        languageList.add(languageID.toLowerCase());
-      }
+      languageList.add(languageID.toLowerCase());
     }
   }
 }

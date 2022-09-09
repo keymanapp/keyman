@@ -205,23 +205,16 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
             return;
           }
 
-          boolean languageExists = false;
-          int index = 0;
           // See if languageID already exists in the keyboardList
           for (Keyboard l: keyboardList) {
             if (BCP47.languageEquals(l.getLanguageID(), k.getLanguageID())) {
-              languageExists = true;
-              break;
+              keyboardList.remove(l);
+              return;
             }
-            index++;
           }
 
-          if (languageExists && index < keyboardList.size()) {
-            keyboardList.remove(index);
-          } else {
-            k.setLanguage(k.getLanguageID().toLowerCase(), k.getLanguageName());
-            keyboardList.add(k);
-          }
+          k.setLanguage(k.getLanguageID().toLowerCase(), k.getLanguageName());
+          keyboardList.add(k);
         }
       }
 
