@@ -337,14 +337,12 @@ namespace com.keyman.keyboards {
 
       // Allow for right OSK margin (15 layout units)
       let rightMargin = ActiveKey.DEFAULT_RIGHT_MARGIN/totalWidth;
-      totalPercent += rightMargin;
 
       // If a single key, and padding is negative, add padding to right align the key
       if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
         keyPercent=parseInt(keys[0]['width'],10)/totalWidth;
         keys[0]['widthpc']=keyPercent;
-        totalPercent += keyPercent;
-        keys[0]['padpc']=1-totalPercent;
+        keys[0]['padpc']=1-(totalPercent + keyPercent + rightMargin);
 
         // compute center's default x-coord (used in headless modes)
         setProportions(keys[0] as ActiveKey, padPercent, keyPercent, totalPercent);
@@ -352,8 +350,7 @@ namespace com.keyman.keyboards {
         let j=keys.length-1;
         padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
         keys[j]['padpc']=padPercent;
-        totalPercent += padPercent;
-        keys[j]['widthpc'] = keyPercent = 1-totalPercent;
+        keys[j]['widthpc'] = keyPercent = 1-(totalPercent + padPercent + rightMargin);
 
         // compute center's default x-coord (used in headless modes)
         setProportions(keys[j] as ActiveKey, padPercent, keyPercent, totalPercent);
@@ -511,39 +508,16 @@ namespace com.keyman.keyboards {
       let keyProbs: {[keyId: string]: number} = {};
 
       let totalMass = 0;
-      let bestKey = null;
-      let bestProb = Number.MIN_VALUE;
 
       // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
       // of the formula in the loop below.
       for(let key in keyDists) {
         keyProbs[key] = 1 / (Math.pow(keyDists[key], 2) + 1e-6); // Prevent div-by-0 errors.
         totalMass += keyProbs[key];
-
-        if(keyProbs[key] > bestProb) {
-          bestProb = keyProbs[key];
-          bestKey = key;
-        }
       }
 
       for(let key in keyProbs) {
         keyProbs[key] /= totalMass;
-      }
-
-      // To help ensure the highest probability key gets priority, we'll square-root its probability,
-      // then renormalize.  (p <= 1)  Has the largest effect when near the edge of the best key.
-      const originalBestProb = keyProbs[bestKey];
-      const finalBestProb = Math.sqrt(keyProbs[bestKey]);
-
-      const normDelta = finalBestProb - originalBestProb; // will be positive.
-      const renormalizer = 1 / (1 + normDelta); // as we're increasing the sum-total probability mass.
-
-      for(let key in keyProbs) {
-        if(key == bestKey) {
-          keyProbs[key] = finalBestProb * renormalizer;  // override with the adjusted value, renorm'd.
-        } else {
-          keyProbs[key] *= renormalizer;
-        }
       }
 
       return keyProbs;
