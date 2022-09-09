@@ -1139,7 +1139,7 @@ the state may also be modified.
 
 ##### Parameters:
 - __state__: A pointer to the opaque state object.
-- __event__: The event to be processed, from KM_KBP_EVENT enumeration
+- __event__: The event to be processed, from km_kbp_event_code enumeration
 - __data__: Additional event-specific data. Currently unused, must be nullptr.
 
 ```c
@@ -1152,7 +1152,7 @@ km_kbp_event(
   void* data
 );
 
-enum km_kbp_event_codes {
+enum km_kbp_event_code {
   /**
    * A keyboard has been activated by the user. The processor may use this
    * event, for example, to switch caps lock state or provide other UX.
