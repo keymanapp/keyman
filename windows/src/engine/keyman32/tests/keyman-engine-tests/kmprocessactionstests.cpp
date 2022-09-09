@@ -114,11 +114,11 @@ TEST_F(KMPROCESSACTIONS, processBackCharactertest) {
 TEST_F(KMPROCESSACTIONS, processBackSurrogateTSFtest) {
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
-  WCHAR expectedContext[]        = { 0 };
+  WCHAR expectedContext[]         = { 0 };
   WCHAR expectedStringSurrogate[] = {0xD801, 0xDC37, 0};
 
   km_kbp_usv testSurrogateChar    = Uni_SurrogateToUTF32(0xD801, 0xDC37);  //𐐷';
-  km_kbp_action_item itemAddChar = {KM_KBP_IT_CHAR, {0,}, {testSurrogateChar}};
+  km_kbp_action_item itemAddChar  = {KM_KBP_IT_CHAR, {0,}, {testSurrogateChar}};
   processUnicodeChar(&testApp, &itemAddChar);
 
   km_kbp_action_item itemBackSpace       = {KM_KBP_IT_BACK};
