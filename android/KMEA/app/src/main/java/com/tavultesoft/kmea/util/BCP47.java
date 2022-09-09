@@ -5,6 +5,7 @@
 package com.tavultesoft.kmea.util;
 
 import java.util.ArrayList;
+import java.security.InvalidParameterException;
 
 public final class BCP47 {
   /**
@@ -35,15 +36,14 @@ public final class BCP47 {
       throw new InvalidParameterException("languageID must not be null");
     }
 
-      // See if languageID already exists in the languageList
-      for (String l: languageList) {
-        if (languageEquals(l, languageID)) {
-          languageList.remove(l);
-          return;
-        }
+    // See if languageID already exists in the languageList
+    for (String l: languageList) {
+      if (languageEquals(l, languageID)) {
+        languageList.remove(l);
+        return;
       }
-
-      languageList.add(languageID.toLowerCase());
     }
+
+    languageList.add(languageID.toLowerCase());
   }
 }

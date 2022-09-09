@@ -32,6 +32,7 @@ import com.tavultesoft.kmea.util.KMLog;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -198,24 +199,23 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
        * @param k
        */
       private void toggleLanguage(ArrayList<Keyboard> keyboardList, Keyboard k) {
-        if (keyboardList != null) {
-          if (keyboardList.size() == 0) {
-            k.setLanguage(k.getLanguageID().toLowerCase(), k.getLanguageName());
-            keyboardList.add(k);
+        if (keyboardList == null) {
+          throw new InvalidParameterException("keyboardList must not be null");
+        }
+        if (k == null) {
+          throw new InvalidParameterException("keyboard must not be null");
+        }
+
+        // See if languageID already exists in the keyboardList
+        for (Keyboard l: keyboardList) {
+          if (BCP47.languageEquals(l.getLanguageID(), k.getLanguageID())) {
+            keyboardList.remove(l);
             return;
           }
-
-          // See if languageID already exists in the keyboardList
-          for (Keyboard l: keyboardList) {
-            if (BCP47.languageEquals(l.getLanguageID(), k.getLanguageID())) {
-              keyboardList.remove(l);
-              return;
-            }
-          }
-
-          k.setLanguage(k.getLanguageID().toLowerCase(), k.getLanguageName());
-          keyboardList.add(k);
         }
+
+        k.setLanguage(k.getLanguageID().toLowerCase(), k.getLanguageName());
+        keyboardList.add(k);
       }
 
       @Override
