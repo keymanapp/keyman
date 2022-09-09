@@ -4,7 +4,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { SectionCompiler } from '../../src/keyman/compiler/section-compiler';
-import { Section } from '../../src/keyman/kmx/kmx-plus';
+import { Elem, GlobalSections, Section, Strs } from '../../src/keyman/kmx/kmx-plus';
 import LDMLKeyboardXMLSourceFileReader from '../../src/keyman/ldml-keyboard/ldml-keyboard-xml-reader';
 import { CompilerEvent } from '../keyman/compiler/callbacks';
 
@@ -41,5 +41,12 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
   if(!compiler.validate()) {
     return null;
   }
-  return compiler.compile();
+
+  let globalSections: GlobalSections = {
+    strs: new Strs(),
+    elem: null
+  };
+  globalSections.elem = new Elem(globalSections.strs);
+
+  return compiler.compile(globalSections);
 }

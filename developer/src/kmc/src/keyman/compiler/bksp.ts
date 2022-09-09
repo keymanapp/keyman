@@ -1,6 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Bksp, BkspItem, BkspItemFlags } from "../kmx/kmx-plus";
-import { ElementString } from "../kmx/element-string";
+import { Bksp, BkspItem, BkspItemFlags, GlobalSections } from "../kmx/kmx-plus";
 import { LKBackspace, LKBackspaces } from "../ldml-keyboard/ldml-keyboard-xml";
 import { SectionCompiler } from "./section-compiler";
 
@@ -17,28 +16,28 @@ export class BkspCompiler extends SectionCompiler {
     return valid;
   }
 
-  private compileBackspace(backspace: LKBackspace): BkspItem {
+  private compileBackspace(sections: GlobalSections, backspace: LKBackspace): BkspItem {
     let result = new BkspItem();
-    result.from = new ElementString(backspace.from);
-    result.to = backspace.to;
-    result.before = new ElementString(backspace.before);
+    result.from = sections.elem.allocElementString(sections.strs, backspace.from);
+    result.to = sections.strs.allocString(backspace.to);
+    result.before = sections.elem.allocElementString(sections.strs, backspace.before);
     result.flags = backspace.error == 'fail' ? BkspItemFlags.error : BkspItemFlags.none;
     return result;
   }
 
-  private compileBackspaces(backspaces: LKBackspaces): Bksp {
+  private compileBackspaces(sections: GlobalSections, backspaces: LKBackspaces): Bksp {
     let result = new Bksp();
 
     if(backspaces?.backspace) {
       for(let backspace of backspaces.backspace) {
-        result.items.push(this.compileBackspace(backspace));
+        result.items.push(this.compileBackspace(sections, backspace));
       }
     }
 
     return result;
   }
 
-  public compile(): Bksp {
-    return this.compileBackspaces(this.keyboard.backspaces);
+  public compile(sections: GlobalSections): Bksp {
+    return this.compileBackspaces(sections, this.keyboard.backspaces);
   }
 }

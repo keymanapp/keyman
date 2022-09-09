@@ -5,7 +5,7 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData } from "../kmx-plus";
-import { alloc_string, BUILDER_STRS } from "./build-strs";
+import { build_strs_index, BUILDER_STRS } from "./build-strs";
 import { BUILDER_SECTION } from "./builder-section";
 
 /**
@@ -32,7 +32,7 @@ export function build_name(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
   };
 
   for(let item of kmxplus.name.names) {
-    name.items.push(alloc_string(sect_strs, item));
+    name.items.push(build_strs_index(sect_strs, item));
   }
 
   return name;

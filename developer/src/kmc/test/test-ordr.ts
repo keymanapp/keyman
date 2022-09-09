@@ -15,10 +15,10 @@ describe('ordr', function () {
 
     assert.lengthOf(ordr.items, 1);
     assert.lengthOf(ordr.items[0].elements, 4);
-    assert.strictEqual(ordr.items[0].elements[0].value, "ខ");
-    assert.strictEqual(ordr.items[0].elements[1].value, "ែ");
-    assert.strictEqual(ordr.items[0].elements[2].value, "្");
-    assert.strictEqual(ordr.items[0].elements[3].value, "ម");
+    assert.strictEqual(ordr.items[0].elements[0].value.value, "ខ");
+    assert.strictEqual(ordr.items[0].elements[1].value.value, "ែ");
+    assert.strictEqual(ordr.items[0].elements[2].value.value, "្");
+    assert.strictEqual(ordr.items[0].elements[3].value.value, "ម");
     assert.strictEqual(ordr.items[0].elements[0].order, 1);
     assert.strictEqual(ordr.items[0].elements[1].order, 3);
     assert.strictEqual(ordr.items[0].elements[2].order, 4);

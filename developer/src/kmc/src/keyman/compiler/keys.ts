@@ -1,5 +1,5 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { Keys } from '../kmx/kmx-plus';
+import { GlobalSections, Keys } from '../kmx/kmx-plus';
 import * as LDMLKeyboard from '../ldml-keyboard/ldml-keyboard-xml';
 import { USVirtualKeyMap } from "../ldml-keyboard/virtual-key-constants";
 import { CompilerMessages } from './messages';
@@ -12,12 +12,12 @@ export class KeysCompiler extends SectionCompiler {
     return constants.section.keys;
   }
 
-  public compile(): Keys {
+  public compile(sections: GlobalSections): Keys {
     // Use LayerMap + keys to generate compiled keys for hardware
 
     if(this.keyboard.layerMaps?.[0]?.form == 'hardware') {
       for(let layer of this.keyboard.layerMaps[0].layerMap) {
-        let sect = this.compileHardwareLayer(layer);
+        let sect = this.compileHardwareLayer(sections, layer);
         return sect;
       }
     }
@@ -28,6 +28,7 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   private compileHardwareLayer(
+    sections: GlobalSections,
     layer: LDMLKeyboard.LKLayerMap
   ): Keys {
     let result = new Keys();
@@ -58,7 +59,7 @@ export class KeysCompiler extends SectionCompiler {
         result.keys.push({
           vkey: USVirtualKeyMap[y][x],
           mod: mod,
-          to: keydef.to,
+          to: sections.strs.allocString(keydef.to),
           flags: 0 // Note: 'expand' is never set here, only by the .kmx builder
         });
       }

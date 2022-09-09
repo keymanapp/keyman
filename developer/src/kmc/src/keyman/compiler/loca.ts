@@ -1,5 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Loca } from "../kmx/kmx-plus";
+import { GlobalSections, Loca } from "../kmx/kmx-plus";
 import { SectionCompiler } from "./section-compiler";
 import { CompilerMessages } from "./messages";
 import { LKKeyboard } from "../ldml-keyboard/ldml-keyboard-xml";
@@ -37,7 +37,7 @@ export class LocaCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(): Loca {
+  public compile(sections: GlobalSections): Loca {
     let result = new Loca();
 
     // This also minimizes locales according to Remove Likely Subtags algorithm:
@@ -54,7 +54,8 @@ export class LocaCompiler extends SectionCompiler {
     // TODO: remove `as any` cast: (Intl as any): ts lib version we have doesn't
     // yet include `getCanonicalLocales` but node 16 does include it so we can
     // safely use it. Also well supported in modern browsers.
-    result.locales = (Intl as any).getCanonicalLocales(locales);
+    const canonicalLocales = (Intl as any).getCanonicalLocales(locales) as string[];
+    result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale));
 
     if(result.locales.length < locales.length) {
       this.callbacks.reportMessage(CompilerMessages.Hint_OneOrMoreRepeatedLocales());

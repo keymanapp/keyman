@@ -14,7 +14,7 @@ describe('name', function () {
     assert.equal(callbacks.messages.length, 0);
 
     assert.equal(name.names.length, 1);
-    assert.equal(name.names[0], 'My First Keyboard');
+    assert.equal(name.names[0].value, 'My First Keyboard');
   });
 
   it('should compile multiple names', function() {
@@ -23,11 +23,11 @@ describe('name', function () {
     assert.equal(callbacks.messages.length, 0);
 
     assert.equal(name.names.length, 5);
-    assert.equal(name.names[0], 'My Second Keyboard');
-    assert.equal(name.names[1], 'My 2nd Keyboard');
-    assert.equal(name.names[2], 'win:kbd2');
-    assert.equal(name.names[3], 'mac:keybd_2');
-    assert.equal(name.names[4], 'web:keyboard-2');
+    assert.equal(name.names[0].value, 'My Second Keyboard');
+    assert.equal(name.names[1].value, 'My 2nd Keyboard');
+    assert.equal(name.names[2].value, 'win:kbd2');
+    assert.equal(name.names[3].value, 'mac:keybd_2');
+    assert.equal(name.names[4].value, 'web:keyboard-2');
   });
 
   //TODO-LDML: should we be linting on repeated names?

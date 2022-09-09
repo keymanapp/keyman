@@ -1,5 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KeyboardSettings, Meta, Meta_NormalizationForm } from "../kmx/kmx-plus";
+import { GlobalSections, KeyboardSettings, Meta, Meta_NormalizationForm } from "../kmx/kmx-plus";
 import { isValidEnumValue } from "../util/util";
 import { CompilerMessages } from "./messages";
 import { SectionCompiler } from "./section-compiler";
@@ -41,14 +41,14 @@ export class MetaCompiler extends SectionCompiler {
     return true;
   }
 
-  public compile(): Meta {
+  public compile(sections: GlobalSections): Meta {
     let result = new Meta();
-    result.author = this.keyboard.info?.author;
-    result.conform = this.keyboard.conformsTo;
-    result.layout = this.keyboard.info?.layout;
-    result.normalization = this.keyboard.info?.normalization as Meta_NormalizationForm;
-    result.indicator = this.keyboard.info?.indicator;
-    result.version = this.keyboard.version?.number ?? "0";
+    result.author        = sections.strs.allocString(this.keyboard.info?.author);
+    result.conform       = sections.strs.allocString(this.keyboard.conformsTo);
+    result.layout        = sections.strs.allocString(this.keyboard.info?.layout);
+    result.normalization = sections.strs.allocString(this.keyboard.info?.normalization);
+    result.indicator     = sections.strs.allocString(this.keyboard.info?.indicator);
+    result.version       = sections.strs.allocString(this.keyboard.version?.number ?? "0");
     result.settings =
       (this.keyboard.settings?.fallback == "omit" ? KeyboardSettings.fallback : 0) |
       (this.keyboard.settings?.transformFailure == "omit" ? KeyboardSettings.transformFailure : 0) |

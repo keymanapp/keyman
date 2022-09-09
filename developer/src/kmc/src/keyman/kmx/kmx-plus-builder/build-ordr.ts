@@ -1,6 +1,6 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData } from "../kmx-plus";
-import { alloc_element_string, BUILDER_ELEM } from "./build-elem";
+import { build_elem_index, BUILDER_ELEM } from "./build-elem";
 import { BUILDER_STRS } from "./build-strs";
 import { BUILDER_SECTION } from "./builder-section";
 
@@ -38,8 +38,8 @@ export function build_ordr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_e
 
  for(let item of kmxplus.ordr.items) {
    ordr.items.push({
-    elements: alloc_element_string(sect_strs, sect_elem, item.elements),
-    before: alloc_element_string(sect_strs, sect_elem, item.before)
+    elements: build_elem_index(sect_elem, item.elements),
+    before: build_elem_index(sect_elem, item.before)
    });
  }
 

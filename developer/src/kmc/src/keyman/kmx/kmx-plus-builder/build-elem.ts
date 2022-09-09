@@ -1,6 +1,7 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { ElementString } from "../element-string";
-import { alloc_string, BUILDER_STRS } from "./build-strs";
+import { Elem } from "../kmx-plus";
+import { build_strs_index, BUILDER_STRS } from "./build-strs";
 import { BUILDER_SECTION } from "./builder-section";
 
 /* ------------------------------------------------------------------
@@ -10,6 +11,7 @@ import { BUILDER_SECTION } from "./builder-section";
 interface BUILDER_ELEM_ELEMENT {
   element: number;  // str | UTF-32 char
   flags: number;
+  _value: string;
 };
 
 interface BUILDER_ELEM_STRING {
@@ -28,68 +30,71 @@ export interface BUILDER_ELEM extends BUILDER_SECTION {
   strings: BUILDER_ELEM_STRING[];
 };
 
-export function build_elem(): BUILDER_ELEM {
-  return {
+function binaryElemCompare(a: BUILDER_ELEM_STRING, b: BUILDER_ELEM_STRING): number {
+  for(let i = 0; i < a.items.length && i < b.items.length; i++) {
+    if(a.items[i]._value < b.items[i]._value) return -1;
+    if(a.items[i]._value > b.items[i]._value) return 1;
+    if(a.items[i].flags < b.items[i].flags) return -1;
+    if(a.items[i].flags > b.items[i].flags) return 1;
+  }
+  if(a.items.length < b.items.length) return -1;
+  if(a.items.length > b.items.length) return 1;
+  return 0;
+}
+
+export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS): BUILDER_ELEM {
+  let result: BUILDER_ELEM = {
     ident: constants.hex_section_id(constants.section.elem),
-    size: 0,  // finalized later
+    size: 0,  // finalized below
     _offset: 0,
-    count: 0,  // finalized later
+    count: source_elem.strings.length,
     reserved: 0,
-    strings: [], // finalized later
+    strings: [], // finalized below
   };
-}
 
-/**
- *
- * @param sect_elem
- * @returns false if the section should be omitted from the file
- */
-export function finalize_elem(sect_elem: BUILDER_ELEM): boolean {
-  if(sect_elem.strings.length == 1) {
-    // If we have only the 'null' element string, then we don't include the
-    // section at all.
-    return false;
-  }
-  sect_elem.count = sect_elem.strings.length;
-  let offset = constants.length_elem + constants.length_elem_item * sect_elem.count;
   // TODO: consider padding
-  for(let string of sect_elem.strings) {
-    string.offset = offset;
-    offset += string.length * constants.length_elem_item_element;
+  result.strings = source_elem.strings.map(item => {
+    let res: BUILDER_ELEM_STRING = {
+      offset: 0, // finalized below
+      length: item.length,
+      items: [],
+      _value: item
+    };
+
+    res.items = item.map(v => {
+      return {
+        element: build_strs_index(sect_strs, v.value),
+        flags: constants.elem_flags_unicode_set |
+              v.flags |                                                             //
+              ((v.order ?? 0) << constants.elem_flags_order_bitshift) |             // -128 to +127; used only by reorder element values
+              ((v.tertiary ?? 0) << constants.elem_flags_tertiary_bitshift),        // -128 to +127; used only by reorder element values
+        _value: v.value.value
+      };
+    });
+    return res;
+  });
+  result.strings.sort((a,b) => binaryElemCompare(a, b));
+
+  /* Calculate offsets and total size */
+
+  let offset = constants.length_elem + constants.length_elem_item * result.count;
+  for(let item of result.strings) {
+    item.offset = offset;
+    offset += item.length * constants.length_elem_item_element;
   }
-  sect_elem.size = offset;
-  return true;
+
+  result.size = offset;
+  return result;
 }
 
-export function alloc_element_string(sect_strs: BUILDER_STRS, sect_elem: BUILDER_ELEM, value: ElementString) {
-  if(value === undefined || value === null) {
-    // the "null" element string
-    value = new ElementString('');
+export function build_elem_index(sect_elem: BUILDER_ELEM, value: ElementString) {
+  if(!(value instanceof ElementString)) {
+    throw new Error('unexpected value '+value);
   }
 
-  const idx = sect_elem.strings.findIndex(v => value.isEqual(v._value));
-  if(idx >= 0) {
-    return idx;
+  const result = sect_elem.strings.findIndex(v => value.isEqual(v._value));
+  if(result < 0) {
+    throw new Error('unexpectedly missing StrsItem '+value);
   }
-
-  let str: BUILDER_ELEM_STRING = {
-    _value: value,
-    items: [],
-    length: value.length,
-    offset: 0 // will be filled in later
-  };
-
-  for(let v of value) {
-    str.items.push({
-      // TODO: support UTF-32 char (!UnicodeSet)
-      // TODO: support UnicodeSet properly
-      element: alloc_string(sect_strs, v.value),
-      flags: constants.elem_flags_unicode_set |
-             v.flags |                                                             //
-             ((v.order ?? 0) << constants.elem_flags_order_bitshift) |             // -128 to +127; used only by reorder element values
-             ((v.tertiary ?? 0) << constants.elem_flags_tertiary_bitshift)            // -128 to +127; used only by reorder element values
-    });
-  }
-
-  return sect_elem.strings.push(str) - 1;
+  return result;
 }

@@ -14,7 +14,7 @@ describe('loca', function () {
     assert.equal(callbacks.messages.length, 0);
 
     assert.equal(loca.locales.length, 1);
-    assert.equal(loca.locales[0].toLowerCase(), 'mt');
+    assert.equal(loca.locales[0].value.toLowerCase(), 'mt');
   });
 
   it('should compile multiple locales', function() {
@@ -30,11 +30,11 @@ describe('loca', function () {
 
     // Original is 6 locales, now five minimized in the results
     assert.equal(loca.locales.length, 5);
-    assert.equal(loca.locales[0], 'mt');
-    assert.equal(loca.locales[1], 'fr');  // Original fr-FR
-    assert.equal(loca.locales[2], 'km');  // Original km-Khmr-kh
-    assert.equal(loca.locales[3], 'qq-Abcd-ZZ-x-foobar');
-    assert.equal(loca.locales[4], 'en-fonipa');
+    assert.equal(loca.locales[0].value, 'mt');
+    assert.equal(loca.locales[1].value, 'fr');  // Original fr-FR
+    assert.equal(loca.locales[2].value, 'km');  // Original km-Khmr-kh
+    assert.equal(loca.locales[3].value, 'qq-Abcd-ZZ-x-foobar');
+    assert.equal(loca.locales[4].value, 'en-fonipa');
   });
 
   it('should reject structurally invalid invalid locales', function() {

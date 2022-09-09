@@ -13,11 +13,11 @@ describe('meta', function () {
     let meta = loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', callbacks) as Meta;
     assert.equal(callbacks.messages.length, 0);
 
-    assert.isUndefined(meta.author);        // TODO-LDML: default author string "unknown"?
-    assert.equal(meta.conform, 'techpreview');
-    assert.isUndefined(meta.layout);        // TODO-LDML: assumed layout?
-    assert.isUndefined(meta.normalization); // TODO-LDML: assumed normalization?
-    assert.isUndefined(meta.indicator);     // TODO-LDML: synthesize an indicator?
+    assert.isEmpty(meta.author.value);        // TODO-LDML: default author string "unknown"?
+    assert.equal(meta.conform.value, 'techpreview');
+    assert.isEmpty(meta.layout.value);        // TODO-LDML: assumed layout?
+    assert.isEmpty(meta.normalization.value); // TODO-LDML: assumed normalization?
+    assert.isEmpty(meta.indicator.value);     // TODO-LDML: synthesize an indicator?
     assert.equal(meta.settings, KeyboardSettings.none);
   });
 
@@ -26,11 +26,11 @@ describe('meta', function () {
     let meta = loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', callbacks) as Meta;
     assert.equal(callbacks.messages.length, 0);
 
-    assert.equal(meta.author, 'The Keyman Team');
-    assert.equal(meta.conform, 'techpreview');
-    assert.equal(meta.layout, 'QWIRKY');
-    assert.equal(meta.normalization, 'NFC');
-    assert.equal(meta.indicator, 'QW');
+    assert.equal(meta.author.value, 'The Keyman Team');
+    assert.equal(meta.conform.value, 'techpreview');
+    assert.equal(meta.layout.value, 'QWIRKY');
+    assert.equal(meta.normalization.value, 'NFC');
+    assert.equal(meta.indicator.value, 'QW');
     assert.equal(meta.settings, KeyboardSettings.fallback | KeyboardSettings.transformFailure | KeyboardSettings.transformPartial);
   });
 

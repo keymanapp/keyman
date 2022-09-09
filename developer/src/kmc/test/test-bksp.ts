@@ -15,11 +15,11 @@ describe('bksp', function () {
 
     assert.lengthOf(bksp.items, 1);
     assert.lengthOf(bksp.items[0].from, 2);
-    assert.strictEqual(bksp.items[0].from[0].value, "្");
-    assert.strictEqual(bksp.items[0].from[1].value, "ម");
+    assert.strictEqual(bksp.items[0].from[0].value.value, "្");
+    assert.strictEqual(bksp.items[0].from[1].value.value, "ម");
     assert.strictEqual(bksp.items[0].flags, BkspItemFlags.none);
     assert.isEmpty(bksp.items[0].before);
-    assert.strictEqual(bksp.items[0].to, "");
+    assert.strictEqual(bksp.items[0].to.value, "");
   });
 });
 
