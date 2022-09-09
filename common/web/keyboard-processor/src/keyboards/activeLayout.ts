@@ -512,8 +512,7 @@ namespace com.keyman.keyboards {
       // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
       // of the formula in the loop below.
       for(let key in keyDists) {
-        keyProbs[key] = 1 / (Math.pow(keyDists[key], 2) + 1e-6); // Prevent div-by-0 errors.
-        totalMass += keyProbs[key];
+        totalMass += keyProbs[key] = 1 / (Math.pow(keyDists[key], 2) + 1e-6); // Prevent div-by-0 errors.
       }
 
       for(let key in keyProbs) {
