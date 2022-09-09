@@ -106,6 +106,32 @@ TEST_F(KMPROCESSACTIONS, processBackCharactertest) {
   EXPECT_STREQ(contextBuf, expectedContextFinal);
 }
 
+
+// KM_KBP_IT_BACK - processBack
+// Press Backspace for a surrogate character.
+// TODO: This test doesn't test for the PostKey handling
+// of TSF and two backspaces being sent to the App. 
+TEST_F(KMPROCESSACTIONS, processBackSurrogateTSFtest) {
+  WCHAR callbuf[MAXCONTEXT];
+  AITIP testApp;
+  WCHAR expectedContext[]         = { 0 };
+  WCHAR expectedStringSurrogate[] = {0xD801, 0xDC37, 0};
+
+  km_kbp_usv testSurrogateChar    = Uni_SurrogateToUTF32(0xD801, 0xDC37);  //𐐷';
+  km_kbp_action_item itemAddChar  = {KM_KBP_IT_CHAR, {0,}, {testSurrogateChar}};
+  processUnicodeChar(&testApp, &itemAddChar);
+
+  km_kbp_action_item itemBackSpace       = {KM_KBP_IT_BACK};
+  itemBackSpace.backspace.expected_type  = KM_KBP_IT_CHAR;
+  itemBackSpace.backspace.expected_value = testSurrogateChar;
+  WCHAR *contextBuf                      = testApp.ContextBufMax(MAXCONTEXT);
+  EXPECT_STREQ(contextBuf, expectedStringSurrogate);
+  // backspace
+  processBack(&testApp, &itemBackSpace);
+  contextBuf = testApp.ContextBufMax(MAXCONTEXT);
+  EXPECT_STREQ(contextBuf, expectedContext);
+}
+
 // KM_KBP_IT_BACK - processBack
 // Press Backspace for a character doesn't match expected character
 // Note currently we don't check for a character match this should be updated
