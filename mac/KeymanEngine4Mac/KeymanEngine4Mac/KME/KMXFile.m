@@ -27,12 +27,12 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
             _filePath = nil;
             return nil;
         }
-        
+
         if (![[self class] verifyCheckSum:path]) {
             NSLog(@"errBadChecksum");
             return nil;
         }
-        
+
         NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
         if (file == nil) {
             //NSLog(@"Failed to open kmx file");
@@ -42,18 +42,18 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
         else {
             _filePath = [NSString stringWithString:path];
         }
-        
+
         struct COMP_KEYBOARD cmp_kb;
         [file seekToFileOffset:0];
         size_t size = sizeof(cmp_kb);
         NSData *dataBuffer = [file readDataOfLength:size];
         [dataBuffer getBytes:&cmp_kb length:size];
-        
+
         if (cmp_kb.dwFileVersion < VERSION_MIN || cmp_kb.dwFileVersion > VERSION_MAX) {
             [file closeFile];
             return nil;
         }
-        
+
         _identifier = cmp_kb.dwIdentifier;
         _fileVersion = cmp_kb.dwFileVersion;
         _checkSum = cmp_kb.dwCheckSum;
@@ -66,7 +66,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
         _startGroup = [[NSArray alloc] initWithArray:mStartGroup];
         _flags = cmp_kb.dwFlags;
         _hotKey = cmp_kb.dwHotKey;
-        
+
         struct COMP_STORE cmp_str[cmp_kb.cxStoreArray];
         [file seekToFileOffset:cmp_kb.dpStoreArray];
         size = sizeof(cmp_str);
@@ -77,7 +77,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
             KMCompStore *kmStore = [[KMCompStore alloc] init];
             kmStore.dwSystemID = cmp_str[i].dwSystemID;
             kmStore.name = [KMXFile UTF16StringWithPointer:cmp_str[i].dpName inFile:file];
-            
+
             if (kmStore.dwSystemID == TSS_VERSION)
                 kmStore.string = [[KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
             else {
@@ -85,24 +85,24 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
                 if (kmStore.dwSystemID == TSS_MNEMONIC && [kmStore.string isEqualToString:@"1"])
                     _isMnemonic = YES;
             }
-            
+
             if (kmStore.dwSystemID == TSS_VERSION)
                 kmStore.string = [[KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
             else
                 kmStore.string = [KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file];
-            
+
             [mStore addObject:kmStore];
         }
-        
+
         _store = [[NSArray alloc] initWithArray:mStore];
         _storeSaved = [[NSArray alloc] initWithArray:mStore copyItems:YES];
-        
+
         struct COMP_GROUP cmp_grp[cmp_kb.cxGroupArray];
         [file seekToFileOffset:cmp_kb.dpGroupArray];
         size = sizeof(cmp_grp);
         dataBuffer = [file readDataOfLength:size];
         [dataBuffer getBytes:cmp_grp length:size];
-        
+
         NSMutableArray *mGroup = [[NSMutableArray alloc] initWithCapacity:cmp_kb.cxGroupArray];
         for (int i = 0; i < cmp_kb.cxGroupArray; i++) {
             KMCompGroup *kmGrp = [[KMCompGroup alloc] init];
@@ -110,13 +110,13 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
             kmGrp.match = [KMXFile UTF16StringWithPointer:cmp_grp[i].dpMatch inFile:file];
             kmGrp.noMatch = [KMXFile UTF16StringWithPointer:cmp_grp[i].dpNoMatch inFile:file];
             kmGrp.fUsingKeys = cmp_grp[i].fUsingKeys;
-            
+
             struct COMP_KEY cmp_keys[cmp_grp[i].cxKeyArray];
             [file seekToFileOffset:cmp_grp[i].dpKeyArray];
             size = sizeof(cmp_keys);
             dataBuffer = [file readDataOfLength:size];
             [dataBuffer getBytes:cmp_keys length:size];
-            
+
             for (int j = 0; j < cmp_grp[i].cxKeyArray; j++) {
                 KMCompKey *kmKey = [[KMCompKey alloc] init];
                 kmKey.key = cmp_keys[j].Key;
@@ -126,19 +126,19 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
                 kmKey.context = [KMXFile UTF16StringWithPointer:cmp_keys[j].dpContext inFile:file];
                 [kmGrp.keys addObject:kmKey];
             }
-            
+
             [mGroup addObject:kmGrp];
         }
         _group = [[NSArray alloc] initWithArray:mGroup];
-        
+
         [file seekToFileOffset:cmp_kb.dpBitmapOffset];
         NSData *bitmapData = [file readDataOfLength:cmp_kb.dwBitmapSize];
         NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:bitmapData];
         _bitmap = [[NSImage alloc] initWithCGImage:imageRep.CGImage size:NSMakeSize(CGImageGetWidth(imageRep.CGImage), CGImageGetHeight(imageRep.CGImage))];
-        
+
         [file closeFile];
     }
-    
+
     return self;
 }
 
@@ -149,50 +149,50 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     return str;
 }
 
-- (BOOL)isValid {    
+- (BOOL)isValid {
     for (KMCompGroup *gp in self.group) {
         if ((gp.match && ![gp.match isValidCode]) || (gp.noMatch && ![gp.noMatch isValidCode]))
             return NO;
-        
+
         for (KMCompKey *kmKey in gp.keys) {
             if (![kmKey.context isValidCode] || ![kmKey.output isValidCode])
                 return NO;
         }
     }
-    
+
     return YES;
 }
 
 + (NSDictionary *)keyboardInfoFromKmxFile:(NSString *)path {
     NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
-    
+
     if (file == nil) {
         //NSLog(@"Failed to open file");
         return nil;
     }
-    
+
     if (![[self class] verifyCheckSum:path]) {
         NSLog(@"errBadChecksum");
         return nil;
     }
-    
+
     struct COMP_KEYBOARD cmp_kb;
     [file seekToFileOffset:0];
     size_t size = sizeof(cmp_kb);
     NSData *dataBuffer = [file readDataOfLength:size];
     [dataBuffer getBytes:&cmp_kb length:size];
-    
+
     if (cmp_kb.dwFileVersion < VERSION_MIN || cmp_kb.dwFileVersion > VERSION_MAX) {
         [file closeFile];
         return nil;
     }
-    
+
     struct COMP_STORE cmp_str[cmp_kb.cxStoreArray];
     [file seekToFileOffset:cmp_kb.dpStoreArray];
     size = sizeof(cmp_str);
     dataBuffer = [file readDataOfLength:size];
     [dataBuffer getBytes:cmp_str length:size];
-    
+
     NSString *nameStr = nil;
     NSString *verStr = nil;
     NSString *copyrightStr = nil;
@@ -212,9 +212,9 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     NSData *bitmapData = [file readDataOfLength:cmp_kb.dwBitmapSize];
     NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:bitmapData];
     NSImage *icon = [[NSImage alloc] initWithCGImage:imageRep.CGImage size:NSMakeSize(CGImageGetWidth(imageRep.CGImage), CGImageGetHeight(imageRep.CGImage))];
-    
+
     [file closeFile];
-    
+
     if (!nameStr || !nameStr.length) {
         nameStr = [path.lastPathComponent stringByReplacingOccurrencesOfString:@".kmx" withString:@""];
     }
@@ -222,7 +222,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
         verStr = @"";
     if (!copyrightStr)
         copyrightStr = @"";
-    
+
     NSDictionary *info;
     if (icon) {
         info = [[NSDictionary alloc] initWithObjectsAndKeys:nameStr, kKMKeyboardNameKey,
@@ -237,14 +237,14 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
                 copyrightStr, kKMKeyboardCopyrightKey,
                 visualKeyboard, kKMVisualKeyboardKey, nil];
     }
-    
+
     return info;
 }
 
 + (NSString *)UTF16StringWithPointer:(DWORD)dp inFile:(NSFileHandle *)file {
     if (dp == 0)
         return nil;
-    
+
     [file seekToFileOffset:dp];
     UTF16Char ch = '\0';
     size_t size = sizeof(ch);
@@ -257,7 +257,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
         dataBuffer = [file readDataOfLength:size];
         [dataBuffer getBytes:&ch length:size];
     }
-    
+
     return mStr;
 }
 
@@ -269,20 +269,20 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
         //NSLog(@"Failed to open file");
         return NO;
     }
-    
+
     [file seekToFileOffset:0];
     NSMutableData *dataBuffer = [[file readDataToEndOfFile] mutableCopy];
     [dataBuffer replaceBytesInRange:NSMakeRange(8, 4) withBytes:0 length:4]; // set dwCheckSum = 0 before calculating CRC32
     unsigned long crc = [self getCRC32:dataBuffer];
-    
+
     struct COMP_KEYBOARD cmp_kb;
     [file seekToFileOffset:0];
     size_t size = sizeof(cmp_kb);
     dataBuffer = [[file readDataOfLength:size] mutableCopy];
     [dataBuffer getBytes:&cmp_kb length:size];
     [file closeFile];
-    
-    return (crc == cmp_kb.dwCheckSum);
+
+    return (cmp_kb.dwFileVersion >= VERSION_160 && cmp_kb.dwCheckSum == 0) || (crc == cmp_kb.dwCheckSum);
 }
 
 #define CRC32_POLYNOMIAL    0xEDB88320L
@@ -293,14 +293,14 @@ unsigned long CRCTable[256];
     int i;
     int j;
     unsigned long crc;
-    
+
     if (!tableBuilt) {
         for (i = 0; i <= 255; i++) {
             crc = i;
-            
+
             for (j = 8; j > 0; j--)
                 if(crc & 1) crc = (crc >> 1) ^ CRC32_POLYNOMIAL; else crc >>= 1;
-            
+
             CRCTable[i] = crc;
         }
     }
@@ -310,15 +310,15 @@ unsigned long CRCTable[256];
     unsigned long temp1;
     unsigned long temp2;
     unsigned long crc = 0xFFFFFFFFL;
-    
+
     [self buildCRCTable];
-    
+
     while (count-- != 0) {
         temp1 = ( crc >> 8 ) & 0x00FFFFFFL;
         temp2 = CRCTable[((int) crc ^ *p++) & 0xff];
         crc = temp1 ^ temp2;
     }
-    
+
     return crc;
 }
 
