@@ -59,7 +59,6 @@ export enum KeyboardSettings {
 export enum Meta_NormalizationForm { NFC='NFC', NFD='NFD', other='other' };
 
 export class Meta extends Section {
-  name: string;
   author: string;
   conform: string;
   layout: string;
@@ -282,7 +281,6 @@ export default class KMXPlusFile extends KMXFile {
     this.COMP_PLUS_META = new r.Struct({
       ident: r.uint32le,
       size: r.uint32le,
-      name: r.uint32le, //str
       author: r.uint32le, //str
       conform: r.uint32le, //str
       layout: r.uint32le, //str

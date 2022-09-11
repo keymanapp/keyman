@@ -231,7 +231,7 @@ class Constants {
   /**
    * length of the 'meta' section
    */
-  readonly length_meta = 40;
+  readonly length_meta = 36;
   /**
    * bitwise or value for fallback=omit in meta.settings
    */

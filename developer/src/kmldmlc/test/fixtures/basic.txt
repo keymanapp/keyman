@@ -21,7 +21,7 @@ block(kmxheader)  #  struct COMP_KEYBOARD {
 
   00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  c2 de d3 3f      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  8f 97 57 27      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
   00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
@@ -224,7 +224,6 @@ block(loca)                         # struct COMP_KMXPLUS_LOCA {
 block(meta)                         # struct COMP_KMXPLUS_META {
   6d 65 74 61                       #   KMX_DWORD header.ident;   // 0000 Section name - meta
   sizeof(meta)                      #   KMX_DWORD header.size;    // 0004 Section length
-  index(strNull,strName,2)          #   KMXPLUS_STR name;
   index(strNull,strAuthor,2)        #   KMXPLUS_STR author;
   index(strNull,strConformsTo,2)    #   KMXPLUS_STR conform;
   index(strNull,strLayout,2)        #   KMXPLUS_STR layout;
@@ -277,13 +276,13 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strKey1)       sizeof(strKey1,2)
   diff(strs,strKey2)       sizeof(strKey2,2)
   diff(strs,strLocale)     sizeof(strLocale,2)
-  diff(strs,strName)       sizeof(strName,2)
   diff(strs,strAuthor)     sizeof(strAuthor,2)
   diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strLayout)     sizeof(strLayout,2)
   diff(strs,strNorm)       sizeof(strNorm,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
   diff(strs,strVersion)    sizeof(strVersion,2)
+  diff(strs,strName)       sizeof(strName,2)
 
   diff(strs,strElemOrdrFrom1)   sizeof(strElemOrdrFrom1,2)
   diff(strs,strElemOrdrFrom2)   sizeof(strElemOrdrFrom2,2)
@@ -302,7 +301,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strKey1)             27 01   block(x) 00 00                                     # 'ħ'
   block(strKey2)             90 17 b6 17   block(x) 00 00                               # 'ថា'
   block(strLocale)           6d 00 74 00   block(x) 00 00                               # 'mt'
-  block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
   block(strAuthor)           73 00 72 00 6c 00 32 00 39 00 35 00   block(x) 00 00       # 'srl295'
   block(strConformsTo)       74 00 65 00 63 00 68 00 70 00 72 00 65 00 76 00
                              69 00 65 00 77 00   block(x) 00 00                         # 'techpreview'
@@ -310,6 +308,8 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strNorm)             4e 00 46 00 43 00   block(x) 00 00                         # 'NFC'
   block(strIndicator)        3d d8 40 de   block(x) 00 00                               # '🙀'
   block(strVersion)          30 00   block(x) 00 00                                     # '0'
+
+  block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
 
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strElemOrdrFrom1)    60 1a block(x) 00 00                                       # '᩠'

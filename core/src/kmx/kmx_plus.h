@@ -196,7 +196,6 @@ static_assert(sizeof(struct COMP_KMXPLUS_LOCA) == LDML_LENGTH_LOCA, "mismatched 
 struct COMP_KMXPLUS_META {
   static const KMX_DWORD IDENT = LDML_SECTIONID_META;
   COMP_KMXPLUS_HEADER header;
-  KMXPLUS_STR name;
   KMXPLUS_STR author;
   KMXPLUS_STR conform;
   KMXPLUS_STR layout;

@@ -43,7 +43,6 @@ export class MetaCompiler extends SectionCompiler {
 
   public compile(): Meta {
     let result = new Meta();
-    result.name = this.keyboard.names?.name?.[0]?.value;
     result.author = this.keyboard.info?.author;
     result.conform = this.keyboard.conformsTo;
     result.layout = this.keyboard.info?.layout;
