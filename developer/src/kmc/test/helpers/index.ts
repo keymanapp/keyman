@@ -30,9 +30,7 @@ export class CompilerCallbacks {
     this.messages.push(event);
   }
   loadLdmlKeyboardSchema(): Buffer {
-    // Relative paths phooey!
-    return fs.readFileSync(path.join(__dirname, '..', '..', '..', '..', '..', '..',
-      'resources', 'standards-data', 'ldml-keyboards', 'techpreview', 'ldml-keyboard.schema.json'));
+    return fs.readFileSync(path.join(__dirname, '..', '..', 'src', 'ldml-keyboard.schema.json'));
   }
 }
 

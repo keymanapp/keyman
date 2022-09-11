@@ -294,7 +294,7 @@ if $CONFIGURE; then
     echo "Note: Found node, checking and building kmc dependency if needed"
     if [[ ! -f "$KEYMAN_ROOT/developer/src/kmc/build/kmc.js" ]]; then
       "$KEYMAN_ROOT/common/web/keyman-version/build.sh" configure build
-      "$KEYMAN_ROOT/developer/src/kmc/build.sh" build
+      "$KEYMAN_ROOT/developer/src/kmc/build.sh" configure build
       "$KEYMAN_ROOT/common/tools/hextobin/build.sh" build
     fi
   else
