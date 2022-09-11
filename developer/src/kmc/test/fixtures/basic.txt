@@ -1,5 +1,5 @@
 #
-# basic.txt describes the expected output of running kmldmlc against basic.xml. It is used in
+# basic.txt describes the expected output of running kmc against basic.xml. It is used in
 # the end-to-end test test-compiler-e2e.ts.
 #
 # Any changes to the compiler or basic.xml will likely result in changes to the compiled file.
@@ -8,7 +8,7 @@
 # updated compilation result. The following may be helpful for working with this file when
 # updating the binary format:
 #
-#    cd developer/src/kmldmlc
+#    cd developer/src/kmc
 #    ./build.sh configure build # if needed
 #    ./build.sh build-fixtures
 #

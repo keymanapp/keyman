@@ -14,9 +14,9 @@
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "license": "MIT",
-  "main": "build/src/kmldmlc.js",
+  "main": "build/src/kmc.js",
   "bin": {
-    "kmldmlc": "build/src/kmldmlc.js"
+    "kmc": "build/src/kmc.js"
   },
   "dependencies": {
     "ajv": "^8.11.0",

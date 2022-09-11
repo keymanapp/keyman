@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * kmldmlc - Keyman LDML Keyboard Compiler
+ * kmc - Keyman LDML Keyboard Compiler
  */
 
 import * as fs from 'fs';

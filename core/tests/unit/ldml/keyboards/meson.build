@@ -10,10 +10,10 @@ tests = [
   'k_001_tiny'
 ]
 
-# Setup kmldmlc
+# Setup kmc
 
-kmldmlc_root = join_paths(meson.source_root(),'..','developer','src','kmldmlc')
-kmldmlc_cmd = [node, kmldmlc_root]
+kmc_root = join_paths(meson.source_root(),'..','developer','src','kmc')
+kmc_cmd = [node, kmc_root]
 
 # Build all keyboards in output folder
 
@@ -25,7 +25,7 @@ foreach kbd : tests
   )
 
   configure_file(
-    command: kmldmlc_cmd + ['@INPUT@', '--outFile', '@OUTPUT@'],
+    command: kmc_cmd + ['@INPUT@', '--outFile', '@OUTPUT@'],
     output: kbd + '.kmx',
     input: kbd + '.xml'
   )

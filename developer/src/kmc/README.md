@@ -3,7 +3,7 @@ Keyman Developer - LDML Keyboard Compiler
 
 This package provides the following Keyman **command line tool**:
 
- - `kmldmlc` — takes **LDML Keyboard .xml sources** and compiles them in to a
+ - `kmc` — takes **LDML Keyboard .xml sources** and compiles them in to a
    KMXPlus **.kmx** file.
 
 Install
@@ -16,13 +16,13 @@ Install `kmlmdlc` globally:
 Usage
 -----
 
-To compile an LDML keyboard from its `.xml` source, use `kmldmlc`:
+To compile an LDML keyboard from its `.xml` source, use `kmc`:
 
-    kmldmlc my-keyboard.xml --outFile my-keyboard.kmx
+    kmc my-keyboard.xml --outFile my-keyboard.kmx
 
 To see more command line options by using the `--help` option:
 
-    kmldmlc --help
+    kmc --help
 
 How to build from source
 ------------------------

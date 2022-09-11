@@ -31,7 +31,7 @@ bundle() {
   # We copy the built compiler into a temporary folder in order to prepare
   # the node modules, as otherwise the workspace will interfere
 
-  cp -R "$KEYMAN_ROOT/developer/src/kmldmlc/"* "$KEYMAN_LDMLKEYBOARDCOMPILER_TEMP/"
+  cp -R "$KEYMAN_ROOT/developer/src/kmc/"* "$KEYMAN_LDMLKEYBOARDCOMPILER_TEMP/"
 
   cd "$KEYMAN_LDMLKEYBOARDCOMPILER_TEMP"
 
@@ -52,19 +52,19 @@ bundle() {
   # directory. This automatically strips the package to its barebones.
   set_npm_version
   npm pack
-  mv keymanapp-ldml-keyboard-compiler*.tgz kmldmlc.tgz
-  mv kmldmlc.tgz "$KEYMAN_WIX_TEMP_BASE"
+  mv keymanapp-ldml-keyboard-compiler*.tgz kmc.tgz
+  mv kmc.tgz "$KEYMAN_WIX_TEMP_BASE"
 
   # We extract the npm-packed version of the compiler in order to reproduce
   # our needed bundle.
   cd "$KEYMAN_WIX_TEMP_BASE"
-  tar xvzf kmldmlc.tgz
+  tar xvzf kmc.tgz
 
   # Creates the directory referenced by $(KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER).
   mv package LDMLKeyboardCompiler
 
   # Cleans up the npm pack artifacts, which are no longer needed.
-  rm kmldmlc.tgz
+  rm kmc.tgz
 
   # Step 2 - the compiler has one in-repo dependency that will also need to
   # be packed. Managing other in-repo dependencies will be simpler; they install

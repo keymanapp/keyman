@@ -285,20 +285,20 @@ if $CLEAN; then
   clean
 fi
 
-# check dependency for ldml - kmldmlc
+# check dependency for ldml - kmc
 # TODO: in the future this should be part of the meson build, but
 # it's too complicated at present due to old meson versions in
 # debian packaging environments
 if $CONFIGURE; then
   if type node >/dev/null 2>&1; then
-    echo "Note: Found node, checking and building kmldmlc dependency if needed"
-    if [[ ! -f "$KEYMAN_ROOT/developer/src/kmldmlc/build/kmldmlc.js" ]]; then
+    echo "Note: Found node, checking and building kmc dependency if needed"
+    if [[ ! -f "$KEYMAN_ROOT/developer/src/kmc/build/kmc.js" ]]; then
       "$KEYMAN_ROOT/common/web/keyman-version/build.sh" configure build
-      "$KEYMAN_ROOT/developer/src/kmldmlc/build.sh" build
+      "$KEYMAN_ROOT/developer/src/kmc/build.sh" build
       "$KEYMAN_ROOT/common/tools/hextobin/build.sh" build
     fi
   else
-    echo "Note: could not find node, skipping kmldmlc dependency build, ldml tests will not be run"
+    echo "Note: could not find node, skipping kmc dependency build, ldml tests will not be run"
   fi
 fi
 
