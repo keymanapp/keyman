@@ -7,10 +7,10 @@ import { BUILDER_KEYS, build_keys } from './build-keys';
 import { BUILDER_LOCA, build_loca } from './build-loca';
 import { BUILDER_META, build_meta } from './build-meta';
 import { BUILDER_NAME, build_name } from './build-name';
-import { alloc_string, BUILDER_STRS, build_strs, finalize_strs } from './build-strs';
+import { BUILDER_STRS, build_strs } from './build-strs';
 import { BUILDER_VKEY, build_vkey } from './build-vkey';
 import { BUILDER_TRAN, build_tran } from './build-tran';
-import { alloc_element_string, BUILDER_ELEM, build_elem, finalize_elem } from './build-elem';
+import { BUILDER_ELEM, build_elem } from './build-elem';
 import { BUILDER_ORDR, build_ordr } from './build-ordr';
 
 type BUILDER_BKSP = BUILDER_TRAN;
@@ -63,19 +63,10 @@ export default class KMXPlusBuilder {
   private build() {
     // Required sections: sect, strs, loca, meta
 
-    this.sect_sect = build_sect();
-
-    // We must prepare the strs section early so that other sections can
-    // reference it. However, it will be emitted in alpha order.
-    this.sect_strs = build_strs();
-    // per C7043, the first string in sect_strs MUST be the zero-length string.
-    alloc_string(this.sect_strs, '');
-
-    // We must prepare the elem section early so that other sections can
-    // reference it. However, it will be emitted in alpha order.
-    this.sect_elem = build_elem();
-    // per C7043, the first element string in sect_elem MUST be the zero-length string.
-    alloc_element_string(this.sect_strs, this.sect_elem, null);
+    // We must prepare the strs and elem sections early so that other sections can
+    // reference them. However, they will be emitted in alpha order.
+    this.sect_strs = build_strs(this.file.kmxplus.strs);
+    this.sect_elem = build_elem(this.file.kmxplus.elem, this.sect_strs);
 
     const build_bksp = build_tran;
     const build_finl = build_tran;
@@ -90,16 +81,10 @@ export default class KMXPlusBuilder {
     this.sect_tran = build_tran(this.file.kmxplus.tran, this.sect_strs, this.sect_elem);
     this.sect_vkey = build_vkey(this.file.kmxplus);
 
-    // Finalize all sections
+    // Finalize the sect (index) section
 
-    if(!finalize_elem(this.sect_elem)) { // must be done after all element strings allocated
-      this.sect_elem = null;
-    }
-
-    finalize_strs(this.sect_strs); // must be done after all strings allocated
-
+    this.sect_sect = build_sect();
     this.finalize_sect(); // must be done last
-
     return this.sect_sect.total;
   }
 

@@ -15,11 +15,11 @@ describe('tran', function () {
 
     assert.lengthOf(tran.items, 1);
     assert.lengthOf(tran.items[0].from, 2);
-    assert.strictEqual(tran.items[0].from[0].value, "x");
-    assert.strictEqual(tran.items[0].from[1].value, "x");
+    assert.strictEqual(tran.items[0].from[0].value.value, "x");
+    assert.strictEqual(tran.items[0].from[1].value.value, "x");
     assert.strictEqual(tran.items[0].flags, TranItemFlags.error);
     assert.isEmpty(tran.items[0].before);
-    assert.strictEqual(tran.items[0].to, "x");
+    assert.strictEqual(tran.items[0].to.value, "x");
   });
 });
 

@@ -1,7 +1,7 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KeyFlags, KMXPlusData } from "../kmx-plus";
-import { alloc_string, BUILDER_STRS } from "./build-strs";
+import { build_strs_index, BUILDER_STRS } from "./build-strs";
 import { BUILDER_SECTION } from "./builder-section";
 
 /* ------------------------------------------------------------------
@@ -45,7 +45,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
       vkey: item.vkey,
       mod: item.mod,
       // todo: support 'extend'
-      to: alloc_string(sect_strs, item.to),
+      to: build_strs_index(sect_strs, item.to),
       flags: KeyFlags.extend // todo: support non-extended
     });
   }

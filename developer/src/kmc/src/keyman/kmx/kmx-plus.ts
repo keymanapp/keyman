@@ -11,14 +11,36 @@ import KMXFile from './kmx';
 export class Section {
 }
 
+export class GlobalSections {
+  // These sections are used by other sections during compilation
+  strs: Strs;
+  elem: Elem;
+}
+
 // 'sect'
 
 export class Sect extends Section {};
 
 // 'bksp' -- see 'tran'
+
 // 'elem'
 
-export class Elem extends Section {};
+export class Elem extends Section {
+  strings: ElementString[] = [];
+  constructor(strs: Strs) {
+    super();
+    this.strings.push(new ElementString(strs, '')); // C7043: null element string
+  }
+  allocElementString(strs: Strs, source: string, order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
+    let s = new ElementString(strs, source, order, tertiary, tertiary_base, prebase);
+    let result = this.strings.find(item => item.isEqual(s));
+    if(result === undefined) {
+      result = s;
+      this.strings.push(result);
+    }
+    return result;
+  }
+};
 
 // 'finl' -- see 'tran'
 
@@ -33,7 +55,7 @@ export enum KeyFlags {
 export class KeysItem {
   vkey: number;
   mod: number;
-  to: string;
+  to: StrsItem;
   flags: KeyFlags;
 };
 
@@ -44,7 +66,7 @@ export class Keys extends Section {
 // 'loca'
 
 export class Loca extends Section {
-  locales: string[] = [];
+  locales: StrsItem[] = [];
 };
 
 // 'meta'
@@ -59,19 +81,19 @@ export enum KeyboardSettings {
 export enum Meta_NormalizationForm { NFC='NFC', NFD='NFD', other='other' };
 
 export class Meta extends Section {
-  author: string;
-  conform: string;
-  layout: string;
-  normalization: Meta_NormalizationForm;
-  indicator: string;
-  version: string; // semver version string, defaults to "0"
+  author: StrsItem;
+  conform: StrsItem;
+  layout: StrsItem;
+  normalization: StrsItem;
+  indicator: StrsItem;
+  version: StrsItem; // semver version string, defaults to "0"
   settings: KeyboardSettings;
 };
 
 // 'name'
 
 export class Name extends Section {
-  names: string[] = [];
+  names: StrsItem[] = [];
 };
 
 // 'ordr'
@@ -87,7 +109,34 @@ export class Ordr extends Section {
 
 // 'strs'
 
-export type Strs = Section;
+export class StrsItem {
+  readonly value: string;
+  constructor(value: string) {
+    this.value = value;
+  }
+}
+
+export class Strs extends Section {
+  strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
+
+  allocString(s?: string): StrsItem {
+    if(s === undefined || s === null) {
+      // undefined or null are always equivalent to empty string, see C7043
+      s = '';
+    }
+
+    if(typeof s !== 'string') {
+      throw new Error('alloc_string: s must be a string, undefined, or null.');
+    }
+
+    let result = this.strings.find(item => item.value === s);
+    if(result === undefined) {
+      result = new StrsItem(s);
+      this.strings.push(result);
+    }
+    return result;
+  }
+};
 
 // 'tran'
 
@@ -98,7 +147,7 @@ export enum TranItemFlags {
 
 export class TranItem extends Section {
   from: ElementString;
-  to: string;
+  to: StrsItem;
   before: ElementString;
   flags: TranItemFlags;
 };

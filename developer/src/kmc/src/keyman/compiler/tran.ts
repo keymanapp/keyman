@@ -1,6 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Finl, FinlItem, Tran, TranItem, TranItemFlags } from "../kmx/kmx-plus";
-import { ElementString } from "../kmx/element-string";
+import { Finl, FinlItem, GlobalSections, Tran, TranItem, TranItemFlags } from "../kmx/kmx-plus";
 import LDMLKeyboardXMLSourceFile, { LKTransform, LKTransforms } from "../ldml-keyboard/ldml-keyboard-xml";
 import CompilerCallbacks from "./callbacks";
 import { SectionCompiler } from "./section-compiler";
@@ -30,31 +29,31 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran, 
     return null;
   }
 
-  private compileTransform(transform: LKTransform): TranItemBase {
+  private compileTransform(sections: GlobalSections, transform: LKTransform): TranItemBase {
     let result = this.newTranItem();
-    result.from = new ElementString(transform.from);
-    result.to = transform.to;
-    result.before = new ElementString(transform.before);
+    result.from = sections.elem.allocElementString(sections.strs, transform.from);
+    result.to = sections.strs.allocString(transform.to);
+    result.before = sections.elem.allocElementString(sections.strs, transform.before);
     result.flags = transform.error == 'fail' ? TranItemFlags.error : TranItemFlags.none;
     return result;
   }
 
-  private compileTransforms(transforms: LKTransforms): TranBase {
+  private compileTransforms(sections: GlobalSections, transforms: LKTransforms): TranBase {
     let result = this.newTran();
 
     if(transforms?.transform) {
       for(let transform of transforms.transform) {
-        result.items.push(this.compileTransform(transform));
+        result.items.push(this.compileTransform(sections, transform));
       }
     }
 
     return result;
   }
 
-  public compile(): TranBase {
+  public compile(sections: GlobalSections): TranBase {
     for(let t of this.keyboard.transforms) {
       if(t.type == this.type) {
-        return this.compileTransforms(t);
+        return this.compileTransforms(sections, t);
       }
     }
     return this.newTran();

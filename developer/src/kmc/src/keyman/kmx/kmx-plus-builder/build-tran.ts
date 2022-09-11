@@ -1,8 +1,8 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { Bksp, Finl, Tran } from "../kmx-plus";
-import { alloc_element_string, BUILDER_ELEM } from "./build-elem";
-import { alloc_string, BUILDER_STRS } from "./build-strs";
+import { build_elem_index, BUILDER_ELEM } from "./build-elem";
+import { build_strs_index, BUILDER_STRS } from "./build-strs";
 import { BUILDER_SECTION } from "./builder-section";
 
 /* ------------------------------------------------------------------
@@ -41,9 +41,9 @@ export function build_tran(source_tran: Tran|Finl|Bksp, sect_strs: BUILDER_STRS,
 
  for(let item of source_tran.items) {
    tran.items.push({
-    from: alloc_element_string(sect_strs, sect_elem, item.from),
-    to: alloc_string(sect_strs, item.to),
-    before: alloc_element_string(sect_strs, sect_elem, item.before),
+    from: build_elem_index(sect_elem, item.from),
+    to: build_strs_index(sect_strs, item.to),
+    before: build_elem_index(sect_elem, item.before),
     flags: item.flags
    });
  }

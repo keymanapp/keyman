@@ -1,4 +1,4 @@
-import KMXPlusFile from '../kmx/kmx-plus';
+import KMXPlusFile, { Elem, Strs } from '../kmx/kmx-plus';
 import LDMLKeyboardXMLSourceFile from '../ldml-keyboard/ldml-keyboard-xml';
 import LDMLKeyboardXMLSourceFileReader from '../ldml-keyboard/ldml-keyboard-xml-reader';
 import { BkspCompiler } from './bksp';
@@ -65,20 +65,26 @@ export default class Compiler {
   public compile(source: LDMLKeyboardXMLSourceFile): KMXPlusFile {
     const sections = this.buildSections(source);
     let passed = true;
+
     const kmx = new KMXPlusFile();
+
+    // These two sections are required by other sections
+    kmx.kmxplus.strs = new Strs();
+    kmx.kmxplus.elem = new Elem(kmx.kmxplus.strs);
+
     for(let section of sections) {
       if(!section.validate()) {
-        //console.log(`failed to validate ${section.id}`);
         passed = false;
         // We'll keep validating other sections anyway, so we get a full set of
         // errors for the keyboard developer.
         continue;
       }
-      const sect = section.compile();
+      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem});
+
+      /* istanbul ignore if */
       if(!sect) {
         // This should not really happen -- validate() should be telling us
         // if something is going to fail to compiler
-        //console.log(`failed to compile ${section.id}`);
         passed = false;
         continue;
       }

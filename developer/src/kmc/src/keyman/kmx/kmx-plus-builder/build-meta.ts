@@ -5,7 +5,7 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData } from "../kmx-plus";
-import { alloc_string, BUILDER_STRS } from "./build-strs";
+import { build_strs_index, BUILDER_STRS } from "./build-strs";
 import { BUILDER_SECTION } from "./builder-section";
 
 /**
@@ -26,12 +26,12 @@ export function build_meta(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     ident: constants.hex_section_id(constants.section.meta),
     size: constants.length_meta,
     _offset: 0,
-    author: alloc_string(sect_strs, kmxplus.meta.author),
-    conform: alloc_string(sect_strs, kmxplus.meta.conform),
-    layout: alloc_string(sect_strs, kmxplus.meta.layout),
-    normalization: alloc_string(sect_strs, kmxplus.meta.normalization),
-    indicator: alloc_string(sect_strs, kmxplus.meta.indicator),
-    version: alloc_string(sect_strs, kmxplus.meta.version),
+    author: build_strs_index(sect_strs, kmxplus.meta.author),
+    conform: build_strs_index(sect_strs, kmxplus.meta.conform),
+    layout: build_strs_index(sect_strs, kmxplus.meta.layout),
+    normalization: build_strs_index(sect_strs, kmxplus.meta.normalization),
+    indicator: build_strs_index(sect_strs, kmxplus.meta.indicator),
+    version: build_strs_index(sect_strs, kmxplus.meta.version),
     settings: kmxplus.meta.settings ?? 0,
   };
 }

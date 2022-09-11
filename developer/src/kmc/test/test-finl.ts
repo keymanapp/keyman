@@ -15,11 +15,11 @@ describe('finl', function () {
 
     assert.lengthOf(finl.items, 1);
     assert.lengthOf(finl.items[0].from, 2);
-    assert.strictEqual(finl.items[0].from[0].value, "x");
-    assert.strictEqual(finl.items[0].from[1].value, "x");
+    assert.strictEqual(finl.items[0].from[0].value.value, "x");
+    assert.strictEqual(finl.items[0].from[1].value.value, "x");
     assert.strictEqual(finl.items[0].flags, FinlItemFlags.error);
     assert.isEmpty(finl.items[0].before);
-    assert.strictEqual(finl.items[0].to, "x");
+    assert.strictEqual(finl.items[0].to.value, "x");
   });
 });
 

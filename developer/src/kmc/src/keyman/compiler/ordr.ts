@@ -1,6 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Ordr, OrdrItem } from "../kmx/kmx-plus";
-import { ElementString } from "../kmx/element-string";
+import { GlobalSections, Ordr, OrdrItem } from "../kmx/kmx-plus";
 import { LKReorder, LKReorders } from "../ldml-keyboard/ldml-keyboard-xml";
 import { SectionCompiler } from "./section-compiler";
 
@@ -17,26 +16,26 @@ export class OrdrCompiler extends SectionCompiler {
     return valid;
   }
 
-  private compileReorder(reorder: LKReorder): OrdrItem {
+  private compileReorder(sections: GlobalSections, reorder: LKReorder): OrdrItem {
     let result = new OrdrItem();
-    result.elements = new ElementString(reorder.from, reorder.order, reorder.tertiary, reorder.tertiary_base, reorder.prebase);
-    result.before = new ElementString(reorder.before);
+    result.elements = sections.elem.allocElementString(sections.strs, reorder.from, reorder.order, reorder.tertiary, reorder.tertiary_base, reorder.prebase);
+    result.before = sections.elem.allocElementString(sections.strs, reorder.before);
     return result;
   }
 
-  private compileReorders(reorders: LKReorders): Ordr {
+  private compileReorders(sections: GlobalSections, reorders: LKReorders): Ordr {
     let result = new Ordr();
 
     if(reorders?.reorder) {
       for(let reorder of reorders.reorder) {
-        result.items.push(this.compileReorder(reorder));
+        result.items.push(this.compileReorder(sections, reorder));
       }
     }
 
     return result;
   }
 
-  public compile(): Ordr {
-    return this.compileReorders(this.keyboard.reorders);
+  public compile(sections: GlobalSections): Ordr {
+    return this.compileReorders(sections, this.keyboard.reorders);
   }
 }
