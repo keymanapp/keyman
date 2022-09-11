@@ -8,10 +8,6 @@ invalid_tests = [
   'ik_000_null_invalid'
 ]
 
-
-hextobin_root = join_paths(meson.source_root(),'..','common','tools','hextobin')
-hextobin_cmd = [node, hextobin_root]
-
 if build_machine.system() == 'windows'
   copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
 else

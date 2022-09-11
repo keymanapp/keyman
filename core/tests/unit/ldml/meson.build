@@ -27,7 +27,6 @@ else
   copy_cmd = [find_program('cp', required: true)]
 endif
 
-node = find_program('node', required: false)
 if node.found()
   # Note: if node is not available, we cannot build the keyboards; build.sh
   # emits a warning that the ldml keyboard tests will be skipped
