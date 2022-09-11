@@ -27,12 +27,7 @@ if [[ "${CONFIGUREONLY}" != "no" && "${BUILDONLY}" != "no" ]]; then
 fi
 
 if [[ "${BUILDONLY}" == "no" ]]; then
-	../core/build.sh -t keyboardprocessor configure
-
-	cd keyboardprocessor/arch/release
-	echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"
-	meson configure -Dprefix=${INSTALLDIR} && ninja reconfigure
-	cd $BASEDIR
+	../core/build.sh --target-path keyboardprocessor --configure="-Dprefix=${INSTALLDIR}" configure
 fi
 
 if [[ "${CONFIGUREONLY}" == "no" ]]; then
@@ -40,7 +35,7 @@ if [[ "${CONFIGUREONLY}" == "no" ]]; then
 	# May 2021: For now, running tests here as well. We could move this elsewhere
 	# in the future if we want to split out the tests, but they run in a couple of seconds
 	# at present.
-	../core/build.sh -t keyboardprocessor build tests
+	../core/build.sh --target-path keyboardprocessor build test
 fi
 
 function buildproject() {

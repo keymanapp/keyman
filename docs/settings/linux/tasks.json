@@ -53,7 +53,7 @@
       "command": "${workspaceFolder}/core/build.sh",
       "args": [
         "--debug",
-        "tests"
+        "test"
       ],
       "problemMatcher": [
         "$gcc"

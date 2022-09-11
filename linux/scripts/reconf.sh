@@ -76,7 +76,8 @@ for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" -o "${proj}" == "keyman" ]; then
         rm -rf keyboardprocessor
         cp ../VERSION.md ../core/
-        ../core/build.sh -t keyboardprocessor configure
+        ../core/build.sh --target-path keyboardprocessor configure
+        #TODO: is  --configure="-Dprefix=${INSTALLDIR}"  needed also?
     fi
     if [ "${proj}" == "keyman-config"  -o "${proj}" == "keyman" ]; then
         cd keyman-config
