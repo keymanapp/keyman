@@ -5,6 +5,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 SCRIPT_ROOT="$(dirname "$THIS_SCRIPT")"
 
@@ -95,6 +96,24 @@ init_dependencies
 # Run headless (browserless) tests.
 if (( RUN_HEADLESS )); then
   test-headless || fail "DOMless tests failed!"
+fi
+
+if (( RUN_BROWSERS )); then
+  if [[ $VERSION_ENVIRONMENT == test ]]; then
+    # If we are running a TeamCity test build, for now, only run BrowserStack
+    # tests when on a PR branch with a title including "(web)" or with the label
+    # test-browserstack. This is because the BrowserStack tests are currently
+    # unreliable, and the false positive failures are masking actual failures.
+    #
+    # We do not run BrowserStack tests on master, beta, or stable-x.y test
+    # builds.
+    RUN_BROWSERS=0
+    if builder_pull_get_details; then
+      if [[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack; then
+        RUN_BROWSERS=1
+      fi
+    fi
+  fi
 fi
 
 # Run browser-based tests.

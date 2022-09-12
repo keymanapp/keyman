@@ -186,7 +186,6 @@ COMP_KMXPLUS_META::valid(KMX_DWORD _kmn_unused(length)) const {
     debug_println("header.size < expected size");
     return false;
   }
-  KMXPLUS_PRINTF((" name:\t#0x%X\n", this->name));
   KMXPLUS_PRINTF((" author:\t#0x%X\n", this->author));
   KMXPLUS_PRINTF((" conform:\t#0x%X\n", this->conform));
   KMXPLUS_PRINTF((" layout:\t#0x%X\n", this->layout));

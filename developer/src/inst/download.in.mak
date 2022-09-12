@@ -37,7 +37,7 @@ candle: heat-cef heat-xml heat-templates heat-model-compiler heat-server heat-ld
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
-    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dLDMLKeyboardCompilerSourceDir=$(KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER) kmldmlc.wxs
+    $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dLDMLKeyboardCompilerSourceDir=$(KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER) kmc.wxs
     $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dServerSourceDir=$(KEYMAN_WIX_KMDEV_SERVER) server.wxs
 
 clean-heat: clean-heat-model-compiler clean-heat-ldml-keyboard-compiler
@@ -88,7 +88,7 @@ heat-ldml-keyboard-compiler:
 
 # Build the .wxs file
     cd $(DEVELOPER_ROOT)\src\inst
-    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER) -o kmldmlc.wxs -ag -cg LDMLKeyboardCompiler -dr INSTALLDIR -var var.LDMLKeyboardCompilerSourceDir -wx -nologo
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_LDMLKEYBOARDCOMPILER) -o kmc.wxs -ag -cg LDMLKeyboardCompiler -dr INSTALLDIR -var var.LDMLKeyboardCompilerSourceDir -wx -nologo
 
 clean-heat-ldml-keyboard-compiler:
 # the production build generates files that are not in source, e.g. .ps1 scripts

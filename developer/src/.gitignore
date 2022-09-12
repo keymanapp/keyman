@@ -32,7 +32,7 @@ inst/setup.zip
 inst/templates.wxs
 inst/xml.wxs
 inst/kmlmc.wxs
-inst/kmldmlc.wxs
+inst/kmc.wxs
 
 # /developer/TIKE/
 tike/stock.kct

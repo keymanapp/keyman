@@ -278,7 +278,7 @@
       </Component>
 
       <Component Directory="INSTALLDIR">
-        <File Name='kmldmlc.cmd' KeyPath="yes" Source="node\kmldmlc.cmd" />
+        <File Name='kmc.cmd' KeyPath="yes" Source="node\kmc.cmd" />
       </Component>
     </ComponentGroup>
 

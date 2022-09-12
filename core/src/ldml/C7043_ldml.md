@@ -172,13 +172,12 @@ locale IDs (starting at offset 16) are in sorted binary order.
 |---|------|---------------|-------------------------------------|
 | 0 |  32  | ident         | `meta`                              |
 | 4 |  32  | size          | int: Length of section              |
-| 8 |  32  | name          | str: Keyboard name                  |
-|12 |  32  | author        | str: Keyboard author                |
-|16 |  32  | conform       | str: CLDR 'conformsTo' version      |
-|20 |  32  | layout        | str: layout type                    |
-|24 |  32  | normalization | str: normalization mode             |
-|28 |  32  | indicator     | str: indicator                      |
-|32 |  32  | settings      | int: keyboard settings              |
+| 8 |  32  | author        | str: Keyboard author                |
+|12 |  32  | conform       | str: CLDR 'conformsTo' version      |
+|16 |  32  | layout        | str: layout type                    |
+|20 |  32  | normalization | str: normalization mode             |
+|24 |  32  | indicator     | str: indicator                      |
+|28 |  32  | settings      | int: keyboard settings              |
 
 The `settings` is a 32-bit bitfield as below:
 
@@ -209,9 +208,8 @@ For each name in `count`:
 |---|------|---------|------------------------------------------|
 |16+|  32  | name    | str: A name for the keyboard             |
 
-Note that the first name is repeated in the `meta` section. The remaining names
-are stored in source file order, and the semantic meaning of each name is not
-defined here.
+Names are stored in source file order, and the semantic meaning of each name is
+not defined here.
 
 ### C7043.2.9 `ordr`—Reorders
 

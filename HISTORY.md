@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 16.0.60 alpha 2022-09-10
+
+* fix(web): enhanced timer for prediction algorithm (#7037)
+* chore(core): fixup km_kbp_event docs (#7253)
+* fix(windows) Update unit tests for tsf bkspace (#7254)
+* fix(android): Standardize language ID in language picker menu (#7239)
+
+## 16.0.59 alpha 2022-09-09
+
+* chore: use keyman.com instead of keyman-staging.com (#7233)
+* feat(core): add `km_kbp_event` API endpoint (#7223)
+* fix(windows): Delete both code units when deleting surrogate pairs in TSF-aware apps (#7243)
+
 ## 16.0.58 alpha 2022-09-08
 
 * fix(common/models): reconnects unit tests for worker-internal submodules (#7215)

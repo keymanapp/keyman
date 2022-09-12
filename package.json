@@ -14,7 +14,7 @@
     "resources/build/version",
     "core/include/ldml",
     "developer/src/kmlmc",
-    "developer/src/kmldmlc",
+    "developer/src/kmc",
     "developer/src/server",
     "common/models/*",
     "common/web/*",

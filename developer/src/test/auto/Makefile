@@ -27,7 +27,7 @@ developer-tests: \
   model-ts-parser \
   package-info \
   kmlmc \
-  kmldmlc
+  kmc
 
 # ----------------------------------------------------------------------
 
@@ -86,8 +86,8 @@ package-info: .virtual
 # Tests outside the test/auto folder
 # ----------------------------------------------------------------------
 
-kmldmlc: .virtual
-  cd $(DEVELOPER_ROOT)\src\kmldmlc
+kmc: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc
   $(MAKE) $(TARGET)
 
 kmlmc: .virtual
