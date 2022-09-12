@@ -14,7 +14,7 @@
   ],
   "homepage": "https://github.com/keymanapp/keyman",
   "license": "MIT",
-  "main": "index.js",
+  "main": "build/index.js",
   "directories": {
     "lib": "lib",
     "test": "test"

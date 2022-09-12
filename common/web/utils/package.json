@@ -1,8 +1,8 @@
 {
   "name": "@keymanapp/web-utils",
   "description": "Common utility functions used throughout other Keyman packages",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
   "scripts": {
     "build": "gosh ./build.sh",
     "tsc": "tsc"

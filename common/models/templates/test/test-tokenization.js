@@ -3,7 +3,7 @@
  */
 
 var assert = require('chai').assert;
-var models = require('../').models;
+var models = require('../build/index.bundled.js').models;
 var wordBreakers = require('@keymanapp/models-wordbreakers').wordBreakers;
 
 describe('Tokenization functions', function() {
@@ -132,7 +132,7 @@ describe('Tokenization functions', function() {
         left: '', startOfBuffer: true,
         right: '', endOfBuffer: true
       };
-  
+
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
@@ -140,7 +140,7 @@ describe('Tokenization functions', function() {
         right: [],
         caretSplitsToken: false
       };
-  
+
       assert.deepEqual(tokenization, expectedResult);
     });
 
@@ -153,7 +153,7 @@ describe('Tokenization functions', function() {
         right: [],
         caretSplitsToken: false
       };
-  
+
       assert.deepEqual(tokenization, expectedResult);
     });
 
@@ -163,7 +163,7 @@ describe('Tokenization functions', function() {
         left: ' ', startOfBuffer: true,
         right: '', endOfBuffer: true
       };
-  
+
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
@@ -171,7 +171,7 @@ describe('Tokenization functions', function() {
         right: [],
         caretSplitsToken: false
       };
-  
+
       assert.deepEqual(tokenization, expectedResult);
     });
 
@@ -233,7 +233,7 @@ describe('Tokenization functions', function() {
         case 'ស្រុកខ្មែរ':
           return [srok, shiftSpan(khmer, srok.length)]; // array of the two.
         case 'កខ្មែរ':
-          // I'd admittedly be at least somewhat surprised if a real wordbreaker got this 
+          // I'd admittedly be at least somewhat surprised if a real wordbreaker got this
           // and similar situations perfectly right... but at least it gives us what
           // we need for a test.
           return [k, shiftSpan(khmer, k.length)];

@@ -9,8 +9,10 @@ WORKING_DIRECTORY=`pwd`
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # A simple utility script to facilitate our different modes for unit-testing KMW.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
@@ -134,10 +136,36 @@ pushd "$KEYMAN_ROOT/common/web/input-processor"
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd
 
-echo_heading "Running KeymanWeb integration test suite"
-npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
-npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
+# Browserstack or CI-based tests
 
-CODE=$?
+DO_BROWSER_TEST_SUITE=true
+
+if [[ $VERSION_ENVIRONMENT == test ]]; then
+  # Implied: CONFIG=CI.conf.js because `-CI` parameter is passed.
+  #
+  # If we are running a TeamCity test build, for now, only run BrowserStack
+  # tests when on a PR branch with a title including "(web)" or with the label
+  # test-browserstack. This is because the BrowserStack tests are currently
+  # unreliable, and the false positive failures are masking actual failures.
+  #
+  # We do not run BrowserStack tests on master, beta, or stable-x.y test
+  # builds.
+  DO_BROWSER_TEST_SUITE=false
+  if builder_pull_get_details; then
+    if [[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack; then
+      DO_BROWSER_TEST_SUITE=true
+    fi
+  fi
+fi
+
+CODE=0
+
+if $DO_BROWSER_TEST_SUITE; then
+  echo_heading "Running KeymanWeb integration test suite"
+  npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
+  npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
+
+  CODE=$?
+fi
 
 exit $CODE

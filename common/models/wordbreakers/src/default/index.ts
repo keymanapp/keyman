@@ -3,8 +3,8 @@
 namespace wordBreakers {
   /**
    * Word breaker based on Unicode Standard Annex #29, Section 4.1:
-   * Default Word Boundary Specification.   
-   * 
+   * Default Word Boundary Specification.
+   *
    * @see http://unicode.org/reports/tr29/#Word_Boundaries
    * @see https://github.com/eddieantonio/unicode-default-word-boundary/tree/v12.0.0
    */
@@ -14,7 +14,7 @@ namespace wordBreakers {
       return [];
     }
 
-    // All non-empty strings have at least TWO boundaries at the start and end of
+    // All non-empty strings have at least TWO boundaries: at the start and at the end of
     // the string.
     let spans = [];
     for (let i = 0; i < boundaries.length - 1; i++) {
@@ -349,6 +349,12 @@ namespace wordBreakers {
 
   /**
    * Binary search for the word break property of a given CODE POINT.
+   *
+   * The auto-generated data.ts master array defines a **character range**
+   * lookup table.  If a character's codepoint is equal to or greater than
+   * the I.Start value for an entry and exclusively less than the next entry,
+   * it falls in the first entry's range bucket and is classified accordingly
+   * by this method.
    */
   function searchForProperty(codePoint: number, left: number, right: number): WordBreakProperty {
     // All items that are not found in the array are assigned the 'Other' property.
