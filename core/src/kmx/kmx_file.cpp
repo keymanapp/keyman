@@ -394,5 +394,18 @@ KMX_BOOL KMX_ProcessEvent::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
 
   if(!VerifyChecksum(filebase, sz)) { DebugLog("errBadChecksum"); return FALSE; }
 
+  // Verify file structure
+
+  if(ckbp->StartGroup[0] != 0xFFFFFFFF && ckbp->StartGroup[0] >= ckbp->cxGroupArray) {
+    DebugLog("Invalid ANSI start group index");
+    return FALSE;
+  }
+  if(ckbp->StartGroup[1] != 0xFFFFFFFF && ckbp->StartGroup[1] >= ckbp->cxGroupArray) {
+    DebugLog("Invalid Unicode start group index");
+    return FALSE;
+  }
+
+  // TODO: verify many other offsets such as stores, groups, keys, strings!
+
   return TRUE;
 }
