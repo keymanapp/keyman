@@ -37,6 +37,7 @@ namespace com.keyman.keyboards {
     layer: string;
     displayLayer: string;
     nextlayer: string;
+    sp?: ButtonClass;
 
     private baseKeyEvent: text.KeyEvent;
     isMnemonic: boolean = false;
@@ -71,6 +72,12 @@ namespace com.keyman.keyboards {
       }
 
       return this.id;
+    }
+
+    public get isPadding(): boolean {
+      // Does not include 9 (class:  blank) as that may be an intentional 'catch' for misplaced
+      // keystrokes.
+      return this['sp'] == 10; // Button class: hidden.
     }
 
     /**
@@ -546,6 +553,8 @@ namespace com.keyman.keyboards {
             // Attempt to filter out known non-output keys.
             // Results in a more optimized distribution.
             if(text.Codes.isKnownOSKModifierKey(key.baseKeyID)) {
+              return;
+            } else if(key.isPadding) { // to the user, blank / padding keys do not exist.
               return;
             }
           }
