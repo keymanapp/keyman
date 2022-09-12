@@ -64,7 +64,10 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
   KMXPLUS_ASSERT(true, data.size() > sizeof(kmx::COMP_KEYBOARD_EX));
 
 //   // Locate the structs here, but still retain ptrs to the raw structs.
-  const kmx::COMP_KEYBOARD* comp_keyboard = (kmx::COMP_KEYBOARD*)data.data();
+  kmx::COMP_KEYBOARD* comp_keyboard = (kmx::COMP_KEYBOARD*)data.data();
+
+  // Perform the standard validation
+  KMXPLUS_ASSERT(TRUE, comp_keyboard->VerifyKeyboard(data.size()));
 
   kmx::kmx_plus kplus(comp_keyboard, data.size());
 
