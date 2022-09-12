@@ -1,0 +1,27 @@
+{
+  "extends": "../../../tsconfig-base.json",
+
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2020",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "declaration": true,
+    "alwaysStrict": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../../common/web/keyman-version" },
+    { "path": "../../../core/include/ldml/"}
+  ]
+}

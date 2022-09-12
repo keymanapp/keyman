@@ -41,7 +41,8 @@ namespace kbp
       km_kbp_state *,
       km_kbp_virtual_key,
       uint16_t modifier_state,
-      uint8_t is_key_down
+      uint8_t is_key_down,
+      uint16_t event_flags
     ) = 0;
 
     virtual km_kbp_status

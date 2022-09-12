@@ -1041,6 +1041,13 @@ enum km_kbp_tech_value {
   KM_KBP_TECH_LDML        = 1 << 2
 };
 
+/**
+ * Bit flags to be used with the event_flags parameter of km_kbp_process_event
+ */
+enum km_kbp_event_flags {
+  KM_KBP_EVENT_FLAG_DEFAULT = 0, // default value: hardware
+  KM_KBP_EVENT_FLAG_TOUCH = 1, // set if the event is touch, otherwise hardware
+};
 
 /*
 ```
@@ -1081,6 +1088,7 @@ state is passed.
 - __modifier_state__:
 The combinations of modifier keys set at the time key `vk` was pressed, bitmask
 from the `km_kbp_modifier_state` enum.
+- __event_flags__: Event level flags, see km_kbp_event_flags
 
 ```c
 */
@@ -1089,7 +1097,8 @@ km_kbp_status
 km_kbp_process_event(km_kbp_state *state,
                      km_kbp_virtual_key vk,
                      uint16_t modifier_state,
-                     uint8_t is_key_down);
+                     uint8_t is_key_down,
+                     uint16_t event_flags);
 
 /*
 ```

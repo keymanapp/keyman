@@ -9,21 +9,28 @@
                                     into keyboard.hpp
 */
 #include <cassert>
+#include <vector>
 
 #include <keyman/keyboardprocessor.h>
 #include "keyboard.hpp"
 #include "processor.hpp"
 #include "kmx/kmx_processor.hpp"
+#include "ldml/ldml_processor.hpp"
 #include "mock/mock_processor.hpp"
 
 using namespace km::kbp;
 
 namespace
 {
-  abstract_processor * processor_factory(path const & kb_path)
-  {
+  abstract_processor * processor_factory(path const & kb_path) {
     // Some legacy packages may include upper-case file extensions
+    // TODO-LDML: move file io out of core and into engine
     if (kb_path.suffix() == ".kmx" || kb_path.suffix() == ".KMX") {
+      std::vector<uint8_t> buf;
+      if(ldml_processor::is_kmxplus_file(kb_path, buf)) {
+        abstract_processor * result = new ldml_processor(kb_path, buf);
+        return result;
+      }
       return new kmx_processor(kb_path);
     }
     else if (kb_path.suffix() == ".mock") {

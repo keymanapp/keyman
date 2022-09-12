@@ -287,16 +287,24 @@ builder_use_color() {
   if $1; then
     COLOR_RED=$(tput setaf 1)
     COLOR_GREEN=$(tput setaf 2)
-    COLOR_BLUE=$(tput setaf 4)
     COLOR_YELLOW=$(tput setaf 3)
+    COLOR_BLUE=$(tput setaf 4)
+    COLOR_PURPLE=$(tput setaf 5)
+    COLOR_TEAL=$(tput setaf 6)
+    COLOR_WHITE=$(tput setaf 7)
+    COLOR_GREY=$(tput setaf 8)
     COLOR_RESET=$(tput sgr0)
     # e.g. VSCode https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support
     HEADING_SETMARK='\x1b]1337;SetMark\x07'
   else
     COLOR_RED=
     COLOR_GREEN=
-    COLOR_BLUE=
     COLOR_YELLOW=
+    COLOR_BLUE=
+    COLOR_PURPLE=
+    COLOR_TEAL=
+    COLOR_WHITE=
+    COLOR_GREY=
     COLOR_RESET=
     HEADING_SETMARK=
   fi

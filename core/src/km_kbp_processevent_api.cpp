@@ -43,12 +43,13 @@ km_kbp_status
 km_kbp_process_event(km_kbp_state *state,
                      km_kbp_virtual_key vk,
                      uint16_t modifier_state,
-                     uint8_t is_key_down) {
+                     uint8_t is_key_down,
+                     uint16_t event_flags) {
   assert(state != nullptr);
   if(state == nullptr) {
     return KM_KBP_STATUS_INVALID_ARGUMENT;
   }
-  return state->processor().process_event(state, vk, modifier_state, is_key_down);
+  return state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
 }
 
 km_kbp_status

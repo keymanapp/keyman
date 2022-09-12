@@ -1,0 +1,674 @@
+{
+  "title": "techpreview/ldmlKeyboard.xsd",
+  "$schema": "http://json-schema.org/schema#",
+  "$id": "http://tempuri.org/ldmlKeyboard",
+  "type": "object",
+  "properties": {
+    "keyboard": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "locales": {
+          "$ref": "#/definitions/locales"
+        },
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "info": {
+          "$ref": "#/definitions/info"
+        },
+        "names": {
+          "$ref": "#/definitions/names"
+        },
+        "settings": {
+          "$ref": "#/definitions/settings"
+        },
+        "vkeyMaps": {
+         "$ref": "#/definitions/vkeyMaps"
+        },
+        "displayMap": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/displayMap"
+          }
+        },
+        "keys": {
+          "$ref": "#/definitions/keys"
+        },
+        "layerMaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/layerMaps"
+          }
+        },
+        "transforms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/transforms"
+          }
+        },
+        "reorders": {
+          "$ref": "#/definitions/reorders"
+        },
+        "backspaces": {
+          "$ref": "#/definitions/backspaces"
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        },
+        "locale": {
+          "type": "string"
+        },
+        "conformsTo": {
+          "type": "string",
+          "enum": [
+            "techpreview"
+          ]
+        }
+      },
+      "required": [
+        "names",
+        "keys",
+        "locale",
+        "conformsTo"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "keyboard"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "import": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "base": {
+          "type": "string",
+          "enum": [
+            "cldr"
+          ]
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "locales": {
+      "type": "object",
+      "properties": {
+        "locale": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/locale"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "locale": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "version": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "cldrVersion": {
+          "type": "string",
+          "enum": [
+            "techpreview"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "normalization": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "string"
+        },
+        "indicator": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "names": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "name": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/name"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "name": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "special": {
+      "type": "string"
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "fallback": {
+          "type": "string",
+          "enum": [
+            "omit"
+          ]
+        },
+        "transformFailure": {
+          "type": "string",
+          "enum": [
+            "omit"
+          ]
+        },
+        "transformPartial": {
+          "type": "string",
+          "enum": [
+            "hide"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "vkeyMaps": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "vkeyMap": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/vkeyMap"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "vkeyMap": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "additionalProperties": false
+    },
+    "displayMap": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "display": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/display"
+          }
+        },
+        "displayOptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/displayOptions"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "display": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "type": "string"
+        },
+        "display": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "to",
+        "display"
+      ],
+      "additionalProperties": false
+    },
+    "displayOptions": {
+      "type": "object",
+      "properties": {
+        "baseCharacter": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "keys": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        },
+        "key": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/key"
+          }
+        },
+        "flicks": {
+          "$ref": "#/definitions/flicks"
+        }
+      },
+      "additionalProperties": false
+    },
+    "key": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "flicks": {
+          "type": "string"
+        },
+        "gap": {
+          "type": "string",
+          "enum": [
+            "true"
+          ]
+        },
+        "to": {
+          "type": "string"
+        },
+        "longPress": {
+          "type": "string"
+        },
+        "longPressDefault": {
+          "type": "string"
+        },
+        "multitap": {
+          "type": "string"
+        },
+        "switch": {
+          "type": "string"
+        },
+        "transform": {
+          "type": "string",
+          "enum": [
+            "no"
+          ]
+        },
+        "width": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "flicks": {
+      "type": "object",
+      "properties": {
+        "flick": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/flick"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "flick",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "flick": {
+      "type": "object",
+      "properties": {
+        "directions": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "directions",
+        "to"
+      ],
+      "additionalProperties": false
+    },
+    "layerMaps": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "layerMap": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/layerMap"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        },
+        "form": {
+          "type": "string",
+          "enum": [
+            "hardware",
+            "touch"
+          ]
+        },
+        "minDeviceWidthMM": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "form"
+      ],
+      "additionalProperties": false
+    },
+    "layerMap": {
+      "type": "object",
+      "properties": {
+        "row": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/row"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "modifier": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "row"
+      ],
+      "additionalProperties": false
+    },
+    "row": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "keys"
+      ],
+      "additionalProperties": false
+    },
+    "transforms": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "transform": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/transform"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "transform": {
+      "type": "object",
+      "properties": {
+        "before": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string",
+          "enum": [
+            "fail"
+          ]
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "additionalProperties": false
+    },
+    "reorders": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "reorder": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/reorder"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "reorder": {
+      "type": "object",
+      "properties": {
+        "before": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "order": {
+          "type": "string"
+        },
+        "tertiary": {
+          "type": "string"
+        },
+        "tertiary_base": {
+          "type": "string"
+        },
+        "prebase": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from"
+      ],
+      "additionalProperties": false
+    },
+    "backspaces": {
+      "type": "object",
+      "properties": {
+        "import": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/import"
+          }
+        },
+        "backspace": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/backspace"
+          }
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/special"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "backspace": {
+      "type": "object",
+      "properties": {
+        "before": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string",
+          "enum": [
+            "fail"
+          ]
+        }
+      },
+      "required": [
+        "from"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

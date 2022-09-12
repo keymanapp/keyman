@@ -1,0 +1,3 @@
+tsconfig.tsbuildinfo
+build/
+.nyc_output/

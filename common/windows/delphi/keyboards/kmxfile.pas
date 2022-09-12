@@ -195,8 +195,10 @@ const
     KF_CAPSONONLY =     $0002;
     KF_CAPSALWAYSOFF =  $0004;
     KF_LOGICALLAYOUT =  $0008;
+    KF_AUTOMATICVERSION = $0010;
 
-
+    // 16.0: Support for LDML Keyboards in KMXPlus file format
+    KF_KMXPLUS =        $0020;
 
 function GetSystemStore(Memory: PByte; SystemID: DWord; var Buffer: WideString): Boolean;  // I3310
 var

@@ -36,7 +36,8 @@ namespace kbp
       km_kbp_state *state,
       km_kbp_virtual_key vk,
       uint16_t modifier_state,
-      uint8_t is_key_down
+      uint8_t is_key_down,
+      uint16_t event_flags
     ) override;
 
     km_kbp_attr const & attributes() const override;
