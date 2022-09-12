@@ -32,6 +32,7 @@ if [[ "${BUILDONLY}" == "no" ]]; then
 	cd keyboardprocessor/arch/release
 	echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"
 	meson configure -Dprefix=${INSTALLDIR} && ninja reconfigure
+	cd $BASEDIR
 fi
 
 if [[ "${CONFIGUREONLY}" == "no" ]]; then
