@@ -138,7 +138,7 @@ module.exports = function(baseConfigParams  /* the project's base configuration 
     // Concurrency level
     // We are alloted 5 total at once from BrowserStack.  That said, note that we have multiple build configs that may
     // need BrowserStack-based testing simultaneously.  It may be best to avoid bottlenecking on that limitation.
-    concurrency: 2,
+    concurrency: 1,
 
     customLaunchers: FINAL_LAUNCHER_DEFS,
 
