@@ -59,17 +59,17 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "--test=opt_tests,-t             Test[s] to run (space separated)"
 builder_parse "$@"
 
-if builder_has_option debug; then
+if builder_has_option --debug; then
   CONFIGURATION=debug
 else
   CONFIGURATION=release
 fi
 
 # Target path is used by Linux build, e.g. --target-path keyboardprocessor
-if builder_has_option target-path; then
-  TARGET_PATH=$opt_target_path
+if builder_has_option --target-path; then
+  TARGET_PATH="$opt_target_path"
 else
-  TARGET_PATH=build
+  TARGET_PATH="$KEYMAN_ROOT/core/build"
 fi
 
 # Iterate through all possible targets; note that targets that cannot be built
