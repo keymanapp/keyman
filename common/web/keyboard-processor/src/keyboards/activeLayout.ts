@@ -74,6 +74,7 @@ namespace com.keyman.keyboards {
       return this.id;
     }
 
+    @Enumerable
     public get isPadding(): boolean {
       // Does not include 9 (class:  blank) as that may be an intentional 'catch' for misplaced
       // keystrokes.
