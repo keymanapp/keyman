@@ -27,7 +27,11 @@ if [[ "${CONFIGUREONLY}" != "no" && "${BUILDONLY}" != "no" ]]; then
 fi
 
 if [[ "${BUILDONLY}" == "no" ]]; then
-	../core/build.sh --target-path "$BASEDIR/keyboardprocessor" --configure "-Dprefix=${INSTALLDIR}" clean:arch configure:arch
+	../core/build.sh --target-path "$BASEDIR/keyboardprocessor" configure:arch
+
+	cd keyboardprocessor/arch/release
+	echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"
+	meson configure -Dprefix=${INSTALLDIR} && ninja reconfigure
 fi
 
 if [[ "${CONFIGUREONLY}" == "no" ]]; then
