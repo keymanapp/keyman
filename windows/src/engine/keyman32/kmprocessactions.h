@@ -6,7 +6,7 @@
  *              Keyman for Windows engine.
  */
 #ifndef _KMPROCESSACTIONS_H
-#define _KMPROCESSACTIONS_h
+#define _KMPROCESSACTIONS_H
 
 /**
  * Process the actions queued in the core processor
