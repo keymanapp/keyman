@@ -10,8 +10,8 @@ The work flow that works well using testhost.
 With Visual Studio(VS)
 1. Build Keyman32 with Debug Configuration.
 2. Build testhost with Debug Configuration.
-3. Insure Keyman is not running and that language associated with keyboard you want to test is not selected in the language bar.
+3. Ensure Keyman is not running and that language associated with keyboard you want to test is not selected in the language bar.
 4. Press F5 to start debugging.
 5. Now use the language bar to select the language associated with a keyman keyboard.
 6. You should now be able to debug both the platform and keyman core code.
-7. Once you stop the debug session you will need to got back to step 3 start a new session. [ or step 1 if you are making code changes you should not need to reboot windows]
+7. Once you stop the debug session you will need to go back to step 3 to start a new session. (or step 1 if you are making code changes; you should not need to reboot windows.)
