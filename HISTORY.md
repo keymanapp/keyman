@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.61 alpha 2022-09-12
+
+* docs(windows): add steps for using testhost debugging (#7263)
+* fix(developer): compiler mismatch on currentLine (#7190)
+* fix(developer): suppress repeated warnings about unreachable code (#7219)
+* chore:  try disabling concurrency for browserstack tests (#7258)
+* chore(web): disable browserstack on non-web-specific builds (#7260)
+
 ## 16.0.60 alpha 2022-09-10
 
 * fix(web): enhanced timer for prediction algorithm (#7037)
