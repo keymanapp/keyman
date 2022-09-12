@@ -15,14 +15,13 @@ goto help
 rem ----------------------------------
 
 :help
-echo Usage: %0 x86^|x64^|all debug^|release [build] [tests]
+echo Usage: %0 x86^|x64^|all debug^|release [configure] [build] [test]
 echo   or
-echo Usage: %0 x86^|x64^|all -c
+echo Usage: %0 x86^|x64 -c
 echo -c will leave your environment configured for Visual Studio for selected platform.
-echo -c can be used only with x86 and x64 options
 echo.
 echo Otherwise, %0 is intended to be used by build.sh, not directly.
-echo At least one of 'build' or 'tests' is required.
+echo At least one of 'configure', 'build', or 'test' is required.
 goto :eof
 
 rem ----------------------------------
@@ -72,27 +71,27 @@ set BUILDTYPE=%2
 
 set STATIC_LIBRARY=--default-library both
 
-if "%3" == "build" (
-  echo === Calling meson build for Windows !ARCH! !BUILDTYPE! ===
+if "%3" == "configure" (
+  echo === Configuring Keyman Core for Windows !ARCH! !BUILDTYPE! ===
   if exist build\!ARCH!\!BUILDTYPE! rd /s/q build\!ARCH!\!BUILDTYPE!
-  meson build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror || exit !errorlevel!
-
-  echo === Building Keyman Core for Windows !ARCH! !BUILDTYPE! ===
-  cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
-
-  ninja || exit !errorlevel!
-  cd ..\..\..
-
+  meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror || exit !errorlevel!
   shift
 )
 
-if "%3" == "tests" (
-  cd build\!ARCH!/!BUILDTYPE! || exit !errorlevel!
-
-  echo === Running tests for Windows !ARCH! !BUILDTYPE! ===
-  meson test --print-errorlogs || exit !errorlevel!
-
+if "%3" == "build" (
+  echo === Building Keyman Core for Windows !ARCH! !BUILDTYPE! ===
+  cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
+  ninja || exit !errorlevel!
   cd ..\..\..
+  shift
+)
+
+if "%3" == "test" (
+  echo === Testing Keyman Core for Windows !ARCH! !BUILDTYPE! ===
+  cd build\!ARCH!/!BUILDTYPE! || exit !errorlevel!
+  meson test --print-errorlogs || exit !errorlevel!
+  cd ..\..\..
+  shift
 )
 
 goto :eof
