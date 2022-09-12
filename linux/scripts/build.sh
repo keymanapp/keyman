@@ -27,7 +27,7 @@ if [[ "${CONFIGUREONLY}" != "no" && "${BUILDONLY}" != "no" ]]; then
 fi
 
 if [[ "${BUILDONLY}" == "no" ]]; then
-	../core/build.sh --target-path "$BASEDIR/keyboardprocessor" --configure "-Dprefix=${INSTALLDIR}" configure:arch
+	../core/build.sh --target-path "$BASEDIR/keyboardprocessor" --configure "-Dprefix=${INSTALLDIR}" clean:arch configure:arch
 fi
 
 if [[ "${CONFIGUREONLY}" == "no" ]]; then
