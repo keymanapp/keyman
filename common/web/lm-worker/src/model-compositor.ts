@@ -6,6 +6,23 @@ class ModelCompositor {
   private static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
 
+  /**
+   * Controls the strength of anti-corrective measures for single-character scenarios.
+   * The base key probability will be raised to this power for this specific case.
+   *
+   * Current selection's motivation:  (0.5 / 0.4) ^ 16 ~= 35.5.
+   * - if the most likely has p=0.5 and second-most has p=0.4 - a highly-inaccurate key
+   *   stroke - the net effect will apply a factor of 35.5 to the lexical probability of
+   *   the best key's prediction roots, favoring it in this manner.
+   * - less extreme edge cases will have a significantly stronger factor, acting as a
+   *   "soft threshold".
+   * - truly ambiguous, "coin flip" cases will have a lower factor and thus favor the
+   *   more likely words from the pair.
+   *   - Our OSK key-element borders aren't visible to the user, so the 'spot' where
+   *     behavior changes might feel arbitrary to users if we used a hard threshold instead.
+   */
+  private static readonly SINGLE_CHAR_KEY_PROB_EXPONENT = 16;
+
   private SUGGESTION_ID_SEED = 0;
 
   constructor(lexicalModel: LexicalModel) {
@@ -238,9 +255,9 @@ class ModelCompositor {
            * is needed in the future.
            */
           if(isTokenStart) {
-            /* Suppose a key distribution:  most likely with p=0.5,, second-most with 0.4 - a pretty
+            /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
              * ambiguous case that would only arise very near the center of the boundary between two keys.
-             * Raising (0.5/0.4)^16 ~= 35.53.
+             * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
              * That seems 'within reason' for correction very near boundaries.
              *
              * So, with the second-most-likely key being that close in probability, its best suggestion
@@ -249,7 +266,7 @@ class ModelCompositor {
              * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
              * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
              */
-            rootCost *= 16;
+            rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
           }
 
           return {
