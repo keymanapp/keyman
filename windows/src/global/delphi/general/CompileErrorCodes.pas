@@ -194,7 +194,7 @@ const
   CWARN_VisualKeyboardFileMissing                   = $2097;
   CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb   = $2098;   // I4118
   CWARN_TouchLayoutUnidentifiedKey                  = $2099;   // I4142
-  CWARN_UnreachableKeyCode                          = $209A;   // I4141
+  CHINT_UnreachableKeyCode                          = $109A;   // I4141
 
   CWARN_CouldNotCopyJsonFile                        = $209B;   // I4688
   CWARN_PlatformNotInTargets                        = $209C;
