@@ -5,13 +5,12 @@
 # ----------------------------------------------------------------------------
 
 do_clean() {
-  # clean: note build/<arch> will be left, but build/<arch>/<CONFIGURATION> should be gone
+  # clean: note build/<target> will be left, but build/<target>/<configuration> should be gone
   local target=$1
+  builder_has_action clean:$target || return 0
 
-  if builder_has_action clean:$target; then
-    rm -rf "$MESON_PATH"
-    builder_report success clean:$target
-  fi
+  rm -rf "$MESON_PATH"
+  builder_report success clean:$target
 }
 
 # ----------------------------------------------------------------------------
@@ -19,12 +18,10 @@ do_clean() {
 # ----------------------------------------------------------------------------
 
 do_configure() {
-  if ! builder_has_action configure:$1; then return; fi
-
   local target=$1
+  builder_has_action configure:$target || return 0
 
   local STANDARD_MESON_ARGS=
-
   # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
   local ADDITIONAL_ARGS=${opt_configure-}
 
@@ -77,8 +74,8 @@ do_configure_dependencies() {
 # ----------------------------------------------------------------------------
 
 do_build() {
-  if ! builder_has_action build:$1; then return; fi
   local target=$1
+  builder_has_action build:$target || return 0
 
   echo_heading "======= Building $target ======="
 
@@ -101,9 +98,9 @@ do_build() {
 # ----------------------------------------------------------------------------
 
 do_test() {
-  if ! builder_has_action test:$1; then return; fi
-
   local target=$1
+  builder_has_action test:$target || return 0
+
   echo_heading "======= Testing $target ======="
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
@@ -128,10 +125,9 @@ do_uninstall() {
 }
 
 do_command() {
-  if ! builder_has_action $1:$2; then return; fi
-
   local command=$1
   local target=$2
+  builder_has_action $command:$target || return 0
 
   echo_heading "======= Installing $target ======="
 
