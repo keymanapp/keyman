@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.270 stable 2022-09-12
+
+* chore(linux): Add support for Ubuntu 22.10 "Kinetic Kudu" (#7143)
+* chore(linux): Update debian changelog (#7144)
+* fix(android/engine): Cleanup list of subkeys when dismissing window (#7176)
+* chore(linux): Fix ibus-keyman.postinst script (#7208)
+* fix(windows): Delete both code units when deleting surrogate pairs in TSF-aware apps (#7256)
+* fix(developer): compiler mismatch on currentLine (#7191)
+* fix(developer): suppress repeated warnings about unreachable code (#7265)
+
 ## 15.0.269 stable 2022-08-29
 
 * chore(linux): Update debian changelog (#7040)
