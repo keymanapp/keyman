@@ -15,4 +15,5 @@ rem		- vietnamese_telex_legacy
 rem		- vietnamese_vni
 
 dir  /s/b ..\..\..\..\keyboards\release\*.kmn | more |    findstr /v /i  "viet*" |  findstr /v /i  "eKwTamil99UniUpdt" | findstr /v /i  "CERR*"
+rem dir  /s/b ..\..\..\..\keyboards\release\*.kmn | more |    findstr /v /i  "viet*" |  findstr /v /i  "eKwTamil99UniUpdt"
 

@@ -34,7 +34,12 @@ bool IsRelativePath(KMX_CHAR const * p) {
   //  C:\...\BITMAP.BMP
   //  \\SERVER\SHARE\...\BITMAP.BMP
 
+#if defined(_WIN32) || defined(_WIN64)
   if (*p == '\\') return FALSE;
+#else
+  if (*p == '/') return FALSE;
+#endif
+
   if (*p && *(p + 1) == ':') return FALSE;
 
   return TRUE;
@@ -53,7 +58,12 @@ bool IsRelativePath(KMX_WCHART const * p) {
   //  C:\...\BITMAP.BMP
   //  \\SERVER\SHARE\...\BITMAP.BMP
 
+#if defined(_WIN32) || defined(_WIN64)
   if (*p == L'\\') return FALSE;
+#else
+  if (*p == L'/') return FALSE;
+#endif
+
   if (*p && *(p + 1) == L':') return FALSE;
 
   return TRUE;
@@ -95,9 +105,14 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissi
     return CERR_None;
   }
 
+#if defined(_WIN32) || defined(_WIN64)
   const wchar_t* cptr1 = wcsrchr(Name, '\\');
+#else
+  const wchar_t* cptr1 = wcsrchr(Name, '/');
+#endif
   cptr1++;
 
+//TODO: sort out how to find common includes in non-Windows platforms:
 #if defined(_WIN32) || defined(_WIN64)
   if (wcscmp(cptr1, fi.name) != 0) {
     u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);

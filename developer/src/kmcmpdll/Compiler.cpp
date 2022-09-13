@@ -81,6 +81,7 @@
 #include <debugstore.h>
 #include <namedcodeconstants.h>
 #include <../../../common/windows/cpp/include/unicode.h>
+#include <../../../common/windows/cpp/include/keymanversion.h>
 
 #include <edition.h>
 
@@ -132,7 +133,6 @@ KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk); // I3438
 KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID= NULL);
 KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp);
 void RecordDeadkeyNames(PFILE_KEYBOARD fk);
-KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk);
 KMX_BOOL CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
 
 KMX_DWORD process_if(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
@@ -326,7 +326,12 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile, PK
   if (!pMsgProc || !pszInfile || !pszOutfile) SetError(CERR_BadCallParams);
 
   PKMX_STR p;
+
+#if defined(_WIN32) || defined(_WIN64)
   if (p = strrchr(pszInfile, '\\'))
+#else
+  if (p = strrchr(pszInfile, '/'))
+#endif
   {
     strncpy_s(CompileDir, _countof(CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
     CompileDir[(INT_PTR)(p - pszInfile + 1)] = 0;
@@ -416,7 +421,12 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PKMX_STR pszIn
   if (!pMsgProc || !pszInfile || !pfkBuffer) SetError(CERR_BadCallParams);
 
   PKMX_STR p;
+
+#if defined(_WIN32) || defined(_WIN64)
   if (p = strrchr(pszInfile, '\\'))
+#else
+  if (p = strrchr(pszInfile, '/'))
+#endif
   {
     strncpy_s(CompileDir, _countof(CompileDir), pszInfile, (INT_PTR)(p - pszInfile + 1));  // I3481
     CompileDir[(INT_PTR)(p - pszInfile + 1)] = 0;
@@ -534,7 +544,6 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
     // must preprocess for group and store names -> this isn't really necessary, but never mind!
     while ((msg = ReadLine(fp_in, str, TRUE)) == CERR_None)
     {
-      if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
       p = str;
       switch (LineTokenType(&p))
       {
@@ -568,7 +577,6 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
   while ((msg = ReadLine(fp_in, str, FALSE)) == CERR_None)
   {
-    if (GetAsyncKeyState(VK_ESCAPE) < 0) SetError(CERR_Break);
     msg = ParseLine(fk, str);
     if (msg != CERR_None) SetError(msg);
   }
@@ -580,7 +588,7 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   if (FSaveDebug) RecordDeadkeyNames(fk);
 
   /* Add the compiler version as a system store */
-  if ((msg = AddCompilerVersionStore(fk)) != CERR_None) SetError(msg);
+  if ((msg = AddStore(fk, TSS_COMPILEDVERSION, KEYMAN_VersionWin_W16)) != CERR_None) return msg;
 
   if ((msg = BuildVKDictionary(fk)) != CERR_None) SetError(msg);  // I3438
 
@@ -1307,7 +1315,12 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     {
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
+
+#if defined(_WIN32) || defined(_WIN64)
       char16_t *pp = (char16_t*) u16chr((const PKMX_WCHAR) p, u'\\');
+#else
+      char16_t *pp = (char16_t*) u16chr((const PKMX_WCHAR) p, u'/');
+#endif
 
       if (!pp) {
         pp = p;
@@ -1449,53 +1462,6 @@ KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
 
   return TRUE;
 }
-
-KMX_BOOL GetFileVersion(KMX_CHAR *filename, KMX_WORD *d1, KMX_WORD *d2, KMX_WORD *d3, KMX_WORD *d4)
-{
-  KMX_CHAR fnbuf[260];
-  DWORD h;
-  DWORD sz;
-  PKMX_STR p;
-  VS_FIXEDFILEINFO *vffi;
-  KMX_UINT len;
-
-  GetModuleFileName(0, fnbuf, 260);
-  sz = GetFileVersionInfoSize(fnbuf, &h);
-  if (sz == 0) return FALSE;
-  p = new KMX_CHAR[sz];
-  if (!p) return FALSE;
-  GetFileVersionInfo(fnbuf, h, sz, p);
-  VerQueryValue(p, "\\", (void **)&vffi, &len);
-
-  *d1 = HIWORD(vffi->dwFileVersionMS);
-  *d2 = LOWORD(vffi->dwFileVersionMS);
-  *d3 = HIWORD(vffi->dwFileVersionLS);
-  *d4 = LOWORD(vffi->dwFileVersionLS);
-
-  delete[] p;
-  return TRUE;
-}
-
-KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk)
-{
-
-  if(!FShouldAddCompilerVersion) {
-    return CERR_None;
-  }
-
-  KMX_WCHAR verstr[32];
-  PKMX_WCHAR p_verstr = verstr;
-  KMX_WORD d1, d2, d3, d4;
-  KMX_WORD msg;
-
-  GetFileVersion(NULL, &d1, &d2, &d3, &d4);
-
-  u16sprintf(verstr, _countof(verstr), L"%d.%d.%d.%d", d1, d2, d3, d4);  // I3481
-  if ((msg = AddStore(fk, TSS_COMPILEDVERSION, verstr)) != CERR_None) return msg;
-
-  return CERR_None;
-}
-
 /****************************
 * Rule lines
 */
@@ -3417,7 +3383,13 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
       *p = L' ';
       continue;
     }
+
+#if defined(_WIN32) || defined(_WIN64)
     if (*p == L'\\') {
+#else
+    if (*p == L'/') {
+#endif
+
       LineCarry = TRUE;
       *p = L' ';
       continue;
