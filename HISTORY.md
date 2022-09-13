@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.62 alpha 2022-09-13
+
+* fix(developer): hide key-sizes when in desktop layout in touch layout editor (#7225)
+* fix(developer): show more useful error if out of space during Setup (#7267)
+
 ## 16.0.61 alpha 2022-09-12
 
 * docs(windows): add steps for using testhost debugging (#7263)
