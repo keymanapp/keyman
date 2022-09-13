@@ -402,11 +402,11 @@ KMX_BOOL COMP_KEYBOARD::VerifyKeyboard(size_t sz)
 
   // Verify file structure
 
-  if(ckbp->StartGroup[0] != 0xFFFFFFFF && ckbp->StartGroup[0] >= ckbp->cxGroupArray) {
+  if(StartGroup[0] != 0xFFFFFFFF && StartGroup[0] >= cxGroupArray) {
     DebugLog("Invalid ANSI start group index");
     return FALSE;
   }
-  if(ckbp->StartGroup[1] != 0xFFFFFFFF && ckbp->StartGroup[1] >= ckbp->cxGroupArray) {
+  if(StartGroup[1] != 0xFFFFFFFF && StartGroup[1] >= cxGroupArray) {
     DebugLog("Invalid Unicode start group index");
     return FALSE;
   }
