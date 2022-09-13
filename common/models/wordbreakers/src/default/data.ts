@@ -28,6 +28,32 @@ export const enum WordBreakProperty { // Scary bit:  this does not exist as an o
   eot
 };
 
+// Not currently built by the auto-generator tool, but it easily could be.
+// If and when we import the data.ts rebuilder, we can add this in.
+export const propertyMap = [
+  "Other",
+  "LF",
+  "Newline",
+  "CR",
+  "WSegSpace",
+  "Double_Quote",
+  "Single_Quote",
+  "MidNum",
+  "MidNumLet",
+  "Numeric",
+  "MidLetter",
+  "ALetter",
+  "ExtendNumLet",
+  "Format",
+  "Extend",
+  "Hebrew_Letter",
+  "ZWJ",
+  "Katakana",
+  "Regional_Indicator",
+  "sot",
+  "eot"
+];
+
 /**
  * Constants for indexing values in WORD_BREAK_PROPERTY.
  */

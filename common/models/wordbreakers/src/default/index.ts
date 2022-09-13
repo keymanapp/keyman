@@ -2,14 +2,42 @@
 /// <reference path="./data.ts" />
 namespace wordBreakers {
   /**
+   * A set of options used to customize and extend the behavior of the default
+   * Unicode wordbreaker.
+   */
+  export interface DefaultWordBreakerOptions {
+    /**
+     * Allows addition of custom wordbreaking rules, which will be applied
+     * after WB1-WB4 and before all other default wordbreaking rules.
+     *
+     * @see `WordbreakerRule`
+     */
+    rules?: WordbreakerRule[];
+
+    /**
+     * Allows assignment of characters to different word-breaking properties than
+     * their standard word-breaking assignment, including to custom properties
+     * specified within `customProperties`.
+     * @param char
+     */
+    propertyMapping?(char: string): string;
+
+    /**
+     * Allows definition of extra word-breaking properties for use with custom
+     * rules.
+     */
+    customProperties?: [string];
+  }
+
+  /**
    * Word breaker based on Unicode Standard Annex #29, Section 4.1:
    * Default Word Boundary Specification.
    *
    * @see http://unicode.org/reports/tr29/#Word_Boundaries
    * @see https://github.com/eddieantonio/unicode-default-word-boundary/tree/v12.0.0
    */
-  export function default_(text: string): Span[] {
-    let boundaries = findBoundaries(text);
+  export function default_(text: string, options?: DefaultWordBreakerOptions): Span[] {
+    let boundaries = findBoundaries(text, options);
     if (boundaries.length == 0) {
       return [];
     }
@@ -22,7 +50,7 @@ namespace wordBreakers {
       let end = boundaries[i + 1];
       let span = new LazySpan(text, start, end);
 
-      if (isNonSpace(span.text)) {
+      if (isNonSpace(span.text, options)) {
         spans.push(span);
         // Preserve a sequence-final space if it exists.  Needed to signal "end of word".
       } else if (i == boundaries.length - 2) { // if "we just checked the final boundary"...
@@ -64,8 +92,7 @@ namespace wordBreakers {
   /**
    * An abstraction supporting custom wordbreaker boundary rules.  While this doesn't provide
    * support for more complex rules like WB4, WB15, or WB16, this is sufficient for all other
-   * default word-breaking rules.  Thus, this should cover the majority of cases requiring
-   * custom handling for specific languages.
+   * default word-breaking rules and can be used to define custom rules of similar structure.
    *
    * @see https://unicode.org/reports/tr29/#WB_Rule_Macros
    */
@@ -90,6 +117,7 @@ namespace wordBreakers {
   export class BreakerContext {
     // Referenced by this object in order to facilitate `lookahead` maintenance.
     private readonly text: string;
+    readonly options?: DefaultWordBreakerOptions;
 
     /**
      * Represents the property of character immediately preceding `left`'s character.
@@ -117,7 +145,7 @@ namespace wordBreakers {
      * @param text          The text to be word-broken
      * @param lookaheadPos  The position corresponding to `lookahead`.
      */
-    constructor(text: string, lookaheadPos: number);
+    constructor(text: string, options: DefaultWordBreakerOptions | undefined, lookaheadPos: number);
     /**
      * Used internally by the boundary-detection algorithm during context-shifting operations.
      * @param text
@@ -127,20 +155,23 @@ namespace wordBreakers {
      * @param lookahead
      */
     constructor(text: string,
+                options: DefaultWordBreakerOptions | undefined,
                 lookbehind: WordBreakProperty,
                 left:       WordBreakProperty,
                 right:      WordBreakProperty,
                 lookahead:  WordBreakProperty);
     constructor(text: string,
+                options: DefaultWordBreakerOptions | undefined,
                 prop1:  WordBreakProperty | number,
                 prop2?: WordBreakProperty,
                 prop3?: WordBreakProperty,
                 prop4?: WordBreakProperty) {
       this.text = text;
+      this.options = options;
 
-      if(arguments.length == 2) {
+      if(arguments.length == 3) {
         this.lookahead = this.wordbreakPropertyAt(prop1);// prop1;
-      } else /*if(arguments.length == 5)*/ {
+      } else /*if(arguments.length == 6)*/ {
         this.lookbehind = prop1 as WordBreakProperty;
         this.left       = prop2 as WordBreakProperty;
         this.right      = prop3 as WordBreakProperty;
@@ -155,7 +186,7 @@ namespace wordBreakers {
      */
     public next(lookaheadPos: number): BreakerContext {
       let newLookahead = this.wordbreakPropertyAt(lookaheadPos);
-      return new BreakerContext(this.text, this.left, this.right, this.lookahead, newLookahead);
+      return new BreakerContext(this.text, this.options, this.left, this.right, this.lookahead, newLookahead);
     }
 
     /**
@@ -167,7 +198,7 @@ namespace wordBreakers {
      */
     public ignoringRight(lookaheadPos: number) {
       let newLookahead = this.wordbreakPropertyAt(lookaheadPos);
-      return new BreakerContext(this.text, this.lookbehind, this.left, this.lookahead, newLookahead);
+      return new BreakerContext(this.text, this.options, this.lookbehind, this.left, this.lookahead, newLookahead);
     }
 
     /**
@@ -178,7 +209,7 @@ namespace wordBreakers {
      */
     public ignoringLookahead(lookaheadPos: number) {
       let newLookahead = this.wordbreakPropertyAt(lookaheadPos);
-      return new BreakerContext(this.text, this.lookbehind, this.left, this.right, newLookahead);
+      return new BreakerContext(this.text, this.options, this.lookbehind, this.left, this.right, newLookahead);
     }
 
     /**
@@ -194,7 +225,7 @@ namespace wordBreakers {
         // Surrogate pairs the next TWO items from the string!
         return property(this.text[pos] + this.text[pos + 1]);
       }
-      return property(this.text[pos]);
+      return property(this.text[pos], this.options);
     }
 
     /**
@@ -215,15 +246,38 @@ namespace wordBreakers {
       result = result && (rightSet?.includes(this.right) ?? true);
       return   result && (lookaheadSet?.includes(this.lookahead) ?? true);
     }
-  }
+
+    /**
+     * Returns `true` if and only if each member of the context has a property included within
+     * its corresponding set (when specified).  Any set may be replaced with null to disable
+     * a check against its corresponding property.
+     *
+     * Names should match those found at https://unicode.org/reports/tr29/#Word_Boundary_Rules
+     * or defined in the word-breaker customization options; matching is case-insensitive.
+     * @param lookbehindSet
+     * @param leftSet
+     * @param rightSet
+     * @param lookaheadSet
+     */
+    public propertyMatch(lookbehindSet: string[] | null,
+                         leftSet:       string[] | null,
+                         rightSet:      string[] | null,
+                         lookaheadSet:  string[] | null) : boolean {
+        const propMapper = (name: string) => propertyVal(name, this.options);
+        return this.match(lookbehindSet?.map(propMapper) as WordBreakProperty[] | null,
+                          leftSet?.map(propMapper)       as WordBreakProperty[] | null,
+                          rightSet?.map(propMapper)      as WordBreakProperty[] | null,
+                          lookaheadSet?.map(propMapper)  as WordBreakProperty[] | null);
+      }
+    }
 
   /**
    * Returns true when the chunk does not solely consist of whitespace.
    *
    * @param chunk a chunk of text. Starts and ends at word boundaries.
    */
-  function isNonSpace(chunk: string): boolean {
-    return !Array.from(chunk).map(property).every(wb => (
+  function isNonSpace(chunk: string, options?: DefaultWordBreakerOptions): boolean {
+    return !Array.from(chunk).map((char) => property(char, options)).every(wb => (
       wb === WordBreakProperty.CR ||
       wb === WordBreakProperty.LF ||
       wb === WordBreakProperty.Newline ||
@@ -238,15 +292,15 @@ namespace wordBreakers {
    *
    * @param text Text to find word boundaries in.
    */
-  function findBoundaries(text: string, options?: WordbreakerRule[]): number[] {
+  function findBoundaries(text: string, options?: DefaultWordBreakerOptions): number[] {
     // WB1 and WB2: no boundaries if given an empty string.
     if (text.length === 0) {
       // There are no boundaries in an empty string!
       return [];
     }
 
-    if(!options) {
-      options = [];
+    if(options && !options.rules) {
+      options.rules = [];
     }
 
     // This algorithm works by maintaining a sliding window of four SCALAR VALUES.
@@ -272,7 +326,7 @@ namespace wordBreakers {
     let rightPos: number;
     let lookaheadPos = 0; // lookahead, one scalar value to the right of right.
     // Before the start of the string is also the start of the string.
-    let state = new BreakerContext(text, lookaheadPos);
+    let state = new BreakerContext(text, options, lookaheadPos);
     // Count RIs to make sure we're not splitting emoji flags:
     let nConsecutiveRegionalIndicators = 0;
 
@@ -356,21 +410,22 @@ namespace wordBreakers {
       const SET_AHLETTER   = [WordBreakProperty.ALetter,   WordBreakProperty.Hebrew_Letter];
       const SET_MIDNUMLETQ = [WordBreakProperty.MidNumLet, WordBreakProperty.Single_Quote];
 
-      // Start: Custom rules
-      let customMatch: boolean = false;
-      for(const rule of options) {
-        customMatch = rule.match(state);
-        if(customMatch) {
-          if(rule.breakIfMatch) {
-            boundaries.push(rightPos);
+      // Custom rules may override the base ruleset aside from the first few fundamental ones.
+      if(options?.rules) {
+        let customMatch: boolean = false;
+        for(const rule of options.rules) {
+          customMatch = rule.match(state);
+          if(customMatch) {
+            if(rule.breakIfMatch) {
+              boundaries.push(rightPos);
+            }
+            break; // as customMatch == true here, this will trigger the `continue` that follows.
           }
-          break; // as customMatch == true here, this will trigger the `continue` that follows.
+        }
+        if(customMatch) {
+          continue;
         }
       }
-      if(customMatch) {
-        continue;
-      }
-      // End: Custom rules
 
       // WB5: Do not break between most letters.
       // if (isAHLetter(state.left) && isAHLetter(state.right))
@@ -503,12 +558,42 @@ namespace wordBreakers {
    * Note that
    * @param character a scalar value
    */
-  export function property(character: string): WordBreakProperty {
+  function property(character: string, options?: DefaultWordBreakerOptions): WordBreakProperty {
+    // If there is a customized mapping for the character, prioritize that.
+    if(options?.propertyMapping) {
+      let propName = options.propertyMapping(character);
+      if(propName) {
+        return propertyVal(propName, options);
+      }
+    }
+
     // This MUST be a scalar value.
     // TODO: remove dependence on character.codepointAt()?
     let codepoint = character.codePointAt(0) as number;
+
     return searchForProperty(codepoint, 0, WORD_BREAK_PROPERTY.length - 1);
   }
+
+  function propertyVal(propName: string, options?: DefaultWordBreakerOptions) {
+    const matcher = (name: string) => name.toLowerCase() == propName.toLowerCase()
+
+    const customIndex = options?.customProperties?.findIndex(matcher) ?? -1;
+    return customIndex != -1 ? -customIndex - 1 : data.propertyMap.findIndex(matcher);
+  }
+
+  // /**
+  //  * Provides the word-breaking property name for the specified character based on the property
+  //  * values used by https://unicode.org/reports/tr29/#Word_Boundary_Rules.
+  //  * @param character
+  //  * @returns
+  //  */
+  // export function unicodeProperty(character: string): string {
+  //   // Since we use a const enum for property names, the TS compiler optimizes it away
+  //   // and does not provide a reverse lookup for us.  So, we do that here.
+  //   const enumVal = property(character);
+
+  //   return data.propertyMap[enumVal];
+  // }
 
   /**
    * Binary search for the word break property of a given CODE POINT.
@@ -546,8 +631,7 @@ namespace wordBreakers {
 // implementing a namespace, BUT we can manually make the
 // assignment and **declare** it as part of the namespace.
 wordBreakers['default'] = wordBreakers.default_;
-wordBreakers['unicodeProperty'] = wordBreakers.property;
+// wordBreakers['unicodeProperty'] = wordBreakers.unicodeProperty;
 declare namespace wordBreakers {
   export { default_ as default };
-  export { property as unicodeProperty };
 }
