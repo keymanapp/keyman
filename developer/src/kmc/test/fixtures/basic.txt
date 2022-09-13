@@ -21,15 +21,15 @@ block(kmxheader)  #  struct COMP_KEYBOARD {
 
   00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  26 d2 24 03      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  c1 79 c0 dd      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
   00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
 
-  00 00 00 00      #    KMX_DWORD cxStoreArray;   // 0018 in array entries
-  00 00 00 00      #    KMX_DWORD cxGroupArray;   // 001C in array entries
+  sizeof(stores,12) #    KMX_DWORD cxStoreArray;   // 0018 in array entries
+  00 00 00 00       #    KMX_DWORD cxGroupArray;   // 001C in array entries
 
-  00 00 00 00      #    KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
+  offset(stores)   #    KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
   00 00 00 00      #    KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
 
   ff ff ff ff      #    KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
@@ -43,11 +43,46 @@ block(kmxheader)  #  struct COMP_KEYBOARD {
   00 00 00 00      #    KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
                    #  };
 
-
 block(kmxplusinfo)                  #  struct COMP_KEYBOARD_KMXPLUSINFO {
   offset(sect)                      #    KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data from BOF, <sect> header is first
   diff(sect,eof)                    #    KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
                                     #  };
+
+block(stores)                          #  struct COMP_STORE {
+  07 00 00 00                          #  KMX_DWORD dwSystemID; - TSS_NAME
+  offset(store_name_name)              #  KMX_DWORD dpName;
+  offset(store_name_string)            #  KMX_DWORD dpString;
+                                       #  };
+  # excluding this so we don't have compiled version changes
+  # 14 00 00 00                          #  KMX_DWORD dwSystemID; - TSS_COMPILEDVERSION
+  # offset(store_compiledversion_name)   #  KMX_DWORD dpName;
+  # offset(store_compiledversion_string) #  KMX_DWORD dpString;
+                                       #  };
+  24 00 00 00                          #  KMX_DWORD dwSystemID; - TSS_KEYBOARDVERSION
+  offset(store_keyboardversion_name)   #  KMX_DWORD dpName;
+  offset(store_keyboardversion_string) #  KMX_DWORD dpString;
+                                       #  };
+  26 00 00 00                          #  KMX_DWORD dwSystemID; - TSS_TARGETS
+  offset(store_targets_name)           #  KMX_DWORD dpName;
+  offset(store_targets_string)         #  KMX_DWORD dpString;
+                                       #  };
+
+block(store_name_name)
+  26 00 4e 00 41 00 4d 00 45 00 00 00  # '&NAME'
+block(store_name_string)
+  54 00 65 00 73 00 74 00 4b 00 62 00 64 00 00 00 # 'TestKbd'
+
+block(store_keyboardversion_name)
+  26 00 4b 00 45 00 59 00 42 00 4f 00 41 00 52 00
+  44 00 56 00 45 00 52 00 53 00 49 00 4f 00 4e 00
+  00 00                                # '&KEYBOARDVERSION'
+block(store_keyboardversion_string)
+  31 00 2e 00 30 00 2e 00 30 00 00 00  # '1.0.0'
+
+block(store_targets_name)
+  26 00 54 00 41 00 52 00 47 00 45 00 54 00 53 00 00 00 # '&TARGETS'
+block(store_targets_string)
+  64 00 65 00 73 00 6b 00 74 00 6f 00 70 00 00 00 # 'desktop'
 
 block(sect)                         #  struct COMP_KMXPLUS_SECT {
   73 65 63 74                       #    KMX_DWORD header.ident;   // 0000 Section name
@@ -296,7 +331,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   #                 without interfering with sizeof() calculation above
 
   block(strNull)             block(x) 00 00                                             # the zero-length string
-  block(strVersion)          30 00   block(x) 00 00                                     # '0'
+  block(strVersion)          31 00 2e 00 30 00 2e 00 30 00   block(x) 00 00             # '1.0.0'
   block(strNorm)             4e 00 46 00 43 00   block(x) 00 00                         # 'NFC'
   block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
   block(strElemTranFrom1)    5E 00 block(x) 00 00                                       # '^'

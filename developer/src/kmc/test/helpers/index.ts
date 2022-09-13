@@ -4,9 +4,13 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { SectionCompiler } from '../../src/keyman/compiler/section-compiler';
-import { Elem, GlobalSections, Section, Strs } from '../../src/keyman/kmx/kmx-plus';
+import KMXPlusFile, { Elem, GlobalSections, Section, Strs } from '../../src/keyman/kmx/kmx-plus';
 import LDMLKeyboardXMLSourceFileReader from '../../src/keyman/ldml-keyboard/ldml-keyboard-xml-reader';
-import { CompilerEvent } from '../keyman/compiler/callbacks';
+import { CompilerEvent } from '../../src/keyman/compiler/callbacks';
+import Compiler from '../../src/keyman/compiler/compiler';
+import { assert } from 'chai';
+import KMXPlusMetadataCompiler from '../../src/keyman/compiler/metadata-compiler';
+import CompilerOptions from '../../src/keyman/compiler/compiler-options';
 
 /**
  * Builds a path to the fixture with the given path components.
@@ -49,4 +53,32 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
   globalSections.elem = new Elem(globalSections.strs);
 
   return compiler.compile(globalSections);
+}
+
+export function compileKeyboard(inputFilename: string, callbacks: CompilerCallbacks, options: CompilerOptions): KMXPlusFile {
+  const k = new Compiler(callbacks, options);
+  const source = k.load(inputFilename);
+  checkMessages(callbacks);
+  assert.isNotNull(source, 'k.load should not have returned null');
+
+  const valid = k.validate(source);
+  checkMessages(callbacks);
+  assert.isTrue(valid, 'k.validate should not have failed');
+
+  const kmx = k.compile(source);
+  checkMessages(callbacks);
+  assert.isNotNull(kmx, 'k.compile should not have returned null');
+
+  // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
+  // to duplicate some of the metadata
+  KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, options);
+
+  return kmx;
+}
+
+export function checkMessages(callbacks: CompilerCallbacks) {
+  if(callbacks.messages.length > 0) {
+    console.log(callbacks.messages);
+  }
+  assert.isEmpty(callbacks.messages);
 }

@@ -3,6 +3,7 @@ import LDMLKeyboardXMLSourceFile from '../ldml-keyboard/ldml-keyboard-xml';
 import LDMLKeyboardXMLSourceFileReader from '../ldml-keyboard/ldml-keyboard-xml-reader';
 import { BkspCompiler } from './bksp';
 import CompilerCallbacks from './callbacks';
+import CompilerOptions from './compiler-options';
 import { KeysCompiler } from './keys';
 import { LocaCompiler } from './loca';
 import { MetaCompiler } from './meta';
@@ -25,8 +26,16 @@ const SECTION_COMPILERS = [
 
 export default class Compiler {
   private readonly callbacks: CompilerCallbacks;
+  // private readonly options: CompilerOptions; // not currently used
 
-  constructor (callbacks: CompilerCallbacks) {
+  constructor (callbacks: CompilerCallbacks, _options?: CompilerOptions) {
+    /*
+    this.options = {
+      debug: false,
+      addCompilerVersion: true,
+      ...options
+    };
+    */
     this.callbacks = callbacks;
   }
 

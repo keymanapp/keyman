@@ -6,6 +6,8 @@
 -->
 <!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
+  <version number="1.0.0" />
+
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
 
   <names>
