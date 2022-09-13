@@ -32,6 +32,7 @@ import com.tavultesoft.kmea.util.KMLog;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -190,6 +191,33 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
 
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+      /**
+       * Utility to modify keyboardList. Based on BCP47.toggleLanguage
+       * If keyboard's languageID exists in the list, remove the keyboard.
+       * Otherwise, add the keyboard to the list.
+       * @param keyboardList
+       * @param k
+       */
+      private void toggleLanguage(ArrayList<Keyboard> keyboardList, Keyboard k) {
+        if (keyboardList == null) {
+          throw new InvalidParameterException("keyboardList must not be null");
+        }
+        if (k == null) {
+          throw new InvalidParameterException("keyboard must not be null");
+        }
+
+        // See if languageID already exists in the keyboardList
+        for (Keyboard l: keyboardList) {
+          if (BCP47.languageEquals(l.getLanguageID(), k.getLanguageID())) {
+            keyboardList.remove(l);
+            return;
+          }
+        }
+
+        k.setLanguage(k.getLanguageID().toLowerCase(), k.getLanguageName());
+        keyboardList.add(k);
+      }
+
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Keyboard k = availableKeyboardsList.get(position);
@@ -199,21 +227,13 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
             languageList = new ArrayList<String>();
           }
           String selectedLanguageID = k.getLanguageID();
-          if (languageList.contains(selectedLanguageID)) {
-            languageList.remove(selectedLanguageID);
-          } else {
-            languageList.add(selectedLanguageID);
-          }
+          BCP47.toggleLanguage(languageList, selectedLanguageID);
         } else {
           // Otherwise, add the language association
           if (addKeyboardsList == null) {
             addKeyboardsList = new ArrayList<Keyboard>();
           }
-          if (addKeyboardsList.contains(k)) {
-            addKeyboardsList.remove(k);
-          } else {
-            addKeyboardsList.add(k);
-          }
+          toggleLanguage(addKeyboardsList, k);
         }
 
         // Disable install button if no languages selected or all languages already installed
