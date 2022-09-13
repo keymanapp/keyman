@@ -254,6 +254,9 @@ namespace wordBreakers {
      *
      * Names should match those found at https://unicode.org/reports/tr29/#Word_Boundary_Rules
      * or defined in the word-breaker customization options; matching is case-insensitive.
+     * Also includes two extra properties:
+     * - `sot` - start of text
+     * - `eot` - end of text
      * @param lookbehindSet
      * @param leftSet
      * @param rightSet
