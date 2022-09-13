@@ -584,20 +584,6 @@ namespace wordBreakers {
     return customIndex != -1 ? -customIndex - 1 : data.propertyMap.findIndex(matcher);
   }
 
-  // /**
-  //  * Provides the word-breaking property name for the specified character based on the property
-  //  * values used by https://unicode.org/reports/tr29/#Word_Boundary_Rules.
-  //  * @param character
-  //  * @returns
-  //  */
-  // export function unicodeProperty(character: string): string {
-  //   // Since we use a const enum for property names, the TS compiler optimizes it away
-  //   // and does not provide a reverse lookup for us.  So, we do that here.
-  //   const enumVal = property(character);
-
-  //   return data.propertyMap[enumVal];
-  // }
-
   /**
    * Binary search for the word break property of a given CODE POINT.
    *
@@ -634,7 +620,6 @@ namespace wordBreakers {
 // implementing a namespace, BUT we can manually make the
 // assignment and **declare** it as part of the namespace.
 wordBreakers['default'] = wordBreakers.default_;
-// wordBreakers['unicodeProperty'] = wordBreakers.unicodeProperty;
 declare namespace wordBreakers {
   export { default_ as default };
 }
