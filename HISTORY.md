@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.63 alpha 2022-09-14
+
+* chore(linux): Update debian changelog (#7281)
+* fix(linux): Fix ignored error (#7284)
+
 ## 16.0.62 alpha 2022-09-13
 
 * fix(developer): hide key-sizes when in desktop layout in touch layout editor (#7225)
