@@ -653,7 +653,7 @@ namespace correction {
 
         shouldTimeout(): boolean {
           const now = Date.now();
-          if(this.start - now > this.maxTrueTime) {
+          if(now - this.start > this.maxTrueTime) {
             return true;
           }
 
