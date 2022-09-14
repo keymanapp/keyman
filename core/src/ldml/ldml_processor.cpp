@@ -12,6 +12,7 @@
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
 #include "ldml/keyboardprocessor_ldml.h"
+#include "kmx/kmx_file_validator.hpp"
 
 namespace {
   constexpr km_kbp_attr const engine_attrs = {
@@ -64,12 +65,12 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
   KMXPLUS_ASSERT(true, data.size() > sizeof(kmx::COMP_KEYBOARD_EX));
 
 //   // Locate the structs here, but still retain ptrs to the raw structs.
-  kmx::COMP_KEYBOARD* comp_keyboard = (kmx::COMP_KEYBOARD*)data.data();
+  kmx::KMX_FileValidator* comp_keyboard = (kmx::KMX_FileValidator*)data.data();
 
   // Perform the standard validation
   KMXPLUS_ASSERT(TRUE, comp_keyboard->VerifyKeyboard(data.size()));
 
-  kmx::kmx_plus kplus(comp_keyboard, data.size());
+  kmx::kmx_plus kplus(comp_keyboard, data.size()); // slices to a COMP_KEYBOARD
 
   KMXPLUS_ASSERT(true, kplus.is_valid());
 

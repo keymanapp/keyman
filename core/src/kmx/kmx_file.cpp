@@ -4,6 +4,7 @@
 */
 #include "kmx_processevent.h"
 #include <assert.h>
+#include "kmx_file_validator.hpp"
 
 using namespace km::kbp;
 using namespace kmx;
@@ -349,12 +350,12 @@ LPKEYBOARD KMX_ProcessEvent::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 
 KMX_BOOL KMX_ProcessEvent::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
 {
-  PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
+  KMX_FileValidator *ckbp = reinterpret_cast<KMX_FileValidator*>(filebase);
 
   return ckbp->VerifyKeyboard(sz);
 }
 
-KMX_BOOL COMP_KEYBOARD::VerifyChecksum(size_t sz)
+KMX_BOOL KMX_FileValidator::VerifyChecksum(size_t sz)
 {
   KMX_DWORD tempcs;
 
@@ -366,11 +367,15 @@ KMX_BOOL COMP_KEYBOARD::VerifyChecksum(size_t sz)
   tempcs = dwCheckSum;
   dwCheckSum = 0;
 
-  return tempcs == CalculateBufferCRC(sz, (KMX_BYTE*)this);
+  KMX_BOOL status = (tempcs == CalculateBufferCRC(sz, (KMX_BYTE*)this));
+
+  dwCheckSum = tempcs;
+
+  return status;
 }
 
 
-KMX_BOOL COMP_KEYBOARD::VerifyKeyboard(size_t sz)
+KMX_BOOL KMX_FileValidator::VerifyKeyboard(size_t sz)
 {
   KMX_DWORD i;
   PCOMP_STORE csp;
