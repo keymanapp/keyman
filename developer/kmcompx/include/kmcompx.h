@@ -5,12 +5,10 @@
 
 typedef int         INT_PKMX;
 typedef wchar_t     KMX_WCHART;
-typedef KMX_WCHAR * PKMX_WSTR;
-typedef KMX_WCHART *PKMX_WCHART;
 typedef KMX_BYTE *  LPKMX_BYTE;
 typedef KMX_DWORD * LPKMX_DWORD;
 typedef char *      PKMX_STR;
-typedef KMX_WCHAR * LPKMX_WCHAR;
+typedef KMX_WCHAR*  LPKMX_WCHAR ;
 
 // TODO: Windows-specific
 #ifndef CALLBACK
