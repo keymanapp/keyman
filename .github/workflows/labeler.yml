@@ -12,7 +12,7 @@ jobs:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
     - name: Update labels based on PR title
       id: labeler
-      uses: fuxingloh/multi-labeler@8afa186ed03230c98fe24ebf9fe35093072ad46e # v1.4.0
+      uses: fuxingloh/multi-labeler@fb9bc28b2d65e406ffd208384c5095793c3fd59a # v1.8.0
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         config-path: .github/multi-labeler.yml
