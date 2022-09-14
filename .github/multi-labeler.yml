@@ -11,7 +11,9 @@ version: v1
 #
 
 labels:
+  #
   # conventional commit / semantic PR styles
+  #
 
   - label: 'feat'
     matcher:
@@ -32,18 +34,28 @@ labels:
     matcher:
       title: '^auto(\(|:)'
 
+  #
   # additional meta flags
+  #
 
-  # note, this does not pick up chained PRs automatically
+  # stable-targeted patches; note, this does not pick up chained PRs automatically
   - label: 'stable'
     matcher:
       baseBranch: '^stable-.+'
 
+  # PRs marked as cherry-picks by title
   - label: 'cherry-pick'
     matcher:
       title: '(🍒|:cherries:)'
 
+  # long-lived feature branches
+  - label: 'feature-branch'
+    matcher:
+      branch: '^feature-.+'
+
+  #
   # Scopes that we look for in the PR title
+  #
 
   - label: 'android/'
     matcher:
@@ -76,7 +88,9 @@ labels:
     matcher:
       title: '\(.*windows.*\):'
 
+  #
   # epics -- we will add/remove these as we work on new epics each release
+  #
 
   - label: 'epic-ldml'
     matcher:
