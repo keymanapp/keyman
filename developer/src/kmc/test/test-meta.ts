@@ -31,6 +31,7 @@ describe('meta', function () {
     assert.equal(meta.layout.value, 'QWIRKY');
     assert.equal(meta.normalization.value, 'NFC');
     assert.equal(meta.indicator.value, 'QW');
+    assert.equal(meta.version.value, "1.2.3");
     assert.equal(meta.settings, KeyboardSettings.fallback | KeyboardSettings.transformFailure | KeyboardSettings.transformPartial);
   });
 
@@ -40,6 +41,19 @@ describe('meta', function () {
     assert.isNull(meta);
     assert.equal(callbacks.messages.length, 1);
     assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidNormalization({form:'NFQ'}));
+  });
+
+  it('should reject invalid version', function() {
+    const callbacks = new CompilerCallbacks();
+    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-1.0.xml', callbacks) as Meta;
+    assert.isNull(meta);
+    assert.equal(callbacks.messages.length, 1);
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidVersion({version:'1.0'}));
+
+    meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-v1.0.3.xml', callbacks) as Meta;
+    assert.isNull(meta);
+    assert.equal(callbacks.messages.length, 1);
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidVersion({version:'v1.0.3'}));
   });
 });
 

@@ -3,6 +3,7 @@ import LDMLKeyboardXMLSourceFile, { LKKeyboard } from "../ldml-keyboard/ldml-key
 import CompilerCallbacks from "./callbacks";
 import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 
+/* istanbul ignore next */
 export class SectionCompiler {
   protected readonly keyboard: LKKeyboard;
   protected readonly callbacks: CompilerCallbacks;
@@ -12,17 +13,14 @@ export class SectionCompiler {
     this.callbacks = callbacks;
   }
 
-  /* istanbul ignore next */
   public get id(): SectionIdent {
     return null;
   }
 
-  /* istanbul ignore next */
   public get required(): boolean {
     return true;
   }
 
-  /* istanbul ignore next */
   public compile(sections: GlobalSections): Section {
     return null;
   }

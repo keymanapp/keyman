@@ -21,27 +21,27 @@ export class VkeyCompiler extends SectionCompiler {
 
       this.keyboard.vkeyMaps.vkeyMap.forEach(vk => {
         if(LdmlVkeyNames[vk.from] === undefined) {
-          this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsNotValid(vk.from));
+          this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsNotValid({vkey: vk.from}));
           valid = false;
         }
 
         if(LdmlVkeyNames[vk.to] === undefined) {
-          this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsNotValid(vk.to));
+          this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsNotValid({vkey: vk.to}));
           valid = false;
         }
 
         if(vk.from == vk.to) {
-          this.callbacks.reportMessage(CompilerMessages.Hint_VkeyMapIsRedundant(vk.from));
+          this.callbacks.reportMessage(CompilerMessages.Hint_VkeyMapIsRedundant({vkey: vk.from}));
         }
 
         if(from.find(svk => svk == vk.from)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_VkeyMapIsRepeated(vk.from));
+          this.callbacks.reportMessage(CompilerMessages.Error_VkeyMapIsRepeated({vkey: vk.from}));
           valid = false;
         }
         from.push(vk.from);
 
         if(to.find(svk => svk == vk.to)) {
-          this.callbacks.reportMessage(CompilerMessages.Info_MultipleVkeyMapsHaveSameTarget(vk.to));
+          this.callbacks.reportMessage(CompilerMessages.Info_MultipleVkeyMapsHaveSameTarget({vkey: vk.to}));
         }
         to.push(vk.to);
       });

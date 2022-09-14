@@ -46,7 +46,7 @@ export class LocaCompiler extends SectionCompiler {
     const locales = sourceLocales.map((sourceLocale: string) => {
       const locale = new Intl.Locale(sourceLocale).minimize().toString();
       if(locale != sourceLocale) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_LocaleIsNotMinimalAndClean(sourceLocale, locale));
+        this.callbacks.reportMessage(CompilerMessages.Hint_LocaleIsNotMinimalAndClean({sourceLocale, locale}));
       }
       return locale;
     });

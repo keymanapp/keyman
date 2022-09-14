@@ -2,15 +2,9 @@
 
 <!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
-  <version number="1.2.3" />
-
-  <info author="The Keyman Team" indicator="QW" layout="QWIRKY" normalization="NFC" />
-
   <names>
-    <name value="meta-maximal" />
+    <name value="keys-minimal" />
   </names>
-
-  <settings fallback="omit" transformFailure="omit" transformPartial="hide" />
 
   <keys />
 </keyboard>

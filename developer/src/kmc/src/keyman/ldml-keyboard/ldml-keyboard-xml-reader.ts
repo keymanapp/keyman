@@ -58,7 +58,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
     const schema = JSON.parse(this.callbacks.loadLdmlKeyboardSchema().toString('utf8'));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile(ajv.errorsText()));
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: ajv.errorsText()}));
       return null;
     }
     return source;

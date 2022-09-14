@@ -12,6 +12,52 @@ export class KeysCompiler extends SectionCompiler {
     return constants.section.keys;
   }
 
+  private validateHardwareLayer(layer: LDMLKeyboard.LKLayerMap) {
+    let valid = true;
+    if(layer.row.length > USVirtualKeyMap.length) {
+      this.callbacks.reportMessage(CompilerMessages.Error_HardwareLayerHasTooManyRows());
+      valid = false;
+    }
+
+    for(let y = 0; y < layer.row.length && y < USVirtualKeyMap.length; y++) {
+      const keys = layer.row[y].keys.split(' ');
+
+      if(keys.length > USVirtualKeyMap[y].length) {
+        this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: y+1}));
+        valid = false;
+      }
+
+      let x = -1;
+      for(let key of keys) {
+        x++;
+
+        let keydef = this.keyboard.keys?.key?.find(x => x.id == key);
+        if(!keydef) {
+          this.callbacks.reportMessage(CompilerMessages.Error_KeyNotFoundInKeyBag({keyId: key, col: x+1, row: y+1, layer: layer.id, form: 'hardware'}));
+          valid = false;
+          continue;
+        }
+      }
+    }
+
+    return valid;
+  }
+
+  public validate() {
+    let valid = true;
+    if(!this.keyboard.layerMaps?.[0]?.layerMap?.length) {
+      valid = false;
+      this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
+    }
+
+    if(this.keyboard.layerMaps?.[0]?.form == 'hardware') {
+      for(let layer of this.keyboard.layerMaps[0].layerMap) {
+        valid = this.validateHardwareLayer(layer) && valid; // note: always validate even if previously invalid results found
+      }
+    }
+    return valid;
+  }
+
   public compile(sections: GlobalSections): Keys {
     // Use LayerMap + keys to generate compiled keys for hardware
 
@@ -37,24 +83,13 @@ export class KeysCompiler extends SectionCompiler {
     let y = -1;
     for(let row of layer.row) {
       y++;
-      if(y > USVirtualKeyMap.length) {
-        this.callbacks.reportMessage(CompilerMessages.Error_HardwareLayerHasTooManyRows());
-        break;
-      }
 
       const keys = row.keys.split(' ');
       let x = -1;
       for(let key of keys) {
         x++;
-        if(x > USVirtualKeyMap[y].length) {
-          this.callbacks.reportMessage(CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: y+1}));
-          break;
-        }
 
         let keydef = this.keyboard.keys?.key?.find(x => x.id == key);
-        if(!keydef) {
-          this.callbacks.reportMessage(CompilerMessages.Error_KeyNotFoundInKeyBag({keyId: key, col: x+1, row: y+1, layer: layer.id, form: 'hardware'}));
-        }
 
         result.keys.push({
           vkey: USVirtualKeyMap[y][x],

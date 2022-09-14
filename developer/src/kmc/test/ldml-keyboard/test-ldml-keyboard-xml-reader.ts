@@ -14,7 +14,7 @@ describe('ldml keyboard xml reader tests', function() {
     const source = reader.loadFile(inputFilename);
     assert.isNull(source);
     assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidFile("data/keyboard must have required property 'names'"));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidFile({errorText: "data/keyboard must have required property 'names'"}));
   });
 
   it("should fail to load files with an invalid conformsTo", function() {
@@ -24,7 +24,7 @@ describe('ldml keyboard xml reader tests', function() {
     const source = reader.loadFile(inputFilename);
     assert.isNull(source);
     assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidFile("data/keyboard/conformsTo must be equal to one of the allowed values"));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidFile({errorText: "data/keyboard/conformsTo must be equal to one of the allowed values"}));
   });
 
 });

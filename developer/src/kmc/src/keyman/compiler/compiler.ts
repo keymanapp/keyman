@@ -6,6 +6,7 @@ import CompilerCallbacks from './callbacks';
 import CompilerOptions from './compiler-options';
 import { KeysCompiler } from './keys';
 import { LocaCompiler } from './loca';
+import { CompilerMessages } from './messages';
 import { MetaCompiler } from './meta';
 import { NameCompiler } from './name';
 import { OrdrCompiler } from './ordr';
@@ -92,8 +93,9 @@ export default class Compiler {
 
       /* istanbul ignore if */
       if(!sect) {
-        // This should not really happen -- validate() should be telling us
-        // if something is going to fail to compiler
+        // This should not happen -- validate() should have told us
+        // if something is going to fail to compile
+        this.callbacks.reportMessage(CompilerMessages.Fatal_SectionCompilerFailed({sect:section.id}));
         passed = false;
         continue;
       }

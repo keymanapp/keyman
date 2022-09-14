@@ -39,6 +39,7 @@ export class CompilerCallbacks {
 }
 
 export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: CompilerCallbacks): Section {
+  callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
   const source = (new LDMLKeyboardXMLSourceFileReader(callbacks)).loadFile(inputFilename);
   const compiler = new compilerClass(source, callbacks);
