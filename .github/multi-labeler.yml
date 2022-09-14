@@ -37,7 +37,7 @@ labels:
   # note, this does not pick up chained PRs automatically
   - label: 'stable'
     matcher:
-      baseBranch: '^stable-\\d+\\.\\d+'
+      baseBranch: '^stable-.+'
 
   - label: 'cherry-pick'
     matcher:
