@@ -94,6 +94,7 @@
 #include <UnreachableRules.h>
 #include <CheckForDuplicates.h>
 #include <kmx_u16.h>
+#include <CompMsg.h>
 
 int xatoi(PKMX_WCHAR *p);
 int atoiW(PKMX_WCHAR p);
@@ -268,24 +269,31 @@ KMX_BOOL AddCompileString(LPSTR buf)
 KMX_BOOL AddCompileMessage(KMX_DWORD msg)
 {
   KMX_CHAR szText[SZMAX_ERRORTEXT + 1 + 280];
+  KMX_CHAR ending[SZMAX_ERRORTEXT + 1 + 280] = "";
+  KMX_CHAR* szTextp = NULL;
 
   SetLastError(0);
 
   if (msg & CERR_FATAL)
   {
-    LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);
-    (*msgproc)(currentLine + 1, msg, szText);
+    szTextp = GetCompilerErrorString(msg);
+    (*msgproc)(currentLine + 1, msg, szTextp);
     nErrors++;
     return TRUE;
   }
 
   if (msg & CERR_ERROR) nErrors++;
-  LoadString(g_hInstance, msg, szText, SZMAX_ERRORTEXT);
+    szTextp = GetCompilerErrorString(msg);
+
   if (ErrChr > 0)
-    sprintf(strchr(szText, 0), "  character offset:%d", ErrChr);
+    sprintf(ending, "  character offset:%d", ErrChr);
 
   if (*ErrExtra)
-    sprintf(strchr(szText, 0), " extra:%s", ErrExtra);
+    sprintf(ending, " extra:%s", ErrExtra);
+
+  if (szTextp) {
+    strcpy(szText, szTextp);
+    strcat(szText, ending); }
 
   ErrChr = 0; *ErrExtra = 0;
 
@@ -474,6 +482,9 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PKMX_STR pszIn
 
 void GetVersionInfo(KMX_DWORD *VersionMajor, KMX_DWORD *VersionMinor)
 {
+
+  //TODO: sort out how to find common includes in non-Windows platforms:
+  #ifdef _WINDOWS_
   HRSRC hres = FindResource(0, MAKEINTRESOURCE(1), RT_VERSION);
   if (hres)
   {
@@ -482,6 +493,7 @@ void GetVersionInfo(KMX_DWORD *VersionMajor, KMX_DWORD *VersionMinor)
     *VersionMajor = *((PKMX_DWORD)&buf[0x30]);
     *VersionMinor = *((PKMX_DWORD)&buf[0x34]);
   }
+  #endif
 }
 
 KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)

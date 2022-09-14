@@ -80,6 +80,7 @@ lib = library('kmcompx',
   '../../src/kmcmpdll/CheckNCapsConsistency.cpp',
   '../../src/kmcmpdll/UnreachableRules.cpp',
   '../../src/kmcmpdll/kmx_u16.cpp',
+  '../../src/kmcmpdll/CompMsg.cpp',
 
   '../../../common/windows/cpp/src/ConvertUTF.c',
   '../../../common/windows/cpp/src/crc32.cpp',
