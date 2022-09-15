@@ -264,6 +264,9 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
 #pragma mark - CRC32
 
 + (BOOL)verifyCheckSum:(NSString *)path {
+    if (cmp_kb.dwFileVersion >= VERSION_160) {
+        return YES; // #7276: We ignore checksum in Keyman 16.0 and later
+    }
     NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
     if (file == nil) {
         //NSLog(@"Failed to open file");
@@ -282,7 +285,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     [dataBuffer getBytes:&cmp_kb length:size];
     [file closeFile];
 
-    return (cmp_kb.dwFileVersion >= VERSION_160 && cmp_kb.dwCheckSum == 0) || (crc == cmp_kb.dwCheckSum);
+    return (crc == cmp_kb.dwCheckSum);
 }
 
 #define CRC32_POLYNOMIAL    0xEDB88320L

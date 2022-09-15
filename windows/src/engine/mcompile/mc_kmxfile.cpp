@@ -118,12 +118,12 @@ BOOL VerifyChecksum(LPBYTE buf, DWORD sz) {
 
   ckbp = (PCOMP_KEYBOARD) buf;
 
-  if(ckbp->dwFileVersion >= VERSION_160 && ckbp->dwCheckSum == 0) {
-    // #7222: We support a zero checksum in Keyman 16.0 and later
+  if(ckbp->dwFileVersion >= VERSION_160) {
+    // #7276: We ignore checksum in Keyman 16.0 and later
     return TRUE;
   }
 
-	tempcs = ckbp->dwCheckSum;
+  tempcs = ckbp->dwCheckSum;
   ckbp->dwCheckSum = 0;
 
 	return tempcs == CalculateBufferCRC(sz, buf);

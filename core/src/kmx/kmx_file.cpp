@@ -359,8 +359,8 @@ KMX_BOOL KMX_FileValidator::VerifyChecksum(size_t sz)
 {
   KMX_DWORD tempcs;
 
-  if(dwFileVersion >= VERSION_160 && dwCheckSum == 0) {
-    // #7222: We support a zero checksum in Keyman 16.0 and later
+  if(dwFileVersion >= VERSION_160) {
+    // #7276: We ignore checksum in Keyman 16.0 and later
     return TRUE;
   }
 

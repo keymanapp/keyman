@@ -152,7 +152,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 	   ckbp->dwFileVersion > VERSION_MAX)
 	{
 		/* Old or new version -- identify the desired program version */
-    if((ckbp->dwFileVersion >= VERSION_160 && ckbp->dwCheckSum == 0) ||
+    if((ckbp->dwFileVersion >= VERSION_160) ||
       /* #7222: We support a zero checksum in Keyman 16.0 and later */
       VerifyChecksum(buf, &kbp->dwCheckSum, sz))
     {
@@ -171,7 +171,8 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 		return FALSE;
 	}
 
-  if(ckbp->dwFileVersion < VERSION_160 || ckbp->dwCheckSum != 0) {
+  if(ckbp->dwFileVersion < VERSION_160) {
+		// #7276: We ignore checksum in Keyman 16.0 and later
 		if(!VerifyChecksum(buf, &kbp->dwCheckSum, sz)) { delete buf; Err("Bad Checksum in file"); return FALSE; }
 	}
 
