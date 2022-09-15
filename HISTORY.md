@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.64 alpha 2022-09-15
+
+* fix(android/engine): Switch keyboard if uninstalling current one (#7291)
+* fix(common/models): fixes quote-adjacent pred-text suggestions (#7205)
+* fix(common/models): max prediction wait check (#7290)
+
 ## 16.0.63 alpha 2022-09-14
 
 * chore(linux): Update debian changelog (#7281)
