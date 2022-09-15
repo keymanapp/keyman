@@ -26,7 +26,7 @@ namespace wordBreakers {
      * Allows definition of extra word-breaking properties for use with custom
      * rules.
      */
-    customProperties?: [string];
+    customProperties?: string[];
   }
 
   /**
