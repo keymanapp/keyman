@@ -28,7 +28,15 @@
     save_state();
 
     if(!loading_state) {
-      var q = document.getElementById('content_'+c.menu_name).getElementsByTagName('span');
+      let q = null;
+      if (c.menu_name.includes("keyboardlist"))
+      {
+        q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item expanded');
+      }
+      if (q == null || q.length == 0)
+      {
+        q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item');
+      }
       for(var i = 0; i < q.length; i++) {
         blah = q[i].id;
         itemtype = blah.substr(0, 5);

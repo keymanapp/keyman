@@ -96,6 +96,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
             if(elem.children[j].tabIndex)
             {
               elem.children[j].focus();
+              list_expanded_selected(elem.children[j]);
               break;
             }
           } while(j != i);
@@ -121,6 +122,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
             if(elem.children[j].tabIndex)
             {
               elem.children[j].focus();
+              list_expanded_selected(elem.children[j]);
               break;
             }
           } while(j != i);
@@ -130,15 +132,15 @@ document.addEventListener("DOMContentLoaded", windowResize);
       break;
     case 37:    // left
     case 109:   // minus
-      var k = document.getElementById('list_detail_'+n);
+      var k = document.getElementById('list_'+n);
       if( !k ) break;
-      if(k.style.display == 'block') list_detail(event,n);
+      if(k.classList.contains('expanded')) list_detail(event,n);
       break;
     case 39:    // right
     case 107:   // plus
-      var k = document.getElementById('list_detail_'+n);
+      var k = document.getElementById('list_'+n);
       if( !k ) break;
-      if(!k.style.display || k.style.display == 'none') list_detail(event,n);
+      if(!k.classList.contains('expanded')) list_detail(event,n);
       break;
     case 93:    // context menu key
       if( document.getElementById('menu_options_'+n) != null ) {
@@ -342,14 +344,16 @@ function keyboard_toggle(n) {
   k.checked = !k.checked;
   if (k.checked){
     btn.value = "Disable";
+    btn.style.background = '#dadddc';
   }
   else{
     btn.value = "Enable";
+    btn.style.background = '#808080';
   }
 
   location.href='keyman:keyboard_clickcheck?id='+n+'&value='+k.checked;
   var liTitle = document.getElementById('listtitle_keyboard_'+n);
-  liTitle.className = k.checked ? 'list_title keyboard_loaded' : 'list_title keyboard_unloaded';
+  liTitle.className = k.checked ? 'list_title keyboard_loaded flex-container-title' : 'list_title keyboard_unloaded flex-container-title';
   li.focus();
   return true;
 }
@@ -364,4 +368,16 @@ function showKeyboardLink(id) {
 function hideKeyboardLink(id) {
   var e = document.getElementById('qrcode-'+id);
   e.className='qrcode';
+}
+
+/* Modify Languages Popup */
+
+function showModifyLink(id) {
+  var e = document.getElementById('modify-'+id);
+  e.className='modify modify-visible';
+}
+
+function hideModifyLink(id) {
+  var e = document.getElementById('modify-'+id);
+  e.className='modify';
 }
