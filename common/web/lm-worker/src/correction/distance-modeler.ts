@@ -653,7 +653,7 @@ namespace correction {
 
         shouldTimeout(): boolean {
           const now = Date.now();
-          if(this.start - now > this.maxTrueTime) {
+          if(now - this.start > this.maxTrueTime) {
             return true;
           }
 
@@ -710,7 +710,7 @@ namespace correction {
 
       let batcher = new BatchingAssistant();
 
-      const timer = new ExecutionTimer(maxTime*3, maxTime);
+      const timer = new ExecutionTimer(maxTime*1.5, maxTime);
 
       // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
       let returnedValues = Object.values(this.returnedValues);
