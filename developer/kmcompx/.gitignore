@@ -1,1 +1,4 @@
 build/
+developer/kmcompx/src/meson - Copy.build
+**/core/tests/unit/kmx/kmx_tests_50/*.kmn
+**/core/tests/unit/kmx/kmx_tests_50/*.kmx
