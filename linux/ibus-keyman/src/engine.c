@@ -70,7 +70,6 @@ struct _IBusKeymanEngine {
     gboolean         lalt_pressed;
     gboolean         ralt_pressed;
     gboolean         emitting_keystroke;
-    IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
 #ifdef GDK_WINDOWING_X11
@@ -262,8 +261,6 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   g_object_ref_sink(keyman->prop_list);
   ibus_prop_list_append(keyman->prop_list, keyman->status_prop);
 
-  keyman->table = ibus_lookup_table_new(9, 0, TRUE, TRUE);
-  g_object_ref_sink(keyman->table);
   keyman->state = NULL;
 #ifdef GDK_WINDOWING_X11
   keyman->xdisplay = NULL;
@@ -469,11 +466,6 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
         keyman->status_prop = NULL;
     }
 
-    if (keyman->table) {
-        g_debug("DAR: unref keyman->table");
-        g_object_unref (keyman->table);
-        keyman->table = NULL;
-    }
     if (keyman->state) {
         km_kbp_state_dispose(keyman->state);
         keyman->state = NULL;
