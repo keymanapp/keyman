@@ -85,6 +85,20 @@
   <!-- Introduced: 7.0.239.0 -->
   <string name="S_Caption_Help" comment="Configuration dialog link to Help">Help</string>
 
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Uninstall</string>
+
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Enable</string>
+
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Disable</string>
 
 
   <!-- Context: Configuration Dialog - Tab names -->

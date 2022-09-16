@@ -143,33 +143,35 @@
                 <xsl:attribute name='onclick'>return keyboard_checkclick('<xsl:value-of select="$id"/>');</xsl:attribute>
                 <xsl:if test='loaded'><xsl:attribute name='checked'>checked</xsl:attribute></xsl:if>
               </input>
-              <input class="kbd_button" type="button" value="Disable">
-                <xsl:attribute name="id">button_<xsl:value-of select="id"/></xsl:attribute>
-                <xsl:attribute name='onclick'>return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:attribute>
-              </input>
+              <xsl:call-template name="button">
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Disable']"/></xsl:with-param>
+                  <xsl:with-param name="command">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
+              </xsl:call-template>
+
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id] and ../../options">
-                <input class="kbd_button" type="button">
-                  <xsl:attribute name="value"><xsl:value-of select="$locale/string[@name='S_Menu_Options']"/></xsl:attribute>
-                  <xsl:attribute name='onclick'>location.href="keyman:keyboard_options?id=<xsl:value-of select="id"/>"</xsl:attribute>
-                  <xsl:attribute name="id">keyboard_button_<xsl:value-of select="id"/></xsl:attribute>
-                </input>
+                <xsl:call-template name="button">
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Menu_Options']"/></xsl:with-param>
+                  <xsl:with-param name="command">keyman:keyboard_options?id=<xsl:value-of select="id"/></xsl:with-param>
+                </xsl:call-template>
               </xsl:if>
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
-                <input class="kbd_button" type="button" value="Help">
-                  <xsl:attribute name='onclick'>location.href="keyman:package_welcome?id=<xsl:value-of select="$package_id" />"</xsl:attribute>
-                  <xsl:attribute name="id">keyboard_button_<xsl:value-of select="id"/></xsl:attribute>
-                </input>
+                <xsl:call-template name="button">
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Help']"/></xsl:with-param>
+                  <xsl:with-param name="command">keyman:package_welcome?id=<xsl:value-of select="$package_id" /></xsl:with-param>
+                </xsl:call-template>
               </xsl:if>
               <xsl:choose>
                 <xsl:when test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
-                  <input class="kbd_button" type="button" value="Uninstall">
-                    <xsl:attribute name="onclick">location.href="keyman:package_uninstall?id=<xsl:value-of select="$package_id"/>"</xsl:attribute>
-                  </input>
+                  <xsl:call-template name="button">
+                    <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Uninstall']"/></xsl:with-param>
+                    <xsl:with-param name="command">keyman:package_uninstall?id=<xsl:value-of select="$package_id"/></xsl:with-param>
+                  </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
-                  <input class="kbd_button" type="button" value="Uninstall">
-                    <xsl:attribute name="onclick">location.href="keyman:keyboard_uninstall?id=<xsl:value-of select="$id"/>"</xsl:attribute>
-                  </input>
+                  <xsl:call-template name="button">
+                    <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Uninstall']"/></xsl:with-param>
+                    <xsl:with-param name="command">keyman:keyboard_uninstall?id=<xsl:value-of select="$id"/></xsl:with-param>
+                  </xsl:call-template>
                 </xsl:otherwise>
               </xsl:choose>
 
@@ -177,6 +179,39 @@
                 <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Languages_Modify']"/></xsl:with-param>
                 <xsl:with-param name="command">javascript:showModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
               </xsl:call-template>
+
+              <xsl:if test="$singlekeyboardpackage = '1' or //KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
+                <xsl:call-template name="button">
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Keyboard_Share']"/></xsl:with-param>
+                  <xsl:with-param name="command">javascript:showKeyboardLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                </xsl:call-template>
+                <div class='qrcode'>
+                  <xsl:attribute name='id'>qrcode-<xsl:value-of select="../../id" /></xsl:attribute>
+                  <div class='qrcode-back'>
+                    <xsl:attribute name="onclick">return hideKeyboardLink('<xsl:value-of select="../../id" />')</xsl:attribute>
+                  </div>
+                  <div class='qrcode-popup'>
+                    <div>
+                      <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="../../id" /></xsl:attribute>
+                    </div>
+                    <div class='qrcode-caption'>
+                      <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>
+                      <a>
+                        <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
+                        <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_Link']"/>
+                      </a>
+                      <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_LinkSuffix']"/>
+                    </div>
+                    <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="../../id"/>"), {
+                        text: '<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id"/>/share',
+                        width: 256,
+                        height: 256
+                      });
+                    </script>
+                  </div>
+                </div>
+              </xsl:if>
+
             </div> <!--- End buttons flex container -->
 
             <div class="flex-vertical-line"> </div><!--- Vertical seperator  -->

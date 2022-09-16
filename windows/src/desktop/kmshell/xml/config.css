@@ -354,8 +354,8 @@ input[type=checkbox]:checked +label {
 .list_item.kbd_list_item.expanded .list_detail
 {
   display: block;
-  animation: growDown 500ms ease-in-out forwards;
-  transform-origin: top center;
+ /* animation: growDown 500ms ease-in-out forwards;
+  transform-origin: top center;*/
 }
 
 
