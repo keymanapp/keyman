@@ -14,6 +14,8 @@ rem		- vietnamese_telex
 rem		- vietnamese_telex_legacy
 rem		- vietnamese_vni
 
-rem dir  /s/b ..\..\..\..\keyboards\release\*.kmn | more |    findstr /v /i  "viet*" |  findstr /v /i  "eKwTamil99UniUpdt" | findstr /v /i  "CERR*"
+rem added CERR_XXXX-Tests to test if right ErrorMessage is sent
+
+dir  /s/b ..\..\..\common\test\keyboards\kmcompx_tests\*.kmn
 dir  /s/b ..\..\..\..\keyboards\release\*.kmn | more |    findstr /v /i  "viet*" |  findstr /v /i  "eKwTamil99UniUpdt"
 
