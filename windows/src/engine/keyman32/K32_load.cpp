@@ -888,7 +888,7 @@ HBITMAP LoadBitmapFileEx(PBYTE filebase)
 }
 
 
-BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz)
+BOOL VerifyKeyboard(LPBYTE filebase, DWORD _kmn_unused(sz))
 {
   DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
