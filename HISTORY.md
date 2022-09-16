@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.65 alpha 2022-09-16
+
+* chore(linux): Remove unused IBusLookupTable (#7296)
+
 ## 16.0.64 alpha 2022-09-15
 
 * fix(android/engine): Switch keyboard if uninstalling current one (#7291)
