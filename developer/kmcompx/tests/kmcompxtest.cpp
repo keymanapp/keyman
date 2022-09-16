@@ -7,9 +7,18 @@
 #include <windows.h>
 #include <stdio.h>
 #include "kmcompx.h"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+//#include <bitset>
+using namespace std;
+
+vector < int > error_vec;
 
 int WINAPI msgproc(int line, KMX_DWORD dwMsgCode, char* szText)
 {
+  error_vec.push_back(dwMsgCode);
   printf("line %d  error %x  %s\n", line, (unsigned int)dwMsgCode, szText);
 	return 1;
 }
@@ -62,5 +71,28 @@ int main(int argc, char *argv[])
     fread(buf2, 1, sz1, fp2);
     return memcmp(buf1, buf2, sz1) ? 3 : 0;
   }
-  else return 1;
+  else  /*if Errors are found - check if errors are tested for */
+  {
+    // check failed tests for Errornumber in Name
+    // e.g. (CERR_4061_balochi_phonetic.kmn contains Error 4061)
+    char* Testname = 1 + strrchr( (char*) argv[1], '\\');
+    char  first5[6] = "CERR_";
+    char* pfirst5 = first5;
+    int   Error_Val = 0;
+    char* ErrNr= 1+strchr(Testname, '_');
+    ErrNr[4] = '\0';
+
+    // Does Testname contain CERR_Nr ?->  Get Value
+    if (strncmp(Testname, pfirst5, 5) == 0) {
+      std::istringstream(ErrNr) >> std::hex >> Error_Val;
+
+      // check if Error_Val is in Array of Errors; if it is found return 0 ( its not an error)
+      for (int i = 0; i < error_vec.size() ; i++) {
+        if (error_vec[i] == Error_Val)
+          return 0;
+      }
+      return 1;
+    }
+  }
+  return 1;
 }
