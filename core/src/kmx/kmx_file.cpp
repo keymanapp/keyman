@@ -4,6 +4,7 @@
 */
 #include "kmx_processevent.h"
 #include <assert.h>
+#include "kmx_file_validator.hpp"
 
 using namespace km::kbp;
 using namespace kmx;
@@ -346,45 +347,55 @@ LPKEYBOARD KMX_ProcessEvent::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 
 #endif
 
-KMX_BOOL KMX_ProcessEvent::VerifyChecksum(PKMX_BYTE buf, size_t sz)
+
+KMX_BOOL KMX_ProcessEvent::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
+{
+  KMX_FileValidator *ckbp = reinterpret_cast<KMX_FileValidator*>(filebase);
+
+  return ckbp->VerifyKeyboard(sz);
+}
+
+KMX_BOOL KMX_FileValidator::VerifyChecksum(size_t sz)
 {
   KMX_DWORD tempcs;
-  PCOMP_KEYBOARD ckbp;
 
-  ckbp = (PCOMP_KEYBOARD) buf;
-
-  if(ckbp->dwFileVersion >= VERSION_160 && ckbp->dwCheckSum == 0) {
+  if(dwFileVersion >= VERSION_160 && dwCheckSum == 0) {
     // #7222: We support a zero checksum in Keyman 16.0 and later
     return TRUE;
   }
 
-  tempcs = ckbp->dwCheckSum;
-  ckbp->dwCheckSum = 0;
+  tempcs = dwCheckSum;
+  dwCheckSum = 0;
 
-  return tempcs == CalculateBufferCRC(sz, buf);
+  KMX_BOOL status = (tempcs == CalculateBufferCRC(sz, (KMX_BYTE*)this));
+
+  dwCheckSum = tempcs;
+
+  return status;
 }
 
-KMX_BOOL KMX_ProcessEvent::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
+
+KMX_BOOL KMX_FileValidator::VerifyKeyboard(size_t sz)
 {
   KMX_DWORD i;
-  PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
   PCOMP_STORE csp;
+  const PKMX_BYTE filebase = (KMX_BYTE*)this;
 
   /* Check file version */
 
-  if(ckbp->dwFileVersion < VERSION_MIN ||
-     ckbp->dwFileVersion > VERSION_MAX)
+  if(dwFileVersion < VERSION_MIN ||
+     dwFileVersion > VERSION_MAX)
   {
     /* Old or new version -- identify the desired program version */
-    if(VerifyChecksum(filebase, sz))
+    if(VerifyChecksum(sz))
     {
-      for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++)
+      for(csp = (PCOMP_STORE)(filebase + dpStoreArray), i = 0; i < cxStoreArray; i++, csp++)
         if(csp->dwSystemID == TSS_COMPILEDVERSION)
         {
           if(csp->dpString == 0)
             DebugLog("errWrongFileVersion:NULL");
           else
-            DebugLog("errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
+            DebugLog("errWrongFileVersion:%10.10ls", KMX_ProcessEvent::StringOffset(filebase, csp->dpString));
           return FALSE;
         }
     }
@@ -392,15 +403,15 @@ KMX_BOOL KMX_ProcessEvent::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
     return FALSE;
   }
 
-  if(!VerifyChecksum(filebase, sz)) { DebugLog("errBadChecksum"); return FALSE; }
+  if(!VerifyChecksum(sz)) { DebugLog("errBadChecksum"); return FALSE; }
 
   // Verify file structure
 
-  if(ckbp->StartGroup[0] != 0xFFFFFFFF && ckbp->StartGroup[0] >= ckbp->cxGroupArray) {
+  if(StartGroup[0] != 0xFFFFFFFF && StartGroup[0] >= cxGroupArray) {
     DebugLog("Invalid ANSI start group index");
     return FALSE;
   }
-  if(ckbp->StartGroup[1] != 0xFFFFFFFF && ckbp->StartGroup[1] >= ckbp->cxGroupArray) {
+  if(StartGroup[1] != 0xFFFFFFFF && StartGroup[1] >= cxGroupArray) {
     DebugLog("Invalid Unicode start group index");
     return FALSE;
   }
