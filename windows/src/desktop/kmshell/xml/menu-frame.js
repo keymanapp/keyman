@@ -17,7 +17,7 @@
   function menuframe_activate(n)
   {
     var p = menuframe_items[menuframe_activeindex], c = menuframe_items[n];
-    var itemtype, blah;
+    var itemtype, list_array;
 
     p.className='menuframe';
     c.className='menuframe_active';
@@ -29,17 +29,16 @@
 
     if(!loading_state) {
       let q = null;
-      if (c.menu_name.includes("keyboardlist"))
-      {
+      if (c.menu_name.includes("keyboardlist")) {
         q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item expanded');
       }
-      if (q == null || q.length == 0)
-      {
+      // if none are expanded select the first item
+      if (q == null || q.length == 0) {
         q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item');
       }
       for(var i = 0; i < q.length; i++) {
-        blah = q[i].id;
-        itemtype = blah.substr(0, 5);
+        list_array = q[i].id;
+        itemtype = list_array.substr(0, 5);
 
         if( itemtype == "list_" ) {
           q[i].focus();

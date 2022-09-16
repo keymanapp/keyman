@@ -27,8 +27,6 @@
   outline: none;
  /* background: #79C3DA;*/
 }
-
-
 #contentframe
 {
   position: absolute;
@@ -46,7 +44,8 @@
   bottom: 0;
   width: 100%;
   overflow: hidden;
-  /*background: #79C3DA;*/
+  /*TODO background: #79C3DA;*/
+  background: #DADDDC;
   padding: 10px 8px 8px 8px;
 }
 
@@ -64,12 +63,14 @@
   padding: 4px;
   color: #000000;
   font-weight: bold;
-  /*background: #79C3DA;*/
+  /*TODO background: #79C3DA;*/
+  background: #DADDDC;
 }
 
 #header-pad
 {
-  /*background: #79C3DA;*/
+  /*TODO background: #79C3DA;*/
+  background: #DADDDC;
   width: 117px;
   height: 40px;
   position: absolute;
@@ -102,7 +103,8 @@
   font-size: 12px;
   padding: 8px 0px 8px 2px;
   border-right: 2px solid #888888;
-  /*background: #79C3DA !important;*/
+  /*TODO background: #79C3DA !important;;*/
+  background: #DADDDC !important;
   border-right: 1px solid #6D6C6F;
 }
 
@@ -128,6 +130,8 @@
 {
   height: 100%;
  /* background: #79C3DA;*/
+  /*TODO background: #79C3DA;*/
+  background: #DADDDC;
   border-right: 1px solid #6D6C6F;
 }
 
@@ -139,7 +143,7 @@
 
 input[type='submit'], input[type='button'], button
 {
-  background: #dadddc;
+  background: #DADDDC;
   border-radius: 4px;
   color: #33333f;
   border: none;
@@ -164,7 +168,6 @@ input.kbd_button:hover, input[type='button']:hover
 {
   background: #79c3da;
 }
-
 
 input[type='submit']:disabled, input[type='button']:disabled, button:disabled
 {
@@ -220,7 +223,9 @@ html
 }
 
 /* List Styles */
-
+.list
+{
+}
 .list_packageitem
 {
   display: block;
@@ -239,24 +244,20 @@ html
   clear: left;
   cursor: default;
 }
-
+/* keyboard list has different properties to the options list */
 .list_item.kbd_list_item
 {
   display: block;
-  /*background: none;*/
-  background: #e0e5ef;
+  background: #DADDDC;
   border-radius: 5px;
   border: 1px solid #808080;
   font-size: 12px;
   margin: 7px;
- /* padding: 4px 0 4px 0;*/
   clear: left;
   cursor: default;
 }
 
-
 .list_item.kbd_list_item:focus{
-  /*background: url("transLightBlue.png") repeat !important;*/
   outline: none;
 }
 
@@ -268,7 +269,6 @@ html
 .no_outline:focus{
   outline: none;
 }
-
 .list_title
 {
   padding: 0 0 0 4px;
@@ -287,21 +287,28 @@ html
   font-weight: bold;
   white-space: nowrap;
 }
-.list_icon
+
+.kbd_list_item .list_icon
 {
   margin: 0px 6px 0px 2px;
 }
+
+.list_icon
+{
+  display: inline;
+  margin: 2px 6px 0px 2px;
+  vertical-align: middle;
+}
+
 .list_detail
 {
 
   background: #ffffff;
-  /*border: solid 1px #79c3da;*/
   clear: both;
   font-size: 11px;
   display: none;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-
 }
 
 .checkbox_hidden
@@ -335,53 +342,28 @@ input[type=checkbox]:checked +label {
   border: 1px solid #dadddc;
 }
 
-/*
-.list_detail > table > tbody > tr > td
-{
-  border: solid 1px #79c3da;
-  vertical-align: top;
+@keyframes growDown {
+  0% {
+      transform: scaleY(0)
+  }
+  100% {
+      transform: scaleY(1)
+  }
 }
-*/
 
 .list_item.kbd_list_item.expanded .list_detail
 {
   display: block;
+  animation: growDown 500ms ease-in-out forwards;
+  transform-origin: top center;
 }
 
-/*
-.list_help
-{
-  float: right;
-  cursor: default;
-  background: url('help20.png') 0 0 no-repeat;
-  width: 20px;
-  height: 20px;
-  margin: 2px 4px 0 0;
-}
-
-.list_close
-{
-  float: right;
-  visibility: visible;
-  cursor: default;
-  background: url('cross20.png') 0 0 no-repeat;
-  width: 20px;
-  height: 20px;
-  margin: 2px 4px 0 0;
-}
-*/
 
 .list_item:hover
 {
   background: #79c3da;
 }
 
-/*
-.expanded .list_close
-{
-  visibility: visible;
-}
-*/
 table tr
 {
   text-align: left;
@@ -404,7 +386,6 @@ table tr
   text-align: center;
   font-size: 12px;
   padding: 8px 0;
- /* background: url(tab-unselected.png) top left no-repeat;*/
 }
 .menuframe_active
 {
@@ -496,12 +477,12 @@ table tr
   margin: 0 8px 0 0;
 }
 
-/* grid & flex styles */
-/* main keyboad lang */
+/* CSS Grid and Flex styles */
+/* main keyboard lang */
 .flex-container
 {
   display: flex;
-  /*justify-content: space-between;*/
+
   align-items: flex-start;
   padding: 5px 0 5px 5px;
 }
@@ -510,10 +491,7 @@ table tr
 {
   display: flex;
   flex-direction: column;
-  /*justify-content: space-between;*/
-  /*align-items: flex-start;*/
   gap: 10px;
-
 }
 
 .flex-container-title
@@ -560,58 +538,30 @@ table tr
   margin: 0px;
   padding: 1px;
   margin: 0 0 0 5px;
-  /*background: #ffffff;*/
-  /*background: #f0f0ff;*/
-}
-
-.grid_debug_text::before
-{
-  content: 'Name:';
-  position: relative;
 }
 
 .grid_item_title{
   font-weight: bold;
 }
-/*
-.grid_item_content{
-
-}
-*/
-
 
 .grid_item_text
 {
-  content: 'blah detail';
+
   position: relative;
   font-size: 11px;
   font-weight: normal;
-
   margin: 0px;
   background: #f0f0ff;
   clear: both;
 }
-/*
-.grid_item:last-child{
 
-  grid-column-start: 3;
-  position: absolute;
-  height: 100%;
-
-
-
-}
-*/
 .grid_col_span_2
 {
   grid-column: span 2;
   padding-top: 10px;
 }
 
-
 .grid_rows_hide{
- /*grid-template-rows: minmax(11px, auto) minmax(11px, auto) minmax(11px, auto) minmax(11px, auto) repeat(10, 0px);*/
-/*    grid-template-rows: 11px 11px 11px 11px 11px repeat(10, 0px); */
 
 }
 
@@ -620,24 +570,10 @@ table tr
   display: none;
 }
 
-/*
-.grid_rows_hide [more]{
-  background: url('expand20.png') 0 0 no-repeat;
-}
-
-.grid_item [more] {
-  background: url('collapse20.png') 0 0 no-repeat;
-}
-*/
-
-/*#more {
-  background: url('collapse20.png') 0 0 no-repeat;
-}*/
-
 /* Keyboard Styles */
 .keyboard_header
 {
-  font-size: 16px;
+  font-size: 14.7px;
   padding:2px;
 }
 .keyboard_hotkey
@@ -717,10 +653,6 @@ table tr
 }
 
 /* keyboard languages */
-/*.keyboard-language-popup
-{
-  display: flex;
-}*/
 .keyboard-language
 {
   display: flex;
@@ -729,7 +661,6 @@ table tr
 .keyboard-language span
 {
   display: inline-block;
- /* vertical-align: middle;*/
 }
 
 .keyboard-language-popup a
@@ -741,7 +672,6 @@ table tr
 .keyboard-language-pop-up a img
 {
   border: none;
-  /*vertical-align: middle;*/
 }
 
 .keyboard-language:hover
@@ -755,10 +685,6 @@ table tr
   visibility: visible;
 }
 
-/*.list-languages-add
-{
-  margin: 4px 6px;
-}*/
 
 .language-icon
 {
@@ -768,9 +694,7 @@ table tr
   display: inline-block;
   margin: 0 4px 0 0;
   background: #cccccc;
-
   text-align: center;
-
 }
 
 /* option styles */
@@ -1255,6 +1179,13 @@ th
   text-align: center;
   z-index: 101;
   padding: 10px;
+}
+
+.qrcode .qrcode-caption {
+  display: block;
+  white-space: normal;
+  font-size: 12pt;
+  padding: 8px;
 }
 
 /* Modify Languages */

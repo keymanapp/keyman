@@ -132,15 +132,29 @@ document.addEventListener("DOMContentLoaded", windowResize);
       break;
     case 37:    // left
     case 109:   // minus
-      var k = document.getElementById('list_'+n);
-      if( !k ) break;
-      if(k.classList.contains('expanded')) list_detail(event,n);
+      {
+        let keyboard_name = n.substring(9); // remove keyboard_ from element name
+        let kbd_grid = document.getElementById('keyboard_grid_'+keyboard_name);
+        if( !kbd_grid ) break;
+        let kbd_list = document.getElementById('list_'+n);
+        if( !kbd_list ) break;
+        if(!kbd_list.classList.contains('expanded')) break;
+        ///  hide more details for the expanded list
+        if ($(kbd_grid).hasClass('grid_rows_hide')) more_detail(kbd_grid.id);
+      }
       break;
     case 39:    // right
     case 107:   // plus
-      var k = document.getElementById('list_'+n);
-      if( !k ) break;
-      if(!k.classList.contains('expanded')) list_detail(event,n);
+      {
+        let keyboard_name = n.substring(9); // remove keyboard_ from element name
+        let kbd_grid = document.getElementById('keyboard_grid_'+keyboard_name);
+        if( !kbd_grid ) break;
+        let kbd_list = document.getElementById('list_'+n);
+        if( !kbd_list ) break;
+        if(!kbd_list.classList.contains('expanded')) break;
+        ///  show more details for the expanded list
+        if (!$(kbd_grid).hasClass('grid_rows_hide')) more_detail(kbd_grid.id);
+      }
       break;
     case 93:    // context menu key
       if( document.getElementById('menu_options_'+n) != null ) {
@@ -196,7 +210,6 @@ document.addEventListener("DOMContentLoaded", windowResize);
 
   function list_detail(event,n) {
     var k = document.getElementById('list_'+n);
-    //$(k).toggleClass('expanded');
     list_expanded_selected (k);
     k.focus();
     save_state();
@@ -207,14 +220,10 @@ document.addEventListener("DOMContentLoaded", windowResize);
     if(loading_state) return;
     var keyboards = $('div.list_item');
     keyboards.each(function(index) {
-      //const name = $(this).data('name');
-      //if(name = n) {
-      if(this.id == n.id){
-        //$(this).addClass('expanded');
+      if(this.id == n.id) {
         $(this).toggleClass('expanded');
       }
-      else
-      {
+      else {
         $(this).removeClass('expanded');
       }
     });
@@ -230,7 +239,6 @@ document.addEventListener("DOMContentLoaded", windowResize);
     else {
       $(m).attr("src","/app/collapse20.png");
     }
-    //document.querySelector('.grid-container').classList.toggle("grid_rows_hide");
   }
 
   var loading_state = false;
@@ -346,7 +354,7 @@ function keyboard_toggle(n) {
     btn.value = "Disable";
     btn.style.background = '#dadddc';
   }
-  else{
+  else {
     btn.value = "Enable";
     btn.style.background = '#808080';
   }
@@ -371,12 +379,10 @@ function hideKeyboardLink(id) {
 }
 
 /* Modify Languages Popup */
-
 function showModifyLink(id) {
   var e = document.getElementById('modify-'+id);
   e.className='modify modify-visible';
 }
-
 function hideModifyLink(id) {
   var e = document.getElementById('modify-'+id);
   e.className='modify';
