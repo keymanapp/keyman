@@ -207,7 +207,9 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
     return CERR_SomewhereIGotItWrong;
   }
 
-	SetChecksum(buf, &ck->dwCheckSum, size);
+	if (ck->dwFileVersion < VERSION_160) {
+		SetChecksum(buf, &ck->dwCheckSum, size);
+	}
 
 	WriteFile(hOutfile, buf, size, &offset, NULL);
 

@@ -23,16 +23,7 @@ public:
    * @param sz total size of keyboard structure
    * @return KMX_BOOL
    */
-  KMX_BOOL VerifyKeyboard(std::size_t sz);
-private:
-  /**
-   * @brief Validate checksum of the entire file
-   * Non const because the checksum gets cleared
-   *
-   * @param sz
-   * @return KMX_BOOL
-   */
-  KMX_BOOL VerifyChecksum(std::size_t sz);
+  KMX_BOOL VerifyKeyboard(std::size_t sz) const;
 };
 
 

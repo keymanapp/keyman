@@ -27,7 +27,6 @@
 
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWORD *cbBitmap);
 
-extern BOOL VerifyChecksum(LPBYTE buf, LPDWORD CheckSum, DWORD sz);
 void Err(char *p);
 int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *filename, char *bmpfile);
 int run(int argc, char *argv[]);
@@ -152,9 +151,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 	   ckbp->dwFileVersion > VERSION_MAX)
 	{
 		/* Old or new version -- identify the desired program version */
-    if((ckbp->dwFileVersion >= VERSION_160) ||
-      /* #7222: We support a zero checksum in Keyman 16.0 and later */
-      VerifyChecksum(buf, &kbp->dwCheckSum, sz))
+    if(ckbp->dwFileVersion >= VERSION_160)
     {
 			kbp->dpStoreArray = (LPSTORE) (buf + ckbp->dpStoreArray);
 			for(sp = kbp->dpStoreArray, i = 0; i < kbp->cxStoreArray; i++, sp++)
@@ -169,11 +166,6 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 		}
 		delete buf; Err("Unknown File Version: try using the latest version of KMDECOMP");
 		return FALSE;
-	}
-
-  if(ckbp->dwFileVersion < VERSION_160) {
-		// #7276: We ignore checksum in Keyman 16.0 and later
-		if(!VerifyChecksum(buf, &kbp->dwCheckSum, sz)) { delete buf; Err("Bad Checksum in file"); return FALSE; }
 	}
 
 	kbp->dpStoreArray = (LPSTORE) (buf + ckbp->dpStoreArray);

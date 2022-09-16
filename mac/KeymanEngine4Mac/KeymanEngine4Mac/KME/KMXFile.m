@@ -28,10 +28,6 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
             return nil;
         }
 
-        if (![[self class] verifyCheckSum:path]) {
-            NSLog(@"errBadChecksum");
-            return nil;
-        }
 
         NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
         if (file == nil) {
@@ -56,7 +52,6 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
 
         _identifier = cmp_kb.dwIdentifier;
         _fileVersion = cmp_kb.dwFileVersion;
-        _checkSum = cmp_kb.dwCheckSum;
         _keyboardID = cmp_kb.KeyboardID;
         _isRegistered = (cmp_kb.IsRegistered == 0?NO:YES);
         _version = cmp_kb.version;
@@ -171,10 +166,6 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
         return nil;
     }
 
-    if (![[self class] verifyCheckSum:path]) {
-        NSLog(@"errBadChecksum");
-        return nil;
-    }
 
     struct COMP_KEYBOARD cmp_kb;
     [file seekToFileOffset:0];
@@ -261,73 +252,5 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     return mStr;
 }
 
-#pragma mark - CRC32
-
-+ (BOOL)verifyCheckSum:(NSString *)path {
-    if (cmp_kb.dwFileVersion >= VERSION_160) {
-        return YES; // #7276: We ignore checksum in Keyman 16.0 and later
-    }
-    NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
-    if (file == nil) {
-        //NSLog(@"Failed to open file");
-        return NO;
-    }
-
-    [file seekToFileOffset:0];
-    NSMutableData *dataBuffer = [[file readDataToEndOfFile] mutableCopy];
-    [dataBuffer replaceBytesInRange:NSMakeRange(8, 4) withBytes:0 length:4]; // set dwCheckSum = 0 before calculating CRC32
-    unsigned long crc = [self getCRC32:dataBuffer];
-
-    struct COMP_KEYBOARD cmp_kb;
-    [file seekToFileOffset:0];
-    size_t size = sizeof(cmp_kb);
-    dataBuffer = [[file readDataOfLength:size] mutableCopy];
-    [dataBuffer getBytes:&cmp_kb length:size];
-    [file closeFile];
-
-    return (crc == cmp_kb.dwCheckSum);
-}
-
-#define CRC32_POLYNOMIAL    0xEDB88320L
-unsigned long CRCTable[256];
-
-+ (void)buildCRCTable {
-    static BOOL tableBuilt = FALSE;
-    int i;
-    int j;
-    unsigned long crc;
-
-    if (!tableBuilt) {
-        for (i = 0; i <= 255; i++) {
-            crc = i;
-
-            for (j = 8; j > 0; j--)
-                if(crc & 1) crc = (crc >> 1) ^ CRC32_POLYNOMIAL; else crc >>= 1;
-
-            CRCTable[i] = crc;
-        }
-    }
-}
-
-+ (unsigned long)calculateBufferCRC:(unsigned long)count pointer:(Byte *)p {
-    unsigned long temp1;
-    unsigned long temp2;
-    unsigned long crc = 0xFFFFFFFFL;
-
-    [self buildCRCTable];
-
-    while (count-- != 0) {
-        temp1 = ( crc >> 8 ) & 0x00FFFFFFL;
-        temp2 = CRCTable[((int) crc ^ *p++) & 0xff];
-        crc = temp1 ^ temp2;
-    }
-
-    return crc;
-}
-
-+ (unsigned long)getCRC32:(NSData *)data {
-    Byte *bytes = (Byte *)[data bytes];
-    return [self calculateBufferCRC:[data length] pointer:bytes];
-}
 
 @end

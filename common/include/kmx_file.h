@@ -322,7 +322,7 @@ struct COMP_KEYBOARD {
 
   KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard. DEPRECATED/Ignored in 16.0 and following.
+  KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard. DEPRECATED as of 16.0
   KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   KMX_DWORD IsRegistered;   // 0010
   KMX_DWORD version;        // 0014 keyboard version

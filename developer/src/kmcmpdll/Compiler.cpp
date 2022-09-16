@@ -3327,7 +3327,9 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
     return CERR_SomewhereIGotItWrong;
   }
 
-  SetChecksum(buf, &ck->dwCheckSum, (DWORD)size);
+  if (ck->dwFileVersion < VERSION_160) {
+    SetChecksum(buf, &ck->dwCheckSum, (DWORD)size);
+  }
 
   DWORD dwBytesWritten = 0;
   WriteFile(hOutfile, buf, (DWORD)size, &dwBytesWritten, NULL);
