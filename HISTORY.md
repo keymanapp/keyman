@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.66 alpha 2022-09-17
+
+* chore: improve auto labeling (#7288)
+
 ## 16.0.65 alpha 2022-09-16
 
 * chore(linux): Remove unused IBusLookupTable (#7296)
