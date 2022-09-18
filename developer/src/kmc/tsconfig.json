@@ -1,27 +1,25 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "./tsconfig.kmc-base.json",
 
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2020",
-    "moduleResolution": "node",
-    "sourceMap": true,
     "outDir": "build/src/",
     "rootDir": "src/",
-    "declaration": true,
-    "alwaysStrict": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "noImplicitAny": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
-    "noUnusedLocals": true
+    "baseUrl": ".",
+    "paths": {
+      "@keymanapp/kmc-keyboard": [ "../kmc-keyboard/src/main" ],
+      "@keymanapp/kmc-model": [ "../kmc-model/src/main" ],
+      "@keymanapp/kmc-model-info": [ "../kmc-model-info/src/model-info-compiler" ],
+      "@keymanapp/kmc-package": [ "../kmc-package/src/kmp-compiler" ],
+    }
   },
   "include": [
     "src/**/*.ts"
   ],
   "references": [
-    { "path": "../../../common/web/keyman-version" },
-    { "path": "../../../core/include/ldml/"}
+    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../kmc-keyboard" },
+    { "path": "../kmc-model" },
+    { "path": "../kmc-model-info" },
+    { "path": "../kmc-package" },
   ]
 }

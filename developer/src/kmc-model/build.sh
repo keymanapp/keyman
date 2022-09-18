@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Compiles the developer tools, including the language model compilers.
+# Compiles the kmc lexical model compiler.
 #
 
 # Exit on command failure and when using unset variables:
@@ -16,14 +16,12 @@ cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-builder_describe "Build Keyman Keyboard Compiler kmc" \
-  "configure                 runs 'npm ci' on root folder" \
-  "build                     (default) builds kmc to build/" \
-  "clean                     cleans build/ folder" \
-  "bundle                    creates a bundled version of kmc" \
-  "test                      run automated tests for kmc" \
+builder_describe "Build Keyman kmc Lexical Model Compiler module" \
+  "configure" \
+  "build" \
+  "clean" \
+  "test" \
   "publish                   publish to npm" \
-  "--build-path=BUILD_PATH   build directory for bundle" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_parse "$@"
@@ -33,12 +31,7 @@ builder_parse "$@"
 if builder_has_action clean; then
   rm -rf ./build/ ./tsconfig.tsbuildinfo
   builder_report success clean
-else
-  # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
-  mkdir -p "$THIS_SCRIPT_PATH/build/src/"
-  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
 fi
-
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +43,10 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_has_action build; then
+  # Note: build-cjs only emits lexical-model-compiler.cjs at this time, as that
+  # is the only file required by other non-ES modules
+  # (common/web/input-processor tests)
+  mkdir -p build/cjs-src
   npm run build
   builder_report success build
 fi
@@ -57,23 +54,8 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_has_action test; then
-  # npm test -- no tests as yet
+  npm test
   builder_report success test
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_has_action bundle; then
-  if ! builder_has_option --build-path; then
-    builder_report "Parameter --build-path is required" bundle
-    exit 64
-  fi
-
-  mkdir -p build/cjs-src
-  npm run bundle
-  cp build/cjs-src/* "$BUILD_PATH"
-
-  builder_report success bundle
 fi
 
 #-------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,19 @@
+{
+  "extends": "../../kmc/tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+      "rootDir": ".",
+      "rootDirs": ["./", "../src/"],
+      "outDir": "../build/test",
+      "baseUrl": ".",
+      "strictNullChecks": false, // TODO: get rid of this as some point
+  },
+  "include": [
+      "**/test-*.ts",
+      "./helpers/index.ts"
+  ],
+  "references": [
+      { "path": "../../../../common/web/keyman-version/tsconfig.esm.json" },
+      { "path": "../" }
+    ]
+}

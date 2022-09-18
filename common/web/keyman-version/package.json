@@ -2,7 +2,10 @@
   "name": "@keymanapp/keyman-version",
   "description": "Keyman global version data",
   "main": "./build/index.js",
-  "exports": "./build/index.js",
+  "exports": {
+    ".": "./build/index.js",
+    "./keyman-version.mjs": "./build/keyman-version.mjs"
+  },
   "scripts": {
     "build": "echo 'Building @keymanapp/keyman-version' && tsc -b",
     "clean": "tsc -b --clean"

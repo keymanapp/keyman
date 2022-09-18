@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Compiles the developer tools, including the language model compilers.
+# Compiles the kmc keyboard compiler.
 #
 
 # Exit on command failure and when using unset variables:
@@ -16,14 +16,13 @@ cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-builder_describe "Build Keyman Keyboard Compiler kmc" \
-  "configure                 runs 'npm ci' on root folder" \
-  "build                     (default) builds kmc to build/" \
-  "clean                     cleans build/ folder" \
-  "bundle                    creates a bundled version of kmc" \
-  "test                      run automated tests for kmc" \
+builder_describe "Build Keyman kmc Keyboard Compiler module" \
+  "configure" \
+  "build" \
+  "clean" \
+  "test" \
+  "build-fixtures            builds test fixtures for manual examination" \
   "publish                   publish to npm" \
-  "--build-path=BUILD_PATH   build directory for bundle" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_parse "$@"
@@ -38,7 +37,6 @@ else
   mkdir -p "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
 fi
-
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -56,24 +54,24 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action test; then
-  # npm test -- no tests as yet
-  builder_report success test
+if builder_has_action build-fixtures; then
+  # Build basic.kmx and emit its checksum
+  mkdir -p ./build/test/fixtures
+  node . ./test/fixtures/basic.xml --no-compiler-version --debug --out-file ./build/test/fixtures/basic-xml.kmx
+  printf "${COLOR_GREY}Checksum for basic-xml.kmx: ${COLOR_PURPLE}%s${COLOR_RESET}\n" \
+    "$(xxd -g 1 -l 12 ./build/test/fixtures/basic-xml.kmx | cut -d' ' -f 10-13)"
+
+  # Generate a binary file from basic.txt for comparison purposes
+  node ../../../common/tools/hextobin/build/hextobin.js ./test/fixtures/basic.txt ./build/test/fixtures/basic-txt.kmx
+
+  builder_report success build-fixtures
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action bundle; then
-  if ! builder_has_option --build-path; then
-    builder_report "Parameter --build-path is required" bundle
-    exit 64
-  fi
-
-  mkdir -p build/cjs-src
-  npm run bundle
-  cp build/cjs-src/* "$BUILD_PATH"
-
-  builder_report success bundle
+if builder_has_action test; then
+  npm test
+  builder_report success test
 fi
 
 #-------------------------------------------------------------------------------------------------------------------

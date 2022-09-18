@@ -6,7 +6,7 @@
 
 # ----------------------------------------------------------------------
 
-DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj kmlmc.wixobj server.wixobj kmc.wixobj
+DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj server.wixobj kmc.wixobj
 
 setup:
 #
@@ -60,7 +60,7 @@ clean:
     -del /Q xml.wxs
     -del /Q cef.wxs
     -del /Q templates.wxs
-    -del /Q kmlmc.wxs
+    -del /Q kmc.wxs
 
 test-releaseexists:
     cd $(DEVELOPER_ROOT)\src\inst

@@ -1,11 +1,10 @@
 #
-# Keyman Developer - next generation compiler Makefile
+# Keyman Developer - kmc Model-Info Compiler Makefile
 #
 
 !include ..\Defines.mak
 
-# We don't depend on configure here because kmc-keyboard does that already,
-# called from parent folder Makefile
+# We don't depend on configure here because kmc-keyboard does that already
 build: .virtual
     $(GIT_BASH_FOR_KEYMAN) build.sh build
 
