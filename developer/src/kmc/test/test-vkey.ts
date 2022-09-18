@@ -27,7 +27,7 @@ describe('vkey compiler', function () {
     let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/redundant.xml', callbacks) as Vkey;
     assert.isNotNull(vkey);
     assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], CompilerMessages.Hint_VkeyMapIsRedundant('A'));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Hint_VkeyMapIsRedundant({vkey: 'A'}));
   });
 
   it('should report an info message if same target found', function() {
@@ -35,7 +35,7 @@ describe('vkey compiler', function () {
     let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/same-target.xml', callbacks) as Vkey;
     assert.isNotNull(vkey);
     assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], CompilerMessages.Info_MultipleVkeyMapsHaveSameTarget('Q'));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Info_MultipleVkeyMapsHaveSameTarget({vkey: 'Q'}));
   });
 
   it('should error on invalid "from" vkey', function() {
@@ -43,8 +43,8 @@ describe('vkey compiler', function () {
     let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-from-vkey.xml', callbacks) as Vkey;
     assert.isNull(vkey);
     assert.equal(callbacks.messages.length, 2);
-    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_VkeyIsNotValid('q'));
-    assert.deepEqual(callbacks.messages[1], CompilerMessages.Error_VkeyIsNotValid('HYFEN'));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_VkeyIsNotValid({vkey: 'q'}));
+    assert.deepEqual(callbacks.messages[1], CompilerMessages.Error_VkeyIsNotValid({vkey: 'HYFEN'}));
   });
 
   it('should error on invalid "to" vkey', function() {
@@ -52,7 +52,7 @@ describe('vkey compiler', function () {
     let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-to-vkey.xml', callbacks) as Vkey;
     assert.isNull(vkey);
     assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_VkeyIsNotValid('A-ACUTE'));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_VkeyIsNotValid({vkey: 'A-ACUTE'}));
   });
 
   it('should error on repeated vkeys', function() {
@@ -60,7 +60,7 @@ describe('vkey compiler', function () {
     let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-repeated-vkey.xml', callbacks) as Vkey;
     assert.isNull(vkey);
     assert.equal(callbacks.messages.length, 1);
-    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_VkeyMapIsRepeated('A'));
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_VkeyMapIsRepeated({vkey: 'A'}));
   });
 });
 

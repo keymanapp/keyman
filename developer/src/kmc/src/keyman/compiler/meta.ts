@@ -24,9 +24,13 @@ export class MetaCompiler extends SectionCompiler {
     if(versionNumber !== undefined) {
       if(versionNumber.match(/^[=v]/i)) {
         // semver ignores a preceding '=' or 'v'
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidVersion({ version: versionNumber }));
         return false;
       }
-      return !!semver.parse(versionNumber, {loose: false, includePrerelease: true});
+      if(!semver.parse(versionNumber, {loose: false, includePrerelease: true})) {
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidVersion({ version: versionNumber }));
+        return false;
+      }
     }
     return true;
   }
@@ -48,7 +52,7 @@ export class MetaCompiler extends SectionCompiler {
     result.layout        = sections.strs.allocString(this.keyboard.info?.layout);
     result.normalization = sections.strs.allocString(this.keyboard.info?.normalization);
     result.indicator     = sections.strs.allocString(this.keyboard.info?.indicator);
-    result.version       = sections.strs.allocString(this.keyboard.version?.number ?? "0");
+    result.version       = sections.strs.allocString(this.keyboard.version?.number ?? "0.0.0");
     result.settings =
       (this.keyboard.settings?.fallback == "omit" ? KeyboardSettings.fallback : 0) |
       (this.keyboard.settings?.transformFailure == "omit" ? KeyboardSettings.transformFailure : 0) |

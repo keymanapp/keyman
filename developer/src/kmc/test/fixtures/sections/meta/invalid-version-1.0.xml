@@ -2,15 +2,11 @@
 
 <!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
-  <version number="1.2.3" />
-
-  <info author="The Keyman Team" indicator="QW" layout="QWIRKY" normalization="NFC" />
+  <version number="1.0" /> <!-- invalid because it's not "1.0.0" as required by semver -->
 
   <names>
-    <name value="meta-maximal" />
+    <name value="meta-minimal" />
   </names>
-
-  <settings fallback="omit" transformFailure="omit" transformPartial="hide" />
 
   <keys />
 </keyboard>
