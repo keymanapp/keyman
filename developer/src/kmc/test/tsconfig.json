@@ -16,6 +16,7 @@
         "./helpers/index.ts"
     ],
     "references": [
+        { "path": "../../../../common/web/keyman-version" },
         { "path": "../" }
       ]
 }

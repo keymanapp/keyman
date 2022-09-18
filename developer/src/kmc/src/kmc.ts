@@ -7,10 +7,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as program from 'commander';
 
+import CompilerOptions from './keyman/compiler/compiler-options';
 import Compiler from './keyman/compiler/compiler';
 import KMXBuilder from './keyman/kmx/kmx-builder';
 import { CompilerMessages } from './keyman/compiler/messages';
 import { CompilerEvent } from './keyman/compiler/callbacks';
+import KMXPlusMetadataCompiler from './keyman/compiler/metadata-compiler';
 
 let inputFilename: string;
 
@@ -22,7 +24,9 @@ program
   .version(KEYMAN_VERSION.VERSION_WITH_TAG)
   .arguments('<infile>')
   .action((infile:any) => inputFilename = infile)
-  .option('-o, --outFile <filename>', 'where to save the resulting .kmx file');
+  .option('-d, --debug', 'Include debug information in output')
+  .option('--no-compiler-version', 'Exclude compiler version metadata from output')
+  .option('-o, --out-file <filename>', 'where to save the resulting .kmx file');
 
 program.parse(process.argv);
 
@@ -51,9 +55,9 @@ class CompilerCallbacks {
   }
 }
 
-function compileKeyboard(inputFilename: string): Uint8Array {
+function compileKeyboard(inputFilename: string, options: CompilerOptions): Uint8Array {
   const c = new CompilerCallbacks();
-  const k = new Compiler(c);
+  const k = new Compiler(c, options);
   let source = k.load(inputFilename);
   if(!source) {
     return null;
@@ -66,13 +70,22 @@ function compileKeyboard(inputFilename: string): Uint8Array {
     return null;
   }
 
+  // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
+  // to duplicate some of the metadata
+  KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, options);
+
   // Use the builder to generate the binary output file
-  let builder = new KMXBuilder(kmx, true);
+  let builder = new KMXBuilder(kmx, options.debug);
   return builder.compile();
 }
 
+let options: CompilerOptions = {
+  debug: program.debug ?? false,
+  addCompilerVersion: program.compilerVersion ?? true
+}
+
 // Compile:
-let code = compileKeyboard(inputFilename);
+let code = compileKeyboard(inputFilename, options);
 
 // Output:
 

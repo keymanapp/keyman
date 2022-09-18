@@ -60,7 +60,7 @@ fi
 if builder_has_action build-fixtures; then
   # Build basic.kmx and emit its checksum
   mkdir -p ./build/test/fixtures
-  node . ./test/fixtures/basic.xml -o ./build/test/fixtures/basic-xml.kmx
+  node . ./test/fixtures/basic.xml --no-compiler-version --debug --out-file ./build/test/fixtures/basic-xml.kmx
   printf "${COLOR_GREY}Checksum for basic-xml.kmx: ${COLOR_PURPLE}%s${COLOR_RESET}\n" \
     "$(xxd -g 1 -l 12 ./build/test/fixtures/basic-xml.kmx | cut -d' ' -f 10-13)"
 
