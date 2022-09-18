@@ -25,7 +25,7 @@ foreach kbd : tests
   )
 
   configure_file(
-    command: kmc_cmd + ['@INPUT@', '--outFile', '@OUTPUT@'],
+    command: kmc_cmd + ['@INPUT@', '--out-file', '@OUTPUT@'],
     output: kbd + '.kmx',
     input: kbd + '.xml'
   )
