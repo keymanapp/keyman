@@ -82,7 +82,8 @@ heat-server:
 heat-kmc:
     cd $(DEVELOPER_ROOT)\src\kmc
 # Build the distributable package
-    $(GIT_BASH_FOR_KEYMAN) build.sh bundle --build-path "$(KEYMAN_WIX_TEMP_BASE)"
+    mkdir $(KEYMAN_WIX_TEMP_KMC)
+    $(GIT_BASH_FOR_KEYMAN) build.sh bundle --build-path "$(KEYMAN_WIX_TEMP_KMC)"
 
 # Build the .wxs file
     cd $(DEVELOPER_ROOT)\src\inst
