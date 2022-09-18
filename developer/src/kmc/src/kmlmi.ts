@@ -3,15 +3,16 @@
  * kmlmi - Keyman Lexical Model model_info Compiler
  */
 
-import * as program from 'commander';
 import * as fs from 'fs';
 import * as path from 'path';
-import KmpCompiler from './package-compiler/kmp-compiler';
-import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from './model-info-compiler/model-info-compiler';
+import { Command } from 'commander';
+import KmpCompiler from '@keymanapp/kmc-package';
+import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
 import { SysExits } from './util/sysexits';
-const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
+import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
 
 let inputFilename: string;
+const program = new Command();
 
 /* Arguments */
 program
@@ -60,10 +61,15 @@ let modelInfoOptions: ModelInfoOptions = {
   kmpFileName: kmpFilename
 };
 
-writeMergedModelMetadataFile(
-  inputFilename,
-  outputFilename,
-  modelInfoOptions);
+try {
+  writeMergedModelMetadataFile(
+    inputFilename,
+    outputFilename,
+    modelInfoOptions);
+} catch(e) {
+  console.error(e);
+  process.exit(SysExits.EX_DATAERR);
+}
 
 function exitDueToUsageError(message: string): never  {
   console.error(`${program._name}: ${message}`);

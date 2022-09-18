@@ -3,13 +3,14 @@
  * kmlmp - Keyman Lexical Model Package Compiler
  */
 
-import * as program from 'commander';
 import * as fs from 'fs';
-import KmpCompiler from './package-compiler/kmp-compiler';
+import { Command } from 'commander';
+import KmpCompiler from '@keymanapp/kmc-package';
 import { SysExits } from './util/sysexits';
-const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
+import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
 
 let inputFilename: string;
+const program = new Command();
 
 /* Arguments */
 program

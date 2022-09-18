@@ -1,23 +1,18 @@
 #!/usr/bin/env node
 /**
- * kmc - Keyman LDML Keyboard Compiler
+ * kmc - Keyman Next Generation Compiler
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as program from 'commander';
 
-import CompilerOptions from './keyman/compiler/compiler-options';
-import Compiler from './keyman/compiler/compiler';
-import KMXBuilder from './keyman/kmx/kmx-builder';
-import { CompilerMessages } from './keyman/compiler/messages';
-import { CompilerEvent } from './keyman/compiler/callbacks';
-import KMXPlusMetadataCompiler from './keyman/compiler/metadata-compiler';
+import { Command } from 'commander';
+import * as kmc from '@keymanapp/kmc-keyboard';
+import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
 
 let inputFilename: string;
 
-const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
-
+const program = new Command();
 /* Arguments */
 program
   .description('Compiles Keyman LDML keyboards')
@@ -47,17 +42,18 @@ class CompilerCallbacks {
     // TODO: translate filename based on the baseFilename
     return fs.readFileSync(filename);
   }
-  reportMessage(event: CompilerEvent): void {
-    console.log(CompilerMessages.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
+  reportMessage(event: kmc.CompilerEvent): void {
+    console.log(kmc.CompilerMessages.severityName(event.code) + ' ' + event.code.toString(16) + ': ' + event.message);
   }
   loadLdmlKeyboardSchema(): Buffer {
-    return fs.readFileSync(path.join(__dirname, 'ldml-keyboard.schema.json'));
+    let schemaPath = new URL('ldml-keyboard.schema.json', import.meta.url);
+    return fs.readFileSync(schemaPath);
   }
 }
 
-function compileKeyboard(inputFilename: string, options: CompilerOptions): Uint8Array {
+function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): Uint8Array {
   const c = new CompilerCallbacks();
-  const k = new Compiler(c, options);
+  const k = new kmc.Compiler(c, options);
   let source = k.load(inputFilename);
   if(!source) {
     return null;
@@ -72,14 +68,14 @@ function compileKeyboard(inputFilename: string, options: CompilerOptions): Uint8
 
   // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
   // to duplicate some of the metadata
-  KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, options);
+  kmc.KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, options);
 
   // Use the builder to generate the binary output file
-  let builder = new KMXBuilder(kmx, options.debug);
+  let builder = new kmc.KMXBuilder(kmx, options.debug);
   return builder.compile();
 }
 
-let options: CompilerOptions = {
+let options: kmc.CompilerOptions = {
   debug: program.debug ?? false,
   addCompilerVersion: program.compilerVersion ?? true
 }

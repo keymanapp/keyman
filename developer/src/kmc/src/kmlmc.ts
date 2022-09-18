@@ -2,17 +2,15 @@
 /**
  * kmlmc - Keyman Lexical Model Compiler
  */
-/// <reference path="lexical-model-compiler/lexical-model.ts" />
 
 import * as fs from 'fs';
-import * as program from 'commander';
-
-import { compileModel } from './util/util';
+import { Command } from 'commander';
+import { compileModel } from '@keymanapp/kmc-model';
 import { SysExits } from './util/sysexits';
+import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
 
 let inputFilename: string;
-
-const KEYMAN_VERSION = require("@keymanapp/keyman-version").KEYMAN_VERSION;
+const program = new Command();
 
 /* Arguments */
 program
@@ -29,8 +27,19 @@ if (!inputFilename) {
   exitDueToUsageError('Must provide a lexical model source file.');
 }
 
+let code = null;
 // Compile:
-let code = compileModel(inputFilename);
+try {
+  code = compileModel(inputFilename);
+} catch(e) {
+  console.error(e);
+  process.exit(SysExits.EX_DATAERR);
+}
+
+if(!code) {
+  console.error('Compilation failed.')
+  process.exit(SysExits.EX_DATAERR);
+}
 
 // Output:
 if (program.outFile) {
