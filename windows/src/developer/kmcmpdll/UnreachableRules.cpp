@@ -25,6 +25,8 @@ DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;
   DWORD i;
 
+  int oldCurrentLine = currentLine;
+
   std::unordered_map<std::wstring, FILE_KEY> map;
   std::unordered_set<int> reportedLines;
 
@@ -43,6 +45,8 @@ DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       map.insert({ key, *kp });
     }
   }
+
+  currentLine = oldCurrentLine;
 
   return CERR_None;
 }
