@@ -79,6 +79,22 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       KMManager.KMDefault_KeyboardFont,
       KMManager.KMDefault_KeyboardFont);
     KMManager.addKeyboard(this, platformtestKBbInfo);
+
+    // Final K_ENTER test keyboard
+    Keyboard finalKBInfo = new Keyboard(
+      "final",
+      "final",
+      "final Keyboard",
+      "en",
+      "English",
+      "1.0",
+      "",
+      "",
+      true,
+      KMManager.KMDefault_KeyboardFont,
+      KMManager.KMDefault_KeyboardFont);
+    KMManager.addKeyboard(this, finalKBInfo);
+
   }
 
   @Override
