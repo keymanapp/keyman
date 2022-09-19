@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 16.0.67 alpha 2022-09-19
+
+* fix(common/models): blocks full-text "corrections"  ️ (#7241)
+* change(web): better fat-finger key weighting  ️ (#7242)
+* fix(web): fixes unintended auto-acceptance of suggestion after reverting (#7305)
+* feat(common/models): wordbreaker customization (#7279)
+* fix(common/models): fixes reference dropped by git merge (#7313)
+* test(android): Add final keyboard to test K_ENTER rule (#7303)
+* chore(common): Update to Unicode 15.0 (#7302)
+* chore(common): update auto labeler configuration (#7316)
+* chore(common): make scripts executable and add pre-commit test (#7317)
+* chore(deps): bump nanoid and mocha (#7307)
+* chore(common): remove unused ncc dependency (#7318)
+
 ## 16.0.66 alpha 2022-09-17
 
 * chore: improve auto labeling (#7288)
