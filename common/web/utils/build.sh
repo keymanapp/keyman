@@ -11,41 +11,42 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-display_usage ( ) {
-    echo "build.sh [-skip-package-install]"
-    echo
-    echo "  -skip-package-install  skips the \`npm install\` dependency check."
-    echo "                            (or -S) Intended for use when this script is called by another build script."
-    echo ""
-    echo "  If more than one target is specified, the last one will take precedence."
-    exit 1
+action=
+function action_failure() {
+  if [ -n "$action" ]; then
+    builder_report failure $action
+  fi
 }
 
-# Establish default build parameters
-set_default_vars ( ) {
-    FETCH_DEPS=true
-    # We need to build keyman-version and lm-worker with a script for now
-    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
-}
+trap action_failure err
 
-set_default_vars
+################################ Main script ################################
 
-# Parse args
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    case $key in
-        -skip-package-install|-S)
-            FETCH_DEPS=false
-            ;;
-    esac
-    shift # past argument
-done
+builder_describe \
+  "Compiles the web-oriented utility function module." \
+  configure clean build
 
-if [ "$FETCH_DEPS" = true ]; then
-    verify_npm_setup
+builder_parse "$@"
+
+if builder_has_action configure; then
+  action=configure
+  verify_npm_setup
+
+  "$THIS_SCRIPT_PATH/build.sh"
+
+  builder_report success configure
 fi
 
-npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
-if [ $? -ne 0 ]; then
-    fail "Utility-function package compilation failed."
+if builder_has_action clean; then
+  action=clean
+  npm run clean
+
+  builder_report success clean
+fi
+
+if builder_has_action build; then
+  action=build
+  npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+
+  builder_report success build
 fi
