@@ -162,8 +162,9 @@ class ModelCompositor {
 
       // The amount of text to 'replace' depends upon whatever sort of context change occurs
       // from the received input.
-      let postContextLength = postContextState.tokens.length;
-      let contextLengthDelta = postContextState.tokens.length - contextState.tokens.length;
+      const postContextTokens = postContextState.tokens;
+      let postContextLength = postContextTokens.length;
+      let contextLengthDelta = postContextTokens.length - contextState.tokens.length;
       // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
       if(postContextLength == 0 || contextLengthDelta > 0) {
         // As the word/token being corrected/predicted didn't originally exist, there's no
@@ -225,7 +226,7 @@ class ModelCompositor {
       //
       // NOTE:  we only want this applied word-initially, when any corrections 'correct'
       // 100% of the word.  Things are generally fine once it's not "all or nothing."
-      let tailToken = contextTokens[contextTokens.length - 1];
+      let tailToken = postContextTokens[postContextTokens.length - 1];
       const isTokenStart = tailToken.transformDistributions.length <= 1;
 
       // TODO:  whitespace, backspace filtering.  Do it here.
