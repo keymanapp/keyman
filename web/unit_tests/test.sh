@@ -72,6 +72,7 @@ get_OS
 get_browser_set_for_OS
 
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
+SH_FLAGS=
 DEBUG=false
 FLAGS=
 HEADLESS_FLAGS=-skip-package-install
@@ -83,6 +84,7 @@ while [[ $# -gt 0 ]] ; do
         -CI)
             CONFIG=CI.conf.js
             HEADLESS_FLAGS="$HEADLESS_FLAGS -CI"
+            SH_FLAGS="--ci"
             ;;
         -log-level)
             shift
@@ -133,39 +135,19 @@ cd ../tools/recorder
 # First:  Web-core tests.
 pushd "$KEYMAN_ROOT/common/web/input-processor"
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
-# Once done, now we run the integrated (KeymanWeb) tests.
 popd
 
-# Browserstack or CI-based tests
+# For now, we'll also link in the gesture-recognizer unit tests here.
+echo_heading "Running gesture-recognizer test suite"
+pushd "$KEYMAN_ROOT/common/web/gesture-recognizer"
+npm run test -- $SH_FLAGS
+popd
 
-DO_BROWSER_TEST_SUITE=true
+# Once done, now we run the integrated (KeymanWeb) tests.
+echo_heading "Running KeymanWeb integration test suite"
+npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
+npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
 
-if [[ $VERSION_ENVIRONMENT == test ]]; then
-  # Implied: CONFIG=CI.conf.js because `-CI` parameter is passed.
-  #
-  # If we are running a TeamCity test build, for now, only run BrowserStack
-  # tests when on a PR branch with a title including "(web)" or with the label
-  # test-browserstack. This is because the BrowserStack tests are currently
-  # unreliable, and the false positive failures are masking actual failures.
-  #
-  # We do not run BrowserStack tests on master, beta, or stable-x.y test
-  # builds.
-  DO_BROWSER_TEST_SUITE=false
-  if builder_pull_get_details; then
-    if [[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack; then
-      DO_BROWSER_TEST_SUITE=true
-    fi
-  fi
-fi
-
-CODE=0
-
-if $DO_BROWSER_TEST_SUITE; then
-  echo_heading "Running KeymanWeb integration test suite"
-  npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
-  npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
-
-  CODE=$?
-fi
+CODE=$?
 
 exit $CODE
