@@ -469,7 +469,7 @@ namespace com.keyman {
           }
         }
         // Calculate viewport scale
-        return Math.round(100*screenWidth / window.innerWidth)/100;
+        return Math.round(100*screenWidth / viewportWidth)/100;
       } catch(ex) {
         return 1;
       }
