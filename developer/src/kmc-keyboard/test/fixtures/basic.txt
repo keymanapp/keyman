@@ -21,7 +21,7 @@ block(kmxheader)  #  struct COMP_KEYBOARD {
 
   00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  c1 79 c0 dd      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  00 00 00 00      #    KMX_DWORD dwCheckSum;     // 0008 deprecated in 16.0, always 0
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
   00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version

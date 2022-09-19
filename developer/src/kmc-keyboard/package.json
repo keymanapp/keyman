@@ -24,7 +24,6 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "ajv": "^8.11.0",
-    "crc-32": "^1.2.2",
     "restructure": "^3.0.0",
     "semver": "^7.3.7",
     "xml2js": "^0.4.19"

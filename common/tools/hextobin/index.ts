@@ -44,7 +44,7 @@ export default async function hextobin(inputFilename: string, outputFilename?: s
 
   return save();
 
-  function reportError(message) {
+  function reportError(message: string) {
     if(!options.silent) {
       console.error(`Invalid input file: ${message} on line #${currentLineNumber}: "${currentLine}"`);
     }
