@@ -1,43 +1,62 @@
 {
-  "name": "@keymanapp/ldml-keyboard-compiler",
-  "description": "Keyman Developer LDML keyboard compiler",
+  "name": "@keymanapp/kmc",
+  "description": "Keyman Developer compiler command line tools",
   "keywords": [
     "keyboard",
     "keyman",
     "ldml",
-    "unicode"
+    "unicode",
+    "lexical-model",
+    "predictive-text"
   ],
   "scripts": {
     "build": "tsc -b",
-    "test": "cd test && tsc -b && cd .. && nyc --check-coverage --lines 90 --reporter=text mocha",
+    "bundle": "npm run bundle-kmc && npm run bundle-kmlmc && npm run bundle-kmlmi && npm run bundle-kmlmp",
+    "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node > build/cjs-src/kmc.cjs",
+    "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node > build/cjs-src/kmlmc.cjs",
+    "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node > build/cjs-src/kmlmi.cjs",
+    "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node > build/cjs-src/kmlmp.cjs",
+    "test": "cd test && tsc -b && cd .. && c8 mocha",
     "prepublishOnly": "npm run build"
   },
+  "type": "module",
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "contributors": [
+    "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
+    "Joshua Horton"
+  ],
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
   "main": "build/src/kmc.js",
   "bin": {
-    "kmc": "build/src/kmc.js"
+    "kmc": "build/src/kmc.js",
+    "kmlmc": "build/src/kmlmc.js",
+    "kmlmp": "build/src/kmlmp.js",
+    "kmlmi": "build/src/kmlmi.js"
   },
   "dependencies": {
-    "ajv": "^8.11.0",
-    "commander": "^3.0.0",
-    "crc-32": "^1.2.2",
-    "restructure": "^3.0.0",
-    "semver": "^7.3.7",
-    "typescript": "^4.5.4",
-    "xml2js": "^0.4.19"
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/kmc-keyboard": "*",
+    "@keymanapp/kmc-model": "*",
+    "@keymanapp/kmc-model-info": "*",
+    "@keymanapp/kmc-package": "*",
+    "@keymanapp/models-types": "*",
+    "commander": "^3.0.0"
   },
   "devDependencies": {
-    "@keymanapp/keyman-version": "*",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.6",
     "@types/xml2js": "^0.4.5",
+    "c8": "^7.12.0",
     "chai": "^4.3.4",
     "chalk": "^2.4.2",
+    "esbuild": "^0.15.8",
     "mocha": "^8.4.0",
-    "nyc": "^15.1.0",
-    "ts-node": "^9.1.1"
+    "ts-node": "^9.1.1",
+    "typescript": "^4.5.4"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

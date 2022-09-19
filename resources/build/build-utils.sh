@@ -752,7 +752,7 @@ builder_report() {
     target="$3"
   fi
 
-  if [ $result == success ]; then
+  if [[ $result == success ]]; then
     echo "${COLOR_GREEN}## $action$target completed successfully${COLOR_RESET}"
   else
     echo "${COLOR_RED}## $action$target failed. Result: $result${COLOR_RESET}"

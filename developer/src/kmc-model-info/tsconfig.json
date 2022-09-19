@@ -1,0 +1,17 @@
+{
+  "extends": "../kmc/tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "baseUrl": ".",
+    "paths": {
+    }
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../kmc-package" }  // can we eliminate this in future?
+  ]
+}
