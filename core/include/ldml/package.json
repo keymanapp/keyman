@@ -8,6 +8,7 @@
     "unicode"
   ],
   "license": "MIT",
+  "type": "module",
   "main": "build/keyboardprocessor_ldml.js",
   "repository": {
     "type": "git",
