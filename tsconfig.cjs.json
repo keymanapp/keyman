@@ -1,4 +1,7 @@
 {
+  // Lists only CommonJS or 'none' modules; as we move modules from cjs/none to
+  // esm, we should move them from here into tsconfig.esm.json. Eventually, when
+  // we have only ES modules, we'll delete this file.
   "files": [],
   "include": [],
   "references": [
@@ -19,18 +22,6 @@
     { "path": "./common/predictive-text/testing/two-stage-embedded-webworker/worker/tsconfig.json" },
     { "path": "./common/predictive-text/tsconfig.json" },
 
-    //{ "path": "./developer/src/kmc/test/tsconfig.json" },
-    { "path": "./developer/src/kmc/tsconfig.json" },
-
-    { "path": "./developer/src/kmc-keyboard/test/tsconfig.json" },
-    { "path": "./developer/src/kmc-keyboard/tsconfig.json" },
-    { "path": "./developer/src/kmc-model/test/tsconfig.json" },
-    { "path": "./developer/src/kmc-model/tsconfig.json" },
-    //{ "path": "./developer/src/kmc-model-info/test/tsconfig.json" },
-    { "path": "./developer/src/kmc-model-info/tsconfig.json" },
-    { "path": "./developer/src/kmc-package/test/tsconfig.json" },
-    { "path": "./developer/src/kmc-package/tsconfig.json" },
-
     { "path": "./developer/src/server/tsconfig.json" },
 
     { "path": "./resources/build/version/tsconfig.json" },
@@ -44,6 +35,5 @@
     { "path": "./common/web/lm-message-types/" },
     { "path": "./common/web/lm-worker/" },
     { "path": "./common/web/keyman-version/" },
-    { "path": "./common/web/keyman-version/tsconfig.esm.json" },
   ]
 }
