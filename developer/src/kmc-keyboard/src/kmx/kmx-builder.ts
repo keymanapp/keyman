@@ -1,5 +1,4 @@
 import * as r from 'restructure';
-import crc32 from 'crc-32';
 import KMXFile, { GROUP, KEY, STORE } from './kmx.js';
 import KMXPlusFile from './kmx-plus.js';
 import KMXPlusBuilder from './kmx-plus-builder/kmx-plus-builder.js';
@@ -98,7 +97,7 @@ export default class KMXBuilder {
     this.comp_header = {
       dwIdentifier: KMXFile.FILEID_COMPILED,
       dwFileVersion: KMXFile.VERSION_160,
-      dwCheckSum: 0,
+      dwCheckSum: 0,  // Deprecated in Keyman 16.0
       KeyboardID: 0,
       IsRegistered: 1,
       version: 0,
@@ -234,10 +233,6 @@ export default class KMXBuilder {
     }
   }
 
-  calculateCRC32(file: Uint8Array): number {
-    return ~crc32.buf(file, 0);
-  }
-
   compile(): Uint8Array {
     const fileSize = this.build();
 
@@ -286,11 +281,6 @@ export default class KMXBuilder {
     if(this.file instanceof KMXPlusFile) {
       file.set(this.comp_kmxplus_data, this.comp_kmxplus.dpKMXPlus);
     }
-
-    // Finally, calculate and write the checksum
-
-    this.comp_header.dwCheckSum = this.calculateCRC32(file);
-    file.set(this.file.COMP_KEYBOARD.toBuffer(this.comp_header), this.base_keyboard);
 
     return file;
   }
