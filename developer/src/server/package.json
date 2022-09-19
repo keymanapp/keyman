@@ -21,7 +21,7 @@
   },
   "optionalDependencies": {
     "hetrodo-node-hide-console-window-napi": "keymanapp/hetrodo-node-hide-console-window-napi#keyman-15.0",
-    "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-15.0"
+    "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-16.0"
   },
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
