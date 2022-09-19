@@ -44,6 +44,15 @@ namespace kbp
       uint8_t is_key_down
     ) = 0;
 
+    virtual km_kbp_status
+    external_event(
+      km_kbp_state* _kmn_unused(state),
+      uint32_t _kmn_unused(event),
+      void* _kmn_unused(data)
+    ) {
+      return KM_KBP_STATUS_OK;
+    }
+
     virtual km_kbp_attr const & attributes() const = 0;
     virtual km_kbp_status       validate() const = 0;
 

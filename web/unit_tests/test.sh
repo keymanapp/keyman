@@ -9,8 +9,10 @@ WORKING_DIRECTORY=`pwd`
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # A simple utility script to facilitate our different modes for unit-testing KMW.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.

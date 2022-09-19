@@ -762,10 +762,24 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           // Launch PlayStore to update Chrome
           try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.android.chrome"));
-            startActivity(intent);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+              startActivity(intent);
+            } else {
+              intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
+              if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+              } else {
+                Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+              }
+            }
           } catch (android.content.ActivityNotFoundException e) {
             // Link to Chrome if user is not signed in to Play Store
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome")));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
+            if (intent.resolveActivity(getPackageManager()) != null) {
+              startActivity(intent);
+            } else {
+              Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+            }
           }
         }
       });
@@ -978,10 +992,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         if ((KMManager.getAssociatedLexicalModel(languageID) == null) && KMManager.hasConnection(context)) {
           String _downloadid = CloudLexicalModelMetaDataDownloadCallback.createDownloadId(languageID);
           CloudLexicalModelMetaDataDownloadCallback _callback = new CloudLexicalModelMetaDataDownloadCallback();
-
-          Toast.makeText(context,
-            context.getString(R.string.query_associated_model),
-            Toast.LENGTH_SHORT).show();
 
           ArrayList<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams = new ArrayList<>();
           String url = CloudRepository.prepareLexicalModelQuery(languageID);

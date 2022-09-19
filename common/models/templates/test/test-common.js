@@ -3,7 +3,7 @@
  */
 
 var assert = require('chai').assert;
-var models = require('../').models;
+var models = require('../build/index.bundled.js').models;
 
 describe('Common utility functions', function() {
   // TODO:  unit tests for other common utility functions
@@ -97,7 +97,7 @@ describe('Common utility functions', function() {
       let apple = {
         insert: 'apple',
         deleteLeft: 0,
-        deleteRight: 2 
+        deleteRight: 2
       };
 
       let banana = {
@@ -143,7 +143,7 @@ describe('Common utility functions', function() {
       let apple = {
         insert: 'apple',
         deleteLeft: 0,
-        deleteRight: 2 
+        deleteRight: 2
       };
 
       let banana = {
@@ -167,7 +167,7 @@ describe('Common utility functions', function() {
       let apple = {
         insert: 'apple',
         deleteLeft: 0,
-        deleteRight: 2 
+        deleteRight: 2
       };
 
       let banana = {

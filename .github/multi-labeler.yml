@@ -11,6 +11,10 @@ version: v1
 #
 
 labels:
+  #
+  # conventional commit / semantic PR styles
+  #
+
   - label: 'feat'
     matcher:
       title: '^feat(\(|:)'
@@ -20,26 +24,48 @@ labels:
   - label: 'chore'
     matcher:
       title: '^chore(\(|:)'
-  # "change",
   - label: 'docs'
     matcher:
       title: '^docs(\(|:)'
-  # "style",
   - label: 'refactor'
     matcher:
       title: '^refactor(\(|:)'
-  # "test",
   - label: 'auto'
     matcher:
       title: '^auto(\(|:)'
 
-  # Below are the scopes that we look for in the PR title
+  #
+  # additional meta flags
+  #
+
+  # stable-targeted patches; note, this does not pick up chained PRs automatically
+  - label: 'stable'
+    matcher:
+      baseBranch: '^stable-.+'
+
+  # PRs marked as cherry-picks by title
+  - label: 'cherry-pick'
+    matcher:
+      title: '(🍒|:cherries:)'
+
+  # long-lived feature branches
+  - label: 'feature-branch'
+    matcher:
+      branch: '^feature-.+'
+
+  #
+  # Scopes that we look for in the PR title
+  #
+
   - label: 'android/'
     matcher:
       title: '\(.*android.*\):'
   - label: 'common/'
     matcher:
       title: '\(.*common.*\):'
+  - label: 'core/'
+    matcher:
+      title: '\(.*core.*\):'
   - label: 'developer/'
     matcher:
       title: '\(.*developer.*\):'
@@ -62,6 +88,10 @@ labels:
     matcher:
       title: '\(.*windows.*\):'
 
-  - label: 'cherry-pick'
+  #
+  # epics -- we will add/remove these as we work on new epics each release
+  #
+
+  - label: 'epic-ldml'
     matcher:
-      title: '(🍒|:cherries:)'
+      branch: '.*epic-ldml.*' # anywhere in the branch name, e.g. feat/epic-ldml/developer/... or feat/developer/foo-epic-ldml

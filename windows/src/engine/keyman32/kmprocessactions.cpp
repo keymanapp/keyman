@@ -30,8 +30,17 @@ static BOOL processAlert(AITIP* app) {
 static BOOL processBack(AITIP* app, const km_kbp_action_item* actionItem) {
   if (actionItem->backspace.expected_type == KM_KBP_BT_MARKER) {
     app->QueueAction(QIT_BACK, BK_DEADKEY);
-  } else /* actionItem->backspace.expected_type == KM_KBP_BT_CHAR, KM_KBP_BT_UNKNOWN */ {
-    app->QueueAction(QIT_BACK, 0);
+  } else if(actionItem->backspace.expected_type == KM_KBP_BT_CHAR) {
+    // If this is a TSF-aware app we need to set the BK_SURROGATE flag to delete
+    // both parts of the surrogate pair. Legacy apps receive a BKSP WM_KEYDOWN event
+    // which results in deleting both parts in one action.
+    if (!app->IsLegacy() && Uni_IsSMP(actionItem->backspace.expected_value)) {
+      app->QueueAction(QIT_BACK, BK_DEFAULT | BK_SURROGATE);
+    } else {
+      app->QueueAction(QIT_BACK, BK_DEFAULT);
+    }
+  } else { // KM_KBP_BT_UNKNOWN
+    app->QueueAction(QIT_BACK, BK_DEFAULT);
   }
   return TRUE;
 }
@@ -167,7 +176,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 }
 
 BOOL
-ProcessActionsTestParse(BOOL* emitKeyStroke) {
+ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) {
     return FALSE;
@@ -184,12 +193,15 @@ ProcessActionsTestParse(BOOL* emitKeyStroke) {
     switch (act->type) {
     case KM_KBP_IT_EMIT_KEYSTROKE:
       *emitKeyStroke = TRUE;
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsTestParse EMIT_KEYSTROKE: act->type=%d", act->type);
+      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse EMIT_KEYSTROKE: act->type=[%d]", act->type);
       continueProcessingActions = TRUE;
       _td->CoreProcessEventRun = FALSE; // If we emit the key stroke on this parse we don't need the second parse
       break;
     case KM_KBP_IT_CAPSLOCK:
       continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable);
+      break;
+    case KM_KBP_IT_INVALIDATE_CONTEXT:
+      continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
       break;
     }
     if (!continueProcessingActions) {

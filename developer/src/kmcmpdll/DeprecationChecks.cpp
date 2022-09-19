@@ -25,7 +25,7 @@ BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
       // Keyman 7
       #define TSS_WINDOWSLANGUAGES 29
   */
-  int currentLineBackup = currentLine;
+  int oldCurrentLine = currentLine;
   DWORD i;
   PFILE_STORE sp;
 
@@ -46,7 +46,7 @@ BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
     }
   }
 
-  currentLine = currentLineBackup;
+  currentLine = oldCurrentLine;
 
   return TRUE;
 }

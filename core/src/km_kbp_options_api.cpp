@@ -14,7 +14,7 @@
 #include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 
-#include "json.hpp"
+#include "jsonpp.hpp"
 #include "state.hpp"
 
 

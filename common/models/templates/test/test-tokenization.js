@@ -3,7 +3,7 @@
  */
 
 var assert = require('chai').assert;
-var models = require('../').models;
+var models = require('../build/index.bundled.js').models;
 var wordBreakers = require('@keymanapp/models-wordbreakers').wordBreakers;
 
 describe('Tokenization functions', function() {
@@ -132,7 +132,7 @@ describe('Tokenization functions', function() {
         left: '', startOfBuffer: true,
         right: '', endOfBuffer: true
       };
-  
+
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
@@ -140,7 +140,7 @@ describe('Tokenization functions', function() {
         right: [],
         caretSplitsToken: false
       };
-  
+
       assert.deepEqual(tokenization, expectedResult);
     });
 
@@ -153,7 +153,7 @@ describe('Tokenization functions', function() {
         right: [],
         caretSplitsToken: false
       };
-  
+
       assert.deepEqual(tokenization, expectedResult);
     });
 
@@ -163,7 +163,7 @@ describe('Tokenization functions', function() {
         left: ' ', startOfBuffer: true,
         right: '', endOfBuffer: true
       };
-  
+
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
@@ -171,7 +171,7 @@ describe('Tokenization functions', function() {
         right: [],
         caretSplitsToken: false
       };
-  
+
       assert.deepEqual(tokenization, expectedResult);
     });
 
@@ -233,7 +233,7 @@ describe('Tokenization functions', function() {
         case 'ស្រុកខ្មែរ':
           return [srok, shiftSpan(khmer, srok.length)]; // array of the two.
         case 'កខ្មែរ':
-          // I'd admittedly be at least somewhat surprised if a real wordbreaker got this 
+          // I'd admittedly be at least somewhat surprised if a real wordbreaker got this
           // and similar situations perfectly right... but at least it gives us what
           // we need for a test.
           return [k, shiftSpan(khmer, k.length)];
@@ -288,6 +288,82 @@ describe('Tokenization functions', function() {
       };
 
       assert.deepEqual(tokenization, expectedResult);
+    });
+
+    let midLetterNonbreaker = (text) => {
+      let customization = {
+        rules: [{
+          match: (context) => {
+            if(context.propertyMatch(null, ["ALetter"], ["MidLetter"], ["eot"])) {
+              return true;
+            } else {
+              return false;
+            }
+          },
+          breakIfMatch: false
+        }],
+        propertyMapping: (char) => {
+          let hyphens = ['\u002d', '\u2010', '\u058a', '\u30a0'];
+          if(hyphens.includes(char)) {
+              return "MidLetter";
+          } else {
+            return null;
+          }
+        }
+      };
+
+      return wordBreakers.default(text, customization);
+    }
+
+    it('treats caret as `eot` for pre-caret text', function() {
+      let context = {
+        left: "don-",  // We use a hyphen here b/c single-quote is hardcoded.
+        right: " worry",
+        endOfBuffer: true,
+        startOfBuffer: true
+      };
+
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      assert.deepEqual(tokenization, {
+        left: ["don", "-"],
+        right: ["worry"],
+        caretSplitsToken: false
+      });
+
+      tokenization = models.tokenize(midLetterNonbreaker, context);
+
+      assert.deepEqual(tokenization, {
+        left: ["don-"],
+        right: ["worry"],
+        caretSplitsToken: false
+      });
+    });
+
+    it('handles mid-contraction tokenization', function() {
+      let context = {
+        left: "don:",
+        right: "t worry",
+        endOfBuffer: true,
+        startOfBuffer: true
+      };
+
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      assert.deepEqual(tokenization, {
+        left: ["don", ":"],    // This particular case feels like a possible issue.
+        right: ["t", "worry"], // It'd be a three-way split token, as "don:t" would
+                               // be a single token were it not for the caret in the middle.
+        caretSplitsToken: false
+      })
+
+      tokenization = models.tokenize(midLetterNonbreaker, context);
+
+      assert.deepEqual(tokenization, {
+        left: ["don:"],
+        right: ["t", "worry"],
+        caretSplitsToken: true
+      });
     });
   });
 
