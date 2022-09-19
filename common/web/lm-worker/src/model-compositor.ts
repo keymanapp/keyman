@@ -6,6 +6,23 @@ class ModelCompositor {
   private static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
 
+  /**
+   * Controls the strength of anti-corrective measures for single-character scenarios.
+   * The base key probability will be raised to this power for this specific case.
+   *
+   * Current selection's motivation:  (0.5 / 0.4) ^ 16 ~= 35.5.
+   * - if the most likely has p=0.5 and second-most has p=0.4 - a highly-inaccurate key
+   *   stroke - the net effect will apply a factor of 35.5 to the lexical probability of
+   *   the best key's prediction roots, favoring it in this manner.
+   * - less extreme edge cases will have a significantly stronger factor, acting as a
+   *   "soft threshold".
+   * - truly ambiguous, "coin flip" cases will have a lower factor and thus favor the
+   *   more likely words from the pair.
+   *   - Our OSK key-element borders aren't visible to the user, so the 'spot' where
+   *     behavior changes might feel arbitrary to users if we used a hard threshold instead.
+   */
+  private static readonly SINGLE_CHAR_KEY_PROB_EXPONENT = 16;
+
   private SUGGESTION_ID_SEED = 0;
 
   constructor(lexicalModel: LexicalModel) {
@@ -201,6 +218,16 @@ class ModelCompositor {
         deleteLeft = this.wordbreak(context).kmwLength();
       }
 
+      // Is the token under construction newly-constructed / is there no pre-existing root?
+      // If so, we want to strongly avoid overcorrection, even for 'nearby' keys.
+      // (Strong lexical frequency differences can easily cause overcorrection when only
+      // one key's available.)
+      //
+      // NOTE:  we only want this applied word-initially, when any corrections 'correct'
+      // 100% of the word.  Things are generally fine once it's not "all or nothing."
+      let tailToken = contextTokens[contextTokens.length - 1];
+      const isTokenStart = tailToken.transformDistributions.length <= 1;
+
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
 
@@ -229,9 +256,39 @@ class ModelCompositor {
             id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
+          let rootCost = match.totalCost;
+
+          /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+           * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+           * there are significantly more likely words.  We only need this to allow very minor fat-finger
+           * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+           * key borders.
+           *
+           * Technically, the probabilities this produces won't be normalized as-is... but there's no
+           * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+           * to apply it could become tricky, so it's simpler to leave out.
+           *
+           * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+           * is needed in the future.
+           */
+          if(isTokenStart) {
+            /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
+             * ambiguous case that would only arise very near the center of the boundary between two keys.
+             * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
+             * That seems 'within reason' for correction very near boundaries.
+             *
+             * So, with the second-most-likely key being that close in probability, its best suggestion
+             * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
+             * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
+             * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
+             * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
+             */
+            rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
+          }
+
           return {
             sample: correctionTransform,
-            p: Math.exp(-match.totalCost)
+            p: Math.exp(-rootCost)
           };
         }, this);
 
