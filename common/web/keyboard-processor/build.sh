@@ -8,11 +8,12 @@ set -eu
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 action=
 function action_failure() {
@@ -30,15 +31,19 @@ c0="${COLOR_RESET:=>}"
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  configure clean build test "--ci,-c    For use with ${c1}test${c0} action - emits CI-friendly test reports"
+  configure \
+  clean \
+  build \
+  test \
+  "--ci    For use with ${c1}test${c0} action - emits CI-friendly test reports"
 
 builder_parse "$@"
 
 # START - Script parameter configuration
-REPORT_STYLE="local"  # Default setting.
+REPORT_STYLE=local  # Default setting.
 
 if builder_has_option --ci; then
-  REPORT_STYLE="ci"
+  REPORT_STYLE=ci
 
   echo "Replacing user-friendly test reports with CI-friendly versions."
 fi
@@ -81,7 +86,7 @@ if builder_has_action test; then
   echo_heading "Running Keyboard Processor test suite"
 
   FLAGS=
-  if [ $REPORT_STYLE == "ci" ]; then
+  if [ $REPORT_STYLE == ci ]; then
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
