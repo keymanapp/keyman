@@ -397,9 +397,11 @@ function _builder_failure_trap() {
 }
 
 #
-# Returns the standarized `action:target` string for the specified action and target
-# if the user has asked to perform it on the command line.  Otherwise, returns an
-# empty string.
+# Builds the standarized `action:target` string for the specified action-target pairing
+# and also returns 0 if the user has asked to perform it on the command line.  Otherwise,
+# returns 0 and sets an empty string in place of the matched pair.
+#
+# The string will be set as `_builder_matched_action`.
 #
 # Usage:
 #   if build_has_action action[:target]; then ...; fi
