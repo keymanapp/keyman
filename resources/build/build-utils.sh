@@ -372,7 +372,7 @@ function _builder_failure_trap() {
     # While there weren't errors, were there any actions that never reported success or failure?
     for action in "${_builder_current_actions[@]}"; do
       if [[ -n "$action" ]]; then
-        echo "${COLOR_YELLOW}## ${scope}Warning: action $action never reported success or failure${COLOR_RESET}"
+        echo "${COLOR_YELLOW}## ${scope}Warning - $action never reported success or failure${COLOR_RESET}"
         # exit 1  # If we wanted this scenario to result in a forced build-script fail.
       fi
     done
