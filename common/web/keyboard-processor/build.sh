@@ -26,16 +26,13 @@ trap action_failure err
 
 ################################ Main script ################################
 
-c1="${COLOR_BLUE:=<}"
-c0="${COLOR_RESET:=>}"
-
 builder_describe \
   "Compiles the web-oriented utility function module." \
   configure \
   clean \
   build \
   test \
-  "--ci    For use with ${c1}test${c0} action - emits CI-friendly test reports"
+  "--ci    For use with action ${DESCRIBE_TERM_START}test${DESCRIBE_TERM_END} - emits CI-friendly test reports"
 
 builder_parse "$@"
 

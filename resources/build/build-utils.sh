@@ -300,6 +300,11 @@ builder_use_color() {
     COLOR_RESET=
     HEADING_SETMARK=
   fi
+
+  # Used by `builder_display_usage` when marking special terms (actions, targets, options)
+  # in the plain-text description area.
+  DESCRIBE_TERM_START="${COLOR_BLUE:=<}"
+  DESCRIBE_TERM_END="${COLOR_RESET:=>}"
 }
 
 if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
@@ -721,8 +726,10 @@ builder_display_usage() {
   _builder_pad $width "  --color"        "Force colorized output"
   _builder_pad $width "  --no-color"     "Never use colorized output"
   _builder_pad $width "  --help, -h"     "Show this help"
-  local c1="${COLOR_BLUE:=<}"
-  local c0="${COLOR_RESET:=>}"
+
+  # Defined in `builder_use_color`; this assumes that said func has been called.
+  local c1=$DESCRIBE_TERM_START
+  local c0=$DESCRIBE_TERM_END
   echo
   echo "* Specify ${c1}action:target${c0} to run a specific ${c1}action${c0} against a specific ${c1}:target${c0}."
   echo "* If ${c1}action${c0} is specified without a ${c1}target${c0} suffix, it will be applied to all ${c1}:target${c0}s."
