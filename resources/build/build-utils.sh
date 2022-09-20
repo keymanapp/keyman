@@ -397,7 +397,9 @@ function _builder_failure_trap() {
 }
 
 #
-# Returns 0 if the user has asked to perform action on target on the command line
+# Returns the standarized `action:target` string for the specified action and target
+# if the user has asked to perform it on the command line.  Otherwise, returns an
+# empty string.
 #
 # Usage:
 #   if build_has_action action[:target]; then ...; fi
@@ -405,10 +407,10 @@ function _builder_failure_trap() {
 #   1: action    name of action
 #   2: :target    name of target, :-prefixed, as part of first param or space separated ok
 # Example:
-#   if build_has_action build :app; then
-#   if build_has_action build:app; then
-#
-builder_has_action() {
+#   action=_build_match_action build :app  # or build:app, that's fine too.
+#   ...
+#   if [ -n "$action" ]; then #...
+_builder_match_action() {    # to become the new `builder_has_action``
   local action="$1" target
 
   if [[ $action =~ : ]]; then
@@ -420,14 +422,38 @@ builder_has_action() {
     target="$2"
   fi
 
+  if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
+    # To avoid WET re-processing of the $action$target string set
+    _builder_matched_action="$action$target"
+    return 0
+  else
+    _builder_matched_action=""
+    return 1
+  fi
+}
+
+#
+# Returns 0 if the user has asked to perform action on target on the command line
+#
+# Usage:
+#   if build_has_action action[:target]; then ...; fi
+# Parameters:
+#   1: action    name of action
+#   2: :target    name of target, :-prefixed, as part of first param or space separated ok
+# Example:
+#   if build_has_action build :app; then
+#   if build_has_action build:app; then
+#
+builder_has_action() {     # to become the new `builder_start_action`
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
-  if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
-    echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
-    _builder_current_actions+=("$action$target")
+  if _builder_match_action $@; then
+    echo "${COLOR_BLUE}## $scope$_builder_matched_action starting...${COLOR_RESET}"
+    _builder_current_actions+=("$_builder_matched_action")
     return 0
+  else
+    return 1
   fi
-  return 1
 }
 
 #
