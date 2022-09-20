@@ -48,6 +48,18 @@ function die () {
     exit 1
 }
 
+# Used to build an identifier usable to prefix builder_report outputs to more clearly identify
+# the calling script.
+#
+# Assumes that `findRepositoryRoot` has already been called.
+function buildScriptIdentifier() {
+  if [ ! -z ${THIS_SCRIPT+x} ]; then
+    # Leaves only the part of the path based upon KEYMAN_ROOT.
+    THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$KEYMAN_ROOT/"}
+    readonly THIS_SCRIPT_IDENTIFIER
+  fi
+}
+
 function findRepositoryRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
@@ -181,6 +193,7 @@ function findShouldSentryRelease() {
 }
 
 findRepositoryRoot
+buildScriptIdentifier
 findTier
 findVersion
 # printVersionUtilsDebug
@@ -377,7 +390,7 @@ function _builder_failure_trap() {
 #   if build_has_action build:app; then
 #
 builder_has_action() {
-  local action="$1" target
+  local action="$1" target scope=""
 
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
@@ -388,8 +401,12 @@ builder_has_action() {
     target="$2"
   fi
 
+  if [ -n "$_builder_report_scope" ]; then
+    scope="[$THIS_SCRIPT_IDENTIFIER] "
+  fi
+
   if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
-    echo "${COLOR_BLUE}## $action$target starting...${COLOR_RESET}"
+    echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
     _builder_current_actions+=("$action$target")
     return 0
   fi
@@ -599,6 +616,7 @@ builder_check_color() {
 #   1: $@         command-line arguments
 builder_parse() {
   builder_verbose=
+  _builder_report_scope=
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
   _builder_current_actions=()
@@ -679,6 +697,9 @@ builder_parse() {
           _builder_chosen_options+=(--verbose)
           builder_verbose=--verbose
           ;;
+        --report-scope)
+          _builder_report_scope=--report-scope
+          ;;
         *)
           _builder_parameter_error "$0" parameter "$key"
       esac
@@ -720,9 +741,9 @@ _builder_pad() {
 builder_display_usage() {
   local e program description
 
-  # Minimum padding is 12 characters, increase this if necessary
+  # Minimum padding is 13 characters, increase this if necessary
   # if you add other, longer, global options (like --verbose)
-  local width=12
+  local width=13
 
   for e in "${!_builder_params[@]}"; do
     if (( ${#e} > $width )); then
@@ -773,6 +794,7 @@ builder_display_usage() {
   done
 
   _builder_pad $width "  --verbose, -v"  "Verbose logging"
+  _builder_pad $width "  --report-scope" "Include script name in build-action reports"
   _builder_pad $width "  --color"        "Force colorized output"
   _builder_pad $width "  --no-color"     "Never use colorized output"
   _builder_pad $width "  --help, -h"     "Show this help"
@@ -791,6 +813,7 @@ builder_display_usage() {
 builder_report() {
   local result="$1"
   local action="$2" target
+  local scope=""
 
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
@@ -801,11 +824,15 @@ builder_report() {
     target="$3"
   fi
 
+  if [ -n "$_builder_report_scope" ]; then
+    scope="[$THIS_SCRIPT_IDENTIFIER] "
+  fi
+
   if _builder_item_in_array "$action$target" "${_builder_current_actions[@]}"; then
     if [ $result == success ]; then
-      echo "${COLOR_GREEN}## $action$target completed successfully${COLOR_RESET}"
+      echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
     else
-      echo "${COLOR_RED}## $action$target failed. Result: $result${COLOR_RESET}"
+      echo "${COLOR_RED}## $scope$action$target failed. Result: $result${COLOR_RESET}"
     fi
 
     # Remove $action$target from the array; it is no longer a current action

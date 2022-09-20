@@ -22,7 +22,7 @@ builder_parse "$@"
 if builder_has_action configure; then
   verify_npm_setup
 
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" --report-scope
 
   builder_report success configure
 fi

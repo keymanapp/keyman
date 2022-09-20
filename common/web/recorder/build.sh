@@ -38,6 +38,7 @@ fi
 
 # END - Script parameter configuration
 
+CONFIGURE=
 if builder_has_action configure :module; then
   CONFIGURE=true
 fi
@@ -46,10 +47,10 @@ if builder_has_action configure :proctor; then
   CONFIGURE=true
 fi
 
-if [ $CONFIGURE==true ]; then
+if [ $CONFIGURE == "true" ]; then
   verify_npm_setup
 
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" --report-scope
 
   builder_report success configure :module
   builder_report success configure :proctor
