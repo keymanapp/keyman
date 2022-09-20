@@ -148,7 +148,17 @@ else
   echo "FAIL: --feature option not found"
 fi
 
+# Run tests based in separate scripts to facilitate their operation
+
+# Due to the nature of the build-utils-traps tests, only one may be
+# specified at a time; each ends with an `exit`.
+echo "Running separate tests"
+$THIS_SCRIPT_PATH/tests/build-utils-traps.test.sh error
+$THIS_SCRIPT_PATH/tests/build-utils-traps.test.sh incomplete
+echo "Fin"
+
 # Finally, run with --help so we can see what it looks like
+# Note:  calls `exit`, so no further tests may be defined.
 
 echo "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
 
