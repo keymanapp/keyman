@@ -292,6 +292,11 @@ builder_use_color() {
     COLOR_RESET=$(tput sgr0)
     # e.g. VSCode https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support
     HEADING_SETMARK='\x1b]1337;SetMark\x07'
+
+    # Used by `builder_display_usage` when marking special terms (actions, targets, options)
+    # in the plain-text description area.
+    DESCRIBE_TERM_START="$COLOR_BLUE"
+    DESCRIBE_TERM_END="$COLOR_RESET"
   else
     COLOR_RED=
     COLOR_GREEN=
@@ -299,12 +304,9 @@ builder_use_color() {
     COLOR_YELLOW=
     COLOR_RESET=
     HEADING_SETMARK=
+    DESCRIBE_TERM_START="<"
+    DESCRIBE_TERM_END=">"
   fi
-
-  # Used by `builder_display_usage` when marking special terms (actions, targets, options)
-  # in the plain-text description area.
-  DESCRIBE_TERM_START="${COLOR_BLUE:=<}"
-  DESCRIBE_TERM_END="${COLOR_RESET:=>}"
 }
 
 if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
@@ -542,6 +544,32 @@ _builder_parameter_error() {
   builder_display_usage
   exit 64
 
+}
+
+# Pre-initializes the color setting based on the options specified to a
+# a build.sh script, parsing the command line to do so.  This is only
+# needed if said script wishes to use this script's defined colors while
+# respecting the options provided by the script's caller.
+#
+# Usage:
+#   builder_parse "$@"
+# Parameters
+#   1: $@         command-line arguments
+builder_check_color() {
+  # Process command-line arguments
+  while [[ $# -gt 0 ]] ; do
+    local key="$1"
+
+    case "$key" in
+      --color)
+        builder_use_color true
+        ;;
+      --no-color)
+        builder_use_color false
+        ;;
+    esac
+    shift # past the processed argument
+  done
 }
 
 # Initializes a build.sh script, parses command line. Will abort the script if

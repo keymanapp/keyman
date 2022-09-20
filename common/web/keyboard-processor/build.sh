@@ -26,6 +26,10 @@ trap action_failure err
 
 ################################ Main script ################################
 
+# Ensures color var use in `builder_describe`'s argument respects the specified
+# --color/--no-color option.
+builder_check_color "$@"
+
 builder_describe \
   "Compiles the web-oriented utility function module." \
   configure \
