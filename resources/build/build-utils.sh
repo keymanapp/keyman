@@ -32,32 +32,12 @@
 #
 SHLVL=0
 
-# Setup variable for calling script's path and name
-if [ ! -z ${THIS_SCRIPT+x} ]; then
-  THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
-  readonly THIS_SCRIPT_PATH
-  THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
-  readonly THIS_SCRIPT_NAME
-fi
-
 function die () {
     # TODO: consolidate this with fail() from shellHelperFunctions.sh
     echo
     echo "$*"
     echo
     exit 1
-}
-
-# Used to build an identifier usable to prefix builder_report outputs to more clearly identify
-# the calling script.
-#
-# Assumes that `findRepositoryRoot` has already been called.
-function buildScriptIdentifier() {
-  if [ ! -z ${THIS_SCRIPT+x} ]; then
-    # Leaves only the part of the path based upon KEYMAN_ROOT.
-    THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$KEYMAN_ROOT/"}
-    readonly THIS_SCRIPT_IDENTIFIER
-  fi
 }
 
 function findRepositoryRoot() {
@@ -67,6 +47,24 @@ function findRepositoryRoot() {
     local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
     KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
     readonly KEYMAN_ROOT
+}
+
+# Used to build script-related build variables useful for referencing the calling script
+# and for prefixing builder_report outputs in order to more clearly identify the calling
+# script.
+#
+# Assumes that `findRepositoryRoot` has already been called, a condition met later on
+# within this script.
+function buildScriptIdentifiers() {
+  if [ ! -z ${THIS_SCRIPT+x} ]; then
+    THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
+    readonly THIS_SCRIPT_PATH
+    THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
+    readonly THIS_SCRIPT_NAME
+    # Leaves only the part of the path based upon KEYMAN_ROOT.
+    THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$KEYMAN_ROOT/"}
+    readonly THIS_SCRIPT_IDENTIFIER
+  fi
 }
 
 function findVersion() {
@@ -193,7 +191,7 @@ function findShouldSentryRelease() {
 }
 
 findRepositoryRoot
-buildScriptIdentifier
+buildScriptIdentifiers
 findTier
 findVersion
 # printVersionUtilsDebug
@@ -361,8 +359,27 @@ _builder_item_is_target() {
   return 0
 }
 
+# Used by a `trap` statement later to facilitate auto-reporting failures on error detection
+# without obscuring failure exit/error codes.
 function _builder_failure_trap() {
+  local trappedExitCode=$?
   local action target
+
+  # Since 'exit' is also trapped, we can also handle end-of-script incomplete actions.
+  if [[ $trappedExitCode == 0 ]]; then
+    local scope="[$THIS_SCRIPT_IDENTIFIER] "
+
+    # While there weren't errors, were there any actions that never reported success or failure?
+    for action in "${_builder_current_actions[@]}"; do
+      if [[ -n "$action" ]]; then
+        echo "${COLOR_YELLOW}## ${scope}Warning: action $action never reported success or failure${COLOR_RESET}"
+        # exit 1  # If we wanted this scenario to result in a forced build-script fail.
+      fi
+    done
+    return
+  fi
+
+  # If we've reached this point, we're here because an error occurred.
 
   # Iterate across currently-active actions and report their failures.
   for action in "${_builder_current_actions[@]}"; do
@@ -375,6 +392,8 @@ function _builder_failure_trap() {
 
     builder_report failure $action $target
   done
+
+  _builder_current_actions=()
 }
 
 #
@@ -719,9 +738,14 @@ builder_parse() {
     done
   fi
 
-  # Now that we've successfully parsed options adhering to the _builder spec, we may activate the
-  # action_failure trap.  (We don't want it active on scripts not yet using said script.)
-  trap _builder_failure_trap err
+  # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
+  # action_failure and action_hanging traps.  (We don't want them active on scripts not yet using
+  # said script.)
+  #
+  # Note:  if an error occurs within a script's function in a `set -e` script, it becomes an exit
+  # instead for the function's caller.  So, we need both `err` and `exit` here.
+  # See https://medium.com/@dirk.avery/the-bash-trap-trap-ce6083f36700.
+  trap _builder_failure_trap err exit
 }
 
 _builder_pad() {
@@ -827,6 +851,8 @@ builder_report() {
 
     # Remove $action$target from the array; it is no longer a current action
     _builder_current_actions=( "${_builder_current_actions[@]/$action$target}" )
+  else
+    echo "${COLOR_YELLOW}## Warning: reporting result of $action$target but the action was never started!${COLOR_RESET}"
   fi
 }
 
