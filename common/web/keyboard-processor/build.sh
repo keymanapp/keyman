@@ -45,7 +45,7 @@ fi
 if builder_has_action configure; then
   verify_npm_setup
 
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" --report-scope
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
 
   builder_report success configure
 fi
@@ -63,7 +63,7 @@ fi
 if builder_has_action test; then
   # Build test dependency
   pushd "$KEYMAN_ROOT/common/web/recorder"
-  ./build.sh --report-scope
+  ./build.sh
   popd
 
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.bundled.json"

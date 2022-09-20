@@ -390,7 +390,7 @@ function _builder_failure_trap() {
 #   if build_has_action build:app; then
 #
 builder_has_action() {
-  local action="$1" target scope=""
+  local action="$1" target
 
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
@@ -401,9 +401,7 @@ builder_has_action() {
     target="$2"
   fi
 
-  if [ -n "$_builder_report_scope" ]; then
-    scope="[$THIS_SCRIPT_IDENTIFIER] "
-  fi
+  local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
   if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
     echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
@@ -616,7 +614,6 @@ builder_check_color() {
 #   1: $@         command-line arguments
 builder_parse() {
   builder_verbose=
-  _builder_report_scope=
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
   _builder_current_actions=()
@@ -696,9 +693,6 @@ builder_parse() {
         --verbose|-v)
           _builder_chosen_options+=(--verbose)
           builder_verbose=--verbose
-          ;;
-        --report-scope)
-          _builder_report_scope=--report-scope
           ;;
         *)
           _builder_parameter_error "$0" parameter "$key"
@@ -794,7 +788,6 @@ builder_display_usage() {
   done
 
   _builder_pad $width "  --verbose, -v"  "Verbose logging"
-  _builder_pad $width "  --report-scope" "Include script name in build-action reports"
   _builder_pad $width "  --color"        "Force colorized output"
   _builder_pad $width "  --no-color"     "Never use colorized output"
   _builder_pad $width "  --help, -h"     "Show this help"
@@ -813,7 +806,6 @@ builder_display_usage() {
 builder_report() {
   local result="$1"
   local action="$2" target
-  local scope=""
 
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
@@ -824,9 +816,7 @@ builder_report() {
     target="$3"
   fi
 
-  if [ -n "$_builder_report_scope" ]; then
-    scope="[$THIS_SCRIPT_IDENTIFIER] "
-  fi
+  local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
   if _builder_item_in_array "$action$target" "${_builder_current_actions[@]}"; then
     if [ $result == success ]; then

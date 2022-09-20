@@ -73,13 +73,13 @@ test-headless ( ) {
 if [ $FETCH_DEPS = true ]; then
   # Next, build the lm-worker in its proper, wrapped form
   pushd "$KEYMAN_ROOT/common/web/lm-worker"
-  ./build.sh --report-scope
+  ./build.sh
   popd
 fi
 
 # First, run tests on the keyboard processor.
 pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
-./build.sh test $CHAINING_FLAGS --report-scope || fail "Tests failed by dependencies; aborting integration tests."
+./build.sh test $CHAINING_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 popd
 
 # Build the leaf-style, bundled version of input-processor for use in testing.
