@@ -374,6 +374,7 @@ builder_has_action() {
 
   if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
     echo "${COLOR_BLUE}## $action$target starting...${COLOR_RESET}"
+    _builder_current_actions+=("$action$target")
     return 0
   fi
   return 1
@@ -584,6 +585,7 @@ builder_parse() {
   builder_verbose=
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
+  _builder_current_actions=()
 
   # Process command-line arguments
   while [[ $# -gt 0 ]] ; do
@@ -779,10 +781,15 @@ builder_report() {
     target="$3"
   fi
 
-  if [ $result == success ]; then
-    echo "${COLOR_GREEN}## $action$target completed successfully${COLOR_RESET}"
-  else
-    echo "${COLOR_RED}## $action$target failed. Result: $result${COLOR_RESET}"
+  if _builder_item_in_array "$action$target" "${_builder_current_actions[@]}"; then
+    if [ $result == success ]; then
+      echo "${COLOR_GREEN}## $action$target completed successfully${COLOR_RESET}"
+    else
+      echo "${COLOR_RED}## $action$target failed. Result: $result${COLOR_RESET}"
+    fi
+
+    # Remove $action$target from the array; it is no longer a current action
+    _builder_current_actions=( "${_builder_current_actions[@]/$action$target}" )
   fi
 }
 

@@ -48,7 +48,15 @@ fi
 
 # END - Script parameter configuration
 
-if builder_has_action configure :module || builder_has_action configure :proctor; then
+if builder_has_action configure :module; then
+  CONFIGURE=true
+fi
+
+if builder_has_action configure :proctor; then
+  CONFIGURE=true
+fi
+
+if [ $CONFIGURE==true ]; then
   action=configure
   target=:project
 
@@ -56,7 +64,8 @@ if builder_has_action configure :module || builder_has_action configure :proctor
 
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
 
-  builder_report success configure :project
+  builder_report success configure :module
+  builder_report success configure :proctor
 fi
 
 if builder_has_action clean :module; then
