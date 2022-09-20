@@ -54,7 +54,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "install         install libraries to current system" \
   "uninstall       uninstall libraries from current system" \
   "${archtargets[@]}" \
-  "--debug,d                       configuration is 'debug', not 'release'" \
+  "--debug,-d                      configuration is 'debug', not 'release'" \
   "--target-path=opt_target_path   override for build/ target path" \
   "--test=opt_tests,-t             test[s] to run (space separated)"
 builder_parse "$@"
