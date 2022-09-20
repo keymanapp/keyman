@@ -1,7 +1,6 @@
 #pragma once
 
-#include <windows.h>
 #include <Compfile.h>
 
-BOOL WarnDeprecatedHeader();
-BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk);
+KMX_BOOL WarnDeprecatedHeader();
+KMX_BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk);

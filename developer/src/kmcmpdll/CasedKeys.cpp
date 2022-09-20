@@ -7,12 +7,14 @@
 #include <kmcmpdll.h>
 
 #include "CharToKeyConversion.h"
+#include <kmx_u16.h>
+#include <xstring.h>
 
-extern BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
+extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
 
-DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);
+KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);
 
-DWORD VerifyCasedKeys(PFILE_STORE sp) {
+KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   assert(sp != NULL);
 
   if (FMnemonicLayout) {
@@ -23,12 +25,12 @@ DWORD VerifyCasedKeys(PFILE_STORE sp) {
 
   // We will rewrite this store with virtual keys
 
-  PWSTR p = sp->dpString;
-  PWSTR buf = new WCHAR[wcslen(p) * 5 + 1];  // extended keys are 5 units long, so this is the max length
-  PWSTR q = buf;
+  PKMX_WCHAR p = sp->dpString;
+  PKMX_WCHAR buf = new KMX_WCHAR[u16len(p) * 5 + 1];  // extended keys are 5 units long, so this is the max length
+  PKMX_WCHAR q = buf;
 
   while (*p) {
-    UINT key = 0, shift = 0;
+    KMX_UINT key = 0, shift = 0;
     if (*p != UC_SENTINEL) {
       if (!MapUSCharToVK(*p, &key, &shift)) {
         return CERR_CasedKeysMustContainOnlyVirtualKeys;
@@ -63,7 +65,7 @@ DWORD VerifyCasedKeys(PFILE_STORE sp) {
   return CERR_None;
 }
 
-DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
+KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   assert(fk != NULL);
   assert(gp != NULL);
 
@@ -80,7 +82,7 @@ DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
     return CERR_None;
   }
 
-  DWORD msg;
+  KMX_DWORD msg;
   // ExpandCapsRule may add extra rules at the end of gp->dpKeyArray,
   // reallocating it, so we (a) cache the original length, and (b)
   // dereference the array every call
@@ -93,9 +95,9 @@ DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   return CERR_None;
 }
 
-DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
-  UINT key = kpp->Key;
-  UINT shift = kpp->ShiftFlags;
+KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
+  KMX_UINT key = kpp->Key;
+  KMX_UINT shift = kpp->ShiftFlags;
 
   if (shift == 0) {
     // Convert US key cap to a virtual key
@@ -109,7 +111,7 @@ DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
     return CERR_None;
   }
 
-  PWSTR p = sp->dpString;
+  PKMX_WCHAR p = sp->dpString;
   for (; *p; p = incxstr(p)) {
     // We've already verified that the store contains only virtual keys in VerifyCasedKeys
     if (*(p + 3) == key) {
@@ -127,17 +129,18 @@ DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   if (!k) return CERR_CannotAllocateMemory;
   memcpy(k, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
 
-  kpp = &k[(INT_PTR)(kpp - gp->dpKeyArray)];
+  kpp = &k[(INT_PKMX)(kpp - gp->dpKeyArray)];
 
   delete gp->dpKeyArray;
   gp->dpKeyArray = k;
   gp->cxKeyArray++;
 
-  k = &k[gp->cxKeyArray - 1];
-  k->dpContext = new WCHAR[wcslen(kpp->dpContext) + 1];
-  k->dpOutput = new WCHAR[wcslen(kpp->dpOutput) + 1];
-  wcscpy_s(k->dpContext, wcslen(kpp->dpContext) + 1, kpp->dpContext);	// copy the context.
-  wcscpy_s(k->dpOutput, wcslen(kpp->dpOutput) + 1, kpp->dpOutput);		// copy the output.
+  k = &k[gp->cxKeyArray - 1];  
+  k->dpContext = new KMX_WCHAR[u16len(kpp->dpContext) + 1];
+  k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];   
+  u16cpy(k->dpContext, kpp->dpContext );  // copy the context.
+  u16cpy(k->dpOutput, kpp->dpOutput );    // copy the output.
+  
   k->Key = key;
   k->Line = kpp->Line;
   // Add the CAPITAL FLAG, invert shift flag for the rule

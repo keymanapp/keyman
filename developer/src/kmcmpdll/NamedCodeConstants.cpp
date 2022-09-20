@@ -22,16 +22,28 @@
 */
 
 #include "pch.h"
-#include <comperr.h>
+#include <io.h>
+#include <limits.h>
 #include "NamedCodeConstants.h"
-#include "CheckFilenameConsistency.h"
 #include "kmcmpdll.h"
 
 extern char CompileDir[];
 
 
-int IsHangulSyllable(const wchar_t *codename, int *code);
+int IsHangulSyllable(const char16_t *codename, int *code);
 
+KMX_BOOL FileExists(const char *filename)
+{
+  _finddata_t fi;
+  intptr_t n;
+
+  if((n = _findfirst(filename, &fi)) != -1)  // I3056   // I3512
+  {
+    _findclose(n);
+    return TRUE;
+  }
+  return FALSE;
+}
 
 NamedCodeConstants::NamedCodeConstants()
 {
@@ -48,7 +60,7 @@ NamedCodeConstants::~NamedCodeConstants()
   if(entries_file) delete entries_file;
 }
 
-void NamedCodeConstants::AddCode(int n, const wchar_t *p, DWORD storeIndex)
+void NamedCodeConstants::AddCode(int n, const char16_t *p, KMX_DWORD storeIndex)
 {
   if((nEntries_file % ALLOC_SIZE) == 0)
   {
@@ -62,17 +74,17 @@ void NamedCodeConstants::AddCode(int n, const wchar_t *p, DWORD storeIndex)
   }
 
   entries_file[nEntries_file].code = n;
-  wcsncpy_s(entries_file[nEntries_file].name, _countof(entries_file[nEntries_file].name), p, MAX_ENAME);  // I3481
+  u16ncpy(entries_file[nEntries_file].name, p, _countof(entries_file[nEntries_file].name));  // I3481
   entries_file[nEntries_file].name[MAX_ENAME] = 0;
 
-  for (wchar_t *r = entries_file[nEntries_file].name; *r; r++)
+  for (char16_t *r = entries_file[nEntries_file].name; *r; r++)
     if (iswblank(*r) && *r != '-') *r = '_';
 
   entries_file[nEntries_file].storeIndex = storeIndex;
   nEntries_file++;
 }
 
-void NamedCodeConstants::AddCode_IncludedCodes(int n, const wchar_t *p)
+void NamedCodeConstants::AddCode_IncludedCodes(int n, const char16_t *p)
 {
   if((nEntries % ALLOC_SIZE) == 0)
   {
@@ -86,34 +98,30 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const wchar_t *p)
   }
 
   entries[nEntries].code = n;
-  wcsncpy_s(entries[nEntries].name, _countof(entries[nEntries].name), p, MAX_ENAME);  // I3481
+  u16ncpy(entries[nEntries].name, p, MAX_ENAME);  // I3481
   entries[nEntries].name[MAX_ENAME] = 0;
-  for (wchar_t *r = entries[nEntries].name; *r; r++)
+  for (char16_t *r = entries[nEntries].name; *r; r++)
     if (iswblank(*r)) *r = '_';
 
   entries[nEntries].storeIndex = 0xFFFFFFFFL;
   nEntries++;
 }
 
+
 int __cdecl sort_entries(const void *elem1, const void *elem2)
 {
-  return _wcsicmp(
+  return u16icmp(
     ((NCCENTRY *)elem1)->name,
     ((NCCENTRY *)elem2)->name);
 }
 
-BOOL NamedCodeConstants::IntLoadFile(const char *filename)
+KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 {
   FILE *fp = NULL;
-
-  if (CheckFilenameConsistency(filename, FALSE) != CERR_None) {
-    return FALSE;
-  }
-
   if(fopen_s(&fp, filename, "rt") != 0) return FALSE;  // I3481
 
-  char str[256], *p, *q, *context = NULL;
-  BOOL neol, first = TRUE;
+  KMX_CHAR str[256], *p, *q, *context = NULL;
+  KMX_BOOL neol, first = TRUE;
 
   while(fgets(str, 256, fp))
   {
@@ -122,12 +130,12 @@ BOOL NamedCodeConstants::IntLoadFile(const char *filename)
     q = strtok_s(NULL, ";\n", &context);
     if(p && q)
     {
-      if(first && *p == (char)0xEF && *(p+1) == (char)0xBB && *(p+2) == (char)0xBF) p += 3;  // I3056 UTF-8   // I3512
+      if(first && *p == (KMX_CHAR)0xEF && *(p+1) == (KMX_CHAR)0xBB && *(p+2) == (KMX_CHAR)0xBF) p += 3;  // I3056 UTF-8   // I3512
       first = FALSE;
       _strupr_s(q, strlen(q)+1);  // I3481   // I3641
       int n = strtol(p, NULL, 16);
       if (*q != '<') {
-        PWSTR q0 = strtowstr(q);
+        PKMX_WCHAR q0 =  strtowstr(q);
         AddCode_IncludedCodes(n, q0);
         delete[] q0;
       }
@@ -143,7 +151,7 @@ BOOL NamedCodeConstants::IntLoadFile(const char *filename)
   return TRUE;
 }
 
-BOOL NamedCodeConstants::LoadFile(const char *filename)
+KMX_BOOL NamedCodeConstants::LoadFile(const char *filename)
 {
   char buf[260];
   // Look in current directory first
@@ -155,13 +163,17 @@ BOOL NamedCodeConstants::LoadFile(const char *filename)
   strncat_s(buf, _countof(buf), filename, 259-strlen(CompileDir)); buf[259] = 0;
   if(FileExists(buf))
     return IntLoadFile(buf);
-  // Finally look in kmcmpdll.dll directory
-  GetModuleFileName(0, buf, 260);
-  char *p = strrchr(buf, '\\'); if(p) p++; else p = buf;
-  *p = 0;
-  strncat_s(buf, _countof(buf), filename, 259-strlen(buf)); buf[259] = 0;  // I3481   // I3641
-  if(FileExists(buf))
-    return IntLoadFile(buf);
+
+  //TODO: sort out how to find common includes in non-Windows platforms:
+  #ifdef _WINDOWS_
+    // Finally look in kmcmpdll.dll directory
+    GetModuleFileName(0, buf, 260);
+    char *p = strrchr(buf, '\\'); if(p) p++; else p = buf;
+    *p = 0;
+    strncat_s(buf, _countof(buf), filename, 259-strlen(buf)); buf[259] = 0;  // I3481   // I3641
+    if(FileExists(buf))
+      return IntLoadFile(buf);
+  #endif
 
   reindex();
 
@@ -189,13 +201,13 @@ void NamedCodeConstants::reindex()
   }
 }
 
-int NamedCodeConstants::GetCode(const wchar_t *codename, DWORD *storeIndex)
+int NamedCodeConstants::GetCode(const char16_t *codename, KMX_DWORD *storeIndex)
 {
   *storeIndex = 0xFFFFFFFFL;    // I2993
   int code = GetCode_IncludedCodes(codename);
   if(code) return code;
   for(int i = 0; i < nEntries_file; i++)
-    if(!_wcsicmp(entries_file[i].name, codename))
+    if(!u16icmp(entries_file[i].name, codename))
     {
       *storeIndex = entries_file[i].storeIndex;
       return entries_file[i].code;
@@ -203,9 +215,9 @@ int NamedCodeConstants::GetCode(const wchar_t *codename, DWORD *storeIndex)
   return 0;
 }
 
-int NamedCodeConstants::GetCode_IncludedCodes(const wchar_t *codename)
+int NamedCodeConstants::GetCode_IncludedCodes(const char16_t *codename)
 {
-  wchar_t c = towupper(*codename);
+  char16_t c = towupper(*codename);
   int code;
 
   if(IsHangulSyllable(codename, &code)) return code;
@@ -213,7 +225,7 @@ int NamedCodeConstants::GetCode_IncludedCodes(const wchar_t *codename)
   if(c < 32 || c > 127 || chrindexes[c] < 0) return 0;
   for(int n = chrindexes[c]; n < nEntries && towupper(entries[n].name[0]) == c; n++)
   {
-    int cmp = _wcsicmp(codename, entries[n].name);
+    int cmp = u16icmp(codename, entries[n].name);
     if(cmp == 0) return entries[n].code;
     if(cmp < 0) break;
   }
@@ -237,26 +249,28 @@ const int
  HangulNCount = HangulVCount * HangulTCount,   // 588
  HangulSCount = HangulLCount * HangulNCount;   // 11172
 
-const wchar_t *
+const char16_t *
   Hangul_JAMO_L_TABLE[] = {
-        L"G", L"GG", L"N", L"D", L"DD", L"R", L"M", L"B", L"BB",
-    L"S", L"SS", L"", L"J", L"JJ", L"C", L"K", L"T", L"P", L"H" };
+        u"G", u"GG", u"N", u"D", u"DD", u"R", u"M", u"B", u"BB",
+    u"S", u"SS", u"", u"J", u"JJ", u"C", u"K", u"T", u"P", u"H" };
 
-const wchar_t *
+const char16_t *
   Hangul_JAMO_V_TABLE[] = {
-        L"A", L"AE", L"YA", L"YAE", L"EO", L"E", L"YEO", L"YE", L"O",
-        L"WA", L"WAE", L"OE", L"YO", L"U", L"WEO", L"WE", L"WI",
-        L"YU", L"EU", L"YI", L"I" };
+        u"A", u"AE", u"YA", u"YAE", u"EO", u"E", u"YEO", u"YE", u"O",
+        u"WA", u"WAE", u"OE", u"YO", u"U", u"WEO", u"WE", u"WI",
+        u"YU", u"EU", u"YI", u"I" };
 
-const wchar_t *
+
+const char16_t *
   Hangul_JAMO_T_TABLE[] = {
-        L"", L"G", L"GG", L"GS", L"N", L"NJ", L"NH", L"D", L"L", L"LG", L"LM",
-        L"LB", L"LS", L"LT", L"LP", L"LH", L"M", L"B", L"BS",
-        L"S", L"SS", L"NG", L"J", L"C", L"K", L"T", L"P", L"H" };
+        u"", u"G", u"GG", u"GS", u"N", u"NJ", u"NH", u"D", u"u", u"LG", u"LM",
+        u"LB", u"LS", u"LT", u"LP", u"LH", u"M", u"B", u"BS",
+        u"S", u"SS", u"NG", u"J", u"C", u"K", u"T", u"P", u"H" };
 
-int IsHangulSyllable(const wchar_t *codename, int *code)
+
+int IsHangulSyllable(const char16_t *codename, int *code)
 {
-  if(_wcsnicmp(codename, L"HANGUL_SYLLABLE_", 16)) return 0;
+  if(u16ncmp(codename, u"HANGUL_SYLLABLE_", 16)) return 0;
   codename += 16;
   if(!*codename) return 0;
 
@@ -286,25 +300,25 @@ int IsHangulSyllable(const wchar_t *codename, int *code)
 
     /* Find vowel */ 
 
-  wchar_t V[4] = L"";
+  char16_t V[4] = u"";
   V[0] = *codename;
   if(V[0] && strchr("AEIOUWY", towupper(*(codename+1)))) V[1] = *(codename+1);
   if(V[1] && strchr("AEIOUWY", towupper(*(codename+2)))) V[2] = *(codename+2);
 
   VIndex = -1;
   for(i = 0; i < HangulVCount; i++)
-  if(!_wcsicmp(Hangul_JAMO_V_TABLE[i], V)) { VIndex = i; break; }
+  if(!u16icmp(Hangul_JAMO_V_TABLE[i], V)) { VIndex = i; break; }
 
   if(VIndex == -1) return 0;
 
-  codename += wcslen(V);
+  codename += u16len(V);
 
   /* Find final */ 
 
   TIndex = -1;
     
   for(i = 0; i < HangulTCount; i++)
-  if(!_wcsicmp(Hangul_JAMO_T_TABLE[i], codename)) { TIndex = i; break; }
+  if(!u16icmp(Hangul_JAMO_T_TABLE[i], codename)) { TIndex = i; break; }
 
   if(TIndex == -1) return 0;
 

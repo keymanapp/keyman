@@ -1,3 +1,3 @@
 #pragma once
 
-DWORD VerifyUnreachableRules(PFILE_GROUP gp);
+KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp);

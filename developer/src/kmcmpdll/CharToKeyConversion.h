@@ -1,7 +1,5 @@
 #pragma once
 
-#include <windows.h>
-
 #define VK_COLON	0xBA
 #define VK_EQUAL	0xBB
 #define VK_COMMA	0xBC
@@ -15,6 +13,5 @@
 #define VK_QUOTE	0xDE
 #define VK_xDF		0xDF
 
-BOOL MapUSCharToVK(UINT ch, UINT *puKey, UINT *puShiftFlags);
-WCHAR VKToChar(WORD keyCode, UINT shiftFlags);
-
+KMX_BOOL MapUSCharToVK(KMX_UINT ch, KMX_UINT *puKey, KMX_UINT *puShiftFlags);
+KMX_WCHAR VKToChar(KMX_WORD keyCode, KMX_UINT shiftFlags);

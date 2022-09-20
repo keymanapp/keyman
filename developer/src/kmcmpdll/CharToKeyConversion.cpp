@@ -4,9 +4,9 @@
 
 /* Following code lifted from syskbd.cpp and tweaked for compiler use. Todo: consolidate */
 
-WCHAR VKToChar(WORD keyCode, UINT shiftFlags)
+KMX_WCHAR VKToChar(KMX_WORD keyCode, KMX_UINT shiftFlags)
 {
-  char shiftedDigit[] = ")!@#$%^&*(";
+  KMX_CHAR shiftedDigit[] = ")!@#$%^&*(";
   int n, Shift;
 
   if (!(shiftFlags & ISVIRTUALKEY)) return keyCode;
@@ -70,8 +70,8 @@ WCHAR VKToChar(WORD keyCode, UINT shiftFlags)
 // TODO: share this
 const struct
 {
-  UINT key;
-  BOOL shift;
+  KMX_UINT key;
+  KMX_BOOL shift;
 } USCharMap[] = {
   { VK_SPACE, FALSE }, // 20 ' '
   { '1', TRUE }, // 21 '!'
@@ -175,7 +175,7 @@ const struct
   { VK_ACCENT, TRUE }  // 7E '~'
 };
 
-BOOL MapUSCharToVK(UINT ch, UINT *puKey, UINT *puShiftFlags) {
+KMX_BOOL MapUSCharToVK(KMX_UINT ch, KMX_UINT *puKey, KMX_UINT *puShiftFlags) {
   assert(puKey != NULL);
   assert(puShiftFlags != NULL);
   if (ch >= 0x20 && ch < 0x7F) {

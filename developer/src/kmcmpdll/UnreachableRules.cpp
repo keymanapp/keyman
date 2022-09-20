@@ -20,9 +20,9 @@ std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
   return key.str();
 }
 
-DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
+KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;
-  DWORD i;
+  KMX_DWORD i;
 
   int oldCurrentLine = currentLine;
 
@@ -36,7 +36,8 @@ DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         currentLine = kp->Line;
-        wsprintf(ErrExtra, "Overridden by rule on line %d", k1.Line);
+        PKMX_WCHAR ErrExtra = NULL;
+        u16sprintf(ErrExtra, 1024, L"Overridden by rule on line %d", k1.Line);
         AddWarning(CHINT_UnreachableRule);
       }
     }

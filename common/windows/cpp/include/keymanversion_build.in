@@ -12,6 +12,7 @@
 
 #define KEYMAN_VersionWin         "$VersionWin"
 #define KEYMAN_VersionWin_W       L"$VersionWin"
+#define KEYMAN_VersionWin_W16     u"$VersionWin"
 
 #define KEYMAN_VersionRelease     "$VersionRelease"
 #define KEYMAN_VersionRelease_W   L"$VersionRelease"
