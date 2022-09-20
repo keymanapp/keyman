@@ -57,6 +57,6 @@ if builder_has_action build; then
   " > ./version.inc.ts
 
   # Build
-  npm run build -- $builder_verbose || die "Could not build worker."
+  npm run build -- $builder_verbose
   builder_report success build
 fi
