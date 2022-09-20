@@ -30,7 +30,7 @@ public enum KeymanHosts {
         case .alpha:
           fallthrough
         case .beta:
-          return URL.init(string: "https://api.keyman-staging.com")!
+          return URL.init(string: "https://api.keyman.com")! // #7227 disabling: "https://api.keyman-staging.com")!
         case .stable:
           return URL.init(string: "https://api.keyman.com")!
       }
@@ -54,7 +54,7 @@ public enum KeymanHosts {
         case .alpha:
           fallthrough
         case .beta:
-          return URL.init(string: "https://help.keyman-staging.com")!
+          return URL.init(string: "https://help.keyman.com")! // #7227 disabling: "https://help.keyman-staging.com")!
         case .stable:
           return URL.init(string: "https://help.keyman.com")!
       }
@@ -78,7 +78,7 @@ public enum KeymanHosts {
         case .alpha:
           fallthrough
         case .beta:
-          return URL.init(string: "https://keyman-staging.com")!
+          return URL.init(string: "https://keyman.com")! // #7227 disabling: "https://keyman-staging.com")!
         case .stable:
           return URL.init(string: "https://keyman.com")!
       }

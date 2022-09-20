@@ -3,7 +3,7 @@
  */
 
 var assert = require('chai').assert;
-var QuoteBehavior = require('../').models.QuoteBehavior;
+var QuoteBehavior = require('../build/index.bundled.js').models.QuoteBehavior;
 
 describe('Quote behaviors', function() {
   describe('Script directionality', function() {
@@ -144,15 +144,15 @@ describe('Quote behaviors', function() {
         quotesForKeepSuggestion: { open: `“`, close: `”`},
         insertAfterWord: " "
       }
-      
+
       assert.throws(function() {
         QuoteBehavior.apply(QuoteBehavior.default, "hello", englishPunctuation, QuoteBehavior.default);
       });
-  
+
       assert.throws(function() {
         QuoteBehavior.apply(QuoteBehavior.useQuotes, "hello", englishPunctuation, QuoteBehavior.default);
       });
-  
+
       assert.throws(function() {
         QuoteBehavior.apply(QuoteBehavior.noQuotes, "hello", englishPunctuation, QuoteBehavior.default);
       });

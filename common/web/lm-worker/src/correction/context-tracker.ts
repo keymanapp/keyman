@@ -32,10 +32,6 @@ namespace correction {
     replacements: TrackedContextSuggestion[];
     activeReplacementId: number = -1;
 
-    get isNew(): boolean {
-      return this.transformDistributions.length == 0;
-    }
-
     get currentText(): string {
       if(this.replacementText === undefined || this.replacementText === null) {
         return this.raw;
@@ -89,7 +85,7 @@ namespace correction {
           if(token.replacementText) {
             copy.replacementText = token.replacementText;
           }
-  
+
           return copy;
         });
         this.searchSpace = obj.searchSpace;
@@ -139,8 +135,8 @@ namespace correction {
 
       // Track the Transform that resulted in the whitespace 'token'.
       // Will be needed for phrase-level correction/prediction.
-      whitespaceToken.transformDistributions = [transformDistribution]; 
-      
+      whitespaceToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
+
       whitespaceToken.raw = null;
       this.tokens.push(whitespaceToken);
     }
@@ -149,19 +145,19 @@ namespace correction {
      * Used for 14.0's backspace workaround, which flattens all previous Distribution<Transform>
      * entries because of limitations with direct use of backspace transforms.
      * @param tokenText
-     * @param transformId 
+     * @param transformId
      */
     replaceTailForBackspace(tokenText: USVString, transformId: number) {
       this.tokens.pop();
 
       // It's a backspace transform; time for special handling!
       //
-      // For now, with 14.0, we simply compress all remaining Transforms for the token into 
-      // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex, 
+      // For now, with 14.0, we simply compress all remaining Transforms for the token into
+      // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex,
       // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
       //
       // Note that we cannot just use a single, monolithic transform at this point b/c
-      // of our current edit-distance optimization strategy; diagonalization is currently... 
+      // of our current edit-distance optimization strategy; diagonalization is currently...
       // not very compatible with that.
       let backspacedTokenContext: Distribution<Transform>[] = textToCharTransforms(tokenText, transformId).map(function(transform) {
         return [{sample: transform, p: 1.0}];
@@ -175,7 +171,7 @@ namespace correction {
 
     updateTail(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
       let editedToken = this.tail;
-      
+
       // Preserve existing text if new text isn't specified.
       tokenText = tokenText || (tokenText === '' ? '' : editedToken.raw);
 
@@ -191,7 +187,7 @@ namespace correction {
 
     toRawTokenization() {
       let sequence: USVString[] = [];
-      
+
       for(let token of this.tokens) {
         // Hide any tokens representing wordbreaks.  (Thinking ahead to phrase-level possibilities)
         if(token.currentText !== null) {
@@ -281,7 +277,7 @@ namespace correction {
     /**
      * Returns items contained within the circular array, ordered from 'oldest' to 'newest' -
      * the same order in which the items will be dequeued.
-     * @param index 
+     * @param index
      */
     item(index: number) {
       if(index >= this.count) {
@@ -294,7 +290,7 @@ namespace correction {
   }
 
   export class ContextTracker extends CircularArray<TrackedContextState> {
-    static attemptMatchContext(tokenizedContext: USVString[], 
+    static attemptMatchContext(tokenizedContext: USVString[],
                                matchState: TrackedContextState,
                                transformDistribution?: Distribution<Transform>,): TrackedContextState {
       // Map the previous tokenized state to an edit-distance friendly version.
@@ -335,7 +331,7 @@ namespace correction {
       }
 
       // Can happen for the first text input after backspace deletes a wordbreaking character,
-      // thus the new input continues a previous word while dropping the empty word after 
+      // thus the new input continues a previous word while dropping the empty word after
       // that prior wordbreaking character.
       //
       // We can't handle it reliably from this match state, but a previous entry (without the empty token)
@@ -353,7 +349,7 @@ namespace correction {
 
       // If we've made it here... success!  We have a context match!
       let state: TrackedContextState;
-      
+
       if(pushedTail) {
         // On suggestion acceptance, we should update the previous final token.
         // We do it first so that the acceptance is replicated in the new TrackedContextState
@@ -376,7 +372,9 @@ namespace correction {
       if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
         primaryInput = null;
       }
-      const isBackspace = primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft > 0 && !primaryInput.deleteRight;
+
+      const isWhitespace = primaryInput && TransformUtils.isWhitespace(primaryInput);
+      const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
       const finalToken = tokenizedContext[tokenizedContext.length-1];
 
       /* Assumption:  This is an adequate check for its two sub-branches.
@@ -388,7 +386,7 @@ namespace correction {
        * - Assumption:  one keystroke may only cause a single token to be appended to the context
        *   - That is, no "reasonable" keystroke would emit a Transform adding two separate word tokens
        *     - For languages using whitespace to word-break, said keystroke would have to include said whitespace to break the assumption.
-       */ 
+       */
 
       // If there is/was more than one context token available...
       if(editPath.length > 1) {
@@ -399,17 +397,29 @@ namespace correction {
 
         // We're adding an additional context token.
         if(pushedTail) {
-          // ASSUMPTION:  any transform that triggers this case is a pure-whitespace Transform, as we
-          //              need a word-break before beginning a new word's context.
-          //              Worth note:  when invalid, the lm-layer already has problems in other aspects too.
-          state.pushWhitespaceToTail(transformDistribution);
+          const tokenizedTail = tokenizedContext[tokenizedContext.length - 1];
+          /*
+           * Common-case:  most transforms that trigger this case are from pure-whitespace Transforms.  MOST.
+           *
+           * Less-common, but noteworthy:  some wordbreaks may occur without whitespace.  Example:
+           * `"o` => ['"', 'o'].  Make sure to double-check against `tokenizedContext`!
+           */
+          let pushedToken = new TrackedContextToken();
+          pushedToken.raw = tokenizedTail;
 
-          let emptyToken = new TrackedContextToken();
-          emptyToken.raw = '';
-          // Continuing the earlier assumption, that 'pure-whitespace Transform' does not emit any initial characters
-          // for the new word (token), so the input keystrokes do not correspond to the new text token.
-          emptyToken.transformDistributions = [];
-          state.pushTail(emptyToken);
+          if(isWhitespace || !primaryInput) {
+            state.pushWhitespaceToTail(transformDistribution ?? []);
+            // Continuing the earlier assumption, that 'pure-whitespace Transform' does not emit any initial characters
+            // for the new word (token), so the input keystrokes do not correspond to the new text token.
+            pushedToken.transformDistributions = [];
+          } else {
+            state.pushWhitespaceToTail();
+            // Assumption: Since we only allow one-transform-at-a-time changes between states, we shouldn't be missing
+            // any metadata used to construct the new context state token.
+            pushedToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
+          }
+
+          state.pushTail(pushedToken);
         } else { // We're editing the final context token.
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
           //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
@@ -442,7 +452,9 @@ namespace correction {
       return state;
     }
 
-    static modelContextState(tokenizedContext: USVString[], lexicalModel: LexicalModel): TrackedContextState {
+    static modelContextState(tokenizedContext: USVString[],
+                             transformDistribution: Distribution<Transform>,
+                             lexicalModel: LexicalModel): TrackedContextState {
       let baseTokens = tokenizedContext.map(function(entry) {
         let token = new TrackedContextToken();
         token.raw = entry;
@@ -483,13 +495,12 @@ namespace correction {
      * Compares the current, post-input context against the most recently-seen contexts from previous prediction calls, returning
      * the most information-rich `TrackedContextState` possible.  If a match is found, the state will be annotated with the
      * input information provided to previous prediction calls and persisted correction-search calculations for re-use.
-     * 
-     * @param model 
-     * @param context 
-     * @param mainTransform 
-     * @param transformDistribution 
+     *
+     * @param model
+     * @param context
+     * @param transformDistribution
      */
-    analyzeState(model: LexicalModel, 
+    analyzeState(model: LexicalModel,
                  context: Context,
                  transformDistribution?: Distribution<Transform>): TrackedContextState {
       if(!model.traverseFromRoot) {
@@ -519,7 +530,7 @@ namespace correction {
       //
       // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
       // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-      let state = ContextTracker.modelContextState(tokenizedContext.left, model);
+      let state = ContextTracker.modelContextState(tokenizedContext.left, transformDistribution, model);
       state.taggedContext = context;
       this.enqueue(state);
       return state;

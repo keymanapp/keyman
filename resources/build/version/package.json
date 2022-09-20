@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@actions/core": "^1.2.6",
+    "@actions/core": "^1.9.1",
     "@actions/github": "^2.1.0",
     "typescript": "^4.5.4",
     "yargs": "^15.1.0"
@@ -9,7 +9,6 @@
   "devDependencies": {
     "@types/node": "^13.7.0",
     "@types/semver": "^7.1.0",
-    "@zeit/ncc": "^0.21.0",
     "semver": "^7.1.2",
     "ts-node": "^8.6.2"
   },
@@ -17,20 +16,16 @@
     "node": "16"
   },
   "files": [
-    "dist",
     "src"
   ],
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "name": "@keymanapp/auto-history-action",
   "private": true,
   "scripts": {
-    "build": "npm run clean:dist; npm run build:dist",
-    "build:dist": "ncc build src/index.ts --minify --source-map --v8-cache",
     "build:ts": "tsc --project tsconfig.production.json",
     "build:ts:watch": "tsc --project tsconfig.production.json --watch",
     "clean": "run-p clean:*",
-    "clean:dist": "rm -rf dist",
     "clean:lib": "rm -rf lib",
     "types": "tsc --noEmit"
   }

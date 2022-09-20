@@ -2,7 +2,7 @@
 <!-- Dimens for Landscape (Tablet 10") -->
 <resources>
     <dimen name="banner_height">60dp</dimen>
-    <dimen name="keyboard_height">300dp</dimen>
+    <dimen name="keyboard_height">200dp</dimen>
     <dimen name="key_width">98.5dp</dimen>
     <dimen name="key_height">98.5dp</dimen>
     <dimen name="popup_arrow_width">42dp</dimen>

@@ -36,6 +36,8 @@ implementation
 
 uses
   System.SysUtils,
+  Winapi.ActiveX,
+
   compile,
   CompilePackage,
   Keyman.Developer.System.Project.kmnProjectFileAction,
@@ -154,5 +156,8 @@ begin
 end;
 
 initialization
+  CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
   TDUnitX.RegisterTestFixture(TCompilePackageVersioningTest);
+finalization
+  CoUninitialize;
 end.

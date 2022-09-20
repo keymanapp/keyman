@@ -102,6 +102,7 @@ uses
   Winapi.Windows,
   System.Character,
   System.Classes,
+  System.Generics.Collections,
   System.UITypes,
 
   compile,
@@ -214,6 +215,7 @@ type
     FTouchLayoutFont: string;
     FFix183_LadderLength: Integer;
     FCloseBrace: Boolean;   // I4872
+    FUnreachableKeys: TList<PFILE_KEY>;
 
     function JavaScript_String(ch: DWord): string;  // I2242
 
@@ -254,6 +256,8 @@ type
     function IsKeyboardVersion15OrLater: Boolean;
     function WriteBeginStatement(const name: string;
       groupIndex: Integer): string;
+    function FormatKeyForErrorMessage(fkp: PFILE_KEY;
+      FMnemonic: Boolean): string;
   public
     function Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallbackW): Boolean;   // I3681   // I4140   // I4688   // I4866
     constructor Create;
@@ -273,14 +277,11 @@ uses
   CompileErrorCodes,
   JsonUtil,
   KeymanDeveloperOptions,
-  KeyboardParser,
   Keyman.System.KeyboardUtils,
   KeymanWebKeyCodes,
   kmxfileutils,
   TouchLayout,
-  TouchLayoutUtils,
   Unicode,
-  UnicodeData,
   utilstr,
   VisualKeyboard,
   VKeys;
@@ -303,6 +304,8 @@ var
   WarnDeprecatedCode: Boolean;
   Data: string;
 begin
+  FUnreachableKeys.Clear;
+
   FCallback := Callback;
   FInFile := InFile;
   FOutFile := OutFile;   // I4140   // I4155   // I4154
@@ -375,6 +378,7 @@ end;
 
 constructor TCompileKeymanWeb.Create;
 begin
+  FUnreachableKeys := TList<PFILE_KEY>.Create;
   FillChar(fk, sizeof(fk), 0);
   FFix183_LadderLength := FKeymanDeveloperOptions.Fix183_LadderLength; // How frequently to break ladders
 end;
@@ -382,6 +386,7 @@ end;
 destructor TCompileKeymanWeb.Destroy;
 begin
   // TODO: Free FK values
+  FUnreachableKeys.Free;
   inherited;
 end;
 
@@ -800,6 +805,63 @@ const // I1585 - add space to conversion
     VK_NUMLOCK,			// &H90
     VK_SCROLL);			// &H91
 
+function TCompileKeymanWeb.FormatKeyForErrorMessage(fkp: PFILE_KEY; FMnemonic: Boolean): string;
+  function FormatShift(ShiftFlags: DWord): string;
+  const
+    mask: array[0..13] of string = (
+      'LCTRL',             // 0X0001
+      'RCTRL',             // 0X0002
+      'LALT',              // 0X0004
+      'RALT',              // 0X0008
+
+      'SHIFT',             // 0X0010
+      'CTRL',              // 0X0020
+      'ALT',               // 0X0040
+
+      '???',               // Reserved
+
+      'CAPS',              // 0X0100
+      'NCAPS',             // 0X0200
+
+      'NUMLOCK',           // 0X0400
+      'NNUMLOCK',          // 0X0800
+
+      'SCROLLLOCK',        // 0X1000
+      'NSCROLLLOCK'        // 0X2000
+    );
+  var
+    i: Integer;
+  begin
+    Result := '';
+    for i := 0 to High(mask) do
+    begin
+      if ShiftFlags and (1 shl i) <> 0 then
+      begin
+        Result := Result + mask[i] + ' ';
+      end;
+    end;
+  end;
+begin
+  if not FMnemonic then
+  begin
+    if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
+    begin
+      if Ord(fkp.Key) < 256
+        then Result := Format('[%s%s]', [FormatShift(fkp.ShiftFlags), VKeyNames[Ord(fkp.Key)]])
+        else Result := Format('[%sK_%x]', [FormatShift(fkp.ShiftFlags), Ord(fkp.Key)]);
+    end
+    else
+    begin
+      Result := Format('''%s''', [fkp.Key]);
+    end;
+  end
+  else
+  begin
+    if (fkp.ShiftFlags and KMX_VIRTUALCHARKEY) = KMX_VIRTUALCHARKEY
+      then Result := Format('[%s''%s'']', [FormatShift(fkp.ShiftFlags), fkp.Key])
+      else Result := Format('''%s''', [fkp.Key]);
+  end;
+end;
 
 function TCompileKeymanWeb.JavaScript_Key(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
 var
@@ -835,7 +897,13 @@ begin
 
   if (Result = 0) or (Result >= Ord(Low(TKeymanWebTouchStandardKey))) then   // I4141
   begin
-    ReportError(fkp.Line, CWARN_UnreachableKeyCode, 'The rule will never be matched because its key code is never fired.');
+    if not FUnreachableKeys.Contains(fkp) then
+    begin
+      ReportError(fkp.Line, CHINT_UnreachableKeyCode,
+        'The rule will never be matched for key '+
+        FormatKeyForErrorMessage(fkp,FMnemonic)+' because its key code is never fired.');
+      FUnreachableKeys.Add(fkp);
+    end;
   end;
 end;
 

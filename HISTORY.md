@@ -1,5 +1,105 @@
 # Keyman Version History
 
+## 16.0.66 alpha 2022-09-17
+
+* chore: improve auto labeling (#7288)
+
+## 16.0.65 alpha 2022-09-16
+
+* chore(linux): Remove unused IBusLookupTable (#7296)
+
+## 16.0.64 alpha 2022-09-15
+
+* fix(android/engine): Switch keyboard if uninstalling current one (#7291)
+* fix(common/models): fixes quote-adjacent pred-text suggestions (#7205)
+* fix(common/models): max prediction wait check (#7290)
+
+## 16.0.63 alpha 2022-09-14
+
+* chore(linux): Update debian changelog (#7281)
+* fix(linux): Fix ignored error (#7284)
+
+## 16.0.62 alpha 2022-09-13
+
+* fix(developer): hide key-sizes when in desktop layout in touch layout editor (#7225)
+* fix(developer): show more useful error if out of space during Setup (#7267)
+
+## 16.0.61 alpha 2022-09-12
+
+* docs(windows): add steps for using testhost debugging (#7263)
+* fix(developer): compiler mismatch on currentLine (#7190)
+* fix(developer): suppress repeated warnings about unreachable code (#7219)
+* chore:  try disabling concurrency for browserstack tests (#7258)
+* chore(web): disable browserstack on non-web-specific builds (#7260)
+
+## 16.0.60 alpha 2022-09-10
+
+* fix(web): enhanced timer for prediction algorithm (#7037)
+* chore(core): fixup km_kbp_event docs (#7253)
+* fix(windows) Update unit tests for tsf bkspace (#7254)
+* fix(android): Standardize language ID in language picker menu (#7239)
+
+## 16.0.59 alpha 2022-09-09
+
+* chore: use keyman.com instead of keyman-staging.com (#7233)
+* feat(core): add `km_kbp_event` API endpoint (#7223)
+* fix(windows): Delete both code units when deleting surrogate pairs in TSF-aware apps (#7243)
+
+## 16.0.58 alpha 2022-09-08
+
+* fix(common/models): reconnects unit tests for worker-internal submodules (#7215)
+* feat(common/models): extra Unicode-based wordbreaker unit tests (#7217)
+
+## 16.0.57 alpha 2022-09-07
+
+* fix(android/engine): Fix Backspace key to delete without errant subkeys (#7156)
+
+## 16.0.56 alpha 2022-09-05
+
+* chore(linux): Fix ibus-keyman.postinst script (#7192)
+
+## 16.0.55 alpha 2022-09-03
+
+* chore(android): Reduce Toast notification noise (#7178)
+
+## 16.0.54 alpha 2022-08-30
+
+* chore(core): rename json.hpp to jsonpp.hpp (#6993)
+* chore(developer): remove unused dependencies from KeymanWeb compiler (#7000)
+* chore: update core/ label (#7138)
+* chore(linux): Update debian changelog (#7145)
+* fix(linux): Allow downgrades for installing build deps (#7147)
+* chore(core): emcc off path for linux (#7149)
+
+## 16.0.53 alpha 2022-08-29
+
+* feat(linux): Dockerfile for linux builder (#7133)
+
+## 16.0.52 alpha 2022-08-26
+
+* fix(android/engine): Lower the max height for landscape orientation (#7119)
+* fix(linux): Remove wrong `ok_for_single_backspace` method (#7123)
+
+## 16.0.51 alpha 2022-08-24
+
+* fix(android): verify browser before starting activity (#7001)
+* chore: Change platform advocates per discussion (#7096)
+* fix(windows): Add invalidate context action to non-updatable parse (#7089)
+* feat(common): add parameter variable support to `builder_` functions (#7103)
+
+## 16.0.50 alpha 2022-08-23
+
+* chore(core): Remove obsolete python keyboardprocessor (#7094)
+
+## 16.0.49 alpha 2022-08-22
+
+* fix: remove saving and restoring context kbd options (#7077)
+* chore(deps): bump @actions/core from 1.8.2 to 1.9.1 (#7087)
+
+## 16.0.48 alpha 2022-08-16
+
+* fix(web): button, float init timer cleanup (#7036)
+
 ## 16.0.47 alpha 2022-08-15
 
 * chore(core): refactor kmx_file.h to common (#7062)
