@@ -38,26 +38,29 @@ fi
 
 # END - Script parameter configuration
 
-CONFIGURE=
+function do_configure() {
+  verify_npm_setup
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
+}
+
+CONFIGURE=false
 if builder_has_action configure :module; then
   CONFIGURE=true
+  do_configure
+  builder_report success configure :module
 fi
 
 if builder_has_action configure :proctor; then
-  CONFIGURE=true
-fi
-
-if [[ $CONFIGURE == "true" ]]; then
-  verify_npm_setup
-
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
-
-  builder_report success configure :module
+  if [[ $CONFIGURE == false ]]; then
+    do_configure
+  else
+    echo "Configuration already completed in configure:module; skipping."
+  fi
   builder_report success configure :proctor
 fi
 
 if builder_has_action clean :module; then
-  npm run tsc -- -b --clean "src/tsconfig.json"
+  npm run tsc -- -b --clean "$THIS_SCRIPT_PATH/src/tsconfig.json"
   builder_report success clean :module
 fi
 

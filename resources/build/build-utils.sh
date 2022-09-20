@@ -308,8 +308,8 @@ builder_use_color() {
 
     # Used by `builder_display_usage` when marking special terms (actions, targets, options)
     # in the plain-text description area.
-    DESCRIBE_TERM_START="$COLOR_BLUE"
-    DESCRIBE_TERM_END="$COLOR_RESET"
+    BUILDER_TERM_START="$COLOR_BLUE"
+    BUILDER_TERM_END="$COLOR_RESET"
   else
     COLOR_RED=
     COLOR_GREEN=
@@ -317,8 +317,8 @@ builder_use_color() {
     COLOR_YELLOW=
     COLOR_RESET=
     HEADING_SETMARK=
-    DESCRIBE_TERM_START="<"
-    DESCRIBE_TERM_END=">"
+    BUILDER_TERM_START="<"
+    BUILDER_TERM_END=">"
   fi
 }
 
@@ -584,9 +584,9 @@ _builder_parameter_error() {
 # respecting the options provided by the script's caller.
 #
 # Usage:
-#   builder_parse "$@"
+#   builder_check_color "$@"
 # Parameters
-#   1: $@         command-line arguments
+#   1: $@         all command-line arguments (as with builder_parse)
 builder_check_color() {
   # Process command-line arguments
   while [[ $# -gt 0 ]] ; do
@@ -735,9 +735,9 @@ _builder_pad() {
 builder_display_usage() {
   local e program description
 
-  # Minimum padding is 13 characters, increase this if necessary
+  # Minimum padding is 12 characters, increase this if necessary
   # if you add other, longer, global options (like --verbose)
-  local width=13
+  local width=12
 
   for e in "${!_builder_params[@]}"; do
     if (( ${#e} > $width )); then
@@ -793,8 +793,8 @@ builder_display_usage() {
   _builder_pad $width "  --help, -h"     "Show this help"
 
   # Defined in `builder_use_color`; this assumes that said func has been called.
-  local c1=$DESCRIBE_TERM_START
-  local c0=$DESCRIBE_TERM_END
+  local c1=$BUILDER_TERM_START
+  local c0=$BUILDER_TERM_END
   echo
   echo "* Specify ${c1}action:target${c0} to run a specific ${c1}action${c0} against a specific ${c1}:target${c0}."
   echo "* If ${c1}action${c0} is specified without a ${c1}target${c0} suffix, it will be applied to all ${c1}:target${c0}s."
