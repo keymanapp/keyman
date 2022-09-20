@@ -81,10 +81,13 @@ namespace com.keyman.text {
         case 'K_SHIFT':
         case 'K_LOPT':
         case 'K_ROPT':
-        case 'K_NUMLOCK': // Often used for numeric layers.
+        case 'K_NUMLOCK':  // Often used for numeric layers.
         case 'K_CAPS':
           return true;
         default:
+          if(Codes.keyCodes[keyID] >= 50000) { // A few are used by `sil_euro_latin`.
+            return true; // is a 'K_' key defined for layer shifting or 'control' use.
+          }
           // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
           // layer shifting keys.  To be safe, we currently let K_TABBACK and
           // K_TABFWD through, though we might be able to drop them too.
