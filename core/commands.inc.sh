@@ -131,7 +131,7 @@ do_command() {
   echo_heading "======= Installing $target ======="
 
   pushd "$MESON_PATH" > /dev/null
-  ninja $2
+  ninja $command
   popd > /dev/null
 }
 
