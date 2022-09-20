@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.68 alpha 2022-09-20
+
+* chore(web): update `got` dependency for regression tests (#7315)
+* chore(developer): update multer dependency for server (#7314)
+* chore(developer): update node-windows-trayicon to update node-gyp to 9.1.0 (#7321)
+
 ## 16.0.67 alpha 2022-09-19
 
 * fix(common/models): blocks full-text "corrections"  ️ (#7241)
