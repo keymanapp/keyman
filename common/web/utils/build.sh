@@ -11,15 +11,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-action=
-function action_failure() {
-  if [ -n "$action" ]; then
-    builder_report failure $action
-  fi
-}
-
-trap action_failure err
-
 ################################ Main script ################################
 
 builder_describe \
@@ -29,24 +20,19 @@ builder_describe \
 builder_parse "$@"
 
 if builder_has_action configure; then
-  action=configure
   verify_npm_setup
 
-  "$THIS_SCRIPT_PATH/build.sh"
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
 
   builder_report success configure
 fi
 
 if builder_has_action clean; then
-  action=clean
   npm run clean
-
   builder_report success clean
 fi
 
 if builder_has_action build; then
-  action=build
   npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
-
   builder_report success build
 fi

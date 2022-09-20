@@ -348,6 +348,22 @@ _builder_item_is_target() {
   return 0
 }
 
+function _builder_failure_trap() {
+  local action target
+
+  # Iterate across currently-active actions and report their failures.
+  for action in "${_builder_current_actions[@]}"; do
+    if [[ $action =~ : ]]; then
+      IFS=: read -r action target <<< $action
+      target=:$target
+    else
+      target=:project
+    fi
+
+    builder_report failure $action $target
+  done
+}
+
 #
 # Returns 0 if the user has asked to perform action on target on the command line
 #
@@ -687,6 +703,10 @@ builder_parse() {
       echo "* $e"
     done
   fi
+
+  # Now that we've successfully parsed options adhering to the _builder spec, we may activate the
+  # action_failure trap.  (We don't want it active on scripts not yet using said script.)
+  trap _builder_failure_trap err
 }
 
 _builder_pad() {

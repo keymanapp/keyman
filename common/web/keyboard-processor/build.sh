@@ -15,15 +15,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
-action=
-function action_failure() {
-  if [ -n "$action" ]; then
-    builder_report failure $action
-  fi
-}
-
-trap action_failure err
-
 ################################ Main script ################################
 
 # Ensures color var use in `builder_describe`'s argument respects the specified
@@ -52,7 +43,6 @@ fi
 # END - Script parameter configuration
 
 if builder_has_action configure; then
-  action=configure
   verify_npm_setup
 
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
@@ -61,22 +51,16 @@ if builder_has_action configure; then
 fi
 
 if builder_has_action clean; then
-  action=clean
   npm run clean
-
   builder_report success clean
 fi
 
 if builder_has_action build; then
-  action=build
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-
   builder_report success build
 fi
 
 if builder_has_action test; then
-  action=test
-
   # Build test dependency
   pushd "$KEYMAN_ROOT/common/web/recorder"
   ./build.sh

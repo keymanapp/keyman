@@ -14,16 +14,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-action=
-target=
-function action_failure() {
-  if [ -n "$action" ]; then
-    builder_report failure $action $target
-  fi
-}
-
-trap action_failure err
-
 ################################ Main script ################################
 
 
@@ -57,9 +47,6 @@ if builder_has_action configure :proctor; then
 fi
 
 if [ $CONFIGURE==true ]; then
-  action=configure
-  target=:project
-
   verify_npm_setup
 
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
@@ -69,33 +56,21 @@ if [ $CONFIGURE==true ]; then
 fi
 
 if builder_has_action clean :module; then
-  action=clean
-  target=:module
   npm run tsc -- -b --clean "src/tsconfig.json"
-
   builder_report success clean :module
 fi
 
 if builder_has_action clean :proctor; then
-  action=clean
-  target=:module
   npm run tsc -- -b --clean "$THIS_SCRIPT_PATH/src/nodeProctor.tsconfig.json"
-
   builder_report success clean :proctor
 fi
 
 if builder_has_action build :module; then
-  action=build
-  target=:module
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-
   builder_report success build :module
 fi
 
 if builder_has_action build :proctor; then
-  action=build
-  target=:proctor
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/nodeProctor.tsconfig.json"
-
   builder_report success build :proctor
 fi
