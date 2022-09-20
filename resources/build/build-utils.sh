@@ -320,6 +320,11 @@ fi
 #
 _builder_debug=false
 
+#
+# builder_extra_params: string containing all parameters after '--'
+#
+builder_extra_params=()
+
 # returns 0 if first parameter is in the array passed as second parameter
 #
 # Usage:
@@ -549,6 +554,7 @@ _builder_parameter_error() {
 #   1: $@         command-line arguments
 builder_parse() {
   builder_verbose=
+  builder_extra_params=()
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
 
@@ -558,6 +564,12 @@ builder_parse() {
     local action=
     local target=
     local e has_action has_target has_option longhand_option
+
+    if [[ $key == "--" ]]; then
+      shift
+      builder_extra_params=("$@")
+      break
+    fi
 
     if [[ $key =~ : ]]; then
       IFS=: read -r action target <<< $key
