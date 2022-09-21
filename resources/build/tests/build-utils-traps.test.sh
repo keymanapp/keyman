@@ -12,8 +12,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 ##############
 
-CHECK="${COLOR_GREEN}\xE2\x9C\x94${COLOR_RESET}" # ✔
-CROSS="${COLOR_RED}\xE2\x9D\x8C${COLOR_RESET}" # ❌
+CHECK="${COLOR_GREEN}✔${COLOR_RESET}" # ✔
+CROSS="${COLOR_RED}❌${COLOR_RESET}" # ❌
 
 builder_describe \
   "Provides actions useful for build-utils.sh trap-functionality unit testing.\nOnly one action may be set at a time." \
@@ -70,13 +70,13 @@ if builder_has_action error; then
 
   # The `|| true` disables any trap shenanigans.
   # Needed to capture the log messages.
-  output_logs=`./trap-test-builds.sh raise-build-error` || true
+  output_logs=`$THIS_SCRIPT_PATH/trap-test-builds.sh raise-build-error` || true
 
   trap error-test-matcher err
 
   # Relies on the `trap` - no further commands outside the handler will be processed.
   # Also emits the log messages (but we can't capture them here)
-  ./trap-test-builds.sh raise-build-error
+  $THIS_SCRIPT_PATH/trap-test-builds.sh raise-build-error
 
   # In case the expected error isn't emitted.  Will emit the report-failure.
   error-test-matcher
@@ -126,12 +126,12 @@ if builder_has_action incomplete; then
   echo "$HR"
 
   # The `|| true` disables any trap shenanigans.
-  output_logs=`./trap-test-builds.sh unreported-action` || true
+  output_logs=`$THIS_SCRIPT_PATH/trap-test-builds.sh unreported-action` || true
 
   trap warning-test-matcher err
 
   # Relies on the `trap` - no further commands outside the handler will be processed.
-  ./trap-test-builds.sh unreported-action
+  $THIS_SCRIPT_PATH/trap-test-builds.sh unreported-action
 
   warning-test-matcher
 fi
