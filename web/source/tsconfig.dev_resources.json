@@ -18,7 +18,6 @@
     "dom/targets/designIFrame.ts",
     "dom/targets/touchAlias.ts",
     "dom/targets/outputTarget.ts",
-    "dom/touchAliasElement.ts",
     "kmwexthtml.ts",
     "kmwdevice.ts",
     "dom/utils.ts",

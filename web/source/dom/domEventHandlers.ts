@@ -1,4 +1,3 @@
-/// <reference path="touchAliasElement.ts" />
 /// <reference path="preProcessor.ts" />
 
 namespace com.keyman.dom {
@@ -655,83 +654,6 @@ namespace com.keyman.dom {
     dragEnd: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
       e.stopPropagation();
       this.firstTouch = null;
-    }.bind(this);
-
-    /**
-     * Handle the touch move event for an input element
-     */
-    dragInput: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
-      // Prevent dragging window
-      if(e.cancelable) {
-        // If a touch-alias element is scrolling, this may be false.
-        // Tends to result in a spam of console errors when e.cancelable == false.
-        e.preventDefault();
-      }
-      e.stopPropagation();
-
-      // Identify the target from the touch list or the event argument (IE 10 only)
-      var target: HTMLElement;
-      let touch: Touch;
-
-      if(dom.Utils.instanceof(e, "TouchEvent")) {
-        try {
-          touch=DOMTouchHandlers.selectTouch(e as TouchEvent);
-        } catch(err) {
-          console.warn(err);
-          return;
-        }
-        target = touch.target as HTMLElement;
-      } else {
-        target = e.target as HTMLElement;
-      }
-      if(target == null) {
-        return;
-      }
-
-      // Identify the input element from the touch event target (touched element may be contained by input)
-      target = findTouchAliasTarget(target);
-
-      if(!target) {
-        return;
-      }
-
-      const x = touch.screenX;
-      const y = touch.screenY;
-
-      // Allow content of input elements to be dragged horizontally or vertically
-      if(typeof this.firstTouch == 'undefined' || this.firstTouch == null) {
-        this.firstTouch={x:x,y:y};
-      } else {
-        var x0=this.firstTouch.x,y0=this.firstTouch.y,
-          scroller=target.firstChild as HTMLElement,dx,dy,x1;
-
-        if(target.base.nodeName == 'TEXTAREA') {
-          var yOffset=parseInt(scroller.style.top,10);
-          if(isNaN(yOffset)) yOffset=0;
-          dy=y0-y;
-          if(dy < -4 || dy > 4) {
-            scroller.style.top=(yOffset<dy?yOffset-dy:0)+'px';
-            this.firstTouch.y=y;
-          }
-        } else {
-          var xOffset=parseInt(scroller.style.left,10);
-          if(isNaN(xOffset)) xOffset=0;
-          dx=x0-x;
-          if(dx < -4 || dx > 4)
-          {
-            // Limit dragging beyond the defined text (to avoid dragging the text completely out of view)
-            var xMin=0, xMax= dom.Utils.getAbsoluteX(target)+target.offsetWidth-scroller.offsetWidth-32;
-            if(target.base.dir == 'rtl')xMin=16; else xMax=xMax-24;
-            x1=xOffset-dx;
-            if(x1 > xMin) x1=xMin;
-            if(x1 < xMax) x1=xMax;
-            scroller.style.left=x1+'px';
-            this.firstTouch.x=x;
-          }
-        }
-      }
-      // Should refactor to use TouchAliasElement's version; target is an instance of the class.
-      this.setScrollBar(target);
     }.bind(this);
 
     /**

@@ -315,49 +315,6 @@ if(typeof InterfaceTests == 'undefined') {
     }
     //#endregion
 
-    //#region Defines helpers related to TouchAliasElement test setup.
-    InterfaceTests.TouchAlias = {};
-
-    InterfaceTests.TouchAlias.setupElement = function() {
-      var id = DynamicElements.addTouchAlias();
-      var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.targets.TouchAlias(elem);
-
-      return {elem: elem, wrapper: wrapper};
-    }
-
-    InterfaceTests.TouchAlias.resetWithText = function(pair, string) {
-      // This method is tested separately in the touch_aliases.js test case file.
-      pair.elem.setText(string, 0);
-    }
-
-    // Implemented for completeness and generality with other tests.
-    InterfaceTests.TouchAlias.setCaret = function(pair, index) {
-      var text = pair.elem.getText();
-
-      // White-box style caret setting.
-      var pre = text.substr(0, index);
-      var post = text.substr(index);
-
-      pair.elem.__preCaret.textContent = pre;
-      pair.elem.__postCaret.textContent = post;
-
-      // Alternative, black-box-ish way to do this:
-
-      // // setTextCaret performs the needed string index translations already, so we need to convert back.
-      // pair.elem.setTextCaret(text._kmwCodePointToCodeUnit(index));
-    }
-
-    // Implemented for completeness and generality with other tests.
-    InterfaceTests.TouchAlias.getCaret = function(pair) {
-      return pair.elem.getCaret();
-    }
-
-    InterfaceTests.TouchAlias.setText = function(pair, text) {
-      pair.elem.setText(text);
-    }
-    //#endregion
-
     //#region Defines helpers related to HTMLInputElement / Input test setup.
     InterfaceTests.Mock = {};
 

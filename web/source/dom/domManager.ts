@@ -8,8 +8,6 @@
 /// <reference path="domDefaultOutput.ts" />
 // References other DOM-specific web-core overrides.
 /// <reference path="domOverrides.ts" />
-// Defines the touch-alias element structure used for mobile devices.
-/// <reference path="touchAliasElement.ts" />
 // Defines per-element-type OutputTarget element wrapping.
 /// <reference path="targets/wrapElement.ts" />
 // Defines cookie-based variable store serialization
@@ -256,9 +254,6 @@ namespace com.keyman.dom {
 
       Pelem.addEventListener('touchstart', touchHandlers.setFocus);
       Pelem.addEventListener('touchend', touchHandlers.dragEnd, false);
-
-      // Disable internal scroll when input element in focus
-      Pelem.addEventListener('touchmove', touchHandlers.dragInput, false);
 
       // Hide keyboard and caret when losing focus from simulated input field
       Pelem.onblur=touchHandlers.setBlur;
