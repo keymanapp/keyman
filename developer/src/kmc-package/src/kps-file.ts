@@ -38,10 +38,10 @@ interface KpsFileSystem {
 
 interface KpsFileOptions {
   followKeyboardVersion?: string;
-  readmeFile?: string;
+  readMeFile?: string;
   graphicFile?: string;
   executeProgram?: string;
-  msiFilename?: string;
+  msiFileName?: string;
   msiOptions?: string;
 }
 
@@ -49,7 +49,7 @@ interface KpsFileInfo {
   name?: KpsFileInfoItem;
   copyright?: KpsFileInfoItem;
   author?: KpsFileInfoItem;
-  website?: KpsFileInfoItem;
+  webSite?: KpsFileInfoItem;
   version?: KpsFileInfoItem;
 }
 
@@ -92,7 +92,7 @@ interface KpsFileKeyboard {
   name: string;
   iD: string;
   version: string;
-  oskFont?: string;
+  oSKFont?: string;
   displayFont?: string;
   rtl?: boolean;
   languages?: KpsFileLanguages;
