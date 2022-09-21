@@ -400,7 +400,7 @@ _builder_failure_trap() {
 }
 
 #
-# Builds the standarized `action:target` string for the specified action-target
+# Builds the standardized `action:target` string for the specified action-target
 # pairing and also returns 0 if the user has asked to perform it on the command
 # line.  Otherwise, returns 0 and sets an empty string in place of the matched
 # pair.
