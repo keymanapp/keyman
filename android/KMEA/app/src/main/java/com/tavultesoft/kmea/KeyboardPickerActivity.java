@@ -321,8 +321,10 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   private static void setSelection(int position) {
-    listView.setItemChecked(position, true);
-    listView.setSelection(position);
+    if (listView != null) {
+      listView.setItemChecked(position, true);
+      listView.setSelection(position);
+    }
     selectedIndex = position;
   }
 
@@ -433,7 +435,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
       if(adapter != null) {
         adapter.notifyDataSetChanged();
       }
-      if (position == curKbPos && listView != null) {
+      if (position == curKbPos) {
         switchKeyboard(0,false);
       } else if(listView != null) { // A bit of a hack, since LanguageSettingsActivity calls this method too.
         curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
