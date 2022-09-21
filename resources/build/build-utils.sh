@@ -298,8 +298,12 @@ builder_use_color() {
   if $1; then
     COLOR_RED=$(tput setaf 1)
     COLOR_GREEN=$(tput setaf 2)
-    COLOR_BLUE=$(tput setaf 4)
     COLOR_YELLOW=$(tput setaf 3)
+    COLOR_BLUE=$(tput setaf 4)
+    COLOR_PURPLE=$(tput setaf 5)
+    COLOR_TEAL=$(tput setaf 6)
+    COLOR_WHITE=$(tput setaf 7)
+    COLOR_GREY=$(tput setaf 8)
     COLOR_RESET=$(tput sgr0)
     # e.g. VSCode https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support
     HEADING_SETMARK='\x1b]1337;SetMark\x07'
@@ -311,8 +315,12 @@ builder_use_color() {
   else
     COLOR_RED=
     COLOR_GREEN=
-    COLOR_BLUE=
     COLOR_YELLOW=
+    COLOR_BLUE=
+    COLOR_PURPLE=
+    COLOR_TEAL=
+    COLOR_WHITE=
+    COLOR_GREY=
     COLOR_RESET=
     HEADING_SETMARK=
     BUILDER_TERM_START="<"
@@ -337,6 +345,11 @@ fi
 # _builder_ names are internal use and subject to change
 #
 _builder_debug=false
+
+#
+# builder_extra_params: string containing all parameters after '--'
+#
+builder_extra_params=()
 
 # returns 0 if first parameter is in the array passed as second parameter
 #
@@ -667,6 +680,7 @@ builder_check_color() {
 #   1: $@         command-line arguments
 builder_parse() {
   builder_verbose=
+  builder_extra_params=()
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
   _builder_current_action=
@@ -677,6 +691,12 @@ builder_parse() {
     local action=
     local target=
     local e has_action has_target has_option longhand_option
+
+    if [[ $key == "--" ]]; then
+      shift
+      builder_extra_params=("$@")
+      break
+    fi
 
     if [[ $key =~ : ]]; then
       IFS=: read -r action target <<< $key
