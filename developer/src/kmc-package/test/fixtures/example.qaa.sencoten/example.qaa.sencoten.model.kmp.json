@@ -22,8 +22,11 @@
   "files": [
     {
       "name": "..\\build\\example.qaa.sencoten.model.js",
-      "description": "Lexical model example.qaa.sencoten.model.js",
-      "copyLocation": 0
+      "description": "Lexical model example.qaa.sencoten.model.js"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
     }
   ],
   "lexicalModels": [
