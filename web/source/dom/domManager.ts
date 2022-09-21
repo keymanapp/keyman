@@ -397,7 +397,7 @@ namespace com.keyman.dom {
       }
 
       var lastElem = this.lastActiveElement;
-      if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
+      if(lastElem == Pelem) {
         if(this.activeElement == lastElem) {
           this.activeElement = null;
         }
@@ -780,12 +780,6 @@ namespace com.keyman.dom {
           // If a touch alias was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
           window.setTimeout(function() {
             this.listInputs();
-
-            for(var k = 0; k < this.sortedInputs.length; k++) {
-              if(this.sortedInputs[k]['kmw_ip']) {
-                this.sortedInputs[k]['kmw_ip'].updateInput(this.sortedInputs[k]['kmw_ip']);
-              }
-            }
           }.bind(this), 1);
         } else {
           this.listInputs(); // Fix up our internal input ordering scheme.
@@ -812,12 +806,6 @@ namespace com.keyman.dom {
           // if we don't update the touch elements.
           window.setTimeout(function() {
             keyman.domManager.listInputs();
-
-            for(var k = 0; k < this.sortedInputs.length; k++) {
-              if(this.sortedInputs[k]['kmw_ip']) {
-                this.sortedInputs[k]['kmw_ip'].updateInput(this.sortedInputs[k]['kmw_ip']);
-              }
-            }
           }.bind(this), 1);
         } else {
           this.enableInputElement(Pelem);
@@ -949,12 +937,6 @@ namespace com.keyman.dom {
           var domManager = this;
           window.setTimeout(function() {
             domManager.listInputs();
-
-            for(var k = 0; k < this.sortedInputs.length; k++) {
-              if(this.sortedInputs[k]['kmw_ip']) {
-                this.sortedInputs[k]['kmw_ip'].updateInput();
-              }
-            }
           }.bind(this), 1);
         }
       }
@@ -1116,10 +1098,9 @@ namespace com.keyman.dom {
         Pelem._kmwAttachment.languageCode = Plc;
 
         // If Pelem is the focused element/active control, we should set the keyboard in place now.
-        // 'kmw_ip' is the touch-alias for the original page's control.
 
         var lastElem = this.lastActiveElement;
-        if(lastElem && (lastElem == Pelem || lastElem == Pelem['kmw_ip'])) {
+        if(lastElem && (lastElem == Pelem)) {
 
           if(Pkbd != null && Plc != null) { // Second part necessary for Closure.
             this.keyman.keyboardManager.setActiveKeyboard(Pkbd, Plc);
@@ -1248,10 +1229,6 @@ namespace com.keyman.dom {
         return;
       }
 
-      // As this is an API function, someone may pass in the base of a touch element.
-      // We need to respond appropriately.
-      e = (e['kmw_ip'] ? e['kmw_ip'] : e) as HTMLElement;
-
       // If we're changing controls, don't forget to properly manage the keyboard settings!
       // It's only an issue on 'native' (non-embedded) code paths.
       if(!this.keyman.isEmbedded) {
@@ -1343,17 +1320,11 @@ namespace com.keyman.dom {
      *
      */
     moveToElement(e:string|HTMLElement) {
-      var i;
-
       if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
         e=document.getElementById(e);
       }
 
-      if(this.keyman.util.device.touchable && e['kmw_ip']) {
-        e['kmw_ip'].focus();
-      } else {
-        e.focus();
-      }
+      e.focus();
     }
 
     /* ----------------------- Editable IFrame methods ------------------- */

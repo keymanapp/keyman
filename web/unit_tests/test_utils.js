@@ -162,9 +162,6 @@ var loadKeyboardFromJSON = function(jsonPath, timeout, params) {
 
 function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
   var inputElem = document.getElementById('singleton');
-  if(inputElem['kmw_ip']) {
-    inputElem = inputElem['kmw_ip'];
-  }
 
   let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
   testDef.test(proctor);
@@ -183,15 +180,8 @@ function runKeyboardTestFromJSON(jsonPath, params, callback, assertCallback, tim
 }
 
 function retrieveAndReset(Pelem) {
-  var alias = Pelem['kmw_ip'];
-  var val = "";
-  if(alias) {
-    val = alias.textContent;
-    alias.setText("", 0);
-  } else {
-    val = Pelem.value;
-    Pelem.value = "";
-  }
+  let val = Pelem.value;
+  Pelem.value = "";
 
   return val;
 }

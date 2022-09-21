@@ -388,11 +388,6 @@ namespace com.keyman.dom {
     doChangeEvent(_target: HTMLElement) {
       if(DOMEventHandlers.states.changed) {
         let event = new Event('change', {"bubbles": true, "cancelable": false});
-
-        // Ensure that touch-aliased elements fire as if from the aliased element.
-        if(_target['base'] && _target['base']['kmw_ip']) {
-          _target = _target['base'];
-        }
         _target.dispatchEvent(event);
       }
 
@@ -528,14 +523,9 @@ namespace com.keyman.dom {
         // Will usually be called from setActiveElement, which should define DOMEventHandlers.states.lastActiveElement
         if(this.keyman.domManager.lastActiveElement) {
           tEvent.target = this.keyman.domManager.lastActiveElement;
-          // Shouldn't happen, but... just in case.  Implemented late in 14.0 beta, so
-          // this detail was kept, though it's likely safe to eliminate.
-          if(tEvent.target['kmw_ip']) {
-            tEvent.target = tEvent.target['kmw_ip'];
-          }
         // but will default to first input or text area on page if DOMEventHandlers.states.lastActiveElement is null
         } else {
-          tEvent.target = this.keyman.domManager.sortedInputs[0]['kmw_ip'];
+          tEvent.target = this.keyman.domManager.sortedInputs[0];
         }
       }
 
