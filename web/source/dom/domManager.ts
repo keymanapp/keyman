@@ -238,34 +238,13 @@ namespace com.keyman.dom {
       // Remove any handlers for "NonKMWTouch" elements, since we're enabling it here.
       Pelem.removeEventListener('touchstart', this.nonKMWTouchHandler);
 
-      /*
-      *  Does this element already have a simulated touch element established?  If so,
-      *  just reuse it - if it isn't still in the input list!
-      */
-      if(Pelem['kmw_ip']) {
-
-        if(this.inputList.indexOf(Pelem['kmw_ip']) != -1) {
-          return false;
-        }
-
-        this.inputList.push(Pelem['kmw_ip']);
-
-        console.log("Unexpected state - this element's simulated input DIV should have been removed from the page!");
-
-        return true;   // May need setup elsewhere since it's just been re-added!
+      if(!this.isAttached(Pelem)) {
+        this.setupElementAttachment(Pelem);
+        Pelem.inputMode = 'none';
       }
-
-      // The simulated touch element doesn't already exist?  Time to initialize it.
-      let x=dom.constructTouchAlias(Pelem);
-      if(this.isAttached(x)) {
-        x._kmwAttachment.interface = dom.targets.wrapElement(x);
-      } else {
-        this.setupElementAttachment(x); // The touch-alias should have its own wrapper.
-      }
-      Pelem._kmwAttachment = x._kmwAttachment; // It's an object reference we need to alias.
 
       // Set font for base element
-      this.enableInputElement(x, true);
+      this.enableInputElement(Pelem, false);
 
       // Superimpose custom input fields for each input or textarea, unless readonly or disabled
 
@@ -275,14 +254,14 @@ namespace com.keyman.dom {
       // We know this to be the correct set of handlers because we're setting up a touch element.
       var touchHandlers = this.touchHandlers;
 
-      x.addEventListener('touchstart', touchHandlers.setFocus);
-      x.addEventListener('touchend', touchHandlers.dragEnd, false);
+      Pelem.addEventListener('touchstart', touchHandlers.setFocus);
+      Pelem.addEventListener('touchend', touchHandlers.dragEnd, false);
 
       // Disable internal scroll when input element in focus
-      x.addEventListener('touchmove', touchHandlers.dragInput, false);
+      Pelem.addEventListener('touchmove', touchHandlers.dragInput, false);
 
       // Hide keyboard and caret when losing focus from simulated input field
-      x.onblur=touchHandlers.setBlur;
+      Pelem.onblur=touchHandlers.setBlur;
 
       // Note that touchend event propagates and is processed by body touchend handler
       // re-setting the first touch point for a drag
@@ -305,26 +284,7 @@ namespace com.keyman.dom {
         return; // If/when we do support this, we'll need an iframe-level manager for it.
       }
 
-      if(Pelem['kmw_ip']) {
-        var index = this.inputList.indexOf(Pelem['kmw_ip']);
-        if(index != -1) {
-          this.inputList.splice(index, 1);
-        }
-
-        Pelem.style.visibility='visible'; // hide by default: KMW-3
-        Pelem.disabled = false;
-        Pelem.removeEventListener('resize', Pelem['kmw_ip']._kmwResizeHandler);
-
-        // Disable touch-related handling code.
-        this.disableInputElement(Pelem['kmw_ip']);
-        Pelem._kmwAttachment.interface = dom.targets.wrapElement(Pelem);
-
-        // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
-        if(Pelem.parentNode) {
-          Pelem.parentNode.removeChild(Pelem['kmw_ip']);
-        }
-        delete Pelem['kmw_ip'];
-      }
+      Pelem.inputMode = 'text';
 
       this.setupNonKMWTouchElement(Pelem);
     }
@@ -796,21 +756,13 @@ namespace com.keyman.dom {
       var elDir=(activeKeyboard && activeKeyboard.isRTL) ? 'rtl' : 'ltr';
 
       if(Ptarg) {
-        if(this.keyman.util.device.touchable) {
-          let alias = <dom.TouchAliasElement> Ptarg;
-          if(Ptarg.textContent.length == 0) {
-            alias.base.dir=alias.dir=elDir;
-            alias.setTextCaret(10000);
-          }
-        } else {
-          if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement
-              || Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLTextAreaElement) {
-            if((Ptarg as HTMLInputElement|HTMLTextAreaElement).value.length == 0) {
-              Ptarg.dir=elDir;
-            }
-          } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
+        if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement
+            || Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLTextAreaElement) {
+          if((Ptarg as HTMLInputElement|HTMLTextAreaElement).value.length == 0) {
             Ptarg.dir=elDir;
           }
+        } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
+          Ptarg.dir=elDir;
         }
       }
     }
@@ -1262,13 +1214,6 @@ namespace com.keyman.dom {
     }
 
     set activeElement(Pelem: HTMLElement) {
-      // Ensure that a TouchAliasElement is hidden whenever it is deactivated for input.
-      if(this.activeElement) {
-        if(Utils.instanceof(this.keyman.domManager.activeElement, "TouchAliasElement")) {
-          (this.keyman.domManager.activeElement as TouchAliasElement).hideCaret();
-        }
-      }
-
       DOMEventHandlers.states._activeElement = Pelem;
 
       var isActivating = this.keyman.uiManager.isActivating;
@@ -1393,24 +1338,7 @@ namespace com.keyman.dom {
       i = i < 0 ? i+t.length : i;
 
       // Move to the selected element
-      if(touchable) {
-        // Set focusing flag to prevent OSK disappearing
-        DOMEventHandlers.states.focusing=true;
-        var target=t[i]['kmw_ip'];
-
-        // Focus if next element is non-mapped
-        if(typeof(target) == 'undefined') {
-          t[i].focus();
-        } else { // Or reposition the caret on the input DIV if mapped
-          let alias = <dom.TouchAliasElement> target;
-          this.keyman.domManager.setActiveElement(target); // Handles both `lastActive` + `active`.
-          alias.setTextCaret(10000); // Safe b/c touchable == true.
-          alias.scrollInput();   // mousedown check
-          target.focus();
-        }
-      } else { // Behaviour for desktop browsers
-        t[i].focus();
-      }
+      t[i].focus();
     }
 
     /**

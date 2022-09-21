@@ -182,16 +182,6 @@ namespace com.keyman.dom {
         Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
       }
 
-      // Makes sure we properly detect the TouchAliasElement root,
-      // rather than one of its constituent children.
-      if(this.keyman.util.device.touchable) {
-        Ltarg = findTouchAliasTarget(Ltarg);
-
-        if(!Ltarg) {
-          return true;
-        }
-      }
-
       if(DOMEventHandlers.states._IgnoreNextSelChange) {
         // If a keyboard calls saveFocus() (KSF), then ignore the
         // next selection change
@@ -206,12 +196,6 @@ namespace com.keyman.dom {
         e.cancelBubble = true;
         e.stopPropagation();
         return true;
-      }
-
-      // Hide the touch device input caret, if applicable  I3363 (Build 301)
-      if(dom.Utils.instanceof(this.keyman.domManager.activeElement, "TouchAliasElement")) {
-        let lastAlias = <TouchAliasElement> this.keyman.domManager.activeElement;
-        lastAlias.hideCaret();
       }
 
       if (Ltarg.nodeType == 3) { // defeat Safari bug
@@ -503,16 +487,6 @@ namespace com.keyman.dom {
     }
 
     private static selectTouch(e: TouchEvent): Touch {
-      /*
-       * During multi-touch events, it's possible for one or more touches of said multi-touch
-       * to be against irrelevant parts of the page.  We only want to consider touches against
-       * valid OutputTargets - against elements of the page that KMW can attach to.
-       * With touch active... that's a TouchAliasElement.
-       */
-      let isValidTouch = function(touch: Touch, target: EventTarget): boolean {
-        return e.target == target && !!(findTouchAliasTarget(touch.target as HTMLElement));
-      }
-
       // The event at least tells us the event's target, which can be used to help check
       // whether or not individual `Touch`es may be related to this specific event for
       // an ongoing multitouch scenario.
@@ -520,7 +494,7 @@ namespace com.keyman.dom {
 
       // Find the first touch affected by this event that matches the current target.
       for(let i=0; i < e.changedTouches.length; i++) {
-        if(isValidTouch(e.changedTouches[i], target)) {
+        if(e.changedTouches[i].target == target) {
           return e.changedTouches[i];
         }
       }
@@ -571,64 +545,14 @@ namespace com.keyman.dom {
 
     // Also handles initial touch responses.
     setFocusWithTouch(tEvent: {pageX: number, pageY: number, target?: EventTarget}) {
-      var touchX=tEvent.pageX,touchY=tEvent.pageY;
-
-      // Some specifics rely upon which child of the TouchAliasElement received the actual event.
-      let tTarg=tEvent.target as HTMLElement;
-
-      // Determines the actual TouchAliasElement - the part tied to an OutputTarget.
-      let target = findTouchAliasTarget(tTarg);
-
-      if(!target) {
-        return;
-      }
-
-      // Some parts rely upon the scroller element.
-      let scroller = target.firstChild as HTMLElement;
-
-      // Move the caret and refocus if necessary
-      if(this.keyman.domManager.activeElement != target) {
-        // Hide the KMW caret
-        let prevTarget = <TouchAliasElement> this.keyman.domManager.activeElement;
-
-        // We're not 100% sure whether or not the next line can occur,
-        // but it's a decent failsafe regardless.
-        if(prevTarget && prevTarget['kmw_ip']) {
-          prevTarget = prevTarget['kmw_ip'] as TouchAliasElement;
-        }
-
-        // Make sure that we have the right type so that the expected method exists.
-        if(prevTarget && dom.Utils.instanceof(prevTarget, "TouchAliasElement")) {
-          prevTarget.hideCaret();
-        }
-
-        this.keyman.domManager.activeElement = target;
-        // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
-        // We must explicitly set the focus in order to remove focus from any non-KMW input
-        target.focus();  //Android native browsers may not like this, but it is needed for Chrome, Safari
-      }
+      let target=tEvent.target as HTMLElement;
 
       // Correct element directionality if required
       this.keyman.domManager._SetTargDir(target);
 
-      // If clicked on DIV on the main element, rather than any part of the text representation,
-      // set caret to end of text
-      if(tTarg && tTarg == target) {
-        let cp: number;
-        let x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);
-        if(target.dir == 'rtl') {
-          x += (scroller.firstChild as HTMLElement).offsetWidth;
-          cp=(touchX > x ? 0 : 100000);
-        } else {
-          cp=(touchX<x ? 0 : 100000);
-        }
-
-        target.setTextCaret(cp);
-        target.scrollInput();
-        // nextSibling - the scrollbar element.
-      } else if(tTarg != scroller.nextSibling) {
-        // Otherwise, if clicked on text in SPAN, set at touch position
-        target.executeCaretSearch(touchX, touchY);
+      // Move the caret and refocus if necessary
+      if(this.keyman.domManager.activeElement != target) {
+        this.keyman.domManager.activeElement = target;
       }
 
       /*
@@ -643,12 +567,13 @@ namespace com.keyman.dom {
 
       // With the attachment API update, we now directly track the old legacy control behavior.
       this.keyman.domManager.lastActiveElement = target;
-      target.showCaret();
 
       /*
        * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
        * If not, we need to activate the control's preferred keyboard.
        */
+
+      DOMEventHandlers.states._IgnoreBlurFocus = true;      // Used to temporarily ignore focus changes
       this._FocusKeyboardSettings(target, false);
 
       // Always do the common focus stuff, instantly returning if we're in an editable iframe.

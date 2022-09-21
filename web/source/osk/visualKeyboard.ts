@@ -1671,10 +1671,6 @@ namespace com.keyman.osk {
         } else if (keyName.indexOf('K_ROPT') >= 0) {
           keyman.uiManager.setActivatingUI(false);
           oskManager.startHide(true);
-          let active = keyman.domManager.activeElement;
-          if (dom.Utils.instanceof(active, "TouchAliasElement")) {
-            (active as dom.TouchAliasElement).hideCaret();
-          }
           keyman.domManager.lastActiveElement = null;
         }
       }
