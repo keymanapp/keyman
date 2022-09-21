@@ -154,6 +154,7 @@ fi
 # specified at a time; each ends with an `exit`.
 echo "Running separate tests"
 $THIS_SCRIPT_PATH/tests/build-utils-traps.test.sh error
+$THIS_SCRIPT_PATH/tests/build-utils-traps.test.sh error-in-function
 $THIS_SCRIPT_PATH/tests/build-utils-traps.test.sh incomplete
 echo "Fin"
 
