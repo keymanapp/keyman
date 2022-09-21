@@ -1236,6 +1236,38 @@ test_xstrlen_ignoreifopt() {
   assert_equal(xstrlen_ignoreifopt((PKMX_WCHAR) U_1F609_WINKING_FACE u"a"), 2);
 }
 
+void
+test_utf32() {
+  const KMX_DWORD u295 =     0x0127; // ħ
+
+  assert(Uni_IsBMP(u295));
+
+  const char16_t hmaqtua = Uni_UTF32BMPToUTF16(u295);
+  assert(hmaqtua == 0x0127);
+
+  char16_single c0;
+  int l0 = Utf32CharToUtf16(u295, c0);
+  assert(l0 == 1);
+  assert(c0.ch[0] == 0x0127);
+  assert(c0.ch[1] == 0);
+  std::u16string s0 = std::u16string(c0.ch, l0);
+  assert(s0 == std::u16string(u"ħ"));
+  assert_equal(s0.at(0), 0x0127);
+
+  const KMX_DWORD scat = 0x0001F640; // 🙀
+  assert(!Uni_IsBMP(scat));
+  char16_single c1;
+  int l1 = Utf32CharToUtf16(scat, c1);
+  assert(l1 == 2);
+  assert_equal(c1.ch[0], 0xD83D);
+  assert_equal(c1.ch[1], 0xDE40);
+  assert_equal(c1.ch[2], 0);
+  std::u16string s1 = std::u16string(c1.ch, l1);
+  assert_equal(s1.at(0), 0xD83D);
+  assert_equal(s1.at(1), 0xDE40);
+  assert(s1 == std::u16string(u"🙀"));
+}
+
 constexpr const auto help_str = u"\
 test_kmx_xstring [--color]\n\
 \n\
@@ -1256,6 +1288,7 @@ int main(int argc, char *argv []) {
   test_decxstr();
   test_xstrlen();
   test_xstrlen_ignoreifopt();
+  test_utf32();
 
   return 0;
 }

@@ -816,7 +816,7 @@ ibus_keyman_engine_process_key_event(
   km_kbp_context *context = km_kbp_state_context(keyman->state);
   g_free(get_current_context_text(context));
   g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=0x%x", km_mod_state);
-  km_kbp_status event_status = km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown);
+  km_kbp_status event_status = km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown, KM_KBP_EVENT_FLAG_DEFAULT);
   context                    = km_kbp_state_context(keyman->state);
   g_message("after process key event");
   g_free(get_current_context_text(context));

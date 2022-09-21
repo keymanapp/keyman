@@ -74,9 +74,9 @@ done
 
 for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" -o "${proj}" == "keyman" ]; then
-        rm -rf keyboardprocessor
+        rm -rf "$BASEDIR/keyboardprocessor"
         cp ../VERSION.md ../core/
-        ../core/build.sh -t keyboardprocessor configure
+        ../core/build.sh --target-path "$BASEDIR/keyboardprocessor" configure:arch
     fi
     if [ "${proj}" == "keyman-config"  -o "${proj}" == "keyman" ]; then
         cd keyman-config

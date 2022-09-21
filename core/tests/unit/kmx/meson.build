@@ -17,6 +17,9 @@ endif
 
 if compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_source_dir(),'@/')]
+  # we have to link in files from the binary folder also as the binary tests
+  # use the kmx test runner.
+  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'fixtures','binary','@')]
   source_path = '/'
   test_path = '/'
 else
@@ -216,6 +219,9 @@ else
   endforeach
 endif
 
+# binary file unit tests
+
+subdir('fixtures')
 
 # test for km_kbp_keyboard_get_key_list
 

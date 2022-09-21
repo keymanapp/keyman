@@ -15,14 +15,13 @@ goto help
 rem ----------------------------------
 
 :help
-echo Usage: %0 x86^|x64^|all debug^|release [build] [tests]
+echo Usage: %0 x86^|x64^|all debug^|release [configure] [build] [test] [additional params for meson/ninja]
 echo   or
-echo Usage: %0 x86^|x64^|all -c
+echo Usage: %0 x86^|x64 -c
 echo -c will leave your environment configured for Visual Studio for selected platform.
-echo -c can be used only with x86 and x64 options
 echo.
 echo Otherwise, %0 is intended to be used by build.sh, not directly.
-echo At least one of 'build' or 'tests' is required.
+echo At least one of 'configure', 'build', or 'test' is required.
 goto :eof
 
 rem ----------------------------------
@@ -31,10 +30,10 @@ rem ----------------------------------
 
 setlocal
 cd %KEYMAN_ROOT%\core
-cmd /c build.bat x86 %2 %3 %4 %5 || exit !errorlevel!
+cmd /c build.bat x86 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
 
 cd %KEYMAN_ROOT%\core
-cmd /c build.bat x64 %2 %3 %4 %5 || exit !errorlevel!
+cmd /c build.bat x64 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
 
 goto :eof
 
@@ -42,9 +41,10 @@ rem ----------------------------------
 
 :build
 
-if "%2"=="-c" goto :setup
-
 set ARCH=%1
+shift
+
+if "%1"=="-c" goto :setup
 
 echo === Locating Visual Studio ===
 
@@ -68,31 +68,35 @@ call !VCVARSALL! !ARCH! || exit !errorlevel!
 
 cd %KEYMAN_ROOT%\core
 
-set BUILDTYPE=%2
+set BUILDTYPE=%1
+shift
 
 set STATIC_LIBRARY=--default-library both
 
-if "%3" == "build" (
-  echo === Calling meson build for Windows !ARCH! !BUILDTYPE! ===
+set COMMAND=%1
+shift
+
+if "!COMMAND!" == "configure" (
+  echo === Configuring Keyman Core for Windows !ARCH! !BUILDTYPE! ===
   if exist build\!ARCH!\!BUILDTYPE! rd /s/q build\!ARCH!\!BUILDTYPE!
-  meson build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror || exit !errorlevel!
-
-  echo === Building Keyman Core for Windows !ARCH! !BUILDTYPE! ===
-  cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
-
-  ninja || exit !errorlevel!
-  cd ..\..\..
-
+  meson setup build\!ARCH!\!BUILDTYPE! !STATIC_LIBRARY! --buildtype !BUILDTYPE! --werror %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
   shift
 )
 
-if "%3" == "tests" (
-  cd build\!ARCH!/!BUILDTYPE! || exit !errorlevel!
-
-  echo === Running tests for Windows !ARCH! !BUILDTYPE! ===
-  meson test --print-errorlogs || exit !errorlevel!
-
+if "!COMMAND!" == "build" (
+  echo === Building Keyman Core for Windows !ARCH! !BUILDTYPE! ===
+  cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
+  ninja %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
   cd ..\..\..
+  shift
+)
+
+if "!COMMAND!" == "test" (
+  echo === Testing Keyman Core for Windows !ARCH! !BUILDTYPE! ===
+  cd build\!ARCH!\!BUILDTYPE! || exit !errorlevel!
+  meson test --print-errorlogs %1 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+  cd ..\..\..
+  shift
 )
 
 goto :eof
@@ -108,7 +112,7 @@ endlocal
 for /f "usebackq tokens=*" %%i in (`..\resources\build\vswhere -version [15^,17^) -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
   set VCVARSALL="%%i"
 )
-%VCVARSALL% %1
+%VCVARSALL% !ARCH!
 goto :eof
 
 rem ----------------------------------

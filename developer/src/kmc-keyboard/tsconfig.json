@@ -1,0 +1,17 @@
+{
+  "extends": "../kmc/tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true // for ajv
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../../../core/include/ldml/"}
+  ]
+}

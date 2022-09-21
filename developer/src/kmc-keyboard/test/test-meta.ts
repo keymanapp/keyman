@@ -1,0 +1,59 @@
+import 'mocha';
+import {assert} from 'chai';
+import { MetaCompiler } from '../src/compiler/meta.js';
+import { CompilerCallbacks, loadSectionFixture } from './helpers/index.js';
+import { KeyboardSettings, Meta } from '../src/kmx/kmx-plus.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
+
+describe('meta', function () {
+  this.slow(500); // 0.5 sec -- json schema validation takes a while
+
+  it('should compile minimal metadata', function() {
+    const callbacks = new CompilerCallbacks();
+    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', callbacks) as Meta;
+    assert.equal(callbacks.messages.length, 0);
+
+    assert.isEmpty(meta.author.value);        // TODO-LDML: default author string "unknown"?
+    assert.equal(meta.conform.value, 'techpreview');
+    assert.isEmpty(meta.layout.value);        // TODO-LDML: assumed layout?
+    assert.isEmpty(meta.normalization.value); // TODO-LDML: assumed normalization?
+    assert.isEmpty(meta.indicator.value);     // TODO-LDML: synthesize an indicator?
+    assert.equal(meta.settings, KeyboardSettings.none);
+  });
+
+  it('should compile maximal metadata', function() {
+    const callbacks = new CompilerCallbacks();
+    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', callbacks) as Meta;
+    assert.equal(callbacks.messages.length, 0);
+
+    assert.equal(meta.author.value, 'The Keyman Team');
+    assert.equal(meta.conform.value, 'techpreview');
+    assert.equal(meta.layout.value, 'QWIRKY');
+    assert.equal(meta.normalization.value, 'NFC');
+    assert.equal(meta.indicator.value, 'QW');
+    assert.equal(meta.version.value, "1.2.3");
+    assert.equal(meta.settings, KeyboardSettings.fallback | KeyboardSettings.transformFailure | KeyboardSettings.transformPartial);
+  });
+
+  it('should reject invalid normalization', function() {
+    const callbacks = new CompilerCallbacks();
+    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-normalization.xml', callbacks) as Meta;
+    assert.isNull(meta);
+    assert.equal(callbacks.messages.length, 1);
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidNormalization({form:'NFQ'}));
+  });
+
+  it('should reject invalid version', function() {
+    const callbacks = new CompilerCallbacks();
+    let meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-1.0.xml', callbacks) as Meta;
+    assert.isNull(meta);
+    assert.equal(callbacks.messages.length, 1);
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidVersion({version:'1.0'}));
+
+    meta = loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-v1.0.3.xml', callbacks) as Meta;
+    assert.isNull(meta);
+    assert.equal(callbacks.messages.length, 1);
+    assert.deepEqual(callbacks.messages[0], CompilerMessages.Error_InvalidVersion({version:'v1.0.3'}));
+  });
+});
+

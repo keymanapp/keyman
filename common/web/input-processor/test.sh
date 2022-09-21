@@ -61,8 +61,8 @@ if [ $FETCH_DEPS = true ]; then
 fi
 
 # Ensures that the lexical model compiler has been built locally.
-echo_heading "Preparing Lexical Model Compiler for test use"
-pushd "$KEYMAN_ROOT/developer/src/kmlmc/"
+echo_heading "Preparing Lexical Model Compiler (kmc-model) for test use"
+pushd "$KEYMAN_ROOT/developer/src/kmc-model/"
 ./build.sh
 popd
 

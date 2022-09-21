@@ -57,7 +57,6 @@ private:
   KMX_BOOL LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
-  PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 #ifdef KMX_64BIT
   LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
 #else
@@ -108,6 +107,10 @@ public:
   KMX_Environment *GetEnvironment();
   KMX_Environment const *GetEnvironment() const;
   INTKEYBOARDINFO const *GetKeyboard() const;
+
+  // Utility function
+public:
+  static PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 };
 
 inline KMX_BOOL KMX_ProcessEvent::IsCapsLockOn(KMX_DWORD modifiers) {

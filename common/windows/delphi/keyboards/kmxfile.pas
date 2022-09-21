@@ -195,8 +195,10 @@ const
     KF_CAPSONONLY =     $0002;
     KF_CAPSALWAYSOFF =  $0004;
     KF_LOGICALLAYOUT =  $0008;
+    KF_AUTOMATICVERSION = $0010;
 
-
+    // 16.0: Support for LDML Keyboards in KMXPlus file format
+    KF_KMXPLUS =        $0020;
 
 function GetSystemStore(Memory: PByte; SystemID: DWord; var Buffer: WideString): Boolean;  // I3310
 var
@@ -257,8 +259,12 @@ begin
     Position := 0;
     Write(kfh, SizeOf(TKeyboardFileHeader));
 
-    if CalculateBufferCRC(Size, Memory) <> cs then
-      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
+    if (kfh.dwFileVersion < VERSION_160) or (cs <> 0) then
+    begin
+      // #7222: We support a zero checksum in Keyman 16.0 and later
+      if CalculateBufferCRC(Size, Memory) <> cs then
+        raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
+    end;
 
     if kfh.dwIdentifier <> FILEID_COMPILED then
       raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);

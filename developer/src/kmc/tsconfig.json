@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "baseUrl": ".",
+    "paths": {
+      "@keymanapp/kmc-keyboard": [ "../kmc-keyboard/src/main" ],
+      "@keymanapp/kmc-model": [ "../kmc-model/src/main" ],
+      "@keymanapp/kmc-model-info": [ "../kmc-model-info/src/model-info-compiler" ],
+      "@keymanapp/kmc-package": [ "../kmc-package/src/kmp-compiler" ],
+    }
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../kmc-keyboard" },
+    { "path": "../kmc-model" },
+    { "path": "../kmc-model-info" },
+    { "path": "../kmc-package" },
+  ]
+}
