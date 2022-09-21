@@ -564,6 +564,7 @@ namespace com.keyman.dom {
 
       DOMEventHandlers.states._IgnoreBlurFocus = true;      // Used to temporarily ignore focus changes
       this._FocusKeyboardSettings(target, false);
+      DOMEventHandlers.states._IgnoreBlurFocus = false;     // Used to temporarily ignore focus changes
 
       // Always do the common focus stuff, instantly returning if we're in an editable iframe.
       // This parallels the if-statement in _ControlFocus - it may be needed as this if-statement in the future,
