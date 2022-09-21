@@ -55,7 +55,7 @@ function findRepositoryRoot() {
 #
 # Assumes that `findRepositoryRoot` has already been called, a condition met later on
 # within this script.
-function buildScriptIdentifiers() {
+function _builder_setBuildScriptIdentifiers() {
   if [ ! -z ${THIS_SCRIPT+x} ]; then
     THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
     readonly THIS_SCRIPT_PATH
@@ -191,7 +191,7 @@ function findShouldSentryRelease() {
 }
 
 findRepositoryRoot
-buildScriptIdentifiers
+_builder_setBuildScriptIdentifiers
 findTier
 findVersion
 # printVersionUtilsDebug
@@ -359,6 +359,17 @@ _builder_item_is_target() {
   return 0
 }
 
+function _builder_warn_if_incomplete() {
+  if [ -n "${_builder_current_action}" ]; then
+    local scope="[$THIS_SCRIPT_IDENTIFIER] "
+    echo "${COLOR_YELLOW}## ${scope}Warning - $_builder_current_action never reported success or failure${COLOR_RESET}"
+    # exit 1  # If we wanted this scenario to result in a forced build-script fail.
+  fi
+
+  # Since we've already warned about this once, we'll clear the variable to prevent repetitions.
+  _builder_current_action=
+}
+
 # Used by a `trap` statement later to facilitate auto-reporting failures on error detection
 # without obscuring failure exit/error codes.
 _builder_failure_trap() {
@@ -367,22 +378,16 @@ _builder_failure_trap() {
 
   # Since 'exit' is also trapped, we can also handle end-of-script incomplete actions.
   if [[ $trappedExitCode == 0 ]]; then
-    local scope="[$THIS_SCRIPT_IDENTIFIER] "
-
     # While there weren't errors, were there any actions that never reported success or failure?
-    for action in "${_builder_current_actions[@]}"; do
-      if [[ -n "$action" ]]; then
-        echo "${COLOR_YELLOW}## ${scope}Warning - $action never reported success or failure${COLOR_RESET}"
-        # exit 1  # If we wanted this scenario to result in a forced build-script fail.
-      fi
-    done
+    _builder_warn_if_incomplete
     return
   fi
 
   # If we've reached this point, we're here because an error occurred.
 
   # Iterate across currently-active actions and report their failures.
-  for action in "${_builder_current_actions[@]}"; do
+  if [ -n "${_builder_current_action}" ]; then
+    action="${_builder_current_action}"
     if [[ $action =~ : ]]; then
       IFS=: read -r action target <<< $action
       target=:$target
@@ -391,9 +396,7 @@ _builder_failure_trap() {
     fi
 
     builder_finish_action failure $action $target
-  done
-
-  _builder_current_actions=()
+  fi
 }
 
 #
@@ -452,7 +455,10 @@ builder_start_action() {
 
   if builder_has_action $@; then
     echo "${COLOR_BLUE}## $scope$_builder_matched_action starting...${COLOR_RESET}"
-    _builder_current_actions+=("$_builder_matched_action")
+    if [ -n "${_builder_current_action}" ]; then
+      _builder_warn_if_incomplete
+    fi
+    _builder_current_action="$_builder_matched_action"
     return 0
   else
     return 1
@@ -663,7 +669,7 @@ builder_parse() {
   builder_verbose=
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
-  _builder_current_actions=()
+  _builder_current_action=
 
   # Process command-line arguments
   while [[ $# -gt 0 ]] ; do
@@ -870,7 +876,7 @@ builder_finish_action() {
 
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
-  if _builder_item_in_array "$action$target" "${_builder_current_actions[@]}"; then
+  if [[ "$action$target" == "${_builder_current_action}" ]]; then
     if [[ $result == success ]]; then
       echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
     elif [[ $result == failure ]]; then
@@ -880,7 +886,7 @@ builder_finish_action() {
     fi
 
     # Remove $action$target from the array; it is no longer a current action
-    _builder_current_actions=( "${_builder_current_actions[@]/$action$target}" )
+    _builder_current_action=
   else
     echo "${COLOR_YELLOW}## Warning: reporting result of $action$target but the action was never started!${COLOR_RESET}"
   fi
