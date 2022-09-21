@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.69 alpha 2022-09-21
+
+* fix(android/engine): Check listview for setting keyboard selection (#7325)
+* refactor(common/web): reworks low-level module build scripts  ️ (#7319)
+* refactor(common): `builder` script tweaks - "has action" vs "start action"  ️ (#7333)
+* feat(common): builder trap-functionality testing  ️ (#7334)
+* chore(common): builder extra params support (#7339)
+
 ## 16.0.68 alpha 2022-09-20
 
 * chore(web): update `got` dependency for regression tests (#7315)
