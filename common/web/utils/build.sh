@@ -19,20 +19,20 @@ builder_describe \
 
 builder_parse "$@"
 
-if builder_has_action configure; then
+if builder_start_action configure; then
   verify_npm_setup
 
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
 
-  builder_report success configure
+  builder_finish_action success configure
 fi
 
-if builder_has_action clean; then
+if builder_start_action clean; then
   npm run clean
-  builder_report success clean
+  builder_finish_action success clean
 fi
 
-if builder_has_action build; then
+if builder_start_action build; then
   npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
-  builder_report success build
+  builder_finish_action success build
 fi

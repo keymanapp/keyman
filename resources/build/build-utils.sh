@@ -50,7 +50,7 @@ function findRepositoryRoot() {
 }
 
 # Used to build script-related build variables useful for referencing the calling script
-# and for prefixing builder_report outputs in order to more clearly identify the calling
+# and for prefixing builder_finish_action outputs in order to more clearly identify the calling
 # script.
 #
 # Assumes that `findRepositoryRoot` has already been called, a condition met later on
@@ -372,7 +372,7 @@ function _builder_warn_if_incomplete() {
 
 # Used by a `trap` statement later to facilitate auto-reporting failures on error detection
 # without obscuring failure exit/error codes.
-function _builder_failure_trap() {
+_builder_failure_trap() {
   local trappedExitCode=$?
   local action target
 
@@ -395,12 +395,18 @@ function _builder_failure_trap() {
       target=:project
     fi
 
-    builder_report failure $action $target
+    builder_finish_action failure $action $target
   fi
 }
 
 #
-# Returns 0 if the user has asked to perform action on target on the command line
+# Builds the standarized `action:target` string for the specified action-target
+# pairing and also returns 0 if the user has asked to perform it on the command
+# line.  Otherwise, returns 0 and sets an empty string in place of the matched
+# pair.
+#
+# The string will be set as `_builder_matched_action`, which is for
+# build-utils.sh internal use, used by `builder_start_action`.
 #
 # Usage:
 #   if build_has_action action[:target]; then ...; fi
@@ -408,9 +414,7 @@ function _builder_failure_trap() {
 #   1: action    name of action
 #   2: :target    name of target, :-prefixed, as part of first param or space separated ok
 # Example:
-#   if build_has_action build :app; then
-#   if build_has_action build:app; then
-#
+#   if builder_has_action build :app; then  # or build:app, that's fine too.
 builder_has_action() {
   local action="$1" target
 
@@ -423,17 +427,42 @@ builder_has_action() {
     target="$2"
   fi
 
+  if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
+    # To avoid WET re-processing of the $action$target string set
+    _builder_matched_action="$action$target"
+    return 0
+  else
+    _builder_matched_action=
+    return 1
+  fi
+}
+
+#
+# Returns 0 if the user has asked to perform action on target on the command line, and
+# then starts the action. Should be paired with builder_finish_action
+#
+# Usage:
+#   if builder_start_action action[:target]; then ...; fi
+# Parameters:
+#   1: action    name of action
+#   2: :target    name of target, :-prefixed, as part of first param or space separated ok
+# Example:
+#   if builder_start_action build :app; then
+#   if builder_start_action build:app; then
+#
+builder_start_action() {
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
-  if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
-    echo "${COLOR_BLUE}## $scope$action$target starting...${COLOR_RESET}"
+  if builder_has_action $@; then
+    echo "${COLOR_BLUE}## $scope$_builder_matched_action starting...${COLOR_RESET}"
     if [ -n "${_builder_current_action}" ]; then
       _builder_warn_if_incomplete
     fi
-    _builder_current_action="$action$target"
+    _builder_current_action="$_builder_matched_action"
     return 0
+  else
+    return 1
   fi
-  return 1
 }
 
 #
@@ -465,9 +494,8 @@ _builder_trim() {
 }
 
 #
-# Describes a build script, defines available parameters
-# and their meanings. Use together with builder_parse
-# to process input parameters
+# Describes a build script, defines available parameters and their meanings. Use
+# together with `builder_parse` to process input parameters.
 #
 # Usage:
 #    builder_describe description param_desc...
@@ -833,7 +861,7 @@ builder_display_usage() {
   echo
 }
 
-builder_report() {
+builder_finish_action() {
   local result="$1"
   local action="$2" target
 
@@ -849,10 +877,12 @@ builder_report() {
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
   if [[ "$action$target" == "${_builder_current_action}" ]]; then
-    if [ $result == success ]; then
+    if [[ $result == success ]]; then
       echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
+    elif [[ $result == failure ]]; then
+      echo "${COLOR_RED}## $scope$action$target failed${COLOR_RESET}"
     else
-      echo "${COLOR_RED}## $scope$action$target failed. Result: $result${COLOR_RESET}"
+      echo "${COLOR_RED}## $scope$action$target failed with message: $result${COLOR_RESET}"
     fi
 
     # Remove $action$target from the array; it is no longer a current action
