@@ -95,7 +95,7 @@ fi
 # of typescript, we need to avoid this!
 # TODO: we should try and rework this to avoid the need to manually wrap
 
-if builder_start_action clean || builder_has_action build then
+if builder_start_action clean || builder_has_action build; then
   npm run clean
   builder_finish_action success clean
 fi
