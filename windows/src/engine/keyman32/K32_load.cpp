@@ -31,7 +31,7 @@
 #include "pch.h"
 
 HBITMAP LoadBitmapFile(LPBYTE data, DWORD sz);
-BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz);
+BOOL VerifyKeyboard(LPBYTE filebase);
 
 #ifdef _WIN64
 LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
@@ -281,7 +281,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
     return FALSE;
   }
 
-  if(!VerifyKeyboard(filebase, sz)) return FALSE;
+  if(!VerifyKeyboard(filebase)) return FALSE;
 
 #ifdef _WIN64
   kbp = CopyKeyboard(buf, filebase, sz);
@@ -888,7 +888,7 @@ HBITMAP LoadBitmapFileEx(PBYTE filebase)
 }
 
 
-BOOL VerifyKeyboard(LPBYTE filebase, DWORD _kmn_unused(sz))
+BOOL VerifyKeyboard(LPBYTE filebase)
 {
   DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
