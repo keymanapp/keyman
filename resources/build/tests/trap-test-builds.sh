@@ -15,11 +15,11 @@ builder_describe \
 
 builder_parse "$@"
 
-if builder_has_action raise-build-error; then
+if builder_start_action raise-build-error; then
   echo "Emulating build script error => failure report"
   exit 1
 fi
 
-if builder_has_action unreported-action; then
+if builder_start_action unreported-action; then
   echo "Leaving action 'success' unreported; should trigger trap message"
 fi

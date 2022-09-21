@@ -53,17 +53,20 @@ error-test-matcher() {
     ALL_PASS=false
   fi
 
+  # Let's not re-trap ourselves from the trap!
+  trap - err exit
+
   if [[ $ALL_PASS == true ]]; then
-    builder_report success $active_test
+    builder_finish_action success $active_test
     exit 0
   else
-    builder_report failure $active_test
+    builder_finish_action failure $active_test
     exit 1
   fi
 }
 
 # Note:  if this test is run, no other ones after it may execute!
-if builder_has_action error; then
+if builder_start_action error; then
   # clear base traps
   trap - err
   trap - exit
@@ -91,7 +94,7 @@ function-with-error() {
 }
 
 # Note:  if this test is run, no other ones after it may execute!
-if builder_has_action error-in-function; then
+if builder_start_action error-in-function; then
   # clear base traps
   trap - err
   trap - exit
@@ -141,16 +144,19 @@ warning-test-matcher() {
     ALL_PASS=false
   fi
 
+  # Let's not re-trap ourselves from the trap!
+  trap - err exit
+
   if [[ $ALL_PASS == true ]]; then
-    builder_report success incomplete
+    builder_finish_action success incomplete
     exit 0
   else
-    builder_report failure incomplete
+    builder_finish_action failure incomplete
     exit 1
   fi
 }
 
-if builder_has_action incomplete; then
+if builder_start_action incomplete; then
   # clear base traps
   trap - err
   trap - exit
