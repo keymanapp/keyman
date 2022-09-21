@@ -12,6 +12,10 @@ including this file...
 
 ## Various tools
 
+### build-utils.sh
+
+See [build-utils.md](build-utils.md)
+
 ### vswhere
 
 vswhere.exe is used by Keyman Core to select a Visual Studio version on Windows.

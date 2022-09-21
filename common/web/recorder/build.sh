@@ -43,38 +43,36 @@ function do_configure() {
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
 }
 
-CONFIGURE=false
-if builder_has_action configure :module; then
-  CONFIGURE=true
+if builder_start_action configure :module; then
   do_configure
-  builder_report success configure :module
+  builder_finish_action success configure :module
 fi
 
-if builder_has_action configure :proctor; then
-  if [[ $CONFIGURE == false ]]; then
-    do_configure
-  else
+if builder_start_action configure :proctor; then
+  if builder_has_action configure :module; then
     echo "Configuration already completed in configure:module; skipping."
+  else
+    do_configure
   fi
-  builder_report success configure :proctor
+  builder_finish_action success configure :proctor
 fi
 
-if builder_has_action clean :module; then
+if builder_start_action clean :module; then
   npm run tsc -- -b --clean "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  builder_report success clean :module
+  builder_finish_action success clean :module
 fi
 
-if builder_has_action clean :proctor; then
+if builder_start_action clean :proctor; then
   npm run tsc -- -b --clean "$THIS_SCRIPT_PATH/src/nodeProctor.tsconfig.json"
-  builder_report success clean :proctor
+  builder_finish_action success clean :proctor
 fi
 
-if builder_has_action build :module; then
+if builder_start_action build :module; then
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  builder_report success build :module
+  builder_finish_action success build :module
 fi
 
-if builder_has_action build :proctor; then
+if builder_start_action build :proctor; then
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/nodeProctor.tsconfig.json"
-  builder_report success build :proctor
+  builder_finish_action success build :proctor
 fi
