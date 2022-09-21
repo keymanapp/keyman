@@ -18,9 +18,9 @@ if [[ "${_builder_chosen_action_targets[@]}" != "build:project" ]]; then
   fail "  Test: builder_parse, shorthand form 'build' should give us 'build:project"
 fi
 
-if builder_has_action build; then
+if builder_start_action build; then
   echo "building project"
-  builder_report success build
+  builder_finish_action success build
 else
   fail "FAIL: should have matched action build for :project"
 fi
@@ -54,35 +54,35 @@ if [[ $_builder_default_action != "default" ]]; then
 fi
 
 # Shorthand form where we don't have a :target (default is ":project")
-if builder_has_action build; then
+if builder_start_action build; then
   echo "building project"
-  builder_report success build
+  builder_finish_action success build
 else
   fail "FAIL: should have matched action build for :project"
 fi
 
-if builder_has_action clean :app; then
+if builder_start_action clean :app; then
   echo "Cleaning <clean :app>"
-  builder_report success clean :app
+  builder_finish_action success clean :app
 else
   fail "FAIL: should have matched action clean for :app"
 fi
 
-if builder_has_action clean:app; then
+if builder_start_action clean:app; then
   echo "Cleaning <clean:app>"
-  builder_report success clean:app
+  builder_finish_action success clean:app
 else
   fail "FAIL: should have matched action clean for :app"
 fi
 
-if builder_has_action build :app; then
+if builder_start_action build :app; then
   echo "Building app"
-  builder_report success build :app
+  builder_finish_action success build :app
 else
   fail "FAIL: should have matched action build for :app"
 fi
 
-if builder_has_action build :module; then
+if builder_start_action build :module; then
   fail "FAIL: should not have matched action build for :module"
 fi
 

@@ -83,9 +83,9 @@ builder_parse "$@"
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_has_action configure; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_report success configure
+  builder_finish_action success configure
 fi
 
 # We always need to clean first because the wrapping function
@@ -95,12 +95,12 @@ fi
 # of typescript, we need to avoid this!
 # TODO: we should try and rework this to avoid the need to manually wrap
 
-if builder_has_action clean || builder_has_action build >/dev/null; then
+if builder_start_action clean || builder_has_action build then
   npm run clean
-  builder_report success clean
+  builder_finish_action success clean
 fi
 
-if builder_has_action build; then
+if builder_start_action build; then
   # Ensure keyman-version is properly build (requires build script)
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 
@@ -115,10 +115,10 @@ if builder_has_action build; then
   wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT}/intermediate.js" > "${WORKER_OUTPUT_FILENAME}" || die
   cp "${WORKER_OUTPUT_FILENAME}" "${WORKER_TEST_BUNDLE_TARGET_FILENAME}" || die
 
-  builder_report success build
+  builder_finish_action success build
 fi
 
-if builder_has_action test; then
+if builder_start_action test; then
   npm test || fail "Tests failed"
-  builder_report success test
+  builder_finish_action success test
 fi

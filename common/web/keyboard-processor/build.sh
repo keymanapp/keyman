@@ -42,25 +42,25 @@ fi
 
 # END - Script parameter configuration
 
-if builder_has_action configure; then
+if builder_start_action configure; then
   verify_npm_setup
 
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
 
-  builder_report success configure
+  builder_finish_action success configure
 fi
 
-if builder_has_action clean; then
+if builder_start_action clean; then
   npm run clean
-  builder_report success clean
+  builder_finish_action success clean
 fi
 
-if builder_has_action build; then
+if builder_start_action build; then
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  builder_report success build
+  builder_finish_action success build
 fi
 
-if builder_has_action test; then
+if builder_start_action test; then
   # Build test dependency
   pushd "$KEYMAN_ROOT/common/web/recorder"
   ./build.sh
@@ -77,5 +77,5 @@ if builder_has_action test; then
 
   npm run mocha -- --recursive $FLAGS ./tests/cases/
 
-  builder_report success test
+  builder_finish_action success test
 fi
