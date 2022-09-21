@@ -298,18 +298,6 @@ if(typeof(DynamicElements) == 'undefined') {
     return editable.id;
   }
 
-  // base: takes an optional element to use as the touch alias's ['base'] property.
-  DynamicElements.addTouchAlias = function(base) {
-    var masterDiv = document.getElementById('DynamicElements');
-    var touchAlias = com.keyman.dom.constructTouchAlias(base);
-    var i = inputCounter++;
-
-    touchAlias.id = 'touchAlias' + i;
-
-    masterDiv.appendChild(touchAlias);
-    return touchAlias.id;
-  }
-
   DynamicElements.assertAttached = function(ele, done) {
     var assertion = function() {
       assert.isTrue(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not attached!");

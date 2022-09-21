@@ -1321,59 +1321,6 @@ describe('Element Input/Output Interfacing', function() {
     });
   });
 
-  /**
-   * TODO:  Design and implement some 'complex', cross-Node selection tests.
-   */
-  describe('Wrapper: Touch-Alias Elements', function() {
-    // Always has an active caret pos, so there's never a rejection.
-    // However, never has an actual SELECTION, since touch aliases don't support those yet.
-    // describe('Caret Handling', function() {
-    //   describe('hasSelection', function() {
-    //     it('correctly reports an active selection', function () {
-    //       InterfaceTests.Tests.getSelectionOwned(InterfaceTests.TouchAlias);
-    //     });
-    //   });
-    // });
-
-    describe('Text Retrieval', function(){
-      describe('getText', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.TouchAlias);
-        });
-      });
-
-      describe('getTextBeforeCaret', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.TouchAlias);
-        });
-      });
-
-      describe('getTextAfterCaret', function() {
-        it('correctly returns text (no active selection)', function() {
-          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.TouchAlias);
-        });
-      });
-    });
-
-    describe('Text Mutation', function() {
-      describe('deleteCharsBeforeCaret', function() {
-        it("correctly deletes characters from 'context' (no active selection)", function() {
-          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.TouchAlias);
-        });
-      });
-
-      describe('insertTextBeforeCaret', function() {
-        it("correctly replaces the element's 'context' (no active selection)", function() {
-          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.TouchAlias);
-        });
-      });
-
-      it('correctly maintains deadkeys', function() {
-        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.TouchAlias);
-      });
-    });
-  });
-
   describe('The "Mock" output target', function() {
     // Unique to the Mock type - element interface cloning tests.  Is element state properly copied?
     // As those require a very different setup, they're in the target_mocks.js test case file instead.
