@@ -522,7 +522,7 @@ namespace com.keyman.dom {
           console.warn("Error during attachment to / detachment from iframe: ");
           console.warn(err);
         }
-      } else if(x.isContentEditable && !touchable) { // Only allow contentEditable attachment outside of 'touch' mode.
+      } else if(x.isContentEditable) {
         return true;
       }
 
@@ -774,8 +774,6 @@ namespace com.keyman.dom {
         if(this.keyman.util.device.touchable) {
           this.disableTouchElement(Pelem);
           this.setupNonKMWTouchElement(Pelem);
-
-          var keyman = this.keyman;
 
           // If a touch alias was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
           window.setTimeout(function() {
