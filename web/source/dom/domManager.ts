@@ -217,11 +217,6 @@ namespace com.keyman.dom {
      *              Also ensures the element is registered on keymanweb's internal input list.
      */
     enableTouchElement(Pelem: HTMLElement) {
-      // Touch doesn't worry about iframes.
-      if(Pelem.tagName.toLowerCase() == 'iframe') {
-        return false;
-      }
-
       if(this.isKMWDisabled(Pelem)) {
         this.setupNonKMWTouchElement(Pelem);
         return false;
@@ -273,14 +268,7 @@ namespace com.keyman.dom {
      */
     disableTouchElement(Pelem: HTMLElement) {
       // Do not check for the element being officially disabled - it's also used for detachment.
-
-      // Touch doesn't worry about iframes.
-      if(Pelem.tagName.toLowerCase() == 'iframe') {
-        return; // If/when we do support this, we'll need an iframe-level manager for it.
-      }
-
       Pelem.inputMode = 'text';
-
       this.setupNonKMWTouchElement(Pelem);
     }
 
@@ -501,18 +489,21 @@ namespace com.keyman.dom {
      *              Also filters elements not supported for touch devices when device.touchable == true.
      */
     isKMWInput(x: HTMLElement): boolean {
-      var touchable = this.keyman.util.device.touchable;
-
       if(x instanceof x.ownerDocument.defaultView.HTMLTextAreaElement) {
         return true;
       } else if(x instanceof x.ownerDocument.defaultView.HTMLInputElement) {
         if (x.type == 'text' || x.type == 'search') {
           return true;
         }
-      } else if(x instanceof x.ownerDocument.defaultView.HTMLIFrameElement && !touchable) { // Do not allow iframe attachment if in 'touch' mode.
+      } else if(x instanceof x.ownerDocument.defaultView.HTMLIFrameElement) {
         try {
           if(x.contentWindow) {
-            if(x.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
+            const iframeDoc = x.contentWindow.document;
+            if(iframeDoc) { // Only allow attachment if the iframe's internal document is valid.
+              // Do not allow design-mode iframe attachment if in 'touch' mode.
+              if(this.keyman.util.device.touchable && iframeDoc.designMode.toLowerCase() == 'on') {
+                return false;
+              }
               return true;
             }
           } // else nothing?
@@ -948,7 +939,7 @@ namespace com.keyman.dom {
      *
      */
     _MutationAdditionObserved = function(Pelem: HTMLElement) {
-      if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement && !this.keyman.util.device.touchable) {
+      if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
         //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
         var domManager = this;

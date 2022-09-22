@@ -536,6 +536,10 @@ namespace com.keyman.dom {
     setFocusWithTouch(tEvent: {pageX: number, pageY: number, target?: EventTarget}) {
       let target=tEvent.target as HTMLElement;
 
+      if(target['body']) {
+        target = target['body']; // Occurs in Firefox for design-mode iframes.
+      }
+
       // Correct element directionality if required
       this.keyman.domManager._SetTargDir(target);
 
@@ -592,6 +596,10 @@ namespace com.keyman.dom {
 
       if(('relatedTarget' in e) && e.relatedTarget) {
         elem = e.relatedTarget as HTMLElement;
+      }
+
+      if(elem['body']) {
+        elem = elem['body']; // Occurs in Firefox for design-mode iframes.
       }
 
       this.executeBlur(elem);
