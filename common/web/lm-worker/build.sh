@@ -97,7 +97,9 @@ fi
 
 if builder_start_action clean || builder_has_action build; then
   npm run clean
-  builder_finish_action success clean
+  if builder_has_action clean; then
+    builder_finish_action success clean
+  fi
 fi
 
 if builder_start_action build; then
