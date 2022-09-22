@@ -27,7 +27,7 @@ export class MetaCompiler extends SectionCompiler {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidVersion({ version: versionNumber }));
         return false;
       }
-      if(!semver.parse(versionNumber, {loose: false, includePrerelease: true})) {
+      if(!semver.parse(versionNumber, {loose: false})) {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidVersion({ version: versionNumber }));
         return false;
       }
