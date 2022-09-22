@@ -143,7 +143,8 @@ function setSpacebarText(mode) {
   keyman.osk.show(true);
 
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  var kmw = window['keyman'];
+  kmw.correctOSKTextSize();
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't
