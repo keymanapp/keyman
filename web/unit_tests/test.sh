@@ -61,7 +61,7 @@ get_browser_set_for_OS ( ) {
     if [ $os_id = "mac" ]; then
         BROWSERS="--browsers Firefox,Chrome,Safari"
     elif [ $os_id = "win" ]; then
-        BROWSERS="--browsers Firefox,Chrome,IE,Edge"
+        BROWSERS="--browsers Firefox,Chrome,Edge"
     else
         BROWSERS="--browsers Firefox,Chrome"
     fi
