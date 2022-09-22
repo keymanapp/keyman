@@ -95,14 +95,16 @@ fi
 # of typescript, we need to avoid this!
 # TODO: we should try and rework this to avoid the need to manually wrap
 
-if builder_start_action clean || builder_has_action build; then
+if builder_start_action clean; then
   npm run clean
-  if builder_has_action clean; then
-    builder_finish_action success clean
-  fi
+  builder_finish_action success clean
 fi
 
 if builder_start_action build; then
+  if ! builder_has_action clean; then
+    npm run clean
+  fi
+
   # Ensure keyman-version is properly build (requires build script)
   "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 
