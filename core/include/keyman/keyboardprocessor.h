@@ -643,7 +643,7 @@ undefined. The returned buffer uses UTF-8 encoding.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 - `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 ##### Parameters:
-- __opts__: An opaque pointer to a state object.
+- __state__: An opaque pointer to a state object.
 - __buf__: A pointer to the buffer to place the C string containing the JSON
 document into, can be null.
 - __space__: A pointer to a size_t variable. This variable must contain the
@@ -786,7 +786,7 @@ km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
 Free the allocated memory belonging to a keyboard key list previously
 returned by `km_kbp_keyboard_get_key_list`.
 ##### Parameters:
-- __keyboard__: A pointer to the keyboard key list to be
+- __key_list__: A pointer to the keyboard key list to be
     disposed of.
 
 ```c
@@ -1111,16 +1111,55 @@ In the event the `state` pointer is null
 
 ##### Parameters:
 - __state__: A pointer to the opaque state object.
-- __vk__: A virtual key to be processed.
-- __modifier_state__:
-The combinations of modifier keys set at the time key `vk` was pressed, bitmask
-from the `km_kbp_modifier_state` enum.
 
 ```c
 */
 KMN_API
 km_kbp_status
 km_kbp_process_queued_actions(km_kbp_state *state);
+
+/*
+```
+### `km_kbp_event`
+##### Description:
+Tell the keyboard processor that an external event has occurred, such as a keyboard
+being activated through the language switching UI.
+##### Return status:
+- `KM_KBP_STATUS_OK`: On success.
+- `KM_KBP_STATUS_NO_MEM`:
+In the event memory is unavailable to allocate internal buffers.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+In the event the `state` pointer is null or an invalid event or data is passed.
+
+The keyboard processor may generate actions which should be processed by the
+consumer of the API.
+
+The action list will be cleared at the start of this call; options and context in
+the state may also be modified.
+
+##### Parameters:
+- __state__: A pointer to the opaque state object.
+- __event__: The event to be processed, from km_kbp_event_code enumeration
+- __data__: Additional event-specific data. Currently unused, must be nullptr.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_event(
+  km_kbp_state *state,
+  uint32_t event,
+  void* data
+);
+
+enum km_kbp_event_code {
+  /**
+   * A keyboard has been activated by the user. The processor may use this
+   * event, for example, to switch caps lock state or provide other UX.
+   */
+  KM_KBP_EVENT_KEYBOARD_ACTIVATED = 1,
+  //future: KM_KBP_EVENT_KEYBOARD_DEACTIVATED = 2,
+};
 
 #if defined(__cplusplus)
 } // extern "C"

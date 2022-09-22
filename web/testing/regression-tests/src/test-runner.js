@@ -1,6 +1,6 @@
 // test-runner
 
-const KEYBOARDS_RELATIVE_PATH = "/keyboards/"; 
+const KEYBOARDS_RELATIVE_PATH = "/keyboards/";
 const TEST_BATCH_SIZE = 100; // or Infinity
 
 var receiver;
@@ -17,7 +17,7 @@ var windowLoad = new Promise(function(resolve, reject) {
     receiver = document.getElementById('receiver');
     if(!receiver) {
       // When running tests, we dynamically create the receiver
-      receiver = document.createElement('input'); 
+      receiver = document.createElement('input');
       document.body.appendChild(receiver);
       let d0 = document.createElement('div');
       d0.id = 'progressWindow';
@@ -51,15 +51,15 @@ function chunk(arr, chunkSize) {
 }
 
 var testRunner = {
-  modCodes: keyman.osk.modifierCodes,
-  keyCodes: keyman.osk.keyCodes,
+  modCodes: com.keyman.text.Codes.modifierCodes,
+  keyCodes: com.keyman.text.Codes.keyCodes,
   keyboards: {},
   max: 0,
 
   /**
-   * Loads a .tests file for the given keyboard, and the corresponding keyboard. Both the 
+   * Loads a .tests file for the given keyboard, and the corresponding keyboard. Both the
    * keyboard and the tests file are injected via script into the document.
-   * 
+   *
    * @param {string} locator  a string in the form of shortname/id, e.g. k/kayan, sil/sil_ipa
    * @returns {Promise} A promise fulfilled when the keyboard and the tests file are ready
    */
@@ -102,7 +102,7 @@ var testRunner = {
 
   /**
    * Load a tests file and a keyboard from the keyboards repository
-   * @param {string} locator 
+   * @param {string} locator
    */
   loadTests: function(locator) {
     console.log('Loading tests + keyboard for '+locator);
@@ -130,7 +130,7 @@ var testRunner = {
         };
         // The KeymanWeb global will always exist, even when we otherwise change API.
         KeymanWeb.registerStub(stub);
-        let k = testRunner.keyboards[id]; 
+        let k = testRunner.keyboards[id];
         keyman.setKeyboardForControl(receiver, id, k.keyboard.languages[0].id);
         document.body.focus();
         receiver.focus();
@@ -185,7 +185,7 @@ var testRunner = {
       };
       http.open('POST', '/save-results');
       http.setRequestHeader('Content-Type', 'application/json');
-      http.send(JSON.stringify(json)); 
+      http.send(JSON.stringify(json));
     });
   },
 
@@ -203,7 +203,7 @@ var testRunner = {
 
   /**
    * Called by a .tests file to register a set of input tests
-   * @param {object} data  
+   * @param {object} data
    */
   register: function(data) {
     let keys = Object.keys(data.inputTests);
@@ -240,7 +240,7 @@ var testRunner = {
   runTests: function(keyboardId) {
     return new Promise(function(resolve, reject) {
       this.keyboards[keyboardId].results = {};
-      
+
       console.log('-- Running '+this.keyboards[keyboardId].inputTests.length+' tests for '+keyboardId+'.');
       var chunkSize = TEST_BATCH_SIZE;
 
@@ -291,7 +291,7 @@ var testRunner = {
         e.LisVirtualKeyCode = true;
         e.LisVirtualKey = true;
         e.vkCode = test.key;
-        
+
         // Keyman 14 changes the processKeystroke interface
         e.device = keyman.util.device.coreSpec;
         if(keyman.core) {
@@ -319,7 +319,7 @@ var testRunner = {
   initProgress: function(max) {
     this.max = max;
     this.progressPosition = document.getElementById('progressPosition');
-    if(this.progressPosition) this.progressPosition.style.width = '0px'; 
+    if(this.progressPosition) this.progressPosition.style.width = '0px';
   },
 
   /**
@@ -327,7 +327,7 @@ var testRunner = {
    * @param {number} len Current position of progress bar
    */
   updateProgress: function(len) {
-    if(this.progressPosition) this.progressPosition.style.width = Math.round(len / this.max * 100).toString() + '%'; 
+    if(this.progressPosition) this.progressPosition.style.width = Math.round(len / this.max * 100).toString() + '%';
   }
 };
 

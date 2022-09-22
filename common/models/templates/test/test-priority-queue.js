@@ -3,12 +3,12 @@
  */
 
 var assert = require('chai').assert;
-var PriorityQueue = require('../').models.PriorityQueue;
+var PriorityQueue = require('../build/index.bundled.js').models.PriorityQueue;
 
 describe('Priority queue', function() {
   it('can act as a min-heap', function () {
     let input = [1, 10, 2, 9, 3, 8, 4, 7, 5, 6];
-    
+
     let queue = new PriorityQueue((a, b) => a - b);
     input.forEach((input) => queue.enqueue(input));
 
@@ -41,7 +41,7 @@ describe('Priority queue', function() {
 
   it('can act as a max-heap', function () {
     let input = [1, 10, 2, 9, 3, 8, 4, 7, 5, 6];
-    
+
     let queue = new PriorityQueue((a, b) => b - a);
     input.forEach((input) => queue.enqueue(input));
 

@@ -13,7 +13,7 @@
 #include <type_traits>
 
 #include <keyman/keyboardprocessor.h>
-#include "json.hpp"
+#include "jsonpp.hpp"
 #include "utfcodec.hpp"
 
 // Forward declarations

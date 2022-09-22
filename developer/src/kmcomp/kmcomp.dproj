@@ -202,7 +202,6 @@
         <DCCReference Include="..\common\delphi\compiler\CompileErrorCodes.pas"/>
         <DCCReference Include="..\tike\oskbuilder\TouchLayout.pas"/>
         <DCCReference Include="..\tike\oskbuilder\TouchLayoutDefinitions.pas"/>
-        <DCCReference Include="..\tike\oskbuilder\TouchLayoutUtils.pas"/>
         <DCCReference Include="..\common\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\tike\main\KeyboardParser.pas"/>
         <DCCReference Include="..\common\delphi\general\WindowsLanguages.pas"/>

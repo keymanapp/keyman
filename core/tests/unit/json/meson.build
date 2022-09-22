@@ -13,7 +13,7 @@ endif
 e = executable('jsontest', 'jsontest.cpp',
     include_directories: [libsrc],
     link_args: links + tests_flags,
-    objects: lib.extract_objects('json.cpp'))
+    objects: lib.extract_objects('jsonpp.cpp'))
 test('jsontest', e, args: 'jsontest.json')
 test('jsontestOutput', python, is_parallel: false, args:
     cmpfiles + ['jsontest.json', join_paths(stnds, 'jsontest.json')])

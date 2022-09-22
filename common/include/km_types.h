@@ -58,7 +58,7 @@ typedef KMX_DWORD* PKMX_DWORD;
 
 #ifdef USE_CHAR16_T
 #define lpuch(x) u ## x
-typedef  char16_t KMX_UCHAR;
+typedef  km_kbp_cp KMX_UCHAR;
 #else
 #define lpuch(x) L ## x
 typedef  wchar_t KMX_UCHAR;

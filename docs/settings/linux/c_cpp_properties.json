@@ -2,7 +2,7 @@
   "configurations": [
     {
       "name": "linux",
-      "includePath": ["${workspaceFolder}/core/include/**"],
+      "includePath": ["${workspaceFolder}/common/include/","${workspaceFolder}/core/include/**"],
       "defines": [],
       "compilerPath": "/usr/lib/ccache/clang",
       "cStandard": "c11",

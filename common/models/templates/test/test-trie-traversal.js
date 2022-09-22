@@ -3,7 +3,7 @@
  */
 
 var assert = require('chai').assert;
-var TrieModel = require('../').models.TrieModel;
+var TrieModel = require('../build/index.bundled.js').models.TrieModel;
 
 // Useful for tests related to strings with supplementary pairs.
 var smpForUnicode = function(code){
@@ -52,7 +52,7 @@ describe('Trie traversal abstractions', function() {
         assert.isEmpty(child.traversal().entries);
 
         for(tChild of traversalInner1.children()) {
-          if(tChild.char == 'h') { 
+          if(tChild.char == 'h') {
             hSuccess = true;
             let traversalInner2 = tChild.traversal();
             assert.isDefined(traversalInner2);
@@ -64,7 +64,7 @@ describe('Trie traversal abstractions', function() {
                 eSuccess = true;
                 let traversalInner3 = hChild.traversal();
                 assert.isDefined(traversalInner3);
-                
+
                 assert.isDefined(traversalInner3.entries);
                 assert.equal(traversalInner3.entries[0], "the");
 
@@ -104,7 +104,7 @@ describe('Trie traversal abstractions', function() {
         assert.isEmpty(child.traversal().entries);
 
         for(tChild of traversalInner1.children()) {
-          if(tChild.char == 'r') { 
+          if(tChild.char == 'r') {
             let traversalInner2 = tChild.traversal();
             assert.isDefined(traversalInner2);
             assert.isArray(tChild.traversal().entries);
@@ -185,7 +185,7 @@ describe('Trie traversal abstractions', function() {
         assert.isEmpty(child.traversal().entries);
 
         for(aChild of traversalInner1.children()) {
-          if(aChild.char == smpP) { 
+          if(aChild.char == smpP) {
             pSuccess = true;
             let traversalInner2 = aChild.traversal();
             assert.isDefined(traversalInner2);

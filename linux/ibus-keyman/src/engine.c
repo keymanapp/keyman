@@ -70,7 +70,6 @@ struct _IBusKeymanEngine {
     gboolean         lalt_pressed;
     gboolean         ralt_pressed;
     gboolean         emitting_keystroke;
-    IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
 #ifdef GDK_WINDOWING_X11
@@ -262,8 +261,6 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   g_object_ref_sink(keyman->prop_list);
   ibus_prop_list_append(keyman->prop_list, keyman->status_prop);
 
-  keyman->table = ibus_lookup_table_new(9, 0, TRUE, TRUE);
-  g_object_ref_sink(keyman->table);
   keyman->state = NULL;
 #ifdef GDK_WINDOWING_X11
   keyman->xdisplay = NULL;
@@ -469,11 +466,6 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
         keyman->status_prop = NULL;
     }
 
-    if (keyman->table) {
-        g_debug("DAR: unref keyman->table");
-        g_object_unref (keyman->table);
-        keyman->table = NULL;
-    }
     if (keyman->state) {
         km_kbp_state_dispose(keyman->state);
         keyman->state = NULL;
@@ -506,16 +498,6 @@ static void forward_backspace(IBusKeymanEngine *keyman, unsigned int state)
 {
     g_message("DAR: forward_backspace %d no keysym state %d", KEYMAN_BACKSPACE, state);
     ibus_engine_forward_key_event((IBusEngine *)keyman, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, state);
-}
-
-static gboolean ok_for_single_backspace(const km_kbp_action_item *action_items, int i, size_t num_actions)
-{
-    for (int j=i+1; j < num_actions; j++) {
-        if (action_items[i].type == KM_KBP_IT_BACK || action_items[i].type == KM_KBP_IT_CHAR || action_items[i].type == KM_KBP_IT_EMIT_KEYSTROKE) {
-            return FALSE;
-        }
-    }
-    return TRUE;
 }
 
 static gboolean
@@ -601,10 +583,6 @@ process_backspace_action(
     }
     g_free(keyman->char_buffer);
     keyman->char_buffer = new_buffer;
-  } else if (ok_for_single_backspace(action_items, i, num_action_items)) {
-    // single backspace can be handled by ibus as normal
-    g_message("no char actions, just single back");
-    return FALSE;
   } else {
     g_message(
         "DAR: process_backspace_action - client_capabilities=%x, %x", engine->client_capabilities, IBUS_CAP_SURROUNDING_TEXT);

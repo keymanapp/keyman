@@ -13,7 +13,7 @@
 #include <sstream>
 
 #include <keyman/keyboardprocessor.h>
-#include "json.hpp"
+#include "jsonpp.hpp"
 
 #include "processor.hpp"
 #include "state.hpp"

@@ -106,7 +106,6 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
           return;
         }
 
-        BaseActivity.makeToast(currentContext, R.string.update_check_current, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

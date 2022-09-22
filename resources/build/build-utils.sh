@@ -27,6 +27,11 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
 # Setup variable for calling script's path and name
 if [ ! -z ${THIS_SCRIPT+x} ]; then
   THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
@@ -410,11 +415,15 @@ _builder_trim() {
 #
 # There are three types of parameters that may be specified:
 #
-# * Option, param_desc format: "--option[,-o]   [One line description]"
+# * Option, param_desc format: "--option[,-o][=var]   [One line description]"
 #   All options must have a longhand form with two prefix hyphens,
 #   e.g. --option. The ",-o" shorthand form is optional. When testing if
 #   the option is set with `builder_has_option``, always use the longhand
 #   form.
+#
+#   if =var is specified, then the next parameter will be a variable stored
+#   in $var for that option. e.g. --option=opt means $opt will have the value
+#   'foo' when the script is called for --option foo.
 #
 # * Action, param_desc format: "action   [One line description]"
 #   Actions must be a single word, lower case. To specify an action
@@ -433,6 +442,7 @@ builder_describe() {
   _builder_default_action=build
   declare -A -g _builder_params
   declare -A -g _builder_options_short
+  declare -A -g _builder_options_var
   shift
   # describe each target, action, and option possibility
   while [[ $# -gt 0 ]]; do
@@ -449,14 +459,30 @@ builder_describe() {
     elif [[ $value =~ ^-- ]]; then
       # Parameter is an option
       # Look for a shorthand version of the option
+      local option_var=
+      if [[ $value =~ = ]]; then
+        option_var="$(echo "$value" | cut -d= -f 2 -)"
+        value="$(echo "$value" | cut -d= -f 1 -)"
+      fi
+
       if [[ $value =~ , ]]; then
         local option_long="$(echo "$value" | cut -d, -f 1 -)"
         local option_short="$(echo "$value" | cut -d, -f 2 -)"
         _builder_options+=($option_long)
         _builder_options_short[$option_short]="$option_long"
+        if [[ ! -z "$option_var" ]]; then
+          _builder_options_var[$option_long]="$option_var"
+        fi
         value="$option_long, $option_short"
       else
         _builder_options+=($value)
+        if [[ ! -z "$option_var" ]]; then
+          _builder_options_var[$value]="$option_var"
+        fi
+      fi
+
+      if [[ ! -z $option_var ]]; then
+        value="$value $option_var"
       fi
     else
       # Parameter is an action
@@ -574,6 +600,18 @@ builder_parse() {
       _builder_chosen_action_targets+=("$_builder_default_action$target")
     elif (( has_option )); then
       _builder_chosen_options+=("$key")
+      if [[ ! -z ${_builder_options_var[$key]+x} ]]; then
+        shift
+        if [[ $# -eq 0 ]]; then
+          _builder_parameter_error "$0" parameter "$key"
+        fi
+        # Set the variable associated with this option to the next parameter value
+        # A little bit of hoop jumping here to avoid issues with cygwin paths being
+        # corrupted too early in the game
+        local varname=${_builder_options_var[$key]}
+        declare -g $varname="$1"
+      fi
+
     else
       case "$key" in
         --help|-h)
@@ -632,7 +670,9 @@ builder_display_usage() {
   local width=12
 
   for e in "${!_builder_params[@]}"; do
-    if (( ${#e} > $width )); then width = ${#e}; fi
+    if (( ${#e} > $width )); then
+      width=${#e}
+    fi
   done
 
   width=$((width + 6))

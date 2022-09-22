@@ -73,7 +73,6 @@ uses
   OnScreenKeyboardData in '..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   TouchLayout in '..\TIKE\oskbuilder\TouchLayout.pas',
   TouchLayoutDefinitions in '..\TIKE\oskbuilder\TouchLayoutDefinitions.pas',
-  TouchLayoutUtils in '..\TIKE\oskbuilder\TouchLayoutUtils.pas',
   KeyboardFonts in '..\common\delphi\general\KeyboardFonts.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   utilicon in '..\..\..\common\windows\delphi\general\utilicon.pas',

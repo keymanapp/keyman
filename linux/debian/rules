@@ -26,7 +26,7 @@ override_dh_auto_configure:
 	# ibus-keyman
 	cd linux/ibus-keyman && \
 		cp -f ../../VERSION.md VERSION && \
-		export KEYMAN_PROC_CFLAGS="-I$(CURDIR)/core/build/arch/release/include -I$(CURDIR)/core/include" && \
+		export KEYMAN_PROC_CFLAGS="-I$(CURDIR)/core/build/arch/release/include -I$(CURDIR)/common/include -I$(CURDIR)/core/include" && \
 		export KEYMAN_PROC_LIBS="-L$(CURDIR)/core/build/arch/release/src -lkmnkbp0" && \
 		export PKG_CONFIG_PATH=$(CURDIR)/core/build/arch/release/meson-private && \
 		./autogen.sh && \

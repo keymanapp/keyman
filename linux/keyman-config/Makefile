@@ -55,8 +55,10 @@ deb: dist
 man:
 	./build-help.sh --man --no-reconf
 
-version:
+version_reconf:
 	cd .. && ./scripts/reconf.sh keyman-config
+
+version: version_reconf
 	$(eval VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
 
 # i18n

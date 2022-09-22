@@ -37,6 +37,7 @@ namespace com.keyman.keyboards {
     layer: string;
     displayLayer: string;
     nextlayer: string;
+    sp?: ButtonClass;
 
     private baseKeyEvent: text.KeyEvent;
     isMnemonic: boolean = false;
@@ -71,6 +72,13 @@ namespace com.keyman.keyboards {
       }
 
       return this.id;
+    }
+
+    @Enumerable
+    public get isPadding(): boolean {
+      // Does not include 9 (class:  blank) as that may be an intentional 'catch' for misplaced
+      // keystrokes.
+      return this['sp'] == 10; // Button class: hidden.
     }
 
     /**
@@ -337,14 +345,12 @@ namespace com.keyman.keyboards {
 
       // Allow for right OSK margin (15 layout units)
       let rightMargin = ActiveKey.DEFAULT_RIGHT_MARGIN/totalWidth;
-      totalPercent += rightMargin;
 
       // If a single key, and padding is negative, add padding to right align the key
       if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
         keyPercent=parseInt(keys[0]['width'],10)/totalWidth;
         keys[0]['widthpc']=keyPercent;
-        totalPercent += keyPercent;
-        keys[0]['padpc']=1-totalPercent;
+        keys[0]['padpc']=1-(totalPercent + keyPercent + rightMargin);
 
         // compute center's default x-coord (used in headless modes)
         setProportions(keys[0] as ActiveKey, padPercent, keyPercent, totalPercent);
@@ -352,8 +358,7 @@ namespace com.keyman.keyboards {
         let j=keys.length-1;
         padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
         keys[j]['padpc']=padPercent;
-        totalPercent += padPercent;
-        keys[j]['widthpc'] = keyPercent = 1-totalPercent;
+        keys[j]['widthpc'] = keyPercent = 1-(totalPercent + padPercent + rightMargin);
 
         // compute center's default x-coord (used in headless modes)
         setProportions(keys[j] as ActiveKey, padPercent, keyPercent, totalPercent);
@@ -515,7 +520,7 @@ namespace com.keyman.keyboards {
       // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
       // of the formula in the loop below.
       for(let key in keyDists) {
-        totalMass += keyProbs[key] = 1 / (keyDists[key] + 1e-6); // Prevent div-by-0 errors.
+        totalMass += keyProbs[key] = 1 / (Math.pow(keyDists[key], 2) + 1e-6); // Prevent div-by-0 errors.
       }
 
       for(let key in keyProbs) {
@@ -549,6 +554,8 @@ namespace com.keyman.keyboards {
             // Attempt to filter out known non-output keys.
             // Results in a more optimized distribution.
             if(text.Codes.isKnownOSKModifierKey(key.baseKeyID)) {
+              return;
+            } else if(key.isPadding) { // to the user, blank / padding keys do not exist.
               return;
             }
           }

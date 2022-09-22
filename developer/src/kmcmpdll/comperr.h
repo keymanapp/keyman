@@ -191,7 +191,7 @@
 #define CWARN_VisualKeyboardFileMissing                    0x00002097
 #define CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb    0x00002098   // I4118
 #define CWARN_TouchLayoutUnidentifiedKey                   0x00002099
-#define CWARN_UnreachableKeyCode                           0x0000209A
+#define CHINT_UnreachableKeyCode                           0x0000109A
 
 #define CWARN_CouldNotCopyJsonFile                         0x0000209B
 #define CWARN_PlatformNotInTargets                         0x0000209C

@@ -6,6 +6,23 @@ class ModelCompositor {
   private static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
 
+  /**
+   * Controls the strength of anti-corrective measures for single-character scenarios.
+   * The base key probability will be raised to this power for this specific case.
+   *
+   * Current selection's motivation:  (0.5 / 0.4) ^ 16 ~= 35.5.
+   * - if the most likely has p=0.5 and second-most has p=0.4 - a highly-inaccurate key
+   *   stroke - the net effect will apply a factor of 35.5 to the lexical probability of
+   *   the best key's prediction roots, favoring it in this manner.
+   * - less extreme edge cases will have a significantly stronger factor, acting as a
+   *   "soft threshold".
+   * - truly ambiguous, "coin flip" cases will have a lower factor and thus favor the
+   *   more likely words from the pair.
+   *   - Our OSK key-element borders aren't visible to the user, so the 'spot' where
+   *     behavior changes might feel arbitrary to users if we used a hard threshold instead.
+   */
+  private static readonly SINGLE_CHAR_KEY_PROB_EXPONENT = 16;
+
   private SUGGESTION_ID_SEED = 0;
 
   constructor(lexicalModel: LexicalModel) {
@@ -14,30 +31,6 @@ class ModelCompositor {
       this.contextTracker = new correction.ContextTracker();
     }
     this.punctuation = ModelCompositor.determinePunctuationFromModel(lexicalModel);
-  }
-
-  protected isWhitespace(transform: Transform): boolean {
-    // Matches prefixed text + any instance of a character with Unicode general property Z* or the following: CR, LF, and Tab.
-    let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u202f\u205f\u3000]/i;
-
-    // Filter out null-inserts; their high probability can cause issues.
-    if(transform.insert == '') { // Can actually register as 'whitespace'.
-      return false;
-    }
-
-    let insert = transform.insert;
-
-    insert = insert.replace(whitespaceRemover, '');
-
-    return insert == '';
-  }
-
-  protected isBackspace(transform: Transform): boolean {
-    return transform.insert == "" && transform.deleteLeft > 0;
-  }
-
-  protected isEmpty(transform: Transform): boolean {
-    return transform.insert == '' && transform.deleteLeft == 0;
   }
 
   private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): Distribution<Suggestion> {
@@ -98,8 +91,8 @@ class ModelCompositor {
     })[0].sample;
 
     // Only allow new-word suggestions if space was the most likely keypress.
-    let allowSpace = this.isWhitespace(inputTransform);
-    let allowBksp = this.isBackspace(inputTransform);
+    let allowSpace = TransformUtils.isWhitespace(inputTransform);
+    let allowBksp = TransformUtils.isBackspace(inputTransform);
 
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.wordbreak(postContext);
@@ -109,7 +102,7 @@ class ModelCompositor {
 
     // Used to restore whitespaces if operations would remove them.
     let prefixTransform: Transform;
-    let contextState: correction.TrackedContextState = null;
+    let postContextState: correction.TrackedContextState = null;
 
     // Section 1:  determining 'prediction roots'.
     if(!this.contextTracker) {
@@ -124,18 +117,18 @@ class ModelCompositor {
         predictionRoots = [{sample: inputTransform, p: 1.0}];
         prefixTransform = inputTransform;
       } else {
-        predictionRoots = transformDistribution.map(function(alt) {
+        predictionRoots = transformDistribution.map((alt) => {
           let transform = alt.sample;
 
           // Filter out special keys unless they're expected.
-          if(this.isWhitespace(transform) && !allowSpace) {
+          if(TransformUtils.isWhitespace(transform) && !allowSpace) {
             return null;
-          } else if(this.isBackspace(transform) && !allowBksp) {
+          } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
             return null;
           }
 
           return alt;
-        }, this);
+        });
       }
 
       // Remove `null` entries.
@@ -144,12 +137,15 @@ class ModelCompositor {
       // Running in bulk over all suggestions, duplicate entries may be possible.
       rawPredictions = this.predictFromCorrections(predictionRoots, context);
     } else {
-      contextState = this.contextTracker.analyzeState(this.lexicalModel,
-                                                      postContext,
-                                                      !this.isEmpty(inputTransform) ?
-                                                                    transformDistribution:
-                                                                    null
-                                                      );
+      // Token replacement benefits greatly from knowledge of the prior context state.
+      let contextState = this.contextTracker.analyzeState(this.lexicalModel, context, null);
+      // Corrections and predictions are based upon the post-context state, though.
+      postContextState = this.contextTracker.analyzeState(this.lexicalModel,
+                                                          postContext,
+                                                          !TransformUtils.isEmpty(inputTransform) ?
+                                                                          transformDistribution:
+                                                                          null
+                                                          );
 
       // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
       //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -158,18 +154,80 @@ class ModelCompositor {
       // let's just note that right now, there will only ever be one.
       //
       // The 'eventual' logic will be significantly more complex, though still manageable.
-      let searchSpace = contextState.searchSpace[0];
+      let searchSpace = postContextState.searchSpace[0];
 
-      let newEmptyToken = false;
-      // Detect if we're starting a new context state.
-      let contextTokens = contextState.tokens;
-      if(contextTokens.length == 0 || contextTokens[contextTokens.length - 1].isNew) {
-        if(this.isEmpty(inputTransform) || this.isWhitespace(inputTransform)) {
-          newEmptyToken = true;
+      // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
+      // same amount of text.  We can handle this before the big 'prediction root' loop.
+      let deleteLeft = 0;
+
+      // The amount of text to 'replace' depends upon whatever sort of context change occurs
+      // from the received input.
+      const postContextTokens = postContextState.tokens;
+      let postContextLength = postContextTokens.length;
+      let contextLengthDelta = postContextTokens.length - contextState.tokens.length;
+      // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
+      if(postContextLength == 0 || contextLengthDelta > 0) {
+        // As the word/token being corrected/predicted didn't originally exist, there's no
+        // part of it to 'replace'.
+        deleteLeft = 0;
+
+        // If the new token is due to whitespace or due to a different input type that would
+        // likely imply a tokenization boundary...
+        if(TransformUtils.isWhitespace(inputTransform)) {
+          /* TODO:  consider/implement:  the second half of the comment above.
+           * For example:  on input of a `'`, predict new words instead of replacing the `'`.
+           * (since after a letter, the `'` will be ignored, anyway)
+           *
+           * Idea:  if the model's most likely prediction (with no root) would make a new
+           * token if appended to the current token, that's probably a good case.
+           * Keeps the check simple & quick.
+           *
+           * Might need a mixed mode, though:  ';' is close enough that `l` is a reasonable
+           * fat-finger guess.   So yeah, we're not addressing this idea right now.
+           * - so... consider multiple context behavior angles when building prediction roots?
+           *
+           * May need something similar to help handle contractions during their construction,
+           * but that'd be within `ContextTracker`.
+           * can' => [`can`, `'`]
+           * can't => [`can't`]  (WB6, 7 of https://unicode.org/reports/tr29/#Word_Boundary_Rules)
+           *
+           * (Would also helps WB7b+c for Hebrew text)
+           */
+
+          // Infer 'new word' mode, even if we received new text when reaching
+          // this position.  That new text didn't exist before, so still - nothing
+          // to 'replace'.
           prefixTransform = inputTransform;
-          context = postContext; // Ensure the whitespace token is preapplied!
+          context = postContext; // As far as predictions are concerned, the post-context state
+                                 // should not be replaced.  Predictions are to be rooted on
+                                 // text "up for correction" - so we want a null root for this
+                                 // branch.
+          contextState = postContextState;
         }
+        // If the tokenized context length is shorter... sounds like a backspace (or similar).
+      } else if (contextLengthDelta < 0) {
+        /* Ooh, we've dropped context here.  Almost certainly from a backspace.
+         * Even if we drop multiple tokens... well, we know exactly how many chars
+         * were actually deleted - `inputTransform.deleteLeft`.
+         * Since we replace a word being corrected/predicted, we take length of the remaining
+         * context's tail token in addition to however far was deleted to reach that state.
+         */
+        deleteLeft = this.wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
+      } else {
+        // Suggestions are applied to the pre-input context, so get the token's original length.
+        // We're on the same token, so just delete its text for the replacement op.
+        deleteLeft = this.wordbreak(context).kmwLength();
       }
+
+      // Is the token under construction newly-constructed / is there no pre-existing root?
+      // If so, we want to strongly avoid overcorrection, even for 'nearby' keys.
+      // (Strong lexical frequency differences can easily cause overcorrection when only
+      // one key's available.)
+      //
+      // NOTE:  we only want this applied word-initially, when any corrections 'correct'
+      // 100% of the word.  Things are generally fine once it's not "all or nothing."
+      let tailToken = postContextTokens[postContextTokens.length - 1];
+      const isTokenStart = tailToken.transformDistributions.length <= 1;
 
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
@@ -192,19 +250,6 @@ class ModelCompositor {
             finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
           }
 
-          let deleteLeft = 0;
-          // remove actual token string.  If new token, there should be nothing to delete.
-          if(!newEmptyToken) {
-            // If this is triggered from a backspace, make sure to use its results
-            // and also include its left-deletions!  It's the one post-input context case.
-            if(allowBksp) {
-              deleteLeft = this.wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
-            } else {
-              // Normal case - use the pre-input context.
-              deleteLeft = this.wordbreak(context).kmwLength();
-            }
-          }
-
           // Replace the existing context with the correction.
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
@@ -212,9 +257,39 @@ class ModelCompositor {
             id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
+          let rootCost = match.totalCost;
+
+          /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+           * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+           * there are significantly more likely words.  We only need this to allow very minor fat-finger
+           * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+           * key borders.
+           *
+           * Technically, the probabilities this produces won't be normalized as-is... but there's no
+           * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+           * to apply it could become tricky, so it's simpler to leave out.
+           *
+           * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+           * is needed in the future.
+           */
+          if(isTokenStart) {
+            /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
+             * ambiguous case that would only arise very near the center of the boundary between two keys.
+             * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
+             * That seems 'within reason' for correction very near boundaries.
+             *
+             * So, with the second-most-likely key being that close in probability, its best suggestion
+             * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
+             * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
+             * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
+             * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
+             */
+            rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
+          }
+
           return {
             sample: correctionTransform,
-            p: Math.exp(-match.totalCost)
+            p: Math.exp(-rootCost)
           };
         }, this);
 
@@ -411,8 +486,8 @@ class ModelCompositor {
 
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
-    if(contextState) {
-      contextState.tail.replacements = suggestions.map(function(suggestion) {
+    if(postContextState) {
+      postContextState.tail.replacements = suggestions.map(function(suggestion) {
         return {
           suggestion: suggestion,
           tokenWidth: 1
@@ -659,7 +734,7 @@ class ModelCompositor {
     // than before.
     if(this.contextTracker) {
       let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
-      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, this.lexicalModel);
+      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, null, this.lexicalModel);
       this.contextTracker.enqueue(contextState);
     }
   }

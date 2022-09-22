@@ -82,27 +82,38 @@ var
   fs: TFileStream;
   ms: TMemoryStream;
 begin
-  fs := TFileStream.Create(ParamStr(0), fmOpenRead or fmShareDenyWrite);
-  ms := TMemoryStream.Create;
   try
-    if not FindFirstHeader(fs) then
-      Exit(False);
-
-    fs.Seek(StartOfFile, TSeekOrigin.soBeginning);
-
-    ms.CopyFrom(fs, fs.Size - StartOfFile);
-    ms.Position := 0;
-
-    with TZipFile.Create do
+    fs := TFileStream.Create(ParamStr(0), fmOpenRead or fmShareDenyWrite);
+    ms := TMemoryStream.Create;
     try
-      Open(ms, zmRead);
-      ExtractAll(ExtPath);
+      if not FindFirstHeader(fs) then
+        Exit(False);
+
+      fs.Seek(StartOfFile, TSeekOrigin.soBeginning);
+
+      ms.CopyFrom(fs, fs.Size - StartOfFile);
+      ms.Position := 0;
+
+      with TZipFile.Create do
+      try
+        Open(ms, zmRead);
+        ExtractAll(ExtPath);
+      finally
+        Free;
+      end;
     finally
-      Free;
+      fs.Free;
+      ms.Free;
     end;
-  finally
-    fs.Free;
-    ms.Free;
+  except
+    on E:Exception do
+    begin
+      raise Exception.Create(
+        'Failed to extract setup archive. '+
+        'You may have run out of disk space or there may be a '+
+        'problem with the source files.'#13#10#13#10+
+        'The error received was: '+E.Message);
+    end;
   end;
   Result := True;
 end;

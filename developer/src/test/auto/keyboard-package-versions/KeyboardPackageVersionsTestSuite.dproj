@@ -153,14 +153,8 @@
         <DCCReference Include="..\..\..\common\delphi\general\WindowsLanguages.pas"/>
         <DCCReference Include="..\..\..\tike\compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\..\..\..\common\windows\delphi\keyboards\kmxfileutils.pas"/>
-        <DCCReference Include="..\..\..\tike\main\TikeUnicodeData.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>
-        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\..\tike\oskbuilder\TouchLayoutDefinitions.pas"/>
         <DCCReference Include="..\..\..\tike\oskbuilder\TouchLayout.pas"/>
-        <DCCReference Include="..\..\..\tike\oskbuilder\TouchLayoutUtils.pas"/>
         <DCCReference Include="..\..\..\common\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\..\..\tike\project\Keyman.Developer.System.Project.kpsProjectFile.pas"/>
         <DCCReference Include="..\..\..\tike\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas"/>

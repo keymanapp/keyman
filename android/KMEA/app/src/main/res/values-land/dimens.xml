@@ -2,7 +2,7 @@
 <!-- Dimens for Landscape (Phone) -->
 <resources>
     <dimen name="banner_height">40dp</dimen>
-    <dimen name="keyboard_height">150dp</dimen>
+    <dimen name="keyboard_height">100dp</dimen>
     <dimen name="key_width">49.25dp</dimen>
     <dimen name="key_height">49.25dp</dimen>
     <dimen name="popup_arrow_width">21dp</dimen>

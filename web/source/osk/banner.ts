@@ -560,13 +560,17 @@ namespace com.keyman.osk {
     private doAccept(suggestion: BannerSuggestion) {
       let _this = this;
 
+      // Selecting a suggestion or a reversion should both clear selection
+      // and clear the reversion-displaying state of the banner.
+      this.selected = null;
+      this.doRevert = false;
+
       this.revertAcceptancePromise = suggestion.apply();
       if(!this.revertAcceptancePromise) {
         // We get here either if suggestion acceptance fails or if it was a reversion.
         if(suggestion.suggestion && suggestion.suggestion.tag == 'revert') {
           // Reversion state management
           this.recentAccept = false;
-          this.doRevert = false;
           this.recentRevert = true;
 
           this.doUpdate();
@@ -581,9 +585,7 @@ namespace com.keyman.osk {
         }
       });
 
-      this.selected = null;
       this.recentAccept = true;
-      this.doRevert = false;
       this.recentRevert = false;
 
       this.swallowPrediction = true;

@@ -24,7 +24,7 @@ program
   .version('0.1')
   .option('-c, --compiler-versions [versions]', 'Specify compiler version(s) to test. Can specify "stable", "source" or a specific version number.', list, ['stable','source'])
   .option('-e, --engine-versions [versions]', 'Specify KeymanWeb engine version(s) to test. Can specify "stable", "source" or a specific version number.', list, ['stable','source'])
-  .option('-k, --keyboards [keyboards]', 'Builds and tests specific keyboard source files. If -k is not specified, then test all keyboards in the keyboards repository.', list, [])
+  .option('-k, --keyboards [keyboards]', 'Builds and tests specific keyboard source files (e.g. k/khmer_angkor). If -k is not specified, then test all keyboards in the keyboards repository.', list, [])
   .option('-f, --fail-fast', "Don't attempt to continue tests after the first keyboard test fails")
   .option('-d, --debug', "Build keyboard with debug symbols")
   .option('--deep', "Compare all version combinations against base version, instead of just one; only valid when comparing 1 version of each against base")
@@ -57,8 +57,8 @@ const bash = process.platform == 'win32'
 //TODO: support testing standalone keyboards that are not in the repo
 
 const compilerDestPath = path.join(config.KEYBOARDS_ROOT, 'tools');
-const kmcompDestPath = path.join(compilerDestPath, 'kmcomp.exe');
-const kmcmpdllDestPath = path.join(compilerDestPath, 'kmcmpdll.dll');
+const kmcompDestPath = path.join(compilerDestPath, 'kmcomp', 'kmcomp.exe');
+const kmcmpdllDestPath = path.join(compilerDestPath, 'kmcomp', 'kmcmpdll.dll');
 
 let testedCompilerVersions = [], testedEngineVersions = [], firstCompile = true;
 
@@ -75,7 +75,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 /**
- * 
+ *
  * @param items An array of items.
  * @param fn A function that accepts an item from the array and returns a promise.
  * @returns {Promise}
@@ -95,7 +95,7 @@ function fail(msg, code) {
   if(program.failFast) process.exit();
 }
 
-// 
+//
 // Clean the keyboards repo -- unless we are skipping analysis
 // This removes the build/ and tests/ folders
 //
@@ -107,27 +107,31 @@ if(!program.skipAnalysis) {
   let cleanKeyboard = function(keyboard) {
     keyboard = keyboard ? config.KEYBOARDS_GROUP+'/'+keyboard : config.KEYBOARDS_GROUP;
     return util.runProcess(
-      `${bash.command}`, 
-      [].concat(bash.params, ['build.sh', '-c', keyboard]), 
+      `${bash.command}`,
+      [].concat(bash.params, ['build.sh', '-c', keyboard]),
       { cwd: config.KEYBOARDS_ROOT });
   };
-  
-  cleanKeyboards = (program.keyboards.length) 
+
+  cleanKeyboards = (program.keyboards.length)
     ? forEachPromise(program.keyboards, cleanKeyboard)
     : cleanKeyboard('');
-} 
+}
 
 cleanKeyboards.then(() => {
   fs.renameSync(kmcompDestPath, kmcompDestPath + '.bak');
   fs.renameSync(kmcmpdllDestPath, kmcmpdllDestPath + '.bak');
-  
+
   process.on('exit', () => {
     console.log('Restoring original compiler files');
-    fs.renameSync(kmcompDestPath + '.bak', kmcompDestPath);
-    fs.renameSync(kmcmpdllDestPath + '.bak', kmcmpdllDestPath);
+    if(fs.existsSync(kmcompDestPath + '.bak')) {
+      fs.renameSync(kmcompDestPath + '.bak', kmcompDestPath);
+    }
+    if(fs.existsSync(kmcmpdllDestPath + '.bak')) {
+      fs.renameSync(kmcmpdllDestPath + '.bak', kmcmpdllDestPath);
+    }
   });
 }).then(() => forEachPromise(program.compilerVersions, version => {
-  // 
+  //
   // Compile phase - get the compiler
   //
 
@@ -141,17 +145,18 @@ cleanKeyboards.then(() => {
           console.error('Source build of compiler is only available on Windows.');
           reject();
         }
-        fs.copyFileSync(path.join(config.KEYMAN_REPO_BASE_RELATIVE_PATH, 'windows', 'bin', 'developer', 'kmcomp.exe'), kmcompDestPath);
-        fs.copyFileSync(path.join(config.KEYMAN_REPO_BASE_RELATIVE_PATH, 'windows', 'bin', 'developer', 'kmcmpdll.dll'), kmcmpdllDestPath);
+        fs.copyFileSync(path.join(config.KEYMAN_REPO_BASE_RELATIVE_PATH, 'developer', 'bin', 'kmcomp.exe'), kmcompDestPath);
+        fs.copyFileSync(path.join(config.KEYMAN_REPO_BASE_RELATIVE_PATH, 'developer', 'bin', 'kmcmpdll.dll'), kmcmpdllDestPath);
         resolve();
       });
       break;
     case 'stable':
-      getCompiler = got('https://downloads.keyman.com/api/version/developer/2.0', { json: true })
+      getCompiler = got('https://downloads.keyman.com/api/version/developer/2.0')
+        .json()
         .then(response => {
-          compilerVersion = response.body.developer.stable.version;
+          compilerVersion = response.developer.stable.version;
           console.log('Downloading compiler version '+compilerVersion);
-          return got(`https://downloads.keyman.com/developer/stable/${compilerVersion}/kmcomp-${compilerVersion}.zip`, { encoding: null });
+          return got(`https://downloads.keyman.com/developer/stable/${compilerVersion}/kmcomp-${compilerVersion}.zip`, { responseType: 'buffer' });
         })
         .then(response => {
           console.log('Unzipping compiler');
@@ -163,7 +168,7 @@ cleanKeyboards.then(() => {
     default:
       console.log('Downloading specified compiler version '+version);
       compilerVersion = version;
-      getCompiler = got(`https://downloads.keyman.com/developer/stable/${version}/kmcomp-${version}.zip`, { encoding: null })
+      getCompiler = got(`https://downloads.keyman.com/developer/stable/${version}/kmcomp-${version}.zip`, { responseType: 'buffer' })
         .then(response => {
           console.log('Unzipping compiler');
           let zip = new AdmZip(response.body);
@@ -190,11 +195,11 @@ cleanKeyboards.then(() => {
       console.log('building keyboard '+keyboard);
 
       return util.runProcess(
-        `${bash.command}`, 
-        [].concat(bash.params, ['build.sh'], program.debug?['-d']:[], [/*TODO: waiting on keyboards repo support for this param: '-T', 'kmn',*/ keyboard]), 
+        `${bash.command}`,
+        [].concat(bash.params, ['build.sh'], program.debug?['-d']:[], [/*TODO: waiting on keyboards repo support for this param: '-T', 'kmn',*/ keyboard]),
         { cwd: config.KEYBOARDS_ROOT });
     };
-  
+
     return (program.keyboards.length) ? forEachPromise(program.keyboards, buildKeyboard) : buildKeyboard('');
   });
 
@@ -208,7 +213,7 @@ cleanKeyboards.then(() => {
       firstCompile = false;
       let analyzeKeyboard = function(keyboard) {
         const locator = keyboard.shortname+'/'+keyboard.id;
-  
+
         const kmx = path.join(config.KEYBOARDS_ROOT, config.KEYBOARDS_GROUP, locator, 'build', keyboard.id+'.kmx');
         const testsPath = path.join(config.KEYBOARDS_ROOT, config.KEYBOARDS_GROUP, locator, 'tests');
         const tests = path.join(testsPath, keyboard.id+'.tests');
@@ -225,11 +230,11 @@ cleanKeyboards.then(() => {
 
         console.log(`Building test cases for ${locator}`);
         // TODO: Find kmanalyze outside the repo. This forces Windows-dependence right now
-        return util.runProcess('../../../windows/bin/developer/kmanalyze.exe', [kmx, tests], {}, true);
+        return util.runProcess('../../../developer/bin/kmanalyze.exe', [kmx, tests], {}, true);
       };
-    
-      let keyboards = program.keyboards.length 
-        ? program.keyboards.map((locator) => util.parseLocator(locator)) 
+
+      let keyboards = program.keyboards.length
+        ? program.keyboards.map((locator) => util.parseLocator(locator))
         : util.getKeyboardFolders(KEYBOARDS_ROOT, false);
       return forEachPromise(keyboards, analyzeKeyboard);
     }
@@ -267,11 +272,12 @@ cleanKeyboards.then(() => {
           });
           break;
         case 'stable':
-          getEngine = got('https://downloads.keyman.com/api/version/web/2.0', { json: true })
+          getEngine = got('https://downloads.keyman.com/api/version/web/2.0')
+            .json()
             .then(response => {
-              engineVersion = response.body.web.stable.version;
+              engineVersion = response.web.stable.version;
               console.log('Downloading engine version '+engineVersion);
-              return got(`https://downloads.keyman.com/web/stable/${engineVersion}/keymanweb-${engineVersion}.zip`, { encoding: null });
+              return got(`https://downloads.keyman.com/web/stable/${engineVersion}/keymanweb-${engineVersion}.zip`, { responseType: 'buffer' });
             })
             .then(response => {
               console.log('Unzipping engine');
@@ -283,7 +289,7 @@ cleanKeyboards.then(() => {
         default:
           console.log('Downloading specified engine version '+version0);
           engineVersion = version0;
-          getEngine = got(`https://downloads.keyman.com/web/stable/${version0}/keymanweb-${version0}.zip`, { encoding: null })
+          getEngine = got(`https://downloads.keyman.com/web/stable/${version0}/keymanweb-${version0}.zip`, { responseType: 'buffer' })
             .then(response => {
               console.log('Unzipping engine');
               // Assuming engine files we want are at unminified/ in the zip
@@ -292,8 +298,8 @@ cleanKeyboards.then(() => {
             });
       }
 
-      return getEngine.then(() => { 
-        console.log('Testing compiler version '+compilerVersion+', engine version '+engineVersion); 
+      return getEngine.then(() => {
+        console.log('Testing compiler version '+compilerVersion+', engine version '+engineVersion);
 
         if(testedEngineVersions.indexOf(engineVersion) < 0) {
           testedEngineVersions.push(engineVersion);
@@ -302,9 +308,9 @@ cleanKeyboards.then(() => {
         return util.runProcess(
           `node`,
           [].concat(
-            ['test-builder.js', 
-            '--compiler-version', compilerVersion, 
-            '--engine-version', engineVersion], 
+            ['test-builder.js',
+            '--compiler-version', compilerVersion,
+            '--engine-version', engineVersion],
             program.keyboards.length ? ['--keyboards', program.keyboards.join(',')] : []
           )
         );
@@ -330,8 +336,8 @@ cleanKeyboards.then(() => {
       // Validate each of the test files against the first tested compiler+engine version
 
       let localFailCount = 0;
-      const localFail = knownFailures.hasOwnProperty([keyboard.id]) ? 
-        (msg) => { if(++localFailCount == 1) console.warn(`WARN: Not failing test because ${keyboard.id} is in known-failures.`); console.warn(`WARN: ${msg}`); } : 
+      const localFail = knownFailures.hasOwnProperty([keyboard.id]) ?
+        (msg) => { if(++localFailCount == 1) console.warn(`WARN: Not failing test because ${keyboard.id} is in known-failures.`); console.warn(`WARN: ${msg}`); } :
         fail;
 
       try {
@@ -370,8 +376,8 @@ cleanKeyboards.then(() => {
               for(let k in baseResultJSON) {
                 if(resultJSON[k] !== baseResultJSON[k]) {
                   if(++errors == 1 || program.logAllFailures) {
-                    let 
-                      ix = k.toString(), 
+                    let
+                      ix = k.toString(),
                       whitespace = ' '.repeat(prefix.length + ix.length + 6),
                       input = `${testsJSON.inputTests[k].context ? `"${testsJSON.inputTests[k].context}" ` : ""}+ ${keyname(testsJSON.inputTests[k].modifier, testsJSON.inputTests[k].key)}`;
                     console.error(`${prefix}[${ix}]: expected: ${input} > "${baseResultJSON[k]}"`);
