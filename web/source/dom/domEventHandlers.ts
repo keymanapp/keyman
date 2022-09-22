@@ -675,13 +675,7 @@ namespace com.keyman.dom {
       // This works OK for iOS, but may need something else for other platforms
       var elem: HTMLElement;
 
-      if(('relatedTarget' in e) && e.relatedTarget) {
-        elem = e.relatedTarget as HTMLElement;
-      }
-
-      if(elem['body']) {
-        elem = elem['body']; // Occurs in Firefox for design-mode iframes.
-      }
+      elem = DOMEventHandlers.states._lastActiveElement;
 
       this.executeBlur(elem);
     }.bind(this);
