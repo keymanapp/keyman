@@ -12,7 +12,7 @@ namespace com.keyman.text {
 
     /**
      * Indicates the device (platform) to be used for non-keystroke events,
-     * such as those sent to `begin postkeystroke` and `begin newcontext` 
+     * such as those sent to `begin postkeystroke` and `begin newcontext`
      * entry points.
      */
     private contextDevice: utils.DeviceSpec;
@@ -273,6 +273,7 @@ namespace com.keyman.text {
           let totalMass = 0; // Tracks sum of non-error probabilities.
           for(let pair of keyDistribution) {
             if(pair.p < KEYSTROKE_EPSILON) {
+              totalMass += pair.p;
               break;
             } else if(timer && timer() >= TIMEOUT_THRESHOLD) {
               // Note:  it's always possible that the thread _executing_ our JS

@@ -22,8 +22,6 @@ do_configure() {
   builder_has_action configure:$target || return 0
 
   local STANDARD_MESON_ARGS=
-  # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-  local ADDITIONAL_ARGS=${opt_configure-}
 
   echo_heading "======= Configuring $target ======="
 
@@ -37,10 +35,11 @@ do_configure() {
   fi
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION configure
+    cmd //C build.bat $target $CONFIGURATION configure "${builder_extra_params[@]}"
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
-    meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS $ADDITIONAL_ARGS
+    # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
+    meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
 }
@@ -85,7 +84,7 @@ do_build() {
     # the Visual Studio build environment with vcvarsall.bat
     # TODO: if PATH is the only variable required, let's try and
     #       eliminate this difference in the build process
-    cmd //C build.bat $target $CONFIGURATION build
+    cmd //C build.bat $target $CONFIGURATION build "${builder_extra_params[@]}"
   else
     pushd "$MESON_PATH" > /dev/null
     ninja
@@ -104,10 +103,10 @@ do_test() {
   echo_heading "======= Testing $target ======="
 
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $CONFIGURATION test
+    cmd //C build.bat $target $CONFIGURATION test "${builder_extra_params[@]}"
   else
     pushd "$MESON_PATH" > /dev/null
-    meson test --print-errorlogs
+    meson test "${builder_extra_params[@]}"
     popd > /dev/null
   fi
 }
@@ -132,7 +131,7 @@ do_command() {
   echo_heading "======= Installing $target ======="
 
   pushd "$MESON_PATH" > /dev/null
-  ninja $2
+  ninja $command
   popd > /dev/null
 }
 

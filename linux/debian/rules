@@ -20,7 +20,7 @@ export LC_ALL=C.UTF-8
 override_dh_auto_configure:
 	# keymankeyboardprocessor
 	cd core && \
-		./build.sh configure -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
+		./build.sh configure:arch -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
 			--localstatedir=/var --libdir=lib/$(DEB_TARGET_MULTIARCH) \
 			--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
 	# ibus-keyman
@@ -35,7 +35,7 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	# keymankeyboardprocessor
-	cd core && ./build.sh build
+	cd core && ./build.sh build:arch
 	# ibus-keyman
 	cd linux/ibus-keyman && make
 	# keyman-config
@@ -48,7 +48,7 @@ override_dh_auto_build:
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# keymankeyboardprocessor
-	cd core && ./build.sh tests
+	cd core && ./build.sh test:arch
 	# ibus-keyman
 	cd linux/ibus-keyman && make check VERBOSE=1
 	# keyman-config
@@ -58,7 +58,7 @@ endif
 override_dh_auto_install:
 	# keymankeyboardprocessor
 	install -d $(CURDIR)/debian/tmp
-	cd core && DESTDIR=$(CURDIR)/debian/tmp ./build.sh install
+	cd core && DESTDIR=$(CURDIR)/debian/tmp ./build.sh install:arch
 	# ibus-keyman
 	cd linux/ibus-keyman && make install DESTDIR=$(CURDIR)/debian/tmp
 	# keyman-config

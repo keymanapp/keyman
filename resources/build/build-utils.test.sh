@@ -142,10 +142,21 @@ if builder_has_option --feature; then
   if [[ $FOO == xyzzy ]]; then
     echo "PASS: --feature option variable \$FOO has expected value 'xyzzy'"
   else
-    echo "FAIL: --feature option variable \$FOO had value '$FOO' but should have had 'xyzzy'"
+    fail "FAIL: --feature option variable \$FOO had value '$FOO' but should have had 'xyzzy'"
   fi
 else
   echo "FAIL: --feature option not found"
+fi
+
+builder_parse -- one two "three four five"
+if [[ ${builder_extra_params[0]} != "one" ]]; then
+  fail "FAIL: -- extra parameter 'one' not found"
+fi
+if [[ ${builder_extra_params[1]} != "two" ]]; then
+  fail "FAIL: -- extra parameter 'two' not found"
+fi
+if [[ ${builder_extra_params[2]} != "three four five" ]]; then
+  fail "FAIL: -- extra parameter 'three four five' not found"
 fi
 
 # Finally, run with --help so we can see what it looks like

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+#
+# We want to make sure that .sh files are executable; however, .inc.sh need not
+# be as they are always source-included in scripts.
+#
+SH_NON_EXECUTABLE=`git ls-files --stage | grep "\\.sh$" | grep -v "\\.inc\\.sh$" | grep -v 755 | cut -f 2 -`
+
+if [ ! -z "$SH_NON_EXECUTABLE" ]; then
+  echo "ERROR: The following scripts are not marked as executable:"
+  echo
+  echo "$SH_NON_EXECUTABLE"
+  echo
+  echo "You can mark them as executable with:"
+  echo "  git add --chmod=+x"
+  exit 1
+fi
+
+exit 0

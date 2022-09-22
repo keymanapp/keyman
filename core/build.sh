@@ -45,18 +45,18 @@ builder_describe \
 
 Libraries will be built in 'build/<target>/<configuration>/src'.
   * <configuration>: 'debug' or 'release' (see --debug flag)
+  * All parameters after '--' are passed to meson or ninja
 " \
   "clean" \
   "configure" \
   "build" \
   "test" \
-  "install         Install libraries to current system" \
-  "uninstall       Uninstall libraries from current system" \
+  "install         install libraries to current system" \
+  "uninstall       uninstall libraries from current system" \
   "${archtargets[@]}" \
-  "--debug,d                       Configuration is 'debug', not 'release'" \
-  "--target-path=opt_target_path   Override for build/ target path" \
-  "--configure=opt_configure       Options to pass to C++ configure" \
-  "--test=opt_tests,-t             Test[s] to run (space separated)"
+  "--debug,-d                      configuration is 'debug', not 'release'" \
+  "--target-path=opt_target_path   override for build/ target path" \
+  "--test=opt_tests,-t             test[s] to run (space separated)"
 builder_parse "$@"
 
 if builder_has_option --debug; then

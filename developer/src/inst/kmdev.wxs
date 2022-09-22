@@ -363,8 +363,7 @@
       <ComponentGroupRef Id="XML" />
       <ComponentGroupRef Id="CEF" />
       <ComponentGroupRef Id="Templates" />
-      <ComponentGroupRef Id="ModelCompiler" />
-      <ComponentGroupRef Id="LDMLKeyboardCompiler" />
+      <ComponentGroupRef Id="kmc" />
       <ComponentGroupRef Id="Node" />
       <ComponentGroupRef Id="KeymanDevSentryComponents" />
       <ComponentGroupRef Id="Server" />

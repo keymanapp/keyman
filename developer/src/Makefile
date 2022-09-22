@@ -3,9 +3,9 @@
 #
 
 !ifdef NODELPHI
-TARGETS=build-tools kmcmpdll kmanalyze kmdecomp server kmlmc kmc
+TARGETS=build-tools kmcmpdll kmanalyze kmdecomp server kmc
 !else
-TARGETS=build-tools kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmlmc kmc
+TARGETS=build-tools kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmc
 !endif
 
 EXCLUDEPATHDEFINES=1
@@ -65,12 +65,24 @@ server: .virtual
     cd $(DEVELOPER_ROOT)\src\server
     $(MAKE) $(TARGET)
 
-kmlmc: .virtual
-    cd $(DEVELOPER_ROOT)\src\kmlmc
+kmc: kmc-keyboard kmc-model kmc-model-info kmc-package
+    cd $(DEVELOPER_ROOT)\src\kmc
     $(MAKE) $(TARGET)
 
-kmc: .virtual
-    cd $(DEVELOPER_ROOT)\src\kmc
+kmc-keyboard: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-keyboard
+    $(MAKE) $(TARGET)
+
+kmc-model: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-model
+    $(MAKE) $(TARGET)
+
+kmc-model-info: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-model-info
+    $(MAKE) $(TARGET)
+
+kmc-package: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-package
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------

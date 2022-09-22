@@ -50,6 +50,45 @@ describe('ModelCompositor', function() {
         });
       });
 
+      it('strongly avoids corrections for single-character roots', function() {
+        let compositor = new ModelCompositor(plainModel);
+        let context = {
+          left: '', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        // The 'weights' involved imply that we have an edge-case fat finger on the bottom of
+        // the 'q' key, slightly in its favor.
+        let inputDistribution = [
+          {sample: {insert: 'q', deleteLeft: 0}, p: 0.5},  // 'quite' (679) and 'question' (644) are included!
+          {sample: {insert: 'a', deleteLeft: 0}, p: 0.4}   // but at lower weight than 'and' (998).
+        ];
+
+        compositor.predict({insert: '', deleteLeft: 0}, context); // Initialize context tracking first!
+        let suggestions = compositor.predict(inputDistribution, context);
+
+        // remove the keep suggestion; we're not testing that here.
+        suggestions = suggestions.filter((suggestion) => suggestion.tag != 'keep');
+
+        suggestions.sort((a, b) => b.p - a.p);
+
+        // There are only 4 suggestions in this limited test model that begin with 'q'.
+        // We expect more than that, since 'a' is indicated to be very close by.
+        assert.isAbove(suggestions.length, 4, "fat-finger style corrections needed for test comparisons are missing");
+
+        // Note:  'and' is (currently) modeled by the text-fixture model to have 9.3x the base probability
+        // that the worst 'q'-rooted suggestion ('quality') does.  Without single-character correction
+        // avoidance logic, this test _will_ fail.
+        //
+        // In case a tweak to test parameters is desired, note that 'and' beats rank #3 - 'questions' -
+        // at 3.36x base.  At the time of writing this test, upping 'a's probability to 0.45 will block
+        // 'quality' while the top three 'q's (ending with 'questions') remain in place.
+        let qRange = suggestions.slice(0, 4);
+        assert.isUndefined(qRange.find((suggestion) => suggestion.transform.insert.charAt(0) != 'q'));
+
+        let aRange = suggestions.slice(4);
+        assert.isUndefined(aRange.find((suggestion) => suggestion.transform.insert.charAt(0) == 'q'));
+      });
+
       it('properly handles suggestions after a backspace', function() {
         let compositor = new ModelCompositor(plainModel);
         let context = {
@@ -66,10 +105,51 @@ describe('ModelCompositor', function() {
           // Suggestions always delete the full root of the suggestion.
           //
           // After a backspace, that means the text 'the' - 3 chars.
-          // Char 4 is for the original backspace, as suggstions are built
+          // Char 4 is for the original backspace, as suggestions are built
           // based on the context state BEFORE the triggering input -
           // here, a backspace.
           assert.equal(suggestion.transform.deleteLeft, 4);
+        });
+      });
+
+      it('properly handles suggestions for the first letter after a ` `', function() {
+        let compositor = new ModelCompositor(plainModel);
+        let context = {
+          left: 'the', startOfBuffer: true, endOfBuffer: true,
+        };
+
+        let inputTransform = {
+          insert: ' ',
+          deleteLeft: 0
+        };
+
+        let suggestions = compositor.predict(inputTransform, context);
+        suggestions.forEach(function(suggestion) {
+          // After a space, predictions are based on a new, zero-length root.
+          // With nothing to replace, .deleteLeft should be zero.
+          assert.equal(suggestion.transform.deleteLeft, 0);
+        });
+      });
+
+      it('properly handles suggestions for the first letter after a `\'`', function() {
+        let compositor = new ModelCompositor(plainModel);
+        let context = {
+          left: "the '", startOfBuffer: true, endOfBuffer: true,
+        };
+
+        // This results in a new word boundary (between the `'` and the `a`).
+        // Basically, an implied (but nonexistent) ` `.
+        let inputTransform = {
+          insert: "a",
+          deleteLeft: 0
+        };
+
+        let suggestions = compositor.predict(inputTransform, context);
+        suggestions.forEach(function(suggestion) {
+          // Suggestions always delete the full root of the suggestion.
+          // Which, here, didn't exist before the input.  Nothing to
+          // replace => nothing for the suggestion to delete.
+          assert.equal(suggestion.transform.deleteLeft, 0);
         });
       });
     });

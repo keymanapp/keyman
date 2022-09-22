@@ -1,5 +1,37 @@
 # Keyman Version History
 
+## 16.0.66 alpha 2022-09-17
+
+* chore: improve auto labeling (#7288)
+
+## 16.0.65 alpha 2022-09-16
+
+* chore(linux): Remove unused IBusLookupTable (#7296)
+
+## 16.0.64 alpha 2022-09-15
+
+* fix(android/engine): Switch keyboard if uninstalling current one (#7291)
+* fix(common/models): fixes quote-adjacent pred-text suggestions (#7205)
+* fix(common/models): max prediction wait check (#7290)
+
+## 16.0.63 alpha 2022-09-14
+
+* chore(linux): Update debian changelog (#7281)
+* fix(linux): Fix ignored error (#7284)
+
+## 16.0.62 alpha 2022-09-13
+
+* fix(developer): hide key-sizes when in desktop layout in touch layout editor (#7225)
+* fix(developer): show more useful error if out of space during Setup (#7267)
+
+## 16.0.61 alpha 2022-09-12
+
+* docs(windows): add steps for using testhost debugging (#7263)
+* fix(developer): compiler mismatch on currentLine (#7190)
+* fix(developer): suppress repeated warnings about unreachable code (#7219)
+* chore:  try disabling concurrency for browserstack tests (#7258)
+* chore(web): disable browserstack on non-web-specific builds (#7260)
+
 ## 16.0.60 alpha 2022-09-10
 
 * fix(web): enhanced timer for prediction algorithm (#7037)

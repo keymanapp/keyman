@@ -3,7 +3,7 @@
     "compilerOptions": {
         "composite": true,
         "declaration": true,
-        "module": "CommonJS",
+        "module": "es2020",
         "moduleResolution": "node",
         "rootDir": ".",
         "outDir": "build/",

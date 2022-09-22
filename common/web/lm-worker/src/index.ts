@@ -32,6 +32,7 @@
 /// <reference types="@keymanapp/lm-message-types" />
 /// <reference path="./models/dummy-model.ts" />
 /// <reference path="./model-compositor.ts" />
+/// <reference path="./transformUtils.ts" />
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -407,6 +408,7 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports['wordBreakers'] = wordBreakers;
   /// XXX: export the ModelCompositor for testing.
   module.exports['ModelCompositor'] = ModelCompositor;
+  module.exports['TransformUtils'] = TransformUtils;
 } else if (typeof self !== 'undefined' && 'postMessage' in self && 'importScripts' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as any); // really, 'as typeof globalThis', but we're currently getting TS errors from use of that.
