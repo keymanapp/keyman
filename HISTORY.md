@@ -363,7 +363,96 @@
 
 ## 16.0.1 alpha 2022-03-02
 
-* chore: move to 16.0 (#6318)
+* chore(common): move to 16.0 (#6318)
+
+## 15.0.270 stable 2022-09-12
+
+* chore(linux): Add support for Ubuntu 22.10 "Kinetic Kudu" (#7143)
+* chore(linux): Update debian changelog (#7144)
+* fix(android/engine): Cleanup list of subkeys when dismissing window (#7176)
+* chore(linux): Fix ibus-keyman.postinst script (#7208)
+* fix(windows): Delete both code units when deleting surrogate pairs in TSF-aware apps (#7256)
+* fix(developer): compiler mismatch on currentLine (#7191)
+* fix(developer): suppress repeated warnings about unreachable code (#7265)
+
+## 15.0.269 stable 2022-08-29
+
+* chore(linux): Update debian changelog (#7040)
+* feat(linux): Replace deprecated distutils :cherries: (#7052)
+* fix(developer): compiler emitting garbage for readonly groups (#7014)
+* chore: Change platform advocates per discussion (#7114)
+* fix(windows): remove saving and restoring context kbd options (#7107)
+* fix(windows): Add invalidate context action to non-updatable parse (#7108)
+* fix(android/engine): :cherries: Lower the max height for landscape orientation (#7128)
+
+## 15.0.268 stable 2022-08-04
+
+* chore(linux): Update debian changelog (#6995)
+* fix(developer): increase maximum file size for server (#7004)
+* fix(developer): rebuilding a model would not refresh it in server (#7016)
+* chore(linux): Add script to upload to debian (#7017)
+* fix(developer): stack overflow when compiling non-web keyboard (#7034)
+* fix(developer): prevent crash attempting to compile ansi keyboard (#7035)
+
+## 15.0.267 stable 2022-07-26
+
+* fix(developer): QR Code for Package Editor had wrong path (#6927)
+* fix(ios): ignore CFBundleShortVersionString (#6935)
+* fix(web): context-only rule effects, set(&layer) from physical keystrokes  ️ (#6949)
+* chore(web): remove invalid warning msg (#6951)
+* fix(common): Fix `delete` :cherries: (#6966)
+* fix(linux): Another attempt at fixing postinst script :cherries: (#6961)
+* fix(linux): Fix uninstallation when using fcitx5 :cherries: (#6964)
+* fix(linux): Catch PermissionError exception :cherries: (#6969)
+* chore(linux): Update Debian changelog (#6972)
+* fix(developer): kmdecomp virtual character key output (#6945)
+* fix(developer): crash on exit when checking for updates (#6946)
+* fix(developer): crash when switching back a tab (#6947)
+* fix(developer): reduce timeouts if server shut down (#6948)
+* fix(android): rework longpress movement trigger (#6992)
+* chore(linux): Update changelog (#6987)
+* fix(developer): improve error message for multi-part key ids on <15.0 (#6990)
+
+## 15.0.266 stable 2022-07-08
+
+* fix(linux): Fix post-install script :cherries: (#6895)
+* fix(web): improve `console.error()` reporting (#6904)
+* fix(web): ncaps rules not matching on touch (#6913)
+
+## 15.0.265 stable 2022-07-04
+
+* fix(common): trigger builds correctly for stable builds (#6879)
+* fix(web): post-keystroke processing after use of pred. text selection (#6886)
+
+## 15.0.264 stable 2022-07-01
+
+* fix(ios): eliminates conditional height for banner image (#6857)
+* fix(web): clears repeating bksp on keyboard reload  ️ (#6863)
+* fix(web): better stability during transient OSK load state (#6861)
+* fix(developer): readonly groups should never emit output (#6873)
+* fix(web): Maintain separate Caps Lock states for touch and physical (#6874)
+
+## 15.0.263 stable 2022-06-24
+
+* chore(ios): add manageAppVersionAndBuildNumber=false (#6837)
+
+## 15.0.262 stable 2022-06-23
+
+* fix(web): key preview styling, positioning issues (#6795)
+* chore(linux): Update Debian changelog (#6809)
+* fix(linux): Deal with non-existing files (#6812)
+* fix(linux): Catch KeyboardInterrupt (#6814)
+* fix(ios): blocks known non-error "error" report (#6816)
+* fix(web): fixes doc-keyboard generation (#6817)
+* chore(web): updates error-reporting lib uploader (pseudo- ) (#6819)
+
+## 15.0.261 stable 2022-06-18
+
+* fix(web): crash on custom modifier keys (#6789)
+
+## 15.0.260 stable 2022-06-15
+
+* chore(common): Release version 15.0
 
 ## 15.0.259 beta 2022-06-10
 
