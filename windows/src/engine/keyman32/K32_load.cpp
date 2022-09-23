@@ -31,7 +31,7 @@
 #include "pch.h"
 
 HBITMAP LoadBitmapFile(LPBYTE data, DWORD sz);
-BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz);
+BOOL VerifyKeyboard(LPBYTE filebase);
 
 #ifdef _WIN64
 LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
@@ -281,7 +281,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
     return FALSE;
   }
 
-  if(!VerifyKeyboard(filebase, sz)) return FALSE;
+  if(!VerifyKeyboard(filebase)) return FALSE;
 
 #ifdef _WIN64
   kbp = CopyKeyboard(buf, filebase, sz);
@@ -887,26 +887,8 @@ HBITMAP LoadBitmapFileEx(PBYTE filebase)
     return NULL;
 }
 
-BOOL VerifyChecksum(LPBYTE buf, DWORD sz)
-{
-  DWORD tempcs;
-  PCOMP_KEYBOARD ckbp;
 
-  ckbp = (PCOMP_KEYBOARD) buf;
-
-  if(ckbp->dwFileVersion >= VERSION_160 && ckbp->dwCheckSum == 0) {
-    // #7222: We support a zero checksum in Keyman 16.0 and later
-    return TRUE;
-  }
-
-
-  tempcs = ckbp->dwCheckSum;
-  ckbp->dwCheckSum = 0;
-
-  return tempcs == CalculateBufferCRC(sz, buf);
-}
-
-BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz)
+BOOL VerifyKeyboard(LPBYTE filebase)
 {
   DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
@@ -917,26 +899,21 @@ BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz)
   if(ckbp->dwFileVersion < VERSION_MIN ||
      ckbp->dwFileVersion > VERSION_MAX)
   {
-    /* Old or new version -- identify the desired program version */
-    if(VerifyChecksum(filebase, sz))
-    {
-      for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++)
-        if(csp->dwSystemID == TSS_COMPILEDVERSION)
-        {
-          char buf2[256];
-          if(csp->dpString == 0)
-            wsprintf(buf2, "errWrongFileVersion:NULL");
-          else
-            wsprintf(buf2, "errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
-          Err(buf2);
-          return FALSE;
-        }
+    for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++) {
+      if(csp->dwSystemID == TSS_COMPILEDVERSION)
+      {
+        char buf2[256];
+        if(csp->dpString == 0)
+          wsprintf(buf2, "errWrongFileVersion:NULL");
+        else
+          wsprintf(buf2, "errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
+        Err(buf2);
+        return FALSE;
+      }
     }
     Err("errWrongFileVersion");
     return FALSE;
   }
-
-  if(!VerifyChecksum(filebase, sz)) { Err("errBadChecksum"); return FALSE; }
 
   return TRUE;
 }

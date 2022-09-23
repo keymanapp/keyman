@@ -49,7 +49,7 @@ typedef struct tagKEYBOARD
 
   KMX_DWORD dwFileVersion;  // Version of the file - Keyman 4.0 is 0x0400
 
-  KMX_DWORD dwCheckSum;   // As stored in keyboard
+  KMX_DWORD dwCheckSum;   // As stored in keyboard. DEPRECATED as of 16.0
   KMX_DWORD xxkbdlayout;      // as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   KMX_DWORD IsRegistered;   // layout id, from same key
   KMX_DWORD version;      // keyboard version

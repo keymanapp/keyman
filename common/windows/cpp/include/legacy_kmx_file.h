@@ -370,7 +370,7 @@ struct COMP_KEYBOARD {
 
 	DWORD dwFileVersion;	// 0004 Version of the file - Keyman 4.0 is 0x0400
 
-	DWORD dwCheckSum;		  // 0008 As stored in keyboard
+	DWORD dwCheckSum;		  // 0008 As stored in keyboard. DEPRECATED as of 16.0
 	DWORD KeyboardID;    	// 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
 	DWORD IsRegistered;		// 0010
 	DWORD version;			  // 0014 keyboard version
