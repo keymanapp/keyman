@@ -36,13 +36,13 @@ let outputFilename: string = program.outFile ? program.outFile : inputFilename.r
 
 let kpsString: string = fs.readFileSync(inputFilename, 'utf8');
 let kmpCompiler = new KmpCompiler();
-let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString);
+let kmpJsonData = kmpCompiler.transformKpsToKmpObject(inputFilename, kpsString);
 
 //
 // Build the .kmp package file
 //
 
-let promise = kmpCompiler.buildKmpFile(kmpJsonData);
+let promise = kmpCompiler.buildKmpFile(inputFilename, kmpJsonData);
 promise.then(data => {
   fs.writeFileSync(outputFilename, data, 'binary');
 }).catch(error => {

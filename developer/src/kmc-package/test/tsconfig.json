@@ -6,12 +6,14 @@
       "rootDirs": ["./", "../src/"],
       "outDir": "../build/test",
       "baseUrl": ".",
-  },
+      "allowSyntheticDefaultImports": true, // for jszip
+    },
   "include": [
       "**/test-*.ts",
       "helpers/*.ts"
   ],
   "references": [
-      { "path": "../" }
+      { "path": "../" },
+      { "path": "../../../../common/web/keyman-version/tsconfig.esm.json" },
     ]
 }
