@@ -5,6 +5,7 @@
   "types": "./build/index.d.ts",
   "scripts": {
     "build": "gosh ./build.sh",
+    "clean": "tsc -b --clean",
     "tsc": "tsc"
   },
   "repository": {

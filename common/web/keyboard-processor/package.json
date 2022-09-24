@@ -19,13 +19,14 @@
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
     "chai": "^4.3.4",
-    "mocha": "^8.4.0",
+    "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.5.4"
   },
   "scripts": {
     "tsc": "tsc",
+    "clean": "tsc -b --clean src/tsconfig.json && tsc -b --clean src/tsconfig.bundled.json",
     "test": "gosh ./test.sh",
     "mocha": "mocha"
   },

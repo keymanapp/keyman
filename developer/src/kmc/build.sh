@@ -30,9 +30,9 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action clean; then
+if builder_start_action clean; then
   rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_report success clean
+  builder_finish_action success clean
 else
   # We need the schema file at runtime and bundled, so always copy it for all actions except `clean`
   mkdir -p "$THIS_SCRIPT_PATH/build/src/"
@@ -42,30 +42,30 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action configure; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_report success configure
+  builder_finish_action success configure
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action build; then
+if builder_start_action build; then
   npm run build
-  builder_report success build
+  builder_finish_action success build
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action test; then
+if builder_start_action test; then
   # npm test -- no tests as yet
-  builder_report success test
+  builder_finish_action success test
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action bundle; then
+if builder_start_action bundle; then
   if ! builder_has_option --build-path; then
-    builder_report "Parameter --build-path is required" bundle
+    builder_finish_action "Parameter --build-path is required" bundle
     exit 64
   fi
 
@@ -73,13 +73,13 @@ if builder_has_action bundle; then
   npm run bundle
   cp build/cjs-src/* "$BUILD_PATH"
 
-  builder_report success bundle
+  builder_finish_action success bundle
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action publish; then
+if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/npm-publish.inc.sh"
   npm_publish
-  builder_report success publish
+  builder_finish_action success publish
 fi

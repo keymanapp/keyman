@@ -75,7 +75,15 @@ export default class LDMLKeyboardXMLSourceFileReader {
       let parser = new xml2js.Parser({
         explicitArray: false,
         mergeAttrs: true,
-        emptyTag: {}
+        emptyTag: {} as any
+        // Why "as any"? xml2js is broken:
+        // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
+        // that an old version of `emptyTag` is used which doesn't support
+        // functions, but DefinitelyTyped is requiring use of function or a
+        // string. See also notes at
+        // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59259#issuecomment-1254405470
+        // An alternative fix would be to pull xml2js directly from github
+        // rather than using the version tagged on npmjs.com.
       });
       parser.parseString(file, (e: unknown, r: unknown) => { a = r as LDMLKeyboardXMLSourceFile });
       return a;

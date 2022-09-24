@@ -7,10 +7,10 @@
 do_clean() {
   # clean: note build/<target> will be left, but build/<target>/<configuration> should be gone
   local target=$1
-  builder_has_action clean:$target || return 0
+  builder_start_action clean:$target || return 0
 
   rm -rf "$MESON_PATH"
-  builder_report success clean:$target
+  builder_finish_action success clean:$target
 }
 
 # ----------------------------------------------------------------------------
@@ -19,7 +19,7 @@ do_clean() {
 
 do_configure() {
   local target=$1
-  builder_has_action configure:$target || return 0
+  builder_start_action configure:$target || return 0
 
   local STANDARD_MESON_ARGS=
 
@@ -42,6 +42,7 @@ do_configure() {
     meson setup "$MESON_PATH" --werror --buildtype $CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
+  builder_finish_action success configure:$target
 }
 
 has_configured_dependencies=false
@@ -74,7 +75,7 @@ do_configure_dependencies() {
 
 do_build() {
   local target=$1
-  builder_has_action build:$target || return 0
+  builder_start_action build:$target || return 0
 
   echo_heading "======= Building $target ======="
 
@@ -90,6 +91,7 @@ do_build() {
     ninja
     popd > /dev/null
   fi
+  builder_finish_action success build:$target
 }
 
 # ----------------------------------------------------------------------------
@@ -98,7 +100,7 @@ do_build() {
 
 do_test() {
   local target=$1
-  builder_has_action test:$target || return 0
+  builder_start_action test:$target || return 0
 
   echo_heading "======= Testing $target ======="
 
@@ -109,6 +111,7 @@ do_test() {
     meson test "${builder_extra_params[@]}"
     popd > /dev/null
   fi
+  builder_finish_action success test:$target
 }
 
 # ----------------------------------------------------------------------------
@@ -126,13 +129,11 @@ do_uninstall() {
 do_command() {
   local command=$1
   local target=$2
-  builder_has_action $command:$target || return 0
-
-  echo_heading "======= Installing $target ======="
-
+  builder_start_action $command:$target || return 0
   pushd "$MESON_PATH" > /dev/null
   ninja $command
   popd > /dev/null
+  builder_finish_action success $command:$target
 }
 
 # ----------------------------------------------------------------------------

@@ -28,23 +28,23 @@ builder_parse "$@"
 # TODO: configure if npm has not been run, and build is specified
 
 
-if builder_has_action clean; then
+if builder_start_action clean; then
   rm -rf ../../include/ldml/build/
   # Not removing ${KBP_LDML_H_FILE} as it is checked in
-  builder_report success clean
+  builder_finish_action success clean
 fi
 
-if builder_has_action build; then
+if builder_start_action build; then
   # Generate index.ts
   npx tsc -b ../../include/ldml/tsconfig.build.json
 
-  builder_report success build
+  builder_finish_action success build
 fi
 
-if builder_has_action run; then
+if builder_start_action run; then
   node ../../include/ldml/ldml-const-builder/ldml-const-builder.js > ${KBP_LDML_H_FILE}
   echo "Updated ${KBP_LDML_H_FILE}"
 
-  builder_report success run
+  builder_finish_action success run
 fi
 

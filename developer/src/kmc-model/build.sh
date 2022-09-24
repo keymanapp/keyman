@@ -28,40 +28,40 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action clean; then
+if builder_start_action clean; then
   rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_report success clean
+  builder_finish_action success clean
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action configure; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_report success configure
+  builder_finish_action success configure
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action build; then
+if builder_start_action build; then
   # Note: build-cjs only emits lexical-model-compiler.cjs at this time, as that
   # is the only file required by other non-ES modules
   # (common/web/input-processor tests)
   mkdir -p build/cjs-src
   npm run build
-  builder_report success build
+  builder_finish_action success build
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action test; then
+if builder_start_action test; then
   npm test
-  builder_report success test
+  builder_finish_action success test
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action publish; then
+if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/npm-publish.inc.sh"
   npm_publish
-  builder_report success publish
+  builder_finish_action success publish
 fi

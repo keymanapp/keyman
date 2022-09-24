@@ -32,14 +32,6 @@
 #
 SHLVL=0
 
-# Setup variable for calling script's path and name
-if [ ! -z ${THIS_SCRIPT+x} ]; then
-  THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
-  readonly THIS_SCRIPT_PATH
-  THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
-  readonly THIS_SCRIPT_NAME
-fi
-
 function die () {
     # TODO: consolidate this with fail() from shellHelperFunctions.sh
     echo
@@ -55,6 +47,24 @@ function findRepositoryRoot() {
     local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
     KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
     readonly KEYMAN_ROOT
+}
+
+# Used to build script-related build variables useful for referencing the calling script
+# and for prefixing builder_finish_action outputs in order to more clearly identify the calling
+# script.
+#
+# Assumes that `findRepositoryRoot` has already been called, a condition met later on
+# within this script.
+function _builder_setBuildScriptIdentifiers() {
+  if [ ! -z ${THIS_SCRIPT+x} ]; then
+    THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
+    readonly THIS_SCRIPT_PATH
+    THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
+    readonly THIS_SCRIPT_NAME
+    # Leaves only the part of the path based upon KEYMAN_ROOT.
+    THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$KEYMAN_ROOT/"}
+    readonly THIS_SCRIPT_IDENTIFIER
+  fi
 }
 
 function findVersion() {
@@ -181,6 +191,7 @@ function findShouldSentryRelease() {
 }
 
 findRepositoryRoot
+_builder_setBuildScriptIdentifiers
 findTier
 findVersion
 # printVersionUtilsDebug
@@ -296,6 +307,11 @@ builder_use_color() {
     COLOR_RESET=$(tput sgr0)
     # e.g. VSCode https://code.visualstudio.com/updates/v1_69#_setmark-sequence-support
     HEADING_SETMARK='\x1b]1337;SetMark\x07'
+
+    # Used by `builder_display_usage` when marking special terms (actions, targets, options)
+    # in the plain-text description area.
+    BUILDER_TERM_START="$COLOR_BLUE"
+    BUILDER_TERM_END="$COLOR_RESET"
   else
     COLOR_RED=
     COLOR_GREEN=
@@ -307,6 +323,8 @@ builder_use_color() {
     COLOR_GREY=
     COLOR_RESET=
     HEADING_SETMARK=
+    BUILDER_TERM_START="<"
+    BUILDER_TERM_END=">"
   fi
 }
 
@@ -354,8 +372,54 @@ _builder_item_is_target() {
   return 0
 }
 
+function _builder_warn_if_incomplete() {
+  if [ -n "${_builder_current_action}" ]; then
+    local scope="[$THIS_SCRIPT_IDENTIFIER] "
+    echo "${COLOR_YELLOW}## ${scope}Warning - $_builder_current_action never reported success or failure${COLOR_RESET}"
+    # exit 1  # If we wanted this scenario to result in a forced build-script fail.
+  fi
+
+  # Since we've already warned about this once, we'll clear the variable to prevent repetitions.
+  _builder_current_action=
+}
+
+# Used by a `trap` statement later to facilitate auto-reporting failures on error detection
+# without obscuring failure exit/error codes.
+_builder_failure_trap() {
+  local trappedExitCode=$?
+  local action target
+
+  # Since 'exit' is also trapped, we can also handle end-of-script incomplete actions.
+  if [[ $trappedExitCode == 0 ]]; then
+    # While there weren't errors, were there any actions that never reported success or failure?
+    _builder_warn_if_incomplete
+    return
+  fi
+
+  # If we've reached this point, we're here because an error occurred.
+
+  # Iterate across currently-active actions and report their failures.
+  if [ -n "${_builder_current_action}" ]; then
+    action="${_builder_current_action}"
+    if [[ $action =~ : ]]; then
+      IFS=: read -r action target <<< $action
+      target=:$target
+    else
+      target=:project
+    fi
+
+    builder_finish_action failure $action $target
+  fi
+}
+
 #
-# Returns 0 if the user has asked to perform action on target on the command line
+# Builds the standardized `action:target` string for the specified action-target
+# pairing and also returns 0 if the user has asked to perform it on the command
+# line.  Otherwise, returns 0 and sets an empty string in place of the matched
+# pair.
+#
+# The string will be set as `_builder_matched_action`, which is for
+# build-utils.sh internal use, used by `builder_start_action`.
 #
 # Usage:
 #   if build_has_action action[:target]; then ...; fi
@@ -363,9 +427,7 @@ _builder_item_is_target() {
 #   1: action    name of action
 #   2: :target    name of target, :-prefixed, as part of first param or space separated ok
 # Example:
-#   if build_has_action build :app; then
-#   if build_has_action build:app; then
-#
+#   if builder_has_action build :app; then  # or build:app, that's fine too.
 builder_has_action() {
   local action="$1" target
 
@@ -379,10 +441,41 @@ builder_has_action() {
   fi
 
   if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
-    echo "${COLOR_BLUE}## $action$target starting...${COLOR_RESET}"
+    # To avoid WET re-processing of the $action$target string set
+    _builder_matched_action="$action$target"
     return 0
+  else
+    _builder_matched_action=
+    return 1
   fi
-  return 1
+}
+
+#
+# Returns 0 if the user has asked to perform action on target on the command line, and
+# then starts the action. Should be paired with builder_finish_action
+#
+# Usage:
+#   if builder_start_action action[:target]; then ...; fi
+# Parameters:
+#   1: action    name of action
+#   2: :target    name of target, :-prefixed, as part of first param or space separated ok
+# Example:
+#   if builder_start_action build :app; then
+#   if builder_start_action build:app; then
+#
+builder_start_action() {
+  local scope="[$THIS_SCRIPT_IDENTIFIER] "
+
+  if builder_has_action $@; then
+    echo "${COLOR_BLUE}## $scope$_builder_matched_action starting...${COLOR_RESET}"
+    if [ -n "${_builder_current_action}" ]; then
+      _builder_warn_if_incomplete
+    fi
+    _builder_current_action="$_builder_matched_action"
+    return 0
+  else
+    return 1
+  fi
 }
 
 #
@@ -414,9 +507,8 @@ _builder_trim() {
 }
 
 #
-# Describes a build script, defines available parameters
-# and their meanings. Use together with builder_parse
-# to process input parameters
+# Describes a build script, defines available parameters and their meanings. Use
+# together with `builder_parse` to process input parameters.
 #
 # Usage:
 #    builder_describe description param_desc...
@@ -552,6 +644,32 @@ _builder_parameter_error() {
 
 }
 
+# Pre-initializes the color setting based on the options specified to a
+# a build.sh script, parsing the command line to do so.  This is only
+# needed if said script wishes to use this script's defined colors while
+# respecting the options provided by the script's caller.
+#
+# Usage:
+#   builder_check_color "$@"
+# Parameters
+#   1: $@         all command-line arguments (as with builder_parse)
+builder_check_color() {
+  # Process command-line arguments
+  while [[ $# -gt 0 ]] ; do
+    local key="$1"
+
+    case "$key" in
+      --color)
+        builder_use_color true
+        ;;
+      --no-color)
+        builder_use_color false
+        ;;
+    esac
+    shift # past the processed argument
+  done
+}
+
 # Initializes a build.sh script, parses command line. Will abort the script if
 # invalid parameters are passed in. Use together with builder_describe which
 # sets up the possible command line parameters
@@ -565,6 +683,7 @@ builder_parse() {
   builder_extra_params=()
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
+  _builder_current_action=
 
   # Process command-line arguments
   while [[ $# -gt 0 ]] ; do
@@ -672,6 +791,15 @@ builder_parse() {
       echo "* $e"
     done
   fi
+
+  # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
+  # action_failure and action_hanging traps.  (We don't want them active on scripts not yet using
+  # said script.)
+  #
+  # Note:  if an error occurs within a script's function in a `set -e` script, it becomes an exit
+  # instead for the function's caller.  So, we need both `err` and `exit` here.
+  # See https://medium.com/@dirk.avery/the-bash-trap-trap-ce6083f36700.
+  trap _builder_failure_trap err exit
 }
 
 _builder_pad() {
@@ -741,8 +869,10 @@ builder_display_usage() {
   _builder_pad $width "  --color"        "Force colorized output"
   _builder_pad $width "  --no-color"     "Never use colorized output"
   _builder_pad $width "  --help, -h"     "Show this help"
-  local c1="${COLOR_BLUE:=<}"
-  local c0="${COLOR_RESET:=>}"
+
+  # Defined in `builder_use_color`; this assumes that said func has been called.
+  local c1=$BUILDER_TERM_START
+  local c0=$BUILDER_TERM_END
   echo
   echo "* Specify ${c1}action:target${c0} to run a specific ${c1}action${c0} against a specific ${c1}:target${c0}."
   echo "* If ${c1}action${c0} is specified without a ${c1}target${c0} suffix, it will be applied to all ${c1}:target${c0}s."
@@ -751,7 +881,7 @@ builder_display_usage() {
   echo
 }
 
-builder_report() {
+builder_finish_action() {
   local result="$1"
   local action="$2" target
 
@@ -764,10 +894,21 @@ builder_report() {
     target="$3"
   fi
 
-  if [[ $result == success ]]; then
-    echo "${COLOR_GREEN}## $action$target completed successfully${COLOR_RESET}"
+  local scope="[$THIS_SCRIPT_IDENTIFIER] "
+
+  if [[ "$action$target" == "${_builder_current_action}" ]]; then
+    if [[ $result == success ]]; then
+      echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
+    elif [[ $result == failure ]]; then
+      echo "${COLOR_RED}## $scope$action$target failed${COLOR_RESET}"
+    else
+      echo "${COLOR_RED}## $scope$action$target failed with message: $result${COLOR_RESET}"
+    fi
+
+    # Remove $action$target from the array; it is no longer a current action
+    _builder_current_action=
   else
-    echo "${COLOR_RED}## $action$target failed. Result: $result${COLOR_RESET}"
+    echo "${COLOR_YELLOW}## Warning: reporting result of $action$target but the action was never started!${COLOR_RESET}"
   fi
 }
 

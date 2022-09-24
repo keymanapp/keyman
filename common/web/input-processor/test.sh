@@ -31,7 +31,7 @@ display_usage ( ) {
 FLAGS=
 CI_REPORTING=0
 FETCH_DEPS=true
-CHAINING_FLAGS=-skip-package-install
+CHAINING_FLAGS=
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
     -CI)
       CI_REPORTING=1
-      CHAINING_FLAGS="$CHAINING_FLAGS -CI"
+      CHAINING_FLAGS="$CHAINING_FLAGS --ci"
       ;;
     -skip-package-install|-S)
       FETCH_DEPS=false
@@ -79,7 +79,7 @@ fi
 
 # First, run tests on the keyboard processor.
 pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
-./test.sh $CHAINING_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
+./build.sh test $CHAINING_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 popd
 
 # Build the leaf-style, bundled version of input-processor for use in testing.
