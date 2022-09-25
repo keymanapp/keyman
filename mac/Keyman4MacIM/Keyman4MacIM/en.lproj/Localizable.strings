@@ -68,4 +68,7 @@
 /* copyright label in the Package Information window */
 "copyright-label" = "Copyright:";
 
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "To function properly, Keyman requires accessibility features.\n\nAfter granting access in System Preferences, Privacy & Security, restart your system.";
+
 

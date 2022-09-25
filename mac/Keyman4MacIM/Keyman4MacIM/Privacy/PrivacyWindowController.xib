@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="PrivacyWindowController">
+            <connections>
+                <outlet property="alertText" destination="Q9Y-hw-8LE" id="MO8-UJ-6JC"/>
+                <outlet property="appLogo" destination="v0C-81-K9I" id="c6w-la-PzL"/>
+                <outlet property="okButton" destination="osj-ah-rAs" id="Owd-6J-kof"/>
+                <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
+            <windowStyleMask key="styleMask" titled="YES"/>
+            <rect key="contentRect" x="196" y="240" width="483" height="193"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <view key="contentView" id="se5-gp-TjO">
+                <rect key="frame" x="0.0" y="0.0" width="483" height="116"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="osj-ah-rAs">
+                        <rect key="frame" x="195" y="13" width="94" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="80" id="fC7-xX-Aio"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="f50-zb-EzH">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                            <connections>
+                                <binding destination="-2" name="argument" keyPath="self.okButton" id="fTd-bT-gmZ"/>
+                            </connections>
+                        </buttonCell>
+                        <connections>
+                            <action selector="closeAction:" target="-2" id="T0n-eX-sTD"/>
+                        </connections>
+                    </button>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Q9Y-hw-8LE">
+                        <rect key="frame" x="108" y="70" width="352" height="16"/>
+                        <textFieldCell key="cell" selectable="YES" title="Multiline Label" id="Jeh-id-hnX">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            <connections>
+                                <binding destination="-2" name="displayPatternValue1" keyPath="self.alertText" id="ZwG-0I-cdN">
+                                    <dictionary key="options">
+                                        <string key="NSDisplayPattern">%{value1}@</string>
+                                    </dictionary>
+                                </binding>
+                            </connections>
+                        </textFieldCell>
+                    </textField>
+                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="v0C-81-K9I">
+                        <rect key="frame" x="32" y="38" width="48" height="48"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="48" id="RFl-kR-snc"/>
+                            <constraint firstAttribute="width" constant="48" id="eye-si-xYn"/>
+                        </constraints>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="DhJ-BG-53w"/>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="v0C-81-K9I" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="32" id="3Dn-dx-OqD"/>
+                    <constraint firstItem="Q9Y-hw-8LE" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="30" id="AXd-9W-fDZ"/>
+                    <constraint firstAttribute="trailing" secondItem="Q9Y-hw-8LE" secondAttribute="trailing" constant="25" id="HN0-mp-uth"/>
+                    <constraint firstItem="osj-ah-rAs" firstAttribute="top" secondItem="Q9Y-hw-8LE" secondAttribute="bottom" constant="30" id="Myv-mo-vTX"/>
+                    <constraint firstAttribute="bottom" secondItem="osj-ah-rAs" secondAttribute="bottom" constant="20" id="Yy4-7w-xtn"/>
+                    <constraint firstItem="osj-ah-rAs" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="dsE-Sh-KFc"/>
+                    <constraint firstItem="v0C-81-K9I" firstAttribute="top" secondItem="Q9Y-hw-8LE" secondAttribute="top" id="tjs-vE-MlM"/>
+                    <constraint firstItem="Q9Y-hw-8LE" firstAttribute="leading" secondItem="v0C-81-K9I" secondAttribute="trailing" constant="30" id="uai-PQ-Tyt"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
+            </connections>
+            <point key="canvasLocation" x="208.5" y="146"/>
+        </window>
+    </objects>
+</document>
