@@ -343,11 +343,11 @@
 		297A501128DF4D360074EB1B /* Privacy */ = {
 			isa = PBXGroup;
 			children = (
+				297A501428DF4D360074EB1B /* PrivacyConsent.h */,
+				297A501628DF4D360074EB1B /* PrivacyConsent.m */,
+				297A501528DF4D360074EB1B /* PrivacyWindowController.h */,
 				297A501228DF4D360074EB1B /* PrivacyWindowController.m */,
 				297A501328DF4D360074EB1B /* PrivacyWindowController.xib */,
-				297A501428DF4D360074EB1B /* PrivacyConsent.h */,
-				297A501528DF4D360074EB1B /* PrivacyWindowController.h */,
-				297A501628DF4D360074EB1B /* PrivacyConsent.m */,
 			);
 			path = Privacy;
 			sourceTree = "<group>";
