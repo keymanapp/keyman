@@ -165,6 +165,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
       lexicalModelInfo.put(KMManager.KMKey_PackageID, defaultLexicalModel.getPackageID());
       lexicalModelInfo.put(KMManager.KMKey_LanguageID, defaultLexicalModel.getLanguageID());
+      lexicalModelInfo.put(KMManager.KMKey_LanguageName, defaultLexicalModel.getLanguageName());
       lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, defaultLexicalModel.getLexicalModelID());
       lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, defaultLexicalModel.getLexicalModelName());
       lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, defaultLexicalModel.getVersion());
