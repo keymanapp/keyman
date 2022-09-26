@@ -1,26 +1,19 @@
 import * as xml2js from 'xml2js';
 import KVKSourceFile from './kvks-file.js';
-import CompilerCallbacks from '../compiler/callbacks.js';
 import Ajv from 'ajv';
-import { CompilerMessages } from '../compiler/messages.js';
 import { boxXmlArray } from '../util/util.js';
 import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../ldml-keyboard/virtual-key-constants.js';
 import { BUILDER_KVK_HEADER_VERSION } from './kvk-file.js';
 
+export enum KVKSParseErrorType { invalidVkey };
+export class KVKSParseError extends Error {
+  public type: KVKSParseErrorType;
+  public vkey: string;
+};
+
 export default class KVKSFileReader {
-  private readonly callbacks: CompilerCallbacks;
-
-  constructor (callbacks: CompilerCallbacks) {
-    this.callbacks = callbacks;
-  }
-
-  public read(file: Uint8Array): VisualKeyboard {
-    let source = this.internalRead(file);
-    return this.transform(source);
-  }
-
-  public internalRead(file: Uint8Array): KVKSourceFile {
+  public read(file: Uint8Array): KVKSourceFile {
     let source: KVKSourceFile;
 
     const parser = new xml2js.Parser({
@@ -42,7 +35,7 @@ export default class KVKSFileReader {
     parser.parseString(file, (e: unknown, r: unknown) => { source = r as KVKSourceFile });
     source = this.boxArrays(source);
     this.cleanupUnderscore('visualkeyboard', source.visualkeyboard);
-    return this.validate(source);
+    return source;
   }
 
   /**
@@ -71,18 +64,15 @@ export default class KVKSFileReader {
     }
   }
 
-  public validate(source: KVKSourceFile): KVKSourceFile {
-    const schema = JSON.parse(this.callbacks.loadKvksJsonSchema().toString('utf8'));
+  public validate(source: KVKSourceFile, schemaBuffer: Buffer): void {
+    const schema = JSON.parse(schemaBuffer.toString('utf8'));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
-      console.dir(source, {depth:8});
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: ajv.errorsText()}));
-      return null;
+      throw new Error(ajv.errorsText());
     }
-    return source;
   }
 
-  public transform(source: KVKSourceFile): VisualKeyboard {
+  public transform(source: KVKSourceFile, errors?: KVKSParseError[]): VisualKeyboard {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume properties exist
     let result: VisualKeyboard = {
@@ -119,7 +109,12 @@ export default class KVKSFileReader {
         for(let sourceKey of layer.key) {
           let vkey = (USVirtualKeyCodes as any)[sourceKey.vkey];
           if(!vkey) {
-            this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsNotValid({vkey: sourceKey.vkey}));
+            if(errors) {
+              let e = new KVKSParseError();
+              e.type = KVKSParseErrorType.invalidVkey;
+              e.vkey = sourceKey.vkey;
+              errors.push(e);
+            }
             continue;
           }
           let key: VisualKeyboardKey = {
