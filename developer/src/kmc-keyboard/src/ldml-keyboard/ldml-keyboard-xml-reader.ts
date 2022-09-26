@@ -65,6 +65,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
       let parser = new xml2js.Parser({
         explicitArray: false,
         mergeAttrs: true,
+        includeWhiteChars: false,
         emptyTag: {} as any
         // Why "as any"? xml2js is broken:
         // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means

@@ -49,6 +49,10 @@ class CompilerCallbacks {
     let schemaPath = new URL('ldml-keyboard.schema.json', import.meta.url);
     return fs.readFileSync(schemaPath);
   }
+  loadKvksJsonSchema(): Buffer {
+    let schemaPath = new URL('kvks.schema.json', import.meta.url);
+    return fs.readFileSync(schemaPath);
+  }
 }
 
 function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): Uint8Array {

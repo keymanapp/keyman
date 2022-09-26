@@ -13,8 +13,7 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "test": "cd test && tsc -b && cd .. && mocha",
-    "coverage": "cd test && tsc -b && cd .. && c8 mocha",
+    "test": "cd test && tsc -b && cd .. && c8 mocha",
     "prepublishOnly": "npm run build"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
