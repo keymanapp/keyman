@@ -24,20 +24,36 @@ export function makePathToFixture(...components: string[]): string {
   return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
 }
 
-
-export class CompilerCallbacks {
+class CompilerCallbacks {
   messages: CompilerEvent[] = [];
   loadFile(baseFilename: string, filename:string): Buffer {
     // TODO: translate filename based on the baseFilename
     return fs.readFileSync(filename);
   }
   reportMessage(event: CompilerEvent): void {
+    // console.log(event.message);
     this.messages.push(event);
   }
   loadLdmlKeyboardSchema(): Buffer {
     return fs.readFileSync(new URL(path.join('..', '..', 'src', 'ldml-keyboard.schema.json'), import.meta.url));
   }
-}
+  loadKvksJsonSchema(): Buffer {
+    return fs.readFileSync(new URL(path.join('..', '..', 'src', 'kvks.schema.json'), import.meta.url));
+  }
+};
+
+export const compilerTestCallbacks = new CompilerCallbacks();
+
+beforeEach(function() {
+  compilerTestCallbacks.messages = [];
+});
+
+afterEach(function() {
+  if (this.currentTest.state !== 'passed') {
+    compilerTestCallbacks.messages.forEach(message => console.log(message.message));
+  }
+});
+
 
 export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: CompilerCallbacks): Section {
   callbacks.messages = [];
@@ -57,18 +73,18 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
   return compiler.compile(globalSections);
 }
 
-export function compileKeyboard(inputFilename: string, callbacks: CompilerCallbacks, options: CompilerOptions): KMXPlusFile {
-  const k = new Compiler(callbacks, options);
+export function compileKeyboard(inputFilename: string, options: CompilerOptions): KMXPlusFile {
+  const k = new Compiler(compilerTestCallbacks, options);
   const source = k.load(inputFilename);
-  checkMessages(callbacks);
+  checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
 
   const valid = k.validate(source);
-  checkMessages(callbacks);
+  checkMessages();
   assert.isTrue(valid, 'k.validate should not have failed');
 
   const kmx = k.compile(source);
-  checkMessages(callbacks);
+  checkMessages();
   assert.isNotNull(kmx, 'k.compile should not have returned null');
 
   // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
@@ -78,9 +94,9 @@ export function compileKeyboard(inputFilename: string, callbacks: CompilerCallba
   return kmx;
 }
 
-export function checkMessages(callbacks: CompilerCallbacks) {
-  if(callbacks.messages.length > 0) {
-    console.log(callbacks.messages);
+export function checkMessages() {
+  if(compilerTestCallbacks.messages.length > 0) {
+    console.log(compilerTestCallbacks.messages);
   }
-  assert.isEmpty(callbacks.messages);
+  assert.isEmpty(compilerTestCallbacks.messages);
 }
