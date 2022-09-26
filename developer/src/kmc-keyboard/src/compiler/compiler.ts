@@ -51,9 +51,21 @@ export default class Compiler {
    * @returns
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile {
-    const reader = new LDMLKeyboardXMLSourceFileReader(this.callbacks);
-    const source = reader.loadFile(filename);
-    return source ?? null;
+    const reader = new LDMLKeyboardXMLSourceFileReader();
+    const data = this.callbacks.loadFile(filename, filename);
+    const source = reader.load(data);
+    if(!source) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
+      return null;
+    }
+    try {
+      reader.validate(source, this.callbacks.loadLdmlKeyboardSchema());
+    } catch(e) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
+      return null;
+    }
+
+    return source;
   }
 
   /**
