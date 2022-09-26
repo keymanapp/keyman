@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.70 alpha 2022-09-26
+
+* fix(android): Add language name when installing default lexical-model (#7347)
+* chore(common): Add 15.0 stable entries to HISTORY.md :cherries: (#7350)
+
 ## 16.0.69 alpha 2022-09-21
 
 * fix(android/engine): Check listview for setting keyboard selection (#7325)
