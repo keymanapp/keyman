@@ -7,7 +7,7 @@
 // Using prefix LK for LDML Keyboard
 //
 
-export default interface LDMLKeyboardXMLSourceFile {
+export interface LDMLKeyboardXMLSourceFile {
   /**
    * <keyboard> -- the root element.
    */

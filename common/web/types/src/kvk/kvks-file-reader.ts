@@ -3,7 +3,7 @@ import KVKSourceFile from './kvks-file.js';
 import Ajv from 'ajv';
 import { boxXmlArray } from '../util/util.js';
 import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
-import { USVirtualKeyCodes } from '../ldml-keyboard/virtual-key-constants.js';
+import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
 import { BUILDER_KVK_HEADER_VERSION } from './kvk-file.js';
 
 export enum KVKSParseErrorType { invalidVkey };

@@ -1,7 +1,12 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { GlobalSections, Ordr, OrdrItem } from "../kmx/kmx-plus.js";
-import { LKReorder, LKReorders } from "../ldml-keyboard/ldml-keyboard-xml.js";
+import { KMXPlus, LDMLKeyboard } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
+
+import GlobalSections = KMXPlus.GlobalSections;
+import Ordr = KMXPlus.Ordr;
+import OrdrItem = KMXPlus.OrdrItem;
+import LKReorder = LDMLKeyboard.LKReorder;
+import LKReorders = LDMLKeyboard.LKReorders;
 
 export class OrdrCompiler extends SectionCompiler {
 

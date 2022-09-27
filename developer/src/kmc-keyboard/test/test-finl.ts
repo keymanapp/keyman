@@ -2,8 +2,10 @@ import 'mocha';
 import { assert } from 'chai';
 import { FinlCompiler } from '../src/compiler/tran.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
-import { Finl, FinlItemFlags } from '../src/kmx/kmx-plus.js';
-//import { CompilerMessages } from './keyman/compiler/messages';
+import { KMXPlus } from '@keymanapp/common-types';
+
+import Finl = KMXPlus.Finl;
+import FinlItemFlags = KMXPlus.FinlItemFlags;
 
 describe('finl', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

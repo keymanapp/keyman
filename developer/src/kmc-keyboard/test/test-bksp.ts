@@ -2,8 +2,10 @@ import 'mocha';
 import { assert } from 'chai';
 import { BkspCompiler } from '../src/compiler/bksp.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
-import { Bksp, BkspItemFlags } from '../src/kmx/kmx-plus.js';
-//import { CompilerMessages } from './keyman/compiler/messages';
+import { KMXPlus } from '@keymanapp/common-types';
+
+import Bksp = KMXPlus.Bksp;
+import BkspItemFlags = KMXPlus.BkspItemFlags;
 
 describe('bksp', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

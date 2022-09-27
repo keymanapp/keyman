@@ -1,8 +1,10 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Vkey } from "../kmx/kmx-plus.js";
-import { LdmlVkeyNames } from "../ldml-keyboard/virtual-key-constants.js";
+import { KMXPlus, Constants } from '@keymanapp/common-types';
 import { CompilerMessages } from "./messages.js";
 import { SectionCompiler } from "./section-compiler.js";
+
+import Vkey = KMXPlus.Vkey;
+import LdmlVkeyNames = Constants.LdmlVkeyNames;
 
 export class VkeyCompiler extends SectionCompiler {
 

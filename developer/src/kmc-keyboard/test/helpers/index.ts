@@ -5,13 +5,18 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import KMXPlusFile, { Elem, GlobalSections, Section, Strs } from '../../src/kmx/kmx-plus.js';
-import LDMLKeyboardXMLSourceFileReader from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
 import { CompilerEvent } from '../../src/compiler/callbacks.js';
 import Compiler from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
 import KMXPlusMetadataCompiler from '../../src/compiler/metadata-compiler.js';
 import CompilerOptions from '../../src/compiler/compiler-options.js';
+
+import KMXPlusFile = KMXPlus.KMXPlusFile;
+import Elem = KMXPlus.Elem;
+import GlobalSections = KMXPlus.GlobalSections;
+import Section = KMXPlus.Section;
+import Strs = KMXPlus.Strs;
 
 /**
  * Builds a path to the fixture with the given path components.

@@ -1,9 +1,15 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { GlobalSections, KeyboardSettings, Meta, Meta_NormalizationForm } from "../kmx/kmx-plus.js";
+import { KMXPlus } from '@keymanapp/common-types';
+
 import { isValidEnumValue } from "../util/util.js";
 import { CompilerMessages } from "./messages.js";
 import { SectionCompiler } from "./section-compiler.js";
 import semver from "semver";
+
+import GlobalSections = KMXPlus.GlobalSections;
+import Meta = KMXPlus.Meta;
+import Meta_NormalizationForm = KMXPlus.Meta_NormalizationForm;
+import KeyboardSettings = KMXPlus.KeyboardSettings;
 
 export class MetaCompiler extends SectionCompiler {
 

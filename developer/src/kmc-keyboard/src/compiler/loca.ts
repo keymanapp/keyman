@@ -1,8 +1,11 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { GlobalSections, Loca } from "../kmx/kmx-plus.js";
+import { LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 import { CompilerMessages } from "./messages.js";
-import { LKKeyboard } from "../ldml-keyboard/ldml-keyboard-xml.js";
+
+import GlobalSections = KMXPlus.GlobalSections;
+import Loca = KMXPlus.Loca;
+import LKKeyboard = LDMLKeyboard.LKKeyboard;
 
 export class LocaCompiler extends SectionCompiler {
 

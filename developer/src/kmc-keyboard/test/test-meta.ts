@@ -2,8 +2,11 @@ import 'mocha';
 import {assert} from 'chai';
 import { MetaCompiler } from '../src/compiler/meta.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
-import { KeyboardSettings, Meta } from '../src/kmx/kmx-plus.js';
+import { KMXPlus } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
+
+import KeyboardSettings = KMXPlus.KeyboardSettings;
+import Meta = KMXPlus.Meta;
 
 describe('meta', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

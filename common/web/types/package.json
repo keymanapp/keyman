@@ -1,6 +1,6 @@
 {
-  "name": "@keymanapp/kmc-keyboard",
-  "description": "Keyman Developer keyboard compiler",
+  "name": "@keymanapp/common-types",
+  "description": "Keyman Developer keyboard file types",
   "keywords": [
     "keyboard",
     "keyman",

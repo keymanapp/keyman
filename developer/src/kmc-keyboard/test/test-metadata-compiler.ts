@@ -1,8 +1,10 @@
 import 'mocha';
-import {assert} from 'chai';
+import { assert } from 'chai';
 import { checkMessages, compileKeyboard, makePathToFixture } from './helpers/index.js';
-import KMXFile from '../src/kmx/kmx.js';
+import { KMX } from '@keymanapp/common-types';
 import KEYMAN_VERSION from '@keymanapp/keyman-version/keyman-version.mjs';
+
+import KMXFile = KMX.KMXFile;
 
 describe('kmx metadata compiler', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

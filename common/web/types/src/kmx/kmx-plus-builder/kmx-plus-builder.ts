@@ -1,5 +1,5 @@
 import * as r from 'restructure';
-import KMXPlusFile from "../kmx-plus.js";
+import { KMXPlusFile } from "../kmx-plus.js";
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { BUILDER_SECTION } from './builder-section.js';
 import { BUILDER_SECT, build_sect } from './build-sect.js';

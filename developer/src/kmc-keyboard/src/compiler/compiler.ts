@@ -1,6 +1,4 @@
-import KMXPlusFile, { Elem, Strs } from '../kmx/kmx-plus.js';
-import LDMLKeyboardXMLSourceFile from '../ldml-keyboard/ldml-keyboard-xml.js';
-import LDMLKeyboardXMLSourceFileReader from '../ldml-keyboard/ldml-keyboard-xml-reader.js';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
 import { BkspCompiler } from './bksp.js';
 import CompilerCallbacks from './callbacks.js';
 import CompilerOptions from './compiler-options.js';
@@ -12,6 +10,9 @@ import { NameCompiler } from './name.js';
 import { OrdrCompiler } from './ordr.js';
 import { FinlCompiler, TranCompiler } from './tran.js';
 import { VkeyCompiler } from './vkey.js';
+
+import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
+import KMXPlusFile = KMXPlus.KMXPlusFile;
 
 const SECTION_COMPILERS = [
   BkspCompiler,
@@ -91,8 +92,8 @@ export default class Compiler {
     const kmx = new KMXPlusFile();
 
     // These two sections are required by other sections
-    kmx.kmxplus.strs = new Strs();
-    kmx.kmxplus.elem = new Elem(kmx.kmxplus.strs);
+    kmx.kmxplus.strs = new KMXPlus.Strs();
+    kmx.kmxplus.elem = new KMXPlus.Elem(kmx.kmxplus.strs);
 
     for(let section of sections) {
       if(!section.validate()) {

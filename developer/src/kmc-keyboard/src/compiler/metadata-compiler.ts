@@ -1,7 +1,10 @@
-import KMXFile, { KEYBOARD } from "../kmx/kmx.js";
-import { KMXPlusData } from "../kmx/kmx-plus.js";
+import { KMX, KMXPlus } from '@keymanapp/common-types';
 import CompilerOptions from "./compiler-options.js";
 import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
+
+import KMXPlusData = KMXPlus.KMXPlusData;
+import KMXFile = KMX.KMXFile;
+import KEYBOARD = KMX.KEYBOARD;
 
 export default class KMXPlusMetadataCompiler {
   /**

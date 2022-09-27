@@ -1,8 +1,17 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Finl, FinlItem, GlobalSections, Tran, TranItem, TranItemFlags } from "../kmx/kmx-plus.js";
-import LDMLKeyboardXMLSourceFile, { LKTransform, LKTransforms } from "../ldml-keyboard/ldml-keyboard-xml.js";
+import { KMXPlus, LDMLKeyboard } from '@keymanapp/common-types';
 import CompilerCallbacks from "./callbacks.js";
 import { SectionCompiler } from "./section-compiler.js";
+
+import Finl = KMXPlus.Finl;
+import FinlItem = KMXPlus.FinlItem;
+import GlobalSections = KMXPlus.GlobalSections;
+import Tran = KMXPlus.Tran;
+import TranItem = KMXPlus.TranItem;
+import TranItemFlags = KMXPlus.TranItemFlags;
+import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
+import LKTransform = LDMLKeyboard.LKTransform;
+import LKTransforms = LDMLKeyboard.LKTransforms;
 
 type TransformCompilerType = 'simple' | 'final';
 

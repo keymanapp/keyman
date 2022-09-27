@@ -1,7 +1,13 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Bksp, BkspItem, BkspItemFlags, GlobalSections } from "../kmx/kmx-plus.js";
-import { LKBackspace, LKBackspaces } from "../ldml-keyboard/ldml-keyboard-xml.js";
+import { KMXPlus, LDMLKeyboard } from "@keymanapp/common-types";
 import { SectionCompiler } from "./section-compiler.js";
+
+import LKBackspace = LDMLKeyboard.LKBackspace;
+import LKBackspaces = LDMLKeyboard.LKBackspaces;
+import GlobalSections = KMXPlus.GlobalSections;
+import Bksp = KMXPlus.Bksp;
+import BkspItem = KMXPlus.BkspItem;
+import BkspItemFlags = KMXPlus.BkspItemFlags;
 
 export class BkspCompiler extends SectionCompiler {
 
@@ -17,7 +23,7 @@ export class BkspCompiler extends SectionCompiler {
   }
 
   private compileBackspace(sections: GlobalSections, backspace: LKBackspace): BkspItem {
-    let result = new BkspItem();
+    let result = new KMXPlus.BkspItem();
     result.from = sections.elem.allocElementString(sections.strs, backspace.from);
     result.to = sections.strs.allocString(backspace.to);
     result.before = sections.elem.allocElementString(sections.strs, backspace.before);
