@@ -86,12 +86,11 @@ namespace com.keyman.dom {
       }
 
       // Prevent any action if a protected input field
-      if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
+      if(device.touchable && Ltarg.className == null) {
         return true;
       }
 
       // Or if not a remappable input field
-      var en=Ltarg.nodeName.toLowerCase();
       if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLInputElement) {
         var et=Ltarg.type.toLowerCase();
         if(!(et == 'text' || et == 'search')) {
@@ -112,13 +111,6 @@ namespace com.keyman.dom {
       }
 
       var LfocusTarg = Ltarg;
-
-      // Ensure that focussed element is visible above the keyboard
-      if(Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0) {
-        if(this instanceof DOMTouchHandlers) {
-          (this as DOMTouchHandlers).scrollBody(Ltarg);
-        }
-      }
 
       if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) { //**TODO: check case reference
         this.keyman.domManager._AttachToIframe(Ltarg as HTMLIFrameElement);
@@ -319,6 +311,13 @@ namespace com.keyman.dom {
       DOMEventHandlers.states._DisableInput = false;
 
       const outputTarget = dom.Utils.getOutputTarget(target);
+
+      // Ensure that focused element is visible above the keyboard
+      if(keyman.util.device.touchable && outputTarget) {
+        if(this instanceof DOMTouchHandlers) {
+          (this as DOMTouchHandlers).scrollBody(target);
+        }
+      }
 
       let activeKeyboard = keyman.core.activeKeyboard;
       if(!uiManager.justActivated) {
@@ -594,11 +593,7 @@ namespace com.keyman.dom {
       // This works OK for iOS, but may need something else for other platforms
       var elem: HTMLElement;
 
-      if(('relatedTarget' in e) && e.relatedTarget) {
-        elem = e.relatedTarget as HTMLElement;
-      }
-
-      elem = DOMEventHandlers.states._lastActiveElement;
+      elem = (e.currentTarget || e.relatedTarget) as HTMLElement || DOMEventHandlers.states._lastActiveElement;
 
       this.executeBlur(elem);
     }.bind(this);
@@ -608,7 +603,8 @@ namespace com.keyman.dom {
 
       if(elem) {
         this.doChangeEvent(elem);
-        if(elem.nodeName != 'DIV' || elem.className.indexOf('keymanweb-input') == -1) {
+        // Attached inputs are assigned this KMW property.
+        if(elem.className.indexOf('keymanweb-font') == -1) {
           this.cancelInput();
           return;
         }
@@ -656,21 +652,23 @@ namespace com.keyman.dom {
     /**
      * Scroll the document body vertically to bring the active input into view
      *
-     * @param       {Object}      e        simulated input field object being focussed
+     * @param       {Object}      e        input field object being focussed
      */
     scrollBody(e: HTMLElement): void {
       var osk = this.keyman.osk;
 
-      if(!e || e.className == null || e.className.indexOf('keymanweb-input') < 0 || !osk) {
+      if(!e || e.className == null || !osk) {
         return;
       }
 
       // Get the absolute position of the caret
-      var s2=<HTMLElement>e.firstChild.childNodes[1], y=dom.Utils.getAbsoluteY(s2), t=window.pageYOffset,dy=0;
+      const y = dom.Utils.getAbsoluteY(e);
+      const t = window.pageYOffset;
+      let dy = 0;
       if(y < t) {
         dy=y-t;
       } else {
-        dy=y-t-(window.innerHeight-osk._Box.offsetHeight-s2.offsetHeight-2);
+        dy=y-t-(window.innerHeight-osk._Box.offsetHeight-e.offsetHeight-2);
         if(dy < 0) dy=0;
       }
       // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
