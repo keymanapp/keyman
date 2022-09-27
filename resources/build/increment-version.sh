@@ -85,15 +85,15 @@ git pull origin $base
 #
 
 echo "increment-version.sh: building resources/build/version"
-pushd "$KEYMAN_ROOT"
+pushd "$REPO_ROOT"
 npm ci
 
-pushd "$KEYMAN_ROOT/resources/build/version"
+pushd "$REPO_ROOT/resources/build/version"
 npm run build:ts
 popd
 
 echo "increment-version.sh: running resources/build/version"
-pushd "$KEYMAN_ROOT"
+pushd "$REPO_ROOT"
 ABORT=0
 node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
 
@@ -120,10 +120,10 @@ popd > /dev/null
 
 if [ "$action" == "commit" ]; then
   echo "increment-version.sh: committing to repository and tagging release version $VERSION_WITH_TAG"
-  VERSION_MD="$KEYMAN_ROOT/VERSION.md"
+  VERSION_MD="$REPO_ROOT/VERSION.md"
   NEWVERSION=`cat $VERSION_MD | tr -d "[:space:]"`
 
-  pushd "$KEYMAN_ROOT" > /dev/null
+  pushd "$REPO_ROOT" > /dev/null
   message="auto: increment $base version to $NEWVERSION"
   branch="auto/version-$base-$NEWVERSION"
   git tag -a "release-$VERSION_WITH_TAG" -m "Keyman release $VERSION_WITH_TAG"
@@ -152,7 +152,7 @@ if [ "$action" == "commit" ]; then
   # Now, create the PR on GitHub which will be merged when ready
   #
 
-  cd "$KEYMAN_ROOT"
+  cd "$REPO_ROOT"
   git checkout "$branch"
   hub pull-request -f --no-edit -b $base -l auto
 

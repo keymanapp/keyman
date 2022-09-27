@@ -7,7 +7,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$REPO_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
@@ -52,8 +52,8 @@ echo ""
 echo "---------------------------------------------"
 echo "iOS base i18n files have been exported."
 echo "Examine the contents of the folder at"
-echo "${COLOR_GREEN}$KEYMAN_ROOT/ios/$BASE_EXPORT_FOLDER${COLOR_RESET}"
+echo "${COLOR_GREEN}$REPO_ROOT/ios/$BASE_EXPORT_FOLDER${COLOR_RESET}"
 echo "and compare against the iOS entries within"
-echo "${COLOR_GREEN}$KEYMAN_ROOT/crowdin.yml${COLOR_RESET}"
+echo "${COLOR_GREEN}$REPO_ROOT/crowdin.yml${COLOR_RESET}"
 echo "---------------------------------------------"
 

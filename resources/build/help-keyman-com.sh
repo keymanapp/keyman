@@ -82,7 +82,7 @@ function help_product_path {
 # Generate markdown help files
 function generate_markdown_help {
   if [ $platform == 'linux' ]; then
-    pushd $KEYMAN_ROOT/linux/keyman-config > /dev/null
+    pushd $REPO_ROOT/linux/keyman-config > /dev/null
     ./build-help.sh --md
     popd
   fi
@@ -99,20 +99,20 @@ function upload_keyman_help {
 
   case $platform in
     android)
-      helppath=$KEYMAN_ROOT/android/help
+      helppath=$REPO_ROOT/android/help
       ;;
     ios)
-      helppath=$KEYMAN_ROOT/ios/help
+      helppath=$REPO_ROOT/ios/help
       ;;
     linux)
-      helppath=$KEYMAN_ROOT/linux/help
+      helppath=$REPO_ROOT/linux/help
       ;;
     mac)
-      helppath=$KEYMAN_ROOT/mac/help
+      helppath=$REPO_ROOT/mac/help
       ;;
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
-      helppath=$KEYMAN_ROOT/windows/bin/help/md/desktop
+      helppath=$REPO_ROOT/windows/bin/help/md/desktop
       ;;
     *)
       display_usage

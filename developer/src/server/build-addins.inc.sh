@@ -29,14 +29,14 @@ build_addins() {
   echo "TRAYICON_TARGET=$TRAYICON_TARGET"
   echo "HIDECONSOLE_TARGET=$HIDECONSOLE_TARGET"
 
-  HIDECONSOLE_TARGET="$KEYMAN_ROOT/developer/src/server/src/win32/console/$HIDECONSOLE_TARGET"
-  TRAYICON_TARGET="$KEYMAN_ROOT/developer/src/server/src/win32/trayicon/$TRAYICON_TARGET"
+  HIDECONSOLE_TARGET="$REPO_ROOT/developer/src/server/src/win32/console/$HIDECONSOLE_TARGET"
+  TRAYICON_TARGET="$REPO_ROOT/developer/src/server/src/win32/trayicon/$TRAYICON_TARGET"
 
   #
   # Build node-windows-trayicon
   #
 
-  pushd "$KEYMAN_ROOT/node_modules/node-windows-trayicon"
+  pushd "$REPO_ROOT/node_modules/node-windows-trayicon"
   rm -rf build
   npx node-gyp clean configure build --arch=$ARCH --silent
   cp build/Release/addon.node "$TRAYICON_TARGET"
@@ -46,7 +46,7 @@ build_addins() {
   # Build hetrodo-node-hide-console-window-napi
   #
 
-  pushd "$KEYMAN_ROOT/node_modules/hetrodo-node-hide-console-window-napi"
+  pushd "$REPO_ROOT/node_modules/hetrodo-node-hide-console-window-napi"
   rm -rf build
   npx node-gyp clean configure build --arch=$ARCH --silent
   cp build/Release/node-hide-console-window.node "$HIDECONSOLE_TARGET"

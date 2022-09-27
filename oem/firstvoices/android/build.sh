@@ -14,7 +14,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+. "$REPO_ROOT/resources/build/build-download-resources.sh"
 
 display_usage ( ) {
   echo "build.sh [-no-daemon] [-debug] [-no-update] [-lib-build|-no-lib-build] [-download-keyboards] [-h|-?]"
@@ -32,9 +32,9 @@ display_usage ( ) {
 
 export TARGET=FirstVoices
 KEYBOARD_PACKAGE_ID="fv_all"
-KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
-KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
-KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
+KEYBOARDS_TARGET="$REPO_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
+KEYBOARDS_CSV="$REPO_ROOT/oem/firstvoices/keyboards.csv"
+KEYBOARDS_CSV_TARGET="$REPO_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
 
 # This build script assumes that the https://github.com/keymanapp/keyboards repo is in
 # the same parent folder as this repo, with the default name 'keyboards'

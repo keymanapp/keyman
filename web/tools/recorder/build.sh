@@ -8,7 +8,7 @@
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$REPO_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
@@ -28,7 +28,7 @@ readonly ENGINE_TEST_OUTPUT
 # (Facilitates automated setup for build agents.)
 PATH="../../node_modules/.bin:$PATH"
 
-pushd "$KEYMAN_ROOT/common/web/recorder"
+pushd "$REPO_ROOT/common/web/recorder"
 ./build.sh || fail "recorder-core compilation failed."
 popd
 

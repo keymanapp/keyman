@@ -266,7 +266,7 @@ init_npm() {
   if [ "${KEYMAN_ROOT}" = "" ]; then
     fail "KEYMAN_ROOT not defined; cannot install repo's dependencies"
   fi
-  pushd "$KEYMAN_ROOT" > /dev/null
+  pushd "$REPO_ROOT" > /dev/null
   npm ci
   popd > /dev/null
 }

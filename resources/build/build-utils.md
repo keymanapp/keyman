@@ -95,11 +95,11 @@ search-and-replace) this section in the future as required.
 
 ## Any other includes
 
-Once `build-utils.sh` has been included, the variable `$KEYMAN_ROOT` will be
+Once `build-utils.sh` has been included, the variable `$REPO_ROOT` will be
 available, so other include scripts should be sourced accordingly, for example:
 
 ```bash
-. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+. "$REPO_ROOT/resources/build/jq.inc.sh"
 ```
 
 ## Split

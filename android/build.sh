@@ -23,25 +23,25 @@ SHLVL=0
 
 # Clean build artifacts: keyman-engine.aar libaries, output and upload directories
 clean ( ) {
-  cd "$KEYMAN_ROOT/android"
+  cd "$REPO_ROOT/android"
 
   find . -name "keyman-engine.aar" | while read fname; do
     echo "Cleaning $fname"
     rm $fname
   done
-  if [ -f "$KEYMAN_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar" ]; then
+  if [ -f "$REPO_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar" ]; then
     echo "Cleaning OEM FirstVoices keyman-engine.aar"
-    rm "$KEYMAN_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar"
+    rm "$REPO_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar"
   fi
 
-  if [ -d "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs" ]; then
+  if [ -d "$REPO_ROOT/android/KMAPro/kMAPro/build/outputs" ]; then
     echo "Cleaning KMAPro build outputs directory"
-    rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs"
+    rm -rf "$REPO_ROOT/android/KMAPro/kMAPro/build/outputs"
   fi
 
-  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
+  if [ -d "$REPO_ROOT/android/upload" ]; then
     echo "Cleaning upload directory"
-    rm -rf "$KEYMAN_ROOT/android/upload"
+    rm -rf "$REPO_ROOT/android/upload"
   fi
 }
 
@@ -55,7 +55,7 @@ fi
 
 # Building Keyman Engine for Android
 
-cd "$KEYMAN_ROOT/android/KMEA"
+cd "$REPO_ROOT/android/KMEA"
 ./build.sh "$@"
 
 if [ $? -ne 0 ]; then
@@ -64,19 +64,19 @@ fi
 
 # Building Keyman for Android
 
-cd "$KEYMAN_ROOT/android/KMAPro"
+cd "$REPO_ROOT/android/KMAPro"
 ./build.sh "$@"
 
 if [ $? -ne 0 ]; then
     builder_die "ERROR: KMAPro/build.sh failed"
 fi
 
-cd "$KEYMAN_ROOT/android"
+cd "$REPO_ROOT/android"
 
 # Building OEM apps
 
 if [ ! -z "$RELEASE_OEM" ]; then
-  pushd "$KEYMAN_ROOT/oem/firstvoices/android"
+  pushd "$REPO_ROOT/oem/firstvoices/android"
   ./build.sh -download-keyboards -lib-nobuild "$@"
 
   if [ $? -ne 0 ]; then

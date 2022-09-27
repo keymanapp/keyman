@@ -15,11 +15,11 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-LOCALE_DIR="$KEYMAN_ROOT/windows/src/desktop/locale/"
-XSLT="$KEYMAN_ROOT/windows/bin/buildtools/xslt.exe"
+LOCALE_DIR="$REPO_ROOT/windows/src/desktop/locale/"
+XSLT="$REPO_ROOT/windows/bin/buildtools/xslt.exe"
 [ -f "$XSLT" ] || die "ERROR: Unable to find xslt.exe; build Keyman buildtools first."
 
-SOURCE_LOCALE_XML="$KEYMAN_ROOT/windows/src/desktop/kmshell/xml/locale.xml"
+SOURCE_LOCALE_XML="$REPO_ROOT/windows/src/desktop/kmshell/xml/locale.xml"
 TARGET_STRINGS_XML="$LOCALE_DIR/strings.xml"
 
 display_usage() {

@@ -14,7 +14,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+. "$REPO_ROOT/resources/build/build-download-resources.sh"
 
 display_usage ( ) {
   echo "build_csv_languages.sh  [-h|-?]"
@@ -26,8 +26,8 @@ display_usage ( ) {
 
 export TARGET=FirstVoices
 KEYBOARD_PACKAGE_ID="fv_all"
-KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/${KEYBOARD_PACKAGE_ID}.kmp"
-KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
+KEYBOARDS_TARGET="$REPO_ROOT/oem/firstvoices/${KEYBOARD_PACKAGE_ID}.kmp"
+KEYBOARDS_CSV="$REPO_ROOT/oem/firstvoices/keyboards.csv"
 KEYBOARDS_CSV_TEMP="${KEYBOARDS_CSV}.tmp"
 
 ## Parses kmp.json from fv_all.kmp and add the keyboard version and the

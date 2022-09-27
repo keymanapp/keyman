@@ -15,7 +15,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$REPO_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
@@ -94,8 +94,8 @@ verify_npm_setup $fetch_deps
 
 if $fetch_deps; then
   # We need to build keyman-version and lm-worker with a script for now
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
-  "$KEYMAN_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
+  "$REPO_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+  "$REPO_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
 fi
 
 build-browser || fail "Browser-oriented compilation failed."

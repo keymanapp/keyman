@@ -43,8 +43,8 @@ SHLVL=0
 
 # Path definitions
 
-KMA_ROOT="$KEYMAN_ROOT/android"
-KMW_ROOT="$KEYMAN_ROOT/web"
+KMA_ROOT="$REPO_ROOT/android"
+KMW_ROOT="$REPO_ROOT/web"
 KMW_SOURCE="$KMW_ROOT/source"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
 
@@ -140,10 +140,10 @@ if [ "$DO_COPY" = true ]; then
     cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
     cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
 
-    cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js
+    cp $REPO_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js
 
     echo "Copying es6-shim polyfill"
-    cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
+    cp $REPO_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
 
     if [ $? -ne 0 ]; then
         builder_die "ERROR: copying artifacts failed"

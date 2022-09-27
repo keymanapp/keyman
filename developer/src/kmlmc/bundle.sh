@@ -8,8 +8,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$REPO_ROOT/resources/build/jq.inc.sh"
+. "$REPO_ROOT/resources/shellHelperFunctions.sh"
 
 display_usage() {
   echo "Usage: $0 --build-path path"
@@ -57,7 +57,7 @@ KEYMAN_MODELCOMPILER_TEMP=`mktemp -d`
 # We copy the built model compiler into a temporary folder in order to prepare
 # the node modules, as otherwise the workspace will interfere
 
-cp -R "$KEYMAN_ROOT/developer/src/kmlmc/"* "$KEYMAN_MODELCOMPILER_TEMP/"
+cp -R "$REPO_ROOT/developer/src/kmlmc/"* "$KEYMAN_MODELCOMPILER_TEMP/"
 
 cd "$KEYMAN_MODELCOMPILER_TEMP"
 
@@ -96,7 +96,7 @@ rm kmlmc.tgz
 # into ModelCompiler's extracted bundle.
 
 mkdir -p "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/"
-cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/models-types" "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/"
+cp -R "$REPO_ROOT/node_modules/@keymanapp/models-types" "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/"
 
 cd "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/models-types"
 set_npm_version
@@ -105,7 +105,7 @@ mv keymanapp-models-types*.tgz kmtypes.tgz
 mv kmtypes.tgz "$KEYMAN_WIX_TEMP_MODELCOMPILER"
 
 
-cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version" "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/"
+cp -R "$REPO_ROOT/node_modules/@keymanapp/keyman-version" "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/"
 
 cd "$KEYMAN_MODELCOMPILER_TEMP/node_modules/@keymanapp/keyman-version"
 set_npm_version

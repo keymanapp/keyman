@@ -10,7 +10,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$REPO_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
@@ -45,7 +45,7 @@ fi
 if builder_start_action configure; then
   verify_npm_setup
 
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
+  "$REPO_ROOT/common/web/keyman-version/build.sh"
 
   builder_finish_action success configure
 fi
@@ -62,7 +62,7 @@ fi
 
 if builder_start_action test; then
   # Build test dependency
-  pushd "$KEYMAN_ROOT/common/web/recorder"
+  pushd "$REPO_ROOT/common/web/recorder"
   ./build.sh
   popd
 

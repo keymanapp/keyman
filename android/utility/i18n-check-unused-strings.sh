@@ -45,7 +45,7 @@ echo "-------|--------|------" | tee -a summary.md
 # (up to the name attribute, anyway) but this is good enough for now.
 
 grep -oP '<string.+name="(.+?)"' \
-  "$KEYMAN_ROOT/android/KMEA/app/src/main/res/values/strings.xml" "$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/res/values/strings.xml" | grep -oP 'name="(.+?)"' | awk -F[\"] '{print $2}' > strings.txt
+  "$REPO_ROOT/android/KMEA/app/src/main/res/values/strings.xml" "$REPO_ROOT/android/KMAPro/kMAPro/src/main/res/values/strings.xml" | grep -oP 'name="(.+?)"' | awk -F[\"] '{print $2}' > strings.txt
 
 while IFS= read -r string; do
   echo "## $string" >> detail.md
@@ -53,8 +53,8 @@ while IFS= read -r string; do
     --exclude=strings.xml \
     --exclude-dir=utility \
     "$string" \
-    "$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/res/layout" "$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/res/menu" "$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/java" \
-    "$KEYMAN_ROOT/android/KMEA/app/src/main/res/layout" "$KEYMAN_ROOT/android/KMEA/app/src/main/java" | tee -a detail.md | wc -l)
+    "$REPO_ROOT/android/KMAPro/kMAPro/src/main/res/layout" "$REPO_ROOT/android/KMAPro/kMAPro/src/main/res/menu" "$REPO_ROOT/android/KMAPro/kMAPro/src/main/java" \
+    "$REPO_ROOT/android/KMEA/app/src/main/res/layout" "$REPO_ROOT/android/KMEA/app/src/main/java" | tee -a detail.md | wc -l)
   echo >> detail.md
 
   # Write summary

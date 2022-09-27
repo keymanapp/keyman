@@ -23,11 +23,11 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+. "$REPO_ROOT/resources/build/jq.inc.sh"
 
 # This build script assumes that the https://github.com/keymanapp/keyboards repo is in
 # the same parent folder as this repo, with the default name 'keyboards'
-KEYBOARDS_ROOT="$KEYMAN_ROOT/../keyboards"
+KEYBOARDS_ROOT="$REPO_ROOT/../keyboards"
 
 function display_usage {
   echo "Usage: build_keyboards.sh [-download-keyboards] [-copy-keyboards] [-clean-keyboards] [-debug] [-h|-?]"

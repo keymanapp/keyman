@@ -15,7 +15,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-BASEDIR="$KEYMAN_ROOT/linux"
+BASEDIR="$REPO_ROOT/linux"
 echo "basedir is $BASEDIR"
 legacy_projects=""
 if [ -n "$BUILD_LEGACY" ]; then

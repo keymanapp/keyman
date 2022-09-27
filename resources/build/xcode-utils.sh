@@ -23,7 +23,7 @@ function importEnvironment() {
     exit 1
   else
     # As defined within build-utils.sh, which this script does NOT call.  (It was already called externally.)
-    ENVIRONMENT_SH="$KEYMAN_ROOT/resources/environment.sh"
+    ENVIRONMENT_SH="$REPO_ROOT/resources/environment.sh"
     . "$ENVIRONMENT_SH"
   fi
 }
@@ -45,7 +45,7 @@ function phaseSetBundleVersions() {
     # We're not a command-line build... so we'll need to retrieve these values ourselves with ./build-utils.sh.
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
-    . "$KEYMAN_ROOT/resources/build/build-utils.sh"
+    . "$REPO_ROOT/resources/build/build-utils.sh"
     echo "phaseSetBundleVersions: UI build - fetching version from repository:"
     echo "  Plain:  $VERSION"
     echo "  Tagged: $VERSION_WITH_TAG"
@@ -99,7 +99,7 @@ function setSettingsBundleVersion() {
     # We're not a command-line build... so we'll need to retrieve these values ourselves with ./build-utils.sh.
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
-    . "$KEYMAN_ROOT/resources/build/build-utils.sh"
+    . "$REPO_ROOT/resources/build/build-utils.sh"
     echo "setSettingsBundleVersion: UI build - fetching version from repository:"
     echo "  Plain:  $VERSION"
     echo "  Tagged: $VERSION_WITH_TAG"
@@ -158,14 +158,14 @@ function phaseSentryDsymUpload() {
 
 #
 # All calls to xcode-utils.sh scripts will have their output redirected to
-# $KEYMAN_ROOT/xcodebuild-scripts.log. This will redirect both stdout and stderr
+# $REPO_ROOT/xcodebuild-scripts.log. This will redirect both stdout and stderr
 # to this log file. See the corresponding printXCodeBuildScriptLogs function in
 # build-utils.sh to print the log after xcodebuild returns.
 #
 # More information in the build-utils.sh.
 #
 function logScriptsToFile() {
-  local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"
+  local SCRIPT_LOG="$REPO_ROOT/xcodebuild-scripts.log"
   exec >> "$SCRIPT_LOG" 2>&1
 }
 

@@ -11,7 +11,7 @@ set -u
 
 # Assumption: parent script that sources this already has START STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+. "$REPO_ROOT/resources/build/jq.inc.sh"
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell

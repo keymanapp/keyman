@@ -5,7 +5,7 @@
 # prefix builder_pull_.
 #
 
-. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+. "$REPO_ROOT/resources/build/jq.inc.sh"
 
 #
 # Returns 0 if current build is in CI and triggered from a pull request. If it

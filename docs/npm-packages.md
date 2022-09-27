@@ -75,7 +75,7 @@ This helper function sets the version in the `package.json` for the
 given package, according to the VERSION_WITH_TAG variable.
 
 ```bash
-. $KEYMAN_ROOT/resources/shellHelperFunctions.sh
+. $REPO_ROOT/resources/shellHelperFunctions.sh
 
 set_npm_version
 ```

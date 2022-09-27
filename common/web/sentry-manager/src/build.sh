@@ -10,7 +10,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$REPO_ROOT/resources/shellHelperFunctions.sh"
 
 display_usage ( ) {
     echo "build.sh [-skip-package-install]"
@@ -44,7 +44,7 @@ done
 if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
     # We need to build keyman-version with a script for now
-    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+    "$REPO_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 fi
 
 npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"

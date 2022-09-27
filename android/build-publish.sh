@@ -74,7 +74,7 @@ echo "BUILD_FLAGS $BUILD_FLAGS"
 
 # Publish Keyman for Android
 if [ "$DO_KMAPRO" = true ]; then
-  cd "$KEYMAN_ROOT/android/KMAPro/"
+  cd "$REPO_ROOT/android/KMAPro/"
   # Copy Release Notes
   ./build-play-store-notes.sh
 
@@ -83,6 +83,6 @@ fi
 
 # Publish FV app
 if [ "$DO_FV" = true ]; then
-  cd "$KEYMAN_ROOT/oem/firstvoices/android/"
+  cd "$REPO_ROOT/oem/firstvoices/android/"
   ./gradlew $DAEMON_FLAG $BUILD_FLAGS
 fi

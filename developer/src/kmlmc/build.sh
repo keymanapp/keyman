@@ -10,12 +10,12 @@ set -eu
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$REPO_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 EX_USAGE=64
 
 # Where to find lexical model types.
-LEXICAL_MODELS_TYPES="$KEYMAN_ROOT/common/models/types"
+LEXICAL_MODELS_TYPES="$REPO_ROOT/common/models/types"
 
 
 # Build the main script.
@@ -95,7 +95,7 @@ type npm >/dev/null ||\
 if (( install_dependencies )) ; then
   verify_npm_setup
   # We need to build keyman-version and lm-worker with a script for now
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+  "$REPO_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 fi
 
 build || fail "Compilation failed."
