@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/kmc-keyboard": "*",
     "@keymanapp/kmc-model": "*",
     "@keymanapp/kmc-model-info": "*",
