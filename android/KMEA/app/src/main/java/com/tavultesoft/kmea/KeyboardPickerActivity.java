@@ -321,8 +321,10 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   private static void setSelection(int position) {
-    listView.setItemChecked(position, true);
-    listView.setSelection(position);
+    if (listView != null) {
+      listView.setItemChecked(position, true);
+      listView.setSelection(position);
+    }
     selectedIndex = position;
   }
 
