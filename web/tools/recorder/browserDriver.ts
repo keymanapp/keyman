@@ -52,7 +52,7 @@ namespace KMWRecorder {
       // To be safe, we replicate the MouseEvent similarly to the keystroke event.
       var downEvent;
       var upEvent;
-      if((window['keyman'] as any).util.device.touchable) {
+      if(target['base'] && target instanceof HTMLDivElement) {
         downEvent = new Event(BrowserDriver.oskDownTouchType);
         upEvent = new Event(BrowserDriver.oskUpTouchType);
         downEvent['touches'] = [{"target": oskKeyElement}];

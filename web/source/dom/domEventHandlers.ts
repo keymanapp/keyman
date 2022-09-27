@@ -675,7 +675,9 @@ namespace com.keyman.dom {
       // This works OK for iOS, but may need something else for other platforms
       var elem: HTMLElement;
 
-      elem = DOMEventHandlers.states._lastActiveElement;
+      if(('relatedTarget' in e) && e.relatedTarget) {
+        elem = e.relatedTarget as HTMLElement;
+      }
 
       this.executeBlur(elem);
     }.bind(this);
