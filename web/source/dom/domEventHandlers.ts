@@ -598,9 +598,7 @@ namespace com.keyman.dom {
         elem = e.relatedTarget as HTMLElement;
       }
 
-      if(elem['body']) {
-        elem = elem['body']; // Occurs in Firefox for design-mode iframes.
-      }
+      elem = DOMEventHandlers.states._lastActiveElement;
 
       this.executeBlur(elem);
     }.bind(this);
