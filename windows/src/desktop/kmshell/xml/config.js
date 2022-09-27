@@ -153,7 +153,9 @@ document.addEventListener("DOMContentLoaded", windowResize);
         if( !kbd_list ) break;
         if(!kbd_list.classList.contains('expanded')) break;
         ///  show more details for the expanded list
-        if (!$(kbd_grid).hasClass('grid_rows_hide')) more_detail(kbd_grid.id);
+        if (!$(kbd_grid).hasClass('grid_rows_hide')) {
+          more_detail(kbd_grid.id);
+        }
       }
       break;
     case 93:    // context menu key
