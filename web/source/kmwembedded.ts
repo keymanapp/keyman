@@ -229,14 +229,6 @@ namespace com.keyman.text {
   keymanweb.domManager._SetTargDir = function(Ptarg){};
 
   /**
-   * Align input fields (should not be needed with KMEI, KMEA)
-   *
-   *  @param  {object}   eleList    A list of specific elements to align.  If nil, selects all elements.
-   *
-   **/
-  keymanweb.alignInputs = function(eleList: HTMLElement[]) {};
-
-  /**
    * Use rotation events to adjust OSK element positions and scaling if necessary
    */
   keymanweb.handleRotationEvents = function() {};
