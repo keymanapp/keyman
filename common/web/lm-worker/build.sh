@@ -51,23 +51,23 @@ wrap-worker-code ( ) {
   # but also adds a lot more code the worker doesn't need to use.
   # Recommended by MDN while keeping the worker lean and efficient.
   # Needed for Android / Chromium browser pre-41.
-  cat "../../../node_modules/string.prototype.codepointat/codepointat.js" || die
+  cat "../../../node_modules/string.prototype.codepointat/codepointat.js" || builder_die
 
   # These two are straight from MDN - I didn't find any NPM ones that don't
   # use the node `require` statement for the second.  They're also relatively
   # short and simple, which is good.
-  cat "src/polyfills/array.fill.js" || die # Needed for Android / Chromium browser pre-45.
-  cat "src/polyfills/array.from.js" || die # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.fill.js" || builder_die # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.from.js" || builder_die # Needed for Android / Chromium browser pre-45.
 
   # For Object.values, for iteration over object-based associate arrays.
-  cat "src/polyfills/object.values.js" || die # Needed for Android / Chromium browser pre-54.
+  cat "src/polyfills/object.values.js" || builder_die # Needed for Android / Chromium browser pre-54.
 
   # Needed to support Symbol.iterator, as used by the correction algorithm.
-  cat "src/polyfills/symbol-es6.min.js" || die # Needed for Android / Chromium browser pre-43.
+  cat "src/polyfills/symbol-es6.min.js" || builder_die # Needed for Android / Chromium browser pre-43.
 
   echo ""
 
-  cat "${js}" || die
+  cat "${js}" || builder_die
   printf "\n}\n"
   echo "// --END:LMLlayerWorkerCode"
 }
@@ -112,8 +112,8 @@ if builder_start_action build; then
   echo "Wrapping worker in function LMLayerWorkerCode ${WORKER_OUTPUT_FILENAME}"
   # Note: We use intermediate.js for unit tests in predictive-text
   cp "${WORKER_OUTPUT_FILENAME}" "${WORKER_OUTPUT}/intermediate.js"
-  wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT}/intermediate.js" > "${WORKER_OUTPUT_FILENAME}" || die
-  cp "${WORKER_OUTPUT_FILENAME}" "${WORKER_TEST_BUNDLE_TARGET_FILENAME}" || die
+  wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT}/intermediate.js" > "${WORKER_OUTPUT_FILENAME}" || builder_die
+  cp "${WORKER_OUTPUT_FILENAME}" "${WORKER_TEST_BUNDLE_TARGET_FILENAME}" || builder_die
 
   builder_finish_action success build
 fi

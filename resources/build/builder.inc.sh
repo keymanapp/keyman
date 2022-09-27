@@ -3,14 +3,6 @@
 # This script contails utilities for builder_script calls
 #
 
-function die () {
-    # TODO: consolidate this with fail() from shellHelperFunctions.sh
-    echo
-    echo "$*"
-    echo
-    exit 1
-}
-
 # Used to build script-related build variables useful for referencing the calling script
 # and for prefixing builder_finish_action outputs in order to more clearly identify the calling
 # script.
@@ -80,6 +72,18 @@ if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; th
 else
   builder_use_color false
 fi
+
+function die () {
+    # TODO: consolidate this with fail() from shellHelperFunctions.sh
+    echo
+    echo "${COLOR_RED}$* ${COLOR_RESET}"
+    echo
+    exit 1
+}
+
+function builder_die() {
+    die "$*"
+}
 
 ####################################################################################
 #

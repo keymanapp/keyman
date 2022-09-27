@@ -59,7 +59,7 @@ cd "$KEYMAN_ROOT/android/KMEA"
 ./build.sh "$@"
 
 if [ $? -ne 0 ]; then
-    die "ERROR: KMEA/build.sh failed"
+    builder_die "ERROR: KMEA/build.sh failed"
 fi
 
 # Building Keyman for Android
@@ -68,7 +68,7 @@ cd "$KEYMAN_ROOT/android/KMAPro"
 ./build.sh "$@"
 
 if [ $? -ne 0 ]; then
-    die "ERROR: KMAPro/build.sh failed"
+    builder_die "ERROR: KMAPro/build.sh failed"
 fi
 
 cd "$KEYMAN_ROOT/android"
@@ -80,6 +80,6 @@ if [ ! -z "$RELEASE_OEM" ]; then
   ./build.sh -download-keyboards -lib-nobuild "$@"
 
   if [ $? -ne 0 ]; then
-    die "ERROR: oem/firstvoices/android/build.sh failed"
+    builder_die "ERROR: oem/firstvoices/android/build.sh failed"
   fi
 fi

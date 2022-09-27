@@ -52,13 +52,6 @@ warn ( ) {
     echo "$*"
 }
 
-die ( ) {
-    echo
-    echo "$*"
-    echo
-    exit 1
-}
-
 # Default is building KMW and copying artifacts
 DO_BUILD=true
 DO_COPY=true
@@ -136,7 +129,7 @@ if [ "$DO_BUILD" = true ]; then
     ./build.sh $KMWFLAGS
 
     if [ $? -ne 0 ]; then
-        die "ERROR: keymanweb build failed. Exiting"
+        builder_die "ERROR: keymanweb build failed. Exiting"
     fi
 fi
 if [ "$DO_COPY" = true ]; then
@@ -153,7 +146,7 @@ if [ "$DO_COPY" = true ]; then
     cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
 
     if [ $? -ne 0 ]; then
-        die "ERROR: copying artifacts failed"
+        builder_die "ERROR: copying artifacts failed"
     fi
 fi
 
@@ -181,13 +174,13 @@ fi
 echo "BUILD_FLAGS $BUILD_FLAGS"
 ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 if [ $? -ne 0 ]; then
-    die "ERROR: Build of KMEA failed"
+    builder_die "ERROR: Build of KMEA failed"
 fi
 if [ "$DO_TEST" = true ]; then
     echo "TEST_FLAGS $TEST_FLAGS"
     ./gradlew $DAEMON_FLAG $TEST_FLAGS
     if [ $? -ne 0 ]; then
-        die "ERROR: KMEA test cases failed"
+        builder_die "ERROR: KMEA test cases failed"
     fi
 fi
 
