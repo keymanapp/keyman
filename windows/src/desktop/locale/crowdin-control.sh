@@ -50,7 +50,7 @@ do_upload() {
 ##
 do_download() {
   # crowdin.bat download
-  builder_die "Not yet implemented"
+  die "Not yet implemented"
 }
 
 # Parse args
@@ -71,14 +71,14 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       ;;
     *)
-      builder_die "Invalid parameters specified. $0 --help for help."
+      die "Invalid parameters specified. $0 --help for help."
       ;;
   esac
   shift # past argument
 done
 
 if [ -z $ACTION ]; then
-  builder_die "No parameters specified. $0 --help for help.";
+  die "No parameters specified. $0 --help for help.";
 fi
 
 if [ $ACTION = upload ]; then
