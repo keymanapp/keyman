@@ -1,7 +1,28 @@
 #!/usr/bin/env bash
 #
-# This script contails utilities for builder_script calls
+# This script contains utilities for builder_script calls
 #
+# * builder_ functions and variables are defined here.
+# * REPO_ROOT defines the top level of this repository
+# * THIS_SCRIPT_PATH defines the full path of the running script
+# * THIS_SCRIPT_NAME defines the basename of the running script
+# * THIS_SCRIPT_IDENTIFIER defines the repo-relative path of the running script
+# * _builder_ functions and variables are internal use only for this script 
+#   and subject to change
+#
+
+# _builder_init is called internally at the bottom of this file after we have
+# all function declarations in place.
+function _builder_init() {
+  _builder_findRepoRoot
+  _builder_setBuildScriptIdentifiers
+
+  if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
+    builder_use_color true
+  else
+    builder_use_color false
+  fi
+}
 
 function _builder_findRepoRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
@@ -11,8 +32,6 @@ function _builder_findRepoRoot() {
     REPO_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
     readonly REPO_ROOT
 }
-
-_builder_findRepoRoot
 
 # Used to build script-related build variables useful for referencing the calling script
 # and for prefixing builder_finish_action outputs in order to more clearly identify the calling
@@ -674,7 +693,7 @@ builder_finish_action() {
   fi
 }
 
-set_keyman_standard_build_path() {
-  PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
-}
-
+#
+# Initialize builder once all functions are declared
+#
+_builder_init

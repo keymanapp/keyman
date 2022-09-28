@@ -259,6 +259,10 @@ replaceVersionStrings_Mkver() {
     " "$infile" > "$outfile"
 }
 
+set_keyman_standard_build_path() {
+  PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
+}
+
 #
 # printXCodeBuildScriptLogs: xcodebuild does not emit stdout from scripts in
 # PBXShellScriptBuildPhase phases. This is a real problem for us because if
