@@ -1,5 +1,4 @@
 import 'mocha';
-import * as fs from 'fs';
 import {assert} from 'chai';
 import x_hextobin from '@keymanapp/hextobin';
 import { KvkFileWriter } from '@keymanapp/common-types';
