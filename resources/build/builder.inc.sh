@@ -7,7 +7,7 @@
 # and for prefixing builder_finish_action outputs in order to more clearly identify the calling
 # script.
 #
-# Assumes that `_builder_findRepoRoot` has already been called, a condition met later on
+# Assumes that `findRepositoryRoot` has already been called, a condition met later on
 # within this script.
 function _builder_setBuildScriptIdentifiers() {
   if [ ! -z ${THIS_SCRIPT+x} ]; then
@@ -16,7 +16,7 @@ function _builder_setBuildScriptIdentifiers() {
     THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
     readonly THIS_SCRIPT_NAME
     # Leaves only the part of the path based upon KEYMAN_ROOT.
-    THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$REPO_ROOT/"}
+    THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$KEYMAN_ROOT/"}
     readonly THIS_SCRIPT_IDENTIFIER
   fi
 }
@@ -664,6 +664,6 @@ builder_finish_action() {
 }
 
 set_keyman_standard_build_path() {
-  PATH="$REPO_ROOT/node_modules/.bin:$PATH"
+  PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
 }
 

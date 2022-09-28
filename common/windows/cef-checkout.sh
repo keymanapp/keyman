@@ -14,12 +14,12 @@ set -u
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
-# . "$REPO_ROOT/resources/shellHelperFunctions.sh"
+# . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 pushd $KEYMAN_CEF4DELPHI_ROOT > /dev/null
 
-CEF_VERSION_MD="$REPO_ROOT/common/windows/CEF_VERSION.md"
+CEF_VERSION_MD="$KEYMAN_ROOT/common/windows/CEF_VERSION.md"
 CEF_VERSION=`cat $CEF_VERSION_MD | tr -d "[:space:]"`
 
 # Switch to the version of CEF referenced in CEF_VERSION.md

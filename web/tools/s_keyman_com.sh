@@ -11,10 +11,10 @@ set -eu
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/build/jq.inc.sh"
+. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 #
 # In this script we update the s.keyman.com git repo and copy the Keyman Web release
@@ -67,7 +67,7 @@ fi
 ##
 function upload_keyman_web {
 
-  local kmwpath="$REPO_ROOT/web/release/web"
+  local kmwpath="$KEYMAN_ROOT/web/release/web"
   local dstpath="$S_KEYMAN_COM/kmw/engine/$VERSION/"
 
   #
@@ -110,7 +110,7 @@ function remap_sourcemap_paths {
 
 function commit_and_push {
   echo "Committing and pushing KeymanWeb"
-  cd "$REPO_ROOT/web/tools"
+  cd "$KEYMAN_ROOT/web/tools"
   pushd "$S_KEYMAN_COM"
 
   if [ ! -z "${TEAMCITY_VERSION-}" ]; then

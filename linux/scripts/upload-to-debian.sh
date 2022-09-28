@@ -33,7 +33,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 NOOP=
 PUSH=
@@ -66,7 +66,7 @@ stable_branch=${stable_branch##* }
 # Checkout stable branch so that `scripts/debian.sh` picks up correct version
 git checkout ${stable_branch#origin/}
 
-cd "$REPO_ROOT/linux"
+cd "$KEYMAN_ROOT/linux"
 echo_heading "Building source package"
 DIST=unstable scripts/debian.sh
 cd debianpackage/

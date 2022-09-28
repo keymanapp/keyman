@@ -15,8 +15,8 @@ SIZE_THRESHOLD=1024
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
-. "$REPO_ROOT/resources/build/jq.inc.sh"
-. "$REPO_ROOT/resources/build/github.inc.sh"
+. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+. "$KEYMAN_ROOT/resources/build/github.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage() {
@@ -85,7 +85,7 @@ parse_params "$@"
 #
 
 LOCAL_FILE=web/release/web/keymanweb.js
-LOCAL_FILE_SIZE=`stat --printf="%s" $REPO_ROOT/$LOCAL_FILE`
+LOCAL_FILE_SIZE=`stat --printf="%s" $KEYMAN_ROOT/$LOCAL_FILE`
 
 #
 # Get the most recent build for $TIER from downloads.keyman.com

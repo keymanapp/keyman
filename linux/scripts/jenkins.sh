@@ -11,7 +11,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 keyman_projects="keyman"
 
@@ -28,7 +28,7 @@ proj=${proj%"-alpha"}
 proj=${proj%"-beta"}
 
 fullsourcename="keyman"
-sourcedir="$REPO_ROOT"
+sourcedir="$KEYMAN_ROOT"
 sourcename=${fullsourcename%"-alpha"}
 sourcename=${sourcename%"-beta"}
 

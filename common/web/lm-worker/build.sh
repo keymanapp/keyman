@@ -15,7 +15,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
@@ -102,7 +102,7 @@ fi
 
 if builder_start_action build; then
   # Ensure keyman-version is properly build (requires build script)
-  "$REPO_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."

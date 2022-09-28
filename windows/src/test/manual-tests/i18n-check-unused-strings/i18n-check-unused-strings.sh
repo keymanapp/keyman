@@ -40,7 +40,7 @@ echo "-------|--------|------" | tee -a summary.md
 # Note that this relies on the XML following a single line per string pattern
 # (up to the name attribute, anyway) but this is good enough for now.
 
-grep -oP '<string.+name="(.+?)"' "$REPO_ROOT/windows/src/desktop/kmshell/xml/strings.xml" | grep -oP 'Id="(.+?)"' | awk -F[\"] '{print $2}' > strings.txt
+grep -oP '<string.+name="(.+?)"' "$KEYMAN_ROOT/windows/src/desktop/kmshell/xml/strings.xml" | grep -oP 'Id="(.+?)"' | awk -F[\"] '{print $2}' > strings.txt
 
 while IFS= read -r string; do
   echo "## $string" >> detail.md
@@ -49,7 +49,7 @@ while IFS= read -r string; do
     --exclude-dir=i18n-check-unused-strings --exclude=messages.txt --exclude=MessageIdentifierConsts.pas \
     --exclude-dir=__history \
     "$string" \
-    "$REPO_ROOT/windows/src/desktop" "$REPO_ROOT/windows/src/engine" | tee -a detail.md | wc -l)
+    "$KEYMAN_ROOT/windows/src/desktop" "$KEYMAN_ROOT/windows/src/engine" | tee -a detail.md | wc -l)
   echo >> detail.md
 
   # Write summary

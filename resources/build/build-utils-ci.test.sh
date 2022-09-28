@@ -11,8 +11,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # Tests
 

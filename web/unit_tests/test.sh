@@ -11,8 +11,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # A simple utility script to facilitate our different modes for unit-testing KMW.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
@@ -131,7 +131,7 @@ cd ../tools/recorder
 # Run our headless tests first.
 
 # First:  Web-core tests.
-pushd "$REPO_ROOT/common/web/input-processor"
+pushd "$KEYMAN_ROOT/common/web/input-processor"
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd

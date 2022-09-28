@@ -14,7 +14,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 QUIET=0
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
@@ -69,9 +69,9 @@ displayInfo "" \
 # Compile all .md to .html
 #
 
-cd $REPO_ROOT/ios/help
+cd $KEYMAN_ROOT/ios/help
 
-MDLUA="$REPO_ROOT/resources/build/html-link.lua"
+MDLUA="$KEYMAN_ROOT/resources/build/html-link.lua"
 CSS="../../resources/build/offline-help-style-spec.txt"
 MD=`find . -name "*.md"`
 DESTHTM="$THIS_DIR/keyman/Keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources"
@@ -102,7 +102,7 @@ if $DO_HTM; then
   #
   # Copy Images
   #
-  cd $REPO_ROOT/ios/help/
+  cd $KEYMAN_ROOT/ios/help/
   mkdir -p "$DESTHTM/ios_images"
   cp ios_images/* "$DESTHTM/ios_images/"
 

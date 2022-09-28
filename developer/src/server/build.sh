@@ -13,8 +13,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 EX_USAGE=64
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
-. "$REPO_ROOT/resources/build/jq.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 pushd "$(dirname "$THIS_SCRIPT")"
 
@@ -99,7 +99,7 @@ if (( install_dependencies )) ; then
   verify_npm_setup
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   # TODO: this is horrible; is there a way we can avoid this?
-  rm -f "$REPO_ROOT"/node_modules/ngrok/bin/ngrok.exe
+  rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok.exe
 fi
 
 # ----------------------------------------
@@ -115,7 +115,7 @@ if (( build_addins )); then
   fi
 
   # Build with the Keyman Developer x86 version of node
-  PATH="$REPO_ROOT/developer/src/inst/node/dist:$PATH" build_addins
+  PATH="$KEYMAN_ROOT/developer/src/inst/node/dist:$PATH" build_addins
 fi
 
 # ----------------------------------------
@@ -123,13 +123,13 @@ fi
 # ----------------------------------------
 
 if (( build_keymanweb )); then
-  pushd "$REPO_ROOT/web/source"
+  pushd "$KEYMAN_ROOT/web/source"
   ./build.sh -no_minify
   popd
 fi
 
 if (( copy_keymanweb )); then
-  SRC="$REPO_ROOT/web/release/unminified"
+  SRC="$KEYMAN_ROOT/web/release/unminified"
   DST="$(dirname "$THIS_SCRIPT")/src/site/resource"
 
   rm -rf "$DST"
@@ -138,8 +138,8 @@ if (( copy_keymanweb )); then
   cp "$SRC/web/"*.js "$SRC/web/"*.js.map "$DST/"
   cp -R "$SRC/web/osk/"* "$DST/osk/"
   cp -R "$SRC/web/ui/"* "$DST/ui/"
-  cp "$REPO_ROOT/web/LICENSE" "$DST/"
-  cp "$REPO_ROOT/web/README.md" "$DST/"
+  cp "$KEYMAN_ROOT/web/LICENSE" "$DST/"
+  cp "$KEYMAN_ROOT/web/README.md" "$DST/"
 fi
 
 # ----------------------------------------
@@ -182,12 +182,12 @@ if (( production )) ; then
 
   # @keymanapp/keyman-version is required in dist now but we need to copy it in manually
   mkdir -p "$PRODBUILDTEMP/node_modules/@keymanapp/"
-  cp -R "$REPO_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
 
-  # We'll build in the $REPO_ROOT/developer/bin/server/ folder
-  rm -rf "$REPO_ROOT/developer/bin/server/"
-  mkdir -p "$REPO_ROOT/developer/bin/server/dist/"
-  cp -R dist/* "$REPO_ROOT/developer/bin/server/dist/"
-  cp -R "$PRODBUILDTEMP"/* "$REPO_ROOT/developer/bin/server/"
+  # We'll build in the $KEYMAN_ROOT/developer/bin/server/ folder
+  rm -rf "$KEYMAN_ROOT/developer/bin/server/"
+  mkdir -p "$KEYMAN_ROOT/developer/bin/server/dist/"
+  cp -R dist/* "$KEYMAN_ROOT/developer/bin/server/dist/"
+  cp -R "$PRODBUILDTEMP"/* "$KEYMAN_ROOT/developer/bin/server/"
   rm -rf "$PRODBUILDTEMP"
 fi

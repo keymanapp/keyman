@@ -32,20 +32,20 @@
 #
 SHLVL=0
 
-function _builder_findRepoRoot() {
+function findRepositoryRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
     local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
-    REPO_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
-    readonly REPO_ROOT
+    KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
+    readonly KEYMAN_ROOT
 }
 
-# Source builder_script (how to move function _builder_findRepoRoot() to .inc.sh?)
-. "$REPO_ROOT/resources/build/builder.inc.sh"
+# Source builder_script (how to move findRepositoryRoot to .inc.sh?)
+. "$KEYMAN_ROOT/resources/build/builder.inc.sh"
 
 function findVersion() {
-    local VERSION_MD="$REPO_ROOT/VERSION.md"
+    local VERSION_MD="$KEYMAN_ROOT/VERSION.md"
     VERSION=`cat $VERSION_MD | tr -d "[:space:]"`
     [[ "$VERSION" =~ ^([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)$ ]] && {
         VERSION_MAJOR="${BASH_REMATCH[1]}"
@@ -117,7 +117,7 @@ function findVersion() {
 }
 
 function findTier() {
-    local TIER_MD="$REPO_ROOT/TIER.md"
+    local TIER_MD="$KEYMAN_ROOT/TIER.md"
     TIER=`cat $TIER_MD | tr -d "[:space:]"`
     [[ "$TIER" =~ ^(alpha|beta|stable)$ ]] || {
         echo "Invalid TIER.md file: expected alpha, beta or stable."
@@ -140,7 +140,7 @@ function printBuildNumberForTeamCity() {
 }
 
 function printVersionUtilsDebug() {
-    echo "KEYMAN_ROOT:         $REPO_ROOT"
+    echo "KEYMAN_ROOT:         $KEYMAN_ROOT"
     echo "VERSION:             $VERSION"
     echo "VERSION_WIN:         $VERSION_WIN"
     echo "VERSION_RELEASE:     $VERSION_RELEASE"
@@ -167,7 +167,7 @@ function findShouldSentryRelease() {
     esac
 }
 
-_builder_findRepoRoot
+findRepositoryRoot
 _builder_setBuildScriptIdentifiers
 findTier
 findVersion
@@ -179,7 +179,7 @@ findShouldSentryRelease
 # Intended for use with macOS-based builds, as Xcode build phase "run script"s do not have access to important
 # environment variables.  Doesn't hurt to run it at other times as well.  The output file is .gitignore'd.
 function exportEnvironmentDefinitionScript() {
-    ENVIRONMENT_SH="$REPO_ROOT/resources/environment.sh"
+    ENVIRONMENT_SH="$KEYMAN_ROOT/resources/environment.sh"
 
     # Remove old copy if it exists
     [ -f "$ENVIRONMENT_SH" ] && rm "$ENVIRONMENT_SH"
@@ -270,13 +270,13 @@ replaceVersionStrings_Mkver() {
 # script phase will append to the log file, until funprintXCodeBuildScriptLogs
 # is called, at which point the logfile will be deleted.
 #
-# The logfile is placed in $REPO_ROOT/xcodebuild-scripts.log. It is used for
+# The logfile is placed in $KEYMAN_ROOT/xcodebuild-scripts.log. It is used for
 # both iOS and macOS builds.
 #
 # If there is no logfile, then this function will not emit anything.
 #
 printXCodeBuildScriptLogs() {
-  local SCRIPT_LOG="$REPO_ROOT/xcodebuild-scripts.log"
+  local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"
   if [ -f "$SCRIPT_LOG" ]; then
     echo "printXCodeBuildScriptLogs: reporting script results from previous xcode build"
     cat "$SCRIPT_LOG"

@@ -109,7 +109,7 @@ fi
 
 # (Ensure we are within the repository before running git calls)
 echo ". Ensure our local branch is up to date"
-pushd "$REPO_ROOT" > /dev/null
+pushd "$KEYMAN_ROOT" > /dev/null
 git fetch origin > /dev/null
 
 #

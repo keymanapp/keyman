@@ -8,7 +8,7 @@ set -eu
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # This script runs from its own folder
@@ -54,7 +54,7 @@ done
 if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
     # We need to build keyman-version with a script for now
-    "$REPO_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
 fi
 
 if [ $BUILD_LMLAYER = true ]; then

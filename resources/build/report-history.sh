@@ -12,7 +12,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 BUILD=false
 BASE=`git branch --show-current`
@@ -86,18 +86,18 @@ if [ ! "$BASE" == "master" ] && [ ! "$BASE" == "beta" ] && [[ ! $BASE =~ stable-
   fail "Invalid base branch $BASE"
 fi
 
-if [ ! -f "$REPO_ROOT/resources/build/version/lib/index.js" ]; then
+if [ ! -f "$KEYMAN_ROOT/resources/build/version/lib/index.js" ]; then
   echo "Script not found, building..."
   BUILD=true
 fi
 
 if $BUILD; then
-  pushd "$REPO_ROOT/resources/build/version" > /dev/null
+  pushd "$KEYMAN_ROOT/resources/build/version" > /dev/null
   npm install
   npm run build:ts
   popd > /dev/null
 fi
 
-pushd "$REPO_ROOT" > /dev/null
+pushd "$KEYMAN_ROOT" > /dev/null
 node resources/build/version/lib/index.js report-history -t "$GITHUB_TOKEN" -b "$BASE" $GITHUB_PR $FROM "$FROM_VALUE" $TO "$TO_VALUE"
 popd > /dev/null

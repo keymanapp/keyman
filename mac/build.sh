@@ -7,10 +7,10 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-KEYMAN_MAC_BASE_PATH="$REPO_ROOT/mac"
+KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 
 # Include our resource functions; they're pretty useful!
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"

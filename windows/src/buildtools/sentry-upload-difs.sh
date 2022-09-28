@@ -23,7 +23,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-cd "$REPO_ROOT/windows/src"
+cd "$KEYMAN_ROOT/windows/src"
 
 #
 # Upload the files

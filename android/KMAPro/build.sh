@@ -15,7 +15,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/build/build-download-resources.sh"
+. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 echo Build KMAPro
 
@@ -77,9 +77,9 @@ while [[ $# -gt 0 ]] ; do
 done
 
 KEYBOARD_PACKAGE_ID="sil_euro_latin"
-KEYBOARDS_TARGET="$REPO_ROOT/android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
+KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
 MODEL_PACKAGE_ID="nrc.en.mtnt"
-MODELS_TARGET="$REPO_ROOT/android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
+MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
 
 # Verify default keyboard and dictionary exist
 if [[ ! -f "$KEYBOARDS_TARGET" ]]; then
@@ -113,9 +113,9 @@ fi
 
 # Convert markdown to html for offline help
 echo "Converting markdown to html for offline help"
-cd "$REPO_ROOT/android"
+cd "$KEYMAN_ROOT/android"
 ./build-help.sh htm
-cd "$REPO_ROOT/android/KMAPro"
+cd "$KEYMAN_ROOT/android/KMAPro"
 
 # Download default keyboard and dictionary
 if [ "$DO_KEYBOARDS_DOWNLOAD" = true ]; then

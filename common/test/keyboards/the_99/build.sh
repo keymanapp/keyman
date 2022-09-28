@@ -7,7 +7,7 @@ set -u
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
-# . "$REPO_ROOT/resources/shellHelperFunctions.sh"
+# . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 

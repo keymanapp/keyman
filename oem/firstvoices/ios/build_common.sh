@@ -7,7 +7,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Include our resource functions; they're pretty useful!
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" == *"darwin" ]]; then
@@ -48,7 +48,7 @@ verify_KMEI ( ) {
     [ -d "$KEYMAN_ENGINE_FRAMEWORK_SRC" ] || KMEI_BUILD_EXISTS=false
 }
 
-KMEI_BUILD_DIR="$REPO_ROOT/ios/"
+KMEI_BUILD_DIR="$KEYMAN_ROOT/ios/"
 
 BUILD_FOLDER=build
 

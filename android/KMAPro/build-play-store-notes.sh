@@ -12,7 +12,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 QUIET=0
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
@@ -20,9 +20,9 @@ THIS_DIR="$(dirname "$THIS_SCRIPT")"
 # Copy release notes for Gradle Play Publisher to upload
 # Reference: https://github.com/Triple-T/gradle-play-publisher#uploading-release-notes
 #
-PLAY_RELEASE_NOTES="$REPO_ROOT/android/KMAPro/kMAPro/src/main/play/release-notes/en-US/$TIER.txt"
+PLAY_RELEASE_NOTES="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/play/release-notes/en-US/$TIER.txt"
 if [ $TIER = "stable" ]; then
-  PLAY_RELEASE_NOTES="$REPO_ROOT/android/KMAPro/kMAPro/src/main/play/release-notes/en-US/default.txt"
+  PLAY_RELEASE_NOTES="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/play/release-notes/en-US/default.txt"
 fi
 echo "Generating Play Store release notes to $PLAY_RELEASE_NOTES"
 echo "" > "$PLAY_RELEASE_NOTES"
@@ -30,7 +30,7 @@ echo "" > "$PLAY_RELEASE_NOTES"
 # Copy whatsnew.md to release notes 1 line at a time,
 # filtering for lines that start with "*".
 # Play Store release notes have a limit of 500 characters
-FILTERED_LINES=`grep '^\s*\*.*$' "$REPO_ROOT/android/help/about/whatsnew.md"`
+FILTERED_LINES=`grep '^\s*\*.*$' "$KEYMAN_ROOT/android/help/about/whatsnew.md"`
 IFS=$'\n'      # Change IFS to new line
 for line in $FILTERED_LINES
 do

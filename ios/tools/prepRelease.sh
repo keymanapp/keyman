@@ -24,7 +24,7 @@ if [ -d "upload" ]; then
 fi
 
 #Include script dependency
-. $REPO_ROOT/resources/build/history/history-utils.sh         #includes the following
+. $KEYMAN_ROOT/resources/build/history/history-utils.sh         #includes the following
 #. ../resources/shellHelperFunctions.sh
 
 BUILD_NUMBER=`cat ../VERSION.md`

@@ -12,7 +12,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 ################################ Main script ################################
 
@@ -40,7 +40,7 @@ fi
 
 function do_configure() {
   verify_npm_setup
-  "$REPO_ROOT/common/web/keyman-version/build.sh"
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
 }
 
 if builder_start_action configure :module; then

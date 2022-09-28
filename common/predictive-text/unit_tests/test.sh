@@ -5,8 +5,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 SCRIPT_ROOT="$(dirname "$THIS_SCRIPT")"
 
 # A simple utility script to facilitate unit-testing for the LM Layer.
@@ -34,15 +34,15 @@ test-headless ( ) {
     _FLAGS="$_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  pushd "$REPO_ROOT/common/models/wordbreakers"
+  pushd "$KEYMAN_ROOT/common/models/wordbreakers"
   npm run test || fail "models/wordbreakers tests failed"
   popd
 
-  pushd "$REPO_ROOT/common/models/templates"
+  pushd "$KEYMAN_ROOT/common/models/templates"
   npm run test || fail "models/templates tests failed"
   popd
 
-  pushd "$REPO_ROOT/common/models/types"
+  pushd "$KEYMAN_ROOT/common/models/types"
   npm run test || fail "models/types tests failed"
   popd
 

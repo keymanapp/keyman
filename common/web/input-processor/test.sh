@@ -9,7 +9,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # We should work within the script's directory, not the one we were called in.
 cd "$THIS_SCRIPT_PATH"
@@ -62,7 +62,7 @@ fi
 
 # Ensures that the lexical model compiler has been built locally.
 echo_heading "Preparing Lexical Model Compiler for test use"
-pushd "$REPO_ROOT/developer/src/kmlmc/"
+pushd "$KEYMAN_ROOT/developer/src/kmlmc/"
 ./build.sh
 popd
 
@@ -72,13 +72,13 @@ test-headless ( ) {
 
 if [ $FETCH_DEPS = true ]; then
   # Next, build the lm-worker in its proper, wrapped form
-  pushd "$REPO_ROOT/common/web/lm-worker"
+  pushd "$KEYMAN_ROOT/common/web/lm-worker"
   ./build.sh
   popd
 fi
 
 # First, run tests on the keyboard processor.
-pushd "$REPO_ROOT/common/web/keyboard-processor"
+pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
 ./build.sh test $CHAINING_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 popd
 

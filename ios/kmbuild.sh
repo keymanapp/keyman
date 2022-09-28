@@ -17,8 +17,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 cd "$(dirname "$THIS_SCRIPT")"
 
 # Include our resource functions; they're pretty useful!
-. "$REPO_ROOT/resources/shellHelperFunctions.sh"
-. "$REPO_ROOT/resources/build/build-download-resources.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -185,7 +185,7 @@ update_bundle ( ) {
           rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
         fi
 
-        cd "$REPO_ROOT/common/web/sentry-manager/build"
+        cd "$KEYMAN_ROOT/common/web/sentry-manager/build"
 
         cp index.js                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
