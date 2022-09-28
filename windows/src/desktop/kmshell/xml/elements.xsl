@@ -65,6 +65,8 @@
     <xsl:param name="disabled" />
     <xsl:param name="tabid" />
     <xsl:param name="shield" />
+    <xsl:param name="visible" />
+    <xsl:param name="background" />
 
     <xsl:choose>
       <xsl:when test="$shield = 1 and /Keyman/canelevate">
@@ -88,6 +90,8 @@
             width: <xsl:value-of select="$width"/>;
             margin-right: 8px;
             vertical-align: top;
+            <xsl:if test="$visible = 'false'">display:none;</xsl:if>
+            <xsl:if test="background">background:<xsl:value-of select="$id"/></xsl:if>
           </xsl:attribute>
           <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 4px 5px 0px; display: inline; height: 18px;" src="/app/shield.png" />
           <xsl:value-of select="$caption" />
@@ -113,6 +117,8 @@
             height: 25px;
             display: inline-block;
             margin-right: 8px;
+            <xsl:if test="$visible = 'false'">display:none;</xsl:if>
+            <xsl:if test="$background">background:<xsl:value-of select="$background"/></xsl:if>
           </xsl:attribute>
         </input>
       </xsl:otherwise>

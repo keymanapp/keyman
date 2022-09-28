@@ -357,23 +357,24 @@ function keyboard_checkclick(n,toggle) {
 }
 
 /* Disable/Enable Button replaces checkbox for now still use the "check" function in delphi webserver */
-function keyboard_toggle(n) {
-  var k = document.getElementById('keyboardcheck_'+n), li = document.getElementById('list_keyboard_'+n);
-  var btn = document.getElementById('button_'+n);
+function keyboard_toggle(keyboard_name) {
+  const checkbox = document.getElementById('keyboardcheck_'+keyboard_name), li = document.getElementById('list_keyboard_'+keyboard_name);
+  const disable_btn = document.getElementById('button_disable_'+keyboard_name);
+  const enable_btn = document.getElementById('button_enable_'+keyboard_name);
 
-  k.checked = !k.checked;
-  if (k.checked){
-    btn.value = "Disable";
-    btn.style.background = '#dadddc';
+  checkbox.checked = !checkbox.checked;
+  if (checkbox.checked){
+    enable_btn.style.display = "none";
+    disable_btn.style.display = "block";
   }
   else {
-    btn.value = "Enable";
-    btn.style.background = '#808080';
+    disable_btn.style.display = "none";
+    enable_btn.style.display = "block";
   }
 
-  location.href='keyman:keyboard_clickcheck?id='+n+'&value='+k.checked;
-  var liTitle = document.getElementById('listtitle_keyboard_'+n);
-  liTitle.className = k.checked ? 'list_title keyboard_loaded flex-container-title' : 'list_title keyboard_unloaded flex-container-title';
+  location.href='keyman:keyboard_clickcheck?id='+keyboard_name+'&value='+checkbox.checked;
+  var liTitle = document.getElementById('listtitle_keyboard_'+keyboard_name);
+  liTitle.className = checkbox.checked ? 'list_title keyboard_loaded flex-container-title' : 'list_title keyboard_unloaded flex-container-title';
   li.focus();
   return true;
 }

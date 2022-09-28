@@ -144,17 +144,30 @@
                 <xsl:if test='loaded'><xsl:attribute name='checked'>checked</xsl:attribute></xsl:if>
               </input>
               <xsl:call-template name="button">
-                  <xsl:with-param name="id"><xsl:value-of select="id"/></xsl:with-param>
+                  <xsl:with-param name="id">disable_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="onclick">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
-                  <xsl:with-param name="caption">
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Disable']"/></xsl:with-param>
+                  <xsl:with-param name="visible">
                     <xsl:choose>
-                      <xsl:when test='loaded'><xsl:value-of select="$locale/string[@name='S_Caption_Disable']"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Caption_Enable']"/></xsl:otherwise>
+                      <xsl:when test='loaded'>true</xsl:when>
+                      <xsl:otherwise>false</xsl:otherwise>
                     </xsl:choose>
                   </xsl:with-param>
               </xsl:call-template>
-
+              <xsl:call-template name="button">
+                  <xsl:with-param name="id">enable_<xsl:value-of select="id"/></xsl:with-param>
+                  <xsl:with-param name="onclick">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
+                  <xsl:with-param name="className">kbd_button</xsl:with-param>
+                  <xsl:with-param name="background">#808080</xsl:with-param>
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Enable']"/></xsl:with-param>
+                  <xsl:with-param name="visible">
+                    <xsl:choose>
+                      <xsl:when test='loaded'>false</xsl:when>
+                      <xsl:otherwise>true</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+              </xsl:call-template>
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id] and ../../options">
                 <xsl:call-template name="button">
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
