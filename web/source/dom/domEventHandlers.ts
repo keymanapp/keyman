@@ -82,11 +82,6 @@ namespace com.keyman.dom {
         if(!(et == 'text' || et == 'search')) {
           return true;
         }
-      } else if(Ltarg.ownerDocument && Ltarg.ownerDocument.designMode == 'on') {
-        // continue; don't block this one!
-      } else if((device.touchable || !Ltarg.isContentEditable)
-          && !(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLTextAreaElement)) {
-        return true;
       }
 
       // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
