@@ -3,11 +3,22 @@
 # This script contails utilities for builder_script calls
 #
 
+function _builder_findRepoRoot() {
+    # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
+    # None of the answers are 100% correct for cross-platform
+    # On macOS, requires coreutils (`brew install coreutils`)
+    local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
+    REPO_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
+    readonly REPO_ROOT
+}
+
+_builder_findRepoRoot
+
 # Used to build script-related build variables useful for referencing the calling script
 # and for prefixing builder_finish_action outputs in order to more clearly identify the calling
 # script.
 #
-# Assumes that `findRepositoryRoot` has already been called, a condition met later on
+# Assumes that `findKeymanRoot` has already been called, a condition met later on
 # within this script.
 function _builder_setBuildScriptIdentifiers() {
   if [ ! -z ${THIS_SCRIPT+x} ]; then

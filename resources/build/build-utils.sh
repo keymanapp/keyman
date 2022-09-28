@@ -32,7 +32,7 @@
 #
 SHLVL=0
 
-function findRepositoryRoot() {
+function findKeymanRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
@@ -41,7 +41,7 @@ function findRepositoryRoot() {
     readonly KEYMAN_ROOT
 }
 
-# Source builder_script (how to move findRepositoryRoot to .inc.sh?)
+# Source builder_script
 . "$KEYMAN_ROOT/resources/build/builder.inc.sh"
 
 function findVersion() {
@@ -167,7 +167,7 @@ function findShouldSentryRelease() {
     esac
 }
 
-findRepositoryRoot
+findKeymanRoot
 _builder_setBuildScriptIdentifiers
 findTier
 findVersion
