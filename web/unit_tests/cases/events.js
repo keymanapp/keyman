@@ -101,8 +101,6 @@ describe('Event Management', function() {
     var ele = document.getElementById("input");
     doFocus(ele);
 
-    assert.isOk(keyman.domManager.activeElement, "Test initialization failure");
-
     var counterObj = {i:0};
     var fin = 3;
 
@@ -130,8 +128,6 @@ describe('Event Management', function() {
 
     var ele = document.getElementById("input");
     doFocus(ele);
-
-    assert.isOk(keyman.domManager.activeElement, "Test initialization failure");
 
     var counterObj = {i:0};
     var fin = 3;
