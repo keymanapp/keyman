@@ -174,7 +174,7 @@ findTier
 findVersion
 
 # Source builder_script
-. "$KEYMAN_ROOT/resources/build/builder.inc.sh"
+. "$KEYMAN_ROOT/resources/builder.inc.sh"
 # printVersionUtilsDebug
 printBuildNumberForTeamCity
 
