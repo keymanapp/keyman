@@ -3,6 +3,7 @@ import LDMLKeyboardXMLSourceFile from './ldml-keyboard-xml.js';
 import CompilerCallbacks from '../compiler/callbacks.js';
 import Ajv from 'ajv';
 import { CompilerMessages } from '../compiler/messages.js';
+import { boxXmlArray } from '../util/util.js';
 
 export default class LDMLKeyboardXMLSourceFileReader {
   private readonly callbacks: CompilerCallbacks;
@@ -17,40 +18,29 @@ export default class LDMLKeyboardXMLSourceFileReader {
    * @param source any
    */
   private boxArrays(source: any) {
-    let box = (o: any, x: string) => {
-      if(typeof o == 'object' && !Array.isArray(o[x])) {
-        if(o[x] === null || o[x] === undefined) {
-          o[x] = [];
-        }
-        else {
-          o[x] = [o[x]];
-        }
-      }
-    }
-
-    box(source?.keyboard, 'layerMaps');
-    box(source?.keyboard?.names, 'name');
-    box(source?.keyboard?.vkeyMaps, 'vkeyMap');
-    box(source?.keyboard?.keys, 'key');
-    box(source?.keyboard?.locales, 'locale');
-    box(source?.keyboard, 'transforms');
+    boxXmlArray(source?.keyboard, 'layerMaps');
+    boxXmlArray(source?.keyboard?.names, 'name');
+    boxXmlArray(source?.keyboard?.vkeyMaps, 'vkeyMap');
+    boxXmlArray(source?.keyboard?.keys, 'key');
+    boxXmlArray(source?.keyboard?.locales, 'locale');
+    boxXmlArray(source?.keyboard, 'transforms');
     if(source?.keyboard?.layerMaps) {
       for(let layerMaps of source?.keyboard?.layerMaps) {
-        box(layerMaps, 'layerMap');
+        boxXmlArray(layerMaps, 'layerMap');
         if(layerMaps?.layerMap) {
           for(let layerMap of layerMaps?.layerMap) {
-            box(layerMap, 'row');
+            boxXmlArray(layerMap, 'row');
           }
         }
       }
     }
     if(source?.keyboard?.transforms) {
       for(let transform of source.keyboard.transforms)  {
-        box(transform, 'transform');
+        boxXmlArray(transform, 'transform');
       }
     }
-    box(source?.keyboard?.reorders, 'reorder');
-    box(source?.keyboard?.backspaces, 'backspace');
+    boxXmlArray(source?.keyboard?.reorders, 'reorder');
+    boxXmlArray(source?.keyboard?.backspaces, 'backspace');
     return source;
   }
 
@@ -75,6 +65,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
       let parser = new xml2js.Parser({
         explicitArray: false,
         mergeAttrs: true,
+        includeWhiteChars: false,
         emptyTag: {} as any
         // Why "as any"? xml2js is broken:
         // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means

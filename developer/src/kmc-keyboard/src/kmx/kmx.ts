@@ -2,6 +2,8 @@ import * as r from 'restructure';
 
 /* Definitions from kmx_file.h. Must be kept in sync */
 
+// TODO: split kmx-file from kmx in-memory, similar to what I've done for kvk (keep restructure decl + BUILDER_ interfaces together)
+
 // In memory representations of KMX structures
 // kmx-builder will transform these to the corresponding COMP_xxxx
 

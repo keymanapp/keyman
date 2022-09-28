@@ -6,5 +6,6 @@ export interface CompilerEvent {
 export default interface CompilerCallbacks {
   loadFile(baseFilename: string, filename: string): Buffer;
   loadLdmlKeyboardSchema(): Buffer;
+  loadKvksJsonSchema(): Buffer;
   reportMessage(event: CompilerEvent): void;
 };

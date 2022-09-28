@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { FinlCompiler } from '../src/compiler/tran.js';
-import { CompilerCallbacks, loadSectionFixture } from './helpers/index.js';
+import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { Finl, FinlItemFlags } from '../src/kmx/kmx-plus.js';
 //import { CompilerMessages } from './keyman/compiler/messages';
 
@@ -9,9 +9,8 @@ describe('finl', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile minimal finl data', function() {
-    const callbacks = new CompilerCallbacks();
-    let finl = loadSectionFixture(FinlCompiler, 'sections/finl/minimal.xml', callbacks) as Finl;
-    assert.lengthOf(callbacks.messages, 0);
+    let finl = loadSectionFixture(FinlCompiler, 'sections/finl/minimal.xml', compilerTestCallbacks) as Finl;
+    assert.lengthOf(compilerTestCallbacks.messages, 0);
 
     assert.lengthOf(finl.items, 1);
     assert.lengthOf(finl.items[0].from, 2);

@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import { checkMessages, compileKeyboard, CompilerCallbacks, makePathToFixture } from './helpers/index.js';
+import { checkMessages, compileKeyboard, makePathToFixture } from './helpers/index.js';
 import KMXFile from '../src/kmx/kmx.js';
 import KEYMAN_VERSION from '@keymanapp/keyman-version/keyman-version.mjs';
 
@@ -8,13 +8,11 @@ describe('kmx metadata compiler', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile metadata with debug and compiler version', function() {
-    debugger
-        const callbacks = new CompilerCallbacks();
     const inputFilename = makePathToFixture('basic.xml');
 
     // Compile the keyboard
-    const kmx = compileKeyboard(inputFilename, callbacks, {debug:true, addCompilerVersion:true});
-    checkMessages(callbacks);
+    const kmx = compileKeyboard(inputFilename, {debug:true, addCompilerVersion:true});
+    checkMessages();
     assert.isNotNull(kmx);
 
     // Order of stores is not significant in kmx spec, but kmxplus compiler will
@@ -45,12 +43,11 @@ describe('kmx metadata compiler', function () {
   });
 
   it('should compile metadata with no compiler version', function() {
-    const callbacks = new CompilerCallbacks();
     const inputFilename = makePathToFixture('basic.xml');
 
     // Compile the keyboard
-    const kmx = compileKeyboard(inputFilename, callbacks, {debug:true, addCompilerVersion:false});
-    checkMessages(callbacks);
+    const kmx = compileKeyboard(inputFilename, {debug:true, addCompilerVersion:false});
+    checkMessages();
     assert.isNotNull(kmx);
 
     // TSS_NAME = 7
