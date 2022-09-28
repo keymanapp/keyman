@@ -183,144 +183,75 @@ describe('Attachment API', function() {
   });
 });
 
-Modernizr.on('touchevents', function(result) {
-  if(result) {
-    describe('Device-specific Attachment Checks (Touch, \'auto\')', function() {
 
-      this.timeout(testconfig.timeouts.standard);
+describe('Attachment Checks (Desktop, \'auto\')', function() {
 
-      before(function() {
-        this.timeout(testconfig.timeouts.scriptLoad);
+  this.timeout(testconfig.timeouts.standard);
 
-        fixture.setBase('fixtures');
-        return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
-      });
+  before(function() {
+    this.timeout(testconfig.timeouts.scriptLoad);
 
-      beforeEach(function() {
-        fixture.load("robustAttachment.html");
-      });
+    fixture.setBase('fixtures');
+    return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
+  });
 
-      after(function() {
-        teardownKMW();
-      });
+  beforeEach(function() {
+    fixture.load("robustAttachment.html");
+  });
 
-      afterEach(function(done) {
-        fixture.cleanup();
-        window.setTimeout(function(){
+  after(function() {
+    teardownKMW();
+  });
+
+  afterEach(function(done) {
+    fixture.cleanup();
+    window.setTimeout(function(){
+      done();
+    }, testconfig.timeouts.eventDelay);
+  })
+
+  describe('Element Type', function() {
+    it('<input>', function(done) {
+      var ID = DynamicElements.addInput();
+      var ele = document.getElementById(ID);
+
+      DynamicElements.assertAttached(ele, done);
+    });
+
+    it('<textarea>', function(done) {
+      var ID = DynamicElements.addText();
+      var ele = document.getElementById(ID);
+
+      DynamicElements.assertAttached(ele, done);
+    });
+
+    it.skip('<iframe>', function(done) {
+      this.timeout(testconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
+
+      var ID = DynamicElements.addIFrame(function() {
+        var ele = document.getElementById(ID);
+        var innerEle = ele.contentDocument.getElementById('iframe_input');
+
+        // No need to track data on the iframe itself.
+        assert.isFalse(keyman.isAttached(ele));
+        assert.isNotNull(innerEle);
+        assert.isTrue(keyman.isAttached(innerEle));
+        keyman.detachFromControl(ele);
+
+        window.setTimeout(function() {
           done();
         }, testconfig.timeouts.eventDelay);
       });
-
-      describe('Element Type', function() {
-        it('<input>', function(done) {
-          var ID = DynamicElements.addInput();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-
-        it('<textarea>', function(done) {
-          var ID = DynamicElements.addText();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-
-        it.skip('<iframe>', function(done) {
-          this.timeout(testconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
-
-          var ID = DynamicElements.addIFrame(function() {
-            var ele = document.getElementById(ID);
-            var innerEle = ele.contentDocument.getElementById('iframe_input');
-
-            assert.isFalse(keyman.isAttached(ele));
-            assert.isNotNull(innerEle);
-            assert.isFalse(keyman.isAttached(innerEle));
-
-            window.setTimeout(function() {
-              done();
-            }, testconfig.timeouts.eventDelay);
-          });
-        });
-
-        it('contentEditable=true', function(done) {
-          var ID = DynamicElements.addEditable();
-          var ele = document.getElementById(ID);
-
-          assert.isFalse(keyman.isAttached(ele));
-          done();
-        });
-      });
-    });
-  } else {
-    describe('Device-specific Attachment Checks (Desktop, \'auto\')', function() {
-
-      this.timeout(testconfig.timeouts.standard);
-
-      before(function() {
-        this.timeout(testconfig.timeouts.scriptLoad);
-
-        fixture.setBase('fixtures');
-        return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
-      });
-
-      beforeEach(function() {
-        fixture.load("robustAttachment.html");
-      });
-
-      after(function() {
-        teardownKMW();
-      });
-
-      afterEach(function(done) {
-        fixture.cleanup();
-        window.setTimeout(function(){
-          done();
-        }, testconfig.timeouts.eventDelay);
-      })
-
-      describe('Element Type', function() {
-        it('<input>', function(done) {
-          var ID = DynamicElements.addInput();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-
-        it('<textarea>', function(done) {
-          var ID = DynamicElements.addText();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-
-        it.skip('<iframe>', function(done) {
-          this.timeout(testconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
-
-          var ID = DynamicElements.addIFrame(function() {
-            var ele = document.getElementById(ID);
-            var innerEle = ele.contentDocument.getElementById('iframe_input');
-
-            // No need to track data on the iframe itself.
-            assert.isFalse(keyman.isAttached(ele));
-            assert.isNotNull(innerEle);
-            assert.isTrue(keyman.isAttached(innerEle));
-            keyman.detachFromControl(ele);
-
-            window.setTimeout(function() {
-              done();
-            }, testconfig.timeouts.eventDelay);
-          });
-        });
-
-        it('contentEditable=true', function(done) {
-          var ID = DynamicElements.addEditable();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-      });
     });
 
-  }
+    // If we were to set up a design-mode iframe test, that one would need to be conditioned on
+    // whether or not we were on a touch-device, at least as of this time. (#7343)
+
+    it('contentEditable=true', function(done) {
+      var ID = DynamicElements.addEditable();
+      var ele = document.getElementById(ID);
+
+      DynamicElements.assertAttached(ele, done);
+    });
+  });
 });
