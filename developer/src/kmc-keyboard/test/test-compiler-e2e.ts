@@ -1,10 +1,9 @@
 import 'mocha';
 import {assert} from 'chai';
 import x_hextobin from '@keymanapp/hextobin';
-import KMXBuilder from '../src/kmx/kmx-builder.js';
+import { KMXBuilder } from '@keymanapp/common-types';
 import {checkMessages, compileKeyboard, makePathToFixture} from './helpers/index.js';
 
-// const __filename = fileURLToPath(import.meta.url);
 const hextobin = (x_hextobin as any).default;
 
 describe('compiler-tests', function() {

@@ -2,9 +2,11 @@ import 'mocha';
 import { assert } from 'chai';
 import { VkeyCompiler } from '../src/compiler/vkey.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
-import { Vkey } from '../src/kmx/kmx-plus.js';
+import { KMXPlus, Constants } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
-import { USVirtualKeyCodes } from '../src/ldml-keyboard/virtual-key-constants.js';
+
+import Vkey = KMXPlus.Vkey;
+import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
 
 describe('vkey compiler', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

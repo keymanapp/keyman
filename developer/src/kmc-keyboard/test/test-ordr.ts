@@ -2,8 +2,9 @@ import 'mocha';
 import { assert } from 'chai';
 import { OrdrCompiler } from '../src/compiler/ordr.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
-import { Ordr } from '../src/kmx/kmx-plus.js';
-//import { CompilerMessages } from './keyman/compiler/messages';
+import { KMXPlus } from '@keymanapp/common-types';
+
+import Ordr = KMXPlus.Ordr;
 
 describe('ordr', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

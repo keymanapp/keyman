@@ -1,6 +1,6 @@
 import * as r from 'restructure';
-import KMXFile, { GROUP, KEY, STORE } from './kmx.js';
-import KMXPlusFile from './kmx-plus.js';
+import { KMXFile, GROUP, KEY, STORE } from './kmx.js';
+import { KMXPlusFile } from './kmx-plus.js';
 import KMXPlusBuilder from './kmx-plus-builder/kmx-plus-builder.js';
 
 // These type-checking structures are here to ensure that

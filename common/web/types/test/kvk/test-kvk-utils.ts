@@ -1,7 +1,7 @@
 import 'mocha';
 import {assert} from 'chai';
-import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKeyFlags, VisualKeyboardShiftState } from "./visual-keyboard.js";
-import { USVirtualKeyCodes } from '../../src/ldml-keyboard/virtual-key-constants.js';
+import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKeyFlags, VisualKeyboardShiftState } from "../../src/kvk/visual-keyboard.js";
+import { USVirtualKeyCodes } from '../../src/consts/virtual-key-constants.js';
 
 export function verify_khmer_angkor(vk: VisualKeyboard) {
   assert.equal(vk.header.flags, VisualKeyboardHeaderFlags.kvkhAltGr);

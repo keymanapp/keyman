@@ -1,14 +1,13 @@
-import { GlobalSections, Section } from "../kmx/kmx-plus.js";
-import LDMLKeyboardXMLSourceFile, { LKKeyboard } from "../ldml-keyboard/ldml-keyboard-xml.js";
+import { LDMLKeyboard, KMXPlus } from "@keymanapp/common-types";
 import CompilerCallbacks from "./callbacks.js";
 import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 
 /* istanbul ignore next */
 export class SectionCompiler {
-  protected readonly keyboard: LKKeyboard;
+  protected readonly keyboard: LDMLKeyboard.LKKeyboard;
   protected readonly callbacks: CompilerCallbacks;
 
-  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
+  constructor(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
     this.keyboard = source.keyboard;
     this.callbacks = callbacks;
   }
@@ -21,7 +20,7 @@ export class SectionCompiler {
     return true;
   }
 
-  public compile(sections: GlobalSections): Section {
+  public compile(sections: KMXPlus.GlobalSections): KMXPlus.Section {
     return null;
   }
 

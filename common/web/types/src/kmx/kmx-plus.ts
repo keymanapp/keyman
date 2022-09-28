@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 
-import KMXFile from './kmx.js';
+import { KMXFile } from './kmx.js';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
 // Writer in kmx-builder.ts
@@ -205,7 +205,7 @@ export interface KMXPlusData {
     vkey?: Vkey;
 };
 
-export default class KMXPlusFile extends KMXFile {
+export class KMXPlusFile extends KMXFile {
 
   /* KMXPlus file structures */
 

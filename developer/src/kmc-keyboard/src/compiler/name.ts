@@ -1,6 +1,9 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { GlobalSections, Name } from "../kmx/kmx-plus.js";
+import { KMXPlus } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
+
+import GlobalSections = KMXPlus.GlobalSections;
+import Name = KMXPlus.Name;
 
 export class NameCompiler extends SectionCompiler {
 

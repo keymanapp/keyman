@@ -36,7 +36,7 @@ export class KEY {
 };
 
 
-export default class KMXFile {
+export class KMXFile {
 
   /* KMX file structures */
 

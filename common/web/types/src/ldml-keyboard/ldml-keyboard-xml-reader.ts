@@ -1,5 +1,5 @@
 import * as xml2js from 'xml2js';
-import LDMLKeyboardXMLSourceFile from './ldml-keyboard-xml.js';
+import { LDMLKeyboardXMLSourceFile } from './ldml-keyboard-xml.js';
 import Ajv from 'ajv';
 import { boxXmlArray } from '../util/util.js';
 

@@ -27,6 +27,7 @@
   ],
   "dependencies": {
     "@keymanapp/hextobin": "file:common/tools/hextobin",
-    "@keymanapp/keyman-version": "file:common/web/keyman-version"
+    "@keymanapp/keyman-version": "file:common/web/keyman-version",
+    "@keymanapp/common-types": "file:common/web/types"
   }
 }

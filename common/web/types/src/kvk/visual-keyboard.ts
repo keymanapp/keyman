@@ -47,7 +47,7 @@ interface VisualKeyboardLegalShiftState {
 };
 
 import { BUILDER_KVK_SHIFT_STATE as ss } from "./kvk-file.js";
-import { USVirtualKeyCodes as vk } from "../ldml-keyboard/virtual-key-constants.js";
+import { USVirtualKeyCodes as vk } from "../consts/virtual-key-constants.js";
 
 export const VisualKeyboardLegalShiftStates: VisualKeyboardLegalShiftState[] = [
   {desc: 'Unshifted',                  name: '',      shift: ss.KVKS_NORMAL, vkeys: []},    //1

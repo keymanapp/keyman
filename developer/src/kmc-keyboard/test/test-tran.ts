@@ -2,8 +2,10 @@ import 'mocha';
 import { assert } from 'chai';
 import { TranCompiler } from '../src/compiler/tran.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
-import { Tran, TranItemFlags } from '../src/kmx/kmx-plus.js';
-//import { CompilerMessages } from './keyman/compiler/messages';
+import { KMXPlus } from '@keymanapp/common-types';
+
+import Tran = KMXPlus.Tran;
+import TranItemFlags = KMXPlus.TranItemFlags;
 
 describe('tran', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

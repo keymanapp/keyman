@@ -2,8 +2,10 @@ import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
-import { Keys } from '../src/kmx/kmx-plus.js';
+import { KMXPlus } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
+
+import Keys = KMXPlus.Keys;
 
 describe('keys', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

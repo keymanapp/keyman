@@ -1,5 +1,7 @@
 import { expect } from 'chai';
-import { LdmlVkeyNames } from '../src/ldml-keyboard/virtual-key-constants.js';
+import { Constants } from '@keymanapp/common-types';
+
+import LdmlVkeyNames = Constants.LdmlVkeyNames;
 
 describe('virtual key constants', function () {
 
