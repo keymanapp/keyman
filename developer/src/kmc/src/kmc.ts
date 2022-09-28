@@ -9,6 +9,7 @@ import * as path from 'path';
 import { Command } from 'commander';
 import * as kmc from '@keymanapp/kmc-keyboard';
 import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
+import { KvkFileWriter } from '@keymanapp/common-types';
 
 let inputFilename: string;
 
@@ -55,7 +56,7 @@ class CompilerCallbacks {
   }
 }
 
-function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): Uint8Array {
+function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): [Uint8Array,Uint8Array] {
   const c = new CompilerCallbacks();
   const k = new kmc.Compiler(c, options);
   let source = k.load(inputFilename);
@@ -75,8 +76,15 @@ function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): U
   kmc.KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, options);
 
   // Use the builder to generate the binary output file
-  let builder = new kmc.KMXBuilder(kmx, options.debug);
-  return builder.compile();
+  const builder = new kmc.KMXBuilder(kmx, options.debug);
+  const kmx_binary = builder.compile();
+
+  const vkcompiler = new kmc.VisualKeyboardCompiler();
+  const vk = vkcompiler.compile(source);
+  const writer = new KvkFileWriter();
+  const kvk_binary = writer.write(vk);
+
+  return [kmx_binary, kvk_binary];
 }
 
 let options: kmc.CompilerOptions = {
@@ -84,13 +92,18 @@ let options: kmc.CompilerOptions = {
   addCompilerVersion: program.compilerVersion ?? true
 }
 
+// TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
 // Compile:
-let code = compileKeyboard(inputFilename, options);
+let [kmx,kvk] = compileKeyboard(inputFilename, options);
 
 // Output:
 
-if(code) {
-  const outFile = program.outFile ?? path.join(path.dirname(inputFilename), path.basename(inputFilename, '.xml') + '.kmx');
-  console.log(`Writing compiled keyboard to ${outFile}`);
-  fs.writeFileSync(outFile, code);
+if(kmx && kvk) {
+  const outFileKmx = program.outFile ?? path.join(path.dirname(inputFilename), path.basename(inputFilename, '.xml') + '.kmx');
+  console.log(`Writing compiled keyboard to ${outFileKmx}`);
+  fs.writeFileSync(outFileKmx, kmx);
+
+  const outFileKvk = program.outFile ?? path.join(path.dirname(inputFilename), path.basename(inputFilename, '.xml') + '.kvk');
+  console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
+  fs.writeFileSync(outFileKvk, kvk);
 }

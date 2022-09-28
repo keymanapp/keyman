@@ -6,6 +6,7 @@
     "rootDir": "src/",
     "baseUrl": ".",
     "paths": {
+      "@keymanapp/common-types": [ "../../../common/web/types/src/main" ],
       "@keymanapp/kmc-keyboard": [ "../kmc-keyboard/src/main" ],
       "@keymanapp/kmc-model": [ "../kmc-model/src/main" ],
       "@keymanapp/kmc-model-info": [ "../kmc-model-info/src/model-info-compiler" ],
@@ -17,6 +18,7 @@
   ],
   "references": [
     { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../../../common/web/types" },
     { "path": "../kmc-keyboard" },
     { "path": "../kmc-model" },
     { "path": "../kmc-model-info" },

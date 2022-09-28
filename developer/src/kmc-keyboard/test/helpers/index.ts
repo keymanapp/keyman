@@ -5,12 +5,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import { SectionCompiler } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard } from '@keymanapp/common-types';
 import { CompilerEvent } from '../../src/compiler/callbacks.js';
 import Compiler from '../../src/compiler/compiler.js';
 import { assert } from 'chai';
 import KMXPlusMetadataCompiler from '../../src/compiler/metadata-compiler.js';
 import CompilerOptions from '../../src/compiler/compiler-options.js';
+import VisualKeyboardCompiler from '../../src/compiler/visual-keyboard-compiler.js';
 
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import Elem = KMXPlus.Elem;
@@ -107,6 +108,23 @@ export function compileKeyboard(inputFilename: string, options: CompilerOptions)
   KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, options);
 
   return kmx;
+}
+
+export function compileVisualKeyboard(inputFilename: string, options: CompilerOptions): VisualKeyboard.VisualKeyboard {
+  const k = new Compiler(compilerTestCallbacks, options);
+  const source = k.load(inputFilename);
+  checkMessages();
+  assert.isNotNull(source, 'k.load should not have returned null');
+
+  const valid = k.validate(source);
+  checkMessages();
+  assert.isTrue(valid, 'k.validate should not have failed');
+
+  const vk = (new VisualKeyboardCompiler()).compile(source);
+  checkMessages();
+  assert.isNotNull(vk, 'VisualKeyboardCompiler.compile should not have returned null');
+
+  return vk;
 }
 
 export function checkMessages() {
