@@ -84,6 +84,18 @@ else
   builder_use_color false
 fi
 
+function die() {
+  # TODO: consolidate this with fail() from shellHelperFunctions.sh
+  echo
+  echo "${COLOR_RED}$*"
+  echo
+  exit 1
+}
+
+function builder_die() {
+  die "$*"
+}
+
 ####################################################################################
 #
 # builder_ functions for standard build script parameter and process management
