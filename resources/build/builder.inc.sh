@@ -29,7 +29,7 @@ function _builder_findRepoRoot() {
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
     local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
-    REPO_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
+    REPO_ROOT=$(dirname $(dirname "$SCRIPT"))
     readonly REPO_ROOT
 }
 
@@ -48,6 +48,8 @@ function _builder_setBuildScriptIdentifiers() {
     # Leaves only the part of the path based upon REPO_ROOT.
     THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$REPO_ROOT/"}
     readonly THIS_SCRIPT_IDENTIFIER
+  else
+    echo "Warning: THIS_SCRIPT not defined; builder.inc.sh has not been sourced with standard script include."
   fi
 }
 
