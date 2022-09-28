@@ -17,36 +17,55 @@ describe('Event Management', function() {
 
   after(function() {
     teardownKMW();
+    fixture.cleanup();
   });
 
-  it('Keystroke-based onChange event generation', function(done) {
+  buildEvent = (type, ele) => new FocusEvent(type, {relatedTarget: ele});
+
+  doFocus = (ele) => {
+    // Sometimes this fails to trigger our event handlers when unit testing, though it DOES set
+    // the document's focus correctly.
+    ele.focus();
+
+    // If our event handlers didn't trigger, force 'em via synthetic event.
+    if(!keyman.domManager.activeElement) {
+      ele.dispatchEvent(buildEvent('focus', ele));
+    }
+
+    // We assume that one of the two cases above will properly update KMW to the expected state.
+    assert.isOk(keyman.domManager.activeElement, "Test initialization failure");
+  };
+
+  doBlur = (ele) => {
+    // The same behaviors documented in `doFocus` apply here.
+    ele.blur();
+
+    if(keyman.domManager.activeElement) {
+      ele.dispatchEvent(buildEvent('blur', ele));
+    }
+
+    // We assume that one of the two cases above will properly update KMW to the expected state.
+    assert.isNotOk(keyman.domManager.activeElement, "Test execution failure");
+  }
+
+  it('Keystroke-based onChange event generation', function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
-    var aliasing = false;
+    doFocus(ele);
 
     ele.onchange = function() {
       ele.onchange = null;
-      done();
     }
-
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      aliasing = true;
-    }
-
-    // A bit of a force-hack to ensure the element is seen as active for the tests.
-    com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
-    com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
 
-    var focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    doBlur(ele);
 
-    if(focusEvent) {
-      ele.dispatchEvent(focusEvent);
+    if(ele.onchange) {
+      assert.fail("Event did not fire as expected");
     }
   });
 
@@ -55,51 +74,36 @@ describe('Event Management', function() {
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
-    var aliasing = false;
+    doFocus(ele);
 
     ele.onchange = function() {
       ele.onchange = null;
       done();
     }
 
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      aliasing = true;
-    }
-
-    // A bit of a force-hack to ensure the element is seen as active for the tests.
-    com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
-    com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
-
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
 
-    var focusEvent;
+    doBlur(ele);
 
-    if(typeof FocusEvent == 'function') {
-      focusEvent = new FocusEvent('blur', {relatedTarget: ele});
-    } else {
-      focusEvent = document.createEvent("FocusEvent");
-      focusEvent.initFocusEvent("blur", true, false, ele.ownerDocument.defaultView, 0, ele);
+    if(ele.onchange) {
+      assert.fail("Event did not fire as expected");
+      done();
     }
-
-    if(focusEvent)
-      ele.dispatchEvent(focusEvent);
   });
 
   it('Keystroke-based onInput event generation', function(done) {
-    // Not all browsers support InputEvent.  Bypass the test for these.
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return;
-    }
+    // The only possibly-relevant browser not implementing InputEvent:  Opera Mini.
+    // We no longer consider IE.  So long as we don't test against either, there's
+    // no need to condition this test.
 
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
-    var aliasing = false;
+    doFocus(ele);
+
+    assert.isOk(keyman.domManager.activeElement, "Test initialization failure");
 
     var counterObj = {i:0};
     var fin = 3;
@@ -111,30 +115,29 @@ describe('Event Management', function() {
       }
     });
 
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      aliasing = true;
-    }
-
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
+
+    if(counterObj.i != fin) {
+      assert.fail(`InputEvent only signalled ${counterObj.i} out of ${fin} expected times.`);
+      done();
+    }
   });
 
   it('OSK-based onInput event generation', function(done) {
-    // Not all browsers support InputEvent.  Bypass the test for these.
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return;
-    }
+    // The only possibly-relevant browser not implementing InputEvent:  Opera Mini.
+    // We no longer consider IE.  So long as we don't test against either, there's
+    // no need to condition this test.
 
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
-    var aliasing = false;
+    doFocus(ele);
+
+    assert.isOk(keyman.domManager.activeElement, "Test initialization failure");
 
     var counterObj = {i:0};
     var fin = 3;
@@ -146,14 +149,14 @@ describe('Event Management', function() {
       }
     });
 
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      aliasing = true;
-    }
-
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
+
+    if(counterObj.i != fin) {
+      assert.fail(`InputEvent only signalled ${counterObj.i} out of ${fin} expected times.`);
+      done();
+    }
   });
 });
