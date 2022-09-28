@@ -133,28 +133,38 @@ document.addEventListener("DOMContentLoaded", windowResize);
     case 37:    // left
     case 109:   // minus
       {
-        let keyboard_name = n.substring(9); // remove keyboard_ from element name
-        let kbd_grid = document.getElementById('keyboard_grid_'+keyboard_name);
+        const kbd_list = document.getElementById('list_'+n);
+        if( !kbd_list ) {
+          break;
+        }
+        if(!kbd_list.classList.contains('expanded')){
+          break;
+        }
+        //  hide more details for the expanded list
+        const keyboard_name = n.substring(9); // remove keyboard_ from element name
+        const kbd_grid = document.getElementById('keyboard_grid_'+keyboard_name);
         if( !kbd_grid ) break;
-        let kbd_list = document.getElementById('list_'+n);
-        if( !kbd_list ) break;
-        if(!kbd_list.classList.contains('expanded')) break;
-        ///  hide more details for the expanded list
-        if ($(kbd_grid).hasClass('grid_rows_hide')) more_detail(kbd_grid.id);
+        if ($(kbd_grid).hasClass('grid_rows_hide')){
+          more_detail_toggle(kbd_grid.id);
+        }
       }
       break;
     case 39:    // right
     case 107:   // plus
       {
-        let keyboard_name = n.substring(9); // remove keyboard_ from element name
-        let kbd_grid = document.getElementById('keyboard_grid_'+keyboard_name);
+        const kbd_list = document.getElementById('list_'+n);
+        if( !kbd_list ) {
+          break;
+        }
+        if(!kbd_list.classList.contains('expanded')){
+          break;
+        }
+        //  show more details for the expanded list
+        const keyboard_name = n.substring(9); // remove keyboard_ from element name
+        const kbd_grid = document.getElementById('keyboard_grid_'+keyboard_name);
         if( !kbd_grid ) break;
-        let kbd_list = document.getElementById('list_'+n);
-        if( !kbd_list ) break;
-        if(!kbd_list.classList.contains('expanded')) break;
-        ///  show more details for the expanded list
-        if (!$(kbd_grid).hasClass('grid_rows_hide')) {
-          more_detail(kbd_grid.id);
+        if (!$(kbd_grid).hasClass('grid_rows_hide')){
+          more_detail_toggle(kbd_grid.id);
         }
       }
       break;
@@ -210,19 +220,19 @@ document.addEventListener("DOMContentLoaded", windowResize);
     return true;
   }
 
-  function list_detail(event,n) {
-    var k = document.getElementById('list_'+n);
-    list_expanded_selected (k);
-    k.focus();
+  function list_detail(event,kbd_name) {
+    var kbd_list_item = document.getElementById('list_'+kbd_name);
+    list_expanded_selected (kbd_list_item);
+    kbd_list_item.focus();
     save_state();
     return false;
   }
 
-  function list_expanded_selected (n){
+  function list_expanded_selected (kbd_list_item){
     if(loading_state) return;
-    var keyboards = $('div.list_item');
+    const keyboards = $('div.list_item');
     keyboards.each(function(index) {
-      if(this.id == n.id) {
+      if(this.id == kbd_list_item.id) {
         $(this).toggleClass('expanded');
       }
       else {
@@ -231,15 +241,15 @@ document.addEventListener("DOMContentLoaded", windowResize);
     });
   }
 
-  function more_detail(n) {
-    var k = document.getElementById(n);
-    var m = document.getElementById(n+'_more');
-    $(k).toggleClass('grid_rows_hide');
-    if ($(k).hasClass('grid_rows_hide')){
-      $(m).attr("src","/app/expand20.png");
+  function more_detail_toggle(kbd_grid_name) {
+    const kbd_grid_item = document.getElementById(kbd_grid_name);
+    const more_detail_input = document.getElementById(kbd_grid_name+'_more');
+    $(kbd_grid_item).toggleClass('grid_rows_hide');
+    if ($(kbd_grid_item).hasClass('grid_rows_hide')){
+      $(more_detail_input).attr("src","/app/expand20.png");
     }
     else {
-      $(m).attr("src","/app/collapse20.png");
+      $(more_detail_input).attr("src","/app/collapse20.png");
     }
   }
 

@@ -32,18 +32,16 @@
       if (c.menu_name.includes("keyboardlist")) {
         q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item expanded');
       }
-      // if none are expanded select the first item
+      // if none are expanded get the full list
       if (q == null || q.length == 0) {
         q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item');
       }
+      // select the first list item
       for(var i = 0; i < q.length; i++) {
         list_array = q[i].id;
         itemtype = list_array.substr(0, 5);
-
-        if( itemtype == "list_" ) {
-          q[i].focus();
-          break;
-        }
+        q[i].focus();
+        break;
       }
     }
 

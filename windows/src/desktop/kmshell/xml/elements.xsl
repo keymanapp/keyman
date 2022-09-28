@@ -77,6 +77,7 @@
           </xsl:attribute>
           <xsl:if test="$disabled = 1"><xsl:attribute name="disabled">disabled</xsl:attribute></xsl:if>
           <xsl:attribute name="id">button_<xsl:value-of select="$id"/></xsl:attribute>
+          <xsl:attribute name="class"><xsl:value-of select="$className"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
@@ -102,6 +103,7 @@
           </xsl:attribute>
           <xsl:if test="$disabled = 1"><xsl:attribute name="disabled">disabled</xsl:attribute></xsl:if>
           <xsl:attribute name="ID">button_<xsl:value-of select="$id"/></xsl:attribute>
+          <xsl:attribute name="class"><xsl:value-of select="$className"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="$caption" /></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>

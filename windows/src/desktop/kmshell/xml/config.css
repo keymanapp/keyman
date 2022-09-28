@@ -342,20 +342,9 @@ input[type=checkbox]:checked +label {
   border: 1px solid #dadddc;
 }
 
-@keyframes growDown {
-  0% {
-      transform: scaleY(0)
-  }
-  100% {
-      transform: scaleY(1)
-  }
-}
-
 .list_item.kbd_list_item.expanded .list_detail
 {
   display: block;
- /* animation: growDown 500ms ease-in-out forwards;
-  transform-origin: top center;*/
 }
 
 
