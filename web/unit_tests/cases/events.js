@@ -69,7 +69,7 @@ describe('Event Management', function() {
     }
   });
 
-  it('OSK-based onChange event generation', function(done) {
+  it('OSK-based onChange event generation', function() {
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
@@ -78,7 +78,6 @@ describe('Event Management', function() {
 
     ele.onchange = function() {
       ele.onchange = null;
-      done();
     }
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
@@ -88,11 +87,10 @@ describe('Event Management', function() {
 
     if(ele.onchange) {
       assert.fail("Event did not fire as expected");
-      done();
     }
   });
 
-  it('Keystroke-based onInput event generation', function(done) {
+  it('Keystroke-based onInput event generation', function() {
     // The only possibly-relevant browser not implementing InputEvent:  Opera Mini.
     // We no longer consider IE.  So long as we don't test against either, there's
     // no need to condition this test.
@@ -110,9 +108,6 @@ describe('Event Management', function() {
 
     ele.addEventListener("input", function() {
       counterObj.i++;
-      if(counterObj.i == fin) {
-        done();
-      }
     });
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
@@ -122,11 +117,10 @@ describe('Event Management', function() {
 
     if(counterObj.i != fin) {
       assert.fail(`InputEvent only signalled ${counterObj.i} out of ${fin} expected times.`);
-      done();
     }
   });
 
-  it('OSK-based onInput event generation', function(done) {
+  it('OSK-based onInput event generation', function() {
     // The only possibly-relevant browser not implementing InputEvent:  Opera Mini.
     // We no longer consider IE.  So long as we don't test against either, there's
     // no need to condition this test.
@@ -144,9 +138,6 @@ describe('Event Management', function() {
 
     ele.addEventListener("input", function() {
       counterObj.i++;
-      if(counterObj.i == fin) {
-        done();
-      }
     });
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
@@ -156,7 +147,6 @@ describe('Event Management', function() {
 
     if(counterObj.i != fin) {
       assert.fail(`InputEvent only signalled ${counterObj.i} out of ${fin} expected times.`);
-      done();
     }
   });
 });
