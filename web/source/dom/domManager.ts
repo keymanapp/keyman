@@ -247,11 +247,7 @@ namespace com.keyman.dom {
       // We know this to be the correct set of handlers because we're setting up a touch element.
       var touchHandlers = this.touchHandlers;
 
-      Pelem.addEventListener('touchstart', touchHandlers.setFocus);
       Pelem.addEventListener('touchend', touchHandlers.dragEnd, false);
-
-      // Hide keyboard and caret when losing focus from simulated input field
-      Pelem.onblur=touchHandlers.setBlur;
 
       // Note that touchend event propagates and is processed by body touchend handler
       // re-setting the first touch point for a drag
@@ -1236,18 +1232,7 @@ namespace com.keyman.dom {
 
       // Allow external focusing KMEW-123
       if(arguments.length > 1 && setFocus) {
-        if(this.keyman.util.device.touchable) {
-          var tEvent = {
-            pageX: 0,
-            pageY: 0,
-            target: e as HTMLElement
-          };
-
-          // Kinda hacky, but gets the job done.
-          (this.keyman.touchAliasing as DOMTouchHandlers).setFocusWithTouch(tEvent);
-        } else {
-          this.focusLastActiveElement();
-        }
+        this.focusLastActiveElement();
       }
 
       // Let the keyboard do its initial group processing
