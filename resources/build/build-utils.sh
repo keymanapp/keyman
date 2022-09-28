@@ -32,6 +32,11 @@
 #
 SHLVL=0
 
+function die() {
+  # TODO: consolidate this with fail() from shellHelperFunctions.sh
+  builder_die "$*"
+}
+
 function findKeymanRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
@@ -40,9 +45,6 @@ function findKeymanRoot() {
     KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
     readonly KEYMAN_ROOT
 }
-
-# Source builder_script
-. "$KEYMAN_ROOT/resources/build/builder.inc.sh"
 
 function findVersion() {
     local VERSION_MD="$KEYMAN_ROOT/VERSION.md"
@@ -168,9 +170,11 @@ function findShouldSentryRelease() {
 }
 
 findKeymanRoot
-_builder_setBuildScriptIdentifiers
 findTier
 findVersion
+
+# Source builder_script
+. "$KEYMAN_ROOT/resources/build/builder.inc.sh"
 # printVersionUtilsDebug
 printBuildNumberForTeamCity
 

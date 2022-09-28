@@ -45,8 +45,8 @@ function _builder_setBuildScriptIdentifiers() {
     readonly THIS_SCRIPT_PATH
     THIS_SCRIPT_NAME="$(basename "$THIS_SCRIPT")"
     readonly THIS_SCRIPT_NAME
-    # Leaves only the part of the path based upon KEYMAN_ROOT.
-    THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$KEYMAN_ROOT/"}
+    # Leaves only the part of the path based upon REPO_ROOT.
+    THIS_SCRIPT_IDENTIFIER=${THIS_SCRIPT_PATH#"$REPO_ROOT/"}
     readonly THIS_SCRIPT_IDENTIFIER
   fi
 }
@@ -97,22 +97,11 @@ builder_use_color() {
   fi
 }
 
-if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
-  builder_use_color true
-else
-  builder_use_color false
-fi
-
-function die() {
-  # TODO: consolidate this with fail() from shellHelperFunctions.sh
+function builder_die() {
   echo
   echo "${COLOR_RED}$*"
   echo
   exit 1
-}
-
-function builder_die() {
-  die "$*"
 }
 
 ####################################################################################
