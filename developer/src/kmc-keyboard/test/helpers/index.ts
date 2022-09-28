@@ -58,8 +58,18 @@ afterEach(function() {
 export function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: CompilerCallbacks): Section {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
-  const source = (new LDMLKeyboardXMLSourceFileReader(callbacks)).loadFile(inputFilename);
+  const data = callbacks.loadFile(inputFilename, inputFilename);
+  assert.isNotNull(data);
+
+  const reader = new LDMLKeyboardXMLSourceFileReader();
+  const source = reader.load(data);
+  assert.isNotNull(source);
+  assert.doesNotThrow(() => {
+    reader.validate(source, callbacks.loadLdmlKeyboardSchema());
+  });
+
   const compiler = new compilerClass(source, callbacks);
+
   if(!compiler.validate()) {
     return null;
   }

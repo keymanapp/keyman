@@ -1,17 +1,9 @@
 import * as xml2js from 'xml2js';
 import LDMLKeyboardXMLSourceFile from './ldml-keyboard-xml.js';
-import CompilerCallbacks from '../compiler/callbacks.js';
 import Ajv from 'ajv';
-import { CompilerMessages } from '../compiler/messages.js';
 import { boxXmlArray } from '../util/util.js';
 
 export default class LDMLKeyboardXMLSourceFileReader {
-  private readonly callbacks: CompilerCallbacks;
-
-  constructor (callbacks: CompilerCallbacks) {
-    this.callbacks = callbacks;
-  }
-
   /**
    * xml2js will not place single-entry objects into arrays.
    * Easiest way to fix this is to box them ourselves as needed
@@ -44,19 +36,12 @@ export default class LDMLKeyboardXMLSourceFileReader {
     return source;
   }
 
-  public validate(source: LDMLKeyboardXMLSourceFile): LDMLKeyboardXMLSourceFile {
-    const schema = JSON.parse(this.callbacks.loadLdmlKeyboardSchema().toString('utf8'));
+  public validate(source: LDMLKeyboardXMLSourceFile, schemaSource: Buffer): void {
+    const schema = JSON.parse(schemaSource.toString('utf8'));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: ajv.errorsText()}));
-      return null;
+      throw new Error(ajv.errorsText());
     }
-    return source;
-  }
-
-  public loadFile(filename: string) {
-    const buf = this.callbacks.loadFile(filename, filename);
-    return this.load(buf);
   }
 
   public load(file: Uint8Array): LDMLKeyboardXMLSourceFile {
@@ -80,6 +65,6 @@ export default class LDMLKeyboardXMLSourceFileReader {
       return a;
     })();
 
-    return this.validate(this.boxArrays(source));
+    return this.boxArrays(source);
   }
 }
