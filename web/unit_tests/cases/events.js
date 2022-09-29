@@ -19,7 +19,7 @@ describe('Event Management', function() {
     teardownKMW();
   });
 
-  it('Keystroke-based onChange event generation', function(done) {
+  it('Keystroke-based onChange event generation', function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -28,7 +28,6 @@ describe('Event Management', function() {
 
     ele.onchange = function() {
       ele.onchange = null;
-      done();
     }
 
     if(ele['kmw_ip']) {
@@ -48,9 +47,11 @@ describe('Event Management', function() {
     if(focusEvent) {
       ele.dispatchEvent(focusEvent);
     }
+
+    assert.isNull(ele.onchange);
   });
 
-  it('OSK-based onChange event generation', function(done) {
+  it('OSK-based onChange event generation', function() {
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
@@ -59,7 +60,6 @@ describe('Event Management', function() {
 
     ele.onchange = function() {
       ele.onchange = null;
-      done();
     }
 
     if(ele['kmw_ip']) {
@@ -83,18 +83,14 @@ describe('Event Management', function() {
       focusEvent.initFocusEvent("blur", true, false, ele.ownerDocument.defaultView, 0, ele);
     }
 
-    if(focusEvent)
+    if(focusEvent) {
       ele.dispatchEvent(focusEvent);
-  });
-
-  it('Keystroke-based onInput event generation', function(done) {
-    // Not all browsers support InputEvent.  Bypass the test for these.
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return;
     }
 
+    assert.isNull(ele.onchange);
+  });
+
+  it('Keystroke-based onInput event generation', function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -106,9 +102,6 @@ describe('Event Management', function() {
 
     ele.addEventListener("input", function() {
       counterObj.i++;
-      if(counterObj.i == fin) {
-        done();
-      }
     });
 
     if(ele['kmw_ip']) {
@@ -120,16 +113,11 @@ describe('Event Management', function() {
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
+
+    assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
   });
 
-  it('OSK-based onInput event generation', function(done) {
-    // Not all browsers support InputEvent.  Bypass the test for these.
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return;
-    }
-
+  it('OSK-based onInput event generation', function() {
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
@@ -141,9 +129,6 @@ describe('Event Management', function() {
 
     ele.addEventListener("input", function() {
       counterObj.i++;
-      if(counterObj.i == fin) {
-        done();
-      }
     });
 
     if(ele['kmw_ip']) {
@@ -155,5 +140,7 @@ describe('Event Management', function() {
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
+
+    assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
   });
 });
