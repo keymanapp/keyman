@@ -1455,7 +1455,7 @@ describe('Element Input/Output Interfacing', function() {
       });
 
       it('correctly maintains deadkeys', function() {
-        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.TouchAlias);
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.Mock);
       });
     });
   });
