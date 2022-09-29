@@ -405,7 +405,7 @@ namespace com.keyman.dom {
     doChangeEvent(_target: HTMLElement) {
       if(DOMEventHandlers.states.changed) {
         let event = new Event('change', {"bubbles": true, "cancelable": false});
-        
+
         // Ensure that touch-aliased elements fire as if from the aliased element.
         if(_target['base'] && _target['base']['kmw_ip']) {
           _target = _target['base'];
@@ -772,7 +772,7 @@ namespace com.keyman.dom {
 
       const x = touch.screenX;
       const y = touch.screenY;
-      
+
       // Allow content of input elements to be dragged horizontally or vertically
       if(typeof this.firstTouch == 'undefined' || this.firstTouch == null) {
         this.firstTouch={x:x,y:y};
