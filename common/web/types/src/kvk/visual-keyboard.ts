@@ -19,6 +19,7 @@ export class VisualKeyboardHeader {
   associatedKeyboard?: string;
   ansiFont: VisualKeyboardFont;          // generally unused
   unicodeFont: VisualKeyboardFont;
+  underlyingLayout?: string;
 };
 
 export class VisualKeyboardFont {

@@ -18,7 +18,7 @@ export default class KVKSFileReader {
 
     const parser = new xml2js.Parser({
       explicitArray: false,
-      mergeAttrs: true,
+      mergeAttrs: false,
       includeWhiteChars: true,
       normalize: false,
       emptyTag: {} as any
@@ -81,7 +81,8 @@ export default class KVKSFileReader {
         flags: 0,
         ansiFont: { name: "Arial", size: -12, color: 0xFF000008 }, // TODO-LDML: consider defaults
         unicodeFont: { name: "Arial", size: -12, color: 0xFF000008 }, // TODO-LDML: consider defaults
-        associatedKeyboard: source.visualkeyboard?.header?.kbdname
+        associatedKeyboard: source.visualkeyboard?.header?.kbdname,
+        underlyingLayout: source.visualkeyboard?.header?.layout,
       },
       keys: []
     };
@@ -100,19 +101,19 @@ export default class KVKSFileReader {
     }
 
     for(let encoding of source.visualkeyboard.encoding) {
-      let isUnicode = (encoding.name == 'unicode'),
+      let isUnicode = (encoding.$?.name == 'unicode'),
         font = isUnicode ? result.header.unicodeFont : result.header.ansiFont;
-      font.name = encoding.fontname;
-      font.size = parseInt(encoding.fontsize,10);
+      font.name = encoding.$?.fontname;
+      font.size = parseInt(encoding.$?.fontsize,10);
       for(let layer of encoding.layer) {
-        let shift = this.kvksShiftToKvkShift(layer.shift);
+        let shift = this.kvksShiftToKvkShift(layer.$?.shift);
         for(let sourceKey of layer.key) {
-          let vkey = (USVirtualKeyCodes as any)[sourceKey.vkey];
+          let vkey = (USVirtualKeyCodes as any)[sourceKey.$?.vkey];
           if(!vkey) {
             if(errors) {
               let e = new KVKSParseError();
               e.type = KVKSParseErrorType.invalidVkey;
-              e.vkey = sourceKey.vkey;
+              e.vkey = sourceKey.$?.vkey;
               errors.push(e);
             }
             continue;

@@ -17,7 +17,6 @@ export interface KVKSHeader {
   version?: string;
   kbdname?: string;
   flags?: KVKSFlags;
-  keybitmap?: string;
   layout?: string;
 };
 
@@ -29,19 +28,25 @@ export interface KVKSFlags {
 };
 
 export interface KVKSEncoding {
-  name?: string;
-  fontname?: string;
-  fontsize?: string;
+  $?: {
+    name?: string;
+    fontname?: string;
+    fontsize?: string;
+  };
   layer?: KVKSLayer[];
 };
 
 export interface KVKSLayer {
-  shift?: string;
+  $?: {
+    shift?: string;
+  };
   key?: KVKSKey[];
 };
 
 export interface KVKSKey {
-  vkey?: string;
+  $?: {
+    vkey?: string;
+  }
   bitmap?: string;
   _?: string;
 };
