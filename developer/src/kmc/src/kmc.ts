@@ -99,11 +99,15 @@ let [kmx,kvk] = compileKeyboard(inputFilename, options);
 // Output:
 
 if(kmx && kvk) {
-  const outFileKmx = program.outFile ?? path.join(path.dirname(inputFilename), path.basename(inputFilename, '.xml') + '.kmx');
+  const fileBaseName = program.outFile ?? inputFilename;
+  const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
+  const outFileDir = path.dirname(fileBaseName);
+
+  const outFileKmx = path.join(outFileDir, outFileBase + '.kmx');
   console.log(`Writing compiled keyboard to ${outFileKmx}`);
   fs.writeFileSync(outFileKmx, kmx);
 
-  const outFileKvk = program.outFile ?? path.join(path.dirname(inputFilename), path.basename(inputFilename, '.xml') + '.kvk');
+  const outFileKvk = path.join(outFileDir, outFileBase + '.kvk');
   console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
   fs.writeFileSync(outFileKvk, kvk);
 }
