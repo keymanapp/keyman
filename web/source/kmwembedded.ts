@@ -80,11 +80,6 @@ namespace com.keyman.osk {
     };
   }
 
-  VisualKeyboard.prototype.waitForFonts = function(this: VisualKeyboard, kfd, ofd) {
-    // a dummy function; it's only really used for 'native' KMW.
-    return true;
-  }
-
   SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
     // Parallels VisualKeyboard.prototype.touchHold, but for predictive suggestions instead of keystrokes.
     let suggestionEle = suggestionObj.div;
