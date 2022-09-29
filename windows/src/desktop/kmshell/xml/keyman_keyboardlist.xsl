@@ -159,7 +159,8 @@
                   <xsl:with-param name="id">enable_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="onclick">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
-                  <xsl:with-param name="background">#808080</xsl:with-param>
+                  <xsl:with-param name="background">#D44B2C</xsl:with-param>
+                  <xsl:with-param name="color">white</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Enable']"/></xsl:with-param>
                   <xsl:with-param name="visible">
                     <xsl:choose>
@@ -201,7 +202,7 @@
 
               <xsl:call-template name="button">
                 <xsl:with-param name="className">kbd_button</xsl:with-param>
-                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Languages_Modify']"/></xsl:with-param>
+                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Languages_Modify']"/>...</xsl:with-param>
                 <xsl:with-param name="command">javascript:showModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
               </xsl:call-template>
 
@@ -253,6 +254,9 @@
                 </div>
               </xsl:if>
               <div class="grid_item grid_item_title">
+                <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) = 0">
+                  <xsl:attribute name="style">color:red;</xsl:attribute>
+                </xsl:if>
                 <xsl:value-of select="$locale/string[@name='S_Caption_Languages']"/>
               </div>
               <div class="grid_item">
@@ -372,7 +376,7 @@
             <div class='modify-popup'>
 
               <div class="list-languages">
-                <div class="list-languages-title"><xsl:value-of select="$locale/string[@name='S_Caption_Languages']"/></div>
+                <div class="popup-header"><xsl:value-of select="$locale/string[@name='S_Languages_Modify']"/></div>
                 <div>
                   <xsl:apply-templates select="KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]">
                     <xsl:with-param name="modify">1</xsl:with-param>
@@ -382,6 +386,10 @@
                   <xsl:call-template name="button">
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Languages_Install']"/></xsl:with-param>
                     <xsl:with-param name="command">keyman:keyboardlanguage_install?id=<xsl:value-of select="id"/></xsl:with-param>
+                  </xsl:call-template>
+                  <xsl:call-template name="button">
+                    <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Close']"/></xsl:with-param>
+                    <xsl:with-param name="onclick">return hideModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
                   </xsl:call-template>
                 </div>
               </div>
@@ -411,22 +419,24 @@
 
       <div class="language-icon"><xsl:value-of select="substring(bcp47code, 1, 2)" /></div>
       <div><xsl:value-of select="langname" /> (<xsl:value-of select="bcp47code" />)</div>
-      <div class="hotkey" tabindex = "-1">
-        <xsl:for-each select="//KeymanLanguage">
-          <xsl:if test="keymankeyboardid=$id and bcp47code=$bcp47code">
-            <xsl:attribute name="style">margin-left: auto; margin-right: 19px;</xsl:attribute>
-            <a>
-            <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
-            <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
-            <xsl:choose>
-              <xsl:when test="hotkey">
-                <xsl:value-of select="hotkey"/></xsl:when>
-              <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
-            </xsl:choose>
-            </a>
-          </xsl:if>
-          </xsl:for-each>
-      </div>
+      <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) > 1">
+        <div class="hotkey" tabindex = "-1">
+          <xsl:for-each select="//KeymanLanguage">
+            <xsl:if test="keymankeyboardid=$id and bcp47code=$bcp47code">
+              <xsl:attribute name="style">margin-left: auto; margin-right: 19px;</xsl:attribute>
+              <a>
+              <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
+              <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
+              <xsl:choose>
+                <xsl:when test="hotkey">
+                  <xsl:value-of select="hotkey"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
+              </xsl:choose>
+              </a>
+            </xsl:if>
+            </xsl:for-each>
+        </div>
+      </xsl:if>
       <xsl:if test="$modify = 1">
         <div>
           <a>

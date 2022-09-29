@@ -44,8 +44,7 @@
   bottom: 0;
   width: 100%;
   overflow: hidden;
-  /*TODO background: #79C3DA;*/
-  background: #DADDDC;
+  background: #79C3DA;
   padding: 10px 8px 8px 8px;
 }
 
@@ -63,14 +62,12 @@
   padding: 4px;
   color: #000000;
   font-weight: bold;
-  /*TODO background: #79C3DA;*/
-  background: #DADDDC;
+  background: #79C3DA;
 }
 
 #header-pad
 {
-  /*TODO background: #79C3DA;*/
-  background: #DADDDC;
+  background: #79C3DA;
   width: 117px;
   height: 40px;
   position: absolute;
@@ -103,8 +100,7 @@
   font-size: 12px;
   padding: 8px 0px 8px 2px;
   border-right: 2px solid #888888;
-  /*TODO background: #79C3DA !important;;*/
-  background: #DADDDC !important;
+  background: #79C3DA !important;
   border-right: 1px solid #6D6C6F;
 }
 
@@ -129,9 +125,7 @@
 #menuframe_footer
 {
   height: 100%;
- /* background: #79C3DA;*/
-  /*TODO background: #79C3DA;*/
-  background: #DADDDC;
+  background: #79C3DA;
   border-right: 1px solid #6D6C6F;
 }
 
@@ -166,7 +160,7 @@ input.kbd_button
 
 input.kbd_button:hover, input[type='button']:hover
 {
-  background: #79c3da;
+  background: #F69169;
 }
 
 input[type='submit']:disabled, input[type='button']:disabled, button:disabled
@@ -259,6 +253,7 @@ html
 
 .list_item.kbd_list_item:focus{
   outline: none;
+  background: #79C3DA;
 }
 
 .list_item_focus
@@ -481,6 +476,7 @@ table tr
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 5px 2px 5px 5px;
 }
 
 .flex-container-title
@@ -663,10 +659,6 @@ table tr
   border: none;
 }
 
-.keyboard-language:hover
-{
-  background: #79C3DA;
-}
 .keyboard-language a
 {
   position: relative;
@@ -1208,4 +1200,15 @@ th
   background: white;
   z-index: 101;
   padding: 10px;
+}
+
+.popup-header {
+
+  font-size: 16px;
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+.list-languages-add{
+  padding-top: 10px;
 }

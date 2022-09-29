@@ -67,6 +67,7 @@
     <xsl:param name="shield" />
     <xsl:param name="visible" />
     <xsl:param name="background" />
+    <xsl:param name="color" />
 
     <xsl:choose>
       <xsl:when test="$shield = 1 and /Keyman/canelevate">
@@ -91,7 +92,8 @@
             margin-right: 8px;
             vertical-align: top;
             <xsl:if test="$visible = 'false'">display:none;</xsl:if>
-            <xsl:if test="background">background:<xsl:value-of select="$id"/></xsl:if>
+            <xsl:if test="string($background)">background:<xsl:value-of select="$background"/>;</xsl:if>
+            <xsl:if test="string($color)">color:<xsl:value-of select="$color"/>;</xsl:if>
           </xsl:attribute>
           <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 4px 5px 0px; display: inline; height: 18px;" src="/app/shield.png" />
           <xsl:value-of select="$caption" />
@@ -118,7 +120,8 @@
             display: inline-block;
             margin-right: 8px;
             <xsl:if test="$visible = 'false'">display:none;</xsl:if>
-            <xsl:if test="$background">background:<xsl:value-of select="$background"/></xsl:if>
+            <xsl:if test="string($background)">background:<xsl:value-of select="$background"/>;</xsl:if>
+            <xsl:if test="string($color)">color:<xsl:value-of select="$color"/>;</xsl:if>
           </xsl:attribute>
         </input>
       </xsl:otherwise>
