@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 16.0.71 alpha 2022-09-29
+
+* fix(developer): generate valid js when using unquoted digits in stores (#7369)
+* fix(developer): ensure backslash in paths passed to kmcomp (#7370)
+* fix(web): Update spacebar caption when refreshing layout (#7348)
+* fix(common/web): mock deadkey handling after rules manipulating context (#7345)
+
 ## 16.0.70 alpha 2022-09-26
 
 * fix(android): Add language name when installing default lexical-model (#7347)
