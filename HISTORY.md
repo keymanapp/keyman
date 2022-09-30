@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.72 alpha 2022-09-30
+
+* fix(web): Only unhighlight suggestion if there's a pending one (#7383)
+* refactor(common): Split builder utilities to separate script (#7365)
+
 ## 16.0.71 alpha 2022-09-29
 
 * fix(developer): generate valid js when using unquoted digits in stores (#7369)
