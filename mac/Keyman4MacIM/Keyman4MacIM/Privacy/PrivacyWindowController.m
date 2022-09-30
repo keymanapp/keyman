@@ -26,25 +26,11 @@
   [self.window setTitle:bundleDisplayName];
   [_alertText setStringValue:NSLocalizedString(@"privacy-alert-text", nil)];
   
-  NSFileManager *fileManager  = [NSFileManager defaultManager];
-  NSString *logoPath = [[NSBundle mainBundle] pathForResource:@"keyman-alert-logo" ofType:@"png"];
-  if ([fileManager fileExistsAtPath:logoPath]) {
-    NSLog(@"keyman-alert-logo exists at path %@", logoPath);
-    NSImage *logo = [[NSImage alloc]initWithContentsOfFile:logoPath];
-    [_appLogo setImage:logo];
-  } else {
-    NSLog(@"keyman-alert-logo does not exist at path %@", logoPath);
+  NSImage *keymanLogo = [NSImage imageNamed:NSImageNameApplicationIcon];
+  if (keymanLogo) {
+    [_appLogo setImage:keymanLogo];
   }
-  
   [_okButton setEnabled:YES];
-  
-  // main need to add button for easier access if we can detect that system will not prompt
-  /*  if (!hasAccessibility) {
-        NSString *urlString = @"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
-        [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
-    }
-   */
-
 }
 
 - (IBAction)closeAction:(id)sender {
