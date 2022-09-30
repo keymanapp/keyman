@@ -54,8 +54,8 @@ namespace com.keyman {
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
     warned = false;            // Warning flag (to prevent multiple warnings)
-    baseFont = 'sans-serif';   // Default font for mapped input elements
-    appliedFont = '';          // Chain of fonts to be applied to mapped input elements
+    baseFont = 'sans-serif';   // Default page font (utilized by the OSK)
+    appliedFont = '';          // Chain of fonts to be applied to OSK elements
     srcPath = '';              // Path to folder containing executing keymanweb script
     rootPath = '';             // Path to server root
     protocol = '';             // Protocol used for the KMW script.
