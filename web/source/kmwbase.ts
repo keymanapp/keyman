@@ -56,7 +56,6 @@ namespace com.keyman {
     warned = false;            // Warning flag (to prevent multiple warnings)
     baseFont = 'sans-serif';   // Default font for mapped input elements
     appliedFont = '';          // Chain of fonts to be applied to mapped input elements
-    fontCheckTimer = null;     // Timer for testing loading of embedded fonts
     srcPath = '';              // Path to folder containing executing keymanweb script
     rootPath = '';             // Path to server root
     protocol = '';             // Protocol used for the KMW script.
@@ -227,17 +226,6 @@ namespace com.keyman {
       }
 
       return metadata;
-    }
-
-    /**
-     * Expose font testing to allow checking that SpecialOSK or custom font has
-     * been correctly loaded by browser
-     *
-     *  @param  {string}  fName   font-family name
-     *  @return {boolean}         true if available
-     **/
-    ['isFontAvailable'](fName: string): boolean {
-      return this.util.checkFont({'family':fName});
     }
 
     /**
