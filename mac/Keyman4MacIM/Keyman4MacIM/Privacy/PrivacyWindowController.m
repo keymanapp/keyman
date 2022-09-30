@@ -2,13 +2,14 @@
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * PrivacyWindowController.m
- * TestInputMethod2
+ * Keyman4MacIM
  * 
  * Created by Shawn Schantz on 2022-09-20.
  * 
- * Controller for the alert dialog that is displayed at startup by the PrivacyConsent class
- * when it detects that the application has not been granted sufficient access
- * (Accessibility or PostEvent, depending on macOS version) to run properly.
+ * Controller for the alert dialog that is displayed at startup by the
+ * PrivacyConsent class when it detects that the application has not been
+ * granted sufficient access (Accessibility or PostEvent, depending on macOS
+ * version) to run properly.
  */
 
 #import "PrivacyWindowController.h"
