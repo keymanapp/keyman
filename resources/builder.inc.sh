@@ -8,10 +8,9 @@
 # * THIS_SCRIPT_NAME defines the basename of the running script
 # * THIS_SCRIPT_IDENTIFIER defines the repo-relative path of the running script
 # * _builder_ functions and variables are internal use only for builder.inc.sh, and 
-# subject to change at any time. Do not use them in other scripts.
+#   subject to change at any time. Do not use them in other scripts.
 # * Note: the running script is the top-level script that includes either 
 #   builder.inc.sh directly, or, just in the Keyman repo, via build-utils.sh.
-#   and subject to change
 #
 
 # _builder_init is called internally at the bottom of this file after we have
