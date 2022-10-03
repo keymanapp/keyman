@@ -7,9 +7,9 @@
 # * THIS_SCRIPT_PATH defines the full path of the running script
 # * THIS_SCRIPT_NAME defines the basename of the running script
 # * THIS_SCRIPT_IDENTIFIER defines the repo-relative path of the running script
-# * _builder_ functions and variables are internal use only for builder.inc.sh, and 
+# * _builder_ functions and variables are internal use only for builder.inc.sh, and
 #   subject to change at any time. Do not use them in other scripts.
-# * Note: the running script is the top-level script that includes either 
+# * Note: the running script is the top-level script that includes either
 #   builder.inc.sh directly, or, just in the Keyman repo, via build-utils.sh.
 #
 
@@ -188,6 +188,9 @@ _builder_failure_trap() {
     fi
 
     builder_finish_action failure $action $target
+
+    # Ensure that the exit code propagates fully.
+    exit $trappedExitCode
   fi
 }
 
