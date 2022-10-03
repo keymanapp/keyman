@@ -24,7 +24,6 @@ describe('Event Management', function() {
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
-    var aliasing = false;
 
     ele.onchange = function() {
       ele.onchange = null;
@@ -42,13 +41,12 @@ describe('Event Management', function() {
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
 
-    var focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    ele.dispatchEvent(focusEvent);
 
-    if(focusEvent) {
-      ele.dispatchEvent(focusEvent);
-    }
-
-    assert.isNull(ele.onchange);
+    // Asserts that the handler is called.  As the handler clears itself, it will only
+    // remain set if it hasn't been called.
+    assert.isNull(ele.onchange, '`onchange` handler was not called');
   });
 
   it('OSK-based onChange event generation', function() {
@@ -74,20 +72,12 @@ describe('Event Management', function() {
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
 
-    var focusEvent;
+    let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    ele.dispatchEvent(focusEvent);
 
-    if(typeof FocusEvent == 'function') {
-      focusEvent = new FocusEvent('blur', {relatedTarget: ele});
-    } else {
-      focusEvent = document.createEvent("FocusEvent");
-      focusEvent.initFocusEvent("blur", true, false, ele.ownerDocument.defaultView, 0, ele);
-    }
-
-    if(focusEvent) {
-      ele.dispatchEvent(focusEvent);
-    }
-
-    assert.isNull(ele.onchange);
+    // Asserts that the handler is called.  As the handler clears itself, it will only
+    // remain set if it hasn't been called.
+    assert.isNull(ele.onchange, '`onchange` handler was not called');
   });
 
   it('Keystroke-based onInput event generation', function() {
