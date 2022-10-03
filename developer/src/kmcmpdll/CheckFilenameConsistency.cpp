@@ -9,18 +9,7 @@
 #include "CheckFilenameConsistency.h"
 
 extern char CompileDir[MAX_PATH];
-/*
-bool FileExists(char const * filename) {
-  _finddata_t fi;
-  intptr_t n;
 
-  if ((n = _findfirst(filename, &fi)) != -1) {
-    _findclose(n);
-    return TRUE;
-  }
-  return FALSE;
-}
-*/
 bool IsRelativePath(KMX_CHAR const * p) {
   // Relative path (returns TRUE):
   //  ..\...\BITMAP.BMP

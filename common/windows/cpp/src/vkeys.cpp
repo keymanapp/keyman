@@ -19,7 +19,7 @@
 #include "pch.h"
 #include "../include/vkeys.h"
 
- const KMX_UCHAR* VKeyNames[256] = { 
+const KMX_UCHAR* VKeyNames[256] = {
 // Key Codes
   lpuch("K_?00"),				// &H0
   lpuch("K_LBUTTON"),			// &H1
@@ -291,7 +291,7 @@
   lpuch("K_?FF")				// &HFF
   };
 
- const KMX_UCHAR* VKeyISO9995Names[256] = {
+const KMX_UCHAR* VKeyISO9995Names[256] = {
   // Key Codes
   lpuch(""), // lpuch("K_?00"),				// &H0
   lpuch(""), // lpuch("K_LBUTTON"),			// &H1

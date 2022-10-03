@@ -1,4 +1,3 @@
-// taken from C:\Projects\keyman\keyman\common\core\desktop\src\kmx\kmx_base.h
 #pragma once
 #include <stdint.h>
 #include <km_types.h>
