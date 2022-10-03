@@ -24,7 +24,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 builder_check_color "$@"
 
-builder_describe "Runs all tests for the gesture-recognizer module" \
+builder_describe "Builds the lm-layer module" \
   "clean" \
   "configure" \
   "build" \
