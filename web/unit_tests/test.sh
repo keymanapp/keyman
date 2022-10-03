@@ -132,7 +132,7 @@ cd ../tools/recorder
 
 # First:  Web-core tests.
 pushd "$KEYMAN_ROOT/common/web/input-processor"
-./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
+./build.sh build:tools test || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd
 
