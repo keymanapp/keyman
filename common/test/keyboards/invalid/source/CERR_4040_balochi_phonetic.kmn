@@ -1,5 +1,7 @@
 ﻿store(&VERSION) '10.0'
+c ***** CERR_InvalidSystemStore 0x00004040 *************************
 store(&NXXAME) 'Balochi Phonetic'
+c ******************************************************************
 store(&TARGETS) 'any'
 store(&KMW_RTL) '1'
 store(&LAYOUTFILE) 'balochi_phonetic.keyman-touch-layout'

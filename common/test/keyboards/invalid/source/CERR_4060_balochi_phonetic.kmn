@@ -9,7 +9,9 @@ store(&MESSAGE) 'The Balochi Phonetic keyboard is distributed under The MIT Lice
 store(&KMW_HELPTEXT) 'This is a phonetically organized Balochi keyboard.'
 store(&VISUALKEYBOARD) 'balochi_phonetic.kvks'
 store(&BITMAP) 'CERR__balochi_phonetic.ico'
-
+c ***** CERR_90FeatureOnlyEmbedCSS 0x00004060 **********************
+store(&KMW_EMBEDCSS) 'naijatype.css'
+c ******************************************************************
 begin Unicode > use(main)
 
 group(main) using keys

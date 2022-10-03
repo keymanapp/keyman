@@ -11,3 +11,7 @@ store(&VISUALKEYBOARD) 'balochi_phonetic.kvks'
 store(&BITMAP) 'CERR__balochi_phonetic.ico'
 
 begin Unicode > use(main)
+
+c ***** CERR_GroupDoesNotExist 0x00004026 **************************
+
+c ******************************************************************

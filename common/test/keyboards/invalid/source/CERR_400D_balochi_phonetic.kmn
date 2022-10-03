@@ -1,4 +1,6 @@
-﻿store(&VERSION) '27.0'
+﻿ c ***** CERR_InvalidVersion 0x0000400D *****************************
+store(&VERSION) '127.0'
+c *******************************************************************
 store(&NAME) 'Balochi Phonetic'
 store(&TARGETS) 'any'
 store(&KMW_RTL) '1'

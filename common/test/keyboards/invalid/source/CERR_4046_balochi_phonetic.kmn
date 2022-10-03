@@ -1,4 +1,6 @@
-﻿store(&VERSION) '4.0'
+﻿c ***** CERR_70FeatureOnly 0x00004046 ******************************
+store(&VERSION) '4.0'
+c ******************************************************************
 store(&NAME) 'Balochi Phonetic'
 store(&TARGETS) 'any'
 store(&KMW_RTL) '1'

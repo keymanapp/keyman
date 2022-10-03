@@ -1,4 +1,6 @@
-﻿store(&VERSION) '10.0'
+﻿c ***** CERR_90FeatureOnlyLayoutFile 0x0000405C ********************
+store(&VERSION) '4.0'
+c ******************************************************************
 store(&NAME) 'Balochi Phonetic'
 store(&TARGETS) 'any'
 store(&KMW_RTL) '1'
@@ -15,7 +17,7 @@ begin Unicode > use(main)
 group(main) using keys
 + [CTRL B08] > '‎'
 + [CTRL B09] > '‏'
-+ [CTRL B10] >
++ [CTRL B10] > '–'
 + [SHIFT CTRL E11] > '“'
 + [SHIFT CTRL E12] > '”'
 + [CTRL E11] > '‘'

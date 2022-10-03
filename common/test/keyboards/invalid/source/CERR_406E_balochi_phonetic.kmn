@@ -1,4 +1,4 @@
-﻿store(&VERSION) '4.0'
+﻿store(&VERSION) '10.0'
 store(&NAME) 'Balochi Phonetic'
 store(&TARGETS) 'any'
 store(&KMW_RTL) '1'
@@ -11,8 +11,9 @@ store(&VISUALKEYBOARD) 'balochi_phonetic.kvks'
 store(&BITMAP) 'CERR__balochi_phonetic.ico'
 
 begin Unicode > use(main)
-
-group(main) using keys
+c ***** CERR_OutputInReadonlyGroup 0x0000406E **********************
+group using keys
+c ******************************************************************
 + [CTRL B08] > '‎'
 + [CTRL B09] > '‏'
 + [CTRL B10] > '–'

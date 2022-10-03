@@ -11,7 +11,9 @@ store(&VISUALKEYBOARD) 'balochi_phonetic.kvks'
 store(&BITMAP) 'CERR__balochi_phonetic.ico'
 
 begin Unicode > use(main)
+c ***** CERR_CodeInvalidInThisSection 0x0000402D *******************
 
+c ******************************************************************
 + [CTRL B08] > '‎'
 + [CTRL B09] > '‏'
 + [CTRL B10] > '–'

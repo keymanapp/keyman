@@ -16,6 +16,6 @@ rem		- vietnamese_vni
 
 rem added CERR_XXXX-Tests to test if right ErrorMessage is sent
 
-dir  /s/b ..\..\..\common\test\keyboards\kmcompx_tests\*.kmn
-dir  /s/b ..\..\..\..\keyboards\release\*.kmn | more |    findstr /v /i  "viet*" |  findstr /v /i  "eKwTamil99UniUpdt"
+dir  /s/b ..\..\..\common\test\keyboards\invalid\*.kmn
+dir  /s/b ..\..\..\..\keyboards\release\*.kmn | more |   findstr /v /i  "viet*" |  findstr /v /i  "eKwTamil99UniUpdt"
 

@@ -15,7 +15,9 @@ begin Unicode > use(main)
 group(main) using keys
 + [CTRL B08] > '‎'
 + [CTRL B09] > '‏'
-+ [CTRL B10] > L'1234'
+c ***** CERR_ZeroLengthString 0x00004017 ***************************
++ [CTRL B10] >
+c ******************************************************************
 + [SHIFT CTRL E11] > '“'
 + [SHIFT CTRL E12] > '”'
 + [CTRL E11] > '‘'

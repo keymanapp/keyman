@@ -1,9 +1,11 @@
-﻿store(&VERSION '10.0'
+﻿store(&VERSION) '10.0'
 store(&NAME) 'Balochi Phonetic'
 store(&TARGETS) 'any'
 store(&KMW_RTL) '1'
 store(&LAYOUTFILE) 'balochi_phonetic.keyman-touch-layout'
-store(&KEYBOARDVERSION) '1.4.2'
+c ***** CERR_KeyboardVersionFormatInvalid 0x0000405E ***************
+store(&KEYBOARDVERSION) 'abc'
+c ******************************************************************
 store(&COPYRIGHT) '© 2017-2021 SIL International'
 store(&MESSAGE) 'The Balochi Phonetic keyboard is distributed under The MIT License (MIT).'
 store(&KMW_HELPTEXT) 'This is a phonetically organized Balochi keyboard.'
