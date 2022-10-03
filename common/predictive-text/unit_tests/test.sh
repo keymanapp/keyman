@@ -43,7 +43,7 @@ if builder_start_action configure :libraries; then
 fi
 
 if builder_start_action configure :headless; then
-  if [[ -n "$CONFIGURED" ]]; then
+  if [ -n "$CONFIGURED" ]; then
     echo "Configuration already completed in ${BUILDER_TERM_START}${CONFIGURED}${BUILDER_TERM_END}; skipping."
   else
     do_configure
