@@ -293,7 +293,7 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg)
 
   if (szTextp) {
     strcpy(szText, szTextp);
-    strcat(szText, ending); }
+    strcat(szText, ending);}
 
   ErrChr = 0; *ErrExtra = 0;
 
@@ -414,7 +414,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile, PK
 
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
 {
-  FILE* fp_in =NULL;
+  FILE* fp_in = NULL;
   KMX_BOOL err;
   KMX_DWORD len;
   KMX_DWORD len2;
@@ -537,45 +537,45 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
 
   /* Add a store for the Keyman 6.0 copyright information string */
 
-    if(FShouldAddCompilerVersion) {
-      KMX_DWORD vmajor, vminor;
-      GetVersionInfo(&vmajor, &vminor);
-      u16sprintf(str,LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));
+  if(FShouldAddCompilerVersion) {
+    KMX_DWORD vmajor, vminor;
+    GetVersionInfo(&vmajor, &vminor);
+    u16sprintf(str,LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", HIWORD(vmajor), LOWORD(vmajor), HIWORD(vminor), LOWORD(vminor));
 
     AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
   }
 
-    /* Add a system store for the Keyman edition number */
-    u16sprintf(str, LINESIZE, L"%d", 0);  // I3481
-    AddStore(fk, TSS_CUSTOMKEYMANEDITION, str);
+  /* Add a system store for the Keyman edition number */
+  u16sprintf(str, LINESIZE, L"%d", 0);  // I3481
+  AddStore(fk, TSS_CUSTOMKEYMANEDITION, str);
 
-    PKMX_WCHAR tbuf = strtowstr((KMX_CHAR*) "Keyman");
-    AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, tbuf);
-    delete tbuf;
+  PKMX_WCHAR tbuf = strtowstr((KMX_CHAR*) "Keyman");
+  AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, tbuf);
+  delete tbuf;
 
-    // must preprocess for group and store names -> this isn't really necessary, but never mind!
-    while ((msg = ReadLine(fp_in, str, TRUE)) == CERR_None)
+  // must preprocess for group and store names -> this isn't really necessary, but never mind!
+  while ((msg = ReadLine(fp_in, str, TRUE)) == CERR_None)
+  {
+    p = str;
+    switch (LineTokenType(&p))
     {
-      p = str;
-      switch (LineTokenType(&p))
-      {
-        case T_VERSION:
-          *(p + 4) = 0;
-          if ((msg = AddStore(fk, TSS_VERSION, p)) != CERR_None) SetError(msg);
-          break;
+      case T_VERSION:
+        *(p + 4) = 0;
+        if ((msg = AddStore(fk, TSS_VERSION, p)) != CERR_None) SetError(msg);
+        break;
 
-        case T_GROUP:
-          if ((msg = ProcessGroupLine(fk, p)) != CERR_None) SetError(msg);
-          break;
+      case T_GROUP:
+        if ((msg = ProcessGroupLine(fk, p)) != CERR_None) SetError(msg);
+        break;
 
-        case T_STORE:
-          if ((msg = ProcessStoreLine(fk, p)) != CERR_None) SetError(msg);
-          break;
+      case T_STORE:
+        if ((msg = ProcessStoreLine(fk, p)) != CERR_None) SetError(msg);
+        break;
 
-        default:
-          break;
-      }
+      default:
+        break;
     }
+  }
 
   if (msg != CERR_EndOfFile) SetError(msg);
 
@@ -659,8 +659,8 @@ KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
     //if(tstr[3] == UC_SENTINEL && tstr[4] == CODE_USE) fk->StartGroup[1] = tstr[5] - 1;
 
     if (FSaveDebug) {
-        /* Record a system store for the line number of the begin statement */
-        AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN u"Unicode" : DEBUGSTORE_BEGIN u"ANSI");
+      /* Record a system store for the line number of the begin statement */
+      AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN u"Unicode" : DEBUGSTORE_BEGIN u"ANSI");
     }
   }
   else {
@@ -1407,7 +1407,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       r = (KMX_WCHAR*) u16chr(q, 0);  // I3481
     }
     delete[] sp->dpString;
-    if (*q) *((KMX_WCHAR*) u16chr(q, 0) - 1) = 0; // delete final space - safe because we control the formatting - ugly? scared?
+    if (*q) {
+      *((KMX_WCHAR*) u16chr(q, 0) - 1) = 0; // delete final space - safe because we control the formatting - ugly? scared?
+    }
     sp->dpString = q;
     break;
   }
@@ -1421,9 +1423,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_LAYOUTFILE:  // I3483
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
-     if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
-           return msg;
-     }
+    if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
+          return msg;
+    }
     // Used by KMW compiler
     break;
 
@@ -1995,7 +1997,7 @@ int LineTokenType(PKMX_WCHAR *str)
 KMX_WCHAR const * DeadKeyChars =
 u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
 
-KMX_BOOL strvalidchrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
+KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 {
   for (; *q; q++)
     if (!u16chr(chrs, *q)) return FALSE;
@@ -2089,7 +2091,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 
           tstr[mx++] = UC_SENTINEL;
           tstr[mx++] = CODE_DEADKEY;
-          if (!strvalidchrs(q, DeadKeyChars)) return CERR_InvalidDeadkey;
+          if (!StrValidChrs(q, DeadKeyChars)) return CERR_InvalidDeadkey;
           tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
           tstr[mx] = 0;
         }
@@ -3249,7 +3251,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
   wcscpy((PWSTR)(buf + offset), fk->szName);
   offset += wcslen(fk->szName)*2 + 2;
 
-  ck->dpCopyright = offset;//
+  ck->dpCopyright = offset;
   wcscpy((PWSTR)(buf + offset), fk->szCopyright);
   offset += wcslen(fk->szCopyright)*2 + 2;
 
@@ -3502,26 +3504,6 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token)
   }
   return FALSE;
 }
-/*
-KMX_BOOL IsRelativePath(KMX_CHAR *p)
-{
-  // Relative path (returns TRUE):
-  //  ..\...\BITMAP.BMP
-  //  PATH\BITMAP.BMP
-  //  BITMAP.BMP
-
-  // Semi-absolute path (returns FALSE):
-  //  \...\BITMAP.BMP
-
-  // Absolute path (returns FALSE):
-  //  C:\...\BITMAP.BMP
-  //  \\SERVER\SHARE\...\BITMAP.BMP
-
-  if (*p == '\\') return FALSE;
-  if (*p && *(p + 1) == ':') return FALSE;
-
-  return TRUE;
-}*/
 
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 {
