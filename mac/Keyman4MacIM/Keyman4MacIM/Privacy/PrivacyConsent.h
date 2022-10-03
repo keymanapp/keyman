@@ -1,4 +1,4 @@
-/*
+/**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * PrivacyConsent.h
@@ -15,9 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PrivacyConsent : NSObject
 @property (nonatomic, strong) PrivacyWindowController *privacyDialog;
-@property (nonatomic, copy, nullable) void (^handler)(void);
+@property (nonatomic, copy, nullable) void (^completionHandler)(void);
 + (PrivacyConsent *)shared;
-- (void)requestPrivacyAccess:(void (^)(void))completionHandler;
+- (void)requestPrivacyAccess:(void (^)(void))withCompletionHandler;
 @end
 
 NS_ASSUME_NONNULL_END

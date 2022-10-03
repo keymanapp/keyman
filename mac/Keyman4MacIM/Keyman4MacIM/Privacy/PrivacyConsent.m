@@ -1,4 +1,4 @@
-/*
+/**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * PrivacyConsent.m
@@ -41,6 +41,9 @@
     return shared;
 }
 
+/**
+ * For macOS earlier than 10.15: check for Accessibility access.
+ */
 - (BOOL)checkAccessibility
 {
   BOOL hasAccessibility = NO;
@@ -50,17 +53,16 @@
   return hasAccessibility;
 }
 
-/*
+/**
  * Principal method to set privacy checks in motion. May cause multiple dialogs to
  * be presented to the user.
  *
  * The completionHandler is provided to continue with work that the client
  * must execute after privacy is requested.
- *
  */
-- (void)requestPrivacyAccess:(void (^)(void))completionHandler
+- (void)requestPrivacyAccess:(void (^)(void))withCompletionHandler
 {
-  _handler = completionHandler;
+  _completionHandler = withCompletionHandler;
   BOOL hasAccessibility = NO;
   
   // check if we already have accessibility
@@ -78,9 +80,8 @@
   }
 }
 
-/*
+/**
  * For macOS earlier than 10.15: request Accessibility access.
- *
  */
 - (void)requestAccessibility
 {
@@ -89,10 +90,9 @@
   NSLog(@"  hasAccessibility: %@",hasAccessibility ? @"YES" : @"NO, requesting...");
 }
 
-/*
+/**
  * getter for privacyDialog -- does lazy load of controller as privacyDialog is not
  * needed when consent has already been provided by user.
- *
  */
 - (NSWindowController *)privacyDialog {
   if (!_privacyDialog) {
@@ -104,11 +104,9 @@
   return _privacyDialog;
 }
 
-/*
+/**
  * Initialize privacy alert appropriately as determined by macOS version.
- *
  */
-
 - (void)configureDialogForOsVersion {
 
   if (@available(macOS 10.15, *)) {
@@ -118,51 +116,45 @@
   }
 }
 
-/*
+/**
  * Initialize privacy dialog for macOS versions prior to Catalina (10.15).
  * In this case, request Accessibility access, not PostEvent.
- *
  */
-
 - (void)configureDialogForPreCatalina {
   void (^consentPrompt)(void) = ^(void) {
     [self requestAccessibility];
     
-    if (self.handler) {
-      self.handler();
+    if (self.completionHandler) {
+      self.completionHandler();
     }
   };
-  [_privacyDialog setConsentCallback:consentPrompt];
+  [_privacyDialog setCompletionHandler:consentPrompt];
 }
 
-/*
+/**
  * Initialize privacy dialog for macOS versions of Catalina (10.15) or later.
  * In this case, request PostEvent access, not Accessibility.
- *
  */
-
 - (void)configureDialogForCatalinaAndLater {
   void (^consentPrompt)(void) = ^(void) {
     [self requestPostEventAccess];
     
-    if (self.handler) {
-      self.handler();
+    if (self.completionHandler) {
+      self.completionHandler();
     }
   };
-  [_privacyDialog setConsentCallback:consentPrompt];
+  [_privacyDialog setCompletionHandler:consentPrompt];
 }
 
-/*
+/**
  * Present the PrivacyDialog alert to the user.
- *
  */
-
 - (void)showPrivacyDialog {
     [[self.privacyDialog window] setLevel:NSModalPanelWindowLevel];
     [[self.privacyDialog window] makeKeyAndOrderFront:nil];
 }
 
-/*
+/**
  * Check whether the user has allowed ListenEvent access.
  * Only available with macOS Catalina (10.15) or later.
  *
@@ -183,7 +175,7 @@
   return hasAccess;
 }
 
-/*
+/**
  * Check whether the user has allowed PostEvent access.
  * Only available with macOS Catalina (10.15) or later.
  *
@@ -204,7 +196,7 @@
   return hasAccess;
 }
 
-/*
+/**
  * Request ListenEvent access.
  * Only available with macOS Catalina (10.15) or later.
  */
@@ -221,7 +213,7 @@
   return granted;
 }
 
-/*
+/**
  * Request PostEvent access.
  * Only available with macOS Catalina (10.15) or later.
  */
@@ -237,6 +229,5 @@
   }
   return granted;
 }
-
 
 @end

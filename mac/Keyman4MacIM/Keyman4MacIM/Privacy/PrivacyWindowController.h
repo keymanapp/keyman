@@ -1,4 +1,4 @@
-/*
+/**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * PrivacyWindowController.h
@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak) IBOutlet NSButton *okButton;
 @property (weak) IBOutlet NSTextField *alertText;
 @property (weak) IBOutlet NSImageView *appLogo;
-@property (nonatomic, copy, nullable) void (^consentCallback)(void);
+@property (nonatomic, copy, nullable) void (^completionHandler)(void);
 
 - (IBAction)closeAction:(id)sender;
 

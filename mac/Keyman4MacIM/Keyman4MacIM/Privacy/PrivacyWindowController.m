@@ -1,4 +1,4 @@
-/*
+/**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * PrivacyWindowController.m
@@ -38,8 +38,8 @@
   [self close];
   
   // if callback to check for user consent has been set, execute it
-  if (self.consentCallback) {
-    self.consentCallback();
+  if (self.completionHandler) {
+    self.completionHandler();
   }
 }
 

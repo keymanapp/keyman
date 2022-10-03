@@ -90,17 +90,17 @@ NSString* _keymanDataPath = nil;
 #endif
 
       // first notify user and request access to Accessibility/PostEvent permissions
-      // and pass callback to continue with init via initCallback
+      // pass block as completion handler to complete init with initCompletion
       [PrivacyConsent.shared requestPrivacyAccess:^void (void){
-        [self initCallback];
+        [self initCompletion];
       }];
     }
 
     return self;
 }
 
-- (void)initCallback {
-  NSLog(@"initCallback method invoked");
+- (void)initCompletion {
+  NSLog(@"initCompletionHandler method invoked");
   [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                      andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                    forEventClass:kInternetEventClass
