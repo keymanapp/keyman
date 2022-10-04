@@ -142,20 +142,25 @@ fi
 # Note - the actual test setup is done in a separate test script, but it's easy
 # enough to route the calls through.
 
+TEST_OPTIONS=
+if builder_has_option --ci; then
+  TEST_OPTIONS=--ci
+fi
+
 if builder_start_action test :libraries; then
-  ./unit_tests/test.sh test:libraries
+  ./unit_tests/test.sh test:libraries $TEST_OPTIONS
 
   builder_finish_action success test :libraries
 fi
 
 if builder_start_action test :headless; then
-  ./unit_tests/test.sh test:headless
+  ./unit_tests/test.sh test:headless $TEST_OPTIONS
 
   builder_finish_action success test :headless
 fi
 
 if builder_start_action test :browser; then
-  ./unit_tests/test.sh test:browser
+  ./unit_tests/test.sh test:browser $TEST_OPTIONS
 
   builder_finish_action success test :browser
 fi
