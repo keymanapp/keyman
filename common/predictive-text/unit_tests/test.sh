@@ -62,19 +62,39 @@ if builder_start_action configure :browser; then
 fi
 
 if builder_start_action test :libraries; then
+
   # Note:  these do not yet provide TeamCity-friendly-formatted test reports.
-  # Sadly, appending them to the `npm run test` doesn't work; it'll require work in these modules.
+  # They do not have builder-based scripts, being run directly via npm package script.
+  # So, for now, we add a text header to clarify what is running at each stage, in
+  # addition to fair bit of `pushd` and `popd`.
   pushd "$KEYMAN_ROOT/common/models/wordbreakers"
-  npm run test || fail "models/wordbreakers tests failed"
+  echo
+  echo "### Running ${BUILDER_TERM_START}common/models/wordbreaker${BUILDER_TERM_END} tests"
+  # NPM doesn't seem to parse the post `--` part if specified via script variable.
+  # So... a simple if-else will do the job for now.
+  if builder_has_option --ci; then
+    npm run test -- -reporter mocha-teamcity-reporter
+  else
+    npm run test
+  fi
   popd
 
   pushd "$KEYMAN_ROOT/common/models/templates"
-  npm run test || fail "models/templates tests failed"
+  echo
+  echo "### Running ${BUILDER_TERM_START}common/models/templates${BUILDER_TERM_END} tests"
+  if builder_has_option --ci; then
+    npm run test -- -reporter mocha-teamcity-reporter
+  else
+    npm run test
+  fi
   popd
 
   pushd "$KEYMAN_ROOT/common/models/types"
-  # Is not mocha-based.
-  npm run test || fail "models/types tests failed"
+  echo
+  echo "### Running ${BUILDER_TERM_START}common/models/types${BUILDER_TERM_END} tests"
+  # Is not mocha-based; it's TSC-based instead, as we're just ensuring that the .d.ts
+  # file is a proper TS declaration file.
+  npm run test
   popd
 
   builder_finish_action success test :libraries
