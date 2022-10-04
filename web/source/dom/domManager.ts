@@ -1060,6 +1060,10 @@ namespace com.keyman.dom {
      * Description  Set default keyboard for the control
      */
     setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string) {
+      if(!Pelem) {
+        return;
+      }
+
       /* pass null for kbd to specify no default, or '' to specify the default system keyboard. */
       if(Pkbd !== null && Pkbd !== undefined) {
         var index = Pkbd.indexOf("Keyboard_");

@@ -114,6 +114,9 @@ namespace com.keyman {
     KC_(n, ln, Pelem){return '';}
     handleRotationEvents(){}
     // Will serve as an API function for a workaround, in case of future touch-alignment issues.
+    /**
+     * This function is deprecated in 16.0, with plans for removal in 17.0.
+     */
     ['alignInputs'](eleList?: HTMLElement[]){}
     hideInputs() {};
     namespaceID(Pstub) {};
