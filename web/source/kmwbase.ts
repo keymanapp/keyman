@@ -112,8 +112,12 @@ namespace com.keyman {
     getKeyboardPath(f, p?){return f;}
     KC_(n, ln, Pelem){return '';}
     handleRotationEvents(){}
-    // Legacy API function for touch-alias issue workarounds
-    // Touch-aliases have been eliminated, though.
+    /**
+     * Legacy API function for touch-alias issue workarounds
+     * Touch-aliases have been eliminated, though.
+     *
+     * This function is deprecated in 16.0, with plans for removal in 17.0.
+     */
     ['alignInputs'](eleList?: HTMLElement[]){}
     namespaceID(Pstub) {};
     preserveID(Pk) {};

@@ -60,7 +60,6 @@ namespace com.keyman.dom {
      */
     _ControlFocus: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
       var Ltarg: HTMLElement;
-      var device = this.keyman.util.device;
 
       Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
       if (Ltarg == null) {
@@ -69,11 +68,6 @@ namespace com.keyman.dom {
 
       if(Ltarg['body']) {
         Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
-      }
-
-      // Prevent any action if a protected input field
-      if(device.touchable && Ltarg.className == null) {
-        return true;
       }
 
       // Or if not a remappable input field
@@ -528,7 +522,7 @@ namespace com.keyman.dom {
     scrollBody(e: HTMLElement): void {
       var osk = this.keyman.osk;
 
-      if(!e || e.className == null || !osk) {
+      if(!e || !osk) {
         return;
       }
 
