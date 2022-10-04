@@ -265,7 +265,6 @@ namespace com.keyman.dom {
     disableTouchElement(Pelem: HTMLElement) {
       // Do not check for the element being officially disabled - it's also used for detachment.
       Pelem.inputMode = 'text';
-      this.setupNonKMWTouchElement(Pelem);
     }
 
     /**
@@ -343,15 +342,14 @@ namespace com.keyman.dom {
         return;
       }
 
-      var baseElement = isAlias ? Pelem['base'] : Pelem;
       // Do NOT test for pre-disabledness - we also use this to fully detach without officially 'disabling' via kmw-disabled.
       if((Pelem.ownerDocument.defaultView && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) ||
           Pelem instanceof HTMLIFrameElement) {
         this._DetachFromIframe(Pelem);
       } else {
-        var cnIndex = baseElement.className.indexOf('keymanweb-font');
-        if(cnIndex > 0 && !isAlias) { // See note about the alias below.
-          baseElement.className = baseElement.className.replace('keymanweb-font', '').trim();
+        let cnIndex = Pelem.className.indexOf('keymanweb-font');
+        if(cnIndex >= 0 && !isAlias) { // See note about the alias below.
+          Pelem.className = Pelem.className.replace('keymanweb-font', '').trim();
         }
 
         // Remove the element from our internal input tracking.
@@ -360,24 +358,13 @@ namespace com.keyman.dom {
           this.inputList.splice(index, 1);
         }
 
-        if(!isAlias) { // See note about the alias below.
-          this.keyman.util.detachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
-          this.keyman.util.detachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
-          this.keyman.util.detachDOMEvent(baseElement,'click', this.getHandlers(Pelem)._Click);
-        }
-        // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
+        this.keyman.util.detachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+        this.keyman.util.detachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+        this.keyman.util.detachDOMEvent(Pelem,'click', this.getHandlers(Pelem)._Click);
+
         Pelem.onkeypress = null;
         Pelem.onkeydown = null;
         Pelem.onkeyup = null;
-      }
-
-      // If we're disabling an alias, we should fully enable the base version.  (Thinking ahead to toggleable-touch mode.)
-      if(isAlias) {
-        this.inputList.push(baseElement);
-
-        baseElement.onkeypress = this.getHandlers(Pelem)._KeyPress;
-        baseElement.onkeydown = this.getHandlers(Pelem)._KeyDown;
-        baseElement.onkeyup = this.getHandlers(Pelem)._KeyUp;
       }
 
       var lastElem = this.lastActiveElement;
@@ -760,16 +747,9 @@ namespace com.keyman.dom {
       if(this.isAttached(Pelem) || Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
         if(this.keyman.util.device.touchable) {
           this.disableTouchElement(Pelem);
-          this.setupNonKMWTouchElement(Pelem);
-
-          // If a touch alias was removed, chances are it's gonna mess up our touch-based layout scheme, so let's update the touch elements.
-          window.setTimeout(function() {
-            this.listInputs();
-          }.bind(this), 1);
-        } else {
-          this.listInputs(); // Fix up our internal input ordering scheme.
         }
 
+        this.listInputs(); // Fix up our internal input ordering scheme.
         this.disableInputElement(Pelem);
       }
     }
