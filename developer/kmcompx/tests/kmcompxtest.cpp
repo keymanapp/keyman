@@ -24,50 +24,46 @@ int WINAPI msgproc(int line, KMX_DWORD dwMsgCode, char* szText)
 
 int main(int argc, char *argv[])
 {
-	if(argc < 3)
-	{
-		puts("Usage: kmcompxtest infile.kmn outfile.kmx");
+  PKMX_STR kmn_file = argv[1];
+  PKMX_STR kmx_file = argv[2];
+
+	if(argc < 3) {
+		puts("Usage: kmcompxtest source.kmn compiled.kmx");
 		return 1;
 	}
 
-	for(char *p = argv[1]; *p; p++) {
+	for(char *p = kmn_file; *p; p++) {
 		if(*p == '/') *p = '\\';
 	}
 
-	for(char *p = argv[2]; *p; p++) {
+	for(char *p = kmx_file; *p; p++) {
 		if(*p == '/') *p = '\\';
 	}
 
-	puts(argv[1]);
-	puts(argv[2]);
+	puts(kmn_file);
+	puts(kmx_file);
 
   char  first5[6] = "CERR_";
   char* pfirst5 = first5;
 
-  if (CompileKeyboardFile(argv[1], argv[2], FALSE, FALSE, TRUE, msgproc)) {
-    char* Testname = 1 + strrchr( (char*) argv[1], '\\');
-    if (strncmp(Testname, pfirst5, 5) == 0) return 1; //no Error found + CERR_ in Name
+  if (CompileKeyboardFile(kmn_file, kmx_file, FALSE, FALSE, TRUE, msgproc)) {
+    char* testname = 1 + strrchr( (char*) kmn_file, '\\');
+    if (strncmp(testname, pfirst5, 5) == 0) return 1; //no Error found + CERR_ in Name
 
-    // TODO: compare argv[2] to ../build/argv[2]
-    FILE* fp1 = fopen(argv[2], "rb");
+    // TODO: compare kmx_file to ../build/kmx_file
+    FILE* fp1 = fopen(kmx_file, "rb");
     char fname[260];
-    strcpy(fname, argv[2]);
-    char* p = strrchr(fname, '\\');
-    if (!p) p = fname;
-    strcpy(p, "\\..\\build\\");
-    char* q = strrchr(argv[2], '\\');
-    if (!q) q = argv[2]; else q++;
-    strcat(p, q);
+    strcpy(fname, kmx_file);
+
     FILE* fp2 = fopen(fname, "rb");
     if (!fp2) return 0; //assume pass if no reference kmx file
+
     fseek(fp1, 0, SEEK_END);
     auto sz1 = ftell(fp1);
     fseek(fp1, 0, SEEK_SET);
-
     fseek(fp2, 0, SEEK_END);
     auto sz2 = ftell(fp2);
     fseek(fp2, 0, SEEK_SET);
-
     if (sz1 != sz2) return 2;
 
     char* buf1 = new char[sz1];
@@ -78,13 +74,19 @@ int main(int argc, char *argv[])
   }
   else  /*if Errors found check number (CERR_4061_balochi_phonetic.kmn should produce Error 4061)*/
   {
-    char* Testname = 1 + strrchr( (char*) argv[1], '\\');
-    char* ErrNr = 1 + strchr(Testname, '_');
-    ErrNr[4] = '\0';
+    char* testname = strrchr( (char*) kmn_file, '\\') + 1;
     int   Error_Val = 0;
 
-    // Does Testname contain CERR_Nr ? ->  Get Value
-    if (strncmp(Testname, pfirst5, 5) == 0) {
+    // Does testname contain CERR_Nr ? ->  Get Value
+    if (strncmp(testname, pfirst5, 5) == 0) {
+      char* ErrNr = strchr(testname, '_') ;
+      if (ErrNr) {
+        ErrNr++;
+        ErrNr[4] = '\0';
+      }
+      else
+        return 99;
+
       std::istringstream(ErrNr) >> std::hex >> Error_Val;
 
       // check if Error_Val is in Array of Errors; if it is found return 0 (its not an error)
