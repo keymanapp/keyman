@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
+
+@@keys: [K_A][K_B][K_C][K_SPACE][K_A][K_B][K_D][K_SPACE][K_A][K_B][K_E][K_Q][K_SPACE][K_B][K_C]
+@@expected: y\u0020xd\u0020xeq\u0020m
+
+-->
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
+<keyboard locale="en" conformsTo="techpreview">
+  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+
+  <names>
+    <name value="TestKbd" />
+  </names>
+
+  <keys>
+    <!-- <key id="gap" gap="true" /> -->
+    <key id="space" to=" " width="5" />
+
+    <key id="a" to="a" />
+    <key id="b" to="b" />
+    <key id="c" to="c" />
+    <key id="d" to="d" />
+    <key id="e" to="e" />
+    <key id="f" to="f" />
+    <key id="g" to="g" />
+    <key id="h" to="h" />
+    <key id="i" to="i" />
+    <key id="j" to="j" />
+    <key id="k" to="k" />
+    <key id="l" to="l" />
+    <key id="m" to="m" />
+    <key id="n" to="n" />
+    <key id="o" to="o" />
+    <key id="p" to="p" />
+    <key id="q" to="q" />
+    <key id="r" to="r" />
+    <key id="s" to="s" />
+    <key id="t" to="t" />
+    <key id="u" to="u" />
+    <key id="v" to="v" />
+    <key id="w" to="w" />
+    <key id="x" to="x" />
+    <key id="y" to="y" />
+    <key id="z" to="z" />
+    <key id="bquote" to="`"/>
+  </keys>
+
+  <layerMaps form="hardware">
+    <layerMap id="base">
+      <!-- <row keys="" />  failed -->
+      <row keys="bquote" /> <!-- number row -->
+      <row keys="q w e r t y u i o p" />
+      <row keys="a s d f g h j k l" />
+      <row keys="z x c v b n m space" />
+      <!-- <row keys="space" /> -->
+    </layerMap>
+  </layerMaps>
+
+  <transforms type="simple">
+    <transform from="ab" to="x" />
+    <transform from="abc" to="y" />
+    <transform from="abef" to="z" />
+    <transform from="bc" to="m" />
+    <transform from="beq" to="n" />
+  </transforms>
+</keyboard>

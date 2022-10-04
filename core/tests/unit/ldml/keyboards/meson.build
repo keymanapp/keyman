@@ -7,7 +7,8 @@
 tests = [
 # disabling 000 until we have updates to core or to the keyboard so that it passes
 #  'k_000_null_keyboard',
-  'k_001_tiny'
+  'k_001_tiny',
+  'k_002_transform'
 ]
 
 # Setup kmc
