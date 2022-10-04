@@ -56,6 +56,11 @@ namespace com.keyman.dom {
     enablementObserver: MutationObserver;
 
     /**
+     * Tracks changes in inputmode state.
+     */
+    inputModeObserver: MutationObserver;
+
+    /**
      * Tracks a list of event-listening elements.
      *
      * In touch mode, this should contain touch-aliasing DIVs, but will contain other elements in non-touch mode.
@@ -98,6 +103,9 @@ namespace com.keyman.dom {
         }
         if(this.attachmentObserver) {
           this.attachmentObserver.disconnect();
+        }
+        if(this.inputModeObserver) {
+          this.inputModeObserver.disconnect();
         }
 
         for(let input of this.inputList) {
@@ -233,6 +241,7 @@ namespace com.keyman.dom {
 
       if(!this.isAttached(Pelem)) {
         this.setupElementAttachment(Pelem);
+        Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text';
         Pelem.inputMode = 'none';
       }
 
@@ -264,7 +273,13 @@ namespace com.keyman.dom {
      */
     disableTouchElement(Pelem: HTMLElement) {
       // Do not check for the element being officially disabled - it's also used for detachment.
-      Pelem.inputMode = 'text';
+      const intendedInputMode = Pelem._kmwAttachment.inputMode;
+
+      this.disableInputModeObserver();
+      Pelem.inputMode = intendedInputMode;
+      this.enableInputModeObserver();
+
+      this.setupNonKMWTouchElement(Pelem);
     }
 
     /**
@@ -904,6 +919,30 @@ namespace com.keyman.dom {
             domManager.listInputs();
           }.bind(this), 1);
         }
+      }
+    }.bind(this);
+
+    _InputModeObserverCore = function(this: DOMManager, mutations: MutationRecord[]) {
+      const keyman = com.keyman.singleton;
+      // Prevent infinite recursion from any changes / updates made within the observation handler.
+      this.disableInputModeObserver();
+      try {
+        for(const mutation of mutations) {
+          const target = mutation.target as HTMLElement;
+          if(!(this as DOMManager).isAttached(target)) {
+            continue;
+          }
+
+          const newValue = target.inputMode;
+
+          target._kmwAttachment.inputMode = newValue;
+
+          if(keyman.util.device.touchable) {
+            target.inputMode = 'none';
+          }
+        }
+      } finally {
+        this.enableInputModeObserver();
       }
     }.bind(this);
 
@@ -1611,6 +1650,12 @@ namespace com.keyman.dom {
         observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
         this.enablementObserver = new MutationObserver(this._EnablementMutationObserverCore);
         this.enablementObserver.observe(observationTarget, observationConfig);
+
+        /**
+         * Setup of handlers for dynamic detection of change in inputMode state.
+         */
+        this.inputModeObserver = new MutationObserver(this._InputModeObserverCore);
+        this.enableInputModeObserver();
       } else {
         console.warn("Your browser is outdated and does not support MutationObservers, a web feature " +
           "needed by KeymanWeb to support dynamically-added elements.");
@@ -1629,6 +1674,16 @@ namespace com.keyman.dom {
       this.keyman.setInitialized(2);
       return Promise.resolve();
     }.bind(this);
+
+    enableInputModeObserver() {
+      const observationTarget = document.querySelector('body');
+      const observationConfig = { subtree: true, attributes: true, attributeFilter: ['inputmode']};
+      this.inputModeObserver.observe(observationTarget, observationConfig);
+    }
+
+    disableInputModeObserver() {
+      this.inputModeObserver.disconnect();
+    }
 
     /**
      * Initialize the desktop user interface as soon as it is ready
