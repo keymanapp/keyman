@@ -3,7 +3,7 @@
 <!--
 from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
 
-@@keys: [K_A][K_B][K_C][K_SPACE][K_A][K_B][K_D][K_SPACE][K_A][K_B][K_E][K_Q][K_SPACE][K_B][K_C]
+@@keys: [K_A][K_B][K_C][K_BKQUOTE][K_A][K_B][K_D][K_BKQUOTE][K_A][K_B][K_E][K_Q][K_BKQUOTE][K_B][K_C]
 @@expected: y\u0020xd\u0020xeq\u0020m
 
 -->
@@ -19,6 +19,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
     <!-- <key id="gap" gap="true" /> -->
     <key id="space" to=" " width="5" />
 
+    <!-- bug: these keys should not need to be specified -->
     <key id="a" to="a" />
     <key id="b" to="b" />
     <key id="c" to="c" />
@@ -50,12 +51,11 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
 
   <layerMaps form="hardware">
     <layerMap id="base">
-      <!-- <row keys="" />  failed -->
-      <row keys="bquote" /> <!-- number row -->
+      <row keys="space" /> <!-- number row -->
       <row keys="q w e r t y u i o p" />
       <row keys="a s d f g h j k l" />
-      <row keys="z x c v b n m space" />
-      <!-- <row keys="space" /> -->
+      <row keys="z x c v b n m" />
+      <!-- <row keys="space" /> --> <!-- Bug: 5 rows is 'too many'? -->
     </layerMap>
   </layerMaps>
 
