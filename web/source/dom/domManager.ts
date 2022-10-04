@@ -929,7 +929,7 @@ namespace com.keyman.dom {
       try {
         for(const mutation of mutations) {
           const target = mutation.target as HTMLElement;
-          if(!(this as DOMManager).isAttached(target)) {
+          if(!this.isAttached(target)) {
             continue;
           }
 
