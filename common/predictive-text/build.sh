@@ -81,9 +81,7 @@ fi
 
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 do_clean() {
-  if [ -d $LMLAYER_OUTPUT ]; then
-    rm -rf "$LMLAYER_OUTPUT"
-  fi
+  rm -rf "$LMLAYER_OUTPUT"
 }
 
 CLEANED=

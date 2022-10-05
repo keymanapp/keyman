@@ -7,10 +7,9 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-SCRIPT_ROOT="$(dirname "$THIS_SCRIPT")"
 
 # This script runs from its own folder
-cd "$SCRIPT_ROOT"
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 

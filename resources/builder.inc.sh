@@ -189,7 +189,9 @@ _builder_failure_trap() {
 
     builder_finish_action failure $action $target
 
-    # Ensure that the exit code propagates fully.
+    # Make 100% sure that the exit code chains fully.
+    # Without this, nested scripts have failed to chain errors from npm calls past the script
+    # that directly executed the failed npm command.
     exit $trappedExitCode
   fi
 }
