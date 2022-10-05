@@ -269,7 +269,6 @@ KMX_BOOL AddCompileString(LPSTR buf)
 KMX_BOOL AddCompileMessage(KMX_DWORD msg)
 {
   KMX_CHAR szText[SZMAX_ERRORTEXT + 1 + 280];
-  KMX_CHAR ending[SZMAX_ERRORTEXT + 1 + 280] = "";
   KMX_CHAR* szTextp = NULL;
 
   SetLastError(0);
@@ -287,14 +286,10 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg)
   szTextp = GetCompilerErrorString(msg);
 
   if (ErrChr > 0)
-    sprintf(ending, "  character offset:%d", ErrChr);
+    sprintf(strchr(szText, 0), "  character offset:%d", ErrChr);
 
   if (*ErrExtra)
-    sprintf(ending, " extra:%s", ErrExtra);
-
-  if (szTextp) {
-    strcpy(szText, szTextp);
-    strcat(szText, ending);}
+    sprintf(strchr(szText, 0), " extra:%s", ErrExtra);
 
   ErrChr = 0; *ErrExtra = 0;
 
@@ -3724,14 +3719,6 @@ KMX_BOOL IsValidCallStore(PFILE_STORE fs)
 
 FILE* CreateTempFile()
 {
-  //return tmpfile();
-  KMX_CHAR szTempPathBuffer[MAX_PATH], szTempFileName[MAX_PATH];   // I3228   // I3510
-
-  if (!tmpfile())
-    return NULL;
-  if (!tmpnam(szTempPathBuffer))
-    return NULL;                                                  // I3228   // I3510
-  
   return tmpfile();
 }
 
