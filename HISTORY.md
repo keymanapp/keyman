@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.75 alpha 2022-10-05
+
+* chore(common): builder script maintenance (#7405)
+
 ## 16.0.74 alpha 2022-10-04
 
 * chore(android/engine): Display Toast notifications on Sentry errors (#7390)
