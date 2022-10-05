@@ -157,6 +157,11 @@ if [ "$DO_COPY" = true ]; then
     fi
 fi
 
+# Cursory check that KMW exists
+if [ ! -f "$KMEA_ASSETS/keymanandroid.js" ]; then
+  die "ERROR: keymanweb not built"
+fi
+
 echo "Gradle Build of KMEA"
 cd $KMA_ROOT/KMEA
 
