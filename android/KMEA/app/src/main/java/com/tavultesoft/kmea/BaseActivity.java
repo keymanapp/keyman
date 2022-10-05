@@ -36,6 +36,19 @@ public class BaseActivity extends AppCompatActivity {
     Toast.makeText(context, String.format(msg, args), duration).show();
   }
 
+  /**
+   * Some classes aren't an AppCompatActivity and need this helper to send Toast notifications
+   * @param defaultContext - the context to fallback if localeUpdatedContext is null
+   * @param msg - Toast notification string
+   * @param duration - length of the Toast notification (Toast.LENGTH_LONG or Toast.LENGTH_SHORT)
+   */
+  public static void makeToast(Context defaultContext, String msg, int duration) {
+    Context context = (localeUpdatedContext != null) ? localeUpdatedContext : defaultContext;
+    if (context != null) {
+      Toast.makeText(context, msg, duration).show();
+    }
+  }
+
   @Override
   protected void attachBaseContext(Context newBase) {
     // Override the app locale using the BCP 47 tag from shared preferences

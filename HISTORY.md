@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 16.0.74 alpha 2022-10-04
+
+* chore(android/engine): Display Toast notifications on Sentry errors (#7390)
+* fix(android/engine): Dismiss subkeys on multi-touch (#7388)
+
+## 16.0.73 alpha 2022-10-03
+
+* fix(developer): handle invalid kps xml when loading project view (#7371)
+
 ## 16.0.72 alpha 2022-09-30
 
 * fix(web): Only unhighlight suggestion if there's a pending one (#7383)
