@@ -20,9 +20,6 @@ if compiler.get_id() == 'msvc'
   add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
 endif
 
-py = import('python3')
-python = py.find_python()
-
 message('host_machine.system(): ' + host_machine.system())
 message('compiler.get_id(): ' + compiler.get_id())
 
