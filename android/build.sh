@@ -173,13 +173,6 @@ if builder_start_action build:app; then
   builder_finish_action success build:app
 fi
 
-# Default build action
-if builder_start_action build; then
-  _build_engine
-  _build_app
-  builder_finish_action success build
-fi
-
 # Building Sample apps
 if builder_start_action build:samples; then
   _build_samples
