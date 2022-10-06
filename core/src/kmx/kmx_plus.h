@@ -125,6 +125,13 @@ struct COMP_KMXPLUS_ELEM {
    * @brief True if section is valid.
    */
   bool valid(KMX_DWORD length) const;
+  /**
+   * @param elementNumber element number, 0..count-1
+   * @param length fillin: length of list
+   * @return pointer to first element of list of length length. or nullptr
+   */
+  const COMP_KMXPLUS_ELEM_ELEMENT *getElementList(KMX_DWORD elementNumber,
+                                                  KMX_DWORD &length) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_ELEM) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");

@@ -297,9 +297,45 @@ COMP_KMXPLUS_ELEM::valid(KMX_DWORD _kmn_unused(length)) const {
     debug_println("header.size < expected size");
     return false;
   }
-  // TODO-LDML
-  debug_println("!! More to do here.");
+  const COMP_KMXPLUS_ELEM_ENTRY &firstEntry = entries[0];
+  if (firstEntry.length != 0 ) {
+    debug_println("ERROR: elem[0].length != 0");
+    return false;
+  }
+  if (firstEntry.offset + sizeof(COMP_KMXPLUS_ELEM_ELEMENT) > header.size) {
+    // TODO-LDML: change to  (firstEntry.offset != 0 )
+    // Blocked by https://github.com/keymanapp/keyman/issues/7404
+    debug_println("ERROR: preposterous elem[0].offset");
+    return false;
+  }
+  for (KMX_DWORD e = 1; e < count; e++) {
+    // Don't need to recheck the first entry here.
+    KMX_DWORD listLength;
+    if (getElementList(e, listLength) == nullptr) {
+      return false;
+    }
+    if (listLength == 0) {
+      debug_println("ERROR: elem[e>0].length == 0");
+      return false;
+    }
+  }
   return true;
+}
+
+const COMP_KMXPLUS_ELEM_ELEMENT *
+COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) const {
+  if (elementNumber > count) {
+    return nullptr;
+  }
+  const COMP_KMXPLUS_ELEM_ENTRY &entry = entries[elementNumber];
+  length = entry.length;
+  if (entry.offset + (entry.length * sizeof(COMP_KMXPLUS_ELEM_ELEMENT)) > header.size) {
+    debug_println("ERROR: !! COMP_KMXPLUS_ELEM::getElementList")
+  }
+  // pointer to beginning of elem section
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(this);
+  // pointer to specified entry
+  return reinterpret_cast<const COMP_KMXPLUS_ELEM_ELEMENT *>(rawdata + entry.offset);
 }
 
 std::u16string

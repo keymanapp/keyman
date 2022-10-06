@@ -46,7 +46,7 @@ namespace kbp {
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), vkey_to_string()
+  ), _valid(false), vkey_to_string(), simple_transforms()
 {
 
 // TODO-LDML: move these asserts into kmx_plus
@@ -58,6 +58,12 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
  */
 #define KMXPLUS_ASSERT(expect,actual) if ((expect) != (actual)) { \
     KMXPLUS_NOTEQUAL(expect, actual); \
+    _valid = false; \
+    return; \
+  }
+
+#define KMXPLUS_ASSERT_NOTNULL(p) if ((p) == nullptr) { \
+    KMXPLUS_NOTEQUAL("!nullptr", p); \
     _valid = false; \
     return; \
   }
@@ -81,7 +87,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       std::u16string str;
       const kmx::COMP_KMXPLUS_KEYS_ENTRY &entry = kplus.keys->entries[i];
       if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
-        KMXPLUS_ASSERT(false, nullptr == kplus.strs); // need a string table to get strings
+        KMXPLUS_ASSERT_NOTNULL(kplus.strs); // need a string table to get strings
         str = kplus.strs->get(entry.to);
       } else {
         str = entry.get_string();
@@ -90,9 +96,49 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       vkey_to_string[vkey_id] = str; // assign the string
     }
   } // else: no keys! but still valid. Just, no keys.
+  if (kplus.tran != nullptr) {
+    KMXPLUS_ASSERT_NOTNULL(kplus.elem);  // fail if elems arent' there
+    KMXPLUS_ASSERT_NOTNULL(kplus.strs);  // gonna need strs
+    for (KMX_DWORD i = 0; i < kplus.tran->count; i++) {
+      const kmx::COMP_KMXPLUS_TRAN_ENTRY &entry = kplus.tran->entries[i];
+      // 'to' is always a string, unlike keys
+      const std::u16string tostr = kplus.strs->get(entry.to);
+      // now, fetch the 'from'
+      ldml_string_list list;
+
+      // TODO-LDML: before=
+      // TODO-LDML: error=
+
+      // process From
+      const KMX_DWORD elemNo = entry.from;
+      KMXPLUS_ASSERT(true, elemNo < kplus.elem->count);
+
+      // TODO-LDML: refactor this
+      KMX_DWORD elemListLength                       = 0;
+      const kmx::COMP_KMXPLUS_ELEM_ELEMENT *elemList = kplus.elem->getElementList(elemNo, elemListLength);
+      KMXPLUS_ASSERT_NOTNULL(elemList);  // either invalid OR zero length
+      KMXPLUS_ASSERT(true, elemListLength > 0);   // not a zero length
+
+      // now we have an array of elements
+      for (KMX_DWORD e = 0; e < elemListLength; e++) {
+        const kmx::COMP_KMXPLUS_ELEM_ELEMENT &element = elemList[e];
+        std::u16string str;
+        if (element.flags && LDML_ELEM_FLAGS_UNICODE_SET) {
+          str = kplus.strs->get(element.element);
+          // TODO-LDML: actually a UnicodeSet here?!
+        } else {
+          str = element.get_string();  // Get single UTF-16
+        }
+        list.push_back(str);  // add the string to the end
+      }
+      // Now, add the list to the map
+      simple_transforms.insert({list, tostr});
+    }
+  }
   KMXPLUS_PRINTLN("_valid = true");
 
 #undef KMXPLUS_ASSERT
+#undef KMXPLUS_ASSERT_NOTNULL
   _valid = true;
 }
 

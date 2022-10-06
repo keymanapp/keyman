@@ -24,6 +24,15 @@ namespace kbp {
 
 #define KM_KBP_LMDL_PROCESSOR_VERSION u"1.0"
 
+  /**
+   * An ordered list of strings.
+   */
+  typedef std::vector<std::u16string> ldml_string_list;
+  /**
+   * map from transform list to string
+   */
+  typedef std::map<ldml_string_list, std::u16string> ldml_simple_transforms;
+
  /**
   * identifier for keybag lookup
   */
@@ -33,6 +42,7 @@ namespace kbp {
   private:
     bool _valid;
     std::map<ldml_vkey_id, std::u16string> vkey_to_string;
+    ldml_simple_transforms  simple_transforms;
 
   public:
     ldml_processor(
