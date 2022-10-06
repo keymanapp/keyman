@@ -64,7 +64,6 @@ struct _IBusKeymanEngine {
     gchar           *ldmlfile;
     gchar           *kb_name;
     gchar           *char_buffer;
-    gunichar         firstsurrogate;
     gboolean         lctrl_pressed;
     gboolean         rctrl_pressed;
     gboolean         lalt_pressed;
@@ -223,7 +222,6 @@ static void reset_context(IBusEngine *engine)
     km_kbp_context *context;
 
     g_message("reset_context");
-    keyman->firstsurrogate = 0;
     context = km_kbp_state_context(keyman->state);
     if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
     {
@@ -313,7 +311,6 @@ ibus_keyman_engine_constructor(
 
     keyman->kb_name = NULL;
     keyman->ldmlfile = NULL;
-    keyman->firstsurrogate = 0;
     keyman->lalt_pressed = FALSE;
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
@@ -505,44 +502,25 @@ process_unicode_char_action(
   IBusKeymanEngine *keyman,
   const km_kbp_action_item *action_item
 ) {
-  if (g_unichar_type(action_item->character) == G_UNICODE_SURROGATE) {
-    if (keyman->firstsurrogate == 0) {
-      keyman->firstsurrogate = action_item->character;
-      g_message("first surrogate %d", keyman->firstsurrogate);
-    } else {
-      glong items_read, items_written;
-      gunichar2 utf16_pair[2] = {keyman->firstsurrogate, action_item->character};
-      gchar *utf8_pair        = g_utf16_to_utf8(utf16_pair, 2, &items_read, &items_written, NULL);
-      if (keyman->char_buffer == NULL) {
-        keyman->char_buffer = utf8_pair;
-      } else {
-        gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8_pair, NULL);
-        g_free(keyman->char_buffer);
-        g_free(utf8_pair);
-        keyman->char_buffer = new_buffer;
-      }
-      keyman->firstsurrogate = 0;
-    }
+  g_assert(g_unichar_type(action_item->character) != G_UNICODE_SURROGATE);
+  gchar *utf8   = (gchar *)g_new0(gchar, 12);
+  gint numbytes = g_unichar_to_utf8(action_item->character, utf8);
+  if (numbytes > 12) {
+    g_error("g_unichar_to_utf8 overflowing buffer");
+    g_free(utf8);
   } else {
-    gchar *utf8   = (gchar *)g_new0(gchar, 12);
-    gint numbytes = g_unichar_to_utf8(action_item->character, utf8);
-    if (numbytes > 12) {
-      g_error("g_unichar_to_utf8 overflowing buffer");
-      g_free(utf8);
+    g_message("unichar:U+%04x, bytes:%d, string:%s", action_item->character, numbytes, utf8);
+    if (keyman->char_buffer == NULL) {
+      g_message("setting buffer to converted unichar");
+      keyman->char_buffer = utf8;
     } else {
-      g_message("unichar:U+%04x, bytes:%d, string:%s", action_item->character, numbytes, utf8);
-      if (keyman->char_buffer == NULL) {
-        g_message("setting buffer to converted unichar");
-        keyman->char_buffer = utf8;
-      } else {
-        g_message("appending converted unichar to CHAR buffer");
-        gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8, NULL);
-        g_free(keyman->char_buffer);
-        g_free(utf8);
-        keyman->char_buffer = new_buffer;
-      }
-      g_message("CHAR buffer is now %s", keyman->char_buffer);
+      g_message("appending converted unichar to CHAR buffer");
+      gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8, NULL);
+      g_free(keyman->char_buffer);
+      g_free(utf8);
+      keyman->char_buffer = new_buffer;
     }
+    g_message("CHAR buffer is now %s", keyman->char_buffer);
   }
   return TRUE;
 }
@@ -671,7 +649,6 @@ process_capslock_action(
 }
 
 static gboolean process_end_action(IBusKeymanEngine *keyman) {
-  keyman->firstsurrogate = 0;
   if (keyman->char_buffer != NULL) {
     ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
     g_free(keyman->char_buffer);
