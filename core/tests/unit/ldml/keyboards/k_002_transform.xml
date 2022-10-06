@@ -3,7 +3,9 @@
 <!--
 from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
 
-@@keys: [K_A][K_B][K_C][K_BKQUOTE][K_A][K_B][K_D][K_BKQUOTE][K_A][K_B][K_E][K_Q][K_BKQUOTE][K_B][K_C]
+Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are functioning properly.
+
+@@keys: [K_Y][K_BKQUOTE][K_A][K_B][K_D][K_BKQUOTE][K_A][K_B][K_E][K_Q][K_BKQUOTE][K_B][K_C]
 @@expected: y\u0020xd\u0020xeq\u0020m
 
 -->

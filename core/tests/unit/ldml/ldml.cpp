@@ -229,7 +229,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
       assert(false);
     }
 
-#if 1
+#if 0
     // Extra debugging
     std::cerr << "TODO-LDML: extra debugging here" << std::endl;
     std::cerr << "VKEY: " << p.vk << std::endl;

@@ -265,6 +265,7 @@ ldml_processor::process_event(
       unsigned long longest_length = 0;  // length of longest match
       // auto i                       = 0;   // counter
       std::u16string result;
+      // TODO-LDML: need to handle partial matches.
       // bool partial       = false;      // true if the longest was a partial match
       for (auto it = simple_transforms.begin(); it != simple_transforms.end(); it++/*,i++*/) {
         auto list = it->first;
@@ -273,7 +274,7 @@ ldml_processor::process_event(
           continue; // already have a longer match
         }
         if (list.size() > ctxt.size()) {
-          continue; // not enough ctxt for a match
+          continue; // not enough ctxt for a match (TODO-LDML: partial match.)
         }
         // Now, check for match
         bool is_match = true;
