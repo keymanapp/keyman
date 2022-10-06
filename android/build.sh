@@ -124,14 +124,14 @@ function _build_app() {
 }
 
 function _build_samples() {
-  cd "$KEYMAN_ROOT/android/samples/KMSample1"
+  cd "$KEYMAN_ROOT/android/Samples/KMSample1"
   ./build.sh $SAMPLE_FLAGS
 
   if [ $? -ne 0 ]; then
     die "ERROR: KMSample1/build.sh failed"
   fi
 
-  cd "$KEYMAN_ROOT/android/samples/KMSample2"
+  cd "$KEYMAN_ROOT/android/Samples/KMSample2"
   ./build.sh SAMPLE_FLAGS
 
   if [ $? -ne 0 ]; then
