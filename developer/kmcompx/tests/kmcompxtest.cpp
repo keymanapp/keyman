@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
   char* pfirst5 = first5;
 
   if (CompileKeyboardFile(kmn_file, kmx_file, FALSE, FALSE, TRUE, msgproc)) {
-    char* testname = 1 + strrchr( (char*) kmn_file, '\\');
+    char* testname = strrchr( (char*) kmn_file, '\\') + 1;
     if (strncmp(testname, pfirst5, 5) == 0) return 1; //no Error found + CERR_ in Name
 
     // TODO: compare kmx_file to ../build/kmx_file
@@ -72,30 +72,26 @@ int main(int argc, char *argv[])
     fread(buf2, 1, sz1, fp2);
     return memcmp(buf1, buf2, sz1) ? 3 : 0;
   }
-  else  /*if Errors found check number (CERR_4061_balochi_phonetic.kmn should produce Error 4061)*/
+  else  /*if Errors found check number (e.g. CERR_4061_balochi_phonetic.kmn should produce Error 4061)*/
   {
+    int error_val = 0;
     char* testname = strrchr( (char*) kmn_file, '\\') + 1;
-    int   Error_Val = 0;
 
-    // Does testname contain CERR_Nr ? ->  Get Value
-    if (strncmp(testname, pfirst5, 5) == 0) {
-      char* ErrNr = strchr(testname, '_') ;
-      if (ErrNr) {
-        ErrNr++;
-        ErrNr[4] = '\0';
-      }
-      else
-        return 99;
+    // Does testname contain CERR_  && contains '_' on pos 9 ? ->  Get ErrorValue
+    if ((strncmp(testname, pfirst5, 5) == 0) &&   (testname[9] == '_'))
+    {
+      char* ErrNr = strchr(testname, '_') +1 ;
+      std::istringstream(ErrNr) >> std::hex >> error_val;
 
-      std::istringstream(ErrNr) >> std::hex >> Error_Val;
-
-      // check if Error_Val is in Array of Errors; if it is found return 0 (its not an error)
+      // check if error_val is in Array of Errors; if it is found return 0 (it's not an error)
       for (int i = 0; i < error_vec.size() ; i++) {
-        if (error_vec[i] == Error_Val)
+        if (error_vec[i] == error_val)
           return 0;
       }
       return 1;
     }
+    else
+    return 99;  // wrong name
   }
   return 1;
 }
