@@ -34,14 +34,21 @@ int IsHangulSyllable(const char16_t *codename, int *code);
 
 KMX_BOOL FileExists(const char *filename)
 {
-  _finddata_t fi;
   intptr_t n;
 
+#if defined(_WIN32) || defined(_WIN64)
+  _finddata_t fi;
   if((n = _findfirst(filename, &fi)) != -1)  // I3056   // I3512
   {
     _findclose(n);
     return TRUE;
   }
+#else
+  if((n= access(filename,F_OK)) != -1)  // I3056   // I3512
+  {
+    return TRUE;
+  }
+#endif
   return FALSE;
 }
 

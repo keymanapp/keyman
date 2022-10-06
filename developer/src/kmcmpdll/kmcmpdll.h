@@ -7,7 +7,7 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg);
 
 // TODO: These macros can return FALSE in functions that expect a DWORD CERR_x
 //       return value type. This is just plain wrong!
-#define SetError(err)       { if(AddCompileMessage(err) || (err & (CERR_HINT|CERR_FATAL))) return FALSE; }
+#define SetError(err)       { if(AddCompileMessage(err) || (err & CERR_FATAL)) return FALSE; }
 #define AddWarning(warn)    { if(AddCompileMessage(warn)) return FALSE; }
 
 extern BOOL FWarnDeprecatedCode;

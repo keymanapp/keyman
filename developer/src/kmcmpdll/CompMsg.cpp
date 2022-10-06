@@ -32,7 +32,7 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_Break              , "Compiler interrupted by user"},
     { CERR_CannotAllocateMemory , "Out of memory"},
     { CERR_InvalidBitmapLine  , "Invalid 'bitmaps' command"},
-    { CERR_CannotReadBitmapFile , "Cannot open the bitmap file for reading"},
+    { CERR_CannotReadBitmapFile , "Cannot open the bitmap or icon file for reading"},
     { CERR_IndexDoesNotPointToAny  , "An index() in the output does not have a corresponding any() statement"},
     { CERR_ReservedCharacter  , "A reserved character was found"},
     { CERR_InvalidCharacter   , "A character was found that is outside the valid Unicode range (U+0000 - U+10FFFF)"},
