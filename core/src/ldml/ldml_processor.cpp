@@ -262,7 +262,7 @@ ldml_processor::process_event(
       }
 
       // int longest_index            = -1;  // index to longest match in simple_transforms
-      unsigned long longest_length = 0;  // length of longest match
+      size_t longest_length = 0;  // length of longest match
       // auto i                       = 0;   // counter
       std::u16string result;
       // TODO-LDML: need to handle partial matches.
@@ -278,7 +278,7 @@ ldml_processor::process_event(
         }
         // Now, check for match
         bool is_match = true;
-        for (unsigned long j = 0; j < list.size(); j++) {
+        for (size_t j = 0; j < list.size(); j++) {
           const auto found  = ctxt.at(ctxt.size() - j - 1);
           const auto expect = list.at(list.size() - j - 1);
           if (found != expect) {
@@ -300,7 +300,7 @@ ldml_processor::process_event(
         // Reset actions.  TODO-LDML: wrong for backspace
         // state->actions().clear();
         // Now, clear out the old context
-        for (unsigned long i=0; i<longest_length; i++) {
+        for (size_t i=0; i<longest_length; i++) {
           state->context().pop_back(); // Pop off last
           auto deletedChar = ctxt[ctxt.size() - i - 1][0];
           state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
