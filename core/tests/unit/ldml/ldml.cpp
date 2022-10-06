@@ -228,6 +228,14 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
       std::cerr << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
       assert(false);
     }
+
+#if 1
+    // Extra debugging
+    std::cerr << "TODO-LDML: extra debugging here" << std::endl;
+    std::cerr << "VKEY: " << p.vk << std::endl;
+    std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+    std::cerr << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+#endif
   }
 
   // Test if the beep action was as expected

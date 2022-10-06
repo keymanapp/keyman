@@ -247,10 +247,74 @@ ldml_processor::process_event(
         state->actions().push_character(str[i]);
       }
     }
-    state->actions().commit();
     // TODO-LDML: transform
+    if(simple_transforms.size() > 0) { // shortcut if no transforms
+      // from kmx_processor.cpp
+      // Construct a context buffer from the items
+      ldml_string_list ctxt;
+      auto cp = state->context();
+      // We're only interested in as much of the context as is a KM_KBP_CT_CHAR.
+      for (auto c = cp.begin(); c != cp.end() && c->type == KM_KBP_CT_CHAR; c++) {
+        km::kbp::kmx::char16_single buf;
+        const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
+        const std::u16string str(buf.ch, len);
+        ctxt.push_back(str);
+      }
+
+      // int longest_index            = -1;  // index to longest match in simple_transforms
+      unsigned long longest_length = 0;  // length of longest match
+      // auto i                       = 0;   // counter
+      std::u16string result;
+      // bool partial       = false;      // true if the longest was a partial match
+      for (auto it = simple_transforms.begin(); it != simple_transforms.end(); it++/*,i++*/) {
+        auto list = it->first;
+        // see if it matches
+        if (longest_length >= list.size()) {
+          continue; // already have a longer match
+        }
+        if (list.size() > ctxt.size()) {
+          continue; // not enough ctxt for a match
+        }
+        // Now, check for match
+        bool is_match = true;
+        for (unsigned long j = 0; j < list.size(); j++) {
+          const auto found  = ctxt.at(ctxt.size() - j - 1);
+          const auto expect = list.at(list.size() - j - 1);
+          if (found != expect) {
+            // mismatch, break
+            is_match = false;
+            break;
+          }
+        }
+        if (!is_match) {
+          continue;
+        }
+        // Found a match
+        longest_length = list.size();
+        // longest_index  = i;
+        result = it->second;
+      }
+      if (longest_length > 0) {
+        // Found something.
+        // Reset actions.  TODO-LDML: wrong for backspace
+        // state->actions().clear();
+        // Now, clear out the old context
+        for (unsigned long i=0; i<longest_length; i++) {
+          state->context().pop_back(); // Pop off last
+          auto deletedChar = ctxt[ctxt.size() - i - 1][0];
+          state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
+        }
+        // Now, add in the updated text
+        for(size_t i=0; i<result.length(); i++) {
+          state->context().push_character(result[i]);
+          state->actions().push_character(result[i]);
+        }
+      }
+    }
+
     // TODO-LDML: reorder
     // TODO-LDML: final
+    state->actions().commit();
   } catch (std::bad_alloc &) {
     state->actions().clear();
     return KM_KBP_STATUS_NO_MEM;
