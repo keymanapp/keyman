@@ -47,6 +47,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
     <key id="y" to="y" />
     <key id="z" to="z" />
     <key id="bquote" to="`"/>
+    <key id="backslash" to="\u{005c}"/>
   </keys>
 
   <layerMaps form="hardware">
@@ -54,7 +55,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
       <row keys="space" /> <!-- number row -->
       <row keys="q w e r t y u i o p" />
       <row keys="a s d f g h j k l" />
-      <row keys="z x c v b n m" />
+      <row keys="backslash z x c v b n m" />
       <!-- <row keys="space" /> --> <!-- Bug: 5 rows is 'too many'? -->
     </layerMap>
   </layerMaps>
