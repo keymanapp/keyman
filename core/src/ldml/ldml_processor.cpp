@@ -46,7 +46,7 @@ namespace kbp {
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), vkey_to_string(), simple_transforms()
+  ), _valid(false), simple_transforms(), vkeys()
 {
 
 // TODO-LDML: move these asserts into kmx_plus
@@ -92,8 +92,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       } else {
         str = entry.get_string();
       }
-      ldml_vkey_id vkey_id((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod);
-      vkey_to_string[vkey_id] = str; // assign the string
+      vkeys.add((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod, str);
     }
   } // else: no keys! but still valid. Just, no keys.
   if (kplus.tran != nullptr) {
@@ -234,14 +233,12 @@ ldml_processor::process_event(
       break;
     default:
       // Look up the key
-      const ldml_vkey_id vkey_id(vk, modifier_state);
-      const auto key = vkey_to_string.find(vkey_id);
-      if (key == vkey_to_string.end()) {
+      const std::u16string str = vkeys.lookup(vk, modifier_state);
+      if (str.empty()) {
         // not found
         state->actions().commit(); // finish up and
         return KM_KBP_STATUS_OK; // Nothing to do- no key
       }
-      const std::u16string &str = key->second;
       for(size_t i=0; i<str.length(); i++) {
         state->context().push_character(str[i]);
         state->actions().push_character(str[i]);
