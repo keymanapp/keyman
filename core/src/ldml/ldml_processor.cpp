@@ -228,6 +228,7 @@ ldml_processor::process_event(
 
     switch (vk) {
     case KM_KBP_VKEY_BKSP:
+      // TODO-LDML: backspace transform
       state->context().pop_back();
       state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
       break;
@@ -247,6 +248,9 @@ ldml_processor::process_event(
       }
     }
     state->actions().commit();
+    // TODO-LDML: transform
+    // TODO-LDML: reorder
+    // TODO-LDML: final
   } catch (std::bad_alloc &) {
     state->actions().clear();
     return KM_KBP_STATUS_NO_MEM;
