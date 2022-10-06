@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.76 alpha 2022-10-06
+
+* chore(linux): Cleanup unnecessary surrogate check (#7396)
+
 ## 16.0.75 alpha 2022-10-05
 
 * chore(common): builder script maintenance (#7405)
