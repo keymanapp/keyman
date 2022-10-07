@@ -482,31 +482,6 @@ namespace com.keyman.dom {
     };
 
     /**
-     * Display and position a scrollbar in the input field if needed
-     *
-     * @param   {Object}  e   input DIV element (copy of INPUT or TEXTAREA)
-     */
-    setScrollBar(e: HTMLElement) {
-      // Display the scrollbar if necessary.  Added TEXTAREA condition to correct rotation issue KMW-5.  Fixed for 310 beta.
-      var scroller=<HTMLElement>e.childNodes[0], sbs=(<HTMLElement>e.childNodes[1]).style;
-      if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && (e.base.nodeName != 'TEXTAREA')) {
-        sbs.height='4px';
-        sbs.width=100*(e.offsetWidth/scroller.offsetWidth)+'%';
-        sbs.left=100*(-scroller.offsetLeft/scroller.offsetWidth)+'%';
-        sbs.top='0';
-        sbs.visibility='visible';
-      } else if(scroller.offsetHeight > e.offsetHeight || scroller.offsetTop < 0) {
-        sbs.width='4px';
-        sbs.height=100*(e.offsetHeight/scroller.offsetHeight)+'%';
-        sbs.top=100*(-scroller.offsetTop/scroller.offsetHeight)+'%';
-        sbs.left='0';
-        sbs.visibility='visible';
-      } else {
-        sbs.visibility='hidden';
-      }
-    }
-
-    /**
      * Handle the touch end event for an input element
      */
     dragEnd: (e: TouchEvent) => void = function(this: DOMTouchHandlers, e: TouchEvent) {
