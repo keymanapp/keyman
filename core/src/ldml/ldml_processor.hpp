@@ -16,6 +16,7 @@
 #include "processor.hpp"
 #include "option.hpp"
 #include "ldml_vkeys.hpp"
+#include "ldml_transforms.hpp"
 // TODO-LDML: May not need this eventually
 #include <kmx/kmx_plus.h>
 
@@ -24,20 +25,10 @@ namespace kbp {
 
 #define KM_KBP_LMDL_PROCESSOR_VERSION u"1.0"
 
-  /**
-   * An ordered list of strings.
-   */
-  typedef std::vector<std::u16string> ldml_string_list;
-  /**
-   * map from transform list to string
-   */
-  typedef std::map<ldml_string_list, std::u16string> ldml_simple_transforms;
-
-
   class ldml_processor : public abstract_processor {
   private:
     bool _valid;
-    ldml_simple_transforms  simple_transforms;
+    ldml::transforms transforms;
     ldml::vkeys vkeys;
   public:
     ldml_processor(

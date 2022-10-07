@@ -46,7 +46,7 @@ namespace kbp {
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), simple_transforms(), vkeys()
+  ), _valid(false), transforms(), vkeys()
 {
 
 // TODO-LDML: move these asserts into kmx_plus
@@ -103,7 +103,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       // 'to' is always a string, unlike keys
       const std::u16string tostr = kplus.strs->get(entry.to);
       // now, fetch the 'from'
-      ldml_string_list list;
+      ldml::string_list list;
 
       // TODO-LDML: before=
       // TODO-LDML: error=
@@ -131,7 +131,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
         list.push_back(str);  // add the string to the end
       }
       // Now, add the list to the map
-      simple_transforms.insert({list, tostr});
+      transforms.add(list, tostr);
     }
   }
   KMXPLUS_PRINTLN("_valid = true");
@@ -244,74 +244,36 @@ ldml_processor::process_event(
         state->actions().push_character(str[i]);
       }
     }
-    // TODO-LDML: transform
-    if(simple_transforms.size() > 0) { // shortcut if no transforms
-      // from kmx_processor.cpp
-      // Construct a context buffer from the items
-      ldml_string_list ctxt;
-      auto cp = state->context();
-      // We're only interested in as much of the context as is a KM_KBP_CT_CHAR.
-      for (auto c = cp.begin(); c != cp.end() && c->type == KM_KBP_CT_CHAR; c++) {
-        km::kbp::kmx::char16_single buf;
-        const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
-        const std::u16string str(buf.ch, len);
-        ctxt.push_back(str);
-      }
-
-      // int longest_index            = -1;  // index to longest match in simple_transforms
-      size_t longest_length = 0;  // length of longest match
-      // auto i                       = 0;   // counter
-      std::u16string result;
-      // TODO-LDML: need to handle partial matches.
-      // bool partial       = false;      // true if the longest was a partial match
-      for (auto it = simple_transforms.begin(); it != simple_transforms.end(); it++/*,i++*/) {
-        auto list = it->first;
-        // see if it matches
-        if (longest_length >= list.size()) {
-          continue; // already have a longer match
-        }
-        if (list.size() > ctxt.size()) {
-          continue; // not enough ctxt for a match (TODO-LDML: partial match.)
-        }
-        // Now, check for match
-        bool is_match = true;
-        for (size_t j = 0; j < list.size(); j++) {
-          const auto found  = ctxt.at(ctxt.size() - j - 1);
-          const auto expect = list.at(list.size() - j - 1);
-          if (found != expect) {
-            // mismatch, break
-            is_match = false;
-            break;
-          }
-        }
-        if (!is_match) {
-          continue;
-        }
-        // Found a match
-        longest_length = list.size();
-        // longest_index  = i;
-        result = it->second;
-      }
-      if (longest_length > 0) {
-        // Found something.
-        // Reset actions.  TODO-LDML: wrong for backspace
-        // state->actions().clear();
-        // Now, clear out the old context
-        for (size_t i=0; i<longest_length; i++) {
-          state->context().pop_back(); // Pop off last
-          auto deletedChar = ctxt[ctxt.size() - i - 1][0];
-          state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
-        }
-        // Now, add in the updated text
-        for(size_t i=0; i<result.length(); i++) {
-          state->context().push_character(result[i]);
-          state->actions().push_character(result[i]);
-        }
-      }
+    std::u16string outputString;
+    // from kmx_processor.cpp
+    // Construct a context buffer from the items
+    ldml::string_list ctxt;
+    auto cp = state->context();
+    // We're only interested in as much of the context as is a KM_KBP_CT_CHAR.
+    for (auto c = cp.begin(); c != cp.end() && c->type == KM_KBP_CT_CHAR; c++) {
+      km::kbp::kmx::char16_single buf;
+      const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
+      const std::u16string str(buf.ch, len);
+      ctxt.push_back(str);
     }
 
-    // TODO-LDML: reorder
-    // TODO-LDML: final
+    // Process the transforms
+    const size_t matchedContext = transforms.matchContext(ctxt, outputString);
+
+    if (matchedContext > 0) {
+      // Found something.
+      // Now, clear out the old context
+      for (size_t i = 0; i < matchedContext; i++) {
+        state->context().pop_back();  // Pop off last
+        auto deletedChar = ctxt[ctxt.size() - i - 1][0];
+        state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
+      }
+      // Now, add in the updated text
+      for (size_t i = 0; i < outputString.length(); i++) {
+        state->context().push_character(outputString[i]);
+        state->actions().push_character(outputString[i]);
+      }
+    }
     state->actions().commit();
   } catch (std::bad_alloc &) {
     state->actions().clear();
