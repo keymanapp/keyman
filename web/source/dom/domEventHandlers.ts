@@ -454,24 +454,6 @@ namespace com.keyman.dom {
       super(keyman);
     }
 
-    private static selectTouch(e: TouchEvent): Touch {
-      // The event at least tells us the event's target, which can be used to help check
-      // whether or not individual `Touch`es may be related to this specific event for
-      // an ongoing multitouch scenario.
-      let target = e.target;
-
-      // Find the first touch affected by this event that matches the current target.
-      for(let i=0; i < e.changedTouches.length; i++) {
-        if(e.changedTouches[i].target == target) {
-          return e.changedTouches[i];
-        }
-      }
-
-      // Shouldn't be possible.  Just in case, we'd prefer a silent failure that allows
-      // callers to silently abort.
-      throw new Error("Could not select valid Touch for event.");
-    }
-
     /**
      * Close OSK and remove simulated caret on losing focus
      */
