@@ -800,22 +800,26 @@ namespace com.keyman.keyboards {
         }
       }, false);
 
-      // Some browsers may instantly start loading the file when assigned to an element, so we do this after the rest
-      // of our setup.  This method is not relocated here (yet) b/c it varies based upon 'native' vs 'embedded'.
-      Lscript.src = scriptSrc;
+      // DO NOT MERGE THIS!  ARTIFICIAL REPRO ATTEMPT FOR #6898.
+      window.setTimeout(() => {
+        // Some browsers may instantly start loading the file when assigned to an element, so we do this after the rest
+        // of our setup.  This method is not relocated here (yet) b/c it varies based upon 'native' vs 'embedded'.
+        Lscript.src = scriptSrc;
 
-      try {
-        document.body.appendChild(Lscript);
-      }
-      catch(ex) {
         try {
-          document.getElementsByTagName('head')[0].appendChild(Lscript);
-        } catch(ex2) {
-          reject('Error registering script ' + scriptSrc + ': ' + ex2);
-          return;
+          document.body.appendChild(Lscript);
         }
-      }
-      this.linkedScripts.push(Lscript);
+        catch(ex) {
+          try {
+            document.getElementsByTagName('head')[0].appendChild(Lscript);
+          } catch(ex2) {
+            reject('Error registering script ' + scriptSrc + ': ' + ex2);
+            return;
+          }
+        }
+        this.linkedScripts.push(Lscript);
+      // DO NOT MERGE THIS!  ARTIFICIAL REPRO ATTEMPT FOR #6898.
+      }, 5000);
     }
 
     /* TODO: why not use util.loadCookie and saveCookie?? */
