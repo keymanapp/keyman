@@ -247,6 +247,11 @@ namespace com.keyman.dom {
       // We know this to be the correct set of handlers because we're setting up a touch element.
       var touchHandlers = this.touchHandlers;
 
+      Pelem.addEventListener('touchmove', (event) => {
+        // Prevent the base-page `touchMoveActivationHandler` from triggering if we're
+        // "scrolling" within a valid input-element type.  That can be used for selection.
+        event.stopPropagation();
+      }, false);
       Pelem.addEventListener('touchend', touchHandlers.dragEnd, false);
 
       // Note that touchend event propagates and is processed by body touchend handler
