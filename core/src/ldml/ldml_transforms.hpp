@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include <vector>
+#include <deque>
 
 namespace km {
 namespace kbp {
@@ -20,7 +20,7 @@ namespace ldml {
 /**
  * An ordered list of strings.
  */
-typedef std::vector<std::u16string> string_list;
+typedef std::deque<std::u16string> string_list;
 /**
  * map from transform list to string
  */

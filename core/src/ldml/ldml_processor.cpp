@@ -232,6 +232,29 @@ ldml_processor::process_event(
       state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
       break;
     default:
+      // from kmx_processor.cpp
+      // Construct a context buffer from the items up until the last KM_KBP_CT_MARKER marker
+      ldml::string_list ctxt;
+      auto cp = state->context();
+      // We're only interested in as much of the context as is a KM_KBP_CT_CHAR.
+      // This will stop at the KM_KBP_CT_MARKER type.
+      uint8_t last_type = KM_KBP_BT_UNKNOWN;
+      for (auto c = cp.rbegin(); c != cp.rend(); c++) {
+        last_type = c->type;
+        if (last_type != KM_KBP_BT_CHAR) {
+          break;
+        }
+        km::kbp::kmx::char16_single buf;
+        const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
+        const std::u16string str(buf.ch, len);
+        ctxt.push_front(str); // prepend to string
+      }
+      if (last_type != KM_KBP_BT_MARKER) {
+        // There was no beginning-of-translation marker.
+        //Add one.
+        state->context().push_marker(0x0);
+        state->actions().push_marker(0x0);
+      }
       // Look up the key
       const std::u16string str = vkeys.lookup(vk, modifier_state);
       if (str.empty()) {
@@ -240,38 +263,33 @@ ldml_processor::process_event(
         return KM_KBP_STATUS_OK; // Nothing to do- no key
       }
       for(size_t i=0; i<str.length(); i++) {
+        // TODO-LDML: needs to be per UTF-32 char? Seems this would push surrogates.
         state->context().push_character(str[i]);
         state->actions().push_character(str[i]);
       }
-    }
-    std::u16string outputString;
-    // from kmx_processor.cpp
-    // Construct a context buffer from the items
-    ldml::string_list ctxt;
-    auto cp = state->context();
-    // We're only interested in as much of the context as is a KM_KBP_CT_CHAR.
-    for (auto c = cp.begin(); c != cp.end() && c->type == KM_KBP_CT_CHAR; c++) {
-      km::kbp::kmx::char16_single buf;
-      const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
-      const std::u16string str(buf.ch, len);
+      // add the newly added char
       ctxt.push_back(str);
-    }
+      // Now process transforms
+      std::u16string outputString;
+      // Process the transforms
+      const size_t matchedContext = transforms.matchContext(ctxt, outputString);
 
-    // Process the transforms
-    const size_t matchedContext = transforms.matchContext(ctxt, outputString);
-
-    if (matchedContext > 0) {
-      // Found something.
-      // Now, clear out the old context
-      for (size_t i = 0; i < matchedContext; i++) {
-        state->context().pop_back();  // Pop off last
-        auto deletedChar = ctxt[ctxt.size() - i - 1][0];
-        state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
-      }
-      // Now, add in the updated text
-      for (size_t i = 0; i < outputString.length(); i++) {
-        state->context().push_character(outputString[i]);
-        state->actions().push_character(outputString[i]);
+      if (matchedContext > 0) {
+        // Found something.
+        // Now, clear out the old context
+        for (size_t i = 0; i < matchedContext; i++) {
+          state->context().pop_back();  // Pop off last
+          auto deletedChar = ctxt[ctxt.size() - i - 1][0];
+          state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
+        }
+        // Now, add in the updated text
+        for (size_t i = 0; i < outputString.length(); i++) {
+          state->context().push_character(outputString[i]);
+          state->actions().push_character(outputString[i]);
+        }
+        // Add a marker so we don't retransform this text.
+        state->context().push_marker(0x0);
+        state->actions().push_marker(0x0);
       }
     }
     state->actions().commit();
