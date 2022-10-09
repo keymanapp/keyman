@@ -32,7 +32,7 @@ describe('KeymanWebCompiler', function() {
     assert.isNotNull(output);
 
     // Does the emitted js match?
-    const outputFixture = fs.readFileSync(outputFilename, 'utf-8');
+    const outputFixture = fs.readFileSync(outputFilename, 'utf-8').replaceAll(/\r\n/g, '\n');
     assert.strictEqual(output, outputFixture);
 
     // Second test: compile to javascript without debug formatting
@@ -41,7 +41,7 @@ describe('KeymanWebCompiler', function() {
     assert.isNotNull(outputNoDebug);
 
     // Does the emitted js match?
-    const outputFixtureNoDebug = fs.readFileSync(outputFilenameNoDebug, 'utf-8');
+    const outputFixtureNoDebug = fs.readFileSync(outputFilenameNoDebug, 'utf-8').replaceAll(/\r\n/g, '\n');
     assert.strictEqual(outputNoDebug, outputFixtureNoDebug);
 
     // TODO(lowpri): consider using Typescript parser to generate AST for further validation
