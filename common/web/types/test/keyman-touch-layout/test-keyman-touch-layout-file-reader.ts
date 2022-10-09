@@ -64,7 +64,8 @@ describe('TouchLayoutFileReader', function () {
     const layout = reader.read(input);
     reader.validate(layout, schema);
 
-    // row.id can be a string in legacy files
+    // sk was defined as [] in legacy.keyman-touch-layout but we want to treat
+    // it as not present
     assert.isUndefined(layout.tablet.layer[0].row[0].key[1].sk);
   });
 });
