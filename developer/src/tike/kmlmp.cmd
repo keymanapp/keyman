@@ -16,5 +16,5 @@ if exist "%~dp0..\inst\node\dist\node.exe" (
   exit /b 1
 )
 
-%nodeexe% %nodecli% %*
+%nodeexe% --enable-source-maps %nodecli% %*
 exit /b %errorlevel%
