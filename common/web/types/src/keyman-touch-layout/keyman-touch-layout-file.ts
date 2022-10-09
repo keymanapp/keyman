@@ -15,14 +15,14 @@ export interface TouchLayoutFile {
 
 export type TouchLayoutFont = string;
 export type TouchLayoutFontSize = string;
-export type TouchLayoutyDefaultHint = "none"|"dot"|"longpress"|"multitap"|"flick"|"flick-n"|"flick-ne"|"flick-e"|"flick-se"|"flick-s"|"flick-sw"|"flick-w"|"flick-nw";
+export type TouchLayoutDefaultHint = "none"|"dot"|"longpress"|"multitap"|"flick"|"flick-n"|"flick-ne"|"flick-e"|"flick-se"|"flick-s"|"flick-sw"|"flick-w"|"flick-nw";
 
 export interface TouchLayoutPlatform {
   font?: TouchLayoutFont;
   fontsize?: TouchLayoutFontSize;
   layer: TouchLayoutLayer[];
   displayUnderlying?: boolean;
-  defaultHint: TouchLayoutyDefaultHint;
+  defaultHint: TouchLayoutDefaultHint;
 };
 
 export type TouchLayoutLayerId = string;  // pattern = /^[a-zA-Z0-9_-]+$/

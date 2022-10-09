@@ -24,5 +24,12 @@ describe('TouchLayoutFile', function () {
     output = writer.write(layout, {formatted:false});
     newLayout = reader.read(output);
     assert.deepEqual(layout, newLayout);
+
+    // And do the same without any options
+    let output2 = writer.write(layout);
+    assert.deepEqual(output, output2);
+
+    newLayout = reader.read(output2);
+    assert.deepEqual(layout, newLayout);
   });
 });

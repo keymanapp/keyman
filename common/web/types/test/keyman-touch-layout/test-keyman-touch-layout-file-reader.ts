@@ -55,4 +55,16 @@ describe('TouchLayoutFileReader', function () {
     assert.strictEqual(layout.tablet.layer[0].row[0].key[0].sk[0].width, 25);
     assert.strictEqual(layout.tablet.layer[0].row[0].key[0].sk[0].sp, 8);
   });
+
+  it('should fixup remove empty arrays in a valid legacy file', function() {
+    const path = makePathToFixture('keyman-touch-layout', 'legacy.keyman-touch-layout');
+    const schema = loadKeymanTouchLayoutCleanJsonSchema();
+    const input = fs.readFileSync(path);
+    const reader = new TouchLayoutFileReader();
+    const layout = reader.read(input);
+    reader.validate(layout, schema);
+
+    // row.id can be a string in legacy files
+    assert.isUndefined(layout.tablet.layer[0].row[0].key[1].sk);
+  });
 });

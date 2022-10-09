@@ -1,7 +1,7 @@
 import { TouchLayoutFile } from "./keyman-touch-layout-file.js";
 
-export class TouchLayoutFileWriterOptions {
-  /* c8 ignore next */ formatted?: boolean;
+export interface TouchLayoutFileWriterOptions {
+  formatted?: boolean;
 };
 
 export class TouchLayoutFileWriter {
@@ -11,8 +11,8 @@ export class TouchLayoutFileWriter {
    * @param options TouchLayoutFileWriterOptions
    * @returns Uint8Array, the .keyman-touch-layout file
    */
-  write(source: TouchLayoutFile, options: TouchLayoutFileWriterOptions): Uint8Array {
-    const output = JSON.stringify(source, null, options.formatted ? 2 : undefined);
+  write(source: TouchLayoutFile, options?: TouchLayoutFileWriterOptions): Uint8Array {
+    const output = JSON.stringify(source, null, options?.formatted ? 2 : undefined);
     const encoder = new TextEncoder();
     return encoder.encode(output);
   }

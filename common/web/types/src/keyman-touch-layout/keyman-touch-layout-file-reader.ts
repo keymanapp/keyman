@@ -3,7 +3,7 @@ import { TouchLayoutFile } from "./keyman-touch-layout-file.js";
 
 export class TouchLayoutFileReader {
   public read(source: Uint8Array): TouchLayoutFile {
-    const decoder = new TextDecoder('utf-8',{fatal:true, ignoreBOM: true});
+    const decoder = new TextDecoder('utf-8', {fatal:true, ignoreBOM: true});
     let sourceString: string;
     try {
       sourceString = decoder.decode(source);
