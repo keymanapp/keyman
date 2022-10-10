@@ -241,8 +241,6 @@ namespace com.keyman.dom {
 
       if(!this.isAttached(Pelem)) {
         this.setupElementAttachment(Pelem);
-        Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text';
-        Pelem.inputMode = 'none';
       }
 
       // Set font for base element
@@ -322,6 +320,11 @@ namespace com.keyman.dom {
       var baseElement = isAlias ? Pelem['base'] : Pelem;
 
       if(!this.isKMWDisabled(baseElement)) {
+        this.disableInputModeObserver();
+        Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text';
+        Pelem.inputMode = 'none';
+        this.enableInputModeObserver();
+
         if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
           this._AttachToIframe(Pelem);
         } else {
