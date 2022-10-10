@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <utility>
 #include <deque>
+#include <vector>
 
 namespace km {
 namespace kbp {
@@ -26,9 +27,28 @@ typedef std::deque<std::u16string> string_list;
  */
 typedef std::map<string_list, std::u16string> simple_transforms;
 
+class text_node {
+public:
+    text_node(const std::u16string &output);
+    text_node();
+    /**
+     * add a vertex to another node
+     */
+    void add(const std::u16string &ch, const text_node* other);
+
+    bool is_only_terminal() const;
+    const text_node *get(const std::u16string *ch) const;
+private:
+    std::u16string output;
+    std::map<std::u16string, const text_node*> vertices;
+};
+
 class transforms {
 private:
-    simple_transforms  simple;
+    /**
+     * TextNodes. First element is the root.
+     */
+    std::vector<text_node> simple;
 public:
     transforms();
 
