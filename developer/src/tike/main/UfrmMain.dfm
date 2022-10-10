@@ -2699,6 +2699,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
   end
   object ApplicationEvents1: TApplicationEvents
     OnHelp = ApplicationEvents1Help
+    OnMessage = ApplicationEvents1Message
     Left = 484
     Top = 176
   end
