@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.77 alpha 2022-10-10
+
+* fix(web): possible error on change of context to a contextEditable (#7359)
+* chore(web): unit test polishing pass (#7381)
+
 ## 16.0.76 alpha 2022-10-06
 
 * chore(linux): Cleanup unnecessary surrogate check (#7396)
