@@ -893,8 +893,8 @@ object frameBitmapEditor: TframeBitmapEditor
     end
   end
   object cmdClearAll: TButton
-    Left = 224
-    Top = 252
+    Left = 201
+    Top = 44
     Width = 73
     Height = 25
     Caption = '&Clear all'

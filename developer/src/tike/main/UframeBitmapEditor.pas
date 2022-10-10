@@ -888,10 +888,10 @@ begin
           FIcon.LoadFromStream(Stream);
           DrawIconEx(FBitmaps[bebEdit].Canvas.Handle, 0, 0, FIcon.Handle, 16, 16, 0, 0, DI_NORMAL);
         except
-          on E:EOutOfResources do
-            ShowMessage(E.Message);
-          on E:EInvalidGraphic do
-            ShowMessage(E.Message);
+          // We won't complain here because LoadReadOnlyIcon will also be
+          // reporting on this, less obtrusively
+          on E:EOutOfResources do ;
+          on E:EInvalidGraphic do ;
         end;
       finally
         FIcon.Free;
