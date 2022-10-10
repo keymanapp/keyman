@@ -32,15 +32,6 @@ describe('Text Selection', function() {
     return new KMWRecorder.BrowserDriver(setupElement(ele));
   }
 
-  var device = new com.keyman.Device();
-  device.detect();
-
-  if(device.formFactor != 'desktop') {
-    console.log('Don\'t run Text Selection tests on mobile, because we don\'t '+
-      'yet support selection on mobile browsers');
-    return;
-  }
-
   /* Define key event specs */
 
   var keys = {};
