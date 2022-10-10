@@ -1681,11 +1681,11 @@ namespace com.keyman.dom {
     enableInputModeObserver() {
       const observationTarget = document.querySelector('body');
       const observationConfig = { subtree: true, attributes: true, attributeFilter: ['inputmode']};
-      this.inputModeObserver.observe(observationTarget, observationConfig);
+      this.inputModeObserver?.observe(observationTarget, observationConfig);
     }
 
     disableInputModeObserver() {
-      this.inputModeObserver.disconnect();
+      this.inputModeObserver?.disconnect();
     }
 
     /**
