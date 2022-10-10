@@ -1,5 +1,5 @@
 import { VisualKeyboard, LDMLKeyboard } from "@keymanapp/common-types";
-import { BUILDER_KVK_HEADER_FLAGS } from "@keymanapp/common-types/src/kvk/kvk-file";
+
 import * as path from 'path';
 import VisualKeyboardCompiler from "./visual-keyboard-compiler.js";
 
@@ -27,7 +27,7 @@ export class KeymanWebCompiler {
 
     let result =
       `{F: '${vk.header.unicodeFont.size}pt ${JSON.stringify(vk.header.unicodeFont.name)}', `+
-      `K102: ${vk.header.flags & BUILDER_KVK_HEADER_FLAGS.kvkh102 ? 1 : 0}};${nl}` + // TODO-LDML: escape ' and " in font name correctly
+      `K102: ${vk.header.flags & VisualKeyboard.VisualKeyboardHeaderFlags.kvkh102 ? 1 : 0}};${nl}` + // TODO-LDML: escape ' and " in font name correctly
       `${tab}this.KV.KLS={${nl}` +
       `${tab}${tab}TODO_LDML: ${vk.keys.length}${nl}` +
       // TODO-LDML: fill in KLS
