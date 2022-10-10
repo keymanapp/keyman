@@ -302,6 +302,11 @@ final class KMKeyboard extends WebView {
       // if active, allowing for smooth, integrated gesture control.
       subKeysWindow.getContentView().findViewById(R.id.grid).dispatchTouchEvent(event);
     } else {
+      if (event.getPointerCount() > 1) {
+        // Multiple points touch the screen at the same time, so dismiss any pending subkeys
+        dismissKeyPreview(0);
+        dismissSubKeysWindow();
+      }
       gestureDetector.onTouchEvent(event);
     }
 

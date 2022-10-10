@@ -5,15 +5,6 @@ describe('Text Selection', function() {
 
   /* Utility functions */
 
-  function supportsInputEvent(done) {
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return false;
-    }
-    return true;
-  }
-
   function setupElement(ele) {
     // A bit of a force-hack to ensure the element is seen as active for the tests.
     com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
@@ -41,8 +32,12 @@ describe('Text Selection', function() {
     return new KMWRecorder.BrowserDriver(setupElement(ele));
   }
 
-  if(!supportsInputEvent()) {
-    console.log('Don\'t run Text Selection tests on browsers that don\'t support Input event');
+  var device = new com.keyman.Device();
+  device.detect();
+
+  if(device.formFactor != 'desktop') {
+    console.log('Don\'t run Text Selection tests on mobile, because we don\'t '+
+      'yet support selection on mobile browsers');
     return;
   }
 

@@ -19,7 +19,7 @@ describe('Event Management', function() {
     teardownKMW();
   });
 
-  it('Keystroke-based onChange event generation', function(done) {
+  it('Keystroke-based onChange event generation', function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -27,7 +27,6 @@ describe('Event Management', function() {
 
     ele.onchange = function() {
       ele.onchange = null;
-      done();
     }
 
     // A bit of a force-hack to ensure the element is seen as active for the tests.
@@ -37,14 +36,15 @@ describe('Event Management', function() {
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
 
-    var focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    ele.dispatchEvent(focusEvent);
 
-    if(focusEvent) {
-      ele.dispatchEvent(focusEvent);
-    }
+    // Asserts that the handler is called.  As the handler clears itself, it will only
+    // remain set if it hasn't been called.
+    assert.isNull(ele.onchange, '`onchange` handler was not called');
   });
 
-  it('OSK-based onChange event generation', function(done) {
+  it('OSK-based onChange event generation', function() {
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
@@ -52,7 +52,6 @@ describe('Event Management', function() {
 
     ele.onchange = function() {
       ele.onchange = null;
-      done();
     }
 
     // A bit of a force-hack to ensure the element is seen as active for the tests.
@@ -62,27 +61,15 @@ describe('Event Management', function() {
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
 
-    var focusEvent;
+    let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
+    ele.dispatchEvent(focusEvent);
 
-    if(typeof FocusEvent == 'function') {
-      focusEvent = new FocusEvent('blur', {relatedTarget: ele});
-    } else {
-      focusEvent = document.createEvent("FocusEvent");
-      focusEvent.initFocusEvent("blur", true, false, ele.ownerDocument.defaultView, 0, ele);
-    }
-
-    if(focusEvent)
-      ele.dispatchEvent(focusEvent);
+    // Asserts that the handler is called.  As the handler clears itself, it will only
+    // remain set if it hasn't been called.
+    assert.isNull(ele.onchange, '`onchange` handler was not called');
   });
 
-  it('Keystroke-based onInput event generation', function(done) {
-    // Not all browsers support InputEvent.  Bypass the test for these.
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return;
-    }
-
+  it('Keystroke-based onInput event generation', function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -93,25 +80,17 @@ describe('Event Management', function() {
 
     ele.addEventListener("input", function() {
       counterObj.i++;
-      if(counterObj.i == fin) {
-        done();
-      }
     });
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
+
+    assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
   });
 
-  it('OSK-based onInput event generation', function(done) {
-    // Not all browsers support InputEvent.  Bypass the test for these.
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return;
-    }
-
+  it('OSK-based onInput event generation', function() {
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
@@ -122,14 +101,13 @@ describe('Event Management', function() {
 
     ele.addEventListener("input", function() {
       counterObj.i++;
-      if(counterObj.i == fin) {
-        done();
-      }
     });
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
     eventDriver.simulateEvent(event);
+
+    assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
   });
 });
