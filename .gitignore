@@ -146,6 +146,7 @@
 # VS Code
 .vscode/
 .vs/
+.devcontainer/
 
 # IDE files
 **/.idea/**/*.xml
