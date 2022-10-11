@@ -33,38 +33,38 @@ builder_parse "$@"
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_has_action configure :module; then
+if builder_start_action configure :module; then
   verify_npm_setup
-  builder_report success configure :module
+  builder_finish_action success configure :module
 fi
 
-if builder_has_action clean :tools; then
+if builder_start_action clean :tools; then
   src/tools/build.sh clean
-  builder_report success clean :tools
+  builder_finish_action success clean :tools
 fi
 
-if builder_has_action clean :module; then
+if builder_start_action clean :module; then
   npm run clean
   rm -rf build/
-  builder_report success clean :module
+  builder_finish_action success clean :module
 fi
 
-if builder_has_action build :module; then
+if builder_start_action build :module; then
   # Build
   npm run build -- $builder_verbose
-  builder_report success build :module
+  builder_finish_action success build :module
 fi
 
-if builder_has_action build :tools; then
+if builder_start_action build :tools; then
   src/tools/build.sh build
-  builder_report success build :tools
+  builder_finish_action success build :tools
 fi
 
-if builder_has_action test :module; then
+if builder_start_action test :module; then
   if builder_has_option --ci; then
     npm test -- --ci
   else
     npm test
   fi
-  builder_report success test :module
+  builder_finish_action success test :module
 fi

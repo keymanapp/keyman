@@ -9,7 +9,7 @@ The Keyboard Processor module is an internal component of KeymanWeb, seen within
 	* Builds will call `npm install` to automatically install further necessary build dependencies.
 
 	* Linux users can run the following to update to LTS version of nodejs
-	
+
 ```
 sudo apt-get install python-software-properties
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
@@ -18,4 +18,4 @@ sudo apt-get install nodejs
 
 **********************************************************************
 
-The build script may be found at src/build.sh.
+The main build script may be found in this folder at ./build.sh.

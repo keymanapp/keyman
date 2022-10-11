@@ -5,15 +5,6 @@ describe('Text Selection', function() {
 
   /* Utility functions */
 
-  function supportsInputEvent(done) {
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return false;
-    }
-    return true;
-  }
-
   function setupElement(ele) {
     if(ele['kmw_ip']) {
       ele = ele['kmw_ip'];
@@ -44,12 +35,6 @@ describe('Text Selection', function() {
 
   function instantiateBrowserDriver(ele) {
     return new KMWRecorder.BrowserDriver(setupElement(ele));
-  }
-
-
-  if(!supportsInputEvent()) {
-    console.log('Don\'t run Text Selection tests on browsers that don\'t support Input event');
-    return;
   }
 
   var device = new com.keyman.Device();

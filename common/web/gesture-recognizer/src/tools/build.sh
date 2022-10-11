@@ -31,33 +31,33 @@ builder_parse "$@"
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_has_action clean :recorder; then
+if builder_start_action clean :recorder; then
   rm -rf ./recorder/build
-  builder_report success clean :recorder
+  builder_finish_action success clean :recorder
 fi
 
-if builder_has_action clean :fixture; then
+if builder_start_action clean :fixture; then
   rm -f ../../build/tools/host-fixture.html
   rm -f ../../build/tools/gestureHost.css
-  builder_report success clean :fixture
+  builder_finish_action success clean :fixture
 fi
 
-if builder_has_action clean :test-module; then
+if builder_start_action clean :test-module; then
   rm -rf ../../build/tools/*.ts*
   rm -rf ../../build/tools/*.js*
-  builder_report success clean :test-module
+  builder_finish_action success clean :test-module
 fi
 
-if builder_has_action build :fixture; then
+if builder_start_action build :fixture; then
   if [ ! -d ../../build/tools ]; then
     mkdir -p ../../build/tools
   fi
   ./host-fixture/extract-fixture.sh > ../../build/tools/host-fixture.html
   cp ./host-fixture/gestureHost.css ../../build/tools/gestureHost.css
-  builder_report success build :fixture
+  builder_finish_action success build :fixture
 fi
 
-if builder_has_action build :recorder; then
+if builder_start_action build :recorder; then
   if [ ! -d recorder/build ]; then
     mkdir -p recorder/build
   fi
@@ -71,10 +71,10 @@ if builder_has_action build :recorder; then
   pushd recorder >/dev/null
   node update-index.js build/index.html
   popd >/dev/null
-  builder_report success build :recorder
+  builder_finish_action success build :recorder
 fi
 
-if builder_has_action build :test-module; then
+if builder_start_action build :test-module; then
   npm run tsc -- -b "$THIS_SCRIPT_PATH/unit-test-resources/tsconfig.json"
-  builder_report success build :test-module
+  builder_finish_action success build :test-module
 fi
