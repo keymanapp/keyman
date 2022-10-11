@@ -173,3 +173,14 @@ Thumbs.db
 # Temporary file for logging scripts in xcode runs, see build-utils.sh for
 # details
 /xcodebuild-scripts.log
+
+# Linux packaging related
+/debian/
+results/
+*.deb
+*.ddeb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.tar.?z

@@ -54,7 +54,7 @@ See [license information](./LICENSE.md) about licensing.
 
 Used by TC for validating PRs
 
-Run `make tmpinstall` to build and install **keyboardprocessor** and **ibus-keyman** to `/tmp/kmfl`
+Run `make tmpinstall` to build and install **keyboardprocessor** and **ibus-keyman** to `/tmp/keyman`
 
 This is only for testing the build, not for running **ibus-keyman** in ibus
 
