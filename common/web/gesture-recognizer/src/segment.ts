@@ -42,6 +42,8 @@ namespace com.keyman.osk {
     private _resolutionPromise: Promise<void>;
     private _resolutionPromiseResolver: () => void;
 
+    private _isResolved: boolean = false;
+
     /**
      * Intended for internal-use only; this is utilized during the segmentation process.
      */
@@ -57,6 +59,7 @@ namespace com.keyman.osk {
         // We'll use the loaded object as our core reference.
         this._stats = serializedObj;
         this._peakSpeed = serializedObj.peakSpeed; // Is retrieved from `this`, not `this._stats`.
+        this._type = serializedObj.type;           // This one too.
 
         // Ensure that the two promises are properly initialized for this construction type.
         this._recognitionPromise = Promise.resolve(serializedObj.type);
@@ -69,7 +72,10 @@ namespace com.keyman.osk {
         });
 
         this._resolutionPromise = new Promise<void>((resolve) => {
-          this._resolutionPromiseResolver = resolve;
+          this._resolutionPromiseResolver = () => {
+            this._isResolved = true;
+            resolve();
+          }
         })
       }
     }
@@ -85,16 +91,26 @@ namespace com.keyman.osk {
     }
 
     protected setPeakSpeed(speed: number) {
+      if(this._isResolved) {
+        throw new Error("May not modify a resolved segment!");
+      }
       this._peakSpeed = speed;
     }
 
     protected updateStats(totalStats: CumulativePathStats) {
+      if(this._isResolved) {
+        throw new Error("May not modify a resolved segment!");
+      }
       this._stats = totalStats;
     }
 
     protected classifyType(type: SegmentClass) {
       if(!this._stats) {
         throw new Error("Cannot recognize the segment - lacking critical metadata");
+      }
+
+      if(this._isResolved) {
+        throw new Error("May not modify a resolved segment!");
       }
 
       if(this._type === undefined) {

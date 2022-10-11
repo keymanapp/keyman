@@ -2,7 +2,8 @@ namespace com.keyman.osk {
   /**
    * This class is responsible for managing the construction of public-facing Segments while keeping
    * all the internal parts... internal.  As such, it includes state management for parts of
-   * PathSegmenter's operations.
+   * PathSegmenter's operations.  Note that it makes many assumptions based upon its usage within
+   * PathSegmenter.
    *
    * See also `SubsegmentCompatibilityAnalyzer`, which defines the criteria used within this class
    * for determining when to recombine subsegments and when to uphold segmentation decisions.
@@ -53,7 +54,7 @@ namespace com.keyman.osk {
      * @param accumulation
      * @returns
      */
-    public buildIntervalFromBase(accumulation: CumulativePathStats) {
+    private buildIntervalFromBase(accumulation: CumulativePathStats) {
       return accumulation.deaccumulate(this.baseAccumulation);
     }
 
@@ -167,6 +168,11 @@ namespace com.keyman.osk {
      * about the state of the as-of-yet unresolved Segment, including the most recent location
      * of the corresponding touchpoint.
      *
+     * NOTE:  Assumes that .isCompatible has been checked first!  This method (currently) does not
+     * perform the related check!
+     * - It is currently called when and where relevant in PathSegmenter, the only thing currently
+     *   calling this method.
+     *
      * @param subsegmentation
      * @returns `true` unless the subsegment
      */
@@ -232,6 +238,9 @@ namespace com.keyman.osk {
       // the need to rely on Segment events for that; even that's better off handled with path.coords
       // events instead.
       this.pendingSubsegmentation = null;
+
+      // If there was a pending subsegment, we need to remove its components from the published segment stats.
+      this.pathSegment.updateStats(this.committedInterval);
     }
 
     /**

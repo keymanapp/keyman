@@ -28,10 +28,11 @@ namespace com.keyman.osk {
    * For reference, (32-bit) floats have 23 bits of significand precision, while (64-bit)
    * doubles have 52.  Therefore, we'll still be more precise than baseline floats.
    */
-  function sigMinus(operand1: number, operand2: number) {
+  export function sigMinus(operand1: number, operand2: number) {
     const diff = operand1 - operand2;
+    const magnitude = Math.max(Math.abs(operand1), Math.abs(operand2));
 
-    const logDiff = Math.log2(Math.abs(operand1)) - Math.log2(Math.abs(operand2));
+    const logDiff = Math.log2(magnitude) - Math.log2(Math.abs(diff));
     // If an operand is 2^30 (or ~10^9) larger than the result of the difference, it's
     // nigh-certainly a floating-point error at play.
     return logDiff < 30 ? diff : 0;
@@ -115,7 +116,7 @@ namespace com.keyman.osk {
        * that is unexplained by this regression.
        */
       get sumOfSquaredError(): number {
-        return this.accumulator.squaredSum(this.dependent) - this.sumOfSquaredModeled;
+        return sigMinus(this.accumulator.squaredSum(this.dependent), this.sumOfSquaredModeled);
       }
 
       /**
@@ -160,12 +161,6 @@ namespace com.keyman.osk {
         return this.slope * value + this.intercept;
       }
     }
-
-    /**
-     * Floating-point errors may result from cross-sum calculations, and they may be slightly larger than
-     * Number.EPSILON as the sums grow.  (Taking the difference of cross-sums)
-     */
-    private static readonly CANCELLATION_EPSILON = Math.sqrt(Number.EPSILON);
 
     private rawLinearSums  = {'x': 0, 'y': 0, 't': 0, 'v': 0};
     private rawSquaredSums = {'x': 0, 'y': 0, 't': 0, 'v': 0};
@@ -359,7 +354,7 @@ namespace com.keyman.osk {
 
         result.cosLinearSum   -= subsetStats.cosLinearSum;
         result.sinLinearSum   -= subsetStats.sinLinearSum;
-        result.arcSampleCount -= subsetStats.arcSampleCount;
+        result.arcSampleCount -= (subsetStats.arcSampleCount + 1);
 
         if(tDelta) {
           result.rawLinearSums.v  -= coordArcDelta   / tDelta;
@@ -673,6 +668,10 @@ namespace com.keyman.osk {
      * Range:  floating-point values on the interval [0, 1].
      */
     private get angleRSquared() {
+      if(this.arcSampleCount == 0) {
+        return 1;
+      }
+
       // Refer to https://en.wikipedia.org/wiki/Directional_statistics#Distribution_of_the_mean.
       // We're computing the squared value of that page's R-bar stat.
       //
@@ -702,7 +701,8 @@ namespace com.keyman.osk {
         return Number.NaN;
       }
 
-      return Math.sqrt(-Math.log(this.angleRSquared));
+      const val = Math.sqrt(-Math.log(this.angleRSquared));
+      return isNaN(val) ? 0 : val;
     }
 
     /**
