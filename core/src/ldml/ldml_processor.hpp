@@ -15,6 +15,7 @@
 #include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 #include "option.hpp"
+#include "ldml_vkeys.hpp"
 
 // TODO-LDML: May not need this eventually
 #include <kmx/kmx_plus.h>
@@ -24,15 +25,10 @@ namespace kbp {
 
 #define KM_KBP_LMDL_PROCESSOR_VERSION u"1.0"
 
- /**
-  * identifier for keybag lookup
-  */
-  typedef std::pair<km_kbp_virtual_key, uint16_t> ldml_vkey_id;
-
   class ldml_processor : public abstract_processor {
   private:
     bool _valid;
-    std::map<ldml_vkey_id, std::u16string> vkey_to_string;
+    vkeys keys;
 
   public:
     ldml_processor(

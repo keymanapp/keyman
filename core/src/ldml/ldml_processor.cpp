@@ -35,7 +35,7 @@ namespace kbp {
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), vkey_to_string()
+  ), _valid(false), keys()
 {
 
   if(data.size() <= sizeof(kmx::COMP_KEYBOARD_EX)) {
@@ -74,8 +74,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       } else {
         str = entry.get_string();
       }
-      ldml_vkey_id vkey_id((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod);
-      vkey_to_string[vkey_id] = str; // assign the string
+      keys.add((km_kbp_virtual_key)entry.vkey, (uint16_t)entry.mod, str);
     }
   } // else: no keys! but still valid. Just, no keys.
   DebugLog("_valid = true");
@@ -174,15 +173,14 @@ ldml_processor::process_event(
       break;
     default:
       // Look up the key
-      const ldml_vkey_id vkey_id(vk, modifier_state);
-      const auto key = vkey_to_string.find(vkey_id);
-      if (key == vkey_to_string.end()) {
+      const std::u16string str = keys.lookup(vk, modifier_state);
+      if (str.empty()) {
         // not found
         state->actions().commit(); // finish up and
         return KM_KBP_STATUS_OK; // Nothing to do- no key
       }
-      const std::u16string &str = key->second;
       for(size_t i=0; i<str.length(); i++) {
+        // TODO-LDML: needs to be per UTF-32 char? Seems this would push surrogates.
         state->context().push_character(str[i]);
         state->actions().push_character(str[i]);
       }
