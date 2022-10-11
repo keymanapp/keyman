@@ -64,7 +64,7 @@ namespace com.keyman.osk {
        */
       constructor(mainStats: CumulativePathStats, dependentAxis: PathCoordAxis, independentAxis: PathCoordAxis) {
         if(dependentAxis == independentAxis) {
-          throw "Two different axes must be specified for the regression object.";
+          throw new Error("Two different axes must be specified for the regression object.");
         }
 
         this.accumulator = mainStats;
@@ -199,7 +199,7 @@ namespace com.keyman.osk {
      * The initial sample included by this instance's computed stats.  Needed for
      * the 'directness' properties.
      */
-    private initialSample?: InputSample;
+    private _initialSample?: InputSample;
 
     private _lastSample?: InputSample;
     private followingSample?: InputSample;
@@ -223,7 +223,7 @@ namespace com.keyman.osk {
       } else if(isAnInputSample(obj)) {
         Object.assign(this, this.extend(obj));
       } else {
-        throw "A constructor for this input pattern has not yet been implemented";
+        throw new Error("A constructor for this input pattern has not yet been implemented");
       }
     }
 
@@ -235,8 +235,8 @@ namespace com.keyman.osk {
      *          newly-sampled point.
      */
     public extend(sample: InputSample): CumulativePathStats {
-      if(!this.initialSample) {
-        this.initialSample = sample;
+      if(!this._initialSample) {
+        this._initialSample = sample;
         this.baseSample = sample;
       }
       const result = new CumulativePathStats(this);
@@ -376,7 +376,7 @@ namespace com.keyman.osk {
       // ANY case except the timestamp (.t) - and even then, not far from the baseSample's timestamp value.
 
       // initialSample, though, we need to update b/c of the 'directness' properties.
-      result.initialSample = subsetStats.followingSample;
+      result._initialSample = subsetStats.followingSample;
 
       return result;
     }
@@ -395,6 +395,10 @@ namespace com.keyman.osk {
 
     private set sampleCount(value: number) {
       this._sampleCount = value;
+    }
+
+    public get initialSample() {
+      return this._initialSample;
     }
 
     /**
@@ -580,10 +584,10 @@ namespace com.keyman.osk {
      */
     public get angle() {
       if(this.sampleCount == 1 || !this.lastSample || !this.initialSample) {
-        return Number.NaN;
+        return undefined;
       } else if(this.netDistance < 1) {
         // < 1 px, thus sub-pixel, means we have nothing relevant enough to base an angle on.
-        return Number.NaN;
+        return undefined;
       }
 
       const xDelta = this.lastSample.targetX - this.initialSample.targetX;
@@ -614,6 +618,10 @@ namespace com.keyman.osk {
         return undefined;
       }
 
+      if(isNaN(this.angle) || this.angle === null || this.angle === undefined) {
+        return undefined;
+      }
+
       const buckets = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'n'];
 
       // We could be 'more efficient' and use radians here instead, but this
@@ -624,10 +632,11 @@ namespace com.keyman.osk {
 
     /**
      * Measured in pixels per second.
-     * @return a speed in pixels per millisecond, or `Number.NaN` if no data
+     * @return a speed in pixels per millisecond.  May be 0 if no movement was observed
+     * among the samples.
      */
     public get speed() {
-      return this.duration ? this.netDistance / this.duration : Number.NaN;
+      return this.duration ? this.netDistance / this.duration : 0;
     }
 
     /**
@@ -704,42 +713,23 @@ namespace com.keyman.osk {
       return this.coordArcSum;
     }
 
-    // Convert to a `toJSON` method for use during investigative debugging.
-    private toDebuggingJSON() {
-      // This `likelyState` value is extremely prototyped & just here for reviewer/tester convenience.
-      // It'll need to be developed a bit more fully, but follows my intuitions from development &
-      // testing.
-      let likelyType = 'unknown';
-
-      if(this.mean('v') < 0.08 && this.rawDistance < 12 && this.duration > 100) {
-        likelyType = 'hold';
-      } else if(this.mean('v') < 0.08 && this.rawDistance < 6) {
-        likelyType = 'hold';
-      }
-
-      if(this.mean('v') > 0.4 || (this.mean('v') > 0.2 && this.duration > 80) || this.netDistance > 20) {
-        likelyType = 'move';
-      }
-
+    /**
+     * Provides a JSON.stringify()-friendly object with the properties most useful for
+     * debugger-based inspection and/or console-logging statements.
+     */
+    public get summaryObject() {
       return {
         angle: this.angle,
         cardinal: this.cardinalDirection,
-        likelyType: likelyType,
         speedMean: this.mean('v'),
-        rawDistance: this.rawDistance,
+        netDistance: this.netDistance,
         duration: this.duration,
         sampleCount: this.sampleCount,
         angleMeanDegrees: this.angleMean * 180 / Math.PI,
         angleDeviation: this.angleDeviation,
+        rawDistance: this.rawDistance,
         speedVariance: this.variance('v')
       }
-    }
-
-    public toJSON() {
-      // We're not actually saving the JSON out to anything yet or loading/parsing it
-      // for any use beyond direct human interpretation, so... it's "okay" to
-      // leave like this for now.
-      return this.toDebuggingJSON();
     }
   }
 
