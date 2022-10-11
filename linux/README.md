@@ -16,7 +16,7 @@ See [license information](./LICENSE.md) about licensing.
 
 - It is helpful to be using the [packages.sil.org](http://packages.sil.org) repo
 
-- Install packages required for building and developing KMFL and Keyman for Linux
+- Install packages required for building and developing Keyman for Linux
 
   ```bash
   sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential \
@@ -31,7 +31,7 @@ See [license information](./LICENSE.md) about licensing.
 
 ### Build script
 
-#### Installing for ibus to use ibus-kmfl or ibus-keyman
+#### Installing for ibus to use ibus-keyman
 
 - The process to build and install everything is:
 
@@ -44,10 +44,8 @@ See [license information](./LICENSE.md) about licensing.
   To do this run `sudo make install`
 
   - This will install to `/usr/local`
-    - and `/usr/share/ibus/component/kmfl.xml` and `/usr/share/kmfl/icons`
     - and `/usr/share/ibus/component/keyman.xml` and `/usr/share/keyman/icons`
 
-  - If you already have the ibus-kmfl package installed then it will move the file `/usr/share/ibus/component/kmfl.xml` to `/usr/share/doc/ibus-kmfl/`
   - If you already have the ibus-keyman package installed then it will move the file `/usr/share/ibus/component/keyman.xml` to `/usr/share/doc/ibus-keyman/`
 
 - run `sudo make uninstall` to uninstall everything and put it back again
@@ -56,20 +54,16 @@ See [license information](./LICENSE.md) about licensing.
 
 Used by TC for validating PRs
 
-Run `make tmpinstall` to build and install **keyboardprocessor**, **kmflcomp**, **libkmfl**, **ibus-kmfl** and **ibus-keyman** to `/tmp/kmfl`
+Run `make tmpinstall` to build and install **keyboardprocessor** and **ibus-keyman** to `/tmp/kmfl`
 
-This is only for testing the build, not for running **ibus-kmfl** or **ibus-keyman** in ibus
+This is only for testing the build, not for running **ibus-keyman** in ibus
 
 ### Manually
 
-- **libkmfl** requires `kmfl.h` header from **kmflcomp**
-- **ibus-kfml** requires `kmfl.h` and headers and lib from **libkmfl**
 - **ibus-keyman** requires headers and lib from **keyboardprocessor**
 
 So
 
-- **kmflcomp** must be built and installed before **libkmfl**
-- **libkmfl** must be built and installed before **ibus-kmfl**
 - **keyboardprocessor** must be built before **ibus-keyman**
 
 For each project run `./configure && make && make install`.
@@ -77,15 +71,12 @@ For each project run `./configure && make && make install`.
 You may prefer to create a different directory to build in and run configure from there e.g.
 
 ```bash
-mkdir ../build-kmflcomp
-cd ../build-kmflcomp
-../kmflcomp/configure
+mkdir ../build-ibus-keyman
+cd ../build-ibus-keyman
+../ibus-keyman/configure
 make
 make install
 ```
-
-The install of **ibus-kmfl** doesn't install everything to the correct location for it to be
-used - to be fixed
 
 ## Continuous integration
 
