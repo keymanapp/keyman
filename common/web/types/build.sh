@@ -36,6 +36,7 @@ else
   mkdir -p "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard.schema.json" "$THIS_SCRIPT_PATH/build/src/"
   cp "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json" "$THIS_SCRIPT_PATH/build/src/"
+  cp "$KEYMAN_ROOT/common/schemas/keyman-touch-layout/keyman-touch-layout.clean.spec.json" "$THIS_SCRIPT_PATH/build/src/"
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
