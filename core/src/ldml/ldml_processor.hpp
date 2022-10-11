@@ -16,7 +16,7 @@
 #include "processor.hpp"
 #include "option.hpp"
 #include "ldml_vkeys.hpp"
-
+#include "ldml_transforms.hpp"
 // TODO-LDML: May not need this eventually
 #include <kmx/kmx_plus.h>
 
@@ -28,8 +28,8 @@ namespace kbp {
   class ldml_processor : public abstract_processor {
   private:
     bool _valid;
+    ldml::transforms transforms;
     ldml::vkeys keys;
-
   public:
     ldml_processor(
       path const & kb_path,
