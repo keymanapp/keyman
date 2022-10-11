@@ -527,7 +527,7 @@ describe("Iterative Segment Construction (ConstructingSegment)", function() {
         assert.isTrue(constructor.isCompatible(followup)); // To verify the following method's precondition.
         assert.isTrue(constructor.updatePendingSubsegment(followup));
 
-        followup = turtle.move(90, 100, 20, 20);
+        followup = turtle.move(90, 1, 20, 20);
         assert.isTrue(constructor.isCompatible(followup)); // To verify the following method's precondition.
         assert.isTrue(constructor.updatePendingSubsegment(followup));
       });
