@@ -37,11 +37,10 @@
         q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item');
       }
       // select the first list item
-      for(var i = 0; i < q.length; i++) {
-        list_array = q[i].id;
-        itemtype = list_array.substr(0, 5);
-        q[i].focus();
-        break;
+      if (q!==null && q.length > 0) {
+        list_array = q[0].id;
+        itemtype = list_array.substring(0, 5);
+        q[0].focus();
       }
     }
 

@@ -202,7 +202,7 @@
 
               <xsl:call-template name="button">
                 <xsl:with-param name="className">kbd_button</xsl:with-param>
-                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Languages_Modify']"/>...</xsl:with-param>
+                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='SKAddremove']"/></xsl:with-param>
                 <xsl:with-param name="command">javascript:showModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
               </xsl:call-template>
 
@@ -376,7 +376,7 @@
             <div class='modify-popup'>
 
               <div class="list-languages">
-                <div class="popup-header"><xsl:value-of select="$locale/string[@name='S_Languages_Modify']"/></div>
+                <div class="popup-header"><xsl:value-of select="$locale/string[@name='S_Languages_Addremove']"/></div>
                 <div>
                   <xsl:apply-templates select="KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]">
                     <xsl:with-param name="modify">1</xsl:with-param>
