@@ -14,14 +14,14 @@
     "@sentry/node": "^6.16.1",
     "chalk": "^4.1.2",
     "express": "^4.17.2",
-    "multer": "^1.4.4",
+    "multer": "^1.4.5-lts.1",
     "ngrok": "^4.2.2",
     "open": "^8.4.0",
     "ws": "^8.3.0"
   },
   "optionalDependencies": {
     "hetrodo-node-hide-console-window-napi": "keymanapp/hetrodo-node-hide-console-window-napi#keyman-15.0",
-    "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-15.0"
+    "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-16.0"
   },
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",

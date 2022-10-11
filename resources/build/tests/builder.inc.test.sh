@@ -5,7 +5,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../build-utils.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -18,9 +18,9 @@ if [[ "${_builder_chosen_action_targets[@]}" != "build:project" ]]; then
   fail "  Test: builder_parse, shorthand form 'build' should give us 'build:project"
 fi
 
-if builder_has_action build; then
+if builder_start_action build; then
   echo "building project"
-  builder_report success build
+  builder_finish_action success build
 else
   fail "FAIL: should have matched action build for :project"
 fi
@@ -54,35 +54,35 @@ if [[ $_builder_default_action != "default" ]]; then
 fi
 
 # Shorthand form where we don't have a :target (default is ":project")
-if builder_has_action build; then
+if builder_start_action build; then
   echo "building project"
-  builder_report success build
+  builder_finish_action success build
 else
   fail "FAIL: should have matched action build for :project"
 fi
 
-if builder_has_action clean :app; then
+if builder_start_action clean :app; then
   echo "Cleaning <clean :app>"
-  builder_report success clean :app
+  builder_finish_action success clean :app
 else
   fail "FAIL: should have matched action clean for :app"
 fi
 
-if builder_has_action clean:app; then
+if builder_start_action clean:app; then
   echo "Cleaning <clean:app>"
-  builder_report success clean:app
+  builder_finish_action success clean:app
 else
   fail "FAIL: should have matched action clean for :app"
 fi
 
-if builder_has_action build :app; then
+if builder_start_action build :app; then
   echo "Building app"
-  builder_report success build :app
+  builder_finish_action success build :app
 else
   fail "FAIL: should have matched action build for :app"
 fi
 
-if builder_has_action build :module; then
+if builder_start_action build :module; then
   fail "FAIL: should not have matched action build for :module"
 fi
 
@@ -142,13 +142,35 @@ if builder_has_option --feature; then
   if [[ $FOO == xyzzy ]]; then
     echo "PASS: --feature option variable \$FOO has expected value 'xyzzy'"
   else
-    echo "FAIL: --feature option variable \$FOO had value '$FOO' but should have had 'xyzzy'"
+    fail "FAIL: --feature option variable \$FOO had value '$FOO' but should have had 'xyzzy'"
   fi
 else
   echo "FAIL: --feature option not found"
 fi
 
+builder_parse -- one two "three four five"
+if [[ ${builder_extra_params[0]} != "one" ]]; then
+  fail "FAIL: -- extra parameter 'one' not found"
+fi
+if [[ ${builder_extra_params[1]} != "two" ]]; then
+  fail "FAIL: -- extra parameter 'two' not found"
+fi
+if [[ ${builder_extra_params[2]} != "three four five" ]]; then
+  fail "FAIL: -- extra parameter 'three four five' not found"
+fi
+
+# Run tests based in separate scripts to facilitate their operation
+
+# Due to the nature of the build-utils-traps tests, only one may be
+# specified at a time; each ends with an `exit`.
+echo "Running separate tests"
+$THIS_SCRIPT_PATH/build-utils-traps.test.sh error
+$THIS_SCRIPT_PATH/build-utils-traps.test.sh error-in-function
+$THIS_SCRIPT_PATH/build-utils-traps.test.sh incomplete
+echo "Fin"
+
 # Finally, run with --help so we can see what it looks like
+# Note:  calls `exit`, so no further tests may be defined.
 
 echo "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
 
