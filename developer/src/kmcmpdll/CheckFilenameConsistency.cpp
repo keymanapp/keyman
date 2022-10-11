@@ -82,6 +82,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissi
 #if defined(_WIN32) || defined(_WIN64)
   _wfinddata_t fi;
   n = _wfindfirst(Name, &fi);
+  _findclose(n);
 #else
   n= access(Name,F_OK);
 #endif

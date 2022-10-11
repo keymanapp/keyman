@@ -134,6 +134,7 @@ KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk); // I3438
 KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID= NULL);
 KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp);
 void RecordDeadkeyNames(PFILE_KEYBOARD fk);
+DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk);
 KMX_BOOL CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
 
 KMX_DWORD process_if(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
@@ -596,7 +597,7 @@ KMX_BOOL CompileKeyboardHandle(FILE* fp_in, PFILE_KEYBOARD fk)
   if (FSaveDebug) RecordDeadkeyNames(fk);
 
   /* Add the compiler version as a system store */
-  if ((msg = AddStore(fk, TSS_COMPILEDVERSION, KEYMAN_VersionWin_W16)) != CERR_None) return msg;
+  if ((msg = AddCompilerVersionStore(fk)) != CERR_None) SetError(msg);
 
   if ((msg = BuildVKDictionary(fk)) != CERR_None) SetError(msg);  // I3438
 
@@ -859,7 +860,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
         //swprintf(tstr, "%d", fk->currentGroup);
         /* Record a system store for the line number of the begin statement */
         //wcscpy(tstr, DEBUGSTORE_MATCH);
-        u16sprintf(tstr, _countof(tstr), L"%ls%d %ls",u16fmt( DEBUGSTORE_MATCH).c_str(), (int) fk->currentGroup, u16fmt(gp->szName).c_str());  // I3481
+        u16sprintf(tstr, _countof(tstr), L"%s%d %s",u16fmt( DEBUGSTORE_MATCH).c_str(), (int) fk->currentGroup, u16fmt(gp->szName).c_str());  // I3481
         AddDebugStore(fk, tstr);
       }
     }
@@ -892,7 +893,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
         KMX_WCHAR tstr[128];
         PKMX_WCHAR p_tstr;
         /* Record a system store for the line number of the begin statement */
-        u16sprintf(tstr, _countof(tstr), L"%ls%d %ls", u16fmt(DEBUGSTORE_NOMATCH).c_str(), fk->currentGroup, u16fmt(gp->szName).c_str());  // I3481
+        u16sprintf(tstr, _countof(tstr), L"%s%d %s", u16fmt(DEBUGSTORE_NOMATCH).c_str(), fk->currentGroup, u16fmt(gp->szName).c_str());  // I3481
         AddDebugStore(fk, tstr);
       }
     }
@@ -1472,6 +1473,21 @@ KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
 
   return TRUE;
 }
+
+
+DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk)
+{
+  DWORD msg;
+
+  if(!FShouldAddCompilerVersion) {
+    return CERR_None;
+  }
+
+  if ((msg = AddStore(fk, TSS_COMPILEDVERSION, KEYMAN_VersionWin_W16)) != CERR_None) return msg;
+
+  return CERR_None;
+}
+
 /****************************
 * Rule lines
 */
@@ -3696,7 +3712,7 @@ void RecordDeadkeyNames(PFILE_KEYBOARD fk)
   KMX_DWORD i;
   for (i = 0; i < fk->cxDeadKeyArray; i++)
   {
-    u16sprintf(buf, _countof(buf), L"%ls%d %ls", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i, u16fmt(fk->dpDeadKeyArray[i].szName).c_str());  // I3481 
+    u16sprintf(buf, _countof(buf), L"%s%d %s", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i, u16fmt(fk->dpDeadKeyArray[i].szName).c_str());  // I3481 
     AddDebugStore(fk, buf);
   }
 }
