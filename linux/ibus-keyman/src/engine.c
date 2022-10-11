@@ -51,32 +51,46 @@
 #define KEYMAN_LALT  56 // 0x38
 #define KEYMAN_RCTRL 97 // 0x61
 #define KEYMAN_RALT 100 // 0x64
+#define KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL  202
+#define KEYMAN_NOCHAR_KEYSYM (0xfdd0 | 0x1000000) // Unicode NOCHAR
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
 
-struct _IBusKeymanEngine {
-	IBusEngine parent;
+#define MAX_QUEUE_SIZE 100
 
-    /* members */
-    km_kbp_keyboard *keyboard;
-    km_kbp_state    *state;
-    gchar           *ldmlfile;
-    gchar           *kb_name;
-    gchar           *char_buffer;
-    gboolean         lctrl_pressed;
-    gboolean         rctrl_pressed;
-    gboolean         lalt_pressed;
-    gboolean         ralt_pressed;
-    gboolean         emitting_keystroke;
-    IBusProperty    *status_prop;
-    IBusPropList    *prop_list;
+typedef struct _commit_queue_item {
+  gchar *char_buffer;
+  gboolean emitting_keystroke;
+  guint keyval;
+  guint keycode;
+  guint state;
+} commit_queue_item;
+
+struct _IBusKeymanEngine {
+  IBusEngine parent;
+
+  /* members */
+  km_kbp_keyboard *keyboard;
+  km_kbp_state    *state;
+  gchar           *ldmlfile;
+  gchar           *kb_name;
+  gboolean         lctrl_pressed;
+  gboolean         rctrl_pressed;
+  gboolean         lalt_pressed;
+  gboolean         ralt_pressed;
+  IBusLookupTable *table;
+  IBusProperty    *status_prop;
+  IBusPropList    *prop_list;
 #ifdef GDK_WINDOWING_X11
-    Display         *xdisplay;
+  Display         *xdisplay;
 #endif
 #ifdef GDK_WINDOWING_WAYLAND
-    GdkWaylandDisplay *wldisplay;
+  GdkWaylandDisplay *wldisplay;
 #endif
+
+  commit_queue_item commit_queue[MAX_QUEUE_SIZE];
+  commit_queue_item *commit_item;
 };
 
 struct _IBusKeymanEngineClass {
@@ -212,9 +226,22 @@ static gchar *get_current_context_text(km_kbp_context *context)
     return current_context_utf8;
 }
 
-static void reset_context(IBusEngine *engine)
+static gboolean
+client_supports_prefilter(IBusEngine *engine)
 {
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
+  g_assert(engine != NULL);
+  return (engine->client_capabilities & IBUS_CAP_PREFILTER) != 0;
+}
+
+static gboolean
+client_supports_surrounding_text(IBusEngine *engine) {
+  g_assert(engine != NULL);
+  return (engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0;
+}
+
+static void
+reset_context(IBusEngine *engine) {
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
     IBusText *text;
     gchar *surrounding_text, *current_context_utf8;
     guint cursor_pos, anchor_pos, context_start, context_pos;
@@ -248,6 +275,15 @@ static void reset_context(IBusEngine *engine)
     else {
         km_kbp_context_clear(context);
     }
+}
+
+static void
+initialize_queue(IBusKeymanEngine *keyman, int index, int count) {
+  g_assert(keyman != NULL);
+  g_assert(index >= 0 && index < MAX_QUEUE_SIZE);
+  g_assert(count > 0 && count <= MAX_QUEUE_SIZE);
+  g_assert(index + count <= MAX_QUEUE_SIZE);
+  memset(&keyman->commit_queue[index], 0, sizeof(commit_queue_item) * count);
 }
 
 static void
@@ -315,8 +351,9 @@ ibus_keyman_engine_constructor(
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
     keyman->rctrl_pressed = FALSE;
-    keyman->emitting_keystroke = FALSE;
-    gchar **split_name = g_strsplit(engine_name, ":", 2);
+    initialize_queue(keyman, 0, MAX_QUEUE_SIZE);
+    keyman->commit_item    = &keyman->commit_queue[0];
+    gchar **split_name     = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
     {
         IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
@@ -510,17 +547,17 @@ process_unicode_char_action(
     g_free(utf8);
   } else {
     g_message("unichar:U+%04x, bytes:%d, string:%s", action_item->character, numbytes, utf8);
-    if (keyman->char_buffer == NULL) {
+    if (keyman->commit_item->char_buffer == NULL) {
       g_message("setting buffer to converted unichar");
-      keyman->char_buffer = utf8;
+      keyman->commit_item->char_buffer = utf8;
     } else {
       g_message("appending converted unichar to CHAR buffer");
-      gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8, NULL);
-      g_free(keyman->char_buffer);
+      gchar *new_buffer = g_strjoin("", keyman->commit_item->char_buffer, utf8, NULL);
+      g_free(keyman->commit_item->char_buffer);
       g_free(utf8);
-      keyman->char_buffer = new_buffer;
+      keyman->commit_item->char_buffer = new_buffer;
     }
-    g_message("CHAR buffer is now %s", keyman->char_buffer);
+    g_message("CHAR buffer is now %s", keyman->commit_item->char_buffer);
   }
   return TRUE;
 }
@@ -544,28 +581,27 @@ process_backspace_action(
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   if (action_items[i].backspace.expected_type == KM_KBP_IT_MARKER) {
     g_message("skipping marker type");
-  } else if (keyman->char_buffer != NULL) {
-    // ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+  } else if (keyman->commit_item->char_buffer != NULL) {
     g_message("removing one utf8 char from CHAR buffer");
-    glong end_pos = g_utf8_strlen(keyman->char_buffer, -1);
+    glong end_pos = g_utf8_strlen(keyman->commit_item->char_buffer, -1);
     gchar *new_buffer;
     if (end_pos == 1) {
       new_buffer = NULL;
       g_message("resetting CHAR buffer to NULL");
     } else {
-      new_buffer = g_utf8_substring(keyman->char_buffer, 0, end_pos - 1);
+      new_buffer = g_utf8_substring(keyman->commit_item->char_buffer, 0, end_pos - 1);
       g_message("changing CHAR buffer to :%s:", new_buffer);
     }
-    if (g_strcmp0(keyman->char_buffer, new_buffer) == 0) {
+    if (g_strcmp0(keyman->commit_item->char_buffer, new_buffer) == 0) {
       g_message("oops, CHAR buffer hasn't changed");
     }
-    g_free(keyman->char_buffer);
-    keyman->char_buffer = new_buffer;
+    g_free(keyman->commit_item->char_buffer);
+    keyman->commit_item->char_buffer = new_buffer;
   } else {
     g_message(
         "DAR: process_backspace_action - client_capabilities=%x, %x", engine->client_capabilities, IBUS_CAP_SURROUNDING_TEXT);
 
-    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
+    if (client_supports_surrounding_text(engine)) {
       g_message("deleting surrounding text 1 char");
       ibus_engine_delete_surrounding_text(engine, -1, 1);
     } else {
@@ -609,18 +645,21 @@ process_persist_action(
   return TRUE;
 }
 
-static gboolean process_emit_keystroke_action(IBusKeymanEngine *keyman) {
-  if (keyman->char_buffer != NULL) {
-    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-    g_free(keyman->char_buffer);
-    keyman->char_buffer = NULL;
+static gboolean
+process_emit_keystroke_action(IBusKeymanEngine *keyman) {
+  IBusEngine *engine = (IBusEngine *)keyman;
+  if ((!client_supports_prefilter(engine) || client_supports_surrounding_text(engine)) &&
+      keyman->commit_item->char_buffer != NULL) {
+    ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
+    g_free(keyman->commit_item->char_buffer);
+    keyman->commit_item->char_buffer = NULL;
   }
-  keyman->emitting_keystroke = TRUE;
+  keyman->commit_item->emitting_keystroke = TRUE;
   return TRUE;
 }
 
-static gboolean process_invalidate_context_action(IBusEngine *engine) {
-  IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+static gboolean
+process_invalidate_context_action(IBusEngine *engine) {
   reset_context(engine);
   return TRUE;
 }
@@ -648,17 +687,69 @@ process_capslock_action(
   return TRUE;
 }
 
-static gboolean process_end_action(IBusKeymanEngine *keyman) {
-  if (keyman->char_buffer != NULL) {
-    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-    g_free(keyman->char_buffer);
-    keyman->char_buffer = NULL;
+static void
+commit_text(IBusKeymanEngine *keyman) {
+  g_assert(keyman != NULL);
+  if (keyman->commit_item <= keyman->commit_queue)
+    return;
+
+  commit_queue_item *current_item = &keyman->commit_queue[0];
+  if (current_item->char_buffer != NULL) {
+    ibus_keyman_engine_commit_string(keyman, current_item->char_buffer);
+    g_free(current_item->char_buffer);
   }
-  if (keyman->emitting_keystroke) {
-    keyman->emitting_keystroke = FALSE;
-    return FALSE;
+  if (current_item->emitting_keystroke) {
+    ibus_engine_forward_key_event((IBusEngine*)keyman, current_item->keyval, current_item->keycode, current_item->state);
+  }
+  keyman->commit_item--;
+  memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * MAX_QUEUE_SIZE - 1);
+  initialize_queue(keyman, MAX_QUEUE_SIZE - 1, 1);
+}
+
+static gboolean
+process_end_action(IBusKeymanEngine *keyman) {
+  g_assert(keyman != NULL);
+  IBusEngine *engine = (IBusEngine *)keyman;
+  if (client_supports_prefilter(engine) && !client_supports_surrounding_text(engine)) {
+    guint state = keyman->commit_item->state;
+    keyman->commit_item++;
+    if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE-1]) {
+      g_error("Overflow of keyman commit_queue!");
+      // TODO: log to Sentry
+      keyman->commit_item--;
+    }
+
+    // Forward a fake key event to get the correct order of events so that any backspace key we
+    // generated will be processed before the character we're adding. We need to send a
+    // valid keyval/keycode combination so that it doesn't get swallowed by GTK but which
+    // isn't very likely used in real keyboards. F24 seems to work for that.
+    ibus_engine_forward_key_event((IBusEngine*)keyman,
+      KEYMAN_NOCHAR_KEYSYM,
+      KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL,
+      (state & IBUS_RELEASE_MASK)
+        ? IBUS_PREFILTER_MASK | IBUS_RELEASE_MASK
+        : IBUS_PREFILTER_MASK);
+  } else {
+    if (keyman->commit_item->char_buffer != NULL) {
+      ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
+      g_free(keyman->commit_item->char_buffer);
+      keyman->commit_item->char_buffer = NULL;
+    }
+    if (keyman->commit_item->emitting_keystroke) {
+      keyman->commit_item->emitting_keystroke = FALSE;
+      // We have an old ibus version without prefilter support, or a client that does support
+      // surrounding text. In either case we return FALSE because we emitted a keystroke
+      // so that the processing of the event will continue.
+      return FALSE;
+    }
   }
 
+  // If we have a new ibus version that supports prefilter and a client that doesn't support
+  // surrounding text (e.g. Chromium as of v104) we forwarded the key event with
+  // IBUS_PREFILTER_MASK set and now return TRUE here to stop further processing.
+  // With an old ibus version without prefilter support, or with a client that does support
+  // surrounding text, we return TRUE if we completely processed the event and no further
+  // processing should happen.
   return TRUE;
 }
 
@@ -675,6 +766,7 @@ process_actions(
     case KM_KBP_IT_CHAR:
       g_message("CHAR action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_unicode_char_action(keyman, &action_items[i]);
+      g_assert(continue_with_next_action == TRUE);
       break;
     case KM_KBP_IT_MARKER:
       g_message("MARKER action %d/%d", i + 1, (int)num_action_items);
@@ -682,26 +774,32 @@ process_actions(
     case KM_KBP_IT_ALERT:
       g_message("ALERT action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_alert_action();
+      g_assert(continue_with_next_action == TRUE);
       break;
     case KM_KBP_IT_BACK:
       g_message("BACK action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_backspace_action(engine, action_items, i, num_action_items);
+      g_assert(continue_with_next_action == TRUE);
       break;
     case KM_KBP_IT_PERSIST_OPT:
       g_message("PERSIST_OPT action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_persist_action(keyman, &action_items[i]);
+      g_assert(continue_with_next_action == TRUE);
       break;
     case KM_KBP_IT_EMIT_KEYSTROKE:
       g_message("EMIT_KEYSTROKE action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_emit_keystroke_action(keyman);
+      g_assert(continue_with_next_action == TRUE);
       break;
     case KM_KBP_IT_INVALIDATE_CONTEXT:
       g_message("INVALIDATE_CONTEXT action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_invalidate_context_action(engine);
+      g_assert(continue_with_next_action == TRUE);
       break;
     case KM_KBP_IT_CAPSLOCK:
       g_message("CAPSLOCK action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_capslock_action(keyman, &action_items[i]);
+      g_assert(continue_with_next_action == TRUE);
       break;
     case KM_KBP_IT_END:
       g_message("END action %d/%d", i + 1, (int)num_action_items);
@@ -724,13 +822,24 @@ ibus_keyman_engine_process_key_event(
   guint state
 ) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  keyman->commit_item->keyval     = keyval;
+  keyman->commit_item->keycode    = keycode;
+  keyman->commit_item->state      = state;
 
   gboolean isKeyDown = !(state & IBUS_RELEASE_MASK);
 
   g_message("-----------------------------------------------------------------------------------------------------------------");
   g_message(
-      "DAR: ibus_keyman_engine_process_key_event - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d", keyval, keycode,
-      state, isKeyDown);
+      "DAR: ibus_keyman_engine_process_key_event - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, supports_prefilter=%d", keyval, keycode,
+      state, isKeyDown, client_supports_prefilter(engine));
+
+  // This keycode is a fake keycode that we send when it's time to commit the text, ensuring the
+  // correct output order of backspace and text.
+  if (client_supports_prefilter(engine) && !client_supports_surrounding_text(engine) &&
+      keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL && (state & IBUS_PREFILTER_MASK)) {
+    commit_text(keyman);
+    return TRUE;
+  }
 
   // REVIEW: why don't we handle these keys?
   switch (keycode) {
@@ -800,12 +909,17 @@ ibus_keyman_engine_process_key_event(
 
   // km_kbp_state_action_items to get action items
   size_t num_action_items;
-  g_free(keyman->char_buffer);
-  keyman->char_buffer                    = NULL;
+  g_free(keyman->commit_item->char_buffer);
+  keyman->commit_item->char_buffer = NULL;
   const km_kbp_action_item *action_items = km_kbp_state_action_items(keyman->state, &num_action_items);
 
-  if (!process_actions(engine, action_items, num_action_items))
+  if (!process_actions(engine, action_items, num_action_items) &&
+      (!client_supports_prefilter(engine) || client_supports_surrounding_text(engine))) {
+    // If we have an old ibus version without prefilter support, or a client that supports
+    // surrounding text, and we forwarded a key event we want to return FALSE so that the
+    // processing of the event continues.
     return FALSE;
+  }
 
   context = km_kbp_state_context(keyman->state);
   g_message("after processing all actions");
