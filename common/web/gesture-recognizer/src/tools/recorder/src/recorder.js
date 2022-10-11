@@ -48,6 +48,7 @@ loadPromise.then((recognizer) => {
     });
 
     sequence.on('end', function() {
+      //let stats = sequence.touchpoints[0].path.segments[0].stats;
       logElement.value = recorder.recordingsToJSON();
     });
   });

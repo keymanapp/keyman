@@ -7,7 +7,7 @@ namespace com.keyman.osk {
   export type JSONTrackedPath = {
     coords: InputSample[]; // ensures type match with public class property.
     wasCancelled?: boolean;
-    // segments: Segment[];
+    //segments: Segment[];
   }
 
   interface EventMap {
@@ -36,6 +36,10 @@ namespace com.keyman.osk {
    */
   export class TrackedPath extends EventEmitter<EventMap> {
     private samples: InputSample[] = [];
+    private _segments: Segment[] = [];
+
+    private readonly segmenter: PathSegmenter;
+
     private _isComplete: boolean = false;
     private wasCancelled?: boolean;
 
@@ -56,10 +60,16 @@ namespace com.keyman.osk {
 
       if(jsonObj) {
         this.samples = [...jsonObj.coords.map((obj) => ({...obj} as InputSample))];
-        // If we're reconstructing this from a JSON.parse, it's a previously-recorded, completed path.
+        // If we're reconstructing this from a JSON.parse, it's a previously-recorded,
+        // completed path.
         this._isComplete = true;
         this.wasCancelled = jsonObj.wasCancelled;
       }
+
+      // Keep this as the _final_ statement in the constructor.  `PathSegmenter` will
+      // need a reference to this instance, even if only via closure.
+      // (Most likely; not yet done.) Kinda awkward, but it's useful for compartmentalization.
+      this.segmenter = new PathSegmenter();
     }
 
     /**
@@ -80,6 +90,7 @@ namespace com.keyman.osk {
       }
 
       this.samples.push(sample);
+      this.segmenter.add(sample);
       this.emit('step', sample);
     }
 
@@ -93,6 +104,7 @@ namespace com.keyman.osk {
       }
       this.wasCancelled = cancel;
       this._isComplete = true;
+      this.segmenter.close();
 
       if(cancel) {
         this.emit('invalidated');
@@ -108,6 +120,10 @@ namespace com.keyman.osk {
      */
     public get coords(): readonly InputSample[] {
       return this.samples;
+    }
+
+    public get segments(): readonly Segment[] {
+      return this._segments;
     }
 
     /**

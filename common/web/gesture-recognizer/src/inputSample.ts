@@ -36,4 +36,8 @@ namespace com.keyman.osk {
   }
 
   export type InputSampleSequence = InputSample[];
+
+  export function isAnInputSample(obj: any): obj is InputSample {
+    return 'targetX' in obj && 'targetY' in obj && 't' in obj;
+  }
 }
