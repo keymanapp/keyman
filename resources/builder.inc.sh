@@ -214,7 +214,7 @@ _builder_failure_trap() {
       target=:project
     fi
 
-    builder_finish_action failure $action $target
+    builder_finish_action failure $action$target
 
     # Make 100% sure that the exit code chains fully.
     # Without this, nested scripts have failed to chain errors from npm calls past the script
@@ -247,23 +247,28 @@ _builder_cleanup_deps() {
 # The string will be set as `_builder_matched_action`, which is for
 # builder.inc.sh internal use, used by `builder_start_action`.
 #
-# Usage:
+# ### Usage
+#
+# ```bash
 #   if build_has_action action[:target]; then ...; fi
+# ````
+#
 # Parameters:
-#   1: action    name of action
-#   2: :target    name of target, :-prefixed, as part of first param or space separated ok
+#   1: action[:target]    name of action:target
 # Example:
-#   if builder_has_action build :app; then  # or build:app, that's fine too.
+#
+# ```bash
+#   if builder_has_action build:app; then ...
+# ```
+#
 builder_has_action() {
   local action="$1" target
 
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
     target=:$target
-  elif [[ -z ${2+x} ]]; then
-    target=:project
   else
-    target="$2"
+    target=:project
   fi
 
   if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
@@ -301,7 +306,7 @@ builder_has_action() {
 builder_start_action() {
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
-  if builder_has_action $@; then
+  if builder_has_action $1; then
     # In a dependency quick build (the default), determine whether we actually
     # need to run this step. Uses data passed to builder_describe_outputs to
     # verify whether a target output is present.
@@ -310,7 +315,7 @@ builder_start_action() {
         [[ ! -z ${_builder_dep_path[$_builder_matched_action]+x} ]] &&
         [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$_builder_matched_action]}" ]]; then
       if builder_verbose; then
-        echo "[$THIS_SCRIPT_IDENTIFIER] skipping $_builder_matched_action, up-to-date"
+        echo "$scope skipping $_builder_matched_action, up-to-date"
       fi
       return 1
     fi
@@ -922,10 +927,8 @@ builder_finish_action() {
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
     target=:$target
-  elif [[ -z ${3+x} ]]; then
-    target=:project
   else
-    target="$3"
+    target=:project
   fi
 
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
