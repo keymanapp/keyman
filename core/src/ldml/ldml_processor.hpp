@@ -28,7 +28,7 @@ namespace kbp {
   class ldml_processor : public abstract_processor {
   private:
     bool _valid;
-    vkeys keys;
+    ldml::vkeys keys;
 
   public:
     ldml_processor(
