@@ -12,17 +12,6 @@
 #include <kmx_file.h>
 #include <ldml/keyboardprocessor_ldml.h>
 
-/**
- * @def KMXPLUS_DEBUG Set to 1 to enable debug output
- */
-#ifndef KMXPLUS_DEBUG
-#if defined(DEBUG)
-#define KMXPLUS_DEBUG 1
-#else
-#define KMXPLUS_DEBUG 0
-#endif
-#endif
-
 namespace km {
 namespace kbp {
 namespace kmx {

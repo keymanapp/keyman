@@ -208,36 +208,20 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     return false;
   }
   for (KMX_DWORD i=0; i<this->count; i++) {
-    DebugLog("#0x%X: ", i);
     KMX_DWORD offset = entries[i].offset;
     KMX_DWORD length = entries[i].length;
     if(offset+((length+1)*2) > header.size) {
-      DebugLog("expected end of string past header.size");
+      DebugLog("#0x%X: expected end of string past header.size", i);
       return false;
     }
     const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(this);
     const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
     if(start[length] != 0) {
-      DebugLog("String not null terminated");
+      DebugLog("#0x%X: String not null terminated", i);
       return false;
     }
     // TODO-LDML: validate valid UTF-16LE?
-#if KMXPLUS_DEBUG
-    // first print it escaped
-    for(KMX_DWORD j=0; start[j] && j<length; j++) {
-        if (start[j] < 0x7F && start[j] > 0x20) {
-            DebugLog("%c", start[j]);
-        } else {
-            DebugLog(" U+%04X ", start[j]);
-        }
-    }
-    DebugLog("");
-
-    // // now print it as a string
-    // TODO-LDML
-    // std::u16string str = get(i);
-    // std::cerr << str << std::endl;
-#endif
+    DebugLog("#0x%X: '%s'", i, Debug_UnicodeString(start, length));
   }
   return true;
 }
@@ -255,7 +239,7 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
   bool overall_valid = true;
   for (KMX_DWORD i = 0; i < this->count; i++) {
     const COMP_KMXPLUS_SECT_ENTRY& entry = this->entries[i];
-    DebugLog("\n#%d: ", i);
+    DebugLog("#%d: ", i);
     if(!validate_section_name(entry.sect)) {
       DebugLog(" (invalid section name) ");
       return false;
@@ -283,18 +267,19 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
 bool
 COMP_KMXPLUS_ELEM::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    DebugLog("header.size < expected size");
+    DebugLog("header.size 0x%X < expected size");
     return false;
   }
   const COMP_KMXPLUS_ELEM_ENTRY &firstEntry = entries[0];
   if (firstEntry.length != 0 ) {
-    DebugLog("ERROR: elem[0].length != 0");
+    // per spec, the first elem should have zero length and zero offset
+    DebugLog("ERROR: elem[0].length 0x%x but should be zero", firstEntry.length);
     return false;
   }
   if (firstEntry.offset + sizeof(COMP_KMXPLUS_ELEM_ELEMENT) > header.size) {
     // TODO-LDML: change to  (firstEntry.offset != 0 )
     // Blocked by https://github.com/keymanapp/keyman/issues/7404
-    DebugLog("ERROR: preposterous elem[0].offset");
+    DebugLog("ERROR: elem[0].offset 0x%x would put element outside of data region");
     return false;
   }
   for (KMX_DWORD e = 1; e < count; e++) {
@@ -303,8 +288,8 @@ COMP_KMXPLUS_ELEM::valid(KMX_DWORD _kmn_unused(length)) const {
     if (getElementList(e, listLength) == nullptr) {
       return false;
     }
-    if (listLength == 0) {
-      DebugLog("ERROR: elem[e>0].length == 0");
+    if (listLength == 0) { // only the first element should have length zero
+      DebugLog("ERROR: elem[0x%x].length == 0", e);
       return false;
     }
   }

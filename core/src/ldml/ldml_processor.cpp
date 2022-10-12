@@ -13,6 +13,7 @@
 #include "kmx/kmx_xstring.h"
 #include "ldml/keyboardprocessor_ldml.h"
 #include "kmx/kmx_file_validator.hpp"
+#include "kmx/kmx_processevent.h" // for DebugLog
 
 namespace {
   constexpr km_kbp_attr const engine_attrs = {
@@ -25,23 +26,11 @@ namespace {
   };
 }
 
-/**
- * @brief Usage: `KMXPLUS_PRINTF(("str: %s\n", "something"));`
- * Note double parens
- * \def KMXPLUS_DEBUG
- */
-#if KMXPLUS_DEBUG
-#include <iostream>
-#define KMXPLUS_NOTEQUAL(expect, actual) std::cerr << __FILE__ << ":" << __LINE__ << ": ASSERT FAILED: " \
-              << #actual << "=" << (actual) << ", expected " << (expect) << std::endl
-#define KMXPLUS_PRINTLN(msg) std::cerr  << __FILE__ << ":" << __LINE__ << ": " msg << std::endl;
-#else
-#define KMXPLUS_NOTEQUAL(expect, actual)
-#define KMXPLUS_PRINTLN(msg)
-#endif
+using km::kbp::kmx::ShouldDebug; // for DebugLog
 
 namespace km {
 namespace kbp {
+
 
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
@@ -49,30 +38,26 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
   ), _valid(false), vkey_to_string()
 {
 
-// TODO-LDML: move these asserts into kmx_plus
-
-/**
- * Assert something, just in this function
- * If fails, print a message and exit as invalid
- * \def KMXPLUS_ASSERT
- */
-#define KMXPLUS_ASSERT(expect,actual) if ((expect) != (actual)) { \
-    KMXPLUS_NOTEQUAL(expect, actual); \
-    _valid = false; \
-    return; \
+  if(data.size() <= sizeof(kmx::COMP_KEYBOARD_EX)) {
+    DebugLog("data.size %zu too small", data.size());
+    return;
   }
-
-  KMXPLUS_ASSERT(true, data.size() > sizeof(kmx::COMP_KEYBOARD_EX));
 
 //   // Locate the structs here, but still retain ptrs to the raw structs.
   kmx::KMX_FileValidator* comp_keyboard = (kmx::KMX_FileValidator*)data.data();
 
   // Perform the standard validation
-  KMXPLUS_ASSERT(TRUE, comp_keyboard->VerifyKeyboard(data.size()));
+  if(!comp_keyboard->VerifyKeyboard(data.size())) {
+    DebugLog("VerifyKeyboard() returned false");
+    return;
+  }
 
   kmx::kmx_plus kplus(comp_keyboard, data.size()); // slices to a COMP_KEYBOARD
 
-  KMXPLUS_ASSERT(true, kplus.is_valid());
+  if(!kplus.is_valid()) {
+    DebugLog("kmx_plus.is_valid is false");
+    return;
+  }
 
   // Now, if we have keys, use them.
   if (kplus.keys != nullptr) {
@@ -81,7 +66,10 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       std::u16string str;
       const kmx::COMP_KMXPLUS_KEYS_ENTRY &entry = kplus.keys->entries[i];
       if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
-        KMXPLUS_ASSERT(false, nullptr == kplus.strs); // need a string table to get strings
+        if (nullptr == kplus.strs) {
+          DebugLog("kplus.strs == nullptr"); // need a string table to get strings
+          return;
+        }
         str = kplus.strs->get(entry.to);
       } else {
         str = entry.get_string();
@@ -90,9 +78,8 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       vkey_to_string[vkey_id] = str; // assign the string
     }
   } // else: no keys! but still valid. Just, no keys.
-  KMXPLUS_PRINTLN("_valid = true");
+  DebugLog("_valid = true");
 
-#undef KMXPLUS_ASSERT
   _valid = true;
 }
 
