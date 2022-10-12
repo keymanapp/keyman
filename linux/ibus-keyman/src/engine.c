@@ -241,33 +241,33 @@ client_supports_surrounding_text(IBusEngine *engine) {
 
 static void
 reset_context(IBusEngine *engine) {
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  km_kbp_context *context;
+
+  g_message("%s", __FUNCTION__);
+  context = km_kbp_state_context(keyman->state);
+  km_kbp_context_clear(context);
+
+  if (client_supports_surrounding_text(engine)) {
     IBusText *text;
-    gchar *surrounding_text, *current_context_utf8;
-    guint cursor_pos, anchor_pos, context_start, context_pos;
+    gchar *surrounding_text;
+    guint cursor_pos, anchor_pos, context_start, context_end;
     km_kbp_context_item *context_items;
-    km_kbp_context *context;
 
-    g_message("reset_context");
-    context = km_kbp_state_context(keyman->state);
-    km_kbp_context_clear(context);
+    ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
 
-    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
+    context_start    = context_end > MAXCONTEXT_ITEMS ? context_end - MAXCONTEXT_ITEMS : 0;
+    context_end      = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
+    surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_end);
+    g_message("%s: new context is :%s: (len:%u) cursor:%d anchor:%d", __FUNCTION__,
+      surrounding_text, context_end - context_start, cursor_pos, anchor_pos);
 
-        ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
-
-        context_pos      = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
-        context_start    = context_pos > MAXCONTEXT_ITEMS ? context_pos - MAXCONTEXT_ITEMS : 0;
-        surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_pos);
-        g_message("%s: new context is :%s: (len:%u) cursor:%d anchor:%d", __FUNCTION__,
-          surrounding_text, context_pos - context_start, cursor_pos, anchor_pos);
-
-        if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
-          km_kbp_context_set(context, context_items);
-        }
-        km_kbp_context_items_dispose(context_items);
-        g_free(surrounding_text);
+    if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
+      km_kbp_context_set(context, context_items);
     }
+    km_kbp_context_items_dispose(context_items);
+    g_free(surrounding_text);
+  }
 }
 
 static void
