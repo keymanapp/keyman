@@ -1,23 +1,26 @@
-﻿store(&VERSION) '10.0'
+﻿c ***** This test will produce 1 Error: ****************************
+c ***** It will be marked as FAIL when run in kmcompxtest **********
+c *****    as a non-existing ErrorNr (0x00001234) is specified *****
+c ***** 2) CERR_InvalidCharacter 0x00004034 will be produced *******
+c ******************************************************************
+store(&VERSION) '10.0'
 store(&NAME) 'Balochi Phonetic'
 store(&TARGETS) 'any'
 store(&KMW_RTL) '1'
 store(&LAYOUTFILE) 'balochi_phonetic.keyman-touch-layout'
-store(&KEYBOARDVERSION) '1.4.2'
-store(&COPYRIGHT) '© 2017-2021 SIL International'
+store(&KEYBOARDVERSION) '1.5'
+store(&COPYRIGHT) '© SIL International'
 store(&MESSAGE) 'The Balochi Phonetic keyboard is distributed under The MIT License (MIT).'
 store(&KMW_HELPTEXT) 'This is a phonetically organized Balochi keyboard.'
 store(&VISUALKEYBOARD) 'balochi_phonetic.kvks'
-store(&BITMAP) 'CERR__balochi_phonetic.bmp'
+store(&BITMAP) 'balochi__phonetic.ico'
 
 begin Unicode > use(main)
 
 group(main) using keys
 + [CTRL B08] > '‎'
 + [CTRL B09] > '‏'
-c ***** CERR_ZeroLengthString 0x00004017 ***************************
-+ [CTRL B10] >
-c ******************************************************************
++ [CTRL B10] > '–'
 + [SHIFT CTRL E11] > '“'
 + [SHIFT CTRL E12] > '”'
 + [CTRL E11] > '‘'

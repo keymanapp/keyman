@@ -1,23 +1,23 @@
-﻿store(&VERSION) '10.0'
+store(&VERSION) '10.0'
 store(&NAME) 'Balochi Phonetic'
 store(&TARGETS) 'any'
 store(&KMW_RTL) '1'
 store(&LAYOUTFILE) 'balochi_phonetic.keyman-touch-layout'
 store(&KEYBOARDVERSION) '1.4.2'
-store(&COPYRIGHT) '© 2017-2021 SIL International'
+c ***** CERR_InvalidCharacter 0x00004034 ***************************
+store(&COPYRIGHT) '� 2012 U+1234 -2020 SIL International'
+c ******************************************************************
 store(&MESSAGE) 'The Balochi Phonetic keyboard is distributed under The MIT License (MIT).'
 store(&KMW_HELPTEXT) 'This is a phonetically organized Balochi keyboard.'
 store(&VISUALKEYBOARD) 'balochi_phonetic.kvks'
-store(&BITMAP) 'CERR__balochi_phonetic.bmp'
+store(&BITMAP) 'CERR__balochi_phonetic.ico'
 
 begin Unicode > use(main)
 
 group(main) using keys
 + [CTRL B08] > '‎'
 + [CTRL B09] > '‏'
-c ***** CERR_ZeroLengthString 0x00004017 ***************************
-+ [CTRL B10] >
-c ******************************************************************
++ [CTRL B10] > '–'
 + [SHIFT CTRL E11] > '“'
 + [SHIFT CTRL E12] > '”'
 + [CTRL E11] > '‘'

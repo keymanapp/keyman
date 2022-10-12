@@ -6,7 +6,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <kmcompx.h>
+#include "kmcompx.h"
 #include <iostream>
 #include <vector>
 #include <string>
