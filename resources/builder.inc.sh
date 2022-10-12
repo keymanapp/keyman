@@ -369,7 +369,7 @@ _builder_expand_relative_path() {
   if [[ "$path" =~ ^/ ]]; then
     echo "${path:1}"
   else
-    realpath --relative-to="$KEYMAN_ROOT" "$THIS_SCRIPT_PATH/$path"
+    realpath --canonicalize-missing --relative-to="$KEYMAN_ROOT" "$THIS_SCRIPT_PATH/$path"
   fi
 }
 
