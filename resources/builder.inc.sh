@@ -36,16 +36,19 @@ function _builder_findRepoRoot() {
 }
 
 # Used to build script-related build variables useful for referencing the calling script
-# and for prefixing builder_finish_action outputs in order to more clearly identify the calling
+# and for prefixing `builder_finish_action` outputs in order to more clearly identify the calling
 # script.
 #
-# Assumes that THIS_SCRIPT has been set, typically like this:
+# Assumes that `THIS_SCRIPT` has been set, typically like this:
 #
-#  ## START STANDARD BUILD SCRIPT INCLUDE
-#  # adjust relative paths as necessary
-#  THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-#  . "$(dirname "$THIS_SCRIPT")/resources/builder.inc.sh"
-#  ## END STANDARD BUILD SCRIPT INCLUDE
+# ```bash
+#   ## START STANDARD BUILD SCRIPT INCLUDE
+#   # adjust relative paths as necessary
+#   THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+#   . "$(dirname "$THIS_SCRIPT")/resources/builder.inc.sh"
+#   ## END STANDARD BUILD SCRIPT INCLUDE
+# ```
+#
 function _builder_setBuildScriptIdentifiers() {
   if [ ! -z ${THIS_SCRIPT+x} ]; then
     THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
@@ -141,7 +144,7 @@ _builder_item_in_array() {
   local e match="$1"
   shift
   [[ -z "$match" ]] && return 1
-  for e; do [[ "$e" == "$match" ]] && return 0; done
+  for e; do [[ "$e" == $match ]] && return 0; done
   return 1
 }
 
@@ -268,12 +271,17 @@ builder_has_action() {
     IFS=: read -r action target <<< $action
     target=:$target
   else
-    target=:project
+    target=':*'
   fi
 
   if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
     # To avoid WET re-processing of the $action$target string set
     _builder_matched_action="$action$target"
+    if [[ $target == ':*' ]]; then
+      _builder_matched_action_name="$action"
+    else
+      _builder_matched_action_name="$action$target"
+    fi
     return 0
   else
     _builder_matched_action=
@@ -315,12 +323,12 @@ builder_start_action() {
         [[ ! -z ${_builder_dep_path[$_builder_matched_action]+x} ]] &&
         [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$_builder_matched_action]}" ]]; then
       if builder_verbose; then
-        echo "$scope skipping $_builder_matched_action, up-to-date"
+        echo "$scope skipping $_builder_matched_action_name, up-to-date"
       fi
       return 1
     fi
 
-    echo "${COLOR_BLUE}## $scope$_builder_matched_action starting...${COLOR_RESET}"
+    echo "${COLOR_BLUE}## $scope$_builder_matched_action_name starting...${COLOR_RESET}"
     if [ -n "${_builder_current_action}" ]; then
       _builder_warn_if_incomplete
     fi
@@ -593,14 +601,14 @@ function builder_describe_outputs() {
   while [[ $# -gt 0 ]]; do
     local key="$1" path="$2" action target
     if [[ $key =~ : ]]; then
-      action=$(echo "$key" | cut -d: -f 1 -)
-      target=$(echo "$key" | cut -d: -f 2 -)
+      action="$(echo "$key" | cut -d: -f 1 -)"
+      target=":$(echo "$key" | cut -d: -f 2 -)"
     else
-      action=$key
-      target=project
+      action="$key"
+      target=':*'
     fi
     path="`_builder_expand_relative_path "$path"`"
-    _builder_dep_path[$action:$target]="$path"
+    _builder_dep_path[$action$target]="$path"
     shift 2
   done
 }
@@ -922,30 +930,36 @@ builder_display_usage() {
 
 builder_finish_action() {
   local result="$1"
-  local action="$2" target
+  local action="$2" target action_name
 
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
-    target=:$target
+    target=":$target"
   else
-    target=:project
+    target=':*'
+  fi
+
+  if [[ "$target" == ":*" ]]; then
+    action_name="$action"
+  else
+    action_name="$action$target"
   fi
 
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
   if [[ "$action$target" == "${_builder_current_action}" ]]; then
     if [[ $result == success ]]; then
-      echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
+      echo "${COLOR_GREEN}## $scope$action_name completed successfully${COLOR_RESET}"
     elif [[ $result == failure ]]; then
-      echo "${COLOR_RED}## $scope$action$target failed${COLOR_RESET}"
+      echo "${COLOR_RED}## $scope$action_name failed${COLOR_RESET}"
     else
-      echo "${COLOR_RED}## $scope$action$target failed with message: $result${COLOR_RESET}"
+      echo "${COLOR_RED}## $scope$action_name failed with message: $result${COLOR_RESET}"
     fi
 
     # Remove $action$target from the array; it is no longer a current action
     _builder_current_action=
   else
-    echo "${COLOR_YELLOW}## Warning: reporting result of $action$target but the action was never started!${COLOR_RESET}"
+    echo "${COLOR_YELLOW}## Warning: reporting result of $action_name but the action was never started!${COLOR_RESET}"
   fi
 }
 
@@ -982,7 +996,7 @@ _builder_do_build_deps() {
     # Don't attempt to build dependencies that don't match the current
     # action:target (wildcards supported for matches here)
     if ! _builder_should_build_dep "$action_target" "$dep"; then
-      echo "[$THIS_SCRIPT_IDENTIFIER] Skipping dependency build $dep for $action_target"
+      echo "[$THIS_SCRIPT_IDENTIFIER] Skipping dependency build $dep for $_builder_matched_action_name"
       continue
     fi
 

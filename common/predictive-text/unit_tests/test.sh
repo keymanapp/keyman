@@ -30,20 +30,9 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
 
 builder_parse "$@"
 
-if builder_start_action configure:libraries; then
-  # Ensure all testing dependencies are in place.
+if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success configure:libraries
-fi
-
-if builder_start_action configure:headless; then
-  verify_npm_setup
-  builder_finish_action success configure:headless
-fi
-
-if builder_start_action configure:browser; then
-  verify_npm_setup
-  builder_finish_action success configure:browser
+  builder_finish_action success configure
 fi
 
 if builder_start_action test:libraries; then

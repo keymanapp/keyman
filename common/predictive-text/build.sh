@@ -43,45 +43,18 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-# Exit status on invalid usage.
-LMLAYER_OUTPUT=build
-
 ### CONFIGURE ACTIONS
 
-if builder_start_action configure:browser; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success configure:browser
-fi
-
-if builder_start_action configure:headless; then
-  verify_npm_setup
-  builder_finish_action success configure:headless
+  builder_finish_action success configure
 fi
 
 ### CLEAN ACTIONS
 
-# A nice, extensible method for -clean operations.  Add to this as necessary.
-# TODO: separate clean for different targets
-do_clean() {
-  rm -rf "$LMLAYER_OUTPUT"
-}
-
-CLEANED=
-if builder_start_action clean:browser; then
-  do_clean
-  CLEANED=clean:browser
+if builder_start_action clean; then
+  rm -rf build/
   builder_finish_action success clean:browser
-fi
-
-if builder_start_action clean:headless; then
-  if [ -n "$CLEANED" ]; then
-    echo "${BUILDER_TERM_START}clean${BUILDER_TERM_END} already completed as ${BUILDER_TERM_START}${CLEANED}${BUILDER_TERM_END}; skipping."
-  else
-    do_clean
-    CLEANED=clean:headless
-  fi
-
-  builder_finish_action success clean:headless
 fi
 
 ### BUILD ACTIONS

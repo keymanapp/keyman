@@ -43,42 +43,16 @@ builder_parse "$@"
 
 ### CONFIGURE ACTIONS
 
-if builder_start_action configure:module; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success configure:module
-fi
-
-if builder_start_action configure:tools; then
-  verify_npm_setup
-  builder_finish_action success configure:tools
+  builder_finish_action success configure
 fi
 
 ### CLEAN ACTIONS
 
-# A nice, extensible method for -clean operations.  Add to this as necessary.
-do_clean() {
-  if [ -d build ]; then
-    rm -rf build/
-  fi
-}
-
-CLEANED=
-
-if builder_start_action clean:module; then
-  do_clean
-  CLEANED=clean:module
-  builder_finish_action success clean:module
-fi
-
-if builder_start_action clean:tools; then
-  if [ -n "$CLEANED" ]; then
-    echo "${BUILDER_TERM_START}clean${BUILDER_TERM_END} already completed as ${BUILDER_TERM_START}${CLEANED}${BUILDER_TERM_END}; skipping."
-  else
-    do_clean
-    CLEANED=clean:tools
-  fi
-
-  builder_finish_action success clean:tools
+if builder_start_action clean; then
+  rm -rf build/
+  builder_finish_action success clean
 fi
 
 ### BUILD ACTIONS
