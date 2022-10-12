@@ -19,32 +19,23 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
+  "@../keyman-version" \
   configure \
   clean \
   build \
   ":module      Builds recorder-core module" \
   ":proctor     Builds headless-testing, node-oriented 'proctor' component"
 
+builder_describe_outputs \
+  configure:module   "/node_modules" \
+  configure:proctor  "/node_modules" \
+  build:module    "build/index.js" \
+  build:proctor   "build/nodeProctor/index.js"
+
 builder_parse "$@"
 
-# START - Script parameter configuration
-REPORT_STYLE="local"  # Default setting.
-
-if builder_has_option --ci; then
-  REPORT_STYLE="ci"
-
-  echo "Replacing user-friendly test reports with CI-friendly versions."
-fi
-
-# END - Script parameter configuration
-
-function do_configure() {
-  verify_npm_setup
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
-}
-
 if builder_start_action configure :module; then
-  do_configure
+  verify_npm_setup
   builder_finish_action success configure :module
 fi
 
@@ -52,7 +43,7 @@ if builder_start_action configure :proctor; then
   if builder_has_action configure :module; then
     echo "Configuration already completed in configure:module; skipping."
   else
-    do_configure
+    verify_npm_setup
   fi
   builder_finish_action success configure :proctor
 fi

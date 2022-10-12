@@ -163,11 +163,14 @@ fi
 
 # Due to the nature of the build-utils-traps tests, only one may be
 # specified at a time; each ends with an `exit`.
-echo "Running separate tests"
+echo "${COLOR_BLUE}## Running trap tests{$COLOR_RESET}"
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh error
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh error-in-function
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh incomplete
-echo "Fin"
+echo "${COLOR_BLUE}## Running dependency tests{$COLOR_RESET}"
+$THIS_SCRIPT_PATH/builder-deps.test.sh
+echo "${COLOR_BLUE}## End external tests${COLOR_RESET}"
+echo
 
 # Finally, run with --help so we can see what it looks like
 # Note:  calls `exit`, so no further tests may be defined.

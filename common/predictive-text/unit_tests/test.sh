@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# We should work within the script's directory, not the one we were called in.
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
@@ -25,38 +26,23 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
   "--ci        Uses CI-based test configurations & emits CI-friendly test reports" \
   "--debug,-d  Activates developer-friendly debug mode for unit tests where applicable"
 
+# TODO: consider dependencies? ideally this will be test.inc.sh?
+
 builder_parse "$@"
-
-do_configure() {
-  # Ensure all testing dependencies are in place.
-  verify_npm_setup
-}
-
-CONFIGURED=
 
 if builder_start_action configure :libraries; then
   # Ensure all testing dependencies are in place.
-  do_configure
-  CONFIGURED=configure:libraries
+  verify_npm_setup
   builder_finish_action success configure :libraries
 fi
 
 if builder_start_action configure :headless; then
-  if [ -n "$CONFIGURED" ]; then
-    echo "Configuration already completed in ${BUILDER_TERM_START}${CONFIGURED}${BUILDER_TERM_END}; skipping."
-  else
-    do_configure
-    CONFIGURED=configure:headless
-  fi
+  verify_npm_setup
   builder_finish_action success configure :headless
 fi
 
 if builder_start_action configure :browser; then
-  if [[ -n "$CONFIGURED" ]]; then
-    echo "Configuration already completed in ${BUILDER_TERM_START}${CONFIGURED}${BUILDER_TERM_END}; skipping."
-  else
-    do_configure
-  fi
+  verify_npm_setup
   builder_finish_action success configure :browser
 fi
 
