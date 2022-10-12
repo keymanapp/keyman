@@ -232,6 +232,7 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     return false;
   }
   for (KMX_DWORD i=0; i<this->count; i++) {
+    DebugLog("#0x%X: ...", i);
     KMX_DWORD offset = entries[i].offset;
     KMX_DWORD length = entries[i].length;
     if(offset+((length+1)*2) > header.size) {
@@ -241,11 +242,11 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(this);
     const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
     if(start[length] != 0) {
-      DebugLog("#0x%X: String not null terminated", i);
+      DebugLog("#0x%X: String of length 0x%x not null terminated", i, length);
       return false;
     }
     // TODO-LDML: validate valid UTF-16LE?
-    DebugLog("#0x%X: '%s'", i, Debug_UnicodeString(start, length));
+    DebugLog("#0x%X: '%s'", i, Debug_UnicodeString(start));
   }
   return true;
 }
