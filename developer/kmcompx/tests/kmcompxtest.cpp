@@ -6,7 +6,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include "kmcompx.h"
+#include <kmcompx.h>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
       return 1;
     }
     else
-    return 99;  // wrong name
+    return 1;  // no CERR_ in Name => CompileKeyboardFile failed
   }
   return 1;
 }

@@ -7,7 +7,7 @@
 #include <kmcmpdll.h>
 
 #include "CharToKeyConversion.h"
-#include <kmx_u16.h>
+#include "kmx_u16.h"
 #include <xstring.h>
 
 extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day

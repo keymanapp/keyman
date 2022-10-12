@@ -64,36 +64,36 @@
                     23 Feb 2016 - mcdurdin - I4982 - Defined character constants cannot be referenced correctly in other stores
                     25 Oct 2016 - mcdurdin - I5135 - Remove product and licensing references from Developer projects
 */
-#include <pch.h>
+#include "pch.h"
 
 #include <compfile.h>
 #include <comperr.h>
-#include <../../../common/windows/cpp/include/vkeys.h>
+#include "../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
 #include <versioning.h>
 #include <kmcmpdll.h>
 #include <DeprecationChecks.h>
 
-#include <virtualcharkeys.h>
+#include "virtualcharkeys.h"
 
-#include <../../../common/windows/cpp/include/crc32.h>
-#include <../../../common/windows/cpp/include/ConvertUTF.h>
-#include <debugstore.h>
-#include <namedcodeconstants.h>
-#include <../../../common/windows/cpp/include/unicode.h>
-#include <../../../common/windows/cpp/include/keymanversion.h>
+#include "../../../common/windows/cpp/include/crc32.h"
+#include "../../../common/windows/cpp/include/ConvertUTF.h"
+#include "debugstore.h"
+#include "namedcodeconstants.h"
+#include "../../../common/windows/cpp/include/unicode.h"
+#include "../../../common/windows/cpp/include/keymanversion.h"
 
-#include <edition.h>
+#include "edition.h"
 
-#include <CharToKeyConversion.h>
-#include <CasedKeys.h>
+#include "CharToKeyConversion.h"
+#include "CasedKeys.h"
 #include <vector>
-#include <../../src/kmcmpdll/xstring.h>
-#include <CheckNCapsConsistency.h>
-#include <CheckFilenameConsistency.h>
-#include <UnreachableRules.h>
-#include <CheckForDuplicates.h>
-#include <kmx_u16.h>
+#include <xstring.h>
+#include "CheckNCapsConsistency.h"
+#include "CheckFilenameConsistency.h"
+#include "UnreachableRules.h"
+#include "CheckForDuplicates.h"
+#include "kmx_u16.h"
 #include <CompMsg.h>
 
 int xatoi(PKMX_WCHAR *p);
@@ -3409,13 +3409,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
       *p = L' ';
       continue;
     }
-
-#if defined(_WIN32) || defined(_WIN64)
     if (*p == L'\\') {
-#else
-    if (*p == L'/') {
-#endif
-
       LineCarry = TRUE;
       *p = L' ';
       continue;
@@ -3793,6 +3787,8 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
           fwrite(poutbuf, (KMX_DWORD)u16len(poutbuf) * 2 , 1, fp_out);
           delete[] poutbuf;
         }
+        else
+          AddCompileMessage(CERR_InvalidCharacter);
       }
 
       else {

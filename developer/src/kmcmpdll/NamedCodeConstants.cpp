@@ -25,7 +25,7 @@
 #include <io.h>
 #include <limits.h>
 #include "NamedCodeConstants.h"
-#include "kmcmpdll.h"
+#include <kmcmpdll.h>
 
 extern char CompileDir[];
 

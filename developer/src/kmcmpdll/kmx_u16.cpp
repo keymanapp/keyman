@@ -1,6 +1,7 @@
 
-#include <../../kmcompx/include/kmcompx.h>
-#include <kmx_u16.h>
+//#include "../../kmcompx/include/kmcompx.h"
+#include <kmcompx.h>
+#include "kmx_u16.h"
 
 #include <xstring.h>
 #include <km_types.h>

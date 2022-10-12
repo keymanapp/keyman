@@ -13,7 +13,7 @@
 
 #define USE_CHAR16_T
 #include <kmx_file.h>
-#include <kmx_u16.h>  
+#include "kmx_u16.h"
 #include <kmcompx.h>
 
 #include "../../../common/windows/cpp/include/registry.h"

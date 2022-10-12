@@ -5,7 +5,7 @@
 #include <comperr.h>
 #include <kmcmpdll.h>
 #include <xstring.h>
-#include <kmx_u16.h>
+#include "kmx_u16.h"
 #include <kmcompx.h>
 
 #include "CheckForDuplicates.h"
