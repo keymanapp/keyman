@@ -18,6 +18,27 @@ namespace kbp {
 namespace kmx {
 
 /**
+ * @brief convert a section name to string, for debugging
+ * @param ident the hex dword
+ * @param buf buffer, must be size 5
+ * @return const pointer to buffer
+ */
+inline const char *
+section_name_to_str(KMX_DWORD ident, char *buf) {
+  for (int i = 0; i < 4; i++) {
+    unsigned char ch = ident & 0xFF;
+    if (ch < 0x20 || ch > 0x7F) {
+      buf[i] = '?';
+    } else {
+      buf[i] = (char)ch;
+    }
+    ident >>= 8;
+  }
+  buf[4]=0;
+  return buf;
+}
+
+/**
  * @brief Validate (and print out) a section name dword
  *
  * @param ident the hex dword
@@ -26,18 +47,18 @@ namespace kmx {
  */
 static bool
 validate_section_name(KMX_DWORD ident) {
-  bool valid = true;
   for (int i = 0; i < 4; i++) {
     unsigned char ch = ident & 0xFF;
     if (ch < 0x20 || ch > 0x7F) {
-      valid = false;
-      DebugLog("\\x%02X", ch);
-    } else {
-      DebugLog("%c", ch);
+      if(ShouldDebug()) {
+        char buf[5];
+        DebugLog("Invalid section name %s (0x%X)", section_name_to_str(ident, buf), ident);
+      }
+      return false;
     }
     ident >>= 8;
   }
-  return valid;
+  return true;
 }
 
 /**
@@ -102,9 +123,10 @@ const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
   }
   KMX_DWORD offset = sect->find(T::IDENT);
   if (!offset) {
-    DebugLog("section_from_sect() - not found. section:");
-    validate_section_name(T::IDENT);
-    DebugLog("");
+    if(ShouldDebug()) {
+      char buf[5];
+      DebugLog("section_from_sect() - not found. section %s (0x%X)", section_name_to_str(T::IDENT, buf), T::IDENT);
+    }
     return nullptr;
   }
   KMX_DWORD entrylength = sect->total - offset;
@@ -113,7 +135,10 @@ const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
 
 bool
 COMP_KMXPLUS_HEADER::valid(KMX_DWORD length) const {
-  DebugLog(": (%X) size 0x%X\n", ident, size);
+  if(ShouldDebug()) {
+    char buf[5];
+    DebugLog("%s: (%X) size 0x%X\n", section_name_to_str(ident, buf), ident, size);
+  }
   if (size < LDML_LENGTH_HEADER) {
     DebugLog("size < LDML_LENGTH_HEADER");
     return false;
@@ -123,7 +148,6 @@ COMP_KMXPLUS_HEADER::valid(KMX_DWORD length) const {
     return false;
   }
   if (!validate_section_name(ident)) {
-    DebugLog("invalid section name");
     return false;
   }
   DebugLog(" (header OK)"); // newline after section name
@@ -239,12 +263,13 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
   bool overall_valid = true;
   for (KMX_DWORD i = 0; i < this->count; i++) {
     const COMP_KMXPLUS_SECT_ENTRY& entry = this->entries[i];
-    DebugLog("#%d: ", i);
+    if (ShouldDebug()) {
+      char buf[5];
+      DebugLog("%s #%d: %X @ %X\n", section_name_to_str(entry.sect, buf), i, entry.sect, entry.offset);
+    }
     if(!validate_section_name(entry.sect)) {
-      DebugLog(" (invalid section name) ");
       return false;
     }
-    DebugLog(" %X @ %X\n", entry.sect, entry.offset);
     if (entry.sect == LDML_SECTIONID_SECT) {
       DebugLog("Invalid nested 'sect'");
       overall_valid = false;
@@ -279,11 +304,13 @@ COMP_KMXPLUS_ELEM::valid(KMX_DWORD _kmn_unused(length)) const {
   if (firstEntry.offset + sizeof(COMP_KMXPLUS_ELEM_ELEMENT) > header.size) {
     // TODO-LDML: change to  (firstEntry.offset != 0 )
     // Blocked by https://github.com/keymanapp/keyman/issues/7404
-    DebugLog("ERROR: elem[0].offset 0x%x would put element outside of data region");
-    return false;
+    DebugLog("WARNING: elem[0].offset 0x%x would put element outside of data region..."
+           "Please fix https://github.com/keymanapp/keyman/issues/7404");
+    // TODO-LDML: should exit here
+    // return false;
   }
   for (KMX_DWORD e = 1; e < count; e++) {
-    // Don't need to recheck the first entry here.
+    // Don't need to recheck the first entry hbere.
     KMX_DWORD listLength;
     if (getElementList(e, listLength) == nullptr) {
       return false;
@@ -303,6 +330,9 @@ COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) co
   }
   const COMP_KMXPLUS_ELEM_ENTRY &entry = entries[elementNumber];
   length = entry.length;
+  if (length == 0) {
+    return nullptr;
+  }
   if (entry.offset + (entry.length * sizeof(COMP_KMXPLUS_ELEM_ELEMENT)) > header.size) {
     DebugLog("ERROR: !! COMP_KMXPLUS_ELEM::getElementList");
   }
