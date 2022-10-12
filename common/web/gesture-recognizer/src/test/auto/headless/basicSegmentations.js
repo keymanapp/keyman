@@ -7,7 +7,10 @@ const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 
 const GestureRecognizer = require('../../../../build/index.js');
 const com = GestureRecognizer.com;
+global.com = com; // TouchpathTurtle has issues without this at present.
+
 const PathSegmenter = com.keyman.osk.PathSegmenter;
+const TouchpathTurtle     = require('../../../../build/tools/unit-test-resources.js').TouchpathTurtle;
 
 const timedPromise = require('../../../../build/tools/unit-test-resources.js').timedPromise;
 
@@ -247,8 +250,6 @@ describe("Basic segmentation cases", function() {
       this.fakeClock.restore();
     })
 
-    // TODO:  replace with TouchpathTurtle, as it can manage this for us now!
-
     /**
      * Builds a diagonal sequence traveling 40 pixels 's', 40 pixels 'e' in a perfect diagonal lock-step.
      */
@@ -259,15 +260,11 @@ describe("Basic segmentation cases", function() {
         t: 100
       };
 
+      let turtle = new TouchpathTurtle(startSample);
       let samples = [startSample];
 
-      for(let i=1; i <=20; i++) {
-        samples.push({
-          targetX: startSample.targetX + 2 * i,
-          targetY: startSample.targetY + 2 * i,
-          t: startSample.t + 10 * i
-        });
-      }
+      turtle.on('sample', (sample) => samples.push(sample));
+      turtle.move(135, 40 * Math.SQRT2, 200, 10);
 
       return samples;
     }
@@ -378,7 +375,8 @@ describe("Basic segmentation cases", function() {
         assert.equal(moveSegment.type, 'move');
         assert.isAtLeast(moveSegment.duration, samples[20].t - samples[0].t);
         assert.equal(moveSegment.direction, 'se');
-        assert.equal(moveSegment.distance, 40 * Math.SQRT2);
+        assert.isAtLeast(moveSegment.distance, 40 * Math.SQRT2 * 0.9999);
+        assert.isAtMost(moveSegment.distance, 40 * Math.SQRT2 * 1.0001);
         assert.equal(moveSegment.angle, (135 / 180) * Math.PI);
 
         // Speed:  our idealized sequence moves 2*sqrt(2) px distance every 10ms.
