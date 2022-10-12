@@ -354,10 +354,16 @@ describe("TrackedPath", function() {
         }, sample.t);
       });
 
-      // Generates the simulated touchpath.
-      turtle.move(45, 3, 66, 33); // 45 degrees, 3px distance, 66ms, 33ms at a time.
+      // START: TOUCHPATH SIMULATION
+
+      // Move NE 3 pixels over 66ms, sampling every 33ms.
+      turtle.move(45, 3, 66, 33);
+      // Wait for 20 ms
       turtle.wait(20, 20);
+      // Move S 10 pixels over 100ms, sampling every 16ms.
       turtle.move(90, 10, 100, 16);
+
+      // END: TOUCHPATH SIMULATION
 
       // Queue up touchpath finalization so that internal sample-replication timers
       // don't go infinite.
