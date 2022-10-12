@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include <deque>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include <deque>
 
 namespace km {
 namespace kbp {
@@ -28,21 +28,26 @@ typedef std::map<string_list, std::u16string> simple_transforms;
 
 class transforms {
 private:
-    simple_transforms  simple;
+  simple_transforms simple;
+
 public:
-    transforms();
+  transforms();
 
-    /**
-     * Add a transform
-     */
-    void
-    add(const string_list &list, const std::u16string &tostr);
+  /**
+   * Add a simple transform rule
+   * @param match list of matching string elements
+   * @param output output string for this rule
+   */
+  void add(const string_list &match, const std::u16string &output);
 
-    size_t
-    matchContext(const string_list &ctxt, std::u16string &outputString) const;
-
+  /**
+   * Check for any matching transform rules
+   * @param ctxt context array for matching
+   * @param output fillin: will contain the output string for this rule, if there is a match
+   * @return 0 if no match, or the length of the ctxt string matched, starting at the end
+   */
+  size_t matchContext(const string_list &ctxt, std::u16string &output) const;
 };
-
 
 }  // namespace ldml
 }  // namespace kbp
