@@ -54,7 +54,7 @@ fi
 
 if builder_start_action clean; then
   rm -rf build/
-  builder_finish_action success clean:browser
+  builder_finish_action success clean
 fi
 
 ### BUILD ACTIONS
