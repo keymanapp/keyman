@@ -15,11 +15,11 @@ vkeys::vkeys() : vkey_to_string() {
 }
 
 void
-vkeys::add(km_kbp_virtual_key vkey, uint16_t mod, std::u16string str) {
+vkeys::add(km_kbp_virtual_key vk, uint16_t modifier_state, std::u16string output) {
   // construct key
-  const vkey_id id(vkey, mod);
+  const vkey_id id(vk, modifier_state);
   // assign the string
-  vkey_to_string[id] = str;
+  vkey_to_string[id] = output;
 }
 
 std::u16string
