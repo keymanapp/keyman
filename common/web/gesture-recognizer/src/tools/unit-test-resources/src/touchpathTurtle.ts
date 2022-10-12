@@ -92,7 +92,8 @@ namespace Testing {
       }
 
       // Angle is measured clockwise from the DOM's <0, -1>.
-      let angle = angleInDegrees * Math.PI / 180;
+      // But the standard Math.cos, .sin funcs operate CCW from the DOM's <1, 0>.
+      let angle = (90 - angleInDegrees) * Math.PI / 180;
       let xDistance = Math.cos(angle) * distance;
       let yDistance = -Math.sin(angle) * distance;
 
