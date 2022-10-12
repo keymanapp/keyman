@@ -529,6 +529,14 @@ namespace com.keyman.osk {
     private constructingSegment: ConstructingSegment;
 
     /**
+     * Accumulates all segments to be emitted for a subsegmentation step.
+     * Note that the very first sample taken will emit two:
+     * - the path's 'start' segment (as it needs the initial coordinate)
+     * - the first incomplete segment (that may become a hold or a move)
+     */
+    private segmentsToEmit: Segment[];
+
+    /**
      * Used to 'repeat' the most-recently observed incoming sample if no
      * other replaces it before it triggers.
      *
@@ -553,7 +561,7 @@ namespace com.keyman.osk {
      * A closure used to 'forward' generated Segments, generally to their public-facing
      * location on TrackedPath.segments.
      */
-    private readonly segmentForwarder: (segment: Segment) => void;
+    private readonly segmentForwarder: (segments: Segment[]) => void;
 
     /**
      * Denotes whether or not a first touchpath sample has been provided.
@@ -578,8 +586,9 @@ namespace com.keyman.osk {
       holdMoveTolerance: 5
     }
 
-    constructor(segmentationConfig: SegmentationConfiguration, segmentForwarder: (segment: Segment) => void) {
+    constructor(segmentationConfig: SegmentationConfiguration, segmentForwarder: (segments: Segment[]) => void) {
       this.steppedCumulativeStats = [];
+      this.segmentsToEmit = [];
       this.segmentForwarder = segmentForwarder;
 
       this.segmentationConfig = segmentationConfig;
@@ -602,7 +611,7 @@ namespace com.keyman.osk {
         startSegment.classifyType(SegmentClass.START);
         startSegment.resolve();
 
-        this.segmentForwarder(startSegment);
+        this.segmentsToEmit.push(startSegment);
       }
 
       // Set up the input-repeater (in case we don't get further feedback but remain active)
@@ -663,7 +672,7 @@ namespace com.keyman.osk {
       endSegment.classifyType(SegmentClass.END);
       endSegment.resolve();
 
-      this.segmentForwarder(endSegment);
+      this.segmentForwarder([endSegment]);
     }
 
     /**
@@ -689,6 +698,11 @@ namespace com.keyman.osk {
       this.steppedCumulativeStats.push(extendedStats);
 
       this.performSubsegmentation();
+
+      if(this.segmentsToEmit.length > 0) {
+        this.segmentForwarder(this.segmentsToEmit);
+        this.segmentsToEmit = [];
+      }
     }
 
     // The "reported via event" aspect mentioned below is necessary because this may be
@@ -961,7 +975,7 @@ namespace com.keyman.osk {
       this.finalizeSegment();
 
       this.constructingSegment = new ConstructingSegment(subsegment, new SegmentClassifier(this.segmentationConfig));
-      this.segmentForwarder(this.constructingSegment.pathSegment);
+      this.segmentsToEmit.push(this.constructingSegment.pathSegment);
 
       return true;
     }

@@ -14,7 +14,7 @@ namespace com.keyman.osk {
     'step': (sample: InputSample) => void,
     'complete': () => void,
     'invalidated': () => void
-    'segmentation': (segment: Segment) => void
+    'segmentation': (segments: Segment[]) => void
   }
 
   /**
@@ -87,9 +87,9 @@ namespace com.keyman.osk {
       // (Most likely; not yet done.) Kinda awkward, but it's useful for compartmentalization.
       // - DO use 'via closure.'  That allows us to have the segment passing done via
       // `private` method.
-      const segmentStartClosure = (segment: Segment) => {
-        this._segments.push(segment);
-        this.emit('segmentation', segment);
+      const segmentStartClosure = (segments: Segment[]) => {
+        this._segments = this._segments.concat(segments);
+        this.emit('segmentation', segments);
       }
 
       this.segmenter = new PathSegmenter(PathSegmenter.DEFAULT_CONFIG, segmentStartClosure);

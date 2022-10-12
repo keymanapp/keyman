@@ -18,6 +18,8 @@ const SEGMENT_TEST_JSON_FOLDER = 'src/test/resources/json/segmentation';
 
 const assertSegmentSimilarity = require('../../resources/assertSegmentSimilarity.js');
 
+const spySegmentArrayReducer = (spy) => spy.getCalls().reduce((arr, call) => arr.concat(call.args[0]), []);
+
 describe("Segmentation - from recorded sequences", function() {
   beforeEach(function() {
     this.fakeClock = sinon.useFakeTimers();
@@ -87,7 +89,7 @@ describe("Segmentation - from recorded sequences", function() {
     const originalSegments = testObj.originalSegments;
     const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
 
-    const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+    const reproedSegments = spySegmentArrayReducer(spy);
     const reproedSegmentTypeSequence  = reproedSegments.map((segment) => segment.type);
 
     assert.sameOrderedMembers(reproedSegmentTypeSequence, originalSegmentTypeSequence);
@@ -153,7 +155,7 @@ describe("Segmentation - from recorded sequences", function() {
     const originalSegments = testObj.originalSegments;
     const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
 
-    const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+    const reproedSegments = spySegmentArrayReducer(spy);
     const reproedSegmentTypeSequence  = reproedSegments.map((segment) => segment.type);
 
     assert.sameOrderedMembers(reproedSegmentTypeSequence, originalSegmentTypeSequence);
@@ -189,7 +191,7 @@ describe("Segmentation - from recorded sequences", function() {
     const originalSegments = testObj.originalSegments;
     const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
 
-    const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+    const reproedSegments = spySegmentArrayReducer(spy);
     const reproedSegmentTypeSequence  = reproedSegments.map((segment) => segment.type);
 
     assert.sameOrderedMembers(reproedSegmentTypeSequence, originalSegmentTypeSequence);
@@ -227,7 +229,7 @@ describe("Segmentation - from recorded sequences", function() {
 
     // Any post-sequence tests to run.
     const originalSegments = testObj.originalSegments;
-    const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+    const reproedSegments = spySegmentArrayReducer(spy);
 
     // Because of the sweeping arc motion, we won't assume a perfect match to the segmentation here.
 
@@ -267,7 +269,7 @@ describe("Segmentation - from recorded sequences", function() {
     await testObj.compositePromise;
 
     // Any post-sequence tests to run.
-    const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+    const reproedSegments = spySegmentArrayReducer(spy);
 
     // Ensure all relevant Promises resolved.
     for(let segment of reproedSegments) {

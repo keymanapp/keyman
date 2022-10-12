@@ -5,7 +5,10 @@ const fs = require('fs');
 
 const GestureRecognizer = require('../../../../build/index.js');
 const com = GestureRecognizer.com;
+global.com = com; // TouchpathTurtle has issues without this at present.
+
 const TrackedPath = com.keyman.osk.TrackedPath;
+const TouchpathTurtle     = require('../../../../build/tools/unit-test-resources.js').TouchpathTurtle;
 
 const timedPromise = require('../../../../build/tools/unit-test-resources.js').timedPromise;
 
@@ -17,6 +20,8 @@ const SEGMENT_TEST_JSON_FOLDER = 'src/test/resources/json/segmentation';
 
 const assertSegmentSimilarity = require('../../resources/assertSegmentSimilarity.js');
 // End of "for the integrated style..."
+
+const spySegmentArrayReducer = (spy) => spy.getCalls().reduce((arr, call) => arr.concat(call.args[0]), []);
 
 describe("TrackedPath", function() {
   // // File paths need to be from the package's / module's root folder
@@ -47,22 +52,22 @@ describe("TrackedPath", function() {
 
       touchpath.extend(sample);
       try {
-        assert.isTrue(spy.calledTwice, "'segmentation' event was not raised exactly twice before the .close().");
+        assert.isTrue(spy.calledOnce, "'segmentation' event was not raised exactly once before the .close().");
       } finally {
         touchpath.terminate(false); // false = "not cancelled"
       }
-      assert.isTrue(spy.calledThrice, "'segmentation' event was not raised exactly once after the .close().");
+      assert.isTrue(spy.calledTwice, "'segmentation' event was not raised exactly once after the .close().");
 
-      for(let i=0; i < 3; i++) {
+      for(let i=0; i < 2; i++) {
         assert.equal(spy.args[i].length, 1, "'segmentation' event was raised with an unexpected number of arguments");
       }
 
-      assert.equal(spy.firstCall.args[0].type, 'start', "First event should provide a 'start'-type segment.");
-      assert.equal(spy.secondCall.args[0].type, undefined, "Second event's segment should not be classified.");
-      assert.equal(spy.thirdCall.args[0].type, 'end', "Third event should provide an 'end'-type segment.");
+      assert.equal(spy.firstCall .args[0][0].type, 'start', "First event's first entry should provide a 'start'-type segment.");
+      assert.equal(spy.firstCall .args[0][1].type, undefined, "First event's second segment should not be classified.");
+      assert.equal(spy.secondCall.args[0][0].type, 'end', "Second event should provide an 'end'-type segment.");
 
       assert.deepEqual(touchpath.coords, [sample]);
-      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]),
+      assert.deepEqual(touchpath.segments, spySegmentArrayReducer(spy),
         "The touchpath's segment array does not match the `Segment`s from raised events.");
     });
 
@@ -154,13 +159,13 @@ describe("TrackedPath", function() {
 
       assert(spyEventStep.firstCall.calledBefore(spyEventSegmentation.firstCall),
         "'step' should be raised before 'segmentation'");
-      assert(spyEventSegmentation.thirdCall.calledBefore(spyEventComplete.firstCall),
+      assert(spyEventSegmentation.secondCall.calledBefore(spyEventComplete.firstCall),
         "all 'segmentation' events should be raised before 'complete'");
 
       const spy = spyEventSegmentation;
       assert.deepEqual(touchpath.coords, [sample]);
       spy.call
-      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]));
+      assert.deepEqual(touchpath.segments, spySegmentArrayReducer(spy));
     });
 
     it("event ordering - 'invalidated'", function() {
@@ -186,15 +191,13 @@ describe("TrackedPath", function() {
 
       assert(spyEventStep.firstCall.calledBefore(spyEventSegmentation.firstCall),
         "'step' should be raised before 'segmentation'");
-      assert(spyEventSegmentation.secondCall.calledBefore(spyEventInvalidated.firstCall),
-        "first 'segmentation' event ('start' segment) not raised before cancellation");
-      assert(spyEventSegmentation.thirdCall.calledAfter(spyEventInvalidated.firstCall),
+      assert(spyEventSegmentation.secondCall.calledAfter(spyEventInvalidated.firstCall),
         "Cancellation event not raised before cancelled segment completion");
 
       // Even though the touchpath was 'cancelled', we should still see the segments that finished processing.
       const spy = spyEventSegmentation;
       assert.deepEqual(touchpath.coords, [sample]);
-      assert.deepEqual(touchpath.segments, spy.getCalls().map((call) => call.args[0]));
+      assert.deepEqual(touchpath.segments, spySegmentArrayReducer(spy));
     });
   });
 
@@ -248,8 +251,8 @@ describe("TrackedPath", function() {
       }).then(() => {
         // The main test assertions.
         assert.deepEqual(touchpath.coords, [startSample, endSample]);
-        assert.deepEqual(touchpath.segments, spyEventSegmentation.getCalls().map((call) => call.args[0]));
-        assert.deepEqual(spyEventSegmentation.getCalls().map((call) => call.args[0].type), ['start', 'hold', 'end']);
+        assert.deepEqual(touchpath.segments, spySegmentArrayReducer(spyEventSegmentation));
+        assert.deepEqual(spySegmentArrayReducer(spyEventSegmentation).map((seg) => seg.type), ['start', 'hold', 'end']);
       });
 
       const finalPromise = segmentationEndPromise.catch((reason) => {
@@ -306,7 +309,7 @@ describe("TrackedPath", function() {
       const originalSegments = testObj.originalSegments;
       const originalSegmentTypeSequence = originalSegments.map((segment) => segment.type);
 
-      const reproedSegments = spy.getCalls().map((call) => call.args[0]);
+      const reproedSegments = spySegmentArrayReducer(spy);
       const reproedSegmentTypeSequence  = reproedSegments.map((segment) => segment.type);
 
       assert.sameOrderedMembers(reproedSegmentTypeSequence, originalSegmentTypeSequence);
@@ -316,6 +319,89 @@ describe("TrackedPath", function() {
       assertSegmentSimilarity(reproedSegments[3], originalSegments[3], 'hold');  // ~580ms
       assertSegmentSimilarity(reproedSegments[4], originalSegments[4], 'move');  // 'se'
       assertSegmentSimilarity(reproedSegments[5], originalSegments[5], 'hold');  // ~300ms
+    });
+  });
+
+  describe('.segments event/Promise ordering', function() {
+    beforeEach(function() {
+      this.fakeClock = sinon.useFakeTimers();
+    })
+
+    afterEach(function() {
+      // NOTE:  for debugging investigations, it may be necessary to use .only on
+      // the test under investigation and to disable the `this.fakeClock.restore()` line.
+      //
+      // Tests tend to timeout when interactively debugging, and having unmocked timers
+      // suddenly restored during investigation can cause some very confusing behavior.
+      this.fakeClock.restore();
+    });
+
+    it('synthetic sequence: start -> hold -> move -> end', async function() {
+      const firstSample = {
+        targetX: 10,
+        targetY: 20,
+        t: 100
+      };
+
+      // Create a touchpath object + link it with our synthetic touch-sequence generator (TouchpathTurtle).
+      const touchpath = new TrackedPath();
+      const turtle = new TouchpathTurtle(firstSample);
+
+      // Reproduces the turtle's traced path as a time-delayed input sequence.
+      turtle.on('sample', (sample) => {
+        setTimeout(() => {
+          touchpath.extend(sample);
+        }, sample.t);
+      });
+
+      // Generates the simulated touchpath.
+      turtle.move(45, 3, 66, 33); // 45 degrees, 3px distance, 66ms, 33ms at a time.
+      turtle.wait(20, 20);
+      turtle.move(90, 10, 100, 16);
+
+      // Queue up touchpath finalization so that internal sample-replication timers
+      // don't go infinite.
+      setTimeout(() => {
+        touchpath.terminate();
+      }, turtle.location.t);
+
+      // Start:  main test definition.
+      // This tests our expected event + promise orderings.  The gesture synthesis layer
+      // will need guarantees on relative event & promise-resolution orderings.
+
+      let segmentEventPromise = () => new Promise((resolve) => touchpath.once('segmentation', resolve));
+      let promiseTail = segmentEventPromise().then(async (segments) => {
+        let [startSegment, secondSegment] = segments;
+
+        let segmentType = await startSegment.whenRecognized;
+        assert.equal(segmentType, "start");
+        await startSegment.whenResolved;
+
+        segmentType = await secondSegment.whenRecognized;
+        assert.equal(segmentType, "hold");
+
+        let nextPromise = segmentEventPromise();
+        await secondSegment.whenResolved;
+
+        let [segment] = await nextPromise;
+        segmentType = await segment.whenRecognized;
+        assert.equal(segmentType, "move");
+
+        nextPromise = segmentEventPromise();
+        await segment.whenResolved;
+
+        [segment] = await nextPromise;
+        segmentType = await segment.whenRecognized;
+        assert.equal(segmentType, "end");
+        await segment.whenResolved;
+      });
+
+      // End:  main test definition.
+
+      // Run all queued-up time delayed samples produced by the 'TouchpathTurtle'.
+      await this.fakeClock.runAllAsync();
+
+      await promiseTail.finally();
     });
   });
 });

@@ -3,11 +3,15 @@ namespace Testing {
   type InputSample     = com.keyman.osk.InputSample;
   type Subsegmentation = com.keyman.osk.Subsegmentation;
 
+  interface EventMap {
+    'sample': (sample: InputSample) => void
+  }
+
   /**
    * Designed to facilitate creation of 'synthetic' touchpath sample sequences for use
    * in unit tests.
    */
-  export class TouchpathTurtle {
+  export class TouchpathTurtle extends EventEmitter<EventMap> {
     private readonly startSample: InputSample;
     private currentSample: InputSample;
     private currentStats: com.keyman.osk.CumulativePathStats;
@@ -16,6 +20,8 @@ namespace Testing {
     private _pathSegments: Subsegmentation[] = [];
 
     constructor(obj: InputSample | TouchpathTurtle) {
+      super();
+
       if(!(obj instanceof TouchpathTurtle)) {
         this.startSample = obj;
         this.currentSample = obj;
@@ -60,6 +66,7 @@ namespace Testing {
         let sample = {...startSample};
         sample.t += timeDelta;
 
+        this.emit('sample', sample);
         currentStats = currentStats.extend(sample);
       }
 
@@ -103,9 +110,10 @@ namespace Testing {
         currentSample = {
           targetX: currentSample.targetX + xTickDist,
           targetY: currentSample.targetY + yTickDist,
-          t: currentSample.t + timeDelta
+          t: startSample.t + timeDelta
         };
 
+        this.emit('sample', currentSample);
         currentStats = currentStats.extend(currentSample);
       }
 
@@ -115,6 +123,8 @@ namespace Testing {
         t: startSample.t + time
       };
       this.currentChop = currentStats;
+
+      this.emit('sample', currentSample);
       this.currentStats = currentStats.extend(this.currentSample);
 
       const pathComponent = {

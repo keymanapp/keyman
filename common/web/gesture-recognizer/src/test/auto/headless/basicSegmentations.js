@@ -33,20 +33,21 @@ describe("Basic segmentation cases", function() {
 
       segmenter.add(sample);
       try {
-        assert.isTrue(spy.calledTwice, "Segmenter callback was not called exactly twice before the .close().");
+        assert.isTrue(spy.calledOnce, "Segmenter callback was not called exactly once before the .close().");
+        assert.equal(spy.firstCall.args[0].length, 2, "Segmenter callback did not receive two segments on first sample");
       } finally {
         segmenter.close();
       }
-      assert.isTrue(spy.calledThrice, "Segmenter callback was not called exactly once after the .close().");
+      assert.isTrue(spy.calledTwice, "Segmenter callback was not called exactly once after the .close().");
 
-      for(let i=0; i < 3; i++) {
+      for(let i=0; i < 2; i++) {
         assert.equal(spy.args[i].length, 1, "Segmenter callback received an unexpected number of arguments");
       }
 
-      // Is the first argument of each call's argument set.
-      assert.equal(spy.firstCall .args[0].type, 'start', "First call should receive a 'start'-type segment.");
-      assert.equal(spy.secondCall.args[0].type, undefined, "Second call's segment should not be classified.");
-      assert.equal(spy.thirdCall .args[0].type, 'end', "Third call should receive an 'end'-type segment.");
+      // The returned segment array is the first argument of each call's argument set.
+      assert.equal(spy.firstCall .args[0][0].type, 'start', "First call should receive a 'start'-type segment at index 0.");
+      assert.equal(spy.firstCall .args[0][1].type, undefined, "First call's second segment should not be classified.");
+      assert.equal(spy.secondCall.args[0][0].type, 'end', "Second call should receive an 'end'-type segment.");
     });
 
     it("segment recognition + resolution", async function() {
@@ -63,28 +64,28 @@ describe("Basic segmentation cases", function() {
       segmenter.add(sample);
       try {
         // It's still best to verify this before proceeding.
-        assert.isTrue(spy.calledTwice, "Segmenter callback was not called exactly twice before the .close().");
+        assert.isTrue(spy.calledOnce, "Segmenter callback was not called exactly once before the .close().");
 
         // 'start':  should be fully resolved, right out of the gate.
-        assert.equal(await promiseStatus(spy.firstCall.args[0].whenRecognized), PromiseStatuses.PROMISE_RESOLVED);
-        assert.equal(await promiseStatus(spy.firstCall.args[0].whenResolved), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(spy.firstCall.args[0][0].whenRecognized), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(spy.firstCall.args[0][0].whenResolved), PromiseStatuses.PROMISE_RESOLVED);
 
         // null-typed, just-starting segment:  neither recognized nor resolved.
-        assert.equal(await promiseStatus(spy.secondCall.args[0].whenRecognized), PromiseStatuses.PROMISE_PENDING);
-        assert.equal(await promiseStatus(spy.secondCall.args[0].whenResolved), PromiseStatuses.PROMISE_PENDING);
+        assert.equal(await promiseStatus(spy.firstCall.args[0][1].whenRecognized), PromiseStatuses.PROMISE_PENDING);
+        assert.equal(await promiseStatus(spy.firstCall.args[0][1].whenResolved), PromiseStatuses.PROMISE_PENDING);
       } finally {
         segmenter.close();
       }
 
-      assert.isTrue(spy.calledThrice, "Segmenter callback was not called exactly once after the .close().");
+      assert.isTrue(spy.calledTwice, "Segmenter callback was not called exactly once after the .close().");
 
       // null-typed segment should now be recognized and resolved.
-      assert.equal(await promiseStatus(spy.secondCall.args[0].whenRecognized), PromiseStatuses.PROMISE_RESOLVED);
-      assert.equal(await promiseStatus(spy.secondCall.args[0].whenResolved), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(spy.firstCall.args[0][1].whenRecognized), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(spy.firstCall.args[0][1].whenResolved), PromiseStatuses.PROMISE_RESOLVED);
 
       // 'end':  should be fully resolved, right out of the gate.
-      assert.equal(await promiseStatus(spy.thirdCall.args[0].whenRecognized), PromiseStatuses.PROMISE_RESOLVED);
-      assert.equal(await promiseStatus(spy.thirdCall.args[0].whenResolved), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(spy.secondCall.args[0][0].whenRecognized), PromiseStatuses.PROMISE_RESOLVED);
+      assert.equal(await promiseStatus(spy.secondCall.args[0][0].whenResolved), PromiseStatuses.PROMISE_RESOLVED);
     });
   });
 
@@ -120,10 +121,10 @@ describe("Basic segmentation cases", function() {
       // Timestamp 1:  segmentation begins, with an initial Sample recorded.
       const firstPromise = timedPromise(() => {
         segmenter.add(startSample);
-        assert.isTrue(spy.calledTwice, "Segmenter callback was not called exactly twice upon adding the first point.");
+        assert.isTrue(spy.calledOnce, "Segmenter callback was not called exactly once upon adding the first point.");
 
         // The focus of this unit test is the two `Promise`s provided by this specific `Segment`.
-        const pendingSegment = spy.secondCall.args[0];
+        const pendingSegment = spy.firstCall.args[0][1];
         assert.exists(pendingSegment);
 
         pendingSegment.whenRecognized.then(segment2Recognition);
@@ -132,7 +133,7 @@ describe("Basic segmentation cases", function() {
         // At time = 0, neither recognition nor resolution should have triggered.
         assert.isFalse(segment2Recognition.called);
 
-        const pendingSegment = spy.secondCall.args[0];
+        const pendingSegment = spy.firstCall.args[0][1];
         assert.isNull(pendingSegment.type); // not yet recognized.
 
         assert.isFalse(segment2Resolution.called);
@@ -145,7 +146,7 @@ describe("Basic segmentation cases", function() {
           // to the segmenter.
           assert.isTrue(segment2Recognition.called);
 
-          const pendingSegment = spy.secondCall.args[0];
+          const pendingSegment = spy.firstCall.args[0][1];
           assert.equal(pendingSegment.type, 'hold'); // now has a type, as it's been recognized.
 
           // And now to update with a new sample.
@@ -153,7 +154,7 @@ describe("Basic segmentation cases", function() {
         }, 1000).then(() => {
           assert.isFalse(segment2Resolution.called);
 
-          const pendingSegment = spy.secondCall.args[0];
+          const pendingSegment = spy.firstCall.args[0][1];
           assert.isAtLeast(pendingSegment.duration, 1000); // Latest sample's timestamp gives exactly 1000.
         });
       });
@@ -166,7 +167,7 @@ describe("Basic segmentation cases", function() {
         //            (after `segmenter.close()`) because Promises are async.
       }).then(() => {
         assert.isTrue(segment2Resolution.called);
-        assert.isTrue(spy.calledThrice);
+        assert.isTrue(spy.calledTwice);
       })
 
       const finalPromise = segmentationEndPromise.catch((reason) => {
@@ -220,7 +221,7 @@ describe("Basic segmentation cases", function() {
 
       // This is the one that reports all of our async assertion failures.
       return finalPromise.then(() => {
-        const holdSegment = spy.secondCall.args[0];
+        const holdSegment = spy.firstCall.args[0][1];
 
         assert.equal(holdSegment.type, 'hold');
         assert.isAtLeast(holdSegment.duration, endSample.t - startSample.t);
@@ -245,6 +246,8 @@ describe("Basic segmentation cases", function() {
     afterEach(function() {
       this.fakeClock.restore();
     })
+
+    // TODO:  replace with TouchpathTurtle, as it can manage this for us now!
 
     /**
      * Builds a diagonal sequence traveling 40 pixels 's', 40 pixels 'e' in a perfect diagonal lock-step.
@@ -289,8 +292,8 @@ describe("Basic segmentation cases", function() {
       const segment2Resolution  = sinon.fake();
 
       samplePromises[0] = samplePromises[0].then(async () => {
-        assert.isAtLeast(spy.callCount, 2);
-        const moveSegment = spy.secondCall.args[0];
+        assert.isAtLeast(spy.callCount, 1);
+        const moveSegment = spy.firstCall.args[0][1];
 
         assert.equal(await promiseStatus(moveSegment.whenRecognized), PromiseStatuses.PROMISE_PENDING);
         assert.equal(await promiseStatus(moveSegment.whenResolved), PromiseStatuses.PROMISE_PENDING);
@@ -305,7 +308,7 @@ describe("Basic segmentation cases", function() {
       // Given the current engine setup, we know that after 5 samples, we pass the movement-based
       // recognition threshold and thus should be classified as a 'move'.
       samplePromises[5] = samplePromises[5].then(() => {
-        const moveSegment = spy.secondCall.args[0];
+        const moveSegment = spy.firstCall.args[0][1];
 
         assert.isTrue(segment2Recognition.called);
         assert.isFalse(segment2Resolution.called);
@@ -314,7 +317,7 @@ describe("Basic segmentation cases", function() {
       });
 
       samplePromises[20] = samplePromises[20].then(() => {
-        const moveSegment = spy.secondCall.args[0];
+        const moveSegment = spy.firstCall.args[0][1];
 
         assert.isTrue(segment2Recognition.called);
         assert.isFalse(segment2Resolution.called);
@@ -328,7 +331,7 @@ describe("Basic segmentation cases", function() {
         segmenter.close();
       }).then(() => {
         assert.isTrue(segment2Resolution.called);
-        assert.equal(spy.callCount, 3);
+        assert.equal(spy.callCount, 2);
       });
 
       const finalPromise = segmentationEndPromise.catch((reason) => {
@@ -370,7 +373,7 @@ describe("Basic segmentation cases", function() {
       // This is the one that reports all of our async assertion failures.
       return finalPromise.then(() => {
         // The real checks.
-        const moveSegment = spy.secondCall.args[0];
+        const moveSegment = spy.firstCall.args[0][1];
 
         assert.equal(moveSegment.type, 'move');
         assert.isAtLeast(moveSegment.duration, samples[20].t - samples[0].t);
