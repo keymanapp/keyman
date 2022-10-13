@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     HashMap<String, String>lexicalModelInfo = new HashMap<String, String>();
     lexicalModelInfo.put(KMManager.KMKey_PackageID, "example.ta.wordlist");
     lexicalModelInfo.put(KMManager.KMKey_LanguageID, "ta");
+    lexicalModelInfo.put(KMManager.KMKey_LanguageName, "Tamil");
     lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, "example.ta.wordlist");
     lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, "1.0");
     KMManager.addLexicalModel(context, lexicalModelInfo);
