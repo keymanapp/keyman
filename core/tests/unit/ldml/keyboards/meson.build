@@ -9,6 +9,7 @@ tests = [
 #  'k_000_null_keyboard',
   'k_001_tiny',
   'k_002_tinyu32',
+  'k_003_transform',
 ]
 
 # Setup kmc
