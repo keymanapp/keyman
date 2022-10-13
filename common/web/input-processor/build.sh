@@ -18,83 +18,55 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 builder_check_color "$@"
 
+# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
+# TODO: remove :tools once kmlmc is a dependency for test:module
+
 builder_describe "Builds the standalone, headless form of Keyman Engine for Web's input-processor module" \
+  "@../keyman-version" \
+  "@../keyboard-processor" \
+  "@../../predictive-text" \
   "clean" \
   "configure" \
   "build" \
   "test" \
-  ":libraries  Targets all in-repo libraries that this module is dependent upon" \
   ":module     A headless, Node-oriented version of the module useful for unit tests" \
   ":tools      Related tools useful for development and testing of this module" \
   "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
+
+builder_describe_outputs \
+  configure:module   /node_modules \
+  configure:tools    /node_modules \
+  build:module       build/index.js \
+  build:tools        /developer/src/kmlmc/dist/kmlmc.js    # TODO: remove this once kmlmc is a dependency
 
 builder_parse "$@"
 
 ### CONFIGURE ACTIONS
 
-do_configure() {
-  # Check if Node.JS/npm is installed.
-  verify_npm_setup
-
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
-}
-
-CONFIGURED=
-if builder_start_action configure :libraries; then
-  do_configure
-  CONFIGURED=configure:libraries
-
-  builder_finish_action success configure :libraries
-fi
-
-
 if builder_start_action configure :module; then
-  if [ -n "$CONFIGURED" ]; then
-    echo "Configuration already completed in ${BUILDER_TERM_START}${CONFIGURED}${BUILDER_TERM_END}; skipping."
-  else
-    do_configure
-    CONFIGURED=configure:module
-  fi
+  verify_npm_setup
   builder_finish_action success configure :module
 fi
 
 if builder_start_action configure :tools; then
-  if [ -n "$CONFIGURED" ]; then
-    echo "Configuration already completed in ${BUILDER_TERM_START}${CONFIGURED}${BUILDER_TERM_END}; skipping."
-  else
-    do_configure
-    CONFIGURED=configure:tools
-  fi
-
+  verify_npm_setup
   builder_finish_action success configure :tools
 fi
 
 ### CLEAN ACTIONS
 
-MODULE_OUTPUT=build
-
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 do_clean() {
-  if [ -d $MODULE_OUTPUT ]; then
-    rm -rf "$MODULE_OUTPUT"
+  if [ -d build ]; then
+    rm -rf build/
   fi
 }
 
 CLEANED=
-if builder_start_action clean :libraries; then
-  do_clean
-  CLEANED=clean:libraries
-
-  builder_finish_action success clean :libraries
-fi
 
 if builder_start_action clean :module; then
-  if [ -n "$CLEANED" ]; then
-    echo "${BUILDER_TERM_START}clean${BUILDER_TERM_END} already completed as ${BUILDER_TERM_START}${CLEANED}${BUILDER_TERM_END}; skipping."
-  else
-    do_clean
-    CLEANED=clean:module
-  fi
+  do_clean
+  CLEANED=clean:module
   builder_finish_action success clean :module
 fi
 
@@ -111,17 +83,9 @@ fi
 
 ### BUILD ACTIONS
 
-if builder_start_action build :libraries; then
-  # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
-  "$KEYMAN_ROOT/common/predictive-text/build.sh" build:headless
-  # Also ensure that the keyboard-processor module builds appropriately.
-  "$KEYMAN_ROOT/common/web/keyboard-processor/build.sh" build
-
-  builder_finish_action success build :libraries
-fi
-
 if builder_start_action build :tools; then
   # Used by test:module
+  # TODO: convert to a dependency once we have updated kmlmc to use builder script
   pushd "$KEYMAN_ROOT/developer/src/kmlmc"
   ./build.sh -S
   popd
@@ -131,30 +95,10 @@ fi
 
 if builder_start_action build :module; then
   npm run tsc -- -b src/tsconfig.json
-
   builder_finish_action success build :module
 fi
 
 # TEST ACTIONS
-
-if builder_start_action test :tools; then
-  builder_finish_action success test :tools
-fi
-
-if builder_start_action test :libraries; then
-  CHAINING_FLAGS=
-  if builder_has_option --ci; then
-    CHAINING_FLAGS=--ci
-  fi
-  # First, run tests on the keyboard processor.
-  pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
-  ./build.sh test $CHAINING_FLAGS
-  popd
-
-  # lm-layer tests are handled outside of this chain, at least by our existing CI processes.
-
-  builder_finish_action success test :libraries
-fi
 
 if builder_start_action test :module; then
   FLAGS=
