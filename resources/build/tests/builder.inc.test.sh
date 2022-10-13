@@ -61,13 +61,6 @@ else
   fail "FAIL: should have matched action build for :project"
 fi
 
-if builder_start_action clean :app; then
-  echo "Cleaning <clean :app>"
-  builder_finish_action success clean :app
-else
-  fail "FAIL: should have matched action clean for :app"
-fi
-
 if builder_start_action clean:app; then
   echo "Cleaning <clean:app>"
   builder_finish_action success clean:app
@@ -75,14 +68,14 @@ else
   fail "FAIL: should have matched action clean for :app"
 fi
 
-if builder_start_action build :app; then
+if builder_start_action build:app; then
   echo "Building app"
-  builder_finish_action success build :app
+  builder_finish_action success build:app
 else
   fail "FAIL: should have matched action build for :app"
 fi
 
-if builder_start_action build :module; then
+if builder_start_action build:module; then
   fail "FAIL: should not have matched action build for :module"
 fi
 
@@ -163,11 +156,14 @@ fi
 
 # Due to the nature of the build-utils-traps tests, only one may be
 # specified at a time; each ends with an `exit`.
-echo "Running separate tests"
+echo "${COLOR_BLUE}## Running trap tests${COLOR_RESET}"
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh error
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh error-in-function
 $THIS_SCRIPT_PATH/build-utils-traps.test.sh incomplete
-echo "Fin"
+echo "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
+$THIS_SCRIPT_PATH/builder-deps.test.sh
+echo "${COLOR_BLUE}## End external tests${COLOR_RESET}"
+echo
 
 # Finally, run with --help so we can see what it looks like
 # Note:  calls `exit`, so no further tests may be defined.

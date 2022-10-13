@@ -19,60 +19,42 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
+  "@../keyman-version" \
   configure \
   clean \
   build \
   ":module      Builds recorder-core module" \
   ":proctor     Builds headless-testing, node-oriented 'proctor' component"
 
+builder_describe_outputs \
+  configure:module   "/node_modules" \
+  configure:proctor  "/node_modules" \
+  build:module    "build/index.js" \
+  build:proctor   "build/nodeProctor/index.js"
+
 builder_parse "$@"
 
-# START - Script parameter configuration
-REPORT_STYLE="local"  # Default setting.
-
-if builder_has_option --ci; then
-  REPORT_STYLE="ci"
-
-  echo "Replacing user-friendly test reports with CI-friendly versions."
-fi
-
-# END - Script parameter configuration
-
-function do_configure() {
+if builder_start_action configure; then
   verify_npm_setup
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
-}
-
-if builder_start_action configure :module; then
-  do_configure
-  builder_finish_action success configure :module
+  builder_finish_action success configure
 fi
 
-if builder_start_action configure :proctor; then
-  if builder_has_action configure :module; then
-    echo "Configuration already completed in configure:module; skipping."
-  else
-    do_configure
-  fi
-  builder_finish_action success configure :proctor
-fi
-
-if builder_start_action clean :module; then
+if builder_start_action clean:module; then
   npm run tsc -- -b --clean "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  builder_finish_action success clean :module
+  builder_finish_action success clean:module
 fi
 
-if builder_start_action clean :proctor; then
+if builder_start_action clean:proctor; then
   npm run tsc -- -b --clean "$THIS_SCRIPT_PATH/src/nodeProctor.tsconfig.json"
-  builder_finish_action success clean :proctor
+  builder_finish_action success clean:proctor
 fi
 
-if builder_start_action build :module; then
+if builder_start_action build:module; then
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  builder_finish_action success build :module
+  builder_finish_action success build:module
 fi
 
-if builder_start_action build :proctor; then
+if builder_start_action build:proctor; then
   npm run tsc -- --build "$THIS_SCRIPT_PATH/src/nodeProctor.tsconfig.json"
-  builder_finish_action success build :proctor
+  builder_finish_action success build:proctor
 fi
