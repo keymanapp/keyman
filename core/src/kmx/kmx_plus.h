@@ -12,17 +12,6 @@
 #include <kmx_file.h>
 #include <ldml/keyboardprocessor_ldml.h>
 
-/**
- * @def KMXPLUS_DEBUG Set to 1 to enable debug output
- */
-#ifndef KMXPLUS_DEBUG
-#if defined(DEBUG)
-#define KMXPLUS_DEBUG 1
-#else
-#define KMXPLUS_DEBUG 0
-#endif
-#endif
-
 namespace km {
 namespace kbp {
 namespace kmx {
@@ -101,6 +90,12 @@ typedef COMP_KMXPLUS_TRAN COMP_KMXPLUS_BKSP;
 struct COMP_KMXPLUS_ELEM_ELEMENT {
     KMX_DWORD element;                // str: output string or UTF-32LE codepoint
     KMX_DWORD flags;                  // flag and order values
+    /**
+     * @brief Get the 'to' as a string, if flags&LDML_ELEM_FLAGS_UNICODE_SET is not set
+     *
+     * @return std::u16string
+     */
+    std::u16string get_string() const;
 };
 
 struct COMP_KMXPLUS_ELEM_ENTRY {
@@ -119,6 +114,13 @@ struct COMP_KMXPLUS_ELEM {
    * @brief True if section is valid.
    */
   bool valid(KMX_DWORD length) const;
+  /**
+   * @param elementNumber element number, 0..count-1
+   * @param length fillin: length of list
+   * @return pointer to first element of list of length length. or nullptr
+   */
+  const COMP_KMXPLUS_ELEM_ELEMENT *getElementList(KMX_DWORD elementNumber,
+                                                  KMX_DWORD &length) const;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_ELEM) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
@@ -358,11 +360,13 @@ class kmx_plus {
      * @param length length of the entire KMX file
      */
     kmx_plus(const COMP_KEYBOARD *keyboard, size_t length);
+    const COMP_KMXPLUS_ELEM *elem;
     const COMP_KMXPLUS_KEYS *keys;
     const COMP_KMXPLUS_LOCA *loca;
     const COMP_KMXPLUS_META *meta;
     const COMP_KMXPLUS_SECT *sect;
     const COMP_KMXPLUS_STRS *strs;
+    const COMP_KMXPLUS_TRAN *tran;
     const COMP_KMXPLUS_VKEY *vkey;
     inline bool is_valid() { return valid; }
   private:

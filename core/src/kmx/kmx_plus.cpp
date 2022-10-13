@@ -9,10 +9,7 @@
 #include <kmx/kmx_plus.h>
 #include <kmx/kmx_xstring.h>
 
-#if KMXPLUS_DEBUG
-#include <iostream>
-#include <stdio.h>
-#endif
+#include "kmx_processevent.h" // for debug functions
 
 #include <assert.h>
 
@@ -20,13 +17,22 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
-#if KMXPLUS_DEBUG
-#define debug_println(x) std::cerr << __FILE__ << ":" << __LINE__ << ": " << (x) << std::endl;
-#define KMXPLUS_PRINTF(x) printf x
-#else
-#define debug_println(x)
-#define KMXPLUS_PRINTF(x)
-#endif
+
+/**
+ * \def _DEBUG_IDENT_SAFE for use by DEBUG_IDENT
+*/
+#define _DEBUG_IDENT_SAFE(x,b) (((x)>>b)&0x7F)<0x20?'?':(((x)>>b)&0x7F)
+
+/**
+ * \def DEBUG_IDENT
+ * Expands to four chars:  a,b,c,d
+ * for purposes of debug logging a hex identifier
+ */
+#define DEBUG_IDENT(x) \
+  _DEBUG_IDENT_SAFE(x,0), \
+  _DEBUG_IDENT_SAFE(x,8), \
+  _DEBUG_IDENT_SAFE(x,16), \
+  _DEBUG_IDENT_SAFE(x,24)
 
 /**
  * @brief Validate (and print out) a section name dword
@@ -37,18 +43,15 @@ namespace kmx {
  */
 static bool
 validate_section_name(KMX_DWORD ident) {
-  bool valid = true;
   for (int i = 0; i < 4; i++) {
     unsigned char ch = ident & 0xFF;
     if (ch < 0x20 || ch > 0x7F) {
-      valid = false;
-      KMXPLUS_PRINTF(("\\x%02X", ch));
-    } else {
-      KMXPLUS_PRINTF(("%c", ch));
+      DebugLog("Invalid section name %c%c%c%c (0x%X)", DEBUG_IDENT(ident), ident);
+      return false;
     }
     ident >>= 8;
   }
-  return valid;
+  return true;
 }
 
 /**
@@ -62,19 +65,19 @@ validate_section_name(KMX_DWORD ident) {
 static const kmx::COMP_KMXPLUS_HEADER *
 header_from_bytes(const uint8_t *data, KMX_DWORD length, uint32_t ident) {
   if (!data) {
-    debug_println("!data");
+    DebugLog("!data");
     return nullptr;
   }
   if (length < LDML_LENGTH_HEADER) {
-    debug_println("length < LDML_LENGTH_HEADER");
+    DebugLog("length < LDML_LENGTH_HEADER");
   }
   const COMP_KMXPLUS_HEADER *all = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(data);
   if (!all->valid(length)) {
-    debug_println("header failed validation");
+    DebugLog("header failed validation");
     return nullptr;
   }
   if (all->ident != ident) {
-    debug_println("header had wrong section id");
+    DebugLog("header had wrong section id");
     return nullptr;
   }
   return all;
@@ -91,7 +94,7 @@ header_from_bytes(const uint8_t *data, KMX_DWORD length, uint32_t ident) {
 template <class T>
 const T *section_from_bytes(const uint8_t *data, KMX_DWORD length) {
   if (length < sizeof(T)) { // Does not include dynamic data. First check.
-    debug_println("length < sizeof(section)");
+    DebugLog("length < sizeof(section)");
     return nullptr;
   }
   const COMP_KMXPLUS_HEADER *header = header_from_bytes(data, length, T::IDENT);
@@ -105,14 +108,15 @@ const T *section_from_bytes(const uint8_t *data, KMX_DWORD length) {
 
 template <class T>
 const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
+  DebugLog("----"); // separate a new section's validation
   const uint8_t *rawbytes = reinterpret_cast<const uint8_t *>(sect);
   if (rawbytes == nullptr) {
-    debug_println("section_from_sect(nullptr) == nullptr");
+    DebugLog("section_from_sect(nullptr) == nullptr");
     return nullptr;
   }
   KMX_DWORD offset = sect->find(T::IDENT);
   if (!offset) {
-    debug_println("section_from_sect() - not found");
+    DebugLog("section_from_sect() - not found. section %c%c%c%c (0x%X)", DEBUG_IDENT(T::IDENT), T::IDENT);
     return nullptr;
   }
   KMX_DWORD entrylength = sect->total - offset;
@@ -121,39 +125,39 @@ const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
 
 bool
 COMP_KMXPLUS_HEADER::valid(KMX_DWORD length) const {
-  KMXPLUS_PRINTF((": (%X) size 0x%X\n", ident, size));
+  DebugLog("%c%c%c%c: (%X) size 0x%X\n", DEBUG_IDENT(ident), ident, size);
   if (size < LDML_LENGTH_HEADER) {
-    debug_println("size < LDML_LENGTH_HEADER");
+    DebugLog("size < LDML_LENGTH_HEADER");
     return false;
   }
   if (size > length) {
-    debug_println("size > length");
+    DebugLog("size > length");
     return false;
   }
   if (!validate_section_name(ident)) {
-    debug_println("invalid section name");
     return false;
   }
+  DebugLog(" (header OK)"); // newline after section name
   return true;
 }
 
 bool
 COMP_KMXPLUS_KEYS::valid(KMX_DWORD _kmn_unused(length)) const {
-  KMXPLUS_PRINTF((" count: #0x%X\n", this->count));
+  DebugLog(" count: #0x%X\n", this->count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    debug_println("header.size < expected size");
+    DebugLog("header.size < expected size");
     return false;
   }
   for (KMX_DWORD i = 0; i<this->count; i++) {
-    KMXPLUS_PRINTF((" #0x%d\n", i));
+    DebugLog(" #0x%d\n", i);
     const COMP_KMXPLUS_KEYS_ENTRY& entry = this->entries[i];
-    KMXPLUS_PRINTF(("  vkey\t0x%X\n", entry.vkey));
-    KMXPLUS_PRINTF(("  mod\t0x%X\n", entry.mod));
-    KMXPLUS_PRINTF(("  flags\t0x%X\n", entry.flags));
+    DebugLog("  vkey\t0x%X\n", entry.vkey);
+    DebugLog("  mod\t0x%X\n", entry.mod);
+    DebugLog("  flags\t0x%X\n", entry.flags);
     if (entry.flags & LDML_KEYS_FLAGS_EXTEND) {
-        KMXPLUS_PRINTF(("  \t Extend: String #0x%X\n", entry.to));
+        DebugLog("  \t Extend: String #0x%X\n", entry.to);
     } else {
-        KMXPLUS_PRINTF(("  \t UTF-32:U+%04X\n", entry.to));
+        DebugLog("  \t UTF-32:U+%04X\n", entry.to);
     }
   }
   return true;
@@ -170,12 +174,12 @@ COMP_KMXPLUS_KEYS_ENTRY::get_string() const {
 bool
 COMP_KMXPLUS_LOCA::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    debug_println("header.size < expected size");
+    DebugLog("header.size < expected size");
     return false;
   }
   // TODO-LDML
   for(KMX_DWORD i=0; i<this->count; i++) {
-    KMXPLUS_PRINTF((" Locale #%d: #0x%X\n", i, this->entries[i].locale));
+    DebugLog(" Locale #%d: #0x%X\n", i, this->entries[i].locale);
   }
   return true;
 }
@@ -183,78 +187,63 @@ COMP_KMXPLUS_LOCA::valid(KMX_DWORD _kmn_unused(length)) const {
 bool
 COMP_KMXPLUS_META::valid(KMX_DWORD _kmn_unused(length)) const {
   if (header.size < sizeof(*this)) {
-    debug_println("header.size < expected size");
+    DebugLog("header.size < expected size");
     return false;
   }
-  KMXPLUS_PRINTF((" author:\t#0x%X\n", this->author));
-  KMXPLUS_PRINTF((" conform:\t#0x%X\n", this->conform));
-  KMXPLUS_PRINTF((" layout:\t#0x%X\n", this->layout));
-  KMXPLUS_PRINTF((" normalization:\t#0x%X\n", this->normalization));
-  KMXPLUS_PRINTF((" indicator:\t#0x%X\n", this->indicator));
-  KMXPLUS_PRINTF((" settings:\t0x%X\n", this->settings));
+  DebugLog(" author:\t#0x%X\n", this->author);
+  DebugLog(" conform:\t#0x%X\n", this->conform);
+  DebugLog(" layout:\t#0x%X\n", this->layout);
+  DebugLog(" normalization:\t#0x%X\n", this->normalization);
+  DebugLog(" indicator:\t#0x%X\n", this->indicator);
+  DebugLog(" settings:\t0x%X\n", this->settings);
   return true;
 }
 
 bool
 COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
-  KMXPLUS_PRINTF(("vkey: count 0x%X\n", this->count));
+  DebugLog("vkey: count 0x%X\n", this->count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    debug_println("header.size < expected size");
+    DebugLog("header.size < expected size");
     return false;
   }
   // TODO-LDML
-  KMXPLUS_PRINTF(("TODO: dump vkey"));
+  DebugLog("TODO: dump vkey");
   return true;
 }
 
 bool
 COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
-  KMXPLUS_PRINTF(("strs: count 0x%X\n", this->count));
+  DebugLog("strs: count 0x%X\n", this->count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    debug_println("header.size < expected size");
+    DebugLog("header.size < expected size");
     return false;
   }
   for (KMX_DWORD i=0; i<this->count; i++) {
-    KMXPLUS_PRINTF(("#0x%X: ", i));
+    DebugLog("#0x%X: ...", i);
     KMX_DWORD offset = entries[i].offset;
     KMX_DWORD length = entries[i].length;
     if(offset+((length+1)*2) > header.size) {
-      debug_println("expected end of string past header.size");
+      DebugLog("#0x%X: expected end of string past header.size", i);
       return false;
     }
     const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(this);
     const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
     if(start[length] != 0) {
-      debug_println("String not null terminated");
+      DebugLog("#0x%X: String of length 0x%x not null terminated", i, length);
       return false;
     }
     // TODO-LDML: validate valid UTF-16LE?
-#if KMXPLUS_DEBUG
-    // first print it escaped
-    for(KMX_DWORD j=0; start[j] && j<length; j++) {
-        if (start[j] < 0x7F && start[j] > 0x20) {
-            KMXPLUS_PRINTF(("%c", start[j]));
-        } else {
-            KMXPLUS_PRINTF((" U+%04X ", start[j]));
-        }
-    }
-    KMXPLUS_PRINTF(("\n"));
-
-    // // now print it as a string
-    // TODO-LDML
-    // std::u16string str = get(i);
-    // std::cerr << str << std::endl;
-#endif
+    DebugLog("#0x%X: '%s'", i, Debug_UnicodeString(start));
   }
   return true;
 }
 
 bool
 COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
-  KMXPLUS_PRINTF(("sect: total 0x%X\n", this->total));
-  KMXPLUS_PRINTF(("sect: count 0x%X\n", this->count));
+  DebugLog("sect: total 0x%X\n", this->total);
+  DebugLog("sect: count 0x%X\n", this->count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    debug_println("header.size < expected size");
+    DebugLog("header.size < expected size");
     return false;
   }
 
@@ -262,13 +251,12 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
   bool overall_valid = true;
   for (KMX_DWORD i = 0; i < this->count; i++) {
     const COMP_KMXPLUS_SECT_ENTRY& entry = this->entries[i];
+    DebugLog("%c%c%c%c #%d: %X @ %X\n", DEBUG_IDENT(entry.sect), i, entry.sect, entry.offset);
     if(!validate_section_name(entry.sect)) {
-      KMXPLUS_PRINTF((" (invalid section name) \n"));
       return false;
     }
-    KMXPLUS_PRINTF((" sect#%d: %X @ %X\n", i, entry.sect, entry.offset));
     if (entry.sect == LDML_SECTIONID_SECT) {
-      debug_println("Invalid nested 'sect'");
+      DebugLog("Invalid nested 'sect'");
       overall_valid = false;
       continue;
     }
@@ -277,7 +265,7 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
     KMX_DWORD entrylength = length - entry.offset;
     // just validate header
     if(header_from_bytes(entrydata, entrylength, entry.sect) == nullptr) {
-      KMXPLUS_PRINTF(("Invalid header %X", entry.sect));
+      DebugLog("Invalid header %X", entry.sect);
       overall_valid = false;
       continue;
     }
@@ -285,26 +273,103 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
   return overall_valid;
 }
 
+// ---- transform related fcns
+bool
+COMP_KMXPLUS_ELEM::valid(KMX_DWORD _kmn_unused(length)) const {
+  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
+    DebugLog("header.size 0x%X < expected size");
+    return false;
+  }
+  const COMP_KMXPLUS_ELEM_ENTRY &firstEntry = entries[0];
+  if (firstEntry.length != 0 ) {
+    // per spec, the first elem should have zero length and zero offset
+    DebugLog("ERROR: elem[0].length 0x%x but should be zero", firstEntry.length);
+    return false;
+  }
+  if (firstEntry.offset + sizeof(COMP_KMXPLUS_ELEM_ELEMENT) > header.size) {
+    // TODO-LDML: change to  (firstEntry.offset != 0 )
+    // Blocked by https://github.com/keymanapp/keyman/issues/7404
+    DebugLog("WARNING: elem[0].offset 0x%x would put element outside of data region..."
+           "Please fix https://github.com/keymanapp/keyman/issues/7404");
+    // TODO-LDML: should exit here
+    // return false;
+  }
+  for (KMX_DWORD e = 1; e < count; e++) {
+    // Don't need to recheck the first entry hbere.
+    KMX_DWORD listLength;
+    if (getElementList(e, listLength) == nullptr) {
+      return false;
+    }
+    if (listLength == 0) { // only the first element should have length zero
+      DebugLog("ERROR: elem[0x%x].length == 0", e);
+      return false;
+    }
+  }
+  return true;
+}
+
+const COMP_KMXPLUS_ELEM_ELEMENT *
+COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) const {
+  if (elementNumber >= count) {
+    DebugLog("ERROR: COMP_KMXPLUS_ELEM::getElementList(%d) >= count %d", elementNumber, count);
+    return nullptr;
+  }
+  const COMP_KMXPLUS_ELEM_ENTRY &entry = entries[elementNumber];
+  length = entry.length;
+  if (length == 0) {
+    return nullptr; // Normal case for first element
+  }
+  if (entry.offset + (entry.length * sizeof(COMP_KMXPLUS_ELEM_ELEMENT)) > header.size) {
+    DebugLog("ERROR: !! COMP_KMXPLUS_ELEM::getElementList(%d) would be off end of data area", elementNumber);
+    return nullptr;
+  }
+  // pointer to beginning of elem section
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(this);
+  // pointer to specified entry
+  return reinterpret_cast<const COMP_KMXPLUS_ELEM_ELEMENT *>(rawdata + entry.offset);
+}
+
+std::u16string
+COMP_KMXPLUS_ELEM_ELEMENT::get_string() const {
+  assert(!(flags & LDML_ELEM_FLAGS_UNICODE_SET)); // should not be called.
+  char16_single buf;
+  const int len = Utf32CharToUtf16(element, buf);
+  return std::u16string(buf.ch, len);
+}
+
+bool
+COMP_KMXPLUS_TRAN::valid(KMX_DWORD _kmn_unused(length)) const {
+  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
+    DebugLog("header.size < expected size");
+    return false;
+  }
+  // TODO-LDML
+  DebugLog("!! More to do here.");
+  return true;
+}
+
+// ---- constructor
+
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     : keys(nullptr), loca(nullptr), meta(nullptr),
       sect(nullptr), strs(nullptr), vkey(nullptr), valid(false) {
 
-  KMXPLUS_PRINTF(("kmx_plus(): Got a COMP_KEYBOARD at %p\n", keyboard));
+  DebugLog("kmx_plus(): Got a COMP_KEYBOARD at %p\n", keyboard);
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
-    KMXPLUS_PRINTF(("Err: flags COMP_KEYBOARD.dwFlags did not have KF_KMXPLUS set\n"));
+    DebugLog("Err: flags COMP_KEYBOARD.dwFlags did not have KF_KMXPLUS set");
     valid = false;
     return;
   }
   const COMP_KEYBOARD_EX* ex = reinterpret_cast<const COMP_KEYBOARD_EX*>(keyboard);
 
-  KMXPLUS_PRINTF(("kmx_plus(): KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize));
+  DebugLog("kmx_plus(): KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
   if (ex->kmxplus.dpKMXPlus < sizeof(kmx::COMP_KEYBOARD_EX)) {
-    debug_println("dwKMXPlus is not past the end of COMP_KEYBOARD_EX");
+    DebugLog("dwKMXPlus is not past the end of COMP_KEYBOARD_EX");
     valid = false;
     return;
   }
   if ( ex->kmxplus.dpKMXPlus + ex->kmxplus.dwKMXPlusSize > length) {
-    debug_println("dpKMXPlus + dwKMXPlusSize is past the end of the file");
+    DebugLog("dpKMXPlus + dwKMXPlusSize is past the end of the file");
     valid = false;
     return;
   }
@@ -313,16 +378,18 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
 
   sect = section_from_bytes<COMP_KMXPLUS_SECT>(rawdata+ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
   if (sect == nullptr) {
-    KMXPLUS_PRINTF(("kmx_plus(): 'sect' did not validate\n"));
+    DebugLog("kmx_plus(): 'sect' did not validate");
     valid = false;
   } else {
     valid = true;
     // load other sections, validating as we go
     // these will be nullptr if they don't validate
+    elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect);
     keys = section_from_sect<COMP_KMXPLUS_KEYS>(sect);
     loca = section_from_sect<COMP_KMXPLUS_LOCA>(sect);
     meta = section_from_sect<COMP_KMXPLUS_META>(sect);
     strs = section_from_sect<COMP_KMXPLUS_STRS>(sect);
+    tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect);
     vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
   }
 }
