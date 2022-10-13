@@ -275,7 +275,9 @@ namespace com.keyman.osk {
 
         // Cancel (but do not execute) pending key if neither a popup key or the base key
         if(t == null || t.id.indexOf('popup') < 0) {
-          this.highlight(this.pendingTarget,false);
+          if (this.pendingTarget) {
+            this.highlight(this.pendingTarget,false);
+          }
           this.clearHolds();
           this.pendingTarget = null;
         }

@@ -146,6 +146,7 @@
 # VS Code
 .vscode/
 .vs/
+.devcontainer/
 
 # IDE files
 **/.idea/**/*.xml
@@ -178,3 +179,13 @@ Thumbs.db
 # Code coverage tools for JS/TS - nyc and c8
 #
 .nyc_output/
+# Linux packaging related
+/debian/
+results/
+*.deb
+*.ddeb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.tar.?z

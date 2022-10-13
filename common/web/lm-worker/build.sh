@@ -76,7 +76,12 @@ wrap-worker-code ( ) {
 
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
+  "@../keyman-version" \
   configure clean build test
+
+builder_describe_outputs \
+  configure     /node_modules \
+  build         build/index.js
 
 builder_parse "$@"
 
@@ -95,14 +100,15 @@ fi
 # of typescript, we need to avoid this!
 # TODO: we should try and rework this to avoid the need to manually wrap
 
-if builder_start_action clean || builder_has_action build; then
+if builder_start_action clean; then
   npm run clean
   builder_finish_action success clean
 fi
 
 if builder_start_action build; then
-  # Ensure keyman-version is properly build (requires build script)
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+  if ! builder_has_action clean; then
+    npm run clean
+  fi
 
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."

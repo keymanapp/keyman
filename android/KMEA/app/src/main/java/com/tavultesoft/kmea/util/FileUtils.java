@@ -135,7 +135,7 @@ public final class FileUtils {
         if (tmpFile != null && tmpFile.exists()) {
           tmpFile.delete();
         }
-        KMLog.LogError(TAG, "Could not download filename " + filename);
+        KMLog.LogError(TAG, "Could not download filename " + destinationFilename);
       }
 
       Connection.disconnect();

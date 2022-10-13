@@ -499,6 +499,8 @@ namespace com.keyman.osk {
         bs.width  = bs.maxWidth  = this.computedWidth + 'px';
         bs.height = bs.maxHeight = this.computedHeight + 'px';
 
+        // Ensure that the layer's spacebar is properly captioned.
+        this.vkbd.showLanguage();
       } else {
         const bs = this._Box.style;
         bs.width  = 'auto';

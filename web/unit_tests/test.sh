@@ -61,7 +61,7 @@ get_browser_set_for_OS ( ) {
     if [ $os_id = "mac" ]; then
         BROWSERS="--browsers Firefox,Chrome,Safari"
     elif [ $os_id = "win" ]; then
-        BROWSERS="--browsers Firefox,Chrome,IE,Edge"
+        BROWSERS="--browsers Firefox,Chrome,Edge"
     else
         BROWSERS="--browsers Firefox,Chrome"
     fi
@@ -74,7 +74,7 @@ get_browser_set_for_OS
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
 DEBUG=false
 FLAGS=
-HEADLESS_FLAGS=-skip-package-install
+HEADLESS_FLAGS=
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -82,7 +82,7 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -CI)
             CONFIG=CI.conf.js
-            HEADLESS_FLAGS="$HEADLESS_FLAGS -CI"
+            HEADLESS_FLAGS="$HEADLESS_FLAGS --ci"
             ;;
         -log-level)
             shift
@@ -131,8 +131,13 @@ cd ../tools/recorder
 # Run our headless tests first.
 
 # First:  Web-core tests.
+pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
+./build.sh test $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
+# Once done, now we run the integrated (KeymanWeb) tests.
+popd
+
 pushd "$KEYMAN_ROOT/common/web/input-processor"
-./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
+./build.sh build:tools test $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd
 
