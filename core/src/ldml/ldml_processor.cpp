@@ -168,8 +168,22 @@ ldml_processor::process_event(
 
     switch (vk) {
     case KM_KBP_VKEY_BKSP:
-      state->context().pop_back();
-      state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
+      {
+        KMX_DWORD last_char = 0UL; // Assuming we don't know the character
+        // attempt to get the last char
+        auto end = state->context().rbegin();
+        if(end != state->context().rend()) {
+          if((*end).type == KM_KBP_CT_CHAR) {
+            last_char = (*end).character;
+          }
+        }
+        if (last_char == 0UL) {
+          state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
+        } else {
+          state->actions().push_backspace(KM_KBP_BT_CHAR, last_char);
+        }
+        state->context().pop_back();
+      }
       break;
     default:
       // Look up the key
@@ -179,10 +193,10 @@ ldml_processor::process_event(
         state->actions().commit(); // finish up and
         return KM_KBP_STATUS_OK; // Nothing to do- no key
       }
-      for(size_t i=0; i<str.length(); i++) {
-        // TODO-LDML: needs to be per UTF-32 char? Seems this would push surrogates.
-        state->context().push_character(str[i]);
-        state->actions().push_character(str[i]);
+      const std::u32string str32 = kmx::u16string_to_u32string(str);
+      for(size_t i=0; i<str32.length(); i++) {
+        state->context().push_character(str32[i]);
+        state->actions().push_character(str32[i]);
       }
     }
     state->actions().commit();
