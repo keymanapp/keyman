@@ -131,6 +131,11 @@ cd ../tools/recorder
 # Run our headless tests first.
 
 # First:  Web-core tests.
+pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
+./build.sh test $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
+# Once done, now we run the integrated (KeymanWeb) tests.
+popd
+
 pushd "$KEYMAN_ROOT/common/web/input-processor"
 ./build.sh build:tools test $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
