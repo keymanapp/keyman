@@ -17,6 +17,12 @@ cd "$THIS_SCRIPT_PATH"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Build Keyman Keyboard Compiler kmc" \
+  "@/common/web/keyman-version" \
+  "@/common/web/types" \
+  "@../kmc-keyboard" \
+  "@../kmc-model" \
+  "@../kmc-model-info" \
+  "@../kmc-package" \
   "configure                 runs 'npm ci' on root folder" \
   "build                     (default) builds kmc to build/" \
   "clean                     cleans build/ folder" \
@@ -25,6 +31,9 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "publish                   publish to npm" \
   "--build-path=BUILD_PATH   build directory for bundle" \
   "--dry-run,-n              don't actually publish, just dry run"
+builder_describe_outputs \
+  configure     /node_modules \
+  build         build/src/kmc.js
 
 builder_parse "$@"
 

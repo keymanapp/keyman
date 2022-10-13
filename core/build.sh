@@ -12,6 +12,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$THIS_SCRIPT_PATH/commands.inc.sh"
 
+cd "$THIS_SCRIPT_PATH"
+
 ################################ Main script ################################
 
 get_builder_OS
@@ -47,6 +49,9 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   * <configuration>: 'debug' or 'release' (see --debug flag)
   * All parameters after '--' are passed to meson or ninja
 " \
+  "@/common/tools/hextobin      test" \
+  "@/common/web/keyman-version  test" \
+  "@/developer/src/kmc          test" \
   "clean" \
   "configure" \
   "build" \
@@ -57,6 +62,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "--debug,-d                      configuration is 'debug', not 'release'" \
   "--target-path=opt_target_path   override for build/ target path" \
   "--test=opt_tests,-t             test[s] to run (space separated)"
+
 builder_parse "$@"
 
 if builder_has_option --debug; then
@@ -64,6 +70,16 @@ if builder_has_option --debug; then
 else
   CONFIGURATION=release
 fi
+
+builder_describe_outputs \
+  configure:x86      build/x86/$CONFIGURATION/build.ninja \
+  configure:x64      build/x64/$CONFIGURATION/build.ninja \
+  configure:arch     build/arch/$CONFIGURATION/build.ninja \
+  configure:wasm     build/wasm/$CONFIGURATION/build.ninja \
+  build:x86          build/x86/$CONFIGURATION/src/libkmnkbp0.a \
+  build:x64          build/x64/$CONFIGURATION/src/libkmnkbp0.a \
+  build:arch         build/arch/$CONFIGURATION/src/libkmnkbp0.a \
+  build:wasm         build/wasm/$CONFIGURATION/src/libkmnkbp0.a
 
 # Target path is used by Linux build, e.g. --target-path keyboardprocessor
 if builder_has_option --target-path; then

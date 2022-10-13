@@ -12,17 +12,21 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-cd "$THIS_SCRIPT_PATH"
-
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
+cd "$THIS_SCRIPT_PATH"
+
 builder_describe "Build Keyman common file types module" \
+  "@../keyman-version" \
   "configure" \
   "build" \
   "clean" \
   "test" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
+builder_describe_outputs \
+  configure   /node_modules \
+  build       build/src/main.js
 
 builder_parse "$@"
 

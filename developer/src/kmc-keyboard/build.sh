@@ -17,6 +17,8 @@ cd "$THIS_SCRIPT_PATH"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Build Keyman kmc Keyboard Compiler module" \
+  "@/common/web/keyman-version" \
+  "@/common/web/types" \
   "configure" \
   "build" \
   "clean" \
@@ -24,6 +26,9 @@ builder_describe "Build Keyman kmc Keyboard Compiler module" \
   "build-fixtures            builds test fixtures for manual examination" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
+builder_describe_outputs \
+  configure     /node_modules \
+  build         build/src/main.js
 
 builder_parse "$@"
 

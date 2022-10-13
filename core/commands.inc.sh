@@ -25,8 +25,6 @@ do_configure() {
 
   echo_heading "======= Configuring $target ======="
 
-  do_configure_dependencies
-
   if [[ $target == wasm ]]; then
     # do_configure_wasm
     locate_emscripten
@@ -43,30 +41,6 @@ do_configure() {
     popd > /dev/null
   fi
   builder_finish_action success configure:$target
-}
-
-has_configured_dependencies=false
-
-do_configure_dependencies() {
-  if $has_configured_dependencies; then
-    return
-  fi
-  has_configured_dependencies=true
-
-  # check dependency for ldml - kmc
-  # TODO: in the future this should be part of the meson build, but
-  # it's too complicated at present due to old meson versions in
-  # debian packaging environments
-  if type node >/dev/null 2>&1; then
-    echo "Note: Found node, checking and building kmc and hextobin dependencies if needed"
-    if [[ ! -f "$KEYMAN_ROOT/developer/src/kmc/build/kmc.js" ]]; then
-      "$KEYMAN_ROOT/common/web/keyman-version/build.sh" configure build
-      "$KEYMAN_ROOT/developer/src/kmc/build.sh" configure build
-      "$KEYMAN_ROOT/common/tools/hextobin/build.sh" build
-    fi
-  else
-    echo "Note: could not find node, skipping hextobin and kmc dependency builds, ldml+binary tests will not be run"
-  fi
 }
 
 # ----------------------------------------------------------------------------
