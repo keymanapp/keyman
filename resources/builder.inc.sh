@@ -780,6 +780,10 @@ builder_parse() {
           shift
           _builder_deps_built="$1"
           ;;
+        --builder-report-dependencies)
+          # internal reporting function, ignores all other parameters
+          _builder_report_dependencies
+          ;;
         *)
           _builder_parameter_error "$0" parameter "$key"
       esac
@@ -1138,6 +1142,15 @@ builder_verbose() {
     return 0
   fi
   return 1
+}
+
+#
+# Reports on all described dependencies, then exits
+# used by builder-controls.sh
+#
+_builder_report_dependencies() {
+  echo "${_builder_deps[@]}"
+  exit 0
 }
 
 #
