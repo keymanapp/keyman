@@ -291,9 +291,10 @@ ldml_processor::process_event(
           state->actions().push_backspace(KM_KBP_BT_CHAR, deletedChar);  // Cause prior char to be removed
         }
         // Now, add in the updated text
-        for (size_t i = 0; i < outputString.length(); i++) {
-          state->context().push_character(outputString[i]);
-          state->actions().push_character(outputString[i]);
+        const std::u32string outstr32 = kmx::u16string_to_u32string(outputString);
+        for (size_t i = 0; i < outstr32.length(); i++) {
+          state->context().push_character(outstr32[i]);
+          state->actions().push_character(outstr32[i]);
         }
         // Add a marker so we don't retransform this text.
         state->context().push_marker(0x0);
