@@ -99,7 +99,8 @@ Utf32CharToUtf16(const KMX_DWORD ch32, char16_single &ch16) {
 }
 
 /**
- * Convert a u16 string to a u32 string. U+FFFD instead of mismatched surrogates or sliced surrogate
+ * Convert a u16 string to a u32 string.
+ * Mismatched surrogates or sliced surrogates are replaced with U+FFFD (replacement character).
  * @param source UTF-16 string
  * @return a UTF-32 string
  */

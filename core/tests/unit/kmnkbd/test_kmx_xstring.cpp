@@ -1316,6 +1316,15 @@ test_u16string_to_u32string() {
     assert_equal(str.length(), 1);
     assert_equal(str.at(0), 0xFFFD);
   }
+  {
+      std::u16string no_cat;
+      no_cat.push_back(0xDE40);
+      no_cat.push_back(0xD83D);
+      const std::u32string str = u16string_to_u32string(no_cat);
+      assert_equal(str.length(), 2);
+      assert_equal(str.at(0), 0xFFFD);
+      assert_equal(str.at(1), 0xFFFD);
+  }
 }
 
 constexpr const auto help_str = u"\

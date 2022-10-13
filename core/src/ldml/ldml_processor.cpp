@@ -223,7 +223,7 @@ ldml_processor::process_event(
     switch (vk) {
     case KM_KBP_VKEY_BKSP:
       {
-        KMX_DWORD last_char = 0UL; // Assuming we don't know the character
+        KMX_DWORD last_char = 0UL;
         // attempt to get the last char
         auto end = state->context().rbegin();
         if(end != state->context().rend()) {
