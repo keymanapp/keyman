@@ -73,6 +73,7 @@ UINT
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
   wm_keyman_keyevent = 0,   // for serialized input
+  wm_keyman_modifierevent = 0,
 	wm_kmdebug = 0,						//  " "  "  "   - debugging
 
 	wm_keymankeydown = 0,
