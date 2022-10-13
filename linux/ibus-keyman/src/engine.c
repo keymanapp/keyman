@@ -256,16 +256,16 @@ reset_context(IBusEngine *engine) {
 
     ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
 
-    context_start    = context_end > MAXCONTEXT_ITEMS ? context_end - MAXCONTEXT_ITEMS : 0;
     context_end      = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
+    context_start    = context_end > MAXCONTEXT_ITEMS ? context_end - MAXCONTEXT_ITEMS : 0;
     surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_end);
     g_message("%s: new context is :%s: (len:%u) cursor:%d anchor:%d", __FUNCTION__,
       surrounding_text, context_end - context_start, cursor_pos, anchor_pos);
 
     if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
       km_kbp_context_set(context, context_items);
+      km_kbp_context_items_dispose(context_items);
     }
-    km_kbp_context_items_dispose(context_items);
     g_free(surrounding_text);
   }
 }
