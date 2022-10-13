@@ -17,26 +17,22 @@ namespace km {
 namespace kbp {
 namespace kmx {
 
+
 /**
- * @brief convert a section name to string, for debugging
- * @param ident the hex dword
- * @param buf buffer, must be size 5
- * @return const pointer to buffer
+ * \def _DEBUG_IDENT_SAFE for use by DEBUG_IDENT
+*/
+#define _DEBUG_IDENT_SAFE(x,b) (((x)>>b)&0x7F)<0x20?'?':(((x)>>b)&0x7F)
+
+/**
+ * \def DEBUG_IDENT
+ * Expands to four chars:  a,b,c,d
+ * for purposes of debug logging a hex identifier
  */
-inline const char *
-section_name_to_str(KMX_DWORD ident, char *buf) {
-  for (int i = 0; i < 4; i++) {
-    unsigned char ch = ident & 0xFF;
-    if (ch < 0x20 || ch > 0x7F) {
-      buf[i] = '?';
-    } else {
-      buf[i] = (char)ch;
-    }
-    ident >>= 8;
-  }
-  buf[4]=0;
-  return buf;
-}
+#define DEBUG_IDENT(x) \
+  _DEBUG_IDENT_SAFE(x,0), \
+  _DEBUG_IDENT_SAFE(x,8), \
+  _DEBUG_IDENT_SAFE(x,16), \
+  _DEBUG_IDENT_SAFE(x,24)
 
 /**
  * @brief Validate (and print out) a section name dword
@@ -50,10 +46,7 @@ validate_section_name(KMX_DWORD ident) {
   for (int i = 0; i < 4; i++) {
     unsigned char ch = ident & 0xFF;
     if (ch < 0x20 || ch > 0x7F) {
-      if(ShouldDebug()) {
-        char buf[5];
-        DebugLog("Invalid section name %s (0x%X)", section_name_to_str(ident, buf), ident);
-      }
+      DebugLog("Invalid section name %c%c%c%c (0x%X)", DEBUG_IDENT(ident), ident);
       return false;
     }
     ident >>= 8;
@@ -123,10 +116,7 @@ const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
   }
   KMX_DWORD offset = sect->find(T::IDENT);
   if (!offset) {
-    if(ShouldDebug()) {
-      char buf[5];
-      DebugLog("section_from_sect() - not found. section %s (0x%X)", section_name_to_str(T::IDENT, buf), T::IDENT);
-    }
+    DebugLog("section_from_sect() - not found. section %c%c%c%c (0x%X)", DEBUG_IDENT(T::IDENT), T::IDENT);
     return nullptr;
   }
   KMX_DWORD entrylength = sect->total - offset;
@@ -135,10 +125,7 @@ const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
 
 bool
 COMP_KMXPLUS_HEADER::valid(KMX_DWORD length) const {
-  if(ShouldDebug()) {
-    char buf[5];
-    DebugLog("%s: (%X) size 0x%X\n", section_name_to_str(ident, buf), ident, size);
-  }
+  DebugLog("%c%c%c%c: (%X) size 0x%X\n", DEBUG_IDENT(ident), ident, size);
   if (size < LDML_LENGTH_HEADER) {
     DebugLog("size < LDML_LENGTH_HEADER");
     return false;
@@ -264,10 +251,7 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
   bool overall_valid = true;
   for (KMX_DWORD i = 0; i < this->count; i++) {
     const COMP_KMXPLUS_SECT_ENTRY& entry = this->entries[i];
-    if (ShouldDebug()) {
-      char buf[5];
-      DebugLog("%s #%d: %X @ %X\n", section_name_to_str(entry.sect, buf), i, entry.sect, entry.offset);
-    }
+    DebugLog("%c%c%c%c #%d: %X @ %X\n", DEBUG_IDENT(entry.sect), i, entry.sect, entry.offset);
     if(!validate_section_name(entry.sect)) {
       return false;
     }
@@ -327,15 +311,17 @@ COMP_KMXPLUS_ELEM::valid(KMX_DWORD _kmn_unused(length)) const {
 const COMP_KMXPLUS_ELEM_ELEMENT *
 COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) const {
   if (elementNumber >= count) {
+    DebugLog("ERROR: COMP_KMXPLUS_ELEM::getElementList(%d) >= count %d", elementNumber, count);
     return nullptr;
   }
   const COMP_KMXPLUS_ELEM_ENTRY &entry = entries[elementNumber];
   length = entry.length;
   if (length == 0) {
-    return nullptr;
+    return nullptr; // Normal case for first element
   }
   if (entry.offset + (entry.length * sizeof(COMP_KMXPLUS_ELEM_ELEMENT)) > header.size) {
-    DebugLog("ERROR: !! COMP_KMXPLUS_ELEM::getElementList");
+    DebugLog("ERROR: !! COMP_KMXPLUS_ELEM::getElementList(%d) would be off end of data area", elementNumber);
+    return nullptr;
   }
   // pointer to beginning of elem section
   const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(this);
