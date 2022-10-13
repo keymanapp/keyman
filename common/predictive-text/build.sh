@@ -20,92 +20,145 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-# Exit status on invalid usage.
-EX_USAGE=64
-
-LMLAYER_OUTPUT=build
-
-# Builds the top-level JavaScript file for use in browsers (the second stage of compilation)
-build-browser () {
-  npm run tsc -- -b ./browser.tsconfig.json || fail "Could not build top-level browser-targeted JavaScript file."
-}
-
-# Builds the top-level JavaScript file for use on Node (the second stage of compilation)
-build-headless () {
-  npm run tsc -- -b ./tsconfig.json || fail "Could not build top-level node-targeted JavaScript file."
-}
-
-# A nice, extensible method for -clean operations.  Add to this as necessary.
-clean ( ) {
-  if [ -d $LMLAYER_OUTPUT ]; then
-    rm -rf "$LMLAYER_OUTPUT" || fail "Failed to erase the prior build."
-  fi
-}
-
-display_usage ( ) {
-  echo "Usage: $0 [-clean] [-skip-package-install | -S] [-test | -tdd]"
-  echo "       $0 -help"
-  echo
-  echo "  -clean                 to erase pre-existing build products before a re-build"
-  echo "  -help                  displays this screen and exits"
-  echo "  -skip-package-install  (or -S) skips dependency updates"
-  echo "  -tdd                   skips dependency updates, builds, then runs unit tests only"
-  echo "  -test                  runs unit and integration tests after building"
-}
-
 ################################ Main script ################################
 
-run_tests=0
-fetch_deps=true
-unit_tests_only=0
+builder_check_color "$@"
 
-# Process command-line arguments
-while [[ $# -gt 0 ]] ; do
-  key="$1"
-  case $key in
-    -clean)
-      clean
-      ;;
-    -help|-h)
-      display_usage
-      exit
-      ;;
-    -skip-package-install|-S)
-      fetch_deps=false
-      ;;
-    -test)
-      run_tests=1
-      ;;
-    -tdd)
-      run_tests=1
-      fetch_deps=false
-      unit_tests_only=1
-      ;;
-    *)
-      echo "$0: invalid option: $key"
-      display_usage
-      exit $EX_USAGE
-  esac
-  shift # past the processed argument
-done
+builder_describe "Builds the lm-layer module" \
+  "clean" \
+  "configure" \
+  "build" \
+  "test" \
+  ":libraries  Targets all in-repo libraries that this module is dependent upon" \
+  ":headless   A headless, Node-oriented version of the module useful for unit tests" \
+  ":browser    The standard version of the module for in-browser use" \
+  "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
 
-# Check if Node.JS/npm is installed.
-verify_npm_setup $fetch_deps
+builder_parse "$@"
 
-if $fetch_deps; then
-  # We need to build keyman-version and lm-worker with a script for now
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
-  "$KEYMAN_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
+# Exit status on invalid usage.
+EX_USAGE=64
+LMLAYER_OUTPUT=build
+
+### CONFIGURE ACTIONS
+
+do_configure() {
+  # Check if Node.JS/npm is installed.
+  verify_npm_setup
+}
+
+CONFIGURED=
+if builder_start_action configure :libraries; then
+  do_configure
+  CONFIGURED=configure:libraries
+
+  builder_finish_action success configure :libraries
 fi
 
-build-browser || fail "Browser-oriented compilation failed."
-build-headless || fail "Headless compilation failed."
-echo "Typescript compilation successful."
 
-if (( run_tests )); then
-  if (( unit_tests_only )); then
-    npm run test -- -headless || fail "Unit tests failed"
+if builder_start_action configure :browser; then
+  if [ -n "$CONFIGURED" ]; then
+    echo "Configuration already completed in ${BUILDER_TERM_START}${CONFIGURED}${BUILDER_TERM_END}; skipping."
   else
-    npm test || fail "Tests failed"
+    do_configure
+    CONFIGURED=configure:browser
   fi
+  builder_finish_action success configure :browser
+fi
+
+if builder_start_action configure :headless; then
+  if [ -n "$CONFIGURED" ]; then
+    echo "Configuration already completed in ${BUILDER_TERM_START}${CONFIGURED}${BUILDER_TERM_END}; skipping."
+  else
+    do_configure
+    CONFIGURED=configure:headless
+  fi
+
+  builder_finish_action success configure :headless
+fi
+
+### CLEAN ACTIONS
+
+# A nice, extensible method for -clean operations.  Add to this as necessary.
+do_clean() {
+  rm -rf "$LMLAYER_OUTPUT"
+}
+
+CLEANED=
+if builder_start_action clean :libraries; then
+  do_clean
+  CLEANED=clean:libraries
+
+  builder_finish_action success clean :libraries
+fi
+
+if builder_start_action clean :browser; then
+  if [ -n "$CLEANED" ]; then
+    echo "${BUILDER_TERM_START}clean${BUILDER_TERM_END} already completed as ${BUILDER_TERM_START}${CLEANED}${BUILDER_TERM_END}; skipping."
+  else
+    do_clean
+    CLEANED=clean:browser
+  fi
+  builder_finish_action success clean :browser
+fi
+
+if builder_start_action clean :headless; then
+  if [ -n "$CLEANED" ]; then
+    echo "${BUILDER_TERM_START}clean${BUILDER_TERM_END} already completed as ${BUILDER_TERM_START}${CLEANED}${BUILDER_TERM_END}; skipping."
+  else
+    do_clean
+    CLEANED=clean:headless
+  fi
+
+  builder_finish_action success clean :headless
+fi
+
+### BUILD ACTIONS
+
+if builder_start_action build :libraries; then
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh"
+  "$KEYMAN_ROOT/common/web/lm-worker/build.sh"
+
+  builder_finish_action success build :libraries
+fi
+
+# Builds the top-level JavaScript file for use in browsers
+if builder_start_action build :browser; then
+  npm run tsc -- -b ./browser.tsconfig.json
+
+  builder_finish_action success build :browser
+fi
+
+# Builds the top-level JavaScript file for use on Node
+if builder_start_action build :headless; then
+  npm run tsc -- -b ./tsconfig.json || fail
+
+  builder_finish_action success build :headless
+fi
+
+### TEST ACTIONS
+# Note - the actual test setup is done in a separate test script, but it's easy
+# enough to route the calls through.
+
+TEST_OPTIONS=
+if builder_has_option --ci; then
+  TEST_OPTIONS=--ci
+fi
+
+if builder_start_action test :libraries; then
+  ./unit_tests/test.sh test:libraries $TEST_OPTIONS
+
+  builder_finish_action success test :libraries
+fi
+
+if builder_start_action test :headless; then
+  ./unit_tests/test.sh test:headless $TEST_OPTIONS
+
+  builder_finish_action success test :headless
+fi
+
+if builder_start_action test :browser; then
+  ./unit_tests/test.sh test:browser $TEST_OPTIONS
+
+  builder_finish_action success test :browser
 fi
