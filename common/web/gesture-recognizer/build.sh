@@ -28,43 +28,48 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
   ":tools  tools for testing & developing test resources for this module" \
   "--ci    sets the --ci option for child scripts (i.e, the `test` action)"
 
+builder_describe_outputs \
+  configure:module /node_modules \
+  configure:tools  /node_modules \
+  build:module     build/index.js \
+  build:tools      build/tools/unit-test-resources.js
+
 builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_start_action configure :module; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success configure :module
+  builder_finish_action success configure
 fi
 
-if builder_start_action clean :tools; then
-  src/tools/build.sh clean
-  builder_finish_action success clean :tools
-fi
-
-if builder_start_action clean :module; then
+if builder_start_action clean; then
   npm run clean
   rm -rf build/
-  builder_finish_action success clean :module
+  builder_finish_action success clean
 fi
 
-if builder_start_action build :module; then
+if builder_start_action build:module; then
   # Build
   npm run build -- $builder_verbose
-  builder_finish_action success build :module
+  builder_finish_action success build:module
 fi
 
-if builder_start_action build :tools; then
+if builder_start_action build:tools; then
   src/tools/build.sh build
-  builder_finish_action success build :tools
+  builder_finish_action success build:tools
 fi
 
-if builder_start_action test :module; then
+if builder_start_action test:module; then
   if builder_has_option --ci; then
     npm test -- --ci
   else
     npm test
   fi
-  builder_finish_action success test :module
+  builder_finish_action success test:module
+fi
+
+if builder_has_action test:tools && ! builder_has_action test:module; then
+  echo "The ${BUILDER_TERM_START}test:tools${BUILDER_TERM_END} action is currently a no-op."
 fi
