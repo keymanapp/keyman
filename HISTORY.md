@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.79 alpha 2022-10-13
+
+* chore(common/models, web): more script updates (#7392)
+* feat(common): builder dependency support (#7438)
+* chore(common): further tweaks to builder scripts (#7439)
+
 ## 16.0.78 alpha 2022-10-12
 
 * fix(linux): Fix reordering of output (#7079)
