@@ -17,3 +17,7 @@ export * as Constants from './consts/virtual-key-constants.js';
 
 export { CompilerCallbacks, CompilerEvent, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec } from './util/compiler-interfaces.js';
 export { CommonTypesMessages } from './util/common-events.js';
+
+export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
+export { TouchLayoutFileReader } from './keyman-touch-layout/keyman-touch-layout-file-reader.js';
+export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './keyman-touch-layout/keyman-touch-layout-file-writer.js';

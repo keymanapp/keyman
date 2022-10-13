@@ -72,19 +72,19 @@ class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 }
 
-function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): [Uint8Array,Uint8Array] {
+function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): [Uint8Array,Uint8Array,Uint8Array] {
   const c : CompilerCallbacks = new NodeCompilerCallbacks();
   const k = new kmc.Compiler(c, options);
   let source = k.load(inputFilename);
   if(!source) {
-    return [null, null];
+    return [null, null, null];
   }
   if(!k.validate(source)) {
-    return [null, null];
+    return [null, null, null];
   }
   let kmx = k.compile(source);
   if(!kmx) {
-    return [null, null];
+    return [null, null, null];
   }
 
   // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
@@ -100,7 +100,18 @@ function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): [
   const writer = new KvkFileWriter();
   const kvk_binary = writer.write(vk);
 
-  return [kmx_binary, kvk_binary];
+  // Note: we could have a step of generating source files here
+  // KvksFileWriter()...
+  // const tlcompiler = new kmc.TouchLayoutCompiler();
+  // const tl = tlcompiler.compile(source);
+  // const tlwriter = new TouchLayoutFileWriter();
+
+  const kmwcompiler = new kmc.KeymanWebCompiler(options);
+  const kmw_string = kmwcompiler.compile(inputFilename, source);
+  const encoder = new TextEncoder();
+  const kmw_binary = encoder.encode(kmw_string);
+
+  return [kmx_binary, kvk_binary, kmw_binary];
 }
 
 function loadTestData(inputFilename: string, options: kmc.CompilerOptions): LDMLKeyboardTestDataXMLSourceFile {
@@ -135,15 +146,14 @@ if (program.testData) {
 } else {
   // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
   // Compile:
-  let [kmx,kvk] = compileKeyboard(inputFilename, options);
-
+  let [kmx,kvk,kmw] = compileKeyboard(inputFilename, options);
   // Output:
 
-  if(kmx && kvk) {
-    const fileBaseName = program.outFile ?? inputFilename;
-    const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
-    const outFileDir = path.dirname(fileBaseName);
+  const fileBaseName = program.outFile ?? inputFilename;
+  const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
+  const outFileDir = path.dirname(fileBaseName);
 
+  if(kmx && kvk) {
     const outFileKmx = path.join(outFileDir, outFileBase + '.kmx');
     console.log(`Writing compiled keyboard to ${outFileKmx}`);
     fs.writeFileSync(outFileKmx, kmx);
@@ -154,5 +164,11 @@ if (program.testData) {
   } else {
     console.error(`An error occurred compiling ${inputFilename}`);
     process.exit(1);
+  }
+
+  if(kmw) {
+    const outFileKmw = path.join(outFileDir, outFileBase + '.js');
+    console.log(`Writing compiled js keyboard to ${outFileKmw}`);
+    fs.writeFileSync(outFileKmw, kmw);
   }
 }

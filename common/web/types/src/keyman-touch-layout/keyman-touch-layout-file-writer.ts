@@ -5,14 +5,20 @@ export interface TouchLayoutFileWriterOptions {
 };
 
 export class TouchLayoutFileWriter {
+
+  options: TouchLayoutFileWriterOptions;
+
+  constructor(options?: TouchLayoutFileWriterOptions) {
+    this.options = {...options};
+  }
+
   /**
    * Writes the touch layout to a .keyman-touch-layout JSON file
    * @param source TouchLayoutFile
-   * @param options TouchLayoutFileWriterOptions
    * @returns Uint8Array, the .keyman-touch-layout file
    */
-  write(source: TouchLayoutFile, options?: TouchLayoutFileWriterOptions): Uint8Array {
-    const output = JSON.stringify(source, null, options?.formatted ? 2 : undefined);
+  write(source: TouchLayoutFile): Uint8Array {
+    const output = JSON.stringify(source, null, this.options?.formatted ? 2 : undefined);
     const encoder = new TextEncoder();
     return encoder.encode(output);
   }
@@ -73,6 +79,6 @@ export class TouchLayoutFileWriter {
       fixupPlatform(source.tablet);
     }
 
-    return JSON.stringify(source);
+    return JSON.stringify(source, null, this.options?.formatted ? 2 : undefined);
   }
 };
