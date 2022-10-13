@@ -10,9 +10,8 @@ store(&NAME) 'Yorùbá 8'
 store(&MESSAGE) 'A simple Unicode keyboard for Yorùbá, with the option to use either the modern dot or the traditional bar under the letters e, o, and s.'
 store(&COPYRIGHT) '© 2012-2020 SIL International'
 c ******************************************************************
-
 store(&mnemoniclayout) '1'
-
+0024
 c store(&WINDOWSLANGUAGES) 'x046A'
 c store(&LANGUAGE) 'x046A'
 c store(&ETHNOLOGUECODE) 'yor'
