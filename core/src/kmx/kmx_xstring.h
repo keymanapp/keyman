@@ -98,6 +98,39 @@ Utf32CharToUtf16(const KMX_DWORD ch32, char16_single &ch16) {
   return len;
 }
 
+/**
+ * Convert a u16 string to a u32 string. U+FFFD instead of mismatched surrogates or sliced surrogate
+ * @param source UTF-16 string
+ * @return a UTF-32 string
+ */
+inline std::u32string
+u16string_to_u32string(const std::u16string &source) {
+  std::u32string out;
+
+  for (auto ptr = source.begin(); ptr < source.end(); ptr++) {
+    const char16_t lead = *ptr;
+    if (Uni_IsSurrogate1(lead)) {
+      ptr++;
+      if (ptr == source.end()) {
+        // DebugLog("End of string during surrogate pair");
+        out.push_back(0xFFFD);  // error
+        return out;
+      }
+      const char16_t trail = *ptr;
+      if (!Uni_IsSurrogate2(trail)) {
+        out.push_back(0xFFFD);  // error, mismatched lead surrogate
+        ptr--;                  // reprocess remaining char
+      } else {
+        out.push_back(Uni_SurrogateToUTF32(lead, trail));
+      }
+    } else if (Uni_IsSurrogate2(lead)) {
+      out.push_back(0xFFFD);  // error - mismatched trail surrogate
+    } else {
+      out.push_back(lead);
+    }
+  }
+  return out;
+}
 
 } // namespace kmx
 } // namespace kbp
