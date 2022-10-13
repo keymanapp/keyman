@@ -66,12 +66,12 @@ test-browser ( ) {
   npm run karma -- start src/test/auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
 }
 
-if builder_start_action test :headless; then
+if builder_start_action test:headless; then
   test-headless
-  builder_finish_action success test :headless
+  builder_finish_action success test:headless
 fi
 
-if builder_start_action test :browser; then
+if builder_start_action test:browser; then
   if builder_has_option --debug; then
     echo "Running browser-based unit tests in debug-mode configuration..."
     echo
@@ -81,5 +81,5 @@ if builder_start_action test :browser; then
   else
     test-browser
   fi
-  builder_finish_action success test :browser
+  builder_finish_action success test:browser
 fi
