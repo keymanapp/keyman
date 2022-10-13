@@ -15,15 +15,18 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
 builder_describe "Build the include script for current Keyman version" configure clean build
+
+builder_describe_outputs \
+  configure "/node_modules" \
+  build     "build/index.js"
+
 builder_parse "$@"
 
-# TODO: build if out-of-date if test is specified
-# TODO: configure if npm has not been run, and build is specified
 
 if builder_start_action configure; then
   verify_npm_setup
@@ -56,7 +59,12 @@ if builder_start_action build; then
     }
   " > ./version.inc.ts
 
-  # Build
-  npm run build -- $builder_verbose
+  # Note: in a dependency build, we'll expect keyman-version to be built by tsc -b
+  if builder_is_dep_build; then
+    echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
+  else
+    npm run build -- $builder_verbose
+  fi
+
   builder_finish_action success build
 fi

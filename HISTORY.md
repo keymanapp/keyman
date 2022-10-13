@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.78 alpha 2022-10-12
+
+* fix(linux): Fix reordering of output (#7079)
+* fix(linux): Fix make install (#7434)
+* chore(linux): Add Node.js to the docker container (#7435)
+
 ## 16.0.77 alpha 2022-10-10
 
 * fix(web): possible error on change of context to a contextEditable (#7359)
