@@ -20,6 +20,7 @@ cd "$(dirname $THIS_SCRIPT)"
 ################################ Main script ################################
 
 builder_describe "Runs all tests for the gesture-recognizer module" \
+  "@/common/web/gesture-recognizer" \
   "test+" \
   ":headless   Runs headless user tests" \
   ":browser    Runs browser-based user tests" \
