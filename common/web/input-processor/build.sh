@@ -43,64 +43,38 @@ builder_parse "$@"
 
 ### CONFIGURE ACTIONS
 
-if builder_start_action configure :module; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success configure :module
-fi
-
-if builder_start_action configure :tools; then
-  verify_npm_setup
-  builder_finish_action success configure :tools
+  builder_finish_action success configure
 fi
 
 ### CLEAN ACTIONS
 
-# A nice, extensible method for -clean operations.  Add to this as necessary.
-do_clean() {
-  if [ -d build ]; then
-    rm -rf build/
-  fi
-}
-
-CLEANED=
-
-if builder_start_action clean :module; then
-  do_clean
-  CLEANED=clean:module
-  builder_finish_action success clean :module
-fi
-
-if builder_start_action clean :tools; then
-  if [ -n "$CLEANED" ]; then
-    echo "${BUILDER_TERM_START}clean${BUILDER_TERM_END} already completed as ${BUILDER_TERM_START}${CLEANED}${BUILDER_TERM_END}; skipping."
-  else
-    do_clean
-    CLEANED=clean:tools
-  fi
-
-  builder_finish_action success clean :tools
+if builder_start_action clean; then
+  rm -rf build/
+  builder_finish_action success clean
 fi
 
 ### BUILD ACTIONS
 
-if builder_start_action build :tools; then
+if builder_start_action build:tools; then
   # Used by test:module
   # TODO: convert to a dependency once we have updated kmlmc to use builder script
   pushd "$KEYMAN_ROOT/developer/src/kmlmc"
   ./build.sh -S
   popd
 
-  builder_finish_action success build :tools
+  builder_finish_action success build:tools
 fi
 
-if builder_start_action build :module; then
+if builder_start_action build:module; then
   npm run tsc -- -b src/tsconfig.json
-  builder_finish_action success build :module
+  builder_finish_action success build:module
 fi
 
 # TEST ACTIONS
 
-if builder_start_action test :module; then
+if builder_start_action test:module; then
   FLAGS=
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
@@ -111,5 +85,5 @@ if builder_start_action test :module; then
 
   npm run mocha -- --recursive $FLAGS ./tests/cases/
 
-  builder_finish_action success test :module
+  builder_finish_action success test:module
 fi

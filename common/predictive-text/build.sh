@@ -48,61 +48,34 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-# Exit status on invalid usage.
-LMLAYER_OUTPUT=build
-
 ### CONFIGURE ACTIONS
 
-if builder_start_action configure :browser; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success configure :browser
-fi
-
-if builder_start_action configure :headless; then
-  verify_npm_setup
-  builder_finish_action success configure :headless
+  builder_finish_action success configure
 fi
 
 ### CLEAN ACTIONS
 
-# A nice, extensible method for -clean operations.  Add to this as necessary.
-# TODO: separate clean for different targets
-do_clean() {
-  rm -rf "$LMLAYER_OUTPUT"
-}
-
-CLEANED=
-if builder_start_action clean :browser; then
-  do_clean
-  CLEANED=clean:browser
-  builder_finish_action success clean :browser
-fi
-
-if builder_start_action clean :headless; then
-  if [ -n "$CLEANED" ]; then
-    echo "${BUILDER_TERM_START}clean${BUILDER_TERM_END} already completed as ${BUILDER_TERM_START}${CLEANED}${BUILDER_TERM_END}; skipping."
-  else
-    do_clean
-    CLEANED=clean:headless
-  fi
-
-  builder_finish_action success clean :headless
+if builder_start_action clean; then
+  rm -rf build/
+  builder_finish_action success clean
 fi
 
 ### BUILD ACTIONS
 
 # Builds the top-level JavaScript file for use in browsers
-if builder_start_action build :browser; then
+if builder_start_action build:browser; then
   npm run tsc -- -b ./browser.tsconfig.json
 
-  builder_finish_action success build :browser
+  builder_finish_action success build:browser
 fi
 
 # Builds the top-level JavaScript file for use on Node
-if builder_start_action build :headless; then
+if builder_start_action build:headless; then
   npm run tsc -- -b ./tsconfig.json
 
-  builder_finish_action success build :headless
+  builder_finish_action success build:headless
 fi
 
 ### TEST ACTIONS
@@ -114,16 +87,16 @@ if builder_has_option --ci; then
   TEST_OPTIONS=--ci
 fi
 
-if builder_start_action test :headless; then
+if builder_start_action test:headless; then
   # We'll test the included libraries here for now, at least until we have
   # converted their builds to builder scripts
   ./unit_tests/test.sh test:libraries test:headless $TEST_OPTIONS
 
-  builder_finish_action success test :headless
+  builder_finish_action success test:headless
 fi
 
-if builder_start_action test :browser; then
+if builder_start_action test:browser; then
   ./unit_tests/test.sh test:browser $TEST_OPTIONS
 
-  builder_finish_action success test :browser
+  builder_finish_action success test:browser
 fi

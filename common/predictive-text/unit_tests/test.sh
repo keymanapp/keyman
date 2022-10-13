@@ -30,23 +30,12 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
 
 builder_parse "$@"
 
-if builder_start_action configure :libraries; then
-  # Ensure all testing dependencies are in place.
+if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success configure :libraries
+  builder_finish_action success configure
 fi
 
-if builder_start_action configure :headless; then
-  verify_npm_setup
-  builder_finish_action success configure :headless
-fi
-
-if builder_start_action configure :browser; then
-  verify_npm_setup
-  builder_finish_action success configure :browser
-fi
-
-if builder_start_action test :libraries; then
+if builder_start_action test:libraries; then
 
   # Note:  these do not yet provide TeamCity-friendly-formatted test reports.
   # They do not have builder-based scripts, being run directly via npm package script.
@@ -82,10 +71,10 @@ if builder_start_action test :libraries; then
   npm run test
   popd
 
-  builder_finish_action success test :libraries
+  builder_finish_action success test:libraries
 fi
 
-if builder_start_action test :headless; then
+if builder_start_action test:headless; then
   MOCHA_FLAGS=$FLAGS
 
   if builder_has_option --ci; then
@@ -94,7 +83,7 @@ if builder_start_action test :headless; then
 
   npm run mocha -- --recursive $MOCHA_FLAGS ./unit_tests/headless/*.js ./unit_tests/headless/**/*.js
 
-  builder_finish_action success test :headless
+  builder_finish_action success test:headless
 fi
 
 # If we are running a TeamCity test build, for now, only run BrowserStack
@@ -124,7 +113,7 @@ get_browser_set_for_OS ( ) {
   fi
 }
 
-if builder_start_action test :browser; then
+if builder_start_action test:browser; then
   KARMA_FLAGS=$FLAGS
   KARMA_INFO_LEVEL="--log-level=warn"
 
@@ -157,5 +146,5 @@ if builder_start_action test :browser; then
   fi
   npm run karma -- start $KARMA_INFO_LEVEL $KARMA_FLAGS $BROWSERS unit_tests/in_browser/$KARMA_CONFIG
 
-  builder_finish_action success test :browser
+  builder_finish_action success test:browser
 fi
