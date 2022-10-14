@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.80 alpha 2022-10-14
+
+* feat(common): builder script dependency and legacy script report (#7453)
+* chore(linux): Adjust Linux specific files in `.gitignore` (#7451)
+
 ## 16.0.79 alpha 2022-10-13
 
 * chore(common/models, web): more script updates (#7392)
