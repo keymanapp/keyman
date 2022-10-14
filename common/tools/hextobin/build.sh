@@ -32,7 +32,7 @@ fi
 
 if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success clean
+  builder_finish_action success configure
 fi
 
 if builder_start_action build; then

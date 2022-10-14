@@ -42,6 +42,14 @@ esac
 #  ":linux          Build for current Linux architecture"
 #  ":mac            Build for current macOS architecture"
 
+archdeps=()
+if type node >/dev/null 2>&1; then
+  # Note: Found node, can build kmc and hextobin dependencies
+  archdeps+=(@/common/tools/hextobin @/common/web/keyman-version @/developer/src/kmc)
+else
+  echo "Note: could not find node, skipping hextobin and kmc dependency builds, ldml+binary tests will not be run"
+fi
+
 builder_describe \
 "Build Keyman Core
 
@@ -49,9 +57,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   * <configuration>: 'debug' or 'release' (see --debug flag)
   * All parameters after '--' are passed to meson or ninja
 " \
-  "@/common/tools/hextobin      test" \
-  "@/common/web/keyman-version  test" \
-  "@/developer/src/kmc          test" \
+  "${archdeps[@]}" \
   "clean" \
   "configure" \
   "build" \
