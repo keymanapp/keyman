@@ -1,6 +1,6 @@
 ﻿c ***** This test will produce 1 Error: ****************************
 c ***** It will be marked as FAIL when run in kmcompxtest **********
-c *****    as a non-existing ErrorNr (0x00001234) is specified *****
+c *****    as ErrorNr (0x00004040) is specified but not thrown *****
 c ******************************************************************
 store(&VERSION) '10.0'
 store(&NAME) 'Balochi Phonetic'
