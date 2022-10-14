@@ -36,7 +36,11 @@
 
 - (IBAction)closeAction:(id)sender {
   [self close];
-  
+
+  // jump to System Preferences Security and Privacy settings
+  NSString *urlString = @"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
+
   // if callback to check for user consent has been set, execute it
   if (self.completionHandler) {
     self.completionHandler();
