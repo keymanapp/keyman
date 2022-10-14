@@ -79,8 +79,13 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS): BUILDER_
 
   let offset = constants.length_elem + constants.length_elem_item * result.count;
   for(let item of result.strings) {
-    item.offset = offset;
-    offset += item.length * constants.length_elem_item_element;
+    if (item.length === 0) {
+      // no length gets a zero offset
+      item.offset = 0;
+    } else {
+      item.offset = offset;
+      offset += item.length * constants.length_elem_item_element;
+    }
   }
 
   result.size = offset;

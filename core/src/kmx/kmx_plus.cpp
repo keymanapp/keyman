@@ -281,18 +281,10 @@ COMP_KMXPLUS_ELEM::valid(KMX_DWORD _kmn_unused(length)) const {
     return false;
   }
   const COMP_KMXPLUS_ELEM_ENTRY &firstEntry = entries[0];
-  if (firstEntry.length != 0 ) {
-    // per spec, the first elem should have zero length and zero offset
-    DebugLog("ERROR: elem[0].length 0x%x but should be zero", firstEntry.length);
+  if (firstEntry.length != 0 || firstEntry.offset != 0) {
+    DebugLog("ERROR: elem[0].length=0x%x, elem[0].offset=0x%x, both should be zero",
+      firstEntry.length, firstEntry.offset);
     return false;
-  }
-  if (firstEntry.offset + sizeof(COMP_KMXPLUS_ELEM_ELEMENT) > header.size) {
-    // TODO-LDML: change to  (firstEntry.offset != 0 )
-    // Blocked by https://github.com/keymanapp/keyman/issues/7404
-    DebugLog("WARNING: elem[0].offset 0x%x would put element outside of data region..."
-           "Please fix https://github.com/keymanapp/keyman/issues/7404");
-    // TODO-LDML: should exit here
-    // return false;
   }
   for (KMX_DWORD e = 1; e < count; e++) {
     // Don't need to recheck the first entry hbere.
