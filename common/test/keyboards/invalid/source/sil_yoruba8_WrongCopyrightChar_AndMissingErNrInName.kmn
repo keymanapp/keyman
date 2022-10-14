@@ -11,7 +11,6 @@ store(&MESSAGE) 'A simple Unicode keyboard for Yorùbá, with the option to use ei
 store(&COPYRIGHT) '© 2012-2020 SIL International'
 c ******************************************************************
 store(&mnemoniclayout) '1'
-0024
 c store(&WINDOWSLANGUAGES) 'x046A'
 c store(&LANGUAGE) 'x046A'
 c store(&ETHNOLOGUECODE) 'yor'
