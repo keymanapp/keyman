@@ -205,6 +205,9 @@ begin
 
   FIconCanBeEdited := True;
   panReadOnlyIcons.Visible := not FIconCanBeEdited;
+  cmdImport.Visible := FIconCanBeEdited;
+  cmdExport.Visible := FIconCanBeEdited;
+  cmdClearAll.Visible := FIconCanBeEdited;
 
   TPicture.RegisterClipboardFormat(cf_Bitmap, TBitmap);
 
@@ -1148,6 +1151,7 @@ begin
     try
       try
         ico.LoadFromFile(dlgImport.FileName);
+        IconToBitmap(FBitmaps[bebEdit], ico);
       except
         on E:EInvalidGraphic do  // I3147   // I3508
         begin
@@ -1155,7 +1159,6 @@ begin
           Exit;
         end;
       end;
-      IconToBitmap(FBitmaps[bebEdit], ico);
     finally
       ico.Free;
     end;
@@ -1167,6 +1170,7 @@ begin
     try
       try
         LoadFromFile(dlgImport.FileName);
+        FBitmaps[bebEdit].Assign(ji);
       except
         on E:EInvalidGraphic do  // I3147   // I3508
         begin
@@ -1174,7 +1178,6 @@ begin
           Exit;
         end;
       end;
-      FBitmaps[bebEdit].Assign(ji);
     finally
       Free;
     end;
@@ -1194,6 +1197,7 @@ begin
     try
       try
         LoadFromFile(dlgImport.FileName);
+        AssignTo(FBitmaps[bebEdit]);
       except
         on E:Exception do   // I3147 - I don't want to use E:Exception but see http://marc.durdin.net/2012/01/how-not-to-do-exception-classes-in.html   // I3508
         begin
@@ -1201,7 +1205,6 @@ begin
           Exit;
         end;
       end;
-      AssignTo(FBitmaps[bebEdit]);
     finally
       Free;
     end

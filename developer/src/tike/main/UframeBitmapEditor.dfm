@@ -840,6 +840,15 @@ object frameBitmapEditor: TframeBitmapEditor
     TabOrder = 6
     OnClick = cmdExportClick
   end
+  object cmdClearAll: TButton
+    Left = 224
+    Top = 252
+    Width = 73
+    Height = 25
+    Caption = '&Clear all'
+    TabOrder = 8
+    OnClick = cmdClearAllClick
+  end
   object panReadOnlyIcons: TPanel
     Left = 0
     Top = 0
@@ -891,15 +900,6 @@ object frameBitmapEditor: TframeBitmapEditor
         TabOrder = 0
       end
     end
-  end
-  object cmdClearAll: TButton
-    Left = 201
-    Top = 44
-    Width = 73
-    Height = 25
-    Caption = '&Clear all'
-    TabOrder = 8
-    OnClick = cmdClearAllClick
   end
   object ilCmds: TImageList
     Left = 84
