@@ -317,27 +317,24 @@ namespace com.keyman.dom {
      *              Note that the 'kmw-disabled' property is managed by the MutationObserver and by the surface API calls.
      */
     enableInputElement(Pelem: HTMLElement, isAlias?: boolean) {
-      var baseElement = isAlias ? Pelem['base'] : Pelem;
-
-      if(!this.isKMWDisabled(baseElement)) {
+      if(!this.isKMWDisabled(Pelem)) {
         this.disableInputModeObserver();
-        Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text';
-        Pelem.inputMode = 'none';
         this.enableInputModeObserver();
 
         if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
           this._AttachToIframe(Pelem);
         } else {
-          if(!isAlias) {
-            this.setupElementAttachment(Pelem);
-          }
+          this.setupElementAttachment(Pelem);
 
-          baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
+          Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text'; // This spot.
+          Pelem.inputMode = 'none';
+
+          Pelem.className = Pelem.className ? Pelem.className + ' keymanweb-font' : 'keymanweb-font';
           this.inputList.push(Pelem);
 
-          this.keyman.util.attachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
-          this.keyman.util.attachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
-          this.keyman.util.attachDOMEvent(baseElement,'click', this.getHandlers(Pelem)._Click);
+          this.keyman.util.attachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+          this.keyman.util.attachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+          this.keyman.util.attachDOMEvent(Pelem,'click', this.getHandlers(Pelem)._Click);
 
           // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
           Pelem.onkeypress = this.getHandlers(Pelem)._KeyPress;
