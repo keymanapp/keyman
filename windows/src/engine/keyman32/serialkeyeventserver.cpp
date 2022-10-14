@@ -485,7 +485,10 @@ private:
         input[1].ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
         input[1].ki.dwFlags = lParam & 0xFFFF;
 
-        if (msg == wm_keyman_keyevent){
+        if (msg == wm_keyman_keyevent) {
+          // We track changes to modifiers with wm_keyman_modifierevent, but only ever
+          // pass them on to the app when we receive them with the wm_keyman_keyevent 
+          // message.
           if (!SendInput(2, input, sizeof(INPUT))) {
             DebugLastError("SendInput");
           }
