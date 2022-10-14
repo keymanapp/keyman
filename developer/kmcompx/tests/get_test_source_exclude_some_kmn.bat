@@ -1,4 +1,5 @@
 @echo off
+rem Output a list of files to test, excluding some files
 
 rem excluded files from tests:
 

@@ -2,7 +2,7 @@
 
 struct CompilerError {
   KMX_DWORD ErrorCode;
-  const char* Text;
+  const  KMX_CHAR* Text;
   };
 
 const struct CompilerError CompilerErrors[] = {
@@ -120,7 +120,7 @@ KMX_CHAR *GetCompilerErrorString(KMX_DWORD code)
 {
   for(int i = 0; CompilerErrors[i].ErrorCode; i++) {
     if(CompilerErrors[i].ErrorCode == code) {
-      return (char*) CompilerErrors[i].Text;
+      return ( KMX_CHAR*) CompilerErrors[i].Text;
     }
   }
   return nullptr;

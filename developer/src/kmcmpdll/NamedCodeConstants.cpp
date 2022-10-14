@@ -1,4 +1,4 @@
-/*
+/*2012
   Name:             NamedCodeConstants
   Copyright:        Copyright (C) 2003-2017 SIL International.
   Documentation:    
@@ -27,12 +27,12 @@
 #include "NamedCodeConstants.h"
 #include <kmcmpdll.h>
 
-extern char CompileDir[];
+extern KMX_CHAR CompileDir[];
 
 
-int IsHangulSyllable(const char16_t *codename, int *code);
+int IsHangulSyllable(const KMX_WCHAR *codename, int *code);
 
-KMX_BOOL FileExists(const char *filename)
+KMX_BOOL FileExists(const KMX_CHAR *filename)
 {
   intptr_t n;
 
@@ -67,7 +67,7 @@ NamedCodeConstants::~NamedCodeConstants()
   if(entries_file) delete entries_file;
 }
 
-void NamedCodeConstants::AddCode(int n, const char16_t *p, KMX_DWORD storeIndex)
+void NamedCodeConstants::AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex)
 {
   if((nEntries_file % ALLOC_SIZE) == 0)
   {
@@ -84,14 +84,14 @@ void NamedCodeConstants::AddCode(int n, const char16_t *p, KMX_DWORD storeIndex)
   u16ncpy(entries_file[nEntries_file].name, p, _countof(entries_file[nEntries_file].name));  // I3481
   entries_file[nEntries_file].name[MAX_ENAME] = 0;
 
-  for (char16_t *r = entries_file[nEntries_file].name; *r; r++)
+  for (KMX_WCHAR *r = entries_file[nEntries_file].name; *r; r++)
     if (iswblank(*r) && *r != '-') *r = '_';
 
   entries_file[nEntries_file].storeIndex = storeIndex;
   nEntries_file++;
 }
 
-void NamedCodeConstants::AddCode_IncludedCodes(int n, const char16_t *p)
+void NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
 {
   if((nEntries % ALLOC_SIZE) == 0)
   {
@@ -107,7 +107,7 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const char16_t *p)
   entries[nEntries].code = n;
   u16ncpy(entries[nEntries].name, p, MAX_ENAME);  // I3481
   entries[nEntries].name[MAX_ENAME] = 0;
-  for (char16_t *r = entries[nEntries].name; *r; r++)
+  for (KMX_WCHAR *r = entries[nEntries].name; *r; r++)
     if (iswblank(*r)) *r = '_';
 
   entries[nEntries].storeIndex = 0xFFFFFFFFL;
@@ -158,9 +158,9 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
   return TRUE;
 }
 
-KMX_BOOL NamedCodeConstants::LoadFile(const char *filename)
+KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
 {
-  char buf[260];
+  KMX_CHAR buf[260];
   // Look in current directory first
   strncpy_s(buf, _countof(buf), filename, 259); buf[259] = 0;  // I3481
   if(FileExists(buf))
@@ -175,7 +175,7 @@ KMX_BOOL NamedCodeConstants::LoadFile(const char *filename)
   #ifdef _WINDOWS_
     // Finally look in kmcmpdll.dll directory
     GetModuleFileName(0, buf, 260);
-    char *p = strrchr(buf, '\\'); if(p) p++; else p = buf;
+    KMX_CHAR *p = strrchr(buf, '\\'); if(p) p++; else p = buf;
     *p = 0;
     strncat_s(buf, _countof(buf), filename, 259-strlen(buf)); buf[259] = 0;  // I3481   // I3641
     if(FileExists(buf))
@@ -208,7 +208,7 @@ void NamedCodeConstants::reindex()
   }
 }
 
-int NamedCodeConstants::GetCode(const char16_t *codename, KMX_DWORD *storeIndex)
+int NamedCodeConstants::GetCode(const KMX_WCHAR *codename, KMX_DWORD *storeIndex)
 {
   *storeIndex = 0xFFFFFFFFL;    // I2993
   int code = GetCode_IncludedCodes(codename);
@@ -222,9 +222,9 @@ int NamedCodeConstants::GetCode(const char16_t *codename, KMX_DWORD *storeIndex)
   return 0;
 }
 
-int NamedCodeConstants::GetCode_IncludedCodes(const char16_t *codename)
+int NamedCodeConstants::GetCode_IncludedCodes(const KMX_WCHAR *codename)
 {
-  char16_t c = towupper(*codename);
+  KMX_WCHAR c = towupper(*codename);
   int code;
 
   if(IsHangulSyllable(codename, &code)) return code;
@@ -256,26 +256,26 @@ const int
  HangulNCount = HangulVCount * HangulTCount,   // 588
  HangulSCount = HangulLCount * HangulNCount;   // 11172
 
-const char16_t *
+const KMX_WCHAR *
   Hangul_JAMO_L_TABLE[] = {
         u"G", u"GG", u"N", u"D", u"DD", u"R", u"M", u"B", u"BB",
     u"S", u"SS", u"", u"J", u"JJ", u"C", u"K", u"T", u"P", u"H" };
 
-const char16_t *
+const KMX_WCHAR *
   Hangul_JAMO_V_TABLE[] = {
         u"A", u"AE", u"YA", u"YAE", u"EO", u"E", u"YEO", u"YE", u"O",
         u"WA", u"WAE", u"OE", u"YO", u"U", u"WEO", u"WE", u"WI",
         u"YU", u"EU", u"YI", u"I" };
 
 
-const char16_t *
+const KMX_WCHAR *
   Hangul_JAMO_T_TABLE[] = {
         u"", u"G", u"GG", u"GS", u"N", u"NJ", u"NH", u"D", u"u", u"LG", u"LM",
         u"LB", u"LS", u"LT", u"LP", u"LH", u"M", u"B", u"BS",
         u"S", u"SS", u"NG", u"J", u"C", u"K", u"T", u"P", u"H" };
 
 
-int IsHangulSyllable(const char16_t *codename, int *code)
+int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
 {
   if(u16ncmp(codename, u"HANGUL_SYLLABLE_", 16)) return 0;
   codename += 16;
@@ -307,7 +307,7 @@ int IsHangulSyllable(const char16_t *codename, int *code)
 
     /* Find vowel */ 
 
-  char16_t V[4] = u"";
+  KMX_WCHAR V[4] = u"";
   V[0] = *codename;
   if(V[0] && strchr("AEIOUWY", towupper(*(codename+1)))) V[1] = *(codename+1);
   if(V[1] && strchr("AEIOUWY", towupper(*(codename+2)))) V[2] = *(codename+2);

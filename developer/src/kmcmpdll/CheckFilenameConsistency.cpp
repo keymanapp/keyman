@@ -8,7 +8,7 @@
 #include <string>
 #include "CheckFilenameConsistency.h"
 
-extern char CompileDir[MAX_PATH];
+extern  KMX_CHAR CompileDir[MAX_PATH];
 
 bool IsRelativePath(KMX_CHAR const * p) {
   // Relative path (returns TRUE):
@@ -58,8 +58,8 @@ bool IsRelativePath(KMX_WCHART const * p) {
   return TRUE;
 }
 
-KMX_DWORD CheckFilenameConsistency(char const * Filename, BOOL ReportMissingFile) {
-  PKMX_WCHAR WFilename = strtowstr((char *)Filename);
+KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, BOOL ReportMissingFile) {
+  PKMX_WCHAR WFilename = strtowstr(( KMX_CHAR *)Filename);
   KMX_DWORD const result = CheckFilenameConsistency(u16fmt(WFilename).c_str(), ReportMissingFile);
   delete WFilename;  
   return result;
@@ -108,6 +108,8 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissi
     u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
+#else
+  #error Missing implementation for finding common includes
 #endif
   return CERR_None;
 }

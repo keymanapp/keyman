@@ -348,7 +348,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile, PK
   currentLine = 0;
   nErrors = 0;
 
-  fp_in = fopen((const char*)pszInfile, "rb");
+  fp_in = fopen((const  KMX_CHAR*)pszInfile, "rb");
 
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
 
@@ -376,7 +376,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PKMX_STR pszInfile, PK
     return CERR_CannotCreateTempfile;
   }
 
-  fp_out = fopen((const char*)pszOutfile, "wb");
+  fp_out = fopen((const  KMX_CHAR*)pszOutfile, "wb");
 
   if (fp_out == NULL) SetError(CERR_CannotCreateOutfile);
 
@@ -761,7 +761,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   case T_LANGUAGE:
   {
     WarnDeprecatedHeader();   // I4866
-    char16_t *tokcontext = NULL;
+    KMX_WCHAR *tokcontext = NULL;
     q = u16tok(p,  p_sep, &tokcontext);  // I3481
 
     if ((msg = AddStore(fk, TSS_LANGUAGE, q)) != CERR_None) return msg;
@@ -770,7 +770,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   case T_LAYOUT:
   {
     WarnDeprecatedHeader();   // I4866
-    char16_t *tokcontext = NULL;
+    KMX_WCHAR *tokcontext = NULL;
     q = u16tok(p, p_sep, &tokcontext);  // I3481
     if ((msg = AddStore(fk, TSS_LAYOUT, q)) != CERR_None) return msg;
     break;
@@ -793,7 +793,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   case T_HOTKEY:
   {
     WarnDeprecatedHeader();   // I4866
-    char16_t *tokcontext = NULL;
+    KMX_WCHAR *tokcontext = NULL;
     if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return CERR_CodeInvalidInThisSection;  // I3481
     if ((msg = AddStore(fk, TSS_HOTKEY, q)) != CERR_None) return msg;
     break;
@@ -801,7 +801,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   case T_BITMAP:
   {
     WarnDeprecatedHeader();   // I4866
-    char16_t *tokcontext = NULL;
+    KMX_WCHAR *tokcontext = NULL;
     if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return CERR_InvalidBitmapLine;  // I3481
 
     while (iswspace(*q)) q++;
@@ -817,7 +817,7 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
   case T_BITMAPS:
   {
     WarnDeprecatedHeader();   // I4866
-    char16_t *tokcontext = NULL;
+    KMX_WCHAR *tokcontext = NULL;
     AddWarning(CWARN_BitmapNotUsed);
 
     if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return CERR_InvalidBitmapLine;  // I3481
@@ -1223,7 +1223,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_LANGUAGE:
   {
-    char16_t *context = NULL;
+    KMX_WCHAR *context = NULL;
     KMX_WCHAR sep_c[3] = u", ";
     PKMX_WCHAR p_sep_c = sep_c;
     q = u16tok(sp->dpString, p_sep_c, &context);  // I3481
@@ -1326,9 +1326,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       p = sp->dpString;
 
 #if defined(_WIN32) || defined(_WIN64)
-      char16_t *pp = (char16_t*) u16chr((const PKMX_WCHAR) p, u'\\');
+      KMX_WCHAR *pp = (KMX_WCHAR*) u16chr((const PKMX_WCHAR) p, u'\\');
 #else
-      char16_t *pp = (char16_t*) u16chr((const PKMX_WCHAR) p, u'/');
+      KMX_WCHAR *pp = (KMX_WCHAR*) u16chr((const PKMX_WCHAR) p, u'/');
 #endif
 
       if (!pp) {
@@ -1379,7 +1379,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_WINDOWSLANGUAGES:
   {
-    char16_t *context = NULL;
+    KMX_WCHAR *context = NULL;
     VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
     size_t szQ = u16len(sp->dpString) * 6 + 1;  // I3481
     q = new KMX_WCHAR[szQ]; // guaranteed to be enough space for recoding
@@ -2203,7 +2203,7 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
           if (!q || !*q) return CERR_InvalidIndex;
 
           {
-            char16_t *context = NULL;
+            KMX_WCHAR *context = NULL;
             KMX_WCHAR sep_com[3] = u" ,";
             PKMX_WCHAR p_sep_com = sep_com;
             r = u16tok(q, p_sep_com, &context);  // I3481
@@ -2947,7 +2947,7 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *m
   }
   else
   {
-    char16_t *context = NULL;
+    KMX_WCHAR *context = NULL;
     KMX_WCHAR sep_eq[3] = u" =";
     PKMX_WCHAR p_sep_eq = sep_eq;
     LPKMX_WCHAR r = u16tok(q,  sep_eq, &context);  // I3481
@@ -3156,7 +3156,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
 }
 
 
-void SetChecksum(LPKMX_BYTE buf, LPKMX_DWORD CheckSum, KMX_DWORD sz)
+void SetChecksum(PKMX_BYTE buf, LPKMX_DWORD CheckSum, KMX_DWORD sz)
 {
   BuildCRCTable();
   *CheckSum = CalculateBufferCRC(buf, sz);

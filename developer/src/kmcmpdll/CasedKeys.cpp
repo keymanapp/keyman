@@ -129,7 +129,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   if (!k) return CERR_CannotAllocateMemory;
   memcpy(k, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
 
-  kpp = &k[(INT_PKMX)(kpp - gp->dpKeyArray)];
+  kpp = &k[(KMX_INT)(kpp - gp->dpKeyArray)];
 
   delete gp->dpKeyArray;
   gp->dpKeyArray = k;
