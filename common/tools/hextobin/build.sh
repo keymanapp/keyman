@@ -15,15 +15,15 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
 builder_describe "Build hextobin" clean configure build
+builder_describe_outputs \
+  configure /node_modules \
+  build     build/index.js
 builder_parse "$@"
-
-# TODO: build if out-of-date if test is specified
-# TODO: configure if npm has not been run, and build is specified
 
 if builder_start_action clean; then
   npm run clean
@@ -32,7 +32,7 @@ fi
 
 if builder_start_action configure; then
   verify_npm_setup
-  builder_finish_action success clean
+  builder_finish_action success configure
 fi
 
 if builder_start_action build; then

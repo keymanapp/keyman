@@ -16,13 +16,19 @@ cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
+# TODO:   "@/common/models/types" \
+
 builder_describe "Build Keyman kmc Lexical Model Compiler module" \
+  "@/common/web/keyman-version" \
   "configure" \
   "build" \
   "clean" \
   "test" \
   "publish                   publish to npm" \
   "--dry-run,-n              don't actually publish, just dry run"
+builder_describe_outputs \
+  configure     /node_modules \
+  build         build/src/main.js
 
 builder_parse "$@"
 
