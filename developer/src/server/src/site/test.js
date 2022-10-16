@@ -34,8 +34,10 @@ keyman.init({
   resources:'/resource/',
   keyboards:'/data/keyboard/',
   fonts:'/data/font/',
-  attachType:'auto',
+  attachType:'manual',
   setActiveOnRegister:false
+}).then(function() {
+  keyman.attachToControl(document.getElementById('ta1'));
 });
 
 /* Initialization */
