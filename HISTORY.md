@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.81 alpha 2022-10-16
+
+* fix(developer): manual attachment for kmw in server (#7457)
+
 ## 16.0.80 alpha 2022-10-14
 
 * feat(common): builder script dependency and legacy script report (#7453)
