@@ -39,6 +39,7 @@ namespace com.keyman.osk {
     private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
     private keyboard: keyboards.Keyboard;
+    private lgMenu?: LanguageMenu; // only used on non-embedded paths.
 
     private _target:  text.OutputTarget;
 
@@ -440,7 +441,7 @@ namespace com.keyman.osk {
       this.refreshLayoutIfNeeded(pending);
     }
 
-    protected setNeedsLayout() {
+    public setNeedsLayout() {
       this.needsLayout = true;
     }
 
@@ -985,9 +986,14 @@ namespace com.keyman.osk {
      **/
     showLanguageMenu() {
       if(this.hostDevice.touchable) {
-        let menu = new LanguageMenu(com.keyman.singleton);
-        menu.show();
+        this.lgMenu = new LanguageMenu(com.keyman.singleton);
+        this.lgMenu.show();
       }
+    }
+
+    hideLanguageMenu() {
+      this.lgMenu?.hide();
+      this.lgMenu = null;
     }
 
     // OSK state fields & events
@@ -1032,7 +1038,7 @@ namespace com.keyman.osk {
      * Scope        Public
      * @param       {(boolean|number)=}      bShow     True to display, False to hide, omitted to toggle
      */
-     ['show'](bShow: boolean) {
+     ['show'](bShow?: boolean) {
       if(arguments.length > 0) {
         this.displayIfActive = bShow;
       } else {

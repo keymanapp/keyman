@@ -22,6 +22,8 @@ namespace com.keyman.osk {
     x: number;
     y: number;
 
+    private isResizing: boolean = false;
+
     // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
     modifierCodes = text.Codes.modifierCodes;
     modifierBitmasks = text.Codes.modifierBitmasks;
@@ -59,13 +61,40 @@ namespace com.keyman.osk {
       s.position = 'fixed';
     }
 
-    protected postKeyboardLoad() {
-      // Initializes the size of a touch keyboard.
+    /**
+     * @override
+     */
+    public refreshLayout(pending?: boolean): void {
+      // This function is generally triggered whenever the OSK's dimension chang, among other
+      // things.
+      if(this.isResizing) {
+        return;
+      }
+      try {
+        this.isResizing = true;
+        // This resizes the OSK to what is appropriate for the device's current orientation,
+        // which will often trigger a resize event... which in turn triggers a layout refresh.
+        //
+        // So, we mark and unmark the `isResizing` flag to prevent triggering a circular
+        // call-stack chain from this call.
+        this.doResize();
+      } finally {
+        this.isResizing = false;
+      }
+      super.refreshLayout(pending);
+    }
+
+    protected doResize() {
       if(this.vkbd && this.device.touchable) {
         let targetOSKHeight = this.getDefaultKeyboardHeight();
         this.setSize(this.getDefaultWidth(), targetOSKHeight + this.banner.height);
       }
+    }
 
+    protected postKeyboardLoad() {
+      // Initializes the size of a touch keyboard.
+      this.doResize();
+    
       this._Visible = false;  // I3363 (Build 301)
 
       this._Box.onmouseover = this._VKbdMouseOver;
@@ -120,17 +149,52 @@ namespace com.keyman.osk {
         return keymanweb['getOskHeight']();
       }
 
-      var oskHeightLandscapeView=Math.floor(Math.min(screen.availHeight,screen.availWidth)/2),
+      /*
+       * We've noticed some fairly inconsistent behavior in the past when attempting to base
+       * this logic on window.innerWidth/Height, as there can be very unexpected behavior
+       * on mobile devices during and after rotation.
+       *
+       * Online forums (such as https://stackoverflow.com/a/54812656) seem to indicate that
+       * document.documentElement.clientWidth/Height seem to be the most stable analogues
+       * to a window's size in the situations where it matters for Keyman Engine for Web.
+       *
+       * That said, an important note:  this gets the dimensions of the _document element_,
+       * not the screen or even the window.
+       */
+      let baseWidth  = document?.documentElement?.clientWidth;
+      let baseHeight = document?.documentElement?.clientHeight;
+      if(typeof baseWidth == 'undefined') {
+        /*
+         * Fallback logic.  We _shouldn't_ need this, but it's best to have _something_
+         * for the sake of robustness.
+         */
+        baseWidth  = Math.min(screen.height, screen.width);
+        baseHeight = Math.max(screen.height, screen.width);
+
+        if(!keymanweb.util.portraitView()) {
+          let temp = baseWidth;
+          baseWidth = baseHeight;
+          baseHeight = temp;
+        }
+      }
+
+      var oskHeightLandscapeView=Math.floor(Math.min(baseHeight, baseWidth)/2),
           height=oskHeightLandscapeView;
 
       if(device.formFactor == 'phone') {
-        var sx=Math.min(screen.height,screen.width),
-            sy=Math.max(screen.height,screen.width);
-
+        /**
+         * Assuming the first-pass detection of width and height work correctly, note
+         * that these calculations are based on the document's size, not the device's
+         * resolution.  This _particularly_ matters for height.
+         *
+         * - Is the mobile-device browser showing a URL bar?  That's not included.
+         * - The standard signal-strength, battery-strength, etc device status bar?
+         *   Also not included.
+         */
         if(keymanweb.util.portraitView())
-          height=Math.floor(Math.max(screen.availHeight,screen.availWidth)/3);
+          height=Math.floor(baseHeight/2.4);
         else
-          height=height*(sy/sx)/1.6;  //adjust for aspect ratio, increase slightly for iPhone 5
+          height=Math.floor(baseHeight/1.6);  //adjust for aspect ratio, increase slightly for iPhone 5
       }
 
       // Correct for viewport scaling (iOS - Android 4.2 does not want this, at least on Galaxy Tab 3))
@@ -156,20 +220,17 @@ namespace com.keyman.osk {
       }
 
       var width: number;
-      if(device.OS == 'iOS') {
-        // iOS does not interchange these values when the orientation changes!
-        //width = util.portraitView() ? screen.width : screen.height;
-        width = window.innerWidth;
-      } else if(device.OS == 'Android') {
-        try {
-          width=document.documentElement.clientWidth;
-        } catch(ex) {
-          width=screen.availWidth;
-        }
-      } else {
-        width=screen.width;
-      }
 
+      width = document?.documentElement?.clientWidth;
+      if(typeof width == 'undefined') {
+        if(device.OS == 'iOS') {
+          width = window.innerWidth;
+        } else if(device.OS == 'Android') {
+          width=screen.availWidth;
+        } else {
+          width=screen.width;
+        }
+      }
       return width;
     }
 
