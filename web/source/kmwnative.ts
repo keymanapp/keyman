@@ -91,26 +91,6 @@ if(!window['keyman']['initialized']) {
     }
 
     /**
-     * Align input fields (should not be needed with KMEI, KMEA), making them visible if previously hidden.
-     *
-     *  @param  {object}   eleList    A list of specific elements to align.  If nil, selects all elements.
-     *
-     **/
-    keymanweb.alignInputs = function(eleList: HTMLElement[]) {
-      // no-op
-    }
-
-    /**
-     * Programatically hides all input fields with underlying elements.  Restore with .alignInputs.
-     *
-     *  @param  {boolean}   align    align and make visible, else hide
-     *
-     **/
-    keymanweb.hideInputs = function() {
-      // no-op.
-    }
-
-    /**
      * Test if caret position is determined from the active element, or
      * from the synthesized overlay element (touch devices)
      *
