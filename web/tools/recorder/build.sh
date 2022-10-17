@@ -13,6 +13,9 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
 
+# This script runs from its own folder
+cd "$(dirname "$THIS_SCRIPT")"
+
 # Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
 verify_npm_setup
 
@@ -40,7 +43,7 @@ if [ $? -ne 0 ]; then
     fail "KeymanWeb test sequence recorder compilation failed."
 fi
 
-PRODUCT="$SCRIPT_DIR/$OUTPUT_DIR/$OUTPUT"
+PRODUCT="$OUTPUT_DIR/$OUTPUT"
 cp $PRODUCT $ENGINE_TEST_OUTPUT
 cp $PRODUCT.map $ENGINE_TEST_OUTPUT
 
