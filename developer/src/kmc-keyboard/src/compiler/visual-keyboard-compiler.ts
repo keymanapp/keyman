@@ -17,8 +17,8 @@ export default class VisualKeyboardCompiler {
     result.header.unicodeFont.size = 10;
     result.header.unicodeFont.color = 0;
 
-    for(let layerMap of source.keyboard.layerMaps) {
-      for(let layer of layerMap.layerMap) {
+    for(let layers of source.keyboard.layers) {
+      for(let layer of layers.layer) {
         this.compileHardwareLayer(source, result, layer);
       }
     }

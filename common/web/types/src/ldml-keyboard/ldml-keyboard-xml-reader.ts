@@ -17,7 +17,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
     boxXmlArray(source?.keyboard?.locales, 'locale');
     boxXmlArray(source?.keyboard, 'transforms');
     if(source?.keyboard?.layers) {
-      for(let layer of source?.keyboard?.layers) {
+      for(let layers of source?.keyboard?.layers) {
         boxXmlArray(layers, 'layer');
         if(layers?.layer) {
           for(let layer of layers?.layer) {
