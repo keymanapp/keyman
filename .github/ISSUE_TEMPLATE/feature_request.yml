@@ -1,0 +1,127 @@
+name: "Feature request"
+title: "feat: "
+labels: ["feat"]
+description: Suggest an idea for this project
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before you submit this feature request, have you searched existing requests?
+          https://github.com/keymanapp/keyman/issues?q=is%3Aopen+is%3Aissue+label%3Afeat
+
+        * If you find a matching issue, go ahead and add a comment on that issue.
+        * If you find related issues, make sure you list them below.
+
+        You may also wish to discuss your feature request with the Keyman community at:
+          https://community.software.sil.org/c/keyman
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Is your feature request related to a problem? Please describe."
+      description: "A clear and concise description of what the problem is. e.g. I'm always frustrated when [...]"
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Describe the solution you'd like"
+      description: "A clear and concise description of what you want to happen."
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Describe alternatives you've considered"
+      description: "A clear and concise description of any alternative solutions or features you've considered."
+
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: "Related issues"
+      description: "After completing your issue search, you may find some that seem related; list them here."
+
+  - type: markdown
+    attributes:
+      value: ---
+
+  - type: checkboxes
+    id: context-product
+    attributes:
+      label: "Keyman apps"
+      description: "Which Keyman app(s) are you experiencing this problem with?"
+      options:
+        - label: Keyman for Android
+        - label: Keyman for iPhone and iPad
+        - label: Keyman for Linux
+        - label: Keyman for macOS
+        - label: Keyman for Windows
+        - label: Keyman Core
+        - label: Keyman Developer
+        - label: Keyman Engine for Android
+        - label: Keyman Engine for iPhone and iPad
+        - label: Keyman Engine for Linux
+        - label: Keyman Engine for macOS
+        - label: Keyman Engine for Web
+        - label: Keyman Engine for Windows
+        - label: Other - give details at bottom of form
+
+  - type: input
+    id: context-version
+    attributes:
+      label: "Keyman version"
+      placeholder: "e.g. 15.0.270"
+
+  - type: input
+    id: context-os
+    attributes:
+      label: "Operating system"
+      placeholder: "e.g. Windows 10 21H2, macOS 12 Monterey, Ubuntu 22.04, Android 12, iOS 16, ..."
+
+  - type: input
+    id: context-device
+    attributes:
+      label: "Device"
+      placeholder: "e.g. iPhone 14, Windows laptop, Macbook Pro, ..."
+
+  - type: input
+    id: context-app
+    attributes:
+      label: "Target application"
+      description: "If applicable, the app(s) and app version(s) you are trying to use with Keyman when experiencing this problem"
+      placeholder: "e.g. Office 365, ..."
+
+  - type: input
+    id: context-browser
+    attributes:
+      label: "Browser"
+      description: "If applicable, the web browser and version you are trying to use with KeymanWeb when experiencing this problem"
+      placeholder: "e.g. Firefox 104, ..."
+
+  - type: markdown
+    attributes:
+      value: ---
+
+  - type: input
+    id: context-keyboard
+    attributes:
+      label: "Keyboard name"
+      description: "If applicable, the filename of the keyboard you are using when experiencing this problem"
+      placeholder: "e.g. khmer_angkor"
+
+  - type: input
+    id: context-keyboard-version
+    attributes:
+      label: "Keyboard version"
+      placeholder: "e.g. 1.0.1"
+
+  - type: input
+    id: context-keyboard-language
+    attributes:
+      label: "Language name"
+      placeholder: "e.g. Khmer"
+
+  - type: textarea
+    id: context-additional
+    attributes:
+      label: "Additional context"
+      description: "Any other context or notes about the feature request here"
