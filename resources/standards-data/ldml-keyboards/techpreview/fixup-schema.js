@@ -27,10 +27,10 @@ if (data.title.endsWith('ldmlKeyboard.xsd')) {
         data.properties.keyboard.type = 'object';
     }
 
-    if (data?.properties?.keyboard?.properties?.vkeyMaps?.type === 'array') {
-        data.properties.keyboard.properties.vkeyMaps["$ref"] = data.properties.keyboard.properties.vkeyMaps.items["$ref"];
-        delete data.properties.keyboard.properties.vkeyMaps.items;
-        delete data.properties.keyboard.properties.vkeyMaps.type;
+    if (data?.properties?.keyboard?.properties?.vkeys?.type === 'array') {
+        data.properties.keyboard.properties.vkeys["$ref"] = data.properties.keyboard.properties.vkeys.items["$ref"];
+        delete data.properties.keyboard.properties.vkeys.items;
+        delete data.properties.keyboard.properties.vkeys.type;
     }
 
     if (!data?.definitions?.keys?.properties?.key?.type) {

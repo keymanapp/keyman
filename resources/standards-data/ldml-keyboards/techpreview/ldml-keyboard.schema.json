@@ -1,55 +1,9 @@
 {
-  "$id": "http://tempuri.org/ldmlKeyboard",
   "$schema": "http://json-schema.org/schema#",
   "additionalProperties": false,
   "definitions": {
-    "backspace": {
-      "additionalProperties": false,
-      "properties": {
-        "before": {
-          "type": "string"
-        },
-        "error": {
-          "enum": [
-            "fail"
-          ],
-          "type": "string"
-        },
-        "from": {
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "from"
-      ],
-      "type": "object"
-    },
-    "backspaces": {
-      "additionalProperties": false,
-      "properties": {
-        "backspace": {
-          "items": {
-            "$ref": "#/definitions/backspace"
-          },
-          "type": "array"
-        },
-        "import": {
-          "items": {
-            "$ref": "#/definitions/import"
-          },
-          "type": "array"
-        },
-        "special": {
-          "items": {
-            "$ref": "#/definitions/special"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
+    "any": {
+      "type": "string"
     },
     "display": {
       "additionalProperties": false,
@@ -67,7 +21,16 @@
       ],
       "type": "object"
     },
-    "displayMap": {
+    "displayOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "baseCharacter": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "displays": {
       "additionalProperties": false,
       "properties": {
         "display": {
@@ -93,15 +56,6 @@
             "$ref": "#/definitions/special"
           },
           "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "displayOptions": {
-      "additionalProperties": false,
-      "properties": {
-        "baseCharacter": {
-          "type": "string"
         }
       },
       "type": "object"
@@ -205,7 +159,7 @@
         "longPressDefault": {
           "type": "string"
         },
-        "multitap": {
+        "multiTap": {
           "type": "string"
         },
         "switch": {
@@ -256,7 +210,7 @@
       },
       "type": "object"
     },
-    "layerMap": {
+    "layer": {
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -284,7 +238,7 @@
       ],
       "type": "object"
     },
-    "layerMaps": {
+    "layers": {
       "additionalProperties": false,
       "properties": {
         "form": {
@@ -294,19 +248,22 @@
           ],
           "type": "string"
         },
+        "hardware": {
+          "type": "string"
+        },
         "import": {
           "items": {
             "$ref": "#/definitions/import"
           },
           "type": "array"
         },
-        "layerMap": {
+        "layer": {
           "items": {
-            "$ref": "#/definitions/layerMap"
+            "$ref": "#/definitions/layer"
           },
           "type": "array"
         },
-        "minDeviceWidthMM": {
+        "minDeviceWidth": {
           "type": "string"
         },
         "special": {
@@ -397,13 +354,13 @@
         "order": {
           "type": "string"
         },
-        "prebase": {
+        "preBase": {
           "type": "string"
         },
         "tertiary": {
           "type": "string"
         },
-        "tertiary_base": {
+        "tertiaryBase": {
           "type": "string"
         }
       },
@@ -473,7 +430,7 @@
       "type": "object"
     },
     "special": {
-      "type": "string"
+      "$ref": "#/definitions/any"
     },
     "transform": {
       "additionalProperties": false,
@@ -495,8 +452,7 @@
         }
       },
       "required": [
-        "from",
-        "to"
+        "from"
       ],
       "type": "object"
     },
@@ -522,6 +478,11 @@
           "type": "array"
         },
         "type": {
+          "enum": [
+            "simple",
+            "final",
+            "backspace"
+          ],
           "type": "string"
         }
       },
@@ -545,7 +506,7 @@
       },
       "type": "object"
     },
-    "vkeyMap": {
+    "vkey": {
       "additionalProperties": false,
       "properties": {
         "from": {
@@ -561,7 +522,7 @@
       ],
       "type": "object"
     },
-    "vkeyMaps": {
+    "vkeys": {
       "additionalProperties": false,
       "properties": {
         "import": {
@@ -576,9 +537,9 @@
           },
           "type": "array"
         },
-        "vkeyMap": {
+        "vkey": {
           "items": {
-            "$ref": "#/definitions/vkeyMap"
+            "$ref": "#/definitions/vkey"
           },
           "type": "array"
         }
@@ -590,18 +551,15 @@
     "keyboard": {
       "additionalProperties": false,
       "properties": {
-        "backspaces": {
-          "$ref": "#/definitions/backspaces"
-        },
         "conformsTo": {
           "enum": [
             "techpreview"
           ],
           "type": "string"
         },
-        "displayMap": {
+        "displays": {
           "items": {
-            "$ref": "#/definitions/displayMap"
+            "$ref": "#/definitions/displays"
           },
           "type": "array"
         },
@@ -617,9 +575,9 @@
         "keys": {
           "$ref": "#/definitions/keys"
         },
-        "layerMaps": {
+        "layers": {
           "items": {
-            "$ref": "#/definitions/layerMaps"
+            "$ref": "#/definitions/layers"
           },
           "type": "array"
         },
@@ -653,13 +611,12 @@
         "version": {
           "$ref": "#/definitions/version"
         },
-        "vkeyMaps": {
-          "$ref": "#/definitions/vkeyMaps"
+        "vkeys": {
+          "$ref": "#/definitions/vkeys"
         }
       },
       "required": [
         "names",
-        "keys",
         "locale",
         "conformsTo"
       ],
@@ -669,6 +626,6 @@
   "required": [
     "keyboard"
   ],
-  "title": "techpreview/ldmlKeyboard.xsd",
+  "title": "techpreview/dtd/ldmlKeyboard.xsd",
   "type": "object"
 }
