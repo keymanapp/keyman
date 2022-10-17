@@ -1,262 +1,20 @@
 {
-  "title": "techpreview/ldmlKeyboard.xsd",
-  "$schema": "http://json-schema.org/schema#",
   "$id": "http://tempuri.org/ldmlKeyboard",
-  "type": "object",
-  "properties": {
-    "keyboard": {
-      "type": "object",
-      "properties": {
-        "import": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/import"
-          }
-        },
-        "locales": {
-          "$ref": "#/definitions/locales"
-        },
-        "version": {
-          "$ref": "#/definitions/version"
-        },
-        "info": {
-          "$ref": "#/definitions/info"
-        },
-        "names": {
-          "$ref": "#/definitions/names"
-        },
-        "settings": {
-          "$ref": "#/definitions/settings"
-        },
-        "vkeyMaps": {
-         "$ref": "#/definitions/vkeyMaps"
-        },
-        "displayMap": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/displayMap"
-          }
-        },
-        "keys": {
-          "$ref": "#/definitions/keys"
-        },
-        "layerMaps": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/layerMaps"
-          }
-        },
-        "transforms": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/transforms"
-          }
-        },
-        "reorders": {
-          "$ref": "#/definitions/reorders"
-        },
-        "backspaces": {
-          "$ref": "#/definitions/backspaces"
-        },
-        "special": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/special"
-          }
-        },
-        "locale": {
-          "type": "string"
-        },
-        "conformsTo": {
-          "type": "string",
-          "enum": [
-            "techpreview"
-          ]
-        }
-      },
-      "required": [
-        "names",
-        "keys",
-        "locale",
-        "conformsTo"
-      ],
-      "additionalProperties": false
-    }
-  },
-  "required": [
-    "keyboard"
-  ],
+  "$schema": "http://json-schema.org/schema#",
   "additionalProperties": false,
   "definitions": {
-    "import": {
-      "type": "object",
+    "backspace": {
+      "additionalProperties": false,
       "properties": {
-        "path": {
+        "before": {
           "type": "string"
         },
-        "base": {
-          "type": "string",
+        "error": {
           "enum": [
-            "cldr"
-          ]
-        }
-      },
-      "required": [
-        "path"
-      ],
-      "additionalProperties": false
-    },
-    "locales": {
-      "type": "object",
-      "properties": {
-        "locale": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/locale"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "locale": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id"
-      ],
-      "additionalProperties": false
-    },
-    "version": {
-      "type": "object",
-      "properties": {
-        "number": {
+            "fail"
+          ],
           "type": "string"
         },
-        "cldrVersion": {
-          "type": "string",
-          "enum": [
-            "techpreview"
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "info": {
-      "type": "object",
-      "properties": {
-        "author": {
-          "type": "string"
-        },
-        "normalization": {
-          "type": "string"
-        },
-        "layout": {
-          "type": "string"
-        },
-        "indicator": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
-    "names": {
-      "type": "object",
-      "properties": {
-        "import": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/import"
-          }
-        },
-        "name": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/name"
-          }
-        },
-        "special": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/special"
-          }
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "additionalProperties": false
-    },
-    "name": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "value"
-      ],
-      "additionalProperties": false
-    },
-    "special": {
-      "type": "string"
-    },
-    "settings": {
-      "type": "object",
-      "properties": {
-        "fallback": {
-          "type": "string",
-          "enum": [
-            "omit"
-          ]
-        },
-        "transformFailure": {
-          "type": "string",
-          "enum": [
-            "omit"
-          ]
-        },
-        "transformPartial": {
-          "type": "string",
-          "enum": [
-            "hide"
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "vkeyMaps": {
-      "type": "object",
-      "properties": {
-        "import": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/import"
-          }
-        },
-        "vkeyMap": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/vkeyMap"
-          }
-        },
-        "special": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/special"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "vkeyMap": {
-      "type": "object",
-      "properties": {
         "from": {
           "type": "string"
         },
@@ -265,48 +23,41 @@
         }
       },
       "required": [
-        "from",
-        "to"
+        "from"
       ],
-      "additionalProperties": false
+      "type": "object"
     },
-    "displayMap": {
-      "type": "object",
+    "backspaces": {
+      "additionalProperties": false,
       "properties": {
+        "backspace": {
+          "items": {
+            "$ref": "#/definitions/backspace"
+          },
+          "type": "array"
+        },
         "import": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/import"
-          }
-        },
-        "display": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/display"
-          }
-        },
-        "displayOptions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/displayOptions"
-          }
+          },
+          "type": "array"
         },
         "special": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/special"
-          }
+          },
+          "type": "array"
         }
       },
-      "additionalProperties": false
+      "type": "object"
     },
     "display": {
-      "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "to": {
+        "display": {
           "type": "string"
         },
-        "display": {
+        "to": {
           "type": "string"
         }
       },
@@ -314,60 +65,138 @@
         "to",
         "display"
       ],
-      "additionalProperties": false
+      "type": "object"
+    },
+    "displayMap": {
+      "additionalProperties": false,
+      "properties": {
+        "display": {
+          "items": {
+            "$ref": "#/definitions/display"
+          },
+          "type": "array"
+        },
+        "displayOptions": {
+          "items": {
+            "$ref": "#/definitions/displayOptions"
+          },
+          "type": "array"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
     },
     "displayOptions": {
-      "type": "object",
+      "additionalProperties": false,
       "properties": {
         "baseCharacter": {
           "type": "string"
         }
       },
-      "additionalProperties": false
+      "type": "object"
     },
-    "keys": {
-      "type": "object",
+    "flick": {
+      "additionalProperties": false,
       "properties": {
-        "import": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/import"
-          }
+        "directions": {
+          "type": "string"
         },
-        "special": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/special"
-          }
-        },
-        "key": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/key"
-          }
-        },
-        "flicks": {
-          "$ref": "#/definitions/flicks"
+        "to": {
+          "type": "string"
         }
       },
-      "additionalProperties": false
+      "required": [
+        "directions",
+        "to"
+      ],
+      "type": "object"
     },
-    "key": {
-      "type": "object",
+    "flicks": {
+      "additionalProperties": false,
       "properties": {
+        "flick": {
+          "items": {
+            "$ref": "#/definitions/flick"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
         "id": {
           "type": "string"
         },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "flick",
+        "id"
+      ],
+      "type": "object"
+    },
+    "import": {
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "enum": [
+            "cldr"
+          ],
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
+    "info": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "indicator": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "string"
+        },
+        "normalization": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "key": {
+      "additionalProperties": false,
+      "properties": {
         "flicks": {
           "type": "string"
         },
         "gap": {
-          "type": "string",
           "enum": [
             "true"
-          ]
+          ],
+          "type": "string"
         },
-        "to": {
+        "id": {
           "type": "string"
         },
         "longPress": {
@@ -382,11 +211,14 @@
         "switch": {
           "type": "string"
         },
+        "to": {
+          "type": "string"
+        },
         "transform": {
-          "type": "string",
           "enum": [
             "no"
-          ]
+          ],
+          "type": "string"
         },
         "width": {
           "type": "string"
@@ -395,208 +227,166 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false
+      "type": "object"
     },
-    "flicks": {
-      "type": "object",
+    "keys": {
+      "additionalProperties": false,
       "properties": {
-        "flick": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/flick"
-          }
+        "flicks": {
+          "$ref": "#/definitions/flicks"
         },
-        "special": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/special"
-          }
-        },
-        "id": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "flick",
-        "id"
-      ],
-      "additionalProperties": false
-    },
-    "flick": {
-      "type": "object",
-      "properties": {
-        "directions": {
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "directions",
-        "to"
-      ],
-      "additionalProperties": false
-    },
-    "layerMaps": {
-      "type": "object",
-      "properties": {
         "import": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/import"
-          }
+          },
+          "type": "array"
         },
-        "layerMap": {
-          "type": "array",
+        "key": {
           "items": {
-            "$ref": "#/definitions/layerMap"
-          }
+            "$ref": "#/definitions/key"
+          },
+          "type": "array"
         },
         "special": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/special"
-          }
-        },
-        "form": {
-          "type": "string",
-          "enum": [
-            "hardware",
-            "touch"
-          ]
-        },
-        "minDeviceWidthMM": {
-          "type": "string"
+          },
+          "type": "array"
         }
       },
-      "required": [
-        "form"
-      ],
-      "additionalProperties": false
+      "type": "object"
     },
     "layerMap": {
-      "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "row": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/row"
-          }
-        },
-        "special": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/special"
-          }
-        },
         "id": {
           "type": "string"
         },
         "modifier": {
           "type": "string"
+        },
+        "row": {
+          "items": {
+            "$ref": "#/definitions/row"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
         }
       },
       "required": [
         "row"
       ],
-      "additionalProperties": false
+      "type": "object"
     },
-    "row": {
-      "type": "object",
+    "layerMaps": {
+      "additionalProperties": false,
       "properties": {
-        "keys": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "keys"
-      ],
-      "additionalProperties": false
-    },
-    "transforms": {
-      "type": "object",
-      "properties": {
-        "import": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/import"
-          }
-        },
-        "transform": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/transform"
-          }
-        },
-        "special": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/special"
-          }
-        },
-        "type": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "additionalProperties": false
-    },
-    "transform": {
-      "type": "object",
-      "properties": {
-        "before": {
-          "type": "string"
-        },
-        "from": {
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        },
-        "error": {
-          "type": "string",
+        "form": {
           "enum": [
-            "fail"
-          ]
+            "hardware",
+            "touch"
+          ],
+          "type": "string"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "layerMap": {
+          "items": {
+            "$ref": "#/definitions/layerMap"
+          },
+          "type": "array"
+        },
+        "minDeviceWidthMM": {
+          "type": "string"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
         }
       },
       "required": [
-        "from",
-        "to"
+        "form"
       ],
-      "additionalProperties": false
+      "type": "object"
     },
-    "reorders": {
-      "type": "object",
+    "locale": {
+      "additionalProperties": false,
       "properties": {
-        "import": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/import"
-          }
-        },
-        "reorder": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/reorder"
-          }
-        },
-        "special": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/special"
-          }
+        "id": {
+          "type": "string"
         }
       },
-      "additionalProperties": false
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "locales": {
+      "additionalProperties": false,
+      "properties": {
+        "locale": {
+          "items": {
+            "$ref": "#/definitions/locale"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "name": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "type": "object"
+    },
+    "names": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "name": {
+          "items": {
+            "$ref": "#/definitions/name"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
     },
     "reorder": {
-      "type": "object",
+      "additionalProperties": false,
       "properties": {
         "before": {
           "type": "string"
@@ -607,49 +397,94 @@
         "order": {
           "type": "string"
         },
+        "prebase": {
+          "type": "string"
+        },
         "tertiary": {
           "type": "string"
         },
         "tertiary_base": {
-          "type": "string"
-        },
-        "prebase": {
           "type": "string"
         }
       },
       "required": [
         "from"
       ],
-      "additionalProperties": false
+      "type": "object"
     },
-    "backspaces": {
-      "type": "object",
+    "reorders": {
+      "additionalProperties": false,
       "properties": {
         "import": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/import"
-          }
+          },
+          "type": "array"
         },
-        "backspace": {
-          "type": "array",
+        "reorder": {
           "items": {
-            "$ref": "#/definitions/backspace"
-          }
+            "$ref": "#/definitions/reorder"
+          },
+          "type": "array"
         },
         "special": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/special"
-          }
+          },
+          "type": "array"
         }
       },
-      "additionalProperties": false
+      "type": "object"
     },
-    "backspace": {
-      "type": "object",
+    "row": {
+      "additionalProperties": false,
+      "properties": {
+        "keys": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "keys"
+      ],
+      "type": "object"
+    },
+    "settings": {
+      "additionalProperties": false,
+      "properties": {
+        "fallback": {
+          "enum": [
+            "omit"
+          ],
+          "type": "string"
+        },
+        "transformFailure": {
+          "enum": [
+            "omit"
+          ],
+          "type": "string"
+        },
+        "transformPartial": {
+          "enum": [
+            "hide"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "special": {
+      "type": "string"
+    },
+    "transform": {
+      "additionalProperties": false,
       "properties": {
         "before": {
+          "type": "string"
+        },
+        "error": {
+          "enum": [
+            "fail"
+          ],
           "type": "string"
         },
         "from": {
@@ -657,18 +492,183 @@
         },
         "to": {
           "type": "string"
-        },
-        "error": {
-          "type": "string",
-          "enum": [
-            "fail"
-          ]
         }
       },
       "required": [
-        "from"
+        "from",
+        "to"
       ],
-      "additionalProperties": false
+      "type": "object"
+    },
+    "transforms": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "transform": {
+          "items": {
+            "$ref": "#/definitions/transform"
+          },
+          "type": "array"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "additionalProperties": false,
+      "properties": {
+        "cldrVersion": {
+          "enum": [
+            "techpreview"
+          ],
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "vkeyMap": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "type": "object"
+    },
+    "vkeyMaps": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "vkeyMap": {
+          "items": {
+            "$ref": "#/definitions/vkeyMap"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
     }
-  }
+  },
+  "properties": {
+    "keyboard": {
+      "additionalProperties": false,
+      "properties": {
+        "backspaces": {
+          "$ref": "#/definitions/backspaces"
+        },
+        "conformsTo": {
+          "enum": [
+            "techpreview"
+          ],
+          "type": "string"
+        },
+        "displayMap": {
+          "items": {
+            "$ref": "#/definitions/displayMap"
+          },
+          "type": "array"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "info": {
+          "$ref": "#/definitions/info"
+        },
+        "keys": {
+          "$ref": "#/definitions/keys"
+        },
+        "layerMaps": {
+          "items": {
+            "$ref": "#/definitions/layerMaps"
+          },
+          "type": "array"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "locales": {
+          "$ref": "#/definitions/locales"
+        },
+        "names": {
+          "$ref": "#/definitions/names"
+        },
+        "reorders": {
+          "$ref": "#/definitions/reorders"
+        },
+        "settings": {
+          "$ref": "#/definitions/settings"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "transforms": {
+          "items": {
+            "$ref": "#/definitions/transforms"
+          },
+          "type": "array"
+        },
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "vkeyMaps": {
+          "$ref": "#/definitions/vkeyMaps"
+        }
+      },
+      "required": [
+        "names",
+        "keys",
+        "locale",
+        "conformsTo"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "keyboard"
+  ],
+  "title": "techpreview/ldmlKeyboard.xsd",
+  "type": "object"
 }
