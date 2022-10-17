@@ -329,5 +329,5 @@ For each key:
 > * UnicodeSets
 > * spec: reference to `after` in reorders; various other @after refs
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)
-> * spec: layerMaps.displayWidthInMm
+> * spec: layers.displayWidth
 > * `keys.key.mod`: TODO define this.  0 for no modifiers.

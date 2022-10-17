@@ -6,10 +6,10 @@
     <name value="Invalid" />
   </names>
 
-  <vkeyMaps>
+  <vkeys>
     <!-- not a real 'to' key -->
-    <vkeyMap from="A" to="A-ACUTE" />
-  </vkeyMaps>
+    <vkey from="A" to="A-ACUTE" />
+  </vkeys>
 
   <keys />
 </keyboard>

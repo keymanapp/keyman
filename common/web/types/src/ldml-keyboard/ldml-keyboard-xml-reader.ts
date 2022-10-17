@@ -10,18 +10,18 @@ export default class LDMLKeyboardXMLSourceFileReader {
    * @param source any
    */
   private boxArrays(source: any) {
-    boxXmlArray(source?.keyboard, 'layerMaps');
+    boxXmlArray(source?.keyboard, 'layers');
     boxXmlArray(source?.keyboard?.names, 'name');
-    boxXmlArray(source?.keyboard?.vkeyMaps, 'vkeyMap');
+    boxXmlArray(source?.keyboard?.vkeys, 'vkey');
     boxXmlArray(source?.keyboard?.keys, 'key');
     boxXmlArray(source?.keyboard?.locales, 'locale');
     boxXmlArray(source?.keyboard, 'transforms');
-    if(source?.keyboard?.layerMaps) {
-      for(let layerMaps of source?.keyboard?.layerMaps) {
-        boxXmlArray(layerMaps, 'layerMap');
-        if(layerMaps?.layerMap) {
-          for(let layerMap of layerMaps?.layerMap) {
-            boxXmlArray(layerMap, 'row');
+    if(source?.keyboard?.layers) {
+      for(let layers of source?.keyboard?.layers) {
+        boxXmlArray(layers, 'layer');
+        if(layers?.layer) {
+          for(let layer of layers?.layer) {
+            boxXmlArray(layer, 'row');
           }
         }
       }

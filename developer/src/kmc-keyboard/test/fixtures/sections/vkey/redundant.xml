@@ -6,10 +6,10 @@
     <name value="Invalid" />
   </names>
 
-  <vkeyMaps>
+  <vkeys>
     <!-- this is redundant so it should be omitted -->
-    <vkeyMap from="A" to="A" />
-  </vkeyMaps>
+    <vkey from="A" to="A" />
+  </vkeys>
 
   <keys />
 </keyboard>

@@ -13,15 +13,15 @@ export class VkeyCompiler extends SectionCompiler {
   }
 
   public get required(): boolean {
-    return !!this.keyboard.vkeyMaps;
+    return !!this.keyboard.vkeys;
   }
 
   public validate(): boolean {
     let valid = true;
-    if(this.keyboard.vkeyMaps) {
+    if(this.keyboard.vkeys) {
       let from: string[] = [], to: string[] = [];
 
-      this.keyboard.vkeyMaps.vkeyMap.forEach(vk => {
+      this.keyboard.vkeys.vkey.forEach(vk => {
         if(LdmlVkeyNames[vk.from] === undefined) {
           this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsNotValid({vkey: vk.from}));
           valid = false;
@@ -53,11 +53,11 @@ export class VkeyCompiler extends SectionCompiler {
 
   public compile(): Vkey {
     let result = new Vkey();
-    if(!this.keyboard.vkeyMaps) {
+    if(!this.keyboard.vkeys) {
       return result;
     }
 
-    result.vkeys = this.keyboard.vkeyMaps?.vkeyMap.map(vk => {
+    result.vkeys = this.keyboard.vkeys?.vkey.map(vk => {
       return {
         vkey: LdmlVkeyNames[vk.from],
         target: LdmlVkeyNames[vk.to]

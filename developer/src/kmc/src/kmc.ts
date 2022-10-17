@@ -61,14 +61,14 @@ function compileKeyboard(inputFilename: string, options: kmc.CompilerOptions): [
   const k = new kmc.Compiler(c, options);
   let source = k.load(inputFilename);
   if(!source) {
-    return null;
+    return [null, null];
   }
   if(!k.validate(source)) {
-    return null;
+    return [null, null];
   }
   let kmx = k.compile(source);
   if(!kmx) {
-    return null;
+    return [null, null];
   }
 
   // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
@@ -110,4 +110,7 @@ if(kmx && kvk) {
   const outFileKvk = path.join(outFileDir, outFileBase + '.kvk');
   console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
   fs.writeFileSync(outFileKvk, kvk);
+} else {
+  console.error(`An error occurred compiling ${inputFilename}`);
+  process.exit(1);
 }
