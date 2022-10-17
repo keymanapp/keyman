@@ -46,13 +46,13 @@ export class KeysCompiler extends SectionCompiler {
 
   public validate() {
     let valid = true;
-    if(!this.keyboard.layerMaps?.[0]?.layerMap?.length) {
+    if(!this.keyboard.layers?.[0]?.layer?.length) {
       valid = false;
       this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
 
-    if(this.keyboard.layerMaps?.[0]?.form == 'hardware') {
-      for(let layer of this.keyboard.layerMaps[0].layerMap) {
+    if(this.keyboard.layers?.[0]?.form == 'hardware') {
+      for(let layer of this.keyboard.layers[0].layer) {
         valid = this.validateHardwareLayer(layer) && valid; // note: always validate even if previously invalid results found
       }
     }
@@ -62,8 +62,8 @@ export class KeysCompiler extends SectionCompiler {
   public compile(sections: GlobalSections): Keys {
     // Use LayerMap + keys to generate compiled keys for hardware
 
-    if(this.keyboard.layerMaps?.[0]?.form == 'hardware') {
-      for(let layer of this.keyboard.layerMaps[0].layerMap) {
+    if(this.keyboard.layers?.[0]?.form == 'hardware') {
+      for(let layer of this.keyboard.layers[0].layer) {
         let sect = this.compileHardwareLayer(sections, layer);
         return sect;
       }

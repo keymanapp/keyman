@@ -14,20 +14,20 @@
     <name value="TestKbd" />
   </names>
 
-  <vkeyMaps>
-    <vkeyMap from="Q" to="A" />
-  </vkeyMaps>
+  <vkeys>
+    <vkey from="Q" to="A" />
+  </vkeys>
 
   <keys>
     <key id="hmaqtua" to="ħ" />
     <key id="that" to="ថា" />
   </keys>
 
-  <layerMaps form="hardware">
-    <layerMap id="base">
+  <layers form="hardware">
+    <layer id="base">
       <row keys="hmaqtua that" />
-    </layerMap>
-  </layerMaps>
+    </layer>
+  </layers>
 
   <transforms type="simple">
     <transform from="^a" to="â" />
@@ -37,14 +37,13 @@
     <transform from="^^" to="^" error="fail" />
   </transforms>
 
+  <transforms type="backspace">
+    <transform from="^e" />
+  </transforms>
+
   <reorders>
     <!-- Northern Thai example from spec, lightly edited -->
     <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   </reorders>
-
-  <backspaces>
-    <backspace from="^e" />
-  </backspaces>
-
 
 </keyboard>

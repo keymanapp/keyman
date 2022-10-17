@@ -24,10 +24,10 @@
     <key id="equal" to="=" />
   </keys>
 
-  <layerMaps form="hardware">
-    <layerMap id="base">
+  <layers form="hardware">
+    <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="grave one two three four five six seven eight nine ten eleven minus equal" />
-    </layerMap>
-  </layerMaps>
+    </layer>
+  </layers>
 </keyboard>

@@ -24,8 +24,8 @@ export interface LKKeyboard {
   names?: LKNames;
   settings?: LKSettings;
   keys?: LKKeys;
-  layerMaps?: LKLayerMaps[];
-  vkeyMaps?: LKVkeyMaps;
+  layers?: LKLayerMaps[];
+  vkeys?: LKVkeyMaps;
   transforms?: LKTransforms[];
   reorders?: LKReorders;
   backspaces?: LKBackspaces;
@@ -75,7 +75,7 @@ export interface LKKey {
 
 export interface LKLayerMaps {
   form?: string;
-  layerMap?: LKLayerMap[];
+  layer?: LKLayerMap[];
 };
 
 export interface LKLayerMap {
@@ -88,7 +88,7 @@ export interface LKRow {
 };
 
 export interface LKVkeyMaps {
-  vkeyMap?: LKVkeyMap[];
+  vkey?: LKVkeyMap[];
 };
 
 export interface LKVkeyMap {

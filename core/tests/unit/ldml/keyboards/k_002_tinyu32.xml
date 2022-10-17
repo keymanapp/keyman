@@ -20,9 +20,9 @@
     <key id="screamcat" to="🙀" />
   </keys>
 
-  <layerMaps form="hardware">
-    <layerMap id="base">
+  <layers form="hardware">
+    <layer id="base">
       <row keys="hmaqtua that screamcat" /> <!-- number row -->
-    </layerMap>
-  </layerMaps>
+    </layer>
+  </layers>
 </keyboard>

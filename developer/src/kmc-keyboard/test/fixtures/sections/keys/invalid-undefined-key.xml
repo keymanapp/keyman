@@ -10,9 +10,9 @@
     <key id="grave" to="🪦" />
   </keys>
 
-  <layerMaps form="hardware">
-    <layerMap id="base">
+  <layers form="hardware">
+    <layer id="base">
       <row keys="foo" />
-    </layerMap>
-  </layerMaps>
+    </layer>
+  </layers>
 </keyboard>

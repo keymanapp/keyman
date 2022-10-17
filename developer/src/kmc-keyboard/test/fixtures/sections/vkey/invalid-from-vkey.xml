@@ -6,13 +6,13 @@
     <name value="Invalid" />
   </names>
 
-  <vkeyMaps>
+  <vkeys>
     <!-- key names are upper case, so this from attribute is invalid -->
-    <vkeyMap from="q" to="A" />
+    <vkey from="q" to="A" />
 
     <!-- Sorry, hyphen isn't spelled like this even if it should be -->
-    <vkeyMap from="HYFEN" to="Z" />
-  </vkeyMaps>
+    <vkey from="HYFEN" to="Z" />
+  </vkeys>
 
   <keys />
 </keyboard>

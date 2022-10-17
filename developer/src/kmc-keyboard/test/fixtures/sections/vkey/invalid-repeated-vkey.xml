@@ -6,11 +6,11 @@
     <name value="Invalid" />
   </names>
 
-  <vkeyMaps>
+  <vkeys>
     <!-- repeated definitions for same vkey are invalid -->
-    <vkeyMap from="A" to="Q" />
-    <vkeyMap from="A" to="W" />
-  </vkeyMaps>
+    <vkey from="A" to="Q" />
+    <vkey from="A" to="W" />
+  </vkeys>
 
   <keys />
 </keyboard>

@@ -11,8 +11,8 @@
     <key id="W" to="www" />
   </keys>
 
-  <layerMaps form="hardware">
-    <layerMap id="base">
+  <layers form="hardware">
+    <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />
       <row keys="Q W" />
@@ -20,6 +20,6 @@
       <row keys="Q W" />
       <row keys="Q W" />
       <row keys="Q W" />
-    </layerMap>
-  </layerMaps>
+    </layer>
+  </layers>
 </keyboard>

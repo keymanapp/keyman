@@ -6,11 +6,11 @@
     <name value="Invalid" />
   </names>
 
-  <vkeyMaps>
+  <vkeys>
     <!-- it's likely this is incorrect, so it should raise a linter message -->
-    <vkeyMap from="A" to="Q" />
-    <vkeyMap from="Z" to="Q" />
-  </vkeyMaps>
+    <vkey from="A" to="Q" />
+    <vkey from="Z" to="Q" />
+  </vkeys>
 
   <keys />
 </keyboard>
