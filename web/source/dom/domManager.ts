@@ -56,6 +56,11 @@ namespace com.keyman.dom {
     enablementObserver: MutationObserver;
 
     /**
+     * Tracks changes in inputmode state.
+     */
+    inputModeObserver: MutationObserver;
+
+    /**
      * Tracks a list of event-listening elements.
      *
      * In touch mode, this should contain touch-aliasing DIVs, but will contain other elements in non-touch mode.
@@ -98,6 +103,9 @@ namespace com.keyman.dom {
         }
         if(this.attachmentObserver) {
           this.attachmentObserver.disconnect();
+        }
+        if(this.inputModeObserver) {
+          this.inputModeObserver.disconnect();
         }
 
         for(let input of this.inputList) {
@@ -233,11 +241,10 @@ namespace com.keyman.dom {
 
       if(!this.isAttached(Pelem)) {
         this.setupElementAttachment(Pelem);
-        Pelem.inputMode = 'none';
       }
 
       // Set font for base element
-      this.enableInputElement(Pelem, false);
+      this.enableInputElement(Pelem);
 
       // Superimpose custom input fields for each input or textarea, unless readonly or disabled
 
@@ -269,7 +276,15 @@ namespace com.keyman.dom {
      */
     disableTouchElement(Pelem: HTMLElement) {
       // Do not check for the element being officially disabled - it's also used for detachment.
-      Pelem.inputMode = 'text';
+      if(this.isAttached(Pelem)) {
+        const intendedInputMode = Pelem._kmwAttachment.inputMode;
+
+        this.disableInputModeObserver();
+        Pelem.inputMode = intendedInputMode;
+        this.enableInputModeObserver();
+      }
+
+      this.setupNonKMWTouchElement(Pelem);
     }
 
     /**
@@ -308,23 +323,24 @@ namespace com.keyman.dom {
      *              enableTouchElement as it must first establish the simulated touch element to serve as the alias "input element" here.
      *              Note that the 'kmw-disabled' property is managed by the MutationObserver and by the surface API calls.
      */
-    enableInputElement(Pelem: HTMLElement, isAlias?: boolean) {
-      var baseElement = isAlias ? Pelem['base'] : Pelem;
-
-      if(!this.isKMWDisabled(baseElement)) {
+    enableInputElement(Pelem: HTMLElement) {
+      if(!this.isKMWDisabled(Pelem)) {
         if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
           this._AttachToIframe(Pelem);
         } else {
-          if(!isAlias) {
-            this.setupElementAttachment(Pelem);
-          }
+          this.setupElementAttachment(Pelem);
 
-          baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
+          Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text';
+          this.disableInputModeObserver();
+          Pelem.inputMode = 'none';
+          this.enableInputModeObserver();
+
+          Pelem.classList.add('keymanweb-font');
           this.inputList.push(Pelem);
 
-          this.keyman.util.attachDOMEvent(baseElement,'focus', this.getHandlers(Pelem)._ControlFocus);
-          this.keyman.util.attachDOMEvent(baseElement,'blur', this.getHandlers(Pelem)._ControlBlur);
-          this.keyman.util.attachDOMEvent(baseElement,'click', this.getHandlers(Pelem)._Click);
+          this.keyman.util.attachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+          this.keyman.util.attachDOMEvent(Pelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+          this.keyman.util.attachDOMEvent(Pelem,'click', this.getHandlers(Pelem)._Click);
 
           // These need to be on the actual input element, as otherwise the keyboard will disappear on touch.
           Pelem.onkeypress = this.getHandlers(Pelem)._KeyPress;
@@ -909,6 +925,37 @@ namespace com.keyman.dom {
             domManager.listInputs();
           }.bind(this), 1);
         }
+      }
+    }.bind(this);
+
+    /**
+     * The core method for a MutationObserver that checks for changes to the `.inputMode` property
+     * of controls that KMW is attached to in touch mode.
+     *
+     * In touch mode, KMW requires that their `.inputMode` property be set to 'none' in order
+     * to hide the device's default OSK.  That said, we should still aim to honor the setting
+     * and restore it if and when detachment occurs.  Should we ever support intents, we'll want
+     * to utilize the incoming value for use with that feature too.
+     */
+    _InputModeObserverCore = function(this: DOMManager, mutations: MutationRecord[]) {
+      const keyman = com.keyman.singleton;
+      // Prevent infinite recursion from any changes / updates made within the observation handler.
+      this.disableInputModeObserver();
+      try {
+        for(const mutation of mutations) {
+          const target = mutation.target as HTMLElement;
+          if(!this.isAttached(target)) {
+            continue;
+          }
+
+          target._kmwAttachment.inputMode = target.inputMode;
+
+          if(keyman.util.device.touchable) {
+            target.inputMode = 'none';
+          }
+        }
+      } finally {
+        this.enableInputModeObserver();
       }
     }.bind(this);
 
@@ -1616,6 +1663,12 @@ namespace com.keyman.dom {
         observationConfig = { subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'readonly']};
         this.enablementObserver = new MutationObserver(this._EnablementMutationObserverCore);
         this.enablementObserver.observe(observationTarget, observationConfig);
+
+        /**
+         * Setup of handlers for dynamic detection of change in inputMode state.
+         */
+        this.inputModeObserver = new MutationObserver(this._InputModeObserverCore);
+        this.enableInputModeObserver();
       } else {
         console.warn("Your browser is outdated and does not support MutationObservers, a web feature " +
           "needed by KeymanWeb to support dynamically-added elements.");
@@ -1634,6 +1687,16 @@ namespace com.keyman.dom {
       this.keyman.setInitialized(2);
       return Promise.resolve();
     }.bind(this);
+
+    enableInputModeObserver() {
+      const observationTarget = document.querySelector('body');
+      const observationConfig = { subtree: true, attributes: true, attributeFilter: ['inputmode'] };
+      this.inputModeObserver?.observe(observationTarget, observationConfig);
+    }
+
+    disableInputModeObserver() {
+      this.inputModeObserver?.disconnect();
+    }
 
     /**
      * Initialize the desktop user interface as soon as it is ready
