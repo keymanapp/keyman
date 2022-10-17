@@ -244,7 +244,7 @@ namespace com.keyman.dom {
       }
 
       // Set font for base element
-      this.enableInputElement(Pelem, false);
+      this.enableInputElement(Pelem);
 
       // Superimpose custom input fields for each input or textarea, unless readonly or disabled
 
@@ -271,11 +271,13 @@ namespace com.keyman.dom {
      */
     disableTouchElement(Pelem: HTMLElement) {
       // Do not check for the element being officially disabled - it's also used for detachment.
-      const intendedInputMode = Pelem._kmwAttachment.inputMode;
+      if(this.isAttached(Pelem)) {
+        const intendedInputMode = Pelem._kmwAttachment.inputMode;
 
-      this.disableInputModeObserver();
-      Pelem.inputMode = intendedInputMode;
-      this.enableInputModeObserver();
+        this.disableInputModeObserver();
+        Pelem.inputMode = intendedInputMode;
+        this.enableInputModeObserver();
+      }
 
       this.setupNonKMWTouchElement(Pelem);
     }
@@ -316,20 +318,19 @@ namespace com.keyman.dom {
      *              enableTouchElement as it must first establish the simulated touch element to serve as the alias "input element" here.
      *              Note that the 'kmw-disabled' property is managed by the MutationObserver and by the surface API calls.
      */
-    enableInputElement(Pelem: HTMLElement, isAlias?: boolean) {
+    enableInputElement(Pelem: HTMLElement) {
       if(!this.isKMWDisabled(Pelem)) {
-        this.disableInputModeObserver();
-        this.enableInputModeObserver();
-
         if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
           this._AttachToIframe(Pelem);
         } else {
           this.setupElementAttachment(Pelem);
 
-          Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text'; // This spot.
+          Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text';
+          this.disableInputModeObserver();
           Pelem.inputMode = 'none';
+          this.enableInputModeObserver();
 
-          Pelem.className = Pelem.className ? Pelem.className + ' keymanweb-font' : 'keymanweb-font';
+          Pelem.classList.add('keymanweb-font');
           this.inputList.push(Pelem);
 
           this.keyman.util.attachDOMEvent(Pelem,'focus', this.getHandlers(Pelem)._ControlFocus);
@@ -922,6 +923,15 @@ namespace com.keyman.dom {
       }
     }.bind(this);
 
+    /**
+     * The core method for a MutationObserver that checks for changes to the `.inputMode` property
+     * of controls that KMW is attached to in touch mode.
+     *
+     * In touch mode, KMW requires that their `.inputMode` property be set to 'none' in order
+     * to hide the device's default OSK.  That said, we should still aim to honor the setting
+     * and restore it if and when detachment occurs.  Should we ever support intents, we'll want
+     * to utilize the incoming value for use with that feature too.
+     */
     _InputModeObserverCore = function(this: DOMManager, mutations: MutationRecord[]) {
       const keyman = com.keyman.singleton;
       // Prevent infinite recursion from any changes / updates made within the observation handler.
@@ -933,9 +943,7 @@ namespace com.keyman.dom {
             continue;
           }
 
-          const newValue = target.inputMode;
-
-          target._kmwAttachment.inputMode = newValue;
+          target._kmwAttachment.inputMode = target.inputMode;
 
           if(keyman.util.device.touchable) {
             target.inputMode = 'none';
@@ -1677,7 +1685,7 @@ namespace com.keyman.dom {
 
     enableInputModeObserver() {
       const observationTarget = document.querySelector('body');
-      const observationConfig = { subtree: true, attributes: true, attributeFilter: ['inputmode']};
+      const observationConfig = { subtree: true, attributes: true, attributeFilter: ['inputmode'] };
       this.inputModeObserver?.observe(observationTarget, observationConfig);
     }
 
