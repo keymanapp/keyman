@@ -246,11 +246,10 @@ reset_context(IBusEngine *engine) {
 
   g_message("%s", __FUNCTION__);
   context = km_kbp_state_context(keyman->state);
-  km_kbp_context_clear(context);
 
   if (client_supports_surrounding_text(engine)) {
     IBusText *text;
-    gchar *surrounding_text;
+    gchar *surrounding_text, *current_context_utf8;
     guint cursor_pos, anchor_pos, context_start, context_end;
     km_kbp_context_item *context_items;
 
@@ -262,11 +261,18 @@ reset_context(IBusEngine *engine) {
     g_message("%s: new context is :%s: (len:%u) cursor:%d anchor:%d", __FUNCTION__,
       surrounding_text, context_end - context_start, cursor_pos, anchor_pos);
 
-    if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
-      km_kbp_context_set(context, context_items);
-      km_kbp_context_items_dispose(context_items);
+    current_context_utf8 = get_current_context_text(context);
+    if (!g_str_has_suffix(surrounding_text, current_context_utf8) || !g_utf8_strlen(current_context_utf8, -1)) {
+      g_message("%s: setting context because it has changed from expected", __FUNCTION__);
+      if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
+        km_kbp_context_set(context, context_items);
+        km_kbp_context_items_dispose(context_items);
+      }
     }
     g_free(surrounding_text);
+    g_free(current_context_utf8);
+  } else {
+    km_kbp_context_clear(context);
   }
 }
 
