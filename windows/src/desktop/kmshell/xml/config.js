@@ -260,6 +260,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
     var state = {
       activeIndex: menuframe_activeindex,
       keyboards: [],
+      modify_languages: [],
       // TODO: scrollTop is not known when element is display:none
       keyboardsScrollTop: $('#subcontent_keyboards').scrollTop(),
       optionsScrollTop: $('#subcontent_options').scrollTop(),
@@ -272,6 +273,14 @@ document.addEventListener("DOMContentLoaded", windowResize);
         state.keyboards.push({name: name, expanded: $(this).hasClass('expanded')});
       }
     });
+    var modfiy_list = $('div.modify');
+    modfiy_list.each(function(index) {
+      const name = $(this).data('name');
+      if(name) {
+        state.modify_languages.push({name: name, modify: $(this).hasClass('modify-visible')});
+      }
+    });
+
     const stateJson = JSON.stringify(state);
     const params = new URLSearchParams(window.location.search);
     const PageTag = params.get('tag');
@@ -295,6 +304,12 @@ document.addEventListener("DOMContentLoaded", windowResize);
         for(var i = 0; i < state.keyboards.length; i++) {
           if(state.keyboards[i].expanded)
             $('div.list_item[data-name="'+state.keyboards[i].name+'"]').addClass('expanded');
+        }
+      }
+      if(state.modify_languages) {
+        for(var i = 0; i < state.modify_languages.length; i++) {
+          if(state.modify_languages[i].modify)
+            $('div.modify[data-name="'+state.modify_languages[i].name+'"]').addClass('modify-visible');
         }
       }
       window.setTimeout(function() {
@@ -395,8 +410,10 @@ function hideKeyboardLink(id) {
 function showModifyLink(id) {
   var e = document.getElementById('modify-'+id);
   e.className='modify modify-visible';
+  save_state();
 }
 function hideModifyLink(id) {
   var e = document.getElementById('modify-'+id);
   e.className='modify';
+  save_state();
 }

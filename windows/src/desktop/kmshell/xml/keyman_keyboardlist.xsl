@@ -370,6 +370,7 @@
 
           <div class='modify'>
             <xsl:attribute name='id'>modify-<xsl:value-of select="../../id" /></xsl:attribute>
+            <xsl:attribute name="data-name"><xsl:value-of select="name"/></xsl:attribute>
             <div class='modify-back'>
               <xsl:attribute name="onclick">return hideModifyLink('<xsl:value-of select="../../id" />')</xsl:attribute>
             </div>
@@ -414,6 +415,11 @@
       <xsl:with-param name="replace" select='"&apos;"' />
       <xsl:with-param name="with" select='"\&apos;"' />
     </xsl:call-template></xsl:variable>
+    <xsl:variable name="name"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="../../name" />
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
 
     <div class='keyboard-language'> <!-- make a keyboard-language-poput class -->
 
@@ -422,7 +428,7 @@
       <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) > 1">
         <div class="hotkey" tabindex = "-1">
           <xsl:for-each select="//KeymanLanguage">
-            <xsl:if test="keymankeyboardid=$id and bcp47code=$bcp47code">
+            <xsl:if test="keymankeyboardid=$id and bcp47code=$bcp47code and layoutname=$name">
               <xsl:attribute name="style">margin-left: auto; margin-right: 19px;</xsl:attribute>
               <a>
               <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
