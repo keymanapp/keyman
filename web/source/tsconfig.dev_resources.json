@@ -22,14 +22,12 @@
     "dom/utils.ts",
     "utils/styleConstants.ts",
     "kmwtypedefs.ts",
+    "../../node_modules/eventemitter3/index.js"
   ],
 
   "references": [
     { "path": "../../common/web/keyman-version", "prepend": true },
     { "path": "../../common/web/utils", "prepend": true },
-    { "path": "../../common/predictive-text/browser.tsconfig.json", "prepend": true },
-    { "path": "../../common/web/input-processor/src", "prepend": true },
-    { "path": "../../common/web/keyboard-processor/src", "prepend": true },
-    { "path": "../../common/web/lm-message-types" }
+    { "path": "../../common/web/keyboard-processor/src", "prepend": true }
   ]
 }
