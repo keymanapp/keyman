@@ -7,8 +7,6 @@
 ///<reference path="contentEditable.ts" />
 // Defines a basic design-mode IFrame wrapper.
 ///<reference path="designIFrame.ts" />
-// Defines a basic touch-alias element wrapper.
-///<reference path="touchAlias.ts" />
 
 namespace com.keyman.dom.targets {
   export function wrapElement(e: HTMLElement): OutputTarget {
@@ -18,8 +16,6 @@ namespace com.keyman.dom.targets {
       return new Input(<HTMLInputElement> e);
     } else if(Utils.instanceof(e, "HTMLTextAreaElement")) {
       return new TextArea(<HTMLTextAreaElement> e);
-    } else if(Utils.instanceof(e, "TouchAliasElement")) {
-      return new TouchAlias(<TouchAliasElement> e);
     } else if(Utils.instanceof(e, "HTMLIFrameElement")) {
       let iframe = <HTMLIFrameElement> e;
 
@@ -34,7 +30,7 @@ namespace com.keyman.dom.targets {
     } else if(e.isContentEditable) {
       return new ContentEditable(e);
     }
-    
+
     return null;
   }
 }

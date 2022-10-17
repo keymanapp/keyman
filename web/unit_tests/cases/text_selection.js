@@ -6,11 +6,6 @@ describe('Text Selection', function() {
   /* Utility functions */
 
   function setupElement(ele) {
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      //aliasing = true;
-    }
-
     // A bit of a force-hack to ensure the element is seen as active for the tests.
     com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
     com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
@@ -35,15 +30,6 @@ describe('Text Selection', function() {
 
   function instantiateBrowserDriver(ele) {
     return new KMWRecorder.BrowserDriver(setupElement(ele));
-  }
-
-  var device = new com.keyman.Device();
-  device.detect();
-
-  if(device.formFactor != 'desktop') {
-    console.log('Don\'t run Text Selection tests on mobile, because we don\'t '+
-      'yet support selection on mobile browsers');
-    return;
   }
 
   /* Define key event specs */

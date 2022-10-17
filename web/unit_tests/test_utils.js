@@ -162,9 +162,6 @@ var loadKeyboardFromJSON = function(jsonPath, timeout, params) {
 
 function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
   var inputElem = document.getElementById('singleton');
-  if(inputElem['kmw_ip']) {
-    inputElem = inputElem['kmw_ip'];
-  }
 
   let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
   testDef.test(proctor);
@@ -183,15 +180,8 @@ function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
 }
 
 function retrieveAndReset(Pelem) {
-  var alias = Pelem['kmw_ip'];
-  var val = "";
-  if(alias) {
-    val = alias.textContent;
-    alias.setText("", 0);
-  } else {
-    val = Pelem.value;
-    Pelem.value = "";
-  }
+  let val = Pelem.value;
+  Pelem.value = "";
 
   return val;
 }
@@ -296,18 +286,6 @@ if(typeof(DynamicElements) == 'undefined') {
 
     masterDiv.appendChild(editable);
     return editable.id;
-  }
-
-  // base: takes an optional element to use as the touch alias's ['base'] property.
-  DynamicElements.addTouchAlias = function(base) {
-    var masterDiv = document.getElementById('DynamicElements');
-    var touchAlias = com.keyman.dom.constructTouchAlias(base);
-    var i = inputCounter++;
-
-    touchAlias.id = 'touchAlias' + i;
-
-    masterDiv.appendChild(touchAlias);
-    return touchAlias.id;
   }
 
   DynamicElements.assertAttached = function(ele, done) {
