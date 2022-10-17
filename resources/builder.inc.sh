@@ -7,9 +7,9 @@
 # * THIS_SCRIPT_PATH defines the full path of the running script
 # * THIS_SCRIPT_NAME defines the basename of the running script
 # * THIS_SCRIPT_IDENTIFIER defines the repo-relative path of the running script
-# * _builder_ functions and variables are internal use only for builder.inc.sh, and 
+# * _builder_ functions and variables are internal use only for builder.inc.sh, and
 #   subject to change at any time. Do not use them in other scripts.
-# * Note: the running script is the top-level script that includes either 
+# * Note: the running script is the top-level script that includes either
 #   builder.inc.sh directly, or, just in the Keyman repo, via build-utils.sh.
 #
 
@@ -36,16 +36,19 @@ function _builder_findRepoRoot() {
 }
 
 # Used to build script-related build variables useful for referencing the calling script
-# and for prefixing builder_finish_action outputs in order to more clearly identify the calling
+# and for prefixing `builder_finish_action` outputs in order to more clearly identify the calling
 # script.
 #
-# Assumes that THIS_SCRIPT has been set, typically like this:
+# Assumes that `THIS_SCRIPT` has been set, typically like this:
 #
-#  ## START STANDARD BUILD SCRIPT INCLUDE
-#  # adjust relative paths as necessary
-#  THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-#  . "$(dirname "$THIS_SCRIPT")/resources/builder.inc.sh"
-#  ## END STANDARD BUILD SCRIPT INCLUDE
+# ```bash
+#   ## START STANDARD BUILD SCRIPT INCLUDE
+#   # adjust relative paths as necessary
+#   THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+#   . "$(dirname "$THIS_SCRIPT")/resources/builder.inc.sh"
+#   ## END STANDARD BUILD SCRIPT INCLUDE
+# ```
+#
 function _builder_setBuildScriptIdentifiers() {
   if [ ! -z ${THIS_SCRIPT+x} ]; then
     THIS_SCRIPT_PATH="$(dirname "$THIS_SCRIPT")"
@@ -141,9 +144,34 @@ _builder_item_in_array() {
   local e match="$1"
   shift
   [[ -z "$match" ]] && return 1
-  for e; do [[ "$e" == "$match" ]] && return 0; done
+  for e; do [[ "$e" == $match ]] && return 0; done
   return 1
 }
+
+#
+# Returns `0` if first parameter is in the array passed as second parameter,
+# where the array may contain globs.
+#
+# ### Parameters
+#
+# * 1: `item`       item to search for in array
+# * 2: `array`      bash array, e.g. `array=(one two three)`
+#
+# ### Example
+#
+# ```bash
+#   array=(foo bar it*)
+#   if _builder_item_in_glob_array "item" "${array[@]}"; then ...; fi
+# ```
+#
+_builder_item_in_glob_array() {
+  local e match="$1"
+  shift
+  [[ -z "$match" ]] && return 1
+  for e; do [[ "$match" == $e ]] && return 0; done
+  return 1
+}
+
 
 _builder_item_is_target() {
   local item="$1"
@@ -168,6 +196,8 @@ _builder_failure_trap() {
   local trappedExitCode=$?
   local action target
 
+  _builder_cleanup_deps
+
   # Since 'exit' is also trapped, we can also handle end-of-script incomplete actions.
   if [[ $trappedExitCode == 0 ]]; then
     # While there weren't errors, were there any actions that never reported success or failure?
@@ -187,7 +217,27 @@ _builder_failure_trap() {
       target=:project
     fi
 
-    builder_finish_action failure $action $target
+    builder_finish_action failure $action$target
+
+    # Make 100% sure that the exit code chains fully.
+    # Without this, nested scripts have failed to chain errors from npm calls past the script
+    # that directly executed the failed npm command.
+    exit $trappedExitCode
+  fi
+}
+
+#
+# Removes temporary `_builder_deps_built` file when top-level build script
+# finishes.
+#
+_builder_cleanup_deps() {
+  if ! builder_is_dep_build && [[ ! -z ${_builder_deps_built+x} ]]; then
+    if $_builder_debug; then
+      echo "[DEBUG] Dependencies that were built:"
+      cat "$_builder_deps_built"
+    fi
+    rm -f "$_builder_deps_built"
+    _builder_deps_built=
   fi
 }
 
@@ -200,28 +250,38 @@ _builder_failure_trap() {
 # The string will be set as `_builder_matched_action`, which is for
 # builder.inc.sh internal use, used by `builder_start_action`.
 #
-# Usage:
+# ### Usage
+#
+# ```bash
 #   if build_has_action action[:target]; then ...; fi
+# ````
+#
 # Parameters:
-#   1: action    name of action
-#   2: :target    name of target, :-prefixed, as part of first param or space separated ok
+#   1: action[:target]    name of action:target
 # Example:
-#   if builder_has_action build :app; then  # or build:app, that's fine too.
+#
+# ```bash
+#   if builder_has_action build:app; then ...
+# ```
+#
 builder_has_action() {
   local action="$1" target
 
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
     target=:$target
-  elif [[ -z ${2+x} ]]; then
-    target=:project
   else
-    target="$2"
+    target=':*'
   fi
 
   if _builder_item_in_array "$action$target" "${_builder_chosen_action_targets[@]}"; then
     # To avoid WET re-processing of the $action$target string set
     _builder_matched_action="$action$target"
+    if [[ $target == ':*' ]]; then
+      _builder_matched_action_name="$action"
+    else
+      _builder_matched_action_name="$action$target"
+    fi
     return 0
   else
     _builder_matched_action=
@@ -230,27 +290,52 @@ builder_has_action() {
 }
 
 #
-# Returns 0 if the user has asked to perform action on target on the command line, and
-# then starts the action. Should be paired with builder_finish_action
+# Returns `0` if the user has asked to perform action on target on the command
+# line, and then starts the action. Should be paired with
+# `builder_finish_action`.
 #
-# Usage:
+# ### Usage
+#
+# ```bash
 #   if builder_start_action action[:target]; then ...; fi
-# Parameters:
-#   1: action    name of action
-#   2: :target    name of target, :-prefixed, as part of first param or space separated ok
-# Example:
-#   if builder_start_action build :app; then
-#   if builder_start_action build:app; then
+# ```
+#
+# ### Parameters
+#
+# * 1: `action[:target]`   name of action, and optionally also target, if
+#                          target excluded starts for all defined targets
+#
+# ### Example
+#
+# ```bash
+#   if builder_start_action build:app; then ...
+# ```
 #
 builder_start_action() {
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
-  if builder_has_action $@; then
-    echo "${COLOR_BLUE}## $scope$_builder_matched_action starting...${COLOR_RESET}"
+  if builder_has_action $1; then
+    # In a dependency quick build (the default), determine whether we actually
+    # need to run this step. Uses data passed to builder_describe_outputs to
+    # verify whether a target output is present.
+    if builder_is_dep_build &&
+        ! builder_is_full_dep_build &&
+        [[ ! -z ${_builder_dep_path[$_builder_matched_action]+x} ]] &&
+        [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$_builder_matched_action]}" ]]; then
+      if builder_verbose; then
+        echo "$scope skipping $_builder_matched_action_name, up-to-date"
+      fi
+      return 1
+    fi
+
+    echo "${COLOR_BLUE}## $scope$_builder_matched_action_name starting...${COLOR_RESET}"
     if [ -n "${_builder_current_action}" ]; then
       _builder_warn_if_incomplete
     fi
     _builder_current_action="$_builder_matched_action"
+
+    # Build dependencies as required
+    _builder_do_build_deps "$_builder_matched_action"
     return 0
   else
     return 1
@@ -286,47 +371,130 @@ _builder_trim() {
 }
 
 #
+# Expands an in-repo-relative path to a repo-relative path. A path starting with
+# `/` is expected to be relative to repo root, not filesystem root. Otherwise,
+# it's relative to current script path, not current working directory. The
+# returned path will not have a prefix `/`, and will be relative to
+# `$KEYMAN_ROOT`. Assumes realpath is installed (brew coreutils on macOS).
+#
+_builder_expand_relative_path() {
+  local path="$1"
+  if [[ "$path" =~ ^/ ]]; then
+    echo "${path:1}"
+  else
+    realpath --canonicalize-missing --relative-to="$KEYMAN_ROOT" "$THIS_SCRIPT_PATH/$path"
+  fi
+}
+
+#
+# Expands an `[action][:target]` string, replacing missing values with `*`,
+# for example:
+#
+# * `build` --> `build:*`
+# * `build:app` --> `build:app`
+# * `:app` --> `*:app`
+#
+# Supports multiple action:targets in the string
+#
+_builder_expand_action_target() {
+  local input="$1" target= action=
+  if [[ "$input" =~ : ]]; then
+    action=$(echo "$input" | cut -d: -f 1 -)
+    target=$(echo "$input" | cut -d: -f 2 -)
+  else
+    action=$input
+  fi
+
+  if [[ -z "$action" ]]; then
+    action='*'
+  fi
+  if [[ -z "$target" ]]; then
+    target='*'
+  fi
+
+  echo "$action:$target"
+}
+
+_builder_expand_action_targets() {
+  local input=($1) e output=()
+  for e in "${input[@]}"; do
+    e=`_builder_expand_action_target "$e"`
+    output+=($e)
+  done
+  if [[ ${#output[@]} == 0 ]]; then
+    echo "*:*"
+  else
+    echo "${output[@]}"
+  fi
+}
+
+#
 # Describes a build script, defines available parameters and their meanings. Use
 # together with `builder_parse` to process input parameters.
 #
-# Usage:
+# ### Usage
+#
+# ```bash
 #    builder_describe description param_desc...
-# Parameters:
-#    description   A short description of what the script does
-#    param_desc    Space separated name and description of parameter, e.g.
-#                  "build   Builds the target"
-#                  May be repeated to describe all parameters
+# ```
 #
-# There are three types of parameters that may be specified:
+# ### Parameters
 #
-# * Option, param_desc format: "--option[,-o][=var]   [One line description]"
+#  * `description`  A short description of what the script does.
+#  * `param_desc`   Space separated name and description of parameter, e.g.
+#                   `"build   Builds the target"`
+#                   This parameter may be repeated to describe all parameters.
+#
+# There are four types of parameters that may be specified:
+#
+# * **Option:** `"--option[,-o][=var]   [One line description]"`
+#
 #   All options must have a longhand form with two prefix hyphens,
-#   e.g. --option. The ",-o" shorthand form is optional. When testing if
-#   the option is set with `builder_has_option``, always use the longhand
+#   e.g. `--option`. The `,-o` shorthand form is optional. When testing if
+#   the option is set with `builder_has_option`, always use the longhand
 #   form.
 #
-#   if =var is specified, then the next parameter will be a variable stored
-#   in $var for that option. e.g. --option=opt means $opt will have the value
-#   'foo' when the script is called for --option foo.
+#   if `=var` is specified, then the next parameter will be a variable stored in
+#   `$var` for that option. e.g. `--option=opt` means `$opt` will have the value
+#   `"foo"` when the script is called for `--option foo`.
 #
-# * Action, param_desc format: "action   [One line description]"
-#   Actions must be a single word, lower case. To specify an action
-#   as the default, append a '+' to the action name, e.g.
-#   "test+   Test the project". If there is no default specified, then
-#   it will be 'build'
+# * **Action**: `"action   [One line description]"`
 #
-# * Target, param_desc format: ":target   [One line description]"
-#   A target always starts with colon, e.g. :project.
+#   Actions must be a single word, lower case. To specify an action as the
+#   default, append a `+` to the action name, e.g. `"test+   Test the project"`.
+#   If there is no default specified, then it will be `build`.
+#
+# * **Target:** `":target   [One line description]"`
+#
+#   A target always starts with colon, e.g. `:project`.
+#
+# * **Dependency:** "@/path/to/dependency [action][:target] ..."
+#
+#   A dependency always starts with `@`. The path to the dependency will be
+#   relative to the build script folder, or to the root of the repository, if
+#   the path starts with `/`, not to the root of the file system. It is an error
+#   to specify a dependency outside the repo root.
+#
+#   Relative paths will be expanded to full paths, again, relative to the root
+#   of the repository.
+#
+#   Dependencies may be limited to specific `action:target`. If not specified,
+#   dependencies will be built for all actions on all targets. Either `action`
+#   or `:target` may be omitted, and multiple actions and targets may be
+#   specified, space separated.
 #
 builder_describe() {
   _builder_description="$1"
   _builder_actions=()
   _builder_targets=()
   _builder_options=()
+  _builder_deps=()                    # array of all dependencies for this script
   _builder_default_action=build
   declare -A -g _builder_params
   declare -A -g _builder_options_short
   declare -A -g _builder_options_var
+  declare -A -g _builder_dep_path     # array of output files for action:target pairs
+  declare -A -g _builder_dep_related_actions  # array of action:targets associated with a given dependency
   shift
   # describe each target, action, and option possibility
   while [[ $# -gt 0 ]]; do
@@ -334,12 +502,20 @@ builder_describe() {
     local value="$(echo "$key" | cut -d" " -f 1 -)"
     local description=
     if [[ $key =~ [[:space:]] ]]; then
-      description=$(_builder_trim "$(echo "$key" | cut -d" " -f 2- -)")
+      description="$(_builder_trim "$(echo "$key" | cut -d" " -f 2- -)")"
     fi
 
     if [[ $value =~ ^: ]]; then
       # Parameter is a target
       _builder_targets+=($value)
+    elif [[ $value =~ ^@ ]]; then
+      # Parameter is a dependency
+      local dependency="${value:1}"
+      dependency="`_builder_expand_relative_path "$dependency"`"
+      _builder_deps+=($dependency)
+      # echo "$description"
+      _builder_dep_related_actions[$dependency]="`_builder_expand_action_targets "$description"`"
+      # echo "${_builder_dep_related_actions[$dependency]}"
     elif [[ $value =~ ^-- ]]; then
       # Parameter is an option
       # Look for a shorthand version of the option
@@ -391,6 +567,50 @@ builder_describe() {
     _builder_targets+=(:project)
     _builder_params[\:project]=$(_builder_get_default_description ":project")
   fi
+}
+
+#
+# Defines an output file or folder expected to be present after successful
+# completion of an action for a target. Used to skip actions for dependency
+# builds. If `:target` is not provided, assumes `:project`.
+#
+# Relative paths are relative to script folder; absolute paths are relative
+# to repository root, not filesystem root.
+#
+# ### Usage
+#
+# ```bash
+#   builder_describe_outputs action:target filename [...]
+# ```
+#
+# ### Parameters
+#
+# * 1: `action[:target]`   action and/or target associated with file
+# * 2: `filename`          name of file or folder to check
+# * 3+: ... repeat previous arguments for additional outputs
+#
+# ### Example
+#
+# ```bash
+#   builder_describe_outputs \
+#     configure /node_modules \
+#     build     build/index.js
+# ```
+#
+function builder_describe_outputs() {
+  while [[ $# -gt 0 ]]; do
+    local key="$1" path="$2" action target
+    if [[ $key =~ : ]]; then
+      action="$(echo "$key" | cut -d: -f 1 -)"
+      target=":$(echo "$key" | cut -d: -f 2 -)"
+    else
+      action="$key"
+      target=':*'
+    fi
+    path="`_builder_expand_relative_path "$path"`"
+    _builder_dep_path[$action$target]="$path"
+    shift 2
+  done
 }
 
 _builder_get_default_description() {
@@ -458,6 +678,7 @@ builder_check_color() {
 # Parameters
 #   1: $@         command-line arguments
 builder_parse() {
+  _builder_build_deps=--deps
   builder_verbose=
   builder_extra_params=()
   _builder_chosen_action_targets=()
@@ -546,6 +767,23 @@ builder_parse() {
           _builder_chosen_options+=(--verbose)
           builder_verbose=--verbose
           ;;
+        --deps|--no-deps|--force-deps)
+          _builder_build_deps=$key
+          ;;
+        --builder-dep-parent)
+          # internal use parameter for dependency builds - identifier of parent script
+          shift
+          builder_dep_parent="$1"
+          ;;
+        --builder-deps-built)
+          # internal use parameter for dependency builds - path to dependency tracking file
+          shift
+          _builder_deps_built="$1"
+          ;;
+        --builder-report-dependencies)
+          # internal reporting function, ignores all other parameters
+          _builder_report_dependencies
+          ;;
         *)
           _builder_parameter_error "$0" parameter "$key"
       esac
@@ -569,6 +807,19 @@ builder_parse() {
     for e in "${_builder_chosen_options[@]}"; do
       echo "* $e"
     done
+  fi
+
+  if builder_is_dep_build; then
+    echo "[$THIS_SCRIPT_IDENTIFIER] dependency build, started by $builder_dep_parent"
+    if [[ -z ${_builder_deps_built+x} ]]; then
+      echo "FATAL ERROR: Expected --builder-deps-built parameter"
+      exit 1
+    fi
+  else
+    # This is a top-level invocation, not a dependency build, so we want to
+    # track which dependencies have been built, so they don't get built multiple
+    # times.
+    _builder_deps_built=`mktemp`
   fi
 
   # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
@@ -606,11 +857,16 @@ builder_display_usage() {
 
   program="$(basename "$0")"
   if [[ ! -z ${_builder_description+x} ]]; then
-    echo "$program: $_builder_description"
+    echo "Summary:"
+    echo "  $_builder_description"
     echo
   fi
+  echo "Script Identifier:"
+  echo "  $THIS_SCRIPT_IDENTIFIER"
+  echo
 
-  echo "Usage: $program [options...] [action][:target]..."
+  echo "Usage:"
+  echo "  $program [options...] [action][:target]..."
   echo
   echo "Actions: "
 
@@ -647,7 +903,23 @@ builder_display_usage() {
   _builder_pad $width "  --verbose, -v"  "Verbose logging"
   _builder_pad $width "  --color"        "Force colorized output"
   _builder_pad $width "  --no-color"     "Never use colorized output"
+  if builder_has_dependencies; then
+    _builder_pad $width "  --deps"         "Build dependencies if required (default)"
+    _builder_pad $width "  --no-deps"      "Skip build of dependencies"
+    _builder_pad $width "  --force-deps"   "Reconfigure and rebuild all dependencies"
+  fi
   _builder_pad $width "  --help, -h"     "Show this help"
+
+  echo
+  echo "Dependencies: "
+
+  if builder_has_dependencies; then
+    for d in "${_builder_deps[@]}"; do
+      echo "  $d"
+    done
+  else
+    echo "  This module has no dependencies"
+  fi
 
   # Defined in `builder_use_color`; this assumes that said func has been called.
   local c1=$BUILDER_TERM_START
@@ -662,33 +934,223 @@ builder_display_usage() {
 
 builder_finish_action() {
   local result="$1"
-  local action="$2" target
+  local action="$2" target action_name
 
   if [[ $action =~ : ]]; then
     IFS=: read -r action target <<< $action
-    target=:$target
-  elif [[ -z ${3+x} ]]; then
-    target=:project
+    target=":$target"
   else
-    target="$3"
+    target=':*'
+  fi
+
+  if [[ "$target" == ":*" ]]; then
+    action_name="$action"
+  else
+    action_name="$action$target"
   fi
 
   local scope="[$THIS_SCRIPT_IDENTIFIER] "
 
   if [[ "$action$target" == "${_builder_current_action}" ]]; then
     if [[ $result == success ]]; then
-      echo "${COLOR_GREEN}## $scope$action$target completed successfully${COLOR_RESET}"
+      echo "${COLOR_GREEN}## $scope$action_name completed successfully${COLOR_RESET}"
     elif [[ $result == failure ]]; then
-      echo "${COLOR_RED}## $scope$action$target failed${COLOR_RESET}"
+      echo "${COLOR_RED}## $scope$action_name failed${COLOR_RESET}"
     else
-      echo "${COLOR_RED}## $scope$action$target failed with message: $result${COLOR_RESET}"
+      echo "${COLOR_RED}## $scope$action_name failed with message: $result${COLOR_RESET}"
     fi
 
     # Remove $action$target from the array; it is no longer a current action
     _builder_current_action=
   else
-    echo "${COLOR_YELLOW}## Warning: reporting result of $action$target but the action was never started!${COLOR_RESET}"
+    echo "${COLOR_YELLOW}## Warning: reporting result of $action_name but the action was never started!${COLOR_RESET}"
   fi
+}
+
+#
+# Returns `0` if the dependency should be built for the given action:target
+#
+_builder_should_build_dep() {
+  local action_target="$1"
+  local dep="$2"
+  local related_actions=(${_builder_dep_related_actions[$dep]})
+  # echo "bdra: ${_builder_dep_related_actions[@]}"
+  # echo "target: $action_target"
+  # echo "dep: $2"
+  # echo "ra: ${related_actions[@]}"
+  if ! _builder_item_in_glob_array "$action_target" "${related_actions[@]}"; then
+    return 1
+  fi
+  return 0
+}
+
+#
+# Configure and build all dependencies
+# Later, may restrict by either action or target
+#
+_builder_do_build_deps() {
+  local action_target="$1"
+
+  if [[ $_builder_build_deps == --no-deps ]]; then
+    # we've been asked to skip dependencies
+    return 0
+  fi
+
+  for dep in "${_builder_deps[@]}"; do
+    # Don't attempt to build dependencies that don't match the current
+    # action:target (wildcards supported for matches here)
+    if ! _builder_should_build_dep "$action_target" "$dep"; then
+      echo "[$THIS_SCRIPT_IDENTIFIER] Skipping dependency build $dep for $_builder_matched_action_name"
+      continue
+    fi
+
+    # Only configure and build the dependency once per invocation
+    if builder_has_module_been_built "$dep"; then
+      continue
+    fi
+
+    # TODO: add --debug as a standard builder parameter
+    builder_set_module_has_been_built "$dep"
+    "$KEYMAN_ROOT/$dep/build.sh" configure build \
+      $builder_verbose \
+      $_builder_build_deps \
+      --builder-deps-built "$_builder_deps_built" \
+      --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER"
+  done
+}
+
+#
+# returns `0` if we are in a dependency doing a build.
+#
+builder_is_dep_build() {
+  if [[ ! -z ${builder_dep_parent+x} ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# returns `0` if we should attempt to do quick builds in a dependency build, for
+# example skipping `tsc -b` where a parent may also do it; corresponds to the
+# `--deps` parameter (which is the default).
+#
+builder_is_quick_dep_build() {
+  if builder_is_dep_build && [[ $_builder_build_deps == --deps ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# returns `0` if we should do a full configure and build in a dependency build;
+# corresponds to the `--force-deps`` parameter.
+#
+builder_is_full_dep_build() {
+  if builder_is_dep_build && [[ $_builder_build_deps == --force-deps ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# returns `0` if the current build script has at least one dependency.
+#
+builder_has_dependencies() {
+  if [[ ${#_builder_deps[@]} -eq 0 ]]; then
+    return 1
+  fi
+  return 0
+}
+
+#
+# Tests if a dependency module has been built already in the current script
+# invocation; if not running in a builder context, always returns `1` (i.e.
+# "false").
+#
+# ### Usage
+#
+# ```bash
+# builder_has_module_been_built dependency-name
+# ```
+#
+# ### Parameters
+#
+# * 1: `dependency-name`   the `$SCRIPT_IDENTIFIER` of the dependency
+#                          (repo-relative path without leading `/`); or for
+#                          external dependencies, a path-like starting with
+#                          `/external/`.
+#
+# ### Examples
+#
+# ```bash
+#   if builder_has_module_been_built common/web/keyman-version; then ...
+#   if builder_has_module_been_built /external/npm-ci; then ...
+# ```
+#
+builder_has_module_been_built() {
+  local module="$1"
+
+  if [[ -z ${_builder_deps_built+x} ]]; then
+    # not in a builder context, so we assume a build is needed
+    return 1
+  fi
+
+  if [[ -f $_builder_deps_built ]] && grep -qx "$module" $_builder_deps_built; then
+    # dependency history file contains the dependency module
+    return 0
+  fi
+  return 1
+}
+
+#
+# Updates the dependency module build state for the current script invocation;
+# if not running in a builder context, a no-op.
+#
+# ### Usage
+#
+# ```bash
+#   builder_set_module_has_been_built dependency-name
+# ```
+#
+# ### Parameters
+#
+# * 1: `dependency-name`   the `$SCRIPT_IDENTIFIER` of the dependency
+#                          (repo-relative path without leading `/`); or for
+#                          external dependencies, a path-like starting with
+#                          `/external/`.
+#
+# ### Examples
+#
+# ```bash
+#   builder_set_module_has_been_built common/web/keyman-version
+#   builder_set_module_has_been_built /external/npm-ci
+# ```
+#
+builder_set_module_has_been_built() {
+  local module="$1"
+
+  if [[ ! -z ${_builder_deps_built+x} ]]; then
+    echo "$module" >> $_builder_deps_built
+  fi
+}
+
+#
+# returns `0` if we should be verbose in output
+#
+builder_verbose() {
+  if [[ $builder_verbose == --verbose ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Reports on all described dependencies, then exits
+# used by builder-controls.sh
+#
+_builder_report_dependencies() {
+  echo "${_builder_deps[@]}"
+  exit 0
 }
 
 #

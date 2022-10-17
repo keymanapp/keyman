@@ -143,7 +143,7 @@ namespace com.keyman.dom.targets {
 
     getTextAfterCaret(): string {
       if(!this.hasSelection()) {
-        return;
+        return '';
       }
 
       let caret = this.getCarets().end;

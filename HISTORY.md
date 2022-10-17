@@ -1,5 +1,39 @@
 # Keyman Version History
 
+## 16.0.81 alpha 2022-10-16
+
+* fix(developer): manual attachment for kmw in server (#7457)
+
+## 16.0.80 alpha 2022-10-14
+
+* feat(common): builder script dependency and legacy script report (#7453)
+* chore(linux): Adjust Linux specific files in `.gitignore` (#7451)
+
+## 16.0.79 alpha 2022-10-13
+
+* chore(common/models, web): more script updates (#7392)
+* feat(common): builder dependency support (#7438)
+* chore(common): further tweaks to builder scripts (#7439)
+
+## 16.0.78 alpha 2022-10-12
+
+* fix(linux): Fix reordering of output (#7079)
+* fix(linux): Fix make install (#7434)
+* chore(linux): Add Node.js to the docker container (#7435)
+
+## 16.0.77 alpha 2022-10-10
+
+* fix(web): possible error on change of context to a contextEditable (#7359)
+* chore(web): unit test polishing pass (#7381)
+
+## 16.0.76 alpha 2022-10-06
+
+* chore(linux): Cleanup unnecessary surrogate check (#7396)
+
+## 16.0.75 alpha 2022-10-05
+
+* chore(common): builder script maintenance (#7405)
+
 ## 16.0.74 alpha 2022-10-04
 
 * chore(android/engine): Display Toast notifications on Sentry errors (#7390)
