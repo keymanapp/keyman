@@ -160,7 +160,7 @@ block(elem)                         # struct COMP_KMXPLUS_ELEM {
   00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
                                     # };
 
-  diff(elem,elemNull)               #    KMX_DWORD offset;                 // 0010+ offset from this blob
+  00 00 00 00                       #    KMX_DWORD offset;                 // 0010+ offset from this blob
   sizeof(elemNull,8)                #    KMX_DWORD length;                 // 0014+ str length (ELEMENT units)
 
   diff(elem,elemFinlFrom)           #    KMX_DWORD offset;                 // 0010+ offset from this blob
