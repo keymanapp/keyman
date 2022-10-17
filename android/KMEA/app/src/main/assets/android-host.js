@@ -80,11 +80,10 @@ function setOskHeight(h) {
   if(h > 0) {
     oskHeight = Math.ceil(h / window.devicePixelRatio);
   }
-  var kmw=window['keyman'];
-  if(kmw && kmw.core && kmw.core.activeKeyboard) {
-    kmw.core.activeKeyboard.refreshLayouts();
+  if(keyman && keyman.core && keyman.core.activeKeyboard) {
+    keyman.core.activeKeyboard.refreshLayouts();
   }
-  kmw['correctOSKTextSize']();
+  keyman.correctOSKTextSize();
 }
 
 function setOskWidth(w) {
@@ -125,9 +124,7 @@ function onStateChange(change) {
 // Query KMW if a given keyboard uses chiral modifiers.
 function setIsChiral(keyboardProperties) {
   var name = typeof(keyboardProperties.internalName) == 'undefined' ? keyboardProperties.keyboardName : keyboardProperties.internalName;
-  var kmw=window['keyman'];
-  var isChiral = kmw.isChiral(name);
-
+  var isChiral = keyman.isChiral(name);
   window.jsInterface.setIsChiral(isChiral);
   return true;
 }
@@ -169,8 +166,7 @@ function insertText(dn, s, dr) {
 }
 
 function deregisterModel(modelID) {
-  var kmw=window['keyman'];
-  kmw.modelManager.deregister(modelID);
+  keyman.modelManager.deregister(modelID);
 }
 
 function enableSuggestions(model, mayPredict, mayCorrect) {
@@ -191,21 +187,18 @@ function setBannerOptions(mayPredict) {
 }
 
 function registerModel(model) {
-  var kmw=window['keyman'];
   //window.console.log('registerModel: ' + model);
-  kmw.registerModel(model);
+  keyman.registerModel(model);
 }
 
 function resetContext() {
-  var kmw=window['keyman'];
-  kmw.resetContext();
+  keyman.resetContext();
 }
 
 // Tell KMW to switch to "numeric" layer
 function setNumericLayer() {
-  var kmw=window['keyman'];
-  if (kmw && kmw.core && kmw.core.activeKeyboard) {
-    kmw.setNumericLayer();
+  if (keyman && keyman.core && keyman.core.activeKeyboard) {
+    keyman.setNumericLayer();
   }
 }
 
@@ -339,17 +332,14 @@ function showKeyboard() {
 
 function showHelpBubble() {
   fragmentToggle = (fragmentToggle + 1) % 100;
-  var kmw = window['keyman'];
-  var pos = kmw['touchMenuPos']();
+  var pos = keyman.touchMenuPos();
   window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
 }
 
 function executePopupKey(keyID, keyText) {
-  var kmw=window['keyman'];
-
   // KMW only needs keyID to process the popup key. keyText merely logged to console
   //window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
-  kmw['executePopupKey'](keyID);
+  keyman.executePopupKey(keyID);
 }
 
 function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
@@ -368,8 +358,7 @@ function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
 }
 
 function popupVisible(value) {
-  var kmw=window['keyman'];
-  kmw['popupVisible'](value);
+  keyman['popupVisible'](value);
 }
 
 function toHex(theString) {
