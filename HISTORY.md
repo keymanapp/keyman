@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.82 alpha 2022-10-17
+
+* change(web): now utilizes 'inputMode="none"' on supported touch devices (#7343)
+* chore(web): drops alignInputs, hideInputs (#7360)
+* fix(web): better element inputmode management (#7395)
+* chore(common): `--debug` standard flag for builder (#7462)
+* fix(ios):  Allow Full Access enabled to fix ios 16  invisible keyboard (#7459)
+
 ## 16.0.81 alpha 2022-10-16
 
 * fix(developer): manual attachment for kmw in server (#7457)
