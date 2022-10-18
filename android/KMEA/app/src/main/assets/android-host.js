@@ -358,7 +358,7 @@ function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
 }
 
 function popupVisible(value) {
-  keyman['popupVisible'](value);
+  keyman.popupVisible(value);
 }
 
 function toHex(theString) {
