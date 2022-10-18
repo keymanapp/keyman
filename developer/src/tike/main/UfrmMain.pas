@@ -1171,13 +1171,11 @@ end;
 function TfrmKeymanDeveloper.OpenKMNEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmKeymanWizard);
-    //else Result := OpenEditor(FFileName, TfrmEditor);
 end;
 
 function TfrmKeymanDeveloper.OpenTSVEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmWordlistEditor);
-    //else Result := OpenEditor(FFileName, TfrmEditor);
 end;
 
 function TfrmKeymanDeveloper.OpenModelEditor(FFileName: string): TfrmTikeEditor;
@@ -1213,7 +1211,7 @@ begin
   for i := 0 to FChildWindows.Count - 1 do
     if FChildWindows[i] is TfrmTikeEditor then
       with FChildWindows[i] as TfrmTikeEditor do
-        if SameFileName(FileName, FFileName) then   // I4749
+        if SameFileName(FileName, FFileName) or HasSubFilename(FFileName) then   // I4749
         begin
           Result := Self.FChildWindows[i] as TfrmTikeEditor;
           ShowChild(Result);

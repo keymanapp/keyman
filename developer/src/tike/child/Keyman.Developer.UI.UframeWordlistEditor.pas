@@ -211,7 +211,15 @@ end;
 
 procedure TframeWordlistEditor.FindError(const Filename: string; s: string; line: Integer);
 begin
-  //
+  if pages.ActivePage <> pageCode then
+  begin
+    if MoveDesignToWordlist then
+      pages.ActivePage := pageCode;
+  end;
+
+  if line > 0 then
+    Dec(line);
+  frameSource.FindError(line);
 end;
 
 function TframeWordlistEditor.GetHelpTopic: string;
