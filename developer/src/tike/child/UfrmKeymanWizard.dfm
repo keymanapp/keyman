@@ -157,7 +157,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     FFFFFFFFFFFF}
   KeyPreview = True
   Position = poDefaultSizeOnly
-  OnKeyUp = FormKeyUp
   ExplicitWidth = 1043
   ExplicitHeight = 831
   PixelsPerInch = 96
@@ -920,7 +919,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
               Text = 'editKeyOutputText'
               OnChange = editKeyOutputTextChange
               OnClick = editKeyOutputTextClick
-              OnKeyDown = editKeyOutputTextKeyDown
               OnKeyUp = editKeyOutputTextKeyUp
             end
             object editKeyOutputCode: TEdit
@@ -932,7 +930,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
               Text = 'editKeyOutputCode'
               OnChange = editKeyOutputCodeChange
               OnClick = editKeyOutputCodeClick
-              OnKeyDown = editKeyOutputTextKeyDown
               OnKeyUp = editKeyOutputTextKeyUp
             end
             object chkSplitCtrlAlt: TCheckBox

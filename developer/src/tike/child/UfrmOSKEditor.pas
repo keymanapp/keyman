@@ -41,6 +41,7 @@ type
     function DoOpenFile: Boolean; override;
   public
     procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
+    procedure ControlKeyPressedAndReleased; override;
   end;
 
 implementation
@@ -51,6 +52,11 @@ uses
 {$R *.dfm}
 
 { TfrmOSKEditor }
+
+procedure TfrmOSKEditor.ControlKeyPressedAndReleased;
+begin
+  frameOSK.ControlKeyPressedAndReleased;
+end;
 
 function TfrmOSKEditor.DoOpenFile: Boolean;
 begin

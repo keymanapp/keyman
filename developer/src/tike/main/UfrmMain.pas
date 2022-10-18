@@ -304,9 +304,12 @@ type
     procedure mnuToolsClick(Sender: TObject);
     procedure mnuToolsDebugTestsCompilerExceptionTestClick(Sender: TObject);
     procedure mnuToolsDebugTestsShowDebuggerEventsPanelClick(Sender: TObject);
+    procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
 
   private
     AppStorage: TJvAppRegistryStorage;
+
+    FControlDown: Boolean;
 
     FCharMapSettings: TCharMapSettings;
     FDropTarget: TDropTarget;
@@ -824,6 +827,25 @@ begin
       mHHelp.HelpTopic(s);
   end;
   Result := True;
+end;
+
+procedure TfrmKeymanDeveloper.ApplicationEvents1Message(var Msg: tagMSG;
+  var Handled: Boolean);
+var
+  state: Boolean;
+begin
+  Handled := False;
+  if (Msg.message = WM_KEYDOWN) or (Msg.message = WM_SYSKEYDOWN) or
+    (Msg.message = WM_KEYUP) or (Msg.message = WM_SYSKEYUP) then
+  begin
+    state := (Msg.message = WM_KEYDOWN) and (Msg.wParam = VK_CONTROL) and
+      (GetKeyState(VK_SHIFT) >= 0) and (GetKeyState(VK_MENU) >= 0);
+    if not state and FControlDown and Assigned(ActiveEditor) and (Msg.wParam = VK_CONTROL) then
+    begin
+      ActiveEditor.ControlKeyPressedAndReleased;
+    end;
+    FControlDown := state;
+  end;
 end;
 
 procedure TfrmKeymanDeveloper.AppOnActivate(Sender: TObject);
