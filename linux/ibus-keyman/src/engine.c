@@ -3,7 +3,7 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009-2020 SIL International
+ * Copyright (C) 2009-2022 SIL International
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -98,55 +98,55 @@ struct _IBusKeymanEngineClass {
 };
 
 /* functions prototype */
-static void	ibus_keyman_engine_class_init	    (IBusKeymanEngineClass    *klass);
-static void	ibus_keyman_engine_init		    (IBusKeymanEngine		    *keyman);
-static GObject*
-            ibus_keyman_engine_constructor    (GType                   type,
-                                             guint                   n_construct_params,
-                                             GObjectConstructParam  *construct_params);
-static void	ibus_keyman_engine_destroy		(IBusKeymanEngine		    *keyman);
-static gboolean
-			ibus_keyman_engine_process_key_event
-                                            (IBusEngine             *engine,
-                                             guint               	 keyval,
-                                             guint               	 keycode,
-                                             guint               	 state);
-static void ibus_keyman_engine_focus_in       (IBusEngine             *engine);
-static void ibus_keyman_engine_focus_out      (IBusEngine             *engine);
-static void ibus_keyman_engine_reset          (IBusEngine             *engine);
-static void ibus_keyman_engine_enable         (IBusEngine             *engine);
-static void ibus_keyman_engine_disable        (IBusEngine             *engine);
-static void ibus_keyman_engine_set_surrounding_text(
-                                             IBusEngine               *engine,
-                                             IBusText                  *text,
-                                             guint                     cursor_pos,
-                                             guint                     anchor_pos);
-// static void ibus_keyman_engine_set_cursor_location (IBusEngine             *engine,
-//                                              gint                    x,
-//                                              gint                    y,
-//                                              gint                    w,
-//                                              gint                    h);
-static void ibus_keyman_engine_set_capabilities(
-                                            IBusEngine             *engine,
-                                             guint                   caps);
-// static void ibus_keyman_engine_page_up        (IBusEngine             *engine);
-// static void ibus_keyman_engine_page_down      (IBusEngine             *engine);
-// static void ibus_keyman_engine_cursor_up      (IBusEngine             *engine);
-// static void ibus_keyman_engine_cursor_down    (IBusEngine             *engine);
+static void	ibus_keyman_engine_class_init (IBusKeymanEngineClass  *klass);
+static void	ibus_keyman_engine_init       (IBusKeymanEngine       *keyman);
+static GObject* ibus_keyman_engine_constructor
+                                          (GType                   type,
+                                           guint                   n_construct_params,
+                                           GObjectConstructParam  *construct_params);
+static void	ibus_keyman_engine_destroy    (IBusKeymanEngine       *keyman);
+static gboolean ibus_keyman_engine_process_key_event
+                                          (IBusEngine             *engine,
+                                           guint                   keyval,
+                                           guint                   keycode,
+                                           guint                   state);
+static void ibus_keyman_engine_focus_in   (IBusEngine             *engine);
+static void ibus_keyman_engine_focus_out  (IBusEngine             *engine);
+static void ibus_keyman_engine_reset      (IBusEngine             *engine);
+static void ibus_keyman_engine_enable     (IBusEngine             *engine);
+static void ibus_keyman_engine_disable    (IBusEngine             *engine);
+static void ibus_keyman_engine_set_surrounding_text
+                                          (IBusEngine             *engine,
+                                           IBusText               *text,
+                                           guint                   cursor_pos,
+                                           guint                   anchor_pos);
+// static void ibus_keyman_engine_set_cursor_location
+//                                           (IBusEngine             *engine,
+//                                            guint                   x,
+//                                            guint                   y,
+//                                            guint                   w,
+//                                            guint                   h);
+static void ibus_keyman_engine_set_capabilities
+                                          (IBusEngine             *engine,
+                                           guint                   caps);
+// static void ibus_keyman_engine_page_up    (IBusEngine             *engine);
+// static void ibus_keyman_engine_page_down  (IBusEngine             *engine);
+// static void ibus_keyman_engine_cursor_up  (IBusEngine             *engine);
+// static void ibus_keyman_engine_cursor_down(IBusEngine             *engine);
 static void ibus_keyman_engine_property_activate
-                                            (IBusEngine             *engine,
-                                             const gchar            *prop_name,
-                                             guint                   prop_state);
+                                          (IBusEngine             *engine,
+                                           const gchar            *prop_name,
+                                           guint                   prop_state);
 static void ibus_keyman_engine_property_show
-											(IBusEngine             *engine,
-                                             const gchar            *prop_name);
+                                          (IBusEngine             *engine,
+                                           const gchar            *prop_name);
 static void ibus_keyman_engine_property_hide
-											(IBusEngine             *engine,
-                                             const gchar            *prop_name);
+                                          (IBusEngine             *engine,
+                                           const gchar            *prop_name);
 
 static void ibus_keyman_engine_commit_string
-                                            (IBusKeymanEngine         *keyman,
-                                             const gchar            *string);
+                                          (IBusKeymanEngine       *keyman,
+                                           const gchar            *string);
 
 static IBusEngineClass *parent_class = NULL;
 
@@ -946,10 +946,10 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
 }
 
 // static void ibus_keyman_engine_set_cursor_location (IBusEngine             *engine,
-//                                              gint                    x,
-//                                              gint                    y,
-//                                              gint                    w,
-//                                              gint                    h)
+//                                              guint                    x,
+//                                              guint                    y,
+//                                              guint                    w,
+//                                              guint                    h)
 // {
 //     g_message("ibus_keyman_engine_set_cursor_location");
 //     //ibus_keyman_engine_reset(engine);
