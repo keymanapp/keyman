@@ -9,7 +9,7 @@ Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are funct
 @@expected: y\u0020xd\u0020xeq\u0020m
 
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="en" conformsTo="techpreview">
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
 
