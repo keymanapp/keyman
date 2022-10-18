@@ -94,17 +94,17 @@ struct _IBusKeymanEngine {
 };
 
 struct _IBusKeymanEngineClass {
-	IBusEngineClass parent;
+  IBusEngineClass parent;
 };
 
 /* functions prototype */
-static void	ibus_keyman_engine_class_init (IBusKeymanEngineClass  *klass);
-static void	ibus_keyman_engine_init       (IBusKeymanEngine       *keyman);
+static void ibus_keyman_engine_class_init (IBusKeymanEngineClass  *klass);
+static void ibus_keyman_engine_init       (IBusKeymanEngine       *keyman);
 static GObject* ibus_keyman_engine_constructor
                                           (GType                   type,
                                            guint                   n_construct_params,
                                            GObjectConstructParam  *construct_params);
-static void	ibus_keyman_engine_destroy    (IBusKeymanEngine       *keyman);
+static void ibus_keyman_engine_destroy    (IBusKeymanEngine       *keyman);
 static gboolean ibus_keyman_engine_process_key_event
                                           (IBusEngine             *engine,
                                            guint                   keyval,
@@ -153,28 +153,28 @@ static IBusEngineClass *parent_class = NULL;
 GType
 ibus_keyman_engine_get_type (void)
 {
-	static GType type = 0;
+  static GType type = 0;
 
-	static const GTypeInfo type_info = {
-		sizeof (IBusKeymanEngineClass),
-		(GBaseInitFunc)		NULL,
-		(GBaseFinalizeFunc) NULL,
-		(GClassInitFunc)	ibus_keyman_engine_class_init,
-		NULL,
-		NULL,
-		sizeof (IBusKeymanEngine),
-		0,
-		(GInstanceInitFunc)	ibus_keyman_engine_init,
-	};
+  static const GTypeInfo type_info = {
+    sizeof (IBusKeymanEngineClass),
+    (GBaseInitFunc)  NULL,
+    (GBaseFinalizeFunc) NULL,
+    (GClassInitFunc) ibus_keyman_engine_class_init,
+    NULL,
+    NULL,
+    sizeof (IBusKeymanEngine),
+    0,
+    (GInstanceInitFunc) ibus_keyman_engine_init,
+  };
 
-	if (type == 0) {
-		type = g_type_register_static (IBUS_TYPE_ENGINE,
-									   "IBusKeymanEngine",
-									   &type_info,
-									   (GTypeFlags) 0);
-	}
+  if (type == 0) {
+    type = g_type_register_static (IBUS_TYPE_ENGINE,
+                     "IBusKeymanEngine",
+                     &type_info,
+                     (GTypeFlags) 0);
+  }
 
-	return type;
+  return type;
 }
 
 static void
