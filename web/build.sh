@@ -179,7 +179,6 @@ minify ( ) {
     assert_exists "$OUTPUT_SOURCEMAP"
 
     # "Clean" the minified output sourcemaps.
-    echo "node $minified_sourcemap_cleaner $INPUT_SOURCEMAP $OUTPUT_SOURCEMAP $cleanerOptions"
     node $minified_sourcemap_cleaner "$INPUT_SOURCEMAP" "$OUTPUT_SOURCEMAP" $cleanerOptions
 }
 
