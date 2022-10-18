@@ -64,6 +64,7 @@ builder_describe "Builds Keyman Engine for Web." \
   "@../../common/web/keyman-version build:embed build:web build:ui" \
   "@../../common/web/input-processor build:embed build:web" \
   "@../../common/web/lm-worker build:embed build:web" \
+  "@../tools/sourcemap-root build:embed build:web" \
   "clean" \
   "configure" \
   "build" \
@@ -260,12 +261,6 @@ if builder_start_action configure; then
       echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
       exit 1
     fi
-
-    # Also, build our sourcemap-root tool for cleaning up the minified version's sourcemaps.
-    # TODO:  give it its own builder script, make it a dependency
-    echo "Compiling build tools for minified build products"
-    $compiler --build "source/$minified_sourcemap_cleaner/tsconfig.json"
-    assert_exists "$minified_sourcemap_cleaner/index.js"
   fi
 
   builder_finish_action success configure
