@@ -13,30 +13,29 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
-
-# Note:  common/web/recorder is only needed for :recorder, but the builder can't do target-only dependencies yet.
 
 builder_describe "Builds the Keyman Engine for Web's development & unit-testing tools" \
   "@../../common/web/keyman-version" \
   "@../../common/web/keyboard-processor" \
-  "@../../common/web/recorder" \
+  "@../../common/web/recorder     :recorder" \
   "clean" \
   "configure" \
   "build" \
-  ":device     Builds the device-detect submodule" \
-  ":recorder   Builds the KMW recorder submodule for development of unit-test resources" \
-  ":wrappers   Builds the submodule for isolated testing of the outputTarget wrappers for various elements"
+  ":device-detect      Builds the device-detect submodule" \
+  ":recorder           Builds the KMW recorder submodule for development of unit-test resources" \
+  ":element-wrappers   Builds the submodule for isolated testing of the outputTarget wrappers for various elements"
 
 builder_describe_outputs \
-  configure:device   /node_modules \
-  configure:recorder /node_modules \
-  configure:wrapper  /node_modules \
-  build:device       device-detect/build/index.js \
-  build:recorder     recorder/build/index.js \
-  build:wrappers     element-wrappers/build/index.js
+  configure                   /node_modules \
+  configure:device-detect     /node_modules \
+  configure:recorder          /node_modules \
+  configure:element-wrappers  /node_modules \
+  build:device-detect         device-detect/build/index.js \
+  build:recorder              recorder/build/index.js \
+  build:element-wrappers      element-wrappers/build/index.js
 
 builder_parse "$@"
 
@@ -49,9 +48,9 @@ fi
 
 ### CLEAN ACTIONS
 
-if builder_start_action clean:device; then
+if builder_start_action clean:device-detect; then
   rm -rf device-detect/build/
-  builder_finish_action success clean:device
+  builder_finish_action success clean:device-detect
 fi
 
 if builder_start_action clean:recorder; then
@@ -59,17 +58,17 @@ if builder_start_action clean:recorder; then
   builder_finish_action success clean:recorder
 fi
 
-if builder_start_action clean:wrappers; then
+if builder_start_action clean:element-wrappers; then
   rm -rf element-wrappers/build/
-  builder_finish_action success clean:wrappers
+  builder_finish_action success clean:element-wrappers
 fi
 
 ### BUILD ACTIONS
 
-if builder_start_action build:device; then
+if builder_start_action build:device-detect; then
   npm run tsc -- -b tools/device-detect/tsconfig.json
 
-  builder_finish_action success build:device
+  builder_finish_action success build:device-detect
 fi
 
 if builder_start_action build:recorder; then
@@ -78,8 +77,8 @@ if builder_start_action build:recorder; then
   builder_finish_action success build:recorder
 fi
 
-if builder_start_action build:wrappers; then
+if builder_start_action build:element-wrappers; then
   npm run tsc -- -b tools/element-wrappers/tsconfig.json
 
-  builder_finish_action success build:wrappers
+  builder_finish_action success build:element-wrappers
 fi
