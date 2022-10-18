@@ -337,13 +337,6 @@ function showKeyboard() {
   keyman.correctOSKTextSize();
 }
 
-function showHelpBubble() {
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  var kmw = window['keyman'];
-  var pos = kmw['touchMenuPos']();
-  window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
-}
-
 function executePopupKey(keyID, keyText) {
   var kmw=window['keyman'];
 
