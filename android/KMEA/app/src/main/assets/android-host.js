@@ -25,18 +25,17 @@ function init() {
   //document.body.style.backgroundColor="transparent";
   //window.console.log('Device type = '+device);
   //window.console.log('Keyboard height = '+oskHeight);
-  var kmw=com.keyman.singleton;
-  kmw.init({'app':device,'fonts':'packages/',root:'./'});
-  kmw['util']['setOption']('attachType','manual');
-  kmw['oninserttext'] = insertText;
-  kmw['showKeyboardList'] = showMenu;
-  kmw['menuKeyUp'] = menuKeyUp;
-  kmw['hideKeyboard'] = hideKeyboard;
-  kmw['getOskHeight'] = getOskHeight;
-  kmw['getOskWidth'] = getOskWidth;
-  kmw['beepKeyboard'] = beepKeyboard;
+  keyman.init({'app':device,'fonts':'packages/',root:'./'});
+  keyman['util']['setOption']('attachType','manual');
+  keyman['oninserttext'] = insertText;
+  keyman['showKeyboardList'] = showMenu;
+  keyman['menuKeyUp'] = menuKeyUp;
+  keyman['hideKeyboard'] = hideKeyboard;
+  keyman['getOskHeight'] = getOskHeight;
+  keyman['getOskWidth'] = getOskWidth;
+  keyman['beepKeyboard'] = beepKeyboard;
   var ta = document.getElementById('ta');
-  kmw['setActiveElement'](ta);
+  keyman['setActiveElement'](ta);
 
   ta.readOnly = false;
   checkTextArea();
@@ -45,9 +44,9 @@ function init() {
   com.keyman.osk.Banner.DEFAULT_HEIGHT =
     Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
 
-  kmw.addEventListener('keyboardloaded', setIsChiral);
-  kmw.addEventListener('keyboardchange', setIsChiral);
-  kmw.core.languageProcessor.on('statechange', onStateChange);
+  keyman.addEventListener('keyboardloaded', setIsChiral);
+  keyman.addEventListener('keyboardchange', setIsChiral);
+  keyman.core.languageProcessor.on('statechange', onStateChange);
 
   document.body.addEventListener('touchend', loadDefaultKeyboard);
 
@@ -67,13 +66,12 @@ function notifyHost(event, params) {
 
 // Update the KMW banner height
 function setBannerHeight(h) {
-  var kmw=com.keyman.singleton;
   if (h > 0) {
-    var osk = kmw.osk;
+    var osk = keyman.osk;
     osk.banner.height = Math.ceil(h / window.devicePixelRatio);
   }
   // Refresh KMW OSK
-  kmw.correctOSKTextSize();
+  keyman.correctOSKTextSize();
 }
 
 function setOskHeight(h) {
@@ -346,7 +344,7 @@ function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
   console_debug('executeHardwareKeystroke(code='+code+',shift='+shift+',lstates='+lstates+',eventModifiers='+eventModifiers+')');
   try {
     executingHardwareKeystroke = true;
-    if (window.keyman.executeHardwareKeystroke(code, shift, lstates)) { // false if matched, true if not
+    if (keyman.executeHardwareKeystroke(code, shift, lstates)) { // false if matched, true if not
       // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
       window.jsInterface.dispatchKey(code, eventModifiers);
     }
