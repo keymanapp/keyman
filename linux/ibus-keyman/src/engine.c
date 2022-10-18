@@ -115,34 +115,34 @@ static void ibus_keyman_engine_focus_out  (IBusEngine             *engine);
 static void ibus_keyman_engine_reset      (IBusEngine             *engine);
 static void ibus_keyman_engine_enable     (IBusEngine             *engine);
 static void ibus_keyman_engine_disable    (IBusEngine             *engine);
-static void ibus_keyman_engine_set_surrounding_text
-                                          (IBusEngine             *engine,
-                                           IBusText               *text,
-                                           guint                   cursor_pos,
-                                           guint                   anchor_pos);
+// static void ibus_keyman_engine_set_surrounding_text
+//                                           (IBusEngine             *engine,
+//                                            IBusText               *text,
+//                                            guint                   cursor_pos,
+//                                            guint                   anchor_pos);
 // static void ibus_keyman_engine_set_cursor_location
 //                                           (IBusEngine             *engine,
 //                                            guint                   x,
 //                                            guint                   y,
 //                                            guint                   w,
 //                                            guint                   h);
-static void ibus_keyman_engine_set_capabilities
-                                          (IBusEngine             *engine,
-                                           guint                   caps);
+// static void ibus_keyman_engine_set_capabilities
+//                                           (IBusEngine             *engine,
+//                                            guint                   caps);
 // static void ibus_keyman_engine_page_up    (IBusEngine             *engine);
 // static void ibus_keyman_engine_page_down  (IBusEngine             *engine);
 // static void ibus_keyman_engine_cursor_up  (IBusEngine             *engine);
 // static void ibus_keyman_engine_cursor_down(IBusEngine             *engine);
-static void ibus_keyman_engine_property_activate
-                                          (IBusEngine             *engine,
-                                           const gchar            *prop_name,
-                                           guint                   prop_state);
-static void ibus_keyman_engine_property_show
-                                          (IBusEngine             *engine,
-                                           const gchar            *prop_name);
-static void ibus_keyman_engine_property_hide
-                                          (IBusEngine             *engine,
-                                           const gchar            *prop_name);
+// static void ibus_keyman_engine_property_activate
+//                                           (IBusEngine             *engine,
+//                                            const gchar            *prop_name,
+//                                            guint                   prop_state);
+// static void ibus_keyman_engine_property_show
+//                                           (IBusEngine             *engine,
+//                                            const gchar            *prop_name);
+// static void ibus_keyman_engine_property_hide
+//                                           (IBusEngine             *engine,
+//                                            const gchar            *prop_name);
 
 static void ibus_keyman_engine_commit_string
                                           (IBusKeymanEngine       *keyman,
@@ -195,7 +195,7 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
     engine_class->enable = ibus_keyman_engine_enable;
     engine_class->disable = ibus_keyman_engine_disable;
 
-    engine_class->set_surrounding_text = ibus_keyman_engine_set_surrounding_text;
+    // engine_class->set_surrounding_text = ibus_keyman_engine_set_surrounding_text;
     // engine_class->set_cursor_location = ibus_keyman_engine_set_cursor_location;
 
 
@@ -208,7 +208,7 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
     // engine_class->cursor_up = ibus_keyman_engine_cursor_up;
     // engine_class->cursor_down = ibus_keyman_engine_cursor_down;
 
-    engine_class->property_activate = ibus_keyman_engine_property_activate;
+    // engine_class->property_activate = ibus_keyman_engine_property_activate;
 }
 
 static gchar *get_current_context_text(km_kbp_context *context)
@@ -927,23 +927,23 @@ ibus_keyman_engine_process_key_event(
   return TRUE;
 }
 
-static void
-ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
-                                            IBusText    *text,
-                                            guint       cursor_pos,
-                                            guint       anchor_pos)
-{
-    gchar *surrounding_text;
-    guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
-    if (cursor_pos != anchor_pos){
-        g_message("%s: There is a selection", __FUNCTION__);
-    }
-    parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
-    surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
-    g_message("%s: surrounding context is:%u:%s:", __FUNCTION__, cursor_pos - context_start, surrounding_text);
-    g_free(surrounding_text);
-    reset_context(engine);
-}
+// static void
+// ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
+//                                             IBusText    *text,
+//                                             guint       cursor_pos,
+//                                             guint       anchor_pos)
+// {
+//     gchar *surrounding_text;
+//     guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
+//     if (cursor_pos != anchor_pos){
+//         g_message("%s: There is a selection", __FUNCTION__);
+//     }
+//     parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
+//     surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
+//     g_message("%s: surrounding context is:%u:%s:", __FUNCTION__, cursor_pos - context_start, surrounding_text);
+//     g_free(surrounding_text);
+//     reset_context(engine);
+// }
 
 // static void ibus_keyman_engine_set_cursor_location (IBusEngine             *engine,
 //                                              guint                    x,
@@ -1059,13 +1059,11 @@ ibus_keyman_engine_disable (IBusEngine *engine)
 //     reset_context(engine);
 // }
 
-static void
-ibus_keyman_engine_property_activate (IBusEngine  *engine,
-                                    const gchar *prop_name,
-                                    guint        prop_state)
-{
-    g_message("ibus_keyman_engine_property_activate");
-    parent_class->property_activate (engine, prop_name, prop_state);
-}
-
-
+// static void
+// ibus_keyman_engine_property_activate (IBusEngine  *engine,
+//                                     const gchar *prop_name,
+//                                     guint        prop_state)
+// {
+//     g_message("ibus_keyman_engine_property_activate");
+//     parent_class->property_activate (engine, prop_name, prop_state);
+// }
