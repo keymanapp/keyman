@@ -1,5 +1,4 @@
 import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
-import { BkspCompiler } from './bksp.js';
 import CompilerCallbacks from './callbacks.js';
 import CompilerOptions from './compiler-options.js';
 import { KeysCompiler } from './keys.js';
@@ -8,7 +7,7 @@ import { CompilerMessages } from './messages.js';
 import { MetaCompiler } from './meta.js';
 import { NameCompiler } from './name.js';
 import { OrdrCompiler } from './ordr.js';
-import { FinlCompiler, TranCompiler } from './tran.js';
+import { BkspCompiler, FinlCompiler, TranCompiler } from './tran.js';
 import { VkeyCompiler } from './vkey.js';
 
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;

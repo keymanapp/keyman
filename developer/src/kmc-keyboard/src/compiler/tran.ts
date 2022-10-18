@@ -5,6 +5,8 @@ import { SectionCompiler } from "./section-compiler.js";
 
 import Finl = KMXPlus.Finl;
 import FinlItem = KMXPlus.FinlItem;
+import Bksp = KMXPlus.Bksp;
+import BkspItem = KMXPlus.BkspItem;
 import GlobalSections = KMXPlus.GlobalSections;
 import Tran = KMXPlus.Tran;
 import TranItem = KMXPlus.TranItem;
@@ -13,7 +15,7 @@ import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
 
-type TransformCompilerType = 'simple' | 'final';
+type TransformCompilerType = 'simple' | 'final' | 'backspace';
 
 class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran, TranItemBase extends TranItem> extends SectionCompiler {
 
@@ -98,5 +100,21 @@ export class FinlCompiler extends TransformCompiler<'final', Finl, FinlItem> {
   }
   public get id() {
     return constants.section.finl;
+  }
+};
+
+export class BkspCompiler extends TransformCompiler<'backspace', Bksp, BkspItem> {
+  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
+    super(source, callbacks);
+    this.type = 'backspace';
+  }
+  protected newTranItem(): BkspItem {
+    return new BkspItem();
+  }
+  protected newTran(): Bksp {
+    return new Bksp();
+  }
+  public get id() {
+    return constants.section.bksp;
   }
 };

@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { BkspCompiler } from '../src/compiler/bksp.js';
+import { BkspCompiler } from '../src/compiler/tran.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 

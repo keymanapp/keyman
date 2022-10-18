@@ -32,7 +32,6 @@ export default class LDMLKeyboardXMLSourceFileReader {
       }
     }
     boxXmlArray(source?.keyboard?.reorders, 'reorder');
-    boxXmlArray(source?.keyboard?.backspaces, 'backspace');
     return source;
   }
 
