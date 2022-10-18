@@ -9,7 +9,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -26,12 +26,12 @@ UI="ui"
 WEB="web"
 EMBEDDED="embedded"
 
-WEB_OUTPUT="../release/web"
-EMBED_OUTPUT="../release/embedded"
-WEB_OUTPUT_NO_MINI="../release/unminified/web"
-EMBED_OUTPUT_NO_MINI="../release/unminified/embedded"
-INTERMEDIATE="../intermediate"
-SOURCE="."
+WEB_OUTPUT="release/web"
+EMBED_OUTPUT="release/embedded"
+WEB_OUTPUT_NO_MINI="release/unminified/web"
+EMBED_OUTPUT_NO_MINI="release/unminified/embedded"
+INTERMEDIATE="intermediate"
+SOURCE="source"
 NODE_SOURCE="source"
 
 SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
@@ -42,13 +42,13 @@ readonly SOURCE
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
-PATH="../../node_modules/.bin:$PATH"
+PATH="../node_modules/.bin:$PATH"
 
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
-PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
-PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
+PREDICTIVE_TEXT_SOURCE="../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
+PREDICTIVE_TEXT_OUTPUT="testing/prediction-ui/simple-en-trie.js"
 
 builder_check_color "$@"
 
@@ -61,10 +61,10 @@ DOC_BUILD_EMBED_WEB="${BUILDER_TERM_START}build:embed${BUILDER_TERM_END} and ${B
 DOC_TEST_SYMBOL="actions -${BUILDER_TERM_START}test${BUILDER_TERM_END}, ${BUILDER_TERM_START}upload-symbols${BUILDER_TERM_END}"
 
 builder_describe "Builds Keyman Engine for Web." \
-  "@../../common/web/keyman-version build:embed build:web build:ui" \
-  "@../../common/web/input-processor build:embed build:web" \
-  "@../../common/web/lm-worker build:embed build:web" \
-  "@../tools/sourcemap-root build:embed build:web" \
+  "@../common/web/keyman-version build:embed build:web build:ui" \
+  "@../common/web/input-processor build:embed build:web" \
+  "@../common/web/lm-worker build:embed build:web" \
+  "@tools/sourcemap-root build:embed build:web" \
   "clean" \
   "configure" \
   "build" \
@@ -81,12 +81,12 @@ builder_describe "Builds Keyman Engine for Web." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure         ../../node_modules \
-  configure:embed   ../../node_modules \
-  configure:web     ../../node_modules \
-  configure:ui      ../../node_modules \
-  configure:samples ../../node_modules \
-  configure:tools   ../../node_modules \
+  configure         ../node_modules \
+  configure:embed   ../node_modules \
+  configure:web     ../node_modules \
+  configure:ui      ../node_modules \
+  configure:samples ../node_modules \
+  configure:tools   ../node_modules \
   build:embed       $EMBED_OUTPUT/keyman.js \
   build:web         $WEB_OUTPUT/keymanweb.js \
   build:ui          $WEB_OUTPUT/kmwuibutton.js \
@@ -102,7 +102,7 @@ WEB_TARGET=( "keymanweb.js" )
 UI_TARGET=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
 EMBED_TARGET=( "keyman.js" )
 
-: ${CLOSURECOMPILERPATH:=../../node_modules/google-closure-compiler-java}
+: ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler-java}
 : ${JAVA:=java}
 
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
@@ -132,7 +132,7 @@ minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_wa
 readonly minifier
 readonly minifycmd
 
-minified_sourcemap_cleaner="../tools/sourcemap-root"
+minified_sourcemap_cleaner="tools/sourcemap-root"
 
 # Fails the build if a specified file does not exist.
 assert_exists ( ) {
@@ -268,8 +268,8 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action clean; then
-  rm -rf "../release/"
-  rm -rf "../intermediate/"
+  rm -rf "release/"
+  rm -rf "intermediate/"
   builder_finish_action success clean
 fi
 
@@ -280,7 +280,7 @@ if builder_start_action clean:samples; then
 fi
 
 if builder_start_action clean:tools; then
-  ../tools/build.sh clean
+  tools/build.sh clean
 
   builder_finish_action success clean:tools
 fi
@@ -458,15 +458,15 @@ if builder_start_action build:ui; then
 fi
 
 if builder_start_action build:tools; then
-  ../tools/build.sh
+  tools/build.sh
   builder_finish_action success build:tools
 fi
 
 if builder_start_action test:web; then
   if builder_has_option --all; then
-    ../unit_tests/test.sh
+    unit_tests/test.sh
   else
-    ../unit_tests/test.sh engine
+    unit_tests/test.sh :engine
   fi
 
   builder_finish_action success test:web

@@ -45,7 +45,6 @@ SHLVL=0
 
 KMA_ROOT="$KEYMAN_ROOT/android"
 KMW_ROOT="$KEYMAN_ROOT/web"
-KMW_SOURCE="$KMW_ROOT/source"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
 
 warn ( ) {
@@ -132,7 +131,7 @@ PLATFORM=`uname -s`
 
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
-    cd $KMW_SOURCE
+    cd $KMW_ROOT
 
     ./build.sh $KMWFLAGS
 
