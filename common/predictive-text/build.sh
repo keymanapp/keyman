@@ -41,6 +41,7 @@ builder_describe "Builds the lm-layer module" \
   "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \
+  configure           /node_modules \
   configure:headless  /node_modules \
   configure:browser   /node_modules \
   build:headless      build/headless.js \
@@ -51,6 +52,7 @@ builder_parse "$@"
 ### CONFIGURE ACTIONS
 
 if builder_start_action configure; then
+  echo "pred-text config action"
   verify_npm_setup
   builder_finish_action success configure
 fi
