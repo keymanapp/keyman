@@ -65,7 +65,7 @@ DO_COPY=true
 DO_TEST=true
 NO_DAEMON=false
 DEBUG_BUILD=false
-KMWFLAGS=-embed
+KMWFLAGS="build:embed"
 KMW_PATH=
 
 # Parse args
@@ -89,7 +89,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -debug)
             DEBUG_BUILD=true
-            KMWFLAGS=-debug_embedded
+            KMWFLAGS="$KMWFLAGS --debug"
             KMW_PATH=unminified
             ;;
         -h|-\?)
@@ -106,6 +106,7 @@ done
 # by developer. As it's not CI, the Web artifacts won't exist otherwise...
 # unless the developer manually runs the correct build configuration accordingly.
 if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $UPLOAD_SENTRY == true ]]; then
+    # TODO:  handle the -upload-sentry in its eventual new form
     KMWFLAGS="$KMWFLAGS -upload-sentry"
 fi
 

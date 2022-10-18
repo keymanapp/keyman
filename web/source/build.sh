@@ -81,6 +81,7 @@ builder_describe "Builds Keyman Engine for Web." \
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
+  configure         ../../node_modules \
   configure:embed   ../../node_modules \
   configure:web     ../../node_modules \
   configure:ui      ../../node_modules \

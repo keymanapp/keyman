@@ -156,15 +156,16 @@ update_bundle ( ) {
         cd $KMW_SOURCE
 
         if [ "$CONFIG" == "Debug" ]; then
-          KMWFLAGS="-debug_embedded"
+          KMWFLAGS="configure:embed build:embed --debug"
         else
-          KMWFLAGS="-embed"
+          KMWFLAGS="configure:embed build:embed"
         fi
 
         # Local development optimization - cross-target Sentry uploading when requested
         # by developer.  As it's not CI, the Web artifacts won't exist otherwise...
         # unless the developer manually runs the correct build configuration accordingly.
         if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $UPLOAD_SENTRY == true ]]; then
+          # TODO:  handle the -upload-sentry in its eventual new form
           KMWFLAGS="$KMWFLAGS -upload-sentry"
         fi
 
