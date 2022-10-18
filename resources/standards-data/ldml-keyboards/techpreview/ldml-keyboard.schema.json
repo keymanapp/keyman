@@ -187,7 +187,10 @@
       "additionalProperties": false,
       "properties": {
         "flicks": {
-          "$ref": "#/definitions/flicks"
+          "items": {
+            "$ref": "#/definitions/flicks"
+          },
+          "type": "array"
         },
         "import": {
           "items": {

@@ -22,22 +22,40 @@ if (!data['$id'] && data['id']) {
     delete data['id'];
 }
 
+/**
+ * Turn a schema node from an array into a singleton of the specified type
+ * @param {Object} o
+ */
+function arrayToSingle(o) {
+    if (!o) return;
+    if (o.type === 'array') {
+        o["$ref"] = o.items["$ref"];
+        delete o.items;
+        delete o.type;
+    }
+}
+
+/**
+ * Turn a schema node from a singleton of some type into an array of that type
+ * @param {Object} o
+ */
+function singleToArray(o) {
+    if (!o) return;
+    if (!o.type) {
+        o.items = { "$ref": o["$ref"] };
+        o.type = "array";
+        delete o["$ref"];
+    }
+}
+
 if (data.title.endsWith('ldmlKeyboard.xsd')) {
     if (data?.properties?.keyboard) {
         data.properties.keyboard.type = 'object';
     }
 
-    if (data?.properties?.keyboard?.properties?.vkeys?.type === 'array') {
-        data.properties.keyboard.properties.vkeys["$ref"] = data.properties.keyboard.properties.vkeys.items["$ref"];
-        delete data.properties.keyboard.properties.vkeys.items;
-        delete data.properties.keyboard.properties.vkeys.type;
-    }
-
-    if (!data?.definitions?.keys?.properties?.key?.type) {
-        data.definitions.keys.properties.key.items = { "$ref":  data.definitions.keys.properties.key["$ref"] };
-        data.definitions.keys.properties.key.type = "array";
-        delete data.definitions.keys.properties.key["$ref"];
-    }
+    arrayToSingle(data?.properties?.keyboard?.properties?.vkeys);
+    singleToArray(data?.definitions?.keys?.properties?.key);
+    singleToArray(data?.definitions?.keys?.properties?.flicks);
 }
 
 // Write stuff
