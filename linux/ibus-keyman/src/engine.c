@@ -935,13 +935,12 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
 {
     gchar *surrounding_text;
     guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
-    g_message("ibus_keyman_engine_set_surrounding_text");
     if (cursor_pos != anchor_pos){
-        g_message("ibus_keyman_engine_set_surrounding_text: There is a selection");
+        g_message("%s: There is a selection", __FUNCTION__);
     }
     parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
     surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
-    g_message("surrounding context is:%u:%s:", cursor_pos - context_start, surrounding_text);
+    g_message("%s: surrounding context is:%u:%s:", __FUNCTION__, cursor_pos - context_start, surrounding_text);
     g_free(surrounding_text);
     reset_context(engine);
 }
