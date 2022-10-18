@@ -41,26 +41,26 @@ GIT_DESCRIBE=$(cd "${CLDR_DIR}" && git describe HEAD || echo unknown)
 GIT_SHA=$(cd "${CLDR_DIR}" && git rev-parse HEAD || echo unknown)
 NOW=$(date -u -R)
 
-echo ${CLDR_DIR} - ${GIT_DESCRIBE} - ${GIT_SHA}
+echo "${CLDR_DIR}" - "${GIT_DESCRIBE}" - "${GIT_SHA}"
 echo "---"
 
 cp -v "${DTD_DIR}"/*.dtd "${DTD_DIR}"/*.xsd .
 rsync -av --delete "${IMPORT_DIR}"/ ./import/
 
-echo "{\"sha\": \""${GIT_SHA}"\",\"description\":\""${GIT_DESCRIBE}"\",\"date\":\""${NOW}"\"}" | jq . | tee cldr_info.json
+echo "{\"sha\": \"${GIT_SHA}\",\"description\":\"${GIT_DESCRIBE}\",\"date\":\"${NOW}\"}" | jq . | tee cldr_info.json
 echo "Updated cldr_info.json"
 
 echo "Converting XSD to JSON…"
 
 for xsd in *.xsd;
 do
-    base=$(basename ${xsd} .xsd | tr A-Z a-z | sed -e 's%^ldml%ldml-%g' )
+    base=$(basename "${xsd}" .xsd | tr A-Z a-z | sed -e 's%^ldml%ldml-%g' )
     json=${base}.schema.json
     echo "${xsd} -> ${json}"
-    (cd .. ; npx -p  jgexml xsd2json techpreview/${xsd} techpreview/${json}) || exit
-    echo 'fixup-schema.js' ${json}
-    node fixup-schema.js ${json} || exit
-    mv ${json} tmp.json
-    jq . -S < tmp.json > ${json} || (rm tmp.json ; exit)
+    (cd .. ; npx -p  jgexml xsd2json techpreview/"${xsd}" techpreview/"${json}") || exit
+    echo 'fixup-schema.js' "${json}"
+    node fixup-schema.js "${json}" || exit
+    mv "${json}" tmp.json
+    jq . -S < tmp.json > "${json}" || (rm tmp.json ; exit)
     rm tmp.json
 done
