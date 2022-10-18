@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.83 alpha 2022-10-18
+
+* docs(linux): Update readmes (#7468)
+
 ## 16.0.82 alpha 2022-10-17
 
 * change(web): now utilizes 'inputMode="none"' on supported touch devices (#7343)
