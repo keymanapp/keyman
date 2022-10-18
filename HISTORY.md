@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 15.0.271 stable 2022-10-18
+
+* fix(android/engine):  Standardize language ID in language picker (#7266)
+* chore(linux): Update debian changelog (#7280)
+* chore: improve auto labeling (#7289)
+* fix(web): fixes unintended auto-acceptance of suggestion after reverting (#7312)
+* fix(android/engine): Switch keyboard if uninstalling current one :cherries: (#7304)
+* change(web): rotation polish - OSK reload no longer needed (#7188)
+* fix(ios): Allow Full Access enabled to fix ios 16 invisible keyboard (#7465)
+
 ## 15.0.270 stable 2022-09-12
 
 * chore(linux): Add support for Ubuntu 22.10 "Kinetic Kudu" (#7143)
