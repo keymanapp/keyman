@@ -222,7 +222,7 @@ static gchar *get_current_context_text(km_kbp_context *context)
                             &buf_size);
     }
     km_kbp_context_items_dispose(context_items);
-    g_message("current context is:%lu:%lu:%s:", km_kbp_context_length(context), buf_size, current_context_utf8);
+    g_message("%s: current context is:%lu:%lu:%s:", __FUNCTION__, km_kbp_context_length(context), buf_size, current_context_utf8);
     return current_context_utf8;
 }
 
@@ -334,7 +334,7 @@ ibus_keyman_engine_constructor(
     guint cursor_pos, anchor_pos;
     km_kbp_context_item *context_items;
 
-    g_debug("DAR: ibus_keyman_engine_constructor");
+    g_debug("DAR: %s", __FUNCTION__);
 
     keyman = (IBusKeymanEngine *) G_OBJECT_CLASS (parent_class)->constructor (type,
                                                        n_construct_params,
@@ -343,7 +343,7 @@ ibus_keyman_engine_constructor(
     engine = (IBusEngine *) keyman;
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
-    g_message("DAR: ibus_keyman_engine_constructor %s", engine_name);
+    g_message("DAR: %s %s", __FUNCTION__, engine_name);
 
     keyman->kb_name = NULL;
     keyman->ldmlfile = NULL;
@@ -391,7 +391,7 @@ ibus_keyman_engine_constructor(
 
     // Retrieve keyboard options from DConf
     // TODO: May need unique packageID and keyboard ID
-    g_message("Loading options for kb_name: %s", keyman->kb_name);
+    g_message("%s: Loading options for kb_name: %s", __FUNCTION__, keyman->kb_name);
     GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
     int num_options = g_queue_get_length(queue_options);
 
@@ -455,7 +455,7 @@ ibus_keyman_engine_constructor(
 
     if (status_keyboard != KM_KBP_STATUS_OK)
     {
-        g_warning("problem creating km_kbp_keyboard");
+        g_warning("%s: problem creating km_kbp_keyboard", __FUNCTION__);
     }
 
     km_kbp_status status_state = km_kbp_state_create(keyman->keyboard,
@@ -463,7 +463,7 @@ ibus_keyman_engine_constructor(
                                   &(keyman->state));
     if (status_state != KM_KBP_STATUS_OK)
     {
-        g_warning("problem creating km_kbp_state");
+        g_warning("%s: problem creating km_kbp_state", __FUNCTION__);
     }
     for (int i=0; i < KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1; i++) {
         g_free((km_kbp_cp *)keyboard_opts[i].key);
@@ -483,19 +483,19 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
 {
     const gchar *engine_name;
 
-    g_debug("DAR: ibus_keyman_engine_destroy");
+    g_debug("DAR: %s", __FUNCTION__);
     engine_name = ibus_engine_get_name ((IBusEngine *) keyman);
     g_assert (engine_name);
-    g_message("DAR: ibus_keyman_engine_destroy %s", engine_name);
+    g_message("DAR: %s %s", __FUNCTION__, engine_name);
 
     if (keyman->prop_list) {
-        g_debug("DAR: unref keyman->prop_list");
+        g_debug("DAR: %s: unref keyman->prop_list", __FUNCTION__);
         g_object_unref (keyman->prop_list);
         keyman->prop_list = NULL;
     }
 
     if (keyman->status_prop) {
-        g_debug("DAR: unref keyman->status_prop");
+        g_debug("DAR: %s: unref keyman->status_prop", __FUNCTION__);
         g_object_unref (keyman->status_prop);
         keyman->status_prop = NULL;
     }
@@ -521,7 +521,7 @@ ibus_keyman_engine_commit_string (IBusKeymanEngine *keyman,
                                 const gchar    *string)
 {
     IBusText *text;
-    g_message("DAR: ibus_keyman_engine_commit_string - %s", string);
+    g_message("DAR: %s - %s", __FUNCTION__, string);
     text = ibus_text_new_from_static_string (string);
     g_object_ref_sink(text);
     ibus_engine_commit_text ((IBusEngine *)keyman, text);
@@ -530,7 +530,7 @@ ibus_keyman_engine_commit_string (IBusKeymanEngine *keyman,
 
 static void forward_backspace(IBusKeymanEngine *keyman, unsigned int state)
 {
-    g_message("DAR: forward_backspace %d no keysym state %d", KEYMAN_BACKSPACE, state);
+    g_message("DAR: %s: forward_backspace %d no keysym state %d", __FUNCTION__, KEYMAN_BACKSPACE, state);
     ibus_engine_forward_key_event((IBusEngine *)keyman, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, state);
 }
 
@@ -543,21 +543,21 @@ process_unicode_char_action(
   gchar *utf8   = (gchar *)g_new0(gchar, 12);
   gint numbytes = g_unichar_to_utf8(action_item->character, utf8);
   if (numbytes > 12) {
-    g_error("g_unichar_to_utf8 overflowing buffer");
+    g_error("%s: g_unichar_to_utf8 overflowing buffer", __FUNCTION__);
     g_free(utf8);
   } else {
-    g_message("unichar:U+%04x, bytes:%d, string:%s", action_item->character, numbytes, utf8);
+    g_message("%s: unichar:U+%04x, bytes:%d, string:%s", __FUNCTION__, action_item->character, numbytes, utf8);
     if (keyman->commit_item->char_buffer == NULL) {
-      g_message("setting buffer to converted unichar");
+      g_message("%s: setting buffer to converted unichar", __FUNCTION__);
       keyman->commit_item->char_buffer = utf8;
     } else {
-      g_message("appending converted unichar to CHAR buffer");
+      g_message("%s: appending converted unichar to CHAR buffer", __FUNCTION__);
       gchar *new_buffer = g_strjoin("", keyman->commit_item->char_buffer, utf8, NULL);
       g_free(keyman->commit_item->char_buffer);
       g_free(utf8);
       keyman->commit_item->char_buffer = new_buffer;
     }
-    g_message("CHAR buffer is now %s", keyman->commit_item->char_buffer);
+    g_message("%s: CHAR buffer is now %s", __FUNCTION__, keyman->commit_item->char_buffer);
   }
   return TRUE;
 }
@@ -580,32 +580,32 @@ process_backspace_action(
 ) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   if (action_items[i].backspace.expected_type == KM_KBP_IT_MARKER) {
-    g_message("skipping marker type");
+    g_message("%s: skipping marker type", __FUNCTION__);
   } else if (keyman->commit_item->char_buffer != NULL) {
-    g_message("removing one utf8 char from CHAR buffer");
+    g_message("%s: removing one utf8 char from CHAR buffer", __FUNCTION__);
     glong end_pos = g_utf8_strlen(keyman->commit_item->char_buffer, -1);
     gchar *new_buffer;
     if (end_pos == 1) {
       new_buffer = NULL;
-      g_message("resetting CHAR buffer to NULL");
+      g_message("%s: resetting CHAR buffer to NULL", __FUNCTION__);
     } else {
       new_buffer = g_utf8_substring(keyman->commit_item->char_buffer, 0, end_pos - 1);
-      g_message("changing CHAR buffer to :%s:", new_buffer);
+      g_message("%s: changing CHAR buffer to :%s:", __FUNCTION__, new_buffer);
     }
     if (g_strcmp0(keyman->commit_item->char_buffer, new_buffer) == 0) {
-      g_message("oops, CHAR buffer hasn't changed");
+      g_message("%s: oops, CHAR buffer hasn't changed", __FUNCTION__);
     }
     g_free(keyman->commit_item->char_buffer);
     keyman->commit_item->char_buffer = new_buffer;
   } else {
     g_message(
-        "DAR: process_backspace_action - client_capabilities=%x, %x", engine->client_capabilities, IBUS_CAP_SURROUNDING_TEXT);
+        "DAR: %s - client_capabilities=%x, %x", __FUNCTION__, engine->client_capabilities, IBUS_CAP_SURROUNDING_TEXT);
 
     if (client_supports_surrounding_text(engine)) {
-      g_message("deleting surrounding text 1 char");
+      g_message("%s: deleting surrounding text 1 char", __FUNCTION__);
       ibus_engine_delete_surrounding_text(engine, -1, 1);
     } else {
-      g_message("forwarding backspace with reset context");
+      g_message("%s: forwarding backspace with reset context", __FUNCTION__);
       km_kbp_context_item *context_items;
       km_kbp_context_get(km_kbp_state_context(keyman->state), &context_items);
       reset_context(engine);
@@ -631,13 +631,13 @@ process_persist_action(
   memmove(&(keyboard_opts[0]), action_item->option, sizeof(km_kbp_option_item));
   km_kbp_status event_status = km_kbp_state_options_update(keyman->state, keyboard_opts);
   if (event_status != KM_KBP_STATUS_OK) {
-    g_warning("problem saving option for km_kbp_keyboard");
+    g_warning("%s: problem saving option for km_kbp_keyboard", __FUNCTION__);
   }
   g_free(keyboard_opts);
 
   // Put the keyboard option into DConf
   if (action_item->option->key != NULL && action_item->option->value != NULL) {
-    g_message("Saving keyboard option to DConf");
+    g_message("%s: Saving keyboard option to DConf", __FUNCTION__);
     // Load the current keyboard options from DConf
     keyman_put_options_todconf(
         keyman->kb_name, keyman->kb_name, (gchar *)action_item->option->key, (gchar *)action_item->option->value);
@@ -669,7 +669,7 @@ process_capslock_action(
   IBusKeymanEngine *keyman,
   const km_kbp_action_item *action_item
 ) {
-  g_message("**** %s caps-lock", action_item->capsLock ? "Enable" : "Disable");
+  g_message("%s: %s caps-lock", __FUNCTION__, action_item->capsLock ? "Enable" : "Disable");
 
 #ifdef GDK_WINDOWING_X11
   if (keyman->xdisplay) {
@@ -806,7 +806,7 @@ process_actions(
       continue_with_next_action = process_end_action(keyman);
       break;
     default:
-      g_warning("Unknown action %d/%d(%d)", i + 1, (int)num_action_items, action_items[i].type);
+      g_warning("%s: Unknown action %d/%d(%d)", __FUNCTION__, i + 1, (int)num_action_items, action_items[i].type);
     }
     if (!continue_with_next_action)
       return FALSE;
@@ -830,7 +830,7 @@ ibus_keyman_engine_process_key_event(
 
   g_message("-----------------------------------------------------------------------------------------------------------------");
   g_message(
-      "DAR: ibus_keyman_engine_process_key_event - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, supports_prefilter=%d", keyval, keycode,
+      "DAR: %s - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, supports_prefilter=%d", __FUNCTION__, keyval, keycode,
       state, isKeyDown, client_supports_prefilter(engine));
 
   // This keycode is a fake keycode that we send when it's time to commit the text, ensuring the
@@ -858,7 +858,7 @@ ibus_keyman_engine_process_key_event(
   }
 
   if (keycode < 0 || keycode > 255) {
-    g_warning("keycode %d out of range", keycode);
+    g_warning("%s: keycode %d out of range", __FUNCTION__, keycode);
     return FALSE;
   }
 
@@ -873,38 +873,38 @@ ibus_keyman_engine_process_key_event(
   }
   if (state & IBUS_MOD5_MASK) {
     km_mod_state |= KM_KBP_MODIFIER_RALT;
-    g_message("modstate KM_KBP_MODIFIER_RALT from IBUS_MOD5_MASK");
+    g_message("%s: modstate KM_KBP_MODIFIER_RALT from IBUS_MOD5_MASK", __FUNCTION__);
   }
   if (state & IBUS_MOD1_MASK) {
     if (keyman->ralt_pressed) {
       km_mod_state |= KM_KBP_MODIFIER_RALT;
-      g_message("modstate KM_KBP_MODIFIER_RALT from ralt_pressed");
+      g_message("%s: modstate KM_KBP_MODIFIER_RALT from ralt_pressed", __FUNCTION__);
     }
     if (keyman->lalt_pressed) {
       km_mod_state |= KM_KBP_MODIFIER_LALT;
-      g_message("modstate KM_KBP_MODIFIER_LALT from lalt_pressed");
+      g_message("%s: modstate KM_KBP_MODIFIER_LALT from lalt_pressed", __FUNCTION__);
     }
   }
   if (state & IBUS_CONTROL_MASK) {
     if (keyman->rctrl_pressed) {
       km_mod_state |= KM_KBP_MODIFIER_RCTRL;
-      g_message("modstate KM_KBP_MODIFIER_RCTRL from rctrl_pressed");
+      g_message("%s: modstate KM_KBP_MODIFIER_RCTRL from rctrl_pressed", __FUNCTION__);
     }
     if (keyman->lctrl_pressed) {
       km_mod_state |= KM_KBP_MODIFIER_LCTRL;
-      g_message("modstate KM_KBP_MODIFIER_LCTRL from lctrl_pressed");
+      g_message("%s: modstate KM_KBP_MODIFIER_LCTRL from lctrl_pressed", __FUNCTION__);
     }
   }
   if (state & IBUS_LOCK_MASK) {
     km_mod_state |= KM_KBP_MODIFIER_CAPS;
   }
-  g_message("before process key event");
+  g_message("%s: before process key event", __FUNCTION__);
   km_kbp_context *context = km_kbp_state_context(keyman->state);
   g_free(get_current_context_text(context));
-  g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=0x%x", km_mod_state);
+  g_message("DAR: %s - km_mod_state=0x%x", __FUNCTION__, km_mod_state);
   km_kbp_status event_status = km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown);
   context                    = km_kbp_state_context(keyman->state);
-  g_message("after process key event");
+  g_message("%s: after process key event", __FUNCTION__);
   g_free(get_current_context_text(context));
 
   // km_kbp_state_action_items to get action items
@@ -922,7 +922,7 @@ ibus_keyman_engine_process_key_event(
   }
 
   context = km_kbp_state_context(keyman->state);
-  g_message("after processing all actions");
+  g_message("%s: after processing all actions", __FUNCTION__);
   g_free(get_current_context_text(context));
   return TRUE;
 }
@@ -961,7 +961,7 @@ ibus_keyman_engine_focus_in (IBusEngine *engine)
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
-    g_message("ibus_keyman_engine_focus_in");
+    g_message("%s", __FUNCTION__);
     ibus_engine_register_properties (engine, keyman->prop_list);
 
     reset_context(engine);
@@ -973,7 +973,7 @@ ibus_keyman_engine_focus_out (IBusEngine *engine)
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
-    g_message("ibus_keyman_engine_focus_out");
+    g_message("%s", __FUNCTION__);
     km_kbp_context_clear(km_kbp_state_context(keyman->state));
     parent_class->focus_out (engine);
 }
@@ -981,7 +981,7 @@ ibus_keyman_engine_focus_out (IBusEngine *engine)
 static void
 ibus_keyman_engine_reset (IBusEngine *engine)
 {
-    g_message("ibus_keyman_engine_reset");
+    g_message("%s", __FUNCTION__);
     parent_class->reset (engine);
     ibus_keyman_engine_focus_in (engine);
 }
@@ -996,8 +996,7 @@ ibus_keyman_engine_enable (IBusEngine *engine)
 
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
-    g_message("WDG: ibus_keyman_engine_enable %s", engine_name);
-    g_message("enabling surrounding context");
+    g_message("WDG: %s %s: enabling surrounding context", __FUNCTION__, engine_name);
     ibus_engine_get_surrounding_text(engine, NULL, NULL, NULL);
     if (keyman->ldmlfile)
     {
@@ -1017,7 +1016,7 @@ ibus_keyman_engine_disable (IBusEngine *engine)
 
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
-    g_message("WDG: ibus_keyman_engine_disable %s", engine_name);
+    g_message("WDG: %s %s", __FUNCTION__, engine_name);
     ibus_keyman_engine_focus_out (engine);
     // stop owning dbus name com.Keyman
     KeymanService *service = km_service_get_default();
