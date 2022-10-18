@@ -96,7 +96,6 @@
       },
       "required": [
         "chars",
-        "type",
         "name"
       ],
       "type": "object"

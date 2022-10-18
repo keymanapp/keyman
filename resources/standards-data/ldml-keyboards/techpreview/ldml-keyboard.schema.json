@@ -558,10 +558,7 @@
           "type": "string"
         },
         "displays": {
-          "items": {
-            "$ref": "#/definitions/displays"
-          },
-          "type": "array"
+          "$ref": "#/definitions/displays"
         },
         "import": {
           "items": {
