@@ -33,21 +33,17 @@ DATA_DIR="${KEYBOARDS_DIR}/3.0"
 TEST_DIR="${KEYBOARDS_DIR}/test"
 
 # a file to check
-CHECK_1="${DTD_DIR}/ldmlKeyboard.dtd"
-CHECK_2="${DTD_DIR}/ldmlKeyboardTest.dtd"
+CHECK_1="${DTD_DIR}/ldmlKeyboard.dtd"      # Critical, present in prior CLDR
+CHECK_2="${DTD_DIR}/ldmlKeyboardTest.dtd"  # Only in Keyboard 3.0+
 
 if [[ ! -f "${CHECK_1}" ]];
 then
-    echo >&2 "$0: error: ${CHECK_1} did not exist"
-    echo >&2 "$0: error: Is ${CLDR_DIR} a valid cldr keyboard directory?"
-    exit 1
+    die "$0: error: ${CHECK_1} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
 fi
 
 if [[ ! -f "${CHECK_2}" ]];
 then
-    echo >&2 "$0: error: ${CHECK_2} did not exist"
-    echo >&2 "$0: error: Is ${CLDR_DIR} a valid cldr keyboard directory?"
-    exit 1
+    die "$0: error: ${CHECK_2} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
 fi
 
 # collect git info
@@ -63,7 +59,7 @@ rm -rf ./import ./3.0 ./dtd ./test
 # copy over everything
 cp -Rv "${IMPORT_DIR}" "${DATA_DIR}" "${DTD_DIR}" "${TEST_DIR}" .
 
-echo "{\"sha\": \"${GIT_SHA}\",\"description\":\"${GIT_DESCRIBE}\",\"date\":\"${NOW}\"}" | $(JQ) . | tee cldr_info.json
+echo "{\"sha\": \"${GIT_SHA}\",\"description\":\"${GIT_DESCRIBE}\",\"date\":\"${NOW}\"}" | ${JQ} . | tee cldr_info.json
 echo "Updated cldr_info.json"
 
 echo "Converting XSD to JSON…"
@@ -77,6 +73,6 @@ do
     echo 'fixup-schema.js' "${json}"
     node fixup-schema.js "${json}" || die "failed to fixup schema ${json}"
     mv "${json}" tmp.json
-    $(JQ) . -S < tmp.json > "${json}" || (rm tmp.json ; die "failed to transform final schema ${json}")
+    ${JQ} . -S < tmp.json > "${json}" || (rm tmp.json ; die "failed to transform final schema ${json}")
     rm tmp.json
 done
