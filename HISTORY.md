@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 16.0.84 alpha 2022-10-19
+
+* fix(developer): Handle hints and warnings cleanly (#7372)
+* fix(developer): Ctrl key to select key was conflicting with shortcuts (#7430)
+* modify(android/engine): Stop logging if keyboard index not found (#7415)
+* chore(android/engine): Update Keyman references in android-host.js (#7466)
+
 ## 16.0.83 alpha 2022-10-18
 
 * docs(linux): Update readmes (#7468)
