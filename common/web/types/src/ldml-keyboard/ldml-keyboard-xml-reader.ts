@@ -11,6 +11,8 @@ export default class LDMLKeyboardXMLSourceFileReader {
    */
   private boxArrays(source: any) {
     boxXmlArray(source?.keyboard, 'layers');
+    boxXmlArray(source?.keyboard?.displays, 'display');
+    boxXmlArray(source?.keyboard?.displays, 'displayOptions');
     boxXmlArray(source?.keyboard?.names, 'name');
     boxXmlArray(source?.keyboard?.vkeys, 'vkey');
     boxXmlArray(source?.keyboard?.keys, 'key');
@@ -32,7 +34,29 @@ export default class LDMLKeyboardXMLSourceFileReader {
       }
     }
     boxXmlArray(source?.keyboard?.reorders, 'reorder');
+    this.boxImportsAndSpecials(source);
     return source;
+  }
+
+  /**
+   * Recurse over object, boxing up any specials or imports
+   * @param obj any object to be traversed
+   */
+  private boxImportsAndSpecials(obj: any) {
+    if (!obj) return;
+    if (Array.isArray(obj)) {
+      for (const sub of obj) {
+        this.boxImportsAndSpecials(sub);
+      }
+    } else if(typeof obj === 'object') {
+      for (const key of Object.keys(obj)) {
+        if (key === 'special' || key === 'import') {
+          boxXmlArray(obj, key);
+        } else {
+          this.boxImportsAndSpecials(obj[key]);
+        }
+      }
+    }
   }
 
   public validate(source: LDMLKeyboardXMLSourceFile, schemaSource: Buffer): void {
