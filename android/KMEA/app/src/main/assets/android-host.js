@@ -26,16 +26,16 @@ function init() {
   //window.console.log('Device type = '+device);
   //window.console.log('Keyboard height = '+oskHeight);
   keyman.init({'app':device,'fonts':'packages/',root:'./'});
-  keyman['util']['setOption']('attachType','manual');
-  keyman['oninserttext'] = insertText;
-  keyman['showKeyboardList'] = showMenu;
-  keyman['menuKeyUp'] = menuKeyUp;
-  keyman['hideKeyboard'] = hideKeyboard;
-  keyman['getOskHeight'] = getOskHeight;
-  keyman['getOskWidth'] = getOskWidth;
-  keyman['beepKeyboard'] = beepKeyboard;
+  keyman.util.setOption('attachType','manual');
+  keyman.oninserttext = insertText;
+  keyman.showKeyboardList = showMenu;
+  keyman.menuKeyUp = menuKeyUp;
+  keyman.hideKeyboard = hideKeyboard;
+  keyman.getOskHeight = getOskHeight;
+  keyman.getOskWidth = getOskWidth;
+  keyman.beepKeyboard = beepKeyboard;
   var ta = document.getElementById('ta');
-  keyman['setActiveElement'](ta);
+  keyman.setActiveElement(ta);
 
   ta.readOnly = false;
   checkTextArea();
