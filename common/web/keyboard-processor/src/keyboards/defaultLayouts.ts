@@ -11,16 +11,17 @@ namespace com.keyman.keyboards {
   export type KLS = {[layerName: string]: string[]};
 
   // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
-  export type ButtonClass = number|"0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10"
+  export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  export type ButtonClassString = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10";
 
   export type LayoutKey = {
     "id"?: string,
     "text"?: string,
-    "sp"?: ButtonClass,
-    "width"?: string,
+    "sp"?: ButtonClass | ButtonClassString,
+    "width"?: string | number,
     "layer"?: string, // Key derives any modifiers from the value set here if specified, not the actual display layer.
     "nextlayer"?: string,
-    "pad"?: string,
+    "pad"?: string | number,
     "sk"?: LayoutKey[]
   }
 
@@ -73,14 +74,14 @@ namespace com.keyman.keyboards {
 
     // Cross-reference with the ids in osk.setButtonClass.
     static buttonClasses: {[name: string]: ButtonClass} = {
-      'DEFAULT':'0',
-      'SHIFT':'1',
-      'SHIFT-ON':'2',
-      'SPECIAL':'3',
-      'SPECIAL-ON':'4',
-      'DEADKEY':'8',
-      'BLANK':'9',
-      'HIDDEN':'10'
+      'DEFAULT':0,
+      'SHIFT':1,
+      'SHIFT-ON':2,
+      'SPECIAL':3,
+      'SPECIAL-ON':4,
+      'DEADKEY':8,
+      'BLANK':9,
+      'HIDDEN':10
     };
 
     static modifierSpecials = {

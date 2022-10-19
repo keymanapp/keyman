@@ -15,7 +15,6 @@ namespace com.keyman.keyboards {
   };
 
   export class ActiveKey implements LayoutKey {
-
     static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
     static readonly DEFAULT_RIGHT_MARGIN=15; // Padding to right of right-most key, in virtual units
     static readonly DEFAULT_KEY_WIDTH=100;   // Width of a key, if not specified, in virtual units
@@ -23,17 +22,18 @@ namespace com.keyman.keyboards {
     // Defines key defaults
     static readonly DEFAULT_KEY = {
       text: '',
-      width: ActiveKey.DEFAULT_KEY_WIDTH.toString(),
-      sp: '0',
-      pad: ActiveKey.DEFAULT_PAD.toString()
+      width: ActiveKey.DEFAULT_KEY_WIDTH,
+      sp: 0,
+      pad: ActiveKey.DEFAULT_PAD
     };
 
     /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
     id?: string;
 
     // These are fine.
-    width?: string;
-    pad?: string;
+    width?: number;
+    pad?: number;
+
     layer: string;
     displayLayer: string;
     nextlayer: string;
@@ -156,6 +156,12 @@ namespace com.keyman.keyboards {
             key[prop] = dummy[prop];
           }
         }
+      }
+
+      // Coerce not-yet-coerced string-form number properties to their numeric form.
+      // width, pad are already coerced at the layer level (b/c totalWidth calculations)
+      if(typeof key.sp == 'string') {
+        key.sp = Number.parseInt(key.sp, 10) as ButtonClass;
       }
 
       // Ensure subkeys are also properly extended.
@@ -292,7 +298,7 @@ namespace com.keyman.keyboards {
       for(let j=0; j<keys.length; j++) {
         let key=keys[j];
         for(var tp in ActiveKey.DEFAULT_KEY) {
-          if(typeof key[tp] != 'string') {
+          if(typeof key[tp] != 'string' && typeof key[tp] != 'number') {
             key[tp]=ActiveKey.DEFAULT_KEY[tp];
           }
         }
@@ -333,9 +339,10 @@ namespace com.keyman.keyboards {
       // Save each percentage key width as a separate member (do *not* overwrite layout specified width!)
       var keyPercent: number, padPercent: number, totalPercent=0;
       for(let j=0; j<keys.length-1; j++) {
-        keyPercent=parseInt(keys[j]['width'],10)/totalWidth;
+        const key = keys[j] as ActiveKey; // already 'polyfilled' in prior loop
+        keyPercent = key.width/totalWidth;
         keys[j]['widthpc']=keyPercent;
-        padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
+        padPercent = key.pad/totalWidth;
         keys[j]['padpc']=padPercent;
 
         // compute center's default x-coord (used in headless modes)
@@ -346,22 +353,25 @@ namespace com.keyman.keyboards {
       // Allow for right OSK margin (15 layout units)
       let rightMargin = ActiveKey.DEFAULT_RIGHT_MARGIN/totalWidth;
 
-      // If a single key, and padding is negative, add padding to right align the key
-      if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
-        keyPercent=parseInt(keys[0]['width'],10)/totalWidth;
-        keys[0]['widthpc']=keyPercent;
-        keys[0]['padpc']=1-(totalPercent + keyPercent + rightMargin);
+      if(keys.length > 0) {
+        const finalKey = keys[keys.length-1] as ActiveKey;
 
-        // compute center's default x-coord (used in headless modes)
-        setProportions(keys[0] as ActiveKey, padPercent, keyPercent, totalPercent);
-      } else if(keys.length > 0) {
-        let j=keys.length-1;
-        padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
-        keys[j]['padpc']=padPercent;
-        keys[j]['widthpc'] = keyPercent = 1-(totalPercent + padPercent + rightMargin);
+        // If a single key, and padding is negative, add padding to right align the key
+        if(keys.length == 1 && finalKey.pad < 0) {
+          keyPercent = finalKey.width/totalWidth;
+          finalKey['widthpc']=keyPercent;
+          finalKey['padpc']=1-(totalPercent + keyPercent + rightMargin);
 
-        // compute center's default x-coord (used in headless modes)
-        setProportions(keys[j] as ActiveKey, padPercent, keyPercent, totalPercent);
+          // compute center's default x-coord (used in headless modes)
+          setProportions(finalKey, padPercent, keyPercent, totalPercent);
+        } else {
+          padPercent = finalKey.pad/totalWidth;
+          finalKey['padpc']=padPercent;
+          finalKey['widthpc'] = keyPercent = 1-(totalPercent + padPercent + rightMargin);
+
+          // compute center's default x-coord (used in headless modes)
+          setProportions(finalKey, padPercent, keyPercent, totalPercent);
+        }
       }
 
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
@@ -428,16 +438,17 @@ namespace com.keyman.keyboards {
           if(key == null) {
             keys.length = keys.length-1;
           } else {
-            var kw, kp;
-            kw = (typeof key['width'] == 'string' && key['width'] != '') ? parseInt(key['width'],10) : ActiveKey.DEFAULT_KEY_WIDTH;
-            if(isNaN(kw) || kw == 0) kw = ActiveKey.DEFAULT_KEY_WIDTH;
-            key['width'] = kw.toString();
-            kp = (typeof key['pad'] == 'string' && key['pad'] != '') ? parseInt(key['pad'],10) : ActiveKey.DEFAULT_PAD;
-            if(isNaN(kp) || kp == 0) kp = ActiveKey.DEFAULT_PAD;  // KMEW-119
-            key['pad'] = kp.toString();
-            width += kw + kp;
-            //if(typeof key['width'] == 'string' && key['width'] != '') width += parseInt(key['width'],10); else width += DEFAULT_KEY_WIDTH;
-            //if(typeof key['pad'] == 'string' && key['pad'] != '') width += parseInt(key['pad'],10); else width += 5;
+            // Note:  the key has not yet been 'polyfilled'; these _may_ be strings.
+            // We coerce their values to numbers permanently here.
+            if(typeof key.width == 'string') {
+              key.width = parseInt(key.width, 10); // '' => NaN.
+            }
+            width += key.width = (isNaN(key.width as number) ? 0 : key.width) || ActiveKey.DEFAULT_KEY_WIDTH;
+
+            if(typeof key.pad == 'string') {
+              key.pad = parseInt(key.pad, 10);
+            }
+            width += key.pad = (isNaN(key.pad as number) ? 0 : key.pad) || ActiveKey.DEFAULT_PAD;
           }
         }
         if(width > totalWidth) {
@@ -469,7 +480,7 @@ namespace com.keyman.keyboards {
 
       let aLayer = layer as ActiveLayer;
       aLayer.totalWidth = totalWidth;
-      aLayer.defaultKeyProportionalWidth = parseInt(ActiveKey.DEFAULT_KEY.width, 10) / totalWidth;
+      aLayer.defaultKeyProportionalWidth = ActiveKey.DEFAULT_KEY.width / totalWidth;
       aLayer.rowProportionalHeight = 1.0 / rowCount;
       aLayer.keyMap = aLayer.constructKeyMap();
     }
