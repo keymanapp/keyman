@@ -222,7 +222,7 @@
                       <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="../../id" /></xsl:attribute>
                     </div>
                     <div class='qrcode-caption'>
-                      <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>
+                      <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>&#160;
                       <a>
                         <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
                         <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_Link']"/>
@@ -425,7 +425,8 @@
 
       <div class="language-icon"><xsl:value-of select="substring(bcp47code, 1, 2)" /></div>
       <div><xsl:value-of select="langname" /> (<xsl:value-of select="bcp47code" />)</div>
-      <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) > 1">
+      <!-- only provided the hotkeys in the detail drop down, not the modify dialog -->
+      <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) > 1 and $modify=0">
         <div class="hotkey" tabindex = "-1">
           <xsl:for-each select="//KeymanLanguage">
             <xsl:if test="keymankeyboardid=$id and bcp47code=$bcp47code and layoutname=$name">
@@ -445,6 +446,7 @@
       </xsl:if>
       <xsl:if test="$modify = 1">
         <div>
+         <xsl:attribute name="style">margin-left: auto; margin-right: 10px;</xsl:attribute>
           <a>
             <xsl:attribute name="href">keyman:keyboardlanguage_uninstall?id=<xsl:value-of select='../../id'/>&amp;bcp47code=<xsl:value-of select="bcp47code"/></xsl:attribute>
             <img src="/app/cross.png">

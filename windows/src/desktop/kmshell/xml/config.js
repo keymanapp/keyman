@@ -27,7 +27,7 @@ function windowResize()
     eContent.style.top = 0 + 'px';
     eMenu.style.height = (document.body.offsetHeight - eFooter.offsetHeight - eMenu.offsetTop) + 'px';
 
-    var h = (eContent.offsetHeight - 37 - 2) + 'px'; // header height and border height
+    var h = (eContent.offsetHeight - 40 - 2) + 'px'; // header height and border height
     _$('subcontent_keyboards').style.height = h;
     _$('subcontent_options').style.height = h;
     var e = _$('subcontent_hotkeys');
@@ -280,7 +280,6 @@ document.addEventListener("DOMContentLoaded", windowResize);
         state.modify_languages.push({name: name, modify: $(this).hasClass('modify-visible')});
       }
     });
-
     const stateJson = JSON.stringify(state);
     const params = new URLSearchParams(window.location.search);
     const PageTag = params.get('tag');
