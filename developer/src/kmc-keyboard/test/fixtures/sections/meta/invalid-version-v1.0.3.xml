@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <version number="v1.0.3" />
+
+  <names>
+    <name value="meta-minimal" />
+  </names>
+
+  <keys />
+</keyboard>

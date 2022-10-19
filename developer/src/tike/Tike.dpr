@@ -18,7 +18,6 @@ uses
   UfrmKeyTest in 'debug\UfrmKeyTest.pas' {frmKeyTest},
   CompilePackage in '..\common\delphi\compiler\CompilePackage.pas',
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',
-  CRC32 in '..\..\..\common\windows\delphi\general\CRC32.pas',
   UfrmEditor in 'child\UfrmEditor.pas' {frmEditor},
   MenuImgList in '..\common\delphi\components\MenuImgList.pas',
   UfrmSelectKey in 'dialogs\UfrmSelectKey.pas' {frmSelectKey},

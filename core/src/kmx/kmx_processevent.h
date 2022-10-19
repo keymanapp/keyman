@@ -57,7 +57,6 @@ private:
   KMX_BOOL LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
-  PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 #ifdef KMX_64BIT
   LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
 #else
@@ -108,6 +107,10 @@ public:
   KMX_Environment *GetEnvironment();
   KMX_Environment const *GetEnvironment() const;
   INTKEYBOARDINFO const *GetKeyboard() const;
+
+  // Utility function
+public:
+  static PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 };
 
 inline KMX_BOOL KMX_ProcessEvent::IsCapsLockOn(KMX_DWORD modifiers) {
@@ -139,14 +142,24 @@ extern KMX_BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 #define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
 #define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
 #else
-#define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg), ##__VA_ARGS__) : 0)
+#define DebugLog(msg,...) (km::kbp::kmx::ShouldDebug() ? km::kbp::kmx::DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg), ##__VA_ARGS__) : 0)
 #define console_error(msg,...) write_console(TRUE, (msg), ##__VA_ARGS__)
 #define console_log(msg,...) write_console(FALSE, (msg), ##__VA_ARGS__)
 #endif
 
 int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...);
 const char *Debug_VirtualKey(KMX_WORD vk);
+/**
+ * @param s PKMX_WCHAR to output
+ * @param x temporary buffer (0 or 1) to write to
+ * @return pointer to temporary buffer
+ */
 const char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
+/**
+ * @param s std::u16string to output
+ * @param x temporary buffer (0 or 1) to write to
+ * @return pointer to temporary buffer
+ */
 const char *Debug_UnicodeString(std::u16string s, int x = 0);
 const char *Debug_ModifierName(KMX_UINT modifiers);
 

@@ -166,6 +166,7 @@ resources/environment.sh
 /core/VERSION.md
 
 **/node_modules/
+tsconfig.tsbuildinfo
 
 # Windows system files
 Thumbs.db
@@ -174,6 +175,10 @@ Thumbs.db
 # details
 /xcodebuild-scripts.log
 
+#
+# Code coverage tools for JS/TS - nyc and c8
+#
+.nyc_output/
 # Linux packaging related
 /debian/
 /results/

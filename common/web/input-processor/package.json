@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@keymanapp/lexical-model-compiler": "*",
+    "@keymanapp/kmc": "*",
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^11.9.4",
     "chai": "^4.3.4",

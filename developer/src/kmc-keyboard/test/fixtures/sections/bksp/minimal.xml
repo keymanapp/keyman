@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+  <names>
+    <name value="bksp-minimal" />
+  </names>
+
+  <keys />
+
+  <backspaces>
+    <backspace from="្ម" to="" />
+  </backspaces>
+</keyboard>

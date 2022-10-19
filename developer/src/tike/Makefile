@@ -11,6 +11,9 @@ build: version.res manifest.res icons dirs xml xsd pull-core
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tike.exe
     $(COPY) $(WIN32_TARGET_PATH)\tike.exe $(DEVELOPER_PROGRAM)
     $(COPY) kmlmc.cmd $(DEVELOPER_PROGRAM)
+    $(COPY) kmlmi.cmd $(DEVELOPER_PROGRAM)
+    $(COPY) kmlmp.cmd $(DEVELOPER_PROGRAM)
+    $(COPY) kmc.cmd $(DEVELOPER_PROGRAM)
     $(COPY) $(KEYMAN_ROOT)\core\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(DEVELOPER_PROGRAM)
     if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEVELOPER_DEBUGPATH)
 
@@ -31,15 +34,15 @@ pull-core:
     cd $(KEYMAN_ROOT)\core
 !ifdef GIT_BASH_FOR_KEYMAN
 !ifdef DEBUG
-    $(GIT_BASH_FOR_KEYMAN) build.sh --debug
+    $(GIT_BASH_FOR_KEYMAN) build.sh clean:x86 configure:x86 build:x86 --debug
 !else
-    $(GIT_BASH_FOR_KEYMAN) build.sh
+    $(GIT_BASH_FOR_KEYMAN) build.sh clean:x86 configure:x86 build:x86
 !endif
 !else
 !ifdef DEBUG
-    start /wait ./build.sh --debug
+    start /wait ./build.sh clean:x86 configure:x86 build:x86 --debug
 !else
-    start /wait ./build.sh
+    start /wait ./build.sh clean:x86 configure:x86 build:x86
 !endif
 !endif
 

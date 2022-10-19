@@ -1,0 +1,21 @@
+{
+  "extends": "../../../../tsconfig.esm-base.json",
+
+  "compilerOptions": {
+    "rootDir": ".",
+    "rootDirs": ["./", "../src/"],
+    "outDir": "../build/test",
+    "baseUrl": ".",
+    "strictNullChecks": false, // TODO: get rid of this as some point
+    "allowSyntheticDefaultImports": true // for ajv
+  },
+  "include": [
+    "**/test-*.ts",
+    "./helpers/index.ts"
+  ],
+  "references": [
+    { "path": "../../keyman-version/tsconfig.esm.json" },
+    { "path": "../../../../core/include/ldml/"},
+    { "path": "../" },
+  ]
+}

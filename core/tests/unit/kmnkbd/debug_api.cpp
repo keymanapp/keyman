@@ -73,7 +73,7 @@ void setup(const char *keyboard) {
 void test_debugging_disabled() {
   setup("000 - null keyboard.kmx");
   try_status(km_kbp_state_debug_set(test_state, 0));
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_END}
   }));
@@ -91,7 +91,7 @@ void test_debugging_no_rule_match() {
   setup("000 - null keyboard.kmx");
   DEBUG_GROUP gp = {u"Main"};
   try_status(km_kbp_state_debug_set(test_state, 1));
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_S, KM_KBP_MODIFIER_SHIFT, 'S'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -112,7 +112,7 @@ void test_debugging_function_key() {
   setup("000 - null keyboard.kmx");
   DEBUG_GROUP gp = {u"Main"};
   try_status(km_kbp_state_debug_set(test_state, 1));
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F1, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F1, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_F1, 0, 0}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -138,7 +138,7 @@ void test_basic_rule_matches() {
 
   // 'DE' + 'F' > U+0E04 U+0E05 U+0E06
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_D, KM_KBP_MODIFIER_SHIFT, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_D, KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_D, KM_KBP_MODIFIER_SHIFT, 'D'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -151,7 +151,7 @@ void test_basic_rule_matches() {
     {KM_KBP_IT_END}
   }));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_E, KM_KBP_MODIFIER_SHIFT, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_E, KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_E, KM_KBP_MODIFIER_SHIFT, 'E'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -164,7 +164,7 @@ void test_basic_rule_matches() {
     {KM_KBP_IT_END}
   }));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F, KM_KBP_MODIFIER_SHIFT, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F, KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_F, KM_KBP_MODIFIER_SHIFT, 'F'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -208,7 +208,7 @@ void test_multiple_groups() {
 
   // '12' -> 'abc'
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_1, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_1, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_1, 0, '1'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -238,7 +238,7 @@ void test_multiple_groups() {
     {KM_KBP_IT_END}
   }));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_2, 0, '2'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -287,7 +287,7 @@ void test_store_offsets() {
 
   // 'ab' -> 'ex'
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_A, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_A, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_A, 0, 'a'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -307,7 +307,7 @@ void test_store_offsets() {
     {KM_KBP_IT_END}
   }));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_B, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_B, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_B, 0, 'b'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -361,7 +361,7 @@ void test_set_option() {
 
   // '1' -> set_option
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_1, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_1, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_1, 0, '1'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},

@@ -10,7 +10,6 @@ uses
   RegistryKeys in '..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   kccompilepackage in 'kccompilepackage.pas',
   CompilePackage in '..\common\delphi\compiler\CompilePackage.pas',
-  CRC32 in '..\..\..\common\windows\delphi\general\CRC32.pas',
   kpsfile in '..\common\delphi\packages\kpsfile.pas',
   PackageInfo in '..\..\..\common\windows\delphi\packages\PackageInfo.pas',
   PackageFileFormats in '..\..\..\common\windows\delphi\packages\PackageFileFormats.pas',

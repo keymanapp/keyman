@@ -1,0 +1,41 @@
+
+block(kmx)         #  struct COMP_KEYBOARD {
+  4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
+
+  00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
+
+  00 00 00 00      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  00 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
+  00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
+
+  00 00 00 00      #    KMX_DWORD cxStoreArray;   // 0018 in array entries
+  00 00 00 00      #    KMX_DWORD cxGroupArray;   // 001C in array entries
+
+  00 00 00 00      #    KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
+  00 00 00 00      #    KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
+
+  00 00 00 00      #    KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
+  00 00 00 00      #
+
+  20 00 00 00      #    KMX_DWORD dwFlags;        // 0030 Flags for the keyboard file
+
+  00 00 00 00      #    KMX_DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+
+  00 00 00 00      #    KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
+  00 00 00 00      #    KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
+                   #  };
+
+
+block(kmxplus)     #  struct COMP_KEYBOARD_KMXPLUSINFO {
+  00 00 00 00      #  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
+  00 00 00 00      #  KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
+                   #};
+
+block(kmxplusdata)
+  23 20 54 68 69 73 20 69 73 20 6e 6f 74 20 79 65  #  # This is not ye
+  74 20 61 20 76 61 6c 69 64 20 2e 6b 6d 78 20 66  #  t a valid .kmx f
+  69 6c 65 2e 20 48 61 6e 64 20 67 65 6e 65 72 61  #  ile. Hand genera
+  74 65 64 20 74 6f 20 73 65 74 20 74 68 65 20 30  #  ted to set the 0
+  78 32 30 20 76 61 6c 75 65 20 69 6e 20 64 77 46  #  x20 value in dwF
+  6c 61 67 73                                      #  lags
