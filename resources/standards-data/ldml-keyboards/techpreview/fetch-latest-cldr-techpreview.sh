@@ -11,6 +11,16 @@ then
     exit 1
 fi
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../../build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+
+cd "$THIS_SCRIPT_PATH"
+
 CLDR_DIR="$1"
 shift
 
@@ -49,7 +59,7 @@ echo "---"
 # delete the old files in case some were removed from CLDR
 rm -rf ./import ./3.0 ./dtd ./test
 # copy over everything
-rsync -av "${IMPORT_DIR}" "${DATA_DIR}" "${DTD_DIR}" "${TEST_DIR}" .
+cp -Rv "${IMPORT_DIR}" "${DATA_DIR}" "${DTD_DIR}" "${TEST_DIR}" .
 
 echo "{\"sha\": \"${GIT_SHA}\",\"description\":\"${GIT_DESCRIBE}\",\"date\":\"${NOW}\"}" | jq . | tee cldr_info.json
 echo "Updated cldr_info.json"
