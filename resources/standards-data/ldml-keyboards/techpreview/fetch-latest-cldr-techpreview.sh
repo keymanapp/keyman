@@ -5,6 +5,8 @@
 # Create Date:  17 Oct 2022
 # Authors:      Steven R. Loomis (SRL)
 
+set -eu
+
 if [[ $# -ne 1 ]];
 then
     echo >&2 "Usage: $0 <cldr-dir>"
@@ -61,7 +63,7 @@ rm -rf ./import ./3.0 ./dtd ./test
 # copy over everything
 cp -Rv "${IMPORT_DIR}" "${DATA_DIR}" "${DTD_DIR}" "${TEST_DIR}" .
 
-echo "{\"sha\": \"${GIT_SHA}\",\"description\":\"${GIT_DESCRIBE}\",\"date\":\"${NOW}\"}" | jq . | tee cldr_info.json
+echo "{\"sha\": \"${GIT_SHA}\",\"description\":\"${GIT_DESCRIBE}\",\"date\":\"${NOW}\"}" | $(JQ) . | tee cldr_info.json
 echo "Updated cldr_info.json"
 
 echo "Converting XSD to JSON…"
@@ -73,8 +75,8 @@ do
     echo "${xsd} -> ${json}"
     (cd .. ; npx -p  jgexml xsd2json techpreview/"${xsd}" techpreview/"${json}") || exit
     echo 'fixup-schema.js' "${json}"
-    node fixup-schema.js "${json}" || exit
+    node fixup-schema.js "${json}" || die "failed to fixup schema ${json}"
     mv "${json}" tmp.json
-    jq . -S < tmp.json > "${json}" || (rm tmp.json ; exit)
+    $(JQ) . -S < tmp.json > "${json}" || (rm tmp.json ; die "failed to transform final schema ${json}")
     rm tmp.json
 done
