@@ -25,7 +25,7 @@
         <xs:element minOccurs="0" ref="info"/>
         <xs:element ref="names"/>
         <xs:element minOccurs="0" ref="settings"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="vkeys"/>
+        <xs:element minOccurs="0" ref="vkeys"/>
         <xs:element minOccurs="0" ref="displays"/>
         <xs:element minOccurs="0" ref="keys"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="layers"/>
