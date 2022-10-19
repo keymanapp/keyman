@@ -305,8 +305,6 @@
           font-family:SpecialOSK; color:white;}
 .kmw-title-bar-image:hover{font-weight:bold;}
 #kmw-pin-image:before{content:'\e024';}
-#kmw-config-image:before{content:'\e030';}
-#kmw-help-image:before{content:'\e042';}
 #kmw-close-button:before {content:'\e025';}
 
 /* Common key appearance styles (can override with form-factor styles if necessary) */
