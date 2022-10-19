@@ -572,6 +572,13 @@ final class KMKeyboard extends WebView {
 
     String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
 
+    // Verify keyboard file still exists
+    File kbFile = new File(keyboardPath);
+    if (kbFile != null && !kbFile.exists()) {
+      KMLog.LogError(TAG, keyboardID + " no longer installed.");
+      return false;
+    }
+
     JSONObject reg = new JSONObject();
     try {
       reg.put("KN", keyboardName);
