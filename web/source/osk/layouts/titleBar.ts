@@ -6,8 +6,6 @@ namespace com.keyman.osk.layouts {
     private _element: HTMLDivElement;
     private _unpinButton: HTMLDivElement;
     private _closeButton: HTMLDivElement;
-    private _helpButton: HTMLDivElement;
-    private _configButton: HTMLDivElement;
     private _caption: HTMLSpanElement;
 
     private static readonly DISPLAY_HEIGHT = ParsedLengthStyle.inPixels(20); // As set in kmwosk.css
@@ -52,26 +50,6 @@ namespace com.keyman.osk.layouts {
     }
 
     public attachHandlers(osk: OSKView) {
-      let util = com.keyman.singleton.util;
-
-      this._helpButton.onclick = function() {
-        var p={};
-        util.callEvent('osk.helpclick',p);
-        if(window.event) {
-          window.event.returnValue=false;
-        }
-        return false;
-      }
-
-      this._configButton.onclick = function() {
-        var p={};
-        util.callEvent('osk.configclick',p);
-        if(window.event) {
-          window.event.returnValue=false;
-        }
-        return false;
-      }
-
       this._closeButton.onclick = function () {
         osk.startHide(true);
         return false;
@@ -104,12 +82,6 @@ namespace com.keyman.osk.layouts {
       var Limg = this._closeButton = this.buildCloseButton();
       bar.appendChild(Limg);
 
-      Limg = this._helpButton = this.buildHelpButton()
-      bar.appendChild(Limg);
-
-      Limg = this._configButton = this.buildConfigButton();
-      bar.appendChild(Limg);
-
       Limg = this._unpinButton = this.buildUnpinButton();
       bar.appendChild(Limg);
 
@@ -129,28 +101,6 @@ namespace com.keyman.osk.layouts {
 
       Limg.id='kmw-close-button';
       Limg.className='kmw-title-bar-image';
-      Limg.onmousedown = this.mouseCancellingHandler;
-
-      return Limg;
-    }
-
-    private buildHelpButton(): HTMLDivElement {
-      let Limg = document.createElement('div');
-      this.markUnselectable(Limg);
-      Limg.id='kmw-help-image';
-      Limg.className='kmw-title-bar-image';
-      Limg.title='KeymanWeb Help';
-      Limg.onmousedown = this.mouseCancellingHandler;
-      return Limg;
-    }
-
-    private buildConfigButton(): HTMLDivElement {
-      let Limg = document.createElement('div');
-      this.markUnselectable(Limg);
-
-      Limg.id='kmw-config-image';
-      Limg.className='kmw-title-bar-image';
-      Limg.title='KeymanWeb Configuration Options';
       Limg.onmousedown = this.mouseCancellingHandler;
 
       return Limg;
