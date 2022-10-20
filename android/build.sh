@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app
+# Build Keyman Engine for Android, Keyman for Android, OEM FirstVoices Android app,
+# Samples: KMsample1 and KMSample2, Test - KeyboardHarness
 
 set -eu
 # set -x: Debugging use, print each statement
@@ -26,7 +27,8 @@ builder_describe \
   "publish                Publishes the APKs to the Play Store." \
   ":app                   Keyman for Android" \
   ":engine                Keyman Engine for Android" \
-  ":samples               Sample and Test apps" \
+  ":samples               Sample apps: KMSample1 and KMSample2" \
+  ":keyboardharness       Test/KeyboardHarness app" \
   ":fv                    OEM FirstVoices app" \
   "--ci                   Don't start the Gradle daemon. Use for CI" \
   "--debug,-d             Local debug build; use for development builds" \
@@ -137,7 +139,9 @@ function _build_samples() {
   if [ $? -ne 0 ]; then
     die "ERROR: KMSample2/build.sh failed"
   fi
+}
 
+function _build_keyboardharness() {
   cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
   ./build.sh $SAMPLE_FLAGS
 
@@ -177,6 +181,12 @@ fi
 if builder_start_action build:samples; then
   _build_samples
   builder_finish_action success build:samples
+fi
+
+# Building KeyboardHarness app
+if builder_start_action build:keyboardharness; then
+  _build_keyboardharness
+  builder_finish_action success build:keyboardharness
 fi
 
 cd "$KEYMAN_ROOT/android"
