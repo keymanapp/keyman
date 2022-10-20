@@ -2056,12 +2056,12 @@ public final class KMManager {
     return result;
   }
 
-  // This API is deprecated in Keyman 16.0
+  // This API is deprecated in Keyman 16.0 - see #7473
   public static boolean isHelpBubbleEnabled() {
     return false;
   }
 
-  // This API is deprecated in Keyman 16.0
+  // This API is deprecated in Keyman 16.0 - see #7473
   public static void setHelpBubbleEnabled(boolean newValue) {
     return;
   }
