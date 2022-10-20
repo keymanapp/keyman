@@ -20,7 +20,7 @@ namespace com.keyman.osk.layouts {
     public set helpEnabled(val) {
       this._helpEnabled = val;
 
-      this._helpButton.style.visibility = val ? 'visible' : 'hidden';
+      this._helpButton.style.display = val ? 'inline' : 'none';
     }
 
     public get configEnabled(): boolean {
@@ -30,7 +30,7 @@ namespace com.keyman.osk.layouts {
     public set configEnabled(val) {
       this._configEnabled = val;
 
-      this._configButton.style.visibility = val ? 'visible' : 'hidden';
+      this._configButton.style.display = val ? 'inline' : 'none';
     }
 
     private static readonly DISPLAY_HEIGHT = ParsedLengthStyle.inPixels(20); // As set in kmwosk.css
