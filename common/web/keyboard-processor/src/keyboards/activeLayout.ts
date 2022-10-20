@@ -141,6 +141,22 @@ namespace com.keyman.keyboards {
       return this.displayLayer + '-' + this.coreID;
     }
 
+    static sanitize(rawKey: LayoutKey) {
+      if(typeof rawKey.width == 'string') {
+        rawKey.width = parseInt(rawKey.width, 10); // '' => NaN.
+      }
+      rawKey.width = (isNaN(rawKey.width as number) ? 0 : rawKey.width) || ActiveKey.DEFAULT_KEY_WIDTH;
+
+      if(typeof rawKey.pad == 'string') {
+        rawKey.pad = parseInt(rawKey.pad, 10);
+      }
+      rawKey.pad = (isNaN(rawKey.pad as number) ? 0 : rawKey.pad) || ActiveKey.DEFAULT_PAD;
+
+      if(typeof rawKey.sp == 'string') {
+        rawKey.sp = Number.parseInt(rawKey.sp, 10) as ButtonClass;
+      }
+    }
+
     static polyfill(key: LayoutKey, layout: ActiveLayout, displayLayer: string) {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveKey();
@@ -156,12 +172,6 @@ namespace com.keyman.keyboards {
             key[prop] = dummy[prop];
           }
         }
-      }
-
-      // Coerce not-yet-coerced string-form number properties to their numeric form.
-      // width, pad are already coerced at the layer level (b/c totalWidth calculations)
-      if(typeof key.sp == 'string') {
-        key.sp = Number.parseInt(key.sp, 10) as ButtonClass;
       }
 
       // Ensure subkeys are also properly extended.
@@ -292,6 +302,22 @@ namespace com.keyman.keyboards {
 
     }
 
+    static sanitize(rawRow: LayoutRow) {
+      for(const key of rawRow.key) {
+        // Test for a trailing comma included in spec, added as null object by IE
+        // It has only ever appeared at the end of a row's spec.
+        if(key == null) {
+          rawRow.key.length = rawRow.key.length-1;
+        } else {
+          ActiveKey.sanitize(key);
+        }
+      }
+
+      if(typeof rawRow.id == 'string') {
+        rawRow.id = Number.parseInt(rawRow.id, 10);
+      }
+    }
+
     static polyfill(row: LayoutRow, layout: ActiveLayout, displayLayer: string, totalWidth: number, proportionalY: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
@@ -381,9 +407,6 @@ namespace com.keyman.keyboards {
 
       let aRow = row as ActiveRow;
       aRow.proportionalY = proportionalY;
-      if(typeof row.id == 'string') {
-        row.id = Number.parseInt(row.id, 10);
-      }
     }
 
     populateKeyMap(map: {[keyId: string]: ActiveKey}) {
@@ -419,6 +442,12 @@ namespace com.keyman.keyboards {
 
     }
 
+    static sanitize(rawLayer: LayoutLayer) {
+      for(const row of rawLayer.row) {
+        ActiveRow.sanitize(row);
+      }
+    }
+
     static polyfill(layer: LayoutLayer, layout: ActiveLayout) {
       layer.aligned=false;
 
@@ -426,31 +455,16 @@ namespace com.keyman.keyboards {
       let rows=layer['row'];
 
       // Calculate the maximum row width (in layout units)
-      var totalWidth=0;
-      for(let i=0; i<layer['row'].length; i++) {
-        var width=0;
-        let row=rows[i];
-        let keys=row['key'];
-        for(let j=0; j<keys.length; j++) {
-          let key=keys[j];
+      let totalWidth=0;
+      for(const row of rows) {
+        let width=0;
+        const keys=row['key'];
 
-          // Test for a trailing comma included in spec, added as null object by IE
-          if(key == null) {
-            keys.length = keys.length-1;
-          } else {
-            // Note:  the key has not yet been 'polyfilled'; these _may_ be strings.
-            // We coerce their values to numbers permanently here.
-            if(typeof key.width == 'string') {
-              key.width = parseInt(key.width, 10); // '' => NaN.
-            }
-            width += key.width = (isNaN(key.width as number) ? 0 : key.width) || ActiveKey.DEFAULT_KEY_WIDTH;
-
-            if(typeof key.pad == 'string') {
-              key.pad = parseInt(key.pad, 10);
-            }
-            width += key.pad = (isNaN(key.pad as number) ? 0 : key.pad) || ActiveKey.DEFAULT_PAD;
-          }
+        for(const key of keys) {
+          // So long as `sanitize` is called first, these coercions are safe.
+          width += (key.width as number) + (key.pad as number);
         }
+
         if(width > totalWidth) {
           totalWidth = width;
         }
@@ -678,6 +692,14 @@ namespace com.keyman.keyboards {
       }
     }
 
+    static sanitize(rawLayout: LayoutFormFactor) {
+      ActiveLayout.correctLayerEmptyRowBug(rawLayout.layer);
+
+      for(const layer of rawLayout.layer) {
+        ActiveLayer.sanitize(layer);
+      }
+    }
+
     /**
      *
      * @param layout
@@ -688,12 +710,19 @@ namespace com.keyman.keyboards {
         throw new Error("Cannot build an ActiveLayout for a null specification.");
       }
 
+      /* Standardize the layout object's data types.
+       *
+       * In older versions of KMW, some numeric properties were long represented as strings instead,
+       * and that lives on within a _lot_ of keyboards.  The data should be sanitized before it
+       * is processed by this method.
+       */
+      this.sanitize(layout);
+
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
       var n: number;
       let layerMap: {[layerId: string]: ActiveLayer} = {};
 
-      let layers=layout['layer'];
-      ActiveLayout.correctLayerEmptyRowBug(layers);
+      let layers=layout.layer;
 
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveLayout();
