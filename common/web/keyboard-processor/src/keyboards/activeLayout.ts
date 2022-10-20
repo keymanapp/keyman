@@ -280,7 +280,7 @@ namespace com.keyman.keyboards {
     // Identify key labels (e.g. *Shift*) that require the special OSK font
     static readonly SPECIAL_LABEL=/\*\w+\*/;
 
-    id: string;
+    id: number;
     key: ActiveKey[];
 
     /**
@@ -381,6 +381,9 @@ namespace com.keyman.keyboards {
 
       let aRow = row as ActiveRow;
       aRow.proportionalY = proportionalY;
+      if(typeof row.id == 'string') {
+        row.id = Number.parseInt(row.id, 10);
+      }
     }
 
     populateKeyMap(map: {[keyId: string]: ActiveKey}) {

@@ -26,7 +26,7 @@ namespace com.keyman.keyboards {
   }
 
   export type LayoutRow = {
-    "id": string, // represents a number, though...
+    "id": string | number,
     "key": LayoutKey[]
   };
 
