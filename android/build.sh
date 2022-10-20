@@ -54,21 +54,21 @@ fi
 
 # Build flags that apply to apps that include asset .kmp files
 if builder_has_option --download-resources; then
-  KMAPRO_FLAGs="$KMAPRO_FLAGS -download-resources"
+  KMAPRO_FLAGS="$KMAPRO_FLAGS -download-resources"
 fi
 
 # Build flags that apply to all targets
 if builder_has_option --ci; then
   KMEA_FLAGS="$KMEA_FLAGS -no-daemon"
   KMAPRO_FLAGS="$KMAPRO_FLAGS -no-daemon"
-  SAMPLE_FLAGS="$SAMPLE_FLAGS -no-daemon"
+  SAMPLE_FLAGS="$SAMPLE_FLAGS --ci" # builder flag
   FV_FLAGS="$FV_FLAGS -no-daemon"
 fi
 
 if builder_has_option --debug; then
   KMEA_FLAGS="$KMEA_FLAGS -debug"
   KMAPRO_FLAGS="$KMAPRO_FLAGS -debug"
-  SAMPLE_FLAGS="$SAMPLE_FLAGS -debug"
+  SAMPLE_FLAGS="$SAMPLE_FLAGS --debug" # builder flag
   FV_FLAGS="$FV_FLAGS -debug"
 fi
 
@@ -127,14 +127,14 @@ function _build_app() {
 
 function _build_samples() {
   cd "$KEYMAN_ROOT/android/Samples/KMSample1"
-  ./build.sh $SAMPLE_FLAGS
+  ./build.sh build:app $SAMPLE_FLAGS
 
   if [ $? -ne 0 ]; then
     die "ERROR: KMSample1/build.sh failed"
   fi
 
   cd "$KEYMAN_ROOT/android/Samples/KMSample2"
-  ./build.sh SAMPLE_FLAGS
+  ./build.sh build:app $SAMPLE_FLAGS
 
   if [ $? -ne 0 ]; then
     die "ERROR: KMSample2/build.sh failed"
