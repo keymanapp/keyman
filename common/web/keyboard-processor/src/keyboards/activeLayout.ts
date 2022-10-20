@@ -337,17 +337,16 @@ namespace com.keyman.keyboards {
 
       // Calculate percentage-based scalings by summing defined widths and scaling each key to %.
       // Save each percentage key width as a separate member (do *not* overwrite layout specified width!)
-      var keyPercent: number, padPercent: number, totalPercent=0;
+      let totalPercent=0;
       for(let j=0; j<keys.length-1; j++) {
         const key = keys[j] as ActiveKey; // already 'polyfilled' in prior loop
-        keyPercent = key.width/totalWidth;
-        keys[j]['widthpc']=keyPercent;
-        padPercent = key.pad/totalWidth;
-        keys[j]['padpc']=padPercent;
 
-        // compute center's default x-coord (used in headless modes)
-        setProportions(keys[j] as ActiveKey, padPercent, keyPercent, totalPercent);
-        totalPercent += padPercent+keyPercent;
+        // compute center's default x-coord (used in headless modes), assign 'proportional' props
+        setProportions(key, key.pad/totalWidth, key.width/totalWidth, totalPercent);
+
+        // These values are set on the key as part of the prior call.
+        totalPercent += key.proportionalPad;
+        totalPercent += key.proportionalWidth;
       }
 
       // Allow for right OSK margin (15 layout units)
@@ -358,16 +357,14 @@ namespace com.keyman.keyboards {
 
         // If a single key, and padding is negative, add padding to right align the key
         if(keys.length == 1 && finalKey.pad < 0) {
-          keyPercent = finalKey.width/totalWidth;
-          finalKey['widthpc']=keyPercent;
-          finalKey['padpc']=1-(totalPercent + keyPercent + rightMargin);
+          const keyPercent = finalKey.width/totalWidth;
+          const padPercent = 1-(totalPercent + keyPercent + rightMargin);
 
           // compute center's default x-coord (used in headless modes)
           setProportions(finalKey, padPercent, keyPercent, totalPercent);
         } else {
-          padPercent = finalKey.pad/totalWidth;
-          finalKey['padpc']=padPercent;
-          finalKey['widthpc'] = keyPercent = 1-(totalPercent + padPercent + rightMargin);
+          const padPercent = finalKey.pad/totalWidth;
+          const keyPercent = 1-(totalPercent + padPercent + rightMargin);
 
           // compute center's default x-coord (used in headless modes)
           setProportions(finalKey, padPercent, keyPercent, totalPercent);
