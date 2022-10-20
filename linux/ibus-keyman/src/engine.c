@@ -984,7 +984,7 @@ ibus_keyman_engine_reset (IBusEngine *engine)
 {
     g_message("ibus_keyman_engine_reset");
     parent_class->reset (engine);
-    ibus_keyman_engine_focus_in (engine);
+    reset_context(engine);
 }
 
 
