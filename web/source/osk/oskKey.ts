@@ -159,7 +159,7 @@ namespace com.keyman.osk {
         n=8;
       }
 
-      n = key['sp'] !== undefined ? key['sp'] : n;
+      n = key['sp'] ?? n;
 
       if(n < 0 || n > 10) {
         n=0;
