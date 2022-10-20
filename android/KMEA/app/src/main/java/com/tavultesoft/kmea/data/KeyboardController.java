@@ -234,7 +234,7 @@ public class KeyboardController {
     synchronized (list) {
       for (int i=0; i<list.size(); i++) {
         Keyboard k = list.get(i);
-        if (k.getPackageID().equals(packageID) && k.getKeyboardID().equals(keyboardID)) {
+        if (k.getPackageID().equalsIgnoreCase(packageID) && k.getKeyboardID().equalsIgnoreCase(keyboardID)) {
           if ( (matchLanguage && BCP47.languageEquals(k.getLanguageID(), languageID)) ||
               !matchLanguage ) {
             return i;
@@ -243,8 +243,9 @@ public class KeyboardController {
       }
     }
 
-    Log.w(TAG, "getKeyboardIndex failed for packageID: " + packageID +
-      ", keyboardID: " + keyboardID + ", languageID: " + languageID);
+    // Sometimes it's expected that languageID isn't found in the keyboard list
+    // (e.g. rendering the list of additional languages to install for an existing keyboard package)
+    // See keyboardExists()
     return index;
   }
 
