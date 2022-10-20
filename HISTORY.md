@@ -1,5 +1,39 @@
 # Keyman Version History
 
+## 16.0.84 alpha 2022-10-19
+
+* fix(developer): Handle hints and warnings cleanly (#7372)
+* fix(developer): Ctrl key to select key was conflicting with shortcuts (#7430)
+* modify(android/engine): Stop logging if keyboard index not found (#7415)
+* chore(android/engine): Update Keyman references in android-host.js (#7466)
+
+## 16.0.83 alpha 2022-10-18
+
+* docs(linux): Update readmes (#7468)
+
+## 16.0.82 alpha 2022-10-17
+
+* change(web): now utilizes 'inputMode="none"' on supported touch devices (#7343)
+* chore(web): drops alignInputs, hideInputs (#7360)
+* fix(web): better element inputmode management (#7395)
+* chore(common): `--debug` standard flag for builder (#7462)
+* fix(ios):  Allow Full Access enabled to fix ios 16  invisible keyboard (#7459)
+
+## 16.0.81 alpha 2022-10-16
+
+* fix(developer): manual attachment for kmw in server (#7457)
+
+## 16.0.80 alpha 2022-10-14
+
+* feat(common): builder script dependency and legacy script report (#7453)
+* chore(linux): Adjust Linux specific files in `.gitignore` (#7451)
+
+## 16.0.79 alpha 2022-10-13
+
+* chore(common/models, web): more script updates (#7392)
+* feat(common): builder dependency support (#7438)
+* chore(common): further tweaks to builder scripts (#7439)
+
 ## 16.0.78 alpha 2022-10-12
 
 * fix(linux): Fix reordering of output (#7079)

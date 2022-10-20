@@ -1349,9 +1349,6 @@ namespace com.keyman.osk {
       util.addFontFaceStyleSheet(kfd);
       util.addFontFaceStyleSheet(ofd);
 
-      // Temporarily hide duplicated elements on non-desktop browsers
-      keymanweb.hideInputs();
-
       // Build the style string and append (or replace) the font style sheet
       // Note: Some browsers do not download the font-face font until it is applied,
       //       so must apply style before testing for font availability
@@ -1361,11 +1358,6 @@ namespace com.keyman.osk {
         customStyle = customStyle + activeKeyboard.oskStyling;
 
       this.styleSheet = util.addStyleSheet(customStyle); //Build 360
-
-      // Wait until font is loaded then align duplicated input elements with page elements
-      if (this.waitForFonts(kfd, ofd)) {
-        keymanweb.alignInputs();
-      }
     }
 
     /**
@@ -1671,10 +1663,6 @@ namespace com.keyman.osk {
         } else if (keyName.indexOf('K_ROPT') >= 0) {
           keyman.uiManager.setActivatingUI(false);
           oskManager.startHide(true);
-          let active = keyman.domManager.activeElement;
-          if (dom.Utils.instanceof(active, "TouchAliasElement")) {
-            (active as dom.TouchAliasElement).hideCaret();
-          }
           keyman.domManager.lastActiveElement = null;
         }
       }
@@ -1720,51 +1708,6 @@ namespace com.keyman.osk {
           keyman.osk._Box.appendChild(this.keytip.element);
         }
       }
-    };
-
-    /**
-     * Wait until font is loaded before applying stylesheet - test each 100 ms
-     * @param   {Object}  kfd   main font descriptor
-     * @param   {Object}  ofd   secondary font descriptor (OSK only)
-     * @return  {boolean}
-     */
-    waitForFonts(kfd, ofd) {
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
-      let fontDefined = !!(kfd && kfd['files']);
-      kfd = fontDefined ? kfd : undefined;
-
-      let oskFontDefined = !!(ofd && ofd['files']);
-      ofd = oskFontDefined ? ofd : undefined;
-
-      // Automatically 'ready' if the descriptor is explicitly `undefined`.
-      // Thus, also covers the case where both are undefined.
-      var kReady = util.checkFontDescriptor(kfd), oReady = util.checkFontDescriptor(ofd);
-      if (kReady && oReady) {
-        return true;
-      }
-
-      keymanweb.fontCheckTimer = window.setInterval(function () {
-        if (util.checkFontDescriptor(kfd) && util.checkFontDescriptor(ofd)) {
-          window.clearInterval(keymanweb.fontCheckTimer);
-          keymanweb.fontCheckTimer = null;
-          keymanweb.alignInputs();
-        }
-      }, 100);
-
-      // Align anyway as best as can if font appears to remain uninstalled after 5 seconds
-      window.setTimeout(function () {
-        if (keymanweb.fontCheckTimer) {
-          window.clearInterval(keymanweb.fontCheckTimer);
-          keymanweb.fontCheckTimer = null;
-          keymanweb.alignInputs();
-          // Don't notify - this is a management issue, not anything the user needs to deal with
-          // TODO: Consider having an icon in the OSK with a bubble that indicates missing font
-          //util.alert('Unable to download the font normally used with '+ks['KN']+'.');
-        }
-      }, 5000);
-      return false;
     };
 
     shutdown() {

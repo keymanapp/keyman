@@ -6,10 +6,10 @@
    Copyright 2019 SIL International
 ***/
 
-// If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
+// If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
 // load of KMW.
-if(!window['keyman']['initialized']) { 
+if(!window['keyman']['initialized']) {
   /*****************************************/
   /*                                       */
   /*   On-Screen (Visual) Keyboard Code    */
@@ -37,7 +37,7 @@ if(!window['keyman']['initialized']) {
 
   /**
      * Customized wait display
-     * 
+     *
      * @param   {string|boolean}   s       displayed text (or false)
      */
     util.wait = function(s) {
@@ -48,7 +48,7 @@ if(!window['keyman']['initialized']) {
       if(typeof(bg) == 'undefined' || bg == null || keymanweb.warned) {
         return;
       }
-      
+
       var nn=bg.firstChild.childNodes;
       if(s) {
         bg.pending=true;
@@ -68,7 +68,7 @@ if(!window['keyman']['initialized']) {
         }
       }
     }
-      
+
     // Get default style sheet path
     keymanweb.getStyleSheetPath=function(ssName) {
       var ssPath = util['getOption']('resources')+'osk/'+ssName;
@@ -80,86 +80,29 @@ if(!window['keyman']['initialized']) {
      * KeymanWeb 2 revised keyboard location specification:
      *  (a) absolute URL (includes ':') - load from specified URL
      *  (b) relative URL (starts with /, ./, ../) - load with respect to current page
-     *  (c) filename only (anything else) - prepend keyboards option to URL 
+     *  (c) filename only (anything else) - prepend keyboards option to URL
      *      (e.g. default keyboards option will be set by Cloud)
-     *           
-     * @param {string}  Lfilename  keyboard file name with optional prefix                     
-     */   
-    keymanweb.getKeyboardPath=function(Lfilename) {           
-      var rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');   
+     *
+     * @param {string}  Lfilename  keyboard file name with optional prefix
+     */
+    keymanweb.getKeyboardPath=function(Lfilename) {
+      var rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
       return (rx.test(Lfilename) ? '' : keymanweb.options['keyboards']) + Lfilename;
     }
 
     /**
-     * Align input fields (should not be needed with KMEI, KMEA), making them visible if previously hidden.
-     * 
-     *  @param  {object}   eleList    A list of specific elements to align.  If nil, selects all elements.
-     * 
-     **/
-    keymanweb.alignInputs = function(eleList: HTMLElement[]) {
-      if(device.touchable) {
-        var domManager = keymanweb.domManager;
-        var processList: HTMLElement[] = [];
-
-        if(eleList) {
-          // Did the user specify the actual element or the touch-alias?
-          eleList.forEach(function(element: HTMLElement){
-            if(element.base) {
-              // It's a touch-alias element, which is what we wish to perform alignment on.
-              processList.push(element);
-            } else {
-              // This retrieves an element's touch-alias, should it exist.
-              let touchAlias = element['kmw_ip'] as HTMLDivElement;
-              if(touchAlias) {
-                processList.push(element['kmw_ip']);
-              }
-            }
-          });
-        } else {
-          processList = domManager.inputList;
-        }
-
-        processList.forEach(function(element: HTMLElement) {
-          if(dom.Utils.instanceof(element, "TouchAliasElement")) {
-            (element as com.keyman.dom.TouchAliasElement).updateInput();
-          }
-          element.style.visibility = 'visible';
-          if(element.base.textContent.length > 0) {
-            element.base.style.visibility = 'hidden';
-          }
-        })      
-      }
-    }
-
-    /**
-     * Programatically hides all input fields with underlying elements.  Restore with .alignInputs.    
-     * 
-     *  @param  {boolean}   align    align and make visible, else hide
-     * 
-     **/
-    keymanweb.hideInputs = function() {
-      var domManager = keymanweb.domManager;
-      if(device.touchable) {
-        for(var i=0; i<domManager.inputList.length; i++) {
-          domManager.inputList[i].style.visibility='hidden';
-          domManager.inputList[i].base.style.visibility='visible';
-        }        
-      }
-    }
-
-    /**
-     * Test if caret position is determined from the active element, or 
+     * Test if caret position is determined from the active element, or
      * from the synthesized overlay element (touch devices)
-     * 
+     *
      * @return  {boolean}
-     **/          
+     **/
     keymanweb.isPositionSynthesized = function() {
       return device.touchable;
     }
 
     /**
      * Use rotation events to adjust OSK and input element positions and scaling as necessary
-     */     
+     */
     keymanweb.handleRotationEvents=function() {
       var rotationManager = new com.keyman.RotationManager(keymanweb);
 
@@ -168,9 +111,9 @@ if(!window['keyman']['initialized']) {
 
     /**
      * Possible way to detect the start of a rotation and hide the OSK before it is adjusted in size
-     * 
-     *  @param  {Object}    e   accelerometer rotation event      
-     *      
+     *
+     *  @param  {Object}    e   accelerometer rotation event
+     *
     keymanweb.testRotation = function(e)
     {
       var r=e.rotationRate;
@@ -179,6 +122,6 @@ if(!window['keyman']['initialized']) {
         dbg(r.alpha+' '+r.beta+' '+r.gamma);
       }
     }
-    */ 
+    */
   })();
 }

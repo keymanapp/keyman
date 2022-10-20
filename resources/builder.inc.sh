@@ -680,6 +680,7 @@ builder_check_color() {
 builder_parse() {
   _builder_build_deps=--deps
   builder_verbose=
+  builder_debug=
   builder_extra_params=()
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
@@ -767,6 +768,10 @@ builder_parse() {
           _builder_chosen_options+=(--verbose)
           builder_verbose=--verbose
           ;;
+        --debug|-d)
+          _builder_chosen_options+=(--debug)
+          builder_debug=--debug
+          ;;
         --deps|--no-deps|--force-deps)
           _builder_build_deps=$key
           ;;
@@ -779,6 +784,10 @@ builder_parse() {
           # internal use parameter for dependency builds - path to dependency tracking file
           shift
           _builder_deps_built="$1"
+          ;;
+        --builder-report-dependencies)
+          # internal reporting function, ignores all other parameters
+          _builder_report_dependencies
           ;;
         *)
           _builder_parameter_error "$0" parameter "$key"
@@ -840,7 +849,7 @@ builder_display_usage() {
   local e program description
 
   # Minimum padding is 12 characters, increase this if necessary
-  # if you add other, longer, global options (like --verbose)
+  # if you add other, longer, global options (like --verbose, --debug)
   local width=12
 
   for e in "${!_builder_params[@]}"; do
@@ -897,6 +906,7 @@ builder_display_usage() {
   done
 
   _builder_pad $width "  --verbose, -v"  "Verbose logging"
+  _builder_pad $width "  --debug, -d"    "Debug build"
   _builder_pad $width "  --color"        "Force colorized output"
   _builder_pad $width "  --no-color"     "Never use colorized output"
   if builder_has_dependencies; then
@@ -1009,6 +1019,7 @@ _builder_do_build_deps() {
     builder_set_module_has_been_built "$dep"
     "$KEYMAN_ROOT/$dep/build.sh" configure build \
       $builder_verbose \
+      $builder_debug \
       $_builder_build_deps \
       --builder-deps-built "$_builder_deps_built" \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER"
@@ -1138,6 +1149,25 @@ builder_verbose() {
     return 0
   fi
   return 1
+}
+
+#
+# returns `0` if we are doing a debug build
+#
+builder_debug() {
+  if [[ $builder_debug == --debug ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Reports on all described dependencies, then exits
+# used by builder-controls.sh
+#
+_builder_report_dependencies() {
+  echo "${_builder_deps[@]}"
+  exit 0
 }
 
 #

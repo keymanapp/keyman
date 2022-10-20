@@ -29,11 +29,6 @@ describe('Event Management', function() {
       ele.onchange = null;
     }
 
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      aliasing = true;
-    }
-
     // A bit of a force-hack to ensure the element is seen as active for the tests.
     com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
     com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
@@ -54,15 +49,9 @@ describe('Event Management', function() {
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
-    var aliasing = false;
 
     ele.onchange = function() {
       ele.onchange = null;
-    }
-
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      aliasing = true;
     }
 
     // A bit of a force-hack to ensure the element is seen as active for the tests.
@@ -85,7 +74,6 @@ describe('Event Management', function() {
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
-    var aliasing = false;
 
     var counterObj = {i:0};
     var fin = 3;
@@ -93,11 +81,6 @@ describe('Event Management', function() {
     ele.addEventListener("input", function() {
       counterObj.i++;
     });
-
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      aliasing = true;
-    }
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);
@@ -112,7 +95,6 @@ describe('Event Management', function() {
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
-    var aliasing = false;
 
     var counterObj = {i:0};
     var fin = 3;
@@ -120,11 +102,6 @@ describe('Event Management', function() {
     ele.addEventListener("input", function() {
       counterObj.i++;
     });
-
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      aliasing = true;
-    }
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     eventDriver.simulateEvent(event);

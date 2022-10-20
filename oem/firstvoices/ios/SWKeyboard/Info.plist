@@ -38,7 +38,7 @@
 			<key>PrimaryLanguage</key>
 			<string>mul</string>
 			<key>RequestsOpenAccess</key>
-			<false/>
+			<true/>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.keyboard-service</string>

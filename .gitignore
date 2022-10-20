@@ -181,11 +181,9 @@ Thumbs.db
 .nyc_output/
 # Linux packaging related
 /debian/
-results/
-*.deb
-*.ddeb
-*.dsc
-*.build
-*.buildinfo
-*.changes
-*.tar.?z
+/results/
+/keyman*.deb
+/keyman*.ddeb
+/keyman*.buildinfo
+/keyman*.changes
+/keyman*.tar.?z
