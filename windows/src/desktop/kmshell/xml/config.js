@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
     modfiy_list.each(function(index) {
       const name = $(this).data('name');
       if(name) {
-        state.modify_languages.push({name: name, modify: $(this).hasClass('modify-visible')});
+        state.modify_languages.push({name: name, modify: $(this).hasClass('modify_visible')});
       }
     });
     const stateJson = JSON.stringify(state);
@@ -308,7 +308,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
       if(state.modify_languages) {
         for(var i = 0; i < state.modify_languages.length; i++) {
           if(state.modify_languages[i].modify)
-            $('div.modify[data-name="'+state.modify_languages[i].name+'"]').addClass('modify-visible');
+            $('div.modify[data-name="'+state.modify_languages[i].name+'"]').addClass('modify_visible');
         }
       }
       window.setTimeout(function() {
@@ -388,7 +388,7 @@ function keyboard_toggle(keyboard_name) {
 
   location.href='keyman:keyboard_clickcheck?id='+keyboard_name+'&value='+checkbox.checked;
   var liTitle = document.getElementById('listtitle_keyboard_'+keyboard_name);
-  liTitle.className = checkbox.checked ? 'list_title keyboard_loaded flex-container-title' : 'list_title keyboard_unloaded flex-container-title';
+  liTitle.className = checkbox.checked ? 'list_title keyboard_loaded flex_container_title' : 'list_title keyboard_unloaded flex_container_title';
   li.focus();
   return true;
 }
@@ -397,7 +397,7 @@ function keyboard_toggle(keyboard_name) {
 
 function showKeyboardLink(id) {
   var e = document.getElementById('qrcode-'+id);
-  e.className='qrcode qrcode-visible';
+  e.className='qrcode qrcode_visible';
 }
 
 function hideKeyboardLink(id) {
@@ -408,7 +408,7 @@ function hideKeyboardLink(id) {
 /* Modify Languages Popup */
 function showModifyLink(id) {
   var e = document.getElementById('modify-'+id);
-  e.className='modify modify-visible';
+  e.className='modify modify_visible';
   save_state();
 }
 function hideModifyLink(id) {
