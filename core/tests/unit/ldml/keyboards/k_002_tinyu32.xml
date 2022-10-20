@@ -6,7 +6,7 @@
 @@expected: \u0127\u1790\u17B6\u0127\uD83D\uDE40\u0127
 
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
 
@@ -20,9 +20,9 @@
     <key id="screamcat" to="🙀" />
   </keys>
 
-  <layerMaps form="hardware">
-    <layerMap id="base">
+  <layers form="hardware">
+    <layer id="base">
       <row keys="hmaqtua that screamcat" /> <!-- number row -->
-    </layerMap>
-  </layerMaps>
+    </layer>
+  </layers>
 </keyboard>

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
   <names>
     <name value="Invalid" />
   </names>
 
-  <vkeyMaps>
+  <vkeys>
     <!-- this is redundant so it should be omitted -->
-    <vkeyMap from="A" to="A" />
-  </vkeyMaps>
+    <vkey from="A" to="A" />
+  </vkeys>
 
   <keys />
 </keyboard>

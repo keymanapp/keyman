@@ -9,7 +9,7 @@ Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are funct
 @@expected: y\u0020xd\u0020xeq\u0020m
 
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="en" conformsTo="techpreview">
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
 
@@ -52,15 +52,15 @@ Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are funct
     <key id="backslash" to="\u{005c}"/>
   </keys>
 
-  <layerMaps form="hardware">
-    <layerMap id="base">
+  <layers form="hardware">
+    <layer id="base">
       <row keys="space" /> <!-- number row -->
       <row keys="q w e r t y u i o p" />
       <row keys="a s d f g h j k l" />
       <row keys="backslash z x c v b n m" />
       <!-- <row keys="space" /> --> <!-- Bug: 5 rows is 'too many'? -->
-    </layerMap>
-  </layerMaps>
+    </layer>
+  </layers>
 
   <transforms type="simple">
     <transform from="ab" to="x" />

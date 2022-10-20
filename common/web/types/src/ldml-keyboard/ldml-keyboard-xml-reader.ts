@@ -10,18 +10,20 @@ export default class LDMLKeyboardXMLSourceFileReader {
    * @param source any
    */
   private boxArrays(source: any) {
-    boxXmlArray(source?.keyboard, 'layerMaps');
+    boxXmlArray(source?.keyboard, 'layers');
+    boxXmlArray(source?.keyboard?.displays, 'display');
+    boxXmlArray(source?.keyboard?.displays, 'displayOptions');
     boxXmlArray(source?.keyboard?.names, 'name');
-    boxXmlArray(source?.keyboard?.vkeyMaps, 'vkeyMap');
+    boxXmlArray(source?.keyboard?.vkeys, 'vkey');
     boxXmlArray(source?.keyboard?.keys, 'key');
     boxXmlArray(source?.keyboard?.locales, 'locale');
     boxXmlArray(source?.keyboard, 'transforms');
-    if(source?.keyboard?.layerMaps) {
-      for(let layerMaps of source?.keyboard?.layerMaps) {
-        boxXmlArray(layerMaps, 'layerMap');
-        if(layerMaps?.layerMap) {
-          for(let layerMap of layerMaps?.layerMap) {
-            boxXmlArray(layerMap, 'row');
+    if(source?.keyboard?.layers) {
+      for(let layers of source?.keyboard?.layers) {
+        boxXmlArray(layers, 'layer');
+        if(layers?.layer) {
+          for(let layer of layers?.layer) {
+            boxXmlArray(layer, 'row');
           }
         }
       }
@@ -32,8 +34,29 @@ export default class LDMLKeyboardXMLSourceFileReader {
       }
     }
     boxXmlArray(source?.keyboard?.reorders, 'reorder');
-    boxXmlArray(source?.keyboard?.backspaces, 'backspace');
+    this.boxImportsAndSpecials(source);
     return source;
+  }
+
+  /**
+   * Recurse over object, boxing up any specials or imports
+   * @param obj any object to be traversed
+   */
+  private boxImportsAndSpecials(obj: any) {
+    if (!obj) return;
+    if (Array.isArray(obj)) {
+      for (const sub of obj) {
+        this.boxImportsAndSpecials(sub);
+      }
+    } else if(typeof obj === 'object') {
+      for (const key of Object.keys(obj)) {
+        if (key === 'special' || key === 'import') {
+          boxXmlArray(obj, key);
+        } else {
+          this.boxImportsAndSpecials(obj[key]);
+        }
+      }
+    }
   }
 
   public validate(source: LDMLKeyboardXMLSourceFile, schemaSource: Buffer): void {

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/ldmlKeyboard.dtd">
+<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
 <keyboard locale="mt" conformsTo="techpreview">
   <names>
     <name value="Invalid" />
   </names>
 
-  <vkeyMaps>
+  <vkeys>
     <!-- repeated definitions for same vkey are invalid -->
-    <vkeyMap from="A" to="Q" />
-    <vkeyMap from="A" to="W" />
-  </vkeyMaps>
+    <vkey from="A" to="Q" />
+    <vkey from="A" to="W" />
+  </vkeys>
 
   <keys />
 </keyboard>
