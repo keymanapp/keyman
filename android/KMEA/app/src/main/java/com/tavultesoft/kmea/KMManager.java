@@ -261,8 +261,7 @@ public final class KMManager {
   public static final String KMKey_CustomModel = "CustomModel";
   public static final String KMKey_HelpLink = "helpLink";
 
-  // Keyman internal keys
-  protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
+  // Help Bubble removed in 16.0
 
   // Default Legacy Asset Paths
   // Previous keyboards installed from the cloud  went to /languages/ and /fonts/
@@ -2057,26 +2056,14 @@ public final class KMManager {
     return result;
   }
 
+  // This API is deprecated in Keyman 16.0 - see #7473
   public static boolean isHelpBubbleEnabled() {
-    boolean retVal = true;
-
-    if (InAppKeyboard != null) {
-      retVal = InAppKeyboard.isHelpBubbleEnabled;
-    } else if (SystemKeyboard != null) {
-      retVal = SystemKeyboard.isHelpBubbleEnabled;
-    }
-
-    return retVal;
+    return false;
   }
 
+  // This API is deprecated in Keyman 16.0 - see #7473
   public static void setHelpBubbleEnabled(boolean newValue) {
-    if (InAppKeyboard != null) {
-      InAppKeyboard.isHelpBubbleEnabled = newValue;
-    }
-
-    if (SystemKeyboard != null) {
-      SystemKeyboard.isHelpBubbleEnabled = newValue;
-    }
+    return;
   }
 
   public static SpacebarText getSpacebarText() {
@@ -2268,17 +2255,6 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-            if (prefs.getBoolean(KMManager.KMKey_ShouldShowHelpBubble, true)) {
-              InAppKeyboard.loadJavascript("showHelpBubble()");
-            }
-          }
-        }, 2000);
-
         InAppKeyboard.callJavascriptAfterLoad();
         InAppKeyboard.setSpacebarText(spacebarText);
 
@@ -2309,33 +2285,12 @@ public final class KMManager {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
         if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
-          InAppKeyboard.dismissHelpBubble();
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.dismissKeyboard();
         }
       } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
-        InAppKeyboard.dismissHelpBubble();
-        if (!InAppKeyboard.isHelpBubbleEnabled) {
-          return false;
-        }
-
-        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
-        editor.commit();
-
         handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
           KeyboardType.KEYBOARD_TYPE_INAPP);
-      } else if (url.indexOf("showHelpBubble") >= 0) {
-        int start = url.indexOf("keyPos=") + 7;
-        String value = url.substring(start);
-        if (!value.isEmpty()) {
-          String[] globeKeyPos = value.split("\\,");
-          float fx = Float.valueOf(globeKeyPos[0]);
-          float fy = Float.valueOf(globeKeyPos[1]);
-          if (InAppKeyboard.getVisibility() == View.VISIBLE)
-            InAppKeyboard.showHelpBubble(context, fx, fy);
-        }
       } else if (url.indexOf("showKeyPreview") >= 0) {
         String deviceType = context.getResources().getString(R.string.device_type);
         if (deviceType.equals("AndroidTablet")) {
@@ -2506,17 +2461,6 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-            if (prefs.getBoolean(KMManager.KMKey_ShouldShowHelpBubble, true)) {
-              SystemKeyboard.loadJavascript("showHelpBubble()");
-            }
-          }
-        }, 2000);
-
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
 
         SystemKeyboard.callJavascriptAfterLoad();
@@ -2541,30 +2485,10 @@ public final class KMManager {
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
-        SystemKeyboard.dismissHelpBubble();
         IMService.requestHideSelf(0);
       } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
-        SystemKeyboard.dismissHelpBubble();
-        if (!SystemKeyboard.isHelpBubbleEnabled) {
-          return false;
-        }
-
-        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
-        editor.commit();
-
         handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
           KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      } else if (url.indexOf("showHelpBubble") >= 0) {
-        int start = url.indexOf("keyPos=") + 7;
-        String value = url.substring(start);
-        if (!value.isEmpty()) {
-          String[] globeKeyPos = value.split("\\,");
-          float fx = Float.valueOf(globeKeyPos[0]);
-          float fy = Float.valueOf(globeKeyPos[1]);
-          SystemKeyboard.showHelpBubble(context, fx, fy);
-        }
       } else if (url.indexOf("showKeyPreview") >= 0) {
         String deviceType = context.getString(R.string.device_type);
         if (deviceType.equals("AndroidTablet")) {
@@ -2740,8 +2664,6 @@ public final class KMManager {
             return;
           }
 
-          InAppKeyboard.dismissHelpBubble();
-
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.beginBatchEdit();
 
@@ -2864,8 +2786,6 @@ public final class KMManager {
             return;
           }
 
-          SystemKeyboard.dismissHelpBubble();
-
           // Handle tab or enter since KMW didn't process it
           Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
           if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
@@ -2903,8 +2823,6 @@ public final class KMManager {
             }
             return;
           }
-
-          SystemKeyboard.dismissHelpBubble();
 
           ic.beginBatchEdit();
 

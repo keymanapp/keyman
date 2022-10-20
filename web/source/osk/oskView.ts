@@ -507,9 +507,6 @@ namespace com.keyman.osk {
         bs.height = 'auto';
         bs.maxWidth = bs.maxHeight = '';
       }
-
-      let keyman = com.keyman.singleton;
-      keyman.alignInputs();
     }
 
     public refreshLayoutIfNeeded(pending?: boolean) {

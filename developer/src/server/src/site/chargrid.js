@@ -75,7 +75,7 @@
 
     if(keyman.isPositionSynthesized()) { // this is an internal function
       // For touch devices, we need to ask KMW
-      selStart = ta1.kmw_ip ? ta1.kmw_ip.getTextBeforeCaret().length : 0;
+      selStart = 0;
       selLength = 0;
       selDirection = 'forward';
     } else {

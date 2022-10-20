@@ -12,18 +12,13 @@ namespace KMWRecorder {
       ele.value = "";
     } else {
       (window['keyman'] as any).resetContext();
-      if(ele['base']) {
-        // Gotta be extra-careful with the simulated touch fields!
-        (<any> ele /*as com.keyman.dom.TouchAliasElement*/).setText("", 0);
-      } else {
-        ele.textContent = "";
-      }
+      ele.textContent = "";
     }
   }
 
   /**
    * Runs Recorder-generated tests in a browser.
-   * 
+   *
    * Future notes:  further abstraction needed; much of this code will be in common with Node.
    */
   export class BrowserProctor extends Proctor {
