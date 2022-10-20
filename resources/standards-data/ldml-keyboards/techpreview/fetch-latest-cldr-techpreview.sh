@@ -38,12 +38,12 @@ CHECK_2="${DTD_DIR}/ldmlKeyboardTest.dtd"  # Only in Keyboard 3.0+
 
 if [[ ! -f "${CHECK_1}" ]];
 then
-    die "$0: error: ${CHECK_1} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
+    die "${CHECK_1} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
 fi
 
 if [[ ! -f "${CHECK_2}" ]];
 then
-    die "$0: error: ${CHECK_2} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
+    die "${CHECK_2} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
 fi
 
 # collect git info
