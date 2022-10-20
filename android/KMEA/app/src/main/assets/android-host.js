@@ -328,12 +328,6 @@ function showKeyboard() {
   keyman.correctOSKTextSize();
 }
 
-function showHelpBubble() {
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  var pos = keyman.touchMenuPos();
-  window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
-}
-
 function executePopupKey(keyID, keyText) {
   // KMW only needs keyID to process the popup key. keyText merely logged to console
   //window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
