@@ -491,9 +491,9 @@ builder_describe() {
   declare -A -g _builder_params
   declare -A -g _builder_options_short
   declare -A -g _builder_options_var
-  declare -A -g _builder_dep_path     # array of output files for action:target pairs
+  declare -A -g _builder_dep_path             # array of output files for action:target pairs
   declare -A -g _builder_dep_related_actions  # array of action:targets associated with a given dependency
-  declare -A -g _builder_internal_dep
+  declare -A -g _builder_internal_dep         # array of internal action:targets dependency relationships
   shift
   # describe each target, action, and option possibility
   while [[ $# -gt 0 ]]; do
@@ -731,7 +731,6 @@ _builder_define_default_internal_deps_for_target() {
   _builder_define_default_internal_dep "$target" configure build
   _builder_define_default_internal_dep "$target" build test
   _builder_define_default_internal_dep "$target" build install
-  _builder_define_default_internal_dep "$target" build publish
 }
 
 _builder_define_default_internal_dep() {
