@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.85 alpha 2022-10-20
+
+* chore(android/engine): Remove help bubble tool tip (#7473)
+* fix(linux): Fix upload script (#7494)
+* docs(linux): Update sample vscode settings (#7491)
+* fix(android/engine): Dismiss key preview and subkeys on globe action (#7472)
+* refactor(linux): Cleanup whitespace (#7500)
+
 ## 16.0.84 alpha 2022-10-19
 
 * fix(developer): Handle hints and warnings cleanly (#7372)
