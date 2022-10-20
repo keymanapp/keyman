@@ -1,4 +1,4 @@
-name: "Bug report"
+name: "🐛 Bug report"
 title: "bug: "
 labels: ["bug"]
 description: Report a bug in Keyman
@@ -86,14 +86,8 @@ body:
         - label: Keyman for Linux
         - label: Keyman for macOS
         - label: Keyman for Windows
-        - label: Keyman Core
         - label: Keyman Developer
-        - label: Keyman Engine for Android
-        - label: Keyman Engine for iPhone and iPad
-        - label: Keyman Engine for Linux
-        - label: Keyman Engine for macOS
-        - label: Keyman Engine for Web
-        - label: Keyman Engine for Windows
+        - label: KeymanWeb
         - label: Other - give details at bottom of form
 
   - type: input
