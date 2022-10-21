@@ -143,18 +143,20 @@ namespace com.keyman.keyboards {
 
     static sanitize(rawKey: LayoutKey) {
       if(typeof rawKey.width == 'string') {
-        rawKey.width = parseInt(rawKey.width, 10); // '' => NaN.
+        rawKey.width = parseInt(rawKey.width, 10);
       }
-      rawKey.width = (isNaN(rawKey.width as number) ? 0 : rawKey.width) || ActiveKey.DEFAULT_KEY_WIDTH;
+      // Handles NaN cases as well as 'set to 0' cases; both are intentional here.
+      rawKey.width ||= ActiveKey.DEFAULT_KEY_WIDTH;
 
       if(typeof rawKey.pad == 'string') {
         rawKey.pad = parseInt(rawKey.pad, 10);
       }
-      rawKey.pad = (isNaN(rawKey.pad as number) ? 0 : rawKey.pad) || ActiveKey.DEFAULT_PAD;
+      rawKey.pad ||= ActiveKey.DEFAULT_PAD;
 
       if(typeof rawKey.sp == 'string') {
         rawKey.sp = Number.parseInt(rawKey.sp, 10) as ButtonClass;
       }
+      rawKey.sp ||= 0; // The default button class.
     }
 
     static polyfill(key: LayoutKey, layout: ActiveLayout, displayLayer: string) {
