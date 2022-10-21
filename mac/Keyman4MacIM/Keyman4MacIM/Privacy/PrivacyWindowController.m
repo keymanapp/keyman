@@ -25,13 +25,31 @@
   NSString *bundleDisplayName = [[[NSBundle mainBundle] localizedInfoDictionary]
                            objectForKey:@"CFBundleDisplayName"];
   [self.window setTitle:bundleDisplayName];
-  [_alertText setStringValue:NSLocalizedString(@"privacy-alert-text", nil)];
+  
+  // need to provide a defaultValue for the possibility that:
+  // 1. the app is localized for a given language x
+  // 2. the string with the specified key is not found in Localizable.strings for language x
+  // if not, then UI will display the key instead of the string with that language selected
+
+  NSString *defaultValue = [self defaultLocalizableString: @"privacy-alert-text"];
+  [_alertText setStringValue:NSLocalizedStringWithDefaultValue(@"privacy-alert-text", nil, NSBundle.mainBundle, defaultValue, nil)];
   
   NSImage *keymanLogo = [NSImage imageNamed:NSImageNameApplicationIcon];
   if (keymanLogo) {
     [_appLogo setImage:keymanLogo];
   }
   [_okButton setEnabled:YES];
+}
+
+/**
+ * utility method to get the English string for the localizable key
+ * move to some generic place if it will be widely used
+ */
+- (NSString*) defaultLocalizableString:(NSString*) key {
+  NSBundle *main = [NSBundle mainBundle];
+  NSString *resourcePath = [main pathForResource:@"en" ofType:@"lproj"];
+  NSBundle *bundle = [NSBundle bundleWithPath:resourcePath];
+  return NSLocalizedStringFromTableInBundle(key, nil, bundle, nil);
 }
 
 - (IBAction)closeAction:(id)sender {
