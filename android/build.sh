@@ -24,6 +24,7 @@ builder_describe \
   "Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app." \
   clean \
   build \
+  "configure              Download asset .kmp files from downloads.keyman.com" \
   "publish                Publishes the APKs to the Play Store." \
   ":app                   Keyman for Android" \
   ":engine                Keyman Engine for Android" \
@@ -32,7 +33,6 @@ builder_describe \
   ":fv                    OEM FirstVoices app" \
   "--ci                   Don't start the Gradle daemon. Use for CI" \
   "--debug,-d             Local debug build; use for development builds" \
-  "--download-resources   Download asset .kmp files from downloads.keyman.com" \
   "--no-kmw-build,-nkmwb  Don't build KMW. Just copy existing artifacts" \
   "--no-kmw,-nkmw         Don't build KMW. Don't copy artifacts" \
   "--upload-sentry,-us    Uploads debug symbols, etc, to Sentry" 
@@ -50,11 +50,6 @@ if builder_has_option --no-kmw-build; then
   KMEA_FLAGS="-no-kmw-build"
 elif builder_has_option --no-kmw; then
   KMEA_FLAGS="-no-kmw"
-fi
-
-# Build flags that apply to apps that include asset .kmp files
-if builder_has_option --download-resources; then
-  KMAPRO_FLAGS="$KMAPRO_FLAGS -download-resources"
 fi
 
 # Build flags that apply to all targets
@@ -116,6 +111,30 @@ function _clean() {
   ./build.sh clean
 }
 
+function _configure() {
+  . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+
+  # Keyman for Android .kmp dependencies
+  KEYBOARD_PACKAGE_ID="sil_euro_latin"
+  KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
+  MODEL_PACKAGE_ID="nrc.en.mtnt"
+  MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
+
+  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
+  downloadModelPackage "$MODEL_PACKAGE_ID" "$MODELS_TARGET"
+
+  # FirstVoices .csv and .kmp dependencies (dictionaries downloaded within the app)
+  FV_KEYBOARD_PACKAGE_ID="fv_all"
+  FV_KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${FV_KEYBOARD_PACKAGE_ID}.kmp"
+  KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
+  KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
+
+  echo "Copying keyboards.csv"
+  cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
+
+  downloadKeyboardPackage "$FV_KEYBOARD_PACKAGE_ID" "$FV_KEYBOARDS_TARGET"
+}
+
 function _build_engine() {
   cd "$KEYMAN_ROOT/android/KMEA"
   ./build.sh $KMEA_FLAGS
@@ -173,6 +192,12 @@ if builder_start_action clean; then
   _clean
   builder_finish_action success clean
 fi
+
+# Download .kmp resources
+if builder_start_action configure; then
+  _configure
+  builder_finish_action success configure
+fi  
 
 # Building Keyman Engine for Android
 if builder_start_action build:engine; then
