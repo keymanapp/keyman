@@ -31,8 +31,7 @@ EMBED_OUTPUT="release/embedded"
 WEB_OUTPUT_NO_MINI="release/unminified/web"
 EMBED_OUTPUT_NO_MINI="release/unminified/embedded"
 INTERMEDIATE="intermediate"
-SOURCE="source"
-NODE_SOURCE="source"
+SOURCE="src"
 
 SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
 
@@ -302,7 +301,7 @@ fi
 ### -embed section start
 
 if builder_start_action build:embed; then
-  $compilecmd -b $NODE_SOURCE/tsconfig.embedded.json -v
+  $compilecmd -b $SOURCE/tsconfig.embedded.json -v
 
   assert_exists $INTERMEDIATE/keyman.js
 
@@ -369,7 +368,7 @@ fi
 if builder_start_action build:web; then
   # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
   echo Compile Keymanweb...
-  $compilecmd -b $NODE_SOURCE/tsconfig.json -v
+  $compilecmd -b $SOURCE/tsconfig.json -v
   if [ $? -ne 0 ]; then
     fail "Typescript compilation failed."
   fi
@@ -403,12 +402,16 @@ if builder_start_action build:web; then
 fi
 
 if builder_start_action build:ui; then
-  $compilecmd -b $NODE_SOURCE/tsconfig.ui.json
+  $compilecmd -b $SOURCE/tsconfig.ui.json
+
+  echo "---------- NOTE -----------"
+  pwd
+  echo "---------- NOTE -----------"
 
   CURRENT_PATH=`pwd`
   # Since the batch compiler for the UI modules outputs them within a subdirectory,
   # we need to copy them up to the base /intermediate/ folder.
-  cd "$INTERMEDIATE/web/source"
+  cd "$INTERMEDIATE/web/$SOURCE"
   cp * ../../
   cd $CURRENT_PATH
 
@@ -426,28 +429,28 @@ if builder_start_action build:ui; then
     if [ -f "$WEB_OUTPUT/kmuitoolbar.js" ]; then
         rm $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
     fi
-    minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
+    minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/$SOURCE/" "(function() {%output%}());"
     assert_exists $WEB_OUTPUT/kmwuitoolbar.js
 
     echo Minify Toggle UI
     if [ -f "$WEB_OUTPUT/kmuitoggle.js" ]; then
         rm $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
     fi
-    minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
+    minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/$SOURCE/" "(function() {%output%}());"
     assert_exists $WEB_OUTPUT/kmwuitoggle.js
 
     echo Minify Float UI
     if [ -f "$WEB_OUTPUT/kmuifloat.js" ]; then
         rm $WEB_OUTPUT/kmuifloat.js 2>/dev/null
     fi
-    minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
+    minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/$SOURCE/" "(function() {%output%}());"
     assert_exists $WEB_OUTPUT/kmwuifloat.js
 
     echo Minify Button UI
     if [ -f "$WEB_OUTPUT/kmuibutton.js" ]; then
         rm $WEB_OUTPUT/kmuibutton.js 2>/dev/null
     fi
-    minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
+    minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/$SOURCE/" "(function() {%output%}());"
     assert_exists $WEB_OUTPUT/kmwuibutton.js
 
     echo "User interface modules compiled and saved under $WEB_OUTPUT"
