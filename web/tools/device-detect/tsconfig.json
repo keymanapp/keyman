@@ -11,8 +11,8 @@
   },
 
   "files": [
-    "../../src/kmwdevice.ts",
-    "../../src/utils/styleConstants.ts", // goes with kmwdevice.ts
+    "../../src/engine/kmwdevice.ts",
+    "../../src/engine/utils/styleConstants.ts", // goes with kmwdevice.ts
   ],
 
   "references": [

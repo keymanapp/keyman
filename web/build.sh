@@ -30,7 +30,7 @@ WEB_OUTPUT="release/web"
 EMBED_OUTPUT="release/embedded"
 WEB_OUTPUT_NO_MINI="release/unminified/web"
 EMBED_OUTPUT_NO_MINI="release/unminified/embedded"
-INTERMEDIATE="intermediate"
+INTERMEDIATE="intermediate"  # TODO:  Eliminate.  May have lingering side-effects in sourcemapping at the moment.
 SOURCE="src"
 
 SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
@@ -159,10 +159,12 @@ minify ( ) {
         wrapper="%output%"
     fi
 
-    local INPUT="$INTERMEDIATE/$1"
-    local INPUT_SOURCEMAP="$INPUT.map"
-    local OUTPUT="$2/$1"
-    local OUTPUT_SOURCEMAP="$OUTPUT.map"
+    local INPUT="$1"
+    local INPUT_FILE="$(basename $1)"
+    local INPUT_SOURCEMAP="$(dirname $1)/$INPUT_FILE.map"
+    local OUTPUT="$2"
+    local OUTPUT_FILE="$(basename $2)"
+    local OUTPUT_SOURCEMAP="$(dirname $2)/$OUTPUT_FILE.map"
 
     # --source_map_location_mapping - maps paths on INPUT source maps for consumption by Closure.
     # ../../.. => keymanapp, ../.. => keymanapp/keyman.  We have TS root sources on 'keyman'.
@@ -181,63 +183,29 @@ minify ( ) {
     node $minified_sourcemap_cleaner "$INPUT_SOURCEMAP" "$OUTPUT_SOURCEMAP" $cleanerOptions
 }
 
-# $1 - target (WEB, EMBEDDED)
-# $2+ - build target array (one of WEB_TARGET, FULL_WEB_TARGET, or EMBED_TARGET)
-finish_nominify ( ) {
-    args=("$@")
-    if [ $1 = $WEB ] || [ $1 = $UI ]; then
-        dest=$WEB_OUTPUT_NO_MINI
-        resourceDest=$dest
-    else
-        dest=$EMBED_OUTPUT_NO_MINI
-        resourceDest=$dest/resources
-    fi
-
-    # Create our entire embedded compilation results path.
-    if ! [ -d $dest ]; then
-        mkdir -p "$dest"  # Includes base folder, is recursive.
-    fi
-    echo "Copying unminified $1 build products to $dest."
-
-    for (( n=1; n<$#; n++ ))  # Apparently, args ends up zero-based, meaning $2 => n=1.
-    do
-        target=${args[$n]}
-        cp -f $INTERMEDIATE/$target $dest/$target
-        cp -f $INTERMEDIATE/$target.map $dest/$target.map
-    done
-
-    copy_resources $resourceDest
-}
-
 copy_resources ( ) {
     echo
     echo Copy resources to $1/ui, .../osk
 
     # Create our entire compilation results path.  Can't one-line them due to shell-script parsing errors.
-    if ! [ -d $1/ui ];      then
-        mkdir -p "$1/ui"
-    fi
-    if ! [ -d $1/osk ];     then
-        mkdir -p "$1/osk"
-    fi
-    if ! [ -d $1/src/ui ];  then
-        mkdir -p "$1/src/ui"
-    fi
-    if ! [ -d $1/src/osk ]; then
-        mkdir -p "$1/src/osk"
-    fi
+    mkdir -p "$1/ui"
+    mkdir -p "$1/osk"
+    mkdir -p "$1/src/resources/ui"
+    mkdir -p "$1/src/resources/osk"
 
     cp -Rf $SOURCE/resources/ui  $1/  >/dev/null
     cp -Rf $SOURCE/resources/osk $1/  >/dev/null
     # do not copy resources/src
 
     echo Copy source to $1/src
-    cp -Rf $SOURCE/*.js $1/src
-    cp -Rf $SOURCE/*.ts $1/src
+    # cp -Rf $SOURCE/*.js $1/src
+    # cp -Rf $SOURCE/*.ts $1/src
+    cp -Rf $SOURCE/app*       $1/src
+    cp -Rf $SOURCE/engine*    $1/src
     echo $VERSION_PATCH > $1/src/version.txt
 
-    cp -Rf $SOURCE/resources/ui  $1/src/ >/dev/null
-    cp -Rf $SOURCE/resources/osk $1/src/ >/dev/null
+    cp -Rf $SOURCE/resources/ui  $1/src/resources >/dev/null
+    cp -Rf $SOURCE/resources/osk $1/src/resources >/dev/null
 
     # Update build number if successful
     echo
@@ -262,10 +230,23 @@ if builder_start_action configure; then
   builder_finish_action success configure
 fi
 
-if builder_start_action clean; then
-  rm -rf "release/"
-  rm -rf "intermediate/"
-  builder_finish_action success clean
+## Clean actions
+
+if builder_start_action clean:embed; then
+  rm -rf "build/embed/"
+  rm -rf "build/engine/"
+  builder_finish_action success clean:embed
+fi
+
+if builder_start_action clean:web; then
+  rm -rf "build/web/"
+  rm -rf "build/engine/"
+  builder_finish_action success clean:web
+fi
+
+if builder_start_action clean:ui; then
+  rm -rf "build/ui/"
+  builder_finish_action success clean:ui
 fi
 
 if builder_start_action clean:samples; then
@@ -295,51 +276,38 @@ if builder_start_action build:samples; then
   builder_finish_action success build:samples;
 fi
 
-### -embed section start
-
 if builder_start_action build:embed; then
-  $compilecmd -b $SOURCE/tsconfig.embedded.json -v
+  $compilecmd -b src/app/embed -v
 
-  assert_exists $INTERMEDIATE/keyman.js
+  assert_exists build/embed/debug/keyman.js
 
   echo Embedded TypeScript compiled as $INTERMEDIATE/keyman.js
 
-  copy_resources "$INTERMEDIATE"  # Very useful for local testing.
-
-  finish_nominify $EMBEDDED $EMBED_TARGET
+  copy_resources "build/embed/debug"  # Very useful for local testing.
 
   if ! builder_has_option --skip-minify; then
     # Create our entire embedded compilation results path.
-    if ! [ -d $EMBED_OUTPUT/resources ]; then
-      mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
+    if ! [ -d build/embed/release/resources ]; then
+      mkdir -p "build/embed/release/resources"  # Includes base folder, is recursive.
     fi
 
-    if [ -f "$EMBED_OUTPUT/keyman.js" ]; then
-      rm $EMBED_OUTPUT/keyman.js 2>/dev/null
+    if [ -f "build/embed/release/keyman.js" ]; then
+      rm build/embed/release/keyman.js 2>/dev/null
     fi
 
-    minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS
-    assert_exists $EMBED_OUTPUT/keyman.js
-    echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
+    minify build/embed/debug/keyman.js build/embed/release/keyman.js SIMPLE_OPTIMIZATIONS
+    assert_exists build/embed/release/keyman.js
+    echo Compiled embedded application saved as build/embed/release/keyman.js
 
     # Update any changed resources
     # echo Copy or update resources
 
-    copy_resources "$EMBED_OUTPUT/resources"
+    copy_resources "build/embed/release"
 
     # Update build number if successful
     echo
     echo KMEA/KMEI version $VERSION compiled and saved under $EMBED_OUTPUT
     echo
-  fi
-
-  if builder_has_option --debug; then
-    # We currently have an issue with sourcemaps for minified versions in embedded contexts.
-    # We should use the unminified one instead for now.
-    cp $EMBED_OUTPUT_NO_MINI/keyman.js $EMBED_OUTPUT/keyman.js
-    # Copy the sourcemap.
-    cp $EMBED_OUTPUT_NO_MINI/keyman.js.map $EMBED_OUTPUT/keyman.js.map
-    echo Uncompiled embedded application saved as keyman.js
   fi
 
   # TODO:  handle this block somehow.
@@ -350,7 +318,7 @@ if builder_start_action build:embed; then
   #     pushd $EMBED_OUTPUT_NO_MINI
   #   else
   #     ARTIFACT_FOLDER="release/embedded"
-  #     pushd $EMBED_OUTPUT
+  #     pushd $EMBED_OUTPUTs
   #   fi
   #   echo "Uploading to Sentry..."
   #   npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
@@ -365,30 +333,28 @@ fi
 if builder_start_action build:web; then
   # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
   echo Compile Keymanweb...
-  $compilecmd -b $SOURCE/tsconfig.json -v
+  $compilecmd -b src/app/web -v
   if [ $? -ne 0 ]; then
     fail "Typescript compilation failed."
   fi
-  assert_exists $INTERMEDIATE/keymanweb.js
+  assert_exists build/web/debug/keymanweb.js
 
-  echo Native TypeScript compiled as $INTERMEDIATE/keymanweb.js
+  echo Native TypeScript compiled as build/web/debug/keymanweb.js
 
-  copy_resources "$INTERMEDIATE"
-
-  finish_nominify $WEB $WEB_TARGET
+  copy_resources "build/web/debug"
 
   if ! builder_has_option --skip-minify; then
-    if [ -f "$WEB_OUTPUT/keymanweb.js" ]; then
-      rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
+    if [ -f "build/web/release/keymanweb.js" ]; then
+      rm build/web/release/keymanweb.js 2>/dev/null
     fi
 
     echo Minifying KeymanWeb...
-    minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS
-    assert_exists $WEB_OUTPUT/keymanweb.js
+    minify build/web/debug/keymanweb.js build/web/release/keymanweb.js SIMPLE_OPTIMIZATIONS
+    assert_exists build/web/release/keymanweb.js
 
-    echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js
+    echo Compiled KeymanWeb application saved as build/web/release/keymanweb.js
 
-    copy_resources "$WEB_OUTPUT"
+    copy_resources "build/web/release"
     # Update build number if successful
     echo
     echo KeymanWeb $VERSION compiled and saved under $WEB_OUTPUT
@@ -399,58 +365,45 @@ if builder_start_action build:web; then
 fi
 
 if builder_start_action build:ui; then
-  $compilecmd -b $SOURCE/tsconfig.ui.json
+  $compilecmd -b src/app/ui -v
 
-  echo "---------- NOTE -----------"
-  pwd
-  echo "---------- NOTE -----------"
+  assert_exists build/ui/debug/kmwuitoolbar.js
+  assert_exists build/ui/debug/kmwuitoggle.js
+  assert_exists build/ui/debug/kmwuifloat.js
+  assert_exists build/ui/debug/kmwuibutton.js
 
-  CURRENT_PATH=`pwd`
-  # Since the batch compiler for the UI modules outputs them within a subdirectory,
-  # we need to copy them up to the base /intermediate/ folder.
-  cd "$INTERMEDIATE/web/$SOURCE"
-  cp * ../../
-  cd $CURRENT_PATH
-
-  assert_exists $INTERMEDIATE/kmwuitoolbar.js
-  assert_exists $INTERMEDIATE/kmwuitoggle.js
-  assert_exists $INTERMEDIATE/kmwuifloat.js
-  assert_exists $INTERMEDIATE/kmwuibutton.js
-
-  finish_nominify $UI "${UI_TARGET[@]}"
-
-  echo \'Native\' UI TypeScript has been compiled into the $INTERMEDIATE/ folder
+  echo \'Native\' UI TypeScript has been compiled into the build/ui/debug folder
 
   if ! builder_has_option --skip-minify; then
     echo Minify ToolBar UI
-    if [ -f "$WEB_OUTPUT/kmuitoolbar.js" ]; then
-        rm $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
+    if [ -f "build/ui/release/kmuitoolbar.js" ]; then
+        rm $build/ui/release/kmuitoolbar.js 2>/dev/null
     fi
-    minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/$SOURCE/" "(function() {%output%}());"
-    assert_exists $WEB_OUTPUT/kmwuitoolbar.js
+    minify build/ui/debug/kmwuitoolbar.js build/ui/release/kmwuitoolbar.js ADVANCED_OPTIMIZATIONS "web/src/app/ui" "(function() {%output%}());"
+    assert_exists build/ui/release/kmwuitoolbar.js
 
     echo Minify Toggle UI
-    if [ -f "$WEB_OUTPUT/kmuitoggle.js" ]; then
-        rm $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
+    if [ -f "build/ui/release/kmuitoggle.js" ]; then
+        rm build/ui/release/kmuitoggle.js 2>/dev/null
     fi
-    minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/$SOURCE/" "(function() {%output%}());"
-    assert_exists $WEB_OUTPUT/kmwuitoggle.js
+    minify build/ui/debug/kmwuitoggle.js build/ui/release/kmwuitoggle.js SIMPLE_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
+    assert_exists build/ui/release/kmwuitoggle.js
 
     echo Minify Float UI
-    if [ -f "$WEB_OUTPUT/kmuifloat.js" ]; then
-        rm $WEB_OUTPUT/kmuifloat.js 2>/dev/null
+    if [ -f "build/ui/release/kmuifloat.js" ]; then
+        rm build/ui/release/kmuifloat.js 2>/dev/null
     fi
-    minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/$SOURCE/" "(function() {%output%}());"
-    assert_exists $WEB_OUTPUT/kmwuifloat.js
+    minify build/ui/debug/kmwuifloat.js build/ui/release/kmwuifloat.js ADVANCED_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
+    assert_exists build/ui/release/kmwuifloat.js
 
     echo Minify Button UI
-    if [ -f "$WEB_OUTPUT/kmuibutton.js" ]; then
-        rm $WEB_OUTPUT/kmuibutton.js 2>/dev/null
+    if [ -f "build/ui/release/kmuibutton.js" ]; then
+        rm build/ui/release/kmuibutton.js 2>/dev/null
     fi
-    minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/$SOURCE/" "(function() {%output%}());"
-    assert_exists $WEB_OUTPUT/kmwuibutton.js
+    minify build/ui/debug/kmwuibutton.js build/ui/release/kmwuibutton.js SIMPLE_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
+    assert_exists build/ui/release/kmwuibutton.js
 
-    echo "User interface modules compiled and saved under $WEB_OUTPUT"
+    echo "User interface modules compiled and saved under build/ui/release"
   fi
 
   builder_finish_action success build:ui

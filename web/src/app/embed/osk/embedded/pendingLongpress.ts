@@ -1,5 +1,4 @@
 /// <reference path="subkeyDelegator.ts" />
-/// <reference path="../pendingGesture.interface.ts" />
 
 namespace com.keyman.osk.embedded {
   /**
@@ -7,7 +6,7 @@ namespace com.keyman.osk.embedded {
    * both handled by the host app within the Android app, this class
    * serves mostly to communicate longpress state management from the
    * app to the VisualKeyboard.
-   * 
+   *
    * The `resolve()` function should be triggered by the host app
    * whenever it has recognized a completed longpress and has thus
    * begun displaying its subkey popup.  (Should these two events
@@ -39,7 +38,7 @@ namespace com.keyman.osk.embedded {
     }
 
     public cancel() {
-      if(this.resolver) {        
+      if(this.resolver) {
         this.resolver(null);
         this.resolver = null;
       }

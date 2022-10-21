@@ -1,6 +1,5 @@
 // Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
 // References the base Keyman object (and consequently, the rest of the core objects).
-/// <reference path="kmwbase.ts" />
 /// <reference path="osk/embedded/keytip.ts" />
 /// <reference path="osk/embedded/pendingLongpress.ts" />
 
