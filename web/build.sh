@@ -236,10 +236,6 @@ copy_resources ( ) {
     cp -Rf $SOURCE/*.ts $1/src
     echo $VERSION_PATCH > $1/src/version.txt
 
-    # # Remove KMW Recorder source.
-    # rm -f $1/src/recorder_*.ts
-    # rm -f $1/src/recorder_*.js
-
     cp -Rf $SOURCE/resources/ui  $1/src/ >/dev/null
     cp -Rf $SOURCE/resources/osk $1/src/ >/dev/null
 
