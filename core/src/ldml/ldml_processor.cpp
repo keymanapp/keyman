@@ -13,7 +13,7 @@
 #include "kmx/kmx_xstring.h"
 #include "ldml/keyboardprocessor_ldml.h"
 #include "kmx/kmx_file_validator.hpp"
-#include "kmx/kmx_processevent.h" // for DebugLog
+#include "debuglog.h"
 
 namespace {
   constexpr km_kbp_attr const engine_attrs = {
@@ -26,7 +26,7 @@ namespace {
   };
 }
 
-using km::kbp::kmx::ShouldDebug; // for DebugLog
+// using km::kbp::kmx::ShouldDebug; // for DebugLog
 
 namespace km {
 namespace kbp {

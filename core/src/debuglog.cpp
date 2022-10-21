@@ -3,6 +3,7 @@
   Authors:          mcdurdin
 */
 #include <stdarg.h>
+#include <string.h>
 #include <iostream>
 #include <chrono>
 #include "debuglog.h"
