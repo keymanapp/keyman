@@ -105,6 +105,15 @@ function _clean() {
     echo "Cleaning upload directory"
     rm -rf "$KEYMAN_ROOT/android/upload"
   fi
+
+  cd "$KEYMAN_ROOT/android/Samples/KMSample1"
+  ./build.sh clean
+
+  cd "$KEYMAN_ROOT/android/Samples/KMSample2"
+  ./build.sh clean
+
+  cd "$KEYMAN_ROOT/android/Tests/KeyboardHarness"
+  ./build.sh clean
 }
 
 function _build_engine() {
@@ -189,27 +198,25 @@ if builder_start_action build:keyboardharness; then
   builder_finish_action success build:keyboardharness
 fi
 
-cd "$KEYMAN_ROOT/android"
-
 # Building OEM apps
 if builder_start_action build:fv; then
   _build_fv
   builder_finish_action success build:fv
 fi
 
-cd "$KEYMAN_ROOT/android"
-
 # Publish Keyman for Android to Play Store
 if builder_start_action publish:app; then
   echo "publishing Keyman for Android"
 
-  $KEYMAN_ROOT/android/build-publish.sh -no-daemon -kmapro
+  cd "$KEYMAN_ROOT/android"
+  ./build-publish.sh -no-daemon -kmapro
   builder_finish_action success publish:app
 fi
 
 if builder_start_action publish:fv; then
   echo "publishing OEM FirstVoices app"
 
-  $KEYMAN_ROOT/android/build-publish.sh -no-daemon -fv
+  cd "$KEYMAN_ROOT/android"
+  ./build-publish.sh -no-daemon -fv
   builder_finish_action success publish:fv
 fi
