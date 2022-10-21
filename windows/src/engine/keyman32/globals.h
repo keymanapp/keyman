@@ -279,8 +279,8 @@ extern UINT
   wm_keymanim_close,
   wm_keymanim_contextchanged,
   wm_test_keyman_functioning,
-  wm_keyman_keyevent;   // for serialized input
-
+  wm_keyman_keyevent,   // for serialized input
+  wm_keyman_modifierevent;
 extern BOOL
   flag_ShouldSerializeInput;
 

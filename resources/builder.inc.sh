@@ -322,9 +322,7 @@ builder_start_action() {
         ! builder_is_full_dep_build &&
         [[ ! -z ${_builder_dep_path[$_builder_matched_action]+x} ]] &&
         [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$_builder_matched_action]}" ]]; then
-      if builder_verbose; then
-        echo "$scope skipping $_builder_matched_action_name, up-to-date"
-      fi
+      echo "$scope skipping $_builder_matched_action_name, up-to-date"
       return 1
     fi
 
@@ -493,8 +491,9 @@ builder_describe() {
   declare -A -g _builder_params
   declare -A -g _builder_options_short
   declare -A -g _builder_options_var
-  declare -A -g _builder_dep_path     # array of output files for action:target pairs
+  declare -A -g _builder_dep_path             # array of output files for action:target pairs
   declare -A -g _builder_dep_related_actions  # array of action:targets associated with a given dependency
+  declare -A -g _builder_internal_dep         # array of internal action:targets dependency relationships
   shift
   # describe each target, action, and option possibility
   while [[ $# -gt 0 ]]; do
@@ -600,17 +599,25 @@ builder_describe() {
 function builder_describe_outputs() {
   while [[ $# -gt 0 ]]; do
     local key="$1" path="$2" action target
+    path="`_builder_expand_relative_path "$path"`"
+
     if [[ $key =~ : ]]; then
       action="$(echo "$key" | cut -d: -f 1 -)"
       target=":$(echo "$key" | cut -d: -f 2 -)"
     else
+      # Add dependency expected output file for all targets, as well as a
+      # wildcard target match
       action="$key"
+      for target in "${_builder_targets[@]}"; do
+        _builder_dep_path[$action$target]="$path"
+      done
       target=':*'
     fi
-    path="`_builder_expand_relative_path "$path"`"
     _builder_dep_path[$action$target]="$path"
     shift 2
   done
+
+  _builder_define_default_internal_dependencies
 }
 
 _builder_get_default_description() {
@@ -667,6 +674,71 @@ builder_check_color() {
     esac
     shift # past the processed argument
   done
+}
+
+#
+# For every build action:target in _builder_chosen_action_targets, add
+# its full internal dependency tree
+#
+_builder_add_chosen_action_target_dependencies() {
+  local action_target e i=0 new_actions=()
+
+  # Iterate through every action specified on command line; we use this loop
+  # style so that any new actions added here will also be iteratively checked
+  while (( $i < ${#_builder_chosen_action_targets[@]} )); do
+    action_target=${_builder_chosen_action_targets[$i]}
+
+    # If we have an internal dependency for the chosen action:target pair, add
+    # it to the list, but only if there is a defined output and that output is
+    # missing
+    if [[ ! -z ${_builder_internal_dep[$action_target]+x} ]]; then
+      local dep_output=${_builder_internal_dep[$action_target]}
+      if [[ ! -z ${_builder_dep_path[$dep_output]+x} ]] &&
+          [[ ! -e "$KEYMAN_ROOT/${_builder_dep_path[$dep_output]}" ]]; then
+        if ! _builder_item_in_array "$dep_output" "${_builder_chosen_action_targets[@]}"; then
+          _builder_chosen_action_targets+=($dep_output)
+          new_actions+=($dep_output)
+        fi
+      fi
+    fi
+    i=$((i + 1))
+  done
+
+  if [[ ${#new_actions[@]} -gt 0 ]]; then
+    echo "Automatically running following required actions with missing outputs:"
+    for e in "${new_actions[@]}"; do
+      echo "* $e"
+    done
+  fi
+}
+
+#
+# If we have described outputs, then we will setup our
+# default internal dependency chain:
+#
+#  configure <- build <- (test,install,publish)
+#
+_builder_define_default_internal_dependencies() {
+  for target in "${_builder_targets[@]}"; do
+    _builder_define_default_internal_deps_for_target "$target"
+  done
+
+  _builder_define_default_internal_deps_for_target ':*'
+}
+
+_builder_define_default_internal_deps_for_target() {
+  local target=$1
+  _builder_define_default_internal_dep "$target" configure build
+  _builder_define_default_internal_dep "$target" build test
+  _builder_define_default_internal_dep "$target" build install
+}
+
+_builder_define_default_internal_dep() {
+  local target=$1 dep=$2 action=$3
+  if _builder_item_in_array $dep "${_builder_actions[@]}" &&
+        _builder_item_in_array $action "${_builder_actions[@]}"; then
+    _builder_internal_dep[$action$target]=$dep$target
+  fi
 }
 
 # Initializes a build.sh script, parses command line. Will abort the script if
@@ -801,6 +873,8 @@ builder_parse() {
       _builder_chosen_action_targets+=("$_builder_default_action$e")
     done
   fi
+
+  _builder_add_chosen_action_target_dependencies
 
   if $_builder_debug; then
     echo "[DEBUG] Selected actions and targets:"

@@ -209,18 +209,19 @@ void DoChangeWindowMessageFilter()
 
 	DoCWMF(wm_keyman);   // I3594
   DoCWMF(wm_keyman_keyevent);
-    DoCWMF(wm_keymankeydown);
-    DoCWMF(wm_keymankeyup);
-    DoCWMF(wm_keyman_grabwindowproc);
-    DoCWMF(wm_keyman_refresh);
-    DoCWMF(wm_kmgetactivekeymanid);
-    DoCWMF(wm_keymanim_close);
-    DoCWMF(wm_keymanim_contextchanged);
-    DoCWMF(wm_keymanshift);
-    DoCWMF(wm_keyman_control);   // I4714
-    DoCWMF(wm_keyman_control_internal);   // I4714
+  DoCWMF(wm_keymankeydown);
+  DoCWMF(wm_keymankeyup);
+  DoCWMF(wm_keyman_grabwindowproc);
+  DoCWMF(wm_keyman_refresh);
+  DoCWMF(wm_kmgetactivekeymanid);
+  DoCWMF(wm_keymanim_close);
+  DoCWMF(wm_keymanim_contextchanged);
+  DoCWMF(wm_keymanshift);
+  DoCWMF(wm_keyman_control);   // I4714
+  DoCWMF(wm_keyman_control_internal);   // I4714
+  DoCWMF(wm_keyman_modifierevent);
 
-    FreeLibrary(hUser32);
+  FreeLibrary(hUser32);
 }
 
 BOOL InitThread(HWND hwnd)
@@ -310,8 +311,10 @@ BOOL InitialiseProcess(HWND hwnd)
 	wm_keymanim_contextchanged = RegisterWindowMessage("WM_KEYMANIM_CONTEXTCHANGED");
 	wm_keymanshift = RegisterWindowMessage("WM_KEYMANSHIFT");
 
+
 	wm_keyman_control = RegisterWindowMessage(RWM_KEYMAN_CONTROL);
 	wm_keyman_control_internal = RegisterWindowMessage("WM_KEYMAN_CONTROL_INTERNAL");
+  wm_keyman_modifierevent = RegisterWindowMessage("WM_KEYMAN_MODIFIEREVENT");
 
 	wm_test_keyman_functioning = RegisterWindowMessage("wm_test_keyman_functioning");
 
