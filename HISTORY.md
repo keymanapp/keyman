@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 16.0.86 alpha 2022-10-21
+
+* fix(developer): Handle invalid graphics in icon editor (#7431)
+* chore(common): move to new GitHub issue form templates (#7470)
+* change(web): removes unused config, help buttons from OSK (#7484)
+* fix(windows): ensure all modifier events go to serialized queue (#7449)
+* chore(common): automatically run internal dependencies on builder (#7464)
+* fix(mac): Prompt for required permissions at start time (#7354)
+
 ## 16.0.85 alpha 2022-10-20
 
 * chore(android/engine): Remove help bubble tool tip (#7473)
