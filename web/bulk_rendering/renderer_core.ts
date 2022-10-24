@@ -134,7 +134,13 @@ namespace com.keyman.renderer {
       // Once the keyboard's loaded, we can really get started.
       return p.then(function() {
         let box: HTMLDivElement = keyman.osk._Box;
+
         BatchRenderer.boundingRect = box.getBoundingClientRect();
+
+        // Appromixate handling for non-fullscreen mode runs.
+        // Adjusts for the browser window's title bars, address bars, etc.
+        let screenOffsetY = window.outerHeight - window.innerHeight;
+        BatchRenderer.boundingRect.y += screenOffsetY;
 
         divSummary.appendChild(renderer.createKeyboardHeader(kbd, true));
 
@@ -144,21 +150,19 @@ namespace com.keyman.renderer {
         // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
         var layers;
         if(isMobile) {
-          layers = keyman.osk.vkbd.layers;
+          layers = keyman.osk.vkbd.layerGroup.layers;  // It's not there anymore!
         } else {
           // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
           // We instead rely upon the KLS definition to ensure we keep the renders sparse.
           layers = keyman.core.activeKeyboard._legacyLayoutSpec.KLS;
         }
 
-        if(!BatchRenderer.allLayers && layers.length) layers = [layers[0]];
-
         let renderLayer = function(i: number) {
           return new Promise(function(resolve) {
             // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
             if(keyman.osk.vkbd) {
               if(isMobile) {
-                keyman.core.keyboardProcessor.layerId = layers[i].id;
+                keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
               } else {
                 keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
               }
@@ -174,7 +178,7 @@ namespace com.keyman.renderer {
                 renderer.render(box, isMobile).then(function(imgEle: HTMLImageElement) {
                   let eleLayer = document.createElement('div');
                   let eleLayerId = document.createElement('p');
-                  eleLayerId.textContent = 'Layer ID:  ' + (isMobile ? layers[i].id : Object.keys(layers)[i]);
+                  eleLayerId.textContent = 'Layer ID:  ' + Object.keys(layers)[i];
 
                   eleLayer.appendChild(eleLayerId);
                   eleLayer.appendChild(imgEle);
@@ -189,7 +193,7 @@ namespace com.keyman.renderer {
         };
 
         // The resulting Promise will only call it's `.then()` once all of this keyboard's renders have been completed.
-        return renderer.arrayPromiseIteration(renderLayer, isMobile ? layers.length : Object.keys(layers).length);
+        return renderer.arrayPromiseIteration(renderLayer, Object.keys(layers).length);
       }).catch(function() {
         console.log("Failed to load the \"" + kbd['InternalName'] + "\" keyboard for rendering!");
         divSummary.appendChild(renderer.createKeyboardHeader(kbd, false));
@@ -231,7 +235,7 @@ namespace com.keyman.renderer {
     }
 
     setActiveDummy() {
-      com.keyman['dom']['DOMEventHandlers'].states._activeElement = BatchRenderer.dummy;
+      window['keyman'].domManager.activeElement = BatchRenderer.dummy;
     }
 
     async run(allLayers, filter) {
@@ -246,6 +250,7 @@ namespace com.keyman.renderer {
 
         // Establish a 'dummy' element to bypass the 'nothing's active' check KMW usually uses.
         BatchRenderer.dummy = document.createElement('input');
+        window['keyman'].attachToControl(BatchRenderer.dummy);
         this.setActiveDummy();
 
         BatchRenderer.divMaster = <HTMLDivElement> document.getElementById('renderList');
