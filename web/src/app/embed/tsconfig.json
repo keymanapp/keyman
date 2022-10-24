@@ -25,6 +25,6 @@
     // sentry-manager is used by Keyman for Android and Keyman for iOS but not
     // directly by KeymanWeb, but it's neater to reference it here and get the
     // automatic build result, than to reference it directly in those projects.
-    { "path": "../../common/web/sentry-manager/src" },
+    { "path": "../../../../common/web/sentry-manager/src" },
 	]
 }
