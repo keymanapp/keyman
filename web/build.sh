@@ -47,7 +47,7 @@ compiler="npm run tsc --"
 compilecmd="$compiler"
 
 PREDICTIVE_TEXT_SOURCE="../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
-PREDICTIVE_TEXT_OUTPUT="testing/prediction-ui/simple-en-trie.js"
+PREDICTIVE_TEXT_OUTPUT="src/test/manual/web/prediction-ui/simple-en-trie.js"
 
 builder_check_color "$@"
 
@@ -272,7 +272,7 @@ fi
 
 if builder_start_action build:samples; then
   # Some test pages actually have build scripts.
-  ./testing/android-harness/build.sh  # is not yet builder-based.
+  ./src/test/manual/embed/android-harness/build.sh  # is not yet builder-based.
 
   echo "Copying samples & test page resources..."
   # Should probably be changed into a build script for the `prediction-ui` test page.
