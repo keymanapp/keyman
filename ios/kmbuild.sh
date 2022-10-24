@@ -148,17 +148,18 @@ update_bundle ( ) {
         mkdir -p "$BUNDLE_PATH"
     fi
 
-    base_dir="$(pwd)"
+    local base_dir="$(pwd)"
 
     if [ $DO_KMW_BUILD = true ]; then
         echo Building KeymanWeb from $KMW_ROOT
 
-        cd $KMW_ROOT
-
+        KMW_PRODUCT=web/build/embed/
         if [ "$CONFIG" == "Debug" ]; then
           KMWFLAGS="configure:embed build:embed --debug"
+          KMW_PRODUCT="$KMW_PRODUCT/debug"
         else
           KMWFLAGS="configure:embed build:embed"
+          KMW_PRODUCT="$KMW_PRODUCT/release"
         fi
 
         # Local development optimization - cross-target Sentry uploading when requested
@@ -169,28 +170,27 @@ update_bundle ( ) {
           KMWFLAGS="$KMWFLAGS -upload-sentry"
         fi
 
-        ./build.sh $KMWFLAGS
+        $KEYMAN_ROOT/web/build.sh $KMWFLAGS
         if [ $? -ne 0 ]; then
             fail "ERROR:  KeymanWeb's build.sh failed."
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-        cd release/embedded
-        cp resources/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
-        cp resources/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
-        cp keyman.js                       "$base_dir/$BUNDLE_PATH/keymanios.js"
+        cp $KEYMAN_ROOT/$KMW_PRODUCT/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
+        cp $KEYMAN_ROOT/$KMW_PRODUCT/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
+        cp $KEYMAN_ROOT/$KMW_PRODUCT/keyman.js             "$base_dir/$BUNDLE_PATH/keymanios.js"
 
         if [ "$CONFIG" == "Debug" ]; then
-          cp keyman.js.map                 "$base_dir/$BUNDLE_PATH/keyman.js.map"
+          cp $KEYMAN_ROOT/$KMW_PRODUCT/keyman.js.map       "$base_dir/$BUNDLE_PATH/keyman.js.map"
         elif [ -f "$base_dir/$BUNDLE_PATH/keyman.js.map" ]; then
           rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
         fi
 
-        cd "$KEYMAN_ROOT/common/web/sentry-manager/build"
+        pushd "$KEYMAN_ROOT/common/web/sentry-manager/build"
 
         cp index.js                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
-        cd "$base_dir"
+        popd
     fi
 
     # Our default resources are part of the bundle, so let's check on them.
