@@ -21,6 +21,10 @@
     { "path": "../../../../common/predictive-text/browser.tsconfig.json", "prepend": true },
     { "path": "../../../../common/web/input-processor/src", "prepend": true },
     { "path": "../../../../common/web/keyboard-processor/src", "prepend": true },
-		{ "path": "../../engine", "prepend": true}
+		{ "path": "../../engine", "prepend": true},
+    // sentry-manager is used by Keyman for Android and Keyman for iOS but not
+    // directly by KeymanWeb, but it's neater to reference it here and get the
+    // automatic build result, than to reference it directly in those projects.
+    { "path": "../../common/web/sentry-manager/src" },
 	]
 }
