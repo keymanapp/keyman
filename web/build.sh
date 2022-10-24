@@ -424,9 +424,9 @@ fi
 
 if builder_start_action test:web; then
   if builder_has_option --all; then
-    unit_tests/test.sh
+    ./test.sh
   else
-    unit_tests/test.sh :engine
+    ./test.sh :engine
   fi
 
   builder_finish_action success test:web
