@@ -49,19 +49,19 @@ module.exports = {
     'common/test/resources/json/**/*.json',      // Where pre-loaded JSON resides.
     {pattern: 'common/test/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
     {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
-    {pattern: 'web/release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/release/unminified/web/**/*.png', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/release/unminified/web/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
-    {pattern: 'web/release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
+    {pattern: 'web/build/web/debug/**/*.css', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/web/debug/**/*.gif', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/web/debug/**/*.png', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/web/debug/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/web/debug/*.js', watched: true, served: true, included: false},  // The actual KMW code.
+    {pattern: 'web/build/web/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'web/tools/recorder/build/index.js.map', watched: true, served: true, included: false},
     {pattern: 'web/tools/element-wrappers/build/index.js.map', watched: true, served: true, included: false},
     {pattern: 'web/tools/device-detect/build/index.js.map', watched: true, served: true, included: false}
   ],
 
   proxies: {
-    "/source/": "/base/web/release/unminified/web/",
+    "/source/": "/base/web/build/web/debug/",
     "/resources/": "/base/common/test/resources/",
     "/source/recorder_InputEvents.js.map": "/base/common/tests/recorder_InputEvents.js.map"
   },

@@ -84,7 +84,7 @@ parse_params "$@"
 # Get file size of the latest local minified build
 #
 
-LOCAL_FILE=web/release/web/keymanweb.js
+LOCAL_FILE=web/build/web/release/keymanweb.js
 LOCAL_FILE_SIZE=`stat --printf="%s" $KEYMAN_ROOT/$LOCAL_FILE`
 
 #

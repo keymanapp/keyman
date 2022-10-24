@@ -67,7 +67,7 @@ fi
 ##
 function upload_keyman_web {
 
-  local kmwpath="$KEYMAN_ROOT/web/release/web"
+  local kmwpath="$KEYMAN_ROOT/web/build/web/release"
   local dstpath="$S_KEYMAN_COM/kmw/engine/$VERSION/"
 
   #
