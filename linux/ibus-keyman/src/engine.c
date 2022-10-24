@@ -144,9 +144,7 @@ static void ibus_keyman_engine_disable    (IBusEngine             *engine);
 //                                           (IBusEngine             *engine,
 //                                            const gchar            *prop_name);
 
-static void ibus_keyman_engine_commit_string
-                                          (IBusKeymanEngine       *keyman,
-                                           const gchar            *string);
+static void commit_string(IBusKeymanEngine *keyman, const gchar *string);
 
 static IBusEngineClass *parent_class = NULL;
 
@@ -516,9 +514,7 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
 
-static void
-ibus_keyman_engine_commit_string (IBusKeymanEngine *keyman,
-                                const gchar    *string)
+static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
 {
     IBusText *text;
     g_message("DAR: %s - %s", __FUNCTION__, string);
@@ -650,7 +646,7 @@ process_emit_keystroke_action(IBusKeymanEngine *keyman) {
   IBusEngine *engine = (IBusEngine *)keyman;
   if ((!client_supports_prefilter(engine) || client_supports_surrounding_text(engine)) &&
       keyman->commit_item->char_buffer != NULL) {
-    ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
+    commit_string(keyman, keyman->commit_item->char_buffer);
     g_free(keyman->commit_item->char_buffer);
     keyman->commit_item->char_buffer = NULL;
   }
@@ -695,7 +691,7 @@ commit_text(IBusKeymanEngine *keyman) {
 
   commit_queue_item *current_item = &keyman->commit_queue[0];
   if (current_item->char_buffer != NULL) {
-    ibus_keyman_engine_commit_string(keyman, current_item->char_buffer);
+    commit_string(keyman, current_item->char_buffer);
     g_free(current_item->char_buffer);
   }
   if (current_item->emitting_keystroke) {
@@ -731,7 +727,7 @@ process_end_action(IBusKeymanEngine *keyman) {
         : IBUS_PREFILTER_MASK);
   } else {
     if (keyman->commit_item->char_buffer != NULL) {
-      ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
+      commit_string(keyman, keyman->commit_item->char_buffer);
       g_free(keyman->commit_item->char_buffer);
       keyman->commit_item->char_buffer = NULL;
     }
