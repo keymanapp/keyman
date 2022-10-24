@@ -5,7 +5,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
@@ -20,5 +20,5 @@ cp "$KEYMAN_ROOT/web/build/embed/debug/keyman.js.map" "$THIS_DIR/host/keyman.js.
 
 # Test keyboards
 
-cp "$KEYMAN_ROOT/web/testing/web_context_tests.js" "$THIS_DIR/host/"
+cp "$KEYMAN_ROOT/web/src/test/manual/web/web_context_tests.js" "$THIS_DIR/host/"
 # android\KMEA\app\src\main\assets\keyboard.html
