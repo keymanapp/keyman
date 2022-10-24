@@ -26,10 +26,10 @@ UI="ui"
 WEB="web"
 EMBEDDED="embedded"
 
-WEB_OUTPUT="release/web"
-EMBED_OUTPUT="release/embedded"
-WEB_OUTPUT_NO_MINI="release/unminified/web"
-EMBED_OUTPUT_NO_MINI="release/unminified/embedded"
+WEB_OUTPUT="build/web/release"
+EMBED_OUTPUT="build/embed/release"
+WEB_OUTPUT_NO_MINI="build/web/debug"
+EMBED_OUTPUT_NO_MINI="build/embed/debug"
 INTERMEDIATE="intermediate"  # TODO:  Eliminate.  May have lingering side-effects in sourcemapping at the moment.
 SOURCE="src"
 
@@ -161,7 +161,8 @@ minify ( ) {
 
     local INPUT="$1"
     local INPUT_FILE="$(basename $1)"
-    local INPUT_SOURCEMAP="$(dirname $1)/$INPUT_FILE.map"
+    local INPUT_DIR="$(dirname $1)"
+    local INPUT_SOURCEMAP="$INPUT_DIR/$INPUT_FILE.map"
     local OUTPUT="$2"
     local OUTPUT_FILE="$(basename $2)"
     local OUTPUT_SOURCEMAP="$(dirname $2)/$OUTPUT_FILE.map"
@@ -170,7 +171,7 @@ minify ( ) {
     # ../../.. => keymanapp, ../.. => keymanapp/keyman.  We have TS root sources on 'keyman'.
     $minifycmd --source_map_input "$INPUT|$INPUT_SOURCEMAP" \
         --create_source_map "$OUTPUT_SOURCEMAP" --source_map_include_content \
-        --source_map_location_mapping "$INTERMEDIATE|../../.." \
+        --source_map_location_mapping "$INPUT_DIR|../../.." \
         --js "$INPUT" --compilation_level $3 \
         --js_output_file "$OUTPUT" --warning_level VERBOSE --output_wrapper "$wrapper
 //# sourceMappingURL=$1.map"
@@ -270,8 +271,15 @@ if builder_has_action build:embed || builder_has_action build:web; then
 fi
 
 if builder_start_action build:samples; then
+  # Some test pages actually have build scripts.
+  ./testing/android-harness/build.sh  # is not yet builder-based.
+
   echo "Copying samples & test page resources..."
+  # Should probably be changed into a build script for the `prediction-ui` test page.
   cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}"
+
+  # Which could then have a parallel script for `prediction-mtnt` that downloads + extracts
+  # the current MTNT model.
 
   builder_finish_action success build:samples;
 fi
@@ -279,30 +287,30 @@ fi
 if builder_start_action build:embed; then
   $compilecmd -b src/app/embed -v
 
-  assert_exists build/embed/debug/keyman.js
+  assert_exists $EMBED_OUTPUT_NO_MINI/keyman.js
 
-  echo Embedded TypeScript compiled as $INTERMEDIATE/keyman.js
+  echo Embedded TypeScript compiled as $EMBED_OUTPUT_NO_MINI/keyman.js
 
-  copy_resources "build/embed/debug"  # Very useful for local testing.
+  copy_resources "$EMBED_OUTPUT_NO_MINI"  # Very useful for local testing.
 
   if ! builder_has_option --skip-minify; then
     # Create our entire embedded compilation results path.
-    if ! [ -d build/embed/release/resources ]; then
-      mkdir -p "build/embed/release/resources"  # Includes base folder, is recursive.
+    if ! [ -d $EMBED_OUTPUT/resources ]; then
+      mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
     fi
 
-    if [ -f "build/embed/release/keyman.js" ]; then
-      rm build/embed/release/keyman.js 2>/dev/null
+    if [ -f "$EMBED_OUTPUT/keyman.js" ]; then
+      rm $EMBED_OUTPUT/keyman.js 2>/dev/null
     fi
 
-    minify build/embed/debug/keyman.js build/embed/release/keyman.js SIMPLE_OPTIMIZATIONS
-    assert_exists build/embed/release/keyman.js
-    echo Compiled embedded application saved as build/embed/release/keyman.js
+    minify $EMBED_OUTPUT_NO_MINI/keyman.js $EMBED_OUTPUT/keyman.js SIMPLE_OPTIMIZATIONS
+    assert_exists $EMBED_OUTPUT/keyman.js
+    echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
 
     # Update any changed resources
     # echo Copy or update resources
 
-    copy_resources "build/embed/release"
+    copy_resources "$EMBED_OUTPUT"
 
     # Update build number if successful
     echo
@@ -337,24 +345,24 @@ if builder_start_action build:web; then
   if [ $? -ne 0 ]; then
     fail "Typescript compilation failed."
   fi
-  assert_exists build/web/debug/keymanweb.js
+  assert_exists $WEB_OUTPUT_NO_MINI/keymanweb.js
 
-  echo Native TypeScript compiled as build/web/debug/keymanweb.js
+  echo Native TypeScript compiled as $WEB_OUTPUT_NO_MINI/keymanweb.js
 
-  copy_resources "build/web/debug"
+  copy_resources "$WEB_OUTPUT_NO_MINI"
 
   if ! builder_has_option --skip-minify; then
-    if [ -f "build/web/release/keymanweb.js" ]; then
-      rm build/web/release/keymanweb.js 2>/dev/null
+    if [ -f "$WEB_OUTPUT/keymanweb.js" ]; then
+      rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
     fi
 
     echo Minifying KeymanWeb...
-    minify build/web/debug/keymanweb.js build/web/release/keymanweb.js SIMPLE_OPTIMIZATIONS
-    assert_exists build/web/release/keymanweb.js
+    minify $WEB_OUTPUT_NO_MINI/keymanweb.js $WEB_OUTPUT/keymanweb.js SIMPLE_OPTIMIZATIONS
+    assert_exists $WEB_OUTPUT/keymanweb.js
 
-    echo Compiled KeymanWeb application saved as build/web/release/keymanweb.js
+    echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js
 
-    copy_resources "build/web/release"
+    copy_resources "$WEB_OUTPUT"
     # Update build number if successful
     echo
     echo KeymanWeb $VERSION compiled and saved under $WEB_OUTPUT
