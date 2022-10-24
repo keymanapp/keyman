@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.87 alpha 2022-10-24
+
+* fix(web): touch-platform language menu initial scrolling + index scrolling (#7488)
+
 ## 16.0.86 alpha 2022-10-21
 
 * fix(developer): Handle invalid graphics in icon editor (#7431)
