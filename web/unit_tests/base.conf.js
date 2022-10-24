@@ -55,6 +55,8 @@ module.exports = {
     {pattern: 'web/build/web/debug/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/build/web/debug/*.js', watched: true, served: true, included: false},  // The actual KMW code.
     {pattern: 'web/build/web/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
+    {pattern: 'web/build/ui/debug/*.js', watched: true, served: true, included: false},  // The actual KMW UI code.
+    {pattern: 'web/build/ui/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'web/tools/recorder/build/index.js.map', watched: true, served: true, included: false},
     {pattern: 'web/tools/element-wrappers/build/index.js.map', watched: true, served: true, included: false},
     {pattern: 'web/tools/device-detect/build/index.js.map', watched: true, served: true, included: false}
@@ -62,6 +64,7 @@ module.exports = {
 
   proxies: {
     "/source/": "/base/web/build/web/debug/",
+    "/ui-source/": "/base/web/build/ui/debug/",
     "/resources/": "/base/common/test/resources/",
     "/source/recorder_InputEvents.js.map": "/base/common/tests/recorder_InputEvents.js.map"
   },
