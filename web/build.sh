@@ -270,20 +270,6 @@ if builder_has_action build:embed || builder_has_action build:web; then
   echo ""
 fi
 
-if builder_start_action build:samples; then
-  # Some test pages actually have build scripts.
-  ./testing/android-harness/build.sh  # is not yet builder-based.
-
-  echo "Copying samples & test page resources..."
-  # Should probably be changed into a build script for the `prediction-ui` test page.
-  cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}"
-
-  # Which could then have a parallel script for `prediction-mtnt` that downloads + extracts
-  # the current MTNT model.
-
-  builder_finish_action success build:samples;
-fi
-
 if builder_start_action build:embed; then
   $compilecmd -b src/app/embed -v
 
@@ -420,6 +406,20 @@ fi
 if builder_start_action build:tools; then
   tools/build.sh
   builder_finish_action success build:tools
+fi
+
+if builder_start_action build:samples; then
+  # Some test pages actually have build scripts.
+  ./testing/android-harness/build.sh  # is not yet builder-based; depends on build:embed
+
+  echo "Copying samples & test page resources..."
+  # Should probably be changed into a build script for the `prediction-ui` test page.
+  cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}"
+
+  # Which could then have a parallel script for `prediction-mtnt` that downloads + extracts
+  # the current MTNT model.
+
+  builder_finish_action success build:samples;
 fi
 
 if builder_start_action test:web; then
