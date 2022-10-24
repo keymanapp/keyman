@@ -6,7 +6,7 @@
 module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude)
   // set to Keyman repo base.
-  basePath: '../..',
+  basePath: '../../../..',
 
   // Safeguards against disconnecting after starting tests.
   browserNoActivityTimeout: 60000,
@@ -37,15 +37,15 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'web/unit_tests/modernizr.js',               // A dependency-managed utility script that helps with browser feature detection.
+    'web/src/test/auto/modernizr.js',               // A dependency-managed utility script that helps with browser feature detection.
     'web/tools/element-wrappers/build/index.js', // Defines com.keyman.dom objects separate from KMW for unit testing.
     'web/tools/device-detect/build/index.js',    // Defines com.keyman.utils.Device, separated from KMW for use in unit test setup.
     'web/tools/recorder/build/index.js',         // The object definitions used to generate/replicate key events for engine tests.
                                                  // Includes KMW's Device class, which is used by test_utils below.
-    'web/unit_tests/test_init_check.js',         // Ensures that tests will initialize properly
+    'web/src/test/auto/test_init_check.js',         // Ensures that tests will initialize properly
     'common/test/resources/timeout-adapter.js',  // Handles configuration timeout setup at runtime.
-    'web/unit_tests/test_utils.js',              // A basic utility script useful for constructing tests
-    'web/unit_tests/cases/**/*.js',              // Where the tests actually reside.
+    'web/src/test/auto/test_utils.js',              // A basic utility script useful for constructing tests
+    'web/src/test/auto/cases/**/*.js',              // Where the tests actually reside.
     'common/test/resources/json/**/*.json',      // Where pre-loaded JSON resides.
     {pattern: 'common/test/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
     {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
