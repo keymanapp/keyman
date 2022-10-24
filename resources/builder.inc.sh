@@ -512,9 +512,11 @@ builder_describe() {
       local dependency="${value:1}"
       dependency="`_builder_expand_relative_path "$dependency"`"
       _builder_deps+=($dependency)
-      # echo "$description"
       _builder_dep_related_actions[$dependency]="`_builder_expand_action_targets "$description"`"
-      # echo "${_builder_dep_related_actions[$dependency]}"
+
+      # We don't want to add deps to params, so shift+continue
+      shift
+      continue
     elif [[ $value =~ ^-- ]]; then
       # Parameter is an option
       # Look for a shorthand version of the option
