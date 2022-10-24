@@ -54,6 +54,8 @@ ibus_keyman_tests_SOURCES = \
   testfixture.cpp \
   testmodule.c \
   testmodule.h \
+  ../../../core/src/debuglog.cpp \
+  ../../../core/src/debuglog.h \
   ../../../core/src/jsonpp.cpp \
   ../../../core/src/keyboard.cpp \
   ../../../core/src/kmx/kmx_actions.cpp \
@@ -64,7 +66,6 @@ ibus_keyman_tests_SOURCES = \
   ../../../core/src/kmx/kmx_context.cpp \
   ../../../core/src/kmx/kmx_context.h \
   ../../../core/src/kmx/kmx_conversion.cpp \
-  ../../../core/src/kmx/kmx_debug.cpp \
   ../../../core/src/kmx/kmx_debugger.cpp \
   ../../../core/src/kmx/kmx_debugger.h \
   ../../../core/src/kmx/kmx_environment.cpp \
