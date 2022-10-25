@@ -153,7 +153,7 @@ update_bundle ( ) {
     if [ $DO_KMW_BUILD = true ]; then
         echo Building KeymanWeb from $KMW_ROOT
 
-        KMW_PRODUCT=web/build/embed/
+        KMW_PRODUCT=web/build/app/embed/
         if [ "$CONFIG" == "Debug" ]; then
           KMWFLAGS="configure:embed build:embed --debug"
           KMW_PRODUCT="$KMW_PRODUCT/debug"

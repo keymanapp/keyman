@@ -49,22 +49,22 @@ module.exports = {
     'common/test/resources/json/**/*.json',      // Where pre-loaded JSON resides.
     {pattern: 'common/test/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
     {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
-    {pattern: 'web/build/web/debug/**/*.css', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/build/web/debug/**/*.gif', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/build/web/debug/**/*.png', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/build/web/debug/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/build/web/debug/*.js', watched: true, served: true, included: false},  // The actual KMW code.
-    {pattern: 'web/build/web/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
-    {pattern: 'web/build/ui/debug/*.js', watched: true, served: true, included: false},  // The actual KMW UI code.
-    {pattern: 'web/build/ui/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
+    {pattern: 'web/build/app/web/debug/**/*.css', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/app/web/debug/**/*.gif', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/app/web/debug/**/*.png', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/app/web/debug/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
+    {pattern: 'web/build/app/web/debug/*.js', watched: true, served: true, included: false},  // The actual KMW code.
+    {pattern: 'web/build/app/web/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
+    {pattern: 'web/build/app/ui/debug/*.js', watched: true, served: true, included: false},  // The actual KMW UI code.
+    {pattern: 'web/build/app/ui/debug/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'web/tools/recorder/build/index.js.map', watched: true, served: true, included: false},
     {pattern: 'web/tools/element-wrappers/build/index.js.map', watched: true, served: true, included: false},
     {pattern: 'web/tools/device-detect/build/index.js.map', watched: true, served: true, included: false}
   ],
 
   proxies: {
-    "/source/": "/base/web/build/web/debug/",
-    "/ui-source/": "/base/web/build/ui/debug/",
+    "/source/": "/base/web/build/app/web/debug/",
+    "/ui-source/": "/base/web/build/app/ui/debug/",
     "/resources/": "/base/common/test/resources/",
     "/source/recorder_InputEvents.js.map": "/base/common/tests/recorder_InputEvents.js.map"
   },
