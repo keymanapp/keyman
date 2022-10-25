@@ -109,10 +109,9 @@ DOC_BUILD_EMBED_WEB="${BUILDER_TERM_START}build:embed${BUILDER_TERM_END} and ${B
 DOC_TEST_SYMBOL="actions -${BUILDER_TERM_START}test${BUILDER_TERM_END}, ${BUILDER_TERM_START}upload-symbols${BUILDER_TERM_END}"
 
 builder_describe "Builds Keyman Engine for Web." \
-  "@../common/web/keyman-version build:embed build:web build:ui" \
-  "@../common/web/input-processor build:embed build:web" \
-  "@../common/web/lm-worker build:embed build:web" \
-  "@tools/sourcemap-root build:embed build:web" \
+  "@../common/web/keyman-version build:engine build:embed build:web build:ui" \
+  "@../common/web/input-processor build:engine build:embed build:web" \
+  "@tools/sourcemap-root build:engine build:embed build:web" \
   "clean" \
   "configure" \
   "build" \
