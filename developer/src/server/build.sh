@@ -129,8 +129,8 @@ if (( build_keymanweb )); then
 fi
 
 if (( copy_keymanweb )); then
-  WEB_SRC="$KEYMAN_ROOT/build/web/debug"
-  UI_SRC="$KEYMAN_ROOT/build/ui/debug"
+  WEB_SRC="$KEYMAN_ROOT/web/build/web/debug"
+  UI_SRC="$KEYMAN_ROOT/web/build/ui/debug"
   DST="$(dirname "$THIS_SCRIPT")/src/site/resource"
 
   rm -rf "$DST"
