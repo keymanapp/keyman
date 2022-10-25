@@ -459,12 +459,21 @@ begin
   if GetKeyState(VK_SHIFT) < 0 then modifier := modifier or KM_KBP_MODIFIER_SHIFT;
   if (GetKeyState(VK_CAPITAL) and 1) = 1 then modifier := modifier or KM_KBP_MODIFIER_CAPS;
 
+  // TODO: #7529 support translation of base layout to KBDUS layout
+
+  if (modifier and (KM_KBP_MODIFIER_LCTRL or KM_KBP_MODIFIER_RALT)) = (KM_KBP_MODIFIER_LCTRL or KM_KBP_MODIFIER_RALT) then
+  begin
+    // #7506: Windows emits LCtrl+RAlt for AltGr for European keyboards; we want
+    // to ignore this combination
+    modifier := modifier and not KM_KBP_MODIFIER_LCTRL;
+  end;
+
   if not SetKeyEventContext then
     Exit(False);
 
   if km_kbp_process_event(FDebugCore.State, Message.WParam, modifier, 1) = KM_KBP_STATUS_OK then
   begin
-    // Process keystroke
+    // Process keystroke -- true = swallow keystroke
     Result := True;
 
     if IsModifierKey(Message.WParam) then

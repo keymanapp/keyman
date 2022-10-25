@@ -556,6 +556,7 @@ end;
 
 procedure TmodActionsKeyboardEditor.SelectDebugSystemKeyboard(k: TSystemKeyboardItem);
 begin
+//TODO: #1225, #1074 (note both menu item and toolbar combo are hidden while this is not working)
 //  if IsDebuggerVisible then   // I3655
 //    ActiveEditor.DebugForm.SetSystemKeyboardID(k.KeyboardID);
 end;
