@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.88 alpha 2022-10-25
+
+* fix(common): ignore deps when formatting help (#7514)
+* refactor(linux): Comment unused methods (#7501)
+* chore(linux): Rename internal method to `commit_string` (#7502)
+* chore(linux): call `reset_context` instead of `...focus_in` (#7503)
+* chore(common): Update crowdin strings for Amharic (#7522)
+* chore(android): Update help whatsnew for 16.0 (#7507)
+* chore(common): Update existing crowdin strings for 16.0 (#7524)
+
 ## 16.0.87 alpha 2022-10-24
 
 * fix(web): touch-platform language menu initial scrolling + index scrolling (#7488)
