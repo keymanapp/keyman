@@ -16,6 +16,7 @@ import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMString;
 
 import org.json.JSONException;
 
@@ -75,6 +76,11 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
             if (packageID == null || packageID.isEmpty()) {
               KMLog.LogError(TAG, "Cloud URL " + _d.getCloudParams().url + " has null packageID");
             }
+
+            // Log keyboard package update to troubleshoot #7412 (languageID may be null)
+            String msg = KMString.format("Cloud keyboard package updated for: %s, language: %s.", packageID, languageID);
+            KMLog.LogInfo(TAG, msg);
+
             String kmpFilename = String.format("%s%s", packageID, FileUtils.KEYMANPACKAGE);
 
             // Extract the kmp.

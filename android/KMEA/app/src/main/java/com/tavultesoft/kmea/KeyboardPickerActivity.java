@@ -417,6 +417,12 @@ public final class KeyboardPickerActivity extends BaseActivity {
   protected static boolean removeKeyboard(Context context, int position) {
     boolean result = false;
 
+    Keyboard info = KeyboardController.getInstance().getKeyboardInfo(position);
+    if (info != null) {
+      // Log keyboard uninstall to troubleshoot #7412
+      String msg = KMString.format("Uninstalling %s::%s, version: %s.", info.getPackageID(), info.getKeyboardID(), info.getVersion());
+      KMLog.LogInfo(TAG, msg);
+    }
     KeyboardController.getInstance().remove(position);
     result = KeyboardController.getInstance().save(context);
 
