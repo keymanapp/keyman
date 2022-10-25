@@ -124,6 +124,9 @@
 /* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
 "kmp-error-missing-resource" = "Package ngǝni aɗika keyboard wala dictionary natǝ mdǝ bara wa.";
 
+/* Error installing a Keyman package with a version of Keyman that does not support it */
+"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Package ngǝni mda aɗi namni ɓɗakǝlaga wa - mda aɗi sǝndǝɓǝla suayeri na akwa wa.";
 
