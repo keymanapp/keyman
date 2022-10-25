@@ -38,7 +38,7 @@ module.exports = {
   /**
    * Various relative paths
    */
-  KEYMANWEB_RELATIVE_PATH: 'web/build/web/debug',
+  KEYMANWEB_RELATIVE_PATH: 'web/build/app/web/debug',
   BASE_RELATIVE_PATH: '../../../../',
   KEYMAN_REPO_BASE_RELATIVE_PATH: '../../../',
 

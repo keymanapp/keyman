@@ -26,10 +26,13 @@ UI="ui"
 WEB="web"
 EMBEDDED="embedded"
 
-WEB_OUTPUT="build/web/release"
-EMBED_OUTPUT="build/embed/release"
-WEB_OUTPUT_NO_MINI="build/web/debug"
-EMBED_OUTPUT_NO_MINI="build/embed/debug"
+WEB_OUTPUT="build/app/web/release"
+EMBED_OUTPUT="build/app/embed/release"
+UI_OUTPUT="build/app/ui/release"
+WEB_OUTPUT_NO_MINI="build/app/web/debug"
+EMBED_OUTPUT_NO_MINI="build/app/embed/debug"
+UI_OUTPUT_NO_MINI="build/app/ui/debug"
+
 INTERMEDIATE="intermediate"  # TODO:  Eliminate.  May have lingering side-effects in sourcemapping at the moment.
 SOURCE="src"
 
@@ -361,43 +364,43 @@ fi
 if builder_start_action build:ui; then
   $compilecmd -b src/app/ui -v
 
-  assert_exists build/ui/debug/kmwuitoolbar.js
-  assert_exists build/ui/debug/kmwuitoggle.js
-  assert_exists build/ui/debug/kmwuifloat.js
-  assert_exists build/ui/debug/kmwuibutton.js
+  assert_exists $UI_OUTPUT_NO_MINI/kmwuitoolbar.js
+  assert_exists $UI_OUTPUT_NO_MINI/kmwuitoggle.js
+  assert_exists $UI_OUTPUT_NO_MINI/kmwuifloat.js
+  assert_exists $UI_OUTPUT_NO_MINI/kmwuibutton.js
 
   echo \'Native\' UI TypeScript has been compiled into the build/ui/debug folder
 
   if ! builder_has_option --skip-minify; then
     echo Minify ToolBar UI
     if [ -f "build/ui/release/kmuitoolbar.js" ]; then
-        rm $build/ui/release/kmuitoolbar.js 2>/dev/null
+        rm $UI_OUTPUT/kmuitoolbar.js 2>/dev/null
     fi
-    minify build/ui/debug/kmwuitoolbar.js build/ui/release/kmwuitoolbar.js ADVANCED_OPTIMIZATIONS "web/src/app/ui" "(function() {%output%}());"
-    assert_exists build/ui/release/kmwuitoolbar.js
+    minify $UI_OUTPUT_NO_MINI/kmwuitoolbar.js $UI_OUTPUT/kmwuitoolbar.js ADVANCED_OPTIMIZATIONS "web/src/app/ui" "(function() {%output%}());"
+    assert_exists $UI_OUTPUT/kmwuitoolbar.js
 
     echo Minify Toggle UI
     if [ -f "build/ui/release/kmuitoggle.js" ]; then
-        rm build/ui/release/kmuitoggle.js 2>/dev/null
+        rm $UI_OUTPUT/kmuitoggle.js 2>/dev/null
     fi
-    minify build/ui/debug/kmwuitoggle.js build/ui/release/kmwuitoggle.js SIMPLE_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
-    assert_exists build/ui/release/kmwuitoggle.js
+    minify $UI_OUTPUT_NO_MINI/kmwuitoggle.js $UI_OUTPUT/kmwuitoggle.js SIMPLE_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
+    assert_exists $UI_OUTPUT/kmwuitoggle.js
 
     echo Minify Float UI
     if [ -f "build/ui/release/kmuifloat.js" ]; then
-        rm build/ui/release/kmuifloat.js 2>/dev/null
+        rm $UI_OUTPUT/kmuifloat.js 2>/dev/null
     fi
-    minify build/ui/debug/kmwuifloat.js build/ui/release/kmwuifloat.js ADVANCED_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
-    assert_exists build/ui/release/kmwuifloat.js
+    minify $UI_OUTPUT_NO_MINI/kmwuifloat.js $UI_OUTPUT/kmwuifloat.js ADVANCED_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
+    assert_exists $UI_OUTPUT/kmwuifloat.js
 
     echo Minify Button UI
     if [ -f "build/ui/release/kmuibutton.js" ]; then
-        rm build/ui/release/kmuibutton.js 2>/dev/null
+        rm $UI_OUTPUT/kmuibutton.js 2>/dev/null
     fi
-    minify build/ui/debug/kmwuibutton.js build/ui/release/kmwuibutton.js SIMPLE_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
-    assert_exists build/ui/release/kmwuibutton.js
+    minify $UI_OUTPUT_NO_MINI/kmwuibutton.js $UI_OUTPUT/kmwuibutton.js SIMPLE_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
+    assert_exists $UI_OUTPUT/kmwuibutton.js
 
-    echo "User interface modules compiled and saved under build/ui/release"
+    echo "User interface modules compiled and saved under $UI_OUTPUT"
   fi
 
   builder_finish_action success build:ui

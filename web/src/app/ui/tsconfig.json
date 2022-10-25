@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"outDir": "../../../build/ui/debug",
+		"outDir": "../../../build/app/ui/debug",
 		"rootDir": ""
   },
   "extends": "../../tsconfig.base.json",

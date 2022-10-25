@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
 
 	"compilerOptions": {
-		"outFile": "../../../build/embed/debug/keyman.js",
+		"outFile": "../../../build/app/embed/debug/keyman.js",
     "sourceRoot": "/keyman/"
   },
 
