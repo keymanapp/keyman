@@ -8,6 +8,11 @@
         <item quantity="other">Keyboards</item>
     </plurals>
     <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">Other Input Method</item>
+        <item quantity="other">Other Input Methods</item>
+    </plurals>
+    <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Ɓeddu kibod kesum</string>
     <!-- Context: Title for list -->
     <string name="title_languages_settings" comment="List of installed languages">Ɗemngal ko wa`inni</string>
@@ -21,7 +26,7 @@
     <string name="label_cancel" comment="Button to cancel an action">Wurtu</string>
     <!-- Context: Button label -->
     <string name="label_close" comment="Close a dialog">Maɓɓu</string>
-    <!-- Context: Button label -->
+    <!-- Context: Button label. Removed in Keyman 15 -->
     <string name="label_close_keyman" comment="Close the Keyman application">Maɓɓu Keyman</string>
     <!-- Context: Button label -->
     <string name="label_forward" comment="Button to go forward">Yeeso</string>
@@ -39,6 +44,8 @@
     <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Kesutu</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Nastata dow sava Keyman </string>
     <!-- Context: Keyboard Updates -->
@@ -77,6 +84,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Masala nder kibod %1$s:%2$s jee %3$s ɗemngal. </string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Ɗo tefa deftere ma`ana kalimaji ngam jippina</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">A` yiɗan jippingo deftere ma`ana kalimaji ɗo kesum na?  </string>
     <!-- Context: No associated dictionary found -->
@@ -119,16 +127,25 @@
     <string name="uninstall_model" comment="Label to uninstall a dictionary">A` itta deftere ma`ana kalimaji</string>
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">A` yiɗan woggugo deftere ma`ana kalimaji ɗo na?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s Kibod man wa`innaa ma</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Accu wo`inningo</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Accu tammunde</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Deftere ma`ana kalimaji</string>
+    <plurals name="model_count">
+        <item quantity="one">Dictionary</item>
+        <item quantity="other">Dictionaries</item>
+    </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Tefu deftere ma`ana kalimaji ko ɗon</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Deftere ma`ana kalimaji: %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -150,4 +167,6 @@
     <!-- Context: Shared preferences name -->
     <!-- Context: Other strings -->
     <string name="help_bubble_text">A` meema haa ɗo ngam a` wayla kibod</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>
