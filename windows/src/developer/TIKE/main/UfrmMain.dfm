@@ -65,7 +65,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
     object panDebugToolbar: TPanel
       Left = 481
       Top = 2
-      Width = 504
+      Width = 512
       Height = 23
       AutoSize = True
       BevelOuter = bvNone
@@ -89,12 +89,13 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         GroupIndex = 2
       end
       object cbDebugSystemKeyboard: TComboBox
-        Left = 359
+        Left = 367
         Top = 1
         Width = 145
         Height = 21
         Style = csDropDownList
         TabOrder = 0
+        Visible = False
         OnClick = cbDebugSystemKeyboardItemClick
         OnDropDown = cbDebugSystemKeyboard_DropDown
       end
