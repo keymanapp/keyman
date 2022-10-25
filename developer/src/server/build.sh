@@ -140,8 +140,8 @@ if (( copy_keymanweb )); then
   cp "$UI_SRC/"*.js "$UI_SRC/"*.js.map "$DST/"
   cp -R "$WEB_SRC/osk/"* "$DST/osk/"
   cp -R "$WEB_SRC/ui/"* "$DST/ui/"
-  cp "$KEYMAN_ROOT/LICENSE" "$DST/"
-  cp "$KEYMAN_ROOT/README.md" "$DST/"
+  cp "$KEYMAN_ROOT/web/LICENSE" "$DST/"
+  cp "$KEYMAN_ROOT/web/README.md" "$DST/"
 fi
 
 # ----------------------------------------
