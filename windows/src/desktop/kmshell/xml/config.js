@@ -273,8 +273,8 @@ document.addEventListener("DOMContentLoaded", windowResize);
         state.keyboards.push({name: name, expanded: $(this).hasClass('expanded')});
       }
     });
-    var modfiy_list = $('div.modify');
-    modfiy_list.each(function(index) {
+    var modify_list = $('div.modify');
+    modify_list.each(function(index) {
       const name = $(this).data('name');
       if(name) {
         state.modify_languages.push({name: name, modify: $(this).hasClass('modify_visible')});
