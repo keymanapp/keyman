@@ -22,25 +22,71 @@ cd "$THIS_SCRIPT_PATH"
 # ################################ Main script ################################
 
 # Definition of global compile constants
-UI="ui"
-WEB="web"
-EMBEDDED="embedded"
 
-WEB_OUTPUT="build/app/web/release"
-EMBED_OUTPUT="build/app/embed/release"
-UI_OUTPUT="build/app/ui/release"
-WEB_OUTPUT_NO_MINI="build/app/web/debug"
-EMBED_OUTPUT_NO_MINI="build/app/embed/debug"
-UI_OUTPUT_NO_MINI="build/app/ui/debug"
+UI="app/ui"
+WEB="app/web"
+EMBEDDED="app/embed"
+ENGINE="engine" # For now, a catch-all for all engine code.  This should be subdivided
+                # once we have multiple engine modules within this project
+BUILD_BASE="build"
 
-INTERMEDIATE="intermediate"  # TODO:  Eliminate.  May have lingering side-effects in sourcemapping at the moment.
+DEBUG="debug"
+RELEASE="release"
+INTERMEDIATE="obj"
+
+# Composites and outputs the output path corresponding to the build configuration
+# specified by the parameters.
+#
+# ### Parameters
+#
+# * 1: - build product (app/embed, app/web, app/ui, engine)
+# * 2: (optional) - build stage / config (obj, debug, release)
+#
+# ### Example
+#
+# ```bash
+#   cp index.js $(output_path app/web debug)/index.js
+# ```
+#
+# The block above would copy index.js into the build output folder for app/web's debug
+# product.
+#
+# ``` bash
+#   rm -rf $(output_path app/web)
+# ```
+#
+# The block above is useful for deleting all app/web build products as part of a `clean`
+# action.
+#
+# ### Other Notes
+#
+# In the future, we may opt to move $INTERMEDIATE stuff underneath both $DEBUG and $RELEASE,
+# making it a third param.  This is currently unclear, but if so, we'd do
+# $DEBUG/$INTERMEDIATE and $RELEASE/$INTERMEDIATE via a third argument.
+output_path ( ) {
+  if [ $# -lt 1 ]; then
+    echo "Insufficient argument count!"
+    exit 1
+  elif [ $# -eq 1 ]; then
+    # Used by clean:<target> actions
+    echo "$BUILD_BASE/$1"
+  else
+    echo "$BUILD_BASE/$1/$2"
+  fi
+}
+
+WEB_OUTPUT_NO_MINI="$(output_path $WEB $DEBUG)"
+WEB_OUTPUT="$(output_path $WEB $RELEASE)"
+
+EMBED_OUTPUT_NO_MINI="$(output_path $EMBEDDED $DEBUG)"
+EMBED_OUTPUT="$(output_path $EMBEDDED $RELEASE)"
+
+UI_OUTPUT_NO_MINI="$(output_path $UI $DEBUG)"
+UI_OUTPUT="$(output_path $UI $RELEASE)"
+
 SOURCE="src"
 
 SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
-
-readonly WEB_OUTPUT
-readonly EMBED_OUTPUT
-readonly SOURCE
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
@@ -72,6 +118,7 @@ builder_describe "Builds Keyman Engine for Web." \
   "build" \
   "test             Runs unit tests.  Only ${DOC_TEST_WEB} is currently defined"  \
   ":embed           Builds the configuration of Keyman Engine for Web used within the Keyman mobile apps" \
+  ":engine          Builds common code used by other targets" \
   ":web             Builds the website-oriented configuration of Keyman Engine for Web" \
   ":ui              Builds the desktop UI modules used by the ${DOC_WEB_PRODUCT}" \
   ":samples         Builds sample & test pages found under /samples and /testing, but not the ${DOC_WEB_PRODUCT}" \
@@ -89,9 +136,10 @@ builder_describe_outputs \
   configure:ui      ../node_modules \
   configure:samples ../node_modules \
   configure:tools   ../node_modules \
-  build:embed       $EMBED_OUTPUT/keyman.js \
-  build:web         $WEB_OUTPUT/keymanweb.js \
-  build:ui          $WEB_OUTPUT/kmwuibutton.js \
+  build:embed       $(output_path $EMBEDDED $RELEASE)/keyman.js \
+  build:engine      $(output_path $ENGINE $INTERMEDIATE)/keymanweb.js \
+  build:web         $(output_path $WEB $RELEASE)/keymanweb.js \
+  build:ui          $(output_path $UI $RELEASE)/kmwuibutton.js \
   build:samples     $PREDICTIVE_TEXT_OUTPUT
 # Deliberately excluding build:tools b/c its script provides the definitions.
 
@@ -100,9 +148,9 @@ builder_parse "$@"
 #### Build utility methods + definitions ####
 
 # Build products for each main target.
-WEB_TARGET=( "keymanweb.js" )
-UI_TARGET=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
-EMBED_TARGET=( "keyman.js" )
+EMBED_TARGETS=( "keyman.js" )
+WEB_TARGETS=( "keymanweb.js" )
+UI_TARGETS=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
 
 : ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler-java}
 : ${JAVA:=java}
@@ -124,7 +172,8 @@ minifier="$CLOSURECOMPILERPATH/compiler.jar"
 minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars --jscomp_off=jsdocMissingType --jscomp_off=uselessCode --jscomp_off=missingRequire --jscomp_off=strictMissingRequire"
 
 # We use these to prevent Closure from auto-inserting its own polyfills.  Turns out, they can break in the
-# WebView used by Android API 19, which our app still supports.
+# WebView used by Android API 19, which our app still supported when written.  Unsure if it can still occur
+# in Android API 21, our current minimum.
 #
 # Also, we currently apply all needed polyfills either manually or during TS compilation; we don't need the extra,
 # excess code.
@@ -187,34 +236,204 @@ minify ( ) {
     node $minified_sourcemap_cleaner "$INPUT_SOURCEMAP" "$OUTPUT_SOURCEMAP" $cleanerOptions
 }
 
+# Copies specified engine resources to the specified target's build output directories.
+#
+# ### Parameters
+#
+# * 1: `product`    the product's source path under src/
+# * 2: `outputs`    an array of resource types to copy over
+#
+# ### Example
+#
+# ```bash
+#   copy_resources app/web osk ui
+# ```
 copy_resources ( ) {
+  local COMPILE_TARGET=$1
+  shift
+
+  local RESOURCES_TO_COPY=("$@")
+
+  # We leave out $INTERMEDIATE here, as it's not a 'release' of any sort and
+  # thus doesn't need to publish sources or resources.
+  local CONFIGS=($DEBUG)
+
+  if ! builder_has_option --skip-minify; then
+    CONFIGS+=($RELEASE)
+  fi
+
+  echo
+
+  for CONFIG in "${CONFIGS[@]}";
+  do
+    local CONFIG_OUT_PATH=$(output_path $COMPILE_TARGET $CONFIG)
+
+    echo Copying resources to $CONFIG_OUT_PATH/src
+
+    for RESOURCE in "${RESOURCES_TO_COPY[@]}";
+    do
+      mkdir -p "$CONFIG_OUT_PATH/$RESOURCE"
+      mkdir -p "$CONFIG_OUT_PATH/src/resources/$RESOURCE"
+
+      echo "- $SOURCE/resources/$RESOURCE/ => $CONFIG_OUT_PATH/$RESOURCE"
+      cp -Rf $SOURCE/resources/$RESOURCE  $CONFIG_OUT_PATH/  >/dev/null
+    done
+
     echo
-    echo Copy resources to $1/ui, .../osk
+  done
+}
 
-    # Create our entire compilation results path.  Can't one-line them due to shell-script parsing errors.
-    mkdir -p "$1/ui"
-    mkdir -p "$1/osk"
-    mkdir -p "$1/src/resources/ui"
-    mkdir -p "$1/src/resources/osk"
+# Copies specified source folders corresponding to the specified target's build
+# output directories.
+#
+# ### Parameters
+#
+# * 1: `product`    the product's source path under src/
+# * 2: `outputs`    an array of src/ subfolders to copy over
+#
+# ### Example
+#
+# ```bash
+#   copy_sources app/web engine resources/osk
+# ```
+copy_sources ( ) {
+  local COMPILE_TARGET=$1
+  shift
 
-    cp -Rf $SOURCE/resources/ui  $1/  >/dev/null
-    cp -Rf $SOURCE/resources/osk $1/  >/dev/null
-    # do not copy resources/src
+  local SOURCES_TO_COPY=("$@")
 
-    echo Copy source to $1/src
-    # cp -Rf $SOURCE/*.js $1/src
-    # cp -Rf $SOURCE/*.ts $1/src
-    cp -Rf $SOURCE/app*       $1/src
-    cp -Rf $SOURCE/engine*    $1/src
-    echo $VERSION_PATCH > $1/src/version.txt
+  # We leave out $INTERMEDIATE here, as it's not a 'release' of any sort and
+  # thus doesn't need to publish sources or resources.
+  CONFIGS=($DEBUG)
 
-    cp -Rf $SOURCE/resources/ui  $1/src/resources >/dev/null
-    cp -Rf $SOURCE/resources/osk $1/src/resources >/dev/null
+  if ! builder_has_option --skip-minify; then
+    CONFIGS+=($RELEASE)
+  fi
 
-    # Update build number if successful
+  for CONFIG in "${CONFIGS[@]}";
+  do
+    CONFIG_OUT_PATH=$(output_path $COMPILE_TARGET $CONFIG)
+    echo Copying $COMPILE_TARGET sources to $CONFIG_OUT_PATH/src
+
+    rm -rf $CONFIG_OUT_PATH/src
+    mkdir -p $CONFIG_OUT_PATH/src
+    echo $VERSION_PATCH > $CONFIG_OUT_PATH/src/version.txt
+
+    for SOURCE_FOLDER in "${SOURCES_TO_COPY[@]}";
+    do
+      echo "- $SOURCE/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
+      mkdir -p $CONFIG_OUT_PATH/src/$SOURCE_FOLDER
+      cp -Rf  $SOURCE/$SOURCE_FOLDER/    $CONFIG_OUT_PATH/src/$SOURCE_FOLDER
+    done
+
     echo
-    echo KeymanWeb resources saved under $1
-    echo
+  done
+}
+
+# Compiles compiled scripts from the first folder specified to the second folder specified.
+#
+# ### Parameters
+#
+# * 1: `src`      the folder containing scripts to be copied
+# * 2: `dst`      the destination folder for the copy operation
+# * 3: `scripts`  an array of filenames for expected compiled scripts
+#
+# ### Example
+#
+# ```bash
+#   compile_and_minify build/app/web/obj build/app/web/debug keymanweb.js
+# ```
+copy_outputs ( ) {
+  local src=$1
+  local dst=$2
+
+  shift
+  shift
+
+  local BASE_SCRIPTS=("$@")
+
+  mkdir -p "$dst"
+
+  for SCRIPTJS in "${BASE_SCRIPTS[@]}";
+  do
+    cp -Rf $src/$SCRIPTJS             $dst/
+    cp -Rf $src/$SCRIPTJS.map         $dst/
+  done
+}
+
+# Compiles all build products corresponding to the specified target.
+#
+# ### Parameters
+#
+# * 1: `product`    the product's source path under src/
+#
+# ### Example
+#
+# ```bash
+#   compile app/embed
+# ```
+compile ( ) {
+  if [ $# -lt 1 ]; then
+    fail "Scripting error: insufficient argument count!"
+  fi
+
+  local COMPILE_TARGET=$1
+  local COMPILED_INTERMEDIATE_PATH=$(output_path $COMPILE_TARGET $INTERMEDIATE)
+
+  shift
+
+  $compilecmd -b src/$COMPILE_TARGET -v
+
+  echo $COMPILE_TARGET TypeScript compiled under $COMPILED_INTERMEDIATE_PATH
+}
+
+# Finalizes all build products corresponding to the specified target.
+# This should be called after `compile` for all `app/` targets.
+#
+# ### Parameters
+#
+# * 1: `product`    the product's source path under src/
+# * 2: `outputs`    an array of expected output script files for the build
+#
+# ### Example
+#
+# ```bash
+#   compile app/embed
+#   finalize app/embed keyman.js
+# ```
+finalize ( ) {
+  if [ $# -lt 2 ]; then
+    fail "Scripting error: insufficient argument count!"
+  fi
+
+  local COMPILE_TARGET=$1
+  local COMPILED_INTERMEDIATE_PATH=$(output_path $COMPILE_TARGET $INTERMEDIATE)
+  local DEBUG_OUT_PATH=$(output_path $COMPILE_TARGET $DEBUG)
+  local RELEASE_OUT_PATH=$(output_path $COMPILE_TARGET $RELEASE)
+
+  shift
+
+  local OUTPUT_SCRIPTS=("$@")
+
+  # START:  debug output
+
+  mkdir -p "$DEBUG_OUT_PATH"
+  copy_outputs $COMPILED_INTERMEDIATE_PATH $DEBUG_OUT_PATH "${OUTPUT_SCRIPTS[@]}"
+
+  echo Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
+
+  # START:  release output
+  if ! builder_has_option --skip-minify; then
+    for SCRIPT in "${OUTPUT_SCRIPTS[@]}";
+    do
+      minify $COMPILED_INTERMEDIATE_PATH/$SCRIPT $RELEASE_OUT_PATH/$SCRIPT SIMPLE_OPTIMIZATIONS
+    done
+
+    echo Compiled $COMPILE_TARGET release version saved under $RELEASE_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
+  else
+    # The prior 'release' is now outdated:  delete it.
+    rm -rf $RELEASE_OUT_PATH
+  fi
 }
 
 #### Build action definitions ####
@@ -236,20 +455,29 @@ fi
 
 ## Clean actions
 
+# Possible issue:  there's no clear rule to `clean` the engine, which is auto-built
+# by build:embed and build:web.
+#
+# Some sort of command to run ONLY for a general `clean` (no target specified) would
+# be perfect for that, I think.
+
+if builder_start_action clean:engine; then
+  rm -rf "$(output_path $ENGINE)"
+  builder_finish_action success clean:engine
+fi
+
 if builder_start_action clean:embed; then
-  rm -rf "build/embed/"
-  rm -rf "build/engine/"
+  rm -rf "$(output_path $EMBEDDED)"
   builder_finish_action success clean:embed
 fi
 
 if builder_start_action clean:web; then
-  rm -rf "build/web/"
-  rm -rf "build/engine/"
+  rm -rf "$(output_path $WEB)"
   builder_finish_action success clean:web
 fi
 
 if builder_start_action clean:ui; then
-  rm -rf "build/ui/"
+  rm -rf "$(output_path $UI)"
   builder_finish_action success clean:ui
 fi
 
@@ -268,44 +496,31 @@ fi
 ## Build actions
 
 # Adds a simple version 'header' when there's a main engine build product.
-if builder_has_action build:embed || builder_has_action build:web; then
-  echo "${COLOR_PURPLE}Compiling version ${VERSION}${COLOR_RESET}"
+if builder_has_action build:embed || \
+   builder_has_action build:web || \
+   builder_has_action build:ui; then
+
   echo ""
+  echo "${COLOR_PURPLE}Compiling version ${VERSION}${COLOR_RESET}"
+fi
+
+echo ""
+
+if builder_start_action build:engine; then
+  compile $ENGINE
+
+  builder_finish_action success build:engine
 fi
 
 if builder_start_action build:embed; then
-  $compilecmd -b src/app/embed -v
+  compile $EMBEDDED
+  finalize $EMBEDDED ${EMBED_TARGETS[@]}
 
-  assert_exists $EMBED_OUTPUT_NO_MINI/keyman.js
+  # The embedded version doesn't use UI modules.
+  copy_resources $EMBEDDED osk
+  copy_sources $EMBEDDED app/embed engine resources/osk
 
-  echo Embedded TypeScript compiled as $EMBED_OUTPUT_NO_MINI/keyman.js
-
-  copy_resources "$EMBED_OUTPUT_NO_MINI"  # Very useful for local testing.
-
-  if ! builder_has_option --skip-minify; then
-    # Create our entire embedded compilation results path.
-    if ! [ -d $EMBED_OUTPUT/resources ]; then
-      mkdir -p "$EMBED_OUTPUT/resources"  # Includes base folder, is recursive.
-    fi
-
-    if [ -f "$EMBED_OUTPUT/keyman.js" ]; then
-      rm $EMBED_OUTPUT/keyman.js 2>/dev/null
-    fi
-
-    minify $EMBED_OUTPUT_NO_MINI/keyman.js $EMBED_OUTPUT/keyman.js SIMPLE_OPTIMIZATIONS
-    assert_exists $EMBED_OUTPUT/keyman.js
-    echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
-
-    # Update any changed resources
-    # echo Copy or update resources
-
-    copy_resources "$EMBED_OUTPUT"
-
-    # Update build number if successful
-    echo
-    echo KMEA/KMEI version $VERSION compiled and saved under $EMBED_OUTPUT
-    echo
-  fi
+  builder_finish_action success build:embed
 
   # TODO:  handle this block somehow.
 
@@ -328,80 +543,22 @@ fi
 ### -embed section complete.
 
 if builder_start_action build:web; then
-  # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
-  echo Compile Keymanweb...
-  $compilecmd -b src/app/web -v
-  if [ $? -ne 0 ]; then
-    fail "Typescript compilation failed."
-  fi
-  assert_exists $WEB_OUTPUT_NO_MINI/keymanweb.js
+  compile $WEB
+  finalize $WEB ${WEB_TARGETS[@]}
 
-  echo Native TypeScript compiled as $WEB_OUTPUT_NO_MINI/keymanweb.js
-
-  copy_resources "$WEB_OUTPUT_NO_MINI"
-
-  if ! builder_has_option --skip-minify; then
-    if [ -f "$WEB_OUTPUT/keymanweb.js" ]; then
-      rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
-    fi
-
-    echo Minifying KeymanWeb...
-    minify $WEB_OUTPUT_NO_MINI/keymanweb.js $WEB_OUTPUT/keymanweb.js SIMPLE_OPTIMIZATIONS
-    assert_exists $WEB_OUTPUT/keymanweb.js
-
-    echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js
-
-    copy_resources "$WEB_OUTPUT"
-    # Update build number if successful
-    echo
-    echo KeymanWeb $VERSION compiled and saved under $WEB_OUTPUT
-    echo
-  fi
+  # The testing pages need both osk & ui resources in the same place.
+  copy_resources $WEB osk ui
+  copy_sources $WEB app/web engine resources/osk
 
   builder_finish_action success build:web
 fi
 
 if builder_start_action build:ui; then
-  $compilecmd -b src/app/ui -v
+  compile $UI
+  finalize $UI ${UI_TARGETS[@]}
 
-  assert_exists $UI_OUTPUT_NO_MINI/kmwuitoolbar.js
-  assert_exists $UI_OUTPUT_NO_MINI/kmwuitoggle.js
-  assert_exists $UI_OUTPUT_NO_MINI/kmwuifloat.js
-  assert_exists $UI_OUTPUT_NO_MINI/kmwuibutton.js
-
-  echo \'Native\' UI TypeScript has been compiled into the build/ui/debug folder
-
-  if ! builder_has_option --skip-minify; then
-    echo Minify ToolBar UI
-    if [ -f "build/ui/release/kmuitoolbar.js" ]; then
-        rm $UI_OUTPUT/kmuitoolbar.js 2>/dev/null
-    fi
-    minify $UI_OUTPUT_NO_MINI/kmwuitoolbar.js $UI_OUTPUT/kmwuitoolbar.js ADVANCED_OPTIMIZATIONS "web/src/app/ui" "(function() {%output%}());"
-    assert_exists $UI_OUTPUT/kmwuitoolbar.js
-
-    echo Minify Toggle UI
-    if [ -f "build/ui/release/kmuitoggle.js" ]; then
-        rm $UI_OUTPUT/kmuitoggle.js 2>/dev/null
-    fi
-    minify $UI_OUTPUT_NO_MINI/kmwuitoggle.js $UI_OUTPUT/kmwuitoggle.js SIMPLE_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
-    assert_exists $UI_OUTPUT/kmwuitoggle.js
-
-    echo Minify Float UI
-    if [ -f "build/ui/release/kmuifloat.js" ]; then
-        rm $UI_OUTPUT/kmuifloat.js 2>/dev/null
-    fi
-    minify $UI_OUTPUT_NO_MINI/kmwuifloat.js $UI_OUTPUT/kmwuifloat.js ADVANCED_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
-    assert_exists $UI_OUTPUT/kmwuifloat.js
-
-    echo Minify Button UI
-    if [ -f "build/ui/release/kmuibutton.js" ]; then
-        rm $UI_OUTPUT/kmuibutton.js 2>/dev/null
-    fi
-    minify $UI_OUTPUT_NO_MINI/kmwuibutton.js $UI_OUTPUT/kmwuibutton.js SIMPLE_OPTIMIZATIONS "web/src/app/ui/" "(function() {%output%}());"
-    assert_exists $UI_OUTPUT/kmwuibutton.js
-
-    echo "User interface modules compiled and saved under $UI_OUTPUT"
-  fi
+  copy_resources $UI ui
+  copy_sources $UI app/ui resources/ui
 
   builder_finish_action success build:ui
 fi
