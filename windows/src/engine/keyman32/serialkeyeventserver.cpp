@@ -436,7 +436,7 @@ private:
       You can disable this flag with flag_ShouldSerializeInput.
     */
 
-    if ((msg == wm_keyman_keyevent || msg == wm_keyman_modifierevent) && flag_ShouldSerializeInput  /*&& _td->lpActiveKeyboard*/) {
+    if ((msg == WM_KEYMAN_KEY_EVENT || msg == WM_KEYMAN_MODIFIER_EVENT) && flag_ShouldSerializeInput  /*&& _td->lpActiveKeyboard*/) {
 
       if (wParam == VK_RMENU && (lParam & (KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP)) == (KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP) && GetKeyState(VK_LCONTROL) < 0) {
         /*
@@ -485,9 +485,9 @@ private:
         input[1].ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
         input[1].ki.dwFlags = lParam & 0xFFFF;
 
-        if (msg == wm_keyman_keyevent) {
-          // We track changes to modifiers with wm_keyman_modifierevent, but only ever
-          // pass them on to the app when we receive them with the wm_keyman_keyevent 
+        if (msg == WM_KEYMAN_KEY_EVENT) {
+          // We track changes to modifiers with WM_KEYMAN_MODIFIER_EVENT, but only ever
+          // pass them on to the app when we receive them with the WM_KEYMAN_KEYEVENT 
           // message.
           if (!SendInput(2, input, sizeof(INPUT))) {
             DebugLastError("SendInput");
@@ -516,7 +516,7 @@ private:
         input.ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
         input.ki.dwFlags = lParam & 0xFFFF;
 
-        if (msg == wm_keyman_keyevent){
+        if (msg == WM_KEYMAN_KEY_EVENT){
           if (!SendInput(1, &input, sizeof(INPUT))) {
             DebugLastError("SendInput");
           }

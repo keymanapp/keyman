@@ -17,6 +17,11 @@
 #define GLOBAL_KEY_MUTEX_NAME "KeymanEngine_KeyMutex"
 
 /**
+WM_USER private messages
+*/
+#define WM_KEYMAN_KEY_EVENT (WM_USER + 1)
+#define WM_KEYMAN_MODIFIER_EVENT (WM_USER + 2)
+/**
   The INPUT structure and the KEYBDINPUT structure both vary in size between x86 and x64
   because of the presence of the ULONG_PTR member dwExtraInfo. Thus we need to maintain an
   equal sized structure between the two platforms for shared memory, and copy into INPUT
@@ -34,3 +39,5 @@ struct SerialKeyEventSharedData {
   DWORD nInputs;
   CSDINPUT inputs[MAX_KEYEVENT_INPUTS];
 };
+
+
