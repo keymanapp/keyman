@@ -34,7 +34,7 @@ namespace com.keyman.osk.browser {
       }
 
       if(typeof spec['width'] != 'undefined') {
-        ks.width=(parseInt(spec['width'],10)*baseKey.offsetWidth/100)+'px';
+        ks.width=(spec['width']*baseKey.offsetWidth/100)+'px';
       } else {
         ks.width=baseKey.offsetWidth+'px';
       }
