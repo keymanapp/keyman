@@ -487,7 +487,7 @@ private:
 
         if (msg == WM_KEYMAN_KEY_EVENT) {
           // We track changes to modifiers with WM_KEYMAN_MODIFIER_EVENT, but only ever
-          // pass them on to the app when we receive them with the WM_KEYMAN_KEYEVENT 
+          // pass them on to the app when we receive them with the WM_KEYMAN_KEY_EVENT 
           // message.
           if (!SendInput(2, input, sizeof(INPUT))) {
             DebugLastError("SendInput");

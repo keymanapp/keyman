@@ -202,7 +202,7 @@ LRESULT _kmnLowLevelKeyboardProc(
     if(isUp) FHotkeyShiftState &= ~Flag;
     else FHotkeyShiftState |= Flag;
     // #7337 Post the modifier state ensuring the serialized queue is in sync
-    // Note that the modifier key may be posted again with WM_KEYMAN_KEYEVENT,
+    // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
     // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT 
     // message only updates our internal modifier state, and does not do 
     // any additional processing or other serialization of the input queue.
