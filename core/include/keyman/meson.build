@@ -29,4 +29,6 @@ install_headers('keyboardprocessor.h',
                 'keyboardprocessor_debug.h',
                 'keyboardprocessor_vkeys.h',
                 join_paths(meson.current_build_dir(), 'keyboardprocessor_version.h'),
+                '../../../common/include/km_types.h',
+                '../../../common/include/kmx_file.h',
                 subdir: 'keyman')
