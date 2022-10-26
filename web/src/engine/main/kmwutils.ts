@@ -1,7 +1,5 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
-// Includes the Device definition set.
-/// <reference path="kmwdevice.ts" />
 // Includes the DOM utils, since our UI modules need access to certain methods here.
 /// <reference path="dom/utils.ts" />
 

@@ -32,6 +32,7 @@
     { "path": "../../../../common/predictive-text/browser.tsconfig.json"},
     { "path": "../../../../common/web/input-processor/src"},
     { "path": "../../../../common/web/keyboard-processor/src"},
-    { "path": "../../../../common/web/lm-message-types" }
+    { "path": "../../../../common/web/lm-message-types" },
+		{ "path": "../device-detect" }
 	]
 }

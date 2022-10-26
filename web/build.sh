@@ -26,8 +26,8 @@ cd "$THIS_SCRIPT_PATH"
 UI="app/ui"
 WEB="app/web"
 EMBEDDED="app/embed"
-ENGINE="engine" # For now, a catch-all for all engine code.  This should be subdivided
-                # once we have multiple engine modules within this project
+ENGINE="engine/main" # For now, a catch-all for all engine code.  This should be subdivided
+                     # once we have multiple engine modules within this project
 BUILD_BASE="build"
 
 DEBUG="debug"
@@ -504,6 +504,8 @@ echo ""
 
 if builder_start_action build:engine; then
   compile $ENGINE
+  # A throw-in for now.
+  compile "engine/element-wrappers"
 
   builder_finish_action success build:engine
 fi
