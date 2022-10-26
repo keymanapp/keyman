@@ -17,7 +17,8 @@
 #define GLOBAL_KEY_MUTEX_NAME "KeymanEngine_KeyMutex"
 
 /**
-WM_USER private messages
+WM_USER private messages -- used only for communication 
+between low level keyboard hook and serial key event server
 */
 #define WM_KEYMAN_KEY_EVENT (WM_USER + 1)
 #define WM_KEYMAN_MODIFIER_EVENT (WM_USER + 2)
