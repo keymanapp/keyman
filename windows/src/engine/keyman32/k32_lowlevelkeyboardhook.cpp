@@ -275,7 +275,7 @@ LRESULT _kmnLowLevelKeyboardProc(
 
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
-        PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+        PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_KEY_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
         return 1;
       }
       //else SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing"); // too noisy

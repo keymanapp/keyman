@@ -44,6 +44,7 @@
                     09 Aug 2015 - mcdurdin - I4843 - Log reported modifier state as well as Keyman current modifier state
 */
 #include "pch.h"
+#include "serialkeyeventcommon.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <evntprov.h>
@@ -206,8 +207,8 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
 	else if(msg->message == wm_keymankeyup)
     wsprintf(ds, "DebugMessage(%x, wm_keymankeyup: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
       Debug_VirtualKey((WORD) msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
-  else if (msg->message == wm_keyman_keyevent)
-    wsprintf(ds, "DebugMessage(%x, wm_keyman_keyevent: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
+  else if (msg->message == WM_KEYMAN_KEY_EVENT)
+    wsprintf(ds, "DebugMessage(%x, WM_KEYMAN_KEYEVENT: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
       Debug_VirtualKey((WORD)msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
   else if(msg->message == WM_KEYDOWN || msg->message == WM_KEYUP || msg->message == WM_SYSKEYDOWN || msg->message == WM_SYSKEYUP)
     wsprintf(ds, "DebugMessage(%x, %s, wParam: %s, lParam: %X) [message flags: %x time: %d extra: %x]",

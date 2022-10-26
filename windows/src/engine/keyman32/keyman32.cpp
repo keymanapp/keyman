@@ -208,17 +208,16 @@ void DoChangeWindowMessageFilter()
   }
 
 	DoCWMF(wm_keyman);   // I3594
-  DoCWMF(wm_keyman_keyevent);
-    DoCWMF(wm_keymankeydown);
-    DoCWMF(wm_keymankeyup);
-    DoCWMF(wm_keyman_grabwindowproc);
-    DoCWMF(wm_keyman_refresh);
-    DoCWMF(wm_kmgetactivekeymanid);
-    DoCWMF(wm_keymanim_close);
-    DoCWMF(wm_keymanim_contextchanged);
-    DoCWMF(wm_keymanshift);
-    DoCWMF(wm_keyman_control);   // I4714
-    DoCWMF(wm_keyman_control_internal);   // I4714
+  DoCWMF(wm_keymankeydown);
+  DoCWMF(wm_keymankeyup);
+  DoCWMF(wm_keyman_grabwindowproc);
+  DoCWMF(wm_keyman_refresh);
+  DoCWMF(wm_kmgetactivekeymanid);
+  DoCWMF(wm_keymanim_close);
+  DoCWMF(wm_keymanim_contextchanged);
+  DoCWMF(wm_keymanshift);
+  DoCWMF(wm_keyman_control);   // I4714
+  DoCWMF(wm_keyman_control_internal);   // I4714
 
     FreeLibrary(hUser32);
 }
@@ -300,7 +299,6 @@ BOOL InitialiseProcess(HWND hwnd)
   Initialise_Flag_ShouldSerializeInput();
 
 	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
-  wm_keyman_keyevent = RegisterWindowMessage("WM_KEYMAN_KEYEVENT");
 	wm_keymankeydown = RegisterWindowMessage("WM_KEYMANKEYDOWN");
 	wm_keymankeyup = RegisterWindowMessage("WM_KEYMANKEYUP");
 	wm_keyman_grabwindowproc = RegisterWindowMessage("WM_KEYMAN_GRABWINDOWPROC");
