@@ -672,14 +672,16 @@ $(function() {
 
   this.showAllModifierCombinations = false;
 
-  // Add CAPS and NO_CAPS variants for all of the above
-  (function(c, codes) {
-    var i, n = c.length;
-    for(i = 0; i < n; i++)
-      c.push(c[i] | codes.CAPS);
-    for(i = 0; i < n; i++)
-      c.push(c[i] | codes.NO_CAPS);
-  })(this.validModifierCombinations, this.modifierCodes);
+  // Add CAPS variants for all of the above
+  (function addCapsCombinations(validCombinations, CAPS) {
+    const n = validCombinations.length;
+    for(let i = 0; i < n; i++) {
+      const newCombination = validCombinations[i] | CAPS;
+      if(!validCombinations.includes(newCombination)) {
+        validCombinations.push(newCombination);
+      }
+    }
+  })(this.validModifierCombinations, this.modifierCodes.CAPS);
 
   this.modifierNames = [
     'leftctrl',   // 0x001
