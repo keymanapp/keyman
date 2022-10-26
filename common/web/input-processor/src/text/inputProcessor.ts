@@ -89,6 +89,32 @@ namespace com.keyman.text {
      *                                          all matched keyboard rules.
      */
     processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
+      const kbdMismatch = keyEvent.srcKeyboard && this.activeKeyboard != keyEvent.srcKeyboard;
+      const trueActiveKeyboard = this.activeKeyboard;
+
+      try {
+        if(kbdMismatch) {
+          // This will force-reset the context per our setter above.
+          this.activeKeyboard = keyEvent.srcKeyboard;
+        }
+
+        return this._processKeyEvent(keyEvent, outputTarget);
+      } finally {
+        if(kbdMismatch) {
+          // Restore our "current" activeKeyboard to its setting before the mismatching KeyEvent.
+          this.activeKeyboard = trueActiveKeyboard;
+        }
+      }
+    }
+
+    /**
+     * Acts as the core of `processKeyEvent` once we're comfortable asserting that the incoming
+     * keystroke matches the current `activeKeyboard`.
+     * @param keyEvent
+     * @param outputTarget
+     * @returns
+     */
+    private _processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       let formFactor = keyEvent.device.formFactor;
       let fromOSK = keyEvent.isSynthetic;
 
