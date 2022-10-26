@@ -102,6 +102,9 @@ namespace com.keyman.osk {
     // Multi-tap gesture management
     pendingMultiTap: PendingMultiTap;
 
+    // The keyboard object corresponding to this VisualKeyboard.
+    private layoutKeyboard: keyboards.Keyboard;
+
     get layerId(): string {
       return this._layerId;
     }
@@ -172,19 +175,19 @@ namespace com.keyman.osk {
 
       // Now to build the actual layout.
       const formFactor = device.formFactor as utils.FormFactor;
-      let layoutKeyboard = keyboard;
-      if (!layoutKeyboard) {
+      this.layoutKeyboard = keyboard;
+      if (!this.layoutKeyboard) {
         // May occasionally be null in embedded contexts; have seen this when iOS engine sets
         // keyboard height during change of keyboards.
-        layoutKeyboard = new keyboards.Keyboard(null);
+        this.layoutKeyboard = new keyboards.Keyboard(null);
       }
 
-      this.layerGroup = new OSKLayerGroup(this, layoutKeyboard, formFactor);
+      this.layerGroup = new OSKLayerGroup(this, this.layoutKeyboard, formFactor);
 
       // Now that we've properly processed the keyboard's layout, mark it as calibrated.
       // TODO:  drop the whole 'calibration' thing.  The newer layout system supersedes the
       // need for it.  (Is no longer really used, so the drop ought be clean.)
-      layoutKeyboard.markLayoutCalibrated(formFactor);
+      this.layoutKeyboard.markLayoutCalibrated(formFactor);
 
       // Append the OSK layer group container element to the containing element
       //osk.keyMap = divLayerContainer;
@@ -1004,6 +1007,16 @@ namespace com.keyman.osk {
 
       // First check the virtual key, and process shift, control, alt or function keys
       let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device);
+
+      /* In case of "fun" edge cases caused by JS's single-threadedness & event processing queue.
+       *
+       * Should a touch occur on an OSK key during active JS execution that results in a change
+       * of the active keyboard, it's possible for an OSK key to be evaluated against an
+       * unexpected, non-matching keyboard - one that could even be `null`!
+       *
+       * So, we mark the keyboard backing the OSK as the 'correct' keyboard for this key.
+       */
+      Lkc.srcKeyboard = this.layoutKeyboard;
 
       // End - mirrors _GetKeyEventProperties
 
