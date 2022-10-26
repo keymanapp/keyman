@@ -561,7 +561,7 @@ if builder_start_action build:ui; then
 fi
 
 if builder_start_action build:tools; then
-  tools/build.sh
+  src/tools/build.sh
   builder_finish_action success build:tools
 fi
 

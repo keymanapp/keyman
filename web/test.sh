@@ -19,7 +19,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 builder_check_color "$@"
 
 builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
-  "@tools" \
+  "@./src/tools" \
   "@./ build:engine" \
   "test+" \
   ":engine               Runs the top-level Keyman Engine for Web unit tests" \
