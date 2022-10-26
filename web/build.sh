@@ -108,7 +108,7 @@ DOC_TEST_SYMBOL="actions -${BUILDER_TERM_START}test${BUILDER_TERM_END}, ${BUILDE
 builder_describe "Builds Keyman Engine for Web." \
   "@../common/web/keyman-version build:engine build:embed build:web build:ui" \
   "@../common/web/input-processor build:engine build:embed build:web" \
-  "@tools/sourcemap-root build:engine build:embed build:web" \
+  "@src/tools/building/sourcemap-root build:engine build:embed build:web" \
   "clean" \
   "configure" \
   "build" \
@@ -179,7 +179,7 @@ minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_wa
 readonly minifier
 readonly minifycmd
 
-minified_sourcemap_cleaner="tools/sourcemap-root"
+minified_sourcemap_cleaner="build/tools/building/sourcemap-root"
 
 # Fails the build if a specified file does not exist.
 assert_exists ( ) {
