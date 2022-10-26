@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 16.0.89 alpha 2022-10-26
+
+* fix(core): Add missing include files (#7504)
+* fix(linux): Improve setting context (#7084)
+* feat(windows): Change "None" to "No Hotkey" matching new config (#7539)
+* feat(web): keyboard layout spec now allows numeric width, pad, sp (#7486)
+* chore(common): update actions to node16 (#7525)
+* chore(web): KMW dev-tools reorganization, cleanup, script updates (#7463)
+* fix(web): allow `isChiral()` to accept string name parameter of keyboard (#7544)
+* fix(web): ensures keyboard does not change underneath OSK keystroke (#7543)
+
 ## 16.0.88 alpha 2022-10-25
 
 * fix(common): ignore deps when formatting help (#7514)
