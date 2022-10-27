@@ -269,6 +269,9 @@ final class KMKeyboard extends WebView {
   }
 
   public void hideKeyboard() {
+    dismissKeyPreview(0);
+    dismissSubKeysWindow();
+
     String jsString = "hideKeyboard()";
     loadJavascript(jsString);
   }
