@@ -1,5 +1,4 @@
 // Includes KeymanWeb's Device class, as it's quite a useful resource for KMW-related projects.
-/// <reference path="../source/kmwdevice.ts" />
 
 type KeyboardMap = {[id: string]: any};
 
