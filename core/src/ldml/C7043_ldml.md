@@ -324,10 +324,120 @@ For each key:
 - `vkey`: Is the standard vkey, 0-255
 - `target`: Is the target (resolved) vkey, 0-255.
 
+### C7043.2.x `lyrs`—Layers list
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0 |  32  | ident   | `lyrs`                                   |
+| 4 |  32  | size    | int: Length of section                   |
+| 8 |  32  | count   | int: Number of layerses                  |
+|12 |  32  | reserved| padding                                  |
+
+For each 'layers':
+
+| ∆ | Bits | Name       | Description                              |
+|---|------|------------|------------------------------------------|
+|16+|  32  | flags      | int: per-layers options                  |
+|24+|  32  | hardware   | str: layout (`us`,`iso`,`jis`,`abnt2`)   |
+|20+|  32  | target     | int: target vkey ID (0…255)              |
+|28+|  32  | layer      | int: `layr` identifier of first layer    |
+|32+|  32  | layerCount | int: number of `layr` elements           |
+|36+|  96  | reserved   | short`[3]`: padding                      |
+
+- `flags`: a 32-bit bitfield defined as below:
+
+  | Bit position | Meaning  |  Description         |
+  |--------------|----------|----------------------|
+  |       0      | form     | 0: hardware          |
+  |       0      | form     | 1: touch             |
+
+### C7043.2.x `layr`—Layer list
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0 |  32  | ident   | `layr`                                   |
+| 4 |  32  | size    | int: Length of section                   |
+| 8 |  32  | count   | int: Total number of layer elements      |
+|12 |  32  | reserved| padding                                  |
+
+For each 'layer':
+
+| ∆ | Bits | Name       | Description                              |
+|---|------|------------|------------------------------------------|
+|16+|  32  | id         | str: layer id such as `base` or `shift`  |
+|24+|  32  | modifier   | str: modifier string                     |
+|28+|  32  | row        | int: `rows` identifier of first row      |
+|32+|  32  | rowCount   | int: number of `rows` elements           |
+
+### C7043.2.x `rows`—Row list
+
+Each list is a row of keys in the `key2` element
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0 |  32  | ident   | `rows`                                   |
+| 4 |  32  | size    | int: Length of section                   |
+| 8 |  32  | count   | int: Total number of row list elements   |
+|12 |  32  | reserved| padding                                  |
+
+> TODO-LDML: Should there be a '0-key2count terminator'?
+
+For each 'row' list element
+
+| ∆ | Bits | Name       | Description                              |
+|---|------|------------|------------------------------------------|
+|16+|  32  | key2       | int: index into `key2` element           |
+|24+|  32  | key2count  | int: count of `key2` elements            |
+
+### C7043.2.x `key2`—Secondary key list
+
+This is a list of vkeys, but ordered by rows.  The `rows` elements point into the start and length of entries here.
+
+> TODO-LDML: Should there be a '0-vkey terminator'?
+> And shold the 0th element also be a 0 vkey so that key2=0 means null?
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0 |  32  | ident   | `key2`                                   |
+| 4 |  32  | size    | int: Length of section                   |
+| 8 |  32  | count   | int: Total number of key2 elements       |
+|12 |  32  | reserved| padding                                  |
+
+For each `key2` element:
+
+Note that the first two fields are the index into the `keys` element, except arranged according to the keyboard layout.
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|16+|  32  | vkey    | int: vkey ID                             |
+|20+|  32  | mod     | int: modifier key flags                  |
+
+### C7043.2.x `disp`—Display list
+
+| ∆ | Bits | Name          | Description                              |
+|---|------|---------------|------------------------------------------|
+| 0 |  32  | ident         | `disp`                                   |
+| 4 |  32  | size          | int: Length of section                   |
+| 8 |  32  | count         | int: Total number of disp elements       |
+|12 |  32  | baseCharacter | str: If non-null, default base.          |
+|16 | 128  | reserved      | padding (future displayOptions)          |
+
+The default baseCharacter is U+25CC, if baseCharacter is null.
+
+For each element:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|32+|  32  | to      | str: to string                           |
+|36+|  32  | display | str: output display string               |
+
+Entries are sorted in a binary codepoint sort on the `to` field.
+
+
+
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
 
 > * UnicodeSets
 > * spec: reference to `after` in reorders; various other @after refs
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)
-> * spec: layers.displayWidth
 > * `keys.key.mod`: TODO define this.  0 for no modifiers.
