@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.90 alpha 2022-10-27
+
+* chore(common): update configure-repo.sh to include pre-commit hook (#7545)
+* chore(common): Add crowdin strings for Dutch (#7498)
+
 ## 16.0.89 alpha 2022-10-26
 
 * fix(core): Add missing include files (#7504)
