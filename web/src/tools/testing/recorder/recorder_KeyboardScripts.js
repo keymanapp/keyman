@@ -7,7 +7,7 @@ function loadKeyboards() {
     //
     // Both Firefox and Chrome don't like that it's not data: or http:/https:
     // and will consider the local files to be "remote resource[s]".
-    commonPrefix = "../../../common/test/resources";
+    commonPrefix = "../../../../../common/test/resources";
   }
 
   var filePrefix = commonPrefix + "/json/keyboards/";
