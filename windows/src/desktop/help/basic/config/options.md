@@ -92,7 +92,7 @@ To open the Options tab of Keyman Configuration:
     or any personally identifying data. If you would prefer not to
     share these statistics, uncheck this box.
 
-    **Note:** In Keyman 15.0, no statistics are currently sent,
+    **Note:** In Keyman 16.0, no statistics are currently sent,
     although the infrastructure is in place.
 
 ## Using Startup Options
