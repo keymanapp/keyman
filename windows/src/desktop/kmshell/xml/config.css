@@ -306,6 +306,11 @@ html
   border-bottom-right-radius: 5px;
 }
 
+.list_detail.list_disabled
+{
+  opacity: 0.5;
+}
+
 .checkbox_hidden
 {
   visibility: hidden;
@@ -1039,6 +1044,10 @@ th
 
 .keyboard_unloaded .keyboard_language_title {
   display: none;
+}
+
+.keyboard_unloaded {
+     opacity: 0.5;
 }
 
 .keyboard_language_title {

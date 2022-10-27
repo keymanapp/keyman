@@ -136,6 +136,9 @@
       </div>
         <div class="list_detail">
           <xsl:attribute name="id">list_detail_keyboard_<xsl:value-of select="id"/></xsl:attribute>
+          <xsl:attribute name='class'>
+           list_detail <xsl:choose><xsl:when test='loaded'></xsl:when><xsl:otherwise>list_disabled</xsl:otherwise></xsl:choose>
+          </xsl:attribute>
           <div class="flex_container">
             <div class="flex_container_buttons">
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id] and ../../options">
@@ -211,8 +214,6 @@
                   <xsl:with-param name="id">enable_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="onclick">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
-                  <xsl:with-param name="background">#D44B2C</xsl:with-param>
-                  <xsl:with-param name="color">white</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Enable']"/></xsl:with-param>
                   <xsl:with-param name="visible">
                     <xsl:choose>
