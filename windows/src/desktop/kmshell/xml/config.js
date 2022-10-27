@@ -63,6 +63,18 @@ document.addEventListener("DOMContentLoaded", windowResize);
   {
     switch(event.keyCode)
     {
+    case 27:    // esc
+
+      const id = n.substring(9); // remove keyboard_ from element name
+      const qr_id = document.getElementById('qrcode-'+id);
+      const modify_id = document.getElementById('modify-'+id);
+      if ((modify_id) && $(modify_id).hasClass('modify_visible')){
+        hideModifyLink(id);
+      }
+      else if ((qr_id) && $(qr_id).hasClass('qrcode_visible')){
+        hideKeyboardLink(id);
+      }
+      break;
     case 35:    // end
       var elem = event.srcElement.parentElement;
       var j = elem.children.length - 1;
@@ -144,7 +156,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
         const keyboard_name = n.substring(9); // remove keyboard_ from element name
         const kbd_grid = document.getElementById('keyboard_grid_'+keyboard_name);
         if( !kbd_grid ) break;
-        if ($(kbd_grid).hasClass('grid_rows_hide')){
+        if (!$(kbd_grid).hasClass('grid_rows_hide')){
           more_detail_toggle(kbd_grid.id);
         }
       }
@@ -163,7 +175,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
         const keyboard_name = n.substring(9); // remove keyboard_ from element name
         const kbd_grid = document.getElementById('keyboard_grid_'+keyboard_name);
         if( !kbd_grid ) break;
-        if (!$(kbd_grid).hasClass('grid_rows_hide')){
+        if ($(kbd_grid).hasClass('grid_rows_hide')){
           more_detail_toggle(kbd_grid.id);
         }
       }

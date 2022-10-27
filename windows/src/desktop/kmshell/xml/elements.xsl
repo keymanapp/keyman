@@ -84,7 +84,7 @@
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
-            font-size: 12px;
+            font-size: 11px;
             height: 25px;
             display: inline-block;
             text-align: center;
@@ -95,7 +95,7 @@
             <xsl:if test="string($background)">background:<xsl:value-of select="$background"/>;</xsl:if>
             <xsl:if test="string($color)">color:<xsl:value-of select="$color"/>;</xsl:if>
           </xsl:attribute>
-          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 4px 5px 0px; display: inline; height: 18px;" src="/app/shield.png" />
+          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 2px 2px 0px; display: inline; height: 16px;" src="/app/shield.png" />
           <xsl:value-of select="$caption" />
         </button>
       </xsl:when>
