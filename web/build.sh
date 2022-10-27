@@ -26,8 +26,7 @@ cd "$THIS_SCRIPT_PATH"
 UI="app/ui"
 WEB="app/web"
 EMBEDDED="app/embed"
-ENGINE="engine/main" # For now, a catch-all for all engine code.  This should be subdivided
-                     # once we have multiple engine modules within this project
+
 BUILD_BASE="build"
 
 DEBUG="debug"
@@ -75,15 +74,6 @@ output_path ( ) {
   fi
 }
 
-WEB_OUTPUT_NO_MINI="$(output_path $WEB $DEBUG)"
-WEB_OUTPUT="$(output_path $WEB $RELEASE)"
-
-EMBED_OUTPUT_NO_MINI="$(output_path $EMBEDDED $DEBUG)"
-EMBED_OUTPUT="$(output_path $EMBEDDED $RELEASE)"
-
-UI_OUTPUT_NO_MINI="$(output_path $UI $DEBUG)"
-UI_OUTPUT="$(output_path $UI $RELEASE)"
-
 SOURCE="src"
 
 SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
@@ -128,12 +118,12 @@ builder_describe "Builds Keyman Engine for Web (KMW)." \
 builder_describe_outputs \
   configure         ../node_modules \
   configure:embed   ../node_modules \
+  configure:engine  ../node_modules \
   configure:web     ../node_modules \
   configure:ui      ../node_modules \
   configure:samples ../node_modules \
   configure:tools   ../node_modules \
   build:embed       $(output_path $EMBEDDED $RELEASE)/keyman.js \
-  build:engine      $(output_path $ENGINE $INTERMEDIATE)/keymanweb.js \
   build:web         $(output_path $WEB $RELEASE)/keymanweb.js \
   build:ui          $(output_path $UI $RELEASE)/kmwuibutton.js \
   build:samples     $PREDICTIVE_TEXT_OUTPUT
@@ -376,8 +366,6 @@ compile ( ) {
   local COMPILE_TARGET=$1
   local COMPILED_INTERMEDIATE_PATH=$(output_path $COMPILE_TARGET $INTERMEDIATE)
 
-  shift
-
   $compilecmd -b src/$COMPILE_TARGET -v
 
   echo $COMPILE_TARGET TypeScript compiled under $COMPILED_INTERMEDIATE_PATH
@@ -458,7 +446,7 @@ fi
 # be perfect for that, I think.
 
 if builder_start_action clean:engine; then
-  rm -rf "$(output_path $ENGINE)"
+  src/engine/build.sh clean
   builder_finish_action success clean:engine
 fi
 
@@ -484,7 +472,7 @@ if builder_start_action clean:samples; then
 fi
 
 if builder_start_action clean:tools; then
-  tools/build.sh clean
+  src/tools/build.sh clean
 
   builder_finish_action success clean:tools
 fi
@@ -502,10 +490,9 @@ fi
 
 echo ""
 
+
 if builder_start_action build:engine; then
-  compile $ENGINE
-  # A throw-in for now.
-  compile "engine/element-wrappers"
+  src/engine/build.sh build
 
   builder_finish_action success build:engine
 fi
