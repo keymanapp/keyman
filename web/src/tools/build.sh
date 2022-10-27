@@ -20,37 +20,50 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe "Builds the Keyman Engine for Web's development & unit-testing tools" \
   "@../../../common/web/keyman-version" \
   "@../../../common/web/keyboard-processor" \
-  "@../../../common/web/recorder     :recorder" \
   "clean" \
-  "configure" \
   "build" \
-  ":recorder           Builds the KMW recorder submodule for development of unit-test resources" \
-
-builder_describe_outputs \
-  configure                   /node_modules \
-  configure:recorder          /node_modules \
-  build:recorder              testing/recorder/build/index.js
+  ":bulk_rendering     Builds the bulk-rendering tool used to validate changes to OSK display code" \
+  ":recorder           Builds the KMW recorder tool used for development of unit-test resources" \
+  ":sourcemap-root     Builds the sourcemap-cleaning tool used during minification of app/ builds"
 
 builder_parse "$@"
 
-### CONFIGURE ACTIONS
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
 ### CLEAN ACTIONS
 
+if builder_start_action clean:bulk_rendering; then
+  testing/bulk_rendering/build.sh clean
+
+  builder_finish_action success clean:bulk_rendering
+fi
+
 if builder_start_action clean:recorder; then
-  rm -rf testing/recorder/build/
+  testing/recorder/build.sh clean
+
   builder_finish_action success clean:recorder
+fi
+
+if builder_start_action clean:sourcemap-root; then
+  building/sourcemap-root/build.sh clean
+
+  builder_finish_action success clean:sourcemap-root
 fi
 
 ### BUILD ACTIONS
 
+if builder_start_action build:bulk_rendering; then
+  testing/bulk_rendering/build.sh
+
+  builder_finish_action success build:bulk_rendering
+fi
+
 if builder_start_action build:recorder; then
-  npm run tsc -- -b src/tools/testing/recorder/tsconfig.json
+  testing/recorder/build.sh
 
   builder_finish_action success build:recorder
+fi
+
+if builder_start_action build:sourcemap-root; then
+  building/sourcemap-root/build.sh
+
+  builder_finish_action success build:sourcemap-root
 fi
