@@ -28,7 +28,7 @@ namespace com.keyman.text.prediction {
         }
       }
 
-      let lgCode = kbdInfo['languageCode'];
+      let lgCode = kbdInfo['languageCode'].toLowerCase();
       let model = this.languageModelMap[lgCode];
       var loadPromise: Promise<void>;
 
@@ -45,6 +45,9 @@ namespace com.keyman.text.prediction {
     register(model: ModelSpec): void {
       let keyman = com.keyman.singleton;
       let activeLanguage = keyman.keyboardManager.getActiveLanguage();
+
+      // Forcibly lowercase the model ID before proceeding.
+      model.id = model.id.toLowerCase();
 
       if(JSON.stringify(model) == JSON.stringify(this.registeredModels[model.id])) {
         // We are already registered, let's not go through and re-register
@@ -71,6 +74,8 @@ namespace com.keyman.text.prediction {
       let core = keyman.core;
       let model: ModelSpec;
 
+      modelId = modelId.toLowerCase();
+
       // Remove the model from the id-lookup associative array.
       if(this.registeredModels[modelId]) {
         model = this.registeredModels[modelId];
@@ -94,7 +99,7 @@ namespace com.keyman.text.prediction {
     }
 
     isRegistered(model: ModelSpec): boolean {
-      return !! this.registeredModels[model.id];
+      return !! this.registeredModels[model.id.toLowerCase()];
     }
   }
 }
