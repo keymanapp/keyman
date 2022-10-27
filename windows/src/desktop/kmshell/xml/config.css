@@ -1122,8 +1122,6 @@ th
   display: none;
 }
 
-
-
 .qrcode.qrcode_visible .qrcode_popup,
 .qrcode.qrcode_visible .qrcode_back {
   display: block;

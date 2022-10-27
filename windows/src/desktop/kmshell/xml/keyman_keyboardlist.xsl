@@ -123,7 +123,7 @@
                 <a class="hotkey" tabindex="-1">
                   <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
                   <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
-                  <xsl:attribute name="onclick">event.stopPropagation;</xsl:attribute>
+                  <xsl:attribute name="onmousedown">event.stopPropagation();event.returnValue=false;</xsl:attribute>
                   <xsl:choose>
                     <xsl:when test="hotkey"><xsl:value-of select="hotkey"/></xsl:when>
                     <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
