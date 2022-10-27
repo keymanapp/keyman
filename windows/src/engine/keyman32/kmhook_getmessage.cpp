@@ -63,6 +63,7 @@
 */
    // I3583   // I4287
 #include "pch.h"
+#include "serialkeyeventcommon.h"
 
 void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void ProcessWMKeymanControl(WPARAM wParam, LPARAM lParam);
@@ -141,7 +142,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
   }
 
   if (((mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST) || mp->message == wm_keymankeydown || mp->message == wm_keymankeyup ||
-    mp->message == wm_keyman_keyevent)
+    mp->message == WM_KEYMAN_KEY_EVENT)
     && ShouldDebug(sdmMessage)) {
     DebugMessage(mp, wParam);
   }
