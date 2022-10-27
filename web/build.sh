@@ -103,9 +103,9 @@ builder_check_color "$@"
 DOC_WEB_PRODUCT="${BUILDER_TERM_START}:web${BUILDER_TERM_END} build product"
 DOC_TEST_WEB="${BUILDER_TERM_START}test:web${BUILDER_TERM_END}"
 DOC_BUILD_EMBED_WEB="${BUILDER_TERM_START}build:embed${BUILDER_TERM_END} and ${BUILDER_TERM_START}build:web${BUILDER_TERM_END}"
-DOC_TEST_SYMBOL="actions -${BUILDER_TERM_START}test${BUILDER_TERM_END}, ${BUILDER_TERM_START}upload-symbols${BUILDER_TERM_END}"
+DOC_TEST_SYMBOL="actions - ${BUILDER_TERM_START}test${BUILDER_TERM_END}"
 
-builder_describe "Builds Keyman Engine for Web." \
+builder_describe "Builds Keyman Engine for Web (KMW)." \
   "@../common/web/keyman-version build:engine build:embed build:web build:ui" \
   "@../common/web/input-processor build:engine build:embed build:web" \
   "@src/tools/building/sourcemap-root build:engine build:embed build:web" \
@@ -113,11 +113,11 @@ builder_describe "Builds Keyman Engine for Web." \
   "configure" \
   "build" \
   "test             Runs unit tests.  Only ${DOC_TEST_WEB} is currently defined"  \
-  ":embed           Builds the configuration of Keyman Engine for Web used within the Keyman mobile apps" \
-  ":engine          Builds common code used by other targets" \
+  ":embed           Builds the configuration of KMW used within the Keyman mobile apps" \
+  ":engine          Builds all common code used by other targets" \
   ":web             Builds the website-oriented configuration of Keyman Engine for Web" \
   ":ui              Builds the desktop UI modules used by the ${DOC_WEB_PRODUCT}" \
-  ":samples         Builds sample & test pages found under /samples and /testing, but not the ${DOC_WEB_PRODUCT}" \
+  ":samples         Builds only sample & test pages found under src/samples and src/test" \
   ":tools           Builds related development + unit-test resources" \
   "--skip-minify    Skips any minification steps in the build" \
   "--all            Sets action to run on KMW's submodules as well if appropriate ($DOC_TEST_SYMBOL)"
