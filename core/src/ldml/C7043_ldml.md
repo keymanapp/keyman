@@ -326,22 +326,26 @@ For each key:
 
 ### C7043.2.x `lyrs`—Layers list
 
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `lyrs`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Number of layerses                  |
-|12 |  32  | reserved| padding                                  |
+| ∆ | Bits | Name       | Description                              |
+|---|------|------------|------------------------------------------|
+| 0 |  32  | ident      | `lyrs`                                   |
+| 4 |  32  | size       | int: Length of section                   |
+| 8 |  32  | count      | int: Number of layer lists               |
+|12 |  32  | layerstart | int: offset to first layer entry         |
+|16 |  32  | layercount | int: number of layer entries             |
+|20 |  96  | reserved   | padding                                  |
 
-For each 'layers':
+Note layerstart must point after the end of the layer lists
+
+For each 'layers' - the layer lists
 
 | ∆ | Bits | Name       | Description                              |
 |---|------|------------|------------------------------------------|
 |16+|  32  | flags      | int: per-layers options                  |
 |24+|  32  | hardware   | str: layout (`us`,`iso`,`jis`,`abnt2`)   |
 |20+|  32  | target     | int: target vkey ID (0…255)              |
-|28+|  32  | layer      | int: `layr` identifier of first layer    |
-|32+|  32  | layerCount | int: number of `layr` elements           |
+|28+|  32  | layer      | int: index to first layer element        |
+|32+|  32  | layerCount | int: number of `layr` elements in list   |
 |36+|  96  | reserved   | short`[3]`: padding                      |
 
 - `flags`: a 32-bit bitfield defined as below:
@@ -351,16 +355,7 @@ For each 'layers':
   |       0      | form     | 0: hardware          |
   |       0      | form     | 1: touch             |
 
-### C7043.2.x `layr`—Layer list
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `layr`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Total number of layer elements      |
-|12 |  32  | reserved| padding                                  |
-
-For each 'layer':
+For each layer element
 
 | ∆ | Bits | Name       | Description                              |
 |---|------|------------|------------------------------------------|
