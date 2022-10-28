@@ -4,7 +4,7 @@
   This tool generates a .h version of the keyboardprocessor_ldml.ts file
 */
 
-import { constants } from './keyboardprocessor_ldml';
+import { constants } from './keyboardprocessor_ldml.js';
 
 const keys = Object.keys(constants);
 keys.sort();
