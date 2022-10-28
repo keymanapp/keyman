@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.91 alpha 2022-10-28
+
+* fix(developer): handle LControl being set by Windows when AltGr pressed (#7530)
+* chore(windows): convert `wm_keyman_keyevent` and `wm_keyman_modifierevent` to private `WM_USER` messages (#7546)
+* chore(common): Update help references from 15.0 to 16.0 (#7558)
+* fix(core): remove `KMN_API` from callback spec (#7520)
+* fix(developer): exclude `nocaps` from layer id modifier components (#7553)
+* fix(web): model language ids now case-insensitive (#7557)
+* fix(android/engine): Dismiss subkeys when hiding keyboard (#7555)
+
 ## 16.0.90 alpha 2022-10-27
 
 * chore(common): update configure-repo.sh to include pre-commit hook (#7545)
