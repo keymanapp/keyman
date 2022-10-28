@@ -16,6 +16,8 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +45,13 @@ public final class JSONParser {
       }
       jsonStr = strBuilder.toString();
       if (type == JSONObject.class) {
+        String EMPTY_JSONARRAY_FORMATSTR = "^\\[\\](\\n)?$";
+        Pattern pattern = Pattern.compile(EMPTY_JSONARRAY_FORMATSTR);
+        Matcher matcher = pattern.matcher(jsonStr);
+        if (matcher.matches()) {
+          // Treat empty JSONArray as empty JSON Object. Issue #7564
+          jsonStr = "{}";
+        }
         obj = (T) new JSONObject(jsonStr);
       } else if (type == JSONArray.class) {
         obj = (T) new JSONArray(jsonStr);
