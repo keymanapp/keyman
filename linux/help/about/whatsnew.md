@@ -2,7 +2,7 @@
 title: What's New
 ---
 
-Here are some of the new features we have added to Keyman for Linux 15.0:
+Here are some of the new features we have added to Keyman for Linux 16.0:
 
 * Open a .kmp file with Keyman Config (#3183)
 * Now supports Ubuntu 20.10 (Groovy) (#3876)

@@ -2,7 +2,7 @@
 title: What's New
 ---
 
-Here are some of the new features we have added to Keyman for iPhone and iPad 15.0:
+Here are some of the new features we have added to Keyman for iPhone and iPad 16.0:
 
 * Verify Keyman supports a keyboard package before installing
 * Fix positioning and style of popup keys
