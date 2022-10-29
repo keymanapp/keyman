@@ -3,7 +3,7 @@ import {assert} from 'chai';
 import { DispCompiler } from '../src/compiler/disp.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
-import { CompilerMessages } from './compiler/messages.js';
+import { CompilerMessages } from '../src/compiler/messages.js';
 
 import Disp = KMXPlus.Disp;
 

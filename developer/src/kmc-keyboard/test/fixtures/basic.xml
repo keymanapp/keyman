@@ -18,6 +18,12 @@
     <vkey from="Q" to="A" />
   </vkeys>
 
+  <displays>
+    <!-- values chosen to reuse strings -->
+    <display to="Q" display="A"/>
+    <displayOptions baseCharacter="Q" />
+  </displays>
+
   <keys>
     <key id="hmaqtua" to="ħ" />
     <key id="that" to="ថា" />
