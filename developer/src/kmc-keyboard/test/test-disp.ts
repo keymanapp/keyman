@@ -39,7 +39,7 @@ describe('disp', function () {
   });
 
   it('should reject duplicate tos', function() {
-    let disp = loadSectionFixture(DispCompiler, 'sections/meta/invalid-dupto.xml', compilerTestCallbacks) as Disp;
+    let disp = loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupto.xml', compilerTestCallbacks) as Disp;
     assert.isNull(disp);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({to:'e'}));
