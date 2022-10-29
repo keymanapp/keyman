@@ -227,6 +227,9 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_BKSP_ITEM: any;
   public readonly COMP_PLUS_BKSP: any;
 
+  public readonly COMP_PLUS_DISP_ITEM: any;
+  public readonly COMP_PLUS_DISP: any;
+
   public readonly COMP_PLUS_ELEM_ELEMENT: any;
   public readonly COMP_PLUS_ELEM_STRING: any;
   public readonly COMP_PLUS_ELEM: any;
@@ -284,6 +287,24 @@ export class KMXPlusFile extends KMXFile {
     });
 
     // 'bksp' - see 'tran'
+
+    // 'disp'
+    this.COMP_PLUS_DISP_ITEM = new r.Struct({
+      to: r.uint32le,
+      display: r.uint32le,
+    });
+
+    this.COMP_PLUS_DISP = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      count: r.uint32le,
+      baseCharacter: r.uint32le,
+      reserved0: new r.Reserved(r.uint32le), // padding
+      reserved1: new r.Reserved(r.uint32le), // padding
+      reserved2: new r.Reserved(r.uint32le), // padding
+      reserved3: new r.Reserved(r.uint32le), // padding
+      items: new r.Array(this.COMP_PLUS_DISP_ITEM, 'count'),
+    });
 
     // 'elem'
 

@@ -212,6 +212,18 @@ COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
 }
 
 bool
+COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
+  DebugLog("disp: count 0x%X\n", this->count);
+  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
+    DebugLog("header.size < expected size");
+    return false;
+  }
+  // TODO-LDML
+  DebugLog("TODO: dump disp");
+  return true;
+}
+
+bool
 COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
   DebugLog("strs: count 0x%X\n", this->count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
@@ -376,6 +388,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     valid = true;
     // load other sections, validating as we go
     // these will be nullptr if they don't validate
+    disp = section_from_sect<COMP_KMXPLUS_DISP>(sect);
     elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect);
     keys = section_from_sect<COMP_KMXPLUS_KEYS>(sect);
     loca = section_from_sect<COMP_KMXPLUS_LOCA>(sect);
