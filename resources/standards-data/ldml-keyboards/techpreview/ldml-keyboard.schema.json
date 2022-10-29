@@ -40,10 +40,7 @@
           "type": "array"
         },
         "displayOptions": {
-          "items": {
-            "$ref": "#/definitions/displayOptions"
-          },
-          "type": "array"
+          "$ref": "#/definitions/displayOptions"
         },
         "import": {
           "items": {

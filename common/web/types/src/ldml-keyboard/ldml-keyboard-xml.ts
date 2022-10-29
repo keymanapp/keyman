@@ -24,11 +24,11 @@ export interface LKKeyboard {
   names?: LKNames;
   settings?: LKSettings;
   keys?: LKKeys;
+  displays?: LKDisplays;
   layers?: LKLayerMaps[];
   vkeys?: LKVkeyMaps;
   transforms?: LKTransforms[];
   reorders?: LKReorders;
-  backspaces?: LKBackspaces;
 };
 
 export interface LKLocales {
@@ -122,14 +122,15 @@ export interface LKReorder {
   prebase?: string;
 };
 
-export interface LKBackspaces {
-  backspace?: LKBackspace[];
+export interface LKDisplayOptions {
+  baseCharacter?: string;
 };
 
-export interface LKBackspace {
-  from?: string;
+export interface LKDisplay {
   to?: string;
-  before?: string;
-  after?: string;
-  error?: "fail";
+  display?: string;
+}
+export interface LKDisplays {
+  display?: LKDisplay[];
+  displayOptions?: LKDisplayOptions;
 };

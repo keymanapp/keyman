@@ -54,7 +54,7 @@ export class CompilerMessages {
   static HINT_VkeyMapIsRedundant = SevHint | 0x000A;
 
   static Error_VkeyMapIsRepeated = (o:{vkey: string}) =>
-    m(this.ERROR_VkeyMapIsRepeated, `Virtual key '${o.vkey}' has more than one VkeyMap entry.`);
+    m(this.ERROR_VkeyMapIsRepeated, `Virtual key '${o.vkey}' has more than one vkey entry.`);
   static ERROR_VkeyMapIsRepeated = SevError | 0x000B;
 
   static Info_MultipleVkeyMapsHaveSameTarget = (o:{vkey: string}) =>
@@ -72,6 +72,10 @@ export class CompilerMessages {
   static Fatal_SectionCompilerFailed = (o:{sect: string}) =>
     m(this.FATAL_SectionCompilerFailed, `The compiler for '${o.sect}' failed unexpectedly.`);
   static FATAL_SectionCompilerFailed = SevFatal | 0x000F;
+
+  static Error_DisplayIsRepeated = (o:{to: string}) =>
+    m(this.ERROR_DisplayIsRepeated, `display to='${o.to}' has more than one display entry.`);
+  static ERROR_DisplayIsRepeated = SevError | 0x0010;
 
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;

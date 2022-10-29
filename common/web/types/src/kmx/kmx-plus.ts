@@ -196,6 +196,7 @@ export class DispItem {
 };
 
 export class Disp extends Section {
+  baseCharacter: StrsItem;
   disps: DispItem[] = [];
 };
 

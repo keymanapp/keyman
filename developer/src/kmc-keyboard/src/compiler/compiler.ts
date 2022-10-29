@@ -1,6 +1,7 @@
 import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
 import CompilerCallbacks from './callbacks.js';
 import CompilerOptions from './compiler-options.js';
+import { DispCompiler } from './disp.js';
 import { KeysCompiler } from './keys.js';
 import { LocaCompiler } from './loca.js';
 import { CompilerMessages } from './messages.js';
@@ -15,6 +16,7 @@ import KMXPlusFile = KMXPlus.KMXPlusFile;
 
 const SECTION_COMPILERS = [
   BkspCompiler,
+  DispCompiler,
   KeysCompiler,
   FinlCompiler,
   LocaCompiler,

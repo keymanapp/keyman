@@ -12,7 +12,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
   private boxArrays(source: any) {
     boxXmlArray(source?.keyboard, 'layers');
     boxXmlArray(source?.keyboard?.displays, 'display');
-    boxXmlArray(source?.keyboard?.displays, 'displayOptions');
+    // boxXmlArray(source?.keyboard?.displays, 'displayOptions');
     boxXmlArray(source?.keyboard?.names, 'name');
     boxXmlArray(source?.keyboard?.vkeys, 'vkey');
     boxXmlArray(source?.keyboard?.keys, 'key');
