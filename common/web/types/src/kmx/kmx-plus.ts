@@ -190,9 +190,19 @@ export class Vkey extends Section {
   vkeys: VkeyItem[] = [];
 };
 
+export class DispItem {
+  to: StrsItem;
+  display: StrsItem;
+};
+
+export class Disp extends Section {
+  disps: DispItem[] = [];
+};
+
 export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
     bksp?: Bksp;
+    disp?: Disp;
     elem?: Elem; // elem is ignored in-memory
     finl?: Finl;
     keys?: Keys;
