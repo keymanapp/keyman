@@ -20,8 +20,8 @@
 
   <displays>
     <!-- values chosen to reuse strings -->
-    <display to="Q" display="A"/>
-    <displayOptions baseCharacter="Q" />
+    <display to="a" display="^"/>
+    <displayOptions baseCharacter="e" />
   </displays>
 
   <keys>
