@@ -31,7 +31,7 @@ sentryManager.init();
 window.addEventListener('load', init, false);
 
 function init() {
-    const device = navigator.userAgent.indexOf('iPad') >= 0 ? 'AppleTablet' : 'AppleMobile';
+    const device = navigator.userAgent.match(/iPad|Macintosh/) ? 'AppleTablet' : 'AppleMobile';
 
     // As of iOS 15, Safari WebViews will try to avoid letting us use the "safe area"
     // at the bottom of iPhone X style devices.  While `-webkit-fill-available` will partly
