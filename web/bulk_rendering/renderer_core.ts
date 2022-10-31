@@ -139,7 +139,7 @@ namespace com.keyman.renderer {
 
         // Appromixate handling for non-fullscreen mode runs.
         // Adjusts for the browser window's title bars, address bars, etc.
-        let screenOffsetY = window.outerHeight - window.innerHeight;
+        const screenOffsetY = window.outerHeight - window.innerHeight;
         BatchRenderer.boundingRect.y += screenOffsetY;
 
         divSummary.appendChild(renderer.createKeyboardHeader(kbd, true));
@@ -150,7 +150,7 @@ namespace com.keyman.renderer {
         // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
         var layers;
         if(isMobile) {
-          layers = keyman.osk.vkbd.layerGroup.layers;  // It's not there anymore!
+          layers = keyman.osk.vkbd.layerGroup.layers;
         } else {
           // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
           // We instead rely upon the KLS definition to ensure we keep the renders sparse.
@@ -161,11 +161,7 @@ namespace com.keyman.renderer {
           return new Promise(function(resolve) {
             // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
             if(keyman.osk.vkbd) {
-              if(isMobile) {
-                keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
-              } else {
-                keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
-              }
+              keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
             } else {
               console.error("Error - keyman.osk.vkbd is undefined!");
             }

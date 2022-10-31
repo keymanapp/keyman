@@ -6,12 +6,14 @@ This renderer loads all the cloud keyboards from api.keyman.com and renders each
 
 1. `build.sh` to build the renderer (must have already built KeymanWeb in ../source/, `./build.sh -debug`).
 2. Open `index.html` (via http, not via file, as otherwise fonts will not be accessible).
-3. If you want a touch layout, use Developer Tools to select the appropriate emulation and then reload the page.
-4. Choose whether you wish to render all layers or just the default layer for each keyboard.
-5. If desired, filter out keyboards by id (regex).
+3. Choose whether you wish to render all layers or just the default layer for each keyboard.
+4. If desired, filter out keyboards by id (regex).
 5. Run the render.
-    - When prompted to screenshare, be sure to share _the Chrome tab_ if emulating mobile.  The screen capture
-      system will fail to capture the OSK properly otherwise.
+    - Note that it is preferable to run this on an actual device if possible.
+      - If no prompt is given re: screensharing when you click the 'run' button, use Chrome's Developer Tools
+        on a desktop or laptop to run this via emulation instead.
+      - If emulating a mobile device, when prompted to screenshare, be sure to share _the Chrome tab_.  The screen capture
+        system will fail to capture the OSK properly otherwise.
 6. Save the result to a .html file, either before.html or after.html.
 7. When swapping versions, don't forget to rebuild.
 
