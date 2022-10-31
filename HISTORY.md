@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 16.0.92 alpha 2022-10-31
+
+* fix(android/engine): Add FLAG_ACTIVITY_NEW_TASK flag for resource update (#7572)
+* change(common/models): prevent integration test flakiness due to prediction-search timeouts (#7571)
+* chore: make git pre-commit hook executable (#7573)
+* fix(web): bulk renderer update (#7516)
+
 ## 16.0.91 alpha 2022-10-28
 
 * fix(developer): handle LControl being set by Windows when AltGr pressed (#7530)
