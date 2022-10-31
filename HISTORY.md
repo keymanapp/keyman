@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.1 alpha 2022-11-01
+
+* chore: Move to 17.0 alpha
+
 ## 16.0.92 alpha 2022-10-31
 
 * fix(android/engine): Add FLAG_ACTIVITY_NEW_TASK flag for resource update (#7572)
