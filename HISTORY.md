@@ -1,7 +1,10 @@
 # Keyman Version History
 
-## 17.0.1 alpha 2022-11-01
+## 17.0.1 alpha 2022-10-31
 
+* fix(ios): iPad was not recognised as tablet device (#7563)
+* feat(windows): configuration UI polish (#7206)
+* chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
 ## 16.0.92 alpha 2022-10-31
