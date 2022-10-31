@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.94 beta 2022-10-31
+
+* fix(ios): iPad was not recognised as tablet device (#7563)
+* feat(windows): configuration UI polish (#7206)
+
 ## 16.0.93 beta 2022-11-01
 
 * chore: move to 16.0 beta
