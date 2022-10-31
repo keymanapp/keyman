@@ -385,10 +385,12 @@
                 </div>
                 <div class='list_languages_add'>
                   <xsl:call-template name="button">
+                    <xsl:with-param name="className">ms_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Languages_Install']"/></xsl:with-param>
                     <xsl:with-param name="command">keyman:keyboardlanguage_install?id=<xsl:value-of select="id"/></xsl:with-param>
                   </xsl:call-template>
                   <xsl:call-template name="button">
+                    <xsl:with-param name="className">ms_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Close']"/></xsl:with-param>
                     <xsl:with-param name="onclick">return hideModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
                   </xsl:call-template>
@@ -410,10 +412,13 @@
       <xsl:with-param name="replace" select='"&apos;"' />
       <xsl:with-param name="with" select='"\&apos;"' />
     </xsl:call-template></xsl:variable>
-    <xsl:variable name="bcp47code"><xsl:call-template name="replace-string">
-      <xsl:with-param name="text" select="bcp47code" />
+    <xsl:variable name="langid"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="langid" />
       <xsl:with-param name="replace" select='"&apos;"' />
       <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
+    <xsl:variable name="declangid"><xsl:call-template name="hex2dec">
+      <xsl:with-param name="hex" select="$langid"/>
     </xsl:call-template></xsl:variable>
     <xsl:variable name="name"><xsl:call-template name="replace-string">
       <xsl:with-param name="text" select="../../name" />
@@ -427,9 +432,67 @@
       <!-- only provided the hotkeys in the detail drop down, not the modify dialog -->
       <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) > 1 and $modify=0">
         <div tabindex = "-1">
-          <xsl:for-each select="//KeymanLanguage">
-            <xsl:if test="keymankeyboardid=$id and bcp47code=$bcp47code and layoutname=$name">
-              <xsl:attribute name="style">margin-left: auto; margin-right: 19px;</xsl:attribute>
+         <xsl:for-each select="//KeymanLanguage">
+            <xsl:if test="keymankeyboardid=$id and langid=$declangid and layoutname=$name">
+              <xsl:attribute name="style">margin-left: auto; margin-right: 6px;</xsl:attribute>
+              <a>
+              <xsl:attribute name="class">hotkey</xsl:attribute>
+              <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
+              <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
+              <xsl:choose>
+                <xsl:when test="hotkey">
+                  <xsl:value-of select="hotkey"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
+              </xsl:choose>
+              </a>
+            </xsl:if>
+            </xsl:for-each>
+        </div>
+      </xsl:if>
+      <xsl:if test="$modify = 1">
+        <div>
+         <xsl:attribute name="style">margin-left: auto; margin-right: 10px;</xsl:attribute>
+          <a>
+            <xsl:attribute name="href">keyman:keyboardlanguage_uninstall?id=<xsl:value-of select='../../id'/>&amp;bcp47code=<xsl:value-of select="bcp47code"/></xsl:attribute>
+            <img src="/app/cross.png">
+              <xsl:attribute name="title"><xsl:value-of select="$locale/string[@name='S_Languages_Uninstall']"/></xsl:attribute>
+            </img>
+          </a>
+        </div>
+      </xsl:if>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="KeymanKeyboardLanguageInstalledModify">
+    <xsl:param name="modify" />
+    <xsl:variable name="id"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="../../id" />
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
+    <xsl:variable name="langid"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="langid" />
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
+    <xsl:variable name="declangid"><xsl:call-template name="hex2dec">
+      <xsl:with-param name="hex" select="$langid"/>
+    </xsl:call-template></xsl:variable>
+    <xsl:variable name="name"><xsl:call-template name="replace-string">
+      <xsl:with-param name="text" select="../../name" />
+      <xsl:with-param name="replace" select='"&apos;"' />
+      <xsl:with-param name="with" select='"\&apos;"' />
+    </xsl:call-template></xsl:variable>
+
+    <div class='keyboard_language'>
+      <div class="language_icon"><xsl:value-of select="substring(bcp47code, 1, 2)" /></div>
+      <div><xsl:value-of select="langname" /> (<xsl:value-of select="bcp47code" />)</div>
+      <!-- only provided the hotkeys in the detail drop down, not the modify dialog -->
+      <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) > 1 and $modify=0">
+        <div tabindex = "-1">
+         <xsl:for-each select="//KeymanLanguage">
+            <xsl:if test="keymankeyboardid=$id and langid=$declangid and layoutname=$name">
+              <xsl:attribute name="style">margin-left: auto; margin-right: 6px;</xsl:attribute>
               <a>
               <xsl:attribute name="class">hotkey</xsl:attribute>
               <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>

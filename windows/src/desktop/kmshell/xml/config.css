@@ -169,6 +169,36 @@ input[type='submit']:disabled, input[type='button']:disabled, button:disabled
   background: #80808f;
 }
 
+/* Microsoft Window UI style buttons */
+input.ms_button
+{
+  background: #e1e1e1;
+  border-radius: 0px;
+  color: #33333f;
+  border: none;
+  border: 1px solid;
+  border-color: #adadad;
+  vertical-align: top;
+  outline-color: #0078d7;
+  padding: 0px 15px 0px 15px;
+
+}
+
+input.ms_button:hover
+{
+  background: #e5f1fb ;
+  border-color: #0078d7;
+}
+
+input.ms_button:focus
+{
+  background: #e5f1fb ;
+  border-color: #0078d7;
+  border-radius: 0px;
+}
+
+/* Microsoft Window UI style */
+
 a.hotkey:link, a.hotkey:visited
 {
   color: black;
@@ -500,7 +530,7 @@ table tr
 .grid_container {
   display: grid;
   position: relative;
-  grid-template-columns: max-content minmax(260px, 439px);
+  grid-template-columns: max-content minmax(240px, 439px);
   padding: 1px 0 1px 10px;
 }
 
@@ -1180,7 +1210,7 @@ th
 .modify .modify_popup {
   position: fixed;
   display: none;
-  width: 400px;
+  width: 320px;
   height: 200px;
   margin: -180px 0 0 -180px;
   left: 50%;
@@ -1188,16 +1218,26 @@ th
   border: solid 1px black;
   background: white;
   z-index: 101;
-  padding: 10px;
 }
+
 
 .popup_header {
 
   font-size: 16px;
-  font-weight: bold;
-  padding-bottom: 10px;
+  color: #ffffff;
+  padding-bottom: 2px;
+  padding-left: 5px;
+  background: #525e54; /* ms header colour */
 }
 
-.list_languages_add{
+.list_languages_add {
   padding-top: 10px;
+  position: fixed;
+  top: 45%;
+  left: 45%;
+}
+
+.modify .keyboard_language {
+  padding: 3px;
+  padding-left: 10px;
 }
