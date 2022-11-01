@@ -49,17 +49,17 @@ export class CompilerMessages {
     m(this.ERROR_VkeyIsNotValid, `Virtual key '${o.vkey}' is not found in the CLDR VKey Enum table.`);
   static ERROR_VkeyIsNotValid = SevError | 0x0009;
 
-  static Hint_VkeyMapIsRedundant = (o:{vkey: string}) =>
-    m(this.HINT_VkeyMapIsRedundant, `Virtual key '${o.vkey}' is mapped to itself, which is redundant.`);
-  static HINT_VkeyMapIsRedundant = SevHint | 0x000A;
+  static Hint_VkeyIsRedundant = (o:{vkey: string}) =>
+    m(this.HINT_VkeyIsRedundant, `Virtual key '${o.vkey}' is mapped to itself, which is redundant.`);
+  static HINT_VkeyIsRedundant = SevHint | 0x000A;
 
-  static Error_VkeyMapIsRepeated = (o:{vkey: string}) =>
-    m(this.ERROR_VkeyMapIsRepeated, `Virtual key '${o.vkey}' has more than one VkeyMap entry.`);
-  static ERROR_VkeyMapIsRepeated = SevError | 0x000B;
+  static Error_VkeyIsRepeated = (o:{vkey: string}) =>
+    m(this.ERROR_VkeyIsRepeated, `Virtual key '${o.vkey}' has more than one vkey entry.`);
+  static ERROR_VkeyIsRepeated = SevError | 0x000B;
 
-  static Info_MultipleVkeyMapsHaveSameTarget = (o:{vkey: string}) =>
-    m(this.INFO_MultipleVkeyMapsHaveSameTarget, `Target virtual key '${o.vkey}' has multiple source mappings, which may be an error.`);
-  static INFO_MultipleVkeyMapsHaveSameTarget = SevInfo | 0x000C;
+  static Info_MultipleVkeysHaveSameTarget = (o:{vkey: string}) =>
+    m(this.INFO_MultipleVkeysHaveSameTarget, `Target virtual key '${o.vkey}' has multiple source mappings, which may be an error.`);
+  static INFO_MultipleVkeysHaveSameTarget = SevInfo | 0x000C;
 
   static Error_InvalidVersion = (o:{version: string}) =>
     m(this.ERROR_InvalidVersion, `Version number '${o.version}' must be a semantic version format string.`);

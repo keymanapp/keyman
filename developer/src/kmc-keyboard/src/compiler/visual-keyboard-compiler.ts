@@ -28,7 +28,7 @@ export default class VisualKeyboardCompiler {
   private compileHardwareLayer(
     source: LDMLKeyboard.LDMLKeyboardXMLSourceFile,
     vk: VisualKeyboard.VisualKeyboard,
-    layer: LDMLKeyboard.LKLayerMap
+    layer: LDMLKeyboard.LKLayer
   ) {
     // TODO: consider consolidation with keys.ts?
     const shift = this.translateLayerIdToVisualKeyboardShift(layer.id);

@@ -27,14 +27,14 @@ describe('vkey compiler', function () {
     let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/redundant.xml', compilerTestCallbacks) as Vkey;
     assert.isNotNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_VkeyMapIsRedundant({vkey: 'A'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_VkeyIsRedundant({vkey: 'A'}));
   });
 
   it('should report an info message if same target found', function() {
     let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/same-target.xml', compilerTestCallbacks) as Vkey;
     assert.isNotNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Info_MultipleVkeyMapsHaveSameTarget({vkey: 'Q'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Info_MultipleVkeysHaveSameTarget({vkey: 'Q'}));
   });
 
   it('should error on invalid "from" vkey', function() {
@@ -56,7 +56,7 @@ describe('vkey compiler', function () {
     let vkey = loadSectionFixture(VkeyCompiler, 'sections/vkey/invalid-repeated-vkey.xml', compilerTestCallbacks) as Vkey;
     assert.isNull(vkey);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_VkeyMapIsRepeated({vkey: 'A'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_VkeyIsRepeated({vkey: 'A'}));
   });
 });
 
