@@ -1,9 +1,16 @@
 import * as xml2js from 'xml2js';
-import { LDMLKeyboardXMLSourceFile } from './ldml-keyboard-xml.js';
+import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
 import Ajv from 'ajv';
+import * as fs from 'fs';
 import { boxXmlArray } from '../util/util.js';
 
 export default class LDMLKeyboardXMLSourceFileReader {
+  readImportFile(version: string, subpath: string): Buffer {
+    // TODO-LDML: sanitize input string
+    let importPath = new URL(`../import/${version}/${subpath}`, import.meta.url);
+    return fs.readFileSync(importPath);
+  }
+
   /**
    * xml2js will not place single-entry objects into arrays.
    * Easiest way to fix this is to box them ourselves as needed
@@ -39,26 +46,76 @@ export default class LDMLKeyboardXMLSourceFileReader {
       }
     }
     boxXmlArray(source?.keyboard?.reorders, 'reorder');
-    this.boxImportsAndSpecials(source);
+    this.boxImportsAndSpecials(source, 'keyboard');
     return source;
   }
 
   /**
    * Recurse over object, boxing up any specials or imports
    * @param obj any object to be traversed
+   * @param subtag the leafmost enclosing tag such as 'keyboard'
    */
-  private boxImportsAndSpecials(obj: any) {
+  private boxImportsAndSpecials(obj: any, subtag: string) {
     if (!obj) return;
     if (Array.isArray(obj)) {
       for (const sub of obj) {
-        this.boxImportsAndSpecials(sub);
+        // retain the same subtag
+        this.boxImportsAndSpecials(sub, subtag);
       }
     } else if(typeof obj === 'object') {
       for (const key of Object.keys(obj)) {
-        if (key === 'special' || key === 'import') {
+        if (key === 'special') {
           boxXmlArray(obj, key);
+        } else if(key === 'import') {
+          // Need to 'box it up' first for processing
+          boxXmlArray(obj, key);
+          // Now, resolve the import
+          this.resolveImports(obj, subtag);
+          // now delete the import array we so carefully constructed, the caller does not
+          // want to see it.
+          delete obj['import'];
         } else {
-          this.boxImportsAndSpecials(obj[key]);
+          this.boxImportsAndSpecials(obj[key], key);
+        }
+      }
+    }
+  }
+
+  private resolveImports(obj: any, subtag: string) {
+    for (const anImport /* : LKImport */ of obj['import']) {
+      const asImport: LKImport = anImport;
+      if (asImport.base !== 'cldr') {
+        throw new Error(`import element with base ${asImport.base} is unsupported.`);
+      }
+      const paths = asImport.path.split('/');
+      if (!paths[0] || !paths[1] || paths.length !== 2) {
+        throw new Error(`import element with invalid path ${asImport.path}: expect the form 'techpreview/*.xml'`);
+      }
+      const importData : Uint8Array = this.readImportFile(paths[0], paths[1]);
+      if (!importData || !importData.length) {
+        throw new Error(`could not read data with path ${asImport.path}: expect the form 'techpreview/*.xml'`);
+      }
+      const importXml : any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
+      const importRootNode = importXml[subtag]; // e.g. keys
+
+      // importXml will have one property: the root element.
+      if (!importRootNode) {
+        throw new Error(`Invalid import file ${asImport.path}: expected ${subtag} as root element`);
+      }
+      // pull all children of importXml[subtag] into obj
+      for (const subsubtag of Object.keys(importRootNode)) { // e.g. key
+        const subsubval = importRootNode[subsubtag];
+        if (!Array.isArray(subsubval)) {
+          throw new Error(`Problem importing ${asImport.path}: not sure how to handle non-array ${subtag}.${subsubtag}`);
+        }
+        if (!obj[subsubtag]) {
+          // TODO-LDML: this probably should be an error if this doesn't exist
+          obj[subsubtag] = []; // start with empty array
+        }
+        for (const child of subsubval) {
+          // TODO-LDML: given xml2js parsing, can we even preserve the ordering?
+          // Should *replace* duplicate elements here and not just append.
+          obj[subsubtag].push(child);
         }
       }
     }
@@ -81,7 +138,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
     }
   }
 
-  public load(file: Uint8Array): LDMLKeyboardXMLSourceFile {
+  loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
     let source = (() => {
       let a: LDMLKeyboardXMLSourceFile;
       let parser = new xml2js.Parser({
@@ -101,7 +158,11 @@ export default class LDMLKeyboardXMLSourceFileReader {
       parser.parseString(file, (e: unknown, r: unknown) => { a = r as LDMLKeyboardXMLSourceFile });
       return a;
     })();
+    return source;
+  }
 
+  public load(file: Uint8Array): LDMLKeyboardXMLSourceFile {
+    const source = this.loadUnboxed(file);
     return this.boxArrays(source);
   }
 }
