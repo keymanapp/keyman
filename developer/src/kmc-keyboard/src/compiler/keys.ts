@@ -38,6 +38,11 @@ export class KeysCompiler extends SectionCompiler {
           valid = false;
           continue;
         }
+        if (!keydef.to && !keydef.gap && !keydef.switch) {
+          this.callbacks.reportMessage(CompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: key}));
+          valid = false;
+          continue;
+        }
       }
     }
 
