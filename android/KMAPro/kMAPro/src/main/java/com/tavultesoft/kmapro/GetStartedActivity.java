@@ -128,8 +128,33 @@ public class GetStartedActivity extends BaseActivity {
           startActivity(i);
           overridePendingTransition(android.R.anim.fade_in, R.anim.hold);
         }
+
+        uncheckGetStartedIfComplete();
       }
     });
+  }
+
+  /**
+   * Uncheck show "Get Started" on startup if
+   * Keyman enabled as a system-wide keyboard and
+   * Keyman set as default keyboard
+   */
+  private void uncheckGetStartedIfComplete() {
+    if (SystemIMESettings.isEnabledAsSystemKB(this) &&
+        SystemIMESettings.isDefaultKB(this)) {
+
+      final SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      boolean showGetStarted = prefs.getBoolean(showGetStartedKey, true);
+      if (showGetStarted) {
+        // Everything is completed, so un-check "Get Started" on startup
+        final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
+        checkBox.setChecked(false);
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(showGetStartedKey, false);
+        editor.commit();
+      }
+    }
   }
 
   @Override
@@ -180,6 +205,8 @@ public class GetStartedActivity extends BaseActivity {
       int[] to = new int[]{R.id.left_icon, R.id.text};
       listAdapter = new KMListAdapter(this, list, R.layout.get_started_row_layout, from, to);
       listView.setAdapter(listAdapter);
+
+      uncheckGetStartedIfComplete();
     }
   }
 }
