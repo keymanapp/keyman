@@ -4,11 +4,11 @@ import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from './builder-section.js';
 
 /* ------------------------------------------------------------------
- * vkey section
+ * disp section
    ------------------------------------------------------------------ */
 
 /**
- * Builder for the 'vkey' section
+ * Builder for the 'disp' section
  */
 interface BUILDER_DISP_ITEM {
   to: number;

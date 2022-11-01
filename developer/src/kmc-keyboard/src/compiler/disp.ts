@@ -20,13 +20,13 @@ export class DispCompiler extends SectionCompiler {
     const tos = new Set();
 
     if (this.keyboard.displays?.display) {
-        for (const { to } of this.keyboard.displays?.display) {
-            if (tos.has(to)) {
-                this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ to }));
-                return false;
-            }
-            tos.add(to);
+      for (const { to } of this.keyboard.displays?.display) {
+        if (tos.has(to)) {
+          this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ to }));
+          return false;
         }
+        tos.add(to);
+      }
     }
 
     return valid;
@@ -36,23 +36,23 @@ export class DispCompiler extends SectionCompiler {
     let result = new Disp();
 
     // displayOptions
-    result.baseCharacter = sections.strs.allocString(this.keyboard.displays?.displayOptions?.baseCharacter)
+    result.baseCharacter = sections.strs.allocString(this.keyboard.displays?.displayOptions?.baseCharacter);
 
     // displays
     result.disps = this.keyboard.displays?.display.map(display => ({
-        to: sections.strs.allocString(display.to),
-        display: sections.strs.allocString(display.display),
+      to: sections.strs.allocString(display.to),
+      display: sections.strs.allocString(display.display),
     }));
 
     // TODO-LDML: Same function in comon/web/types/src
     function binaryStringCompare(a: string, b: string) : number {
-        if ( a < b ) {
-            return -1;
-        } else if(a > b) {
-            return 1;
-        } else {
-            return 0;
-        }
+      if ( a < b ) {
+        return -1;
+      } else if(a > b) {
+        return 1;
+      } else {
+        return 0;
+      }
     }
 
     result.disps?.sort((a: DispItem, b: DispItem) => binaryStringCompare(a.to.value, b.to.value));

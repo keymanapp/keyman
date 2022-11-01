@@ -37,6 +37,12 @@ describe('disp', function () {
     assert.equal(disp.disps[1].to?.value, 'f');
     assert.equal(disp.disps[1].display?.value, '(f)');
   });
+  it('should compile options-only disp', function() {
+    let disp = loadSectionFixture(DispCompiler, 'sections/disp/maximal.xml', compilerTestCallbacks) as Disp;
+    assert.equal(compilerTestCallbacks.messages.length, 0);
+    assert.equal(disp?.baseCharacter?.value, 'x');
+    assert.ok(disp?.disps);
+  });
 
   it('should reject duplicate tos', function() {
     let disp = loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupto.xml', compilerTestCallbacks) as Disp;
