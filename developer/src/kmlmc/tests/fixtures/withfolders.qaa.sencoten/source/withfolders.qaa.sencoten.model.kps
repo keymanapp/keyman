@@ -15,16 +15,22 @@
   </Info>
   <Files>
     <File>
-      <Name>example.qaa.sencoten.model.js</Name>
-      <Description>Lexical model example.qaa.sencoten.model.js</Description>
+      <Name>..\build\withfolders.qaa.sencoten.model.js</Name>
+      <Description>Lexical model withfolders.qaa.sencoten.model.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.model.js</FileType>
+    </File>
+    <File>
+      <Name>welcome.htm</Name>
+      <Description>Welcome file</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
     </File>
   </Files>
   <LexicalModels>
     <LexicalModel>
       <Name>SENĆOŦEN dictionary</Name>
-      <ID>example.qaa.sencoten</ID>
+      <ID>withfolders.qaa.sencoten</ID>
       <Version>1.0.3</Version>
       <Languages>
         <Language ID="qaa">North Straits Salish</Language>

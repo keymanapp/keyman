@@ -21,15 +21,20 @@
   },
   "files": [
     {
-      "name": "..\\build\\example.qaa.sencoten.model.js",
-      "description": "Lexical model example.qaa.sencoten.model.js",
+      "name": "withfolders.qaa.sencoten.model.js",
+      "description": "Lexical model withfolders.qaa.sencoten.model.js",
       "copyLocation": 0
+    },
+    {
+      "copyLocation": 0,
+      "description": "Welcome file",
+      "name": "welcome.htm"
     }
   ],
   "lexicalModels": [
     {
       "name": "SENĆOŦEN dictionary",
-      "id": "example.qaa.sencoten",
+      "id": "withfolders.qaa.sencoten",
       "languages": [
         {
           "name": "North Straits Salish",
