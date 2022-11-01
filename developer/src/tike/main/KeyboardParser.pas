@@ -962,8 +962,11 @@ end;
 
 procedure TKeyboardParser_SystemStore.SetValue(Value: WideString);
 begin
-  FValue := Value;
-  Line := 'store(&'+SystemStoreNames[FSystemStoreType]+') '+StrToXStr(FValue);
+  if (FValue <> Value) or (Line = '') then
+  begin
+    FValue := Value;
+    Line := 'store(&'+SystemStoreNames[FSystemStoreType]+') '+StrToXStr(FValue);
+  end;
 end;
 
 { TKeyboardParser_LayoutRule }
