@@ -26,7 +26,7 @@ export interface BUILDER_DISP extends BUILDER_SECTION {
 };
 
 export function build_disp(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILDER_DISP {
-  if(!kmxplus.disp?.disps?.length && !kmxplus.disp?.baseCharacter?.value) {
+  if(!kmxplus.disp.disps.length && !kmxplus.disp.baseCharacter.value) {
     return null;
   }
 

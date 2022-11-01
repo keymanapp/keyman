@@ -42,7 +42,7 @@ export class DispCompiler extends SectionCompiler {
     result.disps = this.keyboard.displays?.display.map(display => ({
       to: sections.strs.allocString(display.to),
       display: sections.strs.allocString(display.display),
-    }));
+    })) || [];
 
     // TODO-LDML: Same function in comon/web/types/src
     function binaryStringCompare(a: string, b: string) : number {
