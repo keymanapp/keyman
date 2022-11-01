@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.2 alpha 2022-11-01
+
+* fix(android): Handle empty Play Store release notes (#7581)
+
 ## 17.0.1 alpha 2022-10-31
 
 * fix(ios): iPad was not recognised as tablet device (#7563)
