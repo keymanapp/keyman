@@ -23,7 +23,7 @@
  * through.
  */
 export type SectionIdent =
-  'bksp' |
+  'sect' |
   'disp' |
   'elem' |
   'finl' |
@@ -32,9 +32,9 @@ export type SectionIdent =
   'meta' |
   'name' |
   'ordr' |
-  'sect' |
   'strs' |
   'tran' |
+  'bksp' |
   'vkey';
 
 

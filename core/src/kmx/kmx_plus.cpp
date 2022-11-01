@@ -213,7 +213,7 @@ COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
 
 bool
 COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
-  DebugLog("disp: count 0x%X\n", this->count);
+  DebugLog("disp: count 0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
     DebugLog("header.size < expected size");
     return false;

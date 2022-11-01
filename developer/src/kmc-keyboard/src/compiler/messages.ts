@@ -54,7 +54,7 @@ export class CompilerMessages {
   static HINT_VkeyMapIsRedundant = SevHint | 0x000A;
 
   static Error_VkeyMapIsRepeated = (o:{vkey: string}) =>
-    m(this.ERROR_VkeyMapIsRepeated, `Virtual key '${o.vkey}' has more than one vkey entry.`);
+    m(this.ERROR_VkeyMapIsRepeated, `Virtual key '${o.vkey}' has more than one VkeyMap entry.`);
   static ERROR_VkeyMapIsRepeated = SevError | 0x000B;
 
   static Info_MultipleVkeyMapsHaveSameTarget = (o:{vkey: string}) =>

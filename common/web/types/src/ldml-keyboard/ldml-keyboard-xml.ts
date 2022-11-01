@@ -29,6 +29,7 @@ export interface LKKeyboard {
   vkeys?: LKVkeyMaps;
   transforms?: LKTransforms[];
   reorders?: LKReorders;
+  backspaces?: LKBackspaces;
 };
 
 export interface LKLocales {
@@ -120,6 +121,18 @@ export interface LKReorder {
   tertiary?: string;
   tertiary_base?: string;
   prebase?: string;
+};
+
+export interface LKBackspaces {
+  backspace?: LKBackspace[];
+};
+
+export interface LKBackspace {
+  from?: string;
+  to?: string;
+  before?: string;
+  after?: string;
+  error?: "fail";
 };
 
 export interface LKDisplayOptions {
