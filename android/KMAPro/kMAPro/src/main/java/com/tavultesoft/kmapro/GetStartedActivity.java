@@ -64,6 +64,7 @@ public class GetStartedActivity extends BaseActivity {
     checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        // Save user preference on showing "Get Started"
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(showGetStartedKey, isChecked);
         editor.commit();
@@ -135,8 +136,9 @@ public class GetStartedActivity extends BaseActivity {
   }
 
   /**
-   * Uncheck show "Get Started" on startup if
-   * Keyman enabled as a system-wide keyboard and
+   * Uncheck show "Get Started" on startup if:
+   * User hasn't set a preference on showing "Get Started",
+   * Keyman enabled as a system-wide keyboard, and
    * Keyman set as default keyboard
    */
   private void uncheckGetStartedIfComplete() {
@@ -144,15 +146,16 @@ public class GetStartedActivity extends BaseActivity {
         SystemIMESettings.isDefaultKB(this)) {
 
       final SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-      boolean showGetStarted = prefs.getBoolean(showGetStartedKey, true);
-      if (showGetStarted) {
-        // Everything is completed, so un-check "Get Started" on startup
+      if (!prefs.contains(showGetStartedKey)) {
+        // Everything is completed, so un-check "Get Started" on startup.
+        // onCheckedChanged() will save the preference
         final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
         checkBox.setChecked(false);
 
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(showGetStartedKey, false);
-        editor.commit();
+        // Save preference
+        //SharedPreferences.Editor editor = prefs.edit();
+        //editor.putBoolean(showGetStartedKey, false);
+        //editor.commit();
       }
     }
   }
