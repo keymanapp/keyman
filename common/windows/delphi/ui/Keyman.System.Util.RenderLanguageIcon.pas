@@ -7,11 +7,19 @@ uses
   System.UITypes,
   Vcl.Graphics;
 
-procedure DrawLanguageIcon(ACanvas: TCanvas; x, y: Integer; code: string);   // I3933
+{
+  Renders a two or three character language icon into the canvas
+
+  Parameters:
+    x, y: top left of icon graphic on canvas
+    code: the language code to render
+    size: 0=default size (-10), MaxInt=scale to fit, otherwise font.size as given
+}
+procedure DrawLanguageIcon(ACanvas: TCanvas; x, y: Integer; code: string; size: integer = 0);   // I3933
 
 implementation
 
-procedure DrawLanguageIcon(ACanvas: TCanvas; x, y: Integer; code: string);   // I3933
+procedure DrawLanguageIcon(ACanvas: TCanvas; x, y: Integer; code: string; size: integer);   // I3933
 var
   FIconRect: TRect;
   sz: TSize;
@@ -27,11 +35,29 @@ begin
   FFontName := ACanvas.Font.Name;
   FFontSize := ACanvas.Font.Size;
 
+  if Size = 0 then
+    Size := -10;
+
   ACanvas.Brush.Color := $C0C2C6;
   ACanvas.FillRect(Rect(x, y, x+16, y+16));
   ACanvas.Font.Color := $404143;
   ACanvas.Font.Name := 'Tahoma';
-  ACanvas.Font.Size := -10;
+
+  if Size = MaxInt then
+  begin
+    sz.cx := MaxInt;
+    Size := -12;
+    while (sz.cx > 16) and (Size < -4) do
+    begin
+      ACanvas.Font.Size := Size;
+      sz := ACanvas.TextExtent(code);
+      Inc(Size);
+    end;
+  end
+  else
+  begin
+    ACanvas.Font.Size := Size;
+  end;
 
   sz := ACanvas.TextExtent(code);
 
