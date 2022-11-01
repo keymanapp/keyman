@@ -20,7 +20,6 @@ if(_debug) {
     };
 }
 
-var device = 'AppleMobile';
 var oskHeight = 0;
 var oskWidth = 0;
 
@@ -32,6 +31,8 @@ sentryManager.init();
 window.addEventListener('load', init, false);
 
 function init() {
+    const device = navigator.userAgent.match(/iPad|Macintosh/) ? 'AppleTablet' : 'AppleMobile';
+
     // As of iOS 15, Safari WebViews will try to avoid letting us use the "safe area"
     // at the bottom of iPhone X style devices.  While `-webkit-fill-available` will partly
     // counteract this... it's only a "partly".  Fortunately, we can manually force the
@@ -90,12 +91,6 @@ function setBannerHeight(h) {
     // Refresh KMW's OSK
     kmw.correctOSKTextSize();
     doResetContext();
-}
-
-function setDeviceType(deviceType) {
-    // Set device type: AppleMobile|AppleTablet
-    device = deviceType;
-    init();
 }
 
 function setOskHeight(height) {

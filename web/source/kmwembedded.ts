@@ -141,10 +141,7 @@ namespace com.keyman.text {
     opt['attachType'] = 'manual';
     device.app=opt['app'];
     device.touchable=true;
-    device.formFactor='phone';
-    if(navigator && navigator.userAgent && navigator.userAgent.indexOf('iPad') >= 0) device.formFactor='tablet';
-    if(device.app.indexOf('Mobile') >= 0) device.formFactor='phone';
-    if(device.app.indexOf('Tablet') >= 0) device.formFactor='tablet';
+    device.formFactor = device.app.indexOf('Tablet') >= 0 ? 'tablet' : 'phone';
     device.browser='native';
   };
 
