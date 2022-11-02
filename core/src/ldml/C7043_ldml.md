@@ -326,6 +326,9 @@ For each key:
 
 ### C7043.2.x `lyrs`—Layers list
 
+Represents layers on the keyboard. There may be multiple layer lists,
+corresponding to different form factors and hardware types.
+
 | ∆ | Bits | Name       | Description                              |
 |---|------|------------|------------------------------------------|
 | 0 |  32  | ident      | `lyrs`                                   |
@@ -335,7 +338,7 @@ For each key:
 |16 |  32  | layercount | int: number of layer entries             |
 |20 |  96  | reserved   | padding                                  |
 
-Note layerstart must point after the end of the layer lists
+Note: `layerstart` must point after the end of the layer lists
 
 For each 'layers' - the layer lists
 
@@ -343,9 +346,8 @@ For each 'layers' - the layer lists
 |---|------|------------|------------------------------------------|
 |16+|  32  | flags      | int: per-layers options                  |
 |24+|  32  | hardware   | str: layout (`us`,`iso`,`jis`,`abnt2`)   |
-|20+|  32  | target     | int: target vkey ID (0…255)              |
 |28+|  32  | layer      | int: index to first layer element        |
-|32+|  32  | layerCount | int: number of `layr` elements in list   |
+|32+|  32  | layerCount | int: number of layer elements in list    |
 |36+|  96  | reserved   | short`[3]`: padding                      |
 
 - `flags`: a 32-bit bitfield defined as below:
@@ -417,7 +419,7 @@ Note that the first two fields are the index into the `keys` element, except arr
 |12 |  32  | baseCharacter | str: If non-null, default base.          |
 |16 | 128  | reserved      | padding (future displayOptions)          |
 
-The default baseCharacter is U+25CC, if baseCharacter is null.
+The default `baseCharacter` is U+25CC, if `baseCharacter` is null.
 
 For each element:
 
