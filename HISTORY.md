@@ -4,6 +4,7 @@
 
 * fix(developer): handle LControl being set by Windows when AltGr pressed (#7537)
 * fix(android/engine): Dismiss subkeys when hiding keyboard (#7562)
+* fix(android/engine): Dismiss key previews and subkeys on multi-touch (#7554)
 * fix(ios): iPad was not recognised as tablet device (#7576)
 * fix(developer): Use US base layout for debugger (#7538)
 
