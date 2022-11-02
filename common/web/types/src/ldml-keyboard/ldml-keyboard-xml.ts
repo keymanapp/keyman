@@ -142,7 +142,8 @@ export interface LKDisplayOptions {
 export interface LKDisplay {
   to?: string;
   display?: string;
-}
+};
+
 export interface LKDisplays {
   display?: LKDisplay[];
   displayOptions?: LKDisplayOptions;

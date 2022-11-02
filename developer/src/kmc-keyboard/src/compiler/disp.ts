@@ -46,7 +46,7 @@ export class DispCompiler extends SectionCompiler {
 
     // TODO-LDML: Same function in comon/web/types/src
     function binaryStringCompare(a: string, b: string) : number {
-      if ( a < b ) {
+      if(a < b) {
         return -1;
       } else if(a > b) {
         return 1;
@@ -55,7 +55,7 @@ export class DispCompiler extends SectionCompiler {
       }
     }
 
-    result.disps?.sort((a: DispItem, b: DispItem) => binaryStringCompare(a.to.value, b.to.value));
+    result.disps.sort((a: DispItem, b: DispItem) => binaryStringCompare(a.to.value, b.to.value));
 
     return result;
   }

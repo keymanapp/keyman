@@ -24,6 +24,7 @@
  */
 export type SectionIdent =
   'sect' |
+  'bksp' |
   'disp' |
   'elem' |
   'finl' |
@@ -34,7 +35,6 @@ export type SectionIdent =
   'ordr' |
   'strs' |
   'tran' |
-  'bksp' |
   'vkey';
 
 
