@@ -60,3 +60,44 @@ function builder_pull_has_label() {
   fi
   return 1
 }
+
+#
+# Publishes the package in `cwd` to npm
+#
+# If the `--dry-run` option is available and specified as a command-line
+# parameter, will do a dry run
+#
+# Note that `package.json` will be dirty after this command, as the `version`
+# field will be added to it. This change should not be committed to the
+# repository.
+#
+# Usage:
+# ```bash
+#   builder_publish_to_npm
+# ```
+#
+function builder_publish_to_npm() {
+  local dist_tag=$TIER dry_run
+
+  if [[ $TIER == stable ]]; then
+    dist_tag=latest
+  fi
+
+  if builder_has_option --dry-run; then
+    dry_run=--dry-run
+  fi
+
+  # We use --no-git-tag-version because our CI system controls version numbering and
+  # already tags releases. We also want to have the version of this match the
+  # release of Keyman Developer -- these two versions should be in sync. Because this
+  # is a large repo with multiple projects and build systems, it's better for us that
+  # individual build systems don't take too much ownership of git tagging. :)
+  npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
+
+  # Note: In either case, npm publish MUST be given --access public to publish
+  # a package in the @keymanapp scope on the public npm package index.
+  #
+  # See `npm help publish` for more details.
+  echo "Publishing $dry_run npm package $THIS_SCRIPT_IDENTIFIER with tag $dist_tag"
+  npm publish $dry_run --access public --tag $dist_tag
+}
