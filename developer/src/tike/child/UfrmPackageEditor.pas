@@ -345,6 +345,7 @@ implementation
 
 uses
   Vcl.Clipbrd,
+  Vcl.Imaging.GifImg,
 
   Keyman.Developer.System.HelpTopics,
 
@@ -1346,9 +1347,13 @@ end;
 
 procedure TfrmPackageEditor.UpdateImagePreviews;
 var
-  filename: WideString;
+  filename, msg: string;
+  p: TPicture;
 begin
   filename := '';
+
+  lblKMPImageSize.Caption := '(Unknown image format)';
+  imgKMPSample.Picture := nil;
 
   if cbKMPImageFile.ItemIndex > 0 then
     filename := (cbKMPImageFile.Items.Objects[cbKMPImageFile.ItemIndex] as TPackageContentFile).FileName;
@@ -1356,18 +1361,37 @@ begin
   if filename <> '' then
   begin
     try
-      imgKMPSample.Picture.LoadFromFile(filename);
-      lblKMPImageSize.Caption := Format('Image size: (%d x %d)',
-        [imgKMPSample.Picture.Bitmap.Width, imgKMPSample.Picture.Bitmap.Height]);
+      p := TPicture.Create;
+      try
+        p.LoadFromFile(filename);
+        if (p.Width = 0) or (p.Height = 0) then
+          Exit;
+
+        imgKMPSample.Picture.Bitmap.SetSize(p.Width, p.Height);
+        imgKMPSample.Picture.Bitmap.PixelFormat := pf24bit;
+        imgKMPSample.Picture.Bitmap.Canvas.StretchDraw(imgKMPSample.ClientRect, p.Graphic);
+
+        msg := Format('Image size: (%d x %d)', [p.Width, p.Height]);
+
+        // Check dimensions and aspect ratio
+        if Round(100 * p.Width / p.Height) <> 56 then
+        begin
+          msg := msg + ' WARNING: image has wrong aspect ratio; should be 140 x 250 pixels';
+        end
+        else if (p.Width <> 140) or (p.Height <> 250) then
+        begin
+          msg := msg + ' WARNING: image should be 140 x 250 pixels';
+        end;
+      finally
+        p.Free;
+      end;
+
+      lblKMPImageSize.Caption := msg;
+
     except
       imgKMPSample.Picture := nil;
       lblKMPImageSize.Caption := '(Unknown image format)';
     end;
-  end
-  else
-  begin
-    imgKMPSample.Picture := nil;
-    lblKMPImageSize.Caption := '(No image)';
   end;
 end;
 
