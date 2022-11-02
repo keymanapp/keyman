@@ -152,10 +152,6 @@ public class GetStartedActivity extends BaseActivity {
         final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
         checkBox.setChecked(false);
 
-        // Save preference
-        //SharedPreferences.Editor editor = prefs.edit();
-        //editor.putBoolean(showGetStartedKey, false);
-        //editor.commit();
       }
     }
   }
