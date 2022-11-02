@@ -26,8 +26,10 @@ console.log(`
 #pragma once
 `);
 
+let errs = 0;
+
 for (const key of keys) {
-    const value = constants[key];
+    const value : any = constants[key as keyof typeof constants];
     const upkey = key.toUpperCase();
     const type = typeof value;
     if (type === 'number') {
@@ -40,12 +42,22 @@ for (const key of keys) {
         subkeys.sort();
         for (const subkey of subkeys) {
             const upsubkey = subkey.toUpperCase();
-            const subvalue = subkeys[subkey];
+            const subvalue = value[subkey];
+            if (subvalue !== subkey) {
+                // "can't happen" because tsc would complain
+                console.error(`In the SectionMap:  ${subkey}: '${subvalue}' - expected key and value to match.`);
+                errs++;
+            }
             const asnum = constants.hex_section_id(subkey);
             console.log(`#define LDML_${upkey}ID_${upsubkey} 0x${asnum.toString(16).toUpperCase()} /* "${subkey}" */`);
             console.log(`#define LDML_${upkey}NAME_${upsubkey}             "${subkey}"`);
         }
     } else if (type !== 'function') {
-        console.error(`Unrecognized key ${key}`);
+        console.error(`Don’t know what to do with constants[${key}] of type ${type}`);
+        errs++;
     }
+}
+
+if (errs != 0) {
+    throw Error(`Fail: ${errs} error(s), see above.`);
 }
