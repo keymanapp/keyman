@@ -91,7 +91,6 @@ type
     memoFileDetails: TMemo;
     cmdOpenFile: TButton;
     cmdOpenContainingFolder: TButton;
-    Panel2: TPanel;
     lblKMPImageFile: TLabel;
     lblKMPImageSize: TLabel;
     lblReadme: TLabel;
@@ -104,6 +103,8 @@ type
     lblStep2a: TLabel;
     lblPackageDetails: TLabel;
     lblPackageRequiredInformation: TLabel;
+    sbDetails: TScrollBox;
+    sbCompile: TScrollBox;
     lblVersionHint: TLabel;
     cbReadMe: TComboBox;
     editInfoName: TEdit;
@@ -132,7 +133,6 @@ type
     editStartMenuDescription: TEdit;
     editStartMenuParameters: TEdit;
     cbStartMenuProgram: TComboBox;
-    Panel4: TPanel;
     Label13: TLabel;
     lblCompilePackage: TLabel;
     pageKeyboards: TTabSheet;
@@ -269,6 +269,8 @@ type
     procedure cmdOpenProjectFolderClick(Sender: TObject);
     procedure cmdSendURLsToEmailClick(Sender: TObject);
     procedure cmdCopyDebuggerLinkClick(Sender: TObject);
+    procedure sbDetailsMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -1752,6 +1754,14 @@ begin
   panBuildDesktop.Visible := FHasDesktopTarget;
   panBuildWindowsInstaller.Visible := FHasDesktopTarget;
   panBuildMobile.Visible := FHasMobileTarget;
+end;
+
+procedure TfrmPackageEditor.sbDetailsMouseWheel(Sender: TObject;
+  Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+  (Sender as TScrollBox).VertScrollBar.Position := (Sender as TScrollBox).VertScrollBar.Position - WheelDelta div 2;
+  Handled := True;
 end;
 
 {-------------------------------------------------------------------------------
