@@ -56,6 +56,7 @@ if (data.title.endsWith('ldmlKeyboard.xsd')) {
     arrayToSingle(data?.properties?.keyboard?.properties?.vkeys);
     singleToArray(data?.definitions?.keys?.properties?.key);
     singleToArray(data?.definitions?.keys?.properties?.flicks);
+    arrayToSingle(data?.definitions?.displays?.properties?.displayOptions);
 }
 
 // Write stuff

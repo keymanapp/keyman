@@ -345,6 +345,32 @@ struct COMP_KMXPLUS_VKEY {
 static_assert(sizeof(struct COMP_KMXPLUS_VKEY) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched size of section vkey");
 
+
+/* ------------------------------------------------------------------
+ * disp section
+   ------------------------------------------------------------------ */
+
+struct COMP_KMXPLUS_DISP_ENTRY {
+    KMX_DWORD to;
+    KMX_DWORD display;
+};
+
+struct COMP_KMXPLUS_DISP {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_DISP;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD count;
+  KMXPLUS_STR baseCharacter;
+  KMX_DWORD reserved[4]; // for future displayDptions
+  COMP_KMXPLUS_DISP_ENTRY entries[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_DISP) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_DISP) == LDML_LENGTH_DISP, "mismatched size of section disp");
+
 /**
  * @brief helper accessor object for
  *
@@ -360,6 +386,7 @@ class kmx_plus {
      * @param length length of the entire KMX file
      */
     kmx_plus(const COMP_KEYBOARD *keyboard, size_t length);
+    const COMP_KMXPLUS_DISP *disp;
     const COMP_KMXPLUS_ELEM *elem;
     const COMP_KMXPLUS_KEYS *keys;
     const COMP_KMXPLUS_LOCA *loca;

@@ -73,6 +73,10 @@ export class CompilerMessages {
     m(this.FATAL_SectionCompilerFailed, `The compiler for '${o.sect}' failed unexpectedly.`);
   static FATAL_SectionCompilerFailed = SevFatal | 0x000F;
 
+  static Error_DisplayIsRepeated = (o:{to: string}) =>
+    m(this.ERROR_DisplayIsRepeated, `display to='${o.to}' has more than one display entry.`);
+  static ERROR_DisplayIsRepeated = SevError | 0x0010;
+
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;
     switch(severity) {

@@ -24,6 +24,7 @@ export interface LKKeyboard {
   names?: LKNames;
   settings?: LKSettings;
   keys?: LKKeys;
+  displays?: LKDisplays;
   layers?: LKLayerMaps[];
   vkeys?: LKVkeyMaps;
   transforms?: LKTransforms[];
@@ -132,4 +133,18 @@ export interface LKBackspace {
   before?: string;
   after?: string;
   error?: "fail";
+};
+
+export interface LKDisplayOptions {
+  baseCharacter?: string;
+};
+
+export interface LKDisplay {
+  to?: string;
+  display?: string;
+};
+
+export interface LKDisplays {
+  display?: LKDisplay[];
+  displayOptions?: LKDisplayOptions;
 };

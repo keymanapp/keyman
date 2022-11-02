@@ -25,6 +25,7 @@
 export type SectionIdent =
   'sect' |
   'bksp' |
+  'disp' |
   'elem' |
   'finl' |
   'keys' |
@@ -88,6 +89,19 @@ class Constants {
    * bitwise or value for error="fail" in transform
    */
   readonly bksp_flags_error = 0x0001;
+
+  /* ------------------------------------------------------------------
+    * disp section
+      ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'disp' section, not including entries
+   */
+   readonly length_disp = 32;
+   /**
+    *  Length of each entry in the 'disp' variable part
+    */
+   readonly length_disp_item = 8;
 
   /* ------------------------------------------------------------------
     * elem section
@@ -318,8 +332,8 @@ class Constants {
    * All section IDs.
    */
   readonly section: SectionMap = {
-      sect: 'sect',
       bksp: 'bksp',
+      disp: 'disp',
       elem: 'elem',
       finl: 'finl',
       keys: 'keys',
@@ -327,6 +341,7 @@ class Constants {
       meta: 'meta',
       name: 'name',
       ordr: 'ordr',
+      sect: 'sect',
       strs: 'strs',
       tran: 'tran',
       vkey: 'vkey',

@@ -12,6 +12,7 @@ import { BUILDER_VKEY, build_vkey } from './build-vkey.js';
 import { BUILDER_TRAN, build_tran } from './build-tran.js';
 import { BUILDER_ELEM, build_elem } from './build-elem.js';
 import { BUILDER_ORDR, build_ordr } from './build-ordr.js';
+import { BUILDER_DISP, build_disp } from './build-disp.js';
 
 type BUILDER_BKSP = BUILDER_TRAN;
 type BUILDER_FINL = BUILDER_TRAN;
@@ -22,6 +23,7 @@ export default class KMXPlusBuilder {
 
   private sect_sect: BUILDER_SECT;
   private sect_bksp: BUILDER_BKSP;
+  private sect_disp: BUILDER_DISP;
   private sect_elem: BUILDER_ELEM;
   private sect_finl: BUILDER_FINL;
   private sect_keys: BUILDER_KEYS;
@@ -44,6 +46,7 @@ export default class KMXPlusBuilder {
 
     this.emitSection(file, this.file.COMP_PLUS_SECT, this.sect_sect);
     this.emitSection(file, this.file.COMP_PLUS_BKSP, this.sect_bksp);
+    this.emitSection(file, this.file.COMP_PLUS_DISP, this.sect_disp);
     this.emitSection(file, this.file.COMP_PLUS_ELEM, this.sect_elem);
     this.emitElements(file);
     this.emitSection(file, this.file.COMP_PLUS_FINL, this.sect_finl);
@@ -72,6 +75,7 @@ export default class KMXPlusBuilder {
     const build_finl = build_tran;
 
     this.sect_bksp = build_bksp(this.file.kmxplus.bksp, this.sect_strs, this.sect_elem);
+    this.sect_disp = build_disp(this.file.kmxplus, this.sect_strs);
     this.sect_finl = build_finl(this.file.kmxplus.finl, this.sect_strs, this.sect_elem);
     this.sect_keys = build_keys(this.file.kmxplus, this.sect_strs);
     this.sect_loca = build_loca(this.file.kmxplus, this.sect_strs);
@@ -97,6 +101,9 @@ export default class KMXPlusBuilder {
     // Handle optional sections
     // TODO: use a loop...
     if(this.sect_bksp) {
+      this.sect_sect.count++;
+    }
+    if(this.sect_disp) {
       this.sect_sect.count++;
     }
     if(this.sect_elem) {
@@ -125,6 +132,7 @@ export default class KMXPlusBuilder {
 
     let offset = this.sect_sect.size;
     offset = this.finalize_sect_item(this.sect_bksp, offset);
+    offset = this.finalize_sect_item(this.sect_disp, offset);
     offset = this.finalize_sect_item(this.sect_elem, offset);
     offset = this.finalize_sect_item(this.sect_finl, offset);
     offset = this.finalize_sect_item(this.sect_keys, offset);
