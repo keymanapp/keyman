@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 15.0.272 stable 2022-11-02
+
+* fix(developer): handle LControl being set by Windows when AltGr pressed (#7537)
+* fix(android/engine): Dismiss subkeys when hiding keyboard (#7562)
+* fix(ios): iPad was not recognised as tablet device (#7576)
+* fix(developer): Use US base layout for debugger (#7538)
+
 ## 15.0.271 stable 2022-10-18
 
 * fix(android/engine):  Standardize language ID in language picker (#7266)
