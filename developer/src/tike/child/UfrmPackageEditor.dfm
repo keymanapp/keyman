@@ -716,16 +716,19 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
-      object Panel2: TPanel
+      object sbDetails: TScrollBox
         Left = 0
         Top = 0
         Width = 872
         Height = 622
         Align = alClient
+        BevelInner = bvNone
         BevelOuter = bvNone
+        BorderStyle = bsNone
         Color = 14211288
-        ParentBackground = False
+        ParentColor = False
         TabOrder = 0
+        OnMouseWheel = sbDetailsMouseWheel
         DesignSize = (
           872
           622)
@@ -1123,16 +1126,19 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageCompile: TTabSheet
       Caption = 'Compile'
       ImageIndex = 1
-      object Panel4: TPanel
+      object sbCompile: TScrollBox
         Left = 0
         Top = 0
         Width = 872
         Height = 622
         Align = alClient
+        BevelInner = bvNone
         BevelOuter = bvNone
+        BorderStyle = bsNone
         Color = 14211288
-        ParentBackground = False
+        ParentColor = False
         TabOrder = 0
+        OnMouseWheel = sbDetailsMouseWheel
         object Label13: TLabel
           Left = 15
           Top = 48
