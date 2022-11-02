@@ -9,44 +9,41 @@
 #include <codecvt>
 #include <stdarg.h>
 
+//std::wstring -> std::string
 std::string string_from_wstring(std::wstring const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 	return converter.to_bytes(str);
 }
-
+//std::string -> std::wstring
 std::wstring wstring_from_string(std::string const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 	return converter.from_bytes(str);
 }
 
+//std::string -> std::u16string
 std::u16string u16string_from_string(std::string const str) {
   std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
   return converter.from_bytes(str);
 }
 
+//std::u16string -> std::string
 std::string string_from_u16string(std::u16string const str) {
 	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
 	return converter.to_bytes(str);
 }
 
-long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)   
-{
-	auto s = string_from_u16string(str);
-	char* t;
-	long int result = strtol(s.c_str(), &t, base);
-	if(endptr != nullptr) *endptr = (KMX_WCHAR*) str + (t-s.c_str());
-	return result;
-}
-
-//  often used with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
+// often used with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
+// const char16_t* -> std::u8string  -> std::wstring
 std::wstring u16fmt(const km_kbp_cp* str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-	std::string utf8str = convert.to_bytes(str);
-	std::wstring wstr = convert_wstring.from_bytes(utf8str);
+
+	std::string utf8str = convert.to_bytes(str);              // const char16_t*-> std::u8string
+  std::wstring wstr = convert_wstring.from_bytes(utf8str);  // std::u8string  -> std::wstring
 	return wstr;
 }
 
+ // const wchar_t* -> std::u8string  -> std::u16string ->  char16_t*
 void u16sprintf(km_kbp_cp* dst, const size_t sz, const wchar_t* fmt, ...) {
 	wchar_t* wbuf = new wchar_t[sz];
 	va_list args;
@@ -56,11 +53,20 @@ void u16sprintf(km_kbp_cp* dst, const size_t sz, const wchar_t* fmt, ...) {
 
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-	std::string utf8str = convert_wstring.to_bytes(wbuf);
-	std::u16string u16str = convert.from_bytes(utf8str);
-	u16ncpy(dst, u16str.c_str(), sz);
 
+	std::string utf8str = convert_wstring.to_bytes(wbuf);     // const wchar_t* -> std::u8string
+	std::u16string u16str = convert.from_bytes(utf8str);      // std::u8string  -> std::u16string
+  u16ncpy(dst, u16str.c_str(), sz);                         // std::u16string -> char16_t*
 	delete[] wbuf;
+}
+
+long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
+{
+  auto s = string_from_u16string(str);
+  char* t;
+  long int result = strtol(s.c_str(), &t, base);
+  if (endptr != nullptr) *endptr = (KMX_WCHAR*)str + (t - s.c_str());
+  return result;
 }
 
 std::string toHex(int num1) {

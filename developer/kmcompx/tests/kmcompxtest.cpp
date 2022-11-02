@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
         if (error_vec[i] == error_val)
           return 0;
       }
-      return 1;
+      return 4;
     }
     else
     return 1;  // no CERR_ in Name => CompileKeyboardFile failed

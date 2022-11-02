@@ -1348,7 +1348,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       delete[] sp->dpString;
       sp->dpString = q;
 
-      if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
+      if ((msg = CheckFilenameConsistency( (sp->dpString), FALSE)) != CERR_None) {
         return msg;
       }
     }
@@ -1360,15 +1360,15 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_KMW_HELPFILE:
   case TSS_KMW_EMBEDJS:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);    
-     if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
+    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
+    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
        return msg;
      }
     break;
 
   case TSS_KMW_EMBEDCSS:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
-     if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
+    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
        return msg;
      }
     break;
@@ -1420,7 +1420,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_LAYOUTFILE:  // I3483
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
-    if ((msg = CheckFilenameConsistency(u16fmt(sp->dpString).c_str(), FALSE)) != CERR_None) {
+    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
           return msg;
     }
     // Used by KMW compiler
@@ -3388,6 +3388,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 
     // Always a "\r\n" to the EOF, avoids funny bugs
     u16ncat(str, u"\r\n", _countof(str));  // I3481
+    //u16ncat(str, u"\n", _countof(str));  // I3481
 
   if (len == 0) return CERR_EndOfFile;
 
@@ -3514,8 +3515,9 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token)
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 {
   FILE *fp;
-  KMX_WCHAR szNewName[260], *p;  
-  if (IsRelativePath(u16fmt(szName).c_str()))
+  KMX_WCHAR szNewName[260], *p;
+  //if (IsRelativePath(u16fmt(szName).c_str()))
+  if (IsRelativePath(szName))
   {
     PKMX_WCHAR WCompileDir = strtowstr(CompileDir);
     u16ncpy(szNewName, WCompileDir, _countof(szNewName));  // I3481
@@ -3527,7 +3529,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
 
 
 #if defined(_WIN32) || defined(_WIN64)
-  fp =_wfsopen((wchar_t*)szNewName, L"rb", _SH_DENYWR);  
+  fp =_wfsopen((KMX_WCHART*)szNewName, L"rb", _SH_DENYWR);
 #else
   //fp = fopen( ( const PKMX_CHAR) szNewName, "rb");
 #endif
@@ -3541,7 +3543,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
       u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
         
     #if defined(_WIN32) || defined(_WIN64)
-      fp = _wfsopen((const wchar_t*)szNewName, L"rb", _SH_DENYWR); 
+      fp = _wfsopen((const KMX_WCHART*)szNewName, L"rb", _SH_DENYWR);
     #else
       fp = fopen(( const PKMX_CHAR) szNewName, "rb");
     #endif
@@ -3551,7 +3553,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   }
 
   KMX_DWORD msg;
-  if ((msg = CheckFilenameConsistency(u16fmt(szNewName).c_str(), FALSE)) != CERR_None) {
+  if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
     return msg;
   }
 
@@ -3740,7 +3742,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
   if(fp_out == NULL)    // I3228   // I3510
   {
     fclose(fp_in);
-    return NULL;                               //return  INVALID_HANDLE_VALUE;   can I exchange that?
+    return NULL;                               //return  INVALID_HANDLE_VALUE;   _S2 can I exchange that?
   }
 
   PKMX_BYTE buf, p;

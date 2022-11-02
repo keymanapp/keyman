@@ -34,7 +34,7 @@ bool IsRelativePath(KMX_CHAR const * p) {
   return TRUE;
 }
 
-bool IsRelativePath(KMX_WCHART const * p) {
+bool IsRelativePath(KMX_WCHAR const * p) {
   // Relative path (returns TRUE):
   //  ..\...\BITMAP.BMP
   //  PATH\BITMAP.BMP
@@ -48,40 +48,50 @@ bool IsRelativePath(KMX_WCHART const * p) {
   //  \\SERVER\SHARE\...\BITMAP.BMP
 
 #if defined(_WIN32) || defined(_WIN64)
-  if (*p == L'\\') return FALSE;
+  if (*p == u'\\') return FALSE;
 #else
-  if (*p == L'/') return FALSE;
+  if (*p == u'/') return FALSE;
 #endif
 
-  if (*p && *(p + 1) == L':') return FALSE;
+  if (*p && *(p + 1) == u':') return FALSE;
 
   return TRUE;
 }
 
 KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, BOOL ReportMissingFile) {
   PKMX_WCHAR WFilename = strtowstr(( KMX_CHAR *)Filename);
-  KMX_DWORD const result = CheckFilenameConsistency(u16fmt(WFilename).c_str(), ReportMissingFile);
-  delete WFilename;  
+  KMX_DWORD const result = CheckFilenameConsistency(WFilename, ReportMissingFile);
+  delete WFilename;
   return result;
 }
 
-KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissingFile) {
-  KMX_WCHART Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
+KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
+  KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
   KMX_WCHAR ErrExtra[256];
   intptr_t n;
 
   if (IsRelativePath(Filename)) {
     PKMX_WCHAR WCompileDir = strtowstr(CompileDir);
-    wcscpy_s(Name, _countof(Name), u16fmt(WCompileDir).c_str());  // I3481
-    wcscat_s(Name, _countof(Name), Filename);  // I3481
+    u16ncpy(Name, WCompileDir, _countof(Name));  // I3481
+    u16ncat(Name, Filename, _countof(Name));  // I3481
   }
   else {
-    wcscpy_s(Name, _countof(Name), Filename);  // I3481
+    u16ncpy(Name, Filename, _countof(Name));  // I3481   // _S2 wcscpy_s(Name, _countof(Name), Filename);  // I3481
   }
 
 #if defined(_WIN32) || defined(_WIN64)
+  // convert char16_t to wchar_t*
+  //  char16_t -> std::u16string
+  std::u16string u16str(Name);
+  //  std::u16string -> std::string
+  std::string stri = string_from_u16string(u16str);
+  //  std::string -> std::wstring
+  std::wstring  wstr = wstring_from_string(stri);
+  //  std::wstring -> wchar_t*
+  const KMX_WCHART* wchptr = wstr.c_str();
+
   _wfinddata_t fi;
-  n = _wfindfirst(Name, &fi);
+  n = _wfindfirst(wchptr, &fi);
   _findclose(n);
 #else
   n= access(Name,F_OK);
@@ -96,15 +106,18 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHART const * Filename, bool ReportMissi
   }
 
 #if defined(_WIN32) || defined(_WIN64)
-  const wchar_t* cptr1 = wcsrchr(Name, '\\');
+  const KMX_WCHAR* cptr1 = u16chr(Name, '\\');   // _S2 const wchar_t* cptr1 = wcsrchr(Name, '\\');
 #else
-  const wchar_t* cptr1 = wcsrchr(Name, '/');
+  const KMX_WCHAR* cptr1 = u16rchr(Name, '/');
 #endif
   cptr1++;
 
 //TODO: sort out how to find common includes in non-Windows platforms:
 #if defined(_WIN32) || defined(_WIN64)
-  if (wcscmp(cptr1, fi.name) != 0) {
+KMX_WCHAR fi_name_char16[260];
+u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
+
+  if (u16cmp(cptr1, fi_name_char16) != 0) {
     u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
@@ -119,17 +132,20 @@ KMX_DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk) {
   // where store(DllFunction) "my.dll:func" will look for a
   // file called function.call_js. This is ripe for rewrite!
   // But let's check what we have anyway
+
   PFILE_STORE sp;
   DWORD i, msg;
   for (i = 0, sp = fk->dpStoreArray; i < fk->cxStoreArray; i++, sp++) {
     if (!sp->fIsCall) continue;
 
-    const std::wstring callsite(u16fmt(sp->dpString).c_str());
+    const std::u16string callsite(sp->dpString);
     const auto colon = callsite.find(':');
-    if (colon == std::wstring::npos) continue;
+    if (colon == std::u16string::npos) continue;
 
-    auto func = callsite.substr(colon + 1);
-    func.append(L".call_js");
+    auto func1 = callsite.substr(colon + 1);
+    std::u16string str_js(u".call_js");
+    std::u16string func = func1+ str_js;
+
     if ((msg = CheckFilenameConsistency(func.c_str(), FALSE)) != CERR_None) {
       return msg;
     }
