@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.95 beta 2022-11-02
+
+* fix(developer): Use US base layout for debugger (#7531)
+* fix(developer): ensure kmlmp handles paths (#7580)
+* fix(developer): prevent repeated `begin` statements (#7583)
+* fix(developer): remove ancient samples (#7586)
+* fix(developer): generate a default icon for basic keyboard projects (#7584)
+* fix(developer): avoid reformatting unchanged system stores (#7585)
+* fix(developer): publish `@keymanapp/keyman-version` to npm (#7595)
+
 ## 16.0.94 beta 2022-10-31
 
 * fix(ios): iPad was not recognised as tablet device (#7563)
