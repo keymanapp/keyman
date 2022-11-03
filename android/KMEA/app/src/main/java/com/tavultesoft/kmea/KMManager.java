@@ -1514,8 +1514,7 @@ public final class KMManager {
 
     if (keyboardInfo != null) {
       String languageID = keyboardInfo.getLanguageID();
-      toggleSuggestionBanner(languageID, result1, result2);
-      registerAssociatedLexicalModel(languageID);
+      updateSuggestionBanner(languageID, result1, result2);
     }
 
     return (result1 || result2);
@@ -1530,8 +1529,6 @@ public final class KMManager {
    * @return the success result
    */
   public static boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID, String keyboardName) {
-
-
     boolean result1 = false;
     boolean result2 = false;
 
@@ -1544,9 +1541,9 @@ public final class KMManager {
       result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
     }
 
-    toggleSuggestionBanner(languageID, result1, result2);
-    registerAssociatedLexicalModel(languageID);
-
+    //toggleSuggestionBanner(languageID, result1, result2);
+    //registerAssociatedLexicalModel(languageID);
+    //updateSuggestionBanner(languageID, result1, result2);
     return (result1 || result2);
   }
 
@@ -1560,7 +1557,7 @@ public final class KMManager {
     if (SystemKeyboard != null && SystemKeyboardLoaded)
       result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
-    registerAssociatedLexicalModel(languageID);
+    updateSuggestionBanner(languageID, result1, result2);
 
     return (result1 || result2);
   }
@@ -1585,15 +1582,19 @@ public final class KMManager {
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
     }
 
-    if (InAppKeyboard != null) {
-      InAppKeyboard.setKeyboard(kbInfo);
+    if (kbInfo != null) {
+      prepareKeyboardSwitch(kbInfo.getPackageID(), kbInfo.getKeyboardID(), kbInfo.getLanguageID(), kbInfo.getKeyboardName());
+      //setKeyboard(kbInfo);
+    }
+    KMManager.updateSuggestionBanner(kbInfo.getLanguageID(), true, true);
+
+    if (KMManager.InAppKeyboard != null) {
+      KMManager.InAppKeyboard.loadKeyboard();
+    }
+    if (KMManager.SystemKeyboard != null) {
+      KMManager.SystemKeyboard.loadKeyboard();
     }
 
-    if (SystemKeyboard != null) {
-      SystemKeyboard.setKeyboard(kbInfo);
-    }
-
-    registerAssociatedLexicalModel(kbInfo.getLanguageID());
   }
 
   public static void clearKeyboardCache() {
@@ -2135,6 +2136,11 @@ public final class KMManager {
     globeKeyState = state;
   }
 
+  public static void updateSuggestionBanner(String languageID, boolean inAppKeyboardChanged, boolean systemKeyboardChanged) {
+    toggleSuggestionBanner(languageID, inAppKeyboardChanged, systemKeyboardChanged);
+    registerAssociatedLexicalModel(languageID);
+  }
+
   private static void toggleSuggestionBanner(String languageID, boolean inappKeyboardChanged, boolean systemKeyboardChanged) {
     //reset banner state if new language has no lexical model
     if (currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
@@ -2142,10 +2148,10 @@ public final class KMManager {
       currentBanner = KMManager.KM_BANNER_STATE_BLANK;
     }
 
-    if(inappKeyboardChanged) {
+    if(inappKeyboardChanged && InAppKeyboard != null) {
       InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
-    if(systemKeyboardChanged) {
+    if(systemKeyboardChanged && SystemKeyboard != null) {
       SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
   }
@@ -2238,6 +2244,7 @@ public final class KMManager {
 
       if (url.startsWith("file")) { // TODO: is this test necessary?
         InAppKeyboardLoaded = true;
+        boolean result1 = false;
 
         SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
@@ -2248,7 +2255,7 @@ public final class KMManager {
         String langId = null;
         if (keyboardInfo != null) {
           langId = keyboardInfo.getLanguageID();
-          InAppKeyboard.setKeyboard(keyboardInfo);
+          result1 = InAppKeyboard.setKeyboard(keyboardInfo);
         } else {
           // Revert to default (index 0) or fallback keyboard
           keyboardInfo = KMManager.getKeyboardInfo(context, 0);
@@ -2258,11 +2265,11 @@ public final class KMManager {
           }
           if (keyboardInfo != null) {
             langId = keyboardInfo.getLanguageID();
-            InAppKeyboard.setKeyboard(keyboardInfo);
+            result1 = InAppKeyboard.setKeyboard(keyboardInfo);
           }
         }
 
-        registerAssociatedLexicalModel(langId);
+        updateSuggestionBanner(langId, result1, false);
 
         InAppKeyboard.callJavascriptAfterLoad();
         InAppKeyboard.setSpacebarText(spacebarText);
@@ -2444,6 +2451,7 @@ public final class KMManager {
 
       if (url.startsWith("file:")) { // TODO: is this test necessary?
         SystemKeyboardLoaded = true;
+        boolean result2 = false;
 
         SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
@@ -2454,7 +2462,7 @@ public final class KMManager {
         String langId = null;
         if (keyboardInfo != null) {
           langId  = keyboardInfo.getLanguageID();
-          SystemKeyboard.setKeyboard(keyboardInfo);
+          result2 = SystemKeyboard.setKeyboard(keyboardInfo);
         } else {
           // Revert to default (index 0) or fallback keyboard
           keyboardInfo = KMManager.getKeyboardInfo(context, 0);
@@ -2464,11 +2472,11 @@ public final class KMManager {
           }
           if (keyboardInfo != null) {
             langId = keyboardInfo.getLanguageID();
-            SystemKeyboard.setKeyboard(keyboardInfo);
+            result2 = SystemKeyboard.setKeyboard(keyboardInfo);
           }
         }
 
-        registerAssociatedLexicalModel(langId);
+        updateSuggestionBanner(langId, false, result2);
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
 

@@ -342,10 +342,13 @@ public final class KeyboardPickerActivity extends BaseActivity {
     String kbId = kbInfo.getKeyboardID();
     String langId = kbInfo.getLanguageID();
     String kbName = kbInfo.getKeyboardName();
-    if(aPrepareOnly)
+    if(aPrepareOnly) {
       KMManager.prepareKeyboardSwitch(pkgId, kbId, langId, kbName);
-    else
+    } else {
       KMManager.setKeyboard(kbInfo);
+    }
+
+    KMManager.updateSuggestionBanner(langId, true, true);
   }
 
   protected static boolean addKeyboard(Context context, Keyboard keyboardInfo) {
