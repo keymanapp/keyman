@@ -143,14 +143,14 @@ COMP_KMXPLUS_HEADER::valid(KMX_DWORD length) const {
 
 bool
 COMP_KMXPLUS_KEYS::valid(KMX_DWORD _kmn_unused(length)) const {
-  DebugLog(" count: #0x%X\n", this->count);
+  DebugLog(" count: #0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
     DebugLog("header.size < expected size");
     return false;
   }
-  for (KMX_DWORD i = 0; i<this->count; i++) {
+  for (KMX_DWORD i = 0; i<count; i++) {
     DebugLog(" #0x%d\n", i);
-    const COMP_KMXPLUS_KEYS_ENTRY& entry = this->entries[i];
+    const COMP_KMXPLUS_KEYS_ENTRY& entry = entries[i];
     DebugLog("  vkey\t0x%X\n", entry.vkey);
     DebugLog("  mod\t0x%X\n", entry.mod);
     DebugLog("  flags\t0x%X\n", entry.flags);
@@ -178,8 +178,8 @@ COMP_KMXPLUS_LOCA::valid(KMX_DWORD _kmn_unused(length)) const {
     return false;
   }
   // TODO-LDML
-  for(KMX_DWORD i=0; i<this->count; i++) {
-    DebugLog(" Locale #%d: #0x%X\n", i, this->entries[i].locale);
+  for(KMX_DWORD i=0; i<count; i++) {
+    DebugLog(" Locale #%d: #0x%X\n", i, entries[i].locale);
   }
   return true;
 }
@@ -190,18 +190,18 @@ COMP_KMXPLUS_META::valid(KMX_DWORD _kmn_unused(length)) const {
     DebugLog("header.size < expected size");
     return false;
   }
-  DebugLog(" author:\t#0x%X\n", this->author);
-  DebugLog(" conform:\t#0x%X\n", this->conform);
-  DebugLog(" layout:\t#0x%X\n", this->layout);
-  DebugLog(" normalization:\t#0x%X\n", this->normalization);
-  DebugLog(" indicator:\t#0x%X\n", this->indicator);
-  DebugLog(" settings:\t0x%X\n", this->settings);
+  DebugLog(" author:\t#0x%X\n", author);
+  DebugLog(" conform:\t#0x%X\n", conform);
+  DebugLog(" layout:\t#0x%X\n", layout);
+  DebugLog(" normalization:\t#0x%X\n", normalization);
+  DebugLog(" indicator:\t#0x%X\n", indicator);
+  DebugLog(" settings:\t0x%X\n", settings);
   return true;
 }
 
 bool
 COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
-  DebugLog("vkey: count 0x%X\n", this->count);
+  DebugLog("vkey: count 0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
     DebugLog("header.size < expected size");
     return false;
@@ -225,12 +225,12 @@ COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
 
 bool
 COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
-  DebugLog("strs: count 0x%X\n", this->count);
+  DebugLog("strs: count 0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
     DebugLog("header.size < expected size");
     return false;
   }
-  for (KMX_DWORD i=0; i<this->count; i++) {
+  for (KMX_DWORD i=0; i<count; i++) {
     DebugLog("#0x%X: ...", i);
     KMX_DWORD offset = entries[i].offset;
     KMX_DWORD length = entries[i].length;
@@ -252,8 +252,8 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
 
 bool
 COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
-  DebugLog("sect: total 0x%X\n", this->total);
-  DebugLog("sect: count 0x%X\n", this->count);
+  DebugLog("sect: total 0x%X\n", total);
+  DebugLog("sect: count 0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
     DebugLog("header.size < expected size");
     return false;
@@ -261,8 +261,8 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
 
   // now validate each component
   bool overall_valid = true;
-  for (KMX_DWORD i = 0; i < this->count; i++) {
-    const COMP_KMXPLUS_SECT_ENTRY& entry = this->entries[i];
+  for (KMX_DWORD i = 0; i < count; i++) {
+    const COMP_KMXPLUS_SECT_ENTRY& entry = entries[i];
     DebugLog("%c%c%c%c #%d: %X @ %X\n", DEBUG_IDENT(entry.sect), i, entry.sect, entry.offset);
     if(!validate_section_name(entry.sect)) {
       return false;
