@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.96 beta 2022-11-03
+
+* fix(developer): Make Details and Build tabs scrollable (#7593)
+* fix(developer): support gif preview images in Package Editor (#7594)
+* fix(developer): handle high-bit-set HKL correctly (#7601)
+* fix(android/app): Add check if bundle to PackageActivity is null (#7603)
+* fix(common): always define dry_run variable (#7604)
+* feat(web): Custom layer targets for Shift double-tap (#7608)
+* fix(android/engine): Handle parsing empty JSONArray as JSONObject (#7611)
+
 ## 16.0.95 beta 2022-11-02
 
 * fix(developer): Use US base layout for debugger (#7531)
