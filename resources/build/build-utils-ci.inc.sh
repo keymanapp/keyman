@@ -77,7 +77,7 @@ function builder_pull_has_label() {
 # ```
 #
 function builder_publish_to_npm() {
-  local dist_tag=$TIER dry_run
+  local dist_tag=$TIER dry_run=
 
   if [[ $TIER == stable ]]; then
     dist_tag=latest
