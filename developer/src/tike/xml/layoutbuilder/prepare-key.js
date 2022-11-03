@@ -125,12 +125,12 @@ $(function() {
     function addSubKeys(keys, type) {
       for(let key of keys) {
         let nkey = builder.addKey(type, '#'+type);
-        let text = builder.inferKeyText(key);
+        let text = builder.inferKeyText(key.text, key.id);
 
         if(key.direction) $(nkey).addClass('flick-'+key.direction);
 
         $(nkey)
-          .data('text', text)
+          .data('text', key.text)
           .data('id', key.id)
           .data('sp', key.sp)
           .data('font', key.font)
