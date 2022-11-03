@@ -3,6 +3,7 @@
 /// <reference path="kmwbase.ts" />
 /// <reference path="osk/embedded/keytip.ts" />
 /// <reference path="osk/embedded/pendingLongpress.ts" />
+/// <reference path="osk/embedded/globeHint.ts" />
 
 // KeymanWeb 11.0
 // Copyright 2019 SIL International
@@ -325,6 +326,15 @@ namespace com.keyman.text {
 
     return x+','+y+','+w+','+h;
   };
+
+  // Currently in an "early prototyping" state.
+  keymanweb['showGlobeHint'] = function() {
+    let hint = new com.keyman.osk.embedded.GlobeHint(true);
+    const keyman = keymanweb as KeymanBase;
+    keyman.osk._Box.appendChild(hint.element);
+
+    hint.show(keyman.osk.vkbd.currentLayer.globeKey.btn, true, keymanweb.osk.vkbd);
+  }
 
  /**
    *  Accept an external key ID (from KeymanTouch) and pass to the keyboard mapping
