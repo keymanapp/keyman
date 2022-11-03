@@ -45,7 +45,7 @@ public final class JSONParser {
       }
       jsonStr = strBuilder.toString();
       if (type == JSONObject.class) {
-        String EMPTY_JSONARRAY_FORMATSTR = "^\\[\\](\\n)?$";
+        String EMPTY_JSONARRAY_FORMATSTR = "^\\[\\](\\n)*$";
         Pattern pattern = Pattern.compile(EMPTY_JSONARRAY_FORMATSTR);
         Matcher matcher = pattern.matcher(jsonStr);
         if (matcher.matches()) {
