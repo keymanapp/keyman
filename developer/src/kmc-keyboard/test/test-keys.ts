@@ -55,4 +55,17 @@ describe('keys', function () {
 
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}));
   });
+  it('should reject layouts with invalid keys', function() {
+    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks) as Keys;
+    assert.isNull(keys);
+    assert.equal(compilerTestCallbacks.messages.length, 1);
+
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: 'Q'}));
+  });
+  it('should accept layouts with gap/switch keys', function() {
+    let keys = loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Keys;
+    assert.isNotNull(keys);
+    assert.equal(compilerTestCallbacks.messages.length, 0);
+    assert.equal(keys.keys.length, 2);
+  });
 });

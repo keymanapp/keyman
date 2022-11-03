@@ -71,6 +71,8 @@ export interface LKKeys {
 export interface LKKey {
   id?: string;
   to?: string;
+  gap?: boolean;
+  switch?: string;
 };
 
 export interface LKLayers {

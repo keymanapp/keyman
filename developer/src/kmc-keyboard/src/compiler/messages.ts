@@ -77,6 +77,10 @@ export class CompilerMessages {
     m(this.ERROR_DisplayIsRepeated, `display to='${o.to}' has more than one display entry.`);
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
 
+  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
+  m(this.ERROR_KeyMissingToGapOrSwitch, `key id='${o.keyId}' must have either to=, gap=, or switch=.`);
+static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
+
   static severityName(code: number): string {
     let severity = code & CompilerErrorSeverity.Severity_Mask;
     switch(severity) {
