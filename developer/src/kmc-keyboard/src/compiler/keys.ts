@@ -13,7 +13,7 @@ export class KeysCompiler extends SectionCompiler {
     return constants.section.keys;
   }
 
-  private validateHardwareLayer(layer: LDMLKeyboard.LKLayerMap) {
+  private validateHardwareLayer(layer: LDMLKeyboard.LKLayer) {
     let valid = true;
     if(layer.row.length > USVirtualKeyMap.length) {
       this.callbacks.reportMessage(CompilerMessages.Error_HardwareLayerHasTooManyRows());
@@ -76,7 +76,7 @@ export class KeysCompiler extends SectionCompiler {
 
   private compileHardwareLayer(
     sections: GlobalSections,
-    layer: LDMLKeyboard.LKLayerMap
+    layer: LDMLKeyboard.LKLayer
   ): Keys {
     let result = new Keys();
     const mod = this.translateLayerIdToModifier(layer.id);

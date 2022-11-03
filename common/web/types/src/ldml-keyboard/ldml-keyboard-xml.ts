@@ -25,11 +25,10 @@ export interface LKKeyboard {
   settings?: LKSettings;
   keys?: LKKeys;
   displays?: LKDisplays;
-  layers?: LKLayerMaps[];
-  vkeys?: LKVkeyMaps;
+  layers?: LKLayers[];
+  vkeys?: LKVkeys;
   transforms?: LKTransforms[];
   reorders?: LKReorders;
-  backspaces?: LKBackspaces;
 };
 
 export interface LKLocales {
@@ -74,12 +73,12 @@ export interface LKKey {
   to?: string;
 };
 
-export interface LKLayerMaps {
+export interface LKLayers {
   form?: string;
-  layer?: LKLayerMap[];
+  layer?: LKLayer[];
 };
 
-export interface LKLayerMap {
+export interface LKLayer {
   id?: string;
   row?: LKRow[];
 };
@@ -88,11 +87,11 @@ export interface LKRow {
   keys?: string;
 };
 
-export interface LKVkeyMaps {
-  vkey?: LKVkeyMap[];
+export interface LKVkeys {
+  vkey?: LKVkey[];
 };
 
-export interface LKVkeyMap {
+export interface LKVkey {
   from?: string;
   to?: string;
 };
@@ -116,23 +115,10 @@ export interface LKReorders {
 export interface LKReorder {
   from?: string;
   before?: string;
-  //after?: string; //TODO-LDML
   order?: string;
   tertiary?: string;
   tertiary_base?: string;
   prebase?: string;
-};
-
-export interface LKBackspaces {
-  backspace?: LKBackspace[];
-};
-
-export interface LKBackspace {
-  from?: string;
-  to?: string;
-  before?: string;
-  after?: string;
-  error?: "fail";
 };
 
 export interface LKDisplayOptions {

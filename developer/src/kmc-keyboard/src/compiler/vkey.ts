@@ -33,17 +33,17 @@ export class VkeyCompiler extends SectionCompiler {
         }
 
         if(vk.from == vk.to) {
-          this.callbacks.reportMessage(CompilerMessages.Hint_VkeyMapIsRedundant({vkey: vk.from}));
+          this.callbacks.reportMessage(CompilerMessages.Hint_VkeyIsRedundant({vkey: vk.from}));
         }
 
         if(from.find(svk => svk == vk.from)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_VkeyMapIsRepeated({vkey: vk.from}));
+          this.callbacks.reportMessage(CompilerMessages.Error_VkeyIsRepeated({vkey: vk.from}));
           valid = false;
         }
         from.push(vk.from);
 
         if(to.find(svk => svk == vk.to)) {
-          this.callbacks.reportMessage(CompilerMessages.Info_MultipleVkeyMapsHaveSameTarget({vkey: vk.to}));
+          this.callbacks.reportMessage(CompilerMessages.Info_MultipleVkeysHaveSameTarget({vkey: vk.to}));
         }
         to.push(vk.to);
       });
