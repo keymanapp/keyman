@@ -62,7 +62,16 @@ export default class LDMLKeyboardXMLSourceFileReader {
     const schema = JSON.parse(schemaSource.toString('utf8'));
     const ajv = new Ajv();
     if(!ajv.validate(schema, source)) {
-      throw new Error(ajv.errorsText());
+      // Try to improve the message
+      if (ajv.errors?.length === 1) {
+        // Only one error. Try to improve the message.
+        const err = ajv.errors[0];
+        const { instancePath, keyword, params, message } = err;
+        throw new Error(`${instancePath}: ${keyword}: ${message} ${JSON.stringify(params||{})}`);
+      } else {
+        // Not a single error, so fall through to errorsText()
+        throw new Error(ajv.errorsText());
+      }
     }
   }
 
