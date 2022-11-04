@@ -67,12 +67,12 @@ namespace com.keyman.osk.embedded {
         let canvasWidth = xWidth + Math.ceil(xWidth * 1) * 2;
         let canvasHeight = Math.ceil(3.0 * xHeight) + (ySubPixelPadding); //
 
-        kts.top = 'auto';
         kts.bottom = Math.floor(keyman.osk.computedHeight - y) + 'px';
-        kts.textAlign = 'center';
-        kts.overflow = 'visible';
         kts.width = canvasWidth+'px';
-        kts.height = canvasHeight+'px';
+        kts.maxHeight = '2.4em';
+
+        let kls = this.tip.style;
+        kls.bottom = (rrow.height - 1) + 'px';
 
         // Adjust shape if at edges
 
@@ -96,25 +96,16 @@ namespace com.keyman.osk.embedded {
 
         kts.left=(xLeft - xOverflow) + 'px';
 
-        let cs = getComputedStyle(this.element);
-        let oskHeight = keyman.osk.computedHeight;
-        let bottomY = parseFloat(cs.bottom);
-        let tipHeight = parseFloat(cs.height);
-
         let capHeight = xHeight + 3;
-        let noncapHeight = tipHeight - capHeight;
-
-        this.tip.style.height = noncapHeight + 'px';
-
         let finalBaseCapHeight = (keyRect.bottom - _BoxRect.top - Math.floor(y - canvasHeight) - (capHeight));
         let finalCapCalloutHeight = finalBaseCapHeight / 4;
-        this.cap.style.top = (noncapHeight - 1) + 'px';
+
+        this.cap.style.bottom = (rrow.height - finalCapCalloutHeight) + 'px';
         this.cap.style.width = '0px'; //capWidth + 'px';
         this.cap.style.height = '0px'; //finalCapHeight + 'px';\
         this.cap.style.borderLeftWidth   = (capWidth / 2) + 'px';
         this.cap.style.borderRightWidth  = (capWidth / 2) + 'px';
         this.cap.style.borderTopWidth    = finalCapCalloutHeight + 'px';
-        //this.cap.style.borderBottomWidth = (finalCapHeight / 2) + 'px';
 
         kts.display = 'block';
       } else { // Hide the key preview

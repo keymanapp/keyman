@@ -437,16 +437,11 @@ div.android div.kmw-keytip-cap {
 div.kmw-globehint {
   position: absolute;
   left: 0;
-  top: 0;
-  width: 3em;
-  height: 3em;
   overflow: visible;
 }
 
 div.kmw-globehint-tip {
   position: absolute;
-  top: 0;
-  width: 100%;
   border-radius: 6px 6px 4px 4px;
   border: solid 1px #cccccc;
   border-bottom: solid 1px #8a8d90;
@@ -456,13 +451,12 @@ div.kmw-globehint-tip {
 
 span.kmw-globehint-label {
   display: block;
-  transform: translateY(-50%);
   font-size: 0.72em;
+  text-align: center;
   padding: 3px;
   color: #fff;
+  overflow: visible;
   font-family:Verdana, Geneva, Tahoma, sans-serif;
-  top: 50%;
-  position: relative;
 }
 
 /* create the 'arrow' part of the hint (TODO) */
