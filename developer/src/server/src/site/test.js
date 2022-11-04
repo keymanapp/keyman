@@ -1,7 +1,7 @@
 /* Global Variables */
 
 let helpUrl = ''; // Will be updated when we retrieve the server API version
-let versionMajor = '15.0'; // will be updated from the server when we retrieve the server API version
+let versionMajor = '16.0'; // will be updated from the server when we retrieve the server API version
 
 const ta1 = document.getElementById('ta1');
 
@@ -16,7 +16,7 @@ const devices = {
 };
 
 // these need to be defined before we load inc/keyboards.js
-var debugKeyboards = [];
+let debugKeyboards = [];
 let registeredModels = {};
 
 keyman.addEventListener('keyboardregistered', function(keyboardProperties) {
@@ -29,6 +29,19 @@ keyman.addEventListener('keyboardloaded', function(keyboardProperties) {
   window.setTimeout(buildKeyboardList, 10);
 });
 
+function enableControls(enable) {
+  ['ta1', 'btn-menu', 'btn-keyboard', 'btn-model', 'btn-device'].forEach(btn => {
+    if(enable) {
+      document.getElementById(btn).removeAttribute('disabled');
+    } else {
+      document.getElementById(btn).setAttribute('disabled', '');
+    }
+  });
+}
+
+let keymanInitialized = false;
+enableControls(false);
+
 keyman.init({
   ui:'button',
   resources:'/resource/',
@@ -38,6 +51,8 @@ keyman.init({
   setActiveOnRegister:false
 }).then(function() {
   keyman.attachToControl(document.getElementById('ta1'));
+  enableControls(true);
+  keymanInitialized = true;
 });
 
 /* Initialization */
@@ -277,29 +292,40 @@ function unloadKeyboardsAndModels() {
   modelDropdown.add('', '(no model)');
 }
 
+function handleKeyboardsAndModelsResponse(responseText, shouldReload) {
+  if(!keymanInitialized) {
+    window.setTimeout(function() {
+      handleKeyboardsAndModelsResponse(responseText, shouldReload);
+    }, 100);
+    return;
+  }
+
+  if(responseText !== currentKeyboardModelScript) {
+    currentKeyboardModelScript = responseText;
+    // we need to force a reload of the keyboard and model
+    const currentKeyboard = !shouldReload ? window.sessionStorage.getItem('current-keyboard') : keyman.getActiveKeyboard();
+    const lastModel = !shouldReload ? window.sessionStorage.getItem('current-model') : (keyman.core.activeModel ? keyman.core.activeModel.id : '');
+    unloadKeyboardsAndModels();
+    //console.log(req.responseText);
+    eval(responseText);
+    window.setTimeout(() => {
+      console.log('setting active keyboard to '+currentKeyboard);
+      console.log('setting active model to '+lastModel);
+      keyman.setActiveKeyboard(currentKeyboard, 'en')
+      selectModel(lastModel);
+      refreshStatusKeyboard(currentKeyboard);
+      refreshStatusModel(lastModel);
+    }, 10);
+  }
+}
+
 function checkKeyboardsAndModels(shouldReload) {
-  var req=new XMLHttpRequest();
+  let req=new XMLHttpRequest();
   console.log('Checking for updated keyboards and models ('+shouldReload+')');
   req.onreadystatechange = function() {
     if (req.readyState==4) {
       if (req.status==200) {
-        if(req.responseText !== currentKeyboardModelScript) {
-          currentKeyboardModelScript = req.responseText;
-          // we need to force a reload of the keyboard and model
-          const currentKeyboard = !shouldReload ? window.sessionStorage.getItem('current-keyboard') : keyman.getActiveKeyboard();
-          const lastModel = !shouldReload ? window.sessionStorage.getItem('current-model') : (keyman.core.activeModel ? keyman.core.activeModel.id : '');
-          unloadKeyboardsAndModels();
-          //console.log(req.responseText);
-          eval(req.responseText);
-          window.setTimeout(() => {
-            console.log('setting active keyboard to '+currentKeyboard);
-            console.log('setting active model to '+lastModel);
-            keyman.setActiveKeyboard(currentKeyboard, 'en')
-            selectModel(lastModel);
-            refreshStatusKeyboard(currentKeyboard);
-            refreshStatusModel(lastModel);
-          }, 10);
-        }
+        handleKeyboardsAndModelsResponse(req.responseText, shouldReload);
       }
     }
   }
