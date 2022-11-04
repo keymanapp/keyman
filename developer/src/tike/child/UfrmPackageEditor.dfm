@@ -1124,7 +1124,7 @@ inherited frmPackageEditor: TfrmPackageEditor
       ImageIndex = 9
     end
     object pageCompile: TTabSheet
-      Caption = 'Compile'
+      Caption = 'Build'
       ImageIndex = 1
       object sbCompile: TScrollBox
         Left = 0

@@ -333,7 +333,7 @@ inherited frmModelEditor: TfrmModelEditor
           Width = 333
           Height = 13
           Caption =
-            'The keyboard must be compiled in order to distribute or install ' +
+            'The model must be compiled in order to distribute or install ' +
             'it'
         end
         object panBuildLexicalModel: TPanel
