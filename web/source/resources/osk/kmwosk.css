@@ -428,6 +428,7 @@ div.android div.kmw-keytip-cap {
   }
 }
 
+/*** TODO:  extract to a separate CSS file used only in embedded mode! ***/
 
 #kmw-globehint {
   z-index: 10002;
@@ -477,6 +478,8 @@ div.kmw-globehint-cap {
   border-top-color: rgba(0, 0, 0, 0.9);
   /* width managed by KMW code */
 }
+
+/*** TODO:  end of future separate-CSS-file extraction zone ***/
 
 div.android div.kmw-globehint-cap {
   border-top-color: rgba(48, 48, 48, .9);

@@ -329,7 +329,7 @@ namespace com.keyman.text {
 
   // Currently in an "early prototyping" state.
   keymanweb['showGlobeHint'] = function() {
-    let hint = new com.keyman.osk.embedded.GlobeHint(true);
+    let hint = new com.keyman.osk.embedded.GlobeHint();
     const keyman = keymanweb as KeymanBase;
     keyman.osk._Box.appendChild(hint.element);
 
