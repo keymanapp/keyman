@@ -23,12 +23,14 @@
  * through.
  */
 export type SectionIdent =
+// Keep this sorted, but with `sect` as the first entry.
   'sect' |
   'bksp' |
   'disp' |
   'elem' |
   'finl' |
   'keys' |
+  'layr' |
   'loca' |
   'meta' |
   'name' |
@@ -226,6 +228,43 @@ class Constants {
   readonly keys_flags_extend = 1;
 
   /* ------------------------------------------------------------------
+   * layr section
+     ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'layr' section not including variable parts
+   */
+  readonly length_layr = 32;
+  /**
+   *  Length of each layer list in the 'layr' section variable part
+   */
+  readonly length_layr_list = 16;
+  /**
+   * bitmask for the 'form' field of the layr.list[].flags bitfield
+   */
+  readonly layr_list_flags_mask_form = 1;
+  /**
+   * hardware layout: value for the 'form' field of the layr.list[].flags
+   */
+  readonly layr_list_flags_hardware = 0;
+  /**
+   * touch layout: value for the 'form' field of the layr.list[].flags
+   */
+  readonly layr_list_flags_touch = 1;
+  /**
+   * Length of each layer entry in the 'layr' section variable part
+   */
+  readonly length_layr_entry = 16;
+  /**
+   * Length of each row entry in the 'layr' section variable part
+   */
+  readonly length_layr_row = 8;
+  /**
+   * Length of each key entry in the 'layr' section variable part
+   */
+  readonly length_layr_key = 4;
+
+  /* ------------------------------------------------------------------
     * loca section
       ------------------------------------------------------------------ */
 
@@ -332,11 +371,13 @@ class Constants {
    * All section IDs.
    */
   readonly section: SectionMap = {
+  // keep this sorted
       bksp: 'bksp',
       disp: 'disp',
       elem: 'elem',
       finl: 'finl',
       keys: 'keys',
+      layr: 'layr',
       loca: 'loca',
       meta: 'meta',
       name: 'name',

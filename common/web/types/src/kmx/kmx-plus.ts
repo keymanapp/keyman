@@ -190,6 +190,7 @@ export class Vkey extends Section {
   vkeys: VkeyItem[] = [];
 };
 
+// 'disp'
 export class DispItem {
   to: StrsItem;
   display: StrsItem;
@@ -200,6 +201,55 @@ export class Disp extends Section {
   disps: DispItem[] = [];
 };
 
+// 'layr'
+
+/**
+ * In-memory `<layers>`
+ */
+export class LayrList {
+  flags: number;
+  hardware: StrsItem;
+  /**
+   * Index into Layr.layers
+   */
+  layerIndex: number;
+  count: number;
+};
+
+/**
+ * In-memory `<layer>`
+ */
+ export class LayrEntry {
+  id: StrsItem;
+  modifier: StrsItem;
+  /**
+   * index into Layr.rows
+   */
+  rowIndex: number;
+  count: number;
+};
+
+/**
+ * In-memory `<row>`
+ */
+ export class LayrRow {
+  /**
+   * index into Layr.vkeys
+   */
+  keyIndex: number;
+  count: number;
+};
+
+export class Layr extends Section {
+  lists: LayrList[] = [];
+  layers: LayrEntry[] = [];
+  rows: LayrRow[] = [];
+  /**
+   * each item is a vkey id
+   */
+  vkeys: number[] = [];
+};
+
 export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
     bksp?: Bksp;
@@ -207,6 +257,7 @@ export interface KMXPlusData {
     elem?: Elem; // elem is ignored in-memory
     finl?: Finl;
     keys?: Keys;
+    layr?: Layr;
     loca?: Loca;
     meta?: Meta;
     name?: Name;

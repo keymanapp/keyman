@@ -76,12 +76,24 @@ export interface LKKey {
 };
 
 export interface LKLayers {
+  /**
+   * `hardware` or `touch`
+   */
   form?: string;
+  /**
+   * `us`, `iso`, `jis`, or `abnt2`
+   */
+  hardware?: string;
+  /**
+   * Minimum width in millimeters
+   */
+  minDeviceWidth?: number;
   layer?: LKLayer[];
 };
 
 export interface LKLayer {
   id?: string;
+  modifier?: string;
   row?: LKRow[];
 };
 
