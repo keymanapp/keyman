@@ -372,7 +372,7 @@ There are `rowCount` total row entries.
 | ∆ | Bits | Name       | Description                            |
 |---|------|------------|----------------------------------------|
 | 0+|  32  | key        | int: index into key element            |
-| 4+|  32  | key2count  | int: count of key elements in this row |
+| 4+|  32  | count      | int: count of key elements in this row |
 
 Each key entry corresponds to a key in the row.
 There are `keyCount` total key entries.
