@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 16.0.97 beta 2022-11-04
+
+* fix(android/app): Don't show "Get Started" after setting Keyman as default system keyboard (#7587)
+* fix(windows): include debug info in kmshell build (#7600)
+* fix(developer): tweak captions for consistency (#7607)
+* fix(mac): replace white background keyman system menu icon with transparent one (#7610)
+
 ## 16.0.96 beta 2022-11-03
 
 * fix(developer): Make Details and Build tabs scrollable (#7593)
