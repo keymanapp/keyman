@@ -1541,9 +1541,7 @@ public final class KMManager {
       result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
     }
 
-    //toggleSuggestionBanner(languageID, result1, result2);
-    //registerAssociatedLexicalModel(languageID);
-    //updateSuggestionBanner(languageID, result1, result2);
+    updateSuggestionBanner(languageID, result1, result2);
     return (result1 || result2);
   }
 
@@ -1558,7 +1556,6 @@ public final class KMManager {
       result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
     updateSuggestionBanner(languageID, result1, result2);
-
     return (result1 || result2);
   }
 
@@ -1583,10 +1580,9 @@ public final class KMManager {
     }
 
     if (kbInfo != null) {
-      prepareKeyboardSwitch(kbInfo.getPackageID(), kbInfo.getKeyboardID(), kbInfo.getLanguageID(), kbInfo.getKeyboardName());
-      //setKeyboard(kbInfo);
+      setKeyboard(kbInfo);
+      updateSuggestionBanner(kbInfo.getLanguageID(), true, true);
     }
-    KMManager.updateSuggestionBanner(kbInfo.getLanguageID(), true, true);
 
     if (KMManager.InAppKeyboard != null) {
       KMManager.InAppKeyboard.loadKeyboard();
