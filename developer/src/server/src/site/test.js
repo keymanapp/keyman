@@ -208,6 +208,7 @@ window.onload = function() {
     // we are using the targetDevice for context input.
     newOSK = new com.keyman.osk.InlinedOSKView(targetDevice, keyman.util.device.coreSpec);
     keyman.core.contextDevice = targetDevice;
+    keyman.osk = newOSK;
 
     if(document.body.offsetWidth < targetDevice.dimensions[0]) {
       newOSK.setSize('320px', '200px');
