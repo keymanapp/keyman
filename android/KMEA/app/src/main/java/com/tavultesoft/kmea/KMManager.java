@@ -2132,7 +2132,7 @@ public final class KMManager {
     globeKeyState = state;
   }
 
-  public static void updateSuggestionBanner(String languageID, boolean inAppKeyboardChanged, boolean systemKeyboardChanged) {
+  private static void updateSuggestionBanner(String languageID, boolean inAppKeyboardChanged, boolean systemKeyboardChanged) {
     toggleSuggestionBanner(languageID, inAppKeyboardChanged, systemKeyboardChanged);
     registerAssociatedLexicalModel(languageID);
   }
