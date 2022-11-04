@@ -8,7 +8,6 @@ namespace com.keyman.osk.embedded {
     // |     | <-- tip
     // |  x  | <-- label
     // |_   _|
-    //  \   /
     //   \ /  <-- cap
     //    v
 
@@ -16,14 +15,7 @@ namespace com.keyman.osk.embedded {
     private readonly tip: HTMLDivElement;
     private readonly label: HTMLSpanElement;
 
-    private readonly constrain: boolean;
-
-    /**
-     *
-     * @param constrain keep the keytip within the bounds of the overall OSK.
-     *                  Will probably be handled via function in a later pass.
-     */
-    constructor(constrain: boolean) {
+    constructor() {
       let tipElement = this.element=document.createElement('div');
       tipElement.className='kmw-globehint';
       tipElement.id = 'kmw-globehint';
@@ -41,8 +33,6 @@ namespace com.keyman.osk.embedded {
       this.label.className = 'kmw-globehint-label';
 
       this.label.innerText = "Tap here to change keyboard.";
-
-      this.constrain = constrain;
     }
 
     show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
@@ -125,13 +115,6 @@ namespace com.keyman.osk.embedded {
         this.cap.style.borderRightWidth  = (capWidth / 2) + 'px';
         this.cap.style.borderTopWidth    = finalCapCalloutHeight + 'px';
         //this.cap.style.borderBottomWidth = (finalCapHeight / 2) + 'px';
-
-        if(this.constrain && tipHeight + bottomY > oskHeight) {
-          const delta = tipHeight + bottomY - oskHeight;
-          kts.height = (canvasHeight-delta) + 'px';
-          const hx = Math.max(0, (canvasHeight-delta)-(canvasHeight/2) + 2);
-          this.cap.style.height = hx + 'px';
-        }
 
         kts.display = 'block';
       } else { // Hide the key preview
