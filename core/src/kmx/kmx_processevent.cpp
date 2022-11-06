@@ -524,7 +524,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
       case CODE_SAVEOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Save(*m_kbp_state, n1);
+        GetOptions()->Save(m_actions, n1);
         break;
       case CODE_IFSYSTEMSTORE:
         p+=3;

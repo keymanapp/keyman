@@ -375,6 +375,38 @@ void test_set_option() {
   }));
 }
 
+/**
+ * Test 8: save option
+ */
+void test_save_option() {
+  setup("023 - options with save.kmx");
+  DEBUG_GROUP gp = {u"Main"};
+  DEBUG_KEY kp1 = { '2', /*line*/19, };
+  // DEBUG_STORE sp = {0, u"foo", u"0"};
+  km_kbp_option_item opt = {u"foo", u"0", KM_KBP_OPT_KEYBOARD};
+
+  try_status(km_kbp_state_debug_set(test_state, 1));
+
+  // '2' -> save_option
+
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1));
+  assert(debug_items(test_state, {
+    km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_2, 0, '2'}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
+
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_ENTER, 0, {}, {u"", &gp, &kp1, {0xFFFF}}},
+      km_kbp_state_debug_item{KM_KBP_DEBUG_RULE_EXIT, 0, {}, {u"", &gp, &kp1, {0xFFFF}, 1}},
+
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 0, {}, {u"", &gp, nullptr, {}, 1}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 1}},
+  }));
+
+  assert(action_items(test_state, {
+    {KM_KBP_IT_PERSIST_OPT, {0,}, {uintptr_t(&opt)}},
+    {KM_KBP_IT_END}
+  }));
+}
+
 
 constexpr const auto help_str = "\
 debug_api [--color] <SOURCE_PATH>|--print-sizeof\n\
@@ -436,6 +468,7 @@ int main(int argc, char *argv []) {
   test_multiple_groups();
   test_store_offsets();
   test_set_option();
+  test_save_option();
 
   // Destroy them
   teardown();

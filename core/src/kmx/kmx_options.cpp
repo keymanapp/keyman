@@ -5,7 +5,6 @@
 #include "processor.hpp"
 #include "kmx_processevent.h"
 #include <option.hpp>
-#include <state.hpp>
 
 using namespace km::kbp;
 using namespace kmx;
@@ -204,7 +203,7 @@ void KMX_Options::Reset(abstract_processor & ap, int nStoreToReset)
 }
 
 
-void KMX_Options::Save(state & state, int nStoreToSave)
+void KMX_Options::Save(kmx::KMX_Actions & m_actions, int nStoreToSave)
 {
   assert(_kp != NULL);
   assert(_kp->Keyboard != NULL);
@@ -214,8 +213,5 @@ void KMX_Options::Save(state & state, int nStoreToSave)
 
   auto const & rStoreToSave = _kp->Keyboard->dpStoreArray[nStoreToSave];
   if (rStoreToSave.dpName == nullptr) return;
-
-  state.processor().persisted_store()[rStoreToSave.dpName] = rStoreToSave.dpString;
-  state.actions().push_persist(
-    option{KM_KBP_OPT_KEYBOARD, rStoreToSave.dpName, rStoreToSave.dpString});
+  m_actions.QueueAction(QIT_SAVEOPT, nStoreToSave);
 }
