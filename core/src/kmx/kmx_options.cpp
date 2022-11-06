@@ -203,7 +203,7 @@ void KMX_Options::Reset(abstract_processor & ap, int nStoreToReset)
 }
 
 
-void KMX_Options::Save(kmx::KMX_Actions & m_actions, int nStoreToSave)
+void KMX_Options::Save(int nStoreToSave)
 {
   assert(_kp != NULL);
   assert(_kp->Keyboard != NULL);

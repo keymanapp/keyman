@@ -41,7 +41,7 @@ public:
   void Set(int nStoreToSet, std::u16string const &value);
   void Set(std::u16string const &key, std::u16string const &value);
   void Reset(abstract_processor &, int nStoreToReset);
-  void Save(kmx::KMX_Actions &m_actions, int nStoreToSave);
+  void Save(int nStoreToSave);
 
   void SetInternalDebugItems(KMX_DebugItems *debug_items) {
     m_debug_items = debug_items;
