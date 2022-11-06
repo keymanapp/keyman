@@ -745,20 +745,20 @@ $(function() {
     } else {
       $('.hint', key).removeClass('custom-hint');
     }
-
-    builder.updateCharacterMap(val, false);
   }
 
   const inpKeyHintChange = builder.wrapChange(function (e) {
     const val = $(this).val();
     $('#inpKeyHintUnicode').val(builder.toUnicodeString(val));
     builder.keyHintChange(val);
+    builder.updateCharacterMap(val, false);
   }, {saveOnce: true});
 
   const inpKeyHintUnicodeChange = builder.wrapChange(function (e) {
     const val = builder.fromUnicodeString($(this).val());
     $('#inpKeyHint').val(val);
     builder.keyHintChange(val);
+    builder.updateCharacterMap(val, false);
   }, {saveOnce: true});
 
 
