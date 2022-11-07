@@ -359,6 +359,8 @@ There are `listCount` total lists.
   |       0      | form     | 0: hardware          |
   |       0      | form     | 1: touch             |
 
+### `layr.layers` subtable
+
 Each layer entry corresponds to one `<layer>` element
 There are `layerCount` total layer entries.
 
@@ -369,6 +371,8 @@ There are `layerCount` total layer entries.
 | 8+|  32  | row        | int: index into rows area (next section)       |
 |12+|  32  | count      | int: number of `rows` elements for this layer  |
 
+### `layr.rows` subtable
+
 Each row entry corresponds to one `<row>` element
 There are `rowCount` total row entries.
 
@@ -377,12 +381,14 @@ There are `rowCount` total row entries.
 | 0+|  32  | key        | int: index into key element            |
 | 4+|  32  | count      | int: count of key elements in this row |
 
+### `layr.keys` subtable
+
 Each key entry corresponds to a key in the row.
 There are `keyCount` total key entries.
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-| 0+|  32  | key     | int: index into `keys` element           |
+| 0+|  32  | key     | int: index into `key2` section           |
 
 ### C7043.2.14 `disp`—Display list
 
@@ -404,6 +410,50 @@ For each element:
 |36+|  32  | display | str: output display string               |
 
 Entries are sorted in a binary codepoint sort on the `to` field.
+
+### C7043.2.15 `key2`—Extended keybag
+
+| ∆ | Bits | Name      | Description                              |
+|---|------|-----------|------------------------------------------|
+| 0 |  32  | ident     | `key2`                                   |
+| 4 |  32  | size      | int: Length of section                   |
+| 8 |  32  | count     | int: Number of keys                      |
+|12 |  32  | reserved  | reserved                                 |
+|16 | var  | keys      | keys sub-table                           |
+
+#### `key2.keys` subtable
+
+For each key:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0+|  32  | vkey    | int: vkey ID                             |
+| 4+|  32  | to      | str: output string OR UTF-32LE codepoint |
+| 8+|  32  | flags   | int: per-key flags                       |
+|12+|  32  | id      | str: key id                              |
+|16+|  32  | switch  | str: layer id to switch to               |
+|20+|  32  | width   | int: key width*10 (supports 0.1 as min width) |
+
+- TODO: longpress
+- TODO: multiTap
+- TODO: flicks
+
+- `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
+- `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
+  etc.). It is resolved because the `vkeyMap` from LDML has already been
+  applied.  If this is 256 or above, it is a custom touch layout vkey generated
+  by the compiler.
+- `flags`: Flags is a 32-bit bitfield defined as below:
+
+| Bit position | Meaning  |  Description                                |
+|--------------|----------|---------------------------------------------|
+|       0      | extend   | 0: `to` is a char, 1: `to` is a string      |
+|       1      | gap      | 1 if the key is a gap                       |
+|       2      | transform | 1 if the key is transform=no               |
+
+- `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
+  is a 32 bit index into the `strs` table. The string may be zero-length.
+
 
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
 
