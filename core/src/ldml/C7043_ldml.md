@@ -338,6 +338,9 @@ Represents layers on the keyboard.
 |16 |  32  | rowCount   | int: number of row entries               |
 |20 |  32  | keyCount   | int: number of key entries               |
 |24 |  64  | reserved   | padding                                  |
+|32 | var  | layers     | layers sub-table                         |
+| - | var  | rows       | rows sub-table                           |
+| - | var  | keys       | keys sub-table                           |
 
 Each layer list corresponds to one `<layers>` element.
 There are `listCount` total lists.
@@ -359,11 +362,11 @@ There are `listCount` total lists.
 Each layer entry corresponds to one `<layer>` element
 There are `layerCount` total layer entries.
 
-| ∆ | Bits | Name       | Description                              |
-|---|------|------------|------------------------------------------|
-| 0+|  32  | id         | str: layer id such as `base` or `shift`  |
-| 4+|  32  | modifier   | str: modifier string                     |
-| 8+|  32  | row        | int: index into rows area (next section) |
+| ∆ | Bits | Name       | Description                                    |
+|---|------|------------|------------------------------------------------|
+| 0+|  32  | id         | str: layer id such as `base` or `shift`        |
+| 4+|  32  | modifier   | str: modifier string                           |
+| 8+|  32  | row        | int: index into rows area (next section)       |
 |12+|  32  | count      | int: number of `rows` elements for this layer  |
 
 Each row entry corresponds to one `<row>` element
@@ -379,7 +382,7 @@ There are `keyCount` total key entries.
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-| 0+|  32  | vkey    | int: vkey ID                             |
+| 0+|  32  | key     | int: index into `keys` element           |
 
 ### C7043.2.14 `disp`—Display list
 
