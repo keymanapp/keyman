@@ -15,6 +15,12 @@ namespace kmx {
 #define TAB "\t"
 #define NL  "\n"
 
+/**
+ * \def MEDIUM_BUF_SIZ not too big, not too small
+*/
+#define MEDIUM_BUF_SIZ (128 * 7)
+
+
 #ifdef _MSC_VER
 #define _USE_WINDOWS
 #endif
@@ -348,7 +354,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
     return 0;
 
   char windowinfo[1024];
-  sprintf(windowinfo,
+  snprintf(windowinfo, 1024,
           "%ld" TAB   //"TickCount" TAB
           "%s:%d" TAB //"SourceFile" TAB
           "%s" TAB    //"Function"
@@ -398,10 +404,10 @@ const char *Debug_VirtualKey(KMX_WORD vk) {
   }
 
   if (vk < 256) {
-    sprintf(buf, "['%s' 0x%x]", s_key_names[vk], vk);
+    snprintf(buf, 256, "['%s' 0x%x]", s_key_names[vk], vk);
   }
   else {
-    sprintf(buf, "[0x%x]", vk);
+    snprintf(buf, 256, "[0x%x]", vk);
   }
   return buf;
 }
@@ -413,13 +419,13 @@ const char *Debug_UnicodeString(PKMX_WCHAR s, int x) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif
-  static char bufout[2][128 * 7];
+  static char bufout[2][MEDIUM_BUF_SIZ];
   KMX_WCHAR *p;
   char *q;
   bufout[x][0] = 0;
   for (p = s, q = bufout[x]; *p && (p - s < 128); p++)
   {
-    sprintf(q, "U+%4.4X ", *p);
+    snprintf(q, MEDIUM_BUF_SIZ - (q - bufout[x]), "U+%4.4X ", *p);
     q = strchr(q, 0);
   }
   //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
@@ -433,13 +439,14 @@ const char *Debug_UnicodeString(::std::u16string s, int x) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif
-  static char bufout[2][128 * 7];
+  static char bufout[2][MEDIUM_BUF_SIZ];
   auto p = s.begin();
   char *q;
   bufout[x][0] = 0;
   for (q = bufout[x]; (intptr_t)(q-bufout[x]) < (128*7) && p != s.end(); p++)
   {
-    sprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
+    snprintf(q, MEDIUM_BUF_SIZ - (q - bufout[x]), "U+%4.4X ", *p);
+    q = strchr(q, 0);
   }
   return bufout[x];
 }
