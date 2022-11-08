@@ -143,6 +143,8 @@ begin
   try
     if not IsAdministrator then
       Error(KMN_E_Install_KeyboardMustBeInstalledByAdmin);   // I3612
+    if not TZipFile.IsValid(FileName) then
+      Error(KMN_E_Install_KeyboardMustBeInstalledByAdmin); // #TODO: 6570 a new error message explaining issue
 
     FAutoApply := Context.Control.AutoApply;
     try
@@ -161,11 +163,16 @@ begin
       FTempOutPath := buf; FTempOutPath := FTempOutPath + '\';
 
       inf := nil;
-      // #TODO 6570Check we can access the file and display an error if we can't, then exit.
+
       FZip := TZipFile.Create;
       try
-        FZip.Open(FileName, TZipMode.zmRead);
+        // #TODO: 6570: Check we can access the file and display an error
 
+        // try
+        FZip.Open(FileName, TZipMode.zmRead);
+         // except on EZipExeception do begin
+        //        ErrorFmt(KMN_E_Install_InvalidFile, VarArrayOf([ExtractFileName(FileName), E.Message]));
+        //    end;
         InfFile := '';
 
         for i := 0 to FZip.FileCount - 1 do
