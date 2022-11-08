@@ -121,8 +121,8 @@ void test_debugging_function_key() {
   }));
 
   assert(action_items(test_state, {
-    {KM_KBP_IT_EMIT_KEYSTROKE},
     {KM_KBP_IT_INVALIDATE_CONTEXT}, // It's a non character key that is not a modifier, so this is a hint that context may no longer be valid
+    {KM_KBP_IT_EMIT_KEYSTROKE},
     {KM_KBP_IT_END}
   }));
 }
@@ -407,6 +407,43 @@ void test_save_option() {
   }));
 }
 
+/*
+ * Test 9: backspace + deadkey markers -- should delete two markers and then emit
+ * an 'unknown' backspace because we are at start-of-context
+ */
+void test_backspace_markers() {
+  setup("000 - null keyboard.kmx");
+  km_kbp_context_item marker_context[] = {
+    {KM_KBP_CT_MARKER, {0,}, {1}},
+    {KM_KBP_CT_MARKER, {0,}, {1}},
+    {KM_KBP_CT_END}
+  };
+  try_status(km_kbp_context_set(km_kbp_state_context(test_state), marker_context));
+
+  DEBUG_GROUP gp = {u"Main"};
+
+  try_status(km_kbp_state_debug_set(test_state, 1));
+
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1));
+  assert(debug_items(test_state, {
+    km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_BKSP, 0, 0}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_EXIT, 2, {}, {u"", &gp, nullptr, {}, 3}},
+    km_kbp_state_debug_item{KM_KBP_DEBUG_END, 1, {}, {u"", nullptr, nullptr, {}, 3}},
+  }));
+
+  km_kbp_action_item bksp = {KM_KBP_IT_BACK};
+  bksp.backspace.expected_type = KM_KBP_BT_MARKER;
+  bksp.backspace.expected_value = 1;
+
+  assert(action_items(test_state, {
+    bksp,
+    bksp,
+    {KM_KBP_IT_INVALIDATE_CONTEXT},
+    {KM_KBP_IT_EMIT_KEYSTROKE},
+    {KM_KBP_IT_END}
+  }));
+}
 
 constexpr const auto help_str = "\
 debug_api [--color] <SOURCE_PATH>|--print-sizeof\n\
@@ -469,6 +506,7 @@ int main(int argc, char *argv []) {
   test_store_offsets();
   test_set_option();
   test_save_option();
+  test_backspace_markers();
 
   // Destroy them
   teardown();

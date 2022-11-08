@@ -178,6 +178,9 @@ kmx_processor::internal_process_queued_actions(km_kbp_state *state) {
           option{KM_KBP_OPT_KEYBOARD, rStoreToSave.dpName, rStoreToSave.dpString});
       }
       break;
+    case QIT_EMIT_KEYSTROKE:
+      state->actions().push_emit_keystroke();
+      break;
     case QIT_VKEYDOWN:
     case QIT_VKEYUP:
     case QIT_VSHIFTDOWN:
@@ -276,7 +279,7 @@ kmx_processor::process_event(
 
   if (!_kmx.ProcessEvent(state, vk, modifier_state, is_key_down)) {
     // We need to output the default keystroke
-    state->actions().push_emit_keystroke();
+    _kmx.GetActions()->QueueAction(QIT_EMIT_KEYSTROKE, 0);
   }
 
   return internal_process_queued_actions(state);
