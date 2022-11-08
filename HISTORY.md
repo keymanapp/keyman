@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 16.0.98 beta 2022-11-08
+
+* fix(android/engine): Check temporary kmp file is valid (#7620)
+* fix(developer): set keyman.osk immediately after switching device type (#7624)
+* fix(developer): update monaco editor to 0.15.6 (#7626)
+* chore(developer): tidy up compile hints (#7633)
+* fix(developer): handle EEncodingError loading text file (#7635)
+* fix(developer): prevent exception in charmap when unable to focus (#7640)
+* fix(developer): disable Keyboard|Compile if no project loaded (#7642)
+* fix(web): Handle undefined keyId in multi-tap (#7648)
+* fix(developer): kmlmc has runtime dependency on keyman-version (#7651)
+* fix(web): avoid reset for touch system keyboard (#7638)
+* fix(developer): improve support for inferred key cap text (#7617)
+
 ## 16.0.97 beta 2022-11-04
 
 * fix(android/app): Don't show "Get Started" after setting Keyman as default system keyboard (#7587)
