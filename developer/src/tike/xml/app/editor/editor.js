@@ -149,15 +149,15 @@ async function loadSettings() {
   //
 
   context.editUndo = function() {
-    editor.model.undo();
+    editor.getModel().undo();
   };
 
   context.editRedo = function() {
-    editor.model.redo();
+    editor.getModel().redo();
   };
 
   context.editSelectAll = function() {
-    editor.setSelection(editor.model.getFullModelRange());
+    editor.setSelection(editor.getModel().getFullModelRange());
   };
 
   //
@@ -345,7 +345,7 @@ async function loadSettings() {
 
       monaco.editor.setTheme(themeName);
 
-      editor.model.updateOptions({
+      editor.getModel().updateOptions({
         insertSpaces:
           !_settings.useTabChar && // user pref
           !isWordlistTsv, // We always use tabs for TSV files
@@ -418,10 +418,10 @@ async function loadSettings() {
   var updateState = function () {
     let s = editor.getSelection();
     command(s.isEmpty() ? 'no-selection' : 'has-selection');
-    command(editor.model.canUndo() ? 'undo-enable' : 'undo-disable');
-    command(editor.model.canRedo() ? 'redo-enable' : 'redo-disable');
+    command(editor.getModel().canUndo() ? 'undo-enable' : 'undo-disable');
+    command(editor.getModel().canRedo() ? 'redo-enable' : 'redo-disable');
 
-    var n = editor.model.getValueInRange(s).length;
+    var n = editor.getModel().getValueInRange(s).length;
     if (editor.getSelection().getDirection() == monaco.SelectionDirection.LTR) n = -n;
     command('location,' + (s.startLineNumber-1) + ',' + (s.startColumn-1) + ',' + (s.endLineNumber-1) + ',' + (s.endColumn-1) + ',' + n);
     var token = getTokenAtCursor();
@@ -431,7 +431,7 @@ async function loadSettings() {
   };
 
   var getTokenAtCursor = function () {
-    var txt = editor.model.getValueInRange(editor.getSelection());
+    var txt = editor.getModel().getValueInRange(editor.getSelection());
     if (txt != '') {
       // We'll always return the first 100 characters of the selection and not
       // do any manipulation here.
@@ -442,7 +442,7 @@ async function loadSettings() {
       // Get the token under the cursor
       var c = editor.getSelection();
       try {
-        var line = editor.model.getLineContent(c.positionLineNumber);
+        var line = editor.getModel().getLineContent(c.positionLineNumber);
       } catch(e) {
         // In some situations, e.g. deleting a selection at the end of the document,
         // the selected line may be past the end of the document for a moment
