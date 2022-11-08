@@ -92,7 +92,7 @@ namespace com.keyman.osk {
     public incrementTouch(newKey: KeyElement): PendingMultiTapState {
       // TODO: support for any key
       if(this._state == PendingMultiTapState.Waiting) {
-        if(!newKey['keyId'].includes('K_SHIFT')) {
+        if(!newKey?.['keyId']?.includes('K_SHIFT')) {
           this.cancel();
         }
         else if(++this._touches == this.count) {
