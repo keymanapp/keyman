@@ -94,15 +94,15 @@ namespace com.keyman.text {
 
       try {
         if(kbdMismatch) {
-          // This will force-reset the context per our setter above.
-          this.activeKeyboard = keyEvent.srcKeyboard;
+          // Avoid force-reset of context per our setter above.
+          this.keyboardInterface.activeKeyboard = keyEvent.srcKeyboard;
         }
 
         return this._processKeyEvent(keyEvent, outputTarget);
       } finally {
         if(kbdMismatch) {
           // Restore our "current" activeKeyboard to its setting before the mismatching KeyEvent.
-          this.activeKeyboard = trueActiveKeyboard;
+          this.keyboardInterface.activeKeyboard = trueActiveKeyboard;
         }
       }
     }
