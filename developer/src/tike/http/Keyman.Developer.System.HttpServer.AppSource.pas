@@ -75,7 +75,11 @@ var
 begin
   T := FSources.LockList;
   try
-    Assert(T.Count = 0, 'TAppSourceHttpResponder.Sources should be empty at destruction');
+    // Note: Unlike regular functions, Assert has short-circuit evaluation
+    // intrinsics on the first param which makes it safe to dereference T[0] in
+    // the second parameter.
+    Assert(T.Count = 0, 'TAppSourceHttpResponder.Sources should be empty at destruction '+
+      '(T.Count='+IntToStr(T.Count)+', T[0].Filename='+T[0].Filename+')');
   finally
     FSources.UnlockList;
   end;
