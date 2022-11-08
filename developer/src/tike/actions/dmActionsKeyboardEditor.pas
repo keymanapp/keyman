@@ -149,6 +149,7 @@ uses
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.UI.Project.kmnProjectFileUI,
   Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.UfrmProject,
@@ -470,13 +471,13 @@ begin
   actKeyboardCompile.Enabled :=
     (ActiveEditor <> nil) or
     (ActivePackageEditor <> nil) or
-    (frmKeymanDeveloper.ActiveChild is TfrmProject);
+    ((frmKeymanDeveloper.ActiveChild is TfrmProject) and (FGlobalProject <> nil));
 
   if actKeyboardCompile.Enabled
     then actKeyboardCompile.ShortCut := Vcl.Menus.Shortcut(VK_F7, [])
     else actKeyboardCompile.ShortCut := scNone;
 
-  frmKeymanDeveloper.mnuKeyboard.Visible := actKeyboardCompile.Enabled;
+  frmKeymanDeveloper.mnuKeyboard.Visible := True;
   frmKeymanDeveloper.mnuDebug.Visible := ActiveEditor <> nil;
 end;
 
