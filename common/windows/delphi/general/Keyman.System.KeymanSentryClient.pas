@@ -131,6 +131,7 @@ var
   AppID, ProjectName: string;
 {$IF NOT DEFINED(CONSOLE)}
   ApplicationTitle, CommandLine: string;
+  tsysinfopath, enginepath: string;
 {$ENDIF}
 begin
   if EventType = scetException then
@@ -181,12 +182,20 @@ begin
         StringReplace(Message, '"', '""', [rfReplaceAll])
       ]);
 
-      if not TUtilExecute.Shell(0, TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe'),  // I3349
-          TKeymanPaths.KeymanEngineInstallPath(''), CommandLine) then
+      try
+        tsysinfopath := TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe');
+        enginepath := TKeymanPaths.KeymanEngineInstallPath('');
+      except
+        on E:EKeymanPath do
+        begin
+          tsysinfopath := '';
+          enginepath := '';
+        end;
+      end;
+      if (tsysinfopath = '') or not TUtilExecute.Shell(0, tsysinfopath, enginepath, CommandLine) then
       begin
 {$IF NOT DEFINED(SENTRY_NOVCL)}
-        MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered '+
-          'starting the exception manager ('+SysErrorMessage(GetLastError)+'). '+
+        MessageDlg(Application.Title+' has had a fatal error '+EventID+'. '+
           'This error has been automatically reported to the Keyman team.', mtError, [mbOK], 0);
 {$ENDIF}
       end;
