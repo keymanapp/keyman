@@ -162,7 +162,11 @@ begin
       FilenameBCP47 := Filenames[i].Split(['=']);
       Filename := FilenameBCP47[0];
       IsPackage := AnsiSameText(ExtractFileExt(FileName), '.kmp');
-
+      if not FileExists(FileName) then
+      begin
+        ShowMessage('File: ' + Filename + ' location not available to Admin User');
+        Exit;
+      end;
       if IsPackage then
       begin
         FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True);
