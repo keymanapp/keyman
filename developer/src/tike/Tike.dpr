@@ -312,17 +312,15 @@ begin
           SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
           Application.MainFormOnTaskBar := True;
           Application.Initialize;
-        //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
           Application.Title := 'Keyman Developer';
-          //TBX.TBXSetTheme('OfficeXP2');
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  try
+          try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally
-            FreeAndNil(modWebHttpServer);
             FreeAndNil(frmKeymanDeveloper);
+            FreeAndNil(modWebHttpServer);
           end;
         end;
       finally
