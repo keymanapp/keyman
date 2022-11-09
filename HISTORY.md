@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.3 alpha 2022-11-09
+
+* fix(windows): Cleanup CEF more correctly in shutdown (#7661)
+
 ## 17.0.2 alpha 2022-11-01
 
 * fix(android): Handle empty Play Store release notes (#7581)
