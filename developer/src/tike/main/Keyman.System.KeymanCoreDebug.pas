@@ -106,6 +106,11 @@ pkm_kbp_state_debug_item = ^km_kbp_state_debug_item;
 
 km_kbp_debug_type = type uint32_t;
 
+// These types are used only for debugging convenience
+type
+  km_kbp_state_debug_item_array = array[0..100] of km_kbp_state_debug_item;
+  pkm_kbp_state_debug_item_array = ^km_kbp_state_debug_item_array;
+
 const
   KM_KBP_DEBUG_BEGIN = 0;
   //KM_KBP_DEBUG_BEGIN_ANSI: km_kbp_debug_type = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
