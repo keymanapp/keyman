@@ -426,7 +426,19 @@ async function loadSettings() {
     command('location,' + (s.startLineNumber-1) + ',' + (s.startColumn-1) + ',' + (s.endLineNumber-1) + ',' + (s.endColumn-1) + ',' + n);
     var token = getTokenAtCursor();
     if (token) {
-      command('token,' + token.column + ',' + encodeURIComponent(token.text));
+      let text;
+      try {
+        text = encodeURIComponent(token.text);
+      } catch(e) {
+        if(e instanceof URIError) {
+          // if token.text contains an unpaired surrogate, encodeURIComponent
+          // fails with a URIError, in which case we will just avoid
+          // sending the token command.
+          return;
+        }
+        throw e;
+      }
+      command('token,' + token.column + ',' + text);
     }
   };
 
