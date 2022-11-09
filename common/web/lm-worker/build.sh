@@ -58,6 +58,7 @@ wrap-worker-code ( ) {
   # short and simple, which is good.
   cat "src/polyfills/array.fill.js" || die # Needed for Android / Chromium browser pre-45.
   cat "src/polyfills/array.from.js" || die # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.includes.js" || die # Needed for Android / Chromium browser pre-47.
 
   # For Object.values, for iteration over object-based associate arrays.
   cat "src/polyfills/object.values.js" || die # Needed for Android / Chromium browser pre-54.
