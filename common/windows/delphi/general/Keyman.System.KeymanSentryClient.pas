@@ -34,6 +34,7 @@ type
     class procedure Validate(Force: Boolean = False);
 
     class procedure ReportHandledException(E: Exception; const Message: string = ''; IncludeStack: Boolean = True);
+    class procedure ReportMessage(const Message: string; IncludeStack: Boolean = True);
 
     class procedure Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
 
@@ -227,6 +228,14 @@ begin
     text := Format('%s: %s%s', [E.ClassName, text, E.Message]);
 
   Client.MessageEvent(TSentryLevel.SENTRY_LEVEL_WARNING, text, IncludeStack);
+end;
+
+class procedure TKeymanSentryClient.ReportMessage(const Message: string; IncludeStack: Boolean);
+begin
+  if not Enabled then
+    Exit;
+
+  Client.MessageEvent(TSentryLevel.SENTRY_LEVEL_WARNING, Message, IncludeStack);
 end;
 
 procedure TKeymanSentryClient.ReportRemoteErrors(const childEventID: string);
