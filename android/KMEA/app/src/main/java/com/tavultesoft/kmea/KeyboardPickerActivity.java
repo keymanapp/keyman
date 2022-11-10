@@ -538,25 +538,23 @@ public final class KeyboardPickerActivity extends BaseActivity {
     PackageManager packageManager = context.getPackageManager();
     for (InputMethodInfo imeInfo : imeList) {
       String id = imeInfo.getId();
-      String imeName = "";
       if (!id.startsWith(selfPackageName)) {
         // Attempt to get a readable name
         // Reference: https://stackoverflow.com/questions/62512501/get-human-readable-name-of-default-keyboard-not-package-name
         ComponentName componentName = ComponentName.unflattenFromString(id);
         if (componentName != null) {
           String packageName = componentName.getPackageName();
+          String imeName = "";
           try {
             ApplicationInfo info = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             imeName = (String)packageManager.getApplicationLabel(info);
           } catch (PackageManager.NameNotFoundException e) {
             // For Android 11+, this exception is thrown because we don't have QUERY_ALL_PACKAGES permission.
             // We'll just display the package name instead.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-              imeName = packageName;
-            } else {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
               KMLog.LogException(TAG, "Name not found", e);
-              continue;
             }
+            imeName = packageName;
           }
 
           if (!imeName.isEmpty()) {
