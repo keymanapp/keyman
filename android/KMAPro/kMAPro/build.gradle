@@ -70,6 +70,20 @@ android {
     productFlavors {
     }
 
+    applicationVariants.all { variant ->
+        switch (System.env.TIER) {
+            case 'beta':
+                variant.resValue "string", "app_name", 'Keyman Beta'
+                break
+
+            case 'stable':
+                variant.resValue "string", "app_name", 'Keyman'
+                break
+
+            default:
+                variant.resValue "string", "app_name", 'Keyman Alpha'
+        }
+    }
     lintOptions {
         disable 'MissingQuantity', 'MissingTranslation'
         lintConfig file("lint.xml")
