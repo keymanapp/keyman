@@ -8,6 +8,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.BaseActivity;
+import com.tavultesoft.kmea.BuildConfig;
+import com.tavultesoft.kmea.KMManager;
 
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
@@ -39,7 +41,9 @@ public final class KMLog {
     if (msg != null && !msg.isEmpty()) {
       Log.e(tag, msg);
 
-      BaseActivity.makeToast(null, msg, Toast.LENGTH_LONG);
+      if (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME) != KMManager.Tier.STABLE) {
+        BaseActivity.makeToast(null, msg, Toast.LENGTH_LONG);
+      }
 
       if (Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.ERROR);
@@ -62,7 +66,9 @@ public final class KMLog {
     }
     Log.e(tag, errorMsg, e);
 
-    BaseActivity.makeToast(null, errorMsg, Toast.LENGTH_LONG);
+    if (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME) != KMManager.Tier.STABLE) {
+      BaseActivity.makeToast(null, errorMsg, Toast.LENGTH_LONG);
+    }
 
     if (Sentry.isEnabled()) {
       Sentry.addBreadcrumb(errorMsg);
