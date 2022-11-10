@@ -39,6 +39,7 @@
     <ClCompile Include="..\keyman32\DebugEventTrace.cpp" />
     <ClCompile Include="..\keyman32\kmprocessactions.cpp" />
     <ClCompile Include="..\..\global\vc\kmtip_guids.cpp" />
+    <ClCompile Include="..\keyman32\CoreEnvironment.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\keyman32\addins.h" />

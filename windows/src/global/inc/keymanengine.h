@@ -40,6 +40,7 @@
 #include <msctf.h>
 #include "compiler.h"
 #include <keyman/keyboardprocessor.h>
+#include <keyman/keyboardprocessor_consts.h>
 
 /***************************************************************************/
 
@@ -277,5 +278,7 @@ BOOL SelectKeyboardTSF(DWORD KeymanID, BOOL foreground);   // I3933   // I3949  
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
-#endif  // _KEYMAN64_LIGHT
+BOOL SetupCoreEnvironment(km_kbp_option_item **test_env_opts);
+void DeleteCoreEnvironment(km_kbp_option_item *test_env_opts);
+
 #endif  // _KEYMANENGINE_H
