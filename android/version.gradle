@@ -61,4 +61,7 @@ ext {
     VERSION_CODE=getVersionCode()
     VERSION_NAME=getVersionName()
     VERSION_ENVIRONMENT=getVersionEnvironment()
+    VERSION_TAG=System.getenv("VERSION_TAG")
 }
+
+println "version.gradle: VERSION_TAG: " + VERSION_TAG
