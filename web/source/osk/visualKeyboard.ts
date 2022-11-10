@@ -96,6 +96,7 @@ namespace com.keyman.osk {
 
     // Popup key management
     keytip: KeyTip;
+    globeHint: KeyTip;
     pendingSubkey: PendingGesture;
     subkeyGesture: RealizedGesture;
 
@@ -1722,6 +1723,10 @@ namespace com.keyman.osk {
         }
       }
     };
+
+    createGlobeHint() {
+      // A no-op for standard, non-app-embedded use cases.
+    }
 
     shutdown() {
       let keyman = com.keyman.singleton;

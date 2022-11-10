@@ -1,5 +1,6 @@
 namespace com.keyman.osk.embedded {
-  export class GlobeHint {
+  // Consider it a "specialized key tip".
+  export class GlobeHint implements osk.KeyTip {
     public readonly element: HTMLDivElement;
     public key: KeyElement;
     public state: boolean = false;

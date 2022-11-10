@@ -73,12 +73,17 @@ namespace com.keyman.osk {
       }
     };
 
-    // Create a keytip (dummy call - actual keytip handled by native code)
     VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
       if(com.keyman.singleton.util.device.formFactor == 'phone') {
         this.keytip = new osk.embedded.KeyTip(window['oskCreateKeyPreview'], window['oskClearKeyPreview']);
       }
     };
+  } // end Android-only block.
+
+  VisualKeyboard.prototype.createGlobeHint = function(this: VisualKeyboard) {
+    this.globeHint = new com.keyman.osk.embedded.GlobeHint();
+    let keyman = com.keyman.singleton;
+    keyman.osk._Box.appendChild(this.globeHint.element!);
   }
 
   SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
@@ -327,13 +332,8 @@ namespace com.keyman.text {
     return x+','+y+','+w+','+h;
   };
 
-  // Currently in an "early prototyping" state.
-  keymanweb['showGlobeHint'] = function() {
-    let hint = new com.keyman.osk.embedded.GlobeHint();
-    const keyman = keymanweb as KeymanBase;
-    keyman.osk._Box.appendChild(hint.element);
-
-    hint.show(keyman.osk.vkbd.currentLayer.globeKey.btn, true, keymanweb.osk.vkbd);
+  keymanweb['showGlobeHint'] = function(show: boolean = true) {
+    keymanweb.osk?.vkbd?.globeHint?.show(keymanweb.osk.vkbd.currentLayer.globeKey.btn, show, keymanweb.osk.vkbd);
   }
 
  /**
