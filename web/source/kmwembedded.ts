@@ -332,7 +332,13 @@ namespace com.keyman.text {
     return x+','+y+','+w+','+h;
   };
 
-  keymanweb['showGlobeHint'] = function(show: boolean = true) {
+  keymanweb['showGlobeHint'] = function(text: string, show: boolean = true) {
+    // Ensure localized text is properly in-place.
+    if((keymanweb as KeymanBase).osk?.vkbd) {
+      let hint = (keymanweb as KeymanBase).osk.vkbd.globeHint as com.keyman.osk.embedded.GlobeHint;
+      hint.text = text;
+    }
+
     keymanweb.osk?.vkbd?.globeHint?.show(keymanweb.osk.vkbd.currentLayer.globeKey.btn, show, keymanweb.osk.vkbd);
   }
 

@@ -33,7 +33,15 @@ namespace com.keyman.osk.embedded {
       this.cap.className = 'kmw-globehint-cap';
       this.label.className = 'kmw-globehint-label';
 
-      this.label.innerText = "Tap here to change keyboard.";
+      this.text = "Tap here to change keyboard.";
+    }
+
+    get text(): string {
+      return this.label.innerText;
+    }
+
+    set text(val: string) {
+      this.label.innerText = val;
     }
 
     show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
