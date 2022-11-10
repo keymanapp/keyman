@@ -77,7 +77,7 @@ android {
         String environment = VERSION_ENVIRONMENT
         String tag = VERSION_TAG
         println "variant: " + variant + "tag: " + tag + ", environment: " + environment;
-        if (environment != null && environment.endsWith("-test-\\d+")) {
+        if (environment != null && environment ==~ /.*-test-\d+$/) {
             // -test-PR_NUMBER
             appSuffix = environment;
         } else if (tag != null && tag.startsWith("-beta")) {
