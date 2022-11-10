@@ -57,8 +57,23 @@ def getVersionEnvironment = { ->
     }
 }
 
+def getVersionTier = { ->
+    String env_tier = System.getenv("TIER")
+    if (env_tier != null) {
+        // If building from script, we have build tier
+        println "Using $env_tier from TIER"
+        return "$env_tier"
+    } else {
+        // Building probably from IDE, so let's use TIER.md directly
+        String tier_md = file("$rootPath/../TIER.md").text.trim()
+        println "Using tier $tier_md from TIER.md"
+        return "$tier_md"
+    }
+}
+
 ext {
     VERSION_CODE=getVersionCode()
     VERSION_NAME=getVersionName()
     VERSION_ENVIRONMENT=getVersionEnvironment()
+    VERSION_TIER=getVersionTier()
 }
