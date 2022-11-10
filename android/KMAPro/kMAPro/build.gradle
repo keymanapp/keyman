@@ -73,6 +73,8 @@ android {
     applicationVariants.all { variant ->
         // Append tier and environment to app name
         // Beware: Gradle sync will nullify these values
+        executeBuildUtils()
+
         String appSuffix = ''
         String environment = VERSION_ENVIRONMENT
         String tag = VERSION_TAG
@@ -152,6 +154,25 @@ dependencies {
     // we "lose" it in the dependency management)
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
         transitive = true
+    }
+}
+
+// Use build-utils.sh to get common build version info.
+// Beware: Android Studio IDE Gradle sync will invalidate these values
+def executeBuildUtils() {
+    try {
+        exec {
+            commandLine 'bash', '-c', 'pwd; THIS_SCRIPT=build.gradle; . ../../../resources/build/build-utils.sh'
+        }
+    }
+    catch(Exception e) {
+        GradleException("Exception: $e")
+    }
+    // Debugging
+    println "version.gradle TAG: " + System.getenv("VERSION_TAG") + ", ENVIRONMENT: " + System.getenv("VERSION_ENVIRONMENT");
+    ext {
+        VERSION_TAG=System.getenv("VERSION_TAG")
+        VERSION_ENVIRONMENT=System.getenv("VERSION_ENVIRONMENT")
     }
 }
 
