@@ -1,3 +1,10 @@
+keyman (15.0.271-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 19 Oct 2022 16:15:33 +0200
+
 keyman (15.0.270-1) unstable; urgency=medium
 
   * New upstream release.
