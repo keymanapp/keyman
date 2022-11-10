@@ -54,12 +54,16 @@ const
 
 function KeymanCustomisation: IKeymanCustomisation;
 begin
-  Result := (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation;
+  if kmcom = nil
+    then Result := nil
+    else Result := (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation;
 end;
 
 function KeymanEngineControl: IKeymanEngineControl;
 begin
-  Result := kmcom.Control as IKeymanEngineControl;
+  if kmcom = nil
+    then Result := nil
+    else Result := kmcom.Control as IKeymanEngineControl;
 end;
 
 function EncodingsAsString(encodings: KeymanKeyboardEncodings): WideString;
