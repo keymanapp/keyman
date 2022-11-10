@@ -352,7 +352,7 @@ namespace com.keyman.dom {
         if(el && typeof el.kmwInput != 'undefined' && el.kmwInput == false) {
           return true;
         }
-      } else if(el && el.className.indexOf('kmw-disabled') >= 0) {
+      } else if(el?.className?.indexOf('kmw-disabled') >= 0) {
         return true;
       }
 
