@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.4 alpha 2022-11-10
+
+* chore(deps): bump socket.io-parser from 4.0.4 to 4.0.5 (#7672)
+
 ## 17.0.3 alpha 2022-11-09
 
 * fix(windows): Cleanup CEF more correctly in shutdown (#7661)
