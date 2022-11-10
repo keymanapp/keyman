@@ -53,6 +53,8 @@ namespace com.keyman.osk.embedded {
             xWidth = rkey.width,
             xHeight = rkey.height;
 
+        let center = rkey.left + rkey.width/2;
+
         let kts = this.element.style;
 
         // Roughly matches how the subkey positioning is set.
@@ -62,47 +64,46 @@ namespace com.keyman.osk.embedded {
         let y = (keyRect.bottom - _BoxRect.top + 1);
         let ySubPixelPadding = y - Math.floor(y);
 
-        // Canvas dimensions must be set explicitly to prevent clipping
-        // This gives us exactly the same number of pixels on left and right
-        let canvasWidth = xWidth + Math.ceil(xWidth * 1) * 2;
-        let canvasHeight = Math.ceil(3.0 * xHeight) + (ySubPixelPadding); //
+        // Width dimensions must be set explicitly to prevent clipping.
+        // We'll assume that the globe key is always positioned on the bottom row.
+        let bubbleWidth = xWidth + Math.ceil(xWidth * 1) * 2;
+        let bubbleHeight = Math.ceil(3.0 * xHeight) + (ySubPixelPadding); //
 
         kts.bottom = Math.floor(keyman.osk.computedHeight - y) + 'px';
-        kts.width = canvasWidth+'px';
-        kts.maxHeight = '2.4em';
+        // CSS already defines transform: translateX(-50%) - this centers the element.
+        kts.left = center + 'px';
 
         let kls = this.tip.style;
         kls.bottom = (rrow.height - 1) + 'px';
+        kls.width = bubbleWidth + 'px';
 
         // Adjust shape if at edges
 
         // how much width lies outside the range of the base key, per side
-        var xOverflow = (canvasWidth - xWidth) / 2;
+        var xOverflow = (bubbleWidth - xWidth) / 2;
 
         let capWidth = xWidth * 2 / 3;
-        var capAdjustment = (xWidth - capWidth) / 2;
-        // if the overflow would be clipped by the left edge
-        if(xLeft < xOverflow) {
-          this.cap.style.left = (1 + capAdjustment) + 'px';
-          xLeft += xOverflow - 1;
-          // if the overflow would be clipped by the right edge
-        } else if(xLeft > window.innerWidth - xWidth - xOverflow) {
-          this.cap.style.left = (canvasWidth - xWidth - 1 + capAdjustment) + 'px';
-          xLeft -= xOverflow - 1;
-          // standard
-        } else {
-          this.cap.style.left = (xOverflow + capAdjustment) + 'px';
+
+        const leftEdgeMargin  = xLeft;
+        const rightEdgeMargin = window.innerWidth - (xLeft + xWidth);
+
+        if(leftEdgeMargin < xOverflow) {
+          // The overflow would be clipped by the left edge when centered,
+          // so we "offset" this part to keep it within screen bounds.
+          kls.transform = 'translateX(' + (xOverflow - leftEdgeMargin + 1) + 'px)';
+        } else if(rightEdgeMargin < xOverflow) {
+          // The overflow would be clipped by the right edge when centered,
+          // so we "offset" this part to keep it within screen bounds.
+          kls.transform = 'translateX(-' + (xOverflow - rightEdgeMargin + 1) + 'px)';
         }
 
-        kts.left=(xLeft - xOverflow) + 'px';
-
         let capHeight = xHeight + 3;
-        let finalBaseCapHeight = (keyRect.bottom - _BoxRect.top - Math.floor(y - canvasHeight) - (capHeight));
+        let finalBaseCapHeight = (keyRect.bottom - _BoxRect.top - Math.floor(y - bubbleHeight) - (capHeight));
         let finalCapCalloutHeight = finalBaseCapHeight / 4;
 
         this.cap.style.bottom = (rrow.height - finalCapCalloutHeight) + 'px';
-        this.cap.style.width = '0px'; //capWidth + 'px';
-        this.cap.style.height = '0px'; //finalCapHeight + 'px';\
+        this.cap.style.width = '0px';
+        this.cap.style.height = '0px';
         this.cap.style.borderLeftWidth   = (capWidth / 2) + 'px';
         this.cap.style.borderRightWidth  = (capWidth / 2) + 'px';
         this.cap.style.borderTopWidth    = finalCapCalloutHeight + 'px';

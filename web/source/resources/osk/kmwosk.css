@@ -438,10 +438,11 @@ div.kmw-globehint {
   position: absolute;
   left: 0;
   overflow: visible;
+  transform: translateX(-50%);
 }
 
 div.kmw-globehint-tip {
-  position: absolute;
+  position: relative;
   border-radius: 6px 6px 4px 4px;
   border: solid 1px #cccccc;
   border-bottom: solid 1px #8a8d90;
@@ -462,9 +463,8 @@ span.kmw-globehint-label {
 /* create the 'arrow' part of the hint (TODO) */
 div.kmw-globehint-cap {
   position: absolute;
-}
-
-div.kmw-globehint-cap {
+  left: 50%;
+  transform: translateX(-50%);
   border-style: solid;
   border-bottom-style: hidden;
   border-left-color: transparent;
