@@ -57,23 +57,26 @@ def getVersionEnvironment = { ->
     }
 }
 
-def getVersionTier = { ->
-    String env_tier = System.getenv("TIER")
-    if (env_tier != null) {
-        // If building from script, we have build tier
-        println "Using $env_tier from TIER"
-        return "$env_tier"
-    } else {
-        // Building probably from IDE, so let's use TIER.md directly
-        String tier_md = file("$rootPath/../TIER.md").text.trim()
-        println "Using tier $tier_md from TIER.md"
-        return "$tier_md"
+// Use build-utils.sh to get common build version info.
+// Beware: Android Studio IDE Gradle sync will invalidate these values
+def executeBuildUtils() {
+    try {
+        exec {
+            commandLine 'bash', '-c', 'pwd; THIS_SCRIPT=build.gradle; . ../../../resources/build/build-utils.sh'
+        }
     }
+    catch(Exception e) {
+        println("Exception: $e")
+    }
+    // Debugging
+    println "version.gradle TAG: " + System.getenv("VERSION_TAG") + ", ENVIRONMENT: " + System.getenv("VERSION_ENVIRONMENT");
 }
+
+executeBuildUtils()
 
 ext {
     VERSION_CODE=getVersionCode()
     VERSION_NAME=getVersionName()
-    VERSION_ENVIRONMENT=getVersionEnvironment()
-    VERSION_TIER=getVersionTier()
+    VERSION_ENVIRONMENT=System.getenv("VERSION_ENVIRONMENT")
+    VERSION_TAG=System.getenv("VERSION_TAG")
 }

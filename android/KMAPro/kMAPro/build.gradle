@@ -71,17 +71,21 @@ android {
     }
 
     applicationVariants.all { variant ->
-        String tier = ''
-        switch (VERSION_TIER) {
-            case 'beta':
-                tier = ' Beta'
-                break
-            case 'stable':
-                break
-            default:
-                tier = ' Alpha'
+        // Append tier and environment to app name
+        // Beware: Gradle sync will nullify these values
+        String appSuffix = ''
+        String environment = VERSION_ENVIRONMENT
+        String tag = VERSION_TAG
+        println "variant: " + variant + "tag: " + tag + ", environment: " + environment;
+        if (environment != null && environment.endsWith("-test-\\d+")) {
+            // -test-PR_NUMBER
+            appSuffix = environment;
+        } else if (tag != null && tag.startsWith("-beta")) {
+            appSuffix = ' Beta';
+        } else if (tag != null && tag.startsWith("-alpha")) {
+            appSuffix = ' Alpha';
         }
-        variant.resValue "string", "app_name", 'Keyman' + tier
+        variant.resValue "string", "app_name", 'Keyman' + appSuffix;
     }
     lintOptions {
         disable 'MissingQuantity', 'MissingTranslation'
