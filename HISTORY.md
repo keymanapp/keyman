@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.100 beta 2022-11-10
+
+* chore(linux): Update whatsnew (#7660)
+* chore: Update history-and-versioning to match history (#7669)
+* chore(linux): Update debian changelog (#7492)
+* chore(android/engine): Don't show Toast errors on stable tier (#7676)
+* fix(web): Add additional checks on className.indexOf (#7662)
+
 ## 16.0.99 beta 2022-11-09
 
 * fix(web): Add polyfill for Array.includes() (#7646)
