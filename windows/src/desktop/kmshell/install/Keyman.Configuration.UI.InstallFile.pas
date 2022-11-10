@@ -164,7 +164,8 @@ begin
       IsPackage := AnsiSameText(ExtractFileExt(FileName), '.kmp');
       if not FileExists(FileName) then
       begin
-        ShowMessage('File: ' + Filename + ' location not available to Admin User');
+        if not ASilent then
+          ShowMessage('File: ' + Filename + ' location not available to Admin User');
         Exit;
       end;
       if IsPackage then

@@ -164,7 +164,7 @@ begin
       FZip := TZipFile.Create;
       try
         FZip.Open(FileName, TZipMode.zmRead);
-        
+
         InfFile := '';
 
         for i := 0 to FZip.FileCount - 1 do
