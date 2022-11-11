@@ -564,18 +564,6 @@ namespace com.keyman.osk {
       }
       // END:  construction of the actual internal layout for the overall OSK
 
-      // Correct the classname for the (inner) OSK frame (Build 360)
-      var kbdID: string = (this.activeKeyboard ? this.activeKeyboard.id.replace('Keyboard_','') : '');
-
-      if(kbdID.indexOf('::') != -1) { // We used to also test if we were in embedded mode, but... whatever.
-        // De-namespaces the ID for use with CSS classes.
-        // Assumes that keyboard IDs may not contain the ':' symbol.
-        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
-      }
-
-      const kbdClassSuffix = ' kmw-keyboard-' + kbdID;
-      kbdView.element.className = kbdView.element.className + kbdClassSuffix;
-
       this.banner.appendStyles();
 
       if(this.vkbd) {

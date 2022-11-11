@@ -207,7 +207,20 @@ namespace com.keyman.osk {
         this.inputEngine.registerEventHandlers();
       }
 
-      Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
+      Lkbd.classList.add(device.formFactor);
+      Lkbd.classList.add('kmw-osk-inner-frame');
+
+      // Tag the VisualKeyboard with a CSS class corresponding to its ID.
+      var kbdID: string = this.layoutKeyboard?.id.replace('Keyboard_','') ?? '';
+
+      if(kbdID.indexOf('::') != -1) { // We used to also test if we were in embedded mode, but... whatever.
+        // De-namespaces the ID for use with CSS classes.
+        // Assumes that keyboard IDs may not contain the ':' symbol.
+        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
+      }
+
+      const kbdClassSuffix = 'kmw-keyboard-' + kbdID;
+      this.element.classList.add(kbdClassSuffix);
     }
 
     public get element(): HTMLDivElement {
@@ -1491,17 +1504,29 @@ namespace com.keyman.osk {
       kbd.style.border = '1px solid #ccc';
 
       // Once the element is inserted into the DOM, refresh the layout so that proper text scaling may apply.
-      const refreshInterval = window.setInterval(function () {
-        let computedStyle = getComputedStyle(kbd);
-        if (computedStyle.fontSize) {
-          if (kbd.style.fontSize) {
-            // Preserve the new setting (provided by CSS)
-            kbdObj.fontSize = new ParsedLengthStyle(kbd.style.fontSize);
+      const detectAndHandleInsertion = () => {
+        if(document.contains(kbd)) {
+          // Yay, insertion!
+
+          try {
+            // Are there font-size attributes we may safely adjust?  If so, do that!
+            if(getComputedStyle(kbd) && kbd.style.fontSize) {
+              kbdObj.fontSize = new ParsedLengthStyle(kbd.style.fontSize);
+            }
+
+            // Make sure that the stylesheet is attached, now that the keyboard-doc's been inserted.
+            kbdObj.appendStyleSheet();
+          } finally {
+            insertionObserver.disconnect();
           }
-          kbdObj.refreshLayout();
-          window.clearInterval(refreshInterval);
         }
-      }, 10);
+      }
+
+      let insertionObserver = new MutationObserver(detectAndHandleInsertion);
+      insertionObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
 
       return kbd;
     }
