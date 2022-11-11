@@ -52,23 +52,28 @@
 
       kmw.init({
         }).then(async function() {
-          await kmw.addKeyboards('gff_amharic');
-
-          await kmw.setActiveKeyboard("gff_amharic", "am");
-
           var docTarget = document.getElementById("docTarget");
+
+          await kmw.addKeyboards('gff_amharic');
+          await kmw.setActiveKeyboard("gff_amharic", "am");
           var kbdDiv = keyman.BuildVisualKeyboard("gff_amharic", 1, "phone", "default");
+
+          // await kmw.addKeyboards('sil_euro_latin@no');
+          // await kmw.setActiveKeyboard("sil_euro_latin", "no");
+          // var kbdDiv = keyman.BuildVisualKeyboard("sil_euro_latin", 1, "phone", "default");
+
+          // await kmw.addKeyboards('lao_2008_basic');
+          // await kmw.setActiveKeyboard("lao_2008_basic", "lo");
+          // var kbdDiv = keyman.BuildVisualKeyboard("lao_2008_basic", 1, "phone", "default");
+
           docTarget.appendChild(kbdDiv);
         });
     </script>
 
-    <!-- Add keyboard management script for local selection of keyboards to use -->
-    <script src="../commonHeader.js"></script>
-
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards(1);'>
+  <body>
     <h2>KeymanWeb:  Keyboard documentation rendering</h2>
 
     <div id='DynamicTextboxes'>
