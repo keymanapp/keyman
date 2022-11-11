@@ -1317,7 +1317,12 @@ namespace com.keyman.osk {
     private getVerticalLayerGroupPadding(): number {
       // For touch-based OSK layouts, kmwosk.css may include top & bottom padding on the layer-group element.
       const computedGroupStyle = getComputedStyle(this.layerGroup.element);
-      return parseInt(computedGroupStyle.paddingTop, 10) + parseInt(computedGroupStyle.paddingBottom, 10);
+      let pt = parseInt(computedGroupStyle.paddingTop, 10);
+      let pb = parseInt(computedGroupStyle.paddingBottom, 10);
+
+      pt = isNaN(pt) ? 0 : pt; // parseInt('') == NaN; handle such cases!
+      pb = isNaN(pb) ? 0 : pb;
+      return pt + pb;
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
