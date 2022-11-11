@@ -413,30 +413,33 @@ Entries are sorted in a binary codepoint sort on the `to` field.
 
 ### C7043.2.15 `key2`—Extended keybag
 
-| ∆ | Bits | Name      | Description                              |
-|---|------|-----------|------------------------------------------|
-| 0 |  32  | ident     | `key2`                                   |
-| 4 |  32  | size      | int: Length of section                   |
-| 8 |  32  | count     | int: Number of keys                      |
-|12 |  32  | reserved  | reserved                                 |
-|16 | var  | keys      | keys sub-table                           |
+| ∆ | Bits | Name        | Description                              |
+|---|------|-------------|------------------------------------------|
+| 0 |  32  | ident       | `key2`                                   |
+| 4 |  32  | size        | int: Length of section                   |
+| 8 |  32  | keyCount    | int: Number of keys                      |
+|12 |  32  | flicksCount | int: Number of flick lists               |
+|12 |  32  | flickCount  | int: Number of flick elements            |
+|16 | var  | keys        | keys sub-table                           |
+| - | var  | flicks      | flick lists sub-table                    |
+| - | var  | flick       | flick elements sub-table                 |
 
 #### `key2.keys` subtable
 
 For each key:
 
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-| 0+|  32  | vkey    | int: vkey ID                             |
-| 4+|  32  | to      | str: output string OR UTF-32LE codepoint |
-| 8+|  32  | flags   | int: per-key flags                       |
-|12+|  32  | id      | str: key id                              |
-|16+|  32  | switch  | str: layer id to switch to               |
-|20+|  32  | width   | int: key width*10 (supports 0.1 as min width) |
-
-- TODO: longpress
-- TODO: multiTap
-- TODO: flicks
+| ∆ | Bits | Name             | Description                                              |
+|---|------|----------------  |----------------------------------------------------------|
+| 0+|  32  | vkey             | int: vkey ID                                             |
+| 4+|  32  | to               | str: output string OR UTF-32LE codepoint                 |
+| 8+|  32  | flags            | int: per-key flags                                       |
+|12+|  32  | id               | str: key id                                              |
+|16+|  32  | switch           | str: layer id to switch to                               |
+|20+|  32  | width            | int: key width*10 (supports 0.1 as min width)            |
+|24+|  32  | longPress        | list: index into `list` section with longPress list or 0 |
+|28+|  32  | longPressDefault | str: default longpress target or 0                       |
+|32+|  32  | multiTap         | list: index into `list` section with multiTap list or 0  |
+|36+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
 
 - `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
 - `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
@@ -445,15 +448,77 @@ For each key:
   by the compiler.
 - `flags`: Flags is a 32-bit bitfield defined as below:
 
-| Bit position | Meaning  |  Description                                |
-|--------------|----------|---------------------------------------------|
-|       0      | extend   | 0: `to` is a char, 1: `to` is a string      |
-|       1      | gap      | 1 if the key is a gap                       |
-|       2      | transform | 1 if the key is transform=no               |
+| Bit position | Meaning   |  Description                                |
+|--------------|-----------|---------------------------------------------|
+|       0      | extend    | 0: `to` is a char, 1: `to` is a string      |
+|       1      | gap       | 1 if the key is a gap                       |
+|       2      | transform | 1 if the key is transform=no                |
 
 - `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
   is a 32 bit index into the `strs` table. The string may be zero-length.
 
+#### `key2.flicks` flick list subtable
+
+For each flicks in the flick list:
+
+| ∆ | Bits | Name             | Description                                              |
+|---|------|----------------  |----------------------------------------------------------|
+| 0+|  32  | count            | int: number of flick elements in this flick              |
+|12+|  32  | flick            | int: index into `flick` subtable for first flick element |
+|16+|  32  | id               | str: flick id                                            |
+
+- `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
+
+Elements are ordered by the string id.
+
+#### `key2.flick` flick element subtable
+
+For each flick element:
+
+| ∆ | Bits | Name             | Description                                              |
+|---|------|----------------  |----------------------------------------------------------|
+| 0+|  32  | directions       | list: index into `list` section with direction list      |
+| 8+|  32  | flags            | int: per-key flags                                       |
+|12+|  32  | to               | str: output string                                       |
+
+There is not a 'null' flick element at the end of each list.
+
+Elements are ordered by the `flicks.id`, and secondarily by the directions list id.
+
+### C7043.2.16 `list`—String lists
+
+| ∆ | Bits | Name          | Description                              |
+|---|------|---------------|------------------------------------------|
+| 0 |  32  | ident         | `list`                                   |
+| 4 |  32  | size          | int: Length of section                   |
+| 8 |  32  | listCount     | int: Total number of lists elements      |
+|12 |  32  | indexCount    | int: Total number of index elements      |
+|32 | var  | lists         | list sub-table                           |
+| - | var  | indices       | index sub-table                          |
+
+#### `list.lists` sub-table
+
+The lists entry at location 0 is defined to have index=0 and count=0,
+representing a 0-length list.
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0+|  32  | index   | int: Index into 'indices' subtable       |
+| 4+|  32  | count   | int: Number of indices in this list      |
+
+This data should be sorted in binary lexical order of the substrings.
+
+#### `list.indices` sub-table
+
+The index entry at location 0 is defined to have str=0,
+representing a 0-length string.
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0+|  32  | str     | str: string index into `strs` table      |
+
+These indices are a pool of indexes into the string table.
+The strings order are significant.  There is not a 'null' string at the end of each list.
 
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
 
