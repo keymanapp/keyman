@@ -110,7 +110,16 @@ namespace com.keyman.osk {
     }
 
     set layerId(value: string) {
-      this._layerId = value;
+      const changedLayer = value != this._layerId;
+      if(this.layerGroup.layers[value]) {
+        this._layerId = value;
+      } else {
+        throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
+      }
+
+      if(changedLayer) {
+        this.updateState();
+      }
     }
 
     get currentLayer(): OSKLayer {
@@ -1491,7 +1500,7 @@ namespace com.keyman.osk {
       // Select the layer to display, and adjust sizes
       if (layout != null) {
         kbdObj.layerId = layerId;
-        kbdObj.updateState();
+
         // This still feels fairly hacky... but something IS needed to constrain the height.
         // There are plans to address related concerns through some of the later aspects of
         // the Web OSK-Core design.
