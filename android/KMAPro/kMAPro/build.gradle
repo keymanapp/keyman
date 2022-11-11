@@ -71,7 +71,11 @@ android {
     }
 
     applicationVariants.all { variant ->
-        // Append tag to app name
+        // Append tag to app name to help differentiate versions for app testers:
+        //  - stable builds have no suffix
+        //  - beta and alpha release builds have "Beta" and "Alpha" suffixes
+        //  - local builds (incl. from IDE) also have "-local" suffix
+        //  - PR builds also have "-test-1234" suffix (where 1234 is PR#)
         // Gradle sync will nullify these values, so have a fallback
         String appSuffix = ''
         String tag = VERSION_TAG ? VERSION_TAG : '-' + new File('../../TIER.md').getText('UTF-8');
