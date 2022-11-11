@@ -9,6 +9,10 @@
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.VIBRATE" />
 
+  <!-- Ideally we would declare this permission so we can get other installed keyboard names.
+  But would involve a long review process with the Play Store:
+  https://support.google.com/googleplay/android-developer/answer/9214102#
+  <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" /> -->
   <application
     android:allowBackup="true"
     android:hardwareAccelerated="true"

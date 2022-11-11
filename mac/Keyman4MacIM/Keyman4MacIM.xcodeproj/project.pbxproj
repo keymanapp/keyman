@@ -16,6 +16,8 @@
 		297A501728DF4D360074EB1B /* PrivacyWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 297A501228DF4D360074EB1B /* PrivacyWindowController.m */; };
 		297A501828DF4D360074EB1B /* PrivacyWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 297A501328DF4D360074EB1B /* PrivacyWindowController.xib */; };
 		297A501928DF4D360074EB1B /* PrivacyConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 297A501628DF4D360074EB1B /* PrivacyConsent.m */; };
+		299B5E2029126CA20070841D /* keyman-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 299B5E1E29126CA20070841D /* keyman-icon@2x.png */; };
+		299B5E2129126CA20070841D /* keyman-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 299B5E1F29126CA20070841D /* keyman-icon.png */; };
 		29B42A572728339900EDD5D3 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A592728339900EDD5D3 /* KMInfoWindowController.xib */; };
 		29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
@@ -146,6 +148,8 @@
 		297A501428DF4D360074EB1B /* PrivacyConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrivacyConsent.h; sourceTree = "<group>"; };
 		297A501528DF4D360074EB1B /* PrivacyWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrivacyWindowController.h; sourceTree = "<group>"; };
 		297A501628DF4D360074EB1B /* PrivacyConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivacyConsent.m; sourceTree = "<group>"; };
+		299B5E1E29126CA20070841D /* keyman-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-icon@2x.png"; sourceTree = "<group>"; };
+		299B5E1F29126CA20070841D /* keyman-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-icon.png"; sourceTree = "<group>"; };
 		29A4730527E9D6D500DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		29A4730627E9D6D500DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/preferences.strings; sourceTree = "<group>"; };
 		29A4730727E9D6D600DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
@@ -437,6 +441,8 @@
 		9874C31D1B536847000BB543 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				299B5E1F29126CA20070841D /* keyman-icon.png */,
+				299B5E1E29126CA20070841D /* keyman-icon@2x.png */,
 				9874C31E1B536847000BB543 /* info.png */,
 				9874C31F1B536847000BB543 /* keyman.png */,
 				9874C3201B536847000BB543 /* SideImage.bmp */,
@@ -755,9 +761,11 @@
 				98E672A01B532F5E00DBDE2F /* KMDownloadKBWindowController.xib in Resources */,
 				37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */,
 				37C2B0CB25FF2C350092E16A /* Help in Resources */,
+				299B5E2029126CA20070841D /* keyman-icon@2x.png in Resources */,
 				297A501828DF4D360074EB1B /* PrivacyWindowController.xib in Resources */,
 				984B8F451AF1C3D900E096A8 /* OSKWindowController.xib in Resources */,
 				29B42A572728339900EDD5D3 /* KMInfoWindowController.xib in Resources */,
+				299B5E2129126CA20070841D /* keyman-icon.png in Resources */,
 				E213601E2142D7C000A043B7 /* keyman-88.png in Resources */,
 				293EA3F427181FDA00545EED /* Localizable.strings in Resources */,
 				98BF92471BF01D890002126A /* image.jpg in Resources */,

@@ -1,6 +1,9 @@
 # Ignore files required only in development.
-build.sh
-bundle.sh
+dist-tests/*
 source/*
 tests/*
+build.sh
+bundle.sh
+Makefile
 tsconfig.json
+tsconfig.tsbuildinfo

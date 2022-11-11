@@ -27,7 +27,7 @@ const char *action_item_types[] = {
 
 void print_action_item(const char *title, km_kbp_action_item const & item) {
   std::cout
-    << "debug_item " << title << std::endl
+    << "action_item " << title << std::endl
     << "  type:    " << action_item_types[item.type] << std::endl;
 
   switch(item.type) {

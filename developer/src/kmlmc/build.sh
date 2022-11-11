@@ -120,4 +120,9 @@ if (( should_publish )); then
   # See `npm help publish` for more details.
   echo "Publishing $DRY_RUN npm package with tag $npm_dist_tag"
   npm publish $DRY_RUN --access public --tag $npm_dist_tag || fail "Could not publish $npm_dist_tag release."
+
+  # For now, kmlmc will have responsibility for publishing keyman-version. In
+  # the future, we should probably have a top-level npm publish script that
+  # publishes all modules for a given release version
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" publish $DRY_RUN
 fi

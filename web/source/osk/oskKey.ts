@@ -411,7 +411,7 @@ namespace com.keyman.osk {
       const codePoints = id.substr(2).split('_');
       for(let codePoint of codePoints) {
         const codePointValue = parseInt(codePoint, 16);
-        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F))) {
+        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) || isNaN(codePointValue)) {
           continue;
         } else {
           // String.fromCharCode() is inadequate to handle the entire range of Unicode

@@ -23,6 +23,75 @@
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
+## 16.0.100 beta 2022-11-10
+
+* chore(linux): Update whatsnew (#7660)
+* chore: Update history-and-versioning to match history (#7669)
+* chore(linux): Update debian changelog (#7492)
+* chore(android/engine): Don't show Toast errors on stable tier (#7676)
+* fix(web): Add additional checks on className.indexOf (#7662)
+
+## 16.0.99 beta 2022-11-09
+
+* fix(web): Add polyfill for Array.includes() (#7646)
+* fix(web): Add polyfill for Array.findIndex() (#7652)
+* fix(developer): handle edge cases for app sources (#7654)
+* fix(developer): handle shutdown cleanup more cleanly (#7655)
+* fix(developer): handle crash reports without Keyman Engine installed (#7657)
+* fix(developer): handle unpaired surrogate (#7659)
+* fix(core): `save()` should be on internal kmx action queue (#7644)
+* fix(core): emit keystroke was writing to wrong queue (#7650)
+
+## 16.0.98 beta 2022-11-08
+
+* fix(android/engine): Check temporary kmp file is valid (#7620)
+* fix(developer): set keyman.osk immediately after switching device type (#7624)
+* fix(developer): update monaco editor to 0.15.6 (#7626)
+* chore(developer): tidy up compile hints (#7633)
+* fix(developer): handle EEncodingError loading text file (#7635)
+* fix(developer): prevent exception in charmap when unable to focus (#7640)
+* fix(developer): disable Keyboard|Compile if no project loaded (#7642)
+* fix(web): Handle undefined keyId in multi-tap (#7648)
+* fix(developer): kmlmc has runtime dependency on keyman-version (#7651)
+* fix(web): avoid reset for touch system keyboard (#7638)
+* fix(developer): improve support for inferred key cap text (#7617)
+
+## 16.0.97 beta 2022-11-04
+
+* fix(android/app): Don't show "Get Started" after setting Keyman as default system keyboard (#7587)
+* fix(windows): include debug info in kmshell build (#7600)
+* fix(developer): tweak captions for consistency (#7607)
+* fix(mac): replace white background keyman system menu icon with transparent one (#7610)
+
+## 16.0.96 beta 2022-11-03
+
+* fix(developer): Make Details and Build tabs scrollable (#7593)
+* fix(developer): support gif preview images in Package Editor (#7594)
+* fix(developer): handle high-bit-set HKL correctly (#7601)
+* fix(android/app): Add check if bundle to PackageActivity is null (#7603)
+* fix(common): always define dry_run variable (#7604)
+* feat(web): Custom layer targets for Shift double-tap (#7608)
+* fix(android/engine): Handle parsing empty JSONArray as JSONObject (#7611)
+
+## 16.0.95 beta 2022-11-02
+
+* fix(developer): Use US base layout for debugger (#7531)
+* fix(developer): ensure kmlmp handles paths (#7580)
+* fix(developer): prevent repeated `begin` statements (#7583)
+* fix(developer): remove ancient samples (#7586)
+* fix(developer): generate a default icon for basic keyboard projects (#7584)
+* fix(developer): avoid reformatting unchanged system stores (#7585)
+* fix(developer): publish `@keymanapp/keyman-version` to npm (#7595)
+
+## 16.0.94 beta 2022-10-31
+
+* fix(ios): iPad was not recognised as tablet device (#7563)
+* feat(windows): configuration UI polish (#7206)
+
+## 16.0.93 beta 2022-11-01
+
+* chore: move to 16.0 beta
+
 ## 16.0.92 alpha 2022-10-31
 
 * fix(android/engine): Add FLAG_ACTIVITY_NEW_TASK flag for resource update (#7572)

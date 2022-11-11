@@ -80,6 +80,7 @@ $(function() {
     nkey.data('id', $(this).val());
     builder.generateSubKeys();
     builder.updateKeyId(nkey);
+    builder.subKeyCapChange(nkey.data('text'));
   }, {saveOnce: true});
 
   $('#inpSubKeyName')
@@ -93,30 +94,32 @@ $(function() {
       builder.hasSavedKeyUndo = false;
     });
 
-  const subKeyCapChange = function(val) {
+  this.subKeyCapChange = function(val) {
     var k = builder.selectedSubKey();
     if (k.length == 0) return;
-    $('.text', k).text(builder.renameSpecialKey(val));
     k.data('text', val);
-    if(builder.specialCharacters[val]) {
+    let text = builder.inferKeyText(val, k.data('id'));
+    $('.text', k).text(builder.renameSpecialKey(text));
+    if(builder.specialCharacters[text]) {
       k.addClass('key-special-text');
     } else {
       k.removeClass('key-special-text');
     }
-    builder.updateCharacterMap(val, true);
+    builder.updateCharacterMap(text, true);
     builder.generateSubKeys();
+    builder.keyHintChange(builder.selectedKey().data('hint'));
   }
 
   const inpSubKeyCapChange = builder.wrapChange(function () {
     let val = $(this).val();
     $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
-    subKeyCapChange(val);
+    builder.subKeyCapChange(val);
   }, {saveOnce: true});
 
   const inpSubKeyCapUnicodeChange = builder.wrapChange(function () {
     const val = builder.fromUnicodeString($(this).val());
     $('#inpSubKeyCap').val(val);
-    subKeyCapChange(val);
+    builder.subKeyCapChange(val);
   }, {saveOnce: true});
 
   $('#inpSubKeyCap')
@@ -146,7 +149,7 @@ $(function() {
     var val = $(this).val();
     $('#inpSubKeyCap').val(val);
     $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
-    subKeyCapChange(val);
+    builder.subKeyCapChange(val);
     // We only EnableControls here because if the user types *BkSp* into the
     // text field, we shouldn't hide the text field until next time the key is selected
     builder.enableSubKeyControls();

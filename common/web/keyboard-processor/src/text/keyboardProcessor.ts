@@ -49,7 +49,7 @@ namespace com.keyman.text {
 
     /**
      * Indicates the device (platform) to be used for non-keystroke events,
-     * such as those sent to `begin postkeystroke` and `begin newcontext` 
+     * such as those sent to `begin postkeystroke` and `begin newcontext`
      * entry points.
      */
     contextDevice: utils.DeviceSpec;
@@ -731,7 +731,7 @@ namespace com.keyman.text {
       } else if(KeyboardProcessor.isModifier(Levent)) {
         this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
         // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-        if(!this.contextDevice.touchable) {
+        if(!Levent.device.touchable) {
           return this._UpdateVKShift(Levent); // I2187
         } else {
           return true;
@@ -740,7 +740,7 @@ namespace com.keyman.text {
 
       if(Levent.LmodifierChange) {
         this.activeKeyboard.notify(0, outputTarget, 1);
-        if(!this.contextDevice.touchable) {
+        if(!Levent.device.touchable) {
           this._UpdateVKShift(Levent);
         }
       }
