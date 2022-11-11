@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 17.0.4 alpha 2022-11-10
+
+* chore(deps): bump socket.io-parser from 4.0.4 to 4.0.5 (#7672)
+
+## 17.0.3 alpha 2022-11-09
+
+* fix(windows): Cleanup CEF more correctly in shutdown (#7661)
+
+## 17.0.2 alpha 2022-11-01
+
+* fix(android): Handle empty Play Store release notes (#7581)
+
+## 17.0.1 alpha 2022-10-31
+
+* fix(ios): iPad was not recognised as tablet device (#7563)
+* feat(windows): configuration UI polish (#7206)
+* chore: move to 17.0-alpha (#7577)
+* chore: Move to 17.0 alpha
+
 ## 16.0.100 beta 2022-11-10
 
 * chore(linux): Update whatsnew (#7660)
