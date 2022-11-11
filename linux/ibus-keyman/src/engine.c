@@ -432,7 +432,7 @@ ibus_keyman_engine_constructor(
     }
     g_message("lang is %s", lang);
     km_kbp_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
-    keyboard_opts[2].value = cp;
+    keyboard_opts[2].value = cp; // TODO: free this value
     // g_free(lang);
 #endif
 
@@ -459,9 +459,9 @@ ibus_keyman_engine_constructor(
     {
         g_warning("%s: problem creating km_kbp_state", __FUNCTION__);
     }
-    for (int i=0; i < KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1; i++) {
-        g_free((km_kbp_cp *)keyboard_opts[i].key);
-        g_free((km_kbp_cp *)keyboard_opts[i].value);
+    for (int i = KEYMAN_ENVIRONMENT_OPTIONS; i < KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1; i++) {
+      g_free((km_kbp_cp *)keyboard_opts[i].key);
+      g_free((km_kbp_cp *)keyboard_opts[i].value);
     }
     g_queue_free_full(queue_options, NULL);
     g_free(keyboard_opts);
