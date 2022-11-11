@@ -75,19 +75,22 @@ android {
         // Gradle sync will nullify these values, so have a fallback
         String appSuffix = ''
         String tag = VERSION_TAG ? VERSION_TAG : '-' + new File('../../TIER.md').getText('UTF-8');
-        if (tag != null && tag ==~ /.*-test-\d+$/) {
-            // -test-PR_NUMBER
-            appSuffix = tag;
-        } else if (tag != null && tag.startsWith("-beta")) {
+        if (tag.startsWith("-beta")) {
             appSuffix = ' Beta';
-        } else if (tag != null && tag.startsWith("-alpha")) {
+        } else if (tag.startsWith("-alpha")) {
             appSuffix = ' Alpha';
         }
-        String environment = VERSION_ENVIRONMENT ? VERSION_ENVIRONMENT : 'local';
-        if (environment.matches("local")) {
-            appSuffix = appSuffix + '-' + environment;
+        def match = (tag =~ /.*(-test-\d+)$/);
+        if (match.find()) {
+            // -test-PR_NUMBER
+            appSuffix = appSuffix + match.group(1)
+        } else {
+            String environment = VERSION_ENVIRONMENT ? VERSION_ENVIRONMENT : 'local';
+            if (environment.matches("local")) {
+                appSuffix = appSuffix + '-' + environment;
+            }
         }
-        println "variant: " + variant + "tag: " + tag + ", environment: " + environment;
+        println "tag: " + tag + ", appSuffix: " + appSuffix;
         variant.resValue "string", "app_name", 'Keyman' + appSuffix;
     }
     lintOptions {
