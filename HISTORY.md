@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.101 beta 2022-11-11
+
+* fix(windows): Improve shutdown robustness (#7677)
+* fix(windows): base layout support in Keyman Core (#7667)
+* fix(developer): URL parameters should be UTF-8 (#7631)
+* fix(android/engine): Use IME package name if query permission denied (#7668)
+* fix(linux): Fix keyboard icon in system tray (#7678)
+* chore(linux): Update debian changelog :cherries: (#7682)
+* chore(linux): Update Debian standards version (#7683)
+
 ## 16.0.100 beta 2022-11-10
 
 * chore(linux): Update whatsnew (#7660)
