@@ -50,23 +50,56 @@
                 platform == 'phone' ? 240 : 360;
       };
 
+      let shadowfy = function(container) {
+        const docBase = container.children[0];
+        container.removeChild(docBase);
+
+        const style = docBase.children[1];
+        docBase.removeChild(style);
+
+        const shadow = container.attachShadow({ mode: "open" });
+        shadow.appendChild(docBase);
+
+        const baseOSKStyle = document.createElement('link');
+        baseOSKStyle.href = "../../release/unminified/web/osk/kmwosk.css";
+        baseOSKStyle.rel="stylesheet";
+        baseOSKStyle.type="text/css";
+        shadow.appendChild(baseOSKStyle);
+
+        shadow.appendChild(style);
+      }
+
+      let documentKeyboard = async function(kbdid, langid, formFactor, layer) {
+        let docTarget = document.getElementById("docTarget");
+        label = document.createElement('h3');
+        docTarget.appendChild(label);
+
+        const container = document.createElement('div');
+
+        await kmw.addKeyboards(`${kbdid}@${langid}`);
+        await kmw.setActiveKeyboard(kbdid, langid);
+        docBase = keyman.BuildVisualKeyboard(kbdid, 1, formFactor, layer);
+
+        label.textContent = `${keyman.getKeyboard(kbdid).Name} - ${formFactor} - ${layer} layer`;
+        container.appendChild(docBase);
+
+        docTarget.appendChild(container);
+
+        await Promise.resolve(); // Trigger message queue:  let the mutation observer do its thing.
+        shadowfy(container);
+      }
+
       kmw.init({
         }).then(async function() {
-          var docTarget = document.getElementById("docTarget");
 
-          await kmw.addKeyboards('gff_amharic');
-          await kmw.setActiveKeyboard("gff_amharic", "am");
-          var kbdDiv = keyman.BuildVisualKeyboard("gff_amharic", 1, "phone", "default");
-
-          // await kmw.addKeyboards('sil_euro_latin@no');
-          // await kmw.setActiveKeyboard("sil_euro_latin", "no");
-          // var kbdDiv = keyman.BuildVisualKeyboard("sil_euro_latin", 1, "phone", "default");
-
-          // await kmw.addKeyboards('lao_2008_basic');
-          // await kmw.setActiveKeyboard("lao_2008_basic", "lo");
-          // var kbdDiv = keyman.BuildVisualKeyboard("lao_2008_basic", 1, "phone", "default");
-
-          docTarget.appendChild(kbdDiv);
+          // Order matters here!  There's a bit of style-sheet pollution where one keyboard's font styles
+          // can override some of the others.
+          await documentKeyboard("gff_amharic", "am", "phone", "default");
+          await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
+          await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");
+          await documentKeyboard("lao_2008_basic", "lo", "desktop", "default");
+          await documentKeyboard("sil_cameroon_azerty", "pny", "tablet", "default");
+          await documentKeyboard("khmer_angkor", "km", "desktop", "default");
         });
     </script>
 

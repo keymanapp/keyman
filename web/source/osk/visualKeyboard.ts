@@ -1488,14 +1488,19 @@ namespace com.keyman.osk {
 
       let kbdObj = new VisualKeyboard(PKbd, device.coreSpec, device.coreSpec, true);
 
-      // The 'documentation' format uses the base element's child as the actual display base.
-      // Since there's no backing kmw-osk-frame, we do need the static-class kmw-osk-inner-frame
-      // to perform background styling on our behalf.  We'll trust the actual, live keyboard rules
-      // for the other elements, which in turn needs the non-static variant of the CSS rules.
-      kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className + ' ' + device.formFactor
-        + '-static ' + device.OS.toLowerCase();
+      kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className; // may contain multiple classes
+      kbdObj.layerGroup.element.classList.add(device.formFactor + '-static');
 
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
+
+      // Models CSS classes hosted on the OSKView in normal operation.  We can't do this on the main
+      // layer-group element because of the CSS rule structure for keyboard styling.
+      //
+      // For example, `.ios .kmw-keyboard-sil_cameroon_azerty` requires the element with the keyboard
+      // ID to be in a child of an element with the .ios class.
+      let classWrapper = document.createElement('div');
+      classWrapper.classList.add(device.OS.toLowerCase());
+      classWrapper.classList.add(device.formFactor.toLowerCase());
 
       // Select the layer to display, and adjust sizes
       if (layout != null) {
@@ -1529,7 +1534,23 @@ namespace com.keyman.osk {
             }
 
             // Make sure that the stylesheet is attached, now that the keyboard-doc's been inserted.
+            // The stylesheet is currently built + constructed in the same code that attaches it to
+            // the page.
             kbdObj.appendStyleSheet();
+
+            // Grab a reference to the stylesheet.
+            const stylesheet = kbdObj.styleSheet;
+
+            // Don't reset top-level stuff; just the visible layer.
+            kbdObj.currentLayer.refreshLayout(kbdObj, kbdObj.height);
+
+            // We no longer need a reference to the constructing VisualKeyboard, so we should let
+            // it clean up its <head> stylesheet links.
+            kbdObj.shutdown();
+
+            // Now that shutdown is done (and thus won't detach the stylesheet), attach the stylesheet
+            // under the class wrapper.
+            classWrapper.appendChild(stylesheet);
           } finally {
             insertionObserver.disconnect();
           }
@@ -1542,7 +1563,8 @@ namespace com.keyman.osk {
         subtree: true
       });
 
-      return kbd;
+      classWrapper.append(kbd);
+      return classWrapper;
     }
 
     onHide() {
