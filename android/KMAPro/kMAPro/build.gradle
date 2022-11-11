@@ -71,20 +71,23 @@ android {
     }
 
     applicationVariants.all { variant ->
-        // Append tier and environment to app name
-        // Beware: Gradle sync will nullify these values
+        // Append tag to app name
+        // Gradle sync will nullify these values, so have a fallback
         String appSuffix = ''
-        String environment = VERSION_ENVIRONMENT
-        String tag = VERSION_TAG
-        println "variant: " + variant + "tag: " + tag + ", environment: " + environment;
-        if (environment != null && environment ==~ /.*-test-\d+$/) {
+        String tag = VERSION_TAG ? VERSION_TAG : '-' + new File('../../TIER.md').getText('UTF-8');
+        if (tag != null && tag ==~ /.*-test-\d+$/) {
             // -test-PR_NUMBER
-            appSuffix = environment;
+            appSuffix = tag;
         } else if (tag != null && tag.startsWith("-beta")) {
             appSuffix = ' Beta';
         } else if (tag != null && tag.startsWith("-alpha")) {
             appSuffix = ' Alpha';
         }
+        String environment = VERSION_ENVIRONMENT ? VERSION_ENVIRONMENT : 'local';
+        if (environment.matches("local")) {
+            appSuffix = appSuffix + '-' + environment;
+        }
+        println "variant: " + variant + "tag: " + tag + ", environment: " + environment;
         variant.resValue "string", "app_name", 'Keyman' + appSuffix;
     }
     lintOptions {

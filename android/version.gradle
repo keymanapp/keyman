@@ -64,4 +64,4 @@ ext {
     VERSION_TAG=System.getenv("VERSION_TAG")
 }
 
-println "version.gradle: VERSION_TAG: " + VERSION_TAG
+//println "version.gradle: VERSION_TAG: " + VERSION_TAG
