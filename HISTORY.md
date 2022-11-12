@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.6 beta 2022-11-12
+
+* chore: merge beta to master B16S1 (#7693)
+* chore(deps): bump minimatch from 3.0.4 to 3.1.2 (#7675)
+
 ## 17.0.5 alpha 2022-11-11
 
 * chore(linux): Update debian changelog :cherries: (#7681)
