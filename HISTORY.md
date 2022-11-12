@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.102 beta 2022-11-12
+
+* fix(windows): make sure IdStackWindows finalizes after Vcl.Forms (#7692)
+* fix(android/app): Append tier to app name (#7674)
+* chore(android/app): Remove debugging info on build.gradle (#7700)
+
 ## 16.0.101 beta 2022-11-11
 
 * fix(windows): Improve shutdown robustness (#7677)
