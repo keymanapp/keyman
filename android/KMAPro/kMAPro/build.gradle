@@ -94,7 +94,6 @@ android {
                 appSuffix = appSuffix + '-' + environment;
             }
         }
-        println "tag: " + tag + ", appSuffix: " + appSuffix;
         variant.resValue "string", "app_name", 'Keyman' + appSuffix;
     }
     lintOptions {
