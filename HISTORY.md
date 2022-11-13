@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.7 alpha 2022-11-13
+
+* chore: fix TIER.md for master (#7704)
+
 ## 17.0.6 beta 2022-11-12
 
 * chore: merge beta to master B16S1 (#7693)
