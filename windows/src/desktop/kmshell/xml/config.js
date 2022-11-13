@@ -412,6 +412,10 @@ function keyboard_toggle(keyboard_name) {
 
 function showKeyboardLink(id) {
   var e = document.getElementById('qrcode-'+id);
+  if(window.Sentry) {
+    // trace for KEYMAN-WINDOWS-4R
+    window.Sentry.addBreadcrumb({category:'trace', message:`showKeyboardLink:id=${id}, e=${e?'defined':'undefined'}`, level: 'info'});
+  }
   e.className='qrcode qrcode_visible';
 }
 
