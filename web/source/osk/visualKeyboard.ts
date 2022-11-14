@@ -111,10 +111,10 @@ namespace com.keyman.osk {
 
     set layerId(value: string) {
       const changedLayer = value != this._layerId;
-      if(this.layerGroup.layers[value]) {
-        this._layerId = value;
-      } else {
+      if(!this.layerGroup.layers[value]) {
         throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
+      } else {
+        this._layerId = value;
       }
 
       if(changedLayer) {
@@ -216,16 +216,16 @@ namespace com.keyman.osk {
         this.inputEngine.registerEventHandlers();
       }
 
-      Lkbd.classList.add(device.formFactor);
-      Lkbd.classList.add('kmw-osk-inner-frame');
+      Lkbd.classList.add(device.formFactor, 'kmw-osk-inner-frame');
 
       // Tag the VisualKeyboard with a CSS class corresponding to its ID.
-      var kbdID: string = this.layoutKeyboard?.id.replace('Keyboard_','') ?? '';
+      let kbdID: string = this.layoutKeyboard?.id.replace('Keyboard_','') ?? '';
 
-      if(kbdID.indexOf('::') != -1) { // We used to also test if we were in embedded mode, but... whatever.
+      const separatorIndex = kbdID.indexOf('::');
+      if(separatorIndex != -1) { // We used to also test if we were in embedded mode, but... whatever.
         // De-namespaces the ID for use with CSS classes.
         // Assumes that keyboard IDs may not contain the ':' symbol.
-        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
+        kbdID = kbdID.substring(separatorIndex + 2);
       }
 
       const kbdClassSuffix = 'kmw-keyboard-' + kbdID;
@@ -1326,11 +1326,10 @@ namespace com.keyman.osk {
     private getVerticalLayerGroupPadding(): number {
       // For touch-based OSK layouts, kmwosk.css may include top & bottom padding on the layer-group element.
       const computedGroupStyle = getComputedStyle(this.layerGroup.element);
-      let pt = parseInt(computedGroupStyle.paddingTop, 10);
-      let pb = parseInt(computedGroupStyle.paddingBottom, 10);
 
-      pt = isNaN(pt) ? 0 : pt; // parseInt('') == NaN; handle such cases!
-      pb = isNaN(pb) ? 0 : pb;
+      // parseInt('') => NaN, which is falsy; we want to fallback to zero.
+      let pt = parseInt(computedGroupStyle.paddingTop, 10) || 0;
+      let pb = parseInt(computedGroupStyle.paddingBottom, 10) || 0;
       return pt + pb;
     }
 
@@ -1499,8 +1498,7 @@ namespace com.keyman.osk {
       // For example, `.ios .kmw-keyboard-sil_cameroon_azerty` requires the element with the keyboard
       // ID to be in a child of an element with the .ios class.
       let classWrapper = document.createElement('div');
-      classWrapper.classList.add(device.OS.toLowerCase());
-      classWrapper.classList.add(device.formFactor.toLowerCase());
+      classWrapper.classList.add(device.OS.toLowerCase(), device.formFactor);
 
       // Select the layer to display, and adjust sizes
       if (layout != null) {
@@ -1540,7 +1538,7 @@ namespace com.keyman.osk {
 
             // Grab a reference to the stylesheet.
             const stylesheet = kbdObj.styleSheet;
-            const stylesheetHead = stylesheet.parentElement;
+            const stylesheetParentElement = stylesheet.parentElement;
 
             // Don't reset top-level stuff; just the visible layer.
             kbdObj.currentLayer.refreshLayout(kbdObj, kbdObj.height);
@@ -1550,14 +1548,14 @@ namespace com.keyman.osk {
             kbdObj.shutdown();
 
             // Now that shutdown is done, re-attach the stylesheet.
-            stylesheetHead.appendChild(stylesheet);
+            stylesheetParentElement.appendChild(stylesheet);
           } finally {
             insertionObserver.disconnect();
           }
         }
       }
 
-      let insertionObserver = new MutationObserver(detectAndHandleInsertion);
+      const insertionObserver = new MutationObserver(detectAndHandleInsertion);
       insertionObserver.observe(document.body, {
         childList: true,
         subtree: true

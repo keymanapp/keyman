@@ -99,9 +99,6 @@
 
       kmw.init({
         }).then(async function() {
-
-          // Order matters here!  There's a bit of style-sheet pollution where one keyboard's font styles
-          // can override some of the others.
           await documentKeyboard("gff_amharic", "am", "phone", "default");
           await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
           await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");
