@@ -1540,17 +1540,17 @@ namespace com.keyman.osk {
 
             // Grab a reference to the stylesheet.
             const stylesheet = kbdObj.styleSheet;
+            const stylesheetHead = stylesheet.parentElement;
 
             // Don't reset top-level stuff; just the visible layer.
             kbdObj.currentLayer.refreshLayout(kbdObj, kbdObj.height);
 
             // We no longer need a reference to the constructing VisualKeyboard, so we should let
-            // it clean up its <head> stylesheet links.
+            // it clean up its <head> stylesheet links.  This detaches the stylesheet, though.
             kbdObj.shutdown();
 
-            // Now that shutdown is done (and thus won't detach the stylesheet), attach the stylesheet
-            // under the class wrapper.
-            classWrapper.appendChild(stylesheet);
+            // Now that shutdown is done, re-attach the stylesheet.
+            stylesheetHead.appendChild(stylesheet);
           } finally {
             insertionObserver.disconnect();
           }

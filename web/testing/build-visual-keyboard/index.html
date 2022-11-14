@@ -50,12 +50,9 @@
                 platform == 'phone' ? 240 : 360;
       };
 
-      let shadowfy = function(container) {
+      let shadowfy = function(container, style) {
         const docBase = container.children[0];
         container.removeChild(docBase);
-
-        const style = docBase.children[1];
-        docBase.removeChild(style);
 
         const shadow = container.attachShadow({ mode: "open" });
         shadow.appendChild(docBase);
@@ -86,7 +83,13 @@
         docTarget.appendChild(container);
 
         await Promise.resolve(); // Trigger message queue:  let the mutation observer do its thing.
-        shadowfy(container);
+
+        // Grab the stylesheet element that was inserted; there should be no intervening additions,
+        // so the newly-added stylesheet element should be the last element in the <head> section.
+        const stylesheet = document.head.lastChild;
+        stylesheet.parentElement.removeChild(stylesheet);
+
+        shadowfy(container, stylesheet);
       }
 
       kmw.init({
