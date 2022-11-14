@@ -161,7 +161,7 @@ type
 
   IKeymanCustomisationAccess = interface
     ['{CE1EEB3F-3CF3-46C0-B7AF-C64040F6CFD9}']
-    function KeymanCustomisation: IKeymanCustomisation;
+    function KeymanCustomisation: IKeymanCustomisation; safecall;
   end;
 
 const
