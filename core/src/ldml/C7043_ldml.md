@@ -324,10 +324,205 @@ For each key:
 - `vkey`: Is the standard vkey, 0-255
 - `target`: Is the target (resolved) vkey, 0-255.
 
+### C7043.2.13 `layr`—Layers list
+
+Represents layers on the keyboard.
+- Each key entry corresponds to a key on the row
+
+| ∆ | Bits | Name       | Description                              |
+|---|------|------------|------------------------------------------|
+| 0 |  32  | ident      | `layr`                                   |
+| 4 |  32  | size       | int: Length of section                   |
+| 8 |  32  | listCount  | int: Number of layer lists               |
+|12 |  32  | layerCount | int: number of layer entries             |
+|16 |  32  | rowCount   | int: number of row entries               |
+|20 |  32  | keyCount   | int: number of key entries               |
+|24 |  64  | reserved   | padding                                  |
+|32 | var  | layers     | layers sub-table                         |
+| - | var  | rows       | rows sub-table                           |
+| - | var  | keys       | keys sub-table                           |
+
+Each layer list corresponds to one `<layers>` element.
+There are `listCount` total lists.
+
+| ∆ | Bits | Name       | Description                                |
+|---|------|------------|--------------------------------------------|
+| 0+|  32  | flags      | int: per-layers options                    |
+| 4+|  32  | hardware   | str: layout (`us`,`iso`,`jis`,`abnt2`)     |
+| 8+|  32  | layer      | int: index to first layer element          |
+|12+|  32  | count      | int: number of layer elements in this list |
+
+- `flags`: a 32-bit bitfield defined as below:
+
+  | Bit position | Meaning  |  Description         |
+  |--------------|----------|----------------------|
+  |       0      | form     | 0: hardware          |
+  |       0      | form     | 1: touch             |
+
+### `layr.layers` subtable
+
+Each layer entry corresponds to one `<layer>` element
+There are `layerCount` total layer entries.
+
+| ∆ | Bits | Name       | Description                                    |
+|---|------|------------|------------------------------------------------|
+| 0+|  32  | id         | str: layer id such as `base` or `shift`        |
+| 4+|  32  | modifier   | str: modifier string                           |
+| 8+|  32  | row        | int: index into rows area (next section)       |
+|12+|  32  | count      | int: number of `rows` elements for this layer  |
+
+### `layr.rows` subtable
+
+Each row entry corresponds to one `<row>` element
+There are `rowCount` total row entries.
+
+| ∆ | Bits | Name       | Description                            |
+|---|------|------------|----------------------------------------|
+| 0+|  32  | key        | int: index into key element            |
+| 4+|  32  | count      | int: count of key elements in this row |
+
+### `layr.keys` subtable
+
+Each key entry corresponds to a key in the row.
+There are `keyCount` total key entries.
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0+|  32  | key     | int: index into `key2` section           |
+
+### C7043.2.14 `disp`—Display list
+
+| ∆ | Bits | Name          | Description                              |
+|---|------|---------------|------------------------------------------|
+| 0 |  32  | ident         | `disp`                                   |
+| 4 |  32  | size          | int: Length of section                   |
+| 8 |  32  | count         | int: Total number of disp elements       |
+|12 |  32  | baseCharacter | str: If non-null, default base.          |
+|16 | 128  | reserved      | padding (future displayOptions)          |
+
+The default `baseCharacter` is U+25CC, if `baseCharacter` is null.
+
+For each element:
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+|32+|  32  | to      | str: to string                           |
+|36+|  32  | display | str: output display string               |
+
+Entries are sorted in a binary codepoint sort on the `to` field.
+
+### C7043.2.15 `key2`—Extended keybag
+
+| ∆ | Bits | Name        | Description                              |
+|---|------|-------------|------------------------------------------|
+| 0 |  32  | ident       | `key2`                                   |
+| 4 |  32  | size        | int: Length of section                   |
+| 8 |  32  | keyCount    | int: Number of keys                      |
+|12 |  32  | flicksCount | int: Number of flick lists               |
+|12 |  32  | flickCount  | int: Number of flick elements            |
+|16 | var  | keys        | keys sub-table                           |
+| - | var  | flicks      | flick lists sub-table                    |
+| - | var  | flick       | flick elements sub-table                 |
+
+#### `key2.keys` subtable
+
+For each key:
+
+| ∆ | Bits | Name             | Description                                              |
+|---|------|----------------  |----------------------------------------------------------|
+| 0+|  32  | vkey             | int: vkey ID                                             |
+| 4+|  32  | to               | str: output string OR UTF-32LE codepoint                 |
+| 8+|  32  | flags            | int: per-key flags                                       |
+|12+|  32  | id               | str: key id                                              |
+|16+|  32  | switch           | str: layer id to switch to                               |
+|20+|  32  | width            | int: key width*10 (supports 0.1 as min width)            |
+|24+|  32  | longPress        | list: index into `list` section with longPress list or 0 |
+|28+|  32  | longPressDefault | str: default longpress target or 0                       |
+|32+|  32  | multiTap         | list: index into `list` section with multiTap list or 0  |
+|36+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
+
+- `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
+- `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
+  etc.). It is resolved because the `vkeyMap` from LDML has already been
+  applied.  If this is 256 or above, it is a custom touch layout vkey generated
+  by the compiler.
+- `flags`: Flags is a 32-bit bitfield defined as below:
+
+| Bit position | Meaning   |  Description                                |
+|--------------|-----------|---------------------------------------------|
+|       0      | extend    | 0: `to` is a char, 1: `to` is a string      |
+|       1      | gap       | 1 if the key is a gap                       |
+|       2      | transform | 1 if the key is transform=no                |
+
+- `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
+  is a 32 bit index into the `strs` table. The string may be zero-length.
+
+#### `key2.flicks` flick list subtable
+
+For each flicks in the flick list:
+
+| ∆ | Bits | Name             | Description                                              |
+|---|------|----------------  |----------------------------------------------------------|
+| 0+|  32  | count            | int: number of flick elements in this flick              |
+|12+|  32  | flick            | int: index into `flick` subtable for first flick element |
+|16+|  32  | id               | str: flick id                                            |
+
+- `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
+
+Elements are ordered by the string id.
+
+#### `key2.flick` flick element subtable
+
+For each flick element:
+
+| ∆ | Bits | Name             | Description                                              |
+|---|------|----------------  |----------------------------------------------------------|
+| 0+|  32  | directions       | list: index into `list` section with direction list      |
+| 8+|  32  | flags            | int: per-key flags                                       |
+|12+|  32  | to               | str: output string                                       |
+
+There is not a 'null' flick element at the end of each list.
+
+Elements are ordered by the `flicks.id`, and secondarily by the directions list id.
+
+### C7043.2.16 `list`—String lists
+
+| ∆ | Bits | Name          | Description                              |
+|---|------|---------------|------------------------------------------|
+| 0 |  32  | ident         | `list`                                   |
+| 4 |  32  | size          | int: Length of section                   |
+| 8 |  32  | listCount     | int: Total number of lists elements      |
+|12 |  32  | indexCount    | int: Total number of index elements      |
+|32 | var  | lists         | list sub-table                           |
+| - | var  | indices       | index sub-table                          |
+
+#### `list.lists` sub-table
+
+The lists entry at location 0 is defined to have index=0 and count=0,
+representing a 0-length list.
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0+|  32  | index   | int: Index into 'indices' subtable       |
+| 4+|  32  | count   | int: Number of indices in this list      |
+
+This data should be sorted in binary lexical order of the substrings.
+
+#### `list.indices` sub-table
+
+The index entry at location 0 is defined to have str=0,
+representing a 0-length string.
+
+| ∆ | Bits | Name    | Description                              |
+|---|------|---------|------------------------------------------|
+| 0+|  32  | str     | str: string index into `strs` table      |
+
+These indices are a pool of indexes into the string table.
+The strings order are significant.  There is not a 'null' string at the end of each list.
+
 ## TODO-LDML: various things that need to be completed here or fixed in-spec
 
 > * UnicodeSets
 > * spec: reference to `after` in reorders; various other @after refs
 > * spec: ABNT2 key has hex value 0xC1 (even if kbdus.dll doesn't produce that)
-> * spec: layers.displayWidth
 > * `keys.key.mod`: TODO define this.  0 for no modifiers.
