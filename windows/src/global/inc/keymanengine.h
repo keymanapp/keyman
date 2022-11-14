@@ -281,4 +281,5 @@ void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 BOOL SetupCoreEnvironment(km_kbp_option_item **test_env_opts);
 void DeleteCoreEnvironment(km_kbp_option_item *test_env_opts);
 
+#endif  // _KEYMAN64_LIGHT
 #endif  // _KEYMANENGINE_H
