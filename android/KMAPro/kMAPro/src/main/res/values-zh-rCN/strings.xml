@@ -81,7 +81,7 @@
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">空格键无提示</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
-  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
+  <string name="haptic_feedback" comment="haptic feedback on key press">输入时振动</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">总是显示标签</string>
   <!-- Context: Keyman Settings menu -->
@@ -153,7 +153,7 @@
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">软件包中的元数据无效/丢失</string>
   <!-- Context: KMP Package strings -->
-  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    Keyboard requires a newer version of Keyman</string>
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    键盘需要更新版本的 Keyman</string>
   <!-- Context: anywhere -->
-  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">无法启动网页浏览器</string>
 </resources>
