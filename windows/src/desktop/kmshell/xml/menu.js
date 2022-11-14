@@ -25,6 +25,11 @@ var menudiv = null, global_menu_elem_name = null;
     var menu = document.getElementById('menu_'+name), button = document.getElementById('button_'+name);
     var index = name.substr(8,2);
 
+    if(window.Sentry) {
+      // trace for KEYMAN-WINDOWS-7J
+      window.Sentry.addBreadcrumb({category:'trace', message:`ShowMenu:name=${name}, menu=${menu?'defined':'undefined'} menudiv=${menudiv?'defined':'undefined'}`, level: 'info'});
+    }
+
     menudiv.innerHTML = menu.innerHTML;
     menudiv.style.width = menu.offsetWidth + 'px';
     menudiv.style.overflowY = 'auto';
@@ -192,17 +197,15 @@ var menudiv = null, global_menu_elem_name = null;
     }
   }
 
-  function menu_doAttachEvent(obj, e, f)
-  {
-    if(obj.attachEvent) return obj.attachEvent('on'+e, f);
-    return obj.addEventListener(e, f, false);
-  }
-
   function menusetup() {
     menudiv = document.createElement('SPAN');
     menudiv.className='menu';
-    menu_doAttachEvent(menudiv, 'mouseup', HideMenu);
+    menudiv.addEventListener('mouseup', HideMenu);
     document.body.appendChild(menudiv);
+    if(window.Sentry) {
+      // trace for KEYMAN-WINDOWS-7J
+      window.Sentry.addBreadcrumb({category:'trace', message:`menusetup: menudiv defined`, level: 'info'});
+    }
   }
-  menu_doAttachEvent(window, 'load', menusetup);
+  window.addEventListener('load', menusetup);
 
