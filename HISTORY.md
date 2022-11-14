@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.103 beta 2022-11-14
+
+* fix(windows): click in 1 pixel high box in Language Switch window caused crash (#7699)
+* chore(windows): add sentry traces for unsolved crashes (#7703)
+* fix(windows): handle timeout in downloads (#7709)
+* chore(windows): Add safecall for internal CustomisationStorage API interface (#7707)
+* chore(windows): include debug info in keyman build (#7710)
+* fix(windows): check if permissions for thread to access file (#7207)
+* refactor(linux): Use consts instead of strings (#7686)
+
 ## 16.0.102 beta 2022-11-12
 
 * fix(windows): make sure IdStackWindows finalizes after Vcl.Forms (#7692)
