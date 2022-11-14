@@ -96,11 +96,21 @@ namespace km {
                        std::u16string const & value)
     {
       auto i = _options.find(char16_t(scope) + key);
-      if (i == _options.end()) return option();
-
-      i->second = value;
-      persisted_store()[key] = value;
-      return option(scope, key, i->second);
+      if (i == _options.end()){
+        auto j = _options.emplace(char16_t(scope) + key,value);
+        if(j.second){
+          persisted_store()[key] = value;
+          return option(scope, key, j.first->second);
+        }
+        else {
+          return option();
+       }
+      }
+      else {
+        i->second = value;
+        persisted_store()[key] = value;
+        return option(scope, key, i->second);
+      }
     }
 
     km_kbp_status
