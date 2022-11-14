@@ -20,6 +20,7 @@
       h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
       .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
       #KeymanWebControl {width:50%;min-width:600px;}
+      code {line-height: 1.6; font-style: oblique; }
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
@@ -71,6 +72,9 @@
         label = document.createElement('h3');
         docTarget.appendChild(label);
 
+        let idLabel = document.createElement('code');
+        docTarget.appendChild(idLabel);
+
         const container = document.createElement('div');
 
         await kmw.addKeyboards(`${kbdid}@${langid}`);
@@ -78,6 +82,7 @@
         docBase = keyman.BuildVisualKeyboard(kbdid, 1, formFactor, layer);
 
         label.textContent = `${keyman.getKeyboard(kbdid).Name} - ${formFactor} - ${layer} layer`;
+        idLabel.textContent = `${kbdid.replace(/^Keyboard_/)}`;
         container.appendChild(docBase);
 
         docTarget.appendChild(container);
