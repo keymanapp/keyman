@@ -77,7 +77,7 @@ TEST(KEYBOARDOPTIONS, SaveRestoreKeyboardOptionsCore) {
   delete kp;
 }
 
-// Test SetupCoreEnvironment
+// Test SetupCoreEnvironment and also test km_kbp_state_options_update
 TEST(KEYBOARDOPTIONS, SetupCoreEnvironment) {
   LPINTKEYBOARDINFO kp = new INTKEYBOARDINFO;
   memset(kp, 0, sizeof(INTKEYBOARDINFO));
@@ -119,6 +119,22 @@ TEST(KEYBOARDOPTIONS, SetupCoreEnvironment) {
     expectedValue = expected_items[i].value;
     EXPECT_TRUE(expectedValue == value);
   }
+
+  // Now verify update items call works when items already exist
+  expected_items[0].value = u"updated";
+  expected_items[3].value = u"updated";
+
+  EXPECT_EQ(km_kbp_state_options_update(kp->lpCoreKeyboardState, expected_items), KM_KBP_STATUS_OK);
+
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(
+        km_kbp_state_option_lookup(kp->lpCoreKeyboardState, KM_KBP_OPT_ENVIRONMENT, expected_items[i].key, &retValue),
+        KM_KBP_STATUS_OK);
+    value         = retValue;
+    expectedValue = expected_items[i].value;
+    EXPECT_TRUE(expectedValue == value);
+  }
+
   delete[] expected_items;
 
   DeleteCoreEnvironment(core_env_opts);
