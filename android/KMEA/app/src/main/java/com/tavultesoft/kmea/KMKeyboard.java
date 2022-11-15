@@ -109,8 +109,6 @@ final class KMKeyboard extends WebView {
     this.context = context;
     this.keyboardType = KeyboardType.KEYBOARD_TYPE_INAPP;
     initKMKeyboard(context);
-
-    // this.ShouldShowHelpBubble
   }
 
   public KMKeyboard(Context context, KeyboardType keyboardType) {
@@ -118,8 +116,6 @@ final class KMKeyboard extends WebView {
     this.context = context;
     this.keyboardType = keyboardType;
     initKMKeyboard(context);
-
-    // this.ShouldShowHelpBubble
   }
 
   public boolean getShouldShowHelpBubble() {

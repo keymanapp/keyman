@@ -2265,15 +2265,7 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            if (InAppKeyboard.getShouldShowHelpBubble()) {
-              InAppKeyboard.showHelpBubble();
-            }
-          }
-        }, 2000);
+        InAppKeyboard.showHelpBubbleAfterDelay(2000);
 
         InAppKeyboard.callJavascriptAfterLoad();
         InAppKeyboard.setSpacebarText(spacebarText);
@@ -2305,7 +2297,7 @@ public final class KMManager {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
         if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
-          // TODO:  something to the effect of original line
+          InAppKeyboard.dismissHelpBubble();
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.dismissKeyboard();
         }
@@ -2500,15 +2492,7 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            if (SystemKeyboard.getShouldShowHelpBubble()) {
-              SystemKeyboard.showHelpBubble();
-            }
-          }
-        }, 2000);
+        SystemKeyboard.showHelpBubbleAfterDelay(2000);
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
 
@@ -2535,7 +2519,6 @@ public final class KMManager {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
         SystemKeyboard.dismissHelpBubble();
-        SystemKeyboard.setShouldShowHelpBubble(false);
         IMService.requestHideSelf(0);
       } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
         SystemKeyboard.dismissHelpBubble();
