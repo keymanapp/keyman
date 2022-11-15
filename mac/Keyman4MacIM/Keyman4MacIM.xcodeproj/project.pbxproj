@@ -178,6 +178,12 @@
 		29B5BC0628169A6500B86A17 /* ff */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ff; path = ff.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
 		29B5BC0728169A6600B86A17 /* ff */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ff; path = ff.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		29B5BC0828169A8600B86A17 /* ff */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ff; path = ff.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29B6BB5B292239B4008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/KMAboutWindowController.strings"; sourceTree = "<group>"; };
+		29B6BB5C292239B4008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/preferences.strings"; sourceTree = "<group>"; };
+		29B6BB5D292239B4008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/KMInfoWindowController.strings"; sourceTree = "<group>"; };
+		29B6BB5E292239B4008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/KMKeyboardHelpWindowController.strings"; sourceTree = "<group>"; };
+		29B6BB5F292239B4008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		29B6BB60292239DC008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		29B70A23283CB6680086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/KMAboutWindowController.strings"; sourceTree = "<group>"; };
 		29B70A24283CB6690086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/preferences.strings"; sourceTree = "<group>"; };
 		29B70A25283CB66A0086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/KMInfoWindowController.strings"; sourceTree = "<group>"; };
@@ -734,6 +740,7 @@
 				pl,
 				"es-419",
 				nl,
+				"zh-Hans",
 			);
 			mainGroup = 989C9BFF1A7876DE00A20425;
 			productRefGroup = 989C9C091A7876DE00A20425 /* Products */;
@@ -979,6 +986,7 @@
 				29BFA76D282948BD009FCCC3 /* pl */,
 				29B70A23283CB6680086B580 /* es-419 */,
 				29B27FF229062FF50036917E /* nl */,
+				29B6BB5B292239B4008F04BD /* zh-Hans */,
 			);
 			name = KMAboutWindowController.xib;
 			sourceTree = "<group>";
@@ -997,6 +1005,7 @@
 				29BFA76E282948BE009FCCC3 /* pl */,
 				29B70A24283CB6690086B580 /* es-419 */,
 				29B27FF329062FF50036917E /* nl */,
+				29B6BB5C292239B4008F04BD /* zh-Hans */,
 			);
 			name = preferences.xib;
 			path = Keyman4MacIM/KMConfiguration;
@@ -1015,6 +1024,7 @@
 				29BFA7722829490A009FCCC3 /* pl */,
 				29B70A28283CB6900086B580 /* es-419 */,
 				29B27FF7290630170036917E /* nl */,
+				29B6BB60292239DC008F04BD /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1033,6 +1043,7 @@
 				29BFA76F282948BE009FCCC3 /* pl */,
 				29B70A25283CB66A0086B580 /* es-419 */,
 				29B27FF429062FF50036917E /* nl */,
+				29B6BB5D292239B4008F04BD /* zh-Hans */,
 			);
 			name = KMInfoWindowController.xib;
 			path = Keyman4MacIM/KMInfoWindow;
@@ -1052,6 +1063,7 @@
 				29BFA770282948BF009FCCC3 /* pl */,
 				29B70A26283CB66B0086B580 /* es-419 */,
 				29B27FF529062FF60036917E /* nl */,
+				29B6BB5E292239B4008F04BD /* zh-Hans */,
 			);
 			name = KMKeyboardHelpWindowController.xib;
 			path = Keyman4MacIM/KMKeyboardHelpWindow;
@@ -1071,6 +1083,7 @@
 				29BFA771282948C0009FCCC3 /* pl */,
 				29B70A27283CB66C0086B580 /* es-419 */,
 				29B27FF629062FF60036917E /* nl */,
+				29B6BB5F292239B4008F04BD /* zh-Hans */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
