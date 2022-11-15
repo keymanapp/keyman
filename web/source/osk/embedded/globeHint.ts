@@ -83,7 +83,14 @@ namespace com.keyman.osk.embedded {
 
         // Width dimensions must be set explicitly to prevent clipping.
         // We'll assume that the globe key is always positioned on the bottom row.
-        let bubbleWidth = xWidth + Math.ceil(xWidth * 1) * 2;
+        let oskBaseFontSize = new ParsedLengthStyle(keyman.osk.baseFontSize);
+        let bubbleWidth = Math.ceil(xWidth * 3);
+
+        // The base OSK font-size is typically set in 'em', and we want to scale up
+        // the bubble accordingly for devices where it'd display too small otherwise.
+        if(!oskBaseFontSize.absolute) {
+          bubbleWidth *= oskBaseFontSize.val;
+        }
 
         bubbleStyle.bottom = Math.floor(keyman.osk.computedHeight - y) + 'px';
         // CSS already defines transform: translateX(-50%) - this centers the element.
@@ -110,6 +117,10 @@ namespace com.keyman.osk.embedded {
           // The overflow would be clipped by the right edge when centered,
           // so we "offset" this part to keep it within screen bounds.
           this.tip.style.transform = 'translateX(-' + (xOverflow - rightEdgeMargin + 1) + 'px)';
+        }
+
+        if(!oskBaseFontSize.absolute) {
+          this.element.style.fontSize = keyman.osk.baseFontSize;
         }
 
         let capHeight = xHeight / 3;
