@@ -2265,7 +2265,7 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
-        InAppKeyboard.showHelpBubbleAfterDelay(2000);
+        InAppKeyboard.showHelpBubbleAfterDelay(2000, true); // check if it should be shown at that time!
 
         InAppKeyboard.callJavascriptAfterLoad();
         InAppKeyboard.setSpacebarText(spacebarText);
@@ -2492,7 +2492,7 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
-        SystemKeyboard.showHelpBubbleAfterDelay(2000);
+        SystemKeyboard.showHelpBubbleAfterDelay(2000, true); // check if it should be shown at that time!
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
 

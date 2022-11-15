@@ -1299,8 +1299,12 @@ final class KMKeyboard extends WebView {
     handler.postDelayed(new Runnable() {
       @Override
       public void run() {
-        if(delayedCheck && getShouldShowHelpBubble()) {
-          showHelpBubble();
+        if(delayedCheck) {
+          if(getShouldShowHelpBubble()) {
+            showHelpBubble();
+          } else {
+            showHelpBubble();
+          }
         }
       }
     }, milliseconds);
