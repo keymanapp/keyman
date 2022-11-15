@@ -80,6 +80,10 @@ final class KMKeyboard extends WebView {
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
+
+  // Facilitates a 'lazy init' - we'll only check the preference when it matters,
+  // rather than at construction time.
+  private Boolean _shouldShowHelpBubble = null;
   private boolean isChiral = false;
 
   private int currentKeyboardErrorReports = 0;
@@ -105,6 +109,8 @@ final class KMKeyboard extends WebView {
     this.context = context;
     this.keyboardType = KeyboardType.KEYBOARD_TYPE_INAPP;
     initKMKeyboard(context);
+
+    // this.ShouldShowHelpBubble
   }
 
   public KMKeyboard(Context context, KeyboardType keyboardType) {
@@ -112,6 +118,21 @@ final class KMKeyboard extends WebView {
     this.context = context;
     this.keyboardType = keyboardType;
     initKMKeyboard(context);
+
+    // this.ShouldShowHelpBubble
+  }
+
+  public boolean getShouldShowHelpBubble() {
+    if(this._shouldShowHelpBubble == null) {
+      SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      this._shouldShowHelpBubble = prefs.getBoolean(KMManager.KMKey_ShouldShowHelpBubble, true);
+    }
+
+    return this._shouldShowHelpBubble;
+  }
+
+  public void setShouldShowHelpBubble(boolean flag) {
+    this._shouldShowHelpBubble = flag;
   }
 
   @SuppressWarnings("deprecation")
@@ -326,16 +347,23 @@ final class KMKeyboard extends WebView {
     loadJavascript(KMString.format(
       "window.onload = function(){ setOskWidth(\"%d\");"+
       "setOskHeight(\"0\"); };", kbWidth));
+    if (this.getShouldShowHelpBubble()) {
+      this.showHelpBubbleAfterDelay(2000);
+    }
   }
 
   public void onPause() {
     dismissKeyPreview(0);
     dismissSubKeysWindow();
+
+    dismissHelpBubble();
   }
 
   public void onDestroy() {
     dismissKeyPreview(0);
     dismissSubKeysWindow();
+
+    dismissHelpBubble();
   }
 
   public void onConfigurationChanged(Configuration newConfig) {
@@ -351,6 +379,18 @@ final class KMKeyboard extends WebView {
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
     loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
+
+    this.dismissHelpBubble();
+
+    if(this.getShouldShowHelpBubble()) {
+      Handler handler = new Handler();
+      handler.postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          showHelpBubble();
+        }
+      }, 2000);
+    }
   }
 
   public void dismissSubKeysWindow() {
@@ -577,6 +617,11 @@ final class KMKeyboard extends WebView {
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
+
+    this.dismissHelpBubble();
+    if(this.getShouldShowHelpBubble()) {
+      this.showHelpBubbleAfterDelay(2000);
+    }
 
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
 
@@ -1051,6 +1096,8 @@ final class KMKeyboard extends WebView {
       posY = kbPos[1] + (int) py;
     }
 
+    dismissHelpBubble();
+    this.setShouldShowHelpBubble(false);
     dismissKeyPreview(0);
     //subKeysWindow.setAnimationStyle(R.style.PopupAnim);
 
@@ -1214,6 +1261,8 @@ final class KMKeyboard extends WebView {
       posY = kbPos[1] + (int) (py * density - frame.height() + offset_y);
     }
 
+    dismissHelpBubble();
+    this.setShouldShowHelpBubble(false);
     //keyPreviewWindow.setAnimationStyle(R.style.KeyPreviewAnim);
     if (keyPreviewWindow != null) {
       keyPreviewWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
@@ -1234,6 +1283,36 @@ final class KMKeyboard extends WebView {
         }
       }
     }, delay);
+  }
+
+  protected void showHelpBubble() {
+    String hintText = context.getString(R.string.help_bubble_text);
+
+    // signalHelpBubbleDismissal - defined in android-host.js, gives a helpBubbleDismissed signal.
+
+    // TODO:  ensure it's called against the 'main' thread.
+    loadJavascript("keyman.showGlobeHint(\"" + hintText + "\", signalHelpBubbleDismissal);");
+  }
+
+  protected void showHelpBubbleAfterDelay(int milliseconds) {
+    this.showHelpBubbleAfterDelay(milliseconds, false);
+  }
+
+  protected void showHelpBubbleAfterDelay(int milliseconds, boolean delayedCheck) {
+    Handler handler = new Handler();
+    handler.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        if(delayedCheck && getShouldShowHelpBubble()) {
+          showHelpBubble();
+        }
+      }
+    }, milliseconds);
+  }
+
+  protected void dismissHelpBubble() {
+    // TODO:  ensure it's called against the 'main' thread.
+    loadJavascript("keyman.hideGlobeHint();");
   }
 
   public static void addOnKeyboardEventListener(OnKeyboardEventListener listener) {
