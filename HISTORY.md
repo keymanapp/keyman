@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.104 beta 2022-11-15
+
+* chore(android/engine): Add more logging for keyboard restart (#7719)
+
 ## 16.0.103 beta 2022-11-14
 
 * fix(windows): click in 1 pixel high box in Language Switch window caused crash (#7699)
