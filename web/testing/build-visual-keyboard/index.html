@@ -87,7 +87,10 @@
 
         docTarget.appendChild(container);
 
-        await Promise.resolve(); // Trigger message queue:  let the mutation observer do its thing.
+        // Trigger message queue:  let the mutation observer do its thing.
+        // In case it's not obvious:  this is only really safe because this test page is a
+        // highly-controlled environment.
+        await Promise.resolve();
 
         // Grab the stylesheet element that was inserted; there should be no intervening additions,
         // so the newly-added stylesheet element should be the last element in the <head> section.
