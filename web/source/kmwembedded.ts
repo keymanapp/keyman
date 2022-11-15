@@ -81,7 +81,7 @@ namespace com.keyman.osk {
   } // end Android-only block.
 
   VisualKeyboard.prototype.createGlobeHint = function(this: VisualKeyboard) {
-    this.globeHint = new com.keyman.osk.embedded.GlobeHint();
+    this.globeHint = new com.keyman.osk.embedded.GlobeHint(this);
     let keyman = com.keyman.singleton;
     keyman.osk._Box.appendChild(this.globeHint.element!);
   }
@@ -332,14 +332,18 @@ namespace com.keyman.text {
     return x+','+y+','+w+','+h;
   };
 
-  keymanweb['showGlobeHint'] = function(text: string, show: boolean = true) {
+  keymanweb['showGlobeHint'] = function(text: string, onAutodismissal?: () => void) {
     // Ensure localized text is properly in-place.
     if((keymanweb as KeymanBase).osk?.vkbd) {
       let hint = (keymanweb as KeymanBase).osk.vkbd.globeHint as com.keyman.osk.embedded.GlobeHint;
       hint.text = text;
     }
 
-    keymanweb.osk?.vkbd?.globeHint?.show(keymanweb.osk.vkbd.currentLayer.globeKey.btn, show, keymanweb.osk.vkbd);
+    keymanweb.osk?.vkbd?.globeHint?.show(keymanweb.osk.vkbd.currentLayer.globeKey.btn, onAutodismissal);
+  }
+
+  keymanweb['hideGlobeHint'] = function() {
+    keymanweb.osk?.vkbd?.globeHint?.hide(keymanweb.osk.vkbd.currentLayer.globeKey.btn);
   }
 
  /**

@@ -1,8 +1,9 @@
+///<reference path="singleInputCapture.ts" />
+
 namespace com.keyman.osk.embedded {
   // Consider it a "specialized key tip".
-  export class GlobeHint implements osk.KeyTip {
+  export class GlobeHint implements osk.GlobeHint {
     public readonly element: HTMLDivElement;
-    public key: KeyElement;
     public state: boolean = false;
 
     //  -----
@@ -16,7 +17,13 @@ namespace com.keyman.osk.embedded {
     private readonly tip: HTMLDivElement;
     private readonly label: HTMLSpanElement;
 
-    constructor() {
+    private readonly vkbd: VisualKeyboard;
+
+    private inputTrap?: SingleInputCapture;
+
+    constructor(vkbd: VisualKeyboard) {
+      this.vkbd = vkbd;
+
       let tipElement = this.element=document.createElement('div');
       tipElement.className='kmw-globehint';
       tipElement.id = 'kmw-globehint';
@@ -44,13 +51,15 @@ namespace com.keyman.osk.embedded {
       this.label.innerText = val;
     }
 
-    show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
+    private _show(key: KeyElement, on: boolean) {
       let keyman = com.keyman.singleton;
 
       // Create and display the preview
       // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
       // decent null-guard check.
-      if(on && key.offsetParent) {
+      if(!on || !key.offsetParent) {
+          this.element.style.display = 'none';
+      } else {
         // The key element is positioned relative to its key-square, which is,
         // in turn, relative to its row.  Rows take 100% width, so this is sufficient.
         //
@@ -67,7 +76,7 @@ namespace com.keyman.osk.embedded {
         let bubbleStyle = this.element.style;
 
         // Roughly matches how the subkey positioning is set.
-        const _Box = vkbd.element.parentNode as HTMLDivElement;
+        const _Box = this.vkbd.element.parentNode as HTMLDivElement;
         const _BoxRect = _Box.getBoundingClientRect();
         const keyRect = key.getBoundingClientRect();
         let y = (keyRect.bottom - _BoxRect.top + 1);
@@ -113,13 +122,32 @@ namespace com.keyman.osk.embedded {
         this.cap.style.borderTopWidth    = capHeight + 'px';
 
         bubbleStyle.display = 'block';
-      } else { // Hide the key preview
-        this.element.style.display = 'none';
       }
 
       // Save the key preview state
-      this.key = key;
       this.state = on;
+    }
+
+    public show(key: KeyElement, onDismiss?: () => void) {
+      this._show(key, true);
+
+      if(onDismiss) {
+        // enable input-capture system
+        this.inputTrap = new SingleInputCapture(() => {
+          this._show(key, false);
+          onDismiss();
+        });
+      }
+    }
+
+    public hide(key: KeyElement) {
+      this._show(key, false);
+
+      // disable input-capture system
+      if(this.inputTrap) {
+        this.inputTrap.cancel();
+        this.inputTrap = null;
+      }
     }
   }
 }

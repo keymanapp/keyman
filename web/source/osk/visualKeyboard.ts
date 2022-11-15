@@ -3,6 +3,7 @@
 /// <reference path="utils.ts" />
 /// <reference path="oskLayerGroup.ts" />
 /// <reference path="keytip.interface.ts" />
+/// <reference path="globehint.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/pendingLongpress.ts" />
 /// <reference path="browser/pendingMultiTap.ts" />
@@ -96,7 +97,7 @@ namespace com.keyman.osk {
 
     // Popup key management
     keytip: KeyTip;
-    globeHint: KeyTip;
+    globeHint: GlobeHint;
     pendingSubkey: PendingGesture;
     subkeyGesture: RealizedGesture;
 
