@@ -1,6 +1,5 @@
 # Lintian overrides
 keyman source: very-long-line-length-in-source-file CONTRIBUTING.md *
-keyman source: very-long-line-length-in-source-file linux/ibus-keyman/autom4te.cache/* *
 keyman source: very-long-line-length-in-source-file linux/ibus-keyman/configure *
 keyman source: very-long-line-length-in-source-file linux/ibus-keyman/m4/* *
 keyman source: very-long-line-length-in-source-file linux/ibus-keyman/tests/Makefile.in *
