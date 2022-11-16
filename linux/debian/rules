@@ -12,9 +12,7 @@ export KEYMAN_PKG_BUILD=1
 # xenial needs this to be explicit
 export LC_ALL=C.UTF-8
 
-# Definitions from /usr/share/dpkg/pkg-info.mk
-dpkg_late_eval ?= $(or $(value DPKG_CACHE_$(1)),$(eval DPKG_CACHE_$(1) := $(shell $(2)))$(value DPKG_CACHE_$(1)))
-DEB_VERSION = $(call dpkg_late_eval,DEB_VERSION,dpkg-parsechangelog -SVersion)
+include /usr/share/dpkg/pkg-info.mk
 
 # Unfortunately dh-python 3.20180325 (bionic) doesn't provide the virtual dh-sequence-python3
 # package, so we'll have to pass --with-python3 here
