@@ -30,7 +30,7 @@ class CanonicalLanguageCodeUtils():
             return None
 
         # Special case for IPA keyboards otherwise we'd end up with und-Zyyy-fonipa
-        if bcp47Tag.language == 'und' and bcp47Tag.variant[0] == 'fonipa':
+        if bcp47Tag.language == 'und' and bcp47Tag.variant and bcp47Tag.variant[0] == 'fonipa':
             return 'und-fonipa'
 
         # First, canonicalize any unnecessary ISO639-3 codes
