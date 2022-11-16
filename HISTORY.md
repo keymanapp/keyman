@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 16.0.105 beta 2022-11-16
+
+* chore(windows): add unit test for SetupCoreEnvironment (#7714)
+* docs(linux): Add example for keyman:// URL format (#7726)
+* fix(linux): set DEB_VERSION (#7727)
+* fix(linux): Don't crash if `und` is specified without `fonipa` (#7728)
+
 ## 16.0.104 beta 2022-11-15
 
 * chore(android/engine): Add more logging for keyboard restart (#7719)
