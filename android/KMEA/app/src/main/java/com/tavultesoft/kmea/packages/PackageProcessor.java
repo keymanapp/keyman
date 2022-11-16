@@ -72,7 +72,7 @@ public class PackageProcessor {
   public String getPackageID(File path) {
     // Sometimes, downloading a kmp multiple times results in a filename with a suffix:
     // " (#).kmp" or "-#.kmp" in the filename, so strip out the number
-    String filename = path.getName().toLowerCase().replaceAll("(\\s+\\(|-)\\d+\\)?", "");
+    String filename = path.getName().toLowerCase().replaceAll("(\\s+\\(|-)\\d+\\)?.kmp$", ".kmp");
 
     if(resourceRoot == null) {
       throw new IllegalStateException("The PackageProcessor has not been initialized!");
