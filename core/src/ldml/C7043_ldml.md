@@ -419,8 +419,9 @@ Entries are sorted in a binary codepoint sort on the `to` field.
 | 4 |  32  | size        | int: Length of section                   |
 | 8 |  32  | keyCount    | int: Number of keys                      |
 |12 |  32  | flicksCount | int: Number of flick lists               |
-|12 |  32  | flickCount  | int: Number of flick elements            |
-|16 | var  | keys        | keys sub-table                           |
+|16 |  32  | flickCount  | int: Number of flick elements            |
+|20 |  96  | reserved    | padding                                  |
+|32 | var  | keys        | keys sub-table                           |
 | - | var  | flicks      | flick lists sub-table                    |
 | - | var  | flick       | flick elements sub-table                 |
 
@@ -484,6 +485,13 @@ For each flick element:
 There is not a 'null' flick element at the end of each list.
 
 Elements are ordered by the `flicks.id`, and secondarily by the directions list id.
+
+- `flags`: Flags is a 32-bit bitfield defined as below:
+
+| Bit position | Meaning   |  Description                                |
+|--------------|-----------|---------------------------------------------|
+|       0      | extend    | 0: `to` is a char, 1: `to` is a string      |
+
 
 ### C7043.2.16 `list`—String lists
 
