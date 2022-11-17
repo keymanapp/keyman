@@ -247,9 +247,7 @@ html
 }
 
 /* List Styles */
-.list
-{
-}
+
 .list_packageitem
 {
   display: block;
@@ -564,10 +562,6 @@ table tr
   padding-top: 10px;
 }
 
-.grid_rows_hide{
-
-}
-
 .grid_rows_hide [data-hide] {
   visibility: hidden;
   display: none;
@@ -695,11 +689,14 @@ table tr
 {
   left: 0;
   top: 0;
-  xpadding: 6px 4px 4px 4px;
 }
-.options_list
-{
+
+#options input[type=button],
+#options button {
+  margin: 2px 0 2px 32px;
+  min-width: 160px;
 }
+
 .options_list a
 {
   text-decoration: none;
@@ -707,10 +704,6 @@ table tr
 .options_list a:hover
 {
   text-decoration: underline;
-}
-
-.options_list_footer
-{
 }
 
 .options_list_header
