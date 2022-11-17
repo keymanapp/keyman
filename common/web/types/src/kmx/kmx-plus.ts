@@ -262,7 +262,7 @@ export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
     bksp?: Bksp;
     disp?: Disp;
-    elem?: Elem; // elem is ignored in-memory
+    elem?: Elem; // elem is ignored in-mxemory
     finl?: Finl;
     key2?: Key2;
     keys?: Keys;

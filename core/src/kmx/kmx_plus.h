@@ -404,7 +404,7 @@ static_assert(sizeof(struct COMP_KMXPLUS_LAYR_ROW) == LDML_LENGTH_LAYR_ROW, "mis
 
 
 struct COMP_KMXPLUS_LAYR_KEY {
-    KMX_DWORD vkey;
+    KMX_DWORD key; // index into key2 section
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_LAYR_KEY) == LDML_LENGTH_LAYR_KEY, "mismatched size of COMP_KMXPLUS_LAYR_KEY");
@@ -459,6 +459,51 @@ private:
 
 static_assert(sizeof(struct COMP_KMXPLUS_LAYR) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_LAYR) == LDML_LENGTH_LAYR, "mismatched size of section layr");
+
+/* ------------------------------------------------------------------
+ * key2 section
+   ------------------------------------------------------------------ */
+struct COMP_KMXPLUS_KEY2 {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_KEY2;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD keyCount;
+  KMX_DWORD flicksCount;
+  KMX_DWORD flickCount;
+  KMX_DWORD reserved[3];
+  // TODO-LDML: keys sub-table
+  // TODO-LDML: flick lists sub-table
+  // TODO-LDML: flick elements sub-table
+
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_KEY2) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_KEY2) == LDML_LENGTH_KEY2, "mismatched size of section key2");
+
+
+/* ------------------------------------------------------------------
+ * list section
+   ------------------------------------------------------------------ */
+struct COMP_KMXPLUS_LIST {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_LIST;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD listCount;
+  KMX_DWORD indexCount;
+  // TODO-LDML: lists sub-table
+  // TODO-LDML: indices sub-table
+
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LIST) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_LIST) == LDML_LENGTH_LIST, "mismatched size of section list");
+
 
 /**
  * @brief helper accessor object for KMX Plus data

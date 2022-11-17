@@ -480,6 +480,20 @@ COMP_KMXPLUS_LAYR_Helper::getKey(KMX_DWORD key) const {
   return keys + key;
 }
 
+bool
+COMP_KMXPLUS_KEY2::valid(KMX_DWORD _kmn_unused(length)) const {
+  // TODO-LDML more to do here
+  DebugLog("TODO-LDML: key2");
+  return true;
+}
+
+bool
+COMP_KMXPLUS_LIST::valid(KMX_DWORD _kmn_unused(length)) const {
+  // TODO-LDML more to do here
+  DebugLog("TODO-LDML: list");
+  return true;
+}
+
 // ---- constructor
 
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
