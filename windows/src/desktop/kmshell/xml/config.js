@@ -76,18 +76,21 @@ document.addEventListener("DOMContentLoaded", windowResize);
       }
       break;
     case 35:    // end
-      var elem = event.srcElement.parentElement;
-      var j = elem.children.length - 1;
-      elem.children[j].focus();
+      let elem = event.srcElement.parentElement;
+      for(let i = elem.children.length - 1; i >= 0; i--) {
+        if(elem.children[i].tabIndex != undefined && elem.children[i].tabIndex >= 0) {
+          elem.children[i].focus();
+          break;
+        }
+      }
       break;
     case 36:    // home
       var elem = event.srcElement.parentElement;
       for( var i = 0; i < elem.children.length; i++ ) {
-        if( elem.children[i].tabIndex ) {
+        if( elem.children[i].tabIndex != undefined && elem.children[i].tabIndex >= 0 ) {
           elem.children[i].focus();
           break;
         }
-
       }
       break;
     case 38:    // up
@@ -105,7 +108,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
           j = i;
           do {
             if(--j < 0) j = elem.children.length-1;
-            if(elem.children[j].tabIndex)
+            if(elem.children[j].tabIndex != undefined && elem.children[j].tabIndex >= 0)
             {
               elem.children[j].focus();
               list_expanded_selected(elem.children[j]);
@@ -131,7 +134,7 @@ document.addEventListener("DOMContentLoaded", windowResize);
           j = i;
           do {
             if(++j >= elem.children.length) j = 0;
-            if(elem.children[j].tabIndex)
+            if(elem.children[j].tabIndex != undefined && elem.children[j].tabIndex >= 0)
             {
               elem.children[j].focus();
               list_expanded_selected(elem.children[j]);
