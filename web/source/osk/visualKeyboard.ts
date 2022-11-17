@@ -1147,6 +1147,8 @@ namespace com.keyman.osk {
         if (t.innerText != displayName || displayName == '') {
           t.innerText = displayName;
         }
+
+        // this.spaceBar.key.refreshLayout(this);
       }
       catch (ex) { }
     }

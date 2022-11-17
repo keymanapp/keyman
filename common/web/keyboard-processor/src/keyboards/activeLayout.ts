@@ -141,6 +141,35 @@ namespace com.keyman.keyboards {
       return this.displayLayer + '-' + this.coreID;
     }
 
+    /**
+     * Converts key IDs of the U_* form to their corresponding UTF-16 text.
+     * If an ID not matching the pattern is received, returns null.
+     * @param id
+     * @returns
+     */
+    static unicodeIDToText(id: string, errorCallback?: (codeAsString: string) => void) {
+      if(!id || id.substring(0,2) != 'U_') {
+        return null;
+      }
+
+      let result = '';
+      const codePoints = id.substring(2).split('_');
+      for(let codePoint of codePoints) {
+        const codePointValue = parseInt(codePoint, 16);
+        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) || isNaN(codePointValue)) {
+          if(errorCallback) {
+            errorCallback(codePoint);
+          }
+          continue;
+        } else {
+          // String.fromCharCode() is inadequate to handle the entire range of Unicode
+          // Someday after upgrading to ES2015, can use String.fromCodePoint()
+          result += String.kmwFromCharCode(codePointValue);
+        }
+      }
+      return result ? result : null;
+    }
+
     static sanitize(rawKey: LayoutKey) {
       if(typeof rawKey.width == 'string') {
         rawKey.width = parseInt(rawKey.width, 10);
