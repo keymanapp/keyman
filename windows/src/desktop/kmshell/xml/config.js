@@ -76,8 +76,8 @@ document.addEventListener("DOMContentLoaded", windowResize);
       }
       break;
     case 35:    // end
-      let elem = event.srcElement.parentElement;
-      for(let i = elem.children.length - 1; i >= 0; i--) {
+      var elem = event.srcElement.parentElement;
+      for(var i = elem.children.length - 1; i >= 0; i--) {
         if(elem.children[i].tabIndex != undefined && elem.children[i].tabIndex >= 0) {
           elem.children[i].focus();
           break;
