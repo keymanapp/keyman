@@ -266,8 +266,9 @@ final class KMKeyboard extends WebView {
 
   public void callJavascriptAfterLoad() {
     if(this.javascriptAfterLoad.size() > 0) {
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
+      // Don't call this WebView method on just ANY thread - run it on the main UI thread.
+      // https://stackoverflow.com/a/22611010
+      this.postDelayed(new Runnable() {
         @Override
         public void run() {
           if(javascriptAfterLoad.size() > 0) {
@@ -1296,8 +1297,6 @@ final class KMKeyboard extends WebView {
       return;
     }
 
-    // TODO:  ensure it's called against the 'main' thread.
-
     // signalHelpBubbleDismissal - defined in android-host.js, gives a helpBubbleDismissed signal.
     loadJavascript("keyman.showGlobeHint(" + textWrapper.toString() + ".text, signalHelpBubbleDismissal);");
   }
@@ -1323,7 +1322,6 @@ final class KMKeyboard extends WebView {
   }
 
   protected void dismissHelpBubble() {
-    // TODO:  ensure it's called against the 'main' thread.
     loadJavascript("keyman.hideGlobeHint();");
   }
 
