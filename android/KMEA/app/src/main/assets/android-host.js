@@ -267,7 +267,8 @@ function oskClearKeyPreview() {
 }
 
 function signalHelpBubbleDismissal() {
-  window.location.hash = 'helpBubbleDismissed';
+  fragmentToggle = (fragmentToggle + 1) % 100;
+  window.location.hash = 'helpBubbleDismissed-'+fragmentToggle;
 }
 
 function oskCreatePopup(obj,x,y) {

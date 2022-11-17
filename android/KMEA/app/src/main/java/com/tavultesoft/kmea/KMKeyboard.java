@@ -379,13 +379,7 @@ final class KMKeyboard extends WebView {
     this.dismissHelpBubble();
 
     if(this.getShouldShowHelpBubble()) {
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          showHelpBubble();
-        }
-      }, 2000);
+      this.showHelpBubbleAfterDelay(2000);
     }
   }
 
@@ -1284,10 +1278,28 @@ final class KMKeyboard extends WebView {
   protected void showHelpBubble() {
     String hintText = context.getString(R.string.help_bubble_text);
 
-    // signalHelpBubbleDismissal - defined in android-host.js, gives a helpBubbleDismissed signal.
+    if(keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return; // Help bubble is disabled for System-wide keyboard
+    }
+
+    if(KMManager.getGlobeKeyAction(keyboardType) == KMManager.GlobeKeyAction.GLOBE_KEY_ACTION_DO_NOTHING) {
+      return; // Help bubble is disabled if globe key has no action
+    }
+
+    // To ensure that the localized text is properly escaped, we'll use JSON utilities.  Since
+    // there's no direct string encoder, we'll just wrap it in an object and unwrap it in JS.
+    JSONObject textWrapper = new JSONObject();
+    try {
+      textWrapper.put("text", hintText);
+    } catch(JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return;
+    }
 
     // TODO:  ensure it's called against the 'main' thread.
-    loadJavascript("keyman.showGlobeHint(\"" + hintText + "\", signalHelpBubbleDismissal);");
+
+    // signalHelpBubbleDismissal - defined in android-host.js, gives a helpBubbleDismissed signal.
+    loadJavascript("keyman.showGlobeHint(" + textWrapper.toString() + ".text, signalHelpBubbleDismissal);");
   }
 
   protected void showHelpBubbleAfterDelay(int milliseconds) {
