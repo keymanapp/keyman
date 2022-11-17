@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 16.0.106 beta 2022-11-17
+
+* chore(windows): set platform core env explicitly (#7689)
+* fix(android): bump version_code major calculation (#7735)
+* fix(android/engine): Remove duplicate file suffix when installing .kmp (#7720)
+* fix(linux): Ignore dbus exception when testing for fcitx (#7732)
+* fix(linux): Fix lintian warnings (#7733)
+* feat(linux): Add optional bcp47 parameter to km-package-install (#7731)
+
 ## 16.0.105 beta 2022-11-16
 
 * chore(windows): add unit test for SetupCoreEnvironment (#7714)
