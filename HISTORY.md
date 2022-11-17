@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.8 alpha 2022-11-17
+
+* fix(android): bump version_code major calculation (#7736)
+
 ## 17.0.7 alpha 2022-11-13
 
 * chore: fix TIER.md for master (#7704)
