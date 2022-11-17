@@ -523,8 +523,10 @@ class kmx_plus {
     // keep the next elements sorted
     const COMP_KMXPLUS_DISP *disp;
     const COMP_KMXPLUS_ELEM *elem;
+    const COMP_KMXPLUS_KEY2 *key2;
     const COMP_KMXPLUS_KEYS *keys;
     const COMP_KMXPLUS_LAYR *layr;
+    const COMP_KMXPLUS_LIST *list;
     const COMP_KMXPLUS_LOCA *loca;
     const COMP_KMXPLUS_META *meta;
     const COMP_KMXPLUS_SECT *sect;

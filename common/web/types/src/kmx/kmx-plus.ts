@@ -1,6 +1,7 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
+import { StringList } from './string-list.js';
 
 import { KMXFile } from './kmx.js';
 
@@ -15,6 +16,7 @@ export class GlobalSections {
   // These sections are used by other sections during compilation
   strs: Strs;
   elem: Elem;
+  list: List;
 }
 
 // 'sect'
@@ -114,7 +116,7 @@ export class StrsItem {
   constructor(value: string) {
     this.value = value;
   }
-}
+};
 
 export class Strs extends Section {
   strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
@@ -250,13 +252,51 @@ export class Layr extends Section {
   vkeys: number[] = [];
 };
 
-export class Key2 {
+export class Key2Keys {
+  vkey: number;
+  to: StrsItem;
+  flags: number;
+  id: StrsItem;
+  switch: StrsItem;
+  width: number;
+  longPress: StringList;
+  longPressDefault: StrsItem;
+  multiTap: StringList;
+  flicks: number;
+};
+
+export class Key2Flicks {
+  count: number;
+  flick: number;
+  id: StrsItem;
+};
+
+export class Key2Flick {
+  directions: StringList;
+  flags: number;
+  to: StrsItem;
+};
+
+export class Key2 extends Section {
+  keyCount: number;
+  flicksCount: number;
+  flickCount: number;
+  keys: Key2Keys[] = [];
+  flicks: Key2Flicks[] = [];
+  flick: Key2Flick[] = [];
+};
+
+export class List extends Section {
   // TODO-LDML
 };
 
-export class List {
-  // TODO-LDML
+export class ListItem {
+  readonly value: string[];
+  constructor(value: string[]) {
+    this.value = value;
+  }
 };
+
 
 export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
@@ -301,6 +341,21 @@ export class KMXPlusFile extends KMXFile {
 
   public readonly COMP_PLUS_KEYS_ITEM: any;
   public readonly COMP_PLUS_KEYS: any;
+
+  public readonly COMP_PLUS_LAYR_ENTRY: any;
+  public readonly COMP_PLUS_LAYR_KEY: any;
+  public readonly COMP_PLUS_LAYR_LIST: any;
+  public readonly COMP_PLUS_LAYR_ROW: any;
+  public readonly COMP_PLUS_LAYR: any;
+
+  public readonly COMP_PLUS_KEY2_FLICK: any;
+  public readonly COMP_PLUS_KEY2_FLICKS: any;
+  public readonly COMP_PLUS_KEY2_KEY: any;
+  public readonly COMP_PLUS_KEY2: any;
+
+  public readonly COMP_PLUS_LIST_LIST: any;
+  public readonly COMP_PLUS_LIST_INDEX: any;
+  public readonly COMP_PLUS_LIST: any;
 
   public readonly COMP_PLUS_LOCA_ITEM: any;
   public readonly COMP_PLUS_LOCA: any;
@@ -405,6 +460,106 @@ export class KMXPlusFile extends KMXFile {
       reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_KEYS_ITEM, 'count')
     });
+
+    // 'layr'
+
+    this.COMP_PLUS_LAYR_ENTRY = new r.Struct({
+      id: r.uint32le, // str
+      modifier: r.uint32le, // str
+      row: r.uint32le, // index into rows
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LAYR_KEY = new r.Struct({
+      key: r.uint32le, // index into key2
+    });
+
+    this.COMP_PLUS_LAYR_LIST = new r.Struct({
+      flags: r.uint32le,
+      hardware: r.uint32le, //str
+      layer: r.uint32le, // index into layers
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LAYR_ROW = new r.Struct({
+      key: r.uint32le,
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LAYR = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      listCount: r.uint32le,
+      layerCount: r.uint32le,
+      rowCount: r.uint32le,
+      keyCount: r.uint32le,
+      reserved0: new r.Reserved(r.uint32le),
+      reserved1: new r.Reserved(r.uint32le),
+      lists: new r.Array(this.COMP_PLUS_LAYR_LIST, 'listCount'),
+      layers: new r.Array(this.COMP_PLUS_LAYR_ENTRY, 'layerCount'),
+      rows: new r.Array(this.COMP_PLUS_LAYR_ROW, 'rowCount'),
+      keys: new r.Array(this.COMP_PLUS_LAYR_KEY, 'keyCount'),
+    });
+
+    this.COMP_PLUS_KEY2_FLICK = new r.Struct({
+      directions: r.uint32le, // list
+      flags: r.uint32le,
+      to: r.uint32le, // str | codepoint
+    });
+
+    this.COMP_PLUS_KEY2_FLICKS = new r.Struct({
+      count: r.uint32le,
+      flick: r.uint32le,
+      id: r.uint32le, // str
+    });
+
+    this.COMP_PLUS_KEY2_KEY = new r.Struct({
+      vkey: r.uint32le,
+      to: r.uint32le, // str | codepoint
+      flags: r.uint32le,
+      id: r.uint32le, // str
+      switch: r.uint32le, // str
+      width: r.uint32le, // width*10  ( 1 = 0.1 keys)
+      longPress: r.uint32le, // list index
+      longPressDefault: r.uint32le, // str
+      multiTap: r.uint32le, // list index
+      flicks: r.uint32le, // index into flicks table
+    });
+
+    this.COMP_PLUS_KEY2 = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      keyCount: r.uint32le,
+      flicksCount: r.uint32le,
+      flickCount: r.uint32le,
+      reserved0: new r.Reserved(r.uint32le),
+      reserved1: new r.Reserved(r.uint32le),
+      reserved2: new r.Reserved(r.uint32le),
+      keys: new r.Array(this.COMP_PLUS_KEY2_KEY, 'keyCount'),
+      flicks: new r.Array(this.COMP_PLUS_KEY2_FLICKS, 'flicksCount'),
+      flick: new r.Array(this.COMP_PLUS_KEY2_FLICK, 'flickCount'),
+    });
+
+    // 'list'
+
+    this.COMP_PLUS_LIST_LIST = new r.Struct({
+      index: r.uint32le,
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LIST_INDEX = new r.Struct({
+      str: r.uint32le, // str
+    });
+
+    this.COMP_PLUS_LIST = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      listCount: r.uint32le,
+      indexCount: r.uint32le,
+      lists: new r.Array(this.COMP_PLUS_LIST_LIST, 'listCount'),
+      indices: new r.Array(this.COMP_PLUS_LIST_INDEX, 'indexCount'),
+    });
+
 
     // 'loca'
 

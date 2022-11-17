@@ -338,9 +338,12 @@ Represents layers on the keyboard.
 |16 |  32  | rowCount   | int: number of row entries               |
 |20 |  32  | keyCount   | int: number of key entries               |
 |24 |  64  | reserved   | padding                                  |
-|32 | var  | layers     | layers sub-table                         |
+|32 | var  | lists      | layer list sub-table                     |
+| - | var  | layers     | layers sub-table                         |
 | - | var  | rows       | rows sub-table                           |
 | - | var  | keys       | keys sub-table                           |
+
+### `layr.lists` subtable
 
 Each layer list corresponds to one `<layers>` element.
 There are `listCount` total lists.

@@ -103,7 +103,7 @@ export default class Compiler {
         // errors for the keyboard developer.
         continue;
       }
-      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem});
+      const sect = section.compile({strs: kmx.kmxplus.strs, elem: kmx.kmxplus.elem, list: kmx.kmxplus.list});
 
       /* istanbul ignore if */
       if(!sect) {

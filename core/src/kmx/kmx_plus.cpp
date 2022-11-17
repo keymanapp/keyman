@@ -532,8 +532,10 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     // these will be nullptr if they don't validate
     disp = section_from_sect<COMP_KMXPLUS_DISP>(sect);
     elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect);
+    key2 = section_from_sect<COMP_KMXPLUS_KEY2>(sect);
     keys = section_from_sect<COMP_KMXPLUS_KEYS>(sect);
     layr = section_from_sect<COMP_KMXPLUS_LAYR>(sect);
+    list = section_from_sect<COMP_KMXPLUS_LIST>(sect);
     loca = section_from_sect<COMP_KMXPLUS_LOCA>(sect);
     meta = section_from_sect<COMP_KMXPLUS_META>(sect);
     strs = section_from_sect<COMP_KMXPLUS_STRS>(sect);

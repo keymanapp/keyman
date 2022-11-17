@@ -82,7 +82,8 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
 
   let globalSections: GlobalSections = {
     strs: new Strs(),
-    elem: null
+    elem: null,
+    list: null,
   };
   globalSections.elem = new Elem(globalSections.strs);
 
