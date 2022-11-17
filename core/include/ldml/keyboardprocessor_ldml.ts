@@ -29,8 +29,10 @@ export type SectionIdent =
   'disp' |
   'elem' |
   'finl' |
+  'key2' |
   'keys' |
   'layr' |
+  'list' |
   'loca' |
   'meta' |
   'name' |
@@ -228,6 +230,47 @@ class Constants {
   readonly keys_flags_extend = 1;
 
   /* ------------------------------------------------------------------
+   * key2 section
+    ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'key2' section not including variable parts
+   */
+  readonly length_key2 = 32;
+  /**
+   *  Length of each item in the 'key2' keys sub-table
+   */
+  readonly length_key2_key = 20;
+  /**
+   *  Length of each item in the 'key2' flick lists sub-table
+   */
+  readonly length_key2_flick_list = 12;
+  /**
+   *  Length of each item in the 'key2' flick elements sub-table
+   */
+  readonly length_key2_flick_element = 12;
+
+  /**
+   * 0 if to is a char, 1 if it is a string
+   */
+  readonly key2_key_flags_extend      = 0x00000001;
+
+  /**
+   * 1 if the key is a gap
+   */
+  readonly key2_key_flags_gap         = 0x00000002;
+
+  /**
+   * 1 if the key is transform=no
+   */
+  readonly key2_key_flags_notransform = 0x00000004;
+
+  /**
+   * 0 if to is a char, 1 if it is a string
+   */
+  readonly key2_flick_flags_extend      = 0x00000001;
+
+  /* ------------------------------------------------------------------
    * layr section
      ------------------------------------------------------------------ */
 
@@ -265,8 +308,25 @@ class Constants {
   readonly length_layr_key = 4;
 
   /* ------------------------------------------------------------------
-    * loca section
+   * list section
       ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'list' section not including variable parts
+   */
+  readonly length_list = 32;
+  /**
+   *  Length of each list item in the 'list' list section variable part
+   */
+  readonly length_list_item = 8;
+  /**
+   *  Length of each list item in the 'list' indices section variable part
+   */
+   readonly length_list_index = 4;
+
+  /* ------------------------------------------------------------------
+   * loca section
+   ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'loca' section not including variable parts
@@ -376,8 +436,10 @@ class Constants {
       disp: 'disp',
       elem: 'elem',
       finl: 'finl',
+      key2: 'key2',
       keys: 'keys',
       layr: 'layr',
+      list: 'list',
       loca: 'loca',
       meta: 'meta',
       name: 'name',
@@ -394,7 +456,7 @@ class Constants {
    * @returns hex ID such as 0x74636573
    */
   hex_section_id(id:string) {
-      if(!id || typeof id !== 'string' || !id.match(/[a-z][a-z][a-z][a-z]/)) {
+      if(!id || typeof id !== 'string' || !id.match(/[a-z0-9][a-z0-9][a-z0-9][a-z0-9]/)) {
           throw Error(`hex_section_id(${id}) - need a 4-character string`);
       }
       let r = 0;

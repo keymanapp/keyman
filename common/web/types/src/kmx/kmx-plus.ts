@@ -250,14 +250,24 @@ export class Layr extends Section {
   vkeys: number[] = [];
 };
 
+export class Key2 {
+  // TODO-LDML
+};
+
+export class List {
+  // TODO-LDML
+};
+
 export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
     bksp?: Bksp;
     disp?: Disp;
     elem?: Elem; // elem is ignored in-memory
     finl?: Finl;
+    key2?: Key2;
     keys?: Keys;
     layr?: Layr;
+    list?: List;
     loca?: Loca;
     meta?: Meta;
     name?: Name;
