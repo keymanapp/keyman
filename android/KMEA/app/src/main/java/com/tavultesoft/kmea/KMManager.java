@@ -1862,6 +1862,13 @@ public final class KMManager {
     }
   }
 
+  private static void setPersistentShouldShowHelpBubble(boolean flag) {
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, flag);
+    editor.commit();
+  }
+
   public static void setDebugMode(boolean value) {
     debugMode = value;
   }
@@ -2305,16 +2312,8 @@ public final class KMManager {
         InAppKeyboard.dismissHelpBubble();
         InAppKeyboard.setShouldShowHelpBubble(false);
 
-        // // Original had logic that would shortcut this in some scenarios, but I'm unclear as to its real purpose.
-        // if (!InAppKeyboard.isHelpBubbleEnabled) {
-        //   return false;
-        // }
-
         // Globe key has been used; disable the internal preference setting.
-        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
-        editor.commit();
+        Manager.setPersistentShouldShowHelpBubble(false);
 
         handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
           KeyboardType.KEYBOARD_TYPE_INAPP);
@@ -2524,10 +2523,8 @@ public final class KMManager {
         SystemKeyboard.dismissHelpBubble();
         SystemKeyboard.setShouldShowHelpBubble(false);
 
-        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, false);
-        editor.commit();
+        // Globe key has been used; disable the internal preference setting.
+        Manager.setPersistentShouldShowHelpBubble(false);
 
         handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
           KeyboardType.KEYBOARD_TYPE_SYSTEM);
