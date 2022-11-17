@@ -501,7 +501,7 @@ Elements are ordered by the `flicks.id`, and secondarily by the directions list 
 | 4 |  32  | size          | int: Length of section                   |
 | 8 |  32  | listCount     | int: Total number of lists elements      |
 |12 |  32  | indexCount    | int: Total number of index elements      |
-|32 | var  | lists         | list sub-table                           |
+|16 | var  | lists         | list sub-table                           |
 | - | var  | indices       | index sub-table                          |
 
 #### `list.lists` sub-table
