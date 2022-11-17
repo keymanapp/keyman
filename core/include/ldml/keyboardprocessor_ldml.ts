@@ -314,7 +314,7 @@ class Constants {
   /**
    * Minimum length of the 'list' section not including variable parts
    */
-  readonly length_list = 32;
+  readonly length_list = 16;
   /**
    *  Length of each list item in the 'list' list section variable part
    */
