@@ -2313,7 +2313,7 @@ public final class KMManager {
         InAppKeyboard.setShouldShowHelpBubble(false);
 
         // Globe key has been used; disable the internal preference setting.
-        Manager.setPersistentShouldShowHelpBubble(false);
+        KMManager.setPersistentShouldShowHelpBubble(false);
 
         handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
           KeyboardType.KEYBOARD_TYPE_INAPP);
@@ -2524,7 +2524,7 @@ public final class KMManager {
         SystemKeyboard.setShouldShowHelpBubble(false);
 
         // Globe key has been used; disable the internal preference setting.
-        Manager.setPersistentShouldShowHelpBubble(false);
+        KMManager.setPersistentShouldShowHelpBubble(false);
 
         handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
           KeyboardType.KEYBOARD_TYPE_SYSTEM);
