@@ -333,17 +333,20 @@ namespace com.keyman.text {
   };
 
   keymanweb['showGlobeHint'] = function(text: string, onAutodismissal?: () => void) {
-    // Ensure localized text is properly in-place.
-    if((keymanweb as KeymanBase).osk?.vkbd) {
-      let hint = (keymanweb as KeymanBase).osk.vkbd.globeHint as com.keyman.osk.embedded.GlobeHint;
-      hint.text = text;
+    const keyman = keymanweb as KeymanBase;
+    const globeHint = keyman.osk?.vkbd?.globeHint;
+
+    if(globeHint) {
+      // Ensure localized text is properly in-place.
+      globeHint.text = text;
+      globeHint.show(keyman.osk.vkbd.currentLayer.globeKey.btn, onAutodismissal);
     }
 
-    keymanweb.osk?.vkbd?.globeHint?.show(keymanweb.osk.vkbd.currentLayer.globeKey.btn, onAutodismissal);
   }
 
   keymanweb['hideGlobeHint'] = function() {
-    keymanweb.osk?.vkbd?.globeHint?.hide(keymanweb.osk.vkbd.currentLayer.globeKey.btn);
+    const keyman = keymanweb as KeymanBase;
+    keyman.osk?.vkbd?.globeHint?.hide(keyman.osk.vkbd.currentLayer.globeKey.btn);
   }
 
  /**

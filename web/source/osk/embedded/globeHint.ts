@@ -1,7 +1,11 @@
 ///<reference path="singleInputCapture.ts" />
 
 namespace com.keyman.osk.embedded {
-  // Consider it a "specialized key tip".
+  /**
+   * The GlobeHint is a specialized key tip that is presented above
+   * the globe key on first use of Keyman, to show the user how to
+   * switch input methods. The label is localizable text.
+   */
   export class GlobeHint implements osk.GlobeHint {
     public readonly element: HTMLDivElement;
     public state: boolean = false;
@@ -25,12 +29,12 @@ namespace com.keyman.osk.embedded {
       this.vkbd = vkbd;
 
       let tipElement = this.element=document.createElement('div');
-      tipElement.className='kmw-globehint';
+      tipElement.className = 'kmw-globehint';
       tipElement.id = 'kmw-globehint';
 
       // The following style is critical, so do not rely on external CSS
-      tipElement.style.pointerEvents='none';
-      tipElement.style.display='none';
+      tipElement.style.pointerEvents = 'none';
+      tipElement.style.display = 'none';
 
       tipElement.appendChild(this.tip = document.createElement('div'));
       tipElement.appendChild(this.cap = document.createElement('div'));
@@ -58,7 +62,7 @@ namespace com.keyman.osk.embedded {
       // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
       // decent null-guard check.
       if(!on || !key.offsetParent) {
-          this.element.style.display = 'none';
+        this.element.style.display = 'none';
       } else {
         // The key element is positioned relative to its key-square, which is,
         // in turn, relative to its row.  Rows take 100% width, so this is sufficient.
@@ -102,9 +106,9 @@ namespace com.keyman.osk.embedded {
         // Adjust shape if at edges
 
         // how much width lies outside the range of the base key, per side
-        var xOverflow = (bubbleWidth - xWidth) / 2;
+        const xOverflow = (bubbleWidth - xWidth) / 2;
 
-        let capWidth = xWidth * 2 / 3;
+        const capWidth = xWidth * 2 / 3;
 
         const leftEdgeMargin  = xLeft;
         const rightEdgeMargin = window.innerWidth - (xLeft + xWidth);
@@ -146,6 +150,7 @@ namespace com.keyman.osk.embedded {
         // enable input-capture system
         this.inputTrap = new SingleInputCapture(() => {
           this._show(key, false);
+          this.inputTrap = null;
           onDismiss();
         });
       }
