@@ -151,6 +151,16 @@ namespace com.keyman.text {
     return keymanweb.rootPath+ssName;
   };
 
+  keymanweb.linkStylesheetResources = function() {
+    const keyman = keymanweb as KeymanBase;
+    let util = keyman.util;
+
+    // Install the globe-hint stylesheet.
+    util.linkStyleSheet(keymanweb.getStyleSheetPath('globeHint.css'));
+
+    // For now, the OSK will handle linking of the main OSK stylesheet separately.
+  }
+
   // Get KMEI, KMEA keyboard path (overrides default function, allows direct app control of paths)
   keymanweb.getKeyboardPath = function(Lfilename, packageID) {
     return Lfilename + "?v=" + (new Date()).getTime(); /*cache buster*/
@@ -341,7 +351,6 @@ namespace com.keyman.text {
       globeHint.text = text;
       globeHint.show(keyman.osk.vkbd.currentLayer.globeKey.btn, onAutodismissal);
     }
-
   }
 
   keymanweb['hideGlobeHint'] = function() {

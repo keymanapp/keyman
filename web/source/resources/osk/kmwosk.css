@@ -428,61 +428,6 @@ div.android div.kmw-keytip-cap {
   }
 }
 
-/*** TODO:  extract to a separate CSS file used only in embedded mode! ***/
-
-#kmw-globehint {
-  z-index: 10002;
-}
-
-div.kmw-globehint {
-  position: absolute;
-  left: 0;
-  overflow: visible;
-  transform: translateX(-50%);
-}
-
-div.kmw-globehint-tip {
-  position: relative;
-  border-radius: 6px 6px 4px 4px;
-  border: solid 1px #cccccc;
-  border-bottom: solid 1px #8a8d90;
-  box-sizing: border-box;
-  background-color: rgb(0, 0, 0, 0.9);
-}
-
-span.kmw-globehint-label {
-  display: block;
-  font-size: 0.72em;
-  text-align: center;
-  padding: 3px;
-  color: #fff;
-  overflow: visible;
-  font-family:Verdana, Geneva, Tahoma, sans-serif;
-}
-
-/* create the 'arrow' part of the hint (TODO) */
-div.kmw-globehint-cap {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  border-style: solid;
-  border-bottom-style: hidden;
-  border-left-color: transparent;
-  border-right-color: transparent;
-  border-top-color: rgba(0, 0, 0, 0.9);
-  /* width managed by KMW code */
-}
-
-/*** TODO:  end of future separate-CSS-file extraction zone ***/
-
-div.android div.kmw-globehint-cap {
-  border-top-color: rgba(48, 48, 48, .9);
-}
-
-div.android div.kmw-globehint-tip {
-  background-color: rgba(48, 48, 48, .9);
-}
-
 /* Box styles for keyboard-specific OSK (e.g. EuroLatin) and if no keyboard active (desktop only) */
 .kmw-osk-static, .kmw-osk-none{text-align:left;font:12px sans-serif;border:solid 1px #ad4a28;color:blue;background-color:white;}
 .kmw-osk-none{padding:4px 6px 6px}

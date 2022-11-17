@@ -298,6 +298,7 @@ public final class KMManager {
   protected static final String KMFilename_JSSentry = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
+  protected static final String KMFilename_KmwGlobeHintCss = "globeHint.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
 
@@ -800,6 +801,7 @@ public final class KMManager {
         copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
       }
       copyAsset(context, KMFilename_KmwCss, "", true);
+      copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
 
       // Copy default keyboard font
