@@ -295,7 +295,7 @@ namespace com.keyman.osk {
      * @param override  if true, don't use the font spec from the button, just use the passed in spec
      * @returns         font size as a style string
      */
-    getIdealFontSize(vkbd: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
+    getIdealFontSize(vkbd: VisualKeyboard, text: string, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
       let buttonStyle = getComputedStyle(this.btn);
       let keyWidth = parseFloat(buttonStyle.width);
       let emScale = 1;
@@ -317,7 +317,7 @@ namespace com.keyman.osk {
       }
 
       let fontSpec = getFontSizeStyle(style.fontSize || '1em');
-      let metrics = OSKKey.getTextMetrics(this.keyText, emScale, style);
+      let metrics = OSKKey.getTextMetrics(text, emScale, style);
 
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
@@ -399,7 +399,7 @@ namespace com.keyman.osk {
         oldText;
     }
 
-    private get keyText(): string {
+    public get keyText(): string {
       const spec = this.spec;
       const DEFAULT_BLANK = '\xa0';
 
@@ -478,7 +478,7 @@ namespace com.keyman.osk {
         }
       }
 
-      ts.fontSize = this.getIdealFontSize(vkbd, styleSpec);
+      ts.fontSize = this.getIdealFontSize(vkbd, keyText, styleSpec);
 
       // Finalize the key's text.
       t.innerText = keyText;
@@ -500,8 +500,19 @@ namespace com.keyman.osk {
     }
 
     public refreshLayout(vkbd: VisualKeyboard) {
-      if(this.label) { // space bar may not define the text span!
-        this.label.style.fontSize = this.getIdealFontSize(vkbd, this.btn.style);
+      // space bar may not define the text span!
+      if(this.label) {
+        if(!this.label.classList.contains('kmw-spacebar-caption')) {
+          this.label.style.fontSize = this.getIdealFontSize(vkbd, this.keyText, this.btn.style);
+        } else {
+          // Remove any custom setting placed on it before recomputing its inherited style info.
+          this.label.style.fontSize = '';
+          const fontSize = this.getIdealFontSize(vkbd, this.label.textContent, getComputedStyle(this.label), true);
+
+          // Since the kmw-spacebar-caption version uses !important, we must specify
+          // it directly on the element too; otherwise, scaling gets ignored.
+          this.label.style.setProperty("font-size", fontSize, "important");
+        }
       }
     }
   }
