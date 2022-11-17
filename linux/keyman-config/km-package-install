@@ -93,7 +93,7 @@ def main():
     parser.add_argument('-s', '--shared', action='store_true', help='Install to shared area /usr/local')
     parser.add_argument('-f', '--file', metavar='KMPFILE', help='Keyman kmp file')
     parser.add_argument('-p', '--package', metavar='PACKAGE', help='Keyman package id')
-    parser.add_argument('--bcp47', metavar='LANGTAG', help='bcp47 language tag')
+    parser.add_argument('-l', '--bcp47', metavar='LANGTAG', help='bcp47 language tag')
     parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
