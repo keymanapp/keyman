@@ -161,6 +161,7 @@ input.kbd_button
 input.kbd_button:hover, input[type='button']:hover, button[type='button']:hover
 {
   background: #F69169;
+  border-color: #F69169;
 }
 
 input[type='submit']:disabled, input[type='button']:disabled, button:disabled
