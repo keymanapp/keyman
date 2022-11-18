@@ -130,6 +130,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2901BA8A292332B3009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/KMAboutWindowController.strings"; sourceTree = "<group>"; };
+		2901BA8B292332B3009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/preferences.strings"; sourceTree = "<group>"; };
+		2901BA8C292332B3009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/KMInfoWindowController.strings"; sourceTree = "<group>"; };
+		2901BA8D292332B3009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/KMKeyboardHelpWindowController.strings"; sourceTree = "<group>"; };
+		2901BA8E292332B4009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		2901BA8F292332CF009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		290BC67E274B9DB1005CD1C3 /* KMPackageInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMPackageInfo.h; sourceTree = "<group>"; };
 		290BC67F274B9DB1005CD1C3 /* KMPackageInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMPackageInfo.m; sourceTree = "<group>"; };
 		290BC75C274F3FD7005CD1C3 /* KMKeyboardInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMKeyboardInfo.h; sourceTree = "<group>"; };
@@ -734,6 +740,7 @@
 				pl,
 				"es-419",
 				nl,
+				"ff-NG",
 			);
 			mainGroup = 989C9BFF1A7876DE00A20425;
 			productRefGroup = 989C9C091A7876DE00A20425 /* Products */;
@@ -979,6 +986,7 @@
 				29BFA76D282948BD009FCCC3 /* pl */,
 				29B70A23283CB6680086B580 /* es-419 */,
 				29B27FF229062FF50036917E /* nl */,
+				2901BA8A292332B3009903EC /* ff-NG */,
 			);
 			name = KMAboutWindowController.xib;
 			sourceTree = "<group>";
@@ -997,6 +1005,7 @@
 				29BFA76E282948BE009FCCC3 /* pl */,
 				29B70A24283CB6690086B580 /* es-419 */,
 				29B27FF329062FF50036917E /* nl */,
+				2901BA8B292332B3009903EC /* ff-NG */,
 			);
 			name = preferences.xib;
 			path = Keyman4MacIM/KMConfiguration;
@@ -1015,6 +1024,7 @@
 				29BFA7722829490A009FCCC3 /* pl */,
 				29B70A28283CB6900086B580 /* es-419 */,
 				29B27FF7290630170036917E /* nl */,
+				2901BA8F292332CF009903EC /* ff-NG */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1033,6 +1043,7 @@
 				29BFA76F282948BE009FCCC3 /* pl */,
 				29B70A25283CB66A0086B580 /* es-419 */,
 				29B27FF429062FF50036917E /* nl */,
+				2901BA8C292332B3009903EC /* ff-NG */,
 			);
 			name = KMInfoWindowController.xib;
 			path = Keyman4MacIM/KMInfoWindow;
@@ -1052,6 +1063,7 @@
 				29BFA770282948BF009FCCC3 /* pl */,
 				29B70A26283CB66B0086B580 /* es-419 */,
 				29B27FF529062FF60036917E /* nl */,
+				2901BA8D292332B3009903EC /* ff-NG */,
 			);
 			name = KMKeyboardHelpWindowController.xib;
 			path = Keyman4MacIM/KMKeyboardHelpWindow;
@@ -1071,6 +1083,7 @@
 				29BFA771282948C0009FCCC3 /* pl */,
 				29B70A27283CB66C0086B580 /* es-419 */,
 				29B27FF629062FF60036917E /* nl */,
+				2901BA8E292332B4009903EC /* ff-NG */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
