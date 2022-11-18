@@ -1508,6 +1508,8 @@ namespace com.keyman.osk {
         // There are plans to address related concerns through some of the later aspects of
         // the Web OSK-Core design.
         kbdObj.setSize(800, height); // Probably need something for width, too, rather than
+        kbdObj.fontSize = OSKView.defaultFontSize(device.coreSpec, height, false);
+
         // assuming 100%.
         kbdObj.refreshLayout(); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
@@ -1541,7 +1543,12 @@ namespace com.keyman.osk {
             const stylesheetParentElement = stylesheet.parentElement;
 
             // Don't reset top-level stuff; just the visible layer.
-            kbdObj.currentLayer.refreshLayout(kbdObj, kbdObj.height);
+            // kbdObj.currentLayer.refreshLayout(kbdObj, kbdObj.height);
+
+            // We refresh the full layout so that font-size is properly detected & stored
+            // on the documentation keyboard.
+            kbdObj.refreshLayout();
+            kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
 
             // We no longer need a reference to the constructing VisualKeyboard, so we should let
             // it clean up its <head> stylesheet links.  This detaches the stylesheet, though.

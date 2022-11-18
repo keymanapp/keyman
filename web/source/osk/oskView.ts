@@ -367,20 +367,20 @@ namespace com.keyman.osk {
     protected get parsedBaseFontSize(): ParsedLengthStyle {
       if(!this._baseFontSize) {
         let keymanweb = com.keyman.singleton;
-        this._baseFontSize = this.defaultFontSize(this.device, keymanweb.isEmbedded);
+        this._baseFontSize = OSKView.defaultFontSize(this.device, this.computedHeight, keymanweb.isEmbedded);
       }
 
       return this._baseFontSize;
     }
 
-    public defaultFontSize(device: utils.DeviceSpec, isEmbedded: boolean): ParsedLengthStyle {
+    public static defaultFontSize(device: utils.DeviceSpec, computedHeight: number, isEmbedded: boolean): ParsedLengthStyle {
       if(device.touchable) {
         const fontScale = device.formFactor == 'phone'
           ? 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2  // Combines original scaling factor with one previously applied to the layer group.
           : 2; // iPad or Android tablet
         return ParsedLengthStyle.special(fontScale, 'em');
       } else {
-        return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
+        return computedHeight ? ParsedLengthStyle.inPixels(computedHeight / 8) : undefined;
       }
     }
 
