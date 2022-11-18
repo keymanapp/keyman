@@ -23,7 +23,10 @@ namespace com.keyman.osk.embedded {
 
     private readonly vkbd: VisualKeyboard;
 
-    private inputTrap?: SingleInputCapture;
+    private docInputCatch?: SingleInputCapture;
+    private tipInputTrap?: SingleInputCapture;
+
+    private delayedDismissTimerHandle: number;
 
     constructor(vkbd: VisualKeyboard) {
       this.vkbd = vkbd;
@@ -102,6 +105,7 @@ namespace com.keyman.osk.embedded {
 
         this.tip.style.bottom = (rrow.height - 1) + 'px';
         this.tip.style.width = bubbleWidth + 'px';
+        this.tip.style.pointerEvents = on ? 'auto' : 'none';
 
         // Adjust shape if at edges
 
@@ -143,27 +147,48 @@ namespace com.keyman.osk.embedded {
       this.state = on;
     }
 
+    private clearCatchers() {
+      // disable input-capture system
+      if(this.docInputCatch) {
+        this.docInputCatch.cancel();
+        this.docInputCatch = null;
+      }
+
+      if(this.tipInputTrap) {
+        this.tipInputTrap.cancel();
+        this.tipInputTrap = null;
+      }
+    }
+
     public show(key: KeyElement, onDismiss?: () => void) {
       this._show(key, true);
 
+      const captureHandler = () => {
+        // Prevent duplicated dismissal calls that'd otherwise result when the tip itself receives a touch.
+        window.clearTimeout(this.delayedDismissTimerHandle);
+        this.hide(key);
+        onDismiss();
+      };
+
       if(onDismiss) {
         // enable input-capture system
-        this.inputTrap = new SingleInputCapture(() => {
-          this._show(key, false);
-          this.inputTrap = null;
-          onDismiss();
+        this.tipInputTrap = new SingleInputCapture(this.tip, true, captureHandler);
+        this.docInputCatch = new SingleInputCapture(document.body, false, () => {
+          this.delayedDismissTimerHandle = window.setTimeout(() => {
+            captureHandler();
+          }, 1); // we need to delay processing so that events directly on the tip get priority first!
         });
+      } else {
+        // disable any previously-set input-captures as the incoming
+        // (thus, most-recent) call didn't request one.
+        this.clearCatchers();
       }
     }
 
     public hide(key: KeyElement) {
       this._show(key, false);
 
-      // disable input-capture system
-      if(this.inputTrap) {
-        this.inputTrap.cancel();
-        this.inputTrap = null;
-      }
+      this.clearCatchers();
     }
   }
 }

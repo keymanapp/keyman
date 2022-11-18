@@ -1,6 +1,7 @@
 namespace com.keyman.osk.embedded {
   export class SingleInputCapture {
     private readonly handler: (event: TouchEvent) => boolean;
+    private readonly baseElement: HTMLElement;
 
     private static readonly eventOptionConfig: AddEventListenerOptions = {
       capture: true,
@@ -11,29 +12,33 @@ namespace com.keyman.osk.embedded {
 
     };
 
-    constructor(captureCallback: () => void) {
+    constructor(element: HTMLElement, preventPropagation: boolean, captureCallback: () => void) {
+      this.baseElement = element;
+
       this.handler = (event) => {
         captureCallback();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
+        if(preventPropagation) {
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+        }
 
         // Make extra-sure this is only called once; older versions of Chrome for Android don't support
         // the advanced options configuration that we prefer by default!
         this.cancel();
 
-        return true;
+        return !preventPropagation;
       }
 
       try {
         // Not available in Android Chrome until version 49.  `capture`: 52, `once`: 55, `passive`: 51.
-        document.body.addEventListener('touchstart', this.handler, SingleInputCapture.eventOptionConfig);
+        this.baseElement.addEventListener('touchstart', this.handler, SingleInputCapture.eventOptionConfig);
       } catch (err) {
-        document.body.addEventListener('touchstart', this.handler, true);
+        this.baseElement.addEventListener('touchstart', this.handler, false);
       }
     }
 
     cancel() {
-      document.body.removeEventListener('touchstart', this.handler, SingleInputCapture.eventOptionConfig.capture);
+      this.baseElement.removeEventListener('touchstart', this.handler, SingleInputCapture.eventOptionConfig.capture);
     }
   }
 }
