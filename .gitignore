@@ -172,3 +172,26 @@ Thumbs.db
 # Temporary file for logging scripts in xcode runs, see build-utils.sh for
 # details
 /xcodebuild-scripts.log
+
+#sabine
+/developer/src/kmcmpdll/XX.*
+/common/test/keyboards/invalid/source/CERR_4040_balochi_phonetic_SpecifiedErrorNotThrown.kmx
+/common/test/keyboards/invalid/source/CERR_4040_balochi_phonetic_WithNoErrorThrownButErrorSpecified.kmx
+/common/windows/cpp/include/keymanversion.in
+
+/core/tests/unit/kmx/batchcopy.bat
+/core/tests/unit/kmx/kmx_tests_50/
+/developer/kmcmpx_Sab/
+/developer/kmcomplib_m/
+/developer/kmcompx/include/meson.build.bak
+/developer/kmcompx/meson.build_root
+/developer/kmcompx/src/meson.build.bak
+/developer/kmcompx/tests/get_test_source_exclude.bat
+/developer/kmcompx/tests/meson.build.bak
+/developer/kmcompx_LIB/
+/developer/kmcompx_LIBPlay_1/
+/developer/src/kmcmplib/
+/developer/src/kmcmplibCopy/
+/developer/src/kmcomplibPlay_1/
+/developer/src/samples/Products/LaoUnicode/LaoUnicode/obj/
+.gitignore.bak

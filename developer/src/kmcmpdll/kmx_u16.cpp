@@ -9,42 +9,43 @@
 #include <codecvt>
 #include <stdarg.h>
 
-//std::wstring -> std::string
+//String <- wstring
 std::string string_from_wstring(std::wstring const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 	return converter.to_bytes(str);
 }
-//std::string -> std::wstring
+//wstring <- string
 std::wstring wstring_from_string(std::string const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 	return converter.from_bytes(str);
 }
 
-//std::string -> std::u16string
+//u16String <- string
 std::u16string u16string_from_string(std::string const str) {
   std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
   return converter.from_bytes(str);
 }
 
-//std::u16string -> std::string
+//string <- u16string
 std::string string_from_u16string(std::u16string const str) {
 	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
 	return converter.to_bytes(str);
 }
 
 // often used with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
-// const char16_t* -> std::u8string  -> std::wstring
+// UTF16 (= const char16_t*) -> UTF8 (= std::string)  -> UTF16 ( = std::wstring 16 bit)
 std::wstring u16fmt(const km_kbp_cp* str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 
-	std::string utf8str = convert.to_bytes(str);              // const char16_t*-> std::u8string
-  std::wstring wstr = convert_wstring.from_bytes(utf8str);  // std::u8string  -> std::wstring
+  // UTF16 (= const char16_t*) -> UTF8 (= std::string)  -> UTF16 ( =  std::wstring 16 bit)
+	std::string utf8str = convert.to_bytes(str);              // UTF16 (= const char16_t*) -> UTF8 (= std::string)
+  std::wstring wstr = convert_wstring.from_bytes(utf8str);  // UTF8 (= std::string)  -> UTF16 ( =  std::wstring 16 bit)
 	return wstr;
 }
 
- // const wchar_t* -> std::u8string  -> std::u16string ->  char16_t*
 void u16sprintf(km_kbp_cp* dst, const size_t sz, const wchar_t* fmt, ...) {
+ // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
 	wchar_t* wbuf = new wchar_t[sz];
 	va_list args;
 	va_start(args, fmt);
@@ -54,11 +55,15 @@ void u16sprintf(km_kbp_cp* dst, const size_t sz, const wchar_t* fmt, ...) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
 	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 
-	std::string utf8str = convert_wstring.to_bytes(wbuf);     // const wchar_t* -> std::u8string
-	std::u16string u16str = convert.from_bytes(utf8str);      // std::u8string  -> std::u16string
-  u16ncpy(dst, u16str.c_str(), sz);                         // std::u16string -> char16_t*
+   // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
+	std::string utf8str = convert_wstring.to_bytes(wbuf);     // UTF16 ( = const wchar_t*)  -> std::string
+	std::u16string u16str = convert.from_bytes(utf8str);      // std::string -> std::u16string
+  u16ncpy(dst, u16str.c_str(), sz);                         // std::u16string.c_str() -> char16_t*
 	delete[] wbuf;
 }
+
+
+
 
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
 {
