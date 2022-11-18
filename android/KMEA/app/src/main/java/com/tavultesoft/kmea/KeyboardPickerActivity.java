@@ -363,14 +363,13 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
       keyboardInfo.setNewKeyboard(true);
       KeyboardController.getInstance().add(keyboardInfo);
-      // Check if "other" keyboards of the same packageID and keyboardID need to update version
+      // Check if "other" keyboards of the same packageID and keyboardID also need to update version
       // Don't use forEach because we might be updating entries
       for (int i=0; i<KeyboardController.getInstance().get().size(); i++) {
         Keyboard otherKeyboard = KeyboardController.getInstance().getKeyboardInfo(i);
         if (otherKeyboard.getPackageID().equals(keyboardInfo.getPackageID())
             && otherKeyboard.getKeyboardID().equals(keyboardInfo.getKeyboardID())
-            && !otherKeyboard.getLanguageID().equals(keyboardInfo.getLanguageID())
-            && (FileUtils.compareVersions(otherKeyboard.getVersion(), keyboardInfo.getVersion()) == FileUtils.VERSION_LOWER)) {
+            && !otherKeyboard.getLanguageID().equals(keyboardInfo.getLanguageID())) {
           otherKeyboard.setVersion(keyboardInfo.getVersion());
           KeyboardController.getInstance().set(i, otherKeyboard);
         }
