@@ -1292,13 +1292,13 @@ final class KMKeyboard extends WebView {
       // there's no direct string encoder, we'll just wrap it in an object and unwrap it in JS.
       JSONObject textWrapper = new JSONObject();
       textWrapper.put("text", hintText);
+
+      // signalHelpBubbleDismissal - defined in android-host.js, gives a helpBubbleDismissed signal.
+      loadJavascript("keyman.showGlobeHint(" + textWrapper.toString() + ".text, signalHelpBubbleDismissal);");
     } catch(JSONException e) {
       KMLog.LogException(TAG, "", e);
       return;
     }
-
-    // signalHelpBubbleDismissal - defined in android-host.js, gives a helpBubbleDismissed signal.
-    loadJavascript("keyman.showGlobeHint(" + textWrapper.toString() + ".text, signalHelpBubbleDismissal);");
   }
 
   protected void showHelpBubbleAfterDelay(int milliseconds) {
