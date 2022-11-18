@@ -434,38 +434,8 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Switch to appropriate On Screen Keyboard/Help automatically when a keyboard is selected</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koTurnOnSurrogates" comment="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">Turn on Unicode supplementary character display (requires restart)</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koUnknownLanguage" comment="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">Turn on \'Unknown\' language</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Debugging</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koSwitchLanguageWithKeyboard" comment="Advanced options - switch Windows language when keyboard selected">Switch Windows language when a Keyman keyboard is selected</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.1.274.0 -->
-  <string name="koSwitchLanguageForAllApplications" comment="Advanced options - selected language applies to all applications">Select keyboard layout for all applications</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">Always elevate user permissions when running in Windows Vista</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->

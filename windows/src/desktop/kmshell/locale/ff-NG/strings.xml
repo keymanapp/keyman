@@ -324,27 +324,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koTurnOnSurrogates" comment="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">Kunnu alaama Unikod holla (ɗo mari haaje lora kunna)</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koUnknownLanguage" comment="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">Kunnu dow ʻƊemngalʻ ngam andaaka</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Debugin</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koSwitchLanguageWithKeyboard" comment="Advanced options - switch Windows language when keyboard selected">A` kunna ɗemngal komputa to kibod keyman man suptaama</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.1.274.0 -->
-  <string name="koSwitchLanguageForAllApplications" comment="Advanced options - selected language applies to all applications">A` supta mawnugo kibod dow manhajaji fuu</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">Koonday teddina daama naftirol to ɗo naftira bee man dow Windo Vista</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->

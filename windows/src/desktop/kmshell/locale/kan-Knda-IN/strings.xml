@@ -88,12 +88,7 @@
   <string name="koReleaseShiftKeysAfterKeyPress" comment="/FormatString: ">"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ"ಯಲ್ಲಿ ಯಾವುದೆ ಕೀಲಿಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿದ ನಂತರ Shift/Ctrl/Alt ಅನ್ನು ಬಿಡುಗಡೆ ಮಾಡು</string>
   <string name="koAutoOpenOSK" comment="/FormatString: ">ಹೊಸ ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿದಾಗ ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆಯನ್ನು ತೋರಿಸು</string>
   <string name="koAutoSwitchOSKPages" comment="/FormatString: ">ಬೇರೆ ಕೀಲಿಮಣೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿದಾಗ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸಹಾಯ ಅಥವಾ ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆಯನ್ನು ಬದಲಿಸು</string>
-  <string name="koTurnOnSurrogates" comment="/FormatString: ">ಯುನಿಕೋಡ್ ಪೂರಕ ಅಕ್ಷರ ಪ್ರದರ್ಶನವನ್ನು ಆನ್ ಮಾಡಿ (ರೀಸ್ಟಾರ್ಟ್ ಅಗತ್ಯವಿದೆ)</string>
-  <string name="koUnknownLanguage" comment="/FormatString: ">'ಅಜ್ಞಾತ' ಭಾಷೆಯನ್ನು ಆನ್ ಮಾಡಿ</string>
   <string name="koDebugging" comment="/FormatString: ">ಡೀಬಗ್ ಮಾಡುವುದು</string>
-  <string name="koSwitchLanguageWithKeyboard" comment="/FormatString: ">ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆ ಆಯ್ಕೆಮಾಡಿದಾಗ ವಿಂಡೋಸ್ ಭಾಷೆಯನ್ನು ಬದಲಿಸು</string>
-  <string name="koSwitchLanguageForAllApplications" comment="/FormatString: ">ಕೀಮ್ಯಾನ್‌ನಲ್ಲಿ ಅಥವಾ ಸಿಸ್ಟಮ್ ಟ್ರೇನಲ್ಲಿ ಆಯ್ಕೆ ಮಾಡಿದ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸ, ಎಲ್ಲಾ ಅಪ್ಲಿಕೇಶನ್‌ಗಳಿಗೂ ಅನ್ವಯಿಸುವಂತೆ ಮಾಡು</string>
-  <string name="koRunElevatedInVista" comment="/FormatString: ">ವಿಂಡೋಸ್ ವಿಸ್ಟಾದಲ್ಲಿ ಚಾಲನೆ ಮಾಡುವಾಗ ಯಾವಾಗಲೂ ಬಳಕೆದಾರರ ಅನುಮತಿಗಳನ್ನು ಎತ್ತಿ ಹಿಡಿಯಿರಿ</string>
   <string name="S_Button_UILanguage" comment="/PlainText: ">ಬಳಕೆದಾರ ಇಂಟರ್ಫೇಸ್ ಭಾಷೆ...</string>
   <string name="S_Button_BaseKeyboard" comment="/PlainText: ">ಮೂಲ(ಬೇಸ್) ಕೀಲಿಮಣೆ...</string>
   <string name="S_Hotkey_None" comment="/PlainText: ">(ಯಾವುದೂ ಇಲ್ಲ)</string>
@@ -200,8 +195,8 @@
   <string name="S_Button_ResetHints" comment="/PlainText: ">ಸುಳಿವುಗಳನ್ನು ಮರುಹೊಂದಿಸು</string>
   <string name="SKHintsReset" comment="/PlainText: ">ಎಲ್ಲಾ ಸುಳಿವು ಸಂದೇಶಗಳನ್ನು ಮರುಹೊಂದಿಸಲಾಗಿದೆ ಮತ್ತು ಮತ್ತೆ ಪ್ರದರ್ಶಿಸಲಾಗುತ್ತದೆ.</string>
   <string name="HintTitle_KH_EXITPRODUCT" comment="/HintTitle: ">ನಿರ್ಗಮನ Keyman?</string>
-  <string name="Hint_KH_EXITPRODUCT" comment="/Hint: ">ನೀವು Keyman ನಿರ್ಗಮಸಲು ಬಯಸುತ್ತೀರಾ? 
-ವಿಂಡೋಸ್ ಕೀಲಿಮಣೆಗಳ ಪಟ್ಟಿಯಲ್ಲಿ ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆಗಳನ್ನು ಸೇರಿಸಲಾಗಿದೆ. 
+  <string name="Hint_KH_EXITPRODUCT" comment="/Hint: ">ನೀವು Keyman ನಿರ್ಗಮಸಲು ಬಯಸುತ್ತೀರಾ?
+ವಿಂಡೋಸ್ ಕೀಲಿಮಣೆಗಳ ಪಟ್ಟಿಯಲ್ಲಿ ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆಗಳನ್ನು ಸೇರಿಸಲಾಗಿದೆ.
 ಆದರೆ ನೀವು Keyman ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸುವವರೆಗೆ ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆಗಳು ಕ್ರಿಯಾತ್ಮಕವಾಗಿರುವುದಿಲ್ಲ.</string>
   <string name="HintTitle_KH_CLOSEOSK" comment="/HintTitle: ">ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ ಮುಚ್ಚಲಾಗಿದೆ</string>
   <string name="Hint_KH_CLOSEOSK" comment="/Hint: ">ನೀವು "ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ"ಅನ್ನು ಮುಚ್ಚಿದ್ದೀರಿ. Keyman ಇನ್ನೂ ಚಾಲನೆಯಲ್ಲಿದೆ. Keyman ಚಿತ್ರ(ಐಕಾನ್) ಮೇಲೆ ನೀವು ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಮತ್ತು "ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ಆಯ್ಕೆಮಾಡುವ ಮೂಲಕ; "ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ"ಅನ್ನು ತೆರೆಯಬಹುದು.</string>
