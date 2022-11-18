@@ -164,3 +164,21 @@ def get_kmp_version_user(packageID):
         return user_kmp[packageID]['version']
     else:
         return None
+
+
+def get_kmp_version_shared(packageID):
+    """
+    Get version of the kmp for a kmp ID.
+    This only checks the shared area.
+
+    Args:
+        packageID (dict): kmp ID
+    Returns:
+        str: kmp version if kmp ID is installed
+        None: if not found
+    """
+    shared_kmp = get_installed_kmp(InstallLocation.Shared)
+    if packageID in shared_kmp:
+        return shared_kmp[packageID]['version']
+    else:
+        return None
