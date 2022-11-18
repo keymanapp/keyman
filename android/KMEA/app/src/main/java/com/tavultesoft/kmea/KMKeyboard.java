@@ -1277,8 +1277,6 @@ final class KMKeyboard extends WebView {
   }
 
   protected void showHelpBubble() {
-    String hintText = context.getString(R.string.help_bubble_text);
-
     if(keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       return; // Help bubble is disabled for System-wide keyboard
     }
@@ -1287,10 +1285,12 @@ final class KMKeyboard extends WebView {
       return; // Help bubble is disabled if globe key has no action
     }
 
-    // To ensure that the localized text is properly escaped, we'll use JSON utilities.  Since
-    // there's no direct string encoder, we'll just wrap it in an object and unwrap it in JS.
-    JSONObject textWrapper = new JSONObject();
     try {
+      String hintText = context.getString(R.string.help_bubble_text);
+
+      // To ensure that the localized text is properly escaped, we'll use JSON utilities.  Since
+      // there's no direct string encoder, we'll just wrap it in an object and unwrap it in JS.
+      JSONObject textWrapper = new JSONObject();
       textWrapper.put("text", hintText);
     } catch(JSONException e) {
       KMLog.LogException(TAG, "", e);
