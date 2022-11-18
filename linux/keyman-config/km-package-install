@@ -117,7 +117,7 @@ def main():
                                        keyman_cache_dir)
     from keyman_config.install_kmp import (InstallError, InstallStatus,
                                            install_kmp)
-    from keyman_config.list_installed_kmp import get_kmp_version
+    from keyman_config.list_installed_kmp import get_kmp_version_shared, get_kmp_version_user
 
     if os.path.exists(os.path.join(keyman_cache_dir(), 'kmpdirlist')):
         os.remove(os.path.join(keyman_cache_dir(), 'kmpdirlist'))
@@ -146,7 +146,16 @@ def main():
             sys.exit(2)
         try_install_kmp(args.file, "file " + args.file, args.bcp47, False, args.shared)
     elif args.package:
-        installed_kmp_v = get_kmp_version(args.package)
+        if args.shared:
+            if get_kmp_version_user(args.package):
+                print("km-package-install: Warning: Keyboard %s is also installed for the current user."
+                      % args.package)
+            installed_kmp_v = get_kmp_version_shared(args.package)
+        else:
+            if get_kmp_version_shared(args.package):
+                print("km-package-install: Warning: Keyboard %s is already installed in the shared area."
+                      % args.package)
+            installed_kmp_v = get_kmp_version_user(args.package)
         kbdata = get_keyboard_data(args.package)
         if not kbdata:
             logging.error("km-package-install: error: Could not download keyboard data for %s", args.package)
