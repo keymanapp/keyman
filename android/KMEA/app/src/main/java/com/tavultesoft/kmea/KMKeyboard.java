@@ -1313,9 +1313,9 @@ final class KMKeyboard extends WebView {
         if(delayedCheck) {
           if(getShouldShowHelpBubble()) {
             showHelpBubble();
-          } else {
-            showHelpBubble();
           }
+        } else {
+          showHelpBubble();
         }
       }
     }, milliseconds);
