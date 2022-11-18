@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 16.0.107 beta 2022-11-18
+
+* fix(windows): Download Keyboard blue footer (#7755)
+* fix(windows): tweak elevate icon in Config dialog (#7754)
+* fix(web): documentation keyboard style application + layout (#7694)
+* fix(windows): fix checkbox and hint help button styles (#7764)
+* chore(common): Update crowin strings for Fulfulde (#7715)
+* fix(linux): Fix installation if shared kbd already installed (#7730)
+* fix(linux): Fix a warning (#7746)
+* chore(common): Update crowdin strings for Simplified Chinese (#7713)
+
 ## 16.0.106 beta 2022-11-17
 
 * chore(windows): set platform core env explicitly (#7689)
