@@ -93,12 +93,6 @@ namespace com.keyman.osk.embedded {
         let oskBaseFontSize = new ParsedLengthStyle(keyman.osk.baseFontSize);
         let bubbleWidth = Math.ceil(xWidth * 3);
 
-        // The base OSK font-size is typically set in 'em', and we want to scale up
-        // the bubble accordingly for devices where it'd display too small otherwise.
-        if(!oskBaseFontSize.absolute) {
-          bubbleWidth *= oskBaseFontSize.val;
-        }
-
         bubbleStyle.bottom = Math.floor(keyman.osk.computedHeight - y) + 'px';
         // CSS already defines transform: translateX(-50%) - this centers the element.
         bubbleStyle.left = center + 'px';
