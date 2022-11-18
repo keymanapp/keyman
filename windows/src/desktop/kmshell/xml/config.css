@@ -1135,7 +1135,6 @@ th
 #keepintouch_content {
   height: 100%;
   overflow: hidden;
-  user-select: none;
 }
 
 #keepintouch_frame {
@@ -1143,6 +1142,7 @@ th
   width:100%;
   height:100%;
   border:none;
+  user-select: none;
 }
 
 /* QRCodes */
