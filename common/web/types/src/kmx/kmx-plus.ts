@@ -1,7 +1,7 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
-import { StringList } from './string-list.js';
+import { ListItem } from './string-list.js';
 
 import { KMXFile } from './kmx.js';
 
@@ -253,61 +253,69 @@ export class Layr extends Section {
 };
 
 export class Key2Keys {
-  vkey: number;
-  to: StrsItem;
   flags: number;
+  flicks: string; // for in-memory only
   id: StrsItem;
-  switch: StrsItem;
-  width: number;
-  longPress: StringList;
+  longPress: ListItem;
   longPressDefault: StrsItem;
-  multiTap: StringList;
-  flicks: number;
+  multiTap: ListItem;
+  switch: StrsItem;
+  to: StrsItem;
+  vkey: number;
+  width: number;
 };
 
 export class Key2Flicks {
-  count: number;
-  flick: number;
+  flicks: Key2Flick[] = [];
   id: StrsItem;
 };
 
 export class Key2Flick {
-  directions: StringList;
+  directions: ListItem;
   flags: number;
   to: StrsItem;
 };
 
 export class Key2 extends Section {
-  keyCount: number;
-  flicksCount: number;
-  flickCount: number;
   keys: Key2Keys[] = [];
   flicks: Key2Flicks[] = [];
-  flick: Key2Flick[] = [];
 };
 
 export class List extends Section {
-  // TODO-LDML
-};
-
-export class ListItem {
-  readonly value: string[];
-  constructor(value: string[]) {
-    this.value = value;
+  allocListFromSpaces(strs: Strs, s?: string): ListItem {
+    if(s === undefined || s === null) {
+      s = '';
+    }
+    // TODO-LDML: support unicode escaping etc
+    return this.allocList(strs, s.split(' '));
   }
+  allocList(strs: Strs, s?: string[]): ListItem {
+    let result = this.lists.find(item => item.isEqual(s));
+    if(result === undefined) {
+      result = new ListItem(strs, s);
+      this.lists.push(result);
+    }
+    return result;
+  }
+  constructor(strs: Strs) {
+    super();
+    this.lists.push(new ListItem(strs, [])); // C7043: null element string
+  }
+  lists: ListItem[] = [];
 };
 
+export { ListItem as ListItem };
 
 export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
     bksp?: Bksp;
     disp?: Disp;
-    elem?: Elem; // elem is ignored in-mxemory
+    elem?: Elem; // elem is ignored in-memory
     finl?: Finl;
     key2?: Key2;
     keys?: Keys;
     layr?: Layr;
-    list?: List;
+    list?: List; // list is ignored in-memory
     loca?: Loca;
     meta?: Meta;
     name?: Name;

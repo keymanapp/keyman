@@ -3,6 +3,7 @@ import CompilerCallbacks from './callbacks.js';
 import CompilerOptions from './compiler-options.js';
 import { DispCompiler } from './disp.js';
 import { KeysCompiler } from './keys.js';
+import { Key2Compiler } from './key2.js';
 import { LocaCompiler } from './loca.js';
 import { CompilerMessages } from './messages.js';
 import { MetaCompiler } from './meta.js';
@@ -17,6 +18,7 @@ import KMXPlusFile = KMXPlus.KMXPlusFile;
 const SECTION_COMPILERS = [
   BkspCompiler,
   DispCompiler,
+  Key2Compiler,
   KeysCompiler,
   FinlCompiler,
   LocaCompiler,
@@ -95,6 +97,7 @@ export default class Compiler {
     // These two sections are required by other sections
     kmx.kmxplus.strs = new KMXPlus.Strs();
     kmx.kmxplus.elem = new KMXPlus.Elem(kmx.kmxplus.strs);
+    kmx.kmxplus.list = new KMXPlus.List(kmx.kmxplus.strs);
 
     for(let section of sections) {
       if(!section.validate()) {

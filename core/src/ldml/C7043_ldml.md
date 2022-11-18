@@ -475,6 +475,7 @@ For each flicks in the flick list:
 
 Elements are ordered by the string id.
 
+If this section is present, it must have a 'flicks' in the list at position zero with count=0, index=0 and id=0 meaning 'no flicks'.
 #### `key2.flick` flick element subtable
 
 For each flick element:
@@ -484,6 +485,8 @@ For each flick element:
 | 0+|  32  | directions       | list: index into `list` section with direction list      |
 | 8+|  32  | flags            | int: per-key flags                                       |
 |12+|  32  | to               | str: output string                                       |
+
+If this section is present, it must have a 'flick element' at position zero with directions=0, flags=0, and to=0 meaning 'no flick'.
 
 There is not a 'null' flick element at the end of each list.
 
