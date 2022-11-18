@@ -26,6 +26,7 @@
   z-index: 10;
   outline: none;
  /* background: #79C3DA;*/
+  user-select: none;
 }
 #contentframe
 {
@@ -36,6 +37,7 @@
   height: 100%;
   overflow: hidden;
   border-bottom: 1px solid #6D6C6F;
+  user-select: none;
 }
 #footerframe
 {
@@ -46,11 +48,13 @@
   overflow: hidden;
   background: #79C3DA;
   padding: 10px 8px 8px 8px;
+  user-select: none;
 }
 
 .contentpage
 {
   display: none;
+  user-select: none;
 }
 
 .header
@@ -1131,6 +1135,7 @@ th
 #keepintouch_content {
   height: 100%;
   overflow: hidden;
+  user-select: none;
 }
 
 #keepintouch_frame {
