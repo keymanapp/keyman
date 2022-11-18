@@ -170,36 +170,6 @@ input[type='submit']:disabled, input[type='button']:disabled, button:disabled
   background: #80808f;
 }
 
-/* Microsoft Window UI style buttons */
-input.ms_button
-{
-  background: #e1e1e1;
-  border-radius: 0px;
-  color: #33333f;
-  border: none;
-  border: 1px solid;
-  border-color: #adadad;
-  vertical-align: top;
-  outline-color: #0078d7;
-  padding: 0px 15px 0px 15px;
-
-}
-
-input.ms_button:hover
-{
-  background: #e5f1fb ;
-  border-color: #0078d7;
-}
-
-input.ms_button:focus
-{
-  background: #e5f1fb ;
-  border-color: #0078d7;
-  border-radius: 0px;
-}
-
-/* Microsoft Window UI style */
-
 a.hotkey:link, a.hotkey:visited
 {
   color: black;
@@ -1235,7 +1205,7 @@ th
   padding-top: 10px;
   position: fixed;
   top: 45%;
-  left: 45%;
+  left: 49%;
 }
 
 .modify .keyboard_language {
