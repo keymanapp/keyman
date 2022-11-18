@@ -110,7 +110,16 @@ namespace com.keyman.osk {
     }
 
     set layerId(value: string) {
-      this._layerId = value;
+      const changedLayer = value != this._layerId;
+      if(!this.layerGroup.layers[value]) {
+        throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
+      } else {
+        this._layerId = value;
+      }
+
+      if(changedLayer) {
+        this.updateState();
+      }
     }
 
     get currentLayer(): OSKLayer {
@@ -207,7 +216,20 @@ namespace com.keyman.osk {
         this.inputEngine.registerEventHandlers();
       }
 
-      Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
+      Lkbd.classList.add(device.formFactor, 'kmw-osk-inner-frame');
+
+      // Tag the VisualKeyboard with a CSS class corresponding to its ID.
+      let kbdID: string = this.layoutKeyboard?.id.replace('Keyboard_','') ?? '';
+
+      const separatorIndex = kbdID.indexOf('::');
+      if(separatorIndex != -1) { // We used to also test if we were in embedded mode, but... whatever.
+        // De-namespaces the ID for use with CSS classes.
+        // Assumes that keyboard IDs may not contain the ':' symbol.
+        kbdID = kbdID.substring(separatorIndex + 2);
+      }
+
+      const kbdClassSuffix = 'kmw-keyboard-' + kbdID;
+      this.element.classList.add(kbdClassSuffix);
     }
 
     public get element(): HTMLDivElement {
@@ -1304,7 +1326,11 @@ namespace com.keyman.osk {
     private getVerticalLayerGroupPadding(): number {
       // For touch-based OSK layouts, kmwosk.css may include top & bottom padding on the layer-group element.
       const computedGroupStyle = getComputedStyle(this.layerGroup.element);
-      return parseInt(computedGroupStyle.paddingTop, 10) + parseInt(computedGroupStyle.paddingBottom, 10);
+
+      // parseInt('') => NaN, which is falsy; we want to fallback to zero.
+      let pt = parseInt(computedGroupStyle.paddingTop, 10) || 0;
+      let pb = parseInt(computedGroupStyle.paddingBottom, 10) || 0;
+      return pt + pb;
     }
 
     /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
@@ -1461,23 +1487,29 @@ namespace com.keyman.osk {
 
       let kbdObj = new VisualKeyboard(PKbd, device.coreSpec, device.coreSpec, true);
 
-      // The 'documentation' format uses the base element's child as the actual display base.
-      // Since there's no backing kmw-osk-frame, we do need the static-class kmw-osk-inner-frame
-      // to perform background styling on our behalf.  We'll trust the actual, live keyboard rules
-      // for the other elements, which in turn needs the non-static variant of the CSS rules.
-      kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className + ' ' + device.formFactor
-        + '-static ' + device.OS.toLowerCase();
+      kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className; // may contain multiple classes
+      kbdObj.layerGroup.element.classList.add(device.formFactor + '-static');
 
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
+
+      // Models CSS classes hosted on the OSKView in normal operation.  We can't do this on the main
+      // layer-group element because of the CSS rule structure for keyboard styling.
+      //
+      // For example, `.ios .kmw-keyboard-sil_cameroon_azerty` requires the element with the keyboard
+      // ID to be in a child of an element with the .ios class.
+      let classWrapper = document.createElement('div');
+      classWrapper.classList.add(device.OS.toLowerCase(), device.formFactor);
 
       // Select the layer to display, and adjust sizes
       if (layout != null) {
         kbdObj.layerId = layerId;
-        kbdObj.updateState();
+
         // This still feels fairly hacky... but something IS needed to constrain the height.
         // There are plans to address related concerns through some of the later aspects of
         // the Web OSK-Core design.
         kbdObj.setSize(800, height); // Probably need something for width, too, rather than
+        kbdObj.fontSize = OSKView.defaultFontSize(device.coreSpec, height, false);
+
         // assuming 100%.
         kbdObj.refreshLayout(); // Necessary for the row heights to be properly set!
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
@@ -1491,19 +1523,53 @@ namespace com.keyman.osk {
       kbd.style.border = '1px solid #ccc';
 
       // Once the element is inserted into the DOM, refresh the layout so that proper text scaling may apply.
-      const refreshInterval = window.setInterval(function () {
-        let computedStyle = getComputedStyle(kbd);
-        if (computedStyle.fontSize) {
-          if (kbd.style.fontSize) {
-            // Preserve the new setting (provided by CSS)
-            kbdObj.fontSize = new ParsedLengthStyle(kbd.style.fontSize);
-          }
-          kbdObj.refreshLayout();
-          window.clearInterval(refreshInterval);
-        }
-      }, 10);
+      const detectAndHandleInsertion = () => {
+        if(document.contains(kbd)) {
+          // Yay, insertion!
 
-      return kbd;
+          try {
+            // Are there font-size attributes we may safely adjust?  If so, do that!
+            if(getComputedStyle(kbd) && kbd.style.fontSize) {
+              kbdObj.fontSize = new ParsedLengthStyle(kbd.style.fontSize);
+            }
+
+            // Make sure that the stylesheet is attached, now that the keyboard-doc's been inserted.
+            // The stylesheet is currently built + constructed in the same code that attaches it to
+            // the page.
+            kbdObj.appendStyleSheet();
+
+            // Grab a reference to the stylesheet.
+            const stylesheet = kbdObj.styleSheet;
+            const stylesheetParentElement = stylesheet.parentElement;
+
+            // Don't reset top-level stuff; just the visible layer.
+            // kbdObj.currentLayer.refreshLayout(kbdObj, kbdObj.height);
+
+            // We refresh the full layout so that font-size is properly detected & stored
+            // on the documentation keyboard.
+            kbdObj.refreshLayout();
+            kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
+
+            // We no longer need a reference to the constructing VisualKeyboard, so we should let
+            // it clean up its <head> stylesheet links.  This detaches the stylesheet, though.
+            kbdObj.shutdown();
+
+            // Now that shutdown is done, re-attach the stylesheet.
+            stylesheetParentElement.appendChild(stylesheet);
+          } finally {
+            insertionObserver.disconnect();
+          }
+        }
+      }
+
+      const insertionObserver = new MutationObserver(detectAndHandleInsertion);
+      insertionObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+
+      classWrapper.append(kbd);
+      return classWrapper;
     }
 
     onHide() {
