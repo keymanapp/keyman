@@ -54,16 +54,6 @@
   </xsl:template>
 
   <xsl:template name="option">
-		<xsl:if test="id='koShowHints'">
-				<xsl:call-template name="button">
-          <xsl:with-param name="tabid">1</xsl:with-param>
-          <xsl:with-param name="onkeydown">return list_keydown(event,'_');</xsl:with-param>
-					<xsl:with-param name="caption">
-						<xsl:value-of select="$locale/string[@name='S_Button_ResetHints']"/>
-					</xsl:with-param>
-					<xsl:with-param name="command">keyman:options_resethints</xsl:with-param>
-				</xsl:call-template>
-		</xsl:if>
 		<div class="list_item" tagType="listitem" onmousedown="javascript:this.focus();">
       <xsl:if test="enabled">
         <xsl:attribute name="tabindex">1</xsl:attribute>
@@ -102,6 +92,17 @@
         </div>
       </div>
     </div>
+
+		<xsl:if test="id='koShowHints'">
+				<xsl:call-template name="button">
+          <xsl:with-param name="tabid">1</xsl:with-param>
+          <xsl:with-param name="onkeydown">return list_keydown(event,'_');</xsl:with-param>
+					<xsl:with-param name="caption">
+						<xsl:value-of select="$locale/string[@name='S_Button_ResetHints']"/>
+					</xsl:with-param>
+					<xsl:with-param name="command">keyman:options_resethints</xsl:with-param>
+				</xsl:call-template>
+		</xsl:if>
   </xsl:template>
 
   </xsl:stylesheet>
