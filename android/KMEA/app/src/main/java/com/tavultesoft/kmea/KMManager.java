@@ -298,7 +298,7 @@ public final class KMManager {
   protected static final String KMFilename_JSSentry = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
-  protected static final String KMFilename_KmwGlobeHintCss = "globeHint.css";
+  protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
 

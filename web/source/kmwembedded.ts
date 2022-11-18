@@ -156,7 +156,7 @@ namespace com.keyman.text {
     let util = keyman.util;
 
     // Install the globe-hint stylesheet.
-    util.linkStyleSheet(keymanweb.getStyleSheetPath('globeHint.css'));
+    util.linkStyleSheet(keymanweb.getStyleSheetPath('globe-hint.css'));
 
     // For now, the OSK will handle linking of the main OSK stylesheet separately.
   }
