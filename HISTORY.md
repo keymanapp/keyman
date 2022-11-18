@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.9 alpha 2022-11-18
+
+* chore: github issue template config.yml (#7751)
+* chore(windows): tweak sentry client for cross-module messages (#7752)
+* chore(android): Update Target SDK Version to 31 (#7761)
+
 ## 17.0.8 alpha 2022-11-17
 
 * fix(android): bump version_code major calculation (#7736)
