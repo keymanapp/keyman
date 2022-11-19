@@ -88,7 +88,9 @@ public class CheckInstallReferrer {
     if (installerInfo == null) {
       // Side loaded so just return
       return;
-    } else if (!installerInfo.equalsIgnoreCase(GOOGLE_PLAY)) {
+    }
+    
+    if (!installerInfo.equalsIgnoreCase(GOOGLE_PLAY)) {
       KMLog.LogInfo(TAG, "Skipping install referrer. Installed from " + installerInfo);
       return;
     }
