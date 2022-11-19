@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.RemoteException;
 import android.util.Log;
+import java.lang.IllegalArgumentException;
 
 import com.android.installreferrer.api.InstallReferrerClient;
 import com.android.installreferrer.api.InstallReferrerStateListener;
@@ -71,16 +72,16 @@ public class CheckInstallReferrer {
     }
 
     // Determine if Keyman installed from Google Play store
-    PackageManager packageManager = context.getPackageManager();
     String installerInfo = null;
     try {
+      PackageManager packageManager = context.getPackageManager();
       String packageName = context.getPackageName();
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         installerInfo = packageManager.getInstallSourceInfo(packageName).getInstallingPackageName();
       } else {
         installerInfo = packageManager.getInstallerPackageName(packageName);
       }
-    } catch (PackageManager.NameNotFoundException e) {
+    } catch (PackageManager.NameNotFoundException|IllegalArgumentException e) {
       KMLog.LogException(TAG, "Error determining packageManager", e);
       return;
     }
