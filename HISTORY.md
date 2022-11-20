@@ -173,7 +173,7 @@
 * fix(linux): Fix upload script (#7494)
 * docs(linux): Update sample vscode settings (#7491)
 * fix(android/engine): Dismiss key preview and subkeys on globe action (#7472)
-* refactor(linux): Cleanup whitespace (#7500)
+* chore(linux): Improve debug output (#7499)
 
 ## 16.0.84 alpha 2022-10-19
 
@@ -434,7 +434,7 @@
 
 ## 16.0.38 alpha 2022-07-26
 
-* feat(developer): add hint support to Touch Layout Editor and schema (#6936)
+* feat(developer): Rework Touch Layout Editor to support flick and multitap (#6884)
 * fix(developer): improve error message for multi-part key ids on <15.0 (#6989)
 * fix(android): rework longpress movement trigger (#6984)
 * chore(linux): Update changelog (#6988)
@@ -460,6 +460,7 @@
 ## 16.0.34 alpha 2022-07-15
 
 * fix(developer): set contextDevice in web debugger  ️ (#6906)
+* fix(web): postkeystroke processing should ignore key-event source ️ (#6901)
 * fix(web): layer-setting ops should not trigger for hardware keystroke processing  ️ (#6902)
 * fix(developer): kmdecomp virtual character key output (#6940)
 * fix(developer): crash on exit when checking for updates (#6941)
@@ -469,6 +470,7 @@
 ## 16.0.33 alpha 2022-07-14
 
 * feat(developer): Option to skip embed of compiler version (#6920)
+* feat(developer): compiler regression support (build kmcomp-$version.zip during release build) (#6918)
 * chore(ios): updates core internals for the in-app browser (#6838)
 
 ## 16.0.32 alpha 2022-07-13
@@ -499,6 +501,7 @@
 ## 16.0.26 alpha 2022-07-06
 
 * fix(developer): Show full version number (#6866)
+* chore(developer): rename developer/js to developer/kmlmc (#6630)
 * feat(developer): .keyman-touch-layout schema for 15.0 (#6856)
 * feat(developer): add flick and multitap to touch layout schema and doc (#6877)
 * fix(linux): Fix post-install script (#6894)
@@ -1396,6 +1399,7 @@
 ## 15.0.132 alpha 2021-10-15
 
 * feat(windows): manual keyboard caps tests (#5808)
+* feat(windows): Change caps to work with common core processor (#5803)
 
 ## 15.0.131 alpha 2021-10-13
 
@@ -1413,7 +1417,7 @@
 
 ## 15.0.128 alpha 2021-10-07
 
-* fix(ios): move sentry settings responsibility to build agent  ‍ ️ (#5805)
+* fix(ios): move sentry settings responsibility to build agent (#5805)
 
 ## 15.0.127 alpha 2021-10-06
 
@@ -1569,14 +1573,14 @@
 
 ## 15.0.101 alpha 2021-08-23
 
-* refactor(web): overhaul of OSK key layout calcs + styling, merges desktop & touch logic 📐 (#5462)
+* refactor(web): overhaul of OSK key layout calcs + styling, merges desktop & touch logic (#5462)
 * fix(android): keyboard's black bar bug (#5521)
-* refactor(web): prep work for mouse-based use of touch events 👆  (#5506)
-* refactor(web): mouse-based use of touch handlers 👆  (#5530)
+* refactor(web): prep work for mouse-based use of touch events (#5506)
+* refactor(web): mouse-based use of touch handlers (#5530)
 
 ## 15.0.100 alpha 2021-08-22
 
-* fix(linux): Fix uploading to launchpad for legacy projects 📦 (#5612)
+* fix(linux): Fix uploading to launchpad for legacy projects (#5612)
 
 ## 15.0.99 alpha 2021-08-21
 
@@ -1586,18 +1590,18 @@
 
 * fix(windows): Ignore Access Denied error creating task (#4365)
 * fix(web): Have util.wait check useAlerts option (#5538)
-* fix(developer): debugger cleanup 🐞 (#5588)
-* chore(developer): debug deadkey 1-based values 🐞 (#5592)
-* chore(developer): refactor forcekeyboard in debug 🐞 (#5593)
-* fix(developer): get Test Mode working again 🐞 (#5594)
-* chore(developer): hide debug events panel 🐞 (#5595)
+* fix(developer): debugger cleanup (#5588)
+* chore(developer): debug deadkey 1-based values (#5592)
+* chore(developer): refactor forcekeyboard in debug (#5593)
+* fix(developer): get Test Mode working again (#5594)
+* chore(developer): hide debug events panel (#5595)
 * fix(common/core/web): behavior with unmatched final group (#5553)
 * fix(ios): iOS 13 and 14 only - stuck settings toggles (#5548)
-* fix(linux): Fix lost context after pressing K_SHIFT 🚧 (#5601)
+* fix(linux): Fix lost context after pressing K_SHIFT (#5601)
 
 ## 15.0.97 alpha 2021-08-19
 
-* fix(linux): Fix uploading to launchpad 📦 (#5607)
+* fix(linux): Fix uploading to launchpad (#5607)
 
 ## 15.0.96 alpha 2021-08-19
 
