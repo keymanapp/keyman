@@ -193,7 +193,7 @@ export const fixupHistory = async (
   let pulls: PRInformation[] = [];
 
   try {
-    pulls = await reportHistory(octokit, base, force, true);
+    pulls = await reportHistory(octokit, base, force, false);
   } catch(e) {
     logWarning(String(e));
     return -1;
