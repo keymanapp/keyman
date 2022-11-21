@@ -28,6 +28,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.VersionUtils;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -292,10 +293,15 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   /**
    * Check shared preference to see if an update notification should be ignored.
    * The window is MONTHS_TO_IGNORE_NOTIFICATION from the last time the notification was ignored.
+   * For local and PR test builds, return false to make it easier to get updates for testing.
    * @param id keyboard or lexical model ID
    * @return true if the notification should be ignored
    */
   private boolean shouldIgnoreNotification(String id) {
+    if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild()) {
+      return false;
+    }
+
     SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     String ignoredNotificationsStr = prefs.getString(PREF_KEY_IGNORE_NOTIFICATIONS, null);
@@ -464,6 +470,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   }
 
   public boolean shouldCheckUpdate(Context aContext) {
+    if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild() || FORCE_RESOURCE_UPDATE) {
+      return true;
+    }
     boolean shouldCheckUpdate = false;
     if (lastUpdateCheck == null) {
       SharedPreferences prefs = aContext.getSharedPreferences(aContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
@@ -490,9 +499,6 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     } else {
       shouldCheckUpdate = true;
     }
-
-    if(FORCE_RESOURCE_UPDATE)
-      shouldCheckUpdate = true;
 
     return shouldCheckUpdate;
   }

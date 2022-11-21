@@ -20,6 +20,7 @@ import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.VersionUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,7 +81,8 @@ public class CloudRepository {
   }
 
   /**
-   * Get the validity for cached resources (lexical model cache and package-version)
+   * Get the validity for cached resources (lexical model cache and package-version).
+   * For local and PR test builds, invalidate cache to make keyboard updates easier
    * @param context the main activity of the application
    * @return boolean of the cache validity
    */
@@ -89,6 +91,10 @@ public class CloudRepository {
     boolean loadResourcesFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getResourcesCacheFile(context));
 
     boolean cacheValid = loadLexicalModelsFromCache && loadResourcesFromCache;
+
+    if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild()) {
+      return false;
+    }
     return cacheValid;
   }
 

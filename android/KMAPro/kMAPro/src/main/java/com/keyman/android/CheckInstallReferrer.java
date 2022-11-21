@@ -30,12 +30,12 @@ import java.lang.IllegalArgumentException;
 import com.android.installreferrer.api.InstallReferrerClient;
 import com.android.installreferrer.api.InstallReferrerStateListener;
 import com.android.installreferrer.api.ReferrerDetails;
-import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.MainActivity;
 import com.tavultesoft.kmapro.R;
 import com.tavultesoft.kmea.KmpInstallMode;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
+import com.tavultesoft.kmea.util.VersionUtils;
 
 public class CheckInstallReferrer {
   private static final String TAG = "CheckInstallReferrer";
@@ -66,8 +66,7 @@ public class CheckInstallReferrer {
     editor.commit();
 
     // local environment or test builds are nearly always side loaded
-    if (BuildConfig.VERSION_ENVIRONMENT.equalsIgnoreCase("local") ||
-        BuildConfig.VERSION_NAME.matches("^.*(-test-\\d+)$")) {
+    if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild()) {
       return;
     }
 
