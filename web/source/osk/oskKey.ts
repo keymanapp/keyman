@@ -408,7 +408,7 @@ namespace com.keyman.osk {
       if(spec['text'] == null || spec['text'] == '') {
         if(typeof spec['id'] == 'string') {
           // If the ID's Unicode-based, just use that code.
-          keyText = keyboards.ActiveKey.unicodeIDToText(spec['id']) || DEFAULT_BLANK;
+          keyText = keyboards.ActiveKey.unicodeIDToText(spec['id']);
         }
 
         keyText = keyText || DEFAULT_BLANK;

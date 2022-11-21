@@ -156,7 +156,9 @@ namespace com.keyman.keyboards {
       const codePoints = id.substring(2).split('_');
       for(let codePoint of codePoints) {
         const codePointValue = parseInt(codePoint, 16);
-        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) || isNaN(codePointValue)) {
+        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || 
+            ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) || 
+            isNaN(codePointValue)) {
           if(errorCallback) {
             errorCallback(codePoint);
           }
