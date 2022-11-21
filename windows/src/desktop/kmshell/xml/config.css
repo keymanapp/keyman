@@ -25,7 +25,7 @@
   overflow-y: hidden;
   z-index: 10;
   outline: none;
- /* background: #79C3DA;*/
+  user-select: none;
 }
 #contentframe
 {
@@ -36,6 +36,7 @@
   height: 100%;
   overflow: hidden;
   border-bottom: 1px solid #6D6C6F;
+  user-select: none;
 }
 #footerframe
 {
@@ -46,11 +47,13 @@
   overflow: hidden;
   background: #79C3DA;
   padding: 10px 8px 8px 8px;
+  user-select: none;
 }
 
 .contentpage
 {
   display: none;
+  user-select: none;
 }
 
 .header
@@ -1107,6 +1110,7 @@ th
   width:100%;
   height:100%;
   border:none;
+  user-select: none;
 }
 
 /* QRCodes */
