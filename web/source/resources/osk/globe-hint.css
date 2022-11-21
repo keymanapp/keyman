@@ -37,7 +37,6 @@ span.kmw-globehint-label {
   font-family:Verdana, Geneva, Tahoma, sans-serif;
 }
 
-/* create the 'arrow' part of the hint (TODO) */
 div.kmw-globehint-cap {
   position: absolute;
   left: 50%;
@@ -49,8 +48,6 @@ div.kmw-globehint-cap {
   border-top-color: rgba(0, 0, 0, 0.9);
   /* width managed by KMW code */
 }
-
-/*** TODO:  end of future separate-CSS-file extraction zone ***/
 
 div.android div.kmw-globehint-cap {
   border-top-color: rgba(48, 48, 48, .9);
