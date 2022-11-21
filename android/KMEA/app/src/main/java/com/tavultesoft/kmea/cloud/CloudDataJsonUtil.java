@@ -155,8 +155,9 @@ public class CloudDataJsonUtil {
               String version = kbd.getVersion();
               String updateKMP = kbd.getUpdateKMP();
               if (keyboardID.equalsIgnoreCase(kbd.getKeyboardID()) &&
-                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
-                  (updateKMP != null && !updateKMP.equalsIgnoreCase(cloudKMP))) {
+                  FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER &&
+                  updateKMP != null && 
+                  !updateKMP.equalsIgnoreCase(cloudKMP)) {
                 // Update keyboard with the latest KMP link
                 kbd.setUpdateKMP(cloudKMP);
                 KeyboardController.getInstance().add(kbd);
