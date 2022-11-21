@@ -153,6 +153,23 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           KMManager.KMDefault_LanguageID)) {
         KMManager.addKeyboard(this, KMManager.getDefaultKeyboard(getApplicationContext()));
       }
+
+      // Test code for PR: Do not merge to production
+      HashMap<String, String> kbdInfo = new HashMap<>();
+      KMManager.addKeyboard(this, new Keyboard(
+        "sil_cameroon_qwerty",
+        "sil_cameroon_qwerty",
+        "Cameroon QWERTY",
+        "aku-latn",
+        "Akum",
+        "6.0.4",
+        null,
+        null,
+        true,
+        "AndikaAfr-R.ttf",
+        "AndikaAfr-R.ttf"
+        ));
+
       SharedPreferences.Editor editor = prefs.edit();
       editor.putBoolean(defaultKeyboardInstalled, true);
       editor.commit();
