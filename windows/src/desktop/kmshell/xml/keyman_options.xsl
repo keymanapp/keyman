@@ -12,7 +12,7 @@
       <div id="options" class="options_list">
         <xsl:for-each select="//OptionGroups/OptionGroup">
 					<xsl:sort select="sort" />
-          <div class="options_list_header"><xsl:value-of select="$locale/string[@name=current()/name]"/></div>
+          <div class="options_list_header" tabindex="-1"><xsl:value-of select="$locale/string[@name=current()/name]"/></div>
           <xsl:for-each select="//KeymanOption[group=current()/name]">
             <xsl:if test="optiontype = 1 and id != 'koAutoSwitchOSKPages' and id != 'koSwitchLanguageForAllApplications'">
               <xsl:call-template name="option" />
@@ -22,7 +22,7 @@
             <div class="options_list_footer"></div>
           </xsl:if>
         </xsl:for-each>
-        <div class="options_list_footer"></div>
+        <div class="options_list_footer" tabindex="-1"></div>
 
         <div id='options_control'>
           <xsl:call-template name="button">
