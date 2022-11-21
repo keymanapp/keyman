@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.10 alpha 2022-11-21
+
+* fix: automatically merge changes to history back to master (#7777)
+* chore: cleanup history (#7776)
+
 ## 17.0.9 alpha 2022-11-18
 
 * chore: github issue template config.yml (#7751)
