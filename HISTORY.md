@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 16.0.108 beta 2022-11-21
+
+* fix(windows): backout ms button style for add lang pop up (#7765)
+* fix(android/app): Only check Install Referrer API with Play Store installs (#7766)
+* fix(windows): Fix text selectable configuration (#7758)
+* feat(common/models): directional quote insensitivity (#7767)
+* chore(windows): remove unused options from locales and UI (#7760)
+* fix(developer): cast to prevent ERangeError for failed http reqs in CEF (#7775)
+* chore(android): Update Target SDK Version to 31 (#7768)
+
+## 16.0.107 beta 2022-11-18
+
+* fix(windows): Download Keyboard blue footer (#7755)
+* fix(windows): tweak elevate icon in Config dialog (#7754)
+* fix(web): documentation keyboard style application + layout (#7694)
+* fix(windows): fix checkbox and hint help button styles (#7764)
+* chore(common): Update crowin strings for Fulfulde (#7715)
+* fix(linux): Fix installation if shared kbd already installed (#7730)
+* fix(linux): Fix a warning (#7746)
+* chore(common): Update crowdin strings for Simplified Chinese (#7713)
+
 ## 16.0.106 beta 2022-11-17
 
 * chore(windows): set platform core env explicitly (#7689)

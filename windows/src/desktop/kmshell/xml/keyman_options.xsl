@@ -14,7 +14,7 @@
 					<xsl:sort select="sort" />
           <div class="options_list_header" tabindex="-1"><xsl:value-of select="$locale/string[@name=current()/name]"/></div>
           <xsl:for-each select="//KeymanOption[group=current()/name]">
-            <xsl:if test="optiontype = 1 and id != 'koAutoSwitchOSKPages'">
+            <xsl:if test="optiontype = 1 and id != 'koAutoSwitchOSKPages' and id != 'koSwitchLanguageForAllApplications'">
               <xsl:call-template name="option" />
             </xsl:if>
           </xsl:for-each>

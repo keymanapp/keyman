@@ -56,9 +56,7 @@ namespace com.keyman.osk {
       const rs = this.element.style;
 
       const rowHeight = vkbd.internalHeight.scaledBy(this.heightFraction);
-      if(vkbd.usesFixedHeightScaling) {
-        rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
-      }
+      rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
 
       // Only used for fixed-height scales at present.
       const padRatio = 0.15;

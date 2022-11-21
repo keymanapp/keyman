@@ -125,7 +125,7 @@
 "kmp-error-missing-resource" = "此软件包不包含要求的键盘或字典。";
 
 /* Error installing a Keyman package with a version of Keyman that does not support it */
-"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+"kmp-error-unsupported-keyman-version" = "此软件包需要更新版本的Keyman。";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "此软件包未被正确构建-内容未知。";
