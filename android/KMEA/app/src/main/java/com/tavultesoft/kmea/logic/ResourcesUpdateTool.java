@@ -470,6 +470,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   }
 
   public boolean shouldCheckUpdate(Context aContext) {
+    // For local and PR test builds, invalidate cache to make keyboard updates easier
     if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild() || FORCE_RESOURCE_UPDATE) {
       return true;
     }

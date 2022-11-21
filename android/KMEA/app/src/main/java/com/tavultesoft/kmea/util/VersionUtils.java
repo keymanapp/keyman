@@ -16,6 +16,6 @@ public final class VersionUtils {
   }
 
   public static boolean isTestBuild() {
-    return BuildConfig.KEYMAN_ENGINE_VERSION_NAME.matches("^.*(-test-\\d+)$");
+    return BuildConfig.VERSION_ENVIRONMENT.equalsIgnoreCase("test");
   }
 }

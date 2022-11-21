@@ -62,6 +62,11 @@ public class CloudRepository {
     lastLoad = null;
   }
 
+  // For local and PR test builds, invalidate cache to make keyboard updates easier
+  private static boolean disableCacheForTesting() {
+    return DEBUG_DISABLE_CACHE || VersionUtils.isLocalBuild() || VersionUtils.isTestBuild();
+  }
+
   public interface UpdateHandler {
     void onUpdateDetection(List<Bundle> updateBundles);
   }
@@ -82,24 +87,25 @@ public class CloudRepository {
 
   /**
    * Get the validity for cached resources (lexical model cache and package-version).
-   * For local and PR test builds, invalidate cache to make keyboard updates easier
    * @param context the main activity of the application
    * @return boolean of the cache validity
    */
   public boolean getCacheValidity(@NonNull Context context) {
+    // For local and PR test builds, invalidate cache to make keyboard updates easier
+    if (disableCacheForTesting()) {
+      return false;
+    }
     boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
     boolean loadResourcesFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getResourcesCacheFile(context));
 
     boolean cacheValid = loadLexicalModelsFromCache && loadResourcesFromCache;
 
-    if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild()) {
-      return false;
-    }
     return cacheValid;
   }
 
   public boolean hasCache(Context context) {
-    if(DEBUG_DISABLE_CACHE) {
+    // For local and PR test builds, invalidate cache to make keyboard updates easier
+    if(disableCacheForTesting()) {
       return false;
     }
 
@@ -111,7 +117,8 @@ public class CloudRepository {
   }
 
   private boolean shouldUseMemCache(Context context) {
-    if(DEBUG_DISABLE_CACHE) {
+    // For local and PR test builds, invalidate cache to make keyboard updates easier
+    if(disableCacheForTesting()) {
       return false;
     }
 
@@ -129,7 +136,8 @@ public class CloudRepository {
   }
 
   private boolean shouldUseCache(Context context, File cacheFile) {
-    if(DEBUG_DISABLE_CACHE) {
+    // For local and PR test builds, invalidate cache to make keyboard updates easier
+    if(disableCacheForTesting()) {
       return false;
     }
 
