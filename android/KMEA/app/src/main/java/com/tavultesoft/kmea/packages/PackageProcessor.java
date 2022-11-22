@@ -420,6 +420,10 @@ public class PackageProcessor {
    * @return String of the package target ("keyboards", "lexicalModels", or "invalid")
    */
   public String getPackageTarget(JSONObject json) {
+    if (json == null) {
+      KMLog.LogError(TAG, "kmp.json is null");
+      return PP_TARGET_INVALID;
+    }
     try {
       if (json.has(PP_KEYBOARDS_KEY) && !json.has(PP_LEXICAL_MODELS_KEY)) {
         return PP_TARGET_KEYBOARDS;
