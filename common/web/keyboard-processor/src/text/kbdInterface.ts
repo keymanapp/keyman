@@ -530,6 +530,43 @@ namespace com.keyman.text {
     }
 
     /**
+     * Maps a KeyEvent's modifiers to their appropriate value for key-rule evaluation
+     * based on the rule's specified target modifier set.
+     *
+     * Mostly used to correct chiral OSK-keys targeting non-chiral rules.
+     * @param e The source KeyEvent
+     * @returns
+     */
+    private static matchModifiersToRuleChirality(eventModifiers: number, targetModifierMask: number): number {
+      const CHIRAL_ALT  = Codes.modifierCodes["LALT"]  | Codes.modifierCodes["RALT"];
+      const CHIRAL_CTRL = Codes.modifierCodes["LCTRL"] | Codes.modifierCodes["RCTRL"];
+
+      let modifiers = eventModifiers;
+
+      // If the target rule does not use chiral alt...
+      if(!(targetModifierMask & CHIRAL_ALT)) {
+        const altIntersection  = modifiers & CHIRAL_ALT;
+
+        if(altIntersection) {
+          // Undo the chiral part         and replace with non-chiral.
+          modifiers ^= altIntersection  | Codes.modifierCodes["ALT"];
+        }
+      }
+
+      // If the target rule does not use chiral ctrl...
+      if(!(targetModifierMask & CHIRAL_CTRL)) {
+        const ctrlIntersection = modifiers & CHIRAL_CTRL;
+
+        if(ctrlIntersection) {
+          // Undo the chiral part         and replace with non-chiral.
+          modifiers ^= ctrlIntersection | Codes.modifierCodes["CTRL"];
+        }
+      }
+
+      return modifiers;
+    }
+
+    /**
      * Function     keyMatch      KKM
      * Scope        Public
      * @param       {Object}      e           keystroke event
@@ -547,13 +584,15 @@ namespace com.keyman.text {
       var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
       var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
+      const eventModifiers = KeyboardInterface.matchModifiersToRuleChirality(e.Lmodifiers, Lruleshift);
+
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
       }
 
       if(e.LisVirtualKey || keyCode > 255) {
         if((Lruleshift & 0x4000) == 0x4000 || (keyCode > 255)) { // added keyCode test to support extended keys
-          retVal = ((Lrulekey == keyCode) && ((Lruleshift & modifierBitmask) == e.Lmodifiers)); //I3318, I3555
+          retVal = ((Lrulekey == keyCode) && ((Lruleshift & modifierBitmask) == eventModifiers)); //I3318, I3555
           retVal = retVal && this.stateMatch(e, Lruleshift & stateBitmask);
         }
       } else if((Lruleshift & 0x4000) == 0) {
@@ -882,7 +921,8 @@ namespace com.keyman.text {
      */
     setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       this.resetContextCache();
-      if(systemId == KeyboardInterface.TSS_LAYER) {
+      // Unique case:  we only allow set(&layer) ops from keyboard rules triggered by touch OSKs.
+      if(systemId == KeyboardInterface.TSS_LAYER && this.activeDevice.touchable) {
         // Denote the changed store as part of the matched rule's behavior.
         this.ruleBehavior.setStore[systemId] = strValue;
       } else {

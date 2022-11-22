@@ -430,7 +430,7 @@ namespace KMWRecorder {
 
   type TARGET = 'hardware'|'desktop'|'phone'|'tablet';
   type OS = 'windows'|'android'|'ios'|'macosx'|'linux';
-  type BROWSER = 'ie'|'chrome'|'firefox'|'safari'|'opera';  // ! no 'edge' detection in KMW!
+  type BROWSER = 'chrome'|'firefox'|'safari'|'opera';  // ! no 'edge' detection in KMW!
 
   export class Constraint {
     target: TARGET;

@@ -19,9 +19,9 @@
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">版本: %1$s</string>
   <!-- Context: Text label when old Chrome version installed -->
-  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">    Keyman requires Chrome version 57 or newer.</string>
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">    Keyman 要求使用 Chrome 版本57或更高版本。</string>
   <!-- Context: Button label -->
-  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">Update Chrome</string>
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">更新 Chrome</string>
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">开始在这里输入&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
@@ -59,27 +59,29 @@
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">安装键盘或词典</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="change_display_language" comment="Menu action to change interface language">Display language</string>
+  <string name="change_display_language" comment="Menu action to change interface language">显示语言</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Adjust keyboard height</string>
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">调整键盘高度</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Spacebar caption</string>
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">空格键提示</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
-  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Keyboard</string>
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">键盘</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
-  <string name="spacebar_caption_language" comment="Spacebar caption option - language">Language</string>
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">语言</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
-  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">Language + Keyboard</string>
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">语言+键盘</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
-  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">Blank</string>
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">空白</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
-  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">Show keyboard name on spacebar</string>
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">空格键上显示键盘名称</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
-  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">Show language name on spacebar</string>
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">空格键上显示语言名称</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
-  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Language and keyboard on spacebar</string>
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">空格键上显示语言和键盘</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
-  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Do not show caption on spacebar</string>
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">空格键无提示</string>
+  <!-- Context: Keyman Settings menu / Haptic feedback -->
+  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">总是显示标签</string>
   <!-- Context: Keyman Settings menu -->
@@ -111,11 +113,11 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">所有语言已被安装</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Drag the keyboard to resize the height</string>
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">拖动键盘以调整高度</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Rotate the device to adjust portrait and landscape</string>
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">旋转设备以调整横竖屏模式</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="reset_to_defaults" comment="Button to reset to default heights">Reset to Defaults</string>
+  <string name="reset_to_defaults" comment="Button to reset to default heights">重置为默认值</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">搜索或键入网址</string>
   <!-- Context: Keyman Web Browser -->
@@ -150,4 +152,8 @@
   <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">键盘包里没有需要安装的相关语言</string>
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">软件包中的元数据无效/丢失</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    Keyboard requires a newer version of Keyman</string>
+  <!-- Context: anywhere -->
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>

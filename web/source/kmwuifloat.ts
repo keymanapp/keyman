@@ -48,6 +48,7 @@ if(!window['keyman']['ui']['name']) {
     ui.updateTimer = null;  // prevent unnecessary list refreshing
     ui.floatRight = false;  // align left by default
     ui.initialized = false; // initialization flag
+    ui.initTimer = null;
 
     /**
      * Display or hide the OSK from the OSK icon link
@@ -71,15 +72,21 @@ if(!window['keyman']['ui']['name']) {
      * Scope        Private
      * Description  UI Initialization
      **/
-    ui['initialize'] = ui.Initialize = function()
-    {
-      // Must always initialize after keymanWeb itself, otherwise options are undefined
-      if(!keymanweb['initialized'])
-      {
-        window.setTimeout(ui.Initialize,50); return;
+    ui['initialize'] = ui.Initialize = function() {
+      if(ui.initTimer) {
+        window.clearTimeout(ui.initTimer);
+        ui.initTimer = null;
       }
 
-      if(ui.initialized || util['isTouchDevice']()) return;
+      // Must always initialize after keymanWeb itself, otherwise options are undefined
+      if(!keymanweb['initialized']) {
+        ui.initTimer = window.setTimeout(ui.Initialize, 50);
+        return;
+      }
+
+      if(ui.initialized || util['isTouchDevice']()) {
+        return;
+      }
 
       var imgPath=util['getOption']('resources')+"ui/float/";
 
@@ -497,9 +504,7 @@ if(!window['keyman']['ui']['name']) {
       {
         if(params['activeControl'] == null || params['activeControl']['_kmwAttachment'])
         {
-          /*if(keymanweb._IsIEEditableIframe(Ltarg))
-            Ltarg = Ltarg.ownerDocument.parentWindow.frameElement;
-          else if(keymanweb.domManager._IsMozillaEditableIframe(Ltarg))
+          /*if(keymanweb.domManager._IsEditableIframe(Ltarg))
             Ltarg = Ltarg.defaultView.frameElement;*/
           if(ui.floatRight)   // I1296
             ui.ShowInterface(util['getAbsoluteX'](params.target) + params.target.offsetWidth + 1, util['getAbsoluteY'](params.target) + 1);
@@ -542,9 +547,6 @@ if(!window['keyman']['ui']['name']) {
 
     if(window.addEventListener)
       window.addEventListener('resize', ui._Resize, false);
-
-    // Initialize after KMW is fully initialized, if UI already loaded
-    keymanweb['addEventListener']('loaduserinterface',ui.Initialize);
 
     // but also call initialization when script loaded, which is after KMW initialization for asynchronous script loading
     ui.Initialize();

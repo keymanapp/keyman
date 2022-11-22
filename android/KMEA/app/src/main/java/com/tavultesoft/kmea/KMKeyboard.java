@@ -80,18 +80,15 @@ final class KMKeyboard extends WebView {
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
-  private boolean ShouldShowHelpBubble = false;
   private boolean isChiral = false;
 
   private int currentKeyboardErrorReports = 0;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
-  protected boolean isHelpBubbleEnabled = true;
 
   public PopupWindow subKeysWindow = null;
   public PopupWindow keyPreviewWindow = null;
-  public PopupWindow helpBubbleWindow = null;
 
   public ArrayList<HashMap<String, String>> subKeysList = null;
   public String[] subKeysWindowPos = {"0", "0"};
@@ -169,7 +166,10 @@ final class KMKeyboard extends WebView {
           String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
           String sourceID = cm.sourceId().replaceAll(NAVIGATION_PATTERN, "$1$2");
           sendKMWError(cm.lineNumber(), sourceID, cm.message());
-          sendError(packageID, keyboardID, "");
+          // This duplicates the sendKMWError message, which itself duplicates the reporting now
+          // managed by sentry-manager on the js side in patch in #6890. It does not give us
+          // additional useful information. So we don't re-send to Sentry.
+          sendError(packageID, keyboardID, "", false);
         }
 
         return true;
@@ -185,9 +185,20 @@ final class KMKeyboard extends WebView {
       }
 
       @Override
+      public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        if(e2.getY() - e1.getY() < -5) { // TODO: get better threshold value from KMW
+          if (subKeysList != null && (subKeysWindow == null || !subKeysWindow.isShowing())) {
+            showSubKeys(context);
+            return true;
+          }
+        }
+        return false;
+      }
+
+      @Override
       public void onLongPress(MotionEvent event) {
         // This is also called for banner longpresses!  Need a way to differentiate the sources.
-        if (subKeysList != null && subKeysWindow != null && !subKeysWindow.isShowing()) {
+        if (subKeysList != null && (subKeysWindow == null || !subKeysWindow.isShowing())) {
           showSubKeys(context);
           return;
         } else if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
@@ -258,6 +269,9 @@ final class KMKeyboard extends WebView {
   }
 
   public void hideKeyboard() {
+    dismissKeyPreview(0);
+    dismissSubKeysWindow();
+
     String jsString = "hideKeyboard()";
     loadJavascript(jsString);
   }
@@ -283,17 +297,17 @@ final class KMKeyboard extends WebView {
     // Come to think of it, I wonder if suggestionMenuWindow was work being done to link with
     // suggestion banner longpresses - if so, it's not yet ready for proper integration...
     // and would need its own rung in this if-else ladder.
-    if (subKeysWindow != null && suggestionMenuWindow == null) {
+    if (subKeysWindow != null && suggestionMenuWindow == null && subKeysWindow.isShowing()) {
       // Passes KMKeyboard (subclass of WebView)'s touch events off to our subkey window
       // if active, allowing for smooth, integrated gesture control.
       subKeysWindow.getContentView().findViewById(R.id.grid).dispatchTouchEvent(event);
     } else {
-      //handleTouchEvent(event);
-      gestureDetector.onTouchEvent(event);
-      if (action == MotionEvent.ACTION_MOVE && subKeysList != null && subKeysWindow == null) {
-        // Display subkeys during move
-        showSubKeys(context);
+      if (event.getPointerCount() > 1) {
+        // Multiple points touch the screen at the same time, so dismiss any pending subkeys
+        dismissKeyPreview(0);
+        dismissSubKeysWindow();
       }
+      gestureDetector.onTouchEvent(event);
     }
 
     if (action == MotionEvent.ACTION_UP) {
@@ -312,28 +326,16 @@ final class KMKeyboard extends WebView {
     loadJavascript(KMString.format(
       "window.onload = function(){ setOskWidth(\"%d\");"+
       "setOskHeight(\"0\"); };", kbWidth));
-    if (ShouldShowHelpBubble) {
-      ShouldShowHelpBubble = false;
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          loadJavascript("showHelpBubble()");
-        }
-      }, 2000);
-    }
   }
 
   public void onPause() {
     dismissKeyPreview(0);
     dismissSubKeysWindow();
-    ShouldShowHelpBubble = dismissHelpBubble();
   }
 
   public void onDestroy() {
     dismissKeyPreview(0);
     dismissSubKeysWindow();
-    dismissHelpBubble();
   }
 
   public void onConfigurationChanged(Configuration newConfig) {
@@ -349,22 +351,14 @@ final class KMKeyboard extends WebView {
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
     loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
-
-    if (dismissHelpBubble()) {
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          loadJavascript("showHelpBubble()");
-        }
-      }, 2000);
-    }
   }
 
   public void dismissSubKeysWindow() {
     try {
-      if (subKeysWindow != null && subKeysWindow.isShowing())
+      if (subKeysWindow != null && subKeysWindow.isShowing()) {
         subKeysWindow.dismiss();
+      }
+      subKeysList = null;
     } catch (Exception e) {
       KMLog.LogException(TAG, "", e);
     }
@@ -440,7 +434,7 @@ final class KMKeyboard extends WebView {
     }
 
     if (!KMManager.shouldAllowSetKeyboard() || kbInfo == null) {
-      sendError(packageID, keyboardID, languageID);
+      sendError(packageID, keyboardID, languageID, true);
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       retVal = false;
     } else {
@@ -471,7 +465,7 @@ final class KMKeyboard extends WebView {
 
     if (!KMManager.shouldAllowSetKeyboard() ||
         (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
-      sendError(packageID, keyboardID, languageID);
+      sendError(packageID, keyboardID, languageID, true);
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
@@ -525,7 +519,7 @@ final class KMKeyboard extends WebView {
 
     if (!KMManager.shouldAllowSetKeyboard() ||
         (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
-      sendError(packageID, keyboardID, languageID);
+      sendError(packageID, keyboardID, languageID, true);
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
@@ -583,15 +577,6 @@ final class KMKeyboard extends WebView {
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
-    if (dismissHelpBubble()) {
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          loadJavascript("showHelpBubble()");
-        }
-      }, 2000);
-    }
 
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
 
@@ -610,14 +595,14 @@ final class KMKeyboard extends WebView {
 
   // Display localized Toast notification that keyboard selection failed, so loading default keyboard.
   // Also sends a message to Sentry (not localized)
-  private void sendError(String packageID, String keyboardID, String languageID) {
+  private void sendError(String packageID, String keyboardID, String languageID, boolean reportToSentry) {
     this.currentKeyboardErrorReports++;
 
     if(this.currentKeyboardErrorReports == 1) {
       BaseActivity.makeToast(context, R.string.fatal_keyboard_error_short, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
     }
 
-    if(this.currentKeyboardErrorReports < 5) {
+    if(this.currentKeyboardErrorReports < 5 && reportToSentry) {
       // We'll only report up to 5 errors in a given keyboard to avoid spamming
       // errors and using unnecessary bandwidth doing so
       // Don't use localized string R.string.fatal_keyboard_error msg for Sentry
@@ -685,7 +670,12 @@ final class KMKeyboard extends WebView {
         breadcrumb.setData("keyboardVersion", this.keyboardVersion);
       }
       Sentry.addBreadcrumb(breadcrumb);
-      Sentry.captureMessage(message, SentryLevel.ERROR);
+      //
+      // We now rely on Sentry within KMW to capture these errors
+      // We'll continue to capture breadcrumbs so we can associate
+      // java-side errors with javascript-side errors.
+      //Sentry.captureMessage(message, SentryLevel.ERROR);
+      //
     }
   }
 
@@ -1061,7 +1051,6 @@ final class KMKeyboard extends WebView {
       posY = kbPos[1] + (int) py;
     }
 
-    dismissHelpBubble();
     dismissKeyPreview(0);
     //subKeysWindow.setAnimationStyle(R.style.PopupAnim);
 
@@ -1225,7 +1214,6 @@ final class KMKeyboard extends WebView {
       posY = kbPos[1] + (int) (py * density - frame.height() + offset_y);
     }
 
-    dismissHelpBubble();
     //keyPreviewWindow.setAnimationStyle(R.style.KeyPreviewAnim);
     if (keyPreviewWindow != null) {
       keyPreviewWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
@@ -1246,118 +1234,6 @@ final class KMKeyboard extends WebView {
         }
       }
     }, delay);
-  }
-
-  @SuppressLint("InflateParams")
-  protected void showHelpBubble(Context context, float fx, float fy) {
-    if (!isHelpBubbleEnabled || keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      return; // Help bubble is disabled for System-wide keyboard
-    }
-
-    if (KMManager.getGlobeKeyAction(keyboardType) == KMManager.GlobeKeyAction.GLOBE_KEY_ACTION_DO_NOTHING) {
-      return; // Help bubble is disabled if globe key has no action
-    }
-
-    if (KMManager.getGlobeKeyAction(keyboardType) == KMManager.GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-      // Help bubble is disabled if next keyboard is not available for this action
-      List<Keyboard> keyboardsList = KMManager.getKeyboardsList(context);
-      if (keyboardsList == null) {
-        return;
-      }
-
-      if (keyboardsList.size() < 2) {
-        return;
-      }
-    }
-
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    DisplayMetrics metrics = new DisplayMetrics();
-    wm.getDefaultDisplay().getMetrics(metrics);
-    float density = metrics.density;
-
-    int x = (int) (fx * density);
-    int y = (int) (fy * density);
-
-    int kbWidth = getWidth();
-    float pvWidth = getResources().getDimension(R.dimen.help_bubble_width);
-    float pvHeight = getResources().getDimension(R.dimen.help_bubble_height);
-
-    float arrowWidth = getResources().getDimension(R.dimen.popup_arrow_width);
-    float arrowHeight = getResources().getDimension(R.dimen.popup_arrow_height);
-    float offset_x = getResources().getDimension(R.dimen.help_bubble_offset_x);
-    float offset_y = getResources().getDimension(R.dimen.help_bubble_offset_y);
-
-    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    View contentView = inflater.inflate(R.layout.help_bubble_layout, null, false);
-    KMPopoverView popoverView = (KMPopoverView) contentView.findViewById(R.id.kmPopoverView);
-    popoverView.setBackgroundColor(Color.rgb(253, 244, 196));
-    popoverView.setBackgroundColor2(Color.rgb(233, 224, 176));
-    popoverView.setBorderColor(Color.rgb(128, 64, 64));
-    popoverView.setSize((int) pvWidth, (int) pvHeight);
-    popoverView.setArrowSize(arrowWidth, arrowHeight);
-
-    float px = x + offset_x - pvWidth / 2.0f;
-    float py = y + offset_y - pvHeight;
-    if (px < 0) {
-      px = 0;
-    } else if ((px + pvWidth) > kbWidth) {
-      px = kbWidth - pvWidth;
-    }
-
-    if (px == 0) {
-      popoverView.setArrowPosX(x);
-    } else if (px == (kbWidth - pvWidth)) {
-      popoverView.setArrowPosX(x - px);
-    } else {
-      popoverView.setArrowPosX(pvWidth / 2.0f);
-    }
-
-    popoverView.redraw();
-
-    dismissHelpBubble();
-    helpBubbleWindow = new PopupWindow(contentView, (int) pvWidth, (int) pvHeight, false);
-    helpBubbleWindow.setTouchable(true);
-    helpBubbleWindow.setOnDismissListener(new OnDismissListener() {
-      @Override
-      public void onDismiss() {
-        helpBubbleWindow = null;
-      }
-    });
-
-    int posX, posY;
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      int[] kbPos = new int[2];
-      getLocationOnScreen(kbPos);
-      posX = (int) px;
-      posY = kbPos[1] + (int) py;
-    } else {
-      int[] kbPos = new int[2];
-      getLocationInWindow(kbPos);
-      posX = (int) px;
-      posY = kbPos[1] + (int) py;
-    }
-
-    helpBubbleWindow.setAnimationStyle(R.style.PopupAnim);
-    if (getWindowToken() != null) {
-      helpBubbleWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
-    } else {
-      helpBubbleWindow = null;
-      ShouldShowHelpBubble = true;
-    }
-  }
-
-  protected boolean dismissHelpBubble() {
-    try {
-      if (helpBubbleWindow != null && helpBubbleWindow.isShowing()) {
-        helpBubbleWindow.dismiss();
-        return true;
-      } else {
-        return false;
-      }
-    } catch (Exception e) {
-      KMLog.LogException(TAG, "", e);
-      return true;
-    }
   }
 
   public static void addOnKeyboardEventListener(OnKeyboardEventListener listener) {

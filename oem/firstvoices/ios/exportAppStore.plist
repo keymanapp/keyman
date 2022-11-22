@@ -19,6 +19,7 @@
     </dict>
     <key>signingStyle</key>
     <string>manual</string>
-
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
 </dict>
 </plist>

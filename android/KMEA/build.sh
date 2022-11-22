@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Build Keyman Engine Android using Keyman Web artifacts
 #
 # Abbreviations:
@@ -148,6 +148,9 @@ if [ "$DO_COPY" = true ]; then
     cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
 
     cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js
+
+    echo "Copying es6-shim polyfill"
+    cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
 
     if [ $? -ne 0 ]; then
         die "ERROR: copying artifacts failed"

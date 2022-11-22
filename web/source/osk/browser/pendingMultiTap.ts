@@ -18,6 +18,7 @@ namespace com.keyman.osk {
     private _state: PendingMultiTapState = PendingMultiTapState.Waiting;
     private _timeout: Promise<void>;
     private cancelDelayFactor = 125; // 125msec * count
+    private _destinationLayerId;
 
     public get timeout() {
       return this._timeout;
@@ -40,6 +41,12 @@ namespace com.keyman.osk {
       this.count = count;
       this.baseKey = baseKey;
 
+      this._destinationLayerId = 'caps';
+      let multitap = baseKey?.key?.spec?.['multitap'];
+      if(multitap?.length && multitap[0]?.['nextlayer']) {
+        this._destinationLayerId = multitap[0]['nextlayer'];
+      }
+
       const _this = this;
       this._timeout = new Promise<void>(function(resolve) {
         // If multiple taps do not occur within the timeout window,
@@ -52,8 +59,10 @@ namespace com.keyman.osk {
     }
 
     public static isValidTarget(vkbd: VisualKeyboard, baseKey: KeyElement) {
+      // Could use String.includes, but Chrome for Android must be version 41+.
+      // We support down to version 37.
       return (
-        baseKey['keyId'].includes('K_SHIFT') &&
+        baseKey['keyId'].indexOf('K_SHIFT') >= 0 &&
         vkbd.layerGroup.layers['caps'] &&
         !baseKey['subKeys'] &&
         vkbd.touchCount == 1
@@ -83,7 +92,7 @@ namespace com.keyman.osk {
     public incrementTouch(newKey: KeyElement): PendingMultiTapState {
       // TODO: support for any key
       if(this._state == PendingMultiTapState.Waiting) {
-        if(!newKey['keyId'].includes('K_SHIFT')) {
+        if(!newKey?.['keyId']?.includes('K_SHIFT')) {
           this.cancel();
         }
         else if(++this._touches == this.count) {
@@ -110,7 +119,7 @@ namespace com.keyman.osk {
       // TODO: generalize this with double-tap key properties in touch layout
       //       description.
       let e = text.KeyEvent.constructNullKeyEvent(this.vkbd.device);
-      e.kNextLayer = 'caps';
+      e.kNextLayer = this._destinationLayerId;
       e.Lstates = text.Codes.stateBitmasks.CAPS;
       e.LmodifierChange = true;
       PreProcessor.raiseKeyEvent(e);

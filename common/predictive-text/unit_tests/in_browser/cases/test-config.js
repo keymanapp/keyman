@@ -4,7 +4,7 @@ var assert = chai.assert;
  * A canary test to ensure our timeout configurations are working correctly for our CI.
  */
 describe('Test configuration', function () {
-  this.timeout(config.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   it('Correctly retrieves timeout configurations', function() {
     let configArgs = __karma__.config.args;
@@ -21,8 +21,8 @@ describe('Test configuration', function () {
     assert.isNotNull(timeoutConfig, "Cannot find the timeout configuration object.");
 
     // Now, were they processed correctly?
-    assert.isNotNull(window['config'], "Test global 'config' is missing!");
-    let timeouts = config.timeouts;
+    assert.isNotNull(window['testconfig'], "Test global 'config' is missing!");
+    let timeouts = window['testconfig'].timeouts;
     // May be longer if an extra factor (such as a mobile device multiplier) is added.
     assert.isAtLeast(timeouts.standard, timeoutConfig.standard, "Timeouts were not parsed properly for test configuration.");
   })

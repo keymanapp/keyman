@@ -439,12 +439,14 @@ namespace com.keyman.text {
         if(dn > this.caretIndex) {
           dn = this.caretIndex;
         }
+        this.adjustDeadkeys(-dn);
         this.text = this.text.kmwSubstr(0, this.caretIndex - dn) + this.getTextAfterCaret();
         this.caretIndex -= dn;
       }
     }
 
     insertTextBeforeCaret(s: string): void {
+      this.adjustDeadkeys(s._kmwLength());
       this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
       this.caretIndex += s.kmwLength();
     }

@@ -7,18 +7,18 @@
 //
 
 import KeymanEngine
-import UIKit
+import WebKit
 import Reachability
 
-class InfoViewController: UIViewController, UIWebViewDelegate {
-  @IBOutlet var webView: UIWebView!
+class InfoViewController: UIViewController, WKNavigationDelegate {
+  @IBOutlet var webView: WKWebView!
 
   @IBOutlet var backButton: UIBarButtonItem!
   @IBOutlet var forwardButton: UIBarButtonItem!
 
   private var networkReachable: Reachability?
 
-  private var exitClosure: (() -> Void)? = nil;
+  private var exitClosure: (() -> Void)?
 
   convenience init(exitClosure: @escaping () -> Void) {
     if UIDevice.current.userInterfaceIdiom == .phone {
@@ -33,7 +33,7 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   override func viewDidLoad() {
     super.viewDidLoad()
     extendedLayoutIncludesOpaqueBars = true
-    webView?.delegate = self
+    webView?.navigationDelegate = self
     NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged),
         name: NSNotification.Name.reachabilityChanged, object: nil)
 
@@ -54,17 +54,17 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     forwardButton.isEnabled = webView.canGoForward
   }
 
-  func webViewDidStartLoad(_ webView: UIWebView) {
+  func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = true
     updateButtons()
   }
 
-  func webViewDidFinishLoad(_ webView: UIWebView) {
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
   }
 
-  func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
+  func webView(_ webView: WKWebView, didFailNavigation error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
     log.debug(error)
@@ -91,7 +91,7 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
 
     // Safari won't recognize the contents without the .html ending.
     let filePath = offlineHelpBundle.path(forResource: "index", ofType: "html", inDirectory: nil)
-    webView.loadRequest(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
+    webView.load(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
 
   // Currently unused, as we haven't yet added a toggle to allow users to choose online
@@ -99,7 +99,7 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   private func loadFromServer() {
     let appVersion = Version.current.majorMinor
     let url =  "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)/"
-    webView.loadRequest(URLRequest(url: URL(string: url)!))
+    webView.load(URLRequest(url: URL(string: url)!))
     log.debug("Info page URL: \(url)")
   }
 }

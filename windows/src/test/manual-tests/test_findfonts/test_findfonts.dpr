@@ -5,7 +5,7 @@ program test_findfonts;
 uses
   SysUtils,
   testfindfonts_main in 'testfindfonts_main.pas',
-  findfonts in '..\..\global\delphi\general\findfonts.pas';
+  findfonts in '..\..\..\..\common\windows\delphi\general\findfonts.pas';
 
 begin
   Run;

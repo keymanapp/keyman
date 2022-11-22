@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$ref": "#/definitions/touch-layout",
+  "$comment": "Version: 16.0",
+  "description": "A Keyman Touch Layout file, per version 16.0, loose specification that allows for legacy such as numbers as strings",
+
+  "definitions": {
+    "touch-layout": {
+      "type": "object",
+      "properties": {
+        "tablet": { "$ref": "#/definitions/platform" },
+        "phone": { "$ref": "#/definitions/platform" },
+        "desktop": { "$ref": "#/definitions/platform" }
+      }
+    },
+
+    "platform": {
+      "type": "object",
+      "properties": {
+        "font": { "$ref": "#/definitions/font-spec" },
+        "fontsize": { "$ref": "#/definitions/fontsize-spec" },
+        "layer": { "$ref": "#/definitions/layers" },
+        "displayUnderlying": { "type": "boolean" },
+        "defaultHint": { "type": "string", "enum": ["none","dot","longpress","multitap","flick","flick-n","flick-ne","flick-e","flick-se","flick-s","flick-sw","flick-w","flick-nw"] }
+      },
+      "required": ["layer"],
+      "additionalProperties": false
+    },
+
+    "layers": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/layer" }
+    },
+
+    "layer": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/layer-id" },
+        "row": { "$ref": "#/definitions/rows" }
+      },
+      "required": ["id", "row"],
+      "additionalProperties": false
+    },
+
+    "layer-id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+
+    "rows": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/row" }
+    },
+
+    "row": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/row-id" },
+        "key": { "$ref": "#/definitions/keys" }
+      },
+      "required": ["id", "key"],
+      "additionalProperties": false
+    },
+
+    "row-id": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        }
+      ]
+    },
+
+    "keys": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/key" }
+    },
+
+    "key": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/key-id" },
+        "text": { "type": "string" },
+        "layer": { "$ref": "#/definitions/layer-id" },
+        "nextlayer": { "$ref": "#/definitions/layer-id" },
+        "fontsize": { "type": "string" },
+        "font": { "$ref": "#/definitions/font-spec" },
+        "dk": { "type": "string" },
+        "sp": { "$ref" : "#/definitions/numeric" },
+        "pad": { "$ref" : "#/definitions/numeric" },
+        "width": { "$ref" : "#/definitions/numeric" },
+        "sk": { "$ref": "#/definitions/subkeys" },
+        "flick": { "$ref": "#/definitions/flick" },
+        "multitap": { "$ref": "#/definitions/subkeys" },
+        "hint": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "numeric": {
+      "oneOf": [
+        { "type": "string", "pattern": "^[0-9]+(\\.?[0-9]*)$|^$" },
+        { "type": "number" }
+      ]
+    },
+
+    "key-id": {
+      "type": "string",
+      "pattern": "^[TKUtku]_[a-zA-Z0-9_]+$|^$"
+    },
+
+    "subkeys": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/subkey" }
+    },
+
+    "subkey": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/key-id" },
+        "text": { "type": "string" },
+        "layer": { "$ref": "#/definitions/layer-id" },
+        "nextlayer": { "$ref": "#/definitions/layer-id" },
+        "sp": { "$ref" : "#/definitions/numeric" },
+        "pad": { "$ref" : "#/definitions/numeric" },
+        "width": { "$ref" : "#/definitions/numeric" },
+        "fontsize": { "type": "string" },
+        "font": { "$ref": "#/definitions/font-spec" },
+        "dk": { "type": "string" }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+
+    "flick": {
+      "type": "object",
+      "patternProperties": {
+        "^(n|s|e|w|ne|nw|se|sw)$": { "$ref": "#/definitions/subkey" }
+      },
+      "additionalProperties": false
+    },
+
+    "font-spec": {
+      "type": "string"
+    },
+
+    "fontsize-spec": {
+      "type": "string"
+    }
+  }
+}

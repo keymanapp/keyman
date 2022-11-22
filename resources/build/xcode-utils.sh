@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script will automatically have Xcode's build environment (and variables),
 # so there's no need to do anything extra to fetch them.
@@ -46,12 +46,12 @@ function phaseSetBundleVersions() {
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
     . "$KEYMAN_ROOT/resources/build/build-utils.sh"
-    echo "UI build - fetching version from repository:"
+    echo "phaseSetBundleVersions: UI build - fetching version from repository:"
     echo "  Plain:  $VERSION"
     echo "  Tagged: $VERSION_WITH_TAG"
     echo "  Environment: $VERSION_ENVIRONMENT"
   else
-    echo "Command-line build - using provided version parameters"
+    echo "phaseSetBundleVersions: Command-line build - using provided version parameters"
   fi
 
   # Now, to set the build number (CFBundleVersion)
@@ -68,22 +68,26 @@ function phaseSetBundleVersions() {
   fi
 
   APP_PLIST="$TARGET_BUILD_DIR/$INFOPLIST_PATH"
-  echo "Setting $VERSION for $TARGET_BUILD_DIR/$INFOPLIST_PATH"
+  echo "phaseSetBundleVersions: Setting CFBundleVersion to $BUILD_NUMBER for $APP_PLIST"
   /usr/libexec/Plistbuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_PLIST"
+  echo "phaseSetBundleVersions: Setting CFBundleShortVersionString to $VERSION for $APP_PLIST"
   /usr/libexec/Plistbuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_PLIST"
+
+  /usr/libexec/Plistbuddy -c "Print" "$APP_PLIST"
 
   # Only attempt to write this when directly specified (otherwise, generates minor warning)
   if [ $TAGGED == true ]; then
-    echo "Setting $VERSION_WITH_TAG for tagged version"
+    echo "phaseSetBundleVersions: Setting KeymanVersionWithTag to $VERSION_WITH_TAG for tagged version for $APP_PLIST"
     /usr/libexec/Plistbuddy -c "Set :KeymanVersionWithTag $VERSION_WITH_TAG" "$APP_PLIST"
-    echo "Setting $VERSION_ENVIRONMENT"
+    echo "phaseSetBundleVersions: Setting KeymanVersionEnvironment to $VERSION_ENVIRONMENT for $APP_PLIST"
     /usr/libexec/Plistbuddy -c "Set :KeymanVersionEnvironment $VERSION_ENVIRONMENT" "$APP_PLIST"
   fi
 
   if [ -f "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist" ]; then
     DSYM_PLIST="${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist"
-    echo "Setting $VERSION for $DSYM_PLIST"
+    echo "phaseSetBundleVersions: Setting CFBundleVersion to $BUILD_NUMBER for $DSYM_PLIST"
     /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$DSYM_PLIST"
+    echo "phaseSetBundleVersions: Setting CFBundleShortVersionString to $VERSION for $DSYM_PLIST"
     /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$DSYM_PLIST"
   fi
 }
@@ -96,16 +100,16 @@ function setSettingsBundleVersion() {
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
     . "$KEYMAN_ROOT/resources/build/build-utils.sh"
-    echo "UI build - fetching version from repository:"
+    echo "setSettingsBundleVersion: UI build - fetching version from repository:"
     echo "  Plain:  $VERSION"
     echo "  Tagged: $VERSION_WITH_TAG"
     echo "  Environment: (not setting, assume 'local')"
   else
-    echo "Command-line build - using provided version parameters"
+    echo "setSettingsBundleVersion: Command-line build - using provided version parameters"
   fi
 
   SETTINGS_PLIST="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Settings.bundle/Root.plist"
-  echo "Setting $VERSION_WITH_TAG for $SETTINGS_PLIST"
+  echo "setSettingsBundleVersion: Setting $VERSION_WITH_TAG for $SETTINGS_PLIST"
   # We assume that entry 0 = the version "preference" entry.
   /usr/libexec/PlistBuddy -c "Set :PreferenceSpecifiers:0:DefaultValue $VERSION_WITH_TAG" "$SETTINGS_PLIST"
 }
@@ -151,3 +155,18 @@ function phaseSentryDsymUpload() {
     buildWarning "sentry-cli not installed; please run \"brew install getsentry/tools/sentry-cli\" to remedy"
   fi
 }
+
+#
+# All calls to xcode-utils.sh scripts will have their output redirected to
+# $KEYMAN_ROOT/xcodebuild-scripts.log. This will redirect both stdout and stderr
+# to this log file. See the corresponding printXCodeBuildScriptLogs function in
+# build-utils.sh to print the log after xcodebuild returns.
+#
+# More information in the build-utils.sh.
+#
+function logScriptsToFile() {
+  local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"
+  exec >> "$SCRIPT_LOG" 2>&1
+}
+
+logScriptsToFile

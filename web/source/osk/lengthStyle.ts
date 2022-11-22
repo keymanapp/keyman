@@ -11,7 +11,18 @@ namespace com.keyman.osk {
     public readonly special: 'em' | 'rem';
 
     public constructor(style: LengthStyle | string) {
-      Object.assign(this, typeof style == 'string' ? ParsedLengthStyle.parseLengthStyle(style) : style);
+      let parsed: LengthStyle = (typeof style == 'string') ? ParsedLengthStyle.parseLengthStyle(style) : style;
+
+      // While Object.assign would be nice (and previously, was used), it will break
+      // on old but still supported versions of Android if their Chrome isn't updated.
+      // Requires mobile Chrome 45+, but API 21 (5.0) launches with an older browser.
+
+      // Object.assign(this, parsed);
+      this.val = parsed.val;
+      this.absolute = parsed.absolute;
+      if(parsed.special) {
+        this.special = parsed.special;
+      }
     }
 
     public get styleString(): string {

@@ -12,6 +12,8 @@ class GnomeKeyboardsUtil():
     def read_input_sources(self):
         sources = self.input_sources.get('sources')
         logging.debug('read sources: %s', sources)
+        if sources is None:
+            return []
         return sources
 
     def write_input_sources(self, sources):

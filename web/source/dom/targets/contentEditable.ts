@@ -50,23 +50,11 @@ namespace com.keyman.dom.targets {
     hasSelection(): boolean {
       let Lsel = this.root.ownerDocument.getSelection();
 
-      // We can't completely rely on this.root.contains because of a weird IE 11 bug.
-      // Apparently, the text node contains the HTMLElement?
-      var ie11ParentChild = function(parent, child) {
-        // It's explicitly a text node bug.
-        if(child.nodeType != 3) {
-          return null;
-        }
-        let code = child.compareDocumentPosition(parent);
-
-        return (code & 8) != 0; // Yep.  Text node contains its root.
-      }
-
-      if(this.root != Lsel.anchorNode && !this.root.contains(Lsel.anchorNode) && !ie11ParentChild(this.root, Lsel.anchorNode)) {
+      if(this.root != Lsel.anchorNode && !this.root.contains(Lsel.anchorNode)) {
         return false;
       }
 
-      if(this.root != Lsel.focusNode && !this.root.contains(Lsel.focusNode) && !ie11ParentChild(this.root, Lsel.anchorNode)) {
+      if(this.root != Lsel.focusNode && !this.root.contains(Lsel.focusNode)) {
         return false;
       }
 
@@ -133,7 +121,7 @@ namespace com.keyman.dom.targets {
 
     getTextAfterCaret(): string {
       if(!this.hasSelection()) {
-        return;
+        return '';
       }
 
       let caret = this.getCarets().end;
@@ -193,9 +181,11 @@ namespace com.keyman.dom.targets {
 
       this.adjustDeadkeys(delta);
 
-      // While Selection.extend() is really nice for this, IE doesn't support it whatsoever.
-      // However, IE (11, at least) DOES support setting selections via ranges, so we can still
-      // manage the caret properly.
+      // While Selection.extend() was really nice for this, IE didn't support it whatsoever.
+      // However, IE (11, at least) DID support setting selections via ranges, so we were still
+      // able to manage the caret properly.
+      //
+      // TODO:  double-check that it was only IE-motivated, re-implement with Selection.extend().
       let finalCaret = this.root.ownerDocument.createRange();
 
       if(start.node.nodeType == 3) {

@@ -115,6 +115,7 @@ uses
   ErrorControlledRegistry,
   Keyman.System.KeymanSentryClient,
   KeymanPaths,
+  KeymanVersion,
   RegistryKeys,
   sysinfo_Util,
   UframeAttachedFiles,
@@ -233,7 +234,7 @@ end;
 
 procedure TfrmDiagnostics.mnuHelpAboutClick(Sender: TObject);
 begin
-  ShowMessage(SCaption + ' Version ' + GetVersionString);
+  ShowMessage(SCaption + ' Version ' + CKeymanVersionInfo.VersionWithTag);
 end;
 
 procedure TfrmDiagnostics.mnuExitClick(Sender: TObject);

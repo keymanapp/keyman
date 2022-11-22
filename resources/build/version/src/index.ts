@@ -44,6 +44,12 @@ const argv = yargs
     'github-pr': {
       description: 'Query GitHub for Pull Request number and title instead of parsing from merge commit comments (not valid with --from, --to)',
       type: 'boolean'
+    },
+
+    'write-github-comment': {
+      description: 'Write comment to GitHub PRs for all history entries; used only with "history" command',
+      type: 'boolean',
+      default: true
     }
   })
   .help()
@@ -101,7 +107,7 @@ const main = async (): Promise<void> => {
 
   if(argv._.includes('history')) {
     logInfo(`# Validating history for ${version}`);
-    changeCount = await fixupHistory(octokit, argv.base, argv.force);
+    changeCount = await fixupHistory(octokit, argv.base, argv.force, argv['write-github-comment']);
     logInfo(`# ${changeCount} change(s) found for ${version}\n`);
   }
 
@@ -109,7 +115,7 @@ const main = async (): Promise<void> => {
   // Increment the version number if history has any entries
   //
 
-  if(argv._.includes('version') && changeCount > 0) {
+  if(argv._.includes('version') && (changeCount > 0 || argv.force)) {
     logInfo(`# Incrementing version from ${version}`);
     const newVersion = incrementVersion();
     logInfo(`# New version is ${newVersion}\n`);

@@ -3,6 +3,7 @@
 import logging
 import os
 import threading
+
 from keyman_config import secure_lookup
 from keyman_config.install_kmp import process_keyboard_data
 from keyman_config.kmpmetadata import parsemetadata

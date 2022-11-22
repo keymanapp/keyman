@@ -304,17 +304,12 @@ namespace com.keyman {
 
     // Found a bit of magic formatting that allows dynamic return typing for a specified element tag!
     _CreateElement<E extends "p"|"style"|"script"|"div"|"canvas"|"span">(nodeName:E) {
-      var e = document.createElement<E>(nodeName);
+      const e = document.createElement<E>(nodeName);
 
-      // Make element unselectable (Internet Explorer)
-      if (typeof e.onselectstart != 'undefined') { //IE route
-        e.onselectstart=this.selectStartHandler; // Build 360
-      } else { // And for well-behaved browsers (may also work for IE9+, but not necessary)
-        e.style.MozUserSelect="none";
-        e.style.KhtmlUserSelect="none";
-        e.style.UserSelect="none";
-        e.style.WebkitUserSelect="none";
-      }
+      e.style.MozUserSelect="none";
+      e.style.KhtmlUserSelect="none";
+      e.style.UserSelect="none";
+      e.style.WebkitUserSelect="none";
       return e;
     }
 
@@ -326,29 +321,17 @@ namespace com.keyman {
      * Description  Closes mouse click event
      */
     _CancelMouse=function(e: MouseEvent) {
-      e = com.keyman.singleton._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       if(e && e.preventDefault) {
         e.preventDefault();
       }
       if(e) {
         e.cancelBubble=true;
-        e.returnValue=false;
       } // I2409 - Avoid focus loss for visual keyboard events
 
       return false;
     }
 
     createElement = this._CreateElement;
-
-    /**
-     * Function     getIEVersion
-     * Scope        Public
-     * @return      {number}
-     * Description  Return IE version number (or 999 if browser not IE)
-     */
-    getIEVersion() {
-      return Device._GetIEVersion();
-    }
 
     /**
      * Get browser-independent computed style value for element
@@ -469,7 +452,7 @@ namespace com.keyman {
           }
         }
         // Calculate viewport scale
-        return Math.round(100*screenWidth / window.innerWidth)/100;
+        return Math.round(100*screenWidth / viewportWidth)/100;
       } catch(ex) {
         return 1;
       }
@@ -693,66 +676,55 @@ namespace com.keyman {
       var s='@font-face {\nfont-family:'
         +fd['family']+';\nfont-style:normal;\nfont-weight:normal;\n';
 
-      // Detect if Internet Explorer and version if so
-      var IE=Device._GetIEVersion();
-
       // Build the font source string according to the browser,
       // but return without adding the style sheet if the required font type is unavailable
 
       // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
-      if(IE >= 9) {
-        if(this.device.OS == 'iOS') {
-          if(ttf != '') {
-            // Modify the url if required to prevent caching
-            ttf = this.unCached(ttf);
-            s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
-          } else {
-            return;
-          }
-        } else {
-          var s0 = [];
-
-          if(this.device.OS == 'Android') {
-            // Android 4.2 and 4.3 have bugs in their rendering for some scripts
-            // with embedded ttf or woff.  svg mostly works so is a better initial
-            // choice on the Android browser.
-            if(svg != '') {
-              s0.push("url('"+svg+"') format('svg')");
-            }
-
-            if(woff != '') {
-              s0.push("url('"+woff+"') format('woff')");
-            }
-
-            if(ttf != '') {
-              s0.push("url('"+ttf+"') format('truetype')");
-            }
-          } else {
-            if(woff != '') {
-              s0.push("url('"+woff+"') format('woff')");
-            }
-
-            if(ttf != '') {
-              s0.push("url('"+ttf+"') format('truetype')");
-            }
-
-            if(svg != '') {
-              s0.push("url('"+svg+"') format('svg')");
-            }
-          }
-
-          if(s0.length == 0) {
-            return;
-          }
-
-          s += 'src:'+s0.join(',')+';';
-        }
-      } else { // IE 6-8
-        if(eot != '') {
-          s=s+'src:url(\''+eot+'\');';
+      if(this.device.OS == 'iOS') {
+        if(ttf != '') {
+          // Modify the url if required to prevent caching
+          ttf = this.unCached(ttf);
+          s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
         } else {
           return;
         }
+      } else {
+        var s0 = [];
+
+        if(this.device.OS == 'Android') {
+          // Android 4.2 and 4.3 have bugs in their rendering for some scripts
+          // with embedded ttf or woff.  svg mostly works so is a better initial
+          // choice on the Android browser.
+          if(svg != '') {
+            s0.push("url('"+svg+"') format('svg')");
+          }
+
+          if(woff != '') {
+            s0.push("url('"+woff+"') format('woff')");
+          }
+
+          if(ttf != '') {
+            s0.push("url('"+ttf+"') format('truetype')");
+          }
+        } else {
+          if(woff != '') {
+            s0.push("url('"+woff+"') format('woff')");
+          }
+
+          if(ttf != '') {
+            s0.push("url('"+ttf+"') format('truetype')");
+          }
+
+          if(svg != '') {
+            s0.push("url('"+svg+"') format('svg')");
+          }
+        }
+
+        if(s0.length == 0) {
+          return;
+        }
+
+        s += 'src:'+s0.join(',')+';';
       }
 
       s=s+'\n}\n';
@@ -894,8 +866,6 @@ namespace com.keyman {
         return e.target;
       } else if (e.srcElement) {
         return e.srcElement;
-      } else if(window.event) { //IE 8 (and earlier)
-        return window.event.srcElement;
       } else {
         return null;            // shouldn't happen!
       }
@@ -910,8 +880,6 @@ namespace com.keyman {
     eventType(e: Event): string {
       if(e && e.type) {         // most browsers
         return e.type;
-      } else if(window.event) { // IE 8 (and earlier)
-        return window.event.type;
       } else {
         return '';              // shouldn't happen!
       }
@@ -1052,119 +1020,6 @@ namespace com.keyman {
       } else {
         return this.keyman.protocol+'//'+path;
       }
-    }
-
-    /**
-     * Return the appropriate test string for a given font
-     *
-     * TODO: Tidy up and remove arrays once 'sample' included in font metadata
-     *
-     *  @param  {Object}    fd    font meta-data object
-     *  @return {string}          string to compare width
-     *
-     */
-    testString(fd): string {
-      var fontName=fd['family'],
-      i,s='BESbswy';
-
-      if('sample' in fd && typeof(fd['sample']) == 'string') {
-        return s+fd['sample'];
-      }
-
-      var f=['TamilWeb','TibetanWeb','LatinWeb','CherokeeWeb',
-            'EgyptianWeb','SinhalaWeb','KhmerWeb','ArabicWeb',
-            'BurmeseWeb','LaoWeb','OriyaWeb','GeezWeb'],
-          t=['\u0BBE\u0BF5','\u0F7F\u0FD0','\u02B0\u02A4','\u13D0\u13C9',
-            '\uA723\uF7D3','\u0DD8\u0DA3','\u17D6\u178E','\u0639\u06B3',
-            '\u1038\u1024','\u0EC0\u0EDD','\u0B03\u0B06','\u1361\u132C'];
-
-      for(i=0; i<f.length; i++) {
-        if(fontName == f[i]) {
-          return s+t[i];
-        }
-      }
-
-      return s;
-    }
-
-    /**
-     * Test if a font is installed (or available) on the target platform
-     *
-     * @param       {Object}        fd    font structure
-     * @return      {boolean}             true if font available
-     */
-    checkFont(fd): boolean {
-      var fontReady=false, fontName=fd['family'];
-
-      // Create an absolute positioned div and two paragraph elements with spans for the test string.
-      // The paragraph elements ensure that the spans are measured from the same point, otherwise
-      // pixel rounding can result in different widths for the same string and styles.
-      // Using a separate invisible DIV is more reliable than other positioning.
-      var d=document.createElement('DIV'), ds=d.style,
-          p1=document.createElement('P'),
-          p2=document.createElement('P'),
-          t1=document.createElement('SPAN'), s1=t1.style,
-          t2=document.createElement('SPAN'), s2=t2.style;
-
-      ds.position='absolute';
-      ds.top='10px';
-      ds.left='10px';
-      ds.visibility='hidden';
-      document.body.appendChild(d);
-      d.appendChild(p1);
-      d.appendChild(p2);
-      p1.appendChild(t1);
-      p2.appendChild(t2);
-
-      // Firefox fails without the !important prefix on the fallback font,
-      // apparently applying the same font to both elements.
-      // But it also fails to distinguish the two if !important is added to the test font!
-      // *** TODO: See if still true after changes Dec 2013 ***
-      // Must apply !important tag to font-family, but must apply it to the CSS style, not the JS object member
-      // c.f. http://stackoverflow.com/questions/462537/overriding-important-style-using-javascript
-      t1.setAttribute('style','font-family:monospace !important');
-      s2.fontFamily=fontName+',monospace';
-      s1.fontSize=s2.fontSize='24px';      // Not too large, to avoid wrapping or overflow
-
-      // Include narrow and wide characters from each unique script
-      t1.innerHTML=t2.innerHTML=this.testString(fd);
-
-      // Compare the actual width of each span. Checking monospace, serif,
-      // and sans-serif helps to avoid falsely reporting the font as ready
-      // The width must be different for all three tests.
-      if(t1.offsetWidth != t2.offsetWidth) {
-        t1.setAttribute('style','font-family:sans-serif !important');
-        s2.fontFamily=fontName+',sans-serif';
-        if(t1.offsetWidth != t2.offsetWidth) {
-          t1.setAttribute('style','font-family:serif !important');
-          s2.fontFamily=fontName+',serif';
-        }
-      }
-
-      fontReady=(t1.offsetWidth != t2.offsetWidth);
-
-      // Delete test elements
-      p1.removeChild(t1);
-      p2.removeChild(t2);
-      d.removeChild(p1);
-      d.removeChild(p2);
-      document.body.removeChild(d);
-
-      return fontReady;
-    }
-
-    /**
-     * Check a font descriptor for font availability, returning true if undefined
-     *
-     *  @param  {Object}  fd  font descriptor member of keyboard stub
-     *  @return {boolean}
-     **/
-    checkFontDescriptor(fd): boolean {
-      if(typeof(fd) == 'undefined' || typeof(fd['family']) != 'string') {
-        return true;
-      }
-
-      return this.checkFont(fd);
     }
   }
 }

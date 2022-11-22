@@ -399,7 +399,7 @@ namespace com.keyman.osk {
      * @param    outputTarget
      * @returns  true
      */
-    suggestionApplied(outputTarget: text.OutputTarget): boolean {
+    suggestionApplied: (outputTarget: text.OutputTarget) => boolean = function(this: SuggestionBanner, outputTarget: text.OutputTarget) {
       const keyman = com.keyman.singleton;
       // Tell the keyboard that the current layer has not changed
       keyman.core.keyboardProcessor.newLayerStore.set('');
@@ -411,7 +411,7 @@ namespace com.keyman.osk {
         ?.finalize(keyman.core.keyboardProcessor, outputTarget, true);
 
       return true;
-    };
+    }.bind(this);
 
     postConfigure() {
       let keyman = com.keyman.singleton;
@@ -427,6 +427,7 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.removeListener('suggestionsready', manager.updateSuggestions);
       keyman.core.languageProcessor.removeListener('tryaccept', manager.tryAccept);
       keyman.core.languageProcessor.removeListener('tryrevert', manager.tryRevert);
+      keyman.core.languageProcessor.removeListener('suggestionapplied', this.suggestionApplied);
     }
   }
 
@@ -559,13 +560,17 @@ namespace com.keyman.osk {
     private doAccept(suggestion: BannerSuggestion) {
       let _this = this;
 
+      // Selecting a suggestion or a reversion should both clear selection
+      // and clear the reversion-displaying state of the banner.
+      this.selected = null;
+      this.doRevert = false;
+
       this.revertAcceptancePromise = suggestion.apply();
       if(!this.revertAcceptancePromise) {
         // We get here either if suggestion acceptance fails or if it was a reversion.
         if(suggestion.suggestion && suggestion.suggestion.tag == 'revert') {
           // Reversion state management
           this.recentAccept = false;
-          this.doRevert = false;
           this.recentRevert = true;
 
           this.doUpdate();
@@ -580,9 +585,7 @@ namespace com.keyman.osk {
         }
       });
 
-      this.selected = null;
       this.recentAccept = true;
-      this.doRevert = false;
       this.recentRevert = false;
 
       this.swallowPrediction = true;

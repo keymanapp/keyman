@@ -62,11 +62,11 @@ if(typeof MockTests == 'undefined') {
 }
 
 describe('OutputTarget Mocking', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   before(function() {
     fixture.setBase('fixtures');
-    
+
     // Make sure the basic SMP extension hooks exist to prevent errors later.
     String.kmwEnableSupplementaryPlane(true);
   });
@@ -94,7 +94,7 @@ describe('OutputTarget Mocking', function() {
 
       it('copies an existing OutputTarget without a text selection', function() {
         var base = MockTests.setupBase(4);
-        
+
         var mock = com.keyman.text.Mock.from(base);
         assert.equal(mock.getText(), MockTests.Apple.mixed);
         assert.deepEqual(mock.deadkeys(), base.deadkeys());
@@ -102,7 +102,7 @@ describe('OutputTarget Mocking', function() {
 
       it('copies an existing OutputTarget with a text selection', function() {
         var base = MockTests.setupBase(4, 5);
-        
+
         var mock = com.keyman.text.Mock.from(base);
         // The selection should appear to be automatically deleted, as any text mutation
         // by KMW would automatically erase the text anyway.

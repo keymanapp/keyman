@@ -22,6 +22,7 @@
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
 #import "KMKeyboardInfo.h"
+#import "PrivacyConsent.h"
 @import Sentry;
 
 /** NSUserDefaults keys */
@@ -87,38 +88,48 @@ NSString* _keymanDataPath = nil;
 #else
         _debugMode = self.useVerboseLogging;
 #endif
-        [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
-                                                           andSelector:@selector(handleURLEvent:withReplyEvent:)
-                                                         forEventClass:kInternetEventClass
-                                                            andEventID:kAEGetURL];
 
-        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
-                                                 kCGHeadInsertEventTap,
-                                                 kCGEventTapOptionListenOnly,
-                                                 CGEventMaskBit(kCGEventFlagsChanged) |
-                                                 CGEventMaskBit(kCGEventLeftMouseDown) |
-                                                 CGEventMaskBit(kCGEventLeftMouseUp) |
-                                                 CGEventMaskBit(kCGEventKeyDown),
-                                                 (CGEventTapCallBack)eventTapFunction,
-                                                 nil);
-
-        if (!self.lowLevelEventTap) {
-            NSLog(@"Can't tap into low level events!");
-        }
-        else {
-            CFRelease(self.lowLevelEventTap);
-        }
-
-        self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
-
-        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-
-        if (self.runLoopEventSrc && runLoop) {
-            CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
-        }
+      // first notify user and request access to Accessibility/PostEvent permissions
+      // pass block as completion handler to complete init with initCompletion
+      [PrivacyConsent.shared requestPrivacyAccess:^void (void){
+        [self initCompletion];
+      }];
     }
 
     return self;
+}
+
+- (void)initCompletion {
+  NSLog(@"initCompletionHandler method invoked");
+  [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
+                                                     andSelector:@selector(handleURLEvent:withReplyEvent:)
+                                                   forEventClass:kInternetEventClass
+                                                      andEventID:kAEGetURL];
+
+  self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
+                                           kCGHeadInsertEventTap,
+                                           kCGEventTapOptionListenOnly,
+                                           CGEventMaskBit(kCGEventFlagsChanged) |
+                                           CGEventMaskBit(kCGEventLeftMouseDown) |
+                                           CGEventMaskBit(kCGEventLeftMouseUp) |
+                                           CGEventMaskBit(kCGEventKeyDown),
+                                           (CGEventTapCallBack)eventTapFunction,
+                                           nil);
+
+  if (!self.lowLevelEventTap) {
+      NSLog(@"Can't tap into low level events!");
+  }
+  else {
+      CFRelease(self.lowLevelEventTap);
+  }
+
+  self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
+
+  CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+
+  if (self.runLoopEventSrc && runLoop) {
+      CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
+  }
 }
 
 - (KeymanVersionInfo)versionInfo {
@@ -130,16 +141,16 @@ NSString* _keymanDataPath = nil;
     result.tier = [keymanInfo objectForKey:@"Tier"];
     result.versionRelease = [keymanInfo objectForKey:@"VersionRelease"];
     result.versionWithTag = [keymanInfo objectForKey:@"VersionWithTag"];
-    if([result.tier isEqualToString:@"stable"]) {
-        result.keymanCom = @"keyman.com";
-        result.helpKeymanCom = @"help.keyman.com";
-        result.apiKeymanCom = @"api.keyman.com";
-    }
+    // if([result.tier isEqualToString:@"stable"]) {  // #7227 disabling:
+    result.keymanCom = @"keyman.com";
+    result.helpKeymanCom = @"help.keyman.com";
+    result.apiKeymanCom = @"api.keyman.com";
+    /*}
     else {
         result.keymanCom = @"keyman-staging.com";
         result.helpKeymanCom = @"help.keyman-staging.com";
         result.apiKeymanCom = @"api.keyman-staging.com";
-    }
+    }*/
     return result;
 }
 
@@ -632,11 +643,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
     NSString *path = [[self keymanDataPath] stringByAppendingPathComponent:packageFolder];
     KMPackageInfo *packageInfo = [self.packageReader loadPackageInfo:path];
-  
+
     if (packageInfo) {
         packageName = packageInfo.packageName;
     }
-  
+
     return packageName;
 }
 
@@ -1149,7 +1160,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self.receivedData writeToFile:filePath atomically:YES];
     [self unzipFile:filePath];
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-    
+
     [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-download-complete", nil)];
     NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
     [button setTitle:NSLocalizedString(@"button-download-complete", nil)];

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Setup git hooks in this or all repositories.
@@ -30,10 +30,12 @@ case $1 in
       WinPWD=$(cmd //C cd)
       cmd //C "mklink $WinPWD\\.git\\hooks\\commit-msg $WinPWD\\resources\\git-hooks\\commit-msg"
       cmd //C "mklink $WinPWD\\.git\\hooks\\prepare-commit-msg $WinPWD\\resources\\git-hooks\\prepare-commit-msg"
+      cmd //C "mklink $WinPWD\\.git\\hooks\\pre-commit $WinPWD\\resources\\git-hooks\\pre-commit"
     else
       HOOKSDIR=$(git rev-parse --git-path hooks)
       ln -sf "$SCRIPT_DIR/resources/git-hooks/commit-msg" "$HOOKSDIR/commit-msg"
       ln -sf "$SCRIPT_DIR/resources/git-hooks/prepare-commit-msg" "$HOOKSDIR/prepare-commit-msg"
+      ln -sf "$SCRIPT_DIR/resources/git-hooks/pre-commit" "$HOOKSDIR/pre-commit"
     fi
     ;;
   *)

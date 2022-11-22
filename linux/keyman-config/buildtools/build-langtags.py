@@ -12,16 +12,19 @@ with open('../../../resources/standards-data/langtags/langtags.json') as file:
 # The data comes from `resources/standards-data/langtag/langtags.json`.
 
 class LangTagsMap():
+    @staticmethod
     def lookupLangTags(language):
         if language in LangTagsMap.__langTags:
             return LangTagsMap.__langTags[language]
         return None
 
+    @staticmethod
     def lookupAllTags(language):
         if language in LangTagsMap.__allTags:
             return LangTagsMap.__allTags[language]
         return None
 
+    @staticmethod
     def translateISO6393ToBCP47(code):
         if code in LangTagsMap.__map3To2:
             return LangTagsMap.__map3To2[code]
@@ -41,8 +44,8 @@ class LangTagsMap():
                     if lang['tag'] != lang['iso639_3']:
                         if len(lang['tag']) < 3:
                             map3To2.append("'%s': '%s'" % (lang['iso639_3'], lang['tag']))
-                langTags.append(
-                    "'%s': {'full': '%s', 'region': '%s', 'script': '%s', 'suppress': %s}" % (lang['tag'], lang['full'], region, script, suppress))
+                langTags.append("'%s': {'full': '%s', 'region': '%s', 'script': '%s', 'suppress': %s}" % (
+                  lang['tag'], lang['full'], region, script, suppress))
                 allTags.append("'%s': '%s'" % (lang['tag'], lang['tag']))
                 if lang['tag'] != lang['full']:
                     allTags.append("'%s': '%s'" % (lang['full'], lang['tag']))
@@ -51,9 +54,9 @@ class LangTagsMap():
                         if tag != lang['full'] and tag != lang['tag']:
                             allTags.append("'%s': '%s'" % (tag, lang['tag']))
 
-        langTagsString = ',\n        '.join(map(str, langTags))
-        allTagsString = ',\n        '.join(allTags)
-        map3To2String = ',\n        '.join(map3To2)
-        outputFile.write("    __langTags = {\n        %s }\n\n" % langTagsString)
-        outputFile.write("    __allTags = { %s }\n\n" % allTagsString)
-        outputFile.write("    __map3To2 = { %s }\n" % map3To2String)
+        langTagsString = ',\n      '.join(map(str, langTags))
+        allTagsString = ',\n      '.join(allTags)
+        map3To2String = ',\n      '.join(map3To2)
+        outputFile.write("    __langTags = {\n      %s}\n\n" % langTagsString)
+        outputFile.write("    __allTags = {\n      %s}\n\n" % allTagsString)
+        outputFile.write("    __map3To2 = {\n      %s}\n" % map3To2String)

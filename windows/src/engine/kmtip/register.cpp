@@ -1,18 +1,18 @@
 /*
   Name:             register
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Nov 2007
 
   Modified Date:    31 Dec 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Nov 2007 - mcdurdin - I1139 - Fix TSF 'language overload' issue on Vista
                     18 Mar 2011 - mcdurdin - I2794 - Handle leaks
                     24 Oct 2012 - mcdurdin - I3489 - V9.0 - Add categories for TIP to enable Win8 immersive mode
@@ -29,7 +29,7 @@
 //
 #include "pch.h"
 #include "kmtip.h"
-#include "registry.h"
+#include "../../../../common/windows/cpp/include/registry.h"
 
 #define CLSID_STRLEN 38  // strlen("{xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx}")
 
@@ -137,7 +137,7 @@ BOOL CKMTipTextService::RegisterCategories(BOOL fRegister)
     int i;
     HRESULT hr;
 
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, 
+    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER,
                           IID_ITfCategoryMgr, (void**)&pCategoryMgr);
 
     if (hr != S_OK)

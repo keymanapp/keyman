@@ -54,12 +54,12 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\common\core\desktop\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\common\core\desktop\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\core\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\common\core\desktop\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\core\desktop\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -185,7 +185,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\global\vc\xstring.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
     <ClCompile Include="addins.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -259,7 +259,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\keynames.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -295,13 +295,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\rc4.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="..\..\global\vc\registry.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -331,7 +325,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="syskbdnt64.cpp" />
-    <ClCompile Include="..\..\global\vc\unicode.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -364,8 +358,8 @@
       <SubType>Designer</SubType>
     </CustomBuild>
     <None Include="KEYMAN32.DEF" />
-    <None Include="..\..\global\res\bmp\arrow.bmp" />
-    <None Include="..\..\global\res\bmp\mask.bmp" />
+    <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp" />
+    <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="keyman-debug-etw.rc" />
@@ -375,14 +369,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\global\inc\keymanengine.h" />
+    <ClInclude Include="keymanengine.h" />
     <ClInclude Include="addins.h" />
     <ClInclude Include="appint\aiTIP.h" />
     <ClInclude Include="appint\aiWin2000Unicode.h" />
     <ClInclude Include="appint\appint.h" />
     <ClInclude Include="calldll.h" />
     <ClInclude Include="capsstate.h" />
-    <ClInclude Include="..\..\global\inc\Compiler.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="kmprocessactions.h" />
     <ClInclude Include="pch.h" />
@@ -390,20 +384,19 @@
     <ClInclude Include="k32_tsf.h" />
     <ClInclude Include="KBD.H" />
     <ClInclude Include="keyboardoptions.h" />
-    <ClInclude Include="..\..\global\inc\keyman64.h" />
-    <ClInclude Include="..\..\global\inc\keymancontrol.h" />
+    <ClInclude Include="keyman64.h" />
+    <ClInclude Include="keymancontrol.h" />
     <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
-    <ClInclude Include="..\..\global\inc\rc4.h" />
-    <ClInclude Include="..\..\global\inc\registry.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h" />
     <ClInclude Include="security.h" />
     <ClInclude Include="serialkeyeventclient.h" />
     <ClInclude Include="serialkeyeventcommon.h" />
     <ClInclude Include="serialkeyeventserver.h" />
     <ClInclude Include="SharedBuffers.h" />
     <ClInclude Include="syskbd.h" />
-    <ClInclude Include="..\..\global\inc\unicode.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\unicode.h" />
     <ClInclude Include="vkscancodes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

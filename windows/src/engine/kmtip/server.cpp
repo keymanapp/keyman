@@ -1,18 +1,18 @@
 /*
   Name:             server
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Nov 2007
 
   Modified Date:    7 Nov 2013
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          06 Nov 2007 - mcdurdin - I1140 - Add KeymanAddinConfigure function to reconfigure the user's TSF linked keyboards
                     22 Mar 2010 - mcdurdin - Compiler fixup - x64 support
                     18 Mar 2011 - mcdurdin - I2807 - Enable/disable addins
@@ -29,7 +29,7 @@
 
 #include "pch.h"
 #include "kmtip.h"
-#include "registry.h"
+#include "../../../../common/windows/cpp/include/registry.h"
 
 void FreeGlobalObjects(void);
 

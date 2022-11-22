@@ -117,20 +117,9 @@ if(!window['keyman']['initialized']) {
 
     util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);
 
-    /**
-     * Reset OSK shift states when entering or exiting the active element
-     **/
-    function resetVKShift() {
-      let keyman = com.keyman.singleton;
-      if(!keyman.uiManager.isActivating && keyman.osk?.vkbd) {
-        keyman.core.keyboardProcessor._UpdateVKShift(null);  //this should be enabled !!!!! TODO
-      }
-    }
-
     // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
-    keymanweb['pageFocusHandler'] = resetVKShift;
-    util.attachDOMEvent(window, 'focus', keymanweb['pageFocusHandler'], false);  // I775
-    util.attachDOMEvent(window, 'blur', keymanweb['pageFocusHandler'], false);   // I775
+    util.attachDOMEvent(window, 'focus', keymanweb.pageFocusHandler, false);  // I775
+    util.attachDOMEvent(window, 'blur', keymanweb.pageFocusHandler, false);   // I775
 
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(true);

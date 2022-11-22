@@ -15,13 +15,12 @@ library insthelper;
 uses
   SysUtils,
   Classes,
-  RegistryKeys in '..\..\..\global\delphi\general\RegistryKeys.pas',
-  klog in '..\..\..\global\delphi\general\klog.pas',
-  CRC32 in '..\..\..\global\delphi\general\CRC32.pas',
-  VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
-  GetOsVersion in '..\..\..\global\delphi\general\GetOsVersion.pas',
-  OnlineConstants in '..\..\..\global\delphi\productactivation\OnlineConstants.pas',
-  KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
+  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
+  klog in '..\..\..\..\..\common\windows\delphi\general\klog.pas',
+  CRC32 in '..\..\..\..\..\common\windows\delphi\general\CRC32.pas',
+  VersionInfo in '..\..\..\..\..\common\windows\delphi\general\VersionInfo.pas',
+  GetOsVersion in '..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   preuninstallunit in 'preuninstallunit.pas',
   input_installlayoutortip in '..\..\..\global\delphi\winapi\input_installlayoutortip.pas',
   utiltsf in '..\..\..\global\delphi\general\utiltsf.pas',
@@ -29,12 +28,12 @@ uses
   Keyman.System.Install.EnginePostInstall in 'Keyman.System.Install.EnginePostInstall.pas',
   Keyman.System.Security in '..\..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
-  DebugPaths in '..\..\..\global\delphi\general\DebugPaths.pas',
-  ErrorControlledRegistry in '..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
-  Unicode in '..\..\..\global\delphi\general\Unicode.pas',
-  utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
-  utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
-  KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas';
+  DebugPaths in '..\..\..\..\..\common\windows\delphi\general\DebugPaths.pas',
+  ErrorControlledRegistry in '..\..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
+  Unicode in '..\..\..\..\..\common\windows\delphi\general\Unicode.pas',
+  utilexecute in '..\..\..\..\..\common\windows\delphi\general\utilexecute.pas',
+  utilsystem in '..\..\..\..\..\common\windows\delphi\general\utilsystem.pas',
+  KeymanPaths in '..\..\..\..\..\common\windows\delphi\general\KeymanPaths.pas';
 
 {$R *.RES}
 {$R VERSION.RES}

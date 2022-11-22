@@ -141,13 +141,13 @@
         </DelphiCompile>
         <DCCReference Include="Keyman.System.Test.MetroPermissions.pas"/>
         <DCCReference Include="..\..\..\global\delphi\general\Keyman.System.Security.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilsystem.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\utilexecute.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

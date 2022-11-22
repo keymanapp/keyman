@@ -71,11 +71,6 @@ namespace com.keyman.osk.layouts {
         return false;
       }.bind(this),false);
 
-      // Prevent selection of caption (IE - set by class for other browsers)
-      if('onselectstart' in Ltitle) {
-        Ltitle.onselectstart = util.selectStartHandler; //IE (Build 360)
-      }
-
       bar.appendChild(Ltitle);
 
       var Limg = document.createElement('div');
@@ -83,7 +78,7 @@ namespace com.keyman.osk.layouts {
       Limg.className='kmw-footer-resize';
       bar.appendChild(Limg);
       this._resizeHandle=Limg;
-      //TODO: the image never appears in IE8, have no idea why!
+
       return bar;
     }
 

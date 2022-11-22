@@ -16,8 +16,10 @@ versionhistory-app2:
     $(MAKE) versionhistory
 
 devtools-app: dirs
-    cd $(ROOT)\src\buildtools
-    $(MAKE) devtools
+    cd $(COMMON_ROOT)
+    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    cd $(COMMON_ROOT)\tools\devtools
+    $(MAKE)
     cd $(ROOT)\src
 
 version.res: version.rc
@@ -32,16 +34,17 @@ manifest.res: manifest.in version.res
 dirs:
     -mkdir $(ROOT)\build\desktop 2>nul
     -mkdir $(ROOT)\build\engine 2>nul
-    -mkdir $(ROOT)\build\developer 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\build 2>nul
     -mkdir $(ROOT)\build\buildtools 2>nul
     -mkdir $(ROOT)\build\online 2>nul
     -mkdir $(ROOT)\build\support 2>nul
     -mkdir $(ROOT)\build\inst 2>nul
 
-    -mkdir $(ROOT)\bin\developer\samples 2>nul
-    -mkdir $(ROOT)\bin\developer\xml 2>nul
-    -mkdir $(ROOT)\bin\developer\projects 2>nul
-    -mkdir $(ROOT)\bin\developer\projects\templates 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin\samples 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin\xml 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin\projects 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\bin\projects\templates 2>nul
     -mkdir $(ROOT)\bin\buildtools 2>nul
     -mkdir $(ROOT)\bin\engine 2>nul
     -mkdir $(ROOT)\bin\desktop 2>nul
@@ -55,9 +58,11 @@ dirs:
     -mkdir $(ROOT)\bin\help\md 2>nul
     -mkdir $(ROOT)\bin\help\md\desktop 2>nul
     -mkdir $(ROOT)\lib 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\lib 2>nul
     -mkdir $(ROOT)\release 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\release 2>nul
 
-    -mkdir $(ROOT)\debug\developer 2>nul
+    -mkdir $(KEYMAN_ROOT)\developer\debug 2>nul
     -mkdir $(ROOT)\debug\buildtools 2>nul
     -mkdir $(ROOT)\debug\engine 2>nul
     -mkdir $(ROOT)\debug\desktop 2>nul

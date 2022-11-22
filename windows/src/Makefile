@@ -11,7 +11,6 @@ default:
     @echo .   clean                 removes all temp files
     @echo .   release               make a release
     @echo .   web-install           sends the documentation to the website
-    @echo .   test-certificate      create a test certificate + CA (and install test CA)
     @echo .   signcode              sign the build artifacts
     @echo.
     @echo .   Build flags:
@@ -32,8 +31,8 @@ default:
 TARGETS=ext global buildtools engine desktop
 MANIFESTS=engine desktop
 !else
-TARGETS=ext global buildtools developer engine desktop support
-MANIFESTS=engine desktop developer
+TARGETS=ext global buildtools engine desktop support
+MANIFESTS=engine desktop
 !endif
 
 RELEASE_TARGETS=desktop
@@ -64,11 +63,6 @@ ext: build-tools
 
 buildtools: global
     cd $(ROOT)\src\buildtools
-    $(MAKE) $(TARGET)
-    cd $(ROOT)\src
-
-developer: global
-    cd $(ROOT)\src\developer
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
@@ -103,14 +97,14 @@ unit-tests:
 
 release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert test-hhc test-7zip test-wix clean
     cd $(ROOT)\src
-    $(MAKE) global-versions
+    $(MAKE) devtools-app
     $(MAKE) build-release-wrapper
 #   $(MAKE) clean  <-- this makes it harder to do OEM builds
     cd $(ROOT)\src
 
 clean-pathdefines: test-releasebuildcheck
 # test-releasebuildcheck builds devtools for us
-    $(PROGRAM)\buildtools\devtools -ri
+    $(DEVTOOLS) -ri
 
 #
 # Test that the CEF file path is accessible from env var KEYMAN_CEF4DELPHI_ROOT
@@ -119,9 +113,9 @@ clean-pathdefines: test-releasebuildcheck
 test-release-cef-path:
 !ifndef SC_TIMESTAMP
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) $(ROOT)\src\buildtools\cef-checkout.sh
+    $(GIT_BASH_FOR_KEYMAN) $(KEYMAN_ROOT)\common\windows\cef-checkout.sh
 !else
-    start /wait $(ROOT)\src\buildtools\cef-checkout.sh
+    start /wait $(KEYMAN_ROOT)\common\windows\cef-checkout.sh
 !endif
 !endif
 
@@ -159,7 +153,7 @@ test-7zip:
 #
 
 test-klog:
-    cd $(ROOT)\src\buildtools\test-klog
+    cd $(COMMON_ROOT)\tools\test-klog
     $(MAKE) verify
     cd $(ROOT)\src
 
@@ -168,7 +162,7 @@ test-klog:
 #
 
 test-releaseexists:
-    cd $(ROOT)\src\developer\inst
+    cd $(ROOT)\src\desktop\inst
     $(MAKE) test-releaseexists
     cd $(ROOT)\src
 
@@ -177,7 +171,7 @@ test-releaseexists:
 #
 
 test-releasebuildcheck: global-versions
-    cd $(ROOT)\src\buildtools\devtools
+    cd $(COMMON_ROOT)\tools\devtools
     $(MAKE) test-releasebuildcheck
     cd $(ROOT)\src
 
@@ -215,10 +209,6 @@ test-coverity:
 # TODO: automated upload as part of build
 
 test-coverity-internal:
-    cd $(ROOT)\src\developer\kmanalyze
-    $(MAKE) build
-    cd $(ROOT)\src\developer\kmcmpdll
-    $(MAKE) build
     cd $(ROOT)\src\engine\keyman32
     $(MAKE) build
     cd $(ROOT)\src\engine\keyman64
@@ -258,9 +248,6 @@ build-release-wrapper: clean-output global-versions
 !else
     cd $(ROOT)\src
     $(MAKE) build-release-wrapper-oem
-
-    cd $(ROOT)\src\developer\inst
-    $(MAKE)
 !endif
 
 build-release-wrapper-oem:
@@ -275,31 +262,31 @@ build-release-wrapper-oem:
 # Tools needed to complete a build
 #
 
-global-versions:
-# Build our root version.txt
-    cd $(ROOT)\src
-
-    $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h
-    $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc
-
-build-tools: global-versions
+build-tools:
 !ifdef NODELPHI
     echo Skipping build-tools
 !else
 # we need to build devtools directly because otherwise we have a
 # chicken-and-egg issue with PathDefines.mak
-    cd $(ROOT)\src\buildtools\devtools
-    $(MAKE)
+    $(MAKE) devtools-app
 # We'll build a default PathDefines.mak if it is missing here so we can
 # go on and do the rest of the build
-    $(PROGRAM)\buildtools\devtools -ti
+    $(DEVTOOLS) -ti
 !endif
+
+global-versions:
+    cd $(COMMON_ROOT)
+    @if not exist $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h $(MAKE) global-versions
+    cd $(ROOT)\src
 
 message-constants: build-tools
 !ifdef NODELPHI
     echo Skipping message-constants
 !else
-    $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
+!if "$(TARGET)" != "clean"
+    $(MAKE) devtools-app
+    $(DEVTOOLS) -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
+!endif
 !endif
 
 #
@@ -320,27 +307,7 @@ web-install:
     cd $(ROOT)\src\desktop\help
     $(MAKE) html install
 
-    cd $(ROOT)\src\developer\help
-    $(MAKE) html install
-
 # ----------------------------------------------------------------------
-
-test-certificate:
-    cd $(ROOT)\src\buildtools\certificates
-    -del KeymanTestCA-sha1.*
-    -del KeymanTest-sha1.*
-    -del KeymanTest-sha256.*
-    -del KeymanTestCA-sha256.*
-
-    makecert -r -pe -n "CN=Keyman Test CA SHA1" -ss CA -sr CurrentUser -a sha1 -cy authority -sky signature -sv KeymanTestCA-sha1.pvk KeymanTestCA-sha1.cer
-    certutil -user -addstore Root KeymanTestCA-sha1.cer
-    makecert -pe -n "CN=Keyman Test Certificate SHA1" -a sha1 -cy end -sky signature -ic KeymanTestCA-sha1.cer -iv KeymanTestCA-sha1.pvk -sv KeymanTest-sha1.pvk KeymanTest-sha1.cer
-    pvk2pfx -pvk KeymanTest-sha1.pvk -spc KeymanTest-sha1.cer -pfx KeymanTest-sha1.pfx
-
-    makecert -r -pe -n "CN=Keyman Test CA" -ss CA -sr CurrentUser -a sha256 -cy authority -sky signature -sv KeymanTestCA-sha256.pvk KeymanTestCA-sha256.cer
-    certutil -user -addstore Root KeymanTestCA-sha256.cer
-    makecert -pe -n "CN=Keyman Test Certificate" -a sha256 -cy end -sky signature -ic KeymanTestCA-sha256.cer -iv KeymanTestCA-sha256.pvk -sv KeymanTest-sha256.pvk KeymanTest-sha256.cer
-    pvk2pfx -pvk KeymanTest-sha256.pvk -spc KeymanTest-sha256.cer -pfx KeymanTest-sha256.pfx
 
 !include Target.mak
 

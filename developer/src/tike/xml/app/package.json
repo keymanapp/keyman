@@ -1,0 +1,12 @@
+{
+  "description": "Keyman Developer web user interface",
+  "author": "SIL International",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://keyman.com/",
+  "dependencies": {
+    "monaco-editor": "0.15.6"
+  }
+}

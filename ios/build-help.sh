@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Set sensible script defaults:
 # set -e: Terminate script if a command returns an error

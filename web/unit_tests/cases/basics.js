@@ -1,26 +1,26 @@
 var assert = chai.assert;
 
 describe('Basic KeymanWeb', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   before(function() {
     // These tests require use of KMW's device-detection functionality.
     assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
   })
 
-  beforeEach(function(done) {
-    this.timeout(kmwconfig.timeouts.scriptLoad);
+  beforeEach(function() {
+    this.timeout(testconfig.timeouts.scriptLoad);
 
     fixture.setBase('fixtures');
     fixture.load("singleInput.html");
-    setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
+    return setupKMW(null, testconfig.timeouts.scriptLoad);
   });
-  
+
   afterEach(function() {
     fixture.cleanup();
     teardownKMW();
   });
-  
+
   describe('Initialization', function() {
     it('KMW should attach to the input element.', function() {
       var singleton = document.getElementById('singleton');
@@ -35,17 +35,17 @@ describe('Basic KeymanWeb', function() {
 Modernizr.on('touchevents', function(result) {
   if(!result) {
     describe('Basic Toggle UI', function() {
-      this.timeout(kmwconfig.timeouts.scriptLoad);
+      this.timeout(testconfig.timeouts.scriptLoad);
 
-      beforeEach(function(done) {
-        this.timeout(kmwconfig.timeouts.uiLoad);
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('toggle', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('toggle', testconfig.timeouts.uiLoad);
       });
-      
+
       afterEach(function() {
         fixture.cleanup();
         teardownKMW();
@@ -53,7 +53,7 @@ Modernizr.on('touchevents', function(result) {
 
       it('The Toggle UI initializes correctly.', function() {
         assert(keyman.ui.initialized, 'Initialization flag is set to false!');
-        
+
         assert.isNotNull(keyman.ui.controller, 'Failed to create the controller element!');
 
         var divs = document.getElementsByTagName("div");
@@ -71,15 +71,15 @@ Modernizr.on('touchevents', function(result) {
 
     describe('Basic Button UI', function() {
 
-      beforeEach(function(done) {
-        this.timeout(kmwconfig.timeouts.uiLoad);
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('button', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('button', testconfig.timeouts.uiLoad);
       });
-      
+
       afterEach(function() {
         fixture.cleanup();
         teardownKMW();
@@ -92,15 +92,15 @@ Modernizr.on('touchevents', function(result) {
 
     describe('Basic Float UI', function() {
 
-      beforeEach(function(done) {
-        this.timeout(kmwconfig.timeouts.uiLoad);
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        // Sequentially loads two scripts, so 2x timeout.
-        setupKMW('float', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.initialized; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('float', testconfig.timeouts.uiLoad);
       });
-      
+
       afterEach(function() {
         fixture.cleanup();
         teardownKMW();
@@ -108,7 +108,7 @@ Modernizr.on('touchevents', function(result) {
 
       it('The Float UI initializes correctly.', function() {
         assert(keyman.ui.initialized, 'Initialization flag is set to false!');
-        
+
         assert.isNotNull(keyman.ui.outerDiv, 'Failed to create the floating controller element!');
 
         var divs = document.getElementsByTagName("div");
@@ -126,14 +126,15 @@ Modernizr.on('touchevents', function(result) {
 
     describe('Basic Toolbar UI', function() {
 
-      beforeEach(function(done) {
-        this.timeout(kmwconfig.timeouts.uiLoad);
+      beforeEach(function() {
+        this.timeout(testconfig.timeouts.uiLoad);
         fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
-        setupKMW('toolbar', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.init; });
+        // Loads two scripts in parallel, but just in case, 2x timeout.
+        return setupKMW('toolbar', testconfig.timeouts.uiLoad);
       });
-      
+
       afterEach(function() {
         fixture.cleanup();
         teardownKMW();
@@ -141,7 +142,7 @@ Modernizr.on('touchevents', function(result) {
 
       it('The Toolbar UI initializes correctly.', function() {
         assert(keyman.ui.init, 'Initialization flag is set to false!');
-        
+
         var kwc = document.getElementById('KeymanWebControl');
         assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');
 

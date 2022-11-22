@@ -6,7 +6,7 @@ uses
   kmcomapi_TLB in '..\..\engine\kmcomapi\kmcomapi_TLB.pas',
   msctf in '..\..\global\delphi\winapi\msctf.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
-  ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas';
+  ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas';
 
 {$R *.res}
 

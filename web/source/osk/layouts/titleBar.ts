@@ -10,10 +10,36 @@ namespace com.keyman.osk.layouts {
     private _configButton: HTMLDivElement;
     private _caption: HTMLSpanElement;
 
+    private _helpEnabled:   boolean;
+    private _configEnabled: boolean;
+
+    public get helpEnabled(): boolean {
+      return this._helpEnabled;
+    }
+
+    public set helpEnabled(val) {
+      this._helpEnabled = val;
+
+      this._helpButton.style.display = val ? 'inline' : 'none';
+    }
+
+    public get configEnabled(): boolean {
+      return this._configEnabled;
+    }
+
+    public set configEnabled(val) {
+      this._configEnabled = val;
+
+      this._configButton.style.display = val ? 'inline' : 'none';
+    }
+
     private static readonly DISPLAY_HEIGHT = ParsedLengthStyle.inPixels(20); // As set in kmwosk.css
 
     public constructor(dragHandler?: MouseDragOperation) {
       this._element = this.buildTitleBar();
+
+      this.helpEnabled   = false;
+      this.configEnabled = false;
 
       if(dragHandler) {
         this.element.onmousedown = dragHandler.mouseDownHandler;

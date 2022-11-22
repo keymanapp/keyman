@@ -9,7 +9,7 @@ var assert = chai.assert;
  * if we disable other tests when this fails.
  */
 describe('Test Initialization', function() {
-  // We can't use kmwconfig timeouts yet (they rely on test success), so we simply give
+  // We can't use testconfig timeouts yet (they rely on test success), so we simply give
   // this should-be-simple test a nice, large block of time to run.
   this.timeout(15000);
 

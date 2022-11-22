@@ -3,20 +3,21 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.
- * The dummy model (or mock model) is a language model which has 
+ * The dummy model (or mock model) is a language model which has
  * **injectable** suggestions: that is, you, as the tester, have
  * to provide the predictions. The dummy model does not create any
  * suggestions on its own. The dummy model can take in a series
  * of suggestions when loaded and return them sequentially.
  */
 describe('LMLayer using dummy model', function () {
-  this.timeout(config.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   describe('Prediction', function () {
     it('will predict future suggestions', function () {
-      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
-                                                  // the WebWorker boundary, so we should be generous here.
-      var lmLayer = new LMLayer(helpers.defaultCapabilities);
+      this.timeout(testconfig.timeouts.standard * 3); // This one makes multiple subsequent calls across
+                                                      // the WebWorker boundary, so we should be generous here.
+
+      var lmLayer = new LMLayer(helpers.defaultCapabilities, null, true);
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -57,8 +58,8 @@ describe('LMLayer using dummy model', function () {
 
   describe('Wordbreaking', function () {
     it('will perform (default) wordbreaking and return word at caret', function () {
-      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
-                                                  // the WebWorker boundary, so we should be generous here.
+      this.timeout(testconfig.timeouts.standard * 3); // This one makes multiple subsequent calls across
+                                                      // the WebWorker boundary, so we should be generous here.
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
       // We're testing many as asynchronous messages in a row.
@@ -72,7 +73,7 @@ describe('LMLayer using dummy model', function () {
       }).then(function () {
         // We'll keep it simple here, as this is primarily an integration test.
         // Functionality is handled in the 'headless' test case 'default-word-breaker.js'.
-        let context = { 
+        let context = {
           left: 'The quick brown fox jumped', startOfBuffer: true,
           right: ' over the lazy dog.', endOfBuffer: true
         };

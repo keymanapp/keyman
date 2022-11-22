@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 # set -e: Terminate script if a command returns an error
 set -e
@@ -9,8 +9,10 @@ WORKING_DIRECTORY=`pwd`
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # A simple utility script to facilitate our different modes for unit-testing KMW.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
@@ -59,7 +61,7 @@ get_browser_set_for_OS ( ) {
     if [ $os_id = "mac" ]; then
         BROWSERS="--browsers Firefox,Chrome,Safari"
     elif [ $os_id = "win" ]; then
-        BROWSERS="--browsers Firefox,Chrome,IE,Edge"
+        BROWSERS="--browsers Firefox,Chrome,Edge"
     else
         BROWSERS="--browsers Firefox,Chrome"
     fi
@@ -72,7 +74,7 @@ get_browser_set_for_OS
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
 DEBUG=false
 FLAGS=
-HEADLESS_FLAGS=-skip-package-install
+HEADLESS_FLAGS=
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -80,7 +82,7 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -CI)
             CONFIG=CI.conf.js
-            HEADLESS_FLAGS="$HEADLESS_FLAGS -CI"
+            HEADLESS_FLAGS="$HEADLESS_FLAGS --ci"
             ;;
         -log-level)
             shift
@@ -122,22 +124,51 @@ BASE_PATH=`dirname $BASH_SOURCE`
 cd $BASE_PATH/../source
 
 # Compile our testing dependencies; make sure the script fails if compilation fails!
-./build_dev_resources.sh || fail "Dev resource compilation failed."
-cd ../tools/recorder
-./build.sh || fail "KMW recorder-module compilation failed."
+../tools/build.sh || fail "Dev resource compilation failed."
 
 # Run our headless tests first.
 
 # First:  Web-core tests.
-pushd "$KEYMAN_ROOT/common/web/input-processor"
-./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
+pushd "$KEYMAN_ROOT/common/web/keyboard-processor"
+./build.sh test $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
 popd
 
-echo_heading "Running KeymanWeb integration test suite"
-npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
-npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
+pushd "$KEYMAN_ROOT/common/web/input-processor"
+./build.sh build:tools test $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
+# Once done, now we run the integrated (KeymanWeb) tests.
+popd
 
-CODE=$?
+# Browserstack or CI-based tests
+
+DO_BROWSER_TEST_SUITE=true
+
+if [[ $VERSION_ENVIRONMENT == test ]]; then
+  # Implied: CONFIG=CI.conf.js because `-CI` parameter is passed.
+  #
+  # If we are running a TeamCity test build, for now, only run BrowserStack
+  # tests when on a PR branch with a title including "(web)" or with the label
+  # test-browserstack. This is because the BrowserStack tests are currently
+  # unreliable, and the false positive failures are masking actual failures.
+  #
+  # We do not run BrowserStack tests on master, beta, or stable-x.y test
+  # builds.
+  DO_BROWSER_TEST_SUITE=false
+  if builder_pull_get_details; then
+    if [[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack; then
+      DO_BROWSER_TEST_SUITE=true
+    fi
+  fi
+fi
+
+CODE=0
+
+if $DO_BROWSER_TEST_SUITE; then
+  echo_heading "Running KeymanWeb integration test suite"
+  npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
+  npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
+
+  CODE=$?
+fi
 
 exit $CODE

@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*"
+           UpgradeCode="{E99A1F1E-7046-44F9-89EF-D3A59F84B209}" Manufacturer="SIL International"
+           Name="Keyman Developer $(var.RELEASE)" Version="$(var.VERSION)" Language="1033">
+    <Package Keywords="Keyman,Keyboard,Engine" Compressed="yes"
+             Description="Keyman Developer $(var.RELEASE)" Comments="Contact:  Your local administrator"
+             Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
+
+    <!-- Upgrade from Developer 7.0 -->
+    <!-- ProductID for 7.0 = {5889CA65-3E9F-445b-A22F-9277A0FB43C6} -->
+    <Upgrade Id="FF590D53-075C-45a4-89C2-EC7BA4E1ECD4">
+      <UpgradeVersion OnlyDetect="no" Minimum="7.0.213.0" IncludeMinimum="yes"
+                      Maximum="8.0.314.0" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDERFOUND" />
+    </Upgrade>
+
+    <!-- Upgrade from Developer 8.0 -->
+
+    <Upgrade Id="490D8B83-276E-4434-B1EA-30713F7916C7">
+      <UpgradeVersion OnlyDetect="no" Minimum="8.0.314.0" IncludeMinimum="yes"
+                      Maximum="9.0.507.0" IncludeMaximum="yes" MigrateFeatures="yes" Property="VERSION8FOUND" />
+        <!-- bug in Developer 9.0 installer means 9.0.507.0 and earlier are treated as 8.x -->
+    </Upgrade>
+
+    <!-- Upgrade from Developer 9.0 -->
+
+    <Upgrade Id="E0159651-CEA3-46CF-ACD7-0B0330C1B547">
+      <UpgradeVersion OnlyDetect="no" Minimum="9.0.507.1" IncludeMinimum="yes"
+                      Maximum="10.0.699.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION9FOUND" />
+    </Upgrade>
+
+    <!-- Upgrade from Developer 10.0 or later versions -->
+
+    <Upgrade Id="7B78D2C8-31EC-4B0C-8D7F-650418A4686E">
+      <UpgradeVersion OnlyDetect="no" Minimum="10.0.0.0" IncludeMinimum="yes"
+                      Maximum="11.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION10FOUND" />
+    </Upgrade>
+
+    <!-- Upgrade from Developer 11.0 or later versions -->
+
+    <Upgrade Id="{E99A1F1E-7046-44F9-89EF-D3A59F84B209}">
+      <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes"
+                      Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes"
+                      Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
+    </Upgrade>
+
+    <Property Id="ALLUSERS"><![CDATA[1]]></Property>
+
+    <Condition Message="Keyman Developer requires Windows 7 or later"><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
+
+    <Directory Id='TARGETDIR' Name='SourceDir' DiskId='1'>
+      <Directory Id="ProgramFilesFolder" Name="PFiles">
+        <Directory Id="KeymanRoot" Name="Keyman">
+          <Directory Id="KEYMANDEV" Name="Keyman Developer">
+            <Directory Id="INSTALLDIR" Name="." FileSource="..\bin\">
+              <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
+              <Directory Id="dirNode" Name="node.js" />
+              <Directory Id="dirProjects" Name="Projects" />
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Directory Id="FontsFolder" />
+
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ProgramMenuDir" Name="Keyman Developer" />
+      </Directory>
+
+      <Directory Id="DesktopFolder" Name="Desktop" />
+
+      <Directory Id="AppDataFolder">
+        <Directory Id="App_KeymanRoot" Name="Keyman" >
+          <Directory Id="App_KeymanDev" Name="Keyman Developer">
+            <Directory Id="App_KeymanDev_Databases" Name="Databases" />
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="KeymanDeveloperApp" Source="..\..\bin\" Directory="INSTALLDIR">
+      <Component>
+        <File Name="tike.exe" KeyPath="yes" Vital='yes'>
+          <Shortcut Id="startmenuTIKE" Advertise="yes" Directory="ProgramMenuDir" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
+          <Shortcut Id="desktopTIKE" Advertise="yes" Directory="DesktopFolder" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
+        </File>
+
+        <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]" Permanent="no" Part="last" Action="set" System="yes" />
+
+        <RemoveFile Id="excmagic.log" On="uninstall" Name="excmagic.log" />
+        <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer" />
+
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
+
+        <Environment Id="environmentKeymanDeveloperPath" Action="set" Name="KeymanDeveloperPath" System="yes" Value="[INSTALLDIR]" />
+
+        <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
+        <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
+        <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
+
+        <RegistryValue Root="HKCR" Key=".kmn" Type="string" Value="KeymanDeveloper.File.Keyboard" />
+        <RegistryValue Root="HKCR" Key=".kps" Type="string" Value="KeymanDeveloper.File.Package" />
+
+        <RegistryValue Root="HKCR" Key=".kvks" Type="string" Value="KeymanDeveloper.File.OnScreenKeyboard" />
+        <RegistryValue Root="HKCR" Key=".kpj" Type="string" Value="KeymanDeveloper.File.Project" />
+
+        <RegistryValue Root="HKCR" Key=".kmx" Type="string" Value="Keyman.File.Keyboard" />
+        <RegistryValue Root="HKCR" Key=".kmp" Type="string" Value="Keyman.File.Package" />
+        <RegistryValue Root="HKCR" Key=".kvk" Type="string" Value="Keyman.File.OnScreenKeyboard" />
+
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard" Type="string" Value="Keyman Keyboard Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\DefaultIcon" Type="string" Value="[#tike.exe],1" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package" Type="string" Value="Keyman Package Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\DefaultIcon" Type="string" Value="[#tike.exe],2" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project" Type="string" Value="Keyman Developer Project Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\DefaultIcon" Type="string" Value="[#tike.exe],3" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell" Type="string" Value="open" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell\open" Type="string" Value="&amp;Open" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell\open\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+
+        <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard" Type="string" Value="Keyman Keyboard File" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#tike.exe],4" />
+
+        <RegistryValue Root="HKCR" Key="Keyman.File.Package" Type="string" Value="Keyman Package File" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#tike.exe],5" />
+
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard" Type="string" Value="Keyman On Screen Keyboard File" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],6" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard" Type="string" Value="Keyman On Screen Keyboard Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],7" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+      </Component>
+
+      <Component>
+        <File Name="kmbrowserhost.exe" KeyPath="yes" Source="..\..\..\windows\bin\desktop\kmbrowserhost.exe" />
+      </Component>
+
+      <Component>
+        <File Name="kmdecomp.exe" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="kmdecomp.md" KeyPath="yes" Source="..\kmdecomp\kmdecomp.md" />
+      </Component>
+
+      <Component>
+        <File Name="kmcomp.exe" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="kmconvert.exe" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="kmcmpdll.dll" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="kmcmpdll.x64.dll" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="kmcomp.x64.exe" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="kmnkbp0-0.dll" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="keyboard_info.distribution.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="keyboard_info.source.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
+      </Component>
+
+      <!-- Data Files -->
+
+      <Component>
+        <File Name="kps.xsd" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="unicodedata.mdb" Source="..\..\..\common\windows\bin\data\" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="unicodedata.txt" Source="..\..\..\resources\standards-data\unicode-character-database\" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="blocks.txt" Source="..\..\..\resources\standards-data\unicode-character-database\" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Sentry -->
+    <ComponentGroup Id="KeymanDevSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\..\common\windows\delphi\ext\sentry">
+      <Component>
+        <File Id="sentry.dll" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Id="sentry.x64.dll" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Id="crashpad_handler.exe" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="FontsAndRedist" Source="fonts\">
+
+      <!-- Fonts -->
+
+      <Component Directory="FontsFolder">
+        <File Name="code2000.ttf" TrueType="yes" KeyPath="yes" />
+      </Component>
+
+      <Component Directory="FontsFolder">
+        <File Name="code2001.ttf" TrueType="yes" KeyPath="yes" />
+      </Component>
+
+      <Component Directory="FontsFolder">
+        <File Name="code2002.ttf" TrueType="yes" KeyPath="yes" />
+      </Component>
+
+      <Component Directory="FontsFolder">
+        <File Name='keymanweb-osk.ttf' TrueType='yes' Source='..\tike\xml\layoutbuilder\keymanweb-osk.ttf' KeyPath="yes" />
+      </Component>
+
+    </ComponentGroup>
+
+    <ComponentGroup Id="Node">
+      <Component Directory="dirNode">
+        <File Name='node.exe' KeyPath="yes" Source="node\dist\node.exe" />
+        <File Name='CHANGELOG.md' Source="node\dist\CHANGELOG.md" />
+        <File Name='LICENSE' Source="node\dist\LICENSE" />
+        <File Name='README.md' Source="node\dist\README.md" />
+      </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmlmc.cmd' KeyPath="yes" Source="node\kmlmc.cmd" />
+      </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmlmi.cmd' KeyPath="yes" Source="node\kmlmi.cmd" />
+      </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmlmp.cmd' KeyPath="yes" Source="node\kmlmp.cmd" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="AppData">
+      <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}" Directory="App_KeymanDev_Databases">
+        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
+        <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="no" Root="HKCU" Key="Software\Keyman\Keyman Developer" />
+        <RemoveFolder Id="AD_Uninstall" On="uninstall" Directory="App_KeymanRoot" />
+        <RemoveFolder Id="AD_KeymanDev_Uninstall" On="uninstall" Directory="App_KeymanDev" />
+        <RemoveFolder Id="AD_KeymanDev_Databases_Uninstall" On="uninstall" Directory="App_KeymanDev_Databases" />
+        <RemoveFolder Id="ProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
+        <RemoveFile Id="AD_KeymanDev_Databases_Uninstall_F" Directory="App_KeymanDev_Databases" On="uninstall"  Name="*.mdb" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="featProgram" Title="Keyman Developer Program" Description="Required program files for Keyman Developer"
+             Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR" Absent="disallow">
+
+      <ComponentGroupRef Id="KeymanDeveloperApp" />
+      <ComponentGroupRef Id="FontsAndRedist" />
+      <ComponentGroupRef Id="AppData" />
+      <ComponentGroupRef Id="XML" />
+      <ComponentGroupRef Id="CEF" />
+      <ComponentGroupRef Id="Templates" />
+      <ComponentGroupRef Id="ModelCompiler" />
+      <ComponentGroupRef Id="Node" />
+      <ComponentGroupRef Id="KeymanDevSentryComponents" />
+      <ComponentGroupRef Id="Server" />
+    </Feature>
+
+    <Media Id="1" EmbedCab="yes" CompressionLevel="high" Cabinet="Data1.cab" VolumeLabel="DISK1" />
+
+    <UIRef Id="WixUI_FeatureTree"/>
+
+    <Icon Id="TIKE.ico" SourceFile="..\images\KeymanDeveloper90.ico" />
+
+    <CustomAction Id='AlreadyUpdated' Error='[ProductName] has already been updated to $(var.VERSION) or newer.' />
+    <CustomAction Id='NoDowngrade' Error='A later version of [ProductName] is already installed.' />
+
+    <Property Id='OLDINSTALLDIR'>
+      <RegistrySearch Id='productinstalldir' Key='Software\Keyman\Keyman Developer' Root='HKLM' Name='root path' Type='raw' />
+    </Property>
+
+    <CustomAction Id='LocateInstallDir' Execute='immediate' Directory='INSTALLDIR' Value='[OLDINSTALLDIR]' />
+
+		<!-- I1165 - Uninstall failure on Win9x (n.a. for Keyman Developer but cleanup anyway) -->
+    <CustomAction Id='CachedInstallDir' Property='CachedInstallDir' Value='[ProgramFilesFolder]\Keyman\Cached Installer Files\[ProductCode]' />
+    <CustomAction Id='CachedInstallDirParent' Property='CachedInstallDirParent' Value='[ProgramFilesFolder]\Keyman\Cached Installer Files' />
+
+    <InstallExecuteSequence>
+      <Custom Action='LocateInstallDir' After='CostFinalize'>VERSION11FOUND</Custom>
+
+      <Custom Action='CachedInstallDir' After='CostFinalize' />
+      <Custom Action='CachedInstallDirParent' After='CostFinalize' />
+
+      <RemoveExistingProducts After='InstallValidate'>VERSION8FOUND or VERSION9FOUND or VERSION10FOUND or VERSION11FOUND or OLDERFOUND</RemoveExistingProducts><!--I2839-->
+
+      <Custom Action='AlreadyUpdated' After='FindRelatedProducts'>CURRENTVERSIONFOUND</Custom>
+      <Custom Action='NoDowngrade' After='AlreadyUpdated'>NEWERFOUND</Custom>
+    </InstallExecuteSequence>
+
+  </Product>
+</Wix>

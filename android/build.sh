@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app
 # Use '-clean' flag to clean build artifacts (won't do other build steps)
 

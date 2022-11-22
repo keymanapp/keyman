@@ -5,14 +5,18 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
  * How to run the worlist
  */
 describe('LMLayer using the trie model', function () {
-  this.timeout(config.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
-      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
+      this.timeout(testconfig.timeouts.standard * 3); // This one makes multiple subsequent calls across
                                                   // the WebWorker boundary, so we should be generous here.
-      var lmLayer = new LMLayer(helpers.defaultCapabilities);
+
+      // Parameter 3 = true:  enables 'test mode', disables correction-search timeout.
+      // This helps prevent the correction-search timeout from flaking out periodically during unit tests in
+      // CI, since remote servers / devices are involved.
+      var lmLayer = new LMLayer(helpers.defaultCapabilities, null, true);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but

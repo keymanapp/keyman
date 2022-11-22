@@ -1,7 +1,7 @@
 namespace com.keyman.text {
   export var Codes = {
     // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
-    // Compare against /common/core/desktop/src/kmx/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
+    // Compare against /common/include/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
     modifierCodes: {
       "LCTRL":0x0001,           // LCTRLFLAG
       "RCTRL":0x0002,           // RCTRLFLAG
@@ -11,7 +11,7 @@ namespace com.keyman.text {
       "CTRL":0x0020,            // K_CTRLFLAG
       "ALT":0x0040,             // K_ALTFLAG
       // TENTATIVE:  Represents command keys, which some OSes use for shortcuts we don't
-      // want to block.  No rule will ever target a modifier set with this bit set to 1. 
+      // want to block.  No rule will ever target a modifier set with this bit set to 1.
       "META":0x0080,            // K_METAFLAG
       "CAPS":0x0100,            // CAPITALFLAG
       "NO_CAPS":0x0200,         // NOTCAPITALFLAG
@@ -81,10 +81,13 @@ namespace com.keyman.text {
         case 'K_SHIFT':
         case 'K_LOPT':
         case 'K_ROPT':
-        case 'K_NUMLOCK': // Often used for numeric layers.
+        case 'K_NUMLOCK':  // Often used for numeric layers.
         case 'K_CAPS':
           return true;
         default:
+          if(Codes.keyCodes[keyID] >= 50000) { // A few are used by `sil_euro_latin`.
+            return true; // is a 'K_' key defined for layer shifting or 'control' use.
+          }
           // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
           // layer shifting keys.  To be safe, we currently let K_TABBACK and
           // K_TABFWD through, though we might be able to drop them too.

@@ -2,5 +2,5 @@
 //
 #include "version.rc"
 #include "manifest.rc"
-1 ICON  "..\\..\\global\\res\\90\\desktop\\keymandesktop90-64.ico"
+1 ICON  "..\\..\\desktop\\branding\\keymandesktop90-64.ico"
 

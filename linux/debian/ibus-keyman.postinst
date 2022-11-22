@@ -37,19 +37,21 @@ case "$1" in
       fi
 
       # Verify that it's running now
-      ! ibusdaemon=`ps --user ${SUDO_USER} -o s= -o cmd | grep --regexp="^[^ZT] ibus-daemon .*--xim.*"`
-      if [ "x$ibusdaemon" = "x" ]; then
-        # otherwise try to start it for the user installing the package
-        if [ "x$is_gnome_shell" = "x1" ]; then
-          for session in $(loginctl show-user ${SUDO_USER} -p Sessions --value); do
-            case $(loginctl show-session ${session} -p Type --value) in
-              wayland) sudo -H -u "${SUDO_USER}" -i WAYLAND_DISPLAY=wayland-0 -- ibus-daemon -d -r --xim --panel disable;;
-              x11) sudo -H -u "${SUDO_USER}" -- ibus-daemon -d -r --xim --panel disable;;
-              *) ;;
-            esac
-          done
-        else
-          sudo -H -u "${SUDO_USER}" -- ibus-daemon -d -r --xim
+      if [ ! -z $SUDO_USER ] && id $SUDO_USER > /dev/null 2>/dev/null; then
+        ! ibusdaemon=$(ps --user $SUDO_USER -o s= -o cmd | grep --regexp="^[^ZT] ibus-daemon .*--xim.*")
+        if [ "x$ibusdaemon" = "x" ]; then
+          # otherwise try to start it for the user installing the package
+          if [ "x$is_gnome_shell" = "x1" ]; then
+            for session in $(loginctl show-user ${SUDO_USER} -p Sessions --value); do
+              case $(loginctl show-session ${session} -p Type --value) in
+                wayland) sudo -H -u "${SUDO_USER}" -i WAYLAND_DISPLAY=wayland-0 -- ibus-daemon -d -r --xim --panel disable;;
+                x11) sudo -H -u "${SUDO_USER}" -- ibus-daemon -d -r --xim --panel disable;;
+                *) ;;
+              esac
+            done
+          else
+            sudo -H -u "${SUDO_USER}" -- ibus-daemon -d -r --xim
+          fi
         fi
       fi
     fi

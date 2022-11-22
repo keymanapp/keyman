@@ -3,36 +3,6 @@
         <ProjectGuid>{2816AC5E-98FA-4175-AB45-B153C3AED30A}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="ext\embeddedwb\Packages\EmbeddedWebBrowser_XE.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\dcpcrypt\DCPdelphi2009.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\mbcolor\mbColorLibD10.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\scfontcombobox\scFontCombo.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\jedi\packages\Jcl.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\jedi\packages\JclVcl.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\jedi\packages\JvCore.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\jedi\packages\JvCoreDesign.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\jedi\packages\JvDocking.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ext\jedi\packages\JvDockingDesign.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="global\delphi\keyman_components.dproj">
             <Dependencies/>
         </Projects>
@@ -44,96 +14,6 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="EmbeddedWebBrowser_XE">
-        <MSBuild Projects="ext\embeddedwb\Packages\EmbeddedWebBrowser_XE.dproj"/>
-    </Target>
-    <Target Name="EmbeddedWebBrowser_XE:Clean">
-        <MSBuild Projects="ext\embeddedwb\Packages\EmbeddedWebBrowser_XE.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="EmbeddedWebBrowser_XE:Make">
-        <MSBuild Projects="ext\embeddedwb\Packages\EmbeddedWebBrowser_XE.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="DCPdelphi2009">
-        <MSBuild Projects="ext\dcpcrypt\DCPdelphi2009.dproj"/>
-    </Target>
-    <Target Name="DCPdelphi2009:Clean">
-        <MSBuild Projects="ext\dcpcrypt\DCPdelphi2009.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="DCPdelphi2009:Make">
-        <MSBuild Projects="ext\dcpcrypt\DCPdelphi2009.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="mbColorLibD10">
-        <MSBuild Projects="ext\mbcolor\mbColorLibD10.dproj"/>
-    </Target>
-    <Target Name="mbColorLibD10:Clean">
-        <MSBuild Projects="ext\mbcolor\mbColorLibD10.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="mbColorLibD10:Make">
-        <MSBuild Projects="ext\mbcolor\mbColorLibD10.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="scFontCombo">
-        <MSBuild Projects="ext\scfontcombobox\scFontCombo.dproj"/>
-    </Target>
-    <Target Name="scFontCombo:Clean">
-        <MSBuild Projects="ext\scfontcombobox\scFontCombo.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="scFontCombo:Make">
-        <MSBuild Projects="ext\scfontcombobox\scFontCombo.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="Jcl">
-        <MSBuild Projects="ext\jedi\packages\Jcl.dproj"/>
-    </Target>
-    <Target Name="Jcl:Clean">
-        <MSBuild Projects="ext\jedi\packages\Jcl.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="Jcl:Make">
-        <MSBuild Projects="ext\jedi\packages\Jcl.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="JclVcl">
-        <MSBuild Projects="ext\jedi\packages\JclVcl.dproj"/>
-    </Target>
-    <Target Name="JclVcl:Clean">
-        <MSBuild Projects="ext\jedi\packages\JclVcl.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="JclVcl:Make">
-        <MSBuild Projects="ext\jedi\packages\JclVcl.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="JvCore">
-        <MSBuild Projects="ext\jedi\packages\JvCore.dproj"/>
-    </Target>
-    <Target Name="JvCore:Clean">
-        <MSBuild Projects="ext\jedi\packages\JvCore.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="JvCore:Make">
-        <MSBuild Projects="ext\jedi\packages\JvCore.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="JvCoreDesign">
-        <MSBuild Projects="ext\jedi\packages\JvCoreDesign.dproj"/>
-    </Target>
-    <Target Name="JvCoreDesign:Clean">
-        <MSBuild Projects="ext\jedi\packages\JvCoreDesign.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="JvCoreDesign:Make">
-        <MSBuild Projects="ext\jedi\packages\JvCoreDesign.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="JvDocking">
-        <MSBuild Projects="ext\jedi\packages\JvDocking.dproj"/>
-    </Target>
-    <Target Name="JvDocking:Clean">
-        <MSBuild Projects="ext\jedi\packages\JvDocking.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="JvDocking:Make">
-        <MSBuild Projects="ext\jedi\packages\JvDocking.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="JvDockingDesign">
-        <MSBuild Projects="ext\jedi\packages\JvDockingDesign.dproj"/>
-    </Target>
-    <Target Name="JvDockingDesign:Clean">
-        <MSBuild Projects="ext\jedi\packages\JvDockingDesign.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="JvDockingDesign:Make">
-        <MSBuild Projects="ext\jedi\packages\JvDockingDesign.dproj" Targets="Make"/>
-    </Target>
     <Target Name="keyman_components">
         <MSBuild Projects="global\delphi\keyman_components.dproj"/>
     </Target>
@@ -144,13 +24,13 @@
         <MSBuild Projects="global\delphi\keyman_components.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="EmbeddedWebBrowser_XE;DCPdelphi2009;mbColorLibD10;scFontCombo;Jcl;JclVcl;JvCore;JvCoreDesign;JvDocking;JvDockingDesign;keyman_components"/>
+        <CallTarget Targets="keyman_components"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="EmbeddedWebBrowser_XE:Clean;DCPdelphi2009:Clean;mbColorLibD10:Clean;scFontCombo:Clean;Jcl:Clean;JclVcl:Clean;JvCore:Clean;JvCoreDesign:Clean;JvDocking:Clean;JvDockingDesign:Clean;keyman_components:Clean"/>
+        <CallTarget Targets="keyman_components:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="EmbeddedWebBrowser_XE:Make;DCPdelphi2009:Make;mbColorLibD10:Make;scFontCombo:Make;Jcl:Make;JclVcl:Make;JvCore:Make;JvCoreDesign:Make;JvDocking:Make;JvDockingDesign:Make;keyman_components:Make"/>
+        <CallTarget Targets="keyman_components:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

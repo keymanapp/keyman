@@ -19,10 +19,10 @@
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
     "@keymanapp/web-sentry-manager": "*",
-    "@sentry/cli": "^1.52.3",
+    "@sentry/cli": "2.2.0",
     "chai": "^4.3.4",
     "google-closure-compiler-java": "^20200224.0.0",
-    "karma": "^6.3.4",
+    "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.2.0",
@@ -36,7 +36,7 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-safari-launcher": "^1.0.0",
     "karma-teamcity-reporter": "^1.1.0",
-    "mocha": "^8.4.0",
+    "mocha": "^10.0.0",
     "modernizr": "^3.11.7",
     "ts-node": "^9.1.1",
     "typescript": "^4.5.4"
@@ -52,13 +52,12 @@
   "dependencies": {
     "@keymanapp/input-processor": "*",
     "@keymanapp/keyboard-processor": "*",
+    "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
-    "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
     "@types/node": "^11.9.4",
-    "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0"
   }
 }

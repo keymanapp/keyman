@@ -61,7 +61,7 @@
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
 
-#include "kmtip_guids.h"
+#include "..\..\..\include\kmtip_guids.h"
 
 class Globals
 {
@@ -278,9 +278,7 @@ extern UINT
   wm_keymanshift,
   wm_keymanim_close,
   wm_keymanim_contextchanged,
-  wm_test_keyman_functioning,
-  wm_keyman_keyevent;   // for serialized input
-
+  wm_test_keyman_functioning;
 extern BOOL
   flag_ShouldSerializeInput;
 

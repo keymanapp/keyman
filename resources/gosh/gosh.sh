@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script goes with gosh.bat and gosh.js. It may be helpful for launching
 # a platform independent script "gosh foo.sh ..." where "gosh" will be interpreted

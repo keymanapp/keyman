@@ -19,7 +19,7 @@
       "request": "launch",
       "name": "Launch kmx unit tests",
       "target": "build/arch/debug/tests/unit/kmx/kmx",
-      "cwd": "${workspaceRoot}/common/core/desktop/",
+      "cwd": "${workspaceRoot}/core/",
       "arguments": "tests/unit/kmx/033\\ -\\ caps\\ always\\ off.km{n,x}",
       "valuesFormatting": "parseText"
     },

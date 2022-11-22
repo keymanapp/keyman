@@ -42,19 +42,12 @@ namespace com.keyman {
     }
 
     resolve() {
-      this.keyman.alignInputs();
-
       var osk = this.keyman.osk;
-      // TODO:  Reattach later in the refactoring process!
-      //osk.hideLanguageList();
-      // Force a re-layout for the active keyboard's currently-utilized layout.
-      if(this.keyman.core.activeKeyboard) {
-        this.keyman.core.activeKeyboard.refreshLayouts();
-      }
+      osk.hideLanguageMenu();
 
-      osk._Load();
+      osk.setNeedsLayout();
       if(this.oskVisible) {
-        osk.refreshLayout();
+        osk.present();
       }
 
       this.isActive = false;

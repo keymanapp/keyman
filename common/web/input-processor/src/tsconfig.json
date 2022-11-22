@@ -18,7 +18,6 @@
     { "path": "../../utils" },
     { "path": "../../keyboard-processor/src" },
     { "path": "../../../predictive-text/browser.tsconfig.json" },
-    { "path": "../../es6-shim" }
   ],
   "include": ["./**/*.ts"],
   "files": [

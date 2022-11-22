@@ -1,0 +1,108 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{39F157F7-EACA-4480-A268-2AEEF826DE21}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="keyboard-js-info\KeyboardJSInfoTestSuite.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmcomp-x64-structures\passtructsize\passtructsize.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmconvert\kmconverttest.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmx-file-languages\KMXFileLanguagesTestSuite.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="model-ts-parser\ModelTsParserTest.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="package-info\PackageInfoTestSuite.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="KeyboardJSInfoTestSuite">
+        <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj"/>
+    </Target>
+    <Target Name="KeyboardJSInfoTestSuite:Clean">
+        <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KeyboardJSInfoTestSuite:Make">
+        <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="KeyboardPackageVersionsTestSuite">
+        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj"/>
+    </Target>
+    <Target Name="KeyboardPackageVersionsTestSuite:Clean">
+        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KeyboardPackageVersionsTestSuite:Make">
+        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="passtructsize">
+        <MSBuild Projects="kmcomp-x64-structures\passtructsize\passtructsize.dproj"/>
+    </Target>
+    <Target Name="passtructsize:Clean">
+        <MSBuild Projects="kmcomp-x64-structures\passtructsize\passtructsize.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="passtructsize:Make">
+        <MSBuild Projects="kmcomp-x64-structures\passtructsize\passtructsize.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="kmconverttest">
+        <MSBuild Projects="kmconvert\kmconverttest.dproj"/>
+    </Target>
+    <Target Name="kmconverttest:Clean">
+        <MSBuild Projects="kmconvert\kmconverttest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="kmconverttest:Make">
+        <MSBuild Projects="kmconvert\kmconverttest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="KMXFileLanguagesTestSuite">
+        <MSBuild Projects="kmx-file-languages\KMXFileLanguagesTestSuite.dproj"/>
+    </Target>
+    <Target Name="KMXFileLanguagesTestSuite:Clean">
+        <MSBuild Projects="kmx-file-languages\KMXFileLanguagesTestSuite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KMXFileLanguagesTestSuite:Make">
+        <MSBuild Projects="kmx-file-languages\KMXFileLanguagesTestSuite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ModelTsParserTest">
+        <MSBuild Projects="model-ts-parser\ModelTsParserTest.dproj"/>
+    </Target>
+    <Target Name="ModelTsParserTest:Clean">
+        <MSBuild Projects="model-ts-parser\ModelTsParserTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ModelTsParserTest:Make">
+        <MSBuild Projects="model-ts-parser\ModelTsParserTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PackageInfoTestSuite">
+        <MSBuild Projects="package-info\PackageInfoTestSuite.dproj"/>
+    </Target>
+    <Target Name="PackageInfoTestSuite:Clean">
+        <MSBuild Projects="package-info\PackageInfoTestSuite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PackageInfoTestSuite:Make">
+        <MSBuild Projects="package-info\PackageInfoTestSuite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="KeyboardJSInfoTestSuite;KeyboardPackageVersionsTestSuite;passtructsize;kmconverttest;KMXFileLanguagesTestSuite;ModelTsParserTest;PackageInfoTestSuite"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="KeyboardJSInfoTestSuite:Clean;KeyboardPackageVersionsTestSuite:Clean;passtructsize:Clean;kmconverttest:Clean;KMXFileLanguagesTestSuite:Clean;ModelTsParserTest:Clean;PackageInfoTestSuite:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="KeyboardJSInfoTestSuite:Make;KeyboardPackageVersionsTestSuite:Make;passtructsize:Make;kmconverttest:Make;KMXFileLanguagesTestSuite:Make;ModelTsParserTest:Make;PackageInfoTestSuite:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

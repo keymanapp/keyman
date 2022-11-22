@@ -1,2 +1,0 @@
-jwsclExceptionMaintainer ..\source ..\includes
-pause

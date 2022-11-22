@@ -3,7 +3,7 @@
 # If needed set cowbuilder up for building Keyman Debian packages
 # Then cowbuilder update
 
-distributions='bionic focal impish jammy'
+distributions='bionic focal jammy kinetic'
 
 dpkgcheck=`dpkg-query -l cowbuilder`
 if [ $? != 0 ]; then

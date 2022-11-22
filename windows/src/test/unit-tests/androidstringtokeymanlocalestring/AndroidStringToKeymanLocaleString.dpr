@@ -11,9 +11,9 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
-  DUnitX.Loggers.TeamCity in '..\..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   Keyman.Test.AndroidStringToKeymanLocaleStringTest in 'Keyman.Test.AndroidStringToKeymanLocaleStringTest.pas',
-  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\global\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
 
 var
   runner : ITestRunner;

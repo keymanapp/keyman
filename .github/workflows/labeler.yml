@@ -7,12 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Update labels based on changed files
-      uses: actions/labeler@4b52aec09ba832eb9aecccddbccce644ba9ba69d
+      uses: actions/labeler@v4
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
     - name: Update labels based on PR title
       id: labeler
-      uses: fuxingloh/multi-labeler@8afa186ed03230c98fe24ebf9fe35093072ad46e # v1.4.0
+      uses: fuxingloh/multi-labeler@f5bd7323b53b0833c1e4ed8d7b797ae995ef75b4 # v2.0.1
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         config-path: .github/multi-labeler.yml

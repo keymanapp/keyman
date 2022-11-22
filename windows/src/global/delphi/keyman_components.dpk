@@ -41,41 +41,7 @@ requires
   xmlrtl;
 
 contains
-  extshiftstate in 'comp\extshiftstate.pas',
-  scancodemap in 'general\scancodemap.pas',
-  unicode in 'general\unicode.pas',
-  debuglistbox in 'comp\debuglistbox.pas',
-  debuglistview in 'comp\debuglistview.pas',
-  debugbitbtn in 'comp\debugbitbtn.pas',
-  MenuImgList in 'comp\MenuImgList.pas',
-  KeyBtn in 'comp\KeyBtn.pas',
-  UnicodePanel in 'comp\UnicodePanel.pas',
-  PaintPanel in 'comp\PaintPanel.pas',
-  HintLabel in 'comp\HintLabel.pas',
-  HeadingCheckListBox in 'comp\HeadingCheckListBox.pas',
-  VisualKeyboardParameters in 'visualkeyboard\VisualKeyboardParameters.pas',
-  PanelOverlapped in 'comp\PanelOverlapped.pas',
-  StringGridEditControlled in 'comp\StringGridEditControlled.pas',
-  BitmapEditor in 'comp\BitmapEditor.pas',
-  FixedTrackbar in 'comp\FixedTrackbar.pas',
-  KMDActions in 'comp\KMDActions.pas',
-  CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
-  OnScreenKeyboard in 'comp\OnScreenKeyboard.pas',
-  KMDActionInterfaces in '..\..\developer\TIKE\actions\KMDActionInterfaces.pas',
-  getosversion in 'general\getosversion.pas',
   exImageList in 'comp\exImageList.pas',
-  KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
-  usp10 in 'general\usp10.pas',
-  ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',
-  CaptionPanel in 'comp\CaptionPanel.pas',
-  OnScreenKeyboardData in 'visualkeyboard\OnScreenKeyboardData.pas',
-  LeftTabbedPageControl in 'comp\LeftTabbedPageControl.pas',
-  Glossary in 'general\Glossary.pas',
-  RegistryKeys in 'general\RegistryKeys.pas',
-  KeymanVersion in 'general\KeymanVersion.pas',
-  CloseButtonPageControl in 'comp\CloseButtonPageControl.pas',
-  KeymanDeveloperDebuggerMemo in 'comp\KeymanDeveloperDebuggerMemo.pas',
-  TextFileFormat in '..\..\developer\TIKE\main\TextFileFormat.pas',
-  Browse4Folder in '..\..\ext\browse4folder\Browse4Folder.pas';
+  KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas';
 
 end.

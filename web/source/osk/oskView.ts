@@ -39,6 +39,7 @@ namespace com.keyman.osk {
     private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
     private keyboard: keyboards.Keyboard;
+    private lgMenu?: LanguageMenu; // only used on non-embedded paths.
 
     private _target:  text.OutputTarget;
 
@@ -440,7 +441,7 @@ namespace com.keyman.osk {
       this.refreshLayoutIfNeeded(pending);
     }
 
-    protected setNeedsLayout() {
+    public setNeedsLayout() {
       this.needsLayout = true;
     }
 
@@ -450,7 +451,8 @@ namespace com.keyman.osk {
       }
 
       // Step 1:  have the necessary conditions been met?
-      const fixedSize = this.width && this.height && this.width.absolute && this.height.absolute;
+      const hasDimensions = this.width && this.height;
+      const fixedSize = hasDimensions && this.width.absolute && this.height.absolute;
       const computedStyle = getComputedStyle(this._Box);
       const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
 
@@ -458,7 +460,7 @@ namespace com.keyman.osk {
       if(fixedSize) {
         this._computedWidth  = this.width.val;
         this._computedHeight = this.height.val;
-      } else if(isInDOM) {
+      } else if(isInDOM && hasDimensions) {
         const parent = this._Box.offsetParent as HTMLElement;
         this._computedWidth  = this.width.val  * (this.width.absolute  ? 1 : parent.offsetWidth);
         this._computedHeight = this.height.val * (this.height.absolute ? 1 : parent.offsetHeight);
@@ -497,15 +499,14 @@ namespace com.keyman.osk {
         bs.width  = bs.maxWidth  = this.computedWidth + 'px';
         bs.height = bs.maxHeight = this.computedHeight + 'px';
 
+        // Ensure that the layer's spacebar is properly captioned.
+        this.vkbd.showLanguage();
       } else {
         const bs = this._Box.style;
         bs.width  = 'auto';
         bs.height = 'auto';
         bs.maxWidth = bs.maxHeight = '';
       }
-
-      let keyman = com.keyman.singleton;
-      keyman.alignInputs();
     }
 
     public refreshLayoutIfNeeded(pending?: boolean) {
@@ -984,9 +985,14 @@ namespace com.keyman.osk {
      **/
     showLanguageMenu() {
       if(this.hostDevice.touchable) {
-        let menu = new LanguageMenu(com.keyman.singleton);
-        menu.show();
+        this.lgMenu = new LanguageMenu(com.keyman.singleton);
+        this.lgMenu.show();
       }
+    }
+
+    hideLanguageMenu() {
+      this.lgMenu?.hide();
+      this.lgMenu = null;
     }
 
     // OSK state fields & events
@@ -1031,7 +1037,7 @@ namespace com.keyman.osk {
      * Scope        Public
      * @param       {(boolean|number)=}      bShow     True to display, False to hide, omitted to toggle
      */
-     ['show'](bShow: boolean) {
+     ['show'](bShow?: boolean) {
       if(arguments.length > 0) {
         this.displayIfActive = bShow;
       } else {
@@ -1072,6 +1078,20 @@ namespace com.keyman.osk {
      * Description  Wrapper function to add and identify OSK-specific event handlers
      */
     ['addEventListener'](event: string, func: (obj) => boolean) {
+      // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless
+      // a site designer uses these events, we disable / hide them until an event is attached.
+      let titleBar = this.headerView;
+      if(titleBar && titleBar instanceof layouts.TitleBar) {
+        switch(event) {
+          case 'configclick':
+            titleBar.configEnabled = true;
+            break;
+          case 'helpclick':
+            titleBar.helpEnabled = true;
+            break;
+        }
+      }
+
       return com.keyman.singleton.util.addEventListener('osk.'+event, func);
     }
   }

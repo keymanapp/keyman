@@ -30,18 +30,17 @@
 /windows/src/**/*.idb
 /windows/src/**/*.suo
 /windows/src/**/.idea
+/common/windows/delphi/**/*.dcu
+/common/windows/delphi/**/*.dcp
+/common/windows/delphi/**/*.drc
+/common/windows/delphi/**/*.bpl
+/common/windows/delphi/**/*.map
+/common/windows/delphi/**/*.tds
 
 # Temp files generated during release build
 /windows/src/buildtools/inst/copydebug.mak
 /windows/src/desktop/inst/desktop_resources.res
 /windows/src/desktop/inst/desktopui.wxs
-/windows/src/developer/inst/cef.wxs
-/windows/src/developer/inst/keymandeveloper.msi
-/windows/src/developer/inst/setup.inf
-/windows/src/developer/inst/setup.zip
-/windows/src/developer/inst/templates.wxs
-/windows/src/developer/inst/xml.wxs
-/windows/src/developer/inst/kmlmc.wxs
 
 # local defines for build, usually used for certificates and passwords
 /windows/src/UserDefines.mak
@@ -52,7 +51,6 @@
 
 # global build files
 /windows/src/global/help/version.out
-/windows/src/global/inst/data/UnicodeData.mdb
 /windows/src/global/delphi/general/SourceRootPath.pas
 
 # /buildtools/genkmnp/
@@ -148,6 +146,7 @@
 # VS Code
 .vscode/
 .vs/
+.devcontainer/
 
 # IDE files
 **/.idea/**/*.xml
@@ -164,7 +163,22 @@ compile_flags.txt
 resources/environment.sh
 
 # Copy of the master VERSION.md used for Linux packaging
-/common/core/desktop/VERSION.md
+/core/VERSION.md
 
 **/node_modules/
 
+# Windows system files
+Thumbs.db
+
+# Temporary file for logging scripts in xcode runs, see build-utils.sh for
+# details
+/xcodebuild-scripts.log
+
+# Linux packaging related
+/debian/
+/results/
+/keyman*.deb
+/keyman*.ddeb
+/keyman*.buildinfo
+/keyman*.changes
+/keyman*.tar.?z

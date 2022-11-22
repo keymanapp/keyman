@@ -89,7 +89,7 @@
 			<DCCReference Include="..\..\engine\kmcomapi\kmcomapi_TLB.pas"/>
 			<DCCReference Include="..\..\global\delphi\winapi\msctf.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
-			<DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+			<DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>

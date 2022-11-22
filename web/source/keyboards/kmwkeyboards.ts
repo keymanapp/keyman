@@ -271,13 +271,10 @@ namespace com.keyman.keyboards {
 
       for(Ln=0; Ln < this.keyboardStubs.length; Ln++) { // I1511 - array prototype extended
         Lstub = this.keyboardStubs[Ln];
-        let Lkbd;
-        for(let kbdIndex=0; kbdIndex < this.keyboards.length; kbdIndex++) {
-          if(this.keyboards[kbdIndex]['KI'] == Lstub['KI']) {
-            Lkbd = this.keyboards[kbdIndex];
-            break;
-          }
-        }
+
+        // In Chrome, (including on Android), Array.prototype.find() requires Chrome 45.
+        // This is a later version than the default on our oldest-supported Android devices.
+        const Lkbd = this.keyboards.find(k => k['KI'] == Lstub['KI']);
         Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
         Lr=this.keymanweb._push(Lr,Lrn); // TODO:  Resolve without need for the cast.
       }
@@ -803,7 +800,7 @@ namespace com.keyman.keyboards {
         }
       }, false);
 
-      // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
+      // Some browsers may instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.  This method is not relocated here (yet) b/c it varies based upon 'native' vs 'embedded'.
       Lscript.src = scriptSrc;
 

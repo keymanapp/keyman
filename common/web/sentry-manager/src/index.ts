@@ -62,7 +62,11 @@ namespace com.keyman {
     pathFilter(event: any) {
       // Get the underlying JS error.
       let exception = event.exception;
-
+      if(!exception) {
+        // events are not required to have an exception property
+        // e.g. console.log-type events
+        return;
+      }
       // Iterate through all wrapped exceptions.
       for(let e of exception.values) {
         // If Sentry was unable to generate a stacktrace, there's no path filtering to
@@ -97,7 +101,7 @@ namespace com.keyman {
     }
 
     // Sanitizes the event object (in-place) to remove sensitive information
-    // from the breadcrumbs and url
+    // from the breadcrumbs and url (for embedded KeymanWeb)
     sanitizeEvent(event: any) {
       if (event && event.breadcrumbs) {
         event.breadcrumbs.forEach((b: any) => {
@@ -109,7 +113,7 @@ namespace com.keyman {
         });
       }
 
-      if (event.request.url) {
+      if (event && event.request && event.request.url) {
         let URL_PATTERN = /#.*$/;
         event.request.url = event.request.url.replace(URL_PATTERN, '');
       }
@@ -168,6 +172,58 @@ namespace com.keyman {
       }
     }
 
+    /**
+     * Capture errors and warnings logged to Console in order to get
+     * stack traces. We can't use CaptureConsole integration until we
+     * upgrade to a newer version of Sentry, which has a bit of a cascade
+     * of changes required, in particular a change of module type and
+     * transpiling down to ES5.
+     *
+     * https://stackoverflow.com/a/53214615/1836776
+     */
+    initConsole() {
+      // creating function declarations for better stacktraces (otherwise they'd be anonymous function expressions)
+      let oldConsoleError = console.error;
+      let _this = this;
+      // Note that Sentry may have overridden console.error so we are re-overriding it here post-init.
+      console.error = reportingConsoleError; // defined via function hoisting
+      function reportingConsoleError() {
+        let args = Array.prototype.slice.call(arguments);
+        if(_this._enabled) {
+          Sentry.captureException(reduceConsoleArgs(args), { level: 'error' });
+        }
+        return oldConsoleError.apply(console, args);
+      };
+
+      let oldConsoleWarn = console.warn;
+      console.warn = reportingConsoleWarn; // defined via function hoisting
+      function reportingConsoleWarn() {
+        let args = Array.prototype.slice.call(arguments);
+        if(_this._enabled) {
+          Sentry.captureMessage(reduceConsoleArgs(args), { level: 'warning' });
+        }
+        return oldConsoleWarn.apply(console, args);
+      }
+
+      function reduceConsoleArgs(args) {
+        let errorMsg = args[0];
+        // Make sure errorMsg is either an error or string.
+        // It's therefore best to pass in new Error('msg') instead of just 'msg' since
+        // that'll give you a stack trace leading up to the creation of that new Error
+        // whereas if you just pass in a plain string 'msg', the stack trace will include
+        // reportingConsoleError and reportingConsoleCall
+        if (!(errorMsg instanceof Error)) {
+          // stringify all args as a new Error (which creates a stack trace)
+          errorMsg = new Error(
+            args.reduce(function(accumulator, currentValue) {
+              return accumulator.toString() + ' ' + currentValue.toString();
+            }, '')
+          );
+        }
+        return errorMsg;
+      }
+    }
+
     init() {
       // Do the actual Sentry initialization.
       //@ts-ignore
@@ -177,8 +233,10 @@ namespace com.keyman {
         debug: DEBUG,
         dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@o1005580.ingest.sentry.io/5983524', // keyman-web DSN
         release: com.keyman.KEYMAN_VERSION.SENTRY_RELEASE,
-        environment: com.keyman.KEYMAN_VERSION.VERSION_ENVIRONMENT
+        environment: com.keyman.KEYMAN_VERSION.VERSION_ENVIRONMENT,
       });
+
+      this.initConsole();
     }
 
     get enabled(): boolean {

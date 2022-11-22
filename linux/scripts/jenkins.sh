@@ -1,16 +1,19 @@
-#!/bin/bash -e
+#!/bin/bash
 # $1 - project name with appended tier, e.g. ibus-kmfl-alpha
 # $2 - GPG key used for signing the source package
 
-PROGRAM_NAME="$(basename "$0")"
+set -e
+set -u
 
-. $HOME/ci-builder-scripts/bash/common.sh
-init --no-package
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 keyman_projects="keyman"
-if [ -n "$BUILD_LEGACY" ]; then
-    keyman_projects="keyman kmflcomp libkmfl ibus-kmfl"
-fi
 
 tier="stable"
 
@@ -24,72 +27,59 @@ proj="$1"
 proj=${proj%"-alpha"}
 proj=${proj%"-beta"}
 
-if [ "$proj" == "keyman" ]; then
-	fullsourcename="keyman"
-	sourcedir="$KEYMAN_ROOT"
-else
-	# check if project is known
-	if [[ $keyman_projects =~ (^|[[:space:]])$proj($|[[:space:]]) ]]; then
-		fullsourcename="$1"
-		sourcedir="legacy/$proj"
-	else
-		stderr "$proj not in known projects ($keyman_projects)"
-		exit -1
-	fi
-fi
+fullsourcename="keyman"
+sourcedir="$KEYMAN_ROOT"
 sourcename=${fullsourcename%"-alpha"}
 sourcename=${sourcename%"-beta"}
 
+# set Debian/changelog environment
+export DEBFULLNAME="${fullsourcename} Package Signing Key"
+export DEBEMAIL='jenkins@sil.org'
+
 checkAndInstallRequirements()
 {
-	local TOINSTALL
+	local TOINSTALL=""
 
-	for p in dh-python gir1.2-webkit2-4.0 python3-all python3-setuptools \
-		python3-requests python3-requests-cache python3-numpy python3-pil python3-lxml \
-		python3-gi python3-magic python3-qrcode cargo build-essential python3-dbus
+	for p in devscripts equivs
 	do
-		if ! dpkg -l | grep -q $p; then
+		if ! dpkg -s $p >/dev/null 2>&1; then
 			TOINSTALL="$TOINSTALL $p"
 		fi
 	done
 
-	if [ ! -f /usr/bin/perl ]; then
-		TOINSTALL="$TOINSTALL perl"
-	fi
-
-	if [ ! -f /usr/bin/meson ]; then
-		TOINSTALL="$TOINSTALL meson"
-	fi
+	export DEBIAN_FRONTEND=noninteractive
 
 	if [ -n "$TOINSTALL" ]; then
-		log "Installing prerequisites:$TOINSTALL"
 		sudo apt-get update
 		sudo apt-get -qy install $TOINSTALL
 	fi
+
+	sudo mk-build-deps debian/control
+	sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
+	sudo rm -f keyman-buid-deps_*
 }
 
 checkAndInstallRequirements
 
 # clean up prev deb builds
-log "cleaning previous builds of $1"
-
+echo_heading "cleaning previous builds of $1"
 
 rm -rf builddebs
 rm -rf $sourcedir/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 rm -rf $sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
-log "Make source package for $fullsourcename"
-log "reconfigure"
+echo_heading "Make source package for $fullsourcename"
+echo_heading "reconfigure"
 JENKINS="yes" TIER="$tier" ./scripts/reconf.sh $sourcename
 
-log "Make origdist"
+echo_heading "Make origdist"
 ./scripts/dist.sh origdist $sourcename
-log "Make deb source"
+echo_heading "Make deb source"
 ./scripts/deb.sh sourcepackage $proj
 
 #sign source package
-for file in `ls builddebs/*.dsc`; do
-	log "Signing source package $file"
+for file in $(ls builddebs/*.dsc); do
+	echo_heading "Signing source package $file"
 	debsign -k$2 $file
 done
 

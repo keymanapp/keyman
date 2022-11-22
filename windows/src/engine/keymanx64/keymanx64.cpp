@@ -22,7 +22,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
 #include "keymanx64.h"   // I5136
-#include "keymansentry.h"
+#include "../../../../common/windows/cpp/include/keymansentry.h"
 
 // Forward declarations of functions included in this code module
 

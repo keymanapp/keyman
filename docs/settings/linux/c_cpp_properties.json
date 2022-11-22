@@ -2,13 +2,30 @@
   "configurations": [
     {
       "name": "linux",
-      "includePath": ["${workspaceFolder}/common/core/desktop/include/**"],
-      "defines": [],
+      "includePath": [
+        "${workspaceFolder}/common/include",
+        "${workspaceFolder}/common/include/**",
+        "${workspaceFolder}/core/include",
+        "${workspaceFolder}/core/include/**",
+        "${workspaceFolder}/core/build/arch/debug/include/",
+        "${workspaceFolder}/linux/ibus-keyman/src",
+        "/usr/include/**",
+        "/usr/lib/x86_64-linux-gnu/**",
+        "/usr/include/glib-2.0/",
+        "/usr/include/glib-2.0/glib/",
+        "/usr/lib/x86_64-linux-gnu/glib-2.0/include/"
+      ],
+      // for whatever reason vscode doesn't find the types `gboolean` and `gint`, so we define them here
+      "defines": [
+        "gboolean=int",
+        "gint=int"
+      ],
       "compilerPath": "/usr/lib/ccache/clang",
       "cStandard": "c11",
       "cppStandard": "c++14",
       "intelliSenseMode": "clang-x64",
-      "compileCommands": "${workspaceFolder}/common/core/desktop/build/arch/debug/compile_commands.json"
+      "compileCommands": "${workspaceFolder}/core/build/arch/debug/compile_commands.json",
+      "configurationProvider": "ms-vscode.makefile-tools"
     }
   ],
   "version": 4

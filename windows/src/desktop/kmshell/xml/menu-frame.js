@@ -17,7 +17,7 @@
   function menuframe_activate(n)
   {
     var p = menuframe_items[menuframe_activeindex], c = menuframe_items[n];
-    var itemtype, blah;
+    var itemtype, list_array;
 
     p.className='menuframe';
     c.className='menuframe_active';
@@ -28,15 +28,19 @@
     save_state();
 
     if(!loading_state) {
-      var q = document.getElementById('content_'+c.menu_name).getElementsByTagName('span');
-      for(var i = 0; i < q.length; i++) {
-        blah = q[i].id;
-        itemtype = blah.substr(0, 5);
-
-        if( itemtype == "list_" ) {
-          q[i].focus();
-          break;
-        }
+      let q = null;
+      if (c.menu_name.includes("keyboardlist")) {
+        q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item expanded');
+      }
+      // if none are expanded get the full list
+      if (q == null || q.length == 0) {
+        q = document.getElementById('content_'+c.menu_name).getElementsByClassName('list_item');
+      }
+      // select the first list item
+      if (q!==null && q.length > 0) {
+        list_array = q[0].id;
+        itemtype = list_array.substring(0, 5);
+        q[0].focus();
       }
     }
 

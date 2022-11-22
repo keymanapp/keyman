@@ -1,10 +1,4 @@
-#!/bin/bash
-
-#
-# WARNING: this file is copied into other locations during package builds; do not
-#          include other files or make path assumptions when changing this file.
-#          See `common/core/desktop/build.sh` for more details.
-#
+#!/usr/bin/env bash
 
 _shf_base_dir=$(dirname "$BASH_SOURCE")/..
 
@@ -82,24 +76,20 @@ get_platform_folder() {
   fi
 }
 
-# The following allows coloring of warning and error lines, but only works if there's a
-# terminal attached, so not on the build machine.
-if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]] && [[ "$TERM" != "unknown" ]]; then
-    COLOR_RED=$(tput setaf 1)
-    COLOR_GREEN=$(tput setaf 2)
-    COLOR_BLUE=$(tput setaf 4)
-    COLOR_YELLOW=$(tput setaf 3)
-    COLOR_RESET=$(tput sgr0)
-else
-    COLOR_RED=
-    COLOR_GREEN=
-    COLOR_BLUE=
-    COLOR_YELLOW=
-    COLOR_RESET=
-fi
+# Note: COLOR_ and HEADING_ variables are defined in build-utils.sh
+# which is already required for scripts so these should be safe.
+# (part of TODO: consolidate these two scripts)
 
 echo_heading() {
-  echo "${COLOR_BLUE}$*${COLOR_RESET}"
+  echo -e "${HEADING_SETMARK}${COLOR_BLUE}$*${COLOR_RESET}"
+}
+
+log_error() {
+  echo "${COLOR_RED}$THIS_SCRIPT_NAME: $*${COLOR_RESET}" >&2
+}
+
+log_warning() {
+  echo "${COLOR_YELLOW}$THIS_SCRIPT_NAME: $*${COLOR_RESET}" >&2
 }
 
 fail() {
@@ -265,32 +255,28 @@ set_npm_version () {
   npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
 }
 
-# Initializes use of the npm packages within the repo.
-init_npm() {
-  if [ "${KEYMAN_ROOT}" = "" ]; then
-    fail "KEYMAN_ROOT not defined; cannot install repo's dependencies"
-  fi
-  pushd "$KEYMAN_ROOT" > /dev/null
-  npm ci
-  popd > /dev/null
-}
-
-# Accepts an optional parameter.
-# $1 - when set to 'false', only ensures that `npm` and `node` are accessible; does not install dependencies.
 #
-# Designed for use with the projects/packages we have listed in the base folder package.json workspaces.
-verify_npm_setup () {
-  if [ $# != 0 ]; then
-    fetch_deps=$1
-  else
-    fetch_deps=true
+# Verifies that node is installed, and installs npm packages, but only once per
+# build invocation
+#
+verify_npm_setup() {
+  # We'll piggy-back on the builder module dependency build state to determine
+  # if npm ci has been called in the current script invocation. Adding the
+  # prefix /external/ to module name in order to differentiate between this and
+  # internal modules (although it is unlikely to ever collide!); we will also
+  # use this pattern for other similar external dependencies in future. These
+  # functions are safe to call even in a non-builder context (they do nothing or
+  # return 1 -- not built)
+  if builder_has_module_been_built /external/npm-ci; then
+    return 0
   fi
+  builder_set_module_has_been_built /external/npm-ci
 
   # Check if Node.JS/npm is installed.
   type npm >/dev/null ||\
-      fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
-  if [ $fetch_deps = true ]; then
-    init_npm
-  fi
+  pushd "$KEYMAN_ROOT" > /dev/null
+  npm ci
+  popd > /dev/null
 }

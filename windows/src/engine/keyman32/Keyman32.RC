@@ -6,7 +6,7 @@
 // Bitmap
 //
 
-MASK                    BITMAP  DISCARDABLE     "..\\..\\global\\res\\bmp\\mask.bmp"
-ARROW                   BITMAP  DISCARDABLE     "..\\..\\global\\res\\bmp\\arrow.bmp"
+MASK                    BITMAP  DISCARDABLE     "..\\..\\..\\..\\common\\resources\\bitmaps\\mask.bmp"
+ARROW                   BITMAP  DISCARDABLE     "..\\..\\..\\..\\common\\resources\\bitmaps\\arrow.bmp"
 
 /////////////////////////////////////////////////////////////////////////////

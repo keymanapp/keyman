@@ -1,12 +1,12 @@
-// Original source may be found within the repo at /common/core/desktop/tests/unit/kmx/ as #023.
+// Original source may be found within the repo at /core/tests/unit/kmx/ as #023.
 if(typeof keyman === 'undefined') {
   console.log('Keyboard requires KeymanWeb 10.0 or later');
-  
-  if(typeof tavultesoft !== 'undefined') 
+
+  if(typeof tavultesoft !== 'undefined')
     tavultesoft.keymanweb.util.alert("This keyboard requires KeymanWeb 10.0 or later");
 } else {
   KeymanWeb.KR(new Keyboard_options_with_save());
-} 
+}
 
 function Keyboard_options_with_save() {
   this.KI="Keyboard_options_with_save";
@@ -28,10 +28,10 @@ function Keyboard_options_with_save() {
   this.gs=function(t,e) {
     return this.g0(t,e);
   };
-  
+
   this.g0=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
-    
+
     if(k.KKM(e,16384,48)) {
       if(1){
         r=m=1;

@@ -1,21 +1,22 @@
 #!/usr/bin/python3
 
 import argparse
-from distutils.version import StrictVersion
-import logging
-import sys
-import os
-from keyman_config import __version__, KeymanApiUrl, secure_lookup
-from keyman_config.uninstall_kmp import uninstall_kmp
-
 import datetime
+import logging
+import os
+import sys
 import time
+from pkg_resources import parse_version
 from zipfile import is_zipfile
+
+from keyman_config import KeymanApiUrl, __version__, secure_lookup
+from keyman_config.uninstall_kmp import uninstall_kmp
 
 
 def get_languages():
     import requests
     import requests_cache
+
     from keyman_config.get_kmp import keyman_cache_dir
 
     logging.info("Getting language list from search")
@@ -45,6 +46,9 @@ def get_languages():
 def get_keyboard_list():
     languages = get_languages()
     keyboards = []
+    if not languages:
+        return []
+
     if "languages" in languages:
         for lang in languages["languages"]:
             if "keyboards" in lang:
@@ -82,8 +86,8 @@ def list_keyboards():
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Install a Keyman keyboard package, either a local .kmp file or specify a ' +
-        'keyboard id to download and install')
+      description='Install a Keyman keyboard package, either a local .kmp file or specify a ' +
+      'keyboard id to download and install')
     parser.add_argument('-s', '--shared', action='store_true', help='Install to shared area /usr/local')
     parser.add_argument('-f', '--file', metavar='KMPFILE', help='Keyman kmp file')
     parser.add_argument('-p', '--package', metavar='PACKAGE', help='Keyman package id')
@@ -102,13 +106,15 @@ def main():
     if args.package and args.file:
         parser.print_usage()
         logging.error(
-            "km-package-install: error: too many arguments: either install a local kmp file or " +
-            "specify a keyboard id to download and install.")
+          "km-package-install: error: too many arguments: either install a local kmp file or " +
+          "specify a keyboard id to download and install.")
         sys.exit(2)
 
-    from keyman_config.install_kmp import install_kmp, InstallError, InstallStatus
+    from keyman_config.get_kmp import (get_keyboard_data, get_kmp,
+                                       keyman_cache_dir)
+    from keyman_config.install_kmp import (InstallError, InstallStatus,
+                                           install_kmp)
     from keyman_config.list_installed_kmp import get_kmp_version
-    from keyman_config.get_kmp import get_keyboard_data, get_kmp, keyman_cache_dir
 
     if os.path.exists(os.path.join(keyman_cache_dir(), 'kmpdirlist')):
         os.remove(os.path.join(keyman_cache_dir(), 'kmpdirlist'))
@@ -144,8 +150,8 @@ def main():
             sys.exit(3)
         kbdata_v = secure_lookup(kbdata, 'version')
         if installed_kmp_v and kbdata_v:
-            kbdata_version = StrictVersion(kbdata_v)
-            installed_kmp_ver = StrictVersion(installed_kmp_v)
+            kbdata_version = parse_version(kbdata_v)
+            installed_kmp_ver = parse_version(installed_kmp_v)
             if kbdata_version == installed_kmp_ver:
                 print("km-package-install: Version %s of the %s keyboard package is already installed."
                       % (installed_kmp_ver, args.package))
@@ -165,8 +171,8 @@ def main():
     else:
         parser.print_usage()
         logging.error(
-            "km-package-install: error: no arguments: either install a local kmp file " +
-            "or specify a keyboard package id to download and install.")
+          "km-package-install: error: no arguments: either install a local kmp file " +
+          "or specify a keyboard package id to download and install.")
         sys.exit(2)
 
 

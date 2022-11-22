@@ -11,7 +11,7 @@ On Windows, you can build the following projects:
 
 The following libraries can also be built:
 
-* Keyman Core (Windows, wasm targets) (aka common/core/desktop)
+* Keyman Core (Windows, wasm targets) (aka core)
 * Common/Web
 
 The following projects **cannot** be built on Windows:
@@ -175,21 +175,41 @@ You can use Windows Settings to add these environment variables permanently:
 * KeymanWeb
 
 **Requirements**:
-* node.js 14+
 * emscripten 2.0.23+
+* node.js 14+
 * openjdk 8+
 
 ```ps1
 # Elevated PowerShell
-choco install nodejs emscripten
-choco install openjdk
 
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 
+choco install emscripten
+```
+
+Note: emscripten very unhelpfully overwrites JAVA_HOME, and adds its own
+versions of Python, Node and Java to the PATH. For best results, go ahead
+and remove those paths from your PATH variable before continuing.
+
+There is no need to add emscripten to the path in order to build Keyman.
+However, you should set the EMSCRIPTEN_BASE variable to the path where `emcc`
+can be found, but always in the upstream\emscripten subdirectory where you
+installed emsdk (most likely %LocalAppData%\emsdk\upstream\emscripten)
+
 **Environment variables**:
-* `PATH`:
-  * Add emscripten to path, most likely %LocalAppData%\emsdk\upstream\emscripten
+* `EMSCRIPTEN_BASE`: `<your-emsdk-path>\upstream\emscripten`
+
+After installing emscripten, you'll need to install node.js and openjdk:
+
+```ps1
+# Elevated PowerShell
+
+# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
+$ProgressPreference = 'SilentlyContinue'
+choco install nodejs
+choco install openjdk
+```
 
 ### Windows Platform Dependencies
 
@@ -249,6 +269,7 @@ SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Prog
 ```
 
 **Additional requirements for release builds**:
+* [Certificates](#certificates)
 * [7-Zip](http://www.7-zip.org/), used for archiving build files
 * [HTML Help Workshop](http://web.archive.org/web/20160201063255/http://download.microsoft.com/download/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe) note: Microsoft no longer offer this download...
 * [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm)
@@ -260,6 +281,13 @@ choco install 7zip html-help-workshop
 choco install wixtoolset --version=3.11.1
 git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
 ```
+
+## Certificates
+
+In order to make a release build, you need to sign all the executables. See
+[windows/src/README.md#Certificates](../../windows/src/README.md#Certificates)
+for details on how to create test code signing certificates or specify your own
+certificates for the build.
 
 ## Notes on Environment Variables
 
@@ -285,7 +313,7 @@ repo on your local machine.
 
 The version of CEF in use is determined by CEF_VERSION.md. This maps to a branch
 prefixed with `v` e.g. `v89.0.18` in the CEF4Delphi_binary repository. During a
-release build, the buildtools/cef-checkout.sh script will checkout the correct
+release build, the common/windows/cef-checkout.sh script will checkout the correct
 branch of the repository automatically and extract any compressed files found in
 it.
 

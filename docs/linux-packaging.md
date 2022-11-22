@@ -304,16 +304,16 @@ This is done in several steps:
    got signed with the correct key in the previous step)
 3. upload to mentors
 4. file a RFS bug (Request For Sponsorship) against the `sponsorship-requests` pseudo-package,
-   cc'ing `debian-input-method`
+   cc'ing `debian-input-method`, or just send an email to the `debian-input-method` list.
 
-The first three steps can be done by running these commands:
+After the package got published in Debian you should update the `linux/debian/changelog` file
+with the exact same information that the changelog in Debian has.
+
+The first three steps above and updating the changelog file can be done by running
+the following script:
 
 ```bash
-cd linux
-DIST=unstable scripts/debian.sh
-cd debianpackage/
-debsign -k$DEBSIGN_KEYID --re-sign *.changes
-dput mentors *.changes
+linux/scripts/upload-to-debian.sh -k $DEBSIGN_KEYID --push
 ```
 
 ## Reference

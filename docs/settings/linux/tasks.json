@@ -4,12 +4,12 @@
     {
       "type": "shell",
       "label": "core: build",
-      "command": "${workspaceFolder}/common/core/desktop/build.sh",
+      "command": "${workspaceFolder}/core/build.sh",
       "args": [
         "--debug"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/common/core/desktop"
+        "cwd": "${workspaceFolder}/core"
       },
       "problemMatcher": [
         {
@@ -17,7 +17,7 @@
           "source": "compiler",
           "fileLocation": [
             "relative",
-            "${workspaceFolder}/common/core/desktop/"
+            "${workspaceFolder}/core/"
           ],
           "pattern": [
             {
@@ -45,12 +45,12 @@
         }
       ],
       "group": "build",
-      "detail": "build common/core/desktop"
+      "detail": "build core"
     },
     {
       "type": "shell",
       "label": "core: test",
-      "command": "${workspaceFolder}/common/core/desktop/build.sh",
+      "command": "${workspaceFolder}/core/build.sh",
       "args": [
         "--debug",
         "tests"
@@ -59,14 +59,14 @@
         "$gcc"
       ],
       "group": "test",
-      "detail": "run tests for common/core/desktop"
+      "detail": "run tests for core"
     },
     {
       "type": "shell",
       "label": "ibus-keyman: configure",
       "command": "./configure",
       "args": [
-        "CPPFLAGS=\"-DG_MESSAGES_DEBUG -I${workspaceFolder}/common/core/desktop/build/arch/debug/include/ -I${workspaceFolder}/common/core/desktop/include/\"",
+        "CPPFLAGS=\"-DG_MESSAGES_DEBUG -I${workspaceFolder}/core/build/arch/debug/include/ -I${workspaceFolder}/common/include/ -I${workspaceFolder}/core/include/\"",
         "CFLAGS=\"-g -O0\"",
         "CXXFLAGS=\"-g -O0\"",
         "KEYMAN_PROC_LIBS=\"-L${workspaceFolder}/common/core/desktop/build/arch/debug/src -lkmnkbp0\"",

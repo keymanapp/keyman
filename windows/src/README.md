@@ -38,7 +38,7 @@ building them. In this situation, we recommend copying the relevant Delphi-built
 components into windows/bin folders from a compatible installed version of
 Keyman for testing and debugging purposes.
 
-### Release builds
+## Release builds
 
 A release build is not usually needed for local development. To run a release
 build, you will need to obtain valid code signing certificates. See
@@ -57,14 +57,30 @@ Note: by default, the version number generated may vary from the current release
 version. You will not be able to install it over a later version of Keyman, and
 will need to uninstall and reinstall.
 
-#### Certificates
+## Certificates
 
 In order to create a release build, you will need a code signing certiicate.
 You can use your own certificate, or you can use test certificates which are not
-globally trusted.
+globally trusted. The environment variables `SC_PFX_SHA1` and `SC_PFX_SHA256`
+can be set to custom certificate paths.
 
-To Install the Keyman test certificates, do the following for each KeymanTestCA
-cert in **windows/src/buildtools/certificates**:
+The Keyman repo no longer includes test certificates.  To build your own, run
+`nmake test-certificates` from **common/windows/delphi/tools/certificates** to
+build and install your own local root CA "**KeymanTestCA**" certificates. If you
+specify a password for the certificate, you'll need to set that in the
+environment variable `SC_PWD`.
+
+(Note: these `SC_` values can be defined in `UserDefines.mak` instead of as
+environment variables.)
+
+### Manual certificate installation
+
+You do not need to install the **KeymanTest** certificates, only the
+**KeymanTestCA** certificates.
+
+If you have not already installed the **KeymanTestCA** certificates using the
+`nmake` command above, to manually install the Keyman **KeymanTestCA**
+certificates, do the following in **common/windows/delphi/tools/certificates**:
 
    1. Open the certificate and click 'Install certificate...' to open the
       Certificate Import Wizard.
@@ -74,7 +90,7 @@ cert in **windows/src/buildtools/certificates**:
       select 'Trusted Root Certification Authorities'. Click Next and finish
       the wizard.
 
-### Crash Reporting
+## Crash Reporting
 
 Crash report dialogs as shown by tsysinfo have a few special secret hotkeys
 useful for development purposes:

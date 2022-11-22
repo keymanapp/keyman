@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary

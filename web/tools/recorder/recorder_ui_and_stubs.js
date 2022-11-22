@@ -7,11 +7,8 @@ var recorderScribe;
 
 function focusReceiver() {
   var receiver = document.getElementById('receiver');
-  if(receiver['kmw_ip']) {
-    receiver = receiver['kmw_ip'];
-  }
   receiver.focus();
-  
+
   if(keyman.util.device.touchable) {
     // At present, touch doesn't 'focus' properly.
     keyman.setActiveElement(receiver);
@@ -21,9 +18,6 @@ function focusReceiver() {
 
 setElementText = function(ele, text) {
   ele.value = text;
-  if(ele['kmw_ip']) {
-    ele['kmw_ip'].setTextBeforeCaret(ele.value);
-  }
 }
 
 onUpdateInputRecord = function(json) {
@@ -42,15 +36,8 @@ resetInputRecord = function() {
 
 copyInputRecord = function() {
   try {
-    if(!ta_inputJSON['kmw_ip']) {
-      ta_inputJSON.select();
-    } else {
-      var range = document.createRange();
-      range.selectNode(ta_inputJSON['kmw_ip']);
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
-    }
-    
+    ta_inputJSON.select();
+
     var res = document.execCommand('copy');
     if(res) {
       in_output.focus();
@@ -97,7 +84,7 @@ copyTestDefinition = function() {
 
   try {
     masterJSON.select();
-    
+
     var res = document.execCommand('copy');
     if(res) {
       in_output.focus();
@@ -164,18 +151,6 @@ window.addEventListener('load', function() {
   // Other setup.
   initDevice();
   setupKeyboardPicker();
-
-  var errorInput = document.getElementById('errorText');
-  if(errorInput['kmw_ip']) {
-    // Alias DIVs use subelements b/c caret simulation.
-    // Interestingly, 'childList' is the most important for noting textContent changes.
-    var config = { childList: true, subtree: true };
-    var observer = new MutationObserver(function(mutations) {
-      errorUpdate();
-    });
-
-    observer.observe(errorInput['kmw_ip'], config);
-  }
 });
 
 //var p={'internalName':_internalName,'language':_language,'keyboardName':_keyboardName,'languageCode':_languageCode};
@@ -191,7 +166,7 @@ function keyboardAdded(properties) {
 function setupKeyboardPicker() {
   /* Make sure that Keyman is initialized (we can't guarantee initialization order) */
   keyman.init();
-  
+
   var kbdControl = document.getElementById('KMW_Keyboard');
   /* Retrieve the list of keyboards available from KeymanWeb and populate the selector using the DOM */
   var kbds = keyman.getKeyboards();
@@ -199,9 +174,9 @@ function setupKeyboardPicker() {
     var opt = document.createElement('OPTION');
     opt.value = kbds[kbd].InternalName + "$$" + kbds[kbd].LanguageCode;
     opt.innerHTML = kbds[kbd].Name;
-    kbdControl.appendChild(opt);    
+    kbdControl.appendChild(opt);
   }
-  
+
   // Ensures the default keyboard is active, to match our listbox's initial (default) option.
   keyman.setActiveKeyboard('', '');
   keyman.addEventListener('keyboardregistered', keyboardAdded);
@@ -332,7 +307,7 @@ function convertSet(testSet) {
       if(sequence.msg) {
         recorderScribe.errorUpdate(sequence.msg);
       }
-      
+
       return new Promise(function(resolve) {
         let saveFunc = function() {
           // May need conversion in the future, but is fine for now - the 'Constraint' part of the spec didn't change.
@@ -392,7 +367,7 @@ function deviceFromConstraint(constraint) {
 // ----------- END SPEC VERSION MIGRATION -------------
 
 function loadExistingStubs(files) {
-  
+
   var processStub = function(json, file) {
     try {
       // Load the stub
@@ -429,7 +404,7 @@ function loadExistingStubs(files) {
       var reader = new XMLHttpRequest();
       reader.open('GET', file);
       reader.responseType = 'text';
-      
+
       reader.onload = function() {
         processStub(reader.response, file);
       };

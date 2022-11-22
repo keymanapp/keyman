@@ -1,3 +1,0 @@
-The following examples are not usable due to developing:
--PrivateSD
--XP Elevation

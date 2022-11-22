@@ -1,6 +1,0 @@
-rdpencomapi_TLB.pas provides interfaces for writing Desktop Sharing Application.
-
-MSDN:
-http://blogs.msdn.com/ts/archive/2007/03/23/writing-a-desktop-sharing-application.aspx
-Reference:
-http://msdn2.microsoft.com/en-us/library/aa373871(VS.85).aspx

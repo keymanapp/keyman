@@ -1,4 +1,4 @@
-# Common/Core/Desktop configuration notes
+# Core configuration notes
 
 WARNING: these are old configuration notes. See [index.md](../index.md) for current steps.
 

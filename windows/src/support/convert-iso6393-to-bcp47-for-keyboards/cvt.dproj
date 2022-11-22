@@ -98,20 +98,19 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="cv.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\keyboards\Keyman.System.KMXFileLanguages.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utilstr.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utilfiletypes.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\utildir.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\kmxfile.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\KeyNames.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\cust\StockFileNames.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\Unicode.pas"/>
-        <DCCReference Include="C:\Projects\keyman\open\windows\src\global\delphi\general\JsonUtil.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\utilstr.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\utilfiletypes.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\utildir.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\keyboards\kmxfile.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\CRC32.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\KeyNames.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\KeymanVersion.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\windows\src\..\..\common\windows\delphi\general\StockFileNames.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\Unicode.pas"/>
+        <DCCReference Include="C:\Projects\keyman\open\common\windows\delphi\general\JsonUtil.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

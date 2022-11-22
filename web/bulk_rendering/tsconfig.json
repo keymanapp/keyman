@@ -19,7 +19,6 @@
 	"references": [
     { "path": "../../common/web/utils", "prepend": true },
     { "path": "../../common/web/keyman-version", "prepend": true },
-		{ "path": "../../common/web/es6-shim", "prepend": true },
     { "path": "../../common/web/lm-message-types" },
 	]
 }

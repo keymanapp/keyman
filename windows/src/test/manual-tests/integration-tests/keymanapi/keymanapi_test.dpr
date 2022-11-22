@@ -20,8 +20,8 @@ uses
   KeymanOptionNames in '..\..\..\global\delphi\general\KeymanOptionNames.pas',
   Keyman.Test.Console.KeymanAPITest_BCP47 in 'Keyman.Test.Console.KeymanAPITest_BCP47.pas',
   Keyman.Test.Console.KeymanAPITest_Base in 'Keyman.Test.Console.KeymanAPITest_Base.pas',
-  RegistryKeys in '..\..\..\global\delphi\general\RegistryKeys.pas',
-  KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas';
+  RegistryKeys in '..\..\..\..\..\common\windows\delphi\general\RegistryKeys.pas',
+  KeymanVersion in '..\..\..\..\..\common\windows\delphi\general\KeymanVersion.pas';
 
 var
   runner : ITestRunner;

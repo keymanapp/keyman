@@ -3,7 +3,7 @@
   "private": true,
   "devDependencies": {
     "chai": "^4.3.4",
-    "mocha": "^8.4.0",
+    "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.5.4"
@@ -12,8 +12,8 @@
   "workspaces": [
     "resources/gosh",
     "resources/build/version",
-    "developer/js",
-    "developer/server",
+    "developer/src/kmlmc",
+    "developer/src/server",
     "common/models/*",
     "common/web/*",
     "common/predictive-text",

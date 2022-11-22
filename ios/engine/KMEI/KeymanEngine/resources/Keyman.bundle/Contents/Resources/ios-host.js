@@ -1,23 +1,25 @@
+let _debug = false;
 
-console = new Object();
-console.log = function(log) {
-    var iframe = document.createElement("IFRAME");
-    iframe.setAttribute("src", "ios-log:#iOS#" + log);
-    document.documentElement.appendChild(iframe);
-    iframe.parentNode.removeChild(iframe);
-    iframe = null;
-    if (typeof(window.webkit) != 'undefined')
-        window.webkit.messageHandlers.keyman.postMessage("ios-log:#iOS#" + log);
-};
-console.debug = console.log;
-console.info = console.log;
-console.warn = console.log;
-console.error = console.log;
-window.onerror = function(error, url, line) {
-    console.log('ERROR: '+error+' URL:'+url+' L:'+line);
-};
+if(_debug) {
+    console = new Object();
+    console.log = function(log) {
+        var iframe = document.createElement("IFRAME");
+        iframe.setAttribute("src", "ios-log:#iOS#" + log);
+        document.documentElement.appendChild(iframe);
+        iframe.parentNode.removeChild(iframe);
+        iframe = null;
+        if (typeof(window.webkit) != 'undefined')
+            window.webkit.messageHandlers.keyman.postMessage("ios-log:#iOS#" + log);
+    };
+    console.debug = console.log;
+    console.info = console.log;
+    console.warn = console.log;
+    console.error = console.log;
+    window.onerror = function(error, url, line) {
+        console.log('ERROR: '+error+' URL:'+url+' L:'+line);
+    };
+}
 
-var device = 'AppleMobile';
 var oskHeight = 0;
 var oskWidth = 0;
 
@@ -29,6 +31,8 @@ sentryManager.init();
 window.addEventListener('load', init, false);
 
 function init() {
+    const device = navigator.userAgent.match(/iPad|Macintosh/) ? 'AppleTablet' : 'AppleMobile';
+
     // As of iOS 15, Safari WebViews will try to avoid letting us use the "safe area"
     // at the bottom of iPhone X style devices.  While `-webkit-fill-available` will partly
     // counteract this... it's only a "partly".  Fortunately, we can manually force the
@@ -87,12 +91,6 @@ function setBannerHeight(h) {
     // Refresh KMW's OSK
     kmw.correctOSKTextSize();
     doResetContext();
-}
-
-function setDeviceType(deviceType) {
-    // Set device type: AppleMobile|AppleTablet
-    device = deviceType;
-    init();
 }
 
 function setOskHeight(height) {

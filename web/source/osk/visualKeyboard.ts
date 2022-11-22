@@ -102,6 +102,9 @@ namespace com.keyman.osk {
     // Multi-tap gesture management
     pendingMultiTap: PendingMultiTap;
 
+    // The keyboard object corresponding to this VisualKeyboard.
+    private layoutKeyboard: keyboards.Keyboard;
+
     get layerId(): string {
       return this._layerId;
     }
@@ -172,19 +175,19 @@ namespace com.keyman.osk {
 
       // Now to build the actual layout.
       const formFactor = device.formFactor as utils.FormFactor;
-      let layoutKeyboard = keyboard;
-      if (!layoutKeyboard) {
+      this.layoutKeyboard = keyboard;
+      if (!this.layoutKeyboard) {
         // May occasionally be null in embedded contexts; have seen this when iOS engine sets
         // keyboard height during change of keyboards.
-        layoutKeyboard = new keyboards.Keyboard(null);
+        this.layoutKeyboard = new keyboards.Keyboard(null);
       }
 
-      this.layerGroup = new OSKLayerGroup(this, layoutKeyboard, formFactor);
+      this.layerGroup = new OSKLayerGroup(this, this.layoutKeyboard, formFactor);
 
       // Now that we've properly processed the keyboard's layout, mark it as calibrated.
       // TODO:  drop the whole 'calibration' thing.  The newer layout system supersedes the
       // need for it.  (Is no longer really used, so the drop ought be clean.)
-      layoutKeyboard.markLayoutCalibrated(formFactor);
+      this.layoutKeyboard.markLayoutCalibrated(formFactor);
 
       // Append the OSK layer group container element to the containing element
       //osk.keyMap = divLayerContainer;
@@ -1005,6 +1008,16 @@ namespace com.keyman.osk {
       // First check the virtual key, and process shift, control, alt or function keys
       let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device);
 
+      /* In case of "fun" edge cases caused by JS's single-threadedness & event processing queue.
+       *
+       * Should a touch occur on an OSK key during active JS execution that results in a change
+       * of the active keyboard, it's possible for an OSK key to be evaluated against an
+       * unexpected, non-matching keyboard - one that could even be `null`!
+       *
+       * So, we mark the keyboard backing the OSK as the 'correct' keyboard for this key.
+       */
+      Lkc.srcKeyboard = this.layoutKeyboard;
+
       // End - mirrors _GetKeyEventProperties
 
       if (core.languageProcessor.isActive && input) {
@@ -1349,9 +1362,6 @@ namespace com.keyman.osk {
       util.addFontFaceStyleSheet(kfd);
       util.addFontFaceStyleSheet(ofd);
 
-      // Temporarily hide duplicated elements on non-desktop browsers
-      keymanweb.hideInputs();
-
       // Build the style string and append (or replace) the font style sheet
       // Note: Some browsers do not download the font-face font until it is applied,
       //       so must apply style before testing for font availability
@@ -1361,11 +1371,6 @@ namespace com.keyman.osk {
         customStyle = customStyle + activeKeyboard.oskStyling;
 
       this.styleSheet = util.addStyleSheet(customStyle); //Build 360
-
-      // Wait until font is loaded then align duplicated input elements with page elements
-      if (this.waitForFonts(kfd, ofd)) {
-        keymanweb.alignInputs();
-      }
     }
 
     /**
@@ -1671,10 +1676,6 @@ namespace com.keyman.osk {
         } else if (keyName.indexOf('K_ROPT') >= 0) {
           keyman.uiManager.setActivatingUI(false);
           oskManager.startHide(true);
-          let active = keyman.domManager.activeElement;
-          if (dom.Utils.instanceof(active, "TouchAliasElement")) {
-            (active as dom.TouchAliasElement).hideCaret();
-          }
           keyman.domManager.lastActiveElement = null;
         }
       }
@@ -1722,51 +1723,6 @@ namespace com.keyman.osk {
       }
     };
 
-    /**
-     * Wait until font is loaded before applying stylesheet - test each 100 ms
-     * @param   {Object}  kfd   main font descriptor
-     * @param   {Object}  ofd   secondary font descriptor (OSK only)
-     * @return  {boolean}
-     */
-    waitForFonts(kfd, ofd) {
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
-      let fontDefined = !!(kfd && kfd['files']);
-      kfd = fontDefined ? kfd : undefined;
-
-      let oskFontDefined = !!(ofd && ofd['files']);
-      ofd = oskFontDefined ? ofd : undefined;
-
-      // Automatically 'ready' if the descriptor is explicitly `undefined`.
-      // Thus, also covers the case where both are undefined.
-      var kReady = util.checkFontDescriptor(kfd), oReady = util.checkFontDescriptor(ofd);
-      if (kReady && oReady) {
-        return true;
-      }
-
-      keymanweb.fontCheckTimer = window.setInterval(function () {
-        if (util.checkFontDescriptor(kfd) && util.checkFontDescriptor(ofd)) {
-          window.clearInterval(keymanweb.fontCheckTimer);
-          keymanweb.fontCheckTimer = null;
-          keymanweb.alignInputs();
-        }
-      }, 100);
-
-      // Align anyway as best as can if font appears to remain uninstalled after 5 seconds
-      window.setTimeout(function () {
-        if (keymanweb.fontCheckTimer) {
-          window.clearInterval(keymanweb.fontCheckTimer);
-          keymanweb.fontCheckTimer = null;
-          keymanweb.alignInputs();
-          // Don't notify - this is a management issue, not anything the user needs to deal with
-          // TODO: Consider having an icon in the OSK with a bubble that indicates missing font
-          //util.alert('Unable to download the font normally used with '+ks['KN']+'.');
-        }
-      }, 5000);
-      return false;
-    };
-
     shutdown() {
       let keyman = com.keyman.singleton;
 
@@ -1778,6 +1734,18 @@ namespace com.keyman.osk {
       if(this.inputEngine) {
         this.inputEngine.unregisterEventHandlers();
       }
+
+      if(this.deleting) {
+        window.clearTimeout(this.deleting);
+      }
+
+      this.keyPending = null;
+      this.touchPending = null;
+
+      this.keytip?.show(null, false, this);
+      this.subkeyGesture?.clear();
+      this.pendingMultiTap?.cancel();
+      this.pendingSubkey?.cancel();
     }
   }
 }

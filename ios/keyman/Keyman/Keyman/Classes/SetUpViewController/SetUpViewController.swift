@@ -7,12 +7,12 @@
 //
 
 import KeymanEngine
-import UIKit
+import WebKit
 import Reachability
 
 // TODO: Refactor common functionality from InfoViewController
-class SetUpViewController: UIViewController, UIWebViewDelegate {
-  @IBOutlet var webView: UIWebView!
+class SetUpViewController: UIViewController, WKNavigationDelegate {
+  @IBOutlet var webView: WKWebView!
 
   private var networkReachable: Reachability?
 
@@ -27,7 +27,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     let doneButton = navBar?.topItem?.rightBarButtonItem
     doneButton?.target = self
     doneButton?.action = #selector(self.dismissView)
-    webView?.delegate = self
+    webView?.navigationDelegate = self
     NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged),
         name: NSNotification.Name.reachabilityChanged, object: nil)
 
@@ -66,14 +66,14 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     let filePath = offlineHelpBundle.path(forResource: "installing-system-keyboard",
                                           ofType: "html",
                                           inDirectory: "start")
-    webView.loadRequest(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
+    webView.load(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
 
   private func loadFromServer() {
     let appVersion = Version.current.majorMinor
     let url = "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)"
       + "/start/installing-system-keyboard?embed=ios"
-    webView.loadRequest(URLRequest(url: URL(string: url)!))
+    webView.load(URLRequest(url: URL(string: url)!))
     log.debug("Set up page URL: \(url)")
   }
 }

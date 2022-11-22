@@ -1,18 +1,18 @@
 (*
   Name:             keymancustomisation
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add MouseButton for menu items
                     14 Sep 2006 - mcdurdin - Add Welcome size, splash file name, supports character map properties
@@ -153,7 +153,6 @@ type
 implementation
 
 uses
-  onlineconstants,
   utilhandleexception,
   utilicon,
   utilolepicture,

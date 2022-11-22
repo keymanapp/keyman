@@ -14,7 +14,7 @@
   ],
   "homepage": "https://github.com/keymanapp/keyman",
   "license": "MIT",
-  "main": "index.js",
+  "main": "build/index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -43,7 +43,7 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "chai": "^4.3.4",
-    "mocha": "^8.4.0",
+    "mocha": "^10.0.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.5.4"
   },

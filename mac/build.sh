@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -305,6 +305,8 @@ execBuildCommand() {
     eval $cmnd
     ret_code=$?
     set -e
+
+    printXCodeBuildScriptLogs
 
     if [ $ret_code != 0 ]; then
         fail "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"

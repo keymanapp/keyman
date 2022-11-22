@@ -10,7 +10,6 @@
 
     "baseUrl": ".",
     "paths": {
-      "@keymanapp/es6-shim": ["./common/web/es6-shim"],
       "@keymanapp/input-processor": ["./common/web/input-processor/src"],
       "@keymanapp/keyboard-processor": ["./common/web/keyboard-processor/src"],
       "@keymanapp/models-types": ["./common/models/types"],

@@ -54,37 +54,37 @@ ibus_keyman_tests_SOURCES = \
   testfixture.cpp \
   testmodule.c \
   testmodule.h \
-  ../../../common/core/desktop/src/json.cpp \
-  ../../../common/core/desktop/src/keyboard.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_actions.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_actions.h \
-  ../../../common/core/desktop/src/kmx/kmx_base.h \
-  ../../../common/core/desktop/src/kmx/kmx_capslock.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_consts.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_context.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_context.h \
-  ../../../common/core/desktop/src/kmx/kmx_conversion.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_debug.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_debugger.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_debugger.h \
-  ../../../common/core/desktop/src/kmx/kmx_environment.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_environment.h \
-  ../../../common/core/desktop/src/kmx/kmx_file.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_file.h \
-  ../../../common/core/desktop/src/kmx/kmx_modifiers.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_options.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_options.h \
-  ../../../common/core/desktop/src/kmx/kmx_processevent.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_processevent.h \
-  ../../../common/core/desktop/src/kmx/kmx_processor.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_processor.hpp \
-  ../../../common/core/desktop/src/kmx/kmx_xstring.cpp \
-  ../../../common/core/desktop/src/kmx/kmx_xstring.h \
-  ../../../common/core/desktop/src/option.cpp \
-  ../../../common/core/desktop/src/state.cpp \
-  ../../../common/core/desktop/src/utfcodec.cpp \
-  ../../../common/core/desktop/tests/unit/kmx/kmx_test_source.cpp \
-  ../../../common/core/desktop/tests/unit/kmx/kmx_test_source.hpp \
+  ../../../core/src/jsonpp.cpp \
+  ../../../core/src/keyboard.cpp \
+  ../../../core/src/kmx/kmx_actions.cpp \
+  ../../../core/src/kmx/kmx_actions.h \
+  ../../../core/src/kmx/kmx_base.h \
+  ../../../core/src/kmx/kmx_capslock.cpp \
+  ../../../core/src/kmx/kmx_consts.cpp \
+  ../../../core/src/kmx/kmx_context.cpp \
+  ../../../core/src/kmx/kmx_context.h \
+  ../../../core/src/kmx/kmx_conversion.cpp \
+  ../../../core/src/kmx/kmx_debug.cpp \
+  ../../../core/src/kmx/kmx_debugger.cpp \
+  ../../../core/src/kmx/kmx_debugger.h \
+  ../../../core/src/kmx/kmx_environment.cpp \
+  ../../../core/src/kmx/kmx_environment.h \
+  ../../../core/src/kmx/kmx_file.cpp \
+  ../../../common/include/kmx_file.h \
+  ../../../core/src/kmx/kmx_modifiers.cpp \
+  ../../../core/src/kmx/kmx_options.cpp \
+  ../../../core/src/kmx/kmx_options.h \
+  ../../../core/src/kmx/kmx_processevent.cpp \
+  ../../../core/src/kmx/kmx_processevent.h \
+  ../../../core/src/kmx/kmx_processor.cpp \
+  ../../../core/src/kmx/kmx_processor.hpp \
+  ../../../core/src/kmx/kmx_xstring.cpp \
+  ../../../core/src/kmx/kmx_xstring.h \
+  ../../../core/src/option.cpp \
+  ../../../core/src/state.cpp \
+  ../../../core/src/utfcodec.cpp \
+  ../../../core/tests/unit/kmx/kmx_test_source.cpp \
+  ../../../core/tests/unit/kmx/kmx_test_source.hpp \
   ../src/keycodes.h \
   ../src/keymanutil.c \
   ../src/keymanutil.h \
@@ -99,9 +99,9 @@ ibus_keyman_tests_CFLAGS = \
   @JSON_GLIB_CFLAGS@ \
   @KEYMAN_PROC_CFLAGS@ \
   -DPKGDATADIR=\"$(pkgdatadir)\" \
-  -I$(top_srcdir)/../../common/core/desktop/src \
-  -I$(top_srcdir)/../../common/core/desktop/src/kmx \
-  -I$(top_srcdir)/../../common/core/desktop/tests/unit/kmx \
+  -I$(top_srcdir)/../../core/src \
+  -I$(top_srcdir)/../../core/src/kmx \
+  -I$(top_srcdir)/../../core/tests/unit/kmx \
   -I$(top_srcdir)/src \
   -I$(top_builddir)/src \
   $(NULL)
@@ -113,9 +113,9 @@ ibus_keyman_tests_CPPFLAGS = \
   @JSON_GLIB_CFLAGS@ \
   @KEYMAN_PROC_CFLAGS@ \
   -DPKGDATADIR=\"$(pkgdatadir)\" \
-  -I$(top_srcdir)/../../common/core/desktop/src \
-  -I$(top_srcdir)/../../common/core/desktop/src/kmx \
-  -I$(top_srcdir)/../../common/core/desktop/tests/unit/kmx \
+  -I$(top_srcdir)/../../core/src \
+  -I$(top_srcdir)/../../core/src/kmx \
+  -I$(top_srcdir)/../../core/tests/unit/kmx \
   -I$(top_srcdir)/src \
   -I$(top_builddir)/src \
   $(NULL)

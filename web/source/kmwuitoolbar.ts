@@ -952,7 +952,6 @@ if(!window['keyman']['ui']['name']) {
       // Must disable OSK button when not focused
       if(ui.oskButtonNode.style.display != 'none') ui.oskButtonNode.className='kmw_button_disabled';
 
-      if(!params.event) return true;   // I2404 - Manage IE events in IFRAMEs
       return true;
     }
     keymanweb['addEventListener']('controlblurred',ui.blurControlEvent);
@@ -1216,9 +1215,8 @@ if(!window['keyman']['ui']['name']) {
     }
 
     // Initialize when everything defined (replaces unreliable onload event handler)
-    // ui.initToolbarUI();
-    // No, initialization must not be done before KMW is ready!
-    // ui.initialize() is now called by keymanweb when document is ready and kmw initialization completed
-
+    // In case the toolbar script loads a bit later than the main KMW script
+    // (may happen in unit testing)
+    ui.initToolbarUI(); // equivalent to ui.Initialize() from the other UI modules
   } catch(ex){}
 }

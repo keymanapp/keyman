@@ -1,25 +1,11 @@
 var assert = chai.assert;
 
 describe('Text Selection', function() {
-  this.timeout(kmwconfig.timeouts.standard);
+  this.timeout(testconfig.timeouts.standard);
 
   /* Utility functions */
 
-  function supportsInputEvent(done) {
-    if(typeof InputEvent != 'function') {
-      console.log("InputEvent not supported.");
-      done();
-      return false;
-    }
-    return true;
-  }
-
   function setupElement(ele) {
-    if(ele['kmw_ip']) {
-      ele = ele['kmw_ip'];
-      //aliasing = true;
-    }
-
     // A bit of a force-hack to ensure the element is seen as active for the tests.
     com.keyman.dom['DOMEventHandlers'].states._lastActiveElement = ele;
     com.keyman.dom['DOMEventHandlers'].states._activeElement = ele;
@@ -46,21 +32,6 @@ describe('Text Selection', function() {
     return new KMWRecorder.BrowserDriver(setupElement(ele));
   }
 
-
-  if(!supportsInputEvent()) {
-    console.log('Don\'t run Text Selection tests on browsers that don\'t support Input event');
-    return;
-  }
-
-  var device = new com.keyman.Device();
-  device.detect();
-
-  if(device.formFactor != 'desktop') {
-    console.log('Don\'t run Text Selection tests on mobile, because we don\'t '+
-      'yet support selection on mobile browsers');
-    return;
-  }
-
   /* Define key event specs */
 
   var keys = {};
@@ -76,19 +47,18 @@ describe('Text Selection', function() {
   // TODO: Add automated tests for editable DIV, designMode iframe
   for(var inputType of ['Input', 'TextArea']) {
     describe('Text Selection in '+inputType, function() {
-      before(function(done) {
+      before(function() {
         // These tests require use of KMW's device-detection functionality.
         assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
         fixture.setBase('fixtures');
         fixture.load("single"+inputType+".html");
 
-        this.timeout(kmwconfig.timeouts.scriptLoad*2);
-        setupKMW(null, function() {
-          loadKeyboardFromJSON("/keyboards/web_context_tests.json", function() {
-            keyman.setActiveKeyboard("web_context_tests");
-            done();
-          }, kmwconfig.timeouts.scriptLoad);
-        }, kmwconfig.timeouts.scriptLoad);
+        this.timeout(testconfig.timeouts.scriptLoad*2);
+        return setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
+          return loadKeyboardFromJSON("/keyboards/web_context_tests.json", testconfig.timeouts.scriptLoad).then(() => {
+            return keyman.setActiveKeyboard("web_context_tests");
+          });
+        });
       });
 
       after(function() {
@@ -101,7 +71,7 @@ describe('Text Selection', function() {
         fixture.load("single"+inputType+".html");
         window.setTimeout(function(){
           done();
-        }, kmwconfig.timeouts.eventDelay);
+        }, testconfig.timeouts.eventDelay);
       });
 
       /*

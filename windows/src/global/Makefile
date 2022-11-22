@@ -5,16 +5,13 @@ build:
 !ifdef NODELPHI
   echo Skipping global
 !else
+  cd $(KEYMAN_ROOT)\common\windows\delphi\components
+  $(MAKE) $(TARGET)
+
   cd $(ROOT)\src\global\delphi
   $(MAKE) $(TARGET)
 
-  cd $(ROOT)\src\global\help
-  $(MAKE) $(TARGET)
-
-  cd $(ROOT)\src\global\inst
-  $(MAKE) $(TARGET)
-
-  cd $(ROOT)\src\global\wix
+  cd $(KEYMAN_ROOT)\common\windows\data
   $(MAKE) $(TARGET)
 !endif
 
@@ -23,18 +20,12 @@ build-release:
 
 clean:
   -del $(ROOT)\src\global\delphi\general\keymanversion_build.inc
-  -del $(ROOT)\src\global\inc\keymanversion_build.h
+  -del $(KEYMAN_ROOT)\common\windows\cpp\include\keymanversion_build.h
 
   cd $(ROOT)\src\global\delphi
   $(MAKE) clean
 
-  cd $(ROOT)\src\global\help
-  $(MAKE) clean
-
-  cd $(ROOT)\src\global\inst
-  $(MAKE) clean
-
-  cd $(ROOT)\src\global\wix
+  cd $(KEYMAN_ROOT)\common\windows\data
   $(MAKE) clean
 
 signcode:

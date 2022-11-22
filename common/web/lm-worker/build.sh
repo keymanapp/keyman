@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications.
 # Designed for optimal compatibility with the Keyman Suite.
@@ -20,19 +20,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-display_usage ( ) {
-  echo "Usage: $0 [configure] [clean] [build] [test]"
-  echo "          [--verbose|-v]"
-  echo "       $0 -h|--help"
-  echo
-  echo "  clean                  removes build/ folder"
-  echo "  configure              runs 'npm ci' on root folder"
-  echo "  build                  builds wrapped version of package"
-  echo "                           [if required will: configure]"
-  echo "  test                   runs tests (builds as req'd)"
-  echo "                           [if required will: build]"
-}
-
 WORKER_OUTPUT=build
 WORKER_OUTPUT_FILENAME=$WORKER_OUTPUT/index.js
 WORKER_TEST_BUNDLE_TARGET_FILENAME=$WORKER_OUTPUT/index.wrapped-for-bundle.ts
@@ -52,60 +39,60 @@ wrap-worker-code ( ) {
   echo "// --START:LMLayerWorkerCode--"
   printf "function %s () {\n" "${name}"
 
-  # TODO: I don't know if this is still true, or if we can add the polyfills to
-  # the project directly now?
-  #
   # Since the worker is compiled with "allowJS=false" so that we can make
   # declaration files, we have to insert polyfills here.
 
-  # This one's a minimal, targeted polyfill.  es6-shim could do the same, but
-  # also adds a lot more code the worker doesn't need to use. Recommended by MDN
-  # while keeping the worker lean and efficient.
-  # TODO: determine which platforms+versions require this?
+  ### NOTE ###
+  # Android API 21 (our current minimum) released with Chrome for Android 37.
+  # It's also updatable as of this version, but we can't guarantee that the user
+  # actually updated it, especially on first launch of the Android app/keyboard.
+
+  # This one's a minimal, targeted polyfill.  es6-shim could do the same,
+  # but also adds a lot more code the worker doesn't need to use.
+  # Recommended by MDN while keeping the worker lean and efficient.
+  # Needed for Android / Chromium browser pre-41.
   cat "../../../node_modules/string.prototype.codepointat/codepointat.js" || die
 
-  # Needed to ensure functionality on some older Android devices. (API 19-23 or
-  # so)
-  # TODO: determine exactly which versions require this?
-  cat "../../../node_modules/string.prototype.startswith/startswith.js" || die
-
-  # These two are straight from MDN - I didn't find any NPM ones that don't use
-  # the node `require` statement for the second.  They're also relatively short
-  # and simple, which is good.
-  # TODO: determine which platforms+versions require this?
-  cat "src/polyfills/array.fill.js" || die
-  cat "src/polyfills/array.from.js" || die
+  # These two are straight from MDN - I didn't find any NPM ones that don't
+  # use the node `require` statement for the second.  They're also relatively
+  # short and simple, which is good.
+  cat "src/polyfills/array.fill.js" || die # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.findIndex.js" || die # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.from.js" || die # Needed for Android / Chromium browser pre-45.
+  cat "src/polyfills/array.includes.js" || die # Needed for Android / Chromium browser pre-47.
 
   # For Object.values, for iteration over object-based associate arrays.
-  # TODO: determine which platforms+versions require this?
-  cat "src/polyfills/object.values.js" || die
+  cat "src/polyfills/object.values.js" || die # Needed for Android / Chromium browser pre-54.
 
   # Needed to support Symbol.iterator, as used by the correction algorithm.
-  # TODO: determine which platforms+versions require this?
-  cat "src/polyfills/symbol-es6.min.js" || die
-
-  # Needed to 'support' String.normalize within iOS 9. For our limited use case
-  # thereof; is definitely NOT a general polyfill. (The file size on a true one
-  # would be quite high.)
-  cat "src/polyfills/string.normalize.js" || die
+  cat "src/polyfills/symbol-es6.min.js" || die # Needed for Android / Chromium browser pre-43.
 
   echo ""
 
   cat "${js}" || die
   printf "\n}\n"
-  echo "// --END:LMLayerWorkerCode--"
+  echo "// --END:LMLlayerWorkerCode"
 }
 
 ################################ Main script ################################
 
-builder_init "clean configure build test" "$@"
+builder_describe \
+  "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
+  "@../keyman-version" \
+  configure clean build test
+
+builder_describe_outputs \
+  configure     /node_modules \
+  build         build/index.js
+
+builder_parse "$@"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_has_action configure; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_report configure success
+  builder_finish_action success configure
 fi
 
 # We always need to clean first because the wrapping function
@@ -115,14 +102,15 @@ fi
 # of typescript, we need to avoid this!
 # TODO: we should try and rework this to avoid the need to manually wrap
 
-if builder_has_action clean || builder_has_action build; then
+if builder_start_action clean; then
   npm run clean
-  builder_report clean success
+  builder_finish_action success clean
 fi
 
-if builder_has_action build; then
-  # Ensure keyman-version is properly build (requires build script)
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
+if builder_start_action build; then
+  if ! builder_has_action clean; then
+    npm run clean
+  fi
 
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."
@@ -135,10 +123,10 @@ if builder_has_action build; then
   wrap-worker-code LMLayerWorkerCode "${WORKER_OUTPUT}/intermediate.js" > "${WORKER_OUTPUT_FILENAME}" || die
   cp "${WORKER_OUTPUT_FILENAME}" "${WORKER_TEST_BUNDLE_TARGET_FILENAME}" || die
 
-  builder_report build success
+  builder_finish_action success build
 fi
 
-if builder_has_action test; then
+if builder_start_action test; then
   npm test || fail "Tests failed"
-  builder_report test success
+  builder_finish_action success test
 fi

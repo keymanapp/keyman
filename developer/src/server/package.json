@@ -1,0 +1,46 @@
+{
+  "name": "@keymanapp/developer-server",
+  "description": "Keyman Developer backend server",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "postbuild": "npx gosh ./postbuild.sh",
+    "prod": "node .",
+    "test": "mocha",
+    "watch": "npm run postbuild && tsc-watch --onSuccess \"node --inspect .\" --onFailure \"node --inspect .\""
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@sentry/node": "^6.16.1",
+    "chalk": "^4.1.2",
+    "express": "^4.17.2",
+    "multer": "^1.4.5-lts.1",
+    "ngrok": "^4.2.2",
+    "open": "^8.4.0",
+    "ws": "^8.3.0"
+  },
+  "optionalDependencies": {
+    "hetrodo-node-hide-console-window-napi": "keymanapp/hetrodo-node-hide-console-window-napi#keyman-15.0",
+    "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-16.0"
+  },
+  "devDependencies": {
+    "@keymanapp/resources-gosh": "*",
+    "@keymanapp/keyman-version": "*",
+    "@types/chai": "^4.3.0",
+    "@types/express": "^4.17.13",
+    "@types/mocha": "^9.1.0",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^17.0.0",
+    "@types/ws": "^8.2.2",
+    "chai": "^4.3.4",
+    "copyfiles": "^2.4.1",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.4.0",
+    "tsc-watch": "^4.5.0",
+    "typescript": "^4.5.4"
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "spec": "**/*.test.ts"
+  }
+}

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 #
 # Compile the KeymanWeb bulk-renderer module for use with developing/running engine tests.
 
@@ -13,28 +13,20 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 set_keyman_standard_build_path
 
-display_usage ( ) {
-  echo "Usage: build.sh [flags...] [commands...]"
-  echo
-  echo "Commands:"
-  echo "  configure              runs 'npm ci' on root folder"
-  echo "  build                  (default) builds bulk_renderer to ../release/renderer"
-  echo
-  echo "Flags:"
-  echo "  -v, --verbose          Use verbose logging"
-  echo "  -h, --help             Print this help"
-}
-
 ################################ Main script ################################
 
-builder_init "configure build" "$@"
+builder_describe \
+  "Build the bulk renderer project. The bulk renderer loads all the cloud keyboards from api.keyman.com and renders each of them to a document." \
+  "configure     runs 'npm ci' on root folder" \
+  "build         (default) builds bulk_renderer to ../release/renderer/"
+builder_parse "$@"
 
-if builder_has_action configure; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_report configure success
+  builder_finish_action success configure
 fi
 
-if builder_has_action build; then
+if builder_start_action build; then
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json" $builder_verbose
-  builder_report build success
+  builder_finish_action success build
 fi

@@ -12,7 +12,6 @@
   },
   "references": [
     { "path": "../web/utils" },
-    { "path": "../web/es6-shim" },
     { "path": "../models/types"},
     { "path": "../models/wordbreakers"},
     { "path": "../web/lm-message-types"},

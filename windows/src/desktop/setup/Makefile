@@ -15,7 +15,7 @@ build: version.res manifest.res icons locale
     $(COPY) $(WIN32_TARGET_PATH)\setup.exe $(PROGRAM)\desktop\setup-redist.exe
 
 locale: .virtual
-    $(ROOT)\bin\buildtools\devtools.exe -buildsetupstrings locale\ .\
+    $(DEVTOOLS) -buildsetupstrings locale\ .\
 
 setup_dialog.res:
     rc setup_dialog.rc

@@ -11,7 +11,7 @@ Packages are **never** published from a developer's machine.
 ## List of current npm packages
 
 * `@keymanapp/models-types` -- located at `common/models-types`
-* `@keymanapp/lexical-model-compiler` -- located at `developer/js`
+* `@keymanapp/lexical-model-compiler` -- located at `developer/src/kmlmc`
 
 ## For CI developers
 

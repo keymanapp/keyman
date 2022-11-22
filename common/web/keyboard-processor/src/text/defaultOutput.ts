@@ -154,9 +154,10 @@ namespace com.keyman.text {
       const codePoints = keyName.substr(2).split('_');
       for(let codePoint of codePoints) {
         const codePointValue = parseInt(codePoint, 16);
-        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F))) {
+        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) || isNaN(codePointValue)) {
           // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
           // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
+          // Also handles invalid identifiers (e.g. `U_ghij`) for which parseInt returns NaN
           if(ruleBehavior) {
             ruleBehavior.errorLog = ("Suppressing Unicode control code in " + keyName);
           }

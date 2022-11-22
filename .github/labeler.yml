@@ -5,22 +5,20 @@
 # common ones. The others are commented out. There is still some variance between
 # folder names and labels; consider this documentation of that ;-)
 
+docs: docs/**
+
 #
 # Add labels based on changed files using actions/labeler
 #
 
 android/: android/**
 android/app/: android/KMAPro/**
-#android/browser/:
 android/engine/: android/KMEA/**
-#android/resources/:
 android/samples/: android/Samples/**
 
 common/:
   - common/**
   - resources/**
-common/core/: common/core/**
-common/core/desktop/: common/core/desktop/**
 
 common/models/: common/models/**
 common/models/types/: common/models/types/**
@@ -28,44 +26,41 @@ common/models/templates/: common/models/templates/**
 common/models/wordbreakers/: common/models/wordbreakers/**
 
 common/resources/: resources/**
+common/web/: common/web/**
+
+core/:
+  - core/**
 
 developer/:
   - developer/**
-  - windows/src/developer/**
 
 developer/compilers/:
-  - windows/src/developer/kmcomp/**
-  - developer/js/**
+  - developer/src/kmcomp/**
+  - developer/src/kmcmpdll/**
+  - developer/src/kmc/**
+  - developer/src/kmc-*/**
 
 developer/ide/:
-  - windows/src/developer/TIKE/**
+  - developer/src/server/**
+  - developer/src/tike/**
 
-# developer/resources/
-# developer/tools/
 
 ios/: ios/**
 ios/app/: ios/keyman/**
-# ios/browser/
 ios/engine/: ios/engine/**
-# ios/resources/
 ios/samples/: ios/samples/**
 
 linux/: linux/**
 linux/config/: linux/keyman-config/**
 linux/engine/:
   - linux/ibus-keyman/**
-  - linux/ibus-kmfl/**
-  - linux/kmflcomp/**
-  - linux/libkmfl/**
-  - linux/scim_kmfl_imengine/**
-# linux/resources/
-# linux/samples/
+  - linux/legacy/ibus-kmfl/**
+  - linux/legacy/kmflcomp/**
+  - linux/legacy/libkmfl/**
 
 mac/: mac/**
 # mac/config/:
-mac/engine/: mac/**
-# mac/resources/
-# mac/samples/
+# mac/engine/: mac/**
 
 oem/: oem/**
 oem/fv/: oem/firstvoices/**
@@ -76,15 +71,9 @@ oem/fv/windows/: oem/firstvoices/windows/**
 web/: web/**
 # web/bookmarklet/
 web/engine/: web/source/**
-# web/resources/
 web/ui/: web/source/kmwui*
 web/samples/: web/samples/**
 
-# Somewhat messy since we try and exclude Developer :)
-windows/:
-- any: ['windows/**', '!windows/src/developer/**']
-
+windows/: windows/**
 windows/config/: windows/src/desktop/**
 windows/engine/: windows/src/engine/**
-# windows/resources/
-# windows/samples/

@@ -78,7 +78,8 @@ namespace com.keyman.osk.browser {
         let canvasWidth = xWidth + Math.ceil(xWidth * 0.3) * 2;
         let canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
 
-        kts.top = Math.floor(y - canvasHeight) + 'px';
+        kts.top = 'auto';
+        kts.bottom = Math.floor(keyman.osk.computedHeight - y) + 'px';
         kts.textAlign = 'center';
         kts.overflow = 'visible';
         kts.fontFamily = util.getStyleValue(kc,'font-family');

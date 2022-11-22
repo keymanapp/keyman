@@ -50,10 +50,10 @@
 "command-uninstall-lexical-model-confirm" = "你想要卸载这个字典吗？";
 
 /* Text for error when a keyboard cannot load properly */
-"error-loading-keyboard" = "Unable to load the requested keyboard";
+"error-loading-keyboard" = "无法加载目标键盘";
 
 /* Text for error when a lexical model cannot load properly */
-"error-loading-lexical-model" = "Unable to load the requested dictionary";
+"error-loading-lexical-model" = "无法加载目标字典";
 
 /* Text for error when an installed file is unexpectedly missing */
 "error-missing-file" = "找不到必需文件。";
@@ -118,11 +118,20 @@
 /* Error opening a Keyman package - package is not valid */
 "kmp-error-invalid" = "安装包的文件已被损坏。";
 
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "指定的程序包不存在。";
+
 /* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
 "kmp-error-missing-resource" = "此软件包不包含要求的键盘或字典。";
 
+/* Error installing a Keyman package with a version of Keyman that does not support it */
+"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "此软件包未被正确构建-内容未知。";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "此程序包不支持您的设备。";
 
 /* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
 "kmp-error-wrong-type" = "此软件包不包含预期的资源类型。";
@@ -188,34 +197,34 @@
 "menu-settings-title" = "Keyman 设置";
 
 /* Secondary text showing current setting for spacebar caption - blank */
-"menu-settings-spacebar-hint-blank" = "Do not show caption on spacebar";
+"menu-settings-spacebar-hint-blank" = "空格键无提示";
 
 /* Secondary text showing current setting for spacebar caption - keyboard */
-"menu-settings-spacebar-hint-keyboard" = "Show keyboard name on spacebar";
+"menu-settings-spacebar-hint-keyboard" = "空格键上显示键盘名称";
 
 /* Secondary text showing current setting for spacebar caption - language */
-"menu-settings-spacebar-hint-language" = "Show language name on spacebar";
+"menu-settings-spacebar-hint-language" = "空格键上显示语言名称";
 
 /* Secondary text showing current setting for spacebar caption - language + keyboard */
-"menu-settings-spacebar-hint-languageKeyboard" = "Show language and keyboard name on spacebar";
+"menu-settings-spacebar-hint-languageKeyboard" = "空格键上显示语言和键盘名称";
 
 /* Label for the "Spacebar Caption" item on the main settings screen */
-"menu-settings-spacebar-text" = "Spacebar Caption";
+"menu-settings-spacebar-text" = "空格键提示";
 
 /* Title for the "Spacebar Caption" settings screen */
-"menu-settings-spacebar-title" = "Spacebar Caption";
+"menu-settings-spacebar-title" = "空格键提示";
 
 /* Text showing name of spacebar caption - blank */
-"menu-settings-spacebar-item-blank" = "Blank";
+"menu-settings-spacebar-item-blank" = "空白";
 
 /* Text showing name of spacebar caption - keyboard */
-"menu-settings-spacebar-item-keyboard" = "Keyboard";
+"menu-settings-spacebar-item-keyboard" = "键盘";
 
 /* Text showing name of spacebar caption - language */
-"menu-settings-spacebar-item-language" = "Language";
+"menu-settings-spacebar-item-language" = "语言";
 
 /* Text showing name of spacebar caption - language + keyboard */
-"menu-settings-spacebar-item-languageKeyboard" = "Language and keyboard";
+"menu-settings-spacebar-item-languageKeyboard" = "语言和键盘";
 
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "键盘下载失败";

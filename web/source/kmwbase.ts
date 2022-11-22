@@ -51,13 +51,11 @@ namespace com.keyman {
   }
 
   export class KeymanBase {
-    _IE = 0;                   // browser version identification
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
     warned = false;            // Warning flag (to prevent multiple warnings)
-    baseFont = 'sans-serif';   // Default font for mapped input elements
-    appliedFont = '';          // Chain of fonts to be applied to mapped input elements
-    fontCheckTimer = null;     // Timer for testing loading of embedded fonts
+    baseFont = 'sans-serif';   // Default page font (utilized by the OSK)
+    appliedFont = '';          // Chain of fonts to be applied to OSK elements
     srcPath = '';              // Path to folder containing executing keymanweb script
     rootPath = '';             // Path to server root
     protocol = '';             // Protocol used for the KMW script.
@@ -114,9 +112,13 @@ namespace com.keyman {
     getKeyboardPath(f, p?){return f;}
     KC_(n, ln, Pelem){return '';}
     handleRotationEvents(){}
-    // Will serve as an API function for a workaround, in case of future touch-alignment issues.
+    /**
+     * Legacy API function for touch-alias issue workarounds
+     * Touch-aliases have been eliminated, though.
+     *
+     * This function is deprecated in 16.0, with plans for removal in 17.0.
+     */
     ['alignInputs'](eleList?: HTMLElement[]){}
-    hideInputs() {};
     namespaceID(Pstub) {};
     preserveID(Pk) {};
 
@@ -178,14 +180,25 @@ namespace com.keyman {
     }
 
     /**
+     * Reset context when entering or exiting the active element.
+     * Will also trigger OSK shift state / layer reset.
+     **/
+    pageFocusHandler = () => {
+      if(!this.uiManager.isActivating && this.osk?.vkbd) {
+        this.core.resetContext(null);
+      }
+      return false;
+    }
+
+    /**
      * Triggers a KeymanWeb engine shutdown to facilitate a full system reset.
      * This function is designed for use with KMW unit-testing, which reloads KMW
      * multiple times to test the different initialization paths.
      */
     ['shutdown']() {
       // Disable page focus/blur events, which can sometimes trigger and cause parallel KMW instances in testing.
-      this.util.detachDOMEvent(window, 'focus', this['pageFocusHandler'], false);
-      this.util.detachDOMEvent(window, 'blur', this['pageFocusHandler'], false);
+      this.util.detachDOMEvent(window, 'focus', this.pageFocusHandler, false);
+      this.util.detachDOMEvent(window, 'blur', this.pageFocusHandler, false);
 
       this.domManager.shutdown();
       this.osk.shutdown();
@@ -220,17 +233,6 @@ namespace com.keyman {
     }
 
     /**
-     * Expose font testing to allow checking that SpecialOSK or custom font has
-     * been correctly loaded by browser
-     *
-     *  @param  {string}  fName   font-family name
-     *  @return {boolean}         true if available
-     **/
-    ['isFontAvailable'](fName: string): boolean {
-      return this.util.checkFont({'family':fName});
-    }
-
-    /**
      * Function     addEventListener
      * Scope        Public
      * @param       {string}            event     event to handle
@@ -240,37 +242,6 @@ namespace com.keyman {
      */
     ['addEventListener'](event: string, func): boolean {
       return this.util.addEventListener('kmw.'+event, func);
-    }
-
-      /**
-     * Function     _GetEventObject
-     * Scope        Private
-     * @param       {Event=}     e     Event object if passed by browser
-     * @return      {Event|null}       Event object
-     * Description Gets the event object from the window when using Internet Explorer
-     *             and handles getting the event correctly in frames
-     */
-    _GetEventObject<E extends Event>(e: E) {  // I2404 - Attach to controls in IFRAMEs
-      if (!e) {
-        e = window.event as E;
-        if(!e) {
-          var elem: HTMLElement = this.domManager.lastActiveElement;
-          if(elem) {
-            let doc = elem.ownerDocument;
-            var win: Window;
-            if(doc) {
-              win = doc.defaultView;
-            }
-            if(!win) {
-              return null;
-            }
-
-            e = win.event as E;
-          }
-        }
-      }
-
-      return e;
     }
 
     /**
@@ -441,6 +412,15 @@ namespace com.keyman {
     ['isChiral'](k0?) {
       var kbd: keyboards.Keyboard;
       if(k0) {
+        if(typeof k0 == 'string') {
+          const kbdObj = this.keyboardManager.keyboards.find((kbd) => kbd['KI'] == k0);
+          if(!kbdObj) {
+            throw new Error(`Keyboard '${k0}' has not been loaded.`);
+          } else {
+            k0 = kbdObj;
+          }
+        }
+
         kbd = new keyboards.Keyboard(k0);
       } else {
         kbd = this.core.activeKeyboard;
@@ -710,7 +690,16 @@ namespace com.keyman {
 
       PKbd = PKbd || this.core.activeKeyboard;
 
-      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, this.osk.computedHeight);
+      // help.keyman.com will (lkudingly) set this function in place to specify the desired
+      // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
+      // "temporary" (but actually permanent) solutions from yesteryear.
+      //
+      // Note that the main intended use of that function is for embedded KMW on the mobile apps...
+      // but they never call `BuildVisualKeyboard`, so it's all good.
+      const getOskHeight = this['getOskHeight'];
+      let targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
+
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PKbd, argFormFactor, argLayerId, targetHeight);
     }
   }
 }

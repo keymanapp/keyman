@@ -91,9 +91,9 @@ keyman64-install:
 # ----------------------------------------------------------------------
 
 redist:
-    copy $(ROOT)\src\ext\sentry\sentry.dll $(ROOT)\bin\engine
-    copy $(ROOT)\src\ext\sentry\sentry.x64.dll $(ROOT)\bin\engine
-    copy $(ROOT)\src\ext\sentry\crashpad_handler.exe $(ROOT)\bin\engine
+    copy $(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\sentry.dll $(ROOT)\bin\engine
+    copy $(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\sentry.x64.dll $(ROOT)\bin\engine
+    copy $(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\crashpad_handler.exe $(ROOT)\bin\engine
 
 # ----------------------------------------------------------------------
 

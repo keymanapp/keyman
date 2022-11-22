@@ -47,17 +47,17 @@ namespace com.keyman.osk {
     elementID?: string;
 
     text?: string;
-    sp?: number | keyboards.ButtonClass;
-    width: string;
+    sp?: keyboards.ButtonClass;
+    width: number;
     layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
     nextlayer?: string;
-    pad?: string;
+    pad?: number;
     sk?: OSKKeySpec[];
 
-    constructor(id: string, text?: string, width?: string, sp?: number | keyboards.ButtonClass, nextlayer?: string, pad?: string) {
+    constructor(id: string, text?: string, width?: number, sp?: keyboards.ButtonClass, nextlayer?: string, pad?: number) {
       this.id = id;
       this.text = text;
-      this.width = width ? width : "50";
+      this.width = width ? width : 50;
       this.sp = sp;
       this.nextlayer = nextlayer;
       this.pad = pad;
@@ -159,9 +159,7 @@ namespace com.keyman.osk {
         n=8;
       }
 
-      if(typeof key['sp'] == 'string') {
-        n=parseInt(key['sp'],10);
-      }
+      n = key['sp'] ?? n;
 
       if(n < 0 || n > 10) {
         n=0;
@@ -179,13 +177,8 @@ namespace com.keyman.osk {
      */
     public setToggleState(flag?: boolean) {
       let btnClassId: number;
-      let classAsString: boolean;
 
-      if(classAsString = typeof this.spec['sp'] == 'string') {
-        btnClassId = parseInt(this.spec['sp'], 10);
-      } else {
-        btnClassId = this.spec['sp'];
-      }
+      btnClassId = this.spec['sp'];
 
       // 1 + 2:   shift  +  shift-on
       // 3 + 4:  special + special-on
@@ -196,7 +189,7 @@ namespace com.keyman.osk {
             flag = OSKKey.BUTTON_CLASSES[btnClassId] == 'shift';
           }
 
-          this.spec['sp'] = 1 + (flag ? 1 : 0);
+          this.spec['sp'] = 1 + (flag ? 1 : 0) as keyboards.ButtonClass;
           break;
         // Added in 15.0:  special key highlight toggling.
         // Was _intended_ in earlier versions, but not actually implemented.
@@ -206,15 +199,10 @@ namespace com.keyman.osk {
             flag = OSKKey.BUTTON_CLASSES[btnClassId] == 'special';
           }
 
-          this.spec['sp'] = 3 + (flag ? 1 : 0);
+          this.spec['sp'] = 3 + (flag ? 1 : 0) as keyboards.ButtonClass;
           break;
         default:
           return;
-      }
-
-      if(classAsString) {
-        // KMW currently doesn't handle raw numbers for 'sp' properly.
-        this.spec['sp'] = ('' + this.spec['sp']) as keyboards.ButtonClass;
       }
 
       this.setButtonClass();
@@ -423,7 +411,7 @@ namespace com.keyman.osk {
       const codePoints = id.substr(2).split('_');
       for(let codePoint of codePoints) {
         const codePointValue = parseInt(codePoint, 16);
-        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F))) {
+        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) || isNaN(codePointValue)) {
           continue;
         } else {
           // String.fromCharCode() is inadequate to handle the entire range of Unicode

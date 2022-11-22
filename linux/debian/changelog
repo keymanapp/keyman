@@ -1,3 +1,67 @@
+keyman (15.0.272-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 10 Nov 2022 17:37:24 +0100
+
+keyman (15.0.271-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 19 Oct 2022 16:15:33 +0200
+
+keyman (15.0.270-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Tue, 13 Sep 2022 11:20:25 +0200
+
+keyman (15.0.269-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 29 Aug 2022 15:14:16 +0200
+
+keyman (15.0.268-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 05 Aug 2022 17:31:36 +0200
+
+keyman (15.0.267-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Tue, 26 Jul 2022 10:38:41 +0200
+
+keyman (15.0.266-2) unstable; urgency=high
+
+  * Team upload.
+  * debian/patches/0001-fix-common-Fix-delete.patch: Apply upstream
+    trunk patch to fix FTBFS with GCC 12. (Closes: #1012958)
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 24 Jul 2022 01:07:36 -0400
+
+keyman (15.0.266-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Tue, 12 Jul 2022 16:51:32 +0200
+
+keyman (15.0.260-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 15 Jun 2022 10:55:17 +0200
+
 keyman (15.0.235-1) unstable; urgency=medium
 
   * New upstream release

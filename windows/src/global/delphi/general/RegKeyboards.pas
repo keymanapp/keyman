@@ -79,7 +79,6 @@ type
     FCopyright: WideString;
     FMessage: WideString;
     FVisualKeyboardFileName: string;
-    FProductID: Integer;
     FIcon: TIcon;
     FMnemonicLayout: Boolean;
     //FNewlyInstalled: Boolean;
@@ -125,7 +124,6 @@ type
     property Copyright: WideString read FCopyright;
     property Message: WideString read FMessage;
     property Icon: TIcon read FIcon;
-    property ProductID: Integer read FProductID;
     property MnemonicLayout: Boolean read FMnemonicLayout;
     property WindowsLanguages: WideString read FWindowsLanguages;
     property ISO6393Languages: WideString read FISO6393Languages;
@@ -160,7 +158,6 @@ uses
   isadmin,
   KLog,
   kmxfileusedchars,
-  OnlineConstants,
   ErrorControlledRegistry,
   RegistryKeys,
   utilolepicture,
@@ -327,7 +324,6 @@ begin
   FMessage := '';
   FCopyright := '';
   FKeyboardVersion := '';   // I4136
-  FProductID := OnlineProductID_KeymanDesktop_100;  // I3377
 
   with TRegistryErrorControlled.Create do  // I2890
   try
@@ -440,7 +436,6 @@ begin
       //FIcon.LoadFromResourceName(HInstance, 'kbd_noicon');
     end;
 
-    FProductID := ki.ProductID;
     FMnemonicLayout := ki.MnemonicLayout;
   except
     on E:Exception do

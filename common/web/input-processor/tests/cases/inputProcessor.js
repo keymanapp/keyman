@@ -30,7 +30,7 @@ describe('InputProcessor', function() {
       let core = new InputProcessor(device);
 
       assert.isOk(core.keyboardProcessor);
-      assert.isDefined(core.keyboardProcessor.device);
+      assert.isDefined(core.keyboardProcessor.contextDevice);
       assert.isOk(core.languageProcessor);
       assert.isOk(core.keyboardInterface);
       assert.isUndefined(core.activeKeyboard); // No keyboard should be loaded yet.

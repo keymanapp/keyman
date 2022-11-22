@@ -10,7 +10,12 @@ namespace com.keyman.text {
       baseLayout: 'us'
     }
 
-    private device: utils.DeviceSpec;
+    /**
+     * Indicates the device (platform) to be used for non-keystroke events,
+     * such as those sent to `begin postkeystroke` and `begin newcontext`
+     * entry points.
+     */
+    private contextDevice: utils.DeviceSpec;
     private kbdProcessor: KeyboardProcessor;
     private lngProcessor: prediction.LanguageProcessor;
 
@@ -23,7 +28,7 @@ namespace com.keyman.text {
         options = InputProcessor.DEFAULT_OPTIONS;
       }
 
-      this.device = device;
+      this.contextDevice = device;
       this.kbdProcessor = new KeyboardProcessor(device, options);
       this.lngProcessor = new prediction.LanguageProcessor();
     }
@@ -65,7 +70,7 @@ namespace com.keyman.text {
      *                                    all matched keyboard rules
      */
      processNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
-      const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.device, outputTarget);
+      const ruleBehavior = this.keyboardProcessor.processNewContextEvent(this.contextDevice, outputTarget);
 
       if(ruleBehavior) {
         ruleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
@@ -84,6 +89,32 @@ namespace com.keyman.text {
      *                                          all matched keyboard rules.
      */
     processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
+      const kbdMismatch = keyEvent.srcKeyboard && this.activeKeyboard != keyEvent.srcKeyboard;
+      const trueActiveKeyboard = this.activeKeyboard;
+
+      try {
+        if(kbdMismatch) {
+          // Avoid force-reset of context per our setter above.
+          this.keyboardInterface.activeKeyboard = keyEvent.srcKeyboard;
+        }
+
+        return this._processKeyEvent(keyEvent, outputTarget);
+      } finally {
+        if(kbdMismatch) {
+          // Restore our "current" activeKeyboard to its setting before the mismatching KeyEvent.
+          this.keyboardInterface.activeKeyboard = trueActiveKeyboard;
+        }
+      }
+    }
+
+    /**
+     * Acts as the core of `processKeyEvent` once we're comfortable asserting that the incoming
+     * keystroke matches the current `activeKeyboard`.
+     * @param keyEvent
+     * @param outputTarget
+     * @returns
+     */
+    private _processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       let formFactor = keyEvent.device.formFactor;
       let fromOSK = keyEvent.isSynthetic;
 
@@ -141,27 +172,29 @@ namespace com.keyman.text {
 
       // If it's a key that we 'optimize out' of our fat-finger correction algorithm,
       // we MUST NOT trigger it for this keystroke.
-      let isOnlyLayerShift = text.Codes.isKnownOSKModifierKey(keyEvent.kName);
+      let isOnlyLayerSwitchKey = text.Codes.isKnownOSKModifierKey(keyEvent.kName);
 
       // Best-guess stopgap for possible custom modifier keys.
       // If a key (1) does not affect the context and (2) shifts the active layer,
       // we assume it's a modifier key.  (Touch keyboards may define custom modifier keys.)
       //
-      // Note:  this could cause an issue in the niche scenario where:
+      // Note:  this will mean we won't generate alternates in the niche scenario where:
       // 1.  Keypress does not alter the actual context
       // 2.  It DOES emit a deadkey with an earlier processing rule.
       // 3.  The FINAL processing rule does not match.
       // 4.  The key ALSO signals a layer shift.
       // If any of the four above conditions aren't met - no problem!
       // So it's a pretty niche scenario.
-      if((ruleBehavior.transcription?.transform as TextTransform).isNoOp() && keyEvent.kNextLayer) {
-        isOnlyLayerShift = true;
+      if((ruleBehavior?.transcription?.transform as TextTransform)?.isNoOp() && keyEvent.kNextLayer) {
+        isOnlyLayerSwitchKey = true;
       }
 
       const keepRuleBehavior = ruleBehavior != null;
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
-      if(keepRuleBehavior && !isOnlyLayerShift) {
-        let alternates = this.buildAlternates(ruleBehavior, keyEvent, preInputMock);
+      if(keepRuleBehavior) {
+        // alternates are our fat-finger alternate outputs. We don't build these for keys we detect as
+        // layer switch keys
+        let alternates = isOnlyLayerSwitchKey ? null : this.buildAlternates(ruleBehavior, keyEvent, preInputMock);
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
@@ -173,7 +206,7 @@ namespace com.keyman.text {
         if(alternates && alternates.length > 0) {
           ruleBehavior.transcription.alternates = alternates;
         }
-      } else if(ruleBehavior == null) {
+      } else {
         // We need a dummy RuleBehavior for keys which have no output (e.g. Shift)
         ruleBehavior = new RuleBehavior();
         ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
@@ -191,7 +224,7 @@ namespace com.keyman.text {
       this.keyboardProcessor.newLayerStore.set(hasLayerChanged ? this.keyboardProcessor.layerId : '');
       this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
 
-      let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(keyEvent.device, outputTarget);
+      let postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget);
       if(postRuleBehavior) {
         postRuleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
       }
@@ -266,6 +299,7 @@ namespace com.keyman.text {
           let totalMass = 0; // Tracks sum of non-error probabilities.
           for(let pair of keyDistribution) {
             if(pair.p < KEYSTROKE_EPSILON) {
+              totalMass += pair.p;
               break;
             } else if(timer && timer() >= TIMEOUT_THRESHOLD) {
               // Note:  it's always possible that the thread _executing_ our JS

@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# compares the version of this branch (in ../VERSION.md) to the 
+# compares the version of this branch (in ../VERSION.md) to the
 #	version in the Xcode project file of the subproject named in $1
 # returns zero if they are the same, non-zero if not the same or a problem occurs
 

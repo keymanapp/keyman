@@ -447,7 +447,9 @@
       // Assuming the values are sorted, we can just add all of the values in the
       // leaf, until we reach the limit.
       for (let item of node.entries) {
-        if (item.key.startsWith(prefix)) {
+        // String.startsWith is not supported on certain Android (5.0) devices we wish to support.
+        // Requires a minimum of Chrome 36, as opposed to 5.0's default of 35.
+        if (item.key.indexOf(prefix) == 0) {
           let { content, weight } = item;
           results.push({
             text: content,

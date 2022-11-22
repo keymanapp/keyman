@@ -170,7 +170,7 @@ if [ $DO_CARTHAGE = true ]; then
 
   # Deleted workspace - a test for proper deployment to CocoaPods.  Doesn't matter here.
   rm -r ./Carthage/Checkouts/DeviceKit/CocoaPodsVerification/ || fail "Carthage dependency loading failed"
-  
+
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
   carthage build --use-xcframeworks --no-use-binaries --platform iOS || fail "Carthage dependency loading failed"
@@ -192,7 +192,7 @@ if [ $CODE_SIGN = true ]; then
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .ipa file for deployment to real devices."
-    xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates \
+    run_xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
 
@@ -201,17 +201,17 @@ if [ $CODE_SIGN = true ]; then
 
     # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
     # Xcode to generate a build error.
-    xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
+    run_xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
                -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
   else
-    xcodebuild $XCODEFLAGS_EXT -scheme "$TARGET" \
+    run_xcodebuild $XCODEFLAGS_EXT -scheme "$TARGET" \
                VERSION=$VERSION \
                VERSION_WITH_TAG=$VERSION_WITH_TAG
   fi
 else
-  xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+  run_xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
              $XCODEFLAGS_EXT -scheme "$TARGET" \
              VERSION=$VERSION \
              VERSION_WITH_TAG=$VERSION_WITH_TAG
@@ -219,7 +219,7 @@ fi
 
 if [ $DO_SIMULATOR_TARGET == true ]; then
   echo "Preparing .app file as Simulator-targeted build artifact."
-  xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+  run_xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
              $XCODEFLAGS_EXT -scheme "$TARGET" \
              -sdk iphonesimulator \
              VERSION=$VERSION \

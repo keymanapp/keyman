@@ -6,13 +6,13 @@
 2. Use the same username/password as your host machine (so psexec doesn't need credentials)
 3. Configure the machine for automatic login (https://technet.microsoft.com/en-us/library/ee872306.aspx)
 4. Add a world-writeable share (e.g. Temp = C:\temp)
-5. Install the test root certificates from /windows/src/buildutils/certificates into the root store on the VM
+5. Install the test root certificates from /common/windows/delphi/tools/certificates into the root store on the VM
 6. Login and take a snapshot, give it a name like "Keyman Install Start Point"
 7. Edit vm-test.ps1 and set the configuration parameters accordingly.
 
 ## Host Configuration
 
-1. Copy installers for older versions of Keyman Desktop that you want to start with into 
+1. Copy installers for older versions of Keyman Desktop that you want to start with into
    the /windows/release folder (subdirectories not necessary)
 2. Make sure you have psexec.exe (v2.2 or later) on path or edit vm-test.ps1 accordingly
 

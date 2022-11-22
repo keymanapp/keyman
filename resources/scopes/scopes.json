@@ -8,17 +8,15 @@
       "samples": null
     },
     "common": {
-      "core": {
-          "desktop": null,
-          "web": null
-      },
       "models": {
         "types": null,
         "templates": null,
         "wordbreakers": null
       },
-      "resources": null
+      "resources": null,
+      "web": null
     },
+    "core": null,
     "developer": {
       "compilers": null,
       "ide": null,

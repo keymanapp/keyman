@@ -43,7 +43,7 @@ KEYBOARDS_ONLY=false
 CUSTOM_KMCOMP=
 INDEX=false
 ZIPSOURCE=false
-KMCOMP="$KEYMAN_ROOT/windows/bin/developer/kmcomp.exe"
+KMCOMP="$KEYMAN_ROOT/developer/bin/kmcomp.exe"
 TARGETS=()
 
 # Parse args

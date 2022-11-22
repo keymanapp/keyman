@@ -46,7 +46,13 @@ namespace com.keyman.text {
     modStateFlags: number = 0;
 
     keyboardInterface: KeyboardInterface;
-    device: utils.DeviceSpec;
+
+    /**
+     * Indicates the device (platform) to be used for non-keystroke events,
+     * such as those sent to `begin postkeystroke` and `begin newcontext`
+     * entry points.
+     */
+    contextDevice: utils.DeviceSpec;
 
     baseLayout: string;
 
@@ -60,7 +66,7 @@ namespace com.keyman.text {
         options = KeyboardProcessor.DEFAULT_OPTIONS;
       }
 
-      this.device = device;
+      this.contextDevice = device;
 
       this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
       this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
@@ -190,10 +196,14 @@ namespace com.keyman.text {
     }
 
     setSyntheticEventDefaults(Lkc: text.KeyEvent) {
-      // Set the flags for the state keys.
-      Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
+      // Set the flags for the state keys - for desktop devices. For touch
+      // devices, the only state key in use currently is Caps Lock, which is set
+      // when the 'caps' layer is active in ActiveKey::constructBaseKeyEvent.
+      if(!Lkc.device.touchable) {
+        Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
+        Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
+        Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
+      }
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
       if(Lkc.kName && Lkc.kName.substr(0,2) == 'U_') {
@@ -272,7 +282,7 @@ namespace com.keyman.text {
             matchBehavior.mergeInDefaults(defaultBehavior);
           }
           matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
-        } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default. 
+        } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
 
         this.keyboardInterface.activeTargetOutput = null;
       }
@@ -382,6 +392,8 @@ namespace com.keyman.text {
 
       if(layerId.indexOf('caps') >= 0) {
         modifier |= Codes.modifierCodes['CAPS'];
+      } else {
+        modifier |= Codes.modifierCodes['NO_CAPS'];
       }
 
       return modifier;
@@ -688,19 +700,8 @@ namespace com.keyman.text {
         this.layerId = 'default';
       }
 
-      this.updateStateKeysFromLayer();
-
       let baseModifierState = text.KeyboardProcessor.getModifierState(this.layerId);
       this.modStateFlags = baseModifierState | keyEvent.Lstates;
-    }
-
-    public updateStateKeysFromLayer() {
-      if(this.device.formFactor != utils.FormFactor.Desktop) {
-        // The caps layer works slightly differently on touch than on desktop.
-        // It's a single layer with no ability to mix with other modifiers
-        // We need to make sure that the state is kept in sync with the layer.
-        this.stateKeys['K_CAPS'] = this.layerId == 'caps';
-      }
     }
 
     static isModifier(Levent: KeyEvent): boolean {
@@ -739,7 +740,9 @@ namespace com.keyman.text {
 
       if(Levent.LmodifierChange) {
         this.activeKeyboard.notify(0, outputTarget, 1);
-        this._UpdateVKShift(Levent);
+        if(!Levent.device.touchable) {
+          this._UpdateVKShift(Levent);
+        }
       }
 
       // No modifier keypresses detected.
@@ -748,9 +751,10 @@ namespace com.keyman.text {
 
     resetContext() {
       this.layerId = 'default';
-      this.updateStateKeysFromLayer();
       this.keyboardInterface.resetContextCache();
-      this._UpdateVKShift(null);
+      if(!this.contextDevice.touchable) {
+        this._UpdateVKShift(null);
+      }
     };
 
     setNumericLayer(device: utils.DeviceSpec) {
@@ -758,7 +762,6 @@ namespace com.keyman.text {
         let layout = this.activeKeyboard.layout(device.formFactor);
         if(layout.getLayer('numeric')) {
           this.layerId = 'numeric';
-          this.updateStateKeysFromLayer();
         }
       }
     };

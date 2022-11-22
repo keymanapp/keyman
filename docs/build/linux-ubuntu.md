@@ -5,7 +5,7 @@
 On Linux, you can build the following projects:
 
 * [Keyman for Linux](#keyman-for-linux)
-* [Keyman Core](#keyman-core) (Linux only) (aka common/core/desktop)
+* [Keyman Core](#keyman-core) (Linux only) (aka core)
 <!-- TODO: document how to build for Android, Web, Core-Wasm and Common/Web on Linux. See TC build agent for details. -->
 * Keyman for Android
 * Keyman Core (wasm targets)
@@ -63,4 +63,24 @@ All dependencies are already installed if you followed the instructions under [P
 
 Building:
 
-* [Building Keyman Core](../../common/core/desktop/doc/BUILDING.md)
+* [Building Keyman Core](../../core/doc/BUILDING.md)
+
+## Docker Builder
+
+The Docker builder allows you to perform a linux build from anywhere Docker is supported.
+To build the docker image:
+
+```shell
+cd ../../linux
+docker pull ubuntu:latest
+docker build . -t keymanapp/keyman-linux-builder:latest
+```
+
+Once the image is built, it may be used to build parts of Keyman.
+
+```shell
+cd ../core
+# keep linux build artifacts separate
+mkdir -p build/linux
+docker run -it --rm -v $(pwd)/..:/home/build -v $(pwd)/build/linux:/home/build/core/build keyman-linux-builder:latest bash -c 'cd core; bash build.sh -d'
+```

@@ -32,6 +32,7 @@
 /// <reference types="@keymanapp/lm-message-types" />
 /// <reference path="./models/dummy-model.ts" />
 /// <reference path="./model-compositor.ts" />
+/// <reference path="./transformUtils.ts" />
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -82,6 +83,8 @@ class LMLayerWorker {
   private self: any;
 
   private _platformCapabilities: Capabilities;
+
+  private _testMode: boolean = false;
 
   private _hostURL: string;
 
@@ -258,6 +261,7 @@ class LMLayerWorker {
         }
 
         this._platformCapabilities = payload.capabilities;
+        this._testMode = !!payload.testMode;
 
         this.transitionToLoadingState();
       }
@@ -307,7 +311,7 @@ class LMLayerWorker {
    * @param model The loaded language model.
    */
   private transitionToReadyState(model: LexicalModel): ModelCompositor {
-    let compositor = new ModelCompositor(model);
+    let compositor = new ModelCompositor(model, this._testMode);
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {
@@ -407,6 +411,7 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports['wordBreakers'] = wordBreakers;
   /// XXX: export the ModelCompositor for testing.
   module.exports['ModelCompositor'] = ModelCompositor;
+  module.exports['TransformUtils'] = TransformUtils;
 } else if (typeof self !== 'undefined' && 'postMessage' in self && 'importScripts' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as any); // really, 'as typeof globalThis', but we're currently getting TS errors from use of that.

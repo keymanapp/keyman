@@ -103,34 +103,34 @@
               </Component>
 
               <Component>
-                <File Name="desktop_resources.dll" Source="..\..\desktop\inst\desktop_resources.dll" KeyPath="yes" />
+                <File Name="desktop_resources.dll" Source="..\inst\desktop_resources.dll" KeyPath="yes" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#desktop_resources.dll],0" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],1" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],2" />
               </Component>
 
               <Component>
-                <File Name="menu.txt" Source="..\..\desktop\branding\menu.txt" KeyPath="yes" />
+                <File Name="menu.txt" Source="..\branding\menu.txt" KeyPath="yes" />
               </Component>
 
               <Component>
-                <File Name="messages.txt" Source="..\..\desktop\branding\messages.txt" KeyPath="yes" />
+                <File Name="messages.txt" Source="..\branding\messages.txt" KeyPath="yes" />
               </Component>
 
               <Component>
-                <File Name="menutitle.png" Source="..\..\desktop\branding\menutitle.png" KeyPath="yes" />
+                <File Name="menutitle.png" Source="..\branding\menutitle.png" KeyPath="yes" />
               </Component>
 
               <Component>
-                <File Id="trayicon.ico" Name="trayicon.ico" Source="..\..\desktop\branding\trayicon.ico" KeyPath="yes" />
+                <File Id="trayicon.ico" Name="trayicon.ico" Source="..\branding\trayicon.ico" KeyPath="yes" />
               </Component>
 
               <Component>
-                <File Id="appicon.ico" Name="appicon.ico" Source="..\..\global\res\90\desktop\appicon.ico" KeyPath="yes" />
+                <File Id="appicon.ico" Name="appicon.ico" Source="..\branding\appicon.ico" KeyPath="yes" />
               </Component>
 
               <Component>
-                <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\..\global\res\90\desktop\cfgicon.ico" KeyPath="yes" />
+                <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\branding\cfgicon.ico" KeyPath="yes" />
               </Component>
 
               <Component>
@@ -138,7 +138,7 @@
               </Component>
 
               <Component>
-                <File Name="unicodedata.mdb" Source="..\..\global\inst\data\unicodedata.mdb" />
+                <File Name="unicodedata.mdb" Source="..\..\..\..\common\windows\bin\data\unicodedata.mdb" />
               </Component>
 
               <Component>
@@ -223,7 +223,7 @@
 
     </Directory>
 
-    <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\ext\sentry">
+    <ComponentGroup Id="KeymanSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\..\..\common\windows\delphi\ext\sentry">
       <Component>
         <File Id="sentry.dll" KeyPath="yes" />
       </Component>
@@ -304,8 +304,8 @@
 
     <UIRef Id="WixUI_FeatureTree"/>
 
-    <Icon Id="appicon.ico" SourceFile="..\..\global\res\90\desktop\appicon.ico" />
-    <Icon Id="KMSHELL.ico" SourceFile="..\..\global\res\90\desktop\cfgicon.ico" />
+    <Icon Id="appicon.ico" SourceFile="..\branding\appicon.ico" />
+    <Icon Id="KMSHELL.ico" SourceFile="..\branding\cfgicon.ico" />
 
     <Binary Id="insthelp.exe" SourceFile="..\..\..\bin\desktop\insthelp.exe" />
 

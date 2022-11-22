@@ -143,7 +143,7 @@ namespace com.keyman.dom.targets {
 
     getTextAfterCaret(): string {
       if(!this.hasSelection()) {
-        return;
+        return '';
       }
 
       let caret = this.getCarets().end;
@@ -203,9 +203,11 @@ namespace com.keyman.dom.targets {
 
       this.adjustDeadkeys(delta);
 
-      // While Selection.extend() is really nice for this, IE doesn't support it whatsoever.
-      // However, IE (11, at least) DOES support setting selections via ranges, so we can still
-      // manage the caret properly.
+      // While Selection.extend() was really nice for this, IE didn't support it whatsoever.
+      // However, IE (11, at least) DID support setting selections via ranges, so we were still
+      // able to manage the caret properly.
+      //
+      // TODO:  double-check that it was only IE-motivated, re-implement with Selection.extend().
       let finalCaret = this.root.ownerDocument.createRange();
 
       if(start.node.nodeType == 3) {

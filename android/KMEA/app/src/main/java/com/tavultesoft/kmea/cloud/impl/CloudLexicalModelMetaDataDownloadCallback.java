@@ -125,31 +125,12 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
    * @param aMetaDataResult the meta data results
    */
   private void processCloudResults(Context aContext, List<MetaDataResult> aMetaDataResult) {
-    for(MetaDataResult _r:aMetaDataResult) {
-      if (_r.returnjson.target== CloudApiTypes.ApiTarget.Keyboard) {
+    for (MetaDataResult _r : aMetaDataResult) {
+      if (_r.returnjson.target == CloudApiTypes.ApiTarget.Keyboard) {
         //handleKeyboardMetaData(_r);
       }
-      if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyboardLexicalModels) {
-        JSONArray lmData = _r.returnjson.jsonArray;
-        if (lmData != null && lmData.length() > 0) {
-          try {
-            JSONObject modelInfo = lmData.getJSONObject(0);
-
-            if (modelInfo.has("packageFilename") && modelInfo.has("id")) {
-              String _modelID = modelInfo.getString("id");
-              ArrayList<CloudApiTypes.CloudApiParam> urls = new ArrayList<>();
-              urls.add(new CloudApiTypes.CloudApiParam(
-                CloudApiTypes.ApiTarget.LexicalModelPackage,
-                modelInfo.getString("packageFilename")));
-              _r.additionalDownloadid = CloudLexicalPackageDownloadCallback.createDownloadId(_modelID);
-              _r.additionalDownloads= urls;
-            }
-          } catch (JSONException e) {
-            KMLog.LogException(TAG, "Error parsing lexical model from api.keyman.com. ", e);
-          }
-        } else {
-          BaseActivity.makeToast(aContext, R.string.no_associated_model, Toast.LENGTH_SHORT);
-        }
+      if (_r.returnjson.target == CloudApiTypes.ApiTarget.KeyboardLexicalModels) {
+        processCloudResultForModel(aContext, _r);
       }
 
       if (_r.returnjson.target == CloudApiTypes.ApiTarget.PackageVersion) {
@@ -161,6 +142,32 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
           CloudDataJsonUtil.processLexicalModelPackageUpdateJSON(aContext, pkgData, updateBundles);
         }
       }
+    }
+  }
+
+  private void processCloudResultForModel(Context aContext, MetaDataResult _r) {
+    JSONArray lmData = _r.returnjson.jsonArray;
+    if (lmData == null || lmData.length() == 0) {
+      // Not an error if api.keyman.com returns empty array of associated lexical models
+      return;
+    }
+
+    try {
+      JSONObject modelInfo = lmData.getJSONObject(0);
+      if (!modelInfo.has("packageFilename") || !modelInfo.has("id")) {
+        KMLog.LogError(TAG, "Error in lexical model metadata from api.keyman.com - missing metadata");
+        return;
+      }
+
+      String _modelID = modelInfo.getString("id");
+      ArrayList<CloudApiTypes.CloudApiParam> urls = new ArrayList<>();
+      urls.add(new CloudApiTypes.CloudApiParam(
+        CloudApiTypes.ApiTarget.LexicalModelPackage,
+        modelInfo.getString("packageFilename")));
+      _r.additionalDownloadid = CloudLexicalPackageDownloadCallback.createDownloadId(_modelID);
+      _r.additionalDownloads= urls;
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "Error in lexical model metadata from api.keyman.com. ", e);
     }
   }
 

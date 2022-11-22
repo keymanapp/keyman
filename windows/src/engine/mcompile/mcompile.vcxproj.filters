@@ -41,7 +41,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\global\vc\VKScanCodes.cpp">
+    <ClCompile Include="..\..\global\cpp\VKScanCodes.cpp">
       <Filter>Library Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mc_crc32.cpp">
@@ -71,10 +71,10 @@
     <ClCompile Include="mc_unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\keymansentry.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\global\vc\xstring.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">

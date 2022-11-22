@@ -80,11 +80,6 @@ namespace com.keyman.osk {
     };
   }
 
-  VisualKeyboard.prototype.waitForFonts = function(this: VisualKeyboard, kfd, ofd) {
-    // a dummy function; it's only really used for 'native' KMW.
-    return true;
-  }
-
   SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
     // Parallels VisualKeyboard.prototype.touchHold, but for predictive suggestions instead of keystrokes.
     let suggestionEle = suggestionObj.div;
@@ -141,10 +136,7 @@ namespace com.keyman.text {
     opt['attachType'] = 'manual';
     device.app=opt['app'];
     device.touchable=true;
-    device.formFactor='phone';
-    if(navigator && navigator.userAgent && navigator.userAgent.indexOf('iPad') >= 0) device.formFactor='tablet';
-    if(device.app.indexOf('Mobile') >= 0) device.formFactor='phone';
-    if(device.app.indexOf('Tablet') >= 0) device.formFactor='tablet';
+    device.formFactor = device.app.indexOf('Tablet') >= 0 ? 'tablet' : 'phone';
     device.browser='native';
   };
 
@@ -229,14 +221,6 @@ namespace com.keyman.text {
   keymanweb.domManager._SetTargDir = function(Ptarg){};
 
   /**
-   * Align input fields (should not be needed with KMEI, KMEA)
-   *
-   *  @param  {object}   eleList    A list of specific elements to align.  If nil, selects all elements.
-   *
-   **/
-  keymanweb.alignInputs = function(eleList: HTMLElement[]) {};
-
-  /**
    * Use rotation events to adjust OSK element positions and scaling if necessary
    */
   keymanweb.handleRotationEvents = function() {};
@@ -255,11 +239,7 @@ namespace com.keyman.text {
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    let osk: com.keyman.osk.AnchoredOSKView = keymanweb.osk;
-    if(osk?.vkbd) {
-      osk._Load(); // TODO:  replace with osk.refreshLayout() in the future once it can perfectly
-                   //        handle rotations.
-    }
+    keymanweb.osk?.refreshLayout();
   };
 
   /**
@@ -287,7 +267,7 @@ namespace com.keyman.text {
     /*
      * If a longpress popup was visible, but is no longer, this means that the
      * associated longpress gesture was cancelled.  It is possible for the base
-     * key to emit if selected at this time; detection of this is managed by 
+     * key to emit if selected at this time; detection of this is managed by
      * the `SubkeyDelegator` class.
      */
     if(!isVisible) {

@@ -76,7 +76,6 @@ uses
   Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
   KeymanVersion,
-  OnlineConstants,
   RegistryHelpers,
   RegistryKeys,
   RunTools,

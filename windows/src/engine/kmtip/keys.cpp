@@ -1,18 +1,18 @@
 /*
   Name:             keys
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      7 Sep 2009
 
   Modified Date:    27 Jan 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          07 Sep 2009 - mcdurdin - I1713 - Sticky shift keys with TSF addin
                     07 Sep 2009 - mcdurdin - I2096 - 0x88 callback change
                     17 Nov 2012 - mcdurdin - I3566 - V9.0 - When legacy output is used, we need to avoid eating Keyman-generated characters
@@ -35,8 +35,7 @@
 
 #include "pch.h"
 #include "kmtip.h"
-
-#include "Vkeys.h"
+#include "../../../../common/windows/cpp/include/vkeys.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -68,7 +67,7 @@ BOOL CKMTipTextService::_InitKeystrokeSink()
     DebugLastError0(L"QueryInterface(ITfKeystrokeMgr)", hr);
     return FALSE;
   }
-  
+
   hr = pKeystrokeMgr->AdviseKeyEventSink(_tfClientId, (ITfKeyEventSink *)this, TRUE);
   if (hr != S_OK) {
     DebugLastError0(L"AdviseKeyEventSink", hr);
@@ -257,7 +256,7 @@ STDAPI CKMTipTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lP
 //
 // _PreserveAltKeys
 //
-// Identify and preserve all Alt+ combinations that Keyman Engine needs to 
+// Identify and preserve all Alt+ combinations that Keyman Engine needs to
 // pass through to Keyman keyboard
 //----------------------------------------------------------------------------
 
@@ -300,7 +299,7 @@ HRESULT CKMTipTextService::_PreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)   //
         Log(L"Preserved key %d: %x %x, %x", i, _PreservedKeys[i].key.uVKey, _PreservedKeys[i].key.uModifiers, hr);
     }
 #endif
-  }    
+  }
 
   return S_OK;
 }
@@ -323,7 +322,7 @@ HRESULT CKMTipTextService::_UnpreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)
     hr = pKeystrokeMgr->UnpreserveKey(_PreservedKeys[i].guid, &_PreservedKeys[i].key);
     if(hr != S_OK)
       Log(L"Failed to unpreserve key %d, %x", i, hr);
-  }    
+  }
 
   hr = S_OK;
 
@@ -334,7 +333,7 @@ HRESULT CKMTipTextService::_UnpreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)
   }
 
   _cPreservedKeyCount = 0;
-  
+
   return hr;
 }
 

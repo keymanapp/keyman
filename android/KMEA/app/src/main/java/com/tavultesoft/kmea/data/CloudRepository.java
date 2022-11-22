@@ -39,7 +39,7 @@ public class CloudRepository {
   public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";
 
   public static final String API_PRODUCTION_HOST = "api.keyman.com";
-  public static final String API_STAGING_HOST = "api.keyman-staging.com";
+  public static final String API_STAGING_HOST = "api.keyman.com"; // #7227 disabling: "api.keyman-staging.com";
 
   public static final String API_MODEL_LANGUAGE_FORMATSTR = "https://%s/model?q=bcp47:%s";
   public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android%s%s";
@@ -400,7 +400,6 @@ public class CloudRepository {
         BaseActivity.makeToast(context, R.string.catalog_download_is_running_in_background, Toast.LENGTH_SHORT);
       } else {
         updateIsRunning = true;
-        BaseActivity.makeToast(context, R.string.catalog_download_start_in_background, Toast.LENGTH_SHORT);
         CloudDownloadMgr.getInstance().executeAsDownload(
           context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
       }

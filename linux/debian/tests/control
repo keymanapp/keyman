@@ -1,0 +1,2 @@
+Tests: test_build
+Depends: @, build-essential
