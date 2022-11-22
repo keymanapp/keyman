@@ -25,12 +25,15 @@ class ModelCompositor {
 
   private SUGGESTION_ID_SEED = 0;
 
-  constructor(lexicalModel: LexicalModel) {
+  private testMode: boolean = false
+
+  constructor(lexicalModel: LexicalModel, testMode?: boolean) {
     this.lexicalModel = lexicalModel;
     if(lexicalModel.traverseFromRoot) {
       this.contextTracker = new correction.ContextTracker();
     }
     this.punctuation = ModelCompositor.determinePunctuationFromModel(lexicalModel);
+    this.testMode = !!testMode;
   }
 
   private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): Distribution<Suggestion> {
@@ -233,7 +236,8 @@ class ModelCompositor {
       //        Whitespace is probably fine, actually.  Less sure about backspace.
 
       let bestCorrectionCost: number;
-      for(let matches of searchSpace.getBestMatches()) {
+      const SEARCH_TIMEOUT = this.testMode ? 0 : correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
+      for(let matches of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
         // Corrections obtained:  now to predict from them!
         let predictionRoots = matches.map(function(match) {
           let correction = match.matchString;

@@ -10,6 +10,7 @@ type
 implementation
 
 uses
+  System.UITypes,
   Vcl.Controls,
   Vcl.Dialogs,
   Winapi.Windows,

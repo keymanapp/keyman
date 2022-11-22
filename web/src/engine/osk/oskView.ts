@@ -1078,6 +1078,20 @@ namespace com.keyman.osk {
      * Description  Wrapper function to add and identify OSK-specific event handlers
      */
     ['addEventListener'](event: string, func: (obj) => boolean) {
+      // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless
+      // a site designer uses these events, we disable / hide them until an event is attached.
+      let titleBar = this.headerView;
+      if(titleBar && titleBar instanceof layouts.TitleBar) {
+        switch(event) {
+          case 'configclick':
+            titleBar.configEnabled = true;
+            break;
+          case 'helpclick':
+            titleBar.helpEnabled = true;
+            break;
+        }
+      }
+
       return com.keyman.singleton.util.addEventListener('osk.'+event, func);
     }
   }

@@ -15,7 +15,7 @@
   </Info>
   <Files>
     <File>
-      <Name>..\build\example.qaa.sencoten.model.js</Name>
+      <Name>example.qaa.sencoten.model.js</Name>
       <Description>Lexical model example.qaa.sencoten.model.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.model.js</FileType>

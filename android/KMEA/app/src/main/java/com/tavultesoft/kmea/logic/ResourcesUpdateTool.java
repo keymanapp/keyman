@@ -603,6 +603,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     for(OngoingUpdate _up:openUpdates.values())
     {
       Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       intent.putExtras(_up.bundle);
       currentContext.startActivity(intent);
     }

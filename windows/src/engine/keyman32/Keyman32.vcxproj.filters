@@ -138,6 +138,9 @@
     <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CoreEnvironment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">

@@ -767,6 +767,9 @@ public class PackageProcessor {
       return specs;
     }
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
+    if (newInfoJSON == null) {
+      return specs;
+    }
     String packageId = getPackageID(path);
 
     // For lexical model packages, lexical model version is determined by the package version
