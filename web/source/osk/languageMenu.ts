@@ -11,6 +11,9 @@ namespace com.keyman.osk {
     private activeLgNo: number;
     private y0: number;
 
+    // A subset of CSSStyleDeclaration.
+    private originalBodyStyle: {overflowY?: string, height?: string};
+
     constructor(keyman: KeymanBase) {
       this.keyman = keyman;
       this.scrolling = false;
@@ -92,7 +95,6 @@ namespace com.keyman.osk {
       }, false);
       mx.addEventListener('touchend',function(e){
         e.stopPropagation();
-        e.preventDefault();
       }, false);
       menu.appendChild(mx);
 
@@ -344,7 +346,7 @@ namespace com.keyman.osk {
           lgBar.innerHTML=langs[k]+'...';
           lgBar.scrolled=false;
           lgBar.ontouchend=function(e) {
-            e.preventDefault();e.stopPropagation();
+            e.stopPropagation();
             if(e.target.scrolled)
               e.target.scrolled=false;
             else
@@ -381,7 +383,9 @@ namespace com.keyman.osk {
       var padLast=util._CreateElement('div');
       padLast.id='kmw-menu-footer';
       var cancelTouch=function(e){
-        e.preventDefault();
+        if(e.cancelable) {
+          e.preventDefault();
+        }
         e.stopPropagation();
       };
       padLast.addEventListener('touchstart',cancelTouch,false);
@@ -405,22 +409,38 @@ namespace com.keyman.osk {
       kb.innerHTML=unique?kbd['KL']:kbd['KN'].replace(' Keyboard',''); // Name
 
       // We're setting up a few events - this alias helps avoid scoping issues.
-      let languageMenu = this;
+      const languageMenu = this;
 
       // Touchstart (or mspointerdown) event highlights the touched list item
-      var touchStart=function(e) {
+      const touchStart=function(e) {
         e.stopPropagation();
         if(this.className.indexOf('selected') <= 0) {
           this.className=this.className+' selected';
         }
         languageMenu.scrolling=false;
         languageMenu.y0=e.touches[0].pageY;//osk.lgList.childNodes[0].scrollTop;
+
+        // Preserve the original style for the body element; we're going to change
+        // it to block page scrolling.  Must use a separate instance.
+        //
+        // Reference: https://stackoverflow.com/a/28411556
+        languageMenu.originalBodyStyle = {};
+
+        // Must be separate line from previous due to TS type inference stuff.
+        const obs = languageMenu.originalBodyStyle;
+        const dbs = document.body.style;
+        obs.overflowY = dbs.overflowY;
+        obs.height = dbs.height;
+
+        // Now that the properties we're going to overwrite have been cached...
+        dbs.overflowY = 'hidden';
+        dbs.height = '100%';
         return true;
       };
 
       //TODO: Still drags Android background sometimes (not consistently)
       // Touchmove drags the list and prevents release from selecting the language
-      var touchMove=function(e: TouchEvent) {
+      const touchMove=function(e: TouchEvent) {
         e.stopImmediatePropagation();
         var scroller=<HTMLElement>languageMenu.lgList.childNodes[0],
             yMax=scroller.scrollHeight-scroller.offsetHeight,
@@ -439,13 +459,11 @@ namespace com.keyman.osk {
         // Scroll up (show later listed languages)
         if(dy < 0) {
           if(scroller.scrollTop >= yMax-1) {
-            e.preventDefault();
             languageMenu.y0=y;
           }
           // Scroll down (show earlier listed languages)
         } else if(dy > 0) {
           if(scroller.scrollTop < 2) {
-            e.preventDefault();
             languageMenu.y0=y;
           }
           // Dont' scroll - can happen if changing scroll direction
@@ -462,9 +480,17 @@ namespace com.keyman.osk {
         return true;
       };
 
+      const restoreBodyStyle=function() {
+        // Reverses the changes to document.body.style made in `touchStart`.
+        const obs = languageMenu.originalBodyStyle;
+        const dbs = document.body.style;
+
+        dbs.overflowY = obs.overflowY;
+        dbs.height = obs.height;
+      }
+
       // Touch release (click) event selects touched list item
-      var touchEnd=function(e: TouchEvent) {
-        e.preventDefault();
+      const touchEnd=function(e: TouchEvent) {
         if(typeof(e.stopImmediatePropagation) != 'undefined') {
           e.stopImmediatePropagation();
         } else {
@@ -482,8 +508,14 @@ namespace com.keyman.osk {
           languageMenu.keyman.domManager.focusLastActiveElement();
           languageMenu.hide();
         }
+
+        restoreBodyStyle();
         return true;
       };
+
+      const touchCancel=function(e: TouchEvent) {
+        restoreBodyStyle();
+      }
 
       kb.onmspointerdown=touchStart;
       kb.addEventListener('touchstart',touchStart,false);
@@ -491,6 +523,7 @@ namespace com.keyman.osk {
       kb.addEventListener('touchmove',touchMove,false);
       kb.onmspointerout=touchEnd;
       kb.addEventListener('touchend',touchEnd,false);
+      kb.addEventListener('touchcancel',touchCancel,false);
     }
 
     /**
