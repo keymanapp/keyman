@@ -58,6 +58,7 @@
     <xsl:param name="caption" />
     <xsl:param name="command" />
     <xsl:param name="onclick" />
+    <xsl:param name="onkeydown" />
     <xsl:param name="className" />
 		<xsl:param name="default" />
     <xsl:param name="width" />
@@ -82,6 +83,7 @@
           <xsl:attribute name="id">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="class"><xsl:value-of select="$className"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
+          <xsl:attribute name="onkeydown"><xsl:choose><xsl:when test="$onkeydown != ''"><xsl:value-of select="$onkeydown"/></xsl:when></xsl:choose></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
             font-size: 11px;
@@ -112,6 +114,7 @@
           <xsl:attribute name="ID">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="class"><xsl:value-of select="$className"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
+          <xsl:attribute name="onkeydown"><xsl:choose><xsl:when test="$onkeydown != ''"><xsl:value-of select="$onkeydown"/></xsl:when></xsl:choose></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="$caption" /></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">

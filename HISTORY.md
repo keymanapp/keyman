@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.108 beta 2022-11-21
+
+* fix(windows): backout ms button style for add lang pop up (#7765)
+* fix(android/app): Only check Install Referrer API with Play Store installs (#7766)
+* fix(windows): Fix text selectable configuration (#7758)
+* feat(common/models): directional quote insensitivity (#7767)
+* chore(windows): remove unused options from locales and UI (#7760)
+* fix(developer): cast to prevent ERangeError for failed http reqs in CEF (#7775)
+* chore(android): Update Target SDK Version to 31 (#7768)
+
 ## 16.0.107 beta 2022-11-18
 
 * fix(windows): Download Keyboard blue footer (#7755)

@@ -511,23 +511,6 @@ object Messages: TStockMessages
           Parameters = <>
         end
         item
-          Name = 'koRunElevatedInVista'
-          DefStr = 'Always elevate user permissions when running in Windows Vista'
-          Parameters = <>
-        end
-        item
-          Name = 'koTurnOnSurrogates'
-          DefStr =
-            'Turn on Unicode supplementary character display (requires restar' +
-            't)'
-          Parameters = <>
-        end
-        item
-          Name = 'koUnknownLanguage'
-          DefStr = 'Turn on '#39'Unknown'#39' language'
-          Parameters = <>
-        end
-        item
           Name = 'koDebugging'
           DefStr = 'Debugging'
           Parameters = <>
