@@ -28,7 +28,7 @@ namespace com.keyman.text.prediction {
         }
       }
 
-      let lgCode = kbdInfo['languageCode'].toLowerCase();
+      let lgCode = kbdInfo['languageCode']?.toLowerCase();
       let model = this.languageModelMap[lgCode];
       var loadPromise: Promise<void>;
 

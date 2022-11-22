@@ -12,7 +12,7 @@ describe('Attachment API', function() {
       const kbd1 = loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad, { passive: true });
       const kbd2 = loadKeyboardFromJSON("/keyboards/khmer_angkor.json",   testconfig.timeouts.scriptLoad, { passive: true });
       return Promise.all([kbd1, kbd2]).then(() => {
-        return keyman.setActiveKeyboard("lao_2008_basic");
+        return keyman.setActiveKeyboard("lao_2008_basic", "lo");
       });
     });
   });
