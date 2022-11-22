@@ -284,7 +284,8 @@ uses
   Keyman.Developer.UI.UfrmServerOptions in 'dialogs\Keyman.Developer.UI.UfrmServerOptions.pas' {frmServerOptions},
   Keyman.Developer.System.ServerAPI in 'http\Keyman.Developer.System.ServerAPI.pas',
   Keyman.System.FontLoadUtil in 'main\Keyman.System.FontLoadUtil.pas',
-  Keyman.Developer.UI.ServerUI in 'http\Keyman.Developer.UI.ServerUI.pas';
+  Keyman.Developer.UI.ServerUI in 'http\Keyman.Developer.UI.ServerUI.pas',
+  Keyman.Developer.System.GenerateKeyboardIcon in '..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -311,17 +312,15 @@ begin
           SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
           Application.MainFormOnTaskBar := True;
           Application.Initialize;
-        //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
           Application.Title := 'Keyman Developer';
-          //TBX.TBXSetTheme('OfficeXP2');
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
           try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally
-            FreeAndNil(modWebHttpServer);
             FreeAndNil(frmKeymanDeveloper);
+            FreeAndNil(modWebHttpServer);
           end;
         end;
       finally

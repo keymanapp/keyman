@@ -101,6 +101,7 @@ type
     procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
+    procedure DelayedFindError;
 
   protected
     function GetHelpTopic: string; override;
@@ -331,6 +332,7 @@ procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
 begin
   FHasBeenLoaded := True;
   SetupCharMapDrop;
+  DelayedFindError;
 end;
 
 type
@@ -481,6 +483,11 @@ begin
         end;
       except
         on E:EFOpenError do   // I4616   // I4721
+        begin
+          ShowMessage(E.Message);
+          Exit;
+        end;
+        on E:EEncodingError do
         begin
           ShowMessage(E.Message);
           Exit;
@@ -931,11 +938,20 @@ begin
   end;
 end;
 
+procedure TframeTextEditor.DelayedFindError;
+begin
+  if FErrorLine > 0 then
+    FindError(FErrorLine);
+end;
+
 procedure TframeTextEditor.FindError(ln: Integer);
 begin
   ClearError;
 
   FErrorLine := ln;
+
+  if not FHasBeenLoaded then
+    Exit;
 
   if (ln <= 0) then Exit;
 

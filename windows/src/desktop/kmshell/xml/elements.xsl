@@ -65,6 +65,9 @@
     <xsl:param name="disabled" />
     <xsl:param name="tabid" />
     <xsl:param name="shield" />
+    <xsl:param name="visible" />
+    <xsl:param name="background" />
+    <xsl:param name="color" />
 
     <xsl:choose>
       <xsl:when test="$shield = 1 and /Keyman/canelevate">
@@ -77,18 +80,22 @@
           </xsl:attribute>
           <xsl:if test="$disabled = 1"><xsl:attribute name="disabled">disabled</xsl:attribute></xsl:if>
           <xsl:attribute name="id">button_<xsl:value-of select="$id"/></xsl:attribute>
+          <xsl:attribute name="class"><xsl:value-of select="$className"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
-            font-size: 12px;
+            font-size: 11px;
             height: 25px;
             display: inline-block;
             text-align: center;
             width: <xsl:value-of select="$width"/>;
             margin-right: 8px;
             vertical-align: top;
+            <xsl:if test="$visible = 'false'">display:none;</xsl:if>
+            <xsl:if test="string($background)">background:<xsl:value-of select="$background"/>;</xsl:if>
+            <xsl:if test="string($color)">color:<xsl:value-of select="$color"/>;</xsl:if>
           </xsl:attribute>
-          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 4px 5px 0px; display: inline; height: 18px;" src="/app/shield.png" />
+          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 2px 2px 0px; display: inline; height: 16px;" src="/app/shield.png" />
           <xsl:value-of select="$caption" />
         </button>
       </xsl:when>
@@ -102,6 +109,7 @@
           </xsl:attribute>
           <xsl:if test="$disabled = 1"><xsl:attribute name="disabled">disabled</xsl:attribute></xsl:if>
           <xsl:attribute name="ID">button_<xsl:value-of select="$id"/></xsl:attribute>
+          <xsl:attribute name="class"><xsl:value-of select="$className"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="$caption" /></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
@@ -111,6 +119,9 @@
             height: 25px;
             display: inline-block;
             margin-right: 8px;
+            <xsl:if test="$visible = 'false'">display:none;</xsl:if>
+            <xsl:if test="string($background)">background:<xsl:value-of select="$background"/>;</xsl:if>
+            <xsl:if test="string($color)">color:<xsl:value-of select="$color"/>;</xsl:if>
           </xsl:attribute>
         </input>
       </xsl:otherwise>
@@ -193,5 +204,26 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+<!-- Hex to Decimal https://stackoverflow.com/questions/22905134/convert-a-hexadecimal-number-to-an-integer-in-xslt-->
+
+  <xsl:template name="hex2dec">
+    <xsl:param name="hex"/>
+    <xsl:param name="dec" select="0"/>
+    <xsl:param name="MSB" select="translate(substring($hex, 1, 1), 'abcdef', 'ABCDEF')"/>
+    <xsl:param name="value" select="string-length(substring-before('0123456789ABCDEF', $MSB))"/>
+    <xsl:param name="result" select="16 * $dec + $value"/>
+    <xsl:choose>
+        <xsl:when test="string-length($hex) > 1">
+            <xsl:call-template name="hex2dec">
+                <xsl:with-param name="hex" select="substring($hex, 2)"/>
+                <xsl:with-param name="dec" select="$result"/>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:value-of select="$result"/>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
 
 </xsl:stylesheet>

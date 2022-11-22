@@ -81,6 +81,8 @@
   <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Yare da madannin kan madannin bada tazara</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Kada a nuna komai akan madannin bada tazara</string>
+  <!-- Context: Keyman Settings menu / Haptic feedback -->
+  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Nuna banner koyaushe</string>
   <!-- Context: Keyman Settings menu -->
@@ -151,4 +153,8 @@
   <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Ƙunshin madannan bashi da wani yaren da ke da alaƙa da za a shigar</string>
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Rasa inagancin/ɓacewar metadata cikin ƙunshin</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    Keyboard requires a newer version of Keyman</string>
+  <!-- Context: anywhere -->
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>

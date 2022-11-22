@@ -208,19 +208,18 @@ void DoChangeWindowMessageFilter()
   }
 
 	DoCWMF(wm_keyman);   // I3594
-  DoCWMF(wm_keyman_keyevent);
-    DoCWMF(wm_keymankeydown);
-    DoCWMF(wm_keymankeyup);
-    DoCWMF(wm_keyman_grabwindowproc);
-    DoCWMF(wm_keyman_refresh);
-    DoCWMF(wm_kmgetactivekeymanid);
-    DoCWMF(wm_keymanim_close);
-    DoCWMF(wm_keymanim_contextchanged);
-    DoCWMF(wm_keymanshift);
-    DoCWMF(wm_keyman_control);   // I4714
-    DoCWMF(wm_keyman_control_internal);   // I4714
+  DoCWMF(wm_keymankeydown);
+  DoCWMF(wm_keymankeyup);
+  DoCWMF(wm_keyman_grabwindowproc);
+  DoCWMF(wm_keyman_refresh);
+  DoCWMF(wm_kmgetactivekeymanid);
+  DoCWMF(wm_keymanim_close);
+  DoCWMF(wm_keymanim_contextchanged);
+  DoCWMF(wm_keymanshift);
+  DoCWMF(wm_keyman_control);   // I4714
+  DoCWMF(wm_keyman_control_internal);   // I4714
 
-    FreeLibrary(hUser32);
+  FreeLibrary(hUser32);
 }
 
 BOOL InitThread(HWND hwnd)
@@ -300,7 +299,6 @@ BOOL InitialiseProcess(HWND hwnd)
   Initialise_Flag_ShouldSerializeInput();
 
 	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
-  wm_keyman_keyevent = RegisterWindowMessage("WM_KEYMAN_KEYEVENT");
 	wm_keymankeydown = RegisterWindowMessage("WM_KEYMANKEYDOWN");
 	wm_keymankeyup = RegisterWindowMessage("WM_KEYMANKEYUP");
 	wm_keyman_grabwindowproc = RegisterWindowMessage("WM_KEYMAN_GRABWINDOWPROC");
@@ -309,6 +307,7 @@ BOOL InitialiseProcess(HWND hwnd)
 	wm_keymanim_close = RegisterWindowMessage("WM_KEYMANIM_CLOSE");
 	wm_keymanim_contextchanged = RegisterWindowMessage("WM_KEYMANIM_CONTEXTCHANGED");
 	wm_keymanshift = RegisterWindowMessage("WM_KEYMANSHIFT");
+
 
 	wm_keyman_control = RegisterWindowMessage(RWM_KEYMAN_CONTROL);
 	wm_keyman_control_internal = RegisterWindowMessage("WM_KEYMAN_CONTROL_INTERNAL");
@@ -576,9 +575,18 @@ extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName
     delete keyboardPath;
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core
 
-    const km_kbp_option_item test_env_opts[] = {KM_KBP_OPTIONS_END};
+    km_kbp_option_item *core_environment = nullptr;
+
+    if(!SetupCoreEnvironment(&core_environment)) {
+      SendDebugMessageFormat(0, sdmLoad, 0, "Keyman_ForceKeyboard Core: Unable to set environment options for keyboard %s", FileName); // TODO: 5442 - remove word Core
+      return FALSE;
+    }
+
     err_status =
-        km_kbp_state_create(_td->lpActiveKeyboard->lpCoreKeyboard, test_env_opts, &_td->lpActiveKeyboard->lpCoreKeyboardState);
+        km_kbp_state_create(_td->lpActiveKeyboard->lpCoreKeyboard, core_environment, &_td->lpActiveKeyboard->lpCoreKeyboardState);
+
+    DeleteCoreEnvironment(core_environment);
+
     if (err_status != KM_KBP_STATUS_OK) {
       SendDebugMessageFormat(
           0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_state_create failed with error status [%d]", err_status);

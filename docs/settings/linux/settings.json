@@ -91,7 +91,17 @@
     "bit": "cpp",
     "*.ipp": "cpp",
     "ibus.h": "c",
-    "*.in": "cpp"
+    "*.in": "cpp",
+    "gdk.h": "c",
+    "gio.h": "c",
+    "giotypes.h": "c",
+    "gioenums.h": "c",
+    "glib-object.h": "c",
+    "gtypes.h": "c",
+    "glib.h": "c"
   },
-  "C_Cpp.clang_format_fallbackStyle": "Google"
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "shellcheck.customArgs": [
+    "--external-sources --source-path=resources/build/"
+  ]
 }

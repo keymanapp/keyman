@@ -412,6 +412,15 @@ namespace com.keyman {
     ['isChiral'](k0?) {
       var kbd: keyboards.Keyboard;
       if(k0) {
+        if(typeof k0 == 'string') {
+          const kbdObj = this.keyboardManager.keyboards.find((kbd) => kbd['KI'] == k0);
+          if(!kbdObj) {
+            throw new Error(`Keyboard '${k0}' has not been loaded.`);
+          } else {
+            k0 = kbdObj;
+          }
+        }
+
         kbd = new keyboards.Keyboard(k0);
       } else {
         kbd = this.core.activeKeyboard;

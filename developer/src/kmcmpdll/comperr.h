@@ -163,6 +163,8 @@
 #define CERR_DuplicateGroup                                0x00004071
 #define CERR_DuplicateStore                                0x00004072
 
+#define CERR_RepeatedBegin                                 0x00004073
+
 #define CWARN_TooManyWarnings                              0x00002080
 #define CWARN_OldVersion                                   0x00002081
 #define CWARN_BitmapNotUsed                                0x00002082

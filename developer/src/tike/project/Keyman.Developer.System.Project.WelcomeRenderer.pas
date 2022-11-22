@@ -14,6 +14,7 @@ uses
   System.SysUtils,
   Winapi.msxml,
   Winapi.Shlobj,
+  Winapi.Windows,
   Xml.Win.msxmldom,
 
   KeymanVersion,
@@ -38,7 +39,7 @@ begin
     if not DirectoryExists(path) then
       CreateDir(path);
     if FileExists(path + '\' + SMRuFilename)
-      then DeleteFile(path + SMRUFilename)
+      then System.SysUtils.DeleteFile(path + SMRUFilename)
       else RenameFile(path + SMRUFilename, path + '\' + SMRUFilename);
   end;
   // end patch

@@ -161,7 +161,7 @@ namespace com.keyman.osk.layouts {
 
           let newWidth  = this.startWidth  + cumulativeX;
           let newHeight = this.startHeight + cumulativeY;
-          
+
           // Set the smallest and largest OSK size
           if(newWidth < 0.2*screen.width) {
             newWidth = 0.2*screen.width;

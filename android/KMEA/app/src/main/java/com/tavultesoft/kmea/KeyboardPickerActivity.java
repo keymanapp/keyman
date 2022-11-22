@@ -29,6 +29,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -543,17 +544,24 @@ public final class KeyboardPickerActivity extends BaseActivity {
         ComponentName componentName = ComponentName.unflattenFromString(id);
         if (componentName != null) {
           String packageName = componentName.getPackageName();
+          String imeName = "";
           try {
-            //PackageInfo info = packageManager.getPackageInfo(packageName, 0);
             ApplicationInfo info = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-            String imeName = (String)packageManager.getApplicationLabel(info);
+            imeName = (String)packageManager.getApplicationLabel(info);
+          } catch (PackageManager.NameNotFoundException e) {
+            // For Android 11+, this exception is thrown because we don't have QUERY_ALL_PACKAGES permission.
+            // We'll just display the package name instead.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+              KMLog.LogException(TAG, "Name not found", e);
+            }
+            imeName = packageName;
+          }
+
+          if (!imeName.isEmpty()) {
             HashMap<String, String> hashMap = new HashMap<String, String>();
             hashMap.put(titleKey, imeName);
             hashMap.put(subtitleKey, id);
             list.add(hashMap);
-
-          } catch (PackageManager.NameNotFoundException e) {
-            KMLog.LogException(TAG, "Name not found", e);
           }
         }
       }

@@ -46,6 +46,7 @@ inherited frmModelEditor: TfrmModelEditor
         Color = 14211288
         ParentColor = False
         TabOrder = 0
+        OnMouseWheel = sbDetailsMouseWheel
         object panWordlists: TPanel
           AlignWithMargins = True
           Left = 4
@@ -82,7 +83,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 200
             Width = 415
             Height = 13
-            Caption = 
+            Caption =
               'The editor was unable to parse the source file. Details shown he' +
               're are read-only.'
           end
@@ -313,23 +314,26 @@ inherited frmModelEditor: TfrmModelEditor
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
-      object Panel1: TPanel
+      object sbCompile: TScrollBox
         Left = 0
         Top = 0
         Width = 619
         Height = 708
         Align = alClient
+        BevelInner = bvNone
         BevelOuter = bvNone
+        BorderStyle = bsNone
         Color = 14211288
-        ParentBackground = False
+        ParentColor = False
         TabOrder = 0
+        OnMouseWheel = sbDetailsMouseWheel
         object lblCongrats: TLabel
           Left = 10
           Top = 13
           Width = 333
           Height = 13
-          Caption = 
-            'The keyboard must be compiled in order to distribute or install ' +
+          Caption =
+            'The model must be compiled in order to distribute or install ' +
             'it'
         end
         object panBuildLexicalModel: TPanel
@@ -373,7 +377,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 72
             Width = 389
             Height = 26
-            Caption = 
+            Caption =
               'Optionally, select a compiled keyboard with which to test this l' +
               'exical model. Any keyboards already loaded in the web debugger w' +
               'ill also be available.'

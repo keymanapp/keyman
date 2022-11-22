@@ -75,7 +75,11 @@ var
 begin
   T := FSources.LockList;
   try
-    Assert(T.Count = 0, 'TAppSourceHttpResponder.Sources should be empty at destruction');
+    // Note: Unlike regular functions, Assert has short-circuit evaluation
+    // intrinsics on the first param which makes it safe to dereference T[0] in
+    // the second parameter.
+    Assert(T.Count = 0, 'TAppSourceHttpResponder.Sources should be empty at destruction '+
+      '(T.Count='+IntToStr(T.Count)+', T[0].Filename='+T[0].Filename+')');
   finally
     FSources.UnlockList;
   end;
@@ -96,7 +100,7 @@ begin
   if ARequestInfo.Document = '/app/source/file' then
   begin
     // TODO: We should be passing a token to the browser for future POST security
-    Filename := ARequestInfo.Params.Values['Filename'];
+    Filename := CrackUTF8ZeroExtendedString(ARequestInfo.Params.Values['Filename']);
 
     if ARequestInfo.CommandType = hcGET then
     begin
@@ -112,12 +116,12 @@ begin
   else if ARequestInfo.Document = '/app/source/toucheditor' then
   begin
     // Respond files?
-    Filename := ARequestInfo.Params.Values['Filename'];
+    Filename := CrackUTF8ZeroExtendedString(ARequestInfo.Params.Values['Filename']);
     RespondTouchEditor(Filename, AContext, ARequestInfo, AResponseInfo);
   end
   else if ARequestInfo.Document = '/app/source/toucheditor/state' then
   begin
-    Filename := ARequestInfo.Params.Values['Filename'];
+    Filename := CrackUTF8ZeroExtendedString(ARequestInfo.Params.Values['Filename']);
     RespondTouchEditorState(Filename, AContext, ARequestInfo, AResponseInfo);
   end
   else if ARequestInfo.Document.StartsWith('/app/source/toucheditor/lib/') then
@@ -147,7 +151,7 @@ begin
   end
   else if ARequestInfo.CommandType = hcPOST then
   begin
-    FData := ARequestInfo.Params.Values['State'];
+    FData := CrackUTF8ZeroExtendedString(ARequestInfo.Params.Values['State']);
     RegisterSource(AFilename + '#state', FData, True);
   end;
 end;

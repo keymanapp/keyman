@@ -101,12 +101,17 @@ BOOL LoadlpKeyboardCore(int i)
   }
   delete keyboardPath;
 
-  const km_kbp_option_item test_env_opts[] =
-  {
-    KM_KBP_OPTIONS_END
-  };
+  km_kbp_option_item *core_environment = nullptr;
 
-  err_status = km_kbp_state_create(_td->lpKeyboards[i].lpCoreKeyboard, test_env_opts, &_td->lpKeyboards[i].lpCoreKeyboardState);
+  if(!SetupCoreEnvironment(&core_environment)) {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboardCore: Unable to set environment options for keyboard %ls", keyboardPath);
+    return FALSE;
+  }
+
+  err_status = km_kbp_state_create(_td->lpKeyboards[i].lpCoreKeyboard, core_environment, &_td->lpKeyboards[i].lpCoreKeyboardState);
+
+  DeleteCoreEnvironment(core_environment);
+
   if (err_status != KM_KBP_STATUS_OK) {
     SendDebugMessageFormat(
         0, sdmLoad, 0, "LoadlpKeyboardCore: km_kbp_state_create failed with error status [%d]", err_status);

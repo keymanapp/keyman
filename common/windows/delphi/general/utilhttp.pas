@@ -27,9 +27,10 @@ unit utilhttp;  // I3306  // I3308  // I3309
 interface
 
 uses
-  System.Classes, 
-  System.SysUtils, 
-  System.WideStrUtils;
+  System.Classes,
+  System.SysUtils,
+  System.WideStrUtils,
+  System.NetEncoding;
 
 function GetParamsFromURL(URL: WideString; var Params: TStringList): Boolean;
 function GetParamsFromURLEx(URL: WideString; var Params: TStringList): Boolean;
@@ -42,77 +43,14 @@ function ConvertPathToFileURL(s: WideString): WideString;
 
 implementation
 
-function CharIsInSet(const AString: string; const ACharPos: Integer; ASet: TSysCharSet): Boolean;
-begin
-  if ACharPos > Length(AString) then begin
-    Result := False;
-  end else begin
-    {$IFDEF DotNet}
-    Result := AnsiString(AString[ACharPos])[1] in ASet;
-    {$ELSE}
-    Result := CharInSet(AString[ACharPos], ASet);
-    {$ENDIF}
-  end;
-end;
-
 function URLEncode(ASrc: string): string;
-var
-  i: Integer;
-const
-  UnsafeChars = ['*', '#', '%', '<', '>', ' ','[',']', '{', '}', '?', '&'];  {do not localize}
 begin
-  Result := '';    {Do not Localize}
-  for i := 1 to Length(ASrc) do
-  begin
-    // S.G. 27/11/2002: Changed the parameter encoding: Even in parameters, a space
-    // S.G. 27/11/2002: is much more likely to be meaning "space" than "this is
-    // S.G. 27/11/2002: a new parameter"
-    // S.G. 27/11/2002: ref: Message-ID: <3de30169@newsgroups.borland.com> borland.public.delphi.internet.winsock
-    // S.G. 27/11/2002: Most low-ascii is actually Ok in parameters encoding.
-    if ((CharIsInSet(ASrc, i, UnsafeChars)) or (not (CharIsInSet(ASrc, i, [#33..#128])))) then
-    begin {do not localize}
-      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);  {do not localize}
-    end
-    else
-    begin
-      Result := Result + ASrc[i];
-    end;
-  end;
+  Result := TNetEncoding.URL.Encode(ASrc);
 end;
 
 function URLDecode(ASrc: AnsiString): string;
-var
-  i: integer;
-  s: ansistring;
-  ESC: ansistring;
-  CharCode: integer;
 begin
-  Result := '';    {Do not Localize}
-  // S.G. 27/11/2002: Spaces is NOT to be encoded as "+".
-  // S.G. 27/11/2002: "+" is a field separator in query parameter, space is...
-  // S.G. 27/11/2002: well, a space
-  // ASrc := StringReplace(ASrc, '+', ' ', [rfReplaceAll]);  {do not localize}
-  i := 1;
-  while i <= Length(ASrc) do
-  begin
-    if ASrc[i] <> '%' then
-    begin  {do not localize}
-      S := S + ASrc[i]
-    end
-    else
-    begin
-      Inc(i); // skip the % char
-      ESC := Copy(ASrc, i, 2); // Copy the escape code
-      Inc(i, 1); // Then skip it.
-      try
-        CharCode := StrToInt('$' + string(ESC));  {do not localize}
-        S := S + AnsiChar(CharCode);
-      except
-      end;
-    end;
-    Inc(i);
-  end;
-  Result := UTF8ToString(S);
+  Result := TNetEncoding.URL.Decode(ASrc);
 end;
 
 procedure DecodeAndSetParams(const AValue: WideString; Params: TStringList);
