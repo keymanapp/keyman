@@ -183,7 +183,7 @@ export const sendCommentToPullRequestAndRelatedIssues = async (
  */
 
 export const fixupHistory = async (
-  octokit: GitHub, base: string, force: boolean
+  octokit: GitHub, base: string, force: boolean, writeGithubComment: boolean
 ): Promise<number> => {
 
   //
@@ -213,7 +213,7 @@ export const fixupHistory = async (
   // Write a comment to GitHub for each of the pulls
   //
 
-  if(historyResult.pulls.length > 0) {
+  if(writeGithubComment && historyResult.pulls.length > 0) {
     await sendCommentToPullRequestAndRelatedIssues(octokit, historyResult.pulls);
   }
 
