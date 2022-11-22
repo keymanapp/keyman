@@ -33,6 +33,7 @@ the default iOS keyboard layout by touching the globe key of the keyboard whenev
 ![](../ios_images/globe.png)
 
 ### On "Allow Full Access"
-For normal use of Keyman, there is no need to keep "Allow Full Access" enabled. It is needed only for making changes to some keyboard preferences.
+An issue with iOS 16 causes the Keyman system keyboard to not display unless "Allow Full Access" is enabled. Until the issue is addressed, this setting must be left in the on position for Keyman to operate normally.
 
-However, an issue with iOS 16 causes the Keyman system keyboard to not display unless "Allow Full Access" is enabled. Until the issue is addressed, this setting must be left in the on position for Keyman to operate normally.
+For normal use of Keyman with versions prior to iOS 16.0, there is no need to keep "Allow Full Access" enabled. It is needed only for making changes to some keyboard preferences.
+
