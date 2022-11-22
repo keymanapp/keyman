@@ -78,7 +78,7 @@
   } else {
     // set completionHandler to be called after privacyDialog is dismissed
     _completionHandler = withCompletionHandler;
-   NSLog(@"do not have Accessibility, present Privacy Dialog");
+    NSLog(@"do not have Accessibility, present Privacy Dialog");
     [self showPrivacyDialog];
   }
 }
