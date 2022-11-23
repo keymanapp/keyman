@@ -319,6 +319,114 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   }
 }
 
+static km_kbp_cp* get_base_layout()
+{
+  return u"en-US";
+
+#if 0  // in the future when mnemonic layouts are to be supported
+  const gchar *lang_env = g_getenv("LANG");
+  gchar *lang;
+  if (lang_env != NULL) {
+    g_message("LANG=%s", lang_env);
+    gchar **splitlang = g_strsplit(lang_env, ".", 2);
+    g_message("before . is %s", splitlang[0]);
+    if (g_strrstr(splitlang[0], "_")) {
+      g_message("splitting %s", splitlang[0]);
+      gchar **taglang = g_strsplit(splitlang[0], "_", 2);
+      g_message("lang of tag is %s", taglang[0]);
+      g_message("country of tag is %s", taglang[1]);
+      lang = g_strjoin("-", taglang[0], taglang[1], NULL);
+      g_strfreev(taglang);
+    }
+    else {
+      lang = g_strdup(splitlang[0]);
+    }
+    g_strfreev(splitlang);
+  }
+  else {
+    lang = strdup("en-US");
+  }
+  g_message("lang is %s", lang);
+  km_kbp_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
+  return cp;
+  // g_free(lang);
+#endif
+}
+
+static km_kbp_status
+setup_environment(IBusKeymanEngine *keyman)
+{
+  g_assert(keyman);
+  g_message("%s: setting up environment", __FUNCTION__);
+
+  km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 4);
+
+  keyboard_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
+  keyboard_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
+  keyboard_opts[0].value = u"linux desktop hardware native";
+
+  keyboard_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
+  keyboard_opts[1].key   = KM_KBP_KMX_ENV_BASELAYOUT;
+  keyboard_opts[1].value = u"kbdus.dll";
+
+  keyboard_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
+  keyboard_opts[2].key   = KM_KBP_KMX_ENV_BASELAYOUTALT;
+  keyboard_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
+
+  keyboard_opts[3].scope = 0;
+  keyboard_opts[3].key   = 0;
+  keyboard_opts[3].value = NULL;
+
+  km_kbp_status status = km_kbp_state_create(keyman->keyboard, keyboard_opts, &(keyman->state));
+  if (status != KM_KBP_STATUS_OK) {
+    g_warning("%s: problem creating km_kbp_state. Status is %u.", __FUNCTION__, status);
+  }
+  g_free(keyboard_opts);
+  return status;
+}
+
+static km_kbp_status
+load_keyboard_options(IBusKeymanEngine *keyman)
+{
+  g_assert(keyman);
+
+  // Retrieve keyboard options from DConf
+  // TODO: May need unique packageID and keyboard ID
+  g_message("%s: Loading options for kb_name: %s", __FUNCTION__, keyman->kb_name);
+  GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
+  int num_options       = g_queue_get_length(queue_options);
+  if (num_options < 1)
+    return KM_KBP_STATUS_OK;
+
+  // Allocate enough options for: num_options plus 1 pad struct of 0's
+  km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, num_options + 1);
+
+  for (int i = 0; i < num_options; i++) {
+    km_kbp_option_item *item = g_queue_pop_head(queue_options);
+    keyboard_opts[i].scope = item->scope;
+    keyboard_opts[i].key   = item->key;
+    keyboard_opts[i].value = item->value;
+  }
+
+  keyboard_opts[num_options].scope = 0;
+  keyboard_opts[num_options].key   = 0;
+  keyboard_opts[num_options].value = NULL;
+
+  // once we have the option list we can then update the options using the public api call
+  km_kbp_status status = km_kbp_state_options_update(keyman->state, keyboard_opts);
+
+  if (status != KM_KBP_STATUS_OK) {
+    g_warning("%s: problem creating km_kbp_state. Status is %u.", __FUNCTION__, status);
+  }
+  for (int i = 0; i < num_options; i++) {
+    g_free((km_kbp_cp *)keyboard_opts[i].key);
+    g_free((km_kbp_cp *)keyboard_opts[i].value);
+  }
+  g_queue_free_full(queue_options, NULL);
+  g_free(keyboard_opts);
+  return status;
+}
+
 static GObject*
 ibus_keyman_engine_constructor(
   GType type,
@@ -387,84 +495,24 @@ ibus_keyman_engine_constructor(
     }
     g_free(kmx_file);
 
-    // Retrieve keyboard options from DConf
-    // TODO: May need unique packageID and keyboard ID
-    g_message("%s: Loading options for kb_name: %s", __FUNCTION__, keyman->kb_name);
-    GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
-    int num_options = g_queue_get_length(queue_options);
-
-    // Allocate enough options for: 3 environments plus num_options plus 1 pad struct of 0's
-    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1);
-
-    keyboard_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
-    keyboard_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
-    keyboard_opts[0].value = u"linux desktop hardware native";
-
-    keyboard_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
-    keyboard_opts[1].key   = KM_KBP_KMX_ENV_BASELAYOUT;
-    keyboard_opts[1].value = u"kbdus.dll";
-
-    keyboard_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
-    keyboard_opts[2].key   = KM_KBP_KMX_ENV_BASELAYOUTALT;
-    keyboard_opts[2].value = u"en-US";
-#if 0  // in the future when mnemonic layouts are to be supported
-    const gchar *lang_env = g_getenv("LANG");
-    gchar *lang;
-    if (lang_env != NULL) {
-        g_message("LANG=%s", lang_env);
-        gchar **splitlang = g_strsplit(lang_env, ".", 2);
-        g_message("before . is %s", splitlang[0]);
-        if (g_strrstr(splitlang[0], "_")) {
-            g_message("splitting %s", splitlang[0]);
-            gchar **taglang = g_strsplit(splitlang[0], "_", 2);
-            g_message("lang of tag is %s", taglang[0]);
-            g_message("country of tag is %s", taglang[1]);
-            lang = g_strjoin("-", taglang[0], taglang[1], NULL);
-            g_strfreev(taglang);
-        }
-        else {
-            lang = g_strdup(splitlang[0]);
-        }
-        g_strfreev(splitlang);
-    }
-    else {
-        lang = strdup("en-US");
-    }
-    g_message("lang is %s", lang);
-    km_kbp_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
-    keyboard_opts[2].value = cp; // TODO: free this value
-    // g_free(lang);
-#endif
-
-    // If queue_options contains keyboard options, pop them into keyboard_opts[3] onward
-    for(int i=0; i<num_options; i++)
-    {
-        memmove(&(keyboard_opts[KEYMAN_ENVIRONMENT_OPTIONS+i]), g_queue_pop_head(queue_options), sizeof(km_kbp_option_item));
+    km_kbp_status status = setup_environment(keyman);
+    if (status != KM_KBP_STATUS_OK) {
+      g_free(abs_kmx_path);
+      return NULL;
     }
 
-    // keyboard_opts[tail] already initialised to {0, 0, 0}
-
-    km_kbp_status status_keyboard = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
+    status = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
     g_free(abs_kmx_path);
 
-    if (status_keyboard != KM_KBP_STATUS_OK)
-    {
-        g_warning("%s: problem creating km_kbp_keyboard", __FUNCTION__);
+    if (status != KM_KBP_STATUS_OK) {
+      g_warning("%s: problem creating km_kbp_keyboard. Status is %u.", __FUNCTION__, status);
+      return NULL;
     }
 
-    km_kbp_status status_state = km_kbp_state_create(keyman->keyboard,
-                                  keyboard_opts,
-                                  &(keyman->state));
-    if (status_state != KM_KBP_STATUS_OK)
-    {
-        g_warning("%s: problem creating km_kbp_state", __FUNCTION__);
+    status = load_keyboard_options(keyman);
+    if (status != KM_KBP_STATUS_OK) {
+      return NULL;
     }
-    for (int i = KEYMAN_ENVIRONMENT_OPTIONS; i < KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1; i++) {
-      g_free((km_kbp_cp *)keyboard_opts[i].key);
-      g_free((km_kbp_cp *)keyboard_opts[i].value);
-    }
-    g_queue_free_full(queue_options, NULL);
-    g_free(keyboard_opts);
 
     reset_context(engine);
 
