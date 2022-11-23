@@ -221,7 +221,7 @@ static gchar *get_current_context_text(km_kbp_context *context)
                             &buf_size);
     }
     km_kbp_context_items_dispose(context_items);
-    g_message("%s: current context is:%u:%u:%s:", __FUNCTION__, km_kbp_context_length(context), buf_size, current_context_utf8);
+    g_message("%s: current context is:%zu:%zu:%s:", __FUNCTION__, km_kbp_context_length(context), buf_size, current_context_utf8);
     return current_context_utf8;
 }
 

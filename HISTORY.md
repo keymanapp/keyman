@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.109 beta 2022-11-22
+
+* fix(windows): arrow keys need to select next/prev item in options tab (#7756)
+* fix(windows): buttons should be in list in Options tab (#7757)
+* fix(android/engine): Add null check on kmp filename (#7787)
+* fix(ios): make text size of in-app editor consistent with slider (#7782)
+* fix(android/engine): Check if kmp.json is null (#7788)
+* fix(mac): Enable right-alt/option key mapping (#7762)
+* feat(linux): Add symbols file (#7742)
+
 ## 16.0.108 beta 2022-11-21
 
 * fix(windows): backout ms button style for add lang pop up (#7765)

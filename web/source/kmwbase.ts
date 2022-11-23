@@ -109,6 +109,7 @@ namespace com.keyman {
     // Stub functions (defined later in code only if required)
     setDefaultDeviceOptions(opt: OptionType){}
     getStyleSheetPath(s){return s;}
+    linkStylesheetResources(){}
     getKeyboardPath(f, p?){return f;}
     KC_(n, ln, Pelem){return '';}
     handleRotationEvents(){}

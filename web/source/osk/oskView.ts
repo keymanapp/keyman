@@ -569,6 +569,8 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         // Create the key preview (for phones)
         this.vkbd.createKeyTip();
+        // Create the globe hint (for embedded contexts; has a stub for other contexts)
+        this.vkbd.createGlobeHint();
 
         // Append a stylesheet for this keyboard for keyboard specific styles
         // or if needed to specify an embedded font

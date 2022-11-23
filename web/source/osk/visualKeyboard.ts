@@ -3,6 +3,7 @@
 /// <reference path="utils.ts" />
 /// <reference path="oskLayerGroup.ts" />
 /// <reference path="keytip.interface.ts" />
+/// <reference path="globehint.interface.ts" />
 /// <reference path="browser/keytip.ts" />
 /// <reference path="browser/pendingLongpress.ts" />
 /// <reference path="browser/pendingMultiTap.ts" />
@@ -96,6 +97,7 @@ namespace com.keyman.osk {
 
     // Popup key management
     keytip: KeyTip;
+    globeHint: GlobeHint;
     pendingSubkey: PendingGesture;
     subkeyGesture: RealizedGesture;
 
@@ -1169,6 +1171,8 @@ namespace com.keyman.osk {
         if (t.innerText != displayName || displayName == '') {
           t.innerText = displayName;
         }
+
+        this.spaceBar.key.refreshLayout(this);
       }
       catch (ex) { }
     }
@@ -1788,6 +1792,10 @@ namespace com.keyman.osk {
         }
       }
     };
+
+    createGlobeHint() {
+      // A no-op for standard, non-app-embedded use cases.
+    }
 
     shutdown() {
       let keyman = com.keyman.singleton;

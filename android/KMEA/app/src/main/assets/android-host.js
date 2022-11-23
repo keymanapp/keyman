@@ -266,6 +266,11 @@ function oskClearKeyPreview() {
   window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
 }
 
+function signalHelpBubbleDismissal() {
+  fragmentToggle = (fragmentToggle + 1) % 100;
+  window.location.hash = 'helpBubbleDismissed-'+fragmentToggle;
+}
+
 function oskCreatePopup(obj,x,y) {
   if(obj != null) {
     var i;
