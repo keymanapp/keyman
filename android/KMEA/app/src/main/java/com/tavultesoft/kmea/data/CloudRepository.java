@@ -62,11 +62,6 @@ public class CloudRepository {
     lastLoad = null;
   }
 
-  // For local and PR test builds, force check of keyboard updates
-  private static boolean isTestBuild() {
-    return VersionUtils.isLocalBuild() || VersionUtils.isTestBuild();
-  }
-
   public interface UpdateHandler {
     void onUpdateDetection(List<Bundle> updateBundles);
   }
@@ -246,7 +241,7 @@ public class CloudRepository {
     boolean cacheValid = getCacheValidity(context);
 
     // For local and PR test builds, force update dataset
-    if(cacheValid && shouldUseMemCache(context) && !isTestBuild()) {
+    if(cacheValid && shouldUseMemCache(context) && !VersionUtils.isLocalOrTestBuild()) {
       onSuccess.run();
       return; // isn't null - checked by `shouldUseCache`.
     }
@@ -374,7 +369,7 @@ public class CloudRepository {
     boolean cacheValid = getCacheValidity(context);
 
     // For local and PR test builds, force download of metadata
-    if(cacheValid && shouldUseMemCache(context) && !isTestBuild()) {
+    if(cacheValid && shouldUseMemCache(context) && !VersionUtils.isLocalOrTestBuild()) {
       return; // isn't null - checked by `shouldUseCache`.
     } else if (!KMManager.hasInternetPermission(context) || !KMManager.hasConnection(context)) {
       // noop if no internet permission or network connection
@@ -393,7 +388,7 @@ public class CloudRepository {
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>(2);
 
     // For local and PR test builds, force check of keyboard updates
-    if (!cacheValid || isTestBuild()) {
+    if (!cacheValid || VersionUtils.isLocalOrTestBuild()) {
       cloudQueries.add(prepareResourcesUpdateQuery(context));
     }
 

@@ -298,7 +298,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    */
   private boolean shouldIgnoreNotification(String id) {
     // For local and PR test builds, return false to make it easier to get updates for testing
-    if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild()) {
+    if (VersionUtils.isLocalOrTestBuild()) {
       return false;
     }
 

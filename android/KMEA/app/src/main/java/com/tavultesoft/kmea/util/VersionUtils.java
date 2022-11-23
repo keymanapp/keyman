@@ -18,4 +18,9 @@ public final class VersionUtils {
   public static boolean isTestBuild() {
     return BuildConfig.VERSION_ENVIRONMENT.equalsIgnoreCase("test");
   }
+
+  // Utility for local and PR test builds - e.g. force check of keyboard updates
+  public static boolean isLocalOrTestBuild() {
+    return isLocalBuild() || isTestBuild();
+  }
 }
