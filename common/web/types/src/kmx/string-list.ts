@@ -36,4 +36,23 @@ export class ListItem extends Array<ListIndex> {
     }
     return true;
   }
+  compareTo(o: ListItem): number {
+    for (let i = 0; i < Math.min(this.length, o.length); i++) {
+      const r = this[i].value.compareTo(o[i].value);
+      if (r !== 0) {
+        return r;
+      }
+    }
+    // prefix is the same, so go by length: shortest is first.
+    if (this.length < o.length) {
+      return -1;
+    } else if (this.length > o.length) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+  toString(): string {
+    return this.map(v => v.value.value).toString();
+  }
 };

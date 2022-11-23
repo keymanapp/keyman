@@ -116,6 +116,18 @@ export class StrsItem {
   constructor(value: string) {
     this.value = value;
   }
+  compareTo(o: StrsItem): number {
+    return StrsItem.binaryStringCompare(this.value, o.value);
+  }
+  static binaryStringCompare(a: string, b: string): number {
+    // https://tc39.es/ecma262/multipage/abstract-operations.html#sec-islessthan
+    if(typeof a != 'string' || typeof b != 'string') {
+      throw new Error('binaryStringCompare: inputs must be strings');
+    }
+    if(a < b) return -1;
+    if(a > b) return 1;
+    return 0;
+  }
 };
 
 export class Strs extends Section {

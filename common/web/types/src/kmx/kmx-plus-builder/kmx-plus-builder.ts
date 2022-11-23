@@ -81,9 +81,10 @@ export default class KMXPlusBuilder {
   private build() {
     // Required sections: sect, strs, loca, meta
 
-    // We must prepare the strs and elem sections early so that other sections can
+    // We must prepare the strs, list, and elem sections early so that other sections can
     // reference them. However, they will be emitted in alpha order.
     this.sect.strs = build_strs(this.file.kmxplus.strs);
+    this.sect.list = build_list(this.file.kmxplus.list, this.sect.strs);
     this.sect.elem = build_elem(this.file.kmxplus.elem, this.sect.strs);
 
     const build_bksp = build_tran;
@@ -95,7 +96,6 @@ export default class KMXPlusBuilder {
     this.sect.key2 = build_key2(this.file.kmxplus, this.sect.strs, this.sect.list);
     this.sect.keys = build_keys(this.file.kmxplus, this.sect.strs);
     this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.sect.list);
-    this.sect.list = build_list(this.file.kmxplus, this.sect.strs);
     this.sect.loca = build_loca(this.file.kmxplus, this.sect.strs);
     this.sect.meta = build_meta(this.file.kmxplus, this.sect.strs);
     this.sect.name = build_name(this.file.kmxplus, this.sect.strs);
