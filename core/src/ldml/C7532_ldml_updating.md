@@ -57,7 +57,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
     - Add `import { BUILDER_DISP, build_disp } from './build-disp.js';` to the top (and a new file to go with it) — and, in order
     - Add `private sect_disp: BUILDER_DISP` to `class  KMXPlusBuilder {` — and, in order
     - add `this.sect_disp = build_disp(this.file.kmxplus, this.sect_strs);` to the `build()` function.  Include any other sections that need to be cross referenced.
-    - Update `finalize_sect` to get the section count right, and add `offset = this.finalize_sect_item(this.sect_disp, offset);`
+    - Update `finalize_sect` and add `offset = this.finalize_sect_item(this.sect_disp, offset);`
     - Finally, add `this.emitSection(file, this.file.COMP_PLUS_DISP, this.sect_disp);` to `compile()` — and, in order.
         - Note that some variable length parts (such as the actual text data in `strs`) are sometimes in a separate emit function. Anything that's not in the `COMP_PLUS_STRS` `r.Struct` definition needs one of these.
 
