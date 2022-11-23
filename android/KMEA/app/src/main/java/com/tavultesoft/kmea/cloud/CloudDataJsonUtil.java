@@ -165,9 +165,11 @@ public class CloudDataJsonUtil {
                     saveKeyboardList = true;
                   }
 
-                  // Update bundle list for update notifications
-                  Bundle bundle = new Bundle(kbd.buildDownloadBundle());
-                  updateBundles.add(bundle);
+                  if (!updateKMP.isEmpty()) {
+                    // Update bundle list for update notifications
+                    Bundle bundle = new Bundle(kbd.buildDownloadBundle());
+                    updateBundles.add(bundle);
+                  }
                 }
               }
             }
