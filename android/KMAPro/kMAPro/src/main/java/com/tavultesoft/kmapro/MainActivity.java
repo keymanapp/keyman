@@ -450,6 +450,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         return true;
       case R.id.action_update_keyboards:
         KMManager.getUpdateTool().executeOpenUpdates();
+        // Dismiss icon
+        updateUpdateCountIndicator(0);
         return true;
       default:
         return super.onOptionsItemSelected(item);
