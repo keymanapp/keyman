@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 16.0.110 beta 2022-11-23
+
+* fix(linux): Revert "fix(linux): Fix a warning" (#7783)
+* fix: automatically merge changes to history back to master (#7780)
+* chore(common): Update whatsnew for 16.0 (#7789)
+* fix(web): inferred key text + spacebar caption scaling (#7741)
+* feat(web): re-implementation of introductory globe-key help bubble (#7612)
+* fix(android/engine): Fix logic error for updateKMP (#7799)
+* fix(linux): Allow to build without patched ibus version (#7792)
+* chore(linux): Update autotools configuration (#7793)
+* docs(ios): Update help documentation about Install and Allow Full Access (#7791)
+* fix(android/engine): Update versions of matching package and keyboard ID (#7740)
+
 ## 16.0.109 beta 2022-11-22
 
 * fix(windows): arrow keys need to select next/prev item in options tab (#7756)
