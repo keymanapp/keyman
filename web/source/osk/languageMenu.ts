@@ -411,6 +411,36 @@ namespace com.keyman.osk {
       // We're setting up a few events - this alias helps avoid scoping issues.
       const languageMenu = this;
 
+      // Refer to https://github.com/keymanapp/keyman/pull/7790 for context on
+      // the following two methods.
+      const lockBodyScroll = () => {
+        // Preserve the original style for the body element; we're going to change
+        // it to block page scrolling.  Must use a separate instance.
+        //
+        // Reference: https://stackoverflow.com/a/28411556
+        this.originalBodyStyle = {};
+
+        // Must be separate line from previous due to TS type inference stuff.
+        const obs = this.originalBodyStyle;
+        const dbs = document.body.style;
+        obs.overflowY = dbs.overflowY;
+        obs.height = dbs.height;
+
+        // Now that the properties we're going to overwrite have been cached...
+        dbs.overflowY = 'hidden';
+        dbs.height = '100%';
+        return true;
+      }
+
+      const unlockBodyScroll = () => {
+        // Reverses the changes to document.body.style made by `lockBodyScroll`.
+        const obs = this.originalBodyStyle;
+        const dbs = document.body.style;
+
+        dbs.overflowY = obs.overflowY;
+        dbs.height = obs.height;
+      }
+
       // Touchstart (or mspointerdown) event highlights the touched list item
       const touchStart=function(e) {
         e.stopPropagation();
@@ -420,22 +450,7 @@ namespace com.keyman.osk {
         languageMenu.scrolling=false;
         languageMenu.y0=e.touches[0].pageY;//osk.lgList.childNodes[0].scrollTop;
 
-        // Preserve the original style for the body element; we're going to change
-        // it to block page scrolling.  Must use a separate instance.
-        //
-        // Reference: https://stackoverflow.com/a/28411556
-        languageMenu.originalBodyStyle = {};
-
-        // Must be separate line from previous due to TS type inference stuff.
-        const obs = languageMenu.originalBodyStyle;
-        const dbs = document.body.style;
-        obs.overflowY = dbs.overflowY;
-        obs.height = dbs.height;
-
-        // Now that the properties we're going to overwrite have been cached...
-        dbs.overflowY = 'hidden';
-        dbs.height = '100%';
-        return true;
+        lockBodyScroll();
       };
 
       //TODO: Still drags Android background sometimes (not consistently)
@@ -480,15 +495,6 @@ namespace com.keyman.osk {
         return true;
       };
 
-      const restoreBodyStyle=function() {
-        // Reverses the changes to document.body.style made in `touchStart`.
-        const obs = languageMenu.originalBodyStyle;
-        const dbs = document.body.style;
-
-        dbs.overflowY = obs.overflowY;
-        dbs.height = obs.height;
-      }
-
       // Touch release (click) event selects touched list item
       const touchEnd=function(e: TouchEvent) {
         if(typeof(e.stopImmediatePropagation) != 'undefined') {
@@ -509,12 +515,12 @@ namespace com.keyman.osk {
           languageMenu.hide();
         }
 
-        restoreBodyStyle();
+        unlockBodyScroll();
         return true;
       };
 
       const touchCancel=function(e: TouchEvent) {
-        restoreBodyStyle();
+        unlockBodyScroll();
       }
 
       kb.onmspointerdown=touchStart;
