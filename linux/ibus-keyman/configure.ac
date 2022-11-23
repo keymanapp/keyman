@@ -93,6 +93,16 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Define to the read-only 
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION(0.19.7)
 
+# check if it's a patched ibus
+SAV_CFLAGS="$CFLAGS"
+CFLAGS="$IBUS_CFLAGS $CFLAGS"
+AC_CHECK_DECLS([IBUS_PREFILTER_MASK, IBUS_CAP_PREFILTER],
+    [AC_DEFINE(IBUS_HAS_PREFILTER, 1, [Does ibus support the prefilter flag])],
+    [],
+    [[#include <ibus.h>]]
+)
+CFLAGS="$SAV_CFLAGS"
+
 
 # OUTPUT files
 AC_CONFIG_FILES([ po/Makefile.in
