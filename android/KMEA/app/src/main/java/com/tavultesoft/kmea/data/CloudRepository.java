@@ -62,9 +62,9 @@ public class CloudRepository {
     lastLoad = null;
   }
 
-  // For local and PR test builds, invalidate cache to make keyboard updates easier
-  private static boolean disableCacheForTesting() {
-    return DEBUG_DISABLE_CACHE || VersionUtils.isLocalBuild() || VersionUtils.isTestBuild();
+  // For local and PR test builds, force check of keyboard updates
+  private static boolean isTestBuild() {
+    return VersionUtils.isLocalBuild() || VersionUtils.isTestBuild();
   }
 
   public interface UpdateHandler {
@@ -86,15 +86,11 @@ public class CloudRepository {
   }
 
   /**
-   * Get the validity for cached resources (lexical model cache and package-version).
+   * Get the validity for cached resources (lexical model cache and package-version)
    * @param context the main activity of the application
    * @return boolean of the cache validity
    */
   public boolean getCacheValidity(@NonNull Context context) {
-    // For local and PR test builds, invalidate cache to make keyboard updates easier
-    if (disableCacheForTesting()) {
-      return false;
-    }
     boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
     boolean loadResourcesFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getResourcesCacheFile(context));
 
@@ -104,8 +100,7 @@ public class CloudRepository {
   }
 
   public boolean hasCache(Context context) {
-    // For local and PR test builds, invalidate cache to make keyboard updates easier
-    if(disableCacheForTesting()) {
+    if(DEBUG_DISABLE_CACHE) {
       return false;
     }
 
@@ -117,8 +112,7 @@ public class CloudRepository {
   }
 
   private boolean shouldUseMemCache(Context context) {
-    // For local and PR test builds, invalidate cache to make keyboard updates easier
-    if(disableCacheForTesting()) {
+    if(DEBUG_DISABLE_CACHE) {
       return false;
     }
 
@@ -136,8 +130,7 @@ public class CloudRepository {
   }
 
   private boolean shouldUseCache(Context context, File cacheFile) {
-    // For local and PR test builds, invalidate cache to make keyboard updates easier
-    if(disableCacheForTesting()) {
+    if(DEBUG_DISABLE_CACHE) {
       return false;
     }
 
@@ -252,7 +245,8 @@ public class CloudRepository {
   {
     boolean cacheValid = getCacheValidity(context);
 
-    if(cacheValid && shouldUseMemCache(context)) {
+    // For local and PR test builds, force update dataset
+    if(cacheValid && shouldUseMemCache(context) && !isTestBuild()) {
       onSuccess.run();
       return; // isn't null - checked by `shouldUseCache`.
     }
@@ -379,7 +373,8 @@ public class CloudRepository {
   private void downloadMetaDataFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
     boolean cacheValid = getCacheValidity(context);
 
-    if(cacheValid && shouldUseMemCache(context)) {
+    // For local and PR test builds, force download of metadata
+    if(cacheValid && shouldUseMemCache(context) && !isTestBuild()) {
       return; // isn't null - checked by `shouldUseCache`.
     } else if (!KMManager.hasInternetPermission(context) || !KMManager.hasConnection(context)) {
       // noop if no internet permission or network connection
@@ -397,7 +392,8 @@ public class CloudRepository {
     //    int cloudQueryEntries = 0;
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>(2);
 
-    if (!cacheValid) {
+    // For local and PR test builds, force check of keyboard updates
+    if (!cacheValid || isTestBuild()) {
       cloudQueries.add(prepareResourcesUpdateQuery(context));
     }
 

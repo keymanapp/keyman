@@ -293,11 +293,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   /**
    * Check shared preference to see if an update notification should be ignored.
    * The window is MONTHS_TO_IGNORE_NOTIFICATION from the last time the notification was ignored.
-   * For local and PR test builds, return false to make it easier to get updates for testing.
    * @param id keyboard or lexical model ID
    * @return true if the notification should be ignored
    */
   private boolean shouldIgnoreNotification(String id) {
+    // For local and PR test builds, return false to make it easier to get updates for testing
     if (VersionUtils.isLocalBuild() || VersionUtils.isTestBuild()) {
       return false;
     }
