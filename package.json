@@ -18,5 +18,8 @@
     "common/web/*",
     "common/predictive-text",
     "web"
-  ]
+  ],
+  "dependencies": {
+    "esbuild": "^0.15.15"
+  }
 }

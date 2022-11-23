@@ -43,6 +43,7 @@ if builder_start_action build; then
     echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
   else
     npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+    node build-bundler.js
   fi
   builder_finish_action success build
 fi
