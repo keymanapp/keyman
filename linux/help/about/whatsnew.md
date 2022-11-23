@@ -12,4 +12,6 @@ Here are some of the new features and major bug fixes we have added to Keyman fo
       packages.sil.org and https://launchpad.net/~keymanapp/+archive/ubuntu/keyman
       repos contain the updated ibus versions.
 * Now supports Ubuntu 22.10 (Kinetic) (#6975)
+* System tray will now show icon defined in keyboard instead of generic Keyman icon (#7678)
+* Keyman 16 will be the last release that supports Ubuntu 18.04 Bionic.
 * Fix uninstallation when using fcitx5 (#6963)
