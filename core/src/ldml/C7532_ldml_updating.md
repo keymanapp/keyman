@@ -49,11 +49,21 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
     - add a test case such as `developer/src/kmc-keyboard/src/compiler/layr.ts`
 - add a compiler
     - `developer/src/kmc-keyboard/compiler/key2.ts`
+    - Note: the in-memory compiler can affect `basic.kmx` even _before_ you add the section writing code. How? Simple… `Strs.allocString()` is called for the in-memory structures, so the string table will start growing even before those strings are actually used by the new sections.  This is why it's fine to ignore the basic failure until you actually do the KMXPlus write.
 
 ## Writing out
 
+- The moment you've been waiting for! Crack open `common/web/types/src/kmx/kmx-plus-builder/kmx-plus-builder.ts` and do it.
+    - Add `import { BUILDER_DISP, build_disp } from './build-disp.js';` to the top (and a new file to go with it) — and, in order
+    - Add `private sect_disp: BUILDER_DISP` to `class  KMXPlusBuilder {` — and, in order
+    - add `this.sect_disp = build_disp(this.file.kmxplus, this.sect_strs);` to the `build()` function.  Include any other sections that need to be cross referenced.
+    - Update `finalize_sect` to get the section count right, and add `offset = this.finalize_sect_item(this.sect_disp, offset);`
+    - Finally, add `this.emitSection(file, this.file.COMP_PLUS_DISP, this.sect_disp);` to `compile()` — and, in order.
+        - Note that some variable length parts (such as the actual text data in `strs`) are sometimes in a separate emit function. Anything that's not in the `COMP_PLUS_STRS` `r.Struct` definition needs one of these.
+
 - update basic.xml and basic.txt
-    - TODO-LDML: regen fixtures
-    - … BUT DO NOT CHECK THEM IN!
+    - Tweak `basic.xml` as needed
+    - You can use `developer/src/kmc-keyboard/build.sh build-fixtures` which will generate `build/test/fixtures/basic-xml.kmx` as well as `.kvk`
+    - … BUT DO NOT CHECK IT IN!
 
 ## more to come

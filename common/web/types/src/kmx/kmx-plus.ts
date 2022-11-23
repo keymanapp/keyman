@@ -448,6 +448,7 @@ export class KMXPlusFile extends KMXFile {
       count: r.uint32le,
       reserved: new r.Reserved(r.uint32le), // padding
       strings: new r.Array(this.COMP_PLUS_ELEM_STRING, 'count')
+      // + variable subtable: Element data (see KMXPlusBuilder.emitElements())
     });
 
     // 'finl' - see 'tran'
@@ -637,6 +638,7 @@ export class KMXPlusFile extends KMXFile {
       count: r.uint32le,
       reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
+      // + variable subtable: String data (see KMXPlusBuilder.emitStrings())
     });
 
     // 'tran'
