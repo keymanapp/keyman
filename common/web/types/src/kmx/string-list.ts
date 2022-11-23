@@ -3,12 +3,16 @@ import { Strs, StrsItem } from './kmx-plus.js';
 
 export class ListIndex {
   value: StrsItem; // will become index into Strs table
-  isEqual(a: ListIndex) {
-    return a.value === this.value;
+  isEqual(a: ListIndex | string) {
+    // so we can compare this to a string
+    return a.toString() === this.toString();
+  }
+  toString(): string {
+    return this.value.value;
   }
 };
 
-export class StringList extends Array<ListIndex> {
+export class ListItem extends Array<ListIndex> {
   constructor(strs: Strs, source: Array<string>) {
     super();
     if(!source) {
@@ -21,7 +25,7 @@ export class StringList extends Array<ListIndex> {
         this.push(index);
     }
   }
-  isEqual(a: StringList): boolean {
+  isEqual(a: ListItem | string[]): boolean {
     if (a.length != this.length) {
       return false;
     }

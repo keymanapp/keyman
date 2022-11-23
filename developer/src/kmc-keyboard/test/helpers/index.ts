@@ -18,6 +18,7 @@ import Elem = KMXPlus.Elem;
 import GlobalSections = KMXPlus.GlobalSections;
 import Section = KMXPlus.Section;
 import Strs = KMXPlus.Strs;
+import List = KMXPlus.List;
 
 /**
  * Builds a path to the fixture with the given path components.
@@ -86,6 +87,7 @@ export function loadSectionFixture(compilerClass: typeof SectionCompiler, filena
     list: null,
   };
   globalSections.elem = new Elem(globalSections.strs);
+  globalSections.list = new List(globalSections.strs);
 
   return compiler.compile(globalSections);
 }
