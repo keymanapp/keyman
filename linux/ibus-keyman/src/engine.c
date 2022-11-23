@@ -48,7 +48,7 @@
 
 // Fallback for older ibus versions that don't define IBUS_PREFILTER_MASK
 #ifndef IBUS_HAS_PREFILTER
-#warning Updated ibus version is not installed. Ordered output will not be available.
+#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
 #define IBUS_PREFILTER_MASK (1 << 23)
 #endif
 
