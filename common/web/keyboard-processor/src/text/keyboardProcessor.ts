@@ -32,7 +32,7 @@ export interface ProcessorInitOptions {
   variableStoreSerializer?: VariableStoreSerializer;
 }
 
-export class KeyboardProcessor {
+export default class KeyboardProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
     baseLayout: 'us'
   }
