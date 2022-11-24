@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.11 alpha 2022-11-24
+
+* refactor(linux): Use consts instead of strings  ️ (#7803)
+
 ## 17.0.10 alpha 2022-11-21
 
 * fix: automatically merge changes to history back to master (#7777)
