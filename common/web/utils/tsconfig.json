@@ -3,6 +3,7 @@
   "compilerOptions": {
     "allowJs": true,
     "module": "es6",
+    "moduleResolution": "Node",
     "inlineSources": true,
     "sourceMap": true,
     "declaration": true,
@@ -19,8 +20,5 @@
   ],
   "include": [
     "src/*.ts"
-  ],
-  "paths": {
-    "keyman-version": ["../keyman-version/build" ]
-  }
+  ]
 }
