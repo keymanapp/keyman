@@ -59,6 +59,12 @@ namespace com.keyman.text.prediction {
       // Register the model for each targeted language code variant.
       let mm = this;
       model.languages.forEach(function(code: string) {
+        // Prevent null / undefined codes; they're invalid.
+        if(!code) {
+          console.warn("Null / undefined language codes are not permitted for registration.");
+          return;
+        }
+
         mm.languageModelMap[code] = model;
 
         // The model's for our active language!  Activate it!
