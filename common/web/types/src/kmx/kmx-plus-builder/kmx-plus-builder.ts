@@ -127,11 +127,15 @@ export default class KMXPlusBuilder {
     this.sect.sect.size = constants.length_sect + constants.length_sect_item * this.sect.sect.count;
 
     let offset = this.sect.sect.size;
+    // Note: in order! Everyone's here except 'sect' which is at offset 0
     offset = this.finalize_sect_item(this.sect.bksp, offset);
     offset = this.finalize_sect_item(this.sect.disp, offset);
     offset = this.finalize_sect_item(this.sect.elem, offset);
     offset = this.finalize_sect_item(this.sect.finl, offset);
+    offset = this.finalize_sect_item(this.sect.key2, offset);
     offset = this.finalize_sect_item(this.sect.keys, offset);
+    offset = this.finalize_sect_item(this.sect.layr, offset);
+    offset = this.finalize_sect_item(this.sect.list, offset);
     offset = this.finalize_sect_item(this.sect.loca, offset);
     offset = this.finalize_sect_item(this.sect.meta, offset);
     offset = this.finalize_sect_item(this.sect.name, offset);

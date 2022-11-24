@@ -6,24 +6,47 @@ import { /*build_list_index,*/ BUILDER_LIST } from "./build-list.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 /* ------------------------------------------------------------------
- * keys section
+ * layr section
    ------------------------------------------------------------------ */
 
 
-// interface BUILDER_KEY2_ITEM {
-//   vkey: number;
-//   mod: number;
-//   to: number; //str or UTF-32 char depending on value of 'extend'
-//   flags: number; //bitfield
-// };
+interface BUILDER_LAYR_LIST {
+    flags: number;
+    hardware: number; // str
+    layer: number; // index
+    count: number;
+};
+
+interface BUILDER_LAYR_LAYER {
+    id: number; // str
+    modifier: number; // str
+    row: number; // row index
+    count: number;
+};
+
+interface BUILDER_LAYR_ROW {
+    key: number;
+    count: number;
+};
+
+interface BUILDER_LAYR_KEY {
+    key: number;
+};
 
 /**
  * Builder for the 'keys' section
  */
 export interface BUILDER_LAYR extends BUILDER_SECTION {
-//   count: number;
-//   reserved: number;
-//   items: BUILDER_KEYS_ITEM[];
+  listCount: number,
+  layerCount: number,
+  rowCount: number,
+  keyCount: number,
+  reserved0: number,
+  reserved1: number,
+  lists: BUILDER_LAYR_LIST[],
+  layers: BUILDER_LAYR_LAYER[],
+  rows: BUILDER_LAYR_ROW[],
+  keys: BUILDER_LAYR_KEY[],
 };
 
 
@@ -33,11 +56,22 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   }
 
   let layr: BUILDER_LAYR = {
-    ident: constants.hex_section_id(constants.section.key2),
+      ident: constants.hex_section_id(constants.section.key2),
       size: constants.length_layr,
-      // TODO TODO TODO
-      _offset: 0
+      _offset: 0,
+      listCount: 0,
+      layerCount: 0,
+      rowCount: 0,
+      keyCount: 0,
+      reserved0: 0,
+      reserved1: 0,
+      lists: [],
+      layers: [],
+      rows: [],
+      keys: []
   };
+
+  // TODO-LDML
 
   return layr;
 }

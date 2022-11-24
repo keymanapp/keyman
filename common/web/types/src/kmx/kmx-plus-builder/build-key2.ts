@@ -44,6 +44,9 @@ export interface BUILDER_KEY2 extends BUILDER_SECTION {
   keyCount: number;
   flicksCount: number;
   flickCount: number;
+  reserved0: number;
+  reserved1: number;
+  reserved2: number;
   keys: BUILDER_KEY2_KEY[];
   flicks: BUILDER_KEY2_FLICKS[];
   flick: BUILDER_KEY2_FLICK[];
@@ -61,10 +64,13 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     keyCount: kmxplus.key2.keys.length,
     flicksCount: kmxplus.key2.flicks.length,
     flickCount: 0,
+    reserved0: 0,
+    reserved1: 0,
+    reserved2: 0,
     keys: [],
     flicks: [],
     flick: [],
-    _offset: 0
+    _offset: 0,
   };
 
   // flicks first
