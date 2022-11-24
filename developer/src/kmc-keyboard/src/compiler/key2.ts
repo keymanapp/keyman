@@ -20,13 +20,14 @@ export class Key2Compiler extends SectionCompiler {
     return valid;
   }
 
+
   public compile(sections: GlobalSections): Key2 {
     if (!this.keyboard.keys.key && !this.keyboard.keys.flicks) {
       // short-circuit if no keys or flicks
       return null;
     }
 
-    let sect = new Key2();
+    let sect = new Key2(sections.strs);
 
     // Load the flicks first
     this.loadFlicks(sections, sect);
@@ -39,10 +40,7 @@ export class Key2Compiler extends SectionCompiler {
 
   public loadFlicks(sections: GlobalSections, sect: Key2) {
     for (let lkflicks of this.keyboard.keys.flicks) {
-      let flicks: Key2Flicks = {
-        id: sections.strs.allocString(lkflicks.id),
-        flicks: []
-      };
+      let flicks: Key2Flicks = new Key2Flicks(sections.strs.allocString(lkflicks.id));
 
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
@@ -94,5 +92,4 @@ export class Key2Compiler extends SectionCompiler {
       });
     }
   }
-
 }

@@ -1,7 +1,8 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KeyFlags, KMXPlusData } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
+import { /*KeyFlags,*/ KMXPlusData } from "../kmx-plus.js";
+import { /*build_strs_index,*/ BUILDER_STRS } from "./build-strs.js";
+import { /*build_list_index,*/ BUILDER_LIST } from "./build-list.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 /* ------------------------------------------------------------------
@@ -27,13 +28,14 @@ export interface BUILDER_LAYR extends BUILDER_SECTION {
 
 
 export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_LAYR {
-  if(!kmxplus.keys.keys.length) {
+  if(!kmxplus.layr.layers && !kmxplus.layr.lists && !kmxplus.layr.rows && !kmxplus.layr.vkeys) {
     return null;
   }
 
   let layr: BUILDER_LAYR = {
-      ident: 0,
-      size: 0,
+    ident: constants.hex_section_id(constants.section.key2),
+      size: constants.length_layr,
+      // TODO TODO TODO
       _offset: 0
   };
 

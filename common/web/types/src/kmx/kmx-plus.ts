@@ -280,6 +280,12 @@ export class Key2Keys {
 export class Key2Flicks {
   flicks: Key2Flick[] = [];
   id: StrsItem;
+  compareTo(b: Key2Flicks): number {
+    return this.id.compareTo(b.id);
+  }
+  constructor(id: StrsItem) {
+    this.id = id;
+  }
 };
 
 export class Key2Flick {
@@ -291,6 +297,11 @@ export class Key2Flick {
 export class Key2 extends Section {
   keys: Key2Keys[] = [];
   flicks: Key2Flicks[] = [];
+  constructor(strs: Strs) {
+    super();
+    let nullFlicks = new Key2Flicks(strs.allocString(''));
+    this.flicks.push(nullFlicks); // C7043: null element string
+  }
 };
 
 export class List extends Section {
