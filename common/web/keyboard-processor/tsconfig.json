@@ -3,6 +3,7 @@
   "compilerOptions": {
     "allowJs": true,
     "module": "es6",
+    "moduleResolution": "Node",
     "declaration": true,
     "inlineSources": true,
     "sourceMap": true,

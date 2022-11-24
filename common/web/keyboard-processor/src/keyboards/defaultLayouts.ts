@@ -5,7 +5,7 @@
 
 import Codes from "../text/codes.js";
 import type Keyboard from "./keyboard.js";
-import { Version, deepCopy } from "utils/build/modules/index.js";
+import { Version, deepCopy } from "@keymanapp/web-utils/build/modules/index.js";
 
 export type KLS = {[layerName: string]: string[]};
 

@@ -3,17 +3,17 @@
 import Codes from "./codes.js";
 import type Keyboard from "../keyboards/keyboard.js";
 import KeyEvent from "./keyEvent.js";
-import { Layouts } from "keyboards/defaultLayouts";
+import { Layouts } from "../keyboards/defaultLayouts.js";
 import type { MutableSystemStore } from "./systemStores.js";
 
-import DefaultOutput, { EmulationKeystrokes } from "./defaultOutput";
+import DefaultOutput, { EmulationKeystrokes } from "./defaultOutput.js";
 import type OutputTarget from "./outputTarget.js";
 import { Mock } from "./outputTarget.js";
 
 import KeyboardInterface, { SystemStoreIDs, VariableStore } from "./kbdInterface.js";
 import RuleBehavior from "./ruleBehavior.js";
 
-import { DeviceSpec, globalObject as getGlobalObject } from "utils/build/modules/index.js";
+import { DeviceSpec, globalObject as getGlobalObject } from "@keymanapp/web-utils/build/modules/index.js";
 
 // #endregion
 

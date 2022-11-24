@@ -5,9 +5,9 @@ import type { KeyDistribution } from "../text/keyEvent.js";
 import type { LayoutKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import type Keyboard from "./keyboard.js";
 
-import KeyboardProcessor from "text/keyboardProcessor.js";
+import KeyboardProcessor from "../text/keyboardProcessor.js";
 
-import { deepCopy, type DeviceSpec } from "utils/build/modules/index.js";
+import { deepCopy, type DeviceSpec } from "@keymanapp/web-utils/build/modules/index.js";
 
 // TS 3.9 changed behavior of getters to make them
 // non-enumerable by default. This broke our 'polyfill'

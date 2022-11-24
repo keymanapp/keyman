@@ -18,7 +18,7 @@ import { Mock } from "./outputTarget.js";
 import RuleBehavior from "./ruleBehavior.js";
 import Keyboard, { VariableStoreDictionary } from "../keyboards/keyboard.js";
 
-import { type DeviceSpec } from "utils/build/modules/index.js";
+import { type DeviceSpec } from "@keymanapp/web-utils/build/modules/index.js";
 
 //#endregion
 
