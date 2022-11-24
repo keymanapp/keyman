@@ -22,9 +22,5 @@
     { "path": "../keyman-version/" },
     { "path": "../utils/" }
   ],
-  "include": ["./src/**/*.ts"],
-  "paths": {
-    "keyman-version": ["../keyman-version/build" ],
-    "utils": ["../utils/build" ]
-  }
+  "include": ["./src/**/*.ts"]
 }
