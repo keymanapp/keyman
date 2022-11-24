@@ -16,7 +16,7 @@ describe('key2', function () {
     assert.ok(key2);
     // assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(key2.keys.length, 1);
-    assert.equal(key2.flicks.length, 0);
+    assert.equal(key2.flicks.length, 1); // there's always a 'null' flick
     assert.equal(key2.keys[0].to.value, '🪦');
     assert.equal(key2.keys[0].id.value, 'grave');
   });

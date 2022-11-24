@@ -28,7 +28,7 @@ export interface BUILDER_LAYR extends BUILDER_SECTION {
 
 
 export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_LAYR {
-  if(!kmxplus.layr.layers && !kmxplus.layr.lists && !kmxplus.layr.rows && !kmxplus.layr.vkeys) {
+  if(!kmxplus.layr?.layers && !kmxplus.layr?.lists && !kmxplus.layr?.rows && !kmxplus.layr?.vkeys) {
     return null;
   }
 

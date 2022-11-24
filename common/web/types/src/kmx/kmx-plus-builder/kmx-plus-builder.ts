@@ -44,7 +44,9 @@ export default class KMXPlusBuilder {
   private file: KMXPlusFile;
   //private writeDebug: boolean;
 
-  sect : SectionBuilders;
+  sect : SectionBuilders = {
+
+  };
 
   constructor(file: KMXPlusFile, _writeDebug: boolean) {
     this.file = file;

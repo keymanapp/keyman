@@ -30,6 +30,7 @@ export interface BUILDER_LIST extends BUILDER_SECTION {
 
 export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_LIST {
   if(!source_list?.lists?.length) {
+    // there's always the null list
     return null;
   }
 
