@@ -91,7 +91,7 @@ describe('Engine - Chirality', function() {
 
       // We should get the same results whether or not there actually is a corresponding modifier
       // expected by the rule we're examining.
-      mappedModifiers = KeyboardInterface.matchModifiersToRuleChirality(initialModifiers, VIRTUAL_KEY_CODE);
+      let mappedModifiers = KeyboardInterface.matchModifiersToRuleChirality(initialModifiers, VIRTUAL_KEY_CODE);
       assert.equal(targetModifiers, mappedModifiers);
 
       mappedModifiers = KeyboardInterface.matchModifiersToRuleChirality(initialModifiers, VIRTUAL_KEY_CODE | ALT_CODE);
@@ -110,7 +110,7 @@ describe('Engine - Chirality', function() {
 
       // We should get the same results whether or not there actually is a corresponding modifier
       // expected by the rule we're examining.
-      mappedModifiers = KeyboardInterface.matchModifiersToRuleChirality(initialModifiers, VIRTUAL_KEY_CODE);
+      let mappedModifiers = KeyboardInterface.matchModifiersToRuleChirality(initialModifiers, VIRTUAL_KEY_CODE);
       assert.equal(targetModifiers, mappedModifiers);
 
       let ctrlPlusAlt = ALT_CODE | CTRL_CODE;
@@ -249,7 +249,7 @@ describe('Engine - Chirality', function() {
 
       let modifierTarget   = VIRTUAL_KEY_CODE | ALT_CODE | LCTRL_CODE | SHIFT_CODE;
 
-      mappedModifiers = KeyboardInterface.matchModifiersToRuleChirality(initialModifiers, VIRTUAL_KEY_CODE | LALT_CODE | RCTRL_CODE);
+      let mappedModifiers = KeyboardInterface.matchModifiersToRuleChirality(initialModifiers, VIRTUAL_KEY_CODE | LALT_CODE | RCTRL_CODE);
       assert.equal(modifierTarget, mappedModifiers);
     });
   });
