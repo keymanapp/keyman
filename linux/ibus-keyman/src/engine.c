@@ -40,10 +40,17 @@
 #include <keyman/keyboardprocessor.h>
 #include <keyman/keyboardprocessor_consts.h>
 
+#include "config.h"
 #include "keymanutil.h"
 #include "keyman-service.h"
 #include "engine.h"
 #include "keycodes.h"
+
+// Fallback for older ibus versions that don't define IBUS_PREFILTER_MASK
+#ifndef IBUS_HAS_PREFILTER
+#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
+#define IBUS_PREFILTER_MASK (1 << 23)
+#endif
 
 #define MAXCONTEXT_ITEMS 128
 #define KEYMAN_BACKSPACE 14
@@ -229,7 +236,11 @@ static gboolean
 client_supports_prefilter(IBusEngine *engine)
 {
   g_assert(engine != NULL);
+#ifdef IBUS_HAS_PREFILTER
   return (engine->client_capabilities & IBUS_CAP_PREFILTER) != 0;
+#else
+  return FALSE;
+#endif
 }
 
 static gboolean
