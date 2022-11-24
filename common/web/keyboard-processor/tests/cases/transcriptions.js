@@ -1,8 +1,9 @@
-var assert = require('chai').assert;
-let KeyboardProcessor = require('../../build/index.bundled.js');
+import { assert } from 'chai';
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+import { Mock } from '@keymanapp/keyboard-processor/build/modules/text/outputTarget.js';
+import extendString from '@keymanapp/web-utils/build/modules/kmwstring.js'
+
+extendString();  // Ensure KMW's string-extension functionality is available.
 
 String.kmwEnableSupplementaryPlane(false);
 
@@ -19,8 +20,6 @@ describe("Transcriptions and Transforms", function() {
   let smpApple = u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be);
 
   it("does not store an alias for related OutputTargets", function() {
-    var Mock = com.keyman.text.Mock;
-
     // We have other texts validating Mocks; by using them as our base 'element', this unit test file
     // could eventually run in 'headless' mode.
     var target = new Mock("apple");
@@ -38,8 +37,6 @@ describe("Transcriptions and Transforms", function() {
 
   describe("Plain text operations", function() {
     it("handles context-free single-char output rules", function() {
-      var Mock = com.keyman.text.Mock;
-
       // We have other texts validating Mocks; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
       var target = new Mock("apple");
@@ -67,8 +64,6 @@ describe("Transcriptions and Transforms", function() {
     });
 
     it("handles operations with moderately long text", function() {
-      var Mock = com.keyman.text.Mock;
-
       var target = new Mock("The quick brown cat jumped onto the lazy dog.", 19);
       var original = Mock.from(target);
       target.setDeadkeyCaret(30); // 19 + 11:  moves it to after "onto".
@@ -86,8 +81,6 @@ describe("Transcriptions and Transforms", function() {
     });
 
     it("handles operations with long text", function() {
-      var Mock = com.keyman.text.Mock;
-
       // Eh... had to pick SOMETHING.
       let text = `Did you ever hear the Tragedy of Darth Plagueis the wise? I thought not.
 It's not a story the Jedi would tell you. It's a Sith legend. Darth Plagueis was a
@@ -116,8 +109,6 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     });
 
     it("handles deletions around the caret without text insertion", function() {
-      var Mock = com.keyman.text.Mock;
-
       var target = new Mock("apple", 2);
       var original = Mock.from(target);
       target.setDeadkeyCaret(3);
@@ -136,8 +127,6 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     it("handles deletions around the caret without text insertion (SMP text)", function() {
       try {
         String.kmwEnableSupplementaryPlane(true);
-        var Mock = com.keyman.text.Mock;
-
         var target = new Mock(smpApple, 2);
         var original = Mock.from(target);
         target.setDeadkeyCaret(3);
@@ -157,8 +146,6 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     });
 
     it("handles deletions around the caret with text insertion", function() {
-      var Mock = com.keyman.text.Mock;
-
       // We have other texts validating Mocks; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.
       var target = new Mock("apple", 2);
@@ -232,7 +219,6 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
     it("handles deletions around the caret with text insertion (SMP text)", function() {
       try {
         String.kmwEnableSupplementaryPlane(true);
-        var Mock = com.keyman.text.Mock;
 
         // We have other texts validating Mocks; by using them as our base 'element', this unit test file
         // could eventually run in 'headless' mode.
@@ -316,7 +302,6 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
   /*describe("Operations with deadkeys", function() {
     // Just one, less nuanced/subdivided; it's not a present priority for our work, but it should provide a decent basis if/when it's needed.
     it("Correctly recognizes deadkey set mutations", function() {
-      var Mock = com.keyman.text.Mock;
 
       // We have other texts validating Mocks; by using them as our base 'element', this unit test file
       // could eventually run in 'headless' mode.

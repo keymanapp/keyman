@@ -1,19 +1,18 @@
-var assert = require('chai').assert;
-let fs = require('fs');
-let vm = require('vm');
+import { assert } from 'chai';
+import fs from 'fs';
+import vm from 'vm';
 
-let KeyboardProcessor = require('../../build/index.bundled.js');
-let KMWRecorder = require('../../../recorder/build/nodeProctor');
+import Codes from '@keymanapp/keyboard-processor/build/modules/text/codes.js';
+import KeyboardInterface from '@keymanapp/keyboard-processor/build/modules/text/kbdInterface.js';
+import KeyboardProcessor from '@keymanapp/keyboard-processor/build/modules/text/keyboardProcessor.js';
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
-let KeyboardInterface = com.keyman.text.KeyboardInterface;
-let Codes = com.keyman.text.Codes;
+import { KeyboardTest } from '@keymanapp/recorder-core/build/modules/index.js';
+import NodeProctor from '@keymanapp/recorder-core/build/modules/nodeProctor.js';
 
 describe('Engine - Chirality', function() {
   let testJSONtext = fs.readFileSync('../../test/resources/json/engine_tests/chirality.json');
   // Common test suite setup.
-  let testSuite = new KMWRecorder.KeyboardTest(JSON.parse(testJSONtext));
+  let testSuite = new KeyboardTest(JSON.parse(testJSONtext));
 
   var keyboard;
   let device = {
@@ -42,14 +41,14 @@ describe('Engine - Chirality', function() {
 
   // Converts each test set into its own Mocha-level test.
   for(let set of testSuite.inputTestSets) {
-    let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
+    let proctor = new NodeProctor(keyboard, device, assert.equal);
 
     if(!proctor.compatibleWithSuite(testSuite)) {
       it.skip(set.toTestName() + " - Cannot run this test suite on Node.");
     } else if(set.constraint.target == 'hardware') {
       it(set.toTestName(), function() {
         // Refresh the proctor instance at runtime.
-        let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
+        let proctor = new NodeProctor(keyboard, device, assert.equal);
         set.test(proctor);
       });
     } else {

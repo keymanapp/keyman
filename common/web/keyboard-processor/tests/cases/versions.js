@@ -1,33 +1,31 @@
-var assert = require('chai').assert;
-let KeyboardProcessor = require('../../build/index.bundled.js');
+import { assert } from 'chai';
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+import Version from '@keymanapp/web-utils/build/modules/version.js';
 
 describe('Version Logic', function() {
   it('Should provide a default, fallback value when nothing is specified', function() {
-    var fallback = new com.keyman.utils.Version(undefined);
-    assert.isTrue(fallback.equals(com.keyman.utils.Version.DEVELOPER_VERSION_FALLBACK));
+    var fallback = new Version(undefined);
+    assert.isTrue(fallback.equals(Version.DEVELOPER_VERSION_FALLBACK));
   });
 
   it('Should properly process a simple major.minor version string.', function() {
-    var version = new com.keyman.utils.Version("1.2");
+    var version = new Version("1.2");
     assert.equal(version.major, 1);
     assert.equal(version.minor, 2);
   });
 
   it('Should handle long/deep version specifications.', function() {
-    var version = new com.keyman.utils.Version("1.2.3.4.5.6");
+    var version = new Version("1.2.3.4.5.6");
     assert.equal(version.components.length, 6);
     assert.equal(version.major, 1);
     assert.equal(version.minor, 2);
   });
 
   it('Should properly compare two versions.', function() {
-    var v9_0_1 = new com.keyman.utils.Version("9.0.1");
-    var v9_1_0 = new com.keyman.utils.Version("9.1.0");
-    var v10_0 = new com.keyman.utils.Version("10.0");
-    var v10_0_0 = new com.keyman.utils.Version("10.0.0");
+    var v9_0_1 = new Version("9.0.1");
+    var v9_1_0 = new Version("9.1.0");
+    var v10_0 = new Version("10.0");
+    var v10_0_0 = new Version("10.0.0");
 
     // "Precede" checks
     assert.equal(v9_0_1.compareTo(v9_1_0), -1);

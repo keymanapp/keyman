@@ -1,11 +1,9 @@
-var assert = require('chai').assert;
-var fs = require("fs");
-var vm = require("vm");
+import { assert } from 'chai';
+import fs from 'fs';
+import vm from 'vm';
 
-let KeyboardProcessor = require('../../build/index.bundled.js');
+import KeyboardProcessor from '@keymanapp/keyboard-processor/build/modules/text/keyboardProcessor.js';
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
                     // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 

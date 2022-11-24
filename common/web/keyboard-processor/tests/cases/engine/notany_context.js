@@ -1,15 +1,16 @@
-const assert = require('chai').assert;
-const fs = require('fs');
-const vm = require('vm');
+import { assert } from 'chai';
+import fs from 'fs';
+import vm from 'vm';
 
-let KeyboardProcessor = require('../../../build/index.bundled.js');
+import KeyboardProcessor from '@keymanapp/keyboard-processor/build/modules/text/keyboardProcessor.js';
+import { Mock } from '@keymanapp/keyboard-processor/build/modules/text/outputTarget.js';
 
-// Required initialization setup.
-global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
-global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
-                    // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
+import { RecordedKeystrokeSequence } from '@keymanapp/recorder-core/build/modules/index.js';
+import NodeProctor from '@keymanapp/recorder-core/build/modules/nodeProctor.js';
 
-let KMWRecorder = require('../../../../recorder/build/nodeProctor');
+import extendString from '@keymanapp/web-utils/build/modules/kmwstring.js'
+
+extendString();  // Ensure KMW's string-extension functionality is available.
 
 // Initialize supplementary plane string extensions
 String.kmwEnableSupplementaryPlane(false);
@@ -25,9 +26,9 @@ let keyboard;
 function runEngineRuleSet(ruleSet) {
   for(let ruleDef of ruleSet) {
     // Prepare the context!
-    const ruleSeq = new KMWRecorder.RecordedKeystrokeSequence(ruleDef);
-    const proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
-    const target = new com.keyman.text.Mock();
+    const ruleSeq = new RecordedKeystrokeSequence(ruleDef);
+    const proctor = new NodeProctor(keyboard, device, assert.equal);
+    const target = new Mock();
     ruleSeq.test(proctor, target);
   }
 }
