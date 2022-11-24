@@ -71,7 +71,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   }
   private Bundle updateCheck(LanguageResource cloudResource, LanguageResource existingMatch) {
     // For local and PR test builds, invalidate cache to make keyboard updates easier
-    if (DEBUG_SIMULATE_UPDATES || VersionUtils.isLocalBuild() || VersionUtils.isTestBuild()) {
+    if (DEBUG_SIMULATE_UPDATES || VersionUtils.isLocalOrTestBuild()) {
       return cloudResource.buildDownloadBundle();
     }
 
