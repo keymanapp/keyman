@@ -359,29 +359,30 @@ setup_environment(IBusKeymanEngine *keyman)
   g_assert(keyman);
   g_message("%s: setting up environment", __FUNCTION__);
 
-  km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 4);
+  // Allocate enough options for: 3 environments plus 1 pad struct of 0's
+  km_kbp_option_item *environment_opts = g_new0(km_kbp_option_item, 4);
 
-  keyboard_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
-  keyboard_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
-  keyboard_opts[0].value = u"linux desktop hardware native";
+  environment_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
+  environment_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
+  environment_opts[0].value = u"linux desktop hardware native";
 
-  keyboard_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
-  keyboard_opts[1].key   = KM_KBP_KMX_ENV_BASELAYOUT;
-  keyboard_opts[1].value = u"kbdus.dll";
+  environment_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
+  environment_opts[1].key   = KM_KBP_KMX_ENV_BASELAYOUT;
+  environment_opts[1].value = u"kbdus.dll";
 
-  keyboard_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
-  keyboard_opts[2].key   = KM_KBP_KMX_ENV_BASELAYOUTALT;
-  keyboard_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
+  environment_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
+  environment_opts[2].key   = KM_KBP_KMX_ENV_BASELAYOUTALT;
+  environment_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
 
-  keyboard_opts[3].scope = 0;
-  keyboard_opts[3].key   = 0;
-  keyboard_opts[3].value = NULL;
+  environment_opts[3].scope = 0;
+  environment_opts[3].key   = 0;
+  environment_opts[3].value = NULL;
 
-  km_kbp_status status = km_kbp_state_create(keyman->keyboard, keyboard_opts, &(keyman->state));
+  km_kbp_status status = km_kbp_state_create(keyman->keyboard, environment_opts, &(keyman->state));
   if (status != KM_KBP_STATUS_OK) {
     g_warning("%s: problem creating km_kbp_state. Status is %u.", __FUNCTION__, status);
   }
-  g_free(keyboard_opts);
+  g_free(environment_opts);
   return status;
 }
 
