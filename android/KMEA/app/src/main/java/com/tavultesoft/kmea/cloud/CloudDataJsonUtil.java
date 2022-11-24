@@ -158,9 +158,10 @@ public class CloudDataJsonUtil {
                 // Cloud catalog has newer KMP version available
                 String updateKMP = kbd.getUpdateKMP();
                 if (updateKMP != null) {
-                  if (!updateKMP.equalsIgnoreCase(cloudKMP)) {
-                    // Update keyboard info with the latest KMP link
-                    kbd.setUpdateKMP(cloudKMP);
+                  if (!updateKMP.startsWith(cloudKMP)) {
+                    // Update keyboard info with the latest KMP link after appending languageID
+                    String languageID = kbd.getLanguageID();
+                    kbd.setUpdateKMP(String.format("%s&bcp47=%s", cloudKMP, languageID));
                     KeyboardController.getInstance().add(kbd);
                     saveKeyboardList = true;
                   }
