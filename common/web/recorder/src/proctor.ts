@@ -1,5 +1,5 @@
-import { type DeviceSpec } from "utils/build/modules/index.js";
-import type OutputTarget from "keyboard-processor/build/modules/text/outputTarget.js";
+import { type DeviceSpec } from "@keymanapp/web-utils/build/modules/index.js";
+import type OutputTarget from "@keymanapp/keyboard-processor/build/modules/text/outputTarget.js";
 
 import type { KeyboardTest, TestSet, TestSequence } from "./index.js";
 

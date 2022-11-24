@@ -4,6 +4,7 @@
   "compilerOptions": {
     "allowJs": true,
     "module": "es6",
+    "moduleResolution": "Node",
     "declaration": true,
     "inlineSources": true,
     "inlineSourceMap": true,
@@ -26,10 +27,4 @@
     { "path": "../keyboard-processor/" },
     { "path": "../lm-message-types" }
   ],
-
-  "paths": {
-    "keyboard-processor": ["../keyboard-processor/build" ],
-    "keyman-version": ["../keyman-version/build" ],
-    "utils": ["../utils/build" ]
-  }
 }
