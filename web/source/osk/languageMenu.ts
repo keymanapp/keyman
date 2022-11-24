@@ -414,6 +414,12 @@ namespace com.keyman.osk {
       // Refer to https://github.com/keymanapp/keyman/pull/7790 for context on
       // the following two methods.
       const lockBodyScroll = () => {
+        // If this object still exists, we never ran our paired `unlock` method;
+        // preserve the original state so that we can still restore it later!
+        if(this.originalBodyStyle) {
+          return;
+        }
+
         // Preserve the original style for the body element; we're going to change
         // it to block page scrolling.  Must use a separate instance.
         //
@@ -433,12 +439,22 @@ namespace com.keyman.osk {
       }
 
       const unlockBodyScroll = () => {
+        if(!this.originalBodyStyle) {
+          // We shouldn't be able to reach here, but in case things go out-of-order due
+          // to some unforeseen circumstance, let's null-guard here.
+          return;
+        }
+
         // Reverses the changes to document.body.style made by `lockBodyScroll`.
         const obs = this.originalBodyStyle;
         const dbs = document.body.style;
 
         dbs.overflowY = obs.overflowY;
         dbs.height = obs.height;
+
+        // Successful restoration!  Clear the "restore to this" state so that the
+        // next 'lock' operation knows to do its part.
+        this.originalBodyStyle = null;
       }
 
       // Touchstart (or mspointerdown) event highlights the touched list item
