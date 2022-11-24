@@ -496,17 +496,19 @@ ibus_keyman_engine_constructor(
     }
     g_free(kmx_file);
 
-    km_kbp_status status = setup_environment(keyman);
-    if (status != KM_KBP_STATUS_OK) {
-      g_free(abs_kmx_path);
-      return NULL;
-    }
+    km_kbp_status status;
 
     status = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
     g_free(abs_kmx_path);
 
     if (status != KM_KBP_STATUS_OK) {
       g_warning("%s: problem creating km_kbp_keyboard. Status is %u.", __FUNCTION__, status);
+      return NULL;
+    }
+
+    status = setup_environment(keyman);
+    if (status != KM_KBP_STATUS_OK) {
+      g_free(abs_kmx_path);
       return NULL;
     }
 
