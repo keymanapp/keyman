@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.111 beta 2022-11-24
+
+* fix(android/engine): Make it easier to test keyboard updates (#7781)
+
 ## 16.0.110 beta 2022-11-23
 
 * fix(linux): Revert "fix(linux): Fix a warning" (#7783)
