@@ -5,7 +5,9 @@
  * Add some extra code at the end of src/index.ts and run it to verify successful bundling!
  */
 
-require('esbuild').buildSync({
+import esbuild from 'esbuild';
+
+esbuild.buildSync({
   entryPoints: ['build/modules/index.js'],
   bundle: true,
   sourcemap: true,
