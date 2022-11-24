@@ -14,7 +14,7 @@
     "baseUrl": "./",
     "outDir": "build/modules/",
     "tsBuildInfoFile": "build/modules/tsconfig.tsbuildinfo",
-    "rootDir": "./"
+    "rootDir": "./src"
   },
   "references": [
     { "path": "../../models/types" },
