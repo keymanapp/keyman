@@ -212,6 +212,9 @@ export default class KeyboardInterface {
 
   variableStoreSerializer?: VariableStoreSerializer;
 
+  // A 'reference point' that debug keyboards may use to access KMW's code constants.
+  public readonly Codes = Codes;
+
   constructor(variableStoreSerializer: VariableStoreSerializer = null) {
     this.systemStores = {};
 
