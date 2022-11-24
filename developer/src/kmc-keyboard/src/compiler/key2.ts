@@ -6,7 +6,8 @@ import { SectionCompiler } from "./section-compiler.js";
 import GlobalSections = KMXPlus.GlobalSections;
 import Key2 = KMXPlus.Key2;
 import ListItem = KMXPlus.ListItem;
-import { Key2Flicks } from '@keymanapp/common-types/src/kmx/kmx-plus.js';
+import Key2Flicks = KMXPlus.Key2Flicks;
+
 // import USVirtualKeyMap = Constants.USVirtualKeyMap;
 
 export class Key2Compiler extends SectionCompiler {
