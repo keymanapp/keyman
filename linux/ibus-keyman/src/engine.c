@@ -508,7 +508,6 @@ ibus_keyman_engine_constructor(
 
     status = setup_environment(keyman);
     if (status != KM_KBP_STATUS_OK) {
-      g_free(abs_kmx_path);
       return NULL;
     }
 
