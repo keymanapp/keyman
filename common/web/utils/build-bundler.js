@@ -43,3 +43,10 @@ const dtsBundleCommand = spawn('npx dts-bundle-generator --project tsconfig.json
 
 dtsBundleCommand.stdout.on('data', data =>   console.log(data.toString()));
 dtsBundleCommand.stderr.on('data', data => console.error(data.toString()));
+
+// Forces synchronicity; done mostly so that the logs don't get jumbled up.
+dtsBundleCommand.on('exit', () => {
+  if(dtsBundleCommand.exitCode != 0) { // Ensure the exit code gets emitted!
+    process.exit(dtsBundleCommand.exitCode);
+  }
+});
