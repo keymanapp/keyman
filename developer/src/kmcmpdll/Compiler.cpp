@@ -320,6 +320,11 @@ int kmcmpMsgproc(int line, uint32_t dwMsgCode, char* szText, void* context) {
 
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
+  return CompileKeyboardFileEx(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors, AWarnDeprecatedCode, pMsgProc, CKF_KEYMAN);
+}
+
+extern "C" BOOL __declspec(dllexport) CompileKeyboardFileEx(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
+{
   HANDLE hInfile = INVALID_HANDLE_VALUE, hOutfile = INVALID_HANDLE_VALUE;
   BOOL err;
   DWORD len;
@@ -338,7 +343,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
   FWarnDeprecatedCode = AWarnDeprecatedCode;   // I4866
 
-  CompileTarget = CKF_KEYMAN;
+  CompileTarget = Target;
 
   if (!pMsgProc || !pszInfile || !pszOutfile) SetError(CERR_BadCallParams);
 
