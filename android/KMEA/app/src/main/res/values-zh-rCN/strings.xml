@@ -43,7 +43,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">更新</string>
     <!-- Context: No internet for updates -->
-    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <string name="no_internet_connection" comment="Internet connection missing">没有网络连接</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">无法连接到 Keyman 服务器！</string>
     <!-- Context: Keyboard Updates -->
@@ -82,7 +82,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      对于 %3$s 语言，键盘出现错误 %1$s:%2$s 。</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">正在检查相关字典以下载</string>
-    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">    无法连接到 Keyman 服务器以检查要下载的相关字典</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">您想要下载这个字典的最新版本吗？</string>
     <!-- Context: No associated dictionary found -->
@@ -126,11 +126,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">您想要删除这个字典吗？</string>
     <!-- Context: Model Deleted -->
-    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">字典已删除</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s 键盘已安装</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
-    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">键盘已删除</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">启用校正</string>
     <!-- Context: Language Settings menu strings -->
@@ -138,11 +138,11 @@
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">字典</string>
     <plurals name="model_count">
-        <item quantity="other">Dictionaries</item>
+        <item quantity="other">字典</item>
     </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">检查可用字典</string>
-    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
+    <string name="check_model_online" comment="Check for dictionaries online">查阅在线字典</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">字典： %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -164,5 +164,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">点击此处更改键盘</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">无法启动网页浏览器</string>
 </resources>

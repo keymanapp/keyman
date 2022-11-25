@@ -25,7 +25,7 @@
   overflow-y: hidden;
   z-index: 10;
   outline: none;
- /* background: #79C3DA;*/
+  user-select: none;
 }
 #contentframe
 {
@@ -36,6 +36,7 @@
   height: 100%;
   overflow: hidden;
   border-bottom: 1px solid #6D6C6F;
+  user-select: none;
 }
 #footerframe
 {
@@ -46,11 +47,13 @@
   overflow: hidden;
   background: #79C3DA;
   padding: 10px 8px 8px 8px;
+  user-select: none;
 }
 
 .contentpage
 {
   display: none;
+  user-select: none;
 }
 
 .header
@@ -158,9 +161,10 @@ input.kbd_button
   border: 1px solid #dadddc;
 }
 
-input.kbd_button:hover, input[type='button']:hover, button[type='button']:hover
+input.kbd_button:hover, input[type='button']:hover, button[type='button']:hover, input[type='submit']:hover
 {
   background: #F69169;
+  border-color: #F69169;
 }
 
 input[type='submit']:disabled, input[type='button']:disabled, button:disabled
@@ -168,36 +172,6 @@ input[type='submit']:disabled, input[type='button']:disabled, button:disabled
   color: #c0c0cf;
   background: #80808f;
 }
-
-/* Microsoft Window UI style buttons */
-input.ms_button
-{
-  background: #e1e1e1;
-  border-radius: 0px;
-  color: #33333f;
-  border: none;
-  border: 1px solid;
-  border-color: #adadad;
-  vertical-align: top;
-  outline-color: #0078d7;
-  padding: 0px 15px 0px 15px;
-
-}
-
-input.ms_button:hover
-{
-  background: #e5f1fb ;
-  border-color: #0078d7;
-}
-
-input.ms_button:focus
-{
-  background: #e5f1fb ;
-  border-color: #0078d7;
-  border-radius: 0px;
-}
-
-/* Microsoft Window UI style */
 
 a.hotkey:link, a.hotkey:visited
 {
@@ -247,9 +221,7 @@ html
 }
 
 /* List Styles */
-.list
-{
-}
+
 .list_packageitem
 {
   display: block;
@@ -349,7 +321,7 @@ html
 }
 
 input[type=checkbox]+label {
-  background: #dadddc;
+  background: #79C3DA;
   border-radius: 4px;
   color: #33333f;
   border: none;
@@ -357,11 +329,10 @@ input[type=checkbox]+label {
   font-size: 12px;
   height: 25px;
   margin-right: 8px;
-  border: 1px solid #dadddc;
 }
 
 input[type=checkbox]:checked +label {
-  background: #CC3846;
+  background: #79C3DA;
   border-radius: 4px;
   color: #33333f;
   border: none;
@@ -369,7 +340,6 @@ input[type=checkbox]:checked +label {
   font-size: 12px;
   height: 25px;
   margin-right: 8px;
-  border: 1px solid #dadddc;
 }
 
 .list_item.kbd_list_item.expanded .list_detail
@@ -564,10 +534,6 @@ table tr
   padding-top: 10px;
 }
 
-.grid_rows_hide{
-
-}
-
 .grid_rows_hide [data-hide] {
   visibility: hidden;
   display: none;
@@ -695,11 +661,14 @@ table tr
 {
   left: 0;
   top: 0;
-  xpadding: 6px 4px 4px 4px;
 }
-.options_list
-{
+
+#options input[type=button],
+#options button {
+  margin: 2px 0 2px 32px;
+  min-width: 160px;
 }
+
 .options_list a
 {
   text-decoration: none;
@@ -707,10 +676,6 @@ table tr
 .options_list a:hover
 {
   text-decoration: underline;
-}
-
-.options_list_footer
-{
 }
 
 .options_list_header
@@ -1138,6 +1103,7 @@ th
   width:100%;
   height:100%;
   border:none;
+  user-select: none;
 }
 
 /* QRCodes */
@@ -1234,7 +1200,7 @@ th
   padding-top: 10px;
   position: fixed;
   top: 45%;
-  left: 45%;
+  left: 49%;
 }
 
 .modify .keyboard_language {

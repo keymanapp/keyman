@@ -58,6 +58,7 @@
     <xsl:param name="caption" />
     <xsl:param name="command" />
     <xsl:param name="onclick" />
+    <xsl:param name="onkeydown" />
     <xsl:param name="className" />
 		<xsl:param name="default" />
     <xsl:param name="width" />
@@ -82,20 +83,22 @@
           <xsl:attribute name="id">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="class"><xsl:value-of select="$className"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
+          <xsl:attribute name="onkeydown"><xsl:choose><xsl:when test="$onkeydown != ''"><xsl:value-of select="$onkeydown"/></xsl:when></xsl:choose></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
             font-size: 11px;
             height: 25px;
             display: inline-block;
             text-align: center;
-            width: <xsl:value-of select="$width"/>;
+            <xsl:choose><xsl:when test="$width != ''">width: <xsl:value-of select="$width"/>;</xsl:when></xsl:choose>
             margin-right: 8px;
             vertical-align: top;
+            padding-top: 5px;
             <xsl:if test="$visible = 'false'">display:none;</xsl:if>
             <xsl:if test="string($background)">background:<xsl:value-of select="$background"/>;</xsl:if>
             <xsl:if test="string($color)">color:<xsl:value-of select="$color"/>;</xsl:if>
           </xsl:attribute>
-          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 2px 2px 0px; display: inline; height: 16px;" src="/app/shield.png" />
+          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 0px 2px 2px 0px; display: inline; height: 16px;" src="/app/shield.png" />
           <xsl:value-of select="$caption" />
         </button>
       </xsl:when>
@@ -111,10 +114,11 @@
           <xsl:attribute name="ID">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="class"><xsl:value-of select="$className"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
+          <xsl:attribute name="onkeydown"><xsl:choose><xsl:when test="$onkeydown != ''"><xsl:value-of select="$onkeydown"/></xsl:when></xsl:choose></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="$caption" /></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
-            width: <xsl:value-of select="$width"/>;
+            <xsl:choose><xsl:when test="$width != ''">width: <xsl:value-of select="$width"/>;</xsl:when></xsl:choose>
             font-size: 11px;
             height: 25px;
             display: inline-block;

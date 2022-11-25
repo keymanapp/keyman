@@ -1,5 +1,6 @@
 # Keyman Version History
 
+
 ## 17.0.11 alpha 2022-11-24
 
 * refactor(linux): Use consts instead of strings  ️ (#7803)
@@ -50,6 +51,100 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.111 beta 2022-11-24
+
+* fix(android/engine): Make it easier to test keyboard updates (#7781)
+
+## 16.0.110 beta 2022-11-23
+
+* fix(linux): Revert "fix(linux): Fix a warning" (#7783)
+* fix: automatically merge changes to history back to master (#7780)
+* chore(common): Update whatsnew for 16.0 (#7789)
+* fix(web): inferred key text + spacebar caption scaling (#7741)
+* feat(web): re-implementation of introductory globe-key help bubble (#7612)
+* fix(android/engine): Fix logic error for updateKMP (#7799)
+* fix(linux): Allow to build without patched ibus version (#7792)
+* chore(linux): Update autotools configuration (#7793)
+* docs(ios): Update help documentation about Install and Allow Full Access (#7791)
+* fix(android/engine): Update versions of matching package and keyboard ID (#7740)
+
+## 16.0.109 beta 2022-11-22
+
+* fix(windows): arrow keys need to select next/prev item in options tab (#7756)
+* fix(windows): buttons should be in list in Options tab (#7757)
+* fix(android/engine): Add null check on kmp filename (#7787)
+* fix(ios): make text size of in-app editor consistent with slider (#7782)
+* fix(android/engine): Check if kmp.json is null (#7788)
+* fix(mac): Enable right-alt/option key mapping (#7762)
+* feat(linux): Add symbols file (#7742)
+
+## 16.0.108 beta 2022-11-21
+
+* fix(windows): backout ms button style for add lang pop up (#7765)
+* fix(android/app): Only check Install Referrer API with Play Store installs (#7766)
+* fix(windows): Fix text selectable configuration (#7758)
+* feat(common/models): directional quote insensitivity (#7767)
+* chore(windows): remove unused options from locales and UI (#7760)
+* fix(developer): cast to prevent ERangeError for failed http reqs in CEF (#7775)
+* chore(android): Update Target SDK Version to 31 (#7768)
+
+## 16.0.107 beta 2022-11-18
+
+* fix(windows): Download Keyboard blue footer (#7755)
+* fix(windows): tweak elevate icon in Config dialog (#7754)
+* fix(web): documentation keyboard style application + layout (#7694)
+* fix(windows): fix checkbox and hint help button styles (#7764)
+* chore(common): Update crowin strings for Fulfulde (#7715)
+* fix(linux): Fix installation if shared kbd already installed (#7730)
+* fix(linux): Fix a warning (#7746)
+* chore(common): Update crowdin strings for Simplified Chinese (#7713)
+
+## 16.0.106 beta 2022-11-17
+
+* chore(windows): set platform core env explicitly (#7689)
+* fix(android): bump version_code major calculation (#7735)
+* fix(android/engine): Remove duplicate file suffix when installing .kmp (#7720)
+* fix(linux): Ignore dbus exception when testing for fcitx (#7732)
+* fix(linux): Fix lintian warnings (#7733)
+* feat(linux): Add optional bcp47 parameter to km-package-install (#7731)
+
+## 16.0.105 beta 2022-11-16
+
+* chore(windows): add unit test for SetupCoreEnvironment (#7714)
+* docs(linux): Add example for keyman:// URL format (#7726)
+* fix(linux): set DEB_VERSION (#7727)
+* fix(linux): Don't crash if `und` is specified without `fonipa` (#7728)
+
+## 16.0.104 beta 2022-11-15
+
+* chore(android/engine): Add more logging for keyboard restart (#7719)
+
+## 16.0.103 beta 2022-11-14
+
+* fix(windows): click in 1 pixel high box in Language Switch window caused crash (#7699)
+* chore(windows): add sentry traces for unsolved crashes (#7703)
+* fix(windows): handle timeout in downloads (#7709)
+* chore(windows): Add safecall for internal CustomisationStorage API interface (#7707)
+* chore(windows): include debug info in keyman build (#7710)
+* fix(windows): check if permissions for thread to access file (#7207)
+* refactor(linux): Use consts instead of strings (#7686)
+
+## 16.0.102 beta 2022-11-12
+
+* fix(windows): make sure IdStackWindows finalizes after Vcl.Forms (#7692)
+* fix(android/app): Append tier to app name (#7674)
+* chore(android/app): Remove debugging info on build.gradle (#7700)
+
+## 16.0.101 beta 2022-11-11
+
+* fix(windows): Improve shutdown robustness (#7677)
+* fix(windows): base layout support in Keyman Core (#7667)
+* fix(developer): URL parameters should be UTF-8 (#7631)
+* fix(android/engine): Use IME package name if query permission denied (#7668)
+* fix(linux): Fix keyboard icon in system tray (#7678)
+* chore(linux): Update debian changelog :cherries: (#7682)
+* chore(linux): Update Debian standards version (#7683)
 
 ## 16.0.100 beta 2022-11-10
 

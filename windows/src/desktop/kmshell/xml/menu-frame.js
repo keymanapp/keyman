@@ -19,6 +19,13 @@
     var p = menuframe_items[menuframe_activeindex], c = menuframe_items[n];
     var itemtype, list_array;
 
+    if(window.Sentry) {
+      // trace for KEYMAN-WINDOWS-62, KEYMAN-WINDOWS-6H(?)
+      window.Sentry.addBreadcrumb({category:'trace', message:`menuframe_activate:n=${n}, activeindex=${menuframe_activeindex}, c=${JSON.stringify(c)}, p=${JSON.stringify(p)}`, level: 'info'});
+      if(!document.getElementById('content_'+p.menu_name)) window.Sentry.addBreadcrumb({category:'trace', message:`menuframe_activate:p:content_${p.menu_name} is undefined`, level: 'info'});
+      if(!document.getElementById('content_'+c.menu_name)) window.Sentry.addBreadcrumb({category:'trace', message:`menuframe_activate:c:content_${c.menu_name} is undefined`, level: 'info'});
+    }
+
     p.className='menuframe';
     c.className='menuframe_active';
     menuframe_activeindex=n;

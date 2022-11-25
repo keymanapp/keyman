@@ -20,16 +20,11 @@
   <string name="kogStartup" comment="/FormatString: ">Açılış</string>
   <string name="koKeyboardHotkeysAreToggle" comment="/FormatString: ">Klavye kısayol tuşları, etkin klavyeyi değiştirir</string>
   <string name="koReleaseShiftKeysAfterKeyPress" comment="/FormatString: ">Bir tuşa tıkladıktan sonra Ekran Klavyesinde Shift/Ctrl/Alt tuşlarını bırakın</string>
-  <string name="koRunElevatedInVista" comment="/FormatString: ">Windows Vista'da çalışırken daima kullanıcı izinlerini yükseltin</string>
   <string name="koShowHints" comment="/FormatString: ">İpucu iletileri göster</string>
   <string name="koShowStartup" comment="/FormatString: ">Karşılama ekranı göster</string>
   <string name="koShowWelcome" comment="/FormatString: ">Hoş Geldiniz ekranı</string>
   <string name="koStartWithWindows" comment="/FormatString: ">Windows başladığında başla</string>
-  <string name="koSwitchLanguageForAllApplications" comment="/FormatString: ">Tüm uygulamalar için klavye düzenini seçin</string>
-  <string name="koSwitchLanguageWithKeyboard" comment="/FormatString: ">Bir Keyman klavye seçildiğinde Windows dilini değiştir</string>
   <string name="koTestKeymanFunctioning" comment="/FormatString: ">Keyman başladığında çakışan uygulamaları test et</string>
-  <string name="koTurnOnSurrogates" comment="/FormatString: ">Unicode ek karakter ekranını açın (yeniden başlatmayı gerektirir)</string>
-  <string name="koUnknownLanguage" comment="/FormatString: ">'Bilinmiyor' dili açın</string>
   <string name="S_Menu_OnScreenKeyboard" comment="/PlainText: ">&amp;Ekran Klavyesi</string>
   <string name="S_Toolbar_OpenHelp" comment="/PlainText: ">Yardım Açın</string>
   <string name="S_Toolbar_OpenConfiguration" comment="/PlainText: ">Keyman Yapılandırma Açın</string>

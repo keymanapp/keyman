@@ -139,7 +139,7 @@ kmx_processor::queue_action(
   }
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_CAPSLOCK:
-    DebugLog("kmx_processor::queue_action: Warning handling of action type [%d] not implented \n", action_item->type);
+    DebugLog("kmx_processor::queue_action: Warning handling of action type [%d] not implemented\n", action_item->type);
     return false;
     break;
   case KM_KBP_IT_EMIT_KEYSTROKE:

@@ -367,20 +367,20 @@ namespace com.keyman.osk {
     protected get parsedBaseFontSize(): ParsedLengthStyle {
       if(!this._baseFontSize) {
         let keymanweb = com.keyman.singleton;
-        this._baseFontSize = this.defaultFontSize(this.device, keymanweb.isEmbedded);
+        this._baseFontSize = OSKView.defaultFontSize(this.device, this.computedHeight, keymanweb.isEmbedded);
       }
 
       return this._baseFontSize;
     }
 
-    public defaultFontSize(device: utils.DeviceSpec, isEmbedded: boolean): ParsedLengthStyle {
+    public static defaultFontSize(device: utils.DeviceSpec, computedHeight: number, isEmbedded: boolean): ParsedLengthStyle {
       if(device.touchable) {
         const fontScale = device.formFactor == 'phone'
           ? 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2  // Combines original scaling factor with one previously applied to the layer group.
           : 2; // iPad or Android tablet
         return ParsedLengthStyle.special(fontScale, 'em');
       } else {
-        return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
+        return computedHeight ? ParsedLengthStyle.inPixels(computedHeight / 8) : undefined;
       }
     }
 
@@ -564,23 +564,13 @@ namespace com.keyman.osk {
       }
       // END:  construction of the actual internal layout for the overall OSK
 
-      // Correct the classname for the (inner) OSK frame (Build 360)
-      var kbdID: string = (this.activeKeyboard ? this.activeKeyboard.id.replace('Keyboard_','') : '');
-
-      if(kbdID.indexOf('::') != -1) { // We used to also test if we were in embedded mode, but... whatever.
-        // De-namespaces the ID for use with CSS classes.
-        // Assumes that keyboard IDs may not contain the ':' symbol.
-        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
-      }
-
-      const kbdClassSuffix = ' kmw-keyboard-' + kbdID;
-      kbdView.element.className = kbdView.element.className + kbdClassSuffix;
-
       this.banner.appendStyles();
 
       if(this.vkbd) {
         // Create the key preview (for phones)
         this.vkbd.createKeyTip();
+        // Create the globe hint (for embedded contexts; has a stub for other contexts)
+        this.vkbd.createGlobeHint();
 
         // Append a stylesheet for this keyboard for keyboard specific styles
         // or if needed to specify an embedded font
