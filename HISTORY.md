@@ -1,6 +1,10 @@
 # Keyman Version History
 
 
+## 17.0.12 alpha 2022-11-25
+
+* chore(common): Merge beta from Sprint B16S2 to master (#7815)
+
 ## 17.0.11 alpha 2022-11-24
 
 * refactor(linux): Use consts instead of strings  ️ (#7803)
