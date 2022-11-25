@@ -8,13 +8,13 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import Keyboard from "@keymanapp/keyboard-processor/build/modules/keyboards/keyboard.js";
-import type KeyEvent from "@keymanapp/keyboard-processor/build/modules/text/keyEvent.js";
-import KeyboardProcessor from "@keymanapp/keyboard-processor/build/modules/text/keyboardProcessor.js";
-import type OutputTarget from "@keymanapp/keyboard-processor/build/modules/text/outputTarget.js";
-import { Mock } from "@keymanapp/keyboard-processor/build/modules/text/outputTarget.js";
+import Keyboard from "@keymanapp/keyboard-processor/build/obj/keyboards/keyboard.js";
+import type KeyEvent from "@keymanapp/keyboard-processor/build/obj/text/keyEvent.js";
+import KeyboardProcessor from "@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js";
+import type OutputTarget from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
+import { Mock } from "@keymanapp/keyboard-processor/build/obj/text/outputTarget.js";
 
-import DeviceSpec from "@keymanapp/web-utils/build/modules/deviceSpec.js";
+import DeviceSpec from "@keymanapp/web-utils/build/obj/deviceSpec.js";
 
 export default class NodeProctor extends Proctor {
   private keyboard: Keyboard;

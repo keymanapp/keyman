@@ -12,8 +12,8 @@
     "types": ["node"],
     "lib": ["es6"],
     "baseUrl": "./",
-    "outDir": "build/modules/",
-    "tsBuildInfoFile": "build/modules/tsconfig.tsbuildinfo",
+    "outDir": "build/obj/",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
 

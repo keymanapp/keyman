@@ -6,7 +6,7 @@ import type OutputTarget from "../text/outputTarget.js";
 
 import type { ComplexKeyboardStore } from "../text/kbdInterface.js";
 
-import { Version, DeviceSpec } from "@keymanapp/web-utils/build/modules/index.js";
+import { Version, DeviceSpec } from "@keymanapp/web-utils/build/obj/index.js";
 
 /**
  * Stores preprocessed properties of a keyboard for quick retrieval later.

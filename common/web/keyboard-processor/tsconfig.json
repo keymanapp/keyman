@@ -13,8 +13,8 @@
     "lib": ["es6"],
     "experimentalDecorators": true,
     "baseUrl": "./",
-    "outDir": "build/modules/",
-    "tsBuildInfoFile": "build/modules/tsconfig.tsbuildinfo",
+    "outDir": "build/obj/",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
   "references": [

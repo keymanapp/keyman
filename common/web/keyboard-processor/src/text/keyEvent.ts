@@ -1,5 +1,5 @@
 import type Keyboard from "../keyboards/keyboard.js";
-import type DeviceSpec from "@keymanapp/web-utils/build/modules/deviceSpec.js";
+import type DeviceSpec from "@keymanapp/web-utils/build/obj/deviceSpec.js";
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.

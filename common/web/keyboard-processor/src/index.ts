@@ -17,7 +17,7 @@ import OutputTarget, * as OutputTargetContents from "./text/outputTarget.js";
 import RuleBehavior from "./text/ruleBehavior.js";
 import * as SystemStores from "./text/systemStores.js";
 
-import * as utils from "@keymanapp/web-utils/build/modules/index.js";
+import * as utils from "@keymanapp/web-utils/build/obj/index.js";
 
 export let com = {
   keyman: {

@@ -2,10 +2,10 @@ import { assert } from 'chai';
 import fs from 'fs';
 import vm from 'vm';
 
-import KeyboardProcessor from '@keymanapp/keyboard-processor/build/modules/text/keyboardProcessor.js';
+import KeyboardProcessor from '@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js';
 
-import { KeyboardTest } from '@keymanapp/recorder-core/build/modules/index.js';
-import NodeProctor from '@keymanapp/recorder-core/build/modules/nodeProctor.js';
+import { KeyboardTest } from '@keymanapp/recorder-core/build/obj/index.js';
+import NodeProctor from '@keymanapp/recorder-core/build/obj/nodeProctor.js';
 
 describe('Engine - Deadkeys', function() {
   let testJSONtext = fs.readFileSync('../../test/resources/json/engine_tests/deadkeys.json');

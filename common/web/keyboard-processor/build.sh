@@ -50,6 +50,7 @@ fi
 
 if builder_start_action build; then
   npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+  node ./build-bundler.js
   builder_finish_action success build
 fi
 

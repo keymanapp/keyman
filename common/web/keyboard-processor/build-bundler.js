@@ -8,7 +8,7 @@
 import esbuild from 'esbuild';
 
 esbuild.buildSync({
-  entryPoints: ['build/modules/index.js'],
+  entryPoints: ['build/obj/index.js'],
   bundle: true,
   sourcemap: true,
   minify: true,
@@ -18,8 +18,8 @@ esbuild.buildSync({
   //
   // We also need to point it at the nested build output folder to resolve in-project
   // imports when compiled - esbuild doesn't seem to pick up on the shifted base.
-  nodePaths: ['..', "build/modules"],
-  outfile: "build/bundled/index.js",
+  nodePaths: ['..', "build/obj"],
+  outfile: "build/lib/index.js",
   tsconfig: 'tsconfig.json',
   target: "es5"
 });

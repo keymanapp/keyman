@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
-import { Mock } from '@keymanapp/keyboard-processor/build/modules/text/outputTarget.js';
-import extendString from '@keymanapp/web-utils/build/modules/kmwstring.js'
+import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
+import extendString from '@keymanapp/web-utils/build/obj/kmwstring.js'
 
 extendString();  // Ensure KMW's string-extension functionality is available.
 

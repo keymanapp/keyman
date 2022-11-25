@@ -2,13 +2,13 @@ import { assert } from 'chai';
 import fs from 'fs';
 import vm from 'vm';
 
-import KeyboardProcessor from '@keymanapp/keyboard-processor/build/modules/text/keyboardProcessor.js';
-import { Mock } from '@keymanapp/keyboard-processor/build/modules/text/outputTarget.js';
+import KeyboardProcessor from '@keymanapp/keyboard-processor/build/obj/text/keyboardProcessor.js';
+import { Mock } from '@keymanapp/keyboard-processor/build/obj/text/outputTarget.js';
 
-import { RecordedKeystrokeSequence } from '@keymanapp/recorder-core/build/modules/index.js';
-import NodeProctor from '@keymanapp/recorder-core/build/modules/nodeProctor.js';
+import { RecordedKeystrokeSequence } from '@keymanapp/recorder-core/build/obj/index.js';
+import NodeProctor from '@keymanapp/recorder-core/build/obj/nodeProctor.js';
 
-import extendString from '@keymanapp/web-utils/build/modules/kmwstring.js'
+import extendString from '@keymanapp/web-utils/build/obj/kmwstring.js'
 
 extendString();  // Ensure KMW's string-extension functionality is available.
 
