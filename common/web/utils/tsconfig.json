@@ -8,11 +8,11 @@
     "sourceMap": true,
     "declaration": true,
     "target": "es5",
-    "tsBuildInfoFile": "./build/modules/tsconfig.tsbuildinfo",
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
     "types": ["node"],
     "lib": ["es6"],
     "baseUrl": "./",
-    "outDir": "./build/modules/",
+    "outDir": "./build/obj/",
     "rootDir": "./src"
   },
   "references": [
