@@ -46,9 +46,13 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
 
 - first the compiler tests
     - add a section in `developer/src/kmc-keyboard/test/fixtures/sections` if needed
-    - add a test case such as `developer/src/kmc-keyboard/src/compiler/layr.ts`
+    - add a test case such as `developer/src/kmc-keyboard/test/test-key2.ts`
 - add a compiler
     - `developer/src/kmc-keyboard/compiler/key2.ts`
+    - link it in to `developer/src/kmc-keyboard/src/compiler/compiler.ts`
+        - add the import
+        - add to `SECTION_COMPILERS`
+
     - Note: the in-memory compiler can affect `basic.kmx` even _before_ you add the section writing code. How? Simple… `Strs.allocString()` is called for the in-memory structures, so the string table will start growing even before those strings are actually used by the new sections.  This is why it's fine to ignore the basic failure until you actually do the KMXPlus write.
 
 ## Writing out

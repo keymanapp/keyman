@@ -259,9 +259,9 @@ export class Layr extends Section {
   layers: LayrEntry[] = [];
   rows: LayrRow[] = [];
   /**
-   * each item is a vkey id
+   * each item is a key id for in-memory
    */
-  vkeys: number[] = [];
+  keys: string[] = [];
 };
 
 export class Key2Keys {

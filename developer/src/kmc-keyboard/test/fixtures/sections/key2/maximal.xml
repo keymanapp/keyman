@@ -24,7 +24,7 @@
       <row keys="Q q W w" />
     </layer>
   </layers>
-  <layers form="hardware">
+  <layers form="hardware" hardware="abnt2">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />
