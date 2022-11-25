@@ -109,7 +109,7 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_RunParams>c:\temp\foo.kps -schema-path C:\Projects\keyman\app\common\schemas\kps\</Debugger_RunParams>
+        <Debugger_RunParams>\Projects\keyman\keyboards\release\k\khmer_angkor\source\khmer_angkor.kmn c:\temp\ka.js</Debugger_RunParams>
         <DCC_AssertionsAtRuntime>true</DCC_AssertionsAtRuntime>
         <DCC_DebugInformation>2</DCC_DebugInformation>
         <VerInfo_Locale>1033</VerInfo_Locale>

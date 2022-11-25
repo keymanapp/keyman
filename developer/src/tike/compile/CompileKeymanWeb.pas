@@ -275,6 +275,7 @@ uses
   System.TypInfo,
 
   CompileErrorCodes,
+  TempFileManager,
   JsonUtil,
   KeymanDeveloperOptions,
   Keyman.System.KeyboardUtils,
@@ -282,6 +283,7 @@ uses
   kmxfileutils,
   TouchLayout,
   Unicode,
+  utilexecute,
   utilstr,
   VisualKeyboard,
   VKeys;
@@ -303,6 +305,7 @@ function TCompileKeymanWeb.Compile(AOwnerProject: TProject; const InFile: string
 var
   WarnDeprecatedCode: Boolean;
   Data: string;
+  TempOutFile: TTempFile;
 begin
   FUnreachableKeys.Clear;
 
@@ -337,9 +340,40 @@ begin
     WarnDeprecatedCode := True;
   end;
 
+  TempOutFile := TTempFileManager.Get('.kmx');
+
   GCallbackW := Callback;
   FCallFunctions := TStringList.Create;
   try
+    if CompileKeyboardFileEx(PChar(InFile), PChar(TempOutFile.Name), False, FCompilerWarningsAsErrors,
+      WarnDeprecatedCode, WebCompilerMessageA, CKF_KEYMANWEB) > 0 then
+    begin
+      if Assigned(AOwnerProject) and
+          Assigned(AOwnerProject.CompilerMessageFile) and
+          AOwnerProject.CompilerMessageFile.HasCompileWarning and
+          FCompilerWarningsAsErrors then
+        FError := True;
+
+      if not FError then
+      begin
+        CopyFile(PChar(TempOutFile.Name), PChar(OutFile+'.kmx'), False);
+        // TODO: convert by calling node kmwc.js
+        // TODO: add
+//        TUtilExecute('node.exe kmwc.js "'+TempOutFile.Name+'" "'+OutFile+'"');
+        {Data := WriteCompiledKeyboard;
+
+        if not FError then
+          with TStringStream.Create(Data, TEncoding.UTF8) do
+          try
+            SaveToFile(OutFile);
+          finally
+            Free;
+          end;}
+      end;
+
+      Result := not FError;  // I1971
+
+{
     if CompileKeyboardFileToBuffer(PChar(InFile), @fk,
       FCompilerWarningsAsErrors, WarnDeprecatedCode,
       WebCompilerMessageA, CKF_KEYMANWEB) > 0 then  // I3482   // I4866   // I4865
@@ -365,6 +399,7 @@ begin
       end;
 
       Result := not FError;  // I1971
+}
     end
     else
     begin
