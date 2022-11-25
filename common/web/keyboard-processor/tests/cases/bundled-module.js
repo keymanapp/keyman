@@ -11,6 +11,14 @@ describe('Bundled ES Module', function() {
     });
   });
 
+  describe('Mock', () => {
+    it('basic functionality test', () => {
+      let target = new Package.Mock("aple", 2);
+      target.insertTextBeforeCaret('p');
+      assert.equal(target.getText(), "apple");
+    });
+  });
+
   describe("Imported `utils`", function() {
     it("should include `utils` package's Version class", () => {
       let v16 = new Package.Version([16, 1]);
