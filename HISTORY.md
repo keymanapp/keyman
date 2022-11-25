@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.112 beta 2022-11-25
+
+* fix: test builds should always run latest changes (#7806)
+* fix(web): unit test breakages (#7797)
+
 ## 16.0.111 beta 2022-11-24
 
 * fix(android/engine): Make it easier to test keyboard updates (#7781)
