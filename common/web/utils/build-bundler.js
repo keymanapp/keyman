@@ -3,6 +3,7 @@
  */
 
 import esbuild from 'esbuild';
+import { spawn } from 'child_process';
 
 // Bundles to a compact ESModule
 esbuild.buildSync({
@@ -35,3 +36,10 @@ esbuild.buildSync({
   tsconfig: 'tsconfig.json',
   target: "es5"
 });
+
+const dtsBundleCommand = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/index.d.ts src/index.ts', {
+  shell: true
+});
+
+dtsBundleCommand.stdout.on('data', data =>   console.log(data.toString()));
+dtsBundleCommand.stderr.on('data', data => console.error(data.toString()));
