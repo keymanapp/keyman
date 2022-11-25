@@ -295,7 +295,7 @@ namespace com.keyman.osk {
      * @param override  if true, don't use the font spec from the button, just use the passed in spec
      * @returns         font size as a style string
      */
-    getIdealFontSize(vkbd: VisualKeyboard, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
+    getIdealFontSize(vkbd: VisualKeyboard, text: string, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
       let buttonStyle = getComputedStyle(this.btn);
       let keyWidth = parseFloat(buttonStyle.width);
       let emScale = 1;
@@ -317,7 +317,7 @@ namespace com.keyman.osk {
       }
 
       let fontSpec = getFontSizeStyle(style.fontSize || '1em');
-      let metrics = OSKKey.getTextMetrics(this.spec.text, emScale, style);
+      let metrics = OSKKey.getTextMetrics(text, emScale, style);
 
       const MAX_X_PROPORTION = 0.90;
       const MAX_Y_PROPORTION = 0.90;
@@ -399,42 +399,19 @@ namespace com.keyman.osk {
         oldText;
     }
 
-
-    private unicodeKeyIdToString(id: string): string {
-      // This is similar to defaultOutput.ts:forUnicodeKeynames and could potentially
-      // be refactored in the future.
-      if(!id || id.substr(0,2) != 'U_') {
-        return null;
-      }
-
-      let result = '';
-      const codePoints = id.substr(2).split('_');
-      for(let codePoint of codePoints) {
-        const codePointValue = parseInt(codePoint, 16);
-        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) || isNaN(codePointValue)) {
-          continue;
-        } else {
-          // String.fromCharCode() is inadequate to handle the entire range of Unicode
-          // Someday after upgrading to ES2015, can use String.fromCodePoint()
-          result += String.kmwFromCharCode(codePointValue);
-        }
-      }
-      return result ? result : null;
-    }
-
-    // Produces a HTMLSpanElement with the key's actual text.
-    protected generateKeyText(vkbd: VisualKeyboard): HTMLSpanElement {
-      let spec = this.spec;
+    public get keyText(): string {
+      const spec = this.spec;
+      const DEFAULT_BLANK = '\xa0';
 
       // Add OSK key labels
-      var keyText;
-      var t = document.createElement('span'), ts=t.style;
+      let keyText = null;
       if(spec['text'] == null || spec['text'] == '') {
-        keyText='\xa0';  // default:  nbsp.
         if(typeof spec['id'] == 'string') {
           // If the ID's Unicode-based, just use that code.
-          keyText = this.unicodeKeyIdToString(spec['id']) || keyText;
+          keyText = keyboards.ActiveKey.unicodeIDToText(spec['id']);
         }
+
+        keyText = keyText || DEFAULT_BLANK;
       } else {
         keyText=spec['text'];
 
@@ -444,8 +421,18 @@ namespace com.keyman.osk {
         }
       }
 
+      return keyText;
+    }
+
+    // Produces a HTMLSpanElement with the key's actual text.
+    protected generateKeyText(vkbd: VisualKeyboard): HTMLSpanElement {
+      const spec = this.spec;
+
+      let t = document.createElement('span'), ts=t.style;
       t.className='kmw-key-text';
 
+      // Add OSK key labels
+      let keyText = this.keyText;
       let specialText = this.renameSpecialKey(keyText, vkbd);
       if(specialText != keyText) {
         // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
@@ -491,7 +478,7 @@ namespace com.keyman.osk {
         }
       }
 
-      ts.fontSize = this.getIdealFontSize(vkbd, styleSpec);
+      ts.fontSize = this.getIdealFontSize(vkbd, keyText, styleSpec);
 
       // Finalize the key's text.
       t.innerText = keyText;
@@ -513,8 +500,19 @@ namespace com.keyman.osk {
     }
 
     public refreshLayout(vkbd: VisualKeyboard) {
-      if(this.label) { // space bar may not define the text span!
-        this.label.style.fontSize = this.getIdealFontSize(vkbd, this.btn.style);
+      // space bar may not define the text span!
+      if(this.label) {
+        if(!this.label.classList.contains('kmw-spacebar-caption')) {
+          this.label.style.fontSize = this.getIdealFontSize(vkbd, this.keyText, this.btn.style);
+        } else {
+          // Remove any custom setting placed on it before recomputing its inherited style info.
+          this.label.style.fontSize = '';
+          const fontSize = this.getIdealFontSize(vkbd, this.label.textContent, getComputedStyle(this.label), true);
+
+          // Since the kmw-spacebar-caption version uses !important, we must specify
+          // it directly on the element too; otherwise, scaling gets ignored.
+          this.label.style.setProperty("font-size", fontSize, "important");
+        }
       }
     }
   }

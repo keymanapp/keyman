@@ -569,6 +569,8 @@ namespace com.keyman.osk {
       if(this.vkbd) {
         // Create the key preview (for phones)
         this.vkbd.createKeyTip();
+        // Create the globe hint (for embedded contexts; has a stub for other contexts)
+        this.vkbd.createGlobeHint();
 
         // Append a stylesheet for this keyboard for keyboard specific styles
         // or if needed to specify an embedded font
@@ -590,7 +592,10 @@ namespace com.keyman.osk {
       if((this.vkbd && this.vkbd.layerId != newValue) || source.value != newValue) {
         // Prevents console errors when a keyboard only displays help.
         // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.
-        if(this.vkbd) {
+        //
+        // Also, only change the layer ID itself if there is an actual corresponding layer
+        // in the OSK.
+        if(this.vkbd?.layerGroup.layers[newValue]) {
           this.vkbd.layerId = newValue;
           // Ensure that the layer's spacebar is properly captioned.
           this.vkbd.showLanguage();

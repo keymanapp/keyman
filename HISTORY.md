@@ -1,5 +1,32 @@
 # Keyman Version History
 
+## 16.0.111 beta 2022-11-24
+
+* fix(android/engine): Make it easier to test keyboard updates (#7781)
+
+## 16.0.110 beta 2022-11-23
+
+* fix(linux): Revert "fix(linux): Fix a warning" (#7783)
+* fix: automatically merge changes to history back to master (#7780)
+* chore(common): Update whatsnew for 16.0 (#7789)
+* fix(web): inferred key text + spacebar caption scaling (#7741)
+* feat(web): re-implementation of introductory globe-key help bubble (#7612)
+* fix(android/engine): Fix logic error for updateKMP (#7799)
+* fix(linux): Allow to build without patched ibus version (#7792)
+* chore(linux): Update autotools configuration (#7793)
+* docs(ios): Update help documentation about Install and Allow Full Access (#7791)
+* fix(android/engine): Update versions of matching package and keyboard ID (#7740)
+
+## 16.0.109 beta 2022-11-22
+
+* fix(windows): arrow keys need to select next/prev item in options tab (#7756)
+* fix(windows): buttons should be in list in Options tab (#7757)
+* fix(android/engine): Add null check on kmp filename (#7787)
+* fix(ios): make text size of in-app editor consistent with slider (#7782)
+* fix(android/engine): Check if kmp.json is null (#7788)
+* fix(mac): Enable right-alt/option key mapping (#7762)
+* feat(linux): Add symbols file (#7742)
+
 ## 16.0.108 beta 2022-11-21
 
 * fix(windows): backout ms button style for add lang pop up (#7765)
