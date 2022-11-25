@@ -154,17 +154,23 @@ public class CloudDataJsonUtil {
               Keyboard kbd = KeyboardController.getInstance().getKeyboardInfo(i);
               String version = kbd.getVersion();
               if (keyboardID.equalsIgnoreCase(kbd.getKeyboardID()) &&
-                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
-                  (!kbd.getUpdateKMP().equalsIgnoreCase(cloudKMP))) {
-                // Update keyboard with the latest KMP link
-                kbd.setUpdateKMP(cloudKMP);
-                KeyboardController.getInstance().add(kbd);
+                  FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) {
+                // Cloud catalog has newer KMP version available
+                String updateKMP = kbd.getUpdateKMP();
+                if (updateKMP != null) {
+                  if (!updateKMP.equalsIgnoreCase(cloudKMP)) {
+                    // Update keyboard info with the latest KMP link
+                    kbd.setUpdateKMP(cloudKMP);
+                    KeyboardController.getInstance().add(kbd);
+                    saveKeyboardList = true;
+                  }
 
-                // Update bundle list
-                Bundle bundle = new Bundle(kbd.buildDownloadBundle());
-                updateBundles.add(bundle);
-
-                saveKeyboardList = true;
+                  if (!updateKMP.isEmpty()) {
+                    // Update bundle list for update notifications
+                    Bundle bundle = new Bundle(kbd.buildDownloadBundle());
+                    updateBundles.add(bundle);
+                  }
+                }
               }
             }
           }

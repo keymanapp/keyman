@@ -385,12 +385,12 @@
                 </div>
                 <div class='list_languages_add'>
                   <xsl:call-template name="button">
-                    <xsl:with-param name="className">ms_button</xsl:with-param>
+                    <xsl:with-param name="className">kbd_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Languages_Install']"/></xsl:with-param>
                     <xsl:with-param name="command">keyman:keyboardlanguage_install?id=<xsl:value-of select="id"/></xsl:with-param>
                   </xsl:call-template>
                   <xsl:call-template name="button">
-                    <xsl:with-param name="className">ms_button</xsl:with-param>
+                    <xsl:with-param name="className">kbd_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Close']"/></xsl:with-param>
                     <xsl:with-param name="onclick">return hideModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
                   </xsl:call-template>

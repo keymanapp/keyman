@@ -38,7 +38,9 @@ describe('Model definition pseudoclosures', function () {
                                          // to make the distinction.  Both 'Σ's have the same char-code.
 
         // Uncased syntax and numbers should pass through unscathed:
-        ['1234.?!', '1234.?!', '1234.?!']
+        ['1234.?!', '1234.?!', '1234.?!'],
+        ['”', '”', '"'],
+        ["‘", "‘", "'"]
       ];
 
       for (let [input, cased, keyed] of testCases) {
@@ -81,7 +83,10 @@ describe('Model definition pseudoclosures', function () {
                                // to make the distinction.  Both 'Σ's have the same char-code.
 
         // Uncased syntax and numbers should pass through unscathed:
-        ['1234.?!', '1234.?!']
+        ['1234.?!', '1234.?!'],
+
+        ['”', '"'],
+        ["‘", "'"]
       ];
 
       for (let [input, keyed] of testCases) {

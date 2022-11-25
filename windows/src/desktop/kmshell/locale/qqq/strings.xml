@@ -106,12 +106,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <string name="koReleaseShiftKeysAfterKeyPress" comment="Configuration Dialog - Options tab/FormatString: OSK options - Releases shift/ctrl/alt on OSK after key press (introduced 7.0.236.0)">[!!Ŕěŀęàšĕ Şĥıƒţ/Ĉţřŀ/Ȁľŧ ōň Őņ Ŝčŗėěń Ķēŷƃơâŕđ ȃƒţēŕ ćŀĭċĸīňģ å ĸȅȳ!!]</string>
   <string name="koAutoOpenOSK" comment="Configuration Dialog - Options tab/FormatString: OSK options - auto-open OSK (introduced 7.0.244.0)">[!!Äľŵȁƴŝ ŝĥŏŵ Őƞ Šċŕėěń ĶĕƴƄōãřđ Ŵīƞďơŵ ŵĥėń Ķěɏmàƞ ķȇƴƃőáŗď ĩš śēļĕĉţěď!!]</string>
   <string name="koAutoSwitchOSKPages" comment="Configuration Dialog - Options tab/FormatString: OSK options - when a keyboard is activated, switch to most appropriate page in OSK (introduced 7.0.244.0)">[!!Šŵĭŧčĥ ŧơ āƥƿřőƥŕįáŧė Őŋ Šćŗěėń ƘȅƴƄőãŗđ/Ħȅĺƿ áųťơmăŧĭĉåłŀŷ ŵĥȅņ ȃ ķęȳƀōāŕđ ĭŝ śĕļȇćţȇđ!!]</string>
-  <string name="koTurnOnSurrogates" comment="Configuration Dialog - Options tab/FormatString: Advanced options - turn on Unicode suplementary character display (not needed in Vista) (introduced 7.0.230.0)">[!!Ŧũřŉ őŋ Ūńĩĉơđȅ ŝŭƿƥļēmȇňŧāŕɏ ćħāŗãĉŧěř ďıŝƥľäȳ (řȇǫŭīŗęš ŗĕşţâřť)!!]</string>
-  <string name="koUnknownLanguage" comment="Configuration Dialog - Options tab/FormatString: Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts). (introduced 7.0.230.0)">[!!Ŧũŕŉ őŉ 'Ůńƙňŏŵŉ' ĺǻŋġůǻğě!!]</string>
   <string name="koDebugging" comment="Configuration Dialog - Options tab/FormatString: Advanced options - turn on debugging (which creates a very large file) (introduced 7.0.230.0)">[!!ĎēƄŭģġįƞĝ!!]</string>
-  <string name="koSwitchLanguageWithKeyboard" comment="Configuration Dialog - Options tab/FormatString: Advanced options - switch Windows language when keyboard selected (introduced 7.0.244.0)">[!!Śŵįţċħ Ŵīńďőŵŝ łǻŉġūäģę ŵĥęŉ ā Ƙĕƴmāņ ĸęȳƀőàřđ ĭŝ ŝėľĕčťȅđ!!]</string>
-  <string name="koSwitchLanguageForAllApplications" comment="Configuration Dialog - Options tab/FormatString: Advanced options - selected language applies to all applications (introduced 7.1.274.0)">[!!Šęŀĕćť ƙēƴƅŏàŗď ļáƴōůť ƒōř āĺŀ ȁƥƥłĭċąťįŏńş!!]</string>
-  <string name="koRunElevatedInVista" comment="Configuration Dialog - Options tab/FormatString: Advanced options - elevate user permission to highest permisable level (introduced 7.0.230.0)">[!!Ąŀŵąɏš ěĺěvȃŧȇ ũŝĕř ƥěŗmĩšşıōńş ŵħėń ŗŭńňĩƞģ ĩń Ŵįŋđőŵş Vıŝţă!!]</string>
   <string name="S_Button_UILanguage" comment="Configuration Dialog - Options tab/PlainText: Options button - changes user interface language/localization (introduced 7.0.230.0)">[!!Ůšēř ĩŋţĕŗƒāĉē łáņģůȃġė...!!]</string>
   <string name="S_Button_BaseKeyboard" comment="Configuration Dialog - Options tab/PlainText: Options tab - base keyboard button (introduced 9.0.445.0)">[!!Ɓâśȇ Ƙȇƴɓŏäŕđ...!!]</string>
   <!-- Hotkeys tab -->
@@ -295,7 +290,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <string name="S_Menu_Help" comment="System Tray Menu Items/PlainText: Systray item - Help [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!&amp;Ħęłƥ...!!]</string>
   <string name="S_Menu_Exit" comment="System Tray Menu Items/PlainText: Systray item - Exit [&amp; precedes alt + access-character] (introduced 7.0.230.0)">[!!Ĕ&amp;xĩŧ!!]</string>
   <string name="SKMenu_NoKeyboardsInstalled" comment="System Tray Menu Items/PlainText: Systray - notice of no keyboard layouts installed (introduced 7.0.230.0)">[!!Ňơ ƙěƴɓőȃřď ŀāƴőůťš āŕĕ ıŋşţāłłěď.
-Ĉĥơơšȇ "Čőŉƒįğűŗäťīŏƞ" ŧơ īňŝŧǻłľ á 
+Ĉĥơơšȇ "Čőŉƒįğűŗäťīŏƞ" ŧơ īňŝŧǻłľ á
 ķȅɏƂőäŗđ ļąɏōůţ ƒőř ɏŏūŕ ĺáňġųáĝę.!!]</string>
   <string name="S_OSKContext_FadeWhenInactive" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - fade OSK when mouse is elsewhere (introduced 7.0.230.0)">[!!Ƒȁďȅ Ŵĥęń Ĭŉàčţĭvē!!]</string>
   <string name="S_OSKContext_ShowToolbar" comment="On Screen Keyboard Menu Items/PlainText: OSK right-click menu - show/hide OSK toolbar (introduced 7.0.230.0)">[!!Ŝĥŏŵ Ťōōĺƀåř!!]</string>

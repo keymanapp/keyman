@@ -20,6 +20,7 @@ import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.VersionUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,6 +90,7 @@ public class CloudRepository {
     boolean loadResourcesFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getResourcesCacheFile(context));
 
     boolean cacheValid = loadLexicalModelsFromCache && loadResourcesFromCache;
+
     return cacheValid;
   }
 
@@ -238,7 +240,8 @@ public class CloudRepository {
   {
     boolean cacheValid = getCacheValidity(context);
 
-    if(cacheValid && shouldUseMemCache(context)) {
+    // For local and PR test builds, force update dataset
+    if(cacheValid && shouldUseMemCache(context) && !VersionUtils.isLocalOrTestBuild()) {
       onSuccess.run();
       return; // isn't null - checked by `shouldUseCache`.
     }
@@ -365,7 +368,8 @@ public class CloudRepository {
   private void downloadMetaDataFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
     boolean cacheValid = getCacheValidity(context);
 
-    if(cacheValid && shouldUseMemCache(context)) {
+    // For local and PR test builds, force download of metadata
+    if(cacheValid && shouldUseMemCache(context) && !VersionUtils.isLocalOrTestBuild()) {
       return; // isn't null - checked by `shouldUseCache`.
     } else if (!KMManager.hasInternetPermission(context) || !KMManager.hasConnection(context)) {
       // noop if no internet permission or network connection
@@ -383,7 +387,8 @@ public class CloudRepository {
     //    int cloudQueryEntries = 0;
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>(2);
 
-    if (!cacheValid) {
+    // For local and PR test builds, force check of keyboard updates
+    if (!cacheValid || VersionUtils.isLocalOrTestBuild()) {
       cloudQueries.add(prepareResourcesUpdateQuery(context));
     }
 
