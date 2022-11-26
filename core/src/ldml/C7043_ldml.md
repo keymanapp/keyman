@@ -348,12 +348,13 @@ Represents layers on the keyboard.
 Each layer list corresponds to one `<layers>` element.
 There are `listCount` total lists.
 
-| ∆ | Bits | Name       | Description                                |
-|---|------|------------|--------------------------------------------|
-| 0+|  32  | flags      | int: per-layers options                    |
-| 4+|  32  | hardware   | str: layout (`us`,`iso`,`jis`,`abnt2`)     |
-| 8+|  32  | layer      | int: index to first layer element          |
-|12+|  32  | count      | int: number of layer elements in this list |
+| ∆ | Bits | Name             | Description                                |
+|---|------|------------------|--------------------------------------------|
+| 0+|  32  | flags            | int: per-layers options                    |
+| 4+|  32  | hardware         | str: layout (`us`,`iso`,`jis`,`abnt2`)     |
+| 8+|  32  | layer            | int: index to first layer element          |
+|12+|  32  | count            | int: number of layer elements in this list |
+|16+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
 
 - `flags`: a 32-bit bitfield defined as below:
 
@@ -361,6 +362,8 @@ There are `listCount` total lists.
   |--------------|----------|----------------------|
   |       0      | form     | 0: hardware          |
   |       0      | form     | 1: touch             |
+
+Layers are sorted hardware-first, then by minimum width ascending.
 
 ### `layr.layers` subtable
 
@@ -391,7 +394,7 @@ There are `keyCount` total key entries.
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-| 0+|  32  | key     | int: index into `key2` section           |
+| 0+|  32  | key     | str: key id                              |
 
 ### C7043.2.14 `disp`—Display list
 
