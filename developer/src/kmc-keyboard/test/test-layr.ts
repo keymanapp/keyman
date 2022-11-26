@@ -7,6 +7,15 @@ import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 import Layr = KMXPlus.Layr;
+import LayrRow = KMXPlus.LayrRow;
+
+function allKeysOk(row : LayrRow, str : string, msg? : string) {
+  const split = str.split(' ');
+  assert.equal(row.keys.length, split.length, msg);
+  for (let i=0; i<row.keys.length; i++) {
+    assert.equal(row.keys[i].value, split[i], `${msg||'keys row: '}@#${i}`);
+  }
+}
 
 describe('layr', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
@@ -18,28 +27,21 @@ describe('layr', function () {
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.equal(layr.lists?.length, 1);
-    assert.equal(layr.layers?.length, 1);
-    assert.equal(layr.rows?.length, 1);
-    assert.equal(layr.keys?.length, 1);
+    const list0 = layr.lists[0];
+    assert.ok(list0);
+    assert.equal(list0.layers.length, 1);
+    assert.equal(list0.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_hardware);
+    assert.equal(list0.hardware?.value, '');
+    const layer0 = list0.layers[0];
+    assert.ok(layer0);
+    assert.equal(layer0.rows.length, 1);
+    const row0 = layer0.rows[0];
+    assert.ok(row0);
+    assert.equal(row0.keys.length, 1);
 
-    assert.ok(layr.lists[0]);
-    assert.equal(layr.lists[0].count, 1);
-    assert.equal(layr.lists[0].flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_hardware);
-    assert.equal(layr.lists[0].hardware?.value, '');
-    assert.equal(layr.lists[0].layerIndex, 0);
-
-    assert.ok(layr.layers[0]);
-    assert.equal(layr.layers[0].count, 1);
-    assert.equal(layr.layers[0].id.value, 'base');
+    assert.equal(layer0.id.value, 'base');
     // assert.equal(layr.layers[0].modifier, ?); // TODO-LDML
-    assert.equal(layr.layers[0].rowIndex, 0);
-
-    assert.ok(layr.rows[0]);
-    assert.equal(layr.rows[0].count, 1);
-    assert.equal(layr.rows[0].keyIndex, 0);
-
-    assert.ok(layr.keys[0]);
-    // assert.equal(layr.vkeys[0], 0); // TODO-LDML
+    assert.equal(row0.keys[0]?.value, 'grave');
   });
 
   // reuse key2 maximal
@@ -49,55 +51,44 @@ describe('layr', function () {
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.equal(layr.lists?.length, 2);
-    assert.equal(layr.layers?.length, 3);
-    assert.equal(layr.rows?.length, 3);
-    assert.equal(layr.keys?.length, 8);
 
     const listHardware = layr.lists.find(v => v.hardware.value === 'abnt2');
     assert.ok(listHardware);
-    assert.equal(listHardware.count, 2);
+    assert.equal(listHardware.minDeviceWidth, 0);
+    assert.equal(listHardware.layers.length, 2);
     assert.equal(listHardware.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_hardware);
     assert.equal(listHardware.hardware?.value, 'abnt2');
-    const hardware0 = layr.layers[listHardware.layerIndex + 0];
+    const hardware0 = listHardware.layers[0];
     assert.ok(hardware0);
-    assert.equal(hardware0.count, 1);
     assert.equal(hardware0.id.value, 'base');
     // assert.equal(hardware0.modifier, ?); // TODO-LDML
-    const hardware0row0 = layr.rows[hardware0.rowIndex + 0];
+    const hardware0row0 = hardware0.rows[0];
     assert.ok(hardware0row0);
-    assert.equal(hardware0row0.count, 2);
-    assert.sameMembers(layr.keys.slice(hardware0row0.keyIndex,
-      hardware0row0.keyIndex + hardware0row0.count),
-      'Q W'.split(' ')
-    );
-    const hardware1 = layr.layers[listHardware.layerIndex + 1];
+    assert.equal(hardware0row0.keys.length, 2);
+    allKeysOk(hardware0row0,'Q W', 'hardware0row0');
+    const hardware1 = listHardware.layers[1];
     assert.ok(hardware1);
-    assert.equal(hardware1.count, 1);
+    assert.equal(hardware1.rows.length, 1);
     assert.equal(hardware1.id.value, 'shift');
     // assert.equal(hardware0.modifier, ?); // TODO-LDML
-    const hardware1row0 = layr.rows[hardware1.rowIndex + 0];
+    const hardware1row0 = hardware1.rows[0];
     assert.ok(hardware1row0);
-    assert.equal(hardware1row0.count, 2);
-    assert.sameMembers(layr.keys.slice(hardware1row0.keyIndex,
-      hardware1row0.keyIndex + hardware1row0.count),
-      'q w'.split(' ')
-    );
+    assert.equal(hardware1row0.keys.length, 2);
+    allKeysOk(hardware1row0,'q w', 'hardware1row0');
 
     const listTouch = layr.lists.find(v => v.hardware.value !== 'abnt2'); // TODO-LDML: need to add some more fields!!!
     assert.ok(listTouch);
-    assert.equal(listTouch.count, 1);
+    assert.equal(listTouch.minDeviceWidth, 300);
+    assert.equal(listTouch.layers.length, 1);
     assert.equal(listTouch.flags & constants.layr_list_flags_mask_form, constants.layr_list_flags_touch);
-    const touch0 = layr.layers[listTouch.layerIndex + 0];
+    const touch0 = listTouch.layers[0];
     assert.ok(touch0);
-    assert.equal(touch0.count, 1);
+    assert.equal(touch0.rows.length, 1);
     assert.equal(touch0.id.value, 'base');
     // assert.equal(touch0.modifier, ?); // TODO-LDML
-    const touch0row0 = layr.rows[touch0.rowIndex + 0];
+    const touch0row0 = touch0.rows[0];
     assert.ok(touch0row0);
-    assert.equal(touch0row0.count, 4);
-    assert.sameMembers(layr.keys.slice(touch0row0.keyIndex,
-      touch0row0.keyIndex + touch0row0.count),
-      'Q q W w'.split(' ')
-    );
+    assert.equal(touch0row0.keys.length, 4);
+    allKeysOk(touch0row0,'Q q W w', 'touch0row0');
   });
 });

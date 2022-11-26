@@ -223,11 +223,8 @@ export class Disp extends Section {
 export class LayrList {
   flags: number;
   hardware: StrsItem;
-  /**
-   * Index into Layr.layers
-   */
-  layerIndex: number;
-  count: number;
+  layers: LayrEntry[] = [];
+  minDeviceWidth: number; // millimeters
 };
 
 /**
@@ -236,32 +233,18 @@ export class LayrList {
  export class LayrEntry {
   id: StrsItem;
   modifier: StrsItem;
-  /**
-   * index into Layr.rows
-   */
-  rowIndex: number;
-  count: number;
+  rows: LayrRow[] = [];
 };
 
 /**
  * In-memory `<row>`
  */
  export class LayrRow {
-  /**
-   * index into Layr.vkeys
-   */
-  keyIndex: number;
-  count: number;
+  keys: StrsItem[] = [];
 };
 
 export class Layr extends Section {
   lists: LayrList[] = [];
-  layers: LayrEntry[] = [];
-  rows: LayrRow[] = [];
-  /**
-   * each item is a key id for in-memory
-   */
-  keys: string[] = [];
 };
 
 export class Key2Keys {
@@ -511,6 +494,7 @@ export class KMXPlusFile extends KMXFile {
       hardware: r.uint32le, //str
       layer: r.uint32le, // index into layers
       count: r.uint32le,
+      minDeviceWidth: r.uint32le, // integer: millimeters
     });
 
     this.COMP_PLUS_LAYR_ROW = new r.Struct({
