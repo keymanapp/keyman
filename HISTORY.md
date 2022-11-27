@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 15.0.273 stable 2022-11-27
+
+* chore: Add #7554 to HISTORY.md (#7602)
+* chore(linux): Update debian changelog (#7493)
+* fix(android/engine): Use IME package name if query permission denied (#7679)
+* chore(linux): Update debian changelog (#7680)
+* fix(windows): base layout support in Keyman Core (#7711)
+* chore(android): Update Target SDK Version to 31 (#7814)
+
 ## 15.0.272 stable 2022-11-02
 
 * fix(developer): handle LControl being set by Windows when AltGr pressed (#7537)
