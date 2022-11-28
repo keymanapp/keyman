@@ -145,6 +145,7 @@ if [ "$DO_COPY" = true ]; then
     cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js $KMEA_ASSETS/keymanandroid.js
     cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/keyman.js.map $KMEA_ASSETS/keyman.js.map
     cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
+    cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/globe-hint.css $KMEA_ASSETS/globe-hint.css
     cp $KMW_ROOT/build/app/embed/$KMW_CONFIG/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
 
     cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js

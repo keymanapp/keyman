@@ -38,11 +38,19 @@
 #endif
 
 #include <keyman/keyboardprocessor.h>
+#include <keyman/keyboardprocessor_consts.h>
 
+#include "config.h"
 #include "keymanutil.h"
 #include "keyman-service.h"
 #include "engine.h"
 #include "keycodes.h"
+
+// Fallback for older ibus versions that don't define IBUS_PREFILTER_MASK
+#ifndef IBUS_HAS_PREFILTER
+#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
+#define IBUS_PREFILTER_MASK (1 << 23)
+#endif
 
 #define MAXCONTEXT_ITEMS 128
 #define KEYMAN_BACKSPACE 14
@@ -220,7 +228,7 @@ static gchar *get_current_context_text(km_kbp_context *context)
                             &buf_size);
     }
     km_kbp_context_items_dispose(context_items);
-    g_message("%s: current context is:%lu:%lu:%s:", __FUNCTION__, km_kbp_context_length(context), buf_size, current_context_utf8);
+    g_message("%s: current context is:%zu:%zu:%s:", __FUNCTION__, km_kbp_context_length(context), buf_size, current_context_utf8);
     return current_context_utf8;
 }
 
@@ -228,7 +236,11 @@ static gboolean
 client_supports_prefilter(IBusEngine *engine)
 {
   g_assert(engine != NULL);
+#ifdef IBUS_HAS_PREFILTER
   return (engine->client_capabilities & IBUS_CAP_PREFILTER) != 0;
+#else
+  return FALSE;
+#endif
 }
 
 static gboolean
@@ -396,21 +408,17 @@ ibus_keyman_engine_constructor(
     km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1);
 
     keyboard_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
-    km_kbp_cp *cp = g_utf8_to_utf16 ("platform", -1, NULL, NULL, NULL);
-    keyboard_opts[0].key = cp;
-    cp = g_utf8_to_utf16 ("linux desktop hardware native", -1, NULL, NULL, NULL);
-    keyboard_opts[0].value = cp;
+    keyboard_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
+    keyboard_opts[0].value = u"linux desktop hardware native";
 
     keyboard_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
-    cp = g_utf8_to_utf16 ("baseLayout", -1, NULL, NULL, NULL);
-    keyboard_opts[1].key = cp;
-    cp = g_utf8_to_utf16 ("kbdus.dll", -1, NULL, NULL, NULL);
-    keyboard_opts[1].value = cp;
+    keyboard_opts[1].key   = KM_KBP_KMX_ENV_BASELAYOUT;
+    keyboard_opts[1].value = u"kbdus.dll";
 
     keyboard_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
-    cp = g_utf8_to_utf16 ("baseLayoutAlt", -1, NULL, NULL, NULL);
-    keyboard_opts[2].key = cp;
-    #if 0 // in the future when mnemonic layouts are to be supported
+    keyboard_opts[2].key   = KM_KBP_KMX_ENV_BASELAYOUTALT;
+    keyboard_opts[2].value = u"en-US";
+#if 0  // in the future when mnemonic layouts are to be supported
     const gchar *lang_env = g_getenv("LANG");
     gchar *lang;
     if (lang_env != NULL) {
@@ -434,10 +442,10 @@ ibus_keyman_engine_constructor(
         lang = strdup("en-US");
     }
     g_message("lang is %s", lang);
-    #endif
-    cp = g_utf8_to_utf16 ("en-US", -1, NULL, NULL, NULL);
+    km_kbp_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
+    keyboard_opts[2].value = cp; // TODO: free this value
     // g_free(lang);
-    keyboard_opts[2].value = cp;
+#endif
 
     // If queue_options contains keyboard options, pop them into keyboard_opts[3] onward
     for(int i=0; i<num_options; i++)
@@ -462,9 +470,9 @@ ibus_keyman_engine_constructor(
     {
         g_warning("%s: problem creating km_kbp_state", __FUNCTION__);
     }
-    for (int i=0; i < KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1; i++) {
-        g_free((km_kbp_cp *)keyboard_opts[i].key);
-        g_free((km_kbp_cp *)keyboard_opts[i].value);
+    for (int i = KEYMAN_ENVIRONMENT_OPTIONS; i < KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1; i++) {
+      g_free((km_kbp_cp *)keyboard_opts[i].key);
+      g_free((km_kbp_cp *)keyboard_opts[i].value);
     }
     g_queue_free_full(queue_options, NULL);
     g_free(keyboard_opts);

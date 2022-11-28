@@ -15,6 +15,12 @@ private let baseUri = "https://r.keymanweb.com/20/fonts/get_mobileconfig.php?id=
 private let profileKey = "profile"
 private let checkedProfilesKey = "CheckedProfiles"
 
+// text size constants
+private let defaultIPhoneTextSize: CGFloat = 16.0
+private let defaultIPadTextSize: CGFloat = 32.0
+private let minTextSize: CGFloat = 9.0
+private let maxTextSize: CGFloat = 72.0
+
 // External strings
 let userTextKey = "UserText"
 let userTextSizeKey = "UserTextSize"
@@ -25,8 +31,6 @@ let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotificati
 let urlKey = "url"
 
 class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDelegate {
-  private let minTextSize: CGFloat = 9.0
-  private let maxTextSize: CGFloat = 72.0
   private let getStartedViewTag = 7183
   private let activityIndicatorViewTag = 6573
   private let dropDownListTag = 686876
@@ -135,7 +139,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private func constructAndAddMainTextView() {
     // Setup Keyman TextView
-    textSize = 16.0
     textView = TextView(frame: view.frame)
     textView.translatesAutoresizingMaskIntoConstraints = false
     textView.setKeymanDelegate(self)
@@ -143,20 +146,60 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.backgroundColor = UIColor(named: "InputBackground")!
     textView.isScrollEnabled = true
     textView.isUserInteractionEnabled = true
-    textView.font = textView.font?.withSize(textSize)
     view?.addSubview(textView!)
 
-    textView.topAnchor.constraint   (equalTo: view.safeAreaLayoutGuide.topAnchor   ).isActive = true
-    textView.leftAnchor.constraint  (equalTo: view.safeAreaLayoutGuide.leftAnchor  ).isActive = true
-    textView.rightAnchor.constraint (equalTo: view.safeAreaLayoutGuide.rightAnchor ).isActive = true
+    textView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+    textView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
+    textView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
     textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+  }
 
-    if UIDevice.current.userInterfaceIdiom != .phone {
-      textSize *= 2
-      textView.font = textView?.font?.withSize(textSize)
+  private func initializeTextSettings() {
+    self.initializeUserText()
+    self.initializeTextSize()
+  }
+
+  private func initializeUserText() {
+    let userData = AppDelegate.activeUserDefaults()
+    let userText = userData.object(forKey: userTextKey) as? String
+
+    if let text = userText, !text.isEmpty {
+      self.textView.text = text
     }
   }
 
+  private func initializeTextSize() {
+      let userData = AppDelegate.activeUserDefaults()
+      let userTextSize = userData.object(forKey: userTextSizeKey) as? String
+
+      if let sizeString = userTextSize, let size = Float(sizeString) {
+        self.textSize = CGFloat(size)
+      } else {
+        // no textSize saved in UserDefaults, so use default size
+        self.textSize = self.calculateDefaultTextSize()
+      }
+    
+      // default to system font so that we have a non-nil font that allows us to set size
+      self.textView.font = UIFont.systemFont(ofSize: textSize)
+
+    // set slider position
+      self.textSizeController.value = (Float(textSize - minTextSize))
+    }
+
+  public func saveTextSettings() {
+    let userData = AppDelegate.activeUserDefaults()
+    userData.set(self.textView?.text, forKey: userTextKey)
+    userData.set(self.textSize.description, forKey: userTextSizeKey)
+    userData.synchronize()
+    log.debug("saving text size: \(textSize.description).")
+  }
+
+  private func calculateDefaultTextSize() -> CGFloat {
+    let defaultSize = (UIDevice.current.userInterfaceIdiom == .phone) ?
+      defaultIPhoneTextSize : defaultIPadTextSize
+    return defaultSize
+  }
+  
   private func constructAndAddInfoView() {
     // Setup Info View
     infoView = InfoViewController {
@@ -249,7 +292,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     self.constructAndAddHostedViews()
 
     setNavBarButtons()
-    loadSavedUserText()
+    self.initializeTextSettings()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -779,22 +822,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if let size = textView.font?.pointSize {
       textView.font = textView.font?.withSize(size + 5)
       textView.font = textView.font?.withSize(size - 5)
-    }
-  }
-
-  private func loadSavedUserText() {
-    let userData = AppDelegate.activeUserDefaults()
-    let userText = userData.object(forKey: userTextKey) as? String
-    let userTextSize = userData.object(forKey: userTextSizeKey) as? String
-
-    if let text = userText, !text.isEmpty {
-      textView.text = text
-    }
-
-    if let sizeString = userTextSize, let size = Float(sizeString) {
-      textSize = CGFloat(size)
-      textView.font = textView.font?.withSize(textSize)
-      textSizeController.value = (Float(textSize - minTextSize))
     }
   }
 

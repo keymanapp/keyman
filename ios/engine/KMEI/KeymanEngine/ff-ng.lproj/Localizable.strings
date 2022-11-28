@@ -125,7 +125,7 @@
 "kmp-error-missing-resource" = "Pakej ɗo walaa kibod ko deftere ma`ana kalimaji ko mari haaje.";
 
 /* Error installing a Keyman package with a version of Keyman that does not support it */
-"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+"kmp-error-unsupported-keyman-version" = "Ndee haɓɓere ena naamndii yamre Keyman ɓurnde heɗude.";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Pakej ɗo ɓe waɗay ɗum no haandi - ko ɗum koosi andaaka.";

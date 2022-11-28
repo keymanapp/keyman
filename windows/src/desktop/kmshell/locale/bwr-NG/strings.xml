@@ -324,27 +324,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koTurnOnSurrogates" comment="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">Pali suna ncang Unicode supplementary character (ata bara ka mdǝ jaktǝ kǝlani)</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koUnknownLanguage" comment="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">Kǝla hulfur mnya na ar \'Unknown\'</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Debugging</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koSwitchLanguageWithKeyboard" comment="Advanced options - switch Windows language when keyboard selected">Kǝla hulfur mnya ar Windows sakatǝ mdǝ car keyboard ar Keyman</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.1.274.0 -->
-  <string name="koSwitchLanguageForAllApplications" comment="Advanced options - selected language applies to all applications">Car keyboard layout aka shanga applicationyeri</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">Kǝlara saka kara jakǝngkǝr dunar mdǝ na ana kǝthlǝr ka su ni saka tǝ Windows Vista akwa hara kǝthlǝr</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->

@@ -20,6 +20,7 @@
       h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
       .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
       #KeymanWebControl {width:50%;min-width:600px;}
+      code {line-height: 1.6; font-style: oblique; }
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
@@ -50,13 +51,63 @@
                 platform == 'phone' ? 240 : 360;
       };
 
+      let shadowfy = function(container, style) {
+        const docBase = container.children[0];
+        container.removeChild(docBase);
+
+        const shadow = container.attachShadow({ mode: "open" });
+        shadow.appendChild(docBase);
+
+        const baseOSKStyle = document.createElement('link');
+        baseOSKStyle.href = "../../release/unminified/web/osk/kmwosk.css";
+        baseOSKStyle.rel="stylesheet";
+        baseOSKStyle.type="text/css";
+        shadow.appendChild(baseOSKStyle);
+
+        shadow.appendChild(style);
+      }
+
+      let documentKeyboard = async function(kbdid, langid, formFactor, layer) {
+        let docTarget = document.getElementById("docTarget");
+        label = document.createElement('h3');
+        docTarget.appendChild(label);
+
+        let idLabel = document.createElement('code');
+        docTarget.appendChild(idLabel);
+
+        const container = document.createElement('div');
+
+        await kmw.addKeyboards(`${kbdid}@${langid}`);
+        await kmw.setActiveKeyboard(kbdid, langid);
+        docBase = keyman.BuildVisualKeyboard(kbdid, 1, formFactor, layer);
+
+        label.textContent = `${keyman.getKeyboard(kbdid).Name} - ${formFactor} - ${layer} layer`;
+        idLabel.textContent = `${kbdid.replace(/^Keyboard_/)}`;
+        container.appendChild(docBase);
+
+        docTarget.appendChild(container);
+
+        // Trigger message queue:  let the mutation observer do its thing.
+        // In case it's not obvious:  this is only really safe because this test page is a
+        // highly-controlled environment.
+        await Promise.resolve();
+
+        // Grab the stylesheet element that was inserted; there should be no intervening additions,
+        // so the newly-added stylesheet element should be the last element in the <head> section.
+        const stylesheet = document.head.lastChild;
+        stylesheet.parentElement.removeChild(stylesheet);
+
+        shadowfy(container, stylesheet);
+      }
+
       kmw.init({
-        }).then(function() {
-          kmw.setActiveKeyboard("lao_2008_basic").then(function() {
-            var docTarget = document.getElementById("docTarget");
-            var kbdDiv = keyman.BuildVisualKeyboard("lao_2008_basic", 1, "phone", "shift");
-            docTarget.appendChild(kbdDiv);
-          });
+        }).then(async function() {
+          await documentKeyboard("gff_amharic", "am", "phone", "default");
+          await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
+          await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");
+          await documentKeyboard("lao_2008_basic", "lo", "desktop", "default");
+          await documentKeyboard("sil_cameroon_azerty", "pny", "tablet", "default");
+          await documentKeyboard("khmer_angkor", "km", "desktop", "default");
         });
     </script>
 

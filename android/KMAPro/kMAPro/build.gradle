@@ -70,6 +70,32 @@ android {
     productFlavors {
     }
 
+    applicationVariants.all { variant ->
+        // Append tag to app name to help differentiate versions for app testers:
+        //  - stable builds have no suffix
+        //  - beta and alpha release builds have "Beta" and "Alpha" suffixes
+        //  - local builds (incl. from IDE) also have "-local" suffix
+        //  - PR builds also have "-test-1234" suffix (where 1234 is PR#)
+        // Gradle sync will nullify these values, so have a fallback
+        String appSuffix = ''
+        String tag = VERSION_TAG ? VERSION_TAG : '-' + new File('../../TIER.md').getText('UTF-8');
+        if (tag.startsWithAny("-beta", "beta")) {
+            appSuffix = ' Beta';
+        } else if (tag.startsWithAny("-alpha", "alpha")) {
+            appSuffix = ' Alpha';
+        }
+        def match = (tag =~ /.*(-test-\d+)$/);
+        if (match.find()) {
+            // -test-PR_NUMBER
+            appSuffix = appSuffix + match.group(1)
+        } else {
+            String environment = VERSION_ENVIRONMENT ? VERSION_ENVIRONMENT : 'local';
+            if (environment.matches("local")) {
+                appSuffix = appSuffix + '-' + environment;
+            }
+        }
+        variant.resValue "string", "app_name", 'Keyman' + appSuffix;
+    }
     lintOptions {
         disable 'MissingQuantity', 'MissingTranslation'
         lintConfig file("lint.xml")

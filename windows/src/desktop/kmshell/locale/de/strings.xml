@@ -324,27 +324,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koTurnOnSurrogates" comment="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">Die Unicode ergänzender Zeichen-Display einschalten (Neustart erforderlich)</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koUnknownLanguage" comment="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">In Windows \"unbekannte Sprache\" einschalten</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Fehlersuchen einschalten</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koSwitchLanguageWithKeyboard" comment="Advanced options - switch Windows language when keyboard selected">Windows-Tastatur automatisch wechseln, wenn eine Keyman-Tastatur ausgewählt wird</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.1.274.0 -->
-  <string name="koSwitchLanguageForAllApplications" comment="Advanced options - selected language applies to all applications">Tastaturlayout für alle Anwendungen auswählen</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">Benutzer Berechtigungen werden immer in Windows Vista erhöht</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
