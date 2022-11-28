@@ -4,10 +4,10 @@
   <!ENTITY ProductName "Keyman Desktop">
   <!ENTITY Edition "Professional">
   <!ENTITY Version "7.0">
-  
+
   <!ENTITY EvaluationPeriod "30">
 
-  
+
   <!ENTITY Name "&ProductName;">
   <!ENTITY Name_CNV "&Company;&#160;&ProductName;&#160;&Version;">
   <!ENTITY Name_CN "&Company;&#160;&ProductName;">
@@ -17,7 +17,7 @@
 	<!--
 
 locale.dtd: Contains all localizable strings from Keyman Configuration XML files.
-            
+
 Please see the documentation for information on how to edit this file and where it
 should go.
 
@@ -150,10 +150,10 @@ Entries not in this file will be sourced from the default locale.xml file in the
 	<Dialog Id="Welcome" Width="462" Height="372"/>
 	<String Type="PlainText" Id="S_Welcome_Title">&amp;Name_NV;க்கு வரவேற்கிறோம்</String>
 	<String Type="HTML" Id="S_Welcome_Steps">
- 
+
   To get started using &amp;Name;, follow these simple steps:
 	<ol>
-		</ol>Download and install a keyboard from the 
+		</ol>Download and install a keyboard from the
 		    </String>
 	<String Type="HTML" Id="S_Welcome_StartTyping">பிறகு தட்டச்சு செய்க!</String>
 	<String Type="HTML" Id="S_Welcome_ProductName">&Name_NV;</String>
@@ -178,7 +178,7 @@ Entries not in this file will be sourced from the default locale.xml file in the
 	<!-- - - - - - - - - - - - - - - - - - -->
 	<Dialog Id="Activate" Width="309" Height="308"/>
 	<String Type="PlainText" Id="S_Activate_Title">பதிவு &amp;Name_CN;</String>
-	<String Type="PlainText" Id="S_Activate_Description">&amp;Name;, ஐ நீங்கள் விலைக்கு வாங்கினால் 
+	<String Type="PlainText" Id="S_Activate_Description">&amp;Name;, ஐ நீங்கள் விலைக்கு வாங்கினால்
    &amp;Company;யிடமிருந்து இதைப்போன்ற activation code உடன் கூடிய மின்னஞ்சல் கிடைக்கப்பெறுவீர்.
 </String>
 	<String Type="PlainText" Id="S_Activate_Enter">நீங்கள் பெற்ற உரிம எண்ணை உள்ளீடு செய்யவும்.</String>
@@ -349,12 +349,6 @@ Entries not in this file will be sourced from the default locale.xml file in the
 	<String Type="FormatString" Id="koKeyboardHotkeysAreToggle">தட்டச்சுப்பலகைக்கான ஹாட் கீ </String>
 	<!--    -->
 	<String Type="FormatString" Id="koAltGrCtrlAlt">Simulate AltGr with Ctrl+Alt</String>
-	<!--    -->
-	<String Type="FormatString" Id="koRunElevatedInVista">பயனாளர் உபயோகத்தை "Windows Vista" பதிப்பிலும் தொடர</String>
-	<!--    -->
-	<String Type="FormatString" Id="koTurnOnSurrogates">யுனிகோடுக்கான கூடுதல் எழுத்தை தெரிவிக்க (திரும்ப இயக்க வேண்டி வரும்)</String>
-	<!--    -->
-	<String Type="FormatString" Id="koUnknownLanguage">தெரியாத மொழியை ஆன் செய்ய</String>
 	<!--    -->
 	<String Type="FormatString" Id="koDebugging">தவறை சரி செய்ய</String>
 	<!--   Title of the Change Hotkey dialog box -->

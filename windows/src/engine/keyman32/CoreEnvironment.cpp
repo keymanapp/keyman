@@ -1,7 +1,9 @@
 #include "pch.h"
 
+#define WINDOWS_PLATFORM_ENV u"windows hardware desktop native"
+
 BOOL SetupCoreEnvironment(km_kbp_option_item **core_environment) {
-  km_kbp_option_item *items = new km_kbp_option_item[5];
+  km_kbp_option_item *items = new km_kbp_option_item[6];
 
   items[0].scope = KM_KBP_OPT_ENVIRONMENT;
   items[0].key = KM_KBP_KMX_ENV_BASELAYOUT;
@@ -19,7 +21,11 @@ BOOL SetupCoreEnvironment(km_kbp_option_item **core_environment) {
   items[3].key = KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT;
   items[3].value = KeyboardGivesCtrlRAltForRAlt() ? u"1" : u"0";
 
-  items[4] = KM_KBP_OPTIONS_END;
+  items[4].scope = KM_KBP_OPT_ENVIRONMENT;
+  items[4].key = KM_KBP_KMX_ENV_PLATFORM;
+  items[4].value = WINDOWS_PLATFORM_ENV;
+
+  items[5] = KM_KBP_OPTIONS_END;
 
   *core_environment = items;
   return TRUE;

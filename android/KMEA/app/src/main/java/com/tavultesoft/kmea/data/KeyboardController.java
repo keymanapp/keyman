@@ -191,10 +191,11 @@ public class KeyboardController {
   public int getKeyboardIndex(String key) {
     int index = INDEX_NOT_FOUND;
     if (!isInitialized || list == null) {
-      KMLog.LogError(TAG, "getIndexOfKey while KeyboardController() not initialized");
+      KMLog.LogError(TAG, "getKeyboardIndex while KeyboardController() not initialized");
       return index;
     }
     if (key == null || key.isEmpty()) {
+      KMLog.LogError(TAG, "getKeyboardIndex while key is null");
       return index;
     }
 

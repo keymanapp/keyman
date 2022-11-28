@@ -261,7 +261,8 @@ public final class KMManager {
   public static final String KMKey_CustomModel = "CustomModel";
   public static final String KMKey_HelpLink = "helpLink";
 
-  // Help Bubble removed in 16.0
+  // Keyman internal keys
+  protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
 
   // Default Legacy Asset Paths
   // Previous keyboards installed from the cloud  went to /languages/ and /fonts/
@@ -297,6 +298,7 @@ public final class KMManager {
   protected static final String KMFilename_JSSentry = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
+  protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
 
@@ -799,6 +801,7 @@ public final class KMManager {
         copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
       }
       copyAsset(context, KMFilename_KmwCss, "", true);
+      copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
 
       // Copy default keyboard font
@@ -1861,6 +1864,13 @@ public final class KMManager {
     }
   }
 
+  private static void setPersistentShouldShowHelpBubble(boolean flag) {
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, flag);
+    editor.commit();
+  }
+
   public static void setDebugMode(boolean value) {
     debugMode = value;
   }
@@ -2264,6 +2274,8 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
+        InAppKeyboard.showHelpBubbleAfterDelay(2000, true); // check if it should be shown at that time!
+
         InAppKeyboard.callJavascriptAfterLoad();
         InAppKeyboard.setSpacebarText(spacebarText);
 
@@ -2294,12 +2306,23 @@ public final class KMManager {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
         if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
+          InAppKeyboard.dismissHelpBubble();
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.dismissKeyboard();
         }
       } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
+        InAppKeyboard.dismissHelpBubble();
+        InAppKeyboard.setShouldShowHelpBubble(false);
+
+        // Globe key has been used; disable the internal preference setting.
+        KMManager.setPersistentShouldShowHelpBubble(false);
+
         handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
           KeyboardType.KEYBOARD_TYPE_INAPP);
+      } else if (url.indexOf("helpBubbleDismissed") >= 0) {
+        // The user has begun interacting with the keyboard; we'll disable the help bubble
+        // for the rest of the lifetime of this keyboard instance.
+        InAppKeyboard.setShouldShowHelpBubble(false);
       } else if (url.indexOf("showKeyPreview") >= 0) {
         String deviceType = context.getResources().getString(R.string.device_type);
         if (deviceType.equals("AndroidTablet")) {
@@ -2470,6 +2493,8 @@ public final class KMManager {
 
         registerAssociatedLexicalModel(langId);
 
+        SystemKeyboard.showHelpBubbleAfterDelay(2000, true); // check if it should be shown at that time!
+
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
 
         SystemKeyboard.callJavascriptAfterLoad();
@@ -2494,10 +2519,21 @@ public final class KMManager {
       if(url.indexOf("pageLoaded") >= 0) {
         pageLoaded(view, url);
       } else if (url.indexOf("hideKeyboard") >= 0) {
+        SystemKeyboard.dismissHelpBubble();
         IMService.requestHideSelf(0);
       } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
+        SystemKeyboard.dismissHelpBubble();
+        SystemKeyboard.setShouldShowHelpBubble(false);
+
+        // Globe key has been used; disable the internal preference setting.
+        KMManager.setPersistentShouldShowHelpBubble(false);
+
         handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
           KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      } else if (urlCommand.getQueryParameter("helpBubbleDismissed") != null) {
+        // The user has begun interacting with the keyboard; we'll disable the help bubble
+        // for the rest of the lifetime of this keyboard instance.
+        SystemKeyboard.setShouldShowHelpBubble(false);
       } else if (url.indexOf("showKeyPreview") >= 0) {
         String deviceType = context.getString(R.string.device_type);
         if (deviceType.equals("AndroidTablet")) {
@@ -2673,6 +2709,9 @@ public final class KMManager {
             return;
           }
 
+          InAppKeyboard.dismissHelpBubble();
+          InAppKeyboard.setShouldShowHelpBubble(false);
+
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.beginBatchEdit();
 
@@ -2795,6 +2834,9 @@ public final class KMManager {
             return;
           }
 
+          SystemKeyboard.dismissHelpBubble();
+          SystemKeyboard.setShouldShowHelpBubble(false);
+
           // Handle tab or enter since KMW didn't process it
           Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
           if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
@@ -2897,6 +2939,9 @@ public final class KMManager {
             // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
             ic.commitText(s, 1);
           }
+
+          SystemKeyboard.dismissHelpBubble();
+          SystemKeyboard.setShouldShowHelpBubble(false);
 
           ic.endBatchEdit();
           ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();

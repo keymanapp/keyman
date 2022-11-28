@@ -3,7 +3,7 @@
   <!--
 
 locale.dtd: Contains all localizable strings from Keyman Configuration XML files.
-            
+
 Please see the documentation for information on how to edit this file and where it
 should go.
 
@@ -261,12 +261,6 @@ Entries not in this file will be sourced from the default locale.xml file in the
   <!--    -->
   <string name="koAltGrCtrlAlt" comment="/FormatString: ">Simulate AltGr with Ctrl+Alt</string>
   <!--    -->
-  <string name="koRunElevatedInVista" comment="/FormatString: ">பயனாளர் உபயோகத்தை "Windows Vista" பதிப்பிலும் தொடர</string>
-  <!--    -->
-  <string name="koTurnOnSurrogates" comment="/FormatString: ">யுனிகோடுக்கான கூடுதல் எழுத்தை தெரிவிக்க (திரும்ப இயக்க வேண்டி வரும்)</string>
-  <!--    -->
-  <string name="koUnknownLanguage" comment="/FormatString: ">தெரியாத மொழியை ஆன் செய்ய</string>
-  <!--    -->
   <string name="koDebugging" comment="/FormatString: ">தவறை சரி செய்ய</string>
   <!--   Title of the Change Hotkey dialog box -->
   <string name="SKChangeHotkeyTitle" comment="/FormatString: ">ஹாட் கீயை மாற்றவும்.</string>
@@ -327,8 +321,6 @@ Entries not in this file will be sourced from the default locale.xml file in the
   <string name="koReleaseShiftKeysAfterKeyPress" comment="Configuration Dialog - Options tab/FormatString: OSK options - Releases shift/ctrl/alt on OSK after key press (introduced 7.0.236.0)">Release Shift/Ctrl/Alt on On Screen Keyboard after clicking a key</string>
   <string name="koAutoOpenOSK" comment="Configuration Dialog - Options tab/FormatString: OSK options - auto-open OSK (introduced 7.0.244.0)">Always show On Screen Keyboard Window when Keyman keyboard is selected</string>
   <string name="koAutoSwitchOSKPages" comment="Configuration Dialog - Options tab/FormatString: OSK options - when a keyboard is activated, switch to most appropriate page in OSK (introduced 7.0.244.0)">Switch to appropriate On Screen Keyboard/Help automatically when a keyboard is selected</string>
-  <string name="koSwitchLanguageWithKeyboard" comment="Configuration Dialog - Options tab/FormatString: Advanced options - switch Windows language when keyboard selected (introduced 7.0.244.0)">Switch Windows language when a Keyman keyboard is selected</string>
-  <string name="koSwitchLanguageForAllApplications" comment="Configuration Dialog - Options tab/FormatString: Advanced options - selected language applies to all applications (introduced 7.1.274.0)">Select keyboard layout for all applications</string>
   <string name="S_Button_BaseKeyboard" comment="Configuration Dialog - Options tab/PlainText: Options tab - base keyboard button (introduced 9.0.445.0)">Base Keyboard...</string>
   <string name="S_Hotkey_Language_Prefix" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - activation term preceding Windows language name. Note: include a space following. (introduced 7.0.241.0)"/>
   <string name="S_Hotkey_Language_Suffix" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - language term following Windows language name. Note: include an initial space. (introduced 7.0.241.0)"/>
@@ -402,7 +394,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <string name="S_Help_Keyboard_Prefix" comment="Help Dialog/PlainText: Help - text preceding keyboard name (introduced 7.0.230.0)">Help on "</string>
   <string name="S_Help_Keyboard_Suffix" comment="Help Dialog/PlainText: Help - text following keyboard name (introduced 7.0.230.0)">" keyboard</string>
   <string name="SKMenu_NoKeyboardsInstalled" comment="System Tray Menu Items/PlainText: Systray - notice of no keyboard layouts installed (introduced 7.0.230.0)">No keyboard layouts are installed.
-Choose "Configuration" to install a 
+Choose "Configuration" to install a
 keyboard layout for your language.</string>
   <string name="SKButtonPrint" comment="Formatted Messages/FormatString: Print button in Welcome dialog for keyboards (introduced 7.0.239.0)">&amp;Print...</string>
   <string name="SKButtonDownload" comment="Formatted Messages/FormatString: Download button in Locale Selection dialog (introduced 7.0.240.0)">&amp;Download...</string>

@@ -27,7 +27,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
 from keyman_config.install_kmp import (InstallError, InstallStatus,
                                        extract_kmp, get_metadata, install_kmp)
 from keyman_config.kmpmetadata import get_fonts
-from keyman_config.list_installed_kmp import get_kmp_version
+from keyman_config.list_installed_kmp import get_kmp_version_user
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.welcome import WelcomeView
 
@@ -55,7 +55,7 @@ class InstallKmpWindow(Gtk.Dialog):
         self.accelerators = None
         self.language = language
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
-        installed_kmp_ver = get_kmp_version(keyboardid)
+        installed_kmp_ver = get_kmp_version_user(keyboardid)
         if installed_kmp_ver:
             logging.info("installed kmp version %s", installed_kmp_ver)
 

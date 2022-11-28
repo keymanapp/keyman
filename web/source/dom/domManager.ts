@@ -1482,8 +1482,10 @@ namespace com.keyman.dom {
         return Promise.resolve();
       }
 
-      var keyman: KeymanBase = this.keyman;
-      var domManager = this;
+      this.keyman.linkStylesheetResources();
+
+      const keyman: KeymanBase = this.keyman;
+      const domManager = this;
 
       // Do not initialize until the document has been fully loaded
       if(document.readyState !== 'complete')

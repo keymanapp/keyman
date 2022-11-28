@@ -103,7 +103,7 @@ type
     procedure SetAutoApply(Value: Boolean);
     property AutoApply: Boolean read GetAutoApply write SetAutoApply;
     procedure Refresh;
-    function KeymanCustomisation: IKeymanCustomisation;
+    function KeymanCustomisation: IKeymanCustomisation; safecall;
   end;
 
   IIntKeymanKeyboardsPackageInstalled = interface(IIntKeymanInterface)

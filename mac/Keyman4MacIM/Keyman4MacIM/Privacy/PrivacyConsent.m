@@ -62,7 +62,6 @@
  */
 - (void)requestPrivacyAccess:(void (^)(void))withCompletionHandler
 {
-  _completionHandler = withCompletionHandler;
   BOOL hasAccessibility = NO;
   
   // check if we already have accessibility
@@ -74,7 +73,11 @@
   
   if (hasAccessibility) {
     NSLog(@"already have Accessibility: no need to make request.");
+    // call completionHandler immediately -> privacyDialog will not be presented
+    withCompletionHandler();
   } else {
+    // set completionHandler to be called after privacyDialog is dismissed
+    _completionHandler = withCompletionHandler;
     NSLog(@"do not have Accessibility, present Privacy Dialog");
     [self showPrivacyDialog];
   }
