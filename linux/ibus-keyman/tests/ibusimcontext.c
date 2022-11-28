@@ -310,9 +310,8 @@ _request_surrounding_text(IBusIMContext *context) {
         context->caps &= ~IBUS_CAP_SURROUNDING_TEXT;
         ibus_input_context_set_capabilities(context->ibuscontext, context->caps);
       }
+      // g_debug("%s has no capability of surrounding-text feature", g_get_prgname());
     }
-  } else {
-    // g_debug("%s has no capability of surrounding-text feature", g_get_prgname());
   }
 }
 
@@ -422,9 +421,9 @@ ibus_im_context_init(GObject *obj) {
     ibusimcontext->caps |= IBUS_CAP_SURROUNDING_TEXT;
   }
 
-//#ifdef IBUS_HAS_PREFILTER
+#ifdef IBUS_HAS_PREFILTER
   ibusimcontext->caps |= IBUS_CAP_PREFILTER;
-//#endif
+#endif
 
   ibusimcontext->events_queue = g_queue_new();
 
