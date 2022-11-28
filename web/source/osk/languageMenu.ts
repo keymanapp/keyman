@@ -417,6 +417,7 @@ namespace com.keyman.osk {
         // If this object still exists, we never ran our paired `unlock` method;
         // preserve the original state so that we can still restore it later!
         if(this.originalBodyStyle) {
+          console.error("Unexpected state:  `originalBodyStyle` was not cleared by a previous `unlockBodyScroll()` call");
           return;
         }
 
@@ -442,6 +443,7 @@ namespace com.keyman.osk {
         if(!this.originalBodyStyle) {
           // We shouldn't be able to reach here, but in case things go out-of-order due
           // to some unforeseen circumstance, let's null-guard here.
+          console.error("Unexpected state:  `originalBodyStyle` is unset; cannot restore original body style");
           return;
         }
 
