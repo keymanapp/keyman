@@ -360,7 +360,7 @@ setup_environment(IBusKeymanEngine *keyman)
   g_message("%s: setting up environment", __FUNCTION__);
 
   // Allocate enough options for: 3 environments plus 1 pad struct of 0's
-  km_kbp_option_item *environment_opts = g_new0(km_kbp_option_item, 4);
+  km_kbp_option_item environment_opts[4] = {0};
 
   environment_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
   environment_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
@@ -374,15 +374,11 @@ setup_environment(IBusKeymanEngine *keyman)
   environment_opts[2].key   = KM_KBP_KMX_ENV_BASELAYOUTALT;
   environment_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
 
-  environment_opts[3].scope = 0;
-  environment_opts[3].key   = 0;
-  environment_opts[3].value = NULL;
 
   km_kbp_status status = km_kbp_state_create(keyman->keyboard, environment_opts, &(keyman->state));
   if (status != KM_KBP_STATUS_OK) {
     g_warning("%s: problem creating km_kbp_state. Status is %u.", __FUNCTION__, status);
   }
-  g_free(environment_opts);
   return status;
 }
 
@@ -396,8 +392,10 @@ load_keyboard_options(IBusKeymanEngine *keyman)
   g_message("%s: Loading options for kb_name: %s", __FUNCTION__, keyman->kb_name);
   GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
   int num_options       = g_queue_get_length(queue_options);
-  if (num_options < 1)
+  if (num_options < 1) {
+    g_queue_free_full(queue_options, NULL);
     return KM_KBP_STATUS_OK;
+  }
 
   // Allocate enough options for: num_options plus 1 pad struct of 0's
   km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, num_options + 1);
@@ -409,9 +407,6 @@ load_keyboard_options(IBusKeymanEngine *keyman)
     keyboard_opts[i].value = item->value;
   }
 
-  keyboard_opts[num_options].scope = 0;
-  keyboard_opts[num_options].key   = 0;
-  keyboard_opts[num_options].value = NULL;
 
   // once we have the option list we can then update the options using the public api call
   km_kbp_status status = km_kbp_state_options_update(keyman->state, keyboard_opts);
@@ -503,16 +498,19 @@ ibus_keyman_engine_constructor(
 
     if (status != KM_KBP_STATUS_OK) {
       g_warning("%s: problem creating km_kbp_keyboard. Status is %u.", __FUNCTION__, status);
+      IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
       return NULL;
     }
 
     status = setup_environment(keyman);
     if (status != KM_KBP_STATUS_OK) {
+      IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
       return NULL;
     }
 
     status = load_keyboard_options(keyman);
     if (status != KM_KBP_STATUS_OK) {
+      IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
       return NULL;
     }
 
