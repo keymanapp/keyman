@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.114 beta 2022-11-28
+
+* fix(mac): Caps processing was not consistent with core (#7795)
+* fix(web): locks page scroll when scrolling lang menu (#7790)
+
 ## 16.0.113 beta 2022-11-26
 
 * docs(android/app): Add note of haptic feedback to whatsnew (#7817)
