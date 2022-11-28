@@ -1,4 +1,4 @@
-program Tike;
+program tike;
 
 uses
   Vcl.Forms,
