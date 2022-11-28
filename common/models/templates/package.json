@@ -17,6 +17,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "license": "MIT",
   "main": "index.js",
+  "type": "module",
   "types": "index.d.ts",
   "directories": {
     "test": "test"

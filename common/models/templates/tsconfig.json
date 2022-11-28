@@ -1,16 +1,24 @@
 {
   "extends": "../../../tsconfig-base.json",
   "compilerOptions": {
+    "allowJs": false,
     "declaration": true,
-    "module": "none",
-    "outFile": "./build/index.js",
+    "module": "es6",
+    "moduleResolution": "node",
     "sourceMap": true,
+    "inlineSources": true,
+    "strict": true,
     "lib": ["es6"],
+    "types": ["node"],
     "target": "es5",
+    "baseUrl": "./",
+    "outDir": "build/obj",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
   },
   "references": [
-    { "path": "../../web/utils" },
-    { "path": "../types" }
+    { "path": "../types" },
+    { "path": "../../web/utils" }
   ],
   "include": [
 	"src/**/*.ts"
