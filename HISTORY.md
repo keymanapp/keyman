@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 16.0.113 beta 2022-11-26
+
+* docs(android/app): Add note of haptic feedback to whatsnew (#7817)
+* fix(developer): remove missing files from MRU list (#7821)
+
+## 16.0.112 beta 2022-11-25
+
+* fix: test builds should always run latest changes (#7806)
+* fix(web): unit test breakages (#7797)
+
+## 16.0.111 beta 2022-11-24
+
+* fix(android/engine): Make it easier to test keyboard updates (#7781)
+
 ## 16.0.110 beta 2022-11-23
 
 * fix(linux): Revert "fix(linux): Fix a warning" (#7783)

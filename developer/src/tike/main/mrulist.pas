@@ -69,6 +69,9 @@ procedure TMRUList.Add(FileName: WideString);
 var
   n: Integer;
 begin
+  if not FileExists(FileName) then
+    Exit;
+
   n := FMRU.IndexOf(FileName);
 
   if n = 0 then Exit;
@@ -84,6 +87,9 @@ procedure TMRUList.Append(FileName: WideString);
 var
   n: Integer;
 begin
+  if not FileExists(FileName) then
+    Exit;
+
   n := FMRU.IndexOf(FileName);
   if n >= 0 then
   begin
@@ -123,7 +129,10 @@ begin
             GetValueNames(s);
             s.Sort;
             for i := 0 to s.Count - 1 do
-              FMRU.Add(ReadString(s[i]))
+            begin
+              if FileExists(s[i]) then
+                FMRU.Add(ReadString(s[i]))
+            end;
           finally
             s.Free;
           end;
