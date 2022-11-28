@@ -498,19 +498,19 @@ ibus_keyman_engine_constructor(
 
     if (status != KM_KBP_STATUS_OK) {
       g_warning("%s: problem creating km_kbp_keyboard. Status is %u.", __FUNCTION__, status);
-      IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
+      ibus_keyman_engine_destroy(keyman);
       return NULL;
     }
 
     status = setup_environment(keyman);
     if (status != KM_KBP_STATUS_OK) {
-      IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
+      ibus_keyman_engine_destroy(keyman);
       return NULL;
     }
 
     status = load_keyboard_options(keyman);
     if (status != KM_KBP_STATUS_OK) {
-      IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
+      ibus_keyman_engine_destroy(keyman);
       return NULL;
     }
 
