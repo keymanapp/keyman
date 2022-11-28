@@ -7,6 +7,11 @@ import QuoteBehavior from "./quote-behavior.js";
 import { Tokenization, tokenize, getLastPreCaretToken, wordbreak } from "./tokenization.js";
 import TrieModel, { TrieModelOptions } from "./trie-model.js";
 
+import extendString from "@keymanapp/web-utils/build/obj/kmwstring.js";
+
+// This package requires our string-extension functions.
+extendString();
+
 export {
   SENTINEL_CODE_UNIT, applyTransform, buildMergedTransform, isHighSurrogate, isLowSurrogate, isSentinel,
   transformToSuggestion, defaultApplyCasing, // "common.ts"

@@ -34,7 +34,6 @@
   },
   "scripts": {
     "build": "tsc",
-    "pretest": "tsc -b tsconfig.bundled.json",
     "test": "mocha -r test/helpers.js"
   },
   "bugs": {
