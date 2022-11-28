@@ -97,7 +97,7 @@ DOC_TEST_SYMBOL="actions - ${BUILDER_TERM_START}test${BUILDER_TERM_END}"
 
 builder_describe "Builds Keyman Engine for Web (KMW)." \
   "@../common/web/keyman-version build:embed build:web build:ui" \
-  "@../common/web/input-processor build:embed build:web" \
+  "@../common/web/input-processor build:engine build:embed build:web" \
   "@src/tools/building/sourcemap-root build:embed build:web build:ui" \
   "clean" \
   "configure" \
