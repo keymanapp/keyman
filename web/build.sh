@@ -533,7 +533,6 @@ if builder_start_action build:embed; then
   #   echo "Upload successful."
   #   popd
   # fi
-  builder_finish_action success build:embed
 fi
 
 ### -embed section complete.
