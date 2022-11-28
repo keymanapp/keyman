@@ -101,11 +101,21 @@ if [ -n "$PUSH" ]; then
     $NOOP git push origin chore/linux/changelog
 fi
 
-git checkout -B chore/linux/cherry-pick/changelog origin/master
+if git branch -r | grep origin/beta; then
+    CLBRANCH=origin/beta
+else
+    CLBRANCH=origin/master
+fi
+
+git checkout -B chore/linux/cherry-pick/changelog ${CLBRANCH}
 git cherry-pick -x chore/linux/changelog
 if [ -n "$PUSH" ]; then
     $NOOP git push origin chore/linux/cherry-pick/changelog
 fi
 
 echo_heading "Finishing"
-git checkout master
+if git branch -r | grep origin/beta; then
+    git checkout beta
+else
+    git checkout master
+fi
