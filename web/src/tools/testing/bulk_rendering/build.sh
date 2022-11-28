@@ -37,7 +37,7 @@ if builder_start_action configure; then
 fi
 
 if builder_start_action clean; then
-  rm -r ../../../../build/tools/testing/bulk_rendering
+  rm -rf ../../../../build/tools/testing/bulk_rendering
   builder_finish_action success clean
 fi
 
