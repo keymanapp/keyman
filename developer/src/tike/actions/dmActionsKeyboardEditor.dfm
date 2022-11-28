@@ -108,6 +108,7 @@ object modActionsKeyboardEditor: TmodActionsKeyboardEditor
       Category = 'Debug Control'
       Caption = 'Select System &Keyboard...'
       ImageIndex = 49
+      Visible = False
       OnExecute = actDebugSelectSystemKeyboardExecute
       OnUpdate = actDebugSelectSystemKeyboardUpdate
     end

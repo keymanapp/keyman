@@ -128,6 +128,8 @@ begin
         except
           on E:ENetHTTPClientException do
             Result := False;
+          on E:ENetHTTPResponseException do
+            Result := False;
         end;
       finally
         Stream.Free;

@@ -18,7 +18,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 
 builder_check_color "$@"
 
-builder_describe "Builds the standalone, headless form of Keyman Engine for Web's input-processor module" \
+builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "@tools" \
   "@./ build:engine" \
   "test+" \

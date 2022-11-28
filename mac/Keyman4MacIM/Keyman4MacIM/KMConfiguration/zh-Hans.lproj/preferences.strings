@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "总是在屏幕上显示键盘";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "使用详细的控制台日志";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "支持";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "下载键盘...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Keyman 配置";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "返回";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "键盘";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "当详细日志选项开启时，Keyman 将记录可能有助于 Keyman 支持诊断问题的动作。控制台程序可以用来查看来自 Keyman 的消息日志。在控制台，过滤后可显示来自\"Keyman\"进程的所有消息。此日志可导出，且可在需要时将其发送至 Keyman 支持。";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "前进";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "主页";
+
+/* Options button text */
+"frd-No-seV.label" = "选项";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "已安装的键盘";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "如果特定的键盘或 Keyman 中出现问题，请打开它。";

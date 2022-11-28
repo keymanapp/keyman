@@ -94,3 +94,13 @@ test_dep_should_build test:project dep6
 test_dep_should_not_build configure:bar dep6
 test_dep_should_build build:bar dep6
 test_dep_should_build test:bar dep6
+
+# Test if 'build' actions are added because their output
+# is missing
+builder_parse test
+if [[ "${_builder_chosen_action_targets[@]}" == "test:project test:bar build:project build:bar" ]]; then
+  echo "PASS: 'build' actions automatically added"
+else
+  echo "All targets: ${_builder_chosen_action_targets[@]}"
+  fail "FAIL: 'build' actions not automatically added, or unexpected action:targets added"
+fi

@@ -18,6 +18,7 @@ import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LanguageResource;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.VersionUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -69,7 +70,8 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     };
   }
   private Bundle updateCheck(LanguageResource cloudResource, LanguageResource existingMatch) {
-    if (DEBUG_SIMULATE_UPDATES) {
+    // For local and PR test builds, invalidate cache to make keyboard updates easier
+    if (DEBUG_SIMULATE_UPDATES || VersionUtils.isLocalOrTestBuild()) {
       return cloudResource.buildDownloadBundle();
     }
 

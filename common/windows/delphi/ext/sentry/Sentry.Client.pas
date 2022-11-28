@@ -156,6 +156,7 @@ const
   FRAMES_TO_SKIP = 2;
 var
   Buffer: array[0..BufferSize-1] of Char;
+  Message: string;
 begin
   if TSentryClient.FInstance = nil then
   begin
@@ -164,8 +165,20 @@ begin
 
   if AExceptAddr = nil then
     AExceptAddr := System.ExceptAddr;
+
+
   if ExceptionErrorMessage(E, AExceptAddr, Buffer, BufferSize) = 0 then
     StrCopy(Buffer, 'Unknown exception');
+
+  Message := Buffer;
+
+  if not (TObject(E) is Exception) then
+  begin
+    // Exceptions that bubble out of kmcomapi without safecall semantics
+    // do not inherit from local module Exception object, so we manually import
+    // the message
+    Message := Message + #13#10 + E.Message;
+  end;
 
   if (raw_frame_count = 0) or (raw_frames[0] <> NativeUInt(AExceptAddr)) then
   begin
@@ -176,7 +189,7 @@ begin
     CaptureStackTrace(AExceptAddr, FRAMES_TO_SKIP);
   end;
 
-  TSentryClient.FInstance.ExceptionEvent(E.ClassName, Buffer);
+  TSentryClient.FInstance.ExceptionEvent(E.ClassName, Message);
 
   Result := True;
 end;

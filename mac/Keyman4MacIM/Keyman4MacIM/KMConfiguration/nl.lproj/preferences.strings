@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Altijd het schermtoetsenbord weergeven";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Gebruik verbose console logging";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Ondersteuning";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Download toetsenbord...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Sleutelman configuratie";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Achterzijde";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Keyboards";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Als de uitgebreide logging optie is ingeschakeld, zal Keyman acties loggen die Keyman Support kunnen helpen een probleem te diagnosticeren. Het console programma kan worden gebruikt om een logboek van berichten van Keyman te zien. In de console filteren om alle berichten van het \"Keyman\"-proces te tonen. Deze log kan worden geëxporteerd en naar Keyman-ondersteuning worden verzonden indien nodig.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Doorsturen";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Startpagina";
+
+/* Options button text */
+"frd-No-seV.label" = "Instellingen";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Geïnstalleerd toetsenbord";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Zet dit aan als je problemen hebt met een specifiek toetsenbord of met Keyman in het algemeen.";

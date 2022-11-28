@@ -100,9 +100,6 @@ PREDICTIVE_TEXT_OUTPUT="src/test/manual/web/prediction-ui/simple-en-trie.js"
 
 builder_check_color "$@"
 
-# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
-# TODO: remove :tools once kmlmc is a dependency for test:module
-
 DOC_WEB_PRODUCT="${BUILDER_TERM_START}:web${BUILDER_TERM_END} build product"
 DOC_TEST_WEB="${BUILDER_TERM_START}test:web${BUILDER_TERM_END}"
 DOC_BUILD_EMBED_WEB="${BUILDER_TERM_START}build:embed${BUILDER_TERM_END} and ${BUILDER_TERM_START}build:web${BUILDER_TERM_END}"
@@ -536,7 +533,6 @@ if builder_start_action build:embed; then
   #   echo "Upload successful."
   #   popd
   # fi
-  builder_finish_action success build:embed
 fi
 
 ### -embed section complete.
