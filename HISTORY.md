@@ -1,6 +1,11 @@
 # Keyman Version History
 
 
+## 17.0.13 alpha 2022-11-29
+
+* fix(windows): lower case filenames for projects (#7837)
+* refactor(linux): Refactor setting keyboard options  ️ (#7804)
+
 ## 17.0.12 alpha 2022-11-25
 
 * chore(common): Merge beta from Sprint B16S2 to master (#7815)
