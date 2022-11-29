@@ -28,24 +28,26 @@
 
 /// <reference types="@keymanapp/lm-message-types" />
 
+import type ModelCompositor from './model-compositor.js';
+
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
  */
-type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
-type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
+export type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+export type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 
 
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak' | 'accept' | 'revert' | 'reset-context';
-type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage | AcceptMessage | RevertMessage | ResetContextMessage;
+export type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak' | 'accept' | 'revert' | 'reset-context';
+export type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage | AcceptMessage | RevertMessage | ResetContextMessage;
 
 /**
  * The structure of a config message.  It should include the platform's supported
  * capabilities.
  */
-interface ConfigMessage {
+export interface ConfigMessage {
   message: 'config';
 
   /**
@@ -61,7 +63,7 @@ interface ConfigMessage {
   testMode?: boolean
 }
 
-interface ModelFile {
+export interface ModelFile {
   type: 'file';
 
   /**
@@ -70,7 +72,7 @@ interface ModelFile {
   file: string;
 }
 
-interface ModelEval {
+export interface ModelEval {
   type: 'raw';
 
   /**
@@ -80,13 +82,13 @@ interface ModelEval {
   code: string;
 }
 
-type ModelSourceSpec = ModelFile | ModelEval;
+export type ModelSourceSpec = ModelFile | ModelEval;
 
 /**
  * The structure of an initialization message. It should include the model (either in
  * source code or parameter form), as well as the keyboard's capabilities.
  */
-interface LoadMessage {
+export interface LoadMessage {
   message: 'load';
 
   /**
@@ -98,7 +100,7 @@ interface LoadMessage {
 /**
  * Message to suggestion text.
  */
-interface PredictMessage {
+export interface PredictMessage {
   message: 'predict';
 
   /**
@@ -124,14 +126,14 @@ interface PredictMessage {
   context: Context;
 }
 
-interface UnloadMessage {
+export interface UnloadMessage {
   message: 'unload'
 }
 
 /**
  * Message used to request the last pre-cursor word in the context.
  */
-interface WordbreakMessage {
+export interface WordbreakMessage {
   message: 'wordbreak';
 
   /**
@@ -146,7 +148,7 @@ interface WordbreakMessage {
   context: Context;
 }
 
-interface AcceptMessage {
+export interface AcceptMessage {
   message: 'accept';
 
   /**
@@ -177,7 +179,7 @@ interface AcceptMessage {
   postTransform?: Transform;
 }
 
-interface RevertMessage {
+export interface RevertMessage {
   message: 'revert';
 
   /**
@@ -198,7 +200,7 @@ interface RevertMessage {
   context: Context;
 }
 
-interface ResetContextMessage {
+export interface ResetContextMessage {
   message: 'reset-context';
 
   /**
@@ -210,12 +212,12 @@ interface ResetContextMessage {
 /**
  * The LMLayer can be in one of the following states. The LMLayer can only produce predictions in the 'ready' state.
  */
-type LMLayerWorkerState = LMLayerWorkerUnconfiguredState | LMLayerWorkerModellessState | LMLayerWorkerReadyState;
+ export type LMLayerWorkerState = LMLayerWorkerUnconfiguredState | LMLayerWorkerModellessState | LMLayerWorkerReadyState;
 
 /**
  * Represents the unconfigured state of the LMLayer.
  */
-interface LMLayerWorkerUnconfiguredState {
+export interface LMLayerWorkerUnconfiguredState {
   name: 'unconfigured';
   handleMessage(payload: IncomingMessage): void;
 }
@@ -223,7 +225,7 @@ interface LMLayerWorkerUnconfiguredState {
 /**
  * Represents the pre-model-load state of the LMLayer.
  */
-interface LMLayerWorkerModellessState {
+export interface LMLayerWorkerModellessState {
   name: 'modelless';
   handleMessage(payload: IncomingMessage): void;
 }
@@ -231,7 +233,7 @@ interface LMLayerWorkerModellessState {
 /**
  * Represents the 'ready' state of the LMLayer.
  */
-interface LMLayerWorkerReadyState {
+export interface LMLayerWorkerReadyState {
   name: 'ready';
   handleMessage(payload: IncomingMessage): void;
   compositor: ModelCompositor;
@@ -240,7 +242,7 @@ interface LMLayerWorkerReadyState {
 /**
  * Constructors that return worker internal models.
  */
-interface WorkerInternalModelConstructor {
+export interface WorkerInternalModelConstructor {
   /**
    * LexicalModel instances are all given the keyboard's
    * capabilities, plus any parameters they require.

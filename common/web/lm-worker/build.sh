@@ -115,6 +115,10 @@ if builder_start_action build; then
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."
 
+  echo "Bundling worker modules"
+  echo "  ! TODO !  Failing now."
+  exit 1
+
   # Wrap the worker code and create embedded index.js. Must be run after the
   # worker is built
   echo "Wrapping worker in function LMLayerWorkerCode ${WORKER_OUTPUT_FILENAME}"

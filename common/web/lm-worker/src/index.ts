@@ -30,9 +30,15 @@
  */
 
 /// <reference types="@keymanapp/lm-message-types" />
-/// <reference path="./models/dummy-model.ts" />
-/// <reference path="./model-compositor.ts" />
-/// <reference path="./transformUtils.ts" />
+
+import * as models from './models/index.js';
+import * as correction from './correction/index.js';
+import * as wordBreakers from '@keymanapp/models-wordbreakers/build/obj/index.js';
+
+import ModelCompositor from './model-compositor.js';
+import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
+
+// import type * as WorkerInterfaces from './worker-interfaces.js';
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -57,7 +63,7 @@
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
  */
-class LMLayerWorker {
+export default class LMLayerWorker {
   /**
    * State pattern. This object handles onMessage().
    * handleMessage() can transition to a different state, if
@@ -401,21 +407,4 @@ class LMLayerWorker {
 
     return worker;
   }
-}
-
-// Let LMLayerWorker be available both in the browser and in Node.
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-  module.exports = LMLayerWorker;
-  module.exports['correction'] = correction;
-  module.exports['models'] = models;
-  module.exports['wordBreakers'] = wordBreakers;
-  /// XXX: export the ModelCompositor for testing.
-  module.exports['ModelCompositor'] = ModelCompositor;
-  module.exports['TransformUtils'] = TransformUtils;
-} else if (typeof self !== 'undefined' && 'postMessage' in self && 'importScripts' in self) {
-  // Automatically install if we're in a Web Worker.
-  LMLayerWorker.install(self as any); // really, 'as typeof globalThis', but we're currently getting TS errors from use of that.
-} else {
-  //@ts-ignore
-  window.LMLayerWorker = LMLayerWorker;
 }
