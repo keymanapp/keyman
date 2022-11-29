@@ -33,7 +33,7 @@
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b",
     "test": "mocha -r test/helpers.js"
   },
   "bugs": {
