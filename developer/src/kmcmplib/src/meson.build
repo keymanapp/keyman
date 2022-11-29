@@ -60,7 +60,7 @@ endif
 
 version_lib = compiler.find_library('version')
 
-lib = library('kmcompx',
+lib = library('kmcmplib',
   'CasedKeys.cpp',
   'CharToKeyConversion.cpp',
   'Compiler.cpp',
@@ -96,7 +96,7 @@ lib = library('kmcompx',
   include_directories: inc,
   install: true)
 
-kmcompx = declare_dependency(link_with: lib, include_directories: inc)
+kmcmplib = declare_dependency(link_with: lib, include_directories: inc)
 
 pkg = import('pkgconfig')
 pkg.generate(
