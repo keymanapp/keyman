@@ -89,25 +89,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <LibraryPath>$(KEYMAN_ROOT)\developer\src\kmcmplib\build\x86\src;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+    <LibraryPath>$(KEYMAN_ROOT)\developer\src\kmcmplib\build\x86\$(Configuration)\src;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName).x64</TargetName>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <LibraryPath>$(KEYMAN_ROOT)\developer\src\kmcmplib\build\x64\src;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <LibraryPath>$(KEYMAN_ROOT)\developer\src\kmcmplib\build\x64\$(Configuration)\src;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
-    <LibraryPath>$(KEYMAN_ROOT)\developer\src\kmcmplib\build\x86\src;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+    <LibraryPath>$(KEYMAN_ROOT)\developer\src\kmcmplib\build\x86\$(Configuration)\src;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(KEYMAN_ROOT)\developer\src\ext\json;$(KEYMAN_ROOT)\developer\src\ext\json-schema-validator</IncludePath>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName).x64</TargetName>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <LibraryPath>$(KEYMAN_ROOT)\developer\src\kmcmplib\build\x64\src;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <LibraryPath>$(KEYMAN_ROOT)\developer\src\kmcmplib\build\x64\$(Configuration)\src;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
