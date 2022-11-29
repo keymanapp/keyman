@@ -51,8 +51,7 @@ describe('Attachment API', function() {
       keyman.attachToControl(ele);
       DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
 
-      // A keystroke must target the input-receiving element.  For touch, that's the alias.
-      eventDriver = new KMWRecorder.BrowserDriver(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+      eventDriver = new KMWRecorder.BrowserDriver(ele);
       eventDriver.simulateEvent(DynamicElements.keyCommand);
 
       val = retrieveAndReset(ele);
@@ -74,7 +73,7 @@ describe('Attachment API', function() {
       // for the change to take effect.
       window.setTimeout(function() {
         DynamicElements.assertAttached(ele);
-        let eventDriver = new KMWRecorder.BrowserDriver(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+        let eventDriver = new KMWRecorder.BrowserDriver(ele);
         eventDriver.simulateEvent(DynamicElements.keyCommand);
         val = retrieveAndReset(ele);
         assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
@@ -82,7 +81,7 @@ describe('Attachment API', function() {
         keyman.enableControl(ele);
         window.setTimeout(function() {
           DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
-          let eventDriver = new KMWRecorder.BrowserDriver(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+          let eventDriver = new KMWRecorder.BrowserDriver(ele);
           eventDriver.simulateEvent(DynamicElements.keyCommand);
           val = retrieveAndReset(ele);
           assert.equal(val, DynamicElements.enabledLaoOutput, "'Enabled' element did not perform keystroke processing!");
@@ -108,21 +107,21 @@ describe('Attachment API', function() {
 
     // Set control with independent keyboard.
     keyman.setKeyboardForControl(input, "khmer_angkor", "km");
-    var eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
+    var eventDriver = new KMWRecorder.BrowserDriver(input);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW did not use control's keyboard settings!");
 
     // Swap to a global-linked control...
     keyman.setActiveElement(textarea);
-    eventDriver = new KMWRecorder.BrowserDriver(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    eventDriver = new KMWRecorder.BrowserDriver(textarea);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(textarea);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not use manage keyboard settings correctly for global-linked control!");
 
     // Swap back and check that the settings persist.
     keyman.setActiveElement(input);
-    eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver = new KMWRecorder.BrowserDriver(input);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW forgot control's independent keyboard settings!");
@@ -154,14 +153,14 @@ describe('Attachment API', function() {
     keyman.setActiveElement(input);
     // Set textarea control with independent keyboard khmer_angkor.
     keyman.setKeyboardForControl(textarea, "khmer_angkor", "km");
-    var eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
+    var eventDriver = new KMWRecorder.BrowserDriver(input);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW set independent keyboard for the incorrect control!");
 
     // Swap to the textarea control with its overridden khmer_angkor keyboard...
     keyman.setActiveElement(textarea);
-    eventDriver = new KMWRecorder.BrowserDriver(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    eventDriver = new KMWRecorder.BrowserDriver(textarea);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(textarea);
     assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW did not properly store keyboard for the previously-inactive control!");
@@ -170,158 +169,89 @@ describe('Attachment API', function() {
     keyman.setActiveElement(input);
     keyman.setKeyboardForControl(textarea, null, null);
 
-    eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver = new KMWRecorder.BrowserDriver(input);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW made a strange error when clearing an inactive control's keyboard setting!");
 
     keyman.setActiveElement(textarea);
     // Finally, after clearing the independent setting, check that we are back to Lao output as expected for the textarea
-    eventDriver = new KMWRecorder.BrowserDriver(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    eventDriver = new KMWRecorder.BrowserDriver(textarea);
     eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(textarea);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not properly clear control's independent keyboard settings!");
   });
 });
 
-Modernizr.on('touchevents', function(result) {
-  if(result) {
-    describe('Device-specific Attachment Checks (Touch, \'auto\')', function() {
 
-      this.timeout(testconfig.timeouts.standard);
+describe('Attachment Checks (Desktop, \'auto\')', function() {
 
-      before(function() {
-        this.timeout(testconfig.timeouts.scriptLoad);
+  this.timeout(testconfig.timeouts.standard);
 
-        fixture.setBase('fixtures');
-        return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
-      });
+  before(function() {
+    this.timeout(testconfig.timeouts.scriptLoad);
 
-      beforeEach(function() {
-        fixture.load("robustAttachment.html");
-      });
+    fixture.setBase('fixtures');
+    return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
+  });
 
-      after(function() {
-        teardownKMW();
-      });
+  beforeEach(function() {
+    fixture.load("robustAttachment.html");
+  });
 
-      afterEach(function(done) {
-        fixture.cleanup();
-        window.setTimeout(function(){
+  after(function() {
+    teardownKMW();
+  });
+
+  afterEach(function(done) {
+    fixture.cleanup();
+    window.setTimeout(function(){
+      done();
+    }, testconfig.timeouts.eventDelay);
+  })
+
+  describe('Element Type', function() {
+    it('<input>', function(done) {
+      var ID = DynamicElements.addInput();
+      var ele = document.getElementById(ID);
+
+      DynamicElements.assertAttached(ele, done);
+    });
+
+    it('<textarea>', function(done) {
+      var ID = DynamicElements.addText();
+      var ele = document.getElementById(ID);
+
+      DynamicElements.assertAttached(ele, done);
+    });
+
+    it.skip('<iframe>', function(done) {
+      this.timeout(testconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
+
+      var ID = DynamicElements.addIFrame(function() {
+        var ele = document.getElementById(ID);
+        var innerEle = ele.contentDocument.getElementById('iframe_input');
+
+        // No need to track data on the iframe itself.
+        assert.isFalse(keyman.isAttached(ele));
+        assert.isNotNull(innerEle);
+        assert.isTrue(keyman.isAttached(innerEle));
+        keyman.detachFromControl(ele);
+
+        window.setTimeout(function() {
           done();
         }, testconfig.timeouts.eventDelay);
       });
-
-      describe('Element Type', function() {
-        it('<input>', function(done) {
-          var ID = DynamicElements.addInput();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-
-        it('<textarea>', function(done) {
-          var ID = DynamicElements.addText();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-
-        it.skip('<iframe>', function(done) {
-          this.timeout(testconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
-
-          var ID = DynamicElements.addIFrame(function() {
-            var ele = document.getElementById(ID);
-            var innerEle = ele.contentDocument.getElementById('iframe_input');
-
-            assert.isFalse(keyman.isAttached(ele));
-            assert.isNotNull(innerEle);
-            assert.isFalse(keyman.isAttached(innerEle));
-
-            window.setTimeout(function() {
-              done();
-            }, testconfig.timeouts.eventDelay);
-          });
-        });
-
-        it('contentEditable=true', function(done) {
-          var ID = DynamicElements.addEditable();
-          var ele = document.getElementById(ID);
-
-          assert.isFalse(keyman.isAttached(ele));
-          done();
-        });
-      });
-    });
-  } else {
-    describe('Device-specific Attachment Checks (Desktop, \'auto\')', function() {
-
-      this.timeout(testconfig.timeouts.standard);
-
-      before(function() {
-        this.timeout(testconfig.timeouts.scriptLoad);
-
-        fixture.setBase('fixtures');
-        return setupKMW({ attachType:'auto' }, testconfig.timeouts.scriptLoad);
-      });
-
-      beforeEach(function() {
-        fixture.load("robustAttachment.html");
-      });
-
-      after(function() {
-        teardownKMW();
-      });
-
-      afterEach(function(done) {
-        fixture.cleanup();
-        window.setTimeout(function(){
-          done();
-        }, testconfig.timeouts.eventDelay);
-      })
-
-      describe('Element Type', function() {
-        it('<input>', function(done) {
-          var ID = DynamicElements.addInput();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-
-        it('<textarea>', function(done) {
-          var ID = DynamicElements.addText();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-
-        it.skip('<iframe>', function(done) {
-          this.timeout(testconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
-
-          var ID = DynamicElements.addIFrame(function() {
-            var ele = document.getElementById(ID);
-            var innerEle = ele.contentDocument.getElementById('iframe_input');
-
-            // No need to track data on the iframe itself.
-            assert.isFalse(keyman.isAttached(ele));
-            assert.isNotNull(innerEle);
-            assert.isTrue(keyman.isAttached(innerEle));
-            keyman.detachFromControl(ele);
-
-            window.setTimeout(function() {
-              done();
-            }, testconfig.timeouts.eventDelay);
-          });
-        });
-
-        it('contentEditable=true', function(done) {
-          var ID = DynamicElements.addEditable();
-          var ele = document.getElementById(ID);
-
-          DynamicElements.assertAttached(ele, done);
-        });
-      });
     });
 
-  }
+    // If we were to set up a design-mode iframe test, that one would need to be conditioned on
+    // whether or not we were on a touch-device, at least as of this time. (#7343)
+
+    it('contentEditable=true', function(done) {
+      var ID = DynamicElements.addEditable();
+      var ele = document.getElementById(ID);
+
+      DynamicElements.assertAttached(ele, done);
+    });
+  });
 });

@@ -54,9 +54,8 @@ namespace com.keyman {
     _MasterDocument = null;    // Document with controller (to allow iframes to distinguish local/master control)
     _HotKeys = [];             // Array of document-level hotkey objects
     warned = false;            // Warning flag (to prevent multiple warnings)
-    baseFont = 'sans-serif';   // Default font for mapped input elements
-    appliedFont = '';          // Chain of fonts to be applied to mapped input elements
-    fontCheckTimer = null;     // Timer for testing loading of embedded fonts
+    baseFont = 'sans-serif';   // Default page font (utilized by the OSK)
+    appliedFont = '';          // Chain of fonts to be applied to OSK elements
     srcPath = '';              // Path to folder containing executing keymanweb script
     rootPath = '';             // Path to server root
     protocol = '';             // Protocol used for the KMW script.
@@ -110,12 +109,17 @@ namespace com.keyman {
     // Stub functions (defined later in code only if required)
     setDefaultDeviceOptions(opt: OptionType){}
     getStyleSheetPath(s){return s;}
+    linkStylesheetResources(){}
     getKeyboardPath(f, p?){return f;}
     KC_(n, ln, Pelem){return '';}
     handleRotationEvents(){}
-    // Will serve as an API function for a workaround, in case of future touch-alignment issues.
+    /**
+     * Legacy API function for touch-alias issue workarounds
+     * Touch-aliases have been eliminated, though.
+     *
+     * This function is deprecated in 16.0, with plans for removal in 17.0.
+     */
     ['alignInputs'](eleList?: HTMLElement[]){}
-    hideInputs() {};
     namespaceID(Pstub) {};
     preserveID(Pk) {};
 
@@ -227,17 +231,6 @@ namespace com.keyman {
       }
 
       return metadata;
-    }
-
-    /**
-     * Expose font testing to allow checking that SpecialOSK or custom font has
-     * been correctly loaded by browser
-     *
-     *  @param  {string}  fName   font-family name
-     *  @return {boolean}         true if available
-     **/
-    ['isFontAvailable'](fName: string): boolean {
-      return this.util.checkFont({'family':fName});
     }
 
     /**
@@ -420,6 +413,15 @@ namespace com.keyman {
     ['isChiral'](k0?) {
       var kbd: keyboards.Keyboard;
       if(k0) {
+        if(typeof k0 == 'string') {
+          const kbdObj = this.keyboardManager.keyboards.find((kbd) => kbd['KI'] == k0);
+          if(!kbdObj) {
+            throw new Error(`Keyboard '${k0}' has not been loaded.`);
+          } else {
+            k0 = kbdObj;
+          }
+        }
+
         kbd = new keyboards.Keyboard(k0);
       } else {
         kbd = this.core.activeKeyboard;

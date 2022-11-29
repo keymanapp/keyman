@@ -615,7 +615,6 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
 
   BeginLine[BeginMode] = currentLine;
 
-
   if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
 
   if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) {
@@ -683,7 +682,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     break;	// The line has already been processed
 
   case T_BEGIN:
-    // after a begin can be "Unicode" or "ANSI" or nothing (=ANSI)
+    // after a begin can be "Unicode", "ANSI", "NewContext", "PostKeystroke", or nothing (=ANSI)
     if ((msg = ProcessBeginLine(fk, p)) != CERR_None) return msg;
     break;
 

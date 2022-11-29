@@ -10,7 +10,9 @@ let zip = JSZip();
 
 export default class KmpCompiler {
 
-  public transformKpsToKmpObject(kpsString: string): KmpJsonFile {
+  private kpsFilename: string;
+
+  public transformKpsToKmpObject(kpsString: string, kpsFilename: string): KmpJsonFile {
 
     // Load the KPS data from XML as JS structured data.
 
@@ -25,6 +27,8 @@ export default class KmpCompiler {
     })();
 
     let kps: KpsFile = kpsPackage.package;
+
+    this.kpsFilename = kpsFilename;
 
     //
     // To convert to kmp.json, we need to:
@@ -136,15 +140,19 @@ export default class KmpCompiler {
       kmpJsonData.files = [];
     }
 
+    const kpsPath = path.dirname(this.kpsFilename);
+
     kmpJsonData.files.forEach(function(value) {
       // Make file path slashes compatible across platforms
-      let filename : string = value.name.replace(/\\/g, "/");
+      const filename = value.name.replace(/\\/g, "/");
+      const fullFilename = path.resolve(kpsPath, filename);
+      const baseFilename = path.basename(filename);
 
-      let data = fs.readFileSync(path.join('../source', filename), 'utf8');
-      zip.file(path.basename(filename), data);
+      const data = fs.readFileSync(fullFilename, 'utf8');
+      zip.file(baseFilename, data);
 
       // Remove path data from files before save
-      value.name = path.basename(filename);
+      value.name = baseFilename;
     });
 
     zip.file(kmpJsonFileName, JSON.stringify(kmpJsonData, null, 2));

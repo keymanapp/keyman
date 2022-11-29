@@ -59,18 +59,20 @@ public class PackageActivity extends AppCompatActivity implements
 
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
-    if (bundle != null) {
-      kmpFile = new File(bundle.getString("kmpFile"));
-      if (!kmpFile.exists()) {
-        KMLog.LogError(TAG, kmpFile.getAbsolutePath() + " not found. Unable to extract");
-        showErrorToast(context, getString(R.string.failed_to_extract));
-        return;
-      }
-      installMode = KmpInstallMode.fromString(bundle.getString("installMode"));
-      languageID = bundle.getString("language", null);
-      if (languageID != null && !languageID.isEmpty()) {
-        languageList.add(languageID);
-      }
+    if (bundle == null) {
+      showErrorToast("No bundle for PackageActivity");
+      return;
+    }
+
+    kmpFile = new File(bundle.getString("kmpFile"));
+    if (!kmpFile.exists()) {
+      showErrorToast(kmpFile.getAbsolutePath() + " not found. Unable to extract");
+      return;
+    }
+    installMode = KmpInstallMode.fromString(bundle.getString("installMode"));
+    languageID = bundle.getString("language", null);
+    if (languageID != null && !languageID.isEmpty()) {
+      languageList.add(languageID);
     }
 
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
@@ -82,27 +84,26 @@ public class PackageActivity extends AppCompatActivity implements
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
       } else if (!pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
-        showErrorToast(context, getString(R.string.no_targets_to_install));
+        showErrorToast(getString(R.string.no_targets_to_install));
         return;
       }
       tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
 
     } catch (Exception e) {
-      KMLog.LogException(TAG, "", e);
-      showErrorToast(context, getString(R.string.failed_to_extract));
+      showErrorToast(getString(R.string.failed_to_extract), e);
       return;
     }
 
     JSONObject pkgInfo = kmpProcessor.loadPackageInfo(tempPackagePath);
     if (pkgInfo == null) {
-      showErrorToast(context, getString(R.string.invalid_metadata));
+      showErrorToast(getString(R.string.invalid_metadata));
       return;
     }
 
     // Check minimum keyboard version to ensure current version of Keyman supports the features
     String pkgMinimumKeyboardVersion = kmpProcessor.getPackageMinimumKeyboardVersion(pkgInfo);
     if (FileUtils.compareVersions(pkgMinimumKeyboardVersion, KMManager.getMajorVersion()) == FileUtils.VERSION_GREATER) {
-      showErrorToast(context, getString(R.string.minimum_keyboard_version_not_supported));
+      showErrorToast(getString(R.string.minimum_keyboard_version_not_supported));
       return;
     }
 
@@ -116,9 +117,9 @@ public class PackageActivity extends AppCompatActivity implements
     // Sanity check for keyboard packages
     if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
       if (keyboardCount == 0) {
-        showErrorToast(context, getString(R.string.no_new_touch_keyboards_to_install));
+        showErrorToast(getString(R.string.no_new_touch_keyboards_to_install));
       } else if (languageCount == 0) {
-        showErrorToast(context, getString(R.string.no_associated_languages));
+        showErrorToast(getString(R.string.no_associated_languages));
       }
     }
 
@@ -230,13 +231,21 @@ public class PackageActivity extends AppCompatActivity implements
   public void onLanguagesSelected(ArrayList<Keyboard> addKeyboardsList) {
   }
 
-  private void showErrorToast(Context context, String message) {
-    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+  private void showErrorToast(String message, Exception e) {
+    if (e != null) {
+      KMLog.LogException(TAG, message, e);
+    } else {
+      KMLog.LogError(TAG, message);
+    }
     // Setting result to 1 so calling activity will finish too
     setResult(1);
     cleanup();
     finish();
     MainActivity.cleanupPackageInstall();
+  }
+
+  private void showErrorToast(String message) {
+    showErrorToast(message, null);
   }
 
   /**
@@ -282,7 +291,7 @@ public class PackageActivity extends AppCompatActivity implements
             cleanup();
         } else {
           // Use Toast so it will linger when PackageActivity finishes
-          showErrorToast(context, getString(R.string.no_new_touch_keyboards_to_install));
+          showErrorToast(getString(R.string.no_new_touch_keyboards_to_install));
         }
       } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         List<Map<String, String>> installedLexicalModels =
@@ -305,7 +314,7 @@ public class PackageActivity extends AppCompatActivity implements
             cleanup();
         } else {
           // Use Toast so it will linger when PackageActivity finishes
-          showErrorToast(context, getString(R.string.no_new_predictive_text_to_install));
+          showErrorToast(getString(R.string.no_new_predictive_text_to_install));
         }
       }
 
@@ -313,9 +322,9 @@ public class PackageActivity extends AppCompatActivity implements
         finish();
       }
     } catch (Exception e) {
-      KMLog.LogException(TAG, "", e);
       // Use Toast so it will linger when PackageActivity finishes
-      showErrorToast(context, getString(R.string.no_targets_to_install));
+      String msg = getString(R.string.no_targets_to_install);
+      KMLog.LogException(TAG, msg, e);
     }
   }
 

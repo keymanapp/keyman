@@ -28,27 +28,14 @@ namespace com.keyman.dom {
     let code = DefaultOutput.codeForEvent(Lkc);
     let domManager = com.keyman.singleton.domManager;
 
-    let hideCaret: () => void;
-    if(outputTarget instanceof com.keyman.dom.targets.TouchAlias) {
-      hideCaret = function() {
-        let target = outputTarget as com.keyman.dom.targets.TouchAlias;
-        target.root.hideCaret();
-      }
-    } else {
-      hideCaret = function() {};
-    }
-
     switch(code) {
       case Codes.keyCodes['K_TAB']:
-        hideCaret();
         domManager.moveToNext((Lkc.Lmodifiers & text.Codes.modifierCodes['SHIFT']) != 0);
         break;
       case Codes.keyCodes['K_TABBACK']:
-        hideCaret();
         domManager.moveToNext(true);
         break;
       case Codes.keyCodes['K_TABFWD']:
-        hideCaret();
         domManager.moveToNext(false);
         break;
     }

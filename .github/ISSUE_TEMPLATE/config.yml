@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Keyman Community Support
+    url: https://community.software.sil.org/c/keyman
+    about: Please ask Keyman support questions here.
+  - name: Keyman Security Reports
+    url: mailto:security@keyman.com
+    about: Please report security vulnerabilities here.

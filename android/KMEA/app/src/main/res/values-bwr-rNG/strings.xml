@@ -44,6 +44,8 @@
     <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Jakǝngkǝr su na bǝlin</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Aɗa tsoktǝ kǝɓa ka sava ar Keyman wa!</string>
     <!-- Context: Keyboard Updates -->
@@ -125,8 +127,12 @@
     <string name="uninstall_model" comment="Label to uninstall a dictionary">Kǝlɓǝla dictionary</string>
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Ga ata bara kara cijimta dictionary ngǝni ya?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s keyboard ku hara instal</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Vu ka tsa namtǝdzi</string>
     <!-- Context: Language Settings menu strings -->
@@ -161,4 +167,6 @@
     <!-- Context: Shared preferences name -->
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Tsukwa vi ngǝni kamnyar pali keyboard ni</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>

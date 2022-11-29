@@ -14,6 +14,9 @@ mkdir -p "$THIS_DIR/host"
 cp -R "$KEYMAN_ROOT/android/KMEA/app/src/main/assets/"* "$THIS_DIR/host/"
 cp "$KEYMAN_ROOT/web/release/unminified/embedded/keyman.js" "$THIS_DIR/host/keymanandroid.js"
 cp "$KEYMAN_ROOT/web/release/unminified/embedded/keyman.js.map" "$THIS_DIR/host/keyman.js.map"
+cp "$KEYMAN_ROOT/web/release/unminified/embedded/resources/osk/kmwosk.css" "$THIS_DIR/host/kmwosk.css"
+cp "$KEYMAN_ROOT/web/release/unminified/embedded/resources/osk/globe-hint.css" "$THIS_DIR/host/globe-hint.css"
+cp "$KEYMAN_ROOT/web/release/unminified/embedded/resources/osk/keymanweb-osk.ttf" "$THIS_DIR/host/keymanweb-osk.ttf"
 
 # Test keyboards
 

@@ -18,6 +18,7 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
+import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
 import com.tavultesoft.kmea.util.MapCompat;
@@ -29,6 +30,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -321,8 +323,10 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   private static void setSelection(int position) {
-    listView.setItemChecked(position, true);
-    listView.setSelection(position);
+    if (listView != null) {
+      listView.setItemChecked(position, true);
+      listView.setSelection(position);
+    }
     selectedIndex = position;
   }
 
@@ -359,6 +363,17 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
       keyboardInfo.setNewKeyboard(true);
       KeyboardController.getInstance().add(keyboardInfo);
+      // Check if "other" keyboards of the same packageID and keyboardID also need to update version
+      // Don't use forEach because we might be updating entries
+      for (int i=0; i<KeyboardController.getInstance().get().size(); i++) {
+        Keyboard otherKeyboard = KeyboardController.getInstance().getKeyboardInfo(i);
+        if (otherKeyboard.getPackageID().equals(keyboardInfo.getPackageID())
+            && otherKeyboard.getKeyboardID().equals(keyboardInfo.getKeyboardID())
+            && !otherKeyboard.getLanguageID().equals(keyboardInfo.getLanguageID())) {
+          otherKeyboard.setVersion(keyboardInfo.getVersion());
+          KeyboardController.getInstance().set(i, otherKeyboard);
+        }
+      }
       result = KeyboardController.getInstance().save(context);
       if (!result) {
         KMLog.LogError(TAG, "addKeyboard failed to save");
@@ -541,17 +556,24 @@ public final class KeyboardPickerActivity extends BaseActivity {
         ComponentName componentName = ComponentName.unflattenFromString(id);
         if (componentName != null) {
           String packageName = componentName.getPackageName();
+          String imeName = "";
           try {
-            //PackageInfo info = packageManager.getPackageInfo(packageName, 0);
             ApplicationInfo info = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-            String imeName = (String)packageManager.getApplicationLabel(info);
+            imeName = (String)packageManager.getApplicationLabel(info);
+          } catch (PackageManager.NameNotFoundException e) {
+            // For Android 11+, this exception is thrown because we don't have QUERY_ALL_PACKAGES permission.
+            // We'll just display the package name instead.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+              KMLog.LogException(TAG, "Name not found", e);
+            }
+            imeName = packageName;
+          }
+
+          if (!imeName.isEmpty()) {
             HashMap<String, String> hashMap = new HashMap<String, String>();
             hashMap.put(titleKey, imeName);
             hashMap.put(subtitleKey, id);
             list.add(hashMap);
-
-          } catch (PackageManager.NameNotFoundException e) {
-            KMLog.LogException(TAG, "Name not found", e);
           }
         }
       }

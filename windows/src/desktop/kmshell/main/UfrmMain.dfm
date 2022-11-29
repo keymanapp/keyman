@@ -6,7 +6,7 @@ inherited frmMain: TfrmMain
   ClientHeight = 494
   ClientWidth = 846
   Constraints.MinHeight = 530
-  Constraints.MinWidth = 600
+  Constraints.MinWidth = 680
   OldCreateOrder = True
   Position = poScreenCenter
   OnClose = TntFormClose

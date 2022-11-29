@@ -7,7 +7,7 @@ describe('LMLayer', function () {
 
   describe('[[constructor]]', function () {
     it('should construct with a single argument', function () {
-      let lmLayer = new LMLayer(helpers.defaultCapabilities);
+      let lmLayer = new LMLayer(helpers.defaultCapabilities, null, true);
       assert.instanceOf(lmLayer, LMLayer);
       lmLayer.shutdown();
     });

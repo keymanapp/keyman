@@ -64,6 +64,7 @@ uses
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean; forward;   // I4706
 function KCSetCompilerOptions(const FInFile: string; FShouldAddCompilerVersion: Boolean): Boolean; forward;
 //function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall; forward;
+procedure FixupPathSlashes(var path: string); forward;
 
 procedure Run;
 var
@@ -269,6 +270,14 @@ begin
   try
     if not FSilent then writeln('');
 
+    FixupPathSlashes(FParamDebugFile);
+    FixupPathSlashes(FParamTarget);
+    FixupPathSlashes(FParamInfile);
+    FixupPathSlashes(FParamOutfile);
+    FixupPathSlashes(FParamInfile2);
+    FixupPathSlashes(FInstallerMSI);
+    FixupPathSlashes(FJsonSchemaPath);
+
     if FParamDebugfile <> '' then
     begin
       hOutfile := CreateFile(PChar(FParamDebugfile), GENERIC_WRITE, 0, nil, CREATE_ALWAYS, 0, 0);
@@ -347,6 +356,10 @@ begin
   	else TProjectLogConsole.Instance.Log(plsFailure, FInFile, 'Keyboard '+FInFile+' could not be compiled.', 0, 0);
 end;
 
+procedure FixupPathSlashes(var path: string);
+begin
+  path := path.Replace('/', '\', [rfReplaceAll]);
+end;
 
 
 end.
