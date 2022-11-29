@@ -1,10 +1,10 @@
 #
 # Keyman is copyright (C) SIL International. MIT License.
 #
-# Cross platform build script to compile kmcompx and tests
+# Cross platform build script to compile kmcmplib and tests
 #
 
-project('kmcompx', 'cpp', 'c',
+project('kmcmplib', 'cpp', 'c',
         version: run_command(find_program('getversion.bat', 'getversion.sh')).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
@@ -25,7 +25,7 @@ message('compiler.get_id(): ' + compiler.get_id())
 
 cc = meson.get_compiler('c')
 
-defns=["-DUSE_CHAR16_T"]
+defns=['-DUSE_CHAR16_T']
 
 # subdir('doc')
 subdir('include')
