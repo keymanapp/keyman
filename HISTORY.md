@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 16.0.115 beta 2022-11-29
+
+* fix(windows): Cleanup CEF more correctly in shutdown (#7825)
+* fix(windows): lower case filenames for projects (#7836)
+* chore(linux): Update debian changelog (#7835)
+* chore(linux): Fix upload-to-debian script (#7833)
+
 ## 16.0.114 beta 2022-11-28
 
 * fix(mac): Caps processing was not consistent with core (#7795)
