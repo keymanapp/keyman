@@ -9,7 +9,7 @@ tests_flags = []
 # We'll use the test kmx files from Core for now
 input_path = join_paths(
   meson.current_source_dir(),
-  '../../../core/tests/unit/kmx'
+  '../../../../core/tests/unit/kmx'
 )
 output_path = meson.current_build_dir()
 

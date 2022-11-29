@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
     FILE* fp1 = fopen(kmx_file, "rb");
     char fname[260];
     strcpy(fname, kmx_file);
+    kmx_file[strlen(kmx_file)-1] = 'x'; // .kmn->.kmx
 
     FILE* fp2 = fopen(fname, "rb");
     if (!fp2) return 0; //assume pass if no reference kmx file

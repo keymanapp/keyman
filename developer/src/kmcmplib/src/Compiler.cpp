@@ -238,7 +238,7 @@ KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved
 }
 
 
-PKMX_WCHAR strtowstr(PKMX_STR in) 
+PKMX_WCHAR strtowstr(PKMX_STR in)
 {
   PKMX_WCHAR result;
 
@@ -249,7 +249,7 @@ PKMX_WCHAR strtowstr(PKMX_STR in)
   return result;
 }
 
-PKMX_STR wstrtostr(PKMX_WCHAR in) 
+PKMX_STR wstrtostr(PKMX_WCHAR in)
 {
   PKMX_STR result;
 
@@ -285,6 +285,13 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg)
   if (msg & CERR_ERROR)
     nErrors++;
   szTextp = GetCompilerErrorString(msg);
+
+  if (szTextp) {
+    strcpy(szText, szTextp);
+  }
+  else {
+    sprintf(szText, "Unknown error %x", msg);
+  }
 
   if (ErrChr > 0)
     sprintf(strchr(szText, 0), "  character offset:%d", ErrChr);
@@ -444,7 +451,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PKMX_STR pszIn
   nErrors = 0;
 
   fp_in = fopen(pszInfile,"rb");
- 
+
   if (fp_in == NULL) SetError(CERR_InfileNotExist);
 
   // Transfer the file to a memory stream for processing UTF-8 or ANSI to UTF-16?
@@ -3534,14 +3541,14 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
   //fp = fopen( ( const PKMX_CHAR) szNewName, "rb");
 #endif
 
-  
-  
+
+
   if ( fp == NULL)
   {
-    // else if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp ! 
+    // else if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp !
     if ( u16cmp(szNewName+u16len(szNewName)-4, u".bmp") )
       u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
-        
+
     #if defined(_WIN32) || defined(_WIN64)
       fp = _wfsopen((const KMX_WCHART*)szNewName, L"rb", _SH_DENYWR);
     #else
@@ -3708,7 +3715,7 @@ void RecordDeadkeyNames(PFILE_KEYBOARD fk)
   KMX_DWORD i;
   for (i = 0; i < fk->cxDeadKeyArray; i++)
   {
-    u16sprintf(buf, _countof(buf), L"%s%d %s", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i, u16fmt(fk->dpDeadKeyArray[i].szName).c_str());  // I3481 
+    u16sprintf(buf, _countof(buf), L"%s%d %s", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i, u16fmt(fk->dpDeadKeyArray[i].szName).c_str());  // I3481
     AddDebugStore(fk, buf);
   }
 }
@@ -3778,7 +3785,7 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
       // No preamble, so we attempt to read as strict UTF-8 and fall back to ANSI if that fails
       ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
       if (cr == sourceIllegal) {
-        // Not a valid UTF-8 file, so fall back to ANSI      
+        // Not a valid UTF-8 file, so fall back to ANSI
         // AddCompileMessage(CHINT_NonUnicodeFile);
         // note, while this message is defined, for now we will not emit it
         // because we don't support HINT/INFO messages yet and we don't want
