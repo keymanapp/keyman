@@ -141,7 +141,8 @@ compile ( ) {
   $compilecmd -b src/$COMPILE_TARGET -v
 
   # Handle any 'bundled' compilations, too!
-  if [ -f "$BUNDLE_CONFIG" ]; then
+  # `if`'s working dir:  web/src/engine; $compilecmd's: web/
+  if [ -f "../../$BUNDLE_CONFIG" ]; then
     $compilecmd -b $BUNDLE_CONFIG -v
   fi
 
