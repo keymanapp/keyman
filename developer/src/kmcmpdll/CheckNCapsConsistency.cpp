@@ -33,7 +33,7 @@
  *
  * @param fk     Keyboard to check
  */
-bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
+BOOL CheckNCapsConsistency(PFILE_KEYBOARD fk) {
   struct CapsUsage {
     int ncaps_line, caps_line, neither_line;
   };
@@ -46,17 +46,17 @@ bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
   memset(caps_ncaps_usage, 0, nkeys * sizeof(CapsUsage));
 
   PFILE_GROUP gp;
-  KMX_DWORD gn;
+  DWORD gn;
   for (gn = 0, gp = fk->dpGroupArray; gn < fk->cxGroupArray; gn++, gp++) {
     if (!gp->fUsingKeys) {
       continue;
     }
 
     PFILE_KEY kp;
-    KMX_DWORD kn;
+    DWORD kn;
     for (kn = 0, kp = gp->dpKeyArray; kn < gp->cxKeyArray; kn++, kp++) {
-      KMX_UINT key;
-      KMX_UINT shift;
+      UINT key;
+      UINT shift;
       if (kp->ShiftFlags & ISVIRTUALKEY) {
         if (kp->Key >= nkeys) {
           assert(false);

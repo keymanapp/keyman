@@ -1,5 +1,6 @@
 #pragma once
 
+#include <windows.h>
 #include <Compfile.h>
 
-bool CheckNCapsConsistency(PFILE_KEYBOARD fk);
+BOOL CheckNCapsConsistency(PFILE_KEYBOARD fk);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h>
 #include <Compfile.h>
 
 #define VERIFY_KEYBOARD_VERSION(fk, ver, err) { \
@@ -7,5 +8,5 @@
     return (err); \
 }
 
-KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk);
-KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver);
+BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk);
+BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, DWORD ver);

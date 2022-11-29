@@ -20,6 +20,8 @@
 #ifndef _COMPFILE_H
 #define _COMPFILE_H
 
+#include "../../../common/windows/cpp/include/legacy_kmx_file.h"
+
 #define LINESIZE 8192
 #define GLOBAL_BUFSIZE  4096
 
@@ -68,104 +70,106 @@
 enum FileStoreType { FST_STORE, FST_OPTION, FST_RESERVED };
 
 struct FILE_STORE {
-	KMX_DWORD dwSystemID;
-	KMX_WCHAR szName[SZMAX_STORENAME];	// the name of the store
-	PKMX_WCHAR dpString;	    				// from start of store structure
-	//FileStoreType fstType;
-	KMX_BOOL fIsStore;
-	KMX_BOOL fIsReserved;
-	KMX_BOOL fIsOption;
-	KMX_BOOL fIsDebug;
-	KMX_BOOL fIsCall;
-	int line;
+	DWORD dwSystemID;
+	WCHAR szName[SZMAX_STORENAME];	// the name of the store
+	PWSTR dpString;	    				// from start of store structure
+  //FileStoreType fstType;
+  BOOL fIsStore;
+  BOOL fIsReserved;
+  BOOL fIsOption;
+  BOOL fIsDebug;
+  BOOL fIsCall;
+  int line; // TODO: int vs dword, line vs Line (see FILE_KEY, FILE_GROUP)
 	};
 
-typedef FILE_STORE * PFILE_STORE;
-
+typedef FILE_STORE *PFILE_STORE;
 
 struct FILE_KEY {
-	KMX_WCHAR   Key;            // WCHAR for consistency; only a byte used however
-	KMX_DWORD   Line;
-	KMX_DWORD   ShiftFlags;
-	PKMX_WCHAR  dpOutput;		// from start of key structure
-	PKMX_WCHAR  dpContext;		// from start of key structure
+	WCHAR   Key;            // WCHAR for consistency; only a byte used however
+	DWORD   Line;
+	DWORD   ShiftFlags;
+	PWSTR  dpOutput;		// from start of key structure
+	PWSTR  dpContext;		// from start of key structure
 	};
+
 typedef FILE_KEY *PFILE_KEY;
 
-
 struct FILE_GROUP {
-	KMX_WCHAR		szName[SZMAX_GROUPNAME];
+	WCHAR		szName[SZMAX_GROUPNAME];
 	PFILE_KEY	dpKeyArray;         // address of first item in key array, from start of group structure
-	PKMX_WCHAR      dpMatch;             // from start of group structure
-	PKMX_WCHAR      dpNoMatch;           // from start of group structure
-	KMX_DWORD cxKeyArray;               // in array items
-	KMX_BOOL  fUsingKeys;               // group(xx) [using keys] <-- specified or not
-	KMX_BOOL  fReadOnly;                // group(xx) [readonly] <-- specified or not
-    KMX_DWORD Line;
-	};
+	PWSTR      dpMatch;             // from start of group structure
+	PWSTR      dpNoMatch;           // from start of group structure
+	DWORD cxKeyArray;               // in array items
+	BOOL  fUsingKeys;               // group(xx) [using keys] <-- specified or not
+  BOOL  fReadOnly;                // group(xx) [readonly] <-- specified or not
+  DWORD Line;
+};
+
 typedef FILE_GROUP *PFILE_GROUP;
 
 struct FILE_DEADKEY
 {
-	KMX_WCHAR szName[SZMAX_DEADKEYNAME];
+	WCHAR szName[SZMAX_DEADKEYNAME];
 };
+
 typedef FILE_DEADKEY *PFILE_DEADKEY;
 
 struct FILE_VKDICTIONARY
 {
-	KMX_WCHAR szName[SZMAX_VKDICTIONARYNAME];
+  WCHAR szName[SZMAX_VKDICTIONARYNAME];
 };
+
 typedef FILE_VKDICTIONARY *PFILE_VKDICTIONARY;
 
 struct FILE_KEYBOARD {
-	KMX_DWORD KeyboardID;			// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+	DWORD KeyboardID;			// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
 
-	KMX_DWORD version;				// keyboard file version with VERSION keyword
+	DWORD version;				// keyboard file version with VERSION keyword
 
 	PFILE_STORE dpStoreArray;	// address of first item in store array, from start of store structure
 	PFILE_GROUP dpGroupArray;	// address of first item in group array, from start of group structure
 
-	KMX_DWORD cxStoreArray;			// in number of items
-	KMX_DWORD cxGroupArray;			// in number of items
-	KMX_DWORD StartGroup[2];		// index of starting groups [ANSI=0, Unicode=1]
+	DWORD cxStoreArray;			// in number of items
+	DWORD cxGroupArray;			// in number of items
+	DWORD StartGroup[2];		// index of starting groups [ANSI=0, Unicode=1]
 
-	KMX_DWORD dwHotKey;				// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+	DWORD dwHotKey;				// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 
-	KMX_WCHAR szName[SZMAX_KEYBOARDNAME];			// Keyboard layout name
-	KMX_WCHAR szLanguageName[SZMAX_LANGUAGENAME];	// Language name
-	KMX_WCHAR szCopyright[SZMAX_COPYRIGHT];			// Copyright information
-	KMX_WCHAR szMessage[SZMAX_MESSAGE];				// General information about the keyboard
-	PKMX_BYTE lpBitmap;
-	KMX_DWORD dwBitmapSize;
-	KMX_DWORD dwFlags;					// Flags for the keyboard file
+	WCHAR szName[SZMAX_KEYBOARDNAME];			// Keyboard layout name
+	WCHAR szLanguageName[SZMAX_LANGUAGENAME];	// Language name
+	WCHAR szCopyright[SZMAX_COPYRIGHT];			// Copyright information
+	WCHAR szMessage[SZMAX_MESSAGE];				// General information about the keyboard
+	PBYTE lpBitmap;
+	DWORD dwBitmapSize;
+	DWORD dwFlags;					// Flags for the keyboard file
 
-	KMX_DWORD currentGroup;				// temp - current processing group
-	KMX_DWORD currentStore;				// temp - current processing store
-	KMX_DWORD cxDeadKeyArray;
+	DWORD currentGroup;				// temp - current processing group
+	DWORD currentStore;				// temp - current processing store
+	DWORD cxDeadKeyArray;
 	PFILE_DEADKEY dpDeadKeyArray;	// temp - dead key array
-	KMX_DWORD cxVKDictionary;
-	PFILE_VKDICTIONARY dpVKDictionary; // temp - virtual key dictionary
+  DWORD cxVKDictionary;
+  PFILE_VKDICTIONARY dpVKDictionary; // temp - virtual key dictionary
 	};
 
 typedef FILE_KEYBOARD *PFILE_KEYBOARD;
 
 /*
-These size values are used in unit tests to ensure
-that the structure sizes correspond precisely across
-compilers (pas and c++).
+  These size values are used in unit tests to ensure
+  that the structure sizes correspond precisely across
+  compilers (pas and c++).
 */
 
-const KMX_DWORD sz_FILE_STORE = sizeof(FILE_STORE);
-const KMX_DWORD sz_FILE_KEY = sizeof(FILE_KEY);
-const KMX_DWORD sz_FILE_GROUP = sizeof(FILE_GROUP);
-const KMX_DWORD sz_FILE_DEADKEY = sizeof(FILE_DEADKEY);
-const KMX_DWORD sz_FILE_VKDICTIONARY = sizeof(FILE_VKDICTIONARY);
-const KMX_DWORD sz_FILE_KEYBOARD = sizeof(FILE_KEYBOARD);
+const DWORD sz_FILE_STORE = sizeof(FILE_STORE);
+const DWORD sz_FILE_KEY = sizeof(FILE_KEY);
+const DWORD sz_FILE_GROUP = sizeof(FILE_GROUP);
+const DWORD sz_FILE_DEADKEY = sizeof(FILE_DEADKEY);
+const DWORD sz_FILE_VKDICTIONARY = sizeof(FILE_VKDICTIONARY);
+const DWORD sz_FILE_KEYBOARD = sizeof(FILE_KEYBOARD);
 
 struct COMPMSG {
-	KMX_CHAR szText[SZMAX_ERRORTEXT];
-	KMX_DWORD Line;
-	KMX_DWORD dwMsgCode;
+	char szText[SZMAX_ERRORTEXT];
+	DWORD Line;
+	DWORD dwMsgCode;
 	};
 
 typedef COMPMSG *PCOMPMSG;
@@ -176,10 +180,10 @@ struct COMPILEMESSAGES {
 
 	PCOMPMSG cm;
 
-	KMX_DWORD fatalCode;
-	KMX_CHAR szFatalText[SZMAX_ERRORTEXT];
+	DWORD fatalCode;
+	char szFatalText[SZMAX_ERRORTEXT];
 
-	KMX_DWORD currentLine;
+	DWORD currentLine;
 	};
 
 typedef COMPILEMESSAGES *PCOMPILEMESSAGES;

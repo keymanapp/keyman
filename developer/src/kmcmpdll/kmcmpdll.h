@@ -1,9 +1,10 @@
 #pragma once
 
-#include <compfile.h>
+#include <windows.h>
+#include "compfile.h"
 
-KMX_BOOL AddCompileString(LPSTR buf);
-KMX_BOOL AddCompileMessage(KMX_DWORD msg);
+BOOL AddCompileString(LPSTR buf);
+BOOL AddCompileMessage(DWORD msg);
 
 // TODO: These macros can return FALSE in functions that expect a DWORD CERR_x
 //       return value type. This is just plain wrong!
@@ -12,7 +13,8 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg);
 
 extern BOOL FWarnDeprecatedCode;
 extern int currentLine;
+extern char ErrExtra[];
 
 
-PKMX_WCHAR strtowstr(PKMX_STR in);
-PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID);
+PWSTR strtowstr(PSTR in);
+PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, DWORD dwSystemID);
