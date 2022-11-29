@@ -2,6 +2,7 @@
   "name": "@keymanapp/lm-worker",
   "description": "Keyman/Predictive Text worker",
   "main": "build/index.js",
+  "type": "module",
   "scripts": {
     "karma": "karma",
     "mocha": "mocha",
