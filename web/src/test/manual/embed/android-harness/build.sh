@@ -21,6 +21,10 @@ cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/kmwosk.css" "$THIS_DIR/host/kmwos
 cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/globe-hint.css" "$THIS_DIR/host/globe-hint.css"
 cp "$KEYMAN_ROOT/web/build/app/embed/debug/osk/keymanweb-osk.ttf" "$THIS_DIR/host/keymanweb-osk.ttf"
 
+# We shouldn't rely on a prior Android build for these files!  We can retrieve them separately.
+cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js" "$THIS_DIR/host/keyman-sentry.js"
+cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$THIS_DIR/host/es6-shim.min.js"
+
 # Test keyboards
 
 cp "$KEYMAN_ROOT/web/src/test/manual/web/web_context_tests.js" "$THIS_DIR/host/"
