@@ -181,7 +181,7 @@ namespace KMWRecorder {
       let _originalKeyDown = keyman.touchAliasing._KeyDown.bind(keyman.touchAliasing);
       keyman.touchAliasing._KeyDown = function(e) {
         let in_output = com.keyman.dom.Utils.getOutputTarget(recordingElement);
-        if(!in_output || com.keyman.dom.DOMEventHandlers.states.activeElement != in_output.getElement()) {
+        if(!in_output || keyman.domManager.activeElement != in_output.getElement()) {
           return _originalKeyDown(e);
         }
 
@@ -201,7 +201,7 @@ namespace KMWRecorder {
       var _originalModelKeyClick = com.keyman.osk.VisualKeyboard.prototype.modelKeyClick; //.bind(keyman.osk);
       com.keyman.osk.VisualKeyboard.prototype.modelKeyClick = function(e, touch) {
         let in_output = com.keyman.dom.Utils.getOutputTarget(recordingElement);
-        if(!in_output || com.keyman.dom.DOMEventHandlers.states.activeElement != in_output.getElement()) {
+        if(!in_output || keyman.domManager.activeElement != in_output.getElement()) {
           return _originalModelKeyClick.call(this, e, touch);
         }
 
