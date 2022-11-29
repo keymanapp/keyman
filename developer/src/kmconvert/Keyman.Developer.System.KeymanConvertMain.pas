@@ -84,6 +84,7 @@ begin
     kpt.Version := FParameters.Version;
     kpt.BCP47Tags := FParameters.BCP47Tags;
     kpt.Author := FParameters.Author;
+    kpt.IncludeIcon := True;
 
     FTargetFolder := ExtractFileDir(kpt.ProjectFilename);
     if DirectoryExists(FTargetFolder) then

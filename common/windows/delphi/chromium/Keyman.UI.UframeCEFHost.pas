@@ -584,7 +584,7 @@ procedure TframeCEFHost.cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
   const frame: ICefFrame; httpStatusCode: Integer);
 begin
   AssertCefThread;
-  PostMessage(FCallbackWnd, CEF_LOADEND, httpStatusCode, 0);
+  PostMessage(FCallbackWnd, CEF_LOADEND, WPARAM(httpStatusCode), 0);
 end;
 
 procedure TframeCEFHost.cefLoadingStateChange(Sender: TObject;

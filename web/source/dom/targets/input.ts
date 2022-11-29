@@ -155,7 +155,7 @@ namespace com.keyman.dom.targets {
     }
 
     static newlineHandler(inputEle: HTMLInputElement) {
-      // Can't occur for Mocks - just Input and TouchAlias types.
+      // Can't occur for Mocks - just Input types.
       if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
         inputEle.disabled=false;
         inputEle.form.submit();

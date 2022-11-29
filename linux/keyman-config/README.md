@@ -8,22 +8,29 @@ then you will need to:
 ```bash
 sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil \
     python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli \
-    python3-setuptools python3-pip python3-dbus ibus
+    python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl
 ```
 
-Either `python3-raven` or `python3-sentry-sdk` is required as well. To install it on Ubuntu 18.04 and earlier run:
-
-```bash
-sudo apt install python3-raven
-```
-
-On Ubuntu 20.04 and later:
+Either `python3-raven` or `python3-sentry-sdk` (>= 1.4) is required as well. On Ubuntu 22.04 and later run:
 
 ```bash
 sudo apt install python3-sentry-sdk
 ```
 
-(It's also possible to install it with pip: `pip3 install sentry-sdk`)
+To install it on Ubuntu 18.04 and earlier run:
+
+```bash
+sudo apt install python3-raven
+```
+
+For Ubuntu versions that don't provide `python3-raven` but instead provide
+`python3-sentry-sdk` in a too old version (i.e. Ubuntu 20.04):
+Install `python3-sentry-sdk` from `packages.sil.org`,
+or install it with pip:
+
+```bash
+pip3 install sentry-sdk
+```
 
 Run the script `./createkeymandirs.sh` to create the directories for these programs to
 install the packages to.
@@ -42,13 +49,13 @@ Running `km-config` requires a language tag mapping file
 `keyman_config/standards/lang_tags_map.py`. This file gets generated during a package
 build, and also when running `make`.
 
-### Installing manually from the repo
+## Installing manually from the repo
 
-`make && sudo make install` will install locally to `/usr/local`
+`make && sudo make install` will install locally to `/usr/local`.
 
-`python3 setup.py --help install` will give you more install options
+`pip3 help install` will give you more install options.
 
-You will need `sudo apt install python3-pip` to `make uninstall`
+To uninstall you can run `sudo make uninstall`.
 
 ## Things to run from the command line
 

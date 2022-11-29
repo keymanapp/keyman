@@ -20,92 +20,83 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-# Exit status on invalid usage.
-EX_USAGE=64
-
-LMLAYER_OUTPUT=build
-
-# Builds the top-level JavaScript file for use in browsers (the second stage of compilation)
-build-browser () {
-  npm run tsc -- -b ./browser.tsconfig.json || fail "Could not build top-level browser-targeted JavaScript file."
-}
-
-# Builds the top-level JavaScript file for use on Node (the second stage of compilation)
-build-headless () {
-  npm run tsc -- -b ./tsconfig.json || fail "Could not build top-level node-targeted JavaScript file."
-}
-
-# A nice, extensible method for -clean operations.  Add to this as necessary.
-clean ( ) {
-  if [ -d $LMLAYER_OUTPUT ]; then
-    rm -rf "$LMLAYER_OUTPUT" || fail "Failed to erase the prior build."
-  fi
-}
-
-display_usage ( ) {
-  echo "Usage: $0 [-clean] [-skip-package-install | -S] [-test | -tdd]"
-  echo "       $0 -help"
-  echo
-  echo "  -clean                 to erase pre-existing build products before a re-build"
-  echo "  -help                  displays this screen and exits"
-  echo "  -skip-package-install  (or -S) skips dependency updates"
-  echo "  -tdd                   skips dependency updates, builds, then runs unit tests only"
-  echo "  -test                  runs unit and integration tests after building"
-}
-
 ################################ Main script ################################
 
-run_tests=0
-fetch_deps=true
-unit_tests_only=0
+builder_check_color "$@"
 
-# Process command-line arguments
-while [[ $# -gt 0 ]] ; do
-  key="$1"
-  case $key in
-    -clean)
-      clean
-      ;;
-    -help|-h)
-      display_usage
-      exit
-      ;;
-    -skip-package-install|-S)
-      fetch_deps=false
-      ;;
-    -test)
-      run_tests=1
-      ;;
-    -tdd)
-      run_tests=1
-      fetch_deps=false
-      unit_tests_only=1
-      ;;
-    *)
-      echo "$0: invalid option: $key"
-      display_usage
-      exit $EX_USAGE
-  esac
-  shift # past the processed argument
-done
+# TODO: once these modules are builder-based, reference here too:
+#  "@../models/templates" \
+#  "@../models/types" \
+#  "@../models/wordbreakers"
 
-# Check if Node.JS/npm is installed.
-verify_npm_setup $fetch_deps
+builder_describe "Builds the lm-layer module" \
+  "@../web/keyman-version" \
+  "@../web/lm-worker" \
+  "clean" \
+  "configure" \
+  "build" \
+  "test" \
+  ":headless   A headless, Node-oriented version of the module useful for unit tests" \
+  ":browser    The standard version of the module for in-browser use" \
+  "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
 
-if $fetch_deps; then
-  # We need to build keyman-version and lm-worker with a script for now
-  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
-  "$KEYMAN_ROOT/common/web/lm-worker/build.sh" || fail "Could not build lm-worker"
+builder_describe_outputs \
+  configure:headless  /node_modules \
+  configure:browser   /node_modules \
+  build:headless      build/headless.js \
+  build:browser       build/index.js
+
+builder_parse "$@"
+
+### CONFIGURE ACTIONS
+
+if builder_start_action configure; then
+  verify_npm_setup
+  builder_finish_action success configure
 fi
 
-build-browser || fail "Browser-oriented compilation failed."
-build-headless || fail "Headless compilation failed."
-echo "Typescript compilation successful."
+### CLEAN ACTIONS
 
-if (( run_tests )); then
-  if (( unit_tests_only )); then
-    npm run test -- -headless || fail "Unit tests failed"
-  else
-    npm test || fail "Tests failed"
-  fi
+if builder_start_action clean; then
+  rm -rf build/
+  builder_finish_action success clean
+fi
+
+### BUILD ACTIONS
+
+# Builds the top-level JavaScript file for use in browsers
+if builder_start_action build:browser; then
+  npm run tsc -- -b ./browser.tsconfig.json
+
+  builder_finish_action success build:browser
+fi
+
+# Builds the top-level JavaScript file for use on Node
+if builder_start_action build:headless; then
+  npm run tsc -- -b ./tsconfig.json
+
+  builder_finish_action success build:headless
+fi
+
+### TEST ACTIONS
+# Note - the actual test setup is done in a separate test script, but it's easy
+# enough to route the calls through.
+
+TEST_OPTIONS=
+if builder_has_option --ci; then
+  TEST_OPTIONS=--ci
+fi
+
+if builder_start_action test:headless; then
+  # We'll test the included libraries here for now, at least until we have
+  # converted their builds to builder scripts
+  ./unit_tests/test.sh test:libraries test:headless $TEST_OPTIONS
+
+  builder_finish_action success test:headless
+fi
+
+if builder_start_action test:browser; then
+  ./unit_tests/test.sh test:browser $TEST_OPTIONS
+
+  builder_finish_action success test:browser
 fi

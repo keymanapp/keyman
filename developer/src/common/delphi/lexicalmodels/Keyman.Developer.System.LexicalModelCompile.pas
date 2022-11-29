@@ -13,6 +13,7 @@ implementation
 
 uses
   System.Classes,
+  System.RegularExpressions,
   System.SysUtils,
   compile,
   utilexecute;
@@ -23,6 +24,14 @@ var
   logtext, cmdline: string;
   ec: Integer;
   line: string;
+  messageLine: TRegEx;
+  m: TMatch;
+  state: TProjectLogState;
+  msgFilename: string;
+  msgText: string;
+  msgCode: Integer;
+  msgLine: Integer;
+  msgType: string;
 begin
   ec := 0;
   logtext := '';
@@ -40,13 +49,46 @@ begin
 
   Result := Result and (ec = 0);
 
+  // Format of messages emitted from kmlmc, see errors.ts:printLogs:
+  // '<file> (<line>): <type>: <errornum> <message>'
+  messageLine := TRegEx.Create('^(?:(.+) \((\d+)\): )?(Hint|Warning|Error|Fatal Error): ([a-fA-F0-9]+) (.+)$');
   s := TStringList.Create;
   try
     s.Text := logtext;
     for line in s do
     begin
-      // TODO: for errors and warnings
-      ProjectFile.Project.Log(plsInfo, infile, line, 0, 0);
+      m := messageLine.Match(line);
+      if m.Success then
+      begin
+        msgFilename := m.Groups[1].Value;
+        msgLine := StrToInt(m.Groups[2].Value);
+        msgType := m.Groups[3].Value;
+        msgCode := StrToInt('$'+m.Groups[4].Value);
+        msgText := m.Groups[5].Value;
+        if msgType = 'Hint' then
+          state := plsHint
+        else if msgType = 'Warning' then
+        begin
+          state := plsWarning;
+          if ProjectFile.Project.Options.CompilerWarningsAsErrors then
+            Result := False;
+        end
+        else if msgType = 'Error' then
+        begin
+          state := plsError;
+          Result := False;
+        end
+        else if msgType = 'Fatal Error' then
+        begin
+          state := plsFatal;
+          Result := False;
+        end
+        else
+          state := plsInfo;
+        ProjectFile.Project.Log(state, msgFilename, msgText, msgCode, msgLine);
+      end
+      else
+        ProjectFile.Project.Log(plsInfo, infile, line, 0, 0);
     end;
   finally
     s.Free;

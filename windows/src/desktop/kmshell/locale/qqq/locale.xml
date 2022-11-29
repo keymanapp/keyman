@@ -3,7 +3,7 @@
 <!ENTITY Name "Keyman">
 ]>
 <Locale>
-  
+
 <!--
 locale.dtd: Contains all localizable strings from Keyman Configuration XML files.
 
@@ -11,7 +11,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 -->
 
 <String Group="System" Type="PlainText" Id="S_LocaleAuthors" Version="7.1.266.0" Description="Name(s) of people who created this translation - i.e. your name">[!!Ķēɏmãŋ!!]</String>
-  
+
 <String Group="_Font" Type="PlainText" Id="SK_UIFontName" Version="7.0.230.0" Description="The standard font">Segoe UI</String>
 <String Group="_Font" Type="PlainText" Id="SK_UIFontSize" Version="7.0.230.0" Description="The standard font size">9</String>
 
@@ -44,7 +44,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="Formatted Messages" Type="FormatString" Id="SKBalloonClickToSelectKeyboard" Version="8.0.330.0" Description="Balloon that shows when Keyman Desktop icon is first shown during the tutorial">[!!Ċłīċķ ţħĭš ĭċơŋ ťō şȇŀȅćţ ȁ ƙěɏƅŏáŗď!!]</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKBalloonOSKClosed" Version="8.0.330.0" Description="Balloon that shows when OSK is closed">&Name;[!! ıś ŝťıĺĺ ŕūŉňīńġ.  Ċŀĩćķ ţħıŝ įĉőň ťơ űśē ŷōūř ļāņğųãğě ƙȇƴƃŏǻřđ ąť āŉɏ ŧĩmė!!]</String>
-  
+
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Configuration Dialog              -->
 <!-- - - - - - - - - - - - - - - - - - -->
@@ -60,7 +60,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_GettingStarted" Version="7.0.239.0" Description="Configuration dialog link to Getting Started">[!!Ġĕţŧīńģ Ŝţářťěď!!]</String>
 <String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_Help" Version="7.0.239.0" Description="Configuration dialog link to Help">[!!Ħēļƿ!!]</String>
 
-<!-- Tab names and shortcut keys -->  
+<!-- Tab names and shortcut keys -->
 
 <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Keyboards" Version="7.0.230.0" Description="Keyboard Layouts tab name">[!!Ƙėƴɓŏäŗď Łǻŷơŭţš!!]</String>  <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Keyboards_AccessChar" Version="7.0.230.0" Description="Direct access to the Keyboard Layouts tab using alt+">[!!Ķ!!]</String>
 <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Options" Version="7.0.230.0" Description="Options tab name">[!!Ōƿťĩőƞş!!]</String>      <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Options_AccessChar" Version="7.0.230.0" Description="Direct access to the Options tab using alt+">[!!Ŏ!!]</String>
@@ -96,7 +96,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Languages" Version="9.0.420.0" Description="Text preceding linked language profiles">[!!Ĺǻƞĝůǻĝęŝ:!!]</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Languages_Uninstall" Version="9.0.420.0" Description="Remove language profile">[!!✕!!]</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Languages_Install" Version="9.0.420.0" Description="Add language profile">[!!Āđđ ļàŉğũåĝē!!]</String>
-  
+
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_OnScreenKeyboard" Version="7.0.230.0" Description="Term for the On Screen Keyboard">[!!Őƞ Ŝĉŗȇȅň Ķȅƴƀŏȁřď:!!]</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_OnScreenKeyboard_Custom" Version="8.0.306.0" Description="(OSK) Custom term">[!!Ĉŭŝťŏm!!]</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_OnScreenKeyboard_Installed" Version="7.0.230.0" Description="(OSK) Installed term">[!!Įŋŝťăļļėđ!!]</String>
@@ -105,7 +105,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Documentation" Version="8.0.306.0" Description="Term for the Documentation">[!!Ďơĉũměŋťáťĩŏŉ:!!]</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Documentation_Installed" Version="8.0.306.0" Description="(Documentation) Installed term">[!!İƞśţąļļĕď!!]</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Documentation_NotInstalled" Version="8.0.306.0" Description="(Documentation) Not installed term">[!!Ɲőţ įńşťǻĺłȅđ!!]</String>
-  
+
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Message" Version="7.0.230.0" Description="Keyboard download window, etc. - term for additional messages">[!!Mȅşśäģę:!!]</String>
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Copyright" Version="7.0.230.0" Description="Keyboard download window, etc. - term for copyright">[!!Čőƥȳŕīğĥť:!!]</String>
 
@@ -150,17 +150,12 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koAutoOpenOSK" Version="7.0.244.0" Description="OSK options - auto-open OSK">[!!Äľŵȁƴŝ ŝĥŏŵ Őƞ Šċŕėěń ĶĕƴƄōãřđ Ŵīƞďơŵ ŵĥėń Ķěɏmàƞ ķȇƴƃőáŗď ĩš śēļĕĉţěď!!]</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koAutoSwitchOSKPages" Version="7.0.244.0" Description="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">[!!Šŵĭŧčĥ ŧơ āƥƿřőƥŕįáŧė Őŋ Šćŗěėń ƘȅƴƄőãŗđ/Ħȅĺƿ áųťơmăŧĭĉåłŀŷ ŵĥȅņ ȃ ķęȳƀōāŕđ ĭŝ śĕļȇćţȇđ!!]</String>
 
-<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koTurnOnSurrogates" Version="7.0.230.0" Description="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">[!!Ŧũřŉ őŋ Ūńĩĉơđȅ ŝŭƿƥļēmȇňŧāŕɏ ćħāŗãĉŧěř ďıŝƥľäȳ (řȇǫŭīŗęš ŗĕşţâřť)!!]</String>
-<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koUnknownLanguage" Version="7.0.230.0" Description="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">[!!Ŧũŕŉ őŉ 'Ůńƙňŏŵŉ' ĺǻŋġůǻğě!!]</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koDebugging" Version="7.0.230.0" Description="Advanced options - turn on debugging (which creates a very large file)">[!!ĎēƄŭģġįƞĝ!!]</String>
-<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koSwitchLanguageWithKeyboard" Version="7.0.244.0" Description="Advanced options - switch Windows language when keyboard selected">[!!Śŵįţċħ Ŵīńďőŵŝ łǻŉġūäģę ŵĥęŉ ā Ƙĕƴmāņ ĸęȳƀőàřđ ĭŝ ŝėľĕčťȅđ!!]</String>
-  <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koSwitchLanguageForAllApplications" Version="7.1.274.0" Description="Advanced options - selected language applies to all applications">[!!Šęŀĕćť ƙēƴƅŏàŗď ļáƴōůť ƒōř āĺŀ ȁƥƥłĭċąťįŏńş!!]</String>
-<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koRunElevatedInVista" Version="7.0.230.0" Description="Advanced options - elevate user permission to highest permisable level">[!!Ąŀŵąɏš ěĺěvȃŧȇ ũŝĕř ƥěŗmĩšşıōńş ŵħėń ŗŭńňĩƞģ ĩń Ŵįŋđőŵş Vıŝţă!!]</String>
 
 <String Group="Configuration Dialog - Options tab" Type="PlainText" Id="S_Button_UILanguage" Version="7.0.230.0" Description="Options button - changes user interface language/localization">[!!Ůšēř ĩŋţĕŗƒāĉē łáņģůȃġė...!!]</String>
 
 <String Group="Configuration Dialog - Options tab" Type="PlainText" Id="S_Button_BaseKeyboard" Version="9.0.445.0" Description="Options tab - base keyboard button">[!!Ɓâśȇ Ƙȇƴɓŏäŕđ...!!]</String>
-  
+
 <!-- Hotkeys tab -->
 
 <String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_Keyboard_Prefix" Version="7.0.230.0" Description="Hotkey - activation term preceding Keyman keyboard layout name. Note: include a space following."></String> <!-- e.g. "Activate [Korean KORDA] Keyboard" -->
@@ -181,10 +176,10 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_OpenTextEditor" Version="7.1.275.0" Description="Hotkey - open text editor">[!!Ơƥĕŉ Ţěxţ Ęđĩţŏŕ!!]</String>
 
 <String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_SwitchLanguage" Version="8.0.294.0" Description="Hotkey - switch language window">[!!Ŏƿĕŉ Łåƞġűãĝě Śŵīţċĥĕŕ!!]</String>
-  
+
 <String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_Control_Title" Version="7.1.274.0" Description="Hotkey - Control Title">[!!Ğēņĕŕáŀ Ĥơťĸęŷŝ!!]</String>
 <String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_Keyboard_Title" Version="7.1.274.0" Description="Hotkey - Keyboard Title">[!!Ƙȅŷƅŏȁřđ Łãƴơųţś!!]</String>
-  
+
 <!-- Languages tab -->
 
 <String Group="Configuration Dialog - Languages tab" Type="PlainText" Id="S_Languages_InstalledLanguage" Version="7.0.230.0" Description="Languages - Windows installed languages column header">[!!Ĩňšťăłĺęđ Ŀāŉĝŭāģė!!]</String>
@@ -232,7 +227,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <!-- - - - - - - - - - - - - - - - - - -->
 
 <!-- Note: this dialog uses captions from the Configuration dialog as well -->
-  
+
 <Dialog Id="InstallKeyboard" Width="600" Height="300"/>
 
 <String Group="Install Keyboard Dialog" Type="PlainText" Id="S_InstallKeyboard_Title" Version="7.0.230.0" Description="Install keyboard/package dialog title">[!!Īňśťąľĺ Ķėȳƅőåřď/Ƥàčĸąĝė!!]</String>
@@ -286,22 +281,22 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="Select Keyboard for Install Dialog" Type="FormatString" Id="SKSelectKeyboardsTitle" Version="7.0.241.0" Description="Select Keyboards for Install dialog title">[!!Şȇłěčţ ƘęŷƂŏȁřďš ŧő Įňśţãļľ!!]</String>
 <String Group="Select Keyboard for Install Dialog" Type="FormatString" Id="SKSelectKeyboardsBlurb" Version="7.0.241.0" Parameters="%0:s: Number of keyboards user can still install" Description="Select Keyboards for Install text">[!!Ÿőū ċȃƞņŏŧ įƞśťåłļ āŀŀ ŧħę ƙĕŷƂőǻŗďś įŋ ťħĩš ƥȁčķáĝē.  Ƴŏũ ċãň īƞşťāĺľ à máxĩmūm őƒ %0:d àďđıŧıōŉąļ ĸēɏƄōȃŕďš.  Ƥļĕąšȇ šȅľĕċť ŧħē ĸȇƴƀơåŗđŝ ŷőū ŵįşħ ťő īŉśŧăļĺ ƒŕŏm ťĥīś ƿàĉĸăģȅ.!!]</String>
-  
+
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Online Update Dialog              -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
 <Dialog Id="OnlineUpdate" Width="470" Height="260"/>
-  
+
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_Title" Version="7.0.230.0" Description="Update dialog title, where &Name; = product name">[!!Ŭƥđăţĕď !!]&Name;[!! Ċơmƥơƞȅƞŧś Ãváīŀâɓļĕ!!]</String>
 
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_NewVersionAvailable" Version="7.0.230.0" Description="Update dialog - updates available text">[!!Ůƥđäţęş ƒōŕ !!]&Name;[!! àŕė ŋơŵ ävàıłàƄľē!!]</String>
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_NewVersionPrompt" Version="7.1.255.0" Description="Update dialog - prompt to select updates">[!!Ƥłęāşȅ šĕĺěčţ ŧħę űƥđáŧěš ȳőŭ ŵīŝħ ŧō ĭńšťąľŀ:!!]</String>
-  
+
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_InstallQuery" Version="7.0.230.0" Description="Update dialog - install query">[!!Đō ȳőů ŵãŉŧ ťŏ ďơŵńĺơăď ăńď ĭŋśţȁŀļ ťħīš ƿăŧċħ ƞōŵ?!!]</String>
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_DownloadFrom" Version="7.0.230.0" Description="Update dialog - download information">[!!Ŷŏů ċâƞ ďőŵŋłŏãđ ŧĥě ňȅŵ věŗşıŏƞ ƒŕŏm:!!]</String>
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_DownloadQuery" Version="7.0.230.0" Description="Update dialog - keyman.com website visiting query">[!!Đő ƴơų ŵǻňť ťŏ vīšįť ŧħę ŵȅƄŝįťĕ ŉőŵ?!!]</String>
-  
+
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_Button_InstallNow" Version="7.0.230.0" Description="Update dialog - install now button">[!!Įŉšŧąłļ Ɲōŵ!!]</String>
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_Button_InstallLater" Version="7.0.230.0" Description="Update dialog - cancel button">[!!Čáńĉĕļ!!]</String>
 
@@ -319,7 +314,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconText" Version="8.0.288.0" Description="Update icon - text">[!!Ċłıćķ ťħįŝ ĭĉơņ ţő đơŵŉłōåđ åƞď ĭŉŝťåĺľ űƿđàŧĕŝ!!]</String>
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconMenuText" Version="8.0.288.0" Description="Update icon - install menu item">[!!Vĭėŵ ȃŉđ &amp;ĩńŝţáĺľ !!]&Name;[!! ũƿďąţēş!!]</String>
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconMenuExit" Version="8.0.288.0" Description="Update icon - exit menu item">[!!Ė&amp;xīť őŋľĩńē ŭƥđǻŧĕ ċħěĉƙ!!]</String>
-  
+
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Splash Dialog                     -->
 <!-- - - - - - - - - - - - - - - - - - -->
@@ -331,12 +326,12 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">[!!Ŝŧăŕŧ Ƙęƴmâņ!!]</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Exit" Version="8.0.294.0" Description="Exit button">[!!Ĕxīţ!!]</String>
-  
+
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_OtherTasks" Version="8.0.294.0" Description="Other tasks heading">[!!Őţĥĕŗ ţäśķš!!]</String>
   <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Configuration" Version="8.0.294.0" Description="Keyman Configuration link">[!!Čơŉƒīĝůřȁťīőņ!!]</String>
   <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_ShowAtStartup" Version="9.0.341.0" Description="Show at Startup toggle">[!!Śĥőŵ ŧħıš šćŗęȇň ăť ŝţǻŗŧųƥ!!]</String>
   <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_HideAtStartup" Version="9.0.431.0" Description="Hide at Startup toggle">[!!Ĥĩďė ťħış ŝćŕēėň ąŧ śťǻŗŧŭƿ!!]</String>
-      
+
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- UI Languages & Localization       -->
 <!-- - - - - - - - - - - - - - - - - - -->
@@ -362,7 +357,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <!-- - - - - - - - - - - - - - - - - - -->
 
 <Dialog Id="LangSetup" Width="650" Height="375"></Dialog>
-	
+
 <String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_Title" Version="7.0.230.0" Description="Language configuration tasks dialog title">[!!Ĺǻŉģųâġē Ċőńƒığųŗȃťıŏƞ Ťāşƙś!!]</String>
 
 <String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_TitleInnerPrefix" Version="7.0.230.0" Description="LCT dialog - subtitle text preceding language name(s)">[!!Ċōƞƒĩĝůŕę ƴơŭŗ ĉōmƿūŧȅŕ ťő ŵőŕĸ ŵĭŧĥ!!]</String>
@@ -425,7 +420,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <!-- Menu Items                        -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">[!!Şŵıţčħ !!]&Name;[!! &amp;Ōƒƒ!!]</String> 
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">[!!Şŵıţčħ !!]&Name;[!! &amp;Ōƒƒ!!]</String>
 <String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_OnScreenKeyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">[!!Ōń Ŝćŗĕėň &amp;ĶȇȳƂőářď!!]</String>
 <String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_KeyboardUsage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">[!!Ķȇƴƃơăřď &amp;Ůšăĝė!!]</String>
 <String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_FontHelper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">[!!&amp;Ƒōńť Ħȇŀƥěŕ!!]</String>
@@ -437,7 +432,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_Exit" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Exit">[!!Ĕ&amp;xĩŧ!!]</String>
 
 <String Group="System Tray Menu Items" Type="PlainText" Id="SKMenu_NoKeyboardsInstalled" Version="7.0.230.0" Description="Systray - notice of no keyboard layouts installed">[!!Ňơ ƙěƴɓőȃřď ŀāƴőůťš āŕĕ ıŋşţāłłěď.
-Ĉĥơơšȇ "Čőŉƒįğűŗäťīŏƞ" ŧơ īňŝŧǻłľ á 
+Ĉĥơơšȇ "Čőŉƒįğűŗäťīŏƞ" ŧơ īňŝŧǻłľ á
 ķȅɏƂőäŗđ ļąɏōůţ ƒőř ɏŏūŕ ĺáňġųáĝę.!!]</String>
 
 <String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_FadeWhenInactive" Version="7.0.230.0" Description="OSK right-click menu - fade OSK when mouse is elsewhere">[!!Ƒȁďȅ Ŵĥęń Ĭŉàčţĭvē!!]</String>
@@ -458,7 +453,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Usage Page" Type="HTML" Id="S_Usage_KeyboardDocumentation" Version="7.1.261.0" Description="Usage page - Text shown when keyboard has documentation">[!!Čļīćƙ ťĥȅ ƅŭťŧŏňś ƃȅłơŵ ťơ vıęŵ åďďįŧĩōņāľ ďŏĉųmȅņŧāŧīơƞ ąŉđ/őř Őń Şčřȇęŉ Ƙȇƴƃŏȁŗď.!!]</String>
 <String Group="Usage Page" Type="HTML" Id="S_Usage_KeymanOff" Version="7.1.261.0" Description="Usage page - Text shown when no Keyman keyboard is active">[!!Ňơ ƙęƴƃŏàŕđ ĺȁƴơųŧ ĭś ćũřŗęńţľȳ ŝȇľěćŧĕđ ĩņ !!]&Name;[!!.  Ĉŀĩĉƙ őƞ àŋɏ őƒ ŧĥē ƙěŷƀőăřď ıćőņš ıƞ ŧħĕ ŧŏơŀƀąŗ åƄơvȇ ťơ ćħőŏşȅ ã ĸȅɏƀơáŕď ĺãŷōūţ.!!]</String>
 <String Group="Usage Page" Type="HTML" Id="S_Usage_NoKeyboardsInstalled" Version="7.1.261.0" Description="Usage page - Text shown when no Keyman keyboards are installed">[!!Ŋō ķĕŷƄőàřđ ľãƴŏųŧŝ ąřė ċůŕŕěŋťĺŷ įƞšťàļľĕď ơŗ ŀơȃđȅđ.  Ŭşē !!]&Name;[!! Čōŉƒīĝűŗāťĩőň ŧơ ıƞšŧȃľļ à ķȅɏƂơâřď ĺãɏōũť.!!]</String>
-  
+
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- Formatted messages, assorted                                              -->
 <!-- These messages cannot contain HTML tags and are plain text                -->
@@ -490,8 +485,8 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Formatted Messages" Type="FormatString" Id="SKANSIEncoding" Version="7.0.230.0" Description="Keyboard with an ANSI or Codepage encoding">[!!Ćōđȅƥăġė!!]</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKUnicodeEncoding" Version="7.0.230.0" Description="Keyboard with a Unicode encoding">[!!Ūņıčŏďĕ!!]</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKDownloadProgress_Title" Version="7.0.230.0" Description="Notice of file downloading">[!!Ďŏŵŉľŏąđįńġ Ƒĩłē!!]</String>
-    
-  
+
+
 <!-- Confirmation Requests -->
 
 <String Group="Formatted Messages" Type="FormatString" Id="SKUninstallOnScreenKeyboard" Version="7.0.230.0" Parameters="%0:s = Keyboard name" Description="Request for confirmation to uninstall OSK for a keyboard layout">[!!Ąřĕ ȳőŭ ŝŭŗȅ ɏŏů ŵåňţ ŧő ŗěmōvȅ ŧĥĕ ơƞ śćŕēęƞ ķēȳƀőȁŗď ĭņŝťäľļėď ƒŏŗ %0:s?!!]</String>
@@ -540,7 +535,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Formatted Messages" Type="FormatString" Id="SKLangCheck_WindowsLanguage_Install" Version="7.1.259.0" Parameters="%0:s = language name, %1:s = keyboard name" Description="Shown when Keyman wants to install  a Windows language and link it to a Keyman keyboard so that when one is selected by the user, the other automatically switches in">[!!Ĩňŝŧąŀĺ ļăŉģųåğē %0:s ąŉď łĩňƙ ţŏ Ƙėƴmàŉ ķĕɏƂōäřđ %1:s!!]</String>
 
 <!-- OSK Font Helper -->
-  
+
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_PleaseWait1" Description="OSK Font helper loading message part 1">[!!Ƥłęäśȇ ŵàįŧ ŵħĭĺę !!]&Name;[!! ƒıńďŝ ŧħě ƒōňţŝ ŧĥåţ ŵĩĺľ ŵŏřķ ŵĭţħ!!]</String>
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_PleaseWait2" Description="OSK Font helper loading message part 2">[!!ķȅɏɓơăŗď.!!]</String>
 
@@ -557,10 +552,10 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoFonts1a" Description="OSK Font helper no fonts part 1">[!!Ńő ƒŏŋŧş ŵĕřě ƒōũŉđ ơņ ȳơŭŗ ŝƴśťȅm ťĥȃţ ŵōŕķ ŵīţĥ !!]</String>
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoFonts1b" Description="OSK Font helper no fonts part 2">[!!.  Ƥľȇāšē !!]<a href="keyman:welcome">[!!čħēċƙ ťħė ďŏĉūmęņţǻţīŏņ!!]</a>[!! ţơ ƒıńď ƒơňţś ƒōŕ ťĥış ķȇɏƀōãřď.!!]</String>
-  
+
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoKeyboards" Description="OSK Font helper no keyboards">[!!Ńŏ ĸęƴƅơāŗđ ŀåƴōůŧś äŕȅ ćųŗŕęņťĺȳ īņśťâłłēđ ōŕ łőäđĕď.  Ŭŝě !!]&Name;[!! Ĉőŋƒįğűřąŧīŏņ ŧơ ıŉŝťȃĺľ ä ƙĕɏƃōąŗđ łâƴơŭŧ.!!]</String>
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_ChooseKeyboard" Description="OSK Font helper choose keyboard">[!!Ƥľęǻśĕ ćħōŏšě å !!]&Name;[!! ķēƴƄŏȃřđ ţő ƒīƞď ţħė ƒőƞŧş ŧĥáŧ ŵįĺĺ ŵőŗĸ ŵıŧħ īŧ.!!]</String>
-  
+
 <!-- OSK Hints -->
 
 <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint_Title" Description="On Screen Keyboard Hintbar title">[!!Ħīŉť:!!]</String>
@@ -578,5 +573,5 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <!-- - - - - - - - - - - - - - - - - - -->
 
 <String Group="Text Editor" Type="FormatString" Version="10.0.836.0" Id="SKTextEditorCaption" Description="Caption of Text Editor">[!!Ţęxŧ Ęďĭŧŏŗ - !!]&Name;</String>
-  
+
 </Locale>

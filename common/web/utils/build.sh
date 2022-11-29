@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # Compiles common TS-based utility functions for use among Keyman's codebase
+
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -11,41 +12,37 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-display_usage ( ) {
-    echo "build.sh [-skip-package-install]"
-    echo
-    echo "  -skip-package-install  skips the \`npm install\` dependency check."
-    echo "                            (or -S) Intended for use when this script is called by another build script."
-    echo ""
-    echo "  If more than one target is specified, the last one will take precedence."
-    exit 1
-}
+cd "$THIS_SCRIPT_PATH"
 
-# Establish default build parameters
-set_default_vars ( ) {
-    FETCH_DEPS=true
-    # We need to build keyman-version and lm-worker with a script for now
-    "$KEYMAN_ROOT/common/web/keyman-version/build.sh" || fail "Could not build keyman-version"
-}
+################################ Main script ################################
 
-set_default_vars
+builder_describe \
+  "Compiles the web-oriented utility function module." \
+  "@../keyman-version" \
+  configure clean build
 
-# Parse args
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    case $key in
-        -skip-package-install|-S)
-            FETCH_DEPS=false
-            ;;
-    esac
-    shift # past argument
-done
+builder_describe_outputs \
+  configure "/node_modules" \
+  build     "build/index.js"
 
-if [ "$FETCH_DEPS" = true ]; then
-    verify_npm_setup
+builder_parse "$@"
+
+if builder_start_action configure; then
+  verify_npm_setup
+  builder_finish_action success configure
 fi
 
-npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
-if [ $? -ne 0 ]; then
-    fail "Utility-function package compilation failed."
+if builder_start_action clean; then
+  npm run clean
+  builder_finish_action success clean
+fi
+
+if builder_start_action build; then
+  # Note: in a dependency build, we'll expect utils to be built by tsc -b
+  if builder_is_dep_build; then
+    echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
+  else
+    npm run tsc -- --build "$THIS_SCRIPT_PATH/tsconfig.json"
+  fi
+  builder_finish_action success build
 fi

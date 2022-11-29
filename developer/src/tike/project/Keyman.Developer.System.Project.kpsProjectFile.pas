@@ -39,6 +39,7 @@ interface
 
 uses
   System.SysUtils,
+  Xml.XMLDom,
   Xml.XMLIntf,
 
   KPSFile,
@@ -108,7 +109,19 @@ begin
     pack := TKPSFile.Create;
     try
       pack.FileName := FileName;
-      pack.LoadXML;
+      try
+        pack.LoadXML;
+      except
+        // ignore errors in the xml; will reduce metadata visible to the user
+        on E:EDOMParseError do
+        begin
+          Exit;
+        end;
+        on E:DOMException do
+        begin
+          Exit;
+        end;
+      end;
       for i := 0 to pack.Files.Count - 1 do
         if Project.Files.IndexOfFileName(pack.Files[i].FileName) < 0 then
           CreateProjectFile(Project, pack.Files[i].FileName, Self);

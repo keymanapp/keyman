@@ -37,6 +37,7 @@ type
     pages: TLeftTabbedPageControl;
     pageDetails: TTabSheet;
     sbDetails: TScrollBox;
+    sbCompile: TScrollBox;
     panWordlists: TPanel;
     lblWordlists: TLabel;
     gridWordlists: TStringGrid;
@@ -47,7 +48,6 @@ type
     lblBasicInformation: TLabel;
     pageSource: TTabSheet;
     pageCompile: TTabSheet;
-    Panel1: TPanel;
     lblCongrats: TLabel;
     panBuildLexicalModel: TPanel;
     cbFormat: TComboBox;
@@ -120,6 +120,8 @@ type
     procedure cmdOpenProjectFolderClick(Sender: TObject);
     procedure cmdCopyDebuggerLinkClick(Sender: TObject);
     procedure chkLanguageUsesCasingClick(Sender: TObject);
+    procedure sbDetailsMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
     type
       TWordlist = class
@@ -131,6 +133,7 @@ type
       TWordlists = class(TObjectList<TWordlist>)
       public
         function IndexOfFilename(const Filename: string): Integer;
+        function FindByFullPath(const Filename: string): TWordlist;
       end;
   private
     parser: TLexicalModelParser;
@@ -169,6 +172,8 @@ type
 
     function CanChangeView(FView: TCodeDesignView): Boolean; override;
     procedure ChangeView(FView: TCodeDesignView); override;
+
+    function HasSubfilename(const Filename: string): Boolean; override;
 
     procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
     procedure NotifyStartedWebDebug;
@@ -432,11 +437,31 @@ begin
   EnableControls;
 end;
 
+function TfrmModelEditor.HasSubfilename(const Filename: string): Boolean;
+begin
+  Result := wordlists.FindByFullPath(Filename) <> nil;
+end;
+
 procedure TfrmModelEditor.FindError(const Filename: string; s: string;
   line: Integer);
+var
+  wordlist: TWordlist;
 begin
-  inherited;
-  // TODO
+  if SameText(Filename, Self.FileName) then
+  begin
+    // Switch to code view, highlight line
+    pages.ActivePage := pageSource;
+    frameSource.FindError(line);
+    Exit;
+  end;
+
+  wordlist := wordlists.FindByFullPath(Filename);
+  if Assigned(wordlist) then
+  begin
+    pages.ActivePage := wordlist.Tab;
+    wordlist.Frame.FindError(Filename, s, line);
+    Exit;
+  end;
 end;
 
 procedure TfrmModelEditor.FormCreate(Sender: TObject);
@@ -597,6 +622,14 @@ begin
     AllowChange := MoveDesignToSource
 end;
 
+procedure TfrmModelEditor.sbDetailsMouseWheel(Sender: TObject;
+  Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+  (Sender as TScrollBox).VertScrollBar.Position := (Sender as TScrollBox).VertScrollBar.Position - WheelDelta div 2;
+  Handled := True;
+end;
+
 { --------- Details tab --------- }
 
 procedure TfrmModelEditor.FillDetails;
@@ -699,6 +732,19 @@ begin
 end;
 
 { TfrmModelEditor.TWordlists }
+
+function TfrmModelEditor.TWordlists.FindByFullPath(
+  const Filename: string): TWordlist;
+begin
+  for Result in Self do
+  begin
+    if SameText(Result.Frame.Filename, Filename) then
+    begin
+      Exit;
+    end;
+  end;
+  Result := nil;
+end;
 
 function TfrmModelEditor.TWordlists.IndexOfFilename(
   const Filename: string): Integer;

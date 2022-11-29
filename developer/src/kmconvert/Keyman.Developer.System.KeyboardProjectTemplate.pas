@@ -36,6 +36,7 @@ type
     procedure WriteKVKS;
     procedure WriteTouchLayout;
     procedure WriteKeyboardInfo;
+    procedure WriteIcon;
   protected
     const
       SFileTemplate_KeyboardInfo = '%s.keyboard_info'; // in root
@@ -65,6 +66,7 @@ uses
   KeyboardParser,
   KeymanVersion,
   kmxfileconsts,
+  Keyman.Developer.System.GenerateKeyboardIcon,
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.System.Project.kpsProjectFile,
   Keyman.Developer.System.Project.ProjectFile,
@@ -96,6 +98,8 @@ begin
     WriteKVKS;
   if HasTouchLayout then
     WriteTouchLayout;
+  if HasIcon then
+    WriteIcon;
 
   WriteKPJ;
 
@@ -345,6 +349,31 @@ begin
   finally
     tl.Free;
   end;
+end;
+
+procedure TKeyboardProjectTemplate.WriteIcon;
+var
+  FTags: string;
+begin
+  Assert(HasIcon);
+  // We'll generate an icon, based first on BCP47 tag,
+  // then if that is not present, on first two letters
+  // of filename. Not going to go silly here!
+
+  if FileExists(IconFilename) then
+  begin
+    // Some tools may already generate an icon,
+    // for example import windows keyboard
+    Exit;
+  end;
+
+  if BCP47Tags <> ''
+    then FTags := BCP47Tags
+    else FTags := ChangeFileExt(ExtractFileName(IconFilename), '');
+
+  FTags := Copy(FTags, 1, 3);
+
+  TKeyboardIconGenerator.GenerateIcon(FTags, IconFilename, MaxInt);
 end;
 
 function TKeyboardProjectTemplate.DataPath: string;

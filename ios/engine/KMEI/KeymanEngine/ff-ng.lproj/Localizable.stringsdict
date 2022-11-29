@@ -29,9 +29,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>%u update failed</string>
+        <string>Kesɗitinal %u woorii</string>
         <key>other</key>
-        <string>%u updates failed</string>
+        <string>Kesɗitine %u ngoorii</string>
       </dict>
     </dict>
     <key>notification-update-success</key>
@@ -45,9 +45,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>%u update successful</string>
+        <string>Kesɗitinal %u yuɓɓii</string>
         <key>other</key>
-        <string>%u updates successful</string>
+        <string>Kesɗitine %u njuɓɓii</string>
       </dict>
     </dict>
     <key>settings-keyboards-installed-count</key>

@@ -205,6 +205,9 @@ begin
 
   FIconCanBeEdited := True;
   panReadOnlyIcons.Visible := not FIconCanBeEdited;
+  cmdImport.Visible := FIconCanBeEdited;
+  cmdExport.Visible := FIconCanBeEdited;
+  cmdClearAll.Visible := FIconCanBeEdited;
 
   TPicture.RegisterClipboardFormat(cf_Bitmap, TBitmap);
 
@@ -888,10 +891,10 @@ begin
           FIcon.LoadFromStream(Stream);
           DrawIconEx(FBitmaps[bebEdit].Canvas.Handle, 0, 0, FIcon.Handle, 16, 16, 0, 0, DI_NORMAL);
         except
-          on E:EOutOfResources do
-            ShowMessage(E.Message);
-          on E:EInvalidGraphic do
-            ShowMessage(E.Message);
+          // We won't complain here because LoadReadOnlyIcon will also be
+          // reporting on this, less obtrusively
+          on E:EOutOfResources do ;
+          on E:EInvalidGraphic do ;
         end;
       finally
         FIcon.Free;
@@ -933,6 +936,8 @@ procedure TframeBitmapEditor.LoadReadOnlyIcon(Stream: TStream);
 type
   PIconRecArray = ^TIconRecArray;
   TIconRecArray = array[0..300] of TIconRec;
+const
+  InvalidIconMessage = 'This icon cannot be loaded; it may be corrupt or an unsupported format';
 var
   ci: TCursorOrIcon;
   List: PIconRecArray;
@@ -945,6 +950,15 @@ begin
   memoReadOnlyIcons.Clear;
   p := Stream.Position;
   Stream.ReadBuffer(ci, SizeOf(TCursorOrIcon));
+  if (ci.Reserved <> 0) or (ci.wType <> rc3_Icon) or (ci.Count > 16) then
+  begin
+    // This is either not an icon file, or there are too many icons in the
+    // file
+    memoReadOnlyIcons.Lines.Add(InvalidIconMessage);
+    Stream.Position := p;
+    Exit;
+  end;
+
   HeaderLen := SizeOf(TIconRec) * ci.Count;
   List := AllocMem(HeaderLen);
   try
@@ -958,15 +972,27 @@ begin
       if List[i].Width = 0 then w := 256 else w := List[i].Width;
       if List[i].Height = 0 then h := 256 else h := List[i].Height;
 
-      Stream.Position := List[i].DIBOffset;
-      Assert(Stream.Read(buf, 4) = 4);
+      if (Stream.Seek(List[i].DIBOffset, soBeginning) <> List[i].DIBOffset) or
+        (Stream.Read(buf, 4) <> 4) then
+      begin
+        memoReadOnlyIcons.Lines.Add(InvalidIconMessage);
+        Exit;
+      end;
       if IsPNGSignature(buf) then
       begin
         // Loads a PNG-format icon from the offset of
         // the file for the specific icon
         Stream.Position := List[i].DIBOffset;
         FReadOnlyIcons[i] := TPngImage.Create;
-        FReadOnlyIcons[i].LoadFromStream(Stream);
+        try
+          FReadOnlyIcons[i].LoadFromStream(Stream);
+        except
+          on E:Exception do   // I don't want to use E:Exception but see http://marc.durdin.net/2012/01/how-not-to-do-exception-classes-in.html
+          begin
+            memoReadOnlyIcons.Lines.Add(InvalidIconMessage);
+            Exit;
+          end;
+        end;
       end
       else
       begin
@@ -975,7 +1001,15 @@ begin
         Stream.Position := p;
         FReadOnlyIcons[i] := TIcon.Create;
         FReadOnlyIcons[i].SetSize(w, h);
-        FReadOnlyIcons[i].LoadFromStream(Stream);
+        try
+          FReadOnlyIcons[i].LoadFromStream(Stream);
+        except
+          on E:EInvalidGraphic do
+          begin
+            memoReadOnlyIcons.Lines.Add(InvalidIconMessage);
+            Exit;
+          end;
+        end;
       end;
 
       memoReadOnlyIcons.Lines.Add(Format('Icon #%d: %d x %d, %s colour',
@@ -1117,6 +1151,7 @@ begin
     try
       try
         ico.LoadFromFile(dlgImport.FileName);
+        IconToBitmap(FBitmaps[bebEdit], ico);
       except
         on E:EInvalidGraphic do  // I3147   // I3508
         begin
@@ -1124,7 +1159,6 @@ begin
           Exit;
         end;
       end;
-      IconToBitmap(FBitmaps[bebEdit], ico);
     finally
       ico.Free;
     end;
@@ -1136,6 +1170,7 @@ begin
     try
       try
         LoadFromFile(dlgImport.FileName);
+        FBitmaps[bebEdit].Assign(ji);
       except
         on E:EInvalidGraphic do  // I3147   // I3508
         begin
@@ -1143,7 +1178,6 @@ begin
           Exit;
         end;
       end;
-      FBitmaps[bebEdit].Assign(ji);
     finally
       Free;
     end;
@@ -1163,6 +1197,7 @@ begin
     try
       try
         LoadFromFile(dlgImport.FileName);
+        AssignTo(FBitmaps[bebEdit]);
       except
         on E:Exception do   // I3147 - I don't want to use E:Exception but see http://marc.durdin.net/2012/01/how-not-to-do-exception-classes-in.html   // I3508
         begin
@@ -1170,7 +1205,6 @@ begin
           Exit;
         end;
       end;
-      AssignTo(FBitmaps[bebEdit]);
     finally
       Free;
     end

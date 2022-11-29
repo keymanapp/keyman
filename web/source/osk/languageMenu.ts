@@ -59,7 +59,6 @@ namespace com.keyman.osk {
       // Insert a transparent overlay to prevent anything else happening during keyboard selection,
       // but allow the menu to be closed if anywhere else on screen is touched
 
-      let osk = this.keyman.osk;
       let languageMenu = this;
 
       document.body.appendChild(this.shim);
@@ -185,18 +184,7 @@ namespace com.keyman.osk {
       // Now display the menu
       this.lgList.style.visibility='';
 
-      // Set initial scroll to show current language (but never less than 1, to avoid dragging body)
-      var top=(<HTMLElement>m3.firstChild).offsetHeight*this.activeLgNo+1;
-      m2.scrollTop=top;
-
-      // The scrollTop value is limited by the device, and must be limited to avoid dragging the document body
-      if(m2.scrollTop < top) {
-        m2.scrollTop=m2.scrollHeight-m2.offsetHeight;
-      }
-
-      if(m2.scrollTop > m2.scrollHeight-m2.offsetHeight-1) {
-        m2.scrollTop=m2.scrollHeight-m2.offsetHeight-1;
-      }
+      this.scrollToIndex(this.activeLgNo, m2, m3);
     }
 
     /**
@@ -260,7 +248,7 @@ namespace com.keyman.osk {
         return;
       }
 
-      var i,t,top=0,initial=target.innerHTML.charCodeAt(0),nn=menu.childNodes;
+      var i,t,initial=target.innerHTML.charCodeAt(0),nn=menu.childNodes;
       try {
         for(i=0; i<nn.length-1; i++) {
           t=(<HTMLElement>nn[i].firstChild).innerHTML.toUpperCase().charCodeAt(0);
@@ -270,16 +258,27 @@ namespace com.keyman.osk {
         }
       } catch(ex){}
 
+      this.scrollToIndex(i, m2, menu);
+    }
+
+    scrollToIndex(index: number, m2: HTMLDivElement, menu: HTMLDivElement) {
+      let top: number;
+
+      // Will leave this much portion of the last pre-index item visible.
+      // 0.5 => 50%.
+      const SCROLL_ITEM_BUFFER = 0.5;
       try {
-        top=(<HTMLElement>menu.firstChild).offsetHeight*i+1;
+        top=(<HTMLElement>menu.firstChild).getBoundingClientRect().height*(index-SCROLL_ITEM_BUFFER)+1;
         m2.scrollTop=top;
       } catch(ex) {
         top=0;
       }
 
       try {
-        if(m2.scrollTop < top) {
-          m2.scrollTop=m2.scrollHeight-m2.offsetHeight;
+        // Clamp the language menu scroll within boundaries - do not leave "whitespace" either
+        // before or after all menu items due to scroll positioning near list borders.
+        if(m2.scrollTop < 0) {
+          m2.scrollTop = 0;
         }
         if(m2.scrollTop > m2.scrollHeight-m2.offsetHeight-1) {
           m2.scrollTop=m2.scrollHeight-m2.offsetHeight-1;
@@ -506,7 +505,7 @@ namespace com.keyman.osk {
         this.lgList.style.visibility='hidden';
 
         window.setTimeout(function(){
-          // In case of extremely rapid keyboard swaps, this event may trigger more than once - 
+          // In case of extremely rapid keyboard swaps, this event may trigger more than once -
           // the shim's on-touch event can trigger after a keyboard has been selected!
           if(languageMenu.shim.parentElement) {
             document.body.removeChild(languageMenu.shim);

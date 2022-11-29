@@ -20,8 +20,8 @@ setup(
     ],
 
     # metadata to display on PyPI
-    author="Daniel Glassey",
-    author_email="wdg@debian.org",
+    author="Keyman team",
+    author_email="support@keyman.com",
     description="Keyman for Linux configuration",
     license="MIT",
     keywords="keyman, keyman-config, keyboard",

@@ -13,7 +13,7 @@ namespace com.keyman.dom {
         if(keyman) {
           Lelem = keyman.domManager.lastActiveElement;
         }
-        
+
         if(!Lelem) {
           // If we're trying to find an active target but one doesn't exist, just return null.
           return null;
@@ -27,12 +27,12 @@ namespace com.keyman.dom {
         throw new Error("OSK could not find element output target data!");
       }
     }
-    
+
     /**
      * Function     getAbsoluteX
      * Scope        Public
      * @param       {Object}    Pobj        HTML element
-     * @return      {number}               
+     * @return      {number}
      * Description  Returns x-coordinate of Pobj element absolute position with respect to page
      */
     static getAbsoluteX(Pobj: HTMLElement): number { // I1476 - Handle SELECT overlapping END
@@ -41,7 +41,7 @@ namespace com.keyman.dom {
       if(!Pobj) {
         return 0;
       }
-      
+
       var Lcurleft = Pobj.offsetLeft ? Pobj.offsetLeft : 0;
       Lobj = Pobj;   	// I2404 - Support for IFRAMEs
 
@@ -73,9 +73,9 @@ namespace com.keyman.dom {
      * Function     getAbsoluteY
      * Scope        Public
      * @param       {Object}    Pobj        HTML element
-     * @return      {number}               
+     * @return      {number}
      * Description  Returns y-coordinate of Pobj element absolute position with respect to page
-     */  
+     */
     static getAbsoluteY(Pobj: HTMLElement): number {
       var Lobj: HTMLElement
 
@@ -113,32 +113,20 @@ namespace com.keyman.dom {
     /**
      * Checks the type of an input DOM-related object while ensuring that it is checked against the correct prototype,
      * as class prototypes are (by specification) scoped upon the owning Window.
-     * 
+     *
      * See https://stackoverflow.com/questions/43587286/why-does-instanceof-return-false-on-chrome-safari-and-edge-and-true-on-firefox
      * for more details.
-     * 
+     *
      * @param {Element|Event}   Pelem       An element of the web page or one of its IFrame-based subdocuments.
      * @param {string}          className   The plain-text name of the expected Element type.
      * @return {boolean}
      */
     static instanceof(Pelem: Event|EventTarget, className: string): boolean {
-      // We must write special checks for our custom-defined element types!
-      if(className == "TouchAliasElement") {
-        if(this.instanceof(Pelem, "HTMLDivElement")) {
-          let div = <HTMLDivElement> Pelem;
-
-          // We should probably implement a slightly more robust check, but this should get us started well enough.
-          return div['base'] !== undefined;
-        } else {
-          return false;
-        }
-      }
-
       var scopedClass;
 
       if(!Pelem) {
         // If we're bothering to check something's type, null references don't match
-        // what we're looking for. 
+        // what we're looking for.
         return false;
       }
       if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
@@ -151,7 +139,7 @@ namespace com.keyman.dom {
         var event = Pelem as Event;
 
         if(this.instanceof(event.target, 'Window')) {
-          scopedClass = event.target[className]; 
+          scopedClass = event.target[className];
         } else if(this.instanceof(event.target, 'Document')) {
           scopedClass = (event.target as Document).defaultView[className];
         } else if(this.instanceof(event.target, 'HTMLElement')) {

@@ -29,8 +29,15 @@ echo "" > "$PLAY_RELEASE_NOTES"
 
 # Copy whatsnew.md to release notes 1 line at a time,
 # filtering for lines that start with "*".
+# Pad release notes if whatsnew.md doesn't have any line items
 # Play Store release notes have a limit of 500 characters
-FILTERED_LINES=`grep '^\s*\*.*$' "$KEYMAN_ROOT/android/help/about/whatsnew.md"`
+DEFAULT_RELEASE_NOTE="* Additional bug fixes and improvements"
+FILTERED_LINES=$( grep '^\s*\*.*$' "$KEYMAN_ROOT/android/help/about/whatsnew.md" || [[ $? == 1 ]] ) # Continue if grep has no matches
+if [ -z "$FILTERED_LINES" ]; then
+  FILTERED_LINES="$DEFAULT_RELEASE_NOTE"
+  warn "Warning: whatsnew.md empty so using default release note: '$FILTERED_LINES'"
+fi
+
 IFS=$'\n'      # Change IFS to new line
 for line in $FILTERED_LINES
 do
@@ -42,7 +49,7 @@ do
   else
     # 450 chars reached
     warn "Warning: Play Store release notes approaching 500 character limit"
-    echo '* Additional bug fixes and improvements' >> $PLAY_RELEASE_NOTES
+    echo "$DEFAULT_RELEASE_NOTE" >> $PLAY_RELEASE_NOTES
     break
   fi  
 done

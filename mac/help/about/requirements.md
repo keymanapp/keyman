@@ -4,7 +4,7 @@ title: System Requirements
 
 ## Supported Mac Operating Systems
 
-Keyman 15.0 supports the following Mac operating systems:
+Keyman supports the following Mac operating systems:
 
 * Mac OS X Yosemite (10.10)
 * Mac OS X El Capitan (10.11)

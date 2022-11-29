@@ -23,7 +23,7 @@
   <string name="SK_UIFontSize" comment="The standard font size">9</string>
 
 
-  
+
 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
@@ -62,6 +62,11 @@
 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Add/remove language...</string>
+
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
   <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Click this icon to select a keyboard</string>
 
@@ -74,7 +79,7 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 14.0.234 -->
   <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman is already running. Click the Keyman icon in the system notification area to use your language keyboard</string>
-  
+
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -85,7 +90,21 @@
   <!-- Introduced: 7.0.239.0 -->
   <string name="S_Caption_Help" comment="Configuration dialog link to Help">Help</string>
 
-  
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Uninstall</string>
+
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Enable</string>
+
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Disable</string>
+
 
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
@@ -137,8 +156,8 @@
   <!-- Introduced: 9.0.492.0 -->
   <string name="S_KeepInTouch_AccessChar" comment="Direct access to the Keep in Touch tab using alt+">T</string>
 
-  
-  
+
+
 
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
@@ -227,6 +246,11 @@
 
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Add/remove language</string>
+
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">On Screen Keyboard:</string>
 
@@ -274,7 +298,7 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
   <string name="S_Footer_ChangesImmediate" comment="Short-term (14.0) message explaining why Ok and Cancel buttons are no longer present">Changes are applied immediately</string>
-  
+
   <!-- Context: Configuration Dialog - Footer -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -288,7 +312,7 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
-  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Keyboard options</string>
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Keyboard options...</string>
 
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
@@ -321,7 +345,7 @@
   <!-- Introduced: 13.0.40.0 -->
   <string name="S_Keyboard_Share_LinkSuffix" comment="Keyboard Layouts - suffix for link to share"/>
 
-  
+
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
@@ -416,39 +440,14 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koTurnOnSurrogates" comment="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">Turn on Unicode supplementary character display (requires restart)</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koUnknownLanguage" comment="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">Turn on \'Unknown\' language</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Debugging</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koSwitchLanguageWithKeyboard" comment="Advanced options - switch Windows language when keyboard selected">Switch Windows language when a Keyman keyboard is selected</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.1.274.0 -->
-  <string name="koSwitchLanguageForAllApplications" comment="Advanced options - selected language applies to all applications">Select keyboard layout for all applications</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">Always elevate user permissions when running in Windows Vista</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
   <string name="S_Button_BaseKeyboard" comment="Options tab - base keyboard button">Base Keyboard...</string>
 
-  
+
 
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
@@ -463,7 +462,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set for an option">(none)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(no hotkey)</string>
 
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
@@ -515,7 +514,7 @@
   <!-- Introduced: 7.1.274.0 -->
   <string name="S_Hotkey_Keyboard_Title" comment="Hotkey - Keyboard Title">Keyboard Layouts</string>
 
-  
+
 
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
@@ -572,7 +571,7 @@
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">Diagnostics</string>
 
-  
+
 
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
@@ -594,8 +593,8 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 14.0 -->
   <string name="S_Button_Back" comment="Back button">&lt; Back</string>
-  
-  
+
+
 
   <!-- Context: Install Keyboard Dialog -->
   <!-- String Type: PlainText -->
@@ -617,8 +616,8 @@
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_InstallKeyboard_Button_Install" comment="Install keyboard/package - install button">Install</string>
 
-  
-  
+
+
 
   <!-- Context: Proxy Configuration Dialog -->
   <!-- String Type: PlainText -->
@@ -645,8 +644,8 @@
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_ProxyConfiguration_Password" comment="Proxy dialog - fillable-field password">Password: </string>
 
-  
-  
+
+
 
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
@@ -659,7 +658,7 @@
   <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Select the base Latin script
 keyboard that you use in Windows.  Keyman keyboards will adapt automatically to your preferred layout.</string>
 
-  
+
 
 
   <!-- Context: Hotkey Dialog -->
@@ -696,8 +695,8 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- String Type: FormatString -->
   <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">The hotkey %1$s conflicts with another hotkey.  If you continue, the other hotkey will be cleared.  Continue\?</string>
 
-  
-  
+
+
 
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
@@ -787,8 +786,8 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">E&amp;xit online update check</string>
 
-  
-  
+
+
 
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
@@ -815,8 +814,8 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Introduced: 9.0.341.0 -->
   <string name="S_Splash_ShowAtStartup" comment="Show at Startup toggle">Show this screen at startup</string>
 
-  
-  
+
+
 
   <!-- Context: _LanguageInfo -->
   <!-- String Type: PlainText -->
@@ -858,8 +857,8 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKShortApplicationTitle" comment="Product name">Keyman</string>
 
-  
-  
+
+
 
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
@@ -900,8 +899,8 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Introduced: 10.0.836.0 -->
   <string name="S_HintDialog_DontShowHintAgain" comment="Hint dialog - caption of checkbox at bottom of dialog">Don\'t show this hint again</string>
 
-  
-  
+
+
 
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
@@ -953,8 +952,8 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Toolbar_CloseOnScreenKeyboard" comment="Toolbar help - Close OSK pop-up text">Close On Screen Keyboard</string>
 
-  
-  
+
+
 
   <!-- Context: System Tray Menu Items -->
   <!-- String Type: PlainText -->
@@ -1017,7 +1016,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <string name="S_OSKContext_Print" comment="OSK right-click menu - print diagram of active keyboard layout">Print...</string>
 
 
-  
+
 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
@@ -1035,7 +1034,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Introduced: 7.0.239.0 -->
   <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">&amp;Print...</string>
 
-  
+
 
   <!-- Parameters: %1$s = Package to be uninstalled -->
   <!-- Context: Formatted Messages -->
@@ -1097,7 +1096,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKDownloadProgress_Title" comment="Notice of file downloading">Downloading File</string>
 
-  
+
 
 
   <!-- Parameters: %1$s = Keyboard name -->
@@ -1129,7 +1128,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">The Character Map has a database of characters that needs to be built before it can be used.  Build it now\?</string>
 
-  
+
 
 
   <!-- Parameters: %1$s = Error detail string -->
@@ -1188,7 +1187,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">Please select a Keyman keyboard to find related fonts.</string>
 
 
-  
+
   <!-- Context: Text Editor -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 10.0.836.0 -->

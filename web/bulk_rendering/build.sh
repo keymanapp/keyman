@@ -21,12 +21,12 @@ builder_describe \
   "build         (default) builds bulk_renderer to ../release/renderer/"
 builder_parse "$@"
 
-if builder_has_action configure; then
+if builder_start_action configure; then
   verify_npm_setup
-  builder_report success configure
+  builder_finish_action success configure
 fi
 
-if builder_has_action build; then
+if builder_start_action build; then
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json" $builder_verbose
-  builder_report success build
+  builder_finish_action success build
 fi

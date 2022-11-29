@@ -84,6 +84,8 @@ class LMLayerWorker {
 
   private _platformCapabilities: Capabilities;
 
+  private _testMode: boolean = false;
+
   private _hostURL: string;
 
   private _currentModelSource: ModelSourceSpec;
@@ -259,6 +261,7 @@ class LMLayerWorker {
         }
 
         this._platformCapabilities = payload.capabilities;
+        this._testMode = !!payload.testMode;
 
         this.transitionToLoadingState();
       }
@@ -308,7 +311,7 @@ class LMLayerWorker {
    * @param model The loaded language model.
    */
   private transitionToReadyState(model: LexicalModel): ModelCompositor {
-    let compositor = new ModelCompositor(model);
+    let compositor = new ModelCompositor(model, this._testMode);
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {

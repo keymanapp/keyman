@@ -54,6 +54,7 @@ begin
   frame.Align := alClient;
   frame.Parent := Self;
   frame.OnChanged := FrameModified;
+  frame.Visible := True;
 end;
 
 procedure TfrmWordlistEditor.FormDestroy(Sender: TObject);
