@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
-let LMLayer = require('../../build');
+let LMLayer = require('../../build/headless');
 
 // Test the top-level LMLayer interface.
 // Note: these tests can only be run after BOTH stages of compilation are completed.
@@ -54,7 +54,7 @@ describe('LMLayer', function() {
         assert.notProperty(data.source, 'code');
         assert.property(data.source, 'file');
         assert.isString(data.source.file);
-      
+
         callAsynchronously(() => fakeWorker.onmessage({
           data: {
             message: 'ready',
@@ -113,7 +113,7 @@ describe('LMLayer', function() {
    * Returns an object implementing *enough* of the Worker
    * interface to fool the LMLayer into thinking it's
    * communicating with a bona fide Web Worker.
-   * 
+   *
    * @returns {Worker} an object with sinon.fake() instances.
    */
   function createFakeWorker(postMessage) {
@@ -124,10 +124,10 @@ describe('LMLayer', function() {
   }
 
   /**
-   * Call a function in the future, i.e., later in the event loop.  
+   * Call a function in the future, i.e., later in the event loop.
    * The call does NOT block the current execution.
-   * Use this to fake asynchronous callbacks. 
-   * 
+   * Use this to fake asynchronous callbacks.
+   *
    * @param {Function} fn function to call
    */
   function callAsynchronously(fn) {

@@ -6,7 +6,7 @@ namespace com.keyman.osk {
      * Note that the test-case oriented 'recorder' stubs this method to facilitate OSK-based input
      * recording for use in test cases.  If changing this function, please ensure the recorder is
      * not affected.
-     * 
+     *
      * @param       {Object}      e      element touched (or clicked)
      */
     static clickKey(e: osk.KeyElement, input?: InputEventCoordinate) {
@@ -27,7 +27,7 @@ namespace com.keyman.osk {
         // Handle any DOM state management related to click inputs.
         let outputTarget = dom.Utils.getOutputTarget(Lelem);
         keyman.domManager.initActiveElement(Lelem);
-        
+
         // Clear any cached codepoint data; we can rebuild it if it's unchanged.
         outputTarget.invalidateSelection();
         // Deadkey matching continues to be troublesome.
@@ -51,8 +51,8 @@ namespace com.keyman.osk {
       }
     }
 
-    // Serves to hold DOM-dependent code that affects both 'native' and 'embedded' mode OSK use 
-    // after the KeyEvent object has been properly instantiated.  This should help catch any 
+    // Serves to hold DOM-dependent code that affects both 'native' and 'embedded' mode OSK use
+    // after the KeyEvent object has been properly instantiated.  This should help catch any
     // mutual last-minute DOM-side interactions before passing control to the processor... such as
     // the UI-control command keys as seen below.
     static handleClick(Lkc: text.KeyEvent, outputTarget: text.OutputTarget, e: osk.KeyElement) {

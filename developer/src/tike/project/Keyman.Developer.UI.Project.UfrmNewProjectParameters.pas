@@ -138,7 +138,7 @@ uses
 function ShowNewProjectParameters(Owner: TComponent): Boolean;
 var
   f: TfrmNewProjectParameters;
-  pt: TProjectTemplate;
+  pt: TKeyboardProjectTemplate;
 begin
   f := TfrmNewProjectParameters.Create(Owner);
   try
@@ -154,6 +154,7 @@ begin
       pt.Author := f.Author;
       pt.Version := f.Version;
       pt.BCP47Tags := f.BCP47Tags;
+      pt.IncludeIcon := True;
 
       try
         pt.Generate;

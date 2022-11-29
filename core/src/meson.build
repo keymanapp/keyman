@@ -92,6 +92,8 @@ lib = library('kmnkbp0',
   include_directories: inc,
   install: true)
 
+headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
+
 kmnkbp = declare_dependency(link_with: lib, include_directories: inc)
 
 pkg = import('pkgconfig')
@@ -99,4 +101,5 @@ pkg.generate(
     name: 'keyman_kmn_processor',
     version: meson.project_version(),
     description: 'Keyman processor for KMN keyboards.',
+    subdirs: headerdirs,
     libraries: lib)

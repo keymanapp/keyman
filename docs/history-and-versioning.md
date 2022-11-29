@@ -19,7 +19,7 @@ The version shown in `VERSION.md` is the upcoming release version. This means:
 
 ## TIER.md
 
-The release tier is updated in `TIER.md`?
+The release tier is updated in `TIER.md`.
 
 ## How history and version are updated
 
@@ -35,15 +35,16 @@ request (these are much rarer).
 ### History format
 
 ```text
-## <yyyy-mm-dd> <version> <tier>
+## <version> <tier> <yyyy-mm-dd>
 
-<type> [(<scope>[/<sub-scope>])]: <message> [(#<PR>)]
+* <type> [(<scope>[/<sub-scope>])]: <message> [(#<PR>)]
 ```
 
 For example:
 
 ```text
-## 2020-01-27 13.0.65 beta
-feat(developer/compiler): Hotkeys defined in .kmn no longer need to be quoted (#2432)
-chore: Release beta (#2555)
+## 16.0.98 beta 2022-11-08
+
+* fix(developer): update monaco editor to 0.15.6 (#7626)
+* chore(developer): tidy up compile hints (#7633)
 ```

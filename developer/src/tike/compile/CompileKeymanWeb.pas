@@ -1467,7 +1467,7 @@ begin
       9:  Result := '\t';
       10: Result := '\n';
       13: Result := '\r';
-      else Result := '\x'+IntToHex(ch,1);
+      else Result := '\x'+IntToHex(ch,2);
     end;
   end
   else

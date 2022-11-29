@@ -26,6 +26,7 @@
   },
   "scripts": {
     "tsc": "tsc",
+    "clean": "tsc -b --clean src/tsconfig.json && tsc -b --clean src/tsconfig.bundled.json",
     "test": "gosh ./test.sh",
     "mocha": "mocha"
   },

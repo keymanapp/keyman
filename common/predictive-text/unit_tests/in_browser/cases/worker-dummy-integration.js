@@ -16,7 +16,8 @@ describe('LMLayer using dummy model', function () {
     it('will predict future suggestions', function () {
       this.timeout(testconfig.timeouts.standard * 3); // This one makes multiple subsequent calls across
                                                       // the WebWorker boundary, so we should be generous here.
-      var lmLayer = new LMLayer(helpers.defaultCapabilities);
+
+      var lmLayer = new LMLayer(helpers.defaultCapabilities, null, true);
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {

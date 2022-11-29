@@ -148,7 +148,7 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
   private void processCloudResultForModel(Context aContext, MetaDataResult _r) {
     JSONArray lmData = _r.returnjson.jsonArray;
     if (lmData == null || lmData.length() == 0) {
-      KMLog.LogError(TAG, "Error in lexical model metadata from api.keyman.com - zero or null");
+      // Not an error if api.keyman.com returns empty array of associated lexical models
       return;
     }
 

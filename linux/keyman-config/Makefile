@@ -8,17 +8,20 @@ langtags:
 
 install: # run as sudo
 	pip3 install qrcode sentry-sdk
+	# eventually change this to: pip3 install .
 	python3 setup.py install
 	# install icons
 	mkdir -p /usr/local/share/keyman/icons
 	cp keyman_config/icons/* /usr/local/share/keyman/icons
 	# install man pages
 	mkdir -p /usr/local/share/man/man1
-	cp debian/man/*.1 /usr/local/share/man/man1
+	cp ../../debian/man/*.1 /usr/local/share/man/man1
 
 install-temp:
-	mkdir -p /tmp/kmfl/`python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)'`
-	PYTHONUSERBASE=/tmp/kmfl python3 setup.py install --user
+	mkdir -p /tmp/keyman/$(shell python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')
+	# when we no longer have to support old pip version (python > 3.6) change this to:
+	# pip3 install --prefix /tmp/keyman .
+	PYTHONUSERBASE=/tmp/keyman python3 setup.py install --user
 
 uninstall: clean # run as sudo
 	rm -rf /usr/local/share/keyman/icons
@@ -48,7 +51,7 @@ deb: dist
 	cd make_deb && tar xf ../dist/keyman_config-$(shell cat /tmp/keyman_version).tar.gz && \
 		mv keyman_config-$(shell cat /tmp/keyman_version) keyman-config-$(shell cat /tmp/keyman_version) && \
 		tar cfz keyman-config_$(shell cat /tmp/keyman_version).orig.tar.gz keyman-config-$(shell cat /tmp/keyman_version) && \
-		cd keyman-config-$(shell cat /tmp/keyman_version) && cp -a ../../debian . && dch -v$(shell cat /tmp/keyman_version)-1 ""
+		cd keyman-config-$(shell cat /tmp/keyman_version) && cp -a ../../../debian . && dch -v$(shell cat /tmp/keyman_version)-1 ""
 	cd make_deb/keyman-config-$(shell cat /tmp/keyman_version) && debuild -us -uc
 	rm /tmp/keyman_version
 

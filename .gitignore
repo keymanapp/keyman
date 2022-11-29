@@ -146,6 +146,7 @@
 # VS Code
 .vscode/
 .vs/
+.devcontainer/
 
 # IDE files
 **/.idea/**/*.xml
@@ -172,3 +173,12 @@ Thumbs.db
 # Temporary file for logging scripts in xcode runs, see build-utils.sh for
 # details
 /xcodebuild-scripts.log
+
+# Linux packaging related
+/debian/
+/results/
+/keyman*.deb
+/keyman*.ddeb
+/keyman*.buildinfo
+/keyman*.changes
+/keyman*.tar.?z

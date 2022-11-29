@@ -37,29 +37,27 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'web/unit_tests/modernizr.js',              // A dependency-managed utility script that helps with browser feature detection.
-    'web/unit_tests/dev_resources.js',          // Defines com.keyman.dom objects separate from KMW for unit testing.
-    'common/web/recorder/build/index.js',
-    'web/unit_tests/recorder_InputEvents.js',   // The object definitions used to generate/replicate key events for engine tests.
-                                                // Includes KMW's Device class, which is used by test_utils below.
-    'web/unit_tests/test_init_check.js',        // Ensures that tests will initialize properly
-    'common/test/resources/timeout-adapter.js', // Handles configuration timeout setup at runtime.
-    'web/unit_tests/test_utils.js',             // A basic utility script useful for constructing tests
-    'web/unit_tests/cases/**/*.js',             // Where the tests actually reside.
-    'common/test/resources/json/**/*.json',     // Where pre-loaded JSON resides.
+    'web/unit_tests/modernizr.js',               // A dependency-managed utility script that helps with browser feature detection.
+    'web/tools/element-wrappers/build/index.js', // Defines com.keyman.dom objects separate from KMW for unit testing.
+    'web/tools/device-detect/build/index.js',    // Defines com.keyman.utils.Device, separated from KMW for use in unit test setup.
+    'web/tools/recorder/build/index.js',         // The object definitions used to generate/replicate key events for engine tests.
+                                                 // Includes KMW's Device class, which is used by test_utils below.
+    'web/unit_tests/test_init_check.js',         // Ensures that tests will initialize properly
+    'common/test/resources/timeout-adapter.js',  // Handles configuration timeout setup at runtime.
+    'web/unit_tests/test_utils.js',              // A basic utility script useful for constructing tests
+    'web/unit_tests/cases/**/*.js',              // Where the tests actually reside.
+    'common/test/resources/json/**/*.json',      // Where pre-loaded JSON resides.
     {pattern: 'common/test/resources/fixtures/**/*.html', watched: true}, // HTML structures useful for testing.
     {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
     {pattern: 'web/release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/release/unminified/web/**/*.gif', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/release/unminified/web/**/*.png', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/release/unminified/web/**/*.eot', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/release/unminified/web/**/*.ttf', watched: false, served: true, included: false}, // OSK resources
-    {pattern: 'web/release/unminified/web/**/*.woff', watched: false, served: true, included: false}, // OSK resources
     {pattern: 'web/release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
     {pattern: 'web/release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
-    {pattern: 'web/unit_tests/recorder_InputEvents.js.map', watched: true, served: true, included: false},
-    {pattern: 'web/unit_tests/element-interface.js.map', watched: true, served: true, included: false},
-    {pattern: 'web/unit_tests/dev_resources.js.map', watched: true, served: true, included: false}
+    {pattern: 'web/tools/recorder/build/index.js.map', watched: true, served: true, included: false},
+    {pattern: 'web/tools/element-wrappers/build/index.js.map', watched: true, served: true, included: false},
+    {pattern: 'web/tools/device-detect/build/index.js.map', watched: true, served: true, included: false}
   ],
 
   proxies: {

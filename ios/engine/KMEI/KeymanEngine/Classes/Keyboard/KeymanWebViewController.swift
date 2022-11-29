@@ -254,20 +254,6 @@ extension KeymanWebViewController {
     webView!.evaluateJavaScript("doResetContext();", completionHandler: nil)
   }
 
-  func setDeviceType(_ idiom: UIUserInterfaceIdiom) {
-    let type: String
-    switch idiom {
-    case .phone:
-      type = "AppleMobile"
-    case .pad:
-      type = "AppleTablet"
-    default:
-      SentryManager.captureAndLog("Unexpected interface idiom: \(idiom)", logLevel: .severe)
-      return
-    }
-    webView!.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
-  }
-
   private func fontObject(from font: Font?, keyboard: InstallableKeyboard, isOsk: Bool) -> [String: Any]? {
     guard let font = font else {
       return nil
@@ -660,8 +646,6 @@ extension KeymanWebViewController: KeymanWebDelegate {
     if let cursorRange = self.currentCursorRange {
       self.setCursorRange(cursorRange)
     }
-
-    setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Manager.shared.currentKeyboard
 

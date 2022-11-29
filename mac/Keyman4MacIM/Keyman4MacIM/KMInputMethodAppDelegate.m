@@ -22,6 +22,7 @@
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
 #import "KMKeyboardInfo.h"
+#import "PrivacyConsent.h"
 @import Sentry;
 
 /** NSUserDefaults keys */
@@ -87,38 +88,48 @@ NSString* _keymanDataPath = nil;
 #else
         _debugMode = self.useVerboseLogging;
 #endif
-        [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
-                                                           andSelector:@selector(handleURLEvent:withReplyEvent:)
-                                                         forEventClass:kInternetEventClass
-                                                            andEventID:kAEGetURL];
 
-        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
-                                                 kCGHeadInsertEventTap,
-                                                 kCGEventTapOptionListenOnly,
-                                                 CGEventMaskBit(kCGEventFlagsChanged) |
-                                                 CGEventMaskBit(kCGEventLeftMouseDown) |
-                                                 CGEventMaskBit(kCGEventLeftMouseUp) |
-                                                 CGEventMaskBit(kCGEventKeyDown),
-                                                 (CGEventTapCallBack)eventTapFunction,
-                                                 nil);
-
-        if (!self.lowLevelEventTap) {
-            NSLog(@"Can't tap into low level events!");
-        }
-        else {
-            CFRelease(self.lowLevelEventTap);
-        }
-
-        self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
-
-        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-
-        if (self.runLoopEventSrc && runLoop) {
-            CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
-        }
+      // first notify user and request access to Accessibility/PostEvent permissions
+      // pass block as completion handler to complete init with initCompletion
+      [PrivacyConsent.shared requestPrivacyAccess:^void (void){
+        [self initCompletion];
+      }];
     }
 
     return self;
+}
+
+- (void)initCompletion {
+  NSLog(@"initCompletionHandler method invoked");
+  [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
+                                                     andSelector:@selector(handleURLEvent:withReplyEvent:)
+                                                   forEventClass:kInternetEventClass
+                                                      andEventID:kAEGetURL];
+
+  self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
+                                           kCGHeadInsertEventTap,
+                                           kCGEventTapOptionListenOnly,
+                                           CGEventMaskBit(kCGEventFlagsChanged) |
+                                           CGEventMaskBit(kCGEventLeftMouseDown) |
+                                           CGEventMaskBit(kCGEventLeftMouseUp) |
+                                           CGEventMaskBit(kCGEventKeyDown),
+                                           (CGEventTapCallBack)eventTapFunction,
+                                           nil);
+
+  if (!self.lowLevelEventTap) {
+      NSLog(@"Can't tap into low level events!");
+  }
+  else {
+      CFRelease(self.lowLevelEventTap);
+  }
+
+  self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
+
+  CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+
+  if (self.runLoopEventSrc && runLoop) {
+      CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
+  }
 }
 
 - (KeymanVersionInfo)versionInfo {

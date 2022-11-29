@@ -1,18 +1,18 @@
 (*
   Name:             UfrmCharacterMapNew
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     23 Aug 2006 - mcdurdin - Implement filter dialog
                     23 Aug 2006 - mcdurdin - Mouse wheel scrolling and zooming
@@ -189,6 +189,8 @@ type
     function Blocks: TUnicodeBlockList;
     procedure MoveCell(Direction: TCharMapDirection);
     function GetFontSize: Integer;   // I4807
+    procedure SetFocusToGrid;
+    procedure SetFocusToFilter;
   public
     constructor Create(AOwner: TComponent; ASettingsKey: WideString); reintroduce;
     procedure Reload;
@@ -230,7 +232,7 @@ implementation
 
 uses
   GetOsVersion,
-  ErrorControlledRegistry, 
+  ErrorControlledRegistry,
   RegistryKeys,
   UfrmCharacterMapFilter,
   Unicode,
@@ -524,11 +526,11 @@ procedure TfrmCharacterMapNew.editFilterKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
-    grid.SetFocus
+    SetFocusToGrid
   else if Key = VK_RETURN then
     if ssCtrl in Shift
       then cmdFilterClick(nil)
-      else grid.SetFocus
+      else SetFocusToGrid
   else
     Exit;
   Key := 0;
@@ -708,7 +710,7 @@ begin
   else if (Key = Ord('F')) and (ssCtrl in Shift) and (ssShift in Shift) then
     mnuPopupFontClick(mnuPopupFont)
   else if (Key = Ord('F')) and (ssCtrl in Shift) then
-    editFilter.SetFocus
+    SetFocusToFilter
   else if (Key = Ord('G')) and (ssCtrl in Shift) then
     mnuGotoClick(mnuGoto)
   else if (Key = VK_UP) then
@@ -764,7 +766,7 @@ begin
         while (ARow > 0) and (GetHeaderCellProperties(ACol, ARow) <> nil) do Dec(ARow);
         while (ACol > 0) and not CanSelect(ACol, ARow) do Dec(ACol);
       end;
-    mvDown: 
+    mvDown:
       begin
         Inc(ARow);
         while (ARow < grid.RowCount - 1) and (GetHeaderCellProperties(ACol, ARow) <> nil) do Inc(ARow);
@@ -911,7 +913,7 @@ var
   uc: TUnicodeCharacter;
 begin
   Result := nil;
-  
+
   ch := GetCharFromCell(grid.Col, grid.Row);
   if ch = 0 then Exit;
 
@@ -1043,7 +1045,7 @@ begin
     begin
       Self.editFilter.Text := Filter;
       Self.editFilter.Font.Color := clWindowText;
-      Self.editFilter.SetFocus;
+      SetFocusToFilter;
       Self.editFilterChange(Self.editFilter);
     end;
   finally
@@ -1295,7 +1297,7 @@ end;
 
 procedure TfrmCharacterMapNew.mnuPopupFilterClick(Sender: TObject);
 begin
-  editFilter.SetFocus;
+  SetFocusToFilter;
 end;
 
 procedure TfrmCharacterMapNew.mnuPopupFontClick(Sender: TObject);
@@ -1312,8 +1314,33 @@ begin
 
   UpdateFont(AFontName);
   grid.Invalidate;
-  grid.SetFocus;
+  SetFocusToGrid;
   DialogClosing;
+end;
+
+{
+ #7639: It appears that components within a docking form are unable to be
+ focused in some, rare contexts. We don't want to crash, and the end
+ result of not focusing  is not really all that tragic, so let's just
+ mask the exception.
+}
+
+procedure TfrmCharacterMapNew.SetFocusToGrid;
+begin
+  try
+    grid.SetFocus;
+  except
+    on E:EInvalidOperation do ;
+  end;
+end;
+
+procedure TfrmCharacterMapNew.SetFocusToFilter;
+begin
+  try
+    editFilter.SetFocus;
+  except
+    on E:EInvalidOperation do ;
+  end;
 end;
 
 end.

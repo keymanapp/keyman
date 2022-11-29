@@ -41,7 +41,6 @@ module.exports = {
     // We don't have anything in these locations... yet.  But they'll be useful for test resources.
     'json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
-    {pattern: 'fixtures/**/*.html', watched: true} // HTML structures useful for testing.
   ],
 
   // list of files / patterns to exclude
@@ -51,7 +50,6 @@ module.exports = {
   // preprocess matching files before serving them to the browser
   // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
   preprocessors: {
-    'fixtures/**/*.html'	: ['html2js'],
     'json/**/*.json' : ['json_fixtures']
   },
 

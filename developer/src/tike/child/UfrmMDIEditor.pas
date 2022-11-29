@@ -109,6 +109,8 @@ type
 
     function Revert: Boolean;
 
+    procedure ControlKeyPressedAndReleased; virtual;
+
     procedure SetFocus; override;   // I4679
 
     property Untitled: Boolean read GetUntitled;
@@ -159,6 +161,11 @@ end;
 
 procedure TfrmTikeEditor.CodeFontChanged;
 begin
+end;
+
+procedure TfrmTikeEditor.ControlKeyPressedAndReleased;
+begin
+  // Do nothing
 end;
 
 constructor TfrmTikeEditor.Create(AOwner: TComponent);

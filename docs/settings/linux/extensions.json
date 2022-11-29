@@ -4,6 +4,7 @@
   "recommendations": [
     "asabil.meson",
     "EditorConfig.editorconfig",
-    "ms-python.python"
+    "ms-python.python",
+    "timonwong.shellcheck"
   ]
 }

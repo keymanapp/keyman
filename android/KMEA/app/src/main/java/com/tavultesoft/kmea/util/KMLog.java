@@ -5,6 +5,12 @@
 package com.tavultesoft.kmea.util;
 
 import android.util.Log;
+import android.widget.Toast;
+
+import com.tavultesoft.kmea.BaseActivity;
+import com.tavultesoft.kmea.BuildConfig;
+import com.tavultesoft.kmea.KMManager;
+
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
@@ -35,6 +41,10 @@ public final class KMLog {
     if (msg != null && !msg.isEmpty()) {
       Log.e(tag, msg);
 
+      if (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME) != KMManager.Tier.STABLE) {
+        BaseActivity.makeToast(null, msg, Toast.LENGTH_LONG);
+      }
+
       if (Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.ERROR);
       }
@@ -44,20 +54,24 @@ public final class KMLog {
   /**
    * Utility to log exceptions and send to Sentry
    * @param tag String of the caller
-   * @param msg String of the exception message
+   * @param msg String of the exception message (maybe localized)
    * @param e Throwable exception
    */
   public static void LogException(String tag, String msg, Throwable e) {
+    String errorMsg = "";
     if (msg != null && !msg.isEmpty()) {
-      Log.e(tag, msg + "\n" + e);
+      errorMsg = msg + "\n" + e;
     } else if (e != null) {
-      Log.e(tag, e.getMessage(), e);
+      errorMsg = e.getMessage();
+    }
+    Log.e(tag, errorMsg, e);
+
+    if (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME) != KMManager.Tier.STABLE) {
+      BaseActivity.makeToast(null, errorMsg, Toast.LENGTH_LONG);
     }
 
     if (Sentry.isEnabled()) {
-      if (msg != null && !msg.isEmpty()) {
-        Sentry.addBreadcrumb(msg);
-      }
+      Sentry.addBreadcrumb(errorMsg);
       Sentry.captureException(e);
     }
   }
