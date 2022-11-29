@@ -8,6 +8,20 @@ function loadKeyboards() {
     // Both Firefox and Chrome don't like that it's not data: or http:/https:
     // and will consider the local files to be "remote resource[s]".
     commonPrefix = "../../../../../common/test/resources";
+  } else if(location.href.indexOf("build.palaso.org")) {
+    // URL format:  https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/<build id>:id/ is the test-site root.
+    // <build id> is an integer.
+    //
+    // `/resources` should be rooted on that.
+
+    let testSiteRootSuffixMatcher = /Keymanweb_TestPullRequests\/\d{1,10}:id/;
+    let match = testSiteRootSuffixMatcher.exec(location.href);
+    if(match.length > 0) {
+      let totalLength = match.index + match[0].length;
+      commonPrefix = location.href.substring(0, totalLength) + "/resources";
+    } else {
+      console.error("Failed to properly detect recorder-resource path for TC build artifact");
+    }
   }
 
   var filePrefix = commonPrefix + "/json/keyboards/";
