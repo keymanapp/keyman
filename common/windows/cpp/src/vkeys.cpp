@@ -291,7 +291,7 @@ const VKEY_CHAR* VKeyNames[256] = {
   lpuch("K_?FF")				// &HFF
   };
 
-const KMX_UCHAR* VKeyISO9995Names[256] = {
+const VKEY_CHAR* VKeyISO9995Names[256] = {
   // Key Codes
   lpuch(""), // lpuch("K_?00"),				// &H0
   lpuch(""), // lpuch("K_LBUTTON"),			// &H1
