@@ -1,3 +1,5 @@
+/// <reference types="@keymanapp/models-types" />
+
 /**
  * @file priority-queue.ts
  *

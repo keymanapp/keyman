@@ -30,6 +30,7 @@
  */
 
 /// <reference types="@keymanapp/lm-message-types" />
+import type * as types from "@keymanapp/web-utils/build/obj/kmwstring.js";
 
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';

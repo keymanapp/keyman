@@ -1,3 +1,5 @@
+/// <reference types="@keymanapp/models-types" />
+
 // Allows the kmwstring bindings to resolve.
 import type * as types from "@keymanapp/web-utils/build/obj/kmwstring.js";
 
