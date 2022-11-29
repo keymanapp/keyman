@@ -214,7 +214,7 @@ BOOL FSaveDebug, FCompilerWarningsAsErrors, FWarnDeprecatedCode;   // I4865   //
 BOOL FShouldAddCompilerVersion = TRUE;
 BOOL FOldCharPosMatching = FALSE, FMnemonicLayout = FALSE;
 NamedCodeConstants *CodeConstants = NULL;
-
+int BeginLine[4];
 /* Compile target */
 
 int CompileTarget;
@@ -493,6 +493,11 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
   fk->dwBitmapSize = 0;
   fk->dwHotKey = 0;
 
+  BeginLine[BEGIN_ANSI] = -1;
+  BeginLine[BEGIN_UNICODE] = -1;
+  BeginLine[BEGIN_NEWCONTEXT] = -1;
+  BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+
   /* Add a store for the Keyman 6.0 copyright information string */
 
   if(FShouldAddCompilerVersion) {
@@ -603,6 +608,13 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
   else if (_wcsnicmp(p, L"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
   else if (*p != '>') return CERR_InvalidToken;
   else BeginMode = BEGIN_ANSI;
+
+  if(BeginLine[BeginMode] != -1) {
+    return CERR_RepeatedBegin;
+  }
+
+  BeginLine[BeginMode] = currentLine;
+
 
   if ((msg = GetRHS(fk, p, tstr, 80, (int)(INT_PTR)(p - pp), FALSE)) != CERR_None) return msg;
 
