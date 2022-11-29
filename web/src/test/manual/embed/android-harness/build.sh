@@ -10,9 +10,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
-# TODO:  Convert this into the start of a test/manual/embed section when reworking the Web test
-#        page organization.
-
 mkdir -p "$THIS_DIR/host"
 cp -R "$KEYMAN_ROOT/android/KMEA/app/src/main/assets/"* "$THIS_DIR/host/"
 cp "$KEYMAN_ROOT/web/build/app/embed/debug/keyman.js" "$THIS_DIR/host/keymanandroid.js"
