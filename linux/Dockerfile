@@ -21,4 +21,6 @@ ADD debian/control /tmp/control
 # Answer 'yes' to install questions
 RUN (yes | mk-build-deps --install /tmp/control) || true
 # now, switch to build user
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash
+RUN apt-get -q -y install nodejs
 USER build

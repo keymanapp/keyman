@@ -162,36 +162,26 @@ var loadKeyboardFromJSON = function(jsonPath, timeout, params) {
 
 function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
   var inputElem = document.getElementById('singleton');
-  if(inputElem['kmw_ip']) {
-    inputElem = inputElem['kmw_ip'];
-  }
 
   let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
   testDef.test(proctor);
 }
 
-function runKeyboardTestFromJSON(jsonPath, params, callback, assertCallback, timeout) {
+function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
   var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
   let device = new com.keyman.Device();
   device.detect();
 
-  loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
+  return loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
     runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
+  }).finally(() => {
     keyman.removeKeyboards(testSpec.keyboard.id);
-    callback();
   });
 }
 
 function retrieveAndReset(Pelem) {
-  var alias = Pelem['kmw_ip'];
-  var val = "";
-  if(alias) {
-    val = alias.textContent;
-    alias.setText("", 0);
-  } else {
-    val = Pelem.value;
-    Pelem.value = "";
-  }
+  let val = Pelem.value;
+  Pelem.value = "";
 
   return val;
 }
@@ -296,18 +286,6 @@ if(typeof(DynamicElements) == 'undefined') {
 
     masterDiv.appendChild(editable);
     return editable.id;
-  }
-
-  // base: takes an optional element to use as the touch alias's ['base'] property.
-  DynamicElements.addTouchAlias = function(base) {
-    var masterDiv = document.getElementById('DynamicElements');
-    var touchAlias = com.keyman.dom.constructTouchAlias(base);
-    var i = inputCounter++;
-
-    touchAlias.id = 'touchAlias' + i;
-
-    masterDiv.appendChild(touchAlias);
-    return touchAlias.id;
   }
 
   DynamicElements.assertAttached = function(ele, done) {

@@ -219,6 +219,7 @@ uses
   RegistryKeys,
   KeymanDeveloperOptions,
   KeymanDeveloperUtils,
+  ScanCodeMap,
   TextFileFormat,
   UfrmEditor,
   UfrmKeymanWizard,
@@ -448,10 +449,16 @@ function TfrmDebug.ProcessKeyEvent(var Message: TMessage): Boolean;
     end;
   end;
 var
-  modifier: uint16_t;
+  vkey, modifier: uint16_t;
 begin
   Assert(Assigned(FDebugCore));
+
+  // We always use the US virtual key code as a basis for our keystroke
+  // mapping; the best way to do this is to extract the scan code from
+  // the message data and work from that
+  vkey := MapScanCodeToUSVK((Message.LParam and $FF0000) shr 16);
   modifier := 0;
+
   if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_LCTRL;
   if GetKeyState(VK_RCONTROL) < 0 then modifier := modifier or KM_KBP_MODIFIER_RCTRL;
   if GetKeyState(VK_LMENU) < 0 then modifier := modifier or KM_KBP_MODIFIER_LALT;
@@ -459,22 +466,29 @@ begin
   if GetKeyState(VK_SHIFT) < 0 then modifier := modifier or KM_KBP_MODIFIER_SHIFT;
   if (GetKeyState(VK_CAPITAL) and 1) = 1 then modifier := modifier or KM_KBP_MODIFIER_CAPS;
 
+  if (modifier and (KM_KBP_MODIFIER_LCTRL or KM_KBP_MODIFIER_RALT)) = (KM_KBP_MODIFIER_LCTRL or KM_KBP_MODIFIER_RALT) then
+  begin
+    // #7506: Windows emits LCtrl+RAlt for AltGr for European keyboards; we want
+    // to ignore this combination
+    modifier := modifier and not KM_KBP_MODIFIER_LCTRL;
+  end;
+
   if not SetKeyEventContext then
     Exit(False);
 
-  if km_kbp_process_event(FDebugCore.State, Message.WParam, modifier, 1) = KM_KBP_STATUS_OK then
+  if km_kbp_process_event(FDebugCore.State, vkey, modifier, 1) = KM_KBP_STATUS_OK then
   begin
-    // Process keystroke
+    // Process keystroke -- true = swallow keystroke
     Result := True;
 
-    if IsModifierKey(Message.WParam) then
+    if IsModifierKey(vkey) then
     begin
       // We don't want to trigger the debugger on modifier keys
       Exit(True);
     end;
 
     FEvents.Clear;
-    FEvents.AddStateItems(FDebugCore.State, Message.WParam, modifier, debugkeyboard);
+    FEvents.AddStateItems(FDebugCore.State, vkey, modifier, debugkeyboard);
 
     if FSingleStepMode then
     begin

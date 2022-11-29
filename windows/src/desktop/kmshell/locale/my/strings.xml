@@ -19,16 +19,11 @@
   <string name="kogStartup" comment="/FormatString: ">အစပြု</string>
   <string name="koKeyboardHotkeysAreToggle" comment="/FormatString: ">ကီးဘုတ် hotkeys togggle ကီးဘုတ် အသက်သွင်းခြင်း</string>
   <string name="koReleaseShiftKeysAfterKeyPress" comment="/FormatString: ">Screenမှာပေါ်မှာမြင်ရမည့်ကီးဘုတ်တွင် ကီးကိုနှိပ်ပြီးလျှင်Shift/Ctrl/Alt ကိုလွှတ်လိုက်ပါ</string>
-  <string name="koRunElevatedInVista" comment="/FormatString: ">ဝင်းဒိုး Vista မှာသုံးတိုင်း အသုံးပြုသူရဲ့ခွင့်ပြုချက်ကို အမြင့်ဆုံးအထိ ခွင့်ပြုပါ</string>
   <string name="koShowHints" comment="/FormatString: ">အရိပ်အမွက် စကားစုကိုပြပါ</string>
   <string name="koShowStartup" comment="/FormatString: ">splash screen ကိုပြပါ</string>
   <string name="koShowWelcome" comment="/FormatString: ">Welcome screen ကိုပြပါ</string>
   <string name="koStartWithWindows" comment="/FormatString: ">ဝင်းဒိုးစတက်တာနဲ့ စသုံးပါ</string>
-  <string name="koSwitchLanguageForAllApplications" comment="/FormatString: ">application အားလုံးအတွက် ကီးဘုတ်လက်ကွက်ကို ရွေးချယ်ပါ</string>
-  <string name="koSwitchLanguageWithKeyboard" comment="/FormatString: ">ကီးမန်းကီးဘုတ်ကို ရွေးပြီးလျှင် ဝင်းဒိုးဘာသာစကားကို ဖွင့်ပါ</string>
   <string name="koTestKeymanFunctioning" comment="/FormatString: ">Keymanစသည့်အချိန် တွင် အဆင်မပြေပဲညိနိုင်သော application များကို စစ်ဆေးခြင်း </string>
-  <string name="koTurnOnSurrogates" comment="/FormatString: ">ယူနီကုဒ် အပို အက္ခရာ ဖော်ပြမှုကို ဖွင့်ပါ( Restart လုပ်ရန်လိုသည်)</string>
-  <string name="koUnknownLanguage" comment="/FormatString: ">"အမည်မသိ"ဘာသာစကားကိုဖွင့်ပါ</string>
   <string name="S_Menu_OnScreenKeyboard" comment="/PlainText: ">&amp;Screen ပေါ်ကီးဘုတ်</string>
   <string name="S_Toolbar_OpenHelp" comment="/PlainText: ">အကူအညီကိုဖွင့်ပါ</string>
   <string name="S_Toolbar_OpenConfiguration" comment="/PlainText: ">Keymanရဲ့စနစ်ပိုင်းဆိုင်ရာကို ဖွင့်ပါ</string>

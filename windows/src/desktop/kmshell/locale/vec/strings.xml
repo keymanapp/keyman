@@ -19,15 +19,11 @@
   <string name="kogStartup" comment="/FormatString: ">Startup</string>
   <string name="koKeyboardHotkeysAreToggle" comment="/FormatString: ">I botoni de funsion de tastièra i pasa indretamente da inpisà a destuà e vicevèrsa</string>
   <string name="koReleaseShiftKeysAfterKeyPress" comment="/FormatString: ">Dexativa  Shift/Ctrl/Alt so ƚa Tastièra so Schèrmo dapò ver clicà un tasto</string>
-  <string name="koRunElevatedInVista" comment="/FormatString: ">Inalsa senpre i parmesi utente co' se laora in Windows Vista</string>
   <string name="koShowHints" comment="/FormatString: ">Mostra mesaji de suxerimento</string>
   <string name="koShowStartup" comment="/FormatString: ">Mostra schermada de invìo</string>
   <string name="koShowWelcome" comment="/FormatString: ">Mostra schermada de benvignù</string>
   <string name="koStartWithWindows" comment="/FormatString: ">Invìa Keyman Desktop co se invìa Windows</string>
-  <string name="koSwitchLanguageWithKeyboard" comment="/FormatString: ">Canbia lengua de Windows co xé desernìo na tastièra Keyman</string>
   <string name="koTestKeymanFunctioning" comment="/FormatString: ">Verìfega se ghe xé confliti co' programi co se invìa Keyman</string>
-  <string name="koTurnOnSurrogates" comment="/FormatString: ">Inpisa ƚa mostra de i caràteri suplementar Unicode (senghe vol de inviar da novo)</string>
-  <string name="koUnknownLanguage" comment="/FormatString: ">Inpisa lengua 'desconosesta'</string>
   <string name="S_Menu_OnScreenKeyboard" comment="/PlainText: ">Tastièra so schèrmo</string>
   <string name="S_Toolbar_OpenHelp" comment="/PlainText: ">Vèrxi àida</string>
   <string name="S_Toolbar_OpenConfiguration" comment="/PlainText: ">Vèrxi confegurasion Keyman Desktop</string>
@@ -235,7 +231,6 @@
   <string name="S_Documentation_NotInstalled" comment="Configuration Dialog - Captions/PlainText: (Documentation) Not installed term (introduced 8.0.306.0)">Not installed</string>
   <string name="S_Menu_Options" comment="Configuration Dialog - Keyboard Layouts tab/PlainText: KL option button submenu - keyboard options (introduced 8.0.287.0)">Keyboard options</string>
   <string name="koDeadkeyConversion" comment="Configuration Dialog - Options tab/FormatString: Advanced options - Base keyboard deadkeys are treated as normal keys (introduced 9.0.480.0)">Treat hardware deadkeys as plain keys</string>
-  <string name="koSwitchLanguageForAllApplications" comment="Configuration Dialog - Options tab/FormatString: Advanced options - selected language applies to all applications (introduced 7.1.274.0)">Select keyboard layout for all applications</string>
   <string name="S_Button_BaseKeyboard" comment="Configuration Dialog - Options tab/PlainText: Options tab - base keyboard button (introduced 9.0.445.0)">Base Keyboard...</string>
   <string name="S_Hotkey_ShowFontHelper" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show font helper in OSK (introduced 7.1.275.0)">Show Font Helper Pane</string>
   <string name="S_Hotkey_ShowCharacterMap" comment="Configuration Dialog - Hotkeys tab/PlainText: Hotkey - show character map in OSK (introduced 7.1.275.0)">Show Character Map Pane</string>

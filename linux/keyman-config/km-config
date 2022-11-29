@@ -24,12 +24,14 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--install', action='store', help='download and/or install .kmp ' +
                         'package. INSTALL can either be a downloaded .kmp file, a file:// URL ' +
                         'pointing to a .kmp file, or a keyman:// URL, possibly with a ' +
-                        'bcp47=<language> specified.')
+                        'bcp47=<language> specified (e.g. keyman://download/keyboard/' +
+                        'sil_el_ethiopian_latin?bcp47=ssy-latn).')
     parser.add_argument('url', nargs='?', default='', metavar='INSTALL',
                         help='download and/or install .kmp ' +
                         'package. INSTALL can either be a downloaded .kmp file, a file:// URL ' +
                         'pointing to a .kmp file, or a keyman:// URL, possibly with a ' +
-                        'bcp47=<language> specified.')
+                        'bcp47=<language> specified (e.g. keyman://download/keyboard/' +
+                        'sil_el_ethiopian_latin?bcp47=ssy-latn).')
 
     args = parser.parse_args()
     if args.verbose:

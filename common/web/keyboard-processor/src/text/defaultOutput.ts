@@ -144,31 +144,9 @@ namespace com.keyman.text {
     public static forUnicodeKeynames(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
       const keyName = Lkc.kName;
 
-      // Test for fall back to U_xxxxxx key id
-      // For this first test, we ignore the keyCode and use the keyName
-      if(!keyName || keyName.substr(0,2) != 'U_') {
-        return null;
-      }
-
-      let result = '';
-      const codePoints = keyName.substr(2).split('_');
-      for(let codePoint of codePoints) {
-        const codePointValue = parseInt(codePoint, 16);
-        if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) || ((0x80 <= codePointValue) && (codePointValue <= 0x9F))) {
-          // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
-          // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
-          if(ruleBehavior) {
-            ruleBehavior.errorLog = ("Suppressing Unicode control code in " + keyName);
-          }
-          // We'll attempt to add valid chars
-          continue;
-        } else {
-          // String.fromCharCode() is inadequate to handle the entire range of Unicode
-          // Someday after upgrading to ES2015, can use String.fromCodePoint()
-          result += String.kmwFromCharCode(codePointValue);
-        }
-      }
-      return result ? result : null;
+      return keyboards.ActiveKey.unicodeIDToText(keyName, (codeWithError) => {
+        ruleBehavior.errorLog = ("Suppressing Unicode control code in " + keyName + ": " + codeWithError);
+      });
     }
 
     // Test for otherwise unimplemented keys on the the base default & shift layers.

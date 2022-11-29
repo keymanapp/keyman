@@ -104,7 +104,7 @@ gchar * keyman_get_icon_file(const gchar *kmx_file)
 
     p=rindex(kmx_file,'.');
     filename = g_strndup(kmx_file, p-kmx_file);
-    full_path_to_icon_file=g_strdup_printf("%s.ico.png", filename);
+    full_path_to_icon_file=g_strdup_printf("%s.bmp.png", filename);
     g_free(filename);
 
     if (!g_file_test(full_path_to_icon_file, G_FILE_TEST_EXISTS)) {

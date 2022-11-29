@@ -243,6 +243,14 @@ public class PackageProcessorTest {
     Assert.assertEquals(TEST_GFF_KMP_NAME, PP.getPackageID(TEST_GFF_KMP_FILE));
     Assert.assertNotEquals(TEST_GFF_KBD_ID, PP.getPackageID(TEST_GFF_KMP_FILE));
     Assert.assertEquals(TEST_EN_CUSTOM_MODEL_NAME, PP.getPackageID(TEST_EN_CUSTOM_MODEL_KMP_FILE));
+
+    // Test trimming " (#)" from kmp name
+    Assert.assertEquals("khmer_angkor", PP.getPackageID(new File("khmer_angkor(10).kmp")));
+    Assert.assertEquals("khmer_angkor", PP.getPackageID(new File("khmer_angkor (10).kmp")));
+
+    // Test trimming "-#" from kmp name
+    Assert.assertEquals("khmer_angkor", PP.getPackageID(new File("khmer_angkor-10.kmp")));
+    Assert.assertEquals("khmer_angkor", PP.getPackageID(new File("khmer_angkor -10.kmp")));
   }
 
   @Test

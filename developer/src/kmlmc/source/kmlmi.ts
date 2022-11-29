@@ -46,7 +46,7 @@ let jsFilename = program.jsFilename ? program.jsFilename : path.join(path.dirnam
 
 let kpsString: string = fs.readFileSync(kpsFilename, 'utf8');
 let kmpCompiler = new KmpCompiler();
-let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString);
+let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString, kpsFilename);
 
 //
 // Write out the merged .model_info file

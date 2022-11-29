@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Koonday holla kibod dow yeeso na`ura";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Nafturu bee verbose Consol logging";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Mballa";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Jippunu kibod...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Konfigoreshon Keyman";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Ɓaawo";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Tappirɗe";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "To cuɓol logging verbose man ɗo maɓɓiti, Keyman nastay nder kuuɗe ko mballata Keyman Mballita laarol nder masala. kuuɗe Consol man naftiran nasta nder lelle diga Keyman. Nder Consol, seɗu ngam holla kala lelle fuu diga kuuɗe \"Keyman\" man. nastugo nder man ɓe wurtinay ɗum ɓe yerɓa ɗum haa Keyman to ɗo mari haaje.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Yeeso";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Home";
+
+/* Options button text */
+"frd-No-seV.label" = "Cuɓi";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Wa`unu kibod";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Kunnu ɗo to a` ɗo fotta bee masala bee nanta kala kibod fuu ko bo bee Keyman nder fuu man.";

@@ -36,7 +36,7 @@ Build-Depends:
  xvfb,
  metacity,
  gawk,
-Standards-Version: 4.6.0
+Standards-Version: 4.6.1
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman
 Homepage: https://www.keyman.com

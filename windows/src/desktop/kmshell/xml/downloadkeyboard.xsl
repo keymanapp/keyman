@@ -47,7 +47,7 @@
               height: <xsl:value-of select="$dialoginfo_downloadkeyboard/footerheight" />px;
               width: 100%;
               overflow: hidden;
-              background: #dcdcdc;
+              background: #79C3DA;
               padding: 8px 8px 8px 8px;
             }
         </style>
