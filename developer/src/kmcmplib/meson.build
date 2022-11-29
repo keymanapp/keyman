@@ -9,7 +9,8 @@ project('kmcmplib', 'cpp', 'c',
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14',
-                           'b_vscrt=static_from_buildtype'])
+                           'b_vscrt=static_from_buildtype',
+                           'default_library=static'])
 
 message('meson.project_version(): ' + meson.project_version() + '\n')
 compiler = meson.get_compiler('cpp')
