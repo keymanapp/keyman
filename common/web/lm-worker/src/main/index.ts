@@ -295,16 +295,16 @@ export default class LMLayerWorker {
         if(payload.source.type == 'file') {
           _this.loadModelFile(payload.source.file);
         } else {
-          // Creates a closure capturing all top-level names that the model must be able to reference.
-          // `eval` runs by scope rules; our virtualized worker needs a special scope for this to work.
-          //
-          // Reference: https://stackoverflow.com/a/40108685
-          // Note that we don't need `this`, but we do need the namespaces seen below.
           let code = payload.source.code;
-          let evalInContext = function(LMLayerWorker, models, correction, wordBreakers) {
-            eval(code);
-          }
-          evalInContext(_this, models, correction, wordBreakers);
+
+          // Limits the scope accessible by the code we're about to evaluate; the code may only access
+          // global scope and the arguments specified in the constructor below.
+          //
+          // This is far more encapsulated and likely more secure... and the former point means this is
+          // easier to bundle and more optimizable when bundling than direct eval.
+          // Reference: https://esbuild.github.io/link/direct-eval
+          let modelLoader = new Function('LMLayerWorker', 'models', 'correction', 'wordBreakers', code);
+          modelLoader(_this, models, correction, wordBreakers);
         }
       }
     };
