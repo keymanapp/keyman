@@ -1,6 +1,6 @@
-var assert = require('chai').assert;
+import { assert } from 'chai';
 
-let TransformUtils = require('../../../web/lm-worker/build/intermediate.js').TransformUtils;
+import TransformUtils from '../../../build/obj/transformUtils.js';
 
 describe('TransformUtils', function () {
   describe('isWhitespace', function () {
@@ -20,7 +20,7 @@ describe('TransformUtils', function () {
     });
 
     it("should match a simple ' ' transform", function() {
-      transform = {
+      let transform = {
         insert: " ",
         deleteLeft: 0
       };
@@ -29,7 +29,7 @@ describe('TransformUtils', function () {
     });
 
     it("should match a simple ' ' transform with delete-left", function() {
-      transform = {
+      let transform = {
         insert: " ",
         deleteLeft: 1
       };
@@ -38,7 +38,7 @@ describe('TransformUtils', function () {
     });
 
     it("should match a transform consisting of multiple characters of only whitespace", function() {
-      transform = {
+      let transform = {
         insert: " \n\r\u00a0\t\u2000 ",
         deleteLeft: 0
       };
@@ -47,7 +47,7 @@ describe('TransformUtils', function () {
     });
 
     it("stress tests", function() {
-      transform = {
+      let transform = {
         insert: " \n\r\u00a0\ta\u2000 ",  // the 'a' should cause failure.
         deleteLeft: 0
       };
