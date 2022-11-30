@@ -5,10 +5,19 @@
 // Unfortunately, the declaration-bundling tool that works well for the modules...
 // struggles a bit here.
 
-import * as com from "./com-index.js";
+export {
+  ActiveKey,
+  ActiveRow,
+  ActiveLayer,
+  ActiveLayout
+} from "./activeLayout.js";
 
-// Make sure the declaration-merger code pays attention.
-export * as com from "./com-index.js";
+export {
+  Layouts
+} from "./defaultLayouts.js";
 
-// Force-exports it as the global it always was.
-com.keyman.utils.getGlobalObject()['com'] = com;
+export { default as Keyboard} from "./keyboard.js";
+export {
+  LayoutState
+} from "./keyboard.js";
+
