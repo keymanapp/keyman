@@ -14,8 +14,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-WORKING_DIRECTORY=`pwd`
-
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
@@ -119,7 +117,7 @@ builder_describe "Builds Keyman Engine for Web." \
   ":ui              Builds the desktop UI modules used by the ${DOC_WEB_PRODUCT}" \
   ":samples         Builds sample & test pages found under /samples and /testing, but not the ${DOC_WEB_PRODUCT}" \
   ":tools           Builds related development + unit-test resources" \
-  "--skip-minify    Skips any minification steps in the build" \
+  "--no-minify    Skips any minification steps in the build" \
   "--all            Sets action to run on KMW's submodules as well if appropriate ($DOC_TEST_SYMBOL)"
 
 # Possible TODO?
@@ -437,7 +435,7 @@ finalize ( ) {
 if builder_start_action configure; then
   verify_npm_setup
 
-  if ! builder_has_option --skip-minify; then
+  if ! builder_has_option --no-minify; then
     # NPM install is required for the file to be present.
     if ! [ -f $minifier ];
     then

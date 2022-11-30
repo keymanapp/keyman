@@ -12,7 +12,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
@@ -91,12 +91,11 @@ get_default_browser_set ( ) {
 
 if builder_start_action test:engine; then
   if builder_has_option --ci && builder_has_option --debug; then
-    echo "${COLOR_RED}Options --ci and --debug are incompatible${COLOR_RESET}"
-    exit 1
+    builder_die "Options --ci and --debug are incompatible."
   fi
 
   if [[ DO_BROWSER_TEST_SUITE == false ]]; then
-    echo "${COLOR_YELLOW}Skipping action test:engine - this CI build does not appear to be for a Web PR.${COLOR_YELLOW}"
+    log_warning "Skipping action test:engine - this CI build does not appear to be for a Web PR."
     builder_finish_action success test:engine
     exit 0
   fi
