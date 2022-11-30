@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.116 beta 2022-11-30
+
+* fix(android/app): Toggle keyboard update notifications for landscape and tablets (#7832)
+* fix(android/engine): Append languageID for keyboard updates (#7807)
+* fix(android/engine): Use FLAG_IMMUTABLE for PendingIntent for Android S+ (#7844)
+
 ## 16.0.115 beta 2022-11-29
 
 * fix(windows): Cleanup CEF more correctly in shutdown (#7825)
