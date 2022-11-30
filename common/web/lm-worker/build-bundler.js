@@ -23,7 +23,6 @@ await esbuild.build({
   target: "es5"
 });
 
-
 // Bundled CommonJS (classic Node) module version
 esbuild.buildSync({
   bundle: true,
@@ -40,7 +39,21 @@ esbuild.buildSync({
   target: "es5"
 });
 
-const dtsBundleCommand1 = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/index.d.ts src/index.ts', {
+// Direct-use version
+esbuild.buildSync({
+  bundle: true,
+  sourcemap: true,
+  format: "iife",
+  nodePaths: ['..'],
+  entryPoints: {
+    'worker-main': 'build/obj/worker-main.js'
+  },
+  outdir: 'build/lib',
+  tsconfig: 'tsconfig.json',
+  target: "es5"
+});
+
+const dtsBundleCommand1 = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/index.d.ts src/main/index.ts', {
   shell: true
 });
 
@@ -58,7 +71,7 @@ await new Promise((resolve, reject) => {
   });
 });
 
-const dtsBundleCommand2 = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/worker-main.d.ts src/worker-main.ts', {
+const dtsBundleCommand2 = spawn('npx dts-bundle-generator --project tsconfig.json -o build/lib/worker-main.d.ts src/main/worker-main.ts', {
   shell: true
 });
 
