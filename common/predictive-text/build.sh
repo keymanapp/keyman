@@ -52,7 +52,6 @@ builder_parse "$@"
 ### CONFIGURE ACTIONS
 
 if builder_start_action configure; then
-  echo "pred-text config action"
   verify_npm_setup
   builder_finish_action success configure
 fi
