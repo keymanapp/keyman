@@ -131,9 +131,8 @@ PLATFORM=`uname -s`
 
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
-    cd $KMW_ROOT
 
-    ./build.sh $KMWFLAGS
+    "$KMW_ROOT/build.sh" $KMWFLAGS
 
     if [ $? -ne 0 ]; then
         die "ERROR: keymanweb build failed. Exiting"
