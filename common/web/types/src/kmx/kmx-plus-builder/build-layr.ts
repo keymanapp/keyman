@@ -57,7 +57,7 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   }
 
   let layr: BUILDER_LAYR = {
-      ident: constants.hex_section_id(constants.section.key2),
+      ident: constants.hex_section_id(constants.section.layr),
       size: constants.length_layr,
       _offset: 0,
       listCount: kmxplus.layr.lists.length,
