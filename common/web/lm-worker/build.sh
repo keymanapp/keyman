@@ -102,10 +102,6 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action build; then
-  if ! builder_has_action clean; then
-    npm run clean
-  fi
-
   # Build worker with tsc first
   npm run build -- $builder_verbose || fail "Could not build worker."
 
