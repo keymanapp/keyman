@@ -66,8 +66,10 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
         - Note that some variable length parts (such as the actual text data in `strs`) are sometimes in a separate emit function. Anything that's not in the `COMP_PLUS_STRS` `r.Struct` definition needs one of these.
 
 - update basic.xml and basic.txt
-    - Tweak `basic.xml` as needed
-    - You can use `developer/src/kmc-keyboard/build.sh build-fixtures` which will generate `build/test/fixtures/basic-xml.kmx` as well as `.kvk`
-    - … BUT DO NOT CHECK IT IN!
+    - Tweak `eveloper/src/kmc-keyboard/test/fixtures/basic.xml` as needed
+    - You can use `developer/src/kmc-keyboard/build.sh build-fixtures` which will generate these. The two .kmx files are supposed to match: if not, fix `basic.txt` or fix other bugs.
+        - `developer/src/kmc-keyboard/build/test/fixtures/basic-txt.kmx` - KMX generated from basic.txt.
+        - `developer/src/kmc-keyboard/build/test/fixtures/basic-xml.kmx` - KMX generated from basic.xml.
+        - `developer/src/kmc-keyboard/build/test/fixtures/basic-xml.kvk` - KVK generated from basic.xml.
 
 ## more to come
