@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{82E04599-9378-4816-B0AB-8AB58BD307B3}</ProjectGuid>
-        <MainSource>Tike.dpr</MainSource>
+        <MainSource>tike.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>1</TargetedPlatforms>
@@ -47,7 +47,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <Custom_Styles>Amakrits|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Amakrits.vsf;&quot;Amethyst Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaGraphite.vsf&quot;;&quot;Aqua Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate.vsf&quot;;Auric|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Auric.vsf;Carbon|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Carbon.vsf;&quot;Charcoal Dark Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CobaltXEMedia.vsf&quot;;&quot;Cyan Dusk|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\GoldenGraphite.vsf&quot;;&quot;Iceberg Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\IcebergClassico.vsf&quot;;&quot;Lavender Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\LavenderClassico.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SapphireKamri.vsf&quot;;&quot;Slate Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SlateClassico.vsf&quot;;&quot;Smokey Quartz Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TurquoiseGray.vsf&quot;;Windows10|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10.vsf</Custom_Styles>
-        <SanitizedProjectName>Tike</SanitizedProjectName>
+        <SanitizedProjectName>tike</SanitizedProjectName>
         <VCL_Custom_Styles>&quot;Amakrits|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\Amakrits.vsf&quot;;&quot;Amethyst Kamri|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Graphite|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\AquaGraphite.vsf&quot;;&quot;Aqua Light Slate|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\AquaLightSlate.vsf&quot;;&quot;Auric|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\Auric.vsf&quot;;&quot;Carbon|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\Carbon.vsf&quot;;&quot;Charcoal Dark Slate|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\CobaltXEMedia.vsf&quot;;&quot;Cyan Dusk|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\GoldenGraphite.vsf&quot;;&quot;Iceberg Classico|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\IcebergClassico.vsf&quot;;&quot;Lavender Classico|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\LavenderClassico.vsf&quot;;&quot;Metro Black|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\MetroBlack.vsf&quot;;&quot;Metro Blue|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\MetroBlue.vsf&quot;;&quot;Metro Green|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\MetroGreen.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\SapphireKamri.vsf&quot;;&quot;Slate Classico|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\SlateClassico.vsf&quot;;&quot;Smokey Quartz Kamri|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\9.0\Styles\TurquoiseGray.vsf&quot;</VCL_Custom_Styles>
         <Icon_MainIcon>Tike_Icon.ico</Icon_MainIcon>
         <Manifest_File>None</Manifest_File>
@@ -583,7 +583,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">Tike.dpr</Source>
+                    <Source Name="MainSource">tike.dpr</Source>
                 </Source>
                 <Language>
                     <Language Name="ProjectLang">$00000C09</Language>
@@ -625,27 +625,27 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="bin\Win32\Debug\Tike.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="bin\Win32\Debug\tike.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
-                        <RemoteName>Tike.rsm</RemoteName>
+                        <RemoteName>tike.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="bin\Win32\Debug\Tike.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="bin\Win32\Debug\tike.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>Tike.exe</RemoteName>
+                        <RemoteName>tike.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Tike.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="tike.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
-                        <RemoteName>Tike.rsm</RemoteName>
+                        <RemoteName>tike.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Tike.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="tike.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>Tike.exe</RemoteName>
+                        <RemoteName>tike.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
