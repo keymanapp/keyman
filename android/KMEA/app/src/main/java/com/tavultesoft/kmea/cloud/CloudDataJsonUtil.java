@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.cloud;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -158,9 +159,10 @@ public class CloudDataJsonUtil {
                 // Cloud catalog has newer KMP version available
                 String updateKMP = kbd.getUpdateKMP();
                 if (updateKMP != null) {
-                  if (!updateKMP.equalsIgnoreCase(cloudKMP)) {
-                    // Update keyboard info with the latest KMP link
-                    kbd.setUpdateKMP(cloudKMP);
+                  if (cloudLinkIsNewer(updateKMP, cloudKMP)) {
+                    // Update keyboard info with the latest KMP link after appending languageID
+                    String languageID = kbd.getLanguageID();
+                    kbd.setUpdateKMP(String.format("%s&bcp47=%s", cloudKMP, languageID));
                     KeyboardController.getInstance().add(kbd);
                     saveKeyboardList = true;
                   }
@@ -349,5 +351,39 @@ public class CloudDataJsonUtil {
 
 
     return null;
+  }
+
+  /**
+   * Check if cloudKMP update link is a newer version.
+   * @param updateKMP - Previously stored kmp link. Could be empty if an update wasn't available before
+   * @param cloudKMP - New kmp link from the cloud query
+   * @return boolean if the kmp paths match and cloud kmp version is newer
+   */
+  public static boolean cloudLinkIsNewer(String updateKMP, String cloudKMP) {
+    if (cloudKMP == null || cloudKMP.isEmpty()) {
+      if (!KMManager.isTestMode()) {
+        KMLog.LogError(TAG, "cloudKMP is null or empty");
+      }
+      return false;
+    }
+
+    try {
+      Uri cloudLink = Uri.parse(cloudKMP);
+
+      if (updateKMP == null || updateKMP.isEmpty()) {
+        return true;
+      }
+
+      Uri localLink = Uri.parse(updateKMP);
+
+      boolean pathsMatch = localLink.getLastPathSegment().equalsIgnoreCase(cloudLink.getLastPathSegment());
+      boolean cloudVersionNewer = FileUtils.compareVersions(
+        localLink.getQueryParameter(CDKey_Version), cloudLink.getQueryParameter(CDKey_Version)) == FileUtils.VERSION_LOWER;
+
+      return pathsMatch && cloudVersionNewer;
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "Failed to compare kmp links " + updateKMP + " and " + cloudKMP, e);
+    }
+    return false;
   }
 }
