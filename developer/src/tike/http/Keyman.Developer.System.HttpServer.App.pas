@@ -102,7 +102,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
       Exit;
     end;
 
-    path := CrackUTF8ZeroExtendedString(ARequestInfo.Params.Values['path']);
+    path := CrackUTF8ZeroExtendedString(ARequestInfo.CommandType, ARequestInfo.Params.Values['path']);
 
     if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
     begin
@@ -132,7 +132,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
       Exit;
     end;
 
-    path := CrackUTF8ZeroExtendedString(ARequestInfo.Params.Values['path']);
+    path := CrackUTF8ZeroExtendedString(ARequestInfo.CommandType, ARequestInfo.Params.Values['path']);
 
     if not FileExists(path) or (
       not SameText(ExtractFileExt(path), '.ico') and
