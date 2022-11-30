@@ -31,8 +31,6 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    // Include the generated worker code.  Make sure it's linked before any of the test cases.
-    '../../../web/lm-worker/build/index.js',
     '../../build/index.js',
     '../../../../common/test/resources/timeout-adapter.js',
     'helpers.js',    // Provides utility helpers and objects for tests.
