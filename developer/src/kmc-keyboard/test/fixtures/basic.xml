@@ -25,7 +25,7 @@
   </displays>
 
   <keys>
-    <key id="hmaqtua" to="ħ" />
+    <key id="hmaqtua" to="ħ" longPress="a e" />
     <key id="that" to="ថា" />
   </keys>
 
