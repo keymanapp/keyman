@@ -26,6 +26,6 @@
     "testing"
   ],
   "files": [
-    "../web/lm-worker/build/index.wrapped-for-bundle.ts"
+    "../web/lm-worker/build/lib/worker-main.wrapped-for-bundle.ts"
   ]
 }
