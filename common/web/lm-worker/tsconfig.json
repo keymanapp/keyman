@@ -15,7 +15,7 @@
     "baseUrl": "./",
     "outDir": "build/obj",
     "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
-    "rootDir": "./src"
+    "rootDir": "./src/main"
   },
   "references": [
     // types
@@ -28,6 +28,6 @@
     { "path": "../../models/wordbreakers" },
   ],
   "include": [
-    "src/**/*.ts"
+    "src/main/**/*.ts"
   ]
 }
