@@ -1,12 +1,14 @@
-var assert = require('chai').assert;
-var sinon = require('sinon');
-var fs = require('fs');
+import { assert } from 'chai';
+import sinon from 'sinon';
+import fs from 'fs';
 
-let LMLayerWorker = require('../../../web/lm-worker/build/intermediate.js');
+import LMLayerWorker from '../../../build/obj/index.js';
+
+import { configWorker, createMessageEventWithData, importScriptsWith } from '../../../../../test/resources/model-helpers.mjs';
 
 // Unit tests for instantiating and initializing the LMLayer Worker in isolation.
 //
-// Although the LMLayerWorker expected to be used inside a DedicatedWorkerGlobalScope,
+// Although the LMLayerWorker expects to be used inside a DedicatedWorkerGlobalScope,
 // these unit tests DO NOT run inside a Worker, and instead use Sinon fakes to assert
 // behavior.
 describe('LMLayerWorker', function() {
@@ -149,7 +151,7 @@ describe('LMLayerWorker', function() {
         message: 'load',
         source: {
           type: 'file',
-          file: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+          file: "../../test/resources/models/simple-dummy.js"
         }
       }));
 
@@ -168,7 +170,7 @@ describe('LMLayerWorker', function() {
       var worker = LMLayerWorker.install(context);
       configWorker(worker);
 
-      let modelCode = fs.readFileSync("./unit_tests/in_browser/resources/models/simple-dummy.js").toString();
+      let modelCode = fs.readFileSync("../../test/resources/models/simple-dummy.js").toString();
 
       worker.onMessage(createMessageEventWithData({
         message: 'load',
@@ -199,7 +201,7 @@ describe('LMLayerWorker', function() {
         message: 'load',
         source: {
           type: 'file',
-          file: "./unit_tests/in_browser/resources/models/simple-dummy.js"
+          file: "../../test/resources/models/simple-dummy.js"
         }
       }));
 

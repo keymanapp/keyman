@@ -79,7 +79,8 @@ wrap-worker-code ( ) {
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
   "@../keyman-version" \
-  configure clean build test
+  configure clean build test \
+  "--ci     Runs unit tests with CI reporting"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -130,6 +131,13 @@ if builder_start_action build; then
 fi
 
 if builder_start_action test; then
-  npm test || fail "Tests failed"
+  MOCHA_FLAGS=
+
+  if builder_has_option --ci; then
+    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
+  fi
+
+  npm run mocha -- --recursive $MOCHA_FLAGS ./src/test/helpers.js ./src/test/cases/
+
   builder_finish_action success test
 fi

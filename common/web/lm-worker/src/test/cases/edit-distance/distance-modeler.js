@@ -1,7 +1,8 @@
-var assert = require('chai').assert;
-const LMLayerWorker = require('../../../../web/lm-worker/build/intermediate.js');
-let models = LMLayerWorker.models;
-let correction = LMLayerWorker.correction;
+import { assert } from 'chai';
+import * as models from '../../../../build/obj/models/index.js';
+import * as correction from '../../../../build/obj/correction/index.js';
+
+import { jsonFixture } from '../../../../../../test/resources/model-helpers.mjs';
 
 function assertEdgeChars(edge, input, match) {
   assert.isTrue(edgeHasChars(edge, input, match));
@@ -29,7 +30,7 @@ describe('Correction Distance Modeler', function() {
     var testModel;
 
     before(function() {
-      testModel = new models.TrieModel(jsonFixture('tries/english-1000'));
+      testModel = new models.TrieModel(jsonFixture('models/tries/english-1000'));
     });
 
     it('SearchNode.buildInsertionEdges() - from root', function() {
@@ -244,7 +245,7 @@ describe('Correction Distance Modeler', function() {
     var testModel;
 
     before(function() {
-      testModel = new models.TrieModel(jsonFixture('tries/english-1000'));
+      testModel = new models.TrieModel(jsonFixture('models/tries/english-1000'));
     });
 
     let checkResults_teh = function(iter) {
