@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}</ProjectGuid>
-    <RootNamespace>Keyman32</RootNamespace>
+    <RootNamespace>keyman32</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -67,7 +67,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./Keyman32.tlb</TypeLibraryName>
+      <TypeLibraryName>./keyman32.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -112,7 +112,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>./Keyman32.bsc</OutputFile>
+      <OutputFile>./keyman32.bsc</OutputFile>
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>
@@ -125,7 +125,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./Keyman32.tlb</TypeLibraryName>
+      <TypeLibraryName>./keyman32.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -165,7 +165,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>./Keyman32.bsc</OutputFile>
+      <OutputFile>./keyman32.bsc</OutputFile>
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>
