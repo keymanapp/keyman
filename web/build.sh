@@ -43,14 +43,14 @@ INTERMEDIATE="obj"
 # ### Example
 #
 # ```bash
-#   cp index.js $(output_path app/web debug)/index.js
+#   cp index.js "$(output_path app/web debug)/index.js"
 # ```
 #
 # The block above would copy index.js into the build output folder for app/web's debug
 # product.
 #
 # ``` bash
-#   rm -rf $(output_path app/web)
+#   rm -rf "$(output_path app/web)"
 # ```
 #
 # The block above is useful for deleting all app/web build products as part of a `clean`
@@ -63,8 +63,7 @@ INTERMEDIATE="obj"
 # $DEBUG/$INTERMEDIATE and $RELEASE/$INTERMEDIATE via a third argument.
 output_path ( ) {
   if [ $# -lt 1 ]; then
-    echo "Insufficient argument count!"
-    exit 1
+    builder_die "Insufficient argument count!"
   elif [ $# -eq 1 ]; then
     # Used by clean:<target> actions
     echo "$BUILD_BASE/$1"
@@ -104,9 +103,9 @@ DOC_BUILD_EMBED_WEB="${BUILDER_TERM_START}build:embed${BUILDER_TERM_END} and ${B
 DOC_TEST_SYMBOL="actions -${BUILDER_TERM_START}test${BUILDER_TERM_END}, ${BUILDER_TERM_START}upload-symbols${BUILDER_TERM_END}"
 
 builder_describe "Builds Keyman Engine for Web." \
-  "@../common/web/keyman-version build:engine build:embed build:web build:ui" \
-  "@../common/web/input-processor build:engine build:embed build:web" \
-  "@tools/sourcemap-root build:engine build:embed build:web" \
+  "@../common/web/keyman-version build" \
+  "@../common/web/input-processor build" \
+  "@tools/sourcemap-root build" \
   "clean" \
   "configure" \
   "build" \
@@ -260,7 +259,7 @@ copy_resources ( ) {
 
   for CONFIG in "${CONFIGS[@]}";
   do
-    local CONFIG_OUT_PATH=$(output_path $COMPILE_TARGET $CONFIG)
+    local CONFIG_OUT_PATH="$(output_path $COMPILE_TARGET $CONFIG)"
 
     echo Copying resources to $CONFIG_OUT_PATH/src
 
@@ -270,7 +269,7 @@ copy_resources ( ) {
       mkdir -p "$CONFIG_OUT_PATH/src/resources/$RESOURCE"
 
       echo "- $SOURCE/resources/$RESOURCE/ => $CONFIG_OUT_PATH/$RESOURCE"
-      cp -Rf $SOURCE/resources/$RESOURCE  $CONFIG_OUT_PATH/  >/dev/null
+      cp -Rf "$SOURCE/resources/$RESOURCE"  "$CONFIG_OUT_PATH/"  >/dev/null
     done
 
     echo
@@ -306,18 +305,18 @@ copy_sources ( ) {
 
   for CONFIG in "${CONFIGS[@]}";
   do
-    CONFIG_OUT_PATH=$(output_path $COMPILE_TARGET $CONFIG)
+    CONFIG_OUT_PATH="$(output_path $COMPILE_TARGET $CONFIG)"
     echo Copying $COMPILE_TARGET sources to $CONFIG_OUT_PATH/src
 
-    rm -rf $CONFIG_OUT_PATH/src
-    mkdir -p $CONFIG_OUT_PATH/src
-    echo $VERSION_PATCH > $CONFIG_OUT_PATH/src/version.txt
+    rm -rf "$CONFIG_OUT_PATH/src"
+    mkdir -p "$CONFIG_OUT_PATH/src"
+    echo $VERSION_PATCH > "$CONFIG_OUT_PATH/src/version.txt"
 
     for SOURCE_FOLDER in "${SOURCES_TO_COPY[@]}";
     do
       echo "- $SOURCE/$SOURCE_FOLDER/ => $CONFIG_OUT_PATH/src/$SOURCE_FOLDER/"
-      mkdir -p $CONFIG_OUT_PATH/src/$SOURCE_FOLDER
-      cp -Rf  $SOURCE/$SOURCE_FOLDER/    $CONFIG_OUT_PATH/src/$SOURCE_FOLDER
+      mkdir -p "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
+      cp -Rf  "$SOURCE/$SOURCE_FOLDER/"    "$CONFIG_OUT_PATH/src/$SOURCE_FOLDER"
     done
 
     echo
@@ -338,8 +337,8 @@ copy_sources ( ) {
 #   compile_and_minify build/app/web/obj build/app/web/debug keymanweb.js
 # ```
 copy_outputs ( ) {
-  local src=$1
-  local dst=$2
+  local src="$1"
+  local dst="$2"
 
   shift
   shift
@@ -350,8 +349,8 @@ copy_outputs ( ) {
 
   for SCRIPTJS in "${BASE_SCRIPTS[@]}";
   do
-    cp -Rf $src/$SCRIPTJS             $dst/
-    cp -Rf $src/$SCRIPTJS.map         $dst/
+    cp -Rf "$src/$SCRIPTJS"             "$dst/"
+    cp -Rf "$src/$SCRIPTJS.map"         "$dst/"
   done
 }
 
@@ -372,7 +371,7 @@ compile ( ) {
   fi
 
   local COMPILE_TARGET=$1
-  local COMPILED_INTERMEDIATE_PATH=$(output_path $COMPILE_TARGET $INTERMEDIATE)
+  local COMPILED_INTERMEDIATE_PATH="$(output_path $COMPILE_TARGET $INTERMEDIATE)"
 
   shift
 
@@ -401,9 +400,9 @@ finalize ( ) {
   fi
 
   local COMPILE_TARGET=$1
-  local COMPILED_INTERMEDIATE_PATH=$(output_path $COMPILE_TARGET $INTERMEDIATE)
-  local DEBUG_OUT_PATH=$(output_path $COMPILE_TARGET $DEBUG)
-  local RELEASE_OUT_PATH=$(output_path $COMPILE_TARGET $RELEASE)
+  local COMPILED_INTERMEDIATE_PATH="$(output_path $COMPILE_TARGET $INTERMEDIATE)"
+  local DEBUG_OUT_PATH="$(output_path $COMPILE_TARGET $DEBUG)"
+  local RELEASE_OUT_PATH="$(output_path $COMPILE_TARGET $RELEASE)"
 
   shift
 
@@ -412,7 +411,7 @@ finalize ( ) {
   # START:  debug output
 
   mkdir -p "$DEBUG_OUT_PATH"
-  copy_outputs $COMPILED_INTERMEDIATE_PATH $DEBUG_OUT_PATH "${OUTPUT_SCRIPTS[@]}"
+  copy_outputs "$COMPILED_INTERMEDIATE_PATH" "$DEBUG_OUT_PATH" "${OUTPUT_SCRIPTS[@]}"
 
   echo Compiled $COMPILE_TARGET debug version saved under $DEBUG_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
 
@@ -420,13 +419,13 @@ finalize ( ) {
   if ! builder_has_option --skip-minify; then
     for SCRIPT in "${OUTPUT_SCRIPTS[@]}";
     do
-      minify $COMPILED_INTERMEDIATE_PATH/$SCRIPT $RELEASE_OUT_PATH/$SCRIPT SIMPLE_OPTIMIZATIONS
+      minify "$COMPILED_INTERMEDIATE_PATH/$SCRIPT" "$RELEASE_OUT_PATH/$SCRIPT" SIMPLE_OPTIMIZATIONS
     done
 
     echo Compiled $COMPILE_TARGET release version saved under $RELEASE_OUT_PATH: ${OUTPUT_SCRIPTS[*]}
   else
     # The prior 'release' is now outdated:  delete it.
-    rm -rf $RELEASE_OUT_PATH
+    rm -rf "$RELEASE_OUT_PATH"
   fi
 }
 
