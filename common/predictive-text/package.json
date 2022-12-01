@@ -2,6 +2,7 @@
   "name": "@keymanapp/lexical-model-layer",
   "description": "Keyman/Predictive Text integration layer",
   "main": "build/index.js",
+  "type": "module",
   "scripts": {
     "karma": "karma",
     "mocha": "mocha",

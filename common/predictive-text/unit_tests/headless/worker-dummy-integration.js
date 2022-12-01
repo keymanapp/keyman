@@ -1,9 +1,8 @@
-var assert = require('chai').assert;
-var fs = require('fs');
+import { assert } from 'chai';
+import fs from 'fs';
 
-// // Load the LMLayerWorkerCode function into this context
-// let LMLayerWorkerCode = require('@keymanapp/lm-worker/build/lib/index.cjs');
-let LMLayer = require('../../build/headless');
+import { LMLayer, NodeWorker } from '../../build/obj/index.js';
+import { capabilities, iGotDistractedByHazel } from '../../../../common/test/resources/model-helpers.mjs';
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.
@@ -16,7 +15,7 @@ let LMLayer = require('../../build/headless');
 describe('LMLayer using dummy model', function () {
   describe('Prediction', function () {
     it('will predict future suggestions (loaded from file)', function () {
-      var lmLayer = new LMLayer(capabilities());
+      var lmLayer = new LMLayer(capabilities(), NodeWorker.constructInstance());
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -55,7 +54,7 @@ describe('LMLayer using dummy model', function () {
     });
 
     it('will predict future suggestions (loaded from raw source)', function () {
-      var lmLayer = new LMLayer(capabilities());
+      var lmLayer = new LMLayer(capabilities(), NodeWorker.constructInstance());
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -98,7 +97,7 @@ describe('LMLayer using dummy model', function () {
 
   describe('Wordbreaking', function () {
     it('will perform (default) wordbreaking and return word at caret', function () {
-      var lmLayer = new LMLayer(capabilities());
+      var lmLayer = new LMLayer(capabilities(), NodeWorker.constructInstance());
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.

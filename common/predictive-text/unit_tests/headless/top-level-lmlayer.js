@@ -1,11 +1,27 @@
-var assert = require('chai').assert;
-var sinon = require('sinon');
+import { assert } from 'chai';
+import sinon from 'sinon';
 
-let LMLayer = require('../../build/headless');
+import { LMLayer } from '../../build/obj/index.js';
+import unwrap from '../../build/obj/unwrap.js';
+import { capabilities } from '../../../../common/test/resources/model-helpers.mjs';
 
 // Test the top-level LMLayer interface.
 // Note: these tests can only be run after BOTH stages of compilation are completed.
 describe('LMLayer', function() {
+  /**
+   * Returns an object implementing *enough* of the Worker
+   * interface to fool the LMLayer into thinking it's
+   * communicating with a bona fide Web Worker.
+   *
+   * @returns {Worker} an object with sinon.fake() instances.
+   */
+  function createFakeWorker(postMessage) {
+    return {
+      postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
+      onmessage: null
+    };
+  }
+
   describe('[[constructor]]', function () {
     it('should accept a Worker to instantiate', function () {
       new LMLayer(capabilities(), createFakeWorker());
@@ -97,10 +113,10 @@ describe('LMLayer', function() {
 
   // Since the Blob API is limited to browsers, look for those
   // tests for .asBlobURI() in the in_browser tests.
-  describe('.unwrap', function () {
+  describe('unwrap', function () {
     it('should return the inner code of a function', function () {
       // Create a multi-line function body we can match in a RegExp.
-      let text = LMLayer.unwrap(function hello() {
+      let text = unwrap(function hello() {
         var hello;
         var world;
       });
@@ -108,20 +124,6 @@ describe('LMLayer', function() {
       assert.match(text, /^\s*var\s+hello;\s*var\s+world;\s*$/);
     });
   });
-
-  /**
-   * Returns an object implementing *enough* of the Worker
-   * interface to fool the LMLayer into thinking it's
-   * communicating with a bona fide Web Worker.
-   *
-   * @returns {Worker} an object with sinon.fake() instances.
-   */
-  function createFakeWorker(postMessage) {
-    return {
-        postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
-        onmessage: null
-      };
-  }
 
   /**
    * Call a function in the future, i.e., later in the event loop.
