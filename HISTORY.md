@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.117 beta 2022-12-01
+
+* fix(developer): OnlineUpdate crash on shutdown (#7830)
+* fix(developer): EncodeURL was not handling spaces (#7820)
+
 ## 16.0.116 beta 2022-11-30
 
 * fix(android/app): Toggle keyboard update notifications for landscape and tablets (#7832)
