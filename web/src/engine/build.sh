@@ -23,13 +23,13 @@ cd "$THIS_SCRIPT_PATH"
 
 # Definition of global compile constants
 
-MAIN="engine/main" # Covers all engine code, including submodules like those listed below.
-DEVICEDETECT="engine/device-detect"
-ELEMENTWRAPPERS="engine/element-wrappers"
+MAIN=engine/main     # Covers all engine code, including submodules like those listed below.
+DEVICEDETECT=engine/device-detect
+ELEMENTWRAPPERS=engine/element-wrappers
 
-BUILD_BASE="build"
+BUILD_BASE=build
 
-OUTPUT_DIR="obj"
+OUTPUT_DIR=obj
 
 # Composites and outputs the output path corresponding to the build configuration
 # specified by the parameters.
@@ -42,14 +42,14 @@ OUTPUT_DIR="obj"
 # ### Example
 #
 # ```bash
-#   cp index.js $(output_path app/web debug)/index.js
+#   cp index.js "$(output_path app/web debug)/index.js"
 # ```
 #
 # The block above would copy index.js into the build output folder for app/web's debug
 # product.
 #
 # ``` bash
-#   rm -rf $(output_path app/web)
+#   rm -rf "$(output_path app/web)"
 # ```
 #
 # The block above is useful for deleting all app/web build products as part of a `clean`
@@ -134,7 +134,7 @@ compile ( ) {
   fi
 
   local COMPILE_TARGET=$1
-  local COMPILED_OUTPUT_PATH=$(output_path $COMPILE_TARGET $OUTPUT_DIR)
+  local COMPILED_OUTPUT_PATH="$(output_path $COMPILE_TARGET $OUTPUT_DIR)"
 
   BUNDLE_CONFIG=src/$COMPILE_TARGET/tsconfig.bundled.json
 
