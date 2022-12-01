@@ -41,7 +41,7 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action build; then
-  npm run tsc -- -b $THIS_SCRIPT_PATH/tsconfig.json
+  npm run tsc -- -b "$THIS_SCRIPT_PATH/tsconfig.json"
 
   builder_finish_action success build
 fi
