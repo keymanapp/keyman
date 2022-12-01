@@ -35,16 +35,11 @@ builder_describe "Builds the lm-layer module" \
   "configure" \
   "build" \
   "test" \
-  ":headless   A headless, Node-oriented version of the module useful for unit tests" \
-  ":browser    The standard version of the module for in-browser use" \
   "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \
-  configure           /node_modules \
-  configure:headless  /node_modules \
-  configure:browser   /node_modules \
-  build:headless      build/headless.js \
-  build:browser       build/index.js
+  configure  /node_modules \
+  build      build/obj/index.js
 
 builder_parse "$@"
 
@@ -64,18 +59,11 @@ fi
 
 ### BUILD ACTIONS
 
-# Builds the top-level JavaScript file for use in browsers
-if builder_start_action build:browser; then
-  npm run tsc -- -b ./browser.tsconfig.json
-
-  builder_finish_action success build:browser
-fi
-
 # Builds the top-level JavaScript file for use on Node
-if builder_start_action build:headless; then
-  npm run tsc -- -b ./tsconfig.json
+if builder_start_action build; then
+  npm run tsc -- -b ./tsconfig.all.json
 
-  builder_finish_action success build:headless
+  builder_finish_action success build
 fi
 
 ### TEST ACTIONS
