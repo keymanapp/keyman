@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { LMLayer } from '../../build/obj/index.js';
+import { LMLayer } from '../../build/obj/node/index.js';
 import unwrap from '../../build/obj/unwrap.js';
 import { capabilities } from '../../../../common/test/resources/model-helpers.mjs';
 

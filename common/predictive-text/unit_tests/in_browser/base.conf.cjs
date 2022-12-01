@@ -4,7 +4,7 @@
 
 module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude)
-  basePath: './',
+  basePath: '../../../../', // Root directory of the repository(!)
 
   client: {
     /* `client.args` here is passed to the test runner page as `__karma__.config.args`.
@@ -31,14 +31,27 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    '../../build/index.js',
-    '../../../../common/test/resources/timeout-adapter.js',
-    'helpers.js',    // Provides utility helpers and objects for tests.
-    'cases/**/*.js', // Where the tests actually reside.
+    // { pattern: 'node_modules/**/*.js', served: true, watched: false, included: false },
+    // { pattern: 'node_modules/**/*.mjs', served: true, watched: false, included: false, type: "module" },
+    // { pattern: 'node_modules/**/*.cjs', served: true, watched: false, included: false },
+
+    // Provides utility helpers and objects for tests.
+    { pattern: 'common/predictive-text/unit_tests/in_browser/helpers.mjs', served: true, watched: true, included: false},
+
+    // Where the tests actually reside.
+    { pattern: 'common/predictive-text/unit_tests/in_browser/cases/**/*.js', type: 'module' },
+
+    'common/test/resources/*.js',
+    'common/test/resources/json/models/**/*.json',
+    { pattern: 'common/web/lm-worker/build/lib/*.js', watched: true, served: true, included: false},
+    { pattern: 'common/web/lm-worker/build/lib/*.js.map', watched: true, served: true, included: false},
+    { pattern: 'common/predictive-text/build/obj/**/*.*', watched: true, served: true, included: false },
+    { pattern: 'common/predictive-text/build/obj/**/*.js.map', watched: true, served: true, included: false },
+    { pattern: 'common/predictive-text/build/lib/**/*.*', watched: true, served: true, included: false },
+    { pattern: 'common/predictive-text/build/lib/**/*.js.map', watched: true, served: true, included: false },
 
     // We don't have anything in these locations... yet.  But they'll be useful for test resources.
-    'json/**/*.json', // Where pre-loaded JSON resides.
-    {pattern: 'resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
+    {pattern: 'common/test/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
   ],
 
   // list of files / patterns to exclude
@@ -48,17 +61,19 @@ module.exports = {
   // preprocess matching files before serving them to the browser
   // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
   preprocessors: {
-    'json/**/*.json' : ['json_fixtures']
+    'common/test/resources/json/models/**/*.json' : ['json_fixtures']
   },
 
   // Settings to properly configure how JSON fixtures are automatically loaded by Karma.
   jsonFixturesPreprocessor: {
-    stripPrefix: 'json/',
+    stripPrefix: 'common/test/resources/json/',
     variableName: '__json__'
   },
 
   proxies: {
-    "/resources/": "/base/resources/"
+    "/resources/": "/base/common/test/resources/",
+    "/node_modules/": "/base/node_modules/",
+    "/@keymanapp/lm-worker/": "/base/node_modules/@keymanapp/lm-worker/"
   },
 
   // web server port

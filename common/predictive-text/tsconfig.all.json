@@ -21,7 +21,7 @@
     "tsBuildInfoFile": "build/obj/tsconfig.all.tsbuildinfo",
     "rootDir": "./src"
   },
-  "files": ["src/worker-interface.d.ts", "src/index.ts"],
+  "files": [],
   "references": [
     { "path": "../web/utils" },
     { "path": "../models/types"},

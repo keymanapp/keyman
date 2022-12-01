@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import fs from 'fs';
 
-import { LMLayer, NodeWorker } from '../../build/obj/index.js';
+import { LMLayer, Worker } from '../../build/obj/node/index.js';
 import { capabilities, iGotDistractedByHazel } from '../../../../common/test/resources/model-helpers.mjs';
 
 /*
@@ -15,7 +15,7 @@ import { capabilities, iGotDistractedByHazel } from '../../../../common/test/res
 describe('LMLayer using dummy model', function () {
   describe('Prediction', function () {
     it('will predict future suggestions (loaded from file)', function () {
-      var lmLayer = new LMLayer(capabilities(), NodeWorker.constructInstance());
+      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -54,7 +54,7 @@ describe('LMLayer using dummy model', function () {
     });
 
     it('will predict future suggestions (loaded from raw source)', function () {
-      var lmLayer = new LMLayer(capabilities(), NodeWorker.constructInstance());
+      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -97,7 +97,7 @@ describe('LMLayer using dummy model', function () {
 
   describe('Wordbreaking', function () {
     it('will perform (default) wordbreaking and return word at caret', function () {
-      var lmLayer = new LMLayer(capabilities(), NodeWorker.constructInstance());
+      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.

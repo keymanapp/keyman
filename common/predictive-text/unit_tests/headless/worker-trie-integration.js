@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { LMLayer, NodeWorker } from '../../build/obj/index.js';
+import { LMLayer, Worker } from '../../build/obj/node/index.js';
 import { capabilities } from '../../../../common/test/resources/model-helpers.mjs';
 
 /*
@@ -10,7 +10,7 @@ describe('LMLayer using the trie model', function () {
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
-      var lmLayer = new LMLayer(capabilities(), NodeWorker.constructInstance());
+      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.
@@ -52,7 +52,7 @@ describe('LMLayer using the trie model', function () {
     //
     // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
     it('should use the default searchTermToKey()', function () {
-      var lmLayer = new LMLayer(capabilities(), NodeWorker.constructInstance());
+      var lmLayer = new LMLayer(capabilities(), Worker.constructInstance());
 
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.

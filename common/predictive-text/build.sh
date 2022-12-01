@@ -63,6 +63,9 @@ fi
 if builder_start_action build; then
   npm run tsc -- -b ./tsconfig.all.json
 
+  # esbuild-bundled products at this level are not intended to be used for anything but testing.
+  node build-bundler.js
+
   builder_finish_action success build
 fi
 
@@ -75,16 +78,10 @@ if builder_has_option --ci; then
   TEST_OPTIONS=--ci
 fi
 
-if builder_start_action test:headless; then
+if builder_start_action test; then
   # We'll test the included libraries here for now, at least until we have
   # converted their builds to builder scripts
-  ./unit_tests/test.sh test:libraries test:headless $TEST_OPTIONS
+  ./unit_tests/test.sh test:libraries test:headless test:browser $TEST_OPTIONS
 
-  builder_finish_action success test:headless
-fi
-
-if builder_start_action test:browser; then
-  ./unit_tests/test.sh test:browser $TEST_OPTIONS
-
-  builder_finish_action success test:browser
+  builder_finish_action success test
 fi
