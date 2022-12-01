@@ -14,10 +14,10 @@ The following folders contain the distribution for Keyman Engine for Web:
                                  keymanweb-osk.ttf is maintained at https://github.com/silnrsi/font-keymanweb-osk
     unit_tests                   Automated testing resources
 
-    build/web/release            Fully-compiled KeymanWeb modules for testing
+    build/web/release            Fully-compiled KeymanWeb modules for release
     build/embed/release          Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
-    build/web/debug            Fully-compiled but non-minified KeymanWeb modules
-    build/web/release          Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
+    build/web/debug            Fully-compiled but non-minified KeymanWeb modules 
+    build/embed/debug          Fully-compiled but non-minified KMEA/KMEI modules
 
     samples                      Sample pages demonstrating ways to link with KeymanWeb
     testing                      Test-case web-pages for various aspects of KeymanWeb functionality
