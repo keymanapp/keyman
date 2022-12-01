@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 15.0.274 stable 2022-12-01
+
+* chore(linux): Update debian changelog (#7834)
+* fix(android/engine): Use FLAG_IMMUTABLE for PendingIntent for Android S+ (#7846)
+* fix(windows): lower case filenames for projects for stable-15.0 (#7853)
+
 ## 15.0.273 stable 2022-11-27
 
 * chore: Add #7554 to HISTORY.md (#7602)
