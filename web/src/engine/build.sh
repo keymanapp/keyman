@@ -83,14 +83,6 @@ compilecmd="$compiler"
 
 builder_check_color "$@"
 
-# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
-# TODO: remove :tools once kmlmc is a dependency for test:module
-
-DOC_WEB_PRODUCT="${BUILDER_TERM_START}:web${BUILDER_TERM_END} build product"
-DOC_TEST_WEB="${BUILDER_TERM_START}test:web${BUILDER_TERM_END}"
-DOC_BUILD_EMBED_WEB="${BUILDER_TERM_START}build:embed${BUILDER_TERM_END} and ${BUILDER_TERM_START}build:web${BUILDER_TERM_END}"
-DOC_TEST_SYMBOL="actions - ${BUILDER_TERM_START}test${BUILDER_TERM_END}"
-
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "@../../../common/web/keyman-version build:main" \
   "@../../../common/web/input-processor build:main" \
