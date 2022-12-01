@@ -23,13 +23,13 @@ cd "$THIS_SCRIPT_PATH"
 
 # Definition of global compile constants
 
-MAIN="engine/main" # Covers all engine code, including submodules like those listed below.
-DEVICEDETECT="engine/device-detect"
-ELEMENTWRAPPERS="engine/element-wrappers"
+MAIN=engine/main     # Covers all engine code, including submodules like those listed below.
+DEVICEDETECT=engine/device-detect
+ELEMENTWRAPPERS=engine/element-wrappers
 
-BUILD_BASE="build"
+BUILD_BASE=build
 
-OUTPUT_DIR="obj"
+OUTPUT_DIR=obj
 
 # Composites and outputs the output path corresponding to the build configuration
 # specified by the parameters.
@@ -42,14 +42,14 @@ OUTPUT_DIR="obj"
 # ### Example
 #
 # ```bash
-#   cp index.js $(output_path app/web debug)/index.js
+#   cp index.js "$(output_path app/web debug)/index.js"
 # ```
 #
 # The block above would copy index.js into the build output folder for app/web's debug
 # product.
 #
 # ``` bash
-#   rm -rf $(output_path app/web)
+#   rm -rf "$(output_path app/web)"
 # ```
 #
 # The block above is useful for deleting all app/web build products as part of a `clean`
@@ -82,14 +82,6 @@ compiler="npm run tsc --"
 compilecmd="$compiler"
 
 builder_check_color "$@"
-
-# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
-# TODO: remove :tools once kmlmc is a dependency for test:module
-
-DOC_WEB_PRODUCT="${BUILDER_TERM_START}:web${BUILDER_TERM_END} build product"
-DOC_TEST_WEB="${BUILDER_TERM_START}test:web${BUILDER_TERM_END}"
-DOC_BUILD_EMBED_WEB="${BUILDER_TERM_START}build:embed${BUILDER_TERM_END} and ${BUILDER_TERM_START}build:web${BUILDER_TERM_END}"
-DOC_TEST_SYMBOL="actions - ${BUILDER_TERM_START}test${BUILDER_TERM_END}"
 
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "@../../../common/web/keyman-version build:main" \
@@ -134,7 +126,7 @@ compile ( ) {
   fi
 
   local COMPILE_TARGET=$1
-  local COMPILED_OUTPUT_PATH=$(output_path $COMPILE_TARGET $OUTPUT_DIR)
+  local COMPILED_OUTPUT_PATH="$(output_path $COMPILE_TARGET $OUTPUT_DIR)"
 
   BUNDLE_CONFIG=src/$COMPILE_TARGET/tsconfig.bundled.json
 

@@ -170,27 +170,24 @@ update_bundle ( ) {
           KMWFLAGS="$KMWFLAGS -upload-sentry"
         fi
 
-        $KEYMAN_ROOT/web/build.sh $KMWFLAGS
+        "$KEYMAN_ROOT/web/build.sh" $KMWFLAGS
         if [ $? -ne 0 ]; then
             fail "ERROR:  KeymanWeb's build.sh failed."
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-        cp $KEYMAN_ROOT/$KMW_PRODUCT/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
-        cp $KEYMAN_ROOT/$KMW_PRODUCT/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
-        cp $KEYMAN_ROOT/$KMW_PRODUCT/keyman.js             "$base_dir/$BUNDLE_PATH/keymanios.js"
+        cp "$KEYMAN_ROOT/$KMW_PRODUCT/osk/kmwosk.css"        "$base_dir/$BUNDLE_PATH/kmwosk.css"
+        cp "$KEYMAN_ROOT/$KMW_PRODUCT/osk/keymanweb-osk.ttf" "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
+        cp "$KEYMAN_ROOT/$KMW_PRODUCT/keyman.js"             "$base_dir/$BUNDLE_PATH/keymanios.js"
 
         if [ "$CONFIG" == "Debug" ]; then
-          cp $KEYMAN_ROOT/$KMW_PRODUCT/keyman.js.map       "$base_dir/$BUNDLE_PATH/keyman.js.map"
+          cp "$KEYMAN_ROOT/$KMW_PRODUCT/keyman.js.map"       "$base_dir/$BUNDLE_PATH/keyman.js.map"
         elif [ -f "$base_dir/$BUNDLE_PATH/keyman.js.map" ]; then
           rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
         fi
 
-        pushd "$KEYMAN_ROOT/common/web/sentry-manager/build"
+        cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js"                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
-        cp index.js                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
-
-        popd
     fi
 
     # Our default resources are part of the bundle, so let's check on them.

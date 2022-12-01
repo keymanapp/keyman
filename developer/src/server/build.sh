@@ -124,7 +124,7 @@ fi
 
 if (( build_keymanweb )); then
   pushd "$KEYMAN_ROOT/web/"
-  ./build.sh --skip-minify
+  ./build.sh --no-minify
   popd
 fi
 
