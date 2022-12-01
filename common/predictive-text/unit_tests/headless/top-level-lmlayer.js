@@ -45,7 +45,7 @@ describe('LMLayer', function() {
       let fakeWorker = createFakeWorker();
 
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
-      lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
+      lmLayer.loadModel("./../../common/test/resources/models/simple-dummy.js");
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
     });
@@ -53,7 +53,7 @@ describe('LMLayer', function() {
     it('should send the `load` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
-      let configuration = await lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
+      let configuration = await lmLayer.loadModel("./../../common/test/resources/models/simple-dummy.js");
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 2);
       // In the "Worker", assert the message looks right and

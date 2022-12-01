@@ -28,7 +28,7 @@ describe('LMLayer using dummy model', function () {
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        "unit_tests/in_browser/resources/models/simple-dummy.js"
+        "../../common/test/resources/models/simple-dummy.js"
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -63,7 +63,7 @@ describe('LMLayer using dummy model', function () {
       };
 
       // We're running headlessly, so the path can be relative to the npm root directory.
-      let modelCode = fs.readFileSync("./unit_tests/in_browser/resources/models/simple-dummy.js").toString();
+      let modelCode = fs.readFileSync("./../../common/test/resources/models/simple-dummy.js").toString();
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax.
@@ -104,7 +104,7 @@ describe('LMLayer using dummy model', function () {
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        "unit_tests/in_browser/resources/models/simple-dummy.js"
+        "../../common/test/resources/models/simple-dummy.js"
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {

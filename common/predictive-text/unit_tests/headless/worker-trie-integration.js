@@ -17,7 +17,7 @@ describe('LMLayer using the trie model', function () {
       // Not done yet, as this test case is a slightly-edited copy of the in-browser version.
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        "unit_tests/in_browser/resources/models/simple-trie.js"
+        "../../common/test/resources/models/simple-trie.js"
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -56,7 +56,7 @@ describe('LMLayer using the trie model', function () {
 
       return lmLayer.loadModel(
         // We're running headlessly, so the path can be relative to the npm root directory.
-        "unit_tests/in_browser/resources/models/naive-trie.js"
+        "../../common/test/resources/models/naive-trie.js"
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
