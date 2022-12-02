@@ -486,7 +486,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LAYR_KEY = new r.Struct({
-      key: r.uint32le, // index into key2
+      key: r.uint32le, // str: key id
     });
 
     this.COMP_PLUS_LAYR_LIST = new r.Struct({
