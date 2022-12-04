@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.118 beta 2022-12-04
+
+* chore(linux): Update debian changelog (#7860)
+
 ## 16.0.117 beta 2022-12-01
 
 * fix(developer): OnlineUpdate crash on shutdown (#7830)
