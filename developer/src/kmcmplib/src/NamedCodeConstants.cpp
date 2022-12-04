@@ -1,5 +1,5 @@
 /*2012
-  Name:             NamedCodeConstants
+  Name:             kmcmp_NamedCodeConstants
   Copyright:        Copyright (C) 2003-2017 SIL International.
   Documentation:    
   Description:      
@@ -27,12 +27,12 @@
 #include "NamedCodeConstants.h"
 #include <kmcmpdll.h>
 
-extern KMX_CHAR CompileDir[];
+extern KMX_CHAR kmcmp_CompileDir[];
 
 
 int IsHangulSyllable(const KMX_WCHAR *codename, int *code);
 
-KMX_BOOL FileExists(const KMX_CHAR *filename)
+KMX_BOOL kmcmp_FileExists(const KMX_CHAR *filename)
 {
   intptr_t n;
 
@@ -52,22 +52,22 @@ KMX_BOOL FileExists(const KMX_CHAR *filename)
   return FALSE;
 }
 
-NamedCodeConstants::NamedCodeConstants()
+kmcmp_NamedCodeConstants::kmcmp_NamedCodeConstants()
 {
   nEntries = 0;
   entries = NULL;
   nEntries_file = 0;
   entries_file = NULL;
-  reindex();
+  kmcmp_reindex();
 }
 
-NamedCodeConstants::~NamedCodeConstants()
+kmcmp_NamedCodeConstants::~kmcmp_NamedCodeConstants()
 {
   if(entries) delete entries;
   if(entries_file) delete entries_file;
 }
 
-void NamedCodeConstants::AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex)
+void kmcmp_NamedCodeConstants::AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex)
 {
   if((nEntries_file % ALLOC_SIZE) == 0)
   {
@@ -91,7 +91,7 @@ void NamedCodeConstants::AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex
   nEntries_file++;
 }
 
-void NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
+void kmcmp_NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
 {
   if((nEntries % ALLOC_SIZE) == 0)
   {
@@ -115,14 +115,14 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
 }
 
 
-int __cdecl sort_entries(const void *elem1, const void *elem2)
+int __cdecl kmcmp_sort_entries(const void *elem1, const void *elem2)
 {
   return u16icmp(
     ((NCCENTRY *)elem1)->name,
     ((NCCENTRY *)elem2)->name);
 }
 
-KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
+KMX_BOOL kmcmp_NamedCodeConstants::kmcmp_IntLoadFile(const KMX_CHAR *filename)
 {
   FILE *fp = NULL;
   if(fopen_s(&fp, filename, "rt") != 0) return FALSE;  // I3481
@@ -158,18 +158,18 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
   return TRUE;
 }
 
-KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
+KMX_BOOL kmcmp_NamedCodeConstants::kmcmp_LoadFile(const KMX_CHAR *filename)
 {
   KMX_CHAR buf[260];
   // Look in current directory first
   strncpy_s(buf, _countof(buf), filename, 259); buf[259] = 0;  // I3481
-  if(FileExists(buf))
-    return IntLoadFile(buf);
+  if(kmcmp_FileExists(buf))
+    return kmcmp_IntLoadFile(buf);
   // Then look in keyboard file directory (CompileDir)
-  strncpy_s(buf, _countof(buf), CompileDir, 259); buf[259] = 0;  // I3481
-  strncat_s(buf, _countof(buf), filename, 259-strlen(CompileDir)); buf[259] = 0;
-  if(FileExists(buf))
-    return IntLoadFile(buf);
+  strncpy_s(buf, _countof(buf), kmcmp_CompileDir, 259); buf[259] = 0;  // I3481
+  strncat_s(buf, _countof(buf), filename, 259-strlen(kmcmp_CompileDir)); buf[259] = 0;
+  if(kmcmp_FileExists(buf))
+    return kmcmp_IntLoadFile(buf);
 
   //TODO: sort out how to find common includes in non-Windows platforms:
   #ifdef _WINDOWS_
@@ -178,19 +178,19 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
     KMX_CHAR *p = strrchr(buf, '\\'); if(p) p++; else p = buf;
     *p = 0;
     strncat_s(buf, _countof(buf), filename, 259-strlen(buf)); buf[259] = 0;  // I3481   // I3641
-    if(FileExists(buf))
-      return IntLoadFile(buf);
+    if(kmcmp_FileExists(buf))
+      return kmcmp_IntLoadFile(buf);
   #endif
 
-  reindex();
+  kmcmp_reindex();
 
   return FALSE;
 }
 
-void NamedCodeConstants::reindex()
+void kmcmp_NamedCodeConstants::kmcmp_reindex()
 {
   if (entries != NULL) {
-    qsort(entries, nEntries, sizeof(NCCENTRY), sort_entries);
+    qsort(entries, nEntries, sizeof(NCCENTRY), kmcmp_sort_entries);
   }
 
   wchar_t c = L'.', d;
@@ -208,7 +208,7 @@ void NamedCodeConstants::reindex()
   }
 }
 
-int NamedCodeConstants::GetCode(const KMX_WCHAR *codename, KMX_DWORD *storeIndex)
+int kmcmp_NamedCodeConstants::GetCode(const KMX_WCHAR *codename, KMX_DWORD *storeIndex)
 {
   *storeIndex = 0xFFFFFFFFL;    // I2993
   int code = GetCode_IncludedCodes(codename);
@@ -222,7 +222,7 @@ int NamedCodeConstants::GetCode(const KMX_WCHAR *codename, KMX_DWORD *storeIndex
   return 0;
 }
 
-int NamedCodeConstants::GetCode_IncludedCodes(const KMX_WCHAR *codename)
+int kmcmp_NamedCodeConstants::GetCode_IncludedCodes(const KMX_WCHAR *codename)
 {
   KMX_WCHAR c = towupper(*codename);
   int code;

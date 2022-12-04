@@ -6,7 +6,7 @@
 #include <kmcmpdll.h>
 
 BOOL WarnDeprecatedHeader() {   // I4866
-  if (FWarnDeprecatedCode) {
+  if (kmcmp_FWarnDeprecatedCode) {
     AddWarning(CWARN_HeaderStatementIsDeprecated);
   }
   return TRUE;
@@ -25,11 +25,11 @@ BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
       // Keyman 7
       #define TSS_WINDOWSLANGUAGES 29
   */
-  int oldCurrentLine = currentLine;
+  int oldCurrentLine = kmcmp_currentLine;
   DWORD i;
   PFILE_STORE sp;
 
-  if (!FWarnDeprecatedCode) {
+  if (!kmcmp_FWarnDeprecatedCode) {
     return TRUE;
   }
 
@@ -40,13 +40,13 @@ BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
           sp->dwSystemID == TSS_LANGUAGENAME ||
           sp->dwSystemID == TSS_ETHNOLOGUECODE ||
           sp->dwSystemID == TSS_WINDOWSLANGUAGES) {
-        currentLine = sp->line;
+        kmcmp_currentLine = sp->line;
         AddWarning(CWARN_LanguageHeadersDeprecatedInKeyman10);
       }
     }
   }
 
-  currentLine = oldCurrentLine;
+  kmcmp_currentLine = oldCurrentLine;
 
   return TRUE;
 }

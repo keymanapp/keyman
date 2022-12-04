@@ -2,7 +2,7 @@
 
 #include <compfile.h>
 
-KMX_BOOL AddCompileString(LPSTR buf);
+KMX_BOOL kmcmp_AddCompileString(LPSTR buf);
 KMX_BOOL AddCompileMessage(KMX_DWORD msg);
 
 // TODO: These macros can return FALSE in functions that expect a DWORD CERR_x
@@ -10,8 +10,8 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg);
 #define SetError(err)       { if(AddCompileMessage(err) || (err & CERR_FATAL)) return FALSE; }
 #define AddWarning(warn)    { if(AddCompileMessage(warn)) return FALSE; }
 
-extern BOOL FWarnDeprecatedCode;
-extern int currentLine;
+extern BOOL kmcmp_FWarnDeprecatedCode;
+extern int kmcmp_currentLine;
 
 
 PKMX_WCHAR strtowstr(PKMX_STR in);

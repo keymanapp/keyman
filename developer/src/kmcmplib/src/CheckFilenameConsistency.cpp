@@ -8,7 +8,7 @@
 #include <string>
 #include "CheckFilenameConsistency.h"
 
-extern  KMX_CHAR CompileDir[MAX_PATH];
+extern  KMX_CHAR kmcmp_CompileDir[MAX_PATH];
 
 bool IsRelativePath(KMX_CHAR const * p) {
   // Relative path (returns TRUE):
@@ -67,12 +67,12 @@ KMX_DWORD CheckFilenameConsistency( KMX_CHAR const * Filename, BOOL ReportMissin
 
 KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissingFile) {
   KMX_WCHAR Name[_MAX_PATH], FName[_MAX_FNAME], Ext[_MAX_EXT];
-  KMX_WCHAR ErrExtra[256];
+  KMX_WCHAR kmcmp_ErrExtra[256];
   intptr_t n;
 
   if (IsRelativePath(Filename)) {
-    PKMX_WCHAR WCompileDir = strtowstr(CompileDir);
-    u16ncpy(Name, WCompileDir, _countof(Name));  // I3481
+    PKMX_WCHAR kmcmp_WCompileDir = strtowstr(kmcmp_CompileDir);
+    u16ncpy(Name, kmcmp_WCompileDir, _countof(Name));  // I3481
     u16ncat(Name, Filename, _countof(Name));  // I3481
   }
   else {
@@ -99,7 +99,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
 
   if (n == -1){
     if (ReportMissingFile) {
-      u16sprintf(ErrExtra,_countof(ErrExtra),L"referenced file %ls",Filename);
+      u16sprintf(kmcmp_ErrExtra,_countof(kmcmp_ErrExtra),L"referenced file %ls",Filename);
       AddWarning(CWARN_MissingFile);
     }
     return CERR_None;
@@ -118,7 +118,7 @@ KMX_WCHAR fi_name_char16[260];
 u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
 
   if (u16cmp(cptr1, fi_name_char16) != 0) {
-    u16sprintf(ErrExtra,_countof(ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
+    u16sprintf(kmcmp_ErrExtra,_countof(kmcmp_ErrExtra),L"reference '%ls' does not match actual filename '%ls'", cptr1, &fi.name);
     AddWarning(CHINT_FilenameHasDifferingCase);
   }
 #else

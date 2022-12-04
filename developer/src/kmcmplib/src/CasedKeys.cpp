@@ -10,14 +10,14 @@
 #include "kmx_u16.h"
 #include <xstring.h>
 
-extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
+extern KMX_BOOL kmcmp_FMnemonicLayout; // TODO: these globals should be consolidated one day
 
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);
 
 KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   assert(sp != NULL);
 
-  if (FMnemonicLayout) {
+  if (kmcmp_FMnemonicLayout) {
     // The &CasedKeys system store is not supported for
     // mnemonic layouts in 14.0
     return CERR_CasedKeysNotSupportedWithMnemonicLayout;
@@ -32,7 +32,7 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   while (*p) {
     KMX_UINT key = 0, shift = 0;
     if (*p != UC_SENTINEL) {
-      if (!MapUSCharToVK(*p, &key, &shift)) {
+      if (!kmcmp_MapUSCharToVK(*p, &key, &shift)) {
         return CERR_CasedKeysMustContainOnlyVirtualKeys;
       }
       if (shift & K_SHIFTFLAG) {
@@ -69,7 +69,7 @@ KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   assert(fk != NULL);
   assert(gp != NULL);
 
-  if (FMnemonicLayout) {
+  if (kmcmp_FMnemonicLayout) {
     // The &CasedKeys system store is not supported for
     // mnemonic layouts in 14.0
     return CERR_None;
@@ -101,7 +101,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
 
   if (shift == 0) {
     // Convert US key cap to a virtual key
-    if (!MapUSCharToVK(kpp->Key, &key, &shift)) {
+    if (!kmcmp_MapUSCharToVK(kpp->Key, &key, &shift)) {
       return CERR_None;
     }
   }

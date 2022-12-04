@@ -1,6 +1,6 @@
 
-#ifndef _NAMEDCODECONSTANTS_H
-#define _NAMEDCODECONSTANTS_H
+#ifndef KMCMP_NAMEDCODECONSTANTS_H
+#define KMCMP_NAMEDCODECONSTANTS_H
 
 #define MAX_ENAME	128
 #define ALLOC_SIZE	256
@@ -11,7 +11,7 @@ struct NCCENTRY
 	int code;
     KMX_DWORD storeIndex;
 };
-class NamedCodeConstants
+class kmcmp_NamedCodeConstants
 {
 private:
 	NCCENTRY *entries;			// entries from &includecodes
@@ -21,15 +21,15 @@ private:
 
 	int GetCode_IncludedCodes(const KMX_WCHAR *codename);
 	void AddCode_IncludedCodes(int n, const KMX_WCHAR *p);
-	KMX_BOOL IntLoadFile(const KMX_CHAR *filename);
+	KMX_BOOL kmcmp_IntLoadFile(const KMX_CHAR *filename);
 public:
-	NamedCodeConstants();
-	~NamedCodeConstants();
+	kmcmp_NamedCodeConstants();
+	~kmcmp_NamedCodeConstants();
 
-	void reindex();
+	void kmcmp_reindex();
 	void AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex);
-	KMX_BOOL LoadFile(const  KMX_CHAR *filename);
+	KMX_BOOL kmcmp_LoadFile(const  KMX_CHAR *filename);
 	int GetCode(const KMX_WCHAR *codename, KMX_DWORD *storeIndex);
 };
 
-#endif //_NAMEDCODECONSTANTS_H
+#endif //KMCMP_NAMEDCODECONSTANTS_H

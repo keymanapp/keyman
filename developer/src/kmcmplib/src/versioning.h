@@ -7,5 +7,5 @@
     return (err); \
 }
 
-KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk);
+KMX_BOOL kmcmp_CheckKeyboardFinalVersion(PFILE_KEYBOARD fk);
 KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver);
