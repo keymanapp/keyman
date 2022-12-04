@@ -112,6 +112,9 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_PostKeystrokeGroupMustBeReadonly              , "Group used in begin postKeystroke must be readonly"},
     { CERR_DuplicateGroup                                , "A group with this name has already been defined."},
     { CERR_DuplicateStore                                , "A store with this name has already been defined."},
+    { CERR_RepeatedBegin                                 , "Begin has already been set"},
+    { CHINT_FilenameHasDifferingCase                     , "Casing differences may fail on some platforms:"},
+
     { 0, nullptr }
   };
 
