@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.119 beta 2022-12-05
+
+* chore: Change platform advocates (#7867)
+
 ## 16.0.118 beta 2022-12-04
 
 * chore(linux): Update debian changelog (#7860)
