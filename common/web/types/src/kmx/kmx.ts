@@ -8,7 +8,20 @@ import * as r from 'restructure';
 // kmx-builder will transform these to the corresponding COMP_xxxx
 
 export class KEYBOARD {
-  //TODO: additional header fields
+  fileVersion?: number;  // dwFileVersion
+  keyboardVersion?: number;  // version
+
+  startGroup?: {
+    ansi: number;
+    unicode: number;
+    newContext: number;
+    postKeystroke: number;
+  };
+
+  flags?: number;
+  hotkey?: number;
+
+  //bitmap:
   groups: GROUP[] = [];
   stores: STORE[] = [];
 };
@@ -327,6 +340,10 @@ export class KMXFile {
   public static readonly COMP_STORE_SIZE  = 12;
   public static readonly COMP_GROUP_SIZE  = 24;
   public static readonly COMP_KEY_SIZE    = 20;
+
+
+  public static readonly VERSION_MASK_MINOR = 0x00FF;
+  public static readonly VERSION_MASK_MAJOR = 0xFF00;
 
   /* In-memory representation of the keyboard */
 
