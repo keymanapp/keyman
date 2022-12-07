@@ -4,9 +4,35 @@ function requote(s: string): string {
   return "'" + s.replaceAll(/(['\\])/, "\\$1") + "'";
 }
 
-export function WriteCompiledKeyboard(source: KMXFile): string {
+function RequotedString(s: string, RequoteSingleQuotes: boolean = false): string {
+  // TODO: use a JSON encode
+  let i: number = 0;
+  while(i < s.length) {
+    if (s.charAt(i) == '"' || s.charAt(i) == '\\') {
+      s = s.substring(0, i) + '\\' + s.substring(i);
+      i++;
+    }
+    else if (s.charAt(i) == '\'' && RequoteSingleQuotes) {
+      s = s.substring(0, i) + '\\' + s.substring(i);
+      i++;
+    }
+    else if(s.charAt(i) == '\n') {
+      s = s.substring(0, i) + '\\n' + s.substring(i + 1);
+    }
+    else if(s.charAt(i) == '\r') {
+      s = s.substring(0, i) + ' ' + s.substring(i + 1);
+    }
+  }
+  return s;
+}
+
+export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boolean = false): string {
+  let nl = FDebug ? '\n' : '';
+  let FTabStop = FDebug ? '  ' : '';
+
   // let fgp: GROUP;
-	let fsp: STORE;
+
+  let fsp: STORE;
 	let fkp: KEY;
 
   let j: number;
@@ -70,7 +96,7 @@ export function WriteCompiledKeyboard(source: KMXFile): string {
     }
   }
 
-  const sName = 'Keyboard_'+TKeyboardUtils.GetKeymanWebCompiledNameFromFileName(FInFile);
+  const sName = 'Keyboard_'+name; //TODO: verify --> GetKeymanWebCompiledNameFromFileName(FInFile);
 
   if (sHelpFile != '') {
     sHelp = '';
@@ -183,13 +209,9 @@ export function WriteCompiledKeyboard(source: KMXFile): string {
     sVisualKeyboard = 'null';
   }
 
-  sModifierBitmask = GetKeyboardModifierBitmask;
+  sModifierBitmask = GetKeyboardModifierBitmask(source);
 
-  fMnemonic = vMnemonic == 1;
-
-  let nl = '';//TODO
-  let FTabStop = '';//TODO
-
+  const fMnemonic = vMnemonic == 1;
 
   result +=
     `${JavaScript_SetupProlog}${nl}` +
@@ -201,8 +223,8 @@ export function WriteCompiledKeyboard(source: KMXFile): string {
     // Following line caches the Keyman major version
     `${FTabStop}this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;${nl}` +
     `${FTabStop}this.KI="${sName}";${nl}` +
-    `${FTabStop}this.KN="%s";${nl}` + , RequotedString(sFullName), nl,
-    `${FTabStop}this.KMINVER="${(fk.version & VERSION_MASK_MAJOR) >> 8}.${fkp.version & VERSION_MASK_MINOR}";${nl}` +
+    `${FTabStop}this.KN="${RequotedString(sFullName)}";${nl}`, nl,
+    `${FTabStop}this.KMINVER="${(source.keyboard.fileVersion & KMXFile.VERSION_MASK_MAJOR) >> 8}.${source.keyboard.fileVersion & KMXFile.VERSION_MASK_MINOR}";${nl}` +
     `${FTabStop}this.KV=${sVisualKeyboard};${nl}` +
     `${FTabStop}this.KDU=${fDisplayUnderlying?'1':'0'};${nl}` +
     `${FTabStop}this.KH=${sHelp};${nl}` +
@@ -211,7 +233,7 @@ export function WriteCompiledKeyboard(source: KMXFile): string {
     `${FTabStop}this.KMBM=${sModifierBitmask};${nl}` +
     `${sRTL}`;   // I3681
 
-  if (HasSupplementaryPlaneChars) {
+  if (HasSupplementaryPlaneChars()) {
     result += `${FTabStop}this.KS=1;${nl}`;
   }
 
@@ -267,19 +289,21 @@ export function WriteCompiledKeyboard(source: KMXFile): string {
     return null;
   }
 
-  result += WriteBeginStatement('gs', fk.StartGroup[KMXFile.BEGIN_UNICODE]);
+  result += WriteBeginStatement('gs', source.keyboard.startGroup.unicode);
 
-  rec := ExpandSentinel(PChar(sBegin_NewContext));
-  if rec.Code = CODE_USE then
-    Result := Result + WriteBeginStatement('gn', rec.Use.GroupIndex);
-  rec := ExpandSentinel(PChar(sBegin_PostKeystroke));
-  if rec.Code = CODE_USE then
-    Result := Result + WriteBeginStatement('gpk', rec.Use.GroupIndex);
+  let rec = ExpandSentinel(sBegin_NewContext);
+  if(rec.Code == CODE_USE) {
+    result += WriteBeginStatement('gn', rec.Use.GroupIndex);
+  }
+  rec = ExpandSentinel(sBegin_PostKeystroke);
+  if(rec.Code == CODE_USE) {
+    result += WriteBeginStatement('gpk', rec.Use.GroupIndex);
+  }
 
-  let fgp = source.keyboard.groups[fk.StartGroup[KMXFile.BEGIN_UNICODE]];
+  let fgp = source.keyboard.groups[source.keyboard.startGroup.unicode];
   result +=
     `${FTabStop}this.gs=function(t,e) {${nl}` +
-    `${FTabStop+FTabStop}return this.g${JavaScript_Name(fk.StartGroup[KMXFile.BEGIN_UNICODE], fgp.dpName)}(t,e);${nl}` +
+    `${FTabStop+FTabStop}return this.g${JavaScript_Name(source.keyboard.startGroup.unicode, fgp.dpName)}(t,e);${nl}` +
     `${FTabStop}}${nl}`; // I3681
 
 	for(let i = 0; i < source.keyboard.groups.length; i++) {  // I1964
@@ -406,3 +430,122 @@ export function WriteCompiledKeyboard(source: KMXFile): string {
 
   Result := Result + sEmbedJS + '}' + nl;   // I3681
 end;
+}
+
+///
+/// Determine the modifiers used in the target keyboard and return a bitmask
+/// representing them, or an integer value when not in debug mode
+///
+/// @return string of JavaScript code, e.g. 'modCodes.SHIFT | modCodes.CTRL /* 0x0030 */'
+///
+function GetKeyboardModifierBitmask(source: KMXFile): string {
+  let bitMask = 0;
+  for(let gp of source.keyboard.groups) {
+    if(gp.fUsingKeys) {
+      for(let kp of gp.keys) {
+        if(!RuleIsExcludedByPlatform(kp)) {
+          bitMask |= JavaScript_Shift(kp, fMnemonic);
+        }
+      }
+    }
+  }
+
+  if ((bitMask & KMXFile.KMX_MASK_MODIFIER_CHIRAL) && (bitMask & KMXFile.KMX_MASK_MODIFIER_NONCHIRAL)) {
+    ReportError(0, CWARN_DontMixChiralAndNonChiralModifiers, 'This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.');
+  }
+
+  if(FDebug) {
+    return FormatModifierAsBitflags(bitMask & KMXFile.KMX_MASK_KEYS); // Exclude KMX_ISVIRTUALKEY, KMX_VIRTUALCHARKEY
+  }
+
+  return '0x'+(bitMask & KMXFile.KMX_MASK_KEYS).toString(16);
+}
+
+
+///
+/// If debug mode, then returns Javascript code necessary for
+/// accessing constants in the compiled keyboard
+///
+/// @return string of JavaScript code
+///
+function JavaScript_SetupDebug() {
+  if(IsKeyboardVersion10OrLater()) {
+    if(FDebug) {
+      return 'var modCodes = keyman.osk.modifierCodes;'+nl+
+             FTabStop+'var keyCodes = keyman.osk.keyCodes;'+nl;
+    }
+  }
+  return '';
+}
+
+function JavaScript_SetupProlog() {
+  if(IsKeyboardVersion10OrLater()) {
+    return 'if(typeof keyman === \'undefined\') {'+nl+
+      FTabStop+'console.log(\'Keyboard requires KeymanWeb 10.0 or later\');'+nl+
+      FTabStop+'if(typeof tavultesoft !== \'undefined\') tavultesoft.keymanweb.util.alert("This keyboard requires KeymanWeb 10.0 or later");'+nl+
+      '} else {';
+  }
+  return '';
+}
+
+function JavaScript_SetupEpilog() {
+  if(IsKeyboardVersion10OrLater()) {
+    return '}';
+  }
+  return '';
+}
+
+function HasSupplementaryPlaneChars() {
+  return false; // TODO
+/*  function StringHasSuppChars(p: PWideChar): Boolean;
+  begin
+    if not Assigned(p) then
+      Exit(False);
+
+    while p^ <> #0 do
+    begin
+      if Char.IsSurrogate(p, 0) then
+        Exit(True);
+      p := incxstr(p);
+    end;
+
+    Result := False;
+  end;
+
+var
+  I: Integer;
+  fsp: PFILE_STORE;
+  fgp: PFILE_GROUP;
+  j: Integer;
+  fkp: PFILE_KEY;
+begin
+  fsp := fk.dpStoreArray;
+  for i := 0 to Integer(fk.cxStoreArray) - 1 do
+  begin
+    if StringHasSuppChars(fsp.dpString) then
+      Exit(True);
+    Inc(fsp);
+  end;
+
+  fgp := fk.dpGroupArray;
+  for i := 0 to Integer(fk.cxGroupArray) - 1 do
+  begin
+    fkp := fgp.dpKeyArray;
+    for j := 0 to Integer(fgp.cxKeyArray) - 1 do
+    begin
+      if StringHasSuppChars(fkp.dpContext) or
+         StringHasSuppChars(fkp.dpOutput) then
+        Exit(True);
+      Inc(fkp);
+    end;
+
+    if StringHasSuppChars(fgp.dpMatch) or
+       StringHasSuppChars(fgp.dpNoMatch) then
+      Exit(True);
+
+    Inc(fgp);
+  end;
+
+  Result := False;
+end;*/
+}
