@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.120 beta 2022-12-07
+
+* chore(linux): Improve package build (#7875)
+
 ## 16.0.119 beta 2022-12-05
 
 * chore: Change platform advocates (#7867)
