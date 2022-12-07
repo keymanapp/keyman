@@ -1,6 +1,12 @@
 # Keyman Version History
 
 
+## 17.0.14 alpha 2022-12-07
+
+* docs(linux): Move Linux documentation (#7868)
+* chore(linux): Remove building for Bionic (#7873)
+* chore(linux): Remove some shellcheck warnings (#7874)
+
 ## 17.0.13 alpha 2022-11-29
 
 * fix(windows): lower case filenames for projects (#7837)
