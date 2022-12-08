@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   char  first5[6] = "CERR_";
   char* pfirst5 = first5;
 
-  if (CompileKeyboardFile(kmn_file, kmx_file, FALSE, FALSE, TRUE, msgproc)) {
+  if (Kmcmp_CompileKeyboardFile(kmn_file, kmx_file, FALSE, FALSE, TRUE, msgproc)) {
     char* testname = strrchr( (char*) kmn_file, '\\') + 1;
     if (strncmp(testname, pfirst5, 5) == 0) return 1; //no Error found + CERR_ in Name
 
