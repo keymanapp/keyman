@@ -1,6 +1,10 @@
 # Keyman Version History
 
 
+## 17.0.15 alpha 2022-12-08
+
+* chore(linux): Update vscode settings for Linux (#7876)
+
 ## 17.0.14 alpha 2022-12-07
 
 * docs(linux): Move Linux documentation (#7868)
