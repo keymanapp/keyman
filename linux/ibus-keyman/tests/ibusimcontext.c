@@ -976,9 +976,13 @@ _ibus_context_forward_key_event_cb(
     /* _create_gdk_event() will add 8 to keycode. */
     if (keycode != 0)
       keycode -= 8;
+  } else if (state & IBUS_PREFILTER_MASK) {
+    // _create_gdk_event() will add 8 to keycode
+    if (keycode != 0)
+      keycode -= 8;
   }
+
   GdkEventKey *event = _create_gdk_event(ibusimcontext, keyval, keycode, state);
-  gdk_event_put((GdkEvent *)event);
 
   if (!surrounding_text_supported && keyval == IBUS_KEY_BackSpace && ibusimcontext->text->len > 0) {
     int index = ibusimcontext->text->len - 1;
@@ -999,6 +1003,10 @@ _ibus_context_forward_key_event_cb(
       }
     } while (index >= 0);
     g_string_erase(ibusimcontext->text, index, len);
+  } else if (state & IBUS_PREFILTER_MASK) {
+    gtk_im_context_filter_keypress((GtkIMContext *)ibusimcontext, event);
+  } else {
+    gdk_event_put((GdkEvent *)event);
   }
 
   gdk_event_free((GdkEvent *)event);
