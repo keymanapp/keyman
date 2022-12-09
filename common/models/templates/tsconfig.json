@@ -6,6 +6,7 @@
     "module": "es6",
     "moduleResolution": "node",
     "sourceMap": true,
+    "sourceRoot": "/common/models/templates/src",
     "inlineSources": true,
     "strict": true,
     "lib": ["es6"],

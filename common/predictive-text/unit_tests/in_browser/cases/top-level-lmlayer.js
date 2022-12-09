@@ -14,7 +14,7 @@ describe('LMLayer', function () {
     });
   });
 
-  describe('#asBlobURI()', function () {
+  describe.skip('#asBlobURI()', function () {
     // #asBlobURI() requires browser APIs, hence why it cannot be tested headless in Node.
     it('should take a function and convert it into a blob function', function (done) {
       let uri = WorkerBuilder.asBlobURI(function dummyHandler() {

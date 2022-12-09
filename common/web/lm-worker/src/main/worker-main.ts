@@ -21,7 +21,7 @@
  */
 
 import LMLayerWorker from './index.js';
-export { default as LMLayerWorker } from './index.js';
+//export { default as LMLayerWorker } from './index.js';
 
 // Let LMLayerWorker be available both in the browser and in Node.
 if (typeof self !== 'undefined' && 'postMessage' in self && 'importScripts' in self) {

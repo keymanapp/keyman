@@ -1,5 +1,5 @@
 import unwrap from '../unwrap.js';
-import LMLayerWorkerCode from "@keymanapp/lm-worker/build/lib/worker-main.wrapped-for-bundle.js";
+import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-worker/build/lib/worker-main.wrapped-for-bundle.js";
 
 
 export default class DefaultWorker {
@@ -21,8 +21,11 @@ export default class DefaultWorker {
    *      }
    *    }));
    */
-  static asBlobURI(fn: Function): string {
-    let code = unwrap(fn);
+  static asBlobURI(encodedSrc: string): string {
+    let code = unwrap(encodedSrc);
+    if(true) { // If this is definitively set to either true or false, tree-shaking can take effect.
+      code += '\n' + LMLayerWorkerSourcemapComment;
+    }
     let blob = new Blob([code], { type: 'text/javascript' });
     return URL.createObjectURL(blob);
   }

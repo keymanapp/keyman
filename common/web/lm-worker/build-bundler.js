@@ -11,6 +11,10 @@ import { spawn } from 'child_process';
 await esbuild.build({
   bundle: true,
   sourcemap: true,
+  //sourceRoot: "../../..",
+  sourceRoot: "/",
+  // https://esbuild.github.io/api/#sources-content may be worth considering when making
+  // a release build; erase source, but maintain stack trace mapping.
   format: "esm",
   nodePaths: ['..', '../../models'],
   entryPoints: {
