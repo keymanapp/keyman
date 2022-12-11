@@ -1,6 +1,10 @@
 # Keyman Version History
 
 
+## 17.0.16 alpha 2022-12-11
+
+* refactor(linux): Update ibusimcontext.c (#7813)
+
 ## 17.0.15 alpha 2022-12-08
 
 * chore(linux): Update vscode settings for Linux (#7876)
