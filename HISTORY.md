@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.121 beta 2022-12-11
+
+* chore(linux): Fix `make install` (#7886)
+
 ## 16.0.120 beta 2022-12-07
 
 * chore(linux): Improve package build (#7875)
