@@ -15,6 +15,7 @@
     "developer/src/kmlmc",
     "developer/src/server",
     "common/models/*",
+    "common/tools/*",
     "common/web/*",
     "common/predictive-text",
     "web"
