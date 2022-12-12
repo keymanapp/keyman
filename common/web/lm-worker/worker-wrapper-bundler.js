@@ -1,5 +1,7 @@
 import fs from 'fs';
 
+import SourcemapRemapper from '@keymanapp/sourcemap-path-remapper';
+
 import SourcemapCombiner from 'combine-source-map';
 import convertSourcemap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
@@ -101,40 +103,25 @@ console.log();
 // also link to build outputs, we need to clean up the sourcemap-paths.  Also, the individual module sourcemaps'
 // paths result in unwanted extra pathing that needs to be cleaned up (models/models, correction/correction, etc)
 console.log("Pass 2:  cleaning sourcemap source paths");
-let sourcemapPathMap = [
-  {from: 'polyfills/', to: '/common/web/lm-worker/src/polyfills/'},
-  {from: 'models/templates/build/obj/', to :'common/models/templates/src/'},
-  {from: 'models/wordbreakers/build/obj/default/default', to: 'common/models/wordbreakers/src/default/'},
-  {from: 'models/wordbreakers/build/obj/', to: 'common/models/wordbreakers/src/'},
-  {from: 'obj/models/models/', to: 'common/web/lm-worker/src/models/'},
-  {from: 'obj/correction/correction/', to: 'common/web/lm-worker/src/correction/'},
-  {from: 'obj/', to: 'common/web/lm-worker/src/'},
-  {from: 'utils/src/', to: 'common/web/utils/src/'}
-];
 
-let mapSources = fullWorkerConcatenation.sourcemapJSON.sources;
-let unmapped = [];
-for(let i = 0; i < mapSources.length; i++) {
-  let matched = false;
-  for(let map of sourcemapPathMap) {
-    if(mapSources[i].includes(map.from)) {
-      let originalPath = mapSources[i];
-      mapSources[i] = mapSources[i].replace(map.from, map.to);
-      console.log(`- ${originalPath} -> ${mapSources[i]}`);
-      matched = true;
-      break;
-    }
-  }
+let remappingState = SourcemapRemapper
+  .fromObject(fullWorkerConcatenation.sourcemapJSON)
+  .remapPaths([
+    {from: /^polyfills\//, to: '/common/web/lm-worker/src/polyfills/'},
+    {from: 'models/templates/build/obj/', to :'common/models/templates/src/'},
+    {from: 'models/wordbreakers/build/obj/default/default', to: 'common/models/wordbreakers/src/default/'},
+    {from: 'models/wordbreakers/build/obj/', to: 'common/models/wordbreakers/src/'},
+    {from: 'obj/models/models/', to: 'common/web/lm-worker/src/models/'},
+    {from: 'obj/correction/correction/', to: 'common/web/lm-worker/src/correction/'},
+    {from: 'obj/', to: 'common/web/lm-worker/src/'},
+    {from: /^\/utils\/src\//, to: 'common/web/utils/src/'}
+  ], (from, to) => console.log(`- ${from} => ${to}`));
 
-  if(!matched) {
-    unmapped.push(mapSources[i]);
-  }
-}
-
-if(unmapped.length > 0) {
+if(remappingState.unchangedSourcepaths.length > 0) {
+  console.log();
   console.log("Not mapped:");
 
-  for(let path of unmapped) {
+  for(let path of remappingState.unchangedSourcepaths) {
     console.log(`- ${path}`);
   }
 }
@@ -142,7 +129,8 @@ if(unmapped.length > 0) {
 console.log();
 let sourceRoot = "/@keymanapp/keyman";
 console.log(`Setting sourceRoot: ${sourceRoot}`)
-fullWorkerConcatenation.sourcemapJSON.sourceRoot = sourceRoot;
+remappingState.sourceRoot = sourceRoot;
+fullWorkerConcatenation.sourcemapJSON = remappingState.sourcemap;
 
 // End "cleaning the sourcemaps"
 
