@@ -259,7 +259,7 @@
               </xsl:attribute>
               <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/></xsl:attribute>
               <div class="grid_item grid_item_title">
-                <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) = 0">
+                <xsl:if test="count(KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]) = 0">
                   <xsl:attribute name="style">color:red;</xsl:attribute>
                 </xsl:if>
                 <xsl:value-of select="$locale/string[@name='S_Caption_Languages']"/>
