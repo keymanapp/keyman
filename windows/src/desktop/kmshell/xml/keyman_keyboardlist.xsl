@@ -136,25 +136,31 @@
       </div>
         <div class="list_detail">
           <xsl:attribute name="id">list_detail_keyboard_<xsl:value-of select="id"/></xsl:attribute>
-          <xsl:attribute name='class'>
-           list_detail <xsl:choose><xsl:when test='loaded'></xsl:when><xsl:otherwise>list_disabled</xsl:otherwise></xsl:choose>
-          </xsl:attribute>
           <div class="flex_container">
             <div class="flex_container_buttons">
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id] and ../../options">
                 <xsl:call-template name="button">
+                  <xsl:with-param name="id">menu_options_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Menu_Options']"/></xsl:with-param>
                   <xsl:with-param name="command">keyman:keyboard_options?id=<xsl:value-of select="id"/></xsl:with-param>
                 </xsl:call-template>
               </xsl:if>
               <xsl:call-template name="button">
+                <xsl:with-param name="id">add_remove_<xsl:value-of select="id"/></xsl:with-param>
                 <xsl:with-param name="className">kbd_button</xsl:with-param>
                 <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='SKAddremove']"/></xsl:with-param>
                 <xsl:with-param name="command">javascript:showModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                <xsl:with-param name="disabled">
+                  <xsl:choose>
+                    <xsl:when test='loaded'>0</xsl:when>
+                    <xsl:otherwise>1</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
               </xsl:call-template>
               <xsl:if test="$singlekeyboardpackage = '1' or //KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
                 <xsl:call-template name="button">
+                  <xsl:with-param name="id">share_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Keyboard_Share']"/></xsl:with-param>
                   <xsl:with-param name="command">javascript:showKeyboardLink('<xsl:value-of select="../../id" />')</xsl:with-param>
@@ -187,6 +193,7 @@
               </xsl:if>
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
                 <xsl:call-template name="button">
+                  <xsl:with-param name="id">help_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Help']"/></xsl:with-param>
                   <xsl:with-param name="command">keyman:package_welcome?id=<xsl:value-of select="$package_id" /></xsl:with-param>
@@ -214,6 +221,7 @@
                   <xsl:with-param name="id">enable_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="onclick">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
+                  <xsl:with-param name="fontweight">bold</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Enable']"/></xsl:with-param>
                   <xsl:with-param name="visible">
                     <xsl:choose>
@@ -225,6 +233,7 @@
               <xsl:choose>
                 <xsl:when test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
                   <xsl:call-template name="button">
+                  <xsl:with-param name="id">uninstall_package_<xsl:value-of select="id"/></xsl:with-param>
                     <xsl:with-param name="className">kbd_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Uninstall']"/></xsl:with-param>
                     <xsl:with-param name="command">keyman:package_uninstall?id=<xsl:value-of select="$package_id"/></xsl:with-param>
@@ -232,6 +241,7 @@
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:call-template name="button">
+                    <xsl:with-param name="id">uninstall_kbd_<xsl:value-of select="id"/></xsl:with-param>
                     <xsl:with-param name="className">kbd_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Uninstall']"/></xsl:with-param>
                     <xsl:with-param name="command">keyman:keyboard_uninstall?id=<xsl:value-of select="$id"/></xsl:with-param>
@@ -243,7 +253,10 @@
 
             <div class="flex_vertical_line"> </div><!--- Vertical seperator  -->
 
-            <div class="grid_container grid_rows_hide">
+            <div>
+              <xsl:attribute name='class'>
+                grid_container grid_rows_hide <xsl:choose><xsl:when test='loaded'></xsl:when><xsl:otherwise>grid_disabled</xsl:otherwise></xsl:choose>
+              </xsl:attribute>
               <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/></xsl:attribute>
               <div class="grid_item grid_item_title">
                 <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) = 0">
