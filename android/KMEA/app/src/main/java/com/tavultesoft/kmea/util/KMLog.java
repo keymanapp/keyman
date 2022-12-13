@@ -18,6 +18,21 @@ public final class KMLog {
   private static final String TAG = "KMLog";
 
   /**
+   * Utility to determine if Sentry library is available in an app
+   * @return boolean
+   */
+  public static boolean sentryLibraryExists() {
+    boolean result = false;
+    try {
+      Class.forName("io.sentry.Sentry");
+      return true;
+    } catch (ClassNotFoundException e) {
+      // Intentionally not sending to Sentry because 3rd party apps may not include Sentry library
+      return false;
+    }
+  }
+
+  /**
    * Utility to log info and send to Sentry
    * @param tag String of the caller
    * @param msg String of the info message
@@ -26,7 +41,7 @@ public final class KMLog {
     if (msg != null && !msg.isEmpty()) {
       Log.i(tag, msg);
 
-      if (Sentry.isEnabled()) {
+      if (sentryLibraryExists() && Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.INFO);
       }
     }
@@ -45,7 +60,7 @@ public final class KMLog {
         BaseActivity.makeToast(null, msg, Toast.LENGTH_LONG);
       }
 
-      if (Sentry.isEnabled()) {
+      if (sentryLibraryExists() && Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.ERROR);
       }
     }
@@ -70,7 +85,7 @@ public final class KMLog {
       BaseActivity.makeToast(null, errorMsg, Toast.LENGTH_LONG);
     }
 
-    if (Sentry.isEnabled()) {
+    if (sentryLibraryExists() && Sentry.isEnabled()) {
       Sentry.addBreadcrumb(errorMsg);
       Sentry.captureException(e);
     }
@@ -86,7 +101,7 @@ public final class KMLog {
    */
   public static void LogExceptionWithData(String tag, String msg,
                                           String objName, Object obj, Throwable e) {
-    if (obj != null && Sentry.isEnabled()) {
+    if (obj != null && sentryLibraryExists() && Sentry.isEnabled()) {
       String objStr = null;
       try {
         objStr = obj.toString();
