@@ -674,7 +674,7 @@ final class KMKeyboard extends WebView {
   }
 
   private void sendKMWError(int lineNumber, String sourceId, String message) {
-    if (Sentry.isEnabled()) {
+    if (KMLog.sentryLibraryExists() && Sentry.isEnabled()) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMKeyboard.sendKMWError");
       breadcrumb.setCategory("KMWError");

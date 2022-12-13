@@ -141,7 +141,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
     implementation 'com.google.android.material:material:1.6.0'
     api (name:'keyman-engine', ext:'aar')
-    implementation 'io.sentry:sentry-android:6.9.2'
     implementation 'androidx.preference:preference:1.2.0'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
