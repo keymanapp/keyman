@@ -65,7 +65,7 @@ bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
         key = kp->Key;
         shift = kp->ShiftFlags;
       }
-      else if (!kmcmp_MapUSCharToVK(kp->Key, &key, &shift)) {
+      else if (!kmcmp::MapUSCharToVK(kp->Key, &key, &shift)) {
         // Not a valid key
         continue;
       }

@@ -6,7 +6,7 @@
 #include <kmcmpdll.h>
 
 BOOL WarnDeprecatedHeader() {   // I4866
-  if (kmcmp_FWarnDeprecatedCode) {
+  if (kmcmp::FWarnDeprecatedCode) {
     AddWarning(CWARN_HeaderStatementIsDeprecated);
   }
   return TRUE;
@@ -29,7 +29,7 @@ BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
   DWORD i;
   PFILE_STORE sp;
 
-  if (!kmcmp_FWarnDeprecatedCode) {
+  if (!kmcmp::FWarnDeprecatedCode) {
     return TRUE;
   }
 

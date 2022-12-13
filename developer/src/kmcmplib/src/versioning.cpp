@@ -3,7 +3,8 @@
 #include <comperr.h>
 #include <kmcmpdll.h>
 
-KMX_BOOL kmcmp_CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
+namespace kmcmp{
+KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
   KMX_CHAR buf[128];
 
   if (fk->dwFlags & KF_AUTOMATICVERSION) {
@@ -12,7 +13,7 @@ KMX_BOOL kmcmp_CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
     }
 
     sprintf(buf, "The compiler has assigned a minimum engine version of %d.%d based on features used in this keyboard", (int)((fk->version & 0xFF00) >> 8), (int)(fk->version & 0xFF));
-    kmcmp_AddCompileString(buf);
+    kmcmp::AddCompileString(buf);
   }
 
   return TRUE;
@@ -26,3 +27,4 @@ KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver) {
 
   return fk->version >= ver;
 }
+} // kmcmp

@@ -6,6 +6,7 @@
   if(!VerifyKeyboardVersion((fk), (ver))) \
     return (err); \
 }
-
-KMX_BOOL kmcmp_CheckKeyboardFinalVersion(PFILE_KEYBOARD fk);
+namespace kmcmp {
+KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk);
 KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver);
+} //kmcmp

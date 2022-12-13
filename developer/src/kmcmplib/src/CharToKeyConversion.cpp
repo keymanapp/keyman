@@ -175,7 +175,7 @@ const struct
   { VK_ACCENT, TRUE }  // 7E '~'
 };
 
-KMX_BOOL kmcmp_MapUSCharToVK(KMX_UINT ch, KMX_UINT *puKey, KMX_UINT *puShiftFlags) {
+KMX_BOOL kmcmp::MapUSCharToVK(KMX_UINT ch, KMX_UINT *puKey, KMX_UINT *puShiftFlags) {
   assert(puKey != NULL);
   assert(puShiftFlags != NULL);
   if (ch >= 0x20 && ch < 0x7F) {
