@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.122 beta 2022-12-14
+
+* fix(windows): modify disable keyboard display (#7898)
+* fix(developer): invalid charmap cell selection when updating to empty search result (#7887)
+
 ## 16.0.121 beta 2022-12-11
 
 * chore(linux): Fix `make install` (#7886)
