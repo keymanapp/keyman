@@ -8,8 +8,9 @@
 #include <string>
 #include "CheckFilenameConsistency.h"
 
-extern  KMX_CHAR kmcmp_CompileDir[MAX_PATH];
-
+namespace kmcmp {
+extern  KMX_CHAR CompileDir[MAX_PATH];
+}
 bool IsRelativePath(KMX_CHAR const * p) {
   // Relative path (returns TRUE):
   //  ..\...\BITMAP.BMP
@@ -71,7 +72,7 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   intptr_t n;
 
   if (IsRelativePath(Filename)) {
-    PKMX_WCHAR WCompileDir = strtowstr(kmcmp_CompileDir);
+    PKMX_WCHAR WCompileDir = strtowstr(kmcmp::CompileDir);
     u16ncpy(Name, WCompileDir, _countof(Name));  // I3481
     u16ncat(Name, Filename, _countof(Name));  // I3481
   }

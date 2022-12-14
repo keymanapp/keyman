@@ -301,7 +301,7 @@ extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS optio
   printf("--> starting SetCompilerOptions in dll\n");
   if ( flag_use_kmcompx)
   {
-    return kmcmp::SetCompilerOptions(options);
+    return kmcmp_SetCompilerOptions(options);
   }
   printf("--> stay in dll  SetCompilerOptions\n");
 
@@ -324,7 +324,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
 
   if ( flag_use_kmcompx)
   {
-    return kmcmp::CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
+    return Kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
   }
   printf("--> stay in dll  CompileKeyboardFile of kmcmpdll\n");
 
@@ -413,7 +413,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   printf("--> starting CompileKeyboardFileToBuffer in dll.\n");
   if ( flag_use_kmcompx)
   {
-    return kmcmp::CompileKeyboardFileToBuffer( pszInfile, (void*) pfkBuffer,  ACompilerWarningsAsErrors,  AWarnDeprecatedCode,  pMsgProc,  Target);
+    return kmcmp_CompileKeyboardFileToBuffer( pszInfile, (void*) pfkBuffer,  ACompilerWarningsAsErrors,  AWarnDeprecatedCode,  pMsgProc,  Target);
   }
 
   printf("--> stay in dll  CompileKeyboardFileToBuffer\n");
@@ -3778,7 +3778,7 @@ extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
  printf("--> starting Keyman_Diagnostic in dll\n");
   if ( flag_use_kmcompx)
   {
-    kmcmp::Keyman_Diagnostic( mode);
+    kmcmp_Keyman_Diagnostic( mode);
   }
   printf("--> stay in dll  Keyman_Diagnostic\n");
 

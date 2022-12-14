@@ -3,7 +3,7 @@
 #include <comperr.h>
 #include <kmcmpdll.h>
 
-namespace kmcmp{
+namespace kmcmp {
 KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
   KMX_CHAR buf[128];
 
@@ -18,7 +18,7 @@ KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
 
   return TRUE;
 }
-
+}
 KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver) {
   if (fk->dwFlags & KF_AUTOMATICVERSION) {
     fk->version = max(fk->version, ver);
@@ -27,4 +27,3 @@ KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver) {
 
   return fk->version >= ver;
 }
-} // kmcmp

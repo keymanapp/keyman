@@ -410,15 +410,22 @@ typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
 
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+extern "C" BOOL __declspec(dllexport) Kmcmp_CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+
 extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) ;
+
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options);
+extern "C" BOOL __declspec(dllexport) kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options);
+
+extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFileToBuffer(PSTR pszInfile, void* pfkBuffer, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target);  // I4865   // I4866
 
 
+extern "C" void __declspec(dllexport) kmcmp_Keyman_Diagnostic(int mode) ;
 namespace kmcmp{
-extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
-extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile, void* pfkBuffer, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target);  // I4865   // I4866
-extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) ;
-extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options);
+
+
 }
+
+
 #endif		// _COMPILER_H
 
