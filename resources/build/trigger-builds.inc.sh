@@ -5,7 +5,8 @@
 #
 
 function triggerBuilds() {
-  local base=`git branch --show-current`
+  local base
+  base=$(git branch --show-current)
   # convert stable-14.0 to stable_14_0 to fit in with the definitions
   # in trigger-definitions.inc.sh
   local bcbase=${base//[-.]/_}
@@ -13,8 +14,8 @@ function triggerBuilds() {
   echo "base=$base, TEAMCITY_VCS_ID=${TEAMCITY_VCS_ID}"
 
 
-  for platform in ${available_platforms[@]}; do
-    eval builds='(${'bc_${bcbase}_${platform}'[@]})'
+  for platform in "${available_platforms[@]}"; do
+    eval builds='(${'"bc_${bcbase}_${platform}"'[@]})'
     for build in "${builds[@]}"; do
       if [[ $build == "" ]]; then continue; fi
       if [ "${build:(-8)}" == "_Jenkins" ]; then
@@ -22,8 +23,8 @@ function triggerBuilds() {
         echo Triggering Jenkins build "$job" "$base" "true"
         triggerJenkinsBuild "$job" "$base" "true"
       else
-        echo Triggering TeamCity build false $build $TEAMCITY_VCS_ID $base
-        triggerTeamCityBuild false $build $TEAMCITY_VCS_ID $base
+        echo Triggering TeamCity build false "$build" "$TEAMCITY_VCS_ID" "$base"
+        triggerTeamCityBuild false "$build" "$TEAMCITY_VCS_ID" "$base"
       fi
     done
   done
@@ -42,8 +43,9 @@ function triggerTeamCityBuild() {
     local TEAMCITY_BRANCH_NAME=
   fi
 
-  local GIT_OID=`git rev-parse HEAD`
   local TEAMCITY_SERVER=https://build.palaso.org
+  local GIT_OID
+  GIT_OID=$(git rev-parse HEAD)
 
   local command
 
@@ -87,7 +89,8 @@ function triggerJenkinsBuild() {
     JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
   fi
 
-  local OUTPUT=$(curl --silent --write-out '\n' \
+  local OUTPUT
+  OUTPUT=$(curl --silent --write-out '\n' \
     -X POST \
     --header "token: $JENKINS_TOKEN" \
     --header "Content-Type: application/json" \
@@ -113,9 +116,9 @@ function triggerJenkinsBuild() {
       count=$((++count))
     fi
   done
-  if [[ $count < 1 ]]; then
+  if (( count < 1 )); then
     # DEBUG
-    echo -n $OUTPUT
+    echo -n "$OUTPUT"
 
     echo
   fi
