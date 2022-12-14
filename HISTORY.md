@@ -1,6 +1,5 @@
 # Keyman Version History
 
-
 ## 17.0.16 alpha 2022-12-11
 
 * refactor(linux): Update ibusimcontext.c (#7813)
@@ -74,6 +73,51 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.120 beta 2022-12-07
+
+* chore(linux): Improve package build (#7875)
+
+## 16.0.119 beta 2022-12-05
+
+* chore: Change platform advocates (#7867)
+
+## 16.0.118 beta 2022-12-04
+
+* chore(linux): Update debian changelog (#7860)
+
+## 16.0.117 beta 2022-12-01
+
+* fix(developer): OnlineUpdate crash on shutdown (#7830)
+* fix(developer): EncodeURL was not handling spaces (#7820)
+
+## 16.0.116 beta 2022-11-30
+
+* fix(android/app): Toggle keyboard update notifications for landscape and tablets (#7832)
+* fix(android/engine): Append languageID for keyboard updates (#7807)
+* fix(android/engine): Use FLAG_IMMUTABLE for PendingIntent for Android S+ (#7844)
+
+## 16.0.115 beta 2022-11-29
+
+* fix(windows): Cleanup CEF more correctly in shutdown (#7825)
+* fix(windows): lower case filenames for projects (#7836)
+* chore(linux): Update debian changelog (#7835)
+* chore(linux): Fix upload-to-debian script (#7833)
+
+## 16.0.114 beta 2022-11-28
+
+* fix(mac): Caps processing was not consistent with core (#7795)
+* fix(web): locks page scroll when scrolling lang menu (#7790)
+
+## 16.0.113 beta 2022-11-26
+
+* docs(android/app): Add note of haptic feedback to whatsnew (#7817)
+* fix(developer): remove missing files from MRU list (#7821)
+
+## 16.0.112 beta 2022-11-25
+
+* fix: test builds should always run latest changes (#7806)
+* fix(web): unit test breakages (#7797)
 
 ## 16.0.111 beta 2022-11-24
 
