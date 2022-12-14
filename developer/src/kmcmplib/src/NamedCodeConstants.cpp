@@ -32,7 +32,7 @@ extern KMX_CHAR kmcmp_CompileDir[];
 
 int IsHangulSyllable(const KMX_WCHAR *codename, int *code);
 
-KMX_BOOL kmcmp_FileExists(const KMX_CHAR *filename)
+KMX_BOOL FileExists(const KMX_CHAR *filename)
 {
   intptr_t n;
 
@@ -58,7 +58,7 @@ kmcmp_NamedCodeConstants::kmcmp_NamedCodeConstants()
   entries = NULL;
   nEntries_file = 0;
   entries_file = NULL;
-  kmcmp_reindex();
+  reindex();
 }
 
 kmcmp_NamedCodeConstants::~kmcmp_NamedCodeConstants()
@@ -115,14 +115,14 @@ void kmcmp_NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
 }
 
 
-int __cdecl kmcmp_sort_entries(const void *elem1, const void *elem2)
+int __cdecl sort_entries(const void *elem1, const void *elem2)
 {
   return u16icmp(
     ((NCCENTRY *)elem1)->name,
     ((NCCENTRY *)elem2)->name);
 }
 
-KMX_BOOL kmcmp_NamedCodeConstants::kmcmp_IntLoadFile(const KMX_CHAR *filename)
+KMX_BOOL kmcmp_NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 {
   FILE *fp = NULL;
   if(fopen_s(&fp, filename, "rt") != 0) return FALSE;  // I3481
@@ -158,18 +158,18 @@ KMX_BOOL kmcmp_NamedCodeConstants::kmcmp_IntLoadFile(const KMX_CHAR *filename)
   return TRUE;
 }
 
-KMX_BOOL kmcmp_NamedCodeConstants::kmcmp_LoadFile(const KMX_CHAR *filename)
+KMX_BOOL kmcmp_NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
 {
   KMX_CHAR buf[260];
   // Look in current directory first
   strncpy_s(buf, _countof(buf), filename, 259); buf[259] = 0;  // I3481
-  if(kmcmp_FileExists(buf))
-    return kmcmp_IntLoadFile(buf);
+  if(FileExists(buf))
+    return IntLoadFile(buf);
   // Then look in keyboard file directory (CompileDir)
   strncpy_s(buf, _countof(buf), kmcmp_CompileDir, 259); buf[259] = 0;  // I3481
   strncat_s(buf, _countof(buf), filename, 259-strlen(kmcmp_CompileDir)); buf[259] = 0;
-  if(kmcmp_FileExists(buf))
-    return kmcmp_IntLoadFile(buf);
+  if(FileExists(buf))
+    return IntLoadFile(buf);
 
   //TODO: sort out how to find common includes in non-Windows platforms:
   #ifdef _WINDOWS_
@@ -178,19 +178,19 @@ KMX_BOOL kmcmp_NamedCodeConstants::kmcmp_LoadFile(const KMX_CHAR *filename)
     KMX_CHAR *p = strrchr(buf, '\\'); if(p) p++; else p = buf;
     *p = 0;
     strncat_s(buf, _countof(buf), filename, 259-strlen(buf)); buf[259] = 0;  // I3481   // I3641
-    if(kmcmp_FileExists(buf))
-      return kmcmp_IntLoadFile(buf);
+    if(FileExists(buf))
+      return IntLoadFile(buf);
   #endif
 
-  kmcmp_reindex();
+  reindex();
 
   return FALSE;
 }
 
-void kmcmp_NamedCodeConstants::kmcmp_reindex()
+void kmcmp_NamedCodeConstants::reindex()
 {
   if (entries != NULL) {
-    qsort(entries, nEntries, sizeof(NCCENTRY), kmcmp_sort_entries);
+    qsort(entries, nEntries, sizeof(NCCENTRY), sort_entries);
   }
 
   wchar_t c = L'.', d;

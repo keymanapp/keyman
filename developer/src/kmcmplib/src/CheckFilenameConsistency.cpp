@@ -71,8 +71,8 @@ KMX_DWORD CheckFilenameConsistency(KMX_WCHAR const * Filename, bool ReportMissin
   intptr_t n;
 
   if (IsRelativePath(Filename)) {
-    PKMX_WCHAR kmcmp_WCompileDir = strtowstr(kmcmp_CompileDir);
-    u16ncpy(Name, kmcmp_WCompileDir, _countof(Name));  // I3481
+    PKMX_WCHAR WCompileDir = strtowstr(kmcmp_CompileDir);
+    u16ncpy(Name, WCompileDir, _countof(Name));  // I3481
     u16ncat(Name, Filename, _countof(Name));  // I3481
   }
   else {

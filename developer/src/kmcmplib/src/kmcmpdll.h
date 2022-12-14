@@ -15,8 +15,8 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg);
 #define AddWarning(warn)    { if(AddCompileMessage(warn)) return FALSE; }
 namespace kmcmp{
 extern BOOL FWarnDeprecatedCode;
+extern int currentLine;
 }
-extern int kmcmp_currentLine;
 
 
 PKMX_WCHAR strtowstr(PKMX_STR in);

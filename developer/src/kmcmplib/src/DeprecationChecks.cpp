@@ -25,7 +25,7 @@ BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
       // Keyman 7
       #define TSS_WINDOWSLANGUAGES 29
   */
-  int oldCurrentLine = kmcmp_currentLine;
+  int oldCurrentLine = kmcmp::currentLine;
   DWORD i;
   PFILE_STORE sp;
 
@@ -40,13 +40,13 @@ BOOL CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
           sp->dwSystemID == TSS_LANGUAGENAME ||
           sp->dwSystemID == TSS_ETHNOLOGUECODE ||
           sp->dwSystemID == TSS_WINDOWSLANGUAGES) {
-        kmcmp_currentLine = sp->line;
+        kmcmp::currentLine = sp->line;
         AddWarning(CWARN_LanguageHeadersDeprecatedInKeyman10);
       }
     }
   }
 
-  kmcmp_currentLine = oldCurrentLine;
+  kmcmp::currentLine = oldCurrentLine;
 
   return TRUE;
 }

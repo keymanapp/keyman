@@ -21,14 +21,14 @@ private:
 
 	int GetCode_IncludedCodes(const KMX_WCHAR *codename);
 	void AddCode_IncludedCodes(int n, const KMX_WCHAR *p);
-	KMX_BOOL kmcmp_IntLoadFile(const KMX_CHAR *filename);
+	KMX_BOOL IntLoadFile(const KMX_CHAR *filename);
 public:
 	kmcmp_NamedCodeConstants();
 	~kmcmp_NamedCodeConstants();
 
-	void kmcmp_reindex();
+	void reindex();
 	void AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex);
-	KMX_BOOL kmcmp_LoadFile(const  KMX_CHAR *filename);
+	KMX_BOOL LoadFile(const  KMX_CHAR *filename);
 	int GetCode(const KMX_WCHAR *codename, KMX_DWORD *storeIndex);
 };
 

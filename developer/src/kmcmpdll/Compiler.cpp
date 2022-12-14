@@ -294,7 +294,7 @@ typedef struct _COMPILER_OPTIONS {
 
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 */
-bool flag_use_kmcompx = false;
+bool flag_use_kmcompx = true;
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
 

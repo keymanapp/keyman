@@ -172,14 +172,14 @@ typedef COMPMSG *PCOMPMSG;
 
 struct COMPILEMESSAGES {
 	int nMessages;
-	int kmcmp_nErrors;
+	int nErrors;
 
 	PCOMPMSG cm;
 
 	KMX_DWORD fatalCode;
 	KMX_CHAR szFatalText[SZMAX_ERRORTEXT];
 
-	KMX_DWORD kmcmp_currentLine;
+	KMX_DWORD currentLine;
 	};
 
 typedef COMPILEMESSAGES *PCOMPILEMESSAGES;

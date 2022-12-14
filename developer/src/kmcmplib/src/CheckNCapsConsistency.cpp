@@ -40,7 +40,7 @@ bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
 
   // 256 virtual key codes + sizeof the virtual key dictionary is max key code possible
   const int nkeys = 256 + fk->cxVKDictionary;
-  const int oldCurrentLine = kmcmp_currentLine;
+  const int oldCurrentLine = kmcmp::currentLine;
   auto caps_ncaps_usage = new CapsUsage [nkeys];
 
   memset(caps_ncaps_usage, 0, nkeys * sizeof(CapsUsage));
@@ -85,14 +85,14 @@ bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
   for (int i = 0; i < nkeys; i++) {
     if (caps_ncaps_usage[i].neither_line && (caps_ncaps_usage[i].caps_line || caps_ncaps_usage[i].ncaps_line)) {
       // We set the current line to one needing work: the developer should add the NCAPS flag
-      kmcmp_currentLine = caps_ncaps_usage[i].neither_line;
+      kmcmp::currentLine = caps_ncaps_usage[i].neither_line;
       AddWarning(CWARN_KeyShouldIncludeNCaps);
     }
   }
 
   delete[] caps_ncaps_usage;
 
-  kmcmp_currentLine = oldCurrentLine;
+  kmcmp::currentLine = oldCurrentLine;
 
   return TRUE;
 }
