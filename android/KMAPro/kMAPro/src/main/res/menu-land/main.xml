@@ -45,10 +45,12 @@
         android:title="@string/action_settings"
         android:icon="@drawable/ic_settings" />
 
-     <item
+    <!-- hidden until updates available -->
+    <item
       android:id="@+id/action_update_keyboards"
-      android:title="@string/action_install_updates"
       app:showAsAction="always"
-       app:actionLayout="@layout/update_count_view"/>
+      android:title="@string/action_install_updates"
+      android:visible="false"
+      android:icon="@drawable/ic_cloud_download" />
 
 </menu>
