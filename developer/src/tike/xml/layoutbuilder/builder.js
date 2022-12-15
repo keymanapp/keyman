@@ -266,10 +266,30 @@ $(function() {
     }
   }
 
-  this.inferKeyText = function(key) {
-    let code = key.id ? String.fromCharCode(parseInt(key.id.substring(2), 16)) : 0;
-    let text = typeof key.text == 'string' ? key.text : (code == '' || code.charCodeAt(0) < 32 ? '' : code);
-    return text;
+  this.unicodeKeyIdToString = function(id) {
+    // duplicated from oskKey.ts
+    if(!id || id.substr(0,2) != 'U_') {
+      return null;
+    }
+
+    let result = '';
+    const codePoints = id.substr(2).split('_');
+    for(let codePoint of codePoints) {
+      const codePointValue = parseInt(codePoint, 16);
+      if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) ||
+          ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) ||
+          isNaN(codePointValue)) {
+        continue;
+      } else {
+        result += String.fromCodePoint(codePointValue);
+      }
+    }
+    return result ? result : null;
+  }
+
+  this.inferKeyText = function(text, id) {
+    let val = typeof text == 'string' && text != '' ? text : this.unicodeKeyIdToString(id) ?? '';
+    return val;
   }
 
   this.inferKeyHintText = function(keyHint, longpress, flick, multitap) {
@@ -283,15 +303,15 @@ $(function() {
           if(longpress && longpress.length) hint = '•';
           break;
         case 'longpress':
-          if(longpress && longpress.length) hint = builder.inferKeyText(longpress[0]);
+          if(longpress && longpress.length) hint = builder.inferKeyText(longpress[0].text, longpress[0].id);
           break;
         case 'multitap':
-          if(multitap && multitap.length) hint = builder.inferKeyText(multitap[0]);
+          if(multitap && multitap.length) hint = builder.inferKeyText(multitap[0].text, multitap[0].id);
           break;
         case 'flick':
           for(let direction of ['n','ne','e','se','s','sw','w','nw']) {
             if(flick && flick[direction]) {
-              hint = builder.inferKeyText(flick[direction]);
+              hint = builder.inferKeyText(flick[direction].text, flick[direction].id);
               break;
             }
           }
@@ -305,7 +325,7 @@ $(function() {
         case 'flick-w':
         case 'flick-nw':
           let direction = source.substr(6);
-          if(flick && flick[direction]) hint = builder.inferKeyText(flick[direction]);
+          if(flick && flick[direction]) hint = builder.inferKeyText(flick[direction].text, flick[direction].id);
           break;
       }
     }
@@ -362,7 +382,7 @@ $(function() {
         var nkey = builder.addKey('key', row, key.sp);
         var w = key.width ? key.width : 100;
         var p = (key.pad ? key.pad : builder.keyMargin) * this.xscale;
-        let text = builder.inferKeyText(key);
+        let text = builder.inferKeyText(key.text, key.id);
 
         calcKeyWidth += parseInt(w, 10);
         calcGapWidth += parseInt(key.pad ? key.pad : builder.keyMargin, 10);
@@ -376,7 +396,7 @@ $(function() {
           .data('fontsize', key.fontsize)
           .data('nextlayer', key.nextlayer)
           .data('layer', key.layer)
-          .data('text', text)
+          .data('text', key.text)
           .data('hint', key.hint)
           .data('longpress', key.sk)
           .data('flick', builder.translateFlickObjectToArray(key.flick))
@@ -630,8 +650,10 @@ $(function() {
     .on('input', inpKeyWidthChange);
 
   const inpKeyNameChange = builder.wrapChange(function () {
-    builder.selectedKey().data('id', $(this).val());
-    builder.updateKeyId(builder.selectedKey());
+    let key = builder.selectedKey();
+    key.data('id', $(this).val());
+    builder.updateKeyId(key);
+    builder.keyCapChange(key.data('text'));
   }, {saveOnce: true});
 
   builder.wrapInstant = function(f) {
@@ -689,31 +711,32 @@ $(function() {
     return r;
   }
 
-  const keyCapChange = function(val) {
+  builder.keyCapChange = function(val) {
     const k = builder.selectedKey();
-    $('.text', k).text(builder.renameSpecialKey(val));
     k.data('text', val);
-    if(builder.specialCharacters[val]) {
+    let text = builder.inferKeyText(val, k.data('id'));
+    $('.text', k).text(builder.renameSpecialKey(text));
+    if(builder.specialCharacters[text]) {
       k.addClass('key-special-text');
     } else {
       k.removeClass('key-special-text');
     }
-    builder.updateCharacterMap(val, false);
+    builder.updateCharacterMap(text, false);
   }
 
   const inpKeyCapChange = builder.wrapChange(function (e) {
     const val = $(this).val();
     $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
-    keyCapChange(val);
+    builder.keyCapChange(val);
   }, {saveOnce: true});
 
   const inpKeyCapUnicodeChange = builder.wrapChange(function (e) {
     const val = builder.fromUnicodeString($(this).val());
     $('#inpKeyCap').val(val);
-    keyCapChange(val);
+    builder.keyCapChange(val);
   }, {saveOnce: true});
 
-  const keyHintChange = function(val) {
+  builder.keyHintChange = function(val) {
     const key = builder.selectedKey();
     key.data('hint', val);
     $('.hint', key).text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
@@ -722,20 +745,20 @@ $(function() {
     } else {
       $('.hint', key).removeClass('custom-hint');
     }
-
-    builder.updateCharacterMap(val, false);
   }
 
   const inpKeyHintChange = builder.wrapChange(function (e) {
     const val = $(this).val();
     $('#inpKeyHintUnicode').val(builder.toUnicodeString(val));
-    keyHintChange(val);
+    builder.keyHintChange(val);
+    builder.updateCharacterMap(val, false);
   }, {saveOnce: true});
 
   const inpKeyHintUnicodeChange = builder.wrapChange(function (e) {
     const val = builder.fromUnicodeString($(this).val());
     $('#inpKeyHint').val(val);
-    keyHintChange(val);
+    builder.keyHintChange(val);
+    builder.updateCharacterMap(val, false);
   }, {saveOnce: true});
 
 
@@ -743,7 +766,7 @@ $(function() {
     var val = $(this).val();
     $('#inpKeyCap').val(val);
     $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
-    keyCapChange(val);
+    builder.keyCapChange(val);
     // We only EnableControls here because if the user types *BkSp* into the
     // text field, we shouldn't hide the text field until next time the key is selected
     builder.enableKeyControls();

@@ -1,18 +1,18 @@
 (*
   Name:             UfrmLanguageSwitch
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      22 Oct 2010
 
   Modified Date:    10 Jun 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          22 Oct 2010 - mcdurdin - I2522 - Initial version of language switch window
                     30 Nov 2010 - mcdurdin - I2544 - Restyle language switch window as per Paul's design
                     10 Dec 2010 - mcdurdin - I2555 - Transparency issues
@@ -48,7 +48,7 @@ uses
   LangSwitchManager,
   msctf,
   Types,
-  ErrorControlledRegistry, 
+  ErrorControlledRegistry,
   RegistryKeys, ExtCtrls;
 
 type
@@ -609,7 +609,7 @@ begin
     begin
       pt.X := (pt.X - r.Left) div (CellWidth + MCellSpacing.X);
       pt.Y := GetCellY(pt.Y - r.Top);  // I2669
-      
+
       FNewHoverLanguage := pt.X + pt.Y * ColCount;
       if FNewHoverLanguage >= Manager.LanguageCount then   // I4191
         FNewHoverLanguage := -1
@@ -624,8 +624,8 @@ begin
         pt.Y := pt.Y - GetRowY(FNewHoverLanguage div ColCount);  // I2669
         if pt.Y < MCellMargin.Top + TitleTextHeight + MKeyboardsMargin.Top then
           FNewHoverKeyboard := 0  // on or around the title
-        else if pt.Y > MCellMargin.Top + TitleTextHeight + MKeyboardsMargin.Top + lang.KeyboardCount * KeyboardRowHeight then
-          FNewHoverKeyboard := 0  // below list of keyboards
+        else if pt.Y >= MCellMargin.Top + TitleTextHeight + MKeyboardsMargin.Top + lang.KeyboardCount * KeyboardRowHeight then
+          FNewHoverKeyboard := lang.KeyboardCount - 1  // below list of keyboards
         else if (pt.X < MCellMargin.Left) or (pt.X > CellWidth - MCellMargin.Right) then
           FNewHoverKeyboard := 0  // in the left or right margin of the cell
         else
@@ -674,7 +674,7 @@ var
 begin
   if Message.Msg = wm_keyman_control then
   begin
-    wParam := Message.lParam; 
+    wParam := Message.lParam;
     case Message.WParam of
       KMC_KEYDOWN:
         KeyDown(wParam, []);
@@ -1033,7 +1033,7 @@ begin
       GetTextExtentPoint32W(dcLayered, PWideChar(Manager.Languages[i].IconText), Length(Manager.Languages[i].IconText), sz);   // I4191
 
       ExtTextOutW(dcLayered, FIconRect.Left + 8 - sz.cx div 2, FIconRect.Top + 8 - sz.cy div 2 - 1,
-        ETO_CLIPPED, @FIconRect, PWideChar(Manager.Languages[i].IconText),   
+        ETO_CLIPPED, @FIconRect, PWideChar(Manager.Languages[i].IconText),
         Length(Manager.Languages[i].IconText), nil);   // I4191
 
       SetPixelV(dcLayered, FIconRect.Left, FIconRect.Top, CCellBorder[CellStatus,2]);

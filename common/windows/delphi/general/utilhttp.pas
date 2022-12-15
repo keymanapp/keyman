@@ -1,18 +1,18 @@
 (*
   Name:             utilhttp
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    28 Aug 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Refactor util functions into multiple units
                     23 Aug 2006 - mcdurdin - Use Unicode strings
                     06 Oct 2006 - mcdurdin - Add GetParamsFromURL function
@@ -27,9 +27,10 @@ unit utilhttp;  // I3306  // I3308  // I3309
 interface
 
 uses
-  System.Classes, 
-  System.SysUtils, 
-  System.WideStrUtils;
+  System.Classes,
+  System.SysUtils,
+  System.WideStrUtils,
+  System.NetEncoding;
 
 function GetParamsFromURL(URL: WideString; var Params: TStringList): Boolean;
 function GetParamsFromURLEx(URL: WideString; var Params: TStringList): Boolean;
@@ -42,77 +43,63 @@ function ConvertPathToFileURL(s: WideString): WideString;
 
 implementation
 
-function CharIsInSet(const AString: string; const ACharPos: Integer; ASet: TSysCharSet): Boolean;
-begin
-  if ACharPos > Length(AString) then begin
-    Result := False;
-  end else begin
-    {$IFDEF DotNet}
-    Result := AnsiString(AString[ACharPos])[1] in ASet;
-    {$ELSE}
-    Result := CharInSet(AString[ACharPos], ASet);
-    {$ENDIF}
-  end;
-end;
-
+// Source:
+//   https://marc.durdin.net/2015/08/an-update-for-encodeuricomponent/
+// Stack Overflow:
+//   https://stackoverflow.com/questions/776302/standard-url-encode-function
 function URLEncode(ASrc: string): string;
-var
-  i: Integer;
 const
-  UnsafeChars = ['*', '#', '%', '<', '>', ' ','[',']', '{', '}', '?', '&'];  {do not localize}
-begin
-  Result := '';    {Do not Localize}
-  for i := 1 to Length(ASrc) do
+  HexMap: string = '0123456789ABCDEF';
+
+  function IsSafeChar(ch: Byte): Boolean;
   begin
-    // S.G. 27/11/2002: Changed the parameter encoding: Even in parameters, a space
-    // S.G. 27/11/2002: is much more likely to be meaning "space" than "this is
-    // S.G. 27/11/2002: a new parameter"
-    // S.G. 27/11/2002: ref: Message-ID: <3de30169@newsgroups.borland.com> borland.public.delphi.internet.winsock
-    // S.G. 27/11/2002: Most low-ascii is actually Ok in parameters encoding.
-    if ((CharIsInSet(ASrc, i, UnsafeChars)) or (not (CharIsInSet(ASrc, i, [#33..#128])))) then
-    begin {do not localize}
-      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);  {do not localize}
+    if (ch >= 48) and (ch <= 57) then Result := True    // 0-9
+    else if (ch >= 65) and (ch <= 90) then Result := True  // A-Z
+    else if (ch >= 97) and (ch <= 122) then Result := True  // a-z
+    else if (ch = 33) then Result := True // !
+    else if (ch >= 39) and (ch <= 42) then Result := True // '()*
+    else if (ch >= 45) and (ch <= 46) then Result := True // -.
+    else if (ch = 95) then Result := True // _
+    else if (ch = 126) then Result := True // ~
+    else Result := False;
+  end;
+
+var
+  I, J: Integer;
+  Bytes: TBytes;
+begin
+  Result := '';
+
+  Bytes := TEncoding.UTF8.GetBytes(ASrc);
+
+  I := 0;
+  J := Low(Result);
+
+  SetLength(Result, Length(Bytes) * 3); // space to %xx encode every byte
+
+  while I < Length(Bytes) do
+  begin
+    if IsSafeChar(Bytes[I]) then
+    begin
+      Result[J] := Char(Bytes[I]);
+      Inc(J);
     end
     else
     begin
-      Result := Result + ASrc[i];
+      Result[J] := '%';
+      Result[J+1] := HexMap[(Bytes[I] shr 4) + Low(HexMap)];
+      Result[J+2] := HexMap[(Bytes[I] and 15) + Low(HexMap)];
+      Inc(J,3);
     end;
+    Inc(I);
   end;
+
+  SetLength(Result, J-Low(Result));
 end;
 
 function URLDecode(ASrc: AnsiString): string;
-var
-  i: integer;
-  s: ansistring;
-  ESC: ansistring;
-  CharCode: integer;
 begin
-  Result := '';    {Do not Localize}
-  // S.G. 27/11/2002: Spaces is NOT to be encoded as "+".
-  // S.G. 27/11/2002: "+" is a field separator in query parameter, space is...
-  // S.G. 27/11/2002: well, a space
-  // ASrc := StringReplace(ASrc, '+', ' ', [rfReplaceAll]);  {do not localize}
-  i := 1;
-  while i <= Length(ASrc) do
-  begin
-    if ASrc[i] <> '%' then
-    begin  {do not localize}
-      S := S + ASrc[i]
-    end
-    else
-    begin
-      Inc(i); // skip the % char
-      ESC := Copy(ASrc, i, 2); // Copy the escape code
-      Inc(i, 1); // Then skip it.
-      try
-        CharCode := StrToInt('$' + string(ESC));  {do not localize}
-        S := S + AnsiChar(CharCode);
-      except
-      end;
-    end;
-    Inc(i);
-  end;
-  Result := UTF8ToString(S);
+  Result := TNetEncoding.URL.Decode(string(ASrc));
 end;
 
 procedure DecodeAndSetParams(const AValue: WideString; Params: TStringList);

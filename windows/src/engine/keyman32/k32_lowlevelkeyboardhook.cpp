@@ -202,12 +202,12 @@ LRESULT _kmnLowLevelKeyboardProc(
     if(isUp) FHotkeyShiftState &= ~Flag;
     else FHotkeyShiftState |= Flag;
     // #7337 Post the modifier state ensuring the serialized queue is in sync
-    // Note that the modifier key may be posted again with wm_keyman_keyevent,
-    // later in this function. This is intentional, as the wm_keyman_modifierevent 
+    // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
+    // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT 
     // message only updates our internal modifier state, and does not do 
     // any additional processing or other serialization of the input queue.
     if (flag_ShouldSerializeInput) {
-      PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), wm_keyman_modifierevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+      PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
     }
   }
 
@@ -258,7 +258,7 @@ LRESULT _kmnLowLevelKeyboardProc(
 
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
-        PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+        PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_KEY_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
         return 1;
       }
       //else SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing"); // too noisy

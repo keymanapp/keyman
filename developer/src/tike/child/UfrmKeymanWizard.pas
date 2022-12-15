@@ -204,6 +204,7 @@ type
     panWindowsLanguages: TPanel;
     panFeatures: TPanel;
     sbDetails: TScrollBox;
+    sbCompile: TScrollBox;
     gridFeatures: TStringGrid;
     cmdAddFeature: TButton;
     cmdRemoveFeature: TButton;
@@ -234,7 +235,6 @@ type
     lblISOLang: TLabel;
     editEthnologueCode: TEdit;
     cmdISOLang_Lookup: TButton;
-    Panel1: TPanel;
     lblCongrats: TLabel;
     panBuildWindows: TPanel;
     lblInstallHint: TLabel;
@@ -3198,8 +3198,7 @@ procedure TfrmKeymanWizard.sbDetailsMouseWheel(Sender: TObject;
   Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
   var Handled: Boolean);   // I4082
 begin
-  //inherited;
-  sbDetails.VertScrollBar.Position := sbDetails.VertScrollBar.Position - WheelDelta div 2;
+  (Sender as TScrollBox).VertScrollBar.Position := (Sender as TScrollBox).VertScrollBar.Position - WheelDelta div 2;
   Handled := True;
 end;
 

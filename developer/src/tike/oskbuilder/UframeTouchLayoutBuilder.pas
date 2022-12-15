@@ -87,7 +87,7 @@ type
     procedure UpdateCharacterMap(code: string);  // I4046
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
-    
+
     procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
     procedure cefLoadEnd(Sender: TObject);
     procedure RegisterSource;
@@ -393,7 +393,7 @@ begin
 
   finally
     RegisterSource;
-    if FState <> '' then
+    if (FFileName <> '') and (FState <> '') then
       modWebHttpServer.AppSource.RegisterSource(FFilename + '#state', FState, True);
   end;
 

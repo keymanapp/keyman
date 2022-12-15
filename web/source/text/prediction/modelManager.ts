@@ -28,7 +28,7 @@ namespace com.keyman.text.prediction {
         }
       }
 
-      let lgCode = kbdInfo['languageCode'];
+      let lgCode = kbdInfo['languageCode']?.toLowerCase();
       let model = this.languageModelMap[lgCode];
       var loadPromise: Promise<void>;
 
@@ -46,6 +46,9 @@ namespace com.keyman.text.prediction {
       let keyman = com.keyman.singleton;
       let activeLanguage = keyman.keyboardManager.getActiveLanguage();
 
+      // Forcibly lowercase the model ID before proceeding.
+      model.id = model.id.toLowerCase();
+
       if(JSON.stringify(model) == JSON.stringify(this.registeredModels[model.id])) {
         // We are already registered, let's not go through and re-register
         // because we'll already have the correct model active
@@ -56,6 +59,12 @@ namespace com.keyman.text.prediction {
       // Register the model for each targeted language code variant.
       let mm = this;
       model.languages.forEach(function(code: string) {
+        // Prevent null / undefined codes; they're invalid.
+        if(!code) {
+          console.warn("Null / undefined language codes are not permitted for registration.");
+          return;
+        }
+
         mm.languageModelMap[code] = model;
 
         // The model's for our active language!  Activate it!
@@ -70,6 +79,8 @@ namespace com.keyman.text.prediction {
       let keyman = com.keyman.singleton;
       let core = keyman.core;
       let model: ModelSpec;
+
+      modelId = modelId.toLowerCase();
 
       // Remove the model from the id-lookup associative array.
       if(this.registeredModels[modelId]) {
@@ -94,7 +105,7 @@ namespace com.keyman.text.prediction {
     }
 
     isRegistered(model: ModelSpec): boolean {
-      return !! this.registeredModels[model.id];
+      return !! this.registeredModels[model.id.toLowerCase()];
     }
   }
 }

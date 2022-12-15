@@ -144,6 +144,7 @@ begin
     KM_KBP_IT_PERSIST_OPT:    ; // TODO: The indicated option needs to be stored.
     KM_KBP_IT_EMIT_KEYSTROKE: Action_EmitKeystroke(key);
     KM_KBP_IT_CAPSLOCK:       ; // TODO: Caps lock state needs to be updated
+    KM_KBP_IT_INVALIDATE_CONTEXT: ;
     else Assert(False, 'Action type '+IntToStr(Ord(action._type))+' is unexpected.');
   end;
 end;
@@ -359,9 +360,10 @@ begin
 
   AddDebugItem(debug, debugkeyboard, vk, modifier_state);
 
-  if action._type = KM_KBP_IT_INVALIDATE_CONTEXT then
+  if action._type = KM_KBP_IT_EMIT_KEYSTROKE then
   begin
-    // We may receive a context invalidation but we can ignore it
+    // The EMIT_KEYSTROKE action comes after all rules have completed processing
+    Result := Result and AddActionItem(vk, action);
     Inc(action);
   end;
 

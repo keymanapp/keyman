@@ -65,7 +65,7 @@ namespace com.keyman.text.prediction {
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
-    constructor(capabilities: Capabilities, worker?: Worker) {
+    constructor(capabilities: Capabilities, worker?: Worker, testMode?: boolean) {
       // Either use the given worker, or instantiate the default worker.
       this._worker = worker || DefaultWorker.constructInstance();
       this._worker.onmessage = this.onMessage.bind(this)
@@ -76,7 +76,7 @@ namespace com.keyman.text.prediction {
       this._revertPromises = new PromiseStore();
       this._nextToken = Number.MIN_SAFE_INTEGER;
 
-      this.sendConfig(capabilities);
+      this.sendConfig(capabilities, !!testMode);
     }
 
     /**
@@ -85,10 +85,11 @@ namespace com.keyman.text.prediction {
      * @param capabilities The host platform's capability spec - a model cannot assume access to more context
      *                     than specified by this parameter.
      */
-    private sendConfig(capabilities: Capabilities) {
+    private sendConfig(capabilities: Capabilities, testMode: boolean) {
       this._worker.postMessage({
         message: 'config',
-        capabilities: capabilities
+        capabilities: capabilities,
+        testMode: testMode
       });
     }
 

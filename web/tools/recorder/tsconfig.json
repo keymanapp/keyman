@@ -4,7 +4,7 @@
     "allowJs": true,
     "inlineSources": true,
     "module": "none",
-    "outFile": "build/recorder_InputEvents.js",
+    "outFile": "build/index.js",
     "sourceMap": true,
     "target": "es5"
   },

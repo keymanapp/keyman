@@ -55,6 +55,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("ckl-NG", "Kibaku"),
       new DisplayLanguageType("mfi-NG", "Mandara (Wandala)"),
       new DisplayLanguageType("mrt-NG", "Marghi"),
+      new DisplayLanguageType("nl-NL", "Nederlands (Dutch)"),
       new DisplayLanguageType("ann", "Obolo"),
       new DisplayLanguageType("pl-PL", "Polski (Polish)"),
       new DisplayLanguageType("pt-PT", "Português do Portugal"),

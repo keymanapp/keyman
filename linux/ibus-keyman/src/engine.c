@@ -38,11 +38,19 @@
 #endif
 
 #include <keyman/keyboardprocessor.h>
+#include <keyman/keyboardprocessor_consts.h>
 
+#include "config.h"
 #include "keymanutil.h"
 #include "keyman-service.h"
 #include "engine.h"
 #include "keycodes.h"
+
+// Fallback for older ibus versions that don't define IBUS_PREFILTER_MASK
+#ifndef IBUS_HAS_PREFILTER
+#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
+#define IBUS_PREFILTER_MASK (1 << 23)
+#endif
 
 #define MAXCONTEXT_ITEMS 128
 #define KEYMAN_BACKSPACE 14
@@ -115,38 +123,36 @@ static void ibus_keyman_engine_focus_out  (IBusEngine             *engine);
 static void ibus_keyman_engine_reset      (IBusEngine             *engine);
 static void ibus_keyman_engine_enable     (IBusEngine             *engine);
 static void ibus_keyman_engine_disable    (IBusEngine             *engine);
-static void ibus_keyman_engine_set_surrounding_text
-                                          (IBusEngine             *engine,
-                                           IBusText               *text,
-                                           guint                   cursor_pos,
-                                           guint                   anchor_pos);
+// static void ibus_keyman_engine_set_surrounding_text
+//                                           (IBusEngine             *engine,
+//                                            IBusText               *text,
+//                                            guint                   cursor_pos,
+//                                            guint                   anchor_pos);
 // static void ibus_keyman_engine_set_cursor_location
 //                                           (IBusEngine             *engine,
 //                                            guint                   x,
 //                                            guint                   y,
 //                                            guint                   w,
 //                                            guint                   h);
-static void ibus_keyman_engine_set_capabilities
-                                          (IBusEngine             *engine,
-                                           guint                   caps);
+// static void ibus_keyman_engine_set_capabilities
+//                                           (IBusEngine             *engine,
+//                                            guint                   caps);
 // static void ibus_keyman_engine_page_up    (IBusEngine             *engine);
 // static void ibus_keyman_engine_page_down  (IBusEngine             *engine);
 // static void ibus_keyman_engine_cursor_up  (IBusEngine             *engine);
 // static void ibus_keyman_engine_cursor_down(IBusEngine             *engine);
-static void ibus_keyman_engine_property_activate
-                                          (IBusEngine             *engine,
-                                           const gchar            *prop_name,
-                                           guint                   prop_state);
-static void ibus_keyman_engine_property_show
-                                          (IBusEngine             *engine,
-                                           const gchar            *prop_name);
-static void ibus_keyman_engine_property_hide
-                                          (IBusEngine             *engine,
-                                           const gchar            *prop_name);
+// static void ibus_keyman_engine_property_activate
+//                                           (IBusEngine             *engine,
+//                                            const gchar            *prop_name,
+//                                            guint                   prop_state);
+// static void ibus_keyman_engine_property_show
+//                                           (IBusEngine             *engine,
+//                                            const gchar            *prop_name);
+// static void ibus_keyman_engine_property_hide
+//                                           (IBusEngine             *engine,
+//                                            const gchar            *prop_name);
 
-static void ibus_keyman_engine_commit_string
-                                          (IBusKeymanEngine       *keyman,
-                                           const gchar            *string);
+static void commit_string(IBusKeymanEngine *keyman, const gchar *string);
 
 static IBusEngineClass *parent_class = NULL;
 
@@ -195,7 +201,7 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
     engine_class->enable = ibus_keyman_engine_enable;
     engine_class->disable = ibus_keyman_engine_disable;
 
-    engine_class->set_surrounding_text = ibus_keyman_engine_set_surrounding_text;
+    // engine_class->set_surrounding_text = ibus_keyman_engine_set_surrounding_text;
     // engine_class->set_cursor_location = ibus_keyman_engine_set_cursor_location;
 
 
@@ -208,7 +214,7 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
     // engine_class->cursor_up = ibus_keyman_engine_cursor_up;
     // engine_class->cursor_down = ibus_keyman_engine_cursor_down;
 
-    engine_class->property_activate = ibus_keyman_engine_property_activate;
+    // engine_class->property_activate = ibus_keyman_engine_property_activate;
 }
 
 static gchar *get_current_context_text(km_kbp_context *context)
@@ -222,7 +228,7 @@ static gchar *get_current_context_text(km_kbp_context *context)
                             &buf_size);
     }
     km_kbp_context_items_dispose(context_items);
-    g_message("%s: current context is:%lu:%lu:%s:", __FUNCTION__, km_kbp_context_length(context), buf_size, current_context_utf8);
+    g_message("%s: current context is:%zu:%zu:%s:", __FUNCTION__, km_kbp_context_length(context), buf_size, current_context_utf8);
     return current_context_utf8;
 }
 
@@ -230,7 +236,11 @@ static gboolean
 client_supports_prefilter(IBusEngine *engine)
 {
   g_assert(engine != NULL);
+#ifdef IBUS_HAS_PREFILTER
   return (engine->client_capabilities & IBUS_CAP_PREFILTER) != 0;
+#else
+  return FALSE;
+#endif
 }
 
 static gboolean
@@ -241,40 +251,39 @@ client_supports_surrounding_text(IBusEngine *engine) {
 
 static void
 reset_context(IBusEngine *engine) {
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+  km_kbp_context *context;
+
+  g_message("%s", __FUNCTION__);
+  context = km_kbp_state_context(keyman->state);
+
+  if (client_supports_surrounding_text(engine)) {
     IBusText *text;
     gchar *surrounding_text, *current_context_utf8;
-    guint cursor_pos, anchor_pos, context_start, context_pos;
+    guint cursor_pos, anchor_pos, context_start, context_end;
     km_kbp_context_item *context_items;
-    km_kbp_context *context;
 
-    g_message("reset_context");
-    context = km_kbp_state_context(keyman->state);
-    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
-    {
-        current_context_utf8 = get_current_context_text(context);
+    ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
 
-        ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
-        context_pos = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
-        context_start = context_pos > MAXCONTEXT_ITEMS ? context_pos - MAXCONTEXT_ITEMS : 0;
-        surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_pos);
-        g_message("new context is:%u:%s: cursor:%d anchor:%d", context_pos - context_start, surrounding_text, cursor_pos, anchor_pos);
+    context_end      = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
+    context_start    = context_end > MAXCONTEXT_ITEMS ? context_end - MAXCONTEXT_ITEMS : 0;
+    surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_end);
+    g_message("%s: new context is :%s: (len:%u) cursor:%d anchor:%d", __FUNCTION__,
+      surrounding_text, context_end - context_start, cursor_pos, anchor_pos);
 
-        g_message(":%s:%s:", surrounding_text, current_context_utf8);
-        if (!g_str_has_suffix(surrounding_text, current_context_utf8))
-        {
-            g_message("setting context because it has changed from expected");
-            if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
-                km_kbp_context_set(context, context_items);
-            }
-            km_kbp_context_items_dispose(context_items);
-        }
-        g_free(surrounding_text);
-        g_free(current_context_utf8);
+    current_context_utf8 = get_current_context_text(context);
+    if (!g_str_has_suffix(surrounding_text, current_context_utf8) || !g_utf8_strlen(current_context_utf8, -1)) {
+      g_message("%s: setting context because it has changed from expected", __FUNCTION__);
+      if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
+        km_kbp_context_set(context, context_items);
+        km_kbp_context_items_dispose(context_items);
+      }
     }
-    else {
-        km_kbp_context_clear(context);
-    }
+    g_free(surrounding_text);
+    g_free(current_context_utf8);
+  } else {
+    km_kbp_context_clear(context);
+  }
 }
 
 static void
@@ -319,6 +328,110 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   {
     g_error("unsupported GDK backend");
   }
+}
+
+static km_kbp_cp* get_base_layout()
+{
+  return u"en-US";
+
+#if 0  // in the future when mnemonic layouts are to be supported
+  const gchar *lang_env = g_getenv("LANG");
+  gchar *lang;
+  if (lang_env != NULL) {
+    g_message("LANG=%s", lang_env);
+    gchar **splitlang = g_strsplit(lang_env, ".", 2);
+    g_message("before . is %s", splitlang[0]);
+    if (g_strrstr(splitlang[0], "_")) {
+      g_message("splitting %s", splitlang[0]);
+      gchar **taglang = g_strsplit(splitlang[0], "_", 2);
+      g_message("lang of tag is %s", taglang[0]);
+      g_message("country of tag is %s", taglang[1]);
+      lang = g_strjoin("-", taglang[0], taglang[1], NULL);
+      g_strfreev(taglang);
+    }
+    else {
+      lang = g_strdup(splitlang[0]);
+    }
+    g_strfreev(splitlang);
+  }
+  else {
+    lang = strdup("en-US");
+  }
+  g_message("lang is %s", lang);
+  km_kbp_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
+  return cp;
+  // g_free(lang);
+#endif
+}
+
+static km_kbp_status
+setup_environment(IBusKeymanEngine *keyman)
+{
+  g_assert(keyman);
+  g_message("%s: setting up environment", __FUNCTION__);
+
+  // Allocate enough options for: 3 environments plus 1 pad struct of 0's
+  km_kbp_option_item environment_opts[4] = {0};
+
+  environment_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
+  environment_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
+  environment_opts[0].value = u"linux desktop hardware native";
+
+  environment_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
+  environment_opts[1].key   = KM_KBP_KMX_ENV_BASELAYOUT;
+  environment_opts[1].value = u"kbdus.dll";
+
+  environment_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
+  environment_opts[2].key   = KM_KBP_KMX_ENV_BASELAYOUTALT;
+  environment_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
+
+
+  km_kbp_status status = km_kbp_state_create(keyman->keyboard, environment_opts, &(keyman->state));
+  if (status != KM_KBP_STATUS_OK) {
+    g_warning("%s: problem creating km_kbp_state. Status is %u.", __FUNCTION__, status);
+  }
+  return status;
+}
+
+static km_kbp_status
+load_keyboard_options(IBusKeymanEngine *keyman)
+{
+  g_assert(keyman);
+
+  // Retrieve keyboard options from DConf
+  // TODO: May need unique packageID and keyboard ID
+  g_message("%s: Loading options for kb_name: %s", __FUNCTION__, keyman->kb_name);
+  GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
+  int num_options       = g_queue_get_length(queue_options);
+  if (num_options < 1) {
+    g_queue_free_full(queue_options, NULL);
+    return KM_KBP_STATUS_OK;
+  }
+
+  // Allocate enough options for: num_options plus 1 pad struct of 0's
+  km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, num_options + 1);
+
+  for (int i = 0; i < num_options; i++) {
+    km_kbp_option_item *item = g_queue_pop_head(queue_options);
+    keyboard_opts[i].scope = item->scope;
+    keyboard_opts[i].key   = item->key;
+    keyboard_opts[i].value = item->value;
+  }
+
+
+  // once we have the option list we can then update the options using the public api call
+  km_kbp_status status = km_kbp_state_options_update(keyman->state, keyboard_opts);
+
+  if (status != KM_KBP_STATUS_OK) {
+    g_warning("%s: problem creating km_kbp_state. Status is %u.", __FUNCTION__, status);
+  }
+  for (int i = 0; i < num_options; i++) {
+    g_free((km_kbp_cp *)keyboard_opts[i].key);
+    g_free((km_kbp_cp *)keyboard_opts[i].value);
+  }
+  g_queue_free_full(queue_options, NULL);
+  g_free(keyboard_opts);
+  return status;
 }
 
 static GObject*
@@ -389,88 +502,28 @@ ibus_keyman_engine_constructor(
     }
     g_free(kmx_file);
 
-    // Retrieve keyboard options from DConf
-    // TODO: May need unique packageID and keyboard ID
-    g_message("%s: Loading options for kb_name: %s", __FUNCTION__, keyman->kb_name);
-    GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
-    int num_options = g_queue_get_length(queue_options);
+    km_kbp_status status;
 
-    // Allocate enough options for: 3 environments plus num_options plus 1 pad struct of 0's
-    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1);
-
-    keyboard_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
-    km_kbp_cp *cp = g_utf8_to_utf16 ("platform", -1, NULL, NULL, NULL);
-    keyboard_opts[0].key = cp;
-    cp = g_utf8_to_utf16 ("linux desktop hardware native", -1, NULL, NULL, NULL);
-    keyboard_opts[0].value = cp;
-
-    keyboard_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
-    cp = g_utf8_to_utf16 ("baseLayout", -1, NULL, NULL, NULL);
-    keyboard_opts[1].key = cp;
-    cp = g_utf8_to_utf16 ("kbdus.dll", -1, NULL, NULL, NULL);
-    keyboard_opts[1].value = cp;
-
-    keyboard_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
-    cp = g_utf8_to_utf16 ("baseLayoutAlt", -1, NULL, NULL, NULL);
-    keyboard_opts[2].key = cp;
-    #if 0 // in the future when mnemonic layouts are to be supported
-    const gchar *lang_env = g_getenv("LANG");
-    gchar *lang;
-    if (lang_env != NULL) {
-        g_message("LANG=%s", lang_env);
-        gchar **splitlang = g_strsplit(lang_env, ".", 2);
-        g_message("before . is %s", splitlang[0]);
-        if (g_strrstr(splitlang[0], "_")) {
-            g_message("splitting %s", splitlang[0]);
-            gchar **taglang = g_strsplit(splitlang[0], "_", 2);
-            g_message("lang of tag is %s", taglang[0]);
-            g_message("country of tag is %s", taglang[1]);
-            lang = g_strjoin("-", taglang[0], taglang[1], NULL);
-            g_strfreev(taglang);
-        }
-        else {
-            lang = g_strdup(splitlang[0]);
-        }
-        g_strfreev(splitlang);
-    }
-    else {
-        lang = strdup("en-US");
-    }
-    g_message("lang is %s", lang);
-    #endif
-    cp = g_utf8_to_utf16 ("en-US", -1, NULL, NULL, NULL);
-    // g_free(lang);
-    keyboard_opts[2].value = cp;
-
-    // If queue_options contains keyboard options, pop them into keyboard_opts[3] onward
-    for(int i=0; i<num_options; i++)
-    {
-        memmove(&(keyboard_opts[KEYMAN_ENVIRONMENT_OPTIONS+i]), g_queue_pop_head(queue_options), sizeof(km_kbp_option_item));
-    }
-
-    // keyboard_opts[tail] already initialised to {0, 0, 0}
-
-    km_kbp_status status_keyboard = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
+    status = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
     g_free(abs_kmx_path);
 
-    if (status_keyboard != KM_KBP_STATUS_OK)
-    {
-        g_warning("%s: problem creating km_kbp_keyboard", __FUNCTION__);
+    if (status != KM_KBP_STATUS_OK) {
+      g_warning("%s: problem creating km_kbp_keyboard. Status is %u.", __FUNCTION__, status);
+      ibus_keyman_engine_destroy(keyman);
+      return NULL;
     }
 
-    km_kbp_status status_state = km_kbp_state_create(keyman->keyboard,
-                                  keyboard_opts,
-                                  &(keyman->state));
-    if (status_state != KM_KBP_STATUS_OK)
-    {
-        g_warning("%s: problem creating km_kbp_state", __FUNCTION__);
+    status = setup_environment(keyman);
+    if (status != KM_KBP_STATUS_OK) {
+      ibus_keyman_engine_destroy(keyman);
+      return NULL;
     }
-    for (int i=0; i < KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1; i++) {
-        g_free((km_kbp_cp *)keyboard_opts[i].key);
-        g_free((km_kbp_cp *)keyboard_opts[i].value);
+
+    status = load_keyboard_options(keyman);
+    if (status != KM_KBP_STATUS_OK) {
+      ibus_keyman_engine_destroy(keyman);
+      return NULL;
     }
-    g_queue_free_full(queue_options, NULL);
-    g_free(keyboard_opts);
 
     reset_context(engine);
 
@@ -516,9 +569,7 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
 
-static void
-ibus_keyman_engine_commit_string (IBusKeymanEngine *keyman,
-                                const gchar    *string)
+static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
 {
     IBusText *text;
     g_message("DAR: %s - %s", __FUNCTION__, string);
@@ -650,7 +701,7 @@ process_emit_keystroke_action(IBusKeymanEngine *keyman) {
   IBusEngine *engine = (IBusEngine *)keyman;
   if ((!client_supports_prefilter(engine) || client_supports_surrounding_text(engine)) &&
       keyman->commit_item->char_buffer != NULL) {
-    ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
+    commit_string(keyman, keyman->commit_item->char_buffer);
     g_free(keyman->commit_item->char_buffer);
     keyman->commit_item->char_buffer = NULL;
   }
@@ -695,7 +746,7 @@ commit_text(IBusKeymanEngine *keyman) {
 
   commit_queue_item *current_item = &keyman->commit_queue[0];
   if (current_item->char_buffer != NULL) {
-    ibus_keyman_engine_commit_string(keyman, current_item->char_buffer);
+    commit_string(keyman, current_item->char_buffer);
     g_free(current_item->char_buffer);
   }
   if (current_item->emitting_keystroke) {
@@ -731,7 +782,7 @@ process_end_action(IBusKeymanEngine *keyman) {
         : IBUS_PREFILTER_MASK);
   } else {
     if (keyman->commit_item->char_buffer != NULL) {
-      ibus_keyman_engine_commit_string(keyman, keyman->commit_item->char_buffer);
+      commit_string(keyman, keyman->commit_item->char_buffer);
       g_free(keyman->commit_item->char_buffer);
       keyman->commit_item->char_buffer = NULL;
     }
@@ -927,23 +978,23 @@ ibus_keyman_engine_process_key_event(
   return TRUE;
 }
 
-static void
-ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
-                                            IBusText    *text,
-                                            guint       cursor_pos,
-                                            guint       anchor_pos)
-{
-    gchar *surrounding_text;
-    guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
-    if (cursor_pos != anchor_pos){
-        g_message("%s: There is a selection", __FUNCTION__);
-    }
-    parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
-    surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
-    g_message("%s: surrounding context is:%u:%s:", __FUNCTION__, cursor_pos - context_start, surrounding_text);
-    g_free(surrounding_text);
-    reset_context(engine);
-}
+// static void
+// ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
+//                                             IBusText    *text,
+//                                             guint       cursor_pos,
+//                                             guint       anchor_pos)
+// {
+//     gchar *surrounding_text;
+//     guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
+//     if (cursor_pos != anchor_pos){
+//         g_message("%s: There is a selection", __FUNCTION__);
+//     }
+//     parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
+//     surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
+//     g_message("%s: surrounding context is:%u:%s:", __FUNCTION__, cursor_pos - context_start, surrounding_text);
+//     g_free(surrounding_text);
+//     reset_context(engine);
+// }
 
 // static void ibus_keyman_engine_set_cursor_location (IBusEngine             *engine,
 //                                              guint                    x,
@@ -983,7 +1034,7 @@ ibus_keyman_engine_reset (IBusEngine *engine)
 {
     g_message("%s", __FUNCTION__);
     parent_class->reset (engine);
-    ibus_keyman_engine_focus_in (engine);
+    reset_context(engine);
 }
 
 
@@ -1059,13 +1110,11 @@ ibus_keyman_engine_disable (IBusEngine *engine)
 //     reset_context(engine);
 // }
 
-static void
-ibus_keyman_engine_property_activate (IBusEngine  *engine,
-                                    const gchar *prop_name,
-                                    guint        prop_state)
-{
-    g_message("ibus_keyman_engine_property_activate");
-    parent_class->property_activate (engine, prop_name, prop_state);
-}
-
-
+// static void
+// ibus_keyman_engine_property_activate (IBusEngine  *engine,
+//                                     const gchar *prop_name,
+//                                     guint        prop_state)
+// {
+//     g_message("ibus_keyman_engine_property_activate");
+//     parent_class->property_activate (engine, prop_name, prop_state);
+// }

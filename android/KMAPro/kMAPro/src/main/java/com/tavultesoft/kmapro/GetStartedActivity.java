@@ -64,6 +64,7 @@ public class GetStartedActivity extends BaseActivity {
     checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        // Save user preference on showing "Get Started"
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(showGetStartedKey, isChecked);
         editor.commit();
@@ -128,8 +129,31 @@ public class GetStartedActivity extends BaseActivity {
           startActivity(i);
           overridePendingTransition(android.R.anim.fade_in, R.anim.hold);
         }
+
+        uncheckGetStartedIfComplete();
       }
     });
+  }
+
+  /**
+   * Uncheck show "Get Started" on startup if:
+   * User hasn't set a preference on showing "Get Started",
+   * Keyman enabled as a system-wide keyboard, and
+   * Keyman set as default keyboard
+   */
+  private void uncheckGetStartedIfComplete() {
+    if (SystemIMESettings.isEnabledAsSystemKB(this) &&
+        SystemIMESettings.isDefaultKB(this)) {
+
+      final SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      if (!prefs.contains(showGetStartedKey)) {
+        // Everything is completed, so un-check "Get Started" on startup.
+        // onCheckedChanged() will save the preference
+        final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
+        checkBox.setChecked(false);
+
+      }
+    }
   }
 
   @Override
@@ -180,6 +204,8 @@ public class GetStartedActivity extends BaseActivity {
       int[] to = new int[]{R.id.left_icon, R.id.text};
       listAdapter = new KMListAdapter(this, list, R.layout.get_started_row_layout, from, to);
       listView.setAdapter(listAdapter);
+
+      uncheckGetStartedIfComplete();
     }
   }
 }

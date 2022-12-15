@@ -80,6 +80,10 @@ final class KMKeyboard extends WebView {
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
+
+  // Facilitates a 'lazy init' - we'll only check the preference when it matters,
+  // rather than at construction time.
+  private Boolean _shouldShowHelpBubble = null;
   private boolean isChiral = false;
 
   private int currentKeyboardErrorReports = 0;
@@ -112,6 +116,19 @@ final class KMKeyboard extends WebView {
     this.context = context;
     this.keyboardType = keyboardType;
     initKMKeyboard(context);
+  }
+
+  public boolean getShouldShowHelpBubble() {
+    if(this._shouldShowHelpBubble == null) {
+      SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      this._shouldShowHelpBubble = prefs.getBoolean(KMManager.KMKey_ShouldShowHelpBubble, true);
+    }
+
+    return this._shouldShowHelpBubble;
+  }
+
+  public void setShouldShowHelpBubble(boolean flag) {
+    this._shouldShowHelpBubble = flag;
   }
 
   @SuppressWarnings("deprecation")
@@ -249,8 +266,9 @@ final class KMKeyboard extends WebView {
 
   public void callJavascriptAfterLoad() {
     if(this.javascriptAfterLoad.size() > 0) {
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
+      // Don't call this WebView method on just ANY thread - run it on the main UI thread.
+      // https://stackoverflow.com/a/22611010
+      this.postDelayed(new Runnable() {
         @Override
         public void run() {
           if(javascriptAfterLoad.size() > 0) {
@@ -269,6 +287,9 @@ final class KMKeyboard extends WebView {
   }
 
   public void hideKeyboard() {
+    dismissKeyPreview(0);
+    dismissSubKeysWindow();
+
     String jsString = "hideKeyboard()";
     loadJavascript(jsString);
   }
@@ -323,16 +344,23 @@ final class KMKeyboard extends WebView {
     loadJavascript(KMString.format(
       "window.onload = function(){ setOskWidth(\"%d\");"+
       "setOskHeight(\"0\"); };", kbWidth));
+    if (this.getShouldShowHelpBubble()) {
+      this.showHelpBubbleAfterDelay(2000);
+    }
   }
 
   public void onPause() {
     dismissKeyPreview(0);
     dismissSubKeysWindow();
+
+    dismissHelpBubble();
   }
 
   public void onDestroy() {
     dismissKeyPreview(0);
     dismissSubKeysWindow();
+
+    dismissHelpBubble();
   }
 
   public void onConfigurationChanged(Configuration newConfig) {
@@ -348,6 +376,12 @@ final class KMKeyboard extends WebView {
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
     loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
+
+    this.dismissHelpBubble();
+
+    if(this.getShouldShowHelpBubble()) {
+      this.showHelpBubbleAfterDelay(2000);
+    }
   }
 
   public void dismissSubKeysWindow() {
@@ -574,6 +608,11 @@ final class KMKeyboard extends WebView {
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
+
+    this.dismissHelpBubble();
+    if(this.getShouldShowHelpBubble()) {
+      this.showHelpBubbleAfterDelay(2000);
+    }
 
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
 
@@ -1048,6 +1087,8 @@ final class KMKeyboard extends WebView {
       posY = kbPos[1] + (int) py;
     }
 
+    dismissHelpBubble();
+    this.setShouldShowHelpBubble(false);
     dismissKeyPreview(0);
     //subKeysWindow.setAnimationStyle(R.style.PopupAnim);
 
@@ -1211,6 +1252,8 @@ final class KMKeyboard extends WebView {
       posY = kbPos[1] + (int) (py * density - frame.height() + offset_y);
     }
 
+    dismissHelpBubble();
+    this.setShouldShowHelpBubble(false);
     //keyPreviewWindow.setAnimationStyle(R.style.KeyPreviewAnim);
     if (keyPreviewWindow != null) {
       keyPreviewWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
@@ -1231,6 +1274,55 @@ final class KMKeyboard extends WebView {
         }
       }
     }, delay);
+  }
+
+  protected void showHelpBubble() {
+    if(keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return; // Help bubble is disabled for System-wide keyboard
+    }
+
+    if(KMManager.getGlobeKeyAction(keyboardType) == KMManager.GlobeKeyAction.GLOBE_KEY_ACTION_DO_NOTHING) {
+      return; // Help bubble is disabled if globe key has no action
+    }
+
+    try {
+      String hintText = context.getString(R.string.help_bubble_text);
+
+      // To ensure that the localized text is properly escaped, we'll use JSON utilities.  Since
+      // there's no direct string encoder, we'll just wrap it in an object and unwrap it in JS.
+      JSONObject textWrapper = new JSONObject();
+      textWrapper.put("text", hintText);
+
+      // signalHelpBubbleDismissal - defined in android-host.js, gives a helpBubbleDismissed signal.
+      loadJavascript("keyman.showGlobeHint(" + textWrapper.toString() + ".text, signalHelpBubbleDismissal);");
+    } catch(JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return;
+    }
+  }
+
+  protected void showHelpBubbleAfterDelay(int milliseconds) {
+    this.showHelpBubbleAfterDelay(milliseconds, false);
+  }
+
+  protected void showHelpBubbleAfterDelay(int milliseconds, boolean delayedCheck) {
+    Handler handler = new Handler();
+    handler.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        if(delayedCheck) {
+          if(getShouldShowHelpBubble()) {
+            showHelpBubble();
+          }
+        } else {
+          showHelpBubble();
+        }
+      }
+    }, milliseconds);
+  }
+
+  protected void dismissHelpBubble() {
+    loadJavascript("keyman.hideGlobeHint();");
   }
 
   public static void addOnKeyboardEventListener(OnKeyboardEventListener listener) {

@@ -23,7 +23,13 @@ export function defaultSearchTermToKey(wordform: string): string {
   return wordform
       .normalize('NFKD')
       // Remove any combining diacritics (if input is in NFKD)
-      .replace(/[\u0300-\u036F]/g, '');
+      .replace(/[\u0300-\u036F]/g, '')
+      // Replace directional quotation marks with plain apostrophes
+      .replace(/‘/, "'")
+      .replace(/’/, "'")
+      // Also double-quote marks.
+      .replace(/“/, '"')
+      .replace(/”/, '"');
 }
 
 /**
@@ -57,7 +63,13 @@ export function defaultCasedSearchTermToKey(wordform: string, applyCasing: Casin
         .replace(/[\u0300-\u036F]/g, '')
       ) // end of `Array.from`
       .map(function(c) { return applyCasing('lower', c)})
-      .join('');
+      .join('')
+      // Replace directional quotation marks with plain apostrophes
+      .replace(/‘/, "'")
+      .replace(/’/, "'")
+      // Also double-quote marks.
+      .replace(/“/, '"')
+      .replace(/”/, '"');
 }
 
 /**
