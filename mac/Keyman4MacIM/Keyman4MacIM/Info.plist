@@ -92,6 +92,6 @@
 		<string>Latn</string>
 	</array>
 	<key>tsInputMethodIconFileKey</key>
-	<string>keyman.png</string>
+	<string>keyman-icon.png</string>
 </dict>
 </plist>

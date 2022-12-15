@@ -266,6 +266,11 @@ function oskClearKeyPreview() {
   window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
 }
 
+function signalHelpBubbleDismissal() {
+  fragmentToggle = (fragmentToggle + 1) % 100;
+  window.location.hash = 'helpBubbleDismissed-'+fragmentToggle;
+}
+
 function oskCreatePopup(obj,x,y) {
   if(obj != null) {
     var i;
@@ -326,12 +331,6 @@ function hideKeyboard() {
 function showKeyboard() {
   // Refresh KMW OSK
   keyman.correctOSKTextSize();
-}
-
-function showHelpBubble() {
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  var pos = keyman.touchMenuPos();
-  window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
 }
 
 function executePopupKey(keyID, keyText) {

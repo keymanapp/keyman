@@ -487,6 +487,11 @@ begin
           ShowMessage(E.Message);
           Exit;
         end;
+        on E:EEncodingError do
+        begin
+          ShowMessage(E.Message);
+          Exit;
+        end;
       end;
     end
     else

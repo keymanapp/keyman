@@ -13,7 +13,7 @@ const FILEVERSION_KMP_JSON = '12.0';
 
 export default class KmpCompiler {
 
-  public transformKpsToKmpObject(kpsPath: string, kpsString: string): KmpJsonFile {
+  public transformKpsToKmpObject(kpsString: string, kpsPath: string): KmpJsonFile {
 
     // Load the KPS data from XML as JS structured data.
 

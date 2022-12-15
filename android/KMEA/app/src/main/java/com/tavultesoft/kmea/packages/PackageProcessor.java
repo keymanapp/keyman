@@ -70,7 +70,10 @@ public class PackageProcessor {
    * @throws IllegalArgumentException
    */
   public String getPackageID(File path) {
-    String filename = path.getName().toLowerCase();
+    // Sometimes, downloading a kmp multiple times results in a filename with a suffix:
+    // " (#).kmp" or "-#.kmp" in the filename, so strip out the number
+    String filename = path.getName().toLowerCase().replaceAll(
+      "\\s*((\\(\\d+\\))|(-\\d+))\\.kmp$", ".kmp");
 
     if(resourceRoot == null) {
       throw new IllegalStateException("The PackageProcessor has not been initialized!");
@@ -417,6 +420,10 @@ public class PackageProcessor {
    * @return String of the package target ("keyboards", "lexicalModels", or "invalid")
    */
   public String getPackageTarget(JSONObject json) {
+    if (json == null) {
+      KMLog.LogError(TAG, "kmp.json is null");
+      return PP_TARGET_INVALID;
+    }
     try {
       if (json.has(PP_KEYBOARDS_KEY) && !json.has(PP_LEXICAL_MODELS_KEY)) {
         return PP_TARGET_KEYBOARDS;
@@ -767,6 +774,9 @@ public class PackageProcessor {
       return specs;
     }
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
+    if (newInfoJSON == null) {
+      return specs;
+    }
     String packageId = getPackageID(path);
 
     // For lexical model packages, lexical model version is determined by the package version

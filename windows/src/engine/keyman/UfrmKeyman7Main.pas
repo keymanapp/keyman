@@ -408,6 +408,7 @@ uses
   RegistryKeys,
   klog,
   GetOsVersion,
+  System.StrUtils,
   System.Win.ComObj, {tlhelp32,}
   VistaMessages,
   Vcl.AxCtrls,
@@ -503,6 +504,8 @@ end;
 
 procedure TfrmKeyman7Main.FormCreate(Sender: TObject);
 begin
+  TKeymanSentryClient.Breadcrumb('trace', 'TfrmKeyman7Main.FormCreate');
+
   if GetOs in [osVista, osWin7] then   // I4576
     FGlobalKeyboardChangeManager := TGlobalKeyboardChangeManager.Create;   // I4271
 
@@ -538,6 +541,7 @@ end;}
 
 procedure TfrmKeyman7Main.FormDestroy(Sender: TObject);
 begin
+  TKeymanSentryClient.Breadcrumb('trace', 'TfrmKeyman7Main.FormDestroy');
   if Assigned(FLangSwitchRefreshWatcher) then
   begin
     FLangSwitchRefreshWatcher.Terminate;
@@ -572,7 +576,8 @@ begin
   FreeAndNil(frmKeymanMenu);  // I3139 - attempt to avoid crash because keyman32.dll is unloaded and then additional messages sent?   // I3515
   FreeAndNil(frmLanguageSwitch);  // I3139 - attempt to avoid crash because keyman32.dll is unloaded and then additional messages sent?   // I3515
 
-  kmint.KeymanEngineControl.ShutdownKeyman32Engine;
+  if kmint.KeymanEngineControl <> nil then
+    kmint.KeymanEngineControl.ShutdownKeyman32Engine;
   FreeAndNil(FLangSwitchManager);   // I3933
 
   //Windows.MessageBox(Handle, PChar(IntToStr(kmcom._AddRef)), 'RefCount+1', MB_OK);
@@ -609,12 +614,22 @@ end;
 
 procedure TfrmKeyman7Main.RegisterControllerWindows;  // I3092
 begin
+  if kmint.KeymanEngineControl = nil then
+  begin
+    TKeymanSentryClient.ReportMessage('RegisterControllerWindows: KeymanEngineControl was unexpectedly nil');
+    Exit;
+  end;
   kmint.KeymanEngineControl.RegisterMasterController(Application.Handle);
   kmint.KeymanEngineControl.RegisterControllerThread(GetCurrentThreadId);
 end;
 
 procedure TfrmKeyman7Main.UnregisterControllerWindows;   // I4731
 begin
+  if kmint.KeymanEngineControl = nil then
+  begin
+    TKeymanSentryClient.ReportMessage('UnregisterControllerWindows: KeymanEngineControl was unexpectedly nil');
+    Exit;
+  end;
   kmint.KeymanEngineControl.UnregisterMasterController(Application.Handle);
   kmint.KeymanEngineControl.UnregisterControllerThread(GetCurrentThreadId);
 end;
@@ -627,8 +642,13 @@ begin
   begin
     if not Assigned(kmcom) and not StartKeymanEngine then Exit;  // I1951
 
-    kmint.KeymanEngineControl.ResetKeyman32Engine; // pre-initialise  // I3092   // I5133
+    if kmint.KeymanEngineControl = nil then
+    begin
+      TKeymanSentryClient.ReportMessage('LoadProduct: KeymanEngineControl was unexpectedly nil');
+      Exit;
+    end;
 
+    kmint.KeymanEngineControl.ResetKeyman32Engine; // pre-initialise  // I3092   // I5133
     RegisterControllerWindows;  // I3092
     kmint.KeymanEngineControl.StartKeyman32Engine;   // I5133
 
@@ -647,7 +667,14 @@ begin
   begin
     if not Assigned(kmcom) and not StartKeymanEngine then Exit;  // I1951
 
-    kmint.KeymanEngineControl.StopKeyman32Engine;   // I5133
+    if kmint.KeymanEngineControl = nil then
+    begin
+      TKeymanSentryClient.ReportMessage('UnloadProduct: KeymanEngineControl was unexpectedly nil');
+    end
+    else
+    begin
+      kmint.KeymanEngineControl.StopKeyman32Engine;   // I5133
+    end;
 
     FreeAndNil(FRunningProduct);
 
@@ -1268,6 +1295,8 @@ function TfrmKeyman7Main.StartKeymanEngine: Boolean;  // I1951
 begin
   Result := True;
 
+  TKeymanSentryClient.Breadcrumb('trace', 'TfrmKeyman7Main.StartKeymanEngine:kmcom='+IfThen(Assigned(kmcom),'assigned','nil'));
+
   if Assigned(kmcom) then Exit;
 
   try
@@ -1275,6 +1304,7 @@ begin
   except
     on E:Exception do
     begin
+      TKeymanSentryClient.ReportHandledException(E, 'StartKeymanEngine: Instantiating kmcom');
       ShowMessage(E.Message);
       Application.Terminate;
       Result := False;
@@ -1291,6 +1321,7 @@ begin
   except
     on E:Exception do
     begin
+      TKeymanSentryClient.ReportHandledException(E, 'StartKeymanEngine: Registering controller windows');
       Application.ShowException(E);
       Application.Terminate;
       Result := False;
@@ -1300,6 +1331,7 @@ begin
 
   if not LoadProduct then
   begin
+    TKeymanSentryClient.ReportMessage('StartKeymanEngine: Unable to load product');
     ShowMessage('Unable to load product.');
     Application.Terminate;
     Application.ShowMainForm := False;
@@ -1315,7 +1347,12 @@ begin
     Free;
   end;
 
-  kmint.KeymanEngineControl.RestartEngine; // I1486
+  if kmint.KeymanEngineControl = nil then
+  begin
+    TKeymanSentryClient.ReportMessage('StartKeymanEngine: KeymanEngineControl was unexpectedly nil');
+  end
+  else
+    kmint.KeymanEngineControl.RestartEngine; // I1486
 
   StartKeymanX64;
 
@@ -1824,7 +1861,8 @@ begin
     if FIsInputPaneVisible <> isVisible then
     begin
       FIsInputPaneVisible := isVisible;
-      kmint.KeymanEngineControl.UpdateTouchPanelVisibility(isVisible);
+      if kmint.KeymanEngineControl <> nil then
+        kmint.KeymanEngineControl.UpdateTouchPanelVisibility(isVisible);
     end;
     //TDebugLogClient.Instance.WriteMessage('InputPane Location: %d, %d, %d, %d', [r.Left, r.Top, r.Right, r.Bottom]);
   end;
@@ -1865,7 +1903,8 @@ begin
   tmrTestKeymanFunctioning.Enabled := False;
   if FTestKeymanFunctioning.Count < 3 then
   begin
-    kmint.KeymanEngineControl.RestartEngine;
+    if kmint.KeymanEngineControl <> nil then
+      kmint.KeymanEngineControl.RestartEngine;
     Inc(FTestKeymanFunctioning.Count);
     TestKeymanFunctioning(FTestKeymanFunctioning.FunctionType, FTestKeymanFunctioning.RunOnSuccess, False);
   end

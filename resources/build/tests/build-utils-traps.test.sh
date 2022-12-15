@@ -46,7 +46,7 @@ error-test-matcher() {
 
   # Verify output logs have the expected output message.
 
-  if [[ "${output_logs:-}" =~ "raise-build-error:project failed" ]]; then
+  if [[ "${output_logs:-}" =~ "raise-build-error failed" ]]; then
     printf "${CHECK} Expected build-failure report was emitted\n"
   else
     printf "${CROSS} Expected build-failure report was not emitted\n"
@@ -137,7 +137,7 @@ warning-test-matcher() {
 
   # Verify output logs have the expected output message.
 
-  if [[ "${output_logs:-}" =~ "unreported-action:project never reported" ]]; then
+  if [[ "${output_logs:-}" =~ "unreported-action:* never reported" ]]; then
     printf "${CHECK} Expected warning report was emitted\n"
   else
     printf "${CROSS} Expected warning report was not emitted\n"

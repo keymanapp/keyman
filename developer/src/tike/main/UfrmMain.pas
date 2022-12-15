@@ -323,6 +323,7 @@ type
     FFirstShow: Boolean;
     FIsClosing: Boolean;
     FCanClose: Boolean;
+    FHasDoneCloseCleanup: Boolean;
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -361,6 +362,7 @@ type
     procedure CEFShutdownComplete(Sender: TObject);
     procedure ActivateActiveChild;
     function OpenModelEditor(FFileName: string): TfrmTikeEditor;
+    procedure DoCloseCleanup;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -598,9 +600,19 @@ begin
 end;
 
 procedure TfrmKeymanDeveloper.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  DoCloseCleanup;
+  Action := caFree;
+end;
+
+procedure TfrmKeymanDeveloper.DoCloseCleanup;
 var
   i: Integer;
 begin
+  if FHasDoneCloseCleanup then
+    Exit;
+  FHasDoneCloseCleanup := True;
+
   for i := FChildWindows.Count - 1 downto 0 do
   begin
     FChildWindows[i].Visible := False;
@@ -630,8 +642,6 @@ begin
   finally
     Free;
   end;
-
-  Action := caFree;
 
   FreeAndNil(frmCharacterMapDock);
   FreeAndNil(frmCharacterIdentifier);   // I4807
@@ -678,7 +688,9 @@ end;
 
 procedure TfrmKeymanDeveloper.FormDestroy(Sender: TObject);
 begin
-//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormDestroy'));
+  DoCloseCleanup;
+
+  //  OutputDebugString(PChar('TfrmKeymanDeveloper.FormDestroy'));
   UnhookWindowsHookEx(hInputLangChangeHook);
 
   FreeAndNil(FCharMapSettings);

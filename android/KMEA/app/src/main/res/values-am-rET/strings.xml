@@ -33,7 +33,7 @@
     <!-- Context: Button label -->
     <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">የሚቀጥለውን የመቀበያ ዘዴ</string>
     <!-- Context: Button label -->
-    <string name="label_download" comment="Button to confirm downloading an item">ወርዷል</string>
+    <string name="label_download" comment="Button to confirm downloading an item">አውርድ</string>
     <!-- Context: Button label -->
     <string name="label_install" comment="Confirmation to install a package">ጫን</string>
     <!-- Context: Button label -->
@@ -44,6 +44,8 @@
     <string name="label_ok" comment="Button to acknowledge a dialog">ይሁን</string>
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">አዘምን</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">የኢንተርኔት ግንኙነት ተቋርጧል</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">ከኪይማን ሰርቨር ጋር መገናኘት አልቻለም!</string>
     <!-- Context: Keyboard Updates -->
@@ -82,6 +84,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">የፊደል ገበታ ሰሌዳው ችግር %1$s:%2$s ለ %3$s ቋንቋ።</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">ተያያዥነት ያለውን መዝገበ ቃላት ለመጫን እየፈተሸ ነው።</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">የሚወርደውን መዝገበ ቃላት ከኪይማን ሰርቨር ጋር መገናኘት አልተቻለም</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">የዚህን የፊደል ገበታ አዲሱን መዝገበ ቃላት ማውረድ ትፈልጋለህ?</string>
     <!-- Context: No associated dictionary found -->
@@ -124,16 +127,25 @@
     <string name="uninstall_model" comment="Label to uninstall a dictionary">መዝገበ ቃላቱን ማስወገድ</string>
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">ይህንን መዝገበ ቃላት ልታጠፋው ትፈልጋለህ?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">መዝገበ ቃላት ተሰርዧል</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s ይህ የፊደል ገበታ ሰሌዳ ተጭኗል</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">የፊደል ገበታ ሰሌዳ ተሰርዧል</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">እርማቱን ያብሩ</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">ትንበያውን ያብሩ</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">መዝገበ ቃላት</string>
+    <plurals name="model_count">
+        <item quantity="one">መዝገበ ቃላት</item>
+        <item quantity="other">መዝገበ ቃላቶች</item>
+    </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">መዝገበ ቃላት መኖሩን ይፈትሹ</string>
+    <string name="check_model_online" comment="Check for dictionaries online">ኢንተርኔት ላይ መዝገበ ቃላት እንዳለ አረጋግጥ</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">መዝገበ ቃላት፦ %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -155,4 +167,6 @@
     <!-- Context: Shared preferences name -->
     <!-- Context: Other strings -->
     <string name="help_bubble_text">የፊደል ገበታውን ለመቀየር እዚህ ጋር ንካ</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>

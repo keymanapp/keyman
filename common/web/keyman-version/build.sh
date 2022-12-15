@@ -19,7 +19,12 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-builder_describe "Build the include script for current Keyman version" configure clean build
+builder_describe "Build the include script for current Keyman version" \
+  configure \
+  clean \
+  build \
+  publish \
+  --dry-run
 
 builder_describe_outputs \
   configure "/node_modules" \
@@ -84,4 +89,10 @@ if builder_start_action build; then
   fi
 
   builder_finish_action success build
+fi
+
+if builder_start_action publish; then
+  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+  builder_publish_to_npm
+  builder_finish_action success publish
 fi

@@ -90,5 +90,12 @@ fi
 if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/npm-publish.inc.sh"
   npm_publish
+
+  # For now, kmc will have responsibility for publishing keyman-version. In
+  # the future, we should probably have a top-level npm publish script that
+  # publishes all modules for a given release version
+  # From: #7595
+  "$KEYMAN_ROOT/common/web/keyman-version/build.sh" publish $DRY_RUN
+
   builder_finish_action success publish
 fi

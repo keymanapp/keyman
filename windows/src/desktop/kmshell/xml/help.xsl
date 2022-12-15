@@ -116,7 +116,7 @@
 
           #buttons {
           float: right;
-          padding: 10px;
+          padding: 8px 10px 8px 10px;
           }
 
           #help {
