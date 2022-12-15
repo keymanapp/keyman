@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.DependencyUtil;
+import com.tavultesoft.kmea.util.DependencyUtil.LibraryType;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMString;
@@ -150,7 +151,7 @@ public final class KeyboardInfoActivity extends BaseActivity {
     // If QRGen library included, append the QR code View to the
     // scrollable listview for sharing keyboard
     View view = getLayoutInflater().inflate(R.layout.qr_layout, null);
-    if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.QRCODE)) {
+    if (DependencyUtil.libraryExists(LibraryType.QRCODE)) {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 

@@ -11,6 +11,7 @@ import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.DependencyUtil;
+import com.tavultesoft.kmea.util.DependencyUtil.LibraryType;
 
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
@@ -27,7 +28,7 @@ public final class KMLog {
     if (msg != null && !msg.isEmpty()) {
       Log.i(tag, msg);
 
-      if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
+      if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.INFO);
       }
     }
@@ -46,7 +47,7 @@ public final class KMLog {
         BaseActivity.makeToast(null, msg, Toast.LENGTH_LONG);
       }
 
-      if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
+      if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.ERROR);
       }
     }
@@ -71,7 +72,7 @@ public final class KMLog {
       BaseActivity.makeToast(null, errorMsg, Toast.LENGTH_LONG);
     }
 
-    if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
+    if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
       Sentry.addBreadcrumb(errorMsg);
       Sentry.captureException(e);
     }
@@ -87,7 +88,7 @@ public final class KMLog {
    */
   public static void LogExceptionWithData(String tag, String msg,
                                           String objName, Object obj, Throwable e) {
-    if (obj != null && DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
+    if (obj != null && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
       String objStr = null;
       try {
         objStr = obj.toString();
