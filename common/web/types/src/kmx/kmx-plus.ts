@@ -288,6 +288,14 @@ export class Key2 extends Section {
 };
 
 export class List extends Section {
+  /**
+   * Allocate a list from a space-separated list of items.
+   * Note that passing undefined or null or `''` will
+   * end up being the same as the empty list `[]`
+   * @param strs Strs section for allocation
+   * @param s space-separated list of items
+   * @returns a List object
+   */ 
   allocListFromSpaces(strs: Strs, s?: string): ListItem {
     if(s === undefined || s === null) {
       s = '';
@@ -295,9 +303,22 @@ export class List extends Section {
     // TODO-LDML: support unicode escaping etc
     return this.allocList(strs, s.split(' '));
   }
+  /**
+   * Return a List object referring to the string list.
+   * Note that a falsy list, or a list containing only an empty string
+   * `['']` will be stored as an empty list `[]`.
+   * @param strs Strs section for allocation
+   * @param s string list to allocate
+   * @returns 
+   */
   allocList(strs: Strs, s?: string[]): ListItem {
+    // Special case the 'null' list for [] or ['']
+    if (!s || (s.length === 1 && s[0] === '')) {
+      return this.lists[0];
+    }
     let result = this.lists.find(item => item.isEqual(s));
     if(result === undefined) {
+      // allocate a new ListItem
       result = new ListItem(strs, s);
       this.lists.push(result);
     }

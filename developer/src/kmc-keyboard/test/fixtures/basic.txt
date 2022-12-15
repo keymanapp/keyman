@@ -140,6 +140,10 @@ block(sectitems)
   76 6b 65 79
   diff(sect,vkey)
 
+# ???? TODO
+00 00 00 00
+00 00 00 00
+
 block(endsect)
 
 # ----------------------------------------------------------------------------------------------------
@@ -264,12 +268,49 @@ block(finl)
   00 00 00 00                       #    KMXPLUS_ELEM before;
   01 00 00 00                       #    KMX_DWORD flags;
                                     # };
+# ----------------------------------------------------------------------------------------------------
+# key2
+# ----------------------------------------------------------------------------------------------------
 
 block(key2)                         # struct COMP_KMXPLUS_KEY2 {
-  5b 54 79 32                       #   KMX_DWORD header.ident;   // 0000 Section name - key2
+  6b 65 79 32                       #   KMX_DWORD header.ident;   // 0000 Section name - key2
   sizeof(key2)                      #   KMX_DWORD header.size;    // 0004 Section length
-# TODO: key2
-
+  02 00 00 00                       #   KMX_DWORD keyCount
+  01 00 00 00                       #   KMX_DWORD flicksCount
+  00 00 00 00                       #   KMX_DWORD flickCount
+  00 00 00 00  00 00 00 00  00 00 00 00 # Reserved[3]
+  # keys
+  #  hmaqtua
+  00 00 00 00                       #   KMX_DWORD vkey
+  index(strNull,strKey1,2)          #   KMXPLUS_STR 'U+0127'
+  01 00 00 00                       #   KMX_DWORD (flags: extend)
+  index(strNull,strHmaqtua,2)       #   KMXPLUS_STR 'hmaqtua'
+  00 00 00 00                       #   KMXPLUS_STR switch
+  0A 00 00 00                       #   KMX_DWORD width*10 
+  02 00 00 00                       #   LIST longPress (TODO: should be 0)
+  00 00 00 00                       #   STR longPressDefault
+  01 00 00 00                       #   LIST multiTap (TODO: should be0)
+  00 00 00 00                       #   flicks 0 
+  # that
+  00 00 00 00                       #   KMX_DWORD vkey
+  index(strNull,strKey2,2)          #   KMXPLUS_STR 'U+0127'
+  01 00 00 00                       #   KMX_DWORD flags = extend
+  index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtua'
+  00 00 00 00                       #   KMXPLUS_STR switch
+  0A 00 00 00                       #   KMX_DWORD width*10
+  00 00 00 00                       #   LIST longPress
+  00 00 00 00                       #   STR longPressDefault
+  00 00 00 00                       #   LIST multiTap
+  00 00 00 00                       #   flicks 0
+  # flicks
+  #  flicks 0 - null
+  00 00 00 00                       #   KMX_DWORD count
+  00 00 00 00                       #   KMX_DWORD flick
+  00 00 00 00                       #   KMX_STR id
+  # flick
+  #00 00 00 00                       #   LIST directions
+  #00 00 00 01                       #   flags
+  #00 00 00 00                       #   str: to
 # ----------------------------------------------------------------------------------------------------
 # keys
 # ----------------------------------------------------------------------------------------------------
@@ -287,10 +328,14 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   c0 00 00 00  00 00 00 00  index(strNull,strKey1,2)  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
   31 00 00 00  00 00 00 00  index(strNull,strKey2,2)  01 00 00 00   # KMX_DWORD vkey, mod, to, flags;
 
+# ----------------------------------------------------------------------------------------------------
+# layr
+# ----------------------------------------------------------------------------------------------------
+
+
 block(layr)                         # struct COMP_KMXPLUS_LAYR {
   6c 61 79 72                       #   KMX_DWORD header.ident;   // 0000 Section name - layr
   sizeof(layr)                      #   KMX_DWORD header.size;    // 0004 Section length
-# TODO: layr
   01 00 00 00                       #   KMX_DWORD listCount
   01 00 00 00                       #   KMX_DWORD rowCount
   02 00 00 00                       #   KMX_DWORD keyCount
@@ -319,11 +364,15 @@ block(list)                         # struct COMP_KMXPLUS_LAYR_LIST {
   sizeof(list)                      #   KMX_DWORD header.size;    // 0004 Section length
   01 00 00 00                       #   KMX_DWORD listCount (should be 3)
   01 00 00 00                       #   KMX_DWORD indexCount (should be 3)
-  # first the null list
-  00 00 00 00                       #   KMX_DWORD lists[0].index
+  # lists, first the null list
+  block(listNull)
+  index(indexNull,indexNull,2)      #   KMX_DWORD list index
   00 00 00 00                       #   KMX_DWORD lists[0].count
-  # now the null index
-  00 00 00 00                       #   KMX_DWORD indices[0] (null)
+  block(endLists)
+  # indices
+  block(indexNull)
+  index(strNull,strNull,2)          #   KMXPLUS_STR string index
+  block(endIndices)
 
 block(loca)                         # struct COMP_KMXPLUS_LOCA {
   6c 6f 63 61                       #   KMX_DWORD header.ident;   // 0000 Section name - loca

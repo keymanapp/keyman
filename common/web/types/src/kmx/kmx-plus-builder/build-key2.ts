@@ -108,10 +108,10 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
       longPress: build_list_index(sect_list, key.longPress),
       longPressDefault: build_strs_index(sect_strs, key.longPressDefault),
       multiTap: build_list_index(sect_list, key.multiTap),
-      flicks: key2.flicks.findIndex(v => v._id === key.flicks),
+      flicks: key2.flicks.findIndex(v => v._id === (key.flicks || '')), // flicks id='' is the 'null' flicks
     };
-    // Make sure the flicks were was found
-    if (key.flicks && !result.flicks) {
+    // Make sure the flicks were found
+    if (result.flicks === -1) {
       throw new Error(`Key2: Could not find flicks id=${key.flicks} for key=${key.id.value}`);
     }
     return result;

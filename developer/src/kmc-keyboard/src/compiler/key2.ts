@@ -77,8 +77,8 @@ export class Key2Compiler extends SectionCompiler {
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
       flags |= constants.key2_key_flags_extend;
       const to = sections.strs.allocString(key.to); // TODO-LDML: single char
-      const width = Math.ceil(key.width * 10.0);
-      const vkey: any = null; // TODO-LDML: fill in later
+      const width = Math.ceil((key.width || 1) * 10.0);  // default, width=1
+      const vkey: any = 0; // TODO-LDML: fill in later
       sect.keys.push({
         flags,
         flicks,
