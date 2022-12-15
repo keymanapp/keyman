@@ -10,27 +10,13 @@ import android.widget.Toast;
 import com.tavultesoft.kmea.BaseActivity;
 import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.DependencyUtil;
 
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
 public final class KMLog {
   private static final String TAG = "KMLog";
-
-  /**
-   * Utility to determine if Sentry library is available in an app
-   * @return boolean
-   */
-  public static boolean sentryLibraryExists() {
-    boolean result = false;
-    try {
-      Class.forName("io.sentry.Sentry");
-      return true;
-    } catch (ClassNotFoundException e) {
-      // Intentionally not sending to Sentry because 3rd party apps may not include Sentry library
-      return false;
-    }
-  }
 
   /**
    * Utility to log info and send to Sentry
@@ -41,7 +27,7 @@ public final class KMLog {
     if (msg != null && !msg.isEmpty()) {
       Log.i(tag, msg);
 
-      if (sentryLibraryExists() && Sentry.isEnabled()) {
+      if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.INFO);
       }
     }
@@ -60,7 +46,7 @@ public final class KMLog {
         BaseActivity.makeToast(null, msg, Toast.LENGTH_LONG);
       }
 
-      if (sentryLibraryExists() && Sentry.isEnabled()) {
+      if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.ERROR);
       }
     }
@@ -85,7 +71,7 @@ public final class KMLog {
       BaseActivity.makeToast(null, errorMsg, Toast.LENGTH_LONG);
     }
 
-    if (sentryLibraryExists() && Sentry.isEnabled()) {
+    if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
       Sentry.addBreadcrumb(errorMsg);
       Sentry.captureException(e);
     }
@@ -101,7 +87,7 @@ public final class KMLog {
    */
   public static void LogExceptionWithData(String tag, String msg,
                                           String objName, Object obj, Throwable e) {
-    if (obj != null && sentryLibraryExists() && Sentry.isEnabled()) {
+    if (obj != null && DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
       String objStr = null;
       try {
         objStr = obj.toString();
