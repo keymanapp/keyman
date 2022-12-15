@@ -1,9 +1,11 @@
 #pragma once
 
 #include <compfile.h>
+
 namespace kmcmp {
-KMX_BOOL AddCompileString(LPSTR buf);
+  KMX_BOOL AddCompileString(LPSTR buf);
 }
+
 KMX_BOOL AddCompileMessage(KMX_DWORD msg);
 
 // TODO: These macros can return FALSE in functions that expect a DWORD CERR_x
@@ -12,8 +14,8 @@ KMX_BOOL AddCompileMessage(KMX_DWORD msg);
 #define AddWarning(warn)    { if(AddCompileMessage(warn)) return FALSE; }
 
 namespace kmcmp {
-extern BOOL FWarnDeprecatedCode;
-extern int currentLine;
+  extern BOOL FWarnDeprecatedCode;
+  extern int currentLine;
 }
 
 

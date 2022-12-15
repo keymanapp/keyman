@@ -11,7 +11,7 @@
 #include <xstring.h>
 
 namespace kmcmp {
-extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
+  extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
 }
 
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);

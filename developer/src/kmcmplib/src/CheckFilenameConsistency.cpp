@@ -9,7 +9,7 @@
 #include "CheckFilenameConsistency.h"
 
 namespace kmcmp {
-extern  KMX_CHAR CompileDir[MAX_PATH];
+  extern  KMX_CHAR CompileDir[MAX_PATH];
 }
 bool IsRelativePath(KMX_CHAR const * p) {
   // Relative path (returns TRUE):

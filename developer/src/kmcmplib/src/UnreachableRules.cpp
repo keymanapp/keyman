@@ -13,12 +13,12 @@
 
 #include "UnreachableRules.h"
 namespace kmcmp {
-std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
-  std::wstringstream key;
-  key << kp->Key << "," << kp->ShiftFlags << ",";
-  if (kp->dpContext) key << kp->dpContext;
-  return key.str();
-}
+  std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
+    std::wstringstream key;
+    key << kp->Key << "," << kp->ShiftFlags << ",";
+    if (kp->dpContext) key << kp->dpContext;
+    return key.str();
+  }
 }
 KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;

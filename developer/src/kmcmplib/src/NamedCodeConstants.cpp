@@ -29,31 +29,33 @@
 using namespace kmcmp;
 
 namespace kmcmp {
-extern KMX_CHAR CompileDir[];
+  extern KMX_CHAR CompileDir[];
 }
 
 int IsHangulSyllable(const KMX_WCHAR *codename, int *code);
-namespace kmcmp {
-KMX_BOOL FileExists(const KMX_CHAR *filename)
-{
-  intptr_t n;
 
-#if defined(_WIN32) || defined(_WIN64)
-  _finddata_t fi;
-  if((n = _findfirst(filename, &fi)) != -1)  // I3056   // I3512
+namespace kmcmp {
+  KMX_BOOL FileExists(const KMX_CHAR *filename)
   {
-    _findclose(n);
-    return TRUE;
+    intptr_t n;
+
+  #if defined(_WIN32) || defined(_WIN64)
+    _finddata_t fi;
+    if((n = _findfirst(filename, &fi)) != -1)  // I3056   // I3512
+    {
+      _findclose(n);
+      return TRUE;
+    }
+  #else
+    if((n= access(filename,F_OK)) != -1)  // I3056   // I3512
+    {
+      return TRUE;
+    }
+  #endif
+    return FALSE;
   }
-#else
-  if((n= access(filename,F_OK)) != -1)  // I3056   // I3512
-  {
-    return TRUE;
-  }
-#endif
-  return FALSE;
 }
-}
+
 NamedCodeConstants::NamedCodeConstants()
 {
   nEntries = 0;
@@ -117,12 +119,12 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
 }
 
 namespace kmcmp {
-int __cdecl sort_entries(const void *elem1, const void *elem2)
-{
-  return u16icmp(
-    ((NCCENTRY *)elem1)->name,
-    ((NCCENTRY *)elem2)->name);
-}
+  int __cdecl sort_entries(const void *elem1, const void *elem2)
+  {
+    return u16icmp(
+      ((NCCENTRY *)elem1)->name,
+      ((NCCENTRY *)elem2)->name);
+  }
 }
 KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 {
@@ -165,12 +167,12 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
   KMX_CHAR buf[260];
   // Look in current directory first
   strncpy_s(buf, _countof(buf), filename, 259); buf[259] = 0;  // I3481
-  if(kmcmp::FileExists(buf))
+  if(FileExists(buf))
     return IntLoadFile(buf);
   // Then look in keyboard file directory (CompileDir)
-  strncpy_s(buf, _countof(buf), kmcmp::CompileDir, 259); buf[259] = 0;  // I3481
-  strncat_s(buf, _countof(buf), filename, 259-strlen(kmcmp::CompileDir)); buf[259] = 0;
-  if(kmcmp::FileExists(buf))
+  strncpy_s(buf, _countof(buf), CompileDir, 259); buf[259] = 0;  // I3481
+  strncat_s(buf, _countof(buf), filename, 259-strlen(CompileDir)); buf[259] = 0;
+  if(FileExists(buf))
     return IntLoadFile(buf);
 
   //TODO: sort out how to find common includes in non-Windows platforms:
@@ -180,7 +182,7 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
     KMX_CHAR *p = strrchr(buf, '\\'); if(p) p++; else p = buf;
     *p = 0;
     strncat_s(buf, _countof(buf), filename, 259-strlen(buf)); buf[259] = 0;  // I3481   // I3641
-    if(kmcmp::FileExists(buf))
+    if(FileExists(buf))
       return IntLoadFile(buf);
   #endif
 
@@ -192,7 +194,7 @@ KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
 void NamedCodeConstants::reindex()
 {
   if (entries != NULL) {
-    qsort(entries, nEntries, sizeof(NCCENTRY), kmcmp::sort_entries);
+    qsort(entries, nEntries, sizeof(NCCENTRY), sort_entries);
   }
 
   wchar_t c = L'.', d;

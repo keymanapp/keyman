@@ -298,12 +298,12 @@ bool flag_use_kmcompx = true;
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
 
-  printf("--> starting SetCompilerOptions in dll\n");
+  printf("---> started in SetCompilerOptions() of kmcmpdll\n");
   if ( flag_use_kmcompx)
   {
     return kmcmp_SetCompilerOptions(options);
   }
-  printf("--> stay in dll  SetCompilerOptions\n");
+  printf("--->  stayed in SetCompilerOptions() of kmcmpdll\n");
 
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
@@ -320,13 +320,13 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
   DWORD len;
   char str[260];
 
-  printf("--> starting CompileKeyboardFile in dll\n");
+  printf("---> started in CompileKeyboardFile() of kmcmpdll\n");
 
   if ( flag_use_kmcompx)
   {
-    return Kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
+    return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
   }
-  printf("--> stay in dll  CompileKeyboardFile of kmcmpdll\n");
+  printf("--->  stayed in CompileKeyboardFile() of kmcmpdll\n");
 
   FSaveDebug = ASaveDebug;
   FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
@@ -410,13 +410,13 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   DWORD len;
   char str[260];
 
-  printf("--> starting CompileKeyboardFileToBuffer in dll.\n");
+  printf("---> started in CompileKeyboardFileToBuffer() of kmcmpdll\n");
   if ( flag_use_kmcompx)
   {
     return kmcmp_CompileKeyboardFileToBuffer( pszInfile, (void*) pfkBuffer,  ACompilerWarningsAsErrors,  AWarnDeprecatedCode,  pMsgProc,  Target);
   }
 
-  printf("--> stay in dll  CompileKeyboardFileToBuffer\n");
+  printf("--->  stayed in CompileKeyboardFileToBuffer() of kmcmpdll\n");
 
 
   FSaveDebug = TRUE;   // I3681
@@ -3775,12 +3775,12 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
 
 extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
 
- printf("--> starting Keyman_Diagnostic in dll\n");
+  printf("---> started in Keyman_Diagnostic() of kmcmpdll\n");
   if ( flag_use_kmcompx)
   {
     kmcmp_Keyman_Diagnostic( mode);
   }
-  printf("--> stay in dll  Keyman_Diagnostic\n");
+  printf("--->  stayed in Keyman_Diagnostic() of kmcmpdll\n");
 
   if (mode == 0) {
     RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);

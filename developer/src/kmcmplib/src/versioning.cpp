@@ -4,20 +4,20 @@
 #include <kmcmpdll.h>
 
 namespace kmcmp {
-KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
-  KMX_CHAR buf[128];
+  KMX_BOOL CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
+    KMX_CHAR buf[128];
 
-  if (fk->dwFlags & KF_AUTOMATICVERSION) {
-    if (fk->version <= 0) {
-      fk->version = VERSION_60; // minimum version that we can be safe with
+    if (fk->dwFlags & KF_AUTOMATICVERSION) {
+      if (fk->version <= 0) {
+        fk->version = VERSION_60; // minimum version that we can be safe with
+      }
+
+      sprintf(buf, "The compiler has assigned a minimum engine version of %d.%d based on features used in this keyboard", (int)((fk->version & 0xFF00) >> 8), (int)(fk->version & 0xFF));
+      kmcmp::AddCompileString(buf);
     }
 
-    sprintf(buf, "The compiler has assigned a minimum engine version of %d.%d based on features used in this keyboard", (int)((fk->version & 0xFF00) >> 8), (int)(fk->version & 0xFF));
-    kmcmp::AddCompileString(buf);
+    return TRUE;
   }
-
-  return TRUE;
-}
 }
 KMX_BOOL VerifyKeyboardVersion(PFILE_KEYBOARD fk, KMX_DWORD ver) {
   if (fk->dwFlags & KF_AUTOMATICVERSION) {

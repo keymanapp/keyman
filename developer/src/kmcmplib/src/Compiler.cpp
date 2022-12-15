@@ -96,13 +96,13 @@
 #include "kmx_u16.h"
 #include <CompMsg.h>
 using namespace kmcmp;
+
 namespace kmcmp{
-  
-KMX_BOOL IsValidCallStore(PFILE_STORE fs);
-void RecordDeadkeyNames(PFILE_KEYBOARD fk);
-DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk);
-KMX_BOOL CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
-int UTF32ToUTF16(int n, int *n1, int *n2);
+  KMX_BOOL IsValidCallStore(PFILE_STORE fs);
+  void RecordDeadkeyNames(PFILE_KEYBOARD fk);
+  DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk);
+  KMX_BOOL CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
+  int UTF32ToUTF16(int n, int *n1, int *n2);
 }
 
 int xatoi(PKMX_WCHAR *p);
@@ -218,17 +218,17 @@ enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeyma
 /* Compile target */
 
 namespace kmcmp{
-HINSTANCE g_hInstance;
-KMX_BOOL  FWarnDeprecatedCode; 
-KMX_BOOL  FShouldAddCompilerVersion = TRUE;
-KMX_BOOL  FSaveDebug, FCompilerWarningsAsErrors;   // I4865   // I4866
-int ErrChr;
-int nErrors = 0;
-KMX_CHAR ErrExtra[256];
-KMX_BOOL FMnemonicLayout = FALSE;
-KMX_BOOL FOldCharPosMatching = FALSE;
-int CompileTarget;
-KMX_CHAR CompileDir[MAX_PATH];
+  HINSTANCE g_hInstance;
+  KMX_BOOL  FWarnDeprecatedCode;
+  KMX_BOOL  FShouldAddCompilerVersion = TRUE;
+  KMX_BOOL  FSaveDebug, FCompilerWarningsAsErrors;   // I4865   // I4866
+  int ErrChr;
+  int nErrors = 0;
+  KMX_CHAR ErrExtra[256];
+  KMX_BOOL FMnemonicLayout = FALSE;
+  KMX_BOOL FOldCharPosMatching = FALSE;
+  int CompileTarget;
+  KMX_CHAR CompileDir[MAX_PATH];
 }
 
 
@@ -246,11 +246,11 @@ int BeginLine[4];
 #define CKF_KEYMANWEB 1
 
 namespace kmcmp {
-KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved)
-{
-  if (fdwReason == DLL_PROCESS_ATTACH) kmcmp::g_hInstance = hinst;
-  return TRUE;
-}
+  KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved)
+  {
+    if (fdwReason == DLL_PROCESS_ATTACH) kmcmp::g_hInstance = hinst;
+    return TRUE;
+  }
 }
 
 PKMX_WCHAR strtowstr(PKMX_STR in)
@@ -329,7 +329,7 @@ typedef struct _COMPILER_OPTIONS {
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 
 extern "C" BOOL __declspec(dllexport) kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS options) {
-  printf("°°-> DEBUG: kmcmp::SetCompilerOptions Compiler.cpp of kmcmplib xxxxxrunning\n");
+  printf("°°-> changed to SetCompilerOptions() of kmcmplib \n");
   if(!options || options->dwSize < sizeof(COMPILER_OPTIONS)) {
     return FALSE;
   }
@@ -337,7 +337,7 @@ extern "C" BOOL __declspec(dllexport) kmcmp_SetCompilerOptions(PCOMPILER_OPTIONS
   return TRUE;
 }
 
-extern "C" BOOL __declspec(dllexport) Kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
+extern "C" BOOL __declspec(dllexport) kmcmp_CompileKeyboardFile(PKMX_STR pszInfile, PKMX_STR pszOutfile, KMX_BOOL ASaveDebug, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
   FILE* fp_in = NULL;
   FILE* fp_out = NULL;
@@ -345,7 +345,7 @@ extern "C" BOOL __declspec(dllexport) Kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
   KMX_DWORD len;
   KMX_CHAR str[260];
 
-  printf("°°-> DEBUG: Kmcmp::CompileKeyboardFile Compiler.cpp of kmcmplib xxxxxrunning\n");
+  printf("°°-> changed to CompileKeyboardFile() of kmcmplib \n");
 
   kmcmp::FSaveDebug = ASaveDebug;
   kmcmp::FCompilerWarningsAsErrors = ACompilerWarningsAsErrors;   // I4865
@@ -436,7 +436,7 @@ extern "C" BOOL __declspec(dllexport) Kmcmp_CompileKeyboardFile(PKMX_STR pszInfi
 
 extern "C" BOOL __declspec(dllexport)  kmcmp_CompileKeyboardFileToBuffer(PKMX_STR pszInfile, PFILE_KEYBOARD pfkBuffer, KMX_BOOL ACompilerWarningsAsErrors, KMX_BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc, int Target)   // I4865   // I4866
 {
-  printf("°°-> DEBUG: kmcmp::CompileKeyboardFileToBuffer Compiler.cpp of kmcmplib xxxxrunning\n");
+  printf("°°-> changed to CompileKeyboardFileToBuffer() of kmcmplib \n");
   FILE* fp_in = NULL;
   KMX_BOOL err;
   KMX_DWORD len;
@@ -996,30 +996,30 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   return CheckForDuplicateGroup(fk, gp);
 }
 namespace kmcmp {
-int cmpkeys(const void *key, const void *elem)
-{
-  PFILE_KEY akey;
-  PFILE_KEY  aelem;
-  int l1, l2;
-  KMX_WCHAR char_key, char_elem;
-  akey = (PFILE_KEY)key;
-  aelem = (PFILE_KEY)elem;
-  char_key = VKToChar(akey->Key, akey->ShiftFlags);
-  char_elem = VKToChar(aelem->Key, aelem->ShiftFlags);
-  if (char_key == char_elem) //akey->Key == aelem->Key)
+  int cmpkeys(const void *key, const void *elem)
   {
-    l1 = xstrlen(akey->dpContext); l2 = xstrlen(aelem->dpContext);
-    if (l1 == l2)
+    PFILE_KEY akey;
+    PFILE_KEY  aelem;
+    int l1, l2;
+    KMX_WCHAR char_key, char_elem;
+    akey = (PFILE_KEY)key;
+    aelem = (PFILE_KEY)elem;
+    char_key = VKToChar(akey->Key, akey->ShiftFlags);
+    char_elem = VKToChar(aelem->Key, aelem->ShiftFlags);
+    if (char_key == char_elem) //akey->Key == aelem->Key)
     {
-      if (akey->Line < aelem->Line) return -1;
-      if (akey->Line > aelem->Line) return 1;
-      return 0;
+      l1 = xstrlen(akey->dpContext); l2 = xstrlen(aelem->dpContext);
+      if (l1 == l2)
+      {
+        if (akey->Line < aelem->Line) return -1;
+        if (akey->Line > aelem->Line) return 1;
+        return 0;
+      }
+      if (l1 < l2) return 1;
+      if (l1 > l2) return -1;
     }
-    if (l1 < l2) return 1;
-    if (l1 > l2) return -1;
+    return(char_key - char_elem); // akey->Key - aelem->Key);
   }
-  return(char_key - char_elem); // akey->Key - aelem->Key);
-}
 }
 KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 {
@@ -3630,24 +3630,24 @@ int atoiW(PKMX_WCHAR p)
   return i;
 }
 namespace kmcmp {
-int CheckUTF16(int n)
-{
-  const int res[] = {
-    0xFDD0, 0xFDD1, 0xFDD2, 0xFDD3, 0xFDD4, 0xFDD5, 0xFDD6, 0xFDD7,
-    0xFDD8, 0xFDD9, 0xFDDA, 0xFDDB, 0xFDDC, 0xFDDD, 0xFDDE, 0xFDDF,
-    0xFDE0, 0xFDE1, 0xFDE2, 0xFDE3, 0xFDE4, 0xFDE5, 0xFDE6, 0xFDE7,
-    0xFDE8, 0xFDE9, 0xFDEA, 0xFDEB, 0xFDEC, 0xFDED, 0xFDEE, 0xFDEF,
-    0xFFFF, 0xFFFE, 0 };
+  int CheckUTF16(int n)
+  {
+    const int res[] = {
+      0xFDD0, 0xFDD1, 0xFDD2, 0xFDD3, 0xFDD4, 0xFDD5, 0xFDD6, 0xFDD7,
+      0xFDD8, 0xFDD9, 0xFDDA, 0xFDDB, 0xFDDC, 0xFDDD, 0xFDDE, 0xFDDF,
+      0xFDE0, 0xFDE1, 0xFDE2, 0xFDE3, 0xFDE4, 0xFDE5, 0xFDE6, 0xFDE7,
+      0xFDE8, 0xFDE9, 0xFDEA, 0xFDEB, 0xFDEC, 0xFDED, 0xFDEE, 0xFDEF,
+      0xFFFF, 0xFFFE, 0 };
 
-  if (n == 0) return CERR_ReservedCharacter;
-  for (int i = 0; res[i] > 0; i++)
-    if (n == res[i])
-    {
-      AddWarning(CWARN_ReservedCharacter);
-      break;
-    }
-  return CERR_None;
-}
+    if (n == 0) return CERR_ReservedCharacter;
+    for (int i = 0; res[i] > 0; i++)
+      if (n == res[i])
+      {
+        AddWarning(CWARN_ReservedCharacter);
+        break;
+      }
+    return CERR_None;
+  }
 }
 int kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
 {
@@ -3844,9 +3844,9 @@ FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
   return fp_out;
 }
 
-extern "C" void __declspec(dllexport) kmcmp_Keyman_Diagnostic(int mode) {
+ extern "C" void  __declspec(dllexport) kmcmp_Keyman_Diagnostic(int mode) {
   
-  printf("°°-> DEBUG: kmcmp::Keyman_Diagnostic Compiler.cpp of kmcmplib xxxxxrunning\n");
+  printf("°°-> changed to Keyman_Diagnostic() of kmcmplib \n");
   if (mode == 0) {
     RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }
