@@ -166,6 +166,7 @@ namespace com.keyman.osk {
 
   export class BannerSuggestion {
     div: HTMLDivElement;
+    scroller: HTMLDivElement;
     private display: HTMLSpanElement;
     private fontFamily?: string;
 
@@ -185,7 +186,7 @@ namespace com.keyman.osk {
       // Provides an empty, base SPAN for text display.  We'll swap these out regularly;
       // `Suggestion`s will have varying length and may need different styling.
       let display = this.display = keyman.util._CreateElement('span');
-      this.div.appendChild(display);
+      this.scroller.appendChild(display);
     }
 
     private constructRoot() {
@@ -216,6 +217,11 @@ namespace com.keyman.osk {
       ds.width = widthpc + '%';
 
       this.div['suggestion'] = this;
+
+      let scroller = this.scroller = keyman.util._CreateElement('div'), fadeStyle=scroller.style;
+      scroller.className = "kmw-suggestion-scroller";
+
+      div.appendChild(scroller);
     }
 
     get suggestion(): Suggestion {
@@ -235,7 +241,7 @@ namespace com.keyman.osk {
 
     private updateText() {
       let display = this.generateSuggestionText();
-      this.div.replaceChild(display, this.display);
+      this.scroller.replaceChild(display, this.display);
       this.display = display;
     }
 
@@ -305,6 +311,7 @@ namespace com.keyman.osk {
 
       // Finalize the suggestion text
       s.innerHTML = suggestionText;
+
       return s;
     }
   }
@@ -446,8 +453,21 @@ namespace com.keyman.osk {
           if(util.hasClass(e,'kmw-suggest-option')) {
             return e as HTMLDivElement;
           }
-          if(e.parentNode && util.hasClass(<HTMLElement> e.parentNode,'kmw-suggest-option')) {
+
+          if(!e.parentNode) {
+            return null;
+          }
+
+          if(util.hasClass(<HTMLElement> e.parentNode,'kmw-suggest-option')) {
             return e.parentNode as HTMLDivElement;
+          }
+
+          if(!e.parentNode.parentNode) {
+            return null;
+          }
+
+          if(util.hasClass(<HTMLElement> e.parentNode.parentNode,'kmw-suggest-option')) {
+            return e.parentNode.parentNode as HTMLDivElement;
           }
           // if(e.firstChild && util.hasClass(<HTMLElement> e.firstChild,'kmw-suggest-option')) {
           //   return e.firstChild as HTMLDivElement;
@@ -455,6 +475,10 @@ namespace com.keyman.osk {
         }
       } catch(ex) {}
       return null;
+    }
+
+    protected findScrollerForTarget(target: HTMLDivElement): HTMLElement {
+      return target.firstChild as HTMLElement;
     }
 
     protected highlight(t: HTMLDivElement, on: boolean): void {

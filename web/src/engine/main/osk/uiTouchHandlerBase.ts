@@ -66,6 +66,14 @@ namespace com.keyman.osk {
     abstract findTargetFrom(e: HTMLElement): Target;
 
     /**
+     * Given the current target element, returns the component to be used for
+     * scrolling.
+     */
+    protected findScrollerForTarget(target: Target): HTMLElement {
+      return target;
+    }
+
+    /**
      * Highlights the target element as visual feedback representing
      * a pending touch.
      * @param t The `Target` to highlight
@@ -239,7 +247,8 @@ namespace com.keyman.osk {
       }
 
       // Establish scroll tracking.
-      let shouldScroll = (this.currentTarget.clientWidth < this.currentTarget.scrollWidth);
+      let targetScroller = this.findScrollerForTarget(this.currentTarget);
+      let shouldScroll = (targetScroller.clientWidth < targetScroller.scrollWidth);
       this.scrollTouchState = shouldScroll ? new ScrollState(coord) : null;
 
       // Alright, Target acquired!  Now to use it:
@@ -326,7 +335,6 @@ namespace com.keyman.osk {
      **/
     touchMove(coord: InputEventCoordinate) : void {
       let keyman = com.keyman.singleton;
-      let util = keyman.util;
 
       // Do not attempt to support reselection of target key for overlapped keystrokes
       if(coord.activeInputCount > 1 || this.touchCount == 0) {
@@ -334,8 +342,9 @@ namespace com.keyman.osk {
       }
 
       if(this.currentTarget && this.scrollTouchState != null) {
+        let scrollTarget = this.findScrollerForTarget(this.currentTarget);
         let deltaX = this.scrollTouchState.updateTo(coord).deltaX;
-        this.currentTarget.scrollLeft -= window.devicePixelRatio * deltaX;
+        scrollTarget.scrollLeft -= window.devicePixelRatio * deltaX;
 
         return;
       }

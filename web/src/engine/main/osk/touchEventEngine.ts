@@ -58,7 +58,7 @@ namespace com.keyman.osk {
 
     private preventPropagation(e: TouchEvent) {
       // Standard event maintenance
-      e.preventDefault();
+      // e.preventDefault();
       e.cancelBubble=true;
 
       if(typeof e.stopImmediatePropagation == 'function') {
