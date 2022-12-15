@@ -76,6 +76,7 @@ import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
+import com.tavultesoft.kmea.util.DependencyUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
@@ -1426,7 +1427,7 @@ public final class KMManager {
     keyboardInfo.setNewKeyboard(true);
 
     // Log Sentry analytic event, ignoring default keyboard
-    if (KMLog.sentryLibraryExists() && Sentry.isEnabled() && !(packageID.equalsIgnoreCase(KMManager.KMDefault_PackageID) &&
+    if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled() && !(packageID.equalsIgnoreCase(KMManager.KMDefault_PackageID) &&
       keyboardID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID))) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMManager.addKeyboard");

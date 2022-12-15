@@ -34,6 +34,7 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
+import com.tavultesoft.kmea.util.DependencyUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.KMLog;
@@ -198,7 +199,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     // If QRGen library included, append the QR code View to the
     // scrollable listview for sharing keyboard
     View view = getLayoutInflater().inflate(R.layout.qr_layout, null);
-    if (QRCodeUtil.libraryExists(context)) {
+    if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.QRCODE)) {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 

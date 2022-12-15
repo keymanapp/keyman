@@ -19,6 +19,7 @@ import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.DependencyUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.KMString;
@@ -674,7 +675,7 @@ final class KMKeyboard extends WebView {
   }
 
   private void sendKMWError(int lineNumber, String sourceId, String message) {
-    if (KMLog.sentryLibraryExists() && Sentry.isEnabled()) {
+    if (DependencyUtil.libraryExists(DependencyUtil.LibraryType.SENTRY) && Sentry.isEnabled()) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMKeyboard.sendKMWError");
       breadcrumb.setCategory("KMWError");
