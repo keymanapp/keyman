@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.17 alpha 2022-12-15
+
+* chore: merge beta to master (#7885)
+* chore(android): Update Gradle dependencies; targetSDKVersion to 33 (#7897)
+
 ## 17.0.16 alpha 2022-12-11
 
 * refactor(linux): Update ibusimcontext.c (#7813)
