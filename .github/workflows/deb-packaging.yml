@@ -3,8 +3,11 @@ on:
   repository_dispatch:
     types: ['deb-release-packaging', 'deb-pr-packaging']
 env:
+  COLOR_GREEN: "\e[32m"
   GH_TOKEN: ${{ github.token }}
   STATUS_CONTEXT: 'Debian Packaging'
+  DEBFULLNAME: 'Keyman GHA packager'
+  DEBEMAIL: 'support@keyman.com'
 
 jobs:
   sourcepackage:
@@ -51,16 +54,20 @@ jobs:
         export TIER
         echo "TIER=$TIER" >> $GITHUB_ENV
 
-        echo "Make source package for keyman"
+        echo "${COLOR_GREEN}Make source package for keyman"
         cd linux
 
-        echo "reconfigure"
+        echo "::group::${COLOR_GREEN}reconfigure"
         JENKINS="yes" ./scripts/reconf.sh keyman
+        echo "::endgroup::"
 
-        echo "Make origdist"
+        echo "::group::${COLOR_GREEN}Make origdist"
         ./scripts/dist.sh origdist keyman
-        echo "Make deb source"
+        echo "::endgroup::"
+
+        echo "::group::${COLOR_GREEN}Make deb source"
         ./scripts/deb.sh sourcepackage keyman
+        echo "::endgroup::"
 
         mv builddebs/* ..
 
@@ -120,14 +127,14 @@ jobs:
         path: artifacts
 
     - name: Build
-      uses: sillsdev/gha-ubuntu-packaging@63b12dd80a1ee58cae16a7e3a13ff9d3d4002ba1 # v0.2
+      uses: sillsdev/gha-ubuntu-packaging@5b56c86ee78598308d864edc55a1d06b4ba36f92 # v0.3
       with:
         dist: "${{ matrix.dist }}"
         platform: "${{ matrix.arch }}"
         source_dir: "artifacts/keyman-srcpkg"
         sourcepackage: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.dsc"
-        deb_fullname: "Keyman GHA packager"
-        deb_email: "support@keyman.com"
+        deb_fullname: $DEBFULLNAME
+        deb_email: $DEBEMAIL
         prerelease_tag: ${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}
 
     - name: Output resulting .deb files
@@ -154,7 +161,7 @@ jobs:
 
     steps:
       - name: Sign packages
-        uses: sillsdev/gha-deb-signing@c035bafb5cd334191b6943d063743a619750b016 # v0.1
+        uses: sillsdev/gha-deb-signing@94b4df9e26bd4e1a3842cee544ee268115d6fa75 # v0.3
         with:
           src-pkg-path: "artifacts/keyman-srcpkg"
           src-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1_source.changes"
