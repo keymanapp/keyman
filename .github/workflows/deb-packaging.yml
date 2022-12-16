@@ -131,6 +131,7 @@ jobs:
     needs: [sourcepackage, binary_packages]
     runs-on: ubuntu-latest
     environment: deploy
+    if: github.event.client_payload.isTestBuild == 'false'
 
     steps:
       - name: Sign packages
@@ -152,6 +153,7 @@ jobs:
   #   needs: deb_signing
   #   runs-on: ubuntu-latest
   #   environment: deploy
+  #   if: ${{ ! github.event.client_payload.isTestBuild }}
 
   #   steps:
   #   - name: Configure GPG Key
