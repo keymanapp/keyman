@@ -240,7 +240,7 @@ class Constants {
   /**
    *  Length of each item in the 'key2' keys sub-table
    */
-  readonly length_key2_key = 20;
+  readonly length_key2_key = 40;
   /**
    *  Length of each item in the 'key2' flick lists sub-table
    */
