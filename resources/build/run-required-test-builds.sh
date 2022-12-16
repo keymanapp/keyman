@@ -45,13 +45,13 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 function triggerTestBuilds() {
   # Note: we always run builds for 'all' platforms
-  local platforms=( `echo "all $1"` )
+  local platforms=( $(echo "all $1") )
   local branch="$2"
   local force="${3:-false}"
 
   for platform in "${platforms[@]}"; do
     echo "# $platform: checking for changes"
-    eval test_builds='(${'bc_test_$platform'[@]})'
+    eval test_builds='(${'"bc_test_$platform"'[@]})'
     for test_build in "${test_builds[@]}"; do
       if [[ $test_build == "" ]]; then continue; fi
       if [ "${test_build:(-8)}" == "_Jenkins" ]; then
@@ -74,7 +74,7 @@ function triggerTestBuilds() {
 if [[ ! "$PRNUM" =~ ^[[:digit:]]+$ ]]; then
   # branch name is 'master', 'beta' [, or 'stable' -- in the future]
   echo ". Branch $PRNUM needs to pass tests on all platforms."
-  triggerTestBuilds "`echo ${available_platforms[@]}`" "$PRNUM" "true"
+  triggerTestBuilds "${available_platforms[@]}" "$PRNUM" "true"
   exit 0
 fi
 
@@ -86,11 +86,11 @@ fi
 #
 
 echo ". Get information about pull request #$PRNUM from GitHub"
-prinfo=`curl -s -H "User-Agent: @keymanapp" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`
-prbase=`echo ${prinfo} | "$JQ" -r '.base.ref'`
-prhead=`echo ${prinfo} | "$JQ" -r '.head.ref'`
-prbaserepo=`echo ${prinfo} | "$JQ" -r '.base.repo.html_url'`
-prheadrepo=`echo ${prinfo} | "$JQ" -r '.head.repo.html_url'`
+prinfo=$(curl -s -H "User-Agent: @keymanapp" https://api.github.com/repos/keymanapp/keyman/pulls/"$PRNUM")
+prbase=$(echo "${prinfo}" | "$JQ" -r '.base.ref')
+prhead=$(echo "${prinfo}" | "$JQ" -r '.head.ref')
+prbaserepo=$(echo "${prinfo}" | "$JQ" -r '.base.repo.html_url')
+prheadrepo=$(echo "${prinfo}" | "$JQ" -r '.head.repo.html_url')
 
 debug_echo "PRNUM: $PRNUM"
 debug_echo "BASE: $prbase ($prbaserepo)"
@@ -130,7 +130,7 @@ fi
 #
 
 echo ". Get list of changed files in the pull request"
-prfiles=`git diff --name-only "origin/$prbase"..."$prremote/$prhead" || ( if [ $? == 128 ]; then echo abort; else exit $?; fi )`
+prfiles=$(git diff --name-only "origin/$prbase...$prremote/$prhead" || ( if [ $? == 128 ]; then echo abort; else exit $?; fi ))
 if [ "$prfiles" == "abort" ]; then
   # Don't trigger any builds, exit with success
   if [ "$prremote" != "origin" ]; then
@@ -161,7 +161,7 @@ while IFS= read -r line; do
   for platform in "${available_platforms[@]}"; do
     if [[ ! " ${build_platforms[@]} " =~ " $platform " ]]; then
       # Which platform are we watching?
-      eval watch='$'watch_$platform
+      eval watch='$'"watch_$platform"
       # Add common patterns to the watch list
       watch="^($platform|(oem/[^/]+/$platform)|resources|$watch)"
       if [[ "$line" =~ $watch ]]; then
@@ -177,6 +177,6 @@ debug_echo "Build platforms: ${build_platforms[*]}"
 #
 
 echo ". Start test builds"
-triggerTestBuilds "`echo ${build_platforms[@]}`" "$PRNUM"
+triggerTestBuilds "${build_platforms[@]}" "$PRNUM"
 
 exit 0
