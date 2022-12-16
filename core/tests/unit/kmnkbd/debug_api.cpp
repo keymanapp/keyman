@@ -389,7 +389,7 @@ void test_save_option() {
 
   // '2' -> save_option
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_2, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_2, 0, '2'}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
@@ -424,7 +424,7 @@ void test_backspace_markers() {
 
   try_status(km_kbp_state_debug_set(test_state, 1));
 
-  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
   assert(debug_items(test_state, {
     km_kbp_state_debug_item{KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_FLAG_UNICODE, {KM_KBP_VKEY_BKSP, 0, 0}},
     km_kbp_state_debug_item{KM_KBP_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
