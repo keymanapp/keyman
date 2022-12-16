@@ -2,6 +2,9 @@ name: "Ubuntu packaging"
 on:
   repository_dispatch:
     types: ['deb-release-packaging', 'deb-pr-packaging']
+env:
+  GH_TOKEN: ${{ github.token }}
+  STATUS_CONTEXT: 'Debian Packaging'
 
 jobs:
   sourcepackage:
@@ -10,11 +13,27 @@ jobs:
     outputs:
       VERSION: ${{ steps.version_step.outputs.VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
+      GIT_SHA: ${{ steps.set_status.outputs.GIT_SHA }}
     steps:
     - name: Checkout
       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
       with:
         ref: '${{ github.event.client_payload.ref }}'
+
+    - name: Set pending status on PR builds
+      id: set_status
+      if: github.event.client_payload.isTestBuild == 'true'
+      run: |
+        GIT_SHA=$(git rev-parse HEAD)
+        echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/$GIT_SHA \
+          -f state='pending' \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description='Debian packaging started' \
+          -f context="$STATUS_CONTEXT"
 
     - name: Install devscripts
       uses: ./.github/actions/apt-install
@@ -208,3 +227,38 @@ jobs:
         name: libkmnkbp0-0.symbols
         path: debian/libkmnkbp0-0.symbols
       if: always()
+
+  set_status:
+    name: Set result status on PR builds
+    needs: [sourcepackage, binary_packages, deb_signing, api_verification]
+    runs-on: ubuntu-latest
+    if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
+    steps:
+    - name: Set success
+      if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && (needs.deb_signing.result == 'success' || needs.deb_signing.result == 'skipped') && needs.api_verification.result == 'success'
+      run: |
+        echo "RESULT=success" >> $GITHUB_ENV
+        echo "MSG=Package build succeeded" >> $GITHUB_ENV
+
+    - name: Set cancelled
+      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages.result == 'cancelled' || needs.deb_signing.result == 'cancelled' || needs.api_verification.result == 'cancelled'
+      run: |
+        echo "RESULT=error" >> $GITHUB_ENV
+        echo "MSG=Package build cancelled" >> $GITHUB_ENV
+
+    - name: Set failure
+      if: needs.sourcepackage.result == 'failure' || needs.binary_packages.result == 'failure' || needs.deb_signing.result == 'failure' || needs.api_verification.result == 'failure'
+      run: |
+        echo "RESULT=failure" >> $GITHUB_ENV
+        echo "MSG=Package build failed" >> $GITHUB_ENV
+
+    - name: Set final status
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.sourcepackage.outputs.GIT_SHA }} \
+          -f state="$RESULT" \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description="$MSG" \
+          -f context="$STATUS_CONTEXT"
