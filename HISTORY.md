@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.18 alpha 2022-12-16
+
+* chore(common): Fix shellcheck warnings (#7910)
+
 ## 17.0.17 alpha 2022-12-15
 
 * chore: merge beta to master (#7885)
