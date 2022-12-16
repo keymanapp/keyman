@@ -19,7 +19,7 @@ jobs:
       GIT_SHA: ${{ steps.set_status.outputs.GIT_SHA }}
     steps:
     - name: Checkout
-      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
         ref: '${{ github.event.client_payload.ref }}'
 
@@ -102,7 +102,7 @@ jobs:
         echo "- $(find . -name keyman_\*.dsc)" >> $GITHUB_STEP_SUMMARY
 
     - name: Store source package
-      uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         name: keyman-srcpkg
         path: |
@@ -122,7 +122,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
         path: artifacts
 
@@ -144,7 +144,7 @@ jobs:
         echo '```' >> $GITHUB_STEP_SUMMARY
 
     - name: Store binary packages
-      uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         name: keyman-binarypkgs
         path: |
@@ -161,7 +161,7 @@ jobs:
 
     steps:
       - name: Sign packages
-        uses: sillsdev/gha-deb-signing@94b4df9e26bd4e1a3842cee544ee268115d6fa75 # v0.3
+        uses: sillsdev/gha-deb-signing@cd1af3dddf83787f9da20a93fc449d927a63bfbf # v0.4
         with:
           src-pkg-path: "artifacts/keyman-srcpkg"
           src-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1_source.changes"
@@ -187,7 +187,7 @@ jobs:
   #       echo -n "${{ secrets.GPG_SIGNING_KEY }}" | base64 --decode | gpg --import
 
   #   - name: Download Artifacts
-  #     uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+  #     uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
   #     with:
   #       path: artifacts
 
@@ -201,12 +201,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
         ref: '${{ github.event.client_payload.ref }}'
 
     - name: Download Artifacts
-      uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
         path: artifacts
 
@@ -229,7 +229,7 @@ jobs:
         fi
 
     - name: Archive .symbols file
-      uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         name: libkmnkbp0-0.symbols
         path: debian/libkmnkbp0-0.symbols
