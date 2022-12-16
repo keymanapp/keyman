@@ -58,7 +58,7 @@ jobs:
         cd linux
 
         echo "::group::${COLOR_GREEN}reconfigure"
-        JENKINS="yes" ./scripts/reconf.sh keyman
+        ./scripts/reconf.sh keyman
         echo "::endgroup::"
 
         echo "::group::${COLOR_GREEN}Make origdist"
