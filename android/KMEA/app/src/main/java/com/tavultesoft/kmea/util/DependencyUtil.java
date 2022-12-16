@@ -26,7 +26,7 @@ public final class DependencyUtil {
     }
   };
 
-  private static boolean libraryExists[] = {true, true};
+  private static Boolean libraryExists[] = {null, null};
 
   /**
    * Utility to determine if a dependency library is available in an app
@@ -34,19 +34,18 @@ public final class DependencyUtil {
    * @return boolean - true if the library exists
    */
   public static boolean libraryExists(LibraryType library) {
-    // If library is known not to exist, return false
-    if (!libraryExists[library.ordinal()]) {
-      return libraryExists[library.ordinal()];
+    int ord = library.ordinal();
+    if (libraryExists[ord] == null) {
+      try {
+        Class.forName(library.toString());
+        libraryExists[ord] = true;
+      } catch (ClassNotFoundException e) {
+        // Intentionally not sending Exception to Sentry 
+        // because 3rd party apps may not include the dependency library
+        libraryExists[ord] = false;
+      }
     }
-
-    try {
-      Class.forName(library.toString());
-      return true;
-    } catch (ClassNotFoundException e) {
-      // Intentionally not sending Exception to Sentry because 3rd party apps may not include the dependency library
-      libraryExists[library.ordinal()] = false;
-      return false;
-    }
+    return libraryExists[ord];
   }
 
 }
