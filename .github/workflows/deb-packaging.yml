@@ -28,12 +28,15 @@ jobs:
 
     - name: Build source package
       run: |
-        cd linux
-        tier="stable"
+        TIER=$(cat TIER.md)
+        export TIER
+        echo "TIER=$TIER" >> $GITHUB_ENV
 
         echo "Make source package for keyman"
+        cd linux
+
         echo "reconfigure"
-        JENKINS="yes" TIER="$tier" ./scripts/reconf.sh keyman
+        JENKINS="yes" ./scripts/reconf.sh keyman
 
         echo "Make origdist"
         ./scripts/dist.sh origdist keyman
