@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.19 alpha 2022-12-17
+
+* fix(linux): Fix dependency of ibus-keyman (#7918)
+
 ## 17.0.18 alpha 2022-12-16
 
 * chore(common): Fix shellcheck warnings (#7910)
