@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.123 beta 2022-12-17
+
+* fix(linux): Fix dependency of ibus-keyman (#7917)
+
 ## 16.0.122 beta 2022-12-14
 
 * fix(windows): modify disable keyboard display (#7898)
