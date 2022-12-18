@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.application'
-    id 'io.sentry.android.gradle' // Remove in #7896
 }
 
 android {
@@ -42,6 +41,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
     implementation 'com.google.android.material:material:1.6.0'
     api (name:'keyman-engine', ext:'aar')
-    implementation 'io.sentry:sentry-android:6.9.2' // Remove in #7896
     implementation 'androidx.preference:preference:1.2.0'
 }
