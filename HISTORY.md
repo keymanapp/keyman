@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.124 beta 2022-12-18
+
+* fix(oem/fv/android): Cleanup version title (#7908)
+
 ## 16.0.123 beta 2022-12-17
 
 * fix(linux): Fix dependency of ibus-keyman (#7917)
