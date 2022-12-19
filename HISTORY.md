@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.20 alpha 2022-12-19
+
+* chore(android/samples): Remove Sentry dependencies (#7901)
+* chore: Revert "chore(common): Fix shellcheck warnings" (#7925)
+
 ## 17.0.19 alpha 2022-12-17
 
 * fix(linux): Fix dependency of ibus-keyman (#7918)
