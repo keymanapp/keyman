@@ -1,4 +1,5 @@
 export interface CompilerEvent {
+  line: number;
   code: number;
   message: string;
 };

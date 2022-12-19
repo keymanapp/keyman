@@ -1,4 +1,8 @@
-import { GROUP, KEY, KMXFile, STORE } from "../../../../../common/web/types/src/kmx/kmx";
+import { GROUP, KEY, KMXFile, STORE } from "../../../../../common/web/types/src/kmx/kmx.js";
+import { nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater } from "./compiler-globals.js";
+import CompilerOptions from "./compiler-options.js";
+import { JavaScript_Name, JavaScript_Rules, JavaScript_Shift, JavaScript_Store } from './javascript-strings.js';
+import { CERR_InvalidBegin, CWARN_DontMixChiralAndNonChiralModifiers, ReportError } from "./messages.js";
 
 function requote(s: string): string {
   return "'" + s.replaceAll(/(['\\])/, "\\$1") + "'";
@@ -27,8 +31,11 @@ function RequotedString(s: string, RequoteSingleQuotes: boolean = false): string
 }
 
 export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boolean = false): string {
-  let nl = FDebug ? '\n' : '';
-  let FTabStop = FDebug ? '  ' : '';
+  let opts: CompilerOptions = {
+    addCompilerVersion: false,
+    debug: FDebug
+  };
+  setupGlobals(opts, FDebug?'  ':'', FDebug?'\n':'', source.keyboard);
 
   // let fgp: GROUP;
 
@@ -255,7 +262,7 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
     let fsp = source.keyboard.stores[i];
     // I3438 - Save all system stores to the keyboard, for now   // I3684
 
-    if (!fsp.fIsDebug) { // and not (fsp.dwSystemID in [TSS_BITMAP, TSS_NAME, TSS_VERSION, TSS_CUSTOMKEYMANEDITION, TSS_CUSTOMKEYMANEDITIONNAME, TSS_KEYMANCOPYRIGHT]) then
+    if (!isDebugStore(fsp)) { // and not (fsp.dwSystemID in [TSS_BITMAP, TSS_NAME, TSS_VERSION, TSS_CUSTOMKEYMANEDITION, TSS_CUSTOMKEYMANEDITIONNAME, TSS_KEYMANCOPYRIGHT]) then
       if (fsp.dwSystemID == KMXFile.TSS_COMPARISON) {
         result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(fsp.line, fsp.dpString)};${nl}`;
       }
@@ -264,17 +271,17 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
       }
       //else if fsp.dwSystemID = TSS_VKDICTIONARY then // I3438, required for vkdictionary
       //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
-      else if (fsp.fIsOption && !fsp.fIsReserved) {
-        result += `${FTabStop}this.s${JavaScript_Name(i,fsp.szName)}=KeymanWeb.KLOAD(this.KI,"${JavaScript_Name(i,fsp.szName,true)}",`+
+      else if (isOptionStore(fsp) && !isReservedStore(fsp)) {
+        result += `${FTabStop}this.s${JavaScript_Name(i,fsp.dpName)}=KeymanWeb.KLOAD(this.KI,"${JavaScript_Name(i,fsp.dpName,true)}",`+
           `${JavaScript_Store(fsp.line, fsp.dpString)});${nl}`;
 
         if (FOptionStores != '') {
           FOptionStores += ',';
         }
-        FOptionStores += `'s${JavaScript_Name(i,fsp.szName)}`;
+        FOptionStores += `'s${JavaScript_Name(i, fsp.dpName)}`;
       }
       else if (fsp.dwSystemID == KMXFile.TSS_NONE /* aka not fsp.fIsReserved */) {
-        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.szName)}=${JavaScript_Store(fsp.line, fsp.dpString)};${nl}`;   // I3681
+        result += `${FTabStop}this.s${JavaScript_Name(i, fsp.dpName)}=${JavaScript_Store(fsp.line, fsp.dpString)};${nl}`;   // I3681
       }
     }
   }
@@ -284,7 +291,7 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
 	// Write the groups out
 
   // I853 - begin unicode missing causes crash
-  if (fk.StartGroup[KMXFile.BEGIN_UNICODE] == 0xFFFFFFFF) {
+  if (source.keyboard.startGroup.unicode == 0xFFFFFFFF) {
     ReportError(0, CERR_InvalidBegin, 'A "begin unicode" statement is required to compile a KeymanWeb keyboard');
     return null;
   }
@@ -292,11 +299,11 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
   result += WriteBeginStatement('gs', source.keyboard.startGroup.unicode);
 
   let rec = ExpandSentinel(sBegin_NewContext);
-  if(rec.Code == CODE_USE) {
+  if(rec.Code == KMXFile.CODE_USE) {
     result += WriteBeginStatement('gn', rec.Use.GroupIndex);
   }
   rec = ExpandSentinel(sBegin_PostKeystroke);
-  if(rec.Code == CODE_USE) {
+  if(rec.Code == KMXFile.CODE_USE) {
     result += WriteBeginStatement('gpk', rec.Use.GroupIndex);
   }
 
@@ -346,7 +353,7 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
       for (let j = 0; j < fgp.keys.length; j++) {    // I1964
         let fkp = fgp.keys[j];
         if (!RuleIsExcludedByPlatform(fkp)) {
-          result += FTabstop+FTabstop;   // I3681
+          result += FTabStop+FTabStop;   // I3681
           if (HasRules) {
             result += 'else ';
           }
@@ -380,40 +387,32 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
       }
     }
 
-		if Assigned(fgp.dpMatch) then
-      Result := Result + Format(
-        '%sif(m==1) {%s'+
-        '%s%s%s'+
-        '%s}%s',
-        [FTabstop+FTabstop, nl,
-        FTabstop+Ftabstop, JavaScript_OutputString(FTabStop + FTabStop + FTabStop, nil, fgp.dpMatch, fgp), nl,
-        FTabstop+FTabstop, nl]);   // I3681
-		if Assigned(fgp.dpNoMatch) then
-      if fgp.fUsingKeys then    // I1382 - fixup m=1 to m=g()
-        Result := Result + Format(
-          '%sif(!m&&k.KIK(e)) {%s'+
-          '%sr=1;%s%s'+
-          '%s}%s',
-          [FTabstop+FTabstop, nl,
-          FTabstop+FTabstop+FTabstop, JavaScript_OutputString(FTabStop + FTabStop + FTabStop, nil, fgp.dpNoMatch, fgp), nl,
-          FTabstop+FTabstop, nl])   // I1959. part 2, I2224   // I3681
-      else
-        Result := Result + Format(
-          '%sif(!m) {%s'+
-          '%s%s%s'+
-          '%s}%s',
-          [FTabstop+FTabstop, nl,
-          FTabstop+FTabstop, JavaScript_OutputString(FTabStop + FTabStop + FTabStop, nil, fgp.dpNoMatch, fgp), nl,
-          FTabstop+FTabstop, nl]);  // I1959   // I3681
+		if(fgp.dpMatch) {
+      result +=
+        `${FTabStop+FTabStop}if(m==1) {${nl}`+
+        `${FTabStop+FTabStop+FTabStop}${JavaScript_OutputString(FTabStop + FTabStop + FTabStop, null, fgp.dpMatch, fgp)}${nl}`+
+        `${FTabStop+FTabStop}}${nl}`;
+    }
+		if(fgp.dpNoMatch) {
+      if(fgp.fUsingKeys) {    // I1382 - fixup m=1 to m=g()
+        result +=
+          `${FTabStop+FTabStop}if(!m&&k.KIK(e)) {${nl}`+
+          `${FTabStop+FTabStop+FTabStop}r=1;${JavaScript_OutputString(FTabStop + FTabStop + FTabStop, null, fgp.dpNoMatch, fgp)}${nl}`+
+          `${FTabStop+FTabStop}}${nl}`;   // I1959. part 2, I2224   // I3681
+      }
+      else {
+        result +=
+          `${FTabStop+FTabStop}if(!m) {${nl}`+
+          `${FTabStop+FTabStop+FTabStop}${JavaScript_OutputString(FTabStop + FTabStop + FTabStop, null, fgp.dpNoMatch, fgp)}${nl}`+
+          `${FTabStop+FTabStop}}${nl}`;
+      }
 
-    Result := Result + Format('%sreturn r;%s'+
-                              '%s};%s',
-                              [FTabstop+FTabstop, nl,
-                              FTabstop, nl]); // I1959   // I3681
-    Inc(fgp);
-  end;
-
-  for n := 0 to FCallFunctions.Count - 1 do
+    result +=
+      `${FTabStop+FTabStop}return r;${nl}`+
+      `${FTabStop+FTabStop}};${nl}`;
+  }
+/* TODO
+  for(let n = 0 to FCallFunctions.Count - 1 do
   begin
     s := ExtractFilePath(FInFile) + FCallFunctions[n] + '.call_js';
     if FileExists(s) then
@@ -427,9 +426,9 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
     else
       Result := Result + Format('%sthis.c%d=function(t,e){alert("call(%s) not defined");};%s', [FTabstop, n, FCallFunctions[n], nl]);   // I3681
   end;
-
-  Result := Result + sEmbedJS + '}' + nl;   // I3681
-end;
+*/
+  result += sEmbedJS + '}' + nl;   // I3681
+  return result;
 }
 
 ///
