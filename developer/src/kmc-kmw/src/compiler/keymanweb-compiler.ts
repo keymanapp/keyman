@@ -1,22 +1,21 @@
 import { VisualKeyboard } from "@keymanapp/common-types";
-
 import * as path from 'path';
-import { KMXFile } from "../../../../../common/web/types/src/kmx/kmx";
-// import VisualKeyboardCompiler from "./visual-keyboard-compiler.js";
 
-export interface KeymanWebCompilerOptions {
-  debug?: boolean;
-};
+import { KMXFile } from "../../../../../common/web/types/src/kmx/kmx.js";
+// import VisualKeyboardCompiler from "./visual-keyboard-compiler.js";
+import { nl, FTabStop, setupGlobals } from "./compiler-globals.js";
+import CompilerOptions from "./compiler-options.js";
 
 export class KeymanWebCompiler {
-  private readonly options: KeymanWebCompilerOptions;
+  private readonly options: CompilerOptions;
   private readonly nl: string;
   private readonly tab: string;
 
-  constructor(options?: KeymanWebCompilerOptions) {
+  constructor(options?: CompilerOptions) {
     this.options = options;
     this.nl = this.options.debug ? "\n" : '';
     this.tab = this.options.debug ? "  " : '';
+    setupGlobals(this.options, this.tab, this.nl);
   }
 
   public compile(name: string, source: KMXFile): string {
