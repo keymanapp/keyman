@@ -268,7 +268,7 @@ LRESULT _kmnLowLevelKeyboardProc(
     return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
   }
 
-  if (IsTouchPanelVisible() && isUp) {
+  if (IsTouchPanelVisible()) {
     // See #2450. The touch panel will close automatically if we reprocess key events
     // So we don't want to reprocess events when it is visible.
     SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: touch panel is visible. Not reprocessing keystrokes");
