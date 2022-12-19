@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.125 beta 2022-12-19
+
+* fix(windows): no languages warning source changed (#7900)
+
 ## 16.0.124 beta 2022-12-18
 
 * fix(oem/fv/android): Cleanup version title (#7908)
