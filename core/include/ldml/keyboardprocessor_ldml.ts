@@ -281,7 +281,7 @@ class Constants {
   /**
    *  Length of each layer list in the 'layr' section variable part
    */
-  readonly length_layr_list = 16;
+  readonly length_layr_list = 20;
   /**
    * bitmask for the 'form' field of the layr.list[].flags bitfield
    */

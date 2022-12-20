@@ -286,11 +286,11 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   01 00 00 00                       #   KMX_DWORD (flags: extend)
   index(strNull,strHmaqtua,2)       #   KMXPLUS_STR 'hmaqtua'
   00 00 00 00                       #   KMXPLUS_STR switch
-  0A 00 00 00                       #   KMX_DWORD width*10 
+  0A 00 00 00                       #   KMX_DWORD width*10
   index(listNull,indexAe,4)         #   LIST longPress 'a e'
   00 00 00 00                       #   STR longPressDefault
   index(listNull,listNull,4)        #   LIST multiTap
-  00 00 00 00                       #   flicks 0 
+  00 00 00 00                       #   flicks 0
   # that
   00 00 00 00                       #   KMX_DWORD vkey
   index(strNull,strKey2,2)          #   KMXPLUS_STR 'U+0127'
@@ -339,25 +339,25 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   6c 61 79 72                       #   KMX_DWORD header.ident;   // 0000 Section name - layr
   sizeof(layr)                      #   KMX_DWORD header.size;    // 0004 Section length
   01 00 00 00                       #   KMX_DWORD listCount
-  01 00 00 00                       #   KMX_DWORD layerCount 
+  01 00 00 00                       #   KMX_DWORD layerCount
   01 00 00 00                       #   KMX_DWORD rowCount
   02 00 00 00                       #   KMX_DWORD keyCount
   00 00 00 00                       #   KMX_DWORD reserved0
   00 00 00 00                       #   KMX_DWORD reserved1
   # list 0
-  # flags
+  00 00 00 00                       #   KMX_DWORD flags
   index(strNull,strUs,2)            #   KMXPLUS_STR hardware;
   00 00 00 00                       #   KMX_DWORD layer;
-  01 00 00 00 # count 
+  01 00 00 00 # count
   7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
   # layers 0
   index(strNull,strBase,2)          #   KMXPLUS_STR id;
   00 00 00 00                       #   KMXPLUS_STR mod str
   00 00 00 00                       #   KMX_DWORD row index
-  01 00 00 00                       #   KMX_DWORD  count 
+  01 00 00 00                       #   KMX_DWORD  count
   # rows 0
   00 00 00 00                       #   KMX_DWORD key index
-  02 00 00 00                       #   KMX_DWORD count 
+  02 00 00 00                       #   KMX_DWORD count
   # keys
   index(strNull,strHmaqtua,2)       #   KMXPLUS_STR locale;       // 'hmaqtua'
   index(strNull,strThat,2)          #   KMXPLUS_STR locale;       // 'that'
