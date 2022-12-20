@@ -129,9 +129,11 @@ implementation
 uses
   System.Types,
   Vcl.Themes,
+  Sentry.Client,
 
   Keyman.Configuration.UI.MitigationForWin10_1803,
   Keyman.System.LanguageCodeUtils,
+  Keyman.System.KeymanSentryClient,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.UI.UfrmProgress,
   MessageIdentifierConsts,
@@ -165,13 +167,13 @@ begin
   if n < 0 then
   begin
     // The Keyboard was successully installed for the BCP47Code
-    // for some reason the index look up has failed. Still leave
-    // Result as true, the keyboard will not be enabled.
-    // TODO: Log error unexpected `KeyboardID` not found
+    // for some reason the index look up has failed. Still pass through
+    // the DoInstall reasult, however the keyboard will not be enabled.
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'KeyboardID: '+KeyboardID+' not found');
     Exit;
   end;
   kbd := kmcom.Keyboards[n];
-  kbd.Loaded := TRUE;
+  kbd.Loaded := True;
   kmcom.Apply;
   Result := True;
 end;
