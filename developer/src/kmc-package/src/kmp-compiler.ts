@@ -112,8 +112,8 @@ export default class KmpCompiler {
     if(kps.keyboards && kps.keyboards.keyboard) {
       kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFileKeyboard) => {
         return {
-          displayFont: keyboard.displayFont ? path.basename(keyboard.displayFont) : undefined,
-          oskFont: keyboard.oSKFont ? path.basename(keyboard.oSKFont) : undefined,
+          displayFont: keyboard.displayFont ? path.basename(keyboard.displayFont.replaceAll('\\', '/')) : undefined,
+          oskFont: keyboard.oSKFont ? path.basename(keyboard.oSKFont.replaceAll('\\', '/')) : undefined,
           name:keyboard.name,
           id:keyboard.iD,
           version:keyboard.version,
@@ -195,7 +195,8 @@ export default class KmpCompiler {
     // When we do this, we'll need to update fixtures to have the correct
     // version string also
     if(!kps.keyboards || !kps.keyboards.keyboard) {
-      return '0.0.0';
+      // see if we can extract from the kps
+      return kps?.info?.version.toString() || '0.0.0';
     }
     let k: KpsFileKeyboard[] = this.arrayWrap(kps.keyboards.keyboard);
     return k?.[0]?.version ?? '0.0.0';

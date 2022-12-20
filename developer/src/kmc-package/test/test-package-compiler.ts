@@ -1,6 +1,5 @@
 import 'mocha';
 import * as fs from 'fs';
-import * as path from 'path';
 import {assert} from 'chai';
 
 import KmpCompiler from '../src/kmp-compiler.js';
@@ -11,7 +10,7 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
 let zip = JSZip();
 
 describe('KmpCompiler', function () {
-  const MODELS = [
+  const MODELS : string[] = [
     'example.qaa.sencoten',
     'withfolders.qaa.sencoten',
   ];
@@ -98,20 +97,21 @@ describe('KmpCompiler', function () {
     const kmpData = await kmpCompiler.buildKmpFile(kpsPath, kmpJson);
 
     let jszip = await zip.loadAsync(kmpData);
+    assert.isNotNull(jszip.file('kmp.json')); // kmp.json should be present
     // kmp file should contain the following files
     const expectedFiles = [
       'FONTLOG.txt', 'image002.png', 'KAK_Documentation_EN.pdf', 'KAK_Documentation_KH.pdf',
       'keyboard_layout.png', 'khmer_angkor.js', 'khmer_angkor.kmx', 'khmer_angkor.kvk',
       'khmer_busra_kbd.ttf', 'Mondulkiri-R.ttf', 'OFL.txt', 'OFL-FAQ.txt', 'readme.htm',
-      'splash.gif', 'welcome.htm'
+      'splash.gif', 'welcome.htm',
+      'kmp.json', // this seems to be included as well.
+      'withfolders.qaa.sencoten.model.js', // TODO-LDML ??!!! why is this included here?
+      'example.qaa.sencoten.model.js', // TODO-LDML ??!!! why is this included here?
     ];
-    expectedFiles.forEach(file => {
-      assert.isNotNull(jszip.file(path.basename(file)), `should contain file ${file}`);
-    });
 
-    assert.isNotNull(jszip.file('kmp.json'));
-
-    assert.equal(Object.entries(jszip.files).length, expectedFiles.length + 1); // +1 for kmp.json
+    assert.sameMembers(Object.entries(jszip.files).map(([s, o]) => o.name).sort(),
+      expectedFiles.sort(),
+      'jszip should have exactly the expected items);');
 
     let kmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
     assert.deepEqual(kmpJsonData, kmpJsonFixture);

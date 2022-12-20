@@ -22,13 +22,15 @@
   "files": [
     {
       "name": "..\\build\\withfolders.qaa.sencoten.model.js",
-      "description": "Lexical model withfolders.qaa.sencoten.model.js",
-      "copyLocation": 0
+      "description": "Lexical model withfolders.qaa.sencoten.model.js"
     },
     {
-      "copyLocation": 0,
       "description": "Welcome file",
       "name": "welcome.htm"
+    },
+    {
+      "description": "Package information (JSON)",
+      "name": "kmp.json"
     }
   ],
   "lexicalModels": [
