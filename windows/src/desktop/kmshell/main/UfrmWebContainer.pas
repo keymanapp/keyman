@@ -54,19 +54,19 @@ uses
 type
   TfrmWebContainer = class(TfrmKeymanBase)
     procedure TntFormCreate(Sender: TObject);
-  private
-    class var WebContainerDepth: Integer;
+//  private
+//    class var WebContainerDepth: Integer;
   private
     FDialogName: WideString;
-    FCanClose: Boolean;
-    FIsClosing: Boolean;
+//    FCanClose: Boolean;
+//    FIsClosing: Boolean;
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
 
     procedure ContributeUILanguages;
-    procedure CEFShutdownComplete(Sender: TObject);
-    function IsTopLevel: Boolean;
+//    procedure CEFShutdownComplete(Sender: TObject);
+//    function IsTopLevel: Boolean;
   protected
     cef: TframeCEFHost;
     FRenderPage: string;
@@ -94,8 +94,8 @@ type
     procedure DoOpenHelp;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    function CloseQuery: Boolean; override;
+//    destructor Destroy; override;
+//    function CloseQuery: Boolean; override;
     procedure SetFocus; override;  // I2720
     property DialogName: WideString read FDialogName;
 
@@ -117,7 +117,7 @@ uses
   custinterfaces,
   ErrorControlledRegistry,
   Keyman.Configuration.System.UmodWebHttpServer,
-  Keyman.System.CEFManager,
+//  Keyman.System.CEFManager,
   Keyman.System.KeymanSentryClient,
   kmint,
   UILanguages,
@@ -163,7 +163,7 @@ end;
 
 constructor TfrmWebContainer.Create(AOwner: TComponent);
 begin
-  Inc(WebContainerDepth);
+//  Inc(WebContainerDepth);
   inherited Create(AOwner);
 end;
 
@@ -175,33 +175,6 @@ begin
   else ShowMessage(command + '?' + params.Text);
 end;
 
-function TfrmWebContainer.IsTopLevel: Boolean;
-begin
-  Result := WebContainerDepth = 1;
-end;
-
-function TfrmWebContainer.CloseQuery: Boolean;
-begin
-  Result := inherited;
-  if Result and IsTopLevel then
-  begin
-    if not FIsClosing then
-    begin
-      FIsClosing := True;
-      Result := FInitializeCEF.StartShutdown(CEFShutdownComplete);
-    end
-    else
-      Result := FCanClose;
-  end;
-end;
-
-procedure TfrmWebContainer.CEFShutdownComplete(Sender: TObject);
-begin
-//  OutputDebugString(PChar('TfrmKeymanDeveloper.CEFShutdownComplete'));
-  FCanClose := True;
-  Close;
-end;
-
 
 /// <summary>Returns true if url is from the local render server</summary>
 function TfrmWebContainer.IsLocalUrl(const url: string): Boolean;
@@ -209,11 +182,12 @@ begin
   Result := url.StartsWith(modWebHttpServer.Host, True);
 end;
 
-destructor TfrmWebContainer.Destroy;
-begin
-  Dec(WebContainerDepth);
-  inherited Destroy;
-end;
+//destructor TfrmWebContainer.Destroy;
+//begin
+//  Dec(WebContainerDepth);
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.WebContainerDepth'));
+//  inherited Destroy;
+//end;
 
 procedure TfrmWebContainer.DoOpenHelp;
 begin
