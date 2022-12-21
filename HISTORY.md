@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.126 beta 2022-12-21
+
+* fix(windows): shutdown fix masked modal result (#7932)
+
 ## 16.0.125 beta 2022-12-19
 
 * fix(windows): no languages warning source changed (#7900)
