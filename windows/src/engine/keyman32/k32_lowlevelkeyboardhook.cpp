@@ -59,6 +59,22 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(
   return res;
 }
 
+BOOL isModifierKey(DWORD vkCode) {
+  switch (vkCode) {
+    case VK_LCONTROL:
+    case VK_RCONTROL:
+    case VK_CONTROL:
+    case VK_LMENU:
+    case VK_RMENU:
+    case VK_MENU:
+    case VK_LSHIFT:
+    case VK_RSHIFT:
+    case VK_SHIFT:
+      return TRUE;
+  }
+  return FALSE;
+}
+
 BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD ShiftState);
 int ProcessLanguageSwitchShiftKey(WPARAM wParam, BOOL isUp);
 BOOL IsLanguageSwitchWindowVisible();
@@ -201,14 +217,15 @@ LRESULT _kmnLowLevelKeyboardProc(
   if(Flag != 0) {
     if(isUp) FHotkeyShiftState &= ~Flag;
     else FHotkeyShiftState |= Flag;
-    // #7337 Post the modifier state ensuring the serialized queue is in sync
-    // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
-    // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT 
-    // message only updates our internal modifier state, and does not do 
-    // any additional processing or other serialization of the input queue.
-    if (flag_ShouldSerializeInput) {
+  }
+
+  // #7337 Post the modifier state ensuring the serialized queue is in sync
+  // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
+  // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT
+  // message only updates our internal modifier state, and does not do
+  // any additional processing or other serialization of the input queue.
+  if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
       PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-    }
   }
 
   if(IsLanguageSwitchWindowVisible()) {
