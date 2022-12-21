@@ -169,7 +169,7 @@ begin
     // The Keyboard was successully installed for the BCP47Code
     // for some reason the index look up has failed. Still pass through
     // the DoInstall reasult, however the keyboard will not be enabled.
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'KeyboardID: '+KeyboardID+' not found');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'InstallKeyboardLanguage: KeyboardID "'+KeyboardID+'" not found, attempting to install for language "'+ISOCode+'".');
     Exit;
   end;
   kbd := kmcom.Keyboards[n];
