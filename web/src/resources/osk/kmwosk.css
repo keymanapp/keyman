@@ -66,6 +66,35 @@
   font-size: 0.75em;
 }
 
+.kmw-suggestion-text {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.kmw-suggest-banner-scroller {
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  scrollbar-width: none; /* Firefox scrollbar prevention */
+}
+
+.kmw-suggest-banner-scroller::-webkit-scrollbar {
+  display: none; /* Safari + Chrome scrollbar prevention */
+}
+
+.kmw-suggest-option {
+  overflow: hidden;
+}
+
+.kmw-suggestion-container {
+  height: 100%;
+  transition: all 0.25s;
+}
+
+.kmw-suggest-option.kmw-suggest-touched .kmw-suggestion-container {
+  margin-left: 0px !important /* Overrides 'collapse' styling, which is accomplished via negative margin-left */
+}
+
 .phone.windows .kmw-key-row{max-width:80%;}
 
 .phone .kmw-5rows {padding-top: 0;}

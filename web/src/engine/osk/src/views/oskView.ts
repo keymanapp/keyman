@@ -625,6 +625,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     if(!pending) {
       this.headerView?.refreshLayout();
       this.bannerView.refreshLayout();
+      this.bannerView.width = this.computedWidth;
       this.footerView?.refreshLayout();
     }
 

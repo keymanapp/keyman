@@ -12,6 +12,7 @@ import EventEmitter from 'eventemitter3';
 
 export class BannerSuggestion {
   div: HTMLDivElement;
+  container: HTMLDivElement;
   private display: HTMLSpanElement;
   private fontFamily?: string;
   private rtl: boolean = false;
@@ -31,7 +32,8 @@ export class BannerSuggestion {
     // Provides an empty, base SPAN for text display.  We'll swap these out regularly;
     // `Suggestion`s will have varying length and may need different styling.
     let display = this.display = createUnselectableElement('span');
-    this.div.appendChild(display);
+    display.className = 'kmw-suggestion-text';
+    this.container.appendChild(display);
   }
 
   private constructRoot() {
@@ -40,13 +42,19 @@ export class BannerSuggestion {
     div.className = "kmw-suggest-option";
     div.id = BannerSuggestion.BASE_ID + this.index;
 
-    // Ensures that a reasonable width % is set.
-    let usableWidth = 100 - SuggestionBanner.MARGIN * (SuggestionBanner.SUGGESTION_LIMIT - 1);
-    let widthpc = usableWidth / SuggestionBanner.SUGGESTION_LIMIT;
-
-    ds.width = widthpc + '%';
-
     this.div['suggestion'] = this;
+
+    let container = this.container = document.createElement('div');
+    container.className = "kmw-suggestion-container";
+
+    // Ensures that a reasonable default width, based on % is set. (Since it's not yet in the DOM, we may not yet have actual width info.)
+    let usableWidth = 100 - SuggestionBanner.MARGIN * (SuggestionBanner.SUGGESTION_LIMIT - 1);
+
+    // The `/ 2` part:  Ensures that the full banner is double-wide, which is useful for demoing scrolling.
+    let widthpc = usableWidth / (SuggestionBanner.SUGGESTION_LIMIT / 2);
+    container.style.minWidth = widthpc + '%';
+
+    div.appendChild(container);
   }
 
   public matchKeyboardProperties(keyboardProperties: KeyboardProperties) {
@@ -82,7 +90,7 @@ export class BannerSuggestion {
 
   private updateText() {
     let display = this.generateSuggestionText(this.rtl);
-    this.div.replaceChild(display, this.display);
+    this.container.replaceChild(display, this.display);
     this.display = display;
   }
 
@@ -130,7 +138,7 @@ export class BannerSuggestion {
  * Description  Display lexical model suggestions in the banner
  */
 export class SuggestionBanner extends Banner {
-  public static readonly SUGGESTION_LIMIT: number = 3;
+  public static readonly SUGGESTION_LIMIT: number = 6;
   public static readonly MARGIN = 1;
 
   public readonly events: EventEmitter<SuggestionInputEventMap>;
@@ -141,6 +149,7 @@ export class SuggestionBanner extends Banner {
   private hostDevice: DeviceSpec;
 
   private manager: SuggestionInputManager;
+  private readonly container: HTMLElement;
 
   readonly type = 'suggestion';
 
@@ -148,6 +157,7 @@ export class SuggestionBanner extends Banner {
 
   static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
   static readonly BANNER_CLASS: string = 'kmw-suggest-banner';
+  static readonly BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';
 
   constructor(hostDevice: DeviceSpec, height?: number) {
     super(height || Banner.DEFAULT_HEIGHT);
@@ -155,9 +165,14 @@ export class SuggestionBanner extends Banner {
 
     this.getDiv().className = this.getDiv().className + ' ' + SuggestionBanner.BANNER_CLASS;
 
+    this.container = document.createElement('div');
+    this.container.className = SuggestionBanner.BANNER_SCROLLER_CLASS;
+    this.getDiv().appendChild(this.container);
+    // TODO:  additional styling for the banner scroll container?
+
     this.buildInternals(false);
 
-    this.manager = new SuggestionInputManager(this.getDiv());
+    this.manager = new SuggestionInputManager(this.container, this.container);
     this.events = this.manager.events;
 
     this.setupInputHandling();
@@ -181,18 +196,18 @@ export class SuggestionBanner extends Banner {
       */
     for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
       let indexToInsert = rtl ? SuggestionBanner.SUGGESTION_LIMIT - i -1 : i;
-      this.getDiv().appendChild(this.options[indexToInsert].div);
+      this.container.appendChild(this.options[indexToInsert].div);
 
-      if(i != SuggestionBanner.SUGGESTION_LIMIT) {
+      if(i != SuggestionBanner.SUGGESTION_LIMIT - 1) {
         // Adds a 'separator' div element for UI purposes.
         let separatorDiv = createUnselectableElement('div');
         separatorDiv.className = 'kmw-banner-separator';
 
         let ds = separatorDiv.style;
-        ds.marginLeft = (SuggestionBanner.MARGIN / 2) + '%';
-        ds.marginRight = (SuggestionBanner.MARGIN / 2) + '%';
+        ds.marginLeft = `calc(${(SuggestionBanner.MARGIN / 2)}% - 0.5px)`;
+        ds.marginRight = `calc(${(SuggestionBanner.MARGIN / 2)}% - 0.5px)`;
 
-        this.getDiv().appendChild(separatorDiv);
+        this.container.appendChild(separatorDiv);
       }
     }
   }
@@ -235,7 +250,7 @@ export class SuggestionBanner extends Banner {
     // parse incoming HTML.
     //
     // Just in case, alternative approaches: https://stackoverflow.com/a/3955238
-    this.getDiv().textContent = '';
+    this.container.textContent = '';
 
     // Builds new children to match needed RTL properties.
     this.buildInternals(rtl);
@@ -322,12 +337,24 @@ class SuggestionInputManager extends UITouchHandlerBase<HTMLDivElement> {
   findTargetFrom(e: HTMLElement): HTMLDivElement {
     try {
       if(e) {
-        if(e.classList.contains('kmw-suggest-option')) {
-          return e as HTMLDivElement;
+        const parent = e.parentElement;
+        if(!parent) {
+          return null;
         }
-        if(e.parentElement && e.parentElement.classList.contains('kmw-suggest-option')) {
-          return e.parentElement as HTMLDivElement;
+
+        if(parent.classList.contains('kmw-suggest-option')) {
+          return parent as HTMLDivElement;
         }
+
+        const grandparent = parent.parentElement;
+        if(!grandparent) {
+          return null;
+        }
+
+        if(grandparent.classList.contains('kmw-suggest-option')) {
+          return grandparent as HTMLDivElement;
+        }
+
         // if(e.firstChild && util.hasClass(<HTMLElement> e.firstChild,'kmw-suggest-option')) {
         //   return e.firstChild as HTMLDivElement;
         // }
@@ -418,8 +445,8 @@ class SuggestionInputManager extends UITouchHandlerBase<HTMLDivElement> {
     })
   }
 
-  constructor(div: HTMLElement) {
+  constructor(div: HTMLElement, scroller: HTMLElement) {
     // TODO:  Determine appropriate CSS styling names, etc.
-    super(div, Banner.BANNER_CLASS, SuggestionBanner.TOUCHED_CLASS);
+    super(div, scroller, Banner.BANNER_CLASS, SuggestionBanner.TOUCHED_CLASS);
   }
 }

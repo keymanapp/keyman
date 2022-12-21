@@ -43,7 +43,9 @@ class ScrollState {
 export default abstract class UITouchHandlerBase<Target extends HTMLElement> {
   private rowClassMatch: string;
   private selectedTargetMatch: string;
+
   private baseElement: HTMLElement;
+  private scroller: HTMLElement;
 
   private touchX: number;
   private touchY: number;
@@ -54,10 +56,12 @@ export default abstract class UITouchHandlerBase<Target extends HTMLElement> {
   private scrollTouchState: ScrollState;
   private pendingTarget: Target;
 
-  constructor(baseElement: HTMLElement, rowClassMatch: string, selectedTargetMatch: string) {
+  constructor(baseElement: HTMLElement, scroller: HTMLElement, rowClassMatch: string, selectedTargetMatch: string) {
     this.baseElement = baseElement;
     this.rowClassMatch = rowClassMatch;
     this.selectedTargetMatch = selectedTargetMatch;
+
+    this.scroller = scroller || null;
   }
 
   /**
@@ -241,8 +245,7 @@ export default abstract class UITouchHandlerBase<Target extends HTMLElement> {
     }
 
     // Establish scroll tracking.
-    let shouldScroll = (this.currentTarget.clientWidth < this.currentTarget.scrollWidth);
-    this.scrollTouchState = shouldScroll ? new ScrollState(coord) : null;
+    this.scrollTouchState = new ScrollState(coord);
 
     // Alright, Target acquired!  Now to use it:
 
@@ -334,9 +337,13 @@ export default abstract class UITouchHandlerBase<Target extends HTMLElement> {
       return;
     }
 
-    if(this.currentTarget && this.scrollTouchState != null) {
+    if(this.scrollTouchState != null) {
+      // TODO:  Work on smoothing this out; looks like subpixel scroll info gets rounded out,
+      // and this results in a mild desync.
       let deltaX = this.scrollTouchState.updateTo(coord).deltaX;
-      this.currentTarget.scrollLeft -= window.devicePixelRatio * deltaX;
+      if(this.scroller) {
+        this.scroller.scrollLeft -= deltaX;
+      }
 
       return;
     }
