@@ -226,7 +226,6 @@ LRESULT _kmnLowLevelKeyboardProc(
   // any additional processing or other serialization of the input queue.
   if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
       PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-    }
   }
 
   if(IsLanguageSwitchWindowVisible()) {
