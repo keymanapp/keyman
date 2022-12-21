@@ -9,6 +9,9 @@ import UITouchHandlerBase from '../input/event-interpreter/uiTouchHandlerBase.js
 import { DeviceSpec, Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
 import { Banner } from './banner.js';
 import EventEmitter from 'eventemitter3';
+import { ParsedLengthStyle } from '../lengthStyle.js';
+import { getFontSizeStyle } from '../fontSizeUtils.js';
+import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
 
 export class BannerSuggestion {
   div: HTMLDivElement;
@@ -81,17 +84,45 @@ export class BannerSuggestion {
    * Function update
    * @param {string}     id           Element ID for the suggestion span
    * @param {Suggestion} suggestion   Suggestion from the lexical model
+   * @param fontStyle                 The CSS styling expected for the suggestion text
+   * @param emSize                    The font size represented by 1em (in px, as from getComputedStyle on document.body)
+   * @param targetWidth
+   * @param collapsedTargetWidth
    * Description  Update the ID and text of the BannerSuggestionSpec
    */
-  public update(suggestion: Suggestion) {
+  public update(
+    suggestion: Suggestion,
+    fontStyle: CSSStyleDeclaration,
+    emSize: number,
+    targetWidth: number,
+    collapsedTargetWidth: number
+  ) {
     this._suggestion = suggestion;
-    this.updateText();
-  }
 
-  private updateText() {
+    // TODO:  if the option is highlighted, maybe don't disable transitions?
+    this.container.style.transition = 'none'; // temporarily disable transition effects.
+
     let display = this.generateSuggestionText(this.rtl);
     this.container.replaceChild(display, this.display);
     this.display = display;
+
+    // Compute the raw text-width of the suggestion and determine specs for the default (collapsed) styling.
+    const optionCollapseStyle = this.container.style;
+
+    const rawMetrics = getTextMetrics(suggestion.displayAs, emSize, fontStyle);
+    const rawTextWidth = rawMetrics.width;
+    optionCollapseStyle.minWidth = `${targetWidth}px`;
+
+    if(rawTextWidth > collapsedTargetWidth) {
+      optionCollapseStyle.marginLeft = `${collapsedTargetWidth - rawTextWidth}px`;
+    } else {
+      optionCollapseStyle.marginLeft = '0px';
+    }
+
+    this.container.offsetWidth; // To 'flush' the changes before re-enabling transition animations.
+    this.container.offsetLeft;
+
+    this.container.style.transition = ''; // Re-enable them (it's set on the element's class)
   }
 
   public isEmpty(): boolean {
@@ -310,12 +341,21 @@ export class SuggestionBanner extends Banner {
   public onSuggestionUpdate = (suggestions: Suggestion[]): void => {
     this.currentSuggestions = suggestions;
 
+    const fontStyle = getComputedStyle(this.options[0].div);
+    const emSizeStr = getComputedStyle(document.body).fontSize;
+    const emSize    = getFontSizeStyle(emSizeStr).val;
+
+    const textStyle = getComputedStyle(this.options[0].container.firstChild as HTMLSpanElement);
+
+    // TODO:  polish up; do a calculation that leaves perfect, clean edges when displaying exactly three options.
+    const targetWidth = this.width / 3; // Not fancy; it'll leave rough edges. But... it'll do for a demo.
+    const textLeftPad = new ParsedLengthStyle(textStyle.paddingLeft   || '2px');   // computedStyle will fail if the element's not in the DOM yet.
+    const textRightPad = new ParsedLengthStyle(textStyle.paddingRight || '2px');
+
+    const collapsedTargetWidth = targetWidth - textLeftPad.val - textRightPad.val;  // Assumes fixed px padding.
+
     this.options.forEach((option: BannerSuggestion, i: number) => {
-      if(i < suggestions.length) {
-        option.update(suggestions[i]);
-      } else {
-        option.update(null);
-      }
+      option.update(i < suggestions.length ? suggestions[i] : null, fontStyle, emSize, targetWidth, collapsedTargetWidth);
     });
   }
 }
