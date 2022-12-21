@@ -14,7 +14,7 @@ interface BUILDER_LIST_LIST {
 };
 
 interface BUILDER_LIST_INDEX {
-  index: number; // str
+  str: number; // str
   _value: string; // for findability?
 };
 
@@ -53,7 +53,7 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
     array.forEach((i) => {
       let index : BUILDER_LIST_INDEX = {
         // Get the final string index
-        index: build_strs_index(sect_strs, i.value),
+        str: build_strs_index(sect_strs, i.value),
         _value: i.value.value, // unwrap the actual string value
       };
       result.indices.push(index); // increment the indexCount

@@ -295,7 +295,7 @@ export class List extends Section {
    * @param strs Strs section for allocation
    * @param s space-separated list of items
    * @returns a List object
-   */ 
+   */
   allocListFromSpaces(strs: Strs, s?: string): ListItem {
     if(s === undefined || s === null) {
       s = '';
@@ -309,7 +309,7 @@ export class List extends Section {
    * `['']` will be stored as an empty list `[]`.
    * @param strs Strs section for allocation
    * @param s string list to allocate
-   * @returns 
+   * @returns
    */
   allocList(strs: Strs, s?: string[]): ListItem {
     // Special case the 'null' list for [] or ['']
@@ -596,7 +596,6 @@ export class KMXPlusFile extends KMXFile {
       lists: new r.Array(this.COMP_PLUS_LIST_LIST, 'listCount'),
       indices: new r.Array(this.COMP_PLUS_LIST_INDEX, 'indexCount'),
     });
-
 
     // 'loca'
 

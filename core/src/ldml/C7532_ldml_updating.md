@@ -64,6 +64,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
     - Update `finalize_sect` and add `offset = this.finalize_sect_item(this.sect_disp, offset);`
     - Finally, add `this.emitSection(file, this.file.COMP_PLUS_DISP, this.sect_disp);` to `compile()` — and, in order.
         - Note that some variable length parts (such as the actual text data in `strs`) are sometimes in a separate emit function. Anything that's not in the `COMP_PLUS_STRS` `r.Struct` definition needs one of these.
+        - Also note that restructure will happily ignore (write zeros for) any fields where the BUILDER_* fields don't match the COMP_PLUS_* fields.
 
 - update basic.xml and basic.txt
     - Tweak `eveloper/src/kmc-keyboard/test/fixtures/basic.xml` as needed
