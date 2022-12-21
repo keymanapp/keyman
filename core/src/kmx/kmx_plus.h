@@ -382,6 +382,7 @@ struct COMP_KMXPLUS_LAYR_LIST {
     KMXPLUS_STR hardware;
     KMX_DWORD layer;
     KMX_DWORD count;
+    KMX_DWORD minDeviceWidth;
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_LAYR_LIST) == LDML_LENGTH_LAYR_LIST, "mismatched size of COMP_KMXPLUS_LAYR_LIST");
