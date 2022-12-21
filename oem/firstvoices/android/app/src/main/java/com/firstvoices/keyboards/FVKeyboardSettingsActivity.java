@@ -163,7 +163,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     fvKeyboardTextView = (TextView) layout.findViewById(R.id.text1);
     fvKeyboardTextView.setText(getString(R.string.enable_keyboard));
     fvVersionTextView = (TextView) layout.findViewById(R.id.text2);
-    fvVersionTextView.setText(String.format(getString(R.string.keyboard_version2), version));
+    fvVersionTextView.setText(String.format(getString(R.string.fv_keyboard_version), version));
     fvKeyboardToggle = layout.findViewById(R.id.toggle);
     fvKeyboardToggle.setChecked(KeyboardController.getInstance().keyboardExists(FVShared.FVDefault_PackageID, kbId, null));
     fvKeyboardToggle.setOnClickListener(new View.OnClickListener() {
