@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 16.0.127 beta 2022-12-21
+
+* fix(oem/fv/android): Fix keyboard version title (again) (#7941)
+* fix(oem/fv/android): Add view permission of online help (#7909)
+* fix(windows): modifer event is always serialized (#7935)
+
 ## 16.0.126 beta 2022-12-21
 
 * fix(windows): shutdown fix masked modal result (#7932)
