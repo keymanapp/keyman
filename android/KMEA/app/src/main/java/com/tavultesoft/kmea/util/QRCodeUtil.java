@@ -1,6 +1,9 @@
+/**
+ * Copyright (C) 2022 SIL International. All rights reserved.
+ */
+
 package com.tavultesoft.kmea.util;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import net.glxn.qrgen.android.QRCode;
@@ -21,16 +24,5 @@ public final class QRCodeUtil {
   public static Bitmap toBitmap(String url) {
     Bitmap result = QRCode.from(url).withSize(DEFAULT_WIDTH, DEFAULT_HEIGHT).bitmap();
     return result;
-  }
-
-  public static boolean libraryExists(Context context) {
-    boolean result = false;
-    try {
-      Class.forName("net.glxn.qrgen.android.QRCode");
-      return true;
-    } catch (ClassNotFoundException e) {
-      // Intentionally not sending to Sentry because 3rd party apps may not include this library
-      return false;
-    }
   }
 }

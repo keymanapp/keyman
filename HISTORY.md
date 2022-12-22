@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 17.0.21 alpha 2022-12-21
+
+* fix(windows): shutdown fix masked modal result (#7933)
+
+## 17.0.20 alpha 2022-12-19
+
+* chore(android/samples): Remove Sentry dependencies (#7901)
+* chore: Revert "chore(common): Fix shellcheck warnings" (#7925)
+
+## 17.0.19 alpha 2022-12-17
+
+* fix(linux): Fix dependency of ibus-keyman (#7918)
+
+## 17.0.18 alpha 2022-12-16
+
+* chore(common): Fix shellcheck warnings (#7910)
+
 ## 17.0.17 alpha 2022-12-15
 
 * chore: merge beta to master (#7885)
