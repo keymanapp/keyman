@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.21 alpha 2022-12-21
+
+* fix(windows): shutdown fix masked modal result (#7933)
+
 ## 17.0.20 alpha 2022-12-19
 
 * chore(android/samples): Remove Sentry dependencies (#7901)
