@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.128 beta 2022-12-22
+
+* fix(developer): force ES3 code generation for LMs (#7927)
+
 ## 16.0.127 beta 2022-12-21
 
 * fix(oem/fv/android): Fix keyboard version title (again) (#7941)
