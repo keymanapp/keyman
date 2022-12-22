@@ -8,6 +8,8 @@
       </intent>
     </queries>
 
+    <!-- https://developer.android.com/develop/ui/views/notifications/notification-permission#declare -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Ensure these permissions aren't added by dependencies unless calling app intentionally adds them -->
