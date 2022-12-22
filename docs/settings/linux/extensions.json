@@ -3,7 +3,10 @@
   // for the documentation about the extensions.json format
   "recommendations": [
     "asabil.meson",
-    "EditorConfig.editorconfig",
-    "ms-python.python"
+    "editorconfig.editorconfig",
+    "ms-python.python",
+    "mads-hartmann.bash-ide-vscode",
+    "timonwong.shellcheck",
+    "maelvalais.autoconf"
   ]
 }

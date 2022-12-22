@@ -7,13 +7,11 @@ import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
 
-let zip = JSZip();
-
 const FILEVERSION_KMP_JSON = '12.0';
 
 export default class KmpCompiler {
 
-  public transformKpsToKmpObject(kpsPath: string, kpsString: string): KmpJsonFile {
+  public transformKpsToKmpObject(kpsString: string, kpsPath: string): KmpJsonFile {
 
     // Load the KPS data from XML as JS structured data.
 
@@ -112,8 +110,8 @@ export default class KmpCompiler {
     if(kps.keyboards && kps.keyboards.keyboard) {
       kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFileKeyboard) => {
         return {
-          displayFont: keyboard.displayFont ? path.basename(keyboard.displayFont) : undefined,
-          oskFont: keyboard.oSKFont ? path.basename(keyboard.oSKFont) : undefined,
+          displayFont: keyboard.displayFont ? path.basename(keyboard.displayFont.replaceAll('\\', '/')) : undefined,
+          oskFont: keyboard.oSKFont ? path.basename(keyboard.oSKFont.replaceAll('\\', '/')) : undefined,
           name:keyboard.name,
           id:keyboard.iD,
           version:keyboard.version,
@@ -195,6 +193,9 @@ export default class KmpCompiler {
     // When we do this, we'll need to update fixtures to have the correct
     // version string also
     if(!kps.keyboards || !kps.keyboards.keyboard) {
+      // We don't read from the kps metadata because we want the keyboard
+      // version data here;
+      // TODO: currently model files don't support follow-version?
       return '0.0.0';
     }
     let k: KpsFileKeyboard[] = this.arrayWrap(kps.keyboards.keyboard);
@@ -219,6 +220,8 @@ export default class KmpCompiler {
    * @param kmpJsonData - The kmp.json Object
    */
   public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile): Promise<any> {
+    const zip = JSZip();
+
     const kmpJsonFileName = 'kmp.json';
 
     const basePath = path.dirname(kpsFilename);

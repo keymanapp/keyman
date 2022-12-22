@@ -62,6 +62,7 @@ for proj in ${autotool_projects}; do
     cd $proj
     echo "Reconfiguring $proj to version ${VERSION}"
     autoreconf -if
+    rm -rf autom4te.cache
     cd $BASEDIR
 done
 
@@ -69,6 +70,7 @@ for proj in ${legacy_projects}; do
     cd legacy/$proj
     echo "Reconfiguring $proj to version ${VERSION}"
     autoreconf -if
+    rm -rf autom4te.cache
     cd $BASEDIR
 done
 

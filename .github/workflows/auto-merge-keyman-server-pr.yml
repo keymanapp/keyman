@@ -17,7 +17,7 @@ jobs:
     if: ${{ github.actor == 'keyman-server' && startsWith(github.event.pull_request.title, 'auto:') }}
     steps:
     - name: auto approve PR from keyman-server
-      uses: hmarr/auto-approve-action@v2.0.0
+      uses: hmarr/auto-approve-action@v3
       with:
         github-token: "${{ secrets.GITHUB_TOKEN }}"
     - name: auto merge PR from keyman-server

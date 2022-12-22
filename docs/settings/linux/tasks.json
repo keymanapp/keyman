@@ -51,6 +51,70 @@
     },
     {
       "type": "shell",
+      "label": "core: configure",
+      "command": "${workspaceFolder}/core/build.sh",
+      "args": [ "--debug", "configure",
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/core",
+      },
+      "presentation": {
+        "clear": true
+      },
+      "group": "build",
+      "detail": "configure core"
+    },
+    {
+      "type": "shell",
+      "label": "core: configure+build",
+      "command": "${workspaceFolder}/core/build.sh",
+      "args": [
+        "--debug", "configure", "build", "tests"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/core"
+      },
+      "problemMatcher": [
+        {
+          "owner": "cpp",
+          "source": "compiler",
+          "fileLocation": [
+            "relative",
+            "${workspaceFolder}/core/"
+          ],
+          "pattern": [
+            {
+              "regexp": "^../../../(.*):(\\d+):(\\d+):\\s+(warning|error|note):\\s+(.*)(\\s+\\[.*\\])?$",
+              "file": 1,
+              "line": 2,
+              "column": 3,
+              "severity": 4,
+              "message": 5
+            }
+          ]
+        },
+        {
+          "owner": "cpp",
+          "source": "linker",
+          "fileLocation": "absolute",
+          "pattern": [
+            {
+              "regexp": "^(/usr/bin/ld:\\s+)?(.*):(\\d+):\\s+(.*)$",
+              "file": 2,
+              "location": 3,
+              "message": 4
+            }
+          ]
+        },
+      ],
+      "presentation": {
+        "clear": true
+      },
+      "group": "build",
+      "detail": "build core"
+    },
+    {
+      "type": "shell",
       "label": "core: test",
       "command": "${workspaceFolder}/core/build.sh",
       "args": [
@@ -62,6 +126,16 @@
       ],
       "group": "test",
       "detail": "run tests for core"
+    },
+    {
+      "type": "shell",
+      "label": "ibus-keyman: autogen.sh",
+      "command": "./autogen.sh",
+      "options": {
+        "cwd": "${workspaceFolder}/linux/ibus-keyman"
+      },
+      "group": "build",
+      "detail": "autogen ibus-keyman"
     },
     {
       "type": "shell",
@@ -108,6 +182,37 @@
       ],
       "group": "build",
       "detail": "build ibus-keyman"
+    },
+    {
+      "type": "shell",
+      "label": "ibus-keyman: build tests",
+      "command": "make",
+      "options": {
+        "cwd": "${workspaceFolder}/linux/ibus-keyman/tests",
+      },
+      "group": "build",
+      "detail": "build ibus-keyman"
+    },
+    {
+      "type": "shell",
+      "label": "ibus-keyman: check",
+      "command": "make",
+      "args": ["check"],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/ibus-keyman/",
+      },
+      "group": "build",
+      "detail": "build check ibus-keyman"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-config: tests",
+      "command": "${workspaceFolder}/linux/keyman-config/run-tests.sh",
+      "options": {
+        "cwd": "${workspaceFolder}/linux/keyman-config",
+      },
+      "group": "test",
+      "detail": "unit test keyman-config"
     },
   ]
 }

@@ -1,18 +1,18 @@
 (*
   Name:             OnlineUpdateCheck
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Dec 2006
 
   Modified Date:    8 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Dec 2006 - mcdurdin - Support download progress
                     12 Dec 2006 - mcdurdin - Don't shutdown if update is cancelled
                     14 Dec 2006 - mcdurdin - Only test for patches, not downloads
@@ -67,6 +67,7 @@ type
     function DownloadUpdate(URL: string; var DownloadPath: string): Boolean;
     procedure DoDownloadUpdate(AOwner: TfrmDownloadProgress; var Result: Boolean);
     function DoRun: TOnlineUpdateCheckResult;
+    procedure SyncShowError;
     procedure SyncShowUpdateForm;
     procedure SyncShutDown;
   private
@@ -134,10 +135,10 @@ end;
 destructor TOnlineUpdateCheck.Destroy;
 begin
   if (FErrorMessage <> '') and not FSilent and FShowErrors then
-    ShowMessage(FErrorMessage);
+    Synchronize(SyncShowError);
 
   if FParams.Result = oucShutDown then
-    SyncShutDown;
+    Synchronize(SyncShutDown);
 
   KL.Log('TOnlineUpdateCheck.Destroy: FErrorMessage = '+FErrorMessage);
   KL.Log('TOnlineUpdateCheck.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
@@ -285,7 +286,15 @@ end;
 procedure TOnlineUpdateCheck.SyncShutDown;
 begin
   if Assigned(Application) then
-    Application.Terminate;
+  begin
+    if Assigned(Application.MainForm) then
+      Application.MainForm.Close;
+  end;
+end;
+
+procedure TOnlineUpdateCheck.SyncShowError;
+begin
+  ShowMessage(FErrorMessage);
 end;
 
 function TOnlineUpdateCheck.DoRun: TOnlineUpdateCheckResult;

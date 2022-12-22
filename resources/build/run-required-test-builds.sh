@@ -60,7 +60,7 @@ function triggerTestBuilds() {
         triggerJenkinsBuild "$job" "$branch" "$force"
       else
         echo "  -- Triggering build configuration $test_build on teamcity"
-        triggerTeamCityBuild "$test_build" "$vcs_test" "$branch"
+        triggerTeamCityBuild true "$test_build" "$vcs_test" "$branch"
       fi
     done
   done

@@ -1,6 +1,6 @@
 /***
-   KeymanWeb 11.0
-   Copyright 2019 SIL International
+   KeymanWeb 16.0
+   Copyright 2022 SIL International
 ***/
 
 /*
@@ -346,14 +346,17 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 
 /* Key preview styles */
 
-div.ios div.kmw-keytip {
+div.ios div.kmw-keytip, div.android div.kmw-keytip {
   position: absolute;
   left: 0;
   top: 0;
   width: 3em;
   height: 3em;
-  background-color: rgb(0, 0, 0, 0);
   overflow: visible;
+}
+
+div.ios div.kmw-keytip {
+  background-color: rgb(0, 0, 0, 0);
 }
 
 div.ios div.kmw-keytip-tip {
@@ -366,9 +369,12 @@ div.ios div.kmw-keytip-tip {
   box-sizing: border-box;
 }
 
-div.ios div.kmw-keytip-cap {
+div.ios div.kmw-keytip-cap, div.android div.kmw-keytip-cap {
   position: absolute;
   border-radius: 0 0 5px 5px;
+}
+
+div.ios div.kmw-keytip-cap {
   border-top: solid 1px white;
   border-bottom: solid 1px #8a8d90;
 }
@@ -383,18 +389,12 @@ span.kmw-keytip-label {
 div.ios div.kmw-keytip-cap,
 div.ios div.kmw-keytip-tip {
   background:white;
-  /* background-clip: required to prevent antialiasing on top edge on hires devices e.g. iPhone 13 pro + iOS 15.4 */
+  /* background-clip: required to prevent antialiasing on top edge on hi-res devices e.g. iPhone 13 pro + iOS 15.4 */
   background-clip: content-box;
 }
 
 div.android div.kmw-keytip {
-  position:absolute;
-  left: 0;
-  top: 0;
-  width: 3em;
-  height: 3em;
   color: white;
-  overflow: visible;
 }
 
 div.android div.kmw-keytip-tip {
@@ -403,9 +403,7 @@ div.android div.kmw-keytip-tip {
 }
 
 div.android div.kmw-keytip-cap {
-  position: absolute;
   background: #999;
-  border-radius: 0 0 5px 5px;
   border-bottom: solid 1px #8a8d90
 }
 
@@ -456,7 +454,7 @@ div.android div.kmw-keytip-cap {
 #kmw-language-menu-background{position:fixed;left:0;top:0;width:100%;height:100%;background-color:transparent;z-index:10003;}
 
 #kmw-menu-scroll-container{position:absolute;left:0;top:0px;width:200px;max-width:200px;overflow:auto;z-index:10005;}
-#kmw-menu-scroller{position:absolute;left:0;top:0;width:200px;max-width:200px;background-color:#e0e0e0;overflow:auto;overflow-x:hidden;}
+#kmw-menu-scroller{position:absolute;left:0;top:0;width:200px;max-width:200px;background-color:#e0e0e0;overflow-x:hidden;}
 
 #kmw-menu-index {position:absolute;right:0;width:32px;font-size:14px;}
 #kmw-menu-index p {text-align:center;border:none;padding:0px 2px;margin:0;color:white;}

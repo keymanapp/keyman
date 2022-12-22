@@ -201,6 +201,11 @@ type
 
   pkm_kbp_action_item = ^km_kbp_action_item;
 
+// These types are used only for debugging convenience
+type
+  km_kbp_action_item_array = array[0..100] of km_kbp_action_item;
+  pkm_kbp_action_item_array = ^km_kbp_action_item_array;
+
 function km_kbp_options_list_size(
   opts: pkm_kbp_option_item
 ): Integer; cdecl; external kmnkbp0 delayed;

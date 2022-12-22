@@ -24,6 +24,7 @@
 		"./kmwuifloat.ts",
 		"./kmwuitoggle.ts",
 		"./kmwuitoolbar.ts",
+		"./osk/embedded/*.ts"
 	],
 
   "references": [

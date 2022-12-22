@@ -127,7 +127,7 @@ typedef struct km_kbp_option_item  km_kbp_option_item;
 // Callback function used to to access Input Method eXtension library functions
 // from Keyman Core
 //
-typedef KMN_API uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t, void*);
+typedef uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t, void*);
 
 /*```
 ### Error Handling

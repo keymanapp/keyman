@@ -1,0 +1,28 @@
+#!/bin/bash
+# autopkgtest check: Build a program against libkmnkbp-dev to verify that the
+# headers and pkg-config file are included and installed correctly.
+# cf https://github.com/keymanapp/keyman/issues/7490
+
+set -e
+
+WORKDIR=$(mktemp -d)
+trap "rm -rf $WORKDIR" 0 INT QUIT ABRT PIPE TERM
+cd $WORKDIR
+
+# Test all include files are available
+cat <<EOF > keymantest.c
+#include <keyman/keyboardprocessor.h>
+km_kbp_context c;
+EOF
+
+gcc keymantest.c `pkg-config --cflags --libs keyman_kmn_processor`
+echo "build 1: OK"
+
+# Test pkg-config file - include without path
+cat <<EOF > keymantest.c
+#include <keyboardprocessor.h>
+km_kbp_context c;
+EOF
+
+gcc keymantest.c `pkg-config --cflags --libs keyman_kmn_processor`
+echo "build 2: OK"
