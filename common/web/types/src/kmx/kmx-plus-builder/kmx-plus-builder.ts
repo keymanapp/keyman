@@ -119,7 +119,7 @@ export default class KMXPlusBuilder {
 
     Object.keys(constants.section).forEach((sectstr : string) => {
       const sect : SectionIdent = constants.section[<SectionIdent>sectstr];
-      if(this.sect[sect]) {
+      if(this.sect[sect] && sect !== 'sect') {
         this.sect.sect.count++;
       }
     });
