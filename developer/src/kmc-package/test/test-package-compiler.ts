@@ -105,8 +105,6 @@ describe('KmpCompiler', function () {
       'khmer_busra_kbd.ttf', 'Mondulkiri-R.ttf', 'OFL.txt', 'OFL-FAQ.txt', 'readme.htm',
       'splash.gif', 'welcome.htm',
       'kmp.json', // standard .kmp metadata file
-      'withfolders.qaa.sencoten.model.js', // TODO-LDML ??!!! why is this included here?
-      'example.qaa.sencoten.model.js', // TODO-LDML ??!!! why is this included here?
     ];
 
     assert.sameMembers(Object.entries(jszip.files).map(([s, o]) => o.name).sort(),

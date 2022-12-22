@@ -7,8 +7,6 @@ import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
 
-let zip = JSZip();
-
 const FILEVERSION_KMP_JSON = '12.0';
 
 export default class KmpCompiler {
@@ -220,6 +218,8 @@ export default class KmpCompiler {
    * @param kmpJsonData - The kmp.json Object
    */
   public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile): Promise<any> {
+    const zip = JSZip();
+
     const kmpJsonFileName = 'kmp.json';
 
     const basePath = path.dirname(kpsFilename);
