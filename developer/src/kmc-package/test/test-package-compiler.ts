@@ -104,14 +104,14 @@ describe('KmpCompiler', function () {
       'keyboard_layout.png', 'khmer_angkor.js', 'khmer_angkor.kmx', 'khmer_angkor.kvk',
       'khmer_busra_kbd.ttf', 'Mondulkiri-R.ttf', 'OFL.txt', 'OFL-FAQ.txt', 'readme.htm',
       'splash.gif', 'welcome.htm',
-      'kmp.json', // this seems to be included as well.
+      'kmp.json', // standard .kmp metadata file
       'withfolders.qaa.sencoten.model.js', // TODO-LDML ??!!! why is this included here?
       'example.qaa.sencoten.model.js', // TODO-LDML ??!!! why is this included here?
     ];
 
     assert.sameMembers(Object.entries(jszip.files).map(([s, o]) => o.name).sort(),
       expectedFiles.sort(),
-      'jszip should have exactly the expected items);');
+      'khmer_angkor.kmp file should have exactly the expected files');
 
     let kmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
     assert.deepEqual(kmpJsonData, kmpJsonFixture);
