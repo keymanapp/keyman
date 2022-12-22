@@ -7,8 +7,6 @@ import {makePathToFixture} from './helpers/index.js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version/keyman-version.mjs";
 
-let zip = JSZip();
-
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
     'example.qaa.sencoten',
@@ -53,6 +51,7 @@ describe('KmpCompiler', function () {
     });
     it(`should build a full .kmp for ${modelID}`, async function() {
       const source = fs.readFileSync(kpsPath, 'utf-8');
+      const zip = JSZip();
       // Build kmp.json in memory
       const kmpJson: KmpJsonFile = kmpCompiler.transformKpsToKmpObject(source, kpsPath);
       // Build file.kmp in memory
@@ -95,6 +94,8 @@ describe('KmpCompiler', function () {
     });
 
     const kmpData = await kmpCompiler.buildKmpFile(kpsPath, kmpJson);
+
+    const zip = JSZip();
 
     let jszip = await zip.loadAsync(kmpData);
     assert.isNotNull(jszip.file('kmp.json')); // kmp.json should be present

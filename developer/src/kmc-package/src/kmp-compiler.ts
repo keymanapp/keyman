@@ -193,8 +193,10 @@ export default class KmpCompiler {
     // When we do this, we'll need to update fixtures to have the correct
     // version string also
     if(!kps.keyboards || !kps.keyboards.keyboard) {
-      // see if we can extract from the kps
-      return kps?.info?.version.toString() || '0.0.0';
+      // We don't read from the kps metadata because we want the keyboard
+      // version data here;
+      // TODO: currently model files don't support follow-version?
+      return '0.0.0';
     }
     let k: KpsFileKeyboard[] = this.arrayWrap(kps.keyboards.keyboard);
     return k?.[0]?.version ?? '0.0.0';
