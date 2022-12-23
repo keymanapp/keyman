@@ -204,6 +204,8 @@ EMBEDDED="embedded"
 
 WEB_OUTPUT="../release/web"
 EMBED_OUTPUT="../release/embedded"
+GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/."
+GESTURE_RECOGNIZER_TARGET="../release/unminified/gesture-recognizer/"
 WEB_OUTPUT_NO_MINI="../release/unminified/web"
 EMBED_OUTPUT_NO_MINI="../release/unminified/embedded"
 INTERMEDIATE="../intermediate"
@@ -457,7 +459,22 @@ fi
 
 ### -embed section complete.
 
+### TEMP - to link @keymanapp/gesture-recognizer in for CI while detached
 if [ $BUILD_COREWEB = true ]; then
+    echo "Compiling the detached @keymanapp/gesture-recognizer module"
+    "$KEYMAN_ROOT/common/web/gesture-recognizer/build.sh" build
+
+    # Copy the build artifacts into web-space for CI testing
+    # Note:  make sure this doesn't break once KeymanWeb actually uses the module!
+    if ! [ -d $GESTURE_RECOGNIZER_TARGET ]; then
+        mkdir -p $GESTURE_RECOGNIZER_TARGET
+    fi
+    cp -a $GESTURE_RECOGNIZER_BUILD $GESTURE_RECOGNIZER_TARGET
+fi
+
+
+if [ $BUILD_COREWEB = true ]; then
+
     # Compile KeymanWeb code modules for native keymanweb use, stubbing out and removing references to debug functions
     echo Compile Keymanweb...
     $compilecmd -b $NODE_SOURCE/tsconfig.json -v

@@ -1,25 +1,15 @@
 {
-  "name": "@keymanapp/lm-worker",
-  "description": "Keyman/Predictive Text worker",
-  "main": "build/index.js",
-  "scripts": {
-    "karma": "karma",
-    "mocha": "mocha",
-    "test": "gosh ./test/test.sh",
-    "build": "tsc -b",
-    "clean": "tsc -b --clean"
-  },
-  "license": "MIT",
+  "name": "@keymanapp/gesture-recognizer",
+  "description": "The core gesture-recognition engine used by Keyman's Web-based OSKs.",
   "devDependencies": {
-    "@keymanapp/models-types": "*",
     "@keymanapp/resources-gosh": "*",
-    "@types/node": "^10.17.21",
+    "@types/node": "^11.9.4",
+    "@types/sinon": "^10.0.13",
     "chai": "^4.3.4",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-edge-launcher": "^0.4.2",
     "karma-firefox-launcher": "^1.1.0",
     "karma-fixture": "^0.2.6",
     "karma-html2js-preprocessor": "^1.1.0",
@@ -31,17 +21,20 @@
     "karma-teamcity-reporter": "^1.1.0",
     "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
+    "promise-status-async": "^1.2.10",
     "sinon": "^14.0.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.5.4"
   },
+  "scripts": {
+    "build": "echo 'Building @keymanapp/gesture-recognizer' && tsc -b ./tsconfig.json",
+    "clean": "tsc -b --clean",
+    "karma": "karma",
+    "mocha": "mocha",
+    "test": "gosh ./src/test/test.sh",
+    "tsc": "tsc"
+  },
   "dependencies": {
-    "@keymanapp/models-templates": "*",
-    "@keymanapp/models-wordbreakers": "*",
-    "@keymanapp/keyman-version": "*",
-    "@keymanapp/web-utils": "*",
-    "es6-shim": "^0.35.5",
-    "string.prototype.codepointat": "^0.2.1",
-    "string.prototype.startswith": "^0.2.0"
+    "eventemitter3": "^4.0.0"
   }
 }
