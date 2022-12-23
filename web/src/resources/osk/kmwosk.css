@@ -87,7 +87,8 @@
 }
 
 .kmw-suggest-option.kmw-suggest-touched .kmw-suggestion-container {
-  margin-left: 0px !important /* Overrides 'collapse' styling, which is accomplished via negative margin-left */
+  margin-left: 0px !important;  /* Overrides 'collapse' styling, which is accomplished via negative margin-left */
+  margin-right: 0px !important; /* The same, but for RTL languages */
 }
 
 .phone.windows .kmw-key-row{max-width:80%;}

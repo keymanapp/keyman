@@ -143,7 +143,12 @@ export class BannerSuggestion {
 
     const collapserStyle = this.container.style;
     collapserStyle.minWidth = this.collapsedWidth + 'px';
-    collapserStyle.marginLeft = (this.collapsedWidth - this.expandedWidth) + 'px';
+
+    if(this.rtl) {
+      collapserStyle.marginRight = (this.collapsedWidth - this.expandedWidth) + 'px';
+    } else {
+      collapserStyle.marginLeft  = (this.collapsedWidth - this.expandedWidth) + 'px';
+    }
 
     this.container.offsetWidth; // To 'flush' the changes before re-enabling transition animations.
     this.container.offsetLeft;
