@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
-
+import { unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
@@ -132,7 +132,11 @@ export class StrsItem {
 
 export class Strs extends Section {
   strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
-
+  /**
+   * Allocate a StrsItem given the string.
+   * @param s string
+   * @returns
+   */
   allocString(s?: string): StrsItem {
     if(s === undefined || s === null) {
       // undefined or null are always equivalent to empty string, see C7043
@@ -142,6 +146,8 @@ export class Strs extends Section {
     if(typeof s !== 'string') {
       throw new Error('alloc_string: s must be a string, undefined, or null.');
     }
+
+    s = unescapeString(s);
 
     let result = this.strings.find(item => item.value === s);
     if(result === undefined) {

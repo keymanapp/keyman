@@ -23,8 +23,8 @@ describe('disp', function () {
 
     assert.ok(disp?.disps);
     assert.equal(disp.disps.length, 1);
-    assert.equal(disp.disps[0].to?.value, 'e');
-    assert.equal(disp.disps[0].display?.value, '(e)');
+    assert.equal(disp.disps[0].to?.value, '\u0300');
+    assert.equal(disp.disps[0].display?.value, '`');
   });
   it('should compile maximal disp', function() {
     let disp = loadSectionFixture(DispCompiler, 'sections/disp/maximal.xml', compilerTestCallbacks) as Disp;

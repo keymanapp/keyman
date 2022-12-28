@@ -7,6 +7,6 @@
   </names>
 
   <displays>
-    <display to="e" display="(e)"/>
+    <display to="\u{0300}" display="`" />
   </displays>
 </keyboard>
