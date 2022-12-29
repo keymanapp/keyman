@@ -16,7 +16,7 @@ export function boxXmlArray(o: any, x: string): void {
   }
 }
 
-const MATCH_HEX_ESCAPE = /\\u{([0-9a-f][0-9a-f][0-9a-f][0-9a-f])}/g;
+const MATCH_HEX_ESCAPE = /\\u{([0-9a-fA-F]{1,5})}/g;
 
 export function unescapeString(s: string): string {
   if(!s) return s;
