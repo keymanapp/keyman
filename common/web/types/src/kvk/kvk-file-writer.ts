@@ -50,7 +50,9 @@ export default class KvkFileWriter {
         text: { len: 0, str: '' },
         bitmap: 0
       };
-      this.setString(binaryKey.text, sourceKey.text);
+      if (sourceKey.text) {
+        this.setString(binaryKey.text, sourceKey.text);
+      }
       binary.keys.push(binaryKey);
     }
 
