@@ -32,6 +32,11 @@
 #include <config.h>
 #endif
 
+#ifndef IBUS_HAS_PREFILTER
+#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
+#define IBUS_PREFILTER_MASK (1 << 23)
+#endif
+
 #include "ibusimcontext.h"
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
