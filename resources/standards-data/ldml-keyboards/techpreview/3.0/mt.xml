@@ -14,7 +14,7 @@
 
     <keys>
         <!-- imports -->
-        <import base="cldr" path="techpreview/key-Zyyy-punctuation.xml"/>
+        <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
 
         <!-- accent grave -->
         <key id="a-grave" to="à" />
@@ -33,8 +33,8 @@
         <key id="C-tikka" to="Ċ" />
         <key id="g-tikka" to="ġ" />
         <key id="G-tikka" to="Ġ" />
-        <key id="h-maqtua" to="ħ" />
-        <key id="H-maqtua" to="Ħ" />
+        <key id="h-maqtugha" to="ħ" /> <!-- maqtugħa, i.e. cut -->
+        <key id="H-maqtugha" to="Ħ" /> <!-- maqtugħa, i.e. cut -->
         <key id="z-tikka" to="ż" />
         <key id="Z-tikka" to="Ż" />
 
@@ -47,8 +47,8 @@
 
     <layers form="hardware" hardware="iso">
         <layer modifier="none">
-            <row keys="c-tikka 1 2 3 4 5 6 7 8 9 0 minus equals" />
-            <row keys="q w e r t y u i o p g-tikka h-maqtua" />
+            <row keys="c-tikka 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
+            <row keys="q w e r t y u i o p g-tikka h-maqtugha" />
             <row keys="a s d f g h j k l semi-colon hash" />
             <row keys="z-tikka z x c v b n m comma period slash" />
             <row keys="space" />
@@ -56,7 +56,7 @@
 
         <layer modifier="shift">
             <row keys="C-tikka bang double-quote euro dollar percent caret amp open-paren close-paren underscore plus" />
-            <row keys="Q W E R T Y U I O P G-tikka H-maqtua" />
+            <row keys="Q W E R T Y U I O P G-tikka H-maqtugha" />
             <row keys="A S D F G H J K L colon at tilde" />
             <row keys="Z-tikka Z X C V B N M open-angle close-angle question" />
             <row keys="space" />
