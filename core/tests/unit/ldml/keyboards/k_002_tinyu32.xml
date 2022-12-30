@@ -15,14 +15,14 @@
   </names>
 
   <keys>
-    <key id="hmaqtua" to="ħ" />
+    <key id="hmaqtugha" to="ħ" />
     <key id="that" to="ថា" />
     <key id="screamcat" to="🙀" />
   </keys>
 
   <layers form="hardware">
     <layer id="base">
-      <row keys="hmaqtua that screamcat" /> <!-- number row -->
+      <row keys="hmaqtugha that screamcat" /> <!-- number row -->
     </layer>
   </layers>
 </keyboard>

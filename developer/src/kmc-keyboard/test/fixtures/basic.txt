@@ -276,11 +276,11 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   00 00 00 00                       #   KMX_DWORD flickCount
   00 00 00 00  00 00 00 00  00 00 00 00 # Reserved[3]
   # keys
-  #  hmaqtua
+  #  hmaqtugha
   00 00 00 00                       #   KMX_DWORD vkey
   index(strNull,strKey1,2)          #   KMXPLUS_STR 'U+0127'
   01 00 00 00                       #   KMX_DWORD (flags: extend)
-  index(strNull,strHmaqtua,2)       #   KMXPLUS_STR 'hmaqtua'
+  index(strNull,strHmaqtugha,2)       #   KMXPLUS_STR 'hmaqtugha'
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
   01 00 00 00 # TODO: index(listNull,indexAe,4)         #   LIST longPress 'a e'
@@ -291,7 +291,7 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   00 00 00 00                       #   KMX_DWORD vkey
   index(strNull,strKey2,2)          #   KMXPLUS_STR 'U+0127'
   01 00 00 00                       #   KMX_DWORD flags = extend
-  index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtua'
+  index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtugha'
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST longPress
@@ -354,7 +354,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   00 00 00 00                       #   KMX_DWORD key index
   02 00 00 00                       #   KMX_DWORD count
   # keys
-  index(strNull,strHmaqtua,2)       #   KMXPLUS_STR locale;       // 'hmaqtua'
+  index(strNull,strHmaqtugha,2)       #   KMXPLUS_STR locale;       // 'hmaqtugha'
   index(strNull,strThat,2)          #   KMXPLUS_STR locale;       // 'that'
 
 # ----------------------------------------------------------------------------------------------------
@@ -462,7 +462,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strElemTranFrom2)   sizeof(strElemTranFrom2,2)
   diff(strs,strBase)   sizeof(strBase,2)
   diff(strs,strElemBkspFrom2) sizeof(strElemBkspFrom2,2)
-  diff(strs,strHmaqtua) sizeof(strHmaqtua,2)
+  diff(strs,strHmaqtugha) sizeof(strHmaqtugha,2)
   diff(strs,strLocale)     sizeof(strLocale,2)
   diff(strs,strLayout)     sizeof(strLayout,2)
   diff(strs,strAuthor)     sizeof(strAuthor,2)
@@ -490,7 +490,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strElemTranFrom2)    61 00 block(x) 00 00                                       # 'a'
   block(strBase)             62 00 61 00 73 00 65 00 block(x) 00 00                     # 'base'
   block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
-  block(strHmaqtua)          68 00 6d 00 61 00 71 00 74 00 75 00 61 00 block(x) 00 00   # 'hmaqtua'
+  block(strHmaqtugha)        68 00 6d 00 61 00 71 00 74 00 75 00 67 00 68 00 61 00 block(x) 00 00   # 'hmaqtugha'
   block(strLocale)           6d 00 74 00   block(x) 00 00                               # 'mt'
   block(strLayout)           71 00 77 00 65 00 72 00 74 00 79 00   block(x) 00 00       # 'qwerty'
   block(strAuthor)           73 00 72 00 6c 00 32 00 39 00 35 00   block(x) 00 00       # 'srl295'

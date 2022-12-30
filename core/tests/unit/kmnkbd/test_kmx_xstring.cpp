@@ -1242,8 +1242,8 @@ test_utf32() {
 
   assert(Uni_IsBMP(u295));
 
-  const char16_t hmaqtua = Uni_UTF32BMPToUTF16(u295);
-  assert(hmaqtua == 0x0127);
+  const char16_t hmaqtugha = Uni_UTF32BMPToUTF16(u295);
+  assert(hmaqtugha == 0x0127);
 
   char16_single c0;
   int l0 = Utf32CharToUtf16(u295, c0);
