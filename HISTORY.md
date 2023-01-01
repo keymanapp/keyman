@@ -96,6 +96,41 @@
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
+## 16.0.128 beta 2022-12-22
+
+* fix(developer): force ES3 code generation for LMs (#7927)
+
+## 16.0.127 beta 2022-12-21
+
+* fix(oem/fv/android): Fix keyboard version title (again) (#7941)
+* fix(oem/fv/android): Add view permission of online help (#7909)
+* fix(windows): modifer event is always serialized (#7935)
+
+## 16.0.126 beta 2022-12-21
+
+* fix(windows): shutdown fix masked modal result (#7932)
+
+## 16.0.125 beta 2022-12-19
+
+* fix(windows): no languages warning source changed (#7900)
+
+## 16.0.124 beta 2022-12-18
+
+* fix(oem/fv/android): Cleanup version title (#7908)
+
+## 16.0.123 beta 2022-12-17
+
+* fix(linux): Fix dependency of ibus-keyman (#7917)
+
+## 16.0.122 beta 2022-12-14
+
+* fix(windows): modify disable keyboard display (#7898)
+* fix(developer): invalid charmap cell selection when updating to empty search result (#7887)
+
+## 16.0.121 beta 2022-12-11
+
+* chore(linux): Fix `make install` (#7886)
+
 ## 16.0.120 beta 2022-12-07
 
 * chore(linux): Improve package build (#7875)
