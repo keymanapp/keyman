@@ -12,7 +12,10 @@
   <names>
     <name value="TestKbd" />
   </names>
-
+  <keys>
+    <!-- TODO-LDML: this next import is implied and should not need to be explicitly here. #7534 -->
+    <import base="cldr" path="techpreview/keys-Latn-implied.xml" />
+  </keys>
   <layers form="hardware">
     <layer id="base">
       <row keys="a" /> <!-- number row -->
