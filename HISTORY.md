@@ -1,5 +1,45 @@
 # Keyman Version History
 
+## 17.0.21 alpha 2022-12-21
+
+* fix(windows): shutdown fix masked modal result (#7933)
+
+## 17.0.20 alpha 2022-12-19
+
+* chore(android/samples): Remove Sentry dependencies (#7901)
+* chore: Revert "chore(common): Fix shellcheck warnings" (#7925)
+
+## 17.0.19 alpha 2022-12-17
+
+* fix(linux): Fix dependency of ibus-keyman (#7918)
+
+## 17.0.18 alpha 2022-12-16
+
+* chore(common): Fix shellcheck warnings (#7910)
+
+## 17.0.17 alpha 2022-12-15
+
+* chore: merge beta to master (#7885)
+* chore(android): Update Gradle dependencies; targetSDKVersion to 33 (#7897)
+
+## 17.0.16 alpha 2022-12-11
+
+* refactor(linux): Update ibusimcontext.c (#7813)
+
+## 17.0.15 alpha 2022-12-08
+
+* chore(linux): Update vscode settings for Linux (#7876)
+
+## 17.0.14 alpha 2022-12-07
+
+* docs(linux): Move Linux documentation (#7868)
+* chore(linux): Remove building for Bionic (#7873)
+* chore(linux): Remove some shellcheck warnings (#7874)
+
+## 17.0.13 alpha 2022-11-29
+
+* fix(windows): lower case filenames for projects (#7837)
+* refactor(linux): Refactor setting keyboard options  ️ (#7804)
 
 ## 17.0.12 alpha 2022-11-25
 
@@ -55,6 +95,51 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.120 beta 2022-12-07
+
+* chore(linux): Improve package build (#7875)
+
+## 16.0.119 beta 2022-12-05
+
+* chore: Change platform advocates (#7867)
+
+## 16.0.118 beta 2022-12-04
+
+* chore(linux): Update debian changelog (#7860)
+
+## 16.0.117 beta 2022-12-01
+
+* fix(developer): OnlineUpdate crash on shutdown (#7830)
+* fix(developer): EncodeURL was not handling spaces (#7820)
+
+## 16.0.116 beta 2022-11-30
+
+* fix(android/app): Toggle keyboard update notifications for landscape and tablets (#7832)
+* fix(android/engine): Append languageID for keyboard updates (#7807)
+* fix(android/engine): Use FLAG_IMMUTABLE for PendingIntent for Android S+ (#7844)
+
+## 16.0.115 beta 2022-11-29
+
+* fix(windows): Cleanup CEF more correctly in shutdown (#7825)
+* fix(windows): lower case filenames for projects (#7836)
+* chore(linux): Update debian changelog (#7835)
+* chore(linux): Fix upload-to-debian script (#7833)
+
+## 16.0.114 beta 2022-11-28
+
+* fix(mac): Caps processing was not consistent with core (#7795)
+* fix(web): locks page scroll when scrolling lang menu (#7790)
+
+## 16.0.113 beta 2022-11-26
+
+* docs(android/app): Add note of haptic feedback to whatsnew (#7817)
+* fix(developer): remove missing files from MRU list (#7821)
+
+## 16.0.112 beta 2022-11-25
+
+* fix: test builds should always run latest changes (#7806)
+* fix(web): unit test breakages (#7797)
 
 ## 16.0.111 beta 2022-11-24
 

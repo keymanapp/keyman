@@ -67,6 +67,7 @@ type
     function DownloadUpdate(URL: string; var DownloadPath: string): Boolean;
     procedure DoDownloadUpdate(AOwner: TfrmDownloadProgress; var Result: Boolean);
     function DoRun: TOnlineUpdateCheckResult;
+    procedure SyncShowError;
     procedure SyncShowUpdateForm;
     procedure SyncShutDown;
   private
@@ -134,10 +135,10 @@ end;
 destructor TOnlineUpdateCheck.Destroy;
 begin
   if (FErrorMessage <> '') and not FSilent and FShowErrors then
-    ShowMessage(FErrorMessage);
+    Synchronize(SyncShowError);
 
   if FParams.Result = oucShutDown then
-    SyncShutDown;
+    Synchronize(SyncShutDown);
 
   KL.Log('TOnlineUpdateCheck.Destroy: FErrorMessage = '+FErrorMessage);
   KL.Log('TOnlineUpdateCheck.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
@@ -289,6 +290,11 @@ begin
     if Assigned(Application.MainForm) then
       Application.MainForm.Close;
   end;
+end;
+
+procedure TOnlineUpdateCheck.SyncShowError;
+begin
+  ShowMessage(FErrorMessage);
 end;
 
 function TOnlineUpdateCheck.DoRun: TOnlineUpdateCheckResult;

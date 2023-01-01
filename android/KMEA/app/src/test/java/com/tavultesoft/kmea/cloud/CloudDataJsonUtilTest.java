@@ -53,4 +53,38 @@ public class CloudDataJsonUtilTest {
     Assert.assertEquals("str-latn", lmInfo.getLanguageID());
   }
 
+  @Test
+  public void cloudLinkIsNewer_false() {
+    // Cloud KMP link invalid
+    Assert.assertFalse(CloudDataJsonUtil.cloudLinkIsNewer(null, null));
+    Assert.assertFalse(CloudDataJsonUtil.cloudLinkIsNewer(null, ""));
+
+    // KMPs don't match
+    Assert.assertFalse(CloudDataJsonUtil.cloudLinkIsNewer(
+      "https://keyman.com/go/package/download/keyboard/sil_cameroon_azerty?version=6.0.4&update=1",
+      "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.8&update=1"));
+
+    // Cloud KMP link is older or equal
+    Assert.assertFalse(CloudDataJsonUtil.cloudLinkIsNewer(
+      "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.8&update=1",
+      "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.4&update=1"));
+
+    Assert.assertFalse(CloudDataJsonUtil.cloudLinkIsNewer(
+      "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.8&update=1",
+      "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.8&update=1"));
+  }
+
+  @Test
+  public void cloudLinkIsNewer_true() {
+    // updateKMP link is null or empty
+    Assert.assertTrue(CloudDataJsonUtil.cloudLinkIsNewer(
+      null, "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.8&update=1"));
+    Assert.assertTrue(CloudDataJsonUtil.cloudLinkIsNewer(
+      "", "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.8&update=1"));
+
+    // Cloud KMP link is newer
+    Assert.assertTrue(CloudDataJsonUtil.cloudLinkIsNewer(
+      "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.4&update=1",
+      "https://keyman.com/go/package/download/keyboard/sil_cameroon_qwerty?version=6.0.8&update=1"));
+  }
 }

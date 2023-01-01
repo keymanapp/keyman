@@ -91,6 +91,9 @@ function run_tests() {
     fi
   fi
 
+  echo "NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!"
+  echo ""
+
   if [ "$DISPLAY_SERVER" == "wayland" ]; then
     if ! can_run_wayland; then
       # support for --headless got added in mutter 40.x
