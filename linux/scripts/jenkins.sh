@@ -70,7 +70,7 @@ rm -rf $sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 echo_heading "Make source package for $fullsourcename"
 echo_heading "reconfigure"
-JENKINS="yes" TIER="$tier" ./scripts/reconf.sh $sourcename
+TIER="$tier" ./scripts/reconf.sh $sourcename
 
 echo_heading "Make origdist"
 ./scripts/dist.sh origdist $sourcename
