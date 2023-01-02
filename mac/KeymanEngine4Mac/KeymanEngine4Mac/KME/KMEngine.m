@@ -278,8 +278,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                 DWORD kMask = mask;
                 if (self.debugMode)
                     NSLog(@"Has shift flags: %X", key.shiftFlags);
-                //DWORD flags = key.shiftFlags & 0x0FFF;
-                if ((key.shiftFlags & NOTCAPITALFLAG) && !(kMask & CAPITALFLAG))
+                if ((kMask & CAPITALFLAG) == 0)
                     kMask |= NOTCAPITALFLAG;
                 if ((key.shiftFlags & K_CTRLFLAG) && (kMask & LCTRLFLAG)) {
                     kMask |= K_CTRLFLAG;
@@ -305,7 +304,11 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     NSLog(@"mFlag = %X", mFlag);
                     NSLog(@"mMask = %X", mMask);
                 }
-                if ((kMask & CAPITALFLAG && key.shiftFlags & CAPITALFLAG) || (!(kMask & CAPITALFLAG) && !(key.shiftFlags & CAPITALFLAG))) {
+                // If key.shiftFlags has neither CAPITALMASK nor NOTCAPITALMASK,
+                // we ignore Caps state, otherwise Caps state must match
+                // precisely
+                if ((key.shiftFlags & K_CAPITALMASK) == 0 || 
+                        (key.shiftFlags & K_CAPITALMASK) == (kMask & K_CAPITALMASK)) {
                     if (mMask == mFlag) {
                         if (!key.context.length) {
                             mKey = key;

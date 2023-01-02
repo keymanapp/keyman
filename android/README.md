@@ -11,6 +11,11 @@ Keyman for Android (formerly named KMAPro) can be built from a command line (pre
 
 Building Keyman Web is a precursor for compiling KMEA, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
 
+When attempting to build via Android Studio the first time, you'll also need to accept the SDK licenses. Depending on your OS, you may need to run a command line similar to:
+```bash
+yes | ~/Library/Android/sdk/tools/bin/sdkmanager --licenses
+```
+
 ### Crash Reporting
 Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server https://sentry.keyman.com. The analytics for Debug are associated with an App Bundle ID `com.tavultesoft.kmapro.debug`.
  
@@ -110,8 +115,7 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
 4. Check that the `android{}` object, includes the following:
 ```gradle
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 33
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
@@ -134,14 +138,13 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.3.0-rc01'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
+    implementation 'com.google.android.material:material:1.6.0'
     api (name:'keyman-engine', ext:'aar')
-    implementation 'io.sentry:sentry-android:4.3.0'
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.preference:preference:1.2.0'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
-    implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
+    implementation ('com.github.kenglxn.QRGen:android:2.7.0') {
         transitive = true
     }
 }

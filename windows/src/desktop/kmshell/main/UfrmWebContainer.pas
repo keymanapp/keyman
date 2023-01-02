@@ -60,6 +60,7 @@ type
     FDialogName: WideString;
     FCanClose: Boolean;
     FIsClosing: Boolean;
+    FLastModalResult: Integer;
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
@@ -189,6 +190,7 @@ begin
     begin
       FIsClosing := True;
       Result := FInitializeCEF.StartShutdown(CEFShutdownComplete);
+      FLastModalResult := ModalResult;
     end
     else
       Result := FCanClose;
@@ -199,7 +201,9 @@ procedure TfrmWebContainer.CEFShutdownComplete(Sender: TObject);
 begin
 //  OutputDebugString(PChar('TfrmKeymanDeveloper.CEFShutdownComplete'));
   FCanClose := True;
-  Close;
+  if FLastModalResult <> 0
+    then ModalResult := FLastModalResult
+    else Close;
 end;
 
 

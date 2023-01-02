@@ -26,6 +26,8 @@ import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.util.DependencyUtil;
+import com.tavultesoft.kmea.util.DependencyUtil.LibraryType;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
@@ -44,7 +46,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     public void onCreate() {
         super.onCreate();
 
-        if (!Sentry.isEnabled()) {
+        if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
             Log.d(TAG, "Initializing Sentry");
             SentryAndroid.init(getApplicationContext());
         }
