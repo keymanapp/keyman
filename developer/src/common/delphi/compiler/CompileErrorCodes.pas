@@ -165,6 +165,7 @@ const
 
   CERR_DuplicateGroup                              = $4071;
   CERR_DuplicateStore                              = $4072;
+  CERR_RepeatedBegin                               = $4073;
 
   CWARN_TooManyWarnings                            = $2080;
   CWARN_OldVersion                                 = $2081;

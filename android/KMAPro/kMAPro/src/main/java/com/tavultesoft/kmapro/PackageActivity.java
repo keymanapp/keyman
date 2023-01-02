@@ -59,17 +59,20 @@ public class PackageActivity extends AppCompatActivity implements
 
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
-    if (bundle != null) {
-      kmpFile = new File(bundle.getString("kmpFile"));
-      if (!kmpFile.exists()) {
-        showErrorToast(kmpFile.getAbsolutePath() + " not found. Unable to extract");
-        return;
-      }
-      installMode = KmpInstallMode.fromString(bundle.getString("installMode"));
-      languageID = bundle.getString("language", null);
-      if (languageID != null && !languageID.isEmpty()) {
-        languageList.add(languageID);
-      }
+    if (bundle == null) {
+      showErrorToast("No bundle for PackageActivity");
+      return;
+    }
+
+    kmpFile = new File(bundle.getString("kmpFile"));
+    if (!kmpFile.exists()) {
+      showErrorToast(kmpFile.getAbsolutePath() + " not found. Unable to extract");
+      return;
+    }
+    installMode = KmpInstallMode.fromString(bundle.getString("installMode"));
+    languageID = bundle.getString("language", null);
+    if (languageID != null && !languageID.isEmpty()) {
+      languageList.add(languageID);
     }
 
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);

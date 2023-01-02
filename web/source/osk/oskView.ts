@@ -367,20 +367,20 @@ namespace com.keyman.osk {
     protected get parsedBaseFontSize(): ParsedLengthStyle {
       if(!this._baseFontSize) {
         let keymanweb = com.keyman.singleton;
-        this._baseFontSize = this.defaultFontSize(this.device, keymanweb.isEmbedded);
+        this._baseFontSize = OSKView.defaultFontSize(this.device, this.computedHeight, keymanweb.isEmbedded);
       }
 
       return this._baseFontSize;
     }
 
-    public defaultFontSize(device: utils.DeviceSpec, isEmbedded: boolean): ParsedLengthStyle {
+    public static defaultFontSize(device: utils.DeviceSpec, computedHeight: number, isEmbedded: boolean): ParsedLengthStyle {
       if(device.touchable) {
         const fontScale = device.formFactor == 'phone'
           ? 1.6 * (isEmbedded ? 0.65 : 0.6) * 1.2  // Combines original scaling factor with one previously applied to the layer group.
           : 2; // iPad or Android tablet
         return ParsedLengthStyle.special(fontScale, 'em');
       } else {
-        return this.computedHeight ? ParsedLengthStyle.inPixels(this.computedHeight / 8) : undefined;
+        return computedHeight ? ParsedLengthStyle.inPixels(computedHeight / 8) : undefined;
       }
     }
 
@@ -507,9 +507,6 @@ namespace com.keyman.osk {
         bs.height = 'auto';
         bs.maxWidth = bs.maxHeight = '';
       }
-
-      let keyman = com.keyman.singleton;
-      keyman.alignInputs();
     }
 
     public refreshLayoutIfNeeded(pending?: boolean) {
@@ -567,23 +564,13 @@ namespace com.keyman.osk {
       }
       // END:  construction of the actual internal layout for the overall OSK
 
-      // Correct the classname for the (inner) OSK frame (Build 360)
-      var kbdID: string = (this.activeKeyboard ? this.activeKeyboard.id.replace('Keyboard_','') : '');
-
-      if(kbdID.indexOf('::') != -1) { // We used to also test if we were in embedded mode, but... whatever.
-        // De-namespaces the ID for use with CSS classes.
-        // Assumes that keyboard IDs may not contain the ':' symbol.
-        kbdID = kbdID.substring(kbdID.indexOf('::') + 2);
-      }
-
-      const kbdClassSuffix = ' kmw-keyboard-' + kbdID;
-      kbdView.element.className = kbdView.element.className + kbdClassSuffix;
-
       this.banner.appendStyles();
 
       if(this.vkbd) {
         // Create the key preview (for phones)
         this.vkbd.createKeyTip();
+        // Create the globe hint (for embedded contexts; has a stub for other contexts)
+        this.vkbd.createGlobeHint();
 
         // Append a stylesheet for this keyboard for keyboard specific styles
         // or if needed to specify an embedded font
@@ -605,7 +592,10 @@ namespace com.keyman.osk {
       if((this.vkbd && this.vkbd.layerId != newValue) || source.value != newValue) {
         // Prevents console errors when a keyboard only displays help.
         // Can occur when using SHIFT with sil_euro_latin on a desktop form-factor.
-        if(this.vkbd) {
+        //
+        // Also, only change the layer ID itself if there is an actual corresponding layer
+        // in the OSK.
+        if(this.vkbd?.layerGroup.layers[newValue]) {
           this.vkbd.layerId = newValue;
           // Ensure that the layer's spacebar is properly captioned.
           this.vkbd.showLanguage();
@@ -1081,6 +1071,20 @@ namespace com.keyman.osk {
      * Description  Wrapper function to add and identify OSK-specific event handlers
      */
     ['addEventListener'](event: string, func: (obj) => boolean) {
+      // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless
+      // a site designer uses these events, we disable / hide them until an event is attached.
+      let titleBar = this.headerView;
+      if(titleBar && titleBar instanceof layouts.TitleBar) {
+        switch(event) {
+          case 'configclick':
+            titleBar.configEnabled = true;
+            break;
+          case 'helpclick':
+            titleBar.helpEnabled = true;
+            break;
+        }
+      }
+
       return com.keyman.singleton.util.addEventListener('osk.'+event, func);
     }
   }

@@ -71,15 +71,13 @@ implementation
 
 uses
   System.Classes,
-  System.Math,
   System.Win.Registry,
-  Vcl.Graphics,
   Winapi.Windows,
 
   BCP47Tag,
   Keyman.Developer.System.ImportKeyboardDLL,
+  Keyman.Developer.System.GenerateKeyboardIcon,
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter,
-  Keyman.System.Util.RenderLanguageIcon,
   Keyman.System.KeyboardUtils,
   KeymanVersion,
   KeyboardParser,
@@ -370,48 +368,8 @@ end;
 
 function TImportWindowsKeyboard.GenerateIcon(
   const IconFilename: string): Boolean;
-var
-  FTag: string;
-  n: Integer;
-  ico: TIcon;
-  b: array[0..1] of Vcl.Graphics.TBitmap;
-  iconInfo: TIconInfo;
 begin
-  // We need to use the BCP47 tag that we have received and render that, for now
-
-  n := Min(Pos(' ', FBCP47Tags), Pos('-', FBCP47Tags));
-  if n > 0
-    then FTag := Copy(FBCP47Tags, 1, n-1)
-    else FTag := FBCP47Tags;
-
-  b[0] := Vcl.Graphics.TBitmap.Create;
-  b[1] := Vcl.Graphics.TBitmap.Create;
-  try
-    b[0].SetSize(16, 16);
-    b[0].PixelFormat := pf32bit;
-
-    b[1].SetSize(16, 16);
-    b[1].PixelFormat := pf1bit;
-    b[1].Canvas.Brush.Color := clBlack;
-    b[1].Canvas.FillRect(Rect(0,0,16,16));
-
-    DrawLanguageIcon(b[0].Canvas, 0, 0, UpperCase(FTag));
-    ico := TIcon.Create;
-    try
-      FillChar(iconInfo, sizeof(iconInfo), 0);
-      iconInfo.fIcon := True;
-      iconInfo.hbmMask := b[1].Handle;
-      iconInfo.hbmColor := b[0].Handle;
-      ico.Handle := CreateIconIndirect(iconInfo);
-      ico.SaveToFile(IconFilename);
-    finally
-      ico.Free;
-    end;
-    Result := True;
-  finally
-    b[0].Free;
-    b[1].Free;
-  end;
+  Result := TKeyboardIconGenerator.GenerateIcon(FBCP47Tags, IconFilename, 0);
 end;
 
 function TImportWindowsKeyboard.ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;

@@ -2,7 +2,7 @@
 #
 # ibus-keyman - The Keyman engine for IBus
 #
-# Copyright (c) 2009-2018 SIL International
+# Copyright (c) 2009-2022 SIL International
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,10 +29,10 @@ m4_define(ibus_maybe_datestamp,
 m4_define([ibus_version],
     ibus_major_version.ibus_minor_version.ibus_micro_version[]ibus_maybe_datestamp)
 
-AC_INIT([ibus-keyman], m4_esyscmd_s([cat VERSION]), [https://github.com/keymanapp/keyman/issues/new])
+AC_INIT([ibus-keyman],[m4_esyscmd_s(cat VERSION)],[https://github.com/keymanapp/keyman/issues/new])
 
 AM_INIT_AUTOMAKE
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -40,13 +40,13 @@ AC_CONFIG_MACRO_DIR([m4])
 # define PACKAGE_VERSION_* variables
 AM_SANITY_CHECK
 AM_MAINTAINER_MODE
-AM_DISABLE_STATIC
+AC_DISABLE_STATIC([])
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_CXX
-AC_ISC_POSIX
-AC_HEADER_STDC
-AM_PROG_LIBTOOL
+AC_SEARCH_LIBS([strerror],[cposix])
+
+LT_INIT
 
 # check ibus
 PKG_CHECK_MODULES(IBUS, [
@@ -63,19 +63,12 @@ PKG_CHECK_MODULES(X11, [
   x11 >= 1.6
 ])
 
-# check atkspi 2.0
-#PKG_CHECK_MODULES(ATSPI, [
-#    atspi-2 >= 2.0
-#])
-
-
 # check Json glib
 PKG_CHECK_MODULES(JSON_GLIB, [
     json-glib-1.0 >= 1.0
 ])
 
 # check Keyman keyboard processor
-
 PKG_CHECK_MODULES(KEYMAN_PROC, [
     keyman_kmn_processor >= 0.0.0
 ])
@@ -92,6 +85,16 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Define to the read-only 
 
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION(0.19.7)
+
+# check if it's a patched ibus
+SAV_CFLAGS="$CFLAGS"
+CFLAGS="$IBUS_CFLAGS $CFLAGS"
+AC_CHECK_DECLS([IBUS_PREFILTER_MASK, IBUS_CAP_PREFILTER],
+    [AC_DEFINE(IBUS_HAS_PREFILTER, 1, [Does ibus support the prefilter flag])],
+    [],
+    [[#include <ibus.h>]]
+)
+CFLAGS="$SAV_CFLAGS"
 
 
 # OUTPUT files

@@ -157,7 +157,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     FFFFFFFFFFFF}
   KeyPreview = True
   Position = poDefaultSizeOnly
-  OnKeyUp = FormKeyUp
   ExplicitWidth = 1043
   ExplicitHeight = 831
   PixelsPerInch = 96
@@ -920,7 +919,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
               Text = 'editKeyOutputText'
               OnChange = editKeyOutputTextChange
               OnClick = editKeyOutputTextClick
-              OnKeyDown = editKeyOutputTextKeyDown
               OnKeyUp = editKeyOutputTextKeyUp
             end
             object editKeyOutputCode: TEdit
@@ -932,7 +930,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
               Text = 'editKeyOutputCode'
               OnChange = editKeyOutputCodeChange
               OnClick = editKeyOutputCodeClick
-              OnKeyDown = editKeyOutputTextKeyDown
               OnKeyUp = editKeyOutputTextKeyUp
             end
             object chkSplitCtrlAlt: TCheckBox
@@ -1052,42 +1049,65 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
     object pageIncludeCodes: TTabSheet
       Caption = 'Char Codes'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedJS: TTabSheet
       Caption = 'Embedded JS'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedCSS: TTabSheet
       Caption = 'Embedded CSS'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWHelp: TTabSheet
       Caption = 'Embedded Help'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
-      object Panel1: TPanel
+      object sbCompile: TScrollBox
         Left = 0
         Top = 0
         Width = 950
         Height = 645
         Align = alClient
+        BevelInner = bvNone
         BevelOuter = bvNone
+        BorderStyle = bsNone
         Color = 14211288
-        ParentBackground = False
+        ParentColor = False
         TabOrder = 0
+        OnMouseWheel = sbDetailsMouseWheel
         object lblCongrats: TLabel
           Left = 10
           Top = 13

@@ -142,9 +142,6 @@ describe('Engine - Browser Interactions', function() {
 
     it('Simple Keypress', function() {
       var inputElem = document.getElementById('singleton');
-      if(inputElem['kmw_ip']) {
-        inputElem = inputElem['kmw_ip'];
-      }
 
       var lao_s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
       var lao_s_event = new KMWRecorder.PhysicalInputEventSpec(lao_s_key_json);
@@ -160,9 +157,6 @@ describe('Engine - Browser Interactions', function() {
 
     it('Simple OSK click', function() {
       var inputElem = document.getElementById('singleton');
-      if(inputElem['kmw_ip']) {
-        inputElem = inputElem['kmw_ip'];
-      }
 
       var lao_s_osk_json = {"type": "osk", "keyID": 'shift-K_S'};
       var lao_s_event = new KMWRecorder.OSKInputEventSpec(lao_s_osk_json);

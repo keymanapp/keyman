@@ -11,11 +11,19 @@ def getVersionCode = { ->
     String env_version_minor = System.getenv("VERSION_MINOR")
     String env_version_patch = System.getenv("VERSION_PATCH")
     if(env_version_patch != null && env_version_minor != null && env_version_patch != null) {
-        // Version code is, for 14.1.33: 1410033. This supports up to 9999 builds for a
-        // given major.minor version. We only support up to 9 minor versions for a given
-        // major version but at present we are not using minor versions at all.
+        // Version code is, for 17.1.33: 1810033. This supports up to 9999
+        // builds for a given major.minor version. We only support up to 9 minor
+        // versions for a given major version but at present we are not using
+        // minor versions at all.
+        //
+        // Despite this calculation, the version_code should be treated as an
+        // opaque integer, used only for Play Store publishing.
+        //
+        // NOTE: accidental publish of beta 17.0.6 during 16.0 beta cycle has
+        // forced a version_major bump, which is a permanent change. Relates to
+        // #7705.
         Integer version_code =
-            env_version_major.toInteger() * 100000 +
+            (env_version_major.toInteger() + 1) * 100000 +
             env_version_minor.toInteger() * 10000 +
             env_version_patch.toInteger()
         println "Using version code " + version_code
@@ -61,4 +69,7 @@ ext {
     VERSION_CODE=getVersionCode()
     VERSION_NAME=getVersionName()
     VERSION_ENVIRONMENT=getVersionEnvironment()
+    VERSION_TAG=System.getenv("VERSION_TAG")
 }
+
+//println "version.gradle: VERSION_TAG: " + VERSION_TAG

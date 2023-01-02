@@ -44,6 +44,8 @@
     <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Sabuntawa</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Kasa shiga rumbun bayanan keyman!</string>
     <!-- Context: Keyboard Updates -->
@@ -82,6 +84,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">Kuskure a yaren %1$s:%2$s for %3$s madanni.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Duba ƙamus mai alaƙa domin a sauke</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Ana son sauke sabon nau\'in wannan ƙamus?</string>
     <!-- Context: No associated dictionary found -->
@@ -124,16 +127,25 @@
     <string name="uninstall_model" comment="Label to uninstall a dictionary">Ƙamus ɗin da aka cire</string>
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Ana son a goge wannan ƙamus ɗin?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">An shigar da madannin %1$s</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Damar gyare-gyare</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Damar hasashe</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Ƙamus</string>
+    <plurals name="model_count">
+        <item quantity="one">Dictionary</item>
+        <item quantity="other">Dictionaries</item>
+    </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Bincika ƙamus ɗin da ke akwai</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Ƙamus: %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -155,4 +167,6 @@
     <!-- Context: Shared preferences name -->
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Danna nan domin canza madannai</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
 </resources>

@@ -204,6 +204,7 @@ type
     panWindowsLanguages: TPanel;
     panFeatures: TPanel;
     sbDetails: TScrollBox;
+    sbCompile: TScrollBox;
     gridFeatures: TStringGrid;
     cmdAddFeature: TButton;
     cmdRemoveFeature: TButton;
@@ -234,7 +235,6 @@ type
     lblISOLang: TLabel;
     editEthnologueCode: TEdit;
     cmdISOLang_Lookup: TButton;
-    Panel1: TPanel;
     lblCongrats: TLabel;
     panBuildWindows: TPanel;
     lblInstallHint: TLabel;
@@ -281,8 +281,6 @@ type
     procedure editNameChange(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
     procedure editMessageChange(Sender: TObject);
-    procedure FormKeyUp(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure FormDestroy(Sender: TObject);
     procedure cmdRunTutorialClick(Sender: TObject);
     procedure mnuViewUnderlyingLayoutClick(Sender: TObject);
@@ -298,8 +296,6 @@ type
     procedure kbdLayoutDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
     procedure kbdLayoutDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure editKeyOutputTextKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure editKeyOutputTextKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure chkLayoutDisplay102KeyClick(Sender: TObject);
@@ -353,11 +349,6 @@ type
 
     FKeyboardParser: TKeyboardParser;
     FCurrentRule: TKeyboardParser_LayoutRule;
-
-    FControlDown: Boolean;  // True when Ctrl has been held down.
-
-    //FCurrentShiftState: TExtShiftState;
-    //FCurrentVKey: Integer;
 
     frameOSK: TframeOnScreenKeyboardEditor;
 
@@ -513,6 +504,8 @@ type
     procedure DebugUpdateExecutionPoint(Sender: TObject; ALine: Integer);
 
     function HasSubfilename(const Filename: string): Boolean; override;   // I4081
+
+    procedure ControlKeyPressedAndReleased; override;
 
     procedure FindError(const Filename: string; s1: string; line: Integer); override;   // I4081
     procedure RefreshOptions; override;
@@ -689,31 +682,6 @@ begin
   FreeAndNil(FDebugForm);
   FreeAndNil(FCheckboxGridHelper);
   UninitSystemKeyboard;
-end;
-
-procedure TfrmKeymanWizard.FormKeyUp(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  inherited;
-
-  if FControlDown and (Key = VK_CONTROL) and (Pages.ActivePage = pageLayout) and (pagesLayout.ActivePage = pageLayoutDesign) then
-  begin
-    Key := 0;
-    with TfrmSelectKey.Create(Application.MainForm) do
-    try
-      DistinguishLeftRight := chkSplitCtrlAlt.Checked;
-      if ShowModal = mrOk then
-      begin
-        kbdLayout.ShiftState := ShiftState;
-        Layout_SetAllKeyDetails;
-        SelectVKey(VKey);
-      end;
-    finally
-      Free;
-    end;
-  end;
-
-  FControlDown := False;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1453,32 +1421,8 @@ begin
   DoUpdateCharacterMap;
 end;
 
-procedure TfrmKeymanWizard.editKeyOutputTextKeyDown(Sender: TObject;
-  var Key: Word; Shift: TShiftState);
-begin
-  FControlDown := (Key = VK_CONTROL) and (Pages.ActivePage = pageLayout) and (pagesLayout.ActivePage = pageLayoutDesign) and (Shift = [ssCtrl]);
-end;
-
 procedure TfrmKeymanWizard.editKeyOutputTextKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if FControlDown and (Key = VK_CONTROL) and (Pages.ActivePage = pageLayout) and (pagesLayout.ActivePage = pageLayoutDesign) then
-  begin
-    Key := 0;
-    with TfrmSelectKey.Create(Application.MainForm) do
-    try
-      DistinguishLeftRight := chkSplitCtrlAlt.Checked;
-      if ShowModal = mrOk then
-      begin
-        kbdLayout.ShiftState := ShiftState;
-        Layout_SetAllKeyDetails;
-        SelectVKey(VKey);
-      end;
-    finally
-      Free;
-    end;
-  end;
-
-  FControlDown := False;
   DoUpdateCharacterMap;
 end;
 
@@ -2111,8 +2055,6 @@ var
 begin
   Result := False;
 
-  FControlDown := False;   // I4680
-
   if not IsInParserMode then   // I4557
     MoveSourceToParser(True);
 
@@ -2378,6 +2320,31 @@ begin
       );
 
   // TODO: other file types
+end;
+
+procedure TfrmKeymanWizard.ControlKeyPressedAndReleased;
+var
+  frmSelectKey: TfrmSelectKey;
+begin
+  if (Pages.ActivePage = pageLayout) and (pagesLayout.ActivePage = pageLayoutDesign) then
+  begin
+    frmSelectKey := TfrmSelectKey.Create(Application.MainForm);
+    try
+      frmSelectKey.DistinguishLeftRight := chkSplitCtrlAlt.Checked;
+      if frmSelectKey.ShowModal = mrOk then
+      begin
+        kbdLayout.ShiftState := frmSelectKey.ShiftState;
+        Layout_SetAllKeyDetails;
+        SelectVKey(frmSelectKey.VKey);
+      end;
+    finally
+      frmSelectKey.Free;
+    end;
+  end
+  else if Pages.ActivePage = pageOnScreenKeyboard then
+  begin
+    frameOSK.ControlKeyPressedAndReleased;
+  end;
 end;
 
 procedure TfrmKeymanWizard.UpdateControls(UpdateLRShift: Boolean);   // I4137
@@ -3231,8 +3198,7 @@ procedure TfrmKeymanWizard.sbDetailsMouseWheel(Sender: TObject;
   Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
   var Handled: Boolean);   // I4082
 begin
-  //inherited;
-  sbDetails.VertScrollBar.Position := sbDetails.VertScrollBar.Position - WheelDelta div 2;
+  (Sender as TScrollBox).VertScrollBar.Position := (Sender as TScrollBox).VertScrollBar.Position - WheelDelta div 2;
   Handled := True;
 end;
 

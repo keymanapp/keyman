@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Nederlands</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Installatie</string>
+  <string name="ssTitle">Installeer $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION is succesvol geïnstalleerd.</string>
+  <string name="ssCancelQuery">Weet u zeker dat u de installatie van $APPNAME wilt annuleren?</string>
+  <string name="ssBootstrapExtractingBundle">Bundel extraheren...</string>
+  <string name="ssBootstrapCheckingPackages">Pakketten controleren...</string>
+  <string name="ssBootstrapCheckingForUpdates">Online controleren op updates...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Geïnstalleerde versies controleren...</string>
+  <string name="ssBootstrapReady">Beëindig ...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s voor %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Er is niets te installeren.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s download)</string>
+  <string name="ssActionInstall">Installatie wordt geïnstalleerd:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION is gratis en open source</string>
+  <string name="ssLicenseLink">&amp;Lees de licentie</string>
+  <string name="ssInstallOptionsLink">Installeren &amp;opties</string>
+  <string name="ssMessageBoxTitle">$APPNAME Installatie</string>
+  <string name="ssOkButton">Ok</string>
+  <string name="ssInstallButton">&amp;Installeren</string>
+  <string name="ssCancelButton">annuleren</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Installeren $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Oude versies verwijderen</string>
+  <string name="ssStatusComplete">Installatie voltooid</string>
+  <string name="ssQueryRestart">U moet Windows herstarten voordat de installatie kan worden voltooid. Wanneer u Windows herstart, gaat de installatie.
+
+Nu herstarten?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows kon niet automatisch worden herstart. U moet Windows opnieuw opstarten voordat u $APPNAME probeert te starten.</string>
+  <string name="ssMustRestart">U moet Windows herstarten om de installatie te voltooien. Als u Windows opnieuw opstart, zal de setup voltooid zijn.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION vereist Windows 7 of hoger om te installeren. Echter, Keyman Desktop 7, 8 of 9 is gedetecteerd. Wilt u de toetsenborden die in deze installatie zijn inbegrepen in de geïnstalleerde Keyman Desktop versie installeren?</string>
+  <string name="ssOldOsVersionDownload">Deze versie van $APPNAME vereist Windows 7 of hoger om te installeren. Wilt u Keyman Desktop 8 downloaden?</string>
+  <string name="ssOptionsTitle">Installatie opties</string>
+  <string name="ssOptionsTitleInstallOptions">Installatie opties</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Standaard $APPNAME instellingen</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Modules voor het installeren of upgraden</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Gekoppelde Toetsenbordtaal</string>
+  <string name="ssOptionsTitleLocation">Te installeren versie</string>
+  <string name="ssOptionsStartWithWindows">$APPNAME starten wanneer Windows start</string>
+  <string name="ssOptionsStartAfterInstall">Start $APPNAME wanneer de installatie is voltooid</string>
+  <string name="ssOptionsCheckForUpdates">Controleer regelmatig op updates online</string>
+  <string name="ssOptionsUpgradeKeyboards">Upgrade toetsenborden geïnstalleerd met oudere versies naar versie $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Deel anonieme gebruiksstatistieken met keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup versie: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Installeer $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Verbeter $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s is al geïnstalleerd.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Download versie %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Versie %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Installeren %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Download versie %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Versie %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Selecteer de taal die je wilt associëren met %0:s toetsenbord</string>
+  <string name="ssOptionsDefaultLanguage">Standaard taal</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Downloaden %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Downloaden %0:s</string>
+  <string name="ssOffline">De $APPNAME -installatie kon geen verbinding maken met keyman.com om aanvullende bronnen te downloaden.
+
+Controleer of u online bent en geef $APPNAME Setup toestemming om het internet te openen in uw firewall instellingen.
+
+Klik op Afbreken om Setup, Probeer opnieuw en download resources opnieuw of Negeren om offline door te gaan.</string>
+</resources>

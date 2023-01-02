@@ -126,9 +126,7 @@ BASE_PATH=`dirname $BASH_SOURCE`
 cd $BASE_PATH/../source
 
 # Compile our testing dependencies; make sure the script fails if compilation fails!
-./build_dev_resources.sh || fail "Dev resource compilation failed."
-cd ../tools/recorder
-./build.sh || fail "KMW recorder-module compilation failed."
+../tools/build.sh || fail "Dev resource compilation failed."
 
 # Run our headless tests first.
 

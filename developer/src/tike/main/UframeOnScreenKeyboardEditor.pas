@@ -192,6 +192,7 @@ type
     procedure Load;
     procedure Save;
     procedure UpdateControls;
+    procedure ControlKeyPressedAndReleased;
     procedure SetFocus; override;
     property UnderlyingLayout: HKL read GetUnderlyingLayout write SetUnderlyingLayout;
     property CodeFont: TFont read GetCodeFont write SetCodeFont;
@@ -217,6 +218,7 @@ uses
   ExtShiftState,
   KeymanDeveloperOptions,
   kmxfile,
+  UfrmSelectKey,
   UfrmVisualKeyboardExportBMPParams,
   UfrmVisualKeyboardExportHTMLParams,
   UfrmVisualKeyboardImportKMX,
@@ -767,6 +769,28 @@ begin
     FVK.Header.UnderlyingLayout := FSystemKeyboardName;
     VK_UpdateUnderlyingLayoutCaption;
   end; *)
+end;
+
+procedure TframeOnScreenKeyboardEditor.ControlKeyPressedAndReleased;
+var
+  frmSelectKey: TfrmSelectKey;
+begin
+  frmSelectKey := TfrmSelectKey.Create(Application.MainForm);
+  try
+    frmSelectKey.DistinguishLeftRight := chkVKSplitCtrlAlt.Checked;
+    if frmSelectKey.ShowModal = mrOk then
+    begin
+      kbdOnScreen.ShiftState := frmSelectKey.ShiftState;
+      kbdOnScreen.SelectedKey := kbdOnScreen.Keys.ItemsByUSVK[frmSelectKey.VKey];
+      if kbdOnScreen.SelectedKey = nil then kbdOnScreen.SelectedKey := kbdOnScreen.Keys[0]; // I2584
+      FVKCurrentKey := nil;
+      VK_SetAllKeyDetails;
+      VK_SelectVKey;
+      VK_FocusKey;
+    end;
+  finally
+    frmSelectKey.Free;
+  end;
 end;
 
 procedure TframeOnScreenKeyboardEditor.editVKKeyTextChange(Sender: TObject);

@@ -52,6 +52,13 @@ interface ConfigMessage {
    * The platform's supported capabilities.
    */
   capabilities: Capabilities;
+
+  /**
+   * An optional flag to enable 'test mode'.
+   *
+   * At present, this just disables the correction algorithm's timeout when set to `true`.
+   */
+  testMode?: boolean
 }
 
 interface ModelFile {

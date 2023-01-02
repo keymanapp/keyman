@@ -168,7 +168,7 @@ type
     procedure Refresh;
 
     { IKeymanCustomisationAccess }
-    function KeymanCustomisation: IKeymanCustomisation;
+    function KeymanCustomisation: IKeymanCustomisation; safecall;
   public
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
