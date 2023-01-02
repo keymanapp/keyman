@@ -2,9 +2,8 @@
 
 # autoreconf autotool projects
 
-# parameters: [BUILD_LEGACY=1] [JENKINS="yes"] ./reconf.sh [proj]
+# parameters: [BUILD_LEGACY=1] ./reconf.sh [proj]
 # BUILD_LEGACY=1 to also build legacy KMFL projects
-# JENKINS="yes" to set version for jenkins builds
 # proj = only reconf this project
 
 set -e
