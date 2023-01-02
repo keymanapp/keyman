@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+@@keys: [K_BKQUOTE]
+@@expected: \u0061
+-->
+
+<!--
 from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
 
 -->
