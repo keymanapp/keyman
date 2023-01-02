@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.22 alpha 2023-01-02
+
+* chore: merge beta to master (A17S2) (#7948)
+* chore(linux): Remove unused JENKINS parameter (#7920)
+
 ## 17.0.21 alpha 2022-12-21
 
 * fix(windows): shutdown fix masked modal result (#7933)
