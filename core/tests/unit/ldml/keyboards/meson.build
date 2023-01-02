@@ -10,6 +10,10 @@ tests = [
   'k_001_tiny',
   'k_002_tinyu32',
   'k_003_transform',
+  'k_010_mt',
+  'k_100_keytest',
+  'k_101_keytest',
+  'k_102_keytest',
 ]
 
 # Setup kmc

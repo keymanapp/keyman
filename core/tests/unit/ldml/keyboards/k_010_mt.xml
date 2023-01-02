@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+@@keys: [K_B][K_O][K_N][K_LBRKT][K_U][K_SPACE][K_S][K_A][K_RBRKT][K_RBRKT][K_A]
+@@expected: \u0062\u006f\u006e\u0121\u0075\u0020\u0073\u0061\u0127\u0127\u0061
+
+Note:
+    "bonġu saħħa".split('').map(s=>`\\u${s.codePointAt(0).toString(16)}`).join('')
+Gets part of the way,
+
+    Based on mt.xml from CLDR.  'TODO-LDML' denotes modifications.
+    Note this is the 47-key version.
+-->
+<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
+<keyboard locale="mt" conformsTo="techpreview">
+    <locales>
+        <!-- English is also an official language in Malta.-->
+        <locale id="en" />
+    </locales>
+    <info author="Steven R. Loomis" normalization="NFC" layout="QWERTY" indicator="MT" />
+
+    <names>
+        <name value="Maltese (47-key)" />
+        <!-- <name value="MSA 100:2002" /> -->
+    </names>
+
+    <keys>
+        <!-- imports -->
+        <!-- TODO-LDML: Added next: see #7964 -->
+        <import base="cldr" path="techpreview/keys-Latn-implied.xml"/>
+        <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
+        <!-- TODO-LDML: Added next: see #7964 -->
+        <key id="space" to=" " width="5" />
+        <!-- TODO-LDML: added next -->
+        <key id="asterisk" to="*" />
+        <!-- accent grave -->
+        <key id="a-grave" to="à" />
+        <key id="A-grave" to="À" />
+        <key id="e-grave" to="è" />
+        <key id="E-grave" to="È" />
+        <key id="i-grave" to="ì" />
+        <key id="I-grave" to="Ì" />
+        <key id="o-grave" to="ò" />
+        <key id="O-grave" to="Ò" />
+        <key id="u-grave" to="ù" />
+        <key id="U-grave" to="Ù" />
+
+        <!-- tikka and maqtua -->
+        <key id="c-tikka" to="ċ" />
+        <key id="C-tikka" to="Ċ" />
+        <key id="g-tikka" to="ġ" />
+        <key id="G-tikka" to="Ġ" />
+        <key id="h-maqtugha" to="ħ" /> <!-- maqtugħa, i.e. cut -->
+        <key id="H-maqtugha" to="Ħ" /> <!-- maqtugħa, i.e. cut -->
+        <key id="z-tikka" to="ż" />
+        <key id="Z-tikka" to="Ż" />
+
+        <!-- Cedilla -->
+        <key id="c-cedilla" to="ç" />
+
+        <!-- gaps -->
+        <key id="gap" gap="true" width="1" />
+    </keys>
+
+
+    <!-- TODO-LDML: This has been modified to be the US 47-key format.
+        See MSA 100:2002, Appendix, figure A.1 -->
+
+    <layers form="hardware" hardware="us">
+        <layer modifier="none">
+            <row keys="c-tikka 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
+            <row keys="q w e r t y u i o p g-tikka h-maqtugha z-tikka" />
+            <row keys="a s d f g h j k l semi-colon apos" />
+            <row keys="z x c v b n m comma period slash" />
+            <row keys="space" />
+        </layer>
+
+        <layer modifier="shift">
+            <row keys="C-tikka bang at euro dollar percent caret amp asterisk open-paren close-paren underscore plus" />
+            <row keys="Q W E R T Y U I O P G-tikka H-maqtugha Z-tikka" />
+            <row keys="A S D F G H J K L colon double-quote" />
+            <row keys="Z X C V B N M open-angle close-angle question" />
+            <row keys="space" />
+        </layer>
+
+        <layer modifier="altR">
+            <row keys="grave gap gap pound gap gap gap gap gap gap gap gap gap" />
+            <row keys="gap gap e-grave gap gap gap u-grave i-grave o-grave gap open-square close-square backslash" />
+            <row keys="a-grave gap gap gap gap gap gap gap gap gap gap" />
+            <row keys="gap gap gap gap gap gap gap gap gap gap" />
+            <row keys="space" />
+        </layer>
+
+        <layer modifier="altR-shift">
+            <row keys="tilde gap gap gap gap gap gap gap gap gap gap gap gap" />
+            <row keys="gap gap E-grave gap gap gap U-grave I-grave O-grave gap open-curly close-curly pipe" />
+            <row keys="A-grave gap gap gap gap gap gap gap gap gap gap" />
+            <row keys="gap gap gap gap gap gap gap gap gap gap" />
+            <row keys="space" />
+        </layer>
+    </layers>
+</keyboard>
