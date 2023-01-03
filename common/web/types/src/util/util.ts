@@ -16,12 +16,14 @@ export function boxXmlArray(o: any, x: string): void {
   }
 }
 
-const MATCH_HEX_ESCAPE = /\\u{([0-9a-fA-F]{1,5})}/g;
+const MATCH_HEX_ESCAPE = /\\u{([0-9a-fA-F]{1,6})}/g;
 
 export function unescapeString(s: string): string {
-  if(!s) return s;
+  if(!s) {
+    return s;
+  }
 
   s = s.replaceAll(MATCH_HEX_ESCAPE, (str,hex) => String.fromCodePoint(Number.parseInt(hex, 16)));
 
-  return s; // null imp
+  return s;
 }
