@@ -18,7 +18,7 @@
       <row keys="Q W" />
       <row keys="Q W" />
       <row keys="Q W" />
-      <row keys="Q W" />
+      <row keys="Q" />  <!-- space row -->
       <row keys="Q W" />
     </layer>
   </layers>
