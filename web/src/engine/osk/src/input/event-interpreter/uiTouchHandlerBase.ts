@@ -9,27 +9,33 @@ import { getAbsoluteY } from 'keyman/engine/dom-utils';
  * same method blocks native handling of overflow scrolling for touch browsers.
  */
 class ScrollState {
-  // While we don't currently track y-coordinates here, the class is designed
-  // to permit tracking them with minimal extra effort if we ever decide to do so.
-  x: number;
   totalLength = 0;
+
+  baseCoord: InputEventCoordinate;
+  curCoord: InputEventCoordinate;
+  baseScrollLeft: number;
 
   // The amount of coordinate 'noise' allowed during a scroll-enabled touch allowed
   // before interpreting the currently-ongoing touch command as having scrolled.
   static readonly HAS_SCROLLED_FUDGE_FACTOR = 10;
 
-  constructor(coord: InputEventCoordinate) {
-    this.x = coord.x;
+  constructor(coord: InputEventCoordinate, baseScrollLeft: number) {
+    this.baseCoord = coord;
+    this.curCoord = coord;
+    this.baseScrollLeft = baseScrollLeft;
 
     this.totalLength = 0;
   }
 
-  updateTo(coord: InputEventCoordinate): {deltaX: number} {
-    let x = this.x;
-    this.x = coord.x;
+  updateTo(coord: InputEventCoordinate): {scrollLeft: number} {
+    let prevCoord = this.curCoord;
+    this.curCoord = coord;
 
-    let deltas = {deltaX: this.x - x};
-    this.totalLength += Math.abs(deltas.deltaX);
+    let deltas = {
+      scrollLeft: this.baseCoord.x - this.curCoord.x + this.baseScrollLeft
+    };
+    // Track the total amount of scrolling used, even if just a pixel-wide back and forth wiggle.
+    this.totalLength += Math.abs(this.curCoord.x - prevCoord.x);
 
     return deltas;
   }
@@ -230,6 +236,10 @@ export default abstract class UITouchHandlerBase<Target extends HTMLElement> {
     return false;
   }
 
+  protected onScrollLeftUpdate(val: number) {
+    this.scroller.scrollLeft = val;
+  }
+
   touchStart(coord: InputEventCoordinate) {
     // Determine the selected Target, manage state.
     this.currentTarget = this.findBestTarget(coord);
@@ -245,7 +255,9 @@ export default abstract class UITouchHandlerBase<Target extends HTMLElement> {
     }
 
     // Establish scroll tracking.
-    this.scrollTouchState = new ScrollState(coord);
+    if(this.scroller) {
+      this.scrollTouchState = new ScrollState(coord, this.scroller.scrollLeft);
+    }
 
     // Alright, Target acquired!  Now to use it:
 
@@ -338,11 +350,9 @@ export default abstract class UITouchHandlerBase<Target extends HTMLElement> {
     }
 
     if(this.scrollTouchState != null) {
-      // TODO:  Work on smoothing this out; looks like subpixel scroll info gets rounded out,
-      // and this results in a mild desync.
-      let deltaX = this.scrollTouchState.updateTo(coord).deltaX;
       if(this.scroller) {
-        this.scroller.scrollLeft -= deltaX;
+        const scrollUpdate = this.scrollTouchState.updateTo(coord);
+        this.onScrollLeftUpdate(scrollUpdate.scrollLeft);
       }
 
       return;
