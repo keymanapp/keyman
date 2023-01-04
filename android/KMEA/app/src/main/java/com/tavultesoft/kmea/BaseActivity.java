@@ -49,6 +49,21 @@ public class BaseActivity extends AppCompatActivity {
     }
   }
 
+  /**
+   * Some classes aren't an AppCompatActivity and need this helper to retrieve localized Strings
+   * in the updated locale.
+   * @param defaultContext - the context to fallback if localUpdatedContext is null
+   * @param resID - the resource ID of the string
+   * @return String - localized string
+   */
+  public static String getString(Context defaultContext, int resID) {
+    Context context = (localeUpdatedContext != null) ? localeUpdatedContext : defaultContext;
+    if (context != null) {
+      return context.getString(resID);
+    };
+    return "";
+  }
+
   @Override
   protected void attachBaseContext(Context newBase) {
     // Override the app locale using the BCP 47 tag from shared preferences
