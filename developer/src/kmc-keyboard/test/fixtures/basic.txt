@@ -280,7 +280,7 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   00 00 00 00                       #   KMX_DWORD vkey
   index(strNull,strKey1,2)          #   KMXPLUS_STR 'U+0127'
   01 00 00 00                       #   KMX_DWORD (flags: extend)
-  index(strNull,strHmaqtugha,2)       #   KMXPLUS_STR 'hmaqtugha'
+  index(strNull,strHmaqtugha,2)     #   KMXPLUS_STR 'hmaqtugha'
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
   01 00 00 00 # TODO: index(listNull,indexAe,4)         #   LIST longPress 'a e'
@@ -354,7 +354,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   00 00 00 00                       #   KMX_DWORD key index
   02 00 00 00                       #   KMX_DWORD count
   # keys
-  index(strNull,strHmaqtugha,2)       #   KMXPLUS_STR locale;       // 'hmaqtugha'
+  index(strNull,strHmaqtugha,2)     #   KMXPLUS_STR locale;       // 'hmaqtugha'
   index(strNull,strThat,2)          #   KMXPLUS_STR locale;       // 'that'
 
 # ----------------------------------------------------------------------------------------------------
