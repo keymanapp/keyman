@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString} from '../../src/util/util.js';
+import {unescapeString, UnescapeError} from '../../src/util/util.js';
 
 describe('test unescapeString()', function() {
   it("should pass through falsy strings", function() {
@@ -19,11 +19,15 @@ describe('test unescapeString()', function() {
   });
 
   it("should correctly handle 1..6 char escapes", function() {
-    assert.equal(unescapeString('\\u{9}'),     '\t');
-    assert.equal(unescapeString('\\u{4a}'),    'J');
-    assert.equal(unescapeString('\\u{3c8}'),   'ψ');
-    assert.equal(unescapeString('\\u{304B}'),  'か');
-    assert.equal(unescapeString('\\u{1e109}'), '\u{1e109}');
-    assert.equal(unescapeString('\\u{10fff0}'), '\u{10fff0}');
+    assert.equal(unescapeString('\\u{9}'),      '\u{0009}');   // TAB
+    assert.equal(unescapeString('\\u{4a}'),     '\u{004a}');   // J
+    assert.equal(unescapeString('\\u{3c8}'),    '\u{03c8}');   // ψ
+    assert.equal(unescapeString('\\u{304B}'),   '\u{304b}');   // か
+    assert.equal(unescapeString('\\u{1e109}'),  '\u{1e109}');  // 𞄉
+    assert.equal(unescapeString('\\u{10fff0}'), '\u{10fff0}'); // Plane 16 Private Use
+  });
+
+  it("should throw UnescapeError on invalid escapes", function() {
+    assert.throws(() => unescapeString('\\u{110000}'), UnescapeError);
   });
 });
