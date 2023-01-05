@@ -312,8 +312,13 @@ export class List extends Section {
     if(s === undefined || s === null) {
       s = '';
     }
-    // TODO-LDML: support unicode escaping etc
     return this.allocList(strs, s.split(' '));
+  }
+  allocListFromEscapedSpaces(strs: Strs, s?: string): ListItem {
+    if(s === undefined || s === null) {
+      s = '';
+    }
+    return this.allocList(strs, s.split(' ').map(unescapeString));
   }
   /**
    * Return a List object referring to the string list.

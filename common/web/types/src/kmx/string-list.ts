@@ -53,6 +53,6 @@ export class ListItem extends Array<ListIndex> {
     }
   }
   toString(): string {
-    return this.map(v => v.value.value).toString();
+    return this.map(v => v.value.value).join(' ');
   }
 };

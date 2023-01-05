@@ -45,7 +45,7 @@ export class Key2Compiler extends SectionCompiler {
 
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
-        const to = sections.strs.allocString(lkflick.to);
+        const to = sections.strs.allocAndUnescapeString(lkflick.to);
         flags |= constants.key2_flick_flags_extend;
         let directions : ListItem = sections.list.allocListFromSpaces(sections.strs, lkflick.directions);
         flicks.flicks.push({
@@ -71,12 +71,12 @@ export class Key2Compiler extends SectionCompiler {
         flags |= constants.key2_key_flags_notransform;
       }
       const id = sections.strs.allocString(key.id);
-      const longPress : ListItem = sections.list.allocListFromSpaces(sections.strs, key.longPress);
-      const longPressDefault = sections.strs.allocString(key.longPressDefault);
-      const multiTap : ListItem = sections.list.allocListFromSpaces(sections.strs, key.multiTap);
+      const longPress : ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.longPress);
+      const longPressDefault = sections.strs.allocAndUnescapeString(key.longPressDefault);
+      const multiTap : ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.multiTap);
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
       flags |= constants.key2_key_flags_extend;
-      const to = sections.strs.allocString(key.to); // TODO-LDML: single char
+      const to = sections.strs.allocAndUnescapeString(key.to); // TODO-LDML: single char
       const width = Math.ceil((key.width || 1) * 10.0);  // default, width=1
       const vkey: any = 0; // TODO-LDML: fill in later
       sect.keys.push({
