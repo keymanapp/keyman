@@ -133,6 +133,14 @@ export class StrsItem {
 export class Strs extends Section {
   strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
   /**
+   * Allocate a StrsItem given the string, unescaping if necessary.
+   * @param s escaped string
+   * @returns
+   */
+  allocAndUnescapeString(s?: string): StrsItem {
+    return this.allocString(unescapeString(s));
+  }
+  /**
    * Allocate a StrsItem given the string.
    * @param s string
    * @returns
@@ -146,8 +154,6 @@ export class Strs extends Section {
     if(typeof s !== 'string') {
       throw new Error('alloc_string: s must be a string, undefined, or null.');
     }
-
-    s = unescapeString(s);
 
     let result = this.strings.find(item => item.value === s);
     if(result === undefined) {

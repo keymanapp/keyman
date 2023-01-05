@@ -36,12 +36,12 @@ export class DispCompiler extends SectionCompiler {
     let result = new Disp();
 
     // displayOptions
-    result.baseCharacter = sections.strs.allocString(this.keyboard.displays?.displayOptions?.baseCharacter);
+    result.baseCharacter = sections.strs.allocAndUnescapeString(this.keyboard.displays?.displayOptions?.baseCharacter);
 
     // displays
     result.disps = this.keyboard.displays?.display.map(display => ({
-      to: sections.strs.allocString(display.to),
-      display: sections.strs.allocString(display.display),
+      to: sections.strs.allocAndUnescapeString(display.to),
+      display: sections.strs.allocAndUnescapeString(display.display),
     })) || [];
 
     result.disps.sort((a: DispItem, b: DispItem) => a.to.compareTo(b.to));
