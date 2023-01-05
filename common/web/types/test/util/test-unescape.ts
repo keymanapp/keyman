@@ -3,6 +3,10 @@ import {assert} from 'chai';
 import {unescapeString, UnescapeError} from '../../src/util/util.js';
 
 describe('test unescapeString()', function() {
+  it.skip("should correctly handle multi strings", function() {
+    assert.equal(unescapeString('Sa\\u{0127 0127}a'), 'Saħħa');
+  });
+
   it("should pass through falsy strings", function() {
     assert.equal(unescapeString(''), '');
     assert.equal(unescapeString(null), null);
@@ -10,6 +14,7 @@ describe('test unescapeString()', function() {
 
   it("should pass through non-escaped strings", function() {
     assert.equal(unescapeString('abc'), 'abc');
+    assert.equal(unescapeString('\\u{abc'), '\\u{abc');
   });
 
   it("should correctly unescape strings", function() {
