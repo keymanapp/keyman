@@ -16,7 +16,11 @@ export function boxXmlArray(o: any, x: string): void {
   }
 }
 
-const MATCH_HEX_ESCAPE = /\\u{((?:(?:[0-9a-fA-F]{1,5})|(?:10[0-9a-fA-F]{4})(?: (?!}))?)+)}/g;
+// TODO-LDML: #7569 the below regex works, but captures more than it should
+// (it would include \u{fffffffffffffffff } which
+// is overlong and has a space at the end.) The second regex does not work yet.
+const MATCH_HEX_ESCAPE = /\\u{([0-9a-fA-F ]{1,})}/g;
+// const MATCH_HEX_ESCAPE = /\\u{((?:(?:[0-9a-fA-F]{1,5})|(?:10[0-9a-fA-F]{4})(?: (?!}))?)+)}/g;
 
 export class UnescapeError extends Error {
 }

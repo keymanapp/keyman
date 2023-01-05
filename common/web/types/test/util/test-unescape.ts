@@ -3,7 +3,7 @@ import {assert} from 'chai';
 import {unescapeString, UnescapeError} from '../../src/util/util.js';
 
 describe('test unescapeString()', function() {
-  it.skip("should correctly handle multi strings", function() {
+  it("should correctly handle multi strings", function() {
     assert.equal(unescapeString('Sa\\u{0127 0127}a'), 'Saħħa');
   });
 
