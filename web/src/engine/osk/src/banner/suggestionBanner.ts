@@ -525,6 +525,7 @@ class SuggestionExpandContractAnimation {
   private option: BannerSuggestion;
 
   private collapsedScrollLeft: number;
+  private originalScrollLeft: number;
 
   private startTimestamp: number;
   private pendingAnimation: number;
@@ -535,6 +536,7 @@ class SuggestionExpandContractAnimation {
     this.scrollContainer = scrollContainer;
     this.option = option;
     this.collapsedScrollLeft = scrollContainer.scrollLeft;
+    this.originalScrollLeft  = scrollContainer.scrollLeft;
   }
 
   public setBaseScroll(val: number) {
@@ -554,18 +556,61 @@ class SuggestionExpandContractAnimation {
     if(!this.scrollContainer) {
       return;
     }
-    const baseScrollOffset = this.option.currentWidth - this.option.collapsedWidth;
 
-    // TODO:  clamping logic
+    // -- Clamping logic --
 
-    let finalTargetScrollLeft = this.collapsedScrollLeft + baseScrollOffset;
-    this.scrollContainer.scrollLeft = finalTargetScrollLeft;
+    // As currently written / defined below, "clamping" refers to alterations to scroll-positioned mapping designed
+    // to keep as much of the expanded option visible as possible via the offsets below while not pushing
+    // already-obscured parts of the expanded option into visible range.
+    //
+    // In essence, it's an extra offset we apply that is dynamically adjusted depending on scroll position as it changes.
+    // This offset may be decreased when it is no longer needed to make parts of the element visible.
 
-    // Prevent "jitters" during counterscroll that occur on expansion / collapse animation.
+    // The amount of extra space being taken by a partially or completely expanded suggestion.
+    const maxWidthToCounterscroll = this.option.currentWidth - this.option.collapsedWidth;
+
+    // How much space existed to the left of the collapsed option in its original position.  May be negative.
+    const originalCounterscrollBuffer = this.option.div.offsetLeft - this.originalScrollLeft;
+    // TODO:  RTL version
+
+    // Only allow a negative buffer in the final positioning if it already existed.
+    // And only as much as originally existed.
+    const srcCounterscrollOverflow = -Math.min(originalCounterscrollBuffer, 0);  // positive offset into overflow-land.
+
+    // Base position for scrollLeft clamped within std element scroll bounds, including:
+    // - an adjustment to cover the extra width from expansion
+    // - preserving the base expected overflow levels
+    const unclampedExpandingScrollOffset = Math.max(this.collapsedScrollLeft + maxWidthToCounterscroll, 0) - srcCounterscrollOverflow;
+    const srcUnclampedExpandingScrollOffset = Math.max(this.originalScrollLeft + maxWidthToCounterscroll, 0) - srcCounterscrollOverflow;
+    // TODO:  RTL versions / calculations + logic
+
+    // // Huh - first bugless version didn't actually end up using this.
+    // const collapsedScrollLeftDelta = this.originalScrollLeft - (unclampedExpandingScrollOffset - maxWidthToCounterscroll + srcCounterscrollOverflow); //  neg if touchpoint moving left,
+    //                                                                                                                      //  pos if touchpoint moving right
+    //                                                                                                                      //  - scroll moves opposite ("natural")
+    // // TODO:  May need a similar thing for RTL handling.
+
+    // Do not shift an element clipped by the screen border further than its original scroll starting point.
+    const elementLeftOffsetForClamping = Math.min(unclampedExpandingScrollOffset, srcUnclampedExpandingScrollOffset);
+
+    // Based on the scroll point selected, determine how far to offset scrolls to keep the option in visible range.
+    // Higher .scrollLeft values make this non-zero and reflect when scroll has begun clipping the element.
+    const elementLeftOffsetFromBorder = Math.max(elementLeftOffsetForClamping - this.option.div.offsetLeft, 0);
+
+    const clampedExpandingScrollOffset = Math.min(maxWidthToCounterscroll, elementLeftOffsetFromBorder);
+
+    const clampedScrollLeft = unclampedExpandingScrollOffset  // base scroll-coordinate transform mapping based on extra width from element expansion
+                              - clampedExpandingScrollOffset  // offset to scroll to put word-start border against the corresponding screen border, fully visible
+                              + srcCounterscrollOverflow;     // offset to maintain original overflow past that border if it existed
+
+    // -- Final step: Apply & fine-tune the final scroll positioning --
+    this.scrollContainer.scrollLeft = clampedScrollLeft;
+
+  // Prevent "jitters" during counterscroll that occur on expansion / collapse animation.
     // A one-frame "error correction" effect at the end of animation is far less jarring.
     if(this.pendingAnimation) {
       // scrollLeft doesn't work well with fractional values, unlike marginLeft / marginRight
-      let fractionalOffset = this.scrollContainer.scrollLeft - finalTargetScrollLeft
+      const fractionalOffset = this.scrollContainer.scrollLeft - clampedScrollLeft;
       // So we put the fractional difference into marginLeft to force it to sync.
       this.option.currentWidth += fractionalOffset;
     }
