@@ -1,8 +1,10 @@
-// import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { Strs, StrsItem } from './kmx-plus.js';
 
 export class ListIndex {
-  value: StrsItem; // will become index into Strs table
+  readonly value: StrsItem; // will become index into Strs table
+  constructor(value: StrsItem) {
+    this.value = value;
+  }
   isEqual(a: ListIndex | string) {
     // so we can compare this to a string
     return a.toString() === this.toString();
@@ -20,8 +22,7 @@ export class ListItem extends Array<ListIndex> {
     }
 
     for (const str of source) {
-        let index = new ListIndex();
-        index.value = strs.allocString(str);
+        let index = new ListIndex(strs.allocString(str));
         this.push(index);
     }
   }

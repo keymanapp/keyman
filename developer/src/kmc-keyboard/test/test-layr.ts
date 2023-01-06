@@ -3,7 +3,6 @@ import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
-// import { CompilerMessages } from '../src/compiler/messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 import Layr = KMXPlus.Layr;

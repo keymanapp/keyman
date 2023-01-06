@@ -297,9 +297,7 @@ export class List extends Section {
    * @returns a List object
    */
   allocListFromSpaces(strs: Strs, s?: string): ListItem {
-    if(s === undefined || s === null) {
-      s = '';
-    }
+    s = s ?? '';
     // TODO-LDML: support unicode escaping etc
     return this.allocList(strs, s.split(' '));
   }

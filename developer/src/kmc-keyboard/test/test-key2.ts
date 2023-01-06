@@ -3,7 +3,6 @@ import { assert } from 'chai';
 import { Key2Compiler } from '../src/compiler/key2.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
-// import { CompilerMessages } from '../src/compiler/messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 import Key2 = KMXPlus.Key2;
@@ -30,7 +29,7 @@ describe('key2', function () {
     const [q] = key2.keys.filter(({ id }) => id.value === 'q');
     assert.ok(q);
     assert.isFalse(!!(q.flags & constants.key2_key_flags_gap));
-    assert.equal(q.width, 32); // ceil(3.1 * 10)
+    assert.equal(q.width, 32); // ceil(3.14159 * 10.0)
     assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
 
     const [flick0] = key2.flicks.filter(({ id }) => id.value === 'flick0');

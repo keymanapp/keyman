@@ -1,8 +1,8 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { /*KeyFlags,*/ KMXPlusData } from "../kmx-plus.js";
+import { KMXPlusData } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
-import { /*build_list_index*/ BUILDER_LIST } from "./build-list.js";
+import { BUILDER_LIST } from "./build-list.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 /* ------------------------------------------------------------------

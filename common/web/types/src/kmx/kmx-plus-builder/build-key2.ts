@@ -53,7 +53,7 @@ export interface BUILDER_KEY2 extends BUILDER_SECTION {
 };
 
 export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_KEY2 {
-  if(!kmxplus.key2.keys.length &&
+  if(kmxplus.key2.keys.length == 0 &&
       (kmxplus.key2.flicks.length <= 1)) { // if no keys and only the 'null' flick.
     return null;
   }
@@ -76,7 +76,7 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   // flicks first
   // sort the input, to simplify bookkeeping later
   kmxplus.key2.flicks.sort((a, b) => a.compareTo(b));
-  // we always need a flicks=0 to mena 'no flicks'
+  // we always need a flicks=0 to mean 'no flicks'
   key2.flicks = kmxplus.key2.flicks.map((flicks) => {
     let result : BUILDER_KEY2_FLICKS = {
       count: flicks.flicks.length,
