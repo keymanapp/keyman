@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data;
+package com.keyman.engine.data;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,21 +6,21 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.BuildConfig;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadCallback;
-import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadReturns;
-import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.packages.JSONUtils;
-import com.tavultesoft.kmea.util.BCP47;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.VersionUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.BuildConfig;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.R;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.impl.CloudCatalogDownloadCallback;
+import com.keyman.engine.cloud.impl.CloudCatalogDownloadReturns;
+import com.keyman.engine.cloud.CloudDataJsonUtil;
+import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.packages.JSONUtils;
+import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.VersionUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;

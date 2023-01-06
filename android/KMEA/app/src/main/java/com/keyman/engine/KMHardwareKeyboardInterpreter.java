@@ -2,9 +2,9 @@
  * Copyright (C) 2017 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
-import com.tavultesoft.kmea.KMScanCodeMap;
+import com.keyman.engine.KMScanCodeMap;
 import android.content.Context;
 import android.view.KeyEvent;
 

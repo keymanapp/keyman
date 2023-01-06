@@ -2,7 +2,7 @@
  * Copyright (C) 2021 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import java.io.BufferedInputStream;
 import java.io.File;

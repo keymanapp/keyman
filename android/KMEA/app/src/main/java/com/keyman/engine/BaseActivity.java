@@ -2,7 +2,7 @@
  * Copyright (C) 2021 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -15,7 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.tavultesoft.kmea.util.ContextUtils;
+import com.keyman.engine.util.ContextUtils;
 
 import java.util.Locale;
 

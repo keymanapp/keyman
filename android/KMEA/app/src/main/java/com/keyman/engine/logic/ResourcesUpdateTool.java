@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.logic;
+package com.keyman.engine.logic;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -20,15 +20,15 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationCompat.Builder;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardEventHandler;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.VersionUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KeyboardEventHandler;
+import com.keyman.engine.R;
+import com.keyman.engine.data.CloudRepository;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.VersionUtils;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

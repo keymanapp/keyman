@@ -2,9 +2,9 @@
  * Copyright (C) 2021 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
-import com.tavultesoft.kmea.util.ZipUtils;
+import com.keyman.engine.util.ZipUtils;
 
 import org.junit.Assert;
 import org.junit.Assume;

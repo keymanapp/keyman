@@ -1,22 +1,22 @@
-package com.tavultesoft.kmea.cloud;
+package com.keyman.engine.cloud;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.tavultesoft.kmea.JSONParser;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.MapCompat;
+import com.keyman.engine.JSONParser;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.R;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.data.LexicalModel;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.MapCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;

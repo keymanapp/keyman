@@ -2,7 +2,7 @@
  * Copyright (C) 2021 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -27,11 +27,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.FileProviderUtils;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.HelpFile;
-import com.tavultesoft.kmea.util.WebViewUtils;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.util.FileProviderUtils;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.HelpFile;
+import com.keyman.engine.util.WebViewUtils;
 
 import java.io.File;
 

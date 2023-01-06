@@ -2,7 +2,7 @@
  * Copyright (C) 2017 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -62,27 +62,27 @@ import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
-import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
-import com.tavultesoft.kmea.packages.JSONUtils;
-import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.BCP47;
-import com.tavultesoft.kmea.util.CharSequenceUtil;
-import com.tavultesoft.kmea.util.DependencyUtil;
-import com.tavultesoft.kmea.util.DependencyUtil.LibraryType;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.MapCompat;
-import com.tavultesoft.kmea.util.WebViewUtils;
+import com.keyman.engine.KeyboardEventHandler.EventType;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.cloud.CloudDataJsonUtil;
+import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.data.Dataset;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.logic.ResourcesUpdateTool;
+import com.keyman.engine.packages.JSONUtils;
+import com.keyman.engine.packages.LexicalModelPackageProcessor;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.CharSequenceUtil;
+import com.keyman.engine.util.DependencyUtil;
+import com.keyman.engine.util.DependencyUtil.LibraryType;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.MapCompat;
+import com.keyman.engine.util.WebViewUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -336,12 +336,12 @@ public final class KMManager {
   /**
    * Extract KMEA tier from versionName. Uses parameter so we can unit test.
    * @param versionName String - If not provided, determine tier from
-   *                    com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME
+   *                    com.keyman.engine.BuildConfig.KEYMAN_ENGINE_VERSION_NAME
    * @return Tier (ALPHA, BETA, STABLE)
    */
   public static Tier getTier(String versionName) {
     if (versionName == null || versionName.isEmpty()) {
-      versionName = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
+      versionName = com.keyman.engine.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     }
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+)-(alpha|beta|stable).*");
     Matcher matcher = pattern.matcher(versionName);
@@ -362,7 +362,7 @@ public final class KMManager {
    */
   public static String getMajorVersion() {
     // Regex needs to match the entire string
-    String appVersion = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
+    String appVersion = com.keyman.engine.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+)\\.\\d+.*");
     Matcher matcher = pattern.matcher(appVersion);
     if (matcher.matches() && matcher.groupCount() >= 1) {
@@ -378,7 +378,7 @@ public final class KMManager {
    */
   public static String getVersion() {
     // Regex needs to match the entire string
-    String appVersion = com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
+    String appVersion = com.keyman.engine.BuildConfig.KEYMAN_ENGINE_VERSION_NAME;
     Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+).*");
     Matcher matcher = pattern.matcher(appVersion);
     if (matcher.matches() && matcher.groupCount() >= 1) {

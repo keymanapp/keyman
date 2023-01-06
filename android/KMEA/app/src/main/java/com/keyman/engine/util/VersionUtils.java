@@ -1,9 +1,9 @@
 /**
  * Copyright (C) 2022 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
-import com.tavultesoft.kmea.BuildConfig;
+import com.keyman.engine.BuildConfig;
 
 /**
  * Utilities to determine if a build is local or a test (PR) build.

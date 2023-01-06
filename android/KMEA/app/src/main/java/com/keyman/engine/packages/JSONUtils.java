@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.packages;
+package com.keyman.engine.packages;
 
 import android.util.Log;
 
@@ -7,10 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Map;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.JSONParser;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.JSONParser;
+import com.keyman.engine.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;

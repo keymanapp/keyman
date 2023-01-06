@@ -1,9 +1,9 @@
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 
-import com.tavultesoft.kmea.data.Keyboard;
+import com.keyman.engine.data.Keyboard;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -97,7 +97,7 @@ public class KMManagerTest {
     tier = KMManager.getTier(versionName);
     Assert.assertEquals(KMManager.Tier.STABLE, tier);
 
-    // If versionName is null or blank, tier based on com.tavultesoft.kmea.BuildConfig.KEYMAN_ENGINE_VERSION_NAME
+    // If versionName is null or blank, tier based on com.keyman.engine.BuildConfig.KEYMAN_ENGINE_VERSION_NAME
     // But we can't test for it.
 
     // If regex fails, tier is stable

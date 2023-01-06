@@ -1,8 +1,8 @@
-package com.tavultesoft.kmea.packages;
+package com.keyman.engine.packages;
 
 import android.util.Log;
 
-import com.tavultesoft.kmea.JSONParser;
+import com.keyman.engine.JSONParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;

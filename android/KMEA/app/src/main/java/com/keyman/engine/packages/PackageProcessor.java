@@ -1,19 +1,19 @@
 /**
  * Copyright (C) 2017-2020 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmea.packages;
+package com.keyman.engine.packages;
 
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.JSONParser;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.ZipUtils;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.JSONParser;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.ZipUtils;
 
 import java.io.File;
 import java.io.FileFilter;

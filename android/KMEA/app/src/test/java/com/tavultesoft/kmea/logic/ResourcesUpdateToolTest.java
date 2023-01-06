@@ -1,11 +1,11 @@
-package com.tavultesoft.kmea.logic;
+package com.keyman.engine.logic;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.tavultesoft.kmea.R;
+import com.keyman.engine.R;
 
 import org.junit.Assert;
 import org.junit.Assume;

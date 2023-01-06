@@ -1,9 +1,9 @@
-package com.tavultesoft.kmea.cloud;
+package com.keyman.engine.cloud;
 
-import com.tavultesoft.kmea.JSONParser;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.packages.JSONUtils;
+import com.keyman.engine.JSONParser;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.LexicalModel;
+import com.keyman.engine.packages.JSONUtils;
 
 import org.json.JSONArray;
 import org.junit.Assert;

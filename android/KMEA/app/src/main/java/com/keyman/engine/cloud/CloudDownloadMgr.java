@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.cloud;
+package com.keyman.engine.cloud;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -8,7 +8,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.util.Log;
 
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.util.KMLog;
 
 import java.io.File;
 import java.util.HashMap;

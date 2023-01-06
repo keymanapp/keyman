@@ -1,6 +1,6 @@
-package com.tavultesoft.kmea.packages;
+package com.keyman.engine.packages;
 
-import com.tavultesoft.kmea.KMManager;
+import com.keyman.engine.KMManager;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;

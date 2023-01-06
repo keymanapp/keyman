@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import java.util.Locale;
 

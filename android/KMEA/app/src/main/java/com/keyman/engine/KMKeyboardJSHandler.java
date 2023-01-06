@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import android.content.Context;
 import android.os.Build;

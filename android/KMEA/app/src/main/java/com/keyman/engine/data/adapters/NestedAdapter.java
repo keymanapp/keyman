@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data.adapters;
+package com.keyman.engine.data.adapters;
 
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -7,7 +7,7 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.util.KMLog;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

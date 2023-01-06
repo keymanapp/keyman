@@ -2,19 +2,19 @@
  * Copyright (C) 2020 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea.data;
+package com.keyman.engine.data;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.tavultesoft.kmea.JSONParser;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.util.BCP47;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.MapCompat;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.JSONParser;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.MapCompat;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

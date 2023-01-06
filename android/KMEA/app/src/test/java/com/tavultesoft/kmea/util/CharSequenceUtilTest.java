@@ -1,11 +1,11 @@
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
-import com.tavultesoft.kmea.util.CharSequenceUtil;
+import com.keyman.engine.util.CharSequenceUtil;
 
 @RunWith(RobolectricTestRunner.class)
 public class CharSequenceUtilTest {

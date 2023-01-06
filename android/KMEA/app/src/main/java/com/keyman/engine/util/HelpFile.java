@@ -2,7 +2,7 @@
  * Copyright (C) 2021 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import android.content.ClipData;
 import android.content.ClipDescription;
@@ -13,11 +13,11 @@ import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.util.FileProviderUtils;
-import com.tavultesoft.kmea.util.FileUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.R;
+import com.keyman.engine.util.FileProviderUtils;
+import com.keyman.engine.util.FileUtils;
 
 import java.io.File;
 import java.io.FileFilter;

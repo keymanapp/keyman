@@ -1,16 +1,16 @@
 /**
  * Copyright (C) 2020 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import android.net.Uri;
 import android.os.Build;
 
-import com.tavultesoft.kmea.BuildConfig;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.Tier;
-import com.tavultesoft.kmea.util.KMString;
+import com.keyman.engine.BuildConfig;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMManager.Tier;
+import com.keyman.engine.util.KMString;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

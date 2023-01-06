@@ -1,24 +1,24 @@
-package com.tavultesoft.kmea.cloud.impl;
+package com.keyman.engine.cloud.impl;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
-import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.data.LanguageResource;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.VersionUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.R;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.CloudDataJsonUtil;
+import com.keyman.engine.cloud.ICloudDownloadCallback;
+import com.keyman.engine.data.CloudRepository;
+import com.keyman.engine.data.Dataset;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.data.LanguageResource;
+import com.keyman.engine.data.LexicalModel;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.VersionUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

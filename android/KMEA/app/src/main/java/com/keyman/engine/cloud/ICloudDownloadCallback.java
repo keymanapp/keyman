@@ -1,9 +1,9 @@
-package com.tavultesoft.kmea.cloud;
+package com.keyman.engine.cloud;
 
 import android.content.Context;
 
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.CloudDownloadMgr;
 
 /**
  * Interface for {@link CloudDownloadMgr} as callback to do use case specific task.

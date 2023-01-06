@@ -1,19 +1,19 @@
 /**
  * Copyright (C) 2020 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmea.cloud.impl;
+package com.keyman.engine.cloud.impl;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.R;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.CloudDataJsonUtil;
+import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.ICloudDownloadCallback;
+import com.keyman.engine.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;

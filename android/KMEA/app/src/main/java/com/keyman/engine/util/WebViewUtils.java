@@ -1,12 +1,12 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
  */
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import android.content.Context;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.util.KMLog;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

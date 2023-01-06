@@ -2,14 +2,14 @@
  * Copyright (C) 2017 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tavultesoft.kmea.KMManager.KeyboardType;
+import com.keyman.engine.KMManager.KeyboardType;
 
 public final class KeyboardEventHandler {
 

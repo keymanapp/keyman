@@ -2,16 +2,16 @@
  * Copyright (C) 2020 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import android.util.Log;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.BuildConfig;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.util.DependencyUtil;
-import com.tavultesoft.kmea.util.DependencyUtil.LibraryType;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.BuildConfig;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.util.DependencyUtil;
+import com.keyman.engine.util.DependencyUtil.LibraryType;
 
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;

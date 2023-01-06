@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2020 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import android.content.Context;
 

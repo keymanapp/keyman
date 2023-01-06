@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.view;
+package com.keyman.engine.view;
 
 import android.Manifest;
 import android.app.Application;
@@ -8,10 +8,10 @@ import android.util.Log;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.FileUtils;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.util.FileUtils;
 
 import org.json.JSONException;
 import org.junit.Assert;

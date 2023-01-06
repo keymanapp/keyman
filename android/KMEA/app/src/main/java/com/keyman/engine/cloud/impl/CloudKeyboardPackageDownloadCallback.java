@@ -1,21 +1,21 @@
-package com.tavultesoft.kmea.cloud.impl;
+package com.keyman.engine.cloud.impl;
 
 import android.content.Context;
 import android.net.Uri;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardEventHandler;
-import com.tavultesoft.kmea.KmpInstallMode;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
-import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KeyboardEventHandler;
+import com.keyman.engine.KmpInstallMode;
+import com.keyman.engine.R;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.ICloudDownloadCallback;
+import com.keyman.engine.packages.LexicalModelPackageProcessor;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.KMLog;
 
 import org.json.JSONException;
 

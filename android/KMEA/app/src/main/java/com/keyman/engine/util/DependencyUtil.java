@@ -2,7 +2,7 @@
  * Copyright (C) 2022 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 public final class DependencyUtil {
   private static final String TAG = "DependencyUtil";

@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.cloud;
+package com.keyman.engine.cloud;
 
 import android.app.DownloadManager;
 import android.content.Context;
@@ -7,9 +7,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.util.DownloadFileUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.R;
+import com.keyman.engine.util.DownloadFileUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

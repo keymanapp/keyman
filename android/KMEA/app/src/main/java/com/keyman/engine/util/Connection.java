@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import java.io.InputStream;
 import java.io.IOException;

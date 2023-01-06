@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import android.app.DialogFragment;
 import android.content.Context;
@@ -7,20 +7,20 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.impl.CloudKeyboardPackageDownloadCallback;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.CloudDataJsonUtil;
+import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.impl.CloudKeyboardPackageDownloadCallback;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.cloud.impl.CloudLexicalPackageDownloadCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
-import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_MODEL;
+import static com.keyman.engine.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
+import static com.keyman.engine.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_MODEL;
 
 public class KMKeyboardDownloaderActivity extends BaseActivity {
   // Bundle Keys

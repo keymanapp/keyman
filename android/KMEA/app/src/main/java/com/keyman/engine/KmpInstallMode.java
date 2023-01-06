@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 public enum KmpInstallMode {
   Silent,       // Show no UI while installing a package. Errors may be shown as toasts

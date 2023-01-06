@@ -1,7 +1,7 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
  */
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import android.content.Context;
 
@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import com.tavultesoft.kmea.util.WebViewUtils;
+import com.keyman.engine.util.WebViewUtils;
 
 @RunWith(RobolectricTestRunner.class)
 public class WebViewUtilsTest {

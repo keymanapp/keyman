@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.view;
+package com.keyman.engine.view;
 
 import android.content.Intent;
 import android.util.Log;
@@ -7,11 +7,11 @@ import android.widget.ListView;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardInfoActivity;
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.data.Keyboard;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KeyboardInfoActivity;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.R;
+import com.keyman.engine.data.Keyboard;
 
 import org.json.JSONException;
 import org.junit.After;
@@ -184,7 +184,7 @@ public class KeyboardPickerTest {
       // check result intent to be a weblink to open
       Intent actual2 = Shadows.shadowOf(_info).getNextStartedActivity();
       Assert.assertNotNull(actual2);
-      Assert.assertEquals("com.tavultesoft.kmea.KMHelpFileActivity", actual2.getComponent().getClassName());
+      Assert.assertEquals("com.keyman.engine.KMHelpFileActivity", actual2.getComponent().getClassName());
     }
     finally {
       if(_controller2!=null)

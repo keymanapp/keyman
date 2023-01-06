@@ -2,7 +2,7 @@
  * Copyright (C) 2017 SIL International. All rights reserved.
  */
 
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,8 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.tavultesoft.kmea.util.Connection;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.util.Connection;
+import com.keyman.engine.util.KMLog;
 
 public final class JSONParser {
   private final String TAG = "JSONParser";

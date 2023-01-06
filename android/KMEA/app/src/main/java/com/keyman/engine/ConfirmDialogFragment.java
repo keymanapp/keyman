@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
@@ -7,8 +7,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.data.KeyboardController;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.data.KeyboardController;
 
 import java.util.ArrayList;
 

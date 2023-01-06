@@ -1,5 +1,5 @@
 
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,15 +20,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.data.adapters.NestedAdapter;
-import com.tavultesoft.kmea.util.BCP47;
-import com.tavultesoft.kmea.util.MapCompat;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
+import com.keyman.engine.data.CloudRepository;
+import com.keyman.engine.data.Dataset;
+import com.keyman.engine.data.LexicalModel;
+import com.keyman.engine.data.adapters.NestedAdapter;
+import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.MapCompat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -209,7 +209,7 @@ public final class ModelPickerActivity extends BaseActivity {
         if(immediateRegister) {
           // Register associated lexical model if it matches the active keyboard's language code;
           // it's safe since we're on the same thread.  Needs to be called AFTER deinstalling the old one.
-          com.tavultesoft.kmea.data.Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(context);
+          com.keyman.engine.data.Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(context);
           if(kbInfo != null) {
             String kbdLgCode = kbInfo.getLanguageID();
             if(BCP47.languageEquals(kbdLgCode, languageID)) {

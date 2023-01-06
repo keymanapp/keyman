@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2017-2021 SIL International. All rights reserved.
  */
-package com.tavultesoft.kmea;
+package com.keyman.engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,13 +19,13 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.FileProviderUtils;
-import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.MapCompat;
-import com.tavultesoft.kmea.KMHelpFileActivity;
+import com.keyman.engine.data.LexicalModel;
+import com.keyman.engine.util.FileProviderUtils;
+import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.MapCompat;
+import com.keyman.engine.KMHelpFileActivity;
 
-import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_MODEL;
+import static com.keyman.engine.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_MODEL;
 
 // Public access is necessary to avoid IllegalAccessException
 public final class ModelInfoActivity extends BaseActivity {

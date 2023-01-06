@@ -1,9 +1,9 @@
-package com.tavultesoft.kmea.util;
+package com.keyman.engine.util;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.tavultesoft.kmea.util.KMPLink;
+import com.keyman.engine.util.KMPLink;
 
 import org.junit.Assert;
 import org.junit.Test;
