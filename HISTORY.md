@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.129 beta 2023-01-06
+
+* fix(android/engine): Add utility for localized strings (#7976)
+
 ## 16.0.128 beta 2022-12-22
 
 * fix(developer): force ES3 code generation for LMs (#7927)
