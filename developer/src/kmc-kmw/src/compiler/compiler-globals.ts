@@ -1,4 +1,4 @@
-import { KEYBOARD, KMXFile } from "@keymanapp/common-types/src/kmx/kmx";
+import { KEYBOARD, KMXFile } from "../../../../../common/web/types/src/kmx/kmx.js";
 import CompilerOptions from "./compiler-options.js";
 
 export let FTabStop: string;
