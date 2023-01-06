@@ -44,18 +44,7 @@ export class DispCompiler extends SectionCompiler {
       display: sections.strs.allocString(display.display),
     })) || [];
 
-    // TODO-LDML: Same function in comon/web/types/src
-    function binaryStringCompare(a: string, b: string) : number {
-      if(a < b) {
-        return -1;
-      } else if(a > b) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-
-    result.disps.sort((a: DispItem, b: DispItem) => binaryStringCompare(a.to.value, b.to.value));
+    result.disps.sort((a: DispItem, b: DispItem) => a.to.compareTo(b.to));
 
     return result;
   }

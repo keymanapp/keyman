@@ -371,8 +371,143 @@ struct COMP_KMXPLUS_DISP {
 static_assert(sizeof(struct COMP_KMXPLUS_DISP) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_DISP) == LDML_LENGTH_DISP, "mismatched size of section disp");
 
+
+
+/* ------------------------------------------------------------------
+ * layr section
+   ------------------------------------------------------------------ */
+
+struct COMP_KMXPLUS_LAYR_LIST {
+    KMX_DWORD flags;
+    KMXPLUS_STR hardware;
+    KMX_DWORD layer;
+    KMX_DWORD count;
+    KMX_DWORD minDeviceWidth;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR_LIST) == LDML_LENGTH_LAYR_LIST, "mismatched size of COMP_KMXPLUS_LAYR_LIST");
+
+struct COMP_KMXPLUS_LAYR_ENTRY {
+    KMXPLUS_STR id;
+    KMXPLUS_STR modifier;
+    KMX_DWORD row;
+    KMX_DWORD count;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR_ENTRY) == LDML_LENGTH_LAYR_ENTRY, "mismatched size of COMP_KMXPLUS_LAYR_ENTRY");
+
+struct COMP_KMXPLUS_LAYR_ROW {
+    KMX_DWORD key;
+    KMX_DWORD count;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR_ROW) == LDML_LENGTH_LAYR_ROW, "mismatched size of COMP_KMXPLUS_LAYR_ROW");
+
+
+struct COMP_KMXPLUS_LAYR_KEY {
+    KMX_DWORD key; // index into key2 section
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR_KEY) == LDML_LENGTH_LAYR_KEY, "mismatched size of COMP_KMXPLUS_LAYR_KEY");
+
+struct COMP_KMXPLUS_LAYR {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_LAYR;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD listCount;
+  KMX_DWORD layerCount;
+  KMX_DWORD rowCount;
+  KMX_DWORD keyCount;
+  KMX_DWORD reserved[2];
+  // entries, rows, and keys have a dynamic offset
+  // use COMP_KMXPLUS_LAYR_Helper to access.
+  //
+  // COMP_KMXPLUS_LAYR_LIST lists[];
+  // COMP_KMXPLUS_LAYR_ENTRY entries[];
+  // COMP_KMXPLUS_LAYR_ROW rows[];
+  // COMP_KMXPLUS_LAYR_KEY keys[];
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
 /**
- * @brief helper accessor object for
+ * Helper accessor for the dynamic part of a layr section.
+ */
+class COMP_KMXPLUS_LAYR_Helper {
+public:
+  COMP_KMXPLUS_LAYR_Helper();
+  /**
+   * Initialize the helper to point at a layr section.
+   * @return true if valid
+  */
+  bool setLayr(const COMP_KMXPLUS_LAYR *newLayr);
+  bool valid() const;
+
+  const COMP_KMXPLUS_LAYR_LIST  *getList(KMX_DWORD list) const;
+  const COMP_KMXPLUS_LAYR_ENTRY *getEntry(KMX_DWORD entry) const;
+  const COMP_KMXPLUS_LAYR_ROW   *getRow(KMX_DWORD row) const;
+  const COMP_KMXPLUS_LAYR_KEY   *getKey(KMX_DWORD key) const;
+
+private:
+  const COMP_KMXPLUS_LAYR *layr;
+  bool is_valid;
+  const COMP_KMXPLUS_LAYR_LIST *lists;
+  const COMP_KMXPLUS_LAYR_ENTRY *entries;
+  const COMP_KMXPLUS_LAYR_ROW *rows;
+  const COMP_KMXPLUS_LAYR_KEY *keys;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_LAYR) == LDML_LENGTH_LAYR, "mismatched size of section layr");
+
+/* ------------------------------------------------------------------
+ * key2 section
+   ------------------------------------------------------------------ */
+struct COMP_KMXPLUS_KEY2 {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_KEY2;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD keyCount;
+  KMX_DWORD flicksCount;
+  KMX_DWORD flickCount;
+  KMX_DWORD reserved[3];
+  // TODO-LDML: keys sub-table
+  // TODO-LDML: flick lists sub-table
+  // TODO-LDML: flick elements sub-table
+
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_KEY2) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_KEY2) == LDML_LENGTH_KEY2, "mismatched size of section key2");
+
+
+/* ------------------------------------------------------------------
+ * list section
+   ------------------------------------------------------------------ */
+struct COMP_KMXPLUS_LIST {
+  static const KMX_DWORD IDENT = LDML_SECTIONID_LIST;
+  COMP_KMXPLUS_HEADER header;
+  KMX_DWORD listCount;
+  KMX_DWORD indexCount;
+  // TODO-LDML: lists sub-table
+  // TODO-LDML: indices sub-table
+
+  /**
+   * @brief True if section is valid.
+   */
+  bool valid(KMX_DWORD length) const;
+};
+
+static_assert(sizeof(struct COMP_KMXPLUS_LIST) % 0x10 == 0, "Structs prior to entries[] should align to 128-bit boundary");
+static_assert(sizeof(struct COMP_KMXPLUS_LIST) == LDML_LENGTH_LIST, "mismatched size of section list");
+
+
+/**
+ * @brief helper accessor object for KMX Plus data
  *
  */
 class kmx_plus {
@@ -386,9 +521,13 @@ class kmx_plus {
      * @param length length of the entire KMX file
      */
     kmx_plus(const COMP_KEYBOARD *keyboard, size_t length);
+    // keep the next elements sorted
     const COMP_KMXPLUS_DISP *disp;
     const COMP_KMXPLUS_ELEM *elem;
+    const COMP_KMXPLUS_KEY2 *key2;
     const COMP_KMXPLUS_KEYS *keys;
+    const COMP_KMXPLUS_LAYR *layr;
+    const COMP_KMXPLUS_LIST *list;
     const COMP_KMXPLUS_LOCA *loca;
     const COMP_KMXPLUS_META *meta;
     const COMP_KMXPLUS_SECT *sect;
@@ -398,6 +537,7 @@ class kmx_plus {
     inline bool is_valid() { return valid; }
   private:
     bool valid; // true if valid
+    COMP_KMXPLUS_LAYR_Helper layrHelper;
 };
 
 /**

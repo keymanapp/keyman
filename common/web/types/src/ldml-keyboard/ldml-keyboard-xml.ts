@@ -66,22 +66,51 @@ export interface LKSettings {
 
 export interface LKKeys {
   key: LKKey[];
+  flicks: LKFlicks[];
 };
 
 export interface LKKey {
   id?: string;
+  flicks?: string;
   to?: string;
   gap?: boolean;
   switch?: string;
+  longPress?: string;
+  longPressDefault?: string;
+  multiTap?: string;
+  transform?: "no";
+  width?: number;
+};
+
+export interface LKFlicks {
+  id?: string;
+  flick?: LKFlick[];
+};
+
+export interface LKFlick {
+  directions?: string;
+  to?: string;
 };
 
 export interface LKLayers {
+  /**
+   * `hardware` or `touch`
+   */
   form?: string;
+  /**
+   * `us`, `iso`, `jis`, or `abnt2`
+   */
+  hardware?: string;
+  /**
+   * Minimum width in millimeters
+   */
+  minDeviceWidth?: number;
   layer?: LKLayer[];
 };
 
 export interface LKLayer {
   id?: string;
+  modifier?: string;
   row?: LKRow[];
 };
 

@@ -23,12 +23,16 @@
  * through.
  */
 export type SectionIdent =
+// Keep this sorted, but with `sect` as the first entry.
   'sect' |
   'bksp' |
   'disp' |
   'elem' |
   'finl' |
+  'key2' |
   'keys' |
+  'layr' |
+  'list' |
   'loca' |
   'meta' |
   'name' |
@@ -226,8 +230,103 @@ class Constants {
   readonly keys_flags_extend = 1;
 
   /* ------------------------------------------------------------------
-    * loca section
+   * key2 section
+    ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'key2' section not including variable parts
+   */
+  readonly length_key2 = 32;
+  /**
+   *  Length of each item in the 'key2' keys sub-table
+   */
+  readonly length_key2_key = 40;
+  /**
+   *  Length of each item in the 'key2' flick lists sub-table
+   */
+  readonly length_key2_flick_list = 12;
+  /**
+   *  Length of each item in the 'key2' flick elements sub-table
+   */
+  readonly length_key2_flick_element = 12;
+
+  /**
+   * 0 if to is a char, 1 if it is a string
+   */
+  readonly key2_key_flags_extend      = 0x00000001;
+
+  /**
+   * 1 if the key is a gap
+   */
+  readonly key2_key_flags_gap         = 0x00000002;
+
+  /**
+   * 1 if the key is transform=no
+   */
+  readonly key2_key_flags_notransform = 0x00000004;
+
+  /**
+   * 0 if to is a char, 1 if it is a string
+   */
+  readonly key2_flick_flags_extend      = 0x00000001;
+
+  /* ------------------------------------------------------------------
+   * layr section
+     ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'layr' section not including variable parts
+   */
+  readonly length_layr = 32;
+  /**
+   *  Length of each layer list in the 'layr' section variable part
+   */
+  readonly length_layr_list = 20;
+  /**
+   * bitmask for the 'form' field of the layr.list[].flags bitfield
+   */
+  readonly layr_list_flags_mask_form = 1;
+  /**
+   * hardware layout: value for the 'form' field of the layr.list[].flags
+   */
+  readonly layr_list_flags_hardware = 0;
+  /**
+   * touch layout: value for the 'form' field of the layr.list[].flags
+   */
+  readonly layr_list_flags_touch = 1;
+  /**
+   * Length of each layer entry in the 'layr' section variable part
+   */
+  readonly length_layr_entry = 16;
+  /**
+   * Length of each row entry in the 'layr' section variable part
+   */
+  readonly length_layr_row = 8;
+  /**
+   * Length of each key entry in the 'layr' section variable part
+   */
+  readonly length_layr_key = 4;
+
+  /* ------------------------------------------------------------------
+   * list section
       ------------------------------------------------------------------ */
+
+  /**
+   * Minimum length of the 'list' section not including variable parts
+   */
+  readonly length_list = 16;
+  /**
+   *  Length of each list item in the 'list' list section variable part
+   */
+  readonly length_list_item = 8;
+  /**
+   *  Length of each list item in the 'list' indices section variable part
+   */
+   readonly length_list_index = 4;
+
+  /* ------------------------------------------------------------------
+   * loca section
+   ------------------------------------------------------------------ */
 
   /**
    * Minimum length of the 'loca' section not including variable parts
@@ -332,11 +431,15 @@ class Constants {
    * All section IDs.
    */
   readonly section: SectionMap = {
+  // keep this sorted
       bksp: 'bksp',
       disp: 'disp',
       elem: 'elem',
       finl: 'finl',
+      key2: 'key2',
       keys: 'keys',
+      layr: 'layr',
+      list: 'list',
       loca: 'loca',
       meta: 'meta',
       name: 'name',
@@ -353,8 +456,8 @@ class Constants {
    * @returns hex ID such as 0x74636573
    */
   hex_section_id(id:string) {
-      if(!id || typeof id !== 'string' || !id.match(/[a-z][a-z][a-z][a-z]/)) {
-          throw Error(`hex_section_id(${id}) - need a 4-character string`);
+      if(!id || typeof id !== 'string' || !id.match(/^[a-z0-9]{4}$/)) {
+          throw Error(`hex_section_id(${id}) - need a 4-character alphanumeric lower-case string`);
       }
       let r = 0;
       for (let i = 3; i>=0; i--) {

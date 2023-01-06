@@ -1,6 +1,7 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
+import { ListItem } from './string-list.js';
 
 import { KMXFile } from './kmx.js';
 
@@ -15,6 +16,7 @@ export class GlobalSections {
   // These sections are used by other sections during compilation
   strs: Strs;
   elem: Elem;
+  list: List;
 }
 
 // 'sect'
@@ -109,12 +111,28 @@ export class Ordr extends Section {
 
 // 'strs'
 
+/**
+ * A string item in memory. This will be replaced with an index
+ * into the string table at finalization.
+ */
 export class StrsItem {
   readonly value: string;
   constructor(value: string) {
     this.value = value;
   }
-}
+  compareTo(o: StrsItem): number {
+    return StrsItem.binaryStringCompare(this.value, o.value);
+  }
+  static binaryStringCompare(a: string, b: string): number {
+    // https://tc39.es/ecma262/multipage/abstract-operations.html#sec-islessthan
+    if(typeof a != 'string' || typeof b != 'string') {
+      throw new Error('binaryStringCompare: inputs must be strings');
+    }
+    if(a < b) return -1;
+    if(a > b) return 1;
+    return 0;
+  }
+};
 
 export class Strs extends Section {
   strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
@@ -190,6 +208,7 @@ export class Vkey extends Section {
   vkeys: VkeyItem[] = [];
 };
 
+// 'disp'
 export class DispItem {
   to: StrsItem;
   display: StrsItem;
@@ -200,13 +219,132 @@ export class Disp extends Section {
   disps: DispItem[] = [];
 };
 
+// 'layr'
+
+/**
+ * In-memory `<layers>`
+ */
+export class LayrList {
+  flags: number;
+  hardware: StrsItem;
+  layers: LayrEntry[] = [];
+  minDeviceWidth: number; // millimeters
+};
+
+/**
+ * In-memory `<layer>`
+ */
+ export class LayrEntry {
+  id: StrsItem;
+  modifier: StrsItem;
+  rows: LayrRow[] = [];
+};
+
+/**
+ * In-memory `<row>`
+ */
+ export class LayrRow {
+  keys: StrsItem[] = [];
+};
+
+export class Layr extends Section {
+  lists: LayrList[] = [];
+};
+
+export class Key2Keys {
+  flags: number;
+  flicks: string; // for in-memory only
+  id: StrsItem;
+  longPress: ListItem;
+  longPressDefault: StrsItem;
+  multiTap: ListItem;
+  switch: StrsItem;
+  to: StrsItem;
+  vkey: number;
+  width: number;
+};
+
+export class Key2Flicks {
+  flicks: Key2Flick[] = [];
+  id: StrsItem;
+  compareTo(b: Key2Flicks): number {
+    return this.id.compareTo(b.id);
+  }
+  constructor(id: StrsItem) {
+    this.id = id;
+  }
+};
+
+export class Key2Flick {
+  directions: ListItem;
+  flags: number;
+  to: StrsItem;
+};
+
+export class Key2 extends Section {
+  keys: Key2Keys[] = [];
+  flicks: Key2Flicks[] = [];
+  constructor(strs: Strs) {
+    super();
+    let nullFlicks = new Key2Flicks(strs.allocString(''));
+    this.flicks.push(nullFlicks); // C7043: null element string
+  }
+};
+
+export class List extends Section {
+  /**
+   * Allocate a list from a space-separated list of items.
+   * Note that passing undefined or null or `''` will
+   * end up being the same as the empty list `[]`
+   * @param strs Strs section for allocation
+   * @param s space-separated list of items
+   * @returns a List object
+   */
+  allocListFromSpaces(strs: Strs, s?: string): ListItem {
+    s = s ?? '';
+    // TODO-LDML: support unicode escaping etc
+    return this.allocList(strs, s.split(' '));
+  }
+  /**
+   * Return a List object referring to the string list.
+   * Note that a falsy list, or a list containing only an empty string
+   * `['']` will be stored as an empty list `[]`.
+   * @param strs Strs section for allocation
+   * @param s string list to allocate
+   * @returns
+   */
+  allocList(strs: Strs, s?: string[]): ListItem {
+    // Special case the 'null' list for [] or ['']
+    if (!s || (s.length === 1 && s[0] === '')) {
+      return this.lists[0];
+    }
+    let result = this.lists.find(item => item.isEqual(s));
+    if(result === undefined) {
+      // allocate a new ListItem
+      result = new ListItem(strs, s);
+      this.lists.push(result);
+    }
+    return result;
+  }
+  constructor(strs: Strs) {
+    super();
+    this.lists.push(new ListItem(strs, [])); // C7043: null element string
+  }
+  lists: ListItem[] = [];
+};
+
+export { ListItem as ListItem };
+
 export interface KMXPlusData {
     sect?: Strs; // sect is ignored in-memory
     bksp?: Bksp;
     disp?: Disp;
     elem?: Elem; // elem is ignored in-memory
     finl?: Finl;
+    key2?: Key2;
     keys?: Keys;
+    layr?: Layr;
+    list?: List; // list is ignored in-memory
     loca?: Loca;
     meta?: Meta;
     name?: Name;
@@ -240,6 +378,21 @@ export class KMXPlusFile extends KMXFile {
 
   public readonly COMP_PLUS_KEYS_ITEM: any;
   public readonly COMP_PLUS_KEYS: any;
+
+  public readonly COMP_PLUS_LAYR_ENTRY: any;
+  public readonly COMP_PLUS_LAYR_KEY: any;
+  public readonly COMP_PLUS_LAYR_LIST: any;
+  public readonly COMP_PLUS_LAYR_ROW: any;
+  public readonly COMP_PLUS_LAYR: any;
+
+  public readonly COMP_PLUS_KEY2_FLICK: any;
+  public readonly COMP_PLUS_KEY2_FLICKS: any;
+  public readonly COMP_PLUS_KEY2_KEY: any;
+  public readonly COMP_PLUS_KEY2: any;
+
+  public readonly COMP_PLUS_LIST_LIST: any;
+  public readonly COMP_PLUS_LIST_INDEX: any;
+  public readonly COMP_PLUS_LIST: any;
 
   public readonly COMP_PLUS_LOCA_ITEM: any;
   public readonly COMP_PLUS_LOCA: any;
@@ -324,6 +477,7 @@ export class KMXPlusFile extends KMXFile {
       count: r.uint32le,
       reserved: new r.Reserved(r.uint32le), // padding
       strings: new r.Array(this.COMP_PLUS_ELEM_STRING, 'count')
+      // + variable subtable: Element data (see KMXPlusBuilder.emitElements())
     });
 
     // 'finl' - see 'tran'
@@ -343,6 +497,106 @@ export class KMXPlusFile extends KMXFile {
       count: r.uint32le,
       reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_KEYS_ITEM, 'count')
+    });
+
+    // 'layr'
+
+    this.COMP_PLUS_LAYR_ENTRY = new r.Struct({
+      id: r.uint32le, // str
+      modifier: r.uint32le, // str
+      row: r.uint32le, // index into rows
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LAYR_KEY = new r.Struct({
+      key: r.uint32le, // str: key id
+    });
+
+    this.COMP_PLUS_LAYR_LIST = new r.Struct({
+      flags: r.uint32le,
+      hardware: r.uint32le, //str
+      layer: r.uint32le, // index into layers
+      count: r.uint32le,
+      minDeviceWidth: r.uint32le, // integer: millimeters
+    });
+
+    this.COMP_PLUS_LAYR_ROW = new r.Struct({
+      key: r.uint32le,
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LAYR = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      listCount: r.uint32le,
+      layerCount: r.uint32le,
+      rowCount: r.uint32le,
+      keyCount: r.uint32le,
+      reserved0: new r.Reserved(r.uint32le),
+      reserved1: new r.Reserved(r.uint32le),
+      lists: new r.Array(this.COMP_PLUS_LAYR_LIST, 'listCount'),
+      layers: new r.Array(this.COMP_PLUS_LAYR_ENTRY, 'layerCount'),
+      rows: new r.Array(this.COMP_PLUS_LAYR_ROW, 'rowCount'),
+      keys: new r.Array(this.COMP_PLUS_LAYR_KEY, 'keyCount'),
+    });
+
+    this.COMP_PLUS_KEY2_FLICK = new r.Struct({
+      directions: r.uint32le, // list
+      flags: r.uint32le,
+      to: r.uint32le, // str | codepoint
+    });
+
+    this.COMP_PLUS_KEY2_FLICKS = new r.Struct({
+      count: r.uint32le,
+      flick: r.uint32le,
+      id: r.uint32le, // str
+    });
+
+    this.COMP_PLUS_KEY2_KEY = new r.Struct({
+      vkey: r.uint32le,
+      to: r.uint32le, // str | codepoint
+      flags: r.uint32le,
+      id: r.uint32le, // str
+      switch: r.uint32le, // str
+      width: r.uint32le, // width*10  ( 1 = 0.1 keys)
+      longPress: r.uint32le, // list index
+      longPressDefault: r.uint32le, // str
+      multiTap: r.uint32le, // list index
+      flicks: r.uint32le, // index into flicks table
+    });
+
+    this.COMP_PLUS_KEY2 = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      keyCount: r.uint32le,
+      flicksCount: r.uint32le,
+      flickCount: r.uint32le,
+      reserved0: new r.Reserved(r.uint32le),
+      reserved1: new r.Reserved(r.uint32le),
+      reserved2: new r.Reserved(r.uint32le),
+      keys: new r.Array(this.COMP_PLUS_KEY2_KEY, 'keyCount'),
+      flicks: new r.Array(this.COMP_PLUS_KEY2_FLICKS, 'flicksCount'),
+      flick: new r.Array(this.COMP_PLUS_KEY2_FLICK, 'flickCount'),
+    });
+
+    // 'list'
+
+    this.COMP_PLUS_LIST_LIST = new r.Struct({
+      index: r.uint32le,
+      count: r.uint32le,
+    });
+
+    this.COMP_PLUS_LIST_INDEX = new r.Struct({
+      str: r.uint32le, // str
+    });
+
+    this.COMP_PLUS_LIST = new r.Struct({
+      ident: r.uint32le,
+      size: r.uint32le,
+      listCount: r.uint32le,
+      indexCount: r.uint32le,
+      lists: new r.Array(this.COMP_PLUS_LIST_LIST, 'listCount'),
+      indices: new r.Array(this.COMP_PLUS_LIST_INDEX, 'indexCount'),
     });
 
     // 'loca'
@@ -413,6 +667,7 @@ export class KMXPlusFile extends KMXFile {
       count: r.uint32le,
       reserved: new r.Reserved(r.uint32le), // padding
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
+      // + variable subtable: String data (see KMXPlusBuilder.emitStrings())
     });
 
     // 'tran'

@@ -23,16 +23,6 @@ export interface BUILDER_STRS extends BUILDER_SECTION {
   items: BUILDER_STRS_ITEM[];
 };
 
-function binaryStringCompare(a: string, b: string): number {
-  // https://tc39.es/ecma262/multipage/abstract-operations.html#sec-islessthan
-  if(typeof a != 'string' || typeof b != 'string') {
-    throw new Error('binaryStringCompare: inputs must be strings');
-  }
-  if(a < b) return -1;
-  if(a > b) return 1;
-  return 0;
-}
-
 export function build_strs(source_strs: Strs): BUILDER_STRS {
   let result: BUILDER_STRS = {
     ident: constants.hex_section_id(constants.section.strs),
@@ -44,7 +34,7 @@ export function build_strs(source_strs: Strs): BUILDER_STRS {
   };
 
   result.items = source_strs.strings.map(item => { return {_value: item.value, length: item.value.length, offset: 0}; });
-  result.items.sort((a,b) => binaryStringCompare(a._value, b._value));
+  result.items.sort((a,b) => StrsItem.binaryStringCompare(a._value, b._value));
 
   let offset = constants.length_strs + constants.length_strs_item * result.count;
   // TODO: consider padding

@@ -352,6 +352,148 @@ COMP_KMXPLUS_TRAN::valid(KMX_DWORD _kmn_unused(length)) const {
   return true;
 }
 
+bool
+COMP_KMXPLUS_LAYR::valid(KMX_DWORD _kmn_unused(length)) const {
+  if (header.size < sizeof(*this)
+      + (listCount  * sizeof(COMP_KMXPLUS_LAYR_LIST))
+      + (layerCount * sizeof(COMP_KMXPLUS_LAYR_ENTRY))
+      + (rowCount   * sizeof(COMP_KMXPLUS_LAYR_ROW))
+      + (keyCount   * sizeof(COMP_KMXPLUS_LAYR_KEY))) {
+    DebugLog("header.size < expected size");
+    return false;
+  }
+  // TODO-LDML
+  DebugLog("!! More to do here.");
+  return true;
+}
+
+COMP_KMXPLUS_LAYR_Helper::COMP_KMXPLUS_LAYR_Helper() : layr(nullptr), is_valid(false) {
+}
+
+bool
+COMP_KMXPLUS_LAYR_Helper::setLayr(const COMP_KMXPLUS_LAYR *newLayr) {
+  is_valid = true;
+  if (newLayr == nullptr) {
+    // null = invalid
+    is_valid = false;
+    return false;
+  }
+  layr = newLayr;
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(this);
+  rawdata += LDML_LENGTH_LAYR;  // skip past non-dynamic portion
+  // lists
+  if (layr->listCount > 0) {
+    lists = reinterpret_cast<const COMP_KMXPLUS_LAYR_LIST *>(rawdata);
+  } else {
+    lists    = nullptr;
+    is_valid = false;
+  }
+  rawdata += sizeof(COMP_KMXPLUS_LAYR_LIST) * layr->listCount;
+  // entries
+  if (layr->layerCount > 0) {
+    entries = reinterpret_cast<const COMP_KMXPLUS_LAYR_ENTRY *>(rawdata);
+  } else {
+    entries  = nullptr;
+    is_valid = false;
+  }
+  rawdata += sizeof(COMP_KMXPLUS_LAYR_ENTRY) * layr->layerCount;
+  // rows
+  if (layr->rowCount > 0) {
+    rows = reinterpret_cast<const COMP_KMXPLUS_LAYR_ROW *>(rawdata);
+  } else {
+    rows     = nullptr;
+    is_valid = false;
+  }
+  rawdata += sizeof(COMP_KMXPLUS_LAYR_ROW) * layr->rowCount;
+  // keys
+  if (layr->keyCount > 0) {
+    keys = reinterpret_cast<const COMP_KMXPLUS_LAYR_KEY *>(rawdata);
+  } else {
+    keys     = nullptr;
+    is_valid = false;
+  }
+
+  // Now, validate offsets by walking
+  if (is_valid) {
+    for(KMX_DWORD i = 0; is_valid && i < layr->listCount; i++) {
+      const COMP_KMXPLUS_LAYR_LIST &list = lists[i];
+      // is the count off the end?
+      if ((list.layer >= layr->layerCount) || (list.layer + list.count > layr->layerCount)) {
+        DebugLog("COMP_KMXPLUS_LAYR_Helper: list[%d] would access layer %d+%d, > count %d",
+            i, list.layer, list.count, layr->layerCount);
+        is_valid = false;
+      }
+    }
+    for(KMX_DWORD i = 0; is_valid && i < layr->layerCount; i++) {
+      const COMP_KMXPLUS_LAYR_ENTRY &entry = entries[i];
+      // is the count off the end?
+      if ((entry.row >= layr->rowCount) || (entry.row + entry.count > layr->rowCount)) {
+        DebugLog("COMP_KMXPLUS_LAYR_Helper: entry[%d] would access row %d+%d, > count %d",
+            i, entry.row, entry.count, layr->rowCount);
+        is_valid = false;
+      }
+    }
+    for(KMX_DWORD i = 0; is_valid && i < layr->rowCount; i++) {
+      const COMP_KMXPLUS_LAYR_ROW &row = rows[i];
+      // is the count off the end?
+      if ((row.key >= layr->keyCount) || (row.key + row.count > layr->keyCount)) {
+        DebugLog("COMP_KMXPLUS_LAYR_Helper: row[%d] would access key %d+%d, > count %d",
+            i, row.key, row.count, layr->keyCount);
+        is_valid = false;
+      }
+    }
+  }
+  // Return results
+  DebugLog("COMP_KMXPLUS_LAYR_Helper.setLayr(): %s", is_valid ? "valid" : "invalid");
+  return is_valid;
+}
+
+bool COMP_KMXPLUS_LAYR_Helper::valid() const {
+  return is_valid;
+}
+
+const COMP_KMXPLUS_LAYR_LIST *
+COMP_KMXPLUS_LAYR_Helper::getList(KMX_DWORD list) const {
+  if (!valid() || list >= layr->listCount)
+    return nullptr;
+  return lists + list;
+}
+
+const COMP_KMXPLUS_LAYR_ENTRY *
+COMP_KMXPLUS_LAYR_Helper::getEntry(KMX_DWORD entry) const {
+  if (!valid() || entry >= layr->layerCount)
+    return nullptr;
+  return entries + entry;
+}
+
+const COMP_KMXPLUS_LAYR_ROW *
+COMP_KMXPLUS_LAYR_Helper::getRow(KMX_DWORD row) const {
+  if (!valid() || row >= layr->rowCount)
+    return nullptr;
+  return rows + row;
+}
+
+const COMP_KMXPLUS_LAYR_KEY *
+COMP_KMXPLUS_LAYR_Helper::getKey(KMX_DWORD key) const {
+  if (!valid() || key >= layr->keyCount)
+    return nullptr;
+  return keys + key;
+}
+
+bool
+COMP_KMXPLUS_KEY2::valid(KMX_DWORD _kmn_unused(length)) const {
+  // TODO-LDML more to do here
+  DebugLog("TODO-LDML: key2");
+  return true;
+}
+
+bool
+COMP_KMXPLUS_LIST::valid(KMX_DWORD _kmn_unused(length)) const {
+  // TODO-LDML more to do here
+  DebugLog("TODO-LDML: list");
+  return true;
+}
+
 // ---- constructor
 
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
@@ -390,12 +532,18 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     // these will be nullptr if they don't validate
     disp = section_from_sect<COMP_KMXPLUS_DISP>(sect);
     elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect);
+    key2 = section_from_sect<COMP_KMXPLUS_KEY2>(sect);
     keys = section_from_sect<COMP_KMXPLUS_KEYS>(sect);
+    layr = section_from_sect<COMP_KMXPLUS_LAYR>(sect);
+    list = section_from_sect<COMP_KMXPLUS_LIST>(sect);
     loca = section_from_sect<COMP_KMXPLUS_LOCA>(sect);
     meta = section_from_sect<COMP_KMXPLUS_META>(sect);
     strs = section_from_sect<COMP_KMXPLUS_STRS>(sect);
     tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect);
     vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
+
+    // calculate and validate the layer dynamic parts
+    (void)layrHelper.setLayr(layr);
   }
 }
 

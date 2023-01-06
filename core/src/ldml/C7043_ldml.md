@@ -338,19 +338,23 @@ Represents layers on the keyboard.
 |16 |  32  | rowCount   | int: number of row entries               |
 |20 |  32  | keyCount   | int: number of key entries               |
 |24 |  64  | reserved   | padding                                  |
-|32 | var  | layers     | layers sub-table                         |
+|32 | var  | lists      | layer list sub-table                     |
+| - | var  | layers     | layers sub-table                         |
 | - | var  | rows       | rows sub-table                           |
 | - | var  | keys       | keys sub-table                           |
+
+### `layr.lists` subtable
 
 Each layer list corresponds to one `<layers>` element.
 There are `listCount` total lists.
 
-| ∆ | Bits | Name       | Description                                |
-|---|------|------------|--------------------------------------------|
-| 0+|  32  | flags      | int: per-layers options                    |
-| 4+|  32  | hardware   | str: layout (`us`,`iso`,`jis`,`abnt2`)     |
-| 8+|  32  | layer      | int: index to first layer element          |
-|12+|  32  | count      | int: number of layer elements in this list |
+| ∆ | Bits | Name             | Description                                |
+|---|------|------------------|--------------------------------------------|
+| 0+|  32  | flags            | int: per-layers options                    |
+| 4+|  32  | hardware         | str: layout (`us`,`iso`,`jis`,`abnt2`)     |
+| 8+|  32  | layer            | int: index to first layer element          |
+|12+|  32  | count            | int: number of layer elements in this list |
+|16+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
 
 - `flags`: a 32-bit bitfield defined as below:
 
@@ -358,6 +362,8 @@ There are `listCount` total lists.
   |--------------|----------|----------------------|
   |       0      | form     | 0: hardware          |
   |       0      | form     | 1: touch             |
+
+Layers are sorted hardware-first, then by minimum width ascending.
 
 ### `layr.layers` subtable
 
@@ -388,7 +394,7 @@ There are `keyCount` total key entries.
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-| 0+|  32  | key     | int: index into `key2` section           |
+| 0+|  32  | key     | str: key id                              |
 
 ### C7043.2.14 `disp`—Display list
 
@@ -419,8 +425,9 @@ Entries are sorted in a binary codepoint sort on the `to` field.
 | 4 |  32  | size        | int: Length of section                   |
 | 8 |  32  | keyCount    | int: Number of keys                      |
 |12 |  32  | flicksCount | int: Number of flick lists               |
-|12 |  32  | flickCount  | int: Number of flick elements            |
-|16 | var  | keys        | keys sub-table                           |
+|16 |  32  | flickCount  | int: Number of flick elements            |
+|20 |  96  | reserved    | padding                                  |
+|32 | var  | keys        | keys sub-table                           |
 | - | var  | flicks      | flick lists sub-table                    |
 | - | var  | flick       | flick elements sub-table                 |
 
@@ -471,6 +478,7 @@ For each flicks in the flick list:
 
 Elements are ordered by the string id.
 
+If this section is present, it must have a 'flicks' in the list at position zero with count=0, index=0 and id=0 meaning 'no flicks'.
 #### `key2.flick` flick element subtable
 
 For each flick element:
@@ -479,11 +487,20 @@ For each flick element:
 |---|------|----------------  |----------------------------------------------------------|
 | 0+|  32  | directions       | list: index into `list` section with direction list      |
 | 8+|  32  | flags            | int: per-key flags                                       |
-|12+|  32  | to               | str: output string                                       |
+|12+|  32  | to               | str: output string, or ucs32: output char, see flags     |
+
+If this section is present, it must have a 'flick element' at position zero with directions=0, flags=0, and to=0 meaning 'no flick'.
 
 There is not a 'null' flick element at the end of each list.
 
 Elements are ordered by the `flicks.id`, and secondarily by the directions list id.
+
+- `flags`: Flags is a 32-bit bitfield defined as below:
+
+| Bit position | Meaning   |  Description                                |
+|--------------|-----------|---------------------------------------------|
+|       0      | extend    | 0: `to` is a char, 1: `to` is a string      |
+
 
 ### C7043.2.16 `list`—String lists
 
@@ -493,7 +510,7 @@ Elements are ordered by the `flicks.id`, and secondarily by the directions list 
 | 4 |  32  | size          | int: Length of section                   |
 | 8 |  32  | listCount     | int: Total number of lists elements      |
 |12 |  32  | indexCount    | int: Total number of index elements      |
-|32 | var  | lists         | list sub-table                           |
+|16 | var  | lists         | list sub-table                           |
 | - | var  | indices       | index sub-table                          |
 
 #### `list.lists` sub-table

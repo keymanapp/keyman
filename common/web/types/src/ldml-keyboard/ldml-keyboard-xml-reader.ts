@@ -15,6 +15,7 @@ export default class LDMLKeyboardXMLSourceFileReader {
     boxXmlArray(source?.keyboard?.names, 'name');
     boxXmlArray(source?.keyboard?.vkeys, 'vkey');
     boxXmlArray(source?.keyboard?.keys, 'key');
+    boxXmlArray(source?.keyboard?.keys, 'flicks');
     boxXmlArray(source?.keyboard?.locales, 'locale');
     boxXmlArray(source?.keyboard, 'transforms');
     if(source?.keyboard?.layers) {
@@ -25,6 +26,11 @@ export default class LDMLKeyboardXMLSourceFileReader {
             boxXmlArray(layer, 'row');
           }
         }
+      }
+    }
+    if(source?.keyboard?.keys?.flicks) {
+      for(let flicks of source?.keyboard?.keys?.flicks) {
+        boxXmlArray(flicks, 'flick');
       }
     }
     if(source?.keyboard?.transforms) {
