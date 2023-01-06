@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.24 alpha 2023-01-06
+
+* chore(common/resources): Add Docker readme (#7980)
+
 ## 17.0.23 alpha 2023-01-03
 
 * fix(linux): add IBUS_HAS_PREFILTER ifdef to linux/ibus-keyman/tests (#7958)
