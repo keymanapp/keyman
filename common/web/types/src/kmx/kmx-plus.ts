@@ -111,6 +111,10 @@ export class Ordr extends Section {
 
 // 'strs'
 
+/**
+ * A string item in memory. This will be replaced with an index
+ * into the string table at finalization.
+ */
 export class StrsItem {
   readonly value: string;
   constructor(value: string) {

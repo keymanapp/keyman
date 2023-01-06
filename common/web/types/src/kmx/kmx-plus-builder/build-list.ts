@@ -7,23 +7,26 @@ import { BUILDER_SECTION } from "./builder-section.js";
  * list section
    ------------------------------------------------------------------ */
 
+/**
+ * A list entry.
+ */
 interface BUILDER_LIST_LIST {
-  index: number; // index into indices
-  count: number; // number of strings
-  _value: ListItem; // for findability
+  index: number; // index into indices[] subtable
+  count: number; // number of strings in this list
+  _value: ListItem; // for locating the list during finalization
 };
 
 interface BUILDER_LIST_INDEX {
-  str: number; // str
-  _value: string; // for findability?
+  str: number; // str for this string
+  _value: string; // for locating this string during finalization
 };
 
 /**
  * Builder for the 'list' section
  */
 export interface BUILDER_LIST extends BUILDER_SECTION {
-  listCount: number;
-  indexCount: number;
+  listCount: number; // Number of lists total in the subtable
+  indexCount: number; // Total number of indices in the subtable
   lists: BUILDER_LIST_LIST[];
   indices: BUILDER_LIST_INDEX[];
 };
@@ -35,13 +38,13 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
   }
 
   let result: BUILDER_LIST = {
+    ident: constants.hex_section_id(constants.section.list),
+    size: 0,
+    _offset: 0,
     listCount: source_list.lists.length,
     indexCount: 0,
     lists: [],
     indices: [],
-    ident: constants.hex_section_id(constants.section.list),
-    size: 0,
-    _offset: 0
   };
 
   result.lists = source_list.lists.map(array => {

@@ -1,5 +1,9 @@
 import { Strs, StrsItem } from './kmx-plus.js';
 
+/**
+ * A single entry in a ListItem.
+ * Contains a StrsItem as its value.
+ */
 export class ListIndex {
   readonly value: StrsItem; // will become index into Strs table
   constructor(value: StrsItem) {
@@ -14,7 +18,18 @@ export class ListIndex {
   }
 };
 
+/**
+ * A string list in memory. This will be replaced with an index
+ * into the string table at finalization.
+ */
 export class ListItem extends Array<ListIndex> {
+  /**
+   * Construct a new list from an array of strings.
+   * Use List. This is meant to be called by the List.allocString*() functions.
+   * @param strs the Strs section is needed to construct this object.
+   * @param source array of strings
+   * @returns
+   */
   constructor(strs: Strs, source: Array<string>) {
     super();
     if(!source) {
