@@ -137,9 +137,6 @@ export class BannerSuggestion {
       this.div.style.width='';
     }
 
-    // TODO:  if the option is highlighted, maybe don't disable transitions?
-    this.container.style.transition = 'none'; // temporarily disable transition effects.
-
     const collapserStyle = this.container.style;
     collapserStyle.minWidth = this.collapsedWidth + 'px';
 
@@ -148,11 +145,6 @@ export class BannerSuggestion {
     } else {
       collapserStyle.marginLeft  = (this.collapsedWidth - this.expandedWidth) + 'px';
     }
-
-    this.container.offsetWidth; // To 'flush' the changes before re-enabling transition animations.
-    this.container.offsetLeft;
-
-    this.container.style.transition = ''; // Re-enable them (it's set on the element's class)
   }
 
   public get targetCollapsedWidth(): number {
@@ -297,7 +289,6 @@ export class SuggestionBanner extends Banner {
     this.container = document.createElement('div');
     this.container.className = SuggestionBanner.BANNER_SCROLLER_CLASS;
     this.getDiv().appendChild(this.container);
-    // TODO:  additional styling for the banner scroll container?
 
     this.buildInternals(false);
 
@@ -589,7 +580,7 @@ class SuggestionExpandContractAnimation {
       if(val < this.rootScrollOffset) {
         this.rootScrollOffset = val;
       }
-    } // TODO:  else for the RTL adjustment instead.
+    }
 
     // Attempt to sync the banner-scroller's offset update with that of the
     // animation for expansion and collapsing.
