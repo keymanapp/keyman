@@ -94,7 +94,7 @@ class ViewInstalledWindowBase(Gtk.Window):
             self.close()
 
     def run(self):
-        self.resize(576, 324)
+        self.resize(776, 424)
         self.connect("destroy", Gtk.main_quit)
         self.show_all()
         Gtk.main()
@@ -191,23 +191,41 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bbox_top.add(self.options_button)
 
         vbox.pack_start(bbox_top, False, False, 12)
+        hbox.pack_start(vbox, False, False, 12)
 
-        bbox_bottom = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.VERTICAL)
-        bbox_bottom.set_layout(Gtk.ButtonBoxStyle.END)
+        outerHbox = Gtk.HBox()
+        sidebar = Gtk.StackSidebar()
+        stack = Gtk.Stack()
 
-        button = Gtk.Button.new_with_mnemonic(_("_Refresh"))
-        button.set_tooltip_text(_("Refresh keyboard list"))
-        button.connect("clicked", self.on_refresh_clicked)
+        outerHbox.pack_start(sidebar, False, False, 0)
+        outerHbox.pack_end(Gtk.Separator(), False, False, 0)
+        outerHbox.pack_end(stack, True, True, 0)
+        stack.set_hexpand(True)
+        stack.set_vexpand(True)
+        sidebar.set_stack(stack)
+
+        stack.add_titled(hbox, "KeyboardLayouts", _("Keyboard Layouts"))
+        stack.add_titled(Gtk.Label("TODO - Options"), "Options", _("Options"))
+
+        outmostVBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        outmostVBox.pack_start(outerHbox, True, True, 0)
+
+        bbox_bottom = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+        bbox_bottom.set_layout(Gtk.ButtonBoxStyle.START)
+
+        button = Gtk.Button.new_with_mnemonic(_("_Install keyboard..."))
+        button.set_tooltip_text(_("Install a keyboard from a file"))
+        button.connect("clicked", self.on_installfile_clicked)
         bbox_bottom.add(button)
 
-        button = Gtk.Button.new_with_mnemonic(_("_Download"))
+        button = Gtk.Button.new_with_mnemonic(_("_Download keyboard..."))
         button.set_tooltip_text(_("Download and install a keyboard from the Keyman website"))
         button.connect("clicked", self.on_download_clicked)
         bbox_bottom.add(button)
 
-        button = Gtk.Button.new_with_mnemonic(_("_Install"))
-        button.set_tooltip_text(_("Install a keyboard from a file"))
-        button.connect("clicked", self.on_installfile_clicked)
+        button = Gtk.Button.new_with_mnemonic(_("_Refresh"))
+        button.set_tooltip_text(_("Refresh keyboard list"))
+        button.connect("clicked", self.on_refresh_clicked)
         bbox_bottom.add(button)
 
         button = Gtk.Button.new_with_mnemonic(_("_Close"))
@@ -217,10 +235,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bind_accelerator(self.accelerators, button, '<Control>w')
         bbox_bottom.add(button)
 
-        vbox.pack_end(bbox_bottom, False, False, 12)
-
-        hbox.pack_start(vbox, False, False, 12)
-        self.add(hbox)
+        bbox_hbox = Gtk.HBox(spacing=12)
+        bbox_hbox.pack_start(bbox_bottom, True, True, 12)
+        outmostVBox.pack_end(bbox_hbox, False, True, 12)
+        self.add(outmostVBox)
 
     def addlistitems(self, installed_kmp, store, install_area):
         for kmp in sorted(installed_kmp):
