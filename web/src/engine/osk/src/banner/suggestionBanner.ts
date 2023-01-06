@@ -33,7 +33,7 @@ export class BannerSuggestion {
   private _paddingWidth: number;
 
   private fontFamily?: string;
-  private rtl: boolean = false;
+  public readonly rtl: boolean;
 
   private _suggestion: Suggestion;
 
@@ -43,7 +43,7 @@ export class BannerSuggestion {
 
   constructor(index: number, isRTL: boolean) {
     this.index = index;
-    this.rtl = isRTL;
+    this.rtl = isRTL ?? false;
 
     this.constructRoot();
 
@@ -524,8 +524,8 @@ class SuggestionExpandContractAnimation {
   private scrollContainer: HTMLElement | null;
   private option: BannerSuggestion;
 
-  private collapsedScrollLeft: number;
-  private originalScrollLeft: number;
+  private collapsedScrollOffset: number;
+  private rootScrollOffset: number;
 
   private startTimestamp: number;
   private pendingAnimation: number;
@@ -535,12 +535,20 @@ class SuggestionExpandContractAnimation {
   constructor(scrollContainer: HTMLElement, option: BannerSuggestion, forRTL: boolean) {
     this.scrollContainer = scrollContainer;
     this.option = option;
-    this.collapsedScrollLeft = scrollContainer.scrollLeft;
-    this.originalScrollLeft  = scrollContainer.scrollLeft;
+    this.collapsedScrollOffset = scrollContainer.scrollLeft;
+    this.rootScrollOffset  = scrollContainer.scrollLeft;
   }
 
   public setBaseScroll(val: number) {
-    this.collapsedScrollLeft = val;
+    this.collapsedScrollOffset = val;
+
+    // If the user has shifted right to make more of the element visible, we can remove part of the corresponding
+    // scrolling offset permanently; the user's taken action to view that area.
+    if(!this.option.rtl) {
+      if(val < this.rootScrollOffset) {
+        this.rootScrollOffset = val;
+      }
+    } // TODO:  else for the RTL adjustment instead.
 
     // Attempt to sync the banner-scroller's offset update with that of the
     // animation for expansion and collapsing.
@@ -570,7 +578,7 @@ class SuggestionExpandContractAnimation {
     const maxWidthToCounterscroll = this.option.currentWidth - this.option.collapsedWidth;
 
     // How much space existed to the left of the collapsed option in its original position.  May be negative.
-    const originalCounterscrollBuffer = this.option.div.offsetLeft - this.originalScrollLeft;
+    const originalCounterscrollBuffer = this.option.div.offsetLeft - this.rootScrollOffset;
     // TODO:  RTL version
 
     // Only allow a negative buffer in the final positioning if it already existed.
@@ -580,8 +588,8 @@ class SuggestionExpandContractAnimation {
     // Base position for scrollLeft clamped within std element scroll bounds, including:
     // - an adjustment to cover the extra width from expansion
     // - preserving the base expected overflow levels
-    const unclampedExpandingScrollOffset = Math.max(this.collapsedScrollLeft + maxWidthToCounterscroll, 0) - srcCounterscrollOverflow;
-    const srcUnclampedExpandingScrollOffset = Math.max(this.originalScrollLeft + maxWidthToCounterscroll, 0) - srcCounterscrollOverflow;
+    const unclampedExpandingScrollOffset = Math.max(this.collapsedScrollOffset + maxWidthToCounterscroll, 0) - srcCounterscrollOverflow;
+    const srcUnclampedExpandingScrollOffset = Math.max(this.rootScrollOffset + maxWidthToCounterscroll, 0) - srcCounterscrollOverflow;
     // TODO:  RTL versions / calculations + logic
 
     // // Huh - first bugless version didn't actually end up using this.
