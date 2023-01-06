@@ -1,8 +1,11 @@
+import { ExpandSentinel, incxstr, xstrlen } from "src/util/util.js";
 import { GROUP, KEY, KMXFile, STORE } from "../../../../../common/web/types/src/kmx/kmx.js";
-import { nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater } from "./compiler-globals.js";
+import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater } from "./compiler-globals.js";
 import CompilerOptions from "./compiler-options.js";
-import { JavaScript_Name, JavaScript_Rules, JavaScript_Shift, JavaScript_Store } from './javascript-strings.js';
+import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store } from './javascript-strings.js';
 import { CERR_InvalidBegin, CWARN_DontMixChiralAndNonChiralModifiers, ReportError } from "./messages.js";
+
+export let FFix183_LadderLength: number = 100; // TODO: option
 
 function requote(s: string): string {
   return "'" + s.replaceAll(/(['\\])/, "\\$1") + "'";
@@ -256,6 +259,19 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
     result += `${FTabStop}this.KCSS="${RequotedString(sEmbedCSS)}";${nl}`;
   }
 
+  function isDebugStore(fsp: STORE) {
+    return fsp.dwSystemID == KMXFile.TSS_DEBUG_LINE;
+  }
+
+  function isReservedStore(fsp: STORE) {
+    return fsp.dwSystemID != KMXFile.TSS_NONE;
+  }
+
+  function isOptionStore(fsp: STORE) {
+    // TODO: how do we determine this, see CheckStoreUsage()
+    return false;
+  }
+
 	// Write the stores out
   FOptionStores = '';
 	for(let i = 0; i < source.keyboard.stores.length; i++) {
@@ -296,15 +312,15 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
     return null;
   }
 
-  result += WriteBeginStatement('gs', source.keyboard.startGroup.unicode);
+  result += WriteBeginStatement(source, 'gs', source.keyboard.startGroup.unicode);
 
-  let rec = ExpandSentinel(sBegin_NewContext);
+  let rec = ExpandSentinel(source.keyboard, sBegin_NewContext, 0);
   if(rec.Code == KMXFile.CODE_USE) {
-    result += WriteBeginStatement('gn', rec.Use.GroupIndex);
+    result += WriteBeginStatement(source, 'gn', rec.Use.GroupIndex);
   }
-  rec = ExpandSentinel(sBegin_PostKeystroke);
+  rec = ExpandSentinel(source.keyboard, sBegin_PostKeystroke, 0);
   if(rec.Code == KMXFile.CODE_USE) {
-    result += WriteBeginStatement('gpk', rec.Use.GroupIndex);
+    result += WriteBeginStatement(source, 'gpk', rec.Use.GroupIndex);
   }
 
   let fgp = source.keyboard.groups[source.keyboard.startGroup.unicode];
@@ -352,7 +368,7 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
     else {
       for (let j = 0; j < fgp.keys.length; j++) {    // I1964
         let fkp = fgp.keys[j];
-        if (!RuleIsExcludedByPlatform(fkp)) {
+        if (!RuleIsExcludedByPlatform(source, fkp)) {
           result += FTabStop+FTabStop;   // I3681
           if (HasRules) {
             result += 'else ';
@@ -365,7 +381,7 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
 
           if (xstrlen(fkp.dpContext) > 0) {
             result += fgp.fUsingKeys ? '&&' : 'if(';
-            result += JavaScript_ContextMatch(fkp, fkp.dpContext);
+            result += JavaScript_ContextMatch(source.keyboard, fkp, fkp.dpContext);
           }
           else if (!fgp.fUsingKeys) {
             result += 'if(1';
@@ -377,10 +393,10 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
             `) {${linecomment}${nl}` +
             FTabStop+FTabStop+FTabStop;
           if (fgp.fUsingKeys) {                                                                                      // I1959
-            result += 'r=m=1;' + JavaScript_OutputString(FTabStop + FTabStop + FTabStop, fkp, fkp.dpOutput, fgp);    // I1959   // I3681
+            result += 'r=m=1;' + JavaScript_OutputString(source.keyboard, FTabStop + FTabStop + FTabStop, fkp, fkp.dpOutput, fgp);    // I1959   // I3681
           }
           else {
-            result += 'm=1;' + JavaScript_OutputString(FTabStop + FTabStop + FTabStop, fkp, fkp.dpOutput, fgp);    // I1959   // I3681
+            result += 'm=1;' + JavaScript_OutputString(source.keyboard, FTabStop + FTabStop + FTabStop, fkp, fkp.dpOutput, fgp);    // I1959   // I3681
           }
           result += `${nl}${FTabStop}${FTabStop}}${nl}`;   // I3681
         }
@@ -390,20 +406,20 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
 		if(fgp.dpMatch) {
       result +=
         `${FTabStop+FTabStop}if(m==1) {${nl}`+
-        `${FTabStop+FTabStop+FTabStop}${JavaScript_OutputString(FTabStop + FTabStop + FTabStop, null, fgp.dpMatch, fgp)}${nl}`+
+        `${FTabStop+FTabStop+FTabStop}${JavaScript_OutputString(source.keyboard, FTabStop + FTabStop + FTabStop, null, fgp.dpMatch, fgp)}${nl}`+
         `${FTabStop+FTabStop}}${nl}`;
     }
 		if(fgp.dpNoMatch) {
       if(fgp.fUsingKeys) {    // I1382 - fixup m=1 to m=g()
         result +=
           `${FTabStop+FTabStop}if(!m&&k.KIK(e)) {${nl}`+
-          `${FTabStop+FTabStop+FTabStop}r=1;${JavaScript_OutputString(FTabStop + FTabStop + FTabStop, null, fgp.dpNoMatch, fgp)}${nl}`+
+          `${FTabStop+FTabStop+FTabStop}r=1;${JavaScript_OutputString(source.keyboard, FTabStop + FTabStop + FTabStop, null, fgp.dpNoMatch, fgp)}${nl}`+
           `${FTabStop+FTabStop}}${nl}`;   // I1959. part 2, I2224   // I3681
       }
       else {
         result +=
           `${FTabStop+FTabStop}if(!m) {${nl}`+
-          `${FTabStop+FTabStop+FTabStop}${JavaScript_OutputString(FTabStop + FTabStop + FTabStop, null, fgp.dpNoMatch, fgp)}${nl}`+
+          `${FTabStop+FTabStop+FTabStop}${JavaScript_OutputString(source.keyboard, FTabStop + FTabStop + FTabStop, null, fgp.dpNoMatch, fgp)}${nl}`+
           `${FTabStop+FTabStop}}${nl}`;
       }
 
@@ -411,6 +427,8 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
       `${FTabStop+FTabStop}return r;${nl}`+
       `${FTabStop+FTabStop}};${nl}`;
   }
+}
+
 /* TODO
   for(let n = 0 to FCallFunctions.Count - 1 do
   begin
@@ -433,7 +451,7 @@ export function WriteCompiledKeyboard(name: string, source: KMXFile, FDebug: boo
 
 ///
 /// Determine the modifiers used in the target keyboard and return a bitmask
-/// representing them, or an integer value when not in debug mode
+/// representing them, or an number value when not in debug mode
 ///
 /// @return string of JavaScript code, e.g. 'modCodes.SHIFT | modCodes.CTRL /* 0x0030 */'
 ///
@@ -442,7 +460,7 @@ function GetKeyboardModifierBitmask(source: KMXFile): string {
   for(let gp of source.keyboard.groups) {
     if(gp.fUsingKeys) {
       for(let kp of gp.keys) {
-        if(!RuleIsExcludedByPlatform(kp)) {
+        if(!RuleIsExcludedByPlatform(source, kp)) {
           bitMask |= JavaScript_Shift(kp, fMnemonic);
         }
       }
@@ -453,7 +471,7 @@ function GetKeyboardModifierBitmask(source: KMXFile): string {
     ReportError(0, CWARN_DontMixChiralAndNonChiralModifiers, 'This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.');
   }
 
-  if(FDebug) {
+  if(options.debug) {
     return FormatModifierAsBitflags(bitMask & KMXFile.KMX_MASK_KEYS); // Exclude KMX_ISVIRTUALKEY, KMX_VIRTUALCHARKEY
   }
 
@@ -469,7 +487,7 @@ function GetKeyboardModifierBitmask(source: KMXFile): string {
 ///
 function JavaScript_SetupDebug() {
   if(IsKeyboardVersion10OrLater()) {
-    if(FDebug) {
+    if(options.debug) {
       return 'var modCodes = keyman.osk.modifierCodes;'+nl+
              FTabStop+'var keyCodes = keyman.osk.keyCodes;'+nl;
     }
@@ -512,14 +530,14 @@ function HasSupplementaryPlaneChars() {
   end;
 
 var
-  I: Integer;
+  I: number;
   fsp: PFILE_STORE;
   fgp: PFILE_GROUP;
-  j: Integer;
+  j: number;
   fkp: PFILE_KEY;
 begin
   fsp := fk.dpStoreArray;
-  for i := 0 to Integer(fk.cxStoreArray) - 1 do
+  for i := 0 to number(fk.cxStoreArray) - 1 do
   begin
     if StringHasSuppChars(fsp.dpString) then
       Exit(True);
@@ -527,10 +545,10 @@ begin
   end;
 
   fgp := fk.dpGroupArray;
-  for i := 0 to Integer(fk.cxGroupArray) - 1 do
+  for i := 0 to number(fk.cxGroupArray) - 1 do
   begin
     fkp := fgp.dpKeyArray;
-    for j := 0 to Integer(fgp.cxKeyArray) - 1 do
+    for j := 0 to number(fgp.cxKeyArray) - 1 do
     begin
       if StringHasSuppChars(fkp.dpContext) or
          StringHasSuppChars(fkp.dpOutput) then
@@ -547,4 +565,33 @@ begin
 
   Result := False;
 end;*/
+}
+
+export function RuleIsExcludedByPlatform(source: KMXFile, fkp: KEY): boolean {
+  if(fkp.dpContext == null || fkp.dpContext == '') {
+    return false;
+  }
+
+  let x = 0;
+  while(x < fkp.dpContext.length) {
+    let rec = ExpandSentinel(source.keyboard, fkp.dpContext, x);
+    if(rec.IsSentinel &&
+        (rec.Code == KMXFile.CODE_IFSYSTEMSTORE) &&
+        (rec.IfSystemStore.dwSystemID == KMXFile.TSS_PLATFORM) &&
+        rec.IfSystemStore.Store.dpString.includes('native')) {
+      if(rec.IfSystemStore.Store.dpString.match(/windows|desktop|macosx|linux/)) {
+        return true;
+      }
+    }
+    x = incxstr(fkp.dpContext, x);
+  }
+
+  return false;
+}
+
+function WriteBeginStatement(source: KMXFile, name: string, groupIndex: number): string {
+  const fgp = source.keyboard.groups[groupIndex];
+  return `${FTabStop}this.${name}=function(t,e) {${nl}`+
+         `${FTabStop+FTabStop}return this.g${JavaScript_Name(groupIndex, fgp.dpName)}(t,e);${nl}`+
+         `${FTabStop}};${nl}`;
 }
