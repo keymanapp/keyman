@@ -14,6 +14,7 @@
 #include "ldml/keyboardprocessor_ldml.h"
 #include "kmx/kmx_file_validator.hpp"
 #include "debuglog.h"
+#include <assert.h>
 
 namespace {
   constexpr km_kbp_attr const engine_attrs = {
@@ -66,6 +67,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       std::u16string str;
       const kmx::COMP_KMXPLUS_KEYS_ENTRY &entry = kplus.keys->entries[i];
       if (entry.flags && LDML_KEYS_FLAGS_EXTEND) {
+        assert(nullptr != kplus.strs);
         if (nullptr == kplus.strs) {
           DebugLog("for keys: kplus.strs == nullptr"); // need a string table to get strings
           return;
@@ -78,10 +80,12 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     }
   } // else: no keys! but still valid. Just, no keys.
   if (kplus.tran != nullptr) {
+    assert(nullptr != kplus.elem);
     if (nullptr == kplus.elem) {
       DebugLog("for tran: kplus.elem == nullptr");
       return;
     }
+    assert(nullptr != kplus.strs);
     if (nullptr == kplus.strs) {
       DebugLog("for tran: kplus.strs == nullptr"); // need a string table to get strings
       return;
@@ -98,6 +102,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
 
       // process From
       const KMX_DWORD elemNo = entry.from;
+      assert(elemNo < kplus.elem->count);
       if (elemNo >= kplus.elem->count) {
         DebugLog("tran[%d].from = %d, out of range for elem->count=%d", i, elemNo, kplus.elem->count);
         return;
@@ -106,10 +111,12 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       // TODO-LDML: refactor this
       KMX_DWORD elemListLength                       = 0;
       const kmx::COMP_KMXPLUS_ELEM_ELEMENT *elemList = kplus.elem->getElementList(elemNo, elemListLength);
+      assert(elemList != nullptr);
       if (elemList == nullptr) {
         DebugLog("tran[%d].from = %d, could not load element list", i, elemNo);
         return;
       }
+      assert(elemListLength != 0);
       if (elemListLength == 0) {
         DebugLog("tran[%d].from = %d, element list has 0 length", i, elemNo);
         return;
