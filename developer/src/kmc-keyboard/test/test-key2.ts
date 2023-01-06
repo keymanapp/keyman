@@ -13,7 +13,7 @@ describe('key2', function () {
   it('should compile minimal keys data', function () {
     let key2 = loadSectionFixture(Key2Compiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Key2;
     assert.ok(key2);
-    // assert.equal(compilerTestCallbacks.messages.length, 0);
+    assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(key2.keys.length, 1);
     assert.equal(key2.flicks.length, 1); // there's always a 'null' flick
     assert.equal(key2.keys[0].to.value, '🪦');
