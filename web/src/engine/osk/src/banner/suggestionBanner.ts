@@ -13,15 +13,41 @@ import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
 
-// TODO:  finalize + document
-interface OptionFormatSpec {
+/**
+ * Defines various parameters used by `BannerSuggestion` instances for layout and formatting.
+ * This object is designed first and foremost for use with `BannerSuggestion.update()`.
+ */
+interface BannerSuggestionFormatSpec {
+  /**
+   * Sets a minimum width to use for the `BannerSuggestion`'s element; this overrides any
+   * and all settings that would otherwise result in a narrower final width.
+   */
   minWidth?: number;
-  paddingWidth: number,
-  emSize: number,
-  styleForFont: CSSStyleDeclaration
 
+  /**
+   * Sets the width of padding around the text of each suggestion.  This should generally match
+   * the 'width' of class = `.kmw-suggest-option::before` and class = `.kmw-suggest-option::after`
+   * elements as defined in kmwosk.css.
+   */
+  paddingWidth: number,
+
+  /**
+   * The default font size to use for calculations based on relative font-size specs
+   */
+  emSize: number,
+
+  /**
+   * The font style (font-size, font-family) to use for suggestion-banner display text.
+   */
+  styleForFont: CSSStyleDeclaration,
+
+  /**
+   * Sets a target width to use when 'collapsing' suggestions.  Only affects those long
+   * enough to need said 'collapsing'.
+   */
   collapsedWidth?: number
 }
+
 export class BannerSuggestion {
   div: HTMLDivElement;
   container: HTMLDivElement;
@@ -104,7 +130,7 @@ export class BannerSuggestion {
    * @param collapsedTargetWidth
    * Description  Update the ID and text of the BannerSuggestionSpec
    */
-  public update(suggestion: Suggestion, format: OptionFormatSpec) {
+  public update(suggestion: Suggestion, format: BannerSuggestionFormatSpec) {
     this._suggestion = suggestion;
 
     let display = this.generateSuggestionText(this.rtl);
@@ -147,31 +173,55 @@ export class BannerSuggestion {
     }
   }
 
+  /**
+   * Denotes the threshold at which the banner suggestion will no longer gain width
+   * in its default form, resulting in two separate states:  "collapsed" and "expanded".
+   */
   public get targetCollapsedWidth(): number {
     return this._collapsedWidth;
   }
 
+  /**
+   * The raw width needed to display the suggestion's display text without triggering overflow.
+   */
   public get textWidth(): number {
     return this._textWidth;
   }
 
+  /**
+   * Width of the padding to apply equally on both sides of the suggestion's display text.
+   * Is the sum of both, rather than the value applied to each side.
+   */
   public get paddingWidth(): number {
     return this._paddingWidth;
   }
 
+  /**
+   * The absolute minimum width to allow for the represented suggestion's banner element.
+   */
   public get minWidth(): number {
     return this._minWidth;
   }
 
+  /**
+   * The absolute minimum width to allow for the represented suggestion's banner element.
+   */
   public set minWidth(val: number) {
     this._minWidth = val;
   }
 
+  /**
+   * The total width taken by the suggestion's banner element when fully expanded.
+   * This may equal the `collapsed` width for sufficiently short suggestions.
+   */
   public get expandedWidth(): number {
     // minWidth must be defined AND greater for the conditional to return this.minWidth.
     return this.minWidth > this.spanWidth ? this.minWidth : this.spanWidth;
   }
 
+  /**
+   * The total width used by the internal contents of the suggestion's banner element when not obscured.
+   */
   public get spanWidth(): number {
     let spanWidth = this.textWidth ?? 0;
     if(spanWidth) {
@@ -181,21 +231,32 @@ export class BannerSuggestion {
     return spanWidth;
   }
 
+  /**
+   * The actual width to be used for the `BannerSuggestion`'s display element when in the 'collapsed'
+   * state and not transitioning.
+   */
   public get collapsedWidth(): number {
     // Allow shrinking a suggestion's width if it has excess whitespace.
     let utilizedWidth = this.spanWidth < this.targetCollapsedWidth ? this.spanWidth : this.targetCollapsedWidth;
     // If a minimum width has been specified, enforce that minimum.
     let maxWidth = utilizedWidth < this.expandedWidth ? utilizedWidth : this.expandedWidth;
 
-
     // Will return maxWidth if this.minWidth is undefined.
     return (this.minWidth > maxWidth ? this.minWidth : maxWidth);
   }
 
+  /**
+   * The actual width currently utilized by the `BannerSuggestion`'s display element, regardless of
+   * current state.
+   */
   public get currentWidth(): number {
     return this.div.offsetWidth;
   }
 
+  /**
+   * The actual width currently utilized by the `BannerSuggestion`'s display element, regardless of
+   * current state.
+   */
   public set currentWidth(val: number) {
     // TODO:  probably should set up errors or something here...
     if(val < this.collapsedWidth) {
@@ -451,6 +512,11 @@ export class SuggestionBanner extends Banner {
     }
   }
 
+  /**
+   * Produces a closure useful for updating the SuggestionBanner's UI to match newly-received
+   * suggestions, including optimization of the banner's layout.
+   * @param suggestions
+   */
   public onSuggestionUpdate = (suggestions: Suggestion[]): void => {
     this.currentSuggestions = suggestions;
 
@@ -464,7 +530,7 @@ export class SuggestionBanner extends Banner {
     const textLeftPad = new ParsedLengthStyle(textStyle.paddingLeft   || '2px');   // computedStyle will fail if the element's not in the DOM yet.
     const textRightPad = new ParsedLengthStyle(textStyle.paddingRight || '2px');
 
-    let optionFormat: OptionFormatSpec = {
+    let optionFormat: BannerSuggestionFormatSpec = {
       paddingWidth: textLeftPad.val + textRightPad.val, // Assumes fixed px padding.
       emSize: emSize,
       styleForFont: fontStyle,
@@ -582,29 +648,51 @@ class SuggestionExpandContractAnimation {
       }
     }
 
-    // Attempt to sync the banner-scroller's offset update with that of the
+    // Synchronize the banner-scroller's offset update with that of the
     // animation for expansion and collapsing.
-    window.requestAnimationFrame(this.setOffsetScroll);
-
-    // this.setOffsetScroll();
+    window.requestAnimationFrame(this.setScrollOffset);
   }
 
-  // the "fun", top-level banner part.
-  private setOffsetScroll = () => {
+  /**
+   * Performs mapping of the user's touchpoint to properly-offset scroll coordinates based on
+   * the state of the ongoing scroll operation.
+   *
+   * First priority:  this function aims to keep all currently-visible parts of a selected
+   * suggestion visible when first selected.  Any currently-clipped parts will remain clipped.
+   *
+   * Second priority:  all animations should be smooth and continuous; aesthetics do matter to
+   * users.
+   *
+   * Third priority:  when possible without violating the first two priorities, this (in tandem with
+   * adjustments within `setBaseScroll`) will aim to sync the touchpoint with its original
+   * location on an expanded suggestion.
+   * - For LTR languages, this means that suggestions will "expand left" if possible.
+   * - While for RTL languages, they will "expand right" if possible.
+   * - However, if they would expand outside of the banner's effective viewport, a scroll offset
+   *   will kick in to enforce the "first priority" mentioned above.
+   *   - This "scroll offset" will be progressively removed (because second priority) if and as
+   *     the user manually scrolls to reveal relevant space that was originally outside of the viewport.
+   *
+   * @returns
+   */
+  private setScrollOffset = () => {
     // If we've been 'decoupled', a different instance (likely for a different suggestion)
     // is responsible for counter-scrolling.
     if(!this.scrollContainer) {
       return;
     }
 
-    // -- Clamping logic --
+    // -- Clamping / "scroll offset" logic --
 
-    // As currently written / defined below, "clamping" refers to alterations to scroll-positioned mapping designed
-    // to keep as much of the expanded option visible as possible via the offsets below while not pushing
-    // already-obscured parts of the expanded option into visible range.
+    // As currently written / defined below, and used internally within this function, "clamping"
+    // refers to alterations to scroll-positioned mapping designed to keep as much of the expanded
+    // option visible as possible via the offsets below (that is, "clamped" to the relevant border)
+    // while not adding extra discontinuity by pushing already-obscured parts of the expanded option
+    // into visible range.
     //
-    // In essence, it's an extra offset we apply that is dynamically adjusted depending on scroll position as it changes.
-    // This offset may be decreased when it is no longer needed to make parts of the element visible.
+    // In essence, it's an extra "scroll offset" we apply that is dynamically adjusted depending on
+    // scroll position as it changes. This offset may be decreased when it is no longer needed to
+    // make parts of the element visible.
 
     // The amount of extra space being taken by a partially or completely expanded suggestion.
     const maxWidthToCounterscroll = this.option.currentWidth - this.option.collapsedWidth;
@@ -619,13 +707,15 @@ class SuggestionExpandContractAnimation {
     // Base position for scrollLeft clamped within std element scroll bounds, including:
     // - an adjustment to cover the extra width from expansion
     // - preserving the base expected overflow levels
+    // Does NOT make adjustments to force extra visibility on the element being highlighted/focused.
     const unclampedExpandingScrollOffset = Math.max(this.collapsedScrollOffset + (rtl ? 0 : 1) * maxWidthToCounterscroll, 0) + (rtl ? 0 : -1) * srcCounterscrollOverflow;
-    const srcUnclampedExpandingScrollOffset = Math.max(this.rootScrollOffset + (rtl ? 0 : 1) * maxWidthToCounterscroll, 0) + (rtl ? 0 : -1) * srcCounterscrollOverflow;
+    // The same, but for our 'root scroll coordinate'.
+    const rootUnclampedExpandingScrollOffset = Math.max(this.rootScrollOffset + (rtl ? 0 : 1) * maxWidthToCounterscroll, 0) + (rtl ? 0 : -1) * srcCounterscrollOverflow;
 
     // Do not shift an element clipped by the screen border further than its original scroll starting point.
     const elementOffsetForClamping = rtl
-      ? Math.max(unclampedExpandingScrollOffset, srcUnclampedExpandingScrollOffset)
-      : Math.min(unclampedExpandingScrollOffset, srcUnclampedExpandingScrollOffset);
+      ? Math.max(unclampedExpandingScrollOffset, rootUnclampedExpandingScrollOffset)
+      : Math.min(unclampedExpandingScrollOffset, rootUnclampedExpandingScrollOffset);
 
     // Based on the scroll point selected, determine how far to offset scrolls to keep the option in visible range.
     // Higher .scrollLeft values make this non-zero and reflect when scroll has begun clipping the element.
@@ -635,20 +725,23 @@ class SuggestionExpandContractAnimation {
       // LTR:       based on scrollLeft            offsetLeft
       : Math.max(elementOffsetForClamping - this.option.div.offsetLeft, 0);
 
+    // If the element is close enough to the border, don't offset beyond the element!
+    // If it is further, do not add excess padding - it'd effectively break scrolling.
+    // Do maintain any remaining scroll offset that exists, though.
     const clampedExpandingScrollOffset = Math.min(maxWidthToCounterscroll, elementOffsetFromBorder);
 
-    const clampedScrollLeft = unclampedExpandingScrollOffset  // base scroll-coordinate transform mapping based on extra width from element expansion
+    const finalScrollOffset = unclampedExpandingScrollOffset                   // base scroll-coordinate transform mapping based on extra width from element expansion
                               + (rtl ? 1 : -1) * clampedExpandingScrollOffset  // offset to scroll to put word-start border against the corresponding screen border, fully visible
                               + (rtl ? 0 :  1) * srcCounterscrollOverflow;     // offset to maintain original overflow past that border if it existed
 
     // -- Final step: Apply & fine-tune the final scroll positioning --
-    this.scrollContainer.scrollLeft = clampedScrollLeft;
+    this.scrollContainer.scrollLeft = finalScrollOffset;
 
-  // Prevent "jitters" during counterscroll that occur on expansion / collapse animation.
+    // Prevent "jitters" during counterscroll that occur on expansion / collapse animation.
     // A one-frame "error correction" effect at the end of animation is far less jarring.
     if(this.pendingAnimation) {
       // scrollLeft doesn't work well with fractional values, unlike marginLeft / marginRight
-      const fractionalOffset = this.scrollContainer.scrollLeft - clampedScrollLeft;
+      const fractionalOffset = this.scrollContainer.scrollLeft - finalScrollOffset;
       // So we put the fractional difference into marginLeft to force it to sync.
       this.option.currentWidth += fractionalOffset;
     }
@@ -712,7 +805,7 @@ class SuggestionExpandContractAnimation {
 
     // Part 3:  perform any needed counter-scrolling, scroll clamping, etc
     // Existence of a followup animation frame is part of the logic, so keep this 'after'!
-    this.setOffsetScroll();
+    this.setScrollOffset();
   };
 
   public collapse() {
@@ -762,7 +855,7 @@ class SuggestionExpandContractAnimation {
 
     // Part 3:  perform any needed counter-scrolling, scroll clamping, etc
     // Existence of a followup animation frame is part of the logic, so keep this 'after'!
-    this.setOffsetScroll();
+    this.setScrollOffset();
   };
 }
 
