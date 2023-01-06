@@ -23,11 +23,33 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-protected static final class KMWKeyboardWebViewClient extends WebViewClient {
-  public static Context context;
+public final class KMKeyboardWebViewClient extends WebViewClient {
+  public static final String TAG = "KMKeyboardWebViewClient";
 
-  KMInAppKeyboardWebViewClient(Context context) {
-    KMInAppKeyboardWebViewClient.context = context;
+  public static Context context;
+  private static KeyboardType keyboardType;
+  private static boolean keyboardLoaded;
+
+  KMKeyboardWebViewClient(Context context, KeyboardType keyboardType) {
+    KMKeyboardWebViewClient.context = context;
+    KMKeyboardWebViewClient.keyboardType = keyboardType;
+    KMKeyboardWebViewClient.keyboardLoaded = false;
+
+    if (keyboardType != KeyboardType.KEYBOARD_TYPE_INAPP && keyboardType != KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      KMLog.LogError(TAG, String.format("Cannot initialize: Invalid keyboard type: %s", keyboardType.toString()));
+    }
+  }
+
+  public void setContext(Context context) {
+    KMKeyboardWebViewClient.context = context;
+  }
+
+  public boolean getKeyboardLoaded() {
+    return keyboardLoaded;
+  }
+
+  public void setKeyboardLoaded(boolean keyboardLoaded) {
+    KMKeyboardWebViewClient.keyboardLoaded = keyboardLoaded;
   }
 
   @Override
@@ -42,15 +64,15 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
 
   private void pageLoaded(WebView view, String url) {
     Log.d("KMEA", "pageLoaded: [inapp] " + url);
-    if (InAppKeyboard == null) {
+    if (KMManager.getKMKeyboard(keyboardType) == null) {
       KMLog.LogError(TAG, "pageLoaded and InAppKeyboard null");
       return;
     }
-    InAppKeyboard.keyboardSet = false;
-    currentLexicalModel = null;
+    KMManager.getKMKeyboard(keyboardType).keyboardSet = false;
+    KMManager.currentLexicalModel = null;
 
     if (url.startsWith("file")) { // TODO: is this test necessary?
-      InAppKeyboardLoaded = true;
+      KMKeyboardWebViewClient.keyboardLoaded = true;
 
       SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
@@ -61,7 +83,7 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
       String langId = null;
       if (keyboardInfo != null) {
         langId = keyboardInfo.getLanguageID();
-        InAppKeyboard.setKeyboard(keyboardInfo);
+        KMManager.getKMKeyboard(keyboardType).setKeyboard(keyboardInfo);
       } else {
         // Revert to default (index 0) or fallback keyboard
         keyboardInfo = KMManager.getKeyboardInfo(context, 0);
@@ -71,16 +93,16 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
         }
         if (keyboardInfo != null) {
           langId = keyboardInfo.getLanguageID();
-          InAppKeyboard.setKeyboard(keyboardInfo);
+          KMManager.getKMKeyboard(keyboardType).setKeyboard(keyboardInfo);
         }
       }
 
-      registerAssociatedLexicalModel(langId);
+      KMManager.registerAssociatedLexicalModel(langId);
 
-      InAppKeyboard.showHelpBubbleAfterDelay(2000, true); // check if it should be shown at that time!
+      KMManager.getKMKeyboard(keyboardType).showHelpBubbleAfterDelay(2000, true); // check if it should be shown at that time!
 
-      InAppKeyboard.callJavascriptAfterLoad();
-      InAppKeyboard.setSpacebarText(spacebarText);
+      KMManager.getKMKeyboard(keyboardType).callJavascriptAfterLoad();
+      KMManager.getKMKeyboard(keyboardType).setSpacebarText(KMManager.getSpacebarText());
 
       KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_LOADED, null);
 
@@ -94,7 +116,7 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
   @Override
   public boolean shouldOverrideUrlLoading(WebView view, String url) {
     Log.d("KMEA", "shouldOverrideUrlLoading [inapp]: " + url);
-    if (InAppKeyboard == null) {
+    if (KMManager.getKMKeyboard(keyboardType) == null) {
       KMLog.LogError(TAG, "shouldOverrideUrlLoading and InAppKeyboard null");
       return false;
     }
@@ -109,30 +131,30 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
       pageLoaded(view, url);
     } else if (url.indexOf("hideKeyboard") >= 0) {
       if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
-        InAppKeyboard.dismissHelpBubble();
+        KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
         KMTextView textView = (KMTextView) KMTextView.activeView;
         textView.dismissKeyboard();
       }
     } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
-      InAppKeyboard.dismissHelpBubble();
-      InAppKeyboard.setShouldShowHelpBubble(false);
+      KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
+      KMManager.getKMKeyboard(keyboardType).setShouldShowHelpBubble(false);
 
       // Globe key has been used; disable the internal preference setting.
       KMManager.setPersistentShouldShowHelpBubble(false);
 
-      handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
+      KMManager.handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
         KeyboardType.KEYBOARD_TYPE_INAPP);
     } else if (url.indexOf("helpBubbleDismissed") >= 0) {
       // The user has begun interacting with the keyboard; we'll disable the help bubble
       // for the rest of the lifetime of this keyboard instance.
-      InAppKeyboard.setShouldShowHelpBubble(false);
+      KMManager.getKMKeyboard(keyboardType).setShouldShowHelpBubble(false);
     } else if (url.indexOf("showKeyPreview") >= 0) {
       String deviceType = context.getResources().getString(R.string.device_type);
       if (deviceType.equals("AndroidTablet")) {
         return false;
       }
 
-      if (InAppKeyboard.subKeysWindow != null) {
+      if (KMManager.getKMKeyboard(keyboardType).subKeysWindow != null) {
         return false;
       }
 
@@ -154,7 +176,7 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
 
       start = url.indexOf("t=") + 2;
       String t = url.substring(start);
-      String text = InAppKeyboard.convertKeyText(t);
+      String text = KMManager.getKMKeyboard(keyboardType).convertKeyText(t);
 
       float left = x - w / 2.0f;
       float right = left + w;
@@ -162,32 +184,32 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
       float bottom = top + h;
 
       RectF keyFrame = new RectF(left, top, right, bottom);
-      InAppKeyboard.showKeyPreview(context, (int) x, (int) y, keyFrame, text);
+      KMManager.getKMKeyboard(keyboardType).showKeyPreview(context, (int) x, (int) y, keyFrame, text);
     } else if (url.indexOf("dismissKeyPreview") >= 0) {
-      InAppKeyboard.dismissKeyPreview(100);
+      KMManager.getKMKeyboard(keyboardType).dismissKeyPreview(100);
     } else if (url.indexOf("showMore") >= 0) {
-      if (InAppKeyboard.subKeysWindow != null && InAppKeyboard.subKeysWindow.isShowing()) {
+      if (KMManager.getKMKeyboard(keyboardType).subKeysWindow != null && KMManager.getKMKeyboard(keyboardType).subKeysWindow.isShowing()) {
         return false;
       }
 
       int start = url.indexOf("keyPos=") + 7;
       int end = url.indexOf("+keys=");
-      InAppKeyboard.subKeysWindowPos = url.substring(start, end).split("\\,");
+      KMManager.getKMKeyboard(keyboardType).subKeysWindowPos = url.substring(start, end).split("\\,");
 
       start = end + 6;
       end = url.indexOf("+font=");
       if (end < 0) {
         end = url.length();
-        InAppKeyboard.specialOskFont = "";
+        KMManager.getKMKeyboard(keyboardType).specialOskFont = "";
       } else {
-        InAppKeyboard.specialOskFont = KMFilename_Osk_Ttf_Font;
+        KMManager.getKMKeyboard(keyboardType).specialOskFont = KMManager.KMFilename_Osk_Ttf_Font;
       }
 
       String keys = url.substring(start, end);
 
       String[] keyList = keys.split("\\;");
       int klCount = keyList.length;
-      InAppKeyboard.subKeysList = new ArrayList<HashMap<String, String>>();
+      KMManager.getKMKeyboard(keyboardType).subKeysList = new ArrayList<HashMap<String, String>>();
       for (int i = 0; i < klCount; i++) {
         String[] values = keyList[i].split("\\:");
         String keyId = (values.length > 0) ? values[0] : "";
@@ -196,21 +218,22 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
         HashMap<String, String> hashMap = new HashMap<String, String>();
         hashMap.put("keyId", keyId);
         hashMap.put("keyText", keyText);
-        InAppKeyboard.subKeysList.add(hashMap);
+        KMManager.getKMKeyboard(keyboardType).subKeysList.add(hashMap);
       }
     } else if (url.indexOf("refreshBannerHeight") >= 0) {
       int start = url.indexOf("change=") + 7;
       String change = url.substring(start);
       boolean isModelActive = change.equals("active");
-      SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      // appContext instead of context?
+      SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       boolean modelPredictionPref = false;
-      if (currentLexicalModel != null) {
-        modelPredictionPref = prefs.getBoolean(getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+      if (KMManager.currentLexicalModel != null) {
+        modelPredictionPref = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
       }
-      currentBanner = (isModelActive && modelPredictionPref) ?
-        KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
+      KMManager.currentBanner = (isModelActive && modelPredictionPref) ?
+        KMManager.KM_BANNER_STATE_SUGGESTION : KMManager.KM_BANNER_STATE_BLANK;
+      RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
+      KMManager.getKMKeyboard(keyboardType).setLayoutParams(params);
     } else if (url.indexOf("suggestPopup") >= 0) {
       double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
       double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
@@ -224,6 +247,7 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
         /*  // For future implementation
         InAppKeyboard.suggestionWindowPos = new double[]{x, y};
         InAppKeyboard.suggestionJSON = suggestionJSON;
+
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
@@ -234,7 +258,7 @@ protected static final class KMWKeyboardWebViewClient extends WebViewClient {
         }
         */
     } else if (url.indexOf("reloadAfterError") >= 0) {
-      InAppKeyboard.reloadAfterError();
+      KMManager.getKMKeyboard(keyboardType).reloadAfterError();
     }
     return false;
   }

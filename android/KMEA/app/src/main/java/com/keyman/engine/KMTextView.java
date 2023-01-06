@@ -6,6 +6,7 @@ package com.keyman.engine;
 
 import java.util.ArrayList;
 
+import com.keyman.engine.KMKeyboardWebViewClient;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KeyboardEventHandler.EventType;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
@@ -120,7 +121,7 @@ public final class KMTextView extends AppCompatEditText {
       public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
           activeView = v;
-          if (KMManager.InAppKeyboardLoaded) {
+          if (KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) {
             updateTextContext();
           }
           showKeyboard();
@@ -178,7 +179,7 @@ public final class KMTextView extends AppCompatEditText {
 
     Window mainWindow = activity.getWindow();
     if (hasWindowFocus) {
-      KMManager.KMInAppKeyboardWebViewClient.context = context;
+      KMManager.InAppKeyboardWebViewClient.setContext(context);
       activeView = mainWindow.getCurrentFocus();
 
       Typeface font = KMManager.getFontTypeface(context, KMKeyboard.textFontFilename());
@@ -189,7 +190,7 @@ public final class KMTextView extends AppCompatEditText {
       }
 
       if (activeView != null && activeView.equals(this)) {
-        if (KMManager.InAppKeyboardLoaded) {
+        if (KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) {
           updateTextContext();
         }
 
