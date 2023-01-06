@@ -23,13 +23,13 @@ public class FileUtilsTest {
     List<ShadowLog.LogItem> logs = ShadowLog.getLogs();
 
     // The logs contain type 4, but we only care about type 6 for connection messages
-    Assert.assertEquals(3, logs.size());
+    Assert.assertEquals(2, logs.size());
 
-    Assert.assertEquals("Connection", logs.get(1).tag);
-    Assert.assertEquals("Initialization failed:\njava.net.MalformedURLException: no protocol: invalidURL", logs.get(1).msg);
+    Assert.assertEquals("Connection", logs.get(0).tag);
+    Assert.assertEquals("Initialization failed:\njava.net.MalformedURLException: no protocol: invalidURL", logs.get(0).msg);
 
-    Assert.assertEquals("FileUtils", logs.get(2).tag);
-    Assert.assertEquals("Could not download filename ", logs.get(2).msg);
+    Assert.assertEquals("FileUtils", logs.get(1).tag);
+    Assert.assertEquals("Could not download filename ", logs.get(1).msg);
   }
 
   @Test
