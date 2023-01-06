@@ -16,10 +16,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.tavultesoft.kmea.util.ContextUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.util.Locale;
 
 public class BaseActivity extends AppCompatActivity {
+  private static final String TAG = "BaseActivity";
   static ContextWrapper localeUpdatedContext;
 
   /**
@@ -61,6 +63,8 @@ public class BaseActivity extends AppCompatActivity {
     if (context != null) {
       return context.getString(resID);
     };
+    // Shouldn't be here
+    KMLog.LogError(TAG, "context null for getString()");
     return "";
   }
 
