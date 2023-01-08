@@ -487,7 +487,7 @@ For each flick element:
 |---|------|----------------  |----------------------------------------------------------|
 | 0+|  32  | directions       | list: index into `list` section with direction list      |
 | 8+|  32  | flags            | int: per-key flags                                       |
-|12+|  32  | to               | str: output string                                       |
+|12+|  32  | to               | str: output string, or ucs32: output char, see flags     |
 
 If this section is present, it must have a 'flick element' at position zero with directions=0, flags=0, and to=0 meaning 'no flick'.
 

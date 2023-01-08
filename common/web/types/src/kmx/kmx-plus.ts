@@ -111,6 +111,10 @@ export class Ordr extends Section {
 
 // 'strs'
 
+/**
+ * A string item in memory. This will be replaced with an index
+ * into the string table at finalization.
+ */
 export class StrsItem {
   readonly value: string;
   constructor(value: string) {
@@ -309,9 +313,7 @@ export class List extends Section {
    * @returns a List object
    */
   allocListFromSpaces(strs: Strs, s?: string): ListItem {
-    if(s === undefined || s === null) {
-      s = '';
-    }
+    s = s ?? '';
     return this.allocList(strs, s.split(' '));
   }
   allocListFromEscapedSpaces(strs: Strs, s?: string): ListItem {

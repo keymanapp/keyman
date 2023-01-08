@@ -1,6 +1,5 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { /*LDMLKeyboard,*/ KMXPlus, /*Constants*/ } from '@keymanapp/common-types';
-// import { CompilerMessages } from './messages.js';
+import { KMXPlus } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 
 import GlobalSections = KMXPlus.GlobalSections;
@@ -8,7 +7,6 @@ import Key2 = KMXPlus.Key2;
 import ListItem = KMXPlus.ListItem;
 import Key2Flicks = KMXPlus.Key2Flicks;
 
-// import USVirtualKeyMap = Constants.USVirtualKeyMap;
 
 export class Key2Compiler extends SectionCompiler {
 
@@ -18,6 +16,7 @@ export class Key2Compiler extends SectionCompiler {
 
   public validate() {
     let valid = true;
+    // TODO-LDML: some validation needed here?
     return valid;
   }
 
@@ -45,6 +44,7 @@ export class Key2Compiler extends SectionCompiler {
 
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
+        // TODO-LDML: single char
         const to = sections.strs.allocAndUnescapeString(lkflick.to);
         flags |= constants.key2_flick_flags_extend;
         let directions : ListItem = sections.list.allocListFromSpaces(sections.strs, lkflick.directions);
@@ -71,9 +71,9 @@ export class Key2Compiler extends SectionCompiler {
         flags |= constants.key2_key_flags_notransform;
       }
       const id = sections.strs.allocString(key.id);
-      const longPress : ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.longPress);
+      const longPress: ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.longPress);
       const longPressDefault = sections.strs.allocAndUnescapeString(key.longPressDefault);
-      const multiTap : ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.multiTap);
+      const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(sections.strs, key.multiTap);
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
       flags |= constants.key2_key_flags_extend;
       const to = sections.strs.allocAndUnescapeString(key.to); // TODO-LDML: single char

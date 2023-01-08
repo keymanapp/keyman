@@ -1,6 +1,6 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlusData } from "../kmx-plus.js";
+import { Key2Flick, KMXPlusData, StrsItem } from "../kmx-plus.js";
 import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
 import { build_list_index, BUILDER_LIST } from "./build-list.js";
 import { BUILDER_SECTION } from "./builder-section.js";
@@ -9,30 +9,41 @@ import { BUILDER_SECTION } from "./builder-section.js";
  * key2 section
    ------------------------------------------------------------------ */
 
+/**
+ * This struct is a single <key> in the key2 keybag
+ */
 interface BUILDER_KEY2_KEY {
-  vkey: number;
-  to: number; // str
+  vkey: number; // Scan code for the key
+  to: number; // str or single codepoint
   flags: number;
-  id: number; // str
-  switch: number; // str
-  width: number; // width*10
-  longPress: number; // list
-  longPressDefault: number; // str
-  multiTap: number; // list
-  flicks: number; // index into flicks[]
+  id: number; // str with original key id
+  _id: string; // original key id, for sorting
+  switch: number; // str with layer of new l
+  width: number; // ceil((width||1)*10), so 12 for width 1.2
+  longPress: number; // list of longPress sequences
+  longPressDefault: number; // str with the default longPress target
+  multiTap: number; // list of multiTap sequences
+  flicks: number; // index into the flicks[] subtable for this flick list
 };
 
-interface BUILDER_KEY2_FLICK {
-  directions: number; // list
-  flags: number;
-  to: number; // str
-};
-
+/**
+ * This is a <flicks>, a list of <flick> elements.
+ */
 interface BUILDER_KEY2_FLICKS {
-  count: number;
-  flick: number; // index into flick[]
-  id: number; //str
-  _id: string;
+  count: number; // number of BUILDER_KEY2_FLICK entries in this flick list
+  flick: number; // index into the flick[] subtable of the first flick in the list
+  id: number; // str with the original id of this flicks
+  _id: string; // copy of the flicks id, used for sorting during build
+  _flicks: Key2Flick[]; // temporary copy of Key2Flick object
+};
+
+/**
+ * This is a single <flick> element.
+ */
+interface BUILDER_KEY2_FLICK {
+  directions: number; // list of cardinal/intercardinal directions
+  flags: number; //
+  to: number; // str or single codepoint
 };
 
 /**
@@ -53,7 +64,7 @@ export interface BUILDER_KEY2 extends BUILDER_SECTION {
 };
 
 export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_list: BUILDER_LIST): BUILDER_KEY2 {
-  if(!kmxplus.key2.keys.length &&
+  if(kmxplus.key2.keys.length == 0 &&
       (kmxplus.key2.flicks.length <= 1)) { // if no keys and only the 'null' flick.
     return null;
   }
@@ -73,18 +84,24 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     _offset: 0,
   };
 
-  // flicks first
-  // sort the input, to simplify bookkeeping later
-  kmxplus.key2.flicks.sort((a, b) => a.compareTo(b));
-  // we always need a flicks=0 to mena 'no flicks'
+  // flicks first: the keys will need to index into the flicks table.
+
+  // Note that per the Key2 class and spec, there is always a flicks=0 meaning 'no flicks'
   key2.flicks = kmxplus.key2.flicks.map((flicks) => {
     let result : BUILDER_KEY2_FLICKS = {
       count: flicks.flicks.length,
       flick: key2.flick.length, // index of first flick
       id: build_strs_index(sect_strs, flicks.id),
       _id: flicks.id.value,
+      _flicks: flicks.flicks,
     };
-    flicks.flicks.forEach((flick) => {
+    return result;
+  });
+  // Sort the flicks array by id
+  key2.flicks.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
+  // now, allocate 'flick' entries for each 'flicks'
+  key2.flicks.forEach((flicks) => {
+    flicks._flicks.forEach((flick) => {
       key2.flick.push({
         directions: build_list_index(sect_list, flick.directions),
         flags: flick.flags,
@@ -92,17 +109,16 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
       });
       key2.flickCount++;
     });
-    return result;
   });
 
-  // now keys
-  kmxplus.key2.keys.sort((a, b) => a.id.compareTo(b.id));
+  // now, keys
   key2.keys = kmxplus.key2.keys.map((key) => {
     let result : BUILDER_KEY2_KEY = {
       vkey: key.vkey,
       to: build_strs_index(sect_strs, key.to),
       flags: key.flags,
       id: build_strs_index(sect_strs, key.id),
+      _id: key.id.value,
       switch: build_strs_index(sect_strs, key.switch),
       width: key.width,
       longPress: build_list_index(sect_list, key.longPress),
@@ -116,6 +132,8 @@ export function build_key2(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     }
     return result;
   });
+  // sort the keys by id
+  key2.keys.sort((a, b) => StrsItem.binaryStringCompare(a._id, b._id));
 
   let offset = constants.length_key2 +
     (constants.length_key2_key * key2.keyCount) +

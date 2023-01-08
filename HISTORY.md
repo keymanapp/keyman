@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.23 alpha 2023-01-03
+
+* fix(linux): add IBUS_HAS_PREFILTER ifdef to linux/ibus-keyman/tests (#7958)
+* docs(linux): document fullbuild using docker (#7960)
+
 ## 17.0.22 alpha 2023-01-02
 
 * chore: merge beta to master (A17S2) (#7948)

@@ -412,7 +412,6 @@ COMP_KMXPLUS_LAYR_Helper::setLayr(const COMP_KMXPLUS_LAYR *newLayr) {
     keys     = nullptr;
     is_valid = false;
   }
-  // rawdata += sizeof(COMP_KMXPLUS_LAYR_KEY) * layr->keyCount;
 
   // Now, validate offsets by walking
   if (is_valid) {

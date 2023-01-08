@@ -78,10 +78,7 @@ export interface LKKey {
   longPress?: string;
   longPressDefault?: string;
   multiTap?: string;
-  /**
-   * "no" or falsy
-   */
-  transform?: string;
+  transform?: "no";
   width?: number;
 };
 

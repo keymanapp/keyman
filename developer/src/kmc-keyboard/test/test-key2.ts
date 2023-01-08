@@ -3,7 +3,6 @@ import { assert } from 'chai';
 import { Key2Compiler } from '../src/compiler/key2.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
-// import { CompilerMessages } from '../src/compiler/messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 import Key2 = KMXPlus.Key2;
@@ -14,7 +13,7 @@ describe('key2', function () {
   it('should compile minimal keys data', function () {
     let key2 = loadSectionFixture(Key2Compiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Key2;
     assert.ok(key2);
-    // assert.equal(compilerTestCallbacks.messages.length, 0);
+    assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(key2.keys.length, 1);
     assert.equal(key2.flicks.length, 1); // there's always a 'null' flick
     assert.equal(key2.keys[0].to.value, '🪦');
@@ -30,7 +29,7 @@ describe('key2', function () {
     const [q] = key2.keys.filter(({ id }) => id.value === 'q');
     assert.ok(q);
     assert.isFalse(!!(q.flags & constants.key2_key_flags_gap));
-    assert.equal(q.width, 32); // ceil(3.1 * 10)
+    assert.equal(q.width, 32); // ceil(3.14159 * 10.0)
     assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
     assert.equal(q.longPress.toString(), 'á é í');
     assert.equal(q.longPressDefault.value, 'é');

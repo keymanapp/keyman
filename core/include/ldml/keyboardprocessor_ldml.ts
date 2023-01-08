@@ -456,8 +456,8 @@ class Constants {
    * @returns hex ID such as 0x74636573
    */
   hex_section_id(id:string) {
-      if(!id || typeof id !== 'string' || !id.match(/[a-z0-9][a-z0-9][a-z0-9][a-z0-9]/)) {
-          throw Error(`hex_section_id(${id}) - need a 4-character string`);
+      if(!id || typeof id !== 'string' || !id.match(/^[a-z0-9]{4}$/)) {
+          throw Error(`hex_section_id(${id}) - need a 4-character alphanumeric lower-case string`);
       }
       let r = 0;
       for (let i = 3; i>=0; i--) {
