@@ -65,25 +65,25 @@ validate_section_name(KMX_DWORD ident) {
  */
 static const kmx::COMP_KMXPLUS_HEADER *
 header_from_bytes(const uint8_t *data, KMX_DWORD length, uint32_t ident) {
-  assert(data);
   if (!data) {
     DebugLog("!data");
+    assert(false);
     return nullptr;
   }
-  assert(length >= LDML_LENGTH_HEADER);
   if (length < LDML_LENGTH_HEADER) {
     DebugLog("length < LDML_LENGTH_HEADER");
+    assert(false);
     return nullptr;
   }
   const COMP_KMXPLUS_HEADER *all = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(data);
   if (!all->valid(length)) {
-    assert(false);
     DebugLog("header failed validation");
+    assert(false);
     return nullptr;
   }
-  assert(all->ident == ident);
   if (all->ident != ident) {
     DebugLog("header had wrong section id");
+    assert(false);
     return nullptr;
   }
   return all;
@@ -99,9 +99,9 @@ header_from_bytes(const uint8_t *data, KMX_DWORD length, uint32_t ident) {
  */
 template <class T>
 const T *section_from_bytes(const uint8_t *data, KMX_DWORD length) {
-  assert(length >= sizeof(T));
   if (length < sizeof(T)) { // Does not include dynamic data. First check.
     DebugLog("length < sizeof(section)");
+    assert(false);
     return nullptr;
   }
   const COMP_KMXPLUS_HEADER *header = header_from_bytes(data, length, T::IDENT);
@@ -118,9 +118,9 @@ template <class T>
 const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
   DebugLog("----"); // separate a new section's validation
   const uint8_t *rawbytes = reinterpret_cast<const uint8_t *>(sect);
-  assert(rawbytes != nullptr);
   if (rawbytes == nullptr) {
     DebugLog("section_from_sect(nullptr) == nullptr");
+    assert(false);
     return nullptr;
   }
   KMX_DWORD offset = sect->find(T::IDENT);
@@ -135,14 +135,14 @@ const T *section_from_sect(const COMP_KMXPLUS_SECT* sect) {
 bool
 COMP_KMXPLUS_HEADER::valid(KMX_DWORD length) const {
   DebugLog("%c%c%c%c: (%X) size 0x%X\n", DEBUG_IDENT(ident), ident, size);
-  assert(size >= LDML_LENGTH_HEADER);
   if (size < LDML_LENGTH_HEADER) {
     DebugLog("size < LDML_LENGTH_HEADER");
+    assert(false);
     return false;
   }
-  assert(size <= length);
   if (size > length) {
     DebugLog("size > length");
+    assert(false);
     return false;
   }
   if (!validate_section_name(ident)) {
@@ -156,8 +156,8 @@ bool
 COMP_KMXPLUS_KEYS::valid(KMX_DWORD _kmn_unused(length)) const {
   DebugLog(" count: #0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    assert(false);
     DebugLog("header.size < expected size");
+    assert(false);
     return false;
   }
   for (KMX_DWORD i = 0; i<count; i++) {
@@ -217,8 +217,8 @@ bool
 COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
   DebugLog("vkey: count 0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    assert(false);
     DebugLog("header.size < expected size");
+    assert(false);
     return false;
   }
   // TODO-LDML
@@ -230,8 +230,8 @@ bool
 COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
   DebugLog("disp: count 0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    assert(false);
     DebugLog("header.size < expected size");
+    assert(false);
     return false;
   }
   // TODO-LDML
@@ -258,9 +258,9 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     }
     const uint8_t* thisptr = reinterpret_cast<const uint8_t*>(this);
     const KMX_WCHAR* start = reinterpret_cast<const KMX_WCHAR*>(thisptr+offset);
-    assert(start[length] == 0);
     if(start[length] != 0) {
       DebugLog("#0x%X: String of length 0x%x not null terminated", i, length);
+      assert(start[length] == 0);
       return false;
     }
     // TODO-LDML: validate valid UTF-16LE?
@@ -335,9 +335,9 @@ COMP_KMXPLUS_ELEM::valid(KMX_DWORD _kmn_unused(length)) const {
 
 const COMP_KMXPLUS_ELEM_ELEMENT *
 COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) const {
-  assert(elementNumber < count);
   if (elementNumber >= count) {
     DebugLog("ERROR: COMP_KMXPLUS_ELEM::getElementList(%d) >= count %d", elementNumber, count);
+    assert(false);
     return nullptr;
   }
   const COMP_KMXPLUS_ELEM_ENTRY &entry = entries[elementNumber];
