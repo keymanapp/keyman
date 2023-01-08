@@ -254,4 +254,5 @@ BEGIN
     CERR_PostKeystrokeGroupMustBeReadonly              "Group used in begin postKeystroke must be readonly"
     CERR_DuplicateGroup                                "A group with this name has already been defined."
     CERR_DuplicateStore                                "A store with this name has already been defined."
+    CERR_RepeatedBegin                                 "This begin statement has already been defined."
 END

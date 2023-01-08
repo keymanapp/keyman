@@ -37,6 +37,7 @@ type
     pages: TLeftTabbedPageControl;
     pageDetails: TTabSheet;
     sbDetails: TScrollBox;
+    sbCompile: TScrollBox;
     panWordlists: TPanel;
     lblWordlists: TLabel;
     gridWordlists: TStringGrid;
@@ -47,7 +48,6 @@ type
     lblBasicInformation: TLabel;
     pageSource: TTabSheet;
     pageCompile: TTabSheet;
-    Panel1: TPanel;
     lblCongrats: TLabel;
     panBuildLexicalModel: TPanel;
     cbFormat: TComboBox;
@@ -120,6 +120,8 @@ type
     procedure cmdOpenProjectFolderClick(Sender: TObject);
     procedure cmdCopyDebuggerLinkClick(Sender: TObject);
     procedure chkLanguageUsesCasingClick(Sender: TObject);
+    procedure sbDetailsMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
     type
       TWordlist = class
@@ -618,6 +620,14 @@ begin
     AllowChange := MoveSourceToDesign
   else
     AllowChange := MoveDesignToSource
+end;
+
+procedure TfrmModelEditor.sbDetailsMouseWheel(Sender: TObject;
+  Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+  (Sender as TScrollBox).VertScrollBar.Position := (Sender as TScrollBox).VertScrollBar.Position - WheelDelta div 2;
+  Handled := True;
 end;
 
 { --------- Details tab --------- }

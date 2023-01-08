@@ -324,27 +324,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="koTurnOnSurrogates" comment="Advanced options - turn on Unicode suplementary character display (not needed in Vista)">បើក​ការបង្ហាញ​តួ​អក្សរ​បន្ថែមរបស់យូនីកូដ (តម្រូវ​ឱ្យ​បិទ​រួច​បើក​ឡើង​វិញ)</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koUnknownLanguage" comment="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">បើក​ភាសា \'ដែល​មិន​ស្គាល់\'</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">ការប្រមូល​ព័ត៌មានសម្រាប់​ដោះស្រាយ​បញ្ហា</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koSwitchLanguageWithKeyboard" comment="Advanced options - switch Windows language when keyboard selected">ប្ដូរ​ភាសារបស់ Windows នៅ​ពេល​ក្ដារចុច Keyman ណាមួយ​ត្រូវ​បាន​ជ្រើសរើស</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.1.274.0 -->
-  <string name="koSwitchLanguageForAllApplications" comment="Advanced options - selected language applies to all applications">ជ្រើសរើស​ប្លង់​ក្ដារចុចសម្រាប់​កម្មវិធី​ទាំង​អស់</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koRunElevatedInVista" comment="Advanced options - elevate user permission to highest permissible level">បើក​ការអនុញ្ញាត​របស់​អ្នក​ប្រើប្រាស់​ជានិច្ច នៅពេល​កំពុង​ដំណើរការលើ Windows Vista</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->

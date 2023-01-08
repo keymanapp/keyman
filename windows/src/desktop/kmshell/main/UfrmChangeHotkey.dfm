@@ -66,7 +66,7 @@ inherited frmChangeHotkey: TfrmChangeHotkey
     Top = 61
     Width = 113
     Height = 17
-    Caption = 'None'
+    Caption = 'No Hotkey'
     TabOrder = 0
     OnClick = rbNoneClick
   end

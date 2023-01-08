@@ -1,0 +1,71 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "A` tabbitini a` yiɗi woggugo kibod man '%@'?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "A` haɗata kuuje ɗo.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "Accu";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "Woggu";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "Wa`unu kibod Keyman?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "A` yiɗi Keyman wa`ina kibod man diga dow fayel man '%@'?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "Accu";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "Wa`unu";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "Nastata nder fayel Keyman '%@'.";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(juumre tuma loowgol tappirde)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "anndaaka";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "TOH";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Nonde %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Jippungo...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Jippungo timmini.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Accu";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Waɗi";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Tappirɗe:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Ponte:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Yamre Haɓɓere:";
+
+/* author label in the Package Information window */
+"author-label" = "Topaajo:";
+
+/* website label in the Package Information window */
+"website-label" = "Lowre Geese:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Copyright:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";

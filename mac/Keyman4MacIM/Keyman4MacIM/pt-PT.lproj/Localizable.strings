@@ -25,6 +25,12 @@
 /* Message displayed to inform user that .kmp file could not be read/unzipped  */
 "message-keyboard-file-unreadable" = "Não foi possível ler o arquivo Keyman '%@'.";
 
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(error loading keyboard)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "unknown";
+
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "OK";
 
@@ -60,3 +66,6 @@
 
 /* copyright label in the Package Information window */
 "copyright-label" = "Copyright:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";

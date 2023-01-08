@@ -3,6 +3,7 @@
 /// <reference path="kmwbase.ts" />
 /// <reference path="osk/embedded/keytip.ts" />
 /// <reference path="osk/embedded/pendingLongpress.ts" />
+/// <reference path="osk/embedded/globeHint.ts" />
 
 // KeymanWeb 11.0
 // Copyright 2019 SIL International
@@ -72,12 +73,17 @@ namespace com.keyman.osk {
       }
     };
 
-    // Create a keytip (dummy call - actual keytip handled by native code)
     VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
       if(com.keyman.singleton.util.device.formFactor == 'phone') {
         this.keytip = new osk.embedded.KeyTip(window['oskCreateKeyPreview'], window['oskClearKeyPreview']);
       }
     };
+  } // end Android-only block.
+
+  VisualKeyboard.prototype.createGlobeHint = function(this: VisualKeyboard) {
+    this.globeHint = new com.keyman.osk.embedded.GlobeHint(this);
+    let keyman = com.keyman.singleton;
+    keyman.osk._Box.appendChild(this.globeHint.element!);
   }
 
   SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
@@ -136,10 +142,7 @@ namespace com.keyman.text {
     opt['attachType'] = 'manual';
     device.app=opt['app'];
     device.touchable=true;
-    device.formFactor='phone';
-    if(navigator && navigator.userAgent && navigator.userAgent.indexOf('iPad') >= 0) device.formFactor='tablet';
-    if(device.app.indexOf('Mobile') >= 0) device.formFactor='phone';
-    if(device.app.indexOf('Tablet') >= 0) device.formFactor='tablet';
+    device.formFactor = device.app.indexOf('Tablet') >= 0 ? 'tablet' : 'phone';
     device.browser='native';
   };
 
@@ -147,6 +150,16 @@ namespace com.keyman.text {
   keymanweb.getStyleSheetPath = function(ssName) {
     return keymanweb.rootPath+ssName;
   };
+
+  keymanweb.linkStylesheetResources = function() {
+    const keyman = keymanweb as KeymanBase;
+    let util = keyman.util;
+
+    // Install the globe-hint stylesheet.
+    util.linkStyleSheet(keymanweb.getStyleSheetPath('globe-hint.css'));
+
+    // For now, the OSK will handle linking of the main OSK stylesheet separately.
+  }
 
   // Get KMEI, KMEA keyboard path (overrides default function, allows direct app control of paths)
   keymanweb.getKeyboardPath = function(Lfilename, packageID) {
@@ -328,6 +341,22 @@ namespace com.keyman.text {
 
     return x+','+y+','+w+','+h;
   };
+
+  keymanweb['showGlobeHint'] = function(text: string, onAutodismissal?: () => void) {
+    const keyman = keymanweb as KeymanBase;
+    const globeHint = keyman.osk?.vkbd?.globeHint;
+
+    if(globeHint) {
+      // Ensure localized text is properly in-place.
+      globeHint.text = text;
+      globeHint.show(keyman.osk.vkbd.currentLayer.globeKey.btn, onAutodismissal);
+    }
+  }
+
+  keymanweb['hideGlobeHint'] = function() {
+    const keyman = keymanweb as KeymanBase;
+    keyman.osk?.vkbd?.globeHint?.hide(keyman.osk.vkbd.currentLayer.globeKey.btn);
+  }
 
  /**
    *  Accept an external key ID (from KeymanTouch) and pass to the keyboard mapping

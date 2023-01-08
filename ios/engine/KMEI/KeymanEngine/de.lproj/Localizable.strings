@@ -49,6 +49,12 @@
 /* Confirmation text to display before uninstalling a lexical model */
 "command-uninstall-lexical-model-confirm" = "Möchten Sie dieses Wörterbuch deinstallieren?";
 
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Die gewünschte Tastatur konnte nicht geladen werden";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Das gewünschte Wörterbuch konnte nicht geladen werden";
+
 /* Text for error when an installed file is unexpectedly missing */
 "error-missing-file" = "Eine erforderliche Datei konnte nicht gefunden werden.";
 
@@ -112,11 +118,20 @@
 /* Error opening a Keyman package - package is not valid */
 "kmp-error-invalid" = "Die Paketdatei ist beschädigt.";
 
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "Das angegebene Keyman-Paket existiert nicht.";
+
 /* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
 "kmp-error-missing-resource" = "Dieses Paket enthält nicht die angeforderte Tastatur oder Wörterbuch.";
 
+/* Error installing a Keyman package with a version of Keyman that does not support it */
+"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Dieses Paket wurde nicht richtig erstellt - Inhalt unbekannt.";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "Dieses Keyman-Paket enthält keine Unterstützung für Ihr Gerät.";
 
 /* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
 "kmp-error-wrong-type" = "Dieses Paket enthält nicht den erwarteten Ressourcentyp.";
@@ -180,6 +195,36 @@
 
 /* Title for the main Settings menu */
 "menu-settings-title" = "Keyman Einstellungen";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Beschriftung auf Leertaste nicht anzeigen";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Tastaturnamen auf Leertaste anzeigen";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Sprache auf Leertaste anzeigen";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Sprache und Tastaturnamen auf Leertaste anzeigen";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Leertasten-Beschriftung";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Leertasten-Beschriftung";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Leer";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Tastatur";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Sprache";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Sprache und Tastatur";
 
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Download der Tastatur fehlgeschlagen";

@@ -5,10 +5,12 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.1'
+        // Gradle plugin 7.3.0+ requires JDK 11
+        // https://developer.android.com/studio/releases/gradle-plugin#compatibility-7-3-0
+        classpath 'com.android.tools.build:gradle:4.2.2'
         // io.sentry:sentry-android-gradle-plugin not available for library project
-        classpath 'io.sentry:sentry-android:4.3.0'
-        classpath 'name.remal:gradle-plugins:1.3.1'
+        classpath 'io.sentry:sentry-android:6.9.2'
+        classpath 'name.remal:gradle-plugins:1.5.0'
     }
 }
 

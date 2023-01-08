@@ -14,7 +14,6 @@ namespace km {
 namespace kbp {
 
 class abstract_processor;
-class state;
 
 namespace kmx {
 
@@ -42,7 +41,7 @@ public:
   void Set(int nStoreToSet, std::u16string const &value);
   void Set(std::u16string const &key, std::u16string const &value);
   void Reset(abstract_processor &, int nStoreToReset);
-  void Save(state & state, int nStoreToSave);
+  void Save(int nStoreToSave);
 
   void SetInternalDebugItems(KMX_DebugItems *debug_items) {
     m_debug_items = debug_items;

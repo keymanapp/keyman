@@ -3,7 +3,7 @@
 #
 # @darcywong00 @mcdurdin @ermshiperete @rc-swag @SabineSIL @sgschantz
 
-/android/                     @darcywong00  @mcdurdin
+/android/                     @darcywong00  @sgschantz
 
 /common/                      @mcdurdin     @rc-swag
 /core/                        @mcdurdin     @rc-swag
@@ -12,7 +12,7 @@
 /common/predictive-text/      @jahorton     @mcdurdin
 /common/schemas/              @mcdurdin     @jahorton
 /common/test/                 @mcdurdin     @ermshiperete
-/common/web/                  @jahorton     @sgschantz     @mcdurdin
+/common/web/                  @jahorton     @mcdurdin
 
 /developer/                   @mcdurdin     @darcywong00
 /docs/                        @mcdurdin     @jahorton
@@ -20,14 +20,13 @@
 /linux/                       @ermshiperete @darcywong00
 /mac/                         @sgschantz    @SabineSIL
 
-/oem/firstvoices/android/     @darcywong00  @mcdurdin
+/oem/firstvoices/android/     @darcywong00  @sgschantz
 /oem/firstvoices/common/      @mcdurdin     @rc-swag
 /oem/firstvoices/ios/         @sgschantz    @jahorton
 /oem/firstvoices/windows/     @rc-swag      @ermshiperete
 /resources/                   @mcdurdin     @jahorton
 
 # Web is currently shared between Marc and Joshua:
-/web/                         @jahorton     @sgschantz     @mcdurdin
+/web/                         @jahorton     @mcdurdin
 
 /windows/                     @rc-swag      @ermshiperete
-

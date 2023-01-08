@@ -145,6 +145,7 @@ struct COMP_STORE {
 #define ISVIRTUALKEY    0x4000      // It is a Virtual Key Sequence
 #define VIRTUALCHARKEY  0x8000      // Keyman 6.0: Virtual Key Cap Sequence
 #define K_MODIFIERFLAG  0x007F
+#define K_CAPITALMASK (CAPITALFLAG|NOTCAPITALFLAG)
 
 struct COMP_KEY {
     WORD Key;  // Windows VK code or character value (VIRTUALCHARKEY, ISVIRTUALKEY)

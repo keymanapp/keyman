@@ -112,7 +112,7 @@ begin
       if OpenKeyReadOnly('\'+SRegKey_KeyboardLayoutSubstitutes_CU) and
         ValueExists(IntToHex(HIWORD(ahkl), 8)) then
       begin
-        Result := StrToIntDef('$'+ReadString(IntToHex(HIWORD(ahkl), 8)), 0);
+        Result := DWord(StrToIntDef('$'+ReadString(IntToHex(HIWORD(ahkl), 8)), 0));
         Exit;
       end;
     finally
@@ -146,7 +146,7 @@ begin
       begin
         if StrToIntDef('$'+ReadString(SRegValue_KeyboardLayoutID), 0) = LayoutID then
         begin
-          Result := StrToIntDef('$'+str[i], 0);
+          Result := DWord(StrToIntDef('$'+str[i], 0));
           if Result = 0 then Result := LOWORD(ahkl);
           Exit;
         end;
@@ -186,7 +186,7 @@ begin
         ValueExists(SRegValue_KeyboardLayoutID) then
           if StrToIntDef('$' + ReadString(SRegValue_KeyboardLayoutID), 0) = LayoutID then
         begin
-          Result := HIWORD(StrToIntDef('$'+str[i], 0));
+          Result := HIWORD(DWord(StrToIntDef('$'+str[i], 0)));
           Exit;
         end;
   finally

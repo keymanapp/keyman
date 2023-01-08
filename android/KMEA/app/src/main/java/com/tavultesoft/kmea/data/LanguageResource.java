@@ -55,6 +55,9 @@ public abstract class LanguageResource implements Serializable {
   }
 
   public String getVersion() { return version; }
+  public void setVersion(String version) {
+    this.version = version;
+  }
 
   public String getPackageID() { return packageID; }
 

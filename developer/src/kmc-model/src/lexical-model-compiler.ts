@@ -91,7 +91,10 @@ export default class LexicalModelCompiler {
 
   transpileSources(sources: Array<string>): Array<string> {
     return sources.map((source) => ts.transpileModule(source, {
-        compilerOptions: { module: ts.ModuleKind.None }
+        compilerOptions: {
+          target: ts.ScriptTarget.ES3,
+          module: ts.ModuleKind.None,
+        }
       }).outputText
     );
   };

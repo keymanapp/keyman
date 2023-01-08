@@ -2,9 +2,8 @@
 
 # autoreconf autotool projects
 
-# parameters: [BUILD_LEGACY=1] [JENKINS="yes"] ./reconf.sh [proj]
+# parameters: [BUILD_LEGACY=1] ./reconf.sh [proj]
 # BUILD_LEGACY=1 to also build legacy KMFL projects
-# JENKINS="yes" to set version for jenkins builds
 # proj = only reconf this project
 
 set -e
@@ -62,6 +61,7 @@ for proj in ${autotool_projects}; do
     cd $proj
     echo "Reconfiguring $proj to version ${VERSION}"
     autoreconf -if
+    rm -rf autom4te.cache
     cd $BASEDIR
 done
 
@@ -69,6 +69,7 @@ for proj in ${legacy_projects}; do
     cd legacy/$proj
     echo "Reconfiguring $proj to version ${VERSION}"
     autoreconf -if
+    rm -rf autom4te.cache
     cd $BASEDIR
 done
 

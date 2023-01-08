@@ -67,7 +67,7 @@ namespace com.keyman.osk {
       var bsn: number, bsk=btn['subKeys'] = this.spec['sk'];
       // Transform any special keys into their PUA representations.
       for(bsn=0; bsn<bsk.length; bsn++) {
-        if(bsk[bsn]['sp'] == '1' || bsk[bsn]['sp'] == '2') {
+        if(bsk[bsn]['sp'] == 1 || bsk[bsn]['sp'] == 2) {
           var oldText=bsk[bsn]['text'];
           bsk[bsn]['text']=this.renameSpecialKey(oldText, vkbd);
         }
