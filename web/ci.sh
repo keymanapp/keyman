@@ -24,10 +24,13 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Defines and implements the CI build steps for Keyman Engine for Web (KMW)." \
   "build" \
-  "test             Runs all unit tests."  \
-  "post-test        Runs post-test cleanup.  Should be run even if a prior step fails." \
-  "validate-size    Runs the build-size comparison check" \
-  "--debug          Runs this script in local-development mode; reports and tests will be locally logged"
+  "test                 Runs all unit tests."  \
+  "post-test            Runs post-test cleanup.  Should be run even if a prior step fails." \
+  "validate-size        Runs the build-size comparison check" \
+  "publish-s.keyman     Prepares an s.keyman.com PR (intended for release builds)" \
+  "publish-downloads    Prepares the upload to downloads.keyman.com (intended for release builds)" \
+  "--debug              Runs this script in local-development mode; reports and tests will be locally logged" \
+  "--password=PASSWORD  Used to supply passwords needed by certain actions"
 
 builder_parse "$@"
 
@@ -83,4 +86,48 @@ if builder_start_action validate-size; then
   ./src/tools/building/check-build-size.sh $FLAGS
 
   builder_finish_action success validate-size
+fi
+
+if builder_start_action publish-s.keyman; then
+  TIER=`cat ../TIER.md`
+  BUILD_NUMBER=`cat ../VERSION.md`
+  S_KEYMAN_COM=../../s.keyman.com
+
+  # First phase: make sure the s.keyman.com repo is locally-available and up to date.
+  pushd "$S_KEYMAN_COM"
+  if builder_has_option --password; then
+    git pull https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
+  else
+    # For testing on a local development machine / a machine with the repo already loaded.
+    git checkout master
+    git pull
+  fi
+  popd
+
+  # Second phase:  copy the artifacts over
+
+  # The main build products are expected to reside at the root of this folder.
+  BASE_PUBLISH_FOLDER="$S_KEYMAN_COM/kmw/engine/$BUILD_NUMBER"
+  mkdir "$BASE_PUBLISH_FOLDER"
+
+  cp -Rf build/app/web/release/* "$BASE_PUBLISH_FOLDER"
+  cp -Rf build/app/ui/release/* "$BASE_PUBLISH_FOLDER"
+
+  # Third phase: tweak the sourcemaps
+  # TODO:  actual sourcemap tweaking.
+
+  # Final phase:  build the PR and push it.
+  cd "$S_KEYMAN_COM"
+  # git config user.name "Keyman Build Server"
+  # git config user.email "keyman-server@users.noreply.github.com"
+  git add "kmw/engine/$BUILD_NUMBER"
+  # git commit -m "KeymanWeb release $BUILD_NUMBER (automatic)"
+  # git push https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
+
+  builder_finish_action success publish-s.keyman
+fi
+
+if builder_start_action publish-downloads; then
+#
+  builder_finish_action success publish-downloads
 fi
