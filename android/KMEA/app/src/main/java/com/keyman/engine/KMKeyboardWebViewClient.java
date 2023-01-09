@@ -135,15 +135,17 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
     if (url.indexOf("pageLoaded") >= 0) {
       pageLoaded(view, url);
     } else if (url.indexOf("hideKeyboard") >= 0) {
+      // Dismiss help bubble - though it should only ever display with KEYBOARD_TYPE_INAPP
+      KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
       if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
         if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
-          KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
           KMTextView textView = (KMTextView) KMTextView.activeView;
           textView.dismissKeyboard();
         }
       } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-        KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
-        KMManager.IMService.requestHideSelf(0);
+        if (KMManager.IMService != null) {
+          KMManager.IMService.requestHideSelf(0);
+        }
       }
     } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
       KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
