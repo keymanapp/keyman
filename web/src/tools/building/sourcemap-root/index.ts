@@ -63,7 +63,7 @@ for(let procArgIndex = 4; procArgIndex < process.argv.length; procArgIndex++) {
       shouldClean = true;
       break;
     case "-s":
-    case "--suffix":
+    case "--sourceRoot":
       procArgIndex++;
       sourceRoot = process.argv[procArgIndex];
       break;
