@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.25 alpha 2023-01-09
+
+* chore(linux): Remove unnecessary variable (#7988)
+
 ## 17.0.24 alpha 2023-01-06
 
 * chore(common/resources): Add Docker readme (#7980)
