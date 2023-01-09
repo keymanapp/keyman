@@ -114,15 +114,18 @@ if builder_start_action publish-s.keyman; then
   cp -Rf build/app/ui/release/* "$BASE_PUBLISH_FOLDER"
 
   # Third phase: tweak the sourcemaps
-  # TODO:  actual sourcemap tweaking.
+  # We can use an alt-mode of Web's sourcemap-root tool for this.
+  for sourcemap in "$BASE_PUBLISH_FOLDER/"*.map; do
+    node build/tools/building/sourcemap-root/index.mjs null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$BUILD_NUMBER/src"
+  done
 
   # Final phase:  build the PR and push it.
   cd "$S_KEYMAN_COM"
-  # git config user.name "Keyman Build Server"
-  # git config user.email "keyman-server@users.noreply.github.com"
+  git config user.name "Keyman Build Server"
+  git config user.email "keyman-server@users.noreply.github.com"
   git add "kmw/engine/$BUILD_NUMBER"
-  # git commit -m "KeymanWeb release $BUILD_NUMBER (automatic)"
-  # git push https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
+  git commit -m "KeymanWeb release $BUILD_NUMBER (automatic)"
+  git push https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
 
   builder_finish_action success publish-s.keyman
 fi
