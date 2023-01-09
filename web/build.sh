@@ -183,7 +183,7 @@ assert_exists ( ) {
 # $5 - additional output wrapper
 minify ( ) {
     if [ $# -ge 4 ]; then
-        cleanerOptions="--clean --suffix $4"
+        cleanerOptions="--clean --sourceRoot $4"
     else
         cleanerOptions="--clean"
     fi
