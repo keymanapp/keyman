@@ -1,5 +1,3 @@
-// Sourcemap types!
-
 import * as fs from 'fs';
 import convertSourcemap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
