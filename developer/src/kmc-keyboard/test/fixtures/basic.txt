@@ -150,7 +150,6 @@ block(bksp)
   62 6b 73 70
   sizeof(bksp)
   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
                                     # };
 
                                     # struct COMP_KMXPLUS_TRAN_ENTRY {
@@ -171,10 +170,6 @@ block(disp)                         # struct COMP_KMXPLUS_DISP {
   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
   index(strNull,strElemBkspFrom2,2) #   KMX_DWORD baseCharacter   // 000C baseCharacter = 'e'
                                     # };
-  00 00 00 00                       #    KMX_DWORD reserved0;
-  00 00 00 00                       #    KMX_DWORD reserved1;
-  00 00 00 00                       #    KMX_DWORD reserved2;
-  00 00 00 00                       #    KMX_DWORD reserved3;
 
                                     # only entry:
   index(strNull,strElemTranFrom2,2) #   KMX_DWORD to       // 000C baseCharacter = 'a'
@@ -190,7 +185,6 @@ block(elem)                         # struct COMP_KMXPLUS_ELEM {
   65 6c 65 6d                       #   KMX_DWORD header.ident;   // 0000 Section name - elem
   diff(elem,endelem)                #   KMX_DWORD header.size;    // 0004 Section length
   index(elemNull,endelem)           #   KMX_DWORD count;          // 0008 number of entries
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
                                     # };
 
   00 00 00 00                       #    KMX_DWORD offset;                 // 0010+ offset from this blob
@@ -255,7 +249,6 @@ block(finl)
   66 69 6e 6c
   sizeof(finl)
   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
                                     # };
 
                                     # struct COMP_KMXPLUS_TRAN_ENTRY {
@@ -274,7 +267,6 @@ block(key2)                         # struct COMP_KMXPLUS_KEY2 {
   02 00 00 00                       #   KMX_DWORD keyCount
   01 00 00 00                       #   KMX_DWORD flicksCount
   00 00 00 00                       #   KMX_DWORD flickCount
-  00 00 00 00  00 00 00 00  00 00 00 00 # Reserved[3]
   # keys
   #  hmaqtugha
   00 00 00 00                       #   KMX_DWORD vkey
@@ -318,7 +310,6 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
   sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
   02 00 00 00                       #   KMX_DWORD count;          // 0008 number of keys
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
                                     # };
 
 # Keys data:
@@ -337,8 +328,6 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   01 00 00 00                       #   KMX_DWORD layerCount
   01 00 00 00                       #   KMX_DWORD rowCount
   02 00 00 00                       #   KMX_DWORD keyCount
-  00 00 00 00                       #   KMX_DWORD reserved0
-  00 00 00 00                       #   KMX_DWORD reserved1
   # list 0
   00 00 00 00                       #   KMX_DWORD flags
   index(strNull,strUs,2)            #   KMXPLUS_STR hardware;
@@ -395,8 +384,7 @@ block(loca)                         # struct COMP_KMXPLUS_LOCA {
   6c 6f 63 61                       #   KMX_DWORD header.ident;   // 0000 Section name - loca
   sizeof(loca)                      #   KMX_DWORD header.size;    // 0004 Section length
   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of locales
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
-  index(strNull,strLocale,2)        #   KMXPLUS_STR locale;       // 0010+ locale string entry = 'mt'
+  index(strNull,strLocale,2)        #   KMXPLUS_STR locale;       // 000C+ locale string entry = 'mt'
                                     # };
 # ----------------------------------------------------------------------------------------------------
 # meta
@@ -421,8 +409,7 @@ block(name)                         # struct COMP_KMXPLUS_META {
   6e 61 6d 65                       #   KMX_DWORD header.ident;   // 0000 Section name - name
   sizeof(name)                      #   KMX_DWORD header.size;    // 0004 Section length
   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of names
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
-  index(strNull,strName,2)          #   KMXPLUS_STR name;         // 0010+ name string entry = 'TestKbd'
+  index(strNull,strName,2)          #   KMXPLUS_STR name;         // 000C+ name string entry = 'TestKbd'
                                     # };
 
 # ----------------------------------------------------------------------------------------------------
@@ -433,7 +420,6 @@ block(ordr)
   6f 72 64 72                       #    KMX_DWORD header.ident;   // 0000 Section name - ordr
   sizeof(ordr)                      #    KMX_DWORD header.size;    // 0004 Section length
   01 00 00 00                       #    KMX_DWORD count;          // 0008 count of str entries
-  00 00 00 00                       #    KMX_DWORD reserved;       // 000C padding
                                     # };
 
   index(elemNull,elemOrdrFrom)      #    KMXPLUS_ELEM elements;
@@ -447,7 +433,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   73 74 72 73                       #    KMX_DWORD header.ident;   // 0000 Section name - strs
   diff(strs,endstrs)                #    KMX_DWORD header.size;    // 0004 Section length
   index(strNull,endstrs,2)          #    KMX_DWORD count;          // 0008 count of str entries
-  00 00 00 00                       #    KMX_DWORD reserved;       // 000C padding
                                     # };
 
   # Next sections are string entries
@@ -521,7 +506,6 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
   74 72 61 6e                       #   KMX_DWORD header.ident;   // 0000 Section name - tran
   sizeof(tran)                      #   KMX_DWORD header.size;    // 0004 Section length
   01 00 00 00                       #   KMX_DWORD count;          // 0008 number of entries
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
                                     # };
 
                                     # struct COMP_KMXPLUS_TRAN_ENTRY {
@@ -535,7 +519,6 @@ block(vkey)                         # struct COMP_KMXPLUS_VKEY {
   76 6b 65 79                       #   KMX_DWORD header.ident;   // 0000 Section name - vkey
   sizeof(vkey)                      #   KMX_DWORD header.size;    // 0004 Section length
   01 00 00 00                       #   KMX_DWORD count;          // 0008 Number of vkey maps
-  00 00 00 00                       #   KMX_DWORD reserved;       // 000C padding
 
   51 00 00 00    41 00 00 00        #   KMX_DWORD vkey;  KMX_DWORD target; // K_Q => K_A
                                     # };

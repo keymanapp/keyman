@@ -16,7 +16,6 @@ interface BUILDER_VKEY_ITEM {
 
 export interface BUILDER_VKEY extends BUILDER_SECTION {
   count: number;
-  reserved: number;
   items: BUILDER_VKEY_ITEM[];
 };
 
@@ -29,7 +28,6 @@ export function build_vkey(kmxplus: KMXPlusData): BUILDER_VKEY {
     ident: constants.hex_section_id(constants.section.vkey),
     size: constants.length_vkey + constants.length_vkey_item * kmxplus.vkey.vkeys.length,
     _offset: 0,
-    reserved: 0,
     count: kmxplus.vkey.vkeys.length,
     items: []
   };

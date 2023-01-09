@@ -21,7 +21,6 @@ interface BUILDER_KEYS_ITEM {
  */
 export interface BUILDER_KEYS extends BUILDER_SECTION {
   count: number;
-  reserved: number;
   items: BUILDER_KEYS_ITEM[];
 };
 
@@ -36,7 +35,6 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     size: constants.length_keys + constants.length_keys_item * kmxplus.keys.keys.length,
     _offset: 0,
     count: kmxplus.keys.keys.length,
-    reserved: 0,
     items: []
   };
 

@@ -26,7 +26,6 @@ interface BUILDER_ELEM_STRING {
  */
 export interface BUILDER_ELEM extends BUILDER_SECTION {
   count: number;
-  reserved: number;
   strings: BUILDER_ELEM_STRING[];
 };
 
@@ -48,7 +47,6 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS): BUILDER_
     size: 0,  // finalized below
     _offset: 0,
     count: source_elem.strings.length,
-    reserved: 0,
     strings: [], // finalized below
   };
 

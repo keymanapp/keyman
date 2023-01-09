@@ -19,7 +19,6 @@ interface BUILDER_STRS_ITEM {
  */
 export interface BUILDER_STRS extends BUILDER_SECTION {
   count: number;
-  reserved: number;
   items: BUILDER_STRS_ITEM[];
 };
 
@@ -29,7 +28,6 @@ export function build_strs(source_strs: Strs): BUILDER_STRS {
     size: 0,  // finalized later
     _offset: 0,
     count: source_strs.strings.length,
-    reserved: 0,
     items: [], // filled below
   };
 

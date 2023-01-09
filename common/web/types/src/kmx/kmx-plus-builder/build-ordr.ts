@@ -15,7 +15,6 @@ interface BUILDER_ORDR_ITEM {
 
 export interface BUILDER_ORDR extends BUILDER_SECTION {
  count: number;
- reserved: number;
  items: BUILDER_ORDR_ITEM[];
 };
 
@@ -32,7 +31,6 @@ export function build_ordr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_e
    size: constants.length_ordr + constants.length_ordr_item * kmxplus.ordr.items.length,
    _offset: 0,
    count: kmxplus.ordr.items.length,
-   reserved: 0,
    items: []
  };
 

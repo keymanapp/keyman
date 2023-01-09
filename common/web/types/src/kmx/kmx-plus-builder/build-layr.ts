@@ -56,8 +56,6 @@ export interface BUILDER_LAYR extends BUILDER_SECTION {
   layerCount: number, // number of entries in layers subtable
   rowCount: number, // number of entries in rows subtable
   keyCount: number, // number of entries in keys subtable
-  reserved0: number, // padding
-  reserved1: number, // padding
   lists: BUILDER_LAYR_LIST[], // subtable of <layers> elements
   layers: BUILDER_LAYR_LAYER[], // subtable of <layer> elements
   rows: BUILDER_LAYR_ROW[], // subtable of <row> elements
@@ -77,8 +75,6 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     layerCount: 0, // calculated below
     rowCount: 0, // calculated below
     keyCount: 0, // calculated below
-    reserved0: 0,
-    reserved1: 0,
     lists: [],
     layers: [],
     rows: [],

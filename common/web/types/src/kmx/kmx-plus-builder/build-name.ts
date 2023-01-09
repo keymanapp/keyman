@@ -13,7 +13,6 @@ import { BUILDER_SECTION } from "./builder-section.js";
  */
 export interface BUILDER_NAME extends BUILDER_SECTION {
   count: number;
-  reserved: number;
   items: number[]; //str[]
 };
 
@@ -27,7 +26,6 @@ export function build_name(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     size: constants.length_name + constants.length_name_item * kmxplus.name.names.length,
     _offset: 0,
     count: kmxplus.name.names.length,
-    reserved: 0,
     items: []
   };
 

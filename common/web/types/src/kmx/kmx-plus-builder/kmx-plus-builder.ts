@@ -154,13 +154,17 @@ export default class KMXPlusBuilder {
     }
     sect._offset = offset;
     this.sect.sect.items.push({sect: sect.ident, offset: offset});
-    // TODO: padding
     return offset + sect.size;
   }
 
   private emitSection(file: Uint8Array, comp: any, sect: BUILDER_SECTION) {
     if(sect) {
-      file.set(comp.toBuffer(sect), sect._offset);
+      const buf = comp.toBuffer(sect);
+      if (buf.length > sect.size) {
+        // buf.length may be < sect.size if there is a variable part (i.e. elem)
+        throw new RangeError(`Internal Error: Section ${constants.str_section_id(sect.ident)} claimed size ${sect.size} but produced buffer of size ${buf.length}.`);
+      }
+      file.set(buf, sect._offset);
     }
   }
 
