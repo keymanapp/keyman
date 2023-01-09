@@ -22,6 +22,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
                                    get_keyman_dir)
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.keyboard_details import KeyboardDetailsView
+from keyman_config.kmpmetadata import get_fonts, parsemetadata
 from keyman_config.list_installed_kmp import get_installed_kmp
 from keyman_config.options import OptionsView
 from keyman_config.uninstall_kmp import uninstall_kmp
@@ -351,12 +352,29 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         model, treeiter = self.tree.get_selection().get_selected()
         if treeiter is not None:
             logging.info("Uninstall keyboard " + model[treeiter][3] + "?")
-            dialog = Gtk.MessageDialog(
-                self, 0, Gtk.MessageType.QUESTION,
-                Gtk.ButtonsType.YES_NO, _("Uninstall keyboard package?"))
-            dialog.format_secondary_text(
-                _("Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?")
-                .format(keyboard=model[treeiter][1]))
+            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
+                                       _("Uninstall keyboard package?"))
+            msg = _("Are you sure that you want to uninstall the {keyboard} keyboard?").format(
+              keyboard=model[treeiter][1])
+            kbdir = get_keyboard_dir(InstallLocation.User, model[treeiter][3])
+            kmpjson = os.path.join(kbdir, "kmp.json")
+            if os.path.isfile(kmpjson):
+                info, system, options, keyboards, files = parsemetadata(kmpjson, False)
+                fonts = get_fonts(files)
+                if fonts:
+                    # Fonts are optional
+                    fontlist = ""
+                    for font in fonts:
+                        if 'description' in font:
+                            if fontlist != "":
+                                fontlist = fontlist + "\n"
+                            if font['description'][:5] == "Font ":
+                                fontdesc = font['description'][5:]
+                            else:
+                                fontdesc = font['description']
+                            fontlist = fontlist + fontdesc
+                    msg += "\n\n" + _("The following fonts will also be uninstalled:\n") + fontlist
+            dialog.format_secondary_text(msg)
             response = dialog.run()
             dialog.destroy()
             if response == Gtk.ResponseType.YES:
