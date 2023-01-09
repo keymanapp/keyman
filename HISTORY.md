@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.130 beta 2023-01-09
+
+* fix(windows): kmshell -ikl install language and enable keyboard (#7856)
+
 ## 16.0.129 beta 2023-01-06
 
 * fix(android/engine): Add utility for localized strings (#7976)
