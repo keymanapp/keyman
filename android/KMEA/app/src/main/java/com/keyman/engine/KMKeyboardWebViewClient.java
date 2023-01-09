@@ -58,14 +58,14 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
 
   @Override
   public void onPageFinished(WebView view, String url) {
-    Log.d("KMEA", "onPageFinished: [inapp] " + url);
+    Log.d("KMEA", String.format("onPageFinished: [%s] %s", keyboardType.toString(), url));
     shouldOverrideUrlLoading(view, url);
   }
 
   private void pageLoaded(WebView view, String url) {
-    Log.d("KMEA", "pageLoaded: [inapp] " + url);
+    Log.d("KMEA", String.format("pageLoaded: [%s] %s", keyboardType.toString(), url));
     if (KMManager.getKMKeyboard(keyboardType) == null) {
-      KMLog.LogError(TAG, "pageLoaded and InAppKeyboard null");
+      KMLog.LogError(TAG, String.format("pageLoaded and %s keyboard null", keyboardType.toString()));
       return;
     }
     KMManager.getKMKeyboard(keyboardType).keyboardSet = false;
@@ -88,7 +88,10 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
         // Revert to default (index 0) or fallback keyboard
         keyboardInfo = KMManager.getKeyboardInfo(context, 0);
         if (keyboardInfo == null) {
-          // Not logging to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
+          // Only log SystemKeyboard to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
+          if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+            KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
+          }
           keyboardInfo = KMManager.getDefaultKeyboard(context);
         }
         if (keyboardInfo != null) {
@@ -104,10 +107,11 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       KMManager.getKMKeyboard(keyboardType).callJavascriptAfterLoad();
       KMManager.getKMKeyboard(keyboardType).setSpacebarText(KMManager.getSpacebarText());
 
-      KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_LOADED, null);
+      KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, keyboardType, EventType.KEYBOARD_LOADED, null);
 
       // Special handling for in-app TextView context keymanapp/keyman#3809
-      if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
+      if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
+          KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
         KMTextView.updateTextContext();
       }
     }
@@ -115,14 +119,15 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
 
   @Override
   public boolean shouldOverrideUrlLoading(WebView view, String url) {
-    Log.d("KMEA", "shouldOverrideUrlLoading [inapp]: " + url);
+    Log.d("KMEA", String.format("shouldOverrideUrlLoading [%s]: %s", keyboardType.toString(), url));
     if (KMManager.getKMKeyboard(keyboardType) == null) {
-      KMLog.LogError(TAG, "shouldOverrideUrlLoading and InAppKeyboard null");
+      KMLog.LogError(TAG, String.format("shouldOverrideUrlLoading and %s null", keyboardType.toString()));
       return false;
     }
 
     // URL has actual path to the keyboard.html file as a prefix!  We need to replace
     // just the first intended '#' to get URI-based query param processing.
+
     // At some point, other parts of the function should be redone to allow use of ? instead
     // of # in our WebView command "queries" entirely.
     String cmd = url.replace("keyboard.html#", "keyboard.html?");
@@ -130,10 +135,15 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
     if (url.indexOf("pageLoaded") >= 0) {
       pageLoaded(view, url);
     } else if (url.indexOf("hideKeyboard") >= 0) {
-      if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
+      if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+        if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
+          KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
+          KMTextView textView = (KMTextView) KMTextView.activeView;
+          textView.dismissKeyboard();
+        }
+      } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
         KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
-        KMTextView textView = (KMTextView) KMTextView.activeView;
-        textView.dismissKeyboard();
+        KMManager.IMService.requestHideSelf(0);
       }
     } else if (urlCommand.getQueryParameter("globeKeyAction") != null) {
       KMManager.getKMKeyboard(keyboardType).dismissHelpBubble();
@@ -143,8 +153,8 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       KMManager.setPersistentShouldShowHelpBubble(false);
 
       KMManager.handleGlobeKeyAction(context, urlCommand.getBooleanQueryParameter("keydown", false),
-        KeyboardType.KEYBOARD_TYPE_INAPP);
-    } else if (url.indexOf("helpBubbleDismissed") >= 0) {
+        keyboardType);
+    } else if (urlCommand.getQueryParameter("helpBubbleDismissed") != null) {
       // The user has begun interacting with the keyboard; we'll disable the help bubble
       // for the rest of the lifetime of this keyboard instance.
       KMManager.getKMKeyboard(keyboardType).setShouldShowHelpBubble(false);
