@@ -101,9 +101,6 @@
 #define CERR_InvalidNamedCode                              0x0000403F
 #define CERR_InvalidSystemStore                            0x00004040
 
-#define CERR_CallIsProfessionalFeature                     0x00004041
-#define CERR_IncludeCodesIsProfessionalFeature             0x00004042
-#define CERR_MnemonicLayoutIsProfessionalFeature           0x00004043
 #define CERR_60FeatureOnly_VirtualCharKey                  0x00004044
 
 #define CERR_VersionAlreadyIncluded                        0x00004045

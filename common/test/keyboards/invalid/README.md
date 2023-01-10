@@ -106,9 +106,6 @@ While running kmcompxtest extracts the 4 chars from the Filename and compares th
   ( **x** ) &emsp; 0000403E  &emsp; CERR_501FeatureOnly_Call
   (&emsp;) &emsp; 0000403F  &emsp; CERR_InvalidNamedCode
   ( **x** ) &emsp; 00004040  &emsp; CERR_InvalidSystemStore
-  (&emsp;) &emsp; 00004041  &emsp; CERR_CallIsProfessionalFeature
-  (&emsp;) &emsp; 00004042  &emsp; CERR_IncludeCodesIsProfessionalFeature
-  (&emsp;) &emsp; 00004043  &emsp; CERR_MnemonicLayoutIsProfessionalFeature
   ( **x** ) &emsp; 00004044  &emsp; CERR_60FeatureOnly_VirtualCharKey
   ( **x** ) &emsp; 00004045  &emsp; CERR_VersionAlreadyIncluded
   ( **x** ) &emsp; 00004046  &emsp; CERR_70FeatureOnly
