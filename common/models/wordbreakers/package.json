@@ -30,7 +30,8 @@
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "scripts": {
-    "build": "tsc & node ./build-bundler.js",
+    "build": "gosh ./build.sh",
+    "tsc": "tsc",
     "prepublish": "npm run build",
     "pretest": "npm run build",
     "test": "mocha"
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "@keymanapp/models-types": "*",
+    "@keymanapp/resources-gosh": "*",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "chai": "^4.3.4",
