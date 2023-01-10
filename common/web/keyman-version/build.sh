@@ -67,6 +67,9 @@ export default class KEYMAN_VERSION {
     echo "[$THIS_SCRIPT_IDENTIFIER] skipping tsc -b; will be completed by $builder_dep_parent"
   else
     npm run build -- $builder_verbose
+    # kmlmc (the lexical model compiler) relies on a Node-based import, but after some of the earlier
+    # ES-modularization work, our main output's an ES module.  Fortunately, esbuild can provide an easy stopgap.
+    node nodeConverter.js
   fi
 
   builder_finish_action success build

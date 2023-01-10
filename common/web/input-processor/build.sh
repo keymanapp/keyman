@@ -69,7 +69,9 @@ if builder_start_action build:tools; then
 fi
 
 if builder_start_action build:module; then
-  npm run tsc -- -b src/tsconfig.json
+  npm run tsc -- -b ./tsconfig.json
+  node build-bundler.js
+
   builder_finish_action success build:module
 fi
 
@@ -80,9 +82,6 @@ if builder_start_action test:module; then
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
   fi
-
-  # Build the leaf-style, bundled version of input-processor for use in testing.
-  npm run tsc -- -b src/tsconfig.bundled.json
 
   npm run mocha -- --recursive $FLAGS ./tests/cases/
 
