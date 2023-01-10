@@ -88,7 +88,7 @@ if(shouldClean) {
 }
 
 if(sourceRoot) {
-  srcMap.sourceRoot = srcMap.sourceRoot ?? "" + sourceRoot;
+  srcMap.sourceRoot = sourceRoot;
 }
 
 srcMap.toFile(destFile);
