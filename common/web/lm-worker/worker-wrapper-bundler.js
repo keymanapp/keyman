@@ -160,6 +160,12 @@ fs.writeFileSync('build/lib/worker-main.wrapped-for-bundle.js', wrapper);
 fs.writeFileSync('build/lib/worker-main.bundled.js', fullWorkerConcatenation.script + '\n' + "//# sourceMappingURL=worker-main.bundled.js.map");
 fs.writeFileSync('build/lib/worker-main.bundled.js.map', JSON.stringify(fullWorkerConcatenation.sourcemapJSON, null, 2));
 
+// TS compilation will generally look for attached typing, and it's easy enough to provide.
+fs.writeFileSync('build/lib/worker-main.bundled.d.ts', `
+export var LMLayerWorkerCode: string;
+export var LMLayerWorkerSourcemapComment: string;
+`);
+
 // Will have sourcemap link for original file... then the loaded form that we build earlier on that gets concat'd.
 // THEN the actual, final one.
 
