@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 _km-package-install_completions()
 {
@@ -11,7 +11,8 @@ _km-package-install_completions()
     cache=${XDG_CACHE_HOME:-~/.cache}/keyman/kmpdirlist
 
     if [[ ${cur} == -* ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        # shellcheck disable=SC2207
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 
@@ -27,19 +28,21 @@ _km-package-install_completions()
                 else
                     pkg_install_path='/usr/bin/km-package-install'
                 fi
-                python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', pkg_install_path);spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
+                python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', $pkg_install_path);spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
             fi
 
             if [[ -r $cache ]] ; then
-                for file in `cat $cache`; do words="${words} ${file}"; done
-                COMPREPLY=($(compgen -W "${words}" -- ${cur}))
+                while read -r file; do words="${words} ${file}"; done < "$cache"
+                # shellcheck disable=SC2207
+                COMPREPLY=($(compgen -W "${words}" -- "${cur}"))
                 return 0
             fi
             ;;
         "-f"|"--file")
             local IFS=$'\n'
             compopt -o filenames
-            COMPREPLY=( $(compgen -f -X "!"*.kmp -- $cur) $(compgen -d -- $cur) )
+            # shellcheck disable=SC2207
+            COMPREPLY=( $(compgen -f -X "!"*.kmp -- "$cur") $(compgen -d -- "$cur") )
             return 0
             ;;
         *)
