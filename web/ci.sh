@@ -133,15 +133,6 @@ fi
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
 if builder_start_action publish-downloads; then
-  VERSION_BUILD_REGEX="^[0-9]+\.[0-9]+\.([0-9]+)$"
-
-  if [[ $BUILD_NUMBER =~ $VERSION_BUILD_REGEX ]]; then
-    BUILD_COUNTER="${BASH_REMATCH[1]}"
-  else
-    builder_finish_action failure publish-downloads
-    exit 0
-  fi
-
   UPLOAD_PATH="build/upload/$BUILD_NUMBER"
 
   # --- First action artifact - the KMW zip file ---
