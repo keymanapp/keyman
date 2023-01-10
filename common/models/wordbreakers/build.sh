@@ -26,7 +26,7 @@ builder_describe "Builds the predictive-text wordbreaker implementation module" 
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              build/index.js
+  build              build/lib/index.mjs
 
 builder_parse "$@"
 
@@ -47,7 +47,7 @@ fi
 ### BUILD ACTIONS
 
 if builder_start_action build; then
-  npm run tsc
+  npm run tsc -- -b
   node build-bundler.js
 
   builder_finish_action success build
