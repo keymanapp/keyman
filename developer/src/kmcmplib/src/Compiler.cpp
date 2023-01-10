@@ -141,14 +141,14 @@ KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk); // I3438
 KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID= NULL);
 KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp);
 
-KMX_DWORD process_if(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
-KMX_DWORD process_reset(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
-KMX_DWORD process_set(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
-KMX_DWORD process_save(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);
-KMX_DWORD process_platform(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);  // I3430
-KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx); // I3430
-KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx); // I3437
-KMX_DWORD process_expansion(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx, int max);
+KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);
+KMX_DWORD process_reset(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);
+KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);
+KMX_DWORD process_save(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);
+KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);  // I3430
+KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx); // I3430
+KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx); // I3437
+KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx, int max);
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 
@@ -2695,21 +2695,21 @@ KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   return CERR_NoTokensFound;
 }
 
-KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx);  // I3430
+KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);  // I3430
 
-KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3430
+KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)  // I3430
 {
   /* baselayout(<XString+outs>) */
   return process_if_synonym(TSS_BASELAYOUT, fk, q, tstr, mx);
 }
 
-KMX_DWORD process_platform(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3430
+KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)  // I3430
 {
   /* platform(<XString+outs>) */
   return process_if_synonym(TSS_PLATFORM, fk, q, tstr, mx);
 }
 
-KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3430
+KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)  // I3430
 {
   PKMX_WCHAR temp = new KMX_WCHAR[GLOBAL_BUFSIZE];
 
@@ -2743,12 +2743,12 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHA
   return CERR_None;
 }
 
-KMX_DWORD process_if(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3431
+KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)  // I3431
 {
   /* if(<store> <'='|'!='> <XString+outs>) */
   KMX_DWORD i, code;
   KMX_DWORD nnot = FALSE;
-  LPKMX_WCHAR r = q, s = q;
+  PKMX_WCHAR r = q, s = q;
   while (*s && *s != u' ' && *s != u'!' && *s !=u'=') s++;
   r = s;
   while (*s == u' ') s++;
@@ -2814,7 +2814,7 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx
   return CERR_None;
 }
 
-KMX_DWORD process_reset(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)
+KMX_DWORD process_reset(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 {
   /* reset(<store>) */
   KMX_DWORD i;
@@ -2833,7 +2833,7 @@ KMX_DWORD process_reset(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int 
   return CERR_None;
 }
 
-KMX_DWORD process_expansion(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx, int max) {
+KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx, int max) {
   KMX_BOOL isVKey = FALSE;
 
   KMX_WORD BaseKey=0, BaseShiftFlags=0;
@@ -2842,7 +2842,7 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, 
   if (*mx == 0) {
     return CERR_ExpansionMustFollowCharacterOrVKey;
   }
-  LPKMX_WCHAR p = &tstr[*mx];
+  PKMX_WCHAR p = &tstr[*mx];
   p = decxstr(p, tstr);
   if (*p == UC_SENTINEL) {
     if (*(p + 1) != CODE_EXTENDED) {
@@ -2931,7 +2931,7 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, 
   return CERR_None;
 }
 
-KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)  // I3437
+KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)  // I3437
 {
   /* set(<store> <'='> <XString+outs>), layer */
   KMX_DWORD code = CODE_SETSYSTEMSTORE;
@@ -2958,10 +2958,10 @@ KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, LPKMX_WCH
   return CERR_None;
 }
 
-KMX_DWORD process_set(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)
+KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 {
   /* set(<store> <'='> <XString+outs> */
-  LPKMX_WCHAR r = q, s = q;  // I3440
+  PKMX_WCHAR r = q, s = q;  // I3440
   while (*s && *s != u' ' && *s != u'=') s++;
   r = s;
   while (*s == u' ') s++;
@@ -2988,7 +2988,7 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *m
     KMX_WCHAR *context = NULL;
     KMX_WCHAR sep_eq[3] = u" =";
     PKMX_WCHAR p_sep_eq = sep_eq;
-    LPKMX_WCHAR r = u16tok(q,  sep_eq, &context);  // I3481
+    PKMX_WCHAR r = u16tok(q,  sep_eq, &context);  // I3481
 
     for (i = 0; i < fk->cxStoreArray; i++)
     {
@@ -3025,7 +3025,7 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *m
   return CERR_None;
 }
 
-KMX_DWORD process_save(PFILE_KEYBOARD fk, LPKMX_WCHAR q, LPKMX_WCHAR tstr, int *mx)
+KMX_DWORD process_save(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 {
   /* save(<store>) */
   KMX_DWORD i;
@@ -3194,7 +3194,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
 }
 
 
-void SetChecksum(PKMX_BYTE buf, LPKMX_DWORD CheckSum, KMX_DWORD sz)
+void SetChecksum(PKMX_BYTE buf, PKMX_DWORD CheckSum, KMX_DWORD sz)
 {
   BuildCRCTable();
   *CheckSum = CalculateBufferCRC(buf, sz);
