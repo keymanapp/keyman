@@ -38,9 +38,10 @@ bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
     int ncaps_line, caps_line, neither_line;
   };
 
+  const int oldCurrentLine = kmcmp::currentLine;
+
   // 256 virtual key codes + sizeof the virtual key dictionary is max key code possible
   const int nkeys = 256 + fk->cxVKDictionary;
-  const int oldCurrentLine = kmcmp::currentLine;
   auto caps_ncaps_usage = new CapsUsage [nkeys];
 
   memset(caps_ncaps_usage, 0, nkeys * sizeof(CapsUsage));

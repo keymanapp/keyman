@@ -131,7 +131,8 @@ u16sprintf(fi_name_char16,_countof(fi.name),fi.name);
 KMX_DWORD CheckFilenameConsistencyForCalls(PFILE_KEYBOARD fk) {
   // call() statements depend on a fairly ugly hack for js,
   // where store(DllFunction) "my.dll:func" will look for a
-  // file called function.call_js. This is ripe for rewrite!
+  // file called function.call_js. ( or should this be func.call_js ? )
+  // This is ripe for rewrite!
   // But let's check what we have anyway
 
   PFILE_STORE sp;

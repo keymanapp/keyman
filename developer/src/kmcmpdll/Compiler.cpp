@@ -294,12 +294,12 @@ typedef struct _COMPILER_OPTIONS {
 
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 */
-bool flag_use_kmcompx = true;
+bool flag_use_new_kmcomp  = true;   // flag to switch to kmcompx
 
 extern "C" BOOL __declspec(dllexport) SetCompilerOptions(PCOMPILER_OPTIONS options) {
 
   printf("---> started in SetCompilerOptions() of kmcmpdll\n");
-  if ( flag_use_kmcompx)
+  if ( flag_use_new_kmcomp )
   {
     return kmcmp_SetCompilerOptions(options);
   }
@@ -322,7 +322,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
 
   printf("---> started in CompileKeyboardFile() of kmcmpdll\n");
 
-  if ( flag_use_kmcompx)
+  if ( flag_use_new_kmcomp )
   {
     return kmcmp_CompileKeyboardFile(pszInfile, pszOutfile, ASaveDebug, ACompilerWarningsAsErrors,AWarnDeprecatedCode, pMsgProc);
   }
@@ -411,7 +411,7 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
   char str[260];
 
   printf("---> started in CompileKeyboardFileToBuffer() of kmcmpdll\n");
-  if ( flag_use_kmcompx)
+  if ( flag_use_new_kmcomp )
   {
     return kmcmp_CompileKeyboardFileToBuffer( pszInfile, (void*) pfkBuffer,  ACompilerWarningsAsErrors,  AWarnDeprecatedCode,  pMsgProc,  Target);
   }
@@ -3776,7 +3776,7 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
 extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
 
   printf("---> started in Keyman_Diagnostic() of kmcmpdll\n");
-  if ( flag_use_kmcompx)
+  if ( flag_use_new_kmcomp )
   {
     kmcmp_Keyman_Diagnostic( mode);
   }
