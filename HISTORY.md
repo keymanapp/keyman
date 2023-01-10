@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.26 alpha 2023-01-10
+
+* feat(linux): Add Back button to "Download Keyman Keyboards" dialog (#7994)
+* feat(linux): List fonts in the uninstall confirmation dialog (#7995)
+
 ## 17.0.25 alpha 2023-01-09
 
 * chore(linux): Remove unnecessary variable (#7988)
