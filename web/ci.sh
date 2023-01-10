@@ -121,11 +121,15 @@ if builder_start_action publish-s.keyman; then
 
   # Final phase:  build the PR and push it.
   cd "$S_KEYMAN_COM"
-  git config user.name "Keyman Build Server"
-  git config user.email "keyman-server@users.noreply.github.com"
+  if builder_has_option --password; then
+    git config user.name "Keyman Build Server"
+    git config user.email "keyman-server@users.noreply.github.com"
+  fi
   git add "kmw/engine/$BUILD_NUMBER"
-  git commit -m "KeymanWeb release $BUILD_NUMBER (automatic)"
-  git push https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
+  if builder_has_option --password; then
+    git commit -m "KeymanWeb release $BUILD_NUMBER (automatic)"
+    git push https://keyman-server:$PASSWORD@github.com/keymanapp/s.keyman.com.git master
+  fi
 
   builder_finish_action success publish-s.keyman
 fi
