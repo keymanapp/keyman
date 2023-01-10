@@ -28,9 +28,9 @@ builder_check_color "$@"
 #  "@../models/types" \
 
 builder_describe "Builds the lm-layer module" \
+  "@../web/keyman-version" \
   "@../models/templates" \
   "@../models/wordbreakers" \
-  "@../web/keyman-version" \
   "@../web/lm-worker" \
   "clean" \
   "configure" \
