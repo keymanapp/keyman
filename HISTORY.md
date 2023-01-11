@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.27 alpha 2023-01-11
+
+* chore(linux): Refactor completion script (#8002)
+
 ## 17.0.26 alpha 2023-01-10
 
 * feat(linux): Add Back button to "Download Keyman Keyboards" dialog (#7994)
