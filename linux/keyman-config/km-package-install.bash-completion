@@ -6,7 +6,7 @@ _km-package-install_completions()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-h --help -v --verbose -vv --veryverbose --version -p --package -f --file -s --shared"
+    opts="-h --help -v --verbose -vv --veryverbose --version -p --package -f --file -s --shared -l --bcp47"
 
     cache=${XDG_CACHE_HOME:-~/.cache}/keyman/kmpdirlist
 
@@ -16,6 +16,14 @@ _km-package-install_completions()
         return 0
     fi
 
+    if [[ -e ./km-package-install ]]; then
+        pkg_install_path='./km-package-install'
+        get_kmp_path='keyman_config/get_kmp.py'
+    else
+        pkg_install_path='/usr/bin/km-package-install'
+        get_kmp_path='/usr/lib/python3/dist-packages/keyman_config/get_kmp.py'
+    fi
+
     case "${prev}" in
         "-p"|"--package")
             words=""
@@ -23,12 +31,8 @@ _km-package-install_completions()
                 # NOTE: identical code in `km-package-get.bash-completion`.
                 # Unfortunately with bash completion scripts it's not possible to factor out
                 # common code.
-                if [[ -e ./km-package-install ]]; then
-                    pkg_install_path='./km-package-install'
-                else
-                    pkg_install_path='/usr/bin/km-package-install'
-                fi
-                python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', $pkg_install_path);spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
+
+                python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', '$pkg_install_path');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
             fi
 
             if [[ -r $cache ]] ; then
@@ -43,6 +47,42 @@ _km-package-install_completions()
             compopt -o filenames
             # shellcheck disable=SC2207
             COMPREPLY=( $(compgen -f -X "!"*.kmp -- "$cur") $(compgen -d -- "$cur") )
+            return 0
+            ;;
+        "-l"|"--bcp47")
+            local packageId=""
+            local packageDir
+            packageDir=$(mktemp -d)
+            for ((i=0;i<$COMP_CWORD;i++)); do
+                case ${COMP_WORDS[$i]} in
+                    "-p"|"--package")
+                        packageId="${COMP_WORDS[$i+1]}"
+                        # shellcheck disable=SC2086 # doesn't work with quotes
+                        if [ ! -f ${XDG_CACHE_HOME:-~/.cache}/keyman/$packageId ] && [ ! -f ${XDG_CACHE_HOME:-~/.cache}/keyman/${packageId}.kmp ]; then
+                            python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('get_kmp', '$get_kmp_path');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.get_kmp('$packageId')"
+                        fi
+                        break
+                    ;;
+                    "-f"|"--file")
+                        package="${COMP_WORDS[$i+1]}"
+                        packageId=$(basename "$package")
+                        # shellcheck disable=SC2086 # doesn't work with quotes
+                        cp "$package" ${XDG_CACHE_HOME:-~/.cache}/keyman/${packageId}
+                        break
+                    ;;
+                    *)
+                    ;;
+                esac
+            done
+            if [ -z "$packageId" ]; then
+                return 0
+            fi
+            words=""
+            while read -r lang; do
+                words="$words $lang"
+            done < <(python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', '$pkg_install_path');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_languages_for_keyboard('$packageId', '$packageDir')")
+            # shellcheck disable=SC2207
+            COMPREPLY=($(compgen -W "${words}" -- "${cur}"))
             return 0
             ;;
         *)
