@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 _km-config_completions()
 {
@@ -9,14 +9,15 @@ _km-config_completions()
     opts="-h --help -v --verbose -vv --veryverbose --version -i --install"
 
     if [[ ${cur} == -* ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        # shellcheck disable=SC2207
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 
     # default IFS splits 'file://' into 'file', ':' and '//'
-    if [ "${prev}" == ":" -a "${COMP_WORDS[COMP_CWORD-2]}" == "file" ]; then
+    if [ "${prev}" == ":" ] && [ "${COMP_WORDS[COMP_CWORD-2]}" == "file" ]; then
         local flag=${COMP_WORDS[COMP_CWORD-3]}
-        if [ $flag == "-i" -o $flag == "--install" ]; then
+        if [ "$flag" == "-i" ] || [ "$flag" == "--install" ]; then
             prev=$flag
         fi
     fi
@@ -25,7 +26,8 @@ _km-config_completions()
         "-i"|"--install")
             local IFS=$'\n'
             compopt -o filenames
-            COMPREPLY=( $(compgen -f -X "!"*.kmp -- $cur) $(compgen -d -- $cur) )
+            # shellcheck disable=SC2207
+            COMPREPLY=( $(compgen -f -X "!"*.kmp -- "$cur") $(compgen -d -- "$cur") )
             return 0
             ;;
         *)
