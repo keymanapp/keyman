@@ -362,7 +362,12 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             if response == Gtk.ResponseType.YES:
                 logging.info("Uninstalling keyboard" + model[treeiter][1])
                 # can only uninstall with the gui from user area
-                uninstall_kmp(model[treeiter][3])
+                msg = uninstall_kmp(model[treeiter][3])
+                if not msg == '':
+                    md = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
+                            Gtk.ButtonsType.OK, _("Uninstalling keyboard failed.\n\nError message: ") + msg)
+                    md.run()
+                    md.destroy()
                 logging.info("need to restart window after uninstalling a keyboard")
                 self.restart()
             elif response == Gtk.ResponseType.NO:
