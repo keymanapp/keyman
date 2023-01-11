@@ -1,9 +1,9 @@
-import StyleConstants from 'utils/styleConstants.js';
+import StyleConstants from './utils/styleConstants.js';
 import { DeviceSpec, Version } from "@keymanapp/web-utils/build/obj/index.js";
 
 // The Device object definition -------------------------------------------------
 
-export class Device {
+export default class Device {
   touchable: boolean;
   OS: string;
   formFactor: string;

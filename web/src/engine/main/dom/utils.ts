@@ -1,4 +1,7 @@
 namespace com.keyman.dom {
+  // NOTE:
+  // - instanceOf -> element-wrappers, now called nestedInstanceOf
+  // - forceScroll -> element-wrappers, but I believe it's only ever called from there.
 
   // Defines DOM-related utility functions that are not reliant on KMW's internal state.
   export class Utils {
@@ -108,74 +111,6 @@ namespace com.keyman.dom {
         }
       }
       return Lcurtop;
-    }
-
-    /**
-     * Checks the type of an input DOM-related object while ensuring that it is checked against the correct prototype,
-     * as class prototypes are (by specification) scoped upon the owning Window.
-     *
-     * See https://stackoverflow.com/questions/43587286/why-does-instanceof-return-false-on-chrome-safari-and-edge-and-true-on-firefox
-     * for more details.
-     *
-     * @param {Element|Event}   Pelem       An element of the web page or one of its IFrame-based subdocuments.
-     * @param {string}          className   The plain-text name of the expected Element type.
-     * @return {boolean}
-     */
-    static instanceof(Pelem: Event|EventTarget, className: string): boolean {
-      var scopedClass;
-
-      if(!Pelem) {
-        // If we're bothering to check something's type, null references don't match
-        // what we're looking for.
-        return false;
-      }
-      if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
-        return className == 'Window';
-      } else if (Pelem['defaultView']) { // Covers Document.
-        scopedClass = Pelem['defaultView'][className];
-      } else if(Pelem['ownerDocument']) {
-        scopedClass = (Pelem as Node).ownerDocument.defaultView[className];
-      } else if(Pelem['target']) {
-        var event = Pelem as Event;
-
-        if(this.instanceof(event.target, 'Window')) {
-          scopedClass = event.target[className];
-        } else if(this.instanceof(event.target, 'Document')) {
-          scopedClass = (event.target as Document).defaultView[className];
-        } else if(this.instanceof(event.target, 'HTMLElement')) {
-          scopedClass = (event.target as HTMLElement).ownerDocument.defaultView[className];
-        }
-      }
-
-      if(scopedClass) {
-        return Pelem instanceof scopedClass;
-      } else {
-        return false;
-      }
-    }
-
-    static forceScroll(element: HTMLInputElement | HTMLTextAreaElement) {
-      // Needed to allow ./build_dev_resources.sh to complete;
-      // only executes when com.keyman.DOMEventHandlers is defined.
-      //
-      // We also bypass this whenever operating in the embedded format.
-      if(com && com.keyman && com.keyman['DOMEventHandlers'] && !com.keyman['singleton']['isEmbedded']) {
-        let DOMEventHandlers = com.keyman['DOMEventHandlers'];
-
-        let selectionStart = element.selectionStart;
-        let selectionEnd = element.selectionEnd;
-
-        DOMEventHandlers.states._IgnoreBlurFocus = true;
-        //Forces scrolling; the re-focus triggers the scroll, at least.
-        element.blur();
-        element.focus();
-        DOMEventHandlers.states._IgnoreBlurFocus = false;
-
-        // On Edge, it appears that the blur/focus combination will reset the caret position
-        // under certain scenarios during unit tests.  So, we re-set it afterward.
-        element.selectionStart = selectionStart;
-        element.selectionEnd = selectionEnd;
-      }
     }
   }
 }
