@@ -39,7 +39,7 @@ builder_describe "Builds the lm-layer module" \
 
 builder_describe_outputs \
   configure  /node_modules \
-  build      build/obj/index.js
+  build      build/lib/web/index.mjs # is built by the final step.
 
 builder_parse "$@"
 
