@@ -128,15 +128,16 @@ namespace kmcmp {
 }
 KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 {
+  const int str_size = 256;
   FILE *fp = NULL;
   if(fopen_s(&fp, filename, "rt") != 0) return FALSE;  // I3481
 
-  KMX_CHAR str[256], *p, *q, *context = NULL;
-  KMX_BOOL neol, first = TRUE;
+  KMX_CHAR str[str_size], *p, *q, *context = NULL;
+  KMX_BOOL isEol , first = TRUE;
 
-  while(fgets(str, 256, fp))
+  while(fgets(str, str_size, fp))
   {
-    neol = *(strchr(str, 0) - 1) == '\n';
+    isEol  = *(strchr(str, 0) - 1) == '\n';
     p = strtok_s(str, ";", &context);  // I3481
     q = strtok_s(NULL, ";\n", &context);
     if(p && q)
@@ -151,9 +152,9 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
         delete[] q0;
       }
     }
-    if(!neol)
+    if(!isEol )
     {
-      while(fgets(str, 256, fp)) if(*(strchr(str, 0)-1) == '\n') break;
+      while(fgets(str, str_size, fp)) if(*(strchr(str, 0)-1) == '\n') break;
     }
   }
 
@@ -164,24 +165,25 @@ KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 
 KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
 {
-  KMX_CHAR buf[260];
+  const int buf_size = 260;
+  KMX_CHAR buf[buf_size];
   // Look in current directory first
-  strncpy_s(buf, _countof(buf), filename, 259); buf[259] = 0;  // I3481
+  strncpy_s(buf, _countof(buf), filename, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
   if(FileExists(buf))
     return IntLoadFile(buf);
   // Then look in keyboard file directory (CompileDir)
-  strncpy_s(buf, _countof(buf), CompileDir, 259); buf[259] = 0;  // I3481
-  strncat_s(buf, _countof(buf), filename, 259-strlen(CompileDir)); buf[259] = 0;
+  strncpy_s(buf, _countof(buf), CompileDir, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
+  strncat_s(buf, _countof(buf), filename, (buf_size-1)-strlen(CompileDir)); buf[buf_size-1] = 0;
   if(FileExists(buf))
     return IntLoadFile(buf);
 
   //TODO: sort out how to find common includes in non-Windows platforms:
   #ifdef _WINDOWS_
     // Finally look in kmcmpdll.dll directory
-    GetModuleFileName(0, buf, 260);
+    GetModuleFileName(0, buf, buf_size);
     KMX_CHAR *p = strrchr(buf, '\\'); if(p) p++; else p = buf;
     *p = 0;
-    strncat_s(buf, _countof(buf), filename, 259-strlen(buf)); buf[259] = 0;  // I3481   // I3641
+    strncat_s(buf, _countof(buf), filename, (buf_size-1)-strlen(buf)); buf[buf_size-1] = 0;  // I3481   // I3641
     if(FileExists(buf))
       return IntLoadFile(buf);
   #endif
@@ -217,12 +219,12 @@ int NamedCodeConstants::GetCode(const KMX_WCHAR *codename, KMX_DWORD *storeIndex
   *storeIndex = 0xFFFFFFFFL;    // I2993
   int code = GetCode_IncludedCodes(codename);
   if(code) return code;
-  for(int i = 0; i < nEntries_file; i++)
-    if(!u16icmp(entries_file[i].name, codename))
-    {
+  for(int i = 0; i < nEntries_file; i++) {
+    if(!u16icmp(entries_file[i].name, codename)) {
       *storeIndex = entries_file[i].storeIndex;
       return entries_file[i].code;
     }
+  }
   return 0;
 }
 
@@ -293,19 +295,20 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
   if(strchr("GNDRMBSJCKTPH", ch))
   {
     /* Has an initial syllable */ 
-    int fdouble = towupper(*(codename+1)) == ch;
+    int isDoubled = towupper(*(codename+1)) == ch;
 
     LIndex = -1;
-    for(i = 0; i < HangulLCount; i++)
+    for(i = 0; i < HangulLCount; i++) {
       if(Hangul_JAMO_L_TABLE[i][0] == ch && 
-        (!fdouble || (Hangul_JAMO_L_TABLE[i][1] == ch && fdouble)))
+        (!isDoubled || (Hangul_JAMO_L_TABLE[i][1] == ch && isDoubled)))
       {
         LIndex = i;
         break;
       }
+    }
     if(LIndex == -1) return 0;
     codename++;
-    if(fdouble) codename++;
+    if(isDoubled) codename++;
   }
   else LIndex = 11; /* no initial */ 
 
@@ -317,8 +320,11 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
   if(V[1] && strchr("AEIOUWY", towupper(*(codename+2)))) V[2] = *(codename+2);
 
   VIndex = -1;
-  for(i = 0; i < HangulVCount; i++)
-  if(!u16icmp(Hangul_JAMO_V_TABLE[i], V)) { VIndex = i; break; }
+  for(i = 0; i < HangulVCount; i++) {
+    if(!u16icmp(Hangul_JAMO_V_TABLE[i], V)) {
+      VIndex = i;
+      break; }
+  }
 
   if(VIndex == -1) return 0;
 
@@ -328,8 +334,12 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
 
   TIndex = -1;
     
-  for(i = 0; i < HangulTCount; i++)
-  if(!u16icmp(Hangul_JAMO_T_TABLE[i], codename)) { TIndex = i; break; }
+  for(i = 0; i < HangulTCount; i++) {
+    if(!u16icmp(Hangul_JAMO_T_TABLE[i], codename)) {
+      TIndex = i;
+      break;
+      }
+  }
 
   if(TIndex == -1) return 0;
 
