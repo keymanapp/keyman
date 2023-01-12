@@ -50,12 +50,29 @@ int main(int argc, char *argv[])
     char* testname = strrchr( (char*) kmn_file, '\\') + 1;
     if (strncmp(testname, pfirst5, 5) == 0) return 1; //no Error found + CERR_ in Name
 
+       // TODO: compare argv[2] to ../build/argv[2]
+    FILE* fp1 = fopen(argv[2], "rb");
+    char fname[260];
+    strcpy(fname, argv[2]);
+    char* p = strrchr(fname, '\\');
+    if (!p) p = fname;
+    strcpy(p, "\\..\\build\\");
+    char* q = strrchr(argv[2], '\\');
+    if (!q) q = argv[2]; else q++;
+    strcat(p, q);
+
+
+
+
+
+/*
+
     // TODO: compare kmx_file to ../build/kmx_file
     FILE* fp1 = fopen(kmx_file, "rb");
     char fname[260];
     strcpy(fname, kmx_file);
     kmx_file[strlen(kmx_file)-1] = 'x'; // .kmn->.kmx
-
+ */
     FILE* fp2 = fopen(fname, "rb");
     if (!fp2) return 0; //assume pass if no reference kmx file
 

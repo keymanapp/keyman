@@ -98,11 +98,32 @@
 using namespace kmcmp;
 
 namespace kmcmp{
+
+  HINSTANCE g_hInstance;
+  KMX_BOOL  FWarnDeprecatedCode;
+  KMX_BOOL  FShouldAddCompilerVersion = TRUE;
+  KMX_BOOL  FSaveDebug, FCompilerWarningsAsErrors;   // I4865   // I4866
+  int ErrChr;
+  int nErrors = 0;
+  KMX_CHAR ErrExtra[256];
+  KMX_BOOL FMnemonicLayout = FALSE;
+  KMX_BOOL FOldCharPosMatching = FALSE;
+  int CompileTarget;
+  KMX_CHAR CompileDir[MAX_PATH];
+
+  KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved)
+  {
+    if (fdwReason == DLL_PROCESS_ATTACH) kmcmp::g_hInstance = hinst;
+    return TRUE;
+  }
+
   KMX_BOOL IsValidCallStore(PFILE_STORE fs);
   void RecordDeadkeyNames(PFILE_KEYBOARD fk);
   DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk);
   KMX_BOOL CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
   int UTF32ToUTF16(int n, int *n1, int *n2);
+  int CheckUTF16(int n);
+  int cmpkeys(const void *key, const void *elem);
 }
 
 int xatoi(PKMX_WCHAR *p);
@@ -217,21 +238,6 @@ enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeyma
 
 /* Compile target */
 
-namespace kmcmp{
-  HINSTANCE g_hInstance;
-  KMX_BOOL  FWarnDeprecatedCode;
-  KMX_BOOL  FShouldAddCompilerVersion = TRUE;
-  KMX_BOOL  FSaveDebug, FCompilerWarningsAsErrors;   // I4865   // I4866
-  int ErrChr;
-  int nErrors = 0;
-  KMX_CHAR ErrExtra[256];
-  KMX_BOOL FMnemonicLayout = FALSE;
-  KMX_BOOL FOldCharPosMatching = FALSE;
-  int CompileTarget;
-  KMX_CHAR CompileDir[MAX_PATH];
-}
-
-
 CompilerMessageProc msgproc = NULL;
 int kmcmp::currentLine = 0;
 
@@ -246,11 +252,6 @@ int BeginLine[4];
 #define CKF_KEYMANWEB 1
 
 namespace kmcmp {
-  KMX_BOOL WINAPI DllMain(HINSTANCE hinst, KMX_DWORD fdwReason, LPVOID lpvReserved)
-  {
-    if (fdwReason == DLL_PROCESS_ATTACH) kmcmp::g_hInstance = hinst;
-    return TRUE;
-  }
 }
 
 PKMX_WCHAR strtowstr(PKMX_STR in)
@@ -995,32 +996,32 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 
   return CheckForDuplicateGroup(fk, gp);
 }
-namespace kmcmp {
-  int cmpkeys(const void *key, const void *elem)
+
+int kmcmp::cmpkeys(const void *key, const void *elem)
+{
+  PFILE_KEY akey;
+  PFILE_KEY  aelem;
+  int l1, l2;
+  KMX_WCHAR char_key, char_elem;
+  akey = (PFILE_KEY)key;
+  aelem = (PFILE_KEY)elem;
+  char_key = kmcmp::VKToChar(akey->Key, akey->ShiftFlags);
+  char_elem = kmcmp::VKToChar(aelem->Key, aelem->ShiftFlags);
+  if (char_key == char_elem) //akey->Key == aelem->Key)
   {
-    PFILE_KEY akey;
-    PFILE_KEY  aelem;
-    int l1, l2;
-    KMX_WCHAR char_key, char_elem;
-    akey = (PFILE_KEY)key;
-    aelem = (PFILE_KEY)elem;
-    char_key = VKToChar(akey->Key, akey->ShiftFlags);
-    char_elem = VKToChar(aelem->Key, aelem->ShiftFlags);
-    if (char_key == char_elem) //akey->Key == aelem->Key)
+    l1 = xstrlen(akey->dpContext); l2 = xstrlen(aelem->dpContext);
+    if (l1 == l2)
     {
-      l1 = xstrlen(akey->dpContext); l2 = xstrlen(aelem->dpContext);
-      if (l1 == l2)
-      {
-        if (akey->Line < aelem->Line) return -1;
-        if (akey->Line > aelem->Line) return 1;
-        return 0;
-      }
-      if (l1 < l2) return 1;
-      if (l1 > l2) return -1;
+      if (akey->Line < aelem->Line) return -1;
+      if (akey->Line > aelem->Line) return 1;
+      return 0;
     }
-    return(char_key - char_elem); // akey->Key - aelem->Key);
+    if (l1 < l2) return 1;
+    if (l1 > l2) return -1;
   }
+  return(char_key - char_elem); // akey->Key - aelem->Key);
 }
+
 KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 {
   PFILE_GROUP gp;
@@ -3425,8 +3426,11 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   if (cur == fsize)
 
     // Always a "\r\n" to the EOF, avoids funny bugs
-    u16ncat(str, u"\r\n", _countof(str));  // I3481
-    //u16ncat(str, u"\n", _countof(str));  // I3481
+#if defined(_WIN32) || defined(_WIN64)
+  u16ncat(str, u"\r\n", _countof(str));  // I3481
+#else
+  u16ncat(str, u"\n", _countof(str));  // I3481
+#endif
 
   if (len == 0) return CERR_EndOfFile;
 
@@ -3629,26 +3633,26 @@ int atoiW(PKMX_WCHAR p)
   delete[] q;
   return i;
 }
-namespace kmcmp {
-  int CheckUTF16(int n)
-  {
-    const int res[] = {
-      0xFDD0, 0xFDD1, 0xFDD2, 0xFDD3, 0xFDD4, 0xFDD5, 0xFDD6, 0xFDD7,
-      0xFDD8, 0xFDD9, 0xFDDA, 0xFDDB, 0xFDDC, 0xFDDD, 0xFDDE, 0xFDDF,
-      0xFDE0, 0xFDE1, 0xFDE2, 0xFDE3, 0xFDE4, 0xFDE5, 0xFDE6, 0xFDE7,
-      0xFDE8, 0xFDE9, 0xFDEA, 0xFDEB, 0xFDEC, 0xFDED, 0xFDEE, 0xFDEF,
-      0xFFFF, 0xFFFE, 0 };
 
-    if (n == 0) return CERR_ReservedCharacter;
-    for (int i = 0; res[i] > 0; i++)
-      if (n == res[i])
-      {
-        AddWarning(CWARN_ReservedCharacter);
-        break;
-      }
-    return CERR_None;
-  }
+int kmcmp::CheckUTF16(int n)
+{
+  const int res[] = {
+    0xFDD0, 0xFDD1, 0xFDD2, 0xFDD3, 0xFDD4, 0xFDD5, 0xFDD6, 0xFDD7,
+    0xFDD8, 0xFDD9, 0xFDDA, 0xFDDB, 0xFDDC, 0xFDDD, 0xFDDE, 0xFDDF,
+    0xFDE0, 0xFDE1, 0xFDE2, 0xFDE3, 0xFDE4, 0xFDE5, 0xFDE6, 0xFDE7,
+    0xFDE8, 0xFDE9, 0xFDEA, 0xFDEB, 0xFDEC, 0xFDED, 0xFDEE, 0xFDEF,
+    0xFFFF, 0xFFFE, 0 };
+
+  if (n == 0) return CERR_ReservedCharacter;
+  for (int i = 0; res[i] > 0; i++)
+    if (n == res[i])
+    {
+      AddWarning(CWARN_ReservedCharacter);
+      break;
+    }
+  return CERR_None;
 }
+
 int kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
 {
   *n2 = -1;

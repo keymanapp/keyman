@@ -4,7 +4,7 @@
 
 /* Following code lifted from syskbd.cpp and tweaked for compiler use. Todo: consolidate */
 
-KMX_WCHAR VKToChar(KMX_WORD keyCode, KMX_UINT shiftFlags)
+KMX_WCHAR kmcmp::VKToChar(KMX_WORD keyCode, KMX_UINT shiftFlags)
 {
   KMX_CHAR shiftedDigit[] = ")!@#$%^&*(";
   int n, Shift;

@@ -28,13 +28,19 @@
 #include <kmcmpdll.h>
 using namespace kmcmp;
 
-namespace kmcmp {
-  extern KMX_CHAR CompileDir[];
-}
-
 int IsHangulSyllable(const KMX_WCHAR *codename, int *code);
 
 namespace kmcmp {
+  extern KMX_CHAR CompileDir[];
+
+  int __cdecl sort_entries(const void *elem1, const void *elem2)
+  {
+    return u16icmp(
+      ((NCCENTRY *)elem1)->name,
+      ((NCCENTRY *)elem2)->name);
+  }
+
+
   KMX_BOOL FileExists(const KMX_CHAR *filename)
   {
     intptr_t n;
@@ -118,14 +124,8 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
   nEntries++;
 }
 
-namespace kmcmp {
-  int __cdecl sort_entries(const void *elem1, const void *elem2)
-  {
-    return u16icmp(
-      ((NCCENTRY *)elem1)->name,
-      ((NCCENTRY *)elem2)->name);
-  }
-}
+//  int __cdecl sort_entries(const void *elem1, const void *elem2) moved into namespace further up
+
 KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
 {
   const int str_size = 256;
