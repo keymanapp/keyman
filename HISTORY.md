@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.28 alpha 2023-01-12
+
+* feat(linux): Display error messages in the UI (#8006)
+* bug(linux): Empty keyboard after failed installation (#8008)
+
 ## 17.0.27 alpha 2023-01-11
 
 * chore(linux): Refactor completion script (#8002)
