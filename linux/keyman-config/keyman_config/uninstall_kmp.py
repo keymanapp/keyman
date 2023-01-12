@@ -36,15 +36,26 @@ def uninstall_kmp_shared(packageID):
         packageID (str): Keyboard package ID
     """
     kbdir = get_keyboard_dir(InstallLocation.Shared, packageID)
+    kbdocdir = get_keyman_doc_dir(InstallLocation.Shared, packageID)
+    kbfontdir = get_keyman_font_dir(InstallLocation.Shared, packageID)
+
+    logging.info("Uninstalling shared keyboard: %s", packageID)
+
+    # need to uninstall from ibus for all lang and all kmx in kmp
+    info, system, options, keyboards, files = get_metadata(kbdir)
+    if keyboards:
+        if is_gnome_shell():
+            uninstall_keyboards_from_gnome(keyboards, kbdir)
+        else:
+            uninstall_keyboards_from_ibus(keyboards, kbdir)
+    else:
+        logging.warning("could not uninstall keyboards")
+
     if not os.path.isdir(kbdir):
         msg = _("Keyboard directory for %s does not exist." % packageID)
         logging.error(msg)
         return msg
 
-    kbdocdir = get_keyman_doc_dir(InstallLocation.Shared, packageID)
-    kbfontdir = get_keyman_font_dir(InstallLocation.Shared, packageID)
-
-    logging.info("Uninstalling shared keyboard: %s", packageID)
     if not os.access(kbdir, os.X_OK | os.W_OK):  # Check for write access of keyman dir
         msg = _("You do not have permissions to uninstall the keyboard files. You need to run this with `sudo`")
         logging.error(msg)
@@ -67,16 +78,6 @@ def uninstall_kmp_shared(packageID):
         logging.info("Removed font directory: %s", kbfontdir)
     else:
         logging.info("No font directory")
-
-    # need to uninstall from ibus for all lang and all kmx in kmp
-    info, system, options, keyboards, files = get_metadata(kbdir)
-    if keyboards:
-        if is_gnome_shell():
-            uninstall_keyboards_from_gnome(keyboards, kbdir)
-        else:
-            uninstall_keyboards_from_ibus(keyboards, kbdir)
-    else:
-        logging.warning("could not uninstall keyboards")
 
     delete_dir(kbdir)
     logging.info("Removed keyman directory: %s", kbdir)
@@ -130,11 +131,8 @@ def uninstall_kmp_user(packageID):
     Args:
         packageID (str): Keyboard package ID
     """
+    msg = ''
     kbdir = get_keyboard_dir(InstallLocation.User, packageID)
-    if not os.path.isdir(kbdir):
-        msg = _("Keyboard directory for %s does not exist." % packageID)
-        logging.error(msg)
-        return msg
     logging.info("Uninstalling local keyboard: %s", packageID)
     info, system, options, keyboards, files = get_metadata(kbdir)
     if keyboards:
@@ -146,14 +144,18 @@ def uninstall_kmp_user(packageID):
             uninstall_keyboards_from_ibus(keyboards, kbdir)
     else:
         logging.warning("could not uninstall keyboards")
-    delete_dir(kbdir)
-    logging.info("Removed user keyman directory: %s", kbdir)
+    if not os.path.isdir(kbdir):
+        msg = _("Keyboard directory for %s does not exist." % packageID)
+        logging.error(msg)
+    else:
+        delete_dir(kbdir)
+        logging.info("Removed user keyman directory: %s", kbdir)
     fontdir = get_keyman_font_dir(InstallLocation.User, packageID)
     if os.path.isdir(fontdir):
         delete_dir(fontdir)
         logging.info("Removed user keyman font directory: %s", fontdir)
     logging.info("Finished uninstalling local keyboard: %s", packageID)
-    return ''
+    return msg
 
 
 def uninstall_kmp(packageID, sharedarea=False):
